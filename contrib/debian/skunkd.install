@@ -1,0 +1,2 @@
+debian/bin/bhcoind usr/bin
+src/bhcoind usr/lib/bhcoin

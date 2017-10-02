@@ -1,27 +1,29 @@
-Source: novacoin
+Source: bhcoin
 Section: utils
 Priority: optional
-Maintainer: Alex D. <balthazar.ad@gmail.com>
-Uploaders: Alex D. <balthazar.ad@gmail.com>
+Maintainer: Jonas Smedegaard <dr@jones.dk>
+Uploaders: Micah Anderson <micah@debian.org>
 Build-Depends: debhelper,
  devscripts,
  bash-completion,
- libboost-system-dev,
- libdb++-dev,
+ libboost-system-dev (>> 1.35) | libboost-system1.35-dev,
+ libdb4.8++-dev,
  libssl-dev,
  pkg-config,
- libboost-filesystem-dev,
- libboost-program-options-dev,
- libboost-thread-dev,
+ libminiupnpc8-dev,
+ libboost-filesystem-dev (>> 1.35) | libboost-filesystem1.35-dev,
+ libboost-program-options-dev (>> 1.35) | libboost-program-options1.35-dev,
+ libboost-thread-dev (>> 1.35) | libboost-thread1.35-dev,
+ libboost-test-dev (>> 1.35) | libboost-test1.35-dev,
  qt4-qmake,
  libqt4-dev,
  libqrencode-dev
 Standards-Version: 3.9.2
-Homepage: http://www.novaco.in/
-Vcs-Git: git://github.com/novacoin-project/novacoin.git
-Vcs-Browser: http://github.com/novacoin-project/novacoin
+Homepage: http://www.bhcoin.co/
+Vcs-Git: git://github.com/rat4/bhcoin.git
+Vcs-Browser: http://github.com/rat4/bhcoin
 
-Package: novacoind
+Package: bhcoind
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: peer-to-peer network based digital currency - daemon
@@ -34,12 +36,12 @@ Description: peer-to-peer network based digital currency - daemon
  By default connects to an IRC network to discover other peers.
  .
  Full transaction history is stored locally at each client.  This
- requires 150+ MiB of space, slowly growing.
+ requires 2+ GB of space, slowly growing.
  .
- This package provides novacoind, a combined daemon and CLI tool to
+ This package provides bhcoind, a combined daemon and CLI tool to
  interact with the daemon.
 
-Package: novacoin-qt
+Package: bhcoin-qt
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: peer-to-peer network based digital currency - Qt GUI
@@ -52,6 +54,6 @@ Description: peer-to-peer network based digital currency - Qt GUI
  By default connects to an IRC network to discover other peers.
  .
  Full transaction history is stored locally at each client.  This
- requires 150+ MiB of space, slowly growing.
+ requires 2+ GB of space, slowly growing.
  .
- This package provides Novacoin-Qt, a GUI for Novacoin based on Qt.
+ This package provides Bhcoin-Qt, a GUI for Bhcoin based on Qt.

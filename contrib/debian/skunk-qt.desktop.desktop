@@ -1,0 +1,11 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=Bhcoin
+Comment=Bhcoin P2P Cryptocurrency
+Exec=/usr/bin/bhcoin-qt
+Terminal=false
+Type=Application
+Icon=/usr/share/pixmaps/bitcoin80.xpm
+MimeType=x-scheme-handler/bhcoin;
+Categories=Office;
+Name[en_US]=bhcoin-qt.desktop
