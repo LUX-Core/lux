@@ -8,35 +8,11 @@
 // Name of client reported in the 'version' message. Report the same name
 // for both bitcoind and bitcoin-qt, to make it harder for attackers to
 // target servers or GUI users specifically.
-const std::string CLIENT_NAME("Satoshi");
+const std::string CLIENT_NAME("Bhcoin");
 
 // Client version number
-#ifdef USE_LEVELDB
-#define CLIENT_VERSION_SUFFIX   "-leveldb"
-#else
-#define CLIENT_VERSION_SUFFIX   "-bdb"
-#endif
+#define CLIENT_VERSION_SUFFIX   ""
 
-// Compiler name
-#ifdef __INTEL_COMPILER
-//code specific to intel compiler
-#define CL_NAME   "-icpc"
-#elif _MSC_VER
-//code specific to MSVC compiler
-#define CL_NAME   "-msvc"
-#elif __clang__
-//code specific to clang compilers
-#define CL_NAME   "-clang"
-#elif __GNUC__
-//code for GNU C compiler
-#define CL_NAME   "-gcc"
-#elif __MINGW32__
-//code specific to mingw compilers
-#define CL_NAME   "-mingw"
-#else
-#define CL_NAME   "-genericcl"
-//others
-#endif
 
 // The following part of the code determines the CLIENT_BUILD variable.
 // Several mechanisms are used for this:
@@ -64,22 +40,18 @@ const std::string CLIENT_NAME("Satoshi");
 #    define GIT_COMMIT_DATE "$Format:%cD"
 #endif
 
-#define BUILD_DESC_FROM_COMMIT(maj,min,rev,commit) \
-    "nvc-v" DO_STRINGIZE(maj) "." DO_STRINGIZE(min) "." DO_STRINGIZE(rev) "." DO_STRINGIZE(build) "-g" commit
+#define BUILD_DESC_FROM_COMMIT(maj,min,rev,build,commit) \
+    "v" DO_STRINGIZE(maj) "." DO_STRINGIZE(min) "." DO_STRINGIZE(rev) "." DO_STRINGIZE(build) "-g" commit
 
-#define BUILD_DESC_FROM_UNKNOWN(maj,min,rev) \
-    "nvc-v" DO_STRINGIZE(maj) "." DO_STRINGIZE(min) "." DO_STRINGIZE(rev) "." DO_STRINGIZE(build) "-unk"
+#define BUILD_DESC_FROM_UNKNOWN(maj,min,rev,build) \
+    "v" DO_STRINGIZE(maj) "." DO_STRINGIZE(min) "." DO_STRINGIZE(rev) "." DO_STRINGIZE(build) "-unk"
 
 #ifndef BUILD_DESC
 #    ifdef GIT_COMMIT_ID
-#        define BUILD_DESC BUILD_DESC_FROM_COMMIT(DISPLAY_VERSION_MAJOR, DISPLAY_VERSION_MINOR, DISPLAY_VERSION_REVISION, GIT_COMMIT_ID)
+#        define BUILD_DESC BUILD_DESC_FROM_COMMIT(CLIENT_VERSION_MAJOR, CLIENT_VERSION_MINOR, CLIENT_VERSION_REVISION, CLIENT_VERSION_BUILD, GIT_COMMIT_ID)
 #    else
-#        define BUILD_DESC BUILD_DESC_FROM_UNKNOWN(DISPLAY_VERSION_MAJOR, DISPLAY_VERSION_MINOR, DISPLAY_VERSION_REVISION)
+#        define BUILD_DESC BUILD_DESC_FROM_UNKNOWN(CLIENT_VERSION_MAJOR, CLIENT_VERSION_MINOR, CLIENT_VERSION_REVISION, CLIENT_VERSION_BUILD)
 #    endif
-#endif
-
-#ifdef _MSC_VER
-#undef GIT_COMMIT_DATE
 #endif
 
 #ifndef BUILD_DATE
@@ -90,5 +62,5 @@ const std::string CLIENT_NAME("Satoshi");
 #    endif
 #endif
 
-const std::string CLIENT_BUILD(BUILD_DESC CLIENT_VERSION_SUFFIX CL_NAME);
+const std::string CLIENT_BUILD(BUILD_DESC CLIENT_VERSION_SUFFIX);
 const std::string CLIENT_DATE(BUILD_DATE);
