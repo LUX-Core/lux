@@ -8,3 +8,11 @@ Development process
 02/10/2017 -----> Added echo hash into PHI1612
 
 03/10/2017 -----> New Phi1612 hashing algorithm completed
+Note: Not finished yet, still need some work. 
+
+-------------------------------------------------------------------
+
+<b> ccminer & sgminer for phi1612 algo </b> 
+
+Haven't test Phi1612 hash using GPU yet. I appreciate that if anyone can give me a hand to add phi1612 hasing into ccminer & sgminer.
+
