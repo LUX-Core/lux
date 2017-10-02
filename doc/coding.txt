@@ -28,7 +28,7 @@ someVariable.
 
 Common types:
 n       integer number: short, unsigned short, int, unsigned int,
-            int64, uint64, sometimes char if used as a number
+            int64_t, uint64_t, sometimes char if used as a number
 d       double, float
 f       flag
 hash    uint256
@@ -61,12 +61,6 @@ and its cs_KeyStore lock for example).
 Threads
 
 StartNode : Starts other threads.
-
-ThreadGetMyExternalIP : Determines outside-the-firewall IP address,
-sends addr message to connected peers when it determines it. 
-
-ThreadIRCSeed : Joins IRC bootstrapping channel, watching for new
-peers and advertising this node's IP address. 
 
 ThreadSocketHandler : Sends/Receives data from peers on port 8333.
 

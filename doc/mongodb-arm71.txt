@@ -1,0 +1,10 @@
+W.I.P mongoDB for ARM71- 32bit
+
+apt-get install build-essential libssl-dev git scons libboost-filesystem-dev libboost-program-options-dev libboost-system-dev libboost-thread-dev
+git clone --branch "r3.3.9" --depth 1 https://github.com/mongodb/mongo.git
+cd mongo
+scons --disable-warnings-as-errors --js-engine=mozjs mongo mongod
+./mongo mongodb://localhost:5002/sample
+
+
+-The Doctor

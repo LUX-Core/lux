@@ -1,0 +1,70 @@
+Head over to https://www.raspberrypi.org/downloads/raspbian/ and download the LITE version. As of writing this, it is 
+RASPBIAN STRETCH LITE. Extract the file with .img extension only from the compressed archieve.
+Download the microSD card burner from https://etcher.io
+Insert your microSD card reader/writer and burn the .img file on your microSD card.
+After a successful burn & eject , remove the microSD card from the writer and insert it into Raspberry Pi and hook it up with a 
+HDMI Monitor or a TV. For video demonstration, just watch https://www.youtube.com/watch?v=GJDIgS8nres
+
+Default login is "pi" and password is "raspberry"
+Run raspi-config and enable ssh access on your Pi first. ( you have to use sudo there )
+Read: http://www.instructables.com/id/Use-ssh-to-talk-with-your-Raspberry-Pi/
+Find out the IP address of your Pi by logging into your home DSL/Fiber device. It will show as "pi".
+
+From now on, just paste the following commands to your raspberry
+
+sudo passwd (set up sudo access. its self explanatory)
+sudo apt-get update
+sudo apt-get upgrade -y
+sudo apt-get install build-essential libssl-dev libdb++-dev libdb-dev libboost-all-dev libqrencode-dev libminiupnpc-dev nano git
+sudo git clone https://github.com/bhcoind/source.git
+cd source/src/leveldb/
+sudo chmod +x build_detect_platform
+sudo make libleveldb.a libmemenv.a
+cd .. .. ( its two times .. with a space )
+sudo make -f makefile.unix -j2 ( this will build the wallet / daemon for your Pi. Patience there ...)
+sudo strip bhcoind
+sudo mv bhcoind /usr/bin
+bhcoind ( run it once and wait for it to give you a config missing error )
+cd ( enter )
+cd .bhcoind ( enter )
+wget https://raw.githubusercontent.com/bhcoind/releases/master/bhcoin.conf ( enter )
+cd ( enter )
+bhcoind ( enter )
+
+^ this runs the wallet or the daemon. You can check the sync progress by issuing:
+
+tail -f .bhcoind/debug.log ( press Ctrl+C to cancel )
+
+Get a wallet address
+
+bhcoind getnewaddress ( enter )
+
+Copy that address and send 1 BHC as a test. Wait for a block confirmation and it should show up after you do a :
+
+bhcoind getbalance ( enter )
+
+To enable staking on your Pi device, edit bhcoin.conf file located in .bhcoin folder.
+
+sudo nano .bhcoin/bhcoin.conf ( enter )
+
+add line "staking=1" ( Press Ctrl + X to exit while saving "
+
+bhcoind stop (enter)
+bhcoind (enter)
+bhcoind getinfo ( enter )
+
+Make sure it says "staking: true:
+
+If you wish to take backup of your staking wallet or copy over your current desktop wallet, use WinSCP or Filezilla client.
+Be sure to specy IP, user and password in the file transfer client. Protocol should be SCP and port 22. For Filezilla,
+user the following :
+
+host: sftp://pi-ipaddress user: pi password:your-password port:22
+
+Jump to .bhcoin folder and copy the wallet.dat or place your wallet backup there in that folder. ( Important: Make sure 
+bhcoind stop) is done before you do this.
+
+Thats pretty much it. Ask me for tips on Discord or Telegram on how to stake BHC on your PI.
+
+-The Doctor
+
