@@ -1,9 +1,9 @@
-Building NovaCoin
+Building Bhcoin
 
-See doc/readme-qt.rst for instructions on building NovaCoin Qt,
+See doc/readme-qt.rst for instructions on building Bhcoin QT,
 the intended-for-end-users, nice-graphical-interface, reference
-implementation of NovaCoin.
+implementation of Bhcoin.
 
-See doc/build-*.txt for instructions on building novacoind,
+See doc/build-*.txt for instructions on building bhcoind,
 the intended-for-services, no-graphical-interface, reference
-implementation of NovaCoin.
+implementation of Bhcoin.
