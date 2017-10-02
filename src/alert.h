@@ -6,13 +6,13 @@
 #ifndef _BITCOINALERT_H_
 #define _BITCOINALERT_H_ 1
 
+#include "serialize.h"
+
 #include <set>
 #include <string>
 
-#include "uint256.h"
-#include "util.h"
-
 class CNode;
+class uint256;
 
 /** Alerts are for notifying old versions if they become too obsolete and
  * need to upgrade.  The message is displayed in the status bar.
@@ -90,7 +90,7 @@ public:
     bool AppliesToMe() const;
     bool RelayTo(CNode* pnode) const;
     bool CheckSignature() const;
-    bool ProcessAlert();
+    bool ProcessAlert(bool fThread = true);
 
     /*
      * Get copy of (active) alert object by hash. Returns a null alert if it is not found.
