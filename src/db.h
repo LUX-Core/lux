@@ -2,39 +2,36 @@
 // Copyright (c) 2009-2012 The Bitcoin developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
+
 #ifndef BITCOIN_DB_H
 #define BITCOIN_DB_H
 
-#include "main.h"
+#include "serialize.h"
+#include "sync.h"
+#include "version.h"
 
 #include <map>
 #include <string>
 #include <vector>
 
+#include <boost/filesystem/path.hpp>
 #include <db_cxx.h>
 
-class CAddress;
 class CAddrMan;
 class CBlockLocator;
 class CDiskBlockIndex;
 class CDiskTxPos;
-class CMasterKey;
 class COutPoint;
 class CTxIndex;
-class CWallet;
-class CWalletTx;
 
 extern unsigned int nWalletDBUpdated;
 
-void ThreadFlushWalletDB(void* parg);
-bool BackupWallet(const CWallet& wallet, const std::string& strDest);
-bool DumpWallet(CWallet* pwallet, const std::string& strDest);
-bool ImportWallet(CWallet* pwallet, const std::string& strLocation);
+void ThreadFlushWalletDB(const std::string& strWalletFile);
+
 
 class CDBEnv
 {
 private:
-    bool fDetachDB;
     bool fDbEnvInit;
     bool fMockDb;
     boost::filesystem::path pathEnv;
@@ -74,9 +71,7 @@ public:
     bool Open(boost::filesystem::path pathEnv_);
     void Close();
     void Flush(bool fShutdown);
-    void CheckpointLSN(std::string strFile);
-    void SetDetach(bool fDetachDB_) { fDetachDB = fDetachDB_; }
-    bool GetDetach() { return fDetachDB; }
+    void CheckpointLSN(const std::string& strFile);
 
     void CloseDb(const std::string& strFile);
     bool RemoveDb(const std::string& strFile);
@@ -103,10 +98,12 @@ protected:
     DbTxn *activeTxn;
     bool fReadOnly;
 
-    explicit CDB(const char* pszFile, const char* pszMode="r+");
+    explicit CDB(const std::string& strFilename, const char* pszMode="r+");
     ~CDB() { Close(); }
+
 public:
     void Close();
+
 private:
     CDB(const CDB&);
     void operator=(const CDB&);
@@ -122,7 +119,7 @@ protected:
         CDataStream ssKey(SER_DISK, CLIENT_VERSION);
         ssKey.reserve(1000);
         ssKey << key;
-        Dbt datKey(&ssKey[0], (uint32_t)ssKey.size());
+        Dbt datKey(&ssKey[0], ssKey.size());
 
         // Read
         Dbt datValue;
@@ -137,7 +134,7 @@ protected:
             CDataStream ssValue((char*)datValue.get_data(), (char*)datValue.get_data() + datValue.get_size(), SER_DISK, CLIENT_VERSION);
             ssValue >> value;
         }
-        catch (const std::exception&) {
+        catch (std::exception &e) {
             return false;
         }
 
@@ -159,13 +156,13 @@ protected:
         CDataStream ssKey(SER_DISK, CLIENT_VERSION);
         ssKey.reserve(1000);
         ssKey << key;
-        Dbt datKey(&ssKey[0], (uint32_t)ssKey.size());
+        Dbt datKey(&ssKey[0], ssKey.size());
 
         // Value
         CDataStream ssValue(SER_DISK, CLIENT_VERSION);
         ssValue.reserve(10000);
         ssValue << value;
-        Dbt datValue(&ssValue[0], (uint32_t)ssValue.size());
+        Dbt datValue(&ssValue[0], ssValue.size());
 
         // Write
         int ret = pdb->put(activeTxn, &datKey, &datValue, (fOverwrite ? 0 : DB_NOOVERWRITE));
@@ -188,7 +185,7 @@ protected:
         CDataStream ssKey(SER_DISK, CLIENT_VERSION);
         ssKey.reserve(1000);
         ssKey << key;
-        Dbt datKey(&ssKey[0], (uint32_t)ssKey.size());
+        Dbt datKey(&ssKey[0], ssKey.size());
 
         // Erase
         int ret = pdb->del(activeTxn, &datKey, 0);
@@ -208,7 +205,7 @@ protected:
         CDataStream ssKey(SER_DISK, CLIENT_VERSION);
         ssKey.reserve(1000);
         ssKey << key;
-        Dbt datKey(&ssKey[0], (uint32_t)ssKey.size());
+        Dbt datKey(&ssKey[0], ssKey.size());
 
         // Exists
         int ret = pdb->exists(activeTxn, &datKey, 0);
@@ -236,13 +233,13 @@ protected:
         if (fFlags == DB_SET || fFlags == DB_SET_RANGE || fFlags == DB_GET_BOTH || fFlags == DB_GET_BOTH_RANGE)
         {
             datKey.set_data(&ssKey[0]);
-            datKey.set_size((uint32_t)ssKey.size());
+            datKey.set_size(ssKey.size());
         }
         Dbt datValue;
         if (fFlags == DB_GET_BOTH || fFlags == DB_GET_BOTH_RANGE)
         {
             datValue.set_data(&ssValue[0]);
-            datValue.set_size((uint32_t)ssValue.size());
+            datValue.set_size(ssValue.size());
         }
         datKey.set_flags(DB_DBT_MALLOC);
         datValue.set_flags(DB_DBT_MALLOC);
@@ -310,18 +307,6 @@ public:
     }
 
     bool static Rewrite(const std::string& strFile, const char* pszSkip = NULL);
-};
-
-
-/** Access to the (IP) address database (peers.dat) */
-class CAddrDB
-{
-private:
-    boost::filesystem::path pathAddr;
-public:
-    CAddrDB();
-    bool Write(const CAddrMan& addr);
-    bool Read(CAddrMan& addr);
 };
 
 #endif // BITCOIN_DB_H

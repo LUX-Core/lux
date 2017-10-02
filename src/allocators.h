@@ -144,7 +144,7 @@ public:
     bool Lock(const void *addr, size_t len)
     {
 #ifdef WIN32
-        return VirtualLock(const_cast<void*>(addr), len) != 0;
+        return VirtualLock(const_cast<void*>(addr), len);
 #else
         return mlock(addr, len) == 0;
 #endif
@@ -155,7 +155,7 @@ public:
     bool Unlock(const void *addr, size_t len)
     {
 #ifdef WIN32
-        return VirtualUnlock(const_cast<void*>(addr), len) != 0;
+        return VirtualUnlock(const_cast<void*>(addr), len);
 #else
         return munlock(addr, len) == 0;
 #endif
@@ -175,6 +175,19 @@ private:
         LockedPageManagerBase<MemoryPageLocker>(GetSystemPageSize())
     {}
 };
+
+//
+// Functions for directly locking/unlocking memory objects.
+// Intended for non-dynamically allocated structures.
+//
+template<typename T> void LockObject(const T &t) {
+    LockedPageManager::instance.LockRange((void*)(&t), sizeof(T));
+}
+
+template<typename T> void UnlockObject(const T &t) {
+    OPENSSL_cleanse((void*)(&t), sizeof(T));
+    LockedPageManager::instance.UnlockRange((void*)(&t), sizeof(T));
+}
 
 //
 // Allocator that locks its contents from being paged
