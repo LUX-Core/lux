@@ -1,0 +1,12 @@
+obj/core.o: core.cpp core.h uint256.h serialize.h allocators.h version.h \
+ clientversion.h util.h tinyformat.h script.h keystore.h key.h hash.h \
+ obj/phi1612/sph_skein.h obj/phi1612/sph_types.h obj/phi1612/sph_jh.h \
+ obj/phi1612/sph_cubehash.h obj/phi1612/sph_fugue.h \
+ obj/phi1612/sph_gost.h obj/phi1612/sph_echo.h sync.h threadsafety.h \
+ bignum.h
+core.cpp core.h uint256.h serialize.h allocators.h version.h :
+ clientversion.h util.h tinyformat.h script.h keystore.h key.h hash.h :
+ obj/phi1612/sph_skein.h obj/phi1612/sph_types.h obj/phi1612/sph_jh.h :
+ obj/phi1612/sph_cubehash.h obj/phi1612/sph_fugue.h :
+ obj/phi1612/sph_gost.h obj/phi1612/sph_echo.h sync.h threadsafety.h :
+ bignum.h :

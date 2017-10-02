@@ -1,5 +1,7 @@
 #include "transactionfilterproxy.h"
+
 #include "transactiontablemodel.h"
+#include "transactionrecord.h"
 
 #include <QDateTime>
 
@@ -17,7 +19,8 @@ TransactionFilterProxy::TransactionFilterProxy(QObject *parent) :
     addrPrefix(),
     typeFilter(ALL_TYPES),
     minAmount(0),
-    limitRows(-1)
+    limitRows(-1),
+    showInactive(true)
 {
 }
 
@@ -30,7 +33,10 @@ bool TransactionFilterProxy::filterAcceptsRow(int sourceRow, const QModelIndex &
     QString address = index.data(TransactionTableModel::AddressRole).toString();
     QString label = index.data(TransactionTableModel::LabelRole).toString();
     qint64 amount = llabs(index.data(TransactionTableModel::AmountRole).toLongLong());
+    int status = index.data(TransactionTableModel::StatusRole).toInt();
 
+    if(!showInactive && (status == TransactionStatus::Conflicted || status == TransactionStatus::NotAccepted))
+        return false;
     if(!(TYPE(type) & typeFilter))
         return false;
     if(datetime < dateFrom || datetime > dateTo)
@@ -71,6 +77,12 @@ void TransactionFilterProxy::setMinAmount(qint64 minimum)
 void TransactionFilterProxy::setLimit(int limit)
 {
     this->limitRows = limit;
+}
+
+void TransactionFilterProxy::setShowInactive(bool showInactive)
+{
+    this->showInactive = showInactive;
+    invalidateFilter();
 }
 
 int TransactionFilterProxy::rowCount(const QModelIndex &parent) const

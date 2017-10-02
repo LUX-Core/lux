@@ -3,8 +3,8 @@
 
 #include <QString>
 #include <QObject>
-#include <string>
 
+class TransactionRecord;
 class CWallet;
 class CWalletTx;
 
@@ -13,8 +13,10 @@ class CWalletTx;
 class TransactionDesc: public QObject
 {
     Q_OBJECT
+
 public:
-    static QString toHTML(CWallet *wallet, CWalletTx &wtx);
+    static QString toHTML(CWallet *wallet, CWalletTx &wtx, TransactionRecord *rec, int unit);
+
 private:
     TransactionDesc() {}
 

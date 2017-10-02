@@ -1,9 +1,5 @@
-// Copyright (c) 2011-2013 The Bitcoin developers
-// Distributed under the MIT/X11 software license, see the accompanying
-// file COPYING or http://www.opensource.org/licenses/mit-license.php.
-
-#ifndef BITCOIN_QT_TRAFFICGRAPHWIDGET_H
-#define BITCOIN_QT_TRAFFICGRAPHWIDGET_H
+#ifndef TRAFFICGRAPHWIDGET_H
+#define TRAFFICGRAPHWIDGET_H
 
 #include <QWidget>
 #include <QQueue>
@@ -45,4 +41,4 @@ private:
     ClientModel *clientModel;
 };
 
-#endif // BITCOIN_QT_TRAFFICGRAPHWIDGET_H
+#endif // TRAFFICGRAPHWIDGET_H

@@ -4,21 +4,19 @@
 #include "addressbookpage.h"
 #include "base58.h"
 #include "guiutil.h"
-#include "dialogwindowflags.h"
 #include "init.h"
 #include "main.h"
 #include "optionsmodel.h"
 #include "walletmodel.h"
 #include "wallet.h"
 
+#include <QClipboard>
+
 #include <string>
 #include <vector>
 
-#include <QClipboard>
-#include <QKeyEvent>
-
 SignVerifyMessageDialog::SignVerifyMessageDialog(QWidget *parent) :
-    QWidget(parent, DIALOGWINDOWHINTS),
+    QDialog(parent),
     ui(new Ui::SignVerifyMessageDialog),
     model(0)
 {
@@ -26,11 +24,11 @@ SignVerifyMessageDialog::SignVerifyMessageDialog(QWidget *parent) :
 
 #if (QT_VERSION >= 0x040700)
     /* Do not move this to the XML file, Qt before 4.7 will choke on it */
-    ui->addressIn_SM->setPlaceholderText(tr("Enter a NovaCoin address (e.g. 4Zo1ga6xuKuQ7JV7M9rGDoxdbYwV5zgQJ5)"));
+    ui->addressIn_SM->setPlaceholderText(tr("Enter a Bhcoin address (e.g. SjBj1QvJvsAkU5EBKggdZ8gWc4oK2F5AMY)"));
     ui->signatureOut_SM->setPlaceholderText(tr("Click \"Sign Message\" to generate signature"));
 
-    ui->addressIn_VM->setPlaceholderText(tr("Enter a NovaCoin address (e.g. 4Zo1ga6xuKuQ7JV7M9rGDoxdbYwV5zgQJ5)"));
-    ui->signatureIn_VM->setPlaceholderText(tr("Enter NovaCoin signature"));
+    ui->addressIn_VM->setPlaceholderText(tr("Enter a Bhcoin address (e.g. SjBj1QvJvsAkU5EBKggdZ8gWc4oK2F5AMY)"));
+    ui->signatureIn_VM->setPlaceholderText(tr("Enter Bhcoin signature"));
 #endif
 
     GUIUtil::setupAddressWidget(ui->addressIn_SM, this);
@@ -104,6 +102,9 @@ void SignVerifyMessageDialog::on_pasteButton_SM_clicked()
 
 void SignVerifyMessageDialog::on_signMessageButton_SM_clicked()
 {
+    if (!model)
+        return;
+
     /* Clear old signature to ensure users don't get confused on error with an old signature displayed */
     ui->signatureOut_SM->clear();
 
@@ -220,8 +221,8 @@ void SignVerifyMessageDialog::on_verifyMessageButton_VM_clicked()
     ss << strMessageMagic;
     ss << ui->messageIn_VM->document()->toPlainText().toStdString();
 
-    CPubKey key;
-    if (!key.SetCompactSignature(Hash(ss.begin(), ss.end()), vchSig))
+    CPubKey pubkey;
+    if (!pubkey.RecoverCompact(Hash(ss.begin(), ss.end()), vchSig))
     {
         ui->signatureIn_VM->setValid(false);
         ui->statusLabel_VM->setStyleSheet("QLabel { color: red; }");
@@ -229,7 +230,7 @@ void SignVerifyMessageDialog::on_verifyMessageButton_VM_clicked()
         return;
     }
 
-    if (!(CBitcoinAddress(key.GetID()) == addr))
+    if (!(CBitcoinAddress(pubkey.GetID()) == addr))
     {
         ui->statusLabel_VM->setStyleSheet("QLabel { color: red; }");
         ui->statusLabel_VM->setText(QString("<nobr>") + tr("Message verification failed.") + QString("</nobr>"));
@@ -272,20 +273,5 @@ bool SignVerifyMessageDialog::eventFilter(QObject *object, QEvent *event)
             ui->statusLabel_VM->clear();
         }
     }
-    return QWidget::eventFilter(object, event);
-}
-
-void SignVerifyMessageDialog::keyPressEvent(QKeyEvent *event)
-{
-#ifdef ANDROID
-    if(event->key() == Qt::Key_Back)
-    {
-        close();
-    }
-#else
-    if(event->key() == Qt::Key_Escape)
-    {
-        close();
-    }
-#endif
+    return QDialog::eventFilter(object, event);
 }

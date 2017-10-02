@@ -1,0 +1,16 @@
+obj/script.o: script.cpp script.h keystore.h key.h allocators.h \
+ serialize.h version.h clientversion.h uint256.h hash.h \
+ obj/phi1612/sph_skein.h obj/phi1612/sph_types.h obj/phi1612/sph_jh.h \
+ obj/phi1612/sph_cubehash.h obj/phi1612/sph_fugue.h \
+ obj/phi1612/sph_gost.h obj/phi1612/sph_echo.h sync.h threadsafety.h \
+ bignum.h util.h tinyformat.h main.h core.h txmempool.h net.h mruset.h \
+ netbase.h compat.h protocol.h chainparams.h addrman.h timedata.h \
+ scrypt.h
+script.cpp script.h keystore.h key.h allocators.h :
+ serialize.h version.h clientversion.h uint256.h hash.h :
+ obj/phi1612/sph_skein.h obj/phi1612/sph_types.h obj/phi1612/sph_jh.h :
+ obj/phi1612/sph_cubehash.h obj/phi1612/sph_fugue.h :
+ obj/phi1612/sph_gost.h obj/phi1612/sph_echo.h sync.h threadsafety.h :
+ bignum.h util.h tinyformat.h main.h core.h txmempool.h net.h mruset.h :
+ netbase.h compat.h protocol.h chainparams.h addrman.h timedata.h :
+ scrypt.h :

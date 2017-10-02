@@ -52,23 +52,6 @@
    <item row="5" column="1">
     <widget class="BitcoinAmountField" name="payAmount"/>
    </item>
-   <item row="4" column="1">
-    <layout class="QHBoxLayout" name="horizontalLayout_2">
-     <property name="spacing">
-      <number>0</number>
-     </property>
-     <item>
-      <widget class="QValidatedLineEdit" name="addAsLabel" native="true">
-       <property name="enabled">
-        <bool>true</bool>
-       </property>
-       <property name="toolTip">
-        <string>Enter a label for this address to add it to your address book</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
    <item row="4" column="0">
     <widget class="QLabel" name="label_4">
      <property name="text">
@@ -88,12 +71,12 @@
       <number>0</number>
      </property>
      <item>
-      <widget class="QValidatedLineEdit" name="payTo" native="true">
+      <widget class="QValidatedLineEdit" name="payTo">
        <property name="toolTip">
-        <string>The address to send the payment to  (e.g. 4Zo1ga6xuKuQ7JV7M9rGDoxdbYwV5zgQJ5)</string>
+        <string>The address to send the payment to (e.g. SjBj1QvJvsAkU5EBKggdZ8gWc4oK2F5AMY)</string>
        </property>
-       <property name="maxLength" stdset="0">
-        <number>100</number>
+       <property name="maxLength">
+        <number>34</number>
        </property>
       </widget>
      </item>
@@ -147,12 +130,19 @@
      </item>
     </layout>
    </item>
+   <item row="4" column="1">
+    <widget class="QValidatedLineEdit" name="addAsLabel">
+     <property name="toolTip">
+      <string>Enter a label for this address to add it to your address book</string>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <customwidgets>
   <customwidget>
    <class>QValidatedLineEdit</class>
-   <extends>QWidget</extends>
+   <extends>QLineEdit</extends>
    <header>qvalidatedlineedit.h</header>
   </customwidget>
   <customwidget>

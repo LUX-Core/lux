@@ -1,0 +1,4 @@
+obj/version.o: version.cpp version.h clientversion.h \
+ /home/bh/source/src/obj/build.h
+version.cpp version.h clientversion.h :
+ /home/bh/source/src/obj/build.h :

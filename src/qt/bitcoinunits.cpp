@@ -34,9 +34,9 @@ QString BitcoinUnits::name(int unit)
 {
     switch(unit)
     {
-    case BTC: return QString("NVC");
-    case mBTC: return QString("mNVC");
-    case uBTC: return QString::fromUtf8("μNVC");
+    case BTC: return QString("BHC");
+    case mBTC: return QString("mBHC");
+    case uBTC: return QString::fromUtf8("μBHC");
     default: return QString("???");
     }
 }
@@ -45,9 +45,9 @@ QString BitcoinUnits::description(int unit)
 {
     switch(unit)
     {
-    case BTC: return QString(QObject::tr("NovaCoins"));
-    case mBTC: return QString(QObject::tr("Milli-NovaCoins (1 / 1,000)"));
-    case uBTC: return QString(QObject::tr("Micro-NovaCoins (1 / 1,000,000)"));
+    case BTC: return QString("Bhcoins");
+    case mBTC: return QString("Milli-Bhcoins (1 / 1,000)");
+    case uBTC: return QString("Micro-Bhcoins (1 / 1,000,000)");
     default: return QString("???");
     }
 }
@@ -56,10 +56,10 @@ qint64 BitcoinUnits::factor(int unit)
 {
     switch(unit)
     {
-    case BTC:  return 1000000;
-    case mBTC: return 1000;
-    case uBTC: return 1;
-    default:   return 1000000;
+    case BTC:  return 100000000;
+    case mBTC: return 100000;
+    case uBTC: return 100;
+    default:   return 100000000;
     }
 }
 
@@ -78,14 +78,14 @@ int BitcoinUnits::decimals(int unit)
 {
     switch(unit)
     {
-    case BTC: return 6;
-    case mBTC: return 3;
-    case uBTC: return 0;
+    case BTC: return 8;
+    case mBTC: return 5;
+    case uBTC: return 2;
     default: return 0;
     }
 }
 
-QString BitcoinUnits::format(int unit, qint64 n, bool fPlus, uint8_t nNumberOfZeros)
+QString BitcoinUnits::format(int unit, qint64 n, bool fPlus)
 {
     // Note: not using straight sprintf here because we do NOT want
     // localized number formatting.
@@ -101,7 +101,7 @@ QString BitcoinUnits::format(int unit, qint64 n, bool fPlus, uint8_t nNumberOfZe
 
     // Right-trim excess zeros after the decimal point
     int nTrim = 0;
-    for (int i = remainder_str.size()-1; i>=nNumberOfZeros && (remainder_str.at(i) == '0'); --i)
+    for (int i = remainder_str.size()-1; i>=2 && (remainder_str.at(i) == '0'); --i)
         ++nTrim;
     remainder_str.chop(nTrim);
 
@@ -112,9 +112,9 @@ QString BitcoinUnits::format(int unit, qint64 n, bool fPlus, uint8_t nNumberOfZe
     return quotient_str + QString(".") + remainder_str;
 }
 
-QString BitcoinUnits::formatWithUnit(int unit, qint64 amount, bool plussign, uint8_t nNumberOfZeros)
+QString BitcoinUnits::formatWithUnit(int unit, qint64 amount, bool plussign)
 {
-    return format(unit, amount, plussign, nNumberOfZeros) + QString(" ") + name(unit);
+    return format(unit, amount, plussign) + QString(" ") + name(unit);
 }
 
 bool BitcoinUnits::parse(int unit, const QString &value, qint64 *val_out)
@@ -178,14 +178,4 @@ QVariant BitcoinUnits::data(const QModelIndex &index, int role) const
         }
     }
     return QVariant();
-}
-
-QString BitcoinUnits::getAmountColumnTitle(int unit)
-{
-    QString amountTitle = QObject::tr("Amount");
-    if (BitcoinUnits::valid(unit))
-    {
-        amountTitle += " ("+BitcoinUnits::name(unit) + ")";
-    }
-    return amountTitle;
 }

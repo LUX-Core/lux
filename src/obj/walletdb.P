@@ -1,0 +1,16 @@
+obj/walletdb.o: walletdb.cpp walletdb.h db.h serialize.h allocators.h \
+ version.h clientversion.h sync.h threadsafety.h key.h uint256.h hash.h \
+ obj/phi1612/sph_skein.h obj/phi1612/sph_types.h obj/phi1612/sph_jh.h \
+ obj/phi1612/sph_cubehash.h obj/phi1612/sph_fugue.h \
+ obj/phi1612/sph_gost.h obj/phi1612/sph_echo.h base58.h chainparams.h \
+ bignum.h util.h tinyformat.h script.h keystore.h protocol.h netbase.h \
+ compat.h wallet.h crypter.h main.h core.h txmempool.h net.h mruset.h \
+ addrman.h timedata.h scrypt.h ui_interface.h
+walletdb.cpp walletdb.h db.h serialize.h allocators.h :
+ version.h clientversion.h sync.h threadsafety.h key.h uint256.h hash.h :
+ obj/phi1612/sph_skein.h obj/phi1612/sph_types.h obj/phi1612/sph_jh.h :
+ obj/phi1612/sph_cubehash.h obj/phi1612/sph_fugue.h :
+ obj/phi1612/sph_gost.h obj/phi1612/sph_echo.h base58.h chainparams.h :
+ bignum.h util.h tinyformat.h script.h keystore.h protocol.h netbase.h :
+ compat.h wallet.h crypter.h main.h core.h txmempool.h net.h mruset.h :
+ addrman.h timedata.h scrypt.h ui_interface.h :

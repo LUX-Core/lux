@@ -1,0 +1,12 @@
+obj/addrman.o: addrman.cpp addrman.h netbase.h serialize.h allocators.h \
+ version.h clientversion.h compat.h protocol.h chainparams.h bignum.h \
+ uint256.h util.h tinyformat.h sync.h threadsafety.h timedata.h hash.h \
+ obj/phi1612/sph_skein.h obj/phi1612/sph_types.h obj/phi1612/sph_jh.h \
+ obj/phi1612/sph_cubehash.h obj/phi1612/sph_fugue.h \
+ obj/phi1612/sph_gost.h obj/phi1612/sph_echo.h
+addrman.cpp addrman.h netbase.h serialize.h allocators.h :
+ version.h clientversion.h compat.h protocol.h chainparams.h bignum.h :
+ uint256.h util.h tinyformat.h sync.h threadsafety.h timedata.h hash.h :
+ obj/phi1612/sph_skein.h obj/phi1612/sph_types.h obj/phi1612/sph_jh.h :
+ obj/phi1612/sph_cubehash.h obj/phi1612/sph_fugue.h :
+ obj/phi1612/sph_gost.h obj/phi1612/sph_echo.h :

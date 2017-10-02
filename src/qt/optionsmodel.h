@@ -3,6 +3,8 @@
 
 #include <QAbstractListModel>
 
+extern bool fUseBlackTheme;
+
 /** Interface from Qt to configuration data structure for Bitcoin client.
    To Qt, the options are presented as a list with the different options
    laid out vertically.
@@ -19,24 +21,17 @@ public:
     enum OptionID {
         StartAtStartup,    // bool
         MinimizeToTray,    // bool
+        MapPortUPnP,       // bool
         MinimizeOnClose,   // bool
         ProxyUse,          // bool
         ProxyIP,           // QString
         ProxyPort,         // int
-        ProxySocksVersion, // int
-        TorUse,            // bool
-        TorIP,             // QString
-        TorPort,           // int
-        TorOnly,           // bool
-        TorName,           // QString
         Fee,               // qint64
+        ReserveBalance,    // qint64
         DisplayUnit,       // BitcoinUnits::Unit
-        DisplayAddresses,  // bool
-        ThirdPartyTxUrls,  // QString
-        DetachDatabases,   // bool
         Language,          // QString
         CoinControlFeatures, // bool
-        ExternalSeeder,    // QString
+        UseBlackTheme,     // bool
         OptionIDRowCount,
     };
 
@@ -48,26 +43,24 @@ public:
 
     /* Explicit getters */
     qint64 getTransactionFee();
+    qint64 getReserveBalance();
     bool getMinimizeToTray();
     bool getMinimizeOnClose();
     int getDisplayUnit();
-    bool getDisplayAddresses();
     bool getCoinControlFeatures();
-    QString getThirdPartyTxUrls() { return strThirdPartyTxUrls; }
     QString getLanguage() { return language; }
 
 private:
     int nDisplayUnit;
-    bool bDisplayAddresses;
     bool fMinimizeToTray;
     bool fMinimizeOnClose;
     bool fCoinControlFeatures;
     QString language;
-    QString strThirdPartyTxUrls;
 
 signals:
     void displayUnitChanged(int unit);
     void transactionFeeChanged(qint64);
+    void reserveBalanceChanged(qint64);
     void coinControlFeaturesChanged(bool);
 };
 

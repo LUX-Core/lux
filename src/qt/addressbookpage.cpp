@@ -17,7 +17,6 @@
 #include <QMessageBox>
 #include <QMenu>
 
-
 AddressBookPage::AddressBookPage(Mode mode, Tabs tab, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::AddressBookPage),
@@ -32,6 +31,10 @@ AddressBookPage::AddressBookPage(Mode mode, Tabs tab, QWidget *parent) :
     ui->newAddressButton->setIcon(QIcon());
     ui->copyToClipboard->setIcon(QIcon());
     ui->deleteButton->setIcon(QIcon());
+#endif
+
+#ifndef USE_QRCODE
+    ui->showQRCode->setVisible(false);
 #endif
 
     switch(mode)
@@ -51,22 +54,18 @@ AddressBookPage::AddressBookPage(Mode mode, Tabs tab, QWidget *parent) :
         ui->labelExplanation->setVisible(false);
         ui->deleteButton->setVisible(true);
         ui->signMessage->setVisible(false);
-        ui->verifyMessage->setVisible(true);
         break;
     case ReceivingTab:
         ui->deleteButton->setVisible(false);
         ui->signMessage->setVisible(true);
-        ui->verifyMessage->setVisible(false);
         break;
     }
 
     // Context menu actions
-    QAction *copyLabelAction = new QAction(tr("Copy &Label"), this);
     QAction *copyAddressAction = new QAction(ui->copyToClipboard->text(), this);
+    QAction *copyLabelAction = new QAction(tr("Copy &Label"), this);
     QAction *editAction = new QAction(tr("&Edit"), this);
-#ifdef USE_QRCODE
-    QAction *showQRCodeAction = new QAction(tr("Show &QR Code"), this);
-#endif
+    QAction *showQRCodeAction = new QAction(ui->showQRCode->text(), this);
     QAction *signMessageAction = new QAction(ui->signMessage->text(), this);
     QAction *verifyMessageAction = new QAction(ui->verifyMessage->text(), this);
     deleteAction = new QAction(ui->deleteButton->text(), this);
@@ -79,9 +78,9 @@ AddressBookPage::AddressBookPage(Mode mode, Tabs tab, QWidget *parent) :
     if(tab == SendingTab)
         contextMenu->addAction(deleteAction);
     contextMenu->addSeparator();
-    #ifdef USE_QRCODE
-        contextMenu->addAction(showQRCodeAction);
-    #endif
+#ifdef USE_QRCODE
+    contextMenu->addAction(showQRCodeAction);
+#endif
     if(tab == ReceivingTab)
         contextMenu->addAction(signMessageAction);
     else if(tab == SendingTab)
@@ -92,11 +91,10 @@ AddressBookPage::AddressBookPage(Mode mode, Tabs tab, QWidget *parent) :
     connect(copyLabelAction, SIGNAL(triggered()), this, SLOT(onCopyLabelAction()));
     connect(editAction, SIGNAL(triggered()), this, SLOT(onEditAction()));
     connect(deleteAction, SIGNAL(triggered()), this, SLOT(on_deleteButton_clicked()));
-    #ifdef USE_QRCODE
-        connect(showQRCodeAction, SIGNAL(triggered()), this, SLOT(on_showQRCode_clicked()));
-    #endif
+    connect(showQRCodeAction, SIGNAL(triggered()), this, SLOT(on_showQRCode_clicked()));
     connect(signMessageAction, SIGNAL(triggered()), this, SLOT(on_signMessage_clicked()));
     connect(verifyMessageAction, SIGNAL(triggered()), this, SLOT(on_verifyMessage_clicked()));
+
     connect(ui->tableView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(contextualMenu(QPoint)));
 
     // Pass through accept action from button box
@@ -138,13 +136,9 @@ void AddressBookPage::setModel(AddressTableModel *model)
     // Set column widths
     ui->tableView->horizontalHeader()->resizeSection(
             AddressTableModel::Address, 320);
-#if QT_VERSION < 0x050000
     ui->tableView->horizontalHeader()->setResizeMode(
             AddressTableModel::Label, QHeaderView::Stretch);
-#else
-    ui->tableView->horizontalHeader()->setSectionResizeMode(
-    AddressTableModel::Label, QHeaderView::Stretch);
-#endif
+
     connect(ui->tableView->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)),
             this, SLOT(selectionChanged()));
 
@@ -192,36 +186,31 @@ void AddressBookPage::on_signMessage_clicked()
 {
     QTableView *table = ui->tableView;
     QModelIndexList indexes = table->selectionModel()->selectedRows(AddressTableModel::Address);
-    QString addr;
 
     foreach (QModelIndex index, indexes)
     {
-        QVariant address = index.data();
-        addr = address.toString();
+        QString address = index.data().toString();
+        emit signMessage(address);
     }
-
-    emit signMessage(addr);
 }
 
 void AddressBookPage::on_verifyMessage_clicked()
 {
     QTableView *table = ui->tableView;
     QModelIndexList indexes = table->selectionModel()->selectedRows(AddressTableModel::Address);
-    QString addr;
 
     foreach (QModelIndex index, indexes)
     {
-        QVariant address = index.data();
-        addr = address.toString();
+        QString address = index.data().toString();
+        emit verifyMessage(address);
     }
-
-    emit verifyMessage(addr);
 }
 
 void AddressBookPage::on_newAddressButton_clicked()
 {
     if(!model)
         return;
+
     EditAddressDialog dlg(
             tab == SendingTab ?
             EditAddressDialog::NewSendingAddress :
@@ -238,6 +227,7 @@ void AddressBookPage::on_deleteButton_clicked()
     QTableView *table = ui->tableView;
     if(!table->selectionModel())
         return;
+
     QModelIndexList indexes = table->selectionModel()->selectedRows();
     if(!indexes.isEmpty())
     {
@@ -278,10 +268,12 @@ void AddressBookPage::selectionChanged()
             break;
         }
         ui->copyToClipboard->setEnabled(true);
+        ui->showQRCode->setEnabled(true);
     }
     else
     {
         ui->deleteButton->setEnabled(false);
+        ui->showQRCode->setEnabled(false);
         ui->copyToClipboard->setEnabled(false);
         ui->signMessage->setEnabled(false);
         ui->verifyMessage->setEnabled(false);
@@ -341,17 +333,17 @@ void AddressBookPage::exportClicked()
 
 void AddressBookPage::on_showQRCode_clicked()
 {
- #ifdef USE_QRCODE
+#ifdef USE_QRCODE
     QTableView *table = ui->tableView;
     QModelIndexList indexes = table->selectionModel()->selectedRows(AddressTableModel::Address);
 
     foreach (QModelIndex index, indexes)
     {
-        QString address = index.data().toString(), label = index.sibling(index.row(), 0).data(Qt::EditRole).toString();
+        QString address = index.data().toString();
+        QString label = index.sibling(index.row(), 0).data(Qt::EditRole).toString();
 
         QRCodeDialog *dialog = new QRCodeDialog(address, label, tab == ReceivingTab, this);
-        if(optionsModel)
-            dialog->setModel(optionsModel);
+        dialog->setModel(optionsModel);
         dialog->setAttribute(Qt::WA_DeleteOnClose);
         dialog->show();
     }

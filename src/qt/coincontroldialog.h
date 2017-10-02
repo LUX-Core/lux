@@ -3,7 +3,7 @@
 
 #include <QAbstractButton>
 #include <QAction>
-#include <QWidget>
+#include <QDialog>
 #include <QList>
 #include <QMenu>
 #include <QPoint>
@@ -16,13 +16,9 @@ namespace Ui {
 class WalletModel;
 class CCoinControl;
 
-#define ASYMP_UTF8 "\xE2\x89\x88"
-
-class CoinControlDialog : public QWidget
+class CoinControlDialog : public QDialog
 {
     Q_OBJECT
-signals:
-    void beforeClose();
 
 public:
     explicit CoinControlDialog(QWidget *parent = 0);
@@ -31,14 +27,11 @@ public:
     void setModel(WalletModel *model);
 
     // static because also called from sendcoinsdialog
-    static void updateLabels(WalletModel*, QWidget*);
+    static void updateLabels(WalletModel*, QDialog*);
     static QString getPriorityLabel(double);
 
     static QList<qint64> payAmounts;
     static CCoinControl *coinControl;
-
-protected:
-    void closeEvent(QCloseEvent* e);
 
 private:
     Ui::CoinControlDialog *ui;
@@ -56,8 +49,6 @@ private:
     void sortView(int, Qt::SortOrder);
     void updateView();
 
-    void keyPressEvent(QKeyEvent *);
-
     enum
     {
         COLUMN_CHECKBOX,
@@ -66,7 +57,6 @@ private:
         COLUMN_ADDRESS,
         COLUMN_DATE,
         COLUMN_CONFIRMATIONS,
-        COLUMN_WEIGHT,
         COLUMN_PRIORITY,
         COLUMN_TXHASH,
         COLUMN_VOUT_INDEX,
@@ -94,7 +84,7 @@ private slots:
     void radioListMode(bool);
     void viewItemChanged(QTreeWidgetItem*, int);
     void headerSectionClicked(int);
-    void on_buttonBox_accepted();
+    void buttonBoxClicked(QAbstractButton*);
     void buttonSelectAllClicked();
     //void updateLabelLocked();
 };

@@ -1,7 +1,7 @@
 #ifndef OPTIONSDIALOG_H
 #define OPTIONSDIALOG_H
 
-#include <QWidget>
+#include <QDialog>
 
 namespace Ui {
 class OptionsDialog;
@@ -11,7 +11,7 @@ class MonitoredDataMapper;
 class QValidatedLineEdit;
 
 /** Preferences dialog. */
-class OptionsDialog : public QWidget
+class OptionsDialog : public QDialog
 {
     Q_OBJECT
 
@@ -24,7 +24,6 @@ public:
 
 protected:
     bool eventFilter(QObject *object, QEvent *event);
-    void keyPressEvent(QKeyEvent *);
 
 private slots:
     /* enable only apply button */
@@ -42,29 +41,20 @@ private slots:
     void on_applyButton_clicked();
 
     void showRestartWarning_Proxy();
-    void showRestartWarning_Tor();
     void showRestartWarning_Lang();
-    void showRestartWarning_URL();
     void updateDisplayUnit();
     void handleProxyIpValid(QValidatedLineEdit *object, bool fState);
-    void handleTorIpValid(QValidatedLineEdit *object, bool fState);
-
-    void on_chooseSeeder_clicked();
 
 signals:
     void proxyIpValid(QValidatedLineEdit *object, bool fValid);
-    void torIpValid(QValidatedLineEdit *object, bool fValid);
 
 private:
     Ui::OptionsDialog *ui;
     OptionsModel *model;
     MonitoredDataMapper *mapper;
     bool fRestartWarningDisplayed_Proxy;
-    bool fRestartWarningDisplayed_Tor;
     bool fRestartWarningDisplayed_Lang;
-    bool fRestartWarningDisplayed_URL;
     bool fProxyIpValid;
-    bool fTorIpValid;
 };
 
 #endif // OPTIONSDIALOG_H

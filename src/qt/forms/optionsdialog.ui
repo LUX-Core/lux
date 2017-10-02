@@ -1,17 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>OptionsDialog</class>
- <widget class="QWidget" name="OptionsDialog">
+ <widget class="QDialog" name="OptionsDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>595</width>
+    <width>540</width>
     <height>380</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Options</string>
+  </property>
+  <property name="modal">
+   <bool>true</bool>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -20,7 +23,7 @@
       <enum>QTabWidget::North</enum>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tabMain">
       <attribute name="title">
@@ -30,7 +33,7 @@
        <item>
         <widget class="QLabel" name="transactionFeeInfoLabel">
          <property name="text">
-          <string>Optional transaction fee per kB that helps make sure your transactions are processed quickly. Most transactions are 1 kB. Fee 0.001 recommended.</string>
+          <string>Optional transaction fee per kB that helps make sure your transactions are processed quickly. Most transactions are 1 kB. Fee 0.01 recommended.</string>
          </property>
          <property name="textFormat">
           <enum>Qt::PlainText</enum>
@@ -41,7 +44,7 @@
         </widget>
        </item>
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_Main">
+        <layout class="QHBoxLayout" name="horizontalLayoutFee">
          <item>
           <widget class="QLabel" name="transactionFeeLabel">
            <property name="text">
@@ -59,14 +62,53 @@
           <widget class="BitcoinAmountField" name="transactionFee"/>
          </item>
          <item>
-          <widget class="QLabel" name="label">
+          <spacer name="horizontalSpacerFee">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QLabel" name="reserveBalanceInfoLabel">
+         <property name="text">
+          <string>Reserved amount does not participate in staking and is therefore spendable at any time.</string>
+         </property>
+         <property name="textFormat">
+          <enum>Qt::PlainText</enum>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayoutReserveBalance">
+         <item>
+          <widget class="QLabel" name="reserveBalanceLabel">
            <property name="text">
-            <string>per kilobyte</string>
+            <string>Reserve</string>
+           </property>
+           <property name="textFormat">
+            <enum>Qt::PlainText</enum>
+           </property>
+           <property name="buddy">
+            <cstring>reserveBalance</cstring>
            </property>
           </widget>
          </item>
          <item>
-          <spacer name="horizontalSpacer_Main">
+          <widget class="BitcoinAmountField" name="reserveBalance"/>
+         </item>
+         <item>
+          <spacer name="horizontalSpacerReserveBalance">
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
            </property>
@@ -83,20 +125,10 @@
        <item>
         <widget class="QCheckBox" name="bitcoinAtStartup">
          <property name="toolTip">
-          <string>Automatically start NovaCoin after logging in to the system.</string>
+          <string>Automatically start Bhcoin after logging in to the system.</string>
          </property>
          <property name="text">
-          <string>&amp;Start NovaCoin on system login</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QCheckBox" name="detachDatabases">
-         <property name="toolTip">
-          <string>Detach block and address databases at shutdown. This means they can be moved to another data directory, but it slows down shutdown. The wallet is always detached.</string>
-         </property>
-         <property name="text">
-          <string>&amp;Detach databases at shutdown</string>
+          <string>&amp;Start Bhcoin on system login</string>
          </property>
         </widget>
        </item>
@@ -107,8 +139,8 @@
          </property>
          <property name="sizeHint" stdset="0">
           <size>
-           <width>17</width>
-           <height>153</height>
+           <width>20</width>
+           <height>40</height>
           </size>
          </property>
         </spacer>
@@ -121,12 +153,22 @@
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_Network">
        <item>
-        <widget class="QCheckBox" name="connectSocks">
+        <widget class="QCheckBox" name="mapPortUpnp">
          <property name="toolTip">
-          <string>Connect to the NovaCoin network through a SOCKS proxy (e.g. when connecting through Tor).</string>
+          <string>Automatically open the Bhcoin client port on the router. This only works when your router supports UPnP and it is enabled.</string>
          </property>
          <property name="text">
-          <string>&amp;Connect through SOCKS proxy:</string>
+          <string>Map port using &amp;UPnP</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="connectSocks">
+         <property name="toolTip">
+          <string>Connect to the Bhcoin network through a SOCKS5 proxy (e.g. when connecting through Tor).</string>
+         </property>
+         <property name="text">
+          <string>&amp;Connect through SOCKS5 proxy:</string>
          </property>
         </widget>
        </item>
@@ -185,26 +227,6 @@
           </widget>
          </item>
          <item>
-          <widget class="QLabel" name="socksVersionLabel">
-           <property name="text">
-            <string>SOCKS &amp;Version:</string>
-           </property>
-           <property name="textFormat">
-            <enum>Qt::PlainText</enum>
-           </property>
-           <property name="buddy">
-            <cstring>socksVersion</cstring>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QValueComboBox" name="socksVersion">
-           <property name="toolTip">
-            <string>SOCKS version of the proxy (e.g. 5)</string>
-           </property>
-          </widget>
-         </item>
-         <item>
           <spacer name="horizontalSpacer_Network">
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
@@ -220,132 +242,7 @@
         </layout>
        </item>
        <item>
-        <widget class="QCheckBox" name="connectTor">
-         <property name="text">
-          <string>Connect through &amp;Tor:</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_Tor">
-         <item>
-          <widget class="QLabel" name="torIpLabel">
-           <property name="minimumSize">
-            <size>
-             <width>60</width>
-             <height>0</height>
-            </size>
-           </property>
-           <property name="text">
-            <string>Tor IP:</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QValidatedLineEdit" name="torIp">
-           <property name="maximumSize">
-            <size>
-             <width>115</width>
-             <height>16777215</height>
-            </size>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="torPortLabel">
-           <property name="text">
-            <string>Port:</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLineEdit" name="torPort">
-           <property name="maximumSize">
-            <size>
-             <width>55</width>
-             <height>16777215</height>
-            </size>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QCheckBox" name="TorOnly">
-           <property name="text">
-            <string>Use Tor only</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <spacer name="horizontalSpacer">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout">
-         <item>
-          <widget class="QLabel" name="torNameLabel">
-           <property name="text">
-            <string>Tor name:</string>
-           </property>
-           <property name="textFormat">
-            <enum>Qt::PlainText</enum>
-           </property>
-           <property name="buddy">
-            <cstring>torName</cstring>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLineEdit" name="torName"/>
-         </item>
-         <item>
-          <spacer name="horizontalSpacer_3">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_3">
-         <item>
-          <widget class="QLabel" name="externalSeederLabel">
-           <property name="text">
-            <string>Seeder command:</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLineEdit" name="externalSeederCommand"/>
-         </item>
-         <item>
-          <widget class="QPushButton" name="chooseSeeder">
-           <property name="text">
-            <string>Choose ...</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <spacer name="verticalSpacer">
+        <spacer name="verticalSpacer_Network">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>
@@ -377,7 +274,7 @@
        <item>
         <widget class="QCheckBox" name="minimizeOnClose">
          <property name="toolTip">
-          <string>Minimize instead of exit the application when the window is closed. When this option is enabled, the application will be closed only after selecting Exit in the menu.</string>
+          <string>Minimize instead of exit the application when the window is closed. When this option is enabled, the application will be closed only after selecting Quit in the menu.</string>
          </property>
          <property name="text">
           <string>M&amp;inimize on close</string>
@@ -422,7 +319,7 @@
          <item>
           <widget class="QValueComboBox" name="lang">
            <property name="toolTip">
-            <string>The user interface language can be set here. This setting will take effect after restarting NovaCoin.</string>
+            <string>The user interface language can be set here. This setting will take effect after restarting Bhcoin.</string>
            </property>
           </widget>
          </item>
@@ -453,16 +350,6 @@
         </layout>
        </item>
        <item>
-        <widget class="QCheckBox" name="displayAddresses">
-         <property name="toolTip">
-          <string>Whether to show NovaCoin addresses in the transaction list or not.</string>
-         </property>
-         <property name="text">
-          <string>&amp;Display addresses in transaction list</string>
-         </property>
-        </widget>
-       </item>
-       <item>
         <widget class="QCheckBox" name="coinControlFeatures">
          <property name="toolTip">
           <string>Whether to show coin control features or not.</string>
@@ -473,28 +360,11 @@
         </widget>
        </item>
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_3_Display">
-         <item>
-          <widget class="QLabel" name="thirdPartyTxUrlsLabel">
-           <property name="toolTip">
-            <string>Third party URLs (e.g. explorer.novaco.in) that appear in the transactions tab as context menu items. %s in the URL is replaced by transaction hash. Multiple URLs are separated by vertical bar |.</string>
-           </property>
-           <property name="text">
-            <string>Third party transaction URLs</string>
-           </property>
-           <property name="buddy">
-            <cstring>thirdPartyTxUrls</cstring>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLineEdit" name="thirdPartyTxUrls">
-           <property name="toolTip">
-            <string>Third party URLs (e.g. explorer.novaco.in) that appear in the transactions tab as context menu items. %s in the URL is replaced by transaction hash. Multiple URLs are separated by vertical bar |.</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
+        <widget class="QCheckBox" name="useBlackTheme">
+         <property name="text">
+          <string>Use black visual theme (requires restart)</string>
+         </property>
+        </widget>
        </item>
        <item>
         <spacer name="verticalSpacer_Display">

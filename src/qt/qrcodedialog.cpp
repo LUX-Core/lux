@@ -2,7 +2,6 @@
 #include "ui_qrcodedialog.h"
 
 #include "bitcoinunits.h"
-#include "dialogwindowflags.h"
 #include "guiconstants.h"
 #include "guiutil.h"
 #include "optionsmodel.h"
@@ -13,7 +12,7 @@
 #include <qrencode.h>
 
 QRCodeDialog::QRCodeDialog(const QString &addr, const QString &label, bool enableReq, QWidget *parent) :
-    QDialog(parent, DIALOGWINDOWHINTS),
+    QDialog(parent),
     ui(new Ui::QRCodeDialog),
     model(0),
     address(addr)
@@ -84,7 +83,7 @@ void QRCodeDialog::genCode()
 
 QString QRCodeDialog::getURI()
 {
-    QString ret = QString("novacoin:%1").arg(address);
+    QString ret = QString("bhcoin:%1").arg(address);
     int paramCount = 0;
 
     ui->outUri->clear();

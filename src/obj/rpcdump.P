@@ -1,0 +1,22 @@
+obj/rpcdump.o: rpcdump.cpp init.h wallet.h walletdb.h db.h serialize.h \
+ allocators.h version.h clientversion.h sync.h threadsafety.h key.h \
+ uint256.h hash.h obj/phi1612/sph_skein.h obj/phi1612/sph_types.h \
+ obj/phi1612/sph_jh.h obj/phi1612/sph_cubehash.h obj/phi1612/sph_fugue.h \
+ obj/phi1612/sph_gost.h obj/phi1612/sph_echo.h crypter.h keystore.h \
+ main.h core.h util.h tinyformat.h script.h bignum.h txmempool.h net.h \
+ mruset.h netbase.h compat.h protocol.h chainparams.h addrman.h \
+ timedata.h scrypt.h ui_interface.h rpcserver.h rpcprotocol.h \
+ json/json_spirit_reader_template.h json/json_spirit_value.h \
+ json/json_spirit_error_position.h json/json_spirit_utils.h \
+ json/json_spirit_writer_template.h base58.h
+rpcdump.cpp init.h wallet.h walletdb.h db.h serialize.h :
+ allocators.h version.h clientversion.h sync.h threadsafety.h key.h :
+ uint256.h hash.h obj/phi1612/sph_skein.h obj/phi1612/sph_types.h :
+ obj/phi1612/sph_jh.h obj/phi1612/sph_cubehash.h obj/phi1612/sph_fugue.h :
+ obj/phi1612/sph_gost.h obj/phi1612/sph_echo.h crypter.h keystore.h :
+ main.h core.h util.h tinyformat.h script.h bignum.h txmempool.h net.h :
+ mruset.h netbase.h compat.h protocol.h chainparams.h addrman.h :
+ timedata.h scrypt.h ui_interface.h rpcserver.h rpcprotocol.h :
+ json/json_spirit_reader_template.h json/json_spirit_value.h :
+ json/json_spirit_error_position.h json/json_spirit_utils.h :
+ json/json_spirit_writer_template.h base58.h :

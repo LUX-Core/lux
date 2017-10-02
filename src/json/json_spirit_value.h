@@ -16,9 +16,10 @@
 #include <cassert>
 #include <sstream>
 #include <stdexcept>
-#include <boost/config.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/variant.hpp>
+#include <stdint.h>
+#include <boost/config.hpp> 
+#include <boost/shared_ptr.hpp> 
+#include <boost/variant.hpp> 
 
 namespace json_spirit
 {
@@ -64,8 +65,8 @@ namespace json_spirit
         const Array&       get_array()  const;
         bool               get_bool()   const;
         int                get_int()    const;
-        int64_t            get_int64()  const;
-        uint64_t           get_uint64() const;
+        int64_t     get_int64()  const;
+        uint64_t    get_uint64() const;
         double             get_real()   const;
 
         Object& get_obj();

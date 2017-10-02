@@ -28,6 +28,9 @@ namespace json_spirit
     template< class String_type >
     String_type non_printable_to_string( unsigned int c )
     {
+        // Silence the warning: typedef ‘Char_type’ locally defined but not used [-Wunused-local-typedefs]
+        // typedef typename String_type::value_type Char_type;
+
         String_type result( 6, '\\' );
 
         result[1] = 'u';
@@ -73,7 +76,6 @@ namespace json_spirit
 
             if( add_esc_char( c, result ) ) continue;
 
-            // FIXME: This comparison is always true on some platforms
             const wint_t unsigned_c( ( c >= 0 ) ? c : 256 + c );
 
             if( iswprint( unsigned_c ) )

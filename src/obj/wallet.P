@@ -1,0 +1,28 @@
+obj/wallet.o: wallet.cpp wallet.h walletdb.h db.h serialize.h \
+ allocators.h version.h clientversion.h sync.h threadsafety.h key.h \
+ uint256.h hash.h obj/phi1612/sph_skein.h obj/phi1612/sph_types.h \
+ obj/phi1612/sph_jh.h obj/phi1612/sph_cubehash.h obj/phi1612/sph_fugue.h \
+ obj/phi1612/sph_gost.h obj/phi1612/sph_echo.h crypter.h keystore.h \
+ main.h core.h util.h tinyformat.h script.h bignum.h txmempool.h net.h \
+ mruset.h netbase.h compat.h protocol.h chainparams.h addrman.h \
+ timedata.h scrypt.h ui_interface.h base58.h coincontrol.h kernel.h \
+ txdb.h txdb-leveldb.h /home/bh/source/src/leveldb/include/leveldb/db.h \
+ /home/bh/source/src/leveldb/include/leveldb/iterator.h \
+ /home/bh/source/src/leveldb/include/leveldb/slice.h \
+ /home/bh/source/src/leveldb/include/leveldb/status.h \
+ /home/bh/source/src/leveldb/include/leveldb/options.h \
+ /home/bh/source/src/leveldb/include/leveldb/write_batch.h
+wallet.cpp wallet.h walletdb.h db.h serialize.h :
+ allocators.h version.h clientversion.h sync.h threadsafety.h key.h :
+ uint256.h hash.h obj/phi1612/sph_skein.h obj/phi1612/sph_types.h :
+ obj/phi1612/sph_jh.h obj/phi1612/sph_cubehash.h obj/phi1612/sph_fugue.h :
+ obj/phi1612/sph_gost.h obj/phi1612/sph_echo.h crypter.h keystore.h :
+ main.h core.h util.h tinyformat.h script.h bignum.h txmempool.h net.h :
+ mruset.h netbase.h compat.h protocol.h chainparams.h addrman.h :
+ timedata.h scrypt.h ui_interface.h base58.h coincontrol.h kernel.h :
+ txdb.h txdb-leveldb.h /home/bh/source/src/leveldb/include/leveldb/db.h :
+ /home/bh/source/src/leveldb/include/leveldb/iterator.h :
+ /home/bh/source/src/leveldb/include/leveldb/slice.h :
+ /home/bh/source/src/leveldb/include/leveldb/status.h :
+ /home/bh/source/src/leveldb/include/leveldb/options.h :
+ /home/bh/source/src/leveldb/include/leveldb/write_batch.h :
