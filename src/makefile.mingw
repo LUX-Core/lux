@@ -2,52 +2,44 @@
 # Distributed under the MIT/X11 software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-USE_LEVELDB:=0
-CC=gcc
-
-
-USE_IPV6:=1
-USE_SSE2:=1
-
-BOOST_SUFFIX?=-mgw49-mt-s-1_57
+USE_UPNP:=0
+USE_WALLET:=1
 
 INCLUDEPATHS= \
- -I"$(CURDIR)" \
- -I"/c/deps/boost_1_57_0" \
- -I"/c/deps" \
- -I"/c/deps/db-6.0.20/build_unix" \
- -I"/c/deps/openssl-1.0.2/include"
- 
+ -I"C:\boost-1.50.0-mgw" \
+ -I"C:\db-4.8.30.NC-mgw\build_unix" \
+ -I"C:\openssl-1.0.1c-mgw\include"
+
 LIBPATHS= \
- -L"$(CURDIR)/leveldb" \
- -L"/c/deps/boost_1_57_0/stage/lib" \
- -L"/c/deps/db-6.0.20/build_unix" \
- -L"/c/deps/openssl-1.0.2"
+ -L"C:\boost-1.50.0-mgw\stage\lib" \
+ -L"C:\db-4.8.30.NC-mgw\build_unix" \
+ -L"C:\openssl-1.0.1c-mgw"
 
 LIBS= \
-  -l leveldb \
-  -l memenv \
-  -l boost_system$(BOOST_SUFFIX) \
-  -l boost_filesystem$(BOOST_SUFFIX) \
-  -l boost_program_options$(BOOST_SUFFIX) \
-  -l boost_thread$(BOOST_SUFFIX) \
-  -l boost_chrono$(BOOST_SUFFIX) \
-  -l db_cxx \
-  -l ssl \
-  -l crypto
+ -l boost_system-mgw44-mt-1_53 \
+ -l boost_filesystem-mgw44-mt-1_53 \
+ -l boost_program_options-mgw44-mt-1_53 \
+ -l boost_thread-mgw44-mt-1_53 \
+ -l boost_chrono-mgw44-mt-1_53 \
+ -l db_cxx \
+ -l ssl \
+ -l crypto
 
-xOPT_LEVEL=-O2
-ifeq (${USE_O3}, 1)
-    xOPT_LEVEL=-O3
-endif
-
-DEFS=-DWIN32 -D_WINDOWS -DBOOST_THREAD_USE_LIB -DBOOST_SPIRIT_THREADSAFE -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS
+DEFS=-DWIN32 -D_WINDOWS -DBOOST_THREAD_USE_LIB -DBOOST_SPIRIT_THREADSAFE
 DEBUGFLAGS=-g
-CFLAGS=-mthreads $(xOPT_LEVEL) -msse2 -w -Wall -Wextra -Wno-ignored-qualifiers -Wformat -Wformat-security -Wno-unused-parameter $(DEBUGFLAGS) $(DEFS) $(INCLUDEPATHS)
-LDFLAGS=-Wl,--dynamicbase -Wl,--nxcompat -Wl,--large-address-aware -static
+CFLAGS=-mthreads -O2 -msse2 -w -Wall -Wextra -Wno-ignored-qualifiers -Wformat -Wformat-security -Wno-unused-parameter $(DEBUGFLAGS) $(DEFS) $(INCLUDEPATHS)
+LDFLAGS=-Wl,--dynamicbase -Wl,--nxcompat
 
-ifneq (${USE_IPV6}, -)
-	DEFS += -DUSE_IPV6=$(USE_IPV6)
+TESTDEFS = -DTEST_DATA_DIR=$(abspath test/data)
+
+ifndef USE_UPNP
+	override USE_UPNP = -
+endif
+ifneq (${USE_UPNP}, -)
+ INCLUDEPATHS += -I"C:\miniupnpc-1.6-mgw"
+ LIBPATHS += -L"C:\miniupnpc-1.6-mgw"
+ LIBS += -l miniupnpc -l iphlpapi
+ DEFS += -DMINIUPNP_STATICLIB -DSTATICLIB -DUSE_UPNP=$(USE_UPNP)
 endif
 
 LIBS += -l kernel32 -l user32 -l gdi32 -l comdlg32 -l winspool -l winmm -l shell32 -l comctl32 -l ole32 -l oleaut32 -l uuid -l rpcrt4 -l advapi32 -l ws2_32 -l mswsock -l shlwapi
@@ -62,100 +54,71 @@ OBJS= \
     obj/netbase.o \
     obj/addrman.o \
     obj/crypter.o \
-    obj/base58.o \
     obj/key.o \
-    obj/db.o \
     obj/init.o \
-    obj/irc.o \
+    obj/bitcoind.o \
     obj/keystore.o \
+    obj/core.o \
     obj/main.o \
-    obj/miner.o \
     obj/net.o \
-    obj/ntp.o \
-    obj/stun.o \
     obj/protocol.o \
-    obj/bitcoinrpc.o \
-    obj/rpccrypt.o \
-    obj/rpcdump.o \
+    obj/rpcclient.o \
+    obj/rpcprotocol.o \
+    obj/rpcserver.o \
+    obj/rpcmisc.o \
     obj/rpcnet.o \
-    obj/rpcmining.o \
-    obj/rpcwallet.o \
     obj/rpcblockchain.o \
     obj/rpcrawtransaction.o \
+    obj/timedata.o \
     obj/script.o \
     obj/sync.o \
+    obj/txmempool.o \
     obj/util.o \
-    obj/wallet.o \
-    obj/walletdb.o \
+    obj/hash.o \
     obj/noui.o \
     obj/kernel.o \
-    obj/kernel_worker.o \
-    obj/ecies.o \
-    obj/cryptogram.o \
-    obj/ipcollector.o
+    obj/pbkdf2.o \
+    obj/scrypt.o \
+    obj/scrypt-x86.o \
+    obj/scrypt-x86_64.o \
+    obj/chainparams.o
 
-all: novacoind.exe
+ifeq (${USE_WALLET}, 1)
+    DEFS += -DENABLE_WALLET
+    OBJS += \
+        obj/db.o \
+        obj/miner.o \
+        obj/rpcdump.o \
+        obj/rpcmining.o \
+        obj/rpcwallet.o \
+        obj/wallet.o \
+        obj/walletdb.o
+endif
 
-#
-# LevelDB support
-#
-ifdef USE_LEVELDB
+all: bhcoind.exe
+
 LIBS += $(CURDIR)/leveldb/libleveldb.a $(CURDIR)/leveldb/libmemenv.a
-DEFS += $(addprefix -I,$(CURDIR)/leveldb/include) -DUSE_LEVELDB
+DEFS += $(addprefix -I,$(CURDIR)/leveldb/include)
 DEFS += $(addprefix -I,$(CURDIR)/leveldb/helpers)
 OBJS += obj/txdb-leveldb.o
 leveldb/libleveldb.a:
-	cd leveldb;TARGET_OS=NATIVE_WINDOWS make libleveldb.a libmemenv.a;; cd ..
+	cd leveldb; make; cd ..
 obj/txdb-leveldb.o: leveldb/libleveldb.a
-else
-OBJS += obj/txdb-bdb.o
-endif
-
-ifdef USE_ASM
-# Assembler implementation
-OBJS += crypto/scrypt/asm/obj/scrypt-arm.o crypto/scrypt/asm/obj/scrypt-x86.o crypto/scrypt/asm/obj/scrypt-x86_64.o crypto/scrypt/asm/obj/asm-wrapper.o
-
-crypto/scrypt/asm/obj/scrypt-x86.o: crypto/scrypt/asm/scrypt-x86.S
-	$(CXX) -c $(CFLAGS) -MMD -o $@ $<
-
-crypto/scrypt/asm/obj/scrypt-x86_64.o: crypto/scrypt/asm/scrypt-x86_64.S
-	$(CXX) -c $(CFLAGS) -MMD -o $@ $<
-
-crypto/scrypt/asm/obj/scrypt-arm.o: crypto/scrypt/asm/scrypt-arm.S
-	$(CXX) -c $(CFLAGS) -MMD -o $@ $<
-
-crypto/scrypt/asm/obj/asm-wrapper.o: crypto/scrypt/asm/asm-wrapper.cpp
-	$(CXX) -c $(CFLAGS) -MMD -o $@ $<
-
-DEFS += -DUSE_ASM
-
-else
-ifdef USE_SSE2
-# Intrinsic implementation
-DEFS += -DUSE_SSE2
-OBJS += scrypt-intrin/obj/scrypt-sse2.o
-
-crypto/scrypt/intrin/obj/scrypt-sse2.o: crypto/scrypt/intrin/scrypt-sse2.cpp
-	$(CXX) -c $(CFLAGS) -MMD -o $@ $<
-else
-# Generic implementation
-OBJS += obj/scrypt-generic.o
-
-crypto/scrypt/obj/scrypt-generic.o: crypto/scrypt/generic/scrypt-generic.cpp
-	$(CXX) -c $(CFLAGS) -MMD -o $@ $<
-endif
-endif
-
 
 obj/%.o: %.cpp $(HEADERS)
 	g++ -c $(CFLAGS) -o $@ $<
 
-novacoind.exe: $(OBJS:obj/%=obj/%)
+obj/scrypt-x86.o: scrypt-x86.S
+	$(CXX) -c $(xCXXFLAGS) -MMD -o $@ $<
+
+obj/scrypt-x86_64.o: scrypt-x86_64.S
+	$(CXX) -c $(xCXXFLAGS) -MMD -o $@ $<
+
+bhcoind.exe: $(OBJS:obj/%=obj/%)
 	g++ $(CFLAGS) $(LDFLAGS) -o $@ $(LIBPATHS) $^ $(LIBS)
 
 clean:
-	-del /Q novacoind.exe
+	-del /Q bhcoind
 	-del /Q obj\*
-	-del /Q crypto\scrypt\asm\obj\*
 
 FORCE:
