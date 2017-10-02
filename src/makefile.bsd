@@ -1,0 +1,231 @@
+# Copyright (c) 2009-2010 Satoshi Nakamoto
+# Distributed under the MIT/X11 software license, see the accompanying
+# file COPYING or http://www.opensource.org/licenses/mit-license.php.
+
+USE_LEVELDB:=0
+USE_IPV6:=1
+ARCH:=$(uname -m)
+
+# CC:=clang
+# CXX:=clang++
+
+LINK:=$(CXX)
+
+DEFS=-DBOOST_SPIRIT_THREADSAFE -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS
+
+DEFS += $(addprefix -I,$(CURDIR) $(CURDIR)/obj $(BOOST_INCLUDE_PATH) $(BDB_INCLUDE_PATH) $(OPENSSL_INCLUDE_PATH))
+LIBS = $(addprefix -L,$(BOOST_LIB_PATH) $(BDB_LIB_PATH) $(OPENSSL_LIB_PATH))
+
+LMODE = dynamic
+LMODE2 = dynamic
+ifdef STATIC
+	LMODE = static
+	ifeq (${STATIC}, all)
+		LMODE2 = static
+	endif
+endif
+
+# for boost 1.37, add -mt to the boost libraries
+LIBS += \
+ -Wl,-B$(LMODE) \
+   -l boost_system$(BOOST_LIB_SUFFIX) \
+   -l boost_filesystem$(BOOST_LIB_SUFFIX) \
+   -l boost_program_options$(BOOST_LIB_SUFFIX) \
+   -l boost_thread$(BOOST_LIB_SUFFIX) \
+   -l db_cxx$(BDB_LIB_SUFFIX) \
+   -l ssl \
+   -l crypto \
+   -l execinfo
+
+ifneq (${USE_IPV6}, -)
+	DEFS += -DUSE_IPV6=$(USE_IPV6)
+endif
+
+LIBS+= \
+ -Wl,-B$(LMODE2) \
+   -l z \
+   -l pthread
+
+
+# Hardening
+# Make some classes of vulnerabilities unexploitable in case one is discovered.
+#
+    # This is a workaround for Ubuntu bug #691722, the default -fstack-protector causes
+    # -fstack-protector-all to be ignored unless -fno-stack-protector is used first.
+    # see: https://bugs.launchpad.net/ubuntu/+source/gcc-4.5/+bug/691722
+    HARDENING=-fno-stack-protector
+
+    # Stack Canaries
+    # Put numbers at the beginning of each stack frame and check that they are the same.
+    # If a stack buffer if overflowed, it writes over the canary number and then on return
+    # when that number is checked, it won't be the same and the program will exit with
+    # a "Stack smashing detected" error instead of being exploited.
+    HARDENING+=-fstack-protector-all -Wstack-protector
+
+    # Make some important things such as the global offset table read only as soon as
+    # the dynamic linker is finished building it. This will prevent overwriting of addresses
+    # which would later be jumped to.
+    LDHARDENING+=-Wl,-z,relro -Wl,-z,now
+
+    # Build position independent code to take advantage of Address Space Layout Randomization
+    # offered by some kernels.
+    # see doc/build-unix.txt for more information.
+    ifdef PIE
+        HARDENING+=-fPIE
+        LDHARDENING+=-pie
+    endif
+
+    # -D_FORTIFY_SOURCE=2 does some checking for potentially exploitable code patterns in
+    # the source such overflowing a statically defined buffer.
+    HARDENING+=-D_FORTIFY_SOURCE=2
+#
+
+
+DEBUGFLAGS=-g
+
+ifeq (${ARCH}, i386)
+    EXT_OPTIONS=-msse2
+endif
+
+xOPT_LEVEL=-O2
+ifeq (${USE_O3}, 1)
+    xOPT_LEVEL=-O3
+endif
+
+# CXXFLAGS can be specified on the make command line, so we use xCXXFLAGS that only
+# adds some defaults in front. Unfortunately, CXXFLAGS=... $(CXXFLAGS) does not work.
+xCXXFLAGS=$(xOPT_LEVEL) $(EXT_OPTIONS) -pthread -Wall -Wextra -Wno-ignored-qualifiers -Wformat -Wformat-security -Wno-unused-parameter \
+    $(DEBUGFLAGS) $(DEFS) $(HARDENING) $(CXXFLAGS)
+
+# LDFLAGS can be specified on the make command line, so we use xLDFLAGS that only
+# adds some defaults in front. Unfortunately, LDFLAGS=... $(LDFLAGS) does not work.
+xLDFLAGS=$(LDHARDENING) $(LDFLAGS)
+
+OBJS= \
+    obj/alert.o \
+    obj/version.o \
+    obj/checkpoints.o \
+    obj/netbase.o \
+    obj/addrman.o \
+    obj/crypter.o \
+    obj/base58.o \
+    obj/key.o \
+    obj/db.o \
+    obj/init.o \
+    obj/irc.o \
+    obj/keystore.o \
+    obj/main.o \
+    obj/miner.o \
+    obj/net.o \
+    obj/ntp.o \
+    obj/stun.o \
+    obj/protocol.o \
+    obj/bitcoinrpc.o \
+    obj/rpccrypt.o \
+    obj/rpcdump.o \
+    obj/rpcnet.o \
+    obj/rpcmining.o \
+    obj/rpcwallet.o \
+    obj/rpcblockchain.o \
+    obj/rpcrawtransaction.o \
+    obj/script.o \
+    obj/sync.o \
+    obj/util.o \
+    obj/wallet.o \
+    obj/walletdb.o \
+    obj/noui.o \
+    obj/kernel.o \
+    obj/kernel_worker.o \
+    obj/ecies.o \
+    obj/cryptogram.o \
+    obj/ipcollector.o
+
+all: novacoind
+
+#
+# LevelDB support
+#
+ifeq (${USE_LEVELDB}, 1)
+LIBS += $(CURDIR)/leveldb/libleveldb.a $(CURDIR)/leveldb/libmemenv.a
+DEFS += $(addprefix -I,$(CURDIR)/leveldb/include) -DUSE_LEVELDB
+DEFS += $(addprefix -I,$(CURDIR)/leveldb/helpers)
+OBJS += obj/txdb-leveldb.o
+leveldb/libleveldb.a:
+	@echo "Building LevelDB ..."; cd leveldb; CC=$(CC) CXX=$(CXX) gmake libleveldb.a libmemenv.a; cd ..;
+obj/txdb-leveldb.o: leveldb/libleveldb.a
+endif
+ifneq (${USE_LEVELDB}, 1)
+OBJS += obj/txdb-bdb.o
+endif
+
+ifeq (${USE_ASM}, 1)
+
+DEFS += -DUSE_ASM
+
+# Assembler implementation
+OBJS += crypto/scrypt/asm/obj/scrypt-arm.o crypto/scrypt/asm/obj/scrypt-x86.o crypto/scrypt/asm/obj/scrypt-x86_64.o crypto/scrypt/asm/obj/asm-wrapper.o
+
+crypto/scrypt/asm/obj/scrypt-x86.o: crypto/scrypt/asm/scrypt-x86.S
+	$(CXX) -c $(xCXXFLAGS) -MMD -o $@ $<
+
+crypto/scrypt/asm/obj/scrypt-x86_64.o: crypto/scrypt/asm/scrypt-x86_64.S
+	$(CXX) -c $(xCXXFLAGS) -MMD -o $@ $<
+
+crypto/scrypt/asm/obj/scrypt-arm.o: crypto/scrypt/asm/scrypt-arm.S
+	$(CXX) -c $(xCXXFLAGS) -MMD -o $@ $<
+
+crypto/scrypt/asm/obj/asm-wrapper.o: crypto/scrypt/asm/asm-wrapper.cpp
+	$(CXX) -c $(xCXXFLAGS) -MMD -o $@ $<
+
+else
+ifeq  (${USE_SSE2}, 1)
+# Intrinsic implementation
+DEFS += -DUSE_SSE2
+OBJS += crypto/scrypt/intrin/obj/scrypt-sse2.o
+
+crypto/scrypt/intrin/obj/scrypt-sse2.o: crypto/scrypt/intrin/scrypt-sse2.cpp
+	$(CXX) -c $(xCXXFLAGS) -MMD -o $@ $<
+else
+# Generic implementation
+OBJS += crypto/scrypt/generic/obj/scrypt-generic.o
+
+crypto/scrypt/generic/obj/scrypt-generic.o: crypto/scrypt/generic/scrypt-generic.cpp
+	$(CXX) -c $(xCXXFLAGS) -MMD -o $@ $<
+endif
+endif
+
+# auto-generated dependencies:
+-include obj/*.P
+
+obj/build.h: FORCE
+	/bin/sh ../share/genbuild.sh obj/build.h
+version.cpp: obj/build.h
+DEFS += -DHAVE_BUILD_INFO
+
+obj/%.o: %.cpp
+	$(CXX) -c $(xCXXFLAGS) -MMD -MF $(@:%.o=%.d) -o $@ $<
+	@cp $(@:%.o=%.d) $(@:%.o=%.P); \
+	  sed -e 's/#.*//' -e 's/^[^:]*: *//' -e 's/ *\\$$//' \
+	      -e '/^$$/ d' -e 's/$$/ :/' < $(@:%.o=%.d) >> $(@:%.o=%.P); \
+	  rm -f $(@:%.o=%.d)
+
+novacoind: $(OBJS:obj/%=obj/%)
+	$(LINK) $(xCXXFLAGS) -o $@ $^ $(xLDFLAGS) $(LIBS)
+
+clean:
+	-rm -f novacoind
+	-rm -f obj/*.o
+	-rm -f obj/*.P
+	-rm -f obj/*.d
+	-rm -f crypto/scrypt/asm/obj/*.o
+	-rm -f crypto/scrypt/asm/obj/*.P
+	-rm -f crypto/scrypt/asm/obj/*.d
+	-rm -f crypto/scrypt/intrin/obj/*.o
+	-rm -f crypto/scrypt/intrin/obj/*.P
+	-rm -f crypto/scrypt/intrin/obj/*.d
+	-rm -f crypto/scrypt/generic/obj/*.o
+	-rm -f crypto/scrypt/generic/obj/*.P
+	-rm -f crypto/scrypt/generic/obj/*.d
+	-rm -f obj/build.h
+
+FORCE:

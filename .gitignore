@@ -1,0 +1,24 @@
+src/*.exe
+src/novacoind
+src/build.h
+.*.swp
+*.*~*
+*.bak
+*.rej
+*.orig
+*.o
+*.patch
+.novacoin
+#compilation and Qt preprocessor part
+*.qm
+Makefile
+novacoin-qt
+#resources cpp
+qrc_*.cpp
+#qt creator
+*.pro.user
+#mac specific
+.DS_Store
+build
+
+!src/leveldb/Makefile

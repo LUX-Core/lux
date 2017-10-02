@@ -1,0 +1,191 @@
+# Copyright (c) 2009-2010 Satoshi Nakamoto
+# Distributed under the MIT/X11 software license, see the accompanying
+# file COPYING or http://www.opensource.org/licenses/mit-license.php.
+
+TARGET_PLATFORM:=i686
+#TARGET_PLATFORM:=x86_64
+CC:=$(TARGET_PLATFORM)-w64-mingw32-gcc
+CXX:=$(TARGET_PLATFORM)-w64-mingw32-g++
+RANLIB:=$(TARGET_PLATFORM)-w64-mingw32-ranlib
+STRIP:=$(TARGET_PLATFORM)-w64-mingw32-strip
+
+DEPSDIR:=/usr/$(TARGET_PLATFORM)-w64-mingw32
+
+BOOST_LIB_PATH:=$(DEPSDIR)/boost_1_57_0/stage/lib
+BDB_LIB_PATH:=$(DEPSDIR)/db-6.0.20.NC/build_unix
+OPENSSL_LIB_PATH:=$(DEPSDIR)/openssl-1.0.2g
+
+BOOST_INCLUDE_PATH:=$(DEPSDIR)/boost_1_57_0
+BDB_INCLUDE_PATH:=$(DEPSDIR)/db-6.0.20.NC/build_unix
+OPENSSL_INCLUDE_PATH:=$(DEPSDIR)/openssl-1.0.2g/include
+
+USE_LEVELDB:=0
+USE_IPV6:=1
+
+INCLUDEPATHS= \
+ -I"$(CURDIR)" \
+ -I"$(CURDIR)"/obj \
+ -I"$(BOOST_INCLUDE_PATH)" \
+ -I"$(BDB_INCLUDE_PATH)" \
+ -I"$(OPENSSL_INCLUDE_PATH)"
+
+LIBPATHS= \
+ -L"$(BOOST_LIB_PATH)" \
+ -L"$(BDB_LIB_PATH)" \
+ -L"$(OPENSSL_LIB_PATH)"
+
+LIBS= \
+ -l boost_system-mt \
+ -l boost_filesystem-mt \
+ -l boost_program_options-mt \
+ -l boost_thread_win32-mt \
+ -l boost_chrono-mt \
+ -l db_cxx \
+ -l ssl \
+ -l crypto \
+ -Wl,-Bstatic -lpthread -Wl,-Bdynamic
+
+xOPT_LEVEL=-O2
+ifeq (${USE_O3}, 1)
+    xOPT_LEVEL=-O3
+endif
+
+DEFS=-D_MT -DWIN32 -D_WINDOWS -DBOOST_THREAD_USE_LIB -DBOOST_SPIRIT_THREADSAFE -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS
+
+DEBUGFLAGS=-g
+CFLAGS=$(xOPT_LEVEL) -msse2 -w -Wall -Wextra -Wno-ignored-qualifiers -Wformat -Wformat-security -Wno-unused-parameter $(DEBUGFLAGS) $(DEFS) $(INCLUDEPATHS)
+LDFLAGS=-Wl,--dynamicbase -Wl,--nxcompat -static-libgcc -static-libstdc++
+
+ifneq (${USE_IPV6}, -)
+	DEFS += -DUSE_IPV6=$(USE_IPV6)
+endif
+
+LIBS += -l mingwthrd -l kernel32 -l user32 -l gdi32 -l comdlg32 -l winspool -l winmm -l shell32 -l comctl32 -l ole32 -l oleaut32 -l uuid -l rpcrt4 -l advapi32 -l ws2_32 -l mswsock -l shlwapi
+
+# TODO: make the mingw builds smarter about dependencies, like the linux/osx builds are
+HEADERS = $(wildcard *.h)
+
+OBJS= \
+    obj/alert.o \
+    obj/version.o \
+    obj/checkpoints.o \
+    obj/netbase.o \
+    obj/addrman.o \
+    obj/crypter.o \
+    obj/base58.o \
+    obj/key.o \
+    obj/db.o \
+    obj/init.o \
+    obj/irc.o \
+    obj/keystore.o \
+    obj/main.o \
+    obj/miner.o \
+    obj/net.o \
+    obj/ntp.o \
+    obj/stun.o \
+    obj/protocol.o \
+    obj/bitcoinrpc.o \
+    obj/rpccrypt.o \
+    obj/rpcdump.o \
+    obj/rpcnet.o \
+    obj/rpcmining.o \
+    obj/rpcwallet.o \
+    obj/rpcblockchain.o \
+    obj/rpcrawtransaction.o \
+    obj/script.o \
+    obj/sync.o \
+    obj/util.o \
+    obj/wallet.o \
+    obj/walletdb.o \
+    obj/noui.o \
+    obj/kernel.o \
+    obj/kernel_worker.o \
+    obj/ecies.o \
+    obj/cryptogram.o \
+    obj/ipcollector.o
+
+all: novacoind.exe
+
+#
+# LevelDB support
+#
+ifeq (${USE_LEVELDB}, 1)
+LIBS += $(CURDIR)/leveldb/libleveldb.a $(CURDIR)/leveldb/libmemenv.a
+DEFS += -I"$(CURDIR)/leveldb/include" -DUSE_LEVELDB
+DEFS += -I"$(CURDIR)/leveldb/helpers"
+OBJS += obj/txdb-leveldb.o
+leveldb/libleveldb.a:
+	@echo "Building LevelDB ..." && cd leveldb && CC=$(CC) CXX=$(CXX) TARGET_OS=OS_WINDOWS_CROSSCOMPILE CXXFLAGS="-I$(INCLUDEPATHS)" LDFLAGS="-L$(LIBPATHS)" $(MAKE) libleveldb.a libmemenv.a && $(RANLIB) libleveldb.a && $(RANLIB) libmemenv.a && cd ..
+obj/txdb-leveldb.o: leveldb/libleveldb.a
+else
+OBJS += obj/txdb-bdb.o
+endif
+
+ifeq (${USE_ASM}, 1)
+# Assembler implementation
+OBJS += crypto/scrypt/asm/obj/scrypt-arm.o crypto/scrypt/asm/obj/scrypt-x86.o crypto/scrypt/asm/obj/scrypt-x86_64.o crypto/scrypt/asm/obj/asm-wrapper.o
+
+crypto/scrypt/asm/obj/scrypt-x86.o: crypto/scrypt/asm/scrypt-x86.S
+	$(CXX) -c $(CFLAGS) -MMD -o $@ $<
+
+crypto/scrypt/asm/obj/scrypt-x86_64.o: crypto/scrypt/asm/scrypt-x86_64.S
+	$(CXX) -c $(CFLAGS) -MMD -o $@ $<
+
+crypto/scrypt/asm/obj/scrypt-arm.o: crypto/scrypt/asm/scrypt-arm.S
+	$(CXX) -c $(CFLAGS) -MMD -o $@ $<
+
+crypto/scrypt/asm/obj/asm-wrapper.o: crypto/scrypt/asm/asm-wrapper.cpp
+	$(CXX) -c $(CFLAGS) -MMD -o $@ $<
+
+DEFS += -DUSE_ASM
+else
+ifeq  (${USE_SSE2}, 1)
+# Intrinsic implementation
+DEFS += -DUSE_SSE2
+OBJS += crypto/scrypt/intrin/obj/scrypt-sse2.o
+
+crypto/scrypt/intrin/obj/scrypt-sse2.o: crypto/scrypt/intrin/scrypt-sse2.cpp $(HEADERS)
+	$(CXX) -c $(CFLAGS) -MMD -o $@ $<
+else
+ifneq (${USE_ASM}, 1)
+# Generic implementation
+OBJS += crypto/scrypt/generic/obj/scrypt-generic.o
+
+crypto/scrypt/generic/obj/scrypt-generic.o: crypto/scrypt/generic/scrypt-generic.cpp
+	$(CXX) -c $(CFLAGS) -MMD -o $@ $<
+endif
+endif
+endif
+
+
+
+obj/build.h: FORCE
+	/bin/sh ../share/genbuild.sh obj/build.h
+version.cpp: obj/build.h
+DEFS += -DHAVE_BUILD_INFO
+
+obj/%.o: %.cpp $(HEADERS)
+	$(CXX) -c $(CFLAGS) -o $@ $<
+
+novacoind.exe: $(OBJS:obj/%=obj/%)
+	$(CXX) $(CFLAGS) $(LDFLAGS) -o $@ $(LIBPATHS) $^ $(LIBS) -lshlwapi
+	$(STRIP) novacoind.exe
+
+clean:
+	-rm -f novacoind.exe
+	-rm -f obj/*.o
+	-rm -f obj/*.P
+	-rm -f obj/*.d
+	-rm -f crypto/scrypt/asm/obj/*.o
+	-rm -f crypto/scrypt/asm/obj/*.P
+	-rm -f crypto/scrypt/asm/obj/*.d
+	-rm -f crypto/scrypt/intrin/obj/*.o
+	-rm -f crypto/scrypt/intrin/obj/*.P
+	-rm -f crypto/scrypt/intrin/obj/*.d
+	-rm -f crypto/scrypt/generic/obj/*.o
+	-rm -f crypto/scrypt/generic/obj/*.P
+	-rm -f crypto/scrypt/generic/obj/*.d
+	-rm -f obj/build.h
+	cd leveldb && TARGET_OS=OS_WINDOWS_CROSSCOMPILE $(MAKE) clean && cd ..
+
+FORCE:
