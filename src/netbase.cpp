@@ -9,16 +9,7 @@
 #include "hash.h"
 
 #ifndef WIN32
-#ifdef ANDROID
-#include <fcntl.h>
-#else
 #include <sys/fcntl.h>
-#endif
-#endif
-
-#ifdef _MSC_VER
-#include <BaseTsd.h>
-typedef SSIZE_T ssize_t;
 #endif
 
 #include <boost/algorithm/string/case_conv.hpp> // for to_lower()
@@ -28,7 +19,7 @@ using namespace std;
 
 // Settings
 static proxyType proxyInfo[NET_MAX];
-static proxyType nameproxyInfo;
+static CService nameProxy;
 static CCriticalSection cs_proxyInfos;
 int nConnectTimeout = 5000;
 bool fNameLookup = false;
@@ -39,12 +30,12 @@ enum Network ParseNetwork(std::string net) {
     boost::to_lower(net);
     if (net == "ipv4") return NET_IPV4;
     if (net == "ipv6") return NET_IPV6;
-    if (net == "tor" || net == "onion")  return NET_TOR;
+    if (net == "tor")  return NET_TOR;
     if (net == "i2p")  return NET_I2P;
     return NET_UNROUTABLE;
 }
 
-void SplitHostPort(std::string in, uint16_t &portOut, std::string &hostOut) {
+void SplitHostPort(std::string in, int &portOut, std::string &hostOut) {
     size_t colon = in.find_last_of(':');
     // if a : is found, and it either follows a [...], or no other : is in the string, treat it as port separator
     bool fHaveColon = colon != in.npos;
@@ -82,14 +73,11 @@ bool static LookupIntern(const char *pszName, std::vector<CNetAddr>& vIP, unsign
 
     aiHint.ai_socktype = SOCK_STREAM;
     aiHint.ai_protocol = IPPROTO_TCP;
-#ifdef USE_IPV6
-    aiHint.ai_family = AF_UNSPEC;
-#else
-    aiHint.ai_family = AF_INET;
-#endif
 #ifdef WIN32
+    aiHint.ai_family = AF_UNSPEC;
     aiHint.ai_flags = fAllowLookup ? 0 : AI_NUMERICHOST;
 #else
+    aiHint.ai_family = AF_UNSPEC;
     aiHint.ai_flags = fAllowLookup ? AI_ADDRCONFIG : AI_NUMERICHOST;
 #endif
     struct addrinfo *aiRes = NULL;
@@ -100,19 +88,16 @@ bool static LookupIntern(const char *pszName, std::vector<CNetAddr>& vIP, unsign
     struct addrinfo *aiTrav = aiRes;
     while (aiTrav != NULL && (nMaxSolutions == 0 || vIP.size() < nMaxSolutions))
     {
-        switch (aiTrav->ai_family)
+        if (aiTrav->ai_family == AF_INET)
         {
-            case (AF_INET):
-                assert(aiTrav->ai_addrlen >= sizeof(sockaddr_in));
-                vIP.push_back(CNetAddr(((struct sockaddr_in*)(aiTrav->ai_addr))->sin_addr));
-            break;
+            assert(aiTrav->ai_addrlen >= sizeof(sockaddr_in));
+            vIP.push_back(CNetAddr(((struct sockaddr_in*)(aiTrav->ai_addr))->sin_addr));
+        }
 
-#ifdef USE_IPV6
-            case (AF_INET6):
-                assert(aiTrav->ai_addrlen >= sizeof(sockaddr_in6));
-                vIP.push_back(CNetAddr(((struct sockaddr_in6*)(aiTrav->ai_addr))->sin6_addr));
-            break;
-#endif
+        if (aiTrav->ai_family == AF_INET6)
+        {
+            assert(aiTrav->ai_addrlen >= sizeof(sockaddr_in6));
+            vIP.push_back(CNetAddr(((struct sockaddr_in6*)(aiTrav->ai_addr))->sin6_addr));
         }
 
         aiTrav = aiTrav->ai_next;
@@ -125,22 +110,23 @@ bool static LookupIntern(const char *pszName, std::vector<CNetAddr>& vIP, unsign
 
 bool LookupHost(const char *pszName, std::vector<CNetAddr>& vIP, unsigned int nMaxSolutions, bool fAllowLookup)
 {
-    std::string strHost(pszName);
-    if (strHost.empty())
+    std::string str(pszName);
+    std::string strHost = str;
+    if (str.empty())
         return false;
-    if (boost::algorithm::starts_with(strHost, "[") && boost::algorithm::ends_with(strHost, "]"))
+    if (boost::algorithm::starts_with(str, "[") && boost::algorithm::ends_with(str, "]"))
     {
-        strHost = strHost.substr(1, strHost.size() - 2);
+        strHost = str.substr(1, str.size() - 2);
     }
 
     return LookupIntern(strHost.c_str(), vIP, nMaxSolutions, fAllowLookup);
 }
 
-bool Lookup(const char *pszName, std::vector<CService>& vAddr, uint16_t portDefault, bool fAllowLookup, unsigned int nMaxSolutions)
+bool Lookup(const char *pszName, std::vector<CService>& vAddr, int portDefault, bool fAllowLookup, unsigned int nMaxSolutions)
 {
     if (pszName[0] == 0)
         return false;
-    uint16_t port = portDefault;
+    int port = portDefault;
     std::string hostname = "";
     SplitHostPort(std::string(pszName), port, hostname);
 
@@ -154,7 +140,7 @@ bool Lookup(const char *pszName, std::vector<CService>& vAddr, uint16_t portDefa
     return true;
 }
 
-bool Lookup(const char *pszName, CService& addr, uint16_t portDefault, bool fAllowLookup)
+bool Lookup(const char *pszName, CService& addr, int portDefault, bool fAllowLookup)
 {
     std::vector<CService> vService;
     bool fRet = Lookup(pszName, vService, portDefault, fAllowLookup, 1);
@@ -164,79 +150,38 @@ bool Lookup(const char *pszName, CService& addr, uint16_t portDefault, bool fAll
     return true;
 }
 
-bool LookupNumeric(const char *pszName, CService& addr, uint16_t portDefault)
+bool LookupNumeric(const char *pszName, CService& addr, int portDefault)
 {
     return Lookup(pszName, addr, portDefault, false);
 }
 
-bool static Socks4(const CService &addrDest, SOCKET& hSocket)
+bool static Socks5(string strDest, int port, SOCKET& hSocket)
 {
-    printf("SOCKS4 connecting %s\n", addrDest.ToString().c_str());
-    if (!addrDest.IsIPv4())
-    {
-        CloseSocket(hSocket);
-        return error("Proxy destination is not IPv4");
-    }
-    char pszSocks4IP[] = "\4\1\0\0\0\0\0\0user";
-    struct sockaddr_in addr;
-    socklen_t len = sizeof(addr);
-    if (!addrDest.GetSockAddr((struct sockaddr*)&addr, &len) || addr.sin_family != AF_INET)
-    {
-        CloseSocket(hSocket);
-        return error("Cannot get proxy destination address");
-    }
-    memcpy(pszSocks4IP + 2, &addr.sin_port, 2);
-    memcpy(pszSocks4IP + 4, &addr.sin_addr, 4);
-    char* pszSocks4 = pszSocks4IP;
-    int nSize = sizeof(pszSocks4IP);
-
-    int ret = send(hSocket, pszSocks4, nSize, MSG_NOSIGNAL);
-    if (ret != nSize)
-    {
-        CloseSocket(hSocket);
-        return error("Error sending to proxy");
-    }
-    char pchRet[8];
-    if (recv(hSocket, pchRet, 8, 0) != 8)
-    {
-        CloseSocket(hSocket);
-        return error("Error reading proxy response");
-    }
-    if (pchRet[1] != 0x5a)
-    {
-        CloseSocket(hSocket);
-        if (pchRet[1] != 0x5b)
-            printf("ERROR: Proxy returned error %d\n", pchRet[1]);
-        return false;
-    }
-    printf("SOCKS4 connected %s\n", addrDest.ToString().c_str());
-    return true;
-}
-
-bool static Socks5(string strDest, uint16_t port, SOCKET& hSocket)
-{
-    printf("SOCKS5 connecting %s\n", strDest.c_str());
+    LogPrintf("SOCKS5 connecting %s\n", strDest);
     if (strDest.size() > 255)
     {
-        CloseSocket(hSocket);
+        closesocket(hSocket);
         return error("Hostname too long");
     }
-    const char pszSocks5Init[] = "\5\1\0";
-        ssize_t ret = send(hSocket, pszSocks5Init, 3, MSG_NOSIGNAL);
-    if (ret != 3)
+    char pszSocks5Init[] = "\5\1\0";
+    char *pszSocks5 = pszSocks5Init;
+    ssize_t nSize = sizeof(pszSocks5Init) - 1;
+
+    ssize_t ret = send(hSocket, pszSocks5, nSize, MSG_NOSIGNAL);
+    if (ret != nSize)
     {
-        CloseSocket(hSocket);
+        closesocket(hSocket);
         return error("Error sending to proxy");
     }
     char pchRet1[2];
     if (recv(hSocket, pchRet1, 2, 0) != 2)
     {
-        CloseSocket(hSocket);
+        closesocket(hSocket);
         return error("Error reading proxy response");
     }
     if (pchRet1[0] != 0x05 || pchRet1[1] != 0x00)
     {
-        CloseSocket(hSocket);
+        closesocket(hSocket);
         return error("Proxy failed to initialize");
     }
     string strSocks5("\5\1");
@@ -248,23 +193,23 @@ bool static Socks5(string strDest, uint16_t port, SOCKET& hSocket)
     ret = send(hSocket, strSocks5.data(), strSocks5.size(), MSG_NOSIGNAL);
     if (ret != (ssize_t)strSocks5.size())
     {
-        CloseSocket(hSocket);
+        closesocket(hSocket);
         return error("Error sending to proxy");
     }
     char pchRet2[4];
     if (recv(hSocket, pchRet2, 4, 0) != 4)
     {
-        CloseSocket(hSocket);
+        closesocket(hSocket);
         return error("Error reading proxy response");
     }
     if (pchRet2[0] != 0x05)
     {
-        CloseSocket(hSocket);
+        closesocket(hSocket);
         return error("Proxy failed to accept request");
     }
     if (pchRet2[1] != 0x00)
     {
-        CloseSocket(hSocket);
+        closesocket(hSocket);
         switch (pchRet2[1])
         {
             case 0x01: return error("Proxy error: general failure");
@@ -280,7 +225,7 @@ bool static Socks5(string strDest, uint16_t port, SOCKET& hSocket)
     }
     if (pchRet2[2] != 0x00)
     {
-        CloseSocket(hSocket);
+        closesocket(hSocket);
         return error("Error: malformed proxy response");
     }
     char pchRet3[256];
@@ -292,26 +237,26 @@ bool static Socks5(string strDest, uint16_t port, SOCKET& hSocket)
         {
             ret = recv(hSocket, pchRet3, 1, 0) != 1;
             if (ret) {
-                CloseSocket(hSocket);
+                closesocket(hSocket);
                 return error("Error reading from proxy");
             }
             int nRecv = pchRet3[0];
             ret = recv(hSocket, pchRet3, nRecv, 0) != nRecv;
             break;
         }
-        default: CloseSocket(hSocket); return error("Error: malformed proxy response");
+        default: closesocket(hSocket); return error("Error: malformed proxy response");
     }
     if (ret)
     {
-        CloseSocket(hSocket);
+        closesocket(hSocket);
         return error("Error reading from proxy");
     }
     if (recv(hSocket, pchRet3, 2, 0) != 2)
     {
-        CloseSocket(hSocket);
+        closesocket(hSocket);
         return error("Error reading from proxy");
     }
-    printf("SOCKS5 connected %s\n", strDest.c_str());
+    LogPrintf("SOCKS5 connected %s\n", strDest);
     return true;
 }
 
@@ -319,14 +264,10 @@ bool static ConnectSocketDirectly(const CService &addrConnect, SOCKET& hSocketRe
 {
     hSocketRet = INVALID_SOCKET;
 
-#ifdef USE_IPV6
     struct sockaddr_storage sockaddr;
-#else
-    struct sockaddr sockaddr;
-#endif
     socklen_t len = sizeof(sockaddr);
     if (!addrConnect.GetSockAddr((struct sockaddr*)&sockaddr, &len)) {
-        printf("Cannot connect to %s: unsupported network\n", addrConnect.ToString().c_str());
+        LogPrintf("Cannot connect to %s: unsupported network\n", addrConnect.ToString());
         return false;
     }
 
@@ -346,7 +287,7 @@ bool static ConnectSocketDirectly(const CService &addrConnect, SOCKET& hSocketRe
     if (fcntl(hSocket, F_SETFL, fFlags | O_NONBLOCK) == -1)
 #endif
     {
-        CloseSocket(hSocket);
+        closesocket(hSocket);
         return false;
     }
 
@@ -366,14 +307,14 @@ bool static ConnectSocketDirectly(const CService &addrConnect, SOCKET& hSocketRe
             int nRet = select(hSocket + 1, NULL, &fdset, NULL, &timeout);
             if (nRet == 0)
             {
-                printf("connection timeout\n");
-                CloseSocket(hSocket);
+                LogPrint("net", "connection to %s timeout\n", addrConnect.ToString());
+                closesocket(hSocket);
                 return false;
             }
             if (nRet == SOCKET_ERROR)
             {
-                printf("select() for connection failed: %i\n",WSAGetLastError());
-                CloseSocket(hSocket);
+                LogPrintf("select() for %s failed: %i\n", addrConnect.ToString(), WSAGetLastError());
+                closesocket(hSocket);
                 return false;
             }
             socklen_t nRetSize = sizeof(nRet);
@@ -383,14 +324,14 @@ bool static ConnectSocketDirectly(const CService &addrConnect, SOCKET& hSocketRe
             if (getsockopt(hSocket, SOL_SOCKET, SO_ERROR, &nRet, &nRetSize) == SOCKET_ERROR)
 #endif
             {
-                printf("getsockopt() for connection failed: %i\n",WSAGetLastError());
-                CloseSocket(hSocket);
+                LogPrintf("getsockopt() for %s failed: %i\n", addrConnect.ToString(), WSAGetLastError());
+                closesocket(hSocket);
                 return false;
             }
             if (nRet != 0)
             {
-                printf("connect() failed after select(): %s\n",strerror(nRet));
-                CloseSocket(hSocket);
+                LogPrintf("connect() to %s failed after select(): %s\n", addrConnect.ToString(), strerror(nRet));
+                closesocket(hSocket);
                 return false;
             }
         }
@@ -400,8 +341,8 @@ bool static ConnectSocketDirectly(const CService &addrConnect, SOCKET& hSocketRe
         else
 #endif
         {
-            printf("connect() failed: %i\n",WSAGetLastError());
-            CloseSocket(hSocket);
+            LogPrintf("connect() to %s failed: %i\n", addrConnect.ToString(), WSAGetLastError());
+            closesocket(hSocket);
             return false;
         }
     }
@@ -414,10 +355,10 @@ bool static ConnectSocketDirectly(const CService &addrConnect, SOCKET& hSocketRe
     if (ioctlsocket(hSocket, FIONBIO, &fNonblock) == SOCKET_ERROR)
 #else
     fFlags = fcntl(hSocket, F_GETFL, 0);
-    if (fcntl(hSocket, F_SETFL, fFlags & ~O_NONBLOCK) == SOCKET_ERROR)
+    if (fcntl(hSocket, F_SETFL, fFlags & !O_NONBLOCK) == SOCKET_ERROR)
 #endif
     {
-        CloseSocket(hSocket);
+        closesocket(hSocket);
         return false;
     }
 
@@ -425,123 +366,113 @@ bool static ConnectSocketDirectly(const CService &addrConnect, SOCKET& hSocketRe
     return true;
 }
 
-bool SetProxy(enum Network net, CService addrProxy, int nSocksVersion) {
+bool SetProxy(enum Network net, CService addrProxy) {
     assert(net >= 0 && net < NET_MAX);
-    if (nSocksVersion != 0 && nSocksVersion != 4 && nSocksVersion != 5)
-        return false;
-    if (nSocksVersion != 0 && !addrProxy.IsValid())
+    if (!addrProxy.IsValid())
         return false;
     LOCK(cs_proxyInfos);
-    proxyInfo[net] = std::make_pair(addrProxy, nSocksVersion);
+    proxyInfo[net] = addrProxy;
     return true;
 }
 
 bool GetProxy(enum Network net, proxyType &proxyInfoOut) {
     assert(net >= 0 && net < NET_MAX);
     LOCK(cs_proxyInfos);
-    if (!proxyInfo[net].second)
+    if (!proxyInfo[net].IsValid())
         return false;
     proxyInfoOut = proxyInfo[net];
     return true;
 }
 
-bool SetNameProxy(CService addrProxy, int nSocksVersion) {
-    if (nSocksVersion != 0 && nSocksVersion != 5)
-        return false;
-    if (nSocksVersion != 0 && !addrProxy.IsValid())
+bool SetNameProxy(CService addrProxy) {
+    if (!addrProxy.IsValid())
         return false;
     LOCK(cs_proxyInfos);
-    nameproxyInfo = std::make_pair(addrProxy, nSocksVersion);
+    nameProxy = addrProxy;
     return true;
 }
 
-bool GetNameProxy(proxyType &nameproxyInfoOut) {
+bool GetNameProxy(CService &nameProxyOut) {
     LOCK(cs_proxyInfos);
-    if (!nameproxyInfo.second)
+    if(!nameProxy.IsValid())
         return false;
-    nameproxyInfoOut = nameproxyInfo;
+    nameProxyOut = nameProxy;
     return true;
 }
 
 bool HaveNameProxy() {
     LOCK(cs_proxyInfos);
-    return nameproxyInfo.second != 0;
+    return nameProxy.IsValid();
 }
 
 bool IsProxy(const CNetAddr &addr) {
     LOCK(cs_proxyInfos);
     for (int i = 0; i < NET_MAX; i++) {
-        if (proxyInfo[i].second && (addr == (CNetAddr)proxyInfo[i].first))
+        if (addr == (CNetAddr)proxyInfo[i])
             return true;
     }
     return false;
 }
 
-bool ConnectSocket(const CService &addrDest, SOCKET& hSocketRet, int nTimeout)
+bool ConnectSocket(const CService &addrDest, SOCKET& hSocketRet, int nTimeout, bool *outProxyConnectionFailed)
 {
     proxyType proxy;
-
-    // no proxy needed
+    if (outProxyConnectionFailed)
+        *outProxyConnectionFailed = false;
+    // no proxy needed (none set for target network)
     if (!GetProxy(addrDest.GetNetwork(), proxy))
         return ConnectSocketDirectly(addrDest, hSocketRet, nTimeout);
 
     SOCKET hSocket = INVALID_SOCKET;
 
     // first connect to proxy server
-    if (!ConnectSocketDirectly(proxy.first, hSocket, nTimeout))
-        return false;
-
-    // do socks negotiation
-    switch (proxy.second) {
-    case 4:
-        if (!Socks4(addrDest, hSocket))
-            return false;
-        break;
-    case 5:
-        if (!Socks5(addrDest.ToStringIP(), addrDest.GetPort(), hSocket))
-            return false;
-        break;
-    default:
-        CloseSocket(hSocket);
+    if (!ConnectSocketDirectly(proxy, hSocket, nTimeout)) {
+        if (outProxyConnectionFailed)
+            *outProxyConnectionFailed = true;
         return false;
     }
+    // do socks negotiation
+    if (!Socks5(addrDest.ToStringIP(), addrDest.GetPort(), hSocket))
+        return false;
 
     hSocketRet = hSocket;
     return true;
 }
 
-bool ConnectSocketByName(CService &addr, SOCKET& hSocketRet, const char *pszDest, uint16_t portDefault, int nTimeout)
+bool ConnectSocketByName(CService &addr, SOCKET& hSocketRet, const char *pszDest, int portDefault, int nTimeout, bool *outProxyConnectionFailed)
 {
     string strDest;
-    uint16_t port = portDefault;
+    int port = portDefault;
+
+    if (outProxyConnectionFailed)
+        *outProxyConnectionFailed = false;
+
     SplitHostPort(string(pszDest), port, strDest);
 
     SOCKET hSocket = INVALID_SOCKET;
 
-    proxyType nameproxy;
-    GetNameProxy(nameproxy);
+    CService nameProxy;
+    GetNameProxy(nameProxy);
 
-    CService addrResolved(CNetAddr(strDest, fNameLookup && !nameproxy.second), port);
+    CService addrResolved(CNetAddr(strDest, fNameLookup && !HaveNameProxy()), port);
     if (addrResolved.IsValid()) {
         addr = addrResolved;
         return ConnectSocket(addr, hSocketRet, nTimeout);
     }
-    addr = CService("0.0.0.0:0");
-    if (!nameproxy.second)
-        return false;
-    if (!ConnectSocketDirectly(nameproxy.first, hSocket, nTimeout))
-        return false;
 
-    switch(nameproxy.second) {
-        default:
-        case 4:
-            CloseSocket(hSocket);
-            return false;
-        case 5:
-            if (!Socks5(strDest, port, hSocket))
-                return false;
-            break;
+    addr = CService("0.0.0.0:0");
+
+    if (!HaveNameProxy())
+        return false;
+    // first connect to name proxy server
+    if (!ConnectSocketDirectly(nameProxy, hSocket, nTimeout)) {
+        if (outProxyConnectionFailed)
+            *outProxyConnectionFailed = true;
+        return false;
     }
+    // do socks negotiation
+    if (!Socks5(strDest, (unsigned short)port, hSocket))
+        return false;
 
     hSocketRet = hSocket;
     return true;
@@ -594,12 +525,10 @@ CNetAddr::CNetAddr(const struct in_addr& ipv4Addr)
     memcpy(ip+12, &ipv4Addr, 4);
 }
 
-#ifdef USE_IPV6
 CNetAddr::CNetAddr(const struct in6_addr& ipv6Addr)
 {
     memcpy(ip, &ipv6Addr, 16);
 }
-#endif
 
 CNetAddr::CNetAddr(const char *pszIp, bool fAllowLookup)
 {
@@ -617,7 +546,7 @@ CNetAddr::CNetAddr(const std::string &strIp, bool fAllowLookup)
         *this = vIP[0];
 }
 
-uint8_t CNetAddr::GetByte(int n) const
+unsigned int CNetAddr::GetByte(int n) const
 {
     return ip[15-n];
 }
@@ -782,12 +711,8 @@ std::string CNetAddr::ToStringIP() const
         return EncodeBase32(&ip[6], 10) + ".onion";
     if (IsI2P())
         return EncodeBase32(&ip[6], 10) + ".oc.b32.i2p";
-    CService serv(*this, (uint16_t)0);
-#ifdef USE_IPV6
+    CService serv(*this, 0);
     struct sockaddr_storage sockaddr;
-#else
-    struct sockaddr sockaddr;
-#endif
     socklen_t socklen = sizeof(sockaddr);
     if (serv.GetSockAddr((struct sockaddr*)&sockaddr, &socklen)) {
         char name[1025] = "";
@@ -832,20 +757,18 @@ bool CNetAddr::GetInAddr(struct in_addr* pipv4Addr) const
     return true;
 }
 
-#ifdef USE_IPV6
 bool CNetAddr::GetIn6Addr(struct in6_addr* pipv6Addr) const
 {
     memcpy(pipv6Addr, ip, 16);
     return true;
 }
-#endif
 
 // get canonical identifier of an address' group
 // no two connections will be attempted to addresses with the same group
 std::vector<unsigned char> CNetAddr::GetGroup() const
 {
     std::vector<unsigned char> vchRet;
-    uint8_t nClass = NET_IPV6;
+    int nClass = NET_IPV6;
     int nStartByte = 0;
     int nBits = 16;
 
@@ -896,7 +819,7 @@ std::vector<unsigned char> CNetAddr::GetGroup() const
         nBits = 4;
     }
     // for he.net, use /36 groups
-    else if (GetByte(15) == 0x20 && GetByte(14) == 0x01 && GetByte(13) == 0x04 && GetByte(12) == 0x70)
+    else if (GetByte(15) == 0x20 && GetByte(14) == 0x11 && GetByte(13) == 0x04 && GetByte(12) == 0x70)
         nBits = 36;
     // for the rest of the IPv6 network, use /32 groups
     else
@@ -1011,31 +934,27 @@ CService::CService()
     Init();
 }
 
-CService::CService(const CNetAddr& cip, uint16_t portIn) : CNetAddr(cip), port(portIn)
+CService::CService(const CNetAddr& cip, unsigned short portIn) : CNetAddr(cip), port(portIn)
 {
 }
 
-CService::CService(const struct in_addr& ipv4Addr, uint16_t portIn) : CNetAddr(ipv4Addr), port(portIn)
+CService::CService(const struct in_addr& ipv4Addr, unsigned short portIn) : CNetAddr(ipv4Addr), port(portIn)
 {
 }
 
-#ifdef USE_IPV6
-CService::CService(const struct in6_addr& ipv6Addr, uint16_t portIn) : CNetAddr(ipv6Addr), port(portIn)
+CService::CService(const struct in6_addr& ipv6Addr, unsigned short portIn) : CNetAddr(ipv6Addr), port(portIn)
 {
 }
-#endif
 
 CService::CService(const struct sockaddr_in& addr) : CNetAddr(addr.sin_addr), port(ntohs(addr.sin_port))
 {
     assert(addr.sin_family == AF_INET);
 }
 
-#ifdef USE_IPV6
 CService::CService(const struct sockaddr_in6 &addr) : CNetAddr(addr.sin6_addr), port(ntohs(addr.sin6_port))
 {
    assert(addr.sin6_family == AF_INET6);
 }
-#endif
 
 bool CService::SetSockAddr(const struct sockaddr *paddr)
 {
@@ -1043,11 +962,9 @@ bool CService::SetSockAddr(const struct sockaddr *paddr)
     case AF_INET:
         *this = CService(*(const struct sockaddr_in*)paddr);
         return true;
-#ifdef USE_IPV6
     case AF_INET6:
         *this = CService(*(const struct sockaddr_in6*)paddr);
         return true;
-#endif
     default:
         return false;
     }
@@ -1061,7 +978,7 @@ CService::CService(const char *pszIpPort, bool fAllowLookup)
         *this = ip;
 }
 
-CService::CService(const char *pszIpPort, uint16_t portDefault, bool fAllowLookup)
+CService::CService(const char *pszIpPort, int portDefault, bool fAllowLookup)
 {
     Init();
     CService ip;
@@ -1077,7 +994,7 @@ CService::CService(const std::string &strIpPort, bool fAllowLookup)
         *this = ip;
 }
 
-CService::CService(const std::string &strIpPort, uint16_t portDefault, bool fAllowLookup)
+CService::CService(const std::string &strIpPort, int portDefault, bool fAllowLookup)
 {
     Init();
     CService ip;
@@ -1119,7 +1036,6 @@ bool CService::GetSockAddr(struct sockaddr* paddr, socklen_t *addrlen) const
         paddrin->sin_port = htons(port);
         return true;
     }
-#ifdef USE_IPV6
     if (IsIPv6()) {
         if (*addrlen < (socklen_t)sizeof(struct sockaddr_in6))
             return false;
@@ -1132,7 +1048,6 @@ bool CService::GetSockAddr(struct sockaddr* paddr, socklen_t *addrlen) const
         paddrin6->sin6_port = htons(port);
         return true;
     }
-#endif
     return false;
 }
 
@@ -1168,17 +1083,4 @@ std::string CService::ToString() const
 void CService::SetPort(unsigned short portIn)
 {
     port = portIn;
-}
-
-bool CloseSocket(SOCKET& hSocket)
-{
-    if (hSocket == INVALID_SOCKET)
-        return false;
-#ifdef WIN32
-    int ret = closesocket(hSocket);
-#else
-    int ret = close(hSocket);
-#endif
-    hSocket = INVALID_SOCKET;
-    return ret != SOCKET_ERROR;
 }

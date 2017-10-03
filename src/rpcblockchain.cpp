@@ -1,20 +1,16 @@
 // Copyright (c) 2010 Satoshi Nakamoto
 // Copyright (c) 2009-2012 The Bitcoin developers
-// Distributed under the MIT/X11 software license, see the accompanying
-// file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
+
+#include "rpcserver.h"
 #include "main.h"
-#include "bitcoinrpc.h"
-#include <boost/filesystem.hpp>
-#include <boost/iostreams/device/file.hpp>
-#include <boost/iostreams/stream.hpp>
-#include <ostream>
+#include "kernel.h"
+#include "checkpoints.h"
 
 using namespace json_spirit;
 using namespace std;
 
-extern void TxToJSON(const CTransaction& tx, const uint256& hashBlock, json_spirit::Object& entry);
-extern enum Checkpoints::CPMode CheckpointsMode;
+extern void TxToJSON(const CTransaction& tx, const uint256 hashBlock, json_spirit::Object& entry);
 
 double GetDifficulty(const CBlockIndex* blockindex)
 {
@@ -49,6 +45,9 @@ double GetDifficulty(const CBlockIndex* blockindex)
 
 double GetPoWMHashPS()
 {
+    if (pindexBest->nHeight >= Params().LastPOWBlock())
+        return 0;
+
     int nPoWInterval = 72;
     int64_t nTargetSpacingWorkMin = 30, nTargetSpacingWork = 30;
 
@@ -84,28 +83,38 @@ double GetPoSKernelPS()
     {
         if (pindex->IsProofOfStake())
         {
-            dStakeKernelsTriedAvg += GetDifficulty(pindex) * 4294967296.0;
-            nStakesTime += pindexPrevStake ? (pindexPrevStake->nTime - pindex->nTime) : 0;
+            if (pindexPrevStake)
+            {
+                dStakeKernelsTriedAvg += GetDifficulty(pindexPrevStake) * 4294967296.0;
+                nStakesTime += pindexPrevStake->nTime - pindex->nTime;
+                nStakesHandled++;
+            }
             pindexPrevStake = pindex;
-            nStakesHandled++;
         }
 
         pindex = pindex->pprev;
     }
 
-    if (!nStakesHandled)
-        return 0;
+    double result = 0;
 
-    return dStakeKernelsTriedAvg / nStakesTime;
+    if (nStakesTime)
+        result = dStakeKernelsTriedAvg / nStakesTime;
+
+    if (IsProtocolV2(nBestHeight))
+        result *= STAKE_TIMESTAMP_MASK + 1;
+
+    return result;
 }
 
 Object blockToJSON(const CBlock& block, const CBlockIndex* blockindex, bool fPrintTransactionDetail)
 {
     Object result;
     result.push_back(Pair("hash", block.GetHash().GetHex()));
-    CMerkleTx txGen(block.vtx[0]);
-    txGen.SetMerkleBranch(&block);
-    result.push_back(Pair("confirmations", (int)txGen.GetDepthInMainChain()));
+    int confirmations = -1;
+    // Only report confirmations if the block is on the main chain
+    if (blockindex->IsInMainChain())
+        confirmations = nBestHeight - blockindex->nHeight + 1;
+    result.push_back(Pair("confirmations", confirmations));
     result.push_back(Pair("size", (int)::GetSerializeSize(block, SER_NETWORK, PROTOCOL_VERSION)));
     result.push_back(Pair("height", blockindex->nHeight));
     result.push_back(Pair("version", block.nVersion));
@@ -113,7 +122,7 @@ Object blockToJSON(const CBlock& block, const CBlockIndex* blockindex, bool fPri
     result.push_back(Pair("mint", ValueFromAmount(blockindex->nMint)));
     result.push_back(Pair("time", (int64_t)block.GetBlockTime()));
     result.push_back(Pair("nonce", (uint64_t)block.nNonce));
-    result.push_back(Pair("bits", HexBits(block.nBits)));
+    result.push_back(Pair("bits", strprintf("%08x", block.nBits)));
     result.push_back(Pair("difficulty", GetDifficulty(blockindex)));
     result.push_back(Pair("blocktrust", leftTrim(blockindex->GetBlockTrust().GetHex(), '0')));
     result.push_back(Pair("chaintrust", leftTrim(blockindex->nChainTrust.GetHex(), '0')));
@@ -123,20 +132,21 @@ Object blockToJSON(const CBlock& block, const CBlockIndex* blockindex, bool fPri
         result.push_back(Pair("nextblockhash", blockindex->pnext->GetBlockHash().GetHex()));
 
     result.push_back(Pair("flags", strprintf("%s%s", blockindex->IsProofOfStake()? "proof-of-stake" : "proof-of-work", blockindex->GeneratedStakeModifier()? " stake-modifier": "")));
-    result.push_back(Pair("proofhash", blockindex->IsProofOfStake()? blockindex->hashProofOfStake.GetHex() : blockindex->GetBlockHash().GetHex()));
+    result.push_back(Pair("proofhash", blockindex->hashProof.GetHex()));
     result.push_back(Pair("entropybit", (int)blockindex->GetStakeEntropyBit()));
-    result.push_back(Pair("modifier", strprintf("%016" PRIx64, blockindex->nStakeModifier)));
-    result.push_back(Pair("modifierchecksum", strprintf("%08x", blockindex->nStakeModifierChecksum)));
+    result.push_back(Pair("modifier", strprintf("%016x", blockindex->nStakeModifier)));
+    result.push_back(Pair("modifierv2", blockindex->bnStakeModifierV2.GetHex()));
     Array txinfo;
     BOOST_FOREACH (const CTransaction& tx, block.vtx)
     {
         if (fPrintTransactionDetail)
         {
-            CDataStream ssTx(SER_NETWORK, PROTOCOL_VERSION);
-            ssTx << tx;
-            string strHex = HexStr(ssTx.begin(), ssTx.end());
+            Object entry;
 
-            txinfo.push_back(strHex);
+            entry.push_back(Pair("txid", tx.GetHash().GetHex()));
+            TxToJSON(tx, 0, entry);
+
+            txinfo.push_back(entry);
         }
         else
             txinfo.push_back(tx.GetHash().GetHex());
@@ -144,7 +154,7 @@ Object blockToJSON(const CBlock& block, const CBlockIndex* blockindex, bool fPri
 
     result.push_back(Pair("tx", txinfo));
 
-    if ( block.IsProofOfStake() )
+    if (block.IsProofOfStake())
         result.push_back(Pair("signature", HexStr(block.vchBlockSig.begin(), block.vchBlockSig.end())));
 
     return result;
@@ -181,23 +191,9 @@ Value getdifficulty(const Array& params, bool fHelp)
     Object obj;
     obj.push_back(Pair("proof-of-work",        GetDifficulty()));
     obj.push_back(Pair("proof-of-stake",       GetDifficulty(GetLastBlockIndex(pindexBest, true))));
-    obj.push_back(Pair("search-interval",      (int)nLastCoinStakeSearchInterval));
     return obj;
 }
 
-
-Value settxfee(const Array& params, bool fHelp)
-{
-    if (fHelp || params.size() < 1 || params.size() > 1 || AmountFromValue(params[0]) < MIN_TX_FEE)
-        throw runtime_error(
-            "settxfee <amount>\n"
-            "<amount> is a real and is rounded to the nearest " + FormatMoney(MIN_TX_FEE));
-
-    nTransactionFee = AmountFromValue(params[0]);
-    nTransactionFee = (nTransactionFee / MIN_TX_FEE) * MIN_TX_FEE;  // round to minimum fee
-
-    return true;
-}
 
 Value getrawmempool(const Array& params, bool fHelp)
 {
@@ -269,94 +265,15 @@ Value getblockbynumber(const Array& params, bool fHelp)
     while (pblockindex->nHeight > nHeight)
         pblockindex = pblockindex->pprev;
 
-    pblockindex = mapBlockIndex[*pblockindex->phashBlock];
+    uint256 hash = *pblockindex->phashBlock;
+
+    pblockindex = mapBlockIndex[hash];
     block.ReadFromDisk(pblockindex, true);
 
     return blockToJSON(block, pblockindex, params.size() > 1 ? params[1].get_bool() : false);
 }
 
-bool ExportBlock(const string& strBlockHash, const CDataStream& ssBlock)
-{
-    boost::filesystem::path pathDest = GetDataDir() / strBlockHash;
-    if (boost::filesystem::is_directory(pathDest))
-        pathDest /= strBlockHash;
-
-    try {
-        boost::iostreams::stream_buffer<boost::iostreams::file_sink> buf(pathDest.string());
-        ostream                     exportStream(&buf);
-        exportStream << HexStr(ssBlock.begin(), ssBlock.end());
-        exportStream.flush();
-
-        printf("Successfully exported block to %s\n", pathDest.string().c_str());
-        return true;
-    } catch(const boost::filesystem::filesystem_error &e) {
-        printf("error exporting the block data %s (%s)\n", pathDest.string().c_str(), e.what());
-        return false;
-    }
-}
-
-
-Value dumpblock(const Array& params, bool fHelp)
-{
-    if (fHelp || params.size() < 1 || params.size() > 2)
-        throw runtime_error(
-            "dumpblock <hash> [destination]\n"
-            "Returns serialized contents of a block with given block-hash.");
-
-    std::string strHash = params[0].get_str();
-    uint256 hash(strHash);
-
-    if (mapBlockIndex.count(hash) == 0)
-        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Block not found");
-
-    CBlock block;
-    CBlockIndex* pblockindex = mapBlockIndex[hash];
-    block.ReadFromDisk(pblockindex, true);
-
-    CDataStream ssBlock(SER_NETWORK, PROTOCOL_VERSION);
-    ssBlock << block;
-
-    if (params.size() > 1)
-    {
-        return ExportBlock(params[1].get_str(), ssBlock);
-    }
-
-    return HexStr(ssBlock.begin(), ssBlock.end());
-}
-
-
-Value dumpblockbynumber(const Array& params, bool fHelp)
-{
-    if (fHelp || params.size() < 1 || params.size() > 2)
-        throw runtime_error(
-            "dumpblockbynumber <number>  [destination]\n"
-            "Returns serialized contents of a block with given block-number.");
-
-    int nHeight = params[0].get_int();
-    if (nHeight < 0 || nHeight > nBestHeight)
-        throw runtime_error("Block number out of range.");
-
-    CBlock block;
-    CBlockIndex* pblockindex = mapBlockIndex[hashBestChain];
-    while (pblockindex->nHeight > nHeight)
-        pblockindex = pblockindex->pprev;
-
-    pblockindex = mapBlockIndex[*pblockindex->phashBlock];
-    block.ReadFromDisk(pblockindex, true);
-
-    CDataStream ssBlock(SER_NETWORK, PROTOCOL_VERSION);
-    ssBlock << block;
-
-    if (params.size() > 1)
-    {
-        return ExportBlock(params[1].get_str(), ssBlock);
-    }
-
-    return HexStr(ssBlock.begin(), ssBlock.end());
-}
-
-
-// get information of sync-checkpoint
+// ppcoin: get information of sync-checkpoint
 Value getcheckpoint(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() != 0)
@@ -365,46 +282,13 @@ Value getcheckpoint(const Array& params, bool fHelp)
             "Show info of synchronized checkpoint.\n");
 
     Object result;
-    CBlockIndex* pindexCheckpoint;
+    const CBlockIndex* pindexCheckpoint = Checkpoints::AutoSelectSyncCheckpoint();
 
-    result.push_back(Pair("synccheckpoint", Checkpoints::hashSyncCheckpoint.ToString().c_str()));
-    pindexCheckpoint = mapBlockIndex[Checkpoints::hashSyncCheckpoint];
+    result.push_back(Pair("synccheckpoint", pindexCheckpoint->GetBlockHash().ToString().c_str()));
     result.push_back(Pair("height", pindexCheckpoint->nHeight));
     result.push_back(Pair("timestamp", DateTimeStrFormat(pindexCheckpoint->GetBlockTime()).c_str()));
 
-    if (Checkpoints::checkpointMessage.vchSig.size() != 0)
-    {
-        Object msgdata;
-        CUnsignedSyncCheckpoint checkpoint;
-
-        CDataStream sMsg(Checkpoints::checkpointMessage.vchMsg, SER_NETWORK, PROTOCOL_VERSION);
-        sMsg >> checkpoint;
-
-        Object parsed; // message version and data (block hash)
-        parsed.push_back(Pair("version", checkpoint.nVersion));
-        parsed.push_back(Pair("hash", checkpoint.hashCheckpoint.GetHex().c_str()));
-        msgdata.push_back(Pair("parsed", parsed));
-
-        Object raw; // raw checkpoint message data
-        raw.push_back(Pair("data", HexStr(Checkpoints::checkpointMessage.vchMsg).c_str()));
-        raw.push_back(Pair("signature", HexStr(Checkpoints::checkpointMessage.vchSig).c_str()));
-        msgdata.push_back(Pair("raw", raw));
-
-        result.push_back(Pair("data", msgdata));
-    }
-
-    // Check that the block satisfies synchronized checkpoint
-    if (CheckpointsMode == Checkpoints::STRICT)
-        result.push_back(Pair("policy", "strict"));
-
-    if (CheckpointsMode == Checkpoints::ADVISORY)
-        result.push_back(Pair("policy", "advisory"));
-
-    if (CheckpointsMode == Checkpoints::PERMISSIVE)
-        result.push_back(Pair("policy", "permissive"));
-
-    if (mapArgs.count("-checkpointkey"))
-        result.push_back(Pair("checkpointmaster", true));
+    result.push_back(Pair("policy", "rolling"));
 
     return result;
 }

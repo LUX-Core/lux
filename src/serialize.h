@@ -36,11 +36,11 @@ inline T& REF(const T& val)
     return const_cast<T&>(val);
 }
 
-/////////////////////////////////////////////////////////////////
-//
+
+
 // Templates for serializing to anything that looks like a stream,
 // i.e. anything that supports .read(char*, size_t) and .write(char*, size_t)
-//
+
 
 enum
 {
@@ -370,9 +370,9 @@ public:
 template<typename I>
 CVarInt<I> WrapVarInt(I& n) { return CVarInt<I>(n); }
 
-//
+
 // Forward declarations
-//
+
 
 // string
 template<typename C> unsigned int GetSerializeSize(const std::basic_string<C>& str, int, int=0);
@@ -424,12 +424,12 @@ template<typename Stream, typename K, typename Pred, typename A> void Unserializ
 
 
 
-//
+
 // If none of the specialized versions above matched, default to calling member function.
 // "int nType" is changed to "long nType" to keep from getting an ambiguous overload error.
 // The compiler will only cast int to long if none of the other templates matched.
 // Thanks to Boost serialization for this idea.
-//
+
 template<typename T>
 inline unsigned int GetSerializeSize(const T& a, long nType, int nVersion)
 {
@@ -480,9 +480,9 @@ void Unserialize(Stream& is, std::basic_string<C>& str, int, int)
 
 
 
-//
+
 // vector
-//
+
 template<typename T, typename A>
 unsigned int GetSerializeSize_impl(const std::vector<T, A>& v, int nType, int nVersion, const boost::true_type&)
 {

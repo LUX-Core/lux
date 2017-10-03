@@ -41,12 +41,12 @@ unsigned int nDerivationMethodIndex;
 unsigned int nMinerSleep;
 bool fUseFastIndex;
 
-//////////////////////////////////////////////////////////////////////////////
-//
-// Shutdown
-//
 
-//
+
+// Shutdown
+
+
+
 // Thread management and startup/shutdown:
 //
 // The network-processing threads are all part of a thread group
@@ -69,7 +69,7 @@ bool fUseFastIndex;
 // Shutdown for Qt is very similar, only it uses a QTimer to detect
 // fRequestShutdown getting set, and then does the normal Qt
 // shutdown thing.
-//
+
 
 volatile bool fRequestShutdown = false;
 

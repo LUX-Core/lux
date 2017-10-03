@@ -3,27 +3,40 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
+#include "base58.h"
+#include "rpcserver.h"
+#include "init.h"
+#include "net.h"
+#include "netbase.h"
+#include "timedata.h"
+#include "util.h"
 #include "wallet.h"
 #include "walletdb.h"
-#include "bitcoinrpc.h"
-#include "init.h"
-#include "util.h"
-#include "ntp.h"
-#include "base58.h"
 
-using namespace json_spirit;
 using namespace std;
+using namespace json_spirit;
 
 int64_t nWalletUnlockTime;
 static CCriticalSection cs_nWalletUnlockTime;
 
-extern int64_t nReserveBalance;
-extern void TxToJSON(const CTransaction& tx, const uint256& hashBlock, json_spirit::Object& entry);
+extern void TxToJSON(const CTransaction& tx, const uint256 hashBlock, json_spirit::Object& entry);
+
+static void accountingDeprecationCheck()
+{
+    if (!GetBoolArg("-enableaccounts", false))
+        throw runtime_error(
+            "Accounting API is deprecated and will be removed in future.\n"
+            "It can easily result in negative or odd balances if misused or misunderstood, which has happened in the field.\n"
+            "If you still want to enable it, add to your config file enableaccounts=1\n");
+
+    if (GetBoolArg("-staking", true))
+        throw runtime_error("If you want to use accounting API, staking must be disabled, add to your config file staking=0\n");
+}
 
 std::string HelpRequiringPassphrase()
 {
-    return pwalletMain->IsCrypted()
-        ? "\n\nRequires wallet passphrase to be set with walletpassphrase first"
+    return pwalletMain && pwalletMain->IsCrypted()
+        ? "\nrequires wallet passphrase to be set with walletpassphrase first"
         : "";
 }
 
@@ -31,8 +44,8 @@ void EnsureWalletIsUnlocked()
 {
     if (pwalletMain->IsLocked())
         throw JSONRPCError(RPC_WALLET_UNLOCK_NEEDED, "Error: Please enter the wallet passphrase with walletpassphrase first.");
-    if (fWalletUnlockMintOnly)
-        throw JSONRPCError(RPC_WALLET_UNLOCK_NEEDED, "Error: Wallet unlocked for block minting only.");
+    if (fWalletUnlockStakingOnly)
+        throw JSONRPCError(RPC_WALLET_UNLOCK_NEEDED, "Error: Wallet is unlocked for staking only.");
 }
 
 void WalletTxToJSON(const CWalletTx& wtx, Object& entry)
@@ -41,7 +54,7 @@ void WalletTxToJSON(const CWalletTx& wtx, Object& entry)
     entry.push_back(Pair("confirmations", confirms));
     if (wtx.IsCoinBase() || wtx.IsCoinStake())
         entry.push_back(Pair("generated", true));
-    if (confirms)
+    if (confirms > 0)
     {
         entry.push_back(Pair("blockhash", wtx.hashBlock.GetHex()));
         entry.push_back(Pair("blockindex", wtx.nIndex));
@@ -62,64 +75,41 @@ string AccountFromValue(const Value& value)
     return strAccount;
 }
 
-Value getinfo(const Array& params, bool fHelp)
+
+Value getnewpubkey(const Array& params, bool fHelp)
 {
-    if (fHelp || params.size() != 0)
+    if (fHelp || params.size() > 1)
         throw runtime_error(
-            "getinfo\n"
-            "Returns an object containing various state info.");
+            "getnewpubkey [account]\n"
+            "Returns new public key for coinbase generation.");
 
-    proxyType proxy;
-    GetProxy(NET_IPV4, proxy);
+    // Parse the account first so we don't generate a key if there's an error
+    string strAccount;
+    if (params.size() > 0)
+        strAccount = AccountFromValue(params[0]);
 
-    Object obj, diff, timestamping;
-    obj.push_back(Pair("version",       FormatFullVersion()));
-    obj.push_back(Pair("protocolversion",(int)PROTOCOL_VERSION));
-    obj.push_back(Pair("walletversion", pwalletMain->GetVersion()));
-    obj.push_back(Pair("balance",       ValueFromAmount(pwalletMain->GetBalance())));
-    obj.push_back(Pair("unspendable",       ValueFromAmount(pwalletMain->GetWatchOnlyBalance())));
-    obj.push_back(Pair("newmint",       ValueFromAmount(pwalletMain->GetNewMint())));
-    obj.push_back(Pair("stake",         ValueFromAmount(pwalletMain->GetStake())));
-    obj.push_back(Pair("blocks",        (int)nBestHeight));
+    if (!pwalletMain->IsLocked())
+        pwalletMain->TopUpKeyPool();
 
-    timestamping.push_back(Pair("systemclock", GetTime()));
-    timestamping.push_back(Pair("adjustedtime", GetAdjustedTime()));
+    // Generate a new key that is added to wallet
+    CPubKey newKey;
+    if (!pwalletMain->GetKeyFromPool(newKey))
+        throw JSONRPCError(RPC_WALLET_KEYPOOL_RAN_OUT, "Error: Keypool ran out, please call keypoolrefill first");
+    CKeyID keyID = newKey.GetID();
 
-    int64_t nNtpOffset = GetNtpOffset(),
-            nP2POffset = GetNodesOffset();
+    pwalletMain->SetAddressBookName(keyID, strAccount);
 
-    timestamping.push_back(Pair("ntpoffset", nNtpOffset != INT64_MAX ? nNtpOffset : Value::null));
-    timestamping.push_back(Pair("p2poffset", nP2POffset != INT64_MAX ? nP2POffset : Value::null));
-
-    obj.push_back(Pair("timestamping", timestamping));
-
-    obj.push_back(Pair("moneysupply",   ValueFromAmount(pindexBest->nMoneySupply)));
-    obj.push_back(Pair("connections",   (int)vNodes.size()));
-    obj.push_back(Pair("proxy",         (proxy.first.IsValid() ? proxy.first.ToStringIPPort() : string())));
-    obj.push_back(Pair("ip",            addrSeenByPeer.ToStringIP()));
-
-    diff.push_back(Pair("proof-of-work",  GetDifficulty()));
-    diff.push_back(Pair("proof-of-stake", GetDifficulty(GetLastBlockIndex(pindexBest, true))));
-    obj.push_back(Pair("difficulty",    diff));
-
-    obj.push_back(Pair("testnet",       fTestNet));
-    obj.push_back(Pair("keypoololdest", (int64_t)pwalletMain->GetOldestKeyPoolTime()));
-    obj.push_back(Pair("keypoolsize",   (int)pwalletMain->GetKeyPoolSize()));
-    obj.push_back(Pair("paytxfee",      ValueFromAmount(nTransactionFee)));
-    obj.push_back(Pair("mininput",      ValueFromAmount(nMinimumInputValue)));
-    if (pwalletMain->IsCrypted())
-        obj.push_back(Pair("unlocked_until", (int64_t)nWalletUnlockTime / 1000));
-    obj.push_back(Pair("errors",        GetWarnings("statusbar")));
-    return obj;
+    return HexStr(newKey.begin(), newKey.end());
 }
+
 
 Value getnewaddress(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() > 1)
         throw runtime_error(
             "getnewaddress [account]\n"
-            "Returns a new NovaCoin address for receiving payments.  "
-            "If [account] is specified (recommended), it is added to the address book "
+            "Returns a new Bhcoin address for receiving payments.  "
+            "If [account] is specified, it is added to the address book "
             "so payments received with the address will be credited to [account].");
 
     // Parse the account first so we don't generate a key if there's an error
@@ -132,13 +122,13 @@ Value getnewaddress(const Array& params, bool fHelp)
 
     // Generate a new key that is added to wallet
     CPubKey newKey;
-    if (!pwalletMain->GetKeyFromPool(newKey, false))
+    if (!pwalletMain->GetKeyFromPool(newKey))
         throw JSONRPCError(RPC_WALLET_KEYPOOL_RAN_OUT, "Error: Keypool ran out, please call keypoolrefill first");
-    CBitcoinAddress address(newKey.GetID());
+    CKeyID keyID = newKey.GetID();
 
-    pwalletMain->SetAddressBookName(address, strAccount);
+    pwalletMain->SetAddressBookName(keyID, strAccount);
 
-    return address.ToString();
+    return CBitcoinAddress(keyID).ToString();
 }
 
 
@@ -170,7 +160,7 @@ CBitcoinAddress GetAccountAddress(string strAccount, bool bForceNew=false)
     // Generate a new key
     if (!account.vchPubKey.IsValid() || bForceNew || bKeyUsed)
     {
-        if (!pwalletMain->GetKeyFromPool(account.vchPubKey, false))
+        if (!pwalletMain->GetKeyFromPool(account.vchPubKey))
             throw JSONRPCError(RPC_WALLET_KEYPOOL_RAN_OUT, "Error: Keypool ran out, please call keypoolrefill first");
 
         pwalletMain->SetAddressBookName(account.vchPubKey.GetID(), strAccount);
@@ -185,7 +175,7 @@ Value getaccountaddress(const Array& params, bool fHelp)
     if (fHelp || params.size() != 1)
         throw runtime_error(
             "getaccountaddress <account>\n"
-            "Returns the current NovaCoin address for receiving payments to this account.");
+            "Returns the current Bhcoin address for receiving payments to this account.");
 
     // Parse the account first so we don't generate a key if there's an error
     string strAccount = AccountFromValue(params[0]);
@@ -203,12 +193,12 @@ Value setaccount(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() < 1 || params.size() > 2)
         throw runtime_error(
-            "setaccount <novacoinaddress> <account>\n"
+            "setaccount <bhcoinaddress> <account>\n"
             "Sets the account associated with the given address.");
 
     CBitcoinAddress address(params[0].get_str());
     if (!address.IsValid())
-        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid NovaCoin address");
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid Bhcoin address");
 
 
     string strAccount;
@@ -216,14 +206,14 @@ Value setaccount(const Array& params, bool fHelp)
         strAccount = AccountFromValue(params[1]);
 
     // Detect when changing the account of an address that is the 'unused current key' of another account:
-    if (pwalletMain->mapAddressBook.count(address))
+    if (pwalletMain->mapAddressBook.count(address.Get()))
     {
-        string strOldAccount = pwalletMain->mapAddressBook[address];
+        string strOldAccount = pwalletMain->mapAddressBook[address.Get()];
         if (address == GetAccountAddress(strOldAccount))
             GetAccountAddress(strOldAccount, true);
     }
 
-    pwalletMain->SetAddressBookName(address, strAccount);
+    pwalletMain->SetAddressBookName(address.Get(), strAccount);
 
     return Value::null;
 }
@@ -233,15 +223,15 @@ Value getaccount(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() != 1)
         throw runtime_error(
-            "getaccount <novacoinaddress>\n"
+            "getaccount <bhcoinaddress>\n"
             "Returns the account associated with the given address.");
 
     CBitcoinAddress address(params[0].get_str());
     if (!address.IsValid())
-        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid NovaCoin address");
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid Bhcoin address");
 
     string strAccount;
-    map<CBitcoinAddress, string>::iterator mi = pwalletMain->mapAddressBook.find(address);
+    map<CTxDestination, string>::iterator mi = pwalletMain->mapAddressBook.find(address.Get());
     if (mi != pwalletMain->mapAddressBook.end() && !(*mi).second.empty())
         strAccount = (*mi).second;
     return strAccount;
@@ -269,75 +259,20 @@ Value getaddressesbyaccount(const Array& params, bool fHelp)
     return ret;
 }
 
-Value mergecoins(const Array& params, bool fHelp)
-{
-    if (fHelp || params.size() != 3)
-        throw runtime_error(
-            "mergecoins <amount> <minvalue> <outputvalue>\n"
-            "<amount> is resulting inputs sum\n"
-            "<minvalue> is minimum value of inputs which are used in join process\n"
-            "<outputvalue> is resulting value of inputs which will be created\n"
-            "All values are real and and rounded to the nearest " + FormatMoney(nMinimumInputValue)
-            + HelpRequiringPassphrase());
-
-    if (pwalletMain->IsLocked())
-        throw JSONRPCError(RPC_WALLET_UNLOCK_NEEDED, "Error: Please enter the wallet passphrase with walletpassphrase first.");
-
-    // Total amount
-    int64_t nAmount = AmountFromValue(params[0]);
-
-    // Min input amount
-    int64_t nMinValue = AmountFromValue(params[1]);
-
-    // Output amount
-    int64_t nOutputValue = AmountFromValue(params[2]);
-
-    if (nAmount < nMinimumInputValue)
-        throw JSONRPCError(-101, "Send amount too small");
-
-    if (nMinValue < nMinimumInputValue)
-        throw JSONRPCError(-101, "Max value too small");
-
-    if (nOutputValue < nMinimumInputValue)
-        throw JSONRPCError(-101, "Output value too small");
-
-    if (nOutputValue < nMinValue)
-        throw JSONRPCError(-101, "Output value is lower than min value");
-
-    list<uint256> listMerged;
-    if (!pwalletMain->MergeCoins(nAmount, nMinValue, nOutputValue, listMerged))
-        return Value::null;
-
-    Array mergedHashes;
-    BOOST_FOREACH(const uint256 txHash, listMerged)
-        mergedHashes.push_back(txHash.GetHex());
-
-    return mergedHashes;
-}
-
 Value sendtoaddress(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() < 2 || params.size() > 4)
         throw runtime_error(
-            "sendtoaddress <novacoinaddress> <amount> [comment] [comment-to]\n"
-            "<amount> is a real and is rounded to the nearest " + FormatMoney(nMinimumInputValue)
+            "sendtoaddress <bhcoinaddress> <amount> [comment] [comment-to]\n"
+            "<amount> is a real and is rounded to the nearest 0.000001"
             + HelpRequiringPassphrase());
 
-    // Parse address
-    CScript scriptPubKey;
-    string strAddress = params[0].get_str();
-
-    CBitcoinAddress address(strAddress);
-    if (address.IsValid())
-        scriptPubKey.SetAddress(address);
-    else
-        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid NovaCoin address");
+    CBitcoinAddress address(params[0].get_str());
+    if (!address.IsValid())
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid Bhcoin address");
 
     // Amount
     int64_t nAmount = AmountFromValue(params[1]);
-
-    if (nAmount < nMinimumInputValue)
-        throw JSONRPCError(-101, "Send amount too small");
 
     // Wallet comments
     CWalletTx wtx;
@@ -349,8 +284,8 @@ Value sendtoaddress(const Array& params, bool fHelp)
     if (pwalletMain->IsLocked())
         throw JSONRPCError(RPC_WALLET_UNLOCK_NEEDED, "Error: Please enter the wallet passphrase with walletpassphrase first.");
 
-    string strError = pwalletMain->SendMoney(scriptPubKey, nAmount, wtx);
-    if (!strError.empty())
+    string strError = pwalletMain->SendMoneyToDestination(address.Get(), nAmount, wtx);
+    if (strError != "")
         throw JSONRPCError(RPC_WALLET_ERROR, strError);
 
     return wtx.GetHash().GetHex();
@@ -366,19 +301,19 @@ Value listaddressgroupings(const Array& params, bool fHelp)
             "in past transactions");
 
     Array jsonGroupings;
-    map<CBitcoinAddress, int64_t> balances = pwalletMain->GetAddressBalances();
-    BOOST_FOREACH(set<CBitcoinAddress> grouping, pwalletMain->GetAddressGroupings())
+    map<CTxDestination, int64_t> balances = pwalletMain->GetAddressBalances();
+    BOOST_FOREACH(set<CTxDestination> grouping, pwalletMain->GetAddressGroupings())
     {
         Array jsonGrouping;
-        BOOST_FOREACH(CBitcoinAddress address, grouping)
+        BOOST_FOREACH(CTxDestination address, grouping)
         {
             Array addressInfo;
-            addressInfo.push_back(address.ToString());
+            addressInfo.push_back(CBitcoinAddress(address).ToString());
             addressInfo.push_back(ValueFromAmount(balances[address]));
             {
                 LOCK(pwalletMain->cs_wallet);
-                if (pwalletMain->mapAddressBook.find(address) != pwalletMain->mapAddressBook.end())
-                    addressInfo.push_back(pwalletMain->mapAddressBook.find(address)->second);
+                if (pwalletMain->mapAddressBook.find(CBitcoinAddress(address).Get()) != pwalletMain->mapAddressBook.end())
+                    addressInfo.push_back(pwalletMain->mapAddressBook.find(CBitcoinAddress(address).Get())->second);
             }
             jsonGrouping.push_back(addressInfo);
         }
@@ -391,7 +326,7 @@ Value signmessage(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() != 2)
         throw runtime_error(
-            "signmessage <novacoinaddress> <message>\n"
+            "signmessage <bhcoinaddress> <message>\n"
             "Sign a message with the private key of an address");
 
     EnsureWalletIsUnlocked();
@@ -411,98 +346,61 @@ Value signmessage(const Array& params, bool fHelp)
     if (!pwalletMain->GetKey(keyID, key))
         throw JSONRPCError(RPC_WALLET_ERROR, "Private key not available");
 
-    CDataStream ss(SER_GETHASH, 0);
+    CHashWriter ss(SER_GETHASH, 0);
     ss << strMessageMagic;
     ss << strMessage;
 
     vector<unsigned char> vchSig;
-    if (!key.SignCompact(Hash(ss.begin(), ss.end()), vchSig))
+    if (!key.SignCompact(ss.GetHash(), vchSig))
         throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Sign failed");
 
     return EncodeBase64(&vchSig[0], vchSig.size());
 }
 
-Value verifymessage(const Array& params, bool fHelp)
-{
-    if (fHelp || params.size() != 3)
-        throw runtime_error(
-            "verifymessage <novacoinaddress> <signature> <message>\n"
-            "Verify a signed message");
-
-    string strAddress  = params[0].get_str();
-    string strSign     = params[1].get_str();
-    string strMessage  = params[2].get_str();
-
-    CBitcoinAddress addr(strAddress);
-    if (!addr.IsValid())
-        throw JSONRPCError(RPC_TYPE_ERROR, "Invalid address");
-
-    CKeyID keyID;
-    if (!addr.GetKeyID(keyID))
-        throw JSONRPCError(RPC_TYPE_ERROR, "Address does not refer to key");
-
-    bool fInvalid = false;
-    vector<unsigned char> vchSig = DecodeBase64(strSign.c_str(), &fInvalid);
-
-    if (fInvalid)
-        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Malformed base64 encoding");
-
-    CDataStream ss(SER_GETHASH, 0);
-    ss << strMessageMagic;
-    ss << strMessage;
-
-    CPubKey key;
-    if (!key.SetCompactSignature(Hash(ss.begin(), ss.end()), vchSig))
-        return false;
-
-    return (key.GetID() == keyID);
-}
-
-
 Value getreceivedbyaddress(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() < 1 || params.size() > 2)
         throw runtime_error(
-                "getreceivedbyaddress <novacoinaddress> [minconf=1]\n"
-                "Returns the total amount received by <novacoinaddress> in transactions with at least [minconf] confirmations.");
+            "getreceivedbyaddress <bhcoinaddress> [minconf=1]\n"
+            "Returns the total amount received by <bhcoinaddress> in transactions with at least [minconf] confirmations.");
 
     // Bitcoin address
     CBitcoinAddress address = CBitcoinAddress(params[0].get_str());
+    CScript scriptPubKey;
     if (!address.IsValid())
-        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid NovaCoin address");
-    if (!IsMine(*pwalletMain,address))
-        return 0.0;
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid Bhcoin address");
+    scriptPubKey.SetDestination(address.Get());
+    if (!IsMine(*pwalletMain,scriptPubKey))
+        return (double)0.0;
 
     // Minimum confirmations
     int nMinDepth = 1;
     if (params.size() > 1)
         nMinDepth = params[1].get_int();
 
+    // Tally
     int64_t nAmount = 0;
     for (map<uint256, CWalletTx>::iterator it = pwalletMain->mapWallet.begin(); it != pwalletMain->mapWallet.end(); ++it)
     {
         const CWalletTx& wtx = (*it).second;
-        if (wtx.IsCoinBase() || wtx.IsCoinStake() || !wtx.IsFinal())
+        if (wtx.IsCoinBase() || wtx.IsCoinStake() || !IsFinalTx(wtx))
             continue;
+
         BOOST_FOREACH(const CTxOut& txout, wtx.vout)
-        {
-            CBitcoinAddress addressRet;
-            if (!ExtractAddress(*pwalletMain, txout.scriptPubKey, addressRet))
-                continue;
-            if (addressRet == address)
+            if (txout.scriptPubKey == scriptPubKey)
                 if (wtx.GetDepthInMainChain() >= nMinDepth)
                     nAmount += txout.nValue;
-        }
     }
 
     return  ValueFromAmount(nAmount);
 }
 
-void GetAccountAddresses(string strAccount, set<CBitcoinAddress>& setAddress)
+
+void GetAccountAddresses(string strAccount, set<CTxDestination>& setAddress)
 {
-    BOOST_FOREACH(const PAIRTYPE(CBitcoinAddress, string)& item, pwalletMain->mapAddressBook)
+    BOOST_FOREACH(const PAIRTYPE(CTxDestination, string)& item, pwalletMain->mapAddressBook)
     {
-        const CBitcoinAddress& address = item.first;
+        const CTxDestination& address = item.first;
         const string& strName = item.second;
         if (strName == strAccount)
             setAddress.insert(address);
@@ -516,6 +414,8 @@ Value getreceivedbyaccount(const Array& params, bool fHelp)
             "getreceivedbyaccount <account> [minconf=1]\n"
             "Returns the total amount received by addresses with <account> in transactions with at least [minconf] confirmations.");
 
+    accountingDeprecationCheck();
+
     // Minimum confirmations
     int nMinDepth = 1;
     if (params.size() > 1)
@@ -523,7 +423,7 @@ Value getreceivedbyaccount(const Array& params, bool fHelp)
 
     // Get the set of pub keys assigned to account
     string strAccount = AccountFromValue(params[0]);
-    set<CBitcoinAddress> setAddress;
+    set<CTxDestination> setAddress;
     GetAccountAddresses(strAccount, setAddress);
 
     // Tally
@@ -531,13 +431,13 @@ Value getreceivedbyaccount(const Array& params, bool fHelp)
     for (map<uint256, CWalletTx>::iterator it = pwalletMain->mapWallet.begin(); it != pwalletMain->mapWallet.end(); ++it)
     {
         const CWalletTx& wtx = (*it).second;
-        if (wtx.IsCoinBase() || wtx.IsCoinStake() || !wtx.IsFinal())
+        if (wtx.IsCoinBase() || wtx.IsCoinStake() || !IsFinalTx(wtx))
             continue;
 
         BOOST_FOREACH(const CTxOut& txout, wtx.vout)
         {
-            CBitcoinAddress address;
-            if (ExtractAddress(*pwalletMain, txout.scriptPubKey, address) && IsMine(*pwalletMain, address) && setAddress.count(address))
+            CTxDestination address;
+            if (ExtractDestination(txout.scriptPubKey, address) && IsMine(*pwalletMain, address) && setAddress.count(address))
                 if (wtx.GetDepthInMainChain() >= nMinDepth)
                     nAmount += txout.nValue;
         }
@@ -547,7 +447,7 @@ Value getreceivedbyaccount(const Array& params, bool fHelp)
 }
 
 
-int64_t GetAccountBalance(CWalletDB& walletdb, const string& strAccount, int nMinDepth, const isminefilter& filter)
+int64_t GetAccountBalance(CWalletDB& walletdb, const string& strAccount, int nMinDepth)
 {
     int64_t nBalance = 0;
 
@@ -555,15 +455,15 @@ int64_t GetAccountBalance(CWalletDB& walletdb, const string& strAccount, int nMi
     for (map<uint256, CWalletTx>::iterator it = pwalletMain->mapWallet.begin(); it != pwalletMain->mapWallet.end(); ++it)
     {
         const CWalletTx& wtx = (*it).second;
-        if (!wtx.IsFinal())
+        if (!IsFinalTx(wtx) || wtx.GetDepthInMainChain() < 0)
             continue;
 
-        int64_t nGenerated, nReceived, nSent, nFee;
-        wtx.GetAccountAmounts(strAccount, nGenerated, nReceived, nSent, nFee, filter);
+        int64_t nReceived, nSent, nFee;
+        wtx.GetAccountAmounts(strAccount, nReceived, nSent, nFee);
 
-        if (nReceived != 0 && wtx.GetDepthInMainChain() >= nMinDepth)
+        if (nReceived != 0 && wtx.GetDepthInMainChain() >= nMinDepth && wtx.GetBlocksToMaturity() == 0)
             nBalance += nReceived;
-        nBalance += nGenerated - nSent - nFee;
+        nBalance -= nSent + nFee;
     }
 
     // Tally internal accounting entries
@@ -572,10 +472,10 @@ int64_t GetAccountBalance(CWalletDB& walletdb, const string& strAccount, int nMi
     return nBalance;
 }
 
-int64_t GetAccountBalance(const string& strAccount, int nMinDepth, const isminefilter& filter)
+int64_t GetAccountBalance(const string& strAccount, int nMinDepth)
 {
     CWalletDB walletdb(pwalletMain->strWalletFile);
-    return GetAccountBalance(walletdb, strAccount, nMinDepth, filter);
+    return GetAccountBalance(walletdb, strAccount, nMinDepth);
 }
 
 
@@ -583,10 +483,9 @@ Value getbalance(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() > 2)
         throw runtime_error(
-            "getbalance [account] [minconf=1] [watchonly=0]\n"
+            "getbalance [account] [minconf=1]\n"
             "If [account] is not specified, returns the server's total available balance.\n"
-            "If [account] is specified, returns the balance in the account.\n"
-            "if [includeWatchonly] is specified, include balance in watchonly addresses (see 'importaddress').");
+            "If [account] is specified, returns the balance in the account.");
 
     if (params.size() == 0)
         return  ValueFromAmount(pwalletMain->GetBalance());
@@ -594,10 +493,6 @@ Value getbalance(const Array& params, bool fHelp)
     int nMinDepth = 1;
     if (params.size() > 1)
         nMinDepth = params[1].get_int();
-    isminefilter filter = MINE_SPENDABLE;
-    if(params.size() > 2)
-        if(params[2].get_bool())
-            filter = filter | MINE_WATCH_ONLY;
 
     if (params[0].get_str() == "*") {
         // Calculate total balance a different way from GetBalance()
@@ -610,29 +505,28 @@ Value getbalance(const Array& params, bool fHelp)
             if (!wtx.IsTrusted())
                 continue;
 
-            int64_t allGeneratedImmature, allGeneratedMature, allFee;
-            allGeneratedImmature = allGeneratedMature = allFee = 0;
-
+            int64_t allFee;
             string strSentAccount;
-            list<pair<CBitcoinAddress, int64_t> > listReceived;
-            list<pair<CBitcoinAddress, int64_t> > listSent;
-            wtx.GetAmounts(allGeneratedImmature, allGeneratedMature, listReceived, listSent, allFee, strSentAccount, filter);
-            if (wtx.GetDepthInMainChain() >= nMinDepth)
+            list<pair<CTxDestination, int64_t> > listReceived;
+            list<pair<CTxDestination, int64_t> > listSent;
+            wtx.GetAmounts(listReceived, listSent, allFee, strSentAccount);
+            if (wtx.GetDepthInMainChain() >= nMinDepth && wtx.GetBlocksToMaturity() == 0)
             {
-                BOOST_FOREACH(const PAIRTYPE(CBitcoinAddress,int64_t)& r, listReceived)
+                BOOST_FOREACH(const PAIRTYPE(CTxDestination,int64_t)& r, listReceived)
                     nBalance += r.second;
             }
-            BOOST_FOREACH(const PAIRTYPE(CBitcoinAddress,int64_t)& r, listSent)
+            BOOST_FOREACH(const PAIRTYPE(CTxDestination,int64_t)& r, listSent)
                 nBalance -= r.second;
             nBalance -= allFee;
-            nBalance += allGeneratedMature;
         }
         return  ValueFromAmount(nBalance);
     }
 
+    accountingDeprecationCheck();
+
     string strAccount = AccountFromValue(params[0]);
 
-    int64_t nBalance = GetAccountBalance(strAccount, nMinDepth, filter);
+    int64_t nBalance = GetAccountBalance(strAccount, nMinDepth);
 
     return ValueFromAmount(nBalance);
 }
@@ -645,12 +539,11 @@ Value movecmd(const Array& params, bool fHelp)
             "move <fromaccount> <toaccount> <amount> [minconf=1] [comment]\n"
             "Move from one account in your wallet to another.");
 
+    accountingDeprecationCheck();
+
     string strFrom = AccountFromValue(params[0]);
     string strTo = AccountFromValue(params[1]);
     int64_t nAmount = AmountFromValue(params[2]);
-
-    if (nAmount < nMinimumInputValue)
-        throw JSONRPCError(-101, "Send amount too small");
 
     if (params.size() > 3)
         // unused parameter, used to be nMinDepth, keep type-checking it though
@@ -696,27 +589,15 @@ Value sendfrom(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() < 3 || params.size() > 6)
         throw runtime_error(
-            "sendfrom <fromaccount> <tonovacoinaddress> <amount> [minconf=1] [comment] [comment-to]\n"
-            "<amount> is a real and is rounded to the nearest " + FormatMoney(nMinimumInputValue)
+            "sendfrom <fromaccount> <tobhcoinaddress> <amount> [minconf=1] [comment] [comment-to]\n"
+            "<amount> is a real and is rounded to the nearest 0.000001"
             + HelpRequiringPassphrase());
 
     string strAccount = AccountFromValue(params[0]);
-
-    // Parse address
-    CScript scriptPubKey;
-    string strAddress = params[1].get_str();
-
-    CBitcoinAddress address(strAddress);
-    if (address.IsValid())
-        scriptPubKey.SetAddress(address);
-    else
-        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid NovaCoin address");
-
-
+    CBitcoinAddress address(params[1].get_str());
+    if (!address.IsValid())
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid Bhcoin address");
     int64_t nAmount = AmountFromValue(params[2]);
-
-    if (nAmount < nMinimumInputValue)
-        throw JSONRPCError(-101, "Send amount too small");
 
     int nMinDepth = 1;
     if (params.size() > 3)
@@ -732,13 +613,13 @@ Value sendfrom(const Array& params, bool fHelp)
     EnsureWalletIsUnlocked();
 
     // Check funds
-    int64_t nBalance = GetAccountBalance(strAccount, nMinDepth, MINE_SPENDABLE);
+    int64_t nBalance = GetAccountBalance(strAccount, nMinDepth);
     if (nAmount > nBalance)
         throw JSONRPCError(RPC_WALLET_INSUFFICIENT_FUNDS, "Account has insufficient funds");
 
     // Send
-    string strError = pwalletMain->SendMoney(scriptPubKey, nAmount, wtx);
-    if (!strError.empty())
+    string strError = pwalletMain->SendMoneyToDestination(address.Get(), nAmount, wtx);
+    if (strError != "")
         throw JSONRPCError(RPC_WALLET_ERROR, strError);
 
     return wtx.GetHash().GetHex();
@@ -749,7 +630,7 @@ Value sendmany(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() < 2 || params.size() > 4)
         throw runtime_error(
-            "sendmany <fromaccount> '{address:amount,...}' [minconf=1] [comment]\n"
+            "sendmany <fromaccount> {address:amount,...} [minconf=1] [comment]\n"
             "amounts are double-precision floating point numbers"
             + HelpRequiringPassphrase());
 
@@ -772,21 +653,15 @@ Value sendmany(const Array& params, bool fHelp)
     {
         CBitcoinAddress address(s.name_);
         if (!address.IsValid())
-            throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, string("Invalid NovaCoin address: ")+s.name_);
+            throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, string("Invalid Bhcoin address: ")+s.name_);
 
-        if (!address.IsPair())
-        {
-            if (setAddress.count(address))
-                throw JSONRPCError(RPC_INVALID_PARAMETER, string("Invalid parameter, duplicated address: ")+s.name_);
-            setAddress.insert(address);
-        }
+        if (setAddress.count(address))
+            throw JSONRPCError(RPC_INVALID_PARAMETER, string("Invalid parameter, duplicated address: ")+s.name_);
+        setAddress.insert(address);
 
         CScript scriptPubKey;
-        scriptPubKey.SetAddress(address);
+        scriptPubKey.SetDestination(address.Get());
         int64_t nAmount = AmountFromValue(s.value_);
-
-        if (nAmount < nMinimumInputValue)
-            throw JSONRPCError(-101, "Send amount too small");
 
         totalAmount += nAmount;
 
@@ -796,7 +671,7 @@ Value sendmany(const Array& params, bool fHelp)
     EnsureWalletIsUnlocked();
 
     // Check funds
-    int64_t nBalance = GetAccountBalance(strAccount, nMinDepth, MINE_SPENDABLE);
+    int64_t nBalance = GetAccountBalance(strAccount, nMinDepth);
     if (totalAmount > nBalance)
         throw JSONRPCError(RPC_WALLET_INSUFFICIENT_FUNDS, "Account has insufficient funds");
 
@@ -806,8 +681,7 @@ Value sendmany(const Array& params, bool fHelp)
     bool fCreated = pwalletMain->CreateTransaction(vecSend, wtx, keyChange, nFeeRequired);
     if (!fCreated)
     {
-        int64_t nTotal = pwalletMain->GetBalance(), nWatchOnly = pwalletMain->GetWatchOnlyBalance();
-        if (totalAmount + nFeeRequired > nTotal - nWatchOnly)
+        if (totalAmount + nFeeRequired > pwalletMain->GetBalance())
             throw JSONRPCError(RPC_WALLET_INSUFFICIENT_FUNDS, "Insufficient funds");
         throw JSONRPCError(RPC_WALLET_ERROR, "Transaction creation failed");
     }
@@ -823,7 +697,7 @@ Value addmultisigaddress(const Array& params, bool fHelp)
     {
         string msg = "addmultisigaddress <nrequired> <'[\"key\",\"key\"]'> [account]\n"
             "Add a nrequired-to-sign multisignature address to the wallet\"\n"
-            "each key is a NovaCoin address or hex-encoded public key\n"
+            "each key is a Bhcoin address or hex-encoded public key\n"
             "If [account] is specified, assign address to [account].";
         throw runtime_error(msg);
     }
@@ -840,9 +714,7 @@ Value addmultisigaddress(const Array& params, bool fHelp)
     if ((int)keys.size() < nRequired)
         throw runtime_error(
             strprintf("not enough keys supplied "
-                      "(got %" PRIszu " keys, but need at least %d to redeem)", keys.size(), nRequired));
-    if (keys.size() > 16)
-        throw runtime_error("Number of addresses involved in the multisignature address creation > 16\nReduce the number");
+                      "(got %u keys, but need at least %d to redeem)", keys.size(), nRequired));
     std::vector<CPubKey> pubkeys;
     pubkeys.resize(keys.size());
     for (unsigned int i = 0; i < keys.size(); i++)
@@ -851,17 +723,17 @@ Value addmultisigaddress(const Array& params, bool fHelp)
 
         // Case 1: Bitcoin address and we have full public key:
         CBitcoinAddress address(ks);
-        if (address.IsValid())
+        if (pwalletMain && address.IsValid())
         {
             CKeyID keyID;
             if (!address.GetKeyID(keyID))
                 throw runtime_error(
-                    strprintf("%s does not refer to a key",ks.c_str()));
+                    strprintf("%s does not refer to a key",ks));
             CPubKey vchPubKey;
             if (!pwalletMain->GetPubKey(keyID, vchPubKey))
                 throw runtime_error(
-                    strprintf("no full public key for address %s",ks.c_str()));
-            if (!vchPubKey.IsValid())
+                    strprintf("no full public key for address %s",ks));
+            if (!vchPubKey.IsFullyValid())
                 throw runtime_error(" Invalid public key: "+ks);
             pubkeys[i] = vchPubKey;
         }
@@ -870,9 +742,9 @@ Value addmultisigaddress(const Array& params, bool fHelp)
         else if (IsHex(ks))
         {
             CPubKey vchPubKey(ParseHex(ks));
-            if (!vchPubKey.IsValid())
+            if (!vchPubKey.IsFullyValid())
                 throw runtime_error(" Invalid public key: "+ks);
-             pubkeys[i] = vchPubKey;
+            pubkeys[i] = vchPubKey;
         }
         else
         {
@@ -883,16 +755,12 @@ Value addmultisigaddress(const Array& params, bool fHelp)
     // Construct using pay-to-script-hash:
     CScript inner;
     inner.SetMultisig(nRequired, pubkeys);
+    CScriptID innerID = inner.GetID();
+    if (!pwalletMain->AddCScript(inner))
+        throw runtime_error("AddCScript() failed");
 
-    if (inner.size() > MAX_SCRIPT_ELEMENT_SIZE)
-    throw runtime_error(
-        strprintf("redeemScript exceeds size limit: %" PRIszu " > %d", inner.size(), MAX_SCRIPT_ELEMENT_SIZE));
-
-    pwalletMain->AddCScript(inner);
-    CBitcoinAddress address(inner.GetID());
-
-    pwalletMain->SetAddressBookName(address, strAccount);
-    return address.ToString();
+    pwalletMain->SetAddressBookName(innerID, strAccount);
+    return CBitcoinAddress(innerID).ToString();
 }
 
 Value addredeemscript(const Array& params, bool fHelp)
@@ -912,11 +780,12 @@ Value addredeemscript(const Array& params, bool fHelp)
     // Construct using pay-to-script-hash:
     vector<unsigned char> innerData = ParseHexV(params[0], "redeemScript");
     CScript inner(innerData.begin(), innerData.end());
-    pwalletMain->AddCScript(inner);
-    CBitcoinAddress address(inner.GetID());
+    CScriptID innerID = inner.GetID();
+    if (!pwalletMain->AddCScript(inner))
+        throw runtime_error("AddCScript() failed");
 
-    pwalletMain->SetAddressBookName(address, strAccount);
-    return address.ToString();
+    pwalletMain->SetAddressBookName(innerID, strAccount);
+    return CBitcoinAddress(innerID).ToString();
 }
 
 struct tallyitem
@@ -948,7 +817,7 @@ Value ListReceived(const Array& params, bool fByAccounts)
     {
         const CWalletTx& wtx = (*it).second;
 
-        if (wtx.IsCoinBase() || wtx.IsCoinStake() || !wtx.IsFinal())
+        if (wtx.IsCoinBase() || wtx.IsCoinStake() || !IsFinalTx(wtx))
             continue;
 
         int nDepth = wtx.GetDepthInMainChain();
@@ -1048,63 +917,38 @@ Value listreceivedbyaccount(const Array& params, bool fHelp)
             "  \"amount\" : total amount received by addresses with this account\n"
             "  \"confirmations\" : number of confirmations of the most recent transaction included");
 
+    accountingDeprecationCheck();
+
     return ListReceived(params, true);
 }
 
-static void MaybePushAddress(Object & entry, const CBitcoinAddress &dest)
+static void MaybePushAddress(Object & entry, const CTxDestination &dest)
 {
-    entry.push_back(Pair("address", dest.ToString()));
+    CBitcoinAddress addr;
+    if (addr.Set(dest))
+        entry.push_back(Pair("address", addr.ToString()));
 }
 
-void ListTransactions(const CWalletTx& wtx, const string& strAccount, int nMinDepth, bool fLong, Array& ret, const isminefilter& filter)
+void ListTransactions(const CWalletTx& wtx, const string& strAccount, int nMinDepth, bool fLong, Array& ret)
 {
-    int64_t nGeneratedImmature, nGeneratedMature, nFee;
+    int64_t nFee;
     string strSentAccount;
-    list<pair<CBitcoinAddress, int64_t> > listReceived;
-    list<pair<CBitcoinAddress, int64_t> > listSent;
+    list<pair<CTxDestination, int64_t> > listReceived;
+    list<pair<CTxDestination, int64_t> > listSent;
 
-    wtx.GetAmounts(nGeneratedImmature, nGeneratedMature, listReceived, listSent, nFee, strSentAccount, filter);
+    wtx.GetAmounts(listReceived, listSent, nFee, strSentAccount);
 
     bool fAllAccounts = (strAccount == string("*"));
-    bool involvesWatchonly = wtx.IsFromMe(MINE_WATCH_ONLY);
-
-    // Generated blocks assigned to account ""
-    if ((nGeneratedMature+nGeneratedImmature) != 0 && (fAllAccounts || strAccount.empty()))
-    {
-        Object entry;
-        entry.push_back(Pair("account", string("")));
-        if (nGeneratedImmature)
-        {
-            entry.push_back(Pair("category", wtx.GetDepthInMainChain() ? "immature" : "orphan"));
-            entry.push_back(Pair("amount", ValueFromAmount(nGeneratedImmature)));
-        }
-        else
-        {
-            entry.push_back(Pair("category", "generate"));
-            entry.push_back(Pair("amount", ValueFromAmount(nGeneratedMature)));
-        }
-        if (fLong)
-            WalletTxToJSON(wtx, entry);
-        ret.push_back(entry);
-    }
 
     // Sent
-    if ((!listSent.empty() || nFee != 0) && (fAllAccounts || strAccount == strSentAccount))
+    if ((!wtx.IsCoinStake()) && (!listSent.empty() || nFee != 0) && (fAllAccounts || strAccount == strSentAccount))
     {
-        BOOST_FOREACH(const PAIRTYPE(CBitcoinAddress, int64_t)& s, listSent)
+        BOOST_FOREACH(const PAIRTYPE(CTxDestination, int64_t)& s, listSent)
         {
             Object entry;
             entry.push_back(Pair("account", strSentAccount));
-            if(involvesWatchonly || (::IsMine(*pwalletMain, s.first) & MINE_WATCH_ONLY))
-                entry.push_back(Pair("involvesWatchonly", true));
             MaybePushAddress(entry, s.first);
-
-            if (wtx.GetDepthInMainChain() < 0) {
-                entry.push_back(Pair("category", "conflicted"));
-            } else {
-                entry.push_back(Pair("category", "send"));
-            }
-
+            entry.push_back(Pair("category", "send"));
             entry.push_back(Pair("amount", ValueFromAmount(-s.second)));
             entry.push_back(Pair("fee", ValueFromAmount(-nFee)));
             if (fLong)
@@ -1116,7 +960,8 @@ void ListTransactions(const CWalletTx& wtx, const string& strAccount, int nMinDe
     // Received
     if (listReceived.size() > 0 && wtx.GetDepthInMainChain() >= nMinDepth)
     {
-        BOOST_FOREACH(const PAIRTYPE(CBitcoinAddress, int64_t)& r, listReceived)
+        bool stop = false;
+        BOOST_FOREACH(const PAIRTYPE(CTxDestination, int64_t)& r, listReceived)
         {
             string account;
             if (pwalletMain->mapAddressBook.count(r.first))
@@ -1125,10 +970,8 @@ void ListTransactions(const CWalletTx& wtx, const string& strAccount, int nMinDe
             {
                 Object entry;
                 entry.push_back(Pair("account", account));
-                if(involvesWatchonly || (::IsMine(*pwalletMain, r.first) & MINE_WATCH_ONLY))
-                    entry.push_back(Pair("involvesWatchonly", true));
                 MaybePushAddress(entry, r.first);
-                if (wtx.IsCoinBase())
+                if (wtx.IsCoinBase() || wtx.IsCoinStake())
                 {
                     if (wtx.GetDepthInMainChain() < 1)
                         entry.push_back(Pair("category", "orphan"));
@@ -1138,12 +981,22 @@ void ListTransactions(const CWalletTx& wtx, const string& strAccount, int nMinDe
                         entry.push_back(Pair("category", "generate"));
                 }
                 else
+                {
                     entry.push_back(Pair("category", "receive"));
-                entry.push_back(Pair("amount", ValueFromAmount(r.second)));
+                }
+                if (!wtx.IsCoinStake())
+                    entry.push_back(Pair("amount", ValueFromAmount(r.second)));
+                else
+                {
+                    entry.push_back(Pair("amount", ValueFromAmount(-nFee)));
+                    stop = true; // only one coinstake output
+                }
                 if (fLong)
                     WalletTxToJSON(wtx, entry);
                 ret.push_back(entry);
             }
+            if (stop)
+                break;
         }
     }
 }
@@ -1182,11 +1035,6 @@ Value listtransactions(const Array& params, bool fHelp)
     if (params.size() > 2)
         nFrom = params[2].get_int();
 
-    isminefilter filter = MINE_SPENDABLE;
-    if(params.size() > 3)
-        if(params[3].get_bool())
-            filter = filter | MINE_WATCH_ONLY;
-
     if (nCount < 0)
         throw JSONRPCError(RPC_INVALID_PARAMETER, "Negative count");
     if (nFrom < 0)
@@ -1202,7 +1050,7 @@ Value listtransactions(const Array& params, bool fHelp)
     {
         CWalletTx *const pwtx = (*it).second.first;
         if (pwtx != 0)
-            ListTransactions(*pwtx, strAccount, 0, true, ret, filter);
+            ListTransactions(*pwtx, strAccount, 0, true, ret);
         CAccountingEntry *const pacentry = (*it).second.second;
         if (pacentry != 0)
             AcentryToJSON(*pacentry, strAccount, ret);
@@ -1235,18 +1083,14 @@ Value listaccounts(const Array& params, bool fHelp)
             "listaccounts [minconf=1]\n"
             "Returns Object that has account names as keys, account balances as values.");
 
+    accountingDeprecationCheck();
+
     int nMinDepth = 1;
     if (params.size() > 0)
         nMinDepth = params[0].get_int();
 
-    isminefilter includeWatchonly = MINE_SPENDABLE;
-    if(params.size() > 1)
-        if(params[1].get_bool())
-            includeWatchonly = includeWatchonly | MINE_WATCH_ONLY;
-
-
     map<string, int64_t> mapAccountBalances;
-    BOOST_FOREACH(const PAIRTYPE(CBitcoinAddress, string)& entry, pwalletMain->mapAddressBook) {
+    BOOST_FOREACH(const PAIRTYPE(CTxDestination, string)& entry, pwalletMain->mapAddressBook) {
         if (IsMine(*pwalletMain, entry.first)) // This address belongs to me
             mapAccountBalances[entry.second] = 0;
     }
@@ -1254,18 +1098,20 @@ Value listaccounts(const Array& params, bool fHelp)
     for (map<uint256, CWalletTx>::iterator it = pwalletMain->mapWallet.begin(); it != pwalletMain->mapWallet.end(); ++it)
     {
         const CWalletTx& wtx = (*it).second;
-        int64_t nGeneratedImmature, nGeneratedMature, nFee;
+        int64_t nFee;
         string strSentAccount;
-        list<pair<CBitcoinAddress, int64_t> > listReceived;
-        list<pair<CBitcoinAddress, int64_t> > listSent;
-        wtx.GetAmounts(nGeneratedImmature, nGeneratedMature, listReceived, listSent, nFee, strSentAccount, includeWatchonly);
+        list<pair<CTxDestination, int64_t> > listReceived;
+        list<pair<CTxDestination, int64_t> > listSent;
+        int nDepth = wtx.GetDepthInMainChain();
+        if (nDepth < 0)
+            continue;
+        wtx.GetAmounts(listReceived, listSent, nFee, strSentAccount);
         mapAccountBalances[strSentAccount] -= nFee;
-        BOOST_FOREACH(const PAIRTYPE(CBitcoinAddress, int64_t)& s, listSent)
+        BOOST_FOREACH(const PAIRTYPE(CTxDestination, int64_t)& s, listSent)
             mapAccountBalances[strSentAccount] -= s.second;
-        if (wtx.GetDepthInMainChain() >= nMinDepth)
+        if (nDepth >= nMinDepth && wtx.GetBlocksToMaturity() == 0)
         {
-            mapAccountBalances[""] += nGeneratedMature;
-            BOOST_FOREACH(const PAIRTYPE(CBitcoinAddress, int64_t)& r, listReceived)
+            BOOST_FOREACH(const PAIRTYPE(CTxDestination, int64_t)& r, listReceived)
                 if (pwalletMain->mapAddressBook.count(r.first))
                     mapAccountBalances[pwalletMain->mapAddressBook[r.first]] += r.second;
                 else
@@ -1294,7 +1140,6 @@ Value listsinceblock(const Array& params, bool fHelp)
 
     CBlockIndex *pindex = NULL;
     int target_confirms = 1;
-    isminefilter filter = MINE_SPENDABLE;
 
     if (params.size() > 0)
     {
@@ -1312,10 +1157,6 @@ Value listsinceblock(const Array& params, bool fHelp)
             throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter");
     }
 
-    if(params.size() > 2)
-        if(params[2].get_bool())
-            filter = filter | MINE_WATCH_ONLY;
-
     int depth = pindex ? (1 + nBestHeight - pindex->nHeight) : -1;
 
     Array transactions;
@@ -1325,7 +1166,7 @@ Value listsinceblock(const Array& params, bool fHelp)
         CWalletTx tx = (*it).second;
 
         if (depth == -1 || tx.GetDepthInMainChain() < depth)
-            ListTransactions(tx, "*", 0, true, transactions, filter);
+            ListTransactions(tx, "*", 0, true, transactions);
     }
 
     uint256 lastblock;
@@ -1363,11 +1204,6 @@ Value gettransaction(const Array& params, bool fHelp)
     uint256 hash;
     hash.SetHex(params[0].get_str());
 
-    isminefilter filter = MINE_SPENDABLE;
-    if(params.size() > 1)
-        if(params[1].get_bool())
-            filter = filter | MINE_WATCH_ONLY;
-
     Object entry;
 
     if (pwalletMain->mapWallet.count(hash))
@@ -1376,19 +1212,19 @@ Value gettransaction(const Array& params, bool fHelp)
 
         TxToJSON(wtx, 0, entry);
 
-        int64_t nCredit = wtx.GetCredit(filter);
-        int64_t nDebit = wtx.GetDebit(filter);
+        int64_t nCredit = wtx.GetCredit();
+        int64_t nDebit = wtx.GetDebit();
         int64_t nNet = nCredit - nDebit;
-        int64_t nFee = (wtx.IsFromMe(filter) ? wtx.GetValueOut() - nDebit : 0);
+        int64_t nFee = (wtx.IsFromMe() ? wtx.GetValueOut() - nDebit : 0);
 
         entry.push_back(Pair("amount", ValueFromAmount(nNet - nFee)));
-        if (wtx.IsFromMe(filter))
+        if (wtx.IsFromMe())
             entry.push_back(Pair("fee", ValueFromAmount(nFee)));
 
         WalletTxToJSON(wtx, entry);
 
         Array details;
-        ListTransactions(pwalletMain->mapWallet[hash], "*", 0, false, details, filter);
+        ListTransactions(pwalletMain->mapWallet[hash], "*", 0, false, details);
         entry.push_back(Pair("details", details));
     }
     else
@@ -1442,12 +1278,10 @@ Value keypoolrefill(const Array& params, bool fHelp)
     if (fHelp || params.size() > 1)
         throw runtime_error(
             "keypoolrefill [new-size]\n"
-            "Fills the keypool.\n"
-            "IMPORTANT: Any previous backups you have made of your wallet file "
-            "should be replaced with the newly generated one."
+            "Fills the keypool."
             + HelpRequiringPassphrase());
 
-    unsigned int nSize = max<unsigned int>(GetArgUInt("-keypool", 100), 0);
+    unsigned int nSize = max(GetArg("-keypool", 100), (int64_t)0);
     if (params.size() > 0) {
         if (params[0].get_int() < 0)
             throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter, expected valid size");
@@ -1464,100 +1298,28 @@ Value keypoolrefill(const Array& params, bool fHelp)
     return Value::null;
 }
 
-Value keypoolreset(const Array& params, bool fHelp)
+
+static void LockWallet(CWallet* pWallet)
 {
-    if (fHelp || params.size() > 1)
-        throw runtime_error(
-            "keypoolreset [new-size]\n"
-            "Resets the keypool.\n"
-            "IMPORTANT: Any previous backups you have made of your wallet file "
-            "should be replaced with the newly generated one."
-            + HelpRequiringPassphrase());
-
-    unsigned int nSize = max<unsigned int>(GetArgUInt("-keypool", 100), 0);
-    if (params.size() > 0) {
-        if (params[0].get_int() < 0)
-            throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter, expected valid size");
-        nSize = (unsigned int) params[0].get_int();
-    }
-
-    EnsureWalletIsUnlocked();
-
-    pwalletMain->NewKeyPool(nSize);
-
-    if (pwalletMain->GetKeyPoolSize() < nSize)
-        throw JSONRPCError(RPC_WALLET_ERROR, "Error refreshing keypool.");
-
-    return Value::null;
-}
-
-
-void ThreadTopUpKeyPool(void* parg)
-{
-    // Make this thread recognisable as the key-topping-up thread
-    RenameThread("novacoin-key-top");
-
-    pwalletMain->TopUpKeyPool();
-}
-
-void ThreadCleanWalletPassphrase(void* parg)
-{
-    // Make this thread recognisable as the wallet relocking thread
-    RenameThread("novacoin-lock-wa");
-
-    int64_t nMyWakeTime = GetTimeMillis() + *((int64_t*)parg) * 1000;
-
-    ENTER_CRITICAL_SECTION(cs_nWalletUnlockTime);
-
-    if (nWalletUnlockTime == 0)
-    {
-        nWalletUnlockTime = nMyWakeTime;
-
-        for ( ; ; )
-        {
-            if (nWalletUnlockTime==0)
-                break;
-            int64_t nToSleep = nWalletUnlockTime - GetTimeMillis();
-            if (nToSleep <= 0)
-                break;
-
-            LEAVE_CRITICAL_SECTION(cs_nWalletUnlockTime);
-            Sleep(nToSleep);
-            ENTER_CRITICAL_SECTION(cs_nWalletUnlockTime);
-
-        };
-
-        if (nWalletUnlockTime)
-        {
-            nWalletUnlockTime = 0;
-            pwalletMain->Lock();
-        }
-    }
-    else
-    {
-        if (nWalletUnlockTime < nMyWakeTime)
-            nWalletUnlockTime = nMyWakeTime;
-    }
-
-    LEAVE_CRITICAL_SECTION(cs_nWalletUnlockTime);
-
-    delete (int64_t*)parg;
+    LOCK(cs_nWalletUnlockTime);
+    nWalletUnlockTime = 0;
+    pWallet->Lock();
 }
 
 Value walletpassphrase(const Array& params, bool fHelp)
 {
     if (pwalletMain->IsCrypted() && (fHelp || params.size() < 2 || params.size() > 3))
         throw runtime_error(
-            "walletpassphrase <passphrase> <timeout> [mintonly]\n"
+            "walletpassphrase <passphrase> <timeout> [stakingonly]\n"
             "Stores the wallet decryption key in memory for <timeout> seconds.\n"
-            "mintonly is optional true/false allowing only block minting.");
+            "if [stakingonly] is true sending functions are disabled.");
     if (fHelp)
         return true;
+    if (!fServer)
+        throw JSONRPCError(RPC_SERVER_NOT_STARTED, "Error: RPC server was not started, use server=1 to change this.");
     if (!pwalletMain->IsCrypted())
         throw JSONRPCError(RPC_WALLET_WRONG_ENC_STATE, "Error: running with an unencrypted wallet, but walletpassphrase was called.");
 
-    if (!pwalletMain->IsLocked())
-        throw JSONRPCError(RPC_WALLET_ALREADY_UNLOCKED, "Error: Wallet is already unlocked, use walletlock first if need to change unlock settings.");
     // Note that the walletpassphrase is stored in params[0] which is not mlock()ed
     SecureString strWalletPass;
     strWalletPass.reserve(100);
@@ -1575,15 +1337,18 @@ Value walletpassphrase(const Array& params, bool fHelp)
             "walletpassphrase <passphrase> <timeout>\n"
             "Stores the wallet decryption key in memory for <timeout> seconds.");
 
-    NewThread(ThreadTopUpKeyPool, NULL);
-    int64_t* pnSleepTime = new int64_t(params[1].get_int64());
-    NewThread(ThreadCleanWalletPassphrase, pnSleepTime);
+    pwalletMain->TopUpKeyPool();
+
+    int64_t nSleepTime = params[1].get_int64();
+    LOCK(cs_nWalletUnlockTime);
+    nWalletUnlockTime = GetTime() + nSleepTime;
+    RPCRunLater("lockwallet", boost::bind(LockWallet, pwalletMain), nSleepTime);
 
     // ppcoin: if user OS account compromised prevent trivial sendmoney commands
     if (params.size() > 2)
-        fWalletUnlockMintOnly = params[2].get_bool();
+        fWalletUnlockStakingOnly = params[2].get_bool();
     else
-        fWalletUnlockMintOnly = false;
+        fWalletUnlockStakingOnly = false;
 
     return Value::null;
 }
@@ -1674,99 +1439,9 @@ Value encryptwallet(const Array& params, bool fHelp)
     // slack space in .dat files; that is bad if the old data is
     // unencrypted private keys. So:
     StartShutdown();
-    return "wallet encrypted; NovaCoin server stopping, restart to run with encrypted wallet.  The keypool has been flushed, you need to make a new backup.";
+    return "wallet encrypted; Bhcoin server stopping, restart to run with encrypted wallet. The keypool has been flushed, you need to make a new backup.";
 }
 
-class DescribeAddressVisitor : public boost::static_visitor<Object>
-{
-private:
-    isminetype mine;
-public:
-    DescribeAddressVisitor(isminetype mineIn) : mine(mineIn) {}
-
-    Object operator()(const CNoDestination &dest) const { return Object(); }
-    Object operator()(const CKeyID &keyID) const {
-        Object obj;
-        CPubKey vchPubKey;
-        pwalletMain->GetPubKey(keyID, vchPubKey);
-        obj.push_back(Pair("isscript", false));
-        if (mine == MINE_SPENDABLE) {
-            pwalletMain->GetPubKey(keyID, vchPubKey);
-            obj.push_back(Pair("pubkey", HexStr(vchPubKey.begin(), vchPubKey.end())));
-            obj.push_back(Pair("iscompressed", vchPubKey.IsCompressed()));
-        }
-        return obj;
-    }
-
-    Object operator()(const CScriptID &scriptID) const {
-        Object obj;
-        obj.push_back(Pair("isscript", true));
-        if (mine == MINE_SPENDABLE) {
-            CScript subscript;
-            pwalletMain->GetCScript(scriptID, subscript);
-            std::vector<CTxDestination> addresses;
-            txnouttype whichType;
-            int nRequired;
-            ExtractDestinations(subscript, whichType, addresses, nRequired);
-            obj.push_back(Pair("script", GetTxnOutputType(whichType)));
-            obj.push_back(Pair("hex", HexStr(subscript.begin(), subscript.end())));
-            Array a;
-            BOOST_FOREACH(const CTxDestination& addr, addresses)
-                a.push_back(CBitcoinAddress(addr).ToString());
-            obj.push_back(Pair("addresses", a));
-            if (whichType == TX_MULTISIG)
-                obj.push_back(Pair("sigsrequired", nRequired));
-        }
-        return obj;
-    }
-};
-
-Value validateaddress(const Array& params, bool fHelp)
-{
-    if (fHelp || params.size() != 1)
-        throw runtime_error(
-            "validateaddress <novacoinaddress>\n"
-            "Return information about <novacoinaddress>.");
-
-    CBitcoinAddress address(params[0].get_str());
-    bool isValid = address.IsValid();
-
-    Object ret;
-    ret.push_back(Pair("isvalid", isValid));
-    if (isValid)
-    {
-        if (address.IsPair())
-        {
-            CMalleablePubKey mpk;
-            mpk.setvch(address.GetData());
-            ret.push_back(Pair("ispair", true));
-
-            CMalleableKeyView view;
-            bool isMine = pwalletMain->GetMalleableView(mpk, view);
-            ret.push_back(Pair("ismine", isMine));
-            ret.push_back(Pair("PubkeyPair", mpk.ToString()));
-
-            if (isMine)
-                ret.push_back(Pair("KeyView", view.ToString()));
-        }
-        else
-        {
-            string currentAddress = address.ToString();
-            CTxDestination dest = address.Get();
-            ret.push_back(Pair("address", currentAddress));
-            isminetype mine = pwalletMain ? IsMine(*pwalletMain, address) : MINE_NO;
-            ret.push_back(Pair("ismine", mine != MINE_NO));
-            if (mine != MINE_NO) {
-                ret.push_back(Pair("watchonly", mine == MINE_WATCH_ONLY));
-                Object detail = boost::apply_visitor(DescribeAddressVisitor(mine), dest);
-                ret.insert(ret.end(), detail.begin(), detail.end());
-            }
-            if (pwalletMain->mapAddressBook.count(address))
-                ret.push_back(Pair("account", pwalletMain->mapAddressBook[address]));
-        }
-    }
-    return ret;
-}
 
 // ppcoin: reserve balance from being staked for network protection
 Value reservebalance(const Array& params, bool fHelp)
@@ -1790,19 +1465,17 @@ Value reservebalance(const Array& params, bool fHelp)
             nAmount = (nAmount / CENT) * CENT;  // round to cent
             if (nAmount < 0)
                 throw runtime_error("amount cannot be negative.\n");
-            mapArgs["-reservebalance"] = FormatMoney(nAmount);
+            nReserveBalance = nAmount;
         }
         else
         {
             if (params.size() > 1)
                 throw runtime_error("cannot specify amount to turn off reserve.\n");
-            mapArgs["-reservebalance"] = "0";
+            nReserveBalance = 0;
         }
     }
 
     Object result;
-    if (mapArgs.count("-reservebalance") && !ParseMoney(mapArgs["-reservebalance"], nReserveBalance))
-        throw runtime_error("invalid reserve balance amount\n");
     result.push_back(Pair("reserve", (nReserveBalance > 0)));
     result.push_back(Pair("amount", ValueFromAmount(nReserveBalance)));
     return result;
@@ -1868,176 +1541,38 @@ Value resendtx(const Array& params, bool fHelp)
     return Value::null;
 }
 
-Value resendwallettransactions(const Array& params, bool fHelp)
-{
-    if (fHelp || params.size() != 0)
-        throw runtime_error(
-            "resendwallettransactions\n"
-            "Immediately re-broadcast unconfirmed wallet transactions to all peers.\n"
-            "Intended only for testing; the wallet code periodically re-broadcasts\n"
-            "automatically.\n"
-            "Returns array of transaction ids that were re-broadcast.\n"
-            );
-
-    LOCK2(cs_main, pwalletMain->cs_wallet);
-
-    std::vector<uint256> txids = pwalletMain->ResendWalletTransactionsBefore(GetTime());
-    Array result;
-    BOOST_FOREACH(const uint256& txid, txids)
-    {
-        result.push_back(txid.ToString());
-    }
-    return result;
-}
-
-
-// Make a public-private key pair
+// ppcoin: make a public-private key pair
 Value makekeypair(const Array& params, bool fHelp)
 {
-    if (fHelp || params.size() > 0)
+    if (fHelp || params.size() > 1)
         throw runtime_error(
-            "makekeypair\n"
-            "Make a public/private key pair.\n");
+            "makekeypair [prefix]\n"
+            "Make a public/private key pair.\n"
+            "[prefix] is optional preferred prefix for the public key.\n");
 
     string strPrefix = "";
     if (params.size() > 0)
         strPrefix = params[0].get_str();
-
+ 
     CKey key;
-    key.MakeNewKey(true);
+    key.MakeNewKey(false);
 
     CPrivKey vchPrivKey = key.GetPrivKey();
     Object result;
     result.push_back(Pair("PrivateKey", HexStr<CPrivKey::iterator>(vchPrivKey.begin(), vchPrivKey.end())));
-
-    bool fCompressed;
-    CSecret vchSecret = key.GetSecret(fCompressed);
-    CPubKey vchPubKey = key.GetPubKey();
-    result.push_back(Pair("Secret", HexStr<CSecret::iterator>(vchSecret.begin(), vchSecret.end())));
-    result.push_back(Pair("PublicKey", HexStr(vchPubKey.begin(), vchPubKey.end())));
+    result.push_back(Pair("PublicKey", HexStr(key.GetPubKey())));
     return result;
 }
 
-Value newmalleablekey(const Array& params, bool fHelp)
+Value settxfee(const Array& params, bool fHelp)
 {
-    if (fHelp || params.size() > 1)
+    if (fHelp || params.size() < 1 || params.size() > 1 || AmountFromValue(params[0]) < MIN_TX_FEE)
         throw runtime_error(
-            "newmalleablekey\n"
-            "Make a malleable public/private key pair.\n");
+            "settxfee <amount>\n"
+            "<amount> is a real and is rounded to the nearest 0.01");
 
-    // Parse the account first so we don't generate a key if there's an error
-    string strAccount;
-    if (params.size() > 0)
-        strAccount = AccountFromValue(params[0]);
+    nTransactionFee = AmountFromValue(params[0]);
+    nTransactionFee = (nTransactionFee / CENT) * CENT;  // round to cent
 
-    CMalleableKeyView keyView = pwalletMain->GenerateNewMalleableKey();
-
-    CMalleableKey mKey;
-    if (!pwalletMain->GetMalleableKey(keyView, mKey))
-        throw runtime_error("Unable to generate new malleable key");
-
-    CMalleablePubKey mPubKey = mKey.GetMalleablePubKey();
-    CBitcoinAddress address(mPubKey);
-
-    pwalletMain->SetAddressBookName(address, strAccount);
-
-    Object result;
-    result.push_back(Pair("PublicPair", mPubKey.ToString()));
-    result.push_back(Pair("PublicBytes", HexStr(mPubKey.Raw())));
-    result.push_back(Pair("Address", address.ToString()));
-    result.push_back(Pair("KeyView", keyView.ToString()));
-
-    return result;
+    return true;
 }
-
-Value adjustmalleablekey(const Array& params, bool fHelp)
-{
-    if (fHelp || params.size() != 3)
-        throw runtime_error(
-            "adjustmalleablekey <Malleable key data> <Public key variant data> <R data>\n"
-            "Calculate new private key using provided malleable key, public key and R data.\n");
-
-    CMalleableKey malleableKey;
-    malleableKey.SetString(params[0].get_str());
-
-    CKey privKeyVariant;
-    CPubKey vchPubKeyVariant = CPubKey(ParseHex(params[1].get_str()));
-
-    CPubKey R(ParseHex(params[2].get_str()));
-
-    if (!malleableKey.CheckKeyVariant(R,vchPubKeyVariant, privKeyVariant)) {
-        throw runtime_error("Unable to calculate the private key");
-    }
-
-    Object result;
-    bool fCompressed;
-    CSecret vchPrivKeyVariant = privKeyVariant.GetSecret(fCompressed);
-
-    result.push_back(Pair("PrivateKey", CBitcoinSecret(vchPrivKeyVariant, fCompressed).ToString()));
-
-    return result;
-}
-
-Value adjustmalleablepubkey(const Array& params, bool fHelp)
-{
-    if (fHelp || params.size() > 2 || params.size() == 0)
-        throw runtime_error(
-            "adjustmalleablepubkey <Malleable address, key view or public key pair>\n"
-            "Calculate new public key using provided data.\n");
-
-    string strData = params[0].get_str();
-    CMalleablePubKey malleablePubKey;
-
-    do
-    {
-        CBitcoinAddress addr(strData);
-        if (addr.IsValid() && addr.IsPair())
-        {
-            // Initialize malleable pubkey with address data
-            malleablePubKey = CMalleablePubKey(addr.GetData());
-            break;
-        }
-        CMalleableKeyView viewTmp(strData);
-        if (viewTmp.IsValid())
-        {
-            // Shazaam, we have a valid key view here.
-            malleablePubKey = viewTmp.GetMalleablePubKey();
-            break;
-        }
-        if (malleablePubKey.SetString(strData))
-            break; // A valid public key pair
-
-        throw runtime_error("Though your data seems a valid Base58 string, we were unable to recognize it.");
-    }
-    while(false);
-
-    CPubKey R, vchPubKeyVariant;
-    malleablePubKey.GetVariant(R, vchPubKeyVariant);
-
-    Object result;
-    result.push_back(Pair("R", HexStr(R.begin(), R.end())));
-    result.push_back(Pair("PubkeyVariant", HexStr(vchPubKeyVariant.begin(), vchPubKeyVariant.end())));
-    result.push_back(Pair("KeyVariantID", CBitcoinAddress(vchPubKeyVariant.GetID()).ToString()));
-
-    return result;
-}
-
-Value listmalleableviews(const Array& params, bool fHelp)
-{
-    if (fHelp || params.size() != 0)
-        throw runtime_error(
-            "listmalleableviews\n"
-            "Get list of views for generated malleable keys.\n");
-
-    std::list<CMalleableKeyView> keyViewList;
-    pwalletMain->ListMalleableViews(keyViewList);
-
-    Array result;
-    BOOST_FOREACH(const CMalleableKeyView &keyView, keyViewList)
-    {
-        result.push_back(keyView.ToString());
-    }
-
-    return result;
-}
-

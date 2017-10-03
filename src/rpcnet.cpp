@@ -1,14 +1,18 @@
 // Copyright (c) 2009-2012 Bitcoin Developers
-// Distributed under the MIT/X11 software license, see the accompanying
-// file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "bitcoinrpc.h"
+#include "rpcserver.h"
+
 #include "alert.h"
-#include "wallet.h"
-#include "db.h"
-#include "walletdb.h"
+#include "main.h"
 #include "net.h"
-#include "ntp.h"
+#include "netbase.h"
+#include "protocol.h"
+#include "sync.h"
+#include "timedata.h"
+#include "util.h"
+
+#include <boost/foreach.hpp>
+#include "json/json_spirit_value.h"
 
 using namespace json_spirit;
 using namespace std;
@@ -24,6 +28,24 @@ Value getconnectioncount(const Array& params, bool fHelp)
     return (int)vNodes.size();
 }
 
+Value ping(const Array& params, bool fHelp)
+{
+    if (fHelp || params.size() != 0)
+        throw runtime_error(
+            "ping\n"
+            "Requests that a ping be sent to all other nodes, to measure ping time.\n"
+            "Results provided in getpeerinfo, pingtime and pingwait fields are decimal seconds.\n"
+            "Ping command is handled in queue with all other commands, so it measures processing backlog, not just network ping.");
+
+    // Request that each node send a ping during next message processing pass
+    LOCK(cs_vNodes);
+    BOOST_FOREACH(CNode* pNode, vNodes) {
+        pNode->fPingQueued = true;
+    }
+
+    return Value::null;
+}
+
 static void CopyNodeStats(std::vector<CNodeStats>& vstats)
 {
     vstats.clear();
@@ -35,69 +57,6 @@ static void CopyNodeStats(std::vector<CNodeStats>& vstats)
         pnode->copyStats(stats);
         vstats.push_back(stats);
     }
-}
-
-struct addrManItemSort {
-    bool operator()(const CAddrInfo &leftItem, const CAddrInfo &rightItem) {
-        int64_t nTime = GetTime();
-        return leftItem.GetChance(nTime) > rightItem.GetChance(nTime);
-    }
-};
-
-Value getaddrmaninfo(const Array& params, bool fHelp)
-{
-    if (fHelp || params.size() > 1)
-        throw runtime_error(
-            "getaddrmaninfo [networkType]\n"
-            "Returns a dump of addrman data.");
-
-    // Get a full list of "online" address items
-    vector<CAddrInfo> vAddr = addrman.GetOnlineAddr();
-
-    // Sort by the GetChance result backwardly
-    sort(vAddr.begin(), vAddr.end(), addrManItemSort());
-
-    string strFilterNetType = "";
-    if (params.size() == 1)
-        strFilterNetType = params[0].get_str();
-
-    Array ret;
-    BOOST_FOREACH(const CAddrInfo &addr, vAddr) {
-        if (!addr.IsRoutable() || addr.IsLocal())
-            continue;
-
-        Object addrManItem;
-        addrManItem.push_back(Pair("address", addr.ToString()));
-
-        string strNetType;
-        switch(addr.GetNetwork())
-        {
-            case NET_TOR:
-                strNetType = "tor";
-            break;
-//            case NET_I2P:
-//                strNetType = "i2p";
-//            break;
-            case NET_IPV6:
-                strNetType = "ipv6";
-            break;
-            default:
-            case NET_IPV4:
-                strNetType = "ipv4";
-
-        }
-
-        if (strFilterNetType.size() != 0 && strNetType != strFilterNetType)
-            continue;
-
-        addrManItem.push_back(Pair("chance", addr.GetChance(GetTime())));
-        addrManItem.push_back(Pair("type", strNetType));
-        addrManItem.push_back(Pair("time", (int64_t)addr.nTime));
-
-        ret.push_back(addrManItem);
-    }
-
-    return ret;
 }
 
 Value getpeerinfo(const Array& params, bool fHelp)
@@ -116,20 +75,25 @@ Value getpeerinfo(const Array& params, bool fHelp)
         Object obj;
 
         obj.push_back(Pair("addr", stats.addrName));
-        obj.push_back(Pair("services", strprintf("%08" PRIx64, stats.nServices)));
+        if (!(stats.addrLocal.empty()))
+            obj.push_back(Pair("addrlocal", stats.addrLocal));
+        obj.push_back(Pair("services", strprintf("%08x", stats.nServices)));
         obj.push_back(Pair("lastsend", (int64_t)stats.nLastSend));
         obj.push_back(Pair("lastrecv", (int64_t)stats.nLastRecv));
         obj.push_back(Pair("bytessent", (int64_t)stats.nSendBytes));
         obj.push_back(Pair("bytesrecv", (int64_t)stats.nRecvBytes));
         obj.push_back(Pair("conntime", (int64_t)stats.nTimeConnected));
+        obj.push_back(Pair("timeoffset", stats.nTimeOffset));
+        obj.push_back(Pair("pingtime", stats.dPingTime));
+        if (stats.dPingWait > 0.0)
+            obj.push_back(Pair("pingwait", stats.dPingWait));
         obj.push_back(Pair("version", stats.nVersion));
         obj.push_back(Pair("subver", stats.strSubVer));
         obj.push_back(Pair("inbound", stats.fInbound));
-        obj.push_back(Pair("releasetime", (int64_t)stats.nReleaseTime));
         obj.push_back(Pair("startingheight", stats.nStartingHeight));
         obj.push_back(Pair("banscore", stats.nMisbehavior));
-        if (stats.fSyncNode)
-            obj.push_back(Pair("syncnode", true));
+        obj.push_back(Pair("syncnode", stats.fSyncNode));
+
         ret.push_back(obj);
     }
 
@@ -152,7 +116,7 @@ Value addnode(const Array& params, bool fHelp)
     if (strCommand == "onetry")
     {
         CAddress addr;
-        OpenNetworkConnection(addr, NULL, strNode.c_str());
+        ConnectNode(addr, strNode.c_str());
         return Value::null;
     }
 
@@ -165,13 +129,13 @@ Value addnode(const Array& params, bool fHelp)
     if (strCommand == "add")
     {
         if (it != vAddedNodes.end())
-            throw JSONRPCError(-23, "Error: Node already added");
+            throw JSONRPCError(RPC_CLIENT_NODE_ALREADY_ADDED, "Error: Node already added");
         vAddedNodes.push_back(strNode);
     }
     else if(strCommand == "remove")
     {
         if (it == vAddedNodes.end())
-            throw JSONRPCError(-24, "Error: Node has not been added.");
+            throw JSONRPCError(RPC_CLIENT_NODE_NOT_ADDED, "Error: Node has not been added.");
         vAddedNodes.erase(it);
     }
 
@@ -208,34 +172,34 @@ Value getaddednodeinfo(const Array& params, bool fHelp)
                 break;
             }
         if (laddedNodes.size() == 0)
-            throw JSONRPCError(-24, "Error: Node has not been added.");
-        }
+            throw JSONRPCError(RPC_CLIENT_NODE_NOT_ADDED, "Error: Node has not been added.");
+    }
 
-        if (!fDns)
-        {
-            Object ret;
-            BOOST_FOREACH(string& strAddNode, laddedNodes)
-                ret.push_back(Pair("addednode", strAddNode));
-            return ret;
-        }
-
-        Array ret;
-
-        list<pair<string, vector<CService> > > laddedAddreses(0);
+    if (!fDns)
+    {
+        Object ret;
         BOOST_FOREACH(string& strAddNode, laddedNodes)
+            ret.push_back(Pair("addednode", strAddNode));
+        return ret;
+    }
+
+    Array ret;
+
+    list<pair<string, vector<CService> > > laddedAddreses(0);
+    BOOST_FOREACH(string& strAddNode, laddedNodes)
+    {
+        vector<CService> vservNode(0);
+        if(Lookup(strAddNode.c_str(), vservNode, Params().GetDefaultPort(), fNameLookup, 0))
+            laddedAddreses.push_back(make_pair(strAddNode, vservNode));
+        else
         {
-            vector<CService> vservNode(0);
-            if(Lookup(strAddNode.c_str(), vservNode, GetDefaultPort(), fNameLookup, 0))
-                laddedAddreses.push_back(make_pair(strAddNode, vservNode));
-            else
-            {
-                Object obj;
-                obj.push_back(Pair("addednode", strAddNode));
-                obj.push_back(Pair("connected", false));
-                Array addresses;
-                obj.push_back(Pair("addresses", addresses));
-            }
+            Object obj;
+            obj.push_back(Pair("addednode", strAddNode));
+            obj.push_back(Pair("connected", false));
+            Array addresses;
+            obj.push_back(Pair("addresses", addresses));
         }
+    }
 
     LOCK(cs_vNodes);
     for (list<pair<string, vector<CService> > >::iterator it = laddedAddreses.begin(); it != laddedAddreses.end(); it++)
@@ -270,6 +234,7 @@ Value getaddednodeinfo(const Array& params, bool fHelp)
     return ret;
 }
 
+// ppcoin: send alert.  
 // There is a known deadlock situation with ThreadMessageHandler
 // ThreadMessageHandler: holds cs_vSend and acquiring cs_main in SendMessages()
 // ThreadRPCServer: holds cs_main and acquiring cs_vSend in alert.RelayTo()/PushMessage()/BeginMessage()
@@ -306,7 +271,7 @@ Value sendalert(const Array& params, bool fHelp)
     alert.vchMsg = vector<unsigned char>(sMsg.begin(), sMsg.end());
 
     vector<unsigned char> vchPrivKey = ParseHex(params[1].get_str());
-    key.SetPrivKey(CPrivKey(vchPrivKey.begin(), vchPrivKey.end())); // if key is not correct openssl may crash
+    key.SetPrivKey(CPrivKey(vchPrivKey.begin(), vchPrivKey.end()), false); // if key is not correct openssl may crash
     if (!key.Sign(Hash(alert.vchMsg.begin(), alert.vchMsg.end()), alert.vchSig))
         throw runtime_error(
             "Unable to sign alert, check private key?\n");  
@@ -341,68 +306,8 @@ Value getnettotals(const Array& params, bool fHelp)
             "and current time.");
 
     Object obj;
-    obj.push_back(Pair("totalbytesrecv", static_cast<uint64_t>(CNode::GetTotalBytesRecv())));
-    obj.push_back(Pair("totalbytessent", static_cast<uint64_t>(CNode::GetTotalBytesSent())));
-    obj.push_back(Pair("timemillis", static_cast<int64_t>(GetTimeMillis())));
-    return obj;
-}
-
-/*
-05:53:45 ntptime
-05:53:48
-{
-"epoch" : 1442494427,
-"time" : "2015-09-17 12:53:47 UTC"
-}
-
-05:53:56 ntptime time.windows.com
-05:53:57
-{
-"epoch" : 1442494436,
-"time" : "2015-09-17 12:53:56 UTC"
-}
-
-05:54:33 ntptime time-a.nist.gov
-05:54:34
-{
-"epoch" : 1442494473,
-"time" : "2015-09-17 12:54:33 UTC"
-}*/
-
-Value ntptime(const Array& params, bool fHelp)
-{
-    if (fHelp || params.size() > 1)
-        throw runtime_error(
-            "ntptime [ntpserver]\n"
-            "Returns current time from specific or random NTP server.");
-
-    int64_t nTime;
-    if (params.size() > 0) {
-        string strHostName = params[0].get_str();
-        nTime = NtpGetTime(strHostName);
-    }
-    else {
-        CNetAddr ip;
-        nTime = NtpGetTime(ip);
-    }
-
-    Object obj;
-    switch (nTime) {
-    case -1:
-        throw runtime_error("Socket initialization error");
-    case -2:
-        throw runtime_error("Switching socket mode to non-blocking failed");
-    case -3:
-        throw runtime_error("Unable to send data");
-    case -4:
-        throw runtime_error("Receive timed out");
-    default:
-        if (nTime > 0 && nTime != 2085978496) {
-            obj.push_back(Pair("epoch", nTime));
-            obj.push_back(Pair("time", DateTimeStrFormat(nTime)));
-        }
-        else throw runtime_error("Unexpected response");
-    }
-
+    obj.push_back(Pair("totalbytesrecv", CNode::GetTotalBytesRecv()));
+    obj.push_back(Pair("totalbytessent", CNode::GetTotalBytesSent()));
+    obj.push_back(Pair("timemillis", GetTimeMillis()));
     return obj;
 }

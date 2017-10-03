@@ -9,8 +9,11 @@
 #include "main.h"
 #include "wallet.h"
 
-/* Generate a new block, without valid proof-of-work/with provided proof-of-stake */
-CBlock* CreateNewBlock(CWallet* pwallet, CTransaction *txAdd=NULL);
+/** Run the miner threads */
+void GenerateBitcoins(bool fGenerate, CWallet* pwallet, int nThreads);
+
+/* Generate a new block, without valid proof-of-work */
+CBlock* CreateNewBlock(CReserveKey& reservekey, bool fProofOfStake=false, int64_t* pFees = 0);
 
 /** Modify the extranonce in a block */
 void IncrementExtraNonce(CBlock* pblock, CBlockIndex* pindexPrev, unsigned int& nExtraNonce);
@@ -26,8 +29,5 @@ bool CheckStake(CBlock* pblock, CWallet& wallet);
 
 /** Base sha256 mining transform */
 void SHA256Transform(void* pstate, void* pinput, const void* pinit);
-
-/** Stake miner thread */
-void ThreadStakeMiner(void* parg);
 
 #endif // NOVACOIN_MINER_H
