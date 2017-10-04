@@ -9,7 +9,11 @@ Development process
 
 03/10/2017 -----> New Phi1612 hashing algorithm completed
 Note: Not finished yet, still need some work. 
+-------------------------------------------------------------------
+Testnet trial version
+===========================
 
+04/10/2017 ------> testnet trial version released 
 -------------------------------------------------------------------
 
 <b> ccminer & sgminer for phi1612 algo </b> 
