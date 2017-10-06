@@ -969,16 +969,16 @@ static CBigNum GetProofOfStakeLimit(int nHeight)
 
 int64_t GetProofOfWorkReward(int64_t nFees)
 {
-        int64_t nSubsidy = 1 * COIN;
+    int64_t nSubsidy = 1 * COIN;
 
-    if(pindexBest->nHeight == 1) {
-        nSubsidy = 7500000 * COIN;                 //Pre-mine 10%
+    if(pindexBest->nHeight <= 1) {
+        nSubsidy = 7500000 * COIN;
     } else if(pindexBest->nHeight <= 500000) {
-        nSubsidy = 100 * COIN;                     //50m 
+        nSubsidy = 100 * COIN;
     } else if(pindexBest->nHeight <= 1000000) {
-        nSubsidy = 50 * COIN;                      //25m
+        nSubsidy = 50 * COIN;
     } else {
-        nSubsidy = 1 * COIN; 
+        nSubsidy = 1 * COIN;
     }
 
     LogPrint("GetProofOfWorkReward() : create=%s", FormatMoney(nSubsidy).c_str(), nSubsidy);
@@ -1116,7 +1116,7 @@ unsigned int static DarkGravityWave3(const CBlockIndex* pindexLast/*, const CBlo
 unsigned int GetNextTargetRequired(const CBlockIndex* pindexLast, bool fProofOfStake)
 {
     // Instamine the first block <---------------------------------------------------------------------------------------------------------
-    if (pindexLast->nHeight < 1)
+    if (pindexLast->nHeight < 10)
         return GetNextTargetRequired_PoS(pindexLast, fProofOfStake);
     else if (pindexLast->nHeight < 1000000)
         return DarkGravityWave3(pindexLast);
