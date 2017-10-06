@@ -71,7 +71,7 @@ public:
         pchMessageStart[1] = 0xe2;
         pchMessageStart[2] = 0xa2;
         pchMessageStart[3] = 0xcd;
-        vAlertPubKey = ParseHex("0486cce1bac0d543f104cbff2bd23680056a3b9ea05e1137d2ff90eeb5e08472eb500322593a2cb06fbf8297d7beb6cd30cb90f98153b5b7cce1493749e41e0284");
+        vAlertPubKey = ParseHex("0486phi1bac0d543f104cbff2bd23680056a3b9ea05e1137d2ff90eeb5e08472eb500322593a2cb06fbf8297d7beb6cd30cb90f98153b5b7cce1493749e41e0284");
         nDefaultPort = 6666;
         nRPCPort = 6667;
         bnProofOfWorkLimit = CBigNum(~uint256(0) >> 20);
@@ -79,27 +79,27 @@ public:
         // Build the genesis block. Note that the output of the genesis coinbase cannot
         // be spent as it did not originally exist in the database.
 
-        const char* pszTimestamp = "THE FINAL TEST PHI1612 BEFORE LAUNCH TESTING V1.29"; // Input random pszTimestamp to generate new genesis block
+        const char* pszTimestamp = "THE FINAL TEST PHI1612 BEFORE LAUNCH - TESTING V2.1"; // Input random pszTimestamp to generate new genesis block
         std::vector<CTxIn> vin;
         vin.resize(1);
         vin[0].scriptSig = CScript() << 0 << CBigNum(42) << vector<unsigned char>((const unsigned char*)pszTimestamp, (const unsigned char*)pszTimestamp + strlen(pszTimestamp));
         std::vector<CTxOut> vout;
         vout.resize(1);
         vout[0].SetEmpty();
-        CTransaction txNew(1, 1507285537, vin, vout, 0);
+        CTransaction txNew(1, 1507293100, vin, vout, 0);
         genesis.vtx.push_back(txNew);
         genesis.hashPrevBlock = 0;
         genesis.hashMerkleRoot = genesis.BuildMerkleTree();
         genesis.nVersion = 1;
-        genesis.nTime    = 1507285537; // Replace epochtime to generate new genesis block
+        genesis.nTime    = 1507293100; // Replace epochtime to generate new genesis block
         genesis.nBits    = bnProofOfWorkLimit.GetCompact();
-        genesis.nNonce   = 589826; // Input nNonce 
+        genesis.nNonce   = 1242676; // Input nNonce 
         
         // Comment assert to generate genesis block and hash merkle root
         // Get hashMerkleRoot by using ./bhcoind getblock {Genesis-Block} 
         hashGenesisBlock = genesis.GetHash();
-        assert(hashGenesisBlock == uint256("0x4f74134df97d7d1b655371ffed0dccf2cd10315ce2285f295c63b177bc941ae4")); // Add Genesisblock 
-        assert(genesis.hashMerkleRoot == uint256("0xf4662674723d749ce1fb68e5b442c33082b109df74c6736128f03f56b7048bc5")); // Add hashMerkleRoot
+        assert(hashGenesisBlock == uint256("0xd7e3a09301ab2426738adf311fb16d4dfa271bad78671cf956aefb37a1ae3650")); // Add Genesisblock 
+        assert(genesis.hashMerkleRoot == uint256("0x100342b52470337a2b0de07902ca58f78c027c578edac09922f17efc2b76302c")); // Add hashMerkleRoot
 
         //MineGenesis(genesis);
 
@@ -156,7 +156,7 @@ public:
   
         //hashGenesisBlock = genesis.GetHash();
          
-        //assert(hashGenesisBlock == uint256("0x"));
+        //assert(hashGenesisBlock == uint256("0xbc9b5b1b6c2040eda4c5791216e52be1462be8705ff2908388521efb50632718"));
 
         vFixedSeeds.clear();
         vSeeds.clear();

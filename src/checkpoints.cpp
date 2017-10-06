@@ -21,7 +21,7 @@ namespace Checkpoints
 
     static MapCheckpoints mapCheckpoints =
         boost::assign::map_list_of
-        (  0,     uint256("0x4f74134df97d7d1b655371ffed0dccf2cd10315ce2285f295c63b177bc941ae4") ) // Input blockhash 
+        (  0,     uint256("0xd7e3a09301ab2426738adf311fb16d4dfa271bad78671cf956aefb37a1ae3650") ) // Input blockhash 
         ;
 
     // TestNet has no checkpoints
