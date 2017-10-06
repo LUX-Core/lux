@@ -138,9 +138,6 @@ void ResendWalletTransactions(bool fForce) {
     g_signals.Broadcast(fForce);
 }
 
-
-
-
 // Registration of network node signals.
 
 
@@ -870,7 +867,7 @@ bool GetTransaction(const uint256 &hash, CTransaction &tx, uint256 &hashBlock)
     return false;
 }
 
-// CBlock and CBlockIndex <--------------------------------------
+// CBlock and CBlockIndex
 
 
 static CBlockIndex* pblockindexFBBHLast;
@@ -965,14 +962,14 @@ static CBigNum GetProofOfStakeLimit(int nHeight)
         return bnProofOfStakeLimit;
 }
 
-// miner's coin base reward <--------------------------------------------------------
+// miner's coin base reward 
 
 int64_t GetProofOfWorkReward(int64_t nFees)
 {
         int64_t nSubsidy = 1 * COIN;
 
     if(pindexBest->nHeight <= 1) {
-        nSubsidy = 7500000 * COIN;                 //Pre-mine 10%
+        nSubsidy = 7500000 * COIN;                
     } else if(pindexBest->nHeight <= 500000) {
         nSubsidy = 100 * COIN;                     //50m 
     } else if(pindexBest->nHeight <= 1000000) {
@@ -1054,7 +1051,7 @@ unsigned int static DarkGravityWave3(const CBlockIndex* pindexLast/*, const CBlo
     const CBlockIndex *BlockLastSolved = pindexLast;
     const CBlockIndex *BlockReading = pindexLast;
    // const CBlock *BlockCreating = pblock;
-   // BlockCreating = BlockCreating; // <-------------------------------------------------------------
+   // BlockCreating = BlockCreating; 
     int64_t nActualTimespan = 0;
     int64_t LastBlockTime = 0;
     int64_t PastBlocksMin = 24;
@@ -1115,7 +1112,6 @@ unsigned int static DarkGravityWave3(const CBlockIndex* pindexLast/*, const CBlo
 
 unsigned int GetNextTargetRequired(const CBlockIndex* pindexLast, bool fProofOfStake)
 {
-    // Instamine the first block <---------------------------------------------------------------------------------------------------------
     if (pindexLast->nHeight < 1000)
         return GetNextTargetRequired_PoS(pindexLast, fProofOfStake);
     else if (pindexLast->nHeight < 1000000)

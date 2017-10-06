@@ -1031,10 +1031,8 @@ void CWallet::ResendWalletTransactions(bool fForce)
 
 
 
-//////////////////////////////////////////////////////////////////////////////
-//
 // Actions
-//
+
 
 
 int64_t CWallet::GetBalance() const
@@ -1174,12 +1172,7 @@ static void ApproximateBestSubset(vector<pair<int64_t, pair<const CWalletTx*,uns
         {
             for (unsigned int i = 0; i < vValue.size(); i++)
             {
-                //The solver here uses a randomized algorithm,
-                //the randomness serves no real security purpose but is just
-                //needed to prevent degenerate behavior and it is important
-                //that the rng fast. We do not use a constant random sequence,
-                //because there may be some privacy improvement by making
-                //the selection random.
+               
                 if (nPass == 0 ? insecure_rand()&1 : !vfIncluded[i])
                 {
                     nTotal += vValue[i].first;

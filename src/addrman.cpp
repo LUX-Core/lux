@@ -30,19 +30,19 @@ int CAddrInfo::GetBucketPosition(const uint256 &nKey, bool fNew, int nBucket) co
 
 bool CAddrInfo::IsTerrible(int64_t nNow) const
 {
-    if (nLastTry && nLastTry >= nNow-60) // never remove things tried the last minute
+    if (nLastTry && nLastTry >= nNow-60) 
         return false;
 
-    if (nTime > nNow + 10*60) // came in a flying DeLorean
+    if (nTime > nNow + 10*60) 
         return true;
 
-    if (nTime==0 || nNow-nTime > ADDRMAN_HORIZON_DAYS*24*60*60) // not seen in recent history
+    if (nTime==0 || nNow-nTime > ADDRMAN_HORIZON_DAYS*24*60*60) 
         return true;
 
-    if (nLastSuccess==0 && nAttempts>=ADDRMAN_RETRIES) // tried N times and never a success
+    if (nLastSuccess==0 && nAttempts>=ADDRMAN_RETRIES) 
         return true;
 
-    if (nNow-nLastSuccess > ADDRMAN_MIN_FAIL_DAYS*24*60*60 && nAttempts>=ADDRMAN_MAX_FAILURES) // N successive failures in the last week
+    if (nNow-nLastSuccess > ADDRMAN_MIN_FAIL_DAYS*24*60*60 && nAttempts>=ADDRMAN_MAX_FAILURES) 
         return true;
 
     return false;
