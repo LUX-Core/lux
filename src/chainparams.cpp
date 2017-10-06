@@ -48,7 +48,7 @@ public:
         pchMessageStart[1] = 0xe2;
         pchMessageStart[2] = 0xa2;
         pchMessageStart[3] = 0xcd;
-        vAlertPubKey = ParseHex("0486phi16120d543f104cbff2bd23680056a3b9ea05e1137d2ff90eeb5e08472eb500322593a2cb06fbf8297d7beb6cd30cb90f98153b5b7cce1493749e41e0284");
+        vAlertPubKey = ParseHex("0471dc165db490094d35cde15b1f5d755fa6ad6f2b5ed0f340e3f17f57389c3c2af113a8cbcc885bde73305a553b5640c83021128008ddf882e856336269080496");
         nDefaultPort = 6666;
         nRPCPort = 6667;
         bnProofOfWorkLimit = CBigNum(~uint256(0) >> 20);
@@ -70,17 +70,17 @@ public:
         genesis.nVersion = 1;
         genesis.nTime    = 1506923060; // Replace epochtime to generate new genesis block
         genesis.nBits    = bnProofOfWorkLimit.GetCompact();
-        genesis.nNonce   = 0; // Input nNonce 
+        genesis.nNonce   = 111571; // Input nNonce 
         
         // Comment assert to generate genesis block and hash merkle root
         // Get hashMerkleRoot by using ./bhcoind getblock {Genesis-Block} 
         hashGenesisBlock = genesis.GetHash();
-        assert(hashGenesisBlock == uint256("")); // Add Genesisblock 
-        assert(genesis.hashMerkleRoot == uint256("")); // Add hashMerkleRoot
+        assert(hashGenesisBlock == uint256("0x00000ea3fd7487119120d4a0311cf5e983e226a597ee1eda2f7946f2c44e0372")); // Add Genesisblock 
+        assert(genesis.hashMerkleRoot == uint256("0x88e50ea6e2211a8785199da10ed588a49f853e47d183898856ec923bb7aaa55e")); // Add hashMerkleRoot
 
         //MineGenesis(genesis);
 
-        vSeeds.push_back(CDNSSeedData("", "")); // Add seednode for later start
+        vSeeds.push_back(CDNSSeedData("45.63.25.110", "45.32.245.217")); // Add seednode for later start
 
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1, 25); // BHCoin address started with B
         base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1, 125);
