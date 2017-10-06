@@ -4,11 +4,11 @@ set -e
 
 umask 077
 
-basedir=~/.bhcoin
-cfgfile="$basedir/bhcoin.conf"
+basedir=~/.lux
+cfgfile="$basedir/lux.conf"
 
 [ -e "$basedir" ] || mkdir "$basedir"
 
 [ -e "$cfgfile" ] || perl -le 'print"rpcpassword=",map{(a..z,A..Z,0..9)[rand 62]}0..9' > "$cfgfile"
 
-exec /usr/lib/bhcoin/bhcoind "$@"
+exec /usr/lib/lux/luxd "$@"

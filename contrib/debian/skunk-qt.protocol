@@ -1,6 +1,6 @@
 [Protocol]
 exec=lux-qt '%u'
-protocol=bhcoin
+protocol=lux
 input=none
 output=none
 helper=true

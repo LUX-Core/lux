@@ -1,4 +1,4 @@
-# Mac OS X Bhcoind Build Instructions
+# Mac OS X Luxd Build Instructions
 
 Copyright (c) 2009-2012 Bitcoin Developers
 Distributed under the MIT/X11 software license, see the accompanying file
@@ -8,14 +8,14 @@ OpenSSL Toolkit (http://www.openssl.org/).  This product includes cryptographic
 software written by Eric Young (eay@cryptsoft.com) and UPnP software written by
 Thomas Bernard.
 
-Bhcoin authors:
+Lux authors:
 
 - Laszlo Hanyecz <solar@heliacal.net>
 - Douglas Huff <dhuff@jrbobdobbs.org>
 
 ## Notes
 
-* See readme-qt.rst for instructions on building Bhcoin QT, the
+* See readme-qt.rst for instructions on building Lux QT, the
 graphical user interface.
 
 * Tested on 10.5 and 10.6 intel.  PPC is not supported because it's big-endian.
@@ -48,14 +48,14 @@ Homebrew is an alternative to MacPorts. If you're using MacPorts, skip this sect
 
 		brew install leveldb berkeley-db4 boost miniupnpc openssl
 
-## Building Bhcoin
+## Building Lux
 
-    git clone https://github.com/bhcoind/source bhcoin
-    cd bhcoin/src
+    git clone https://github.com/luxd/source lux
+    cd lux/src
     make -f makefile.osx
 
 ## Useful commands
 
-    ./bhcoind --help  # for a list of command-line options.
-    ./bhcoind -daemon # to start the bhcoin daemon.
-    ./bhcoind help    # When the daemon is running, to get a list of RPC commands
+    ./luxd --help  # for a list of command-line options.
+    ./luxd -daemon # to start the lux daemon.
+    ./luxd help    # When the daemon is running, to get a list of RPC commands

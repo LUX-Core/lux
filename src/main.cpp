@@ -971,7 +971,7 @@ int64_t GetProofOfWorkReward(int64_t nFees)
 {
         int64_t nSubsidy = 1 * COIN;
 
-    if(pindexBest->nHeight == 1) {
+    if(pindexBest->nHeight <= 1) {
         nSubsidy = 7500000 * COIN;                 //Pre-mine 10%
     } else if(pindexBest->nHeight <= 500000) {
         nSubsidy = 100 * COIN;                     //50m 

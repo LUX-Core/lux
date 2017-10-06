@@ -16,42 +16,42 @@ sudo passwd (set up sudo access. its self explanatory)
 sudo apt-get update
 sudo apt-get upgrade -y
 sudo apt-get install build-essential libssl-dev libdb++-dev libdb-dev libboost-all-dev libqrencode-dev libminiupnpc-dev nano git
-sudo git clone https://github.com/bhcoind/source.git
+sudo git clone https://github.com/luxd/source.git
 cd source/src/leveldb/
 sudo chmod +x build_detect_platform
 sudo make libleveldb.a libmemenv.a
 cd .. .. ( its two times .. with a space )
 sudo make -f makefile.unix -j2 ( this will build the wallet / daemon for your Pi. Patience there ...)
-sudo strip bhcoind
-sudo mv bhcoind /usr/bin
-bhcoind ( run it once and wait for it to give you a config missing error )
+sudo strip luxd
+sudo mv luxd /usr/bin
+luxd ( run it once and wait for it to give you a config missing error )
 cd ( enter )
-cd .bhcoind ( enter )
-wget https://raw.githubusercontent.com/bhcoind/releases/master/bhcoin.conf ( enter )
+cd .luxd ( enter )
+wget https://raw.githubusercontent.com/luxd/releases/master/lux.conf ( enter )
 cd ( enter )
-bhcoind ( enter )
+luxd ( enter )
 
 ^ this runs the wallet or the daemon. You can check the sync progress by issuing:
 
-tail -f .bhcoind/debug.log ( press Ctrl+C to cancel )
+tail -f .luxd/debug.log ( press Ctrl+C to cancel )
 
 Get a wallet address
 
-bhcoind getnewaddress ( enter )
+luxd getnewaddress ( enter )
 
-Copy that address and send 1 BHC as a test. Wait for a block confirmation and it should show up after you do a :
+Copy that address and send 1 LUX as a test. Wait for a block confirmation and it should show up after you do a :
 
-bhcoind getbalance ( enter )
+luxd getbalance ( enter )
 
-To enable staking on your Pi device, edit bhcoin.conf file located in .bhcoin folder.
+To enable staking on your Pi device, edit lux.conf file located in .lux folder.
 
-sudo nano .bhcoin/bhcoin.conf ( enter )
+sudo nano .lux/lux.conf ( enter )
 
 add line "staking=1" ( Press Ctrl + X to exit while saving "
 
-bhcoind stop (enter)
-bhcoind (enter)
-bhcoind getinfo ( enter )
+luxd stop (enter)
+luxd (enter)
+luxd getinfo ( enter )
 
 Make sure it says "staking: true:
 
@@ -61,10 +61,10 @@ user the following :
 
 host: sftp://pi-ipaddress user: pi password:your-password port:22
 
-Jump to .bhcoin folder and copy the wallet.dat or place your wallet backup there in that folder. ( Important: Make sure 
-bhcoind stop) is done before you do this.
+Jump to .lux folder and copy the wallet.dat or place your wallet backup there in that folder. ( Important: Make sure 
+luxd stop) is done before you do this.
 
-Thats pretty much it. Ask me for tips on Discord or Telegram on how to stake BHC on your PI.
+Thats pretty much it. Ask me for tips on Discord or Telegram on how to stake LUX on your PI.
 
 -The Doctor
 

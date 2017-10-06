@@ -7,7 +7,7 @@ cryptographic software written by Eric Young (eay@cryptsoft.com) and UPnP
 software written by Thomas Bernard.
 
 
-See readme-qt.rst for instructions on building Bhcoin QT, the
+See readme-qt.rst for instructions on building Lux QT, the
 graphical user interface.
 
 WINDOWS BUILD NOTES
@@ -76,9 +76,9 @@ make -f Makefile.mingw
 mkdir miniupnpc
 cp *.h miniupnpc/
 
-Bhcoin
+Lux
 -------
 DOS prompt:
-cd \bhcoin\src
+cd \lux\src
 mingw32-make -f makefile.mingw
-strip bhcoind.exe
+strip luxd.exe

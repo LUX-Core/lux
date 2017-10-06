@@ -234,6 +234,7 @@ HEADERS += src/qt/bitcoingui.h \
     src/obj/phi1612/sph_cubehash.h \
     src/obj/phi1612/sph_fugue.h\
     src/obj/phi1612/sph_jh.h\
+    src/obj/phi1612/sph_gost.h
     src/obj/phi1612/sph_echo.h
 
 SOURCES += src/qt/bitcoin.cpp src/qt/bitcoingui.cpp \
@@ -414,8 +415,8 @@ macx:HEADERS += src/qt/macdockiconhandler.h src/qt/macnotificationhandler.h
 macx:OBJECTIVE_SOURCES += src/qt/macdockiconhandler.mm src/qt/macnotificationhandler.mm
 macx:LIBS += -framework Foundation -framework ApplicationServices -framework AppKit
 macx:DEFINES += MAC_OSX MSG_NOSIGNAL=0
-macx:ICON = src/qt/res/icons/bhcoin.icns
-macx:TARGET = "Bhcoin-Qt"
+macx:ICON = src/qt/res/icons/lux.icns
+macx:TARGET = "Lux-Qt"
 macx:QMAKE_CFLAGS_THREAD += -pthread
 macx:QMAKE_LFLAGS_THREAD += -pthread
 macx:QMAKE_CXXFLAGS_THREAD += -pthread

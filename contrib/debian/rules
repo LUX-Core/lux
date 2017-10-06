@@ -5,14 +5,14 @@
 #build/bitcoind::
 #	$(if $(filter nocheck,$(DEB_BUILD_OPTIONS)),,src/test_bitcoin)
 
-DEB_INSTALL_EXAMPLES_bhcoind += debian/examples/*
-DEB_INSTALL_MANPAGES_bhcoind += debian/manpages/*
+DEB_INSTALL_EXAMPLES_luxd += debian/examples/*
+DEB_INSTALL_MANPAGES_luxd += debian/manpages/*
 
 %:
 	dh --with bash-completion $@
 
 override_dh_auto_build:
-	cd src; $(MAKE) -f makefile.unix bhcoind
+	cd src; $(MAKE) -f makefile.unix luxd
 	$(MAKE)
 
 override_dh_auto_clean:
@@ -23,11 +23,11 @@ override_dh_auto_configure:
 	qmake lux-qt.pro USE_QRCODE=1
 
 override_dh_auto_test:
-	cd src; $(MAKE) -f makefile.unix test_bhcoin
-	src/test_bhcoin
+	cd src; $(MAKE) -f makefile.unix test_lux
+	src/test_lux
 
 # Ensure wrapper is set executable
-binary-post-install/bhcoind:
-	chmod +x $(cdbs_curdestdir)usr/bin/bhcoind
+binary-post-install/luxd:
+	chmod +x $(cdbs_curdestdir)usr/bin/luxd
 binary-post-install/lux-qt:
 	chmod +x $(cdbs_curdestdir)usr/bin/lux-qt

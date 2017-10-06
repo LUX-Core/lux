@@ -1,11 +1,11 @@
 [Desktop Entry]
 Encoding=UTF-8
-Name=Bhcoin
-Comment=Bhcoin P2P Cryptocurrency
+Name=Lux
+Comment=Lux P2P Cryptocurrency
 Exec=/usr/bin/lux-qt
 Terminal=false
 Type=Application
 Icon=/usr/share/pixmaps/bitcoin80.xpm
-MimeType=x-scheme-handler/bhcoin;
+MimeType=x-scheme-handler/lux;
 Categories=Office;
 Name[en_US]=lux-qt.desktop

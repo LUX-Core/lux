@@ -50,6 +50,6 @@ Designer: Crobbo (forum)
 Site: https://bitcointalk.org/index.php?topic=32273.0
 License: Public domain
 
-Bhcoin Logo
+Lux Logo
 Designer: Evan Zenker
 License: Creative Commons Attribution 4.0 International License

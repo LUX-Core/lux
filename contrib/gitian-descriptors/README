@@ -24,8 +24,8 @@ Once you've got the right hardware and software:
     cd ..
 
     # To build
-    cd bhcoin
+    cd lux
     git pull
     cd ../gitian-builder
     git pull
-    ./bin/gbuild --commit bitcoin=HEAD ../bhcoin/contrib/gitian-descriptors/gitian.yml
+    ./bin/gbuild --commit bitcoin=HEAD ../lux/contrib/gitian-descriptors/gitian.yml

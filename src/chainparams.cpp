@@ -38,7 +38,7 @@ void MineGenesis(CBlock genesis){
 	    printf("New best: %s\n", newhash.GetHex().c_str());
 	}
     }
-    printf("Found Genesis, Nonce: %d, Hash: %s\n", genesis.nNonce, genesis.GetHash().GetHex().c_str());
+    printf("Found Genesis, Nonce: %ld, Hash: %s\n", genesis.nNonce, genesis.GetHash().GetHex().c_str());
     printf("Gensis Hash Merkle: %s\n", genesis.hashMerkleRoot.ToString().c_str());
 }
 */
@@ -73,7 +73,7 @@ public:
         pchMessageStart[1] = 0xe2;
         pchMessageStart[2] = 0xa2;
         pchMessageStart[3] = 0xcd;
-        vAlertPubKey = ParseHex("0486phi16120d543f104cbff2bd23680056a3b9ea05e1137d2ff90eeb5e08472eb500322593a2cb06fbf8297d7beb6cd30cb90f98153b5b7cce1493749e41e0284");
+        vAlertPubKey = ParseHex("0486cce1bac0d543f104cbff2bd23680056a3b9ea05e1137d2ff90eeb5e08472eb500322593a2cb06fbf8297d7beb6cd30cb90f98153b5b7cce1493749e41e0284");
         nDefaultPort = 6666;
         nRPCPort = 6667;
         bnProofOfWorkLimit = CBigNum(~uint256(0) >> 20);
@@ -81,27 +81,27 @@ public:
         // Build the genesis block. Note that the output of the genesis coinbase cannot
         // be spent as it did not originally exist in the database.
 
-        const char* pszTimestamp = "THE NEW IMPLEMENTATION OF PHI1612 HASH - TEST V3"; // Input random pszTimestamp to generate new genesis block
+        const char* pszTimestamp = "THE NEW IMPLEMENTATION OF PHI1612 HASH - TEST V3.1"; // Input random pszTimestamp to generate new genesis block
         std::vector<CTxIn> vin;
         vin.resize(1);
         vin[0].scriptSig = CScript() << 0 << CBigNum(42) << vector<unsigned char>((const unsigned char*)pszTimestamp, (const unsigned char*)pszTimestamp + strlen(pszTimestamp));
         std::vector<CTxOut> vout;
         vout.resize(1);
         vout[0].SetEmpty();
-        CTransaction txNew(1, 1507312447, vin, vout, 0);
+        CTransaction txNew(1, 1507278322, vin, vout, 0);
         genesis.vtx.push_back(txNew);
         genesis.hashPrevBlock = 0;
         genesis.hashMerkleRoot = genesis.BuildMerkleTree();
         genesis.nVersion = 1;
-        genesis.nTime    = 1507312447; // Replace epochtime to generate new genesis block
+        genesis.nTime    = 1507278322; // Replace epochtime to generate new genesis block
         genesis.nBits    = bnProofOfWorkLimit.GetCompact();
-        genesis.nNonce   = 2043303; // Input nNonce 
+        genesis.nNonce   = 361565; // Input nNonce 
         
         // Comment assert to generate genesis block and hash merkle root
         // Get hashMerkleRoot by using ./luxd getblock {Genesis-Block} 
         hashGenesisBlock = genesis.GetHash();
-        assert(hashGenesisBlock == uint256("0x00000a64f027b1c7f4f9584e56b101f4dea7323a1fee6fd963cdda648d7ca215")); // Add Genesisblock 
-        assert(genesis.hashMerkleRoot == uint256("0x907f70506d4d68ad3b2f28e585ab407b8af7d8b8483d3189c6f7a97be84424e0")); // Add hashMerkleRoot
+        assert(hashGenesisBlock == uint256("0x00000b9ccd651d82f1bd79450ff631ed7155eb27828b432c94cf02650fb66409")); // Add Genesisblock 
+        assert(genesis.hashMerkleRoot == uint256("0x77454bf2b437f2346a4e33fd8c5523556f636732696873a5592ca16db86b5ef2")); // Add hashMerkleRoot
 
         //MineGenesis(genesis);
 
@@ -154,7 +154,7 @@ public:
         // Modify the testnet genesis block so the timestamp is valid for a later start.
         genesis.nBits  = bnProofOfWorkLimit.GetCompact();
         genesis.nNonce = 0; // Input nNonce after generated genesis block for testnet used
-        genesis.nTime    = 1506923060;
+        genesis.nTime    = 1507278322;
   
         //hashGenesisBlock = genesis.GetHash();
          

@@ -5,16 +5,16 @@ set -e
 date
 
 #################################################################
-# Update Ubuntu and install prerequisites for running Bhcoin   #
+# Update Ubuntu and install prerequisites for running Lux   #
 #################################################################
 sudo apt-get update
 #################################################################
-# Build Bhcoin from source                                     #
+# Build Lux from source                                     #
 #################################################################
 NPROC=$(nproc)
 echo "nproc: $NPROC"
 #################################################################
-# Install all necessary packages for building Bhcoin           #
+# Install all necessary packages for building Lux           #
 #################################################################
 sudo apt-get install -y qt4-qmake libqt4-dev libminiupnpc-dev libdb++-dev libdb-dev libcrypto++-dev libqrencode-dev libboost-all-dev build-essential libboost-system-dev libboost-filesystem-dev libboost-program-options-dev libboost-thread-dev libboost-filesystem-dev libboost-program-options-dev libboost-thread-dev libssl-dev libdb++-dev libssl-dev ufw git
 sudo add-apt-repository -y ppa:bitcoin/bitcoin

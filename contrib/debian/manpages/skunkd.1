@@ -1,19 +1,19 @@
-.TH BHCD "7" "July 2014" "bhcoind 3.19" 
+.TH LUXD "7" "July 2014" "luxd 3.19" 
 .SH NAME
-bhcoind \- peer-to-peer network based digital currency
+luxd \- peer-to-peer network based digital currency
 .SH SYNOPSIS
-bhcoin [options] <command> [params]  
+lux [options] <command> [params]  
 .TP
-bhcoin [options] help <command> - Get help for a command
+lux [options] help <command> - Get help for a command
 .SH DESCRIPTION
-This  manual page documents the bhcoind program. Novacoin is a peer-to-peer digital currency. Peer-to-peer (P2P) means that there is no central authority to issue new money or keep track of transactions. Instead, these tasks are managed collectively by the nodes of the network. Advantages:
+This  manual page documents the luxd program. Novacoin is a peer-to-peer digital currency. Peer-to-peer (P2P) means that there is no central authority to issue new money or keep track of transactions. Instead, these tasks are managed collectively by the nodes of the network. Advantages:
 
 Novacoins can be sent easily through the Internet, without having to trust middlemen. Transactions are designed to be irreversible. Be safe from instability caused by fractional reserve banking and central banks. The limited inflation of the Novacoin system’s money supply is distributed evenly (by CPU power) throughout the network, not monopolized by banks.
 
 .SH OPTIONS
 .TP
 \fB\-conf=\fR<file>
-Specify configuration file (default: bhcoin.conf)
+Specify configuration file (default: lux.conf)
 .TP
 \fB\-gen\fR
 Generate coins
@@ -84,14 +84,14 @@ This help message
 \fBbackupwallet 'destination'\fR
 Safely copies *wallet.dat* to 'destination', which can be a directory or a path with filename.
 .TP
-\fBgetaccount 'bhcoinaddress'\fR
+\fBgetaccount 'luxaddress'\fR
 Returns the account associated with the given address.
 .TP
-\fBsetaccount 'bhcoinaddress' ['account']\fR
+\fBsetaccount 'luxaddress' ['account']\fR
 Sets the ['account'] associated with the given address. ['account'] may be omitted to remove an address from ['account'].
 .TP
 \fBgetaccountaddress 'account'\fR
-Returns a new bhcoin address for 'account'.
+Returns a new lux address for 'account'.
 .TP
 \fBgetaddressesbyaccount 'account'\fR
 Returns the list of addresses associated with the given 'account'.
@@ -112,7 +112,7 @@ Returns the number of connections to other nodes.
 Returns the proof-of-work difficulty as a multiple of the minimum difficulty.
 .TP
 \fBgetgenerate\fR
-Returns boolean true if server is trying to generate bhcoins, false otherwise.
+Returns boolean true if server is trying to generate luxs, false otherwise.
 .TP
 \fBsetgenerate 'generate' ['genproclimit']\fR
 Generation is limited to ['genproclimit'] processors, -1 is unlimited.
@@ -124,13 +124,13 @@ Returns a recent hashes per second performance measurement while generating.
 Returns an object containing server information.
 .TP
 \fBgetnewaddress 'account'\fR
-Returns a new bhcoin address for receiving payments. If 'account' is specified (recommended), it is added to the address book so payments received with the address will be credited to 'account'.
+Returns a new lux address for receiving payments. If 'account' is specified (recommended), it is added to the address book so payments received with the address will be credited to 'account'.
 .TP
 \fBgetreceivedbyaccount 'account' ['minconf=1']\fR
 Returns the total amount received by addresses associated with 'account' in transactions with at least ['minconf'] confirmations.
 .TP
-\fBgetreceivedbyaddress 'bhcoinaddress' ['minconf=1']\fR
-Returns the total amount received by 'bhcoinaddress' in transactions with at least ['minconf'] confirmations.
+\fBgetreceivedbyaddress 'luxaddress' ['minconf=1']\fR
+Returns the total amount received by 'luxaddress' in transactions with at least ['minconf'] confirmations.
 .TP
 \fBgettransaction 'txid'\fR
 Returns information about a specific transaction, given hexadecimal transaction ID.
@@ -179,26 +179,26 @@ Returns a list of the last ['count'] transactions for 'account' - for all accoun
 \fBmove <'fromaccount'> <'toaccount'> <'amount'> ['minconf=1'] ['comment']\fR
 Moves funds between accounts.
 .TP
-\fBsendfrom* <'account'> <'bhcoinaddress'> <'amount'> ['minconf=1'] ['comment'] ['comment-to']\fR
-Sends amount from account's balance to 'bhcoinaddress'. This method will fail if there is less than amount bhcoins with ['minconf'] confirmations in the account's balance (unless account is the empty-string-named default account; it behaves like the *sendtoaddress* method). Returns transaction ID on success.
+\fBsendfrom* <'account'> <'luxaddress'> <'amount'> ['minconf=1'] ['comment'] ['comment-to']\fR
+Sends amount from account's balance to 'luxaddress'. This method will fail if there is less than amount luxs with ['minconf'] confirmations in the account's balance (unless account is the empty-string-named default account; it behaves like the *sendtoaddress* method). Returns transaction ID on success.
 .TP     
-\fBsendtoaddress 'bhcoinaddress' 'amount' ['comment'] ['comment-to']\fR
-Sends amount from the server's available balance to 'bhcoinaddress'. amount is a real and is rounded to the nearest 0.01. Returns transaction id on success.
+\fBsendtoaddress 'luxaddress' 'amount' ['comment'] ['comment-to']\fR
+Sends amount from the server's available balance to 'luxaddress'. amount is a real and is rounded to the nearest 0.01. Returns transaction id on success.
 .TP    
 \fBstop\fR
-Stops the bhcoin server.
+Stops the lux server.
 .TP    
-\fBvalidateaddress 'bhcoinaddress'\fR
-Checks that 'bhcoinaddress' looks like a proper bhcoin address. Returns an object containing:
+\fBvalidateaddress 'luxaddress'\fR
+Checks that 'luxaddress' looks like a proper lux address. Returns an object containing:
 
     "isvalid" : true or false.
     "ismine"  : true if the address is in the server's wallet.
-    "address" : bhcoinaddress.
+    "address" : luxaddress.
 
     *note: ismine and address are only returned if the address is valid.
 
 .SH "SEE ALSO"
-bhcoin.conf(5)
+lux.conf(5)
 .SH AUTHOR
 This manual page was written by Micah Anderson <micah@debian.org> for the Debian system (but may be used by others). Permission is granted to copy, distribute and/or modify this document under the terms of the GNU General Public License, Version 3 or any later version published by the Free Software Foundation.
 

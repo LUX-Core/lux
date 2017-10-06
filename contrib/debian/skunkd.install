@@ -1,2 +1,2 @@
-debian/bin/bhcoind usr/bin
-src/bhcoind usr/lib/bhcoin
+debian/bin/luxd usr/bin
+src/luxd usr/lib/lux
