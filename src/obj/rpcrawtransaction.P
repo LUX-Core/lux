@@ -8,13 +8,13 @@ obj/rpcrawtransaction.o: rpcrawtransaction.cpp base58.h chainparams.h \
  json/json_spirit_error_position.h json/json_spirit_utils.h \
  json/json_spirit_writer_template.h txdb.h txdb-leveldb.h main.h core.h \
  txmempool.h net.h mruset.h netbase.h protocol.h addrman.h timedata.h \
- scrypt.h /home/bh/source/src/leveldb/include/leveldb/db.h \
- /home/bh/source/src/leveldb/include/leveldb/iterator.h \
- /home/bh/source/src/leveldb/include/leveldb/slice.h \
- /home/bh/source/src/leveldb/include/leveldb/status.h \
- /home/bh/source/src/leveldb/include/leveldb/options.h \
- /home/bh/source/src/leveldb/include/leveldb/write_batch.h init.h \
- wallet.h walletdb.h db.h crypter.h ui_interface.h
+ scrypt.h /home/bh/test/src/leveldb/include/leveldb/db.h \
+ /home/bh/test/src/leveldb/include/leveldb/iterator.h \
+ /home/bh/test/src/leveldb/include/leveldb/slice.h \
+ /home/bh/test/src/leveldb/include/leveldb/status.h \
+ /home/bh/test/src/leveldb/include/leveldb/options.h \
+ /home/bh/test/src/leveldb/include/leveldb/write_batch.h init.h wallet.h \
+ walletdb.h db.h crypter.h ui_interface.h
 rpcrawtransaction.cpp base58.h chainparams.h :
  bignum.h serialize.h allocators.h version.h clientversion.h uint256.h :
  util.h tinyformat.h key.h hash.h obj/phi1612/sph_skein.h :
@@ -25,10 +25,10 @@ rpcrawtransaction.cpp base58.h chainparams.h :
  json/json_spirit_error_position.h json/json_spirit_utils.h :
  json/json_spirit_writer_template.h txdb.h txdb-leveldb.h main.h core.h :
  txmempool.h net.h mruset.h netbase.h protocol.h addrman.h timedata.h :
- scrypt.h /home/bh/source/src/leveldb/include/leveldb/db.h :
- /home/bh/source/src/leveldb/include/leveldb/iterator.h :
- /home/bh/source/src/leveldb/include/leveldb/slice.h :
- /home/bh/source/src/leveldb/include/leveldb/status.h :
- /home/bh/source/src/leveldb/include/leveldb/options.h :
- /home/bh/source/src/leveldb/include/leveldb/write_batch.h init.h :
- wallet.h walletdb.h db.h crypter.h ui_interface.h :
+ scrypt.h /home/bh/test/src/leveldb/include/leveldb/db.h :
+ /home/bh/test/src/leveldb/include/leveldb/iterator.h :
+ /home/bh/test/src/leveldb/include/leveldb/slice.h :
+ /home/bh/test/src/leveldb/include/leveldb/status.h :
+ /home/bh/test/src/leveldb/include/leveldb/options.h :
+ /home/bh/test/src/leveldb/include/leveldb/write_batch.h init.h wallet.h :
+ walletdb.h db.h crypter.h ui_interface.h :

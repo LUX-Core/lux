@@ -30,14 +30,15 @@ Status BlockHandle::DecodeFrom(Slice* input) {
 }
 
 void Footer::EncodeTo(std::string* dst) const {
+#ifndef NDEBUG
   const size_t original_size = dst->size();
+#endif
   metaindex_handle_.EncodeTo(dst);
   index_handle_.EncodeTo(dst);
   dst->resize(2 * BlockHandle::kMaxEncodedLength);  // Padding
   PutFixed32(dst, static_cast<uint32_t>(kTableMagicNumber & 0xffffffffu));
   PutFixed32(dst, static_cast<uint32_t>(kTableMagicNumber >> 32));
   assert(dst->size() == original_size + kEncodedLength);
-  (void)original_size;  // Disable unused variable warning.
 }
 
 Status Footer::DecodeFrom(Slice* input) {
@@ -47,7 +48,7 @@ Status Footer::DecodeFrom(Slice* input) {
   const uint64_t magic = ((static_cast<uint64_t>(magic_hi) << 32) |
                           (static_cast<uint64_t>(magic_lo)));
   if (magic != kTableMagicNumber) {
-    return Status::Corruption("not an sstable (bad magic number)");
+    return Status::InvalidArgument("not an sstable (bad magic number)");
   }
 
   Status result = metaindex_handle_.DecodeFrom(input);

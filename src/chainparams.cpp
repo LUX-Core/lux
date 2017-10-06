@@ -19,6 +19,28 @@ struct SeedSpec6 {
 
 #include "chainparamsseeds.h"
 
+void MineGenesis(CBlock genesis){
+    // This will figure out a valid hash and Nonce if you're creating a different genesis block:
+    uint256 hashTarget = CBigNum().SetCompact(Params().ProofOfWorkLimit().GetCompact()).getuint256();
+    printf("Target: %s\n", hashTarget.GetHex().c_str());
+    uint256 newhash = genesis.GetHash();
+    uint256 besthash;
+    memset(&besthash,0xFF,32);
+    while (newhash > hashTarget) {
+    	++genesis.nNonce;
+        if (genesis.nNonce == 0){
+            printf("NONCE WRAPPED, incrementing time");
+            ++genesis.nTime;
+        }
+	newhash = genesis.GetHash();
+	if(newhash < besthash){
+	    besthash=newhash;
+	    printf("New best: %s\n", newhash.GetHex().c_str());
+	}
+    }
+    printf("Found Genesis, Nonce: %ld, Hash: %s\n", genesis.nNonce, genesis.GetHash().GetHex().c_str());
+    printf("Gensis Hash Merkle: %s\n", genesis.hashMerkleRoot.ToString().c_str());
+}
 // Mainnet
 // Need some more configure to generate new genesis block. Note: we hide our genesis block & hashMerkleRoot for later start. 
 // Convert the pnSeeds6 array into usable address objects.
@@ -48,7 +70,7 @@ public:
         pchMessageStart[1] = 0xe2;
         pchMessageStart[2] = 0xa2;
         pchMessageStart[3] = 0xcd;
-        vAlertPubKey = ParseHex("0471dc165db490094d35cde15b1f5d755fa6ad6f2b5ed0f340e3f17f57389c3c2af113a8cbcc885bde73305a553b5640c83021128008ddf882e856336269080496");
+        vAlertPubKey = ParseHex("0486phi1bac0d543f104cbff2bd23680056a3b9ea05e1137d2ff90eeb5e08472eb500322593a2cb06fbf8297d7beb6cd30cb90f98153b5b7cce1493749e41e0284");
         nDefaultPort = 6666;
         nRPCPort = 6667;
         bnProofOfWorkLimit = CBigNum(~uint256(0) >> 20);
@@ -56,27 +78,27 @@ public:
         // Build the genesis block. Note that the output of the genesis coinbase cannot
         // be spent as it did not originally exist in the database.
 
-        const char* pszTimestamp = "THE NEW IMPLEMENTATION OF PHI1612 HASH"; // Input random pszTimestamp to generate new genesis block
+        const char* pszTimestamp = "THE FINAL TEST FOR PHI1612 BEFORE LAUNCH"; // Input random pszTimestamp to generate new genesis block
         std::vector<CTxIn> vin;
         vin.resize(1);
         vin[0].scriptSig = CScript() << 0 << CBigNum(42) << vector<unsigned char>((const unsigned char*)pszTimestamp, (const unsigned char*)pszTimestamp + strlen(pszTimestamp));
         std::vector<CTxOut> vout;
         vout.resize(1);
         vout[0].SetEmpty();
-        CTransaction txNew(1, 1506923060, vin, vout, 0);
+        CTransaction txNew(1, 1507278322, vin, vout, 0);
         genesis.vtx.push_back(txNew);
         genesis.hashPrevBlock = 0;
         genesis.hashMerkleRoot = genesis.BuildMerkleTree();
         genesis.nVersion = 1;
-        genesis.nTime    = 1506923060; // Replace epochtime to generate new genesis block
+        genesis.nTime    = 1507278322; // Replace epochtime to generate new genesis block
         genesis.nBits    = bnProofOfWorkLimit.GetCompact();
-        genesis.nNonce   = 111571; // Input nNonce 
+        genesis.nNonce   = 0; // Input nNonce 
         
         // Comment assert to generate genesis block and hash merkle root
         // Get hashMerkleRoot by using ./bhcoind getblock {Genesis-Block} 
         hashGenesisBlock = genesis.GetHash();
-        assert(hashGenesisBlock == uint256("0x7eb37ff48d9fb9e3071e4b33a145a47bf5012da06000737d8cfd22480563c8c9")); // Add Genesisblock 
-        assert(genesis.hashMerkleRoot == uint256("0x80a997be94dd7e48e9bd722a916ad8b9239a3d4fb05296b7a1c71c62f3ef3860")); // Add hashMerkleRoot
+        //assert(hashGenesisBlock == uint256("0x7eb37ff48d9fb9e3071e4b33a145a47bf5012da06000737d8cfd22480563c8c9")); // Add Genesisblock 
+        //assert(genesis.hashMerkleRoot == uint256("0x80a997be94dd7e48e9bd722a916ad8b9239a3d4fb05296b7a1c71c62f3ef3860")); // Add hashMerkleRoot
 
         //MineGenesis(genesis);
 
@@ -137,7 +159,7 @@ public:
 
         vFixedSeeds.clear();
         vSeeds.clear();
-        vSeeds.push_back(CDNSSeedData("", "")); // Add seednode for later start
+        vSeeds.push_back(CDNSSeedData("45.63.25.110", "45.32.245.217")); // Add seednode for later start
 
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1, 62); 
         base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1, 196);

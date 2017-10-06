@@ -41,10 +41,14 @@ Status BuildTable(const std::string& dbname,
     }
 
     // Finish and check for builder errors
-    s = builder->Finish();
     if (s.ok()) {
-      meta->file_size = builder->FileSize();
-      assert(meta->file_size > 0);
+      s = builder->Finish();
+      if (s.ok()) {
+        meta->file_size = builder->FileSize();
+        assert(meta->file_size > 0);
+      }
+    } else {
+      builder->Abandon();
     }
     delete builder;
 

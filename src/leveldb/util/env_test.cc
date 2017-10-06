@@ -10,31 +10,29 @@
 namespace leveldb {
 
 static const int kDelayMicros = 100000;
-static const int kReadOnlyFileLimit = 4;
-static const int kMMapLimit = 4;
 
-class EnvTest {
+class EnvPosixTest {
  private:
   port::Mutex mu_;
   std::string events_;
 
  public:
   Env* env_;
-  EnvTest() : env_(Env::Default()) { }
+  EnvPosixTest() : env_(Env::Default()) { }
 };
 
 static void SetBool(void* ptr) {
   reinterpret_cast<port::AtomicPointer*>(ptr)->NoBarrier_Store(ptr);
 }
 
-TEST(EnvTest, RunImmediately) {
+TEST(EnvPosixTest, RunImmediately) {
   port::AtomicPointer called (NULL);
   env_->Schedule(&SetBool, &called);
-  env_->SleepForMicroseconds(kDelayMicros);
+  Env::Default()->SleepForMicroseconds(kDelayMicros);
   ASSERT_TRUE(called.NoBarrier_Load() != NULL);
 }
 
-TEST(EnvTest, RunMany) {
+TEST(EnvPosixTest, RunMany) {
   port::AtomicPointer last_id (NULL);
 
   struct CB {
@@ -61,7 +59,7 @@ TEST(EnvTest, RunMany) {
   env_->Schedule(&CB::Run, &cb3);
   env_->Schedule(&CB::Run, &cb4);
 
-  env_->SleepForMicroseconds(kDelayMicros);
+  Env::Default()->SleepForMicroseconds(kDelayMicros);
   void* cur = last_id.Acquire_Load();
   ASSERT_EQ(4, reinterpret_cast<uintptr_t>(cur));
 }
@@ -80,7 +78,7 @@ static void ThreadBody(void* arg) {
   s->mu.Unlock();
 }
 
-TEST(EnvTest, StartThread) {
+TEST(EnvPosixTest, StartThread) {
   State state;
   state.val = 0;
   state.num_running = 3;
@@ -94,27 +92,9 @@ TEST(EnvTest, StartThread) {
     if (num == 0) {
       break;
     }
-    env_->SleepForMicroseconds(kDelayMicros);
+    Env::Default()->SleepForMicroseconds(kDelayMicros);
   }
   ASSERT_EQ(state.val, 3);
-}
-
-TEST(EnvTest, TestOpenNonExistentFile) {
-  // Write some test data to a single file that will be opened |n| times.
-  std::string test_dir;
-  ASSERT_OK(env_->GetTestDirectory(&test_dir));
-
-  std::string non_existent_file = test_dir + "/non_existent_file";
-  ASSERT_TRUE(!env_->FileExists(non_existent_file));
-
-  RandomAccessFile* random_access_file;
-  Status status = env_->NewRandomAccessFile(
-      non_existent_file, &random_access_file);
-  ASSERT_TRUE(status.IsNotFound());
-
-  SequentialFile* sequential_file;
-  status = env_->NewSequentialFile(non_existent_file, &sequential_file);
-  ASSERT_TRUE(status.IsNotFound());
 }
 
 }  // namespace leveldb

@@ -7,6 +7,7 @@
 #include <cstdlib>
 #include <stdio.h>
 #include <string.h>
+#include "util/logging.h"
 
 namespace leveldb {
 namespace port {

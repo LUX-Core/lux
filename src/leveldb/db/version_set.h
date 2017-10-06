@@ -179,7 +179,7 @@ class VersionSet {
       EXCLUSIVE_LOCKS_REQUIRED(mu);
 
   // Recover the last saved descriptor from persistent storage.
-  Status Recover(bool *save_manifest);
+  Status Recover();
 
   // Return the current version.
   Version* current() const { return current_; }
@@ -274,8 +274,6 @@ class VersionSet {
   friend class Compaction;
   friend class Version;
 
-  bool ReuseManifest(const std::string& dscname, const std::string& dscbase);
-
   void Finalize(Version* v);
 
   void GetRange(const std::vector<FileMetaData*>& inputs,
@@ -366,7 +364,7 @@ class Compaction {
   friend class Version;
   friend class VersionSet;
 
-  Compaction(const Options* options, int level);
+  explicit Compaction(int level);
 
   int level_;
   uint64_t max_output_file_size_;
