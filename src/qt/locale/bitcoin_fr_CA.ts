@@ -3,22 +3,22 @@
     <name>AboutDialog</name>
     <message>
         <location filename="../forms/aboutdialog.ui" line="+14"/>
-        <source>About Bhcoin</source>
-        <translation>Au sujet de Bhcoin</translation>
+        <source>About Lux</source>
+        <translation>Au sujet de Lux</translation>
     </message>
     <message>
         <location line="+39"/>
-        <source>&lt;b&gt;Bhcoin&lt;/b&gt; version</source>
-        <translation>Version de &lt;b&gt;Bhcoin&lt;/b&gt;</translation>
+        <source>&lt;b&gt;Lux&lt;/b&gt; version</source>
+        <translation>Version de &lt;b&gt;Lux&lt;/b&gt;</translation>
     </message>
     <message>
         <location line="+41"/>
         <source>Copyright © 2009-2014 The Bitcoin developers
 Copyright © 2012-2014 The NovaCoin developers
-Copyright © 2014 The Bhcoin developers</source>
+Copyright © 2014 The Lux developers</source>
         <translation>Copyright © 2009-2014 Les développeurs Bitcoin
 Copyright © 2012-2014 Les développeurs NovaCoin
-Copyright © 2014 Les développeurs Bhcoin</translation>
+Copyright © 2014 Les développeurs Lux</translation>
     </message>
     <message>
         <location line="+15"/>
@@ -60,7 +60,7 @@ This product includes software developed by the OpenSSL Project for use in the O
     </message>
     <message>
         <location line="-43"/>
-        <source>These are your Bhcoin addresses for receiving payments. You may want to give a different one to each sender so you can keep track of who is paying you.</source>
+        <source>These are your Lux addresses for receiving payments. You may want to give a different one to each sender so you can keep track of who is paying you.</source>
         <translation>Ce sont vos adresses pour recevoir vos paiements. Vous pouvez utiliser une adresse différente pour chaque réception afin d&apos;identifier facilement le payeur.</translation>
     </message>
     <message>
@@ -75,8 +75,8 @@ This product includes software developed by the OpenSSL Project for use in the O
     </message>
     <message>
         <location line="+7"/>
-        <source>Sign a message to prove you own a Bhcoin address</source>
-        <translation>Signer un message afin de valider l&apos;identité de votre adresse Bhcoin</translation>
+        <source>Sign a message to prove you own a Lux address</source>
+        <translation>Signer un message afin de valider l&apos;identité de votre adresse Lux</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -90,8 +90,8 @@ This product includes software developed by the OpenSSL Project for use in the O
     </message>
     <message>
         <location line="-10"/>
-        <source>Verify a message to ensure it was signed with a specified Bhcoin address</source>
-        <translation>Vérifier un message pour s&apos;assurer qu&apos;il vient d&apos;un adresse Bhcoin spécifique.</translation>
+        <source>Verify a message to ensure it was signed with a specified Lux address</source>
+        <translation>Vérifier un message pour s&apos;assurer qu&apos;il vient d&apos;un adresse Lux spécifique.</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -227,7 +227,7 @@ This product includes software developed by the OpenSSL Project for use in the O
     <message>
         <location line="+1"/>
         <source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR COINS&lt;/b&gt;!</source>
-        <translation>ATTENTION : Si vous cryptez votre portefeuille et perdez votre passphrase, vous ne pourrez plus accéder à vos Bhcoins</translation>
+        <translation>ATTENTION : Si vous cryptez votre portefeuille et perdez votre passphrase, vous ne pourrez plus accéder à vos Luxs</translation>
     </message>
     <message>
         <location line="+0"/>
@@ -258,8 +258,8 @@ This product includes software developed by the OpenSSL Project for use in the O
     </message>
     <message>
         <location line="+82"/>
-        <source>Bhcoin will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your coins from being stolen by malware infecting your computer.</source>
-        <translation>L&apos;application Bhcoin va désormais se terminer afin de finaliser le processus de cryptage. Merci de noter que le cryptage du portefeuille ne garantit pas de se prémunir du vol via l&apos;utilisation de malware, qui auraient pu infecter votre ordinateur. </translation>
+        <source>Lux will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your coins from being stolen by malware infecting your computer.</source>
+        <translation>L&apos;application Lux va désormais se terminer afin de finaliser le processus de cryptage. Merci de noter que le cryptage du portefeuille ne garantit pas de se prémunir du vol via l&apos;utilisation de malware, qui auraient pu infecter votre ordinateur. </translation>
     </message>
     <message>
         <location line="+13"/>
@@ -352,8 +352,8 @@ This product includes software developed by the OpenSSL Project for use in the O
     </message>
     <message>
         <location line="+4"/>
-        <source>Show information about Bhcoin</source>
-        <translation>Afficher des informations au sujet du Bhcoin</translation>
+        <source>Show information about Lux</source>
+        <translation>Afficher des informations au sujet du Lux</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -392,13 +392,13 @@ This product includes software developed by the OpenSSL Project for use in the O
     </message>
     <message>
         <location line="-55"/>
-        <source>Send coins to a Bhcoin address</source>
-        <translation>Envoyer des monnaies vers une adresse Bhcoin</translation>
+        <source>Send coins to a Lux address</source>
+        <translation>Envoyer des monnaies vers une adresse Lux</translation>
     </message>
     <message>
         <location line="+39"/>
-        <source>Modify configuration options for Bhcoin</source>
-        <translation>Modification des options de configuration de Bhcoin</translation>
+        <source>Modify configuration options for Lux</source>
+        <translation>Modification des options de configuration de Lux</translation>
     </message>
     <message>
         <location line="+17"/>
@@ -438,8 +438,8 @@ This product includes software developed by the OpenSSL Project for use in the O
     <message>
         <location line="-214"/>
         <location line="+555"/>
-        <source>Bhcoin</source>
-        <translation>Bhcoin</translation>
+        <source>Lux</source>
+        <translation>Lux</translation>
     </message>
     <message>
         <location line="-555"/>
@@ -448,8 +448,8 @@ This product includes software developed by the OpenSSL Project for use in the O
     </message>
     <message>
         <location line="+193"/>
-        <source>&amp;About Bhcoin</source>
-        <translation>A propos de Bhcoin</translation>
+        <source>&amp;About Lux</source>
+        <translation>A propos de Lux</translation>
     </message>
     <message>
         <location line="+9"/>
@@ -500,13 +500,13 @@ This product includes software developed by the OpenSSL Project for use in the O
     <message>
         <location line="+0"/>
         <location line="+58"/>
-        <source>Bhcoin client</source>
-        <translation>Client Bhcoin</translation>
+        <source>Lux client</source>
+        <translation>Client Lux</translation>
     </message>
     <message numerus="yes">
         <location line="+70"/>
-        <source>%n active connection(s) to Bhcoin network</source>
-        <translation><numerusform>%n connexion active au réseau Bhcoin</numerusform><numerusform>%n connexions actives au réseau Bhcoin</numerusform></translation>
+        <source>%n active connection(s) to Lux network</source>
+        <translation><numerusform>%n connexion active au réseau Lux</numerusform><numerusform>%n connexions actives au réseau Lux</numerusform></translation>
     </message>
     <message>
         <location line="+488"/>
@@ -600,8 +600,8 @@ Adresse : %4
     <message>
         <location line="-15"/>
         <location line="+15"/>
-        <source>URI can not be parsed! This can be caused by an invalid Bhcoin address or malformed URI parameters.</source>
-        <translation>L&apos;adresse du portefeuille Bhcoin n&apos;as pas pu être correctement identifiée, car invalide ou malformée.</translation>
+        <source>URI can not be parsed! This can be caused by an invalid Lux address or malformed URI parameters.</source>
+        <translation>L&apos;adresse du portefeuille Lux n&apos;as pas pu être correctement identifiée, car invalide ou malformée.</translation>
     </message>
     <message>
         <location line="+9"/>
@@ -723,8 +723,8 @@ Adresse : %4
     </message>
     <message>
         <location filename="../bitcoin.cpp" line="+104"/>
-        <source>A fatal error occurred. Bhcoin can no longer continue safely and will quit.</source>
-        <translation>Une erreur fatale a été rencontrée. L&apos;application Bhcoin ne peut plus être s&apos;exécuter de façon correcte et doit se terminer.</translation>
+        <source>A fatal error occurred. Lux can no longer continue safely and will quit.</source>
+        <translation>Une erreur fatale a été rencontrée. L&apos;application Lux ne peut plus être s&apos;exécuter de façon correcte et doit se terminer.</translation>
     </message>
 </context>
 <context>
@@ -1057,8 +1057,8 @@ Les montants inférieurs à  0.546 fois les frais minimum de relais apparaissent
     </message>
     <message>
         <location line="-5"/>
-        <source>The entered address &quot;%1&quot; is not a valid Bhcoin address.</source>
-        <translation>L&apos;adresse &quot;%1&quot; renseignée n&apos;est pas une adresse Bhcoin valide.</translation>
+        <source>The entered address &quot;%1&quot; is not a valid Lux address.</source>
+        <translation>L&apos;adresse &quot;%1&quot; renseignée n&apos;est pas une adresse Lux valide.</translation>
     </message>
     <message>
         <location line="+10"/>
@@ -1076,8 +1076,8 @@ Les montants inférieurs à  0.546 fois les frais minimum de relais apparaissent
     <message>
         <location filename="../guiutil.cpp" line="+426"/>
         <location line="+12"/>
-        <source>Bhcoin-Qt</source>
-        <translation>Bhcoin-Qt</translation>
+        <source>Lux-Qt</source>
+        <translation>Lux-Qt</translation>
     </message>
     <message>
         <location line="-12"/>
@@ -1149,13 +1149,13 @@ Les montants inférieurs à  0.546 fois les frais minimum de relais apparaissent
     </message>
     <message>
         <location line="+31"/>
-        <source>Automatically start Bhcoin after logging in to the system.</source>
-        <translation>Démarrage automatique du client Bhcoin lors de la connexion au système</translation>
+        <source>Automatically start Lux after logging in to the system.</source>
+        <translation>Démarrage automatique du client Lux lors de la connexion au système</translation>
     </message>
     <message>
         <location line="+3"/>
-        <source>&amp;Start Bhcoin on system login</source>
-        <translation>&amp;Démarrage du client Bhcoin à la connexion au système</translation>
+        <source>&amp;Start Lux on system login</source>
+        <translation>&amp;Démarrage du client Lux à la connexion au système</translation>
     </message>
     <message>
         <location line="+21"/>
@@ -1164,8 +1164,8 @@ Les montants inférieurs à  0.546 fois les frais minimum de relais apparaissent
     </message>
     <message>
         <location line="+6"/>
-        <source>Automatically open the Bhcoin client port on the router. This only works when your router supports UPnP and it is enabled.</source>
-        <translation>Ouverture automatique du port client de Bhcoin sur le routeur. Ceci ne fonctionne que dans le cas où le support UPnP sur votre routeur existe et est actif.</translation>
+        <source>Automatically open the Lux client port on the router. This only works when your router supports UPnP and it is enabled.</source>
+        <translation>Ouverture automatique du port client de Lux sur le routeur. Ceci ne fonctionne que dans le cas où le support UPnP sur votre routeur existe et est actif.</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -1194,7 +1194,7 @@ Les montants inférieurs à  0.546 fois les frais minimum de relais apparaissent
     </message>
     <message>
         <location line="-57"/>
-        <source>Connect to the Bhcoin network through a SOCKS5 proxy (e.g. when connecting through Tor).</source>
+        <source>Connect to the Lux network through a SOCKS5 proxy (e.g. when connecting through Tor).</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -1239,8 +1239,8 @@ Les montants inférieurs à  0.546 fois les frais minimum de relais apparaissent
     </message>
     <message>
         <location line="+13"/>
-        <source>The user interface language can be set here. This setting will take effect after restarting Bhcoin.</source>
-        <translation>La langue d&apos;interface de de l&apos;utilisateur peut être définie ici. Ces modification seront effectives après redémarrage de l&apos;application Bhcoin</translation>
+        <source>The user interface language can be set here. This setting will take effect after restarting Lux.</source>
+        <translation>La langue d&apos;interface de de l&apos;utilisateur peut être définie ici. Ces modification seront effectives après redémarrage de l&apos;application Lux</translation>
     </message>
     <message>
         <location line="+11"/>
@@ -1306,8 +1306,8 @@ Les montants inférieurs à  0.546 fois les frais minimum de relais apparaissent
     <message>
         <location line="-9"/>
         <location line="+9"/>
-        <source>This setting will take effect after restarting Bhcoin.</source>
-        <translation>Les paramètres prendront effet après redémarrage du client Bhcoin</translation>
+        <source>This setting will take effect after restarting Lux.</source>
+        <translation>Les paramètres prendront effet après redémarrage du client Lux</translation>
     </message>
     <message>
         <location line="+29"/>
@@ -1325,8 +1325,8 @@ Les montants inférieurs à  0.546 fois les frais minimum de relais apparaissent
     <message>
         <location line="+46"/>
         <location line="+247"/>
-        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the Bhcoin network after a connection is established, but this process has not completed yet.</source>
-        <translation>Les informations affichées peuvent être obsolètes. Votre portefeuille se synchronise automatiquement avec le réseau Bhcoin mais ce processus n&apos;est pas encore terminé.</translation>
+        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the Lux network after a connection is established, but this process has not completed yet.</source>
+        <translation>Les informations affichées peuvent être obsolètes. Votre portefeuille se synchronise automatiquement avec le réseau Lux mais ce processus n&apos;est pas encore terminé.</translation>
     </message>
     <message>
         <location line="-173"/>
@@ -1399,7 +1399,7 @@ Les montants inférieurs à  0.546 fois les frais minimum de relais apparaissent
     <name>PaymentServer</name>
     <message>
         <location filename="../paymentserver.cpp" line="+107"/>
-        <source>Cannot start bhcoin: click-to-pay handler</source>
+        <source>Cannot start lux: click-to-pay handler</source>
         <translation type="unfinished"/>
     </message>
 </context>
@@ -1567,8 +1567,8 @@ Les montants inférieurs à  0.546 fois les frais minimum de relais apparaissent
     </message>
     <message>
         <location line="+7"/>
-        <source>Show the Bhcoin-Qt help message to get a list with possible Bhcoin command-line options.</source>
-        <translation>Afficher le message d&apos;aide Bhcoin-Qt afin d&apos;obtenir la liste des options de de L&apos;outil en ligne de commande Bhcoin</translation>
+        <source>Show the Lux-Qt help message to get a list with possible Lux command-line options.</source>
+        <translation>Afficher le message d&apos;aide Lux-Qt afin d&apos;obtenir la liste des options de de L&apos;outil en ligne de commande Lux</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -1587,13 +1587,13 @@ Les montants inférieurs à  0.546 fois les frais minimum de relais apparaissent
     </message>
     <message>
         <location line="-104"/>
-        <source>Bhcoin - Debug window</source>
-        <translation>Bhcoin - Fenêtre de déboggage</translation>
+        <source>Lux - Debug window</source>
+        <translation>Lux - Fenêtre de déboggage</translation>
     </message>
     <message>
         <location line="+25"/>
-        <source>Bhcoin Core</source>
-        <translation>Bhcoin Core</translation>
+        <source>Lux Core</source>
+        <translation>Lux Core</translation>
     </message>
     <message>
         <location line="+256"/>
@@ -1602,8 +1602,8 @@ Les montants inférieurs à  0.546 fois les frais minimum de relais apparaissent
     </message>
     <message>
         <location line="+7"/>
-        <source>Open the Bhcoin debug log file from the current data directory. This can take a few seconds for large log files.</source>
-        <translation>Ouvrir le fichier journal de debug Bhcoin au sein du répertoire courant. Cette opération peut prendre quelques secondes dans le cas de fichiers journaux volumineux.</translation>
+        <source>Open the Lux debug log file from the current data directory. This can take a few seconds for large log files.</source>
+        <translation>Ouvrir le fichier journal de debug Lux au sein du répertoire courant. Cette opération peut prendre quelques secondes dans le cas de fichiers journaux volumineux.</translation>
     </message>
     <message>
         <location line="+102"/>
@@ -1612,8 +1612,8 @@ Les montants inférieurs à  0.546 fois les frais minimum de relais apparaissent
     </message>
     <message>
         <location filename="../rpcconsole.cpp" line="+325"/>
-        <source>Welcome to the Bhcoin RPC console.</source>
-        <translation>Bienvenue sur la console Bhcoin RPC.</translation>
+        <source>Welcome to the Lux RPC console.</source>
+        <translation>Bienvenue sur la console Lux RPC.</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -1793,8 +1793,8 @@ Les montants inférieurs à  0.546 fois les frais minimum de relais apparaissent
     </message>
     <message>
         <location filename="../sendcoinsdialog.cpp" line="-174"/>
-        <source>Enter a Bhcoin address (e.g. SjBj1QvJvsAkU5EBKggdZ8gWc4oK2F5AMY)</source>
-        <translation>Entrer une adresse Bhcoin (e.g. SjBj1QvJvsAkU5EBKggdZ8gWc4oK2F5AMY)</translation>
+        <source>Enter a Lux address (e.g. SjBj1QvJvsAkU5EBKggdZ8gWc4oK2F5AMY)</source>
+        <translation>Entrer une adresse Lux (e.g. SjBj1QvJvsAkU5EBKggdZ8gWc4oK2F5AMY)</translation>
     </message>
     <message>
         <location line="+15"/>
@@ -1893,8 +1893,8 @@ Les montants inférieurs à  0.546 fois les frais minimum de relais apparaissent
     </message>
     <message>
         <location line="+247"/>
-        <source>WARNING: Invalid Bhcoin address</source>
-        <translation>AVERTISSEMENT: Adresse Bhcoin Invalide</translation>
+        <source>WARNING: Invalid Lux address</source>
+        <translation>AVERTISSEMENT: Adresse Lux Invalide</translation>
     </message>
     <message>
         <location line="+13"/>
@@ -1904,7 +1904,7 @@ Les montants inférieurs à  0.546 fois les frais minimum de relais apparaissent
     <message>
         <location line="+4"/>
         <source>WARNING: unknown change address</source>
-        <translation>AVERTISSEMET: Adresse Bhcoin Invalide</translation>
+        <translation>AVERTISSEMET: Adresse Lux Invalide</translation>
     </message>
 </context>
 <context>
@@ -1967,8 +1967,8 @@ Les montants inférieurs à  0.546 fois les frais minimum de relais apparaissent
     </message>
     <message>
         <location filename="../sendcoinsentry.cpp" line="+1"/>
-        <source>Enter a Bhcoin address (e.g. SjBj1QvJvsAkU5EBKggdZ8gWc4oK2F5AMY)</source>
-        <translation>Entrer une adresse Bhcoin (e.g. SjBj1QvJvsAkU5EBKggdZ8gWc4oK2F5AMY)</translation>
+        <source>Enter a Lux address (e.g. SjBj1QvJvsAkU5EBKggdZ8gWc4oK2F5AMY)</source>
+        <translation>Entrer une adresse Lux (e.g. SjBj1QvJvsAkU5EBKggdZ8gWc4oK2F5AMY)</translation>
     </message>
 </context>
 <context>
@@ -1992,7 +1992,7 @@ Les montants inférieurs à  0.546 fois les frais minimum de relais apparaissent
     <message>
         <location line="+18"/>
         <source>The address to sign the message with (e.g. SjBj1QvJvsAkU5EBKggdZ8gWc4oK2F5AMY)</source>
-        <translation>Entrer une adresse Bhcoin (e.g. SjBj1QvJvsAkU5EBKggdZ8gWc4oK2F5AMY)</translation>
+        <translation>Entrer une adresse Lux (e.g. SjBj1QvJvsAkU5EBKggdZ8gWc4oK2F5AMY)</translation>
     </message>
     <message>
         <location line="+10"/>
@@ -2028,8 +2028,8 @@ Les montants inférieurs à  0.546 fois les frais minimum de relais apparaissent
     </message>
     <message>
         <location line="+21"/>
-        <source>Sign the message to prove you own this Bhcoin address</source>
-        <translation>Signer le message afin de prouver l&apos;identité de votre adresse Bhcoin</translation>
+        <source>Sign the message to prove you own this Lux address</source>
+        <translation>Signer le message afin de prouver l&apos;identité de votre adresse Lux</translation>
     </message>
     <message>
         <location line="+17"/>
@@ -2060,8 +2060,8 @@ Les montants inférieurs à  0.546 fois les frais minimum de relais apparaissent
     </message>
     <message>
         <location line="+40"/>
-        <source>Verify the message to ensure it was signed with the specified Bhcoin address</source>
-        <translation>Vérifier un message pour s&apos;assurer qu&apos;il vient d&apos;un adresse Bhcoin spécifique.</translation>
+        <source>Verify the message to ensure it was signed with the specified Lux address</source>
+        <translation>Vérifier un message pour s&apos;assurer qu&apos;il vient d&apos;un adresse Lux spécifique.</translation>
     </message>
     <message>
         <location line="+17"/>
@@ -2071,8 +2071,8 @@ Les montants inférieurs à  0.546 fois les frais minimum de relais apparaissent
     <message>
         <location filename="../signverifymessagedialog.cpp" line="+27"/>
         <location line="+3"/>
-        <source>Enter a Bhcoin address (e.g. SjBj1QvJvsAkU5EBKggdZ8gWc4oK2F5AMY)</source>
-        <translation>Entrer une adresse Bhcoin (e.g. SjBj1QvJvsAkU5EBKggdZ8gWc4oK2F5AMY)</translation>
+        <source>Enter a Lux address (e.g. SjBj1QvJvsAkU5EBKggdZ8gWc4oK2F5AMY)</source>
+        <translation>Entrer une adresse Lux (e.g. SjBj1QvJvsAkU5EBKggdZ8gWc4oK2F5AMY)</translation>
     </message>
     <message>
         <location line="-2"/>
@@ -2081,8 +2081,8 @@ Les montants inférieurs à  0.546 fois les frais minimum de relais apparaissent
     </message>
     <message>
         <location line="+3"/>
-        <source>Enter Bhcoin signature</source>
-        <translation>Entrer une signature Bhcoin</translation>
+        <source>Enter Lux signature</source>
+        <translation>Entrer une signature Lux</translation>
     </message>
     <message>
         <location line="+85"/>
@@ -2660,8 +2660,8 @@ Les montants inférieurs à  0.546 fois les frais minimum de relais apparaissent
     <name>bitcoin-core</name>
     <message>
         <location filename="../bitcoinstrings.cpp" line="+171"/>
-        <source>Bhcoin version</source>
-        <translation>Version Bhcoin</translation>
+        <source>Lux version</source>
+        <translation>Version Lux</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -2670,8 +2670,8 @@ Les montants inférieurs à  0.546 fois les frais minimum de relais apparaissent
     </message>
     <message>
         <location line="+1"/>
-        <source>Send command to -server or bhcoind</source>
-        <translation>Envoyer commande à -server ou bhcoind</translation>
+        <source>Send command to -server or luxd</source>
+        <translation>Envoyer commande à -server ou luxd</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -2690,13 +2690,13 @@ Les montants inférieurs à  0.546 fois les frais minimum de relais apparaissent
     </message>
     <message>
         <location line="+2"/>
-        <source>Specify configuration file (default: bhcoin.conf)</source>
-        <translation>Spécifier le fichier de configuration (defaut: bhcoin.conf)</translation>
+        <source>Specify configuration file (default: lux.conf)</source>
+        <translation>Spécifier le fichier de configuration (defaut: lux.conf)</translation>
     </message>
     <message>
         <location line="+1"/>
-        <source>Specify pid file (default: bhcoind.pid)</source>
-        <translation>Spécifier le fichier pid (defaut: bhcoind.pid)
+        <source>Specify pid file (default: luxd.pid)</source>
+        <translation>Spécifier le fichier pid (defaut: luxd.pid)
 </translation>
     </message>
     <message>
@@ -2714,13 +2714,13 @@ Les montants inférieurs à  0.546 fois les frais minimum de relais apparaissent
         <source>%s, you must set a rpcpassword in the configuration file:
 %s
 It is recommended you use the following random password:
-rpcuser=bhcoinrpc
+rpcuser=luxrpc
 rpcpassword=%s
 (you do not need to remember this password)
 The username and password MUST NOT be the same.
 If the file does not exist, create it with owner-readable-only file permissions.
 It is also recommended to set alertnotify so you are notified of problems;
-for example: alertnotify=echo %%s | mail -s &quot;Bhcoin Alert&quot; admin@foo.com
+for example: alertnotify=echo %%s | mail -s &quot;Lux Alert&quot; admin@foo.com
 </source>
         <translation type="unfinished"/>
     </message>
@@ -2826,8 +2826,8 @@ for example: alertnotify=echo %%s | mail -s &quot;Bhcoin Alert&quot; admin@foo.c
     </message>
     <message>
         <location line="-103"/>
-        <source>Warning: Please check that your computer&apos;s date and time are correct! If your clock is wrong Bhcoin will not work properly.</source>
-        <translation>Avertissement: Veuillez vérifier la date et l&apos;heure de votre ordinateur. Bhcoin ne pourra pas fonctionner correctement si l&apos;horloge est réglée de façon incorrecte</translation>
+        <source>Warning: Please check that your computer&apos;s date and time are correct! If your clock is wrong Lux will not work properly.</source>
+        <translation>Avertissement: Veuillez vérifier la date et l&apos;heure de votre ordinateur. Lux ne pourra pas fonctionner correctement si l&apos;horloge est réglée de façon incorrecte</translation>
     </message>
     <message>
         <location line="+130"/>
@@ -3121,7 +3121,7 @@ for example: alertnotify=echo %%s | mail -s &quot;Bhcoin Alert&quot; admin@foo.c
     </message>
     <message>
         <location line="+8"/>
-        <source>Initialization sanity check failed. Bhcoin is shutting down.</source>
+        <source>Initialization sanity check failed. Lux is shutting down.</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -3176,13 +3176,13 @@ for example: alertnotify=echo %%s | mail -s &quot;Bhcoin Alert&quot; admin@foo.c
     </message>
     <message>
         <location line="+4"/>
-        <source>Error loading wallet.dat: Wallet requires newer version of Bhcoin</source>
-        <translation>Erreur de chargement du fichier wallet.dat: le portefeuille nécessite une version plus récente de l&apos;application Bhcoin</translation>
+        <source>Error loading wallet.dat: Wallet requires newer version of Lux</source>
+        <translation>Erreur de chargement du fichier wallet.dat: le portefeuille nécessite une version plus récente de l&apos;application Lux</translation>
     </message>
     <message>
         <location line="+1"/>
-        <source>Wallet needed to be rewritten: restart Bhcoin to complete</source>
-        <translation>le portefeuille nécessite d&apos;être réédité : Merci de relancer l&apos;application Bhcoin</translation>
+        <source>Wallet needed to be rewritten: restart Lux to complete</source>
+        <translation>le portefeuille nécessite d&apos;être réédité : Merci de relancer l&apos;application Lux</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -3241,8 +3241,8 @@ for example: alertnotify=echo %%s | mail -s &quot;Bhcoin Alert&quot; admin@foo.c
     </message>
     <message>
         <location line="+124"/>
-        <source>Unable to bind to %s on this computer. Bhcoin is probably already running.</source>
-        <translation>Connexion au port %s impossible. L&apos;application Bhcoin est probablement déjà en cours d&apos;exécution</translation>
+        <source>Unable to bind to %s on this computer. Lux is probably already running.</source>
+        <translation>Connexion au port %s impossible. L&apos;application Lux est probablement déjà en cours d&apos;exécution</translation>
     </message>
     <message>
         <location line="-101"/>
@@ -3276,7 +3276,7 @@ for example: alertnotify=echo %%s | mail -s &quot;Bhcoin Alert&quot; admin@foo.c
     </message>
     <message>
         <location line="+3"/>
-        <source>Cannot obtain a lock on data directory %s. Bhcoin is probably already running.</source>
+        <source>Cannot obtain a lock on data directory %s. Lux is probably already running.</source>
         <translation type="unfinished"/>
     </message>
     <message>

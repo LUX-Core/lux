@@ -1,4 +1,4 @@
-<b> BHCoin - New Implemented PHI1612 Algorithm </b><br /><br />
+<b> LUXoin - New Implemented PHI1612 Algorithm </b><br /><br />
 -----------------------------------------------------------------
 Development process
 ===========================
@@ -9,14 +9,12 @@ Development process
 
 03/10/2017 -----> New Phi1612 hashing algorithm completed
 Note: Not finished yet, still need some work. 
--------------------------------------------------------------------
-Testnet trial version
-===========================
 
-04/10/2017 ------> testnet trial version released 
--------------------------------------------------------------------
+04/10/2017 ------> testnet trial version released
 
-06/10/2017 ------> Final test before launch ( 06/10/2017 - 09/10/2017) 
+06/10/2017 ------> Final test before launch ( 06/10/2017 - 09/10/2017)
+
+07/10/2017 ------> Changed bhcoin to lux ( Trial Version v3)
 -------------------------------------------------------------------
 
 <b> ccminer & sgminer for phi1612 algo </b> 

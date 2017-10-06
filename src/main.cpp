@@ -21,7 +21,7 @@ using namespace std;
 using namespace boost;
 
 #if defined(NDEBUG)
-# error "Bhcoin cannot be compiled without assertions."
+# error "Lux cannot be compiled without assertions."
 #endif
 
 
@@ -77,7 +77,7 @@ map<uint256, set<uint256> > mapOrphanTransactionsByPrev;
 // Constant stuff for coinbase transactions we create:
 CScript COINBASE_FLAGS;
 
-const string strMessageMagic = "Bhcoin Signed Message:\n";
+const string strMessageMagic = "Lux Signed Message:\n";
 
 
 
@@ -969,16 +969,16 @@ static CBigNum GetProofOfStakeLimit(int nHeight)
 
 int64_t GetProofOfWorkReward(int64_t nFees)
 {
-    int64_t nSubsidy = 1 * COIN;
+        int64_t nSubsidy = 1 * COIN;
 
-    if(pindexBest->nHeight <= 0) {
-        nSubsidy = 7500000 * COIN;
+    if(pindexBest->nHeight == 1) {
+        nSubsidy = 7500000 * COIN;                 //Pre-mine 10%
     } else if(pindexBest->nHeight <= 500000) {
-        nSubsidy = 100 * COIN;
+        nSubsidy = 100 * COIN;                     //50m 
     } else if(pindexBest->nHeight <= 1000000) {
-        nSubsidy = 50 * COIN;
+        nSubsidy = 50 * COIN;                      //25m
     } else {
-        nSubsidy = 1 * COIN;
+        nSubsidy = 1 * COIN; 
     }
 
     LogPrint("GetProofOfWorkReward() : create=%s", FormatMoney(nSubsidy).c_str(), nSubsidy);
@@ -1116,8 +1116,9 @@ unsigned int static DarkGravityWave3(const CBlockIndex* pindexLast/*, const CBlo
 unsigned int GetNextTargetRequired(const CBlockIndex* pindexLast, bool fProofOfStake)
 {
     // Instamine the first block <---------------------------------------------------------------------------------------------------------
-
-    if (pindexLast->nHeight < 1000000)
+    if (pindexLast->nHeight < 1)
+        return GetNextTargetRequired_PoS(pindexLast, fProofOfStake);
+    else if (pindexLast->nHeight < 1000000)
         return DarkGravityWave3(pindexLast);
     else
         return GetNextTargetRequired_PoS(pindexLast, fProofOfStake);
@@ -2712,7 +2713,7 @@ struct CImportingNow
 
 void ThreadImport(std::vector<boost::filesystem::path> vImportFiles)
 {
-    RenameThread("bhcoin-loadblk");
+    RenameThread("lux-loadblk");
 
     CImportingNow imp;
 

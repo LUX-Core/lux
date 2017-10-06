@@ -1,5 +1,5 @@
 // Copyright (c) 2013 NovaCoin Developers
-// Copyright (c) 2017 BHCoin Developers
+// Copyright (c) 2017 LUXoin Developers
 #ifndef PBKDF2_H
 #define PBKDF2_H
 

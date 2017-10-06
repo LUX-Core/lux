@@ -918,7 +918,7 @@ static std::string FormatException(std::exception* pex, const char* pszThread)
     char pszModule[MAX_PATH] = "";
     GetModuleFileNameA(NULL, pszModule, sizeof(pszModule));
 #else
-    const char* pszModule = "bhcoin";
+    const char* pszModule = "lux";
 #endif
     if (pex)
         return strprintf(
@@ -948,13 +948,13 @@ void PrintExceptionContinue(std::exception* pex, const char* pszThread)
 boost::filesystem::path GetDefaultDataDir()
 {
     namespace fs = boost::filesystem;
-    // Windows < Vista: C:\Documents and Settings\Username\Application Data\Bhcoin
-    // Windows >= Vista: C:\Users\Username\AppData\Roaming\Bhcoin
-    // Mac: ~/Library/Application Support/Bhcoin
-    // Unix: ~/.bhcoin
+    // Windows < Vista: C:\Documents and Settings\Username\Application Data\Lux
+    // Windows >= Vista: C:\Users\Username\AppData\Roaming\Lux
+    // Mac: ~/Library/Application Support/Lux
+    // Unix: ~/.lux
 #ifdef WIN32
     // Windows
-    return GetSpecialFolderPath(CSIDL_APPDATA) / "Bhcoin";
+    return GetSpecialFolderPath(CSIDL_APPDATA) / "Lux";
 #else
     fs::path pathRet;
     char* pszHome = getenv("HOME");
@@ -966,10 +966,10 @@ boost::filesystem::path GetDefaultDataDir()
     // Mac
     pathRet /= "Library/Application Support";
     fs::create_directory(pathRet);
-    return pathRet / "Bhcoin";
+    return pathRet / "Lux";
 #else
     // Unix
-    return pathRet / ".bhcoin";
+    return pathRet / ".lux";
 #endif
 #endif
 }
@@ -1018,7 +1018,7 @@ void ClearDatadirCache()
 
 boost::filesystem::path GetConfigFile()
 {
-    boost::filesystem::path pathConfigFile(GetArg("-conf", "bhcoin.conf"));
+    boost::filesystem::path pathConfigFile(GetArg("-conf", "lux.conf"));
     if (!pathConfigFile.is_complete()) pathConfigFile = GetDataDir(false) / pathConfigFile;
     return pathConfigFile;
 }
@@ -1051,7 +1051,7 @@ void ReadConfigFile(map<string, string>& mapSettingsRet,
 
 boost::filesystem::path GetPidFile()
 {
-    boost::filesystem::path pathPidFile(GetArg("-pid", "bhcoind.pid"));
+    boost::filesystem::path pathPidFile(GetArg("-pid", "luxd.pid"));
     if (!pathPidFile.is_complete()) pathPidFile = GetDataDir() / pathPidFile;
     return pathPidFile;
 }

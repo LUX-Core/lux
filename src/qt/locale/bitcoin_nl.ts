@@ -3,22 +3,22 @@
     <name>AboutDialog</name>
     <message>
         <location filename="../forms/aboutdialog.ui" line="+14"/>
-        <source>About Bhcoin</source>
-        <translation>Over Bhcoin</translation>
+        <source>About Lux</source>
+        <translation>Over Lux</translation>
     </message>
     <message>
         <location line="+39"/>
-        <source>&lt;b&gt;Bhcoin&lt;/b&gt; version</source>
-        <translation>&lt;b&gt;Bhcoin&lt;/b&gt; versie</translation>
+        <source>&lt;b&gt;Lux&lt;/b&gt; version</source>
+        <translation>&lt;b&gt;Lux&lt;/b&gt; versie</translation>
     </message>
     <message>
         <location line="+41"/>
         <source>Copyright © 2009-2014 The Bitcoin developers
 Copyright © 2012-2014 The NovaCoin developers
-Copyright © 2014 The Bhcoin developers</source>
+Copyright © 2014 The Lux developers</source>
         <translation>Copyright © 2009-2014 De Bitcoin ontwikkelaars
 Copyright © 2012-2014 De NovaCoin ontwikkelaars
-Copyright © 2014 De Bhcoin ontwikkelaars</translation>
+Copyright © 2014 De Lux ontwikkelaars</translation>
     </message>
     <message>
         <location line="+15"/>
@@ -60,8 +60,8 @@ This product includes software developed by the OpenSSL Project for use in the O
     </message>
     <message>
         <location line="-43"/>
-        <source>These are your Bhcoin addresses for receiving payments. You may want to give a different one to each sender so you can keep track of who is paying you.</source>
-        <translation>Dit zijn al jou Bhcoin adressen om betalingen mee te ontvangen. Je kunt iedere verzender een apart adres geven zodat je kunt volgen wie jou betaald.</translation>
+        <source>These are your Lux addresses for receiving payments. You may want to give a different one to each sender so you can keep track of who is paying you.</source>
+        <translation>Dit zijn al jou Lux adressen om betalingen mee te ontvangen. Je kunt iedere verzender een apart adres geven zodat je kunt volgen wie jou betaald.</translation>
     </message>
     <message>
         <location line="+53"/>
@@ -75,8 +75,8 @@ This product includes software developed by the OpenSSL Project for use in the O
     </message>
     <message>
         <location line="+7"/>
-        <source>Sign a message to prove you own a Bhcoin address</source>
-        <translation>Teken een bericht om te bewijzen dat je een Bhcoin adres bezit.</translation>
+        <source>Sign a message to prove you own a Lux address</source>
+        <translation>Teken een bericht om te bewijzen dat je een Lux adres bezit.</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -90,8 +90,8 @@ This product includes software developed by the OpenSSL Project for use in the O
     </message>
     <message>
         <location line="-10"/>
-        <source>Verify a message to ensure it was signed with a specified Bhcoin address</source>
-        <translation>Verifieer een bericht om zeker te zijn dat deze is ondertekend met een specifiek Bhcoin adres</translation>
+        <source>Verify a message to ensure it was signed with a specified Lux address</source>
+        <translation>Verifieer een bericht om zeker te zijn dat deze is ondertekend met een specifiek Lux adres</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -258,8 +258,8 @@ This product includes software developed by the OpenSSL Project for use in the O
     </message>
     <message>
         <location line="+82"/>
-        <source>Bhcoin will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your coins from being stolen by malware infecting your computer.</source>
-        <translation>Bhcoin zal nu sluiten om het versleutel proces te voltooien. Onthou dat het versleutelen van je portemonnee je niet volledig beschermt tegen diefstal van munten door malware op je computer.</translation>
+        <source>Lux will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your coins from being stolen by malware infecting your computer.</source>
+        <translation>Lux zal nu sluiten om het versleutel proces te voltooien. Onthou dat het versleutelen van je portemonnee je niet volledig beschermt tegen diefstal van munten door malware op je computer.</translation>
     </message>
     <message>
         <location line="+13"/>
@@ -352,8 +352,8 @@ This product includes software developed by the OpenSSL Project for use in the O
     </message>
     <message>
         <location line="+4"/>
-        <source>Show information about Bhcoin</source>
-        <translation>Toon informatie over Bhcoin</translation>
+        <source>Show information about Lux</source>
+        <translation>Toon informatie over Lux</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -392,13 +392,13 @@ This product includes software developed by the OpenSSL Project for use in the O
     </message>
     <message>
         <location line="-55"/>
-        <source>Send coins to a Bhcoin address</source>
-        <translation>Verstuur munten naar een Bhcoin adres</translation>
+        <source>Send coins to a Lux address</source>
+        <translation>Verstuur munten naar een Lux adres</translation>
     </message>
     <message>
         <location line="+39"/>
-        <source>Modify configuration options for Bhcoin</source>
-        <translation>Verander configuratie opties voor Bhcoin</translation>
+        <source>Modify configuration options for Lux</source>
+        <translation>Verander configuratie opties voor Lux</translation>
     </message>
     <message>
         <location line="+17"/>
@@ -438,8 +438,8 @@ This product includes software developed by the OpenSSL Project for use in the O
     <message>
         <location line="-214"/>
         <location line="+555"/>
-        <source>Bhcoin</source>
-        <translation>Bhcoin</translation>
+        <source>Lux</source>
+        <translation>Lux</translation>
     </message>
     <message>
         <location line="-555"/>
@@ -448,8 +448,8 @@ This product includes software developed by the OpenSSL Project for use in the O
     </message>
     <message>
         <location line="+193"/>
-        <source>&amp;About Bhcoin</source>
-        <translation>&amp;Over Bhcoin</translation>
+        <source>&amp;About Lux</source>
+        <translation>&amp;Over Lux</translation>
     </message>
     <message>
         <location line="+9"/>
@@ -500,13 +500,13 @@ This product includes software developed by the OpenSSL Project for use in the O
     <message>
         <location line="+0"/>
         <location line="+58"/>
-        <source>Bhcoin client</source>
-        <translation>Bhcoin client</translation>
+        <source>Lux client</source>
+        <translation>Lux client</translation>
     </message>
     <message numerus="yes">
         <location line="+70"/>
-        <source>%n active connection(s) to Bhcoin network</source>
-        <translation><numerusform>%n actieve verbinding naar Bhcoin netwerk</numerusform><numerusform>%n actieve verbindingen naar Bhcoin netwerk</numerusform></translation>
+        <source>%n active connection(s) to Lux network</source>
+        <translation><numerusform>%n actieve verbinding naar Lux netwerk</numerusform><numerusform>%n actieve verbindingen naar Lux netwerk</numerusform></translation>
     </message>
     <message>
         <location line="+488"/>
@@ -600,8 +600,8 @@ Adres: %4
     <message>
         <location line="-15"/>
         <location line="+15"/>
-        <source>URI can not be parsed! This can be caused by an invalid Bhcoin address or malformed URI parameters.</source>
-        <translation>URI kan niet ontleedt worden! Mogelijke oorzaken zijn een ongeldig Bhcoin adres of incorrecte URI parameters.</translation>
+        <source>URI can not be parsed! This can be caused by an invalid Lux address or malformed URI parameters.</source>
+        <translation>URI kan niet ontleedt worden! Mogelijke oorzaken zijn een ongeldig Lux adres of incorrecte URI parameters.</translation>
     </message>
     <message>
         <location line="+9"/>
@@ -723,8 +723,8 @@ Adres: %4
     </message>
     <message>
         <location filename="../bitcoin.cpp" line="+104"/>
-        <source>A fatal error occurred. Bhcoin can no longer continue safely and will quit.</source>
-        <translation>Een fatale fout . Bhcoin kan niet langer veilig doorgaan en sluit af.</translation>
+        <source>A fatal error occurred. Lux can no longer continue safely and will quit.</source>
+        <translation>Een fatale fout . Lux kan niet langer veilig doorgaan en sluit af.</translation>
     </message>
 </context>
 <context>
@@ -1057,8 +1057,8 @@ Dit betekend dat een fee van %2 is vereist.</translation>
     </message>
     <message>
         <location line="-5"/>
-        <source>The entered address &quot;%1&quot; is not a valid Bhcoin address.</source>
-        <translation>Het ingevoerde adres &quot;%1&quot; is geen geldig Bhcoin adres.</translation>
+        <source>The entered address &quot;%1&quot; is not a valid Lux address.</source>
+        <translation>Het ingevoerde adres &quot;%1&quot; is geen geldig Lux adres.</translation>
     </message>
     <message>
         <location line="+10"/>
@@ -1076,8 +1076,8 @@ Dit betekend dat een fee van %2 is vereist.</translation>
     <message>
         <location filename="../guiutil.cpp" line="+426"/>
         <location line="+12"/>
-        <source>Bhcoin-Qt</source>
-        <translation>Bhcoin-Qt</translation>
+        <source>Lux-Qt</source>
+        <translation>Lux-Qt</translation>
     </message>
     <message>
         <location line="-12"/>
@@ -1149,13 +1149,13 @@ Dit betekend dat een fee van %2 is vereist.</translation>
     </message>
     <message>
         <location line="+31"/>
-        <source>Automatically start Bhcoin after logging in to the system.</source>
-        <translation>Automatisch starten van Bhcoin na inloggen van het systeem.</translation>
+        <source>Automatically start Lux after logging in to the system.</source>
+        <translation>Automatisch starten van Lux na inloggen van het systeem.</translation>
     </message>
     <message>
         <location line="+3"/>
-        <source>&amp;Start Bhcoin on system login</source>
-        <translation>&amp;Start Bhcoin bij systeem aanmelding</translation>
+        <source>&amp;Start Lux on system login</source>
+        <translation>&amp;Start Lux bij systeem aanmelding</translation>
     </message>
     <message>
         <location line="+21"/>
@@ -1164,8 +1164,8 @@ Dit betekend dat een fee van %2 is vereist.</translation>
     </message>
     <message>
         <location line="+6"/>
-        <source>Automatically open the Bhcoin client port on the router. This only works when your router supports UPnP and it is enabled.</source>
-        <translation>De Bhcoin client poort automatisch openen op de router. Dit werkt alleen wanneer uw router UPnP ondersteunt en deze is ingeschakeld.</translation>
+        <source>Automatically open the Lux client port on the router. This only works when your router supports UPnP and it is enabled.</source>
+        <translation>De Lux client poort automatisch openen op de router. Dit werkt alleen wanneer uw router UPnP ondersteunt en deze is ingeschakeld.</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -1194,7 +1194,7 @@ Dit betekend dat een fee van %2 is vereist.</translation>
     </message>
     <message>
         <location line="-57"/>
-        <source>Connect to the Bhcoin network through a SOCKS5 proxy (e.g. when connecting through Tor).</source>
+        <source>Connect to the Lux network through a SOCKS5 proxy (e.g. when connecting through Tor).</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -1239,8 +1239,8 @@ Dit betekend dat een fee van %2 is vereist.</translation>
     </message>
     <message>
         <location line="+13"/>
-        <source>The user interface language can be set here. This setting will take effect after restarting Bhcoin.</source>
-        <translation>De user interface-taal kan hier ingesteld worden. Deze instelling word toegepast na Bhcoin opnieuw op te starten.</translation>
+        <source>The user interface language can be set here. This setting will take effect after restarting Lux.</source>
+        <translation>De user interface-taal kan hier ingesteld worden. Deze instelling word toegepast na Lux opnieuw op te starten.</translation>
     </message>
     <message>
         <location line="+11"/>
@@ -1306,8 +1306,8 @@ Dit betekend dat een fee van %2 is vereist.</translation>
     <message>
         <location line="-9"/>
         <location line="+9"/>
-        <source>This setting will take effect after restarting Bhcoin.</source>
-        <translation>Deze instelling word toegepast na een restart van Bhcoin.</translation>
+        <source>This setting will take effect after restarting Lux.</source>
+        <translation>Deze instelling word toegepast na een restart van Lux.</translation>
     </message>
     <message>
         <location line="+29"/>
@@ -1325,8 +1325,8 @@ Dit betekend dat een fee van %2 is vereist.</translation>
     <message>
         <location line="+46"/>
         <location line="+247"/>
-        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the Bhcoin network after a connection is established, but this process has not completed yet.</source>
-        <translation>De weergegeven informatie kan verouderd zijn, Je portemonnee synchroniseerd automatisch met het Bhcoin netwerk nadat er verbindig is gemaakt, maar dit proces is nog niet voltooid.</translation>
+        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the Lux network after a connection is established, but this process has not completed yet.</source>
+        <translation>De weergegeven informatie kan verouderd zijn, Je portemonnee synchroniseerd automatisch met het Lux netwerk nadat er verbindig is gemaakt, maar dit proces is nog niet voltooid.</translation>
     </message>
     <message>
         <location line="-173"/>
@@ -1399,7 +1399,7 @@ Dit betekend dat een fee van %2 is vereist.</translation>
     <name>PaymentServer</name>
     <message>
         <location filename="../paymentserver.cpp" line="+107"/>
-        <source>Cannot start bhcoin: click-to-pay handler</source>
+        <source>Cannot start lux: click-to-pay handler</source>
         <translation type="unfinished"/>
     </message>
 </context>
@@ -1567,8 +1567,8 @@ Dit betekend dat een fee van %2 is vereist.</translation>
     </message>
     <message>
         <location line="+7"/>
-        <source>Show the Bhcoin-Qt help message to get a list with possible Bhcoin command-line options.</source>
-        <translation>Laat het Bhcoin-QT help bericht zien om een lijst te krijgen met mogelijke Bhcoin command-regel opties.</translation>
+        <source>Show the Lux-Qt help message to get a list with possible Lux command-line options.</source>
+        <translation>Laat het Lux-QT help bericht zien om een lijst te krijgen met mogelijke Lux command-regel opties.</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -1587,13 +1587,13 @@ Dit betekend dat een fee van %2 is vereist.</translation>
     </message>
     <message>
         <location line="-104"/>
-        <source>Bhcoin - Debug window</source>
-        <translation>Bhcoin - Debugscherm</translation>
+        <source>Lux - Debug window</source>
+        <translation>Lux - Debugscherm</translation>
     </message>
     <message>
         <location line="+25"/>
-        <source>Bhcoin Core</source>
-        <translation>Bhcoin Kern</translation>
+        <source>Lux Core</source>
+        <translation>Lux Kern</translation>
     </message>
     <message>
         <location line="+256"/>
@@ -1602,8 +1602,8 @@ Dit betekend dat een fee van %2 is vereist.</translation>
     </message>
     <message>
         <location line="+7"/>
-        <source>Open the Bhcoin debug log file from the current data directory. This can take a few seconds for large log files.</source>
-        <translation>Open het Bhcoin debug log bestand van de huidige data map. Dit kan een paar seconden duren voor grote log bestanden.</translation>
+        <source>Open the Lux debug log file from the current data directory. This can take a few seconds for large log files.</source>
+        <translation>Open het Lux debug log bestand van de huidige data map. Dit kan een paar seconden duren voor grote log bestanden.</translation>
     </message>
     <message>
         <location line="+102"/>
@@ -1612,8 +1612,8 @@ Dit betekend dat een fee van %2 is vereist.</translation>
     </message>
     <message>
         <location filename="../rpcconsole.cpp" line="+325"/>
-        <source>Welcome to the Bhcoin RPC console.</source>
-        <translation>Welkom bij de Bhcoin RPC console.</translation>
+        <source>Welcome to the Lux RPC console.</source>
+        <translation>Welkom bij de Lux RPC console.</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -1793,8 +1793,8 @@ Dit betekend dat een fee van %2 is vereist.</translation>
     </message>
     <message>
         <location filename="../sendcoinsdialog.cpp" line="-174"/>
-        <source>Enter a Bhcoin address (e.g. SjBj1QvJvsAkU5EBKggdZ8gWc4oK2F5AMY)</source>
-        <translation>Voeg een Bhcoin adres in (bijv. SjBj1QvJvsAkU5EBKggdZ8gWc4oK2F5AMY)</translation>
+        <source>Enter a Lux address (e.g. SjBj1QvJvsAkU5EBKggdZ8gWc4oK2F5AMY)</source>
+        <translation>Voeg een Lux adres in (bijv. SjBj1QvJvsAkU5EBKggdZ8gWc4oK2F5AMY)</translation>
     </message>
     <message>
         <location line="+15"/>
@@ -1893,8 +1893,8 @@ Dit betekend dat een fee van %2 is vereist.</translation>
     </message>
     <message>
         <location line="+247"/>
-        <source>WARNING: Invalid Bhcoin address</source>
-        <translation>WAARSCHUWING: Ongeldig Bhcoin adres</translation>
+        <source>WARNING: Invalid Lux address</source>
+        <translation>WAARSCHUWING: Ongeldig Lux adres</translation>
     </message>
     <message>
         <location line="+13"/>
@@ -1967,8 +1967,8 @@ Dit betekend dat een fee van %2 is vereist.</translation>
     </message>
     <message>
         <location filename="../sendcoinsentry.cpp" line="+1"/>
-        <source>Enter a Bhcoin address (e.g. SjBj1QvJvsAkU5EBKggdZ8gWc4oK2F5AMY)</source>
-        <translation>Voeg een Bhcoin adres in (bijv. SjBj1QvJvsAkU5EBKggdZ8gWc4oK2F5AMY)</translation>
+        <source>Enter a Lux address (e.g. SjBj1QvJvsAkU5EBKggdZ8gWc4oK2F5AMY)</source>
+        <translation>Voeg een Lux adres in (bijv. SjBj1QvJvsAkU5EBKggdZ8gWc4oK2F5AMY)</translation>
     </message>
 </context>
 <context>
@@ -2028,8 +2028,8 @@ Dit betekend dat een fee van %2 is vereist.</translation>
     </message>
     <message>
         <location line="+21"/>
-        <source>Sign the message to prove you own this Bhcoin address</source>
-        <translation>Teken een bericht om te bewijzen dat je een Bhcoin adres bezit.</translation>
+        <source>Sign the message to prove you own this Lux address</source>
+        <translation>Teken een bericht om te bewijzen dat je een Lux adres bezit.</translation>
     </message>
     <message>
         <location line="+17"/>
@@ -2060,8 +2060,8 @@ Dit betekend dat een fee van %2 is vereist.</translation>
     </message>
     <message>
         <location line="+40"/>
-        <source>Verify the message to ensure it was signed with the specified Bhcoin address</source>
-        <translation>Verifieer een bericht om zeker te zijn dat deze is ondertekend met een specifiek Bhcoin adres</translation>
+        <source>Verify the message to ensure it was signed with the specified Lux address</source>
+        <translation>Verifieer een bericht om zeker te zijn dat deze is ondertekend met een specifiek Lux adres</translation>
     </message>
     <message>
         <location line="+17"/>
@@ -2071,8 +2071,8 @@ Dit betekend dat een fee van %2 is vereist.</translation>
     <message>
         <location filename="../signverifymessagedialog.cpp" line="+27"/>
         <location line="+3"/>
-        <source>Enter a Bhcoin address (e.g. SjBj1QvJvsAkU5EBKggdZ8gWc4oK2F5AMY)</source>
-        <translation>Voeg een Bhcoin adres in (bijv. SjBj1QvJvsAkU5EBKggdZ8gWc4oK2F5AMY)</translation>
+        <source>Enter a Lux address (e.g. SjBj1QvJvsAkU5EBKggdZ8gWc4oK2F5AMY)</source>
+        <translation>Voeg een Lux adres in (bijv. SjBj1QvJvsAkU5EBKggdZ8gWc4oK2F5AMY)</translation>
     </message>
     <message>
         <location line="-2"/>
@@ -2081,8 +2081,8 @@ Dit betekend dat een fee van %2 is vereist.</translation>
     </message>
     <message>
         <location line="+3"/>
-        <source>Enter Bhcoin signature</source>
-        <translation>Voer Bhcoin handtekening in</translation>
+        <source>Enter Lux signature</source>
+        <translation>Voer Lux handtekening in</translation>
     </message>
     <message>
         <location line="+85"/>
@@ -2660,8 +2660,8 @@ Dit betekend dat een fee van %2 is vereist.</translation>
     <name>bitcoin-core</name>
     <message>
         <location filename="../bitcoinstrings.cpp" line="+171"/>
-        <source>Bhcoin version</source>
-        <translation>Bhcoin versie</translation>
+        <source>Lux version</source>
+        <translation>Lux versie</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -2670,8 +2670,8 @@ Dit betekend dat een fee van %2 is vereist.</translation>
     </message>
     <message>
         <location line="+1"/>
-        <source>Send command to -server or bhcoind</source>
-        <translation>Verstuur commando naar -server of bhcoind</translation>
+        <source>Send command to -server or luxd</source>
+        <translation>Verstuur commando naar -server of luxd</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -2690,13 +2690,13 @@ Dit betekend dat een fee van %2 is vereist.</translation>
     </message>
     <message>
         <location line="+2"/>
-        <source>Specify configuration file (default: bhcoin.conf)</source>
-        <translation>Selecteer configuratie bestand (standaard: bhcoin.conf)</translation>
+        <source>Specify configuration file (default: lux.conf)</source>
+        <translation>Selecteer configuratie bestand (standaard: lux.conf)</translation>
     </message>
     <message>
         <location line="+1"/>
-        <source>Specify pid file (default: bhcoind.pid)</source>
-        <translation>Selecteer pid bestand (standaard: bhcoin.conf)</translation>
+        <source>Specify pid file (default: luxd.pid)</source>
+        <translation>Selecteer pid bestand (standaard: lux.conf)</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -2713,13 +2713,13 @@ Dit betekend dat een fee van %2 is vereist.</translation>
         <source>%s, you must set a rpcpassword in the configuration file:
 %s
 It is recommended you use the following random password:
-rpcuser=bhcoinrpc
+rpcuser=luxrpc
 rpcpassword=%s
 (you do not need to remember this password)
 The username and password MUST NOT be the same.
 If the file does not exist, create it with owner-readable-only file permissions.
 It is also recommended to set alertnotify so you are notified of problems;
-for example: alertnotify=echo %%s | mail -s &quot;Bhcoin Alert&quot; admin@foo.com
+for example: alertnotify=echo %%s | mail -s &quot;Lux Alert&quot; admin@foo.com
 </source>
         <translation type="unfinished"/>
     </message>
@@ -2825,8 +2825,8 @@ for example: alertnotify=echo %%s | mail -s &quot;Bhcoin Alert&quot; admin@foo.c
     </message>
     <message>
         <location line="-103"/>
-        <source>Warning: Please check that your computer&apos;s date and time are correct! If your clock is wrong Bhcoin will not work properly.</source>
-        <translation>Waarschuwing: Controleer of de datum en tijd van de computer juist zijn! Als uw klok verkeerd is Bhcoin zal niet goed werken.</translation>
+        <source>Warning: Please check that your computer&apos;s date and time are correct! If your clock is wrong Lux will not work properly.</source>
+        <translation>Waarschuwing: Controleer of de datum en tijd van de computer juist zijn! Als uw klok verkeerd is Lux zal niet goed werken.</translation>
     </message>
     <message>
         <location line="+130"/>
@@ -3120,7 +3120,7 @@ for example: alertnotify=echo %%s | mail -s &quot;Bhcoin Alert&quot; admin@foo.c
     </message>
     <message>
         <location line="+8"/>
-        <source>Initialization sanity check failed. Bhcoin is shutting down.</source>
+        <source>Initialization sanity check failed. Lux is shutting down.</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -3175,13 +3175,13 @@ for example: alertnotify=echo %%s | mail -s &quot;Bhcoin Alert&quot; admin@foo.c
     </message>
     <message>
         <location line="+4"/>
-        <source>Error loading wallet.dat: Wallet requires newer version of Bhcoin</source>
-        <translation>Fout bij laden van wallet.dat: Portemonnee vereist een nieuwere versie van Bhcoin</translation>
+        <source>Error loading wallet.dat: Wallet requires newer version of Lux</source>
+        <translation>Fout bij laden van wallet.dat: Portemonnee vereist een nieuwere versie van Lux</translation>
     </message>
     <message>
         <location line="+1"/>
-        <source>Wallet needed to be rewritten: restart Bhcoin to complete</source>
-        <translation>Portemonnee moet herschreven worden: herstart Bhcoin om te voltooien</translation>
+        <source>Wallet needed to be rewritten: restart Lux to complete</source>
+        <translation>Portemonnee moet herschreven worden: herstart Lux om te voltooien</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -3240,8 +3240,8 @@ for example: alertnotify=echo %%s | mail -s &quot;Bhcoin Alert&quot; admin@foo.c
     </message>
     <message>
         <location line="+124"/>
-        <source>Unable to bind to %s on this computer. Bhcoin is probably already running.</source>
-        <translation>Niet mogelijk om %s op deze computer. Bhcoin is waarschijnlijk al geopened.</translation>
+        <source>Unable to bind to %s on this computer. Lux is probably already running.</source>
+        <translation>Niet mogelijk om %s op deze computer. Lux is waarschijnlijk al geopened.</translation>
     </message>
     <message>
         <location line="-101"/>
@@ -3275,7 +3275,7 @@ for example: alertnotify=echo %%s | mail -s &quot;Bhcoin Alert&quot; admin@foo.c
     </message>
     <message>
         <location line="+3"/>
-        <source>Cannot obtain a lock on data directory %s. Bhcoin is probably already running.</source>
+        <source>Cannot obtain a lock on data directory %s. Lux is probably already running.</source>
         <translation type="unfinished"/>
     </message>
     <message>

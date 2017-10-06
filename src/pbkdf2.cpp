@@ -1,5 +1,5 @@
 // Copyright (c) 2013 NovaCoin Developers
-// Copyright (c) 2017 BHCoin Developers
+// Copyright (c) 2017 LUXoin Developers
 
 #include <string.h>
 #include "pbkdf2.h"

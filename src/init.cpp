@@ -52,7 +52,7 @@ bool fUseFastIndex;
 // The network-processing threads are all part of a thread group
 // created by AppInit() or the Qt main() function.
 //
-// A clean exit happens when StartShutdown() or the BHCERM
+// A clean exit happens when StartShutdown() or the LUXERM
 // signal handler sets fRequestShutdown, which triggers
 // the DetectShutdownThread(), which interrupts the main thread group.
 // DetectShutdownThread() then exits, which causes AppInit() to
@@ -89,7 +89,7 @@ void Shutdown()
     TRY_LOCK(cs_Shutdown, lockShutdown);
     if (!lockShutdown) return;
 
-    RenameThread("bhcoin-shutoff");
+    RenameThread("lux-shutoff");
     mempool.AddTransactionsUpdated(1);
     StopRPCThreads();
 #ifdef ENABLE_WALLET
@@ -160,8 +160,8 @@ std::string HelpMessage()
 {
     string strUsage = _("Options:") + "\n";
     strUsage += "  -?                     " + _("This help message") + "\n";
-    strUsage += "  -conf=<file>           " + _("Specify configuration file (default: bhcoin.conf)") + "\n";
-    strUsage += "  -pid=<file>            " + _("Specify pid file (default: bhcoind.pid)") + "\n";
+    strUsage += "  -conf=<file>           " + _("Specify configuration file (default: lux.conf)") + "\n";
+    strUsage += "  -pid=<file>            " + _("Specify pid file (default: luxd.pid)") + "\n";
     strUsage += "  -datadir=<dir>         " + _("Specify data directory") + "\n";
     strUsage += "  -wallet=<dir>          " + _("Specify wallet file (within data directory)") + "\n";
     strUsage += "  -dbcache=<n>           " + _("Set database cache size in megabytes (default: 25)") + "\n";
@@ -446,7 +446,7 @@ bool AppInit2(boost::thread_group& threadGroup)
 
     // Sanity check
     if (!InitSanityCheck())
-        return InitError(_("Initialization sanity check failed. Bhcoin is shutting down."));
+        return InitError(_("Initialization sanity check failed. Lux is shutting down."));
 
     std::string strDataDir = GetDataDir().string();
 #ifdef ENABLE_WALLET
@@ -462,12 +462,12 @@ bool AppInit2(boost::thread_group& threadGroup)
     if (file) fclose(file);
     static boost::interprocess::file_lock lock(pathLockFile.string().c_str());
     if (!lock.try_lock())
-        return InitError(strprintf(_("Cannot obtain a lock on data directory %s. Bhcoin is probably already running."), strDataDir));
+        return InitError(strprintf(_("Cannot obtain a lock on data directory %s. Lux is probably already running."), strDataDir));
 
     if (GetBoolArg("-shrinkdebugfile", !fDebug))
         ShrinkDebugFile();
     LogPrintf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
-    LogPrintf("Bhcoin version %s (%s)\n", FormatFullVersion(), CLIENT_DATE);
+    LogPrintf("Lux version %s (%s)\n", FormatFullVersion(), CLIENT_DATE);
     LogPrintf("Using OpenSSL version %s\n", SSLeay_version(SSLEAY_VERSION));
     if (!fLogTimestamps)
         LogPrintf("Startup time: %s\n", DateTimeStrFormat("%x %H:%M:%S", GetTime()));
@@ -476,7 +476,7 @@ bool AppInit2(boost::thread_group& threadGroup)
     std::ostringstream strErrors;
 
     if (fDaemon)
-        fprintf(stdout, "Bhcoin server starting\n");
+        fprintf(stdout, "Lux server starting\n");
 
     int64_t nStart;
 
@@ -705,10 +705,10 @@ bool AppInit2(boost::thread_group& threadGroup)
                 InitWarning(msg);
             }
             else if (nLoadWalletRet == DB_TOO_NEW)
-                strErrors << _("Error loading wallet.dat: Wallet requires newer version of Bhcoin") << "\n";
+                strErrors << _("Error loading wallet.dat: Wallet requires newer version of Lux") << "\n";
             else if (nLoadWalletRet == DB_NEED_REWRITE)
             {
-                strErrors << _("Wallet needed to be rewritten: restart Bhcoin to complete") << "\n";
+                strErrors << _("Wallet needed to be rewritten: restart Lux to complete") << "\n";
                 LogPrintf("%s", strErrors.str());
                 return InitError(strErrors.str());
             }

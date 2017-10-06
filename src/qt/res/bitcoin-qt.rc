@@ -1,4 +1,4 @@
-IDI_ICON1 ICON DISCARDABLE "icons/bhcoin.ico"
+IDI_ICON1 ICON DISCARDABLE "icons/lux.ico"
 
 #include <windows.h>             // needed for VERSIONINFO
 #include "../../clientversion.h" // holds the needed client version information
@@ -18,14 +18,14 @@ BEGIN
     BEGIN
         BLOCK "040904E4" // U.S. English - multilingual (hex)
         BEGIN
-            VALUE "CompanyName",        "Bhcoin"
-            VALUE "FileDescription",    "Bhcoin-Qt (OSS GUI client for Bhcoin)"
+            VALUE "CompanyName",        "Lux"
+            VALUE "FileDescription",    "Lux-Qt (OSS GUI client for Lux)"
             VALUE "FileVersion",        VER_FILEVERSION_STR
-            VALUE "InternalName",       "bhcoin-qt"
-            VALUE "LegalCopyright",     "2009-2014 The Bitcoin developers, 20167 The Bhcoin developers"
+            VALUE "InternalName",       "lux-qt"
+            VALUE "LegalCopyright",     "2009-2014 The Bitcoin developers, 20167 The Lux developers"
             VALUE "LegalTrademarks1",   "Distributed under the MIT/X11 software license, see the accompanying file COPYING or http://www.opensource.org/licenses/mit-license.php."
-            VALUE "OriginalFilename",   "bhcoin-qt.exe"
-            VALUE "ProductName",        "Bhcoin-Qt"
+            VALUE "OriginalFilename",   "lux-qt.exe"
+            VALUE "ProductName",        "Lux-Qt"
             VALUE "ProductVersion",     VER_PRODUCTVERSION_STR
         END
     END

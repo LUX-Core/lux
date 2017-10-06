@@ -3,19 +3,19 @@
     <name>AboutDialog</name>
     <message>
         <location filename="../forms/aboutdialog.ui" line="+14"/>
-        <source>About Bhcoin</source>
-        <translation>O Bhcoin</translation>
+        <source>About Lux</source>
+        <translation>O Lux</translation>
     </message>
     <message>
         <location line="+39"/>
-        <source>&lt;b&gt;Bhcoin&lt;/b&gt; version</source>
-        <translation>&lt;b&gt;Bhcoin&lt;/b&gt; verzija</translation>
+        <source>&lt;b&gt;Lux&lt;/b&gt; version</source>
+        <translation>&lt;b&gt;Lux&lt;/b&gt; verzija</translation>
     </message>
     <message>
         <location line="+41"/>
         <source>Copyright © 2009-2014 The Bitcoin developers
 Copyright © 2012-2014 The NovaCoin developers
-Copyright © 2014 The Bhcoin developers</source>
+Copyright © 2014 The Lux developers</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -58,8 +58,8 @@ This product includes software developed by the OpenSSL Project for use in the O
     </message>
     <message>
         <location line="-43"/>
-        <source>These are your Bhcoin addresses for receiving payments. You may want to give a different one to each sender so you can keep track of who is paying you.</source>
-        <translation>To so vaši Bhcoin naslovi za prejemanje plačil. Priporočeno je da vsakemu pošiljatelju namenite drugega in tako dobite večji pregled nad svojimi nakazili.</translation>
+        <source>These are your Lux addresses for receiving payments. You may want to give a different one to each sender so you can keep track of who is paying you.</source>
+        <translation>To so vaši Lux naslovi za prejemanje plačil. Priporočeno je da vsakemu pošiljatelju namenite drugega in tako dobite večji pregled nad svojimi nakazili.</translation>
     </message>
     <message>
         <location line="+53"/>
@@ -73,8 +73,8 @@ This product includes software developed by the OpenSSL Project for use in the O
     </message>
     <message>
         <location line="+7"/>
-        <source>Sign a message to prove you own a Bhcoin address</source>
-        <translation>Podpišite sporočilo, kot dokazilo lastništva Bhcoin naslova</translation>
+        <source>Sign a message to prove you own a Lux address</source>
+        <translation>Podpišite sporočilo, kot dokazilo lastništva Lux naslova</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -88,8 +88,8 @@ This product includes software developed by the OpenSSL Project for use in the O
     </message>
     <message>
         <location line="-10"/>
-        <source>Verify a message to ensure it was signed with a specified Bhcoin address</source>
-        <translation>Potrdi sporočilo, da zagotovite, da je bilo podpisano z izbranim Bhcoin naslovom</translation>
+        <source>Verify a message to ensure it was signed with a specified Lux address</source>
+        <translation>Potrdi sporočilo, da zagotovite, da je bilo podpisano z izbranim Lux naslovom</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -256,8 +256,8 @@ This product includes software developed by the OpenSSL Project for use in the O
     </message>
     <message>
         <location line="+82"/>
-        <source>Bhcoin will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your coins from being stolen by malware infecting your computer.</source>
-        <translation>Bhcoin se bo sedaj zaprl, da dokonča proces šifriranje. Pomnite, da tudi šifriranje vaše denarnice ne more v celoti zaščititi vaših kovancev pred krajo z zlonamernimi programi in računalniškimi virusi, če ti okužijo vaš računalnik.</translation>
+        <source>Lux will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your coins from being stolen by malware infecting your computer.</source>
+        <translation>Lux se bo sedaj zaprl, da dokonča proces šifriranje. Pomnite, da tudi šifriranje vaše denarnice ne more v celoti zaščititi vaših kovancev pred krajo z zlonamernimi programi in računalniškimi virusi, če ti okužijo vaš računalnik.</translation>
     </message>
     <message>
         <location line="+13"/>
@@ -350,8 +350,8 @@ This product includes software developed by the OpenSSL Project for use in the O
     </message>
     <message>
         <location line="+4"/>
-        <source>Show information about Bhcoin</source>
-        <translation>Pokaži informacije o Bhcoin</translation>
+        <source>Show information about Lux</source>
+        <translation>Pokaži informacije o Lux</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -390,13 +390,13 @@ This product includes software developed by the OpenSSL Project for use in the O
     </message>
     <message>
         <location line="-55"/>
-        <source>Send coins to a Bhcoin address</source>
-        <translation>Pošlji kovance na Bhcoin naslov</translation>
+        <source>Send coins to a Lux address</source>
+        <translation>Pošlji kovance na Lux naslov</translation>
     </message>
     <message>
         <location line="+39"/>
-        <source>Modify configuration options for Bhcoin</source>
-        <translation>Spremeni nastavitve za Bhcoin</translation>
+        <source>Modify configuration options for Lux</source>
+        <translation>Spremeni nastavitve za Lux</translation>
     </message>
     <message>
         <location line="+17"/>
@@ -436,8 +436,8 @@ This product includes software developed by the OpenSSL Project for use in the O
     <message>
         <location line="-214"/>
         <location line="+555"/>
-        <source>Bhcoin</source>
-        <translation>Bhcoin</translation>
+        <source>Lux</source>
+        <translation>Lux</translation>
     </message>
     <message>
         <location line="-555"/>
@@ -446,8 +446,8 @@ This product includes software developed by the OpenSSL Project for use in the O
     </message>
     <message>
         <location line="+193"/>
-        <source>&amp;About Bhcoin</source>
-        <translation>&amp;O Bhcoin</translation>
+        <source>&amp;About Lux</source>
+        <translation>&amp;O Lux</translation>
     </message>
     <message>
         <location line="+9"/>
@@ -498,13 +498,13 @@ This product includes software developed by the OpenSSL Project for use in the O
     <message>
         <location line="+0"/>
         <location line="+58"/>
-        <source>Bhcoin client</source>
-        <translation>Bhcoin program</translation>
+        <source>Lux client</source>
+        <translation>Lux program</translation>
     </message>
     <message numerus="yes">
         <location line="+70"/>
-        <source>%n active connection(s) to Bhcoin network</source>
-        <translation><numerusform>%n aktivne povezave na Bhcoin omrežje</numerusform><numerusform>%n aktivnih povezav na Bhcoin omrežje</numerusform><numerusform>%n aktivnih povezav na Bhcoin omrežje</numerusform><numerusform>%n aktivnih povezav na Bhcoin omrežje</numerusform></translation>
+        <source>%n active connection(s) to Lux network</source>
+        <translation><numerusform>%n aktivne povezave na Lux omrežje</numerusform><numerusform>%n aktivnih povezav na Lux omrežje</numerusform><numerusform>%n aktivnih povezav na Lux omrežje</numerusform><numerusform>%n aktivnih povezav na Lux omrežje</numerusform></translation>
     </message>
     <message>
         <location line="+488"/>
@@ -598,8 +598,8 @@ Naslov: %4
     <message>
         <location line="-15"/>
         <location line="+15"/>
-        <source>URI can not be parsed! This can be caused by an invalid Bhcoin address or malformed URI parameters.</source>
-        <translation>URI ne more biti razčlenjen! To se lahko zgodi zaradi neveljavnega Bhcoin naslova ali slabih parametrov URI.</translation>
+        <source>URI can not be parsed! This can be caused by an invalid Lux address or malformed URI parameters.</source>
+        <translation>URI ne more biti razčlenjen! To se lahko zgodi zaradi neveljavnega Lux naslova ali slabih parametrov URI.</translation>
     </message>
     <message>
         <location line="+9"/>
@@ -721,8 +721,8 @@ Naslov: %4
     </message>
     <message>
         <location filename="../bitcoin.cpp" line="+104"/>
-        <source>A fatal error occurred. Bhcoin can no longer continue safely and will quit.</source>
-        <translation>Prišlo je do usodne napake. Program Bhcoin se ne more več varno nadaljevati in se bo zato zaprl. </translation>
+        <source>A fatal error occurred. Lux can no longer continue safely and will quit.</source>
+        <translation>Prišlo je do usodne napake. Program Lux se ne more več varno nadaljevati in se bo zato zaprl. </translation>
     </message>
 </context>
 <context>
@@ -1055,8 +1055,8 @@ Ta oznaka se obarva rdeče, če je prioriteta manjša kot &quot;srednja&quot;.
     </message>
     <message>
         <location line="-5"/>
-        <source>The entered address &quot;%1&quot; is not a valid Bhcoin address.</source>
-        <translation>Vneseni naslov &quot;%1&quot; ni veljaven Bhcoin naslov.</translation>
+        <source>The entered address &quot;%1&quot; is not a valid Lux address.</source>
+        <translation>Vneseni naslov &quot;%1&quot; ni veljaven Lux naslov.</translation>
     </message>
     <message>
         <location line="+10"/>
@@ -1074,8 +1074,8 @@ Ta oznaka se obarva rdeče, če je prioriteta manjša kot &quot;srednja&quot;.
     <message>
         <location filename="../guiutil.cpp" line="+426"/>
         <location line="+12"/>
-        <source>Bhcoin-Qt</source>
-        <translation>Bhcoin-Qt</translation>
+        <source>Lux-Qt</source>
+        <translation>Lux-Qt</translation>
     </message>
     <message>
         <location line="-12"/>
@@ -1147,13 +1147,13 @@ Ta oznaka se obarva rdeče, če je prioriteta manjša kot &quot;srednja&quot;.
     </message>
     <message>
         <location line="+31"/>
-        <source>Automatically start Bhcoin after logging in to the system.</source>
-        <translation>Avtomatično zaženi Bhcoin ob zagonu sistema.</translation>
+        <source>Automatically start Lux after logging in to the system.</source>
+        <translation>Avtomatično zaženi Lux ob zagonu sistema.</translation>
     </message>
     <message>
         <location line="+3"/>
-        <source>&amp;Start Bhcoin on system login</source>
-        <translation>&amp;Zaženi Bhcoin ob prijavi v sistem</translation>
+        <source>&amp;Start Lux on system login</source>
+        <translation>&amp;Zaženi Lux ob prijavi v sistem</translation>
     </message>
     <message>
         <location line="+21"/>
@@ -1162,8 +1162,8 @@ Ta oznaka se obarva rdeče, če je prioriteta manjša kot &quot;srednja&quot;.
     </message>
     <message>
         <location line="+6"/>
-        <source>Automatically open the Bhcoin client port on the router. This only works when your router supports UPnP and it is enabled.</source>
-        <translation>Avtomatično odpri vrata na routerju za Bhcoin program. To deluje le če vaš router podpira UPnP in je ta omogočen. </translation>
+        <source>Automatically open the Lux client port on the router. This only works when your router supports UPnP and it is enabled.</source>
+        <translation>Avtomatično odpri vrata na routerju za Lux program. To deluje le če vaš router podpira UPnP in je ta omogočen. </translation>
     </message>
     <message>
         <location line="+3"/>
@@ -1192,7 +1192,7 @@ Ta oznaka se obarva rdeče, če je prioriteta manjša kot &quot;srednja&quot;.
     </message>
     <message>
         <location line="-57"/>
-        <source>Connect to the Bhcoin network through a SOCKS5 proxy (e.g. when connecting through Tor).</source>
+        <source>Connect to the Lux network through a SOCKS5 proxy (e.g. when connecting through Tor).</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -1237,8 +1237,8 @@ Ta oznaka se obarva rdeče, če je prioriteta manjša kot &quot;srednja&quot;.
     </message>
     <message>
         <location line="+13"/>
-        <source>The user interface language can be set here. This setting will take effect after restarting Bhcoin.</source>
-        <translation>Tu lahko nastavite jezik uporabniškega vmesnika. Nastavitve bodo pričele delovati ob ponovnem zagonu Bhcoin aplikacije. </translation>
+        <source>The user interface language can be set here. This setting will take effect after restarting Lux.</source>
+        <translation>Tu lahko nastavite jezik uporabniškega vmesnika. Nastavitve bodo pričele delovati ob ponovnem zagonu Lux aplikacije. </translation>
     </message>
     <message>
         <location line="+11"/>
@@ -1304,8 +1304,8 @@ Ta oznaka se obarva rdeče, če je prioriteta manjša kot &quot;srednja&quot;.
     <message>
         <location line="-9"/>
         <location line="+9"/>
-        <source>This setting will take effect after restarting Bhcoin.</source>
-        <translation>Ta nastavitev bo pričela delovati ob ponovnem zagonu Bhcoin aplikacije</translation>
+        <source>This setting will take effect after restarting Lux.</source>
+        <translation>Ta nastavitev bo pričela delovati ob ponovnem zagonu Lux aplikacije</translation>
     </message>
     <message>
         <location line="+29"/>
@@ -1323,8 +1323,8 @@ Ta oznaka se obarva rdeče, če je prioriteta manjša kot &quot;srednja&quot;.
     <message>
         <location line="+46"/>
         <location line="+247"/>
-        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the Bhcoin network after a connection is established, but this process has not completed yet.</source>
-        <translation>Prikazane informacije so morda zastarele. Vaša denarnica se avtomatično sinhronizira z Bhcoin omrežjem, ko je vzpostavljena povezava, toda ta proces še ni bil zaključen.</translation>
+        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the Lux network after a connection is established, but this process has not completed yet.</source>
+        <translation>Prikazane informacije so morda zastarele. Vaša denarnica se avtomatično sinhronizira z Lux omrežjem, ko je vzpostavljena povezava, toda ta proces še ni bil zaključen.</translation>
     </message>
     <message>
         <location line="-173"/>
@@ -1397,7 +1397,7 @@ Ta oznaka se obarva rdeče, če je prioriteta manjša kot &quot;srednja&quot;.
     <name>PaymentServer</name>
     <message>
         <location filename="../paymentserver.cpp" line="+107"/>
-        <source>Cannot start bhcoin: click-to-pay handler</source>
+        <source>Cannot start lux: click-to-pay handler</source>
         <translation type="unfinished"/>
     </message>
 </context>
@@ -1565,8 +1565,8 @@ Ta oznaka se obarva rdeče, če je prioriteta manjša kot &quot;srednja&quot;.
     </message>
     <message>
         <location line="+7"/>
-        <source>Show the Bhcoin-Qt help message to get a list with possible Bhcoin command-line options.</source>
-        <translation>Prikaži Bhcoin-Qt sporočilo za pomoč , ki prikaže vse možnosti ukazne vrstice Bhcoin aplikacije</translation>
+        <source>Show the Lux-Qt help message to get a list with possible Lux command-line options.</source>
+        <translation>Prikaži Lux-Qt sporočilo za pomoč , ki prikaže vse možnosti ukazne vrstice Lux aplikacije</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -1585,13 +1585,13 @@ Ta oznaka se obarva rdeče, če je prioriteta manjša kot &quot;srednja&quot;.
     </message>
     <message>
         <location line="-104"/>
-        <source>Bhcoin - Debug window</source>
-        <translation>Bhcoin - okno za odpravljanje napak</translation>
+        <source>Lux - Debug window</source>
+        <translation>Lux - okno za odpravljanje napak</translation>
     </message>
     <message>
         <location line="+25"/>
-        <source>Bhcoin Core</source>
-        <translation>Bhcoin jedro</translation>
+        <source>Lux Core</source>
+        <translation>Lux jedro</translation>
     </message>
     <message>
         <location line="+256"/>
@@ -1600,8 +1600,8 @@ Ta oznaka se obarva rdeče, če je prioriteta manjša kot &quot;srednja&quot;.
     </message>
     <message>
         <location line="+7"/>
-        <source>Open the Bhcoin debug log file from the current data directory. This can take a few seconds for large log files.</source>
-        <translation>Odpri Bhcoin datoteko zapisov odpravljanja napak iz trenutnega direktorija podatkov. Če so datoteke zapisov velike, to lahko traja nekaj sekund.</translation>
+        <source>Open the Lux debug log file from the current data directory. This can take a few seconds for large log files.</source>
+        <translation>Odpri Lux datoteko zapisov odpravljanja napak iz trenutnega direktorija podatkov. Če so datoteke zapisov velike, to lahko traja nekaj sekund.</translation>
     </message>
     <message>
         <location line="+102"/>
@@ -1610,8 +1610,8 @@ Ta oznaka se obarva rdeče, če je prioriteta manjša kot &quot;srednja&quot;.
     </message>
     <message>
         <location filename="../rpcconsole.cpp" line="+325"/>
-        <source>Welcome to the Bhcoin RPC console.</source>
-        <translation>Dobrodošli v Bhcoin RPC konzoli.</translation>
+        <source>Welcome to the Lux RPC console.</source>
+        <translation>Dobrodošli v Lux RPC konzoli.</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -1791,8 +1791,8 @@ Ta oznaka se obarva rdeče, če je prioriteta manjša kot &quot;srednja&quot;.
     </message>
     <message>
         <location filename="../sendcoinsdialog.cpp" line="-174"/>
-        <source>Enter a Bhcoin address (e.g. SjBj1QvJvsAkU5EBKggdZ8gWc4oK2F5AMY)</source>
-        <translation>Vnesite Bhcoin naslov (e.g. SjBj1QvJvsAkU5EBKggdZ8gWc4oK2F5AMY)</translation>
+        <source>Enter a Lux address (e.g. SjBj1QvJvsAkU5EBKggdZ8gWc4oK2F5AMY)</source>
+        <translation>Vnesite Lux naslov (e.g. SjBj1QvJvsAkU5EBKggdZ8gWc4oK2F5AMY)</translation>
     </message>
     <message>
         <location line="+15"/>
@@ -1891,8 +1891,8 @@ Ta oznaka se obarva rdeče, če je prioriteta manjša kot &quot;srednja&quot;.
     </message>
     <message>
         <location line="+247"/>
-        <source>WARNING: Invalid Bhcoin address</source>
-        <translation>OPOZORILO: Neveljaven Bhcoin naslov</translation>
+        <source>WARNING: Invalid Lux address</source>
+        <translation>OPOZORILO: Neveljaven Lux naslov</translation>
     </message>
     <message>
         <location line="+13"/>
@@ -1965,8 +1965,8 @@ Ta oznaka se obarva rdeče, če je prioriteta manjša kot &quot;srednja&quot;.
     </message>
     <message>
         <location filename="../sendcoinsentry.cpp" line="+1"/>
-        <source>Enter a Bhcoin address (e.g. SjBj1QvJvsAkU5EBKggdZ8gWc4oK2F5AMY)</source>
-        <translation>Vnesite Bhcoin naslov (npr. SjBj1QvJvsAkU5EBKggdZ8gWc4oK2F5AMY)</translation>
+        <source>Enter a Lux address (e.g. SjBj1QvJvsAkU5EBKggdZ8gWc4oK2F5AMY)</source>
+        <translation>Vnesite Lux naslov (npr. SjBj1QvJvsAkU5EBKggdZ8gWc4oK2F5AMY)</translation>
     </message>
 </context>
 <context>
@@ -2026,8 +2026,8 @@ Ta oznaka se obarva rdeče, če je prioriteta manjša kot &quot;srednja&quot;.
     </message>
     <message>
         <location line="+21"/>
-        <source>Sign the message to prove you own this Bhcoin address</source>
-        <translation>Podpišite sporočilo, kot dokazilo lastništva Bhcoin naslova</translation>
+        <source>Sign the message to prove you own this Lux address</source>
+        <translation>Podpišite sporočilo, kot dokazilo lastništva Lux naslova</translation>
     </message>
     <message>
         <location line="+17"/>
@@ -2058,8 +2058,8 @@ Ta oznaka se obarva rdeče, če je prioriteta manjša kot &quot;srednja&quot;.
     </message>
     <message>
         <location line="+40"/>
-        <source>Verify the message to ensure it was signed with the specified Bhcoin address</source>
-        <translation>Potrdite sporočilo, da zagotovite, da je bilo podpisano z izbranim Bhcoin naslovom</translation>
+        <source>Verify the message to ensure it was signed with the specified Lux address</source>
+        <translation>Potrdite sporočilo, da zagotovite, da je bilo podpisano z izbranim Lux naslovom</translation>
     </message>
     <message>
         <location line="+17"/>
@@ -2069,8 +2069,8 @@ Ta oznaka se obarva rdeče, če je prioriteta manjša kot &quot;srednja&quot;.
     <message>
         <location filename="../signverifymessagedialog.cpp" line="+27"/>
         <location line="+3"/>
-        <source>Enter a Bhcoin address (e.g. SjBj1QvJvsAkU5EBKggdZ8gWc4oK2F5AMY)</source>
-        <translation>Vnesite Bhcoin naslov (npr. SjBj1QvJvsAkU5EBKggdZ8gWc4oK2F5AMY)</translation>
+        <source>Enter a Lux address (e.g. SjBj1QvJvsAkU5EBKggdZ8gWc4oK2F5AMY)</source>
+        <translation>Vnesite Lux naslov (npr. SjBj1QvJvsAkU5EBKggdZ8gWc4oK2F5AMY)</translation>
     </message>
     <message>
         <location line="-2"/>
@@ -2079,8 +2079,8 @@ Ta oznaka se obarva rdeče, če je prioriteta manjša kot &quot;srednja&quot;.
     </message>
     <message>
         <location line="+3"/>
-        <source>Enter Bhcoin signature</source>
-        <translation>Vnesite Bhcoin podpis</translation>
+        <source>Enter Lux signature</source>
+        <translation>Vnesite Lux podpis</translation>
     </message>
     <message>
         <location line="+85"/>
@@ -2658,8 +2658,8 @@ Ta oznaka se obarva rdeče, če je prioriteta manjša kot &quot;srednja&quot;.
     <name>bitcoin-core</name>
     <message>
         <location filename="../bitcoinstrings.cpp" line="+171"/>
-        <source>Bhcoin version</source>
-        <translation>Bhcoin različica</translation>
+        <source>Lux version</source>
+        <translation>Lux različica</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -2668,7 +2668,7 @@ Ta oznaka se obarva rdeče, če je prioriteta manjša kot &quot;srednja&quot;.
     </message>
     <message>
         <location line="+1"/>
-        <source>Send command to -server or bhcoind</source>
+        <source>Send command to -server or luxd</source>
         <translation>Pošlji ukaz na -server ali blackoind</translation>
     </message>
     <message>
@@ -2688,13 +2688,13 @@ Ta oznaka se obarva rdeče, če je prioriteta manjša kot &quot;srednja&quot;.
     </message>
     <message>
         <location line="+2"/>
-        <source>Specify configuration file (default: bhcoin.conf)</source>
-        <translation>Določi konfiguracijsko datoteko (privzeto: bhcoin.conf)</translation>
+        <source>Specify configuration file (default: lux.conf)</source>
+        <translation>Določi konfiguracijsko datoteko (privzeto: lux.conf)</translation>
     </message>
     <message>
         <location line="+1"/>
-        <source>Specify pid file (default: bhcoind.pid)</source>
-        <translation>Določi pid datoteko (privzeto: bhcoin.pid)</translation>
+        <source>Specify pid file (default: luxd.pid)</source>
+        <translation>Določi pid datoteko (privzeto: lux.pid)</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -2711,13 +2711,13 @@ Ta oznaka se obarva rdeče, če je prioriteta manjša kot &quot;srednja&quot;.
         <source>%s, you must set a rpcpassword in the configuration file:
 %s
 It is recommended you use the following random password:
-rpcuser=bhcoinrpc
+rpcuser=luxrpc
 rpcpassword=%s
 (you do not need to remember this password)
 The username and password MUST NOT be the same.
 If the file does not exist, create it with owner-readable-only file permissions.
 It is also recommended to set alertnotify so you are notified of problems;
-for example: alertnotify=echo %%s | mail -s &quot;Bhcoin Alert&quot; admin@foo.com
+for example: alertnotify=echo %%s | mail -s &quot;Lux Alert&quot; admin@foo.com
 </source>
         <translation type="unfinished"/>
     </message>
@@ -2823,8 +2823,8 @@ for example: alertnotify=echo %%s | mail -s &quot;Bhcoin Alert&quot; admin@foo.c
     </message>
     <message>
         <location line="-103"/>
-        <source>Warning: Please check that your computer&apos;s date and time are correct! If your clock is wrong Bhcoin will not work properly.</source>
-        <translation>Opozorilo: Prosimo preverite svoj datum in čas svojega računalnika! Če je vaša ura nastavljena napačno Bhcoin ne bo deloval.</translation>
+        <source>Warning: Please check that your computer&apos;s date and time are correct! If your clock is wrong Lux will not work properly.</source>
+        <translation>Opozorilo: Prosimo preverite svoj datum in čas svojega računalnika! Če je vaša ura nastavljena napačno Lux ne bo deloval.</translation>
     </message>
     <message>
         <location line="+130"/>
@@ -3118,7 +3118,7 @@ for example: alertnotify=echo %%s | mail -s &quot;Bhcoin Alert&quot; admin@foo.c
     </message>
     <message>
         <location line="+8"/>
-        <source>Initialization sanity check failed. Bhcoin is shutting down.</source>
+        <source>Initialization sanity check failed. Lux is shutting down.</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -3173,13 +3173,13 @@ for example: alertnotify=echo %%s | mail -s &quot;Bhcoin Alert&quot; admin@foo.c
     </message>
     <message>
         <location line="+4"/>
-        <source>Error loading wallet.dat: Wallet requires newer version of Bhcoin</source>
-        <translation>Napaka pri nalaganju wallet.dat: denarnica zahteva novejšo verzijo Bhcoin</translation>
+        <source>Error loading wallet.dat: Wallet requires newer version of Lux</source>
+        <translation>Napaka pri nalaganju wallet.dat: denarnica zahteva novejšo verzijo Lux</translation>
     </message>
     <message>
         <location line="+1"/>
-        <source>Wallet needed to be rewritten: restart Bhcoin to complete</source>
-        <translation>Denarnica mora biti prepisana: ponovno odprite Bhcoin za dokončanje</translation>
+        <source>Wallet needed to be rewritten: restart Lux to complete</source>
+        <translation>Denarnica mora biti prepisana: ponovno odprite Lux za dokončanje</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -3238,8 +3238,8 @@ for example: alertnotify=echo %%s | mail -s &quot;Bhcoin Alert&quot; admin@foo.c
     </message>
     <message>
         <location line="+124"/>
-        <source>Unable to bind to %s on this computer. Bhcoin is probably already running.</source>
-        <translation>Navezava v %s  na tem računalniku ni mogoča Bhcoin aplikacija je verjetno že zagnana.</translation>
+        <source>Unable to bind to %s on this computer. Lux is probably already running.</source>
+        <translation>Navezava v %s  na tem računalniku ni mogoča Lux aplikacija je verjetno že zagnana.</translation>
     </message>
     <message>
         <location line="-101"/>
@@ -3273,7 +3273,7 @@ for example: alertnotify=echo %%s | mail -s &quot;Bhcoin Alert&quot; admin@foo.c
     </message>
     <message>
         <location line="+3"/>
-        <source>Cannot obtain a lock on data directory %s. Bhcoin is probably already running.</source>
+        <source>Cannot obtain a lock on data directory %s. Lux is probably already running.</source>
         <translation type="unfinished"/>
     </message>
     <message>

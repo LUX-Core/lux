@@ -3,22 +3,22 @@
     <name>AboutDialog</name>
     <message>
         <location filename="../forms/aboutdialog.ui" line="+14"/>
-        <source>About Bhcoin</source>
-        <translation>Bhcoin Hakkında</translation>
+        <source>About Lux</source>
+        <translation>Lux Hakkında</translation>
     </message>
     <message>
         <location line="+39"/>
-        <source>&lt;b&gt;Bhcoin&lt;/b&gt; version</source>
-        <translation>&lt;b&gt;Bhcoin&lt;/b&gt; versiyonu</translation>
+        <source>&lt;b&gt;Lux&lt;/b&gt; version</source>
+        <translation>&lt;b&gt;Lux&lt;/b&gt; versiyonu</translation>
     </message>
     <message>
         <location line="+41"/>
         <source>Copyright © 2009-2014 The Bitcoin developers
 Copyright © 2012-2014 The NovaCoin developers
-Copyright © 2014 The Bhcoin developers</source>
+Copyright © 2014 The Lux developers</source>
         <translation>Telif Hakkı © 2009-2014 Bitcoin geliştiricileri
 Telif Hakkı © 2012-2014 NovaCoin geliştiricileri
-Telif Hakkı © 2014 Bhcoin geliştiricileri</translation>
+Telif Hakkı © 2014 Lux geliştiricileri</translation>
     </message>
     <message>
         <location line="+15"/>
@@ -65,8 +65,8 @@ Bu ürün, OpenSSL projesi tarafından OpenSSL araç takımıThis product includ
     </message>
     <message>
         <location line="-43"/>
-        <source>These are your Bhcoin addresses for receiving payments. You may want to give a different one to each sender so you can keep track of who is paying you.</source>
-        <translation>Bunlar, ödeme almak için Bhcoin adreslerinizdir. Her bir göndericiye farklı birini verebilir, böylece size kimin ödeme yaptığını takip edebilirsiniz.</translation>
+        <source>These are your Lux addresses for receiving payments. You may want to give a different one to each sender so you can keep track of who is paying you.</source>
+        <translation>Bunlar, ödeme almak için Lux adreslerinizdir. Her bir göndericiye farklı birini verebilir, böylece size kimin ödeme yaptığını takip edebilirsiniz.</translation>
     </message>
     <message>
         <location line="+53"/>
@@ -80,8 +80,8 @@ Bu ürün, OpenSSL projesi tarafından OpenSSL araç takımıThis product includ
     </message>
     <message>
         <location line="+7"/>
-        <source>Sign a message to prove you own a Bhcoin address</source>
-        <translation>Bir Bhcoin adresine sahip olduğunu ispatlamak için bir mesaj imzala</translation>
+        <source>Sign a message to prove you own a Lux address</source>
+        <translation>Bir Lux adresine sahip olduğunu ispatlamak için bir mesaj imzala</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -95,8 +95,8 @@ Bu ürün, OpenSSL projesi tarafından OpenSSL araç takımıThis product includ
     </message>
     <message>
         <location line="-10"/>
-        <source>Verify a message to ensure it was signed with a specified Bhcoin address</source>
-        <translation>Mesajın, belirli bir Bhcoin adresiyle imzalandığından emin olmak için onu doğrula</translation>
+        <source>Verify a message to ensure it was signed with a specified Lux address</source>
+        <translation>Mesajın, belirli bir Lux adresiyle imzalandığından emin olmak için onu doğrula</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -263,8 +263,8 @@ Bu ürün, OpenSSL projesi tarafından OpenSSL araç takımıThis product includ
     </message>
     <message>
         <location line="+82"/>
-        <source>Bhcoin will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your coins from being stolen by malware infecting your computer.</source>
-        <translation>Bhcoin, şifreleme işlemini tamamlamak için şimdi kapatılacak. Cüzdanınızı şifrelemenin; coinlerinizin, bilgisayarınızı etkileyen zararlı yazılımlar tarafından çalınmasını bütünüyle engelleyemeyebileceğini unutmayınız.</translation>
+        <source>Lux will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your coins from being stolen by malware infecting your computer.</source>
+        <translation>Lux, şifreleme işlemini tamamlamak için şimdi kapatılacak. Cüzdanınızı şifrelemenin; coinlerinizin, bilgisayarınızı etkileyen zararlı yazılımlar tarafından çalınmasını bütünüyle engelleyemeyebileceğini unutmayınız.</translation>
     </message>
     <message>
         <location line="+13"/>
@@ -357,8 +357,8 @@ Bu ürün, OpenSSL projesi tarafından OpenSSL araç takımıThis product includ
     </message>
     <message>
         <location line="+4"/>
-        <source>Show information about Bhcoin</source>
-        <translation>Bhcoin hakkındaki bilgiyi göster</translation>
+        <source>Show information about Lux</source>
+        <translation>Lux hakkındaki bilgiyi göster</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -397,13 +397,13 @@ Bu ürün, OpenSSL projesi tarafından OpenSSL araç takımıThis product includ
     </message>
     <message>
         <location line="-55"/>
-        <source>Send coins to a Bhcoin address</source>
-        <translation>Bir Bhcoin adresine coin gönder</translation>
+        <source>Send coins to a Lux address</source>
+        <translation>Bir Lux adresine coin gönder</translation>
     </message>
     <message>
         <location line="+39"/>
-        <source>Modify configuration options for Bhcoin</source>
-        <translation>Bhcoin yapılandırma seçeneklerini değiştir</translation>
+        <source>Modify configuration options for Lux</source>
+        <translation>Lux yapılandırma seçeneklerini değiştir</translation>
     </message>
     <message>
         <location line="+17"/>
@@ -443,8 +443,8 @@ Bu ürün, OpenSSL projesi tarafından OpenSSL araç takımıThis product includ
     <message>
         <location line="-214"/>
         <location line="+555"/>
-        <source>Bhcoin</source>
-        <translation>Bhcoin</translation>
+        <source>Lux</source>
+        <translation>Lux</translation>
     </message>
     <message>
         <location line="-555"/>
@@ -453,8 +453,8 @@ Bu ürün, OpenSSL projesi tarafından OpenSSL araç takımıThis product includ
     </message>
     <message>
         <location line="+193"/>
-        <source>&amp;About Bhcoin</source>
-        <translation>Bhcoin &amp;Hakkında</translation>
+        <source>&amp;About Lux</source>
+        <translation>Lux &amp;Hakkında</translation>
     </message>
     <message>
         <location line="+9"/>
@@ -505,13 +505,13 @@ Bu ürün, OpenSSL projesi tarafından OpenSSL araç takımıThis product includ
     <message>
         <location line="+0"/>
         <location line="+58"/>
-        <source>Bhcoin client</source>
-        <translation>Bhcoin istemcisi</translation>
+        <source>Lux client</source>
+        <translation>Lux istemcisi</translation>
     </message>
     <message numerus="yes">
         <location line="+70"/>
-        <source>%n active connection(s) to Bhcoin network</source>
-        <translation><numerusform>Bhcoin ağına %n etkin bağlantı</numerusform><numerusform>Bhcoin ağına %n etkin bağlantı</numerusform></translation>
+        <source>%n active connection(s) to Lux network</source>
+        <translation><numerusform>Lux ağına %n etkin bağlantı</numerusform><numerusform>Lux ağına %n etkin bağlantı</numerusform></translation>
     </message>
     <message>
         <location line="+488"/>
@@ -605,8 +605,8 @@ Adres: %4
     <message>
         <location line="-15"/>
         <location line="+15"/>
-        <source>URI can not be parsed! This can be caused by an invalid Bhcoin address or malformed URI parameters.</source>
-        <translation>URI ayrıştırılamadı! Bu, geçersiz bir Bhcoin adresi veya hatalı URI parametreleri nedeniyle olabilir.</translation>
+        <source>URI can not be parsed! This can be caused by an invalid Lux address or malformed URI parameters.</source>
+        <translation>URI ayrıştırılamadı! Bu, geçersiz bir Lux adresi veya hatalı URI parametreleri nedeniyle olabilir.</translation>
     </message>
     <message>
         <location line="+9"/>
@@ -728,8 +728,8 @@ Adres: %4
     </message>
     <message>
         <location filename="../bitcoin.cpp" line="+104"/>
-        <source>A fatal error occurred. Bhcoin can no longer continue safely and will quit.</source>
-        <translation>Önemli bir hata oluştu. Bhcoin artık güvenli bir şekilde devam edemez ve şimdi kapatılacak.</translation>
+        <source>A fatal error occurred. Lux can no longer continue safely and will quit.</source>
+        <translation>Önemli bir hata oluştu. Lux artık güvenli bir şekilde devam edemez ve şimdi kapatılacak.</translation>
     </message>
 </context>
 <context>
@@ -1062,8 +1062,8 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
     </message>
     <message>
         <location line="-5"/>
-        <source>The entered address &quot;%1&quot; is not a valid Bhcoin address.</source>
-        <translation>Girilen %1 adresi, geçerli bir Bhcoin adresi değildir.</translation>
+        <source>The entered address &quot;%1&quot; is not a valid Lux address.</source>
+        <translation>Girilen %1 adresi, geçerli bir Lux adresi değildir.</translation>
     </message>
     <message>
         <location line="+10"/>
@@ -1081,8 +1081,8 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
     <message>
         <location filename="../guiutil.cpp" line="+426"/>
         <location line="+12"/>
-        <source>Bhcoin-Qt</source>
-        <translation>Bhcoin-Qt</translation>
+        <source>Lux-Qt</source>
+        <translation>Lux-Qt</translation>
     </message>
     <message>
         <location line="-12"/>
@@ -1154,13 +1154,13 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
     </message>
     <message>
         <location line="+31"/>
-        <source>Automatically start Bhcoin after logging in to the system.</source>
-        <translation>Sisteme giriş yaptıktan sonra Bhcoin&apos;i otomatik olarak başlat</translation>
+        <source>Automatically start Lux after logging in to the system.</source>
+        <translation>Sisteme giriş yaptıktan sonra Lux&apos;i otomatik olarak başlat</translation>
     </message>
     <message>
         <location line="+3"/>
-        <source>&amp;Start Bhcoin on system login</source>
-        <translation>Sisteme girişte Bhcoin&apos;i &amp;başlat</translation>
+        <source>&amp;Start Lux on system login</source>
+        <translation>Sisteme girişte Lux&apos;i &amp;başlat</translation>
     </message>
     <message>
         <location line="+21"/>
@@ -1169,8 +1169,8 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
     </message>
     <message>
         <location line="+6"/>
-        <source>Automatically open the Bhcoin client port on the router. This only works when your router supports UPnP and it is enabled.</source>
-        <translation>Yönelticide Bhcoin istemci portunu otomatik olarak aç. Bu, sadece yönelticiniz UPnP&apos;i desteklediğinde ve etkin olduğunda çalışır.</translation>
+        <source>Automatically open the Lux client port on the router. This only works when your router supports UPnP and it is enabled.</source>
+        <translation>Yönelticide Lux istemci portunu otomatik olarak aç. Bu, sadece yönelticiniz UPnP&apos;i desteklediğinde ve etkin olduğunda çalışır.</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -1199,7 +1199,7 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
     </message>
     <message>
         <location line="-57"/>
-        <source>Connect to the Bhcoin network through a SOCKS5 proxy (e.g. when connecting through Tor).</source>
+        <source>Connect to the Lux network through a SOCKS5 proxy (e.g. when connecting through Tor).</source>
         <translation type="unfinished"/>
     </message>
     <message>
@@ -1244,8 +1244,8 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
     </message>
     <message>
         <location line="+13"/>
-        <source>The user interface language can be set here. This setting will take effect after restarting Bhcoin.</source>
-        <translation>Kullanıcı arabirimi dili buradan ayarlanabilir. Ayar, Bhcoin yeniden başlatıldığında etkin olacaktır.</translation>
+        <source>The user interface language can be set here. This setting will take effect after restarting Lux.</source>
+        <translation>Kullanıcı arabirimi dili buradan ayarlanabilir. Ayar, Lux yeniden başlatıldığında etkin olacaktır.</translation>
     </message>
     <message>
         <location line="+11"/>
@@ -1311,8 +1311,8 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
     <message>
         <location line="-9"/>
         <location line="+9"/>
-        <source>This setting will take effect after restarting Bhcoin.</source>
-        <translation>Bu ayar, Bhcoin&apos;i yeniden başlattıktan sonra etkin olacaktır.</translation>
+        <source>This setting will take effect after restarting Lux.</source>
+        <translation>Bu ayar, Lux&apos;i yeniden başlattıktan sonra etkin olacaktır.</translation>
     </message>
     <message>
         <location line="+29"/>
@@ -1330,8 +1330,8 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
     <message>
         <location line="+46"/>
         <location line="+247"/>
-        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the Bhcoin network after a connection is established, but this process has not completed yet.</source>
-        <translation>Görüntülenen bilginin tarihi geçmiş olabilir. Cüzdanınız, bağlantı kurulduktan sonra otomatik olarak Bhcoin ağı ile senkronize olur ancak bu süreç, henüz tamamlanmamıştır.</translation>
+        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the Lux network after a connection is established, but this process has not completed yet.</source>
+        <translation>Görüntülenen bilginin tarihi geçmiş olabilir. Cüzdanınız, bağlantı kurulduktan sonra otomatik olarak Lux ağı ile senkronize olur ancak bu süreç, henüz tamamlanmamıştır.</translation>
     </message>
     <message>
         <location line="-173"/>
@@ -1404,8 +1404,8 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
     <name>PaymentServer</name>
     <message>
         <location filename="../paymentserver.cpp" line="+107"/>
-        <source>Cannot start bhcoin: click-to-pay handler</source>
-        <translation>Bhcoin: tıkla-ve-öde işleyicisi başlatılamıyor</translation>
+        <source>Cannot start lux: click-to-pay handler</source>
+        <translation>Lux: tıkla-ve-öde işleyicisi başlatılamıyor</translation>
     </message>
 </context>
 <context>
@@ -1572,8 +1572,8 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
     </message>
     <message>
         <location line="+7"/>
-        <source>Show the Bhcoin-Qt help message to get a list with possible Bhcoin command-line options.</source>
-        <translation>Muhtemel Bhcoin komut satırı seçeneklerinin bir listesini getirmek için Bhcoin-Qt yardım mesajını göster</translation>
+        <source>Show the Lux-Qt help message to get a list with possible Lux command-line options.</source>
+        <translation>Muhtemel Lux komut satırı seçeneklerinin bir listesini getirmek için Lux-Qt yardım mesajını göster</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -1592,13 +1592,13 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
     </message>
     <message>
         <location line="-104"/>
-        <source>Bhcoin - Debug window</source>
-        <translation>Bhcoin - Hata ayıklama penceresi</translation>
+        <source>Lux - Debug window</source>
+        <translation>Lux - Hata ayıklama penceresi</translation>
     </message>
     <message>
         <location line="+25"/>
-        <source>Bhcoin Core</source>
-        <translation>Bhcoin Core</translation>
+        <source>Lux Core</source>
+        <translation>Lux Core</translation>
     </message>
     <message>
         <location line="+256"/>
@@ -1607,8 +1607,8 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
     </message>
     <message>
         <location line="+7"/>
-        <source>Open the Bhcoin debug log file from the current data directory. This can take a few seconds for large log files.</source>
-        <translation>Bhcoin hata ayıklama günlük kütüğü dosyasını, mevcut veri klasöründen aç. Bu işlem, büyük günlük kütüğü dosyaları için birkaç saniye sürebilir.</translation>
+        <source>Open the Lux debug log file from the current data directory. This can take a few seconds for large log files.</source>
+        <translation>Lux hata ayıklama günlük kütüğü dosyasını, mevcut veri klasöründen aç. Bu işlem, büyük günlük kütüğü dosyaları için birkaç saniye sürebilir.</translation>
     </message>
     <message>
         <location line="+102"/>
@@ -1617,8 +1617,8 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
     </message>
     <message>
         <location filename="../rpcconsole.cpp" line="+325"/>
-        <source>Welcome to the Bhcoin RPC console.</source>
-        <translation>Bhcoin RPC konsoluna hoş geldiniz.</translation>
+        <source>Welcome to the Lux RPC console.</source>
+        <translation>Lux RPC konsoluna hoş geldiniz.</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -1798,8 +1798,8 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
     </message>
     <message>
         <location filename="../sendcoinsdialog.cpp" line="-174"/>
-        <source>Enter a Bhcoin address (e.g. SjBj1QvJvsAkU5EBKggdZ8gWc4oK2F5AMY)</source>
-        <translation>Bir Bhcoin adresi gir (örn: SjBj1QvJvsAkU5EBKggdZ8gWc4oK2F5AMY)</translation>
+        <source>Enter a Lux address (e.g. SjBj1QvJvsAkU5EBKggdZ8gWc4oK2F5AMY)</source>
+        <translation>Bir Lux adresi gir (örn: SjBj1QvJvsAkU5EBKggdZ8gWc4oK2F5AMY)</translation>
     </message>
     <message>
         <location line="+15"/>
@@ -1898,8 +1898,8 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
     </message>
     <message>
         <location line="+247"/>
-        <source>WARNING: Invalid Bhcoin address</source>
-        <translation>UYARI: Geçersiz Bhcoin adresi</translation>
+        <source>WARNING: Invalid Lux address</source>
+        <translation>UYARI: Geçersiz Lux adresi</translation>
     </message>
     <message>
         <location line="+13"/>
@@ -1972,8 +1972,8 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
     </message>
     <message>
         <location filename="../sendcoinsentry.cpp" line="+1"/>
-        <source>Enter a Bhcoin address (e.g. SjBj1QvJvsAkU5EBKggdZ8gWc4oK2F5AMY)</source>
-        <translation>Bir Bhcoin adresi girin (örn: SjBj1QvJvsAkU5EBKggdZ8gWc4oK2F5AMY)</translation>
+        <source>Enter a Lux address (e.g. SjBj1QvJvsAkU5EBKggdZ8gWc4oK2F5AMY)</source>
+        <translation>Bir Lux adresi girin (örn: SjBj1QvJvsAkU5EBKggdZ8gWc4oK2F5AMY)</translation>
     </message>
 </context>
 <context>
@@ -2033,8 +2033,8 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
     </message>
     <message>
         <location line="+21"/>
-        <source>Sign the message to prove you own this Bhcoin address</source>
-        <translation>Bu Bhcoin adresine sahip olduğunuzu ispatlamak için mesajı imzala</translation>
+        <source>Sign the message to prove you own this Lux address</source>
+        <translation>Bu Lux adresine sahip olduğunuzu ispatlamak için mesajı imzala</translation>
     </message>
     <message>
         <location line="+17"/>
@@ -2065,8 +2065,8 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
     </message>
     <message>
         <location line="+40"/>
-        <source>Verify the message to ensure it was signed with the specified Bhcoin address</source>
-        <translation>Mesajın, belirtilen Bhcoin adresiyle imzalandığından emin olmak için onu doğrula</translation>
+        <source>Verify the message to ensure it was signed with the specified Lux address</source>
+        <translation>Mesajın, belirtilen Lux adresiyle imzalandığından emin olmak için onu doğrula</translation>
     </message>
     <message>
         <location line="+17"/>
@@ -2076,8 +2076,8 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
     <message>
         <location filename="../signverifymessagedialog.cpp" line="+27"/>
         <location line="+3"/>
-        <source>Enter a Bhcoin address (e.g. SjBj1QvJvsAkU5EBKggdZ8gWc4oK2F5AMY)</source>
-        <translation>Bir Bhcoin adresi girin (örn: SjBj1QvJvsAkU5EBKggdZ8gWc4oK2F5AMY)</translation>
+        <source>Enter a Lux address (e.g. SjBj1QvJvsAkU5EBKggdZ8gWc4oK2F5AMY)</source>
+        <translation>Bir Lux adresi girin (örn: SjBj1QvJvsAkU5EBKggdZ8gWc4oK2F5AMY)</translation>
     </message>
     <message>
         <location line="-2"/>
@@ -2086,8 +2086,8 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
     </message>
     <message>
         <location line="+3"/>
-        <source>Enter Bhcoin signature</source>
-        <translation>Bhcoin imzası gir</translation>
+        <source>Enter Lux signature</source>
+        <translation>Lux imzası gir</translation>
     </message>
     <message>
         <location line="+85"/>
@@ -2665,8 +2665,8 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
     <name>bitcoin-core</name>
     <message>
         <location filename="../bitcoinstrings.cpp" line="+171"/>
-        <source>Bhcoin version</source>
-        <translation>Bhcoin versiyonu</translation>
+        <source>Lux version</source>
+        <translation>Lux versiyonu</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -2675,8 +2675,8 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
     </message>
     <message>
         <location line="+1"/>
-        <source>Send command to -server or bhcoind</source>
-        <translation>-sunucu veya bhcoind&apos;ye komut gönder</translation>
+        <source>Send command to -server or luxd</source>
+        <translation>-sunucu veya luxd&apos;ye komut gönder</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -2695,13 +2695,13 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
     </message>
     <message>
         <location line="+2"/>
-        <source>Specify configuration file (default: bhcoin.conf)</source>
-        <translation>Konfigürasyon dosyasını belirt (varsayılan: bhcoin.conf)</translation>
+        <source>Specify configuration file (default: lux.conf)</source>
+        <translation>Konfigürasyon dosyasını belirt (varsayılan: lux.conf)</translation>
     </message>
     <message>
         <location line="+1"/>
-        <source>Specify pid file (default: bhcoind.pid)</source>
-        <translation>pid dosyasını belirt (varsayılan: bhcoin.pid)</translation>
+        <source>Specify pid file (default: luxd.pid)</source>
+        <translation>pid dosyasını belirt (varsayılan: lux.pid)</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -2718,24 +2718,24 @@ This label turns red, if the priority is smaller than &quot;medium&quot;.
         <source>%s, you must set a rpcpassword in the configuration file:
 %s
 It is recommended you use the following random password:
-rpcuser=bhcoinrpc
+rpcuser=luxrpc
 rpcpassword=%s
 (you do not need to remember this password)
 The username and password MUST NOT be the same.
 If the file does not exist, create it with owner-readable-only file permissions.
 It is also recommended to set alertnotify so you are notified of problems;
-for example: alertnotify=echo %%s | mail -s &quot;Bhcoin Alert&quot; admin@foo.com
+for example: alertnotify=echo %%s | mail -s &quot;Lux Alert&quot; admin@foo.com
 </source>
         <translation>%s, konfigürasyon dosyasında bir rpcpassword belirlemelisiniz: 
 %s
 Aşağıdaki rastgele şifreyi kullanmanız tavsiye edilir:
-rpcuser=bhcoinrpc
+rpcuser=luxrpc
 rpcpassword=%s
 (bu şifreyi hatırlamanız gerekmemektedir)
 Kullanıcı adı ve şifre aynı OLMAMALIDIR.
 Dosya mevcut değilse, sadece sahibi tarafından okunabilir yetkiyle yaratın.
 Ayrıca sorunlardan haberdar edilmek için alertnotify parametresini doldurmanız önerilir;
-örneğin: alertnotify=echo %%s | mail -s &quot;Bhcoin Alarmı&quot; admin@foo.com
+örneğin: alertnotify=echo %%s | mail -s &quot;Lux Alarmı&quot; admin@foo.com
 </translation>
     </message>
     <message>
@@ -2840,8 +2840,8 @@ Ayrıca sorunlardan haberdar edilmek için alertnotify parametresini doldurmanı
     </message>
     <message>
         <location line="-103"/>
-        <source>Warning: Please check that your computer&apos;s date and time are correct! If your clock is wrong Bhcoin will not work properly.</source>
-        <translation>Uyarı: Lütfen bilgisayarınızın tarih ve saatinin doğru olduğunu kontrol ediniz! Saatiniz yanlış ise, Bhcoin düzgün çalışmayacaktır.</translation>
+        <source>Warning: Please check that your computer&apos;s date and time are correct! If your clock is wrong Lux will not work properly.</source>
+        <translation>Uyarı: Lütfen bilgisayarınızın tarih ve saatinin doğru olduğunu kontrol ediniz! Saatiniz yanlış ise, Lux düzgün çalışmayacaktır.</translation>
     </message>
     <message>
         <location line="+130"/>
@@ -3135,8 +3135,8 @@ Ayrıca sorunlardan haberdar edilmek için alertnotify parametresini doldurmanı
     </message>
     <message>
         <location line="+8"/>
-        <source>Initialization sanity check failed. Bhcoin is shutting down.</source>
-        <translation>Başlangıç uygunluk kontrolü başarısız oldu. Bhcoin kapatılıyor.</translation>
+        <source>Initialization sanity check failed. Lux is shutting down.</source>
+        <translation>Başlangıç uygunluk kontrolü başarısız oldu. Lux kapatılıyor.</translation>
     </message>
     <message>
         <location line="+20"/>
@@ -3190,13 +3190,13 @@ Ayrıca sorunlardan haberdar edilmek için alertnotify parametresini doldurmanı
     </message>
     <message>
         <location line="+4"/>
-        <source>Error loading wallet.dat: Wallet requires newer version of Bhcoin</source>
-        <translation>wallet.dat yüklenirken hata: Cüzdan, daha yeni bir Bhcoin versiyonuna ihtiyaç duyuyor.</translation>
+        <source>Error loading wallet.dat: Wallet requires newer version of Lux</source>
+        <translation>wallet.dat yüklenirken hata: Cüzdan, daha yeni bir Lux versiyonuna ihtiyaç duyuyor.</translation>
     </message>
     <message>
         <location line="+1"/>
-        <source>Wallet needed to be rewritten: restart Bhcoin to complete</source>
-        <translation>Cüzdanın yeniden yazılması gerekmektedir: Tamamlamak için Bhcoin&apos;i yeniden başlatın</translation>
+        <source>Wallet needed to be rewritten: restart Lux to complete</source>
+        <translation>Cüzdanın yeniden yazılması gerekmektedir: Tamamlamak için Lux&apos;i yeniden başlatın</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -3255,8 +3255,8 @@ Ayrıca sorunlardan haberdar edilmek için alertnotify parametresini doldurmanı
     </message>
     <message>
         <location line="+124"/>
-        <source>Unable to bind to %s on this computer. Bhcoin is probably already running.</source>
-        <translation>Bu bilgisayarda %s bağlanamadı. Bhcoin muhtemelen halen çalışmaktadır.</translation>
+        <source>Unable to bind to %s on this computer. Lux is probably already running.</source>
+        <translation>Bu bilgisayarda %s bağlanamadı. Lux muhtemelen halen çalışmaktadır.</translation>
     </message>
     <message>
         <location line="-101"/>
@@ -3290,8 +3290,8 @@ Ayrıca sorunlardan haberdar edilmek için alertnotify parametresini doldurmanı
     </message>
     <message>
         <location line="+3"/>
-        <source>Cannot obtain a lock on data directory %s. Bhcoin is probably already running.</source>
-        <translation>Veri klasörü %s üzerinde kilit elde edilemedi. Bhcoin muhtemelen halen çalışmaktadır.</translation>
+        <source>Cannot obtain a lock on data directory %s. Lux is probably already running.</source>
+        <translation>Veri klasörü %s üzerinde kilit elde edilemedi. Lux muhtemelen halen çalışmaktadır.</translation>
     </message>
     <message>
         <location line="+4"/>

@@ -50,12 +50,12 @@ bool AppInit(int argc, char* argv[])
         if (mapArgs.count("-?") || mapArgs.count("--help"))
         {
             // First part of help message is specific to bitcoind / RPC client
-            std::string strUsage = _("Bhcoin version") + " " + FormatFullVersion() + "\n\n" +
+            std::string strUsage = _("Lux version") + " " + FormatFullVersion() + "\n\n" +
                 _("Usage:") + "\n" +
-                  "  bhcoind [options]                     " + "\n" +
-                  "  bhcoind [options] <command> [params]  " + _("Send command to -server or bhcoind") + "\n" +
-                  "  bhcoind [options] help                " + _("List commands") + "\n" +
-                  "  bhcoind [options] help <command>      " + _("Get help for a command") + "\n";
+                  "  luxd [options]                     " + "\n" +
+                  "  luxd [options] <command> [params]  " + _("Send command to -server or luxd") + "\n" +
+                  "  luxd [options] help                " + _("List commands") + "\n" +
+                  "  luxd [options] help <command>      " + _("Get help for a command") + "\n";
 
             strUsage += "\n" + HelpMessage();
 
@@ -65,7 +65,7 @@ bool AppInit(int argc, char* argv[])
 
         // Command-line RPC
         for (int i = 1; i < argc; i++)
-            if (!IsSwitchChar(argv[i][0]) && !boost::algorithm::istarts_with(argv[i], "bhcoin:"))
+            if (!IsSwitchChar(argv[i][0]) && !boost::algorithm::istarts_with(argv[i], "lux:"))
                 fCommandLine = true;
 
         if (fCommandLine)

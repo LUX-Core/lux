@@ -1,6 +1,6 @@
 // Copyright (c) 2010 Satoshi Nakamoto
 // Copyright (c) 2009-2012 The Bitcoin developers
-// Copyright (c) 2017 The BHCoin developers
+// Copyright (c) 2017 The LUXoin developers
 
 #include "assert.h"
 
@@ -18,7 +18,7 @@ struct SeedSpec6 {
 };
 
 #include "chainparamsseeds.h"
-
+/*
 void MineGenesis(CBlock genesis){
     // This will figure out a valid hash and Nonce if you're creating a different genesis block:
     uint256 hashTarget = CBigNum().SetCompact(Params().ProofOfWorkLimit().GetCompact()).getuint256();
@@ -38,9 +38,11 @@ void MineGenesis(CBlock genesis){
 	    printf("New best: %s\n", newhash.GetHex().c_str());
 	}
     }
-    printf("Found Genesis, Nonce: %ld, Hash: %s\n", genesis.nNonce, genesis.GetHash().GetHex().c_str());
+    printf("Found Genesis, Nonce: %d, Hash: %s\n", genesis.nNonce, genesis.GetHash().GetHex().c_str());
     printf("Gensis Hash Merkle: %s\n", genesis.hashMerkleRoot.ToString().c_str());
 }
+*/
+
 
 // Mainnet
 // Need some more configure to generate new genesis block. Note: we hide our genesis block & hashMerkleRoot for later start. 
@@ -71,7 +73,7 @@ public:
         pchMessageStart[1] = 0xe2;
         pchMessageStart[2] = 0xa2;
         pchMessageStart[3] = 0xcd;
-        vAlertPubKey = ParseHex("0486phi1bac0d543f104cbff2bd23680056a3b9ea05e1137d2ff90eeb5e08472eb500322593a2cb06fbf8297d7beb6cd30cb90f98153b5b7cce1493749e41e0284");
+        vAlertPubKey = ParseHex("0486phi16120d543f104cbff2bd23680056a3b9ea05e1137d2ff90eeb5e08472eb500322593a2cb06fbf8297d7beb6cd30cb90f98153b5b7cce1493749e41e0284");
         nDefaultPort = 6666;
         nRPCPort = 6667;
         bnProofOfWorkLimit = CBigNum(~uint256(0) >> 20);
@@ -79,33 +81,33 @@ public:
         // Build the genesis block. Note that the output of the genesis coinbase cannot
         // be spent as it did not originally exist in the database.
 
-        const char* pszTimestamp = "THE FINAL TEST PHI1612 BEFORE LAUNCH - TESTING V2.1"; // Input random pszTimestamp to generate new genesis block
+        const char* pszTimestamp = "THE NEW IMPLEMENTATION OF PHI1612 HASH - TEST V3"; // Input random pszTimestamp to generate new genesis block
         std::vector<CTxIn> vin;
         vin.resize(1);
         vin[0].scriptSig = CScript() << 0 << CBigNum(42) << vector<unsigned char>((const unsigned char*)pszTimestamp, (const unsigned char*)pszTimestamp + strlen(pszTimestamp));
         std::vector<CTxOut> vout;
         vout.resize(1);
         vout[0].SetEmpty();
-        CTransaction txNew(1, 1507293100, vin, vout, 0);
+        CTransaction txNew(1, 1507312447, vin, vout, 0);
         genesis.vtx.push_back(txNew);
         genesis.hashPrevBlock = 0;
         genesis.hashMerkleRoot = genesis.BuildMerkleTree();
         genesis.nVersion = 1;
-        genesis.nTime    = 1507293100; // Replace epochtime to generate new genesis block
+        genesis.nTime    = 1507312447; // Replace epochtime to generate new genesis block
         genesis.nBits    = bnProofOfWorkLimit.GetCompact();
-        genesis.nNonce   = 1242676; // Input nNonce 
+        genesis.nNonce   = 2043303; // Input nNonce 
         
         // Comment assert to generate genesis block and hash merkle root
-        // Get hashMerkleRoot by using ./bhcoind getblock {Genesis-Block} 
+        // Get hashMerkleRoot by using ./luxd getblock {Genesis-Block} 
         hashGenesisBlock = genesis.GetHash();
-        assert(hashGenesisBlock == uint256("0xd7e3a09301ab2426738adf311fb16d4dfa271bad78671cf956aefb37a1ae3650")); // Add Genesisblock 
-        assert(genesis.hashMerkleRoot == uint256("0x100342b52470337a2b0de07902ca58f78c027c578edac09922f17efc2b76302c")); // Add hashMerkleRoot
+        assert(hashGenesisBlock == uint256("0x00000a64f027b1c7f4f9584e56b101f4dea7323a1fee6fd963cdda648d7ca215")); // Add Genesisblock 
+        assert(genesis.hashMerkleRoot == uint256("0x907f70506d4d68ad3b2f28e585ab407b8af7d8b8483d3189c6f7a97be84424e0")); // Add hashMerkleRoot
 
         //MineGenesis(genesis);
 
         vSeeds.push_back(CDNSSeedData("45.63.25.110", "45.32.245.217")); // Add seednode for later start
 
-        base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1, 25); // BHCoin address started with B
+        base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1, 25); //
         base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1, 125);
         base58Prefixes[SECRET_KEY] =     std::vector<unsigned char>(1, (63+128));
         base58Prefixes[EXT_PUBLIC_KEY] = boost::assign::list_of(0x03)(0x82)(0xC8)(0x6E).convert_to_container<std::vector<unsigned char> >();
@@ -156,11 +158,11 @@ public:
   
         //hashGenesisBlock = genesis.GetHash();
          
-        //assert(hashGenesisBlock == uint256("0xbc9b5b1b6c2040eda4c5791216e52be1462be8705ff2908388521efb50632718"));
+        //assert(hashGenesisBlock == uint256("0x"));
 
         vFixedSeeds.clear();
         vSeeds.clear();
-        vSeeds.push_back(CDNSSeedData("45.63.25.110", "45.32.245.217")); // Add seednode for later start
+        vSeeds.push_back(CDNSSeedData("", "")); // Add seednode for later start
 
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1, 62); 
         base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1, 196);

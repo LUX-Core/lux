@@ -6,12 +6,12 @@ obj/main.o: main.cpp alert.h serialize.h allocators.h version.h \
  obj/phi1612/sph_fugue.h obj/phi1612/sph_gost.h obj/phi1612/sph_echo.h \
  db.h init.h wallet.h walletdb.h key.h crypter.h keystore.h main.h core.h \
  script.h txmempool.h scrypt.h ui_interface.h kernel.h txdb.h \
- txdb-leveldb.h /home/bh/test/src/leveldb/include/leveldb/db.h \
- /home/bh/test/src/leveldb/include/leveldb/iterator.h \
- /home/bh/test/src/leveldb/include/leveldb/slice.h \
- /home/bh/test/src/leveldb/include/leveldb/status.h \
- /home/bh/test/src/leveldb/include/leveldb/options.h \
- /home/bh/test/src/leveldb/include/leveldb/write_batch.h
+ txdb-leveldb.h /home/bh/novacoin/src/leveldb/include/leveldb/db.h \
+ /home/bh/novacoin/src/leveldb/include/leveldb/iterator.h \
+ /home/bh/novacoin/src/leveldb/include/leveldb/slice.h \
+ /home/bh/novacoin/src/leveldb/include/leveldb/status.h \
+ /home/bh/novacoin/src/leveldb/include/leveldb/options.h \
+ /home/bh/novacoin/src/leveldb/include/leveldb/write_batch.h
 main.cpp alert.h serialize.h allocators.h version.h :
  clientversion.h chainparams.h bignum.h uint256.h util.h tinyformat.h :
  checkpoints.h net.h mruset.h netbase.h compat.h protocol.h addrman.h :
@@ -20,9 +20,9 @@ main.cpp alert.h serialize.h allocators.h version.h :
  obj/phi1612/sph_fugue.h obj/phi1612/sph_gost.h obj/phi1612/sph_echo.h :
  db.h init.h wallet.h walletdb.h key.h crypter.h keystore.h main.h core.h :
  script.h txmempool.h scrypt.h ui_interface.h kernel.h txdb.h :
- txdb-leveldb.h /home/bh/test/src/leveldb/include/leveldb/db.h :
- /home/bh/test/src/leveldb/include/leveldb/iterator.h :
- /home/bh/test/src/leveldb/include/leveldb/slice.h :
- /home/bh/test/src/leveldb/include/leveldb/status.h :
- /home/bh/test/src/leveldb/include/leveldb/options.h :
- /home/bh/test/src/leveldb/include/leveldb/write_batch.h :
+ txdb-leveldb.h /home/bh/novacoin/src/leveldb/include/leveldb/db.h :
+ /home/bh/novacoin/src/leveldb/include/leveldb/iterator.h :
+ /home/bh/novacoin/src/leveldb/include/leveldb/slice.h :
+ /home/bh/novacoin/src/leveldb/include/leveldb/status.h :
+ /home/bh/novacoin/src/leveldb/include/leveldb/options.h :
+ /home/bh/novacoin/src/leveldb/include/leveldb/write_batch.h :
