@@ -16,6 +16,9 @@ Testnet trial version
 04/10/2017 ------> testnet trial version released 
 -------------------------------------------------------------------
 
+06/10/2017 ------> Final test before launch ( 06/10/2017 - 09/10/2017) 
+-------------------------------------------------------------------
+
 <b> ccminer & sgminer for phi1612 algo </b> 
 
 Haven't test Phi1612 hash using GPU yet. I appreciate that if anyone can give me a hand to add phi1612 hasing into ccminer & sgminer.
