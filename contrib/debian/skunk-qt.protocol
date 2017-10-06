@@ -1,5 +1,5 @@
 [Protocol]
-exec=bhcoin-qt '%u'
+exec=lux-qt '%u'
 protocol=bhcoin
 input=none
 output=none

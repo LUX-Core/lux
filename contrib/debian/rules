@@ -16,11 +16,11 @@ override_dh_auto_build:
 	$(MAKE)
 
 override_dh_auto_clean:
-	if [ -f Makefile ]; then $(MAKE) clean; else rm -rf build/; rm -f bhcoin-qt; fi
+	if [ -f Makefile ]; then $(MAKE) clean; else rm -rf build/; rm -f lux-qt; fi
 	cd src; $(MAKE) -f makefile.unix clean
 
 override_dh_auto_configure:
-	qmake bhcoin-qt.pro USE_QRCODE=1
+	qmake lux-qt.pro USE_QRCODE=1
 
 override_dh_auto_test:
 	cd src; $(MAKE) -f makefile.unix test_bhcoin
@@ -29,5 +29,5 @@ override_dh_auto_test:
 # Ensure wrapper is set executable
 binary-post-install/bhcoind:
 	chmod +x $(cdbs_curdestdir)usr/bin/bhcoind
-binary-post-install/bhcoin-qt:
-	chmod +x $(cdbs_curdestdir)usr/bin/bhcoin-qt
+binary-post-install/lux-qt:
+	chmod +x $(cdbs_curdestdir)usr/bin/lux-qt

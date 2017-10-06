@@ -13,4 +13,4 @@ cfgfile="$basedir/bhcoin.conf"
 # Bhcoin does not clean up DB log files by default
 [ -e "$dbfile" ] || echo 'set_flags DB_LOG_AUTOREMOVE' > "$dbfile"
 
-exec /usr/lib/bhcoin/bhcoin-qt "$@"
+exec /usr/lib/bhcoin/lux-qt "$@"
