@@ -79,27 +79,27 @@ public:
         // Build the genesis block. Note that the output of the genesis coinbase cannot
         // be spent as it did not originally exist in the database.
 
-        const char* pszTimestamp = "THE FINAL TEST PHI1612 BEFORE LAUNCH"; // Input random pszTimestamp to generate new genesis block
+        const char* pszTimestamp = "THE FINAL TEST PHI1612 BEFORE LAUNCH TESTING V1.29"; // Input random pszTimestamp to generate new genesis block
         std::vector<CTxIn> vin;
         vin.resize(1);
         vin[0].scriptSig = CScript() << 0 << CBigNum(42) << vector<unsigned char>((const unsigned char*)pszTimestamp, (const unsigned char*)pszTimestamp + strlen(pszTimestamp));
         std::vector<CTxOut> vout;
         vout.resize(1);
         vout[0].SetEmpty();
-        CTransaction txNew(1, 1507282104, vin, vout, 0);
+        CTransaction txNew(1, 1507285537, vin, vout, 0);
         genesis.vtx.push_back(txNew);
         genesis.hashPrevBlock = 0;
         genesis.hashMerkleRoot = genesis.BuildMerkleTree();
         genesis.nVersion = 1;
-        genesis.nTime    = 1507282104; // Replace epochtime to generate new genesis block
+        genesis.nTime    = 1507285537; // Replace epochtime to generate new genesis block
         genesis.nBits    = bnProofOfWorkLimit.GetCompact();
         genesis.nNonce   = 589826; // Input nNonce 
         
         // Comment assert to generate genesis block and hash merkle root
         // Get hashMerkleRoot by using ./bhcoind getblock {Genesis-Block} 
         hashGenesisBlock = genesis.GetHash();
-        assert(hashGenesisBlock == uint256("0x485aea0cfd637c1dd0b781317d173be835704b75680570fefaf27de99351f94c")); // Add Genesisblock 
-        assert(genesis.hashMerkleRoot == uint256("0xfee648aa1f67ce04258bfcf0573f58e6f07a8d5031cc82117b64bb805bba85ed")); // Add hashMerkleRoot
+        assert(hashGenesisBlock == uint256("0x4f74134df97d7d1b655371ffed0dccf2cd10315ce2285f295c63b177bc941ae4")); // Add Genesisblock 
+        assert(genesis.hashMerkleRoot == uint256("0xf4662674723d749ce1fb68e5b442c33082b109df74c6736128f03f56b7048bc5")); // Add hashMerkleRoot
 
         //MineGenesis(genesis);
 
