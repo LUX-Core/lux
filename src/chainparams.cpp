@@ -75,8 +75,8 @@ public:
         // Comment assert to generate genesis block and hash merkle root
         // Get hashMerkleRoot by using ./bhcoind getblock {Genesis-Block} 
         hashGenesisBlock = genesis.GetHash();
-        assert(hashGenesisBlock == uint256("0x00000ea3fd7487119120d4a0311cf5e983e226a597ee1eda2f7946f2c44e0372")); // Add Genesisblock 
-        assert(genesis.hashMerkleRoot == uint256("0x88e50ea6e2211a8785199da10ed588a49f853e47d183898856ec923bb7aaa55e")); // Add hashMerkleRoot
+        assert(hashGenesisBlock == uint256("0x7eb37ff48d9fb9e3071e4b33a145a47bf5012da06000737d8cfd22480563c8c9")); // Add Genesisblock 
+        assert(genesis.hashMerkleRoot == uint256("0x80a997be94dd7e48e9bd722a916ad8b9239a3d4fb05296b7a1c71c62f3ef3860")); // Add hashMerkleRoot
 
         //MineGenesis(genesis);
 
