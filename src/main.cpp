@@ -1116,7 +1116,7 @@ unsigned int static DarkGravityWave3(const CBlockIndex* pindexLast/*, const CBlo
 unsigned int GetNextTargetRequired(const CBlockIndex* pindexLast, bool fProofOfStake)
 {
     // Instamine the first block <---------------------------------------------------------------------------------------------------------
-    if (pindexLast->nHeight < 1)
+    if (pindexLast->nHeight < 1000)
         return GetNextTargetRequired_PoS(pindexLast, fProofOfStake);
     else if (pindexLast->nHeight < 1000000)
         return DarkGravityWave3(pindexLast);

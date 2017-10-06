@@ -18,7 +18,7 @@ struct SeedSpec6 {
 };
 
 #include "chainparamsseeds.h"
-/*
+
 void MineGenesis(CBlock genesis){
     // This will figure out a valid hash and Nonce if you're creating a different genesis block:
     uint256 hashTarget = CBigNum().SetCompact(Params().ProofOfWorkLimit().GetCompact()).getuint256();
@@ -41,7 +41,7 @@ void MineGenesis(CBlock genesis){
     printf("Found Genesis, Nonce: %ld, Hash: %s\n", genesis.nNonce, genesis.GetHash().GetHex().c_str());
     printf("Gensis Hash Merkle: %s\n", genesis.hashMerkleRoot.ToString().c_str());
 }
-*/
+
 
 
 // Mainnet
@@ -81,27 +81,27 @@ public:
         // Build the genesis block. Note that the output of the genesis coinbase cannot
         // be spent as it did not originally exist in the database.
 
-        const char* pszTimestamp = "THE NEW IMPLEMENTATION OF PHI1612 HASH - TEST V3.1"; // Input random pszTimestamp to generate new genesis block
+        const char* pszTimestamp = "THE NEW IMPLEMENTATION OF PHI1612 HASH - TEST v3.2"; // Input random pszTimestamp to generate new genesis block
         std::vector<CTxIn> vin;
         vin.resize(1);
         vin[0].scriptSig = CScript() << 0 << CBigNum(42) << vector<unsigned char>((const unsigned char*)pszTimestamp, (const unsigned char*)pszTimestamp + strlen(pszTimestamp));
         std::vector<CTxOut> vout;
         vout.resize(1);
         vout[0].SetEmpty();
-        CTransaction txNew(1, 1507278322, vin, vout, 0);
+        CTransaction txNew(1, 1507321521, vin, vout, 0);
         genesis.vtx.push_back(txNew);
         genesis.hashPrevBlock = 0;
         genesis.hashMerkleRoot = genesis.BuildMerkleTree();
         genesis.nVersion = 1;
-        genesis.nTime    = 1507278322; // Replace epochtime to generate new genesis block
+        genesis.nTime    = 1507321521; // Replace epochtime to generate new genesis block
         genesis.nBits    = bnProofOfWorkLimit.GetCompact();
-        genesis.nNonce   = 361565; // Input nNonce 
+        genesis.nNonce   = 2230623; // Input nNonce 
         
         // Comment assert to generate genesis block and hash merkle root
         // Get hashMerkleRoot by using ./luxd getblock {Genesis-Block} 
         hashGenesisBlock = genesis.GetHash();
-        assert(hashGenesisBlock == uint256("0x00000b9ccd651d82f1bd79450ff631ed7155eb27828b432c94cf02650fb66409")); // Add Genesisblock 
-        assert(genesis.hashMerkleRoot == uint256("0x77454bf2b437f2346a4e33fd8c5523556f636732696873a5592ca16db86b5ef2")); // Add hashMerkleRoot
+        assert(hashGenesisBlock == uint256("0x00000f151b8f9aaff59c95ed6b67071eb20107066cc50c379574a38efd6499ac")); // Add Genesisblock 
+        assert(genesis.hashMerkleRoot == uint256("0x12caa02399f4a059dbaa53d126e1c86655298e26892cb4c6803ffcd78122e3e1")); // Add hashMerkleRoot
 
         //MineGenesis(genesis);
 
