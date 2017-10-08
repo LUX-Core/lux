@@ -44,7 +44,7 @@ miniupnpc    1.6
 
 OpenSSL
 -------
-MSYS shell:
+MSYS lux:
 un-tar sources with MSYS 'tar xfz' to avoid issue with symlinks (OpenSSL ticket 2377)
 change 'MAKE' env. variable from 'C:\MinGW32\bin\mingw32-make.exe' to '/c/MinGW32/bin/mingw32-make.exe'
 
@@ -54,7 +54,7 @@ make
 
 Berkeley DB
 -----------
-MSYS shell:
+MSYS lux:
 cd /c/db-4.8.30.NC-mgw/build_unix
 sh ../dist/configure --enable-mingw --enable-cxx
 make
@@ -70,7 +70,7 @@ MiniUPnPc
 ---------
 UPnP support is optional, make with USE_UPNP= to disable it.
 
-MSYS shell:
+MSYS lux:
 cd /c/miniupnpc-1.6-mgw
 make -f Makefile.mingw
 mkdir miniupnpc

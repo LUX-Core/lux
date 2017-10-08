@@ -1,3 +1,235 @@
+/*******************************************************************************
+    
+    Resources:
+    
+*******************************************************************************/
+
+https://github.com/bitcoin/bitcoin/blob/master/doc/gitian-building.md#setting-up-debian-for-gitian-building
+
+
+
+/*******************************************************************************
+    
+    Part 1: Preparing the virtual machine
+    
+*******************************************************************************/
+
+
+Download a 64bit debian netinstall iso from:
+https://www.debian.org/CD/netinst/#netinst-stable
+
+$ wget http://cdimage.debian.org/debian-cd/8.2.0/amd64/iso-cd/debian-8.2.0-amd64-netinst.iso
+
+
+
+Create a new VirtualBox VM
+
+Name: gitianbuild
+Type: Linux (64bit)
+Version: Debian
+
+Memory: 1400MB or more
+Hard Drive: Create a virtual hard drive now
+Hard drive file type: VDI ( Virtualbox disk image )
+Storage on physical hard drive : Dynamically allocated
+File location and size: 40GB (20GB should work)
+
+
+
+Click the Settings button, then go to the Network tab.
+Adapter 1 should be attached to NAT
+
+Click Advanced, then Port Forwarding. 
+We want to set up a port through which we can reach the
+VM to get files in and out.
+Create a new rule by clicking the plus icon.
+
+Set up the new rule the following way:
+    Name: SSH
+    Protocol: TCP
+    Leave Host IP empty
+    Host Port: 22222
+    Leave Guest IP empty
+    Guest Port: 22
+
+Click Ok twice to save.
+
+Start the VM.
+On the first launch you will be asked for a CD or DVD image.
+Choose the downloaded iso.
+
+Choose the non-graphical installer.
+Choose locale and keyboard settings
+The VM should detect network settings using DHCP
+Configure the network:
+    System name: debian.
+    Leave domain name empty.
+
+Choose a root password and enter it twice (remember it for later) 
+
+Name the new user debian (the full name doesn't matter) 
+Choose a user password and enter it twice (remember it for later) 
+
+The installer will set up the clock using a time server;
+Set up the clock: choose a time zone
+(depends on the locale settings that you picked earlier;
+specifics don't matter)
+
+Disk setup
+Partitioning method: Guided - Use the entire disk
+
+Select disk to partition: SCSI1 (0,0,0) 
+Partitioning scheme: All files in one partition 
+Finish partitioning and write changes to disk -> Yes
+
+
+The base system will be installed, this will take a minute or so
+Choose a mirror (any will do)
+
+Enter proxy information (unless you're on an intranet, you can leave this empty)
+
+
+Wait a bit while 'Select and install software' runs
+Participate in popularity contest -> No
+Choose software to install. We need just the base system.
+Make sure only 'SSH server' and 'Standard System Utilities' are checked.
+Uncheck 'Debian Desktop Environment' and 'Print Server'
+
+
+Install the GRUB boot loader to the master boot record? -> Yes
+Select sda
+
+
+Installation Complete -> Continue
+After installation, the VM will reboot and you will have a working Debian
+VM.
+
+Congratulations!
+
+
+On your debian virtual machine log in as root and run the following commands
+to get the show on the road.
+
+Install base packages:
+# apt-get install git ruby sudo apt-cacher-ng qemu-utils debootstrap lxc python-cheetah parted kpartx bridge-utils
+
+Add the gitian user to the superusers list:
+# adduser gitian sudo
+
+
+
+/*******************************************************************************
+    
+    Part 2: Gitian setup
+    
+*******************************************************************************/
+
+
+From your host machine ssh into the virtual machine:
+
+$ ssh gitian@localhost -p 22222
+
+Switch to root user:
+$ sudo su
+
+Run the following commands,
+Or add them to a script and execute it:
+
+# make sure the build script can execute it without providing a password
+echo "gitian ALL=NOPASSWD: /usr/bin/lxc-start" > /etc/sudoers.d/gitian-lxc
+# add cgroup for LXC
+echo "cgroup  /sys/fs/cgroup  cgroup  defaults  0   0" >> /etc/fstab
+# make /etc/rc.local script that sets up bridge between guest and host
+# For debian users (Ubuntu can ignore, check LXC_BRIDGE):
+echo '#!/bin/sh -e'  /etc/rc.local
+echo 'brctl addbr br0' >> /etc/rc.local
+echo 'ifconfig br0 10.0.3.2/24 up' >> /etc/rc.local
+echo 'exit 0' >> /etc/rc.local
+
+# make sure that USE_LXC is always set when logging in as gitian,
+# and configure LXC IP addresses
+echo 'export USE_LXC=1' >> ~/.profile
+echo 'export GITIAN_HOST_IP=10.0.3.1' >> ~/.profile
+echo 'export LXC_GUEST_IP=10.0.3.5' >> ~/.profile
+#echo 'export LXC_BRIDGE=lxcbr0' >> ~/.profile # Ubuntu users only
+echo 'LXC_EXECUTE=lxc-execute' >> ~/.profile
+echo 'PATH="$HOME/gitian-builder/libexec/:$PATH";' >> ~/.profile
+
+reboot
+
+login again:
+$ ssh debian@localhost -p 22222
+
+$ git clone https://github.com/devrandom/gitian-builder.git
+$ git clone https://github.com/CoinProjects/lux.git lux
+
+$ cd gitian-builder
+
+$ ./bin/make-base-vm --lxc --arch amd64 --suite trusty
+$ ./bin/make-base-vm --lxc --arch i386 --suite trusty
+
+$ mkdir inputs;
+$ cd inputs;
+$ cp ../../lux/libs/secp256k1-master.zip .
+$ wget http://miniupnp.free.fr/files/download.php?file=miniupnpc-1.9.20151008.tar.gz -Ominiupnpc-1.9.20151008.tar.gz;
+$ wget http://download.icu-project.org/files/icu4c/55.1/icu4c-55_1-src.tgz;
+$ wget http://download.oracle.com/berkeley-db/db-6.1.26.NC.tar.gz;
+$ wget http://prdownloads.sourceforge.net/libpng/libpng-1.6.18.tar.xz;
+$ wget http://zlib.net/zlib-1.2.8.tar.gz;
+$ wget https://fukuchi.org/works/qrencode/qrencode-3.4.4.tar.gz
+$ wget http://sourceforge.net/projects/boost/files/boost/1.59.0/boost_1_59_0.tar.bz2/download -Oboost_1_59_0.tar.bz2;
+$ wget https://svn.boost.org/trac/boost/raw-attachment/ticket/7262/boost-mingw.patch
+$ wget http://www.openssl.org/source/openssl-1.0.2d.tar.gz
+$ wget http://download.qt.io/archive/qt/5.5/5.5.0/single/qt-everywhere-opensource-src-5.5.0.tar.xz;
+
+
+
+/*******************************************************************************
+    
+    Part 3: Compile
+    
+*******************************************************************************/
+
+$ cd ~/gitian-builder;
+$ LXC_EXECUTE=lxc-execute; PATH="$(pwd)/libexec/:$PATH";
+
+$ ./bin/gbuild --commit lux=HEAD ../lux/contrib/gitian-descriptors/deps-linux.yml
+$ mv build/out/lux-deps-*.zip inputs/
+
+$ ./bin/gbuild --commit lux=HEAD ../lux/contrib/gitian-descriptors/gitian-linux.yml
+$ mkdir -p ../compiled/linux
+$ mv build/out/* ../compiled/linux/
+
+$ ./bin/gbuild --commit lux=HEAD ../lux/contrib/gitian-descriptors/deps-win.yml
+$ mv build/out/lux-deps-*.zip inputs/
+
+$ ./bin/gbuild --commit lux=HEAD ../lux/contrib/gitian-descriptors/qt-win.yml
+$ mv build/out/qt-win*.zip inputs/
+
+$ ./bin/gbuild --commit lux=HEAD ../lux/contrib/gitian-descriptors/gitian-win.yml
+$ mkdir -p ../compiled/win
+$ mv build/out/* ../compiled/win/
+
+
+
+/*******************************************************************************
+    
+    Notes:
+    
+*******************************************************************************/
+
+Check the progress of the script:
+    login to the vm on a new terminal (ssh debian@localhost -p 22222)
+    cd gitian-builder
+    tail -f ~/gitian-builder/var/install.log
+    or
+    tail -f ~/gitian-builder/var/build.log
+
+Reuse last container image:
+    use guild with -i
+
+
+
 Gavin's notes on getting gitian builds up and running:
 
 You need the right hardware: you need a 64-bit-capable CPU with hardware virtualization support (Intel VT-x or AMD-V). Not all modern CPUs support hardware virtualization.
@@ -13,7 +245,7 @@ Sanity checks:
 
 Once you've got the right hardware and software:
 
-    git clone git://github.com/rat4/bitcoin.git
+    git clone git://github.com/bitcoin/bitcoin.git
     git clone git://github.com/devrandom/gitian-builder.git
     mkdir gitian-builder/inputs
     wget 'http://miniupnp.tuxfamily.org/files/download.php?file=miniupnpc-1.6.tar.gz' -O gitian-builder/inputs/miniupnpc-1.6.tar.gz
@@ -24,8 +256,10 @@ Once you've got the right hardware and software:
     cd ..
 
     # To build
-    cd lux
+    cd bitcoin
     git pull
     cd ../gitian-builder
     git pull
-    ./bin/gbuild --commit bitcoin=HEAD ../lux/contrib/gitian-descriptors/gitian.yml
+    ./bin/gbuild --commit bitcoin=HEAD ../bitcoin/contrib/gitian.yml
+
+

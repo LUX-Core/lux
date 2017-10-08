@@ -1,2 +1,0 @@
-debian/bin/luxd usr/bin
-src/luxd usr/lib/lux

@@ -1,5 +1,0 @@
-lux-qt usr/bin
-share/pixmaps/bitcoin32.xpm usr/share/pixmaps
-share/pixmaps/bitcoin80.xpm usr/share/pixmaps
-debian/lux-qt.desktop usr/share/applications
-debian/lux-qt.protocol usr/share/kde4/services/

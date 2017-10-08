@@ -1,9 +1,0 @@
-Building Lux
-
-See doc/readme-qt.rst for instructions on building Lux QT,
-the intended-for-end-users, nice-graphical-interface, reference
-implementation of Lux.
-
-See doc/build-*.txt for instructions on building luxd,
-the intended-for-services, no-graphical-interface, reference
-implementation of Lux.

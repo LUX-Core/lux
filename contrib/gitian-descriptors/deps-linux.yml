@@ -1,0 +1,139 @@
+---
+name: "lux-deps"
+suites:
+- "trusty"
+architectures:
+- "i386"
+- "amd64"
+packages:
+- "g++"
+- "unzip"
+- "zip"
+- "pkg-config"
+- "libtool"
+- "faketime"
+- "bsdmainutils"
+- "automake"
+- "autoconf"
+reference_datetime: "2013-06-01 00:00:00"
+remotes: []
+files:
+- "openssl-1.0.2d.tar.gz"
+- "miniupnpc-1.9.20151008.tar.gz"
+- "db-6.1.26.NC.tar.gz"
+- "zlib-1.2.8.tar.gz"
+- "libpng-1.6.18.tar.xz"
+- "boost_1_59_0.tar.bz2"
+- "secp256k1-master.zip"
+- "qrencode-3.4.4.tar.gz"
+script: |
+  STAGING="$HOME/install"
+  TEMPDIR="$HOME/tmp"
+  OPTFLAGS='-O2'
+  if [ "$GBUILD_BITS" == "32" ]; then
+    export LD_PRELOAD=/usr/lib/i386-linux-gnu/faketime/libfaketime.so.1;
+  else
+    export LD_PRELOAD=/usr/lib/x86_64-linux-gnu/faketime/libfaketime.so.1;
+  fi
+  export FAKETIME=$REFERENCE_DATETIME
+  export TZ=UTC
+  export LIBRARY_PATH="$STAGING/lib"
+  # Integrity Check
+  echo "3da5b3c572741fe2237bee1c3d36b11beef61172ac847132b045548b98d4df29  secp256k1-master.zip"          | sha256sum -c
+  echo "e444ac3b587ce82709c4d0cfca1fe71f44f9fc433e9f946b12b9e1bfe667a633  miniupnpc-1.9.20151008.tar.gz" | sha256sum -c
+  echo "060105bda482fdfb109b88c05b69624e9d467d59fa30fd9a97225efcc38d1561  db-6.1.26.NC.tar.gz"           | sha256sum -c
+  echo "36658cb768a54c1d4dec43c3116c27ed893e88b02ecfcb44f2166f9c0b7f2a0d  zlib-1.2.8.tar.gz"             | sha256sum -c
+  echo "2e10c13b7949883ac961db6177c516d778184432d440317e9f0391305c360963  libpng-1.6.18.tar.xz"          | sha256sum -c
+  echo "727a932322d94287b62abb1bd2d41723eec4356a7728909e38adb65ca25241ca  boost_1_59_0.tar.bz2"          | sha256sum -c
+  echo "671c36487785628a703374c652ad2cebea45fa920ae5681515df25d9f2c9a8c8  openssl-1.0.2d.tar.gz"         | sha256sum -c
+  echo "e794e26a96019013c0e3665cb06b18992668f352c5553d0a553f5d144f7f2a72  qrencode-3.4.4.tar.gz"         | sha256sum -c
+  mkdir -p "$STAGING"
+  #
+  tar xzf openssl-1.0.2d.tar.gz
+  cd openssl-1.0.2d
+  #   need -fPIC to avoid relocation error in 64 bit builds
+  ./config no-shared no-zlib no-dso no-krb5 --openssldir=$STAGING -fPIC
+  #   need to build OpenSSL with faketime because a timestamp is embedded into cversion.o
+  make
+  make install_sw
+  cd ..
+  #
+
+  tar xzfm miniupnpc-1.9.20151008.tar.gz
+  cd miniupnpc-1.9.20151008
+  #   miniupnpc is always built with -fPIC
+  INSTALLPREFIX=$STAGING make $MAKEOPTS install
+  rm -f $STAGING/lib/libminiupnpc.so* # no way to skip shared lib build
+  cd ..
+  #
+  #
+  tar xzf db-6.1.26.NC.tar.gz
+  cd db-6.1.26.NC/build_unix
+  #   need --with-pic to avoid relocation error in 64 bit builds
+  ../dist/configure --prefix=$STAGING --enable-cxx --disable-shared --with-pic
+  # Workaround to prevent re-configuring by make; make all files have a date in the past
+  find . -print0 | xargs -r0 touch -t 200001010000
+  make $MAKEOPTS library_build
+  make install_lib install_include
+  cd ../..
+  #
+  tar --warning=no-timestamp -xjf boost_1_59_0.tar.bz2
+  cd boost_1_59_0
+  GCCVERSION=$(g++ -E -dM $(mktemp --suffix=.h) | grep __VERSION__ | cut -d ' ' -f 3 | cut -d '"' -f 2)
+  # note: bjam with -d+2 reveals that -O3 is implied by default, no need to provide it in cxxflags
+  echo "using gcc : $GCCVERSION : g++
+        :
+        <cxxflags>\"-frandom-seed=boost1 -fPIC\"
+  ;" > user-config.jam
+  ./bootstrap.sh --without-icu
+  ./bjam toolset=gcc threadapi=pthread threading=multi variant=release link=static runtime-link=shared --user-config=user-config.jam --without-mpi --without-python -sNO_BZIP2=1 --layout=tagged --build-type=complete --prefix="$STAGING" $MAKEOPTS -d+2 install
+  cd ..
+  #
+  unzip -o secp256k1-master.zip
+  cd secp256k1-master
+  unset FAKETIME # unset fake time during configure, as it does some clock sanity tests
+  ./autogen.sh
+  ./configure --prefix=$STAGING
+  # Workaround to prevent re-configuring by make; make all files have a date in the past
+  find . -print0 | xargs -r0 touch -t 200001010000
+  export FAKETIME=$REFERENCE_DATETIME
+  make install
+  cd ..
+  #
+  #tar xzf zlib-1.2.8.tar.gz
+  #cd zlib-1.2.8
+  #touch configure -d $REFERENCE_DATETIME
+  #./configure  --prefix=$STAGING
+  #make install
+  #cd ..
+  #
+  #tar xf libpng-1.6.18.tar.xz
+  #cd libpng-1.6.18
+  #touch configure -d $REFERENCE_DATETIME
+  #./configure  --prefix=$STAGING  --with-zlib-prefix=$STAGING
+  #make install
+  #cd ..
+  #
+  tar xzf qrencode-3.4.4.tar.gz
+  cd qrencode-3.4.4
+  unset FAKETIME # unset fake time during configure, as it does some clock sanity tests
+  ./configure --prefix=$STAGING --enable-static --disable-shared --with-pic --without-tools --disable-dependency-tracking
+  # Workaround to prevent re-configuring by make; make all files have a date in the past
+  find . -print0 | xargs -r0 touch -t 200001010000
+  export FAKETIME=$REFERENCE_DATETIME
+  make $MAKEOPTS install
+  cd ..
+  #
+  # post-process all generated libraries to be deterministic
+  # extract them to a temporary directory then re-build them deterministically
+  for LIB in $(find $STAGING -name \*.a); do
+    rm -rf $TEMPDIR && mkdir $TEMPDIR && cd $TEMPDIR
+    ar xv $LIB | cut -b5- > /tmp/list.txt
+    rm $LIB
+    ar crsD $LIB $(cat /tmp/list.txt)
+  done
+  #
+  #
+  cd $STAGING
+  find include lib bin host | sort | zip -X@ $OUTDIR/lux-deps-linux${GBUILD_BITS}-gitian.zip
+

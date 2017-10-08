@@ -1,0 +1,208 @@
+---
+name: "lux-deps"
+suites:
+- "trusty"
+architectures:
+- "amd64"
+packages: 
+- "mingw-w64"
+- "g++-mingw-w64"
+- "git-core"
+- "zip"
+- "unzip"
+- "faketime"
+- "psmisc"
+- "libtool"
+- "automake"
+- "autoconf"
+reference_datetime: "2013-06-01 00:00:00"
+remotes: []
+files:
+- "openssl-1.0.2d.tar.gz"
+- "miniupnpc-1.9.20151008.tar.gz"
+- "db-6.1.26.NC.tar.gz"
+- "zlib-1.2.8.tar.gz"
+- "libpng-1.6.18.tar.xz"
+- "boost_1_59_0.tar.bz2"
+- "secp256k1-master.zip"
+- "qrencode-3.4.4.tar.gz"
+- "icu4c-55_1-src.tgz"
+- "boost-mingw.patch"
+#- "qt-everywhere-opensource-src-5.5.0.tar.xz"
+script: |
+script: |
+  #
+  export LD_PRELOAD=/usr/lib/x86_64-linux-gnu/faketime/libfaketime.so.1
+  export FAKETIME=$REFERENCE_DATETIME
+  export TZ=UTC
+  INDIR=$HOME/build
+  TEMPDIR=$HOME/tmp
+  # Input Integrity Check
+  echo "3da5b3c572741fe2237bee1c3d36b11beef61172ac847132b045548b98d4df29  secp256k1-master.zip"                       | sha256sum -c
+  echo "e444ac3b587ce82709c4d0cfca1fe71f44f9fc433e9f946b12b9e1bfe667a633  miniupnpc-1.9.20151008.tar.gz"              | sha256sum -c
+  echo "060105bda482fdfb109b88c05b69624e9d467d59fa30fd9a97225efcc38d1561  db-6.1.26.NC.tar.gz"                        | sha256sum -c
+  echo "36658cb768a54c1d4dec43c3116c27ed893e88b02ecfcb44f2166f9c0b7f2a0d  zlib-1.2.8.tar.gz"                          | sha256sum -c
+  echo "2e10c13b7949883ac961db6177c516d778184432d440317e9f0391305c360963  libpng-1.6.18.tar.xz"                       | sha256sum -c
+  echo "727a932322d94287b62abb1bd2d41723eec4356a7728909e38adb65ca25241ca  boost_1_59_0.tar.bz2"                       | sha256sum -c
+  echo "671c36487785628a703374c652ad2cebea45fa920ae5681515df25d9f2c9a8c8  openssl-1.0.2d.tar.gz"                      | sha256sum -c
+  echo "e794e26a96019013c0e3665cb06b18992668f352c5553d0a553f5d144f7f2a72  qrencode-3.4.4.tar.gz"                      | sha256sum -c
+  #
+  for BITS in 32 64; do # for architectures
+    #
+    INSTALLPREFIX=$HOME/staging${BITS}
+    BUILDDIR=$HOME/build${BITS}
+    if [ "$BITS" == "32" ]; then
+      HOST=i686-w64-mingw32
+    else
+      HOST=x86_64-w64-mingw32
+    fi
+    #
+    mkdir -p $BUILDDIR $INSTALLPREFIX/lib
+    cd $BUILDDIR
+    #
+    tar xzf $INDIR/openssl-1.0.2d.tar.gz
+    cd openssl-1.0.2d
+    if [ "$BITS" == "32" ]; then
+      OPENSSL_TGT=mingw
+    else
+      OPENSSL_TGT=mingw64
+    fi
+    ./Configure --cross-compile-prefix=$HOST- ${OPENSSL_TGT} --prefix=$INSTALLPREFIX
+    make install
+    #make install_sw
+    cd ..
+    #
+    tar xzf $INDIR/db-6.1.26.NC.tar.gz
+    cd db-6.1.26.NC/build_unix
+    ../dist/configure --prefix=$INSTALLPREFIX --enable-mingw --enable-cxx --host=$HOST -disable-shared --disable-replication
+    # Workaround to prevent re-configuring by make; make all files have a date in the past
+    sed -i 's/WinIoCtl.h/winioctl.h/' ../src/dbinc/win_db.h
+    find . -print0 | xargs -r0 touch -t 200001010000
+    make $MAKEOPTS #library_build
+    make install_lib install_include
+    cd ../..
+    #
+    tar xzf $INDIR/miniupnpc-1.9.20151008.tar.gz
+    cd miniupnpc-1.9.20151008
+    echo "
+  --- miniupnpc-1.9/Makefile.mingw.orig   2013-09-29 18:52:51.014087958 -1000
+  +++ miniupnpc-1.9/Makefile.mingw        2013-09-29 19:09:29.663318691 -1000
+  @@ -67,8 +67,8 @@
+   
+   wingenminiupnpcstrings.o:	wingenminiupnpcstrings.c
+   
+  -miniupnpcstrings.h: miniupnpcstrings.h.in wingenminiupnpcstrings
+  -	wingenminiupnpcstrings \$< \$@
+  +miniupnpcstrings.h: miniupnpcstrings.h.in 
+  +	sed -e 's|OS/version|MSWindows/5.1.2600|' -e 's|MINIUPNPC_VERSION_STRING \"version\"|MINIUPNPC_VERSION_STRING \"VERSIONHERE\"|' \$< > \$@
+   
+   minixml.o:	minixml.c minixml.h miniupnpcstrings.h
+   
+  " | sed "s/VERSIONHERE/$(cat VERSION)/" | patch -p1
+    mkdir -p dll
+    # Workaround to prevent re-configuring by make; make all files have a date in the past
+    find . -print0 | xargs -r0 touch -t 200001010000
+    make -f Makefile.mingw CC=$HOST-gcc AR=$HOST-ar libminiupnpc.a
+    install -d $INSTALLPREFIX/include/miniupnpc
+    install *.h $INSTALLPREFIX/include/miniupnpc
+    install libminiupnpc.a  $INSTALLPREFIX/lib
+    cd ..
+    #
+    tar xzf $INDIR/zlib-1.2.8.tar.gz
+    cd zlib-1.2.8
+    CROSS_PREFIX=$HOST- ./configure --prefix=$INSTALLPREFIX --static
+    make
+    make install
+    cd ..
+    #
+    tar xf $INDIR/libpng-1.6.18.tar.xz
+    cd libpng-1.6.18
+    OPT="-O2"
+    CPPFLAGS="${OPT} -I$INSTALLPREFIX/include" CFLAGS="${OPT} -I$INSTALLPREFIX/include" LDFLAGS="${OPT} -L$INSTALLPREFIX/lib" ./configure --disable-shared --prefix=$INSTALLPREFIX --host=$HOST
+    make $MAKEOPTS
+    make install
+    cd ..
+    #
+    tar xfz $INDIR/qrencode-3.4.4.tar.gz
+    cd qrencode-3.4.4
+    CPPFLAGS="${OPT} -I$INSTALLPREFIX/include" CFLAGS="${OPT} -I$INSTALLPREFIX/include" LDFLAGS="${OPT} -L$INSTALLPREFIX/lib" ./configure --enable-static --disable-shared --without-tools --prefix=$INSTALLPREFIX --host=$HOST
+    make $MAKEOPTS
+    make install
+    cd ..
+    #
+    mkdir -p icuCross
+    cd icuCross
+    tar xzf $INDIR/icu4c-55_1-src.tgz
+    cd icu/source
+    mkdir -p $TEMPDIR/icu
+    ./runConfigureICU MinGW --prefix=$TEMPDIR/icu --enable-static --disable-shared
+    make
+    make install
+    cd ../../..
+    #rm  -rf icu
+    tar xzf $INDIR/icu4c-55_1-src.tgz
+    cd icu/source
+    ./runConfigureICU MinGW --host=$HOST --with-cross-build=$BUILDDIR/icuCross/icu/source --prefix=$INSTALLPREFIX --enable-static --disable-shared
+    make
+    make install
+    cd ../..
+    #
+    tar --warning=no-timestamp -xjf $INDIR/boost_1_59_0.tar.bz2
+    cd boost_1_59_0
+    GCCVERSION=$($HOST-g++ -E -dM $(mktemp --suffix=.h) | grep __VERSION__ | cut -d ' ' -f 3 | cut -d '"' -f 2)
+    echo "using gcc : $GCCVERSION : $HOST-g++
+        :
+        <rc>$HOST-windres
+        <archiver>$HOST-ar
+        <cxxflags>-frandom-seed=boost1
+        <ranlib>$HOST-ranlib
+  ;" > user-config.jam
+    ./bootstrap.sh --without-icu
+    # Workaround: Upstream boost dev refuses to include patch that would allow Free Software cross-compile toolchain to work
+    #             This patch was authored by the Fedora package developer and ships in Fedora's mingw32-boost.
+    #             Please obtain the exact patch that matches the above sha256sum from one of the following mirrors.
+    #
+    # Read History:   https://svn.boost.org/trac/boost/ticket/7262
+    # History Mirror: http://rose.makesad.us/~paulproteus/mirrors/7262%20Boost.Context%20fails%20to%20build%20using%20MinGW.html
+    #
+    # Patch:          https://svn.boost.org/trac/boost/raw-attachment/ticket/7262/boost-mingw.patch
+    # Patch Mirror:   http://wtogami.fedorapeople.org/boost-mingw-gas-cross-compile-2013-03-03.patch
+    # Patch Mirror:   http://mindstalk.net/host/boost-mingw-gas-cross-compile-2013-03-03.patch
+    # Patch Mirror:   http://rose.makesad.us/~paulproteus/mirrors/boost-mingw-gas-cross-compile-2013-03-03.patch
+    #patch -p0 < $INDIR/boost-mingw.patch
+    # Bug Workaround: boost-1.54.0 broke the ability to disable zlib, still broken in 1.55
+    # https://svn.boost.org/trac/boost/ticket/9156
+    sed -i 's^\[ ac.check-library /zlib//zlib : <library>/zlib//zlib^^' libs/iostreams/build/Jamfile.v2
+    sed -i 's^<source>zlib.cpp <source>gzip.cpp \]^^' libs/iostreams/build/Jamfile.v2
+    # http://statmt.org/~s0565741/software/boost_1_52_0/libs/context/doc/html/context/requirements.html
+    # Workaround: Upstream boost dev refuses to include patch that would allow Free Software cross-compile toolchain to work
+    #             This patch was authored by the Fedora package developer and ships in Fedora's mingw32-boost.
+    #             Please obtain the exact patch that matches the above sha256sum from one of the following mirrors.
+    #
+    # Read History:   https://svn.boost.org/trac/boost/ticket/7262
+    # History Mirror: http://rose.makesad.us/~paulproteus/mirrors/7262%20Boost.Context%20fails%20to%20build%20using%20MinGW.html
+    #
+    # Patch:          https://svn.boost.org/trac/boost/raw-attachment/ticket/7262/boost-mingw.patch
+    # Patch Mirror:   http://wtogami.fedorapeople.org/boost-mingw-gas-cross-compile-2013-03-03.patch
+    # Patch Mirror:   http://mindstalk.net/host/boost-mingw-gas-cross-compile-2013-03-03.patch
+    # Patch Mirror:   http://rose.makesad.us/~paulproteus/mirrors/boost-mingw-gas-cross-compile-2013-03-03.patch
+    patch -p0 < $INDIR/boost-mingw.patch
+    # "For cross-compiling the lib you must specify certain additional properties at bjam command line: target-os, abi, binary-format, architecture and address-model."
+    ./bjam toolset=gcc binary-format=pe target-os=windows threadapi=win32 address-model=$BITS threading=multi variant=release link=static runtime-link=static --user-config=user-config.jam --without-mpi --without-python -sNO_BZIP2=1 -sNO_ZLIB=1 --layout=tagged --build-type=complete --prefix="$INSTALLPREFIX" $MAKEOPTS install
+    cd ..
+    #
+    unzip -o $INDIR/secp256k1-master.zip
+    cd secp256k1-master
+    unset FAKETIME # unset fake time during configure, as it does some clock sanity tests
+    ./autogen.sh
+    #LDFLAGS="-no-undefined"
+    ./configure --prefix=$INSTALLPREFIX --host=$HOST
+    # Workaround to prevent re-configuring by make; make all files have a date in the past
+    find . -print0 | xargs -r0 touch -t 200001010000
+    export FAKETIME=$REFERENCE_DATETIME
+    make install
+    #
+    cd $INSTALLPREFIX
+    find -print0 | xargs -r0 touch # fix up timestamps before packaging
+    find include lib | sort | zip -X@ $OUTDIR/lux-deps-win$BITS-gitian.zip
+  done # for BITS in

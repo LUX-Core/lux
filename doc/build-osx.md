@@ -1,5 +1,3 @@
-# Mac OS X Luxd Build Instructions
-
 Copyright (c) 2009-2012 Bitcoin Developers
 Distributed under the MIT/X11 software license, see the accompanying file
 license.txt or http://www.opensource.org/licenses/mit-license.php.  This
@@ -8,54 +6,49 @@ OpenSSL Toolkit (http://www.openssl.org/).  This product includes cryptographic
 software written by Eric Young (eay@cryptsoft.com) and UPnP software written by
 Thomas Bernard.
 
-Lux authors:
 
-- Laszlo Hanyecz <solar@heliacal.net>
-- Douglas Huff <dhuff@jrbobdobbs.org>
+Mac OS X luxd build instructions
+Laszlo Hanyecz <solar@heliacal.net>
+Douglas Huff <dhuff@jrbobdobbs.org>
 
-## Notes
 
-* See readme-qt.rst for instructions on building Lux QT, the
+See readme-qt.rst for instructions on building Lux QT, the
 graphical user interface.
 
-* Tested on 10.5 and 10.6 intel.  PPC is not supported because it's big-endian.
+Tested on 10.5 and 10.6 intel.  PPC is not supported because it's big-endian.
 
-* All of the commands should be executed in Terminal.app.. it's in
+All of the commands should be executed in Terminal.app.. it's in
 /Applications/Utilities
 
-## Prerequisites
-
 You need to install XCode with all the options checked so that the compiler and
-everything is available in /usr not just /Developer. 
-You can get the current version from http://developer.apple.com
+everything is available in /usr not just /Developer I think it comes on the DVD
+but you can get the current version from http://developer.apple.com
 
-## Installing depencies with MacPorts
 
-1.  Download and install MacPorts from http://www.macports.org/. For 10.7 Lion: edit /opt/local/etc/macports/macports.conf and uncomment "build_arch i386".
-2.  Install dependencies:
+1.  Clone the github tree to get the source code:
 
-		sudo port install boost db48 openssl miniupnpc
+git clone http://github.com/luxdev/lux lux
+
+2.  Download and install MacPorts from http://www.macports.org/
+
+2a. (for 10.7 Lion)
+    Edit /opt/local/etc/macports/macports.conf and uncomment "build_arch i386"
+
+3.  Install dependencies from MacPorts
+
+sudo port install boost db48 openssl miniupnpc
 
 Optionally install qrencode (and set USE_QRCODE=1):
 sudo port install qrencode
 
-## Installing dependencies with Homebrew
+4.  Now you should be able to build luxd:
 
-Homebrew is an alternative to MacPorts. If you're using MacPorts, skip this section.
+cd lux/src
+make -f makefile.osx
 
-1. Download and install Homebrew: https://brew.sh/
-2. Install dependencies:
-
-		brew install leveldb berkeley-db4 boost miniupnpc openssl
-
-## Building Lux
-
-    git clone https://github.com/luxd/source lux
-    cd lux/src
-    make -f makefile.osx
-
-## Useful commands
-
-    ./luxd --help  # for a list of command-line options.
-    ./luxd -daemon # to start the lux daemon.
-    ./luxd help    # When the daemon is running, to get a list of RPC commands
+Run:
+  ./luxd --help  # for a list of command-line options.
+Run
+  ./luxd -daemon # to start the lux daemon.
+Run
+  ./luxd help # When the daemon is running, to get a list of RPC commands

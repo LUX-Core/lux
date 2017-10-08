@@ -3,27 +3,27 @@
 <plist version="0.9">
 <dict>
 	<key>CFBundleIconFile</key>
-	<string>lux.icns</string>
+	<string>bitcoin.icns</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleGetInfoString</key>
-	<string>Lux-Qt</string>
+	<string>ArpaCoin-Qt</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleExecutable</key>
-	<string>Lux-Qt</string>
+	<string>ArpaCoin-Qt</string>
 	<key>CFBundleIdentifier</key>
-	<string>co.lux.Lux-Qt</string>
+	<string>co.ArpaCoin.ArpaCoin-Qt</string>
         <key>CFBundleURLTypes</key>
         <array>
           <dict>
             <key>CFBundleTypeRole</key>
             <string>Editor</string>
             <key>CFBundleURLName</key>
-            <string>co.lux.LuxPayment</string>
+            <string>co.ArpaCoin.ArpaCoinPayment</string>
             <key>CFBundleURLSchemes</key>
             <array>
-              <string>lux</string>
+              <string>ArpaCoin</string>
             </array>
           </dict>
         </array>

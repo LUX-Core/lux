@@ -2,7 +2,7 @@
 #
 # linearize-hashes.py:  List blocks in a linear, no-fork version of the chain.
 #
-# Copyright (c) 2013 The Bitcoin developers
+# Copyright (c) 2013-2015 The Bitcoin developers
 # Distributed under the MIT/X11 software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 #
@@ -16,7 +16,7 @@ import sys
 
 settings = {}
 
-class BitcoinRPC:
+class LuxRPC:
 	OBJID = 1
 
 	def __init__(self, host, port, username, password):
@@ -59,7 +59,7 @@ class BitcoinRPC:
 		return self.rpc('getblockhash', [index])
 
 def get_block_hashes(settings):
-	rpc = BitcoinRPC(settings['host'], settings['port'],
+	rpc = LuxRPC(settings['host'], settings['port'],
 			 settings['rpcuser'], settings['rpcpassword'])
 
 	for height in xrange(settings['min_height'], settings['max_height']+1):
@@ -89,7 +89,9 @@ if __name__ == '__main__':
 	if 'host' not in settings:
 		settings['host'] = '127.0.0.1'
 	if 'port' not in settings:
-		settings['port'] = 16174
+		settings['port'] = 31500
+background-color: rgb(0, 0, 0);
+alternate-background-color: rgb(86, 0, 120);
 	if 'min_height' not in settings:
 		settings['min_height'] = 0
 	if 'max_height' not in settings:
