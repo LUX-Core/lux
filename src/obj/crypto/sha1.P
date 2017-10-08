@@ -1,0 +1,6 @@
+obj/crypto/sha1.o: crypto/sha1.cpp \
+ /home/bh/finalmasternode/src/crypto/sha1.h \
+ /home/bh/finalmasternode/src/crypto/common.h
+crypto/sha1.cpp :
+ /home/bh/finalmasternode/src/crypto/sha1.h :
+ /home/bh/finalmasternode/src/crypto/common.h :

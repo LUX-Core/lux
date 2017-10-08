@@ -1,0 +1,6 @@
+obj/crypto/ripemd160.o: crypto/ripemd160.cpp \
+ /home/bh/finalmasternode/src/crypto/ripemd160.h \
+ /home/bh/finalmasternode/src/crypto/common.h
+crypto/ripemd160.cpp :
+ /home/bh/finalmasternode/src/crypto/ripemd160.h :
+ /home/bh/finalmasternode/src/crypto/common.h :

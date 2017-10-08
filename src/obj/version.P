@@ -1,4 +1,0 @@
-obj/version.o: version.cpp version.h clientversion.h \
- /home/bh/finalmasternode/src/obj/build.h
-version.cpp version.h clientversion.h :
- /home/bh/finalmasternode/src/obj/build.h :

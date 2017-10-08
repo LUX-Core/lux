@@ -1,0 +1,6 @@
+obj/crypto/hmac_sha512.o: crypto/hmac_sha512.cpp \
+ /home/bh/finalmasternode/src/crypto/hmac_sha512.h \
+ /home/bh/finalmasternode/src/crypto/sha512.h
+crypto/hmac_sha512.cpp :
+ /home/bh/finalmasternode/src/crypto/hmac_sha512.h :
+ /home/bh/finalmasternode/src/crypto/sha512.h :
