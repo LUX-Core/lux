@@ -34,7 +34,7 @@ SendMessagesDialog::SendMessagesDialog(Mode mode, Type type, QWidget *parent) :
 #if QT_VERSION >= 0x040700
      /* Do not move this to the XML file, Qt before 4.7 will choke on it */
     if(mode == SendMessagesDialog::Encrypted)
-        ui->addressFrom->setPlaceholderText(tr("Enter a Lux address (e.g. CKPnZKDzaDXqEgKJ4GdUg58gXxgzA7mkny)"));
+        ui->addressFrom->setPlaceholderText(tr("Enter a Lux address (e.g. LXcY9ye9ftbELRcAm8rEwPbEweWRax4Asq)"));
  #endif
     addEntry();
 
