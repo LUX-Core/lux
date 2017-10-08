@@ -24,10 +24,10 @@ SignVerifyMessageDialog::SignVerifyMessageDialog(QWidget *parent) :
 
 #if (QT_VERSION >= 0x040700)
     /* Do not move this to the XML file, Qt before 4.7 will choke on it */
-    ui->addressIn_SM->setPlaceholderText(tr("Enter a Lux address (e.g. SjBj1QvJvsAkU5EBKggdZ8gWc4oK2F5AMY)"));
+    ui->addressIn_SM->setPlaceholderText(tr("Enter a Lux address (e.g. CKPnZKDzaDXqEgKJ4GdUg58gXxgzA7mkny)"));
     ui->signatureOut_SM->setPlaceholderText(tr("Click \"Sign Message\" to generate signature"));
 
-    ui->addressIn_VM->setPlaceholderText(tr("Enter a Lux address (e.g. SjBj1QvJvsAkU5EBKggdZ8gWc4oK2F5AMY)"));
+    ui->addressIn_VM->setPlaceholderText(tr("Enter a Lux address (e.g. CKPnZKDzaDXqEgKJ4GdUg58gXxgzA7mkny)"));
     ui->signatureIn_VM->setPlaceholderText(tr("Enter Lux signature"));
 #endif
 

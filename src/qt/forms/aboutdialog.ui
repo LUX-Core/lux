@@ -6,15 +6,9 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>600</width>
-    <height>351</height>
+    <width>593</width>
+    <height>319</height>
    </rect>
-  </property>
-  <property name="minimumSize">
-   <size>
-    <width>600</width>
-    <height>350</height>
-   </size>
   </property>
   <property name="windowTitle">
    <string>About Lux</string>
@@ -99,8 +93,7 @@
        <property name="text">
         <string>Copyright © 2009-2014 The Bitcoin developers
 Copyright © 2012-2014 The NovaCoin developers
-Copyright © 2014-2016 The Blackcoin developers
-Copyright © 2016-2017 The Lux developers</string>
+Copyright © 2014 The Lux developers</string>
        </property>
        <property name="textInteractionFlags">
         <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>

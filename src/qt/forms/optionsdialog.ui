@@ -360,6 +360,16 @@
         </widget>
        </item>
        <item>
+        <widget class="QCheckBox" name="minimizeCoinAge">
+         <property name="toolTip">
+          <string>Whether to select the coin outputs randomly or with minimal coin age.</string>
+         </property>
+         <property name="text">
+          <string>Minimize weight consumption (experimental)</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QCheckBox" name="useBlackTheme">
          <property name="text">
           <string>Use black visual theme (requires restart)</string>

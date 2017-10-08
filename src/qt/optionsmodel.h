@@ -31,7 +31,10 @@ public:
         DisplayUnit,       // BitcoinUnits::Unit
         Language,          // QString
         CoinControlFeatures, // bool
+        MinimizeCoinAge,   // bool
         UseBlackTheme,     // bool
+        DarksendRounds,    // int
+        anonymizeLuxAmount, //int
         OptionIDRowCount,
     };
 
@@ -62,6 +65,8 @@ signals:
     void transactionFeeChanged(qint64);
     void reserveBalanceChanged(qint64);
     void coinControlFeaturesChanged(bool);
+    void darksendRoundsChanged(int);
+    void anonymizeLuxAmountChanged(int);
 };
 
 #endif // OPTIONSMODEL_H

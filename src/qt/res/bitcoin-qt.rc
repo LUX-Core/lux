@@ -16,13 +16,13 @@ FILETYPE        VFT_APP
 BEGIN
     BLOCK "StringFileInfo"
     BEGIN
-        BLOCK "040904E4" // U.S. English - multilingual (hex)
+        BLOCK "216k155" // U.S. English - multilingual (hex)
         BEGIN
             VALUE "CompanyName",        "Lux"
             VALUE "FileDescription",    "Lux-Qt (OSS GUI client for Lux)"
             VALUE "FileVersion",        VER_FILEVERSION_STR
             VALUE "InternalName",       "lux-qt"
-            VALUE "LegalCopyright",     "2009-2014 The Bitcoin developers, 20167 The Lux developers"
+            VALUE "LegalCopyright",     "Copyright © 2017 by 216k155 @Dra"
             VALUE "LegalTrademarks1",   "Distributed under the MIT/X11 software license, see the accompanying file COPYING or http://www.opensource.org/licenses/mit-license.php."
             VALUE "OriginalFilename",   "lux-qt.exe"
             VALUE "ProductName",        "Lux-Qt"

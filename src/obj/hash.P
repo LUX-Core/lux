@@ -1,8 +1,4 @@
 obj/hash.o: hash.cpp hash.h uint256.h serialize.h allocators.h version.h \
- clientversion.h obj/phi1612/sph_skein.h obj/phi1612/sph_types.h \
- obj/phi1612/sph_jh.h obj/phi1612/sph_cubehash.h obj/phi1612/sph_fugue.h \
- obj/phi1612/sph_gost.h obj/phi1612/sph_echo.h
+ clientversion.h
 hash.cpp hash.h uint256.h serialize.h allocators.h version.h :
- clientversion.h obj/phi1612/sph_skein.h obj/phi1612/sph_types.h :
- obj/phi1612/sph_jh.h obj/phi1612/sph_cubehash.h obj/phi1612/sph_fugue.h :
- obj/phi1612/sph_gost.h obj/phi1612/sph_echo.h :
+ clientversion.h :

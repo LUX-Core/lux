@@ -84,7 +84,7 @@ void setupAmountWidget(QLineEdit *widget, QWidget *parent)
 bool parseBitcoinURI(const QUrl &uri, SendCoinsRecipient *out)
 {
     // NovaCoin: check prefix
-    if(uri.scheme() != QString("lux"))
+    if(uri.scheme() != QString("Lux"))
         return false;
 
     SendCoinsRecipient rv;
@@ -129,13 +129,13 @@ bool parseBitcoinURI(const QUrl &uri, SendCoinsRecipient *out)
 
 bool parseBitcoinURI(QString uri, SendCoinsRecipient *out)
 {
-    // Convert lux:// to lux:
+    // Convert Lux:// to Lux:
     //
     //    Cannot handle this later, because bitcoin:// will cause Qt to see the part after // as host,
     //    which will lower-case it (and thus invalidate the address).
-    if(uri.startsWith("lux://"))
+    if(uri.startsWith("Lux://"))
     {
-        uri.replace(0, 12, "lux:");
+        uri.replace(0, 12, "Lux:");
     }
     QUrl uriInstance(uri);
     return parseBitcoinURI(uriInstance, out);
@@ -361,7 +361,7 @@ boost::filesystem::path static GetAutostartDir()
 
 boost::filesystem::path static GetAutostartFilePath()
 {
-    return GetAutostartDir() / "lux.desktop";
+    return GetAutostartDir() / "Lux.desktop";
 }
 
 bool GetStartOnSystemStartup()
@@ -466,16 +466,14 @@ void SetBlackThemeQSS(QApplication& app)
                       "QFrame         { border: none; }"
                       "QComboBox      { color: rgb(255,255,255); }"
                       "QComboBox QAbstractItemView::item { color: rgb(255,255,255); }"
-                      "QPushButton    { background: rgb(68,81,98); color: rgb(222,222,222); }"
+                      "QPushButton    { background: rgb(224,55,63); color: rgb(21,21,21); }"
                       "QDoubleSpinBox { background: rgb(63,67,72); color: rgb(255,255,255); border-color: rgb(194,194,194); }"
                       "QLineEdit      { background: rgb(63,67,72); color: rgb(255,255,255); border-color: rgb(194,194,194); }"
                       "QTextEdit      { background: rgb(63,67,72); color: rgb(255,255,255); }"
                       "QPlainTextEdit { background: rgb(63,67,72); color: rgb(255,255,255); }"
                       "QMenuBar       { background: rgb(41,44,48); color: rgb(110,116,126); }"
                       "QMenu          { background: rgb(30,32,36); color: rgb(222,222,222); }"
-                      "QMenuBar::item { background-color: rgb(68,81,98); color: rgb(222,222,222);}"
-					  "QMenu::item:selected { background-color: rgb(135,146,160); }"
-					  "QMenuBar::item:selected { background-color: rgb(41,44,48); }"
+                      "QMenu::item:selected { background-color: rgb(48,140,198); }"
                       "QLabel         { color: rgb(120,127,139); }"
                       "QScrollBar     { color: rgb(255,255,255); }"
                       "QCheckBox      { color: rgb(120,127,139); }"
@@ -485,11 +483,11 @@ void SetBlackThemeQSS(QApplication& app)
                       "QTabBar::tab:!selected { background: rgb(24,26,30); margin-top: 2px; }"
                       "QTabWidget::pane { border: 1px solid rgb(78,79,83); }"
                       "QToolButton    { background: rgb(30,32,36); color: rgb(116,122,134); border: none; border-left-color: rgb(30,32,36); border-left-style: solid; border-left-width: 6px; margin-top: 8px; margin-bottom: 8px; }"
-                      "QToolButton:checked { color: rgb(255,255,255); border: none; border-left-color: rgb(28,135,200); border-left-style: solid; border-left-width: 6px; }"
-                      "QProgressBar   { color: rgb(149,148,148); border-color: rgb(255,255,255); border-width: 1px; border-style: solid; }"
+                      "QToolButton:checked { color: rgb(255,255,255); border: none; border-left-color: rgb(224,55,63); border-left-style: solid; border-left-width: 6px; }"
+                      "QProgressBar   { color: rgb(149,148,148); border-color: rgb(255,255,255); border-width: 3px; border-style: solid; }"
                       "QProgressBar::chunk { background: rgb(255,255,255); }"
                       "QTreeView::item { background: rgb(41,44,48); color: rgb(212,213,213); }"
-                      "QTreeView::item:selected { background-color: rgb(59,124,220); }"
+                      "QTreeView::item:selected { background-color: rgb(48,140,198); }"
                       "QTableView     { background: rgb(66,71,78); color: rgb(212,213,213); gridline-color: rgb(157,160,165); }"
                       "QHeaderView::section { background: rgb(29,34,39); color: rgb(255,255,255); }"
                       "QToolBar       { background: rgb(30,32,36); border: none; }");
@@ -497,3 +495,5 @@ void SetBlackThemeQSS(QApplication& app)
 
 } // namespace GUIUtil
 
+//QPushButton    { background: rgb(224,55,63); //red color
+//QToolButton:checked: rgb(224,55,63); //red color

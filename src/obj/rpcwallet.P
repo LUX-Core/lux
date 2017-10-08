@@ -1,22 +1,24 @@
 obj/rpcwallet.o: rpcwallet.cpp base58.h chainparams.h bignum.h \
  serialize.h allocators.h version.h clientversion.h uint256.h util.h \
- tinyformat.h key.h hash.h obj/phi1612/sph_skein.h \
- obj/phi1612/sph_types.h obj/phi1612/sph_jh.h obj/phi1612/sph_cubehash.h \
- obj/phi1612/sph_fugue.h obj/phi1612/sph_gost.h obj/phi1612/sph_echo.h \
- script.h keystore.h sync.h threadsafety.h rpcserver.h rpcprotocol.h \
- compat.h json/json_spirit_reader_template.h json/json_spirit_value.h \
+ tinyformat.h key.h hash.h script.h keystore.h sync.h threadsafety.h \
+ stealth.h rpcserver.h rpcprotocol.h compat.h \
+ json/json_spirit_reader_template.h json/json_spirit_value.h \
  json/json_spirit_error_position.h json/json_spirit_utils.h \
  json/json_spirit_writer_template.h init.h wallet.h walletdb.h db.h \
  crypter.h main.h core.h txmempool.h net.h mruset.h netbase.h protocol.h \
- addrman.h timedata.h scrypt.h ui_interface.h
+ addrman.h timedata.h hashblock.h obj/phi1612/sph_skein.h \
+ obj/phi1612/sph_types.h obj/phi1612/sph_jh.h obj/phi1612/sph_cubehash.h \
+ obj/phi1612/sph_fugue.h obj/phi1612/sph_gost.h obj/phi1612/sph_echo.h \
+ ui_interface.h
 rpcwallet.cpp base58.h chainparams.h bignum.h :
  serialize.h allocators.h version.h clientversion.h uint256.h util.h :
- tinyformat.h key.h hash.h obj/phi1612/sph_skein.h :
- obj/phi1612/sph_types.h obj/phi1612/sph_jh.h obj/phi1612/sph_cubehash.h :
- obj/phi1612/sph_fugue.h obj/phi1612/sph_gost.h obj/phi1612/sph_echo.h :
- script.h keystore.h sync.h threadsafety.h rpcserver.h rpcprotocol.h :
- compat.h json/json_spirit_reader_template.h json/json_spirit_value.h :
+ tinyformat.h key.h hash.h script.h keystore.h sync.h threadsafety.h :
+ stealth.h rpcserver.h rpcprotocol.h compat.h :
+ json/json_spirit_reader_template.h json/json_spirit_value.h :
  json/json_spirit_error_position.h json/json_spirit_utils.h :
  json/json_spirit_writer_template.h init.h wallet.h walletdb.h db.h :
  crypter.h main.h core.h txmempool.h net.h mruset.h netbase.h protocol.h :
- addrman.h timedata.h scrypt.h ui_interface.h :
+ addrman.h timedata.h hashblock.h obj/phi1612/sph_skein.h :
+ obj/phi1612/sph_types.h obj/phi1612/sph_jh.h obj/phi1612/sph_cubehash.h :
+ obj/phi1612/sph_fugue.h obj/phi1612/sph_gost.h obj/phi1612/sph_echo.h :
+ ui_interface.h :

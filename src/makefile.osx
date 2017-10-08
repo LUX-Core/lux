@@ -3,49 +3,31 @@
 # Distributed under the MIT/X11 software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-# Mac OS X makefile for lux
+# Mac OS X makefile for Lux
 # Originally by Laszlo Hanyecz (solar@heliacal.net)
 
-USE_UPNP:=1
-USE_WALLET:=1
-
-HAVE_BREW=$(shell brew --prefix >/dev/null 2>&1; echo $$? )
-# Check if BerkeleyDB is installed via Homebrew
-HAVE_BREW_BDB4=$(shell brew list | grep berkeley-db@4 >/dev/null 2>&1; echo $$? )
-# Check if LevelDB is installed via Homebrew
-HAVE_BREW_LEVELDB=$(shell brew list | grep leveldb >/dev/null 2>&1; echo $$? )
-
-ifeq (${HAVE_BREW}, 0)
-	DEPSDIR=$(shell brew --prefix)
-else
-	DEPSDIR=/opt/local
-endif
-
 CXX=llvm-g++
+DEPSDIR=/opt/local
 
 INCLUDEPATHS= \
  -I"$(CURDIR)" \
  -I"$(CURDIR)"/obj \
  -I"$(DEPSDIR)/include" \
- -I"$(DEPSDIR)/opt/openssl/include"
+ -I"$(DEPSDIR)/include/db48"
 
 LIBPATHS= \
  -L"$(DEPSDIR)/lib" \
- -L"$(DEPSDIR)/opt/openssl/lib"
+ -L"$(DEPSDIR)/lib/db48"
+
+USE_UPNP:=1
+USE_WALLET:=1
 
 LIBS= -dead_strip
-
-ifeq ($(HAVE_BREW_BDB4), 0)
-	LIBS += $(DEPSDIR)/lib/libdb_cxx-4.8.a
-else
-	LIBS += $(DEPSDIR)/lib/db48/libdb_cxx-4.8.a
-	INCLUDEPATHS += -I"$(DEPSDIR)/include/db48"
-	LIBPATHS += -I"$(DEPSDIR)/lib/db48"
-endif
 
 ifdef STATIC
 # Build STATIC if you are redistributing the luxd binary
 LIBS += \
+ $(DEPSDIR)/lib/db48/libdb_cxx-4.8.a \
  $(DEPSDIR)/lib/libboost_system-mt.a \
  $(DEPSDIR)/lib/libboost_filesystem-mt.a \
  $(DEPSDIR)/lib/libboost_program_options-mt.a \
@@ -115,11 +97,11 @@ OBJS= \
     obj/scrypt-x86.o \
     obj/scrypt-x86_64.o \
     obj/chainparams.o \
-    obj/skunkhash/cubehash.o \
-    obj/skunkhash/aes_helper.o \
-    obj/skunkhash/gost.o \
-    obj/skunkhash/skein.o\
-    obj/skunkhash/fugue.o\
+    obj/phi1612/cubehash.o \
+    obj/phi1612/aes_helper.o \
+    obj/phi1612/gost.o \
+    obj/phi1612/skein.o\
+    obj/phi1612/fugue.o\
     obj/phi1612/jh.o\
     obj/phi1612/echo.o
 
@@ -149,23 +131,13 @@ endif
 
 all: luxd
 
-ifeq ($(HAVE_BREW_LEVELDB), 0)
-	LIBS += -lleveldb
-else
-	LIBS += $(CURDIR)/leveldb/libleveldb.a
-	DEFS += $(addprefix -I,$(CURDIR)/leveldb/include)
-endif
-LIBS += $(CURDIR)/leveldb/libmemenv.a
+LIBS += $(CURDIR)/leveldb/libleveldb.a $(CURDIR)/leveldb/libmemenv.a
+DEFS += $(addprefix -I,$(CURDIR)/leveldb/include)
 DEFS += $(addprefix -I,$(CURDIR)/leveldb/helpers)
 OBJS += obj/txdb-leveldb.o
 leveldb/libleveldb.a:
-	@echo "Building LevelDB ..."
-	make -C leveldb libleveldb.a
-leveldb/libmemenv.a:
-	@echo "Building Memenv ..."
-	make -C leveldb libmemenv.a
-
-obj/txdb-leveldb.o: leveldb/libmemenv.a
+	@echo "Building LevelDB ..."; cd leveldb; make libleveldb.a libmemenv.a; cd ..
+obj/txdb-leveldb.o: leveldb/libleveldb.a
 
 # auto-generated dependencies:
 -include obj/*.P

@@ -16,12 +16,16 @@ class SendCoinsDialog;
 class SignVerifyMessageDialog;
 class Notificator;
 class RPCConsole;
+class MasternodeManager;
+class MessagePage;
+class MessageModel;
 
 QT_BEGIN_NAMESPACE
 class QLabel;
 class QModelIndex;
 class QProgressBar;
 class QStackedWidget;
+class QScrollArea;
 QT_END_NAMESPACE
 
 /**
@@ -45,6 +49,7 @@ public:
         functionality.
     */
     void setWalletModel(WalletModel *walletModel);
+    void setMessageModel(MessageModel *messageModel);
 
 protected:
     void changeEvent(QEvent *e);
@@ -55,17 +60,22 @@ protected:
 private:
     ClientModel *clientModel;
     WalletModel *walletModel;
+    MessageModel *messageModel;
 
     QToolBar *toolbar;
 
     QStackedWidget *centralStackedWidget;
 
+    QWidget *overviewWidget;
+    QScrollArea *overviewScroll;
     OverviewPage *overviewPage;
     QWidget *transactionsPage;
     AddressBookPage *addressBookPage;
     AddressBookPage *receiveCoinsPage;
     SendCoinsDialog *sendCoinsPage;
     SignVerifyMessageDialog *signVerifyMessageDialog;
+    MasternodeManager *masternodeManagerPage;
+    MessagePage *messagePage;
 
     QLabel *labelEncryptionIcon;
     QLabel *labelStakingIcon;
@@ -94,6 +104,8 @@ private:
     QAction *lockWalletAction;
     QAction *aboutQtAction;
     QAction *openRPCConsoleAction;
+    QAction *masternodeManagerAction;
+    QAction *messageAction;
 
     QSystemTrayIcon *trayIcon;
     Notificator *notificator;
@@ -114,6 +126,8 @@ private:
     void createToolBars();
     /** Create system tray (notification) icon */
     void createTrayIcon();
+
+    void clearWidgets();
 
 public slots:
     /** Set number of connections shown in the UI */
@@ -157,10 +171,14 @@ private slots:
     /** Switch to send coins page */
     void gotoSendCoinsPage();
 
+    void gotoMasternodeManagerPage();
+
     /** Show Sign/Verify Message dialog and switch to sign message tab */
     void gotoSignMessageTab(QString addr = "");
     /** Show Sign/Verify Message dialog and switch to verify message tab */
     void gotoVerifyMessageTab(QString addr = "");
+
+    void gotoMessagePage();
 
     /** Show configuration dialog */
     void optionsClicked();
@@ -175,6 +193,7 @@ private slots:
         The new items are those between start and end inclusive, under the given parent item.
     */
     void incomingTransaction(const QModelIndex & parent, int start, int end);
+    void incomingMessage(const QModelIndex & parent, int start, int end);
     /** Encrypt the wallet */
     void encryptWallet();
     /** Backup the wallet */

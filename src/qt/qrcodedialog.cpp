@@ -52,9 +52,9 @@ void QRCodeDialog::genCode()
 {
     QString uri = getURI();
 
-    if (uri != "")
+    if (uri != "https://luxcoin.tech")
     {
-        ui->lblQRCode->setText("");
+        ui->lblQRCode->setText("Lux");
 
         QRcode *code = QRcode_encodeString(uri.toUtf8().constData(), 0, QR_ECLEVEL_L, QR_MODE_8, 1);
         if (!code)
@@ -83,7 +83,7 @@ void QRCodeDialog::genCode()
 
 QString QRCodeDialog::getURI()
 {
-    QString ret = QString("lux:%1").arg(address);
+    QString ret = QString("Lux:%1").arg(address);
     int paramCount = 0;
 
     ui->outUri->clear();

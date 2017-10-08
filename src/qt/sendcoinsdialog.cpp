@@ -36,7 +36,7 @@ SendCoinsDialog::SendCoinsDialog(QWidget *parent) :
 
 #if QT_VERSION >= 0x040700
     /* Do not move this to the XML file, Qt before 4.7 will choke on it */
-    ui->lineEditCoinControlChange->setPlaceholderText(tr("Enter a Lux address (e.g. SjBj1QvJvsAkU5EBKggdZ8gWc4oK2F5AMY)"));
+    ui->lineEditCoinControlChange->setPlaceholderText(tr("Enter a Lux address (e.g. LXcY9ye9ftbELRcAm8rEwPbEweWRax4Asq)"));
 #endif
 
     addEntry();
@@ -212,6 +212,11 @@ void SendCoinsDialog::on_sendButton_clicked()
     case WalletModel::TransactionCommitFailed:
         QMessageBox::warning(this, tr("Send Coins"),
             tr("Error: The transaction was rejected. This might happen if some of the coins in your wallet were already spent, such as if you used a copy of wallet.dat and coins were spent in the copy but not marked as spent here."),
+            QMessageBox::Ok, QMessageBox::Ok);
+        break;
+    case WalletModel::NarrationTooLong:
+        QMessageBox::warning(this, tr("Send Coins"),
+            tr("Error: Narration is too long."),
             QMessageBox::Ok, QMessageBox::Ok);
         break;
     case WalletModel::Aborted: // User aborted, nothing to do

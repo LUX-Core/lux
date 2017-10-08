@@ -1,28 +1,34 @@
 obj/main.o: main.cpp alert.h serialize.h allocators.h version.h \
  clientversion.h chainparams.h bignum.h uint256.h util.h tinyformat.h \
  checkpoints.h net.h mruset.h netbase.h compat.h protocol.h addrman.h \
- sync.h threadsafety.h timedata.h hash.h obj/phi1612/sph_skein.h \
- obj/phi1612/sph_types.h obj/phi1612/sph_jh.h obj/phi1612/sph_cubehash.h \
- obj/phi1612/sph_fugue.h obj/phi1612/sph_gost.h obj/phi1612/sph_echo.h \
- db.h init.h wallet.h walletdb.h key.h crypter.h keystore.h main.h core.h \
- script.h txmempool.h scrypt.h ui_interface.h kernel.h txdb.h \
- txdb-leveldb.h /home/bh/novacoin/src/leveldb/include/leveldb/db.h \
- /home/bh/novacoin/src/leveldb/include/leveldb/iterator.h \
- /home/bh/novacoin/src/leveldb/include/leveldb/slice.h \
- /home/bh/novacoin/src/leveldb/include/leveldb/status.h \
- /home/bh/novacoin/src/leveldb/include/leveldb/options.h \
- /home/bh/novacoin/src/leveldb/include/leveldb/write_batch.h
+ sync.h threadsafety.h timedata.h hash.h core.h script.h keystore.h key.h \
+ stealth.h db.h init.h wallet.h walletdb.h crypter.h main.h txmempool.h \
+ hashblock.h obj/phi1612/sph_skein.h obj/phi1612/sph_types.h \
+ obj/phi1612/sph_jh.h obj/phi1612/sph_cubehash.h obj/phi1612/sph_fugue.h \
+ obj/phi1612/sph_gost.h obj/phi1612/sph_echo.h ui_interface.h kernel.h \
+ txdb.h txdb-leveldb.h \
+ /home/bh/finalmasternode/src/leveldb/include/leveldb/db.h \
+ /home/bh/finalmasternode/src/leveldb/include/leveldb/iterator.h \
+ /home/bh/finalmasternode/src/leveldb/include/leveldb/slice.h \
+ /home/bh/finalmasternode/src/leveldb/include/leveldb/status.h \
+ /home/bh/finalmasternode/src/leveldb/include/leveldb/options.h \
+ /home/bh/finalmasternode/src/leveldb/include/leveldb/write_batch.h \
+ instantx.h base58.h darksend.h masternode.h activemasternode.h spork.h \
+ smessage.h lz4/lz4.h
 main.cpp alert.h serialize.h allocators.h version.h :
  clientversion.h chainparams.h bignum.h uint256.h util.h tinyformat.h :
  checkpoints.h net.h mruset.h netbase.h compat.h protocol.h addrman.h :
- sync.h threadsafety.h timedata.h hash.h obj/phi1612/sph_skein.h :
- obj/phi1612/sph_types.h obj/phi1612/sph_jh.h obj/phi1612/sph_cubehash.h :
- obj/phi1612/sph_fugue.h obj/phi1612/sph_gost.h obj/phi1612/sph_echo.h :
- db.h init.h wallet.h walletdb.h key.h crypter.h keystore.h main.h core.h :
- script.h txmempool.h scrypt.h ui_interface.h kernel.h txdb.h :
- txdb-leveldb.h /home/bh/novacoin/src/leveldb/include/leveldb/db.h :
- /home/bh/novacoin/src/leveldb/include/leveldb/iterator.h :
- /home/bh/novacoin/src/leveldb/include/leveldb/slice.h :
- /home/bh/novacoin/src/leveldb/include/leveldb/status.h :
- /home/bh/novacoin/src/leveldb/include/leveldb/options.h :
- /home/bh/novacoin/src/leveldb/include/leveldb/write_batch.h :
+ sync.h threadsafety.h timedata.h hash.h core.h script.h keystore.h key.h :
+ stealth.h db.h init.h wallet.h walletdb.h crypter.h main.h txmempool.h :
+ hashblock.h obj/phi1612/sph_skein.h obj/phi1612/sph_types.h :
+ obj/phi1612/sph_jh.h obj/phi1612/sph_cubehash.h obj/phi1612/sph_fugue.h :
+ obj/phi1612/sph_gost.h obj/phi1612/sph_echo.h ui_interface.h kernel.h :
+ txdb.h txdb-leveldb.h :
+ /home/bh/finalmasternode/src/leveldb/include/leveldb/db.h :
+ /home/bh/finalmasternode/src/leveldb/include/leveldb/iterator.h :
+ /home/bh/finalmasternode/src/leveldb/include/leveldb/slice.h :
+ /home/bh/finalmasternode/src/leveldb/include/leveldb/status.h :
+ /home/bh/finalmasternode/src/leveldb/include/leveldb/options.h :
+ /home/bh/finalmasternode/src/leveldb/include/leveldb/write_batch.h :
+ instantx.h base58.h darksend.h masternode.h activemasternode.h spork.h :
+ smessage.h lz4/lz4.h :

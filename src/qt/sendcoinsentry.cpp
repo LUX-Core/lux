@@ -7,6 +7,7 @@
 #include "walletmodel.h"
 #include "optionsmodel.h"
 #include "addresstablemodel.h"
+#include "stealth.h"
 
 #include <QApplication>
 #include <QClipboard>
@@ -24,7 +25,7 @@ SendCoinsEntry::SendCoinsEntry(QWidget *parent) :
 #if QT_VERSION >= 0x040700
     /* Do not move this to the XML file, Qt before 4.7 will choke on it */
     ui->addAsLabel->setPlaceholderText(tr("Enter a label for this address to add it to your address book"));
-    ui->payTo->setPlaceholderText(tr("Enter a Lux address (e.g. SjBj1QvJvsAkU5EBKggdZ8gWc4oK2F5AMY)"));
+    ui->payTo->setPlaceholderText(tr("Enter a Lux address (e.g. CKPnZKDzaDXqEgKJ4GdUg58gXxgzA7mkny)"));
 #endif
     setFocusPolicy(Qt::TabFocus);
     setFocusProxy(ui->payTo);
@@ -134,6 +135,12 @@ SendCoinsRecipient SendCoinsEntry::getValue()
     rv.address = ui->payTo->text();
     rv.label = ui->addAsLabel->text();
     rv.amount = ui->payAmount->value();
+
+ if (rv.address.length() > 75 
+        && IsStealthAddress(rv.address.toStdString()))
+        rv.typeInd = AddressTableModel::AT_Stealth;
+    else
+        rv.typeInd = AddressTableModel::AT_Normal;
 
     return rv;
 }
