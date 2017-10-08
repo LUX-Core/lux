@@ -7,6 +7,7 @@
 
 #include "db.h"
 #include "key.h"
+#include "stealth.h"
 
 #include <list>
 #include <string>
@@ -66,6 +67,52 @@ public:
     }
 };
 
+class CStealthKeyMetadata
+{
+// -- used to get secret for keys created by stealth transaction with wallet locked
+public:
+    CStealthKeyMetadata() {};
+    
+    CStealthKeyMetadata(CPubKey pkEphem_, CPubKey pkScan_)
+    {
+        pkEphem = pkEphem_;
+        pkScan = pkScan_;
+    };
+    
+    CPubKey pkEphem;
+    CPubKey pkScan;
+
+    IMPLEMENT_SERIALIZE
+    (
+        READWRITE(pkEphem);
+        READWRITE(pkScan);
+    )
+
+};
+
+class CAdrenalineNodeConfig
+{
+public:
+    int nVersion;
+    std::string sAlias;
+    std::string sAddress;
+    std::string sCollateralAddress;
+    std::string sMasternodePrivKey;
+
+    CAdrenalineNodeConfig()
+    {
+	nVersion = 0;
+    }
+
+    IMPLEMENT_SERIALIZE(
+        READWRITE(nVersion);
+        READWRITE(sAlias);
+        READWRITE(sAddress);
+        READWRITE(sCollateralAddress);
+	READWRITE(sMasternodePrivKey);
+    )
+};
+
 
 /** Access to the wallet database (wallet.dat) */
 class CWalletDB : public CDB
@@ -84,6 +131,15 @@ public:
 
     bool WriteTx(uint256 hash, const CWalletTx& wtx);
     bool EraseTx(uint256 hash);
+
+    bool WriteStealthKeyMeta(const CKeyID& keyId, const CStealthKeyMetadata& sxKeyMeta);
+    bool EraseStealthKeyMeta(const CKeyID& keyId);
+    bool WriteStealthAddress(const CStealthAddress& sxAddr);    
+    bool ReadStealthAddress(CStealthAddress& sxAddr);
+
+    bool WriteAdrenalineNodeConfig(std::string sAlias, const CAdrenalineNodeConfig& nodeConfig);
+    bool ReadAdrenalineNodeConfig(std::string sAlias, CAdrenalineNodeConfig& nodeConfig);
+    bool EraseAdrenalineNodeConfig(std::string sAlias);
 
     bool WriteKey(const CPubKey& vchPubKey, const CPrivKey& vchPrivKey, const CKeyMetadata &keyMeta);
     bool WriteCryptedKey(const CPubKey& vchPubKey, const std::vector<unsigned char>& vchCryptedSecret, const CKeyMetadata &keyMeta);

@@ -28,5 +28,4 @@ namespace Checkpoints
     const CBlockIndex* AutoSelectSyncCheckpoint();
     bool CheckSync(int nHeight);
 }
-
 #endif

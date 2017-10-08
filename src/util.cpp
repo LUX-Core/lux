@@ -37,6 +37,7 @@ namespace boost {
 #include <boost/thread.hpp>
 #include <openssl/crypto.h>
 #include <openssl/rand.h>
+#include <openssl/err.h>
 #include <stdarg.h>
 
 #ifdef WIN32
@@ -66,9 +67,27 @@ namespace boost {
 
 using namespace std;
 
+//Dark  features
+bool fMasterNode = false;
+string strMasterNodePrivKey = "";
+string strMasterNodeAddr = "";
+bool fLiteMode = false;
+int nInstantXDepth = 1;
+int nDarksendRounds = 2;
+int nAnonymizeLuxAmount = 500;
+int nLiquidityProvider = 0;
+/** Spork enforcement enabled time */
+int64_t enforceMasternodePaymentsTime = 4085657524;
+bool fSucessfullyLoaded = false;
+bool fEnableDarksend = false;
+/** All denominations used by darksend */
+std::vector<int64_t> darkSendDenominations;
+
 map<string, string> mapArgs;
 map<string, vector<string> > mapMultiArgs;
 bool fDebug = false;
+bool fDebugSmsg = false;
+bool fNoSmsg = false;
 bool fPrintToConsole = false;
 bool fPrintToDebugLog = true;
 bool fDaemon = false;
@@ -192,6 +211,14 @@ uint256 GetRandHash()
     uint256 hash;
     RAND_bytes((unsigned char*)&hash, sizeof(hash));
     return hash;
+}
+
+void GetRandBytes(unsigned char* buf, int num)
+{
+    if (RAND_bytes(buf, num) != 1) {
+        LogPrintf("%s: OpenSSL RAND_bytes() failed with error: %s\n", __func__, ERR_error_string(ERR_get_error(), NULL));
+        assert(false);
+    }
 }
 
 // LogPrintf() has been broken a couple of times now
@@ -688,6 +715,63 @@ string DecodeBase64(const string& str)
     return string((const char*)&vchRet[0], vchRet.size());
 }
 
+// Base64 encoding with secure memory allocation
+SecureString EncodeBase64Secure(const SecureString& input)
+{
+    // Init openssl BIO with base64 filter and memory output
+    BIO *b64, *mem;
+    b64 = BIO_new(BIO_f_base64());
+    BIO_set_flags(b64, BIO_FLAGS_BASE64_NO_NL); // No newlines in output
+    mem = BIO_new(BIO_s_mem());
+    BIO_push(b64, mem);
+
+    // Decode the string
+    BIO_write(b64, &input[0], input.size());
+    (void) BIO_flush(b64);
+
+    // Create output variable from buffer mem ptr
+    BUF_MEM *bptr;
+    BIO_get_mem_ptr(b64, &bptr);
+    SecureString output(bptr->data, bptr->length);
+
+    // Cleanse secure data buffer from memory
+    OPENSSL_cleanse((void *) bptr->data, bptr->length);
+
+    // Free memory
+    BIO_free_all(b64);
+    return output;
+}
+
+// Base64 decoding with secure memory allocation
+SecureString DecodeBase64Secure(const SecureString& input)
+{
+    SecureString output;
+
+    // Init openssl BIO with base64 filter and memory input
+    BIO *b64, *mem;
+    b64 = BIO_new(BIO_f_base64());
+    BIO_set_flags(b64, BIO_FLAGS_BASE64_NO_NL); //Do not use newlines to flush buffer
+    mem = BIO_new_mem_buf((void *) &input[0], input.size());
+    BIO_push(b64, mem);
+
+    // Prepare buffer to receive decoded data
+    if(input.size() % 4 != 0) {
+        throw runtime_error("Input length should be a multiple of 4");
+    }
+    size_t nMaxLen = input.size() / 4 * 3; // upper bound, guaranteed divisible by 4
+    output.resize(nMaxLen);
+
+    // Decode the string
+    size_t nLen;
+    nLen = BIO_read(b64, (void *) &output[0], input.size());
+    output.resize(nLen);
+
+    // Free memory
+    BIO_free_all(b64);
+    return output;
+}
+
+
 string EncodeBase32(const unsigned char* pch, size_t len)
 {
     static const char *pbase32 = "abcdefghijklmnopqrstuvwxyz234567";
@@ -906,9 +990,54 @@ bool WildcardMatch(const string& str, const string& mask)
 }
 
 
+bool ParseInt32(const std::string& str, int32_t *out)
+{
+    char *endp = NULL;
+    errno = 0; // strtol will not set errno if valid
+    long int n = strtol(str.c_str(), &endp, 10);
+    if(out) *out = (int)n;
+    // Note that strtol returns a *long int*, so even if strtol doesn't report a over/underflow
+    // we still have to check that the returned value is within the range of an *int32_t*. On 64-bit
+    // platforms the size of these types may be different.
+    return endp && *endp == 0 && !errno &&
+        n >= std::numeric_limits<int32_t>::min() &&
+        n <= std::numeric_limits<int32_t>::max();
+}
 
-
-
+std::string FormatParagraph(const std::string in, size_t width, size_t indent)
+{
+    std::stringstream out;
+    size_t col = 0;
+    size_t ptr = 0;
+    while(ptr < in.size())
+    {
+        // Find beginning of next word
+        ptr = in.find_first_not_of(' ', ptr);
+        if (ptr == std::string::npos)
+            break;
+        // Find end of next word
+        size_t endword = in.find_first_of(' ', ptr);
+        if (endword == std::string::npos)
+            endword = in.size();
+        // Add newline and indentation if this wraps over the allowed width
+        if (col > 0)
+        {
+            if ((col + endword - ptr) > width)
+            {
+                out << '\n';
+                for(size_t i=0; i<indent; ++i)
+                    out << ' ';
+                col = 0;
+            } else
+                out << ' ';
+        }
+        // Append word
+        out << in.substr(ptr, endword - ptr);
+        col += endword - ptr + 1;
+        ptr = endword;
+    }
+    return out.str();
+}
 
 
 
@@ -918,7 +1047,7 @@ static std::string FormatException(std::exception* pex, const char* pszThread)
     char pszModule[MAX_PATH] = "";
     GetModuleFileNameA(NULL, pszModule, sizeof(pszModule));
 #else
-    const char* pszModule = "lux";
+    const char* pszModule = "Lux";
 #endif
     if (pex)
         return strprintf(
@@ -1023,6 +1152,13 @@ boost::filesystem::path GetConfigFile()
     return pathConfigFile;
 }
 
+boost::filesystem::path GetMasternodeConfigFile()
+{
+    boost::filesystem::path pathConfigFile(GetArg("-mnconf", "masternode.conf"));
+    if (!pathConfigFile.is_complete()) pathConfigFile = GetDataDir(false) / pathConfigFile;
+    return pathConfigFile;
+}
+
 void ReadConfigFile(map<string, string>& mapSettingsRet,
                     map<string, vector<string> >& mapMultiSettingsRet)
 {
@@ -1088,6 +1224,30 @@ void FileCommit(FILE *fileout)
     fsync(fileno(fileout));
 #endif
 }
+
+std::string getTimeString(int64_t timestamp, char *buffer, size_t nBuffer)
+{
+    struct tm* dt;
+    time_t t = timestamp;
+    dt = localtime(&t);
+    
+    strftime(buffer, nBuffer, "%Y-%m-%d %H:%M:%S %z", dt); // %Z shows long strings on windows
+    return std::string(buffer); // copies the null-terminated character sequence
+};
+
+std::string bytesReadable(uint64_t nBytes)
+{
+    if (nBytes >= 1024ll*1024ll*1024ll*1024ll)
+        return strprintf("%.2f TB", nBytes/1024.0/1024.0/1024.0/1024.0);
+    if (nBytes >= 1024*1024*1024)
+        return strprintf("%.2f GB", nBytes/1024.0/1024.0/1024.0);
+    if (nBytes >= 1024*1024)
+        return strprintf("%.2f MB", nBytes/1024.0/1024.0);
+    if (nBytes >= 1024)
+        return strprintf("%.2f KB", nBytes/1024.0);
+    
+    return strprintf("%d B", nBytes);
+};
 
 void ShrinkDebugFile()
 {
@@ -1228,3 +1388,5 @@ std::string DateTimeStrFormat(const char* pszFormat, int64_t nTime)
     ss << boost::posix_time::from_time_t(nTime);
     return ss.str();
 }
+
+

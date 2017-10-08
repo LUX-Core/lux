@@ -31,7 +31,7 @@ enum Network ParseNetwork(std::string net) {
     if (net == "ipv4") return NET_IPV4;
     if (net == "ipv6") return NET_IPV6;
     if (net == "tor")  return NET_TOR;
-    if (net == "i2p")  return NET_I2P;
+    if (net == "i2p")  return NET_I2P; // Initilised I2pd full C# implemented by 216k155 for later start
     return NET_UNROUTABLE;
 }
 

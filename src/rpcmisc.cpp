@@ -1,6 +1,7 @@
 // Copyright (c) 2010 Satoshi Nakamoto
 // Copyright (c) 2009-2013 The Bitcoin developers
-
+// Distributed under the MIT/X11 software license, see the accompanying
+// file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "base58.h"
 #include "init.h"
@@ -10,6 +11,8 @@
 #include "rpcserver.h"
 #include "timedata.h"
 #include "util.h"
+#include "stealth.h"
+#include "spork.h"
 #ifdef ENABLE_WALLET
 #include "wallet.h"
 #include "walletdb.h"
@@ -108,6 +111,12 @@ public:
             obj.push_back(Pair("sigsrequired", nRequired));
         return obj;
     }
+
+    Object operator()(const CStealthAddress &stxAddr) const {
+        Object obj;
+        obj.push_back(Pair("todo", true));
+        return obj;
+    }
 };
 #endif
 
@@ -115,8 +124,8 @@ Value validateaddress(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() != 1)
         throw runtime_error(
-            "validateaddress <luxaddress>\n"
-            "Return information about <luxaddress>.");
+            "validateaddress <Luxaddress>\n"
+            "Return information about <Luxaddress>.");
 
     CBitcoinAddress address(params[0].get_str());
     bool isValid = address.IsValid();
@@ -146,8 +155,8 @@ Value validatepubkey(const Array& params, bool fHelp)
 {
     if (fHelp || !params.size() || params.size() > 2)
         throw runtime_error(
-            "validatepubkey <luxpubkey>\n"
-            "Return information about <luxpubkey>.");
+            "validatepubkey <Luxpubkey>\n"
+            "Return information about <Luxpubkey>.");
 
     std::vector<unsigned char> vchPubKey = ParseHex(params[0].get_str());
     CPubKey pubKey(vchPubKey);
@@ -185,7 +194,7 @@ Value verifymessage(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() != 3)
         throw runtime_error(
-            "verifymessage <luxaddress> <signature> <message>\n"
+            "verifymessage <Luxaddress> <signature> <message>\n"
             "Verify a signed message");
 
     string strAddress  = params[0].get_str();
@@ -216,3 +225,43 @@ Value verifymessage(const Array& params, bool fHelp)
 
     return (pubkey.GetID() == keyID);
 }
+
+/*
+    Used for updating/reading spork settings on the network
+*/
+Value spork(const Array& params, bool fHelp)
+{
+    if(params.size() == 1 && params[0].get_str() == "show"){
+        std::map<int, CSporkMessage>::iterator it = mapSporksActive.begin();
+
+        Object ret;
+        while(it != mapSporksActive.end()) {
+            ret.push_back(Pair(sporkManager.GetSporkNameByID(it->second.nSporkID), it->second.nValue));
+            it++;
+        }
+        return ret;
+    } else if (params.size() == 2){
+        int nSporkID = sporkManager.GetSporkIDByName(params[0].get_str());
+        if(nSporkID == -1){
+            return "Invalid spork name";
+        }
+
+        // SPORK VALUE
+        int64_t nValue = params[1].get_int();
+
+        //broadcast new spork
+        if(sporkManager.UpdateSpork(nSporkID, nValue)){
+            return "success";
+        } else {
+            return "failure";
+        }
+
+    }
+
+    throw runtime_error(
+        "spork <name> [<value>]\n"
+        "<name> is the corresponding spork name, or 'show' to show all current spork settings"
+        "<value> is a epoch datetime to enable or disable spork"
+        + HelpRequiringPassphrase());
+}
+

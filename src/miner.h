@@ -9,9 +9,6 @@
 #include "main.h"
 #include "wallet.h"
 
-/** Run the miner threads */
-void GenerateBitcoins(bool fGenerate, CWallet* pwallet, int nThreads);
-
 /* Generate a new block, without valid proof-of-work */
 CBlock* CreateNewBlock(CReserveKey& reservekey, bool fProofOfStake=false, int64_t* pFees = 0);
 

@@ -74,7 +74,7 @@ Object CallRPC(const string& strMethod, const Array& params)
     // Receive HTTP reply message headers and body
     map<string, string> mapHeaders;
     string strReply;
-    ReadHTTPMessage(stream, mapHeaders, strReply, nProto);
+    ReadHTTPMessage(stream, mapHeaders, strReply, nProto, MAX_SIZE);
 
     if (nStatus == HTTP_UNAUTHORIZED)
         throw runtime_error("incorrect rpcuser or rpcpassword (authorization failed)");
@@ -103,8 +103,6 @@ public:
 
 static const CRPCConvertParam vRPCConvertParams[] =
 {
-    { "setgenerate", 0 },
-    { "setgenerate", 1 },
     { "stop", 0 },
     { "getaddednodeinfo", 0 },
     { "sendtoaddress", 1 },
@@ -154,7 +152,10 @@ static const CRPCConvertParam vRPCConvertParams[] =
     { "importprivkey", 2 },
     { "checkkernel", 0 },
     { "checkkernel", 1 },
-    { "submitblock", 1 },
+    { "sendtostealthaddress", 1 },
+    { "searchrawtransactions", 1 },
+    { "searchrawtransactions", 2 },
+    { "searchrawtransactions", 3 },
 };
 
 class CRPCConvertTable

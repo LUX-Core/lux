@@ -26,18 +26,18 @@ using namespace boost;
 using namespace boost::asio;
 using namespace json_spirit;
 
-
+//
 // HTTP protocol
-
+//
 // This ain't Apache.  We're just using HTTP header for the length field
 // and to be compatible with other JSON-RPC implementations.
-
+//
 
 string HTTPPost(const string& strMsg, const map<string,string>& mapRequestHeaders)
 {
     ostringstream s;
     s << "POST / HTTP/1.1\r\n"
-      << "User-Agent: lux-json-rpc/" << FormatFullVersion() << "\r\n"
+      << "User-Agent: Lux-json-rpc/" << FormatFullVersion() << "\r\n"
       << "Host: 127.0.0.1\r\n"
       << "Content-Type: application/json\r\n"
       << "Content-Length: " << strMsg.size() << "\r\n"
@@ -60,7 +60,7 @@ string HTTPReply(int nStatus, const string& strMsg, bool keepalive)
     if (nStatus == HTTP_UNAUTHORIZED)
         return strprintf("HTTP/1.0 401 Authorization Required\r\n"
             "Date: %s\r\n"
-            "Server: lux-json-rpc/%s\r\n"
+            "Server: Lux-json-rpc/%s\r\n"
             "WWW-Authenticate: Basic realm=\"jsonrpc\"\r\n"
             "Content-Type: text/html\r\n"
             "Content-Length: 296\r\n"
@@ -87,7 +87,7 @@ string HTTPReply(int nStatus, const string& strMsg, bool keepalive)
             "Connection: %s\r\n"
             "Content-Length: %u\r\n"
             "Content-Type: application/json\r\n"
-            "Server: lux-json-rpc/%s\r\n"
+            "Server: Lux-json-rpc/%s\r\n"
             "\r\n"
             "%s",
         nStatus,
@@ -177,14 +177,14 @@ int ReadHTTPHeaders(std::basic_istream<char>& stream, map<string, string>& mapHe
 
 int ReadHTTPMessage(std::basic_istream<char>& stream, map<string,
                     string>& mapHeadersRet, string& strMessageRet,
-                    int nProto)
+                    int nProto, size_t max_size)
 {
     mapHeadersRet.clear();
     strMessageRet = "";
 
     // Read header
     int nLen = ReadHTTPHeaders(stream, mapHeadersRet);
-    if (nLen < 0 || nLen > (int)MAX_SIZE)
+    if (nLen < 0 || (size_t)nLen > max_size)
         return HTTP_INTERNAL_SERVER_ERROR;
 
     // Read message
@@ -208,13 +208,15 @@ int ReadHTTPMessage(std::basic_istream<char>& stream, map<string,
     return HTTP_OK;
 }
 
-
+//
 // JSON-RPC protocol.  Bitcoin speaks version 1.0 for maximum compatibility,
 // but uses JSON-RPC 1.1/2.0 standards for parts of the 1.0 standard that were
 // unspecified (HTTP errors and contents of 'error').
 //
-
-
+// 1.0 spec: http://json-rpc.org/wiki/specification
+// 1.2 spec: http://groups.google.com/group/json-rpc/web/json-rpc-over-http
+// http://www.codeproject.com/KB/recipes/JSON_Spirit.aspx
+//
 
 string JSONRPCRequest(const string& strMethod, const Array& params, const Value& id)
 {

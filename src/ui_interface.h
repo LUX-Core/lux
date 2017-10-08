@@ -16,6 +16,7 @@
 class CBasicKeyStore;
 class CWallet;
 class uint256;
+class CAdrenalineNodeConfig;
 
 /** General change type (added, updated, removed). */
 enum ChangeType
@@ -93,6 +94,8 @@ public:
      * @note called with lock cs_mapAlerts held.
      */
     boost::signals2::signal<void (const uint256 &hash, ChangeType status)> NotifyAlertChanged;
+
+    boost::signals2::signal<void (CAdrenalineNodeConfig nodeConfig)> NotifyAdrenalineNodeChanged;
 };
 
 extern CClientUIInterface uiInterface;

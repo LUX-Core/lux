@@ -19,7 +19,6 @@ static const int MODIFIER_INTERVAL_RATIO = 3;
 
 // Compute the hash modifier for proof-of-stake
 bool ComputeNextStakeModifier(const CBlockIndex* pindexPrev, uint64_t& nStakeModifier, bool& fGeneratedStakeModifier);
-uint256 ComputeStakeModifierV2(const CBlockIndex* pindexPrev, const uint256& kernel);
 
 // Check whether stake kernel meets hash target
 // Sets hashProofOfStake on success return

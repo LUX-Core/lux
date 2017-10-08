@@ -6,6 +6,7 @@
 #include "keystore.h"
 #include "script.h"
 
+
 bool CKeyStore::GetPubKey(const CKeyID &address, CPubKey &vchPubKeyOut) const
 {
     CKey key;
@@ -53,3 +54,6 @@ bool CBasicKeyStore::GetCScript(const CScriptID &hash, CScript& redeemScriptOut)
     }
     return false;
 }
+
+
+

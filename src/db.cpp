@@ -84,7 +84,11 @@ bool CDBEnv::Open(boost::filesystem::path pathEnv_)
     dbenv.set_cachesize(nDbCache / 1024, (nDbCache % 1024)*1048576, 1);
     dbenv.set_lg_bsize(1048576);
     dbenv.set_lg_max(10485760);
-    dbenv.set_lk_max_locks(10000);
+
+    // Bugfix: Bump lk_max_locks default to 537000, to safely handle reorgs with up to 5 blocks reversed
+    // dbenv.set_lk_max_locks(10000);
+    dbenv.set_lk_max_locks(537000);
+
     dbenv.set_lk_max_objects(10000);
     dbenv.set_errfile(fopen(pathErrorFile.string().c_str(), "a")); /// debug
     dbenv.set_flags(DB_AUTO_COMMIT, 1);
@@ -206,7 +210,7 @@ bool CDBEnv::Salvage(std::string strFile, bool fAggressive,
     while (!strDump.eof() && keyHex != "DATA=END")
     {
         getline(strDump, keyHex);
-        if (keyHex != "DATA=END")
+        if (keyHex != "DATA_END")
         {
             getline(strDump, valueHex);
             vResult.push_back(make_pair(ParseHex(keyHex),ParseHex(valueHex)));

@@ -16,7 +16,7 @@
 // const unsigned int PRIVATE_KEY_SIZE = 279;
 // const unsigned int PUBLIC_KEY_SIZE  = 65;
 // const unsigned int SIGNATURE_SIZE   = 72;
-
+//
 // see www.keylength.com
 // script supports up to 75 for single byte push
 
@@ -166,12 +166,21 @@ public:
 
     // Derive BIP32 child pubkey.
     bool Derive(CPubKey& pubkeyChild, unsigned char ccChild[32], unsigned int nChild, const unsigned char cc[32]) const;
+
+    // Raw for stealth address
+    std::vector<unsigned char> Raw() const {
+	std::vector<unsigned char> r;
+        r.insert(r.end(), vch, vch+size());
+	return r;
+    }
 };
 
 
 // secure_allocator is defined in allocators.h
 // CPrivKey is a serialized private key, with all parameters included (279 bytes)
 typedef std::vector<unsigned char, secure_allocator<unsigned char> > CPrivKey;
+// CSecret is a serialization of just the secret parameter (32 bytes)
+typedef std::vector<unsigned char, secure_allocator<unsigned char> > CSecret;
 
 /** An encapsulated private key. */
 class CKey {
@@ -270,6 +279,9 @@ public:
 
     // Check whether an element of a signature (r or s) is valid.
     static bool CheckSignatureElement(const unsigned char *vch, int len, bool half);
+
+    // Ensure that signature is DER-encoded
+    static bool ReserealizeSignature(std::vector<unsigned char>& vchSig);
 };
 
 struct CExtPubKey {
@@ -310,7 +322,5 @@ struct CExtKey {
 
 /** Check that required EC support is available at runtime */
 bool ECC_InitSanityCheck(void);
-
-bool EnsureLowS(std::vector<unsigned char>& vchSig);
 
 #endif

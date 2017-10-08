@@ -1,5 +1,4 @@
 // Copyright (c) 2009-2012 The Bitcoin developers
-// Copyright (c) 2017 The Lux Project www.lux.io
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -19,10 +18,20 @@ namespace Checkpoints
 {
     typedef std::map<int, uint256> MapCheckpoints;
 
+    //
+    // What makes a good checkpoint block?
+    // + Is surrounded by blocks with reasonable timestamps
+    //   (no blocks before with a timestamp after, none after with
+    //    timestamp before)
+    // + Contains no strange transactions
+    // Initilised anti exploit protection for checkpoint | Auto checkpoint-back initilised
+
     static MapCheckpoints mapCheckpoints =
         boost::assign::map_list_of
-        (  0,     uint256("0x00000f151b8f9aaff59c95ed6b67071eb20107066cc50c379574a38efd6499ac") ) // Input blockhash 
-        ;
+        ( 0,   uint256("0x") )
+   
+    ;
+
 
     // TestNet has no checkpoints
     static MapCheckpoints mapCheckpointsTestnet;
@@ -59,7 +68,7 @@ namespace Checkpoints
         return NULL;
     }
 
-    // Automatically select a suitable sync-checkpoint 
+    // Automatically select a suitable sync-checkpoint
     const CBlockIndex* AutoSelectSyncCheckpoint()
     {
         const CBlockIndex *pindex = pindexBest;

@@ -27,12 +27,21 @@
 #include <boost/date_time/gregorian/gregorian_types.hpp>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 
+#include <openssl/bio.h>
+#include <openssl/evp.h>
+#include <openssl/buffer.h>
+#include <openssl/crypto.h> // for OPENSSL_cleanse()
+#include <openssl/rand.h>
+#include <openssl/bn.h>
+
 #include <stdint.h>
 
 class uint256;
 
 static const int64_t COIN = 100000000;
 static const int64_t CENT = 1000000;
+
+typedef int64_t CAmount;
 
 #define BEGIN(a)            ((char*)&(a))
 #define END(a)              ((char*)&((&(a))[1]))
@@ -44,6 +53,26 @@ static const int64_t CENT = 1000000;
 #define CVOIDBEGIN(a)        ((const void*)&(a))
 #define UINTBEGIN(a)        ((uint32_t*)&(a))
 #define CUINTBEGIN(a)        ((const uint32_t*)&(a))
+
+/* Format characters for (s)size_t and ptrdiff_t */
+#if defined(_MSC_VER) || defined(__MSVCRT__)
+  /* (s)size_t and ptrdiff_t have the same size specifier in MSVC:
+     http://msdn.microsoft.com/en-us/library/tcxf1dw6%28v=vs.100%29.aspx
+   */
+  #define PRIszx    "Ix"
+  #define PRIszu    "Iu"
+  #define PRIszd    "Id"
+  #define PRIpdx    "Ix"
+  #define PRIpdu    "Iu"
+  #define PRIpdd    "Id"
+#else /* C99 standard */
+  #define PRIszx    "zx"
+  #define PRIszu    "zu"
+  #define PRIszd    "zd"
+  #define PRIpdx    "tx"
+  #define PRIpdu    "tu"
+  #define PRIpdd    "td"
+#endif
 
 // This is needed because the foreach macro can't get over the comma in pair<t1, t2>
 #define PAIRTYPE(t1, t2)    std::pair<t1, t2>
@@ -61,6 +90,8 @@ T* alignup(T* p)
     u.n = (u.n + (nBytes-1)) & ~(nBytes-1);
     return u.ptr;
 }
+
+boost::filesystem::path GetMasternodeConfigFile();
 
 #ifdef WIN32
 #define MSG_NOSIGNAL        0
@@ -83,11 +114,27 @@ inline void MilliSleep(int64_t n)
 #endif
 }
 
+//Dark features
+
+extern bool fMasterNode;
+extern bool fLiteMode;
+extern int nInstantXDepth;
+extern int nDarksendRounds;
+extern int nAnonymizeLuxAmount;
+extern int nLiquidityProvider;
+extern bool fEnableDarksend;
+extern int64_t enforceMasternodePaymentsTime;
+extern std::string strMasterNodeAddr;
+extern int keysLoaded;
+extern bool fSucessfullyLoaded;
+extern std::vector<int64_t> darkSendDenominations;
 
 
 extern std::map<std::string, std::string> mapArgs;
 extern std::map<std::string, std::vector<std::string> > mapMultiArgs;
 extern bool fDebug;
+extern bool fDebugSmsg;
+extern bool fNoSmsg;
 extern bool fPrintToConsole;
 extern bool fPrintToDebugLog;
 extern bool fDaemon;
@@ -100,6 +147,8 @@ extern volatile bool fReopenDebugLog;
 
 void RandAddSeed();
 void RandAddSeedPerfmon();
+
+
 
 /* Return true if log accepts specified category */
 bool LogAcceptCategory(const char* category);
@@ -158,6 +207,8 @@ std::vector<unsigned char> DecodeBase64(const char* p, bool* pfInvalid = NULL);
 std::string DecodeBase64(const std::string& str);
 std::string EncodeBase64(const unsigned char* pch, size_t len);
 std::string EncodeBase64(const std::string& str);
+SecureString DecodeBase64Secure(const SecureString& input);
+SecureString EncodeBase64Secure(const SecureString& input);
 std::vector<unsigned char> DecodeBase32(const char* p, bool* pfInvalid = NULL);
 std::string DecodeBase32(const std::string& str);
 std::string EncodeBase32(const unsigned char* pch, size_t len);
@@ -178,7 +229,12 @@ void ReadConfigFile(std::map<std::string, std::string>& mapSettingsRet, std::map
 #ifdef WIN32
 boost::filesystem::path GetSpecialFolderPath(int nFolder, bool fCreate = true);
 #endif
+
+std::string getTimeString(int64_t timestamp, char *buffer, size_t nBuffer);
+std::string bytesReadable(uint64_t nBytes);
+
 void ShrinkDebugFile();
+void GetRandBytes(unsigned char* buf, int num);
 int GetRandInt(int nMax);
 uint64_t GetRand(uint64_t nMax);
 uint256 GetRandHash();
@@ -191,8 +247,19 @@ void runCommand(std::string strCommand);
 
 
 
+/**
+ * Convert string to signed 32-bit integer with strict parse error feedback.
+ * @returns true if the entire string could be parsed as valid integer,
+ *   false if not the entire string could be parsed or when overflow or underflow occurred.
+ */
+bool ParseInt32(const std::string& str, int32_t *out);
 
 
+/** 
+ * Format a paragraph of text to a fixed width, adding spaces for
+ * indentation to any added line.
+ */
+std::string FormatParagraph(const std::string in, size_t width=79, size_t indent=0);
 
 
 
@@ -508,7 +575,7 @@ inline uint32_t ByteReverse(uint32_t value)
 //    threadGroup.create_thread(boost::bind(&LoopForever<boost::function<void()> >, "nothing", f, milliseconds));
 template <typename Callable> void LoopForever(const char* name,  Callable func, int64_t msecs)
 {
-    std::string s = strprintf("lux-%s", name);
+    std::string s = strprintf("Lux-%s", name);
     RenameThread(s.c_str());
     LogPrintf("%s thread start\n", name);
     try
@@ -534,7 +601,7 @@ template <typename Callable> void LoopForever(const char* name,  Callable func, 
 // .. and a wrapper that just calls func once
 template <typename Callable> void TraceThread(const char* name,  Callable func)
 {
-    std::string s = strprintf("lux-%s", name);
+    std::string s = strprintf("Lux-%s", name);
     RenameThread(s.c_str());
     try
     {

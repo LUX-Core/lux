@@ -14,10 +14,11 @@
 #include <boost/thread/recursive_mutex.hpp>
 
 
-
-                                          
-// THE SIMPLE DEFINITON, EXCLUDING DEBUG CODE 
-
+////////////////////////////////////////////////
+//                                            //
+// THE SIMPLE DEFINITON, EXCLUDING DEBUG CODE //
+//                                            //
+////////////////////////////////////////////////
 
 /*
  
@@ -48,8 +49,11 @@ LEAVE_CRITICAL_SECTION(mutex); // no RAII
 
 
 
-// THE ACTUAL IMPLEMENTATION 
-
+///////////////////////////////
+//                           //
+// THE ACTUAL IMPLEMENTATION //
+//                           //
+///////////////////////////////
 
 // Template mixin that adds -Wthread-safety locking annotations to a
 // subset of the mutex API.

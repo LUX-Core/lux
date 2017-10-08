@@ -12,6 +12,7 @@
 
 #include <stdio.h>
 
+class CScript;
 class CTransaction;
 
 /** An outpoint - a combination of a transaction hash and an index n into its vout */
@@ -70,6 +71,7 @@ class CTxIn
 public:
     COutPoint prevout;
     CScript scriptSig;
+    CScript prevPubKey;
     unsigned int nSequence;
 
     CTxIn()
@@ -84,7 +86,7 @@ public:
         nSequence = nSequenceIn;
     }
 
-    CTxIn(uint256 hashPrevTx, unsigned int nOut, CScript scriptSigIn=CScript(), unsigned int nSequenceIn=std::numeric_limits<unsigned int>::max())
+    explicit CTxIn(uint256 hashPrevTx, unsigned int nOut, CScript scriptSigIn=CScript(), unsigned int nSequenceIn=std::numeric_limits<unsigned int>::max())
     {
         prevout = COutPoint(hashPrevTx, nOut);
         scriptSig = scriptSigIn;
@@ -185,12 +187,6 @@ public:
     uint256 GetHash() const
     {
         return SerializeHash(*this);
-    }
-
-    bool IsUnspendable() const
-    {
-        return IsEmpty() ||
-               (scriptPubKey.size() > 0 && *scriptPubKey.begin() == OP_RETURN);
     }
 
     friend bool operator==(const CTxOut& a, const CTxOut& b)

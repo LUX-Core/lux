@@ -6,7 +6,6 @@
 #define BITCOIN_TXMEMPOOL_H
 
 #include "core.h"
-#include "sync.h"
 
 /*
  * CTxMemPool stores valid-according-to-the-current-best-chain

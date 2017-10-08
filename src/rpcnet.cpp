@@ -1,4 +1,6 @@
 // Copyright (c) 2009-2012 Bitcoin Developers
+// Distributed under the MIT/X11 software license, see the accompanying
+// file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "rpcserver.h"
 
@@ -83,7 +85,7 @@ Value getpeerinfo(const Array& params, bool fHelp)
         obj.push_back(Pair("bytessent", (int64_t)stats.nSendBytes));
         obj.push_back(Pair("bytesrecv", (int64_t)stats.nRecvBytes));
         obj.push_back(Pair("conntime", (int64_t)stats.nTimeConnected));
-        obj.push_back(Pair("timeoffset", stats.nTimeOffset));
+		//obj.push_back(Pair("timeoffset", stats.nTimeOffset));
         obj.push_back(Pair("pingtime", stats.dPingTime));
         if (stats.dPingWait > 0.0)
             obj.push_back(Pair("pingwait", stats.dPingWait));

@@ -1,6 +1,8 @@
 // Copyright (c) 2010 Satoshi Nakamoto
 // Copyright (c) 2009-2012 The Bitcoin developers
-// Copyright (c) 2017 The LUXoin developers
+// Distributed under the MIT/X11 software license, see the accompanying
+// file COPYING or http://www.opensource.org/licenses/mit-license.php.
+// Masternode initilized & modified by 216k155. Used at your own risk.
 
 #include "assert.h"
 
@@ -19,17 +21,16 @@ struct SeedSpec6 {
 
 #include "chainparamsseeds.h"
 
+// Main network
+// Follow my guide to generate new genesis block
 
-
-
-// Mainnet
-// Need some more configure to generate new genesis block. Note: we hide our genesis block & hashMerkleRoot for later start. 
 // Convert the pnSeeds6 array into usable address objects.
 static void convertSeed6(std::vector<CAddress> &vSeedsOut, const SeedSpec6 *data, unsigned int count)
 {
     // It'll only connect to one or two seed nodes because once it connects,
     // it'll get a pile of addresses with newer timestamps.
-
+    // Seed nodes are given a random 'last seen time' of between one and two
+    // weeks ago.
     const int64_t nOneWeek = 7*24*60*60;
     for (unsigned int i = 0; i < count; i++)
     {
@@ -47,54 +48,56 @@ public:
         // The message start string is designed to be unlikely to occur in normal data.
         // The characters are rarely used upper ASCII, not valid as UTF-8, and produce
         // a large 4-byte int at any alignment.
-        pchMessageStart[0] = 0xdf;
-        pchMessageStart[1] = 0xe2;
-        pchMessageStart[2] = 0xa2;
-        pchMessageStart[3] = 0xcd;
-        vAlertPubKey = ParseHex("0486cce1bac0d543f104cbff2bd23680056a3b9ea05e1137d2ff90eeb5e08472eb500322593a2cb06fbf8297d7beb6cd30cb90f98153b5b7cce1493749e41e0284");
-        nDefaultPort = 6006;
-        nRPCPort = 9009;
+        pchMessageStart[0] = 0x68; // Modified pch messagestart by 216k155. 
+        pchMessageStart[1] = 0x78;
+        pchMessageStart[2] = 0x88;
+        pchMessageStart[3] = 0x98;
+        vAlertPubKey = ParseHex("042d13c016ed91528241bcff222989769417eb10cdb679228c91e26e26900eb9fd053cd9f16a9a2894ad5ebbd551be1a4bd23bd55023679be17f0bd3a16e6fbeba"); // Lux coin modified pubkey 
+        nDefaultPort = 28886;
+        nRPCPort = 9898;
         bnProofOfWorkLimit = CBigNum(~uint256(0) >> 20);
 
         // Build the genesis block. Note that the output of the genesis coinbase cannot
         // be spent as it did not originally exist in the database.
-
-        const char* pszTimestamp = "THE NEW IMPLEMENTATION OF PHI1612 HASH - TEST v3.2"; // Input random pszTimestamp to generate new genesis block
+        
+   
+        const char* pszTimestamp = "Lux - Implemented New PHI Algo PoW/PoS Hybird - Parallel Masternode By 216k155"; //Input Timestap to generate new genesisblock
         std::vector<CTxIn> vin;
         vin.resize(1);
         vin[0].scriptSig = CScript() << 0 << CBigNum(42) << vector<unsigned char>((const unsigned char*)pszTimestamp, (const unsigned char*)pszTimestamp + strlen(pszTimestamp));
         std::vector<CTxOut> vout;
         vout.resize(1);
         vout[0].SetEmpty();
-        CTransaction txNew(1, 1507321521, vin, vout, 0);
+        CTransaction txNew(1, 1507458571, vin, vout, 0); // epochtime 08/10/2017
         genesis.vtx.push_back(txNew);
         genesis.hashPrevBlock = 0;
         genesis.hashMerkleRoot = genesis.BuildMerkleTree();
         genesis.nVersion = 1;
-        genesis.nTime    = 1507321521; // Replace epochtime to generate new genesis block
-        genesis.nBits    = bnProofOfWorkLimit.GetCompact();
-        genesis.nNonce   = 2230623; // Input nNonce 
-        
-        // Comment assert to generate genesis block and hash merkle root
-        // Get hashMerkleRoot by using ./luxd getblock {Genesis-Block} 
+        genesis.nTime    = 1507458571; // epochtime 08/10/2017
+        genesis.nBits    = 0x1e0fffff; // Generated nBits. Input right nBits to prevent nBits below minimum works error 
+        genesis.nNonce   = 1681290; // Input nNonce 0
+
+        // Generate genesis hash should take a while as exploit protection active in main.cpp
+        // Anti exploitation activated. Note: need to wait until the generation finished for the right genesis block generated. Otherwise none of them are valid
+
         hashGenesisBlock = genesis.GetHash();
-        assert(hashGenesisBlock == uint256("0x00000f151b8f9aaff59c95ed6b67071eb20107066cc50c379574a38efd6499ac")); // Add Genesisblock 
-        assert(genesis.hashMerkleRoot == uint256("0x12caa02399f4a059dbaa53d126e1c86655298e26892cb4c6803ffcd78122e3e1")); // Add hashMerkleRoot
+        
+        assert(hashGenesisBlock == uint256("0x000006dd8c2aeaeb0430d65bff23b2f9f736e8ac0390b9d94d6a0a3b2fd0bd85")); 
+        assert(genesis.hashMerkleRoot == uint256("0xc1d10e1bc7a27d910dfa24c2f470d9da92ba1696c1a677ce9f3166c1e1ac29e5"));
+            
 
-        //MineGenesis(genesis);
+        vSeeds.push_back(CDNSSeedData("sd1", "45.32.245.217"));
 
-        vSeeds.push_back(CDNSSeedData("45.63.25.110", "45.32.245.217")); // Add seednode for later start
 
-        base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1, 25); //
-        base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1, 125);
-        base58Prefixes[SECRET_KEY] =     std::vector<unsigned char>(1, (63+128));
-        base58Prefixes[EXT_PUBLIC_KEY] = boost::assign::list_of(0x03)(0x82)(0xC8)(0x6E).convert_to_container<std::vector<unsigned char> >();
-        base58Prefixes[EXT_SECRET_KEY] = boost::assign::list_of(0x03)(0x82)(0xB6)(0x5D).convert_to_container<std::vector<unsigned char> >();
+        base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,48); // LUX Start letter L
+        base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1,5); //symbol 3
+        base58Prefixes[SECRET_KEY] =     std::vector<unsigned char>(1,155);
+        base58Prefixes[EXT_PUBLIC_KEY] = list_of(0x04)(0x88)(0xB2)(0x1E).convert_to_container<std::vector<unsigned char> >();
+        base58Prefixes[EXT_SECRET_KEY] = list_of(0x04)(0x88)(0xAD)(0xE4).convert_to_container<std::vector<unsigned char> >();
 
         convertSeed6(vFixedSeeds, pnSeed6_main, ARRAYLEN(pnSeed6_main));
 
-        nLastPOWBlock = 1000000;
-        nPOSStartBlock = 10000;
+        nLastPOWBlock = 6000000; // PoW end at block 6m
     }
 
     virtual const CBlock& GenesisBlock() const { return genesis; }
@@ -112,41 +115,40 @@ static CMainParams mainParams;
 
 
 // Testnet
-// Dont need to modifiled anything under this line
+// Dont need to configure anything under this line
 //------------------------------------------------//
+
 class CTestNetParams : public CMainParams {
 public:
     CTestNetParams() {
-      
-        pchMessageStart[0] = 0x62;
-        pchMessageStart[1] = 0x44;
-        pchMessageStart[2] = 0x85;
-        pchMessageStart[3] = 0x11;
-
+        // The message start string is designed to be unlikely to occur in normal data.
+        // The characters are rarely used upper ASCII, not valid as UTF-8, and produce
+        // a large 4-byte int at any alignment.
+        pchMessageStart[0] = 0xe1;
+        pchMessageStart[1] = 0xc4;
+        pchMessageStart[2] = 0xf8;
+        pchMessageStart[3] = 0x21;
         bnProofOfWorkLimit = CBigNum(~uint256(0) >> 16);
-        vAlertPubKey = ParseHex("0471sc261db490094d35cde15b1f5d755fa6ad6f2b5ed0f340e3f17f57389c3c2af113a8cbcc885bde73305a553b5640c83021128008ddf882e856336269080496");
-        nDefaultPort = 26178;
-        nRPCPort = 26174;
-
+        vAlertPubKey = ParseHex("04cc24ab003c828cdd9cf4db2ebbde8e1cecb3bbfa8b3127fcb9dd9b84d44112080827ed7c49a648af9fe788ff42e316aee665879c553f099e55299d6b54edd7e0"); // input pubkey for later start
+        nDefaultPort = 18065;
+        nRPCPort = 15075;
         strDataDir = "testnet";
+
         // Modify the testnet genesis block so the timestamp is valid for a later start.
-        genesis.nBits  = bnProofOfWorkLimit.GetCompact();
-        genesis.nNonce = 0; // Input nNonce after generated genesis block for testnet used
-        genesis.nTime    = 1507278322;
-  
-        //hashGenesisBlock = genesis.GetHash();
-         
-        //assert(hashGenesisBlock == uint256("0x"));
+        genesis.nBits  = 0x1e0fffff; //504365055 Decimal Number
+        genesis.nTime    = 1504344001;
+        genesis.nNonce = 1454059; // nNonce testnet should be 0
+
+        //assert(hashGenesisBlock == uint256("0x")); // need to generate new genesis block for later start
 
         vFixedSeeds.clear();
         vSeeds.clear();
-        vSeeds.push_back(CDNSSeedData("", "")); // Add seednode for later start
 
-        base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1, 62); 
-        base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1, 196);
-        base58Prefixes[SECRET_KEY]     = std::vector<unsigned char>(1, 65 + 128);
-        base58Prefixes[EXT_PUBLIC_KEY] = boost::assign::list_of(0x04)(0x35)(0x87)(0xCF).convert_to_container<std::vector<unsigned char> >();
-        base58Prefixes[EXT_SECRET_KEY] = boost::assign::list_of(0x04)(0x35)(0x83)(0x94).convert_to_container<std::vector<unsigned char> >();
+        base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,77); // random letter input for testnet
+        base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1,192);
+        base58Prefixes[SECRET_KEY]     = std::vector<unsigned char>(1,239);
+        base58Prefixes[EXT_PUBLIC_KEY] = list_of(0x04)(0x35)(0x87)(0xCF).convert_to_container<std::vector<unsigned char> >();
+        base58Prefixes[EXT_SECRET_KEY] = list_of(0x04)(0x35)(0x83)(0x94).convert_to_container<std::vector<unsigned char> >();
 
         convertSeed6(vFixedSeeds, pnSeed6_test, ARRAYLEN(pnSeed6_test));
 
@@ -156,37 +158,6 @@ public:
 };
 static CTestNetParams testNetParams;
 
-
-
-// Regression test
-// Dont need to modified anything under this line
-//------------------------------------------------//
-class CRegTestParams : public CTestNetParams {
-public:
-    CRegTestParams() {
-        pchMessageStart[0] = 0xf2;
-        pchMessageStart[1] = 0xbe;
-        pchMessageStart[2] = 0xb8;
-        pchMessageStart[3] = 0xd1;
-        bnProofOfWorkLimit = CBigNum(~uint256(0) >> 1);
-        genesis.nTime = 1506923060;
-        genesis.nBits  = bnProofOfWorkLimit.GetCompact();
-        genesis.nNonce = 1815802; // Random nNonce for testing purposed
-        hashGenesisBlock = genesis.GetHash();
-        nDefaultPort = 18444;
-        strDataDir = "regtest";
-
-        // Comment asser to generate genesis block for regtest
-        //MineGenesis(genesis);
-        //assert(hashGenesisBlock == uint256(""));
-
-        vSeeds.clear();  // Regtest mode doesn't have any DNS seeds.
-    }
-
-    virtual bool RequireRPCPassword() const { return false; }
-    virtual Network NetworkID() const { return CChainParams::REGTEST; }
-};
-static CRegTestParams regTestParams;
 
 static CChainParams *pCurrentParams = &mainParams;
 
@@ -202,9 +173,6 @@ void SelectParams(CChainParams::Network network) {
         case CChainParams::TESTNET:
             pCurrentParams = &testNetParams;
             break;
-        case CChainParams::REGTEST:
-            pCurrentParams = &regTestParams;
-            break;
         default:
             assert(false && "Unimplemented network");
             return;
@@ -212,16 +180,10 @@ void SelectParams(CChainParams::Network network) {
 }
 
 bool SelectParamsFromCommandLine() {
-    bool fRegTest = GetBoolArg("-regtest", false);
+
     bool fTestNet = GetBoolArg("-testnet", false);
 
-    if (fTestNet && fRegTest) {
-        return false;
-    }
-
-    if (fRegTest) {
-        SelectParams(CChainParams::REGTEST);
-    } else if (fTestNet) {
+    if (fTestNet) {
         SelectParams(CChainParams::TESTNET);
     } else {
         SelectParams(CChainParams::MAIN);

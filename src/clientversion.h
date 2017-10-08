@@ -1,9 +1,9 @@
 #ifndef CLIENTVERSION_H
 #define CLIENTVERSION_H
 
-//
+
 // client versioning
-//
+
 
 // These need to be macros, as version.cpp's and bitcoin-qt.rc's voodoo requires it
 #define CLIENT_VERSION_MAJOR       1

@@ -16,13 +16,14 @@ using namespace std;
 static CCriticalSection cs_nTimeOffset;
 static int64_t nTimeOffset = 0;
 
-
+//
 // "Never go to sea with two chronometers; take one or three."
 // Our three time sources are:
 //  - System clock
 //  - Median of other nodes clocks
-
-
+//  - The user (asking the user to fix the system clock if the first two disagree)
+//
+//
 int64_t GetTimeOffset()
 {
     LOCK(cs_nTimeOffset);
@@ -34,20 +35,18 @@ int64_t GetAdjustedTime()
     return GetTime() + GetTimeOffset();
 }
 
-#define BITCOIN_TIMEDATA_MAX_SAMPLES 200
-
-void AddTimeData(const CNetAddr& ip, int64_t nOffsetSample)
+void AddTimeData(const CNetAddr& ip, int64_t nTime)
 {
+    int64_t nOffsetSample = nTime - GetTime();
+
     LOCK(cs_nTimeOffset);
     // Ignore duplicates
     static set<CNetAddr> setKnown;
-    if (setKnown.size() == BITCOIN_TIMEDATA_MAX_SAMPLES)
-        return;
     if (!setKnown.insert(ip).second)
         return;
 
     // Add data
-    static CMedianFilter<int64_t> vTimeOffsets(BITCOIN_TIMEDATA_MAX_SAMPLES, 0);
+    static CMedianFilter<int64_t> vTimeOffsets(200,0);
     vTimeOffsets.input(nOffsetSample);
     LogPrintf("Added time data, samples %d, offset %+d (%+d minutes)\n", vTimeOffsets.size(), nOffsetSample, nOffsetSample/60);
 

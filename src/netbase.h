@@ -24,7 +24,7 @@ enum Network
     NET_IPV4,
     NET_IPV6,
     NET_TOR,
-    NET_I2P,
+    NET_I2P, // Remote activation i2pd
 
     NET_MAX,
 };

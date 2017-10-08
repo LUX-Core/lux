@@ -8,6 +8,8 @@
 #include "key.h"
 #include "sync.h"
 #include <boost/signals2/signal.hpp>
+#include "script.h"
+
 
 class CScript;
 
@@ -89,5 +91,7 @@ public:
 };
 
 typedef std::map<CKeyID, std::pair<CPubKey, std::vector<unsigned char> > > CryptedKeyMap;
+
+
 
 #endif
