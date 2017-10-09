@@ -704,12 +704,12 @@
             </font>
            </property>
            <property name="text">
-            <string>TX Available:</string>
+            <string>LUX Available:</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QLabel" name="TXAvailableLabel">
+          <widget class="QLabel" name="LUXAvailableLabel">
            <property name="palette">
             <palette>
              <active>
@@ -1140,7 +1140,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QLabel" name="labelTX">
+          <widget class="QLabel" name="labelLUX">
            <property name="font">
             <font>
              <weight>75</weight>
@@ -1148,7 +1148,7 @@
             </font>
            </property>
            <property name="text">
-            <string> TX</string>
+            <string> LUX</string>
            </property>
           </widget>
          </item>
@@ -1186,7 +1186,7 @@
        <item row="4" column="4">
         <widget class="QLabel" name="label_4">
          <property name="text">
-          <string>TX</string>
+          <string>LUX</string>
          </property>
         </widget>
        </item>
@@ -1203,7 +1203,7 @@
         </widget>
        </item>
        <item row="4" column="9">
-        <widget class="QLineEdit" name="UnitsInputTX">
+        <widget class="QLineEdit" name="UnitsInputLUX">
          <property name="minimumSize">
           <size>
            <width>0</width>
@@ -1222,7 +1222,7 @@
        <item row="4" column="10">
         <widget class="QLabel" name="label_22">
          <property name="text">
-          <string>TX</string>
+          <string>LUX</string>
          </property>
         </widget>
        </item>
@@ -2237,16 +2237,16 @@
         </layout>
        </item>
        <item row="7" column="3">
-        <widget class="QPushButton" name="BuyTX">
+        <widget class="QPushButton" name="BuyLUX">
          <property name="text">
-          <string>Buy TX</string>
+          <string>Buy LUX</string>
          </property>
         </widget>
        </item>
        <item row="7" column="9">
-        <widget class="QPushButton" name="SellTXBTN">
+        <widget class="QPushButton" name="SellLUXBTN">
          <property name="text">
-          <string>Sell TX</string>
+          <string>Sell LUX</string>
          </property>
         </widget>
        </item>
@@ -2313,14 +2313,14 @@
         </widget>
        </item>
        <item row="0" column="1" colspan="5">
-        <widget class="QLabel" name="TXDemand">
+        <widget class="QLabel" name="LUXDemand">
          <property name="font">
           <font>
            <pointsize>8</pointsize>
           </font>
          </property>
          <property name="text">
-          <string>Demand: 0.00000000 TX</string>
+          <string>Demand: 0.00000000 LUX</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -2328,9 +2328,9 @@
         </widget>
        </item>
        <item row="0" column="9" colspan="3">
-        <widget class="QLabel" name="TXSupply">
+        <widget class="QLabel" name="LUXSupply">
          <property name="text">
-          <string>Supply: 0.00000000 TX</string>
+          <string>Supply: 0.00000000 LUX</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -2830,7 +2830,7 @@
             </font>
            </property>
            <property name="text">
-            <string>Amount in TX:</string>
+            <string>Amount in LUX:</string>
            </property>
           </widget>
          </item>
@@ -3279,7 +3279,7 @@
             </font>
            </property>
            <property name="text">
-            <string>TX</string>
+            <string>LUX</string>
            </property>
           </widget>
          </item>
@@ -3797,7 +3797,7 @@
           </font>
          </property>
          <property name="text">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-weight:600; text-decoration: underline;&quot;&gt;Instructions:&lt;/span&gt;&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;To use the cross sending feature you need to have &lt;/p&gt;&lt;p align=&quot;center&quot;&gt;TX available to spend on Bittrex. If you don't have any &lt;/p&gt;&lt;p align=&quot;center&quot;&gt;you can find your deposit address on the &amp;quot;Balance&amp;quot; tab.&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;1. Enter the amount you want to receive in Bitcoin.&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;2. Enter the Bitcoin address you are sending to.&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;3. Check that the Total with fee's is correct.&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;4. Press send and watch the magic happen.&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-weight:600; text-decoration: underline;&quot;&gt;Notes.&lt;/span&gt;&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:7pt;&quot;&gt;Total w/ fees: N/A means you dont have enough TX to sell !&lt;/span&gt;&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:7pt;&quot;&gt;All trades are done through Bittrex using your own balance and API keys.&lt;/span&gt;&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:7pt;&quot;&gt;Encrypt and backup your wallet when using this feature.&lt;/span&gt;&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:7pt;&quot;&gt;If you don't have a password you bittrex account will be accessible 24/7&lt;/span&gt;&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:7pt;&quot;&gt;Withdrawal fee of 0.002 and 0.25% taken by Bittrex.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-weight:600; text-decoration: underline;&quot;&gt;Instructions:&lt;/span&gt;&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;To use the cross sending feature you need to have &lt;/p&gt;&lt;p align=&quot;center&quot;&gt;LUX available to spend on Bittrex. If you don't have any &lt;/p&gt;&lt;p align=&quot;center&quot;&gt;you can find your deposit address on the &amp;quot;Balance&amp;quot; tab.&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;1. Enter the amount you want to receive in Bitcoin.&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;2. Enter the Bitcoin address you are sending to.&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;3. Check that the Total with fee's is correct.&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;4. Press send and watch the magic happen.&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-weight:600; text-decoration: underline;&quot;&gt;Notes.&lt;/span&gt;&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:7pt;&quot;&gt;Total w/ fees: N/A means you dont have enough LUX to sell !&lt;/span&gt;&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:7pt;&quot;&gt;All trades are done through Bittrex using your own balance and API keys.&lt;/span&gt;&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:7pt;&quot;&gt;Encrypt and backup your wallet when using this feature.&lt;/span&gt;&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:7pt;&quot;&gt;If you don't have a password you bittrex account will be accessible 24/7&lt;/span&gt;&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:7pt;&quot;&gt;Withdrawal fee of 0.002 and 0.25% taken by Bittrex.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
         </widget>
        </item>
@@ -3865,12 +3865,12 @@
             </font>
            </property>
            <property name="text">
-            <string>TX Balance:</string>
+            <string>LUX Balance:</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QLabel" name="BittrexTXLabel">
+          <widget class="QLabel" name="BittrexLUXLabel">
            <property name="palette">
             <palette>
              <active>
@@ -4314,7 +4314,7 @@
             </font>
            </property>
            <property name="text">
-            <string>TX</string>
+            <string>LUX</string>
            </property>
           </widget>
          </item>
@@ -4917,12 +4917,12 @@
           </font>
          </property>
          <property name="text">
-          <string>TX Balance:</string>
+          <string>LUX Balance:</string>
          </property>
         </widget>
        </item>
        <item row="0" column="3">
-        <widget class="QLabel" name="TXBalanceLabel">
+        <widget class="QLabel" name="LUXBalanceLabel">
          <property name="font">
           <font>
            <pointsize>10</pointsize>
@@ -4988,12 +4988,12 @@
           </font>
          </property>
          <property name="text">
-          <string>TX Available:</string>
+          <string>LUX Available:</string>
          </property>
         </widget>
        </item>
        <item row="1" column="3">
-        <widget class="QLabel" name="TXAvailableLabel_2">
+        <widget class="QLabel" name="LUXAvailableLabel_2">
          <property name="font">
           <font>
            <pointsize>10</pointsize>
@@ -5046,12 +5046,12 @@
           </font>
          </property>
          <property name="text">
-          <string>TX Pending:</string>
+          <string>LUX Pending:</string>
          </property>
         </widget>
        </item>
        <item row="2" column="3">
-        <widget class="QLabel" name="TXPendingLabel">
+        <widget class="QLabel" name="LUXPendingLabel">
          <property name="font">
           <font>
            <pointsize>10</pointsize>
@@ -5102,7 +5102,7 @@
           </font>
          </property>
          <property name="text">
-          <string>Generate TX Coin Deposit Address</string>
+          <string>Generate LUX Coin Deposit Address</string>
          </property>
         </widget>
        </item>
@@ -5237,7 +5237,7 @@
           </font>
          </property>
          <property name="text">
-          <string>Withdraw TX:</string>
+          <string>Withdraw LUX:</string>
          </property>
         </widget>
        </item>
@@ -5356,9 +5356,9 @@
       <zorder>label_13</zorder>
       <zorder>label_11</zorder>
       <zorder>BitcoinBalanceLabel</zorder>
-      <zorder>TXBalanceLabel</zorder>
-      <zorder>TXAvailableLabel_2</zorder>
-      <zorder>TXPendingLabel</zorder>
+      <zorder>LUXBalanceLabel</zorder>
+      <zorder>LUXAvailableLabel_2</zorder>
+      <zorder>LUXPendingLabel</zorder>
       <zorder>BitcoinAvailableLabel</zorder>
       <zorder>BitcoinPendingLabel</zorder>
       <zorder>label_33</zorder>
