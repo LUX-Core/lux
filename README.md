@@ -13,6 +13,16 @@ Based on a new PHI1612 PoW/PoS Hybrid Algorithm.
 -----------------------------
 
 Lux Detail:
+-----------
+lux.conf
+	server=1
+	daemon=1
+	listen=1
+	rpcuser=your-user-name
+	rpcpassword=your-password
+	rpcport=9898
+	rpcallowip=127.0.0.1
+	staking=1
 
 PoW rewards
 -----------
@@ -77,7 +87,7 @@ PoS rewards
 	}
 
 Masternodes Requirement:
-
+------------------------
 	static const int64_t DARKSEND_COLLATERAL = (16120*COIN);    //161.20 LUX 
 	static const int64_t DARKSEND_FEE = (0.002*COIN);
 	static const int64_t DARKSEND_POOL_MAX = (1999999.99*COIN);
