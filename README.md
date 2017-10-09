@@ -16,12 +16,19 @@ Lux Detail:
 -----------
 lux.conf
 	server=1
+
 	daemon=1
+
 	listen=1
+
 	rpcuser=your-user-name
+
 	rpcpassword=your-password
+
 	rpcport=9898
+
 	rpcallowip=127.0.0.1
+
 	staking=1
 
 PoW rewards
