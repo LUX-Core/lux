@@ -75,15 +75,15 @@ public:
         genesis.nVersion = 1;
         genesis.nTime    = 1507458571; // epochtime 08/10/2017
         genesis.nBits    = 0x1e0fffff; // Generated nBits. Input right nBits to prevent nBits below minimum works error 
-        genesis.nNonce   = 1681290; // Input nNonce 0
+        genesis.nNonce   = 0; // Input nNonce 0
 
         // Generate genesis hash should take a while as exploit protection active in main.cpp
         // Anti exploitation activated. Note: need to wait until the generation finished for the right genesis block generated. Otherwise none of them are valid
 
         hashGenesisBlock = genesis.GetHash();
         
-        assert(hashGenesisBlock == uint256("0x000006dd8c2aeaeb0430d65bff23b2f9f736e8ac0390b9d94d6a0a3b2fd0bd85")); 
-        assert(genesis.hashMerkleRoot == uint256("0xc1d10e1bc7a27d910dfa24c2f470d9da92ba1696c1a677ce9f3166c1e1ac29e5"));
+        //assert(hashGenesisBlock == uint256("0x")); 
+        //assert(genesis.hashMerkleRoot == uint256("0x"));
             
 
         vSeeds.push_back(CDNSSeedData("sd1", "45.32.245.217"));

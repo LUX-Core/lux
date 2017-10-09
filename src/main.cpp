@@ -1107,9 +1107,9 @@ int64_t GetProofOfWorkReward(int64_t nFees, int nHeight)
 {
     int64_t nSubsidy = 1 * COIN;
 
-    if(pindexBest->nHeight <= 1)
+    if(pindexBest->nHeight == 1)
     {
-        nSubsidy = 300000 * COIN;                     // Initilised static pre-mine. 
+        nSubsidy = 3000000 * COIN;                     // Initilised static pre-mine. 
     }
         else if(pindexBest->nHeight < 500)             // First halving - Activated instamine protection 
     {
@@ -1119,7 +1119,7 @@ int64_t GetProofOfWorkReward(int64_t nFees, int nHeight)
     {
         nSubsidy = 10 * COIN;  // ~10m
     }
-        else if(pindexBest->nHeight < 1001000)         // Third halving - Superblock wards | Happy Birthday Lux 1 Year | 10/10/2018 | 30 LUX/block reward 
+        else if(pindexBest->nHeight < 1001000)         // Third halving - Superblock rewards | Happy Birthday Lux 1 Year | 10/10/2018 | 30 LUX/block reward 
     {
         nSubsidy = 30 * COIN;  // ~30,000 reward to miner
     }
