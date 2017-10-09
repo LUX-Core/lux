@@ -33,17 +33,25 @@ lux.conf
 
 PoW rewards
 -----------
+	// miner's coin base reward
+	// First block reward                              -----------------------(Official reward)---------------------------
+	// Initilised B'd reward for LUX at block 1001000  -----------------------(Special event)-----------------------------
+
     int64_t GetProofOfWorkReward(int64_t nFees, int nHeight)
-	{
+    {
     int64_t nSubsidy = 1 * COIN;
 
     if(pindexBest->nHeight == 1)
     {
-        nSubsidy = 3000000 * COIN;                     // Initilised static pre-mine. 
+        nSubsidy = 3000000 * COIN;                     // Initilised static pre-mine
     }
         else if(pindexBest->nHeight < 500)             // First halving - Activated instamine protection 
     {
-        nSubsidy = 1 * COIN;  // ~500
+        nSubsidy = 1 * COIN;   // ~500
+    }
+        else if(pindexBest->nHeight == 501)            // Official Bonus Rewards 
+    {
+        nSubsidy = 1000 * COIN; // 1000                // 1000 LUX for the first block mined after instamine protection
     }
         else if(pindexBest->nHeight < 1000000)         // Second halving - Initilised normal blockchain
     {
@@ -99,7 +107,8 @@ Masternodes Requirement:
 	static const int64_t DARKSEND_FEE = (0.002*COIN);
 	static const int64_t DARKSEND_POOL_MAX = (1999999.99*COIN);
 
-===========================
+# Develop process before launch
+===============================
 
 01/10/2017 -----> PHI1612 hash initilized, replaced novacoin-qt, json, add intallised-dependencies.sh, changed qt/res,etc....
 
