@@ -1,0 +1,34 @@
+Source: i2pd
+Section: net
+Priority: optional
+Maintainer: R4SAS <r4sas@i2pmail.org>
+Build-Depends: debhelper (>= 9), dpkg-dev (>= 1.16.1~), gcc (>= 4.7) | clang (>= 3.3), libboost-system-dev (>= 1.46), libboost-date-time-dev, libboost-filesystem-dev, libboost-program-options-dev, libminiupnpc-dev, libssl-dev, zlib1g-dev
+Standards-Version: 3.9.6
+Homepage: http://i2pd.website/
+Vcs-Git: git://github.com/PurpleI2P/i2pd.git
+Vcs-Browser: https://github.com/PurpleI2P/i2pd.git
+
+Package: i2pd
+Architecture: any
+Pre-Depends: adduser
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Suggests: tor, privoxy
+Description: A full-featured C++ implementation of I2P client.
+ I2P (Invisible Internet Protocol) is a universal anonymous network layer. All
+ communications over I2P are anonymous and end-to-end encrypted, participants
+ don't reveal their real IP addresses.
+ .
+ This package contains the full-featured C++ implementation of I2P router.
+
+Package: i2pd-dbg
+Architecture: any
+Priority: extra
+Section: debug
+Depends: i2pd (= ${binary:Version}), ${misc:Depends}
+Suggests: gdb
+Description: i2pd debugging symbols
+ I2P (Invisible Internet Protocol) is a universal anonymous network layer. All
+ communications over I2P are anonymous and end-to-end encrypted, participants
+ don't reveal their real IP addresses.
+ .
+ This package contains symbols required for debugging.

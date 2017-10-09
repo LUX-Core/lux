@@ -1,0 +1,49 @@
+version: 2.15.{build}
+pull_requests:
+  do_not_increment_build_number: true
+branches:
+  only:
+  - openssl
+skip_tags: true
+os: Visual Studio 2015
+shallow_clone: true
+clone_depth: 1
+
+environment:
+  MSYS2_PATH_TYPE: inherit
+  CHERE_INVOKING: enabled_from_arguments
+  matrix:
+  - MSYSTEM: MINGW64
+  - MSYSTEM: MINGW32
+
+install:
+- c:\msys64\usr\bin\bash -lc "pacman --noconfirm -Rns gcc-fortran gcc"
+- c:\msys64\usr\bin\bash -lc "pacman --noconfirm -Syuu"
+
+- c:\msys64\usr\bin\bash -lc "pacman --noconfirm -Syuu"
+
+- if "%MSYSTEM%" == "MINGW64" (
+    c:\msys64\usr\bin\bash -lc "pacman --noconfirm -S mingw-w64-x86_64-boost mingw-w64-x86_64-miniupnpc"
+  ) else (
+    c:\msys64\usr\bin\bash -lc "pacman --noconfirm -S mingw-w64-i686-boost mingw-w64-i686-miniupnpc"
+  )
+
+- if "%MSYSTEM%" == "MINGW64" (
+    set "bitness=64"
+  ) else (
+    set "bitness=32"
+  )
+
+build_script:
+- cmd: >-
+    cd \projects\i2pd
+
+    echo MSYSTEM = %MSYSTEM%, bitness = %bitness%
+
+- c:\msys64\usr\bin\bash -lc "make USE_UPNP=yes -j2"
+- 7z a -tzip -mx9 -mmt i2pd-mingw-win%bitness%.zip i2pd.exe
+
+test: off
+
+artifacts:
+- path: i2pd-mingw-win*.zip
