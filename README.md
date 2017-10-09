@@ -14,6 +14,8 @@ Based on a new PHI1612 PoW/PoS Hybrid Algorithm.
 
 Lux Detail:
 
+PoW rewards
+-----------
     int64_t GetProofOfWorkReward(int64_t nFees, int nHeight)
 	{
     int64_t nSubsidy = 1 * COIN;
@@ -52,7 +54,9 @@ Lux Detail:
     return nSubsidy + nFees;
 	} 
 
-	// miner's coin stake reward based on coin age spent (coin-days)
+PoS rewards
+-----------
+	// Miner's coin stake reward based on coin age spent (coin-days)
 	int64_t GetProofOfStakeReward(int64_t nCoinAge, int64_t nFees, int nHeight)
 	{
     int64_t nSubsidy = 1 * COIN;
@@ -72,7 +76,12 @@ Lux Detail:
     return nSubsidy + nFees;
 	}
 
-Development process
+Masternodes Requirement:
+
+	static const int64_t DARKSEND_COLLATERAL = (16120*COIN);    //161.20 LUX 
+	static const int64_t DARKSEND_FEE = (0.002*COIN);
+	static const int64_t DARKSEND_POOL_MAX = (1999999.99*COIN);
+
 ===========================
 
 01/10/2017 -----> PHI1612 hash initilized, replaced novacoin-qt, json, add intallised-dependencies.sh, changed qt/res,etc....
