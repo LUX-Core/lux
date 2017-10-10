@@ -48,10 +48,10 @@ public:
         // The message start string is designed to be unlikely to occur in normal data.
         // The characters are rarely used upper ASCII, not valid as UTF-8, and produce
         // a large 4-byte int at any alignment.
-        pchMessageStart[0] = 0x68; // Modified pch messagestart by 216k155. 
-        pchMessageStart[1] = 0x78;
-        pchMessageStart[2] = 0x88;
-        pchMessageStart[3] = 0x98;
+        pchMessageStart[0] = 0x6d; // Modified pch messagestart by 216k155. 
+        pchMessageStart[1] = 0x7a;
+        pchMessageStart[2] = 0x8e;
+        pchMessageStart[3] = 0x9l;
         vAlertPubKey = ParseHex("042d13c016ed91528241bcff222989769417eb10cdb679228c91e26e26900eb9fd053cd9f16a9a2894ad5ebbd551be1a4bd23bd55023679be17f0bd3a16e6fbeba"); // Lux coin modified pubkey 
         nDefaultPort = 28886;
         nRPCPort = 9898;
@@ -61,19 +61,19 @@ public:
         // be spent as it did not originally exist in the database.
         
    
-        const char* pszTimestamp = "Lux - Implemented New PHI Algo PoW/PoS Hybird - Parallel Masternode By 216k155"; //Input Timestap to generate new genesisblock
+        const char* pszTimestamp = "Lux - Implemented New PHI Algo PoW/PoS Hybird - Parallel Masternode By 216k155 - Activation code:********"; // Input Activation code to activate blockchain
         std::vector<CTxIn> vin;
         vin.resize(1);
         vin[0].scriptSig = CScript() << 0 << CBigNum(42) << vector<unsigned char>((const unsigned char*)pszTimestamp, (const unsigned char*)pszTimestamp + strlen(pszTimestamp));
         std::vector<CTxOut> vout;
         vout.resize(1);
         vout[0].SetEmpty();
-        CTransaction txNew(1, 1507458571, vin, vout, 0); // epochtime 08/10/2017
+        CTransaction txNew(1, 1507647000, vin, vout, 0); // epochtime 15:00:00 oct/10/2017
         genesis.vtx.push_back(txNew);
         genesis.hashPrevBlock = 0;
         genesis.hashMerkleRoot = genesis.BuildMerkleTree();
         genesis.nVersion = 1;
-        genesis.nTime    = 1507458571; // epochtime 08/10/2017
+        genesis.nTime    = 1507647000; // epochtime 15:00:00 oct/10/2017
         genesis.nBits    = 0x1e0fffff; // Generated nBits. Input right nBits to prevent nBits below minimum works error 
         genesis.nNonce   = 0; // Input nNonce 0
 
