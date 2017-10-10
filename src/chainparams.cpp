@@ -21,8 +21,6 @@ struct SeedSpec6 {
 
 #include "chainparamsseeds.h"
 
-
-
 // Main network
 // Follow my guide to generate new genesis block
 
@@ -63,7 +61,7 @@ public:
         // be spent as it did not originally exist in the database.
         
    
-        const char* pszTimestamp = "Lux - Implemented New PHI Algo PoW/PoS Hybird - Parallel Masternode By 216k155 - Activation code:********"; // Input Activation code to activate blockchain
+        const char* pszTimestamp = "Lux - Implemented New PHI Algo PoW/PoS Hybird - Parallel Masternode By 216k155 - Activation code: ThankYou"; // Input Activation code to activate blockchain
         std::vector<CTxIn> vin;
         vin.resize(1);
         vin[0].scriptSig = CScript() << 0 << CBigNum(42) << vector<unsigned char>((const unsigned char*)pszTimestamp, (const unsigned char*)pszTimestamp + strlen(pszTimestamp));
@@ -77,17 +75,17 @@ public:
         genesis.nVersion = 1;
         genesis.nTime    = 1507647000; // epochtime 15:00:00 oct/10/2017
         genesis.nBits    = 0x1e0fffff; // Generated nBits. Input right nBits to prevent nBits below minimum works error 
-        genesis.nNonce   = 0; // Input nNonce 0
+        genesis.nNonce   = 141589; // Input nNonce 0
 
         // Generate genesis hash should take a while as exploit protection active in main.cpp
         // Anti exploitation activated. Note: need to wait until the generation finished for the right genesis block generated. Otherwise none of them are valid
 
         hashGenesisBlock = genesis.GetHash();
         
-        //assert(hashGenesisBlock == uint256("0x")); 
-        //assert(genesis.hashMerkleRoot == uint256("0x"));
+        assert(hashGenesisBlock == uint256("0x000008016e816c53a69ad32a90263906f0064e4ab7902682da4ab125ed8d0ce6")); 
+        assert(genesis.hashMerkleRoot == uint256("0x90e9bfbb84ab25b620cf5963b8410ba458d65883409a76e6c7f58beccb04cd5f"));
             
-	MineGenesis(genesis);
+	//MineGenesis(genesis);
 
         vSeeds.push_back(CDNSSeedData("sd1", "45.32.245.217"));
         vSeeds.push_back(CDNSSeedData("sd2", "45.63.25.110"));
