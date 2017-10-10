@@ -21,6 +21,8 @@ struct SeedSpec6 {
 
 #include "chainparamsseeds.h"
 
+
+
 // Main network
 // Follow my guide to generate new genesis block
 
@@ -85,8 +87,10 @@ public:
         //assert(hashGenesisBlock == uint256("0x")); 
         //assert(genesis.hashMerkleRoot == uint256("0x"));
             
+	MineGenesis(genesis);
 
         vSeeds.push_back(CDNSSeedData("sd1", "45.32.245.217"));
+        vSeeds.push_back(CDNSSeedData("sd2", "45.63.25.110"));
 
 
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,48); // LUX Start letter L
