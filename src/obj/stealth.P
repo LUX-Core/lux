@@ -1,0 +1,6 @@
+obj/stealth.o: stealth.cpp stealth.h util.h serialize.h allocators.h \
+ version.h clientversion.h tinyformat.h base58.h chainparams.h bignum.h \
+ uint256.h key.h hash.h script.h keystore.h sync.h threadsafety.h
+stealth.cpp stealth.h util.h serialize.h allocators.h :
+ version.h clientversion.h tinyformat.h base58.h chainparams.h bignum.h :
+ uint256.h key.h hash.h script.h keystore.h sync.h threadsafety.h :

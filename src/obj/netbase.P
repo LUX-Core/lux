@@ -1,0 +1,6 @@
+obj/netbase.o: netbase.cpp netbase.h serialize.h allocators.h version.h \
+ clientversion.h compat.h util.h tinyformat.h sync.h threadsafety.h \
+ hash.h uint256.h
+netbase.cpp netbase.h serialize.h allocators.h version.h :
+ clientversion.h compat.h util.h tinyformat.h sync.h threadsafety.h :
+ hash.h uint256.h :

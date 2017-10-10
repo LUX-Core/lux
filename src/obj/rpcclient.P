@@ -1,0 +1,12 @@
+obj/rpcclient.o: rpcclient.cpp rpcclient.h \
+ json/json_spirit_reader_template.h json/json_spirit_value.h \
+ json/json_spirit_error_position.h json/json_spirit_utils.h \
+ json/json_spirit_writer_template.h rpcprotocol.h compat.h util.h \
+ serialize.h allocators.h version.h clientversion.h tinyformat.h \
+ ui_interface.h chainparams.h bignum.h uint256.h
+rpcclient.cpp rpcclient.h :
+ json/json_spirit_reader_template.h json/json_spirit_value.h :
+ json/json_spirit_error_position.h json/json_spirit_utils.h :
+ json/json_spirit_writer_template.h rpcprotocol.h compat.h util.h :
+ serialize.h allocators.h version.h clientversion.h tinyformat.h :
+ ui_interface.h chainparams.h bignum.h uint256.h :

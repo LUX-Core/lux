@@ -1,0 +1,2 @@
+obj/pbkdf2.o: pbkdf2.cpp pbkdf2.h
+pbkdf2.cpp pbkdf2.h :
