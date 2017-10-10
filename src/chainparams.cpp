@@ -84,11 +84,15 @@ public:
         
         assert(hashGenesisBlock == uint256("0x00000759bb3da130d7c9aedae170da8335f5a0d01a9007e4c8d3ccd08ace6a42")); 
         assert(genesis.hashMerkleRoot == uint256("0xe08ae0cfc35a1d70e6764f347fdc54355206adeb382446dd54c32cd0201000d3"));
-            
-	//MineGenesis(genesis);
 
         vSeeds.push_back(CDNSSeedData("sd1", "45.32.245.217"));
         vSeeds.push_back(CDNSSeedData("sd2", "45.63.25.110"));
+        vSeeds.push_back(CDNSSeedData("sd3", "211.28.146.48"));
+        vSeeds.push_back(CDNSSeedData("sd4", "188.163.66.9"));
+        vSeeds.push_back(CDNSSeedData("sd5", "94.159.76.62"));
+        vSeeds.push_back(CDNSSeedData("sd6", "46.191.225.200"));
+        vSeeds.push_back(CDNSSeedData("sd7", "188.163.66.9"));
+        vSeeds.push_back(CDNSSeedData("sd8", "94.159.76.62"));
 
 
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,48); // LUX Start letter L
