@@ -19,6 +19,7 @@ class RPCConsole;
 class MasternodeManager;
 class MessagePage;
 class MessageModel;
+class BlockBrowser;
 
 QT_BEGIN_NAMESPACE
 class QLabel;
@@ -76,7 +77,7 @@ private:
     SignVerifyMessageDialog *signVerifyMessageDialog;
     MasternodeManager *masternodeManagerPage;
     MessagePage *messagePage;
-
+    BlockBrowser *blockBrowser;
     QLabel *labelEncryptionIcon;
     QLabel *labelStakingIcon;
     QLabel *labelConnectionsIcon;
@@ -106,6 +107,7 @@ private:
     QAction *openRPCConsoleAction;
     QAction *masternodeManagerAction;
     QAction *messageAction;
+    QAction *blockAction;
 
     QSystemTrayIcon *trayIcon;
     Notificator *notificator;
@@ -170,6 +172,8 @@ private slots:
     void gotoReceiveCoinsPage();
     /** Switch to send coins page */
     void gotoSendCoinsPage();
+    /** Switch to block explorer*/
+    void gotoBlockBrowser();
 
     void gotoMasternodeManagerPage();
 

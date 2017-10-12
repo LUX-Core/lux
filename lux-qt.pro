@@ -1,6 +1,6 @@
 TEMPLATE = app
 TARGET = lux-qt
-VERSION = 1.0.0
+VERSION = 2.1.0
 INCLUDEPATH += src src/json src/qt src/qt/plugins/mrichtexteditor
 DEFINES += ENABLE_WALLET
 DEFINES += BOOST_THREAD_USE_LIB BOOST_SPIRIT_THREADSAFE
@@ -242,6 +242,7 @@ HEADERS += src/qt/bitcoingui.h \
     src/json/json_spirit_reader.h \
     src/json/json_spirit_error_position.h \
     src/json/json_spirit.h \
+    src/qt/blockbrowser.h \
     src/qt/clientmodel.h \
     src/qt/guiutil.h \
     src/qt/transactionrecord.h \
@@ -251,7 +252,7 @@ HEADERS += src/qt/bitcoingui.h \
     src/qt/trafficgraphwidget.h \
     src/qt/transactiondesc.h \
     src/qt/transactiondescdialog.h \
-    src/qt/bitcoinamountfield.h \
+    src/qt/bitcoinamountfield.h \  
     src/wallet.h \
     src/keystore.h \
     src/qt/transactionfilterproxy.h \
@@ -351,6 +352,7 @@ SOURCES += src/qt/bitcoin.cpp src/qt/bitcoingui.cpp \
     src/addrman.cpp \
     src/db.cpp \
     src/walletdb.cpp \
+    src/qt/blockbrowser.cpp \
     src/qt/clientmodel.cpp \
     src/qt/guiutil.cpp \
     src/qt/transactionrecord.cpp \
@@ -438,6 +440,7 @@ FORMS += \
     src/qt/forms/overviewpage.ui \
     src/qt/forms/sendcoinsentry.ui \
     src/qt/forms/askpassphrasedialog.ui \
+    src/qt/forms/blockbrowser.ui \
     src/qt/forms/rpcconsole.ui \
     src/qt/forms/optionsdialog.ui \
     src/qt/forms/darksendconfig.ui \
