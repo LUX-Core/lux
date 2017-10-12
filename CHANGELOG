@@ -1,0 +1,18 @@
+# Version 2.1.0
++Fixed Typo
++Added new checkpoint
++Added Block brownser.cpp & blockbrownser.h
++Update QT wallet UI
++Added Block Explorer UI
+
+# Version 2.0.0
+==============
++Reduced outbounce connection to 12
++Add more seednodes
++Inscreased faster peers
++Fixed qt version missmatch
+
+
+
+
+
