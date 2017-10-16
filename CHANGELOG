@@ -1,4 +1,14 @@
+V2.2.0 Changelog"
+===================
++Added PoS automate function
++Added client control function
++Fixed Sync error
++Fixed seednode
++Fixed network protocol
++Fixed some typo
+
 # Version 2.1.0
+===============
 +Fixed Typo
 +Added new checkpoint
 +Added Block brownser.cpp & blockbrownser.h
