@@ -87,14 +87,8 @@ public:
 
         vSeeds.push_back(CDNSSeedData("sd1", "45.32.245.217"));
         vSeeds.push_back(CDNSSeedData("sd2", "45.63.25.110"));
-        vSeeds.push_back(CDNSSeedData("sd3", "211.28.146.48"));
-        vSeeds.push_back(CDNSSeedData("sd4", "188.163.66.9"));
-        vSeeds.push_back(CDNSSeedData("sd5", "94.159.76.62"));
-        vSeeds.push_back(CDNSSeedData("sd6", "46.191.225.200"));
-        vSeeds.push_back(CDNSSeedData("sd7", "188.163.66.9"));
-        vSeeds.push_back(CDNSSeedData("sd8", "94.159.76.62"));
-
-
+        vSeeds.push_back(CDNSSeedData("sd3", "45.76.79.185"));
+   
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,48); // LUX Start letter L
         base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1,48); 
         base58Prefixes[SECRET_KEY] =     std::vector<unsigned char>(1,155);
