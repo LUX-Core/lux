@@ -7,7 +7,6 @@
 
 #include "uint256.h"
 #include "serialize.h"
-#include "util.h"
 #include "script.h"
 
 #include <stdio.h>
@@ -43,10 +42,9 @@ public:
         return !(a == b);
     }
 
-    std::string ToString() const
-    {
-        return strprintf("COutPoint(%s, %u)", hash.ToString().substr(0,10), n);
-    }
+    std::string ToString() const;
+    std::string ToStringShort() const;
+
 };
 
 /** An inpoint - a combination of a transaction and an index n into its vin */
@@ -79,19 +77,9 @@ public:
         nSequence = std::numeric_limits<unsigned int>::max();
     }
 
-    explicit CTxIn(COutPoint prevoutIn, CScript scriptSigIn=CScript(), unsigned int nSequenceIn=std::numeric_limits<unsigned int>::max())
-    {
-        prevout = prevoutIn;
-        scriptSig = scriptSigIn;
-        nSequence = nSequenceIn;
-    }
+    explicit CTxIn(COutPoint prevoutIn, CScript scriptSigIn=CScript(), unsigned int nSequenceIn=std::numeric_limits<unsigned int>::max());
 
-    explicit CTxIn(uint256 hashPrevTx, unsigned int nOut, CScript scriptSigIn=CScript(), unsigned int nSequenceIn=std::numeric_limits<unsigned int>::max())
-    {
-        prevout = COutPoint(hashPrevTx, nOut);
-        scriptSig = scriptSigIn;
-        nSequence = nSequenceIn;
-    }
+    explicit CTxIn(uint256 hashPrevTx, unsigned int nOut, CScript scriptSigIn=CScript(), unsigned int nSequenceIn=std::numeric_limits<unsigned int>::max());
 
     IMPLEMENT_SERIALIZE
     (
@@ -117,20 +105,7 @@ public:
         return !(a == b);
     }
 
-    std::string ToString() const
-    {
-        std::string str;
-        str += "CTxIn(";
-        str += prevout.ToString();
-        if (prevout.IsNull())
-            str += strprintf(", coinbase %s", HexStr(scriptSig));
-        else
-            str += strprintf(", scriptSig=%s", scriptSig.ToString().substr(0,24));
-        if (nSequence != std::numeric_limits<unsigned int>::max())
-            str += strprintf(", nSequence=%u", nSequence);
-        str += ")";
-        return str;
-    }
+    std::string ToString() const;
 };
 
 
@@ -143,6 +118,7 @@ class CTxOut
 {
 public:
     int64_t nValue;
+    int nRounds;
     CScript scriptPubKey;
 
     CTxOut()
@@ -150,11 +126,7 @@ public:
         SetNull();
     }
 
-    CTxOut(int64_t nValueIn, CScript scriptPubKeyIn)
-    {
-        nValue = nValueIn;
-        scriptPubKey = scriptPubKeyIn;
-    }
+    CTxOut(int64_t nValueIn, CScript scriptPubKeyIn);
 
     IMPLEMENT_SERIALIZE
     (
@@ -165,6 +137,7 @@ public:
     void SetNull()
     {
         nValue = -1;
+        nRounds = -10; // an initial value, should be no way to get this by calculations
         scriptPubKey.clear();
     }
 
@@ -184,14 +157,25 @@ public:
         return (nValue == 0 && scriptPubKey.empty());
     }
 
-    uint256 GetHash() const
+    uint256 GetHash() const;
+
+    bool IsDust(int64_t MIN_RELAY_LUX_FEE) const
     {
-        return SerializeHash(*this);
+        // "Dust" is defined in terms of CTransaction::nMinRelayTxFee,
+        // which has units satoshis-per-kilobyte.
+        // If you'd pay more than 1/3 in fees
+        // to spend something, then we consider it dust.
+        // A typical txout is 34 bytes big, and will
+        // need a CTxIn of at least 148 bytes to spend,
+        // so dust is a txout less than 546 satoshis
+        // with default nMinRelayTxFee.
+        return ((nValue*1000)/(3*((int)GetSerializeSize(SER_DISK,0)+148)) < MIN_RELAY_LUX_FEE);
     }
 
     friend bool operator==(const CTxOut& a, const CTxOut& b)
     {
         return (a.nValue       == b.nValue &&
+                a.nRounds      == b.nRounds &&
                 a.scriptPubKey == b.scriptPubKey);
     }
 
@@ -200,11 +184,7 @@ public:
         return !(a == b);
     }
 
-    std::string ToString() const
-    {
-        if (IsEmpty()) return "CTxOut(empty)";
-        return strprintf("CTxOut(nValue=%s, scriptPubKey=%s)", FormatMoney(nValue), scriptPubKey.ToString());
-    }
+    std::string ToString() const;
 };
 
 #endif

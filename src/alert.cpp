@@ -5,9 +5,8 @@
 #include "alert.h"
 
 #include "chainparams.h"
-#include "key.h"
+#include "pubkey.h"
 #include "net.h"
-#include "timedata.h"
 #include "ui_interface.h"
 #include "util.h"
 
@@ -239,7 +238,7 @@ bool CAlert::ProcessAlert(bool fThread)
             {
                 // Alert text should be plain ascii coming from a trusted source, but to
                 // be safe we first strip anything not in safeChars, then add single quotes around
-                // the whole string before passing it to the shell:
+                // the whole string before passing it to the lux:
                 std::string singleQuote("'");
                 std::string safeStatus = SanitizeString(strStatusBar);
                 safeStatus = singleQuote+safeStatus+singleQuote;

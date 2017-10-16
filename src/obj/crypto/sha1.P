@@ -1,6 +1,6 @@
 obj/crypto/sha1.o: crypto/sha1.cpp \
- /home/bh/Documents/lux1/src/crypto/sha1.h \
- /home/bh/Documents/lux1/src/crypto/common.h
+ /home/bh/Documents/lux-checkpoint1/src/crypto/sha1.h \
+ /home/bh/Documents/lux-checkpoint1/src/crypto/common.h
 crypto/sha1.cpp :
- /home/bh/Documents/lux1/src/crypto/sha1.h :
- /home/bh/Documents/lux1/src/crypto/common.h :
+ /home/bh/Documents/lux-checkpoint1/src/crypto/sha1.h :
+ /home/bh/Documents/lux-checkpoint1/src/crypto/common.h :

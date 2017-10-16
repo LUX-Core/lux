@@ -43,13 +43,13 @@ bool CAddrInfo::IsTerrible(int64_t nNow) const
     if (nTime > nNow + 10*60) // came in a flying DeLorean
         return true;
 
-    if (nTime==0 || nNow-nTime > ADDRMAN_HORIZON_DAYS*24*60*60) // not seen in recent history
+    if (nTime==0 || nNow-nTime > ADDRMAN_HORIZON_DAYS*86400) // not seen in over a month
         return true;
 
-    if (nLastSuccess==0 && nAttempts>=ADDRMAN_RETRIES) // tried N times and never a success
+    if (nLastSuccess==0 && nAttempts>=ADDRMAN_RETRIES) // tried three times and never a success
         return true;
 
-    if (nNow-nLastSuccess > ADDRMAN_MIN_FAIL_DAYS*24*60*60 && nAttempts>=ADDRMAN_MAX_FAILURES) // N successive failures in the last week
+    if (nNow-nLastSuccess > ADDRMAN_MIN_FAIL_DAYS*86400 && nAttempts>=ADDRMAN_MAX_FAILURES) // 10 successive failures in the last week
         return true;
 
     return false;
@@ -71,9 +71,8 @@ double CAddrInfo::GetChance(int64_t nNow) const
     if (nSinceLastTry < 60*10)
         fChance *= 0.01;
 
-    // deprioritize 50% after each failed attempt
-    for (int n=0; n<nAttempts; n++)
-        fChance /= 1.5;
+    // deprioritize 66% after each failed attempt, but at most 1/28th to avoid the search taking forever or overly penalizing outages.
+    fChance *= pow(0.66, min(nAttempts, 8));
 
     return fChance;
 }
@@ -490,23 +489,17 @@ int CAddrMan::Check_()
 
 void CAddrMan::GetAddr_(std::vector<CAddress> &vAddr)
 {
-    unsigned int nNodes = ADDRMAN_GETADDR_MAX_PCT * vRandom.size() / 100;
+    int nNodes = ADDRMAN_GETADDR_MAX_PCT*vRandom.size()/100;
     if (nNodes > ADDRMAN_GETADDR_MAX)
         nNodes = ADDRMAN_GETADDR_MAX;
 
-    // gather a list of random nodes, skipping those of low quality
-    for (unsigned int n = 0; n < vRandom.size(); n++)
+    // perform a random shuffle over the first nNodes elements of vRandom (selecting from all)
+    for (int n = 0; n<nNodes; n++)
     {
-        if (vAddr.size() >= nNodes)
-            break;
-
         int nRndPos = GetRandInt(vRandom.size() - n) + n;
         SwapRandom(n, nRndPos);
         assert(mapInfo.count(vRandom[n]) == 1);
-
-        const CAddrInfo& ai = mapInfo[vRandom[n]];
-        if (!ai.IsTerrible())
-            vAddr.push_back(ai);
+        vAddr.push_back(mapInfo[vRandom[n]]);
     }
 }
 

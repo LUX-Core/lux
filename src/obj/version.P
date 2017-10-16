@@ -1,4 +1,4 @@
 obj/version.o: version.cpp version.h clientversion.h \
- /home/bh/Documents/lux1/src/obj/build.h
+ /home/bh/Documents/lux-checkpoint1/src/obj/build.h
 version.cpp version.h clientversion.h :
- /home/bh/Documents/lux1/src/obj/build.h :
+ /home/bh/Documents/lux-checkpoint1/src/obj/build.h :

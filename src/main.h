@@ -81,7 +81,7 @@ static const int64_t MIN_TX_FEE = 10000; //<------------------------------------
 /** Fees smaller than this (in satoshi) are considered zero fee (for relaying) */
 static const int64_t MIN_RELAY_TX_FEE = MIN_TX_FEE;
 /** No amount larger than this (in satoshi) is valid */
-static const int64_t MAX_MONEY = 50000000 * COIN; 
+static const int64_t MAX_MONEY = 500000000 * COIN; 
 
 //static const int64_t COIN_YEAR_REWARD = 10 * CENT;
 //static const int64_t MAX_MINT_PROOF_OF_STAKE = 0.01 * COIN;

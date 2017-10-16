@@ -7,12 +7,12 @@ obj/wallet.o: wallet.cpp wallet.h walletdb.h db.h serialize.h \
  obj/phi1612/sph_cubehash.h obj/phi1612/sph_fugue.h \
  obj/phi1612/sph_gost.h obj/phi1612/sph_echo.h ui_interface.h base58.h \
  coincontrol.h kernel.h txdb.h txdb-leveldb.h \
- /home/bh/Documents/lux1/src/leveldb/include/leveldb/db.h \
- /home/bh/Documents/lux1/src/leveldb/include/leveldb/iterator.h \
- /home/bh/Documents/lux1/src/leveldb/include/leveldb/slice.h \
- /home/bh/Documents/lux1/src/leveldb/include/leveldb/status.h \
- /home/bh/Documents/lux1/src/leveldb/include/leveldb/options.h \
- /home/bh/Documents/lux1/src/leveldb/include/leveldb/write_batch.h \
+ /home/bh/Documents/lux-checkpoint1/src/leveldb/include/leveldb/db.h \
+ /home/bh/Documents/lux-checkpoint1/src/leveldb/include/leveldb/iterator.h \
+ /home/bh/Documents/lux-checkpoint1/src/leveldb/include/leveldb/slice.h \
+ /home/bh/Documents/lux-checkpoint1/src/leveldb/include/leveldb/status.h \
+ /home/bh/Documents/lux-checkpoint1/src/leveldb/include/leveldb/options.h \
+ /home/bh/Documents/lux-checkpoint1/src/leveldb/include/leveldb/write_batch.h \
  spork.h darksend.h masternode.h activemasternode.h init.h instantx.h \
  smessage.h lz4/lz4.h
 wallet.cpp wallet.h walletdb.h db.h serialize.h :
@@ -24,11 +24,11 @@ wallet.cpp wallet.h walletdb.h db.h serialize.h :
  obj/phi1612/sph_cubehash.h obj/phi1612/sph_fugue.h :
  obj/phi1612/sph_gost.h obj/phi1612/sph_echo.h ui_interface.h base58.h :
  coincontrol.h kernel.h txdb.h txdb-leveldb.h :
- /home/bh/Documents/lux1/src/leveldb/include/leveldb/db.h :
- /home/bh/Documents/lux1/src/leveldb/include/leveldb/iterator.h :
- /home/bh/Documents/lux1/src/leveldb/include/leveldb/slice.h :
- /home/bh/Documents/lux1/src/leveldb/include/leveldb/status.h :
- /home/bh/Documents/lux1/src/leveldb/include/leveldb/options.h :
- /home/bh/Documents/lux1/src/leveldb/include/leveldb/write_batch.h :
+ /home/bh/Documents/lux-checkpoint1/src/leveldb/include/leveldb/db.h :
+ /home/bh/Documents/lux-checkpoint1/src/leveldb/include/leveldb/iterator.h :
+ /home/bh/Documents/lux-checkpoint1/src/leveldb/include/leveldb/slice.h :
+ /home/bh/Documents/lux-checkpoint1/src/leveldb/include/leveldb/status.h :
+ /home/bh/Documents/lux-checkpoint1/src/leveldb/include/leveldb/options.h :
+ /home/bh/Documents/lux-checkpoint1/src/leveldb/include/leveldb/write_batch.h :
  spork.h darksend.h masternode.h activemasternode.h init.h instantx.h :
  smessage.h lz4/lz4.h :

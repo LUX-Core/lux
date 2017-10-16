@@ -1,8 +1,8 @@
 obj/crypto/rfc6979_hmac_sha256.o: crypto/rfc6979_hmac_sha256.cpp \
- /home/bh/Documents/lux1/src/crypto/rfc6979_hmac_sha256.h \
- /home/bh/Documents/lux1/src/crypto/hmac_sha256.h \
- /home/bh/Documents/lux1/src/crypto/sha256.h
+ /home/bh/Documents/lux-checkpoint1/src/crypto/rfc6979_hmac_sha256.h \
+ /home/bh/Documents/lux-checkpoint1/src/crypto/hmac_sha256.h \
+ /home/bh/Documents/lux-checkpoint1/src/crypto/sha256.h
 crypto/rfc6979_hmac_sha256.cpp :
- /home/bh/Documents/lux1/src/crypto/rfc6979_hmac_sha256.h :
- /home/bh/Documents/lux1/src/crypto/hmac_sha256.h :
- /home/bh/Documents/lux1/src/crypto/sha256.h :
+ /home/bh/Documents/lux-checkpoint1/src/crypto/rfc6979_hmac_sha256.h :
+ /home/bh/Documents/lux-checkpoint1/src/crypto/hmac_sha256.h :
+ /home/bh/Documents/lux-checkpoint1/src/crypto/sha256.h :
