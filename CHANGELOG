@@ -1,7 +1,13 @@
-# Version 2.2.0
-===================
+# Version 2.2.1
+===============
++Upgraded QT wallet UI
 +Added PoS automate function
 +Added client control function
++Added network statistics into block explorer 
++Redesign dashboard tab
+
+# Version 2.2.0
+===============
 +Fixed Sync error
 +Fixed seednode
 +Fixed network protocol

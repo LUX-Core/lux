@@ -1,5 +1,6 @@
 #include "blockbrowser.h"
 #include "ui_blockbrowser.h"
+
 #include "main.h"
 #include "wallet.h"
 #include "base58.h"
@@ -7,9 +8,53 @@
 #include "walletmodel.h"
 #include "rpcconsole.h"
 #include "transactionrecord.h"
+#include "optionsmodel.h"
+#include "guiutil.h"
+#include "guiconstants.h"
+#include "init.h"
+#include "rpcserver.h"
+
+using namespace json_spirit;
 
 #include <sstream>
 #include <string>
+
+#include <QAbstractItemDelegate>
+#include <QPainter>
+
+#define DECORATION_SIZE 48
+#define NUM_ITEMS 10
+
+BlockBrowser::BlockBrowser(QWidget *parent) :
+    ui(new Ui::BlockBrowser),
+    model(0)
+{
+    ui->setupUi(this);
+
+    connect(ui->blockButton, SIGNAL(pressed()), this, SLOT(blockClicked()));
+    connect(ui->txButton, SIGNAL(pressed()), this, SLOT(txClicked()));
+
+    // Statistics
+    connect(ui->startButton, SIGNAL(pressed()), this, SLOT(updateStatistics()));
+}
+//Statistics
+int heightPrevious = -1;
+int connectionPrevious = -1;
+int volumePrevious = -1;
+double rewardPrevious = -1;
+double netPawratePrevious = -1;
+double pawratePrevious = -1;
+double hardnessPrevious = -1;
+double hardnessPrevious2 = -1;
+int stakeminPrevious = -1;
+int stakemaxPrevious = -1;
+QString stakecPrevious = "";
+
+BlockBrowser::~BlockBrowser()
+{
+    delete ui;
+}
+
 double getBlockHardness(int height)
 {
     const CBlockIndex* blockindex = getBlockIndex(height);
@@ -282,19 +327,6 @@ double getTxFees(std::string txid)
     return value0 - value;
 }
 
-
-BlockBrowser::BlockBrowser(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::BlockBrowser)
-{
-    ui->setupUi(this);
-
-    setFixedSize(400, 420);
-        
-    connect(ui->blockButton, SIGNAL(pressed()), this, SLOT(blockClicked()));
-    connect(ui->txButton, SIGNAL(pressed()), this, SLOT(txClicked()));
-}
-
 void BlockBrowser::updateExplorer(bool block)
 {    
     if(block)
@@ -313,14 +345,18 @@ void BlockBrowser::updateExplorer(bool block)
         ui->timeBox->show();
         ui->hardLabel->show();
         ui->hardBox->show();;
+        ui->pawLabel->show();
         int height = ui->heightBox->value();
         if (height > pindexBest->nHeight)
         {
             ui->heightBox->setValue(pindexBest->nHeight);
             height = pindexBest->nHeight;
         }
+        int Pawrate = getBlockHashrate(height);
+        double Pawrate2 = 0.000;
+        Pawrate2 = ((double)Pawrate / 1000);
         std::string hash = getBlockHash(height);
-        std::string merkle = getBlockMerkle(height);
+        std::string merkle = getBlockMerkle(height);ui->pawLabel->show();
         int nBits = getBlocknBits(height);
         int nNonce = getBlockNonce(height);
         int atime = getBlockTime(height);
@@ -362,11 +398,11 @@ void BlockBrowser::updateExplorer(bool block)
         QString QOutputs = QString::fromUtf8(outputs.c_str());
         QString QInputs = QString::fromUtf8(inputs.c_str());
         QString QFees = QString::number(fees, 'f', 6);
-        ui->valueBox->setText(QValue + " TX");
+        ui->valueBox->setText(QValue + " LUX");
         ui->txID->setText(QID);
         ui->outputBox->setText(QOutputs);
         ui->inputBox->setText(QInputs);
-        ui->feesBox->setText(QFees + " TX");
+        ui->feesBox->setText(QFees + " LUX");
     }
 }
 
@@ -381,12 +417,159 @@ void BlockBrowser::blockClicked()
     updateExplorer(true);
 }
 
+
+//Statistics Section
+void BlockBrowser::updateStatistics()
+{
+    double pHardness = GetDifficulty();
+    double pHardness2 = GetDifficulty(GetLastBlockIndex(pindexBest, true));
+    int pPawrate = GetPoWMHashPS();
+    double pPawrate2 = 0.000;
+    int nHeight = pindexBest->nHeight;
+    double nSubsidy = 10;
+    if(pindexBest->nHeight < 500 && pindexBest->nHeight > 1)
+    {
+        nSubsidy = 1;
+    }
+    else if(pindexBest->nHeight < 6000000)
+    {
+        nSubsidy = 10;
+    }
+    uint64_t nMinWeight = 0; //, nMaxWeight = 0, nWeight = 0
+    //pwalletMain->GetStakeWeight(*pwalletMain, nMinWeight, nMaxWeight, nWeight);
+    pwalletMain->GetStakeWeight();
+    uint64_t nNetworkWeight = GetPoSKernelPS();
+    int64_t volume = ((pindexBest->nMoneySupply)/500000000);
+    int peers = this->clientModel->getNumConnections();
+    pPawrate2 = (double)pPawrate;
+    QString height = QString::number(nHeight);
+    QString stakemin = QString::number(nMinWeight);
+    QString stakemax = QString::number(nNetworkWeight);
+    QString phase = "";
+    if (pindexBest->nHeight < 1000)
+    {
+        phase = "PoW";
+    }
+    else if (pindexBest->nHeight > 1000)
+    {
+        phase = "PoW+PoS";
+    }
+
+    QString subsidy = QString::number(nSubsidy, 'f', 6);
+    QString hardness = QString::number(pHardness, 'f', 6);
+    QString hardness2 = QString::number(pHardness2, 'f', 6);
+    QString pawrate = QString::number(pPawrate2, 'f', 3);
+    QString Qlpawrate = clientModel->getLastBlockDate().toString();
+
+    QString QPeers = QString::number(peers);
+    // QString qVolume = QLocale(QLocale::English).toString(volume);
+    QString qVolume = QString::number(volume);
+
+    if(nHeight > heightPrevious)
+    {
+        ui->heightBox_3->setText("<b><font color=\"green\">" + height + "</font></b>");
+    } else {
+    ui->heightBox_3->setText(height);
+    }
+
+    if(0 > stakeminPrevious)
+    {
+        ui->minBox_2->setText("<b><font color=\"green\">" + stakemin + "</font></b>");
+    } else {
+    ui->minBox_2->setText(stakemin);
+    }
+    if(0 > stakemaxPrevious)
+    {
+        ui->maxBox_2->setText("<b><font color=\"green\">" + stakemax + "</font></b>");
+    } else {
+    ui->maxBox_2->setText(stakemax);
+    }
+
+    if(phase != stakecPrevious)
+    {
+        ui->cBox_2->setText("<b><font color=\"green\">" + phase + "</font></b>");
+    } else {
+    ui->cBox_2->setText(phase);
+    }
+
+
+    if(nSubsidy < rewardPrevious)
+    {
+        ui->rewardBox_2->setText("<b><font color=\"red\">" + subsidy + "</font></b>");
+    } else {
+    ui->rewardBox_2->setText(subsidy);
+    }
+
+    if(pHardness > hardnessPrevious)
+    {
+        ui->diffBox_2->setText("<b><font color=\"green\">" + hardness + "</font></b>");
+    } else if(pHardness < hardnessPrevious) {
+        ui->diffBox_2->setText("<b><font color=\"red\">" + hardness + "</font></b>");
+    } else {
+        ui->diffBox_2->setText(hardness);
+    }
+
+    if(pHardness2 > hardnessPrevious2)
+    {
+        ui->diffBox2_2->setText("<b><font color=\"green\">" + hardness2 + "</font></b>");
+    } else if(pHardness2 < hardnessPrevious2) {
+        ui->diffBox2_2->setText("<b><font color=\"red\">" + hardness2 + "</font></b>");
+    } else {
+        ui->diffBox2_2->setText(hardness2);
+    }
+
+    if(pPawrate2 > netPawratePrevious)
+    {
+        ui->pawrateBox_2->setText("<b><font color=\"green\">" + pawrate + " MH/s</font></b>");
+    } else if(pPawrate2 < netPawratePrevious) {
+        ui->pawrateBox_2->setText("<b><font color=\"red\">" + pawrate + " MH/s</font></b>");
+    } else {
+        ui->pawrateBox_2->setText(pawrate + " GH/s");
+    }
+
+    if(Qlpawrate != pawratePrevious)
+    {
+        ui->localBox_2->setText("<b><font color=\"green\">" + Qlpawrate + "</font></b>");
+    } else {
+    ui->localBox_2->setText(Qlpawrate);
+    }
+
+    if(peers > connectionPrevious)
+    {
+        ui->connectionBox_2->setText("<b><font color=\"green\">" + QPeers + "</font></b>");
+    } else if(peers < connectionPrevious) {
+        ui->connectionBox_2->setText("<b><font color=\"red\">" + QPeers + "</font></b>");
+    } else {
+        ui->connectionBox_2->setText(QPeers);
+    }
+
+    if(volume > volumePrevious)
+    {
+        ui->volumeBox_2->setText("<b><font color=\"green\">" + qVolume + " LUX" + "</font></b>");
+    } else if(volume < volumePrevious) {
+        ui->volumeBox_2->setText("<b><font color=\"red\">" + qVolume + " LUX" + "</font></b>");
+    } else {
+        ui->volumeBox_2->setText(qVolume + " LUX");
+    }
+    updatePrevious(nHeight, nMinWeight, nNetworkWeight, phase, nSubsidy, pHardness, pHardness2, pPawrate2, Qlpawrate, peers, volume);
+}
+
+void BlockBrowser::updatePrevious(int nHeight, int nMinWeight, int nNetworkWeight, QString phase, double nSubsidy, double pHardness, double pHardness2, double pPawrate2, QString Qlpawrate, int peers, int volume)
+{
+    heightPrevious = nHeight;
+    stakeminPrevious = nMinWeight;
+    stakemaxPrevious = nNetworkWeight;
+    stakecPrevious = phase;
+    rewardPrevious = nSubsidy;
+    hardnessPrevious = pHardness;
+    hardnessPrevious2 = pHardness2;
+    netPawratePrevious = pPawrate2;
+    pawratePrevious = Qlpawrate;
+    connectionPrevious = peers;
+    volumePrevious = volume;
+}
+
 void BlockBrowser::setModel(WalletModel *model)
 {
     this->model = model;
-}
-
-BlockBrowser::~BlockBrowser()
-{
-    delete ui;
 }

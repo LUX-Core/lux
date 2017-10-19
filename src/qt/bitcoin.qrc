@@ -45,6 +45,8 @@
         <file alias="staking_on">res/icons/staking_on.png</file>
         <file alias="onion">res/icons/onion.png</file>
         <file alias="onionblack">res/icons/onion-black.png</file>
+        <file alias="worker">res/icons/worker.png</file>
+        <file alias="update">res/icons/update.png</file>
     </qresource>
     <qresource prefix="/icons/black">
         <file alias="connect_0">res/icons/black/connect0_16.png</file>

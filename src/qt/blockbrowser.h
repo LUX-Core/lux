@@ -39,7 +39,12 @@ int64_t getInputValue(CTransaction, CScript);
 namespace Ui {
 class BlockBrowser;
 }
+class ClientModel;
 class WalletModel;
+
+QT_BEGIN_NAMESPACE
+class QModelIndex;
+QT_END_NAMESPACE
 
 class BlockBrowser : public QWidget
 {
@@ -51,18 +56,36 @@ public:
     
     void setModel(WalletModel *model);
     
+    //Statistics
+    int heightPrevious;
+    int connectionPrevious;
+    int volumePrevious;
+    int stakeminPrevious;
+    int stakemaxPrevious;
+    QString stakecPrevious;
+    double rewardPrevious;
+    double netPawratePrevious;
+    QString pawratePrevious;
+    double hardnessPrevious;
+    double hardnessPrevious2;
+
+
 public slots:
     
     void blockClicked();
     void txClicked();
     void updateExplorer(bool);
+    void updateStatistics();
+    void updatePrevious(int, int, int, QString, double, double, double, double, QString, int, int);
+
+signals:
 
 private slots:
 
 private:
     Ui::BlockBrowser *ui;
     WalletModel *model;
-    
+    ClientModel *clientModel;
 };
 
 #endif // BLOCKBROWSER_H

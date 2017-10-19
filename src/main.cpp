@@ -13,7 +13,6 @@
 #include "db.h"
 #include "init.h"
 #include "kernel.h"
-#include "net.h"
 #include "txdb.h"
 #include "txmempool.h"
 #include "ui_interface.h"

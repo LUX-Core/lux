@@ -29,6 +29,7 @@ public:
     void setWalletModel(WalletModel *walletModel);
     void showOutOfSyncWarning(bool fShow);
     void updateDarksendProgress();
+    void updatePlot(int count);
 
 public slots:
     void darkSendStatus();
@@ -49,6 +50,8 @@ private:
     qint64 currentAnonymizedBalance;
     qint64 cachedTxLocks;
     qint64 lastNewBlock;
+    QVector<double> vX;
+    QVector<double> vY;
 
     int showingDarkSendMessage;
     int darksendActionCheck;

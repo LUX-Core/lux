@@ -1,7 +1,3 @@
-// Copyright (c) 2011-2013 The Bitcoin developers
-// Distributed under the MIT/X11 software license, see the accompanying
-// file COPYING or http://www.opensource.org/licenses/mit-license.php.
-
 #include "overviewpage.h"
 #include "ui_overviewpage.h"
 
@@ -15,13 +11,14 @@
 #include "transactionfilterproxy.h"
 #include "guiutil.h"
 #include "guiconstants.h"
+#include "rpcserver.h"
 #include "main.h"
+#include "util.h"
 
 #include <QAbstractItemDelegate>
 #include <QPainter>
 #include <QTimer>
 #include <QDebug>
-#include <QScrollArea>
 #include <QScroller>
 
 #define DECORATION_SIZE 64
@@ -115,21 +112,21 @@ OverviewPage::OverviewPage(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    ui->frameDarksend->setVisible(false);  // Hide darksend features
+    ui->frameDarksend->setVisible(true);  // Hide darksend features
 
-    QScroller::grabGesture(ui->scrollArea, QScroller::LeftMouseButtonGesture);
-    ui->scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    ui->scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    //QScroller::grabGesture(ui->scrollArea, QScroller::LeftMouseButtonGesture);
+    //ui->scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+   // ui->scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
-    ui->columnTwoWidget->setContentsMargins(0,0,0,0);
-    ui->columnTwoWidget->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
-    ui->columnTwoWidget->setMinimumWidth(300);
+   // ui->columnTwoWidget->setContentsMargins(0,0,0,0);
+   // ui->columnTwoWidget->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
+   // ui->columnTwoWidget->setMinimumWidth(300);
 
     // Recent transactions
     ui->listTransactions->setItemDelegate(txdelegate);
     ui->listTransactions->setIconSize(QSize(DECORATION_SIZE, DECORATION_SIZE));
     ui->listTransactions->setMinimumHeight(NUM_ITEMS * (DECORATION_SIZE + 2));
-    ui->listTransactions->setAttribute(Qt::WA_MacShowFocusRect, false);
+    ui->listTransactions->setAttribute(Qt::WA_MacShowFocusRect, true);
     ui->listTransactions->setMinimumWidth(350);
 
     connect(ui->listTransactions, SIGNAL(clicked(QModelIndex)), this, SLOT(handleTransactionClicked(QModelIndex)));
@@ -137,7 +134,36 @@ OverviewPage::OverviewPage(QWidget *parent) :
     // init "out of sync" warning labels
     ui->labelWalletStatus->setText("(" + tr("out of sync") + ")");
     ui->labelTransactionsStatus->setText("(" + tr("out of sync") + ")");
+ // start with displaying the "out of sync" warnings
+    showOutOfSyncWarning(true);
+    if(GetBoolArg("-chart", true))
+    {
+        // setup Plot
+        // create graph
+        ui->diffplot->addGraph();
 
+        // Argh can't get the background to work.
+        //QPixmap background = QPixmap(":/images/splash_testnet");
+        //ui->diffplot->setBackground(background);
+        //ui->diffplot->setBackground(QBrush(QWidget::palette().color(this->backgroundRole())));
+
+        // give the axes some labels:
+        ui->diffplot->xAxis->setLabel("Blocks");
+        ui->diffplot->yAxis->setLabel("Difficulty");
+
+        // set the pens
+        ui->diffplot->graph(0)->setPen(QPen(QColor(255, 165, 18)));
+        ui->diffplot->graph(0)->setLineStyle(QCPGraph::lsLine);
+
+        // set axes label fonts:
+        QFont label = font();
+        ui->diffplot->xAxis->setLabelFont(label);
+        ui->diffplot->yAxis->setLabelFont(label);
+    }
+    else
+    {
+        ui->diffplot->setVisible(false);
+    }
     showingDarkSendMessage = 0;
     darksendActionCheck = 0;
     lastNewBlock = 0;
@@ -173,36 +199,6 @@ OverviewPage::OverviewPage(QWidget *parent) :
         ui->labelImmature->setStyleSheet(whiteLabelQSS);
         ui->labelTotal->setStyleSheet(whiteLabelQSS);
     }
-
-if(GetBoolArg("-chart", true))
-    {
-        // setup Plot
-        // create graph
-        ui->diffplot->addGraph();
-
-        // Argh can't get the background to work.
-        //QPixmap background = QPixmap(":/images/splash_testnet");
-        //ui->diffplot->setBackground(background);
-        //ui->diffplot->setBackground(QBrush(QWidget::palette().color(this->backgroundRole())));
-
-        // give the axes some labels:
-        ui->diffplot->xAxis->setLabel("Blocks");
-        ui->diffplot->yAxis->setLabel("Difficulty");
-
-        // set the pens
-        ui->diffplot->graph(0)->setPen(QPen(QColor(255, 165, 18)));
-        ui->diffplot->graph(0)->setLineStyle(QCPGraph::lsLine);
-
-        // set axes label fonts:
-        QFont label = font();
-        ui->diffplot->xAxis->setLabelFont(label);
-        ui->diffplot->yAxis->setLabelFont(label);
-    }
-    else
-    {
-        ui->diffplot->setVisible(false);
-    }
-
 }
 
 void OverviewPage::updatePlot(int count)
@@ -227,7 +223,7 @@ void OverviewPage::updatePlot(int count)
     vX.resize(numLookBack);
     vY.resize(numLookBack);
 
-    /*
+    
     if(fDebug) {
         if(height != pindex->nHeight) {
             printf("Plot: Warning: nBestHeight and pindexBest->nHeight don't match: %d:%d:\n", height, pindex->nHeight);
@@ -235,11 +231,11 @@ void OverviewPage::updatePlot(int count)
     }
 
     if(fDebug) { printf("Plot: Reading blockchain\n"); }
-    */
+    
     CBlockIndex* itr = pindex;
     while(i >= 0 && itr != NULL)
     {
-        // if(fDebug) { printf("Plot: Processing block: %d - pprev: %p\n", itr->nHeight, itr->pprev); }
+         if(fDebug) { printf("Plot: Processing block: %d - pprev: %p\n", itr->nHeight, itr->pprev); }
         vX[i] = itr->nHeight;
         vY[i] = GetDifficulty(itr);
         diffMax = std::max<double>(diffMax, vY[i]);
@@ -249,7 +245,7 @@ void OverviewPage::updatePlot(int count)
         x--;
     }
 
-    // if(fDebug) { printf("Plot: Drawing plot\n"); }
+    if(fDebug) { printf("Plot: Drawing plot\n"); }
 
     ui->diffplot->graph(0)->setData(vX, vY);
 
@@ -257,8 +253,8 @@ void OverviewPage::updatePlot(int count)
     ui->diffplot->xAxis->setRange((double)xStart, (double)xEnd);
     ui->diffplot->yAxis->setRange(0, diffMax+(diffMax/10));
 
-    ui->diffplot->xAxis->setAutoSubTicks(false);
-    ui->diffplot->yAxis->setAutoSubTicks(false);
+    ui->diffplot->xAxis->setAutoSubTicks(true);
+    ui->diffplot->yAxis->setAutoSubTicks(true);
     ui->diffplot->xAxis->setSubTickCount(0);
     ui->diffplot->yAxis->setSubTickCount(0);
 
@@ -266,6 +262,7 @@ void OverviewPage::updatePlot(int count)
 
     // if(fDebug) { printf("Plot: Done!\n"); }
 }
+
 
 void OverviewPage::handleTransactionClicked(const QModelIndex &index)
 {
