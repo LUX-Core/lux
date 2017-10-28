@@ -49,4 +49,4 @@ bool CMasternodeConfig::read(std::string& strErr) {
 
         add(alias, ip, privKey, txHash, outputIndex);
     }
-
+}
