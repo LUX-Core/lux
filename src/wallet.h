@@ -854,10 +854,10 @@ public:
     //Used with Darksend. Will return fees, then denominations, everything else, then very small inputs that aren't fees
     int Priority() const
     {
-        if(tx->vout[i].nValue == DARKSEND_FEE) return -20000;
+        if(tx->vout[i].nValue == DARKSEND_FEE) return -16120;
         BOOST_FOREACH(int64_t d, darkSendDenominations)
             if(tx->vout[i].nValue == d) return 10000;
-        if(tx->vout[i].nValue < 1*COIN) return 20000;
+        if(tx->vout[i].nValue < 1*COIN) return 16120;
 
         //nondenom return largest first
         return -(tx->vout[i].nValue/COIN);

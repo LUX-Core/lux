@@ -29,15 +29,24 @@ bool CMasternodeConfig::read(std::string& strErr) {
             return false;
         }
 
-/*        if(CService(ip).GetPort() != 19999 && CService(ip).GetPort() != 9999)  {
-            strErr = "Invalid port (must be 9999 for mainnet or 19999 for testnet) detected in masternode.conf: " + line;
+        if(Params().NetworkID() == CChainParams::MAIN){
+            if(CService(ip).GetPort() != 17170) {
+                LogPrintf("Invalid port detected in masternode.conf: %s (must be 17170 for mainnet)\n", line.c_str());
+                streamConfig.close();
+                return false;
+            }
+        } else if(CService(ip).GetPort() == 17170) {
+            LogPrintf("Invalid port detected in masternode.conf: %s (17170 must be only on mainnet)\n", line.c_str());
             streamConfig.close();
             return false;
-        }*/
+        }
+
+        if (!(CService(ip).IsIPv4() && CService(ip).IsRoutable())) {
+            LogPrintf("Invalid Address detected in masternode.conf: %s (IPV4 ONLY) \n", line.c_str());
+            streamConfig.close();
+            return false;
+        }
 
         add(alias, ip, privKey, txHash, outputIndex);
     }
 
-    streamConfig.close();
-    return true;
-}

@@ -1,3 +1,8 @@
+# Version 2.2.2
+===============
++Fixed Masternode Pubkey
++Added Masternode Config
+
 # Version 2.2.1
 ===============
 +Upgraded QT wallet UI

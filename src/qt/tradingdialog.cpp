@@ -40,8 +40,8 @@ tradingDialog::tradingDialog(QWidget *parent) :
     ui->LUXAvailableLabel->setTextFormat(Qt::RichText);
     ui->BuyCostLabel->setTextFormat(Qt::RichText);
     ui->SellCostLabel->setTextFormat(Qt::RichText);
-    ui->BittrexBTCLabel->setTextFormat(Qt::RichText);
-    ui->BittrexLUXLabel->setTextFormat(Qt::RichText);
+    ui->CryptopiaBTCLabel->setTextFormat(Qt::RichText);
+    ui->CryptopiaLUXLabel->setTextFormat(Qt::RichText);
     ui->CSDumpLabel->setTextFormat(Qt::RichText);
     ui->CSTotalLabel->setTextFormat(Qt::RichText);
     ui->CSReceiveLabel->setTextFormat(Qt::RichText);
@@ -112,7 +112,7 @@ tradingDialog::tradingDialog(QWidget *parent) :
     ui->OpenOrdersTable->horizontalHeader()->resizeSection(7,Cellwidth);
     ui->OpenOrdersTable->horizontalHeader()->resizeSection(8,Cellwidth);
     ui->OpenOrdersTable->horizontalHeader()->resizeSection(9,Cellwidth);
-    ui->OpenOrdersTable->setColumnHidden(0,true);
+    ui->OpenOrdersTable->setColumnHidden(0,false);
     ui->OpenOrdersTable->horizontalHeader()->setDefaultAlignment(Qt::AlignLeft);
     ui->OpenOrdersTable->horizontalHeader()->setStyleSheet("QHeaderView::section, QHeaderView::section * {font-weight :bold;}");
 
@@ -150,24 +150,24 @@ void tradingDialog::UpdaterFunction(){
 
 QString tradingDialog::GetMarketSummary(){
 
-     QString Response = sendRequest("https://bittrex.com/api/v1.1/public/GetMarketSummary?market=btc-LUX");
+     QString Response = sendRequest("https://cryptopia.co.nz/api/GetMarket/LUX_BTC");
      return Response;
 }
 
 QString tradingDialog::GetOrderBook(){
 
-      QString  Response = sendRequest("https://bittrex.com/api/v1.1/public/getorderbook?market=BTC-LUX&type=both&depth=50");
+      QString  Response = sendRequest("https://cryptopia.co.nz/api/GetMarketOrders/LUX_BTC");
       return Response;
 }
 
 QString tradingDialog::GetMarketHistory(){
-      QString Response = sendRequest("https://bittrex.com/api/v1.1/public/getmarkethistory?market=BTC-LUX&count=100");
+      QString Response = sendRequest("https://cryptopia.co.nz/api/GetMarketHistory/LUX_BTC");
       return Response;
 }
 
 QString tradingDialog::CancelOrder(QString OrderId){
 
-        QString URL = "https://bittrex.com/api/v1.1/market/cancel?apikey=";
+        QString URL = "https://cryptopia.co.nz/api/CancelTrade";
                 URL += this->ApiKey;
                 URL += "&nonce=12345434&uuid=";
                 URL += OrderId;
@@ -179,9 +179,9 @@ QString tradingDialog::CancelOrder(QString OrderId){
 QString tradingDialog::BuyLUX(QString OrderType, double Quantity, double Rate){
 
     QString str = "";
-    QString URL = "https://bittrex.com/api/v1.1/market/";
+    QString URL = "https://cryptopia.co.nz";
             URL += OrderType;
-            URL += "?apikey=";
+            URL += "/api/SubmitTrade";
             URL += this->ApiKey;
             URL += "&nonce=12345434&market=BTC-LUX&quantity=";
             URL += str.number(Quantity,'i',8);
@@ -195,9 +195,9 @@ QString tradingDialog::BuyLUX(QString OrderType, double Quantity, double Rate){
 QString tradingDialog::SellLUX(QString OrderType, double Quantity, double Rate){
 
     QString str = "";
-    QString URL = "https://bittrex.com/api/v1.1/market/";
+    QString URL = "https://cryptopia.co.nz";
             URL += OrderType;
-            URL += "?apikey=";
+            URL += "/api/GetMarket/LUX_BTC";
             URL += this->ApiKey;
             URL += "&nonce=12345434&market=BTC-LUX&quantity=";
             URL += str.number(Quantity,'i',8);
@@ -211,9 +211,9 @@ QString tradingDialog::SellLUX(QString OrderType, double Quantity, double Rate){
 QString tradingDialog::Withdraw(double Amount, QString Address, QString Coin){
 
     QString str = "";
-    QString URL = "https://bittrex.com/api/v1.1/account/withdraw?apikey=";
+    QString URL = "https://cryptopia.co.nz";
             URL += this->ApiKey;
-            URL += "&currency=";
+            URL += "/api/SubmitWithdraw";
             URL += Coin;
             URL += "&quantity=";
             URL += str.number(Amount,'i',8);
@@ -226,7 +226,7 @@ QString tradingDialog::Withdraw(double Amount, QString Address, QString Coin){
 }
 
 QString tradingDialog::GetOpenOrders(){
-    QString URL = "https://bittrex.com/api/v1.1/market/getopenorders?apikey=";
+    QString URL = "https://cryptopia.co.nz/api/GetOpenOrders";
             URL += this->ApiKey;
             URL += "&nonce=12345434&market=BTC-LUX";
 
@@ -236,7 +236,7 @@ QString tradingDialog::GetOpenOrders(){
 
 QString tradingDialog::GetBalance(QString Currency){
 
-    QString URL = "https://bittrex.com/api/v1.1/account/getbalance?apikey=";
+    QString URL = "https://cryptopia.co.nz/api/GetBalance";
             URL += this->ApiKey;
             URL += "&nonce=12345434&currency=";
             URL += Currency;
@@ -247,7 +247,7 @@ QString tradingDialog::GetBalance(QString Currency){
 
 QString tradingDialog::GetDepositAddress(){
 
-    QString URL = "https://bittrex.com/api/v1.1/account/getdepositaddress?apikey=";
+    QString URL = "https://cryptopia.co.nz/api/GetDepositAddress";
             URL += this->ApiKey;
             URL += "&nonce=12345434&currency=LUX";
 
@@ -257,7 +257,7 @@ QString tradingDialog::GetDepositAddress(){
 
 QString tradingDialog::GetAccountHistory(){
 
-    QString URL = "https://bittrex.com/api/v1.1/account/getorderhistory?apikey=";
+    QString URL = "https://cryptopia.co.nz/api/GetTradeHistory";
             URL += this->ApiKey;
             URL += "&nonce=12345434&market=BTC-LUX&count=10";
 
@@ -370,7 +370,7 @@ void tradingDialog::ParseAndPopulateOpenOrdersTable(QString Response){
 
             ui->OpenOrdersTable->insertRow(RowCount);
             ui->OpenOrdersTable->setItem(itteration, 0, new QTableWidgetItem(obj["OrderUuid"].toString()));
-            ui->OpenOrdersTable->setItem(itteration, 1, new QTableWidgetItem(BittrexTimeStampToReadable(obj["Opened"].toString())));
+            ui->OpenOrdersTable->setItem(itteration, 1, new QTableWidgetItem(CryptopiaTimeStampToReadable(obj["Opened"].toString())));
             ui->OpenOrdersTable->setItem(itteration, 2, new QTableWidgetItem(obj["Exchange"].toString()));
             ui->OpenOrdersTable->setItem(itteration, 3, new QTableWidgetItem(obj["OrderType"].toString()));
             ui->OpenOrdersTable->setItem(itteration, 4, new QTableWidgetItem(str.number(obj["Limit"].toDouble(),'i',8)));
@@ -434,7 +434,7 @@ void tradingDialog::ParseAndPopulateAccountHistoryTable(QString Response){
             RowCount = ui->TradeHistoryTable->rowCount();
 
             ui->TradeHistoryTable->insertRow(RowCount);
-            ui->TradeHistoryTable->setItem(itteration, 0, new QTableWidgetItem(BittrexTimeStampToReadable(obj["TimeStamp"].toString())));
+            ui->TradeHistoryTable->setItem(itteration, 0, new QTableWidgetItem(CryptopiaTimeStampToReadable(obj["TimeStamp"].toString())));
             ui->TradeHistoryTable->setItem(itteration, 1, new QTableWidgetItem(obj["Exchange"].toString()));
             ui->TradeHistoryTable->setItem(itteration, 2, new QTableWidgetItem(obj["OrderType"].toString()));
             ui->TradeHistoryTable->setItem(itteration, 3, new QTableWidgetItem(str.number(obj["Limit"].toDouble(),'i',8)));
@@ -537,7 +537,7 @@ void tradingDialog::ParseAndPopulateMarketHistoryTable(QString Response){
             RowCount = ui->MarketHistoryTable->rowCount();
 
             ui->MarketHistoryTable->insertRow(RowCount);
-            ui->MarketHistoryTable->setItem(itteration, 0, new QTableWidgetItem(BittrexTimeStampToReadable(obj["TimeStamp"].toString())));
+            ui->MarketHistoryTable->setItem(itteration, 0, new QTableWidgetItem(CryptopiaTimeStampToReadable(obj["TimeStamp"].toString())));
             ui->MarketHistoryTable->setItem(itteration, 1, new QTableWidgetItem(obj["OrderType"].toString()));
             ui->MarketHistoryTable->setItem(itteration, 2, new QTableWidgetItem(str.number(obj["Price"].toDouble(),'i',8)));
             ui->MarketHistoryTable->setItem(itteration, 3, new QTableWidgetItem(str.number(obj["Quantity"].toDouble(),'i',8)));
@@ -575,10 +575,10 @@ void tradingDialog::ActionsOnSwitch(int index = -1){
                 break;
 
                 case 1: //Cross send tab active
-                    Response = GetBalance("LUX);
+                    Response = GetBalance("LUX");
                     Response2 = GetBalance("BTC");
                     if((Response.size() > 0 && Response != "Error") && (Response2.size() > 0 && Response2 != "Error")){
-                        DisplayBalance(*ui->BittrexLUXLabel, *ui->BittrexBTCLabel, Response, Response2);
+                        DisplayBalance(*ui->CryptopiaLUXLabel, *ui->CryptopiaBTCLabel, Response, Response2);
                     }
 
                 break;
@@ -655,7 +655,7 @@ QString tradingDialog::sendRequest(QString url){
     req.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
 
     //make this conditional,depending if we are using private api call
-    req.setRawHeader("apisign",HMAC_SHA512_SIGNER(url,Secret).toStdString().c_str()); //set header for bittrex
+    req.setRawHeader("apisign",HMAC_SHA512_SIGNER(url,Secret).toStdString().c_str()); //set header for Cryptopia
 
     QNetworkReply *reply = mgr.get(req);
     eventLoop.exec(); // blocks stack until "finished()" has been called
@@ -676,7 +676,7 @@ QString tradingDialog::sendRequest(QString url){
      return Response;
 }
 
-QString tradingDialog::BittrexTimeStampToReadable(QString DateTime){
+QString tradingDialog::CryptopiaTimeStampToReadable(QString DateTime){
     //Seperate Time and date.
     int TPos = DateTime.indexOf("T");
     int sPos = DateTime.indexOf(".");
@@ -948,7 +948,7 @@ void tradingDialog::on_Buy_Max_Amount_clicked()
 
 void tradingDialog::on_CS_Max_Amount_clicked()
 {
-    double Quantity = ui->BittrexLUXLabel->text().toDouble();
+    double Quantity = ui->CryptopiaLUXLabel->text().toDouble();
     double Received = 0;
     double Qty = 0;
     double Price = 0;

@@ -45,7 +45,7 @@ private slots:
     void DisplayBalance(QLabel &BalanceLabel, QString Response);
     void ActionsOnSwitch(int index);
     void CancelOrderSlot(int row, int col);
-    void on_UpdateKeys_clicked(bool Save=false, bool Load=false);
+    void on_UpdateKeys_clicked(bool Save=true, bool Load=true);
     void on_LoadKeys_clicked();
     void on_SaveKeys_clicked();
     void on_GenDepositBTN_clicked();
@@ -80,7 +80,7 @@ private slots:
 
     int SetExchangeInfoTextLabels();
 
-    QString BittrexTimeStampToReadable(QString DateTime);
+    QString CryptopiaTimeStampToReadable(QString DateTime);
     QString CancelOrder(QString Orderid);
     QString BuyLUX(QString OrderType, double Quantity, double Rate);
     QString SellLUX(QString OrderType, double Quantity, double Rate);
