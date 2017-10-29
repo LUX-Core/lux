@@ -663,9 +663,9 @@ uint64_t CMasternodePayments::CalculateScore(uint256 blockHash, CTxIn& vin)
     uint256 n3 = Hash(BEGIN(vin.prevout.hash), END(vin.prevout.hash));
     uint256 n4 = n3 > n2 ? (n3 - n2) : (n2 - n3);
 
-    printf(" -- CMasternodePayments CalculateScore() n2 = %d \n", n2.Get64());
-    printf(" -- CMasternodePayments CalculateScore() n3 = %d \n", n3.Get64());
-    printf(" -- CMasternodePayments CalculateScore() n4 = %d \n", n4.Get64());
+    //printf(" -- CMasternodePayments CalculateScore() n2 = %d \n", n2.Get64());
+    //printf(" -- CMasternodePayments CalculateScore() n3 = %d \n", n3.Get64());
+    //printf(" -- CMasternodePayments CalculateScore() n4 = %d \n", n4.Get64());
 
     return n4.Get64();
 }

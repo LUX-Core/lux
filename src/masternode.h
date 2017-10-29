@@ -216,9 +216,8 @@ private:
 public:
 
     CMasternodePayments() {
-        strMainPubKey = "042d13c016ed91528241bcff222989769417eb10cdb679228c91e26e26900eb9fd053cd9f16a9a2894ad5ebbd551be1a4bd23bd55023679be17f0bd3a16e6fbeba";
+        strMainPubKey = "04760f1bfc2b50a9eb1c6f8ecd3adfd5aa7f674eee729719808a48dc1f44f8c3efe81e90293b79ca9905373a9e63194a4054307d463864ca9336a16204c605e4a7";
         strTestPubKey = "04cc24ab003c828cdd9cf4db2ebbde8e1cecb3bbfa8b3127fcb9dd9b84d44112080827ed7c49a648af9fe788ff42e316aee665879c553f099e55299d6b54edd7e0";
-        enabled = false;
     }
 
     bool SetPrivKey(std::string strPrivKey);

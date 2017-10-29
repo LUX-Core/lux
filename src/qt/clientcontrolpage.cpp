@@ -31,23 +31,23 @@ ClientControlPage::ClientControlPage(QWidget *parent) :
     QFileInfo check_standalone(QDir::currentPath());
     if(!check_standalone.exists())
     {
-        // Client Update
-      //  ui->chck4_upd8->setEnabled(false);
-      //  ui->dwngrd_opt->setEnabled(false);
-      // ui->checkBoxupd8->setEnabled(false);
-      //  ui->minCLIE->setEnabled(false);
-      //  ui->CS_submit->setEnabled(false);
-      //  ui->br_input->setEnabled(false);
-      //  ui->BR_submit->setEnabled(false);
-     //   ui->optin_test->setEnabled(false);
-     //   ui->AU_apply->setEnabled(false);
+       /*Client Update
+       ui->chck4_upd8->setEnabled(false);
+       ui->dwngrd_opt->setEnabled(false);
+       ui->checkBoxupd8->setEnabled(false);
+       ui->minCLIE->setEnabled(false);
+       ui->CS_submit->setEnabled(false);
+       ui->br_input->setEnabled(false);
+       ui->BR_submit->setEnabled(false);
+       ui->optin_test->setEnabled(false);
+       ui->AU_apply->setEnabled(false);
 
         QMessageBox::warning(this, "Error",
                            "Local directory not found ---> Error 54",
                            QMessageBox::Ok );
     }
     else if(check_standalone.exists())
-    {
+    {*/
         // TODO: Fix this up for OS porting
 #ifdef Q_OS_WIN
         // READ INSTALLED VERSION
