@@ -29,12 +29,21 @@ Releases
 
 Supported Operating Systems:
 * Linux (64 bit)
-* ~~Linux (32 bit)
+* Linux (32 bit)
 * Windows (32 bit)
 * Windows (64 bit)
 
 Development process
 ===========================
+
+# Version 2.2.3
+===============
++Fixed Masternode payment error
+
+# Version 2.2.2
+===============
++Fixed Masternode Pubkey
++Added Masternode Config
 
 # Version 2.2.1
 ===============
