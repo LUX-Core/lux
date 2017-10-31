@@ -208,8 +208,8 @@ void OverviewPage::updatePlot(int count)
 
     // if(fDebug) { printf("Plot: Getting Ready: pidnexBest: %p\n", pindexBest); }
 
-    int numLookBack = 2000;
-    double diffMax = 0;
+    int numLookBack = 10000;
+    double diffMax = 3000;
     CBlockIndex* pindex = pindexBest;
     int height = nBestHeight;
     int xStart = std::max<int>(height-numLookBack, 0) + 1;
