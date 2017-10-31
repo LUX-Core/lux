@@ -1,5 +1,9 @@
 # Version 2.2.4
 ===============
++Changed vNode.emty to vNode < 3 in miner.cpp
+
+# Version 2.2.4
+===============
 +Updated Lux Logo
 +Reduced masternode expiration second
 +Reduced masternode removal second
