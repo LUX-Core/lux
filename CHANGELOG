@@ -1,6 +1,7 @@
-# Version 2.2.4
+# Version 2.2.5
 ===============
 +Changed vNode.emty to vNode < 3 in miner.cpp
++Started Upgraded multisig-wallet
 
 # Version 2.2.4
 ===============
