@@ -2,6 +2,7 @@
 ===============
 +Changed vNode.emty to vNode < 3 in miner.cpp
 +Started Upgraded multisig-wallet
++Added IsInitialBlockDownload
 
 # Version 2.2.4
 ===============
