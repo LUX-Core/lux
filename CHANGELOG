@@ -1,6 +1,15 @@
 # Version 2.2.4
 ===============
 +Updated Lux Logo
++Reduced masternode expiration second
++Reduced masternode removal second
++Changed  payee = winner.payee to Tx
++Forced upgraded blockhash --> Added Masternode payment request sync
++Added Splited up masternode hash
++Added Moved masternode hash around, the closest masternode to that point wins
++Added Calculate distance between target point and masternode point
++Increased search existing masternode list, this is where we update existing with new dsee broadcasts
++Fixed seednode error
 
 # Version 2.2.3
 ===============
