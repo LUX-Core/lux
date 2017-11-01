@@ -119,10 +119,10 @@ inline void MilliSleep(int64_t n)
 extern bool fMasterNode;
 extern bool fLiteMode;
 extern int nInstantXDepth;
-extern int nDarksendRounds;
+extern int nLuxsendRounds;
 extern int nAnonymizeLuxAmount;
 extern int nLiquidityProvider;
-extern bool fEnableDarksend;
+extern bool fEnableLuxsend;
 extern int64_t enforceMasternodePaymentsTime;
 extern std::string strMasterNodeAddr;
 extern int keysLoaded;

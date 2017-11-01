@@ -28,7 +28,7 @@ public:
     void setClientModel(ClientModel *clientModel);
     void setWalletModel(WalletModel *walletModel);
     void showOutOfSyncWarning(bool fShow);
-    void updateDarksendProgress();
+    void updateLuxsendProgress();
     void updatePlot(int count);
 
 public slots:
@@ -60,7 +60,7 @@ private:
     TransactionFilterProxy *filter;
 
 private slots:
-    void toggleDarksend();
+    void toggleLuxsend();
     void darksendAuto();
     void darksendReset();
     void updateDisplayUnit();

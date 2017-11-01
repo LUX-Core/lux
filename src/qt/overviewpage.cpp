@@ -112,7 +112,7 @@ OverviewPage::OverviewPage(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    ui->frameDarksend->setVisible(true);  // Hide darksend features
+    ui->frameLuxsend->setVisible(true);  // Hide darksend features
 
     //QScroller::grabGesture(ui->scrollArea, QScroller::LeftMouseButtonGesture);
     //ui->scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -169,7 +169,7 @@ OverviewPage::OverviewPage(QWidget *parent) :
     lastNewBlock = 0;
 
     if(fLiteMode){
-        ui->frameDarksend->setVisible(false);
+        ui->frameLuxsend->setVisible(false);
     } else {
 	qDebug() << "Dark Send Status Timer";
         timer = new QTimer(this);
@@ -179,12 +179,12 @@ OverviewPage::OverviewPage(QWidget *parent) :
     }
 
     if(fMasterNode || fLiteMode){
-        ui->toggleDarksend->setText("(" + tr("Disabled") + ")");
-        ui->toggleDarksend->setEnabled(false);
-    }else if(!fEnableDarksend){
-        ui->toggleDarksend->setText(tr("Start Darksend"));
+        ui->toggleLuxsend->setText("(" + tr("Disabled") + ")");
+        ui->toggleLuxsend->setEnabled(false);
+    }else if(!fEnableLuxsend){
+        ui->toggleLuxsend->setText(tr("Start Luxsend"));
     } else {
-        ui->toggleDarksend->setText(tr("Stop Darksend"));
+        ui->toggleLuxsend->setText(tr("Stop Luxsend"));
     }
 
     // start with displaying the "out of sync" warnings
@@ -338,7 +338,7 @@ void OverviewPage::setWalletModel(WalletModel *model)
 
         connect(ui->darksendAuto, SIGNAL(clicked()), this, SLOT(darksendAuto()));
         connect(ui->darksendReset, SIGNAL(clicked()), this, SLOT(darksendReset()));
-        connect(ui->toggleDarksend, SIGNAL(clicked()), this, SLOT(toggleDarksend()));
+        connect(ui->toggleLuxsend, SIGNAL(clicked()), this, SLOT(toggleLuxsend()));
     }
 
     // update the display unit, to not use the default ("BTC")
@@ -373,12 +373,12 @@ void OverviewPage::showOutOfSyncWarning(bool fShow)
 
 
 
-void OverviewPage::updateDarksendProgress()
+void OverviewPage::updateLuxsendProgress()
 {
-    qDebug() << "updateDarksendProgress()";
+    qDebug() << "updateLuxsendProgress()";
     if(IsInitialBlockDownload()) return;
     
-    qDebug() << "updateDarksendProgress() getbalance";
+    qDebug() << "updateLuxsendProgress() getbalance";
     int64_t nBalance = pwalletMain->GetBalance();
     if(nBalance == 0)
     {
@@ -430,7 +430,7 @@ void OverviewPage::updateDarksendProgress()
     ui->darksendProgress->setValue(progress);
 
     std::ostringstream convert;
-    convert << "Progress: " << progress << "%, inputs have an average of " << pwalletMain->GetAverageAnonymizedRounds() << " of " << nDarksendRounds << " rounds";
+    convert << "Progress: " << progress << "%, inputs have an average of " << pwalletMain->GetAverageAnonymizedRounds() << " of " << nLuxsendRounds << " rounds";
     QString s(convert.str().c_str());
     ui->darksendProgress->setToolTip(s);
 }
@@ -446,10 +446,10 @@ void OverviewPage::darkSendStatus()
         if(GetTime() - lastNewBlock < 10) return;
         lastNewBlock = GetTime();
 
-        updateDarksendProgress();
+        updateLuxsendProgress();
 
         QString strSettings(" " + tr("Rounds"));
-        strSettings.prepend(QString::number(nDarksendRounds)).prepend(" / ");
+        strSettings.prepend(QString::number(nLuxsendRounds)).prepend(" / ");
         strSettings.prepend(BitcoinUnits::formatWithUnit(
             walletModel->getOptionsModel()->getDisplayUnit(),
             nAnonymizeLuxAmount * COIN)
@@ -458,14 +458,14 @@ void OverviewPage::darkSendStatus()
         ui->labelAmountRounds->setText(strSettings);
     }
 
-    if(!fEnableDarksend) {
+    if(!fEnableLuxsend) {
         if(nBestHeight != darkSendPool.cachedNumBlocks)
         {
             darkSendPool.cachedNumBlocks = nBestHeight;
 
             ui->darksendEnabled->setText(tr("Disabled"));
             ui->darksendStatus->setText("");
-            ui->toggleDarksend->setText(tr("Start Darksend"));
+            ui->toggleLuxsend->setText(tr("Start Luxsend"));
         }
 
         return;
@@ -492,13 +492,13 @@ void OverviewPage::darkSendStatus()
     if(state == POOL_STATUS_ACCEPTING_ENTRIES) {
         if(entries == 0) {
             if(darkSendPool.strAutoDenomResult.size() == 0){
-                convert << tr("Darksend is idle.").toStdString();
+                convert << tr("Luxsend is idle.").toStdString();
             } else {
                 convert << darkSendPool.strAutoDenomResult;
             }
             showingDarkSendMessage = 0;
         } else if (accepted == 1) {
-            convert << tr("Darksend request complete: Your transaction was accepted into the pool!").toStdString();
+            convert << tr("Luxsend request complete: Your transaction was accepted into the pool!").toStdString();
             if(showingDarkSendMessage % 10 > 8) {
                 darkSendPool.lastEntryAccepted = 0;
                 showingDarkSendMessage = 0;
@@ -517,13 +517,13 @@ void OverviewPage::darkSendStatus()
     } else if(state == POOL_STATUS_TRANSMISSION) {
         convert << tr("Transmitting final transaction.").toStdString();
     } else if (state == POOL_STATUS_IDLE) {
-        convert << tr("Darksend is idle.").toStdString();
+        convert << tr("Luxsend is idle.").toStdString();
     } else if (state == POOL_STATUS_FINALIZE_TRANSACTION) {
         convert << tr("Finalizing transaction.").toStdString();
     } else if(state == POOL_STATUS_ERROR) {
-        convert << tr("Darksend request incomplete:").toStdString() << " " << darkSendPool.lastMessage << ". " << tr("Will retry...").toStdString();
+        convert << tr("Luxsend request incomplete:").toStdString() << " " << darkSendPool.lastMessage << ". " << tr("Will retry...").toStdString();
     } else if(state == POOL_STATUS_SUCCESS) {
-        convert << tr("Darksend request complete:").toStdString() << " " << darkSendPool.lastMessage;
+        convert << tr("Luxsend request complete:").toStdString() << " " << darkSendPool.lastMessage;
     } else if(state == POOL_STATUS_QUEUE) {
         if(showingDarkSendMessage % 70 <= 50) convert << tr("Submitted to masternode, waiting in queue .").toStdString();
         else if(showingDarkSendMessage % 70 <= 60) convert << tr("Submitted to masternode, waiting in queue ..").toStdString();
@@ -535,10 +535,10 @@ void OverviewPage::darkSendStatus()
     if(state == POOL_STATUS_ERROR || state == POOL_STATUS_SUCCESS) darkSendPool.Check();
 
     QString s(convert.str().c_str());
-    s = tr("Last Darksend message:\n") + s;
+    s = tr("Last Luxsend message:\n") + s;
 
     if(s != ui->darksendStatus->text())
-        LogPrintf("Last Darksend message: %s\n", convert.str().c_str());
+        LogPrintf("Last Luxsend message: %s\n", convert.str().c_str());
 
     ui->darksendStatus->setText(s);
 
@@ -564,13 +564,13 @@ void OverviewPage::darksendAuto(){
 void OverviewPage::darksendReset(){
     darkSendPool.Reset();
 
-    QMessageBox::warning(this, tr("Darksend"),
-        tr("Darksend was successfully reset."),
+    QMessageBox::warning(this, tr("Luxsend"),
+        tr("Luxsend was successfully reset."),
         QMessageBox::Ok, QMessageBox::Ok);
 }
 
-void OverviewPage::toggleDarksend(){
-    if(!fEnableDarksend){
+void OverviewPage::toggleLuxsend(){
+    if(!fEnableLuxsend){
         int64_t balance = pwalletMain->GetBalance();
         float minAmount = 1.49 * COIN;
         if(balance < minAmount){
@@ -578,8 +578,8 @@ void OverviewPage::toggleDarksend(){
                 BitcoinUnits::formatWithUnit(
                     walletModel->getOptionsModel()->getDisplayUnit(),
                     minAmount));
-            QMessageBox::warning(this, tr("Darksend"),
-                tr("Darksend requires at least %1 to use.").arg(strMinAmount),
+            QMessageBox::warning(this, tr("Luxsend"),
+                tr("Luxsend requires at least %1 to use.").arg(strMinAmount),
                 QMessageBox::Ok, QMessageBox::Ok);
             return;
         }
@@ -592,10 +592,10 @@ void OverviewPage::toggleDarksend(){
             {
                 //unlock was cancelled
                 darkSendPool.cachedNumBlocks = 0;
-                QMessageBox::warning(this, tr("Darksend"),
-                    tr("Wallet is locked and user declined to unlock. Disabling Darksend."),
+                QMessageBox::warning(this, tr("Luxsend"),
+                    tr("Wallet is locked and user declined to unlock. Disabling Luxsend."),
                     QMessageBox::Ok, QMessageBox::Ok);
-                if (fDebug) LogPrintf("Wallet is locked and user declined to unlock. Disabling Darksend.\n");
+                if (fDebug) LogPrintf("Wallet is locked and user declined to unlock. Disabling Luxsend.\n");
                 return;
             }
         }
@@ -603,17 +603,17 @@ void OverviewPage::toggleDarksend(){
     }
 
     darkSendPool.cachedNumBlocks = 0;
-    fEnableDarksend = !fEnableDarksend;
+    fEnableLuxsend = !fEnableLuxsend;
 
-    if(!fEnableDarksend){
-        ui->toggleDarksend->setText(tr("Start Darksend"));
+    if(!fEnableLuxsend){
+        ui->toggleLuxsend->setText(tr("Start Luxsend"));
     } else {
-        ui->toggleDarksend->setText(tr("Stop Darksend"));
+        ui->toggleLuxsend->setText(tr("Stop Luxsend"));
 
         /* show darksend configuration if client has defaults set */
 
         if(nAnonymizeLuxAmount == 0){
-            DarksendConfig dlg(this);
+            LuxsendConfig dlg(this);
             dlg.setModel(walletModel);
             dlg.exec();
         }

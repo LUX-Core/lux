@@ -266,7 +266,7 @@ std::string HelpMessage()
     strUsage += "  -rpcsslcertificatechainfile=<file.cert>  " + _("Server certificate file (default: server.cert)") + "\n";
     strUsage += "  -rpcsslprivatekeyfile=<file.pem>         " + _("Server private key (default: server.pem)") + "\n";
     strUsage += "  -rpcsslciphers=<ciphers>                 " + _("Acceptable ciphers (default: TLSv1.2+HIGH:TLSv1+HIGH:!SSLv2:!aNULL:!eNULL:!3DES:@STRENGTH)") + "\n";
-    strUsage += "  -litemode=<n>          " + _("Disable all Masternode and Darksend related functionality (0-1, default: 0)") + "\n";
+    strUsage += "  -litemode=<n>          " + _("Disable all Masternode and Luxsend related functionality (0-1, default: 0)") + "\n";
 strUsage += "\n" + _("Masternode options:") + "\n";
     strUsage += "  -masternode=<n>            " + _("Enable the client to act as a masternode (0-1, default: 0)") + "\n";
     strUsage += "  -mnconf=<file>             " + _("Specify masternode configuration file (default: masternode.conf)") + "\n";
@@ -274,11 +274,11 @@ strUsage += "\n" + _("Masternode options:") + "\n";
     strUsage += "  -masternodeaddr=<n>        " + _("Set external address:port to get to this masternode (example: address:port)") + "\n";
     strUsage += "  -masternodeminprotocol=<n> " + _("Ignore masternodes less than version (example: 70007; default : 0)") + "\n";
 
-    strUsage += "\n" + _("Darksend options:") + "\n";
+    strUsage += "\n" + _("Luxsend options:") + "\n";
     strUsage += "  -enabledarksend=<n>          " + _("Enable use of automated darksend for funds stored in this wallet (0-1, default: 0)") + "\n";
     strUsage += "  -darksendrounds=<n>          " + _("Use N separate masternodes to anonymize funds  (2-8, default: 2)") + "\n";
     strUsage += "  -anonymizeLuxamount=<n> " + _("Keep N Lux anonymized (default: 0)") + "\n";
-    strUsage += "  -liquidityprovider=<n>       " + _("Provide liquidity to Darksend by infrequently mixing coins on a continual basis (0-100, default: 0, 1=very frequent, high fees, 100=very infrequent, low fees)") + "\n";
+    strUsage += "  -liquidityprovider=<n>       " + _("Provide liquidity to Luxsend by infrequently mixing coins on a continual basis (0-100, default: 0, 1=very frequent, high fees, 100=very infrequent, low fees)") + "\n";
 
     strUsage += "\n" + _("InstantX options:") + "\n";
     strUsage += "  -enableinstantx=<n>    " + _("Enable instantx, show confirmations for locked transactions (bool, default: true)") + "\n";
@@ -923,17 +923,17 @@ bool AppInit2(boost::thread_group& threadGroup)
         }
     }
 
-    fEnableDarksend = GetBoolArg("-enabledarksend", false);
+    fEnableLuxsend = GetBoolArg("-enabledarksend", false);
 
-    nDarksendRounds = GetArg("-darksendrounds", 2);
-    if(nDarksendRounds > 16) nDarksendRounds = 16;
-    if(nDarksendRounds < 1) nDarksendRounds = 1;
+    nLuxsendRounds = GetArg("-darksendrounds", 2);
+    if(nLuxsendRounds > 16) nLuxsendRounds = 16;
+    if(nLuxsendRounds < 1) nLuxsendRounds = 1;
 
     nLiquidityProvider = GetArg("-liquidityprovider", 0); //0-100
     if(nLiquidityProvider != 0) {
         darkSendPool.SetMinBlockSpacing(std::min(nLiquidityProvider,100)*15);
-        fEnableDarksend = true;
-        nDarksendRounds = 99999;
+        fEnableLuxsend = true;
+        nLuxsendRounds = 99999;
     }
 
     nAnonymizeLuxAmount = GetArg("-anonymizeLuxamount", 0);
@@ -949,7 +949,7 @@ bool AppInit2(boost::thread_group& threadGroup)
         nInstantXDepth = 0;
     }
 
-    //lite mode disables all Masternode and Darksend related functionality
+    //lite mode disables all Masternode and Luxsend related functionality
     fLiteMode = GetBoolArg("-litemode", false);
     if(fMasterNode && fLiteMode){
         return InitError("You can not start a masternode in litemode");
@@ -957,11 +957,11 @@ bool AppInit2(boost::thread_group& threadGroup)
 
     LogPrintf("fLiteMode %d\n", fLiteMode);
     LogPrintf("nInstantXDepth %d\n", nInstantXDepth);
-    LogPrintf("Darksend rounds %d\n", nDarksendRounds);
+    LogPrintf("Luxsend rounds %d\n", nLuxsendRounds);
     LogPrintf("Anonymize Lux Amount %d\n", nAnonymizeLuxAmount);
 
     /* Denominations
-       A note about convertability. Within Darksend pools, each denomination
+       A note about convertability. Within Luxsend pools, each denomination
        is convertable to another.
        For example:
        1Lux+1000 == (.1Lux+100)*10

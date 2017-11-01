@@ -453,7 +453,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QFrame" name="frameDarksend">
+        <widget class="QFrame" name="frameLuxsend">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
            <horstretch>0</horstretch>
@@ -487,12 +487,12 @@
                </font>
               </property>
               <property name="text">
-               <string>Darksend</string>
+               <string>Luxsend</string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QLabel" name="labelDarksendSyncStatus">
+             <widget class="QLabel" name="labelLuxsendSyncStatus">
               <property name="toolTip">
                <string>The displayed information may be out of date. Your wallet automatically synchronizes with the Transfer network after a connection is established, but this process has not completed yet.</string>
               </property>
@@ -994,7 +994,7 @@
             <item row="3" column="0">
              <widget class="QLabel" name="labelAnonymizedText">
               <property name="text">
-               <string>Darksend Balance:</string>
+               <string>Luxsend Balance:</string>
               </property>
              </widget>
             </item>
@@ -1086,7 +1086,7 @@
              </sizepolicy>
             </property>
             <property name="toolTip">
-             <string>Try to manually submit a Darksend request.</string>
+             <string>Try to manually submit a Luxsend request.</string>
             </property>
             <property name="text">
              <string>Try Mix</string>
@@ -1094,7 +1094,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="toggleDarksend">
+           <widget class="QPushButton" name="toggleLuxsend">
             <property name="sizePolicy">
              <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
               <horstretch>0</horstretch>
@@ -1115,7 +1115,7 @@
              </sizepolicy>
             </property>
             <property name="toolTip">
-             <string>Reset the current status of Darksend (can interrupt Darksend if it's in the process of Mixing, which can cost you money!)</string>
+             <string>Reset the current status of Luxsend (can interrupt Luxsend if it's in the process of Mixing, which can cost you money!)</string>
             </property>
             <property name="autoFillBackground">
              <bool>false</bool>

@@ -33,7 +33,7 @@ public:
         CoinControlFeatures, // bool
         MinimizeCoinAge,   // bool
         UseBlackTheme,     // bool
-        DarksendRounds,    // int
+        LuxsendRounds,    // int
         anonymizeLuxAmount, //int
         OptionIDRowCount,
     };
