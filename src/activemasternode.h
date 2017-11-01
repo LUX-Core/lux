@@ -15,8 +15,6 @@
 #include "wallet.h"
 #include "darksend.h"
 
-class CActiveMasternode;
-extern CActiveMasternode activeMasternode;
 // Responsible for activating the masternode and pinging the network
 class CActiveMasternode
 {
