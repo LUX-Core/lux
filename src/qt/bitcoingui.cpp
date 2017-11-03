@@ -38,7 +38,6 @@
 #include "messagepage.h"
 #include "blockbrowser.h"
 #include "multisigdialog.h"
-#include "tradingdialog.h"
 
 #ifdef Q_OS_MAC
 #include "macdockiconhandler.h"
@@ -122,8 +121,8 @@ BitcoinGUI::BitcoinGUI(QWidget *parent):
     // Create tabs
     overviewPage = new OverviewPage();
     // Create trading page
-    tradingDialogPage = new tradingDialog(this);
-    tradingDialogPage->setObjectName("tradingDialog");
+  //  tradingDialogPage = new tradingDialog(this);
+   // tradingDialogPage->setObjectName("tradingDialog");
 
     transactionsPage = new QWidget(this);
     QVBoxLayout *vbox = new QVBoxLayout();
@@ -161,8 +160,8 @@ BitcoinGUI::BitcoinGUI(QWidget *parent):
     centralStackedWidget->addWidget(messagePage);
     centralStackedWidget->addWidget(blockBrowser);
     centralStackedWidget->addWidget(clientcontrolPage);
-    TradingAction->setChecked(true);
-    centralStackedWidget->addWidget(tradingDialogPage);
+    //TradingAction->setChecked(true);
+  //  centralStackedWidget->addWidget(tradingDialogPage);
 
     QWidget *centralWidget = new QWidget();
     QVBoxLayout *centralLayout = new QVBoxLayout(centralWidget);
@@ -335,14 +334,14 @@ void BitcoinGUI::createActions()
     multisigAction = new QAction(QIcon(":/icons/send"), tr("Multisig"), this);
     tabGroup->addAction(multisigAction);
 
-    TradingAction = new QAction(tr("&Trade"), this);
+  /*  TradingAction = new QAction(tr("&Trade"), this);
     TradingAction ->setToolTip(tr("Start Trading"));
     TradingAction ->setCheckable(true);
     TradingAction ->setShortcut(QKeySequence(Qt::ALT + Qt::Key_8));
     TradingAction->setProperty("objectName","TradingAction");
-    tabGroup->addAction(TradingAction);
+    tabGroup->addAction(TradingAction);*/
 
-    connect(TradingAction, SIGNAL(triggered()), this, SLOT(gotoTradingPage()));
+   // connect(TradingAction, SIGNAL(triggered()), this, SLOT(gotoTradingPage()));
     connect(blockAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
     connect(blockAction, SIGNAL(triggered()), this, SLOT(gotoBlockBrowser()));
     connect(overviewAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
@@ -480,7 +479,7 @@ void BitcoinGUI::createToolBars()
     toolbar->addAction(clientcontrolAction);
     toolbar->addAction(generateAction);
     toolbar->addAction(blockAction);
-    toolbar->addAction(TradingAction);
+    //toolbar->addAction(TradingAction);
     netLabel = new QLabel();
 
     QWidget *spacer = makeToolBarSpacer();
@@ -1009,7 +1008,7 @@ void BitcoinGUI::gotoClientControlPage()
     disconnect(exportAction, SIGNAL(triggered()), 0, 0);
 }
 
-void BitcoinGUI::gotoTradingPage()
+/*void BitcoinGUI::gotoTradingPage()
 {
 
      TradingAction->setChecked(true);
@@ -1017,7 +1016,7 @@ void BitcoinGUI::gotoTradingPage()
 
   //  exportAction->setEnabled(false);
   //  disconnect(exportAction, SIGNAL(triggered()), 0, 0);
-}
+}*/
 
 void BitcoinGUI::gotoMessagePage()
 {

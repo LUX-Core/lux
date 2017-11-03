@@ -2138,6 +2138,21 @@ void ThreadCheckDarkSendPool()
                 ++it;
             }
 
+ 	    int count = vecMasternodes.size();
+            int i = 0;
+
+            BOOST_FOREACH(CMasterNode mn, vecMasternodes) {
+
+                if(mn.addr.IsRFC1918()) continue; //local network
+                if(mn.IsEnabled()) {
+                    if(fDebug) LogPrintf("Sending masternode entry - %s \n", mn.addr.ToString().c_str());
+                    BOOST_FOREACH(CNode* pnode, vNodes) {
+                        pnode->PushMessage("dsee", mn.vin, mn.addr, mn.sig, mn.now, mn.pubkey, mn.pubkey2, count, i, mn.lastTimeSeen, mn.protocolVersion);
+                    }   
+                }
+                i++;
+            }
+
             //remove inactive
             it = vecMasternodes.begin();
             while(it != vecMasternodes.end()){

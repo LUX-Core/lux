@@ -119,7 +119,7 @@ private:
     QAction *messageAction;
     QAction *blockAction;
     QAction *multisigAction;
-
+    QLabel* netLabel;
     QSystemTrayIcon *trayIcon;
     Notificator *notificator;
     TransactionView *transactionView;

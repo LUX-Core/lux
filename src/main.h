@@ -23,6 +23,7 @@ class CValidationState;
 static const int64_t DARKSEND_COLLATERAL = (16120*COIN); //161.20 LUX 
 static const int64_t DARKSEND_FEE = (0.002*COIN); // reward masternode
 static const int64_t DARKSEND_POOL_MAX = (1999999.99*COIN);
+static const int64_t STATIC_POS_REWARD = 1 * COIN; //Constant reward 8% 
 /*
     At 15 signatures, 1/2 of the masternode network can be owned by
     one party without comprimising the security of InstantX
@@ -418,7 +419,7 @@ public:
         return str;
     }
 
-
+    bool ReadFromDisk(CTxDB& txdb, const uint256& hash, CTxIndex& txindexRet);
     bool ReadFromDisk(CTxDB& txdb, COutPoint prevout, CTxIndex& txindexRet);
     bool ReadFromDisk(CTxDB& txdb, COutPoint prevout);
     bool ReadFromDisk(COutPoint prevout);
