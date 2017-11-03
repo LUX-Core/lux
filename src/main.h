@@ -102,7 +102,7 @@ inline int64_t FutureDriftV2(int64_t nTime) { return nTime + 10 * 60; }
 inline int64_t FutureDrift(int64_t nTime, int nHeight) { return IsProtocolV2(nHeight) ? FutureDriftV2(nTime) : FutureDriftV1(nTime); }
 
 inline unsigned int GetTargetSpacing(int nHeight) { return IsProtocolV2(nHeight) ? 240 : 60; }
-inline int64_t GetMNCollateral(int nHeight) { return nHeight>=40000 ? 16120 : 1999999; }
+inline int64_t GetMNCollateral(int nHeight) { return nHeight>=30000 ? 16120 : 1999999; }
 
 extern CScript COINBASE_FLAGS;
 extern CCriticalSection cs_main;
