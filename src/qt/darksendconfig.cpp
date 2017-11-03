@@ -89,3 +89,4 @@ void LuxsendConfig::configure(bool enabled, int coins, int rounds) {
     nLuxsendRounds = rounds;
     nAnonymizeLuxAmount = coins;
 }
+

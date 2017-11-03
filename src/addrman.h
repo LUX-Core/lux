@@ -228,9 +228,6 @@ protected:
     // Mark an entry as attempted to connect.
     void Attempt_(const CService &addr, int64_t nTime);
 
-    //! Update an entry's service bits.
-    void SetServices_(const CService &addr, uint64_t nServices);
-
     // Select an address to connect to.
     // nUnkBias determines how much to favor new addresses over tried ones (min=0, max=100)
     CAddress Select_(int nUnkBias);
@@ -503,15 +500,6 @@ public:
             Check();
         }
     }
-
-    void SetServices(const CService &addr, uint64_t nServices)
-   {
-            LOCK(cs);
-            Check();
-            SetServices_(addr, nServices);
-            Check();
-   }
-
 };
 
 #endif

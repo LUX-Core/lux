@@ -21,6 +21,7 @@ class MasternodeManager;
 class MessagePage;
 class MessageModel;
 class BlockBrowser;
+class MultisigDialog;
 
 QT_BEGIN_NAMESPACE
 class QLabel;
@@ -80,12 +81,17 @@ private:
     MasternodeManager *masternodeManagerPage;
     MessagePage *messagePage;
     BlockBrowser *blockBrowser;
+    MultisigDialog *multisigPage;
+
+   //----------QLable---------//
+
     QLabel *labelEncryptionIcon;
     QLabel *labelStakingIcon;
     QLabel *labelConnectionsIcon;
     QLabel *labelBlocksIcon;
     QLabel *progressBarLabel;
     QProgressBar *progressBar;
+   //----------QAction---------//
 
     QMenuBar *appMenuBar;
     QAction *overviewAction;
@@ -112,6 +118,7 @@ private:
     QAction *masternodeManagerAction;
     QAction *messageAction;
     QAction *blockAction;
+    QAction *multisigAction;
 
     QSystemTrayIcon *trayIcon;
     Notificator *notificator;
@@ -180,7 +187,9 @@ private slots:
     void gotoSendCoinsPage();
     /** Switch to block explorer*/
     void gotoBlockBrowser();
-
+    /** Switch to multisigpage */
+    void gotoMultisigPage();
+    /** Switch to masternodemanagerpage */
     void gotoMasternodeManagerPage();
 
     /** Show Sign/Verify Message dialog and switch to sign message tab */

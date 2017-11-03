@@ -1,0 +1,114 @@
+#############################################################################
+# Makefile for building: libi2psam.a
+# make -f makefile.mingw
+#############################################################################
+
+####### Compiler, tools and options
+
+CC            = gcc
+CXX           = g++
+DEFINES	   = -D_MT -DWIN32 -D_WINDOWS -DBOOST_THREAD_USE_LIB -DBOOST_SPIRIT_THREADSAFE
+
+CFLAGS        = -pipe -O2 -fPIC -Wall -W -D_REENTRANT $(DEFINES)
+CXXFLAGS      = -pipe -O2 -std=c++11 -fPIC -Wall -W -D_REENTRANT $(DEFINES)
+AR            = ar cqs
+RANLIB        = 
+TAR           = tar -cf
+COMPRESS      = gzip -9f
+COPY          = cp -f
+SED           = sed
+COPY_FILE     = $(COPY)
+COPY_DIR      = $(COPY) -r
+STRIP         = strip
+INSTALL_FILE  = install -m 644 -p
+INSTALL_DIR   = $(COPY_DIR)
+INSTALL_PROGRAM = install -m 755 -p
+DEL_FILE      = rm -f
+SYMLINK       = ln -f -s
+DEL_DIR       = rmdir
+MOVE          = mv -f
+CHK_DIR_EXISTS= test -d
+MKDIR         = mkdir -p
+
+####### Output directory
+
+OBJECTS_DIR   = ./
+
+####### Files
+
+SOURCES       = i2psam.cpp 
+OBJECTS       = i2psam.o
+DESTDIR       = 
+TARGET        = libi2psam.a
+
+first: all
+####### Implicit rules
+
+.SUFFIXES: .o .c .cpp .cc .cxx .C
+
+.cpp.o:
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o "$@" "$<"
+
+.cc.o:
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o "$@" "$<"
+
+.cxx.o:
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o "$@" "$<"
+
+.C.o:
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o "$@" "$<"
+
+.c.o:
+	$(CC) -c $(CFLAGS) $(INCPATH) -o "$@" "$<"
+
+####### Build rules
+
+all: $(TARGET) 
+
+staticlib: $(TARGET)
+
+$(TARGET):  $(OBJECTS) $(OBJCOMP) 
+	-$(DEL_FILE) $(TARGET)
+	$(AR) $(TARGET) $(OBJECTS)
+
+
+dist: 
+	@$(CHK_DIR_EXISTS) .tmp/i2psam1.0.0 || $(MKDIR) .tmp/i2psam1.0.0 
+	$(COPY_FILE) --parents $(SOURCES) $(DIST) .tmp/i2psam1.0.0/ && $(COPY_FILE) --parents i2psam.h .tmp/i2psam1.0.0/ && $(COPY_FILE) --parents i2psam.cpp .tmp/i2psam1.0.0/ && (cd `dirname .tmp/i2psam1.0.0` && $(TAR) i2psam1.0.0.tar i2psam1.0.0 && $(COMPRESS) i2psam1.0.0.tar) && $(MOVE) `dirname .tmp/i2psam1.0.0`/i2psam1.0.0.tar.gz . && $(DEL_FILE) -r .tmp/i2psam1.0.0
+
+
+clean: 
+	-$(DEL_FILE) $(TARGET) 
+	-$(DEL_FILE) $(OBJECTS)
+
+
+####### Sub-libraries
+
+distclean: clean
+	-$(DEL_FILE) $(TARGET) 
+
+
+check: first
+
+####### Compile
+
+i2psam.o: i2psam.cpp i2psam.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o i2psam.o i2psam.cpp
+
+####### Install
+
+install_target: first FORCE
+	@$(CHK_DIR_EXISTS) $(INSTALL_ROOT)/usr/lib/ || $(MKDIR) $(INSTALL_ROOT)/usr/lib/ 
+	-$(INSTALL_FILE) "$(TARGET)" "$(INSTALL_ROOT)/usr/lib/$(TARGET)"
+
+uninstall_target:  FORCE
+	-$(DEL_FILE) "$(INSTALL_ROOT)/usr/lib/$(TARGET)"
+	-$(DEL_DIR) $(INSTALL_ROOT)/usr/lib/ 
+
+
+install:  install_target  FORCE
+
+uninstall: uninstall_target   FORCE
+
+FORCE:
+

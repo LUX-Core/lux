@@ -689,3 +689,7 @@ void WalletModel::listLockedCoins(std::vector<COutPoint>& vOutpts)
     wallet->ListLockedCoins(vOutpts);
 }
 
+CWallet* WalletModel::getWallet()
+{
+    return wallet;
+}

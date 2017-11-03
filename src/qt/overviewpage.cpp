@@ -621,3 +621,4 @@ void OverviewPage::toggleLuxsend(){
         darkSendPool.DoAutomaticDenominating();
     }
 }
+

@@ -1,0 +1,55 @@
+USE_WIN32_APP=yes
+CXX = g++
+WINDRES = windres
+CXXFLAGS = -Os -D_MT -DWIN32 -D_WINDOWS -DWIN32_LEAN_AND_MEAN
+NEEDED_CXXFLAGS = -std=c++11
+BOOST_SUFFIX = -mt
+INCFLAGS = -I/usr/include/ -I/usr/local/include/ -I. -Idaemon
+LDFLAGS = -Wl,-rpath,/usr/local/lib -Wl,-Bstatic -static-libgcc -static-libstdc++ -L/usr/local/lib
+
+# UPNP Support
+ifeq ($(USE_UPNP),yes)
+	CXXFLAGS += -DUSE_UPNP -DMINIUPNP_STATICLIB
+	LDLIBS = -lminiupnpc
+endif
+
+LDLIBS += \
+	-lboost_system$(BOOST_SUFFIX) \
+	-lboost_date_time$(BOOST_SUFFIX) \
+	-lboost_filesystem$(BOOST_SUFFIX) \
+	-lboost_program_options$(BOOST_SUFFIX) \
+	-lssl \
+	-lcrypto \
+	-lz \
+	-lwsock32 \
+	-lws2_32 \
+	-lgdi32 \
+	-liphlpapi \
+	-lstdc++ \
+	-lpthread
+
+ifeq ($(USE_WIN32_APP), yes)
+	CXXFLAGS += -DWIN32_APP
+	LDFLAGS += -mwindows -s
+	DAEMON_RC += Win32/Resource.rc
+	DAEMON_OBJS += $(patsubst %.rc,obj/%.o,$(DAEMON_RC))
+endif
+
+# don't change following line to ifeq ($(USE_AESNI),yes) !!!
+ifeq ($(USE_AESNI),1)
+	CPU_FLAGS += -maes -DAESNI
+else
+	CPU_FLAGS += -msse
+endif
+
+ifeq ($(USE_AVX),1)
+	CPU_FLAGS += -mavx
+endif
+
+ifeq ($(USE_ASLR),yes)
+	LDFLAGS += -Wl,--nxcompat -Wl,--high-entropy-va \
+	-Wl,--dynamicbase,--export-all-symbols
+endif
+
+obj/%.o : %.rc
+	$(WINDRES) -i $< -o $@

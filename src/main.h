@@ -46,8 +46,8 @@ static const int64_t DARKSEND_POOL_MAX = (1999999.99*COIN);
 #define MASTERNODE_MIN_DSEE_SECONDS            (5*60)
 #define MASTERNODE_PING_SECONDS                (1*60) //(1*60)
 #define MASTERNODE_PING_WAIT_SECONDS           (5*60)
-#define MASTERNODE_EXPIRATION_SECONDS          (43265*60) //Old 65*60
-#define MASTERNODE_REMOVAL_SECONDS             (43270*60) //Old 70*60
+#define MASTERNODE_EXPIRATION_SECONDS          (65*60) //Old 65*60
+#define MASTERNODE_REMOVAL_SECONDS             (70*60) //Old 70*60
 
 
 class CBlock;
@@ -101,6 +101,7 @@ inline int64_t FutureDriftV2(int64_t nTime) { return nTime + 10 * 60; }
 inline int64_t FutureDrift(int64_t nTime, int nHeight) { return IsProtocolV2(nHeight) ? FutureDriftV2(nTime) : FutureDriftV1(nTime); }
 
 inline unsigned int GetTargetSpacing(int nHeight) { return IsProtocolV2(nHeight) ? 240 : 60; }
+inline int64_t GetMNCollateral(int nHeight) { return nHeight>=40000 ? 16120 : 1999999; }
 
 extern CScript COINBASE_FLAGS;
 extern CCriticalSection cs_main;
