@@ -1,7 +1,7 @@
 # Version 3.0.0
 ===============
 +Changed vNode.emty to vNode < 3 in miner.cpp
-+Started Upgraded multisig-wallet
++Upgraded multisig-wallet
 +Added IsInitialBlockDownload
 +Added GetMNCollateral
 +Improved MN functions

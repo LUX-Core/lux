@@ -3,7 +3,7 @@
  */
 
 #include <QApplication>
-
+#include "masternodeconfig.h"
 #include "bitcoingui.h"
 #include "clientmodel.h"
 #include "walletmodel.h"
@@ -166,7 +166,7 @@ int main(int argc, char *argv[])
         return 1;
     }
     ReadConfigFile(mapArgs, mapMultiArgs);
-
+    masternodeConfig.read(GetMasternodeConfigFile());
     // Application identification (must be set before OptionsModel is initialized,
     // as it is used to locate QSettings)
     app.setOrganizationName("Lux");
