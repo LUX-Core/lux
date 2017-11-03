@@ -1,6 +1,25 @@
+# Version 3.0.0
+===============
++Changed vNode.emty to vNode < 3 in miner.cpp
++Started Upgraded multisig-wallet
++Added IsInitialBlockDownload
++Added GetMNCollateral
++Improved MN functions
++Prepared to initilised luxgate
++Fixed QT wallet CPU threads exhausted
+
 # Version 2.2.4
 ===============
 +Updated Lux Logo
++Reduced masternode expiration second
++Reduced masternode removal second
++Changed  payee = winner.payee to Tx
++Forced upgraded blockhash --> Added Masternode payment request sync
++Added Splited up masternode hash
++Added Moved masternode hash around, the closest masternode to that point wins
++Added Calculate distance between target point and masternode point
++Increased search existing masternode list, this is where we update existing with new dsee broadcasts
++Fixed seednode error
 
 # Version 2.2.3
 ===============
@@ -18,7 +37,6 @@
 +Added client control function
 +Added network statistics into block explorer 
 +Redesign dashboard tab
-
 # Version 2.2.0
 ===============
 +Fixed Sync error
