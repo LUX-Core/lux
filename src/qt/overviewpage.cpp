@@ -162,7 +162,7 @@ OverviewPage::OverviewPage(QWidget *parent) :
     }
     else
     {
-        ui->diffplot->setVisible(false);
+        ui->diffplot->setVisible(true);
     }
     showingDarkSendMessage = 0;
     darksendActionCheck = 0;
