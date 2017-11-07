@@ -1,3 +1,4 @@
+src/obj/*.p
 src/*.exe
 src/novacoind
 src/build.h
