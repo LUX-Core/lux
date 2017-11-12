@@ -145,7 +145,6 @@ OBJS= \
     obj/instantx.o \
     obj/masternodeconfig.o \
     obj/masternode.o \
-    obj/masternodeman.o \
     obj/rpcdarksend.o \
     obj/spork.o \
     obj/crypto/hmac_sha256.o \

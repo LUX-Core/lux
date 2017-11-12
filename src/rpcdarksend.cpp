@@ -7,7 +7,7 @@
 //#include "primitives/transaction.h"
 #include "db.h"
 #include "init.h"
-#include "masternodeman.h"
+#include "masternode.h"
 #include "activemasternode.h"
 #include "masternodeconfig.h"
 #include "rpcserver.h"
@@ -111,7 +111,7 @@ Value getpoolinfo(const Array& params, bool fHelp)
             "Returns an object containing anonymous pool-related information.");
 
     Object obj;
-    obj.push_back(Pair("current_masternode",        mnodeman.GetCurrentMasterNode()->addr.ToString()));
+    obj.push_back(Pair("current_masternode",        GetCurrentMasterNode()));
     obj.push_back(Pair("state",        darkSendPool.GetState()));
     obj.push_back(Pair("entries",      darkSendPool.GetEntriesCount()));
     obj.push_back(Pair("entries_accepted",      darkSendPool.GetCountEntriesAccepted()));
