@@ -194,15 +194,16 @@ int ReadHTTPMessage(std::basic_istream<char>& stream, map<string,
     {
         vector<char> vch;
         size_t ptr = 0;
-         while (ptr < (size_t)nLen)
-        {
-            size_t bytes_to_read = std::min((size_t)nLen - ptr, POST_READ_SIZE);
+        while (ptr < (size_t)nLen)
+       {
+        size_t bytes_to_read = std::min((size_t)nLen - ptr, POST_READ_SIZE);
             vch.resize(ptr + bytes_to_read);
             stream.read(&vch[ptr], bytes_to_read);
             if (!stream) // Connection lost while reading
                 return HTTP_INTERNAL_SERVER_ERROR;
             ptr += bytes_to_read;
         }
+       
 
         strMessageRet = string(vch.begin(), vch.end());
     }

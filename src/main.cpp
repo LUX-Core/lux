@@ -239,22 +239,13 @@ unsigned int LimitOrphanTxSize(unsigned int nMaxOrphans)
 // CTransaction and CTxIndex
 
 
-bool CTransaction::ReadFromDisk(CTxDB& txdb, const uint256& hash, CTxIndex& txindexRet)
+bool CTransaction::ReadFromDisk(CTxDB& txdb, COutPoint prevout, CTxIndex& txindexRet)
 {
     SetNull();
-    if (!txdb.ReadTxIndex(hash, txindexRet))
+    if (!txdb.ReadTxIndex(prevout.hash, txindexRet))
         return false;
     if (!ReadFromDisk(txindexRet.pos))
         return false;
-
-   return true;
-}
-
-bool CTransaction::ReadFromDisk(CTxDB& txdb, COutPoint prevout, CTxIndex& txindexRet)
-{
-    if (!ReadFromDisk(txdb, prevout.hash, txindexRet))
-        return false;
-
     if (prevout.n >= vout.size())
     {
         SetNull();
@@ -1003,33 +994,13 @@ bool GetTransaction(const uint256 &hash, CTransaction &tx, uint256 &hashBlock)
         }
         CTxDB txdb("r");
         CTxIndex txindex;
-        if (tx.ReadFromDisk(txdb, hash, txindex))
+        if (tx.ReadFromDisk(txdb, COutPoint(hash, 0), txindex))
         {
             CBlock block;
             if (block.ReadFromDisk(txindex.pos.nFile, txindex.pos.nBlockPos, false))
                 hashBlock = block.GetHash();
             return true;
         }
-
-        // look for transaction in disconnected blocks to find orphaned CoinBase and CoinStake transactions
-        BOOST_FOREACH(PAIRTYPE(const uint256, CBlockIndex*)& item, mapBlockIndex)
-        {
-            CBlockIndex* pindex = item.second;
-            if (pindex == pindexBest || pindex->pnext != 0)
-                continue;
-            CBlock block;
-            if (!block.ReadFromDisk(pindex))
-                continue;
-            BOOST_FOREACH(const CTransaction& txOrphan, block.vtx)
-            {
-                if (txOrphan.GetHash() == hash)
-                {
-                    tx = txOrphan;
-                    return true;
-                }
-            }
-        }
-
     }
     return false;
 }
@@ -1177,7 +1148,7 @@ int64_t GetProofOfWorkReward(int64_t nFees, int nHeight)
 // miner's coin stake reward based on coin age spent (coin-days)
 int64_t GetProofOfStakeReward(int64_t nCoinAge, int64_t nFees, int nHeight)
 {
-    int64_t nSubsidy = STATIC_POS_REWARD;
+    int64_t nSubsidy = 1 * COIN;
 
     if(pindexBest->nHeight < 100000) // First 100,000 blocks double stake for masternode ready
     {
@@ -1877,14 +1848,14 @@ bool CBlock::ConnectBlock(CTxDB& txdb, CBlockIndex* pindex, bool fJustCheck)
         if (!txdb.UpdateTxIndex((*mi).first, (*mi).second))
             return error("ConnectBlock() : UpdateTxIndex failed");
     }
-    if(GetBoolArg("-addrindex", false))
+
 
     // Write Address Index
     BOOST_FOREACH(CTransaction& tx, vtx)
     {
-         uint256 hashTx = tx.GetHash();
+        uint256 hashTx = tx.GetHash();
 	// inputs
-	if(!tx.IsCoinBase()) 
+	if(!tx.IsCoinBase())
 	{
             MapPrevTx mapInputs;
 	    map<uint256, CTxIndex> mapQueuedChangesT;
@@ -3236,14 +3207,14 @@ void static ProcessGetData(CNode* pfrom)
                     }
                 }
                 if (!pushed && inv.type == MSG_TX) {
-                    if(mapLuxsendBroadcastTxes.count(inv.hash)){
+                    if(mapDarksendBroadcastTxes.count(inv.hash)){
                         CDataStream ss(SER_NETWORK, PROTOCOL_VERSION);
                         ss.reserve(1000);
                         ss <<
-                            mapLuxsendBroadcastTxes[inv.hash].tx <<
-                            mapLuxsendBroadcastTxes[inv.hash].vin <<
-                            mapLuxsendBroadcastTxes[inv.hash].vchSig <<
-                            mapLuxsendBroadcastTxes[inv.hash].sigTime;
+                            mapDarksendBroadcastTxes[inv.hash].tx <<
+                            mapDarksendBroadcastTxes[inv.hash].vin <<
+                            mapDarksendBroadcastTxes[inv.hash].vchSig <<
+                            mapDarksendBroadcastTxes[inv.hash].sigTime;
 
                         pfrom->PushMessage("dstx", ss);
                         pushed = true;
@@ -3774,6 +3745,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
             SecureMsgScanBlock(block);
     }
 
+
     else if (strCommand == "getaddr")
     {
         // Don't return addresses older than nCutOff timestamp
@@ -3784,6 +3756,8 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
             if(addr.nTime > nCutOff)
                 pfrom->PushAddress(addr);
     }
+
+
     else if (strCommand == "mempool")
     {
         LOCK(cs_main);
@@ -3917,7 +3891,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
         if (fSecMsgEnabled)
             SecureMsgReceiveData(pfrom, strCommand, vRecv);
 
-        ProcessMessageLuxsend(pfrom, strCommand, vRecv);
+        ProcessMessageDarksend(pfrom, strCommand, vRecv);
         ProcessMessageMasternode(pfrom, strCommand, vRecv);
         ProcessMessageInstantX(pfrom, strCommand, vRecv);
         ProcessSpork(pfrom, strCommand, vRecv);

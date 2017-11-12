@@ -202,7 +202,7 @@ bool CActiveMasternode::Dseep(CTxIn vin, CService service, CKey keyMasternode, C
 
     if(!found){
     	// Seems like we are trying to send a ping while the masternode is not registered in the network
-    	retErrorMessage = "Luxsend Masternode List doesn't include our masternode, Shutting down masternode pinging service! " + vin.ToString();
+    	retErrorMessage = "Darksend Masternode List doesn't include our masternode, Shutting down masternode pinging service! " + vin.ToString();
     	LogPrintf("CActiveMasternode::Dseep() - Error: %s\n", retErrorMessage.c_str());
         status = MASTERNODE_NOT_CAPABLE;
         notCapableReason = retErrorMessage;
@@ -427,7 +427,7 @@ vector<COutput> CActiveMasternode::SelectCoinsMasternode()
     // Filter
     BOOST_FOREACH(const COutput& out, vCoins)
     {
-        if(out.tx->vout[out.i].nValue == GetMNCollateral(pindexBest->nHeight)*COIN) {  //exactly 16120 LUX
+        if(out.tx->vout[out.i].nValue == 16120*COIN) { //exactly 161.20 LUX
         	filteredCoins.push_back(out);
         }
     }

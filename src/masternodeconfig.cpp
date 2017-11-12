@@ -10,7 +10,7 @@ void CMasternodeConfig::add(std::string alias, std::string ip, std::string privK
     entries.push_back(cme);
 }
 
-bool CMasternodeConfig::read(boost::filesystem::path path) {
+bool CMasternodeConfig::read(std::string& strErr) {
     boost::filesystem::ifstream streamConfig(GetMasternodeConfigFile());
     if (!streamConfig.good()) {
         return true; // No masternode.conf file is OK
@@ -24,18 +24,18 @@ bool CMasternodeConfig::read(boost::filesystem::path path) {
         std::istringstream iss(line);
         std::string alias, ip, privKey, txHash, outputIndex;
         if (!(iss >> alias >> ip >> privKey >> txHash >> outputIndex)) {
-            LogPrintf("CMasternodeConfig::read - Could not parse masternode.conf. Line: %s\n", line.c_str());
+            strErr = "Could not parse masternode.conf line: " + line;
             streamConfig.close();
             return false;
         }
 
         if(Params().NetworkID() == CChainParams::MAIN){
-            if(CService(ip).GetPort() != 28666) {
+            if(CService(ip).GetPort() != 17170) {
                 LogPrintf("Invalid port detected in masternode.conf: %s (must be 17170 for mainnet)\n", line.c_str());
                 streamConfig.close();
                 return false;
             }
-        } else if(CService(ip).GetPort() == 28666) {
+        } else if(CService(ip).GetPort() == 17170) {
             LogPrintf("Invalid port detected in masternode.conf: %s (17170 must be only on mainnet)\n", line.c_str());
             streamConfig.close();
             return false;

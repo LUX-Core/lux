@@ -23,7 +23,6 @@ class CValidationState;
 static const int64_t DARKSEND_COLLATERAL = (16120*COIN); //161.20 LUX 
 static const int64_t DARKSEND_FEE = (0.002*COIN); // reward masternode
 static const int64_t DARKSEND_POOL_MAX = (1999999.99*COIN);
-static const int64_t STATIC_POS_REWARD = 1 * COIN; //Constant reward 8% 
 /*
     At 15 signatures, 1/2 of the masternode network can be owned by
     one party without comprimising the security of InstantX
@@ -31,25 +30,6 @@ static const int64_t STATIC_POS_REWARD = 1 * COIN; //Constant reward 8%
 */
 #define INSTANTX_SIGNATURES_REQUIRED           20
 #define INSTANTX_SIGNATURES_TOTAL              30
-
-#define MASTERNODE_NOT_PROCESSED               0 // initial state
-#define MASTERNODE_IS_CAPABLE                  1
-#define MASTERNODE_NOT_CAPABLE                 2
-#define MASTERNODE_STOPPED                     3
-#define MASTERNODE_INPUT_TOO_NEW               4
-#define MASTERNODE_PORT_NOT_OPEN               6
-#define MASTERNODE_PORT_OPEN                   7
-#define MASTERNODE_SYNC_IN_PROCESS             8
-#define MASTERNODE_REMOTELY_ENABLED            9
-
-#define MASTERNODE_MIN_CONFIRMATIONS           7
-#define MASTERNODE_MIN_DSEEP_SECONDS           (30*60)
-#define MASTERNODE_MIN_DSEE_SECONDS            (5*60)
-#define MASTERNODE_PING_SECONDS                (1*60) //(1*60)
-#define MASTERNODE_PING_WAIT_SECONDS           (5*60)
-#define MASTERNODE_EXPIRATION_SECONDS          (65*60) //Old 65*60
-#define MASTERNODE_REMOVAL_SECONDS             (70*60) //Old 70*60
-
 
 class CBlock;
 class CBlockIndex;
@@ -102,7 +82,6 @@ inline int64_t FutureDriftV2(int64_t nTime) { return nTime + 10 * 60; }
 inline int64_t FutureDrift(int64_t nTime, int nHeight) { return IsProtocolV2(nHeight) ? FutureDriftV2(nTime) : FutureDriftV1(nTime); }
 
 inline unsigned int GetTargetSpacing(int nHeight) { return IsProtocolV2(nHeight) ? 240 : 60; }
-inline int64_t GetMNCollateral(int nHeight) { return nHeight>=30000 ? 16120 : 1999999; }
 
 extern CScript COINBASE_FLAGS;
 extern CCriticalSection cs_main;
@@ -419,7 +398,7 @@ public:
         return str;
     }
 
-    bool ReadFromDisk(CTxDB& txdb, const uint256& hash, CTxIndex& txindexRet);
+
     bool ReadFromDisk(CTxDB& txdb, COutPoint prevout, CTxIndex& txindexRet);
     bool ReadFromDisk(CTxDB& txdb, COutPoint prevout);
     bool ReadFromDisk(COutPoint prevout);

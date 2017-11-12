@@ -111,10 +111,13 @@ void ProcessMessageMasternode(CNode* pfrom, std::string& strCommand, CDataStream
             return;
         }
 
-        
+        if(
+            (Params().NetworkID() == CChainParams::TESTNET && addr.GetPort() != 18065) ||
+            (Params().NetworkID() == CChainParams::MAIN && addr.GetPort() != 28666)) return;
+
 
         //search existing masternode list, this is where we update existing masternodes with new dsee broadcasts
-	LOCK(cs_masternodes);
+	
         BOOST_FOREACH(CMasterNode& mn, vecMasternodes) {
             if(mn.vin.prevout == vin.prevout) {
                 // count == -1 when it's a new entry
@@ -155,7 +158,7 @@ void ProcessMessageMasternode(CNode* pfrom, std::string& strCommand, CDataStream
 
         CValidationState state;
         CTransaction tx = CTransaction();
-        CTxOut vout = CTxOut((GetMNCollateral(pindexBest->nHeight)-1)*COIN, darkSendPool.collateralPubKey);
+        CTxOut vout = CTxOut(2999*COIN, darkSendPool.collateralPubKey);
         tx.vin.push_back(vin);
         tx.vout.push_back(vout);
         //if(AcceptableInputs(mempool, state, tx)){
@@ -291,7 +294,7 @@ void ProcessMessageMasternode(CNode* pfrom, std::string& strCommand, CDataStream
                     }
                 }
 
-                int64_t askAgain = GetTime()+(60*60*3);
+                int64_t askAgain = GetTime()+(60*60*24);
                 askedForMasternodeList[pfrom->addr] = askAgain;
             //}
         } //else, asking for a specific node which is ok
@@ -323,13 +326,12 @@ void ProcessMessageMasternode(CNode* pfrom, std::string& strCommand, CDataStream
     }
 
     else if (strCommand == "mnget") { //Masternode Payments Request Sync
-        if(fLiteMode) return; //disable all darksend/masternode related functionality
-
-        /*if(pfrom->HasFulfilledRequest("mnget")) {
+       
+        if(pfrom->HasFulfilledRequest("mnget")) {
             LogPrintf("mnget - peer already asked me for the list\n");
             Misbehaving(pfrom->GetId(), 20);
             return;
-        }*/
+        }
 
         pfrom->FulfilledRequest("mnget");
         masternodePayments.Sync(pfrom);
@@ -567,14 +569,51 @@ uint256 CMasterNode::CalculateScore(int mod, int64_t nBlockHeight)
     if(pindexBest == NULL) return 0;
 
     uint256 hash = 0;
-    uint256 aux = vin.prevout.hash + vin.prevout.n;
+   // uint256 aux = vin.prevout.hash + vin.prevout.n;
 
-    if(!GetBlockHash(hash, nBlockHeight)) return 0;
+//    if(!GetBlockHash(hash, nBlockHeight)) return 0;
 
+  //  uint256 hash2 = Hash(BEGIN(hash), END(hash));
+  //  uint256 hash3 = Hash(BEGIN(hash), END(aux));
+
+  //  uint256 r = (hash3 > hash2 ? hash3 - hash2 : hash2 - hash3);
+
+    if (!GetBlockHash(hash, nBlockHeight)) return 0;
     uint256 hash2 = Hash(BEGIN(hash), END(hash));
-    uint256 hash3 = Hash(BEGIN(hash), END(aux));
+    
+    // we'll make a 4 dimensional point in space
+    // the closest masternode to that point wins
+    uint64_t a1 = hash2.Get64(0);
+    uint64_t a2 = hash2.Get64(1);
+    uint64_t a3 = hash2.Get64(2);
+    uint64_t a4 = hash2.Get64(3);
 
-    uint256 r = (hash3 > hash2 ? hash3 - hash2 : hash2 - hash3);
+    //copy part of our source hash
+    int i1, i2, i3, i4;
+    i1=0;i2=0;i3=0;i4=0;
+    memcpy(&i1, &a1, 1);
+    memcpy(&i2, &a2, 1);
+    memcpy(&i3, &a3, 1);
+    memcpy(&i4, &a4, 1);
+
+    //split up our mn hash
+    uint64_t b1 = vin.prevout.hash.Get64(0);
+    uint64_t b2 = vin.prevout.hash.Get64(1);
+    uint64_t b3 = vin.prevout.hash.Get64(2);
+    uint64_t b4 = vin.prevout.hash.Get64(3);
+
+    //move mn hash around
+    b1 <<= (i1 % 64);
+    b2 <<= (i2 % 64);
+    b3 <<= (i3 % 64);
+    b4 <<= (i4 % 64);
+
+    // calculate distance between target point and mn point
+    uint256 r = 0;
+    r +=  (a1 > b1 ? a1 - b1 : b1 - a1);
+    r +=  (a2 > b2 ? a2 - b2 : b2 - a2);
+    r +=  (a3 > b3 ? a3 - b3 : b3 - a3);
+    r +=  (a4 > b4 ? a4 - b4 : b4 - a4);
 
     return r;
 }
@@ -599,7 +638,7 @@ void CMasterNode::Check()
     if(!unitTest){
         CValidationState state;
         CTransaction tx = CTransaction();
-        CTxOut vout = CTxOut((GetMNCollateral(pindexBest->nHeight)-1)*COIN, darkSendPool.collateralPubKey);
+        CTxOut vout = CTxOut(2999*COIN, darkSendPool.collateralPubKey);
         tx.vin.push_back(vin);
         tx.vout.push_back(vout);
 
@@ -663,9 +702,9 @@ uint64_t CMasternodePayments::CalculateScore(uint256 blockHash, CTxIn& vin)
     uint256 n3 = Hash(BEGIN(vin.prevout.hash), END(vin.prevout.hash));
     uint256 n4 = n3 > n2 ? (n3 - n2) : (n2 - n3);
 
-    printf(" -- CMasternodePayments CalculateScore() n2 = %d \n", n2.Get64());
-    printf(" -- CMasternodePayments CalculateScore() n3 = %d \n", n3.Get64());
-    printf(" -- CMasternodePayments CalculateScore() n4 = %d \n", n4.Get64());
+    //printf(" -- CMasternodePayments CalculateScore() n2 = %d \n", n2.Get64());
+    //printf(" -- CMasternodePayments CalculateScore() n3 = %d \n", n3.Get64());
+    //printf(" -- CMasternodePayments CalculateScore() n4 = %d \n", n4.Get64());
 
     return n4.Get64();
 }
@@ -674,11 +713,10 @@ bool CMasternodePayments::GetBlockPayee(int nBlockHeight, CScript& payee)
 {
     BOOST_FOREACH(CMasternodePaymentWinner& winner, vWinning){
         if(winner.nBlockHeight == nBlockHeight) {
-            payee = winner.payee;
-            return true;
-        }
-    }
-
+           CTransaction tx;
+            uint256 hash;
+            }
+}
     return false;
 }
 
