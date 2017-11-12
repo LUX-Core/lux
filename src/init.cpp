@@ -13,6 +13,7 @@
 #include "ui_interface.h"
 #include "checkpoints.h"
 #include "activemasternode.h"
+#include "masternodeman.h"
 #include "spork.h"
 #include "smessage.h"
 
@@ -107,8 +108,10 @@ void Shutdown()
         bitdb.Flush(false);
 #endif
     StopNode();
-    {
-        LOCK(cs_main);
+    DumpMasternodes();
+    UnregisterNodeSignals(GetNodeSignals());
+{
+    LOCK(cs_main);
 #ifdef ENABLE_WALLET
         if (pwalletMain)
             pwalletMain->SetBestChain(CBlockLocator(pindexBest));
@@ -889,6 +892,16 @@ bool AppInit2(boost::thread_group& threadGroup)
 
     if (!strErrors.str().empty())
         return InitError(strErrors.str());
+
+    uiInterface.InitMessage(_("Loading masternode list..."));
+    nStart = GetTimeMillis();{
+       CMasternodeDB mndb;
+       if (!mndb.Read(mnodeman))
+           LogPrintf("Invalid or missing masternodes.dat; recreating\n");
+    }
+
+           LogPrintf("Loaded %i masternodes from masternodes.dat  %dms\n",
+                    mnodeman.size(), GetTimeMillis() - nStart);
 
     fMasterNode = GetBoolArg("-masternode", false);
     if(fMasterNode) {
