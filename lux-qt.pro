@@ -286,7 +286,6 @@ HEADERS += src/qt/bitcoingui.h \
     src/qt/flowlayout.h \
     src/qt/darksendconfig.h \
     src/masternode.h \
-    src/masternodeman.h \
     src/darksend.h \
     src/instantx.h \
     src/activemasternode.h \
@@ -401,7 +400,6 @@ SOURCES += src/qt/bitcoin.cpp src/qt/bitcoingui.cpp \
     src/qt/flowlayout.cpp \
     src/qt/darksendconfig.cpp \
     src/masternode.cpp \
-    src/masternodeman.cpp \
     src/darksend.cpp \
     src/rpcdarksend.cpp \
     src/instantx.cpp \
