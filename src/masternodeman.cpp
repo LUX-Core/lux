@@ -339,7 +339,7 @@ json_spirit::Object CMasternodeMan::GetFilteredVector(std::string strMode, std::
         } else if (strMode == "activeseconds") {
             obj.push_back(Pair(strAddr,       (int64_t)(mn.lastTimeSeen - mn.now)));
         } else if (strMode == "rank") {
-            obj.push_back(Pair(strAddr,       (int)(mnodeman.GetMasternodeRank(mn.vin, chainActive.Tip()->nHeight))));
+            obj.push_back(Pair(strAddr,       (int)(mnodeman.GetMasternodeRank(mn.vin, pindexBest->nHeight))));
         } else if (strMode == "full") {
             CScript pubkey;
             pubkey.SetDestination(mn.pubkey.GetID());
