@@ -7,7 +7,7 @@
 
 //#include "primitives/transaction.h"
 #include "main.h"
-#include "masternode.h"
+#include "masternodeman.h"
 #include "activemasternode.h"
 
 class CTxIn;
@@ -160,22 +160,20 @@ public:
 
     bool GetAddress(CService &addr)
     {
-        BOOST_FOREACH(CMasterNode mn, vecMasternodes) {
-            if(mn.vin == vin){
-                addr = mn.addr;
-                return true;
-            }
+        CMasternode* mn = mnodeman.Find(vin);
+            if(mn){
+                addr = mn->addr;
+                return true;           
         }
         return false;
     }
 
     bool GetProtocolVersion(int &protocolVersion)
     {
-        BOOST_FOREACH(CMasterNode mn, vecMasternodes) {
-            if(mn.vin == vin){
-                protocolVersion = mn.protocolVersion;
-                return true;
-            }
+        CMasternode* mn = mnodeman.Find(vin);
+            if(mn){
+                protocolVersion = mn->protocolVersion;
+                return true;            
         }
         return false;
     }
