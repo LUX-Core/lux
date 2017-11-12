@@ -18,7 +18,7 @@
 #include "spork.h"
 #include "darksend.h"
 #include "instantx.h"
-#include "masternode.h"
+#include "masternodeman.h"
 #include "chainparams.h"
 #include "smessage.h"
 
@@ -3505,9 +3505,10 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
     if(bMasterNodePayment) {
         //spork
         if(!masternodePayments.GetBlockPayee(pindexPrev->nHeight+1, payee)){
-            int winningNode = GetCurrentMasterNode(1);
-                if(winningNode >= 0){
+            CMasternode* winningNode = mnodeman.GetCurrentMasterNode(1);
+                if(winningNode){
                     payee =GetScriptForDestination(vecMasternodes[winningNode].pubkey.GetID());
+                    pblock->payee.SetDestination(winningNode->pubkey.GetID());
                 } else {
                     LogPrintf("CreateCoinStake: Failed to detect masternode to pay\n");
                     hasPayment = false;
