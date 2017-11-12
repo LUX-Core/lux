@@ -6,6 +6,7 @@
 
 #include "rpcserver.h"
 #include "rpcclient.h"
+#include "masternodeman.h"
 
 #include <QTime>
 #include <QThread>
@@ -353,6 +354,11 @@ void RPCConsole::setNumBlocks(int count)
     ui->numberOfBlocks->setText(QString::number(count));
     if(clientModel)
         ui->lastBlockTime->setText(clientModel->getLastBlockDate().toString());
+
+    // set masternode count
+
+    QString masternodes = QString::number((int)mnodeman.size());
+ui->masternodeCount->setText(masternodes);
 }
 
 void RPCConsole::on_lineEdit_returnPressed()
