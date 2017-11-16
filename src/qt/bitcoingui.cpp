@@ -324,13 +324,13 @@ void BitcoinGUI::createActions()
     clientcontrolAction->setCheckable(true);
     clientcontrolAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_6));
     tabGroup->addAction(clientcontrolAction);
-
+/*
     generateAction = new QAction(QIcon(":/icons/worker"), tr("&Worker"), this);
     generateAction->setToolTip(tr("lux mining and staking management"));
     generateAction->setCheckable(true);
     generateAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_7));
     tabGroup->addAction(generateAction);
-
+*/
     //multisigAction = new QAction(QIcon(":/icons/send"), tr("Multisig"), this);
     //tabGroup->addAction(multisigAction);
 
@@ -354,7 +354,7 @@ void BitcoinGUI::createActions()
     connect(historyAction, SIGNAL(triggered()), this, SLOT(gotoHistoryPage()));
     connect(addressBookAction, SIGNAL(triggered()), this, SLOT(gotoAddressBookPage()));
     connect(addressBookAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
-    connect(generateAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
+    //connect(generateAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
     connect(masternodeManagerAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
     connect(masternodeManagerAction, SIGNAL(triggered()), this, SLOT(gotoMasternodeManagerPage()));
     connect(messageAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
@@ -477,7 +477,7 @@ void BitcoinGUI::createToolBars()
     toolbar->addAction(masternodeManagerAction);
     toolbar->addAction(messageAction);
     toolbar->addAction(clientcontrolAction);
-    toolbar->addAction(generateAction);
+    //toolbar->addAction(generateAction);
     toolbar->addAction(blockAction);
     //toolbar->addAction(TradingAction);
     //netLabel = new QLabel();

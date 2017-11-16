@@ -96,7 +96,7 @@ private:
     QMenuBar *appMenuBar;
     QAction *overviewAction;
     QAction *clientcontrolAction;
-    QAction *generateAction;
+    //QAction *generateAction;
     QAction *historyAction;
     QAction *quitAction;
     QAction *sendCoinsAction;
