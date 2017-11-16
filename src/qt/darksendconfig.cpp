@@ -83,10 +83,10 @@ void LuxsendConfig::configure(bool enabled, int coins, int rounds) {
 
     QSettings settings;
 
-    settings.setValue("nLuxsendRounds", rounds);
+    settings.setValue("nDarksendRounds", rounds);
     settings.setValue("nAnonymizeLuxAmount", coins);
 
-    nLuxsendRounds = rounds;
+    nDarksendRounds = rounds;
     nAnonymizeLuxAmount = coins;
 }
 

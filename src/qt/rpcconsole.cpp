@@ -6,7 +6,6 @@
 
 #include "rpcserver.h"
 #include "rpcclient.h"
-#include "masternodeman.h"
 
 #include <QTime>
 #include <QThread>
@@ -323,7 +322,7 @@ void RPCConsole::clear()
                 "b { color: #00C0C0; } "
                 );
 
-    message(CMD_REPLY, (tr("Welcome to the Lux RPC console.") + "<br>" +
+    message(CMD_REPLY, (tr("Welcome to the Cream RPC console.") + "<br>" +
                         tr("Use up and down arrows to navigate history, and <b>Ctrl-L</b> to clear screen.") + "<br>" +
                         tr("Type <b>help</b> for an overview of available commands.")), true);
 }
@@ -354,11 +353,6 @@ void RPCConsole::setNumBlocks(int count)
     ui->numberOfBlocks->setText(QString::number(count));
     if(clientModel)
         ui->lastBlockTime->setText(clientModel->getLastBlockDate().toString());
-
-    // set masternode count
-
-    QString masternodes = QString::number((int)mnodeman.size());
-ui->masternodeCount->setText(masternodes);
 }
 
 void RPCConsole::on_lineEdit_returnPressed()

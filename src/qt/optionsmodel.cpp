@@ -48,13 +48,13 @@ void OptionsModel::Init()
     language = settings.value("language", "").toString();
     fUseBlackTheme = settings.value("fUseBlackTheme", false).toBool();
 
-    if (!settings.contains("nLuxsendRounds"))
-        settings.setValue("nLuxsendRounds", 2);
+    if (!settings.contains("nDarksendRounds"))
+        settings.setValue("nDarksendRounds", 2);
 
     if (!settings.contains("nAnonymizeLuxAmount"))
         settings.setValue("nAnonymizeLuxAmount", 1000);
 
-    nLuxsendRounds = settings.value("nLuxsendRounds").toLongLong();
+    nDarksendRounds = settings.value("nDarksendRounds").toLongLong();
     nAnonymizeLuxAmount = settings.value("nAnonymizeLuxAmount").toLongLong();
 
     // These are shared with core Bitcoin; we want
@@ -68,8 +68,8 @@ void OptionsModel::Init()
     if (!language.isEmpty())
         SoftSetArg("-lang", language.toStdString());
 
-    if (settings.contains("nLuxsendRounds"))
-        SoftSetArg("-darksendrounds", settings.value("nLuxsendRounds").toString().toStdString());
+    if (settings.contains("nDarksendRounds"))
+        SoftSetArg("-darksendrounds", settings.value("nDarksendRounds").toString().toStdString());
     if (settings.contains("nAnonymizeLuxAmount"))
         SoftSetArg("-anonymizeLuxamount", settings.value("nAnonymizeLuxAmount").toString().toStdString());
 }
@@ -212,9 +212,9 @@ bool OptionsModel::setData(const QModelIndex & index, const QVariant & value, in
             settings.setValue("fUseBlackTheme", fUseBlackTheme);
             break;
         case LuxsendRounds:
-            nLuxsendRounds = value.toInt();
-            settings.setValue("nLuxsendRounds", nLuxsendRounds);
-            emit darksendRoundsChanged(nLuxsendRounds);
+            nDarksendRounds = value.toInt();
+            settings.setValue("nDarksendRounds", nDarksendRounds);
+            emit darksendRoundsChanged(nDarksendRounds);
             break;
         case anonymizeLuxAmount:
             nAnonymizeLuxAmount = value.toInt();

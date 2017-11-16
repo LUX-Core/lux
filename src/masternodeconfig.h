@@ -7,7 +7,7 @@
 #define SRC_MASTERNODECONFIG_H_
 
 #include <string>
-#include <vector>
+
 
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
