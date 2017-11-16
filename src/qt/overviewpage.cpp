@@ -208,8 +208,8 @@ void OverviewPage::updatePlot(int count)
 
     // if(fDebug) { printf("Plot: Getting Ready: pidnexBest: %p\n", pindexBest); }
 
-    int numLookBack = 10000;
-    double diffMax = 3000;
+    int numLookBack = 6000000;
+    double diffMax = 30000000;
     CBlockIndex* pindex = pindexBest;
     int height = nBestHeight;
     int xStart = std::max<int>(height-numLookBack, 0) + 1;
@@ -260,7 +260,7 @@ void OverviewPage::updatePlot(int count)
 
     ui->diffplot->replot();
 
-    // if(fDebug) { printf("Plot: Done!\n"); }
+     if(fDebug) { printf("Plot: Done!\n"); }
 }
 
 
