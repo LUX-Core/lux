@@ -925,15 +925,15 @@ bool AppInit2(boost::thread_group& threadGroup)
 
     fEnableLuxsend = GetBoolArg("-enabledarksend", false);
 
-    nLuxsendRounds = GetArg("-darksendrounds", 2);
-    if(nLuxsendRounds > 16) nLuxsendRounds = 16;
-    if(nLuxsendRounds < 1) nLuxsendRounds = 1;
+    nDarksendRounds = GetArg("-darksendrounds", 2);
+    if(nDarksendRounds > 16) nDarksendRounds = 16;
+    if(nDarksendRounds < 1) nDarksendRounds = 1;
 
     nLiquidityProvider = GetArg("-liquidityprovider", 0); //0-100
     if(nLiquidityProvider != 0) {
         darkSendPool.SetMinBlockSpacing(std::min(nLiquidityProvider,100)*15);
         fEnableLuxsend = true;
-        nLuxsendRounds = 99999;
+        nDarksendRounds = 99999;
     }
 
     nAnonymizeLuxAmount = GetArg("-anonymizeLuxamount", 0);
@@ -957,7 +957,7 @@ bool AppInit2(boost::thread_group& threadGroup)
 
     LogPrintf("fLiteMode %d\n", fLiteMode);
     LogPrintf("nInstantXDepth %d\n", nInstantXDepth);
-    LogPrintf("Luxsend rounds %d\n", nLuxsendRounds);
+    LogPrintf("Luxsend rounds %d\n", nDarksendRounds);
     LogPrintf("Anonymize Lux Amount %d\n", nAnonymizeLuxAmount);
 
     /* Denominations

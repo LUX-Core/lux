@@ -73,7 +73,7 @@ string strMasterNodePrivKey = "";
 string strMasterNodeAddr = "";
 bool fLiteMode = false;
 int nInstantXDepth = 1;
-int nLuxsendRounds = 2;
+int nDarksendRounds = 2;
 int nAnonymizeLuxAmount = 500;
 int nLiquidityProvider = 0;
 /** Spork enforcement enabled time */

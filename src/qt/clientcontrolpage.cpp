@@ -128,7 +128,7 @@ void ClientControlPage::on_chck4_upd8_clicked()
 void ClientControlPage::on_dwngrd_opt_clicked()
 {
     QMessageBox::information(this, "Unavailable Versions",
-                       "V2.3.0 is the minimum version, cannot be downgraded,",
+                       "V4.0.0 is the minimum version, cannot be downgraded,",
                        QMessageBox::Ok );
 }
 
@@ -160,8 +160,8 @@ void ClientControlPage::on_CS_submit_clicked()
 
 void ClientControlPage::on_BR_submit_clicked()
 {
-    QMessageBox::information(this, "Coming in v2.3",
-                       "Please email your error to contact@luxcoin.tect",
+    QMessageBox::information(this, "Coming in v4.0.0",
+                       "Please email your error to contact@luxcoin.tech",
                        QMessageBox::Ok );
 }
 

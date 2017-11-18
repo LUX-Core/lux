@@ -37,7 +37,7 @@
 #include "messagemodel.h"
 #include "messagepage.h"
 #include "blockbrowser.h"
-#include "multisigdialog.h"
+
 
 #ifdef Q_OS_MAC
 #include "macdockiconhandler.h"
@@ -146,7 +146,7 @@ BitcoinGUI::BitcoinGUI(QWidget *parent):
     
     clientcontrolPage = new ClientControlPage(this);
 
-    multisigPage = new MultisigDialog(this);
+    //multisigPage = new MultisigDialog(this);
 
     centralStackedWidget = new QStackedWidget(this);
 
@@ -201,8 +201,8 @@ BitcoinGUI::BitcoinGUI(QWidget *parent):
     frameBlocksLayout->addStretch();
     frameBlocksLayout->addWidget(labelBlocksIcon);
     frameBlocksLayout->addStretch();
-    frameBlocksLayout->addWidget(netLabel);
-    frameBlocksLayout->addStretch();
+    //frameBlocksLayout->addWidget(netLabel);
+    //frameBlocksLayout->addStretch();
     
 
     if (GetBoolArg("-staking", true))
@@ -324,15 +324,15 @@ void BitcoinGUI::createActions()
     clientcontrolAction->setCheckable(true);
     clientcontrolAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_6));
     tabGroup->addAction(clientcontrolAction);
-
+/*
     generateAction = new QAction(QIcon(":/icons/worker"), tr("&Worker"), this);
     generateAction->setToolTip(tr("lux mining and staking management"));
     generateAction->setCheckable(true);
     generateAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_7));
     tabGroup->addAction(generateAction);
-
-    multisigAction = new QAction(QIcon(":/icons/send"), tr("Multisig"), this);
-    tabGroup->addAction(multisigAction);
+*/
+    //multisigAction = new QAction(QIcon(":/icons/send"), tr("Multisig"), this);
+    //tabGroup->addAction(multisigAction);
 
   /*  TradingAction = new QAction(tr("&Trade"), this);
     TradingAction ->setToolTip(tr("Start Trading"));
@@ -354,7 +354,7 @@ void BitcoinGUI::createActions()
     connect(historyAction, SIGNAL(triggered()), this, SLOT(gotoHistoryPage()));
     connect(addressBookAction, SIGNAL(triggered()), this, SLOT(gotoAddressBookPage()));
     connect(addressBookAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
-    connect(generateAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
+    //connect(generateAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
     connect(masternodeManagerAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
     connect(masternodeManagerAction, SIGNAL(triggered()), this, SLOT(gotoMasternodeManagerPage()));
     connect(messageAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
@@ -362,8 +362,8 @@ void BitcoinGUI::createActions()
     connect(clientcontrolAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
     connect(clientcontrolAction, SIGNAL(triggered()), this, SLOT(gotoClientControlPage()));
 
-    connect(multisigAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
-    connect(multisigAction, SIGNAL(triggered()), this, SLOT(gotoMultisigPage()));
+    //connect(multisigAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
+    //connect(multisigAction, SIGNAL(triggered()), this, SLOT(gotoMultisigPage()));
 
     quitAction = new QAction(tr("E&xit"), this);
     quitAction->setToolTip(tr("Quit application"));
@@ -427,7 +427,7 @@ void BitcoinGUI::createMenuBar()
     file->addAction(verifyMessageAction);
     file->addSeparator();
     file->addAction(quitAction);
-    file->addAction(multisigAction);
+    //file->addAction(multisigAction);
 
     QMenu *settings = appMenuBar->addMenu(tr("&Settings"));
     settings->addAction(encryptWalletAction);
@@ -477,14 +477,14 @@ void BitcoinGUI::createToolBars()
     toolbar->addAction(masternodeManagerAction);
     toolbar->addAction(messageAction);
     toolbar->addAction(clientcontrolAction);
-    toolbar->addAction(generateAction);
+    //toolbar->addAction(generateAction);
     toolbar->addAction(blockAction);
     //toolbar->addAction(TradingAction);
-    netLabel = new QLabel();
+    //netLabel = new QLabel();
 
     QWidget *spacer = makeToolBarSpacer();
-    netLabel->setObjectName("netLabel");
-    netLabel->setStyleSheet("#netLabel { color: #efefef; }");
+    //netLabel->setObjectName("netLabel");
+    //netLabel->setStyleSheet("#netLabel { color: #efefef; }");
     toolbar->addWidget(spacer);
     toolbar->setOrientation(Qt::Vertical);
     toolbar->setMovable(false);
@@ -548,7 +548,7 @@ void BitcoinGUI::setWalletModel(WalletModel *walletModel)
         sendCoinsPage->setModel(walletModel);
         signVerifyMessageDialog->setModel(walletModel);
         blockBrowser->setModel(walletModel);
-        multisigPage->setModel(walletModel);
+        //multisigPage->setModel(walletModel);
 
         setEncryptionStatus(walletModel->getEncryptionStatus());
         connect(walletModel, SIGNAL(encryptionStatusChanged(int)), this, SLOT(setEncryptionStatus(int)));
@@ -613,7 +613,7 @@ void BitcoinGUI::createTrayIcon()
     trayIconMenu->addSeparator();
     trayIconMenu->addAction(quitAction);
 #endif
-    trayIconMenu->addAction(multisigAction);
+    //trayIconMenu->addAction(multisigAction);
 
     notificator = new Notificator(qApp->applicationName(), trayIcon);
 }
@@ -660,11 +660,11 @@ void BitcoinGUI::setNumConnections(int count)
     labelConnectionsIcon->setToolTip(tr("%n active connection(s) to Lux network", "", count));
 }
 
-void BitcoinGUI::gotoMultisigPage()
+/*void BitcoinGUI::gotoMultisigPage()
 {
     multisigPage->show();
     multisigPage->setFocus();
-}
+}*/
 
 void BitcoinGUI::setNumBlocks(int count)
 {

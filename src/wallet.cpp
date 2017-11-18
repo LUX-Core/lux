@@ -1228,7 +1228,7 @@ CAmount CWallet::GetAnonymizedBalance() const
 		    if(pcoin->IsSpent(i) || !IsMine(pcoin->vout[i]) || !IsDenominated(vin)) continue;
 
                     int rounds = GetInputLuxsendRounds(vin);
-                    if(rounds >= nLuxsendRounds){
+                    if(rounds >= nDarksendRounds){
                         nTotal += pcoin->vout[i].nValue;
                     }
                 }
@@ -1302,7 +1302,7 @@ CAmount CWallet::GetNormalizedAnonymizedBalance() const
 		    if(pcoin->IsSpent(i) || !IsMine(pcoin->vout[i]) || !IsDenominated(vin)) continue;
 
                     int rounds = GetInputLuxsendRounds(vin);
-                    nTotal += pcoin->vout[i].nValue * rounds / nLuxsendRounds;
+                    nTotal += pcoin->vout[i].nValue * rounds / nDarksendRounds;
                 }
             }
         }
@@ -2015,7 +2015,7 @@ bool CWallet::SelectCoins(int64_t nTargetValue, unsigned int nSpendTime, set<pai
                         CTxIn vin = CTxIn(out.tx->GetHash(),out.i);
                         int rounds = GetInputLuxsendRounds(vin);
                         // make sure it's actually anonymized
-                        if(rounds < nLuxsendRounds) continue;
+                        if(rounds < nDarksendRounds) continue;
                         nValueRet += out.tx->vout[out.i].nValue;
                         setCoinsRet.insert(make_pair(out.tx, out.i));
                         added++;
@@ -2094,7 +2094,7 @@ struct CompareByPriority
     }
 };
 
-bool CWallet::SelectCoinsByDenominations(int nDenom, int64_t nValueMin, int64_t nValueMax, std::vector<CTxIn>& setCoinsRet, vector<COutput>& setCoinsRet2, int64_t& nValueRet, int nLuxsendRoundsMin, int nLuxsendRoundsMax)
+bool CWallet::SelectCoinsByDenominations(int nDenom, int64_t nValueMin, int64_t nValueMax, std::vector<CTxIn>& setCoinsRet, vector<COutput>& setCoinsRet2, int64_t& nValueRet, int nDarksendRoundsMin, int nDarksendRoundsMax)
 {
     setCoinsRet.clear();
     nValueRet = 0;
@@ -2145,8 +2145,8 @@ bool CWallet::SelectCoinsByDenominations(int nDenom, int64_t nValueMin, int64_t 
             CTxIn vin = CTxIn(out.tx->GetHash(),out.i);
 
             int rounds = GetInputLuxsendRounds(vin);
-            if(rounds >= nLuxsendRoundsMax) continue;
-            if(rounds < nLuxsendRoundsMin) continue;
+            if(rounds >= nDarksendRoundsMax) continue;
+            if(rounds < nDarksendRoundsMin) continue;
 
             if(fFound100000 && fFound10000 && fFound1000 && fFound100 && fFound10 && fFound1 && fFoundDot1){ //if fulfilled
                 //we can return this for submission
@@ -2187,7 +2187,7 @@ bool CWallet::SelectCoinsByDenominations(int nDenom, int64_t nValueMin, int64_t 
     return (nValueRet >= nValueMin && fFound100000 && fFound10000 && fFound1000 && fFound100 && fFound10 && fFound1 && fFoundDot1);
 }
 
-bool CWallet::SelectCoinsDark(int64_t nValueMin, int64_t nValueMax, std::vector<CTxIn>& setCoinsRet, int64_t& nValueRet, int nLuxsendRoundsMin, int nLuxsendRoundsMax) const
+bool CWallet::SelectCoinsDark(int64_t nValueMin, int64_t nValueMax, std::vector<CTxIn>& setCoinsRet, int64_t& nValueRet, int nDarksendRoundsMin, int nDarksendRoundsMax) const
 {
     CCoinControl *coinControl=NULL;
 
@@ -2195,7 +2195,7 @@ bool CWallet::SelectCoinsDark(int64_t nValueMin, int64_t nValueMax, std::vector<
     nValueRet = 0;
 
     vector<COutput> vCoins;
-    AvailableCoins(vCoins, true, coinControl, nLuxsendRoundsMin < 0 ? ONLY_NONDENOMINATED_NOTMN : ONLY_DENOMINATED);
+    AvailableCoins(vCoins, true, coinControl, nDarksendRoundsMin < 0 ? ONLY_NONDENOMINATED_NOTMN : ONLY_DENOMINATED);
 
     set<pair<const CWalletTx*,unsigned int> > setCoinsRet2;
 
@@ -2213,8 +2213,8 @@ bool CWallet::SelectCoinsDark(int64_t nValueMin, int64_t nValueMax, std::vector<
             CTxIn vin = CTxIn(out.tx->GetHash(),out.i);
 
             int rounds = GetInputLuxsendRounds(vin);
-            if(rounds >= nLuxsendRoundsMax) continue;
-            if(rounds < nLuxsendRoundsMin) continue;
+            if(rounds >= nDarksendRoundsMax) continue;
+            if(rounds < nDarksendRoundsMin) continue;
 
             vin.prevPubKey = out.tx->vout[out.i].scriptPubKey; // the inputs PubKey
             nValueRet += out.tx->vout[out.i].nValue;

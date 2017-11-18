@@ -157,37 +157,10 @@ void MasternodeManager::updateNodeList()
     TRY_LOCK(cs_masternodes, lockMasternodes);
     if(!lockMasternodes)
         return;
-	static int64_t nTimeListUpdated = GetTime();
 
-    // to prevent high cpu usage update only once in MASTERNODELIST_UPDATE_SECONDS seconds
-    // or MASTERNODELIST_FILTER_COOLDOWN_SECONDS seconds after filter was last changed
-    int64_t nSecondsToWait = fFilterUpdated ? nTimeFilterUpdated - GetTime() + MASTERNODELIST_FILTER_COOLDOWN_SECONDS : nTimeListUpdated - GetTime() + MASTERNODELIST_UPDATE_SECONDS;
-
-    if (fFilterUpdated) ui->countLabel->setText(QString::fromStdString(strprintf("Please wait... %d", nSecondsToWait)));
-    if (nSecondsToWait > 0) return;
-
-    nTimeListUpdated = GetTime();
-    
-	nTimeListUpdated = GetTime();
-    fFilterUpdated = false;
-	if (f1.isFinished())
-		f1 = QtConcurrent::run(this,&MasternodeManager::updateListConc);   
-	
-}
-
-void MasternodeManager::updateListConc()
-{
-    TRY_LOCK(cs_masternodes, lockMasternodes);
-    if(!lockMasternodes)
-        return;
-
-    ui->tableWidget_3->clearContents();
-    ui->tableWidget_3->setRowCount(0);
     ui->countLabel->setText("Updating...");
     ui->tableWidget->clearContents();
     ui->tableWidget->setRowCount(0);
-    ui->tableWidget_3->horizontalHeader()->setSortIndicator(ui->tableWidget->horizontalHeader()->sortIndicatorSection() ,ui->tableWidget->horizontalHeader()->sortIndicatorOrder());
-
     BOOST_FOREACH(CMasterNode mn, vecMasternodes) 
     {
         int mnRow = 0;
@@ -217,10 +190,7 @@ void MasternodeManager::updateListConc()
     }
 
     ui->countLabel->setText(QString::number(ui->tableWidget->rowCount()));
-              
-		ui->tableWidget->setVisible(0);
-		ui->tableWidget_3->setVisible(1);
-		ui->tableWidget_3->verticalScrollBar()->setSliderPosition(ui->tableWidget->verticalScrollBar()->sliderPosition());
+
     if(pwalletMain)
     {
         LOCK(cs_adrenaline);
@@ -424,3 +394,5 @@ void MasternodeManager::on_stopAllButton_clicked()
     msg.setText(QString::fromStdString(results));
     msg.exec();
 }
+
+

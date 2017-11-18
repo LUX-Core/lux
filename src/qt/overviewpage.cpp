@@ -135,7 +135,7 @@ OverviewPage::OverviewPage(QWidget *parent) :
     ui->labelWalletStatus->setText("(" + tr("out of sync") + ")");
     ui->labelTransactionsStatus->setText("(" + tr("out of sync") + ")");
  // start with displaying the "out of sync" warnings
-    showOutOfSyncWarning(true);
+    showOutOfSyncWarning(false);
     if(GetBoolArg("-chart", true))
     {
         // setup Plot
@@ -188,7 +188,7 @@ OverviewPage::OverviewPage(QWidget *parent) :
     }
 
     // start with displaying the "out of sync" warnings
-    showOutOfSyncWarning(true);
+    showOutOfSyncWarning(false);
 
     if (fUseBlackTheme)
     {
@@ -208,8 +208,8 @@ void OverviewPage::updatePlot(int count)
 
     // if(fDebug) { printf("Plot: Getting Ready: pidnexBest: %p\n", pindexBest); }
 
-    int numLookBack = 10000;
-    double diffMax = 3000;
+    int numLookBack = 6000000;
+    double diffMax = 30000000;
     CBlockIndex* pindex = pindexBest;
     int height = nBestHeight;
     int xStart = std::max<int>(height-numLookBack, 0) + 1;
@@ -260,7 +260,7 @@ void OverviewPage::updatePlot(int count)
 
     ui->diffplot->replot();
 
-    // if(fDebug) { printf("Plot: Done!\n"); }
+     if(fDebug) { printf("Plot: Done!\n"); }
 }
 
 
@@ -430,7 +430,7 @@ void OverviewPage::updateLuxsendProgress()
     ui->darksendProgress->setValue(progress);
 
     std::ostringstream convert;
-    convert << "Progress: " << progress << "%, inputs have an average of " << pwalletMain->GetAverageAnonymizedRounds() << " of " << nLuxsendRounds << " rounds";
+    convert << "Progress: " << progress << "%, inputs have an average of " << pwalletMain->GetAverageAnonymizedRounds() << " of " << nDarksendRounds << " rounds";
     QString s(convert.str().c_str());
     ui->darksendProgress->setToolTip(s);
 }
@@ -449,7 +449,7 @@ void OverviewPage::darkSendStatus()
         updateLuxsendProgress();
 
         QString strSettings(" " + tr("Rounds"));
-        strSettings.prepend(QString::number(nLuxsendRounds)).prepend(" / ");
+        strSettings.prepend(QString::number(nDarksendRounds)).prepend(" / ");
         strSettings.prepend(BitcoinUnits::formatWithUnit(
             walletModel->getOptionsModel()->getDisplayUnit(),
             nAnonymizeLuxAmount * COIN)

@@ -119,7 +119,7 @@ inline void MilliSleep(int64_t n)
 extern bool fMasterNode;
 extern bool fLiteMode;
 extern int nInstantXDepth;
-extern int nLuxsendRounds;
+extern int nDarksendRounds;
 extern int nAnonymizeLuxAmount;
 extern int nLiquidityProvider;
 extern bool fEnableLuxsend;
