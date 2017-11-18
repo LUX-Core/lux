@@ -16,7 +16,6 @@
 +Windows version for first time users of Lux Wallet (fixes statup issue from version 3.0.0)
 +For users of previous Lux Wallets this update is not required
 
-
 # Version 3.0.0
 ===============
 +Changed vNode.emty to vNode < 3 in miner.cpp

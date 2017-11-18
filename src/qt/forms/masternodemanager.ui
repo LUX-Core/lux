@@ -38,7 +38,7 @@
        </property>
        <widget class="QWidget" name="tab">
         <attribute name="title">
-         <string>Lux Masternodes Network</string>
+         <string>LuxNodes Network</string>
         </attribute>
         <layout class="QGridLayout" name="gridLayout">
          <item row="1" column="0">
@@ -144,7 +144,7 @@
            <item>
             <widget class="QLabel" name="label_2">
              <property name="text">
-              <string>Lux Masternodes Activated:</string>
+              <string>LuxNodes Node Count:</string>
              </property>
             </widget>
            </item>
@@ -174,7 +174,7 @@
        </widget>
        <widget class="QWidget" name="tab_2">
         <attribute name="title">
-         <string>My Lux Masternode</string>
+         <string>My LuxNodes</string>
         </attribute>
         <layout class="QGridLayout" name="gridLayout_2">
          <item row="0" column="0">

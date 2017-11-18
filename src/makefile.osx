@@ -6,8 +6,8 @@
 # Mac OS X makefile for Lux
 # Originally by Laszlo Hanyecz (solar@heliacal.net)
 
-CXX=llvm-g++
-DEPSDIR=/opt/local
+CXX=g++
+DEPSDIR=/usr/local
 
 INCLUDEPATHS= \
  -I"$(CURDIR)" \
@@ -17,7 +17,7 @@ INCLUDEPATHS= \
 
 LIBPATHS= \
  -L"$(DEPSDIR)/lib" \
- -L"$(DEPSDIR)/lib/db48"
+ -I"$(DEPSDIR)/include/berkeley-db4"
 
 USE_UPNP:=1
 USE_WALLET:=1
@@ -28,20 +28,20 @@ ifdef STATIC
 # Build STATIC if you are redistributing the luxd binary
 LIBS += \
  $(DEPSDIR)/lib/db48/libdb_cxx-4.8.a \
- $(DEPSDIR)/lib/libboost_system-mt.a \
- $(DEPSDIR)/lib/libboost_filesystem-mt.a \
- $(DEPSDIR)/lib/libboost_program_options-mt.a \
- $(DEPSDIR)/lib/libboost_thread-mt.a \
+ $(DEPSDIR)/lib/libboost_system.a \
+ $(DEPSDIR)/lib/libboost_filesystem.a \
+ $(DEPSDIR)/lib/libboost_program_options.a \
+ $(DEPSDIR)/lib/libboost_thread.a \
  $(DEPSDIR)/lib/libssl.a \
  $(DEPSDIR)/lib/libcrypto.a \
  -lz
 else
 LIBS += \
  -ldb_cxx-4.8 \
- -lboost_system-mt \
- -lboost_filesystem-mt \
- -lboost_program_options-mt \
- -lboost_thread-mt \
+ -lboost_system \
+ -lboost_filesystem \
+ -lboost_program_options \
+ -lboost_thread \
  -lssl \
  -lcrypto \
  -lz
@@ -59,7 +59,7 @@ CFLAGS = -g -msse2
 endif
 
 # ppc doesn't work because we don't support big-endian
-CFLAGS += -Wall -Wextra -Wformat -Wno-ignored-qualifiers -Wformat-security -Wno-unused-parameter \
+CFLAGS += -Wall -Wextra -Wformat -Wno-ignored-qualifiers -Wformat-security -Wno-unused-parameter -Wunused-function -Wunused-variable -fpermissive -Wconversion-null -Wmaybe-uninitialized\ \
     $(DEBUGFLAGS) $(DEFS) $(INCLUDEPATHS)
 
 OBJS= \
@@ -70,6 +70,9 @@ OBJS= \
     obj/addrman.o \
     obj/crypter.o \
     obj/key.o \
+    obj/eckey.o \
+    obj/rpcsmessage.o \
+    obj/scrypt.o \
     obj/init.o \
     obj/bitcoind.o \
     obj/keystore.o \
@@ -93,10 +96,23 @@ OBJS= \
     obj/noui.o \
     obj/pbkdf2.o \
     obj/kernel.o \
-    obj/scrypt.o \
-    obj/scrypt-x86.o \
-    obj/scrypt-x86_64.o \
-    obj/chainparams.o \
+    obj/stealth.o \
+    obj/activemasternode.o \
+    obj/darksend.o \
+    obj/eccryptoverify.o \
+    obj/instantx.o \
+    obj/masternodeconfig.o \
+    obj/masternode.o \
+    obj/rpcdarksend.o \
+    obj/spork.o \
+    obj/crypto/hmac_sha256.o \
+    obj/crypto/hmac_sha512.o \
+    obj/crypto/rfc6979_hmac_sha256.o \
+    obj/crypto/ripemd160.o \
+    obj/crypto/sha1.o \
+    obj/crypto/sha256.o \
+    obj/crypto/sha512.o \
+    obj/smessage.o    \
     obj/phi1612/cubehash.o \
     obj/phi1612/aes_helper.o \
     obj/phi1612/gost.o \

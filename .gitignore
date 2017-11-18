@@ -1,6 +1,6 @@
 src/obj/*.p
 src/*.exe
-src/luxd
+src/novacoind
 src/build.h
 .*.swp
 *.*~*
@@ -9,7 +9,7 @@ src/build.h
 *.orig
 *.o
 *.patch
-.lux
+.novacoin
 #compilation and Qt preprocessor part
 *.qm
 Makefile

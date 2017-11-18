@@ -452,7 +452,7 @@ void BlockBrowser::updateStatistics()
     }
     else if (pindexBest->nHeight > 1000)
     {
-        phase = "PoW + PoS";
+        phase = "PoW+PoS";
     }
 
     QString subsidy = QString::number(nSubsidy, 'f', 6);

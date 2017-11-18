@@ -135,7 +135,7 @@ OverviewPage::OverviewPage(QWidget *parent) :
     ui->labelWalletStatus->setText("(" + tr("out of sync") + ")");
     ui->labelTransactionsStatus->setText("(" + tr("out of sync") + ")");
  // start with displaying the "out of sync" warnings
-    showOutOfSyncWarning(false);
+    showOutOfSyncWarning(true);
     if(GetBoolArg("-chart", true))
     {
         // setup Plot
@@ -181,14 +181,14 @@ OverviewPage::OverviewPage(QWidget *parent) :
     if(fMasterNode || fLiteMode){
         ui->toggleLuxsend->setText("(" + tr("Disabled") + ")");
         ui->toggleLuxsend->setEnabled(false);
-    }else if(!fEnableDarksend){
+    }else if(!fEnableLuxsend){
         ui->toggleLuxsend->setText(tr("Start Luxsend"));
     } else {
         ui->toggleLuxsend->setText(tr("Stop Luxsend"));
     }
 
     // start with displaying the "out of sync" warnings
-    showOutOfSyncWarning(false);
+    showOutOfSyncWarning(true);
 
     if (fUseBlackTheme)
     {
@@ -208,8 +208,8 @@ void OverviewPage::updatePlot(int count)
 
     // if(fDebug) { printf("Plot: Getting Ready: pidnexBest: %p\n", pindexBest); }
 
-    int numLookBack = 6000000;
-    double diffMax = 30000000;
+    int numLookBack = 10000;
+    double diffMax = 3000;
     CBlockIndex* pindex = pindexBest;
     int height = nBestHeight;
     int xStart = std::max<int>(height-numLookBack, 0) + 1;
@@ -260,7 +260,7 @@ void OverviewPage::updatePlot(int count)
 
     ui->diffplot->replot();
 
-     if(fDebug) { printf("Plot: Done!\n"); }
+    // if(fDebug) { printf("Plot: Done!\n"); }
 }
 
 
@@ -430,7 +430,7 @@ void OverviewPage::updateLuxsendProgress()
     ui->darksendProgress->setValue(progress);
 
     std::ostringstream convert;
-    convert << "Progress: " << progress << "%, inputs have an average of " << pwalletMain->GetAverageAnonymizedRounds() << " of " << nDarksendRounds << " rounds";
+    convert << "Progress: " << progress << "%, inputs have an average of " << pwalletMain->GetAverageAnonymizedRounds() << " of " << nLuxsendRounds << " rounds";
     QString s(convert.str().c_str());
     ui->darksendProgress->setToolTip(s);
 }
@@ -449,7 +449,7 @@ void OverviewPage::darkSendStatus()
         updateLuxsendProgress();
 
         QString strSettings(" " + tr("Rounds"));
-        strSettings.prepend(QString::number(nDarksendRounds)).prepend(" / ");
+        strSettings.prepend(QString::number(nLuxsendRounds)).prepend(" / ");
         strSettings.prepend(BitcoinUnits::formatWithUnit(
             walletModel->getOptionsModel()->getDisplayUnit(),
             nAnonymizeLuxAmount * COIN)
@@ -458,7 +458,7 @@ void OverviewPage::darkSendStatus()
         ui->labelAmountRounds->setText(strSettings);
     }
 
-    if(!fEnableDarksend) {
+    if(!fEnableLuxsend) {
         if(nBestHeight != darkSendPool.cachedNumBlocks)
         {
             darkSendPool.cachedNumBlocks = nBestHeight;
@@ -570,7 +570,7 @@ void OverviewPage::darksendReset(){
 }
 
 void OverviewPage::toggleLuxsend(){
-    if(!fEnableDarksend){
+    if(!fEnableLuxsend){
         int64_t balance = pwalletMain->GetBalance();
         float minAmount = 1.49 * COIN;
         if(balance < minAmount){
@@ -603,9 +603,9 @@ void OverviewPage::toggleLuxsend(){
     }
 
     darkSendPool.cachedNumBlocks = 0;
-    fEnableDarksend = !fEnableDarksend;
+    fEnableLuxsend = !fEnableLuxsend;
 
-    if(!fEnableDarksend){
+    if(!fEnableLuxsend){
         ui->toggleLuxsend->setText(tr("Start Luxsend"));
     } else {
         ui->toggleLuxsend->setText(tr("Stop Luxsend"));

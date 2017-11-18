@@ -119,8 +119,8 @@ public:
     ///      strWalletFile (immutable after instantiation)
     mutable CCriticalSection cs_wallet;
 
-    bool SelectCoinsDark(int64_t nValueMin, int64_t nValueMax, std::vector<CTxIn>& setCoinsRet, int64_t& nValueRet, int nDarksendRoundsMin, int nDarksendRoundsMax) const;
-    bool SelectCoinsByDenominations(int nDenom, int64_t nValueMin, int64_t nValueMax, std::vector<CTxIn>& setCoinsRet, vector<COutput>& vCoins, int64_t& nValueRet, int nDarksendRoundsMin, int nDarksendRoundsMax);
+    bool SelectCoinsDark(int64_t nValueMin, int64_t nValueMax, std::vector<CTxIn>& setCoinsRet, int64_t& nValueRet, int nLuxsendRoundsMin, int nLuxsendRoundsMax) const;
+    bool SelectCoinsByDenominations(int nDenom, int64_t nValueMin, int64_t nValueMax, std::vector<CTxIn>& setCoinsRet, vector<COutput>& vCoins, int64_t& nValueRet, int nLuxsendRoundsMin, int nLuxsendRoundsMax);
     bool SelectCoinsDarkDenominated(int64_t nTargetValue, std::vector<CTxIn>& setCoinsRet, int64_t& nValueRet) const;
     bool SelectCoinsMasternode(CTxIn& vin, int64_t& nValueRet, CScript& pubScript) const;
     bool HasCollateralInputs() const;
@@ -290,7 +290,7 @@ public:
     bool SendStealthMoneyToDestination(CStealthAddress& sxAddress, int64_t nValue, std::string& sNarr, CWalletTx& wtxNew, std::string& sError, bool fAskFee=false);
     bool FindStealthTransactions(const CTransaction& tx, mapValue_t& mapNarr);
 
-    std::string PrepareDarksendDenominate(int minRounds, int maxRounds);
+    std::string PrepareLuxsendDenominate(int minRounds, int maxRounds);
     bool CreateCollateralTransaction(CTransaction& txCollateral, std::string strReason);
     bool ConvertList(std::vector<CTxIn> vCoins, std::vector<int64_t>& vecAmounts);
 
@@ -851,7 +851,7 @@ public:
         return strprintf("COutput(%s, %d, %d) [%s]", tx->GetHash().ToString(), i, nDepth, FormatMoney(tx->vout[i].nValue));
     }
 
-    //Used with Darksend. Will return fees, then denominations, everything else, then very small inputs that aren't fees
+    //Used with Luxsend. Will return fees, then denominations, everything else, then very small inputs that aren't fees
     int Priority() const
     {
         if(tx->vout[i].nValue == DARKSEND_FEE) return -16120;

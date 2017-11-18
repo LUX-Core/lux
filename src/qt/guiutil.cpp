@@ -352,7 +352,7 @@ boost::filesystem::path static GetAutostartDir()
 {
     namespace fs = boost::filesystem;
 
-    char* pszConfigHome = getenv("LUX_CONFIG_HOME");
+    char* pszConfigHome = getenv("XDG_CONFIG_HOME");
     if (pszConfigHome) return fs::path(pszConfigHome) / "autostart";
     char* pszHome = getenv("HOME");
     if (pszHome) return fs::path(pszHome) / ".config" / "autostart";

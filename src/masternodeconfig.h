@@ -7,7 +7,7 @@
 #define SRC_MASTERNODECONFIG_H_
 
 #include <string>
-
+#include <vector>
 
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
@@ -84,7 +84,7 @@ public:
 	}
 
 	void clear();
-    bool read(std::string& strErr);
+    bool read(boost::filesystem::path path);
 	void add(std::string alias, std::string ip, std::string privKey, std::string txHash, std::string outputIndex);
 
 	std::vector<CMasternodeEntry>& getEntries() {

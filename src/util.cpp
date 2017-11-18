@@ -73,13 +73,13 @@ string strMasterNodePrivKey = "";
 string strMasterNodeAddr = "";
 bool fLiteMode = false;
 int nInstantXDepth = 1;
-int nDarksendRounds = 2;
+int nLuxsendRounds = 2;
 int nAnonymizeLuxAmount = 500;
 int nLiquidityProvider = 0;
 /** Spork enforcement enabled time */
 int64_t enforceMasternodePaymentsTime = 4085657524;
 bool fSucessfullyLoaded = false;
-bool fEnableDarksend = false;
+bool fEnableLuxsend = false;
 /** All denominations used by darksend */
 std::vector<int64_t> darkSendDenominations;
 
@@ -1219,7 +1219,8 @@ void FileCommit(FILE *fileout)
 {
     fflush(fileout);                // harmless if redundantly called
 #ifdef WIN32
-    _commit(_fileno(fileout));
+    HANDLE hFile = (HANDLE)_get_osfhandle(_fileno(fileout));
+    FlushFileBuffers(hFile);
 #else
     fsync(fileno(fileout));
 #endif
