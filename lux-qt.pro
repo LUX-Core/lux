@@ -142,7 +142,8 @@ SOURCES += src/txdb-leveldb.cpp \
     src/obj/phi1612/gost.c \
     src/obj/phi1612/fugue.c \
     src/obj/phi1612/jh.c \
-    src/obj/phi1612/echo.c
+    src/obj/phi1612/echo.c \
+    src/qt/rpcexecutor.cpp
 
 !win32 {
     # we use QMAKE_CXXFLAGS_RELEASE even without RELEASE=1 because we use RELEASE to indicate linking preferences not -O preferences
@@ -319,7 +320,9 @@ HEADERS += src/qt/bitcoingui.h \
     src/obj/phi1612/sph_jh.h \
     src/obj/phi1612/sph_gost.h \
     src/obj/phi1612/sph_echo.h \
-    src/txdb-leveldb.h
+    src/txdb-leveldb.h \
+    src/qt/txviewdelegate.h \
+    src/qt/rpcexecutor.h
 
 SOURCES += src/qt/bitcoin.cpp src/qt/bitcoingui.cpp \
     src/qt/transactiontablemodel.cpp \

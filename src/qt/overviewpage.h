@@ -29,11 +29,11 @@ public:
     void setWalletModel(WalletModel *walletModel);
     void showOutOfSyncWarning(bool fShow);
     void updateLuxsendProgress();
-    void updatePlot(int count);
 
 public slots:
     void darkSendStatus();
     void setBalance(qint64 balance, qint64 stake, qint64 unconfirmedBalance, qint64 immatureBalance, qint64 anonymizedBalance);
+    void updatePlot(int count);
 
 signals:
     void transactionClicked(const QModelIndex &index);

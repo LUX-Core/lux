@@ -8,6 +8,8 @@ namespace Ui {
 }
 class ClientModel;
 
+bool parseCommandLine(std::vector<std::string> &args, const std::string &strCommand);
+
 /** Local Bitcoin RPC console. */
 class RPCConsole: public QDialog
 {
