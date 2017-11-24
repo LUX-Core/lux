@@ -1,3 +1,8 @@
+# Version 3.0.4
+===============
++Balance cpu threads usage
++Activate diffplot
+
 # Version 3.0.3
 ===============
 +Fixed wallet lagging
