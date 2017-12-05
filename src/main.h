@@ -20,6 +20,8 @@ class CValidationState;
 #define START_MASTERNODE_PAYMENTS_TESTNET 1432907775
 #define START_MASTERNODE_PAYMENTS 1432907775
 
+static const int SERIALIZE_TRANSACTION_NO_WITNESS = 0x40000000;
+
 static const int64_t DARKSEND_COLLATERAL = (16120*COIN); //161.20 LUX 
 static const int64_t DARKSEND_FEE = (0.002*COIN); // reward masternode
 static const int64_t DARKSEND_POOL_MAX = (1999999.99*COIN);
@@ -266,6 +268,87 @@ typedef std::map<uint256, std::pair<CTxIndex, CTransaction> > MapPrevTx;
 int64_t GetMinFee(const CTransaction& tx, unsigned int nBlockSize = 1, enum GetMinFee_mode mode = GMF_BLOCK, unsigned int nBytes = 0);
 
 
+
+/**
+ * Basic transaction serialization format:
+ * - int32_t nVersion
+ * - std::vector<CTxIn> vin
+ * - std::vector<CTxOut> vout
+ * - uint32_t nLockTime
+ *
+ * Extended transaction serialization format:
+ * - int32_t nVersion
+ * - unsigned char dummy = 0x00
+ * - unsigned char flags (!= 0)
+ * - std::vector<CTxIn> vin
+ * - std::vector<CTxOut> vout
+ * - if (flags & 1):
+ *   - CTxWitness wit;
+ * - uint32_t nLockTime
+ */
+template<typename Stream, typename TxType>
+inline void UnserializeTransaction(TxType& tx, Stream& s) {
+    const bool fAllowWitness = !(s.GetVersion() & SERIALIZE_TRANSACTION_NO_WITNESS);
+
+    s >> tx.nVersion;
+    unsigned char flags = 0;
+    tx.vin.clear();
+    tx.vout.clear();
+    /* Try to read the vin. In case the dummy is there, this will be read as an empty vector. */
+    s >> tx.vin;
+    if (tx.vin.size() == 0 && fAllowWitness) {
+        /* We read a dummy or an empty vin. */
+        s >> flags;
+        if (flags != 0) {
+            s >> tx.vin;
+            s >> tx.vout;
+        }
+    } else {
+        /* We read a non-empty vin. Assume a normal vout follows. */
+        s >> tx.vout;
+    }
+    if ((flags & 1) && fAllowWitness) {
+        /* The witness flag is present, and we support witnesses. */
+        flags ^= 1;
+        for (size_t i = 0; i < tx.vin.size(); i++) {
+            s >> tx.vin[i].scriptWitness.stack;
+        }
+    }
+    if (flags) {
+        /* Unknown flag in the serialization */
+        throw std::ios_base::failure("Unknown transaction optional data");
+    }
+    s >> tx.nLockTime;
+}
+
+template<typename Stream, typename TxType>
+inline void SerializeTransaction(const TxType& tx, Stream& s) {
+    const bool fAllowWitness = !(s.GetVersion() & SERIALIZE_TRANSACTION_NO_WITNESS);
+
+    s << tx.nVersion;
+    unsigned char flags = 0;
+    // Consistency check
+    if (fAllowWitness) {
+        /* Check whether witnesses need to be serialized. */
+        if (tx.HasWitness()) {
+            flags |= 1;
+        }
+    }
+    if (flags) {
+        /* Use extended format in case witnesses are to be serialized. */
+        std::vector<CTxIn> vinDummy;
+        s << vinDummy;
+        s << flags;
+    }
+    s << tx.vin;
+    s << tx.vout;
+    if (flags & 1) {
+        for (size_t i = 0; i < tx.vin.size(); i++) {
+            s << tx.vin[i].scriptWitness.stack;
+        }
+    }
+    s << tx.nLockTime;
+}
 
 /** The basic transaction that is broadcasted on the network and contained in
  * blocks.  A transaction can contain multiple inputs and outputs.
@@ -1443,3 +1526,4 @@ protected:
 };
 
 #endif
+
