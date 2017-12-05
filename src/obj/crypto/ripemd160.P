@@ -1,6 +1,0 @@
-obj/crypto/ripemd160.o: crypto/ripemd160.cpp \
- /home/wallermadev/Desktop/LUX/lux-old/src/crypto/ripemd160.h \
- /home/wallermadev/Desktop/LUX/lux-old/src/crypto/common.h
-crypto/ripemd160.cpp :
- /home/wallermadev/Desktop/LUX/lux-old/src/crypto/ripemd160.h :
- /home/wallermadev/Desktop/LUX/lux-old/src/crypto/common.h :
