@@ -1,0 +1,6 @@
+obj/crypto/sha256.o: crypto/sha256.cpp \
+ /home/wallermadev/Desktop/LUX/lux-old/src/crypto/sha256.h \
+ /home/wallermadev/Desktop/LUX/lux-old/src/crypto/common.h
+crypto/sha256.cpp :
+ /home/wallermadev/Desktop/LUX/lux-old/src/crypto/sha256.h :
+ /home/wallermadev/Desktop/LUX/lux-old/src/crypto/common.h :
