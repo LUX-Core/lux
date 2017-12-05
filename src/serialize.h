@@ -46,7 +46,7 @@ inline T* NCONST_PTR(const T* val)
     return const_cast<T*>(val);
 }
 
-/** 
+/**
  * Get begin pointer of vector (non-const version).
  * @note These functions avoid the undefined case of indexing into an empty
  * vector, as well as that of indexing after the end of the vector.
@@ -135,11 +135,11 @@ enum
 #define READWRITES(obj)	    (::SerReadWrite(s, (obj), nType, nVersion, ser_action))
 
 
-/** 
+/**
  * Implement three methods for serializable objects. These are actually wrappers over
  * "SerializationOp" template, which implements the body of each class' serialization
  * code. Adding "ADD_SERIALIZE_METHODS" in the body of the class causes these wrappers to be
- * added as members. 
+ * added as members.
  */
 #define ADD_SERIALIZE_METHODS                                                          \
     size_t GetSerializeSize(int nType, int nVersion) const {                         \
@@ -869,6 +869,9 @@ public:
 
     CSizeComputer(int nTypeIn, int nVersionIn) : nSize(0), nType(nTypeIn), nVersion(nVersionIn) {}
 
+    int GetType() const { return nType; }
+    int GetVersion() const { return nVersion; }
+
     CSizeComputer& write(const char *psz, size_t nSize)
     {
         this->nSize += nSize;
@@ -945,6 +948,9 @@ public:
     {
         Init(nTypeIn, nVersionIn);
     }
+
+    int GetType() const { return nType; }
+    int GetVersion() const { return nVersion; }
 
     void Init(int nTypeIn, int nVersionIn)
     {
@@ -1308,3 +1314,4 @@ public:
 
 
 #endif
+
