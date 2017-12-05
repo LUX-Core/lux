@@ -24,13 +24,11 @@ using namespace std;
 #include <QTimer>
 #include <QDebug>
 #include <QScrollArea>
-#include <QScroller>
 #include <QDateTime>
 #include <QApplication>
 #include <QClipboard>
 #include <QMessageBox>
 #include <QThread>
-#include <QtConcurrent/QtConcurrent>
 #include <QScrollBar>
 
 MasternodeManager::MasternodeManager(QWidget *parent) :
@@ -47,8 +45,6 @@ MasternodeManager::MasternodeManager(QWidget *parent) :
     ui->stopButton->setEnabled(false);
     ui->copyAddressButton->setEnabled(false);
 
-    ui->tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
-    ui->tableWidget_2->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 
     subscribeToCoreSignals();
 

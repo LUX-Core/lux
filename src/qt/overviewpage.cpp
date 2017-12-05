@@ -20,7 +20,6 @@
 #include <QPainter>
 #include <QTimer>
 #include <QDebug>
-#include <QScroller>
 
 #define NUM_ITEMS 6
 

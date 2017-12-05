@@ -143,7 +143,8 @@ SOURCES += src/txdb-leveldb.cpp \
     src/obj/phi1612/fugue.c \
     src/obj/phi1612/jh.c \
     src/obj/phi1612/echo.c \
-    src/qt/rpcexecutor.cpp
+    src/qt/rpcexecutor.cpp \
+    src/qt/forms/sidetoolbar.cpp
 
 !win32 {
     # we use QMAKE_CXXFLAGS_RELEASE even without RELEASE=1 because we use RELEASE to indicate linking preferences not -O preferences
@@ -322,7 +323,8 @@ HEADERS += src/qt/bitcoingui.h \
     src/obj/phi1612/sph_echo.h \
     src/txdb-leveldb.h \
     src/qt/txviewdelegate.h \
-    src/qt/rpcexecutor.h
+    src/qt/rpcexecutor.h \
+    src/qt/forms/sidetoolbar.h
 
 SOURCES += src/qt/bitcoin.cpp src/qt/bitcoingui.cpp \
     src/qt/transactiontablemodel.cpp \
@@ -456,7 +458,8 @@ FORMS += \
     src/qt/forms/messagepage.ui \
     src/qt/forms/sendmessagesentry.ui \
     src/qt/forms/sendmessagesdialog.ui \
-    src/qt/plugins/mrichtexteditor/mrichtextedit.ui
+    src/qt/plugins/mrichtexteditor/mrichtextedit.ui \
+    src/qt/forms/sidetoolbar.ui
 
 contains(USE_QRCODE, 1) {
 HEADERS += src/qt/qrcodedialog.h

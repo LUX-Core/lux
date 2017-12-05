@@ -1,0 +1,30 @@
+obj/miner.o: miner.cpp txdb.h txdb-leveldb.h main.h core.h uint256.h \
+ serialize.h allocators.h version.h clientversion.h util.h tinyformat.h \
+ script.h keystore.h key.h hash.h sync.h threadsafety.h bignum.h \
+ stealth.h txmempool.h net.h mruset.h netbase.h compat.h protocol.h \
+ chainparams.h addrman.h timedata.h hashblock.h obj/phi1612/sph_skein.h \
+ obj/phi1612/sph_types.h obj/phi1612/sph_jh.h obj/phi1612/sph_cubehash.h \
+ obj/phi1612/sph_fugue.h obj/phi1612/sph_gost.h obj/phi1612/sph_echo.h \
+ /home/wallermadev/Desktop/LUX/lux-old/src/leveldb/include/leveldb/db.h \
+ /home/wallermadev/Desktop/LUX/lux-old/src/leveldb/include/leveldb/iterator.h \
+ /home/wallermadev/Desktop/LUX/lux-old/src/leveldb/include/leveldb/slice.h \
+ /home/wallermadev/Desktop/LUX/lux-old/src/leveldb/include/leveldb/status.h \
+ /home/wallermadev/Desktop/LUX/lux-old/src/leveldb/include/leveldb/options.h \
+ /home/wallermadev/Desktop/LUX/lux-old/src/leveldb/include/leveldb/write_batch.h \
+ miner.h wallet.h walletdb.h db.h crypter.h ui_interface.h kernel.h \
+ masternode.h base58.h
+miner.cpp txdb.h txdb-leveldb.h main.h core.h uint256.h :
+ serialize.h allocators.h version.h clientversion.h util.h tinyformat.h :
+ script.h keystore.h key.h hash.h sync.h threadsafety.h bignum.h :
+ stealth.h txmempool.h net.h mruset.h netbase.h compat.h protocol.h :
+ chainparams.h addrman.h timedata.h hashblock.h obj/phi1612/sph_skein.h :
+ obj/phi1612/sph_types.h obj/phi1612/sph_jh.h obj/phi1612/sph_cubehash.h :
+ obj/phi1612/sph_fugue.h obj/phi1612/sph_gost.h obj/phi1612/sph_echo.h :
+ /home/wallermadev/Desktop/LUX/lux-old/src/leveldb/include/leveldb/db.h :
+ /home/wallermadev/Desktop/LUX/lux-old/src/leveldb/include/leveldb/iterator.h :
+ /home/wallermadev/Desktop/LUX/lux-old/src/leveldb/include/leveldb/slice.h :
+ /home/wallermadev/Desktop/LUX/lux-old/src/leveldb/include/leveldb/status.h :
+ /home/wallermadev/Desktop/LUX/lux-old/src/leveldb/include/leveldb/options.h :
+ /home/wallermadev/Desktop/LUX/lux-old/src/leveldb/include/leveldb/write_batch.h :
+ miner.h wallet.h walletdb.h db.h crypter.h ui_interface.h kernel.h :
+ masternode.h base58.h :

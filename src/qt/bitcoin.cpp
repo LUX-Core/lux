@@ -51,11 +51,11 @@ static void ThreadSafeMessageBox(const std::string& message, const std::string& 
         bool modal = (style & CClientUIInterface::MODAL);
         // In case of modal message, use blocking connection to wait for user to click a button
         QMetaObject::invokeMethod(guiref, "message",
-                                   modal ? GUIUtil::blockingGUIThreadConnection() : Qt::QueuedConnection,
-                                   Q_ARG(QString, QString::fromStdString(caption)),
-                                   Q_ARG(QString, QString::fromStdString(message)),
-                                   Q_ARG(bool, modal),
-                                   Q_ARG(unsigned int, style));
+                                  modal ? GUIUtil::blockingGUIThreadConnection() : Qt::QueuedConnection,
+                                  Q_ARG(QString, QString::fromStdString(caption)),
+                                  Q_ARG(QString, QString::fromStdString(message)),
+                                  Q_ARG(bool, modal),
+                                  Q_ARG(unsigned int, style));
     }
     else
     {
@@ -73,8 +73,8 @@ static bool ThreadSafeAskFee(int64_t nFeeRequired, const std::string& strCaption
     bool payFee = false;
 
     QMetaObject::invokeMethod(guiref, "askFee", GUIUtil::blockingGUIThreadConnection(),
-                               Q_ARG(qint64, nFeeRequired),
-                               Q_ARG(bool*, &payFee));
+                              Q_ARG(qint64, nFeeRequired),
+                              Q_ARG(bool*, &payFee));
 
     return payFee;
 }
@@ -271,11 +271,11 @@ int main(int argc, char *argv[])
 
                 ClientModel clientModel(&optionsModel);
                 WalletModel walletModel(pwalletMain, &optionsModel);
-		MessageModel messageModel(pwalletMain, &walletModel);
+                MessageModel messageModel(pwalletMain, &walletModel);
 
                 window.setClientModel(&clientModel);
                 window.setWalletModel(&walletModel);
-		window.setMessageModel(&messageModel);
+                window.setMessageModel(&messageModel);
 
                 // If -min option passed, start window minimized.
                 if(GetBoolArg("-min", false))
@@ -297,7 +297,7 @@ int main(int argc, char *argv[])
                 window.hide();
                 window.setClientModel(0);
                 window.setWalletModel(0);
-		window.setMessageModel(0);
+                window.setMessageModel(0);
                 guiref = 0;
             }
             // Shutdown the core and its threads, but don't exit Bitcoin-Qt here

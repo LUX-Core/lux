@@ -1,0 +1,6 @@
+obj/core.o: core.cpp core.h uint256.h serialize.h allocators.h version.h \
+ clientversion.h util.h tinyformat.h script.h keystore.h key.h hash.h \
+ sync.h threadsafety.h bignum.h stealth.h
+core.cpp core.h uint256.h serialize.h allocators.h version.h :
+ clientversion.h util.h tinyformat.h script.h keystore.h key.h hash.h :
+ sync.h threadsafety.h bignum.h stealth.h :

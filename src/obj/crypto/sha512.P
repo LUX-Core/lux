@@ -1,6 +1,6 @@
 obj/crypto/sha512.o: crypto/sha512.cpp \
- /home/bh/Documents/lux1/src/crypto/sha512.h \
- /home/bh/Documents/lux1/src/crypto/common.h
+ /home/wallermadev/Desktop/LUX/lux-old/src/crypto/sha512.h \
+ /home/wallermadev/Desktop/LUX/lux-old/src/crypto/common.h
 crypto/sha512.cpp :
- /home/bh/Documents/lux1/src/crypto/sha512.h :
- /home/bh/Documents/lux1/src/crypto/common.h :
+ /home/wallermadev/Desktop/LUX/lux-old/src/crypto/sha512.h :
+ /home/wallermadev/Desktop/LUX/lux-old/src/crypto/common.h :

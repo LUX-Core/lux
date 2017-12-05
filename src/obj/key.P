@@ -1,0 +1,4 @@
+obj/key.o: key.cpp key.h allocators.h serialize.h version.h \
+ clientversion.h uint256.h hash.h
+key.cpp key.h allocators.h serialize.h version.h :
+ clientversion.h uint256.h hash.h :

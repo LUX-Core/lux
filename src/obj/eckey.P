@@ -1,0 +1,4 @@
+obj/eckey.o: eckey.cpp eckey.h key.h allocators.h serialize.h version.h \
+ clientversion.h uint256.h hash.h
+eckey.cpp eckey.h key.h allocators.h serialize.h version.h :
+ clientversion.h uint256.h hash.h :

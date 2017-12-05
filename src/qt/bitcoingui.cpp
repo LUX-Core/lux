@@ -37,6 +37,7 @@
 #include "messagemodel.h"
 #include "messagepage.h"
 #include "blockbrowser.h"
+#include "forms/sidetoolbar.h"
 
 
 #ifdef Q_OS_MAC
@@ -65,7 +66,6 @@
 #include <QStyle>
 #include <QToolButton>
 #include <QScrollArea>
-#include <QScroller>
 #include <QTextDocument>
 
 #include <iostream>
@@ -455,17 +455,22 @@ static QWidget* makeToolBarSpacer()
 void BitcoinGUI::createToolBars()
 {
     toolbar = new QToolBar(tr("Tabs toolbar"));
-    toolbar->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    toolbar->setToolButtonStyle(Qt::ToolButtonFollowStyle);
     toolbar->setContextMenuPolicy(Qt::PreventContextMenu);
-    toolbar->setObjectName("tabs");
-    toolbar->setStyleSheet("QToolButton { color: #101010; } QToolButton:hover { background-color: ##e0373f } QToolButton:checked { background-color: #c51f26 } QToolButton:pressed { background-color: none } #tabs { color: #101010; background-color: #f9f9f9);  }");
+
+    toolbar->setStyleSheet("#Tabs {width: 100%; margin: 0;} QToolButton { color: #101010; text-align:left; float:left; width:100% !important; margin: 0; padding: 5px; font-size:10px; } QToolButton:hover { background-color: ##e0373f } QToolButton:checked { background-color: #c51f26 } QToolButton:pressed { background-color: none } #tabs { color: #101010; background-color: #f9f9f9); text-align:left !important; float:left; }");
 
     QLabel* header = new QLabel();
     header->setMinimumSize(128, 128);
     header->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    header->setPixmap(QPixmap(":/icons/bitcoin"));
-    header->setMaximumSize(180,180);
+    header->setPixmap(QPixmap(":/images/header"));
+    header->setMaximumSize(128,128);
     header->setScaledContents(true);
+
+    header->setObjectName("headerLogo");
+    header->setStyleSheet("#headerLogo {margin-bottom:20px;}");
+
+
     toolbar->addWidget(header);
 
     //QMenu *toolbarMenu = new QMenu();
@@ -477,14 +482,10 @@ void BitcoinGUI::createToolBars()
     toolbar->addAction(masternodeManagerAction);
     toolbar->addAction(messageAction);
     toolbar->addAction(clientcontrolAction);
-    //toolbar->addAction(generateAction);
     toolbar->addAction(blockAction);
-    //toolbar->addAction(TradingAction);
-    //netLabel = new QLabel();
 
     QWidget *spacer = makeToolBarSpacer();
-    //netLabel->setObjectName("netLabel");
-    //netLabel->setStyleSheet("#netLabel { color: #efefef; }");
+
     toolbar->addWidget(spacer);
     toolbar->setOrientation(Qt::Vertical);
     toolbar->setMovable(false);

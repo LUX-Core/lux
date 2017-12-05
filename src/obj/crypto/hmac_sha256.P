@@ -1,6 +1,6 @@
 obj/crypto/hmac_sha256.o: crypto/hmac_sha256.cpp \
- /home/bh/Documents/lux1/src/crypto/hmac_sha256.h \
- /home/bh/Documents/lux1/src/crypto/sha256.h
+ /home/wallermadev/Desktop/LUX/lux-old/src/crypto/hmac_sha256.h \
+ /home/wallermadev/Desktop/LUX/lux-old/src/crypto/sha256.h
 crypto/hmac_sha256.cpp :
- /home/bh/Documents/lux1/src/crypto/hmac_sha256.h :
- /home/bh/Documents/lux1/src/crypto/sha256.h :
+ /home/wallermadev/Desktop/LUX/lux-old/src/crypto/hmac_sha256.h :
+ /home/wallermadev/Desktop/LUX/lux-old/src/crypto/sha256.h :

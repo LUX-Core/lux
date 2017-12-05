@@ -1,0 +1,4 @@
+obj/version.o: version.cpp version.h clientversion.h \
+ /home/wallermadev/Desktop/LUX/lux-old/src/obj/build.h
+version.cpp version.h clientversion.h :
+ /home/wallermadev/Desktop/LUX/lux-old/src/obj/build.h :

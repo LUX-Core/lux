@@ -12,8 +12,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>850</width>
-    <height>500</height>
+    <width>852</width>
+    <height>495</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -401,16 +401,28 @@
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout_4">
-       <item row="3" column="0">
+       <item row="2" column="0">
         <layout class="QFormLayout" name="formLayout_3">
+         <property name="sizeConstraint">
+          <enum>QLayout::SetMinimumSize</enum>
+         </property>
          <property name="fieldGrowthPolicy">
           <enum>QFormLayout::FieldsStayAtSizeHint</enum>
          </property>
+         <property name="labelAlignment">
+          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+         </property>
+         <property name="formAlignment">
+          <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+         </property>
          <property name="horizontalSpacing">
-          <number>30</number>
+          <number>50</number>
          </property>
          <property name="verticalSpacing">
-          <number>18</number>
+          <number>15</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
          </property>
          <property name="rightMargin">
           <number>0</number>
@@ -507,6 +519,15 @@
          </item>
          <item row="7" column="0">
           <widget class="QLabel" name="label1_3">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>12</pointsize>
+             <kerning>true</kerning>
+            </font>
+           </property>
            <property name="text">
             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Connections&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
            </property>
@@ -577,7 +598,7 @@
          </item>
         </layout>
        </item>
-       <item row="2" column="0">
+       <item row="1" column="0">
         <spacer name="verticalSpacer_3">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -589,47 +610,6 @@
           </size>
          </property>
         </spacer>
-       </item>
-       <item row="1" column="1" rowspan="3">
-        <widget class="QFrame" name="frame">
-         <property name="minimumSize">
-          <size>
-           <width>240</width>
-           <height>0</height>
-          </size>
-         </property>
-         <property name="frameShape">
-          <enum>QFrame::StyledPanel</enum>
-         </property>
-         <property name="frameShadow">
-          <enum>QFrame::Raised</enum>
-         </property>
-         <widget class="QLabel" name="label_4">
-          <property name="geometry">
-           <rect>
-            <x>0</x>
-            <y>0</y>
-            <width>240</width>
-            <height>389</height>
-           </rect>
-          </property>
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Ignored">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>240</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="pixmap">
-           <pixmap>:/images/stat_logo</pixmap>
-          </property>
-         </widget>
-        </widget>
        </item>
       </layout>
      </widget>
@@ -699,6 +679,15 @@
       </property>
       <property name="text">
        <string>Update Statistics</string>
+      </property>
+      <property name="autoDefault">
+       <bool>false</bool>
+      </property>
+      <property name="default">
+       <bool>false</bool>
+      </property>
+      <property name="flat">
+       <bool>false</bool>
       </property>
      </widget>
     </widget>

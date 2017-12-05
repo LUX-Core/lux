@@ -1,0 +1,10 @@
+obj/masternodeconfig.o: masternodeconfig.cpp net.h mruset.h netbase.h \
+ serialize.h allocators.h version.h clientversion.h compat.h protocol.h \
+ chainparams.h bignum.h uint256.h util.h tinyformat.h addrman.h sync.h \
+ threadsafety.h timedata.h hash.h core.h script.h keystore.h key.h \
+ stealth.h masternodeconfig.h
+masternodeconfig.cpp net.h mruset.h netbase.h :
+ serialize.h allocators.h version.h clientversion.h compat.h protocol.h :
+ chainparams.h bignum.h uint256.h util.h tinyformat.h addrman.h sync.h :
+ threadsafety.h timedata.h hash.h core.h script.h keystore.h key.h :
+ stealth.h masternodeconfig.h :

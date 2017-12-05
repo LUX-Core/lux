@@ -1,0 +1,6 @@
+obj/db.o: db.cpp db.h serialize.h allocators.h version.h clientversion.h \
+ sync.h threadsafety.h addrman.h netbase.h compat.h protocol.h \
+ chainparams.h bignum.h uint256.h util.h tinyformat.h timedata.h hash.h
+db.cpp db.h serialize.h allocators.h version.h clientversion.h :
+ sync.h threadsafety.h addrman.h netbase.h compat.h protocol.h :
+ chainparams.h bignum.h uint256.h util.h tinyformat.h timedata.h hash.h :

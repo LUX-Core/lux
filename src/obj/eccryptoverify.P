@@ -1,0 +1,2 @@
+obj/eccryptoverify.o: eccryptoverify.cpp eccryptoverify.h
+eccryptoverify.cpp eccryptoverify.h :

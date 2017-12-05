@@ -1,0 +1,6 @@
+obj/util.o: util.cpp util.h serialize.h allocators.h version.h \
+ clientversion.h tinyformat.h chainparams.h bignum.h uint256.h sync.h \
+ threadsafety.h ui_interface.h
+util.cpp util.h serialize.h allocators.h version.h :
+ clientversion.h tinyformat.h chainparams.h bignum.h uint256.h sync.h :
+ threadsafety.h ui_interface.h :

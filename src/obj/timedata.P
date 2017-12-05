@@ -1,0 +1,6 @@
+obj/timedata.o: timedata.cpp timedata.h netbase.h serialize.h \
+ allocators.h version.h clientversion.h compat.h sync.h threadsafety.h \
+ ui_interface.h util.h tinyformat.h
+timedata.cpp timedata.h netbase.h serialize.h :
+ allocators.h version.h clientversion.h compat.h sync.h threadsafety.h :
+ ui_interface.h util.h tinyformat.h :
