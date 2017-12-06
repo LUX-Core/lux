@@ -73,6 +73,7 @@ public:
     CScript scriptSig;
     CScript prevPubKey;
     unsigned int nSequence;
+    CScriptWitness scriptWitness; //! Only serialized through CTransaction
 
     CTxIn()
     {
@@ -208,3 +209,4 @@ public:
 };
 
 #endif
+

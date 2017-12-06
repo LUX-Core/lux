@@ -3298,3 +3298,16 @@ bool CScript::IsNormalPaymentScript() const
 
     return true;
 }
+
+std::string CScriptWitness::ToString() const
+{
+    std::string ret = "CScriptWitness(";
+    for (unsigned int i = 0; i < stack.size(); i++) {
+        if (i) {
+            ret += ", ";
+        }
+        ret += HexStr(stack[i]);
+    }
+    return ret + ")";
+}
+
