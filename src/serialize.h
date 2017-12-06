@@ -844,6 +844,9 @@ struct ser_streamplaceholder
 {
     int nType;
     int nVersion;
+
+    int GetType() const { return nType; }
+    int GetVersion() const { return nVersion; }
 };
 
 
