@@ -462,7 +462,7 @@ public:
             str += "    " + vout[i].ToString() + "\n";
         return str;
     }
-/
+
     bool ReadFromDisk(CTxDB& txdb, const uint256& hash, CTxIndex& txindexRet);
     bool ReadFromDisk(CTxDB& txdb, COutPoint prevout, CTxIndex& txindexRet);
     bool ReadFromDisk(CTxDB& txdb, COutPoint prevout);

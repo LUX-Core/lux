@@ -1016,7 +1016,11 @@ struct CScriptWitness
 
     bool IsNull() const { return stack.empty(); }
 
-    void SetNull() { stack.clear(); stack.shrink_to_fit(); }
+    void SetNull() {
+        stack.clear();
+//        stack.shrink_to_fit();
+        std::vector<std::vector<unsigned char> >(stack).swap(stack);
+    }
 
     std::string ToString() const;
 };
