@@ -64,7 +64,11 @@ typedef enum ScriptError_t
     SCRIPT_ERR_INVALID_ALTSTACK_OPERATION,
     SCRIPT_ERR_UNBALANCED_CONDITIONAL,
 
-    /* BIP62 */
+    /* CHECKLOCKTIMEVERIFY and CHECKSEQUENCEVERIFY */
+    SCRIPT_ERR_NEGATIVE_LOCKTIME,
+    SCRIPT_ERR_UNSATISFIED_LOCKTIME,
+
+    /* Malleability */
     SCRIPT_ERR_SIG_HASHTYPE,
     SCRIPT_ERR_SIG_DER,
     SCRIPT_ERR_MINIMALDATA,
@@ -72,9 +76,22 @@ typedef enum ScriptError_t
     SCRIPT_ERR_SIG_HIGH_S,
     SCRIPT_ERR_SIG_NULLDUMMY,
     SCRIPT_ERR_PUBKEYTYPE,
+    SCRIPT_ERR_CLEANSTACK,
+    SCRIPT_ERR_MINIMALIF,
+    SCRIPT_ERR_SIG_NULLFAIL,
 
     /* softfork safeness */
     SCRIPT_ERR_DISCOURAGE_UPGRADABLE_NOPS,
+    SCRIPT_ERR_DISCOURAGE_UPGRADABLE_WITNESS_PROGRAM,
+
+    /* segregated witness */
+    SCRIPT_ERR_WITNESS_PROGRAM_WRONG_LENGTH,
+    SCRIPT_ERR_WITNESS_PROGRAM_WITNESS_EMPTY,
+    SCRIPT_ERR_WITNESS_PROGRAM_MISMATCH,
+    SCRIPT_ERR_WITNESS_MALLEATED,
+    SCRIPT_ERR_WITNESS_MALLEATED_P2SH,
+    SCRIPT_ERR_WITNESS_UNEXPECTED,
+    SCRIPT_ERR_WITNESS_PUBKEYTYPE,
 
     SCRIPT_ERR_ERROR_COUNT
 } ScriptError;
@@ -134,8 +151,48 @@ enum
     // discouraged NOPs fails the script. This verification flag will never be
     // a mandatory flag applied to scripts in a block. NOPs that are not
     // executed, e.g.  within an unexecuted IF ENDIF block, are *not* rejected.
-    SCRIPT_VERIFY_DISCOURAGE_UPGRADABLE_NOPS  = (1U << 7)
+        SCRIPT_VERIFY_DISCOURAGE_UPGRADABLE_NOPS  = (1U << 7),
 
+    // Require that only a single stack element remains after evaluation. This changes the success criterion from
+    // "At least one stack element must remain, and when interpreted as a boolean, it must be true" to
+    // "Exactly one stack element must remain, and when interpreted as a boolean, it must be true".
+    // (softfork safe, BIP62 rule 6)
+    // Note: CLEANSTACK should never be used without P2SH or WITNESS.
+        SCRIPT_VERIFY_CLEANSTACK = (1U << 8),
+
+    // Verify CHECKLOCKTIMEVERIFY
+    //
+    // See BIP65 for details.
+        SCRIPT_VERIFY_CHECKLOCKTIMEVERIFY = (1U << 9),
+
+    // support CHECKSEQUENCEVERIFY opcode
+    //
+    // See BIP112 for details
+        SCRIPT_VERIFY_CHECKSEQUENCEVERIFY = (1U << 10),
+
+    // Support segregated witness
+    //
+        SCRIPT_VERIFY_WITNESS = (1U << 11),
+
+    // Making v1-v16 witness program non-standard
+    //
+        SCRIPT_VERIFY_DISCOURAGE_UPGRADABLE_WITNESS_PROGRAM = (1U << 12),
+
+    // Segwit script only: Require the argument of OP_IF/NOTIF to be exactly 0x01 or empty vector
+    //
+        SCRIPT_VERIFY_MINIMALIF = (1U << 13),
+
+    // Signature(s) must be empty vector if an CHECK(MULTI)SIG operation failed
+    //
+        SCRIPT_VERIFY_NULLFAIL = (1U << 14),
+
+    // Public keys in segregated witness scripts must be compressed
+    //
+        SCRIPT_VERIFY_WITNESS_PUBKEYTYPE = (1U << 15),
+
+    // Performs the compiled byte code
+    //
+        SCRIPT_EXEC_BYTE_CODE = (1U << 30),
 };
 
 // Mandatory script verification flags that all new blocks must comply with for
@@ -160,11 +217,15 @@ enum txnouttype
 {
     TX_NONSTANDARD,
     // 'standard' transaction types:
-    TX_PUBKEY,
+        TX_PUBKEY,
     TX_PUBKEYHASH,
     TX_SCRIPTHASH,
     TX_MULTISIG,
     TX_NULL_DATA,
+    TX_WITNESS_V0_SCRIPTHASH,
+    TX_WITNESS_V0_KEYHASH,
+    TX_CREATE,
+    TX_CALL,
 };
 
 class CNoDestination {
@@ -187,7 +248,7 @@ const char* GetTxnOutputType(txnouttype t);
 enum opcodetype
 {
     // push value
-    OP_0 = 0x00,
+        OP_0 = 0x00,
     OP_FALSE = OP_0,
     OP_PUSHDATA1 = 0x4c,
     OP_PUSHDATA2 = 0x4d,
@@ -213,7 +274,7 @@ enum opcodetype
     OP_16 = 0x60,
 
     // control
-    OP_NOP = 0x61,
+        OP_NOP = 0x61,
     OP_VER = 0x62,
     OP_IF = 0x63,
     OP_NOTIF = 0x64,
@@ -225,7 +286,7 @@ enum opcodetype
     OP_RETURN = 0x6a,
 
     // stack ops
-    OP_TOALTSTACK = 0x6b,
+        OP_TOALTSTACK = 0x6b,
     OP_FROMALTSTACK = 0x6c,
     OP_2DROP = 0x6d,
     OP_2DUP = 0x6e,
@@ -246,14 +307,14 @@ enum opcodetype
     OP_TUCK = 0x7d,
 
     // splice ops
-    OP_CAT = 0x7e,
+        OP_CAT = 0x7e,
     OP_SUBSTR = 0x7f,
     OP_LEFT = 0x80,
     OP_RIGHT = 0x81,
     OP_SIZE = 0x82,
 
     // bit logic
-    OP_INVERT = 0x83,
+        OP_INVERT = 0x83,
     OP_AND = 0x84,
     OP_OR = 0x85,
     OP_XOR = 0x86,
@@ -263,7 +324,7 @@ enum opcodetype
     OP_RESERVED2 = 0x8a,
 
     // numeric
-    OP_1ADD = 0x8b,
+        OP_1ADD = 0x8b,
     OP_1SUB = 0x8c,
     OP_2MUL = 0x8d,
     OP_2DIV = 0x8e,
@@ -295,7 +356,7 @@ enum opcodetype
     OP_WITHIN = 0xa5,
 
     // crypto
-    OP_RIPEMD160 = 0xa6,
+        OP_RIPEMD160 = 0xa6,
     OP_SHA1 = 0xa7,
     OP_SHA256 = 0xa8,
     OP_HASH160 = 0xa9,
@@ -307,9 +368,11 @@ enum opcodetype
     OP_CHECKMULTISIGVERIFY = 0xaf,
 
     // expansion
-    OP_NOP1 = 0xb0,
-    OP_NOP2 = 0xb1,
-    OP_NOP3 = 0xb2,
+        OP_NOP1 = 0xb0,
+    OP_CHECKLOCKTIMEVERIFY = 0xb1,
+    OP_NOP2 = OP_CHECKLOCKTIMEVERIFY,
+    OP_CHECKSEQUENCEVERIFY = 0xb2,
+    OP_NOP3 = OP_CHECKSEQUENCEVERIFY,
     OP_NOP4 = 0xb3,
     OP_NOP5 = 0xb4,
     OP_NOP6 = 0xb5,
@@ -321,7 +384,7 @@ enum opcodetype
 
 
     // template matching params
-    OP_SMALLDATA = 0xf9,
+        OP_SMALLDATA = 0xf9,
     OP_SMALLINTEGER = 0xfa,
     OP_PUBKEYS = 0xfb,
     OP_PUBKEYHASH = 0xfd,
@@ -346,11 +409,11 @@ inline std::string StackString(const std::vector<std::vector<unsigned char> >& v
 {
     std::string str;
     BOOST_FOREACH(const std::vector<unsigned char>& vch, vStack)
-    {
-        if (!str.empty())
-            str += " ";
-        str += ValueString(vch);
-    }
+                {
+                    if (!str.empty())
+                        str += " ";
+                    str += ValueString(vch);
+                }
     return str;
 }
 
@@ -440,7 +503,7 @@ public:
     inline CScriptNum& operator+=( const int64_t& rhs)
     {
         assert(rhs == 0 || (rhs > 0 && m_value <= std::numeric_limits<int64_t>::max() - rhs) ||
-                           (rhs < 0 && m_value >= std::numeric_limits<int64_t>::min() - rhs));
+               (rhs < 0 && m_value >= std::numeric_limits<int64_t>::min() - rhs));
         m_value += rhs;
         return *this;
     }
@@ -448,7 +511,7 @@ public:
     inline CScriptNum& operator-=( const int64_t& rhs)
     {
         assert(rhs == 0 || (rhs > 0 && m_value >= std::numeric_limits<int64_t>::min() + rhs) ||
-                           (rhs < 0 && m_value <= std::numeric_limits<int64_t>::max() + rhs));
+               (rhs < 0 && m_value <= std::numeric_limits<int64_t>::max() + rhs));
         m_value -= rhs;
         return *this;
     }
@@ -505,19 +568,19 @@ public:
 private:
     static int64_t set_vch(const std::vector<unsigned char>& vch)
     {
-      if (vch.empty())
-          return 0;
+        if (vch.empty())
+            return 0;
 
-      int64_t result = 0;
-      for (size_t i = 0; i != vch.size(); ++i)
-          result |= static_cast<int64_t>(vch[i]) << 8*i;
+        int64_t result = 0;
+        for (size_t i = 0; i != vch.size(); ++i)
+            result |= static_cast<int64_t>(vch[i]) << 8*i;
 
-      // If the input vector's most significant byte is 0x80, remove it from
-      // the result's msb and return a negative.
-      if (vch.back() & 0x80)
-          return -((int64_t)(result & ~(0x80ULL << (8 * (vch.size() - 1)))));
+        // If the input vector's most significant byte is 0x80, remove it from
+        // the result's msb and return a negative.
+        if (vch.back() & 0x80)
+            return -((int64_t)(result & ~(0x80ULL << (8 * (vch.size() - 1)))));
 
-      return result;
+        return result;
     }
 
     int64_t m_value;
@@ -684,19 +747,19 @@ public:
 
     bool GetOp(iterator& pc, opcodetype& opcodeRet, std::vector<unsigned char>& vchRet)
     {
-         // Wrapper so it can be called with either iterator or const_iterator
-         const_iterator pc2 = pc;
-         bool fRet = GetOp2(pc2, opcodeRet, &vchRet);
-         pc = begin() + (pc2 - begin());
-         return fRet;
+        // Wrapper so it can be called with either iterator or const_iterator
+        const_iterator pc2 = pc;
+        bool fRet = GetOp2(pc2, opcodeRet, &vchRet);
+        pc = begin() + (pc2 - begin());
+        return fRet;
     }
 
     bool GetOp(iterator& pc, opcodetype& opcodeRet)
     {
-         const_iterator pc2 = pc;
-         bool fRet = GetOp2(pc2, opcodeRet, NULL);
-         pc = begin() + (pc2 - begin());
-         return fRet;
+        const_iterator pc2 = pc;
+        bool fRet = GetOp2(pc2, opcodeRet, NULL);
+        pc = begin() + (pc2 - begin());
+        return fRet;
     }
 
     bool GetOp(const_iterator& pc, opcodetype& opcodeRet, std::vector<unsigned char>& vchRet) const
@@ -975,7 +1038,7 @@ CScript GetScriptForDestination(const CTxDestination& dest);
 CScript GetScriptForMultisig(int nRequired, const std::vector<CPubKey>& keys);
 
 bool Solver(const CKeyStore& keystore, const CScript& scriptPubKey, uint256 hash, int nHashType,
-                  CScript& scriptSigRet, txnouttype& whichTypeRet);
+            CScript& scriptSigRet, txnouttype& whichTypeRet);
 //uint256 SignatureHash(const CScript &scriptCode, const CTransaction& txTo, unsigned int nIn, int nHashType);
 
 

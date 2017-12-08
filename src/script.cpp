@@ -2820,6 +2820,53 @@ bool VerifyScript(const CScript& scriptSig, const CScript& scriptPubKey, unsigne
     return set_success(serror);
 }
 
+size_t static WitnessSigOps(int witversion, const std::vector<unsigned char>& witprogram, const CScriptWitness& witness, int flags)
+{
+    if (witversion == 0) {
+        if (witprogram.size() == 20)
+            return 1;
+
+        if (witprogram.size() == 32 && witness.stack.size() > 0) {
+            CScript subscript(witness.stack.back().begin(), witness.stack.back().end());
+            return subscript.GetSigOpCount(true);
+        }
+    }
+
+    // Future flags may be implemented here.
+    return 0;
+}
+
+size_t CountWitnessSigOps(const CScript& scriptSig, const CScript& scriptPubKey, const CScriptWitness* witness, unsigned int flags)
+{
+    static const CScriptWitness witnessEmpty;
+
+    if ((flags & SCRIPT_VERIFY_WITNESS) == 0) {
+        return 0;
+    }
+    assert((flags & SCRIPT_VERIFY_P2SH) != 0);
+
+    int witnessversion;
+    std::vector<unsigned char> witnessprogram;
+    if (scriptPubKey.IsWitnessProgram(witnessversion, witnessprogram)) {
+        return WitnessSigOps(witnessversion, witnessprogram, witness ? *witness : witnessEmpty, flags);
+    }
+
+    if (scriptPubKey.IsPayToScriptHash() && scriptSig.IsPushOnly()) {
+        CScript::const_iterator pc = scriptSig.begin();
+        vector<unsigned char> data;
+        while (pc < scriptSig.end()) {
+            opcodetype opcode;
+            scriptSig.GetOp(pc, opcode, data);
+        }
+        CScript subscript(data.begin(), data.end());
+        if (subscript.IsWitnessProgram(witnessversion, witnessprogram)) {
+            return WitnessSigOps(witnessversion, witnessprogram, witness ? *witness : witnessEmpty, flags);
+        }
+    }
+
+    return 0;
+}
+
 
 /*bool SignSignature(const CKeyStore &keystore, const CScript& fromPubKey, CTransaction& txTo, unsigned int nIn, int nHashType)
 {
@@ -3059,6 +3106,54 @@ bool CScript::IsPayToScriptHash() const
             this->at(0) == OP_HASH160 &&
             this->at(1) == 0x14 &&
             this->at(22) == OP_EQUAL);
+}
+
+bool CScript::IsPayToWitnessScriptHash() const
+{
+    // Extra-fast test for pay-to-witness-script-hash CScripts:
+    return (this->size() == 34 &&
+            (*this)[0] == OP_0 &&
+            (*this)[1] == 0x20);
+}
+
+// A witness program is any valid CScript that consists of a 1-byte push opcode
+// followed by a data push between 2 and 40 bytes.
+bool CScript::IsWitnessProgram(int& version, std::vector<unsigned char>& program) const
+{
+    if (this->size() < 4 || this->size() > 42) {
+        return false;
+    }
+    if ((*this)[0] != OP_0 && ((*this)[0] < OP_1 || (*this)[0] > OP_16)) {
+        return false;
+    }
+    if ((size_t)((*this)[1] + 2) == this->size()) {
+        version = DecodeOP_N((opcodetype)(*this)[0]);
+        program = std::vector<unsigned char>(this->begin() + 2, this->end());
+        return true;
+    }
+    return false;
+}
+
+bool CScript::IsPushOnly(const_iterator pc) const
+{
+    while (pc < end())
+    {
+        opcodetype opcode;
+        if (!GetOp(pc, opcode))
+            return false;
+        // Note that IsPushOnly() *does* consider OP_RESERVED to be a
+        // push-type opcode, however execution of OP_RESERVED fails, so
+        // it's not relevant to P2SH/BIP62 as the scriptSig would fail prior to
+        // the P2SH special validation code being executed.
+        if (opcode > OP_16)
+            return false;
+    }
+    return true;
+}
+
+bool CScript::IsPushOnly() const
+{
+    return this->IsPushOnly(begin());
 }
 
 bool CScript::HasCanonicalPushes() const
