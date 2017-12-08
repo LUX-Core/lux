@@ -4237,3 +4237,21 @@ int64_t GetMasternodePayment(int nHeight, int64_t blockValue)
 
     return ret;
 }
+
+unsigned int nBytesPerSigOp = DEFAULT_BYTES_PER_SIGOP;
+
+int64_t GetTransactionWeight(const CTransaction& tx)
+{
+    return ::GetSerializeSize(tx, SER_NETWORK, PROTOCOL_VERSION | SERIALIZE_TRANSACTION_NO_WITNESS) * (WITNESS_SCALE_FACTOR -1) + ::GetSerializeSize(tx, SER_NETWORK, PROTOCOL_VERSION);
+}
+
+int64_t GetVirtualTransactionSize(int64_t nWeight, int64_t nSigOpCost)
+{
+    return (std::max(nWeight, nSigOpCost * nBytesPerSigOp) + WITNESS_SCALE_FACTOR - 1) / WITNESS_SCALE_FACTOR;
+}
+
+int64_t GetVirtualTransactionSize(const CTransaction& tx, int64_t nSigOpCost)
+{
+    return GetVirtualTransactionSize(GetTransactionWeight(tx), nSigOpCost);
+}
+

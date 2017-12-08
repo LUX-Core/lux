@@ -22,6 +22,9 @@ class CValidationState;
 
 static const int SERIALIZE_TRANSACTION_NO_WITNESS = 0x40000000;
 
+static const int WITNESS_SCALE_FACTOR = 4;
+static const unsigned int DEFAULT_BYTES_PER_SIGOP = 20;
+
 static const int64_t DARKSEND_COLLATERAL = (16120*COIN); //161.20 LUX 
 static const int64_t DARKSEND_FEE = (0.002*COIN); // reward masternode
 static const int64_t DARKSEND_POOL_MAX = (1999999.99*COIN);
@@ -363,7 +366,12 @@ public:
 
     uint256 GetHash() const
     {
-        return SerializeHash(*this);
+        return SerializeHash(*this, SER_GETHASH, SERIALIZE_TRANSACTION_NO_WITNESS);
+    }
+
+    uint256 GetWitnessHash() const
+    {
+        return SerializeHash(*this, SER_GETHASH, 0);
     }
 
     bool IsCoinBase() const
@@ -512,8 +520,9 @@ public:
     }
 };
 
-
-
+int64_t GetTransactionWeight(const CTransaction& tx);
+int64_t GetVirtualTransactionSize(int64_t nWeight, int64_t nSigOpCost);
+int64_t GetVirtualTransactionSize(const CTransaction& tx, int64_t nSigOpCost=0);
 
 /** wrapper for CTxOut that provides a more compact serialization */
 class CTxOutCompressor
