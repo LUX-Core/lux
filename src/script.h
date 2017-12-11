@@ -228,6 +228,26 @@ enum txnouttype
     TX_CALL,
 };
 
+struct CScriptWitness
+{
+    // Note that this encodes the data elements being pushed, rather than
+    // encoding them as a CScript that pushes them.
+    std::vector<std::vector<unsigned char> > stack;
+
+    // Some compilers complain without a default constructor
+    CScriptWitness() { }
+
+    bool IsNull() const { return stack.empty(); }
+
+    void SetNull() {
+        stack.clear();
+//        stack.shrink_to_fit();
+        std::vector<std::vector<unsigned char> >(stack).swap(stack);
+    }
+
+    std::string ToString() const;
+};
+
 class CNoDestination {
 public:
     friend bool operator==(const CNoDestination &a, const CNoDestination &b) { return true; }
@@ -882,20 +902,12 @@ public:
     bool IsNormalPaymentScript() const;
     bool IsPayToScriptHash() const;
 
+    bool IsPayToWitnessScriptHash() const;
+    bool IsWitnessProgram(int& version, std::vector<unsigned char>& program) const;
+
     // Called by IsStandardTx and P2SH VerifyScript (which makes it consensus-critical).
-    bool IsPushOnly() const
-    {
-        const_iterator pc = begin();
-        while (pc < end())
-        {
-            opcodetype opcode;
-            if (!GetOp(pc, opcode))
-                return false;
-            if (opcode > OP_16)
-                return false;
-        }
-        return true;
-    }
+    bool IsPushOnly(const_iterator pc) const;
+    bool IsPushOnly() const;
 
     // Called by IsStandardTx.
     bool HasCanonicalPushes() const;
@@ -1030,6 +1042,9 @@ bool VerifySignature(const CTransaction& txFrom, const CTransaction& txTo, unsig
 
 bool VerifyScript(const CScript& scriptSig, const CScript& scriptPubKey, unsigned int flags, const BaseSignatureChecker& checker, ScriptError* error = NULL);
 
+
+size_t CountWitnessSigOps(const CScript& scriptSig, const CScript& scriptPubKey, const CScriptWitness* witness, unsigned int flags);
+
 // Given two sets of signatures for scriptPubKey, possibly with OP_0 placeholders,
 // combine them intelligently and return the result.
 CScript CombineSignatures(CScript scriptPubKey, const CTransaction& txTo, unsigned int nIn, const CScript& scriptSig1, const CScript& scriptSig2);
@@ -1067,26 +1082,4 @@ public:
     bool CheckSig(const std::vector<unsigned char>& scriptSig, const std::vector<unsigned char>& vchPubKey, const CScript& scriptCode) const;
 };
 
-
-struct CScriptWitness
-{
-    // Note that this encodes the data elements being pushed, rather than
-    // encoding them as a CScript that pushes them.
-    std::vector<std::vector<unsigned char> > stack;
-
-    // Some compilers complain without a default constructor
-    CScriptWitness() { }
-
-    bool IsNull() const { return stack.empty(); }
-
-    void SetNull() {
-        stack.clear();
-//        stack.shrink_to_fit();
-        std::vector<std::vector<unsigned char> >(stack).swap(stack);
-    }
-
-    std::string ToString() const;
-};
-
 #endif
-

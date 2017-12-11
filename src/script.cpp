@@ -2298,6 +2298,32 @@ bool Solver(const CScript& scriptPubKey, txnouttype& typeRet, vector<vector<unsi
         return true;
     }
 
+    int witnessversion;
+    std::vector<unsigned char> witnessprogram;
+    if (scriptPubKey.IsWitnessProgram(witnessversion, witnessprogram)) {
+        if (witnessversion == 0 && witnessprogram.size() == 20) {
+            typeRet = TX_WITNESS_V0_KEYHASH;
+            vSolutionsRet.push_back(witnessprogram);
+            return true;
+        }
+        if (witnessversion == 0 && witnessprogram.size() == 32) {
+            typeRet = TX_WITNESS_V0_SCRIPTHASH;
+            vSolutionsRet.push_back(witnessprogram);
+            return true;
+        }
+        return false;
+    }
+
+    // Provably prunable, data-carrying output
+    //
+    // So long as script passes the IsUnspendable() test and all but the first
+    // byte passes the IsPushOnly() test we don't care what exactly is in the
+    // script.
+    if (scriptPubKey.size() >= 1 && scriptPubKey[0] == OP_RETURN && scriptPubKey.IsPushOnly(scriptPubKey.begin()+1)) {
+        typeRet = TX_NULL_DATA;
+        return true;
+    }
+
     // Scan templates
     const CScript& script1 = scriptPubKey;
     BOOST_FOREACH(const PAIRTYPE(txnouttype, CScript)& tplate, mTemplates)
@@ -3405,4 +3431,3 @@ std::string CScriptWitness::ToString() const
     }
     return ret + ")";
 }
-
