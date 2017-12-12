@@ -1,6 +1,6 @@
 obj/crypto/sha1.o: crypto/sha1.cpp \
- /home/wallermadev/Desktop/LUX/lux-old/src/crypto/sha1.h \
- /home/wallermadev/Desktop/LUX/lux-old/src/crypto/common.h
+ /home/luxcore/luxtrial/src/crypto/sha1.h \
+ /home/luxcore/luxtrial/src/crypto/common.h
 crypto/sha1.cpp :
- /home/wallermadev/Desktop/LUX/lux-old/src/crypto/sha1.h :
- /home/wallermadev/Desktop/LUX/lux-old/src/crypto/common.h :
+ /home/luxcore/luxtrial/src/crypto/sha1.h :
+ /home/luxcore/luxtrial/src/crypto/common.h :

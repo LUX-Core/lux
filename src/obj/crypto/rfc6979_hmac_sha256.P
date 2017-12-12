@@ -1,8 +1,8 @@
 obj/crypto/rfc6979_hmac_sha256.o: crypto/rfc6979_hmac_sha256.cpp \
- /home/wallermadev/Desktop/LUX/lux-old/src/crypto/rfc6979_hmac_sha256.h \
- /home/wallermadev/Desktop/LUX/lux-old/src/crypto/hmac_sha256.h \
- /home/wallermadev/Desktop/LUX/lux-old/src/crypto/sha256.h
+ /home/luxcore/luxtrial/src/crypto/rfc6979_hmac_sha256.h \
+ /home/luxcore/luxtrial/src/crypto/hmac_sha256.h \
+ /home/luxcore/luxtrial/src/crypto/sha256.h
 crypto/rfc6979_hmac_sha256.cpp :
- /home/wallermadev/Desktop/LUX/lux-old/src/crypto/rfc6979_hmac_sha256.h :
- /home/wallermadev/Desktop/LUX/lux-old/src/crypto/hmac_sha256.h :
- /home/wallermadev/Desktop/LUX/lux-old/src/crypto/sha256.h :
+ /home/luxcore/luxtrial/src/crypto/rfc6979_hmac_sha256.h :
+ /home/luxcore/luxtrial/src/crypto/hmac_sha256.h :
+ /home/luxcore/luxtrial/src/crypto/sha256.h :

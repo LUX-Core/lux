@@ -85,12 +85,6 @@ void MasternodeManager::subscribeToCoreSignals()
     uiInterface.NotifyAdrenalineNodeChanged.connect(boost::bind(&NotifyAdrenalineNodeUpdated, this, _1));
 }
 
-void MasternodeManager::unsubscribeFromCoreSignals()
-{
-    // Disconnect signals from core
-    uiInterface.NotifyAdrenalineNodeChanged.disconnect(boost::bind(&NotifyAdrenalineNodeUpdated, this, _1));
-}
-
 void MasternodeManager::on_tableWidget_2_itemSelectionChanged()
 {
     if(ui->tableWidget_2->selectedItems().count() > 0)

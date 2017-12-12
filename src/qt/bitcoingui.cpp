@@ -313,7 +313,7 @@ void BitcoinGUI::createActions()
     messageAction->setCheckable(true);
     tabGroup->addAction(messageAction);
 
-    blockAction = new QAction(QIcon(":/icons/block"), tr("&Block Explorer"), this);
+    blockAction = new QAction(QIcon(":/icons/statistics"), tr("&Block Explorer"), this);
     blockAction->setToolTip(tr("Explore the BlockChain"));
     blockAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_6));
     blockAction->setCheckable(true);
@@ -454,17 +454,22 @@ static QWidget* makeToolBarSpacer()
 
 void BitcoinGUI::createToolBars()
 {
+    fLiteMode = GetBoolArg("-litemode", false);
+
     toolbar = new QToolBar(tr("Tabs toolbar"));
-    toolbar->setToolButtonStyle(Qt::ToolButtonFollowStyle);
+
+    toolbar->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+
     toolbar->setContextMenuPolicy(Qt::PreventContextMenu);
 
-    toolbar->setStyleSheet("#Tabs {width: 100%; margin: 0;} QToolButton { color: #101010; text-align:left; float:left; width:100% !important; margin: 0; padding: 5px; font-size:10px; } QToolButton:hover { background-color: ##e0373f } QToolButton:checked { background-color: #c51f26 } QToolButton:pressed { background-color: none } #tabs { color: #101010; background-color: #f9f9f9); text-align:left !important; float:left; }");
+    toolbar->setObjectName("tabs");
+        toolbar->setStyleSheet("QToolButton { color: #101010; font-weight:bold;} QToolButton:hover { background-color: #c1cbcb } QToolButton:checked { background-color: #c1cbcb } QToolButton:pressed { background-color: none } #tabs { color: #101010; background-color: #f9f9f9);  }");
 
     QLabel* header = new QLabel();
-    header->setMinimumSize(128, 128);
+    header->setMinimumSize(142, 142);
     header->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     header->setPixmap(QPixmap(":/images/header"));
-    header->setMaximumSize(128,128);
+    header->setMaximumSize(180,180);
     header->setScaledContents(true);
 
     header->setObjectName("headerLogo");
@@ -480,9 +485,12 @@ void BitcoinGUI::createToolBars()
     toolbar->addAction(historyAction);
     toolbar->addAction(addressBookAction);
     toolbar->addAction(masternodeManagerAction);
-    toolbar->addAction(messageAction);
     toolbar->addAction(clientcontrolAction);
     toolbar->addAction(blockAction);
+
+    if (!fLiteMode){
+        toolbar->addAction(messageAction);
+    }
 
     QWidget *spacer = makeToolBarSpacer();
 
