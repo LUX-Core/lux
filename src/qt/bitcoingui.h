@@ -13,6 +13,7 @@ class TransactionView;
 class OverviewPage;
 class ClientControlPage;
 class AddressBookPage;
+class tradingDialog;
 class SendCoinsDialog;
 class SignVerifyMessageDialog;
 class Notificator;
@@ -72,6 +73,7 @@ private:
     QWidget *overviewWidget;
     QScrollArea *overviewScroll;
     OverviewPage *overviewPage;
+    tradingDialog *tradingDialogPage;
     QWidget *transactionsPage;
     AddressBookPage *addressBookPage;
     AddressBookPage *receiveCoinsPage;
@@ -96,6 +98,7 @@ private:
     QMenuBar *appMenuBar;
     QAction *overviewAction;
     QAction *clientcontrolAction;
+    QAction *TradingAction;
     //QAction *generateAction;
     QAction *historyAction;
     QAction *quitAction;
@@ -195,6 +198,7 @@ private slots:
     void gotoVerifyMessageTab(QString addr = "");
 
     void gotoMessagePage();
+    void gotoTradingPage();
 
     /** Show configuration dialog */
     void optionsClicked();

@@ -23,6 +23,7 @@
 #include "addresstablemodel.h"
 #include "transactionview.h"
 #include "overviewpage.h"
+#include "tradingdialog.h"
 #include "clientcontrolpage.h"
 #include "bitcoinunits.h"
 #include "guiconstants.h"
@@ -121,8 +122,8 @@ BitcoinGUI::BitcoinGUI(QWidget *parent):
     // Create tabs
     overviewPage = new OverviewPage();
     // Create trading page
-  //  tradingDialogPage = new tradingDialog(this);
-   // tradingDialogPage->setObjectName("tradingDialog");
+    tradingDialogPage = new tradingDialog(this);
+    tradingDialogPage->setObjectName("tradingDialog");
 
     transactionsPage = new QWidget(this);
     QVBoxLayout *vbox = new QVBoxLayout();
@@ -160,8 +161,8 @@ BitcoinGUI::BitcoinGUI(QWidget *parent):
     centralStackedWidget->addWidget(messagePage);
     centralStackedWidget->addWidget(blockBrowser);
     centralStackedWidget->addWidget(clientcontrolPage);
-    //TradingAction->setChecked(true);
-  //  centralStackedWidget->addWidget(tradingDialogPage);
+    TradingAction->setChecked(true);
+    centralStackedWidget->addWidget(tradingDialogPage);
 
     QWidget *centralWidget = new QWidget();
     QVBoxLayout *centralLayout = new QVBoxLayout(centralWidget);
@@ -334,14 +335,14 @@ void BitcoinGUI::createActions()
     //multisigAction = new QAction(QIcon(":/icons/send"), tr("Multisig"), this);
     //tabGroup->addAction(multisigAction);
 
-  /*  TradingAction = new QAction(tr("&Trade"), this);
+    TradingAction = new QAction(tr("&Trade"), this);
     TradingAction ->setToolTip(tr("Start Trading"));
     TradingAction ->setCheckable(true);
     TradingAction ->setShortcut(QKeySequence(Qt::ALT + Qt::Key_8));
     TradingAction->setProperty("objectName","TradingAction");
-    tabGroup->addAction(TradingAction);*/
+    tabGroup->addAction(TradingAction);
 
-   // connect(TradingAction, SIGNAL(triggered()), this, SLOT(gotoTradingPage()));
+    connect(TradingAction, SIGNAL(triggered()), this, SLOT(gotoTradingPage()));
     connect(blockAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
     connect(blockAction, SIGNAL(triggered()), this, SLOT(gotoBlockBrowser()));
     connect(overviewAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
@@ -487,6 +488,7 @@ void BitcoinGUI::createToolBars()
     toolbar->addAction(masternodeManagerAction);
     toolbar->addAction(clientcontrolAction);
     toolbar->addAction(blockAction);
+    toolbar->addAction(TradingAction);
 
     if (!fLiteMode){
         toolbar->addAction(messageAction);
@@ -1017,15 +1019,15 @@ void BitcoinGUI::gotoClientControlPage()
     disconnect(exportAction, SIGNAL(triggered()), 0, 0);
 }
 
-/*void BitcoinGUI::gotoTradingPage()
+void BitcoinGUI::gotoTradingPage()
 {
-
+    LogPrintf("123123123123\n");
      TradingAction->setChecked(true);
      centralStackedWidget->setCurrentWidget(tradingDialogPage);
 
-  //  exportAction->setEnabled(false);
-  //  disconnect(exportAction, SIGNAL(triggered()), 0, 0);
-}*/
+    exportAction->setEnabled(false);
+    disconnect(exportAction, SIGNAL(triggered()), 0, 0);
+}
 
 void BitcoinGUI::gotoMessagePage()
 {

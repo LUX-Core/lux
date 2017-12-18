@@ -4,6 +4,7 @@
 
 #include <QDialog>
 #include <QObject>
+#include <QTableWidget>
 #include <stdint.h>
 #include "ui_tradingdialog.h"
 #include "clientmodel.h"
@@ -81,6 +82,7 @@ private slots:
     int SetExchangeInfoTextLabels();
 
     QString CryptopiaTimeStampToReadable(QString DateTime);
+    QString CryptopiaIntegerTimeStampToReadable(int DateTime);
     QString CancelOrder(QString Orderid);
     QString BuyLUX(QString OrderType, double Quantity, double Rate);
     QString SellLUX(QString OrderType, double Quantity, double Rate);
@@ -92,9 +94,12 @@ private slots:
     QString GetAccountHistory();
     QString GetBalance(QString Currency);
     QString GetDepositAddress();
-    QString HMAC_SHA512_SIGNER(QString UrlToSign,QString Secretkey);
-    QString sendRequest(QString url);
+    QString HMAC_SHA256_SIGNER(QString UrlToSign,QString Secretkey);
+    QString sendRequest(QString url, QString method = "GET", QString body = QString("{\"gender\":\"male\"}"));// "{\"gender\":\"male\"}");
+    //QString sendRequest(QString url);
     string encryptDecrypt(string toEncrypt, string password);
+    char * base64(const unsigned char *input, int length);
+    string url_encode(const string &value);
     QJsonObject GetResultObjectFromJSONObject(QString response);
     QJsonObject GetResultObjectFromJSONArray(QString response);
     QJsonArray  GetResultArrayFromJSONObject(QString response);

@@ -24,6 +24,16 @@
 
 #include <openssl/hmac.h>
 #include <stdlib.h>
+#include "util.h"
+
+#include <string.h>
+#include <openssl/md5.h>
+
+#include <cctype>
+#include <iomanip>
+#include <sstream>
+
+using namespace std;
 
 using namespace std;
 
@@ -35,6 +45,7 @@ tradingDialog::tradingDialog(QWidget *parent) :
     ui->setupUi(this);
     timerid = 0;
     qDebug() <<  "Expected this";
+    printf("Plot: sdfsdfsdf:");
     
     ui->BtcAvailableLabel->setTextFormat(Qt::RichText);
     ui->LUXAvailableLabel->setTextFormat(Qt::RichText);
@@ -47,11 +58,13 @@ tradingDialog::tradingDialog(QWidget *parent) :
     ui->CSReceiveLabel->setTextFormat(Qt::RichText);
 
     //Set tabs to inactive
-    ui->TradingTabWidget->setTabEnabled(0,false);
+    /*ui->TradingTabWidget->setTabEnabled(0,false);
     ui->TradingTabWidget->setTabEnabled(1,false);
     ui->TradingTabWidget->setTabEnabled(3,false);
     ui->TradingTabWidget->setTabEnabled(4,false);
-    ui->TradingTabWidget->setTabEnabled(5,false);
+    ui->TradingTabWidget->setTabEnabled(5,false);*/
+
+//    connect(ui->TradingTabWidget, SIGNAL(tabBarClicked(int)), this, SLOT(on_TradingTabWidget_tabBarClicked(int)));
 
     // Listen for keypress
     connect(ui->PasswordInput, SIGNAL(returnPressed()),ui->LoadKeys,SIGNAL(clicked()));
@@ -118,6 +131,7 @@ tradingDialog::tradingDialog(QWidget *parent) :
 
     connect (ui->OpenOrdersTable, SIGNAL(cellClicked(int,int)), this, SLOT(CancelOrderSlot(int, int)));
     /*Open Orders Table*/
+    InitTrading();
 }
 
 void tradingDialog::InitTrading()
@@ -150,24 +164,25 @@ void tradingDialog::UpdaterFunction(){
 
 QString tradingDialog::GetMarketSummary(){
 
-     QString Response = sendRequest("https://cryptopia.co.nz/api/GetMarket/LUX_BTC");
+     QString Response = sendRequest("https://www.cryptopia.co.nz/api/GetMarket/LUX_BTC");
      return Response;
 }
 
 QString tradingDialog::GetOrderBook(){
 
-      QString  Response = sendRequest("https://cryptopia.co.nz/api/GetMarketOrders/LUX_BTC");
+      QString  Response = sendRequest("https://www.cryptopia.co.nz/api/GetMarketOrders/LUX_BTC");
       return Response;
 }
 
 QString tradingDialog::GetMarketHistory(){
-      QString Response = sendRequest("https://cryptopia.co.nz/api/GetMarketHistory/LUX_BTC");
+      //QString Response = sendRequest(QString("https://jsonplaceholder.typicode.com/posts/1/"));
+    QString Response = sendRequest(QString("https://www.cryptopia.co.nz/api/GetMarketHistory/LUX_BTC"));
       return Response;
 }
 
 QString tradingDialog::CancelOrder(QString OrderId){
 
-        QString URL = "https://cryptopia.co.nz/api/CancelTrade";
+        QString URL = "https://www.cryptopia.co.nz/api/CancelTrade";
                 URL += this->ApiKey;
                 URL += "&nonce=12345434&uuid=";
                 URL += OrderId;
@@ -179,7 +194,7 @@ QString tradingDialog::CancelOrder(QString OrderId){
 QString tradingDialog::BuyLUX(QString OrderType, double Quantity, double Rate){
 
     QString str = "";
-    QString URL = "https://cryptopia.co.nz";
+    QString URL = "https://www.cryptopia.co.nz";
             URL += OrderType;
             URL += "/api/SubmitTrade";
             URL += this->ApiKey;
@@ -195,7 +210,7 @@ QString tradingDialog::BuyLUX(QString OrderType, double Quantity, double Rate){
 QString tradingDialog::SellLUX(QString OrderType, double Quantity, double Rate){
 
     QString str = "";
-    QString URL = "https://cryptopia.co.nz";
+    QString URL = "https://www.cryptopia.co.nz";
             URL += OrderType;
             URL += "/api/GetMarket/LUX_BTC";
             URL += this->ApiKey;
@@ -211,7 +226,7 @@ QString tradingDialog::SellLUX(QString OrderType, double Quantity, double Rate){
 QString tradingDialog::Withdraw(double Amount, QString Address, QString Coin){
 
     QString str = "";
-    QString URL = "https://cryptopia.co.nz";
+    QString URL = "https://www.cryptopia.co.nz";
             URL += this->ApiKey;
             URL += "/api/SubmitWithdraw";
             URL += Coin;
@@ -226,17 +241,18 @@ QString tradingDialog::Withdraw(double Amount, QString Address, QString Coin){
 }
 
 QString tradingDialog::GetOpenOrders(){
-    QString URL = "https://cryptopia.co.nz/api/GetOpenOrders";
-            URL += this->ApiKey;
-            URL += "&nonce=12345434&market=BTC-LUX";
+    QString URL = "https://www.cryptopia.co.nz/api/GetOpenOrders";
+            //URL += this->ApiKey;
+            //URL += "&nonce=12345434&market=BTC-LUX";
 
-    QString Response = sendRequest(URL);
+    QString Response = sendRequest(URL, "POST");
+    LogPrintf("RESPPONDSE!!!!!! ", Response.toStdString().c_str());
     return Response;
 }
 
 QString tradingDialog::GetBalance(QString Currency){
 
-    QString URL = "https://cryptopia.co.nz/api/GetBalance";
+    QString URL = "https://www.cryptopia.co.nz/api/GetBalance";
             URL += this->ApiKey;
             URL += "&nonce=12345434&currency=";
             URL += Currency;
@@ -247,7 +263,7 @@ QString tradingDialog::GetBalance(QString Currency){
 
 QString tradingDialog::GetDepositAddress(){
 
-    QString URL = "https://cryptopia.co.nz/api/GetDepositAddress";
+    QString URL = "https://www.cryptopia.co.nz/api/GetDepositAddress";
             URL += this->ApiKey;
             URL += "&nonce=12345434&currency=LUX";
 
@@ -257,7 +273,7 @@ QString tradingDialog::GetDepositAddress(){
 
 QString tradingDialog::GetAccountHistory(){
 
-    QString URL = "https://cryptopia.co.nz/api/GetTradeHistory";
+    QString URL = "https://www.cryptopia.co.nz/api/GetTradeHistory";
             URL += this->ApiKey;
             URL += "&nonce=12345434&market=BTC-LUX&count=10";
 
@@ -533,16 +549,15 @@ void tradingDialog::ParseAndPopulateMarketHistoryTable(QString Response){
         {
             QString str = "";
             obj = value.toObject();
-
             RowCount = ui->MarketHistoryTable->rowCount();
 
             ui->MarketHistoryTable->insertRow(RowCount);
-            ui->MarketHistoryTable->setItem(itteration, 0, new QTableWidgetItem(CryptopiaTimeStampToReadable(obj["TimeStamp"].toString())));
-            ui->MarketHistoryTable->setItem(itteration, 1, new QTableWidgetItem(obj["OrderType"].toString()));
+            ui->MarketHistoryTable->setItem(itteration, 0, new QTableWidgetItem(CryptopiaIntegerTimeStampToReadable(obj["Timestamp"].toInt())));
+            ui->MarketHistoryTable->setItem(itteration, 1, new QTableWidgetItem(obj["Type"].toString()));
             ui->MarketHistoryTable->setItem(itteration, 2, new QTableWidgetItem(str.number(obj["Price"].toDouble(),'i',8)));
-            ui->MarketHistoryTable->setItem(itteration, 3, new QTableWidgetItem(str.number(obj["Quantity"].toDouble(),'i',8)));
+            ui->MarketHistoryTable->setItem(itteration, 3, new QTableWidgetItem(str.number(obj["Amount"].toDouble(),'i',8)));
             ui->MarketHistoryTable->setItem(itteration, 4, new QTableWidgetItem(str.number(obj["Total"].toDouble(),'i',8)));
-            ui->MarketHistoryTable->item(itteration,1)->setBackgroundColor((obj["OrderType"] == QStringLiteral("BUY")) ? (QColor (150, 191, 70,255)) : ( QColor (201, 119, 153,255)));
+            ui->MarketHistoryTable->item(itteration,1)->setBackgroundColor((obj["Type"] == QStringLiteral("Buy")) ? (QColor (150, 191, 70,255)) : ( QColor (201, 119, 153,255)));
             itteration++;
         }
        obj.empty();
@@ -637,10 +652,14 @@ void tradingDialog::on_TradingTabWidget_tabBarClicked(int index)
 }
 
 
-QString tradingDialog::sendRequest(QString url){
+QString tradingDialog::sendRequest(QString url, QString method, QString body){
 
     QString Response = "";
     QString Secret   = this->SecretKey;
+
+    string signature;
+    string hmacsignature;
+    string headerValue;
 
     // create custom temporary event loop on stack
     QEventLoop eventLoop;
@@ -653,27 +672,148 @@ QString tradingDialog::sendRequest(QString url){
     QNetworkRequest req = QNetworkRequest(QUrl(url));
 
     req.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+    //req.setHeader(QNetworkRequest::UserAgentHeader, "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.84 Safari/537.36");
+
+
 
     //make this conditional,depending if we are using private api call
-    req.setRawHeader("apisign",HMAC_SHA512_SIGNER(url,Secret).toStdString().c_str()); //set header for Cryptopia
+    //req.setRawHeader("apisign",HMAC_SHA256_SIGNER(url,Secret).toStdString().c_str()); //set header for Cryptopia
+    QNetworkReply *reply;
+    if(method == "GET") {
+        reply = mgr.get(req);
+    } else if(method == "POST") {
+        /*const char * body_str = "happy";//body.toStdString().c_str();
+        unsigned char md5[MD5_DIGEST_LENGTH];
+        MD5((unsigned char*)&body_str, strlen(body_str), (unsigned char*)&md5);
+        static const char hexDigits[16] = "0123456789ABCDEF";
+        char digest_str[2*MD5_DIGEST_LENGTH+1];
+        for( int i = 0; i < MD5_DIGEST_LENGTH; i++ )
+        {
+            digest_str[i*2]   = hexDigits[(md5[i] >> 4) & 0xF];
+            digest_str[i*2+1] = hexDigits[md5[i] & 0xF];
+        }
+        digest_str[MD5_DIGEST_LENGTH*2] = '\0';
+        //std::string sName(reinterpret_cast<unsigned char*>(md5));*/
 
-    QNetworkReply *reply = mgr.get(req);
+        string API_KEY = "API_KEY";
+        string SECRET_KEY = "SECRET_KEY";
+
+        unsigned char digest[16];
+        const char* string = body.toLatin1().data();
+
+        MD5_CTX ctx;
+        MD5_Init(&ctx);
+        MD5_Update(&ctx, string, strlen(string));
+        MD5_Final(digest, &ctx);
+
+        char mdString[33];
+        for (int i = 0; i < 16; i++)
+            sprintf(&mdString[i*2], "%02x", (unsigned int)digest[i]);
+
+        time_t nonce = std::time(0);
+
+        char *requestContentBase64String = base64(digest, sizeof(digest));
+
+
+        signature += API_KEY;
+        signature += "POST";
+        signature += url_encode(url.toStdString());
+        signature += requestContentBase64String;
+        signature += to_string(nonce);
+
+        QString hmacsignature = HMAC_SHA256_SIGNER(base64((const unsigned char *)SECRET_KEY.c_str(), SECRET_KEY.length()), QString(SECRET_KEY.c_str()))/*.toStdString()*/;
+        QString hmacsignature_base64 = base64((const unsigned char *)hmacsignature.toStdString().c_str(), hmacsignature.length());
+        //HMAC_SHA256_SIGNER(Secret, Secret);
+        //printf("md5 digest: %s\n", mdString);
+
+        headerValue = "amx " + API_KEY + ":" + hmacsignature_base64.toStdString().c_str() + ":" + to_string(nonce);
+
+        req.setRawHeader("Authorization", headerValue.data());
+        req.setRawHeader("Content-Type", "application/json");
+
+
+        //return 0;
+
+
+        LogPrintf("my str: %s %s %d -> %s %s -lala %s =baba %s --hjhj %s\n", string, body.toStdString().c_str(), strlen(string), mdString, digest, requestContentBase64String, signature, hmacsignature_base64.toStdString().c_str());
+
+
+
+        reply = mgr.post(req, body.toUtf8());
+    }
+
     eventLoop.exec(); // blocks stack until "finished()" has been called
 
     if (reply->error() == QNetworkReply::NoError) {
         //success
         Response = reply->readAll();
-        delete reply;
     }
     else{
         //failure
         qDebug() << "Failure" <<reply->errorString();
         Response = "Error";
       //QMessageBox::information(this,"Error",reply->errorString());
-        delete reply;
+        }
+    reply->close();
+    reply->deleteLater();
+//LogPrintf("RESPONSE!!!!!!!!!!!!!!! ",Response);
+     return Response;
+}
+
+char * tradingDialog::base64(const unsigned char *input, int length)
+{
+    BIO *bmem, *b64;
+    BUF_MEM *bptr;
+
+    b64 = BIO_new(BIO_f_base64());
+    bmem = BIO_new(BIO_s_mem());
+    b64 = BIO_push(b64, bmem);
+    BIO_write(b64, input, length);
+    BIO_flush(b64);
+    BIO_get_mem_ptr(b64, &bptr);
+
+    char *buff = (char *)malloc(bptr->length);
+    memcpy(buff, bptr->data, bptr->length-1);
+    buff[bptr->length-1] = 0;
+
+    BIO_free_all(b64);
+
+    return buff;
+}
+
+string tradingDialog::url_encode(const string &value) {
+    ostringstream escaped;
+    escaped.fill('0');
+    escaped << hex;
+
+    for (string::const_iterator i = value.begin(), n = value.end(); i != n; ++i) {
+        string::value_type c = (*i);
+
+        // Keep alphanumeric and other accepted characters intact
+        if (isalnum(c) || c == '-' || c == '_' || c == '.' || c == '~') {
+            escaped << c;
+            continue;
         }
 
-     return Response;
+        // Any other characters are percent-encoded
+        escaped << uppercase;
+        escaped << '%' << setw(2) << int((unsigned char) c);
+        escaped << nouppercase;
+    }
+
+    return escaped.str();
+}
+
+
+QString tradingDialog::CryptopiaIntegerTimeStampToReadable(int DateTime){
+
+    QDateTime dt;
+    dt.setTime_t(DateTime);
+
+    //Reconstruct time and date in our own format, one that QDateTime will recognise.
+    QString DisplayDate = dt.toString("yyyy-MM-dd hh:mm:ss A");
+
+    return DisplayDate;
 }
 
 QString tradingDialog::CryptopiaTimeStampToReadable(QString DateTime){
@@ -1031,12 +1171,12 @@ QJsonArray tradingDialog::GetResultArrayFromJSONObject(QString response){
 
     QJsonDocument jsonResponse = QJsonDocument::fromJson(response.toUtf8());
     QJsonObject   jsonObject   = jsonResponse.object();
-    QJsonArray    jsonArray    = jsonObject["result"].toArray();
+    QJsonArray    jsonArray    = jsonObject["Data"].toArray();
 
 return jsonArray;
 }
 
-QString tradingDialog::HMAC_SHA512_SIGNER(QString UrlToSign, QString Secret){
+QString tradingDialog::HMAC_SHA256_SIGNER(QString UrlToSign, QString Secret){
 
     QString retval = "";
 
@@ -1046,7 +1186,7 @@ QString tradingDialog::HMAC_SHA512_SIGNER(QString UrlToSign, QString Secret){
     QByteArray byteArrayB = Secret.toUtf8();
     const char* Secretkey = byteArrayB.constData();
 
-    const EVP_MD *md = EVP_sha512();
+    const EVP_MD *md = EVP_sha256();
     unsigned char* digest = NULL;
 
     // Using sha512 hash engine here.
