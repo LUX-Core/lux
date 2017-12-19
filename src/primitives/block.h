@@ -113,7 +113,8 @@ public:
     inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion) {
         READWRITE(*(CBlockHeader*)this);
         READWRITE(vtx);
-	if(vtx.size() > 1 && vtx[1].IsCoinStake())
+        std::cout << "VTX: " << vtx.size() << std::endl;
+//	if(vtx.size() > 1 && vtx[1].IsCoinStake())
 		READWRITE(vchBlockSig);
     }
 
