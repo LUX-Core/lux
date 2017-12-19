@@ -1,6 +1,0 @@
-obj/crypto/hmac_sha512.o: crypto/hmac_sha512.cpp \
- /home/luxcore/luxtrial/src/crypto/hmac_sha512.h \
- /home/luxcore/luxtrial/src/crypto/sha512.h
-crypto/hmac_sha512.cpp :
- /home/luxcore/luxtrial/src/crypto/hmac_sha512.h :
- /home/luxcore/luxtrial/src/crypto/sha512.h :

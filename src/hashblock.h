@@ -3,12 +3,12 @@
 
 #include "uint256.h"
 // Initilised PHI
-#include "obj/phi1612/sph_skein.h"
-#include "obj/phi1612/sph_jh.h"
-#include "obj/phi1612/sph_cubehash.h"
-#include "obj/phi1612/sph_fugue.h"
-#include "obj/phi1612/sph_gost.h"
-#include "obj/phi1612/sph_echo.h"
+#include "crypto/sph_skein.h"
+#include "crypto/sph_jh.h"
+#include "crypto/sph_cubehash.h"
+#include "crypto/sph_fugue.h"
+#include "crypto/sph_gost.h"
+#include "crypto/sph_echo.h"
 
 
 #ifndef QT_NO_DEBUG
@@ -35,7 +35,7 @@ GLOBAL sph_echo512_context      z_echo;
     sph_fugue512_init(&z_fugue); \
     sph_gost512_init(&z_gost); \
     sph_echo512_init(&z_echo); \
-} while (0) 
+} while (0)
 
 #define ZSKEIN (memcpy(&ctx_skein, &z_skein, sizeof(z_skein)))
 #define ZJH (memcpy(&ctx_jh, &z_jh, sizeof(z_jh)))
@@ -59,21 +59,21 @@ inline uint256 Phi1612(const T1 pbegin, const T1 pend)
     //std::string strhash;
     //strhash = "";
 #endif
-    
+
     uint512 hash[17];
 
     sph_skein512_init(&ctx_skein);
     sph_skein512 (&ctx_skein, (pbegin == pend ? pblank : static_cast<const void*>(&pbegin[0])), (pend - pbegin) * sizeof(pbegin[0]));
     sph_skein512_close(&ctx_skein, static_cast<void*>(&hash[0]));
-    
+
     sph_jh512_init(&ctx_jh);
     sph_jh512 (&ctx_jh, static_cast<const void*>(&hash[0]), 64);
     sph_jh512_close(&ctx_jh, static_cast<void*>(&hash[1]));
-    
+
     sph_cubehash512_init(&ctx_cubehash);
     sph_cubehash512 (&ctx_cubehash, static_cast<const void*>(&hash[1]), 64);
     sph_cubehash512_close(&ctx_cubehash, static_cast<void*>(&hash[2]));
-        
+
     sph_fugue512_init(&ctx_fugue);
     sph_fugue512 (&ctx_fugue, static_cast<const void*>(&hash[2]), 64);
     sph_fugue512_close(&ctx_fugue, static_cast<void*>(&hash[3]));

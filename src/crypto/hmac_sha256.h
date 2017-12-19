@@ -1,4 +1,4 @@
-// Copyright (c) 2014 The Bitcoin Core developers
+// Copyright (c) 2014 The Bitcoin developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -10,7 +10,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-/** A hasher class for HMAC-SHA-512. */
+/** A hasher class for HMAC-SHA-256. */
 class CHMAC_SHA256
 {
 private:

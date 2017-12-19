@@ -1,14 +1,28 @@
-Copyright (c) 2009-2012 Bitcoin Developers
-Distributed under the MIT/X11 software license, see the accompanying
-file license.txt or http://www.opensource.org/licenses/mit-license.php.
-This product includes software developed by the OpenSSL Project for use in
-the OpenSSL Toolkit (http://www.openssl.org/).  This product includes
-cryptographic software written by Eric Young (eay@cryptsoft.com) and UPnP
-software written by Thomas Bernard.
-
-
 UNIX BUILD NOTES
-================
+====================
+Some notes on how to build LUX in Unix.
+
+Note
+---------------------
+Always use absolute paths to configure and compile lux and the dependencies,
+for example, when specifying the the path of the dependency:
+
+	../dist/configure --enable-cxx --disable-shared --with-pic --prefix=$BDB_PREFIX
+
+Here BDB_PREFIX must absolute path - it is defined using $(pwd) which ensures
+the usage of the absolute path.
+
+To Build
+---------------------
+
+```bash
+./autogen.sh
+./configure
+make
+make install # optional
+```
+
+This will build lux-qt as well if the dependencies are met.
 
 Dependencies
 ---------------------
@@ -17,18 +31,15 @@ These dependencies are required:
 
  Library     | Purpose          | Description
  ------------|------------------|----------------------
- libssl      | Crypto           | Random Number Generation
- libgmp      | Secp256k1        | Secp256k1 Dependency
- libboost    | Utility          | Library for threading, data structures, etc
- libevent    | Networking       | OS independent asynchronous networking
- libdb4.8    | Berkeley DB      | Wallet storage (only needed when wallet enabled)
- libsecp256k1| Secp256k1        | Elliptic Curve Cryptography
+ libssl      | SSL Support      | Secure communications
+ libboost    | Boost            | C++ Library
 
 Optional dependencies:
 
  Library     | Purpose          | Description
  ------------|------------------|----------------------
  miniupnpc   | UPnP Support     | Firewall-jumping support
+ libdb4.8    | Berkeley DB      | Wallet storage (only needed when wallet enabled)
  qt          | GUI              | GUI toolkit (only needed when GUI enabled)
  protobuf    | Payments in GUI  | Data interchange format used for payment protocol (only needed when GUI enabled)
  libqrencode | QR codes in GUI  | Optional for generating QR codes (only needed when GUI enabled)
@@ -39,49 +50,45 @@ System requirements
 --------------------
 
 C++ compilers are memory-hungry. It is recommended to have at least 1 GB of
-memory available when compiling Lux Core. With 512MB of memory or less
+memory available when compiling LUX Core. With 512MB of memory or less
 compilation will take much longer due to swap thrashing.
 
 Dependency Build Instructions: Ubuntu & Debian
 ----------------------------------------------
 Build requirements:
 
-    sudo apt-get install build-essential libtool automake autotools-dev autoconf pkg-config libssl-dev libgmp3-dev libevent-dev bsdmainutils
+	sudo apt-get install build-essential libtool autotools-dev autoconf pkg-config libssl-dev
 
-On at least Ubuntu 14.04+ and Debian 7+ there are generic names for the
-individual boost development packages, so the following can be used to only
-install necessary parts of boost:
+For Ubuntu 12.04 and later or Debian 7 and later libboost-all-dev has to be installed:
 
-    sudo apt-get install libboost-system-dev libboost-filesystem-dev libboost-chrono-dev libboost-program-options-dev libboost-test-dev libboost-thread-dev
+	sudo apt-get install libboost-all-dev
 
-If that doesn't work, you can install all boost development packages with:
+ db4.8 packages are available [here](https://launchpad.net/~bitcoin/+archive/bitcoin).
+ You can add the repository using the following command:
 
-    sudo apt-get install libboost-all-dev
+        sudo add-apt-repository ppa:bitcoin/bitcoin
+        sudo apt-get update
 
-BerkeleyDB is required for the wallet. db4.8 packages are available [here](https://launchpad.net/~bitcoin/+archive/bitcoin).
-You can add the repository and install using the following commands:
+ Ubuntu 12.04 and later have packages for libdb5.1-dev and libdb5.1++-dev,
+ but using these will break binary wallet compatibility, and is not recommended.
 
-    sudo add-apt-repository ppa:bitcoin/bitcoin
-    sudo apt-get update
-    sudo apt-get install libdb4.8-dev libdb4.8++-dev
+For other Debian & Ubuntu (with ppa):
 
-Ubuntu and Debian have their own libdb-dev and libdb++-dev packages, but these will install
-BerkeleyDB 5.1 or later, which break binary wallet compatibility with the distributed executables which
-are based on BerkeleyDB 4.8. If you do not care about wallet compatibility,
-pass `--with-incompatible-bdb` to configure.
+	sudo apt-get install libdb4.8-dev libdb4.8++-dev
 
 Optional:
 
-    sudo apt-get install libminiupnpc-dev (see --with-miniupnpc and --enable-upnp-default)
+	sudo apt-get install libminiupnpc-dev (see --with-miniupnpc and --enable-upnp-default)
 
 Dependencies for the GUI: Ubuntu & Debian
 -----------------------------------------
 
-If you want to build Lux-Qt, make sure that the required packages for Qt development
+If you want to build LUX-Qt, make sure that the required packages for Qt development
 are installed. Qt 5 is necessary to build the GUI.
 If both Qt 4 and Qt 5 are installed, Qt 5 will be used.
+To build without GUI pass `--without-gui`.
 
-To build with Qt 5 (recommended) you need the following:
+For Qt 5 you need the following:
 
     sudo apt-get install libqt5gui5 libqt5core5a libqt5dbus5 qttools5-dev qttools5-dev-tools libprotobuf-dev protobuf-compiler
 
@@ -92,15 +99,41 @@ libqrencode (optional) can be installed with:
 Once these are installed, they will be found by configure and a lux-qt executable will be
 built by default.
 
+Notes
+-----
+The release is built with GCC and then "strip luxd" to strip the debug
+symbols, which reduces the executable size by about 90%.
+
+
+miniupnpc
+---------
+
+[miniupnpc](http://miniupnp.free.fr/) may be used for UPnP port mapping.  It can be downloaded from [here](
+http://miniupnp.tuxfamily.org/files/).  UPnP support is compiled in and
+turned off by default.  See the configure options for upnp behavior desired:
+
+	--without-miniupnpc      No UPnP support miniupnp not required
+	--disable-upnp-default   (the default) UPnP support turned off by default at runtime
+	--enable-upnp-default    UPnP support turned on by default at runtime
+
+To build:
+
+	tar -xzvf miniupnpc-1.6.tar.gz
+	cd miniupnpc-1.6
+	make
+	sudo su
+	make install
+
+
 Berkeley DB
 -----------
 It is recommended to use Berkeley DB 4.8. If you have to build it yourself:
 
 ```bash
-TRANSFER_ROOT=$(pwd)
+LUX_ROOT=$(pwd)
 
 # Pick some path to install BDB to, here we create a directory within the lux directory
-BDB_PREFIX="${TRANSFER_ROOT}/db4"
+BDB_PREFIX="${LUX_ROOT}/db4"
 mkdir -p $BDB_PREFIX
 
 # Fetch the source and verify that it is not tampered with
@@ -111,49 +144,16 @@ tar -xzvf db-4.8.30.NC.tar.gz
 
 # Build the library and install to our prefix
 cd db-4.8.30.NC/build_unix/
-#  Note: Do a static build so that it can be embedded into the executable, instead of having to find a .so at runtime
+#  Note: Do a static build so that it can be embedded into the exectuable, instead of having to find a .so at runtime
 ../dist/configure --enable-cxx --disable-shared --with-pic --prefix=$BDB_PREFIX
 make install
 
-# Configure Lux Core to use our own-built instance of BDB
-cd $TRANSFER_ROOT
-./autogen.sh
-./configure LDFLAGS="-L${BDB_PREFIX}/lib/" CPPFLAGS="-I${BDB_PREFIX}/include/" # (other args...)
+# Configure LUX Core to use our own-built instance of BDB
+cd $LUX_ROOT
+./configure (other args...) LDFLAGS="-L${BDB_PREFIX}/lib/" CPPFLAGS="-I${BDB_PREFIX}/include/"
 ```
 
-Notes
------
-1) You only need Berkeley DB if the wallet is enabled (see the section *Disable-Wallet mode* below).
-
-2) The release is built with GCC and then "strip luxd" to strip the debug
-symbols, which reduces the executable size by about 90%.
-
-To Build luxd
---------
-
-With UPNP:
-
-    cd src && \
-    make -f makefile.unix && \
-    strip luxd
-
-(Recommended) Without UPNP:
-
-    cd src && \
-    make -f makefile.unix USE_UPNP= && \
-    strip luxd
-
-To Build Lux-QT
---------
-
-With UPNP:
-    qmake -qt=qt5 && \
-    make \
-
-(Recommended) Without UPNP:
-
-    qmake -qt=qt5 USE_UPNP=- && \
-    make \
+**Note**: You only need Berkeley DB if the wallet is enabled (see the section *Disable-Wallet mode* below).
 
 Boost
 -----
@@ -163,20 +163,20 @@ If you need to build Boost yourself:
 	./bootstrap.sh
 	./bjam install
 
-Upnp
----------
-If you need to build miniupnpc yourself:
-
-    tar -xzvf miniupnpc-1.6.tar.gz
-    cd miniupnpc-1.6
-    make
-    sudo su
-    make install
 
 Security
 --------
-To help make your lux installation more secure by making certain attacks impossible to
-exploit even if a vulnerability is found, you can take the following measures:
+To help make your LUX installation more secure by making certain attacks impossible to
+exploit even if a vulnerability is found, binaries are hardened by default.
+This can be disabled with:
+
+Hardening Flags:
+
+	./configure --enable-hardening
+	./configure --disable-hardening
+
+
+Hardening enables the following features:
 
 * Position Independent Executable
     Build position independent code to take advantage of Address Space Layout Randomization
@@ -188,11 +188,9 @@ exploit even if a vulnerability is found, you can take the following measures:
     On an Amd64 processor where a library was not compiled with -fPIC, this will cause an error
     such as: "relocation R_X86_64_32 against `......' can not be used when making a shared object;"
 
-    To build with PIE, use:
-    make -f makefile.unix ... -e PIE=1
-
     To test that you have built PIE executable, install scanelf, part of paxutils, and use:
-    scanelf -e ./lux
+
+    	scanelf -e ./luxd
 
     The output should contain:
      TYPE
@@ -206,10 +204,10 @@ exploit even if a vulnerability is found, you can take the following measures:
     executable without the non-executable stack protection.
 
     To verify that the stack is non-executable after compiling use:
-    scanelf -e ./lux
+    `scanelf -e ./luxd`
 
     the output should contain:
-    STK/REL/PTL
-    RW- R-- RW-
+	STK/REL/PTL
+	RW- R-- RW-
 
     The STK RW- means that the stack is readable and writeable but not executable.
