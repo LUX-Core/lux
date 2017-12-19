@@ -4397,15 +4397,15 @@ bool CheckBlockHeader(const CBlockHeader& block, CValidationState& state, bool f
             REJECT_INVALID, "high-hash");
 
     // Version 4 header must be used after Params().Zerocoin_StartHeight(). And never before.
-    if (block.GetBlockTime() > Params().Zerocoin_StartTime()) {
-        if(block.nVersion < Params().Zerocoin_HeaderVersion())
-            return state.DoS(50, error("CheckBlockHeader() : block version must be above 4 after ZerocoinStartHeight"),
-            REJECT_INVALID, "block-version");
-    } else {
-        if (block.nVersion >= Params().Zerocoin_HeaderVersion())
-            return state.DoS(50, error("CheckBlockHeader() : block version must be below 4 before ZerocoinStartHeight"),
-            REJECT_INVALID, "block-version");
-    }
+//    if (block.GetBlockTime() > Params().Zerocoin_StartTime()) {
+//        if(block.nVersion < Params().Zerocoin_HeaderVersion())
+//            return state.DoS(50, error("CheckBlockHeader() : block version must be above 4 after ZerocoinStartHeight"),
+//            REJECT_INVALID, "block-version");
+//    } else {
+//        if (block.nVersion >= Params().Zerocoin_HeaderVersion())
+//            return state.DoS(50, error("CheckBlockHeader() : block version must be below 4 before ZerocoinStartHeight"),
+//            REJECT_INVALID, "block-version");
+//    }
 
     return true;
 }
@@ -4430,6 +4430,9 @@ bool CheckBlock(const CBlock& block, CValidationState& state, bool fCheckPOW, bo
     if (fCheckMerkleRoot) {
         bool mutated;
         uint256 hashMerkleRoot2 = block.BuildMerkleTree(&mutated);
+        std::cout << "hashMerkleRoot: " << block.ToString() << std::endl;
+        std::cout << "hashMerkleRoot: " << block.hashMerkleRoot.GetHex() << std::endl;
+        std::cout << "hashMerkleRoot: " << hashMerkleRoot2.GetHex() << std::endl;
         if (block.hashMerkleRoot != hashMerkleRoot2)
             return state.DoS(100, error("CheckBlock() : hashMerkleRoot mismatch"),
                 REJECT_INVALID, "bad-txnmrklroot", true);
