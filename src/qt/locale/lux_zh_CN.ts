@@ -176,16 +176,16 @@
         <translation>确认钱包加密</translation>
     </message>
     <message>
-        <source>LUX will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your PIVs from being stolen by malware infecting your computer.</source>
-        <translation>LUX将关闭以完成加密过程。但是，仅仅加密您的钱包是不够的，因为它并不能阻止恶意软件从您的电脑里面偷取PIVs。</translation>
+        <source>LUX will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your LUXs from being stolen by malware infecting your computer.</source>
+        <translation>LUX将关闭以完成加密过程。但是，仅仅加密您的钱包是不够的，因为它并不能阻止恶意软件从您的电脑里面偷取LUXs。</translation>
     </message>
     <message>
         <source>Are you sure you wish to encrypt your wallet?</source>
         <translation>您确定加密您的钱包吗？</translation>
     </message>
     <message>
-        <source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR PIV&lt;/b&gt;!</source>
-        <translation>注意：请妥善保管好你的密码，因为在加密后，没有密码将无法打开钱包。这将会让您&lt;b&gt;损失钱包中所有的PIV&lt;/b&gt;！</translation>
+        <source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR LUX&lt;/b&gt;!</source>
+        <translation>注意：请妥善保管好你的密码，因为在加密后，没有密码将无法打开钱包。这将会让您&lt;b&gt;损失钱包中所有的LUX&lt;/b&gt;！</translation>
     </message>
     <message>
         <source>Wallet encrypted</source>

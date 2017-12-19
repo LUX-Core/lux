@@ -31,7 +31,7 @@
      <item>
       <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,0,0">
        <item>
-        <widget class="QLabel" name="zPIVLabel">
+        <widget class="QLabel" name="zLUXLabel">
          <property name="minimumSize">
           <size>
            <width>460</width>
@@ -52,13 +52,13 @@
           </font>
          </property>
          <property name="toolTip">
-          <string>PIV which were anonymized via Zerocin Protocol</string>
+          <string>LUX which were anonymized via Zerocin Protocol</string>
          </property>
          <property name="autoFillBackground">
           <bool>true</bool>
          </property>
          <property name="text">
-          <string>Zerocoin PIV (zPIV)</string>
+          <string>Zerocoin LUX (zLUX)</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>
@@ -74,7 +74,7 @@
              <item>
               <layout class="QHBoxLayout" name="horizontalLayout_3">
                <item>
-                <widget class="QLabel" name="labelzPIVActions">
+                <widget class="QLabel" name="labelzLUXActions">
                  <property name="font">
                   <font>
                    <pointsize>12</pointsize>
@@ -91,7 +91,7 @@
                 </widget>
                </item>
                <item>
-                <widget class="QLabel" name="labelzPIVSyncStatus">
+                <widget class="QLabel" name="labelzLUXSyncStatus">
                  <property name="toolTip">
                   <string>The displayed information may be out of date. Your wallet automatically synchronizes with the LUX network after a connection is established, but this process has not completed yet.</string>
                  </property>
@@ -137,7 +137,7 @@
              <item>
               <layout class="QHBoxLayout" name="horizontalLayout_4">
                <item>
-                <widget class="QPushButton" name="pushButtonMintzPIV">
+                <widget class="QPushButton" name="pushButtonMintzLUX">
                  <property name="minimumSize">
                   <size>
                    <width>131</width>
@@ -169,14 +169,14 @@
                 </widget>
                </item>
                <item>
-                <widget class="QLabel" name="labelzPIV_2">
+                <widget class="QLabel" name="labelzLUX_2">
                  <property name="text">
-                  <string>zPIV</string>
+                  <string>zLUX</string>
                  </property>
                 </widget>
                </item>
                <item>
-                <widget class="QLabel" name="labelzPIVAmountText">
+                <widget class="QLabel" name="labelzLUXAmountText">
                  <property name="toolTip">
                   <string>Available for minting are coins which are confirmed and not locked or Masternode collaterals.</string>
                  </property>
@@ -189,12 +189,12 @@
                 </widget>
                </item>
                <item>
-                <widget class="QLabel" name="labelzPIVAmountValue">
+                <widget class="QLabel" name="labelzLUXAmountValue">
                  <property name="toolTip">
                   <string>Enter an amount of Piv to convert to zLux</string>
                  </property>
                  <property name="text">
-                  <string>0.000 000 00 PIV</string>
+                  <string>0.000 000 00 LUX</string>
                  </property>
                  <property name="alignment">
                   <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -370,7 +370,7 @@
                     <enum>Qt::ActionsContextMenu</enum>
                    </property>
                    <property name="text">
-                    <string notr="true">0.00 PIV</string>
+                    <string notr="true">0.00 LUX</string>
                    </property>
                    <property name="textInteractionFlags">
                     <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
@@ -542,7 +542,7 @@
              <item>
               <layout class="QHBoxLayout" name="horizontalLayout_6">
                <item>
-                <widget class="QPushButton" name="pushButtonSpendzPIV">
+                <widget class="QPushButton" name="pushButtonSpendzLUX">
                  <property name="minimumSize">
                   <size>
                    <width>131</width>
@@ -558,9 +558,9 @@
                 </widget>
                </item>
                <item>
-                <widget class="QLabel" name="labelzPIVBalanceText">
+                <widget class="QLabel" name="labelzLUXBalanceText">
                  <property name="toolTip">
-                  <string>Available (mature and spendable) zPIV for spending</string>
+                  <string>Available (mature and spendable) zLUX for spending</string>
                  </property>
                  <property name="text">
                   <string>Available Balance:</string>
@@ -579,12 +579,12 @@
                   </font>
                  </property>
                  <property name="toolTip">
-                  <string>Available (mature and spendable) zPIV for spending
+                  <string>Available (mature and spendable) zLUX for spending
 
-zPIV are mature when they have more than 20 confirmations AND more than 2 mints of the same denomination after them were minted</string>
+zLUX are mature when they have more than 20 confirmations AND more than 2 mints of the same denomination after them were minted</string>
                  </property>
                  <property name="text">
-                  <string>0 zPIV</string>
+                  <string>0 zLUX</string>
                  </property>
                  <property name="alignment">
                   <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -784,15 +784,15 @@ zPIV are mature when they have more than 20 confirmations AND more than 2 mints 
                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                  </property>
                  <property name="buddy">
-                  <cstring>zPIVpayAmount</cstring>
+                  <cstring>zLUXpayAmount</cstring>
                  </property>
                 </widget>
                </item>
                <item>
-                <widget class="QLineEdit" name="zPIVpayAmount"/>
+                <widget class="QLineEdit" name="zLUXpayAmount"/>
                </item>
                <item>
-                <widget class="QLabel" name="labelzPIV">
+                <widget class="QLabel" name="labelzLUX">
                  <property name="minimumSize">
                   <size>
                    <width>55</width>
@@ -800,7 +800,7 @@ zPIV are mature when they have more than 20 confirmations AND more than 2 mints 
                   </size>
                  </property>
                  <property name="text">
-                  <string>zPIV</string>
+                  <string>zLUX</string>
                  </property>
                 </widget>
                </item>
@@ -886,7 +886,7 @@ zPIV are mature when they have more than 20 confirmations AND more than 2 mints 
              <item>
               <layout class="QHBoxLayout" name="horizontalLayout_21">
                <item>
-                <widget class="QLabel" name="labelzPIVStats">
+                <widget class="QLabel" name="labelzLUXStats">
                  <property name="font">
                   <font>
                    <pointsize>12</pointsize>
@@ -960,7 +960,7 @@ zPIV are mature when they have more than 20 confirmations AND more than 2 mints 
                   </font>
                  </property>
                  <property name="toolTip">
-                  <string>Total Balance including unconfirmed and immature zPIV</string>
+                  <string>Total Balance including unconfirmed and immature zLUX</string>
                  </property>
                  <property name="text">
                   <string>Total Zerocoin  Balance:</string>
@@ -998,10 +998,10 @@ zPIV are mature when they have more than 20 confirmations AND more than 2 mints 
                   </font>
                  </property>
                  <property name="toolTip">
-                  <string>Total Balance including unconfirmed and immature zPIV</string>
+                  <string>Total Balance including unconfirmed and immature zLUX</string>
                  </property>
                  <property name="text">
-                  <string>0 zPIV</string>
+                  <string>0 zLUX</string>
                  </property>
                  <property name="alignment">
                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -1576,7 +1576,7 @@ Immature: confirmed, but less than 2 mints of the same denomination after it was
          <enum>Qt::ActionsContextMenu</enum>
         </property>
         <property name="text">
-         <string notr="true">0.000 000 00 PIV</string>
+         <string notr="true">0.000 000 00 LUX</string>
         </property>
         <property name="textInteractionFlags">
          <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
@@ -1650,7 +1650,7 @@ Immature: confirmed, but less than 2 mints of the same denomination after it was
            <enum>Qt::ActionsContextMenu</enum>
           </property>
           <property name="text">
-           <string notr="true">0.00 PIV</string>
+           <string notr="true">0.00 LUX</string>
           </property>
           <property name="textInteractionFlags">
            <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
@@ -1847,7 +1847,7 @@ Immature: confirmed, but less than 2 mints of the same denomination after it was
          <enum>Qt::ActionsContextMenu</enum>
         </property>
         <property name="text">
-         <string notr="true">0.000 000 00 PIV</string>
+         <string notr="true">0.000 000 00 LUX</string>
         </property>
         <property name="textInteractionFlags">
          <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>

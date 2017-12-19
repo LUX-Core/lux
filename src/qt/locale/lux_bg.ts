@@ -168,7 +168,7 @@
         <translation>Потвърдете криптирането на портфейла</translation>
     </message>
     <message>
-        <source>LUX will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your PIVs from being stolen by malware infecting your computer.</source>
+        <source>LUX will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your LUXs from being stolen by malware infecting your computer.</source>
         <translation>LUX сега ще се затвори, за да довърши процеса на криптиране. Запомнете, че криптирането на вашия портфейл не може напълно да защити вашия LUX от това, да бъде откраднат от злонамерен софутуер, инфектирал вашия компютър.</translation>
     </message>
     <message>
@@ -176,8 +176,8 @@
         <translation>Сигурни ли сте, че искате да криптирате вашия портфейл?</translation>
     </message>
     <message>
-        <source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR PIV&lt;/b&gt;!</source>
-        <translation>&lt;b&gt;Внимание: Ако криптирате вашия портфейл и загубите вашата парола, вие ще ЗАГУБИТЕ ВСИЧКИТЕ ВИ PIV&lt;/b&gt;!</translation>
+        <source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR LUX&lt;/b&gt;!</source>
+        <translation>&lt;b&gt;Внимание: Ако криптирате вашия портфейл и загубите вашата парола, вие ще ЗАГУБИТЕ ВСИЧКИТЕ ВИ LUX&lt;/b&gt;!</translation>
     </message>
     <message>
         <source>Wallet encrypted</source>

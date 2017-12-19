@@ -12,9 +12,9 @@ Please report bugs using the issue tracker at github:
 Recommended Update
 ==============
 
-LUX Core v4.0.0 is a recommended, semi-mandatory update for all users. This release contains transaction creation bug fixes for zPIV spends, automint calculation adjustments, and other various updates/fixes.
+LUX Core v4.0.0 is a recommended, semi-mandatory update for all users. This release contains transaction creation bug fixes for zLUX spends, automint calculation adjustments, and other various updates/fixes.
 
-zPIV spending requires this update.
+zLUX spending requires this update.
 
 How to Upgrade
 ==============
@@ -45,21 +45,21 @@ Notable Changes
 
 Auto Wallet Backup
 ---------------------
-In addition to the automatic wallet backup that is done at each start of the client, a new automatic backup function has been added that will, by default, create a backup of the wallet file during each zPIV mint operation (zPIV spends which re-mint their change are also included in this). This functionality is controlled by the `-backupzlux` command-line option, which defaults to `1` (enabled, auto-backup).
+In addition to the automatic wallet backup that is done at each start of the client, a new automatic backup function has been added that will, by default, create a backup of the wallet file during each zLUX mint operation (zLUX spends which re-mint their change are also included in this). This functionality is controlled by the `-backupzlux` command-line option, which defaults to `1` (enabled, auto-backup).
 
 Users that wish to prevent this behavior (not recommended) can pass `-backupzlux=0` at the command-line when starting the client, or add `backupzlux=0` to their `lux.conf` file.
 
-zPIV Automint Calculations
+zLUX Automint Calculations
 ---------------------
-A bug in the automint calculations was made apparent on mainnet when block times exceeded expectations, resulting in zPIV mint transactions that were in an unconfirmed state to still be treated as if they had never been minted. This caused automint to effectively mint more than what was intended.
+A bug in the automint calculations was made apparent on mainnet when block times exceeded expectations, resulting in zLUX mint transactions that were in an unconfirmed state to still be treated as if they had never been minted. This caused automint to effectively mint more than what was intended.
 
-zPIV Spending Fix
+zLUX Spending Fix
 ---------------------
-The size of zPIV spend transactions is knowingly larger than normal transactions, and while this was expected, a much stricter check against the scriptsig size is used for mainnet, causing the transactions to be rejected by the mempool, and thus not being packaged into any blocks.
+The size of zLUX spend transactions is knowingly larger than normal transactions, and while this was expected, a much stricter check against the scriptsig size is used for mainnet, causing the transactions to be rejected by the mempool, and thus not being packaged into any blocks.
 
-zPIV Transaction Recovery
+zLUX Transaction Recovery
 ---------------------
-Due to the aforementioned issue with zPIV spending, users may find that their attempted spends are now conflicted and zPIV balances are not represented as expected. "Recovery" of these transactions can be done using the following methods:
+Due to the aforementioned issue with zLUX spending, users may find that their attempted spends are now conflicted and zLUX balances are not represented as expected. "Recovery" of these transactions can be done using the following methods:
 
 1. GUI:
 

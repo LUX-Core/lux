@@ -3067,7 +3067,7 @@ void ThreadScriptCheck()
     scriptcheckqueue.Thread();
 }
 
-void RecalculateZPIVMinted()
+void RecalculateZLUXMinted()
 {
     CBlockIndex *pindex = chainActive[Params().Zerocoin_StartHeight()];
     int nHeightEnd = chainActive.Height();
@@ -3094,14 +3094,14 @@ void RecalculateZPIVMinted()
     }
 }
 
-void RecalculateZPIVSpent()
+void RecalculateZLUXSpent()
 {
     CBlockIndex* pindex = chainActive[Params().Zerocoin_StartHeight()];
     while (true) {
         if (pindex->nHeight % 1000 == 0)
             LogPrintf("%s : block %d...\n", __func__, pindex->nHeight);
 
-        //Rewrite zPIV supply
+        //Rewrite zLUX supply
         CBlock block;
         assert(ReadBlockFromDisk(block, pindex));
 
@@ -3110,13 +3110,13 @@ void RecalculateZPIVSpent()
         //Reset the supply to previous block
         pindex->mapZerocoinSupply = pindex->pprev->mapZerocoinSupply;
 
-        //Add mints to zPIV supply
+        //Add mints to zLUX supply
         for (auto denom : libzerocoin::zerocoinDenomList) {
             long nDenomAdded = count(pindex->vMintDenominationsInBlock.begin(), pindex->vMintDenominationsInBlock.end(), denom);
             pindex->mapZerocoinSupply.at(denom) += nDenomAdded;
         }
 
-        //Remove spends from zPIV supply
+        //Remove spends from zLUX supply
         for (auto denom : listDenomsSpent)
             pindex->mapZerocoinSupply.at(denom)--;
 
@@ -3130,7 +3130,7 @@ void RecalculateZPIVSpent()
     }
 }
 
-bool RecalculatePIVSupply(int nHeightStart)
+bool RecalculateLUXSupply(int nHeightStart)
 {
     if (nHeightStart > chainActive.Height())
         return false;
@@ -3444,9 +3444,9 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
     std::list<libzerocoin::CoinDenomination> listSpends = ZerocoinSpendListFromBlock(block, fFilterInvalid);
 
     if (pindex->nHeight == Params().Zerocoin_Block_RecalculateAccumulators() + 1) {
-        RecalculateZPIVMinted();
-        RecalculateZPIVSpent();
-        RecalculatePIVSupply(Params().Zerocoin_StartHeight());
+        RecalculateZLUXMinted();
+        RecalculateZLUXSpent();
+        RecalculateLUXSupply(Params().Zerocoin_StartHeight());
     }
 
     // Initialize zerocoin supply to the supply from previous block
@@ -3676,7 +3676,7 @@ void static UpdateTip(CBlockIndex* pindexNew)
 {
     chainActive.SetTip(pindexNew);
 
-    // If turned on AutoZeromint will automatically convert PIV to zPIV
+    // If turned on AutoZeromint will automatically convert LUX to zLUX
     if (pwalletMain->isZeromintEnabled ())
         pwalletMain->AutoZeromint ();
 

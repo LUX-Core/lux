@@ -135,10 +135,10 @@
          <item>
           <widget class="QLabel" name="percentage_label">
            <property name="toolTip">
-            <string>Percentage of incoming PIV which get automatically converted to zPIV via Zerocoin Protocol (min: 10%)</string>
+            <string>Percentage of incoming LUX which get automatically converted to zLUX via Zerocoin Protocol (min: 10%)</string>
            </property>
            <property name="text">
-            <string>Percentage of autominted zPIV</string>
+            <string>Percentage of autominted zLUX</string>
            </property>
           </widget>
          </item>
@@ -168,10 +168,10 @@
             </size>
            </property>
            <property name="toolTip">
-            <string>Wait with automatic conversion to Zerocoin until enough PIV for this denomination is available</string>
+            <string>Wait with automatic conversion to Zerocoin until enough LUX for this denomination is available</string>
            </property>
            <property name="text">
-            <string>Preferred Automint zPIV Denomination</string>
+            <string>Preferred Automint zLUX Denomination</string>
            </property>
           </widget>
          </item>
@@ -184,7 +184,7 @@
             </size>
            </property>
            <property name="toolTip">
-            <string>Wait with automatic conversion to Zerocoin until enough PIV for this denomination is available</string>
+            <string>Wait with automatic conversion to Zerocoin until enough LUX for this denomination is available</string>
            </property>
            <property name="maxVisibleItems">
             <number>9</number>

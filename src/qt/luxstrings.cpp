@@ -89,10 +89,10 @@ QT_TRANSLATE_NOOP("lux-core", ""
 "Execute command when the best block changes (%s in cmd is replaced by block "
 "hash)"),
 QT_TRANSLATE_NOOP("lux-core", ""
-"Fees (in PIV/Kb) smaller than this are considered zero fee for relaying "
+"Fees (in LUX/Kb) smaller than this are considered zero fee for relaying "
 "(default: %s)"),
 QT_TRANSLATE_NOOP("lux-core", ""
-"Fees (in PIV/Kb) smaller than this are considered zero fee for transaction "
+"Fees (in LUX/Kb) smaller than this are considered zero fee for transaction "
 "creation (default: %s)"),
 QT_TRANSLATE_NOOP("lux-core", ""
 "Flush database activity from memory pool to disk log every <n> megabytes "
@@ -187,10 +187,10 @@ QT_TRANSLATE_NOOP("lux-core", ""
 "Unable to locate enough Obfuscation denominated funds for this transaction."),
 QT_TRANSLATE_NOOP("lux-core", ""
 "Unable to locate enough Obfuscation non-denominated funds for this "
-"transaction that are not equal 10000 PIV."),
+"transaction that are not equal 10000 LUX."),
 QT_TRANSLATE_NOOP("lux-core", ""
 "Unable to locate enough funds for this transaction that are not equal 10000 "
-"PIV."),
+"LUX."),
 QT_TRANSLATE_NOOP("lux-core", ""
 "Use separate SOCKS5 proxy to reach peers via Tor hidden services (default: "
 "%s)"),
@@ -304,7 +304,7 @@ QT_TRANSLATE_NOOP("lux-core", "Failed to listen on any port. Use -listen=0 if yo
 QT_TRANSLATE_NOOP("lux-core", "Failed to read block index"),
 QT_TRANSLATE_NOOP("lux-core", "Failed to read block"),
 QT_TRANSLATE_NOOP("lux-core", "Failed to write block index"),
-QT_TRANSLATE_NOOP("lux-core", "Fee (in PIV/kB) to add to transactions you send (default: %s)"),
+QT_TRANSLATE_NOOP("lux-core", "Fee (in LUX/kB) to add to transactions you send (default: %s)"),
 QT_TRANSLATE_NOOP("lux-core", "Finalizing transaction."),
 QT_TRANSLATE_NOOP("lux-core", "Force safe mode (default: %u)"),
 QT_TRANSLATE_NOOP("lux-core", "Found enough users, signing ( waiting %s )"),

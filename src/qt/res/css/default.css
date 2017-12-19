@@ -694,13 +694,13 @@ QWidget#PrivacyDialog QLabel {
 border:0px solid #000;
 }
 
-QWidget#PrivacyDialog QLabel#zPIVLabel {
+QWidget#PrivacyDialog QLabel#zLUXLabel {
 font-size:14px;
 color:#ffffff;
 background-color:#5B4C7C;
 }
 
-QWidget#PrivacyDialog QLabel#oPIVLabel {
+QWidget#PrivacyDialog QLabel#oLUXLabel {
 font-size:14px;
 color:#ffffff;
 background-color:#5B4C7C;
@@ -877,7 +877,7 @@ font-weight:normal;
 min-height:30px;
 }
 
-QWidget .QFrame#frame .QLabel#label_5 { /* PIV Balances Label */
+QWidget .QFrame#frame .QLabel#label_5 { /* LUX Balances Label */
 qproperty-alignment: 'AlignVCenter | AlignLeft';
 min-width:160px;
 background-color:transparent;
@@ -1014,7 +1014,7 @@ margin-right:5px;
 padding-right:5px;
 }
 
-QWidget .QFrame#frame_4 .QLabel#labelzBalanceText { /* Available zPIV Label */
+QWidget .QFrame#frame_4 .QLabel#labelzBalanceText { /* Available zLUX Label */
 qproperty-alignment: 'AlignVCenter | AlignRight';
 min-width:160px;
 background-color:#5B4C7C;
@@ -1026,7 +1026,7 @@ font-size:14px;
 /* min-height:35px; */
 }
 
-QWidget .QFrame#frame_4 .QLabel#labelzBalance { /* Available zPIV Balance */
+QWidget .QFrame#frame_4 .QLabel#labelzBalance { /* Available zLUX Balance */
 qproperty-alignment: 'AlignVCenter | AlignLeft';
 font-size:12px;
 font-weight:bold;
@@ -1034,7 +1034,7 @@ color:#5B4C7C;
 margin-left:0px;
 }
 
-QWidget .QFrame#frame_4 .QLabel#labelzBalanceUnconfirmedText { /* Unconfirmed zPIV Label */
+QWidget .QFrame#frame_4 .QLabel#labelzBalanceUnconfirmedText { /* Unconfirmed zLUX Label */
 qproperty-alignment: 'AlignVCenter | AlignRight';
 min-width:160px;
 background-color:#5B4C7C;
@@ -1046,7 +1046,7 @@ font-size:14px;
 /* min-height:35px; */
 }
 
-QWidget .QFrame#frame_4 .QLabel#labelzBalanceUnconfirmed { /* Unconfirmed zPIV Balance */
+QWidget .QFrame#frame_4 .QLabel#labelzBalanceUnconfirmed { /* Unconfirmed zLUX Balance */
 qproperty-alignment: 'AlignVCenter | AlignLeft';
 font-size:12px;
 font-weight:bold;
@@ -1054,7 +1054,7 @@ color:#5B4C7C;
 margin-left:0px;
 }
 
-QWidget .QFrame#frame_4 .QLabel#labelzBalanceMatureText { /* Mature zPIV Label */
+QWidget .QFrame#frame_4 .QLabel#labelzBalanceMatureText { /* Mature zLUX Label */
 qproperty-alignment: 'AlignVCenter | AlignRight';
 min-width:160px;
 background-color:#5B4C7C;
@@ -1066,7 +1066,7 @@ font-size:14px;
 /* min-height:35px; */
 }
 
-QWidget .QFrame#frame_4 .QLabel#labelzBalanceMature { /* Mature zPIV Balance */
+QWidget .QFrame#frame_4 .QLabel#labelzBalanceMature { /* Mature zLUX Balance */
 qproperty-alignment: 'AlignVCenter | AlignLeft';
 font-size:12px;
 font-weight:bold;
@@ -1074,7 +1074,7 @@ color:#5B4C7C;
 margin-left:0px;
 }
 
-QWidget .QFrame#frame_4 .QLabel#labelzBalanceImmatureText { /* Immature zPIV Label */
+QWidget .QFrame#frame_4 .QLabel#labelzBalanceImmatureText { /* Immature zLUX Label */
 qproperty-alignment: 'AlignVCenter | AlignRight';
 min-width:160px;
 background-color:#5B4C7C;
@@ -1086,7 +1086,7 @@ font-size:14px;
 /* min-height:35px; */
 }
 
-QWidget .QFrame#frame_4 .QLabel#labelzBalanceImmature { /* Immature zPIV Balance */
+QWidget .QFrame#frame_4 .QLabel#labelzBalanceImmature { /* Immature zLUX Balance */
 qproperty-alignment: 'AlignVCenter | AlignLeft';
 font-size:12px;
 font-weight:bold;
@@ -1105,7 +1105,7 @@ margin-right:5px;
 padding-right:5px;
 }
 
-QWidget .QFrame#frame_3 .QLabel#labelBalanceTextz { /* Available PIV Label */
+QWidget .QFrame#frame_3 .QLabel#labelBalanceTextz { /* Available LUX Label */
 qproperty-alignment: 'AlignVCenter | AlignRight';
 min-width:160px;
 background-color:#5B4C7C;
@@ -1117,7 +1117,7 @@ font-size:14px;
 /* min-height:35px; */
 }
 
-QWidget .QFrame#frame_3 .QLabel#labelBalancez { /* Available PIV Balance */
+QWidget .QFrame#frame_3 .QLabel#labelBalancez { /* Available LUX Balance */
 qproperty-alignment: 'AlignVCenter | AlignLeft';
 font-size:12px;
 font-weight:bold;
@@ -1125,7 +1125,7 @@ color:#5B4C7C;
 margin-left:0px;
 }
 
-QWidget .QFrame#frame_3 .QLabel#labelzBalanceTextz { /* Available zPIV Label */
+QWidget .QFrame#frame_3 .QLabel#labelzBalanceTextz { /* Available zLUX Label */
 qproperty-alignment: 'AlignVCenter | AlignRight';
 min-width:160px;
 background-color:#5B4C7C;
@@ -1137,7 +1137,7 @@ font-size:14px;
 /* min-height:35px; */
 }
 
-QWidget .QFrame#frame_3 .QLabel#labelzBalancez { /* Available zPIV Balance */
+QWidget .QFrame#frame_3 .QLabel#labelzBalancez { /* Available zLUX Balance */
 qproperty-alignment: 'AlignVCenter | AlignLeft';
 font-size:12px;
 font-weight:bold;
@@ -1145,7 +1145,7 @@ color:#5B4C7C;
 margin-left:0px;
 }
 
-QWidget .QFrame#frame_3 .QLabel#labelLockedBalanceText { /* Available zPIV Label */
+QWidget .QFrame#frame_3 .QLabel#labelLockedBalanceText { /* Available zLUX Label */
 qproperty-alignment: 'AlignVCenter | AlignRight';
 min-width:160px;
 background-color:#5B4C7C;
@@ -1157,7 +1157,7 @@ font-size:14px;
 /* min-height:35px; */
 }
 
-QWidget .QFrame#frame_3 .QLabel#labelLockedBalance { /* Available zPIV Balance */
+QWidget .QFrame#frame_3 .QLabel#labelLockedBalance { /* Available zLUX Balance */
 qproperty-alignment: 'AlignVCenter | AlignLeft';
 font-size:12px;
 font-weight:normal;
@@ -1165,7 +1165,7 @@ color:#5B4C7C;
 margin-left:0px;
 }
 
-QWidget .QFrame#frame_3 .QLabel#labelUnLockedBalanceText { /* Available zPIV Label */
+QWidget .QFrame#frame_3 .QLabel#labelUnLockedBalanceText { /* Available zLUX Label */
 qproperty-alignment: 'AlignVCenter | AlignRight';
 min-width:160px;
 background-color:#5B4C7C;
@@ -1177,7 +1177,7 @@ font-size:14px;
 /* min-height:35px; */
 }
 
-QWidget .QFrame#frame_3 .QLabel#labelUnLockedBalance { /* Available zPIV Balance */
+QWidget .QFrame#frame_3 .QLabel#labelUnLockedBalance { /* Available zLUX Balance */
 qproperty-alignment: 'AlignVCenter | AlignLeft';
 font-size:12px;
 font-weight:normal;

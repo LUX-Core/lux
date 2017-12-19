@@ -40,10 +40,10 @@ frequently tested on them.
 Notable Changes
 ===============
 
-Zerocoin (zPIV) Protocol
+Zerocoin (zLUX) Protocol
 ---------------------
 
-At long last, the zPIV release is here and the zerocoin protocol has been fully implemented! This allows users to send transactions with 100% fungible coins and absolutely zero history or link-ability to their previous owners.
+At long last, the zLUX release is here and the zerocoin protocol has been fully implemented! This allows users to send transactions with 100% fungible coins and absolutely zero history or link-ability to their previous owners.
 
 Full and comprehensive details about the process and the use will be posted here during the days between Oct 6 and Oct 13.
 
@@ -65,7 +65,7 @@ the code changes and accompanying discussion, both the pull request and
 git merge commit are mentioned.
 
 ### Broad Features
-- #264 `15e84e5` zPIV is here! (Fuzzbawls Mrs-X Presstab Spock LUX)
+- #264 `15e84e5` zLUX is here! (Fuzzbawls Mrs-X Presstab Spock LUX)
 
 ### P2P Protocol and Network Code
 - #242 `0ecd77f` [P2P] Improve TOR service connectivity (Fuzzbawls)

@@ -1,9 +1,9 @@
 /* src/config/lux-config.h.  Generated from lux-config.h.in by configure.  */
 /* src/config/lux-config.h.in.  Generated from configure.ac by autoheader.  */
 
-#ifndef PIV_CONFIG_H
+#ifndef LUX_CONFIG_H
 
-#define PIV_CONFIG_H
+#define LUX_CONFIG_H
 
 /* Define if building universal (internal helper macro) */
 /* #undef AC_APPLE_UNIVERSAL_BUILD */
@@ -340,4 +340,4 @@
 /* Define for large files, on AIX-style hosts. */
 /* #undef _LARGE_FILES */
 
-#endif //PIV_CONFIG_H
+#endif //LUX_CONFIG_H

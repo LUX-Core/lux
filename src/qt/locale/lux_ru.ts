@@ -172,7 +172,7 @@
         <translation>Подтверждение шифрования кошелька</translation>
     </message>
     <message>
-        <source>LUX will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your PIVs from being stolen by malware infecting your computer.</source>
+        <source>LUX will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your LUXs from being stolen by malware infecting your computer.</source>
         <translation>LUX сейчас закроется, чтобы завершить процесс шифрования. Помните, что шифрование вашего кошелька не может полностью защитить ваши LUX от кражи с использованием вредоносного ПО.</translation>
     </message>
     <message>
@@ -180,8 +180,8 @@
         <translation>Вы действительно хотите зашифровать свой кошелек?</translation>
     </message>
     <message>
-        <source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR PIV&lt;/b&gt;!</source>
-        <translation>Внимание: если вы зашифруете свой кошелёк и потеряете от него пароль, то вы &lt;b&gt;ПОТЕРЯЕТЕ ВСЕ СВОИ PIV&lt;/b&gt;!</translation>
+        <source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR LUX&lt;/b&gt;!</source>
+        <translation>Внимание: если вы зашифруете свой кошелёк и потеряете от него пароль, то вы &lt;b&gt;ПОТЕРЯЕТЕ ВСЕ СВОИ LUX&lt;/b&gt;!</translation>
     </message>
     <message>
         <source>Wallet encrypted</source>
@@ -1504,32 +1504,32 @@ Please check the address and try again.</source>
         <translation>Выберите уровень конфиденциальности.</translation>
     </message>
     <message>
-        <source>Use 2 separate masternodes to mix funds up to 10000 PIV</source>
-        <translation>Используйте 2 разные мастерноды для смешивания средств до 10000 PIV</translation>
+        <source>Use 2 separate masternodes to mix funds up to 10000 LUX</source>
+        <translation>Используйте 2 разные мастерноды для смешивания средств до 10000 LUX</translation>
     </message>
     <message>
-        <source>Use 8 separate masternodes to mix funds up to 10000 PIV</source>
-        <translation>Используйте 8 разных мастернод для смешивания средств до 10000 PIV</translation>
+        <source>Use 8 separate masternodes to mix funds up to 10000 LUX</source>
+        <translation>Используйте 8 разных мастернод для смешивания средств до 10000 LUX</translation>
     </message>
     <message>
         <source>Use 16 separate masternodes</source>
         <translation>Используйте 16 разных мастернод</translation>
     </message>
     <message>
-        <source>This option is the quickest and will cost about ~0.025 PIV to anonymize 10000 PIV</source>
-        <translation>Этот вариант является самым быстрым и будет стоить порядка ~0.025 PIV для анонимизации 10000 PIV</translation>
+        <source>This option is the quickest and will cost about ~0.025 LUX to anonymize 10000 LUX</source>
+        <translation>Этот вариант является самым быстрым и будет стоить порядка ~0.025 LUX для анонимизации 10000 LUX</translation>
     </message>
     <message>
-        <source>This option is moderately fast and will cost about 0.05 PIV to anonymize 10000 PIV</source>
-        <translation>Это средний по скорости вариант и он будет стоить около 0.05 PIV для анонимизации 10000 PIV</translation>
+        <source>This option is moderately fast and will cost about 0.05 LUX to anonymize 10000 LUX</source>
+        <translation>Это средний по скорости вариант и он будет стоить около 0.05 LUX для анонимизации 10000 LUX</translation>
     </message>
     <message>
         <source>This is the slowest and most secure option. Using maximum anonymity will cost</source>
         <translation>Это самый медленный и безопасный вариант. Максимальная анонимность стоит</translation>
     </message>
     <message>
-        <source>0.1 PIV per 10000 PIV you anonymize.</source>
-        <translation>0.1 PIV за 10000 PIV которые вы собираетесь анонимизировать.</translation>
+        <source>0.1 LUX per 10000 LUX you anonymize.</source>
+        <translation>0.1 LUX за 10000 LUX которые вы собираетесь анонимизировать.</translation>
     </message>
     <message>
         <source>Obfuscation Configuration</source>
@@ -2570,8 +2570,8 @@ https://www.transifex.com/216k155/216k155-translations</translation>
         <translation>Изменить:</translation>
     </message>
     <message>
-        <source>0 PIV</source>
-        <translation>0 PIV</translation>
+        <source>0 LUX</source>
+        <translation>0 LUX</translation>
     </message>
     <message>
         <source>Transaction Fee:</source>

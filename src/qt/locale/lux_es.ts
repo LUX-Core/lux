@@ -176,16 +176,16 @@
         <translation>Confirme el cifrado del monedero</translation>
     </message>
     <message>
-        <source>LUX will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your PIVs from being stolen by malware infecting your computer.</source>
-        <translation>LUX se cerrará para finalizar el proceso de cifrado. Recuerde que cifrar su monedero no garantiza que sus PIVs no sean robados mediante malware de su ordenador.</translation>
+        <source>LUX will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your LUXs from being stolen by malware infecting your computer.</source>
+        <translation>LUX se cerrará para finalizar el proceso de cifrado. Recuerde que cifrar su monedero no garantiza que sus LUXs no sean robados mediante malware de su ordenador.</translation>
     </message>
     <message>
         <source>Are you sure you wish to encrypt your wallet?</source>
         <translation>¿Está seguro de que desea cifrar su monedero?</translation>
     </message>
     <message>
-        <source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR PIV&lt;/b&gt;!</source>
-        <translation>Atención: Si cifra su monedero y pierde su contraseña, perderá &lt;b&gt; TODOS SUS PIV&lt;/b&gt;!</translation>
+        <source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR LUX&lt;/b&gt;!</source>
+        <translation>Atención: Si cifra su monedero y pierde su contraseña, perderá &lt;b&gt; TODOS SUS LUX&lt;/b&gt;!</translation>
     </message>
     <message>
         <source>Wallet encrypted</source>
@@ -618,8 +618,8 @@
         <translation>&amp;Privacidad</translation>
     </message>
     <message>
-        <source>Privacy Action for zPIV and Obfuscation</source>
-        <translation>Privacidad con zPIV y Ofuscación</translation>
+        <source>Privacy Action for zLUX and Obfuscation</source>
+        <translation>Privacidad con zLUX y Ofuscación</translation>
     </message>
     <message>
         <source>&amp;Masternodes</source>
@@ -1528,32 +1528,32 @@ Por favor compruebe la dirección e inténtelo de nuevo.</translation>
         <translation>Por favor selecciones un nivel de privacidad.</translation>
     </message>
     <message>
-        <source>Use 2 separate masternodes to mix funds up to 10000 PIV</source>
-        <translation>Use 2 nodos maestros diferentes para mezclar los fondos hasta los 10000 PIV</translation>
+        <source>Use 2 separate masternodes to mix funds up to 10000 LUX</source>
+        <translation>Use 2 nodos maestros diferentes para mezclar los fondos hasta los 10000 LUX</translation>
     </message>
     <message>
-        <source>Use 8 separate masternodes to mix funds up to 10000 PIV</source>
-        <translation>Use 8 nodos maestros diferentes para mezclar fondos hasta los 10000 PIV</translation>
+        <source>Use 8 separate masternodes to mix funds up to 10000 LUX</source>
+        <translation>Use 8 nodos maestros diferentes para mezclar fondos hasta los 10000 LUX</translation>
     </message>
     <message>
         <source>Use 16 separate masternodes</source>
         <translation>Use 16 nodos maestros diferentes</translation>
     </message>
     <message>
-        <source>This option is the quickest and will cost about ~0.025 PIV to anonymize 10000 PIV</source>
-        <translation>Esta opción es la más rápida y costará alrededor de ~0.025 PIV para anonimizar 10000 PIV</translation>
+        <source>This option is the quickest and will cost about ~0.025 LUX to anonymize 10000 LUX</source>
+        <translation>Esta opción es la más rápida y costará alrededor de ~0.025 LUX para anonimizar 10000 LUX</translation>
     </message>
     <message>
-        <source>This option is moderately fast and will cost about 0.05 PIV to anonymize 10000 PIV</source>
-        <translation>Esta opción es moderadamente rápida y costará cerca de 0.05 PIV para anonimizar 10000 PIV.</translation>
+        <source>This option is moderately fast and will cost about 0.05 LUX to anonymize 10000 LUX</source>
+        <translation>Esta opción es moderadamente rápida y costará cerca de 0.05 LUX para anonimizar 10000 LUX.</translation>
     </message>
     <message>
         <source>This is the slowest and most secure option. Using maximum anonymity will cost</source>
         <translation>Esta es la opción más lenta pero más segura. Usar el máximo anonimato costará</translation>
     </message>
     <message>
-        <source>0.1 PIV per 10000 PIV you anonymize.</source>
-        <translation>0.1 PIV por 10000 PIV que anonimizas.</translation>
+        <source>0.1 LUX per 10000 LUX you anonymize.</source>
+        <translation>0.1 LUX por 10000 LUX que anonimizas.</translation>
     </message>
     <message>
         <source>Obfuscation Configuration</source>
@@ -1696,16 +1696,16 @@ https://www.transifex.com/216k155/216k155-translations</translation>
         <translation>Mapear un puerto utilizando &amp;UPnP</translation>
     </message>
     <message>
-        <source>Percentage of incoming PIV which get automatically converted to zPIV via Zerocoin Protocol (min: 10%)</source>
-        <translation>Porcentaje de PIVs entrantes que serán automáticamente convertidos a zPIV a través del Protocolo Zerocoin (mín: 10%)</translation>
+        <source>Percentage of incoming LUX which get automatically converted to zLUX via Zerocoin Protocol (min: 10%)</source>
+        <translation>Porcentaje de LUXs entrantes que serán automáticamente convertidos a zLUX a través del Protocolo Zerocoin (mín: 10%)</translation>
     </message>
     <message>
-        <source>Percentage of autominted zPIV</source>
-        <translation>Porcentaje de zPIV autogenerados</translation>
+        <source>Percentage of autominted zLUX</source>
+        <translation>Porcentaje de zLUX autogenerados</translation>
     </message>
     <message>
-        <source>Wait with automatic conversion to Zerocoin until enough PIV for this denomination is available</source>
-        <translation>Retrasar la conversión automática a Zerocoin hasta que hayan suficientes PIV disponibles para esta denominación</translation>
+        <source>Wait with automatic conversion to Zerocoin until enough LUX for this denomination is available</source>
+        <translation>Retrasar la conversión automática a Zerocoin hasta que hayan suficientes LUX disponibles para esta denominación</translation>
     </message>
     <message>
         <source>Connect to the LUX network through a SOCKS5 proxy.</source>
@@ -1839,8 +1839,8 @@ https://www.transifex.com/216k155/216k155-translations</translation>
         <translation>Formulario</translation>
     </message>
     <message>
-        <source>PIV Balances</source>
-        <translation>Balances PIV</translation>
+        <source>LUX Balances</source>
+        <translation>Balances LUX</translation>
     </message>
     <message>
         <source>Available:</source>
@@ -2741,8 +2741,8 @@ https://www.transifex.com/216k155/216k155-translations</translation>
         <translation>Tamaño de UTXO:</translation>
     </message>
     <message>
-        <source>0 PIV</source>
-        <translation>0 PIV</translation>
+        <source>0 LUX</source>
+        <translation>0 LUX</translation>
     </message>
     <message>
         <source>Transaction Fee:</source>
@@ -2785,12 +2785,12 @@ https://www.transifex.com/216k155/216k155-translations</translation>
         <translation>Tiempo de confirmación:</translation>
     </message>
     <message>
-        <source>If the custom fee is set to 1000 uPIVs and the transaction is only 250 bytes, then "per kilobyte" only pays 250 uPIVs in fee,&lt;br /&gt;while "at least" pays 1000 uPIVs. For transactions bigger than a kilobyte both pay by kilobyte.</source>
-        <translation>Si la comisión personalizada se fija en 1000 uPIVs y la transacción necesita sólo 250 bytes, entonces la opción "por kilobyte" sólo pagará 250 uPIVs de comisión,&lt;br/&gt;mientras "por lo menos" pagará 1000 uPIVs. Para transacciones que midan más de un kilobyte ambas pagan por kilobyte.</translation>
+        <source>If the custom fee is set to 1000 uLUXs and the transaction is only 250 bytes, then "per kilobyte" only pays 250 uLUXs in fee,&lt;br /&gt;while "at least" pays 1000 uLUXs. For transactions bigger than a kilobyte both pay by kilobyte.</source>
+        <translation>Si la comisión personalizada se fija en 1000 uLUXs y la transacción necesita sólo 250 bytes, entonces la opción "por kilobyte" sólo pagará 250 uLUXs de comisión,&lt;br/&gt;mientras "por lo menos" pagará 1000 uLUXs. Para transacciones que midan más de un kilobyte ambas pagan por kilobyte.</translation>
     </message>
     <message>
-        <source>If the custom fee is set to 1000 uPIVs and the transaction is only 250 bytes, then "per kilobyte" only pays 250 uPIVs in fee,&lt;br /&gt;while "total at least" pays 1000 uPIVs. For transactions bigger than a kilobyte both pay by kilobyte.</source>
-        <translation>Si la comisión personalizada se fija en 1000 uPIVs y la transacción necesita sólo 250 bytes, entonces la opción "por kilobyte" sólo pagará 250 uPIVs de comisión,&lt;br/&gt;mientras "por lo menos" pagará 1000 uPIVs. Para transacciones que midan más de un kilobyte ambas pagan por kilobyte.</translation>
+        <source>If the custom fee is set to 1000 uLUXs and the transaction is only 250 bytes, then "per kilobyte" only pays 250 uLUXs in fee,&lt;br /&gt;while "total at least" pays 1000 uLUXs. For transactions bigger than a kilobyte both pay by kilobyte.</source>
+        <translation>Si la comisión personalizada se fija en 1000 uLUXs y la transacción necesita sólo 250 bytes, entonces la opción "por kilobyte" sólo pagará 250 uLUXs de comisión,&lt;br/&gt;mientras "por lo menos" pagará 1000 uLUXs. Para transacciones que midan más de un kilobyte ambas pagan por kilobyte.</translation>
     </message>
     <message>
         <source>Paying only the minimum fee is just fine as long as there is less transaction volume than space in the blocks.&lt;br /&gt;But be aware that this can end up in a never confirming transaction once there is more demand for LUX transactions than the network can process.</source>
@@ -3761,8 +3761,8 @@ https://www.transifex.com/216k155/216k155-translations</translation>
         <translation>Enviar Monedas</translation>
     </message>
     <message>
-        <source>SwiftTX doesn't support sending values that high yet. Transactions are currently limited to %1 PIV.</source>
-        <translation>SwiftTX no soporta el envío de importes tan altos todavía. Las transacciones están actualmente limitadas a %1 PIV.</translation>
+        <source>SwiftTX doesn't support sending values that high yet. Transactions are currently limited to %1 LUX.</source>
+        <translation>SwiftTX no soporta el envío de importes tan altos todavía. Las transacciones están actualmente limitadas a %1 LUX.</translation>
     </message>
 </context>
 <context>
@@ -3898,12 +3898,12 @@ https://www.transifex.com/216k155/216k155-translations</translation>
         <translation>Ejecutar comando cuando el mejor bloque cambie (%s en cmd es reemplazado por el block hash)</translation>
     </message>
     <message>
-        <source>Fees (in PIV/Kb) smaller than this are considered zero fee for relaying (default: %s)</source>
-        <translation>Comisiones (en PIV/Kb) menores a esta son consideradas gratuitas para la propagación de la transacción (default: %s)</translation>
+        <source>Fees (in LUX/Kb) smaller than this are considered zero fee for relaying (default: %s)</source>
+        <translation>Comisiones (en LUX/Kb) menores a esta son consideradas gratuitas para la propagación de la transacción (default: %s)</translation>
     </message>
     <message>
-        <source>Fees (in PIV/Kb) smaller than this are considered zero fee for transaction creation (default: %s)</source>
-        <translation>Comisiones (en PIV/Kb) menores a esta son consideradas gratuitas para la creación de la transacción (default: %s)</translation>
+        <source>Fees (in LUX/Kb) smaller than this are considered zero fee for transaction creation (default: %s)</source>
+        <translation>Comisiones (en LUX/Kb) menores a esta son consideradas gratuitas para la creación de la transacción (default: %s)</translation>
     </message>
     <message>
         <source>Flush database activity from memory pool to disk log every &lt;n&gt; megabytes (default: %u)</source>
@@ -4034,12 +4034,12 @@ por ejemplo: alertnotify=echo %%s | mail -s "LUX Alert" admin@foo.com
         <translation>Imposible localizar suficientes fondos denominados de Ofuscación para esta transacción.</translation>
     </message>
     <message>
-        <source>Unable to locate enough Obfuscation non-denominated funds for this transaction that are not equal 10000 PIV.</source>
-        <translation>Imposible localizar suficientes fondos no-denominados de Ofuscación para esta transacción que no es igual a 10000 PIV.</translation>
+        <source>Unable to locate enough Obfuscation non-denominated funds for this transaction that are not equal 10000 LUX.</source>
+        <translation>Imposible localizar suficientes fondos no-denominados de Ofuscación para esta transacción que no es igual a 10000 LUX.</translation>
     </message>
     <message>
-        <source>Unable to locate enough funds for this transaction that are not equal 10000 PIV.</source>
-        <translation>Imposible localizar fondos suficientes para esta transacción que no es igual a 10000 PIV.</translation>
+        <source>Unable to locate enough funds for this transaction that are not equal 10000 LUX.</source>
+        <translation>Imposible localizar fondos suficientes para esta transacción que no es igual a 10000 LUX.</translation>
     </message>
     <message>
         <source>Use separate SOCKS5 proxy to reach peers via Tor hidden services (default: %s)</source>
@@ -4326,8 +4326,8 @@ por ejemplo: alertnotify=echo %%s | mail -s "LUX Alert" admin@foo.com
         <translation>Falló al leer el bloque</translation>
     </message>
     <message>
-        <source>Fee (in PIV/kB) to add to transactions you send (default: %s)</source>
-        <translation>Comisión (en PIV/kB) para agregar a la transacción que envías (predeterminado: %s)</translation>
+        <source>Fee (in LUX/kB) to add to transactions you send (default: %s)</source>
+        <translation>Comisión (en LUX/kB) para agregar a la transacción que envías (predeterminado: %s)</translation>
     </message>
     <message>
         <source>Finalizing transaction.</source>

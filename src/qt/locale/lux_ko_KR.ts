@@ -176,16 +176,16 @@
         <translation>지갑 암호화 확인</translation>
     </message>
     <message>
-        <source>LUX will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your PIVs from being stolen by malware infecting your computer.</source>
-        <translation>LUX는 이제 암호화 프로세스를 마치기 위해 닫힐것입니다. 지갑을 암호화하더라도 맬웨어로 인한 PIVs 의 도난당하는 것을 완벽하게 보호 할 수는 없습니다.</translation>
+        <source>LUX will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your LUXs from being stolen by malware infecting your computer.</source>
+        <translation>LUX는 이제 암호화 프로세스를 마치기 위해 닫힐것입니다. 지갑을 암호화하더라도 맬웨어로 인한 LUXs 의 도난당하는 것을 완벽하게 보호 할 수는 없습니다.</translation>
     </message>
     <message>
         <source>Are you sure you wish to encrypt your wallet?</source>
         <translation>지갑을 암호화 하시겠습니까?</translation>
     </message>
     <message>
-        <source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR PIV&lt;/b&gt;!</source>
-        <translation>경고: 지갑 암호화 후 암호를 분실하게 되면 &lt;b&gt;모든 PIV를 잃게 됩니다&lt;/b&gt;!</translation>
+        <source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR LUX&lt;/b&gt;!</source>
+        <translation>경고: 지갑 암호화 후 암호를 분실하게 되면 &lt;b&gt;모든 LUX를 잃게 됩니다&lt;/b&gt;!</translation>
     </message>
     <message>
         <source>Wallet encrypted</source>
@@ -1508,32 +1508,32 @@ Please check the address and try again.</source>
         <translation>익명화 레벨을 선택해주세요.</translation>
     </message>
     <message>
-        <source>Use 2 separate masternodes to mix funds up to 10000 PIV</source>
-        <translation>2개의 개별 마스터노드를 이용하여 최대 10000 PIV 를 섞을 수 있습니다.</translation>
+        <source>Use 2 separate masternodes to mix funds up to 10000 LUX</source>
+        <translation>2개의 개별 마스터노드를 이용하여 최대 10000 LUX 를 섞을 수 있습니다.</translation>
     </message>
     <message>
-        <source>Use 8 separate masternodes to mix funds up to 10000 PIV</source>
-        <translation>8개의 개별 마스터노드를 이용하여 최대 10000 PIV 를 섞을 수 있습니다.</translation>
+        <source>Use 8 separate masternodes to mix funds up to 10000 LUX</source>
+        <translation>8개의 개별 마스터노드를 이용하여 최대 10000 LUX 를 섞을 수 있습니다.</translation>
     </message>
     <message>
         <source>Use 16 separate masternodes</source>
         <translation>16개의 개별 마스터노드를 사용</translation>
     </message>
     <message>
-        <source>This option is the quickest and will cost about ~0.025 PIV to anonymize 10000 PIV</source>
-        <translation>이 옵션은 가장 빠르게 전송되며 10000 PIV 익명화에 약 ~0.025 PIV의 비용이 들어갑니다.</translation>
+        <source>This option is the quickest and will cost about ~0.025 LUX to anonymize 10000 LUX</source>
+        <translation>이 옵션은 가장 빠르게 전송되며 10000 LUX 익명화에 약 ~0.025 LUX의 비용이 들어갑니다.</translation>
     </message>
     <message>
-        <source>This option is moderately fast and will cost about 0.05 PIV to anonymize 10000 PIV</source>
-        <translation>이 옵션은 중간 정도의 속도로 전송되며 10000 PIV 익명화에 약 0.05 PIV의 비용이 들어갑니다.</translation>
+        <source>This option is moderately fast and will cost about 0.05 LUX to anonymize 10000 LUX</source>
+        <translation>이 옵션은 중간 정도의 속도로 전송되며 10000 LUX 익명화에 약 0.05 LUX의 비용이 들어갑니다.</translation>
     </message>
     <message>
         <source>This is the slowest and most secure option. Using maximum anonymity will cost</source>
         <translation>이것은 가장 느리고 안전한 옵션입니다. 최고 익명성을 사용하면 비용이 발생합니다.</translation>
     </message>
     <message>
-        <source>0.1 PIV per 10000 PIV you anonymize.</source>
-        <translation>10000 PIV 익명화에 0.1 PIV 가 듭니다.</translation>
+        <source>0.1 LUX per 10000 LUX you anonymize.</source>
+        <translation>10000 LUX 익명화에 0.1 LUX 가 듭니다.</translation>
     </message>
     <message>
         <source>Obfuscation Configuration</source>
@@ -2706,8 +2706,8 @@ https://www.transifex.com/216k155/216k155-translations</translation>
         <translation>UTXO 크기:</translation>
     </message>
     <message>
-        <source>0 PIV</source>
-        <translation>0 PIV</translation>
+        <source>0 LUX</source>
+        <translation>0 LUX</translation>
     </message>
     <message>
         <source>Transaction Fee:</source>
@@ -2750,12 +2750,12 @@ https://www.transifex.com/216k155/216k155-translations</translation>
         <translation>승인 시간:</translation>
     </message>
     <message>
-        <source>If the custom fee is set to 1000 uPIVs and the transaction is only 250 bytes, then "per kilobyte" only pays 250 uPIVs in fee,&lt;br /&gt;while "at least" pays 1000 uPIVs. For transactions bigger than a kilobyte both pay by kilobyte.</source>
-        <translation>트랜잭션이 250바이트 인 경우 사용자 지정 수수료가 1000 uPIVs로 설정되고,&lt;br /&gt;1000 uPIVs 안에는 최소 "킬로바이트당" 250 uPIVs 만 지불합니다. 1 킬로바이트보다 큰 트랜잭션의 경우 모두 킬로바이트 단위로 지불합니다.</translation>
+        <source>If the custom fee is set to 1000 uLUXs and the transaction is only 250 bytes, then "per kilobyte" only pays 250 uLUXs in fee,&lt;br /&gt;while "at least" pays 1000 uLUXs. For transactions bigger than a kilobyte both pay by kilobyte.</source>
+        <translation>트랜잭션이 250바이트 인 경우 사용자 지정 수수료가 1000 uLUXs로 설정되고,&lt;br /&gt;1000 uLUXs 안에는 최소 "킬로바이트당" 250 uLUXs 만 지불합니다. 1 킬로바이트보다 큰 트랜잭션의 경우 모두 킬로바이트 단위로 지불합니다.</translation>
     </message>
     <message>
-        <source>If the custom fee is set to 1000 uPIVs and the transaction is only 250 bytes, then "per kilobyte" only pays 250 uPIVs in fee,&lt;br /&gt;while "total at least" pays 1000 uPIVs. For transactions bigger than a kilobyte both pay by kilobyte.</source>
-        <translation>트랜잭션이 250바이트 인 경우 사용자 지정 수수료가 1000 uPIVs로 설정되고,&lt;br /&gt;1000 uPIVs 안에는 전체에서 최소 "킬로바이트당" 250 uPIVs 만 지불합니다. 1 킬로바이트보다 큰 트랜잭션의 경우 모두 킬로바이트 단위로 지불합니다.</translation>
+        <source>If the custom fee is set to 1000 uLUXs and the transaction is only 250 bytes, then "per kilobyte" only pays 250 uLUXs in fee,&lt;br /&gt;while "total at least" pays 1000 uLUXs. For transactions bigger than a kilobyte both pay by kilobyte.</source>
+        <translation>트랜잭션이 250바이트 인 경우 사용자 지정 수수료가 1000 uLUXs로 설정되고,&lt;br /&gt;1000 uLUXs 안에는 전체에서 최소 "킬로바이트당" 250 uLUXs 만 지불합니다. 1 킬로바이트보다 큰 트랜잭션의 경우 모두 킬로바이트 단위로 지불합니다.</translation>
     </message>
     <message>
         <source>Paying only the minimum fee is just fine as long as there is less transaction volume than space in the blocks.&lt;br /&gt;But be aware that this can end up in a never confirming transaction once there is more demand for LUX transactions than the network can process.</source>
@@ -3731,8 +3731,8 @@ https://www.transifex.com/216k155/216k155-translations</translation>
         <translation>코인 전송 </translation>
     </message>
     <message>
-        <source>SwiftTX doesn't support sending values that high yet. Transactions are currently limited to %1 PIV.</source>
-        <translation>SwiftTX는 아직 높은 값을 전송하는 것을 지원하지 않습니다. 트랜잭션은 현재 %1 PIV로 제한됩니다.</translation>
+        <source>SwiftTX doesn't support sending values that high yet. Transactions are currently limited to %1 LUX.</source>
+        <translation>SwiftTX는 아직 높은 값을 전송하는 것을 지원하지 않습니다. 트랜잭션은 현재 %1 LUX로 제한됩니다.</translation>
     </message>
 </context>
 <context>
@@ -3868,12 +3868,12 @@ https://www.transifex.com/216k155/216k155-translations</translation>
         <translation>최고 블록이 변경될 경우 명령을 실행하십시오 (명령 내 %s 는 블록 해시로 대체 되었습니다)</translation>
     </message>
     <message>
-        <source>Fees (in PIV/Kb) smaller than this are considered zero fee for relaying (default: %s)</source>
-        <translation>이것보다 작은 수수료 (PIV/Kb)는 중계 수수료가 없는 것으로 간주됩니다 (기본값: %s)</translation>
+        <source>Fees (in LUX/Kb) smaller than this are considered zero fee for relaying (default: %s)</source>
+        <translation>이것보다 작은 수수료 (LUX/Kb)는 중계 수수료가 없는 것으로 간주됩니다 (기본값: %s)</translation>
     </message>
     <message>
-        <source>Fees (in PIV/Kb) smaller than this are considered zero fee for transaction creation (default: %s)</source>
-        <translation>이것보다 작은 수수료 (PIV/Kb)는 트랜잭션 생성 수수료가 없는 것으로 간주됩니다 (기본값: %s)</translation>
+        <source>Fees (in LUX/Kb) smaller than this are considered zero fee for transaction creation (default: %s)</source>
+        <translation>이것보다 작은 수수료 (LUX/Kb)는 트랜잭션 생성 수수료가 없는 것으로 간주됩니다 (기본값: %s)</translation>
     </message>
     <message>
         <source>Flush database activity from memory pool to disk log every &lt;n&gt; megabytes (default: %u)</source>
@@ -4004,12 +4004,12 @@ rpcpassword=%s
         <translation>이 트랜잭션를 위해 난독화 표기된 충분한 금액을 찾을 수 없습니다.</translation>
     </message>
     <message>
-        <source>Unable to locate enough Obfuscation non-denominated funds for this transaction that are not equal 10000 PIV.</source>
-        <translation>이 트랜잭션를 위해 난독화 표기가 안된 충분한 금액을 찾을 수 없습니다. 10000 PIV과 일치하지 않음.</translation>
+        <source>Unable to locate enough Obfuscation non-denominated funds for this transaction that are not equal 10000 LUX.</source>
+        <translation>이 트랜잭션를 위해 난독화 표기가 안된 충분한 금액을 찾을 수 없습니다. 10000 LUX과 일치하지 않음.</translation>
     </message>
     <message>
-        <source>Unable to locate enough funds for this transaction that are not equal 10000 PIV.</source>
-        <translation>트랜잭션에 대한 충분한 금액을 찾을 수 없습니다. 10000 PIV와 같지 않음</translation>
+        <source>Unable to locate enough funds for this transaction that are not equal 10000 LUX.</source>
+        <translation>트랜잭션에 대한 충분한 금액을 찾을 수 없습니다. 10000 LUX와 같지 않음</translation>
     </message>
     <message>
         <source>Use separate SOCKS5 proxy to reach peers via Tor hidden services (default: %s)</source>
@@ -4296,8 +4296,8 @@ rpcpassword=%s
         <translation>블록을 받아오는데 실패했습니다.</translation>
     </message>
     <message>
-        <source>Fee (in PIV/kB) to add to transactions you send (default: %s)</source>
-        <translation>당신이 보내는 트랜잭션에 추가 할 수수료 (PIV/kB) (기본값: %s)</translation>
+        <source>Fee (in LUX/kB) to add to transactions you send (default: %s)</source>
+        <translation>당신이 보내는 트랜잭션에 추가 할 수수료 (LUX/kB) (기본값: %s)</translation>
     </message>
     <message>
         <source>Finalizing transaction.</source>
