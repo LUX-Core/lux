@@ -111,10 +111,13 @@ public:
 
     template <typename Stream, typename Operation>
     inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion) {
+        std::cout << std::endl << std::endl << "SERIALIZATION BLOCK:\n------------------------------------------------------------------------------------------\n";
         READWRITE(*(CBlockHeader*)this);
         READWRITE(vtx);
+        std::cout << "nNonce: " << nNonce << std::endl;
         std::cout << "VTX: " << vtx.size() << std::endl;
-//	if(vtx.size() > 1 && vtx[1].IsCoinStake())
+        std::cout << "------------------------------------------------------------------------------------------" << std::endl << std::endl ;
+	if(vtx.size() > 1 && vtx[1].IsCoinStake())
 		READWRITE(vchBlockSig);
     }
 
