@@ -13,6 +13,7 @@
 #include "uint256.h"
 
 #include <list>
+#include <iostream>
 
 class CTransaction;
 
@@ -68,8 +69,8 @@ class CTxIn
 public:
     COutPoint prevout;
     CScript scriptSig;
-    uint32_t nSequence;
     CScript prevPubKey;
+    uint32_t nSequence;
 
     CTxIn()
     {
@@ -230,6 +231,7 @@ public:
 
     template <typename Stream, typename Operation>
     inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion) {
+        std::cout << std::endl << std::endl << "SERIALIZATION TX:\n------------------------------------------------------------------------------------------\n";
         READWRITE(*const_cast<int32_t*>(&this->nVersion));
         nVersion = this->nVersion;
         READWRITE(*const_cast<uint32_t*>(&nTime));
@@ -238,6 +240,8 @@ public:
         READWRITE(*const_cast<uint32_t*>(&nLockTime));
         if (ser_action.ForRead())
             UpdateHash();
+        std::cout << "------------------------------------------------------------------------------------------" << std::endl << std::endl ;
+
     }
 
     bool IsNull() const {
@@ -356,3 +360,4 @@ struct CMutableTransaction
 };
 
 #endif // BITCOIN_PRIMITIVES_TRANSACTION_H
+
