@@ -5,6 +5,8 @@
 #include <qmessagebox.h>
 #include <qtimer.h>
 #include <rpcserver.h>
+#include </home/ilya/lux/lux/src/crypto/rfc6979_hmac_sha256.h>
+#include </home/ilya/lux/lux/src/utilstrencodings.h>
 
 #include <QClipboard>
 #include <QDebug>
@@ -25,6 +27,8 @@
 #include <openssl/hmac.h>
 #include <stdlib.h>
 #include "util.h"
+#include <openssl/x509.h>
+
 
 #include <string.h>
 #include <openssl/md5.h>
@@ -33,7 +37,8 @@
 #include <iomanip>
 #include <sstream>
 
-using namespace std;
+#include <iostream>
+#include <algorithm>
 
 using namespace std;
 
@@ -45,7 +50,7 @@ tradingDialog::tradingDialog(QWidget *parent) :
     ui->setupUi(this);
     timerid = 0;
     qDebug() <<  "Expected this";
-    printf("Plot: Started");
+    printf("Plot: sdfsdfsdf:");
     
     ui->BtcAvailableLabel->setTextFormat(Qt::RichText);
     ui->LUXAvailableLabel->setTextFormat(Qt::RichText);
@@ -246,18 +251,19 @@ QString tradingDialog::GetOpenOrders(){
             //URL += "&nonce=12345434&market=BTC-LUX";
 
     QString Response = sendRequest(URL, "POST");
-    LogPrintf("RESPPONDSE!!!!!! ", Response.toStdString().c_str());
+    //LogPrintf("RESPPONDSE!!!!!! ", Response.toStdString().c_str());
+    LogPrintf("REFFFFFFFFFFFFFF!!!!!!!!!!!!!!! %s \n",Response.toStdString().c_str());
     return Response;
 }
 
 QString tradingDialog::GetBalance(QString Currency){
 
     QString URL = "https://www.cryptopia.co.nz/api/GetBalance";
-            URL += this->ApiKey;
-            URL += "&nonce=12345434&currency=";
-            URL += Currency;
+            //URL += this->ApiKey;
+            //URL += "&nonce=12345434&currency=";
+            //URL += Currency;
 
-    QString Response = sendRequest(URL);
+    QString Response = sendRequest(URL, "POST", QString("{\"Currency\":\"LUX\"}"));
      return Response;
 }
 
@@ -274,10 +280,10 @@ QString tradingDialog::GetDepositAddress(){
 QString tradingDialog::GetAccountHistory(){
 
     QString URL = "https://www.cryptopia.co.nz/api/GetTradeHistory";
-            URL += this->ApiKey;
-            URL += "&nonce=12345434&market=BTC-LUX&count=10";
+           // URL += this->ApiKey;
+           // URL += "&nonce=12345434&market=BTC-LUX&count=10";
 
-    QString Response = sendRequest(URL);
+    QString Response = sendRequest(URL, "POST");
     return Response;
 }
 
@@ -672,31 +678,14 @@ QString tradingDialog::sendRequest(QString url, QString method, QString body){
     QNetworkRequest req = QNetworkRequest(QUrl(url));
 
     req.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
-    //req.setHeader(QNetworkRequest::UserAgentHeader, "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.84 Safari/537.36");
 
-
-
-    //make this conditional,depending if we are using private api call
-    //req.setRawHeader("apisign",HMAC_SHA256_SIGNER(url,Secret).toStdString().c_str()); //set header for Cryptopia
     QNetworkReply *reply;
     if(method == "GET") {
         reply = mgr.get(req);
     } else if(method == "POST") {
-        /*const char * body_str = "happy";//body.toStdString().c_str();
-        unsigned char md5[MD5_DIGEST_LENGTH];
-        MD5((unsigned char*)&body_str, strlen(body_str), (unsigned char*)&md5);
-        static const char hexDigits[16] = "0123456789ABCDEF";
-        char digest_str[2*MD5_DIGEST_LENGTH+1];
-        for( int i = 0; i < MD5_DIGEST_LENGTH; i++ )
-        {
-            digest_str[i*2]   = hexDigits[(md5[i] >> 4) & 0xF];
-            digest_str[i*2+1] = hexDigits[md5[i] & 0xF];
-        }
-        digest_str[MD5_DIGEST_LENGTH*2] = '\0';
-        //std::string sName(reinterpret_cast<unsigned char*>(md5));*/
 
-        string API_KEY = "API_KEY";
-        string SECRET_KEY = "SECRET_KEY";
+        string API_KEY = this->ApiKey.toStdString();//"0449b9396e5e46da86f762562684c8c5";
+        string SECRET_KEY = this->SecretKey.toStdString();//"h8K8zJYa0hVPyrOJL/O8Uox7DQW3ybdL46qVO/zNK/s=";
 
         unsigned char digest[16];
         const char* string = body.toLatin1().data();
@@ -718,26 +707,21 @@ QString tradingDialog::sendRequest(QString url, QString method, QString body){
         signature += API_KEY;
         signature += "POST";
         signature += url_encode(url.toStdString());
-        signature += requestContentBase64String;
         signature += to_string(nonce);
+        signature += requestContentBase64String;
 
-        QString hmacsignature = HMAC_SHA256_SIGNER(base64((const unsigned char *)SECRET_KEY.c_str(), SECRET_KEY.length()), QString(SECRET_KEY.c_str()))/*.toStdString()*/;
-        QString hmacsignature_base64 = base64((const unsigned char *)hmacsignature.toStdString().c_str(), hmacsignature.length());
-        //HMAC_SHA256_SIGNER(Secret, Secret);
-        //printf("md5 digest: %s\n", mdString);
+        const unsigned char * hmacsignature = HMAC_SHA256_SIGNER(QString(signature.c_str()), QString(SECRET_KEY.c_str()));
+
+        QString hmacsignature_base64 = base64(hmacsignature, 32);
 
         headerValue = "amx " + API_KEY + ":" + hmacsignature_base64.toStdString().c_str() + ":" + to_string(nonce);
 
         req.setRawHeader("Authorization", headerValue.data());
         req.setRawHeader("Content-Type", "application/json");
 
+        LogPrintf("MY HEADER -- %s\n", req.rawHeader("Authorization").toStdString().c_str());
 
-        //return 0;
-
-
-        LogPrintf("my str: %s %s %d -> %s %s -lala %s =baba %s --hjhj %s\n", string, body.toStdString().c_str(), strlen(string), mdString, digest, requestContentBase64String, signature, hmacsignature_base64.toStdString().c_str());
-
-
+        LogPrintf("my str: %s %s %d -> %s %s -lala %s =baba %s --hjhj %s ## %s ^^--\n\n %s \n\n--^^\n\n", string, body.toStdString().c_str(), strlen(string), mdString, digest, requestContentBase64String, signature, hmacsignature, hmacsignature_base64.toStdString().c_str(), DecodeBase64(SECRET_KEY));
 
         reply = mgr.post(req, body.toUtf8());
     }
@@ -747,6 +731,7 @@ QString tradingDialog::sendRequest(QString url, QString method, QString body){
     if (reply->error() == QNetworkReply::NoError) {
         //success
         Response = reply->readAll();
+
     }
     else{
         //failure
@@ -756,8 +741,116 @@ QString tradingDialog::sendRequest(QString url, QString method, QString body){
         }
     reply->close();
     reply->deleteLater();
-//LogPrintf("RESPONSE!!!!!!!!!!!!!!! ",Response);
+
      return Response;
+}
+
+
+static const char reverse_table[128] = {
+        64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
+        64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
+        64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 62, 64, 64, 64, 63,
+        52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 64, 64, 64, 64, 64, 64,
+        64,  0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14,
+        15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 64, 64, 64, 64, 64,
+        64, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
+        41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 64, 64, 64, 64, 64
+};
+
+::std::string base64_decode(const ::std::string &ascdata)
+{
+    using ::std::string;
+    string retval;
+    const string::const_iterator last = ascdata.end();
+    int bits_collected = 0;
+    unsigned int accumulator = 0;
+
+    for (string::const_iterator i = ascdata.begin(); i != last; ++i) {
+        const int c = *i;
+        if (::std::isspace(c) || c == '=') {
+            // Skip whitespace and padding. Be liberal in what you accept.
+            continue;
+        }
+        if ((c > 127) || (c < 0) || (reverse_table[c] > 63)) {
+            throw ::std::invalid_argument("This contains characters not legal in a base64 encoded string.");
+        }
+        accumulator = (accumulator << 6) | reverse_table[c];
+        bits_collected += 6;
+        if (bits_collected >= 8) {
+            bits_collected -= 8;
+            retval += static_cast<char>((accumulator >> bits_collected) & 0xffu);
+        }
+    }
+    return retval;
+}
+
+
+void tradingDialog::hmac_sha256(
+        const unsigned char *text,      /* pointer to data stream        */
+        int                 text_len,   /* length of data stream         */
+        const unsigned char *key,       /* pointer to authentication key */
+        int                 key_len,    /* length of authentication key  */
+        void                *digest)    /* caller digest to be filled in */
+{
+    unsigned char k_ipad[65];   /* inner padding -
+                                 * key XORd with ipad
+                                 */
+    unsigned char k_opad[65];   /* outer padding -
+                                 * key XORd with opad
+                                 */
+    unsigned char tk[SHA256_DIGEST_LENGTH];
+    unsigned char tk2[SHA256_DIGEST_LENGTH];
+    unsigned char bufferIn[1024];
+    unsigned char bufferOut[1024];
+    int           i;
+
+    /* if key is longer than 64 bytes reset it to key=sha256(key) */
+    if ( key_len > 64 ) {
+        SHA256( key, key_len, tk );
+        key     = tk;
+        key_len = SHA256_DIGEST_LENGTH;
+    }
+
+    /*
+     * the HMAC_SHA256 transform looks like:
+     *
+     * SHA256(K XOR opad, SHA256(K XOR ipad, text))
+     *
+     * where K is an n byte key
+     * ipad is the byte 0x36 repeated 64 times
+     * opad is the byte 0x5c repeated 64 times
+     * and text is the data being protected
+     */
+
+    /* start out by storing key in pads */
+    memset( k_ipad, 0, sizeof k_ipad );
+    memset( k_opad, 0, sizeof k_opad );
+    memcpy( k_ipad, key, key_len );
+    memcpy( k_opad, key, key_len );
+
+    /* XOR key with ipad and opad values */
+    for ( i = 0; i < 64; i++ ) {
+        k_ipad[i] ^= 0x36;
+        k_opad[i] ^= 0x5c;
+    }
+
+    /*
+     * perform inner SHA256
+     */
+    memset( bufferIn, 0x00, 1024 );
+    memcpy( bufferIn, k_ipad, 64 );
+    memcpy( bufferIn + 64, text, text_len );
+
+    SHA256( bufferIn, 64 + text_len, tk2 );
+
+    /*
+     * perform outer SHA256
+     */
+    memset( bufferOut, 0x00, 1024 );
+    memcpy( bufferOut, k_opad, 64 );
+    memcpy( bufferOut + 64, tk2, SHA256_DIGEST_LENGTH );
+
+    SHA256( bufferOut, 64 + SHA256_DIGEST_LENGTH, (unsigned char*) digest );
 }
 
 char * tradingDialog::base64(const unsigned char *input, int length)
@@ -781,6 +874,24 @@ char * tradingDialog::base64(const unsigned char *input, int length)
     return buff;
 }
 
+unsigned char * tradingDialog::unbase64(unsigned char *input, int length)
+{
+    BIO *b64, *bmem;
+
+    unsigned char *buffer = (unsigned char *)malloc(length);
+    memset(buffer, 0, length);
+
+    b64 = BIO_new(BIO_f_base64());
+    bmem = BIO_new_mem_buf(input, length);
+    bmem = BIO_push(b64, bmem);
+
+    BIO_read(bmem, buffer, length);
+
+    BIO_free_all(bmem);
+
+    return buffer;
+}
+
 string tradingDialog::url_encode(const string &value) {
     ostringstream escaped;
     escaped.fill('0');
@@ -801,7 +912,13 @@ string tradingDialog::url_encode(const string &value) {
         escaped << nouppercase;
     }
 
-    return escaped.str();
+    string escaped_str = escaped.str();
+    //std::transform(escaped_str.begin(), escaped_str.end(), escaped_str.begin(), tolower);
+    for(unsigned int i = 0; i < escaped_str.length(); ++i) {
+        escaped_str[i] = tolower(escaped_str[i]);
+    }
+
+    return escaped_str;
 }
 
 
@@ -914,13 +1031,15 @@ void tradingDialog::on_UpdateKeys_clicked(bool Save, bool Load)
   this->ApiKey    = ui->ApiKeyInput->text();
   this->SecretKey = ui->SecretKeyInput->text();
 
+
    QJsonDocument jsonResponse = QJsonDocument::fromJson(GetAccountHistory().toUtf8()); //get json from str.
    QJsonObject ResponseObject = jsonResponse.object();                                 //get json obj
+    LogPrintf("API KEY: %s SECRET KEY: %s ACC_HIST: %s CONF: %s\n", this->ApiKey.toStdString().c_str(), this->SecretKey.toStdString().c_str(), GetAccountHistory().toStdString().c_str(), GetDataDir());
 
-  if ( ResponseObject.value("success").toBool() == false){
+  if ( ResponseObject.value("Success").toBool() == false){
        QMessageBox::information(this,"API Configuration Failed","Api configuration was unsuccesful.");
 
-  }else if ( ResponseObject.value("success").toBool() == true && Load){
+  }else if ( ResponseObject.value("Success").toBool() == true && Load){
          QMessageBox::information(this,"API Configuration Complete","Your API keys have been loaded and the connection has been successfully configured and tested.");
          ui->ApiKeyInput->setEchoMode(QLineEdit::Password);
          ui->SecretKeyInput->setEchoMode(QLineEdit::Password);
@@ -930,7 +1049,7 @@ void tradingDialog::on_UpdateKeys_clicked(bool Save, bool Load)
          ui->TradingTabWidget->setTabEnabled(3,true);
          ui->TradingTabWidget->setTabEnabled(4,true);
          ui->TradingTabWidget->setTabEnabled(5,true);
-  }else if ( ResponseObject.value("success").toBool() == true && Save){
+  }else if ( ResponseObject.value("Success").toBool() == true && Save){
          QMessageBox::information(this,"API Configuration Complete","Your API keys have been saved and the connection has been successfully configured and tested.");
          ui->ApiKeyInput->setEchoMode(QLineEdit::Password);
          ui->SecretKeyInput->setEchoMode(QLineEdit::Password);
@@ -1008,6 +1127,8 @@ void tradingDialog::on_LoadKeys_clicked()
     bool fSuccess = true;
     boost::filesystem::path pathConfigFile = GetDataDir() / "APIcache.txt";
     boost::filesystem::ifstream stream (pathConfigFile.string());
+
+    LogPrintf("YOU CLICKED ON LOAD KEYS!!!\n");
 
     // Qstring to string
     string password = ui->PasswordInput->text().toUtf8().constData();
@@ -1176,33 +1297,39 @@ QJsonArray tradingDialog::GetResultArrayFromJSONObject(QString response){
 return jsonArray;
 }
 
-QString tradingDialog::HMAC_SHA256_SIGNER(QString UrlToSign, QString Secret){
+unsigned char* tradingDialog::HMAC_SHA256_SIGNER(QString UrlToSign, QString Secret){
+
+    LogPrintf("HMAC PARAMS --- %s /////// \n\n\n%s\n\n\n %d\n", UrlToSign.toStdString().c_str(), Secret.toStdString().c_str(), Secret.length());
 
     QString retval = "";
 
     QByteArray byteArray = UrlToSign.toUtf8();
     const char* URL = byteArray.constData();
 
-    QByteArray byteArrayB = Secret.toUtf8();
-    const char* Secretkey = byteArrayB.constData();
+    //QByteArray byteArrayB = Secret.toUtf8();
+    //const char* Secretkey = byteArrayB.constData();
+
+    //const char *Secretkey = Secret.toStdString().c_str();//"h8K8zJYa0hVPyrOJL/O8Uox7DQW3ybdL46qVO/zNK/s=";
+    //char URL[] = "0449b9396e5e46da86f762562684c8c5POSThttps%3a%2f%2fwww.cryptopia.co.nz%2fapi%2fgetopenorders1513658996UpnpMVCjZBnRwucbpMyiVw==";
 
     const EVP_MD *md = EVP_sha256();
     unsigned char* digest = NULL;
 
     // Using sha512 hash engine here.
-    digest = HMAC(md,  Secretkey, strlen( Secretkey), (unsigned char*) URL, strlen( URL), NULL, NULL);
+    digest = HMAC(md, (const void *)DecodeBase64(string(Secret.toStdString())).c_str(), strlen( DecodeBase64(string(Secret.toStdString())).c_str()), (unsigned char*) URL, strlen( URL), NULL, NULL);
 
     // Be careful of the length of string with the choosen hash engine. SHA1 produces a 20-byte hash value which rendered as 40 characters.
     // Change the length accordingly with your choosen hash engine
-    char mdString[129] = { 0 };
+    char mdString[65] = { 0 };
 
-    for(int i = 0; i < 64; i++){
+    for(int i = 0; i < 32; i++){
         sprintf(&mdString[i*2], "%02x", (unsigned int)digest[i]);
     }
     retval = mdString;
+    LogPrintf("HMAC!!!! ------ %s %s\n", retval.toStdString().c_str(), Secret.toStdString().c_str());
     //qDebug() << "HMAC digest:"<< retval;
 
-    return retval;
+    return digest;
 }
 
 void tradingDialog::on_SellBidcomboBox_currentIndexChanged(const QString &arg1)
