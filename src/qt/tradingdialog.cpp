@@ -2,11 +2,11 @@
 #include "ui_tradingdialog.h"
 #include "clientmodel.h"
 #include "walletmodel.h"
-#include <qmessagebox.h>
-#include <qtimer.h>
-#include <rpcserver.h>
-#include </home/ilya/lux/lux/src/crypto/rfc6979_hmac_sha256.h>
-#include </home/ilya/lux/lux/src/utilstrencodings.h>
+#include "qmessagebox.h"
+#include "qtimer.h"
+#include "rpcserver.h"
+#include "crypto/rfc6979_hmac_sha256.h"
+
 
 #include <QClipboard>
 #include <QDebug>
