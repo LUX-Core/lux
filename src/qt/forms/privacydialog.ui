@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>991</width>
-    <height>568</height>
+    <height>587</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -58,7 +58,7 @@
           <bool>true</bool>
          </property>
          <property name="text">
-          <string>Zerocoin LUX (zLUX)</string>
+          <string>Zerocoin + LUX (zLUX)</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>
