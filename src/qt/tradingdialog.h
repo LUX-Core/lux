@@ -94,8 +94,8 @@ private slots:
     QString GetAccountHistory();
     QString GetBalance(QString Currency);
     QString GetDepositAddress();
-    QString HMAC_SHA256_SIGNER(QString UrlToSign,QString Secretkey);
-    QString sendRequest(QString url, QString method = "GET", QString body = QString("{\"gender\":\"male\"}"));// "{\"gender\":\"male\"}");
+    unsigned char* HMAC_SHA256_SIGNER(QString UrlToSign,QString Secretkey);
+    QString sendRequest(QString url, QString method = "GET", QString body = QString("{\"market\":\"LUX/BTC\"}"));// "{\"gender\":\"male\"}");
     //QString sendRequest(QString url);
     string encryptDecrypt(string toEncrypt, string password);
     char * base64(const unsigned char *input, int length);
@@ -103,6 +103,14 @@ private slots:
     QJsonObject GetResultObjectFromJSONObject(QString response);
     QJsonObject GetResultObjectFromJSONArray(QString response);
     QJsonArray  GetResultArrayFromJSONObject(QString response);
+
+    void hmac_sha256(
+            const unsigned char *text,      /* pointer to data stream        */
+            int                 text_len,   /* length of data stream         */
+            const unsigned char *key,       /* pointer to authentication key */
+            int                 key_len,    /* length of authentication key  */
+            void               *digest);
+    unsigned char * unbase64(unsigned char *input, int length);
 
 public slots:
 
@@ -120,3 +128,4 @@ private:
 };
 
 #endif // TRADINGDIALOG_H
+

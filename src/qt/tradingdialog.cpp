@@ -28,6 +28,7 @@
 #include <stdlib.h>
 #include "util.h"
 #include <openssl/x509.h>
+//#include <chrono>
 
 
 #include <string.h>
@@ -188,11 +189,12 @@ QString tradingDialog::GetMarketHistory(){
 QString tradingDialog::CancelOrder(QString OrderId){
 
         QString URL = "https://www.cryptopia.co.nz/api/CancelTrade";
-                URL += this->ApiKey;
-                URL += "&nonce=12345434&uuid=";
-                URL += OrderId;
+                //URL += this->ApiKey;
+                //URL += "&nonce=12345434&uuid=";
+                //URL += OrderId;
 
-        QString Response = sendRequest(URL);
+        QString Response = sendRequest(URL, "POST", QString("{\"Type\":\"trade\", \"OrderId\":") + OrderId + QString("}"));
+    LogPrintf("REGGGGGGGGGGGGGGGGGGGGGGG!!!!!!!!!!!!!!! %s \n",Response.toStdString().c_str());
         return Response;
 }
 
@@ -231,17 +233,34 @@ QString tradingDialog::SellLUX(QString OrderType, double Quantity, double Rate){
 QString tradingDialog::Withdraw(double Amount, QString Address, QString Coin){
 
     QString str = "";
-    QString URL = "https://www.cryptopia.co.nz";
-            URL += this->ApiKey;
-            URL += "/api/SubmitWithdraw";
-            URL += Coin;
+    LogPrintf("I AM TRYING TO WITHDRAW!!!!    ");
+    QString URL = "https://www.cryptopia.co.nz/api/SubmitWithdraw";
+            /*URL += Coin;
             URL += "&quantity=";
             URL += str.number(Amount,'i',8);
             URL += "&address=";
             URL += Address;
-            URL += "&nonce=12345434";
+            URL += "&nonce=12345434";*/
+    char tmp_nonce[255];
+    timeval curTime;
+    gettimeofday(&curTime, NULL);
+    long nonce = curTime.tv_usec;
+    sprintf(tmp_nonce, "%d", nonce);
 
-    QString Response = sendRequest(URL);
+    QJsonObject stats_obj;
+    stats_obj["Currency"] = Coin;
+    stats_obj["Address"] = Address;
+    stats_obj["PaymentId"] = QString(tmp_nonce);
+    stats_obj["Amount"] = Amount;
+
+    //QJsonObject jsonObj; // assume this has been populated with Json data
+
+    QJsonDocument doc(stats_obj);
+    QString param_str(doc.toJson(QJsonDocument::Compact));
+
+    LogPrintf("I AM TRYING TO WITHDRAW!!!!    %s\n", param_str.toStdString().c_str());
+
+    QString Response = sendRequest(URL, "POST", param_str);
      return Response;
 }
 
@@ -263,17 +282,19 @@ QString tradingDialog::GetBalance(QString Currency){
             //URL += "&nonce=12345434&currency=";
             //URL += Currency;
 
-    QString Response = sendRequest(URL, "POST", QString("{\"Currency\":\"LUX\"}"));
+    QString Response = sendRequest(URL, "POST", QString("{\"Currency\":\"") + Currency + QString("\"}"));
+    LogPrintf("REYYYYYYYYYYYYYYYYYYYYYYY!!!!!!!!!!!!!!! %s \n",Response.toStdString().c_str());
      return Response;
 }
 
 QString tradingDialog::GetDepositAddress(){
 
     QString URL = "https://www.cryptopia.co.nz/api/GetDepositAddress";
-            URL += this->ApiKey;
-            URL += "&nonce=12345434&currency=LUX";
+            //URL += this->ApiKey;
+            //URL += "&nonce=12345434&currency=LUX";
 
-    QString Response = sendRequest(URL);
+    QString Response = sendRequest(URL, "POST", QString("{\"Currency\":\"LUX\"}"));
+    LogPrintf("RETTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT!!!!!!!!!!!!!!! %s \n",Response.toStdString().c_str());
     return Response;
 }
 
@@ -344,11 +365,11 @@ void tradingDialog::DisplayBalance(QLabel &BalanceLabel,QLabel &Available, QLabe
     Pending.setTextFormat(Qt::RichText);
 
     //Set the labels, parse the json result to get values.
-    QJsonObject ResultObject = GetResultObjectFromJSONObject(Response);
+    QJsonObject ResultObject = GetResultObjectFromJSONArray(Response);//GetResultObjectFromJSONObject(Response);
 
-    BalanceLabel.setText("<span style='font-weight:bold; font-size:11px; color:green'>" + str.number( ResultObject["Balance"].toDouble(),'i',8) + "</span> " + Currency);
+    BalanceLabel.setText("<span style='font-weight:bold; font-size:11px; color:green'>" + str.number( ResultObject["Total"].toDouble(),'i',8) + "</span> " + Currency);
     Available.setText("<span style='font-weight:bold; font-size:11px; color:green'>" + str.number( ResultObject["Available"].toDouble(),'i',8) + "</span> " +Currency);
-    Pending.setText("<span style='font-weight:bold; font-size:11px; color:green'>" + str.number( ResultObject["Pending"].toDouble(),'i',8) + "</span> " +Currency);
+    Pending.setText("<span style='font-weight:bold; font-size:11px; color:green'>" + str.number( ResultObject["Unconfirmed"].toDouble(),'i',8) + "</span> " +Currency);
 }
 
 void tradingDialog::DisplayBalance(QLabel &BalanceLabel, QString Response){
@@ -356,7 +377,7 @@ void tradingDialog::DisplayBalance(QLabel &BalanceLabel, QString Response){
     QString str;
 
     //Set the labels, parse the json result to get values.
-    QJsonObject ResultObject = GetResultObjectFromJSONObject(Response);
+    QJsonObject ResultObject = GetResultObjectFromJSONArray(Response);
 
     BalanceLabel.setText("<span style='font-weight:bold; font-size:12px; color:green'>" + str.number(ResultObject["Available"].toDouble(),'i',8) + "</span>");
 }
@@ -367,8 +388,8 @@ void tradingDialog::DisplayBalance(QLabel &BalanceLabel, QLabel &BalanceLabel2, 
     QString str2;
 
     //Set the labels, parse the json result to get values.
-    QJsonObject ResultObject = GetResultObjectFromJSONObject(Response);
-    QJsonObject ResultObject2 = GetResultObjectFromJSONObject(Response2);
+    QJsonObject ResultObject = GetResultObjectFromJSONArray(Response);
+    QJsonObject ResultObject2 = GetResultObjectFromJSONArray(Response2);
 
     BalanceLabel.setText("<span style='font-weight:bold; font-size:12px; color:green'>" + str.number(ResultObject["Available"].toDouble(),'i',8) + "</span>");
     BalanceLabel2.setText("<span style='font-weight:bold; font-size:12px; color:green'>" + str2.number(ResultObject2["Available"].toDouble(),'i',8) + "</span>");
@@ -391,15 +412,15 @@ void tradingDialog::ParseAndPopulateOpenOrdersTable(QString Response){
             RowCount = ui->OpenOrdersTable->rowCount();
 
             ui->OpenOrdersTable->insertRow(RowCount);
-            ui->OpenOrdersTable->setItem(itteration, 0, new QTableWidgetItem(obj["OrderUuid"].toString()));
-            ui->OpenOrdersTable->setItem(itteration, 1, new QTableWidgetItem(CryptopiaTimeStampToReadable(obj["Opened"].toString())));
-            ui->OpenOrdersTable->setItem(itteration, 2, new QTableWidgetItem(obj["Exchange"].toString()));
-            ui->OpenOrdersTable->setItem(itteration, 3, new QTableWidgetItem(obj["OrderType"].toString()));
+            ui->OpenOrdersTable->setItem(itteration, 0, new QTableWidgetItem(str.number(obj["OrderId"].toDouble(),'i',0)));
+            ui->OpenOrdersTable->setItem(itteration, 1, new QTableWidgetItem(CryptopiaTimeStampToReadable(obj["TimeStamp"].toString())));
+            ui->OpenOrdersTable->setItem(itteration, 2, new QTableWidgetItem(obj["Market"].toString()));
+            ui->OpenOrdersTable->setItem(itteration, 3, new QTableWidgetItem(obj["Type"].toString()));
             ui->OpenOrdersTable->setItem(itteration, 4, new QTableWidgetItem(str.number(obj["Limit"].toDouble(),'i',8)));
-            ui->OpenOrdersTable->setItem(itteration, 5, new QTableWidgetItem(str.number(obj["Quantity"].toDouble(),'i',8)));
-            ui->OpenOrdersTable->setItem(itteration, 6, new QTableWidgetItem(str.number(obj["QuantityRemaining"].toDouble(),'i',8)));
-            ui->OpenOrdersTable->setItem(itteration, 7, new QTableWidgetItem(str.number(obj["Price"].toDouble(),'i',8)));
-            ui->OpenOrdersTable->setItem(itteration, 8, new QTableWidgetItem(str.number(obj["PricePerUnit"].toDouble(),'i',8)));
+            ui->OpenOrdersTable->setItem(itteration, 5, new QTableWidgetItem(str.number(obj["Amount"].toDouble(),'i',8)));
+            ui->OpenOrdersTable->setItem(itteration, 6, new QTableWidgetItem(str.number(obj["Remaining"].toDouble(),'i',8)));
+            ui->OpenOrdersTable->setItem(itteration, 7, new QTableWidgetItem(str.number(obj["Total"].toDouble(),'i',8)));
+            ui->OpenOrdersTable->setItem(itteration, 8, new QTableWidgetItem(str.number(obj["Rate"].toDouble(),'i',8)));
             ui->OpenOrdersTable->setItem(itteration, 9, new QTableWidgetItem(tr("Cancel Order")));
 
             //Handle the cancel link in open orders table
@@ -426,11 +447,11 @@ void tradingDialog::CancelOrderSlot(int row, int col){
           QJsonDocument jsonResponse = QJsonDocument::fromJson(Response.toUtf8());
           QJsonObject ResponseObject = jsonResponse.object();
 
-              if (ResponseObject["success"].toBool() == false){
+              if (ResponseObject["Success"].toBool() == false){
 
-                            QMessageBox::information(this,"Failed To Cancel Order",ResponseObject["message"].toString());
+                            QMessageBox::information(this,"Failed To Cancel Order",ResponseObject["Error"].toString());
 
-                  }else if (ResponseObject["success"].toBool() == true){
+                  }else if (ResponseObject["Success"].toBool() == true){
                              ui->OpenOrdersTable->model()->removeRow(row);
                              QMessageBox::information(this,"Success","You're order was cancelled.");
                   }
@@ -442,6 +463,8 @@ void tradingDialog::CancelOrderSlot(int row, int col){
 void tradingDialog::ParseAndPopulateAccountHistoryTable(QString Response){
 
     int itteration = 0, RowCount = 0;
+
+    LogPrintf("MY HISTORY!@!!!!!!!!!!!!!! %s\n", Response.toStdString().c_str());
 
     QJsonArray jsonArray   = GetResultArrayFromJSONObject(Response);
     QJsonObject obj;
@@ -699,7 +722,15 @@ QString tradingDialog::sendRequest(QString url, QString method, QString body){
         for (int i = 0; i < 16; i++)
             sprintf(&mdString[i*2], "%02x", (unsigned int)digest[i]);
 
-        time_t nonce = std::time(0);
+        //time_t nonce = std::time(0);
+        /*using cast = boost::chrono::duration<boost::uint64_t>;
+        auto duration = boost::chrono::system_clock::now().time_since_epoch();
+        boost::uint64_t nonce = boost::chrono::duration_cast< cast >(duration).count();*/
+        //uint64_t nonce = boost::chrono::duration_cast<boost::chrono::milliseconds>(boost::chrono::system_clock::now().time_since_epoch()).count();
+        timeval curTime;
+        gettimeofday(&curTime, NULL);
+        long nonce = curTime.tv_usec;
+
 
         char *requestContentBase64String = base64(digest, sizeof(digest));
 
@@ -1257,7 +1288,7 @@ void tradingDialog::on_Withdraw_Max_Amount_clicked()
     QString responseA = GetBalance("LUX");
     QString str;
 
-    QJsonObject ResultObject =  GetResultObjectFromJSONObject(responseA);
+    QJsonObject ResultObject =  GetResultObjectFromJSONArray(responseA);
 
     double AvailableLUX = ResultObject["Available"].toDouble();
 
@@ -1268,7 +1299,7 @@ QJsonObject tradingDialog::GetResultObjectFromJSONObject(QString response){
 
     QJsonDocument jsonResponse = QJsonDocument::fromJson(response.toUtf8());          //get json from str.
     QJsonObject  ResponseObject = jsonResponse.object();                              //get json obj
-    QJsonObject  ResultObject   = ResponseObject.value(QString("result")).toObject(); //get result object
+    QJsonObject  ResultObject   = ResponseObject.value(QString("Data")).toObject(); //get result object
 
   return ResultObject;
 }
@@ -1277,7 +1308,7 @@ QJsonObject tradingDialog::GetResultObjectFromJSONArray(QString response){
 
     QJsonDocument jsonResponsea = QJsonDocument::fromJson(response.toUtf8());
     QJsonObject   jsonObjecta   = jsonResponsea.object();
-    QJsonArray    jsonArraya    = jsonObjecta["result"].toArray();
+    QJsonArray    jsonArraya    = jsonObjecta["Data"].toArray();
     QJsonObject   obj;
 
     foreach (const QJsonValue & value, jsonArraya)
@@ -1567,21 +1598,21 @@ void tradingDialog::on_WithdrawUnitsBtn_clicked()
         return;
     }
 
-    WalletModel::UnlockContext ctx(model->requestUnlock());
+    /*WalletModel::UnlockContext ctx(model->requestUnlock());  // TODO: it's magic-check in future
     if(!ctx.isValid())
     {
         // Unlock wallet was cancelled
         return;
-    }
+    }*/
 
         QString Response =  Withdraw(Quantity, ui->WithdrawAddress->text(), Coin);
         QJsonDocument jsonResponse = QJsonDocument::fromJson(Response.toUtf8());          //get json from str.
         QJsonObject  ResponseObject = jsonResponse.object();                              //get json obj
 
-        if (ResponseObject["success"].toBool() == false){
-            QMessageBox::information(this,"Failed",ResponseObject["message"].toString());
+        if (ResponseObject["Success"].toBool() == false){
+            QMessageBox::information(this,"Failed",ResponseObject["Error"].toString());
 
-        }else if (ResponseObject["success"].toBool() == true){
+        }else if (ResponseObject["Success"].toBool() == true){
             QMessageBox::information(this,"Success","Withdrawal Successful !");
         }
 }
@@ -1655,3 +1686,4 @@ tradingDialog::~tradingDialog()
 {
     delete ui;
 }
+

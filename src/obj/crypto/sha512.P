@@ -1,6 +1,6 @@
 obj/crypto/sha512.o: crypto/sha512.cpp \
- /home/luxcore/luxtrial/src/crypto/sha512.h \
- /home/luxcore/luxtrial/src/crypto/common.h
+ /home/k155/lux-ex/src/crypto/sha512.h \
+ /home/k155/lux-ex/src/crypto/common.h
 crypto/sha512.cpp :
- /home/luxcore/luxtrial/src/crypto/sha512.h :
- /home/luxcore/luxtrial/src/crypto/common.h :
+ /home/k155/lux-ex/src/crypto/sha512.h :
+ /home/k155/lux-ex/src/crypto/common.h :

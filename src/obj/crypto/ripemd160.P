@@ -1,6 +1,6 @@
 obj/crypto/ripemd160.o: crypto/ripemd160.cpp \
- /home/luxcore/luxtrial/src/crypto/ripemd160.h \
- /home/luxcore/luxtrial/src/crypto/common.h
+ /home/k155/lux-ex/src/crypto/ripemd160.h \
+ /home/k155/lux-ex/src/crypto/common.h
 crypto/ripemd160.cpp :
- /home/luxcore/luxtrial/src/crypto/ripemd160.h :
- /home/luxcore/luxtrial/src/crypto/common.h :
+ /home/k155/lux-ex/src/crypto/ripemd160.h :
+ /home/k155/lux-ex/src/crypto/common.h :
