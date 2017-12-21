@@ -278,12 +278,6 @@ crypto_libbitcoin_crypto_a_SOURCES = \
   crypto/scrypt.cpp \
   crypto/ripemd160.cpp \
   crypto/aes_helper.c \
-  crypto/blake.c \
-  crypto/bmw.c \
-  crypto/groestl.c \
-  crypto/jh.c \
-  crypto/keccak.c \
-  crypto/skein.c \
   crypto/common.h \
   crypto/sha256.h \
   crypto/sha512.h \
@@ -293,11 +287,7 @@ crypto_libbitcoin_crypto_a_SOURCES = \
   crypto/scrypt.h \
   crypto/sha1.h \
   crypto/ripemd160.h \
-  crypto/sph_blake.h \
-  crypto/sph_bmw.h \
-  crypto/sph_groestl.h \
   crypto/sph_jh.h \
-  crypto/sph_keccak.h \
   crypto/sph_skein.h \
   crypto/sph_types.h \
   crypto/sph_fugue.h \
@@ -308,8 +298,8 @@ crypto_libbitcoin_crypto_a_SOURCES = \
   crypto/fugue.c \
   crypto/gost.c \
   crypto/jh.c \
-  crypto/skein.c \
-  hashblock.h
+  crypto/skein.c 
+  
 
 # univalue JSON library
 univalue_libbitcoin_univalue_a_SOURCES = \
