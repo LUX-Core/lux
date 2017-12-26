@@ -4,7 +4,6 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "pow.h"
-
 #include "chain.h"
 #include "chainparams.h"
 #include "main.h"
@@ -14,42 +13,41 @@
 
 #include <math.h>
 
+// Lux modified: find last block index up to pindex
+const CBlockIndex* GetLastBlockIndex(const CBlockIndex* pindex, bool fProofOfStake)
+{
+    while (pindex && pindex->pprev && (pindex->IsProofOfStake() != fProofOfStake))
+        pindex = pindex->pprev;
+    return pindex;
+}
 
 unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHeader* pblock, bool fProofOfStake)
 {
-    /* current difficulty formula, lux - DarkGravity v3, written by Evan Duffield - evan@dashpay.io */
-    const CBlockIndex* BlockLastSolved = pindexLast;
-//    const CBlockIndex* BlockReading = pindexLast;
-//    int64_t nActualTimespan = 0;
-//    int64_t LastBlockTime = 0;
-//    int64_t PastBlocksMin = 24;
-//    int64_t PastBlocksMax = 24;
-//    int64_t CountBlocks = 0;
-//    uint256 PastDifficultyAverage;
-//    uint256 PastDifficultyAveragePrev;
+    int64_t nTargetSpacing = 120;
+    int64_t nTargetTimespan = 30 * 60;
     uint256 bnTargetLimit(Params().ProofOfWorkLimit());
     if(fProofOfStake) {
         bnTargetLimit = GetProofOfStakeLimit(pindexLast->nHeight);
     }
-    int64_t nTargetSpacing = 120;
-    int64_t nTargetTimespan = 30 * 60;
 
-    if (BlockLastSolved == NULL)
+    if (pindexLast == nullptr) // Lux Modified
         return bnTargetLimit.GetCompact();
 
-//    if (pindexLast->nHeight > Params().LAST_POW_BLOCK()) {
+    const CBlockIndex* pindexPrev = GetLastBlockIndex(pindexLast, fProofOfStake);
+    if (pindexPrev->pprev == nullptr)
+        return bnTargetLimit.GetCompact(); // first block
+    const CBlockIndex* pindexPrevPrev = GetLastBlockIndex(pindexPrev->pprev, fProofOfStake);
+    if (pindexPrevPrev->pprev == nullptr)
+        return bnTargetLimit.GetCompact(); // second block
 
-//        int64_t nActualSpacing = 0;
-//        if (pindexLast->nHeight != 0)
-//            nActualSpacing = pindexLast->GetBlockTime() - pindexLast->pprev->GetBlockTime();
-    int64_t nActualSpacing = pindexLast->GetBlockTime() - pindexLast->pprev->GetBlockTime();
+    int64_t nActualSpacing = pindexPrev->GetBlockTime() - pindexPrevPrev->GetBlockTime();
     if (nActualSpacing < 0)
         nActualSpacing = nTargetSpacing;
 
     // ppcoin: target change every block
     // ppcoin: retarget with exponential moving toward target spacing
     uint256 bnNew;
-    bnNew.SetCompact(pindexLast->nBits);
+    bnNew.SetCompact(pindexPrev->nBits); // Replaced pindexLast to avoid bugs
 
     int64_t nInterval = nTargetTimespan / nTargetSpacing;
     bnNew *= ((nInterval - 1) * nTargetSpacing + nActualSpacing + nActualSpacing);
@@ -59,54 +57,6 @@ unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHead
         bnNew = bnTargetLimit;
 
     return bnNew.GetCompact();
-//    }
-
-//    for (unsigned int i = 1; BlockReading && BlockReading->nHeight > 0; i++) {
-//        if (PastBlocksMax > 0 && i > PastBlocksMax) {
-//            break;
-//        }
-//        CountBlocks++;
-//
-//        if (CountBlocks <= PastBlocksMin) {
-//            if (CountBlocks == 1) {
-//                PastDifficultyAverage.SetCompact(BlockReading->nBits);
-//            } else {
-//                PastDifficultyAverage = ((PastDifficultyAveragePrev * CountBlocks) + (uint256().SetCompact(BlockReading->nBits))) / (CountBlocks + 1);
-//            }
-//            PastDifficultyAveragePrev = PastDifficultyAverage;
-//        }
-//
-//        if (LastBlockTime > 0) {
-//            int64_t Diff = (LastBlockTime - BlockReading->GetBlockTime());
-//            nActualTimespan += Diff;
-//        }
-//        LastBlockTime = BlockReading->GetBlockTime();
-//
-//        if (BlockReading->pprev == NULL) {
-//            assert(BlockReading);
-//            break;
-//        }
-//        BlockReading = BlockReading->pprev;
-//    }
-//
-//    uint256 bnNew(PastDifficultyAverage);
-//
-//    int64_t _nTargetTimespan = CountBlocks * Params().TargetSpacing();
-//
-//    if (nActualTimespan < _nTargetTimespan / 3)
-//        nActualTimespan = _nTargetTimespan / 3;
-//    if (nActualTimespan > _nTargetTimespan * 3)
-//        nActualTimespan = _nTargetTimespan * 3;
-//
-//    // Retarget
-//    bnNew *= nActualTimespan;
-//    bnNew /= _nTargetTimespan;
-//
-//    if (bnNew > Params().ProofOfWorkLimit()) {
-//        bnNew = Params().ProofOfWorkLimit();
-//    }
-//
-//    return bnNew.GetCompact();
 }
 
 bool CheckProofOfWork(uint256 hash, unsigned int nBits)
