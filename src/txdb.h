@@ -1,6 +1,5 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2014 The Bitcoin developers
-// Copyright (c) 2016-2017 The LUX developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -9,7 +8,6 @@
 
 #include "leveldbwrapper.h"
 #include "main.h"
-#include "primitives/zerocoin.h"
 
 #include <map>
 #include <string>
@@ -64,30 +62,7 @@ public:
     bool WriteTxIndex(const std::vector<std::pair<uint256, CDiskTxPos> >& list);
     bool WriteFlag(const std::string& name, bool fValue);
     bool ReadFlag(const std::string& name, bool& fValue);
-    bool WriteInt(const std::string& name, int nValue);
-    bool ReadInt(const std::string& name, int& nValue);
     bool LoadBlockIndexGuts();
-};
-
-class CZerocoinDB : public CLevelDBWrapper
-{
-public:
-    CZerocoinDB(size_t nCacheSize, bool fMemory = false, bool fWipe = false);
-
-private:
-    CZerocoinDB(const CZerocoinDB&);
-    void operator=(const CZerocoinDB&);
-
-public:
-    bool WriteCoinMint(const libzerocoin::PublicCoin& pubCoin, const uint256& txHash);
-    bool ReadCoinMint(const CBigNum& bnPubcoin, uint256& txHash);
-    bool WriteCoinSpend(const CBigNum& bnSerial, const uint256& txHash);
-    bool ReadCoinSpend(const CBigNum& bnSerial, uint256& txHash);
-    bool EraseCoinMint(const CBigNum& bnPubcoin);
-    bool EraseCoinSpend(const CBigNum& bnSerial);
-    bool WriteAccumulatorValue(const uint32_t& nChecksum, const CBigNum& bnValue);
-    bool ReadAccumulatorValue(const uint32_t& nChecksum, CBigNum& bnValue);
-    bool EraseAccumulatorValue(const uint32_t& nChecksum);
 };
 
 #endif // BITCOIN_TXDB_H

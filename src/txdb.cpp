@@ -1,6 +1,5 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2014 The Bitcoin developers
-// Copyright (c) 2016-2017 The LUX developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -9,14 +8,12 @@
 #include "main.h"
 #include "pow.h"
 #include "uint256.h"
-#include "accumulators.h"
 
 #include <stdint.h>
 
 #include <boost/thread.hpp>
 
 using namespace std;
-using namespace libzerocoin;
 
 void static BatchWriteCoins(CLevelDBBatch& batch, const uint256& hash, const CCoins& coins)
 {
@@ -198,16 +195,6 @@ bool CBlockTreeDB::ReadFlag(const std::string& name, bool& fValue)
     return true;
 }
 
-bool CBlockTreeDB::WriteInt(const std::string& name, int nValue)
-{
-    return Write(std::make_pair('I', name), nValue);
-}
-
-bool CBlockTreeDB::ReadInt(const std::string& name, int& nValue)
-{
-    return Read(std::make_pair('I', name), nValue);
-}
-
 bool CBlockTreeDB::LoadBlockIndexGuts()
 {
     boost::scoped_ptr<leveldb::Iterator> pcursor(NewIterator());
@@ -217,7 +204,6 @@ bool CBlockTreeDB::LoadBlockIndexGuts()
     pcursor->Seek(ssKeySet.str());
 
     // Load mapBlockIndex
-    uint256 nPreviousCheckpoint;
     while (pcursor->Valid()) {
         boost::this_thread::interruption_point();
         try {
@@ -247,11 +233,6 @@ bool CBlockTreeDB::LoadBlockIndexGuts()
                 pindexNew->nStatus = diskindex.nStatus;
                 pindexNew->nTx = diskindex.nTx;
 
-                //zerocoin
-                pindexNew->nAccumulatorCheckpoint = diskindex.nAccumulatorCheckpoint;
-                pindexNew->mapZerocoinSupply = diskindex.mapZerocoinSupply;
-                pindexNew->vMintDenominationsInBlock = diskindex.vMintDenominationsInBlock;
-
                 //Proof Of Stake
                 pindexNew->nMint = diskindex.nMint;
                 pindexNew->nMoneySupply = diskindex.nMoneySupply;
@@ -269,15 +250,6 @@ bool CBlockTreeDB::LoadBlockIndexGuts()
                 if (pindexNew->IsProofOfStake())
                     setStakeSeen.insert(make_pair(pindexNew->prevoutStake, pindexNew->nStakeTime));
 
-                //populate accumulator checksum map in memory
-                if(pindexNew->nAccumulatorCheckpoint != 0 && pindexNew->nAccumulatorCheckpoint != nPreviousCheckpoint) {
-                    //Don't load any invalid checkpoints
-                    if (!InvalidCheckpointRange(pindexNew->nHeight))
-                        LoadAccumulatorValuesFromDB(pindexNew->nAccumulatorCheckpoint);
-
-                    nPreviousCheckpoint = pindexNew->nAccumulatorCheckpoint;
-                }
-
                 pcursor->Next();
             } else {
                 break; // if shutdown requested or finished loading block index
@@ -288,80 +260,4 @@ bool CBlockTreeDB::LoadBlockIndexGuts()
     }
 
     return true;
-}
-
-CZerocoinDB::CZerocoinDB(size_t nCacheSize, bool fMemory, bool fWipe) : CLevelDBWrapper(GetDataDir() / "zerocoin", nCacheSize, fMemory, fWipe)
-{
-}
-
-bool CZerocoinDB::WriteCoinMint(const PublicCoin& pubCoin, const uint256& hashTx)
-{
-    CBigNum bnValue = pubCoin.getValue();
-    CDataStream ss(SER_GETHASH, 0);
-    ss << pubCoin.getValue();
-    uint256 hash = Hash(ss.begin(), ss.end());
-
-    return Write(make_pair('m', hash), hashTx, true);
-}
-
-bool CZerocoinDB::ReadCoinMint(const CBigNum& bnPubcoin, uint256& hashTx)
-{
-    CDataStream ss(SER_GETHASH, 0);
-    ss << bnPubcoin;
-    uint256 hash = Hash(ss.begin(), ss.end());
-
-    return Read(make_pair('m', hash), hashTx);
-}
-
-bool CZerocoinDB::EraseCoinMint(const CBigNum& bnPubcoin)
-{
-    CDataStream ss(SER_GETHASH, 0);
-    ss << bnPubcoin;
-    uint256 hash = Hash(ss.begin(), ss.end());
-
-    return Erase(make_pair('m', hash));
-}
-
-bool CZerocoinDB::WriteCoinSpend(const CBigNum& bnSerial, const uint256& txHash)
-{
-    CDataStream ss(SER_GETHASH, 0);
-    ss << bnSerial;
-    uint256 hash = Hash(ss.begin(), ss.end());
-
-    return Write(make_pair('s', hash), txHash, true);
-}
-
-bool CZerocoinDB::ReadCoinSpend(const CBigNum& bnSerial, uint256& txHash)
-{
-    CDataStream ss(SER_GETHASH, 0);
-    ss << bnSerial;
-    uint256 hash = Hash(ss.begin(), ss.end());
-
-    return Read(make_pair('s', hash), txHash);
-}
-
-bool CZerocoinDB::EraseCoinSpend(const CBigNum& bnSerial)
-{
-    CDataStream ss(SER_GETHASH, 0);
-    ss << bnSerial;
-    uint256 hash = Hash(ss.begin(), ss.end());
-
-    return Erase(make_pair('s', hash));
-}
-
-bool CZerocoinDB::WriteAccumulatorValue(const uint32_t& nChecksum, const CBigNum& bnValue)
-{
-    LogPrint("zero","%s : checksum:%d val:%s\n", __func__, nChecksum, bnValue.GetHex());
-    return Write(make_pair('a', nChecksum), bnValue);
-}
-
-bool CZerocoinDB::ReadAccumulatorValue(const uint32_t& nChecksum, CBigNum& bnValue)
-{
-    return Read(make_pair('a', nChecksum), bnValue);
-}
-
-bool CZerocoinDB::EraseAccumulatorValue(const uint32_t& nChecksum)
-{
-    LogPrint("zero", "%s : checksum:%d\n", __func__, nChecksum);
-    return Erase(make_pair('a', nChecksum));
 }
