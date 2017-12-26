@@ -99,7 +99,7 @@ Once the source code is ready the build steps are below.
     # If you want to build the Qt GUI:
     sudo apt-get install libqt5gui5 libqt5core5a libqt5dbus5 qttools5-dev qttools5-dev-tools libprotobuf-dev protobuf-compiler
 
-    git clone https://github.com/Lux-core/lux --recursive
+    git clone https://github.com/216k155/lux --recursive
     
     cd lux
 
@@ -133,7 +133,7 @@ NOTE: Building with Qt4 is still supported, however, could result in a broken UI
 
 1. Clone the Lux source code and cd into `Lux`
 
-        git clone --recursive https://github.com/Lux-core/lux.git
+        git clone --recursive https://github.com/216k155/lux.git
         cd Lux
 
 2.  Build Luxcore:
@@ -165,7 +165,7 @@ Development Process
 -------------------
 
 The `master` branch is regularly built and tested, but is not guaranteed to be
-completely stable. [Tags](https://github.com/Lux-core/lux/tags) are created
+completely stable. [Tags](https://github.com/216k155/lux/tags) are created
 regularly to indicate new official, stable release versions of Lux.
 
 The contribution workflow is described in [CONTRIBUTING.md](CONTRIBUTING.md).
