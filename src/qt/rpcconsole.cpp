@@ -30,7 +30,6 @@
 #include <QScrollBar>
 #include <QThread>
 #include <QTime>
-#include <QStringList>
 
 #if QT_VERSION < 0x050000
 #include <QUrl>
@@ -52,7 +51,6 @@ const QString ZAPTXES1("-zapwallettxes=1");
 const QString ZAPTXES2("-zapwallettxes=2");
 const QString UPGRADEWALLET("-upgradewallet");
 const QString REINDEX("-reindex");
-const QString RESYNC("-resync");
 
 const struct {
     const char* url;
@@ -245,13 +243,14 @@ RPCConsole::RPCConsole(QWidget* parent) : QDialog(parent),
     connect(ui->btn_zapwallettxes2, SIGNAL(clicked()), this, SLOT(walletZaptxes2()));
     connect(ui->btn_upgradewallet, SIGNAL(clicked()), this, SLOT(walletUpgrade()));
     connect(ui->btn_reindex, SIGNAL(clicked()), this, SLOT(walletReindex()));
-    connect(ui->btn_resync, SIGNAL(clicked()), this, SLOT(walletResync()));
 
     // set library version labels
     ui->openSSLVersion->setText(SSLeay_version(SSLEAY_VERSION));
 #ifdef ENABLE_WALLET
     ui->berkeleyDBVersion->setText(DbEnv::version(0, 0, 0));
-    ui->wallet_path->setText(QString::fromStdString(GetDataDir().string() + QDir::separator().toLatin1() + GetArg("-wallet", "wallet.dat")));
+    std::string walletPath = QString(tr("Wallet in use: ")).toStdString() + GetDataDir().string();
+    walletPath += QDir::separator().toLatin1() + GetArg("-wallet", "wallet.dat");
+    ui->wallet_path->setText(QString::fromStdString(walletPath));
 #else
     ui->label_berkeleyDBVersion->hide();
     ui->berkeleyDBVersion->hide();
@@ -296,14 +295,6 @@ bool RPCConsole::eventFilter(QObject* obj, QEvent* event)
         case Qt::Key_PageDown:
             if (obj == ui->lineEdit) {
                 QApplication::postEvent(ui->messagesWidget, new QKeyEvent(*keyevt));
-                return true;
-            }
-            break;
-        case Qt::Key_Return:
-        case Qt::Key_Enter:
-            // forward these events to lineEdit
-            if(obj == autoCompleter->popup()) {
-                QApplication::postEvent(ui->lineEdit, new QKeyEvent(*keyevt));
                 return true;
             }
             break;
@@ -360,21 +351,8 @@ void RPCConsole::setClientModel(ClientModel* model)
         ui->clientName->setText(model->clientName());
         ui->buildDate->setText(model->formatBuildDate());
         ui->startupTime->setText(model->formatClientStartupTime());
+
         ui->networkName->setText(QString::fromStdString(Params().NetworkIDString()));
-
-        //Setup autocomplete and attach it
-        QStringList wordList;
-        std::vector<std::string> commandList = tableRPC.listCommands();
-        for (size_t i = 0; i < commandList.size(); ++i)
-        {
-            wordList << commandList[i].c_str();
-        }
-
-        autoCompleter = new QCompleter(wordList, this);
-        ui->lineEdit->setCompleter(autoCompleter);
-
-        // clear the lineEdit after activating from QCompleter
-        autoCompleter->popup()->installEventFilter(this);
     }
 }
 
@@ -429,27 +407,6 @@ void RPCConsole::walletUpgrade()
 void RPCConsole::walletReindex()
 {
     buildParameterlist(REINDEX);
-}
-
-/** Restart wallet with "-resync" */
-void RPCConsole::walletResync()
-{
-    QString resyncWarning = tr("This will delete your local blockchain folders and the wallet will synchronize the complete Blockchain from scratch.<br /><br />");
-        resyncWarning +=   tr("This needs quite some time and downloads a lot of data.<br /><br />");
-        resyncWarning +=   tr("Your transactions and funds will be visible again after the download has completed.<br /><br />");
-        resyncWarning +=   tr("Do you want to continue?.<br />");
-    QMessageBox::StandardButton retval = QMessageBox::question(this, tr("Confirm resync Blockchain"),
-        resyncWarning,
-        QMessageBox::Yes | QMessageBox::Cancel,
-        QMessageBox::Cancel);
-
-    if (retval != QMessageBox::Yes) {
-        // Resync canceled
-        return;
-    }
-
-    // Restart and resync
-    buildParameterlist(RESYNC);
 }
 
 /** Build command-line parameter list for restart */

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>576</width>
-    <height>442</height>
+    <height>417</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -118,7 +118,7 @@
         </layout>
        </item>
        <item>
-        <spacer name="verticalSpacer_2">
+        <spacer name="verticalSpacer_Main">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>
@@ -131,66 +131,69 @@
         </spacer>
        </item>
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <layout class="QHBoxLayout" name="horizontalLayout_4_Main">
          <item>
-          <widget class="QLabel" name="percentage_label">
+          <widget class="QLabel" name="label">
            <property name="toolTip">
-            <string>Percentage of incoming LUX which get automatically converted to zLUX via Zerocoin Protocol (min: 10%)</string>
+            <string>This setting determines the amount of individual masternodes that an input will be anonymized through.&lt;br/&gt;More rounds of anonymization gives a higher degree of privacy, but also costs more in fees.</string>
            </property>
            <property name="text">
-            <string>Percentage of autominted zLUX</string>
+            <string>Obfuscation rounds to use</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QSpinBox" name="zeromintPercentage">
+          <widget class="QSpinBox" name="obfuscationRounds">
            <property name="minimum">
-            <number>10</number>
+            <number>2</number>
            </property>
            <property name="maximum">
-            <number>100</number>
+            <number>8</number>
+           </property>
+           <property name="value">
+            <number>4</number>
            </property>
           </widget>
          </item>
         </layout>
        </item>
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0">
-         <property name="sizeConstraint">
-          <enum>QLayout::SetFixedSize</enum>
-         </property>
+        <layout class="QHBoxLayout" name="horizontalLayout">
          <item>
-          <widget class="QLabel" name="labelPreferredDenom">
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>16777215</height>
-            </size>
-           </property>
+          <widget class="QLabel" name="label_2">
            <property name="toolTip">
-            <string>Wait with automatic conversion to Zerocoin until enough LUX for this denomination is available</string>
+            <string>This amount acts as a threshold to turn off Obfuscation once it's reached.</string>
+           </property>
+           <property name="statusTip">
+            <string notr="true"/>
+           </property>
+           <property name="whatsThis">
+            <string notr="true"/>
+           </property>
+           <property name="accessibleName">
+            <string notr="true"/>
+           </property>
+           <property name="accessibleDescription">
+            <string notr="true"/>
            </property>
            <property name="text">
-            <string>Preferred Automint zLUX Denomination</string>
+            <string>Amount of LUX to keep anonymized</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QComboBox" name="preferredDenom">
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>27</height>
-            </size>
+          <widget class="QSpinBox" name="anonymizeLux">
+           <property name="minimum">
+            <number>100</number>
            </property>
-           <property name="toolTip">
-            <string>Wait with automatic conversion to Zerocoin until enough LUX for this denomination is available</string>
+           <property name="maximum">
+            <number>100000</number>
            </property>
-           <property name="maxVisibleItems">
-            <number>9</number>
+           <property name="singleStep">
+            <number>100</number>
            </property>
-           <property name="maxCount">
-            <number>9</number>
+           <property name="value">
+            <number>1000</number>
            </property>
           </widget>
          </item>
@@ -473,7 +476,7 @@
          </property>
          <property name="text">
           <string>Language missing or translation incomplete? Help contributing translations here:
-https://www.transifex.com/216k155/216k155-translations</string>
+https://www.transifex.com/lux-project/lux-project-translations</string>
          </property>
          <property name="wordWrap">
           <bool>true</bool>

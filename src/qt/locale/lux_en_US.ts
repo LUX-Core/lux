@@ -1208,16 +1208,12 @@ Address: %4
         <translation>command-line options</translation>
     </message>
     <message>
-        <source>UI Options:</source>
-        <translation>UI Options:</translation>
+        <source>UI options</source>
+        <translation>UI options</translation>
     </message>
     <message>
-        <source>Choose data directory on startup (default: %u)</source>
-        <translation>Choose data directory on startup (default: %u)</translation>
-    </message>
-    <message>
-        <source>Show splash screen on startup (default: %u)</source>
-        <translation>Show splash screen on startup (default: %u)</translation>
+        <source>Choose data directory on startup (default: 0)</source>
+        <translation>Choose data directory on startup (default: 0)</translation>
     </message>
     <message>
         <source>Set language, for example "de_DE" (default: system locale)</source>
@@ -1230,6 +1226,10 @@ Address: %4
     <message>
         <source>Set SSL root certificates for payment request (default: -system-)</source>
         <translation>Set SSL root certificates for payment request (default: -system-)</translation>
+    </message>
+    <message>
+        <source>Show splash screen on startup (default: 1)</source>
+        <translation>Show splash screen on startup (default: 1)</translation>
     </message>
 </context>
 <context>
@@ -1344,6 +1344,22 @@ Address: %4
     <message>
         <source>0</source>
         <translation>0</translation>
+    </message>
+    <message>
+        <source>All Masternodes</source>
+        <translation>All Masternodes</translation>
+    </message>
+    <message>
+        <source>Filter List:</source>
+        <translation>Filter List:</translation>
+    </message>
+    <message>
+        <source>Filter masternode list</source>
+        <translation>Filter masternode list</translation>
+    </message>
+    <message>
+        <source>Node Count:</source>
+        <translation>Node Count:</translation>
     </message>
     <message>
         <source>Start alias</source>
@@ -1719,9 +1735,9 @@ Please check the address and try again.</translation>
     </message>
     <message>
         <source>Language missing or translation incomplete? Help contributing translations here:
-https://www.transifex.com/216k155/216k155-translations</source>
+https://www.transifex.com/lux-project/lux-project-translations</source>
         <translation>Language missing or translation incomplete? Help contributing translations here:
-https://www.transifex.com/216k155/216k155-translations</translation>
+https://www.transifex.com/lux-project/lux-project-translations</translation>
     </message>
     <message>
         <source>Map port using &amp;UPnP</source>
@@ -2416,64 +2432,64 @@ https://www.transifex.com/216k155/216k155-translations</translation>
         <translation>&amp;Wallet Repair</translation>
     </message>
     <message>
-        <source>Wallet In Use:</source>
-        <translation>Wallet In Use:</translation>
-    </message>
-    <message>
         <source>Salvage wallet</source>
         <translation>Salvage wallet</translation>
-    </message>
-    <message>
-        <source>Attempt to recover private keys from a corrupt wallet.dat.</source>
-        <translation>Attempt to recover private keys from a corrupt wallet.dat.</translation>
     </message>
     <message>
         <source>Rescan blockchain files</source>
         <translation>Rescan blockchain files</translation>
     </message>
     <message>
-        <source>Rescan the block chain for missing wallet transactions.</source>
-        <translation>Rescan the block chain for missing wallet transactions.</translation>
-    </message>
-    <message>
         <source>Recover transactions 1</source>
         <translation>Recover transactions 1</translation>
-    </message>
-    <message>
-        <source>Recover transactions from blockchain (keep meta-data, e.g. account owner).</source>
-        <translation>Recover transactions from blockchain (keep meta-data, e.g. account owner).</translation>
     </message>
     <message>
         <source>Recover transactions 2</source>
         <translation>Recover transactions 2</translation>
     </message>
     <message>
-        <source>Recover transactions from blockchain (drop meta-data).</source>
-        <translation>Recover transactions from blockchain (drop meta-data).</translation>
-    </message>
-    <message>
         <source>Upgrade wallet format</source>
         <translation>Upgrade wallet format</translation>
-    </message>
-    <message>
-        <source>Rebuild block chain index from current blk000??.dat files.</source>
-        <translation>Rebuild block chain index from current blk000??.dat files.</translation>
     </message>
     <message>
         <source>The buttons below will restart the wallet with command-line options to repair the wallet, fix issues with corrupt blockhain files or missing/obsolete transactions.</source>
         <translation>The buttons below will restart the wallet with command-line options to repair the wallet, fix issues with corrupt blockhain files or missing/obsolete transactions.</translation>
     </message>
     <message>
+        <source>-salvagewallet: Attempt to recover private keys from a corrupt wallet.dat.</source>
+        <translation>-salvagewallet: Attempt to recover private keys from a corrupt wallet.dat.</translation>
+    </message>
+    <message>
+        <source>-rescan: Rescan the block chain for missing wallet transactions.</source>
+        <translation>-rescan: Rescan the block chain for missing wallet transactions.</translation>
+    </message>
+    <message>
+        <source>-zapwallettxes=1: Recover transactions from blockchain (keep meta-data, e.g. account owner).</source>
+        <translation>-zapwallettxes=1: Recover transactions from blockchain (keep meta-data, e.g. account owner).</translation>
+    </message>
+    <message>
+        <source>-zapwallettxes=2: Recover transactions from blockchain (drop meta-data).</source>
+        <translation>-zapwallettxes=2: Recover transactions from blockchain (drop meta-data).</translation>
+    </message>
+    <message>
+        <source>-upgradewallet: Upgrade wallet to latest format on startup. (Note: this is NOT an update of the wallet itself!)</source>
+        <translation>-upgradewallet: Upgrade wallet to latest format on startup. (Note: this is NOT an update of the wallet itself!)</translation>
+    </message>
+    <message>
         <source>Wallet repair options.</source>
         <translation>Wallet repair options.</translation>
     </message>
     <message>
-        <source>Upgrade wallet to latest format on startup. (Note: this is NOT an update of the wallet itself!)</source>
-        <translation>Upgrade wallet to latest format on startup. (Note: this is NOT an update of the wallet itself!)</translation>
-    </message>
-    <message>
         <source>Rebuild index</source>
         <translation>Rebuild index</translation>
+    </message>
+    <message>
+        <source>-reindex: Rebuild block chain index from current blk000??.dat files.</source>
+        <translation>-reindex: Rebuild block chain index from current blk000??.dat files.</translation>
+    </message>
+    <message>
+        <source>Wallet Path</source>
+        <translation>Wallet Path</translation>
     </message>
     <message>
         <source>In:</source>
@@ -2486,6 +2502,10 @@ https://www.transifex.com/216k155/216k155-translations</translation>
     <message>
         <source>Welcome to the LUX RPC console.</source>
         <translation>Welcome to the LUX RPC console.</translation>
+    </message>
+    <message>
+        <source>Wallet in use: </source>
+        <translation>Wallet in use: </translation>
     </message>
     <message>
         <source>Use up and down arrows to navigate history, and &lt;b&gt;Ctrl-L&lt;/b&gt; to clear screen.</source>
@@ -3938,10 +3958,6 @@ https://www.transifex.com/216k155/216k155-translations</translation>
         <translation>Distributed under the MIT software license, see the accompanying file COPYING or &lt;http://www.opensource.org/licenses/mit-license.php&gt;.</translation>
     </message>
     <message>
-        <source>Enable spork administration functionality with the appropriate private key.</source>
-        <translation>Enable spork administration functionality with the appropriate private key.</translation>
-    </message>
-    <message>
         <source>Enable swifttx, show confirmations for locked transactions (bool, default: %s)</source>
         <translation>Enable swifttx, show confirmations for locked transactions (bool, default: %s)</translation>
     </message>
@@ -4006,10 +4022,6 @@ https://www.transifex.com/216k155/216k155-translations</translation>
         <translation>Invalid amount for -maxtxfee=&lt;amount&gt;: '%s' (must be at least the minrelay fee of %s to prevent stuck transactions)</translation>
     </message>
     <message>
-        <source>Keep the specified amount available for spending at all times (default: 0)</source>
-        <translation>Keep the specified amount available for spending at all times (default: 0)</translation>
-    </message>
-    <message>
         <source>Log transaction priority and fee per kB when mining blocks (default: %u)</source>
         <translation>Log transaction priority and fee per kB when mining blocks (default: %u)</translation>
     </message>
@@ -4070,12 +4082,12 @@ https://www.transifex.com/216k155/216k155-translations</translation>
         <translation>Show N confirmations for a successfully locked transaction (0-9999, default: %u)</translation>
     </message>
     <message>
-        <source>Support filtering of blocks and transaction with bloom filters (default: %u)</source>
-        <translation>Support filtering of blocks and transaction with bloom filters (default: %u)</translation>
-    </message>
-    <message>
         <source>SwiftTX requires inputs with at least 6 confirmations, you might need to wait a few minutes and try again.</source>
         <translation>SwiftTX requires inputs with at least 6 confirmations, you might need to wait a few minutes and try again.</translation>
+    </message>
+    <message>
+        <source>This is a pre-release test build - use at your own risk - do not use for mining or merchant applications</source>
+        <translation>This is a pre-release test build - use at your own risk - do not use for mining or merchant applications</translation>
     </message>
     <message>
         <source>This product includes software developed by the OpenSSL Project for use in the OpenSSL Toolkit &lt;https://www.openssl.org/&gt; and cryptographic software written by Eric Young and UPnP software written by Thomas Bernard.</source>
@@ -4180,6 +4192,12 @@ for example: alertnotify=echo %%s | mail -s "LUX Alert" admin@foo.com
     <message>
         <source>(must be 51472 for mainnet)</source>
         <translation>(must be 51472 for mainnet)</translation>
+    </message>
+    <message>
+        <source>&lt;category&gt; can be:
+</source>
+        <translation>&lt;category&gt; can be:
+</translation>
     </message>
     <message>
         <source>Accept command line and JSON-RPC commands</source>
@@ -4530,54 +4548,6 @@ for example: alertnotify=echo %%s | mail -s "LUX Alert" admin@foo.com
         <translation>Invalid script detected.</translation>
     </message>
     <message>
-        <source>This is a pre-release test build - use at your own risk - do not use for staking or merchant applications!</source>
-        <translation>This is a pre-release test build - use at your own risk - do not use for staking or merchant applications!</translation>
-    </message>
-    <message>
-        <source>&lt;category&gt; can be:</source>
-        <translation>&lt;category&gt; can be:</translation>
-    </message>
-    <message>
-        <source>Attempt to force blockchain corruption recovery</source>
-        <translation>Attempt to force blockchain corruption recovery</translation>
-    </message>
-    <message>
-        <source>Display the stake modifier calculations in the debug.log file.</source>
-        <translation>Display the stake modifier calculations in the debug.log file.</translation>
-    </message>
-    <message>
-        <source>Display verbose coin stake messages in the debug.log file.</source>
-        <translation>Display verbose coin stake messages in the debug.log file.</translation>
-    </message>
-    <message>
-        <source>Enable publish hash block in &lt;address&gt;</source>
-        <translation>Enable publish hash block in &lt;address&gt;</translation>
-    </message>
-    <message>
-        <source>Enable publish hash transaction (locked via SwiftTX) in &lt;address&gt;</source>
-        <translation>Enable publish hash transaction (locked via SwiftTX) in &lt;address&gt;</translation>
-    </message>
-    <message>
-        <source>Enable publish hash transaction in &lt;address&gt;</source>
-        <translation>Enable publish hash transaction in &lt;address&gt;</translation>
-    </message>
-    <message>
-        <source>Enable publish raw block in &lt;address&gt;</source>
-        <translation>Enable publish raw block in &lt;address&gt;</translation>
-    </message>
-    <message>
-        <source>Enable publish raw transaction (locked via SwiftTX) in &lt;address&gt;</source>
-        <translation>Enable publish raw transaction (locked via SwiftTX) in &lt;address&gt;</translation>
-    </message>
-    <message>
-        <source>Enable publish raw transaction in &lt;address&gt;</source>
-        <translation>Enable publish raw transaction in &lt;address&gt;</translation>
-    </message>
-    <message>
-        <source>Enable staking functionality (0-1, default: %u)</source>
-        <translation>Enable staking functionality (0-1, default: %u)</translation>
-    </message>
-    <message>
         <source>Keep N LUX anonymized (default: %u)</source>
         <translation>Keep N LUX anonymized (default: %u)</translation>
     </message>
@@ -4758,10 +4728,6 @@ for example: alertnotify=echo %%s | mail -s "LUX Alert" admin@foo.com
         <translation>Prepend debug output with timestamp (default: %u)</translation>
     </message>
     <message>
-        <source>Print version and exit</source>
-        <translation>Print version and exit</translation>
-    </message>
-    <message>
         <source>RPC SSL options: (see the Bitcoin Wiki for SSL setup instructions)</source>
         <translation>RPC SSL options: (see the Bitcoin Wiki for SSL setup instructions)</translation>
     </message>
@@ -4916,10 +4882,6 @@ for example: alertnotify=echo %%s | mail -s "LUX Alert" admin@foo.com
     <message>
         <source>Spend unconfirmed change when sending transactions (default: %u)</source>
         <translation>Spend unconfirmed change when sending transactions (default: %u)</translation>
-    </message>
-    <message>
-        <source>Staking options:</source>
-        <translation>Staking options:</translation>
     </message>
     <message>
         <source>Stop running after importing blocks from disk (default: %u)</source>
@@ -5132,10 +5094,6 @@ for example: alertnotify=echo %%s | mail -s "LUX Alert" admin@foo.com
     <message>
         <source>Zapping all transactions from wallet...</source>
         <translation>Zapping all transactions from wallet...</translation>
-    </message>
-    <message>
-        <source>ZeroMQ notification options:</source>
-        <translation>ZeroMQ notification options:</translation>
     </message>
     <message>
         <source>on startup</source>

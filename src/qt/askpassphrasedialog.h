@@ -29,10 +29,12 @@ public:
         Decrypt          /**< Ask passphrase and decrypt wallet */
     };
 
-    explicit AskPassphraseDialog(Mode mode, QWidget* parent, WalletModel* model);
+    explicit AskPassphraseDialog(Mode mode, QWidget* parent);
     ~AskPassphraseDialog();
 
     void accept();
+
+    void setModel(WalletModel* model);
 
 private:
     Ui::AskPassphraseDialog* ui;

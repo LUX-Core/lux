@@ -16,11 +16,11 @@
 #include <QMessageBox>
 #include <QPushButton>
 
-AskPassphraseDialog::AskPassphraseDialog(Mode mode, QWidget* parent, WalletModel* model) : QDialog(parent),
-                                                                                           ui(new Ui::AskPassphraseDialog),
-                                                                                           mode(mode),
-                                                                                           model(model),
-                                                                                           fCapsLock(false)
+AskPassphraseDialog::AskPassphraseDialog(Mode mode, QWidget* parent) : QDialog(parent),
+                                                                       ui(new Ui::AskPassphraseDialog),
+                                                                       mode(mode),
+                                                                       model(0),
+                                                                       fCapsLock(false)
 {
     ui->setupUi(this);
 
@@ -36,8 +36,6 @@ AskPassphraseDialog::AskPassphraseDialog(Mode mode, QWidget* parent, WalletModel
     ui->passEdit1->installEventFilter(this);
     ui->passEdit2->installEventFilter(this);
     ui->passEdit3->installEventFilter(this);
-
-    this->model = model;
 
     switch (mode) {
     case Encrypt: // Ask passphrase x2
@@ -70,9 +68,6 @@ AskPassphraseDialog::AskPassphraseDialog(Mode mode, QWidget* parent, WalletModel
         ui->warningLabel->setText(tr("Enter the old and new passphrase to the wallet."));
         break;
     }
-
-    ui->anonymizationCheckBox->setChecked(model->isAnonymizeOnlyUnlocked());
-
     textChanged();
     connect(ui->passEdit1, SIGNAL(textChanged(QString)), this, SLOT(textChanged()));
     connect(ui->passEdit2, SIGNAL(textChanged(QString)), this, SLOT(textChanged()));
@@ -86,6 +81,12 @@ AskPassphraseDialog::~AskPassphraseDialog()
     ui->passEdit2->setText(QString(" ").repeated(ui->passEdit2->text().size()));
     ui->passEdit3->setText(QString(" ").repeated(ui->passEdit3->text().size()));
     delete ui;
+}
+
+void AskPassphraseDialog::setModel(WalletModel* model)
+{
+    this->model = model;
+    ui->anonymizationCheckBox->setChecked(model->isAnonymizeOnlyUnlocked());
 }
 
 void AskPassphraseDialog::accept()

@@ -13,13 +13,7 @@
   <property name="windowTitle">
    <string>Blockchain Explorer</string>
   </property>
-  <property name="styleSheet">
-   <string notr="true"/>
-  </property>
   <widget class="QWidget" name="centralwidget">
-   <property name="styleSheet">
-    <string notr="true"/>
-   </property>
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout">
@@ -29,10 +23,10 @@
       <item>
        <widget class="QPushButton" name="back">
         <property name="text">
-         <string>Back</string>
+         <string/>
         </property>
         <property name="icon">
-         <iconset>
+         <iconset resource="../bitcoin.qrc">
           <normaloff>:/icons/back</normaloff>:/icons/back</iconset>
         </property>
         <property name="flat">
@@ -43,10 +37,10 @@
       <item>
        <widget class="QPushButton" name="forward">
         <property name="text">
-         <string>Forward</string>
+         <string/>
         </property>
         <property name="icon">
-         <iconset>
+         <iconset resource="../bitcoin.qrc">
           <normaloff>:/icons/forward</normaloff>:/icons/forward</iconset>
         </property>
        </widget>
@@ -123,7 +117,7 @@
          <x>0</x>
          <y>0</y>
          <width>780</width>
-         <height>489</height>
+         <height>498</height>
         </rect>
        </property>
        <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -161,14 +155,14 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>27</height>
+     <height>25</height>
     </rect>
    </property>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
  <resources>
-  <include location="../lux.qrc"/>
+  <include location="../bitcoin.qrc"/>
  </resources>
  <connections/>
 </ui>

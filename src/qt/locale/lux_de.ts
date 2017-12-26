@@ -239,16 +239,8 @@
         <translation>&amp;BIP 38 Verschlüsselung</translation>
     </message>
     <message>
-        <source>Enter a Lux Address that you would like to encrypt using BIP 38. Enter a passphrase in the middle box. Press encrypt to compute the encrypted private key.</source>
-        <translation>Gib eine LUX Adresse ein welche mit BIP 38 verschlüsselt werden soll. Gib ein Passwort in die mittleren Box ein. Drücke auf verschlüsseln, um den privaten schlüssel zu errechenen.</translation>
-    </message>
-    <message>
         <source>Address:</source>
         <translation>Adresse:</translation>
-    </message>
-    <message>
-        <source>The LUX address to sign the message with</source>
-        <translation>LUX Adresse mit welcher die Nachricht signiert werden soll</translation>
     </message>
     <message>
         <source>Choose previously used address</source>
@@ -271,126 +263,10 @@
         <translation>Passphrase: </translation>
     </message>
     <message>
-        <source>Encrypted Key:</source>
-        <translation>Geschützer Schlüssel:</translation>
-    </message>
-    <message>
-        <source>Copy the current signature to the system clipboard</source>
-        <translation>Kopiert die aktuelle Signatur in den Zwischenspeicher</translation>
-    </message>
-    <message>
-        <source>Sign the message to prove you own this LUX address</source>
-        <translation>Signiere die Nachricht um zu Beweisen, dass du diese LUX Adresse besitzt</translation>
-    </message>
-    <message>
-        <source>Encrypt &amp;Key</source>
-        <translation>Verschlüsselt &amp;Schlüssel</translation>
-    </message>
-    <message>
-        <source>Reset all sign message fields</source>
-        <translation>Setze alle signierten Nachrichten Felder zurück</translation>
-    </message>
-    <message>
         <source>Clear &amp;All</source>
         <translation>&amp;Alles zurücksetzen</translation>
     </message>
-    <message>
-        <source>&amp;BIP 38 Decrypt</source>
-        <translation>&amp;BIP 38 Entschlüsseln</translation>
-    </message>
-    <message>
-        <source>Enter the BIP 38 encrypted private key. Enter the passphrase in the middle box. Click Decrypt Key to compute the private key. After the key is decrypted, clicking 'Import Address' will add this private key to the wallet.</source>
-        <translation>Geben Sie den BIP 38 verschlüsselten privaten Schlüssel ein. Geben Sie die Passphrase im mittleren Feld ein. Klicken Sie auf Entschlüsselung, um den privaten Schlüssel zu berechnen. Nachdem der Schlüssel entschlüsselt wurde, klicken Sie auf 'Adresse importieren', fügen Sie diesen privaten Schlüssel der Wallet hinzu.</translation>
-    </message>
-    <message>
-        <source>The LUX address the message was signed with</source>
-        <translation>Die LUX Adresse mit welcher die Nachricht signiert wurde.</translation>
-    </message>
-    <message>
-        <source>Verify the message to ensure it was signed with the specified LUX address</source>
-        <translation>Überprüfen Sie die Nachricht, um sicherzustellen, dass sie mit der angegebenen LUX-Adresse signiert wurde.</translation>
-    </message>
-    <message>
-        <source>Decrypt &amp;Key</source>
-        <translation>Entschlüsseln &amp;Schlüssel</translation>
-    </message>
-    <message>
-        <source>Reset all verify message fields</source>
-        <translation>Zurücksetzen aller überprüften Felder.</translation>
-    </message>
-    <message>
-        <source>Decrypted Key:</source>
-        <translation>Entschlüsselter Schlüssel:</translation>
-    </message>
-    <message>
-        <source>Import Address</source>
-        <translation>Adresse importieren</translation>
-    </message>
-    <message>
-        <source>Click "Decrypt Key" to compute key</source>
-        <translation>Klicke "Schlüssel entschlüsseln" um den Schlüssel zu berechnen</translation>
-    </message>
-    <message>
-        <source>The entered passphrase is invalid. </source>
-        <translation>Die eingegebene Passphrase ist ungültig. </translation>
-    </message>
-    <message>
-        <source>Allowed: 0-9,a-z,A-Z,</source>
-        <translation>Zulässig: 0-9,a-z,A-Z</translation>
-    </message>
-    <message>
-        <source>The entered address is invalid.</source>
-        <translation>Die eingegebene Adresse ist falsch</translation>
-    </message>
-    <message>
-        <source>Please check the address and try again.</source>
-        <translation>Bitte die Adresse prüfen und erneut eingeben</translation>
-    </message>
-    <message>
-        <source>The entered address does not refer to a key.</source>
-        <translation>Die eingegebene Adresse passt nicht zu einem Schlüssel</translation>
-    </message>
-    <message>
-        <source>Wallet unlock was cancelled.</source>
-        <translation>Wallet-Entsperrung wurde abgebrochen.</translation>
-    </message>
-    <message>
-        <source>Private key for the entered address is not available.</source>
-        <translation>Privater Schlüssel für die eingegebene Adresse ist nicht verfügbar</translation>
-    </message>
-    <message>
-        <source>Failed to decrypt.</source>
-        <translation>Entschlüsselung fehlgeschlagen.</translation>
-    </message>
-    <message>
-        <source>Please check the key and passphrase and try again.</source>
-        <translation>Bitte überprüfe den Schlüssel und die Passphrase und versuche es erneut.</translation>
-    </message>
-    <message>
-        <source>Data Not Valid.</source>
-        <translation>Daten fehlerhaft</translation>
-    </message>
-    <message>
-        <source>Please try again.</source>
-        <translation>Bitte versuche es noch einmal</translation>
-    </message>
-    <message>
-        <source>Please wait while key is imported</source>
-        <translation>Bitte warten. Schlüssel wird importiert..</translation>
-    </message>
-    <message>
-        <source>Key Already Held By Wallet</source>
-        <translation>Schlüssel bereits im Wallet vorhanden</translation>
-    </message>
-    <message>
-        <source>Error Adding Key To Wallet</source>
-        <translation>Fehler beim hinzufügen des Schlüssels zum Wallet</translation>
-    </message>
-    <message>
-        <source>Successfully Added Private Key To Wallet</source>
-        <translation>Erfolgreiches hinzufügen eines privaten Schlüssels zum Wallet</translation>
-    </message>
-</context>
+    </context>
 <context>
     <name>BitcoinGUI</name>
     <message>
@@ -614,14 +490,6 @@
         <translation>Zahlung anfordern (QR-Code Generierung und lux: URIs)</translation>
     </message>
     <message>
-        <source>&amp;Privacy</source>
-        <translation>&amp;Privatsphäre</translation>
-    </message>
-    <message>
-        <source>Privacy Action for zLUX and Obfuscation</source>
-        <translation>Privatsphäre Aktion für zLUX und Verschleierung</translation>
-    </message>
-    <message>
         <source>&amp;Masternodes</source>
         <translation>&amp;Masternodes</translation>
     </message>
@@ -652,50 +520,6 @@
     <message>
         <source>&amp;BIP38 tool</source>
         <translation>&amp;BIP38 Hilfsprogramm</translation>
-    </message>
-    <message>
-        <source>&amp;MultiSend</source>
-        <translation>&amp;MultiSend</translation>
-    </message>
-    <message>
-        <source>MultiSend Settings</source>
-        <translation>MultiSend Einstellungen</translation>
-    </message>
-    <message>
-        <source>Open Wallet &amp;Configuration File</source>
-        <translation>Öffne Wallet &amp;Einstellungsdatei </translation>
-    </message>
-    <message>
-        <source>Open &amp;Masternode Configuration File</source>
-        <translation>Öffne &amp;Masternode Einstellungsdatei </translation>
-    </message>
-    <message>
-        <source>Open Masternode configuration file</source>
-        <translation>Öffne Masternode Einstellungsdatei</translation>
-    </message>
-    <message>
-        <source>Open a LUX: URI or payment request</source>
-        <translation>Öffne eine LUX: URI or Zahlungsanfrage</translation>
-    </message>
-    <message>
-        <source>&amp;Blockchain explorer</source>
-        <translation>&amp;Blockchain Betrachter</translation>
-    </message>
-    <message>
-        <source>Block explorer window</source>
-        <translation>Blockchain Betrachter Fenster</translation>
-    </message>
-    <message>
-        <source>Show the LUX Core help message to get a list with possible LUX command-line options</source>
-        <translation>Zeige die LUX-Core Hilfe, um mögliche LUX Kommando-Zeilen-Optionen anzuzeigen</translation>
-    </message>
-    <message>
-        <source>LUX Core client</source>
-        <translation>LUX Core Client</translation>
-    </message>
-    <message numerus="yes">
-        <source>%n active connection(s) to LUX network</source>
-        <translation><numerusform>%n aktive Verbindung zum LUX Netzwerk</numerusform><numerusform>%n aktive Verbindungen zum LUX Netzwerk</numerusform></translation>
     </message>
     <message>
         <source>Synchronizing with network...</source>
@@ -774,10 +598,6 @@
         <translation>Eingehende Transaktion</translation>
     </message>
     <message>
-        <source>Sent MultiSend transaction</source>
-        <translation>Versende MultiSend Transaktion</translation>
-    </message>
-    <message>
         <source>Date: %1
 Amount: %2
 Type: %3
@@ -789,24 +609,8 @@ Typ: %3
 Adresse: %4</translation>
     </message>
     <message>
-        <source>Staking is active
- MultiSend: %1</source>
-        <translation>Staking ist aktiviert
- MultiSend: %1</translation>
-    </message>
-    <message>
         <source>Active</source>
         <translation>Aktiv</translation>
-    </message>
-    <message>
-        <source>Not Active</source>
-        <translation>Nicht Aktiv</translation>
-    </message>
-    <message>
-        <source>Staking is not active
- MultiSend: %1</source>
-        <translation>Staking ist nicht aktiviert
- MultiSend: %1</translation>
     </message>
     <message>
         <source>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;unlocked&lt;/b&gt;</source>
@@ -828,24 +632,12 @@ Adresse: %4</translation>
         <translation>Blockchain Explorer</translation>
     </message>
     <message>
-        <source>Back</source>
-        <translation>Zurück</translation>
-    </message>
-    <message>
-        <source>Forward</source>
-        <translation>Vor</translation>
-    </message>
-    <message>
         <source>Address / Block / Transaction</source>
         <translation>Addrese / Block / Tansaktion</translation>
     </message>
     <message>
         <source>Search</source>
         <translation>Suche</translation>
-    </message>
-    <message>
-        <source>TextLabel</source>
-        <translation>TextEtikett</translation>
     </message>
     <message>
         <source>Not all transactions will be shown. To view all transactions you need to set txindex=1 in the configuration file (lux.conf).</source>
@@ -886,12 +678,8 @@ Adresse: %4</translation>
         <translation>Gebühr:</translation>
     </message>
     <message>
-        <source>Coin Selection</source>
-        <translation>Münzenauswahl </translation>
-    </message>
-    <message>
         <source>Dust:</source>
-        <translation>Abzug:</translation>
+        <translation>"Dust":</translation>
     </message>
     <message>
         <source>After Fee:</source>
@@ -902,52 +690,16 @@ Adresse: %4</translation>
         <translation>Wechselgeld:</translation>
     </message>
     <message>
-        <source>(un)select all</source>
-        <translation>(nicht) alle auswählen</translation>
-    </message>
-    <message>
-        <source>toggle lock state</source>
-        <translation>Sperrzustand umschalten</translation>
-    </message>
-    <message>
-        <source>Tree mode</source>
-        <translation>Baumansicht</translation>
-    </message>
-    <message>
-        <source>List mode</source>
-        <translation>Listenansicht </translation>
-    </message>
-    <message>
-        <source>(1 locked)</source>
-        <translation>(1 gesperrt)</translation>
-    </message>
-    <message>
         <source>Amount</source>
         <translation>Betrag</translation>
-    </message>
-    <message>
-        <source>Received with label</source>
-        <translation>Empfange mit Bezeichnung</translation>
-    </message>
-    <message>
-        <source>Received with address</source>
-        <translation>Empfangen mit Adresse</translation>
     </message>
     <message>
         <source>Date</source>
         <translation>Datum</translation>
     </message>
     <message>
-        <source>Confirmations</source>
-        <translation>Betätigungen</translation>
-    </message>
-    <message>
         <source>Confirmed</source>
         <translation>Bestätigt</translation>
-    </message>
-    <message>
-        <source>Priority</source>
-        <translation>Priorität</translation>
     </message>
     <message>
         <source>Copy address</source>
@@ -966,138 +718,22 @@ Adresse: %4</translation>
         <translation>Transaktions-ID kopieren</translation>
     </message>
     <message>
-        <source>Lock unspent</source>
-        <translation>Sperre Verwendung</translation>
-    </message>
-    <message>
-        <source>Unlock unspent</source>
-        <translation>Entsperre Verwendung</translation>
-    </message>
-    <message>
-        <source>Copy quantity</source>
-        <translation>Kopiere Anzahl</translation>
-    </message>
-    <message>
-        <source>Copy fee</source>
-        <translation>Kopiere Gebühr</translation>
-    </message>
-    <message>
-        <source>Copy after fee</source>
-        <translation>Kopiere nach Gebühr</translation>
-    </message>
-    <message>
-        <source>Copy bytes</source>
-        <translation>Kopiere Bytes</translation>
-    </message>
-    <message>
-        <source>Copy priority</source>
-        <translation>Kopiere Priorität</translation>
-    </message>
-    <message>
-        <source>Copy dust</source>
-        <translation>Kopiere Abzug</translation>
-    </message>
-    <message>
-        <source>Copy change</source>
-        <translation>Kopiere Wechselgeld</translation>
-    </message>
-    <message>
-        <source>Please switch to "List mode" to use this function.</source>
-        <translation>Bitte wechsle zur "Listenansicht" um diese Funktion zu verwenden.</translation>
-    </message>
-    <message>
-        <source>highest</source>
-        <translation>höchste</translation>
-    </message>
-    <message>
-        <source>higher</source>
-        <translation>höher</translation>
-    </message>
-    <message>
-        <source>high</source>
-        <translation>hoch</translation>
-    </message>
-    <message>
-        <source>medium-high</source>
-        <translation>mittel-hoch</translation>
-    </message>
-    <message>
-        <source>Can vary +/- %1 duff(s) per input.</source>
-        <translation>Kann um +/- %1 Abzug(s) pro Eingang variieren.</translation>
+        <source>n/a</source>
+        <translation>k.A.</translation>
     </message>
     <message>
         <source>medium</source>
         <translation>mittel</translation>
     </message>
     <message>
-        <source>low-medium</source>
-        <translation>niedrig-mittel</translation>
-    </message>
-    <message>
-        <source>low</source>
-        <translation>niedrig</translation>
-    </message>
-    <message>
-        <source>lower</source>
-        <translation>niedriger</translation>
-    </message>
-    <message>
-        <source>lowest</source>
-        <translation>am niedrigsten</translation>
-    </message>
-    <message>
-        <source>(%1 locked)</source>
-        <translation>(%1 gesperrt)</translation>
-    </message>
-    <message>
-        <source>none</source>
-        <translation>keine</translation>
-    </message>
-    <message>
-        <source>yes</source>
-        <translation>ja</translation>
-    </message>
-    <message>
         <source>no</source>
         <translation>nein</translation>
-    </message>
-    <message>
-        <source>This label turns red, if the transaction size is greater than 1000 bytes.</source>
-        <translation>Diese Bezeichnung wird rot, wenn die Transaktion größer als 1000 Bytes ist.</translation>
-    </message>
-    <message>
-        <source>This means a fee of at least %1 per kB is required.</source>
-        <translation>Das heißt, eine Gebühr von mindestens %1 pro kB ist notwendig.</translation>
-    </message>
-    <message>
-        <source>Can vary +/- 1 byte per input.</source>
-        <translation>Kann um +/-1 Byte pro Eingang variieren.</translation>
-    </message>
-    <message>
-        <source>Transactions with higher priority are more likely to get included into a block.</source>
-        <translation>Transaktionen mit höherer Priorität werden eher in einen Block aufgenommen.</translation>
-    </message>
-    <message>
-        <source>This label turns red, if the priority is smaller than "medium".</source>
-        <translation>Diese Bezeichnung wird rot, wenn die Priorität kleiner als "mittel" ist.</translation>
-    </message>
-    <message>
-        <source>This label turns red, if any recipient receives an amount smaller than %1.</source>
-        <translation>Diese Bezeichnung wird rot, wenn ein Empfänger einen Betrag erhält, der kleiner ist als %1.</translation>
     </message>
     <message>
         <source>(no label)</source>
         <translation>(keine Bezeichnung)</translation>
     </message>
-    <message>
-        <source>change from %1 (%2)</source>
-        <translation>Wechselgeld von %1 (%2)</translation>
-    </message>
-    <message>
-        <source>(change)</source>
-        <translation>(Wechselgeld)</translation>
-    </message>
-</context>
+    </context>
 <context>
     <name>EditAddressDialog</name>
     <message>
@@ -1207,16 +843,12 @@ Adresse: %4</translation>
         <translation>Kommandozeilenoptionen</translation>
     </message>
     <message>
-        <source>UI Options:</source>
-        <translation>UI Optionen:</translation>
+        <source>UI options</source>
+        <translation>UI-Optionen</translation>
     </message>
     <message>
-        <source>Choose data directory on startup (default: %u)</source>
-        <translation>Wähle Datenverzeichnis beim Start (Standard: %u)</translation>
-    </message>
-    <message>
-        <source>Show splash screen on startup (default: %u)</source>
-        <translation>Zeige Startbildschirm beim Start (Standard: %u)</translation>
+        <source>Choose data directory on startup (default: 0)</source>
+        <translation>Datenverzeichnis beim Starten auswählen (Standard: 0)</translation>
     </message>
     <message>
         <source>Set language, for example "de_DE" (default: system locale)</source>
@@ -1229,6 +861,10 @@ Adresse: %4</translation>
     <message>
         <source>Set SSL root certificates for payment request (default: -system-)</source>
         <translation>SSL-Wurzelzertifikate für Zahlungsanforderungen festlegen (Standard: Systemstandard)</translation>
+    </message>
+    <message>
+        <source>Show splash screen on startup (default: 1)</source>
+        <translation>Startbildschirm beim Starten anzeigen (Standard: 1)</translation>
     </message>
 </context>
 <context>
@@ -1345,6 +981,22 @@ Adresse: %4</translation>
         <translation>0</translation>
     </message>
     <message>
+        <source>All Masternodes</source>
+        <translation>Alle Masternodes</translation>
+    </message>
+    <message>
+        <source>Filter List:</source>
+        <translation>Liste filtern:</translation>
+    </message>
+    <message>
+        <source>Filter masternode list</source>
+        <translation>Masternode-Liste filtern</translation>
+    </message>
+    <message>
+        <source>Node Count:</source>
+        <translation>Anzahl Masternodes:</translation>
+    </message>
+    <message>
         <source>Start alias</source>
         <translation>Starten</translation>
     </message>
@@ -1384,478 +1036,28 @@ Adresse: %4</translation>
 <context>
     <name>MultiSendDialog</name>
     <message>
-        <source>MultiSend</source>
-        <translation>MultiSend</translation>
-    </message>
-    <message>
-        <source>Enter whole numbers 1 - 100</source>
-        <translation>Gebe Ganzzahlen zwischen 1 - 100 ein</translation>
-    </message>
-    <message>
-        <source>Enter Address to Send to</source>
-        <translation>Zieladresse eingeben</translation>
-    </message>
-    <message>
-        <source>MultiSend allows you to automatically send up to 100% of your stake or masternode reward to a list of other LUX addresses after it matures.
-To Add: enter percentage to give and LUX address to add to the MultiSend vector.
-To Delete: Enter address to delete and press delete.
-MultiSend will not be activated unless you have clicked Activate</source>
-        <translation>MultiSend ermöglicht es automatisch bis zu 100% Ihrer Stake- oder Masternode-Belohnung zu einer Liste von anderen LUX-Adressen zu senden.
-Zum hinzufügen: Gebe den Prozentsätze ein, um die LUX-Adressen des MultiSend-Vektor hinzuzufügen.
-Zum entfernen: Gebe die zu löschende Adresse ein und drücke löschen.
-MultiSend wird nicht aktiviert bis Sie auf Aktivieren geklickt haben.</translation>
-    </message>
-    <message>
-        <source>Add to MultiSend Vector</source>
-        <translation>Füge zum MultiSend-Vektor hinzu</translation>
-    </message>
-    <message>
-        <source>Add</source>
-        <translation>Hinzufügen</translation>
-    </message>
-    <message>
-        <source>Deactivate MultiSend</source>
-        <translation>Deaktiviere MultiSend</translation>
-    </message>
-    <message>
-        <source>Deactivate</source>
-        <translation>Deaktivieren</translation>
-    </message>
-    <message>
-        <source>Choose an address from the address book</source>
-        <translation>Wähle eine Adresse aus dem Adressbuch</translation>
-    </message>
-    <message>
         <source>Alt+A</source>
         <translation>Alt+A</translation>
-    </message>
-    <message>
-        <source>Percentage of stake to send</source>
-        <translation>Prozentsatz des Staken zum senden</translation>
-    </message>
-    <message>
-        <source>Percentage:</source>
-        <translation>Prozent:</translation>
-    </message>
-    <message>
-        <source>Address to send portion of stake to</source>
-        <translation>Adresse zum senden Teil des Staken an</translation>
     </message>
     <message>
         <source>Address:</source>
         <translation>Adresse:</translation>
     </message>
-    <message>
-        <source>Delete Address From MultiSend Vector</source>
-        <translation>Lösche Adresse von MultiSend-Vektor</translation>
-    </message>
-    <message>
-        <source>Delete</source>
-        <translation>Löschen</translation>
-    </message>
-    <message>
-        <source>Activate MultiSend</source>
-        <translation>Aktiviere MultiSend</translation>
-    </message>
-    <message>
-        <source>Activate</source>
-        <translation>Aktivieren</translation>
-    </message>
-    <message>
-        <source>View MultiSend Vector</source>
-        <translation>Zeige MultiSend-Vektor</translation>
-    </message>
-    <message>
-        <source>View MultiSend</source>
-        <translation>Zeige MultiSend</translation>
-    </message>
-    <message>
-        <source>Send For Stakes</source>
-        <translation>For Staker versenden</translation>
-    </message>
-    <message>
-        <source>Send For Masternode Rewards</source>
-        <translation>Für Masternode Rewards versenden</translation>
-    </message>
-    <message>
-        <source>The entered address:
-</source>
-        <translation>Die eingegebene Adresse:
-</translation>
-    </message>
-    <message>
-        <source> is invalid.
-Please check the address and try again.</source>
-        <translation>ist ungültig.
-Bitte Adresse überprüfen und nochmals versuchen.</translation>
-    </message>
-    <message>
-        <source>The total amount of your MultiSend vector is over 100% of your stake reward
-</source>
-        <translation>Die Gesamtzahl des MultiSend Vektors ist über 100% des Stake Rewards
-</translation>
-    </message>
-    <message>
-        <source>Please Enter 1 - 100 for percent.</source>
-        <translation>Bitte eine Zahl zwischen 1-100 in Prozent eingeben.</translation>
-    </message>
-    <message>
-        <source>MultiSend Vector
-</source>
-        <translation>MultiSend Vektor
-</translation>
-    </message>
-    <message>
-        <source>Removed </source>
-        <translation>Gelöscht</translation>
-    </message>
-    <message>
-        <source>Could not locate address
-</source>
-        <translation>Konnte Adresse nicht ermitteln
-</translation>
-    </message>
-</context>
+    </context>
 <context>
     <name>ObfuscationConfig</name>
-    <message>
-        <source>Configure Obfuscation</source>
-        <translation>Verschleierung konfigurieren</translation>
-    </message>
-    <message>
-        <source>Basic Privacy</source>
-        <translation>Wenig Privatsphäre</translation>
-    </message>
-    <message>
-        <source>High Privacy</source>
-        <translation>Hohe Privatsphäre</translation>
-    </message>
-    <message>
-        <source>Maximum Privacy</source>
-        <translation>Maximale Privatsphäre</translation>
-    </message>
-    <message>
-        <source>Please select a privacy level.</source>
-        <translation>Bitte den gewünschten Privatsphäre Level auswählen.</translation>
-    </message>
-    <message>
-        <source>Use 2 separate masternodes to mix funds up to 10000 LUX</source>
-        <translation>2 separate Masternodes verwenden um bis zu 10000 LUX zu mixen</translation>
-    </message>
-    <message>
-        <source>Use 8 separate masternodes to mix funds up to 10000 LUX</source>
-        <translation>8 separate Masternodes verwenden um bis zu 10000 LUX zu mixen</translation>
-    </message>
-    <message>
-        <source>Use 16 separate masternodes</source>
-        <translation>16 separate Masternodes verwenden</translation>
-    </message>
-    <message>
-        <source>This option is the quickest and will cost about ~0.025 LUX to anonymize 10000 LUX</source>
-        <translation>Diese Option ist die schnellst und kostet ungefähr ~0.025 LUX um 10000 LUX zu anonymisieren </translation>
-    </message>
-    <message>
-        <source>This option is moderately fast and will cost about 0.05 LUX to anonymize 10000 LUX</source>
-        <translation>Diese Option ist angemessen schnell und kostet ungefähr  0.05 LUX um 10000 LUX zu anonymisieren</translation>
-    </message>
-    <message>
-        <source>This is the slowest and most secure option. Using maximum anonymity will cost</source>
-        <translation>Diese Option ist die langsamste und sicherste Option. Die Verwendung maximaler Anonymisierung kostet</translation>
-    </message>
-    <message>
-        <source>0.1 LUX per 10000 LUX you anonymize.</source>
-        <translation>0.1 LUX per 10000 LUX die anonymisiert werden.</translation>
-    </message>
-    <message>
-        <source>Obfuscation Configuration</source>
-        <translation>Verschleierungskonfiguration</translation>
-    </message>
-    <message>
-        <source>Obfuscation was successfully set to basic (%1 and 2 rounds). You can change this at any time by opening LUX's configuration screen.</source>
-        <translation>Verschleierung erfolgreich auf normal gesetzt (%1 und 2 Runden). Sie können dies jederzeit in den LUXs Konfigurationen ändern.</translation>
-    </message>
-    <message>
-        <source>Obfuscation was successfully set to high (%1 and 8 rounds). You can change this at any time by opening LUX's configuration screen.</source>
-        <translation>Verschleierung erfolgreich auf hohen gesetzt (%1 und 8 Runden). Sie können dies jederzeit in den LUXs Konfigurationen ändern.</translation>
-    </message>
-    <message>
-        <source>Obfuscation was successfully set to maximum (%1 and 16 rounds). You can change this at any time by opening LUX's configuration screen.</source>
-        <translation>Verschleierung erfolgreich auf maximal gesetzt (%1 und 16 Runden). Sie können dies jederzeit in den LUXs Konfigurationen ändern.</translation>
-    </message>
-</context>
+    </context>
 <context>
     <name>OpenURIDialog</name>
-    <message>
-        <source>Open URI</source>
-        <translation>URI öffnen</translation>
-    </message>
-    <message>
-        <source>Open payment request from URI or file</source>
-        <translation>Zahlungsanfrage von URI oder Datei öffnen</translation>
-    </message>
-    <message>
-        <source>URI:</source>
-        <translation>URI:</translation>
-    </message>
-    <message>
-        <source>Select payment request file</source>
-        <translation>Datei für Zahlungsanfrage auswählen</translation>
-    </message>
-    <message>
-        <source>Select payment request file to open</source>
-        <translation>Datei für Zahlungsanfrage öffnen</translation>
-    </message>
-</context>
+    </context>
 <context>
     <name>OptionsDialog</name>
-    <message>
-        <source>Options</source>
-        <translation>Optionen</translation>
-    </message>
-    <message>
-        <source>&amp;Main</source>
-        <translation>&amp;Main</translation>
-    </message>
-    <message>
-        <source>Size of &amp;database cache</source>
-        <translation>Größe &amp;Datenbank Cache</translation>
-    </message>
-    <message>
-        <source>MB</source>
-        <translation>MB</translation>
-    </message>
-    <message>
-        <source>Number of script &amp;verification threads</source>
-        <translation>Anzahl der Skript &amp;Verifikation Threads</translation>
-    </message>
-    <message>
-        <source>(0 = auto, &lt;0 = leave that many cores free)</source>
-        <translation>(0 = auto, &lt;0 = leave that many cores free)</translation>
-    </message>
-    <message>
-        <source>W&amp;allet</source>
-        <translation>W&amp;allet</translation>
-    </message>
-    <message>
-        <source>If you disable the spending of unconfirmed change, the change from a transaction&lt;br/&gt;cannot be used until that transaction has at least one confirmation.&lt;br/&gt;This also affects how your balance is computed.</source>
-        <translation>Wenn Sie das Ausgeben von unbestätigten Wechselgeld deaktivieren, so kann das Wechselgeld von einer Transaktion &lt;br/&gt;nicht verwendet werden, bis mindestens eine Bestätigung vorliegt.&lt;br/&gt;Dies hat auch Auswirkungen auf ihre Bilanzberechnung.</translation>
-    </message>
-    <message>
-        <source>Automatically open the LUX client port on the router. This only works when your router supports UPnP and it is enabled.</source>
-        <translation>Automatisches öffnen des LUX-Client-Port im Router. Dies funktioniert nur, wenn ihr Router UPnP unterstützt und es eingeschaltet ist.</translation>
-    </message>
-    <message>
-        <source>Accept connections from outside</source>
-        <translation>Verbindungen von Aussen zulassen</translation>
-    </message>
-    <message>
-        <source>Allow incoming connections</source>
-        <translation>Eingehende Verbindungen erlauben</translation>
-    </message>
-    <message>
-        <source>&amp;Connect through SOCKS5 proxy (default proxy):</source>
-        <translation>&amp;Verbindung durch SOCKS5 proxy (default proxy):</translation>
-    </message>
-    <message>
-        <source>Expert</source>
-        <translation>Experte</translation>
-    </message>
-    <message>
-        <source>Automatically start LUX after logging in to the system.</source>
-        <translation>LUX automatisch nach dem Login starten.</translation>
-    </message>
-    <message>
-        <source>&amp;Start LUX on system login</source>
-        <translation>LUX automatisch beim System Login &amp;starten.</translation>
-    </message>
-    <message>
-        <source>Whether to show coin control features or not.</source>
-        <translation>Coin &amp;control Funktionen anzeigen oder nicht</translation>
-    </message>
-    <message>
-        <source>Enable coin &amp;control features</source>
-        <translation>Coin &amp;control Funktionen aktivieren</translation>
-    </message>
-    <message>
-        <source>Show additional tab listing all your masternodes in first sub-tab&lt;br/&gt;and all masternodes on the network in second sub-tab.</source>
-        <translation>Zeige zusätzlichen Tab, der alle ihre Masternodes anzeigt, im ersten Untertab&lt;br/&gt;und alle Masternodes im Netzwerk im zweiten Untertab.</translation>
-    </message>
-    <message>
-        <source>Show Masternodes Tab</source>
-        <translation>Masternodes Tab anzeigen</translation>
-    </message>
-    <message>
-        <source>&amp;Spend unconfirmed change</source>
-        <translation>&amp;Sende unbestätigtes Wechselgeld</translation>
-    </message>
-    <message>
-        <source>&amp;Network</source>
-        <translation>&amp;Netzwerk</translation>
-    </message>
-    <message>
-        <source>The user interface language can be set here. This setting will take effect after restarting LUX.</source>
-        <translation>Die Sprache der Benutzeroberflächekann hier gesetzt werden. Diese Einstellung wird nach einem Neustart realisiert.</translation>
-    </message>
-    <message>
-        <source>Language missing or translation incomplete? Help contributing translations here:
-https://www.transifex.com/216k155/216k155-translations</source>
-        <translation>Sprache fehlt oder ist unvollständig? Helfe mit und trage zur Übersetzung hier bei:
-https://www.transifex.com/216k155/216k155-translations</translation>
-    </message>
-    <message>
-        <source>Map port using &amp;UPnP</source>
-        <translation>Port mit &amp;UPnP mappen</translation>
-    </message>
-    <message>
-        <source>Percentage of incoming LUX which get automatically converted to zLUX via Zerocoin Protocol (min: 10%)</source>
-        <translation>Anteil des einkommenden LUX, welcher automatisch zu zLUX via Zerocoin Protokoll konvertiert wird (min: 10%)</translation>
-    </message>
-    <message>
-        <source>Percentage of autominted zLUX</source>
-        <translation>Prozentsatz der automatisierten zLUX</translation>
-    </message>
-    <message>
-        <source>Wait with automatic conversion to Zerocoin until enough LUX for this denomination is available</source>
-        <translation>Warte mit automatischer Konvertierung zu Zerocoin, bis genügend LUX für diese Stückelung verfügbar ist</translation>
-    </message>
-    <message>
-        <source>Preferred Automint zLUX Denomination</source>
-        <translation>Bevorzugte automatisierte zLUX Stückelung </translation>
-    </message>
-    <message>
-        <source>Connect to the LUX network through a SOCKS5 proxy.</source>
-        <translation>Durch einen SOCKS5 Proxy mit dem LUX Netzwerk verbinden.</translation>
-    </message>
-    <message>
-        <source>Proxy &amp;IP:</source>
-        <translation>Proxy &amp;IP:</translation>
-    </message>
-    <message>
-        <source>IP address of the proxy (e.g. IPv4: 127.0.0.1 / IPv6: ::1)</source>
-        <translation>IP Adresse des PROXY (z.B. IPv4: 127.0.0.1 / IPv6: ::1)</translation>
-    </message>
-    <message>
-        <source>&amp;Port:</source>
-        <translation>&amp;Port:</translation>
-    </message>
-    <message>
-        <source>Port of the proxy (e.g. 9050)</source>
-        <translation>Port des Proxies (z.B. 9050)</translation>
-    </message>
-    <message>
-        <source>&amp;Window</source>
-        <translation>&amp;Fenster</translation>
-    </message>
-    <message>
-        <source>Show only a tray icon after minimizing the window.</source>
-        <translation>Zeige nur ein Symbolkachel nach der Fensterminimierung.</translation>
-    </message>
-    <message>
-        <source>&amp;Minimize to the tray instead of the taskbar</source>
-        <translation>&amp;Minimierung zur Kachel anstelle auf der Taskbar</translation>
-    </message>
-    <message>
-        <source>Minimize instead of exit the application when the window is closed. When this option is enabled, the application will be closed only after selecting Quit in the menu.</source>
-        <translation>Minimierung anstelle vom Schließen der Anwendung, wenn das Fenster geschlossen wird. Wenn diese Option aktiviert ist, wird die Anwendung nur geschlossen, wenn im Menü Beenden gewählt wird.</translation>
-    </message>
-    <message>
-        <source>M&amp;inimize on close</source>
-        <translation>Beim Schließen m&amp;inimieren</translation>
-    </message>
-    <message>
-        <source>&amp;Display</source>
-        <translation>&amp;Display</translation>
-    </message>
-    <message>
-        <source>User Interface &amp;language:</source>
-        <translation>Benutzeroberfläche &amp;Sprache</translation>
-    </message>
-    <message>
-        <source>User Interface Theme:</source>
-        <translation>Benutzeroberfläche Motiv:</translation>
-    </message>
-    <message>
-        <source>&amp;Unit to show amounts in:</source>
-        <translation>&amp;Einheit des Betrags anzeigen in:</translation>
-    </message>
-    <message>
-        <source>Choose the default subdivision unit to show in the interface and when sending coins.</source>
-        <translation>Wähle die Standardunterteilungseinheit, um sie auf der Oberfläche anzuzeigen und wenn Coins gesendet werden.</translation>
-    </message>
-    <message>
-        <source>Decimal digits</source>
-        <translation>Dezimalstellen</translation>
-    </message>
-    <message>
-        <source>Third party URLs (e.g. a block explorer) that appear in the transactions tab as context menu items. %s in the URL is replaced by transaction hash. Multiple URLs are separated by vertical bar |.</source>
-        <translation>Drittpartei URLs (z.B. Blockexplorer) die auf der Registerkarte Transaktionen als Kontextmenü erscheinen.. %s in der URL wird durch den Transaktionshash ersetzt. Mehrere URLs sind durch vertikale Balken | getrennt.</translation>
-    </message>
-    <message>
-        <source>Third party transaction URLs</source>
-        <translation>Drittanbieter Transaktions URLs</translation>
-    </message>
-    <message>
-        <source>Active command-line options that override above options:</source>
-        <translation>Aktive Befehlszeilenoptionen, die über Optionen hinausgehen:</translation>
-    </message>
-    <message>
-        <source>Reset all client options to default.</source>
-        <translation>Alle Client Optionen auf den Standard zurücksetzen</translation>
-    </message>
-    <message>
-        <source>&amp;Reset Options</source>
-        <translation>Optionen Zu&amp;rücksetzen</translation>
-    </message>
-    <message>
-        <source>&amp;OK</source>
-        <translation>&amp;OK</translation>
-    </message>
-    <message>
-        <source>&amp;Cancel</source>
-        <translation>&amp;Abbrechen</translation>
-    </message>
-    <message>
-        <source>I don't care</source>
-        <translation>Mir egal</translation>
-    </message>
-    <message>
-        <source>default</source>
-        <translation>standard</translation>
-    </message>
-    <message>
-        <source>none</source>
-        <translation>keine</translation>
-    </message>
-    <message>
-        <source>Confirm options reset</source>
-        <translation>Zurücksetzen der Optionen bestätigen</translation>
-    </message>
-    <message>
-        <source>Client restart required to activate changes.</source>
-        <translation>Client Neustart erforderlich, um Änderungen zu aktivieren.</translation>
-    </message>
-    <message>
-        <source>Client will be shutdown, do you want to proceed?</source>
-        <translation>Der Client wird heruntergefahren, wollen Sie fortfahren?</translation>
-    </message>
-    <message>
-        <source>This change would require a client restart.</source>
-        <translation>Diese Änderung würde einen Neustart des Clients erfordern.</translation>
-    </message>
-    <message>
-        <source>The supplied proxy address is invalid.</source>
-        <translation>Die eingegeben PROXY-Adresse ist ungültig.</translation>
-    </message>
-</context>
+    </context>
 <context>
     <name>OverviewPage</name>
     <message>
         <source>Form</source>
         <translation>Formular</translation>
-    </message>
-    <message>
-        <source>LUX Balances</source>
-        <translation>LUX Bilanzen</translation>
     </message>
     <message>
         <source>Available:</source>
@@ -1882,8 +1084,8 @@ https://www.transifex.com/216k155/216k155-translations</translation>
         <translation>Erarbeiteter Betrag der noch nicht gereift ist</translation>
     </message>
     <message>
-        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the LUX network after a connection is established, but this process has not completed yet.</source>
-        <translation>Die angezeigte Information ist möglicherweise nicht mehr aktuell. Ihre Wallet synchronisiert sich automatisch mit dem LUX-Netzwerk, nachdem eine Verbindung hergestellt wurde. Aber dieser Vorgang ist noch nicht abgeschlossen.</translation>
+        <source>Balances</source>
+        <translation>Kontostände</translation>
     </message>
     <message>
         <source>Unconfirmed transactions to watch-only addresses</source>
@@ -1918,125 +1120,133 @@ https://www.transifex.com/216k155/216k155-translations</translation>
         <translation>Verfügbar:</translation>
     </message>
     <message>
-        <source>Combined Balances (including immature coins)</source>
-        <translation>Kombinierte Bilanz (einschließlich unreifer Coins)</translation>
+        <source>Status:</source>
+        <translation>Status:</translation>
     </message>
     <message>
-        <source>LUX:</source>
-        <translation>LUX:</translation>
+        <source>Obfuscation Balance:</source>
+        <translation>Verschleierter Betrag:</translation>
     </message>
     <message>
-        <source>zLUX:</source>
-        <translation>zLUX:</translation>
+        <source>0 LUX / 0 Rounds</source>
+        <translation>0 LUX / 0 Runden</translation>
     </message>
     <message>
-        <source>0 %</source>
-        <translation>0 %</translation>
+        <source>Enabled/Disabled</source>
+        <translation>Aktiviert/Deaktiviert</translation>
     </message>
     <message>
-        <source>Zerocoin Balance</source>
-        <translation>Zerocoin Bilanz</translation>
+        <source>Obfuscation</source>
+        <translation>Verschleierung</translation>
+    </message>
+    <message>
+        <source>Completion:</source>
+        <translation>Vollendet:</translation>
+    </message>
+    <message>
+        <source>Amount and Rounds:</source>
+        <translation>Betrag und Runden:</translation>
+    </message>
+    <message>
+        <source>Submitted Denom:</source>
+        <translation>Stückelung des Betrages:</translation>
+    </message>
+    <message>
+        <source>n/a</source>
+        <translation>k.A.</translation>
     </message>
     <message>
         <source>Recent transactions</source>
         <translation>Letzte Transaktionen</translation>
     </message>
     <message>
+        <source>Start/Stop Mixing</source>
+        <translation>Starte/Stoppe das Mixen</translation>
+    </message>
+    <message>
+        <source>The denominations you submitted to the Masternode.&lt;br&gt;To mix, other users must submit the exact same denominations.</source>
+        <translation>Die gestückelten Beträge, die Sie zu dem Masternode gesendet haben.&lt;br&gt; Zum Erfolgreichen Mixen müssen andere Benutzer exakt gleich gestückelte Beträge senden.</translation>
+    </message>
+    <message>
+        <source>(Last Message)</source>
+        <translation>(Letzte Nachricht)</translation>
+    </message>
+    <message>
+        <source>Try Mix</source>
+        <translation>Versuche zu Mixen</translation>
+    </message>
+    <message>
+        <source>Reset</source>
+        <translation>Zurücksetzen</translation>
+    </message>
+    <message>
         <source>out of sync</source>
         <translation>nicht synchron</translation>
+    </message>
+    <message>
+        <source>Disabled</source>
+        <translation>Deaktiviert</translation>
+    </message>
+    <message>
+        <source>No inputs detected</source>
+        <translation>Keine Inputs gefunden</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n Rounds</source>
+        <translation><numerusform>%n Runde</numerusform><numerusform>%n Runden</numerusform></translation>
+    </message>
+    <message>
+        <source>Not enough compatible inputs to anonymize &lt;span style='color:red;'&gt;%1&lt;/span&gt;,&lt;br&gt;will anonymize &lt;span style='color:red;'&gt;%2&lt;/span&gt; instead</source>
+        <translation>Nicht genug kompatible Inputs zum Anonymisieren von &lt;span style='color:red;'&gt;%1&lt;/span&gt; gefunden,&lt;br/&gt;&lt;span style='color:red;'&gt;%2&lt;/span&gt; wird stattdessen anonymisiert</translation>
+    </message>
+    <message>
+        <source>Overall progress</source>
+        <translation>Fortschritt</translation>
+    </message>
+    <message>
+        <source>Denominated</source>
+        <translation>Gestückelt</translation>
+    </message>
+    <message>
+        <source>Anonymized</source>
+        <translation>Anonymisiert</translation>
+    </message>
+    <message numerus="yes">
+        <source>Denominated inputs have %5 of %n rounds on average</source>
+        <translation><numerusform>Gestückelte Inputs haben im Durchschnitt %5 von %n Runde</numerusform><numerusform>Gestückelte Inputs haben im Durchschnitt %5 von %n Runden</numerusform></translation>
+    </message>
+    <message>
+        <source>Wallet is locked and user declined to unlock. Disabling Obfuscation.</source>
+        <translation>Wallet ist gesperrt und der Benutzer verweigert die Entsperrung. Verschleierung deaktiviert.</translation>
+    </message>
+    <message>
+        <source>Found enough compatible inputs to anonymize %1</source>
+        <translation>Genug kompatible Inputs zum Anonymisieren von %1 gefunden</translation>
+    </message>
+    <message>
+        <source>Start Obfuscation</source>
+        <translation>Verschleierung starten</translation>
+    </message>
+    <message>
+        <source>Stop Obfuscation</source>
+        <translation>Verschleierung stoppen</translation>
+    </message>
+    <message>
+        <source>Mixed</source>
+        <translation>Gemixt</translation>
+    </message>
+    <message>
+        <source>Enabled</source>
+        <translation>Aktiviert</translation>
+    </message>
+    <message>
+        <source>N/A</source>
+        <translation>k.A.</translation>
     </message>
 </context>
 <context>
     <name>PaymentServer</name>
-    <message>
-        <source>Payment request error</source>
-        <translation>Zahlungsauftragsfehler</translation>
-    </message>
-    <message>
-        <source>URI handling</source>
-        <translation>URI Behandlung</translation>
-    </message>
-    <message>
-        <source>Payment request fetch URL is invalid: %1</source>
-        <translation>Zahlungsauftragsabruf URL ist ungültig: %1</translation>
-    </message>
-    <message>
-        <source>Payment request file handling</source>
-        <translation>Zahlungsauftragsdatei Behandlung</translation>
-    </message>
-    <message>
-        <source>Invalid payment address %1</source>
-        <translation>Zahlungsaufforderungadresse %1</translation>
-    </message>
-    <message>
-        <source>Cannot start lux: click-to-pay handler</source>
-        <translation>Kann LUX nicht starten: click-to-pay Handler</translation>
-    </message>
-    <message>
-        <source>URI cannot be parsed! This can be caused by an invalid LUX address or malformed URI parameters.</source>
-        <translation>URI kann nicht analysiert werden! Dies kann durch eine ungültige LUX-Adresse oder fehlerhafte URI-Parameter verursacht sein.</translation>
-    </message>
-    <message>
-        <source>Payment request file cannot be read! This can be caused by an invalid payment request file.</source>
-        <translation>Zahlungsauftragsdatei kann nicht gelesen werden! Dies kann durch eine ungültige Zahlungsauftragsdatei verursacht werden.</translation>
-    </message>
-    <message>
-        <source>Payment request rejected</source>
-        <translation>Zahlungsauftrag abgelehnt</translation>
-    </message>
-    <message>
-        <source>Payment request network doesn't match client network.</source>
-        <translation>Das Zahlungsauftragsnetzwerk stimmt nicht mit dem Clientnetzwerk überein.</translation>
-    </message>
-    <message>
-        <source>Payment request has expired.</source>
-        <translation>Zahlungsauftrag ist abgelaufen.</translation>
-    </message>
-    <message>
-        <source>Payment request is not initialized.</source>
-        <translation>Zahlungsauftrag ist nicht initialisiert.</translation>
-    </message>
-    <message>
-        <source>Unverified payment requests to custom payment scripts are unsupported.</source>
-        <translation>Nicht verifizierte Zahlungsaufträge an benutzerdefinierte Zahlungsskripts werden nicht unterstützt.</translation>
-    </message>
-    <message>
-        <source>Requested payment amount of %1 is too small (considered dust).</source>
-        <translation>Der angeforderte Zahlungsbetrag von %1 ist zu klein (betrachtet als Staub).</translation>
-    </message>
-    <message>
-        <source>Refund from %1</source>
-        <translation>Rückerstattung von %1</translation>
-    </message>
-    <message>
-        <source>Payment request %1 is too large (%2 bytes, allowed %3 bytes).</source>
-        <translation>Zahlungsauftrag %1 ist zu groß (%2 Bytes, erlaubt %3 Bytes).</translation>
-    </message>
-    <message>
-        <source>Payment request DoS protection</source>
-        <translation>Zahlungsauftrag DoS Schutz</translation>
-    </message>
-    <message>
-        <source>Error communicating with %1: %2</source>
-        <translation>Fehler beim kommunizieren mit %1: %2</translation>
-    </message>
-    <message>
-        <source>Payment request cannot be parsed!</source>
-        <translation>Zahlungsauftrag kann nicht analysiert werden!</translation>
-    </message>
-    <message>
-        <source>Bad response from server %1</source>
-        <translation>Schlechte Antwort vom Server %1</translation>
-    </message>
-    <message>
-        <source>Network request error</source>
-        <translation>Netzwerkanfragefehler</translation>
-    </message>
-    <message>
-        <source>Payment acknowledged</source>
-        <translation>Zahlung anerkannt</translation>
-    </message>
-</context>
+    </context>
 <context>
     <name>PeerTableModel</name>
     <message>
@@ -2050,475 +1260,6 @@ https://www.transifex.com/216k155/216k155-translations</translation>
     <message>
         <source>Ping Time</source>
         <translation>Latenz (Ping)</translation>
-    </message>
-</context>
-<context>
-    <name>PrivacyDialog</name>
-    <message>
-        <source>LUX which were anonymized via Zerocin Protocol</source>
-        <translation>LUX, die über das Zerocin-Protokoll anonymisiert wurden</translation>
-    </message>
-    <message>
-        <source>Zerocoin LUX (zLUX)</source>
-        <translation>Zerocoin LUX (zLUX)</translation>
-    </message>
-    <message>
-        <source>Zerocoin Actions:</source>
-        <translation>Zerocoin Handlungen:</translation>
-    </message>
-    <message>
-        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the LUX network after a connection is established, but this process has not completed yet.</source>
-        <translation>Die angezeigte Information ist möglicherweise nicht mehr aktuell. Ihre Wallet synchronisiert sich automatisch mit dem LUX-Netzwerk, nachdem eine Verbindung hergestellt wurde. Aber dieser Vorgang ist noch nicht abgeschlossen.</translation>
-    </message>
-    <message>
-        <source>Enter an amount of Piv to convert to zLux</source>
-        <translation>Eingabe des Piv-Betrags, um in zLux umzuwandeln</translation>
-    </message>
-    <message>
-        <source>Mint Zerocoin</source>
-        <translation>Präge Zerocoin</translation>
-    </message>
-    <message>
-        <source>0</source>
-        <translation>0</translation>
-    </message>
-    <message>
-        <source>zLUX</source>
-        <translation>zLUX</translation>
-    </message>
-    <message>
-        <source>Available for Minting:</source>
-        <translation>Verfügbar für Prägung:</translation>
-    </message>
-    <message>
-        <source>0.000 000 00 LUX</source>
-        <translation>0.000 000 00 LUX</translation>
-    </message>
-    <message>
-        <source>Reset Zerocoin Wallet DB. Deletes transactions that did not make it into the blockchain.</source>
-        <translation>Zurücksetzen der Zerocoin-Wallet-DB. Löscht Transaktionen, die es nicht in die Blockchain geschafft haben.</translation>
-    </message>
-    <message>
-        <source>Reset</source>
-        <translation>Zurücksetzen</translation>
-    </message>
-    <message>
-        <source>Coin Control...</source>
-        <translation>Coin-Kontrolle...</translation>
-    </message>
-    <message>
-        <source>Quantity:</source>
-        <translation>Anzahl:</translation>
-    </message>
-    <message>
-        <source>Amount:</source>
-        <translation>Betrag:</translation>
-    </message>
-    <message>
-        <source>Rescan the complete blockchain for  Zerocoin mints and their meta-data. Needs a very long time, please be patient.</source>
-        <translation>Nachscannen der komplette Blockchain für Zerocoin-Prägungen und ihre Metadaten. Braucht eine sehr lange Zeit. Bitte seien Sie geduldig.</translation>
-    </message>
-    <message>
-        <source>ReScan</source>
-        <translation>NachScannen</translation>
-    </message>
-    <message>
-        <source>Status and/or Mesages from the last Mint Action.</source>
-        <translation>Status und/oder Mitteilungen aus der letzten Präge-Action</translation>
-    </message>
-    <message>
-        <source>zLux Control</source>
-        <translation>zLux Kontrolle</translation>
-    </message>
-    <message>
-        <source>zLux Selected:</source>
-        <translation>zLux Ausgewählt:</translation>
-    </message>
-    <message>
-        <source>Quantity Selected:</source>
-        <translation>Menge ausgewählt:</translation>
-    </message>
-    <message>
-        <source>Spend Zerocoin. Without 'Pay To:' address creates payments to yourself.</source>
-        <translation>Ausgebene Zerocoin. Ohne 'Pay To:'-Adresse erstellte Zahlungen an Sie selbst.</translation>
-    </message>
-    <message>
-        <source>Spend Zerocoin</source>
-        <translation>Ausgebene Zerocoin.</translation>
-    </message>
-    <message>
-        <source>Available Balance:</source>
-        <translation>Verfügbare Bilanz:</translation>
-    </message>
-    <message>
-        <source>0 zLUX</source>
-        <translation>0 zLUX</translation>
-    </message>
-    <message>
-        <source>Security Level for Zerocoin Transactions. More is better, but needs more time and resources.</source>
-        <translation>Sicherheitsstufe für Zerocoin-Transaktionen. Mehr ist besser, braucht aber mehr Zeit und Ressourcen.</translation>
-    </message>
-    <message>
-        <source>Security Level:</source>
-        <translation>Sicherheitsstufe:</translation>
-    </message>
-    <message>
-        <source>Security Level 1 - 100 (default: 42)</source>
-        <translation>Sicherheitsstufe 1 - 100 (Voreinstellung: 42)</translation>
-    </message>
-    <message>
-        <source>Pay &amp;To:</source>
-        <translation>E&amp;mpfänger:</translation>
-    </message>
-    <message>
-        <source>The LUX address to send the payment to. Creates local payment to yourself when empty.</source>
-        <translation>Die LUX-Adresse, an die die Zahlung gesenden wird. Erstelle Sie eine lokale Zahlung an sich selbst, wenn sie leer ist.</translation>
-    </message>
-    <message>
-        <source>Choose previously used address</source>
-        <translation>Bereits verwendete Adresse auswählen</translation>
-    </message>
-    <message>
-        <source>Alt+A</source>
-        <translation>Alt+A</translation>
-    </message>
-    <message>
-        <source>Paste address from clipboard</source>
-        <translation>Adresse aus der Zwischenablage einfügen</translation>
-    </message>
-    <message>
-        <source>Alt+P</source>
-        <translation>Alt+P</translation>
-    </message>
-    <message>
-        <source>&amp;Label:</source>
-        <translation>&amp;Bezeichnung:</translation>
-    </message>
-    <message>
-        <source>Enter a label for this address to add it to the list of used addresses</source>
-        <translation>Adressbezeichnung eingeben, um diese in der Liste der bereits verwendeten Adressen zu speichern</translation>
-    </message>
-    <message>
-        <source>A&amp;mount:</source>
-        <translation>Betra&amp;g:</translation>
-    </message>
-    <message>
-        <source>Convert Change to Zerocoin (might cost additional fees)</source>
-        <translation>Wandle Wechselgeld in Zerocoin um (kann zusätzliche Gebühren kosten)</translation>
-    </message>
-    <message>
-        <source>If checked, the wallet tries to minimize the returning change instead of minimizing the number of spent denominations.</source>
-        <translation>Wenn überprüft wird, versucht die Wallet, das zurückkehrende Wechselgeld zu minimieren, anstatt die Anzahl der verbrauchten Stückelungen zu minimieren.</translation>
-    </message>
-    <message>
-        <source>Minimize Change</source>
-        <translation>Minimiert Wechselgeld</translation>
-    </message>
-    <message>
-        <source>Information about the available Zerocoin funds.</source>
-        <translation>Informationen über die verfügbaren Zerocoin-Mittel.</translation>
-    </message>
-    <message>
-        <source>Zerocoin Stats:</source>
-        <translation>Zerocoin Statistiken:</translation>
-    </message>
-    <message>
-        <source>Available Funds</source>
-        <translation>Verfügbare Mittel</translation>
-    </message>
-    <message>
-        <source>Available Zerocoin  Balance:</source>
-        <translation>Verfügbare Zerocoin Bilanz:</translation>
-    </message>
-    <message>
-        <source>Denominations with value 1:</source>
-        <translation>Stückelungen mit Wert 1:</translation>
-    </message>
-    <message>
-        <source>Denom. with value 1:</source>
-        <translation>Stücke mit Wert 1:</translation>
-    </message>
-    <message>
-        <source>0 x</source>
-        <translation>0 x</translation>
-    </message>
-    <message>
-        <source>Denominations with value 5:</source>
-        <translation>Stückelungen mit Wert 5:</translation>
-    </message>
-    <message>
-        <source>Denom. with value 5:</source>
-        <translation>Stücke mit Wert 5:</translation>
-    </message>
-    <message>
-        <source>Denominations with value 10:</source>
-        <translation>Stückelungen mit Wert 10:</translation>
-    </message>
-    <message>
-        <source>Denom. with value 10:</source>
-        <translation>Stücke mit Wert 10:</translation>
-    </message>
-    <message>
-        <source>Denominations with value 50:</source>
-        <translation>Stückelungen mit Wert 50:</translation>
-    </message>
-    <message>
-        <source>Denom. with value 50:</source>
-        <translation>Stücke mit Wert 50:</translation>
-    </message>
-    <message>
-        <source>Denominations with value 100:</source>
-        <translation>Stückelungen mit Wert 100:</translation>
-    </message>
-    <message>
-        <source>Denom. with value 100:</source>
-        <translation>Stücke mit Wert 100:</translation>
-    </message>
-    <message>
-        <source>Denominations with value 500:</source>
-        <translation>Stückelungen mit Wert 500:</translation>
-    </message>
-    <message>
-        <source>Denom. with value 500:</source>
-        <translation>Stücke mit Wert 500:</translation>
-    </message>
-    <message>
-        <source>Denominations with value 1000:</source>
-        <translation>Stückelungen mit Wert 1000:</translation>
-    </message>
-    <message>
-        <source>Denom. with value 1000:</source>
-        <translation>Stücke mit Wert 1000:</translation>
-    </message>
-    <message>
-        <source>Denominations with value 5000:</source>
-        <translation>Stückelungen mit Wert 5000:</translation>
-    </message>
-    <message>
-        <source>Denom. with value 5000:</source>
-        <translation>Stücke mit Wert 5000:</translation>
-    </message>
-    <message>
-        <source>Note: This hidden objects are used for communication between the 'Coin Control' dialog and its parent objects. We don't want to change/reimplement the existing Coin Control, so this objects must be here, even when we don't use them. No, we don't like this approach, either.</source>
-        <translation>Hinweis: Diese verborgenen Objekte werden für die Kommunikation zwischen dem Dialog "Coin Kontrolle" und den übergeordneten Objekten verwendet. Wir wollen die bestehende Coin Kontrolle nicht ändern / reimplementieren. Also müssen diese Objekte hier sein, auch wenn wir sie nicht benutzen. Nein, das gefällt uns auch nicht.</translation>
-    </message>
-    <message>
-        <source>Priority:</source>
-        <translation>Priorität:</translation>
-    </message>
-    <message>
-        <source>Fee:</source>
-        <translation>Gebühr:</translation>
-    </message>
-    <message>
-        <source>Dust:</source>
-        <translation>Abzug:</translation>
-    </message>
-    <message>
-        <source>no</source>
-        <translation>nein</translation>
-    </message>
-    <message>
-        <source>Bytes:</source>
-        <translation>Byte:</translation>
-    </message>
-    <message>
-        <source>Insufficient funds!</source>
-        <translation>Unzureichender Kontostand!</translation>
-    </message>
-    <message>
-        <source>Coins automatically selected</source>
-        <translation>Coins automatisch ausgewählt</translation>
-    </message>
-    <message>
-        <source>medium</source>
-        <translation>mittel</translation>
-    </message>
-    <message>
-        <source>Coin Control Features</source>
-        <translation>"Coin Control"-Funktionen</translation>
-    </message>
-    <message>
-        <source>If this is activated, but the change address is empty or invalid, change will be sent to a newly generated address.</source>
-        <translation>Wenn dies aktivert, und die Wechselgeld-Adresse leer oder ungültig ist, wird das Wechselgeld einer neu erzeugten Adresse gutgeschrieben.</translation>
-    </message>
-    <message>
-        <source>Custom change address</source>
-        <translation>Benutzerdefinierte Wechselgeld-Adresse</translation>
-    </message>
-    <message>
-        <source>Amount After Fee:</source>
-        <translation>Betrag nach Gebühr:</translation>
-    </message>
-    <message>
-        <source>Change:</source>
-        <translation>Wechselgeld:</translation>
-    </message>
-    <message>
-        <source>out of sync</source>
-        <translation>nicht synchron</translation>
-    </message>
-    <message>
-        <source>Mint Status: Okay</source>
-        <translation>Prägestatus: Okay</translation>
-    </message>
-    <message>
-        <source>Copy quantity</source>
-        <translation>Kopiere Anzahl</translation>
-    </message>
-    <message>
-        <source>Copy amount</source>
-        <translation>Betrag kopieren</translation>
-    </message>
-    <message>
-        <source>Error: your wallet is locked. Please enter the wallet passphrase first.</source>
-        <translation>Fehler: Ihre Brieftasche ist gesperrt. Bitte geben Sie zuerst die Passphrase der Wallet ein.</translation>
-    </message>
-    <message>
-        <source>Message: Enter an amount &gt; 0.</source>
-        <translation>Nachricht: Geben Sie einen Betrag &gt; 0 ein.</translation>
-    </message>
-    <message>
-        <source>Minting </source>
-        <translation>Prägung</translation>
-    </message>
-    <message>
-        <source>Successfully minted </source>
-        <translation>Erfolgreich geprägt</translation>
-    </message>
-    <message>
-        <source> zLUX in </source>
-        <translation> zLUX in </translation>
-    </message>
-    <message>
-        <source> sec. Used denominations:
-</source>
-        <translation> ausg. Verwendete Stückelungen:
-</translation>
-    </message>
-    <message>
-        <source>Starting ResetMintZerocoin: rescanning the complete blockchain, this will need up to 30 minutes depending on your hardware.&lt;br /&gt;&lt;br /&gt;</source>
-        <translation>Starten von ResetMintZerocoin: Nachscannung der kompletten Blockchain. Das benötigt bis zu 30 Minuten je nach Hardware.&lt;br /&gt;&lt;br /&gt;</translation>
-    </message>
-    <message>
-        <source>You won't be able to do anything else during that time!&lt;br /&gt;</source>
-        <translation>Sie können während dieser Zeit nichts anderes machen!&lt;br /&gt;</translation>
-    </message>
-    <message>
-        <source>Confirm Rescan</source>
-        <translation>Nachscannen bestätigen</translation>
-    </message>
-    <message>
-        <source>ResetMintZerocoin: action canceled by user</source>
-        <translation>ResetMintZerocoin: Aktion vom Benutzer abgebrochen</translation>
-    </message>
-    <message>
-        <source>Starting ResetMintZerocoin: rescanning complete blockchain, this will need up to 30 minutes depending on your hardware. 
-Please be patient...</source>
-        <translation>Starten von ResetMintZerocoin: Nachscannen der kompletten Blockchain. Das benötigt bis zu 30 Minuten je nach Hardware.
-Bitte haben Sie Geduld...</translation>
-    </message>
-    <message>
-        <source>Duration: </source>
-        <translation>Dauer:</translation>
-    </message>
-    <message>
-        <source> sec.
-</source>
-        <translation>ausg.
-</translation>
-    </message>
-    <message>
-        <source>Starting ResetSpentZerocoin: </source>
-        <translation>Starte ResetSpentZerocoin: </translation>
-    </message>
-    <message>
-        <source>No 'Pay To' address provided, creating local payment</source>
-        <translation>Keine "Pay To"-Adresse zur Verfügung. Erstelle lokale Zahlung</translation>
-    </message>
-    <message>
-        <source>Invalid Lux Address</source>
-        <translation>Ungültige LUX-Adresse </translation>
-    </message>
-    <message>
-        <source>Invalid Send Amount</source>
-        <translation>Ungültiger Sendebetrag.</translation>
-    </message>
-    <message>
-        <source>Confirm additional Fees</source>
-        <translation>Zusätzliche Gebühren bestätigen</translation>
-    </message>
-    <message>
-        <source>Are you sure you want to send?&lt;br /&gt;&lt;br /&gt;</source>
-        <translation>Sind Sie sicher, dass Sie senden möchten?&lt;br /&gt;&lt;br /&gt;</translation>
-    </message>
-    <message>
-        <source> to address </source>
-        <translation>an Adresse</translation>
-    </message>
-    <message>
-        <source> to a newly generated (unused and therefor anonymous) local address &lt;br /&gt;</source>
-        <translation>zu einer neu erzeugten (unbenutzten und damit anonymen) lokalen Adresse &lt;br /&gt;</translation>
-    </message>
-    <message>
-        <source>with Security Level </source>
-        <translation>mit Sicherheitsstufe</translation>
-    </message>
-    <message>
-        <source>Confirm send coins</source>
-        <translation>Sende Coins bestätigen</translation>
-    </message>
-    <message>
-        <source>Spending Zerocoin.
-Computationally expensive, might need several minutes depending on the selected Security Level and your hardware. 
-Please be patient...</source>
-        <translation>Zerocoin ausgeben.
-Rechnerisch aufwändig. Kann je nach ausgewähltem Sicherheitsstufe und Ihrer Hardware mehrere Minuten benötigen
-Bitte haben Sie Geduld...</translation>
-    </message>
-    <message>
-        <source>Spend Zerocoin failed with status = </source>
-        <translation>Ausgeben Zerocoin fehlgeschlagen mit Status =</translation>
-    </message>
-    <message>
-        <source>zLux Spend #: </source>
-        <translation>zLUX Ausgeben #:</translation>
-    </message>
-    <message>
-        <source>denomination: </source>
-        <translation>Stückelung:</translation>
-    </message>
-    <message>
-        <source>serial: </source>
-        <translation>seriell:</translation>
-    </message>
-    <message>
-        <source>Spend is 1 of : </source>
-        <translation>Spend ist 1 von :</translation>
-    </message>
-    <message>
-        <source>value out: </source>
-        <translation>Betrag out:</translation>
-    </message>
-    <message>
-        <source>address: </source>
-        <translation>Adresse:</translation>
-    </message>
-    <message>
-        <source>zLux Mint</source>
-        <translation>zLux Prägen</translation>
-    </message>
-    <message>
-        <source>Sending successful, return code: </source>
-        <translation>Senden erfolgreich, Rückgabecode:</translation>
-    </message>
-    <message>
-        <source>txid: </source>
-        <translation>txid: </translation>
-    </message>
-    <message>
-        <source>fee: </source>
-        <translation>Gebühr:</translation>
     </message>
 </context>
 <context>
@@ -2550,10 +1291,6 @@ Bitte haben Sie Geduld...</translation>
     <message>
         <source>NETWORK</source>
         <translation>NETZWERK</translation>
-    </message>
-    <message>
-        <source>BLOOM</source>
-        <translation>BLOOM</translation>
     </message>
     <message>
         <source>UNKNOWN</source>
@@ -2594,124 +1331,12 @@ Bitte haben Sie Geduld...</translation>
 <context>
     <name>RPCConsole</name>
     <message>
-        <source>Tools window</source>
-        <translation>Werkzeugfenster</translation>
-    </message>
-    <message>
         <source>&amp;Information</source>
         <translation>&amp;Information</translation>
     </message>
     <message>
-        <source>General</source>
-        <translation>Allgemein</translation>
-    </message>
-    <message>
-        <source>Name</source>
-        <translation>Name</translation>
-    </message>
-    <message>
-        <source>Client name</source>
-        <translation>Client Name</translation>
-    </message>
-    <message>
         <source>N/A</source>
         <translation>k.A.</translation>
-    </message>
-    <message>
-        <source>Number of connections</source>
-        <translation>Anzahl der Verbindungen</translation>
-    </message>
-    <message>
-        <source>&amp;Open</source>
-        <translation>&amp;Offen</translation>
-    </message>
-    <message>
-        <source>Startup time</source>
-        <translation>Startzeit</translation>
-    </message>
-    <message>
-        <source>Network</source>
-        <translation>Netzwerk</translation>
-    </message>
-    <message>
-        <source>Last block time</source>
-        <translation>Letzte Blockzeit</translation>
-    </message>
-    <message>
-        <source>Debug log file</source>
-        <translation>Debug-Protokolldatei</translation>
-    </message>
-    <message>
-        <source>Using OpenSSL version</source>
-        <translation>Verwendete OpenSSL Version</translation>
-    </message>
-    <message>
-        <source>Build date</source>
-        <translation>Build Datum</translation>
-    </message>
-    <message>
-        <source>Current number of blocks</source>
-        <translation>Aktuelle Blockanzahl</translation>
-    </message>
-    <message>
-        <source>Client version</source>
-        <translation>Client Version</translation>
-    </message>
-    <message>
-        <source>Using BerkeleyDB version</source>
-        <translation>Verwendete BerkeleyDB Version</translation>
-    </message>
-    <message>
-        <source>Block chain</source>
-        <translation>Block chain</translation>
-    </message>
-    <message>
-        <source>Open the LUX debug log file from the current data directory. This can take a few seconds for large log files.</source>
-        <translation>Öffne LUX-Debug-Protokolldatei aus dem aktuellen Datenverzeichnis. Dies kann für einige Protokolldateien einige Sekunden dauern.</translation>
-    </message>
-    <message>
-        <source>Number of Masternodes</source>
-        <translation>Anzahl der Masternodes</translation>
-    </message>
-    <message>
-        <source>&amp;Console</source>
-        <translation>&amp;Konsole</translation>
-    </message>
-    <message>
-        <source>Clear console</source>
-        <translation> Leere Konsole</translation>
-    </message>
-    <message>
-        <source>&amp;Network Traffic</source>
-        <translation>&amp;Netzwerk Traffic</translation>
-    </message>
-    <message>
-        <source>&amp;Clear</source>
-        <translation>&amp;Clear</translation>
-    </message>
-    <message>
-        <source>Totals</source>
-        <translation>Gesamtbetrag</translation>
-    </message>
-    <message>
-        <source>Received</source>
-        <translation>Empfangen</translation>
-    </message>
-    <message>
-        <source>Sent</source>
-        <translation>Gesendet</translation>
-    </message>
-    <message>
-        <source>&amp;Peers</source>
-        <translation>&amp;Peers</translation>
-    </message>
-    <message>
-        <source>Select a peer to view detailed information.</source>
-        <translation>Wähle ein Peer, um detaillierte Informationen zu sehen.</translation>
-    </message>
-    <message>
-        <source>Direction</source>
-        <translation>Richtung</translation>
     </message>
     <message>
         <source>Protocol</source>
@@ -2722,128 +1347,8 @@ Bitte haben Sie Geduld...</translation>
         <translation>Programmversion</translation>
     </message>
     <message>
-        <source>Services</source>
-        <translation>Dienstleistung</translation>
-    </message>
-    <message>
-        <source>Starting Height</source>
-        <translation>Starthöhe </translation>
-    </message>
-    <message>
-        <source>Sync Height</source>
-        <translation>Sync Höhe</translation>
-    </message>
-    <message>
-        <source>Ban Score</source>
-        <translation>Ban Score</translation>
-    </message>
-    <message>
-        <source>Connection Time</source>
-        <translation>Verbindungszeit</translation>
-    </message>
-    <message>
-        <source>Last Send</source>
-        <translation>Letztes Senden</translation>
-    </message>
-    <message>
-        <source>Last Receive</source>
-        <translation>Letzter Empfang</translation>
-    </message>
-    <message>
-        <source>Bytes Sent</source>
-        <translation>Bytes gesendet</translation>
-    </message>
-    <message>
-        <source>Bytes Received</source>
-        <translation>Bytes empfangen</translation>
-    </message>
-    <message>
         <source>Ping Time</source>
         <translation>Latenz (Ping)</translation>
-    </message>
-    <message>
-        <source>&amp;Wallet Repair</source>
-        <translation>&amp;Wallet Reparieren </translation>
-    </message>
-    <message>
-        <source>Wallet In Use:</source>
-        <translation>Wallet In Benutzung:</translation>
-    </message>
-    <message>
-        <source>Salvage wallet</source>
-        <translation>Wallet Rettung</translation>
-    </message>
-    <message>
-        <source>Attempt to recover private keys from a corrupt wallet.dat.</source>
-        <translation>Versuche, private Schlüssel aus einer beschädigten wallet.dat zurückzugewinnen.</translation>
-    </message>
-    <message>
-        <source>Rescan blockchain files</source>
-        <translation>Nachscannen der Bockchain Dateien</translation>
-    </message>
-    <message>
-        <source>Rescan the block chain for missing wallet transactions.</source>
-        <translation>Nachscannen der Bockchain nach verschollen Wallet Transaktionen</translation>
-    </message>
-    <message>
-        <source>Recover transactions 1</source>
-        <translation>Wiederherstellung von Transaktionen 1</translation>
-    </message>
-    <message>
-        <source>Recover transactions from blockchain (keep meta-data, e.g. account owner).</source>
-        <translation>Wiederherstellung von Transaktionen von Blockchain (behalte Meta-Daten, zB. Kontoinhaber)</translation>
-    </message>
-    <message>
-        <source>Recover transactions 2</source>
-        <translation>Wiederherstellung von Transaktionen 2</translation>
-    </message>
-    <message>
-        <source>Recover transactions from blockchain (drop meta-data).</source>
-        <translation>Wiederherstellung von Transaktionen von Blockchain (verwerfe Meta-Daten)</translation>
-    </message>
-    <message>
-        <source>Upgrade wallet format</source>
-        <translation>Upgrade Wallet Format</translation>
-    </message>
-    <message>
-        <source>Rebuild block chain index from current blk000??.dat files.</source>
-        <translation>Umbau des Blockchain Index vom aktuellen blk000??.dat Datei.</translation>
-    </message>
-    <message>
-        <source>The buttons below will restart the wallet with command-line options to repair the wallet, fix issues with corrupt blockhain files or missing/obsolete transactions.</source>
-        <translation>Die unten aufgeführten Schaltflächen starten die Wallet mit Befehlszeilenoptionen, um die Wallet zu reparieren. Problemebehebung  mit beschädigten Blockhain-Dateien oder fehlenden/veralteten Transaktionen.</translation>
-    </message>
-    <message>
-        <source>Wallet repair options.</source>
-        <translation>Wallet-Reparatur-Optionen </translation>
-    </message>
-    <message>
-        <source>Upgrade wallet to latest format on startup. (Note: this is NOT an update of the wallet itself!)</source>
-        <translation>Upgrade Wallet auf neueste Format beim Start. (Anmerkung: Dies ist NICHT ein Update der Wallet selbst!)</translation>
-    </message>
-    <message>
-        <source>Rebuild index</source>
-        <translation>Unbau-Index</translation>
-    </message>
-    <message>
-        <source>In:</source>
-        <translation>In:</translation>
-    </message>
-    <message>
-        <source>Out:</source>
-        <translation>Out:</translation>
-    </message>
-    <message>
-        <source>Welcome to the LUX RPC console.</source>
-        <translation>Willkommen in der LUX RPC Konsole.</translation>
-    </message>
-    <message>
-        <source>Use up and down arrows to navigate history, and &lt;b&gt;Ctrl-L&lt;/b&gt; to clear screen.</source>
-        <translation>Nutze Pfeiltasten hoch und runter um alt Konsolenbefehle hervor zu holen, und &lt;b&gt;Ctrl-L&lt;/b&gt; um die Konsole zu reinigen.</translation>
-    </message>
-    <message>
-        <source>Type &lt;b&gt;help&lt;/b&gt; for an overview of available commands.</source>
-        <translation>Gebe &lt;b&gt;help&lt;/b&gt; ein, um eine Übersicht der verfügbaren Befehle zu erhalten.</translation>
     </message>
     <message>
         <source>%1 B</source>
@@ -2862,71 +1367,23 @@ Bitte haben Sie Geduld...</translation>
         <translation>%1 GB</translation>
     </message>
     <message>
-        <source>via %1</source>
-        <translation>via %1</translation>
-    </message>
-    <message>
         <source>never</source>
         <translation>nie</translation>
-    </message>
-    <message>
-        <source>Inbound</source>
-        <translation>Eingehend</translation>
-    </message>
-    <message>
-        <source>Outbound</source>
-        <translation>Ausgehend</translation>
     </message>
     <message>
         <source>Unknown</source>
         <translation>Unbekannt</translation>
     </message>
-    <message>
-        <source>Fetching...</source>
-        <translation>Holen...</translation>
-    </message>
-</context>
+    </context>
 <context>
     <name>ReceiveCoinsDialog</name>
-    <message>
-        <source>Reuse one of the previously used receiving addresses.&lt;br&gt;Reusing addresses has security and privacy issues.&lt;br&gt;Do not use this unless re-generating a payment request made before.</source>
-        <translation>Wiederverwendung eines der zuvor verwendeten Empfangsadressen.&lt;br&gt;Wiederverwendung-Adressen haben Sicherheits- und Datenschutzprobleme.&lt;br&gt;Verwenden Sie diese nicht, es sei denn, dass Sie zuvor eine Zahlungsanforderung generieren.</translation>
-    </message>
-    <message>
-        <source>R&amp;euse an existing receiving address (not recommended)</source>
-        <translation>&amp;Wiederverwendung einer vorhandenen Empfangsadresse (nicht empfohlen)</translation>
-    </message>
     <message>
         <source>&amp;Message:</source>
         <translation>Nachricht:</translation>
     </message>
     <message>
-        <source>An optional label to associate with the new receiving address.</source>
-        <translation>Ein optionales Etikett, das mit der neuen Empfangsadresse verknüpft werden soll.</translation>
-    </message>
-    <message>
-        <source>An optional message to attach to the payment request, which will be displayed when the request is opened. Note: The message will not be sent with the payment over the LUX network.</source>
-        <translation>Eine optionale Nachricht anhängen an die Zahlungsaufforderung, die bei der Eröffnung der Anforderung angezeigt wird. Hinweis: Die Nachricht wird nicht mit der Zahlung über das LUX-Netzwerk gesendet.</translation>
-    </message>
-    <message>
-        <source>An optional message to attach to the payment request, which will be displayed when the request is opened.&lt;br&gt;Note: The message will not be sent with the payment over the LUX network.</source>
-        <translation>Eine optionale Nachricht anhängen an die Zahlungsaufforderung, die bei der Eröffnung der Anforderung angezeigt wird.&lt;br&gt;Hinweis: Die Nachricht wird nicht mit der Zahlung über das LUX-Netzwerk gesendet.</translation>
-    </message>
-    <message>
-        <source>Use this form to request payments. All fields are &lt;b&gt;optional&lt;/b&gt;.</source>
-        <translation>Verwenden Sie dieses Formular, um Zahlungen anzufordern. Alle Felder sind &lt;b&gt;optional&lt;/b&gt;.</translation>
-    </message>
-    <message>
         <source>&amp;Label:</source>
         <translation>&amp;Bezeichnung:</translation>
-    </message>
-    <message>
-        <source>An optional amount to request. Leave this empty or zero to not request a specific amount.</source>
-        <translation>Einen optionalen Betrag anfordern. Lassen Sie diesen leer oder Null, um nicht einen bestimmten Betrag anzufordern.</translation>
-    </message>
-    <message>
-        <source>&amp;Amount:</source>
-        <translation>&amp;Betrag:</translation>
     </message>
     <message>
         <source>&amp;Request payment</source>
@@ -2937,36 +1394,8 @@ Bitte haben Sie Geduld...</translation>
         <translation>Alle Formularfelder zurücksetzen.</translation>
     </message>
     <message>
-        <source>Clear</source>
-        <translation>Clear</translation>
-    </message>
-    <message>
-        <source>Requested payments history</source>
-        <translation>Verlauf der  Angeforderten Zahlungen</translation>
-    </message>
-    <message>
-        <source>Show the selected request (does the same as double clicking an entry)</source>
-        <translation>Zeige die ausgewählte Anfrage an (entspricht dem Doppelklick auf einen Eintrag)</translation>
-    </message>
-    <message>
-        <source>Show</source>
-        <translation>Anzeigen</translation>
-    </message>
-    <message>
-        <source>Remove the selected entries from the list</source>
-        <translation>Entferne die ausgewählten Einträge aus der Liste</translation>
-    </message>
-    <message>
-        <source>Remove</source>
-        <translation>Entfernen</translation>
-    </message>
-    <message>
         <source>Copy label</source>
         <translation>Bezeichnung kopieren</translation>
-    </message>
-    <message>
-        <source>Copy message</source>
-        <translation>Kopiere Nachricht</translation>
     </message>
     <message>
         <source>Copy amount</source>
@@ -2980,28 +1409,8 @@ Bitte haben Sie Geduld...</translation>
         <translation>QR Code</translation>
     </message>
     <message>
-        <source>Copy &amp;URI</source>
-        <translation>Kopiere &amp;URI</translation>
-    </message>
-    <message>
-        <source>Copy &amp;Address</source>
-        <translation>Kopiere &amp;Adresse</translation>
-    </message>
-    <message>
         <source>&amp;Save Image...</source>
         <translation>Grafik &amp;speichern...</translation>
-    </message>
-    <message>
-        <source>Request payment to %1</source>
-        <translation>Zahlung anfordern %1</translation>
-    </message>
-    <message>
-        <source>Payment information</source>
-        <translation>Zahlungsinformationen</translation>
-    </message>
-    <message>
-        <source>URI</source>
-        <translation>URI</translation>
     </message>
     <message>
         <source>Address</source>
@@ -3019,15 +1428,7 @@ Bitte haben Sie Geduld...</translation>
         <source>Message</source>
         <translation>Nachricht</translation>
     </message>
-    <message>
-        <source>Resulting URI too long, try to reduce the text for label / message.</source>
-        <translation>Resultierende URI zu lange. Versuchen sie den Text für Label / Nachricht zu reduzieren.</translation>
-    </message>
-    <message>
-        <source>Error encoding URI into QR Code.</source>
-        <translation>Fehler, Codierung URI in QR-Code</translation>
-    </message>
-</context>
+    </context>
 <context>
     <name>RecentRequestsTableModel</name>
     <message>
@@ -3050,15 +1451,7 @@ Bitte haben Sie Geduld...</translation>
         <source>(no label)</source>
         <translation>(keine Bezeichnung)</translation>
     </message>
-    <message>
-        <source>(no message)</source>
-        <translation>(keine Nachricht)</translation>
-    </message>
-    <message>
-        <source>(no amount)</source>
-        <translation>(kein Betrag)</translation>
-    </message>
-</context>
+    </context>
 <context>
     <name>SendCoinsDialog</name>
     <message>
@@ -3068,6 +1461,10 @@ Bitte haben Sie Geduld...</translation>
     <message>
         <source>Coin Control Features</source>
         <translation>"Coin Control"-Funktionen</translation>
+    </message>
+    <message>
+        <source>automatically selected</source>
+        <translation>automatisch ausgewählt</translation>
     </message>
     <message>
         <source>Insufficient funds!</source>
@@ -3099,7 +1496,7 @@ Bitte haben Sie Geduld...</translation>
     </message>
     <message>
         <source>Dust:</source>
-        <translation>Abzug:</translation>
+        <translation>"Dust":</translation>
     </message>
     <message>
         <source>no</source>
@@ -3154,6 +1551,10 @@ Bitte haben Sie Geduld...</translation>
         <translation>Minimieren</translation>
     </message>
     <message>
+        <source>Obfuscation</source>
+        <translation>Verschleierung</translation>
+    </message>
+    <message>
         <source>per kilobyte</source>
         <translation>pro Kilobyte</translation>
     </message>
@@ -3178,26 +1579,6 @@ Bitte haben Sie Geduld...</translation>
         <translation>Bestätigungszeit:</translation>
     </message>
     <message>
-        <source>Open Coin Control...</source>
-        <translation>Öffne Coin Kontrolle...</translation>
-    </message>
-    <message>
-        <source>Coins automatically selected</source>
-        <translation>Coins automatisch ausgewählt</translation>
-    </message>
-    <message>
-        <source>If the custom fee is set to 1000 uLUXs and the transaction is only 250 bytes, then "per kilobyte" only pays 250 uLUXs in fee,&lt;br /&gt;while "at least" pays 1000 uLUXs. For transactions bigger than a kilobyte both pay by kilobyte.</source>
-        <translation>Wenn die kundenspezifische Gebühr auf 1000 uLUXs eingestellt ist und die Transaktion nur 250 Bytes beträgt, dann zahlt man "pro Kilobyte" nur 250 uLUXs an Gebühr,&lt;br /&gt;während man "mindestens" 1000 uLUXs bezahlt. Für Transaktionen, die größer sind als ein Kilobyte, bezahlen sie mit Kilobyte.</translation>
-    </message>
-    <message>
-        <source>If the custom fee is set to 1000 uLUXs and the transaction is only 250 bytes, then "per kilobyte" only pays 250 uLUXs in fee,&lt;br /&gt;while "total at least" pays 1000 uLUXs. For transactions bigger than a kilobyte both pay by kilobyte.</source>
-        <translation>Wenn die kundenspezifische Gebühr auf 1000 uLUXs eingestellt ist und die Transaktion nur 250 Bytes beträgt, dann zahlt man "pro Kilobyte" nur 250 uLUXs an Gebühr,&lt;br /&gt;während man "insgesamt mindestens" 1000 uLUXs bezahlt. Für Transaktionen, die größer sind als ein Kilobyte, bezahlen sie mit Kilobyte.</translation>
-    </message>
-    <message>
-        <source>Paying only the minimum fee is just fine as long as there is less transaction volume than space in the blocks.&lt;br /&gt;But be aware that this can end up in a never confirming transaction once there is more demand for LUX transactions than the network can process.</source>
-        <translation>Nur die minimale Gebühr zu zahlen ist nur gut, solange es weniger Transaktionsvolumen als Platz in den Blocken ist.&lt;br /&gt;Aber sein Sie sich bewusst, dass dies am Ende in einer niemals bestätigende Transaktion endet, sobald es mehr Nachfrage nach LUX-Transaktionen gibt, als das Netzwerk verarbeiten kann.</translation>
-    </message>
-    <message>
         <source>normal</source>
         <translation>normal</translation>
     </message>
@@ -3208,18 +1589,6 @@ Bitte haben Sie Geduld...</translation>
     <message>
         <source>Recommended</source>
         <translation>Empfohlen</translation>
-    </message>
-    <message>
-        <source>Send as zero-fee transaction if possible</source>
-        <translation>Sende als Null-Gebühr Transaction, wenn möglich</translation>
-    </message>
-    <message>
-        <source>(confirmation may take longer)</source>
-        <translation>(Bestätigung kann länger dauern)</translation>
-    </message>
-    <message>
-        <source>Confirm the send action</source>
-        <translation>Bestätige die Sendeaktion</translation>
     </message>
     <message>
         <source>S&amp;end</source>
@@ -3242,10 +1611,6 @@ Bitte haben Sie Geduld...</translation>
         <translation>Empfänge&amp;r hinzufügen</translation>
     </message>
     <message>
-        <source>Anonymized LUX</source>
-        <translation>Anonymisierte LUX</translation>
-    </message>
-    <message>
         <source>SwiftTX</source>
         <translation>SwiftTX</translation>
     </message>
@@ -3254,140 +1619,8 @@ Bitte haben Sie Geduld...</translation>
         <translation>Kontostand:</translation>
     </message>
     <message>
-        <source>Copy quantity</source>
-        <translation>Kopiere Anzahl</translation>
-    </message>
-    <message>
         <source>Copy amount</source>
         <translation>Betrag kopieren</translation>
-    </message>
-    <message>
-        <source>Copy fee</source>
-        <translation>Kopiere Gebühr</translation>
-    </message>
-    <message>
-        <source>Copy after fee</source>
-        <translation>Kopiere nach Gebühr</translation>
-    </message>
-    <message>
-        <source>Copy bytes</source>
-        <translation>Kopiere Bytes</translation>
-    </message>
-    <message>
-        <source>Copy priority</source>
-        <translation>Kopiere Priorität</translation>
-    </message>
-    <message>
-        <source>Copy dust</source>
-        <translation>Kopiere Abzug</translation>
-    </message>
-    <message>
-        <source>Copy change</source>
-        <translation>Kopiere Wechselgeld</translation>
-    </message>
-    <message>
-        <source>The split block tool does not work when sending to outside addresses. Try again.</source>
-        <translation>Das Split-Block-Tool funktioniert nicht beim Senden an externe Adressen. Versuch es noch einmal.</translation>
-    </message>
-    <message>
-        <source>The split block tool does not work with multiple addresses. Try again.</source>
-        <translation>Das Split-Block-Tool funktioniert nicht mit mehreren Adressen. Versuch es noch einmal.</translation>
-    </message>
-    <message>
-        <source>using</source>
-        <translation>benutzend</translation>
-    </message>
-    <message>
-        <source>anonymous funds</source>
-        <translation>anonyme Mittel</translation>
-    </message>
-    <message>
-        <source>Warning: Invalid LUX address</source>
-        <translation>Warnung: Ungültige LUX-Adresse</translation>
-    </message>
-    <message>
-        <source>any available funds (not recommended)</source>
-        <translation>verfügbare Mittel (nicht empfohlen)</translation>
-    </message>
-    <message>
-        <source>and SwiftTX</source>
-        <translation>und SwiftTX</translation>
-    </message>
-    <message>
-        <source>%1 to %2</source>
-        <translation>%1 zu %2</translation>
-    </message>
-    <message>
-        <source>Are you sure you want to send?</source>
-        <translation>Sind Sie sicher, dass Sie senden möchten?</translation>
-    </message>
-    <message>
-        <source>are added as transaction fee</source>
-        <translation>werden als Transaktionsgebühr hinzugefügt</translation>
-    </message>
-    <message>
-        <source>Total Amount = &lt;b&gt;%1&lt;/b&gt;&lt;br /&gt;= %2</source>
-        <translation>GesamtBetrag = &lt;b&gt;%1&lt;/b&gt;&lt;br /&gt;= %2</translation>
-    </message>
-    <message>
-        <source>Confirm send coins</source>
-        <translation>Sende Coins bestätigen</translation>
-    </message>
-    <message>
-        <source>A fee %1 times higher than %2 per kB is considered an insanely high fee.</source>
-        <translation>Eine Gebühr %1 mal höher als %2 pro kB gilt als eine wahnsinnig hohe Gebühr.</translation>
-    </message>
-    <message numerus="yes">
-        <source>Estimated to begin confirmation within %n block(s).</source>
-        <translation><numerusform>Geschätzt beginnt die Betätigung in %n Blöcken.</numerusform><numerusform>Geschätzt beginnt die Betätigung in %n Blöcken.</numerusform></translation>
-    </message>
-    <message>
-        <source>The recipient address is not valid, please recheck.</source>
-        <translation>Die Adresse des Empfängers ist nicht gültig, bitte erneut prüfen.</translation>
-    </message>
-    <message>
-        <source> split into %1 outputs using the UTXO splitter.</source>
-        <translation>In %1 Ausgänge mit dem UTXO-Splitter aufgeteilt.</translation>
-    </message>
-    <message>
-        <source>&lt;b&gt;(%1 of %2 entries displayed)&lt;/b&gt;</source>
-        <translation>&lt;b&gt;(%1 von %2 Einträge angezeigt)&lt;/b&gt;</translation>
-    </message>
-    <message>
-        <source>The amount to pay must be larger than 0.</source>
-        <translation>Der zu zahlende Betrag muss größer als 0 sein.</translation>
-    </message>
-    <message>
-        <source>The amount exceeds your balance.</source>
-        <translation>Der Betrag übersteigt ihre Bilanz.</translation>
-    </message>
-    <message>
-        <source>The total exceeds your balance when the %1 transaction fee is included.</source>
-        <translation>Die Gesamtsumme überschreitet Ihre Bilanz, wenn die Transaktionsgebühr von %1 enthalten ist.</translation>
-    </message>
-    <message>
-        <source>Duplicate address found, can only send to each address once per send operation.</source>
-        <translation>Doppelte Adresse gefunden. Es kann nur an jede Adresse einmal pro Sendeoperation gesenden werden.</translation>
-    </message>
-    <message>
-        <source>Transaction creation failed!</source>
-        <translation>Transaktionserstellung fehlgeschlagen!</translation>
-    </message>
-    <message>
-        <source>The transaction was rejected! This might happen if some of the coins in your wallet were already spent, such as if you used a copy of wallet.dat and coins were spent in the copy but not marked as spent here.</source>
-        <translation>Die Transaktion wurde abgelehnt! Dies könnte passieren, wenn einige der Coins in deiner Wallet schon ausgegeben wurden, wie wenn du eine Kopie der wallet.dat benutzt hättetst und Coins wurden in der Kopie verbracht.  Aber sie sind hier nicht als verbracht markiert.</translation>
-    </message>
-    <message>
-        <source>Error: The wallet was unlocked only to anonymize coins.</source>
-        <translation>Fehler: Die Wallet wurde nur zum Anonymisieren von Coins freigeschaltet.</translation>
-    </message>
-    <message>
-        <source>Error: The wallet was unlocked only to anonymize coins. Unlock canceled.</source>
-        <translation>Fehler: Die Wallet wurde nur zum Anonymisieren von Coins freigeschaltet. Freischalten aufgehoben.</translation>
-    </message>
-    <message>
-        <source>Pay only the minimum fee of %1</source>
-        <translation>Zahle nur die Mindestgebühr von %1</translation>
     </message>
     <message>
         <source>Warning: Unknown change address</source>
@@ -3487,20 +1720,8 @@ Bitte haben Sie Geduld...</translation>
 <context>
     <name>SignVerifyMessageDialog</name>
     <message>
-        <source>Signatures - Sign / Verify a Message</source>
-        <translation>Signaturen - Signieren / Überprüfen einer Nachricht</translation>
-    </message>
-    <message>
         <source>&amp;Sign Message</source>
         <translation>Nachricht &amp;signieren</translation>
-    </message>
-    <message>
-        <source>You can sign messages with your addresses to prove you own them. Be careful not to sign anything vague, as phishing attacks may try to trick you into signing your identity over to them. Only sign fully-detailed statements you agree to.</source>
-        <translation>Sie können Nachrichten mit Ihren Adressen signieren, um zu beweisen, dass Sie sie besitzen. Sein Sie vorsichtig nichts nebulöses zu unterschreiben, da Phishing-Angriffe versuchen können, Sie dazu zu bringen, Ihre Identität zu denen zu untergeben. Unterschreiben Sie nur ganz detaillierte Aussagen, denen Sie zustimmen.</translation>
-    </message>
-    <message>
-        <source>The LUX address to sign the message with</source>
-        <translation>LUX Adresse mit welcher die Nachricht signiert werden soll</translation>
     </message>
     <message>
         <source>Choose previously used address</source>
@@ -3523,106 +1744,10 @@ Bitte haben Sie Geduld...</translation>
         <translation>Gehen Sie hier die Nachricht ein, die Sie digital unterschreiben möchten</translation>
     </message>
     <message>
-        <source>Signature</source>
-        <translation>Signatur</translation>
-    </message>
-    <message>
-        <source>Copy the current signature to the system clipboard</source>
-        <translation>Kopiert die aktuelle Signatur in den Zwischenspeicher</translation>
-    </message>
-    <message>
-        <source>Sign the message to prove you own this LUX address</source>
-        <translation>Signiere die Nachricht um zu Beweisen, dass du diese LUX Adresse besitzt</translation>
-    </message>
-    <message>
-        <source>The LUX address the message was signed with</source>
-        <translation>Die LUX Adresse mit welcher die Nachricht signiert wurde.</translation>
-    </message>
-    <message>
-        <source>Verify the message to ensure it was signed with the specified LUX address</source>
-        <translation>Überprüfen Sie die Nachricht, um sicherzustellen, dass sie mit der angegebenen LUX-Adresse signiert wurde.</translation>
-    </message>
-    <message>
-        <source>Sign &amp;Message</source>
-        <translation>Signiere &amp;Nachricht </translation>
-    </message>
-    <message>
-        <source>Reset all sign message fields</source>
-        <translation>Setze alle signierten Nachrichten Felder zurück</translation>
-    </message>
-    <message>
         <source>Clear &amp;All</source>
         <translation>&amp;Alles zurücksetzen</translation>
     </message>
-    <message>
-        <source>&amp;Verify Message</source>
-        <translation>&amp;Verifiziere Nachricht</translation>
-    </message>
-    <message>
-        <source>Enter the signing address, message (ensure you copy line breaks, spaces, tabs, etc. exactly) and signature below to verify the message. Be careful not to read more into the signature than what is in the signed message itself, to avoid being tricked by a man-in-the-middle attack.</source>
-        <translation>Geben Sie die signierte Adresse, die Nachricht (stellen Sie sicher, dass Zeilenumbrüche, Leerzeichen, Tabs usw. genau kopieren) und Signatur unten ein, um die Nachricht zu überprüfen. Seien Sie vorsichtig, nicht mehr in die Signatur zu lesen, als was in der signierten Nachricht selbst ist, um zu vermeiden, von einem Mann-in-der-Mitte Angriff getroffen zu werden.</translation>
-    </message>
-    <message>
-        <source>Verify &amp;Message</source>
-        <translation>Verifiziere &amp;Nachricht</translation>
-    </message>
-    <message>
-        <source>Reset all verify message fields</source>
-        <translation>Zurücksetzen aller überprüften Felder.</translation>
-    </message>
-    <message>
-        <source>Click "Sign Message" to generate signature</source>
-        <translation>Klicken Sie auf "signiere Nachricht", um Signatur zu generieren</translation>
-    </message>
-    <message>
-        <source>The entered address is invalid.</source>
-        <translation>Die eingegebene Adresse ist falsch</translation>
-    </message>
-    <message>
-        <source>Please check the address and try again.</source>
-        <translation>Bitte die Adresse prüfen und erneut eingeben</translation>
-    </message>
-    <message>
-        <source>The entered address does not refer to a key.</source>
-        <translation>Die eingegebene Adresse passt nicht zu einem Schlüssel</translation>
-    </message>
-    <message>
-        <source>Wallet unlock was cancelled.</source>
-        <translation>Wallet-Entsperrung wurde abgebrochen.</translation>
-    </message>
-    <message>
-        <source>Private key for the entered address is not available.</source>
-        <translation>Privater Schlüssel für die eingegebene Adresse ist nicht verfügbar</translation>
-    </message>
-    <message>
-        <source>Message signing failed.</source>
-        <translation>Nachricht Signierung fehlgeschlagen.</translation>
-    </message>
-    <message>
-        <source>Message signed.</source>
-        <translation>Nachricht signiert.</translation>
-    </message>
-    <message>
-        <source>The signature could not be decoded.</source>
-        <translation>Die Signatur konnte nicht dekodiert werden.</translation>
-    </message>
-    <message>
-        <source>Please check the signature and try again.</source>
-        <translation>Bitte überprüfen Sie die Signatur und versuchen Sie es erneut.</translation>
-    </message>
-    <message>
-        <source>The signature did not match the message digest.</source>
-        <translation>Die Signatur stimmt nicht mit der Nachricht überein.</translation>
-    </message>
-    <message>
-        <source>Message verification failed.</source>
-        <translation>Nachrichtenüberprüfung fehlgeschlagen.</translation>
-    </message>
-    <message>
-        <source>Message verified.</source>
-        <translation>Nachricht überprüft.</translation>
-    </message>
-</context>
+    </context>
 <context>
     <name>SplashScreen</name>
     <message>
@@ -3661,7 +1786,7 @@ Bitte haben Sie Geduld...</translation>
     <name>TransactionDesc</name>
     <message numerus="yes">
         <source>Open for %n more block(s)</source>
-        <translation><numerusform>Offen für %n weitere Block</numerusform><numerusform>Offen für %n weitere Blocks</numerusform></translation>
+        <translation><numerusform>Geöffnet für %n weiteren Block</numerusform><numerusform>Geöffnet für %n weitere Blöcke</numerusform></translation>
     </message>
     <message>
         <source>Open until %1</source>
@@ -3725,7 +1850,7 @@ Bitte haben Sie Geduld...</translation>
     </message>
     <message numerus="yes">
         <source>, broadcast through %n node(s)</source>
-        <translation><numerusform>, Broadcast durch %n Node</numerusform><numerusform>, Broadcast durch %n Nodes</numerusform></translation>
+        <translation><numerusform>, über %n Knoten übertragen</numerusform><numerusform>, über %n Knoten übertragen</numerusform></translation>
     </message>
     <message>
         <source>Date</source>
@@ -3769,7 +1894,7 @@ Bitte haben Sie Geduld...</translation>
     </message>
     <message numerus="yes">
         <source>matures in %n more block(s)</source>
-        <translation><numerusform>gereift in %n weiteren Block</numerusform><numerusform>gereift in %n weiteren Blocks</numerusform></translation>
+        <translation><numerusform>reift noch %n Block</numerusform><numerusform>reift noch %n weitere Blöcke</numerusform></translation>
     </message>
     <message>
         <source>not accepted</source>
@@ -3806,10 +1931,6 @@ Bitte haben Sie Geduld...</translation>
     <message>
         <source>Transaction ID</source>
         <translation>Transaktions-ID</translation>
-    </message>
-    <message>
-        <source>Output index</source>
-        <translation>Output Index</translation>
     </message>
     <message>
         <source>Merchant</source>
@@ -3863,7 +1984,7 @@ Bitte haben Sie Geduld...</translation>
     </message>
     <message>
         <source>Type</source>
-        <translation>Art</translation>
+        <translation>Typ</translation>
     </message>
     <message>
         <source>Address</source>
@@ -3871,7 +1992,7 @@ Bitte haben Sie Geduld...</translation>
     </message>
     <message numerus="yes">
         <source>Open for %n more block(s)</source>
-        <translation><numerusform>Offen für %n weitere Block</numerusform><numerusform>Offen für %n weitere Blocks</numerusform></translation>
+        <translation><numerusform>Geöffnet für %n weiteren Block</numerusform><numerusform>Geöffnet für %n weitere Blöcke</numerusform></translation>
     </message>
     <message>
         <source>Open until %1</source>
@@ -3942,10 +2063,6 @@ Bitte haben Sie Geduld...</translation>
         <translation>Überwiesen an</translation>
     </message>
     <message>
-        <source>Orphan Block - Generated but not accepted. This does not impact your holdings.</source>
-        <translation>Verwaister Block - Generiert, aber nicht akzeptiert. Dies wirkt sich nicht auf Ihre Bestände aus.</translation>
-    </message>
-    <message>
         <source>Payment to yourself</source>
         <translation>Eigenüberweisung</translation>
     </message>
@@ -3962,32 +2079,8 @@ Bitte haben Sie Geduld...</translation>
         <translation>Verschleiert</translation>
     </message>
     <message>
-        <source>Converted Piv to zLux</source>
-        <translation>Umgewandeltes LUX zu zLUX</translation>
-    </message>
-    <message>
-        <source>Spent zLux</source>
-        <translation>Ausgeben zLUX</translation>
-    </message>
-    <message>
-        <source>Received Piv from zLux</source>
-        <translation>Empfangene LUX von zLUX</translation>
-    </message>
-    <message>
-        <source>Minted Change as zLux from zLux Spend</source>
-        <translation>Geprägtes Wechselgeld als zLUX von zLUX Ausgabe</translation>
-    </message>
-    <message>
-        <source>Converted zLux to Piv</source>
-        <translation>Umgewandeltes zLUX zu LUX</translation>
-    </message>
-    <message>
         <source>watch-only</source>
         <translation>nur beobachtet</translation>
-    </message>
-    <message>
-        <source>zLux Accumulator</source>
-        <translation>zLUX Speicher</translation>
     </message>
     <message>
         <source>(n/a)</source>
@@ -4095,26 +2188,6 @@ Bitte haben Sie Geduld...</translation>
     <message>
         <source>Masternode Reward</source>
         <translation>Masternode Vergütung</translation>
-    </message>
-    <message>
-        <source>Received Piv from zLux</source>
-        <translation>Empfangen LUX von zLUX</translation>
-    </message>
-    <message>
-        <source>Zerocoin Mint</source>
-        <translation>Zerocoin Prägung</translation>
-    </message>
-    <message>
-        <source>Zerocoin Spend</source>
-        <translation>Zerocoin Ausgabe</translation>
-    </message>
-    <message>
-        <source>Zerocoin Spend, Change in zLux</source>
-        <translation>Zerocoin Ausgabe, Wechselgeld in zLUX</translation>
-    </message>
-    <message>
-        <source>Zerocoin Spend to Self</source>
-        <translation>Zerocoin Ausgabe an sich Selbst</translation>
     </message>
     <message>
         <source>Other</source>
@@ -4278,369 +2351,14 @@ Bitte haben Sie Geduld...</translation>
     </message>
 </context>
 <context>
-    <name>ZPivControlDialog</name>
-    <message>
-        <source>Select zLux to Spend</source>
-        <translation>Auswahl zLUX als Ausgabe</translation>
-    </message>
-    <message>
-        <source>Quantity</source>
-        <translation>Menge</translation>
-    </message>
-    <message>
-        <source>0</source>
-        <translation>0</translation>
-    </message>
-    <message>
-        <source>zLux</source>
-        <translation>zLUX</translation>
-    </message>
-    <message>
-        <source>Select/Deselect All</source>
-        <translation>Markiere/Demarkiere Alle</translation>
-    </message>
-    <message>
-        <source>Is Spendable</source>
-        <translation>ist aufwendbar</translation>
-    </message>
-</context>
-<context>
     <name>lux-core</name>
-    <message>
-        <source>(1 = keep tx meta data e.g. account owner and payment request information, 2 = drop tx meta data)</source>
-        <translation>(1 = behalte Tx-Meta-Daten z.B. Betrag, Besitzer und Zahlungsanforderungsinformationen, 2 = verwerfe Tx-Meta-Daten)</translation>
-    </message>
-    <message>
-        <source>Allow JSON-RPC connections from specified source. Valid for &lt;ip&gt; are a single IP (e.g. 1.2.3.4), a network/netmask (e.g. 1.2.3.4/255.255.255.0) or a network/CIDR (e.g. 1.2.3.4/24). This option can be specified multiple times</source>
-        <translation>Erlaubt JSON-RPC Verbindungen von der angegebenen Quelle. Valide für &lt;ip&gt; sein eine einzelne  IP (z.B. 1.2.3.4), ein Netzwerk/Netzwerkmaske (z.B. 1.2.3.4/255.255.255.0) oder ein Netzwerk/CIDR (z.B. 1.2.3.4/24). Diese Option kann mehrfach angegeben werden</translation>
-    </message>
-    <message>
-        <source>An error occurred while setting up the RPC address %s port %u for listening: %s</source>
-        <translation>Fehler aufgetreten beim Einrichten der RPC-Adresse %s Port %u für horchen: %s</translation>
-    </message>
-    <message>
-        <source>Calculated accumulator checkpoint is not what is recorded by block index</source>
-        <translation>Der berechnete Akkumulator-Checkpoint ist nicht das, was vom Blockindex aufgezeichnet wurde</translation>
-    </message>
-    <message>
-        <source>Cannot obtain a lock on data directory %s. LUX Core is probably already running.</source>
-        <translation>Kann keine Sperre für das Datenverzeichnis %s erhalten. LUX Core läuft wahrscheinlich bereits.</translation>
-    </message>
-    <message>
-        <source>Create new files with system default permissions, instead of umask 077 (only effective with disabled wallet functionality)</source>
-        <translation>Erstelle neue Dateien mit Systemstandardberechtigungen anstelle von umask 077 (nur wirksam mit deaktivierter Wallet-Funktionalität)</translation>
-    </message>
-    <message>
-        <source>Delete all wallet transactions and only recover those parts of the blockchain through -rescan on startup</source>
-        <translation>Lösche alle Wallet-Transaktionen und stelle nur diese Teile der Blockchain wieder her durch -neuscan beim Start</translation>
-    </message>
-    <message>
-        <source>Disable all LUX specific functionality (Masternodes, Obfuscation, SwiftTX, Budgeting) (0-1, default: %u)</source>
-        <translation>Deaktiviere alle LUX-spezifischen Funktionen (Masternodes, Verschleierung, SwiftTX, Budgetplanung) (0-1, default: %u)</translation>
-    </message>
-    <message>
-        <source>Distributed under the MIT software license, see the accompanying file COPYING or &lt;http://www.opensource.org/licenses/mit-license.php&gt;.</source>
-        <translation>Veröffentlicht unter der MIT-Software-Lizenz, siehe die beigelegte Datei COPYING oder &lt;http://www.opensource.org/licenses/mit-license.php&gt;.</translation>
-    </message>
-    <message>
-        <source>Enable spork administration functionality with the appropriate private key.</source>
-        <translation>Aktiviere die Funktionalität der Spork-Administration mit dem entsprechenden privaten Schlüssel.</translation>
-    </message>
-    <message>
-        <source>Enable swifttx, show confirmations for locked transactions (bool, default: %s)</source>
-        <translation>Swifttx aktivieren, Bestätigungen für gesperrte Transaktionen anzeigen (bool, default: %s)</translation>
-    </message>
-    <message>
-        <source>Enter regression test mode, which uses a special chain in which blocks can be solved instantly.</source>
-        <translation>Gebe den Regressions-Testmodus ein, der eine spezielle Kette verwendet, in der Blöcke sofort gelöst werden können.</translation>
-    </message>
-    <message>
-        <source>Error: Listening for incoming connections failed (listen returned error %s)</source>
-        <translation>Fehler: Horchen von eingehenden Verbindungen fehlgeschlagen (listen return error %s)</translation>
-    </message>
-    <message>
-        <source>Error: The transaction was rejected! This might happen if some of the coins in your wallet were already spent, such as if you used a copy of wallet.dat and coins were spent in the copy but not marked as spent here.</source>
-        <translation>Fehler: Die Transaktion wurde abgelehnt! Dies könnte passieren, wenn einige Coins in deiner Wallet schon ausgegeben wurden, als  wenn du eine Kopie von der wallet.dat benutzt hättest. Coins wurden in der Kopie verbracht, aber hier nicht als verbracht markiert.</translation>
-    </message>
-    <message>
-        <source>Error: This transaction requires a transaction fee of at least %s because of its amount, complexity, or use of recently received funds!</source>
-        <translation>Fehler: Diese Transaktion erfordert eine Transaktionsgebühr von mindestens %s wegen ihrer Menge, Komplexität oder Verwendung von kürzlich erhaltenen Mitteln!</translation>
-    </message>
-    <message>
-        <source>Execute command when a relevant alert is received or we see a really long fork (%s in cmd is replaced by message)</source>
-        <translation>Befehl ausführen, wenn eine relevante Warnung empfangen wird oder wir einen wirklich langen Fork sehen (%s in cmd wird durch Benachrichtigungen ersetzt)</translation>
-    </message>
-    <message>
-        <source>Execute command when a wallet transaction changes (%s in cmd is replaced by TxID)</source>
-        <translation>Befehl ausführen, wenn eine Wallet-Transaktion geändert wird (%s in cmd wird durch TxID ersetzt)</translation>
-    </message>
-    <message>
-        <source>Execute command when the best block changes (%s in cmd is replaced by block hash)</source>
-        <translation>Befehl ausführen, wenn sich der beste Block ändert (%s in cmd wird durch Blockhash ersetzt)</translation>
-    </message>
-    <message>
-        <source>Fees (in LUX/Kb) smaller than this are considered zero fee for relaying (default: %s)</source>
-        <translation>Gebühren (in LUX/kB) kleiner als diese gelten als Null-Gebühr für die Weiterleitung (default: %s)</translation>
-    </message>
-    <message>
-        <source>Fees (in LUX/Kb) smaller than this are considered zero fee for transaction creation (default: %s)</source>
-        <translation>Gebühren (in LUX/kB) kleiner als diese werden als Null-Gebühr für die Transaktionserstellung betrachtet (default: %s)</translation>
-    </message>
-    <message>
-        <source>Flush database activity from memory pool to disk log every &lt;n&gt; megabytes (default: %u)</source>
-        <translation>Flusht die Datenbankaktivität vom Speicherpool auf das Festplattenprotokoll alle &lt;n&gt; Megabytes (default: %u)</translation>
-    </message>
-    <message>
-        <source>Found unconfirmed denominated outputs, will wait till they confirm to continue.</source>
-        <translation>Gefundene unbestätigte benannte Outputs werden warten  bis sie bestätigen sind, um fortzufahren.</translation>
-    </message>
-    <message>
-        <source>How thorough the block verification of -checkblocks is (0-4, default: %u)</source>
-        <translation>Wie gründlich die Blockprüfung von -checkblocks ist (0-4, default: %u)</translation>
-    </message>
-    <message>
-        <source>If paytxfee is not set, include enough fee so transactions begin confirmation on average within n blocks (default: %u)</source>
-        <translation>Wenn paytxfee nicht gesetzt ist, gebe genügend Gebühr an, sodass die Transaktionsbestätigungen im Durchschnitt innerhalb von n Blöcken beginnen (default: %u)</translation>
-    </message>
-    <message>
-        <source>In this mode -genproclimit controls how many blocks are generated immediately.</source>
-        <translation>In diesem Modus -genproclimit steuern, wie viele Blöcke sofort erzeugt werden.</translation>
-    </message>
-    <message>
-        <source>Invalid amount for -maxtxfee=&lt;amount&gt;: '%s' (must be at least the minrelay fee of %s to prevent stuck transactions)</source>
-        <translation>Ungültiger Betrag für -maxtxfee=&lt;amount&gt;: '%s' (muss mindestens das minrelay Gebühr von %s sein, um Transaktionsstau zu vermeiden)</translation>
-    </message>
-    <message>
-        <source>Keep the specified amount available for spending at all times (default: 0)</source>
-        <translation>Behalte jeder Zeit den angegebenen Betrag für die Ausgaben (default: 0)</translation>
-    </message>
-    <message>
-        <source>Log transaction priority and fee per kB when mining blocks (default: %u)</source>
-        <translation>Priorität der Protokolltransaktion und Gebühr pro kB wenn Mining-Blocke (default: %u)</translation>
-    </message>
-    <message>
-        <source>Maintain a full transaction index, used by the getrawtransaction rpc call (default: %u)</source>
-        <translation>Pflege einen vollständigen Transaktionsindex, der von der getrawtransaction rpc call verwendet wird. (default: %u)</translation>
-    </message>
-    <message>
-        <source>Maximum size of data in data carrier transactions we relay and mine (default: %u)</source>
-        <translation>Maximale Größe der Daten in Datenträgertransaktionen, die wir weiterleiten und abbilden (default: %u)</translation>
-    </message>
-    <message>
-        <source>Maximum total fees to use in a single wallet transaction, setting too low may abort large transactions (default: %s)</source>
-        <translation>Maximale Gesamtgebühren für die Verwendung in einer einzigen Wallet-Transaktion. Zu niedrige Einstellung kann große Transaktionen abbrechen (default: %s)</translation>
-    </message>
-    <message>
-        <source>Number of seconds to keep misbehaving peers from reconnecting (default: %u)</source>
-        <translation>Sekundenanzahl, um fehlerhafte Peers zu halten von der Wiederverbindung (default: %u)</translation>
-    </message>
-    <message>
-        <source>(default: %s)</source>
-        <translation>(default: %s)</translation>
-    </message>
-    <message>
-        <source>(default: 1)</source>
-        <translation>(default: 1)</translation>
-    </message>
-    <message>
-        <source>Connection options:</source>
-        <translation>Verbindungsoptionen:</translation>
-    </message>
-    <message>
-        <source>Copyright (C) 2009-%i The Bitcoin Core Developers</source>
-        <translation>Copyright (C) 2009-%i The Bitcoin Core Developers</translation>
-    </message>
-    <message>
-        <source>Copyright (C) 2014-%i The Dash Core Developers</source>
-        <translation>Copyright (C) 2014-%i The Dash Core Developers</translation>
-    </message>
-    <message>
-        <source>Copyright (C) 2015-%i The LUX Core Developers</source>
-        <translation>Copyright (C) 2015-%i The LUX Core Developers</translation>
-    </message>
     <message>
         <source>Error</source>
         <translation>Fehler</translation>
     </message>
     <message>
-        <source>Generate coins (default: %u)</source>
-        <translation>Generiere Coins (default: %u)</translation>
-    </message>
-    <message>
-        <source>How many blocks to check at startup (default: %u, 0 = all)</source>
-        <translation>Zu überprüfende Blöcke beim Start (default: %u, 0 = all)</translation>
-    </message>
-    <message>
-        <source>Importing...</source>
-        <translation>Importiere...</translation>
-    </message>
-    <message>
-        <source>Incompatible mode.</source>
-        <translation>Inkompatibler Modus.</translation>
-    </message>
-    <message>
-        <source>Incompatible version.</source>
-        <translation>Inkompatible Version.</translation>
-    </message>
-    <message>
-        <source>Incorrect or no genesis block found. Wrong datadir for network?</source>
-        <translation>Falscher oder kein Genesis-Block gefunden. Falsches Datenverzeichnis für das Netzwerk?</translation>
-    </message>
-    <message>
         <source>Information</source>
         <translation>Hinweis</translation>
-    </message>
-    <message>
-        <source>Initialization sanity check failed. LUX Core is shutting down.</source>
-        <translation>Initialisierung Sanity-Check fehlgeschlagen. LUX Core schaltet ab.</translation>
-    </message>
-    <message>
-        <source>Input is not valid.</source>
-        <translation>Input ist nicht gültig.</translation>
-    </message>
-    <message>
-        <source>Insufficient funds</source>
-        <translation>Unzureichende Mittel</translation>
-    </message>
-    <message>
-        <source>Insufficient funds.</source>
-        <translation>Unzureichende Mittel.</translation>
-    </message>
-    <message>
-        <source>Invalid -onion address: '%s'</source>
-        <translation>Ungültige -onion Adresse: '%s'</translation>
-    </message>
-    <message>
-        <source>Invalid -proxy address: '%s'</source>
-        <translation>Ungültige -proxy Adresse: '%s'</translation>
-    </message>
-    <message>
-        <source>Invalid amount for -maxtxfee=&lt;amount&gt;: '%s'</source>
-        <translation>Ungültiger Betrag für -maxtxfee=&lt;amount&gt;: '%s'</translation>
-    </message>
-    <message>
-        <source>Invalid amount for -minrelaytxfee=&lt;amount&gt;: '%s'</source>
-        <translation>Ungültiger Betrag für -minrelaytxfee=&lt;amount&gt;: '%s'</translation>
-    </message>
-    <message>
-        <source>Invalid amount for -mintxfee=&lt;amount&gt;: '%s'</source>
-        <translation>Ungültiger Betrag für -mintxfee=&lt;amount&gt;: '%s'</translation>
-    </message>
-    <message>
-        <source>Invalid amount for -paytxfee=&lt;amount&gt;: '%s' (must be at least %s)</source>
-        <translation>Ungültiger Betrag für -paytxfee=&lt;amount&gt;: '%s' (muss mindestens  %s sein)</translation>
-    </message>
-    <message>
-        <source>Invalid amount for -paytxfee=&lt;amount&gt;: '%s'</source>
-        <translation>Ungültiger Betrag für -paytxfee=&lt;amount&gt;: '%s'</translation>
-    </message>
-    <message>
-        <source>Invalid amount for -reservebalance=&lt;amount&gt;</source>
-        <translation>Ungültiger Betrag für -reservebalance=&lt;amount&gt;</translation>
-    </message>
-    <message>
-        <source>Invalid amount</source>
-        <translation>Ungültiger Betrag</translation>
-    </message>
-    <message>
-        <source>Enable staking functionality (0-1, default: %u)</source>
-        <translation>Aktiviere Staking-Funktionalität (0-1, default: %u)</translation>
-    </message>
-    <message>
-        <source>Loading wallet... (%3.2f %%)</source>
-        <translation>Lade Wallet... (%3.2f %%)</translation>
-    </message>
-    <message>
-        <source>Loading wallet...</source>
-        <translation>Lade Wallet...</translation>
-    </message>
-    <message>
-        <source>Masternode options:</source>
-        <translation>Masternode-Optionen:</translation>
-    </message>
-    <message>
-        <source>Masternode queue is full.</source>
-        <translation>Masternode-Schlange ist voll.</translation>
-    </message>
-    <message>
-        <source>Masternode:</source>
-        <translation>Masternode:</translation>
-    </message>
-    <message>
-        <source>Only connect to nodes in network &lt;net&gt; (ipv4, ipv6 or onion)</source>
-        <translation>Nur Verbindung zu Knoten im Netzwerk &lt;net&gt; (ipv4, ipv6 oder onion)</translation>
-    </message>
-    <message>
-        <source>Options:</source>
-        <translation>Optionen:</translation>
-    </message>
-    <message>
-        <source>RPC server options:</source>
-        <translation>RPC Serveroptionen:</translation>
-    </message>
-    <message>
-        <source>Rescan the block chain for missing wallet transactions</source>
-        <translation>Neuscannen der  Blockchain nach fehlenden Wallet-Transaktionen</translation>
-    </message>
-    <message>
-        <source>Rescanning...</source>
-        <translation>Neuscannen...</translation>
-    </message>
-    <message>
-        <source>ResetMintZerocoin finished: </source>
-        <translation>ResetMintZerocoin abgeschlossen: </translation>
-    </message>
-    <message>
-        <source>ResetSpentZerocoin finished: </source>
-        <translation>ResetSpentZerocoin abgeschlossen: </translation>
-    </message>
-    <message>
-        <source>Show all debugging options (usage: --help -help-debug)</source>
-        <translation>Zeige alle debugging Optionen (verwende: --help -help-debug)</translation>
-    </message>
-    <message>
-        <source>Specify data directory</source>
-        <translation>Bezeichne Datenverzeichnis</translation>
-    </message>
-    <message>
-        <source>Specify masternode configuration file (default: %s)</source>
-        <translation>Bezeichne Masternode-Konfigurationsdatei (default: %s)</translation>
-    </message>
-    <message>
-        <source>Specify pid file (default: %s)</source>
-        <translation>Bezeichne pid-Datei  (default: %s)</translation>
-    </message>
-    <message>
-        <source>Specify wallet file (within data directory)</source>
-        <translation>Bezeichne Wallet-Datei (im Datenverzeichnis)</translation>
-    </message>
-    <message>
-        <source>Specify your own public address</source>
-        <translation>Bezeichnen Sie ihre eigene öffentliche Adresse</translation>
-    </message>
-    <message>
-        <source>Staking options:</source>
-        <translation>Staking-Optionen:</translation>
-    </message>
-    <message>
-        <source>Stop running after importing blocks from disk (default: %u)</source>
-        <translation>Stoppt den Lauf nach dem Importieren von Blöcken von der Festplatte (default: %u)</translation>
-    </message>
-    <message>
-        <source>Submitted following entries to masternode: %u / %d</source>
-        <translation>Folgende Einträge zum Masternode eingereicht: %u / %d</translation>
-    </message>
-    <message>
-        <source>Submitted to masternode, waiting for more entries ( %u / %d ) %s</source>
-        <translation>Eingereicht zum Masternode, wartet auf mehr Einträge ( %u / %d ) %s</translation>
-    </message>
-    <message>
-        <source>Submitted to masternode, waiting in queue %s</source>
-        <translation>Eingereicht zum Masternode, wartet in der Schlange %s</translation>
-    </message>
-    <message>
-        <source>SwiftTX options:</source>
-        <translation>SwiftTX Optionen:</translation>
     </message>
     <message>
         <source>Synchronization failed</source>
@@ -4801,30 +2519,6 @@ Bitte haben Sie Geduld...</translation>
     <message>
         <source>Warning: This version is obsolete, upgrade required!</source>
         <translation>Warnung: Diese Version is veraltet, Aktualisierung erforderlich!</translation>
-    </message>
-    <message>
-        <source>Will retry...</source>
-        <translation>Wird wiederholt...</translation>
-    </message>
-    <message>
-        <source>Your entries added successfully.</source>
-        <translation>Ihre Eingaben wurden erfolgreich hinzugefügt.</translation>
-    </message>
-    <message>
-        <source>Your transaction was accepted into the pool!</source>
-        <translation>Ihre Transaktion wurde in den Pool aufgenommen!</translation>
-    </message>
-    <message>
-        <source>ZeroMQ notification options:</source>
-        <translation>ZeroMQ Benachrichtigungsoptionen:</translation>
-    </message>
-    <message>
-        <source>Zerocoin options:</source>
-        <translation>Zerocoin Optionen:</translation>
-    </message>
-    <message>
-        <source>failed to validate zerocoin</source>
-        <translation>fehlgeschlagen beim Zerocoin validieren</translation>
     </message>
     <message>
         <source>on startup</source>

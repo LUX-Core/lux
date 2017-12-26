@@ -107,7 +107,7 @@
              <string notr="true"/>
             </property>
             <property name="text">
-             <string>Open Coin Control...</string>
+             <string>Inputs...</string>
             </property>
             <property name="autoDefault">
              <bool>false</bool>
@@ -117,7 +117,7 @@
           <item>
            <widget class="QLabel" name="labelCoinControlAutomaticallySelected">
             <property name="text">
-             <string>Coins automatically selected</string>
+             <string>automatically selected</string>
             </property>
             <property name="margin">
              <number>5</number>
@@ -651,7 +651,7 @@
         <x>0</x>
         <y>0</y>
         <width>830</width>
-        <height>113</height>
+        <height>95</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,1">
@@ -1385,12 +1385,18 @@
         <number>3</number>
        </property>
        <item>
-        <widget class="QCheckBox" name="checkzLUX">
-         <property name="enabled">
-          <bool>false</bool>
+        <widget class="QCheckBox" name="checkUseObfuscation">
+         <property name="minimumSize">
+          <size>
+           <width>95</width>
+           <height>0</height>
+          </size>
          </property>
          <property name="text">
-          <string>Anonymized LUX</string>
+          <string>Obfuscation</string>
+         </property>
+         <property name="checked">
+          <bool>false</bool>
          </property>
         </widget>
        </item>
@@ -1406,7 +1412,7 @@
           </size>
          </property>
          <property name="text">
-          <string>SwiftX</string>
+          <string>SwiftTX</string>
          </property>
         </widget>
        </item>

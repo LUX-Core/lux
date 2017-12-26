@@ -127,7 +127,7 @@
 <context>
     <name>AddressTableModel</name>
     <message>
-        <location filename="../addresstablemodel.cpp" line="+198"/>
+        <location filename="../addresstablemodel.cpp" line="+157"/>
         <source>Label</source>
         <translation>Label</translation>
     </message>
@@ -175,7 +175,7 @@
         <translation>For anonymization and staking only</translation>
     </message>
     <message>
-        <location filename="../askpassphrasedialog.cpp" line="+44"/>
+        <location filename="../askpassphrasedialog.cpp" line="+42"/>
         <source>Enter the new passphrase to the wallet.&lt;br/&gt;Please use a passphrase of &lt;b&gt;ten or more random characters&lt;/b&gt;, or &lt;b&gt;eight or more words&lt;/b&gt;.</source>
         <translation>Enter the new passphrase to the wallet.&lt;br/&gt;Please use a passphrase of &lt;b&gt;ten or more random characters&lt;/b&gt;, or &lt;b&gt;eight or more words&lt;/b&gt;.</translation>
     </message>
@@ -215,7 +215,7 @@
         <translation>Enter the old and new passphrase to the wallet.</translation>
     </message>
     <message>
-        <location line="+41"/>
+        <location line="+44"/>
         <source>Confirm wallet encryption</source>
         <translation>Confirm wallet encryption</translation>
     </message>
@@ -505,7 +505,7 @@
 <context>
     <name>BitcoinGUI</name>
     <message>
-        <location filename="../bitcoingui.cpp" line="+127"/>
+        <location filename="../bitcoingui.cpp" line="+123"/>
         <source>Wallet</source>
         <translation>Wallet</translation>
     </message>
@@ -515,7 +515,7 @@
         <translation>Node</translation>
     </message>
     <message>
-        <location line="+161"/>
+        <location line="+157"/>
         <source>&amp;Overview</source>
         <translation>&amp;Overview</translation>
     </message>
@@ -545,12 +545,7 @@
         <translation>Browse transaction history</translation>
     </message>
     <message>
-        <location line="+11"/>
-        <source>Privacy Actions for zLUX</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+42"/>
+        <location line="+40"/>
         <source>E&amp;xit</source>
         <translation>E&amp;xit</translation>
     </message>
@@ -727,36 +722,6 @@
     </message>
     <message>
         <location line="+2"/>
-        <source>&amp;Multisignature creation...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Create a new multisignature address and add it to this wallet</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>&amp;Multisignature spending...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Spend from a multisignature address</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>&amp;Multisignature signing...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Sign with a multisignature address</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+2"/>
         <source>Open &amp;URI...</source>
         <translation>Open &amp;URI...</translation>
     </message>
@@ -766,7 +731,7 @@
         <translation>&amp;Command-line options</translation>
     </message>
     <message numerus="yes">
-        <location line="+463"/>
+        <location line="+428"/>
         <source>Processed %n blocks of transaction history.</source>
         <translation>
             <numerusform>Processed %n block of transaction history.</numerusform>
@@ -779,17 +744,12 @@
         <translation>Synchronizing additional data: %p%</translation>
     </message>
     <message>
-        <location line="+27"/>
-        <source>%1 behind. Scanning block %2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="-480"/>
+        <location line="-421"/>
         <source>&amp;File</source>
         <translation>&amp;File</translation>
     </message>
     <message>
-        <location line="+17"/>
+        <location line="+13"/>
         <source>&amp;Settings</source>
         <translation>&amp;Settings</translation>
     </message>
@@ -809,13 +769,13 @@
         <translation>Tabs toolbar</translation>
     </message>
     <message>
-        <location line="-427"/>
-        <location line="+890"/>
+        <location line="-396"/>
+        <location line="+831"/>
         <source>LUX Core</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-707"/>
+        <location line="-652"/>
         <source>Send coins to a LUX address</source>
         <translation type="unfinished"></translation>
     </message>
@@ -825,12 +785,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+21"/>
-        <source>&amp;Privacy</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+15"/>
+        <location line="+25"/>
         <source>&amp;Masternodes</source>
         <translation type="unfinished"></translation>
     </message>
@@ -840,7 +795,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+31"/>
+        <location line="+29"/>
         <source>&amp;About LUX Core</source>
         <translation type="unfinished"></translation>
     </message>
@@ -900,7 +855,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+17"/>
+        <location line="+10"/>
         <source>Open a LUX: URI or payment request</source>
         <translation type="unfinished"></translation>
     </message>
@@ -920,12 +875,12 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+214"/>
+        <location line="+201"/>
         <source>LUX Core client</source>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <location line="+212"/>
+        <location line="+190"/>
         <source>%n active connection(s) to LUX network</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -996,7 +951,12 @@
         </translation>
     </message>
     <message>
-        <location line="+9"/>
+        <location line="+4"/>
+        <source>%1 behind</source>
+        <translation>%1 behind</translation>
+    </message>
+    <message>
+        <location line="+5"/>
         <source>Catching up...</source>
         <translation>Catching up...</translation>
     </message>
@@ -1026,7 +986,7 @@
         <translation>Information</translation>
     </message>
     <message>
-        <location line="+69"/>
+        <location line="+67"/>
         <source>Sent transaction</source>
         <translation>Sent transaction</translation>
     </message>
@@ -1054,7 +1014,7 @@ Address: %4
 </translation>
     </message>
     <message>
-        <location line="+51"/>
+        <location line="+50"/>
         <source>Staking is active
  MultiSend: %1</source>
         <translation type="unfinished"></translation>
@@ -1101,17 +1061,7 @@ Address: %4
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+18"/>
-        <source>Back</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+14"/>
-        <source>Forward</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+29"/>
+        <location line="+55"/>
         <source>Address / Block / Transaction</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1126,7 +1076,7 @@ Address: %4
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../blockexplorer.cpp" line="+476"/>
+        <location filename="../blockexplorer.cpp" line="+473"/>
         <source>Not all transactions will be shown. To view all transactions you need to set txindex=1 in the configuration file (lux.conf).</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1134,9 +1084,9 @@ Address: %4
 <context>
     <name>ClientModel</name>
     <message>
-        <location filename="../clientmodel.cpp" line="+77"/>
-        <source>Total: %1 (IPv4: %2 / IPv6: %3 / Tor: %4 / Unknown: %5)</source>
-        <translation type="unfinished"></translation>
+        <location filename="../clientmodel.cpp" line="+73"/>
+        <source>Total: %1 (OBF compatible: %2 / Enabled: %3)</source>
+        <translation>Total: %1 (OBF compatible: %2 / Enabled: %3)</translation>
     </message>
     <message>
         <location line="+101"/>
@@ -1233,8 +1183,8 @@ Address: %4
     </message>
     <message>
         <location line="+5"/>
-        <source>Type</source>
-        <translation type="unfinished">Type</translation>
+        <source>DS Rounds</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+5"/>
@@ -1257,7 +1207,7 @@ Address: %4
         <translation>Priority</translation>
     </message>
     <message>
-        <location filename="../coincontroldialog.cpp" line="+52"/>
+        <location filename="../coincontroldialog.cpp" line="+50"/>
         <source>Copy address</source>
         <translation>Copy address</translation>
     </message>
@@ -1323,12 +1273,17 @@ Address: %4
         <translation>Copy change</translation>
     </message>
     <message>
-        <location line="+163"/>
+        <location line="+157"/>
         <source>Please switch to &quot;List mode&quot; to use this function.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+220"/>
+        <location line="+196"/>
+        <source>Non-anonymized input selected. &lt;b&gt;Obfuscation will be disabled.&lt;/b&gt;&lt;br&gt;&lt;br&gt;If you still want to use Obfuscation, please deselect all non-nonymized inputs first and then check Obfuscation checkbox again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+31"/>
         <source>highest</source>
         <translation>highest</translation>
     </message>
@@ -1348,13 +1303,18 @@ Address: %4
         <translation>medium-high</translation>
     </message>
     <message>
-        <location line="+238"/>
+        <location line="+207"/>
         <source>Can vary +/- %1 duff(s) per input.</source>
         <translation>Can vary +/- %1 duff(s) per input.</translation>
     </message>
     <message>
+        <location line="+130"/>
+        <source>n/a</source>
+        <translation>n/a</translation>
+    </message>
+    <message>
         <location filename="../forms/coincontroldialog.ui" line="-334"/>
-        <location filename="../coincontroldialog.cpp" line="-236"/>
+        <location filename="../coincontroldialog.cpp" line="-335"/>
         <source>medium</source>
         <translation>medium</translation>
     </message>
@@ -1384,12 +1344,12 @@ Address: %4
         <translation>(%1 locked)</translation>
     </message>
     <message>
-        <location line="+62"/>
+        <location line="+26"/>
         <source>none</source>
         <translation>none</translation>
     </message>
     <message>
-        <location line="+126"/>
+        <location line="+131"/>
         <source>yes</source>
         <translation>yes</translation>
     </message>
@@ -1432,7 +1392,7 @@ Address: %4
     </message>
     <message>
         <location line="+54"/>
-        <location line="+81"/>
+        <location line="+62"/>
         <source>(no label)</source>
         <translation>(no label)</translation>
     </message>
@@ -1546,7 +1506,7 @@ Address: %4
 <context>
     <name>HelpMessageDialog</name>
     <message>
-        <location filename="../utilitydialog.cpp" line="+37"/>
+        <location filename="../utilitydialog.cpp" line="+32"/>
         <source>version</source>
         <translation>version</translation>
     </message>
@@ -1567,7 +1527,7 @@ Address: %4
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+20"/>
+        <location line="+19"/>
         <source>Command-line options</source>
         <translation>Command-line options</translation>
     </message>
@@ -1582,22 +1542,17 @@ Address: %4
         <translation>command-line options</translation>
     </message>
     <message>
-        <location line="+8"/>
-        <source>UI Options:</source>
-        <translation type="unfinished"></translation>
+        <location line="+4"/>
+        <source>UI options</source>
+        <translation>UI options</translation>
     </message>
     <message>
         <location line="+1"/>
-        <source>Choose data directory on startup (default: %u)</source>
-        <translation type="unfinished"></translation>
+        <source>Choose data directory on startup (default: 0)</source>
+        <translation>Choose data directory on startup (default: 0)</translation>
     </message>
     <message>
-        <location line="+4"/>
-        <source>Show splash screen on startup (default: %u)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="-3"/>
+        <location line="+1"/>
         <source>Set language, for example &quot;de_DE&quot; (default: system locale)</source>
         <translation>Set language, for example &quot;de_DE&quot; (default: system locale)</translation>
     </message>
@@ -1610,6 +1565,11 @@ Address: %4
         <location line="+1"/>
         <source>Set SSL root certificates for payment request (default: -system-)</source>
         <translation>Set SSL root certificates for payment request (default: -system-)</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Show splash screen on startup (default: 1)</source>
+        <translation>Show splash screen on startup (default: 1)</translation>
     </message>
 </context>
 <context>
@@ -1655,7 +1615,7 @@ Address: %4
         <translation>Error: Specified data directory &quot;%1&quot; cannot be created.</translation>
     </message>
     <message>
-        <location line="+24"/>
+        <location line="+23"/>
         <source>Error</source>
         <translation>Error</translation>
     </message>
@@ -1678,7 +1638,7 @@ Address: %4
         <translation type="unfinished">Form</translation>
     </message>
     <message>
-        <location line="+18"/>
+        <location line="+40"/>
         <source>My Masternodes</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1694,36 +1654,42 @@ Address: %4
     </message>
     <message>
         <location line="+5"/>
+        <location line="+160"/>
         <source>Address</source>
         <translation type="unfinished">Address</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="-155"/>
+        <location line="+160"/>
         <source>Protocol</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="-155"/>
+        <location line="+160"/>
         <source>Status</source>
         <translation type="unfinished">Status</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="-155"/>
+        <location line="+160"/>
         <source>Active</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="-155"/>
+        <location line="+160"/>
         <source>Last Seen (UTC)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="-155"/>
+        <location line="+160"/>
         <source>Pubkey</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+13"/>
+        <location line="-147"/>
         <source>S&amp;tart alias</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1749,16 +1715,37 @@ Address: %4
     </message>
     <message>
         <location line="+7"/>
+        <location line="+159"/>
         <source>0</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../masternodelist.cpp" line="+45"/>
+        <location line="-134"/>
+        <source>All Masternodes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+100"/>
+        <source>Filter List:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Filter masternode list</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+20"/>
+        <source>Node Count:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../masternodelist.cpp" line="+51"/>
         <source>Start alias</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+189"/>
+        <location line="+261"/>
         <source>Confirm masternode start</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1960,228 +1947,6 @@ Please check the address and try again.</source>
     </message>
 </context>
 <context>
-    <name>MultisigDialog</name>
-    <message>
-        <location filename="../forms/multisigdialog.ui" line="+20"/>
-        <source>Multisignature Address Interactions</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+22"/>
-        <source>Create MultiSignature &amp;Address</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+14"/>
-        <source>How many people must sign to verify a transaction</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+16"/>
-        <source>Enter the minimum number of signatures required to sign transactions</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+11"/>
-        <source>Address Label:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+14"/>
-        <source>Add another address that could sign to verify a transaction from the multisig address.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>&amp;Add Address / Key</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+20"/>
-        <source>Local addresses or public keys that can sign:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+71"/>
-        <source>Create a new multisig address</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+6"/>
-        <source>C&amp;reate</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+14"/>
-        <location line="+345"/>
-        <location line="+183"/>
-        <source>Status:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="-491"/>
-        <source>Use below to quickly import an address by its redeem. Don&apos;t forget to add a label before clicking import!
-Keep in mind, the wallet will rescan the blockchain to find transactions containing the new address.
-Please be patient after clicking import.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+23"/>
-        <source>&amp;Import Redeem</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+24"/>
-        <source>&amp;Create MultiSignature Tx</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+18"/>
-        <source>Inputs:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+13"/>
-        <source>Coin Control</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+12"/>
-        <source>Quantity Selected:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+7"/>
-        <location line="+14"/>
-        <source>0</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="-7"/>
-        <source>Amount:</source>
-        <translation type="unfinished">Amount:</translation>
-    </message>
-    <message>
-        <location line="+22"/>
-        <source>Add an input to fund the outputs</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>Add a Raw Input</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+56"/>
-        <source>Address / Amount:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+13"/>
-        <source>Add destinations to send LUX to</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>Add &amp;Destination</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+81"/>
-        <source>Create a transaction object using the given inputs to the given outputs</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>Cr&amp;eate</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+48"/>
-        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Noto Sans&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+32"/>
-        <source>&amp;Sign MultiSignature Tx</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+8"/>
-        <source>Transaction Hex:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+34"/>
-        <source>Sign the transaction from this wallet or from provided private keys</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>S&amp;ign</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+26"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;DISABLED until transaction has been signed enough times.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+6"/>
-        <source>Co&amp;mmit</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+22"/>
-        <source>Add private keys to sign the transaction with</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>Add Private &amp;Key</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+11"/>
-        <source>Sign with only private keys (Not Recommened)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../multisigdialog.cpp" line="+250"/>
-        <source>Invalid Tx Hash.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+8"/>
-        <source>Vout position must be positive.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+535"/>
-        <source>Maximum possible addresses reached. (16)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+112"/>
-        <source>Vout Position: </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+58"/>
-        <source>Amount: </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+27"/>
-        <source>Maximum (15)</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>ObfuscationConfig</name>
     <message>
         <location filename="../forms/obfuscationconfig.ui" line="+14"/>
@@ -2327,7 +2092,7 @@ p, li { white-space: pre-wrap; }
         <translation>(0 = auto, &lt;0 = leave that many cores free)</translation>
     </message>
     <message>
-        <location line="+102"/>
+        <location line="+105"/>
         <source>W&amp;allet</source>
         <translation>W&amp;allet</translation>
     </message>
@@ -2362,7 +2127,7 @@ p, li { white-space: pre-wrap; }
         <translation>Expert</translation>
     </message>
     <message>
-        <location line="-176"/>
+        <location line="-179"/>
         <source>Automatically start LUX after logging in to the system.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2372,7 +2137,27 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+179"/>
+        <location line="+102"/>
+        <source>This setting determines the amount of individual masternodes that an input will be anonymized through.&lt;br/&gt;More rounds of anonymization gives a higher degree of privacy, but also costs more in fees.</source>
+        <translation>This setting determines the amount of individual masternodes that an input will be anonymized through.&lt;br/&gt;More rounds of anonymization gives a higher degree of privacy, but also costs more in fees.</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Obfuscation rounds to use</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+24"/>
+        <source>This amount acts as a threshold to turn off Obfuscation once it&apos;s reached.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+15"/>
+        <source>Amount of LUX to keep anonymized</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+38"/>
         <source>Whether to show coin control features or not.</source>
         <translation>Whether to show coin control features or not.</translation>
     </message>
@@ -2409,7 +2194,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location line="+21"/>
         <source>Language missing or translation incomplete? Help contributing translations here:
-https://www.transifex.com/216k155/216k155-translations</source>
+https://www.transifex.com/lux-project/lux-project-translations</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2418,28 +2203,7 @@ https://www.transifex.com/216k155/216k155-translations</source>
         <translation>Map port using &amp;UPnP</translation>
     </message>
     <message>
-        <location line="-133"/>
-        <source>Percentage of incoming LUX which get automatically converted to zLUX via Zerocoin Protocol (min: 10%)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>Percentage of autominted zLUX</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+30"/>
-        <location line="+16"/>
-        <source>Wait with automatic conversion to Zerocoin until enough LUX for this denomination is available</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="-13"/>
-        <source>Preferred Automint zLUX Denomination</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+114"/>
+        <location line="+17"/>
         <source>Connect to the LUX network through a SOCKS5 proxy.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2555,12 +2319,7 @@ https://www.transifex.com/216k155/216k155-translations</source>
         <translation>&amp;Cancel</translation>
     </message>
     <message>
-        <location filename="../optionsdialog.cpp" line="+87"/>
-        <source>I don&apos;t care</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+23"/>
+        <location filename="../optionsdialog.cpp" line="+99"/>
         <source>default</source>
         <translation>default</translation>
     </message>
@@ -2570,7 +2329,7 @@ https://www.transifex.com/216k155/216k155-translations</source>
         <translation>none</translation>
     </message>
     <message>
-        <location line="+88"/>
+        <location line="+87"/>
         <source>Confirm options reset</source>
         <translation>Confirm options reset</translation>
     </message>
@@ -2604,51 +2363,49 @@ https://www.transifex.com/216k155/216k155-translations</source>
         <translation>Form</translation>
     </message>
     <message>
-        <location line="+43"/>
-        <source>LUX Balances</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+259"/>
+        <location line="+302"/>
         <source>Available:</source>
         <translation>Available:</translation>
     </message>
     <message>
         <location line="+16"/>
-        <location line="+702"/>
         <source>Your current spendable balance</source>
         <translation>Your current spendable balance</translation>
     </message>
     <message>
-        <location line="-661"/>
+        <location line="+41"/>
         <source>Pending:</source>
         <translation>Pending:</translation>
     </message>
     <message>
         <location line="-236"/>
-        <location line="+820"/>
         <source>Total of transactions that have yet to be confirmed, and do not yet count toward the spendable balance</source>
         <translation>Total of transactions that have yet to be confirmed, and do not yet count toward the spendable balance</translation>
     </message>
     <message>
-        <location line="-708"/>
-        <location line="+1118"/>
+        <location line="+112"/>
         <source>Immature:</source>
         <translation>Immature:</translation>
     </message>
     <message>
-        <location line="-1147"/>
+        <location line="-29"/>
         <source>Staked or masternode rewards that has not yet matured</source>
         <translation>Staked or masternode rewards that has not yet matured</translation>
     </message>
     <message>
-        <location line="-153"/>
-        <location line="+1393"/>
+        <location line="-163"/>
+        <source>Balances</source>
+        <translation>Balances</translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <location line="+1015"/>
+        <location line="+93"/>
         <source>The displayed information may be out of date. Your wallet automatically synchronizes with the LUX network after a connection is established, but this process has not completed yet.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-1348"/>
+        <location line="-1063"/>
         <source>Unconfirmed transactions to watch-only addresses</source>
         <translation>Unconfirmed transactions to watch-only addresses</translation>
     </message>
@@ -2659,13 +2416,11 @@ https://www.transifex.com/216k155/216k155-translations</source>
     </message>
     <message>
         <location line="+42"/>
-        <location line="+807"/>
-        <location line="+255"/>
         <source>Total:</source>
         <translation>Total:</translation>
     </message>
     <message>
-        <location line="-1001"/>
+        <location line="+61"/>
         <source>Your current total balance</source>
         <translation>Your current total balance</translation>
     </message>
@@ -2690,143 +2445,211 @@ https://www.transifex.com/216k155/216k155-translations</source>
         <translation>Spendable:</translation>
     </message>
     <message>
-        <location line="+525"/>
-        <source>Combined Balances (including unconfirmed and immature coins)</source>
+        <location line="+51"/>
+        <source>Status:</source>
+        <translation>Status:</translation>
+    </message>
+    <message>
+        <location line="+27"/>
+        <source>Obfuscation Balance:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+3"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Combined Balances&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <location line="+27"/>
+        <source>0 LUX / 0 Rounds</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+74"/>
-        <source>Total Balance, including unconfirmed and immature coins.</source>
+        <location line="+24"/>
+        <source>Enabled/Disabled</source>
+        <translation>Enabled/Disabled</translation>
+    </message>
+    <message>
+        <location line="+516"/>
+        <source>Try to manually submit a Obfuscation request.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+36"/>
-        <source>LUX:</source>
+        <location line="+22"/>
+        <source>Reset the current status of Obfuscation (can interrupt Obfuscation if it&apos;s in the process of Mixing, which can cost you money!)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+35"/>
-        <source>zLUX:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+7"/>
-        <source>Current percentage of zLUX.
-If AutoMint is enabled this percentage will settle around the configured AutoMint percentage (default = 10%)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+4"/>
-        <location line="+66"/>
-        <source>0 %</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="-46"/>
-        <location line="+13"/>
-        <source>Locked LUX or Masternode collaterals. These are excluded from zLUX minting.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="-10"/>
-        <location line="+33"/>
-        <location line="+189"/>
-        <location line="+31"/>
-        <location line="+44"/>
-        <source>0.000 000 00 LUX</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="-284"/>
-        <source>Locked:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+7"/>
+        <location line="+28"/>
+        <location filename="../overviewpage.cpp" line="+478"/>
+        <location line="+11"/>
         <location line="+10"/>
-        <source>Unlocked LUXs. These can be used for zLUX minting.</source>
+        <location line="+12"/>
+        <source>Obfuscation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-7"/>
-        <source>Unlocked:</source>
-        <translation type="unfinished"></translation>
+        <location line="-637"/>
+        <source>Completion:</source>
+        <translation>Completion:</translation>
     </message>
     <message>
-        <location line="+77"/>
-        <source>Zerocoin Balance</source>
-        <translation type="unfinished"></translation>
+        <location line="+40"/>
+        <source>Amount and Rounds:</source>
+        <translation>Amount and Rounds:</translation>
     </message>
     <message>
         <location line="+14"/>
-        <location line="+104"/>
-        <source>Mature: more than 20 confirmation and more than 3 mints of the same denomination after it was minted.
-These zLUX are spendable.</source>
-        <translation type="unfinished"></translation>
+        <source>Submitted Denom:</source>
+        <translation>Submitted Denom:</translation>
     </message>
     <message>
-        <location line="-100"/>
-        <source>Mature:</source>
-        <translation type="unfinished"></translation>
+        <location line="+10"/>
+        <source>n/a</source>
+        <translation>n/a</translation>
     </message>
     <message>
-        <location line="+23"/>
-        <location line="+35"/>
-        <source>All available zLUX, unconfirmed and immature zLUX included.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+56"/>
-        <location line="+17"/>
-        <location line="+27"/>
-        <location line="+17"/>
-        <source>Unconfirmed: less than 20 confirmations
-Immature: confirmed, but less than 3 mints of the same denomination after it was minted</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="-57"/>
-        <source>Unconfirmed:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+127"/>
+        <location line="+663"/>
         <source>Recent transactions</source>
         <translation>Recent transactions</translation>
     </message>
     <message>
-        <location filename="../overviewpage.cpp" line="+135"/>
+        <location line="-197"/>
+        <source>Start/Stop Mixing</source>
+        <translation>Start/Stop Mixing</translation>
+    </message>
+    <message>
+        <location line="-469"/>
+        <source>The denominations you submitted to the Masternode.&lt;br&gt;To mix, other users must submit the exact same denominations.</source>
+        <translation>The denominations you submitted to the Masternode.&lt;br&gt;To mix, other users must submit the exact same denominations.</translation>
+    </message>
+    <message>
+        <location line="+501"/>
+        <source>(Last Message)</source>
+        <translation>(Last Message)</translation>
+    </message>
+    <message>
+        <location line="+28"/>
+        <source>Try Mix</source>
+        <translation>Try Mix</translation>
+    </message>
+    <message>
+        <location line="+25"/>
+        <source>Reset</source>
+        <translation>Reset</translation>
+    </message>
+    <message>
+        <location filename="../overviewpage.cpp" line="-381"/>
+        <location line="+1"/>
         <location line="+1"/>
         <source>out of sync</source>
         <translation>out of sync</translation>
     </message>
     <message>
-        <location line="+93"/>
-        <source>Current percentage of zLUX.
-If AutoMint is enabled this percentage will settle around the configured AutoMint percentage (default = 10%).
+        <location line="+6"/>
+        <location line="+1"/>
+        <location line="+1"/>
+        <location line="+293"/>
+        <source>Disabled</source>
+        <translation>Disabled</translation>
+    </message>
+    <message>
+        <location line="-117"/>
+        <location line="+6"/>
+        <source>No inputs detected</source>
+        <translation>No inputs detected</translation>
+    </message>
+    <message numerus="yes">
+        <location line="-2"/>
+        <location line="+35"/>
+        <location line="+10"/>
+        <source>%n Rounds</source>
+        <translation>
+            <numerusform>%n Round</numerusform>
+            <numerusform>%n Rounds</numerusform>
+        </translation>
+    </message>
+    <message>
+        <location line="-7"/>
+        <source>Not enough compatible inputs to anonymize &lt;span style=&apos;color:red;&apos;&gt;%1&lt;/span&gt;,&lt;br&gt;will anonymize &lt;span style=&apos;color:red;&apos;&gt;%2&lt;/span&gt; instead</source>
+        <translation>Not enough compatible inputs to anonymize &lt;span style=&apos;color:red;&apos;&gt;%1&lt;/span&gt;,&lt;br&gt;will anonymize &lt;span style=&apos;color:red;&apos;&gt;%2&lt;/span&gt; instead</translation>
+    </message>
+    <message>
+        <location line="+46"/>
+        <source>Overall progress</source>
+        <translation>Overall progress</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Denominated</source>
+        <translation>Denominated</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Anonymized</source>
+        <translation>Anonymized</translation>
+    </message>
+    <message numerus="yes">
+        <location line="+1"/>
+        <source>Denominated inputs have %5 of %n rounds on average</source>
+        <translation>
+            <numerusform>Denominated inputs have %5 of %n rounds on average</numerusform>
+            <numerusform>Denominated inputs have %5 of %n rounds on average</numerusform>
+        </translation>
+    </message>
+    <message>
+        <location line="+44"/>
+        <source>Last Obfuscation message:
 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+4"/>
-        <source>AutoMint is currently enabled and set to </source>
+        <location line="+27"/>
+        <source>Obfuscation was successfully reset.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+1"/>
-        <source>To disable AutoMint add &apos;enablezeromint=0&apos; in lux.conf.</source>
+        <location line="+11"/>
+        <source>If you don&apos;t want to see internal Obfuscation fees/transactions select &quot;Most Common&quot; as Type on the &quot;Transactions&quot; tab.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+3"/>
-        <source>AutoMint is currently disabled.
-To enable AutoMint change &apos;enablezeromint=0&apos; to &apos;enablezeromint=1&apos; in lux.conf</source>
+        <location line="+10"/>
+        <source>Obfuscation requires at least %1 to use.</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <source>Wallet is locked and user declined to unlock. Disabling Obfuscation.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-160"/>
+        <source>Found enough compatible inputs to anonymize %1</source>
+        <translation>Found enough compatible inputs to anonymize %1</translation>
+    </message>
+    <message>
+        <location line="-208"/>
+        <location line="+291"/>
+        <location line="+89"/>
+        <source>Start Obfuscation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-378"/>
+        <location line="+381"/>
+        <source>Stop Obfuscation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-121"/>
+        <source>Mixed</source>
+        <translation>Mixed</translation>
+    </message>
+    <message>
+        <location line="+41"/>
+        <source>Enabled</source>
+        <translation>Enabled</translation>
+    </message>
+    <message>
+        <location line="+13"/>
+        <source>N/A</source>
+        <translation>N/A</translation>
     </message>
 </context>
 <context>
@@ -2970,653 +2793,6 @@ To enable AutoMint change &apos;enablezeromint=0&apos; to &apos;enablezeromint=1
     </message>
 </context>
 <context>
-    <name>PrivacyDialog</name>
-    <message>
-        <location filename="../forms/privacydialog.ui" line="+55"/>
-        <source>LUX which were anonymized via Zerocin Protocol</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+6"/>
-        <source>Zerocoin LUX (zLUX)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+25"/>
-        <source>Zerocoin Actions:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+10"/>
-        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the LUX network after a connection is established, but this process has not completed yet.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+52"/>
-        <location line="+46"/>
-        <source>Enter an amount of Piv to convert to zLux</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="-43"/>
-        <location filename="../privacydialog.cpp" line="+150"/>
-        <location line="+113"/>
-        <source>Mint Zerocoin</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+13"/>
-        <location line="+329"/>
-        <location line="+30"/>
-        <source>0</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="-349"/>
-        <location line="+629"/>
-        <source>zLUX</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="-622"/>
-        <source>Available for minting are coins which are confirmed and not locked or Masternode collaterals.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>Available for Minting:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+13"/>
-        <source>0.000 000 00 LUX</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+29"/>
-        <source>Reset Zerocoin Wallet DB. Deletes transactions that did not make it into the blockchain.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>Reset</source>
-        <translation type="unfinished">Reset</translation>
-    </message>
-    <message>
-        <location line="+26"/>
-        <source>Coin Control...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+36"/>
-        <source>Quantity:</source>
-        <translation type="unfinished">Quantity:</translation>
-    </message>
-    <message>
-        <location line="+22"/>
-        <source>Amount:</source>
-        <translation type="unfinished">Amount:</translation>
-    </message>
-    <message>
-        <location line="+91"/>
-        <source>Rescan the complete blockchain for  Zerocoin mints and their meta-data.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>ReScan</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+27"/>
-        <source>Status and/or Mesages from the last Mint Action.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+45"/>
-        <source>zLux Control</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+7"/>
-        <source>zLux Selected:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+30"/>
-        <source>Quantity Selected:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+37"/>
-        <source>Spend Zerocoin. Without &apos;Pay To:&apos; address creates payments to yourself.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <location filename="../privacydialog.cpp" line="+46"/>
-        <location line="+4"/>
-        <location line="+12"/>
-        <location line="+100"/>
-        <location line="+4"/>
-        <source>Spend Zerocoin</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+7"/>
-        <source>Available (mature and spendable) zLUX for spending</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>Available Balance:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+16"/>
-        <source>Available (mature and spendable) zLUX for spending
-
-zLUX are mature when they have more than 20 confirmations AND more than 2 mints of the same denomination after them were minted</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+5"/>
-        <location line="+417"/>
-        <source>0 zLUX</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="-394"/>
-        <source>Security Level for Zerocoin Transactions. More is better, but needs more time and resources.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+6"/>
-        <source>Security Level:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+18"/>
-        <source>Security Level 1 - 100 (default: 42)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+37"/>
-        <source>Pay &amp;To:</source>
-        <translation type="unfinished">Pay &amp;To:</translation>
-    </message>
-    <message>
-        <location line="+27"/>
-        <source>The LUX address to send the payment to. Creates local payment to yourself when empty.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+7"/>
-        <source>Choose previously used address</source>
-        <translation type="unfinished">Choose previously used address</translation>
-    </message>
-    <message>
-        <location line="+10"/>
-        <source>Alt+A</source>
-        <translation type="unfinished">Alt+A</translation>
-    </message>
-    <message>
-        <location line="+7"/>
-        <source>Paste address from clipboard</source>
-        <translation type="unfinished">Paste address from clipboard</translation>
-    </message>
-    <message>
-        <location line="+10"/>
-        <source>Alt+P</source>
-        <translation type="unfinished">Alt+P</translation>
-    </message>
-    <message>
-        <location line="+19"/>
-        <source>&amp;Label:</source>
-        <translation type="unfinished">&amp;Label:</translation>
-    </message>
-    <message>
-        <location line="+13"/>
-        <source>Enter a label for this address to add it to the list of used addresses</source>
-        <translation type="unfinished">Enter a label for this address to add it to the list of used addresses</translation>
-    </message>
-    <message>
-        <location line="+17"/>
-        <source>A&amp;mount:</source>
-        <translation type="unfinished">A&amp;mount:</translation>
-    </message>
-    <message>
-        <location line="+55"/>
-        <source>Convert Change to Zerocoin (might cost additional fees)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+7"/>
-        <source>If checked, the wallet tries to minimize the returning change instead of minimizing the number of spent denominations.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>Minimize Change</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+52"/>
-        <source>Information about the available Zerocoin funds.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>Zerocoin Stats:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+62"/>
-        <location line="+38"/>
-        <source>Total Balance including unconfirmed and immature zLUX</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="-35"/>
-        <source>Total Zerocoin  Balance:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+52"/>
-        <source>Denominations with value 1:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>Denom. with value 1:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+29"/>
-        <location line="+53"/>
-        <location line="+53"/>
-        <location line="+53"/>
-        <location line="+53"/>
-        <location line="+53"/>
-        <location line="+53"/>
-        <location line="+53"/>
-        <source>Unconfirmed: less than 20 confirmations
-Immature: confirmed, but less than 2 mints of the same denomination after it was minted</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="-367"/>
-        <location line="+53"/>
-        <location line="+53"/>
-        <location line="+53"/>
-        <location line="+53"/>
-        <location line="+53"/>
-        <location line="+53"/>
-        <location line="+53"/>
-        <source>0 x</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="-354"/>
-        <source>Denominations with value 5:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>Denom. with value 5:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+50"/>
-        <source>Denominations with value 10:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>Denom. with value 10:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+50"/>
-        <source>Denominations with value 50:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>Denom. with value 50:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+50"/>
-        <source>Denominations with value 100:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>Denom. with value 100:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+50"/>
-        <source>Denominations with value 500:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>Denom. with value 500:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+50"/>
-        <source>Denominations with value 1000:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>Denom. with value 1000:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+50"/>
-        <source>Denominations with value 5000:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>Denom. with value 5000:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+106"/>
-        <source>Note: This hidden objects are used for communication between the &apos;Coin Control&apos; dialog and its parent objects. We don&apos;t want to change/reimplement the existing Coin Control, so this objects must be here, even when we don&apos;t use them. No, we don&apos;t like this approach, either.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+100"/>
-        <source>Priority:</source>
-        <translation type="unfinished">Priority:</translation>
-    </message>
-    <message>
-        <location line="+36"/>
-        <source>Fee:</source>
-        <translation type="unfinished">Fee:</translation>
-    </message>
-    <message>
-        <location line="+38"/>
-        <source>Dust:</source>
-        <translation type="unfinished">Dust:</translation>
-    </message>
-    <message>
-        <location line="+16"/>
-        <source>no</source>
-        <translation type="unfinished">no</translation>
-    </message>
-    <message>
-        <location line="+21"/>
-        <source>Bytes:</source>
-        <translation type="unfinished">Bytes:</translation>
-    </message>
-    <message>
-        <location line="+54"/>
-        <source>Insufficient funds!</source>
-        <translation type="unfinished">Insufficient funds!</translation>
-    </message>
-    <message>
-        <location line="+50"/>
-        <location filename="../privacydialog.cpp" line="-391"/>
-        <location line="+1"/>
-        <location line="+481"/>
-        <location line="+1"/>
-        <source>Coins automatically selected</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+56"/>
-        <source>medium</source>
-        <translation type="unfinished">medium</translation>
-    </message>
-    <message>
-        <location line="+80"/>
-        <source>Coin Control Features</source>
-        <translation type="unfinished">Coin Control Features</translation>
-    </message>
-    <message>
-        <location line="+72"/>
-        <source>If this is activated, but the change address is empty or invalid, change will be sent to a newly generated address.</source>
-        <translation type="unfinished">If this is activated, but the change address is empty or invalid, change will be sent to a newly generated address.</translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>Custom change address</source>
-        <translation type="unfinished">Custom change address</translation>
-    </message>
-    <message>
-        <location line="+83"/>
-        <source>Amount After Fee:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+40"/>
-        <source>Change:</source>
-        <translation type="unfinished">Change:</translation>
-    </message>
-    <message>
-        <location filename="../privacydialog.cpp" line="-481"/>
-        <source>out of sync</source>
-        <translation type="unfinished">out of sync</translation>
-    </message>
-    <message>
-        <location line="+6"/>
-        <location line="+111"/>
-        <source>Mint Status: Okay</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="-105"/>
-        <source>Copy quantity</source>
-        <translation type="unfinished">Copy quantity</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Copy amount</source>
-        <translation type="unfinished">Copy amount</translation>
-    </message>
-    <message>
-        <location line="+45"/>
-        <location line="+3"/>
-        <source>zLUX is currently disabled due to maintenance.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+50"/>
-        <location line="+113"/>
-        <source>zLUX is currently undergoing maintenance.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="-99"/>
-        <source>Error: Your wallet is locked. Please enter the wallet passphrase first.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+10"/>
-        <source>Message: Enter an amount &gt; 0.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+4"/>
-        <source>Minting </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+18"/>
-        <source>Successfully minted </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+0"/>
-        <source> zLUX in </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source> sec. Used denominations:
-</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+30"/>
-        <source>Starting ResetMintZerocoin: rescanning complete blockchain, this will need up to 30 minutes depending on your hardware. 
-Please be patient...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+6"/>
-        <location line="+16"/>
-        <location line="+216"/>
-        <source>Duration: </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="-232"/>
-        <location line="+16"/>
-        <location line="+216"/>
-        <source> sec.
-</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="-221"/>
-        <source>Starting ResetSpentZerocoin: </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+64"/>
-        <source>No &apos;Pay To&apos; address provided, creating local payment</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+4"/>
-        <source>Invalid Lux Address</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+12"/>
-        <source>Invalid Send Amount</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+22"/>
-        <source>Confirm additional Fees</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+25"/>
-        <source>Are you sure you want to send?&lt;br /&gt;&lt;br /&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source> to address </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+4"/>
-        <source> to a newly generated (unused and therefore anonymous) local address &lt;br /&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>with Security Level </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+4"/>
-        <source>Confirm send coins</source>
-        <translation type="unfinished">Confirm send coins</translation>
-    </message>
-    <message>
-        <location line="+11"/>
-        <source>Spending Zerocoin.
-Computationally expensive, might need several minutes depending on the selected Security Level and your hardware. 
-Please be patient...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+27"/>
-        <source>Too much inputs (</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+0"/>
-        <source>) needed. 
-Maximum allowed: </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>
-Either mint higher denominations (so fewer inputs are needed) or reduce the amount to spend.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <location line="+4"/>
-        <source>Spend Zerocoin failed with status = </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+15"/>
-        <source>zLux Spend #: </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>denomination: </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>serial: </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Spend is 1 of : </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+6"/>
-        <source>value out: </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>address: </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>zLux Mint</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+7"/>
-        <source>Sending successful, return code: </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>txid: </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>fee: </source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>QObject</name>
     <message>
         <location filename="../bitcoinunits.cpp" line="+252"/>
@@ -3629,7 +2805,7 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+776"/>
+        <location line="+762"/>
         <source>%1 d</source>
         <translation>%1 d</translation>
     </message>
@@ -3652,11 +2828,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <location line="+15"/>
         <source>NETWORK</source>
         <translation>NETWORK</translation>
-    </message>
-    <message>
-        <location line="+4"/>
-        <source>BLOOM</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+3"/>
@@ -3715,33 +2886,33 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>&amp;Information</translation>
     </message>
     <message>
-        <location line="+15"/>
+        <location line="+51"/>
         <source>General</source>
         <translation>General</translation>
     </message>
     <message>
-        <location line="+164"/>
+        <location line="+204"/>
         <source>Name</source>
         <translation>Name</translation>
     </message>
     <message>
-        <location line="-157"/>
+        <location line="-197"/>
         <source>Client name</source>
         <translation>Client name</translation>
     </message>
     <message>
+        <location line="-36"/>
         <location line="+10"/>
+        <location line="+36"/>
+        <location line="+30"/>
         <location line="+23"/>
-        <location line="+26"/>
-        <location line="+26"/>
         <location line="+23"/>
+        <location line="+62"/>
         <location line="+23"/>
         <location line="+36"/>
+        <location line="+26"/>
         <location line="+23"/>
-        <location line="+23"/>
-        <location line="+36"/>
-        <location line="+23"/>
-        <location line="+454"/>
+        <location line="+425"/>
         <location line="+23"/>
         <location line="+23"/>
         <location line="+23"/>
@@ -3754,82 +2925,81 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <location line="+23"/>
         <location line="+23"/>
         <location line="+23"/>
-        <location line="+91"/>
         <source>N/A</source>
         <translation>N/A</translation>
     </message>
     <message>
-        <location line="-913"/>
+        <location line="-927"/>
         <source>Number of connections</source>
         <translation>Number of connections</translation>
     </message>
     <message>
-        <location line="+134"/>
+        <location line="+79"/>
         <source>&amp;Open</source>
         <translation>&amp;Open</translation>
     </message>
     <message>
-        <location line="-193"/>
+        <location line="-56"/>
         <source>Startup time</source>
         <translation>Startup time</translation>
     </message>
     <message>
-        <location line="+29"/>
+        <location line="+137"/>
         <source>Network</source>
         <translation>Network</translation>
     </message>
     <message>
-        <location line="+112"/>
+        <location line="-91"/>
         <source>Last block time</source>
         <translation>Last block time</translation>
     </message>
     <message>
-        <location line="+42"/>
+        <location line="+26"/>
         <source>Debug log file</source>
         <translation>Debug log file</translation>
     </message>
     <message>
-        <location line="-258"/>
+        <location line="+95"/>
         <source>Using OpenSSL version</source>
         <translation>Using OpenSSL version</translation>
     </message>
     <message>
-        <location line="+52"/>
+        <location line="-197"/>
         <source>Build date</source>
         <translation>Build date</translation>
     </message>
     <message>
-        <location line="+141"/>
+        <location line="+53"/>
         <source>Current number of blocks</source>
         <translation>Current number of blocks</translation>
     </message>
     <message>
-        <location line="-216"/>
+        <location line="+85"/>
         <source>Client version</source>
         <translation>Client version</translation>
     </message>
     <message>
-        <location line="+49"/>
+        <location line="+108"/>
         <source>Using BerkeleyDB version</source>
         <translation>Using BerkeleyDB version</translation>
     </message>
     <message>
-        <location line="+160"/>
+        <location line="-312"/>
         <source>Block chain</source>
         <translation>Block chain</translation>
     </message>
     <message>
-        <location line="+79"/>
+        <location line="+149"/>
         <source>Open the LUX debug log file from the current data directory. This can take a few seconds for large log files.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-108"/>
+        <location line="+140"/>
         <source>Number of Masternodes</source>
         <translation>Number of Masternodes</translation>
     </message>
     <message>
-        <location line="+122"/>
+        <location line="+34"/>
         <source>&amp;Console</source>
         <translation>&amp;Console</translation>
     </message>
@@ -3870,8 +3040,8 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
     </message>
     <message>
         <location line="+41"/>
-        <location filename="../rpcconsole.cpp" line="+263"/>
-        <location line="+481"/>
+        <location filename="../rpcconsole.cpp" line="+262"/>
+        <location line="+439"/>
         <source>Select a peer to view detailed information.</source>
         <translation>Select a peer to view detailed information.</translation>
     </message>
@@ -3946,94 +3116,79 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>&amp;Wallet Repair</translation>
     </message>
     <message>
-        <location line="+15"/>
-        <source>Delete local Blockchain Folders</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+36"/>
-        <source>Wallet In Use:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+42"/>
+        <location line="+18"/>
         <source>Salvage wallet</source>
         <translation>Salvage wallet</translation>
     </message>
     <message>
-        <location line="+14"/>
-        <source>Attempt to recover private keys from a corrupt wallet.dat.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+16"/>
+        <location line="+19"/>
         <source>Rescan blockchain files</source>
         <translation>Rescan blockchain files</translation>
     </message>
     <message>
-        <location line="+14"/>
-        <source>Rescan the block chain for missing wallet transactions.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+16"/>
+        <location line="+19"/>
         <source>Recover transactions 1</source>
         <translation>Recover transactions 1</translation>
     </message>
     <message>
-        <location line="+14"/>
-        <source>Recover transactions from blockchain (keep meta-data, e.g. account owner).</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+16"/>
+        <location line="+19"/>
         <source>Recover transactions 2</source>
         <translation>Recover transactions 2</translation>
     </message>
     <message>
-        <location line="+14"/>
-        <source>Recover transactions from blockchain (drop meta-data).</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+16"/>
+        <location line="+19"/>
         <source>Upgrade wallet format</source>
         <translation>Upgrade wallet format</translation>
     </message>
     <message>
-        <location line="+44"/>
-        <source>Rebuild block chain index from current blk000??.dat files.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+23"/>
-        <source>-resync:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+7"/>
-        <source>Deletes all local blockchain folders so the wallet synchronizes from scratch.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="-246"/>
+        <location line="+19"/>
         <source>The buttons below will restart the wallet with command-line options to repair the wallet, fix issues with corrupt blockhain files or missing/obsolete transactions.</source>
         <translation>The buttons below will restart the wallet with command-line options to repair the wallet, fix issues with corrupt blockhain files or missing/obsolete transactions.</translation>
     </message>
     <message>
-        <location line="-13"/>
-        <source>Wallet repair options.</source>
-        <translation>Wallet repair options.</translation>
+        <location line="+16"/>
+        <source>-salvagewallet: Attempt to recover private keys from a corrupt wallet.dat.</source>
+        <translation>-salvagewallet: Attempt to recover private keys from a corrupt wallet.dat.</translation>
     </message>
     <message>
-        <location line="+199"/>
-        <source>Upgrade wallet to latest format on startup. (Note: this is NOT an update of the wallet itself!)</source>
-        <translation type="unfinished"></translation>
+        <location line="+16"/>
+        <source>-rescan: Rescan the block chain for missing wallet transactions.</source>
+        <translation>-rescan: Rescan the block chain for missing wallet transactions.</translation>
+    </message>
+    <message>
+        <location line="+16"/>
+        <source>-zapwallettxes=1: Recover transactions from blockchain (keep meta-data, e.g. account owner).</source>
+        <translation>-zapwallettxes=1: Recover transactions from blockchain (keep meta-data, e.g. account owner).</translation>
+    </message>
+    <message>
+        <location line="+16"/>
+        <source>-zapwallettxes=2: Recover transactions from blockchain (drop meta-data).</source>
+        <translation>-zapwallettxes=2: Recover transactions from blockchain (drop meta-data).</translation>
+    </message>
+    <message>
+        <location line="+16"/>
+        <source>-upgradewallet: Upgrade wallet to latest format on startup. (Note: this is NOT an update of the wallet itself!)</source>
+        <translation>-upgradewallet: Upgrade wallet to latest format on startup. (Note: this is NOT an update of the wallet itself!)</translation>
+    </message>
+    <message>
+        <location line="+23"/>
+        <source>Wallet repair options.</source>
+        <translation>Wallet repair options.</translation>
     </message>
     <message>
         <location line="+16"/>
         <source>Rebuild index</source>
         <translation>Rebuild index</translation>
+    </message>
+    <message>
+        <location line="+13"/>
+        <source>-reindex: Rebuild block chain index from current blk000??.dat files.</source>
+        <translation>-reindex: Rebuild block chain index from current blk000??.dat files.</translation>
+    </message>
+    <message>
+        <location line="+16"/>
+        <source>Wallet Path</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../rpcconsole.cpp" line="-206"/>
@@ -4051,32 +3206,12 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-66"/>
-        <source>This will delete your local blockchain folders and the wallet will synchronize the complete Blockchain from scratch.&lt;br /&gt;&lt;br /&gt;</source>
+        <location line="-209"/>
+        <source>Wallet in use: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+1"/>
-        <source>This needs quite some time and downloads a lot of data.&lt;br /&gt;&lt;br /&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Your transactions and funds will be visible again after the download has completed.&lt;br /&gt;&lt;br /&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Do you want to continue?.&lt;br /&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Confirm resync Blockchain</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+63"/>
+        <location line="+210"/>
         <source>Use up and down arrows to navigate history, and &lt;b&gt;Ctrl-L&lt;/b&gt; to clear screen.</source>
         <translation>Use up and down arrows to navigate history, and &lt;b&gt;Ctrl-L&lt;/b&gt; to clear screen.</translation>
     </message>
@@ -4358,9 +3493,10 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
     <name>SendCoinsDialog</name>
     <message>
         <location filename="../forms/sendcoinsdialog.ui" line="+14"/>
-        <location filename="../sendcoinsdialog.cpp" line="+231"/>
+        <location filename="../sendcoinsdialog.cpp" line="+233"/>
         <location line="+25"/>
-        <location line="+397"/>
+        <location line="+383"/>
+        <location line="+12"/>
         <source>Send Coins</source>
         <translation>Send Coins</translation>
     </message>
@@ -4370,7 +3506,17 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>Coin Control Features</translation>
     </message>
     <message>
-        <location line="+49"/>
+        <location line="+20"/>
+        <source>Inputs...</source>
+        <translation>Inputs...</translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>automatically selected</source>
+        <translation>automatically selected</translation>
+    </message>
+    <message>
+        <location line="+19"/>
         <source>Insufficient funds!</source>
         <translation>Insufficient funds!</translation>
     </message>
@@ -4475,7 +3621,12 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>Minimize</translation>
     </message>
     <message>
-        <location line="+81"/>
+        <location line="+579"/>
+        <source>Obfuscation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-498"/>
         <source>per kilobyte</source>
         <translation>per kilobyte</translation>
     </message>
@@ -4495,32 +3646,17 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>Custom:</translation>
     </message>
     <message>
-        <location line="+27"/>
+        <location line="+20"/>
         <source>(Smart fee not initialized yet. This usually takes a few blocks...)</source>
         <translation>(Smart fee not initialized yet. This usually takes a few blocks...)</translation>
     </message>
     <message>
-        <location line="+197"/>
-        <source>SwiftX</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="-352"/>
+        <location line="-148"/>
         <source>Confirmation time:</source>
         <translation>Confirmation time:</translation>
     </message>
     <message>
-        <location line="-947"/>
-        <source>Open Coin Control...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+10"/>
-        <source>Coins automatically selected</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+772"/>
+        <location line="-165"/>
         <source>If the custom fee is set to 1000 uLUXs and the transaction is only 250 bytes, then &quot;per kilobyte&quot; only pays 250 uLUXs in fee,&lt;br /&gt;while &quot;at least&quot; pays 1000 uLUXs. For transactions bigger than a kilobyte both pay by kilobyte.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4551,7 +3687,7 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+73"/>
+        <location line="+70"/>
         <source>Send as zero-fee transaction if possible</source>
         <translation>Send as zero-fee transaction if possible</translation>
     </message>
@@ -4591,17 +3727,17 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>Add &amp;Recipient</translation>
     </message>
     <message>
-        <location line="+35"/>
-        <source>Anonymized LUX</source>
-        <translation type="unfinished"></translation>
+        <location line="+57"/>
+        <source>SwiftTX</source>
+        <translation>SwiftTX</translation>
     </message>
     <message>
-        <location line="+23"/>
+        <location line="+7"/>
         <source>Balance:</source>
         <translation>Balance:</translation>
     </message>
     <message>
-        <location filename="../sendcoinsdialog.cpp" line="-571"/>
+        <location filename="../sendcoinsdialog.cpp" line="-566"/>
         <source>Copy quantity</source>
         <translation>Copy quantity</translation>
     </message>
@@ -4641,7 +3777,7 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>Copy change</translation>
     </message>
     <message>
-        <location line="+143"/>
+        <location line="+140"/>
         <source>The split block tool does not work when sending to outside addresses. Try again.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4652,27 +3788,34 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
     </message>
     <message>
         <location line="+8"/>
-        <location line="+3"/>
+        <location line="+6"/>
+        <location line="+9"/>
         <source>using</source>
         <translation>using</translation>
     </message>
     <message>
-        <location line="-3"/>
+        <location line="-15"/>
+        <location line="+6"/>
         <source>anonymous funds</source>
         <translation>anonymous funds</translation>
     </message>
     <message>
-        <location line="+622"/>
+        <location line="+614"/>
         <source>Warning: Invalid LUX address</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-619"/>
+        <location line="-605"/>
         <source>any available funds (not recommended)</source>
         <translation>any available funds (not recommended)</translation>
     </message>
     <message>
-        <location line="+28"/>
+        <location line="+6"/>
+        <source>and SwiftTX</source>
+        <translation>and SwiftTX</translation>
+    </message>
+    <message>
+        <location line="+23"/>
         <location line="+4"/>
         <location line="+4"/>
         <location line="+3"/>
@@ -4700,12 +3843,12 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>Confirm send coins</translation>
     </message>
     <message>
-        <location line="+230"/>
+        <location line="+227"/>
         <source>A fee %1 times higher than %2 per kB is considered an insanely high fee.</source>
         <translation>A fee %1 times higher than %2 per kB is considered an insanely high fee.</translation>
     </message>
     <message numerus="yes">
-        <location line="+114"/>
+        <location line="+102"/>
         <source>Estimated to begin confirmation within %n block(s).</source>
         <translation>
             <numerusform>Estimated to begin confirmation within %n block.</numerusform>
@@ -4713,17 +3856,17 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         </translation>
     </message>
     <message>
-        <location line="-145"/>
+        <location line="-129"/>
         <source>The recipient address is not valid, please recheck.</source>
         <translation>The recipient address is not valid, please recheck.</translation>
     </message>
     <message>
-        <location line="-329"/>
-        <source>and SwiftX</source>
+        <location line="-341"/>
+        <source>(obfuscation requires this amount to be rounded up to the nearest %1).</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+38"/>
+        <location line="+49"/>
         <source> split into %1 outputs using the UTXO splitter.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4733,7 +3876,7 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>&lt;b&gt;(%1 of %2 entries displayed)&lt;/b&gt;</translation>
     </message>
     <message>
-        <location line="+205"/>
+        <location line="+206"/>
         <source>The amount to pay must be larger than 0.</source>
         <translation>The amount to pay must be larger than 0.</translation>
     </message>
@@ -4763,17 +3906,12 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>The transaction was rejected! This might happen if some of the coins in your wallet were already spent, such as if you used a copy of wallet.dat and coins were spent in the copy but not marked as spent here.</translation>
     </message>
     <message>
-        <location line="+8"/>
+        <location line="+5"/>
         <source>Error: The wallet was unlocked only to anonymize coins.</source>
         <translation>Error: The wallet was unlocked only to anonymize coins.</translation>
     </message>
     <message>
-        <location line="+16"/>
-        <source>Error: The wallet was unlocked only to anonymize coins. Unlock canceled.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+84"/>
+        <location line="+87"/>
         <source>Pay only the minimum fee of %1</source>
         <translation>Pay only the minimum fee of %1</translation>
     </message>
@@ -4890,7 +4028,7 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
 <context>
     <name>ShutdownWindow</name>
     <message>
-        <location filename="../utilitydialog.cpp" line="+75"/>
+        <location filename="../utilitydialog.cpp" line="+42"/>
         <source>LUX Core is shutting down...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5147,7 +4285,22 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>conflicted</translation>
     </message>
     <message>
+        <location line="-31"/>
+        <source>%1/offline (verified via swifttx)</source>
+        <translation>%1/offline (verified via swifttx)</translation>
+    </message>
+    <message>
         <location line="+2"/>
+        <source>%1/confirmed (verified via swifttx)</source>
+        <translation>%1/confirmed (verified via swifttx)</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>%1 confirmations (verified via swifttx)</source>
+        <translation>%1 confirmations (verified via swifttx)</translation>
+    </message>
+    <message>
+        <location line="+29"/>
         <source>%1/offline</source>
         <translation>%1/offline</translation>
     </message>
@@ -5163,44 +4316,29 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>%1 confirmations</translation>
     </message>
     <message>
-        <location line="-37"/>
-        <source>%1/offline (verified via SwiftX)</source>
-        <translation type="unfinished"></translation>
+        <location line="-26"/>
+        <source>%1/offline (SwiftTX verification in progress - %2 of %3 signatures)</source>
+        <translation>%1/offline (SwiftTX verification in progress - %2 of %3 signatures)</translation>
     </message>
     <message>
         <location line="+2"/>
-        <source>%1/confirmed (verified via SwiftX)</source>
-        <translation type="unfinished"></translation>
+        <source>%1/confirmed (SwiftTX verification in progress - %2 of %3 signatures )</source>
+        <translation>%1/confirmed (SwiftTX verification in progress - %2 of %3 signatures )</translation>
     </message>
     <message>
         <location line="+2"/>
-        <source>%1 confirmations (verified via SwiftX)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+7"/>
-        <source>%1/offline (SwiftX verification in progress - %2 of %3 signatures)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>%1/confirmed (SwiftX verification in progress - %2 of %3 signatures )</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>%1 confirmations (SwiftX verification in progress - %2 of %3 signatures)</source>
-        <translation type="unfinished"></translation>
+        <source>%1 confirmations (SwiftTX verification in progress - %2 of %3 signatures)</source>
+        <translation>%1 confirmations (SwiftTX verification in progress - %2 of %3 signatures)</translation>
     </message>
     <message>
         <location line="+6"/>
-        <source>%1/offline (SwiftX verification failed)</source>
-        <translation type="unfinished"></translation>
+        <source>%1/offline (SwiftTX verification failed)</source>
+        <translation>%1/offline (SwiftTX verification failed)</translation>
     </message>
     <message>
         <location line="+2"/>
-        <source>%1/confirmed (SwiftX verification failed)</source>
-        <translation type="unfinished"></translation>
+        <source>%1/confirmed (SwiftTX verification failed)</source>
+        <translation>%1/confirmed (SwiftTX verification failed)</translation>
     </message>
     <message>
         <location line="+32"/>
@@ -5532,42 +4670,12 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>Obfuscated</translation>
     </message>
     <message>
-        <location line="+2"/>
-        <source>Converted Piv to zLux</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>Spent zLux</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>Received Piv from zLux</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>Minted Change as zLux from zLux Spend</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>Converted zLux to Piv</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+33"/>
+        <location line="+31"/>
         <source>watch-only</source>
         <translation>watch-only</translation>
     </message>
     <message>
-        <location line="+22"/>
-        <source>zLux Accumulator</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+3"/>
+        <location line="+19"/>
         <source>(n/a)</source>
         <translation>(n/a)</translation>
     </message>
@@ -5702,31 +4810,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
     </message>
     <message>
         <location line="+1"/>
-        <source>Received Piv from zLux</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Zerocoin Mint</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Zerocoin Spend</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Zerocoin Spend, Change in zLux</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Zerocoin Spend to Self</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
         <source>Other</source>
         <translation>Other</translation>
     </message>
@@ -5771,7 +4854,7 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>Show transaction details</translation>
     </message>
     <message>
-        <location line="+195"/>
+        <location line="+193"/>
         <source>Export Transaction History</source>
         <translation>Export Transaction History</translation>
     </message>
@@ -5781,7 +4864,7 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>Comma separated file (*.csv)</translation>
     </message>
     <message>
-        <location line="+11"/>
+        <location line="+9"/>
         <source>Confirmed</source>
         <translation>Confirmed</translation>
     </message>
@@ -5816,7 +4899,7 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>ID</translation>
     </message>
     <message>
-        <location line="+10"/>
+        <location line="+3"/>
         <source>Exporting Failed</source>
         <translation>Exporting Failed</translation>
     </message>
@@ -5826,7 +4909,7 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>There was an error trying to save the transaction history to %1.</translation>
     </message>
     <message>
-        <location line="-4"/>
+        <location line="+3"/>
         <source>Exporting Successful</source>
         <translation>Exporting Successful</translation>
     </message>
@@ -5836,7 +4919,7 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>The transaction history was successfully saved to %1.</translation>
     </message>
     <message>
-        <location line="+121"/>
+        <location line="+117"/>
         <source>Range:</source>
         <translation>Range:</translation>
     </message>
@@ -5865,7 +4948,7 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
 <context>
     <name>WalletModel</name>
     <message>
-        <location filename="../walletmodel.cpp" line="+317"/>
+        <location filename="../walletmodel.cpp" line="+274"/>
         <location line="+9"/>
         <location line="+9"/>
         <source>Send Coins</source>
@@ -5874,14 +4957,14 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
     <message>
         <location line="-18"/>
         <location line="+9"/>
-        <source>SwiftX doesn&apos;t support sending values that high yet. Transactions are currently limited to %1 LUX.</source>
+        <source>SwiftTX doesn&apos;t support sending values that high yet. Transactions are currently limited to %1 LUX.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>WalletView</name>
     <message>
-        <location filename="../walletview.cpp" line="+51"/>
+        <location filename="../walletview.cpp" line="+49"/>
         <source>&amp;Export</source>
         <translation>&amp;Export</translation>
     </message>
@@ -5896,7 +4979,7 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>Selected amount:</translation>
     </message>
     <message>
-        <location line="+256"/>
+        <location line="+237"/>
         <source>Backup Wallet</source>
         <translation>Backup Wallet</translation>
     </message>
@@ -5927,43 +5010,9 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
     </message>
 </context>
 <context>
-    <name>ZPivControlDialog</name>
-    <message>
-        <location filename="../forms/zpivcontroldialog.ui" line="+20"/>
-        <source>Select zLux to Spend</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+11"/>
-        <source>Quantity</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+7"/>
-        <location line="+14"/>
-        <source>0</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="-7"/>
-        <source>zLux</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+14"/>
-        <source>Select/Deselect All</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+50"/>
-        <source>Is Spendable</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>lux-core</name>
     <message>
-        <location filename="../luxstrings.cpp" line="+15"/>
+        <location filename="../luxstrings.cpp" line="+12"/>
         <source>(1 = keep tx meta data e.g. account owner and payment request information, 2 = drop tx meta data)</source>
         <translation type="unfinished">(1 = keep tx meta data e.g. account owner and payment request information, 2 = drop tx meta data)</translation>
     </message>
@@ -5994,11 +5043,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
     </message>
     <message>
         <location line="+4"/>
-        <source>Calculated accumulator checkpoint is not what is recorded by block index</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+2"/>
         <source>Cannot obtain a lock on data directory %s. LUX Core is probably already running.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6023,17 +5067,27 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation type="unfinished">Delete all wallet transactions and only recover those parts of the blockchain through -rescan on startup</translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+3"/>
+        <source>Disable all LUX specific functionality (Masternodes, Obfuscation, SwiftTX, Budgeting) (0-1, default: %u)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
         <source>Distributed under the MIT software license, see the accompanying file COPYING or &lt;http://www.opensource.org/licenses/mit-license.php&gt;.</source>
         <translation type="unfinished">Distributed under the MIT software license, see the accompanying file COPYING or &lt;http://www.opensource.org/licenses/mit-license.php&gt;.</translation>
     </message>
     <message>
-        <location line="+8"/>
-        <source>Enable spork administration functionality with the appropriate private key.</source>
+        <location line="+3"/>
+        <source>Enable swifttx, show confirmations for locked transactions (bool, default: %s)</source>
+        <translation type="unfinished">Enable swifttx, show confirmations for locked transactions (bool, default: %s)</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Enable use of automated obfuscation for funds stored in this wallet (0-1, default: %u)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+2"/>
+        <location line="+3"/>
         <source>Enter regression test mode, which uses a special chain in which blocks can be solved instantly.</source>
         <translation type="unfinished">Enter regression test mode, which uses a special chain in which blocks can be solved instantly.</translation>
     </message>
@@ -6043,7 +5097,7 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation type="unfinished">Error: Listening for incoming connections failed (listen returned error %s)</translation>
     </message>
     <message>
-        <location line="+11"/>
+        <location line="+2"/>
         <source>Error: Unsupported argument -socks found. Setting SOCKS version isn&apos;t possible anymore, only SOCKS5 proxies are supported.</source>
         <translation type="unfinished">Error: Unsupported argument -socks found. Setting SOCKS version isn&apos;t possible anymore, only SOCKS5 proxies are supported.</translation>
     </message>
@@ -6084,6 +5138,11 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
     </message>
     <message>
         <location line="+3"/>
+        <source>How thorough the block verification of -checkblocks is (0-4, default: %u)</source>
+        <translation type="unfinished">How thorough the block verification of -checkblocks is (0-4, default: %u)</translation>
+    </message>
+    <message>
+        <location line="+2"/>
         <source>If paytxfee is not set, include enough fee so transactions begin confirmation on average within n blocks (default: %u)</source>
         <translation type="unfinished">If paytxfee is not set, include enough fee so transactions begin confirmation on average within n blocks (default: %u)</translation>
     </message>
@@ -6094,21 +5153,11 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
     </message>
     <message>
         <location line="+3"/>
-        <source>Insufficient or insufficient confirmed funds, you might need to wait a few minutes and try again.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+3"/>
         <source>Invalid amount for -maxtxfee=&lt;amount&gt;: &apos;%s&apos; (must be at least the minrelay fee of %s to prevent stuck transactions)</source>
         <translation type="unfinished">Invalid amount for -maxtxfee=&lt;amount&gt;: &apos;%s&apos; (must be at least the minrelay fee of %s to prevent stuck transactions)</translation>
     </message>
     <message>
         <location line="+3"/>
-        <source>Keep the specified amount available for spending at all times (default: 0)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+2"/>
         <source>Log transaction priority and fee per kB when mining blocks (default: %u)</source>
         <translation type="unfinished">Log transaction priority and fee per kB when mining blocks (default: %u)</translation>
     </message>
@@ -6143,14 +5192,14 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation type="unfinished">Output debugging information (default: %u, supplying &lt;category&gt; is optional)</translation>
     </message>
     <message>
-        <location line="+5"/>
-        <source>Query for peer addresses via DNS lookup, if low on addresses (default: 1 unless -connect)</source>
-        <translation type="unfinished">Query for peer addresses via DNS lookup, if low on addresses (default: 1 unless -connect)</translation>
+        <location line="+2"/>
+        <source>Provide liquidity to Obfuscation by infrequently mixing coins on a continual basis (0-100, default: %u, 1=very frequent, high fees, 100=very infrequent, low fees)</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+3"/>
-        <source>Randomize credentials for every proxy connection. This enables Tor stream isolation (default: %u)</source>
-        <translation type="unfinished"></translation>
+        <location line="+4"/>
+        <source>Query for peer addresses via DNS lookup, if low on addresses (default: 1 unless -connect)</source>
+        <translation type="unfinished">Query for peer addresses via DNS lookup, if low on addresses (default: 1 unless -connect)</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -6184,11 +5233,16 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
     </message>
     <message>
         <location line="+3"/>
-        <source>Support filtering of blocks and transaction with bloom filters (default: %u)</source>
-        <translation type="unfinished"></translation>
+        <source>SwiftTX requires inputs with at least 6 confirmations, you might need to wait a few minutes and try again.</source>
+        <translation type="unfinished">SwiftTX requires inputs with at least 6 confirmations, you might need to wait a few minutes and try again.</translation>
     </message>
     <message>
-        <location line="+8"/>
+        <location line="+3"/>
+        <source>This is a pre-release test build - use at your own risk - do not use for mining or merchant applications</source>
+        <translation type="unfinished">This is a pre-release test build - use at your own risk - do not use for mining or merchant applications</translation>
+    </message>
+    <message>
+        <location line="+3"/>
         <source>This product includes software developed by the OpenSSL Project for use in the OpenSSL Toolkit &lt;https://www.openssl.org/&gt; and cryptographic software written by Eric Young and UPnP software written by Thomas Bernard.</source>
         <translation type="unfinished">This product includes software developed by the OpenSSL Project for use in the OpenSSL Toolkit &lt;https://www.openssl.org/&gt; and cryptographic software written by Eric Young and UPnP software written by Thomas Bernard.</translation>
     </message>
@@ -6303,7 +5357,14 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+2"/>
+        <location line="+1"/>
+        <source>&lt;category&gt; can be:
+</source>
+        <translation type="unfinished">&lt;category&gt; can be:
+</translation>
+    </message>
+    <message>
+        <location line="+1"/>
         <source>Accept command line and JSON-RPC commands</source>
         <translation type="unfinished">Accept command line and JSON-RPC commands</translation>
     </message>
@@ -6343,24 +5404,14 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
         <translation type="unfinished">Always query for peer addresses via DNS lookup (default: %u)</translation>
     </message>
     <message>
-        <location line="+2"/>
+        <location line="+1"/>
         <source>Attempt to recover private keys from a corrupt wallet.dat</source>
         <translation type="unfinished">Attempt to recover private keys from a corrupt wallet.dat</translation>
     </message>
     <message>
         <location line="+1"/>
-        <source>Automatically create Tor hidden service (default: %d)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
         <source>Block creation options:</source>
         <translation type="unfinished">Block creation options:</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Calculating missing accumulators...</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
@@ -6464,16 +5515,6 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <location line="+1"/>
-        <source>Delete blockchain folders and resync from scratch</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Disable OS notifications for incoming transactions (default: %u)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
         <source>Disable safemode, override a real safe mode event (default: %u)</source>
         <translation type="unfinished">Disable safemode, override a real safe mode event (default: %u)</translation>
     </message>
@@ -6483,7 +5524,7 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
         <translation type="unfinished">Discover own IP address (default: 1 when listening and no -externalip)</translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location line="+1"/>
         <source>Do not load the wallet and disable wallet RPC calls</source>
         <translation type="unfinished">Do not load the wallet and disable wallet RPC calls</translation>
     </message>
@@ -6499,21 +5540,6 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <location line="+1"/>
-        <source>Enable automatic Zerocoin minting (0-1, default: %u)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>Enable publish hash transaction (locked via SwiftX) in &lt;address&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>Enable publish raw transaction (locked via SwiftX) in &lt;address&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+3"/>
         <source>Enable the client to act as a masternode (0-1, default: %u)</source>
         <translation type="unfinished">Enable the client to act as a masternode (0-1, default: %u)</translation>
     </message>
@@ -6609,28 +5635,13 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <location line="+1"/>
-        <source>Failed to calculate accumulator checkpoint</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
         <source>Failed to listen on any port. Use -listen=0 if you want this.</source>
         <translation type="unfinished">Failed to listen on any port. Use -listen=0 if you want this.</translation>
     </message>
     <message>
         <location line="+1"/>
-        <source>Failed to read block index</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
         <source>Failed to read block</source>
         <translation type="unfinished">Failed to read block</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Failed to write block index</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
@@ -6719,23 +5730,18 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <location line="+1"/>
-        <source>Insufficient funds</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
         <source>Insufficient funds.</source>
         <translation type="unfinished">Insufficient funds.</translation>
     </message>
     <message>
         <location line="+1"/>
-        <source>Invalid -onion address or hostname: &apos;%s&apos;</source>
-        <translation type="unfinished"></translation>
+        <source>Invalid -onion address: &apos;%s&apos;</source>
+        <translation type="unfinished">Invalid -onion address: &apos;%s&apos;</translation>
     </message>
     <message>
         <location line="+1"/>
-        <source>Invalid -proxy address or hostname: &apos;%s&apos;</source>
-        <translation type="unfinished"></translation>
+        <source>Invalid -proxy address: &apos;%s&apos;</source>
+        <translation type="unfinished">Invalid -proxy address: &apos;%s&apos;</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -6769,11 +5775,6 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <location line="+1"/>
-        <source>Invalid amount</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
         <source>Invalid masternodeprivkey. Please see documenation.</source>
         <translation type="unfinished">Invalid masternodeprivkey. Please see documenation.</translation>
     </message>
@@ -6798,119 +5799,12 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
         <translation type="unfinished">Invalid script detected.</translation>
     </message>
     <message>
-        <location line="+98"/>
-        <source>SwiftX options:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="-273"/>
-        <source>This is a pre-release test build - use at your own risk - do not use for staking or merchant applications!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="-152"/>
-        <source> mints deleted
-</source>
+        <location line="+1"/>
+        <source>Keep N LUX anonymized (default: %u)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
-        <source> mints updated, </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source> unconfirmed transactions removed
-</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+38"/>
-        <source>Disable all LUX specific functionality (Masternodes, Zerocoin, SwiftX, Budgeting) (0-1, default: %u)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+6"/>
-        <source>Enable SwiftX, show confirmations for locked transactions (bool, default: %s)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>Enable automatic wallet backups triggered after each zLux minting (0-1, default: %u)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+10"/>
-        <source>Error: The transaction was rejected! This might happen if some of the coins in your wallet were already spent, such as if you used a copy of wallet.dat and coins were spent in the copy but not marked as spent here.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+4"/>
-        <source>Error: This transaction requires a transaction fee of at least %s because of its amount, complexity, or use of recently received funds!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>Error: Unsupported argument -checklevel found. Checklevel must be level 4.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+58"/>
-        <source>Preferred Denomination for automatically minted Zerocoin  (1/5/10/50/100/500/1000/5000), 0 for no preference. default: %u)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+26"/>
-        <source>SwiftX requires inputs with at least 6 confirmations, you might need to wait a few minutes and try again.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+71"/>
-        <source>&lt;category&gt; can be:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+9"/>
-        <source>Attempt to force blockchain corruption recovery</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+29"/>
-        <source>Display the stake modifier calculations in the debug.log file.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Display verbose coin stake messages in the debug.log file.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+5"/>
-        <source>Enable publish hash block in &lt;address&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>Enable publish hash transaction in &lt;address&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Enable publish raw block in &lt;address&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>Enable publish raw transaction in &lt;address&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Enable staking functionality (0-1, default: %u)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+58"/>
         <source>Keep at most &lt;n&gt; unconnectable transactions in memory (default: %u)</source>
         <translation type="unfinished">Keep at most &lt;n&gt; unconnectable transactions in memory (default: %u)</translation>
     </message>
@@ -6968,11 +5862,6 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
         <location line="+1"/>
         <source>Loading masternode payment cache...</source>
         <translation type="unfinished">Loading masternode payment cache...</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Loading sporks...</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
@@ -7096,6 +5985,11 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <location line="+1"/>
+        <source>Obfuscation options:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
         <source>Obfuscation request complete:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7126,23 +6020,8 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <location line="+1"/>
-        <source>Percentage of automatically minted Zerocoin  (10-100, default: %u)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Preparing for resync...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
         <source>Prepend debug output with timestamp (default: %u)</source>
         <translation type="unfinished">Prepend debug output with timestamp (default: %u)</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Print version and exit</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
@@ -7176,23 +6055,8 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <location line="+1"/>
-        <source>Recalculating coin supply may take 30-60 minutes...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Recalculating supply statistics may take 30-60 minutes...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
         <source>Receive and display P2P network alerts (default: %u)</source>
         <translation type="unfinished">Receive and display P2P network alerts (default: %u)</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Reindex the accumulator database</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
@@ -7213,16 +6077,6 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
         <location line="+1"/>
         <source>Rescanning...</source>
         <translation type="unfinished">Rescanning...</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>ResetMintZerocoin finished: </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>ResetSpentZerocoin finished: </source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
@@ -7283,11 +6137,6 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
         <location line="+1"/>
         <source>Set minimum block size in bytes (default: %u)</source>
         <translation type="unfinished">Set minimum block size in bytes (default: %u)</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Set the Maximum reorg depth (default: %u)</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
@@ -7371,11 +6220,6 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <location line="+1"/>
-        <source>Staking options:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
         <source>Stop running after importing blocks from disk (default: %u)</source>
         <translation type="unfinished">Stop running after importing blocks from disk (default: %u)</translation>
     </message>
@@ -7395,7 +6239,12 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
         <translation type="unfinished">Submitted to masternode, waiting in queue %s</translation>
     </message>
     <message>
-        <location line="+2"/>
+        <location line="+1"/>
+        <source>SwiftTX options:</source>
+        <translation type="unfinished">SwiftTX options:</translation>
+    </message>
+    <message>
+        <location line="+1"/>
         <source>Synchronization failed</source>
         <translation type="unfinished">Synchronization failed</translation>
     </message>
@@ -7453,16 +6302,6 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
         <location line="+1"/>
         <source>Threshold for disconnecting misbehaving peers (default: %u)</source>
         <translation type="unfinished">Threshold for disconnecting misbehaving peers (default: %u)</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Tor control port password (default: empty)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Tor control port to use if onion listening enabled (default: %s)</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
@@ -7531,6 +6370,11 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <location line="+1"/>
+        <source>Use N separate masternodes to anonymize funds  (2-8, default: %u)</source>
+        <translation type="unfinished">Use N separate masternodes to anonymize funds  (2-8, default: %u)</translation>
+    </message>
+    <message>
+        <location line="+1"/>
         <source>Use OpenSSL (https) for JSON-RPC connections</source>
         <translation type="unfinished">Use OpenSSL (https) for JSON-RPC connections</translation>
     </message>
@@ -7543,11 +6387,6 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
         <location line="+1"/>
         <source>Use UPnP to map the listening port (default: 1 when listening)</source>
         <translation type="unfinished">Use UPnP to map the listening port (default: 1 when listening)</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Use a custom max chain reorganization depth (default: %u)</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
@@ -7643,21 +6482,6 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
         <location line="+1"/>
         <source>Zapping all transactions from wallet...</source>
         <translation type="unfinished">Zapping all transactions from wallet...</translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>ZeroMQ notification options:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Zerocoin options:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>failed to validate zerocoin</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>

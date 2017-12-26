@@ -112,9 +112,6 @@
     <name>PeerTableModel</name>
     </context>
 <context>
-    <name>PrivacyDialog</name>
-    </context>
-<context>
     <name>QObject</name>
     </context>
 <context>
@@ -181,9 +178,6 @@
         <source>Export the data in the current tab to a file</source>
         <translation>Exportă datele din fila curentă într-un fișier</translation>
     </message>
-    </context>
-<context>
-    <name>ZPivControlDialog</name>
     </context>
 <context>
     <name>lux-core</name>

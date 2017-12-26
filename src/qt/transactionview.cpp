@@ -95,11 +95,6 @@ TransactionView::TransactionView(QWidget* parent) : QWidget(parent), model(0), t
     typeWidget->addItem(tr("Mined"), TransactionFilterProxy::TYPE(TransactionRecord::Generated));
     typeWidget->addItem(tr("Minted"), TransactionFilterProxy::TYPE(TransactionRecord::StakeMint));
     typeWidget->addItem(tr("Masternode Reward"), TransactionFilterProxy::TYPE(TransactionRecord::MNReward));
-    typeWidget->addItem(tr("Received Piv from zLux"), TransactionFilterProxy::TYPE(TransactionRecord::RecvFromZerocoinSpend));
-    typeWidget->addItem(tr("Zerocoin Mint"), TransactionFilterProxy::TYPE(TransactionRecord::ZerocoinMint));
-    typeWidget->addItem(tr("Zerocoin Spend"), TransactionFilterProxy::TYPE(TransactionRecord::ZerocoinSpend));
-    typeWidget->addItem(tr("Zerocoin Spend, Change in zLux"), TransactionFilterProxy::TYPE(TransactionRecord::ZerocoinSpend_Change_zLux));
-    typeWidget->addItem(tr("Zerocoin Spend to Self"), TransactionFilterProxy::TYPE(TransactionRecord::ZerocoinSpend_FromMe));
     typeWidget->addItem(tr("Other"), TransactionFilterProxy::TYPE(TransactionRecord::Other));
     typeWidget->setCurrentIndex(settings.value("transactionType").toInt());
 
@@ -332,16 +327,14 @@ void TransactionView::changedAmount(const QString& amount)
         return;
     CAmount amount_parsed = 0;
 
-    if (model) {
-        // Replace "," by "." so BitcoinUnits::parse will not fail for users entering "," as decimal separator
-        QString newAmount = amount;
-        newAmount.replace(QString(","), QString("."));
+    // Replace "," by "." so BitcoinUnits::parse will not fail for users entering "," as decimal separator
+    QString newAmount = amount;
+    newAmount.replace(QString(","), QString("."));
 
-        if (BitcoinUnits::parse(model->getOptionsModel()->getDisplayUnit(), newAmount, &amount_parsed)) {
-            transactionProxyModel->setMinAmount(amount_parsed);
-        } else {
-            transactionProxyModel->setMinAmount(0);
-        }
+    if (BitcoinUnits::parse(model->getOptionsModel()->getDisplayUnit(), newAmount, &amount_parsed)) {
+        transactionProxyModel->setMinAmount(amount_parsed);
+    } else {
+        transactionProxyModel->setMinAmount(0);
     }
 }
 
@@ -356,31 +349,25 @@ void TransactionView::exportClicked()
         return;
 
     CSVModelWriter writer(filename);
-    bool fExport = false;
 
-    if (model) {
-        // name, column, role
-        writer.setModel(transactionProxyModel);
-        writer.addColumn(tr("Confirmed"), 0, TransactionTableModel::ConfirmedRole);
-        if (model->haveWatchOnly())
-            writer.addColumn(tr("Watch-only"), TransactionTableModel::Watchonly);
-        writer.addColumn(tr("Date"), 0, TransactionTableModel::DateRole);
-        writer.addColumn(tr("Type"), TransactionTableModel::Type, Qt::EditRole);
-        writer.addColumn(tr("Label"), 0, TransactionTableModel::LabelRole);
-        writer.addColumn(tr("Address"), 0, TransactionTableModel::AddressRole);
-        writer.addColumn(BitcoinUnits::getAmountColumnTitle(model->getOptionsModel()->getDisplayUnit()), 0, TransactionTableModel::FormattedAmountRole);
-        writer.addColumn(tr("ID"), 0, TransactionTableModel::TxIDRole);
+    // name, column, role
+    writer.setModel(transactionProxyModel);
+    writer.addColumn(tr("Confirmed"), 0, TransactionTableModel::ConfirmedRole);
+    if (model && model->haveWatchOnly())
+        writer.addColumn(tr("Watch-only"), TransactionTableModel::Watchonly);
+    writer.addColumn(tr("Date"), 0, TransactionTableModel::DateRole);
+    writer.addColumn(tr("Type"), TransactionTableModel::Type, Qt::EditRole);
+    writer.addColumn(tr("Label"), 0, TransactionTableModel::LabelRole);
+    writer.addColumn(tr("Address"), 0, TransactionTableModel::AddressRole);
+    writer.addColumn(BitcoinUnits::getAmountColumnTitle(model->getOptionsModel()->getDisplayUnit()), 0, TransactionTableModel::FormattedAmountRole);
+    writer.addColumn(tr("ID"), 0, TransactionTableModel::TxIDRole);
 
-        fExport = writer.write();
-    }
-
-    if (fExport) {
-        emit message(tr("Exporting Successful"), tr("The transaction history was successfully saved to %1.").arg(filename),
-                     CClientUIInterface::MSG_INFORMATION);
-    } 
-    else {
+    if (!writer.write()) {
         emit message(tr("Exporting Failed"), tr("There was an error trying to save the transaction history to %1.").arg(filename),
-                     CClientUIInterface::MSG_ERROR);
+            CClientUIInterface::MSG_ERROR);
+    } else {
+        emit message(tr("Exporting Successful"), tr("The transaction history was successfully saved to %1.").arg(filename),
+            CClientUIInterface::MSG_INFORMATION);
     }
 }
 

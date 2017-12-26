@@ -477,11 +477,11 @@
      </column>
      <column>
       <property name="text">
-	<string>Type</string>
+       <string>DS Rounds</string>
       </property>
      </column>
      <column>
-      <property name="text">	 
+      <property name="text">
        <string>Date</string>
       </property>
      </column>

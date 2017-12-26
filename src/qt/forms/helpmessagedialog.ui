@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>585</width>
-    <height>225</height>
+    <width>800</width>
+    <height>400</height>
    </rect>
   </property>
   <property name="font">
@@ -35,13 +35,6 @@
    <item>
     <layout class="QVBoxLayout" name="verticalLayout">
      <item>
-      <widget class="QTextEdit" name="helpMessage">
-       <property name="readOnly">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item>
       <widget class="QScrollArea" name="scrollArea">
        <property name="verticalScrollBarPolicy">
         <enum>Qt::ScrollBarAlwaysOn</enum>
@@ -54,21 +47,18 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>447</width>
-          <height>68</height>
+          <width>659</width>
+          <height>348</height>
          </rect>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_2">
          <item>
-          <widget class="QLabel" name="aboutMessage">
+          <widget class="QLabel" name="helpMessageLabel">
            <property name="cursor">
             <cursorShape>IBeamCursor</cursorShape>
            </property>
            <property name="textFormat">
             <enum>Qt::PlainText</enum>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
            </property>
            <property name="openExternalLinks">
             <bool>true</bool>

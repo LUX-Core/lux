@@ -55,11 +55,7 @@
     </message>
     <message>
         <source>Sending addresses</source>
-        <translation>Адреса отправки</translation>
-    </message>
-    <message>
-        <source>Receiving addresses</source>
-        <translation>Адреса получения</translation>
+        <translation>Отправка адресов</translation>
     </message>
     <message>
         <source>These are your LUX addresses for sending payments. Always check the amount and the receiving address before sending coins.</source>
@@ -84,10 +80,6 @@
     <message>
         <source>Export Address List</source>
         <translation>Экспорт списка адресов</translation>
-    </message>
-    <message>
-        <source>Comma separated file (*.csv)</source>
-        <translation>Файл формата csv</translation>
     </message>
     <message>
         <source>Exporting Failed</source>
@@ -133,11 +125,7 @@
     </message>
     <message>
         <source>For anonymization and staking only</source>
-        <translation>Только для анонимизации и хранения</translation>
-    </message>
-    <message>
-        <source>Enter the new passphrase to the wallet.&lt;br/&gt;Please use a passphrase of &lt;b&gt;ten or more random characters&lt;/b&gt;, or &lt;b&gt;eight or more words&lt;/b&gt;.</source>
-        <translation>Введите новый пароль к кошельку. &lt;br/&gt;Используйте при этом десять &lt;/b&gt;или болле случайных символов &lt;/b&gt;или восем и более слов.</translation>
+        <translation>Только для анонимизации и разбивки</translation>
     </message>
     <message>
         <source>Encrypt wallet</source>
@@ -149,7 +137,7 @@
     </message>
     <message>
         <source>Unlock wallet</source>
-        <translation>Снятие блокировки кошелька</translation>
+        <translation>Разблокировать кошелек</translation>
     </message>
     <message>
         <source>This operation needs your wallet passphrase to decrypt the wallet.</source>
@@ -178,10 +166,6 @@
     <message>
         <source>Are you sure you wish to encrypt your wallet?</source>
         <translation>Вы действительно хотите зашифровать свой кошелек?</translation>
-    </message>
-    <message>
-        <source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR LUX&lt;/b&gt;!</source>
-        <translation>Внимание: если вы зашифруете свой кошелёк и потеряете от него пароль, то вы &lt;b&gt;ПОТЕРЯЕТЕ ВСЕ СВОИ LUX&lt;/b&gt;!</translation>
     </message>
     <message>
         <source>Wallet encrypted</source>
@@ -233,10 +217,6 @@
     <message>
         <source>&amp;BIP 38 Encrypt</source>
         <translation>&amp;BIP 38 Шифрование</translation>
-    </message>
-    <message>
-        <source>Enter a Lux Address that you would like to encrypt using BIP 38. Enter a passphrase in the middle box. Press encrypt to compute the encrypted private key.</source>
-        <translation>Введите LUX адрес, которым вы хотите зашифровать, используя BIP 38. Введите пароль в среднем поле. Нажмите "Зашифровать", чтобы создать зашиврованный секретный ключ.</translation>
     </message>
     <message>
         <source>Address:</source>
@@ -297,14 +277,6 @@
     <message>
         <source>Enter the BIP 38 encrypted private key. Enter the passphrase in the middle box. Click Decrypt Key to compute the private key. After the key is decrypted, clicking 'Import Address' will add this private key to the wallet.</source>
         <translation>Введите зашифрованный с помощью BIP 38 секретный ключ. Введите секретную фразу в среднем окне. Нажмите Дешифровать Ключ чтобы создать секретный ключ. Нажав на Импортировать Адрес после дешифровки, вы добавите секретный ключ к кошельку.</translation>
-    </message>
-    <message>
-        <source>The LUX address the message was signed with</source>
-        <translation>Адрес LUX, которым подписано сообщение</translation>
-    </message>
-    <message>
-        <source>Verify the message to ensure it was signed with the specified LUX address</source>
-        <translation>Проверте сообщение, чтобы убедиться, что оно было подписано указанным LUX адресом </translation>
     </message>
     <message>
         <source>Decrypt &amp;Key</source>
@@ -550,16 +522,8 @@
         <translation>&amp;Адреса отправки...</translation>
     </message>
     <message>
-        <source>Show the list of used sending addresses and labels</source>
-        <translation>Показать список использованых адресов отправки </translation>
-    </message>
-    <message>
         <source>&amp;Receiving addresses...</source>
         <translation>&amp;Адреса получения...</translation>
-    </message>
-    <message>
-        <source>Show the list of used receiving addresses and labels</source>
-        <translation>Показать список использованых адресов приёма</translation>
     </message>
     <message>
         <source>Open &amp;URI...</source>
@@ -568,6 +532,10 @@
     <message>
         <source>&amp;Command-line options</source>
         <translation>&amp;Параметры командной строки</translation>
+    </message>
+    <message numerus="yes">
+        <source>Processed %n blocks of transaction history.</source>
+        <translation><numerusform>Обработан %n блок истории транзакций</numerusform><numerusform>Обработано %n блоков истории транзакций</numerusform><numerusform>Обработано %n блоков истории транзакций</numerusform><numerusform>Обработано %n блоков истории транзакций</numerusform></translation>
     </message>
     <message>
         <source>Synchronizing additional data: %p%</source>
@@ -626,14 +594,6 @@
         <translation>Изменение параметров конфигурации LUX</translation>
     </message>
     <message>
-        <source>Sign messages with your LUX addresses to prove you own them</source>
-        <translation>Подписывайте сообщения вашими LUX адресами, чтобы доказать, что вы их владелец</translation>
-    </message>
-    <message>
-        <source>Verify messages to ensure they were signed with specified LUX addresses</source>
-        <translation>Проверте сообщения, чтобы убедиться, что они были подписаны указанным LUX адресом </translation>
-    </message>
-    <message>
         <source>&amp;BIP38 tool</source>
         <translation>&amp;BIP38 Утилита</translation>
     </message>
@@ -662,10 +622,6 @@
         <translation>Открыть файл настроек мастернод</translation>
     </message>
     <message>
-        <source>Open a LUX: URI or payment request</source>
-        <translation>Открыть LUX: URI или запрос платежа</translation>
-    </message>
-    <message>
         <source>&amp;Blockchain explorer</source>
         <translation>&amp;Обзор блокчейна</translation>
     </message>
@@ -674,12 +630,12 @@
         <translation>Окно обзора блока</translation>
     </message>
     <message>
-        <source>Show the LUX Core help message to get a list with possible LUX command-line options</source>
-        <translation>Смотрите помощь к программе, чтобы получить документацию ко всем возможным опциям комманды LUX</translation>
-    </message>
-    <message>
         <source>LUX Core client</source>
         <translation>Клиент LUX Core</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n active connection(s) to LUX network</source>
+        <translation><numerusform>%n активное подключение к сети LUX</numerusform><numerusform>%n активных подключений к сети LUX</numerusform><numerusform>%n активных подключений к сети LUX</numerusform><numerusform>%n активных подключений к сети LUX</numerusform></translation>
     </message>
     <message>
         <source>Synchronizing with network...</source>
@@ -694,32 +650,36 @@
         <translation>Переиндексация блоков на диске...</translation>
     </message>
     <message>
-        <source>No block source available...</source>
-        <translation>Источник блоков недоступен</translation>
-    </message>
-    <message>
         <source>Up to date</source>
         <translation>Обновление не требуется</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n hour(s)</source>
+        <translation><numerusform>%n час</numerusform><numerusform>%n часа</numerusform><numerusform>%n часов</numerusform><numerusform>%n часов</numerusform></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n day(s)</source>
+        <translation><numerusform>%n день</numerusform><numerusform>%n дня</numerusform><numerusform>%n дней</numerusform><numerusform>%n дней</numerusform></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n week(s)</source>
+        <translation><numerusform>%n неделя</numerusform><numerusform>%n недели</numerusform><numerusform>%n недель</numerusform><numerusform>%n недель</numerusform></translation>
     </message>
     <message>
         <source>%1 and %2</source>
         <translation>%1 и %2</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n year(s)</source>
+        <translation><numerusform>%n год</numerusform><numerusform>%n года</numerusform><numerusform>%n лет</numerusform><numerusform>%n лет</numerusform></translation>
     </message>
     <message>
         <source>%1 behind</source>
         <translation>%1 позади</translation>
     </message>
     <message>
-        <source>Catching up...</source>
-        <translation>ловлю...</translation>
-    </message>
-    <message>
         <source>Last received block was generated %1 ago.</source>
         <translation>Последний полученный блок был сгенерирован %1 назад</translation>
-    </message>
-    <message>
-        <source>Transactions after this will not yet be visible.</source>
-        <translation>Трансакции после этой не будут видимы</translation>
     </message>
     <message>
         <source>Error</source>
@@ -758,12 +718,6 @@ Address: %4
 </translation>
     </message>
     <message>
-        <source>Staking is active
- MultiSend: %1</source>
-        <translation>Хранение активно
-MultiSend: %1</translation>
-    </message>
-    <message>
         <source>Active</source>
         <translation>Активно</translation>
     </message>
@@ -772,18 +726,8 @@ MultiSend: %1</translation>
         <translation>Не активно</translation>
     </message>
     <message>
-        <source>Staking is not active
- MultiSend: %1</source>
-        <translation>Хранение не активно
-MultiSend: %1</translation>
-    </message>
-    <message>
         <source>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;unlocked&lt;/b&gt;</source>
         <translation>Кошелек &lt;b&gt;зашифрован&lt;/b&gt; и в настоящее время &lt;b&gt;разблокирован&lt;/b&gt;</translation>
-    </message>
-    <message>
-        <source>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;unlocked&lt;/b&gt; for anonimization and staking only</source>
-        <translation>Кошелек &lt;b&gt;зашифрован&lt;/b&gt; и в настоящее время &lt;b&gt;разблокирован&lt;/b&gt; для анонимизации и хранения.</translation>
     </message>
     <message>
         <source>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;locked&lt;/b&gt;</source>
@@ -815,10 +759,6 @@ MultiSend: %1</translation>
 </context>
 <context>
     <name>ClientModel</name>
-    <message>
-        <source>Total: %1 (OBF compatible: %2 / Enabled: %3)</source>
-        <translation>Всего: %1 (OBF совместимые: %2 / Включеные: %3)</translation>
-    </message>
     <message>
         <source>Network Alert</source>
         <translation>Сетевое предупреждение</translation>
@@ -867,10 +807,6 @@ MultiSend: %1</translation>
         <translation>выделить(снять) все</translation>
     </message>
     <message>
-        <source>toggle lock state</source>
-        <translation>поменять статус блокировки</translation>
-    </message>
-    <message>
         <source>Tree mode</source>
         <translation>Режим древа</translation>
     </message>
@@ -889,10 +825,6 @@ MultiSend: %1</translation>
     <message>
         <source>Received with label</source>
         <translation>Получено с меткой</translation>
-    </message>
-    <message>
-        <source>Received with address</source>
-        <translation>Полученно на адрес</translation>
     </message>
     <message>
         <source>Date</source>
@@ -927,24 +859,12 @@ MultiSend: %1</translation>
         <translation>Копировать ID транзакции</translation>
     </message>
     <message>
-        <source>Lock unspent</source>
-        <translation>Заблокировать нестраченные</translation>
-    </message>
-    <message>
-        <source>Unlock unspent</source>
-        <translation>Разблокировать неистраченные</translation>
-    </message>
-    <message>
         <source>Copy quantity</source>
         <translation>Копировать количество</translation>
     </message>
     <message>
         <source>Copy fee</source>
         <translation>Копировать комиссию</translation>
-    </message>
-    <message>
-        <source>Copy after fee</source>
-        <translation>Копировать после вознаграждения </translation>
     </message>
     <message>
         <source>Copy bytes</source>
@@ -967,52 +887,8 @@ MultiSend: %1</translation>
         <translation>Для использования этой функции перейдите в "Режим списка"</translation>
     </message>
     <message>
-        <source>highest</source>
-        <translation>самый высокий</translation>
-    </message>
-    <message>
-        <source>higher</source>
-        <translation>выше</translation>
-    </message>
-    <message>
-        <source>high</source>
-        <translation>высокий</translation>
-    </message>
-    <message>
-        <source>medium-high</source>
-        <translation>средне-высокий</translation>
-    </message>
-    <message>
-        <source>Can vary +/- %1 duff(s) per input.</source>
-        <translation>Может вариировать +/- %1 duff(s) к вводу</translation>
-    </message>
-    <message>
         <source>medium</source>
-        <translation>промежуточный</translation>
-    </message>
-    <message>
-        <source>low-medium</source>
-        <translation>низко-средний</translation>
-    </message>
-    <message>
-        <source>low</source>
-        <translation>низкий</translation>
-    </message>
-    <message>
-        <source>lower</source>
-        <translation>ниже</translation>
-    </message>
-    <message>
-        <source>lowest</source>
-        <translation>самый низкий</translation>
-    </message>
-    <message>
-        <source>(%1 locked)</source>
-        <translation>(%1 заблокирован)</translation>
-    </message>
-    <message>
-        <source>none</source>
-        <translation>ничего</translation>
+        <translation>средний</translation>
     </message>
     <message>
         <source>yes</source>
@@ -1029,10 +905,6 @@ MultiSend: %1</translation>
     <message>
         <source>This means a fee of at least %1 per kB is required.</source>
         <translation>Это означает, что необходима комиссия в размере как минимум %1 за kB</translation>
-    </message>
-    <message>
-        <source>Can vary +/- 1 byte per input.</source>
-        <translation>Может вариировать +/- 1 байт на каждый ввод</translation>
     </message>
     <message>
         <source>Transactions with higher priority are more likely to get included into a block.</source>
@@ -1054,11 +926,7 @@ MultiSend: %1</translation>
         <source>change from %1 (%2)</source>
         <translation>изменить с %1 (%2)</translation>
     </message>
-    <message>
-        <source>(change)</source>
-        <translation>(изменить)</translation>
-    </message>
-</context>
+    </context>
 <context>
     <name>EditAddressDialog</name>
     <message>
@@ -1076,10 +944,6 @@ MultiSend: %1</translation>
     <message>
         <source>&amp;Address</source>
         <translation>&amp;Адрес</translation>
-    </message>
-    <message>
-        <source>The address associated with this address list entry. This can only be modified for sending addresses.</source>
-        <translation>Адрес ассоциирован с этим элемнтом списка адресов. Это может быть изменнено только для адресов отправления.</translation>
     </message>
     <message>
         <source>New receiving address</source>
@@ -1168,28 +1032,24 @@ MultiSend: %1</translation>
         <translation>параметры командной строки</translation>
     </message>
     <message>
-        <source>UI Options:</source>
-        <translation>Опции интерфейса</translation>
+        <source>UI options</source>
+        <translation>Параметры интерфейса</translation>
     </message>
     <message>
-        <source>Choose data directory on startup (default: %u)</source>
-        <translation>Выберите директорию для данных при запуске (по умолчанию: %u)</translation>
-    </message>
-    <message>
-        <source>Show splash screen on startup (default: %u)</source>
-        <translation>Показывать загрузочную заставку при запуске (по умолчанию: %u)</translation>
+        <source>Choose data directory on startup (default: 0)</source>
+        <translation>Выберите каталог данных, используемый при запуске (по умолчанию: 0)</translation>
     </message>
     <message>
         <source>Set language, for example "de_DE" (default: system locale)</source>
         <translation>Задайте язык, например "de_DE"(по умолчанию: язык системы)</translation>
     </message>
     <message>
-        <source>Start minimized</source>
-        <translation>Запускать свёрнутым</translation>
-    </message>
-    <message>
         <source>Set SSL root certificates for payment request (default: -system-)</source>
         <translation>Задать корневой сертификат SSL для платежных запросов (по умолчанию: -system-)</translation>
+    </message>
+    <message>
+        <source>Show splash screen on startup (default: 1)</source>
+        <translation>Показывать заставку при запуске (по умолчанию: 1)</translation>
     </message>
 </context>
 <context>
@@ -1306,6 +1166,22 @@ MultiSend: %1</translation>
         <translation>0</translation>
     </message>
     <message>
+        <source>All Masternodes</source>
+        <translation>Все Мастерноды</translation>
+    </message>
+    <message>
+        <source>Filter List:</source>
+        <translation>Список фильтров:</translation>
+    </message>
+    <message>
+        <source>Filter masternode list</source>
+        <translation>Фильтровать список мастернод</translation>
+    </message>
+    <message>
+        <source>Node Count:</source>
+        <translation>Количество нод:</translation>
+    </message>
+    <message>
         <source>Start alias</source>
         <translation>Запуск алиаса</translation>
     </message>
@@ -1365,7 +1241,7 @@ MultiSend: %1</translation>
 To Add: enter percentage to give and LUX address to add to the MultiSend vector.
 To Delete: Enter address to delete and press delete.
 MultiSend will not be activated unless you have clicked Activate</source>
-        <translation>MultiSend позволяет вам автоматически отправлять до 100% вознаграждения за мастерноды и хранение, после их созревания, на другие LUX адреса.
+        <translation>MultiSend позволяет вам автоматически отправлять до 100% вознаграждения за мастерноды и удерживание, после их созревания, на другие LUX адреса.
 Для добавления: введите передаваемый процент и LUX адрес для добавления к вектору MultiSend.
 Для удаления: введите удаляемый адрес и нажмите удалить.
 MultiSend будет неактивен до тех пор, пока вы не нажмете Включить</translation>
@@ -1396,7 +1272,7 @@ MultiSend будет неактивен до тех пор, пока вы не �
     </message>
     <message>
         <source>Percentage of stake to send</source>
-        <translation>Процент от хранящихся монет для отправки</translation>
+        <translation>Процент от удерживания для отправки</translation>
     </message>
     <message>
         <source>Percentage:</source>
@@ -1404,7 +1280,7 @@ MultiSend будет неактивен до тех пор, пока вы не �
     </message>
     <message>
         <source>Address to send portion of stake to</source>
-        <translation>Адрес для отправки части от хранения</translation>
+        <translation>Адрес для отправки части от удерживания</translation>
     </message>
     <message>
         <source>Address:</source>
@@ -1436,7 +1312,7 @@ MultiSend будет неактивен до тех пор, пока вы не �
     </message>
     <message>
         <source>Send For Stakes</source>
-        <translation>Передавать вознаграждение от хранения</translation>
+        <translation>Передавать вознаграждение от удерживания</translation>
     </message>
     <message>
         <source>Send For Masternode Rewards</source>
@@ -1634,6 +1510,22 @@ Please check the address and try again.</source>
         <translation>&amp;Запускать LUX при входе в систему</translation>
     </message>
     <message>
+        <source>This setting determines the amount of individual masternodes that an input will be anonymized through.&lt;br/&gt;More rounds of anonymization gives a higher degree of privacy, but also costs more in fees.</source>
+        <translation>Эта настройка определяет количество мастернод, используемых для анонимизации. Чем больше циклов, тем выше уровень конфиденциальности, но не стоит забывать также об увеличивающейся комиссии.</translation>
+    </message>
+    <message>
+        <source>Obfuscation rounds to use</source>
+        <translation>Количество циклов Перемешивания</translation>
+    </message>
+    <message>
+        <source>This amount acts as a threshold to turn off Obfuscation once it's reached.</source>
+        <translation>При достижении этого значения Перемешивание будет отключено.</translation>
+    </message>
+    <message>
+        <source>Amount of LUX to keep anonymized</source>
+        <translation>Количество LUX, держащихся анонимизированными</translation>
+    </message>
+    <message>
         <source>Whether to show coin control features or not.</source>
         <translation>Показывает или скрывает особенности управления монетами.</translation>
     </message>
@@ -1663,9 +1555,9 @@ Please check the address and try again.</source>
     </message>
     <message>
         <source>Language missing or translation incomplete? Help contributing translations here:
-https://www.transifex.com/216k155/216k155-translations</source>
+https://www.transifex.com/lux-project/lux-project-translations</source>
         <translation>Отсутствует ваш язык или заметили незавершенный перевод? Вы можете помочь нам стать лучше:
-https://www.transifex.com/216k155/216k155-translations</translation>
+https://www.transifex.com/lux-project/lux-project-translations</translation>
     </message>
     <message>
         <source>Map port using &amp;UPnP</source>
@@ -1712,10 +1604,6 @@ https://www.transifex.com/216k155/216k155-translations</translation>
         <translation>C&amp;ворачивать при закрытии</translation>
     </message>
     <message>
-        <source>&amp;Display</source>
-        <translation>&amp;Экран</translation>
-    </message>
-    <message>
         <source>User Interface &amp;language:</source>
         <translation>&amp;Язык Интерфейса</translation>
     </message>
@@ -1728,325 +1616,22 @@ https://www.transifex.com/216k155/216k155-translations</translation>
         <translation>В каких единицах показывать сумму:</translation>
     </message>
     <message>
-        <source>Choose the default subdivision unit to show in the interface and when sending coins.</source>
-        <translation>Выберите стандарную дробную величину, которая будет показываться в графическом интерфейсе и при отправке монет.</translation>
-    </message>
-    <message>
         <source>Decimal digits</source>
         <translation>Десятичная разрядность</translation>
     </message>
-    <message>
-        <source>Third party URLs (e.g. a block explorer) that appear in the transactions tab as context menu items. %s in the URL is replaced by transaction hash. Multiple URLs are separated by vertical bar |.</source>
-        <translation>Сторониие ссылки (такие как block exporer), которые отображаются в закладке "транзакции" как контекстное меню. %s в ссыле будет замещено хэшем транзакции. Ссылки отделяются друг от друга вертикальной чертой |.</translation>
-    </message>
-    <message>
-        <source>Third party transaction URLs</source>
-        <translation>Сторонние ссылки</translation>
-    </message>
-    <message>
-        <source>Active command-line options that override above options:</source>
-        <translation>Активные опции коммандной строки, которые переписывают опции выше:</translation>
-    </message>
-    <message>
-        <source>Reset all client options to default.</source>
-        <translation>Вернуть стандартные настройки клиента</translation>
-    </message>
-    <message>
-        <source>&amp;Reset Options</source>
-        <translation>&amp;Сбросить Настройки</translation>
-    </message>
-    <message>
-        <source>&amp;OK</source>
-        <translation>&amp;OK</translation>
-    </message>
-    <message>
-        <source>&amp;Cancel</source>
-        <translation>&amp;Отмена</translation>
-    </message>
-    <message>
-        <source>default</source>
-        <translation>по-умолчанию</translation>
-    </message>
-    <message>
-        <source>none</source>
-        <translation>ничего</translation>
-    </message>
-    <message>
-        <source>Confirm options reset</source>
-        <translation>Подтвердить сброс настроек</translation>
-    </message>
-    <message>
-        <source>Client restart required to activate changes.</source>
-        <translation>Для применения изменений требуется перезапуск клиента.</translation>
-    </message>
-    <message>
-        <source>Client will be shutdown, do you want to proceed?</source>
-        <translation>Клиент будет закрыт, вы хотите продолжить?</translation>
-    </message>
-    <message>
-        <source>This change would require a client restart.</source>
-        <translation>Это изменение потребует перезапуска клиента.</translation>
-    </message>
-    <message>
-        <source>The supplied proxy address is invalid.</source>
-        <translation>Указан недопустимый адрес прокси-сервера.</translation>
-    </message>
-</context>
+    </context>
 <context>
     <name>OverviewPage</name>
     <message>
         <source>Form</source>
-        <translation>Вид</translation>
+        <translation>Форма</translation>
     </message>
-    <message>
-        <source>Available:</source>
-        <translation>Доступно:</translation>
-    </message>
-    <message>
-        <source>Your current spendable balance</source>
-        <translation>Ваш текущий остаток средств</translation>
-    </message>
-    <message>
-        <source>Pending:</source>
-        <translation>В ожидании:</translation>
-    </message>
-    <message>
-        <source>Total of transactions that have yet to be confirmed, and do not yet count toward the spendable balance</source>
-        <translation>Транзакции, которые ещё должны быть подтверждены и не уменьшают баланс</translation>
-    </message>
-    <message>
-        <source>Immature:</source>
-        <translation>Дозревают:</translation>
-    </message>
-    <message>
-        <source>Staked or masternode rewards that has not yet matured</source>
-        <translation>Награды за хранение и мастерноды, которые еще не *созрели*</translation>
-    </message>
-    <message>
-        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the LUX network after a connection is established, but this process has not completed yet.</source>
-        <translation>Возможно отображаемая информация устарела. Ваш кошелек автоматически синхронизируется с сетью LUX после установки соединения, но этот процесс еще не завершен. </translation>
-    </message>
-    <message>
-        <source>Unconfirmed transactions to watch-only addresses</source>
-        <translation>Неподтверждённые транзакции на наблюдаемые адреса</translation>
-    </message>
-    <message>
-        <source>Staked or masternode rewards in watch-only addresses that has not yet matured</source>
-        <translation>Награды за хранение и мастерноды в наблюдаемых адресах, которые еще не *созрели*</translation>
-    </message>
-    <message>
-        <source>Total:</source>
-        <translation>Всего:</translation>
-    </message>
-    <message>
-        <source>Your current total balance</source>
-        <translation>Ваш текущий баланс</translation>
-    </message>
-    <message>
-        <source>Current total balance in watch-only addresses</source>
-        <translation>Текущий баланс всех наблюдаемых адресов</translation>
-    </message>
-    <message>
-        <source>Watch-only:</source>
-        <translation>Наблюдаемый:</translation>
-    </message>
-    <message>
-        <source>Your current balance in watch-only addresses</source>
-        <translation>Ваш текущий баланс в наблюдаемых адресах</translation>
-    </message>
-    <message>
-        <source>Spendable:</source>
-        <translation>Расходуемый:</translation>
-    </message>
-    <message>
-        <source>Recent transactions</source>
-        <translation>Последние транзакции</translation>
-    </message>
-    <message>
-        <source>out of sync</source>
-        <translation>несинронизировано</translation>
-    </message>
-</context>
+    </context>
 <context>
     <name>PaymentServer</name>
-    <message>
-        <source>Payment request error</source>
-        <translation>Ошибка при запросе на оплату</translation>
-    </message>
-    <message>
-        <source>URI handling</source>
-        <translation>Обработка ссылок</translation>
-    </message>
-    <message>
-        <source>Payment request file handling</source>
-        <translation>Обработка файла запроса на оплату</translation>
-    </message>
-    <message>
-        <source>Invalid payment address %1</source>
-        <translation>Неверный адрес оплаты %1</translation>
-    </message>
-    <message>
-        <source>Cannot start lux: click-to-pay handler</source>
-        <translation>Не удалось запустить lux: обработчик click-to-pay </translation>
-    </message>
-    <message>
-        <source>URI cannot be parsed! This can be caused by an invalid LUX address or malformed URI parameters.</source>
-        <translation>URI не интерпретируется! Причиной этому может быть неверный LUX адрес или неверные параметеры URI.</translation>
-    </message>
-    <message>
-        <source>Payment request file cannot be read! This can be caused by an invalid payment request file.</source>
-        <translation>Файл запроса оплаты нечитается! Причиной может быть неверный файл запроса оплаты.</translation>
-    </message>
-    <message>
-        <source>Payment request rejected</source>
-        <translation>Запрос на оплату отклонен</translation>
-    </message>
-    <message>
-        <source>Payment request network doesn't match client network.</source>
-        <translation>Сеть запроса на оплату отличается от сети клиента.</translation>
-    </message>
-    <message>
-        <source>Payment request has expired.</source>
-        <translation>Запрос на оплату просрочен.</translation>
-    </message>
-    <message>
-        <source>Payment request is not initialized.</source>
-        <translation>Запрос на оплату не инициализирован.</translation>
-    </message>
-    <message>
-        <source>Unverified payment requests to custom payment scripts are unsupported.</source>
-        <translation>Неверифицированные запросы на оплату к пользовательским скриптам оплаты не поддерживается.</translation>
-    </message>
-    <message>
-        <source>Requested payment amount of %1 is too small (considered dust).</source>
-        <translation>Запрашиваемая сумма оплаты %1 слишком мала (considered dust).</translation>
-    </message>
-    <message>
-        <source>Refund from %1</source>
-        <translation>Сумма возврата от %1</translation>
-    </message>
-    <message>
-        <source>Payment request %1 is too large (%2 bytes, allowed %3 bytes).</source>
-        <translation>Запрос на оплату %1 слишком велик (%2 байт, разрешено %3 байт).</translation>
-    </message>
-    <message>
-        <source>Payment request DoS protection</source>
-        <translation>Защита от DoS атак, использующих запросы на оплату</translation>
-    </message>
-    <message>
-        <source>Error communicating with %1: %2</source>
-        <translation>Ошибка коммуникации с %1: %2</translation>
-    </message>
-    <message>
-        <source>Payment request cannot be parsed!</source>
-        <translation>Запрос на оплату непонятен!</translation>
-    </message>
-    <message>
-        <source>Bad response from server %1</source>
-        <translation>Неожиданный ответ сервера %1</translation>
-    </message>
-    <message>
-        <source>Network request error</source>
-        <translation>Ошибка обращения к сети</translation>
-    </message>
-    <message>
-        <source>Payment acknowledged</source>
-        <translation>Оплата принята к обработке</translation>
-    </message>
-</context>
+    </context>
 <context>
     <name>PeerTableModel</name>
-    <message>
-        <source>Address/Hostname</source>
-        <translation>Адрес / имя хоста</translation>
-    </message>
-    <message>
-        <source>Version</source>
-        <translation>Версия</translation>
-    </message>
-    <message>
-        <source>Ping Time</source>
-        <translation>Время отклика</translation>
-    </message>
-</context>
-<context>
-    <name>PrivacyDialog</name>
-    <message>
-        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the LUX network after a connection is established, but this process has not completed yet.</source>
-        <translation>Возможно отображаемая информация устарела. Ваш кошелек автоматически синхронизируется с сетью LUX после установки соединения, но этот процесс еще не завершен. </translation>
-    </message>
-    <message>
-        <source>0</source>
-        <translation>0</translation>
-    </message>
-    <message>
-        <source>Reset</source>
-        <translation>Сброс</translation>
-    </message>
-    <message>
-        <source>Quantity:</source>
-        <translation>Количество:</translation>
-    </message>
-    <message>
-        <source>Amount:</source>
-        <translation>Сумма:</translation>
-    </message>
-    <message>
-        <source>Choose previously used address</source>
-        <translation>Выбрать ранее использованный адрес</translation>
-    </message>
-    <message>
-        <source>Alt+A</source>
-        <translation>Alt+A</translation>
-    </message>
-    <message>
-        <source>Paste address from clipboard</source>
-        <translation>Вставить адрес из буфера обмена</translation>
-    </message>
-    <message>
-        <source>Alt+P</source>
-        <translation>Alt+P</translation>
-    </message>
-    <message>
-        <source>Priority:</source>
-        <translation>Приоритет:</translation>
-    </message>
-    <message>
-        <source>Fee:</source>
-        <translation>Комиссия:</translation>
-    </message>
-    <message>
-        <source>Dust:</source>
-        <translation>Пыль:</translation>
-    </message>
-    <message>
-        <source>no</source>
-        <translation>нет</translation>
-    </message>
-    <message>
-        <source>Bytes:</source>
-        <translation>Байты:</translation>
-    </message>
-    <message>
-        <source>medium</source>
-        <translation>промежуточный</translation>
-    </message>
-    <message>
-        <source>Change:</source>
-        <translation>Изменить:</translation>
-    </message>
-    <message>
-        <source>out of sync</source>
-        <translation>несинронизировано</translation>
-    </message>
-    <message>
-        <source>Copy quantity</source>
-        <translation>Копировать количество</translation>
-    </message>
-    <message>
-        <source>Copy amount</source>
-        <translation>Копировать сумму</translation>
-    </message>
     </context>
 <context>
     <name>QObject</name>
@@ -2054,395 +1639,26 @@ https://www.transifex.com/216k155/216k155-translations</translation>
         <source>Amount</source>
         <translation>Сумма</translation>
     </message>
-    <message>
-        <source>Enter a LUX address (e.g. %1)</source>
-        <translation>Введите адрес LUX (например %1)</translation>
-    </message>
-    <message>
-        <source>%1 d</source>
-        <translation>%1 д</translation>
-    </message>
-    <message>
-        <source>%1 h</source>
-        <translation>%1 ч</translation>
-    </message>
-    <message>
-        <source>%1 m</source>
-        <translation>%1 м</translation>
-    </message>
-    <message>
-        <source>%1 s</source>
-        <translation>%1 с</translation>
-    </message>
-    <message>
-        <source>NETWORK</source>
-        <translation>СЕТЬ</translation>
-    </message>
-    <message>
-        <source>UNKNOWN</source>
-        <translation>НЕИЗВЕСТНО</translation>
-    </message>
-    <message>
-        <source>None</source>
-        <translation>Ничего</translation>
-    </message>
-    <message>
-        <source>N/A</source>
-        <translation>Недоступно</translation>
-    </message>
-    <message>
-        <source>%1 ms</source>
-        <translation>%1 мс</translation>
-    </message>
-</context>
+    </context>
 <context>
     <name>QRImageWidget</name>
-    <message>
-        <source>&amp;Save Image...</source>
-        <translation>&amp;Сохранить изображение</translation>
-    </message>
-    <message>
-        <source>&amp;Copy Image</source>
-        <translation>&amp;Копировать изображение</translation>
-    </message>
-    <message>
-        <source>Save QR Code</source>
-        <translation>Сохранить QR-код</translation>
-    </message>
-    <message>
-        <source>PNG Image (*.png)</source>
-        <translation>Изображение в формате PNG (*.png)</translation>
-    </message>
-</context>
+    </context>
 <context>
     <name>RPCConsole</name>
-    <message>
-        <source>Tools window</source>
-        <translation>Окно с инструментами</translation>
-    </message>
     <message>
         <source>&amp;Information</source>
         <translation>&amp;Информация</translation>
     </message>
     <message>
-        <source>General</source>
-        <translation>Основное</translation>
-    </message>
-    <message>
-        <source>Name</source>
-        <translation>Имя</translation>
-    </message>
-    <message>
-        <source>Client name</source>
-        <translation>Имя клиента</translation>
-    </message>
-    <message>
-        <source>N/A</source>
-        <translation>Недоступно</translation>
-    </message>
-    <message>
-        <source>Number of connections</source>
-        <translation>Количество соениднений</translation>
-    </message>
-    <message>
-        <source>&amp;Open</source>
-        <translation>&amp;Открыть</translation>
-    </message>
-    <message>
-        <source>Startup time</source>
-        <translation>Время старта</translation>
-    </message>
-    <message>
-        <source>Network</source>
-        <translation>Сеть</translation>
-    </message>
-    <message>
-        <source>Last block time</source>
-        <translation>Время последнего блока</translation>
-    </message>
-    <message>
-        <source>Debug log file</source>
-        <translation>Протокол отладки</translation>
-    </message>
-    <message>
-        <source>Using OpenSSL version</source>
-        <translation>Используемая версия OpenSSL</translation>
-    </message>
-    <message>
-        <source>Build date</source>
-        <translation>Дата сборки</translation>
-    </message>
-    <message>
-        <source>Current number of blocks</source>
-        <translation>Текущее количество блоков</translation>
-    </message>
-    <message>
-        <source>Client version</source>
-        <translation>Версия клиента</translation>
-    </message>
-    <message>
-        <source>Using BerkeleyDB version</source>
-        <translation>Используемая версия BrekleyDB</translation>
-    </message>
-    <message>
-        <source>Block chain</source>
-        <translation>Блокчейн</translation>
-    </message>
-    <message>
-        <source>Open the LUX debug log file from the current data directory. This can take a few seconds for large log files.</source>
-        <translation>Открыть протокол отладки LUX. Это может занять некоторе время, если файл протокола очень большой.</translation>
-    </message>
-    <message>
-        <source>Number of Masternodes</source>
-        <translation>Количество мастернод</translation>
-    </message>
-    <message>
-        <source>&amp;Console</source>
-        <translation>&amp;Коммандая строка</translation>
-    </message>
-    <message>
-        <source>Clear console</source>
-        <translation>Очистить коммандную строку</translation>
-    </message>
-    <message>
-        <source>&amp;Network Traffic</source>
-        <translation>&amp;Сетевая передача данных</translation>
-    </message>
-    <message>
-        <source>&amp;Clear</source>
-        <translation>&amp;Очистить</translation>
-    </message>
-    <message>
-        <source>Totals</source>
-        <translation>Результаты</translation>
-    </message>
-    <message>
-        <source>Received</source>
-        <translation>Принято</translation>
-    </message>
-    <message>
-        <source>Sent</source>
-        <translation>Отправлено</translation>
-    </message>
-    <message>
-        <source>&amp;Peers</source>
-        <translation>&amp;Пиры</translation>
-    </message>
-    <message>
-        <source>Select a peer to view detailed information.</source>
-        <translation>Выберите пир, чтобы показать детальную информацию.</translation>
-    </message>
-    <message>
-        <source>Direction</source>
-        <translation>Направление</translation>
-    </message>
-    <message>
         <source>Protocol</source>
         <translation>Протокол</translation>
     </message>
-    <message>
-        <source>Version</source>
-        <translation>Версия</translation>
-    </message>
-    <message>
-        <source>Services</source>
-        <translation>Сервисы</translation>
-    </message>
-    <message>
-        <source>Starting Height</source>
-        <translation>Стартовая мощность</translation>
-    </message>
-    <message>
-        <source>Sync Height</source>
-        <translation>Мощность при синхронизации</translation>
-    </message>
-    <message>
-        <source>Ban Score</source>
-        <translation>Рекорд банов</translation>
-    </message>
-    <message>
-        <source>Connection Time</source>
-        <translation>Продолжительность соединения</translation>
-    </message>
-    <message>
-        <source>Last Send</source>
-        <translation>Посленее отправление</translation>
-    </message>
-    <message>
-        <source>Last Receive</source>
-        <translation>Послений приём</translation>
-    </message>
-    <message>
-        <source>Bytes Sent</source>
-        <translation>Байтов отправлено</translation>
-    </message>
-    <message>
-        <source>Bytes Received</source>
-        <translation>Байтов получено</translation>
-    </message>
-    <message>
-        <source>Ping Time</source>
-        <translation>Время отклика</translation>
-    </message>
-    <message>
-        <source>&amp;Wallet Repair</source>
-        <translation>&amp;Ремонт кошелька</translation>
-    </message>
-    <message>
-        <source>Wallet In Use:</source>
-        <translation>Используемый кошелек:</translation>
-    </message>
-    <message>
-        <source>Rescan blockchain files</source>
-        <translation>Пересканировать файлы блокчейна</translation>
-    </message>
-    <message>
-        <source>Rescan the block chain for missing wallet transactions.</source>
-        <translation>Пересканировать блокчейн для поиска пропущенных транзакций в кошельке.</translation>
-    </message>
-    <message>
-        <source>Recover transactions 1</source>
-        <translation>Востановление транзакций 1</translation>
-    </message>
-    <message>
-        <source>Recover transactions from blockchain (keep meta-data, e.g. account owner).</source>
-        <translation>Перезаписать транзакции из блокчейна (при сохранении мета-данных, таких как владелец кошелька).</translation>
-    </message>
-    <message>
-        <source>Recover transactions 2</source>
-        <translation>Востановление транзакций 2</translation>
-    </message>
-    <message>
-        <source>Recover transactions from blockchain (drop meta-data).</source>
-        <translation>Перезаписать транзакции из блокчейна (с удалением мета-данных, таких как владелец кошелька).</translation>
-    </message>
-    <message>
-        <source>Upgrade wallet format</source>
-        <translation>Обновить формат кошелька</translation>
-    </message>
-    <message>
-        <source>Rebuild block chain index from current blk000??.dat files.</source>
-        <translation>Перестроить индекс блокчейна из текущих blk000??.dat файлов.</translation>
-    </message>
-    <message>
-        <source>The buttons below will restart the wallet with command-line options to repair the wallet, fix issues with corrupt blockhain files or missing/obsolete transactions.</source>
-        <translation>Кнопка ниже перезапустит кошелёк с некоторыми опциями кммандной строки чтобы отремотировать кошелёк, файлы блокчейна и пропавшие / устаревшие транзакции. </translation>
-    </message>
-    <message>
-        <source>Wallet repair options.</source>
-        <translation>Опции ремонта кошелька.</translation>
-    </message>
-    <message>
-        <source>Upgrade wallet to latest format on startup. (Note: this is NOT an update of the wallet itself!)</source>
-        <translation>Обновить кошелек до последнего формата при запуске.
-(Примечание: это НЕ обновление самого кошелька!)</translation>
-    </message>
-    <message>
-        <source>Rebuild index</source>
-        <translation>Пересоздать индекс</translation>
-    </message>
-    <message>
-        <source>In:</source>
-        <translation>Ввод:</translation>
-    </message>
-    <message>
-        <source>Out:</source>
-        <translation>Вывод:</translation>
-    </message>
-    <message>
-        <source>Welcome to the LUX RPC console.</source>
-        <translation>Добро пожаловать в окружение LUX RPC.</translation>
-    </message>
-    <message>
-        <source>Use up and down arrows to navigate history, and &lt;b&gt;Ctrl-L&lt;/b&gt; to clear screen.</source>
-        <translation>Используйте стрелки вверх и вниз для навигации по истории, и &lt;b&gt;Ctrl-L&lt;/b&gt; для очистки экрана.</translation>
-    </message>
-    <message>
-        <source>Type &lt;b&gt;help&lt;/b&gt; for an overview of available commands.</source>
-        <translation>Введите &lt;b&gt;help&lt;/b&gt; для просмотра доступных команд.</translation>
-    </message>
-    <message>
-        <source>%1 B</source>
-        <translation>%1 Б</translation>
-    </message>
-    <message>
-        <source>%1 KB</source>
-        <translation>%1 КБ</translation>
-    </message>
-    <message>
-        <source>%1 MB</source>
-        <translation>%1 МБ</translation>
-    </message>
-    <message>
-        <source>%1 GB</source>
-        <translation>%1 ГБ</translation>
-    </message>
-    <message>
-        <source>via %1</source>
-        <translation>через %1</translation>
-    </message>
-    <message>
-        <source>never</source>
-        <translation>никогда</translation>
-    </message>
-    <message>
-        <source>Unknown</source>
-        <translation>Неизвестно</translation>
-    </message>
-    <message>
-        <source>Fetching...</source>
-        <translation>Извлечение...</translation>
-    </message>
-</context>
+    </context>
 <context>
     <name>ReceiveCoinsDialog</name>
     <message>
-        <source>&amp;Message:</source>
-        <translation>&amp;Сообщение:</translation>
-    </message>
-    <message>
-        <source>&amp;Amount:</source>
-        <translation>&amp;Количество:</translation>
-    </message>
-    <message>
-        <source>&amp;Request payment</source>
-        <translation>&amp;Запрос платежа</translation>
-    </message>
-    <message>
-        <source>Clear all fields of the form.</source>
-        <translation>Очистить все поля этой формы.</translation>
-    </message>
-    <message>
-        <source>Clear</source>
-        <translation>Очистить</translation>
-    </message>
-    <message>
-        <source>Requested payments history</source>
-        <translation>Запрос истории платежей</translation>
-    </message>
-    <message>
-        <source>Show the selected request (does the same as double clicking an entry)</source>
-        <translation>Показать этот выбранный запрос (или просто сделайте двойной клик за запись)</translation>
-    </message>
-    <message>
-        <source>Show</source>
-        <translation>Показать</translation>
-    </message>
-    <message>
-        <source>Remove the selected entries from the list</source>
-        <translation>Удалить эти выбранные записи из этого списка</translation>
-    </message>
-    <message>
-        <source>Remove</source>
-        <translation>Удалить</translation>
-    </message>
-    <message>
         <source>Copy label</source>
         <translation>Копировать метку</translation>
-    </message>
-    <message>
-        <source>Copy message</source>
-        <translation>Скопировать сообщение</translation>
     </message>
     <message>
         <source>Copy amount</source>
@@ -2451,30 +1667,6 @@ https://www.transifex.com/216k155/216k155-translations</translation>
 </context>
 <context>
     <name>ReceiveRequestDialog</name>
-    <message>
-        <source>QR Code</source>
-        <translation>QR код</translation>
-    </message>
-    <message>
-        <source>Copy &amp;URI</source>
-        <translation>Скопировать &amp;URI</translation>
-    </message>
-    <message>
-        <source>Copy &amp;Address</source>
-        <translation>Скопировать &amp;Адрес</translation>
-    </message>
-    <message>
-        <source>&amp;Save Image...</source>
-        <translation>&amp;Сохранить изображение</translation>
-    </message>
-    <message>
-        <source>Payment information</source>
-        <translation>Платежная информация</translation>
-    </message>
-    <message>
-        <source>URI</source>
-        <translation>URI</translation>
-    </message>
     <message>
         <source>Address</source>
         <translation>Адрес</translation>
@@ -2485,17 +1677,9 @@ https://www.transifex.com/216k155/216k155-translations</translation>
     </message>
     <message>
         <source>Label</source>
-        <translation>Метка</translation>
+        <translation>метка</translation>
     </message>
-    <message>
-        <source>Message</source>
-        <translation>Сообщение</translation>
-    </message>
-    <message>
-        <source>Error encoding URI into QR Code.</source>
-        <translation>Ошибка при кодировании URI в QR код.</translation>
-    </message>
-</context>
+    </context>
 <context>
     <name>RecentRequestsTableModel</name>
     <message>
@@ -2504,11 +1688,7 @@ https://www.transifex.com/216k155/216k155-translations</translation>
     </message>
     <message>
         <source>Label</source>
-        <translation>Метка</translation>
-    </message>
-    <message>
-        <source>Message</source>
-        <translation>Сообщение</translation>
+        <translation>метка</translation>
     </message>
     <message>
         <source>Amount</source>
@@ -2518,17 +1698,9 @@ https://www.transifex.com/216k155/216k155-translations</translation>
         <source>(no label)</source>
         <translation>(нет метки)</translation>
     </message>
-    <message>
-        <source>(no message)</source>
-        <translation>(нет сообщений)</translation>
-    </message>
     </context>
 <context>
     <name>SendCoinsDialog</name>
-    <message>
-        <source>Send Coins</source>
-        <translation>Отправить Монеты</translation>
-    </message>
     <message>
         <source>Quantity:</source>
         <translation>Количество:</translation>
@@ -2570,52 +1742,8 @@ https://www.transifex.com/216k155/216k155-translations</translation>
         <translation>Изменить:</translation>
     </message>
     <message>
-        <source>0 LUX</source>
-        <translation>0 LUX</translation>
-    </message>
-    <message>
-        <source>Transaction Fee:</source>
-        <translation>Комиссия за транзакцию:</translation>
-    </message>
-    <message>
-        <source>Choose...</source>
-        <translation>Выберите:</translation>
-    </message>
-    <message>
-        <source>Minimize</source>
-        <translation>Свернуть</translation>
-    </message>
-    <message>
-        <source>per kilobyte</source>
-        <translation>за килобайт</translation>
-    </message>
-    <message>
-        <source>Confirmation time:</source>
-        <translation>Количество подтверждений:</translation>
-    </message>
-    <message>
-        <source>normal</source>
-        <translation>нормально</translation>
-    </message>
-    <message>
-        <source>fast</source>
-        <translation>быстро</translation>
-    </message>
-    <message>
-        <source>Clear all fields of the form.</source>
-        <translation>Очистить все поля этой формы.</translation>
-    </message>
-    <message>
         <source>Clear &amp;All</source>
         <translation>Очистить &amp;Все</translation>
-    </message>
-    <message>
-        <source>SwiftTX</source>
-        <translation>SwiftTX</translation>
-    </message>
-    <message>
-        <source>Balance:</source>
-        <translation>Баланс:</translation>
     </message>
     <message>
         <source>Copy quantity</source>
@@ -2628,10 +1756,6 @@ https://www.transifex.com/216k155/216k155-translations</translation>
     <message>
         <source>Copy fee</source>
         <translation>Копировать комиссию</translation>
-    </message>
-    <message>
-        <source>Copy after fee</source>
-        <translation>Копировать после вознаграждения </translation>
     </message>
     <message>
         <source>Copy bytes</source>
@@ -2648,26 +1772,6 @@ https://www.transifex.com/216k155/216k155-translations</translation>
     <message>
         <source>Copy change</source>
         <translation>Копировать изменение</translation>
-    </message>
-    <message>
-        <source>Warning: Invalid LUX address</source>
-        <translation>Предупреждение: неправильный LUX адрес</translation>
-    </message>
-    <message>
-        <source>and SwiftTX</source>
-        <translation>и SwiftTX</translation>
-    </message>
-    <message>
-        <source>%1 to %2</source>
-        <translation>%1 до %2</translation>
-    </message>
-    <message>
-        <source>Are you sure you want to send?</source>
-        <translation>Вы уверены, что хотите отправить?</translation>
-    </message>
-    <message>
-        <source>The amount to pay must be larger than 0.</source>
-        <translation>Сумма для платежа должна быть больше, чем 0.</translation>
     </message>
     <message>
         <source>(no label)</source>
@@ -2692,26 +1796,10 @@ https://www.transifex.com/216k155/216k155-translations</translation>
         <source>Alt+P</source>
         <translation>Alt+P</translation>
     </message>
-    <message>
-        <source>Remove this entry</source>
-        <translation>Удалить эту запись</translation>
-    </message>
-    <message>
-        <source>Message:</source>
-        <translation>Сообщение:</translation>
-    </message>
     </context>
 <context>
     <name>ShutdownWindow</name>
-    <message>
-        <source>LUX Core is shutting down...</source>
-        <translation>LUX Core выключается...</translation>
-    </message>
-    <message>
-        <source>Do not shut down the computer until this window disappears.</source>
-        <translation>Не выключайте этот компьютер пока это окно не исчезнет.</translation>
-    </message>
-</context>
+    </context>
 <context>
     <name>SignVerifyMessageDialog</name>
     <message>
@@ -2743,14 +1831,6 @@ https://www.transifex.com/216k155/216k155-translations</translation>
         <translation>Подпишите сообщение, чтобы подтвердить свой адрес LUX</translation>
     </message>
     <message>
-        <source>The LUX address the message was signed with</source>
-        <translation>Адрес LUX, которым подписано сообщение</translation>
-    </message>
-    <message>
-        <source>Verify the message to ensure it was signed with the specified LUX address</source>
-        <translation>Проверте сообщение, чтобы убедиться, что оно было подписано указанным LUX адресом </translation>
-    </message>
-    <message>
         <source>Reset all sign message fields</source>
         <translation>Сбросить все поля сообщений</translation>
     </message>
@@ -2776,19 +1856,11 @@ https://www.transifex.com/216k155/216k155-translations</translation>
     </message>
     <message>
         <source>Wallet unlock was cancelled.</source>
-        <translation>Снятие блокировки кошелька было отменено.</translation>
+        <translation>Разблокировка кошелька была отменена.</translation>
     </message>
     <message>
         <source>Private key for the entered address is not available.</source>
-        <translation>Персональный ключ для введенного адреса недоступен.</translation>
-    </message>
-    <message>
-        <source>Message signed.</source>
-        <translation>Сообщение подписано.</translation>
-    </message>
-    <message>
-        <source>Please check the signature and try again.</source>
-        <translation>Пожалуйста, проверьте эту подпись и попробуйте снова.</translation>
+        <translation>Секретный ключ для введенного адреса недоступен.</translation>
     </message>
     </context>
 <context>
@@ -2797,34 +1869,10 @@ https://www.transifex.com/216k155/216k155-translations</translation>
         <source>LUX Core</source>
         <translation>LUX Core</translation>
     </message>
-    <message>
-        <source>Version %1</source>
-        <translation>Версия %1</translation>
-    </message>
-    <message>
-        <source>The Bitcoin Core developers</source>
-        <translation>Разработчики Bitcoin Core</translation>
-    </message>
-    <message>
-        <source>The Dash Core developers</source>
-        <translation>Разработчики Dash Core</translation>
-    </message>
-    <message>
-        <source>The LUX Core developers</source>
-        <translation>Разработчики LUX Core</translation>
-    </message>
-    <message>
-        <source>[testnet]</source>
-        <translation>[тестовая сеть]</translation>
-    </message>
-</context>
+    </context>
 <context>
     <name>TrafficGraphWidget</name>
-    <message>
-        <source>KB/s</source>
-        <translation>КБ/с</translation>
-    </message>
-</context>
+    </context>
 <context>
     <name>TransactionDesc</name>
     <message>
@@ -2836,68 +1884,12 @@ https://www.transifex.com/216k155/216k155-translations</translation>
         <translation>Дата</translation>
     </message>
     <message>
-        <source>Source</source>
-        <translation>Источник</translation>
-    </message>
-    <message>
-        <source>From</source>
-        <translation>От</translation>
-    </message>
-    <message>
-        <source>unknown</source>
-        <translation>неизвестно</translation>
-    </message>
-    <message>
-        <source>To</source>
-        <translation>Кому</translation>
-    </message>
-    <message>
-        <source>Credit</source>
-        <translation>Кредит</translation>
-    </message>
-    <message>
-        <source>Debit</source>
-        <translation>Дебит</translation>
-    </message>
-    <message>
-        <source>Transaction fee</source>
-        <translation>Комиссия за транзакцию</translation>
-    </message>
-    <message>
-        <source>Message</source>
-        <translation>Сообщение</translation>
-    </message>
-    <message>
-        <source>Comment</source>
-        <translation>Комментарий</translation>
-    </message>
-    <message>
-        <source>Transaction ID</source>
-        <translation>Номер транзакции</translation>
-    </message>
-    <message>
-        <source>Transaction</source>
-        <translation>Транзакция</translation>
-    </message>
-    <message>
         <source>Amount</source>
         <translation>Сумма</translation>
     </message>
-    <message>
-        <source>true</source>
-        <translation>истина</translation>
-    </message>
-    <message>
-        <source>false</source>
-        <translation>ложь</translation>
-    </message>
-</context>
+    </context>
 <context>
     <name>TransactionDescDialog</name>
-    <message>
-        <source>Transaction details</source>
-        <translation>Детали транзакции</translation>
-    </message>
     </context>
 <context>
     <name>TransactionTableModel</name>
@@ -2906,68 +1898,12 @@ https://www.transifex.com/216k155/216k155-translations</translation>
         <translation>Дата</translation>
     </message>
     <message>
-        <source>Type</source>
-        <translation>Тип</translation>
-    </message>
-    <message>
         <source>Address</source>
         <translation>Адрес</translation>
-    </message>
-    <message>
-        <source>Masternode Reward</source>
-        <translation>Вознаграждение Мастерноды</translation>
-    </message>
-    <message>
-        <source>Sent to</source>
-        <translation>Отправить</translation>
-    </message>
-    <message>
-        <source>(n/a)</source>
-        <translation>(н/з)</translation>
-    </message>
-    <message>
-        <source>Type of transaction.</source>
-        <translation>Тип транзакции.</translation>
     </message>
     </context>
 <context>
     <name>TransactionView</name>
-    <message>
-        <source>Today</source>
-        <translation>Сегодня</translation>
-    </message>
-    <message>
-        <source>This week</source>
-        <translation>Эта неделя</translation>
-    </message>
-    <message>
-        <source>This month</source>
-        <translation>Этот месяц</translation>
-    </message>
-    <message>
-        <source>Last month</source>
-        <translation>Последний месяц</translation>
-    </message>
-    <message>
-        <source>This year</source>
-        <translation>Этот год</translation>
-    </message>
-    <message>
-        <source>Range...</source>
-        <translation>Диапазон...</translation>
-    </message>
-    <message>
-        <source>Sent to</source>
-        <translation>Отправить</translation>
-    </message>
-    <message>
-        <source>Masternode Reward</source>
-        <translation>Вознаграждение Мастерноды</translation>
-    </message>
-    <message>
-        <source>Enter address or label to search</source>
-        <translation>Введите адрес или имя для поиска</translation>
-    </message>
     <message>
         <source>Copy address</source>
         <translation>Копировать адрес</translation>
@@ -2985,22 +1921,6 @@ https://www.transifex.com/216k155/216k155-translations</translation>
         <translation>Копировать ID транзакции</translation>
     </message>
     <message>
-        <source>Edit label</source>
-        <translation>Редактировать имя</translation>
-    </message>
-    <message>
-        <source>Show transaction details</source>
-        <translation>Детали транзакции</translation>
-    </message>
-    <message>
-        <source>Export Transaction History</source>
-        <translation>Экспорт истории транзакций</translation>
-    </message>
-    <message>
-        <source>Comma separated file (*.csv)</source>
-        <translation>Файл формата csv</translation>
-    </message>
-    <message>
         <source>Confirmed</source>
         <translation>Подтверждено</translation>
     </message>
@@ -3009,28 +1929,16 @@ https://www.transifex.com/216k155/216k155-translations</translation>
         <translation>Дата</translation>
     </message>
     <message>
-        <source>Type</source>
-        <translation>Тип</translation>
-    </message>
-    <message>
         <source>Label</source>
-        <translation>Метка</translation>
+        <translation>метка</translation>
     </message>
     <message>
         <source>Address</source>
         <translation>Адрес</translation>
     </message>
     <message>
-        <source>ID</source>
-        <translation>Номер</translation>
-    </message>
-    <message>
         <source>Exporting Failed</source>
         <translation>Ошибка экспорта</translation>
-    </message>
-    <message>
-        <source>Exporting Successful</source>
-        <translation>Экспортирование произошло успешно</translation>
     </message>
     </context>
 <context>
@@ -3041,10 +1949,6 @@ https://www.transifex.com/216k155/216k155-translations</translation>
     </context>
 <context>
     <name>WalletModel</name>
-    <message>
-        <source>Send Coins</source>
-        <translation>Отправить Монеты</translation>
-    </message>
     </context>
 <context>
     <name>WalletView</name>
@@ -3054,26 +1958,11 @@ https://www.transifex.com/216k155/216k155-translations</translation>
     </message>
     <message>
         <source>Export the data in the current tab to a file</source>
-        <translation>Экспортировать данные с текущей вкладки в файл</translation>
-    </message>
-    <message>
-        <source>Backup Wallet</source>
-        <translation>Резервная копия кошелька</translation>
-    </message>
-    </context>
-<context>
-    <name>ZPivControlDialog</name>
-    <message>
-        <source>0</source>
-        <translation>0</translation>
+        <translation>Экспортировать данные на текущей вкладке в файл</translation>
     </message>
     </context>
 <context>
     <name>lux-core</name>
-    <message>
-        <source>SwiftTX requires inputs with at least 6 confirmations, you might need to wait a few minutes and try again.</source>
-        <translation>Для SwiftTX требуется как минимум 6 подтверждений, Вам нужно подождать несколько минут и попытаться снова.</translation>
-    </message>
     <message>
         <source>Block creation options:</source>
         <translation>Варианты создания блока:</translation>
@@ -3247,20 +2136,12 @@ https://www.transifex.com/216k155/216k155-translations</translation>
         <translation>Загрузка кошелька ...</translation>
     </message>
     <message>
-        <source>Masternode:</source>
-        <translation>Мастернода:</translation>
-    </message>
-    <message>
         <source>Missing input transaction information.</source>
         <translation>Отсутствует входная информация о транзакции.</translation>
     </message>
     <message>
         <source>Mixing in progress...</source>
         <translation>Выполняется микширование ...</translation>
-    </message>
-    <message>
-        <source>No Masternodes detected.</source>
-        <translation>Мастерноды не найдены.</translation>
     </message>
     <message>
         <source>No funds detected in need of denominating.</source>
@@ -3285,6 +2166,10 @@ https://www.transifex.com/216k155/216k155-translations</translation>
     <message>
         <source>Not enough file descriptors available.</source>
         <translation>Недостаточно доступных дескрипторов файлов.</translation>
+    </message>
+    <message>
+        <source>Obfuscation options:</source>
+        <translation>Варианты обфускации:</translation>
     </message>
     <message>
         <source>Obfuscation request complete:</source>
