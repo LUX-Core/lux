@@ -21,8 +21,6 @@ extern bool fNameLookup;
 
 /** -timeout default */
 static const int DEFAULT_CONNECT_TIMEOUT = 5000;
-//! -dns default
-static const int DEFAULT_NAME_LOOKUP = true;
 
 #ifdef WIN32
 // In MSVC, this is defined as a macro, undefine it to prevent a compile and link error
@@ -64,7 +62,7 @@ public:
     bool IsRFC1918() const;                      // IPv4 private networks (10.0.0.0/8, 192.168.0.0/16, 172.16.0.0/12)
     bool IsRFC2544() const;                      // IPv4 inter-network communcations (192.18.0.0/15)
     bool IsRFC6598() const;                      // IPv4 ISP-level NAT (100.64.0.0/10)
-    bool IsRFC5737() const;                      // IPv4 documentation addresses (192.0.2.0/24, 198.51.100.0/24, 203.0.114.0.04)
+    bool IsRFC5737() const;                      // IPv4 documentation addresses (192.0.2.0/24, 198.51.100.0/24, 203.0.113.0/24)
     bool IsRFC3849() const;                      // IPv6 documentation address (2001:0DB8::/32)
     bool IsRFC3927() const;                      // IPv4 autoconfig (169.254.0.0/16)
     bool IsRFC3964() const;                      // IPv6 6to4 tunnelling (2002::/16)
@@ -173,25 +171,15 @@ public:
     }
 };
 
-class proxyType
-{
-public:
-    proxyType(): randomize_credentials(false) {}
-    proxyType(const CService &proxy, bool randomize_credentials=false): proxy(proxy), randomize_credentials(randomize_credentials) {}
-
-    bool IsValid() const { return proxy.IsValid(); }
-
-    CService proxy;
-    bool randomize_credentials;
-};
+typedef CService proxyType;
 
 enum Network ParseNetwork(std::string net);
 std::string GetNetworkName(enum Network net);
 void SplitHostPort(std::string in, int& portOut, std::string& hostOut);
-bool SetProxy(enum Network net, const proxyType &addrProxy);
+bool SetProxy(enum Network net, CService addrProxy);
 bool GetProxy(enum Network net, proxyType& proxyInfoOut);
 bool IsProxy(const CNetAddr& addr);
-bool SetNameProxy(const proxyType &addrProxy);
+bool SetNameProxy(CService addrProxy);
 bool HaveNameProxy();
 bool LookupHost(const char* pszName, std::vector<CNetAddr>& vIP, unsigned int nMaxSolutions = 0, bool fAllowLookup = true);
 bool Lookup(const char* pszName, CService& addr, int portDefault = 0, bool fAllowLookup = true);
@@ -205,9 +193,5 @@ std::string NetworkErrorString(int err);
 bool CloseSocket(SOCKET& hSocket);
 /** Disable or enable blocking-mode for a socket */
 bool SetSocketNonBlocking(SOCKET& hSocket, bool fNonBlocking);
-/**
- * Convert milliseconds to a struct timeval for e.g. select.
- */
-struct timeval MillisToTimeval(int64_t nTimeout);
 
 #endif // BITCOIN_NETBASE_H
