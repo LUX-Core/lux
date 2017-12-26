@@ -27,7 +27,7 @@ struct CCheckpointData {
 };
 
 //! Returns true if block passes checkpoint checks
-bool CheckBlock(int nHeight, const uint256& hash, bool fMatchesCheckpoint = false);
+bool CheckBlock(int nHeight, const uint256& hash);
 
 //! Return conservative estimate of total number of blocks, 0 if unknown
 int GetTotalBlocksEstimate();
