@@ -1,6 +1,5 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2014 The Bitcoin developers
-// Copyright (c) 2015-2017 The LUX developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -11,9 +10,6 @@
 #include "script/script.h"
 #include "serialize.h"
 #include "uint256.h"
-
-#include <list>
-#include <iostream>
 
 class CTransaction;
 
@@ -34,8 +30,8 @@ public:
         READWRITE(FLATDATA(*this));
     }
 
-    void SetNull() { hash.SetNull(); n = (uint32_t) -1; }
-    bool IsNull() const { return (hash.IsNull() && n == (uint32_t) -1); }
+    void SetNull() { hash = 0; n = (uint32_t) -1; }
+    bool IsNull() const { return (hash == 0 && n == (uint32_t) -1); }
     bool IsMasternodeReward(const CTransaction* tx) const;
 
     friend bool operator<(const COutPoint& a, const COutPoint& b)
@@ -69,8 +65,8 @@ class CTxIn
 public:
     COutPoint prevout;
     CScript scriptSig;
-    CScript prevPubKey;
     uint32_t nSequence;
+    CScript prevPubKey;
 
     CTxIn()
     {
@@ -172,11 +168,6 @@ public:
         return (nValue < 3*minRelayTxFee.GetFee(nSize));
     }
 
-    bool IsZerocoinMint() const
-    {
-        return !scriptPubKey.empty() && scriptPubKey.IsZerocoinMint();
-    }
-
     friend bool operator==(const CTxOut& a, const CTxOut& b)
     {
         return (a.nValue       == b.nValue &&
@@ -231,7 +222,6 @@ public:
 
     template <typename Stream, typename Operation>
     inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion) {
-        std::cout << std::endl << std::endl << "SERIALIZATION TX:\n------------------------------------------------------------------------------------------\n";
         READWRITE(*const_cast<int32_t*>(&this->nVersion));
         nVersion = this->nVersion;
         READWRITE(*const_cast<uint32_t*>(&nTime));
@@ -240,8 +230,6 @@ public:
         READWRITE(*const_cast<uint32_t*>(&nLockTime));
         if (ser_action.ForRead())
             UpdateHash();
-        std::cout << "------------------------------------------------------------------------------------------" << std::endl << std::endl ;
-
     }
 
     bool IsNull() const {
@@ -263,35 +251,9 @@ public:
     // Compute modified tx size for priority calculation (optionally given tx size)
     unsigned int CalculateModifiedSize(unsigned int nTxSize=0) const;
 
-    bool IsZerocoinSpend() const
-    {
-        return (vin.size() > 0 && vin[0].prevout.IsNull() && vin[0].scriptSig[0] == OP_ZEROCOINSPEND);
-    }
-
-    bool IsZerocoinMint() const
-    {
-        for(const CTxOut& txout : vout) {
-            if (txout.scriptPubKey.IsZerocoinMint())
-                return true;
-        }
-        return false;
-    }
-
-    bool ContainsZerocoins() const
-    {
-        return IsZerocoinSpend() || IsZerocoinMint();
-    }
-
-    CAmount GetZerocoinMinted() const;
-    CAmount GetZerocoinSpent() const;
-    int GetZerocoinMintCount() const;
-
-    bool UsesUTXO(const COutPoint out);
-    std::list<COutPoint> GetOutPoints() const;
-
     bool IsCoinBase() const
     {
-        return (vin.size() == 1 && vin[0].prevout.IsNull() && !ContainsZerocoins());
+        return (vin.size() == 1 && vin[0].prevout.IsNull());
     }
 
     bool IsCoinStake() const
@@ -334,7 +296,6 @@ struct CMutableTransaction
         READWRITE(this->nVersion);
         nVersion = this->nVersion;
         READWRITE(nTime);
-        READWRITE(nLockTime);
         READWRITE(vin);
         READWRITE(vout);
         READWRITE(nLockTime);
@@ -360,4 +321,3 @@ struct CMutableTransaction
 };
 
 #endif // BITCOIN_PRIMITIVES_TRANSACTION_H
-

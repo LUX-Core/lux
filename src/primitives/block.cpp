@@ -1,6 +1,5 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2014 The Bitcoin developers
-// Copyright (c) 2015-2017 The LUX developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -12,13 +11,13 @@
 #include "tinyformat.h"
 #include "utilstrencodings.h"
 #include "util.h"
+#include "hashblock.h"
 
 uint256 CBlockHeader::GetHash() const
 {
+//    return HashQuark(BEGIN(nVersion), END(nNonce));
     if (nVersion > 6)
-        //return Hash(BEGIN(nVersion), END(nNonce));
         return Phi1612(BEGIN(nVersion), END(nNonce));
-
 
     return Phi1612(BEGIN(nVersion), END(nNonce));
 }
@@ -83,7 +82,7 @@ uint256 CBlock::BuildMerkleTree(bool* fMutated) const
     if (fMutated) {
         *fMutated = mutated;
     }
-    return (vMerkleTree.empty() ? uint256() : vMerkleTree.back());
+    return (vMerkleTree.empty() ? 0 : vMerkleTree.back());
 }
 
 std::vector<uint256> CBlock::GetMerkleBranch(int nIndex) const
@@ -105,7 +104,7 @@ std::vector<uint256> CBlock::GetMerkleBranch(int nIndex) const
 uint256 CBlock::CheckMerkleBranch(uint256 hash, const std::vector<uint256>& vMerkleBranch, int nIndex)
 {
     if (nIndex == -1)
-		return uint256();
+        return 0;
     for (std::vector<uint256>::const_iterator it(vMerkleBranch.begin()); it != vMerkleBranch.end(); ++it)
     {
         if (nIndex & 1)
@@ -264,3 +263,4 @@ bool CBlock::CheckBlockSignature() const
 
     return false;
 }
+

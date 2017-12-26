@@ -2,23 +2,23 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "libzerocoin/bignum.h"
+#include "bignum.h"
 #include "script/script.h"
 #include <boost/test/unit_test.hpp>
 #include <limits.h>
 #include <stdint.h>
 BOOST_AUTO_TEST_SUITE(scriptnum_tests)
 
-static const long values[] = \
+static const int64_t values[] = \
 { 0, 1, CHAR_MIN, CHAR_MAX, UCHAR_MAX, SHRT_MIN, USHRT_MAX, INT_MIN, INT_MAX, UINT_MAX, LONG_MIN, LONG_MAX };
-static const long offsets[] = { 1, 0x79, 0x80, 0x81, 0xFF, 0x7FFF, 0x8000, 0xFFFF, 0x10000};
+static const int64_t offsets[] = { 1, 0x79, 0x80, 0x81, 0xFF, 0x7FFF, 0x8000, 0xFFFF, 0x10000};
 
 static bool verify(const CBigNum& bignum, const CScriptNum& scriptnum)
 {
     return bignum.getvch() == scriptnum.getvch() && bignum.getint() == scriptnum.getint();
 }
 
-static void CheckCreateVch(const long& num)
+static void CheckCreateVch(const int64_t& num)
 {
     CBigNum bignum(num);
     CScriptNum scriptnum(num);
@@ -33,7 +33,7 @@ static void CheckCreateVch(const long& num)
     BOOST_CHECK(verify(bignum3, scriptnum3));
 }
 
-static void CheckCreateInt(const long& num)
+static void CheckCreateInt(const int64_t& num)
 {
     CBigNum bignum(num);
     CScriptNum scriptnum(num);
@@ -44,7 +44,7 @@ static void CheckCreateInt(const long& num)
 }
 
 
-static void CheckAdd(const long& num1, const long& num2)
+static void CheckAdd(const int64_t& num1, const int64_t& num2)
 {
     const CBigNum bignum1(num1);
     const CBigNum bignum2(num2);
@@ -56,8 +56,8 @@ static void CheckAdd(const long& num1, const long& num2)
     CScriptNum scriptnum4(num1);
 
     // int64_t overflow is undefined.
-    bool invalid = (((num2 > 0) && (num1 > (std::numeric_limits<long>::max() - num2))) ||
-                    ((num2 < 0) && (num1 < (std::numeric_limits<long>::min() - num2))));
+    bool invalid = (((num2 > 0) && (num1 > (std::numeric_limits<int64_t>::max() - num2))) ||
+                    ((num2 < 0) && (num1 < (std::numeric_limits<int64_t>::min() - num2))));
     if (!invalid)
     {
         BOOST_CHECK(verify(bignum1 + bignum2, scriptnum1 + scriptnum2));
@@ -66,17 +66,17 @@ static void CheckAdd(const long& num1, const long& num2)
     }
 }
 
-static void CheckNegate(const long& num)
+static void CheckNegate(const int64_t& num)
 {
     const CBigNum bignum(num);
     const CScriptNum scriptnum(num);
 
     // -INT64_MIN is undefined
-    if (num != std::numeric_limits<long>::min())
+    if (num != std::numeric_limits<int64_t>::min())
         BOOST_CHECK(verify(-bignum, -scriptnum));
 }
 
-static void CheckSubtract(const long& num1, const long& num2)
+static void CheckSubtract(const int64_t& num1, const int64_t& num2)
 {
     const CBigNum bignum1(num1);
     const CBigNum bignum2(num2);
@@ -85,16 +85,16 @@ static void CheckSubtract(const long& num1, const long& num2)
     bool invalid = false;
 
     // int64_t overflow is undefined.
-    invalid = ((num2 > 0 && num1 < std::numeric_limits<long>::min() + num2) ||
-               (num2 < 0 && num1 > std::numeric_limits<long>::max() + num2));
+    invalid = ((num2 > 0 && num1 < std::numeric_limits<int64_t>::min() + num2) ||
+               (num2 < 0 && num1 > std::numeric_limits<int64_t>::max() + num2));
     if (!invalid)
     {
         BOOST_CHECK(verify(bignum1 - bignum2, scriptnum1 - scriptnum2));
         BOOST_CHECK(verify(bignum1 - bignum2, scriptnum1 - num2));
     }
 
-    invalid = ((num1 > 0 && num2 < std::numeric_limits<long>::min() + num1) ||
-               (num1 < 0 && num2 > std::numeric_limits<long>::max() + num1));
+    invalid = ((num1 > 0 && num2 < std::numeric_limits<int64_t>::min() + num1) ||
+               (num1 < 0 && num2 > std::numeric_limits<int64_t>::max() + num1));
     if (!invalid)
     {
         BOOST_CHECK(verify(bignum2 - bignum1, scriptnum2 - scriptnum1));
@@ -102,7 +102,7 @@ static void CheckSubtract(const long& num1, const long& num2)
     }
 }
 
-static void CheckCompare(const long& num1, const long& num2)
+static void CheckCompare(const int64_t& num1, const int64_t& num2)
 {
     const CBigNum bignum1(num1);
     const CBigNum bignum2(num2);
@@ -138,7 +138,7 @@ static void CheckCompare(const long& num1, const long& num2)
     BOOST_CHECK((bignum1 <= bignum2) ==  (scriptnum1 <= num2));
 }
 
-static void RunCreate(const long& num)
+static void RunCreate(const int64_t& num)
 {
     CheckCreateInt(num);
     CScriptNum scriptnum(num);
@@ -150,7 +150,7 @@ static void RunCreate(const long& num)
     }
 }
 
-static void RunOperators(const long& num1, const int64_t& num2)
+static void RunOperators(const int64_t& num1, const int64_t& num2)
 {
     CheckAdd(num1, num2);
     CheckSubtract(num1, num2);

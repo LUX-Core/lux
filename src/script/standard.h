@@ -20,12 +20,12 @@ class CScript;
 class CScriptID : public uint160
 {
 public:
-    CScriptID() : uint160() {}
+    CScriptID() : uint160(0) {}
     CScriptID(const CScript& in);
     CScriptID(const uint160& in) : uint160(in) {}
 };
 
-static const unsigned int MAX_OP_RETURN_RELAY = 83;      //!< bytes (+1 for OP_RETURN, +2 for the pushdata opcodes)
+static const unsigned int MAX_OP_RETURN_RELAY = 40;      //! bytes
 extern unsigned nMaxDatacarrierBytes;
 
 /**
@@ -63,7 +63,6 @@ enum txnouttype
     TX_SCRIPTHASH,
     TX_MULTISIG,
     TX_NULL_DATA,
-    TX_ZEROCOINMINT,
 };
 
 class CNoDestination {
