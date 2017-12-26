@@ -20,10 +20,8 @@
 
 #include <stdint.h>
 
-#include "libzerocoin/Coin.h"
 #include "json/json_spirit_utils.h"
 #include "json/json_spirit_value.h"
-#include "spork.h"
 #include <boost/assign/list_of.hpp>
 
 using namespace std;
@@ -623,7 +621,7 @@ Value getbalance(const Array& params, bool fHelp)
     if (fHelp || params.size() > 3)
         throw runtime_error(
             "getbalance ( \"account\" minconf includeWatchonly )\n"
-            "\nIf account is not specified, returns the server's total available balance (excluding zerocoins).\n"
+            "\nIf account is not specified, returns the server's total available balance.\n"
             "If account is specified, returns the balance in the account.\n"
             "Note that the account \"\" is not the same as leaving the parameter out.\n"
             "The server total may be different to the balance in the default \"\" account.\n"
@@ -1590,7 +1588,6 @@ static void LockWallet(CWallet* pWallet)
 {
     LOCK(cs_nWalletUnlockTime);
     nWalletUnlockTime = 0;
-    pWallet->fWalletUnlockAnonymizeOnly = false;
     pWallet->Lock();
 }
 
@@ -1607,7 +1604,7 @@ Value walletpassphrase(const Array& params, bool fHelp)
             "3. anonymizeonly      (boolean, optional, default=flase) If is true sending functions are disabled."
             "\nNote:\n"
             "Issuing the walletpassphrase command while the wallet is already unlocked will set a new unlock\n"
-            "time that overrides the old one. A timeout of \"0\" unlocks until the wallet is closed.\n"
+            "time that overrides the old one.\n"
             "\nExamples:\n"
             "\nUnlock the wallet for 60 seconds\n" +
             HelpExampleCli("walletpassphrase", "\"my pass phrase\" 60") +
@@ -1642,11 +1639,7 @@ Value walletpassphrase(const Array& params, bool fHelp)
     int64_t nSleepTime = params[1].get_int64();
     LOCK(cs_nWalletUnlockTime);
     nWalletUnlockTime = GetTime() + nSleepTime;
-
-    if (nSleepTime > 0) {
-        nWalletUnlockTime = GetTime () + nSleepTime;
-        RPCRunLater ("lockwallet", boost::bind (LockWallet, pwalletMain), nSleepTime);
-    }
+    RPCRunLater("lockwallet", boost::bind(LockWallet, pwalletMain), nSleepTime);
 
     return Value::null;
 }
@@ -1936,27 +1929,18 @@ Value reservebalance(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() > 2)
         throw runtime_error(
-            "reservebalance ( reserve amount )\n"
-            "\nShow or set the reserve amount not participating in network protection\n"
-            "If no parameters provided current setting is printed.\n"
-
-            "\nArguments:\n"
-            "1. reserve     (boolean, optional) is true or false to turn balance reserve on or off.\n"
-            "2. amount      (numeric, optional) is a real and rounded to cent.\n"
-
-            "\nResult:\n"
-            "{\n"
-            "  \"reserve\": true|false,     (boolean) Status of the reserve balance\n"
-            "  \"amount\": x.xxxx       (numeric) Amount reserved\n"
-            "\nExamples:\n" +
-            HelpExampleCli("reservebalance", "true 5000") + HelpExampleRpc("reservebalance", "true 5000"));
+            "reservebalance [<reserve> [amount]]\n"
+            "<reserve> is true or false to turn balance reserve on or off.\n"
+            "<amount> is a real and rounded to cent.\n"
+            "Set reserve amount not participating in network protection.\n"
+            "If no parameters provided current setting is printed.\n");
 
     if (params.size() > 0) {
         bool fReserve = params[0].get_bool();
         if (fReserve) {
             if (params.size() == 1)
                 throw runtime_error("must provide amount to reserve balance.\n");
-            CAmount nAmount = AmountFromValue(params[1]);
+            int64_t nAmount = AmountFromValue(params[1]);
             nAmount = (nAmount / CENT) * CENT; // round to cent
             if (nAmount < 0)
                 throw runtime_error("amount cannot be negative.\n");
@@ -1979,24 +1963,13 @@ Value setstakesplitthreshold(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() != 1)
         throw runtime_error(
-            "setstakesplitthreshold value\n"
-            "\nThis will set the output size of your stakes to never be below this number\n"
-
-            "\nArguments:\n"
-            "1. value   (numeric, required) Threshold value between 1 and 999999\n"
-            "\nResult:\n"
-            "{\n"
-            "  \"threshold\": n,    (numeric) Threshold value set\n"
-            "  \"saved\": true|false    (boolean) 'true' if successfully saved to the wallet file\n"
-            "}\n"
-            "\nExamples:\n" +
-            HelpExampleCli("setstakesplitthreshold", "5000") + HelpExampleRpc("setstakesplitthreshold", "5000"));
-
+            "setstakesplitthreshold <1 - 999,999>\n"
+            "This will set the output size of your stakes to never be below this number\n");
     uint64_t nStakeSplitThreshold = params[0].get_int();
     if (pwalletMain->IsLocked())
         throw JSONRPCError(RPC_WALLET_UNLOCK_NEEDED, "Error: Unlock wallet to use this feature");
     if (nStakeSplitThreshold > 999999)
-        throw runtime_error("Value out of range, max allowed is 999999");
+        return "out of range - setting split threshold failed";
 
     CWalletDB walletdb(pwalletMain->strWalletFile);
     LOCK(pwalletMain->cs_wallet);
@@ -2005,12 +1978,12 @@ Value setstakesplitthreshold(const Array& params, bool fHelp)
 
         Object result;
         pwalletMain->nStakeSplitThreshold = nStakeSplitThreshold;
-        result.push_back(Pair("threshold", int(pwalletMain->nStakeSplitThreshold)));
+        result.push_back(Pair("split stake threshold set to ", int(pwalletMain->nStakeSplitThreshold)));
         if (fFileBacked) {
             walletdb.WriteStakeSplitThreshold(nStakeSplitThreshold);
-            result.push_back(Pair("saved", "true"));
+            result.push_back(Pair("saved to wallet.dat ", "true"));
         } else
-            result.push_back(Pair("saved", "false"));
+            result.push_back(Pair("saved to wallet.dat ", "false"));
 
         return result;
     }
@@ -2022,38 +1995,31 @@ Value getstakesplitthreshold(const Array& params, bool fHelp)
     if (fHelp || params.size() != 0)
         throw runtime_error(
             "getstakesplitthreshold\n"
-            "Returns the threshold for stake splitting\n"
-            "\nResult:\n"
-            "n      (numeric) Threshold value\n"
-            "\nExamples:\n" +
-            HelpExampleCli("getstakesplitthreshold", "") + HelpExampleRpc("getstakesplitthreshold", ""));
+            "Returns the set splitstakethreshold\n");
 
-    return int(pwalletMain->nStakeSplitThreshold);
+    Object result;
+    result.push_back(Pair("split stake threshold set to ", int(pwalletMain->nStakeSplitThreshold)));
+    return result;
 }
 
 Value autocombinerewards(const Array& params, bool fHelp)
 {
-    bool fEnable;
-    if (params.size() >= 1)
-        fEnable = params[0].get_bool();
-
-    if (fHelp || params.size() < 1 || (fEnable && params.size() != 2) || params.size() > 2)
+    if (fHelp || params.size() < 1)
         throw runtime_error(
-            "autocombinerewards true|false ( threshold )\n"
-            "\nWallet will automatically monitor for any coins with value below the threshold amount, and combine them if they reside with the same LUX address\n"
-            "When autocombinerewards runs it will create a transaction, and therefore will be subject to transaction fees.\n"
-
-            "\nArguments:\n"
-            "1. true|false      (boolean, required) Enable auto combine (true) or disable (false)\n"
-            "2. threshold       (numeric, optional) Threshold amount (default: 0)\n"
-            "\nExamples:\n" +
-            HelpExampleCli("autocombinerewards", "true 500") + HelpExampleRpc("autocombinerewards", "true 500"));
+            "autocombinerewards <true/false> threshold\n"
+            "Wallet will automatically monitor for any coins with value below the threshold amount, and combine them if they reside with the same LUX address\n"
+            "When autocombinerewards runs it will create a transaction, and therefore will be subject to transaction fees.\n");
 
     CWalletDB walletdb(pwalletMain->strWalletFile);
+    bool fEnable = params[0].get_bool();
     CAmount nThreshold = 0;
 
-    if (fEnable)
+    if (fEnable) {
+        if (params.size() != 2)
+            throw runtime_error("Input Error: use format: autocombinerewards <true/false> threshold\n");
+
         nThreshold = params[1].get_int();
+    }
 
     pwalletMain->fCombineDust = fEnable;
     pwalletMain->nAutoCombineThreshold = nThreshold;
@@ -2061,7 +2027,7 @@ Value autocombinerewards(const Array& params, bool fHelp)
     if (!walletdb.WriteAutoCombineSettings(fEnable, nThreshold))
         throw runtime_error("Changed settings in wallet but failed to save to database\n");
 
-    return Value::null;
+    return "Auto Combine Rewards Threshold Set";
 }
 
 Array printMultiSend()
@@ -2304,504 +2270,4 @@ Value multisend(const Array& params, bool fHelp)
         }
     }
     return printMultiSend();
-}
-Value getzerocoinbalance(const Array& params, bool fHelp)
-{
-
-    if (fHelp || params.size() != 0)
-        throw runtime_error(
-                            "getzerocoinbalance\n"
-                            + HelpRequiringPassphrase());
-
-    if (pwalletMain->IsLocked())
-        throw JSONRPCError(RPC_WALLET_UNLOCK_NEEDED, "Error: Please enter the wallet passphrase with walletpassphrase first.");
-
-    return ValueFromAmount(pwalletMain->GetZerocoinBalance(true));
-
-}
-Value listmintedzerocoins(const Array& params, bool fHelp)
-{
-
-    if (fHelp || params.size() != 0)
-        throw runtime_error(
-                            "listmintedzerocoins\n"
-                            + HelpRequiringPassphrase());
-
-    if (pwalletMain->IsLocked())
-        throw JSONRPCError(RPC_WALLET_UNLOCK_NEEDED, "Error: Please enter the wallet passphrase with walletpassphrase first.");
-
-    CWalletDB walletdb(pwalletMain->strWalletFile);
-    list<CZerocoinMint> listPubCoin = walletdb.ListMintedCoins(true, false, true);
-
-    Array jsonList;
-    for (const CZerocoinMint& pubCoinItem : listPubCoin) {
-        jsonList.push_back(pubCoinItem.GetValue().GetHex());
-    }
-
-    return jsonList;
-}
-
-Value listzerocoinamounts(const Array& params, bool fHelp)
-{
-
-    if (fHelp || params.size() != 0)
-        throw runtime_error(
-            "listzerocoinamounts\n"
-            + HelpRequiringPassphrase());
-
-    if (pwalletMain->IsLocked())
-        throw JSONRPCError(RPC_WALLET_UNLOCK_NEEDED, "Error: Please enter the wallet passphrase with walletpassphrase first.");
-
-    CWalletDB walletdb(pwalletMain->strWalletFile);
-    list<CZerocoinMint> listPubCoin = walletdb.ListMintedCoins(true, true, true);
-
-    std::map<libzerocoin::CoinDenomination, CAmount> spread;
-    for (const auto& denom : libzerocoin::zerocoinDenomList)
-        spread.insert(std::pair<libzerocoin::CoinDenomination, CAmount>(denom, 0));
-    for (auto& mint : listPubCoin) spread.at(mint.GetDenomination())++;
-
-
-    Array jsonList;
-    Object val;
-    for (const auto& m : libzerocoin::zerocoinDenomList) {
-        stringstream s1;
-        s1 << "Denomination Value " << libzerocoin::ZerocoinDenominationToInt(m);
-        stringstream s2;
-        s2 << spread.at(m) << " coins";
-        val.push_back(Pair(s1.str(),s2.str()));
-    }
-    jsonList.push_back(val);
-    return jsonList;
-}
-Value listspentzerocoins(const Array& params, bool fHelp)
-{
-
-    if (fHelp || params.size() != 0)
-        throw runtime_error(
-            "listspentzerocoins\n"
-            + HelpRequiringPassphrase());
-
-    if (pwalletMain->IsLocked())
-        throw JSONRPCError(RPC_WALLET_UNLOCK_NEEDED, "Error: Please enter the wallet passphrase with walletpassphrase first.");
-
-    CWalletDB walletdb(pwalletMain->strWalletFile);
-    list<CBigNum> listPubCoin = walletdb.ListSpentCoinsSerial();
-
-    Array jsonList;
-    for (const CBigNum& pubCoinItem : listPubCoin) {
-        jsonList.push_back(pubCoinItem.GetHex());
-    }
-
-    return jsonList;
-}
-
-Value mintzerocoin(const Array& params, bool fHelp)
-{
-    if (fHelp || params.size() != 1)
-        throw runtime_error(
-            "mintzerocoin <amount>\n"
-            "Usage: Enter an amount of Piv to convert to zLux"
-            + HelpRequiringPassphrase());
-
-    int64_t nTime = GetTimeMillis();
-
-    if(GetAdjustedTime() > GetSporkValue(SPORK_16_ZEROCOIN_MAINTENANCE_MODE))
-        throw JSONRPCError(RPC_WALLET_ERROR, "zLUX is currently disabled due to maintenance.");
-
-    if (pwalletMain->IsLocked())
-        throw JSONRPCError(RPC_WALLET_UNLOCK_NEEDED, "Error: Please enter the wallet passphrase with walletpassphrase first.");
-
-    CAmount nAmount = params[0].get_int() * COIN;
-
-    CWalletTx wtx;
-    vector<CZerocoinMint> vMints;
-    string strError = pwalletMain->MintZerocoin(nAmount, wtx, vMints);
-
-    if (strError != "")
-        throw JSONRPCError(RPC_WALLET_ERROR, strError);
-
-    Array arrMints;
-    for (CZerocoinMint mint : vMints) {
-        Object m;
-        m.push_back(Pair("txid", wtx.GetHash().ToString()));
-        m.push_back(Pair("value", ValueFromAmount(libzerocoin::ZerocoinDenominationToAmount(mint.GetDenomination()))));
-        m.push_back(Pair("pubcoin", mint.GetValue().GetHex()));
-        m.push_back(Pair("randomness", mint.GetRandomness().GetHex()));
-        m.push_back(Pair("serial", mint.GetSerialNumber().GetHex()));
-        m.push_back(Pair("time", GetTimeMillis() - nTime));
-        arrMints.push_back(m);
-    }
-
-    return arrMints;
-}
-
-Value spendzerocoin(const Array& params, bool fHelp)
-{
-    if (fHelp || params.size() > 5 || params.size() < 4)
-        throw runtime_error(
-            "spendzerocoin <amount> <mintchange [true|false]> <minimizechange [true|false]>  <securitylevel [1-100]> <address>\n"
-            "Overview: Convert zLUX (zerocoins) into LUX. \n"
-            "amount: amount to spend\n"
-            "mintchange: if there is left over LUX (change), the wallet can convert it automatically back to zerocoins [true]\n"
-            "minimizechange: try to minimize the returning change  [false]\n"
-            "security level: the amount of checkpoints to add to the accumulator. A checkpoint contains 10 blocks worth of zerocoinmints."
-                    "The more checkpoints that are added, the more untraceable the transaction will be. Use [100] to add the maximum amount"
-                    "of checkpoints available. Tip: adding more checkpoints makes the minting process take longer\n"
-            "address: Send straight to an address or leave the address blank and the wallet will send to a change address. If there is change then"
-                    "an address is required"
-            + HelpRequiringPassphrase());
-
-    if(GetAdjustedTime() > GetSporkValue(SPORK_16_ZEROCOIN_MAINTENANCE_MODE))
-        throw JSONRPCError(RPC_WALLET_ERROR, "zLUX is currently disabled due to maintenance.");
-
-    int64_t nTimeStart = GetTimeMillis();
-    if (pwalletMain->IsLocked())
-        throw JSONRPCError(RPC_WALLET_UNLOCK_NEEDED, "Error: Please enter the wallet passphrase with walletpassphrase first.");
-
-    CAmount nAmount = AmountFromValue(params[0]);   // Spending amount
-    bool fMintChange = params[1].get_bool();        // Mint change to zLUX
-    bool fMinimizeChange = params[2].get_bool();    // Minimize change
-    int nSecurityLevel = params[3].get_int();       // Security level
-
-    CBitcoinAddress address = CBitcoinAddress(); // Optional sending address. Dummy initialization here.
-    if (params.size() == 5) {
-        // Destination address was supplied as params[4]. Optional parameters MUST be at the end
-        // to avoid type confusion from the JSON interpreter
-        address = CBitcoinAddress(params[4].get_str());
-        if(!address.IsValid())
-            throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid LUX address");
-    }
-
-    CWalletTx wtx;
-    vector<CZerocoinMint> vMintsSelected;
-    CZerocoinSpendReceipt receipt;
-    bool fSuccess;
-
-    if(params.size() == 5) // Spend to supplied destination address
-        fSuccess = pwalletMain->SpendZerocoin(nAmount, nSecurityLevel, wtx, receipt, vMintsSelected, fMintChange, fMinimizeChange, &address);
-    else                   // Spend to newly generated local address
-        fSuccess = pwalletMain->SpendZerocoin(nAmount, nSecurityLevel, wtx, receipt, vMintsSelected, fMintChange, fMinimizeChange);
-
-    if (!fSuccess)
-        throw JSONRPCError(RPC_WALLET_ERROR, receipt.GetStatusMessage());
-
-    CAmount nValueIn = 0;
-    Array arrSpends;
-    for (CZerocoinSpend spend : receipt.GetSpends()) {
-        Object obj;
-        obj.push_back(Pair("denomination", spend.GetDenomination()));
-        obj.push_back(Pair("pubcoin", spend.GetPubCoin().GetHex()));
-        obj.push_back(Pair("serial", spend.GetSerial().GetHex()));
-        uint32_t nChecksum = spend.GetAccumulatorChecksum();
-        obj.push_back(Pair("acc_checksum", HexStr(BEGIN(nChecksum), END(nChecksum))));
-        arrSpends.push_back(obj);
-        nValueIn += libzerocoin::ZerocoinDenominationToAmount(spend.GetDenomination());
-    }
-
-    CAmount nValueOut = 0;
-    Array vout;
-    for (unsigned int i = 0; i < wtx.vout.size(); i++) {
-        const CTxOut& txout = wtx.vout[i];
-        Object out;
-        out.push_back(Pair("value", ValueFromAmount(txout.nValue)));
-        nValueOut += txout.nValue;
-
-        CTxDestination dest;
-        if(txout.scriptPubKey.IsZerocoinMint())
-            out.push_back(Pair("address", "zerocoinmint"));
-        else if(ExtractDestination(txout.scriptPubKey, dest))
-            out.push_back(Pair("address", CBitcoinAddress(dest).ToString()));
-        vout.push_back(out);
-    }
-
-    //construct JSON to return
-    Object ret;
-    ret.push_back(Pair("txid", wtx.GetHash().ToString()));
-    ret.push_back(Pair("bytes", (int64_t)wtx.GetSerializeSize(SER_NETWORK, CTransaction::CURRENT_VERSION)));
-    ret.push_back(Pair("fee", ValueFromAmount(nValueIn - nValueOut)));
-    ret.push_back(Pair("duration_millis", (GetTimeMillis() - nTimeStart)));
-    ret.push_back(Pair("spends", arrSpends));
-    ret.push_back(Pair("outputs", vout));
-
-    return ret;
-}
-
-Value resetmintzerocoin(const Array& params, bool fHelp)
-{
-    if (fHelp || params.size() > 1)
-        throw runtime_error(
-            "resetmintzerocoin <extended_search>\n"
-            "Scan the blockchain for all of the zerocoins that are held in the wallet.dat. Update any meta-data that is incorrect.\n"
-            "Archive any mints that are not able to be found."
-
-            "\nArguments:\n"
-            "1. \"extended_search\"      (bool, optional) Rescan each block of the blockchain looking for your mints. WARNING - may take 30+ minutes!\n"
-
-            + HelpRequiringPassphrase());
-
-    bool fExtendedSearch = false;
-    if (params.size() == 1)
-        fExtendedSearch = params[0].get_bool();
-
-    CWalletDB walletdb(pwalletMain->strWalletFile);
-    list<CZerocoinMint> listMints = walletdb.ListMintedCoins(false, false, true);
-    vector<CZerocoinMint> vMintsToFind{ std::make_move_iterator(std::begin(listMints)), std::make_move_iterator(std::end(listMints)) };
-    vector<CZerocoinMint> vMintsMissing;
-    vector<CZerocoinMint> vMintsToUpdate;
-
-    // search all of our available data for these mints
-    FindMints(vMintsToFind, vMintsToUpdate, vMintsMissing, fExtendedSearch);
-
-    // update the meta data of mints that were marked for updating
-    Array arrUpdated;
-    for (CZerocoinMint mint : vMintsToUpdate) {
-        walletdb.WriteZerocoinMint(mint);
-        arrUpdated.push_back(mint.GetValue().GetHex());
-    }
-
-    // delete any mints that were unable to be located on the blockchain
-    Array arrDeleted;
-    for (CZerocoinMint mint : vMintsMissing) {
-        arrDeleted.push_back(mint.GetValue().GetHex());
-        walletdb.ArchiveMintOrphan(mint);
-    }
-
-    Object obj;
-    obj.push_back(Pair("updated", arrUpdated));
-    obj.push_back(Pair("archived", arrDeleted));
-    return obj;
-}
-
-Value resetspentzerocoin(const Array& params, bool fHelp)
-{
-    if (fHelp || params.size() != 0)
-        throw runtime_error(
-            "resetspentzerocoin\n"
-                "Scan the blockchain for all of the zerocoins that are held in the wallet.dat. Reset mints that are considered spent that did not make it into the blockchain."
-            + HelpRequiringPassphrase());
-
-    CWalletDB walletdb(pwalletMain->strWalletFile);
-    list<CZerocoinMint> listMints = walletdb.ListMintedCoins(false, false, false);
-    list<CZerocoinSpend> listSpends = walletdb.ListSpentCoins();
-    list<CZerocoinSpend> listUnconfirmedSpends;
-
-    for (CZerocoinSpend spend : listSpends) {
-        CTransaction tx;
-        uint256 hashBlock = 0;
-        if (!GetTransaction(spend.GetTxHash(), tx, hashBlock)) {
-            listUnconfirmedSpends.push_back(spend);
-            continue;
-        }
-
-        //no confirmations
-        if (hashBlock == 0)
-            listUnconfirmedSpends.push_back(spend);
-    }
-
-    Object objRet;
-    Array arrRestored;
-    for (CZerocoinSpend spend : listUnconfirmedSpends) {
-        for (CZerocoinMint mint : listMints) {
-            if (mint.GetSerialNumber() == spend.GetSerial()) {
-                mint.SetUsed(false);
-                walletdb.WriteZerocoinMint(mint);
-                walletdb.EraseZerocoinSpendSerialEntry(spend.GetSerial());
-                RemoveSerialFromDB(spend.GetSerial());
-                Object obj;
-                obj.push_back(Pair("serial", spend.GetSerial().GetHex()));
-                arrRestored.push_back(obj);
-                continue;
-            }
-        }
-    }
-
-    objRet.push_back(Pair("restored", arrRestored));
-    return objRet;
-}
-
-Value getarchivedzerocoin(const Array& params, bool fHelp)
-{
-    if(fHelp || params.size() != 0)
-        throw runtime_error(
-            "getarchivedzerocoin\n"
-            "Display zerocoins that were archived because they were believed to be orphans."
-            "Provides enough information to recover mint if it was incorrectly archived."
-            + HelpRequiringPassphrase());
-
-    CWalletDB walletdb(pwalletMain->strWalletFile);
-    list<CZerocoinMint> listMints = walletdb.ListArchivedZerocoins();
-
-    Array arrRet;
-    for (const CZerocoinMint mint : listMints) {
-        Object objMint;
-        objMint.push_back(Pair("txid", mint.GetTxHash().GetHex()));
-        objMint.push_back(Pair("denomination", FormatMoney(mint.GetDenominationAsAmount())));
-        objMint.push_back(Pair("serial", mint.GetSerialNumber().GetHex()));
-        objMint.push_back(Pair("randomness", mint.GetRandomness().GetHex()));
-        objMint.push_back(Pair("pubcoin", mint.GetValue().GetHex()));
-        arrRet.push_back(objMint);
-    }
-
-    return arrRet;
-}
-
-Value exportzerocoins(const Array& params, bool fHelp)
-{
-    if(fHelp || params.empty() || params.size() > 2)
-        throw runtime_error(
-            "exportzerocoins include_spent ( denomination )\n"
-                "Exports zerocoin mints that are held by this wallet.dat\n"
-
-                "\nArguments:\n"
-                "1. \"include_spent\"        (bool, required) Include mints that have already been spent\n"
-                "2. \"denomination\"         (integer, optional) Export a specific denomination of zLux\n"
-
-                "\nResult\n"
-                "[                   (array of json object)\n"
-                "  {\n"
-                "    \"d\" : n,        (numeric) the mint's zerocoin denomination \n"
-                "    \"p\" : \"pubcoin\", (string) The public coin\n"
-                "    \"s\" : \"serial\",  (string) The secret serial number\n"
-                "    \"r\" : \"random\",  (string) The secret random number\n"
-                "    \"t\" : \"txid\",    (string) The txid that the coin was minted in\n"
-                "    \"h\" : n,         (numeric) The height the tx was added to the blockchain\n"
-                "    \"u\" : used       (boolean) Whether the mint has been spent\n"
-                "  }\n"
-                "  ,...\n"
-                "]\n"
-
-                "\nExamples\n" +
-            HelpExampleCli("exportzerocoins", "false 5") + HelpExampleRpc("exportzerocoins", "false 5"));
-
-    if (pwalletMain->IsLocked())
-        throw JSONRPCError(RPC_WALLET_UNLOCK_NEEDED, "Error: Please enter the wallet passphrase with walletpassphrase first.");
-
-    CWalletDB walletdb(pwalletMain->strWalletFile);
-
-    bool fIncludeSpent = params[0].get_bool();
-    libzerocoin::CoinDenomination denomination = libzerocoin::ZQ_ERROR;
-    if (params.size() == 2)
-        denomination = libzerocoin::IntToZerocoinDenomination(params[1].get_int());
-    list<CZerocoinMint> listMints = walletdb.ListMintedCoins(!fIncludeSpent, false, false);
-
-    Array jsonList;
-    for (const CZerocoinMint mint : listMints) {
-        if (denomination != libzerocoin::ZQ_ERROR && denomination != mint.GetDenomination())
-            continue;
-
-        Object objMint;
-        objMint.emplace_back(Pair("d", mint.GetDenomination()));
-        objMint.emplace_back(Pair("p", mint.GetValue().GetHex()));
-        objMint.emplace_back(Pair("s", mint.GetSerialNumber().GetHex()));
-        objMint.emplace_back(Pair("r", mint.GetRandomness().GetHex()));
-        objMint.emplace_back(Pair("t", mint.GetTxHash().GetHex()));
-        objMint.emplace_back(Pair("h", mint.GetHeight()));
-        objMint.emplace_back(Pair("u", mint.IsUsed()));
-        jsonList.emplace_back(objMint);
-    }
-
-    return jsonList;
-}
-
-Value importzerocoins(const Array& params, bool fHelp)
-{
-    if(fHelp || params.size() == 0)
-        throw runtime_error(
-            "importzerocoins importdata \n"
-                "[{\"d\":denomination,\"p\":\"pubcoin_hex\",\"s\":\"serial_hex\",\"r\":\"randomness_hex\",\"t\":\"txid\",\"h\":height, \"u\":used},{\"d\":...}]\n"
-                "\nImport zerocoin mints.\n"
-                "Adds raw zerocoin mints to the wallet.dat\n"
-                "Note it is recommended to use the json export created from the exportzerocoins RPC call\n"
-
-                "\nArguments:\n"
-                "1. \"importdata\"    (string, required) A json array of json objects containing zerocoin mints\n"
-
-                "\nResult:\n"
-                "\"added\"            (int) the quantity of zerocoin mints that were added\n"
-                "\"value\"            (string) the total zLux value of zerocoin mints that were added\n"
-
-                "\nExamples\n" +
-            HelpExampleCli("importzerocoins", "\'[{\"d\":100,\"p\":\"mypubcoin\",\"s\":\"myserial\",\"r\":\"randomness_hex\",\"t\":\"mytxid\",\"h\":104923, \"u\":false},{\"d\":5,...}]\'") +
-                HelpExampleRpc("importzerocoins", "[{\"d\":100,\"p\":\"mypubcoin\",\"s\":\"myserial\",\"r\":\"randomness_hex\",\"t\":\"mytxid\",\"h\":104923, \"u\":false},{\"d\":5,...}]"));
-
-    if(pwalletMain->IsLocked())
-        throw JSONRPCError(RPC_WALLET_UNLOCK_NEEDED, "Error: Please enter the wallet passphrase with walletpassphrase first.");
-
-    RPCTypeCheck(params, list_of(array_type)(obj_type));
-    Array arrMints = params[0].get_array();
-    CWalletDB walletdb(pwalletMain->strWalletFile);
-
-    int count = 0;
-    CAmount nValue = 0;
-    for (const Value &val : arrMints) {
-        const Object &o = val.get_obj();
-
-        int d = ParseInt(o, "d");
-        if (d < 0)
-            throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter, d must be positive");
-
-        libzerocoin::CoinDenomination denom = libzerocoin::IntToZerocoinDenomination(d);
-        CBigNum bnValue = CBigNum(find_value(o, "p").get_str());
-        CBigNum bnSerial = CBigNum(find_value(o, "s").get_str());
-        CBigNum bnRandom = CBigNum(find_value(o, "r").get_str());
-        uint256 txid(find_value(o, "t").get_str());
-
-        int nHeight = ParseInt(o, "h");
-        if (nHeight < 0)
-            throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter, h must be positive");
-
-        bool fUsed = ParseBool(o, "u");
-        CZerocoinMint mint(denom, bnValue, bnRandom, bnSerial, fUsed);
-        mint.SetTxHash(txid);
-        mint.SetHeight(nHeight);
-        walletdb.WriteZerocoinMint(mint);
-        count++;
-        nValue += libzerocoin::ZerocoinDenominationToAmount(denom);
-    }
-
-    Object ret;
-    ret.emplace_back(Pair("added", count));
-    ret.emplace_back(Pair("value", FormatMoney(nValue)));
-    return ret;
-}
-
-Value reconsiderzerocoins(const Array& params, bool fHelp)
-{
-    if(fHelp || !params.empty())
-        throw runtime_error(
-            "reconsiderzerocoins\n"
-                "\nCheck archived zLux list to see if any mints were added to the blockchain.\n"
-
-                "\nResult\n"
-                "[                                 (array of json objects)\n"
-                "  {\n"
-                "    \"txid\" : txid,              (numeric) the mint's zerocoin denomination \n"
-                "    \"denomination\" : \"denom\", (numeric) the mint's zerocoin denomination\n"
-                "    \"pubcoin\" : \"pubcoin\",    (string) The mint's public identifier\n"
-                "    \"height\" : n,               (numeric) The height the tx was added to the blockchain\n"
-                "  }\n"
-                "  ,...\n"
-                "]\n"
-
-                "\nExamples\n" +
-            HelpExampleCli("reconsiderzerocoins", "") + HelpExampleRpc("reconsiderzerocoins", ""));
-
-    if(pwalletMain->IsLocked())
-        throw JSONRPCError(RPC_WALLET_UNLOCK_NEEDED,
-                           "Error: Please enter the wallet passphrase with walletpassphrase first.");
-
-    list<CZerocoinMint> listMints;
-    pwalletMain->ReconsiderZerocoins(listMints);
-
-    Array arrRet;
-    for (const CZerocoinMint mint : listMints) {
-        Object objMint;
-        objMint.emplace_back(Pair("txid", mint.GetTxHash().GetHex()));
-        objMint.emplace_back(Pair("denomination", FormatMoney(mint.GetDenominationAsAmount())));
-        objMint.emplace_back(Pair("pubcoin", mint.GetValue().GetHex()));
-        objMint.emplace_back(Pair("height", mint.GetHeight()));
-        arrRet.emplace_back(objMint);
-    }
-
-    return arrRet;
 }

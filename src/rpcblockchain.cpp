@@ -14,8 +14,6 @@
 #include <stdint.h>
 
 #include "json/json_spirit_value.h"
-#include "utilmoneystr.h"
-#include "base58.h"
 
 using namespace json_spirit;
 using namespace std;
@@ -65,7 +63,6 @@ Object blockToJSON(const CBlock& block, const CBlockIndex* blockindex, bool txDe
     result.push_back(Pair("height", blockindex->nHeight));
     result.push_back(Pair("version", block.nVersion));
     result.push_back(Pair("merkleroot", block.hashMerkleRoot.GetHex()));
-    result.push_back(Pair("acc_checkpoint", block.nAccumulatorCheckpoint.GetHex()));
     Array txs;
     BOOST_FOREACH (const CTransaction& tx, block.vtx) {
         if (txDetails) {
@@ -87,16 +84,6 @@ Object blockToJSON(const CBlock& block, const CBlockIndex* blockindex, bool txDe
     CBlockIndex* pnext = chainActive.Next(blockindex);
     if (pnext)
         result.push_back(Pair("nextblockhash", pnext->GetBlockHash().GetHex()));
-
-    result.push_back(Pair("moneysupply",ValueFromAmount(blockindex->nMoneySupply)));
-
-    Object zpivObj;
-    for (auto denom : libzerocoin::zerocoinDenomList) {
-        zpivObj.push_back(Pair(to_string(denom), ValueFromAmount(blockindex->mapZerocoinSupply.at(denom) * (denom*COIN))));
-    }
-    zpivObj.emplace_back(Pair("total", ValueFromAmount(blockindex->GetZerocoinSupply())));
-    result.emplace_back(Pair("zLUXsupply", zpivObj));
-
     return result;
 }
 
@@ -277,19 +264,6 @@ Value getblock(const Array& params, bool fHelp)
             "  \"difficulty\" : x.xxx,  (numeric) The difficulty\n"
             "  \"previousblockhash\" : \"hash\",  (string) The hash of the previous block\n"
             "  \"nextblockhash\" : \"hash\"       (string) The hash of the next block\n"
-            "  \"moneysupply\" : \"supply\"       (numeric) The money supply when this block was added to the blockchain\n"
-            "  \"zLUXsupply\" :\n"
-            "  {\n"
-            "     \"1\" : n,            (numeric) supply of 1 zLUX denomination\n"
-            "     \"5\" : n,            (numeric) supply of 5 zLUX denomination\n"
-            "     \"10\" : n,           (numeric) supply of 10 zLUX denomination\n"
-            "     \"50\" : n,           (numeric) supply of 50 zLUX denomination\n"
-            "     \"100\" : n,          (numeric) supply of 100 zLUX denomination\n"
-            "     \"500\" : n,          (numeric) supply of 500 zLUX denomination\n"
-            "     \"1000\" : n,         (numeric) supply of 1000 zLUX denomination\n"
-            "     \"5000\" : n,         (numeric) supply of 5000 zLUX denomination\n"
-            "     \"total\" : n,        (numeric) The total supply of all zLUX denominations\n"
-            "  }\n"
             "}\n"
             "\nResult (for verbose=false):\n"
             "\"data\"             (string) A string that is serialized, hex-encoded data for block 'hash'.\n"
@@ -487,18 +461,21 @@ Value verifychain(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() > 2)
         throw runtime_error(
-            "verifychain ( numblocks )\n"
+            "verifychain ( checklevel numblocks )\n"
             "\nVerifies blockchain database.\n"
             "\nArguments:\n"
-            "1. numblocks    (numeric, optional, default=288, 0=all) The number of blocks to check.\n"
+            "1. checklevel   (numeric, optional, 0-4, default=3) How thorough the block verification is.\n"
+            "2. numblocks    (numeric, optional, default=288, 0=all) The number of blocks to check.\n"
             "\nResult:\n"
             "true|false       (boolean) Verified or not\n"
             "\nExamples:\n" +
             HelpExampleCli("verifychain", "") + HelpExampleRpc("verifychain", ""));
 
-    int nCheckLevel = 4;
+    int nCheckLevel = GetArg("-checklevel", 3);
     int nCheckDepth = GetArg("-checkblocks", 288);
     if (params.size() > 0)
+        nCheckLevel = params[0].get_int();
+    if (params.size() > 1)
         nCheckDepth = params[1].get_int();
 
     return CVerifyDB().VerifyDB(pcoinsTip, nCheckLevel, nCheckDepth);
@@ -724,129 +701,4 @@ Value reconsiderblock(const Array& params, bool fHelp)
     }
 
     return Value::null;
-}
-
-Value getinvalid (const Array& params, bool fHelp)
-{
-    if (fHelp || params.size() > 1)
-        throw runtime_error(
-                "getinvalid \n"
-                        "\nGet a summary of invalidated outpoints.\n"
-                        "\nArguments:\n"
-                        "1. all   (string, optional) return a full list of outpoints even if they are spent\n"
-                        "\nExamples:\n" +
-                HelpExampleCli("getinvalid", "\"all\"") + HelpExampleRpc("getinvalid", "\"all\""));
-
-    string strCommand;
-    if (params.size() == 1){
-        strCommand = params[0].get_str();
-    }
-
-    if (strCommand == "serials") {
-        Array ret;
-        CAmount nSerialTotal = 0;
-        for (auto it : mapInvalidSerials) {
-            Object objSerial;
-            objSerial.emplace_back(Pair(it.first.GetHex(), FormatMoney(it.second)));
-            nSerialTotal += it.second;
-            ret.emplace_back(objSerial);
-        }
-
-        Object objTotal;
-        objTotal.emplace_back(Pair("total_value", FormatMoney(nSerialTotal)));
-        ret.emplace_back(objTotal);
-        return ret;
-    }
-
-    bool fShowAll = false;
-    if (strCommand == "all")
-        fShowAll = true;
-
-    CAmount nUnspent = 0;
-    CAmount nMint = 0;
-    CAmount nMixedValid = 0;
-    map<CBitcoinAddress, CAmount> mapBanAddress;
-    map<COutPoint, int> mapMixedValid;
-
-    Array ret;
-    for (auto it : mapInvalidOutPoints) {
-        COutPoint out = it.first;
-        //Get the tx that the outpoint is from
-        CTransaction tx;
-        uint256 hashBlock;
-        if (!GetTransaction(out.hash, tx, hashBlock, true)) {
-            continue;
-        }
-
-        Object objTx;
-        objTx.emplace_back(Pair("inv_out", it.first.ToString()));
-
-        CAmount nValue = tx.vout[out.n].nValue;
-        objTx.emplace_back(Pair("value", FormatMoney(nValue)));
-
-        //Search the txin's to see if any of them are "valid".
-        Object objMixedValid;
-
-        //if some of the other inputs are valid
-        for(CTxIn in2 : tx.vin) {
-            //See if this is already accounted for
-            if(mapInvalidOutPoints.count(in2.prevout) || mapMixedValid.count(in2.prevout))
-                continue;
-
-            CTransaction txPrev;
-            uint256 hashBlock;
-            if(!GetTransaction(in2.prevout.hash, txPrev, hashBlock, true))
-                continue;
-
-            //This is a valid outpoint that mixed with an invalid outpoint. Investigate this person.
-            //Information leakage, not covering their tracks well enough
-            CAmount nValid = txPrev.vout[in2.prevout.n].nValue;
-            objMixedValid.emplace_back(Pair(FormatMoney(nValid), in2.prevout.ToString()));
-
-            nMixedValid += nValid;
-            mapMixedValid[in2.prevout] = 1;
-        }
-
-        //Check whether this bad outpoint has been spent
-        bool fSpent = false;
-        CCoinsViewCache cache(pcoinsTip);
-        const CCoins* coins = cache.AccessCoins(out.hash);
-        if (!coins || !coins->IsAvailable(out.n))
-            fSpent = true;
-
-        objTx.emplace_back(Pair("spent", fSpent));
-        if (!objMixedValid.empty())
-            objTx.emplace_back(Pair("mixed_with_valid", objMixedValid));
-
-        CScript scriptPubKey = tx.vout[out.n].scriptPubKey;
-        if (scriptPubKey.IsZerocoinMint()) {
-            nMint += nValue;
-        } else if (!fSpent) {
-            CTxDestination dest;
-            if (!ExtractDestination(scriptPubKey, dest)) {
-                continue;
-            }
-            CBitcoinAddress address(dest);
-            mapBanAddress[address] += nValue;
-            nUnspent += nValue;
-        }
-
-        if (fSpent && !fShowAll)
-            continue;
-
-        ret.emplace_back(objTx);
-    }
-
-    Object objAddresses;
-    for (auto it : mapBanAddress)
-        objAddresses.emplace_back(Pair(it.first.ToString(), FormatMoney(it.second)));
-
-    Object obj;
-    obj.emplace_back(Pair("addresses_with_invalid", objAddresses));
-    obj.emplace_back(Pair("total_unspent", FormatMoney(nUnspent)));
-    obj.emplace_back(Pair("total_minted", FormatMoney(nMint)));
-    obj.emplace_back(Pair("total_valid_used", FormatMoney(nMixedValid)));
-
-    ret.emplace_back(obj);
-    return ret;
 }

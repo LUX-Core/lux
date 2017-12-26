@@ -1,6 +1,3 @@
-// Copyright (c) 2017 The LUX Core developers
-// Distributed under the MIT software license, see the accompanying
-// file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "bip38.h"
 #include "base58.h"
@@ -77,7 +74,7 @@ std::string AddressToBip38Hash(std::string address)
     return HexStr(addrCheck).substr(0, 8);
 }
 
-std::string BIP38_Encrypt(std::string strAddress, std::string strPassphrase, uint256 privKey, bool fCompressed)
+std::string BIP38_Encrypt(std::string strAddress, std::string strPassphrase, uint256 privKey)
 {
     string strAddressHash = AddressToBip38Hash(strAddress);
 
@@ -106,10 +103,7 @@ std::string BIP38_Encrypt(std::string strAddress, std::string strPassphrase, uin
     uint512 encrypted2;
     AES_encrypt(block2.begin(), encrypted2.begin(), &key);
 
-    string strPrefix = "0142";
-    strPrefix += (fCompressed ? "E0" : "C0");
-
-    uint512 encryptedKey(ReverseEndianString(strPrefix + strAddressHash));
+    uint512 encryptedKey(ReverseEndianString("0142E0" + strAddressHash));
 
     //add encrypted1 to the end of encryptedKey
     encryptedKey = encryptedKey | (encrypted1 << 56);
@@ -117,14 +111,7 @@ std::string BIP38_Encrypt(std::string strAddress, std::string strPassphrase, uin
     //add encrypted2 to the end of encryptedKey
     encryptedKey = encryptedKey | (encrypted2 << (56 + 128));
 
-    //Base58 checksum is the 4 bytes of dSHA256 hash of the encrypted key
-    uint256 hashChecksum = Hash(encryptedKey.begin(), encryptedKey.begin() + 39);
-    uint512 b58Checksum(hashChecksum.ToString().substr(64 - 8, 8));
-
-    // append the encrypted key with checksum (currently occupies 312 bits)
-    encryptedKey = encryptedKey | (b58Checksum << 312);
-
-    //43 bytes is the total size that we are encoding
+    //TODO: ensure +43 works on different OS
     return EncodeBase58(encryptedKey.begin(), encryptedKey.begin() + 43);
 }
 
