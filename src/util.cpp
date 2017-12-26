@@ -105,26 +105,20 @@ std::string to_internal(const std::string&);
 
 using namespace std;
 
-// LUX only features
-// Masternode
+//LUX only features
 bool fMasterNode = false;
 string strMasterNodePrivKey = "";
 string strMasterNodeAddr = "";
 bool fLiteMode = false;
-// SwiftX
 bool fEnableSwiftTX = true;
 int nSwiftTXDepth = 5;
-// Automatic Zerocoin minting
-bool fEnableZeromint = true;
-int nZeromintPercentage = 10;
-int nPreferredDenom = 0;
-const int64_t AUTOMINT_DELAY = (60 * 5); // Wait at least 5 minutes until Automint starts
-
+int nObfuscationRounds = 2;
 int nAnonymizeLuxAmount = 1000;
 int nLiquidityProvider = 0;
 /** Spork enforcement enabled time */
 int64_t enforceMasternodePaymentsTime = 4085657524;
 bool fSucessfullyLoaded = false;
+bool fEnableObfuscation = false;
 /** All denominations used by obfuscation */
 std::vector<int64_t> obfuScationDenominations;
 string strBudgetMode = "";
@@ -240,10 +234,9 @@ bool LogAcceptCategory(const char* category)
             // "lux" is a composite category enabling all LUX-related debug output
             if (ptrCategory->count(string("lux"))) {
                 ptrCategory->insert(string("obfuscation"));
-                ptrCategory->insert(string("swiftx"));
+                ptrCategory->insert(string("swifttx"));
                 ptrCategory->insert(string("masternode"));
                 ptrCategory->insert(string("mnpayments"));
-                ptrCategory->insert(string("zero"));
                 ptrCategory->insert(string("mnbudget"));
             }
         }
@@ -295,20 +288,16 @@ int LogPrintStr(const std::string& str)
     return ret;
 }
 
-/** Interpret string as boolean, for argument parsing */
-static bool InterpretBool(const std::string& strValue)
+static void InterpretNegativeSetting(string name, map<string, string>& mapSettingsRet)
 {
-    if (strValue.empty())
-        return true;
-    return (atoi(strValue) != 0);
-}
-
-/** Turn -noX into -X=0 */
-static void InterpretNegativeSetting(std::string& strKey, std::string& strValue)
-{
-    if (strKey.length()>3 && strKey[0]=='-' && strKey[1]=='n' && strKey[2]=='o') {
-        strKey = "-" + strKey.substr(3);
-        strValue = InterpretBool(strValue) ? "0" : "1";
+    // interpret -nofoo as -foo=0 (and -nofoo=0 as -foo=1) as long as -foo not set
+    if (name.find("-no") == 0) {
+        std::string positive("-");
+        positive.append(name.begin() + 3, name.end());
+        if (mapSettingsRet.count(positive) == 0) {
+            bool value = !GetBoolArg(name, false);
+            mapSettingsRet[positive] = (value ? "1" : "0");
+        }
     }
 }
 
@@ -338,10 +327,15 @@ void ParseParameters(int argc, const char* const argv[])
         // If both --foo and -foo are set, the last takes effect.
         if (str.length() > 1 && str[1] == '-')
             str = str.substr(1);
-        InterpretNegativeSetting(str, strValue);
 
         mapArgs[str] = strValue;
         mapMultiArgs[str].push_back(strValue);
+    }
+
+    // New 0.6 features:
+    BOOST_FOREACH (const PAIRTYPE(string, string) & entry, mapArgs) {
+        // interpret -nofoo as -foo=0 (and -nofoo=0 as -foo=1) as long as -foo not set
+        InterpretNegativeSetting(entry.first, mapArgs);
     }
 }
 
@@ -354,15 +348,33 @@ std::string GetArg(const std::string& strArg, const std::string& strDefault)
 
 int64_t GetArg(const std::string& strArg, int64_t nDefault)
 {
-    if (mapArgs.count(strArg))
-        return atoi64(mapArgs[strArg]);
+    if (mapArgs.count(strArg)) {
+        int64_t n;
+        try {
+            n = std::stoi(mapArgs[strArg]);
+        } catch (const std::exception& e) {
+            return nDefault;
+        }
+
+        return n;
+    }
     return nDefault;
 }
 
 bool GetBoolArg(const std::string& strArg, bool fDefault)
 {
-    if (mapArgs.count(strArg))
-        return InterpretBool(mapArgs[strArg]);
+    if (mapArgs.count(strArg)) {
+        if (mapArgs[strArg].empty())
+            return true;
+
+        int n;
+        try {
+            n = std::stoi(mapArgs[strArg]);
+        } catch (const std::exception& e) {
+            return fDefault;
+        }
+        return n;
+    }
     return fDefault;
 }
 
@@ -380,21 +392,6 @@ bool SoftSetBoolArg(const std::string& strArg, bool fValue)
         return SoftSetArg(strArg, std::string("1"));
     else
         return SoftSetArg(strArg, std::string("0"));
-}
-
-static const int screenWidth = 79;
-static const int optIndent = 2;
-static const int msgIndent = 7;
-
-std::string HelpMessageGroup(const std::string &message) {
-    return std::string(message) + std::string("\n\n");
-}
-
-std::string HelpMessageOpt(const std::string &option, const std::string &message) {
-    return std::string(optIndent,' ') + std::string(option) +
-           std::string("\n") + std::string(msgIndent,' ') +
-           FormatParagraph(message, screenWidth - msgIndent, msgIndent) +
-           std::string("\n\n");
 }
 
 static std::string FormatException(std::exception* pex, const char* pszThread)
@@ -524,11 +521,12 @@ void ReadConfigFile(map<string, string>& mapSettingsRet,
     for (boost::program_options::detail::config_file_iterator it(streamConfig, setOptions), end; it != end; ++it) {
         // Don't overwrite existing settings so command line settings override lux.conf
         string strKey = string("-") + it->string_key;
-        string strValue = it->value[0];
-        InterpretNegativeSetting(strKey, strValue);
-        if (mapSettingsRet.count(strKey) == 0)
-            mapSettingsRet[strKey] = strValue;
-        mapMultiSettingsRet[strKey].push_back(strValue);
+        if (mapSettingsRet.count(strKey) == 0) {
+            mapSettingsRet[strKey] = it->value[0];
+            // interpret nofoo=1 as foo=0 (and nofoo=0 as foo=1) as long as foo not set)
+            InterpretNegativeSetting(strKey, mapSettingsRet);
+        }
+        mapMultiSettingsRet[strKey].push_back(it->value[0]);
     }
     // If datadir is changed in .conf file:
     ClearDatadirCache();
