@@ -111,8 +111,6 @@ public:
 
     int CountEnabled(int protocolVersion = -1);
 
-    void CountNetworks(int protocolVersion, int& ipv4, int& ipv6, int& onion);
-
     void DsegUpdate(CNode* pnode);
 
     /// Find an entry
@@ -145,9 +143,6 @@ public:
 
     /// Return the number of (unique) Masternodes
     int size() { return vMasternodes.size(); }
-
-    /// Return the number of Masternodes older than (default) 8000 seconds
-    int stable_size ();
 
     std::string ToString() const;
 
