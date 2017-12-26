@@ -136,10 +136,6 @@ bool CInv::IsKnownType() const
     return (type >= 1 && type < (int)ARRAYLEN(ppszTypeName));
 }
 
-bool CInv::IsMasterNodeType() const{
- 	return (type >= 6);
-}
-
 const char* CInv::GetCommand() const
 {
     if (!IsKnownType())
