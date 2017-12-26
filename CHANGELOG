@@ -1,6 +1,10 @@
 # Version 4.0.0
 ===============
 +Wallet version upgraded
++Upgraded bip38
++Added priv functions
++New Wallet UI
++Speed up block sync, strict database requests have been freed as code has been added to fix most of the corruption issues.
 
 # Version 3.0.5
 ===============
