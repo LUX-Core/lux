@@ -222,6 +222,7 @@ HEADERS += src/activemasternode.h \
            src/script/sigcache.h \
            src/script/sign.h \
            src/script/standard.h \
+           src/test/bignum.h \
            src/univalue/univalue.h \
            src/univalue/univalue_escapes.h \
            src/leveldb/db/builder.h \

@@ -7,12 +7,12 @@ reset-files.bash
 *.tar.gz
 
 *.exe
-src/pivx
-src/pivxd
-src/pivx-cli
-src/pivx-tx
-src/test/test_pivx
-src/qt/test/test_pivx-qt
+src/lux
+src/luxd
+src/lux-cli
+src/lux-tx
+src/test/test_lux
+src/qt/test/test_lux-qt
 
 # autoreconf
 Makefile.in
@@ -34,16 +34,12 @@ build-aux/test-driver
 config.log
 config.status
 configure
-confdefs.h
-conftest.cpp
-conftest.err
 libtool
-src/config/pivx-config.h
-src/config/pivx-config.h.in
+src/config/lux-config.h
+src/config/lux-config.h.in
 src/config/stamp-h1
 share/setup.nsi
 share/qt/Info.plist
-contrib/devtools/split-debug.sh
 
 src/univalue/gen
 
@@ -65,7 +61,7 @@ src/qt/test/moc*.cpp
 *.o
 *.o-*
 *.patch
-.pivx
+.lux
 *.a
 *.pb.cc
 *.pb.h
@@ -84,12 +80,12 @@ src/qt/test/moc*.cpp
 # Compilation and Qt preprocessor part
 *.qm
 Makefile
-pivx-qt
-LUXX-Qt.app
+lux-qt
+LUX-Qt.app
 
 # Unit-tests
 Makefile.test
-pivx-qt_test
+lux-qt_test
 src/test/buildenv.py
 
 # Resources cpp
@@ -105,7 +101,7 @@ build
 #lcov
 *.gcno
 /*.info
-test_pivx.coverage/
+test_lux.coverage/
 total.coverage/
 coverage_percent.txt
 
@@ -126,5 +122,3 @@ qa/pull-tester/test.*/*
 /nbproject/
 
 .idea
-CMakeLists.txt
-cmake-build-debug

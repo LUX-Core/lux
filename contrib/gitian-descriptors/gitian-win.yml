@@ -1,11 +1,11 @@
 ---
-name: "lux-win-3.1"
+name: "lux-win-2.2"
 enable_cache: true
 suites:
 - "trusty"
 architectures:
 - "amd64"
-packages:
+packages: 
 - "curl"
 - "g++"
 - "git-core"
@@ -22,12 +22,12 @@ packages:
 - "ca-certificates"
 - "python"
 remotes:
-- "url": "https://github.com/216k155/lux.git"
+- "url": "https://github.com/lux-project/lux.git"
   "dir": "lux"
 files: []
 script: |
   WRAP_DIR=$HOME/wrapped
-  HOSTS="i686-w64-mingw32 x86_64-w64-mingw32"
+  HOSTS="x86_64-w64-mingw32 i686-w64-mingw32"
   CONFIGFLAGS="--enable-reduce-exports --disable-bench --disable-gui-tests"
   FAKETIME_HOST_PROGS="g++ ar ranlib nm windres strip objcopy"
   FAKETIME_PROGS="date makensis zip"
@@ -147,16 +147,15 @@ script: |
     make install DESTDIR=${INSTALLPATH}
     cp -f lux-*setup*.exe $OUTDIR/
     cd installed
-    # mv ${DISTNAME}/bin/*.dll ${DISTNAME}/lib/ # temporarily disabled for Zerocoin
-    # find . -name "lib*.la" -delete            # temporarily disabled for Zerocoin
-    # find . -name "lib*.a" -delete             # temporarily disabled for Zerocoin
+    mv ${DISTNAME}/bin/*.dll ${DISTNAME}/lib/
+    find . -name "lib*.la" -delete
+    find . -name "lib*.a" -delete
     rm -rf ${DISTNAME}/lib/pkgconfig
     find ${DISTNAME}/bin -type f -executable -exec ${i}-objcopy --only-keep-debug {} {}.dbg \; -exec ${i}-strip -s {} \; -exec ${i}-objcopy --add-gnu-debuglink={}.dbg {} \;
-    # find ${DISTNAME}/lib -type f -exec ${i}-objcopy --only-keep-debug {} {}.dbg \; -exec ${i}-strip -s {} \; -exec ${i}-objcopy --add-gnu-debuglink={}.dbg {} \;
+    find ${DISTNAME}/lib -type f -exec ${i}-objcopy --only-keep-debug {} {}.dbg \; -exec ${i}-strip -s {} \; -exec ${i}-objcopy --add-gnu-debuglink={}.dbg {} \;
     find ${DISTNAME} -not -name "*.dbg"  -type f | sort | zip -X@ ${OUTDIR}/${DISTNAME}-${i}.zip
     find ${DISTNAME} -name "*.dbg"  -type f | sort | zip -X@ ${OUTDIR}/${DISTNAME}-${i}-debug.zip
     cd ../../
-    rm -rf distsrc-${i}
   done
   cd $OUTDIR
   rename 's/-setup\.exe$/-setup-unsigned.exe/' *-setup.exe

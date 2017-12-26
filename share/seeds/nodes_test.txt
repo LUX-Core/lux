@@ -1,1 +1,0 @@
-# List of fixed seed nodes for testnet
