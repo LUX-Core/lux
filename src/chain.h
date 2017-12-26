@@ -1,6 +1,5 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2014 The Bitcoin developers
-// Copyright (c) 2015-2017 The LUX developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -12,7 +11,6 @@
 #include "tinyformat.h"
 #include "uint256.h"
 #include "util.h"
-#include "libzerocoin/Denominations.h"
 
 #include <vector>
 
@@ -173,15 +171,10 @@ public:
     unsigned int nTime;
     unsigned int nBits;
     unsigned int nNonce;
-    uint256 nAccumulatorCheckpoint;
 
     //! (memory only) Sequential id assigned to distinguish order in which blocks are received.
     uint32_t nSequenceId;
-    
-    //! zerocoin specific fields
-    std::map<libzerocoin::CoinDenomination, int64_t> mapZerocoinSupply;
-    std::vector<libzerocoin::CoinDenomination> vMintDenominationsInBlock;
-    
+
     void SetNull()
     {
         phashBlock = NULL;
@@ -206,16 +199,10 @@ public:
         nStakeTime = 0;
 
         nVersion = 0;
-        hashMerkleRoot = uint256();
+        hashMerkleRoot = 0;
         nTime = 0;
         nBits = 0;
         nNonce = 0;
-        nAccumulatorCheckpoint = 0;
-        // Start supply of each denomination with 0s
-        for (auto& denom : libzerocoin::zerocoinDenomList) {
-            mapZerocoinSupply.insert(make_pair(denom, 0));
-        }
-        vMintDenominationsInBlock.clear();
     }
 
     CBlockIndex()
@@ -232,17 +219,15 @@ public:
         nTime = block.nTime;
         nBits = block.nBits;
         nNonce = block.nNonce;
-        if(block.nVersion > 3)
-            nAccumulatorCheckpoint = block.nAccumulatorCheckpoint;
 
         //Proof of Stake
-        bnChainTrust = uint256();
+        bnChainTrust = 0;
         nMint = 0;
         nMoneySupply = 0;
         nFlags = 0;
         nStakeModifier = 0;
         nStakeModifierChecksum = 0;
-        hashProofOfStake = uint256();
+        hashProofOfStake = 0;
 
         if (block.IsProofOfStake()) {
             SetProofOfStake();
@@ -253,7 +238,6 @@ public:
             nStakeTime = 0;
         }
     }
-    
 
     CDiskBlockPos GetBlockPos() const
     {
@@ -285,22 +269,7 @@ public:
         block.nTime = nTime;
         block.nBits = nBits;
         block.nNonce = nNonce;
-        block.nAccumulatorCheckpoint = nAccumulatorCheckpoint;
         return block;
-    }
-
-    int64_t GetZerocoinSupply() const
-    {
-        int64_t nTotal = 0;
-        for (auto& denom : libzerocoin::zerocoinDenomList) {
-            nTotal += libzerocoin::ZerocoinDenominationToAmount(denom) * mapZerocoinSupply.at(denom);
-        }
-        return nTotal;
-    }
-
-    bool MintedDenomination(libzerocoin::CoinDenomination denom) const
-    {
-        return std::find(vMintDenominationsInBlock.begin(), vMintDenominationsInBlock.end(), denom) != vMintDenominationsInBlock.end();
     }
 
     uint256 GetBlockHash() const
@@ -428,13 +397,13 @@ public:
 
     CDiskBlockIndex()
     {
-        hashPrev = uint256();
-        hashNext = uint256();
+        hashPrev = 0;
+        hashNext = 0;
     }
 
     explicit CDiskBlockIndex(CBlockIndex* pindex) : CBlockIndex(*pindex)
     {
-        hashPrev = (pprev ? pprev->GetBlockHash() : uint256());
+        hashPrev = (pprev ? pprev->GetBlockHash() : 0);
     }
 
     ADD_SERIALIZE_METHODS;
@@ -466,7 +435,7 @@ public:
         } else {
             const_cast<CDiskBlockIndex*>(this)->prevoutStake.SetNull();
             const_cast<CDiskBlockIndex*>(this)->nStakeTime = 0;
-            const_cast<CDiskBlockIndex*>(this)->hashProofOfStake = uint256();
+            const_cast<CDiskBlockIndex*>(this)->hashProofOfStake = 0;
         }
 
         // block header
@@ -477,12 +446,6 @@ public:
         READWRITE(nTime);
         READWRITE(nBits);
         READWRITE(nNonce);
-        if(this->nVersion > 3) {
-            READWRITE(nAccumulatorCheckpoint);
-            READWRITE(mapZerocoinSupply);
-            READWRITE(vMintDenominationsInBlock);
-        }
-
     }
 
     uint256 GetBlockHash() const
@@ -494,7 +457,6 @@ public:
         block.nTime = nTime;
         block.nBits = nBits;
         block.nNonce = nNonce;
-        block.nAccumulatorCheckpoint = nAccumulatorCheckpoint;
         return block.GetHash();
     }
 

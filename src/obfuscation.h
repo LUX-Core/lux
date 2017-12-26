@@ -6,6 +6,7 @@
 #ifndef OBFUSCATION_H
 #define OBFUSCATION_H
 
+#include "activemasternode.h"
 #include "main.h"
 #include "masternode-payments.h"
 #include "masternode-sync.h"
@@ -46,8 +47,8 @@ class CActiveMasternode;
 #define OBFUSCATION_RELAY_OUT 2
 #define OBFUSCATION_RELAY_SIG 3
 
-static const CAmount OBFUSCATION_COLLATERAL = (10 * COIN);
-static const CAmount OBFUSCATION_POOL_MAX = (99999.99 * COIN);
+static const int64_t OBFUSCATION_COLLATERAL = (10 * COIN);
+static const int64_t OBFUSCATION_POOL_MAX = (99999.99 * COIN);
 
 extern CObfuscationPool obfuScationPool;
 extern CObfuScationSigner obfuScationSigner;
@@ -98,7 +99,7 @@ public:
     bool isSet;
     std::vector<CTxDSIn> sev;
     std::vector<CTxDSOut> vout;
-    CAmount amount;
+    int64_t amount;
     CTransaction collateral;
     CTransaction txSupporting;
     int64_t addedTime; // time in UTC milliseconds
@@ -411,11 +412,11 @@ public:
     void UpdateState(unsigned int newState)
     {
         if (fMasterNode && (newState == POOL_STATUS_ERROR || newState == POOL_STATUS_SUCCESS)) {
-            // LogPrint("obfuscation", "CObfuscationPool::UpdateState() - Can't set state to ERROR or SUCCESS as a Masternode. \n");
+            LogPrint("obfuscation", "CObfuscationPool::UpdateState() - Can't set state to ERROR or SUCCESS as a Masternode. \n");
             return;
         }
 
-        // LogPrintf("CObfuscationPool::UpdateState() == %d | %d \n", state, newState);
+        LogPrintf("CObfuscationPool::UpdateState() == %d | %d \n", state, newState);
         if (state != newState) {
             lastTimeChanged = GetTimeMillis();
             if (fMasterNode) {
@@ -441,7 +442,7 @@ public:
     bool IsCompatibleWithEntries(std::vector<CTxOut>& vout);
 
     /// Is this amount compatible with other client in the pool?
-    bool IsCompatibleWithSession(CAmount nAmount, CTransaction txCollateral, int& errorID);
+    bool IsCompatibleWithSession(int64_t nAmount, CTransaction txCollateral, int& errorID);
 
     /// Passively run Obfuscation in the background according to the configuration in settings (only for QT)
     bool DoAutomaticDenominating(bool fDryRun = false);
@@ -461,13 +462,13 @@ public:
     /// If the collateral is valid given by a client
     bool IsCollateralValid(const CTransaction& txCollateral);
     /// Add a clients entry to the pool
-    bool AddEntry(const std::vector<CTxIn>& newInput, const CAmount& nAmount, const CTransaction& txCollateral, const std::vector<CTxOut>& newOutput, int& errorID);
+    bool AddEntry(const std::vector<CTxIn>& newInput, const int64_t& nAmount, const CTransaction& txCollateral, const std::vector<CTxOut>& newOutput, int& errorID);
     /// Add signature to a vin
     bool AddScriptSig(const CTxIn& newVin);
     /// Check that all inputs are signed. (Are all inputs signed?)
     bool SignaturesComplete();
     /// As a client, send a transaction to a Masternode to start the denomination process
-    void SendObfuscationDenominate(std::vector<CTxIn>& vin, std::vector<CTxOut>& vout, CAmount amount);
+    void SendObfuscationDenominate(std::vector<CTxIn>& vin, std::vector<CTxOut>& vout, int64_t amount);
     /// Get Masternode updates about the progress of Obfuscation
     bool StatusUpdate(int newState, int newEntriesCount, int newAccepted, int& errorID, int newSessionID = 0);
 
@@ -485,7 +486,7 @@ public:
 
     /// Split up large inputs or make fee sized inputs
     bool MakeCollateralAmounts();
-    bool CreateDenominated(CAmount nTotalValue);
+    bool CreateDenominated(int64_t nTotalValue);
 
     /// Get the denominations for a list of outputs (returns a bitshifted integer)
     int GetDenominations(const std::vector<CTxOut>& vout, bool fSingleRandomDenom = false);
@@ -494,8 +495,8 @@ public:
     void GetDenominationsToString(int nDenom, std::string& strDenom);
 
     /// Get the denominations for a specific amount of lux.
-    int GetDenominationsByAmount(CAmount nAmount, int nDenomTarget = 0); // is not used anymore?
-    int GetDenominationsByAmounts(std::vector<CAmount>& vecAmount);
+    int GetDenominationsByAmount(int64_t nAmount, int nDenomTarget = 0); // is not used anymore?
+    int GetDenominationsByAmounts(std::vector<int64_t>& vecAmount);
 
     std::string GetMessageByID(int messageID);
 
@@ -506,7 +507,7 @@ public:
     void RelayFinalTransaction(const int sessionID, const CTransaction& txNew);
     void RelaySignaturesAnon(std::vector<CTxIn>& vin);
     void RelayInAnon(std::vector<CTxIn>& vin, std::vector<CTxOut>& vout);
-    void RelayIn(const std::vector<CTxDSIn>& vin, const CAmount& nAmount, const CTransaction& txCollateral, const std::vector<CTxDSOut>& vout);
+    void RelayIn(const std::vector<CTxDSIn>& vin, const int64_t& nAmount, const CTransaction& txCollateral, const std::vector<CTxDSOut>& vout);
     void RelayStatus(const int sessionID, const int newState, const int newEntriesCount, const int newAccepted, const int errorID = MSG_NOERR);
     void RelayCompletedTransaction(const int sessionID, const bool error, const int errorID);
 };
