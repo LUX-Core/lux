@@ -7,6 +7,7 @@
 
 #include "amount.h"
 #include "masternodelist.h"
+#include "tradingdialog.h"
 
 #include <QStackedWidget>
 
@@ -61,6 +62,7 @@ private:
 
     OverviewPage* overviewPage;
     QWidget* transactionsPage;
+    tradingDialog* tradingPage;
     ReceiveCoinsDialog* receiveCoinsPage;
     SendCoinsDialog* sendCoinsPage;
     BlockExplorer* explorerWindow;
@@ -76,6 +78,8 @@ public slots:
     void gotoOverviewPage();
     /** Switch to history (transactions) page */
     void gotoHistoryPage();
+    /** Switch to trading page */
+    void gotoTradingPage();
     /** Switch to masternode page */
     void gotoMasternodePage();
     /** Switch to explorer page */
@@ -122,7 +126,7 @@ public slots:
     /** Show progress dialog e.g. for rescan */
     void showProgress(const QString& title, int nProgress);
 
-    /** Update selected LUX amount from transactionview */
+    /** Update selected PIV amount from transactionview */
     void trxAmount(QString amount);
 
 signals:

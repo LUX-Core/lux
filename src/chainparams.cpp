@@ -108,10 +108,10 @@ public:
         nRejectBlockOutdatedMajority = 950;
         nToCheckBlockUpgradeMajority = 1000;
         nMinerThreads = 0;
-        nTargetTimespan = 1 * 60; // LUX: 1 day
-        nTargetSpacing = 1 * 60;  // LUX: 1 minute
+        nTargetTimespan = 20 * 60; // LUX: 1 36hrs
+        nTargetSpacing = 2 * 60;  // LUX: 2 minute
         nLastPOWBlock = 6000000;
-        nMaturity = 100;
+        nMaturity = 79;
         nMasternodeCountDrift = 20;
         nModifierUpdateBlock = 615800;
 
@@ -195,10 +195,10 @@ public:
         nRejectBlockOutdatedMajority = 75;
         nToCheckBlockUpgradeMajority = 100;
         nMinerThreads = 0;
-        nTargetTimespan = 1 * 60; // LUX: 1 day
-        nTargetSpacing = 1 * 60;  // LUX: 1 minute
-        nLastPOWBlock = 200;
-        nMaturity = 15;
+        nTargetTimespan = 30 * 60; // LUX: 1 day
+        nTargetSpacing = 3 * 60;  // LUX: 1 minute
+        nLastPOWBlock = 6000000;
+        nMaturity = 79;
         nModifierUpdateBlock = 51197; //approx Mon, 17 Apr 2017 04:00:00 GMT
 
         //! Modify the testnet genesis block so the timestamp is valid for a later start.
