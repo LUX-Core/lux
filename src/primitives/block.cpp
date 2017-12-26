@@ -11,7 +11,6 @@
 #include "tinyformat.h"
 #include "utilstrencodings.h"
 #include "util.h"
-#include "hashblock.h"
 
 uint256 CBlockHeader::GetHash() const
 {

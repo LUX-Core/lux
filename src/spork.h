@@ -79,7 +79,7 @@ public:
 
     uint256 GetHash()
     {
-        uint256 n = HashQuark(BEGIN(nSporkID), END(nTimeSigned));
+        uint256 n = Phi1612(BEGIN(nSporkID), END(nTimeSigned));
         return n;
     }
 
