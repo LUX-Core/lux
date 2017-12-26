@@ -43,6 +43,7 @@ const std::string CLIENT_NAME("LUX Core");
 #endif
 
 //! git will put "#define GIT_ARCHIVE 1" on the next line inside archives.
+#define GIT_ARCHIVE 1
 #ifdef GIT_ARCHIVE
 #define GIT_COMMIT_ID "cbcb549"
 #define GIT_COMMIT_DATE "Tue, 9 Feb 2016 16:54:57 -0500"
