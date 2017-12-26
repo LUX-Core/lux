@@ -135,24 +135,6 @@ vector<unsigned char> ParseHexO(const Object& o, string strKey)
     return ParseHexV(find_value(o, strKey), strKey);
 }
 
-int ParseInt(const Object& o, string strKey)
-{
-    const Value& v = find_value(o, strKey);
-    if (v.type() != int_type)
-        throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter, " + strKey + "is not an int");
-
-    return v.get_int();
-}
-
-bool ParseBool(const Object& o, string strKey)
-{
-    const Value& v = find_value(o, strKey);
-    if (v.type() != bool_type)
-        throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter, " + strKey + "is not a bool");
-
-    return v.get_bool();
-}
-
 
 /**
  * Note: This interface may still be subject to change.
@@ -281,7 +263,6 @@ static const CRPCCommand vRPCCommands[] =
         {"blockchain", "verifychain", &verifychain, true, false, false},
         {"blockchain", "invalidateblock", &invalidateblock, true, true, false},
         {"blockchain", "reconsiderblock", &reconsiderblock, true, true, false},
-        {"getinvalid", "getinvalid", &getinvalid, true, true, false},
 
         /* Mining */
         {"mining", "getblocktemplate", &getblocktemplate, true, false, false},
@@ -320,32 +301,12 @@ static const CRPCCommand vRPCCommands[] =
 
         /* Lux features */
         {"lux", "masternode", &masternode, true, true, false},
-        {"lux", "listmasternodes", &listmasternodes, true, true, false},
-        {"lux", "getmasternodecount", &getmasternodecount, true, true, false},
-        {"lux", "masternodeconnect", &masternodeconnect, true, true, false},
-        {"lux", "masternodecurrent", &masternodecurrent, true, true, false},
-        {"lux", "masternodedebug", &masternodedebug, true, true, false},
-        {"lux", "startmasternode", &startmasternode, true, true, false},
-        {"lux", "createmasternodekey", &createmasternodekey, true, true, false},
-        {"lux", "getmasternodeoutputs", &getmasternodeoutputs, true, true, false},
-        {"lux", "listmasternodeconf", &listmasternodeconf, true, true, false},
-        {"lux", "getmasternodestatus", &getmasternodestatus, true, true, false},
-        {"lux", "getmasternodewinners", &getmasternodewinners, true, true, false},
-        {"lux", "getmasternodescores", &getmasternodescores, true, true, false},
+        {"lux", "masternodelist", &masternodelist, true, true, false},
         {"lux", "mnbudget", &mnbudget, true, true, false},
-        {"lux", "preparebudget", &preparebudget, true, true, false},
-        {"lux", "submitbudget", &submitbudget, true, true, false},
-        {"lux", "mnbudgetvote", &mnbudgetvote, true, true, false},
-        {"lux", "getbudgetvotes", &getbudgetvotes, true, true, false},
-        {"lux", "getnextsuperblock", &getnextsuperblock, true, true, false},
-        {"lux", "getbudgetprojection", &getbudgetprojection, true, true, false},
-        {"lux", "getbudgetinfo", &getbudgetinfo, true, true, false},
-        {"lux", "mnbudgetrawvote", &mnbudgetrawvote, true, true, false},
+        {"lux", "mnbudgetvoteraw", &mnbudgetvoteraw, true, true, false},
         {"lux", "mnfinalbudget", &mnfinalbudget, true, true, false},
-        {"lux", "checkbudgets", &checkbudgets, true, true, false},
         {"lux", "mnsync", &mnsync, true, true, false},
         {"lux", "spork", &spork, true, true, false},
-        {"lux", "getpoolinfo", &getpoolinfo, true, true, false},
 #ifdef ENABLE_WALLET
         {"lux", "obfuscation", &obfuscation, false, false, true}, /* not threadSafe because of SendMoney */
 
@@ -397,21 +358,6 @@ static const CRPCCommand vRPCCommands[] =
         {"wallet", "walletlock", &walletlock, true, false, true},
         {"wallet", "walletpassphrasechange", &walletpassphrasechange, true, false, true},
         {"wallet", "walletpassphrase", &walletpassphrase, true, false, true},
-
-        {"zerocoin", "getzerocoinbalance", &getzerocoinbalance, false, false, true},
-        {"zerocoin", "listmintedzerocoins", &listmintedzerocoins, false, false, true},
-        {"zerocoin", "listspentzerocoins", &listspentzerocoins, false, false, true},
-        {"zerocoin", "listzerocoinamounts", &listzerocoinamounts, false, false, true},
-        {"zerocoin", "mintzerocoin", &mintzerocoin, false, false, true},
-        {"zerocoin", "spendzerocoin", &spendzerocoin, false, false, true},
-        {"zerocoin", "resetmintzerocoin", &resetmintzerocoin, false, false, true},
-        {"zerocoin", "resetspentzerocoin", &resetspentzerocoin, false, false, true},
-        {"zerocoin", "getarchivedzerocoin", &getarchivedzerocoin, false, false, true},
-        {"zerocoin", "importzerocoins", &importzerocoins, false, false, true},
-        {"zerocoin", "exportzerocoins", &exportzerocoins, false, false, true},
-        {"zerocoin", "reconsiderzerocoins", &reconsiderzerocoins, false, false, true},
-        {"zerocoin", "getspentzerocoinamount", &getspentzerocoinamount, false, false, false}
-
 #endif // ENABLE_WALLET
 };
 
@@ -1072,17 +1018,6 @@ json_spirit::Value CRPCTable::execute(const std::string& strMethod, const json_s
     } catch (std::exception& e) {
         throw JSONRPCError(RPC_MISC_ERROR, e.what());
     }
-}
-
-std::vector<std::string> CRPCTable::listCommands() const
-{
-    std::vector<std::string> commandList;
-    typedef std::map<std::string, const CRPCCommand*> commandMap;
-
-    std::transform( mapCommands.begin(), mapCommands.end(),
-                   std::back_inserter(commandList),
-                   boost::bind(&commandMap::value_type::first,_1) );
-    return commandList;
 }
 
 std::string HelpExampleCli(string methodname, string args)

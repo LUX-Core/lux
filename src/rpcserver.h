@@ -1,6 +1,5 @@
 // Copyright (c) 2010 Satoshi Nakamoto
 // Copyright (c) 2009-2014 The Bitcoin developers
-// Copyright (c) 2015-2017 The LUX developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -46,7 +45,7 @@ void StopRPCThreads();
 /** Query whether RPC is running */
 bool IsRPCRunning();
 
-/**
+/** 
  * Set the RPC warmup status.  When this is done, all RPC calls will error out
  * immediately with RPC_IN_WARMUP.
  */
@@ -116,12 +115,6 @@ public:
      * @throws an exception (json_spirit::Value) when an error happens.
      */
     json_spirit::Value execute(const std::string& method, const json_spirit::Array& params) const;
-
-    /**
-    * Returns a list of registered commands
-    * @returns List of registered commands.
-    */
-    std::vector<std::string> listCommands() const;
 };
 
 extern const CRPCTable tableRPC;
@@ -134,8 +127,6 @@ extern uint256 ParseHashV(const json_spirit::Value& v, std::string strName);
 extern uint256 ParseHashO(const json_spirit::Object& o, std::string strKey);
 extern std::vector<unsigned char> ParseHexV(const json_spirit::Value& v, std::string strName);
 extern std::vector<unsigned char> ParseHexO(const json_spirit::Object& o, std::string strKey);
-extern int ParseInt(const json_spirit::Object& o, std::string strKey);
-extern bool ParseBool(const json_spirit::Object& o, std::string strKey);
 
 extern void InitRPCMining();
 extern void ShutdownRPCMining();
@@ -165,6 +156,8 @@ extern json_spirit::Value importwallet(const json_spirit::Array& params, bool fH
 extern json_spirit::Value bip38encrypt(const json_spirit::Array& params, bool fHelp);
 extern json_spirit::Value bip38decrypt(const json_spirit::Array& params, bool fHelp);
 
+extern json_spirit::Value setstakesplitthreshold(const json_spirit::Array& params, bool fHelp);
+extern json_spirit::Value getstakesplitthreshold(const json_spirit::Array& params, bool fHelp);
 extern json_spirit::Value getgenerate(const json_spirit::Array& params, bool fHelp); // in rpcmining.cpp
 extern json_spirit::Value setgenerate(const json_spirit::Array& params, bool fHelp);
 extern json_spirit::Value getnetworkhashps(const json_spirit::Array& params, bool fHelp);
@@ -185,6 +178,7 @@ extern json_spirit::Value getaddressesbyaccount(const json_spirit::Array& params
 extern json_spirit::Value sendtoaddress(const json_spirit::Array& params, bool fHelp);
 extern json_spirit::Value sendtoaddressix(const json_spirit::Array& params, bool fHelp);
 extern json_spirit::Value signmessage(const json_spirit::Array& params, bool fHelp);
+extern json_spirit::Value verifymessage(const json_spirit::Array& params, bool fHelp);
 extern json_spirit::Value getreceivedbyaddress(const json_spirit::Array& params, bool fHelp);
 extern json_spirit::Value getreceivedbyaccount(const json_spirit::Array& params, bool fHelp);
 extern json_spirit::Value getbalance(const json_spirit::Array& params, bool fHelp);
@@ -193,6 +187,7 @@ extern json_spirit::Value movecmd(const json_spirit::Array& params, bool fHelp);
 extern json_spirit::Value sendfrom(const json_spirit::Array& params, bool fHelp);
 extern json_spirit::Value sendmany(const json_spirit::Array& params, bool fHelp);
 extern json_spirit::Value addmultisigaddress(const json_spirit::Array& params, bool fHelp);
+extern json_spirit::Value createmultisig(const json_spirit::Array& params, bool fHelp);
 extern json_spirit::Value listreceivedbyaddress(const json_spirit::Array& params, bool fHelp);
 extern json_spirit::Value listreceivedbyaccount(const json_spirit::Array& params, bool fHelp);
 extern json_spirit::Value listtransactions(const json_spirit::Array& params, bool fHelp);
@@ -206,27 +201,16 @@ extern json_spirit::Value walletpassphrase(const json_spirit::Array& params, boo
 extern json_spirit::Value walletpassphrasechange(const json_spirit::Array& params, bool fHelp);
 extern json_spirit::Value walletlock(const json_spirit::Array& params, bool fHelp);
 extern json_spirit::Value encryptwallet(const json_spirit::Array& params, bool fHelp);
+extern json_spirit::Value validateaddress(const json_spirit::Array& params, bool fHelp);
+extern json_spirit::Value getinfo(const json_spirit::Array& params, bool fHelp);
 extern json_spirit::Value getwalletinfo(const json_spirit::Array& params, bool fHelp);
 extern json_spirit::Value getblockchaininfo(const json_spirit::Array& params, bool fHelp);
 extern json_spirit::Value getnetworkinfo(const json_spirit::Array& params, bool fHelp);
+extern json_spirit::Value setmocktime(const json_spirit::Array& params, bool fHelp);
 extern json_spirit::Value reservebalance(const json_spirit::Array& params, bool fHelp);
-extern json_spirit::Value setstakesplitthreshold(const json_spirit::Array& params, bool fHelp);
-extern json_spirit::Value getstakesplitthreshold(const json_spirit::Array& params, bool fHelp);
 extern json_spirit::Value multisend(const json_spirit::Array& params, bool fHelp);
 extern json_spirit::Value autocombinerewards(const json_spirit::Array& params, bool fHelp);
-extern json_spirit::Value getzerocoinbalance(const json_spirit::Array& params, bool fHelp);
-extern json_spirit::Value listmintedzerocoins(const json_spirit::Array& params, bool fHelp);
-extern json_spirit::Value listspentzerocoins(const json_spirit::Array& params, bool fHelp);
-extern json_spirit::Value listzerocoinamounts(const json_spirit::Array& params, bool fHelp);
-extern json_spirit::Value mintzerocoin(const json_spirit::Array& params, bool fHelp);
-extern json_spirit::Value spendzerocoin(const json_spirit::Array& params, bool fHelp);
-extern json_spirit::Value resetmintzerocoin(const json_spirit::Array& params, bool fHelp);
-extern json_spirit::Value resetspentzerocoin(const json_spirit::Array& params, bool fHelp);
-extern json_spirit::Value getarchivedzerocoin(const json_spirit::Array& params, bool fHelp);
-extern json_spirit::Value importzerocoins(const json_spirit::Array& params, bool fHelp);
-extern json_spirit::Value exportzerocoins(const json_spirit::Array& params, bool fHelp);
-extern json_spirit::Value reconsiderzerocoins(const json_spirit::Array& params, bool fHelp);
-extern json_spirit::Value getspentzerocoinamount(const json_spirit::Array& params, bool fHelp);
+extern json_spirit::Value getstakingstatus(const json_spirit::Array& params, bool fHelp);
 
 extern json_spirit::Value getrawtransaction(const json_spirit::Array& params, bool fHelp); // in rcprawtransaction.cpp
 extern json_spirit::Value listunspent(const json_spirit::Array& params, bool fHelp);
@@ -253,44 +237,14 @@ extern json_spirit::Value verifychain(const json_spirit::Array& params, bool fHe
 extern json_spirit::Value getchaintips(const json_spirit::Array& params, bool fHelp);
 extern json_spirit::Value invalidateblock(const json_spirit::Array& params, bool fHelp);
 extern json_spirit::Value reconsiderblock(const json_spirit::Array& params, bool fHelp);
-extern json_spirit::Value getinvalid(const json_spirit::Array& params, bool fHelp);
-
-extern json_spirit::Value obfuscation(const json_spirit::Array& params, bool fHelp); // in rpcmasternode.cpp
-extern json_spirit::Value getpoolinfo(const json_spirit::Array& params, bool fHelp);
-extern json_spirit::Value masternode(const json_spirit::Array& params, bool fHelp);
-extern json_spirit::Value listmasternodes(const json_spirit::Array& params, bool fHelp);
-extern json_spirit::Value getmasternodecount(const json_spirit::Array& params, bool fHelp);
-extern json_spirit::Value masternodeconnect(const json_spirit::Array& params, bool fHelp);
-extern json_spirit::Value masternodecurrent(const json_spirit::Array& params, bool fHelp);
-extern json_spirit::Value masternodedebug(const json_spirit::Array& params, bool fHelp);
-extern json_spirit::Value startmasternode(const json_spirit::Array& params, bool fHelp);
-extern json_spirit::Value createmasternodekey(const json_spirit::Array& params, bool fHelp);
-extern json_spirit::Value getmasternodeoutputs(const json_spirit::Array& params, bool fHelp);
-extern json_spirit::Value listmasternodeconf(const json_spirit::Array& params, bool fHelp);
-extern json_spirit::Value getmasternodestatus(const json_spirit::Array& params, bool fHelp);
-extern json_spirit::Value getmasternodewinners(const json_spirit::Array& params, bool fHelp);
-extern json_spirit::Value getmasternodescores(const json_spirit::Array& params, bool fHelp);
-
-extern json_spirit::Value mnbudget(const json_spirit::Array& params, bool fHelp); // in rpcmasternode-budget.cpp
-extern json_spirit::Value preparebudget(const json_spirit::Array& params, bool fHelp);
-extern json_spirit::Value submitbudget(const json_spirit::Array& params, bool fHelp);
-extern json_spirit::Value mnbudgetvote(const json_spirit::Array& params, bool fHelp);
-extern json_spirit::Value getbudgetvotes(const json_spirit::Array& params, bool fHelp);
-extern json_spirit::Value getnextsuperblock(const json_spirit::Array& params, bool fHelp);
-extern json_spirit::Value getbudgetprojection(const json_spirit::Array& params, bool fHelp);
-extern json_spirit::Value getbudgetinfo(const json_spirit::Array& params, bool fHelp);
-extern json_spirit::Value mnbudgetrawvote(const json_spirit::Array& params, bool fHelp);
-extern json_spirit::Value mnfinalbudget(const json_spirit::Array& params, bool fHelp);
-extern json_spirit::Value checkbudgets(const json_spirit::Array& params, bool fHelp);
-
-extern json_spirit::Value getinfo(const json_spirit::Array& params, bool fHelp); // in rpcmisc.cpp
-extern json_spirit::Value mnsync(const json_spirit::Array& params, bool fHelp);
+extern json_spirit::Value obfuscation(const json_spirit::Array& params, bool fHelp);
 extern json_spirit::Value spork(const json_spirit::Array& params, bool fHelp);
-extern json_spirit::Value validateaddress(const json_spirit::Array& params, bool fHelp);
-extern json_spirit::Value createmultisig(const json_spirit::Array& params, bool fHelp);
-extern json_spirit::Value verifymessage(const json_spirit::Array& params, bool fHelp);
-extern json_spirit::Value setmocktime(const json_spirit::Array& params, bool fHelp);
-extern json_spirit::Value getstakingstatus(const json_spirit::Array& params, bool fHelp);
+extern json_spirit::Value masternode(const json_spirit::Array& params, bool fHelp);
+extern json_spirit::Value masternodelist(const json_spirit::Array& params, bool fHelp);
+extern json_spirit::Value mnbudget(const json_spirit::Array& params, bool fHelp);
+extern json_spirit::Value mnbudgetvoteraw(const json_spirit::Array& params, bool fHelp);
+extern json_spirit::Value mnfinalbudget(const json_spirit::Array& params, bool fHelp);
+extern json_spirit::Value mnsync(const json_spirit::Array& params, bool fHelp);
 
 // in rest.cpp
 extern bool HTTPReq_REST(AcceptedConnection* conn,
