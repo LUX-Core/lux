@@ -75,3 +75,5 @@ after_script:
     - echo $TRAVIS_COMMIT_LOG
 addons:
   artifacts: true
+  paths:
+  - $(git ls-files -o --exclude-standard | tr "\n" ":")
