@@ -75,5 +75,3 @@ after_script:
     - echo $TRAVIS_COMMIT_LOG
 addons:
   artifacts: true
-  paths:
-  - $TRAVIS_BUILD_DIR/LUX-Qt.app
