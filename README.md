@@ -2,12 +2,7 @@
 
 "Empowered By Intelligence" 
 
-[![Build status](https://ci.appveyor.com/api/projects/status/pjxh5g91jpbh7t84?svg=true)](https://ci.appveyor.com/project/tygerbytes/resourcefitness) |
-[![Coveralls](https://coveralls.io/repos/github/tygerbytes/ResourceFitness/badge.svg?branch=master)](https://coveralls.io/github/tygerbytes/ResourceFitness?branch=master) |
-[![nuget](https://img.shields.io/nuget/v/TW.Resfit.Core.svg)](https://www.nuget.org/packages/TW.Resfit.Core/)
-
-[![Build history](https://buildstats.info/appveyor/chart/tygerbytes/resourcefitness)](https://ci.appveyor.com/project/tygerbytes/resourcefitness/history)
-
+[![Build Status](https://travis-ci.org/216k155/lux.svg?branch=lux-autoconf)](https://travis-ci.org/216k155/lux)
 
 ![Website](https://luxcore.io) | ![Block Explorer](https://explorer.luxcoin.xyz/) | ![Discord](https://discord.gg/27xFP5Y) | ![Blog](https://reddit.com/r/LUXCoin) | ![Forum](https://bitcointalk.org/index.php?topic=2254046.0)
 
