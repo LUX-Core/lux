@@ -8,7 +8,7 @@
 #include "spork.h"
 
 //
-// Bootup the Masternode, look for a 10000 LUX input and register on the network
+// Bootup the Masternode, look for a 16120 LUX input and register on the network
 //
 void CActiveMasternode::ManageStatus()
 {
@@ -64,12 +64,12 @@ void CActiveMasternode::ManageStatus()
         }
 
         if (Params().NetworkID() == CBaseChainParams::MAIN) {
-            if (service.GetPort() != 51472) {
+            if (service.GetPort() != 28666) {
                 notCapableReason = strprintf("Invalid port: %u - only 51472 is supported on mainnet.", service.GetPort());
                 LogPrintf("CActiveMasternode::ManageStatus() - not capable: %s\n", notCapableReason);
                 return;
             }
-        } else if (service.GetPort() == 51472) {
+        } else if (service.GetPort() == 28666) {
             notCapableReason = strprintf("Invalid port: %u - 51472 is only supported on mainnet.", service.GetPort());
             LogPrintf("CActiveMasternode::ManageStatus() - not capable: %s\n", notCapableReason);
             return;
@@ -468,7 +468,7 @@ vector<COutput> CActiveMasternode::SelectCoinsMasternode()
 
     // Filter
     BOOST_FOREACH (const COutput& out, vCoins) {
-        if (out.tx->vout[out.i].nValue == 10000 * COIN) { //exactly
+        if (out.tx->vout[out.i].nValue == 16120 * COIN) { //exactly 16120 LUX
             filteredCoins.push_back(out);
         }
     }

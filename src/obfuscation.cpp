@@ -568,7 +568,7 @@ void CObfuscationPool::Check()
     }
 
     // reset if we're here for 10 seconds
-    if ((state == POOL_STATUS_ERROR || state == POOL_STATUS_SUCCESS) && GetTimeMillis() - lastTimeChanged >= 10000) {
+    if ((state == POOL_STATUS_ERROR || state == POOL_STATUS_SUCCESS) && GetTimeMillis() - lastTimeChanged >= 16120) {
         LogPrint("obfuscation", "CObfuscationPool::Check() -- timeout, RESETTING\n");
         UnlockCoins();
         SetNull();
