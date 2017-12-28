@@ -4,7 +4,7 @@
 
 [![Build Status](https://travis-ci.org/216k155/lux.svg?branch=lux-autoconf)](https://travis-ci.org/216k155/lux)
 
-![Website](https://luxcore.io) | ![Block Explorer](https://explorer.luxcoin.xyz/) | ![Discord](https://discord.gg/27xFP5Y) | ![Blog](https://reddit.com/r/LUXCoin) | ![Forum](https://bitcointalk.org/index.php?topic=2254046.0)
+[Website](https://luxcore.io) | [PoS Web Wallet](https://lux.poswallet.io) | [Block Explorer](https://explorer.luxcore.io/) | [Blog](https://reddit.com/r/LUXCoin) | [Forum](https://bitcointalk.org/index.php?topic=2254046.0) | [Discord](https://discord.gg/27xFP5Y) | [Telegram](https://t.me/LUXcoinOfficialChat) | [Twitter](https://twitter.com/LUX_Coin) |
 
 Features
 =============
