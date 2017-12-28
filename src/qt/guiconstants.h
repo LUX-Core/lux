@@ -47,7 +47,7 @@ static const int MAX_URI_LENGTH = 255;
 #define SPINNER_FRAMES 35
 
 #define QAPP_ORG_NAME "LUX"
-#define QAPP_ORG_DOMAIN "lux.org"
+#define QAPP_ORG_DOMAIN "luxcore.io"
 #define QAPP_APP_NAME_DEFAULT "LUX-Qt"
 #define QAPP_APP_NAME_TESTNET "LUX-Qt-testnet"
 
