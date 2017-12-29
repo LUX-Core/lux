@@ -4,7 +4,7 @@
 
 [![Build Status](https://travis-ci.org/216k155/lux.svg?branch=lux-autoconf)](https://travis-ci.org/216k155/lux)
 
-[Website](https://luxcore.io) | [PoS Web Wallet]() | [Block Explorer](https://explorer.luxcore.io/) | [Blog](https://reddit.com/r/LUXCoin) | [Forum](https://bitcointalk.org/index.php?topic=2254046.0) | [Discord](https://discord.gg/27xFP5Y) | [Telegram](https://t.me/LUXcoinOfficialChat) | [Twitter](https://twitter.com/LUX_Coin) |
+| [Website](https://luxcore.io) | [PoS Web Wallet]() | [Block Explorer](https://explorer.luxcore.io/) | [Blog](https://reddit.com/r/LUXCoin) | [Forum](https://bitcointalk.org/index.php?topic=2254046.0) | [Discord](https://discord.gg/27xFP5Y) | [Telegram](https://t.me/LUXcoinOfficialChat) | [Twitter](https://twitter.com/LUX_Coin) |
 
 Features
 =============
@@ -16,15 +16,13 @@ Features
 * New PHI1612 PoW/PoS hybrid algorithm
 * Static PoS
 
-The Luxcore Project  is a decentralized peer-to-peer banking financial platform, created under an open source license, featuring a built-in cryptocurrency, end-to-end encrypted messaging and decentralized marketplace. The decentralized network aims to provide anonymity and privacy for everyone through a simple user-friendly interface by taking care of all the advanced cryptography in the background. 
+The Luxcore Project is a decentralized peer-to-peer banking financial platform, created under an open source license, featuring a built-in cryptocurrency, end-to-end encrypted messaging and decentralized marketplace. The decentralized network aims to provide anonymity and privacy for everyone through a simple user-friendly interface by taking care of all the advanced cryptography in the background.
 
-The luxgate allow for communications among validated blockchain with the ability to perform tasks and advanced functions. Through the use of pmn, lux is able to interact many other popular blockchains and create a unifying bond among those ecosystems.
+The Luxgate allow for communications among validated blockchain with the ability to perform tasks and advanced functions. Through the use of Pmn, Lux is able to interact many other popular blockchains and create a unifying bond among those ecosystems.
 
-Lux doesnt provide direct support for dapp database. Instead, a mechanism to interact with other blockchain via luxgate function where other blockchain can send and recieve trigger function notices and international data through the lux network via pmn and luxgate. Pmn & luxgate can also be used to interact with the centralised services such as banker. Those centralism service can connect to the lux network for specific trigger of the luxgate via pmn. It will allow for their developed autonomous system to act base on their behalf. The pmn will then be developed by the connecting blockchain developer. Luxcore will have to supply a deployment guide to assist their developer. In other to assist the centralised services, lux will need to provide a centralised trustworthy environments. So user have their trusted oversight to verify that the transactions are legitmate
+Lux doesn't provide direct support for dapp database. Instead, a mechanism to interact with other Blockchain via Luxgate function where other Blockchain can send and receive trigger function notices and international data through the Lux network via Parallel Masternode (Pmn) and Luxgate. Pmn & Luxgate can also be used to interact with the centralized services such as banker. Those centralism service can connect to the Lux network for specific trigger of the Luxgate via Pmn. It will allow for their developed autonomous system to act base on their behalf. The Pmn will then be developed by the connecting Blockchain developer. Luxcore will have to supply a deployment guide to assist their developer. In other to assist the Centralized services, Lux will need to provide a centralized trustworthy environments. So user have their trusted oversight to verify that the transactions are legitimate
 
-In addition, without luxgate and pmn, bitcoin and ethereum cannot interact with each other on the same blockchain
-because of the technology is incompatible, it almost impossible before our pmn and luxgate functions implemented.
-Therefore, we have to introduce a smartcontract & segwit features in the next release to verify that we succeed to combine those different technology together to create a brand new unique features of LUX
+In addition, without Luxgate and Pmn, bitcoin and Ethereum cannot interact with each other on the same Blockchain because of the technology is incompatible, it almost impossible before our Pmn and Luxgate functions implemented. Therefore, we have to introduce a Smartcontract & Segwit features in the next release to verify that we succeed to combine those different technology together to create a brand new unique features of LUX
 
 ## Coin Specifications
 
