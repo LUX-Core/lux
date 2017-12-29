@@ -1122,9 +1122,9 @@ void tradingDialog::on_UpdateKeys_clicked(bool Save, bool Load)
 
     }else if ( ResponseObject.value("Success").toBool() == true && Load){
         QMessageBox::information(this,"API Configuration Complete","Your API keys have been loaded and the connection has been successfully configured and tested.");
-        ui->ApiKeyInput->setEchoMode(QLineEdit::Password);
-        ui->SecretKeyInput->setEchoMode(QLineEdit::Password);
-        ui->PasswordInput->setText("");
+        //ui->ApiKeyInput->setEchoMode(QLineEdit::Password);
+        //ui->SecretKeyInput->setEchoMode(QLineEdit::Password);
+        //ui->PasswordInput->setText("");
         ui->TradingTabWidget->setTabEnabled(0,true);
         ui->TradingTabWidget->setTabEnabled(1,true);
         ui->TradingTabWidget->setTabEnabled(3,true);
@@ -1132,9 +1132,9 @@ void tradingDialog::on_UpdateKeys_clicked(bool Save, bool Load)
         ui->TradingTabWidget->setTabEnabled(5,true);
     }else if ( ResponseObject.value("Success").toBool() == true && Save){
         QMessageBox::information(this,"API Configuration Complete","Your API keys have been saved and the connection has been successfully configured and tested.");
-        ui->ApiKeyInput->setEchoMode(QLineEdit::Password);
-        ui->SecretKeyInput->setEchoMode(QLineEdit::Password);
-        ui->PasswordInput->setText("");
+        //ui->ApiKeyInput->setEchoMode(QLineEdit::Password);
+        //ui->SecretKeyInput->setEchoMode(QLineEdit::Password);
+        //ui->PasswordInput->setText("");
         ui->TradingTabWidget->setTabEnabled(0,true);
         ui->TradingTabWidget->setTabEnabled(1,true);
         ui->TradingTabWidget->setTabEnabled(3,true);
@@ -1142,9 +1142,9 @@ void tradingDialog::on_UpdateKeys_clicked(bool Save, bool Load)
         ui->TradingTabWidget->setTabEnabled(5,true);
     }else{
         QMessageBox::information(this,"API Configuration Complete","Api connection has been successfully configured and tested.");
-        ui->ApiKeyInput->setEchoMode(QLineEdit::Password);
-        ui->SecretKeyInput->setEchoMode(QLineEdit::Password);
-        ui->PasswordInput->setText("");
+        //ui->ApiKeyInput->setEchoMode(QLineEdit::Password);
+        //ui->SecretKeyInput->setEchoMode(QLineEdit::Password);
+        //ui->PasswordInput->setText("");
         ui->TradingTabWidget->setTabEnabled(0,true);
         ui->TradingTabWidget->setTabEnabled(1,true);
         ui->TradingTabWidget->setTabEnabled(3,true);
@@ -1159,13 +1159,14 @@ string tradingDialog::encryptDecrypt(string toEncrypt, string password) {
     char * key = new char [password.size()+1];
     std::strcpy (key, password.c_str());
     key[password.size()] = '\0'; // don't forget the terminating 0
-
     string output = toEncrypt;
 
     for (unsigned int i = 0; i < toEncrypt.size(); i++)
-        output[i] = toEncrypt[i] ^ key[i % (sizeof(key) / sizeof(char))];
+        output[i] = toEncrypt[i] ^ key[i % (strlen(key) / sizeof(char))];
     return output;
 }
+
+
 
 void tradingDialog::on_SaveKeys_clicked()
 {
@@ -1174,7 +1175,7 @@ void tradingDialog::on_SaveKeys_clicked()
     boost::filesystem::ofstream stream (pathConfigFile.string(), ios::out | ios::trunc);
 
     // Qstring to string
-    string password = ui->PasswordInput->text().toUtf8().constData();
+    string password = ui->PasswordInput->text().toStdString();
 
     if (password.length() <= 6){
         QMessageBox::information(this,"Error !","Your password is too short !");
@@ -1183,15 +1184,15 @@ void tradingDialog::on_SaveKeys_clicked()
     }
 
     // qstrings to utf8, add to byteArray and convert to const char for stream
-    string Secret = ui->SecretKeyInput->text().toUtf8().constData();
-    string Key = ui->ApiKeyInput->text().toUtf8().constData();
+    string Secret = ui->SecretKeyInput->text().toStdString();
+    string Key = ui->ApiKeyInput->text().toStdString();
     string ESecret = "";
     string EKey = "";
 
     if (stream.is_open() && fSuccess)
     {
-        ESecret = encryptDecrypt(Secret, password);
-        EKey = encryptDecrypt(Key, password);
+        ESecret = EncodeBase64(encryptDecrypt(Secret, password));
+        EKey = EncodeBase64(encryptDecrypt(Key, password));
         stream << ESecret << '\n';
         stream << EKey;
         stream.close();
@@ -1229,10 +1230,10 @@ void tradingDialog::on_LoadKeys_clicked()
         for ( std::string line; std::getline(stream,line); )
         {
             if (i == 0 ){
-                DSecret = QString::fromUtf8(encryptDecrypt(line, password).c_str());
+                DSecret = QString::fromStdString(encryptDecrypt(DecodeBase64(line), password).c_str());
                 ui->SecretKeyInput->setText(DSecret);
             } else if (i == 1){
-                DKey = QString::fromUtf8(encryptDecrypt(line, password).c_str());
+                DKey = QString::fromStdString(encryptDecrypt(DecodeBase64(line), password).c_str());
                 ui->ApiKeyInput->setText(DKey);
             }
             i++;
