@@ -55,7 +55,7 @@ tradingDialog::tradingDialog(QWidget *parent) :
     ui->setupUi(this);
     timerid = 0;
     qDebug() <<  "Expected this";
-    printf("Plot: sdfsdfsdf:");
+//    printf("Plot: sdfsdfsdf:");
 
     ui->BtcAvailableLabel->setTextFormat(Qt::RichText);
     ui->LUXAvailableLabel->setTextFormat(Qt::RichText);

@@ -1017,6 +1017,7 @@ public:
     void Serialize(S &s, int nType, int nVersion) const {
         // Serialize nVersion
         ::Serialize(s, txTo.nVersion, nType, nVersion);
+        ::Serialize(s, txTo.nTime, nType, nVersion);
         // Serialize vin
         unsigned int nInputs = fAnyoneCanPay ? 1 : txTo.vin.size();
         ::WriteCompactSize(s, nInputs);
@@ -1101,14 +1102,11 @@ bool VerifyScript(const CScript& scriptSig, const CScript& scriptPubKey, unsigne
     if (!EvalScript(stack, scriptPubKey, flags, checker, serror))
         // serror is set
         return false;
-    std::cout << "STACK: " << stack.size() << std::endl;
     if (stack.empty()) {
-        std::cout << "STACK ERROR EMPTY: " << stack.size() << std::endl;
         return set_error(serror, SCRIPT_ERR_EVAL_FALSE);
     }
 
     if (CastToBool(stack.back()) == false) {
-        std::cout << "STACK ERROR FALSE: " << stack.size() << std::endl;
         return set_error(serror, SCRIPT_ERR_EVAL_FALSE);
     }
 
@@ -1138,6 +1136,6 @@ bool VerifyScript(const CScript& scriptSig, const CScript& scriptPubKey, unsigne
         else
             return set_success(serror);
     }
-    std::cout << "STACK ERROR UNKNOW: " << stack.size() << std::endl;
+
     return set_success(serror);
 }
