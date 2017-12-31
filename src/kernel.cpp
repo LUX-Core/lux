@@ -19,7 +19,6 @@ bool fTestNet = false; //Params().NetworkID() == CBaseChainParams::TESTNET;
 // Modifier interval: time to elapse before new modifier is computed
 // Set to 3-hour for production network and 20-minute for test network
 unsigned int nModifierInterval;
-int nStakeTargetSpacing = 60;
 unsigned int getIntervalVersion(bool fTestNet)
 {
     if (fTestNet)
@@ -81,7 +80,6 @@ static bool SelectBlockFromCandidates(
     const CBlockIndex** pindexSelected)
 {
     bool fModifierV2 = false;
-    bool fFirstRun = true;
     bool fSelected = false;
     uint256 hashBest = 0;
     *pindexSelected = (const CBlockIndex*)0;
@@ -92,13 +90,6 @@ static bool SelectBlockFromCandidates(
         const CBlockIndex* pindex = mapBlockIndex[item.second];
         if (fSelected && pindex->GetBlockTime() > nSelectionIntervalStop)
             break;
-
-        //if the lowest block height (vSortedByTimestamp[0]) is >= switch height, use new modifier calc
-        if (fFirstRun){
-            fModifierV2 = pindex->nHeight >= Params().ModifierUpgradeBlock();
-            fFirstRun = false;
-        }
-
         if (mapSelectedBlocks.count(pindex->GetBlockHash()) > 0)
             continue;
 
@@ -175,7 +166,7 @@ bool ComputeNextStakeModifier(const CBlockIndex* pindexPrev, uint64_t& nStakeMod
 
     // Sort candidate blocks by timestamp
     vector<pair<int64_t, uint256> > vSortedByTimestamp;
-    vSortedByTimestamp.reserve(64 * getIntervalVersion(fTestNet) / nStakeTargetSpacing);
+    vSortedByTimestamp.reserve(64 * getIntervalVersion(fTestNet) / GetTargetSpacing(pindexPrev->nHeight));
     int64_t nSelectionInterval = GetStakeModifierSelectionInterval();
     int64_t nSelectionIntervalStart = (pindexPrev->GetBlockTime() / getIntervalVersion(fTestNet)) * getIntervalVersion(fTestNet) - nSelectionInterval;
     const CBlockIndex* pindex = pindexPrev;
@@ -292,6 +283,8 @@ bool stakeTargetHit(uint256 hashProofOfStake, int64_t nValueIn, uint256 bnTarget
 //instead of looping outside and reinitializing variables many times, we will give a nTimeTx and also search interval so that we can do all the hashing here
 bool CheckStakeKernelHash(unsigned int nBits, const CBlock blockFrom, const CTransaction txPrev, const COutPoint prevout, unsigned int& nTimeTx, unsigned int nHashDrift, bool fCheck, uint256& hashProofOfStake, bool fPrintProofOfStake)
 {
+    const CBlockIndex* pindexPrev = pindexBestHeader;
+    std::cout << "CheckStakeKernelHash: " << pindexPrev->nHeight << std::endl;
     if (nTimeTx < txPrev.nTime)  // Transaction timestamp violation
         return error("CheckStakeKernelHash() : nTime violation");
 
@@ -302,23 +295,38 @@ bool CheckStakeKernelHash(unsigned int nBits, const CBlock blockFrom, const CTra
     uint256 bnTarget;
     bnTarget.SetCompact(nBits);
 
+    std::cout << "bnTarget: " << bnTarget.GetHex() << std::endl;
+
+
     // Weighted target
     int64_t nValueIn = txPrev.vout[prevout.n].nValue;
     uint256 bnWeight = uint256(nValueIn);
     bnTarget *= bnWeight;
 
-    uint64_t nStakeModifier = 0;
-    int nStakeModifierHeight = 0;
-    int64_t nStakeModifierTime = 0;
-    if (!GetKernelStakeModifier(blockFrom.GetHash(), nStakeModifier, nStakeModifierHeight, nStakeModifierTime, fPrintProofOfStake)) {
-        LogPrintf("CheckStakeKernelHash(): failed to get kernel stake modifier \n");
-        return false;
-    }
+    std::cout << "targetProofOfStake: " << bnTarget.GetHex() << std::endl;
+
+
+    uint64_t nStakeModifier = pindexPrev->nStakeModifier;
+    int nStakeModifierHeight = pindexPrev->nHeight;
+    int64_t nStakeModifierTime = pindexPrev->nTime;
+//    if (!GetKernelStakeModifier(blockFrom.GetHash(), nStakeModifier, nStakeModifierHeight, nStakeModifierTime, fPrintProofOfStake)) {
+//        LogPrintf("CheckStakeKernelHash(): failed to get kernel stake modifier \n");
+//        return false;
+//    }
+
+    std::cout << "nStakeModifier: " << nStakeModifier << std::endl;
+    std::cout << "nStakeModifierHeight: " << nStakeModifierHeight << std::endl;
+    std::cout << "nStakeModifierTime: " << nStakeModifierTime << std::endl;
+
 
     // Calculate hash
     CDataStream ss(SER_GETHASH, 0);
-    ss << nStakeModifier << blockFrom.GetBlockTime() << txPrev.nTime << prevout.hash << prevout.n << nTimeTx;
+    unsigned int nTimeBlockFrom = blockFrom.GetBlockTime();
+    ss << nStakeModifier << nTimeBlockFrom << txPrev.nTime << prevout.hash << prevout.n << nTimeTx;
     hashProofOfStake = Hash(ss.begin(), ss.end());
+
+    std::cout << "hashProofOfStake: " << hashProofOfStake.GetHex() << std::endl;
+
 
     if (fPrintProofOfStake)
     {
