@@ -1,0 +1,4 @@
+obj/crypto/sha1.o: crypto/sha1.cpp /home/k155/lux-ex/src/crypto/sha1.h \
+ /home/k155/lux-ex/src/crypto/common.h
+crypto/sha1.cpp /home/k155/lux-ex/src/crypto/sha1.h :
+ /home/k155/lux-ex/src/crypto/common.h :

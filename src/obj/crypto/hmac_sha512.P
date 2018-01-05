@@ -1,0 +1,6 @@
+obj/crypto/hmac_sha512.o: crypto/hmac_sha512.cpp \
+ /home/k155/lux-ex/src/crypto/hmac_sha512.h \
+ /home/k155/lux-ex/src/crypto/sha512.h
+crypto/hmac_sha512.cpp :
+ /home/k155/lux-ex/src/crypto/hmac_sha512.h :
+ /home/k155/lux-ex/src/crypto/sha512.h :
