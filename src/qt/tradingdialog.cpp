@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 //
 // Created by 216k155 on 12/26/17.
 //
@@ -3275,4 +3275,3 @@ tradingDialog::~tradingDialog()
 {
     delete ui;
 }
->>>>>>> master
