@@ -186,7 +186,7 @@ class Repairer {
     reporter.env = env_;
     reporter.info_log = options_.info_log;
     reporter.lognum = log;
-    // We intentially make log::Reader do checksumming so that
+    // We intentionally make log::Reader do checksumming so that
     // corruptions cause entire commits to be skipped instead of
     // propagating bad information (like overly large sequence
     // numbers).
@@ -242,7 +242,6 @@ class Repairer {
   }
 
   void ExtractMetaData() {
-    std::vector<TableInfo> kept;
     for (size_t i = 0; i < table_numbers_.size(); i++) {
       ScanTable(table_numbers_[i]);
     }

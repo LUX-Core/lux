@@ -6,21 +6,18 @@
 #ifndef BITCOIN_UI_INTERFACE_H
 #define BITCOIN_UI_INTERFACE_H
 
-#include <boost/signals2/last_value.hpp>
-#include <boost/signals2/signal.hpp>
-
+#include <stdint.h>
 #include <string>
 
-#include <stdint.h>
+#include <boost/signals2/last_value.hpp>
+#include <boost/signals2/signal.hpp>
 
 class CBasicKeyStore;
 class CWallet;
 class uint256;
-class CAdrenalineNodeConfig;
 
 /** General change type (added, updated, removed). */
-enum ChangeType
-{
+enum ChangeType {
     CT_NEW,
     CT_UPDATED,
     CT_DELETED
@@ -31,11 +28,10 @@ class CClientUIInterface
 {
 public:
     /** Flags for CClientUIInterface::ThreadSafeMessageBox */
-    enum MessageBoxFlags
-    {
-        ICON_INFORMATION    = 0,
-        ICON_WARNING        = (1U << 0),
-        ICON_ERROR          = (1U << 1),
+    enum MessageBoxFlags {
+        ICON_INFORMATION = 0,
+        ICON_WARNING = (1U << 0),
+        ICON_ERROR = (1U << 1),
         /**
          * Mask of all available icons in CClientUIInterface::MessageBoxFlags
          * This needs to be updated, when icons are changed there!
@@ -43,59 +39,68 @@ public:
         ICON_MASK = (ICON_INFORMATION | ICON_WARNING | ICON_ERROR),
 
         /** These values are taken from qmessagebox.h "enum StandardButton" to be directly usable */
-        BTN_OK      = 0x00000400U, // QMessageBox::Ok
-        BTN_YES     = 0x00004000U, // QMessageBox::Yes
-        BTN_NO      = 0x00010000U, // QMessageBox::No
-        BTN_ABORT   = 0x00040000U, // QMessageBox::Abort
-        BTN_RETRY   = 0x00080000U, // QMessageBox::Retry
-        BTN_IGNORE  = 0x00100000U, // QMessageBox::Ignore
-        BTN_CLOSE   = 0x00200000U, // QMessageBox::Close
-        BTN_CANCEL  = 0x00400000U, // QMessageBox::Cancel
+        BTN_OK = 0x00000400U,      // QMessageBox::Ok
+        BTN_YES = 0x00004000U,     // QMessageBox::Yes
+        BTN_NO = 0x00010000U,      // QMessageBox::No
+        BTN_ABORT = 0x00040000U,   // QMessageBox::Abort
+        BTN_RETRY = 0x00080000U,   // QMessageBox::Retry
+        BTN_IGNORE = 0x00100000U,  // QMessageBox::Ignore
+        BTN_CLOSE = 0x00200000U,   // QMessageBox::Close
+        BTN_CANCEL = 0x00400000U,  // QMessageBox::Cancel
         BTN_DISCARD = 0x00800000U, // QMessageBox::Discard
-        BTN_HELP    = 0x01000000U, // QMessageBox::Help
-        BTN_APPLY   = 0x02000000U, // QMessageBox::Apply
-        BTN_RESET   = 0x04000000U, // QMessageBox::Reset
+        BTN_HELP = 0x01000000U,    // QMessageBox::Help
+        BTN_APPLY = 0x02000000U,   // QMessageBox::Apply
+        BTN_RESET = 0x04000000U,   // QMessageBox::Reset
         /**
          * Mask of all available buttons in CClientUIInterface::MessageBoxFlags
          * This needs to be updated, when buttons are changed there!
          */
         BTN_MASK = (BTN_OK | BTN_YES | BTN_NO | BTN_ABORT | BTN_RETRY | BTN_IGNORE |
-                    BTN_CLOSE | BTN_CANCEL | BTN_DISCARD | BTN_HELP | BTN_APPLY | BTN_RESET),
+                    BTN_CLOSE |
+                    BTN_CANCEL |
+                    BTN_DISCARD |
+                    BTN_HELP |
+                    BTN_APPLY |
+                    BTN_RESET),
 
         /** Force blocking, modal message box dialog (not just OS notification) */
-        MODAL               = 0x10000000U,
+        MODAL = 0x10000000U,
+
+        /** Do not print contents of message to debug log */
+        SECURE = 0x40000000U,
 
         /** Predefined combinations for certain default usage cases */
-        MSG_INFORMATION = (ICON_INFORMATION | BTN_OK),
+        MSG_INFORMATION = ICON_INFORMATION,
         MSG_WARNING = (ICON_WARNING | BTN_OK | MODAL),
         MSG_ERROR = (ICON_ERROR | BTN_OK | MODAL)
     };
 
     /** Show message box. */
-    boost::signals2::signal<void (const std::string& message, const std::string& caption, unsigned int style)> ThreadSafeMessageBox;
-
-    /** Ask the user whether they want to pay a fee or not. */
-    boost::signals2::signal<bool (int64_t nFeeRequired, const std::string& strCaption), boost::signals2::last_value<bool> > ThreadSafeAskFee;
-
-    /** Handle a URL passed at the command line. */
-    boost::signals2::signal<void (const std::string& strURI)> ThreadSafeHandleURI;
+    boost::signals2::signal<bool(const std::string& message, const std::string& caption, unsigned int style), boost::signals2::last_value<bool> > ThreadSafeMessageBox;
 
     /** Progress message during initialization. */
-    boost::signals2::signal<void (const std::string &message)> InitMessage;
+    boost::signals2::signal<void(const std::string& message)> InitMessage;
 
     /** Translate a message to the native language of the user. */
-    boost::signals2::signal<std::string (const char* psz)> Translate;
+    boost::signals2::signal<std::string(const char* psz)> Translate;
 
     /** Number of network connections changed. */
-    boost::signals2::signal<void (int newNumConnections)> NotifyNumConnectionsChanged;
+    boost::signals2::signal<void(int newNumConnections)> NotifyNumConnectionsChanged;
 
     /**
      * New, updated or cancelled alert.
      * @note called with lock cs_mapAlerts held.
      */
-    boost::signals2::signal<void (const uint256 &hash, ChangeType status)> NotifyAlertChanged;
+    boost::signals2::signal<void(const uint256& hash, ChangeType status)> NotifyAlertChanged;
 
-    boost::signals2::signal<void (CAdrenalineNodeConfig nodeConfig)> NotifyAdrenalineNodeChanged;
+    /** A wallet has been loaded. */
+    boost::signals2::signal<void(CWallet* wallet)> LoadWallet;
+
+    /** Show progress e.g. for verifychain */
+    boost::signals2::signal<void(const std::string& title, int nProgress)> ShowProgress;
+
+    /** New block has been accepted */
+    boost::signals2::signal<void(const uint256& hash)> NotifyBlockTip;
 };
 
 extern CClientUIInterface uiInterface;
@@ -110,4 +115,4 @@ inline std::string _(const char* psz)
     return rv ? (*rv) : psz;
 }
 
-#endif
+#endif // BITCOIN_UI_INTERFACE_H

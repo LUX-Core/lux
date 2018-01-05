@@ -1,19 +1,28 @@
-#ifndef TRANSACTIONVIEW_H
-#define TRANSACTIONVIEW_H
+// Copyright (c) 2011-2013 The Bitcoin developers
+// Distributed under the MIT/X11 software license, see the accompanying
+// file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
+#ifndef BITCOIN_QT_TRANSACTIONVIEW_H
+#define BITCOIN_QT_TRANSACTIONVIEW_H
+
+#include "guiutil.h"
+
+#include <QKeyEvent>
 #include <QWidget>
 
-class WalletModel;
 class TransactionFilterProxy;
+class WalletModel;
 
 QT_BEGIN_NAMESPACE
-class QTableView;
 class QComboBox;
-class QLineEdit;
-class QModelIndex;
-class QMenu;
-class QFrame;
 class QDateTimeEdit;
+class QFrame;
+class QItemSelectionModel;
+class QLineEdit;
+class QMenu;
+class QModelIndex;
+class QSignalMapper;
+class QTableView;
 QT_END_NAMESPACE
 
 /** Widget showing the transaction list for a wallet, including a filter row.
@@ -24,13 +33,12 @@ class TransactionView : public QWidget
     Q_OBJECT
 
 public:
-    explicit TransactionView(QWidget *parent = 0);
+    explicit TransactionView(QWidget* parent = 0);
 
-    void setModel(WalletModel *model);
+    void setModel(WalletModel* model);
 
     // Date ranges for filter
-    enum DateEnum
-    {
+    enum DateEnum {
         All,
         Today,
         ThisWeek,
@@ -40,26 +48,42 @@ public:
         Range
     };
 
+    enum ColumnWidths {
+        STATUS_COLUMN_WIDTH = 23,
+        WATCHONLY_COLUMN_WIDTH = 23,
+        DATE_COLUMN_WIDTH = 120,
+        TYPE_COLUMN_WIDTH = 240,
+        AMOUNT_MINIMUM_COLUMN_WIDTH = 120,
+        MINIMUM_COLUMN_WIDTH = 23
+    };
+
 private:
-    WalletModel *model;
-    TransactionFilterProxy *transactionProxyModel;
-    QTableView *transactionView;
+    WalletModel* model;
+    TransactionFilterProxy* transactionProxyModel;
+    QTableView* transactionView;
+    QComboBox* dateWidget;
+    QComboBox* typeWidget;
+    QComboBox* watchOnlyWidget;
+    QLineEdit* addressWidget;
+    QLineEdit* amountWidget;
 
-    QComboBox *dateWidget;
-    QComboBox *typeWidget;
-    QLineEdit *addressWidget;
-    QLineEdit *amountWidget;
+    QMenu* contextMenu;
+    QSignalMapper* mapperThirdPartyTxUrls;
 
-    QMenu *contextMenu;
+    QFrame* dateRangeWidget;
+    QDateTimeEdit* dateFrom;
+    QDateTimeEdit* dateTo;
 
-    QFrame *dateRangeWidget;
-    QDateTimeEdit *dateFrom;
-    QDateTimeEdit *dateTo;
+    QWidget* createDateRangeWidget();
 
-    QWidget *createDateRangeWidget();
+    GUIUtil::TableViewLastColumnResizingFixer* columnResizingFixer;
+
+    virtual void resizeEvent(QResizeEvent* event);
+
+    bool eventFilter(QObject* obj, QEvent* event);
 
 private slots:
-    void contextualMenu(const QPoint &);
+    void contextualMenu(const QPoint&);
     void dateRangeChanged();
     void showDetails();
     void copyAddress();
@@ -67,18 +91,27 @@ private slots:
     void copyLabel();
     void copyAmount();
     void copyTxID();
+    void openThirdPartyTxUrl(QString url);
+    void updateWatchOnlyColumn(bool fHaveWatchOnly);
 
 signals:
     void doubleClicked(const QModelIndex&);
 
+    /**  Fired when a message should be reported to the user */
+    void message(const QString& title, const QString& message, unsigned int style);
+
+    /** Send computed sum back to wallet-view */
+    void trxAmount(QString amount);
+
 public slots:
     void chooseDate(int idx);
     void chooseType(int idx);
-    void changedPrefix(const QString &prefix);
-    void changedAmount(const QString &amount);
+    void chooseWatchonly(int idx);
+    void changedPrefix(const QString& prefix);
+    void changedAmount(const QString& amount);
     void exportClicked();
     void focusTransaction(const QModelIndex&);
-
+    void computeSum();
 };
 
-#endif // TRANSACTIONVIEW_H
+#endif // BITCOIN_QT_TRANSACTIONVIEW_H

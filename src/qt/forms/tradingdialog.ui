@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>tradingDialog</class>
- <widget class="QDialog" name="tradingDialog">
+ <widget class="QWidget" name="tradingDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -1242,15 +1242,7 @@
          </property>
         </widget>
        </item>
-       <item row="5" column="2">
-        <widget class="QComboBox" name="BuyBidcomboBox">
-         <property name="font">
-          <font>
-           <pointsize>10</pointsize>
-          </font>
-         </property>
-        </widget>
-       </item>
+
        <item row="5" column="3">
         <widget class="QLineEdit" name="BuyBidPriceEdit">
          <property name="minimumSize">
@@ -1275,15 +1267,7 @@
          </property>
         </widget>
        </item>
-       <item row="5" column="8">
-        <widget class="QComboBox" name="SellBidcomboBox">
-         <property name="font">
-          <font>
-           <pointsize>10</pointsize>
-          </font>
-         </property>
-        </widget>
-       </item>
+
        <item row="5" column="9">
         <widget class="QLineEdit" name="SellBidPriceEdit">
          <property name="minimumSize">

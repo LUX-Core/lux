@@ -1,0 +1,26 @@
+# /etc/conf.d/luxd: config file for /etc/init.d/luxd
+
+# Config file location
+#BITCOIND_CONFIGFILE="/etc/lux/lux.conf"
+
+# What directory to write pidfile to?  (created and owned by $BITCOIND_USER)
+#BITCOIND_PIDDIR="/var/run/luxd"
+
+# What filename to give the pidfile
+#BITCOIND_PIDFILE="${BITCOIND_PIDDIR}/luxd.pid"
+
+# Where to write luxd data (be mindful that the blockchain is large)
+#BITCOIND_DATADIR="/var/lib/luxd"
+
+# User and group to own luxd process
+#BITCOIND_USER="lux"
+#BITCOIND_GROUP="lux"
+
+# Path to luxd executable
+#BITCOIND_BIN="/usr/bin/luxd"
+
+# Nice value to run luxd under
+#BITCOIND_NICE=0
+
+# Additional options (avoid -conf and -datadir, use flags above)
+BITCOIND_OPTS=""

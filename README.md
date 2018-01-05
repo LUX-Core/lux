@@ -1,219 +1,194 @@
-![Luxcoin Logo](https://i.imgur.com/NGH5SmR.png)
+![Luxcoin Logo](https://i.imgur.com/0Dtm0qk.png)
 
-"Developed For Mining And Trading Pleasure" 
+"Empowered By Intelligence" 
 
-[![Discord](https://discord.gg/27xFP5Y)](https://discord.gg/27xFP5Y)
+[![Build Status](https://travis-ci.org/216k155/lux.svg?branch=lux-autoconf)](https://travis-ci.org/216k155/lux)
+<a href="https://discord.gg/27xFP5Y"><img src="https://discordapp.com/api/guilds/364500397999652866/embed.png" alt="Discord server" /></a>
 
-Introduction
+[![Build history](https://buildstats.info/travisci/chart/216k155/lux?branch=lux-autoconf)](https://travis-ci.org/216k155/lux?branch=lux-autoconf)
+
+| [Website](https://luxcore.io) | [PoS Web Wallet]() | [Block Explorer](https://explorer.luxcore.io/) | [Blog](https://reddit.com/r/LUXCoin) | [Forum](https://bitcointalk.org/index.php?topic=2254046.0)| [Telegram](https://t.me/LUXcoinOfficialChat) | [Twitter](https://twitter.com/LUX_Coin) |
+
+Features
 =============
 
-+New PHI1612 PoW/PoS Hybrid Algorithm Implemented
-+Masternode + Parallel masternode implemented
-+Static PoS implemented
-+I2p full C++ implemented
-+Luxgate implemented
+* Luxgate - Parallel masternode / masternode
+* Segwit
+* Smart contract 
+* Luxgate
+* New PHI1612 PoW/PoS hybrid algorithm
+* Static PoS
 
-The Luxcore Project  is a decentralized peer-to-peer banking financial platform, created under an open source license, featuring a built-in cryptocurrency, end-to-end encrypted messaging and decentralized marketplace. The decentralized network aims to provide anonymity and privacy for everyone through a simple user-friendly interface by taking care of all the advanced cryptography in the background. 
+The Luxcore Project is a decentralized peer-to-peer banking financial platform, created under an open source license, featuring a built-in cryptocurrency, end-to-end encrypted messaging and decentralized marketplace. The decentralized network aims to provide anonymity and privacy for everyone through a simple user-friendly interface by taking care of all the advanced cryptography in the background.
 
-* [Website](https://luxcore.io)
-* [Website](https://luxcoin.tech)
-* [Blog](https://reddit.com/r/LUXCoin)
-* [Block Explorer](https://explorer.luxcoin.xyz/)
-* [Forum](https://bitcointalk.org/index.php?topic=2254046.0)
+The Luxgate allow for communications among validated blockchain with the ability to perform tasks and advanced functions. Through the use of Pmn, Lux is able to interact many other popular blockchains and create a unifying bond among those ecosystems.
 
+Lux doesn't provide direct support for dapp database. Instead, a mechanism to interact with other Blockchain via Luxgate function where other Blockchain can send and receive trigger function notices and international data through the Lux network via Parallel Masternode (Pmn) and Luxgate. Pmn & Luxgate can also be used to interact with the centralized services such as banker. Those centralism service can connect to the Lux network for specific trigger of the Luxgate via Pmn. It will allow for their developed autonomous system to act base on their behalf. The Pmn will then be developed by the connecting Blockchain developer. Luxcore will have to supply a deployment guide to assist their developer. In other to assist the Centralized services, Lux will need to provide a centralized trustworthy environments. So user have their trusted oversight to verify that the transactions are legitimate
 
+In addition, without Luxgate and Pmn, bitcoin and Ethereum cannot interact with each other on the same Blockchain because of the technology is incompatible, it almost impossible before our Pmn and Luxgate functions implemented. Therefore, we have to introduce a Smartcontract & Segwit features in the next release to verify that we succeed to combine those different technology together to create a brand new unique features of LUX
 
-Releases
-===========================
-[Click on this link to go to the latest release - v2.2.1](https://github.com/216k155/lux/releases/latest)
+## Coin Specifications
 
-Supported Operating Systems:
-* Linux (64 bit)
-* Linux (32 bit)
-* Windows (32 bit)
-* Windows (64 bit)
-
-Development process
-===========================
-
-# Version 2.2.3
-===============
-+Fixed Masternode payment error
-
-# Version 2.2.2
-===============
-+Fixed Masternode Pubkey
-+Added Masternode Config
-
-# Version 2.2.1
-===============
-+Upgraded QT wallet UI
-+Added PoS automate function
-+Added client control function
-+Added network statistics into block explorer 
-+Redesign dashboard tab
-
-# Version 2.2.0
-===============
-+Fixed Sync error
-+Fixed seednode
-+Fixed network protocol
-+Fixed some typo
-
-# Version 2.1.0
-===============
-+Fixed Typo
-+Added new checkpoint
-+Added Block brownser.cpp & blockbrownser.h
-+Update QT wallet UI
-+Added Block Explorer UI
-
-# Version 2.0.0
-==============
-+Reduced outbounce connection to 12
-+Add more seednodes
-+Inscreased faster peers
-+Fixed qt version missmatch
+| Specification | Value |
+|:-----------|:-----------|
+| Total Blocks | `6,000,000` |
+| Block Size | `4MB` |
+| Block Time | `60s` |
+| PoW Reward | `10 LUX` |
+| PoS Reward | `1 LUX` |
+| Stake Time | `36 hours` |
+| Masternode Requirement | `16,120 LUX` |
+| Masternode Reward | `40% PoS Block ` |
+| Port | `28666` |
+| RPC Port | `9888` |
+| Masternode Port | `28666` |
 
 
-Lux Detail:
------------
-lux.conf
-	server=1
+Build Lux wallet
+----------
 
-	daemon=1
+### Building for 64-bit Windows
 
-	listen=1
+The first step is to install the mingw-w64 cross-compilation tool chain. Due to different Ubuntu packages for each distribution and problems with the Xenial packages the steps for each are different.
 
-	rpcuser=your-user-name
+Common steps to install mingw32 cross compiler tool chain:
 
-	rpcpassword=your-password
+    sudo apt install g++-mingw-w64-x86-64
+    
+Ubuntu Xenial 16.04 and Windows Subsystem for Linux
 
-	rpcport=9898
+    sudo apt install software-properties-common
+    sudo add-apt-repository "deb http://archive.ubuntu.com/ubuntu zesty universe"
+    sudo apt update
+    sudo apt upgrade
+    sudo update-alternatives --config x86_64-w64-mingw32-g++ # Set the default mingw32 g++ compiler option to posix.
+    
+Once the tool chain is installed the build steps are common:
 
-	rpcallowip=127.0.0.1
+Note that for WSL the Lux Core source path MUST be somewhere in the default mount file system, for example /usr/src/lux, AND not under /mnt/d/. If this is not the case the dependency autoconf scripts will fail. This means you cannot use a directory that located directly on the host Windows file system to perform the build.
 
-	staking=1
+The next three steps are an example of how to acquire the source in an appropriate way.
 
-PoW rewards
------------
-	// miner's coin base reward
-	// First block reward                              -----------------------(Official reward)---------------------------
-	// Initilised B'd reward for LUX at block 1001000  -----------------------(Special event)-----------------------------
+    cd /usr/src
+    sudo git clone https://github.com/216k155/lux.git
+    sudo chmod -R a+rw lux
+    
+Once the source code is ready the build steps are below.
 
-    int64_t GetProofOfWorkReward(int64_t nFees, int nHeight)
-    {
-    int64_t nSubsidy = 1 * COIN;
+    PATH=$(echo "$PATH" | sed -e 's/:\/mnt.*//g') # strip out problematic Windows %PATH% imported var
+    cd depends
+    make HOST=x86_64-w64-mingw32
+    cd ..
+    ./autogen.sh # not required when building from tarball
+    CONFIG_SITE=$PWD/depends/x86_64-w64-mingw32/share/config.site 
+    ./configure --prefix=/ --disable-tests
+    make HOST=x86_64-w64-mingw32 -j4
 
-    if(pindexBest->nHeight == 1)
-    {
-        nSubsidy = 3000000 * COIN;                     // Initilised static pre-mine
-    }
-        else if(pindexBest->nHeight < 500)             // First halving - Activated instamine protection 
-    {
-        nSubsidy = 1 * COIN;   // ~500
-    }
-        else if(pindexBest->nHeight == 501)            // Official Bonus Rewards 
-    {
-        nSubsidy = 1000 * COIN; // 1000                // 1000 LUX for the first block mined after instamine protection
-    }
-        else if(pindexBest->nHeight < 1000000)         // Second halving - Initilised normal blockchain
-    {
-        nSubsidy = 10 * COIN;  // ~10m
-    }
-        else if(pindexBest->nHeight < 1001000)         // Third halving - Superblock rewards | Happy Birthday Lux 1 Year | 10/10/2018 | 30 LUX/block reward 
-    {
-        nSubsidy = 30 * COIN;  // ~30,000 reward to miner
-    }
-        else if(pindexBest->nHeight < 5000000)         // Last halving - Re-activate normal blockchain
-    {
-        nSubsidy = 10 * COIN;  // ~10m
-    }
-		else if(pindexBest->nHeight < 6000000) // PoW end block 6m - Reduce block reward | Automatic initilised new blockchain after 6m blocks 
-    {
-        nSubsidy = 10 * COIN;  // ~10m
-    }
-        else
-    {
-        nSubsidy = 1 * COIN; 
-    }
+### Build on Ubuntu
 
-    LogPrint("creation", "GetProofOfWorkReward() : create=%s nSubsidy=%d nHeight=%d\n", FormatMoney(nSubsidy), nSubsidy, nHeight);
+    sudo apt-get install build-essential libtool autotools-dev automake pkg-config libssl-dev libevent-dev bsdmainutils git cmake libboost-all-dev
+    sudo apt-get install software-properties-common
+    sudo add-apt-repository ppa:bitcoin/bitcoin
+    sudo apt-get update
+    sudo apt-get install libdb4.8-dev libdb4.8++-dev
 
-    return nSubsidy + nFees;
-	} 
+    # If you want to build the Qt GUI:
+    sudo apt-get install libqt5gui5 libqt5core5a libqt5dbus5 qttools5-dev qttools5-dev-tools libprotobuf-dev protobuf-compiler
 
-PoS rewards
------------
-	// Miner's coin stake reward based on coin age spent (coin-days)
-	int64_t GetProofOfStakeReward(int64_t nCoinAge, int64_t nFees, int nHeight)
-	{
-    int64_t nSubsidy = 1 * COIN;
+    git clone https://github.com/216k155/lux --recursive
+    
+    cd lux
 
-    if(pindexBest->nHeight < 100000) // First 100,000 blocks double stake for masternode ready
-    {
-        nSubsidy = 2 * COIN;
-    }
-        else
-    {
-        nSubsidy = 1 * COIN;
-    }
+    # Note autogen will prompt to install some more dependencies if needed
+    ./autogen.sh
+    ./configure 
+    make -j4
+
+### Build on OSX
+
+The commands in this guide should be executed in a Terminal application.
+The built-in one is located in `/Applications/Utilities/Terminal.app`.
+
+#### Preparation
+
+Install the OS X command line tools:
+
+`xcode-select --install`
+
+When the popup appears, click `Install`.
+
+Then install [Homebrew](https://brew.sh).
+
+#### Dependencies
+
+    brew install cmake automake berkeley-db4 libtool boost --c++11 --without-single --without-static miniupnpc openssl pkg-config protobuf qt5 libevent imagemagick --with-librsvg
+
+NOTE: Building with Qt4 is still supported, however, could result in a broken UI. Building with Qt5 is recommended.
+
+#### Build Lux Core
+
+1. Clone the Lux source code and cd into `Lux`
+
+        git clone --recursive https://github.com/216k155/lux.git
+        cd Lux
+
+2.  Build Luxcore:
+
+    Configure and build the headless Lux binaries as well as the GUI (if Qt is found).
+
+    You can disable the GUI build by passing `--without-gui` to configure.
+
+        ./autogen.sh
+        ./configure
+        make
+
+3.  It is recommended to build and run the unit tests:
+
+        make check
+
+### Run
+
+Then you can either run the command-line daemon using `src/Luxd` and `src/Lux-cli`, or you can run the Qt GUI using `src/qt/Lux-qt`
+
+For in-depth description of Sparknet and how to use Lux for interacting with contracts, please see [sparknet-guide](doc/sparknet-guide.md).
+
+License
+-------
+
+Luxcore is GPLv3 licensed.
+
+Development Process
+-------------------
+
+The `master` branch is regularly built and tested, but is not guaranteed to be
+completely stable. [Tags](https://github.com/216k155/lux/tags) are created
+regularly to indicate new official, stable release versions of Lux.
+
+The contribution workflow is described in [CONTRIBUTING.md](CONTRIBUTING.md).
 
 
-    LogPrint("creation", "GetProofOfStakeReward(): create=%s nCoinAge=%d nHeight=%d\n", FormatMoney(nSubsidy), nCoinAge, nHeight);
+Testing
+-------
 
-    return nSubsidy + nFees;
-	}
+Testing and code review is the bottleneck for development; we get more pull
+requests than we can review and test on short notice. Please be patient and help out by testing
+other people's pull requests, and remember this is a security-critical project where any mistake might cost people
+lots of money.
 
-Masternodes Requirement:
-------------------------
-	static const int64_t DARKSEND_COLLATERAL = (16120*COIN);    //161.20 LUX 
-	static const int64_t DARKSEND_FEE = (0.002*COIN);
-	static const int64_t DARKSEND_POOL_MAX = (1999999.99*COIN);
+### Automated Testing
 
-# Develop process before launch
-===============================
+Developers are strongly encouraged to write [unit tests](src/test/README.md) for new code, and to
+submit new unit tests for old code. Unit tests can be compiled and run
+(assuming they weren't disabled in configure) with: `make check`. Further details on running
+and extending unit tests can be found in [/src/test/README.md](/src/test/README.md).
 
-01/10/2017 -----> PHI1612 hash initilized, replaced novacoin-qt, json, add intallised-dependencies.sh, changed qt/res,etc....
+There are also [regression and integration tests](/qa) of the RPC interface, written
+in Python, that are run automatically on the build server.
+These tests can be run (if the [test dependencies](/qa) are installed) with: `qa/pull-tester/rpc-tests.py`
 
-02/10/2017 -----> Added echo hash into PHI1612
+### Manual Quality Assurance (QA) Testing
 
-03/10/2017 -----> New Phi1612 hashing algorithm completed
-Note: Not finished yet, still need some work. 
-
-04/10/2017 ------> testnet trial version released
-
-06/10/2017 ------> Final test before launch ( 06/10/2017 - 09/10/2017)
-
-07/10/2017 ------> Changed bhcoin to lux ( Trial Version v3)
-
-09/10/2017 ------> Updated New Trial Version Lux - PHI | PoW/PoS Hybrid - Parallel Masternode Implemented | I2pd Networks Remote Activation
-
--------------------------------------------------------------------
-
-# Install
-=========
--Unix daemon compile:
-
-	cd lux
-
-	sudo sh install-dependencies.sh install
-
-	cd src/leveldb
-
-	chmod +x build_detect_platform
-
-	make clean && make libleveldb.a libmemenv.a
-
-	cd ..
-
-	make -f makefile.unix 
-
--Unix QT wallet compile:
-
-	cd lux
-
-	qmake USE_QRCODE=1
-
-	make
-
+Changes should be tested by somebody other than the developer who wrote the
+code. This is especially important for large or high-risk changes. It is useful
+to add a test plan to the pull request description if testing the changes is
+not straightforward.

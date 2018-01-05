@@ -1,0 +1,26 @@
+[Unit]
+Description=LUX's distributed currency daemon
+After=network.target
+
+[Service]
+User=lux
+Group=lux
+
+Type=forking
+PIDFile=/var/lib/luxd/luxd.pid
+
+ExecStart=/usr/bin/luxd -daemon -pid=/var/lib/luxd/luxd.pid \
+          -conf=/etc/lux/lux.conf -datadir=/var/lib/luxd
+
+ExecStop=-/usr/bin/lux-cli -conf=/etc/lux/lux.conf \
+         -datadir=/var/lib/luxd stop
+
+Restart=always
+PrivateTmp=true
+TimeoutStopSec=60s
+TimeoutStartSec=2s
+StartLimitInterval=120s
+StartLimitBurst=5
+
+[Install]
+WantedBy=multi-user.target

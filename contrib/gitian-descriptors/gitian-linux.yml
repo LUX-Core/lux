@@ -1,63 +1,175 @@
 ---
-name: "lux"
+name: "lux-linux-2.2"
+enable_cache: true
 suites:
 - "trusty"
 architectures:
-- "i386"
 - "amd64"
 packages: 
-- "g++"
-- "qt5-qmake"
-- "qt5-default"
-- "qttools5-dev-tools"
+- "curl"
+- "g++-aarch64-linux-gnu"
+- "g++-4.8-aarch64-linux-gnu"
+- "gcc-4.8-aarch64-linux-gnu"
+- "binutils-aarch64-linux-gnu"
+- "g++-arm-linux-gnueabihf"
+- "g++-4.8-arm-linux-gnueabihf"
+- "gcc-4.8-arm-linux-gnueabihf"
+- "binutils-arm-linux-gnueabihf"
+- "g++-4.8-multilib"
+- "gcc-4.8-multilib"
+- "binutils-gold"
 - "git-core"
-- "unzip"
 - "pkg-config"
+- "autoconf"
 - "libtool"
 - "automake"
 - "faketime"
 - "bsdmainutils"
-reference_datetime: "2015-05-25 00:00:00"
+- "ca-certificates"
+- "python"
+reference_datetime: "2015-06-01 00:00:00"
 remotes:
-- "url": "https://github.com/CoinProjects/lux.git"
+- "url": "https://github.com/lux-project/lux.git"
   "dir": "lux"
-files:
-- "lux-deps-linux32-gitian.zip"
-- "lux-deps-linux64-gitian.zip"
+files: []
 script: |
-  echo "6324ba3b1d571dc833528bf13efd5534a28fb35b59885543533cc7ec018d969b  lux-deps-linux32-gitian.zip" | sha256sum -c
-  echo "713f164feb9fab5d200c8587e04a4ac53cbab78ddada6022d80895372e684ecd  lux-deps-linux64-gitian.zip" | sha256sum -c
-  STAGING="$HOME/install"
-  OPTFLAGS='-O2'
-  BINDIR="${OUTDIR}/bin/${GBUILD_BITS}" # 32/64 bit build specific output directory
-  TEMPDIR="$HOME/tempdir"
-  if [ "$GBUILD_BITS" == "32" ]; then
-    export LD_PRELOAD=/usr/lib/i386-linux-gnu/faketime/libfaketime.so.1;
-  else
-    export LD_PRELOAD=/usr/lib/x86_64-linux-gnu/faketime/libfaketime.so.1;
+
+  WRAP_DIR=$HOME/wrapped
+  HOSTS="i686-pc-linux-gnu x86_64-linux-gnu arm-linux-gnueabihf aarch64-linux-gnu"
+  CONFIGFLAGS="--enable-glibc-back-compat --enable-reduce-exports --disable-bench --disable-gui-tests"
+  FAKETIME_HOST_PROGS=""
+  FAKETIME_PROGS="date ar ranlib nm"
+  HOST_CFLAGS="-O2 -g"
+  HOST_CXXFLAGS="-O2 -g"
+  HOST_LDFLAGS=-static-libstdc++
+
+  export QT_RCC_TEST=1
+  export GZIP="-9n"
+  export TAR_OPTIONS="--mtime="$REFERENCE_DATE\\\ $REFERENCE_TIME""
+  export TZ="UTC"
+  export BUILD_DIR=`pwd`
+  mkdir -p ${WRAP_DIR}
+  if test -n "$GBUILD_CACHE_ENABLED"; then
+    export SOURCES_PATH=${GBUILD_COMMON_CACHE}
+    export BASE_CACHE=${GBUILD_PACKAGE_CACHE}
+    mkdir -p ${BASE_CACHE} ${SOURCES_PATH}
   fi
-  export FAKETIME=$REFERENCE_DATETIME
-  export TZ=UTC
-  export LIBRARY_PATH="$STAGING/lib"
-  mkdir -p ${BINDIR}
-  #
-  mkdir -p $STAGING
-  cd $STAGING
-  unzip ../build/lux-deps-linux${GBUILD_BITS}-gitian.zip
-  cd ../build
-  #
+
+  function create_global_faketime_wrappers {
+  for prog in ${FAKETIME_PROGS}; do
+    echo '#!/bin/bash' > ${WRAP_DIR}/${prog}
+    echo "REAL=\`which -a ${prog} | grep -v ${WRAP_DIR}/${prog} | head -1\`" >> ${WRAP_DIR}/${prog}
+    echo 'export LD_PRELOAD=/usr/lib/x86_64-linux-gnu/faketime/libfaketime.so.1' >> ${WRAP_DIR}/${prog}
+    echo "export FAKETIME=\"$1\"" >> ${WRAP_DIR}/${prog}
+    echo "\$REAL \$@" >> $WRAP_DIR/${prog}
+    chmod +x ${WRAP_DIR}/${prog}
+  done
+  }
+
+  function create_per-host_faketime_wrappers {
+  for i in $HOSTS; do
+    for prog in ${FAKETIME_HOST_PROGS}; do
+        echo '#!/bin/bash' > ${WRAP_DIR}/${i}-${prog}
+        echo "REAL=\`which -a ${i}-${prog} | grep -v ${WRAP_DIR}/${i}-${prog} | head -1\`" >> ${WRAP_DIR}/${i}-${prog}
+        echo 'export LD_PRELOAD=/usr/lib/x86_64-linux-gnu/faketime/libfaketime.so.1' >> ${WRAP_DIR}/${i}-${prog}
+        echo "export FAKETIME=\"$1\"" >> ${WRAP_DIR}/${i}-${prog}
+        echo "\$REAL \$@" >> $WRAP_DIR/${i}-${prog}
+        chmod +x ${WRAP_DIR}/${i}-${prog}
+    done
+  done
+  }
+
+  # Faketime for depends so intermediate results are comparable
+  export PATH_orig=${PATH}
+  create_global_faketime_wrappers "2000-01-01 12:00:00"
+  create_per-host_faketime_wrappers "2000-01-01 12:00:00"
+  export PATH=${WRAP_DIR}:${PATH}
+
+  EXTRA_INCLUDES_BASE=$WRAP_DIR/extra_includes
+  mkdir -p $EXTRA_INCLUDES_BASE
+
+  # x86 needs /usr/include/i386-linux-gnu/asm pointed to /usr/include/x86_64-linux-gnu/asm,
+  # but we can't write there. Instead, create a link here and force it to be included in the
+  # search paths by wrapping gcc/g++.
+
+  mkdir -p $EXTRA_INCLUDES_BASE/i686-pc-linux-gnu
+  rm -f $WRAP_DIR/extra_includes/i686-pc-linux-gnu/asm
+  ln -s /usr/include/x86_64-linux-gnu/asm $EXTRA_INCLUDES_BASE/i686-pc-linux-gnu/asm
+
+  for prog in gcc g++; do
+  rm -f ${WRAP_DIR}/${prog}
+  cat << EOF > ${WRAP_DIR}/${prog}
+  #!/bin/bash
+  REAL="`which -a ${prog} | grep -v ${WRAP_DIR}/${prog} | head -1`"
+  for var in "\$@"
+  do
+    if [ "\$var" = "-m32" ]; then
+      export C_INCLUDE_PATH="$EXTRA_INCLUDES_BASE/i686-pc-linux-gnu"
+      export CPLUS_INCLUDE_PATH="$EXTRA_INCLUDES_BASE/i686-pc-linux-gnu"
+      break
+    fi
+  done
+  \$REAL \$@
+  EOF
+  chmod +x ${WRAP_DIR}/${prog}
+  done
+
   cd lux
+  BASEPREFIX=`pwd`/depends
+  # Build dependencies for each host
+  for i in $HOSTS; do
+    EXTRA_INCLUDES="$EXTRA_INCLUDES_BASE/$i"
+    if [ -d "$EXTRA_INCLUDES" ]; then
+      export HOST_ID_SALT="$EXTRA_INCLUDES"
+    fi
+    make ${MAKEOPTS} -C ${BASEPREFIX} HOST="${i}"
+    unset HOST_ID_SALT
+  done
+
+  # Faketime for binaries
+  export PATH=${PATH_orig}
+  create_global_faketime_wrappers "${REFERENCE_DATETIME}"
+  create_per-host_faketime_wrappers "${REFERENCE_DATETIME}"
+  export PATH=${WRAP_DIR}:${PATH}
+
+  # Create the release tarball using (arbitrarily) the first host
+  ./autogen.sh
+  CONFIG_SITE=${BASEPREFIX}/`echo "${HOSTS}" | awk '{print $1;}'`/share/config.site ./configure --prefix=/
+  make dist
+  SOURCEDIST=`echo lux-*.tar.gz`
+  DISTNAME=`echo ${SOURCEDIST} | sed 's/.tar.*//'`
+  # Correct tar file order
+  mkdir -p temp
+  pushd temp
+  tar xf ../$SOURCEDIST
+  find lux-* | sort | tar --no-recursion --mode='u+rw,go+r-w,a+X' --owner=0 --group=0 -c -T - | gzip -9n > ../$SOURCEDIST
+  popd
+
+  ORIGPATH="$PATH"
+  # Extract the release tarball into a dir for each host and build
+  for i in ${HOSTS}; do
+    export PATH=${BASEPREFIX}/${i}/native/bin:${ORIGPATH}
+    mkdir -p distsrc-${i}
+    cd distsrc-${i}
+    INSTALLPATH=`pwd`/installed/${DISTNAME}
+    mkdir -p ${INSTALLPATH}
+    tar --strip-components=1 -xf ../$SOURCEDIST
+
+    CONFIG_SITE=${BASEPREFIX}/${i}/share/config.site ./configure --prefix=/ --disable-ccache --disable-maintainer-mode --disable-dependency-tracking ${CONFIGFLAGS} CFLAGS="${HOST_CFLAGS}" CXXFLAGS="${HOST_CXXFLAGS}" LDFLAGS="${HOST_LDFLAGS}"
+    make ${MAKEOPTS}
+
+    make install DESTDIR=${INSTALLPATH}
+    cd installed
+    find . -name "lib*.la" -delete
+    find . -name "lib*.a" -delete
+    rm -rf ${DISTNAME}/lib/pkgconfig
+    find ${DISTNAME}/bin -type f -executable -exec ../contrib/devtools/split-debug.sh {} {} {}.dbg \;
+    find ${DISTNAME}/lib -type f -exec ../contrib/devtools/split-debug.sh {} {} {}.dbg \;
+    find ${DISTNAME} -not -name "*.dbg" | sort | tar --no-recursion --mode='u+rw,go+r-w,a+X' --owner=0 --group=0 -c -T - | gzip -9n > ${OUTDIR}/${DISTNAME}-${i}.tar.gz
+    find ${DISTNAME} -name "*.dbg" | sort | tar --no-recursion --mode='u+rw,go+r-w,a+X' --owner=0 --group=0 -c -T - | gzip -9n > ${OUTDIR}/${DISTNAME}-${i}-debug.tar.gz
+    cd ../../
+    rm -rf distsrc-${i}
+  done
   mkdir -p $OUTDIR/src
-  git archive HEAD | tar -x -C $OUTDIR/src
-  cp $OUTDIR/src/doc/README $OUTDIR
-  cp $OUTDIR/src/COPYING $OUTDIR
-  cd src
-  cp -r crypto obj
-  make -f makefile.unix STATIC=1 USE_NATIVE_I2P=1 OPENSSL_INCLUDE_PATH="$STAGING/include" OPENSSL_LIB_PATH="$STAGING/lib" $MAKEOPTS luxd USE_UPNP=1 BOOST_LIB_SUFFIX="-mt" DEBUGFLAGS= 
-  mkdir -p $STAGING/bin/$GBUILD_BITS
-  install -s luxd $OUTDIR/bin/$GBUILD_BITS
-  #
-  cd ..
-  qmake INCLUDEPATH="$STAGING/include" LIBS="-L$STAGING/lib" BOOST_LIB_SUFFIX="-mt" RELEASE=1 USE_QRCODE=1 USE_NATIVE_I2P=1
-  make $MAKEOPTS
-  install Lux $OUTDIR/bin/$GBUILD_BITS
+  mkdir -p $OUTDIR/src
+  mv $SOURCEDIST $OUTDIR/src
