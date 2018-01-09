@@ -6,6 +6,7 @@
 
 #include "sendcoinsdialog.h"
 #include "ui_sendcoinsdialog.h"
+#include "askpassphrasedialog.h"
 
 #include "addresstablemodel.h"
 #include "bitcoinunits.h"
@@ -362,7 +363,7 @@ void SendCoinsDialog::send(QList<SendCoinsRecipient> recipients, QString strFee,
 
     // process prepareStatus and on error generate message shown to user
     processSendCoinsReturn(prepareStatus,
-        BitcoinUnits::formatWithUnit(model->getOptionsModel()->getDisplayUnit(), currentTransaction.getTransactionFee()));
+        BitcoinUnits::formatWithUnit(model->getOptionsModel()->getDisplayUnit(), currentTransaction.getTransactionFee()), true);
 
     if (prepareStatus.status != WalletModel::OK) {
         fNewRecipientAllowed = true;
@@ -604,8 +605,10 @@ void SendCoinsDialog::updateSwiftTX()
     coinControlUpdateLabels();
 }
 
-void SendCoinsDialog::processSendCoinsReturn(const WalletModel::SendCoinsReturn& sendCoinsReturn, const QString& msgArg)
+void SendCoinsDialog::processSendCoinsReturn(const WalletModel::SendCoinsReturn& sendCoinsReturn, const QString& msgArg, bool fPrepare)
 {
+    bool fAskForUnlock = false;
+
     QPair<QString, CClientUIInterface::MessageBoxFlags> msgParams;
     // Default to a warning message, override if error message is needed
     msgParams.second = CClientUIInterface::MSG_WARNING;
@@ -638,9 +641,13 @@ void SendCoinsDialog::processSendCoinsReturn(const WalletModel::SendCoinsReturn&
         msgParams.second = CClientUIInterface::MSG_ERROR;
         break;
     case WalletModel::AnonymizeOnlyUnlocked:
-        QMessageBox::warning(this, tr("Send Coins"),
-            tr("Error: The wallet was unlocked only to anonymize coins."),
-            QMessageBox::Ok, QMessageBox::Ok);
+        // Unlock is only need when the coins are send
+        if(!fPrepare)
+            fAskForUnlock = true;
+        else
+            msgParams.first = tr("Error: The wallet was unlocked only to anonymize coins.");
+        break;
+
     case WalletModel::InsaneFee:
         msgParams.first = tr("A fee %1 times higher than %2 per kB is considered an insanely high fee.").arg(10000).arg(BitcoinUnits::formatWithUnit(model->getOptionsModel()->getDisplayUnit(), ::minRelayTxFee.GetFeePerK()));
         break;
@@ -649,6 +656,18 @@ void SendCoinsDialog::processSendCoinsReturn(const WalletModel::SendCoinsReturn&
     default:
         return;
     }
+
+     // Unlock wallet if it wasn't fully unlocked already
+        if(fAskForUnlock) {
+         model->requestUnlock(false);
+         if(model->getEncryptionStatus () != WalletModel::Unlocked) {
+             msgParams.first = tr("Error: The wallet was unlocked only to anonymize coins. Unlock canceled.");
+         }
+         else {
+      // Wallet unlocked
+         return;
+         }
+     }
 
     emit message(tr("Send Coins"), msgParams.first, msgParams.second);
 }
