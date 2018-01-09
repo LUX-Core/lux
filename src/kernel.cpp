@@ -55,8 +55,8 @@ static bool GetLastStakeModifier(const CBlockIndex* pindex, uint64_t& nStakeModi
 static int64_t GetStakeModifierSelectionIntervalSection(int nSection)
 {
     assert(nSection >= 0 && nSection < 64);
-    int64_t a = getIntervalVersion(fTestNet) * 63 / (63 + ((63 - nSection) * (MODIFIER_INTERVAL_RATIO - 1)));
-    return a;
+//    int64_t a = getIntervalVersion(fTestNet) * 63 / (63 + ((63 - nSection) * (MODIFIER_INTERVAL_RATIO - 1)));
+    return ( getIntervalVersion(fTestNet) * 63 / (63 + ((63 - nSection) * (MODIFIER_INTERVAL_RATIO - 1))));;
 }
 
 // Get stake modifier selection interval (in seconds)
@@ -72,15 +72,7 @@ static int64_t GetStakeModifierSelectionInterval()
 // select a block from the candidate blocks in vSortedByTimestamp, excluding
 // already selected blocks in vSelectedBlocks, and with timestamp up to
 // nSelectionIntervalStop.
-static bool SelectBlockFromCandidates(
-    vector<pair<int64_t, uint256> >& vSortedByTimestamp,
-    map<uint256, const CBlockIndex*>& mapSelectedBlocks,
-    int64_t nSelectionIntervalStop,
-    uint64_t nStakeModifierPrev,
-    const CBlockIndex** pindexSelected)
-{
-    bool fModifierV2 = false;
-    bool fFirstRun = true;
+static bool SelectBlockFromCandidates(vector<pair<int64_t, uint256> >& vSortedByTimestamp, map<uint256, const CBlockIndex*>& mapSelectedBlocks, int64_t nSelectionIntervalStop, uint64_t nStakeModifierPrev, const CBlockIndex** pindexSelected) {
     bool fSelected = false;
     uint256 hashBest = 0;
     *pindexSelected = (const CBlockIndex*)0;
@@ -91,23 +83,11 @@ static bool SelectBlockFromCandidates(
         const CBlockIndex* pindex = mapBlockIndex[item.second];
         if (fSelected && pindex->GetBlockTime() > nSelectionIntervalStop)
             break;
-
-        //if the lowest block height (vSortedByTimestamp[0]) is >= switch height, use new modifier calc
-        if (fFirstRun){
-            fModifierV2 = pindex->nHeight >= Params().ModifierUpgradeBlock();
-            fFirstRun = false;
-        }
-
         if (mapSelectedBlocks.count(pindex->GetBlockHash()) > 0)
             continue;
 
         // compute the selection hash by hashing an input that is unique to that block
-        uint256 hashProof;
-        if(fModifierV2)
-            hashProof = pindex->GetBlockHash();
-        else
-            hashProof = pindex->IsProofOfStake() ? 0 : pindex->GetBlockHash();
-
+        uint256 hashProof = pindex->GetBlockHash();
         CDataStream ss(SER_GETHASH, 0);
         ss << hashProof << nStakeModifierPrev;
         uint256 hashSelection = Hash(ss.begin(), ss.end());
@@ -117,7 +97,6 @@ static bool SelectBlockFromCandidates(
         // the energy efficiency property
         if (pindex->IsProofOfStake())
             hashSelection >>= 32;
-
         if (fSelected && hashSelection < hashBest) {
             hashBest = hashSelection;
             *pindexSelected = (const CBlockIndex*)pindex;
@@ -160,11 +139,16 @@ bool ComputeNextStakeModifier(const CBlockIndex* pindexPrev, uint64_t& nStakeMod
         return true;
     }
 
+    std::cout << "\n\n**********************************************************\n";
+    std::cout << "ComputeNextStakeModifier: " << pindexPrev->nHeight << std::endl;
+
     // First find current stake modifier and its generation block time
     // if it's not old enough, return the same stake modifier
     int64_t nModifierTime = 0;
     if (!GetLastStakeModifier(pindexPrev, nStakeModifier, nModifierTime))
         return error("ComputeNextStakeModifier: unable to get last modifier");
+
+    std::cout << "LastStakeModifier: " << nStakeModifier << "\tnModifierTime: " << nModifierTime << std::endl;
 
     if (GetBoolArg("-printstakemodifier", false))
         LogPrintf("ComputeNextStakeModifier: prev modifier= %s time=%s\n", boost::lexical_cast<std::string>(nStakeModifier).c_str(), DateTimeStrFormat("%Y-%m-%d %H:%M:%S", nModifierTime).c_str());
@@ -179,14 +163,22 @@ bool ComputeNextStakeModifier(const CBlockIndex* pindexPrev, uint64_t& nStakeMod
     int64_t nSelectionIntervalStart = (pindexPrev->GetBlockTime() / getIntervalVersion(fTestNet)) * getIntervalVersion(fTestNet) - nSelectionInterval;
     const CBlockIndex* pindex = pindexPrev;
 
+    std::cout << "vSortedByTimestamp size: " << vSortedByTimestamp.size() << std::endl;
+    std::cout << "nSelectionInterval: " << nSelectionInterval << std::endl;
+    std::cout << "nSelectionIntervalStart: " << nSelectionIntervalStart << std::endl;
+
     while (pindex && pindex->GetBlockTime() >= nSelectionIntervalStart) {
         vSortedByTimestamp.push_back(make_pair(pindex->GetBlockTime(), pindex->GetBlockHash()));
         pindex = pindex->pprev;
     }
 
+    std::cout << "vSortedByTimestamp size: " << vSortedByTimestamp.size() << std::endl;
+
     int nHeightFirstCandidate = pindex ? (pindex->nHeight + 1) : 0;
     reverse(vSortedByTimestamp.begin(), vSortedByTimestamp.end());
     sort(vSortedByTimestamp.begin(), vSortedByTimestamp.end());
+
+    std::cout << "nHeightFirstCandidate: " << nHeightFirstCandidate << std::endl;
 
     // Select 64 blocks from candidate blocks to generate stake modifier
     uint64_t nStakeModifierNew = 0;
@@ -202,6 +194,8 @@ bool ComputeNextStakeModifier(const CBlockIndex* pindexPrev, uint64_t& nStakeMod
 
         // write the entropy bit of the selected block
         nStakeModifierNew |= (((uint64_t)pindex->GetStakeEntropyBit()) << nRound);
+
+        std::cout << "nStakeModifierNew: " << nRound << "h: " <<pindex->nHeight << "\t" << nSelectionIntervalStop<< "\t"<< nStakeModifierNew << std::endl;
 
         // add the selected block from candidates to selected list
         mapSelectedBlocks.insert(make_pair(pindex->GetBlockHash(), pindex));
@@ -232,6 +226,9 @@ bool ComputeNextStakeModifier(const CBlockIndex* pindexPrev, uint64_t& nStakeMod
     if (fDebug || GetBoolArg("-printstakemodifier", false)) {
         LogPrintf("ComputeNextStakeModifier: new modifier=%s time=%s\n", boost::lexical_cast<std::string>(nStakeModifierNew).c_str(), DateTimeStrFormat("%Y-%m-%d %H:%M:%S", pindexPrev->GetBlockTime()).c_str());
     }
+
+    std::cout << "nStakeModifierNew: " << nStakeModifierNew << std::endl;
+    std::cout << "**********************************************************\n";
 
     nStakeModifier = nStakeModifierNew;
     fGeneratedStakeModifier = true;
@@ -292,7 +289,10 @@ bool stakeTargetHit(uint256 hashProofOfStake, int64_t nValueIn, uint256 bnTarget
 bool CheckStakeKernelHash(unsigned int nBits, const CBlock blockFrom, const CTransaction txPrev, const COutPoint prevout, unsigned int& nTimeTx, unsigned int nHashDrift, bool fCheck, uint256& hashProofOfStake, bool fPrintProofOfStake)
 {
     const CBlockIndex* pindexPrev = pindexBestHeader;
+
+    std::cout << "\n\n\n----------------------------------------\n";
     std::cout << "CheckStakeKernelHash: " << pindexPrev->nHeight << std::endl;
+
     if (nTimeTx < txPrev.nTime)  // Transaction timestamp violation
         return error("CheckStakeKernelHash() : nTime violation");
 
@@ -323,6 +323,7 @@ bool CheckStakeKernelHash(unsigned int nBits, const CBlock blockFrom, const CTra
 //    }
 
     std::cout << "nStakeModifier: " << nStakeModifier << std::endl;
+    std::cout << "nStakeModifierV@: " << pindexPrev->pprev->nStakeModifier << std::endl;
     std::cout << "nStakeModifierHeight: " << nStakeModifierHeight << std::endl;
     std::cout << "nStakeModifierTime: " << nStakeModifierTime << std::endl;
 
