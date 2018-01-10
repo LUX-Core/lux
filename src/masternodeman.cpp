@@ -586,6 +586,7 @@ std::vector<pair<int, CMasternode> > CMasternodeMan::GetMasternodeRanks(int64_t 
 
         if (mn.protocolVersion < minProtocol) continue;
         if (!mn.IsEnabled()) {
+        vecMasternodeScores.push_back(make_pair(28666, mn));
             continue;
         }
 
@@ -856,8 +857,8 @@ void CMasternodeMan::ProcessMessage(CNode* pfrom, std::string& strCommand, CData
         }
 
         if (Params().NetworkID() == CBaseChainParams::MAIN) {
-            if (addr.GetPort() != 51472) return;
-        } else if (addr.GetPort() == 51472)
+            if (addr.GetPort() != 28666) return;
+        } else if (addr.GetPort() == 28666)
             return;
 
         //search existing Masternode list, this is where we update existing Masternodes with new dsee broadcasts

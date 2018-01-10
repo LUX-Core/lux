@@ -42,6 +42,7 @@ endif()
 
 
 IF (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+#    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 ")
 	add_compile_options(-Wno-potentially-evaluated-expression -Wno-unused-const-variable -Wno-unused-function -Wno-deprecated-declarations -Wno-inaccessible-base -Wno-unused-local-typedefs -Wno-logical-op-parentheses -Wno-shift-negative-value -Wno-array-bounds)
 	add_definitions("-DOS_MACOSX -DLEVELDB_PLATFORM_POSIX")
 	add_definitions("-DENABLE_WALLET")
