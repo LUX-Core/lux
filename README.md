@@ -1,4 +1,4 @@
-![Luxcoin Logo](https://i.imgur.com/0Dtm0qk.png)
+![LUX Logo](https://i.imgur.com/mRMr5A1.png)
 
 "Empowered By Intelligence" 
 
