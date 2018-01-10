@@ -1605,7 +1605,7 @@ Value walletpassphrase(const Array& params, bool fHelp)
             "3. anonymizeonly      (boolean, optional, default=flase) If is true sending functions are disabled."
             "\nNote:\n"
             "Issuing the walletpassphrase command while the wallet is already unlocked will set a new unlock\n"
-            "time that overrides the old one.\n"
+            "time that overrides the old one. A timeout of \"0\" unlocks until the wallet is closed.\n"
             "\nExamples:\n"
             "\nUnlock the wallet for 60 seconds\n" +
             HelpExampleCli("walletpassphrase", "\"my pass phrase\" 60") +
@@ -1640,7 +1640,11 @@ Value walletpassphrase(const Array& params, bool fHelp)
     int64_t nSleepTime = params[1].get_int64();
     LOCK(cs_nWalletUnlockTime);
     nWalletUnlockTime = GetTime() + nSleepTime;
-    RPCRunLater("lockwallet", boost::bind(LockWallet, pwalletMain), nSleepTime);
+    if (nSleepTime > 0) 
+        {
+            nWalletUnlockTime = GetTime () + nSleepTime;
+            RPCRunLater ("lockwallet", boost::bind (LockWallet, pwalletMain), nSleepTime);
+        };
 
     return Value::null;
 }
