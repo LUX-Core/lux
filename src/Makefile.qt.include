@@ -69,6 +69,7 @@ QT_MOC_CPP = \
   qt/moc_optionsmodel.cpp \
   qt/moc_overviewpage.cpp \
   qt/moc_tradingdialog.cpp \
+  qt/moc_qcustomplot.cpp \
   qt/moc_peertablemodel.cpp \
   qt/moc_paymentserver.cpp \
   qt/moc_qvalidatedlineedit.cpp \
@@ -168,7 +169,8 @@ BITCOIN_QT_H = \
   qt/walletmodel.h \
   qt/walletmodeltransaction.h \
   qt/walletview.h \
-  qt/winshutdownmonitor.h
+  qt/winshutdownmonitor.h \
+  qt/qcustomplot.h
 
 RES_ICONS = \
   qt/res/icons/add.png \
@@ -268,6 +270,7 @@ BITCOIN_QT_CPP += \
   qt/multisenddialog.cpp \
   qt/openuridialog.cpp \
   qt/overviewpage.cpp \
+  qt/qcustomplot.cpp \
   qt/tradingdialog.cpp \
   qt/paymentrequestplus.cpp \
   qt/paymentserver.cpp \
