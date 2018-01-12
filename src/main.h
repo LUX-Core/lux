@@ -112,6 +112,9 @@ static const unsigned char REJECT_DUST = 0x41;
 static const unsigned char REJECT_INSUFFICIENTFEE = 0x42;
 static const unsigned char REJECT_CHECKPOINT = 0x43;
 
+static const int64_t STATIC_POS_REWARD = 1 * COIN; //Constant reward 8%
+
+
 inline bool IsProtocolV2(int nHeight) { return TestNet() || nHeight > 0; }
 
 struct BlockHasher {
@@ -236,6 +239,7 @@ inline unsigned int GetTargetSpacing(int nHeight) { return IsProtocolV2(nHeight)
 
 bool ActivateBestChain(CValidationState& state, CBlock* pblock = NULL);
 CAmount GetBlockValue(int nHeight);
+CAmount GetProofOfStakeReward(int64_t nCoinAge, int64_t nFees, int nHeight);
 
 /** Create a new block index entry for a given block hash */
 CBlockIndex* InsertBlockIndex(uint256 hash);
