@@ -227,6 +227,9 @@ public:
 
     CHashWriter(int nTypeIn, int nVersionIn) : nType(nTypeIn), nVersion(nVersionIn) {}
 
+    int GetType() const { return nType; }
+    int GetVersion() const { return nVersion; }
+
     CHashWriter& write(const char* pch, size_t size)
     {
         ctx.Write((const unsigned char*)pch, size);

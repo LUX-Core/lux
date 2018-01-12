@@ -233,7 +233,6 @@ void CMasternodeSync::ClearFulfilledRequest()
 void CMasternodeSync::Process()
 {
     static int tick = 0;
-    static int syncCount = 0;
 
     if (tick++ % MASTERNODE_SYNC_TIMEOUT != 0) return;
 
@@ -241,15 +240,11 @@ void CMasternodeSync::Process()
         /* 
             Resync if we lose all masternodes from sleep/wake or failure to sync originally
         */
-         if (mnodeman.CountEnabled() == 0 ) {
-			if(syncCount < 2){
-				Reset();
-				syncCount++;
-			}
+        if (mnodeman.CountEnabled() == 0) {
+            Reset();
         } else
             return;
     }
-
 
     //try syncing again
     if (RequestedMasternodeAssets == MASTERNODE_SYNC_FAILED && lastFailure + (1 * 60) < GetTime()) {
