@@ -1662,7 +1662,16 @@ int64_t GetProofOfStakeReward(int64_t nCoinAge, int64_t nFees, int nHeight)
 }
 
 int64_t GetMasternodePayment(int nHeight, int64_t blockValue, int nMasternodeCount)
+
 {
+    
+
+    if (Params().NetworkID() == CBaseChainParams::TESTNET) 
+{
+        if (nHeight < 200)
+            return 0;
+}
+
     int64_t ret = blockValue * 0.4; //40% for masternodes
 
     return ret;
@@ -3079,7 +3088,7 @@ bool CheckBlock(const CBlock& block, CValidationState& state, bool fCheckPOW, bo
 
     // Check that the header is valid (particularly PoW).  This is mostly
     // redundant with the call in AcceptBlockHeader.
-    if (!CheckBlockHeader(block, state, block.IsProofOfWork()))
+    if (block.IsProofOfWork() && !CheckBlockHeader(block, state, fCheckPOW))
         return state.DoS(100, error("CheckBlock() : CheckBlockHeader failed"),
             REJECT_INVALID, "bad-header", true);
 
@@ -5399,10 +5408,10 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
 
 int ActiveProtocol()
 {
-    if (IsSporkActive(SPORK_14_NEW_PROTOCOL_ENFORCEMENT)) {
-        if (chainActive.Tip()->nHeight >= Params().ModifierUpgradeBlock())
+    if (IsSporkActive(SPORK_14_NEW_PROTOCOL_ENFORCEMENT)) 
+      //  if (chainActive.Tip()->nHeight >= Params().ModifierUpgradeBlock())
             return MIN_PEER_PROTO_VERSION_AFTER_ENFORCEMENT;
-    }
+    
 
     return MIN_PEER_PROTO_VERSION_BEFORE_ENFORCEMENT;
 }
