@@ -297,38 +297,31 @@ void CMasternodePayments::FillBlockPayee(CMutableTransaction& txNew, int64_t nFe
     CAmount blockValue = GetBlockValue(pindexPrev->nHeight);
     CAmount masternodePayment = GetMasternodePayment(pindexPrev->nHeight, blockValue);
 
-   if (!fProofOfStake && pindexPrev->nHeight + 1 < Params().LAST_POW_BLOCK()) 			
- 	{			
- 		txNew.vout[0].nValue = blockValue;			
- 	}
-   
-    if (hasPayment) {
-        if (fProofOfStake) {
-            /**For Proof Of Stake vout[0] must be null
-             * Stake reward can be split into many different outputs, so we must
-             * use vout.size() to align with several different cases.
-             * An additional output is appended as the masternode payment
-             */
+     if (hasPayment && fProofOfStake) {
             unsigned int i = txNew.vout.size();
             txNew.vout.resize(i + 1);
             txNew.vout[i].scriptPubKey = payee;
             txNew.vout[i].nValue = masternodePayment;
-
-            //subtract mn payment from the stake reward
-            txNew.vout[i - 1].nValue -= masternodePayment;
-        } else {
+			//subtract mn payment from the stake reward
+			txNew.vout[i - 1].nValue -= masternodePayment;
+        } else if (hasPayment && !fProofOfStake) {
             txNew.vout.resize(2);
             txNew.vout[1].scriptPubKey = payee;
             txNew.vout[1].nValue = masternodePayment;
             txNew.vout[0].nValue = blockValue - masternodePayment;
-        }
+        } else {
+			txNew.vout[0].nValue = blockValue - masternodePayment;
+		}
 
-        CTxDestination address1;
-        ExtractDestination(payee, address1);
-        CBitcoinAddress address2(address1);
+		if (hasPayment)
+		{
+			CTxDestination address1;
+			ExtractDestination(payee, address1);
+			CBitcoinAddress address2(address1);
 
-        LogPrintf("Masternode payment of %s to %s\n", FormatMoney(masternodePayment).c_str(), address2.ToString().c_str());
-    }
+			LogPrintf("Masternode payment of %s to %s\n", FormatMoney(masternodePayment).c_str(), address2.ToString().c_str());
+		}
+    
 }
 
 int CMasternodePayments::GetMinMasternodePaymentsProto()
