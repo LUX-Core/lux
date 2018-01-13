@@ -270,6 +270,7 @@ bool GetKernelStakeModifier(uint256 hashBlockFrom, uint64_t& nStakeModifier, int
     return true;
 }
 
+#if 0
 uint256 stakeHash(unsigned int nTimeTx, CDataStream ss, unsigned int prevoutIndex, uint256 prevoutHash, unsigned int nTimeBlockFrom,
                   unsigned int txnTime)
 {
@@ -287,6 +288,7 @@ bool stakeTargetHit(uint256 hashProofOfStake, int64_t nValueIn, uint256 bnTarget
     // Now check if proof-of-stake hash meets target protocol
     return (uint256(hashProofOfStake) < bnCoinDayWeight * bnTargetPerCoinDay);
 }
+#endif
 
 //instead of looping outside and reinitializing variables many times, we will give a nTimeTx and also search interval so that we can do all the hashing here
 bool CheckStakeKernelHash(unsigned int nBits, const CBlock &blockFrom, const CTransaction &txPrev, const COutPoint &prevout, unsigned int& nTimeTx, uint256& hashProofOfStake)
@@ -339,12 +341,6 @@ bool CheckStakeKernelHash(unsigned int nBits, const CBlock &blockFrom, const CTr
         std::cout << "BlockTarget: " << bnTarget.GetHex() << std::endl;
         std::cout << "BlockStake: " << hashProofOfStake.GetHex() << std::endl;
         std::cout << "GoodStake: " << (hashProofOfStake > bnTarget ? "false" : "true") << std::endl;
-    }
-
-    if (blockFrom.GetHash().GetHex() == "000000002354f72a2a222cd84af26325587b22426ce04d8d2897d0499cc871c7") {
-        if (hashProofOfStake.GetHex() == "a1d4bc57342665a93050b62410129239a61f3d49f46562364db29b16aff0be69") {
-            return true;
-        }
     }
 
     // Now check if proof-of-stake hash meets target protocol
