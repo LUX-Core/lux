@@ -11,6 +11,7 @@
 #include <rpcserver.h>
 #include "crypto/rfc6979_hmac_sha256.h"
 #include "utilstrencodings.h"
+#include "qcustomplot.h"
 
 #include <QClipboard>
 #include <QDebug>
@@ -27,6 +28,7 @@
 #include <QVariantMap>
 #include <QJsonArray>
 #include <QTime>
+#include <QVBoxLayout>
 
 #include <openssl/hmac.h>
 #include <stdlib.h>
@@ -55,6 +57,18 @@ tradingDialog::tradingDialog(QWidget *parent) :
     timerid = 0;
     qDebug() <<  "Expected this";
 
+
+    QWidget* a1 = ui->priceChart;
+    QVBoxLayout* plotLay = new QVBoxLayout();
+    ui->priceChart->setLayout(plotLay);
+
+    derPlot = new QCustomPlot();
+    plotLay->addWidget(derPlot);
+
+    ohlc = new QCPFinancial(derPlot->xAxis, derPlot->yAxis);
+    ohlc->setName("OHLC");
+    ohlc->setChartStyle(QCPFinancial::csOhlc);
+
     ui->BtcAvailableLabel->setTextFormat(Qt::RichText);
     ui->LUXAvailableLabel->setTextFormat(Qt::RichText);
     ui->BuyCostLabel->setTextFormat(Qt::RichText);
@@ -80,6 +94,8 @@ tradingDialog::tradingDialog(QWidget *parent) :
     /*OrderBook Table Init*/
     CreateOrderBookTables(*ui->BidsTable,QStringList() << "SUM(BTC)" << "TOTAL(BTC)" << "LUX(SIZE)" << "BID(BTC)");
     CreateOrderBookTables(*ui->AsksTable,QStringList() << "ASK(BTC)" << "LUX(SIZE)" << "TOTAL(BTC)" << "SUM(BTC)");
+    connect (ui->BidsTable, SIGNAL(cellClicked(int,int)), this, SLOT(BidInfoInsertSlot(int, int)));
+    connect (ui->AsksTable, SIGNAL(cellClicked(int,int)), this, SLOT(AskInfoInsertSlot(int, int)));
     /*OrderBook Table Init*/
 
     /*Market History Table Init*/
@@ -417,6 +433,27 @@ void tradingDialog::ParseAndPopulateOpenOrdersTable(QString Response){
     obj.empty();
 }
 
+void tradingDialog::BidInfoInsertSlot(int row, int col){
+
+    QString BuyBidPriceString = ui->BidsTable->model()->data(ui->BidsTable->model()->index(row,3)).toString();
+    QString UnitsString = ui->BidsTable->model()->data(ui->BidsTable->model()->index(row,2)).toString();
+    ui->BuyBidPriceEdit->setText(BuyBidPriceString);
+    ui->UnitsInput->setText(UnitsString);
+
+
+
+}
+
+void tradingDialog::AskInfoInsertSlot(int row, int col){
+
+    QString SellBidPriceString = ui->AsksTable->model()->data(ui->AsksTable->model()->index(row,0)).toString();
+    QString UnitsLUXString = ui->AsksTable->model()->data(ui->AsksTable->model()->index(row,1)).toString();
+    ui->SellBidPriceEdit->setText(SellBidPriceString);
+    ui->UnitsInputLUX->setText(UnitsLUXString);
+
+
+
+}
 
 void tradingDialog::CancelOrderSlot(int row, int col){
 
@@ -572,11 +609,71 @@ void tradingDialog::ParseAndPopulateMarketHistoryTable(QString Response){
     obj.empty();
 }
 
+
+void tradingDialog::ParseAndPopulatePriceChart(QString Response){
+
+    int itteration = 0, RowCount = 0;
+    QJsonArray    jsonArray    = GetResultArrayFromJSONObject(Response);
+    QJsonObject   obj;
+    double binSize = 60*15;
+
+    QVector<double> time(jsonArray.size()), price(jsonArray.size());
+
+    foreach (const QJsonValue & value, jsonArray)
+    {
+        QString str = "";
+        obj = value.toObject();
+
+
+        time[itteration] = obj["Timestamp"].toDouble();
+        price[itteration] = obj["Price"].toDouble();
+
+        itteration++;
+    }
+    obj.empty();
+
+
+    std::reverse(price.begin(), price.end());
+    std::reverse(time.begin(), time.end());
+
+    double min_time = *std::min_element(time.constBegin(), time.constEnd());
+    double max_time = *std::max_element(time.constBegin(), time.constEnd());
+
+    double min_price = *std::min_element(price.constBegin(), price.constEnd());
+    double max_price = *std::max_element(price.constBegin(), price.constEnd());
+    double diff_price = max_price - min_price;
+
+    ohlc->data()->set(QCPFinancial::timeSeriesToOhlc(time, price, binSize/3.0, min_time)); // divide binSize by 3 just to make the ohlc bars a bit denser
+    ohlc->setWidth(binSize*0.2);
+    ohlc->setTwoColored(true);
+
+    derPlot->xAxis->setLabel("Time (GMT)");
+    derPlot->yAxis->setLabel("LUX Price in BTC");
+
+    QCPAxisRect *volumeAxisRect = new QCPAxisRect(derPlot);
+    QSharedPointer<QCPAxisTickerDateTime> dateTimeTicker(new QCPAxisTickerDateTime);
+    dateTimeTicker->setDateTimeSpec(Qt::UTC);
+    dateTimeTicker->setDateTimeFormat("dd.MM.yy(hh:mm)");
+    volumeAxisRect->axis(QCPAxis::atBottom)->setTicker(dateTimeTicker);
+    volumeAxisRect->axis(QCPAxis::atBottom)->setTickLabelRotation(15);
+    derPlot->xAxis->setBasePen(Qt::NoPen);
+    derPlot->xAxis->setTicker(dateTimeTicker);
+    derPlot->rescaleAxes();
+    derPlot->xAxis->setRange(min_time, max_time+5);
+    derPlot->xAxis->scaleRange(1.025, derPlot->xAxis->range().center());
+    derPlot->yAxis->setRange(min_price-0.2*diff_price, max_price+0.2*diff_price);
+
+    derPlot->replot();
+
+
+}
+
 void tradingDialog::ActionsOnSwitch(int index = -1){
 
     QString Response = "";
     QString Response2 = "";
     QString Response3 = "";
+    QString Response4 = "";
 
     if(index == -1){
         index = ui->TradingTabWidget->currentIndex();
@@ -588,12 +685,16 @@ void tradingDialog::ActionsOnSwitch(int index = -1){
             Response = GetBalance("BTC");
             Response2 = GetBalance("LUX");
             Response3 = GetOrderBook();
+            Response4 = GetMarketHistory();
 
             if((Response.size() > 0 && Response != "Error") && (Response2.size() > 0 && Response2 != "Error")){
                 DisplayBalance(*ui->BtcAvailableLabel, *ui->LUXAvailableLabel, Response, Response2);
             }
             if ((Response3.size() > 0 && Response3 != "Error")) {
                 ParseAndPopulateOrderBookTables(Response3);
+            }
+            if(Response4.size() > 0 && Response4 != "Error"){
+                ParseAndPopulatePriceChart(Response4);
             }
 
             break;

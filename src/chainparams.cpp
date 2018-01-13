@@ -69,20 +69,22 @@ static const Checkpoints::CCheckpointData data = {
 };
 
 static Checkpoints::MapCheckpoints mapCheckpointsTestnet =
-    boost::assign::map_list_of(0, uint256("0x001"));
+    boost::assign::map_list_of(0, uint256("0"));
 static const Checkpoints::CCheckpointData dataTestnet = {
     &mapCheckpointsTestnet,
-    1454124731,
     0,
-    250};
+    0,
+    0
+};
 
 static Checkpoints::MapCheckpoints mapCheckpointsRegtest =
-    boost::assign::map_list_of(0, uint256("0x001"));
+    boost::assign::map_list_of(0, uint256("0"));
 static const Checkpoints::CCheckpointData dataRegtest = {
     &mapCheckpointsRegtest,
-    1454124731,
     0,
-    100};
+    0,
+    0
+};
 
 class CMainParams : public CChainParams
 {
@@ -139,10 +141,10 @@ public:
         assert(hashGenesisBlock == uint256("0x00000759bb3da130d7c9aedae170da8335f5a0d01a9007e4c8d3ccd08ace6a42"));
         assert(genesis.hashMerkleRoot == uint256("0xe08ae0cfc35a1d70e6764f347fdc54355206adeb382446dd54c32cd0201000d3"));
 
-        vSeeds.push_back(CDNSSeedData("sd1", "45.32.245.217"));
-        vSeeds.push_back(CDNSSeedData("sd2", "45.63.25.110"));
-        vSeeds.push_back(CDNSSeedData("sd3", "45.76.118.90"));
-        vSeeds.push_back(CDNSSeedData("sd4", "136.243.89.142"));        // Single node address
+        vSeeds.push_back(CDNSSeedData("45.63.25.110", "45.32.245.217"));
+        vSeeds.push_back(CDNSSeedData("136.243.89.142", "45.76.118.90"));
+        //vSeeds.push_back(CDNSSeedData("sd3", "45.63.25.110"));
+        //vSeeds.push_back(CDNSSeedData("sd4", "136.243.89.142"));        // Single node address
 
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,48); // LUX Start letter L
         base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1,48);

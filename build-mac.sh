@@ -3,7 +3,7 @@ echo "The first argument to this shell script should be 11 or 13 based on the OS
 echo "e.g. ./build-mac.sh 13"
 echo "Please install homebrew first too"
 if [ -z "$1" ]; then exit 1; fi
-brew install autoconf automake pkg-config libtool
+brew install autoconf automake pkg-config libtool librsvg
 # echo $1
 export MAKEJOBS=-j3
 # export HOST=x86_64-apple-darwin13

@@ -15,6 +15,7 @@
 
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
+#include "qcustomplot.h"
 
 #include <QJsonObject>
 #include <QJsonArray>
@@ -39,6 +40,7 @@ private slots:
     void InitTrading();
     void on_TradingTabWidget_tabBarClicked(int index);
     void ParseAndPopulateOrderBookTables(QString Response);
+    void ParseAndPopulatePriceChart(QString Response);
     void ParseAndPopulateMarketHistoryTable(QString Response);
     void ParseAndPopulateAccountHistoryTable(QString Response);
     void ParseAndPopulateOpenOrdersTable(QString Response);
@@ -49,6 +51,8 @@ private slots:
     void DisplayBalance(QLabel &BalanceLabel, QString Response);
     void ActionsOnSwitch(int index);
     void CancelOrderSlot(int row, int col);
+    void BidInfoInsertSlot(int row, int col);
+    void AskInfoInsertSlot(int row, int col);
     void on_UpdateKeys_clicked(bool Save=true, bool Load=true);
     void on_LoadKeys_clicked();
     void on_SaveKeys_clicked();
@@ -118,7 +122,8 @@ private:
     QString ApiKey;
     QString SecretKey;
     WalletModel *model;
-
+    QCustomPlot* derPlot;
+    QCPFinancial *ohlc;
 
 
 };

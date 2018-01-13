@@ -1,5 +1,4 @@
-/* @flow */
-// Copyright (c) 2012-2013 The PPCoin developers
+// Copyright (c) 2017 LUX developer
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -10,7 +9,6 @@
 #include "kernel.h"
 #include "script/interpreter.h"
 #include "timedata.h"
-#include "util.h"
 
 using namespace std;
 
@@ -55,8 +53,8 @@ static bool GetLastStakeModifier(const CBlockIndex* pindex, uint64_t& nStakeModi
 static int64_t GetStakeModifierSelectionIntervalSection(int nSection)
 {
     assert(nSection >= 0 && nSection < 64);
-    int64_t a = getIntervalVersion(fTestNet) * 63 / (63 + ((63 - nSection) * (MODIFIER_INTERVAL_RATIO - 1)));
-    return a;
+//    int64_t a = getIntervalVersion(fTestNet) * 63 / (63 + ((63 - nSection) * (MODIFIER_INTERVAL_RATIO - 1)));
+    return ( getIntervalVersion(fTestNet) * 63 / (63 + ((63 - nSection) * (MODIFIER_INTERVAL_RATIO - 1))));;
 }
 
 // Get stake modifier selection interval (in seconds)
@@ -72,15 +70,7 @@ static int64_t GetStakeModifierSelectionInterval()
 // select a block from the candidate blocks in vSortedByTimestamp, excluding
 // already selected blocks in vSelectedBlocks, and with timestamp up to
 // nSelectionIntervalStop.
-static bool SelectBlockFromCandidates(
-    vector<pair<int64_t, uint256> >& vSortedByTimestamp,
-    map<uint256, const CBlockIndex*>& mapSelectedBlocks,
-    int64_t nSelectionIntervalStop,
-    uint64_t nStakeModifierPrev,
-    const CBlockIndex** pindexSelected)
-{
-    bool fModifierV2 = false;
-    bool fFirstRun = true;
+static bool SelectBlockFromCandidates(vector<pair<int64_t, uint256> >& vSortedByTimestamp, map<uint256, const CBlockIndex*>& mapSelectedBlocks, int64_t nSelectionIntervalStop, uint64_t nStakeModifierPrev, const CBlockIndex** pindexSelected) {
     bool fSelected = false;
     uint256 hashBest = 0;
     *pindexSelected = (const CBlockIndex*)0;
@@ -91,23 +81,17 @@ static bool SelectBlockFromCandidates(
         const CBlockIndex* pindex = mapBlockIndex[item.second];
         if (fSelected && pindex->GetBlockTime() > nSelectionIntervalStop)
             break;
-
-        //if the lowest block height (vSortedByTimestamp[0]) is >= switch height, use new modifier calc
-        if (fFirstRun){
-            fModifierV2 = pindex->nHeight >= Params().ModifierUpgradeBlock();
-            fFirstRun = false;
-        }
-
         if (mapSelectedBlocks.count(pindex->GetBlockHash()) > 0)
             continue;
 
         // compute the selection hash by hashing an input that is unique to that block
-        uint256 hashProof;
-        if(fModifierV2)
-            hashProof = pindex->GetBlockHash();
-        else
-            hashProof = pindex->IsProofOfStake() ? 0 : pindex->GetBlockHash();
 
+        uint256 hashProof;
+        if (pindex->IsProofOfStake()) {
+            hashProof = pindex->hashProofOfStake;
+        } else {
+            hashProof = pindex->GetBlockHash();
+        }
         CDataStream ss(SER_GETHASH, 0);
         ss << hashProof << nStakeModifierPrev;
         uint256 hashSelection = Hash(ss.begin(), ss.end());
@@ -117,7 +101,6 @@ static bool SelectBlockFromCandidates(
         // the energy efficiency property
         if (pindex->IsProofOfStake())
             hashSelection >>= 32;
-
         if (fSelected && hashSelection < hashBest) {
             hashBest = hashSelection;
             *pindexSelected = (const CBlockIndex*)pindex;
@@ -344,8 +327,11 @@ bool CheckStakeKernelHash(unsigned int nBits, const CBlock &blockFrom, const CTr
     }
 
     // Now check if proof-of-stake hash meets target protocol
-    if (hashProofOfStake > bnTarget)
-        return false;
+    if (fCheck) {
+        return !(hashProofOfStake > bnTarget);
+    }
+//    if (CBigNum(hashProofOfStake) > CBigNum(bnTarget))
+//        return false;
 
     return true;
 }
