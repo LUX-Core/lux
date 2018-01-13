@@ -121,3 +121,5 @@ qa/pull-tester/test.*/*
 /nbproject/
 
 .idea
+
+contrib/devtools/split-debug.sh
