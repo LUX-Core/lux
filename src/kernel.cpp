@@ -319,21 +319,17 @@ bool CheckStakeKernelHash(unsigned int nBits, const CBlock &blockFrom, const CTr
         // Target: 00fa27b8ad58a400000000000000000000000000000000000000000000000000
         // ProofOfStake: a1d4bc57342665a93050b62410129239a61f3d49f46562364db29b16aff0be69
         std::cout << "LastBlock: " << pindexPrev->GetBlockHash().GetHex() << " nHeight=" << pindexPrev->nHeight << ", " << " nTime=" << pindexPrev->nTime << std::endl;
-        std::cout << "StakeModifier: " << nStakeModifier << std::endl;
+        std::cout << "BlockWork: " << nBits << std::endl;
         std::cout << "BlockHash: " << blockFrom.GetHash().GetHex() << std::endl;
         std::cout << "BlockTarget: " << bnTarget.GetHex() << std::endl;
         std::cout << "BlockStake: " << hashProofOfStake.GetHex() << std::endl;
-        std::cout << "GoodStake: " << (hashProofOfStake > bnTarget ? "false" : "true") << std::endl;
+        std::cout << "StakeModifier: " << nStakeModifier << std::endl;
+        std::cout << "StakeWeight: " << nValueIn << std::endl;
+        std::cout << "StakeGood: " << (hashProofOfStake > bnTarget ? "false" : "true") << std::endl;
     }
 
     // Now check if proof-of-stake hash meets target protocol
-    if (fCheck) {
-        return !(hashProofOfStake > bnTarget);
-    }
-//    if (CBigNum(hashProofOfStake) > CBigNum(bnTarget))
-//        return false;
-
-    return true;
+    return !(hashProofOfStake > bnTarget);
 }
 
 // Check kernel hash target and coinstake signature
