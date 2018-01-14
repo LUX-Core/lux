@@ -1,9 +1,3 @@
-.gitignore
-*.sublime-project
-*.sublime-workspace
-todo.txt
-reset-files.bash
-
 *.tar.gz
 
 *.exe
@@ -12,6 +6,7 @@ src/luxd
 src/lux-cli
 src/lux-tx
 src/test/test_lux
+src/test/test_lux_fuzzy
 src/qt/test/test_lux-qt
 
 # autoreconf
@@ -60,7 +55,7 @@ src/qt/test/moc*.cpp
 *.pyc
 *.o
 *.o-*
-.lux
+*.patch
 *.a
 *.pb.cc
 *.pb.h
@@ -80,18 +75,15 @@ src/qt/test/moc*.cpp
 *.qm
 Makefile
 lux-qt
-LUX-Qt.app
+lux-Qt.app
+background.tiff*
 
 # Unit-tests
 Makefile.test
 lux-qt_test
-src/test/buildenv.py
 
 # Resources cpp
 qrc_*.cpp
-
-# Qt creator
-*.pro.user
 
 # Mac specific
 .DS_Store
@@ -99,6 +91,7 @@ build
 
 #lcov
 *.gcno
+*.gcda
 /*.info
 test_lux.coverage/
 total.coverage/
@@ -108,16 +101,12 @@ coverage_percent.txt
 linux-coverage-build
 linux-build
 win32-build
-qa/pull-tester/run-bitcoind-for-test.sh
-qa/pull-tester/tests-config.sh
-qa/pull-tester/cache/*
-qa/pull-tester/test.*/*
+test/config.ini
+test/cache/*
 
 !src/leveldb*/Makefile
 
-.cproject
-.project
 /doc/doxygen/
-/nbproject/
 
-.idea
+libluxconsensus.pc
+contrib/devtools/split-debug.sh

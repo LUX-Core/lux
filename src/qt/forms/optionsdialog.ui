@@ -476,7 +476,7 @@
          </property>
          <property name="text">
           <string>Language missing or translation incomplete? Help contributing translations here:
-https://www.transifex.com/lux-project/lux-project-translations</string>
+https://www.transifex.com/216k155/216k155-translations</string>
          </property>
          <property name="wordWrap">
           <bool>true</bool>
