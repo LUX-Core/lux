@@ -31,7 +31,7 @@ In addition, without Luxgate and Pmn, Bitcoin and Ethereum cannot interact with 
 
 | Specification | Value |
 |:-----------|:-----------|
-| Total Blocks | `6,000,000` |
+| Total Blocks | `60,000,000` |
 | Block Size | `4MB` |
 | Block Time | `60s` |
 | PoW Reward | `10 LUX` |
