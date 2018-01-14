@@ -13,7 +13,7 @@
 #include "sync.h"
 #include "util.h"
 
-#include "obfuscation.h"
+#include "luxsend.h"
 #include "protocol.h"
 #include <boost/lexical_cast.hpp>
 

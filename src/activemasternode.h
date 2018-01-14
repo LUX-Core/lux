@@ -10,7 +10,7 @@
 #include "key.h"
 #include "masternode.h"
 #include "net.h"
-#include "obfuscation.h"
+#include "luxsend.h"
 #include "sync.h"
 #include "wallet.h"
 

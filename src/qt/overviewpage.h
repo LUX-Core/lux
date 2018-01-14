@@ -35,7 +35,7 @@ public:
     void setClientModel(ClientModel* clientModel);
     void setWalletModel(WalletModel* walletModel);
     void showOutOfSyncWarning(bool fShow);
-    void updateObfuscationProgress();
+    void updateLuxsendProgress();
 
 public slots:
     void obfuScationStatus();
@@ -62,9 +62,9 @@ private:
     TransactionFilterProxy* filter;
 
 private slots:
-    void toggleObfuscation();
-    void obfuscationAuto();
-    void obfuscationReset();
+    void toggleLuxsend();
+    void luxsendAuto();
+    void luxsendReset();
     void updateDisplayUnit();
     void handleTransactionClicked(const QModelIndex& index);
     void updateAlerts(const QString& warnings);

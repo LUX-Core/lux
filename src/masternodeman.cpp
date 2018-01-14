@@ -7,7 +7,7 @@
 #include "activemasternode.h"
 #include "addrman.h"
 #include "masternode.h"
-#include "obfuscation.h"
+#include "luxsend.h"
 #include "spork.h"
 #include "util.h"
 #include <boost/filesystem.hpp>
@@ -656,7 +656,7 @@ void CMasternodeMan::ProcessMasternodeConnections()
 
 void CMasternodeMan::ProcessMessage(CNode* pfrom, std::string& strCommand, CDataStream& vRecv)
 {
-    if (fLiteMode) return; //disable all Obfuscation/Masternode related functionality
+    if (fLiteMode) return; //disable all Luxsend/Masternode related functionality
     if (!masternodeSync.IsBlockchainSynced()) return;
 
     LOCK(cs_process_message);

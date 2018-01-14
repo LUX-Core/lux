@@ -93,8 +93,8 @@ BITCOIN_CORE_H = \
   primitives/transaction.h \
   core_io.h \
   crypter.h \
-  obfuscation.h \
-  obfuscation-relay.h \
+  luxsend.h \
+  luxsend-relay.h \
   db.h \
   eccryptoverify.h \
   ecwrapper.h \
@@ -211,8 +211,8 @@ libbitcoin_wallet_a_CPPFLAGS = $(BITCOIN_INCLUDES)
 libbitcoin_wallet_a_SOURCES = \
   activemasternode.cpp \
   bip38.cpp \
-  obfuscation.cpp \
-  obfuscation-relay.cpp \
+  luxsend.cpp \
+  luxsend-relay.cpp \
   db.cpp \
   crypter.cpp \
   swifttx.cpp \

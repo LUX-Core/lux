@@ -490,9 +490,9 @@
     </message>
     </context>
 <context>
-    <name>ObfuscationConfig</name>
+    <name>LuxsendConfig</name>
     <message>
-        <source>Configure Obfuscation</source>
+        <source>Configure Luxsend</source>
         <translation>Configurar Ofuscació</translation>
     </message>
     </context>
@@ -537,7 +537,7 @@
         <translation>Estat:</translation>
     </message>
     <message>
-        <source>Obfuscation</source>
+        <source>Luxsend</source>
         <translation>Ofuscació</translation>
     </message>
     <message>
@@ -549,11 +549,11 @@
         <translation>Desactivat</translation>
     </message>
     <message>
-        <source>Start Obfuscation</source>
+        <source>Start Luxsend</source>
         <translation>Iniciar Ofuscació</translation>
     </message>
     <message>
-        <source>Stop Obfuscation</source>
+        <source>Stop Luxsend</source>
         <translation>Aturar Ofuscació</translation>
     </message>
     <message>
@@ -780,7 +780,7 @@
         <translation>no</translation>
     </message>
     <message>
-        <source>Obfuscation</source>
+        <source>Luxsend</source>
         <translation>Ofuscació</translation>
     </message>
     <message>
@@ -1050,7 +1050,7 @@
         <translation>Informació</translation>
     </message>
     <message>
-        <source>Obfuscation options:</source>
+        <source>Luxsend options:</source>
         <translation>Opcions d'ofuscació:</translation>
     </message>
     <message>

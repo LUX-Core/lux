@@ -192,8 +192,8 @@ SET(SOURCES
 	./src/masternodeconfig.cpp
 	./src/masternodeman.cpp
 	./src/miner.cpp
-	./src/obfuscation-relay.cpp
-	./src/obfuscation.cpp
+	./src/luxsend-relay.cpp
+	./src/luxsend.cpp
 	./src/primitives/block.cpp
 	./src/primitives/transaction.cpp
 	./src/script/bitcoinconsensus.cpp

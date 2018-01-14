@@ -1385,7 +1385,7 @@
         <number>3</number>
        </property>
        <item>
-        <widget class="QCheckBox" name="checkUseObfuscation">
+        <widget class="QCheckBox" name="checkUseLuxsend">
          <property name="minimumSize">
           <size>
            <width>95</width>
@@ -1393,7 +1393,7 @@
           </size>
          </property>
          <property name="text">
-          <string>Obfuscation</string>
+          <string>Luxsend</string>
          </property>
          <property name="checked">
           <bool>false</bool>

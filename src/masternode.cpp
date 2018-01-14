@@ -6,7 +6,7 @@
 #include "masternode.h"
 #include "addrman.h"
 #include "masternodeman.h"
-#include "obfuscation.h"
+#include "luxsend.h"
 #include "sync.h"
 #include "util.h"
 #include <boost/lexical_cast.hpp>

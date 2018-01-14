@@ -234,7 +234,7 @@ private:
     EncryptionStatus cachedEncryptionStatus;
     int cachedNumBlocks;
     int cachedTxLocks;
-    int cachedObfuscationRounds;
+    int cachedLuxsendRounds;
 
     QTimer* pollTimer;
 

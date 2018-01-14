@@ -98,7 +98,7 @@
     <name>MultiSendDialog</name>
     </context>
 <context>
-    <name>ObfuscationConfig</name>
+    <name>LuxsendConfig</name>
     </context>
 <context>
     <name>OpenURIDialog</name>
