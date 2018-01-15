@@ -4,6 +4,7 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
+
 #ifndef SRC_MASTERNODECONFIG_H_
 #define SRC_MASTERNODECONFIG_H_
 
@@ -18,104 +19,84 @@ extern CMasternodeConfig masternodeConfig;
 
 class CMasternodeConfig
 {
+
 public:
-    class CMasternodeEntry
-    {
-    private:
-        std::string alias;
-        std::string ip;
-        std::string privKey;
-        std::string txHash;
-        std::string outputIndex;
+	class CMasternodeEntry {
 
-    public:
-        CMasternodeEntry(std::string alias, std::string ip, std::string privKey, std::string txHash, std::string outputIndex)
-        {
-            this->alias = alias;
-            this->ip = ip;
-            this->privKey = privKey;
-            this->txHash = txHash;
-            this->outputIndex = outputIndex;
-        }
+	private:
+		std::string alias;
+		std::string ip;
+		std::string privKey;
+		std::string txHash;
+		std::string outputIndex;
 
-        const std::string& getAlias() const
-        {
-            return alias;
-        }
+	public:
 
-        void setAlias(const std::string& alias)
-        {
-            this->alias = alias;
-        }
+		CMasternodeEntry(std::string alias, std::string ip, std::string privKey, std::string txHash, std::string outputIndex) {
+			this->alias = alias;
+			this->ip = ip;
+			this->privKey = privKey;
+			this->txHash = txHash;
+			this->outputIndex = outputIndex;
+		}
 
-        const std::string& getOutputIndex() const
-        {
-            return outputIndex;
-        }
+		const std::string& getAlias() const {
+			return alias;
+		}
 
-        bool castOutputIndex(int& n);
+		void setAlias(const std::string& alias) {
+			this->alias = alias;
+		}
 
-        void setOutputIndex(const std::string& outputIndex)
-        {
-            this->outputIndex = outputIndex;
-        }
+		const std::string& getOutputIndex() const {
+			return outputIndex;
+		}
 
-        const std::string& getPrivKey() const
-        {
-            return privKey;
-        }
+		void setOutputIndex(const std::string& outputIndex) {
+			this->outputIndex = outputIndex;
+		}
 
-        void setPrivKey(const std::string& privKey)
-        {
-            this->privKey = privKey;
-        }
+		const std::string& getPrivKey() const {
+			return privKey;
+		}
 
-        const std::string& getTxHash() const
-        {
-            return txHash;
-        }
+		void setPrivKey(const std::string& privKey) {
+			this->privKey = privKey;
+		}
 
-        void setTxHash(const std::string& txHash)
-        {
-            this->txHash = txHash;
-        }
+		const std::string& getTxHash() const {
+			return txHash;
+		}
 
-        const std::string& getIp() const
-        {
-            return ip;
-        }
+		void setTxHash(const std::string& txHash) {
+			this->txHash = txHash;
+		}
 
-        void setIp(const std::string& ip)
-        {
-            this->ip = ip;
-        }
-    };
+		const std::string& getIp() const {
+			return ip;
+		}
 
-    CMasternodeConfig()
-    {
-        entries = std::vector<CMasternodeEntry>();
-    }
+		void setIp(const std::string& ip) {
+			this->ip = ip;
+		}
+	};
 
-    void clear();
-    bool read(std::string& strErr);
-    void add(std::string alias, std::string ip, std::string privKey, std::string txHash, std::string outputIndex);
+	CMasternodeConfig() {
+		entries = std::vector<CMasternodeEntry>();
+	}
 
-    std::vector<CMasternodeEntry>& getEntries()
-    {
-        return entries;
-    }
+	void clear();
+    bool read(boost::filesystem::path path);
+	void add(std::string alias, std::string ip, std::string privKey, std::string txHash, std::string outputIndex);
 
-    int getCount()
-    {
-        int c = -1;
-        BOOST_FOREACH (CMasternodeEntry e, entries) {
-            if (e.getAlias() != "") c++;
-        }
-        return c;
-    }
+	std::vector<CMasternodeEntry>& getEntries() {
+		return entries;
+	}
 
 private:
-    std::vector<CMasternodeEntry> entries;
+	std::vector<CMasternodeEntry> entries;
+
+
 };
 
 
