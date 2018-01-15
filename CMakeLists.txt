@@ -188,13 +188,11 @@ SET(SOURCES
 	./src/masternode-budget.cpp
 	./src/masternode-payments.cpp
 	./src/masternode-sync.cpp
-	./src/masternode.cpp
-	./src/masternodeconfig.cpp
+        ./src/masternodeconfig.cpp
 	./src/masternodeman.cpp
 	./src/miner.cpp
-	./src/luxsend-relay.cpp
-	./src/luxsend.cpp
-	./src/primitives/block.cpp
+	./src/obfuscation-relay.cpp
+        ./src/primitives/block.cpp
 	./src/primitives/transaction.cpp
 	./src/script/bitcoinconsensus.cpp
 	./src/script/interpreter.cpp
