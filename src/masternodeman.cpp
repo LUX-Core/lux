@@ -7,7 +7,7 @@
 #include "activemasternode.h"
 #include "addrman.h"
 #include "masternode.h"
-#include "Luxsend.h"
+#include "luxsend.h"
 #include "spork.h"
 #include "util.h"
 #include <boost/filesystem.hpp>
