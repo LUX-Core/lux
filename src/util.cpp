@@ -111,7 +111,7 @@ string strMasterNodePrivKey = "";
 string strMasterNodeAddr = "";
 bool fLiteMode = false;
 bool fEnableSwiftTX = true;
-int nSwiftTXDepth = 5;
+int nInstantXDepth = 1;
 int nLuxsendRounds = 2;
 int nAnonymizeLuxAmount = 1000;
 int nLiquidityProvider = 0;
@@ -120,7 +120,7 @@ int64_t enforceMasternodePaymentsTime = 4085657524;
 bool fSucessfullyLoaded = false;
 bool fEnableLuxsend = false;
 /** All denominations used by luxsend */
-std::vector<int64_t> obfuScationDenominations;
+std::vector<int64_t> LuxsendDenominations;
 string strBudgetMode = "";
 
 map<string, string> mapArgs;
