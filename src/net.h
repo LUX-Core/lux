@@ -33,6 +33,9 @@
 class CAddrMan;
 class CBlockIndex;
 class CNode;
+class CTxIn;
+class CTxOut;
+class CPubKey;
 
 namespace boost
 {
@@ -656,6 +659,15 @@ void RelayTransaction(const CTransaction& tx);
 void RelayTransaction(const CTransaction& tx, const CDataStream& ss);
 void RelayTransactionLockReq(const CTransaction& tx, bool relayToAll = false);
 void RelayInv(CInv& inv);
+void RelayLuxsendFinalTransaction(const int sessionID, const CTransaction& txNew);
+void RelayLuxsendIn(const std::vector<CTxIn>& in, const int64_t& nAmount, const CTransaction& txCollateral, const std::vector<CTxOut>& out);
+void RelayLuxsendStatus(const int sessionID, const int newState, const int newEntriesCount, const int newAccepted, const std::string error="");
+void RelayLuxsendElectionEntry(const CTxIn vin, const CService addr, const std::vector<unsigned char> vchSig, const int64_t nNow, const CPubKey pubkey, const CPubKey pubkey2, const int count, const int current, const int64_t lastUpdated, const int protocolVersion);
+void SendLuxsendElectionEntry(const CTxIn vin, const CService addr, const std::vector<unsigned char> vchSig, const int64_t nNow, const CPubKey pubkey, const CPubKey pubkey2, const int count, const int current, const int64_t lastUpdated, const int protocolVersion);
+void RelayLuxsendElectionEntryPing(const CTxIn vin, const std::vector<unsigned char> vchSig, const int64_t nNow, const bool stop);
+void SendLuxsendElectionEntryPing(const CTxIn vin, const std::vector<unsigned char> vchSig, const int64_t nNow, const bool stop);
+void RelayLuxsendCompletedTransaction(const int sessionID, const bool error, const std::string errorMessage);
+void RelayLuxsendMasterNodeContestant();
 
 /** Access to the (IP) address database (peers.dat) */
 class CAddrDB
@@ -670,3 +682,4 @@ public:
 };
 
 #endif // BITCOIN_NET_H
+

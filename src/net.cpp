@@ -376,18 +376,18 @@ CNode* FindNode(const CService& addr)
     return NULL;
 }
 
-CNode* ConnectNode(CAddress addrConnect, const char* pszDest, bool obfuScationMaster)
+CNode* ConnectNode(CAddress addrConnect, const char* pszDest, bool LuxsendMaster)
 {
     if (pszDest == NULL) {
         // we clean masternode connections in CMasternodeMan::ProcessMasternodeConnections()
         // so should be safe to skip this and connect to local Hot MN on CActiveMasternode::ManageStatus()
-        if (IsLocal(addrConnect) && !obfuScationMaster)
+        if (IsLocal(addrConnect) && !LuxsendMaster)
             return NULL;
 
         // Look for an existing connection
         CNode* pnode = FindNode((CService)addrConnect);
         if (pnode) {
-            pnode->fObfuScationMaster = obfuScationMaster;
+            pnode->fLuxsendMaster = LuxsendMaster;
 
             pnode->AddRef();
             return pnode;
@@ -422,7 +422,7 @@ CNode* ConnectNode(CAddress addrConnect, const char* pszDest, bool obfuScationMa
         }
 
         pnode->nTimeConnected = GetTime();
-        if (obfuScationMaster) pnode->fObfuScationMaster = true;
+        if (LuxsendMaster) pnode->fLuxsendMaster = true;
 
         return pnode;
     } else if (!proxyConnectionFailed) {
@@ -1721,6 +1721,87 @@ void RelayInv(CInv& inv)
             pnode->PushInventory(inv);
 }
 
+
+void RelayLuxsendFinalTransaction(const int sessionID, const CTransaction& txNew)
+{
+    LOCK(cs_vNodes);
+    BOOST_FOREACH(CNode* pnode, vNodes)
+                {
+                    pnode->PushMessage("dsf", sessionID, txNew);
+                }
+}
+
+void RelayLuxsendIn(const std::vector<CTxIn>& in, const int64_t& nAmount, const CTransaction& txCollateral, const std::vector<CTxOut>& out)
+{
+    LOCK(cs_vNodes);
+
+    BOOST_FOREACH(CNode* pnode, vNodes)
+                {
+                    if((CNetAddr)LuxsendPool.submittedToMasternode != (CNetAddr)pnode->addr) continue;
+                    LogPrintf("RelayLuxsendIn - found master, relaying message - %s \n", pnode->addr.ToString().c_str());
+                    pnode->PushMessage("dsi", in, nAmount, txCollateral, out);
+                }
+}
+
+void RelayLuxsendStatus(const int sessionID, const int newState, const int newEntriesCount, const int newAccepted, const std::string error)
+{
+    LOCK(cs_vNodes);
+    BOOST_FOREACH(CNode* pnode, vNodes)
+                {
+                    pnode->PushMessage("dssu", sessionID, newState, newEntriesCount, newAccepted, error);
+                }
+}
+
+void RelayLuxsendElectionEntry(const CTxIn vin, const CService addr, const std::vector<unsigned char> vchSig, const int64_t nNow, const CPubKey pubkey, const CPubKey pubkey2, const int count, const int current, const int64_t lastUpdated, const int protocolVersion)
+{
+    LOCK(cs_vNodes);
+    BOOST_FOREACH(CNode* pnode, vNodes)
+                {
+                    if(!pnode->fRelayTxes) continue;
+
+                    pnode->PushMessage("dsee", vin, addr, vchSig, nNow, pubkey, pubkey2, count, current, lastUpdated, protocolVersion);
+                }
+}
+
+void SendLuxsendElectionEntry(const CTxIn vin, const CService addr, const std::vector<unsigned char> vchSig, const int64_t nNow, const CPubKey pubkey, const CPubKey pubkey2, const int count, const int current, const int64_t lastUpdated, const int protocolVersion)
+{
+    LOCK(cs_vNodes);
+    BOOST_FOREACH(CNode* pnode, vNodes)
+                {
+                    pnode->PushMessage("dsee", vin, addr, vchSig, nNow, pubkey, pubkey2, count, current, lastUpdated, protocolVersion);
+                }
+}
+
+void RelayLuxsendElectionEntryPing(const CTxIn vin, const std::vector<unsigned char> vchSig, const int64_t nNow, const bool stop)
+{
+    LOCK(cs_vNodes);
+    BOOST_FOREACH(CNode* pnode, vNodes)
+                {
+                    if(!pnode->fRelayTxes) continue;
+
+                    pnode->PushMessage("dseep", vin, vchSig, nNow, stop);
+                }
+}
+
+void SendLuxsendElectionEntryPing(const CTxIn vin, const std::vector<unsigned char> vchSig, const int64_t nNow, const bool stop)
+{
+    LOCK(cs_vNodes);
+    BOOST_FOREACH(CNode* pnode, vNodes)
+                {
+                    pnode->PushMessage("dseep", vin, vchSig, nNow, stop);
+                }
+}
+
+void RelayLuxsendCompletedTransaction(const int sessionID, const bool error, const std::string errorMessage)
+{
+    LOCK(cs_vNodes);
+    BOOST_FOREACH(CNode* pnode, vNodes)
+                {
+                    pnode->PushMessage("dsc", sessionID, error, errorMessage);
+                }
+}
+
+
 void CNode::RecordBytesRecv(uint64_t bytes)
 {
     LOCK(cs_totalBytesRecv);
@@ -1910,7 +1991,7 @@ CNode::CNode(SOCKET hSocketIn, CAddress addrIn, std::string addrNameIn, bool fIn
     nPingUsecStart = 0;
     nPingUsecTime = 0;
     fPingQueued = false;
-    fObfuScationMaster = false;
+    fLuxsendMaster = false;
 
     {
         LOCK(cs_nLastNodeId);
@@ -2025,3 +2106,4 @@ void CNode::EndMessage() UNLOCK_FUNCTION(cs_vSend)
 
     LEAVE_CRITICAL_SECTION(cs_vSend);
 }
+
