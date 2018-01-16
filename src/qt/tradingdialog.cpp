@@ -45,6 +45,7 @@
 
 #include <iostream>
 #include <algorithm>
+#include <functional>
 
 using namespace std;
 
@@ -53,6 +54,7 @@ tradingDialog::tradingDialog(QWidget *parent) :
         ui(new Ui::tradingDialog),
         model(0)
 {
+    qmanager = new QNetworkAccessManager(this);
     ui->setupUi(this);
     timerid = 0;
     qDebug() <<  "Expected this";
@@ -199,10 +201,10 @@ QString tradingDialog::GetOrderBook(){
     return Response;
 }
 
-QString tradingDialog::GetMarketHistory(){
-    //QString Response = sendRequest(QString("https://jsonplaceholder.typicode.com/posts/1/"));
-    QString Response = sendRequest(QString("https://www.cryptopia.co.nz/api/GetMarketHistory/LUX_BTC"));
-    return Response;
+void tradingDialog::GetMarketHistory(){
+    std::function<void(void)> f = std::bind(&tradingDialog::showMarketHistoryWhenReplyFinished, this);//&tradingDialog::showMarketHistoryWhenReplyFinished;//std::bind(&tradingDialog::showMarketHistoryWhenReplyFinished, this);
+
+    sendRequest1(QString("https://www.cryptopia.co.nz/api/GetMarketHistory/LUX_BTC"), f);
 }
 
 QString tradingDialog::CancelOrder(QString OrderId){
@@ -678,69 +680,61 @@ void tradingDialog::ActionsOnSwitch(int index = -1){
     if(index == -1){
         index = ui->TradingTabWidget->currentIndex();
     }
+    std::function<void(void)> f;
 
     switch (index){
         case 0:    //buy tab is active
 
-            Response = GetBalance("BTC");
-            Response2 = GetBalance("LUX");
-            Response3 = GetOrderBook();
-            Response4 = GetMarketHistory();
+            f = std::bind(&tradingDialog::showBalanceOfLUXOnTradingTab, this);
+            sendRequest1(QString("https://www.cryptopia.co.nz/api/GetBalance"), f, "POST", QString("{\"Currency\":\"") + "LUX" + QString("\"}"));
 
-            if((Response.size() > 0 && Response != "Error") && (Response2.size() > 0 && Response2 != "Error")){
-                DisplayBalance(*ui->BtcAvailableLabel, *ui->LUXAvailableLabel, Response, Response2);
-            }
-            if ((Response3.size() > 0 && Response3 != "Error")) {
-                ParseAndPopulateOrderBookTables(Response3);
-            }
-            if(Response4.size() > 0 && Response4 != "Error"){
-                ParseAndPopulatePriceChart(Response4);
-            }
+            f = std::bind(&tradingDialog::showBalanceOfBTCOnTradingTab, this);
+            sendRequest1(QString("https://www.cryptopia.co.nz/api/GetBalance"), f, "POST", QString("{\"Currency\":\"") + "BTC" + QString("\"}"));
+
+            f = std::bind(&tradingDialog::showOrderBookOnTradingTab, this);
+            sendRequest1("https://www.cryptopia.co.nz/api/GetMarketOrders/LUX_BTC", f);
+
+            f = std::bind(&tradingDialog::showMarketHistoryOnTradingTab, this);
+            sendRequest1(QString("https://www.cryptopia.co.nz/api/GetMarketHistory/LUX_BTC"), f);
 
             break;
 
         case 1: //Cross send tab active
-            Response = GetBalance("LUX");
-            Response2 = GetBalance("BTC");
-            if((Response.size() > 0 && Response != "Error") && (Response2.size() > 0 && Response2 != "Error")){
-                DisplayBalance(*ui->CryptopiaLUXLabel, *ui->CryptopiaBTCLabel, Response, Response2);
 
-            }
+            f = std::bind(&tradingDialog::showBalanceOfLUXOnSendTab, this);
+            sendRequest1(QString("https://www.cryptopia.co.nz/api/GetBalance"), f, "POST", QString("{\"Currency\":\"") + "LUX" + QString("\"}"));
+
+            f = std::bind(&tradingDialog::showBalanceOfBTCOnSendTab, this);
+            sendRequest1(QString("https://www.cryptopia.co.nz/api/GetBalance"), f, "POST", QString("{\"Currency\":\"") + "BTC" + QString("\"}"));
 
             break;
 
         case 2://market history tab
-            Response = GetMarketHistory();
-            if(Response.size() > 0 && Response != "Error"){
-                ParseAndPopulateMarketHistoryTable(Response);
-            }
+            GetMarketHistory();
             break;
 
         case 3: //open orders tab
-            Response = GetOpenOrders();
-            if(Response.size() > 0 && Response != "Error"){
-                ParseAndPopulateOpenOrdersTable(Response);
-            }
+
+            f = std::bind(&tradingDialog::showOpenOrders, this);
+            sendRequest1("https://www.cryptopia.co.nz/api/GetOpenOrders", f, "POST");
 
             break;
 
         case 4://account history tab
-            Response = GetAccountHistory();
-            if(Response.size() > 0 && Response != "Error"){
-                ParseAndPopulateAccountHistoryTable(Response);
-            }
+
+            f = std::bind(&tradingDialog::showAccountHistory, this);
+            sendRequest1("https://www.cryptopia.co.nz/api/GetTradeHistory", f, "POST");
+
             break;
 
         case 5://show balance tab
-            Response = GetBalance("BTC");
-            if(Response.size() > 0 && Response != "Error"){
-                DisplayBalance(*ui->BitcoinBalanceLabel,*ui->BitcoinAvailableLabel,*ui->BitcoinPendingLabel, QString::fromUtf8("BTC"),Response);
-            }
 
-            Response = GetBalance("LUX");
-            if(Response.size() > 0 && Response != "Error"){
-                DisplayBalance(*ui->LUXBalanceLabel,*ui->LUXAvailableLabel_2,*ui->LUXPendingLabel, QString::fromUtf8("LUX"),Response);
-            }
+            f = std::bind(&tradingDialog::showBalanceOfLUXOnBalanceTab, this);
+            sendRequest1(QString("https://www.cryptopia.co.nz/api/GetBalance"), f, "POST", QString("{\"Currency\":\"") + "LUX" + QString("\"}"));
+
+            f = std::bind(&tradingDialog::showBalanceOfBTCOnBalanceTab, this);
+            sendRequest1(QString("https://www.cryptopia.co.nz/api/GetBalance"), f, "POST", QString("{\"Currency\":\"") + "BTC" + QString("\"}"));
+
             break;
 
         case 6:
@@ -848,6 +842,307 @@ QString tradingDialog::sendRequest(QString url, QString method, QString body){
     return Response;
 }
 
+void tradingDialog::sendRequest1(QString url, std::function<void (void)> funcForCallAfterReceiveResponse, QString method, QString body){
+
+    QString Response = "";
+    QString Secret   = this->SecretKey;
+
+    string signature;
+    string hmacsignature;
+    string headerValue;
+
+    // the HTTP request
+    QNetworkRequest req = QNetworkRequest(QUrl(url));
+
+    req.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+
+    QNetworkReply *reply;
+    //reply = qmanager->get(req);
+
+    //printf("REPLY STARTED %s\n",url.toStdString().c_str());
+
+    //funcForCallAfterReceiveResponse();
+
+
+
+    if(method == "GET") {
+        reply = qmanager->get(req);
+    } else if(method == "POST") {
+
+        string API_KEY = this->ApiKey.toStdString();
+        string SECRET_KEY = this->SecretKey.toStdString();
+
+        unsigned char digest[16];
+        const char* string = body.toLatin1().data();
+
+        MD5_CTX ctx;
+        MD5_Init(&ctx);
+        MD5_Update(&ctx, string, strlen(string));
+        MD5_Final(digest, &ctx);
+
+        char mdString[33];
+        for (int i = 0; i < 16; i++)
+            sprintf(&mdString[i*2], "%02x", (unsigned int)digest[i]);
+
+        timeval curTime;
+        gettimeofday(&curTime, NULL);
+        long nonce = curTime.tv_usec;
+
+        char *requestContentBase64String = base64(digest, sizeof(digest));
+
+        signature += API_KEY;
+        signature += "POST";
+        signature += url_encode(url.toStdString());
+        signature += to_string(nonce);
+        signature += requestContentBase64String;
+
+        const unsigned char * hmacsignature = HMAC_SHA256_SIGNER(QString(signature.c_str()), QString(SECRET_KEY.c_str()));
+
+        QString hmacsignature_base64 = base64(hmacsignature, 32);
+
+        headerValue = "amx " + API_KEY + ":" + hmacsignature_base64.toStdString().c_str() + ":" + to_string(nonce);
+
+        req.setRawHeader("Authorization", headerValue.data());
+        req.setRawHeader("Content-Type", "application/json");
+
+        reply = qmanager->post(req, body.toUtf8());
+    }
+
+    connect( reply, &QNetworkReply::finished, this, [reply, this, funcForCallAfterReceiveResponse](){
+        funcForCallAfterReceiveResponse();
+    });
+
+
+}
+
+void tradingDialog::slotReadyRead() {
+    printf("slotReadyRead\n");
+}
+
+void tradingDialog::slotError1(QNetworkReply::NetworkError e) {
+    printf("slotError\n");
+}
+
+
+void tradingDialog::showMarketHistoryWhenReplyFinished() {
+    QNetworkReply *reply = qobject_cast<QNetworkReply *>(sender());
+    QString Response = "";
+    if (reply->error() == QNetworkReply::NoError) {
+        //success
+        Response = reply->readAll();
+
+    }
+    else{
+        //failure
+        qDebug() << "Failure" << reply->errorString();
+        Response = "Error";
+    }
+
+    reply->deleteLater();
+    if(Response.size() > 0 && Response != "Error"){
+        ParseAndPopulateMarketHistoryTable(Response);
+    }
+}
+
+void tradingDialog::showBalanceOfLUXOnTradingTab() {
+    QNetworkReply *reply = qobject_cast<QNetworkReply *>(sender());
+    QString Response = "";
+    if (reply->error() == QNetworkReply::NoError) {
+        //success
+        Response = reply->readAll();
+
+    }
+    else{
+        //failure
+        qDebug() << "Failure" << reply->errorString();
+        Response = "Error";
+    }
+
+    reply->deleteLater();
+    if(Response.size() > 0 && Response != "Error"){
+        DisplayBalance(*ui->LUXAvailableLabel, Response);
+    }
+}
+
+void tradingDialog::showBalanceOfBTCOnTradingTab() {
+    QNetworkReply *reply = qobject_cast<QNetworkReply *>(sender());
+    QString Response = "";
+    if (reply->error() == QNetworkReply::NoError) {
+        //success
+        Response = reply->readAll();
+
+    }
+    else{
+        //failure
+        qDebug() << "Failure" << reply->errorString();
+        Response = "Error";
+    }
+
+    reply->deleteLater();
+    if(Response.size() > 0 && Response != "Error"){
+        DisplayBalance(*ui->BtcAvailableLabel, Response);
+    }
+}
+
+void tradingDialog::showOrderBookOnTradingTab() {
+    QNetworkReply *reply = qobject_cast<QNetworkReply *>(sender());
+    QString Response = "";
+    if (reply->error() == QNetworkReply::NoError) {
+        //success
+        Response = reply->readAll();
+
+    }
+    else{
+        //failure
+        qDebug() << "Failure" << reply->errorString();
+        Response = "Error";
+    }
+
+    reply->deleteLater();
+    if(Response.size() > 0 && Response != "Error"){
+        ParseAndPopulateOrderBookTables(Response);
+    }
+}
+
+void tradingDialog::showMarketHistoryOnTradingTab() {
+    QNetworkReply *reply = qobject_cast<QNetworkReply *>(sender());
+    QString Response = "";
+    if (reply->error() == QNetworkReply::NoError) {
+        //success
+        Response = reply->readAll();
+
+    }
+    else{
+        //failure
+        qDebug() << "Failure" << reply->errorString();
+        Response = "Error";
+    }
+
+    reply->deleteLater();
+    if(Response.size() > 0 && Response != "Error"){
+        ParseAndPopulatePriceChart(Response);
+    }
+}
+
+void tradingDialog::showBalanceOfLUXOnSendTab() {
+    QNetworkReply *reply = qobject_cast<QNetworkReply *>(sender());
+    QString Response = "";
+    if (reply->error() == QNetworkReply::NoError) {
+        //success
+        Response = reply->readAll();
+
+    }
+    else{
+        //failure
+        qDebug() << "Failure" << reply->errorString();
+        Response = "Error";
+    }
+
+    reply->deleteLater();
+    if(Response.size() > 0 && Response != "Error"){
+        DisplayBalance(*ui->CryptopiaLUXLabel, Response);
+    }
+}
+
+void tradingDialog::showBalanceOfBTCOnSendTab() {
+    QNetworkReply *reply = qobject_cast<QNetworkReply *>(sender());
+    QString Response = "";
+    if (reply->error() == QNetworkReply::NoError) {
+        //success
+        Response = reply->readAll();
+
+    }
+    else{
+        //failure
+        qDebug() << "Failure" << reply->errorString();
+        Response = "Error";
+    }
+
+    reply->deleteLater();
+    if(Response.size() > 0 && Response != "Error"){
+        DisplayBalance(*ui->CryptopiaBTCLabel, Response);
+    }
+}
+
+void tradingDialog::showBalanceOfLUXOnBalanceTab() {
+    QNetworkReply *reply = qobject_cast<QNetworkReply *>(sender());
+    QString Response = "";
+    if (reply->error() == QNetworkReply::NoError) {
+        //success
+        Response = reply->readAll();
+
+    }
+    else{
+        //failure
+        qDebug() << "Failure" << reply->errorString();
+        Response = "Error";
+    }
+
+    reply->deleteLater();
+    if(Response.size() > 0 && Response != "Error"){
+        DisplayBalance(*ui->LUXBalanceLabel,*ui->LUXAvailableLabel_2,*ui->LUXPendingLabel, QString::fromUtf8("LUX"),Response);
+    }
+}
+
+void tradingDialog::showBalanceOfBTCOnBalanceTab() {
+    QNetworkReply *reply = qobject_cast<QNetworkReply *>(sender());
+    QString Response = "";
+    if (reply->error() == QNetworkReply::NoError) {
+        //success
+        Response = reply->readAll();
+
+    }
+    else{
+        //failure
+        qDebug() << "Failure" << reply->errorString();
+        Response = "Error";
+    }
+
+    reply->deleteLater();
+    if(Response.size() > 0 && Response != "Error"){
+        DisplayBalance(*ui->BitcoinBalanceLabel,*ui->BitcoinAvailableLabel,*ui->BitcoinPendingLabel, QString::fromUtf8("BTC"),Response);
+    }
+}
+
+void tradingDialog::showOpenOrders() {
+    QNetworkReply *reply = qobject_cast<QNetworkReply *>(sender());
+    QString Response = "";
+    if (reply->error() == QNetworkReply::NoError) {
+        //success
+        Response = reply->readAll();
+
+    }
+    else{
+        //failure
+        qDebug() << "Failure" << reply->errorString();
+        Response = "Error";
+    }
+
+    reply->deleteLater();
+    if(Response.size() > 0 && Response != "Error"){
+        ParseAndPopulateOpenOrdersTable(Response);
+    }
+}
+
+void tradingDialog::showAccountHistory() {
+    QNetworkReply *reply = qobject_cast<QNetworkReply *>(sender());
+    QString Response = "";
+    if (reply->error() == QNetworkReply::NoError) {
+        //success
+        Response = reply->readAll();
+
+    }
+    else{
+        //failure
+        qDebug() << "Failure" << reply->errorString();
+        Response = "Error";
+    }
+
+    reply->deleteLater();
+    if(Response.size() > 0 && Response != "Error"){
+        ParseAndPopulateAccountHistoryTable(Response);
+    }
+}
 
 char * tradingDialog::base64(const unsigned char *input, int length)
 {
