@@ -37,7 +37,7 @@ QString TransactionDesc::FormatTxStatus(const CWalletTx& wtx)
         int signatures = wtx.GetTransactionLockSignatures();
         QString strUsingIX = "";
         if (signatures >= 0) {
-            if (signatures >= INSTANTX_SIGNATURES_REQUIRED) {
+            if (signatures >= SWIFTTX_SIGNATURES_REQUIRED) {
                 int nDepth = wtx.GetDepthInMainChain();
                 if (nDepth < 0)
                     return tr("conflicted");

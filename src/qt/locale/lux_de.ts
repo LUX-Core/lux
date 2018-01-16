@@ -1045,7 +1045,7 @@ Adresse: %4</translation>
     </message>
     </context>
 <context>
-    <name>LuxsendConfig</name>
+    <name>ObfuscationConfig</name>
     </context>
 <context>
     <name>OpenURIDialog</name>
@@ -1124,7 +1124,7 @@ Adresse: %4</translation>
         <translation>Status:</translation>
     </message>
     <message>
-        <source>Luxsend Balance:</source>
+        <source>Obfuscation Balance:</source>
         <translation>Verschleierter Betrag:</translation>
     </message>
     <message>
@@ -1136,7 +1136,7 @@ Adresse: %4</translation>
         <translation>Aktiviert/Deaktiviert</translation>
     </message>
     <message>
-        <source>Luxsend</source>
+        <source>Obfuscation</source>
         <translation>Verschleierung</translation>
     </message>
     <message>
@@ -1216,7 +1216,7 @@ Adresse: %4</translation>
         <translation><numerusform>Gestückelte Inputs haben im Durchschnitt %5 von %n Runde</numerusform><numerusform>Gestückelte Inputs haben im Durchschnitt %5 von %n Runden</numerusform></translation>
     </message>
     <message>
-        <source>Wallet is locked and user declined to unlock. Disabling Luxsend.</source>
+        <source>Wallet is locked and user declined to unlock. Disabling Obfuscation.</source>
         <translation>Wallet ist gesperrt und der Benutzer verweigert die Entsperrung. Verschleierung deaktiviert.</translation>
     </message>
     <message>
@@ -1224,11 +1224,11 @@ Adresse: %4</translation>
         <translation>Genug kompatible Inputs zum Anonymisieren von %1 gefunden</translation>
     </message>
     <message>
-        <source>Start Luxsend</source>
+        <source>Start Obfuscation</source>
         <translation>Verschleierung starten</translation>
     </message>
     <message>
-        <source>Stop Luxsend</source>
+        <source>Stop Obfuscation</source>
         <translation>Verschleierung stoppen</translation>
     </message>
     <message>
@@ -1551,7 +1551,7 @@ Adresse: %4</translation>
         <translation>Minimieren</translation>
     </message>
     <message>
-        <source>Luxsend</source>
+        <source>Obfuscation</source>
         <translation>Verschleierung</translation>
     </message>
     <message>
@@ -2039,23 +2039,23 @@ Adresse: %4</translation>
         <translation>Empfangen von</translation>
     </message>
     <message>
-        <source>Received via Luxsend</source>
+        <source>Received via Obfuscation</source>
         <translation>über/durch Verschleierung empfangen</translation>
     </message>
     <message>
-        <source>Luxsend Denominate</source>
+        <source>Obfuscation Denominate</source>
         <translation>Stückelung der Verschleierung</translation>
     </message>
     <message>
-        <source>Luxsend Collateral Payment</source>
+        <source>Obfuscation Collateral Payment</source>
         <translation>Sicherheitspfandzahlung für Verschleierung</translation>
     </message>
     <message>
-        <source>Luxsend Make Collateral Inputs</source>
+        <source>Obfuscation Make Collateral Inputs</source>
         <translation>Verschleierung Erzeugung des Sicherheitspfand</translation>
     </message>
     <message>
-        <source>Luxsend Create Denominations</source>
+        <source>Obfuscation Create Denominations</source>
         <translation>Verschleierung Erzeugung der Stückelung</translation>
     </message>
     <message>
@@ -2158,19 +2158,19 @@ Adresse: %4</translation>
         <translation>Verschleiert</translation>
     </message>
     <message>
-        <source>Luxsend Make Collateral Inputs</source>
+        <source>Obfuscation Make Collateral Inputs</source>
         <translation>Verschleierung Erzeugung des Sicherheitspfand</translation>
     </message>
     <message>
-        <source>Luxsend Create Denominations</source>
+        <source>Obfuscation Create Denominations</source>
         <translation>Verschleierung Erzeugung der Stückelung</translation>
     </message>
     <message>
-        <source>Luxsend Denominate</source>
+        <source>Obfuscation Denominate</source>
         <translation>Stückelung der Verschleierung</translation>
     </message>
     <message>
-        <source>Luxsend Collateral Payment</source>
+        <source>Obfuscation Collateral Payment</source>
         <translation>Sicherheitspfandzahlung für Verschleierung</translation>
     </message>
     <message>
@@ -2481,7 +2481,7 @@ Adresse: %4</translation>
         <translation>Benutzername für JSON-RPC-Verbindungen</translation>
     </message>
     <message>
-        <source>Value more than Luxsend pool maximum allows.</source>
+        <source>Value more than Obfuscation pool maximum allows.</source>
         <translation>Wert höher als der vom Verschleierungspool maximal erlaubte.</translation>
     </message>
     <message>

@@ -72,8 +72,9 @@ enum WalletFeature {
 enum AvailableCoinsType {
     ALL_COINS = 1,
     ONLY_DENOMINATED = 2,
-    ONLY_NONDENOMINATED = 3,
-    ONLY_NONDENOMINATED_NOTMN = 4 // ONLY_NONDENOMINATED and not 10000 LUX at the same time
+    ONLY_NOT10000IFMN = 3,
+    ONLY_NONDENOMINATED_NOT10000IFMN = 4, // ONLY_NONDENOMINATED and not 10000 LUX at the same time
+    ONLY_10000 = 5                        // find masternode outputs including locked ones (use with caution)
 };
 
 struct CompactTallyItem {
@@ -443,8 +444,7 @@ public:
 
     isminetype IsMine(const CTxIn& txin) const;
     CAmount GetDebit(const CTxIn& txin, const isminefilter& filter) const;
-
-    bool IsMine(const CTxOut& txout) const
+    isminetype IsMine(const CTxOut& txout) const
     {
         return ::IsMine(*this, txout.scriptPubKey);
     }
@@ -672,8 +672,8 @@ public:
      *  0  : in memory pool, waiting to be included in a block
      * >=1 : this many blocks deep in the main chain
      */
-    int GetDepthInMainChain(const CBlockIndex*& pindexRet, bool enableIX = false) const;
-    int GetDepthInMainChain(bool enableIX = false) const
+    int GetDepthInMainChain(const CBlockIndex*& pindexRet, bool enableIX = true) const;
+    int GetDepthInMainChain(bool enableIX = true) const
     {
         const CBlockIndex* pindexRet;
         return GetDepthInMainChain(pindexRet, enableIX);
@@ -981,7 +981,7 @@ public:
             if (fMasterNode && vout[i].nValue == 16120 * COIN) continue; // do not count MN-like outputs
 
             const int rounds = pwallet->GetInputObfuscationRounds(vin);
-            if (rounds >= -2 && rounds < nDarksendRounds) {
+            if (rounds >= -2 && rounds < nObfuscationRounds) {
                 nCredit += pwallet->GetCredit(txout, ISMINE_SPENDABLE);
                 if (!MoneyRange(nCredit))
                     throw std::runtime_error("CWalletTx::GetAnonamizableCredit() : value out of range");
@@ -1014,7 +1014,7 @@ public:
             if (pwallet->IsSpent(hashTx, i) || !pwallet->IsDenominated(vin)) continue;
 
             const int rounds = pwallet->GetInputObfuscationRounds(vin);
-            if (rounds >= nDarksendRounds) {
+            if (rounds >= nObfuscationRounds) {
                 nCredit += pwallet->GetCredit(txout, ISMINE_SPENDABLE);
                 if (!MoneyRange(nCredit))
                     throw std::runtime_error("CWalletTx::GetAnonymizedCredit() : value out of range");
@@ -1190,7 +1190,7 @@ public:
     //Used with Obfuscation. Will return largest nondenom, then denominations, then very small inputs
     int Priority() const
     {
-        BOOST_FOREACH (int64_t d, darkSendDenominations)
+        BOOST_FOREACH (int64_t d, obfuScationDenominations)
             if (tx->vout[i].nValue == d) return 10000;
         if (tx->vout[i].nValue < 1 * COIN) return 20000;
 

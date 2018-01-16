@@ -7,7 +7,7 @@ architectures:
 packages:
 - "faketime"
 remotes:
-- "url": "https://github.com/216k155/lux-detached-sigs.git"
+- "url": "https://github.com/lux-project/lux-detached-sigs.git"
   "dir": "signature"
 files:
 - "lux-osx-unsigned.tar.gz"

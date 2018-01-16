@@ -10,7 +10,7 @@
 #include "amount.h"
 #include "hash.h"
 #include "main.h"
-//#include "masternode-sync.h"
+#include "masternode-sync.h"
 #include "net.h"
 #include "pow.h"
 #include "primitives/block.h"
@@ -21,7 +21,7 @@
 #ifdef ENABLE_WALLET
 #include "wallet.h"
 #endif
-//#include "masternode-payments.h"
+#include "masternode-payments.h"
 
 #include <boost/thread.hpp>
 #include <boost/tuple/tuple.hpp>
@@ -331,15 +331,15 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
             }
         }
 
-//        if (!fProofOfStake) {
-//            //Masternode and general budget payments
-//            FillBlockPayee(txNew, nFees, fProofOfStake);
-//
-//            //Make payee
-//            if (txNew.vout.size() > 1) {
-//                pblock->payee = txNew.vout[1].scriptPubKey;
-//            }
-//        }
+        if (!fProofOfStake) {
+            //Masternode and general budget payments
+            FillBlockPayee(txNew, nFees, fProofOfStake);
+
+            //Make payee
+            if (txNew.vout.size() > 1) {
+                pblock->payee = txNew.vout[1].scriptPubKey;
+            }
+        }
 
         nLastBlockTx = nBlockTx;
         nLastBlockSize = nBlockSize;
@@ -467,7 +467,7 @@ void BitcoinMiner(CWallet* pwallet, bool fProofOfStake)
                 continue;
             }
 
-            while (chainActive.Tip()->nTime < 1471482000 || vNodes.empty() || pwallet->IsLocked() || !fMintableCoins || nReserveBalance >= pwallet->GetBalance() /*|| !masternodeSync.IsSynced()*/) {
+            while (chainActive.Tip()->nTime < 1471482000 || vNodes.empty() || pwallet->IsLocked() || !fMintableCoins || nReserveBalance >= pwallet->GetBalance() || !masternodeSync.IsSynced()) {
                 nLastCoinStakeSearchInterval = 0;
                 MilliSleep(5000);
                 if (!fGenerateBitcoins && !fProofOfStake)

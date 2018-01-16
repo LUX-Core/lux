@@ -999,7 +999,7 @@ MultiEnvío: %1</translation>
         <translation>Por favor cambie a "Modo de Lista" para utilizar esta función.</translation>
     </message>
     <message>
-        <source>Non-anonymized input selected. &lt;b&gt;Luxsend will be disabled.&lt;/b&gt;&lt;br&gt;&lt;br&gt;If you still want to use Luxsend, please deselect all non-nonymized inputs first and then check Luxsend checkbox again.</source>
+        <source>Non-anonymized input selected. &lt;b&gt;Obfuscation will be disabled.&lt;/b&gt;&lt;br&gt;&lt;br&gt;If you still want to use Obfuscation, please deselect all non-nonymized inputs first and then check Obfuscation checkbox again.</source>
         <translation>Has seleccionado una entrada que no ha sido anonimizada. &lt;b&gt;La Ofuscación será deshabilitada.&lt;/b&gt;&lt;br&gt;&lt;br&gt;Si todavía quiere utilizar la Ofuscación, por favor primero deseleccione todas las entrada no anonimizadas y entonces marque la casilla de Ofuscación de nuevo.</translation>
     </message>
     <message>
@@ -1538,9 +1538,9 @@ Por favor compruebe la dirección e inténtelo de nuevo.</translation>
     </message>
 </context>
 <context>
-    <name>LuxsendConfig</name>
+    <name>ObfuscationConfig</name>
     <message>
-        <source>Configure Luxsend</source>
+        <source>Configure Obfuscation</source>
         <translation>Configurar Ofuscación</translation>
     </message>
     <message>
@@ -1588,19 +1588,19 @@ Por favor compruebe la dirección e inténtelo de nuevo.</translation>
         <translation>0.1 LUX por 10000 LUX que anonimizas.</translation>
     </message>
     <message>
-        <source>Luxsend Configuration</source>
+        <source>Obfuscation Configuration</source>
         <translation>Configuración de Ofuscación</translation>
     </message>
     <message>
-        <source>Luxsend was successfully set to basic (%1 and 2 rounds). You can change this at any time by opening LUX's configuration screen.</source>
+        <source>Obfuscation was successfully set to basic (%1 and 2 rounds). You can change this at any time by opening LUX's configuration screen.</source>
         <translation>La Ofuscación se configuró correctamente en modo básico (%1 y 2 rondas). Puedes cambiar esto en cualquier momento accediendo a la ventana de configuración de LUX.</translation>
     </message>
     <message>
-        <source>Luxsend was successfully set to high (%1 and 8 rounds). You can change this at any time by opening LUX's configuration screen.</source>
+        <source>Obfuscation was successfully set to high (%1 and 8 rounds). You can change this at any time by opening LUX's configuration screen.</source>
         <translation>La Ofuscación se activó correctamente en modo alto (%1 y 8 rondas). Usted puede cambiar esto en cualquier momento abriendo la ventana de configuración de LUX.</translation>
     </message>
     <message>
-        <source>Luxsend was successfully set to maximum (%1 and 16 rounds). You can change this at any time by opening LUX's configuration screen.</source>
+        <source>Obfuscation was successfully set to maximum (%1 and 16 rounds). You can change this at any time by opening LUX's configuration screen.</source>
         <translation>La Ofuscación se activó correctamente en su grado máximo (%1 y 16 rondas). Usted puede cambiar ésto en cualquier momento en la ventana de configuración de LUX.</translation>
     </message>
 </context>
@@ -1694,11 +1694,11 @@ Por favor compruebe la dirección e inténtelo de nuevo.</translation>
         <translation>Esta configuración determina la cantidad máxima de nodos maestros individuales a través de los cuales una entrada se anonimizará.&lt;br/&gt;Más rondas de anonimización ofrecen un mayor grado de privacidad, pero también cuesta más en comisiones.</translation>
     </message>
     <message>
-        <source>Luxsend rounds to use</source>
+        <source>Obfuscation rounds to use</source>
         <translation>Rondas de Ofuscación a utilizar</translation>
     </message>
     <message>
-        <source>This amount acts as a threshold to turn off Luxsend once it's reached.</source>
+        <source>This amount acts as a threshold to turn off Obfuscation once it's reached.</source>
         <translation>Esta cantidad actúa como un techo para desactivar la Ofuscación una vez alcanzado.</translation>
     </message>
     <message>
@@ -1735,9 +1735,9 @@ Por favor compruebe la dirección e inténtelo de nuevo.</translation>
     </message>
     <message>
         <source>Language missing or translation incomplete? Help contributing translations here:
-https://www.transifex.com/216k155/216k155-translations</source>
+https://www.transifex.com/lux-project/lux-project-translations</source>
         <translation>¿Falta su lenguaje o la traducción está incompleta? Contribuya con las traducciones aquí:
-https://www.transifex.com/216k155/216k155-translations</translation>
+https://www.transifex.com/lux-project/lux-project-translations</translation>
     </message>
     <message>
         <source>Map port using &amp;UPnP</source>
@@ -1939,7 +1939,7 @@ https://www.transifex.com/216k155/216k155-translations</translation>
         <translation>Estado:</translation>
     </message>
     <message>
-        <source>Luxsend Balance:</source>
+        <source>Obfuscation Balance:</source>
         <translation>Balance de Ofuscación:</translation>
     </message>
     <message>
@@ -1951,15 +1951,15 @@ https://www.transifex.com/216k155/216k155-translations</translation>
         <translation>Activado/Desactivado</translation>
     </message>
     <message>
-        <source>Try to manually submit a Luxsend request.</source>
+        <source>Try to manually submit a Obfuscation request.</source>
         <translation>Intentar enviar manualmente una solicitud de Ofuscación.</translation>
     </message>
     <message>
-        <source>Reset the current status of Luxsend (can interrupt Luxsend if it's in the process of Mixing, which can cost you money!)</source>
+        <source>Reset the current status of Obfuscation (can interrupt Obfuscation if it's in the process of Mixing, which can cost you money!)</source>
         <translation>Reiniciar el estado actual de Ofuscación (puede interrumpir la Ofuscación si está en el proceso de Mezcla, que puede costarle dinero!)</translation>
     </message>
     <message>
-        <source>Luxsend</source>
+        <source>Obfuscation</source>
         <translation>Ofuscación</translation>
     </message>
     <message>
@@ -2036,25 +2036,25 @@ https://www.transifex.com/216k155/216k155-translations</translation>
         <translation>Anonimizadas</translation>
     </message>
     <message>
-        <source>Last Luxsend message:
+        <source>Last Obfuscation message:
 </source>
         <translation>Último mensaje de Ofuscación:
 </translation>
     </message>
     <message>
-        <source>Luxsend was successfully reset.</source>
+        <source>Obfuscation was successfully reset.</source>
         <translation>La Ofuscación fue reiniciada satisfactoriamente.</translation>
     </message>
     <message>
-        <source>If you don't want to see internal Luxsend fees/transactions select "Most Common" as Type on the "Transactions" tab.</source>
+        <source>If you don't want to see internal Obfuscation fees/transactions select "Most Common" as Type on the "Transactions" tab.</source>
         <translation>Si no quiere ver aquí las operaciones internas de Ofuscación seleccione "Las Más Comunes" como el Tipo en la pestaña de "Transacciones".</translation>
     </message>
     <message>
-        <source>Luxsend requires at least %1 to use.</source>
+        <source>Obfuscation requires at least %1 to use.</source>
         <translation>La Ofuscación requiere como mínimo %1 para usarse.</translation>
     </message>
     <message>
-        <source>Wallet is locked and user declined to unlock. Disabling Luxsend.</source>
+        <source>Wallet is locked and user declined to unlock. Disabling Obfuscation.</source>
         <translation>El Monedero está bloqueado y el usuario declinó su desbloqueo. Desactivando Ofuscación.</translation>
     </message>
     <message>
@@ -2062,11 +2062,11 @@ https://www.transifex.com/216k155/216k155-translations</translation>
         <translation>Se encontraron suficientes entradas compatibles para anonimizar %1</translation>
     </message>
     <message>
-        <source>Start Luxsend</source>
+        <source>Start Obfuscation</source>
         <translation>Comenzar Ofuscación</translation>
     </message>
     <message>
-        <source>Stop Luxsend</source>
+        <source>Stop Obfuscation</source>
         <translation>Parar Ofuscación</translation>
     </message>
     <message>
@@ -2829,7 +2829,7 @@ https://www.transifex.com/216k155/216k155-translations</translation>
         <translation>Minimizar</translation>
     </message>
     <message>
-        <source>Luxsend</source>
+        <source>Obfuscation</source>
         <translation>Ofuscación</translation>
     </message>
     <message>
@@ -3005,7 +3005,7 @@ https://www.transifex.com/216k155/216k155-translations</translation>
         <translation>La dirección de destino no es válida, por favor compruébelo de nuevo.</translation>
     </message>
     <message>
-        <source>(luxsend requires this amount to be rounded up to the nearest %1).</source>
+        <source>(obfuscation requires this amount to be rounded up to the nearest %1).</source>
         <translation>(la ofuscación requiere redondear hacia arriba esta cantidad al %1 más cercano).</translation>
     </message>
     <message>

@@ -1358,9 +1358,9 @@ Please check the address and try again.</source>
     </message>
 </context>
 <context>
-    <name>LuxsendConfig</name>
+    <name>ObfuscationConfig</name>
     <message>
-        <source>Configure Luxsend</source>
+        <source>Configure Obfuscation</source>
         <translation>Параметры Перемешивания</translation>
     </message>
     <message>
@@ -1408,19 +1408,19 @@ Please check the address and try again.</source>
         <translation>0.1 LUX за 10000 LUX которые вы собираетесь анонимизировать.</translation>
     </message>
     <message>
-        <source>Luxsend Configuration</source>
+        <source>Obfuscation Configuration</source>
         <translation>Настройка Перемешивания</translation>
     </message>
     <message>
-        <source>Luxsend was successfully set to basic (%1 and 2 rounds). You can change this at any time by opening LUX's configuration screen.</source>
+        <source>Obfuscation was successfully set to basic (%1 and 2 rounds). You can change this at any time by opening LUX's configuration screen.</source>
         <translation>Перемешивание было успешно выставлено на стандартные значения (%1 и 2 цикла). Вы в любой момент можете это изменить, открыв окно настройки LUX.</translation>
     </message>
     <message>
-        <source>Luxsend was successfully set to high (%1 and 8 rounds). You can change this at any time by opening LUX's configuration screen.</source>
+        <source>Obfuscation was successfully set to high (%1 and 8 rounds). You can change this at any time by opening LUX's configuration screen.</source>
         <translation>Перемешивание было успешно выбрано как высокое (%1 и 8 циклов). Вы в любой момент можете это изменить, открыв окно настройки LUX.</translation>
     </message>
     <message>
-        <source>Luxsend was successfully set to maximum (%1 and 16 rounds). You can change this at any time by opening LUX's configuration screen.</source>
+        <source>Obfuscation was successfully set to maximum (%1 and 16 rounds). You can change this at any time by opening LUX's configuration screen.</source>
         <translation>Перемешивание было успешно выставлено на максимальное (%1 и 16 циклов). Вы в любой момент можете это изменить, открыв окно настройки LUX.</translation>
     </message>
 </context>
@@ -1514,11 +1514,11 @@ Please check the address and try again.</source>
         <translation>Эта настройка определяет количество мастернод, используемых для анонимизации. Чем больше циклов, тем выше уровень конфиденциальности, но не стоит забывать также об увеличивающейся комиссии.</translation>
     </message>
     <message>
-        <source>Luxsend rounds to use</source>
+        <source>Obfuscation rounds to use</source>
         <translation>Количество циклов Перемешивания</translation>
     </message>
     <message>
-        <source>This amount acts as a threshold to turn off Luxsend once it's reached.</source>
+        <source>This amount acts as a threshold to turn off Obfuscation once it's reached.</source>
         <translation>При достижении этого значения Перемешивание будет отключено.</translation>
     </message>
     <message>
@@ -1555,9 +1555,9 @@ Please check the address and try again.</source>
     </message>
     <message>
         <source>Language missing or translation incomplete? Help contributing translations here:
-https://www.transifex.com/216k155/216k155-translations</source>
+https://www.transifex.com/lux-project/lux-project-translations</source>
         <translation>Отсутствует ваш язык или заметили незавершенный перевод? Вы можете помочь нам стать лучше:
-https://www.transifex.com/216k155/216k155-translations</translation>
+https://www.transifex.com/lux-project/lux-project-translations</translation>
     </message>
     <message>
         <source>Map port using &amp;UPnP</source>
@@ -2112,7 +2112,7 @@ https://www.transifex.com/216k155/216k155-translations</translation>
         <translation>Обнаружен неверный сценарий.</translation>
     </message>
     <message>
-        <source>Last successful Luxsend action was too recent.</source>
+        <source>Last successful Obfuscation action was too recent.</source>
         <translation>Последняя успешная операция обфускации была совсем недавно.</translation>
     </message>
     <message>
@@ -2168,15 +2168,15 @@ https://www.transifex.com/216k155/216k155-translations</translation>
         <translation>Недостаточно доступных дескрипторов файлов.</translation>
     </message>
     <message>
-        <source>Luxsend options:</source>
+        <source>Obfuscation options:</source>
         <translation>Варианты обфускации:</translation>
     </message>
     <message>
-        <source>Luxsend request complete:</source>
+        <source>Obfuscation request complete:</source>
         <translation>Запрос об обфускации завершен:</translation>
     </message>
     <message>
-        <source>Luxsend request incomplete:</source>
+        <source>Obfuscation request incomplete:</source>
         <translation>Запрос об обфускации неполный:</translation>
     </message>
     <message>
