@@ -123,3 +123,5 @@ qa/pull-tester/test.*/*
 .idea
 
 contrib/devtools/split-debug.sh
+
+/src/DEBUG_DUMP_STAKING_INFO.hpp
