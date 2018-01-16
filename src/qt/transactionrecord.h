@@ -81,11 +81,11 @@ public:
         MNReward,
         RecvFromOther,
         SendToSelf,
-        RecvWithLuxsend,
-        LuxsendDenominate,
-        LuxsendCollateralPayment,
-        LuxsendMakeCollaterals,
-        LuxsendCreateDenominations,
+        RecvWithObfuscation,
+        ObfuscationDenominate,
+        ObfuscationCollateralPayment,
+        ObfuscationMakeCollaterals,
+        ObfuscationCreateDenominations,
         Obfuscated
     };
 

@@ -72,13 +72,13 @@ void OptionsModel::Init()
         settings.setValue("fCoinControlFeatures", false);
     fCoinControlFeatures = settings.value("fCoinControlFeatures", false).toBool();
 
-    if (!settings.contains("nLuxsendRounds"))
-        settings.setValue("nLuxsendRounds", 2);
+    if (!settings.contains("nObfuscationRounds"))
+        settings.setValue("nObfuscationRounds", 2);
 
     if (!settings.contains("nAnonymizeLuxAmount"))
         settings.setValue("nAnonymizeLuxAmount", 1000);
 
-    nLuxsendRounds = settings.value("nLuxsendRounds").toLongLong();
+    nObfuscationRounds = settings.value("nObfuscationRounds").toLongLong();
     nAnonymizeLuxAmount = settings.value("nAnonymizeLuxAmount").toLongLong();
 
     if (!settings.contains("fShowMasternodesTab"))
@@ -144,8 +144,8 @@ void OptionsModel::Init()
     if (!SoftSetArg("-lang", settings.value("language").toString().toStdString()))
         addOverriddenOption("-lang");
 
-    if (settings.contains("nLuxsendRounds"))
-        SoftSetArg("-luxsendrounds", settings.value("nLuxsendRounds").toString().toStdString());
+    if (settings.contains("nObfuscationRounds"))
+        SoftSetArg("-obfuscationrounds", settings.value("nObfuscationRounds").toString().toStdString());
     if (settings.contains("nAnonymizeLuxAmount"))
         SoftSetArg("-anonymizeluxamount", settings.value("nAnonymizeLuxAmount").toString().toStdString());
 
@@ -225,8 +225,8 @@ QVariant OptionsModel::data(const QModelIndex& index, int role) const
             return settings.value("nDatabaseCache");
         case ThreadsScriptVerif:
             return settings.value("nThreadsScriptVerif");
-        case LuxsendRounds:
-            return QVariant(nLuxsendRounds);
+        case ObfuscationRounds:
+            return QVariant(nObfuscationRounds);
         case AnonymizeLuxAmount:
             return QVariant(nAnonymizeLuxAmount);
         case Listen:
@@ -332,10 +332,10 @@ bool OptionsModel::setData(const QModelIndex& index, const QVariant& value, int 
                 setRestartRequired(true);
             }
             break;
-        case LuxsendRounds:
-            nLuxsendRounds = value.toInt();
-            settings.setValue("nLuxsendRounds", nLuxsendRounds);
-            emit luxsendRoundsChanged(nLuxsendRounds);
+        case ObfuscationRounds:
+            nObfuscationRounds = value.toInt();
+            settings.setValue("nObfuscationRounds", nObfuscationRounds);
+            emit obfuscationRoundsChanged(nObfuscationRounds);
             break;
         case AnonymizeLuxAmount:
             nAnonymizeLuxAmount = value.toInt();

@@ -396,7 +396,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QFrame" name="frameLuxsend">
+        <widget class="QFrame" name="frameObfuscation">
          <property name="minimumSize">
           <size>
            <width>0</width>
@@ -446,7 +446,7 @@
             </widget>
            </item>
            <item row="1" column="1">
-            <widget class="QProgressBar" name="luxsendProgress">
+            <widget class="QProgressBar" name="obfuscationProgress">
              <property name="maximumSize">
               <size>
                <width>154</width>
@@ -461,7 +461,7 @@
            <item row="2" column="0">
             <widget class="QLabel" name="labelAnonymizedText">
              <property name="text">
-              <string>Luxsend Balance:</string>
+              <string>Obfuscation Balance:</string>
              </property>
             </widget>
            </item>
@@ -510,7 +510,7 @@
             </widget>
            </item>
            <item row="0" column="1">
-            <widget class="QLabel" name="luxsendEnabled">
+            <widget class="QLabel" name="obfuscationEnabled">
              <property name="text">
               <string>Enabled/Disabled</string>
              </property>
@@ -955,7 +955,7 @@
            <bool>true</bool>
           </property>
          </widget>
-         <widget class="QPushButton" name="toggleLuxsend">
+         <widget class="QPushButton" name="toggleObfuscation">
           <property name="geometry">
            <rect>
             <x>120</x>
@@ -987,7 +987,7 @@
            <enum>Qt::Horizontal</enum>
           </property>
          </widget>
-         <widget class="QLabel" name="luxsendStatus">
+         <widget class="QLabel" name="obfuscationStatus">
           <property name="geometry">
            <rect>
             <x>10</x>
@@ -1012,7 +1012,7 @@
            <bool>true</bool>
           </property>
          </widget>
-         <widget class="QPushButton" name="luxsendAuto">
+         <widget class="QPushButton" name="obfuscationAuto">
           <property name="geometry">
            <rect>
             <x>10</x>
@@ -1028,13 +1028,13 @@
            </sizepolicy>
           </property>
           <property name="toolTip">
-           <string>Try to manually submit a Luxsend request.</string>
+           <string>Try to manually submit a Obfuscation request.</string>
           </property>
           <property name="text">
            <string>Try Mix</string>
           </property>
          </widget>
-         <widget class="QPushButton" name="luxsendReset">
+         <widget class="QPushButton" name="obfuscationReset">
           <property name="geometry">
            <rect>
             <x>230</x>
@@ -1050,7 +1050,7 @@
            </sizepolicy>
           </property>
           <property name="toolTip">
-           <string>Reset the current status of Luxsend (can interrupt Luxsend if it's in the process of Mixing, which can cost you money!)</string>
+           <string>Reset the current status of Obfuscation (can interrupt Obfuscation if it's in the process of Mixing, which can cost you money!)</string>
           </property>
           <property name="autoFillBackground">
            <bool>false</bool>
@@ -1078,12 +1078,12 @@
               </font>
              </property>
              <property name="text">
-              <string>Luxsend</string>
+              <string>Obfuscation</string>
              </property>
             </widget>
            </item>
            <item>
-            <widget class="QLabel" name="labelLuxsendSyncStatus">
+            <widget class="QLabel" name="labelObfuscationSyncStatus">
              <property name="toolTip">
               <string>The displayed information may be out of date. Your wallet automatically synchronizes with the LUX network after a connection is established, but this process has not completed yet.</string>
              </property>

@@ -902,9 +902,6 @@ public:
 
     CSizeComputer(int nTypeIn, int nVersionIn) : nSize(0), nType(nTypeIn), nVersion(nVersionIn) {}
 
-    int GetType() const { return nType; }
-    int GetVersion() const { return nVersion; }
-
     CSizeComputer& write(const char* psz, size_t nSize)
     {
         this->nSize += nSize;

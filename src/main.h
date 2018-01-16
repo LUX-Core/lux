@@ -50,8 +50,13 @@ class CValidationState;
 
 struct CBlockTemplate;
 struct CNodeStateStats;
-/**Segit**/
-static const int SERIALIZE_TRANSACTION_NO_WITNESS = 0x40000000;
+
+#define START_MASTERNODE_PAYMENTS 1432907775
+
+static const int64_t DARKSEND_COLLATERAL = (16120*COIN); //161.20 LUX
+static const int64_t DARKSEND_FEE = (0.002*COIN); // reward masternode
+static const int64_t DARKSEND_POOL_MAX = (1999999.99*COIN);
+
 /** Default for -blockmaxsize and -blockminsize, which control the range of sizes the mining code will create **/
 static const unsigned int DEFAULT_BLOCK_MAX_SIZE = 6000000;
 static const unsigned int DEFAULT_BLOCK_MIN_SIZE = 0;
@@ -117,6 +122,7 @@ static const int64_t STATIC_POS_REWARD = 1 * COIN; //Constant reward 8%
 
 
 inline bool IsProtocolV2(int nHeight) { return TestNet() || nHeight > 0; }
+inline int64_t GetMNCollateral(int nHeight) { return nHeight>=30000 ? 16120 : 1999999; }
 
 struct BlockHasher {
     size_t operator()(const uint256& hash) const { return hash.GetLow64(); }
@@ -241,6 +247,7 @@ inline unsigned int GetTargetSpacing(int nHeight) { return IsProtocolV2(nHeight)
 bool ActivateBestChain(CValidationState& state, CBlock* pblock = NULL);
 CAmount GetBlockValue(int nHeight);
 CAmount GetProofOfStakeReward(int64_t nCoinAge, int64_t nFees, int nHeight);
+bool IsBlockValueValid(const CBlock& block, int64_t nExpectedValue);
 
 /** Create a new block index entry for a given block hash */
 CBlockIndex* InsertBlockIndex(uint256 hash);
@@ -319,88 +326,6 @@ CAmount GetMinRelayFee(const CTransaction& tx, unsigned int nBytes, bool fAllowF
  * @param[in] mapInputs    Map of previous transactions that have outputs we're spending
  * @return True if all inputs (scriptSigs) use only standard transaction forms
  */
-
-/**
-  * Basic transaction serialization format:
-  * - int32_t nVersion
-  * - std::vector<CTxIn> vin
-  * - std::vector<CTxOut> vout
-  * - uint32_t nLockTime
-  *
-  * Extended transaction serialization format:
-  * - int32_t nVersion
-  * - unsigned char dummy = 0x00
-  * - unsigned char flags (!= 0)
-  * - std::vector<CTxIn> vin
-  * - std::vector<CTxOut> vout
-  * - if (flags & 1):
-  *   - CTxWitness wit;
-  * - uint32_t nLockTime
-  */
- template<typename Stream, typename TxType>
- inline void UnserializeTransaction(TxType& tx, Stream& s) {
-     const bool fAllowWitness = !(s.GetVersion() & SERIALIZE_TRANSACTION_NO_WITNESS);
- 
-     s >> tx.nVersion;
-     unsigned char flags = 0;
-     tx.vin.clear();
-     tx.vout.clear();
-     /* Try to read the vin. In case the dummy is there, this will be read as an empty vector. */
-     s >> tx.vin;
-     if (tx.vin.size() == 0 && fAllowWitness) {
-         /* We read a dummy or an empty vin. */
-         s >> flags;
-         if (flags != 0) {
-           s >> tx.vin;
-             s >> tx.vout;
-         }
-     } else {
-         /* We read a non-empty vin. Assume a normal vout follows. */
-         s >> tx.vout;
-     }
-     if ((flags & 1) && fAllowWitness) {
-         /* The witness flag is present, and we support witnesses. */
-         flags ^= 1;
-         for (size_t i = 0; i < tx.vin.size(); i++) {
-             s >> tx.vin[i].scriptWitness.stack;
-         }
-     }
-     if (flags) {
-         /* Unknown flag in the serialization */
-         throw std::ios_base::failure("Unknown transaction optional data");
-     }
-     s >> tx.nLockTime;
- }
- 
- template<typename Stream, typename TxType>
- inline void SerializeTransaction(const TxType& tx, Stream& s) {
-     const bool fAllowWitness = !(s.GetVersion() & SERIALIZE_TRANSACTION_NO_WITNESS);
- 
-     s << tx.nVersion;
-     unsigned char flags = 0;
-     // Consistency check
-     if (fAllowWitness) {
-         /* Check whether witnesses need to be serialized. */
-         if (tx.HasWitness()) {
-             flags |= 1;
-         }
-     }
-     if (flags) {
-         /* Use extended format in case witnesses are to be serialized. */
-         std::vector<CTxIn> vinDummy;
-         s << vinDummy;
-         s << flags;
-     }
-     s << tx.vin;
-     s << tx.vout;
-     if (flags & 1) {
-         for (size_t i = 0; i < tx.vin.size(); i++) {
-             s << tx.vin[i].scriptWitness.stack;
-         }
-     }
-     s << tx.nLockTime;
- }
- 
 bool AreInputsStandard(const CTransaction& tx, const CCoinsViewCache& mapInputs);
 
 /** 

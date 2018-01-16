@@ -11,15 +11,16 @@
 #include "checkpoints.h"
 #include "coincontrol.h"
 #include "kernel.h"
-#include "masternode-budget.h"
+//#include "masternode-budget.h"
 #include "net.h"
 #include "script/script.h"
 #include "script/sign.h"
 #include "spork.h"
-#include "swifttx.h"
+//#include "swifttx.h"
 #include "timedata.h"
 #include "util.h"
 #include "utilmoneystr.h"
+#include "instantx.h"
 
 #include <assert.h>
 
@@ -922,7 +923,7 @@ bool CWallet::IsDenominated(const CTransaction& tx) const
 
 bool CWallet::IsDenominatedAmount(int64_t nInputAmount) const
 {
-    BOOST_FOREACH (int64_t d, obfuScationDenominations)
+    BOOST_FOREACH (int64_t d, darkSendDenominations)
         if (nInputAmount == d)
             return true;
     return false;
@@ -1443,6 +1444,7 @@ void CWallet::AvailableCoins(vector<COutput>& vCoins, bool fOnlyConfirmed, const
                 continue;
 
             int nDepth = pcoin->GetDepthInMainChain(false);
+
             // do not use IX for inputs that have less then 6 blockchain confirmations
             if (fUseIX && nDepth < 6)
                 continue;
@@ -1455,21 +1457,20 @@ void CWallet::AvailableCoins(vector<COutput>& vCoins, bool fOnlyConfirmed, const
             for (unsigned int i = 0; i < pcoin->vout.size(); i++) {
                 bool found = false;
                 if (nCoinType == ONLY_DENOMINATED) {
+                                    //should make this a vector
+
                     found = IsDenominatedAmount(pcoin->vout[i].nValue);
-                } else if (nCoinType == ONLY_NOT10000IFMN) {
-                    found = !(fMasterNode && pcoin->vout[i].nValue == 16120 * COIN);
-                } else if (nCoinType == ONLY_NONDENOMINATED_NOT10000IFMN) {
+                } else if (nCoinType == ONLY_NONDENOMINATED || nCoinType == ONLY_NONDENOMINATED_NOTMN) {
+                    found = true;
                     if (IsCollateralAmount(pcoin->vout[i].nValue)) continue; // do not use collateral amounts
                     found = !IsDenominatedAmount(pcoin->vout[i].nValue);
-                    if (found && fMasterNode) found = pcoin->vout[i].nValue != 16120 * COIN; // do not use Hot MN funds
-                } else if (nCoinType == ONLY_10000) {
-                    found = pcoin->vout[i].nValue == 16120 * COIN;
+                    if (found && nCoinType == ONLY_NONDENOMINATED_NOTMN) found = (pcoin->vout[i].nValue != GetMNCollateral(pindexBestHeader->nHeight) * COIN); // do not use Hot MN funds
                 } else {
                     found = true;
                 }
                 if (!found) continue;
 
-                isminetype mine = IsMine(pcoin->vout[i]);
+                bool mine = IsMine(pcoin->vout[i]);
                 if (!(IsSpent(wtxid, i)) && mine != ISMINE_NO &&
                     (!IsLockedCoin((*it).first, i) || nCoinType == ONLY_10000) &&
                     (pcoin->vout[i].nValue > 0 || fIncludeZeroValue) &&
@@ -1985,7 +1986,11 @@ bool CWallet::HasCollateralInputs(bool fOnlyConfirmed) const
 
 bool CWallet::IsCollateralAmount(int64_t nInputAmount) const
 {
-    return nInputAmount != 0 && nInputAmount % OBFUSCATION_COLLATERAL == 0 && nInputAmount < OBFUSCATION_COLLATERAL * 5 && nInputAmount > OBFUSCATION_COLLATERAL;
+    return  nInputAmount == (DARKSEND_COLLATERAL * 5)+DARKSEND_FEE ||
+            nInputAmount == (DARKSEND_COLLATERAL * 4)+DARKSEND_FEE ||
+            nInputAmount == (DARKSEND_COLLATERAL * 3)+DARKSEND_FEE ||
+            nInputAmount == (DARKSEND_COLLATERAL * 2)+DARKSEND_FEE ||
+            nInputAmount == (DARKSEND_COLLATERAL * 1)+DARKSEND_FEE;
 }
 
 bool CWallet::CreateCollateralTransaction(CMutableTransaction& txCollateral, std::string& strReason)
@@ -3588,8 +3593,8 @@ int CMerkleTx::GetDepthInMainChain(const CBlockIndex*& pindexRet, bool enableIX)
     if (enableIX) {
         if (nResult < 6) {
             int signatures = GetTransactionLockSignatures();
-            if (signatures >= SWIFTTX_SIGNATURES_REQUIRED) {
-                return nSwiftTXDepth + nResult;
+            if (signatures >= INSTANTX_SIGNATURES_REQUIRED) {
+                return nInstantXDepth + nResult;
             }
         }
     }
@@ -3613,9 +3618,9 @@ bool CMerkleTx::AcceptToMemoryPool(bool fLimitFree, bool fRejectInsaneFee, bool 
 
 int CMerkleTx::GetTransactionLockSignatures() const
 {
-    if (fLargeWorkForkFound || fLargeWorkInvalidChainFound) return -2;
-    if (!IsSporkActive(SPORK_2_SWIFTTX)) return -3;
-    if (!fEnableSwiftTX) return -1;
+//    if (fLargeWorkForkFound || fLargeWorkInvalidChainFound) return -2;
+    if (!IsSporkActive(SPORK_1_MASTERNODE_PAYMENTS_ENFORCEMENT)) return -3;
+    if (!nInstantXDepth) return -1;
 
     //compile consessus vote
     std::map<uint256, CTransactionLock>::iterator i = mapTxLocks.find(GetHash());
@@ -3628,7 +3633,7 @@ int CMerkleTx::GetTransactionLockSignatures() const
 
 bool CMerkleTx::IsTransactionLockTimedOut() const
 {
-    if (!fEnableSwiftTX) return 0;
+    if (!nInstantXDepth) return 0;
 
     //compile consessus vote
     std::map<uint256, CTransactionLock>::iterator i = mapTxLocks.find(GetHash());

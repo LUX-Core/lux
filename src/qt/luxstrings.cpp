@@ -45,7 +45,7 @@ QT_TRANSLATE_NOOP("lux-core", ""
 "Delete all wallet transactions and only recover those parts of the "
 "blockchain through -rescan on startup"),
 QT_TRANSLATE_NOOP("lux-core", ""
-"Disable all LUX specific functionality (Masternodes, Luxsend, SwiftTX, "
+"Disable all LUX specific functionality (Masternodes, Obfuscation, SwiftTX, "
 "Budgeting) (0-1, default: %u)"),
 QT_TRANSLATE_NOOP("lux-core", ""
 "Distributed under the MIT software license, see the accompanying file "
@@ -54,7 +54,7 @@ QT_TRANSLATE_NOOP("lux-core", ""
 "Enable swifttx, show confirmations for locked transactions (bool, default: "
 "%s)"),
 QT_TRANSLATE_NOOP("lux-core", ""
-"Enable use of automated luxsend for funds stored in this wallet (0-1, "
+"Enable use of automated obfuscation for funds stored in this wallet (0-1, "
 "default: %u)"),
 QT_TRANSLATE_NOOP("lux-core", ""
 "Enter regression test mode, which uses a special chain in which blocks can "
@@ -110,12 +110,12 @@ QT_TRANSLATE_NOOP("lux-core", ""
 QT_TRANSLATE_NOOP("lux-core", ""
 "Number of seconds to keep misbehaving peers from reconnecting (default: %u)"),
 QT_TRANSLATE_NOOP("lux-core", ""
-"Luxsend uses exact denominated amounts to send funds, you might simply "
+"Obfuscation uses exact denominated amounts to send funds, you might simply "
 "need to anonymize some more coins."),
 QT_TRANSLATE_NOOP("lux-core", ""
 "Output debugging information (default: %u, supplying <category> is optional)"),
 QT_TRANSLATE_NOOP("lux-core", ""
-"Provide liquidity to Luxsend by infrequently mixing coins on a continual "
+"Provide liquidity to Obfuscation by infrequently mixing coins on a continual "
 "basis (0-100, default: %u, 1=very frequent, high fees, 100=very infrequent, "
 "low fees)"),
 QT_TRANSLATE_NOOP("lux-core", ""
@@ -162,9 +162,9 @@ QT_TRANSLATE_NOOP("lux-core", ""
 QT_TRANSLATE_NOOP("lux-core", ""
 "Unable to bind to %s on this computer. LUX Core is probably already running."),
 QT_TRANSLATE_NOOP("lux-core", ""
-"Unable to locate enough Luxsend denominated funds for this transaction."),
+"Unable to locate enough Obfuscation denominated funds for this transaction."),
 QT_TRANSLATE_NOOP("lux-core", ""
-"Unable to locate enough Luxsend non-denominated funds for this "
+"Unable to locate enough Obfuscation non-denominated funds for this "
 "transaction that are not equal 10000 LUX."),
 QT_TRANSLATE_NOOP("lux-core", ""
 "Unable to locate enough funds for this transaction that are not equal 10000 "
@@ -261,7 +261,7 @@ QT_TRANSLATE_NOOP("lux-core", "Error: Can't select current denominated inputs"),
 QT_TRANSLATE_NOOP("lux-core", "Error: Disk space is low!"),
 QT_TRANSLATE_NOOP("lux-core", "Error: Unsupported argument -tor found, use -onion."),
 QT_TRANSLATE_NOOP("lux-core", "Error: Wallet locked, unable to create transaction!"),
-QT_TRANSLATE_NOOP("lux-core", "Error: You already have pending entries in the Luxsend pool"),
+QT_TRANSLATE_NOOP("lux-core", "Error: You already have pending entries in the Obfuscation pool"),
 QT_TRANSLATE_NOOP("lux-core", "Failed to listen on any port. Use -listen=0 if you want this."),
 QT_TRANSLATE_NOOP("lux-core", "Failed to read block"),
 QT_TRANSLATE_NOOP("lux-core", "Fee (in LUX/kB) to add to transactions you send (default: %s)"),
@@ -297,8 +297,8 @@ QT_TRANSLATE_NOOP("lux-core", "Invalid private key."),
 QT_TRANSLATE_NOOP("lux-core", "Invalid script detected."),
 QT_TRANSLATE_NOOP("lux-core", "Keep N LUX anonymized (default: %u)"),
 QT_TRANSLATE_NOOP("lux-core", "Keep at most <n> unconnectable transactions in memory (default: %u)"),
-QT_TRANSLATE_NOOP("lux-core", "Last Luxsend was too recent."),
-QT_TRANSLATE_NOOP("lux-core", "Last successful Luxsend action was too recent."),
+QT_TRANSLATE_NOOP("lux-core", "Last Obfuscation was too recent."),
+QT_TRANSLATE_NOOP("lux-core", "Last successful Obfuscation action was too recent."),
 QT_TRANSLATE_NOOP("lux-core", "Limit size of signature cache to <n> entries (default: %u)"),
 QT_TRANSLATE_NOOP("lux-core", "Line: %d"),
 QT_TRANSLATE_NOOP("lux-core", "Listen for JSON-RPC connections on <port> (default: %u or testnet: %u)"),
@@ -331,10 +331,10 @@ QT_TRANSLATE_NOOP("lux-core", "Not compatible with existing transactions."),
 QT_TRANSLATE_NOOP("lux-core", "Not enough file descriptors available."),
 QT_TRANSLATE_NOOP("lux-core", "Not in the Masternode list."),
 QT_TRANSLATE_NOOP("lux-core", "Number of automatic wallet backups (default: 10)"),
-QT_TRANSLATE_NOOP("lux-core", "Luxsend is idle."),
-QT_TRANSLATE_NOOP("lux-core", "Luxsend options:"),
-QT_TRANSLATE_NOOP("lux-core", "Luxsend request complete:"),
-QT_TRANSLATE_NOOP("lux-core", "Luxsend request incomplete:"),
+QT_TRANSLATE_NOOP("lux-core", "Obfuscation is idle."),
+QT_TRANSLATE_NOOP("lux-core", "Obfuscation options:"),
+QT_TRANSLATE_NOOP("lux-core", "Obfuscation request complete:"),
+QT_TRANSLATE_NOOP("lux-core", "Obfuscation request incomplete:"),
 QT_TRANSLATE_NOOP("lux-core", "Only accept block chain matching built-in checkpoints (default: %u)"),
 QT_TRANSLATE_NOOP("lux-core", "Only connect to nodes in network <net> (ipv4, ipv6 or onion)"),
 QT_TRANSLATE_NOOP("lux-core", "Options:"),
@@ -415,7 +415,7 @@ QT_TRANSLATE_NOOP("lux-core", "Use UPnP to map the listening port (default: %u)"
 QT_TRANSLATE_NOOP("lux-core", "Use UPnP to map the listening port (default: 1 when listening)"),
 QT_TRANSLATE_NOOP("lux-core", "Use the test network"),
 QT_TRANSLATE_NOOP("lux-core", "Username for JSON-RPC connections"),
-QT_TRANSLATE_NOOP("lux-core", "Value more than Luxsend pool maximum allows."),
+QT_TRANSLATE_NOOP("lux-core", "Value more than Obfuscation pool maximum allows."),
 QT_TRANSLATE_NOOP("lux-core", "Verifying blocks..."),
 QT_TRANSLATE_NOOP("lux-core", "Verifying wallet..."),
 QT_TRANSLATE_NOOP("lux-core", "Wallet %s resides outside data directory %s"),
