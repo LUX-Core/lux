@@ -33,17 +33,17 @@
 
 extern bool fMasterNode;
 extern bool fLiteMode;
-extern bool fEnableInstantX;
-extern int nInstantXDepth;
-extern int nLuxsendRounds;
+extern bool fEnableSwiftTX;
+extern int nSwiftTXDepth;
+extern int nObfuscationRounds;
 extern int nAnonymizeLuxAmount;
 extern int nLiquidityProvider;
-extern bool fEnableLuxsend;
+extern bool fEnableObfuscation;
 extern int64_t enforceMasternodePaymentsTime;
 extern std::string strMasterNodeAddr;
 extern int keysLoaded;
 extern bool fSucessfullyLoaded;
-extern std::vector<int64_t> LuxsendDenominations;
+extern std::vector<int64_t> obfuScationDenominations;
 extern std::string strBudgetMode;
 
 extern std::map<std::string, std::string> mapArgs;

@@ -14,15 +14,15 @@
 #include "checkqueue.h"
 #include "init.h"
 #include "kernel.h"
-//#include "masternode-budget.h"
-//#include "masternode-payments.h"
-//#include "masternodeman.h"
+#include "masternode-budget.h"
+#include "masternode-payments.h"
+#include "masternodeman.h"
 #include "merkleblock.h"
 #include "net.h"
-//#include "luxsend.h"
+#include "obfuscation.h"
 #include "pow.h"
 #include "spork.h"
-#include "instantx.h"
+#include "swifttx.h"
 #include "txdb.h"
 #include "txmempool.h"
 #include "ui_interface.h"
@@ -881,24 +881,24 @@ int GetInputAge(CTxIn& vin)
     }
 }
 
-//int GetInputAgeIX(uint256 nTXHash, CTxIn& vin)
-//{
-//    int sigs = 0;
-//    int nResult = GetInputAge(vin);
-//    if (nResult < 0) nResult = 0;
-//
-//    if (nResult < 6) {
-//        std::map<uint256, CTransactionLock>::iterator i = mapTxLocks.find(nTXHash);
-//        if (i != mapTxLocks.end()) {
-//            sigs = (*i).second.CountSignatures();
-//        }
-//        if (sigs >= SWIFTTX_SIGNATURES_REQUIRED) {
-//            return nSwiftTXDepth + nResult;
-//        }
-//    }
-//
-//    return -1;
-//}
+int GetInputAgeIX(uint256 nTXHash, CTxIn& vin)
+{
+    int sigs = 0;
+    int nResult = GetInputAge(vin);
+    if (nResult < 0) nResult = 0;
+
+    if (nResult < 6) {
+        std::map<uint256, CTransactionLock>::iterator i = mapTxLocks.find(nTXHash);
+        if (i != mapTxLocks.end()) {
+            sigs = (*i).second.CountSignatures();
+        }
+        if (sigs >= SWIFTTX_SIGNATURES_REQUIRED) {
+            return nSwiftTXDepth + nResult;
+        }
+    }
+
+    return -1;
+}
 
 int GetIXConfirmations(uint256 nTXHash)
 {
@@ -908,8 +908,8 @@ int GetIXConfirmations(uint256 nTXHash)
     if (i != mapTxLocks.end()) {
         sigs = (*i).second.CountSignatures();
     }
-    if (sigs >= INSTANTX_SIGNATURES_REQUIRED) {
-        return nInstantXDepth;
+    if (sigs >= SWIFTTX_SIGNATURES_REQUIRED) {
+        return nSwiftTXDepth;
     }
 
     return 0;
@@ -1201,7 +1201,7 @@ bool AcceptToMemoryPool(CTxMemPool& pool, CValidationState& state, const CTransa
 
         // Don't accept it if it can't get into a block
         // but prioritise dstx and don't check fees for it
-        if (mapLuxsendBroadcastTxes.count(hash)) {
+        if (mapObfuscationBroadcastTxes.count(hash)) {
             mempool.PrioritiseTransaction(hash, hash.ToString(), 1000, 0.1 * COIN);
         } else if (!ignoreFees) {
             CAmount txMinFee = GetMinRelayFee(tx, nSize, true);
@@ -4303,7 +4303,7 @@ bool static AlreadyHave(const CInv& inv)
                pcoinsTip->HaveCoins(inv.hash);
     }
     case MSG_DSTX:
-        return mapLuxsendBroadcastTxes.count(inv.hash);
+        return mapObfuscationBroadcastTxes.count(inv.hash);
     case MSG_BLOCK:
         return mapBlockIndex.count(inv.hash);
     case MSG_TXLOCK_REQUEST:
@@ -4550,10 +4550,10 @@ void static ProcessGetData(CNode* pfrom)
                 }
 
                 if (!pushed && inv.type == MSG_DSTX) {
-                    if (mapLuxsendBroadcastTxes.count(inv.hash)) {
+                    if (mapObfuscationBroadcastTxes.count(inv.hash)) {
                         CDataStream ss(SER_NETWORK, PROTOCOL_VERSION);
                         ss.reserve(1000);
-                        ss << mapLuxsendBroadcastTxes[inv.hash].tx << mapLuxsendBroadcastTxes[inv.hash].vin << mapLuxsendBroadcastTxes[inv.hash].vchSig << mapLuxsendBroadcastTxes[inv.hash].sigTime;
+                        ss << mapObfuscationBroadcastTxes[inv.hash].tx << mapObfuscationBroadcastTxes[inv.hash].vin << mapObfuscationBroadcastTxes[inv.hash].vchSig << mapObfuscationBroadcastTxes[inv.hash].sigTime;
 
                         pfrom->PushMessage("dstx", ss);
                         pushed = true;
@@ -4963,14 +4963,14 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
                 ignoreFees = true;
                 pmn->allowFreeTx = false;
 
-                if (!mapLuxsendBroadcastTxes.count(tx.GetHash())) {
-                    CLuxsendBroadcastTx dstx;
+                if (!mapObfuscationBroadcastTxes.count(tx.GetHash())) {
+                    CObfuscationBroadcastTx dstx;
                     dstx.tx = tx;
                     dstx.vin = vin;
                     dstx.vchSig = vchSig;
                     dstx.sigTime = sigTime;
 
-                    mapLuxsendBroadcastTxes.insert(make_pair(tx.GetHash(), dstx));
+                    mapObfuscationBroadcastTxes.insert(make_pair(tx.GetHash(), dstx));
                 }
             }
         }
@@ -5384,7 +5384,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
         }
     } else {
         //probably one the extensions
-        obfuScationPool.ProcessMessageLuxsend(pfrom, strCommand, vRecv);
+        obfuScationPool.ProcessMessageObfuscation(pfrom, strCommand, vRecv);
         mnodeman.ProcessMessage(pfrom, strCommand, vRecv);
         budget.ProcessMessage(pfrom, strCommand, vRecv);
         masternodePayments.ProcessMessageMasternodePayments(pfrom, strCommand, vRecv);
