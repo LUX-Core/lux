@@ -417,7 +417,7 @@ vector<COutput> CActiveMasternode::SelectCoinsMasternode() {
 
     // Filter
     BOOST_FOREACH(const COutput& out, vCoins) {
-        if(out.tx->vout[out.i].nValue == GetMNCollateral(pindexBest->nHeight)*COIN) {  //exactly 16120 LUX
+        if(out.tx->vout[out.i].nValue == GetMNCollateral(pindexBestHeader->nHeight)*COIN) {  //exactly 16120 LUX
         	filteredCoins.push_back(out);
         }
     }
@@ -427,8 +427,8 @@ vector<COutput> CActiveMasternode::SelectCoinsMasternode() {
 // get all possible outputs for running masternode for a specific pubkey
 vector<COutput> CActiveMasternode::SelectCoinsMasternodeForPubKey(std::string collateralAddress) {
     CBitcoinAddress address(collateralAddress);
-    CScript scriptPubKey;
-    scriptPubKey.SetDestination(address.Get());
+    CScript scriptPubKey = GetScriptForDestination(address.Get());
+//    scriptPubKey.SetDestination(address.Get());
     vector<COutput> vCoins;
     vector<COutput> filteredCoins;
 
