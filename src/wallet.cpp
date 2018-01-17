@@ -777,7 +777,7 @@ void CWallet::EraseFromWallet(const uint256& hash)
 }
 
 
-isminetype CWallet::IsMine(const CTxIn& txin) const
+bool CWallet::IsMine(const CTxIn& txin) const
 {
     {
         LOCK(cs_wallet);
@@ -788,7 +788,7 @@ isminetype CWallet::IsMine(const CTxIn& txin) const
                 return IsMine(prev.vout[txin.prevout.n]);
         }
     }
-    return ISMINE_NO;
+    return false;
 }
 
 CAmount CWallet::GetDebit(const CTxIn& txin, const isminefilter& filter) const
@@ -1483,6 +1483,75 @@ void CWallet::AvailableCoins(vector<COutput>& vCoins, bool fOnlyConfirmed, const
     }
 }
 
+
+void CWallet::AvailableCoinsMN(vector<COutput>& vCoins, bool fOnlyConfirmed, const CCoinControl *coinControl, AvailableCoinsType coin_type, bool useIX) const
+{
+    vCoins.clear();
+
+    {
+        LOCK2(cs_main, cs_wallet);
+        for (map<uint256, CWalletTx>::const_iterator it = mapWallet.begin(); it != mapWallet.end(); ++it)
+        {
+            const CWalletTx* pcoin = &(*it).second;
+
+            if (!IsFinalTx(*pcoin))
+                continue;
+
+            if (fOnlyConfirmed && !pcoin->IsTrusted())
+                continue;
+
+            if (pcoin->IsCoinBase() && pcoin->GetBlocksToMaturity() > 0)
+                continue;
+
+            if(pcoin->IsCoinStake() && pcoin->GetBlocksToMaturity() > 0)
+                continue;
+
+            int nDepth = pcoin->GetDepthInMainChain();
+            if (nDepth <= 0) // LuxNOTE: coincontrol fix / ignore 0 confirm
+                continue;
+
+            /* for (unsigned int i = 0; i < pcoin->vout.size(); i++)
+                 if (!(pcoin->IsSpent(i)) && IsMine(pcoin->vout[i]) && pcoin->vout[i].nValue >= nMinimumInputValue &&
+                 (!coinControl || !coinControl->HasSelected() || coinControl->IsSelected((*it).first, i)))
+                     vCoins.push_back(COutput(pcoin, i, nDepth));*/
+            // do not use IX for inputs that have less then 6 blockchain confirmations
+            if (useIX && nDepth < 6)
+                continue;
+
+            for (unsigned int i = 0; i < pcoin->vout.size(); i++) {
+                bool found = false;
+                if(coin_type == ONLY_DENOMINATED) {
+                    //should make this a vector
+
+                    found = IsDenominatedAmount(pcoin->vout[i].nValue);
+                } else if(coin_type == ONLY_NONDENOMINATED || coin_type == ONLY_NONDENOMINATED_NOTMN) {
+                    found = true;
+                    if (IsCollateralAmount(pcoin->vout[i].nValue)) continue; // do not use collateral amounts
+                    found = !IsDenominatedAmount(pcoin->vout[i].nValue);
+                    if(found && coin_type == ONLY_NONDENOMINATED_NOTMN) found = (pcoin->vout[i].nValue != GetMNCollateral(pindexBest->nHeight)*COIN); // do not use MN funds
+                } else {
+                    found = true;
+                }
+                if(!found) continue;
+
+                //isminetype mine = IsMine(pcoin->vout[i]);
+                bool mine = IsMine(pcoin->vout[i]);
+
+                //if (!(IsSpent(wtxid, i)) && mine != ISMINE_NO &&
+                //    !IsLockedCoin((*it).first, i) && pcoin->vout[i].nValue > 0 &&
+                //    (!coinControl || !coinControl->HasSelected() || coinControl->IsSelected((*it).first, i)))
+                //        vCoins.push_back(COutput(pcoin, i, nDepth, (mine & ISMINE_SPENDABLE) != ISMINE_NO));
+                //if (!(IsSpent(wtxid, i)) && mine &&
+                if (!(pcoin->IsSpent(i)) &&
+                    !IsLockedCoin((*it).first, i) && pcoin->vout[i].nValue > 0 &&
+                    (!coinControl || !coinControl->HasSelected() || coinControl->IsSelected((*it).first, i)))
+                    vCoins.push_back(COutput(pcoin, i, nDepth, mine));
+            }
+        }
+    }
+}
+
+
 map<CBitcoinAddress, vector<COutput> > CWallet::AvailableCoinsByAddress(bool fConfirmed, CAmount maxCoinValue)
 {
     vector<COutput> vCoins;
@@ -1999,7 +2068,7 @@ bool CWallet::CreateCollateralTransaction(CMutableTransaction& txCollateral, std
         To doublespend a collateral transaction, it will require a fee higher than this. So there's
         still a significant cost.
     */
-    CAmount nFeeRet = 1 * COIN;
+    CAmount nFeeRet = 0.001 * COIN;
 
     txCollateral.vin.clear();
     txCollateral.vout.clear();
@@ -2009,7 +2078,7 @@ bool CWallet::CreateCollateralTransaction(CMutableTransaction& txCollateral, std
     std::vector<CTxIn> vCoinsCollateral;
 
     if (!SelectCoinsCollateral(vCoinsCollateral, nValueIn2)) {
-        strReason = "Error: Obfuscation requires a collateral transaction and could not locate an acceptable input!";
+        strReason = "Error: Luxsend requires a collateral transaction and could not locate an acceptable input!";
         return false;
     }
 
@@ -2023,9 +2092,9 @@ bool CWallet::CreateCollateralTransaction(CMutableTransaction& txCollateral, std
     BOOST_FOREACH (CTxIn v, vCoinsCollateral)
         txCollateral.vin.push_back(v);
 
-    if (nValueIn2 - OBFUSCATION_COLLATERAL - nFeeRet > 0) {
+    if (nValueIn2 - DARKSEND_COLLATERAL - nFeeRet > 0) {
         //pay collateral charge in fees
-        CTxOut vout3 = CTxOut(nValueIn2 - OBFUSCATION_COLLATERAL, scriptChange);
+        CTxOut vout3 = CTxOut(nValueIn2 - DARKSEND_COLLATERAL, scriptChange);
         txCollateral.vout.push_back(vout3);
     }
 
@@ -3613,6 +3682,7 @@ int CMerkleTx::GetBlocksToMaturity() const
 bool CMerkleTx::AcceptToMemoryPool(bool fLimitFree, bool fRejectInsaneFee, bool ignoreFees)
 {
     CValidationState state;
+
     return ::AcceptToMemoryPool(mempool, state, *this, fLimitFree, NULL, fRejectInsaneFee, ignoreFees);
 }
 
