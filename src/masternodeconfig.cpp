@@ -2,6 +2,7 @@
 #include "net.h"
 #include "masternodeconfig.h"
 #include "util.h"
+#include "chainparams.h"
 
 CMasternodeConfig masternodeConfig;
 
@@ -16,8 +17,7 @@ bool CMasternodeConfig::read(boost::filesystem::path path) {
         return true; // No masternode.conf file is OK
     }
 
-    for(std::string line; std::getline(streamConfig, line); )
-    {
+    for(std::string line; std::getline(streamConfig, line); ) {
         if(line.empty()) {
             continue;
         }
@@ -29,7 +29,7 @@ bool CMasternodeConfig::read(boost::filesystem::path path) {
             return false;
         }
 
-        if(Params().NetworkID() == CChainParams::MAIN){
+        if(Params().NetworkID() == CBaseChainParams::MAIN) {
             if(CService(ip).GetPort() != 28666) {
                 LogPrintf("Invalid port detected in masternode.conf: %s (must be 17170 for mainnet)\n", line.c_str());
                 streamConfig.close();

@@ -150,7 +150,7 @@ public:
 
     template <typename Stream, typename Operation>
     inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion){
-	unsigned int nSerSize = 0;
+//	unsigned int nSerSize = 0;
         READWRITE(nDenom);
         READWRITE(vin);
         READWRITE(time);
@@ -232,7 +232,7 @@ public:
     // masternode entries
     std::vector<CDarkSendEntry> entries;
     // the finalized transaction ready for signing
-    CTransaction finalTransaction;
+    CMutableTransaction finalTransaction;
 
     int64_t lastTimeChanged;
     int64_t lastAutoDenomination;

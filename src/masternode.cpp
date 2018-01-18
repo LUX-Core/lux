@@ -341,16 +341,16 @@ void ProcessMessageMasternode(CNode* pfrom, std::string& strCommand, CDataStream
         int a = 0;
         vRecv >> winner >> a;
 
-        if(pindexBest == NULL) return;
+        if(pindexBestHeader == NULL) return;
 
         uint256 hash = winner.GetHash();
         if(mapSeenMasternodeVotes.count(hash)) {
-            if(fDebug) LogPrintf("mnw - seen vote %s Height %d bestHeight %d\n", hash.ToString().c_str(), winner.nBlockHeight, pindexBest->nHeight);
+            if(fDebug) LogPrintf("mnw - seen vote %s Height %d bestHeight %d\n", hash.ToString().c_str(), winner.nBlockHeight, pindexBestHeader->nHeight);
             return;
         }
 
-        if(winner.nBlockHeight < pindexBest->nHeight - 10 || winner.nBlockHeight > pindexBest->nHeight+20){
-            LogPrintf("mnw - winner out of range %s Height %d bestHeight %d\n", winner.vin.ToString().c_str(), winner.nBlockHeight, pindexBest->nHeight);
+        if(winner.nBlockHeight < pindexBestHeader->nHeight - 10 || winner.nBlockHeight > pindexBestHeader->nHeight+20){
+            LogPrintf("mnw - winner out of range %s Height %d bestHeight %d\n", winner.vin.ToString().c_str(), winner.nBlockHeight, pindexBestHeader->nHeight);
             return;
         }
 
@@ -360,7 +360,7 @@ void ProcessMessageMasternode(CNode* pfrom, std::string& strCommand, CDataStream
             return;
         }
 
-        LogPrintf("mnw - winning vote  %s Height %d bestHeight %d\n", winner.vin.ToString().c_str(), winner.nBlockHeight, pindexBest->nHeight);
+        LogPrintf("mnw - winning vote  %s Height %d bestHeight %d\n", winner.vin.ToString().c_str(), winner.nBlockHeight, pindexBestHeader->nHeight);
 
         if(!masternodePayments.CheckSignature(winner)){
             LogPrintf("mnw - invalid signature\n");
@@ -522,23 +522,23 @@ int GetMasternodeRank(CTxIn& vin, int64_t nBlockHeight, int minProtocol)
 //Get the last hash that matches the modulus given. Processed in reverse order
 bool GetBlockHash(uint256& hash, int nBlockHeight)
 {
-    if (pindexBest == NULL) return false;
+    if (pindexBestHeader == NULL) return false;
 
     if(nBlockHeight == 0)
-        nBlockHeight = pindexBest->nHeight;
+        nBlockHeight = pindexBestHeader->nHeight;
 
     if(mapCacheBlockHashes.count(nBlockHeight)){
         hash = mapCacheBlockHashes[nBlockHeight];
         return true;
     }
 
-    const CBlockIndex *BlockLastSolved = pindexBest;
-    const CBlockIndex *BlockReading = pindexBest;
+    const CBlockIndex *BlockLastSolved = pindexBestHeader;
+    const CBlockIndex *BlockReading = pindexBestHeader;
 
-    if (BlockLastSolved == NULL || BlockLastSolved->nHeight == 0 || pindexBest->nHeight+1 < nBlockHeight) return false;
+    if (BlockLastSolved == NULL || BlockLastSolved->nHeight == 0 || pindexBestHeader->nHeight+1 < nBlockHeight) return false;
 
     int nBlocksAgo = 0;
-    if(nBlockHeight > 0) nBlocksAgo = (pindexBest->nHeight+1)-nBlockHeight;
+    if(nBlockHeight > 0) nBlocksAgo = (pindexBestHeader->nHeight+1)-nBlockHeight;
     assert(nBlocksAgo >= 0);
 
     int n = 0;
@@ -564,7 +564,7 @@ bool GetBlockHash(uint256& hash, int nBlockHeight)
 //
 uint256 CMasterNode::CalculateScore(int mod, int64_t nBlockHeight)
 {
-    if(pindexBest == NULL) return 0;
+    if(pindexBestHeader == NULL) return 0;
 
     uint256 hash = 0;
     uint256 aux = vin.prevout.hash + vin.prevout.n;
@@ -599,13 +599,13 @@ void CMasterNode::Check()
     if(!unitTest){
         CValidationState state;
         CTransaction tx = CTransaction();
-        CTxOut vout = CTxOut((GetMNCollateral(pindexBest->nHeight)-1)*COIN, darkSendPool.collateralPubKey);
+        CTxOut vout = CTxOut((GetMNCollateral(pindexBestHeader->nHeight)-1)*COIN, darkSendPool.collateralPubKey);
         tx.vin.push_back(vin);
         tx.vout.push_back(vout);
 
         //if(!AcceptableInputs(mempool, state, tx)){
         bool pfMissingInputs;
-        if(!AcceptableInputs(mempool, tx, false, &pfMissingInputs)){
+        if(!AcceptableInputs(mempool, state, tx, false, &pfMissingInputs)){
             enabled = 3;
             return;
         }
@@ -732,13 +732,13 @@ bool CMasternodePayments::AddWinningMasternode(CMasternodePaymentWinner& winnerI
 void CMasternodePayments::CleanPaymentList()
 {
     LOCK(cs_masternodes);
-    if(pindexBest == NULL) return;
+    if(pindexBestHeader == NULL) return;
 
     int nLimit = std::max(((int)vecMasternodes.size())*2, 1000);
 
     vector<CMasternodePaymentWinner>::iterator it;
     for(it=vWinning.begin();it<vWinning.end();it++){
-        if(pindexBest->nHeight - (*it).nBlockHeight > nLimit){
+        if(pindexBestHeader->nHeight - (*it).nBlockHeight > nLimit){
             if(fDebug) LogPrintf("CMasternodePayments::CleanPaymentList - Removing old masternode payment - block %d\n", (*it).nBlockHeight);
             vWinning.erase(it);
             break;
@@ -815,7 +815,7 @@ void CMasternodePayments::Sync(CNode* node)
 {
     int a = 0;
     BOOST_FOREACH(CMasternodePaymentWinner& winner, vWinning)
-                    if(winner.nBlockHeight >= pindexBest->nHeight-10 && winner.nBlockHeight <= pindexBest->nHeight + 20)
+                    if(winner.nBlockHeight >= pindexBestHeader->nHeight-10 && winner.nBlockHeight <= pindexBestHeader->nHeight + 20)
                         node->PushMessage("mnw", winner, a);
 }
 

@@ -6,6 +6,7 @@
 #include "darksend.h"
 #include "main.h"
 #include "init.h"
+#include "script/sign.h"
 #include "script/interpreter.h"
 #include "util.h"
 #include "masternode.h"
@@ -1098,7 +1099,7 @@ bool CDarkSendPool::SignaturesComplete(){
 // This is only ran from clients
 //
 void CDarkSendPool::SendLuxsendDenominate(std::vector<CTxIn>& vin, std::vector<CTxOut>& vout, int64_t amount){
-    if(darkSendPool.txCollateral == CTransaction()){
+    if(darkSendPool.txCollateral == CMutableTransaction()){
         LogPrintf ("CLuxsendPool:SendLuxsendDenominate() - Luxsend collateral not set");
         return;
     }
@@ -1156,7 +1157,7 @@ void CDarkSendPool::SendLuxsendDenominate(std::vector<CTxIn>& vin, std::vector<C
 
         //if(!AcceptableInputs(mempool, state, tx)){
         bool* pfMissingInputs;
-        if(!AcceptableInputs(mempool, tx, false, pfMissingInputs)){
+        if(!AcceptableInputs(mempool, state, tx, false, pfMissingInputs)){
             LogPrintf("dsi -- transaction not valid! %s \n", tx.ToString().c_str());
             return;
         }
@@ -1279,7 +1280,9 @@ bool CDarkSendPool::SignFinalTransaction(CTransaction& finalTransactionNew, CNod
                                         }
 
                                         if(fDebug) LogPrintf("CDarkSendPool::Sign - Signing my input %i\n", mine);
-                                        if(!SignSignature(*pwalletMain, prevPubKey, finalTransaction, mine, int(SIGHASH_ALL|SIGHASH_ANYONECANPAY))) { // changes scriptSig
+                                        const CKeyStore& keystore = *pwalletMain;
+
+                                        if(!SignSignature(keystore, prevPubKey, finalTransaction, mine, int(SIGHASH_ALL|SIGHASH_ANYONECANPAY))) { // changes scriptSig
                                             if(fDebug) LogPrintf("CDarkSendPool::Sign - Unable to sign my own transaction! \n");
                                             // not sure what to do here, it will timeout...?
                                         }
@@ -1314,7 +1317,7 @@ void CDarkSendPool::NewBlock()
 
     if(!fMasterNode){
         //denominate all non-denominated inputs every 25 minutes.
-        if(pindexBest->nHeight % 10 == 0) UnlockCoins();
+        if(pindexBestHeader->nHeight % 10 == 0) UnlockCoins();
         ProcessMasternodeConnections();
     }
 }
@@ -1334,7 +1337,7 @@ void CDarkSendPool::CompletedTransaction(bool error, std::string lastMessageNew)
         myEntries.clear();
 
         // To avoid race conditions, we'll only let DS run once per block
-        cachedLastSuccess = pindexBest->nHeight;
+        cachedLastSuccess = pindexBestHeader->nHeight;
     }
     lastMessage = lastMessageNew;
 
@@ -1362,7 +1365,7 @@ bool CDarkSendPool::DoAutomaticDenominating(bool fDryRun, bool ready)
     if(fMasterNode) return false;
     if(state == POOL_STATUS_ERROR || state == POOL_STATUS_SUCCESS) return false;
 
-    if(pindexBest->nHeight - cachedLastSuccess < minBlockSpacing) {
+    if(pindexBestHeader->nHeight - cachedLastSuccess < minBlockSpacing) {
         LogPrintf("CDarkSendPool::DoAutomaticDenominating - Last successful darksend action was too recent\n");
         strAutoDenomResult = _("Last successful darksend action was too recent.");
         return false;
@@ -1512,7 +1515,7 @@ bool CDarkSendPool::DoAutomaticDenominating(bool fDryRun, bool ready)
                                                 if((CNetAddr)pnode->addr != (CNetAddr)submittedToMasternode) continue;
 
                                                 std::string strReason;
-                                                if(txCollateral == CTransaction()){
+                                                if(txCollateral == CMutableTransaction()){
                                                     if(!pwalletMain->CreateCollateralTransaction(txCollateral, strReason)){
                                                         LogPrintf("DoAutomaticDenominating -- dsa error:%s\n", strReason.c_str());
                                                         return false;
@@ -1573,7 +1576,7 @@ bool CDarkSendPool::DoAutomaticDenominating(bool fDryRun, bool ready)
                                 if((CNetAddr)pnode->addr != (CNetAddr)vecMasternodes[i].addr) continue;
 
                                 std::string strReason;
-                                if(txCollateral == CTransaction()){
+                                if(txCollateral == CMutableTransaction()){
                                     if(!pwalletMain->CreateCollateralTransaction(txCollateral, strReason)){
                                         LogPrintf("DoAutomaticDenominating -- create collateral error:%s\n", strReason.c_str());
                                         return false;
@@ -1648,7 +1651,8 @@ bool CDarkSendPool::SendRandomPaymentToSelf()
 
     CCoinControl *coinControl=NULL;
     int32_t nChangePos;
-    bool success = pwalletMain->CreateTransaction(vecSend, wtx, reservekey, nFeeRet, nChangePos, strFail, coinControl, ONLY_DENOMINATED);
+    bool success = pwalletMain->CreateTransaction(vecSend, wtx, reservekey, nFeeRet, strFail, coinControl, ONLY_DENOMINATED);
+//    bool success = pwalletMain->CreateTransaction(vecSend, wtx, reservekey, nFeeRet, nChangePos, strFail, coinControl, ONLY_DENOMINATED);
     if(!success){
         LogPrintf("SendRandomPaymentToSelf: Error - %s\n", strFail.c_str());
         return false;
@@ -1681,15 +1685,19 @@ bool CDarkSendPool::MakeCollateralAmounts()
     vecSend.push_back(make_pair(scriptChange, (DARKSEND_COLLATERAL*2)+DARKSEND_FEE));
 
     CCoinControl *coinControl=NULL;
-    int32_t nChangePos;
+//    int32_t nChangePos;
     // try to use non-denominated and not mn-like funds
+//    bool success = pwalletMain->CreateTransaction(vecSend, wtx, reservekey,
+//                                                  nFeeRet, nChangePos, strFail, coinControl, ONLY_NONDENOMINATED_NOTMN);
     bool success = pwalletMain->CreateTransaction(vecSend, wtx, reservekey,
-                                                  nFeeRet, nChangePos, strFail, coinControl, ONLY_NONDENOMINATED_NOTMN);
+                                                  nFeeRet, strFail, coinControl, ONLY_NONDENOMINATED_NOTMN);
     if(!success){
         // if we failed (most likeky not enough funds), try to use denominated instead -
         // MN-like funds should not be touched in any case and we can't mix denominated without collaterals anyway
+//        success = pwalletMain->CreateTransaction(vecSend, wtx, reservekey,
+//                                                 nFeeRet, nChangePos, strFail, coinControl, ONLY_DENOMINATED);
         success = pwalletMain->CreateTransaction(vecSend, wtx, reservekey,
-                                                 nFeeRet, nChangePos, strFail, coinControl, ONLY_DENOMINATED);
+                                                 nFeeRet, strFail, coinControl, ONLY_DENOMINATED);
         if(!success){
             LogPrintf("MakeCollateralAmounts: Error - %s\n", strFail.c_str());
             return false;
@@ -1759,8 +1767,10 @@ bool CDarkSendPool::CreateDenominated(int64_t nTotalValue)
 
     CCoinControl *coinControl=NULL;
     int32_t nChangePos;
+//    bool success = pwalletMain->CreateTransaction(vecSend, wtx, reservekey,
+//                                                  nFeeRet, nChangePos, strFail, coinControl, ONLY_NONDENOMINATED_NOTMN);
     bool success = pwalletMain->CreateTransaction(vecSend, wtx, reservekey,
-                                                  nFeeRet, nChangePos, strFail, coinControl, ONLY_NONDENOMINATED_NOTMN);
+                                                  nFeeRet, strFail, coinControl, ONLY_NONDENOMINATED_NOTMN);
     if(!success){
         LogPrintf("CreateDenominated: Error - %s\n", strFail.c_str());
         return false;
