@@ -115,8 +115,7 @@ static const unsigned char REJECT_CHECKPOINT = 0x43;
 
 static const int64_t STATIC_POS_REWARD = 1 * COIN; //Constant reward 8%
 
-
-inline bool IsProtocolV2(int nHeight) { return TestNet() || nHeight > 0; }
+inline bool IsProtocolV2(int nHeight) { return IsTestNet() || nHeight > 0; }
 
 struct BlockHasher {
     size_t operator()(const uint256& hash) const { return hash.GetLow64(); }

@@ -13,6 +13,8 @@
 
 #include <boost/thread.hpp>
 
+extern map<uint256, uint256> mapProofOfStake;
+
 using namespace std;
 
 void static BatchWriteCoins(CLevelDBBatch& batch, const uint256& hash, const CCoins& coins)
@@ -77,6 +79,9 @@ CBlockTreeDB::CBlockTreeDB(size_t nCacheSize, bool fMemory, bool fWipe) : CLevel
 
 bool CBlockTreeDB::WriteBlockIndex(const CDiskBlockIndex& blockindex)
 {
+    if (blockindex.IsProofOfStake() && blockindex.hashProofOfStake == 0) {
+        return error("%s: zero stake (block %s)", __func__, blockindex.GetBlockHash().GetHex());
+    }
     return Write(make_pair('b', blockindex.GetBlockHash()), blockindex);
 }
 
@@ -244,12 +249,23 @@ bool CBlockTreeDB::LoadBlockIndexGuts()
 
                 if (pindexNew->IsProofOfWork() && pindexNew->nHeight <= Params().LAST_POW_BLOCK()) {
                     if (!CheckProofOfWork(pindexNew->GetBlockHash(), pindexNew->nBits))
-                        return error("LoadBlockIndex() : CheckProofOfWork failed: %s", pindexNew->ToString());
+                        return error("%s: CheckProofOfWork failed: %s", __func__, pindexNew->ToString());
                 }
 
                 // ppcoin: build setStakeSeen
                 if (pindexNew->IsProofOfStake()) {
-                    setStakeSeen.insert(make_pair(pindexNew->prevoutStake, pindexNew->nStakeTime));
+                    setStakeSeen.emplace(pindexNew->prevoutStake, pindexNew->nStakeTime);
+                    auto const hash(pindexNew->GetBlockHash());
+                    if (pindexNew->hashProofOfStake == 0) {
+                        return error("%s: zero stake (block %s)", __func__, hash.GetHex());
+                    } else if (mapProofOfStake.count(hash)) {
+                        auto const &h = mapProofOfStake[hash];
+                        if (h != pindexNew->hashProofOfStake)
+                            return error("%s: diverged stake %s, %s (block %s)\n", __func__, 
+                                         pindexNew->hashProofOfStake.GetHex(), h.GetHex(), hash.GetHex());
+                    } else {
+                        mapProofOfStake.emplace(hash, pindexNew->hashProofOfStake);
+                    }
                 }
 
                 pcursor->Next();

@@ -177,9 +177,7 @@ void SelectParams(CBaseChainParams::Network network);
  */
 bool SelectParamsFromCommandLine();
 
-inline bool TestNet() {
-    // Note: it's deliberate that this returns "false" for regression test mode.
-    return Params().NetworkID() == CBaseChainParams::TESTNET;
-}
+// Note: it's deliberate that this returns "false" for regression test mode.
+inline bool IsTestNet() { return Params().NetworkID() == CBaseChainParams::TESTNET; }
 
 #endif // BITCOIN_CHAINPARAMS_H

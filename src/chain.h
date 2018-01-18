@@ -315,11 +315,7 @@ public:
 
     unsigned int GetStakeEntropyBit() const
     {
-        unsigned int nEntropyBit = ((GetBlockHash().Get64()) & 1llu);
-        if (fDebug || GetBoolArg("-printstakemodifier", false))
-            LogPrintf("GetStakeEntropyBit: nHeight=%u hashBlock=%s nEntropyBit=%u\n", nHeight, GetBlockHash().ToString().c_str(), nEntropyBit);
-
-        return nEntropyBit;
+        return ((GetBlockHash().Get64()) & 1llu);
     }
 
     bool SetStakeEntropyBit(unsigned int nEntropyBit)
@@ -432,6 +428,7 @@ public:
         if (IsProofOfStake()) {
             READWRITE(prevoutStake);
             READWRITE(nStakeTime);
+            READWRITE(hashProofOfStake);
         } else {
             const_cast<CDiskBlockIndex*>(this)->prevoutStake.SetNull();
             const_cast<CDiskBlockIndex*>(this)->nStakeTime = 0;
