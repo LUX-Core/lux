@@ -445,17 +445,17 @@ public:
     bool IsDenominatedAmount(int64_t nInputAmount) const;
 
     bool IsMine(const CTxIn& txin) const;
-    CAmount GetDebit(const CTxIn& txin, const isminefilter& filter) const;
+    CAmount GetDebit(const CTxIn& txin) const;
 
     bool IsMine(const CTxOut& txout) const
     {
         return ::IsMine(*this, txout.scriptPubKey);
     }
-    CAmount GetCredit(const CTxOut& txout, const isminefilter& filter) const
+    CAmount GetCredit(const CTxOut& txout) const
     {
         if (!MoneyRange(txout.nValue))
             throw std::runtime_error("CWallet::GetCredit() : value out of range");
-        return ((IsMine(txout) & filter) ? txout.nValue : 0);
+        return (IsMine(txout) ? txout.nValue : 0);
     }
     bool IsChange(const CTxOut& txout) const;
     CAmount GetChange(const CTxOut& txout) const
@@ -474,23 +474,23 @@ public:
     /** should probably be renamed to IsRelevantToMe */
     bool IsFromMe(const CTransaction& tx) const
     {
-        return (GetDebit(tx, ISMINE_ALL) > 0);
+        return (GetDebit(tx) > 0);
     }
-    CAmount GetDebit(const CTransaction& tx, const isminefilter& filter) const
+    CAmount GetDebit(const CTransaction& tx) const
     {
         CAmount nDebit = 0;
         BOOST_FOREACH (const CTxIn& txin, tx.vin) {
-            nDebit += GetDebit(txin, filter);
+            nDebit += GetDebit(txin);
             if (!MoneyRange(nDebit))
                 throw std::runtime_error("CWallet::GetDebit() : value out of range");
         }
         return nDebit;
     }
-    CAmount GetCredit(const CTransaction& tx, const isminefilter& filter) const
+    CAmount GetCredit(const CTransaction& tx) const
     {
         CAmount nCredit = 0;
         BOOST_FOREACH (const CTxOut& txout, tx.vout) {
-            nCredit += GetCredit(txout, filter);
+            nCredit += GetCredit(txout);
             if (!MoneyRange(nCredit))
                 throw std::runtime_error("CWallet::GetCredit() : value out of range");
         }
@@ -865,60 +865,29 @@ public:
     }
 
     //! filter decides which addresses will count towards the debit
-    CAmount GetDebit(const isminefilter& filter) const
+    CAmount GetDebit() const
     {
         if (vin.empty())
             return 0;
-
-        CAmount debit = 0;
-        if (filter & ISMINE_SPENDABLE) {
-            if (fDebitCached)
-                debit += nDebitCached;
-            else {
-                nDebitCached = pwallet->GetDebit(*this, ISMINE_SPENDABLE);
-                fDebitCached = true;
-                debit += nDebitCached;
-            }
-        }
-        if (filter & ISMINE_WATCH_ONLY) {
-            if (fWatchDebitCached)
-                debit += nWatchDebitCached;
-            else {
-                nWatchDebitCached = pwallet->GetDebit(*this, ISMINE_WATCH_ONLY);
-                fWatchDebitCached = true;
-                debit += nWatchDebitCached;
-            }
-        }
-        return debit;
+        if (fDebitCached)
+            return nDebitCached;
+        nDebitCached = pwallet->GetDebit(*this);
+        fDebitCached = true;
+        return nDebitCached;
     }
 
-    CAmount GetCredit(const isminefilter& filter) const
+    CAmount GetCredit(bool fUseCache=true) const
     {
         // Must wait until coinbase is safely deep enough in the chain before valuing it
-        if (IsCoinBase() && GetBlocksToMaturity() > 0)
+        if ((IsCoinBase() || IsCoinStake()) && GetBlocksToMaturity() > 0)
             return 0;
 
-        int64_t credit = 0;
-        if (filter & ISMINE_SPENDABLE) {
-            // GetBalance can assume transactions in mapWallet won't change
-            if (fCreditCached)
-                credit += nCreditCached;
-            else {
-                nCreditCached = pwallet->GetCredit(*this, ISMINE_SPENDABLE);
-                fCreditCached = true;
-                credit += nCreditCached;
-            }
-        }
-        if (filter & ISMINE_WATCH_ONLY) {
-            if (fWatchCreditCached)
-                credit += nWatchCreditCached;
-            else {
-                nWatchCreditCached = pwallet->GetCredit(*this, ISMINE_WATCH_ONLY);
-                fWatchCreditCached = true;
-                credit += nWatchCreditCached;
-            }
-        }
-        return credit;
+        // GetBalance can assume transactions in mapWallet won't change
+        if (fUseCache && fCreditCached)
+            return nCreditCached;
+        nCreditCached = pwallet->GetCredit(*this);
+        fCreditCached = true;
+        return nCreditCached;
     }
 
     CAmount GetImmatureCredit(bool fUseCache = true) const
@@ -926,7 +895,7 @@ public:
         if ((IsCoinBase() || IsCoinStake()) && GetBlocksToMaturity() > 0 && IsInMainChain()) {
             if (fUseCache && fImmatureCreditCached)
                 return nImmatureCreditCached;
-            nImmatureCreditCached = pwallet->GetCredit(*this, ISMINE_SPENDABLE);
+            nImmatureCreditCached = pwallet->GetCredit(*this);
             fImmatureCreditCached = true;
             return nImmatureCreditCached;
         }
@@ -951,7 +920,7 @@ public:
         for (unsigned int i = 0; i < vout.size(); i++) {
             if (!pwallet->IsSpent(hashTx, i)) {
                 const CTxOut& txout = vout[i];
-                nCredit += pwallet->GetCredit(txout, ISMINE_SPENDABLE);
+                nCredit += pwallet->GetCredit(txout);
                 if (!MoneyRange(nCredit))
                     throw std::runtime_error("CWalletTx::GetAvailableCredit() : value out of range");
             }
@@ -985,7 +954,7 @@ public:
 
             const int rounds = pwallet->GetInputObfuscationRounds(vin);
             if (rounds >= -2 && rounds < nDarksendRounds) {
-                nCredit += pwallet->GetCredit(txout, ISMINE_SPENDABLE);
+                nCredit += pwallet->GetCredit(txout);
                 if (!MoneyRange(nCredit))
                     throw std::runtime_error("CWalletTx::GetAnonamizableCredit() : value out of range");
             }
@@ -1018,7 +987,7 @@ public:
 
             const int rounds = pwallet->GetInputObfuscationRounds(vin);
             if (rounds >= nDarksendRounds) {
-                nCredit += pwallet->GetCredit(txout, ISMINE_SPENDABLE);
+                nCredit += pwallet->GetCredit(txout);
                 if (!MoneyRange(nCredit))
                     throw std::runtime_error("CWalletTx::GetAnonymizedCredit() : value out of range");
             }
@@ -1058,7 +1027,7 @@ public:
 
             if (pwallet->IsSpent(hashTx, i) || !pwallet->IsDenominatedAmount(vout[i].nValue)) continue;
 
-            nCredit += pwallet->GetCredit(txout, ISMINE_SPENDABLE);
+            nCredit += pwallet->GetCredit(txout);
             if (!MoneyRange(nCredit))
                 throw std::runtime_error("CWalletTx::GetDenominatedCredit() : value out of range");
         }
@@ -1078,7 +1047,7 @@ public:
         if (IsCoinBase() && GetBlocksToMaturity() > 0 && IsInMainChain()) {
             if (fUseCache && fImmatureWatchCreditCached)
                 return nImmatureWatchCreditCached;
-            nImmatureWatchCreditCached = pwallet->GetCredit(*this, ISMINE_WATCH_ONLY);
+            nImmatureWatchCreditCached = pwallet->GetCredit(*this);
             fImmatureWatchCreditCached = true;
             return nImmatureWatchCreditCached;
         }
@@ -1102,7 +1071,7 @@ public:
         for (unsigned int i = 0; i < vout.size(); i++) {
             if (!pwallet->IsSpent(GetHash(), i)) {
                 const CTxOut& txout = vout[i];
-                nCredit += pwallet->GetCredit(txout, ISMINE_WATCH_ONLY);
+                nCredit += pwallet->GetCredit(txout);
                 if (!MoneyRange(nCredit))
                     throw std::runtime_error("CWalletTx::GetAvailableCredit() : value out of range");
             }
@@ -1125,14 +1094,13 @@ public:
     void GetAmounts(std::list<COutputEntry>& listReceived,
         std::list<COutputEntry>& listSent,
         CAmount& nFee,
-        std::string& strSentAccount,
-        const isminefilter& filter) const;
+        std::string& strSentAccount) const;
 
     void GetAccountAmounts(const std::string& strAccount, CAmount& nReceived, CAmount& nSent, CAmount& nFee, const isminefilter& filter) const;
 
-    bool IsFromMe(const isminefilter& filter) const
+    bool IsFromMe() const
     {
-        return (GetDebit(filter) > 0);
+        return (GetDebit() > 0);
     }
 
     bool InMempool() const;
@@ -1147,7 +1115,7 @@ public:
             return true;
         if (nDepth < 0)
             return false;
-        if (!bSpendZeroConfChange || !IsFromMe(ISMINE_ALL)) // using wtx's cached debit
+        if (!bSpendZeroConfChange || !IsFromMe()) // using wtx's cached debit
             return false;
 
         // Trusted if all inputs are from us and are in the mempool:
