@@ -26,10 +26,9 @@ Drag LUX-Qt to your applications folder, and then run LUX-Qt.
 
 ### Need Help?
 
-* See the documentation at the [LUX Wiki](https://en.bitcoin.it/wiki/Main_Page) ***TODO***
+* See the documentation at the [LUX Wiki](https://github.com/216k155/lux/wiki) ***TODO***
 for help and more information.
-* Ask for help on [BitcoinTalk](https://bitcointalk.org/index.php?topic=1262920.0) or on the [LUX Forum](http://forum.lux.org/).
-* Join one of our Slack groups [LUX Slack Groups](https://lux.org/slack-logins/).
+* Ask for help on [BitcoinTalk](https://bitcointalk.org/index.php?topic=2254046.0) or on the [LUX Telegram](https://t.me/LUXcoinOfficialChat).
 
 Building
 ---------------------
