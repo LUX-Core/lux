@@ -6,44 +6,21 @@
 
 #include "main.h"
 
-// MODIFIER_INTERVAL: time to elapse before new modifier is computed
-static const unsigned int MODIFIER_INTERVAL = 10 * 60;
-static const unsigned int MODIFIER_INTERVAL_TESTNET = 60;
-extern unsigned int nModifierInterval;
-extern unsigned int getIntervalVersion(bool fTestNet);
-
-static const int STAKE_TIMESTAMP_MASK = 15;
-
-// MODIFIER_INTERVAL_RATIO:
-// ratio of group interval length between the last group and the first group
-static const int MODIFIER_INTERVAL_RATIO = 3;
-
 // Compute the hash modifier for proof-of-stake
 bool ComputeNextStakeModifier(const CBlockIndex* pindexPrev, uint64_t& nStakeModifier, bool& fGeneratedStakeModifier);
 
 // Check whether stake kernel meets hash target
 // Sets hashProofOfStake on success return
-#if 0
-uint256 stakeHash(unsigned int nTimeTx, CDataStream ss, unsigned int prevoutIndex, uint256 prevoutHash, unsigned int nTimeBlockFrom,
-                  unsigned int txnTime);
-bool stakeTargetHit(uint256 hashProofOfStake, int64_t nValueIn, uint256 bnTargetPerCoinDay);
-#endif
 bool CheckStakeKernelHash(const CBlockIndex* pindexPrev, unsigned int nBits, const CBlock &blockFrom, const CTransaction &txPrev, const COutPoint &prevout, unsigned int& nTimeTx, uint256& hashProofOfStake);
 
 // Check kernel hash target and coinstake signature
 // Sets hashProofOfStake on success return
 bool CheckProofOfStake(CBlockIndex* const pindexPrev, const CBlock &block, uint256& hashProofOfStake);
 
-// Check whether the coinstake timestamp meets protocol
-bool CheckCoinStakeTimestamp(int64_t nTimeBlock, int64_t nTimeTx);
-
 // Get stake modifier checksum
 unsigned int GetStakeModifierChecksum(const CBlockIndex* pindex);
 
 // Check stake modifier hard checkpoints
 bool CheckStakeModifierCheckpoints(int nHeight, unsigned int nStakeModifierChecksum);
-
-// Get time weight using supplied timestamps
-int64_t GetWeight(int64_t nIntervalBeginning, int64_t nIntervalEnd);
 
 #endif // BITCOIN_KERNEL_H

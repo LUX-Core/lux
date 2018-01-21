@@ -2090,11 +2090,11 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
     }
 
 //    if (pindex->nHeight <= Params().LAST_POW_BLOCK() && block.IsProofOfStake())
-//        return state.DoS(100, error("ConnectBlock() : PoS period not active"),
+//        return state.DoS(100, error("%s: PoS period not active", __func__),
 //            REJECT_INVALID, "PoS-early");
 
     if (pindex->nHeight > Params().LAST_POW_BLOCK() && block.IsProofOfWork())
-        return state.DoS(100, error("ConnectBlock() : PoW period ended"),
+        return state.DoS(100, error("%s: PoW period ended", __func__),
             REJECT_INVALID, "PoW-ended");
 
     bool fScriptChecks = pindex->nHeight >= Checkpoints::GetTotalBlocksEstimate();
@@ -2118,7 +2118,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
         BOOST_FOREACH (const CTransaction& tx, block.vtx) {
             const CCoins* coins = view.AccessCoins(tx.GetHash());
             if (coins && !coins->IsPruned())
-                return state.DoS(100, error("ConnectBlock() : tried to overwrite transaction"),
+                return state.DoS(100, error("%s: tried to overwrite transaction", __func__),
                     REJECT_INVALID, "bad-txns-BIP30");
         }
     }
@@ -2155,14 +2155,14 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
         nInputs += tx.vin.size();
         nSigOps += GetLegacySigOpCount(tx);
         if (nSigOps > MAX_BLOCK_SIGOPS)
-            return state.DoS(100, error("ConnectBlock() : too many sigops"),
+            return state.DoS(100, error("%s: too many sigops", __func__),
                 REJECT_INVALID, "bad-blk-sigops");
 
         if (tx.IsCoinBase()) {
             nValueOut += tx.GetValueOut();
         } else {
             if (!view.HaveInputs(tx))
-                return state.DoS(100, error("ConnectBlock() : inputs missing/spent"),
+                return state.DoS(100, error("%s: inputs missing/spent", __func__),
                     REJECT_INVALID, "bad-txns-inputs-missingorspent");
 
             if (fStrictPayToScriptHash) {
@@ -2171,7 +2171,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
                 // an incredibly-expensive-to-validate block.
                 nSigOps += GetP2SHSigOpCount(tx, view);
                 if (nSigOps > MAX_BLOCK_SIGOPS)
-                    return state.DoS(100, error("ConnectBlock() : too many sigops"),
+                    return state.DoS(100, error("%s: too many sigops", __func__),
                         REJECT_INVALID, "bad-blk-sigops");
             }
 
@@ -2202,7 +2202,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
     pindex->nMoneySupply = (pindex->pprev ? pindex->pprev->nMoneySupply : 0) + nValueOut - nValueIn;
 
     if (!pblocktree->WriteBlockIndex(CDiskBlockIndex(pindex)))
-        return error("Connect() : WriteBlockIndex for pindex failed");
+        return error("%s: WriteBlockIndex for pindex failed", __func__);
 
     int64_t nTime1 = GetTimeMicros();
     nTimeConnect += nTime1 - nTimeStart;
@@ -2211,7 +2211,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
 //    if (block.IsProofOfWork()) {
 //        int64_t nReward = GetBlockValue(pindex->pprev->nHeight) + nFees;
 //        if (block.vtx[0].GetValueOut() > nReward)
-//            return error("ConnectBlock() : coinbase reward exceeded (actual=%d vs calculated=%d)",
+//            return error("%s: coinbase reward exceeded (actual=%d vs calculated=%d)", __func__,
 //                         block.vtx[0].GetValueOut(),
 //                         nReward + nFees);
 //    }
@@ -2219,7 +2219,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
     if (block.IsProofOfWork()) {
         if (!IsInitialBlockDownload() && !IsBlockValueValid(block, GetBlockValue(pindex->pprev->nHeight) + nFees)) {
             return state.DoS(100,
-                             error("ConnectBlock() : reward pays too much (actual=%d vs limit=%d)",
+                             error("%s: reward pays too much (actual=%d vs limit=%d)", __func__,
                                    block.vtx[0].GetValueOut(), GetBlockValue(pindex->pprev->nHeight) + nFees),
                              REJECT_INVALID, "bad-cb-amount");
         }
@@ -2229,11 +2229,11 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
         uint64_t nCoinAge;
         const CTransaction &tx = block.vtx[1];
         if (!GetCoinAge(tx, tx.nTime, nCoinAge))
-           return error("ConnectBlock() : %s unable to get coin age for coinstake", tx.GetHash().ToString());
+            return error("%s: %s unable to get coin age for coinstake", __func__, tx.GetHash().GetHex());
 
         int64_t nCalculatedStakeReward = GetProofOfStakeReward(pindex->nHeight, nCoinAge, nFees);
         if (nStakeReward > nCalculatedStakeReward)
-            return error("ConnectBlock() : coinstake pays too much(actual=%d vs calculated=%d)", nStakeReward, nCalculatedStakeReward);
+            return error("%s: coinstake pays too much(actual=%d vs calculated=%d)", __func__, nStakeReward, nCalculatedStakeReward);
     }
 
     if (!control.Wait())
@@ -2251,7 +2251,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
         if (pindex->GetUndoPos().IsNull()) {
             CDiskBlockPos pos;
             if (!FindUndoPos(state, pindex->nFile, pos, ::GetSerializeSize(blockundo, SER_DISK, CLIENT_VERSION) + 40))
-                return error("ConnectBlock() : FindUndoPos failed");
+                return error("%s: FindUndoPos failed", __func__);
             if (!blockundo.WriteToDisk(pos, pindex->pprev->GetBlockHash()))
                 return state.Abort("Failed to write undo data");
 
@@ -2298,7 +2298,7 @@ enum FlushStateMode {
  * The caches and indexes are flushed if either they're too large, forceWrite is set, or
  * fast is not set and it's been a while since the last write.
  */
-bool static FlushStateToDisk(CValidationState& state, FlushStateMode mode)
+static bool FlushStateToDisk(CValidationState& state, FlushStateMode mode)
 {
     LOCK(cs_main);
     static int64_t nLastWrite = 0;
@@ -2881,11 +2881,12 @@ CBlockIndex* AddToBlockIndex(const CBlock& block)
     // Construct new block index object
     CBlockIndex* pindexNew = new CBlockIndex(block);
     assert(pindexNew);
+
     // We assign the sequence id to blocks only when the full data is available,
     // to avoid miners withholding blocks but broadcasting headers, to get a
     // competitive advantage.
     pindexNew->nSequenceId = 0;
-    BlockMap::iterator mi = mapBlockIndex.insert(make_pair(hash, pindexNew)).first;
+    BlockMap::iterator mi = mapBlockIndex.emplace(hash, pindexNew).first;
 
     //mark as PoS seen
     if (pindexNew->IsProofOfStake())
@@ -2906,29 +2907,29 @@ CBlockIndex* AddToBlockIndex(const CBlock& block)
 
         // ppcoin: compute stake entropy bit for stake modifier
         if (!pindexNew->SetStakeEntropyBit(pindexNew->GetStakeEntropyBit()))
-            LogPrintf("AddToBlockIndex() : SetStakeEntropyBit() failed \n");
+            LogPrintf("%s: SetStakeEntropyBit() failed \n", __func__);
 
         // ppcoin: record proof-of-stake hash value
         if (pindexNew->IsProofOfStake()) {
-            if (!mapProofOfStake.count(hash))
-                LogPrintf("AddToBlockIndex() : hashProofOfStake not found in map \n");
-            pindexNew->hashProofOfStake = mapProofOfStake[hash];
+            if (mapProofOfStake.count(hash)) {
+                pindexNew->hashProofOfStake = mapProofOfStake[hash];
+            } else {
+                LogPrintf("%s: zero stake (%s)\n", __func__, hash.GetHex());
+            }
         }
 
         // ppcoin: compute stake modifier
         uint64_t nStakeModifier = 0;
         bool fGeneratedStakeModifier = false;
         if (!ComputeNextStakeModifier(pindexNew->pprev, nStakeModifier, fGeneratedStakeModifier))
-            LogPrintf("AddToBlockIndex() : ComputeNextStakeModifier() failed \n");
-
-        if (fDebug) {
-            DEBUG_DUMP_STAKING_INFO_AddToBlockIndex();
-        }
+            LogPrintf("%s: ComputeNextStakeModifier() failed \n", __func__);
 
         pindexNew->SetStakeModifier(nStakeModifier, fGeneratedStakeModifier);
         pindexNew->nStakeModifierChecksum = GetStakeModifierChecksum(pindexNew);
         if (!CheckStakeModifierCheckpoints(pindexNew->nHeight, pindexNew->nStakeModifierChecksum))
-            LogPrintf("AddToBlockIndex() : Rejected by stake modifier checkpoint height=%d, modifier=%s \n", pindexNew->nHeight, boost::lexical_cast<std::string>(nStakeModifier));
+            LogPrintf("%s: Rejected by stake modifier checkpoint height=%d, modifier=%s \n", __func__, pindexNew->nHeight, boost::lexical_cast<std::string>(nStakeModifier));
+
+        DEBUG_DUMP_STAKING_INFO_AddToBlockIndex();
     }
     pindexNew->nChainWork = (pindexNew->pprev ? pindexNew->pprev->nChainWork : 0) + GetBlockProof(*pindexNew);
     pindexNew->RaiseValidity(BLOCK_VALID_TREE);
@@ -3212,7 +3213,7 @@ bool CheckBlock(const CBlock& block, CValidationState& state, bool fCheckPOW, bo
 bool CheckWork(const CBlock &block, CBlockIndex* const pindexPrev)
 {
     if (pindexPrev == NULL)
-        return error("%s : null pindexPrev for block %s", __func__, block.GetHash().ToString().c_str());
+        return error("%s: null pindexPrev for block %s", __func__, block.GetHash().ToString().c_str());
 
     unsigned int nBitsRequired = GetNextWorkRequired(pindexPrev, &block, block.IsProofOfStake());
 
@@ -3227,23 +3228,26 @@ bool CheckWork(const CBlock &block, CBlockIndex* const pindexPrev)
 //    }
 
     if (block.IsProofOfWork() && pindexPrev->nHeight + 1 > Params().LAST_POW_BLOCK())
-        return  error("AcceptBlock() : reject proof-of-work at height %d", pindexPrev->nHeight + 1);
+        return  error("%s: reject proof-of-work at height %d", __func__, pindexPrev->nHeight + 1);
 
     if (block.nBits != nBitsRequired)
-        return error("%s : incorrect proof of work at %d", __func__, pindexPrev->nHeight + 1);
+        return error("%s: incorrect proof of work at %d", __func__, pindexPrev->nHeight + 1);
 
     if (block.IsProofOfStake()) {
         uint256 hashProofOfStake;
         uint256 hash = block.GetHash();
-
-        if(!CheckProofOfStake(pindexPrev, block, hashProofOfStake)) {
-            LogPrintf("WARNING: ProcessBlock(): check proof-of-stake failed for block %s\n", hash.ToString().c_str());
-            return false;
+        if (!CheckProofOfStake(pindexPrev, block, hashProofOfStake)) {
+            return error("%s: invalid proof-of-stake (block %s)\n", __func__, hash.GetHex());
         }
-        if(!mapProofOfStake.count(hash)) // add to mapProofOfStake
-            mapProofOfStake.insert(make_pair(hash, hashProofOfStake));
+        if (mapProofOfStake.count(hash)) {
+            auto const &h = mapProofOfStake[hash];
+            if (h != hashProofOfStake)
+                return error("%s: diverged stake %s, %s (block %s)\n", __func__, 
+                             hashProofOfStake.GetHex(), h.GetHex(), hash.GetHex());
+        } else {
+            mapProofOfStake.emplace(hash, hashProofOfStake);
+        }
     }
-
     return true;
 }
 
@@ -3412,12 +3416,12 @@ bool AcceptBlock(CBlock& block, CValidationState& state, CBlockIndex** ppindex, 
         if (dbp != NULL)
             blockPos = *dbp;
         if (!FindBlockPos(state, blockPos, nBlockSize + 8, nHeight, block.GetBlockTime(), dbp != NULL))
-            return error("AcceptBlock() : FindBlockPos failed");
+            return error("%s: FindBlockPos failed", __func__);
         if (dbp == NULL)
             if (!WriteBlockToDisk(block, blockPos))
                 return state.Abort("Failed to write block");
         if (!ReceivedBlockTransactions(block, state, pindex, blockPos))
-            return error("AcceptBlock() : ReceivedBlockTransactions failed");
+            return error("%s: ReceivedBlockTransactions failed", __func__);
     } catch (std::runtime_error& e) {
         return state.Abort(std::string("System error: ") + e.what());
     }
@@ -3499,7 +3503,7 @@ bool ProcessNewBlock(CValidationState& state, CNode* pfrom, CBlock* pblock, CDis
 
     // NovaCoin: check proof-of-stake block signature
     if (!pblock->CheckBlockSignature())
-        return error("ProcessNewBlock() : bad proof-of-stake block signature");
+        return error("%s: bad proof-of-stake block signature", __func__);
 
     if (pblock->GetHash() != Params().HashGenesisBlock() && pfrom != NULL) {
         //if we get this far, check if the prev block is our prev block, if not then request sync and return false
@@ -3519,7 +3523,7 @@ bool ProcessNewBlock(CValidationState& state, CNode* pfrom, CBlock* pblock, CDis
 
         MarkBlockAsReceived(pblock->GetHash());
         if (!checked) {
-            return error("%s : CheckBlock FAILED", __func__);
+            return error("%s: CheckBlock FAILED", __func__);
         }
 
         // Store to disk
@@ -3530,12 +3534,12 @@ bool ProcessNewBlock(CValidationState& state, CNode* pfrom, CBlock* pblock, CDis
         }
         CheckBlockIndex();
         if (!ret)
-            return error("%s : AcceptBlock FAILED", __func__);
+            return error("%s: AcceptBlock FAILED", __func__);
         break;
     }
 
     if (!ActivateBestChain(state, pblock))
-        return error("%s : ActivateBestChain failed", __func__);
+        return error("%s: ActivateBestChain failed", __func__);
 
     if (!fLiteMode) {
         if (masternodeSync.RequestedMasternodeAssets > MASTERNODE_SYNC_LIST) {
@@ -3555,7 +3559,7 @@ bool ProcessNewBlock(CValidationState& state, CNode* pfrom, CBlock* pblock, CDis
             pwalletMain->AutoCombineDust();
     }
 
-    LogPrintf("%s : ACCEPTED\n", __func__);
+    LogPrintf("%s: ACCEPTED\n", __func__);
 
     return true;
 }
@@ -3659,11 +3663,7 @@ CBlockIndex* InsertBlockIndex(uint256 hash)
     CBlockIndex* pindexNew = new CBlockIndex();
     if (!pindexNew)
         throw runtime_error("LoadBlockIndex() : new CBlockIndex failed");
-    mi = mapBlockIndex.insert(make_pair(hash, pindexNew)).first;
-
-    //mark as PoS seen
-    if (pindexNew->IsProofOfStake())
-        setStakeSeen.insert(make_pair(pindexNew->prevoutStake, pindexNew->nStakeTime));
+    mi = mapBlockIndex.emplace(hash, pindexNew).first;
 
     pindexNew->phashBlock = &((*mi).first);
 
@@ -3680,12 +3680,12 @@ bool static LoadBlockIndexDB()
     // Calculate nChainWork
     vector<pair<int, CBlockIndex*> > vSortedByHeight;
     vSortedByHeight.reserve(mapBlockIndex.size());
-    BOOST_FOREACH (const PAIRTYPE(uint256, CBlockIndex*) & item, mapBlockIndex) {
+    for (auto const &item : mapBlockIndex) {
         CBlockIndex* pindex = item.second;
         vSortedByHeight.push_back(make_pair(pindex->nHeight, pindex));
     }
     sort(vSortedByHeight.begin(), vSortedByHeight.end());
-    BOOST_FOREACH (const PAIRTYPE(int, CBlockIndex*) & item, vSortedByHeight) {
+    for (auto const &item : vSortedByHeight) {
         CBlockIndex* pindex = item.second;
         pindex->nChainWork = (pindex->pprev ? pindex->pprev->nChainWork : 0) + GetBlockProof(*pindex);
         if (pindex->nStatus & BLOCK_HAVE_DATA) {
@@ -3728,7 +3728,7 @@ bool static LoadBlockIndexDB()
     // Check presence of blk files
     LogPrintf("Checking all blk files are present...\n");
     set<int> setBlkDataFiles;
-    BOOST_FOREACH (const PAIRTYPE(uint256, CBlockIndex*) & item, mapBlockIndex) {
+    for (auto const &item : mapBlockIndex) {
         CBlockIndex* pindex = item.second;
         if (pindex->nStatus & BLOCK_HAVE_DATA) {
             setBlkDataFiles.insert(pindex->nFile);
@@ -3833,7 +3833,7 @@ bool static LoadBlockIndexDB()
 
     // Check whether we have a transaction index
     pblocktree->ReadFlag("txindex", fTxIndex);
-    LogPrintf("LoadBlockIndexDB(): transaction index %s\n", fTxIndex ? "enabled" : "disabled");
+    LogPrintf("%s: transaction index %s\n", __func__, fTxIndex ? "enabled" : "disabled");
 
     // If this is written true before the next client init, then we know the shutdown process failed
     pblocktree->WriteFlag("shutdown", false);
@@ -3846,7 +3846,7 @@ bool static LoadBlockIndexDB()
 
     PruneBlockIndexCandidates();
 
-    LogPrintf("LoadBlockIndexDB(): hashBestChain=%s height=%d date=%s progress=%f\n",
+    LogPrintf("%s: hashBestChain=%s height=%d date=%s progress=%f\n", __func__,
         chainActive.Tip()->GetBlockHash().ToString(), chainActive.Height(),
         DateTimeStrFormat("%Y-%m-%d %H:%M:%S", chainActive.Tip()->GetBlockTime()),
         Checkpoints::GuessVerificationProgress(chainActive.Tip()));
