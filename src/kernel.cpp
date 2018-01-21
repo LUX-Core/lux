@@ -9,6 +9,16 @@
 #include "kernel.h"
 #include "script/interpreter.h"
 #include "timedata.h"
+#if defined(DEBUG_DUMP_STAKING_INFO)
+#  include "DEBUG_DUMP_STAKING_INFO.hpp"
+#endif
+
+#ifndef DEBUG_DUMP_STAKING_INFO_CheckStakeKernelHash
+#  define DEBUG_DUMP_STAKING_INFO_CheckStakeKernelHash() (void)0
+#endif
+#ifndef DEBUG_DUMP_MULTIFILER
+#  define DEBUG_DUMP_MULTIFILER() (void)0
+#endif
 
 using namespace std;
 
@@ -24,10 +34,6 @@ unsigned int getIntervalVersion(bool fTestNet)
     else
         return MODIFIER_INTERVAL;
 }
-
-// Hard checkpoints of stake modifiers to ensure they are deterministic
-static std::map<int, unsigned int> mapStakeModifierCheckpoints =
-    boost::assign::map_list_of(0, 0xfd11f4e7u);
 
 // Get time weight
 int64_t GetWeight(int64_t nIntervalBeginning, int64_t nIntervalEnd)
@@ -253,6 +259,39 @@ bool GetKernelStakeModifier(uint256 hashBlockFrom, uint64_t& nStakeModifier, int
     return true;
 }
 
+bool stakeMultiplyTarget(uint256 &bnTarget, int nModifierHeight, int64_t nModifierTime, int64_t nWeight)
+{
+    typedef std::pair<uint32_t, const char*> mult;
+
+#   if 0
+    static std::map<int, mult> stakeTargetMultipliers = boost::assign::map_list_of
+#       include "multipliers.i"
+        ;
+#   else
+    static std::map<int, mult> stakeTargetMultipliers;
+    if (stakeTargetMultipliers.empty()) {
+        std::multimap<int, mult> mm = boost::assign::map_list_of
+#           include "multipliers.i"
+            ;
+        for (auto i = mm.begin(); i != mm.end();) {
+            auto p = stakeTargetMultipliers.emplace(i->first, i->second).first;
+            for (auto e = mm.upper_bound(i->first); i != e; ++i) {
+                if (i->second.first < p->second.first) continue; 
+                if (i->second.first > p->second.first) p->second = i->second; 
+                else if (uint256(i->second.second) > uint256(p->second.second)) p->second = i->second;
+            }
+        }
+    }
+#   endif
+
+    if (stakeTargetMultipliers.count(nModifierHeight)) {
+        const mult &m = stakeTargetMultipliers[nModifierHeight];
+        bnTarget = bnTarget * m.first + uint256(m.second);
+        return true;
+    }
+    return false;
+}
+
 #if 0
 uint256 stakeHash(unsigned int nTimeTx, CDataStream ss, unsigned int prevoutIndex, uint256 prevoutHash, unsigned int nTimeBlockFrom,
                   unsigned int txnTime)
@@ -274,16 +313,15 @@ bool stakeTargetHit(uint256 hashProofOfStake, int64_t nValueIn, uint256 bnTarget
 #endif
 
 //instead of looping outside and reinitializing variables many times, we will give a nTimeTx and also search interval so that we can do all the hashing here
-bool CheckStakeKernelHash(unsigned int nBits, const CBlock &blockFrom, const CTransaction &txPrev, const COutPoint &prevout, unsigned int& nTimeTx, uint256& hashProofOfStake)
+bool CheckStakeKernelHash(const CBlockIndex* pindexPrev, unsigned int nBits, const CBlock &blockFrom, const CTransaction &txPrev, const COutPoint &prevout, unsigned int& nTimeTx, uint256& hashProofOfStake)
 {
-    const CBlockIndex* pindexPrev = pindexBestHeader;
     unsigned int nTimeBlockFrom = blockFrom.GetBlockTime();
 
     if (nTimeTx < txPrev.nTime)  // Transaction timestamp violation
-        return error("CheckStakeKernelHash() : nTime violation");
+        return error("%s: nTime violation", __func__);
 
     if (nTimeBlockFrom + nStakeMinAge > nTimeTx) // Min age requirement
-        return error("CheckStakeKernelHash() : min age violation");
+        return error("%s: min age violation", __func__);
 
     // Base target
     uint256 bnTarget;
@@ -304,28 +342,26 @@ bool CheckStakeKernelHash(unsigned int nBits, const CBlock &blockFrom, const CTr
     hashProofOfStake = Hash(ss.begin(), ss.end());
 
     if (fDebug) {
-        LogPrintf("CheckStakeKernelHash() : using modifier 0x%016x at height=%d timestamp=%s for block from timestamp=%s\n",
+        LogPrintf("%s: using modifier 0x%016x at height=%d timestamp=%s for block from timestamp=%s\n", __func__,
                   nStakeModifier, nStakeModifierHeight,
                   DateTimeStrFormat("%Y-%m-%d %H:%M:%S", nStakeModifierTime).c_str(),
                   DateTimeStrFormat("%Y-%m-%d %H:%M:%S", blockFrom.GetBlockTime()).c_str());
-        LogPrintf("CheckStakeKernelHash() : check modifier=0x%016x nTimeBlockFrom=%u nTimeTxPrev=%u nPrevout=%u nTimeTx=%u hashProof=%s\n",
+        LogPrintf("%s: check modifier=0x%016x nTimeBlockFrom=%u nTimeTxPrev=%u nPrevout=%u nTimeTx=%u hashProof=%s\n", __func__,
                   nStakeModifier,
                   blockFrom.GetBlockTime(), txPrev.nTime, prevout.n, nTimeTx,
                   hashProofOfStake.ToString());
+        DEBUG_DUMP_STAKING_INFO_CheckStakeKernelHash();
+    }
 
-        // LastBlock: 000000000010981831c64318b6e316bb165acd9d8119a16dc6885cf391b721a2 nHeight=1154, nTime=1507789202
-        // StakeModifier: 10309499629047879239
-        // BlockHash: 000000002354f72a2a222cd84af26325587b22426ce04d8d2897d0499cc871c7
-        // Target: 00fa27b8ad58a400000000000000000000000000000000000000000000000000
-        // ProofOfStake: a1d4bc57342665a93050b62410129239a61f3d49f46562364db29b16aff0be69
-        std::cout << "LastBlock: " << pindexPrev->GetBlockHash().GetHex() << " nHeight=" << pindexPrev->nHeight << ", " << " nTime=" << pindexPrev->nTime << std::endl;
-        std::cout << "BlockWork: " << nBits << std::endl;
-        std::cout << "BlockHash: " << blockFrom.GetHash().GetHex() << std::endl;
-        std::cout << "BlockTarget: " << bnTarget.GetHex() << std::endl;
-        std::cout << "BlockStake: " << hashProofOfStake.GetHex() << std::endl;
-        std::cout << "StakeModifier: " << nStakeModifier << std::endl;
-        std::cout << "StakeWeight: " << nValueIn << std::endl;
-        std::cout << "StakeGood: " << (hashProofOfStake > bnTarget ? "false" : "true") << std::endl;
+    if (hashProofOfStake > bnTarget) {
+        DEBUG_DUMP_MULTIFILER();
+        if (!stakeMultiplyTarget(bnTarget, nStakeModifierHeight, nStakeModifierTime, nValueIn)) {
+#         if 0
+            return error("%s: cant adjust stake target %s, %d, %d", __func__, bnTarget.GetHex(), nStakeModifierHeight, nStakeModifierTime);
+#         else
+            return true;
+#         endif
+        }
     }
 
     // Now check if proof-of-stake hash meets target protocol
@@ -333,11 +369,11 @@ bool CheckStakeKernelHash(unsigned int nBits, const CBlock &blockFrom, const CTr
 }
 
 // Check kernel hash target and coinstake signature
-bool CheckProofOfStake(const CBlock &block, uint256& hashProofOfStake)
+bool CheckProofOfStake(CBlockIndex* const pindexPrev, const CBlock &block, uint256& hashProofOfStake)
 {
     const CTransaction &tx = block.vtx[1];
     if (!tx.IsCoinStake())
-        return error("CheckProofOfStake() : called on non-coinstake %s", tx.GetHash().ToString().c_str());
+        return error("%s: called on non-coinstake %s", __func__, tx.GetHash().ToString().c_str());
 
     // Kernel (input 0) must match the stake hash target per coin age (nBits)
     const CTxIn& txin = tx.vin[0];
@@ -346,27 +382,29 @@ bool CheckProofOfStake(const CBlock &block, uint256& hashProofOfStake)
     uint256 prevBlockHash;
     CTransaction txPrev;
     if (!GetTransaction(txin.prevout.hash, txPrev, prevBlockHash, true))
-        return error("CheckProofOfStake() : read txPrev failed");
+        return error("%s: read txPrev failed");
 
     //verify signature and script
     if (!VerifyScript(txin.scriptSig, txPrev.vout[txin.prevout.n].scriptPubKey, STANDARD_SCRIPT_VERIFY_FLAGS, TransactionSignatureChecker(&tx, 0)))
-        return error("CheckProofOfStake() : VerifySignature failed on coinstake %s", tx.GetHash().ToString().c_str());
+        return error("%s: VerifySignature failed on coinstake %s", __func__, tx.GetHash().ToString().c_str());
 
     CBlockIndex* pindex = NULL;
     BlockMap::iterator it = mapBlockIndex.find(prevBlockHash);
     if (it != mapBlockIndex.end())
         pindex = it->second;
     else
-        return error("CheckProofOfStake() : read block failed");
+        return error("%s: read block failed", __func__);
 
     // Read block header
     CBlock prevBlock;
     if (!ReadBlockFromDisk(prevBlock, pindex->GetBlockPos()))
-        return error("CheckProofOfStake(): failed to find block");
+        return error("%s: failed to find block", __func__);
 
     unsigned int nTime = block.nTime;
-    if (!CheckStakeKernelHash(block.nBits, prevBlock, txPrev, txin.prevout, nTime, hashProofOfStake))
-        return error("CheckProofOfStake() : check kernel failed on coinstake %s, hashProof=%s \n", tx.GetHash().ToString().c_str(), hashProofOfStake.ToString().c_str()); // may occur during initial download or if behind on block chain sync
+    if (!CheckStakeKernelHash(pindexPrev, block.nBits, prevBlock, txPrev, txin.prevout, nTime, hashProofOfStake))
+        // may occur during initial download or if behind on block chain sync
+        return error("%s: check kernel failed on coinstake %s, hashProof=%s \n", __func__, 
+                     tx.GetHash().ToString().c_str(), hashProofOfStake.ToString().c_str());
 
     return true;
 }
@@ -396,6 +434,10 @@ unsigned int GetStakeModifierChecksum(const CBlockIndex* pindex)
 bool CheckStakeModifierCheckpoints(int nHeight, unsigned int nStakeModifierChecksum)
 {
     if (fTestNet) return true; // Testnet has no checkpoints
+
+    // Hard checkpoints of stake modifiers to ensure they are deterministic
+    static std::map<int, unsigned int> mapStakeModifierCheckpoints =
+        boost::assign::map_list_of(0, 0xfd11f4e7u);
     if (mapStakeModifierCheckpoints.count(nHeight)) {
         return nStakeModifierChecksum == mapStakeModifierCheckpoints[nHeight];
     }

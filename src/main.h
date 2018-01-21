@@ -156,7 +156,7 @@ extern std::map<unsigned int, unsigned int> mapHashedBlocks;
 extern std::set<std::pair<COutPoint, unsigned int> > setStakeSeen;
 
 /** Best header we've seen so far (used for getheaders queries' starting points). */
-extern CBlockIndex* pindexBestHeader;
+// extern CBlockIndex* pindexBestHeader;
 
 /** Minimum disk space required - used in CheckDiskSpace() */
 static const uint64_t nMinDiskSpace = 52428800;
