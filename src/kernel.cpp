@@ -253,6 +253,7 @@ bool GetKernelStakeModifier(uint256 hashBlockFrom, uint64_t& nStakeModifier, int
     return true;
 }
 
+#if 0
 uint256 stakeHash(unsigned int nTimeTx, CDataStream ss, unsigned int prevoutIndex, uint256 prevoutHash, unsigned int nTimeBlockFrom,
                   unsigned int txnTime)
 {
@@ -270,16 +271,18 @@ bool stakeTargetHit(uint256 hashProofOfStake, int64_t nValueIn, uint256 bnTarget
     // Now check if proof-of-stake hash meets target protocol
     return (uint256(hashProofOfStake) < bnCoinDayWeight * bnTargetPerCoinDay);
 }
+#endif
 
 //instead of looping outside and reinitializing variables many times, we will give a nTimeTx and also search interval so that we can do all the hashing here
-bool CheckStakeKernelHash(unsigned int nBits, const CBlock &blockFrom, const CTransaction &txPrev, const COutPoint &prevout, unsigned int& nTimeTx, unsigned int nHashDrift, bool fCheck, uint256& hashProofOfStake, bool fPrintProofOfStake)
+bool CheckStakeKernelHash(unsigned int nBits, const CBlock &blockFrom, const CTransaction &txPrev, const COutPoint &prevout, unsigned int& nTimeTx, uint256& hashProofOfStake)
 {
     const CBlockIndex* pindexPrev = pindexBestHeader;
+    unsigned int nTimeBlockFrom = blockFrom.GetBlockTime();
 
     if (nTimeTx < txPrev.nTime)  // Transaction timestamp violation
         return error("CheckStakeKernelHash() : nTime violation");
 
-    if (blockFrom.GetBlockTime() + nStakeMinAge > nTimeTx) // Min age requirement
+    if (nTimeBlockFrom + nStakeMinAge > nTimeTx) // Min age requirement
         return error("CheckStakeKernelHash() : min age violation");
 
     // Base target
@@ -297,12 +300,10 @@ bool CheckStakeKernelHash(unsigned int nBits, const CBlock &blockFrom, const CTr
 
     // Calculate hash
     CDataStream ss(SER_GETHASH, 0);
-    unsigned int nTimeBlockFrom = blockFrom.GetBlockTime();
     ss << nStakeModifier << nTimeBlockFrom << txPrev.nTime << prevout.hash << prevout.n << nTimeTx;
     hashProofOfStake = Hash(ss.begin(), ss.end());
 
-    if (fPrintProofOfStake)
-    {
+    if (fDebug) {
         LogPrintf("CheckStakeKernelHash() : using modifier 0x%016x at height=%d timestamp=%s for block from timestamp=%s\n",
                   nStakeModifier, nStakeModifierHeight,
                   DateTimeStrFormat("%Y-%m-%d %H:%M:%S", nStakeModifierTime).c_str(),
@@ -311,28 +312,24 @@ bool CheckStakeKernelHash(unsigned int nBits, const CBlock &blockFrom, const CTr
                   nStakeModifier,
                   blockFrom.GetBlockTime(), txPrev.nTime, prevout.n, nTimeTx,
                   hashProofOfStake.ToString());
+
+        // LastBlock: 000000000010981831c64318b6e316bb165acd9d8119a16dc6885cf391b721a2 nHeight=1154, nTime=1507789202
+        // StakeModifier: 10309499629047879239
+        // BlockHash: 000000002354f72a2a222cd84af26325587b22426ce04d8d2897d0499cc871c7
+        // Target: 00fa27b8ad58a400000000000000000000000000000000000000000000000000
+        // ProofOfStake: a1d4bc57342665a93050b62410129239a61f3d49f46562364db29b16aff0be69
+        std::cout << "LastBlock: " << pindexPrev->GetBlockHash().GetHex() << " nHeight=" << pindexPrev->nHeight << ", " << " nTime=" << pindexPrev->nTime << std::endl;
+        std::cout << "BlockWork: " << nBits << std::endl;
+        std::cout << "BlockHash: " << blockFrom.GetHash().GetHex() << std::endl;
+        std::cout << "BlockTarget: " << bnTarget.GetHex() << std::endl;
+        std::cout << "BlockStake: " << hashProofOfStake.GetHex() << std::endl;
+        std::cout << "StakeModifier: " << nStakeModifier << std::endl;
+        std::cout << "StakeWeight: " << nValueIn << std::endl;
+        std::cout << "StakeGood: " << (hashProofOfStake > bnTarget ? "false" : "true") << std::endl;
     }
 
     // Now check if proof-of-stake hash meets target protocol
-    if (fCheck) {
-        return !(hashProofOfStake > bnTarget);
-    }
-//    if (CBigNum(hashProofOfStake) > CBigNum(bnTarget))
-//        return false;
-
-    if (fDebug && !fPrintProofOfStake)
-    {
-        LogPrintf("CheckStakeKernelHash() : using modifier 0x%016x at height=%d timestamp=%s for block from timestamp=%s\n",
-                  nStakeModifier, nStakeModifierHeight,
-                  DateTimeStrFormat("%Y-%m-%d %H:%M:%S", nStakeModifierTime).c_str(),
-                  DateTimeStrFormat("%Y-%m-%d %H:%M:%S", blockFrom.GetBlockTime()).c_str());
-        LogPrintf("CheckStakeKernelHash() : pass modifier=0x%016x nTimeBlockFrom=%u nTimeTxPrev=%u nPrevout=%u nTimeTx=%u hashProof=%s\n",
-                  nStakeModifier,
-                  blockFrom.GetBlockTime(), txPrev.nTime, prevout.n, nTimeTx,
-                  hashProofOfStake.ToString());
-    }
-
-    return true;
+    return !(hashProofOfStake > bnTarget);
 }
 
 // Check kernel hash target and coinstake signature
@@ -346,32 +343,30 @@ bool CheckProofOfStake(const CBlock &block, uint256& hashProofOfStake)
     const CTxIn& txin = tx.vin[0];
 
     // First try finding the previous transaction in database
-    uint256 hashBlock;
+    uint256 prevBlockHash;
     CTransaction txPrev;
-    if (!GetTransaction(txin.prevout.hash, txPrev, hashBlock, true))
-        return error("CheckProofOfStake() : INFO: read txPrev failed");
+    if (!GetTransaction(txin.prevout.hash, txPrev, prevBlockHash, true))
+        return error("CheckProofOfStake() : read txPrev failed");
 
     //verify signature and script
     if (!VerifyScript(txin.scriptSig, txPrev.vout[txin.prevout.n].scriptPubKey, STANDARD_SCRIPT_VERIFY_FLAGS, TransactionSignatureChecker(&tx, 0)))
         return error("CheckProofOfStake() : VerifySignature failed on coinstake %s", tx.GetHash().ToString().c_str());
 
     CBlockIndex* pindex = NULL;
-    BlockMap::iterator it = mapBlockIndex.find(hashBlock);
+    BlockMap::iterator it = mapBlockIndex.find(prevBlockHash);
     if (it != mapBlockIndex.end())
         pindex = it->second;
     else
         return error("CheckProofOfStake() : read block failed");
 
     // Read block header
-    CBlock blockprev;
-    if (!ReadBlockFromDisk(blockprev, pindex->GetBlockPos()))
-        return error("CheckProofOfStake(): INFO: failed to find block");
+    CBlock prevBlock;
+    if (!ReadBlockFromDisk(prevBlock, pindex->GetBlockPos()))
+        return error("CheckProofOfStake(): failed to find block");
 
-    unsigned int nInterval = 0;
     unsigned int nTime = block.nTime;
-    if (!CheckStakeKernelHash(block.nBits, blockprev, txPrev, txin.prevout, nTime, nInterval, false, hashProofOfStake,
-                              true))
-        return error("CheckProofOfStake() : INFO: check kernel failed on height=%d, coinstake %s, hashProof=%s \n", pindex->nHeight, tx.GetHash().ToString().c_str(), hashProofOfStake.ToString().c_str()); // may occur during initial download or if behind on block chain sync
+    if (!CheckStakeKernelHash(block.nBits, prevBlock, txPrev, txin.prevout, nTime, hashProofOfStake))
+        return error("CheckProofOfStake() : check kernel failed on coinstake %s, hashProof=%s \n", tx.GetHash().ToString().c_str(), hashProofOfStake.ToString().c_str()); // may occur during initial download or if behind on block chain sync
 
     return true;
 }
