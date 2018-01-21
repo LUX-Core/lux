@@ -191,6 +191,21 @@ if test "x$enable_debug" = xyes; then
     fi
 fi
 
+# Enable dump extra debug info
+AC_ARG_ENABLE([debug-xdump],
+    [AS_HELP_STRING([--enable-xdebug],
+                    [dump extra debug info on stderr (or stdout) (default is no)])],
+    [enable_debug_xdump=$enableval],
+    [enable_debug_xdump=no])
+if test "x$enable_debug_xdump" = xyes; then
+    if test "x$GCC" = xyes; then
+        CFLAGS="-DDEBUG_DUMP_STAKING_INFO"
+    fi
+    if test "x$GXX" = xyes; then
+        CXXFLAGS="-DDEBUG_DUMP_STAKING_INFO"
+    fi
+fi
+
 ## TODO: Remove these hard-coded paths and flags. They are here for the sake of
 ##       compatibility with the legacy buildsystem.
 ##
