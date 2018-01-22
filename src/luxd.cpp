@@ -102,11 +102,11 @@ bool AppInit(int argc, char* argv[])
         }
 
         // parse masternode.conf
-        std::string strErr;
-        if (!masternodeConfig.read(strErr)) {
-            fprintf(stderr, "Error reading masternode configuration file: %s\n", strErr.c_str());
-            return false;
-        }
+//        std::string strErr;
+//        if (!masternodeConfig.read(strErr)) {
+//            fprintf(stderr, "Error reading masternode configuration file: %s\n", strErr.c_str());
+//            return false;
+//        }
 
         // Command-line RPC
         bool fCommandLine = false;

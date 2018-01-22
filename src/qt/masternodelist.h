@@ -16,7 +16,7 @@
 
 namespace Ui
 {
-class MasternodeList;
+    class MasternodeList;
 }
 
 class ClientModel;
@@ -46,11 +46,11 @@ private:
     bool fFilterUpdated;
 
 public Q_SLOTS:
-    void updateMyMasternodeInfo(QString strAlias, QString strAddr, CMasternode* pmn);
+    void updateMyMasternodeInfo(QString strAlias, QString strAddr, CMasterNode* pmn);
     void updateMyNodeList(bool fForce = false);
     void updateNodeList();
 
-Q_SIGNALS:
+    Q_SIGNALS:
 
 private:
     QTimer* timer;
