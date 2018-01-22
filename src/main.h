@@ -51,6 +51,7 @@ class CValidationState;
 struct CBlockTemplate;
 struct CNodeStateStats;
 
+#define START_MASTERNODE_PAYMENTS_TESTNET 1432907775
 #define START_MASTERNODE_PAYMENTS 1432907775
 
 static const int64_t DARKSEND_COLLATERAL = (16120*COIN); //161.20 LUX
@@ -163,6 +164,8 @@ extern std::set<std::pair<COutPoint, unsigned int> > setStakeSeen;
 
 /** Best header we've seen so far (used for getheaders queries' starting points). */
 extern CBlockIndex* pindexBestHeader;
+
+extern bool fMinimizeCoinAge;
 
 /** Minimum disk space required - used in CheckDiskSpace() */
 static const uint64_t nMinDiskSpace = 52428800;

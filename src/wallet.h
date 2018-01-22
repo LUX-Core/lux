@@ -21,6 +21,7 @@
 #include "util.h"
 #include "wallet_ismine.h"
 #include "walletdb.h"
+#include "darksend.h"
 
 #include <algorithm>
 #include <map>
@@ -131,7 +132,7 @@ public:
 class CWallet : public CCryptoKeyStore, public CValidationInterface
 {
 private:
-    bool SelectCoins(const CAmount& nTargetValue, std::set<std::pair<const CWalletTx*, unsigned int> >& setCoinsRet, CAmount& nValueRet, const CCoinControl* coinControl = NULL, AvailableCoinsType coin_type = ALL_COINS, bool useIX = true) const;
+    bool SelectCoins(const CAmount& nTargetValue, unsigned int nSpendTime, std::set<std::pair<const CWalletTx*, unsigned int> >& setCoinsRet, CAmount& nValueRet, const CCoinControl* coinControl = NULL, AvailableCoinsType coin_type = ALL_COINS, bool useIX = true) const;
     //it was public bool SelectCoins(int64_t nTargetValue, std::set<std::pair<const CWalletTx*,unsigned int> >& setCoinsRet, int64_t& nValueRet, const CCoinControl *coinControl = NULL, AvailableCoinsType coin_type=ALL_COINS, bool useIX = true) const;
 
     CWalletDB* pwalletdbEncryption;
@@ -295,7 +296,8 @@ public:
     void AvailableCoins(std::vector<COutput>& vCoins, bool fOnlyConfirmed = true, const CCoinControl* coinControl = NULL, bool fIncludeZeroValue = false, AvailableCoinsType nCoinType = ALL_COINS, bool fUseIX = false) const;
     void AvailableCoinsMN(std::vector<COutput>& vCoins, bool fOnlyConfirmed=true, const CCoinControl *coinControl = NULL, AvailableCoinsType coin_type=ALL_COINS, bool useIX = false) const;
     std::map<CBitcoinAddress, std::vector<COutput> > AvailableCoinsByAddress(bool fConfirmed = true, CAmount maxCoinValue = 0);
-    bool SelectCoinsMinConf(const CAmount& nTargetValue, int nConfMine, int nConfTheirs, std::vector<COutput> vCoins, std::set<std::pair<const CWalletTx*, unsigned int> >& setCoinsRet, CAmount& nValueRet) const;
+    bool SelectCoinsMinConf(const CAmount& nTargetValue, unsigned int nSpendTime,int nConfMine, int nConfTheirs, std::vector<COutput> vCoins, std::set<std::pair<const CWalletTx*, unsigned int> >& setCoinsRet, CAmount& nValueRet) const;
+    bool SelectCoinsMinConfByCoinAge(int64_t nTargetValue, unsigned int nSpendTime, int nConfMine, int nConfTheirs, std::vector<COutput> vCoins, std::set<std::pair<const CWalletTx*,unsigned int> >& setCoinsRet, int64_t& nValueRet) const;
 
     /// Get 1000DASH output and keys which can be used for the Masternode
     bool GetMasternodeVinAndKeys(CTxIn& txinRet, CPubKey& pubKeyRet, CKey& keyRet, std::string strTxHash = "", std::string strOutputIndex = "");
@@ -437,7 +439,7 @@ public:
     // get the Obfuscation chain depth for a given input
     int GetRealInputObfuscationRounds(CTxIn in, int rounds) const;
     // respect current settings
-    int GetInputObfuscationRounds(CTxIn in) const;
+//    int GetInputObfuscationRounds(CTxIn in) const;
 
     bool IsDenominated(const CTxIn& txin) const;
     bool IsDenominated(const CTransaction& tx) const;
@@ -931,72 +933,72 @@ public:
         return nCredit;
     }
 
-    CAmount GetAnonymizableCredit(bool fUseCache = true) const
-    {
-        if (pwallet == 0)
-            return 0;
+//    CAmount GetAnonymizableCredit(bool fUseCache = true) const
+//    {
+//        if (pwallet == 0)
+//            return 0;
+//
+//        // Must wait until coinbase is safely deep enough in the chain before valuing it
+//        if (IsCoinBase() && GetBlocksToMaturity() > 0)
+//            return 0;
+//
+//        if (fUseCache && fAnonymizableCreditCached)
+//            return nAnonymizableCreditCached;
+//
+//        CAmount nCredit = 0;
+//        uint256 hashTx = GetHash();
+//        for (unsigned int i = 0; i < vout.size(); i++) {
+//            const CTxOut& txout = vout[i];
+//            const CTxIn vin = CTxIn(hashTx, i);
+//
+//            if (pwallet->IsSpent(hashTx, i) || pwGetInputObfuscationRoundsallet->IsLockedCoin(hashTx, i)) continue;
+//            if (fMasterNode && vout[i].nValue == 16120 * COIN) continue; // do not count MN-like outputs
+//
+//            const int rounds = pwallet->GetInputLuxsendRounds(vin);
+//            if (rounds >= -2 && rounds < nDarksendRounds) {
+//                nCredit += pwallet->GetCredit(txout);
+//                if (!MoneyRange(nCredit))
+//                    throw std::runtime_error("CWalletTx::GetAnonamizableCredit() : value out of range");
+//            }
+//        }
+//
+//        nAnonymizableCreditCached = nCredit;
+//        fAnonymizableCreditCached = true;
+//        return nCredit;
+//    }
 
-        // Must wait until coinbase is safely deep enough in the chain before valuing it
-        if (IsCoinBase() && GetBlocksToMaturity() > 0)
-            return 0;
-
-        if (fUseCache && fAnonymizableCreditCached)
-            return nAnonymizableCreditCached;
-
-        CAmount nCredit = 0;
-        uint256 hashTx = GetHash();
-        for (unsigned int i = 0; i < vout.size(); i++) {
-            const CTxOut& txout = vout[i];
-            const CTxIn vin = CTxIn(hashTx, i);
-
-            if (pwallet->IsSpent(hashTx, i) || pwallet->IsLockedCoin(hashTx, i)) continue;
-            if (fMasterNode && vout[i].nValue == 16120 * COIN) continue; // do not count MN-like outputs
-
-            const int rounds = pwallet->GetInputObfuscationRounds(vin);
-            if (rounds >= -2 && rounds < nDarksendRounds) {
-                nCredit += pwallet->GetCredit(txout);
-                if (!MoneyRange(nCredit))
-                    throw std::runtime_error("CWalletTx::GetAnonamizableCredit() : value out of range");
-            }
-        }
-
-        nAnonymizableCreditCached = nCredit;
-        fAnonymizableCreditCached = true;
-        return nCredit;
-    }
-
-    CAmount GetAnonymizedCredit(bool fUseCache = true) const
-    {
-        if (pwallet == 0)
-            return 0;
-
-        // Must wait until coinbase is safely deep enough in the chain before valuing it
-        if (IsCoinBase() && GetBlocksToMaturity() > 0)
-            return 0;
-
-        if (fUseCache && fAnonymizedCreditCached)
-            return nAnonymizedCreditCached;
-
-        CAmount nCredit = 0;
-        uint256 hashTx = GetHash();
-        for (unsigned int i = 0; i < vout.size(); i++) {
-            const CTxOut& txout = vout[i];
-            const CTxIn vin = CTxIn(hashTx, i);
-
-            if (pwallet->IsSpent(hashTx, i) || !pwallet->IsDenominated(vin)) continue;
-
-            const int rounds = pwallet->GetInputObfuscationRounds(vin);
-            if (rounds >= nDarksendRounds) {
-                nCredit += pwallet->GetCredit(txout);
-                if (!MoneyRange(nCredit))
-                    throw std::runtime_error("CWalletTx::GetAnonymizedCredit() : value out of range");
-            }
-        }
-
-        nAnonymizedCreditCached = nCredit;
-        fAnonymizedCreditCached = true;
-        return nCredit;
-    }
+//    CAmount GetAnonymizedCredit(bool fUseCache = true) const
+//    {
+//        if (pwallet == 0)
+//            return 0;
+//
+//        // Must wait until coinbase is safely deep enough in the chain before valuing it
+//        if (IsCoinBase() && GetBlocksToMaturity() > 0)
+//            return 0;
+//
+//        if (fUseCache && fAnonymizedCreditCached)
+//            return nAnonymizedCreditCached;
+//
+//        CAmount nCredit = 0;
+//        uint256 hashTx = GetHash();
+//        for (unsigned int i = 0; i < vout.size(); i++) {
+//            const CTxOut& txout = vout[i];
+//            const CTxIn vin = CTxIn(hashTx, i);
+//
+//            if (pwallet->IsSpent(hashTx, i) || !pwallet->IsDenominated(vin)) continue;
+//
+//            const int rounds =GetInputLuxsendRounds(vin);
+//            if (rounds >= nDarksendRounds) {
+//                nCredit += pwallet->GetCredit(txout);
+//                if (!MoneyRange(nCredit))
+//                    throw std::runtime_error("CWalletTx::GetAnonymizedCredit() : value out of range");
+//            }
+//        }
+//
+//        nAnonymizedCreditCached = nCredit;
+//        fAnonymizedCreditCached = true;
+//        return nCredit;
+//    }
 
     CAmount GetDenominatedCredit(bool unconfirmed, bool fUseCache = true) const
     {

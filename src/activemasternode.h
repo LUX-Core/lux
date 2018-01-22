@@ -9,7 +9,7 @@
 #include "sync.h"
 #include "net.h"
 #include "key.h"
-//#include "primitives/transaction.h"
+#include "primitives/transaction.h"
 #include "main.h"
 #include "init.h"
 #include "wallet.h"

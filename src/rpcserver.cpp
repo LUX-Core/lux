@@ -301,14 +301,14 @@ static const CRPCCommand vRPCCommands[] =
 
         /* Lux features */
         {"lux", "masternode", &masternode, true, true, false},
-        {"lux", "masternodelist", &masternodelist, true, true, false},
-        {"lux", "mnbudget", &mnbudget, true, true, false},
-        {"lux", "mnbudgetvoteraw", &mnbudgetvoteraw, true, true, false},
-        {"lux", "mnfinalbudget", &mnfinalbudget, true, true, false},
-        {"lux", "mnsync", &mnsync, true, true, false},
+//        {"lux", "masternodelist", &masternodelist, true, true, false},
+//        {"lux", "mnbudget", &mnbudget, true, true, false},
+//        {"lux", "mnbudgetvoteraw", &mnbudgetvoteraw, true, true, false},
+//        {"lux", "mnfinalbudget", &mnfinalbudget, true, true, false},
+//        {"lux", "mnsync", &mnsync, true, true, false},
         {"lux", "spork", &spork, true, true, false},
 #ifdef ENABLE_WALLET
-        {"lux", "obfuscation", &obfuscation, false, false, true}, /* not threadSafe because of SendMoney */
+//        {"lux", "obfuscation", &obfuscation, false, false, true}, /* not threadSafe because of SendMoney */
 
         /* Wallet */
         {"wallet", "addmultisigaddress", &addmultisigaddress, true, false, true},
@@ -327,7 +327,7 @@ static const CRPCCommand vRPCCommands[] =
         {"wallet", "getrawchangeaddress", &getrawchangeaddress, true, false, true},
         {"wallet", "getreceivedbyaccount", &getreceivedbyaccount, false, false, true},
         {"wallet", "getreceivedbyaddress", &getreceivedbyaddress, false, false, true},
-        {"wallet", "getstakingstatus", &getstakingstatus, false, false, true},
+//        {"wallet", "getstakingstatus", &getstakingstatus, false, false, true},
         {"wallet", "getstakesplitthreshold", &getstakesplitthreshold, false, false, true},
         {"wallet", "gettransaction", &gettransaction, false, false, true},
         {"wallet", "getunconfirmedbalance", &getunconfirmedbalance, false, false, true},
