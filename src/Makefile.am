@@ -107,10 +107,6 @@ BITCOIN_CORE_H = \
   limitedmap.h \
   main.h \
   masternode.h \
-  masternode-payments.h \
-  masternode-budget.h \
-  masternode-sync.h \
-  masternodeman.h \
   masternodeconfig.h \
   merkleblock.h \
   miner.h \
@@ -214,11 +210,7 @@ libbitcoin_wallet_a_SOURCES = \
   crypter.cpp \
   instantx.cpp \
   masternode.cpp \
-  masternode-budget.cpp \
-  masternode-payments.cpp \
-  masternode-sync.cpp \
   masternodeconfig.cpp \
-  masternodeman.cpp \
   rpcdump.cpp \
   rpcwallet.cpp \
   kernel.cpp \
