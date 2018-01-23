@@ -134,10 +134,13 @@ CAmount CTransaction::GetValueOut() const
     CAmount nValueOut = 0;
     for (std::vector<CTxOut>::const_iterator it(vout.begin()); it != vout.end(); ++it)
     {
+        std::cout << "GetValueOut: " << it->nValue << std::endl;
         nValueOut += it->nValue;
         if (!MoneyRange(it->nValue) || !MoneyRange(nValueOut))
             throw std::runtime_error("CTransaction::GetValueOut() : value out of range");
     }
+    std::cout << "GetValueOut Summ: " << nValueOut << std::endl;
+
     return nValueOut;
 }
 

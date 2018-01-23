@@ -2177,7 +2177,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
     CCheckQueueControl<CScriptCheck> control(fScriptChecks && nScriptCheckThreads ? &scriptcheckqueue : NULL);
 
     int64_t nTimeStart = GetTimeMicros();
-    CAmount nFees = 0;
+    int64_t nFees = 0;
     int nInputs = 0;
     unsigned int nSigOps = 0;
     CDiskTxPos pos(pindex->GetBlockPos(), GetSizeOfCompactSize(block.vtx.size()));
@@ -2218,9 +2218,9 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
             nValueIn += nTxValueIn;
             nValueOut += nTxValueOut;
             if (!tx.IsCoinStake())
-                nFees += nTxValueOut - nTxValueIn;
+                nFees += nTxValueIn - nTxValueOut;
             if (tx.IsCoinStake())
-                nStakeReward = nTxValueIn - nTxValueOut;
+                nStakeReward = nTxValueOut - nTxValueIn;
 
             std::vector<CScriptCheck> vChecks;
             if (!CheckInputs(tx, state, view, fScriptChecks, flags, false, nScriptCheckThreads ? &vChecks : NULL))
@@ -2259,10 +2259,15 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
 
 
     if (block.IsProofOfWork()) {
-        if (!IsInitialBlockDownload() && !IsBlockValueValid(block, GetBlockValue(pindex->pprev->nHeight) + nFees)) {
+        std::cout << "PoW Rewards:"
+                  << " H:\t" << pindex->nHeight
+                  << " A:\t" << block.vtx[0].GetValueOut()
+                  << " L:\t" << GetBlockValue(pindex->pprev->nHeight) + nFees
+                  << " F:\t" << nFees << std::endl;
+        if (/*!IsInitialBlockDownload() && */!IsBlockValueValid(block, GetBlockValue(pindex->pprev->nHeight) + nFees + 1)) {
             return state.DoS(100,
-                             error("ConnectBlock() : reward pays too much (actual=%d vs limit=%d)",
-                                   block.vtx[0].GetValueOut(), GetBlockValue(pindex->pprev->nHeight) + nFees),
+                             error("ConnectBlock() : %d reward pays too much  (actual=%d vs limit=%d) fee: %d",
+                                   pindex->nHeight, block.vtx[0].GetValueOut(), GetBlockValue(pindex->pprev->nHeight) + nFees, nFees),
                              REJECT_INVALID, "bad-cb-amount");
         }
     }
@@ -2272,9 +2277,14 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
 //        if(!block.vtx[1].GetCoinAge(nCoinAge))
 //           return error("ConnectBlock() : %s unable to get coin age for coinstake", block.vtx[1].GetHash().ToString());
 
-        int64_t nCalculatedStakeReward = GetProofOfStakeReward(pindex->nHeight, nCoinAge, nFees);
+        int64_t nCalculatedStakeReward = GetProofOfStakeReward(pindex->pprev->nHeight, nCoinAge, nFees);
+        std::cout << "PoS Rewards:"
+                  << " H:\t" << pindex->nHeight
+                  << " A:\t" << nStakeReward
+                  << " L:\t" << nCalculatedStakeReward
+                  << " F:\t" << nFees << std::endl;
         if (nStakeReward > nCalculatedStakeReward)
-            return error("ConnectBlock() : coinstake pays too much(actual=%d vs calculated=%d)", nStakeReward, nCalculatedStakeReward);
+            return error("ConnectBlock() : %d coinstake pays too much(actual=%d vs calculated=%d) fee: %d",pindex->nHeight, nStakeReward, nCalculatedStakeReward, nFees);
 
     }
 
