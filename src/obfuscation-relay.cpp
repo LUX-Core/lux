@@ -38,17 +38,17 @@ bool CObfuScationRelay::Sign(std::string strSharedKey)
     CPubKey pubkey2;
     std::string errorMessage = "";
 
-    if (!obfuScationSigner.SetKey(strSharedKey, errorMessage, key2, pubkey2)) {
+    if (!obfuscationSigner.SetKey(strSharedKey, errorMessage, key2, pubkey2)) {
         LogPrintf("CObfuScationRelay():Sign - ERROR: Invalid shared key: '%s'\n", errorMessage.c_str());
         return false;
     }
 
-    if (!obfuScationSigner.SignMessage(strMessage, errorMessage, vchSig2, key2)) {
+    if (!obfuscationSigner.SignMessage(strMessage, errorMessage, vchSig2, key2)) {
         LogPrintf("CObfuScationRelay():Sign - Sign message failed\n");
         return false;
     }
 
-    if (!obfuScationSigner.VerifyMessage(pubkey2, vchSig2, strMessage, errorMessage)) {
+    if (!obfuscationSigner.VerifyMessage(pubkey2, vchSig2, strMessage, errorMessage)) {
         LogPrintf("CObfuScationRelay():Sign - Verify message failed\n");
         return false;
     }
@@ -64,12 +64,12 @@ bool CObfuScationRelay::VerifyMessage(std::string strSharedKey)
     CPubKey pubkey2;
     std::string errorMessage = "";
 
-    if (!obfuScationSigner.SetKey(strSharedKey, errorMessage, key2, pubkey2)) {
+    if (!obfuscationSigner.SetKey(strSharedKey, errorMessage, key2, pubkey2)) {
         LogPrintf("CObfuScationRelay()::VerifyMessage - ERROR: Invalid shared key: '%s'\n", errorMessage.c_str());
         return false;
     }
 
-    if (!obfuScationSigner.VerifyMessage(pubkey2, vchSig2, strMessage, errorMessage)) {
+    if (!obfuscationSigner.VerifyMessage(pubkey2, vchSig2, strMessage, errorMessage)) {
         LogPrintf("CObfuScationRelay()::VerifyMessage - Verify message failed\n");
         return false;
     }

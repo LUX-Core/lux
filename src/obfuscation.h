@@ -16,7 +16,7 @@
 
 class CTxIn;
 class CObfuscationPool;
-class CObfuScationSigner;
+class CObfuscationSigner;
 class CMasterNodeVote;
 class CBitcoinAddress;
 class CObfuscationQueue;
@@ -50,8 +50,8 @@ class CActiveMasternode;
 static const int64_t OBFUSCATION_COLLATERAL = (10 * COIN);
 static const int64_t OBFUSCATION_POOL_MAX = (99999.99 * COIN);
 
-extern CObfuscationPool obfuScationPool;
-extern CObfuScationSigner obfuScationSigner;
+extern CObfuscationPool obfuscationPool;
+extern CObfuscationSigner obfuscationSigner;
 extern std::vector<CObfuscationQueue> vecObfuscationQueue;
 extern std::string strMasterNodePrivKey;
 extern map<uint256, CObfuscationBroadcastTx> mapObfuscationBroadcastTxes;
@@ -93,7 +93,7 @@ public:
 };
 
 // A clients transaction in the obfuscation pool
-class CObfuScationEntry
+class CObfuscationEntry
 {
 public:
     bool isSet;
@@ -104,7 +104,7 @@ public:
     CTransaction txSupporting;
     int64_t addedTime; // time in UTC milliseconds
 
-    CObfuScationEntry()
+    CObfuscationEntry()
     {
         isSet = false;
         collateral = CTransaction();
@@ -245,7 +245,7 @@ public:
 
 /** Helper object for signing and checking signatures
  */
-class CObfuScationSigner
+class CObfuscationSigner
 {
 public:
     /// Is the inputs associated with this public key? (and there is 16120 LUX - checking if valid masternode)
@@ -267,7 +267,7 @@ class CObfuscationPool
 private:
     mutable CCriticalSection cs_obfuscation;
 
-    std::vector<CObfuScationEntry> entries; // Masternode/clients entries
+    std::vector<CObfuscationEntry> entries; // Masternode/clients entries
     CMutableTransaction finalTransaction;   // the finalized transaction ready for signing
 
     int64_t lastTimeChanged; // last time the 'state' changed, in UTC milliseconds
@@ -420,7 +420,7 @@ public:
         if (state != newState) {
             lastTimeChanged = GetTimeMillis();
             if (fMasterNode) {
-                RelayStatus(obfuScationPool.sessionID, obfuScationPool.GetState(), obfuScationPool.GetEntriesCount(), MASTERNODE_RESET);
+                RelayStatus(obfuscationPool.sessionID, obfuscationPool.GetState(), obfuscationPool.GetEntriesCount(), MASTERNODE_RESET);
             }
         }
         state = newState;
@@ -512,6 +512,6 @@ public:
     void RelayCompletedTransaction(const int sessionID, const bool error, const int errorID);
 };
 
-void ThreadCheckObfuScationPool();
+void ThreadCheckObfuscationPool();
 
 #endif

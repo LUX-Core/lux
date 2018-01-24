@@ -197,7 +197,9 @@ bool ComputeNextStakeModifier(const CBlockIndex* pindexPrev, uint64_t& nStakeMod
         pindex = pindex->pprev;
     }
 
+#   if defined(DEBUG_DUMP_STAKING_INFO) && false
     int nHeightFirstCandidate = pindex ? (pindex->nHeight + 1) : 0;
+#   endif
 
     //reverse(vSortedCandidates.begin(), vSortedCandidates.end());
     sort(vSortedCandidates.begin(), vSortedCandidates.end());

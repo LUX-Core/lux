@@ -1465,7 +1465,7 @@ bool AppInit2(boost::thread_group& threadGroup)
             CKey key;
             CPubKey pubkey;
 
-            if (!obfuScationSigner.SetKey(strMasterNodePrivKey, errorMessage, key, pubkey)) {
+            if (!obfuscationSigner.SetKey(strMasterNodePrivKey, errorMessage, key, pubkey)) {
                 return InitError(_("Invalid masternodeprivkey. Please see documenation."));
             }
 
@@ -1499,7 +1499,7 @@ bool AppInit2(boost::thread_group& threadGroup)
 
     nLiquidityProvider = GetArg("-liquidityprovider", 0); //0-100
     if (nLiquidityProvider != 0) {
-        obfuScationPool.SetMinBlockSpacing(std::min(nLiquidityProvider, 100) * 15);
+        obfuscationPool.SetMinBlockSpacing(std::min(nLiquidityProvider, 100) * 15);
         fEnableObfuscation = true;
         nObfuscationRounds = 99999;
     }
@@ -1533,20 +1533,20 @@ bool AppInit2(boost::thread_group& threadGroup)
        1LUX+1000 == (.1LUX+100)*10
        10LUX+10000 == (1LUX+1000)*10
     */
-    obfuScationDenominations.push_back((10000 * COIN) + 10000000);
-    obfuScationDenominations.push_back((1000 * COIN) + 1000000);
-    obfuScationDenominations.push_back((100 * COIN) + 100000);
-    obfuScationDenominations.push_back((10 * COIN) + 10000);
-    obfuScationDenominations.push_back((1 * COIN) + 1000);
-    obfuScationDenominations.push_back((.1 * COIN) + 100);
+    obfuscationDenominations.push_back((10000 * COIN) + 10000000);
+    obfuscationDenominations.push_back((1000 * COIN) + 1000000);
+    obfuscationDenominations.push_back((100 * COIN) + 100000);
+    obfuscationDenominations.push_back((10 * COIN) + 10000);
+    obfuscationDenominations.push_back((1 * COIN) + 1000);
+    obfuscationDenominations.push_back((.1 * COIN) + 100);
     /* Disabled till we need them
-    obfuScationDenominations.push_back( (.01      * COIN)+10 );
-    obfuScationDenominations.push_back( (.001     * COIN)+1 );
+    obfuscationDenominations.push_back( (.01      * COIN)+10 );
+    obfuscationDenominations.push_back( (.001     * COIN)+1 );
     */
 
-    obfuScationPool.InitCollateralAddress();
+    obfuscationPool.InitCollateralAddress();
 
-    threadGroup.create_thread(boost::bind(&ThreadCheckObfuScationPool));
+    threadGroup.create_thread(boost::bind(&ThreadCheckObfuscationPool));
 
     // ********************************************************* Step 11: start node
 
