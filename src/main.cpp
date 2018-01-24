@@ -1617,8 +1617,7 @@ uint256 GetProofOfStakeLimit(int nHeight)
         return bnProofOfStakeLimit;
 }
 
-int64_t GetBlockValue(int nHeight)
-{
+CAmount GetBlockValue(int nHeight) {
     int64_t nSubsidy = 1 * COIN;
 
     if (Params().NetworkID() == CBaseChainParams::TESTNET) {
@@ -1628,30 +1627,29 @@ int64_t GetBlockValue(int nHeight)
 
     if (nHeight == 1) {
         nSubsidy = 3000000 * COIN;
-    } else if (nHeight < 500 && nHeight > 0) {
+    } else if (nHeight < 500) {
         nSubsidy = 1 * COIN;
     } else if (nHeight == 501) {
         nSubsidy = 1000 * COIN;
-    } else if (nHeight <= 1000000 && nHeight >= 502) {
+    } else if (nHeight < 1000000) {
         nSubsidy = 10 * COIN;
-    } else if (nHeight <= 1001000 && nHeight >= 1000001) {
+    } else if (nHeight < 1001000) {
         nSubsidy = 30 * COIN;
-    } else if (nHeight <= 5000000 && nHeight >= 1001001) {
+    } else if (nHeight < 5000000) {
         nSubsidy = 10 * COIN;
-    } else if (nHeight <= 6000000 && nHeight >= 5000001) {
+    } else if (nHeight < 6000000) {
         nSubsidy = 10 * COIN;
     } else {
         nSubsidy = 1 * COIN;
     }
-    return nSubsidy;
+    return nSubsidy + nHeight + 1;
 }
 
-int64_t GetProofOfStakeReward(int64_t nCoinAge, int64_t nFees, int nHeight)
-{
+CAmount GetProofOfStakeReward(int64_t nCoinAge, int64_t nFees, int nHeight) {
     int64_t nSubsidy = STATIC_POS_REWARD;
 
     // First 100,000 blocks double stake for masternode ready
-    if(/*pindexBestHeader->*/nHeight < 100000) {
+    if(pindexBestHeader->nHeight < 100000) {
         nSubsidy = 2 * COIN;
     } else {
         nSubsidy = 1 * COIN;
@@ -2249,40 +2247,21 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
     nTimeConnect += nTime1 - nTimeStart;
     LogPrint("bench", "      - Connect %u transactions: %.2fms (%.3fms/tx, %.3fms/txin) [%.2fs]\n", (unsigned)block.vtx.size(), 0.001 * (nTime1 - nTimeStart), 0.001 * (nTime1 - nTimeStart) / block.vtx.size(), nInputs <= 1 ? 0 : 0.001 * (nTime1 - nTimeStart) / (nInputs - 1), nTimeConnect * 0.000001);
 
-//    if (block.IsProofOfWork()) {
-//        int64_t nReward = GetBlockValue(pindex->pprev->nHeight) + nFees;
-//        if (block.vtx[0].GetValueOut() > nReward)
-//            return error("ConnectBlock() : coinbase reward exceeded (actual=%d vs calculated=%d)",
-//                         block.vtx[0].GetValueOut(),
-//                         nReward + nFees);
-//    }
-
-
     if (block.IsProofOfWork()) {
-        std::cout << "PoW Rewards:"
-                  << " H:\t" << pindex->nHeight
-                  << " A:\t" << block.vtx[0].GetValueOut()
-                  << " L:\t" << GetBlockValue(pindex->pprev->nHeight) + nFees
-                  << " F:\t" << nFees << std::endl;
-        if (/*!IsInitialBlockDownload() && */!IsBlockValueValid(block, GetBlockValue(pindex->pprev->nHeight) + nFees + 1)) {
+        if (/*!IsInitialBlockDownload() && */!IsBlockValueValid(block, GetBlockValue(pindex->pprev->nHeight))) {
             return state.DoS(100,
                              error("ConnectBlock() : %d reward pays too much  (actual=%d vs limit=%d) fee: %d",
-                                   pindex->nHeight, block.vtx[0].GetValueOut(), GetBlockValue(pindex->pprev->nHeight) + nFees, nFees),
+                                   pindex->nHeight, block.vtx[0].GetValueOut(), GetBlockValue(pindex->pprev->nHeight), nFees),
                              REJECT_INVALID, "bad-cb-amount");
         }
     }
 
     if(block.IsProofOfStake()) {
-        uint64_t nCoinAge;
-//        if(!block.vtx[1].GetCoinAge(nCoinAge))
-//           return error("ConnectBlock() : %s unable to get coin age for coinstake", block.vtx[1].GetHash().ToString());
+        uint64_t nCoinAge = 1;
+        if(!GetCoinAge(block.vtx[1], block.vtx[1].nTime, nCoinAge))
+           return error("ConnectBlock() : %s unable to get coin age for coinstake", block.vtx[1].GetHash().ToString());
 
-        int64_t nCalculatedStakeReward = GetProofOfStakeReward(pindex->pprev->nHeight, nCoinAge, nFees);
-        std::cout << "PoS Rewards:"
-                  << " H:\t" << pindex->nHeight
-                  << " A:\t" << nStakeReward
-                  << " L:\t" << nCalculatedStakeReward
-                  << " F:\t" << nFees << std::endl;
+        int64_t nCalculatedStakeReward = GetProofOfStakeReward(pindex->nHeight, nCoinAge, nFees);
         if (nStakeReward > nCalculatedStakeReward)
             return error("ConnectBlock() : %d coinstake pays too much(actual=%d vs calculated=%d) fee: %d",pindex->nHeight, nStakeReward, nCalculatedStakeReward, nFees);
 
@@ -5918,4 +5897,3 @@ public:
         mapOrphanTransactionsByPrev.clear();
     }
 } instance_of_cmaincleanup;
-
