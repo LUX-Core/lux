@@ -32,10 +32,10 @@ using namespace std;
 #include <QScrollBar>
 
 MasternodeManager::MasternodeManager(QWidget *parent) :
-        QWidget(parent),
-        ui(new Ui::MasternodeManager),
-        clientModel(0),
-        walletModel(0)
+    QWidget(parent),
+    ui(new Ui::MasternodeManager),
+    clientModel(0),
+    walletModel(0)
 {
     ui->setupUi(this);
 
@@ -52,8 +52,8 @@ MasternodeManager::MasternodeManager(QWidget *parent) :
     connect(timer, SIGNAL(timeout()), this, SLOT(updateNodeList()));
     if(!GetBoolArg("-reindexaddr", false))
         timer->start(1000);
-    fFilterUpdated = true;
-    nTimeFilterUpdated = GetTime();
+        fFilterUpdated = true;
+	nTimeFilterUpdated = GetTime();
 
     updateNodeList();
 }
@@ -70,13 +70,13 @@ static void NotifyAdrenalineNodeUpdated(MasternodeManager *page, CAdrenalineNode
     QString addr = QString::fromStdString(nodeConfig.sAddress);
     QString privkey = QString::fromStdString(nodeConfig.sMasternodePrivKey);
     QString collateral = QString::fromStdString(nodeConfig.sCollateralAddress);
-
+    
     QMetaObject::invokeMethod(page, "updateAdrenalineNode", Qt::QueuedConnection,
                               Q_ARG(QString, alias),
                               Q_ARG(QString, addr),
                               Q_ARG(QString, privkey),
                               Q_ARG(QString, collateral)
-    );
+                              );
 }
 
 void MasternodeManager::subscribeToCoreSignals()
@@ -93,7 +93,7 @@ void MasternodeManager::on_tableWidget_2_itemSelectionChanged()
         ui->getConfigButton->setEnabled(true);
         ui->startButton->setEnabled(true);
         ui->stopButton->setEnabled(true);
-        ui->copyAddressButton->setEnabled(true);
+	ui->copyAddressButton->setEnabled(true);
     }
 }
 
@@ -128,18 +128,18 @@ void MasternodeManager::updateAdrenalineNode(QString alias, QString addr, QStrin
 
 static QString seconds_to_DHMS(quint32 duration)
 {
-    QString res;
-    int seconds = (int) (duration % 60);
-    duration /= 60;
-    int minutes = (int) (duration % 60);
-    duration /= 60;
-    int hours = (int) (duration % 24);
-    int days = (int) (duration / 24);
-    if((hours == 0)&&(days == 0))
-        return res.sprintf("%02dm:%02ds", minutes, seconds);
-    if (days == 0)
-        return res.sprintf("%02dh:%02dm:%02ds", hours, minutes, seconds);
-    return res.sprintf("%dd %02dh:%02dm:%02ds", days, hours, minutes, seconds);
+  QString res;
+  int seconds = (int) (duration % 60);
+  duration /= 60;
+  int minutes = (int) (duration % 60);
+  duration /= 60;
+  int hours = (int) (duration % 24);
+  int days = (int) (duration / 24);
+  if((hours == 0)&&(days == 0))
+      return res.sprintf("%02dm:%02ds", minutes, seconds);
+  if (days == 0)
+      return res.sprintf("%02dh:%02dm:%02ds", hours, minutes, seconds);
+  return res.sprintf("%dd %02dh:%02dm:%02ds", days, hours, minutes, seconds);
 }
 
 void MasternodeManager::updateNodeList()
@@ -151,32 +151,32 @@ void MasternodeManager::updateNodeList()
     ui->countLabel->setText("Updating...");
     ui->tableWidget->clearContents();
     ui->tableWidget->setRowCount(0);
-    BOOST_FOREACH(CMasterNode mn, vecMasternodes)
+    BOOST_FOREACH(CMasterNode mn, vecMasternodes) 
     {
         int mnRow = 0;
         ui->tableWidget->insertRow(0);
 
-        // populate list
-        // Address, Rank, Active, Active Seconds, Last Seen, Pub Key
-        QTableWidgetItem *activeItem = new QTableWidgetItem(QString::number(mn.IsEnabled()));
-        QTableWidgetItem *addressItem = new QTableWidgetItem(QString::fromStdString(mn.addr.ToString()));
-        QTableWidgetItem *rankItem = new QTableWidgetItem(QString::number(GetMasternodeRank(mn.vin, pindexBest->nHeight)));
-        QTableWidgetItem *activeSecondsItem = new QTableWidgetItem(seconds_to_DHMS((qint64)(mn.lastTimeSeen - mn.now)));
-        QTableWidgetItem *lastSeenItem = new QTableWidgetItem(QString::fromStdString(DateTimeStrFormat(mn.lastTimeSeen)));
-
-        CScript pubkey;
+ 	// populate list
+	// Address, Rank, Active, Active Seconds, Last Seen, Pub Key
+	QTableWidgetItem *activeItem = new QTableWidgetItem(QString::number(mn.IsEnabled()));
+	QTableWidgetItem *addressItem = new QTableWidgetItem(QString::fromStdString(mn.addr.ToString()));
+	QTableWidgetItem *rankItem = new QTableWidgetItem(QString::number(GetMasternodeRank(mn.vin, pindexBestHeader->nHeight)));
+	QTableWidgetItem *activeSecondsItem = new QTableWidgetItem(seconds_to_DHMS((qint64)(mn.lastTimeSeen - mn.now)));
+	QTableWidgetItem *lastSeenItem = new QTableWidgetItem(QString::fromStdString(DateTimeStrFormat("%Y-%m-%d %H:%M:%S UTC", mn.lastTimeSeen)));
+	
+	CScript pubkey;
         pubkey =GetScriptForDestination(mn.pubkey.GetID());
         CTxDestination address1;
         ExtractDestination(pubkey, address1);
         CBitcoinAddress address2(address1);
-        QTableWidgetItem *pubkeyItem = new QTableWidgetItem(QString::fromStdString(address2.ToString()));
-
-        ui->tableWidget->setItem(mnRow, 0, addressItem);
-        ui->tableWidget->setItem(mnRow, 1, rankItem);
-        ui->tableWidget->setItem(mnRow, 2, activeItem);
-        ui->tableWidget->setItem(mnRow, 3, activeSecondsItem);
-        ui->tableWidget->setItem(mnRow, 4, lastSeenItem);
-        ui->tableWidget->setItem(mnRow, 5, pubkeyItem);
+	QTableWidgetItem *pubkeyItem = new QTableWidgetItem(QString::fromStdString(address2.ToString()));
+	
+	ui->tableWidget->setItem(mnRow, 0, addressItem);
+	ui->tableWidget->setItem(mnRow, 1, rankItem);
+	ui->tableWidget->setItem(mnRow, 2, activeItem);
+	ui->tableWidget->setItem(mnRow, 3, activeSecondsItem);
+	ui->tableWidget->setItem(mnRow, 4, lastSeenItem);
+	ui->tableWidget->setItem(mnRow, 5, pubkeyItem);
     }
 
     ui->countLabel->setText(QString::number(ui->tableWidget->rowCount()));
@@ -345,16 +345,16 @@ void MasternodeManager::on_startAllButton_clicked()
     BOOST_FOREACH(PAIRTYPE(std::string, CAdrenalineNodeConfig) adrenaline, pwalletMain->mapMyAdrenalineNodes)
     {
         CAdrenalineNodeConfig c = adrenaline.second;
-        std::string errorMessage;
+	std::string errorMessage;
         bool result = activeMasternode.RegisterByPubKey(c.sAddress, c.sMasternodePrivKey, c.sCollateralAddress, errorMessage);
-        if(result)
-        {
-            results += c.sAddress + ": STARTED\n";
-        }
-        else
-        {
-            results += c.sAddress + ": ERROR: " + errorMessage + "\n";
-        }
+	if(result)
+	{
+   	    results += c.sAddress + ": STARTED\n";
+	}	
+	else
+	{
+	    results += c.sAddress + ": ERROR: " + errorMessage + "\n";
+	}
     }
 
     QMessageBox msg;
@@ -368,20 +368,21 @@ void MasternodeManager::on_stopAllButton_clicked()
     BOOST_FOREACH(PAIRTYPE(std::string, CAdrenalineNodeConfig) adrenaline, pwalletMain->mapMyAdrenalineNodes)
     {
         CAdrenalineNodeConfig c = adrenaline.second;
-        std::string errorMessage;
+	std::string errorMessage;
         bool result = activeMasternode.StopMasterNode(c.sAddress, c.sMasternodePrivKey, errorMessage);
-        if(result)
-        {
-            results += c.sAddress + ": STOPPED\n";
-        }
-        else
-        {
-            results += c.sAddress + ": ERROR: " + errorMessage + "\n";
-        }
+	if(result)
+	{
+   	    results += c.sAddress + ": STOPPED\n";
+	}	
+	else
+	{
+	    results += c.sAddress + ": ERROR: " + errorMessage + "\n";
+	}
     }
 
     QMessageBox msg;
     msg.setText(QString::fromStdString(results));
     msg.exec();
 }
+
 

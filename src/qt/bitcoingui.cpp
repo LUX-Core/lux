@@ -30,7 +30,7 @@
 #endif
 
 #include "init.h"
-#include "masternodelist.h"
+#include "masternodemanager.h"
 #include "ui_interface.h"
 #include "util.h"
 

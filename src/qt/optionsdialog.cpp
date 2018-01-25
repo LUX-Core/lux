@@ -11,7 +11,7 @@
 
 #include "bitcoinunits.h"
 #include "guiutil.h"
-#include "obfuscation.h"
+//#include "obfuscation.h"
 #include "optionsmodel.h"
 
 #include "main.h" // for MAX_SCRIPTCHECK_THREADS
@@ -212,7 +212,7 @@ void OptionsDialog::setMapper()
 
 
     /* Obfuscation Rounds */
-    mapper->addMapping(ui->obfuscationRounds, OptionsModel::ObfuscationRounds);
+    mapper->addMapping(ui->obfuscationRounds, OptionsModel::LuxsendRounds);
     mapper->addMapping(ui->anonymizeLux, OptionsModel::AnonymizeLuxAmount);
     mapper->addMapping(ui->showMasternodesTab, OptionsModel::ShowMasternodesTab);
 }
@@ -254,7 +254,7 @@ void OptionsDialog::on_resetButton_clicked()
 void OptionsDialog::on_okButton_clicked()
 {
     mapper->submit();
-    obfuScationPool.cachedNumBlocks = std::numeric_limits<int>::max();
+//    obfuScationPool.cachedNumBlocks = std::numeric_limits<int>::max();
     pwalletMain->MarkDirty();
     accept();
 }

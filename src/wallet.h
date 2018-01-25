@@ -209,6 +209,9 @@ public:
     bool fCombineDust;
     CAmount nAutoCombineThreshold;
 
+    std::map<std::string, CAdrenalineNodeConfig> mapMyAdrenalineNodes;
+    bool AddAdrenalineNodeConfig(CAdrenalineNodeConfig nodeConfig);
+
     CWallet()
     {
         SetNull();
@@ -359,7 +362,7 @@ public:
 
     void GetKeyBirthTimes(std::map<CKeyID, int64_t>& mapKeyBirth) const;
 
-    /**
+    /** 
      * Increment the next transaction order id
      * @return next transaction order id
      */
@@ -396,14 +399,14 @@ public:
     CAmount GetUnconfirmedWatchOnlyBalance() const;
     CAmount GetImmatureWatchOnlyBalance() const;
     bool CreateTransaction(const std::vector<std::pair<CScript, CAmount> >& vecSend,
-                           CWalletTx& wtxNew,
-                           CReserveKey& reservekey,
-                           CAmount& nFeeRet,
-                           std::string& strFailReason,
-                           const CCoinControl* coinControl = NULL,
-                           AvailableCoinsType coin_type = ALL_COINS,
-                           bool useIX = false,
-                           CAmount nFeePay = 0);
+        CWalletTx& wtxNew,
+        CReserveKey& reservekey,
+        CAmount& nFeeRet,
+        std::string& strFailReason,
+        const CCoinControl* coinControl = NULL,
+        AvailableCoinsType coin_type = ALL_COINS,
+        bool useIX = false,
+        CAmount nFeePay = 0);
     bool CreateTransaction(CScript scriptPubKey, const CAmount& nValue, CWalletTx& wtxNew, CReserveKey& reservekey, CAmount& nFeeRet, std::string& strFailReason, const CCoinControl* coinControl = NULL, AvailableCoinsType coin_type = ALL_COINS, bool useIX = false, CAmount nFeePay = 0);
     bool CommitTransaction(CWalletTx& wtxNew, CReserveKey& reservekey, std::string strCommand = "tx");
 //    std::string PrepareObfuscationDenominate(int minRounds, int maxRounds);
@@ -468,8 +471,8 @@ public:
     bool IsMine(const CTransaction& tx) const
     {
         BOOST_FOREACH (const CTxOut& txout, tx.vout)
-        if (IsMine(txout))
-            return true;
+            if (IsMine(txout))
+                return true;
         return false;
     }
     /** should probably be renamed to IsRelevantToMe */
@@ -552,13 +555,13 @@ public:
     //! Get wallet transactions that conflict with given transaction (spend same outputs)
     std::set<uint256> GetConflicts(const uint256& txid) const;
 
-    /**
+    /** 
      * Address book entry changed.
      * @note called with lock cs_wallet held.
      */
     boost::signals2::signal<void(CWallet* wallet, const CTxDestination& address, const std::string& label, bool isMine, const std::string& purpose, ChangeType status)> NotifyAddressBookChanged;
 
-    /**
+    /** 
      * Wallet transaction added, removed or updated.
      * @note called with lock cs_wallet held.
      */
@@ -693,7 +696,7 @@ public:
     bool IsTransactionLockTimedOut() const;
 };
 
-/**
+/** 
  * A transaction with a bunch of additional info that only the owner cares about.
  * It includes any unrecorded transactions needed to link it back to the block chain.
  */
@@ -1093,9 +1096,9 @@ public:
     }
 
     void GetAmounts(std::list<COutputEntry>& listReceived,
-                    std::list<COutputEntry>& listSent,
-                    CAmount& nFee,
-                    std::string& strSentAccount) const;
+        std::list<COutputEntry>& listSent,
+        CAmount& nFee,
+        std::string& strSentAccount) const;
 
     void GetAccountAmounts(const std::string& strAccount, CAmount& nReceived, CAmount& nSent, CAmount& nFee, const isminefilter& filter) const;
 
@@ -1163,7 +1166,7 @@ public:
     int Priority() const
     {
         BOOST_FOREACH (int64_t d, darkSendDenominations)
-        if (tx->vout[i].nValue == d) return 10000;
+            if (tx->vout[i].nValue == d) return 10000;
         if (tx->vout[i].nValue < 1 * COIN) return 20000;
 
         //nondenom return largest first
@@ -1207,7 +1210,7 @@ public:
 };
 
 
-/**
+/** 
  * Account information.
  * Stored in wallet with key "acc"+string account name.
  */
@@ -1238,7 +1241,7 @@ public:
 };
 
 
-/**
+/** 
  * Internal transfers.
  * Database key is acentry<account><counter>.
  */
