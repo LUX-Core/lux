@@ -51,6 +51,8 @@ using namespace std;
 #  define DEBUG_DUMP_STAKING_INFO_AddToBlockIndex() (void)0
 #endif
 
+const int LAST_HEIGHT_FEE_BLOCK = 180000;
+
 /**
  * Global state
  */
@@ -1625,52 +1627,54 @@ uint256 GetProofOfStakeLimit(int nHeight)
         return bnProofOfStakeLimit;
 }
 
-int64_t GetBlockValue(int nHeight)
+CAmount GetProofOfWorkReward(int64_t nFees, int nHeight)
 {
-    int64_t nSubsidy = 1 * COIN;
-
     if (Params().NetworkID() == CBaseChainParams::TESTNET) {
-        if (nHeight < 200 && nHeight > 0)
-            return 250000 * COIN;
+        if (nHeight < 200) return 250000 * COIN;
     }
 
-    if (nHeight == 1) {
+    CAmount nSubsidy = 1 * COIN;
+    if (nHeight < 1) {
+        nSubsidy = 1 * COIN;
+    } else if (nHeight == 1) {
         nSubsidy = 3000000 * COIN;
-    } else if (nHeight < 500 && nHeight > 0) {
+    } else if (nHeight < 500) {
         nSubsidy = 1 * COIN;
     } else if (nHeight == 501) {
         nSubsidy = 1000 * COIN;
-    } else if (nHeight <= 1000000 && nHeight >= 502) {
+    } else if (nHeight < 1000000) {
         nSubsidy = 10 * COIN;
-    } else if (nHeight <= 1001000 && nHeight >= 1000001) {
+    } else if (nHeight < 1001000) {
         nSubsidy = 30 * COIN;
-    } else if (nHeight <= 5000000 && nHeight >= 1001001) {
+    } else if (nHeight < 5000000) {
         nSubsidy = 10 * COIN;
-    } else if (nHeight <= 6000000 && nHeight >= 5000001) {
+    } else if (nHeight < 6000000) {
         nSubsidy = 10 * COIN;
     } else {
         nSubsidy = 1 * COIN;
     }
-    return nSubsidy;
+
+    if (nHeight < LAST_HEIGHT_FEE_BLOCK) {
+        nFees = nHeight;
+    }
+    return nSubsidy + nFees;
 }
 
-int64_t GetProofOfStakeReward(int64_t nCoinAge, int64_t nFees, int nHeight)
+CAmount GetProofOfStakeReward(int64_t nCoinAge, int64_t nFees, int nHeight)
 {
-    int64_t nSubsidy = STATIC_POS_REWARD;
+    CAmount nSubsidy = STATIC_POS_REWARD;
 
     // First 100,000 blocks double stake for masternode ready
-    if(nHeight < 100000) {
+    if (nHeight < 100000) {
         nSubsidy = 2 * COIN;
     } else {
         nSubsidy = 1 * COIN;
     }
 
-//    LogPrint("creation", "GetProofOfStakeReward(): create=%s nCoinAge=%d nHeight=%d\n", FormatMoney(nSubsidy), nCoinAge, nHeight);
-
     return nSubsidy + nFees;
 }
 
-int64_t GetMasternodePayment(int nHeight, int64_t blockValue, int nMasternodeCount)
+CAmount GetMasternodePayment(int nHeight, int64_t blockValue, int nMasternodeCount)
 {
     int64_t ret = blockValue * 0.4; //40% for masternodes
 
@@ -2209,18 +2213,11 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
     nTimeConnect += nTime1 - nTimeStart;
     LogPrint("bench", "      - Connect %u transactions: %.2fms (%.3fms/tx, %.3fms/txin) [%.2fs]\n", (unsigned)block.vtx.size(), 0.001 * (nTime1 - nTimeStart), 0.001 * (nTime1 - nTimeStart) / block.vtx.size(), nInputs <= 1 ? 0 : 0.001 * (nTime1 - nTimeStart) / (nInputs - 1), nTimeConnect * 0.000001);
 
-//    if (block.IsProofOfWork()) {
-//        int64_t nReward = GetBlockValue(pindex->pprev->nHeight) + nFees;
-//        if (block.vtx[0].GetValueOut() > nReward)
-//            return error("%s: coinbase reward exceeded (actual=%d vs calculated=%d)", __func__,
-//                         block.vtx[0].GetValueOut(),
-//                         nReward + nFees);
-//    }
-
     if (block.IsProofOfWork()) {
-        if (!IsInitialBlockDownload() && !IsBlockValueValid(block, GetBlockValue(pindex->pprev->nHeight) + nFees)) {
-            return state.DoS(100, error("%s: reward pays too much (actual=%d vs limit=%d)", __func__,
-                                        block.vtx[0].GetValueOut(), GetBlockValue(pindex->pprev->nHeight) + nFees),
+        auto nReward = GetProofOfWorkReward(nFees, /*pindex->nHeight*/pindex->pprev->nHeight);
+        if (!IsInitialBlockDownload() && !IsBlockValueValid(block, nReward)) {
+            return state.DoS(100, error("%s: reward pays too much (actual=%d vs limit=%d) (nHeight=%d, nFees=%d)", __func__,
+                                        block.vtx[0].GetValueOut(), nReward, pindex->nHeight, nFees),
                              REJECT_INVALID, "bad-cb-amount");
         }
     }
@@ -3572,7 +3569,8 @@ bool ProcessNewBlock(CValidationState& state, CNode* pfrom, CBlock* pblock, CDis
             pwalletMain->AutoCombineDust();
     }
 
-    LogPrintf("%s: ACCEPTED %d %s\n", __func__, pindex->nHeight, pindex->GetBlockHash().GetHex());
+    LogPrintf("%s: ACCEPTED %d %s (%d)\n", __func__, pindex->nHeight, pindex->GetBlockHash().GetHex(),
+              chainActive.Tip()->nHeight);
 
     return true;
 }

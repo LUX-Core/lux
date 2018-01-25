@@ -475,8 +475,6 @@ void CBudgetManager::FillBlockPayee(CMutableTransaction& txNew, CAmount nFees, b
         ++it;
     }
 
-    CAmount blockValue = GetBlockValue(pindexPrev->nHeight);
-
     if (fProofOfStake) {
         if (nHighestCount > 0) {
             unsigned int i = txNew.vout.size();
@@ -490,7 +488,7 @@ void CBudgetManager::FillBlockPayee(CMutableTransaction& txNew, CAmount nFees, b
         }
     } else {
         //miners get the full amount on these blocks
-        txNew.vout[0].nValue = blockValue;
+        txNew.vout[0].nValue = GetProofOfWorkReward(0, pindexPrev->nHeight);
 
         if (nHighestCount > 0) {
             txNew.vout.resize(2);
