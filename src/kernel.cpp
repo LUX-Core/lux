@@ -32,11 +32,7 @@ static const int STAKE_TIMESTAMP_MASK = 15;
 // ratio of group interval length between the last group and the first group
 static const int MODIFIER_INTERVAL_RATIO = 3;
 
-<<<<<<< HEAD
-static const int LAST_MULTIPLIED_BLOCK = 160*1000; // 160K
-=======
 static const int LAST_MULTIPLIED_BLOCK = 180*1000; // 180K
->>>>>>> 80c62a8e03f1f07d4f41e2dbdedbff0520a40219
 
 // Modifier interval: time to elapse before new modifier is computed
 // Set to 3-hour for production network and 20-minute for test network
@@ -203,10 +199,7 @@ bool ComputeNextStakeModifier(const CBlockIndex* pindexPrev, uint64_t& nStakeMod
 
 #   if defined(DEBUG_DUMP_STAKING_INFO) && false
     int nHeightFirstCandidate = pindex ? (pindex->nHeight + 1) : 0;
-<<<<<<< HEAD
-=======
 #   endif
->>>>>>> 80c62a8e03f1f07d4f41e2dbdedbff0520a40219
 
     //reverse(vSortedCandidates.begin(), vSortedCandidates.end());
     sort(vSortedCandidates.begin(), vSortedCandidates.end());

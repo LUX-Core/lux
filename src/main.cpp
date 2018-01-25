@@ -51,11 +51,8 @@ using namespace std;
 #  define DEBUG_DUMP_STAKING_INFO_AddToBlockIndex() (void)0
 #endif
 
-<<<<<<< HEAD
-=======
 const int LAST_HEIGHT_FEE_BLOCK = 180000;
 
->>>>>>> 80c62a8e03f1f07d4f41e2dbdedbff0520a40219
 /**
  * Global state
  */
@@ -1668,11 +1665,7 @@ CAmount GetProofOfStakeReward(int64_t nCoinAge, int64_t nFees, int nHeight)
     CAmount nSubsidy = STATIC_POS_REWARD;
 
     // First 100,000 blocks double stake for masternode ready
-<<<<<<< HEAD
-    if(nHeight < 100000) {
-=======
     if (nHeight < 100000) {
->>>>>>> 80c62a8e03f1f07d4f41e2dbdedbff0520a40219
         nSubsidy = 2 * COIN;
     } else {
         nSubsidy = 1 * COIN;
@@ -2220,27 +2213,11 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
     nTimeConnect += nTime1 - nTimeStart;
     LogPrint("bench", "      - Connect %u transactions: %.2fms (%.3fms/tx, %.3fms/txin) [%.2fs]\n", (unsigned)block.vtx.size(), 0.001 * (nTime1 - nTimeStart), 0.001 * (nTime1 - nTimeStart) / block.vtx.size(), nInputs <= 1 ? 0 : 0.001 * (nTime1 - nTimeStart) / (nInputs - 1), nTimeConnect * 0.000001);
 
-<<<<<<< HEAD
-//    if (block.IsProofOfWork()) {
-//        int64_t nReward = GetBlockValue(pindex->pprev->nHeight) + nFees;
-//        if (block.vtx[0].GetValueOut() > nReward)
-//            return error("%s: coinbase reward exceeded (actual=%d vs calculated=%d)", __func__,
-//                         block.vtx[0].GetValueOut(),
-//                         nReward + nFees);
-//    }
-
-    if (block.IsProofOfWork()) {
-        if (!IsInitialBlockDownload() && !IsBlockValueValid(block, GetBlockValue(pindex->pprev->nHeight) + nFees)) {
-            return state.DoS(100,
-                             error("%s: reward pays too much (actual=%d vs limit=%d)", __func__,
-                                   block.vtx[0].GetValueOut(), GetBlockValue(pindex->pprev->nHeight) + nFees),
-=======
     if (block.IsProofOfWork()) {
         auto nReward = GetProofOfWorkReward(nFees, pindex->nHeight/*pindex->pprev->nHeight*/);
         if (!IsInitialBlockDownload() && !IsBlockValueValid(block, nReward)) {
             return state.DoS(100, error("%s: reward pays too much (actual=%d vs limit=%d) (nHeight=%d, nFees=%d)", __func__,
                                         block.vtx[0].GetValueOut(), nReward, pindex->nHeight, nFees),
->>>>>>> 80c62a8e03f1f07d4f41e2dbdedbff0520a40219
                              REJECT_INVALID, "bad-cb-amount");
         }
     }
@@ -3112,18 +3089,8 @@ bool CheckBlock(const CBlock& block, CValidationState& state, bool fCheckPOW, bo
         return state.DoS(100, error("%s: invalid (%s) block header", __func__, s),
             REJECT_INVALID, "bad-header", true);
 
-<<<<<<< HEAD
-    const char * const s = block.IsProofOfStake() ? "pos" : "pow";
-
-    // Check timestamp
-    LogPrint("debug", "%s: block=%s (%s)\n", __func__, block.GetHash().ToString().c_str(), s);
-    if (block.GetBlockTime() > GetAdjustedTime() + (block.IsProofOfStake() ? 180 : 7200)) // 3 minute future drift for PoS
-        return state.Invalid(error("CheckBlock() : block timestamp too far in the future"),
-            REJECT_INVALID, "time-too-new");
-=======
     // 3 minute future drift for PoS
     auto const nBlockTimeLimit = GetAdjustedTime() + (block.IsProofOfStake() ? 180 : 7200);
->>>>>>> 80c62a8e03f1f07d4f41e2dbdedbff0520a40219
 
     LogPrint("debug", "%s: block=%s (%s) %d %d\n", __func__, block.GetHash().GetHex(), s, 
              block.GetBlockTime(), nBlockTimeLimit);
@@ -3249,11 +3216,7 @@ bool CheckBlock(const CBlock& block, CValidationState& state, bool fCheckPOW, bo
 bool CheckWork(const CBlock &block, CBlockIndex* const pindexPrev)
 {
     if (pindexPrev == NULL)
-<<<<<<< HEAD
-        return error("%s: null pindexPrev for block %s", __func__, block.GetHash().ToString().c_str());
-=======
         return error("%s: null pindexPrev for block %s", __func__, block.GetHash().GetHex());
->>>>>>> 80c62a8e03f1f07d4f41e2dbdedbff0520a40219
 
     unsigned int nBitsRequired = GetNextWorkRequired(pindexPrev, &block, block.IsProofOfStake());
 
@@ -3538,11 +3501,7 @@ bool ProcessNewBlock(CValidationState& state, CNode* pfrom, CBlock* pblock, CDis
 
     // Check proof-of-stake block signature
     if (!pblock->CheckBlockSignature())
-<<<<<<< HEAD
-        return error("%s: bad proof-of-stake block signature", __func__);
-=======
         return error("%s: bad block signature", __func__);
->>>>>>> 80c62a8e03f1f07d4f41e2dbdedbff0520a40219
 
     // Limited duplicity on stake: prevents block flood attack
     // Duplicate stake allowed only when there is orphan child block
@@ -3573,12 +3532,6 @@ bool ProcessNewBlock(CValidationState& state, CNode* pfrom, CBlock* pblock, CDis
         }
 
         MarkBlockAsReceived(pblock->GetHash());
-<<<<<<< HEAD
-        if (!checked) {
-            return error("%s: CheckBlock FAILED", __func__);
-        }
-=======
->>>>>>> 80c62a8e03f1f07d4f41e2dbdedbff0520a40219
 
         // Store to disk
         bool ret = AcceptBlock(*pblock, state, &pindex, dbp);
@@ -3587,18 +3540,12 @@ bool ProcessNewBlock(CValidationState& state, CNode* pfrom, CBlock* pblock, CDis
         }
 
         CheckBlockIndex();
-<<<<<<< HEAD
-        if (!ret)
-            return error("%s: AcceptBlock FAILED", __func__);
-        break;
-=======
         
         if (ret) {
             break;
         } else {
             return error("%s: block not accepted", __func__);
         }
->>>>>>> 80c62a8e03f1f07d4f41e2dbdedbff0520a40219
     }
 
     if (!ActivateBestChain(state, pblock))
@@ -3622,12 +3569,8 @@ bool ProcessNewBlock(CValidationState& state, CNode* pfrom, CBlock* pblock, CDis
             pwalletMain->AutoCombineDust();
     }
 
-<<<<<<< HEAD
-    LogPrintf("%s: ACCEPTED\n", __func__);
-=======
     LogPrintf("%s: ACCEPTED %d %s (%d)\n", __func__, pindex->nHeight, pindex->GetBlockHash().GetHex(),
               chainActive.Tip()->nHeight);
->>>>>>> 80c62a8e03f1f07d4f41e2dbdedbff0520a40219
 
     return true;
 }
