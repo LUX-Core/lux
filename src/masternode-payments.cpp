@@ -330,7 +330,7 @@ int CMasternodePayments::GetMinMasternodePaymentsProto()
 {    return ActiveProtocol();
 }
 
-void CMasternodePayments::ProcessMessage(CNode* pfrom, std::string& strCommand, CDataStream& vRecv, bool &isPaymentCommand)
+void CMasternodePayments::ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv, bool &isPaymentCommand)
 {
     if (!masternodeSync.IsBlockchainSynced()) return;
 

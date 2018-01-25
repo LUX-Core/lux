@@ -281,7 +281,7 @@ public:
     }
 
     int GetMinMasternodePaymentsProto();
-    void ProcessMessage(CNode* pfrom, std::string& strCommand, CDataStream& vRecv, bool &isPaymentCommand);
+    void ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv, bool &isPaymentCommand);
     std::string GetRequiredPaymentsString(int nBlockHeight);
     void FillBlockPayee(CMutableTransaction& txNew, int64_t nFees, bool fProofOfStake);
     std::string ToString() const;

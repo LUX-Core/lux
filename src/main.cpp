@@ -4605,7 +4605,7 @@ void static ProcessGetData(CNode* pfrom)
     }
 }
 
-static bool ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, int64_t nTimeReceived)
+static bool ProcessMessage(CNode* pfrom, const string &strCommand, CDataStream& vRecv, int64_t nTimeReceived)
 {
     RandAddSeedPerfmon();
     if (fDebug) {
@@ -5150,6 +5150,7 @@ static bool ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
         CheckBlockIndex();
     }
 
+
     else if (strCommand == "block" && !fImporting && !fReindex) { // Ignore blocks received while importing
         CBlock block;
         vRecv >> block;
@@ -5326,13 +5327,15 @@ static bool ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
         }
     }
 
+
     else if (!(nLocalServices & NODE_BLOOM) &&
              (strCommand == "filterload" ||
-                 strCommand == "filteradd" ||
-                 strCommand == "filterclear")) {
+              strCommand == "filteradd" ||
+              strCommand == "filterclear")) {
         LogPrintf("bloom message=%s\n", strCommand);
         Misbehaving(pfrom->GetId(), 100);
     }
+
 
     else if (strCommand == "filterload") {
         CBloomFilter filter;

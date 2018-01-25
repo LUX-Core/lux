@@ -65,7 +65,7 @@ extern std::map<int, CSporkMessage> mapSporksActive;
 extern CSporkManager sporkManager;
 
 void LoadSporksFromDB();
-void ProcessSpork(CNode* pfrom, std::string& strCommand, CDataStream& vRecv, bool &isSporkCommand);
+void ProcessSpork(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv, bool &isSporkCommand);
 int64_t GetSporkValue(int nSporkID);
 bool IsSporkActive(int nSporkID);
 void ReprocessBlocks(int nBlocks);

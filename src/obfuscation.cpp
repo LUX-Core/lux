@@ -43,7 +43,7 @@ CActiveMasternode activeMasternode;
         udjinm6   - udjinm6@dashpay.io
 */
 
-void CObfuscationPool::ProcessMessage(CNode* pfrom, std::string& strCommand, CDataStream& vRecv, bool &isObfuscationCommand)
+void CObfuscationPool::ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv, bool &isObfuscationCommand)
 {
     if (fLiteMode) return; //disable all Obfuscation/Masternode related functionality
     if (!masternodeSync.IsBlockchainSynced()) return;

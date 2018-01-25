@@ -32,7 +32,7 @@ int nCompleteTXLocks;
 //         Send "txvote", CTransaction, Signature, Approve
 //step 3.) Top 1 masternode, waits for SWIFTTX_SIGNATURES_REQUIRED messages. Upon success, sends "txlock'
 
-void ProcessSwiftTX(CNode* pfrom, std::string& strCommand, CDataStream& vRecv, bool &isSwiftTXCmd)
+void ProcessSwiftTX(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv, bool &isSwiftTXCmd)
 {
     if (fLiteMode) return; //disable all obfuscation/masternode related functionality
     if (!IsSporkActive(SPORK_2_SWIFTTX)) return;

@@ -939,7 +939,7 @@ void CBudgetManager::NewBlock()
     LogPrintf("CBudgetManager::NewBlock - PASSED\n");
 }
 
-void CBudgetManager::ProcessMessage(CNode* pfrom, std::string& strCommand, CDataStream& vRecv, bool &isMBCommand)
+void CBudgetManager::ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv, bool &isMBCommand)
 {
     // lite mode is not supported
     if (fLiteMode) return;

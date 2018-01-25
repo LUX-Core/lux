@@ -25,7 +25,7 @@ CSporkManager sporkManager;
 std::map<uint256, CSporkMessage> mapSporks;
 std::map<int, CSporkMessage> mapSporksActive;
 
-void ProcessSpork(CNode* pfrom, std::string& strCommand, CDataStream& vRecv, bool &isSporkCommand)
+void ProcessSpork(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv, bool &isSporkCommand)
 {
     if (fLiteMode) return; //disable all obfuscation/masternode related functionality
     
