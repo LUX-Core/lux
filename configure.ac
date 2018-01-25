@@ -180,21 +180,6 @@ if test "x$enable_debug" = xyes; then
     fi
 fi
 
-# Enable dump extra debug info
-AC_ARG_ENABLE([debug-xdump],
-    [AS_HELP_STRING([--enable-xdebug],
-                    [dump extra debug info on stderr (or stdout) (default is no)])],
-    [enable_debug_xdump=$enableval],
-    [enable_debug_xdump=no])
-if test "x$enable_debug_xdump" = xyes; then
-    if test "x$GCC" = xyes; then
-        CFLAGS="-DDEBUG_DUMP_STAKING_INFO"
-    fi
-    if test "x$GXX" = xyes; then
-        CXXFLAGS="-DDEBUG_DUMP_STAKING_INFO"
-    fi
-fi
-
 ## TODO: Remove these hard-coded paths and flags. They are here for the sake of
 ##       compatibility with the legacy buildsystem.
 ##
@@ -982,3 +967,38 @@ case $host in
      chmod 755 libtool
    ;;
 esac
+
+dnl Replace the BUILDDIR path with the correct Windows path if compiling on Native Windows
+case ${OS} in
+   *Windows*)
+     sed  's/BUILDDIR="\/\([[a-z]]\)/BUILDDIR="\1:/'  qa/pull-tester/tests_config.py > qa/pull-tester/tests_config-2.py
+     mv qa/pull-tester/tests_config-2.py qa/pull-tester/tests_config.py
+   ;;
+esac
+
+echo 
+echo "Options used to compile and link:"
+echo "  with wallet   = $enable_wallet"
+echo "  with gui / qt = $bitcoin_enable_qt"
+if test x$bitcoin_enable_qt != xno; then
+    echo "    qt version  = $bitcoin_qt_got_major_vers"
+    echo "    with qr     = $use_qr"
+fi
+echo "  with zmq      = $use_zmq"
+echo "  with test     = $use_tests"
+echo "  with bench    = $use_bench"
+echo "  with upnp     = $use_upnp"
+echo "  debug enabled = $enable_debug"
+echo "  werror        = $enable_werror"
+echo 
+echo "  target os     = $TARGET_OS"
+echo "  build os      = $BUILD_OS"
+echo
+echo "  CC            = $CC"
+echo "  CFLAGS        = $CFLAGS"
+echo "  CPPFLAGS      = $CPPFLAGS"
+echo "  CXX           = $CXX"
+echo "  CXXFLAGS      = $CXXFLAGS"
+echo "  LDFLAGS       = $LDFLAGS"
+echo "  ARFLAGS       = $ARFLAGS"
+echo 
