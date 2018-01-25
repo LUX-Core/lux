@@ -43,7 +43,7 @@ public:
         ThreadsScriptVerif,  // int
         DatabaseCache,       // int
         SpendZeroConfChange, // bool
-        LuxsendRounds,   // int
+        ObfuscationRounds,   // int
         AnonymizeLuxAmount, //int
         ShowMasternodesTab,  // bool
         Listen,              // bool
@@ -89,7 +89,7 @@ private:
 
 signals:
     void displayUnitChanged(int unit);
-    void darksendRoundsChanged(int);
+    void obfuscationRoundsChanged(int);
     void anonymizeLuxAmountChanged(int);
     void coinControlFeaturesChanged(bool);
 };

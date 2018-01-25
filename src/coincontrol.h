@@ -13,7 +13,7 @@ class CCoinControl
 {
 public:
     CTxDestination destChange;
-    bool useObfuScation;
+    bool useObfuscation;
     bool useSwiftTX;
     bool fSplitBlock;
     int nSplitBlock;
@@ -34,7 +34,7 @@ public:
         destChange = CNoDestination();
         setSelected.clear();
         useSwiftTX = false;
-        useObfuScation = true;
+        useObfuscation = true;
         fAllowOtherInputs = false;
         fAllowWatchOnly = false;
         nMinimumTotalFee = 0;

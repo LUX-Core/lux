@@ -18,11 +18,10 @@
 #include "compat/sanity.h"
 #include "key.h"
 #include "main.h"
-//#include "masternode-budget.h"
-//#include "masternode-payments.h"
+#include "masternode-budget.h"
+#include "masternode-payments.h"
 #include "masternodeconfig.h"
-//#include "masternodeman.h"
-#include "darksend.h"
+#include "masternodeman.h"
 #include "miner.h"
 #include "net.h"
 #include "rpcserver.h"
@@ -62,7 +61,6 @@ int nWalletBackups = 10;
 #endif
 bool fFeeEstimatesInitialized = false;
 bool fRestartRequested = false; // true: restart false: shutdown
-bool fMinimizeCoinAge;
 
 #ifdef WIN32
 // Win32 LevelDB doesn't use filedescriptors, and the ones used for
@@ -173,9 +171,9 @@ void PrepareShutdown()
     GenerateBitcoins(false, NULL, 0);
 #endif
     StopNode();
-//    DumpMasternodes();
-//    DumpBudgets();
-//    DumpMasternodePayments();
+    DumpMasternodes();
+    DumpBudgets();
+    DumpMasternodePayments();
     UnregisterNodeSignals(GetNodeSignals());
 
     if (fFeeEstimatesInitialized) {
@@ -422,8 +420,8 @@ std::string HelpMessage(HelpMessageMode mode)
     strUsage += "  -liquidityprovider=<n>       " + strprintf(_("Provide liquidity to Obfuscation by infrequently mixing coins on a continual basis (0-100, default: %u, 1=very frequent, high fees, 100=very infrequent, low fees)"), 0) + "\n";
 
     strUsage += "\n" + _("SwiftTX options:") + "\n";
-    strUsage += "  -enableinstantx=<n>    " + strprintf(_("Enable swifttx, show confirmations for locked transactions (bool, default: %s)"), "true") + "\n";
-    strUsage += "  -instantxdepth=<n>     " + strprintf(_("Show N confirmations for a successfully locked transaction (0-9999, default: %u)"), nInstantXDepth) + "\n";
+    strUsage += "  -enableswifttx=<n>    " + strprintf(_("Enable swifttx, show confirmations for locked transactions (bool, default: %s)"), "true") + "\n";
+    strUsage += "  -swifttxdepth=<n>     " + strprintf(_("Show N confirmations for a successfully locked transaction (0-9999, default: %u)"), nSwiftTXDepth) + "\n";
 
     strUsage += "\n" + _("Node relay options:") + "\n";
     strUsage += "  -datacarrier           " + strprintf(_("Relay and mine data carrier transactions (default: %u)"), 1) + "\n";
@@ -697,10 +695,10 @@ bool AppInit2(boost::thread_group& threadGroup)
             LogPrintf("AppInit2 : parameter interaction: -zapwallettxes=<mode> -> setting -rescan=1\n");
     }
 
-//    if (!GetBoolArg("-enableswifttx", fEnableSwiftTX)) {
-//        if (SoftSetArg("-swifttxdepth", 0))
-//            LogPrintf("AppInit2 : parameter interaction: -enableswifttx=false -> setting -nSwiftTXDepth=0\n");
-//    }
+    if (!GetBoolArg("-enableswifttx", fEnableSwiftTX)) {
+        if (SoftSetArg("-swifttxdepth", 0))
+            LogPrintf("AppInit2 : parameter interaction: -enableswifttx=false -> setting -nSwiftTXDepth=0\n");
+    }
 
     if (mapArgs.count("-reservebalance")) {
         if (!ParseMoney(mapArgs["-reservebalance"], nReserveBalance)) {
@@ -816,9 +814,6 @@ bool AppInit2(boost::thread_group& threadGroup)
 
     std::string strWalletFile = GetArg("-wallet", "wallet.dat");
 #endif // ENABLE_WALLET
-
-    fMinimizeCoinAge = GetBoolArg("-minimizecoinage", false);
-
 
     fIsBareMultisigStd = GetArg("-permitbaremultisig", true) != 0;
     nMaxDatacarrierBytes = GetArg("-datacarriersize", nMaxDatacarrierBytes);
@@ -1392,176 +1387,71 @@ bool AppInit2(boost::thread_group& threadGroup)
             MilliSleep(10);
     }
 
-    // ********************************************************* Step 10: setup ObfuScation
+    // ********************************************************* Step 10: setup Obfuscation
 
-//    uiInterface.InitMessage(_("Loading masternode cache..."));
-//
-//    CMasternodeDB mndb;
-//    CMasternodeDB::ReadResult readResult = mndb.Read(mnodeman);
-//    if (readResult == CMasternodeDB::FileError)
-//        LogPrintf("Missing masternode cache file - mncache.dat, will try to recreate\n");
-//    else if (readResult != CMasternodeDB::Ok) {
-//        LogPrintf("Error reading mncache.dat: ");
-//        if (readResult == CMasternodeDB::IncorrectFormat)
-//            LogPrintf("magic is ok but data has invalid format, will try to recreate\n");
-//        else
-//            LogPrintf("file format is unknown or invalid, please fix it manually\n");
-//    }
-//
-//    uiInterface.InitMessage(_("Loading budget cache..."));
-//
-//    CBudgetDB budgetdb;
-//    CBudgetDB::ReadResult readResult2 = budgetdb.Read(budget);
-//
-//    if (readResult2 == CBudgetDB::FileError)
-//        LogPrintf("Missing budget cache - budget.dat, will try to recreate\n");
-//    else if (readResult2 != CBudgetDB::Ok) {
-//        LogPrintf("Error reading budget.dat: ");
-//        if (readResult2 == CBudgetDB::IncorrectFormat)
-//            LogPrintf("magic is ok but data has invalid format, will try to recreate\n");
-//        else
-//            LogPrintf("file format is unknown or invalid, please fix it manually\n");
-//    }
-//
-//    //flag our cached items so we send them to our peers
-//    budget.ResetSync();
-//    budget.ClearSeen();
-//
-//
-//    uiInterface.InitMessage(_("Loading masternode payment cache..."));
-//
-//    CMasternodePaymentDB mnpayments;
-//    CMasternodePaymentDB::ReadResult readResult3 = mnpayments.Read(masternodePayments);
-//
-//    if (readResult3 == CMasternodePaymentDB::FileError)
-//        LogPrintf("Missing masternode payment cache - mnpayments.dat, will try to recreate\n");
-//    else if (readResult3 != CMasternodePaymentDB::Ok) {
-//        LogPrintf("Error reading mnpayments.dat: ");
-//        if (readResult3 == CMasternodePaymentDB::IncorrectFormat)
-//            LogPrintf("magic is ok but data has invalid format, will try to recreate\n");
-//        else
-//            LogPrintf("file format is unknown or invalid, please fix it manually\n");
-//    }
-//
-//    fMasterNode = GetBoolArg("-masternode", false);
-//
-//    if ((fMasterNode || masternodeConfig.getCount() > -1) && fTxIndex == false) {
-//        return InitError("Enabling Masternode support requires turning on transaction indexing."
-//                         "Please add txindex=1 to your configuration and start with -reindex");
-//    }
-//
-//    if (fMasterNode) {
-//        LogPrintf("IS OBFUSCATION MASTER NODE\n");
-//        strMasterNodeAddr = GetArg("-masternodeaddr", "");
-//
-//        LogPrintf(" addr %s\n", strMasterNodeAddr.c_str());
-//
-//        if (!strMasterNodeAddr.empty()) {
-//            CService addrTest = CService(strMasterNodeAddr);
-//            if (!addrTest.IsValid()) {
-//                return InitError("Invalid -masternodeaddr address: " + strMasterNodeAddr);
-//            }
-//        }
-//
-//        strMasterNodePrivKey = GetArg("-masternodeprivkey", "");
-//        if (!strMasterNodePrivKey.empty()) {
-//            std::string errorMessage;
-//
-//            CKey key;
-//            CPubKey pubkey;
-//
-//            if (!obfuScationSigner.SetKey(strMasterNodePrivKey, errorMessage, key, pubkey)) {
-//                return InitError(_("Invalid masternodeprivkey. Please see documenation."));
-//            }
-//
-//            activeMasternode.pubKeyMasternode = pubkey;
-//
-//        } else {
-//            return InitError(_("You must specify a masternodeprivkey in the configuration. Please see documentation for help."));
-//        }
-//    }
-//
-//    //get the mode of budget voting for this masternode
-//    strBudgetMode = GetArg("-budgetvotemode", "auto");
-//
-//    if (GetBoolArg("-mnconflock", true) && pwalletMain) {
-//        LOCK(pwalletMain->cs_wallet);
-//        LogPrintf("Locking Masternodes:\n");
-//        uint256 mnTxHash;
-//        BOOST_FOREACH (CMasternodeConfig::CMasternodeEntry mne, masternodeConfig.getEntries()) {
-//            LogPrintf("  %s %s\n", mne.getTxHash(), mne.getOutputIndex());
-//            mnTxHash.SetHex(mne.getTxHash());
-//            COutPoint outpoint = COutPoint(mnTxHash, boost::lexical_cast<unsigned int>(mne.getOutputIndex()));
-//            pwalletMain->LockCoin(outpoint);
-//        }
-//    }
-//
-//    fEnableObfuscation = GetBoolArg("-enableobfuscation", false);
-//
-//    nObfuscationRounds = GetArg("-obfuscationrounds", 2);
-//    if (nObfuscationRounds > 16) nObfuscationRounds = 16;
-//    if (nObfuscationRounds < 1) nObfuscationRounds = 1;
-//
-//    nLiquidityProvider = GetArg("-liquidityprovider", 0); //0-100
-//    if (nLiquidityProvider != 0) {
-//        obfuScationPool.SetMinBlockSpacing(std::min(nLiquidityProvider, 100) * 15);
-//        fEnableObfuscation = true;
-//        nObfuscationRounds = 99999;
-//    }
-//
-//    nAnonymizeLuxAmount = GetArg("-anonymizeluxamount", 0);
-//    if (nAnonymizeLuxAmount > 999999) nAnonymizeLuxAmount = 999999;
-//    if (nAnonymizeLuxAmount < 2) nAnonymizeLuxAmount = 2;
-//
-//    fEnableSwiftTX = GetBoolArg("-enableswifttx", fEnableSwiftTX);
-//    nSwiftTXDepth = GetArg("-swifttxdepth", nSwiftTXDepth);
-//    nSwiftTXDepth = std::min(std::max(nSwiftTXDepth, 0), 60);
-//
-//    //lite mode disables all Masternode and Obfuscation related functionality
-//    fLiteMode = GetBoolArg("-litemode", false);
-//    if (fMasterNode && fLiteMode) {
-//        return InitError("You can not start a masternode in litemode");
-//    }
-//
-//    LogPrintf("fLiteMode %d\n", fLiteMode);
-//    LogPrintf("nSwiftTXDepth %d\n", nSwiftTXDepth);
-//    LogPrintf("Obfuscation rounds %d\n", nObfuscationRounds);
-//    LogPrintf("Anonymize LUX Amount %d\n", nAnonymizeLuxAmount);
-//    LogPrintf("Budget Mode %s\n", strBudgetMode.c_str());
-//
-//    /* Denominations
-//
-//       A note about convertability. Within Obfuscation pools, each denomination
-//       is convertable to another.
-//
-//       For example:
-//       1LUX+1000 == (.1LUX+100)*10
-//       10LUX+10000 == (1LUX+1000)*10
-//    */
-//    obfuScationDenominations.push_back((10000 * COIN) + 10000000);
-//    obfuScationDenominations.push_back((1000 * COIN) + 1000000);
-//    obfuScationDenominations.push_back((100 * COIN) + 100000);
-//    obfuScationDenominations.push_back((10 * COIN) + 10000);
-//    obfuScationDenominations.push_back((1 * COIN) + 1000);
-//    obfuScationDenominations.push_back((.1 * COIN) + 100);
-//    /* Disabled till we need them
-//    obfuScationDenominations.push_back( (.01      * COIN)+10 );
-//    obfuScationDenominations.push_back( (.001     * COIN)+1 );
-//    */
-//
-//    obfuScationPool.InitCollateralAddress();
-//
-//    threadGroup.create_thread(boost::bind(&ThreadCheckObfuScationPool));
-    // ********************************************************* Step 10: setup DarkSend
+    uiInterface.InitMessage(_("Loading masternode cache..."));
+
+    CMasternodeDB mndb;
+    CMasternodeDB::ReadResult readResult = mndb.Read(mnodeman);
+    if (readResult == CMasternodeDB::FileError)
+        LogPrintf("Missing masternode cache file - mncache.dat, will try to recreate\n");
+    else if (readResult != CMasternodeDB::Ok) {
+        LogPrintf("Error reading mncache.dat: ");
+        if (readResult == CMasternodeDB::IncorrectFormat)
+            LogPrintf("magic is ok but data has invalid format, will try to recreate\n");
+        else
+            LogPrintf("file format is unknown or invalid, please fix it manually\n");
+    }
+
+    uiInterface.InitMessage(_("Loading budget cache..."));
+
+    CBudgetDB budgetdb;
+    CBudgetDB::ReadResult readResult2 = budgetdb.Read(budget);
+
+    if (readResult2 == CBudgetDB::FileError)
+        LogPrintf("Missing budget cache - budget.dat, will try to recreate\n");
+    else if (readResult2 != CBudgetDB::Ok) {
+        LogPrintf("Error reading budget.dat: ");
+        if (readResult2 == CBudgetDB::IncorrectFormat)
+            LogPrintf("magic is ok but data has invalid format, will try to recreate\n");
+        else
+            LogPrintf("file format is unknown or invalid, please fix it manually\n");
+    }
+
+    //flag our cached items so we send them to our peers
+    budget.ResetSync();
+    budget.ClearSeen();
+
+
+    uiInterface.InitMessage(_("Loading masternode payment cache..."));
+
+    CMasternodePaymentDB mnpayments;
+    CMasternodePaymentDB::ReadResult readResult3 = mnpayments.Read(masternodePayments);
+
+    if (readResult3 == CMasternodePaymentDB::FileError)
+        LogPrintf("Missing masternode payment cache - mnpayments.dat, will try to recreate\n");
+    else if (readResult3 != CMasternodePaymentDB::Ok) {
+        LogPrintf("Error reading mnpayments.dat: ");
+        if (readResult3 == CMasternodePaymentDB::IncorrectFormat)
+            LogPrintf("magic is ok but data has invalid format, will try to recreate\n");
+        else
+            LogPrintf("file format is unknown or invalid, please fix it manually\n");
+    }
 
     fMasterNode = GetBoolArg("-masternode", false);
-    if(fMasterNode) {
-        LogPrintf("IS DARKSEND MASTER NODE\n");
+
+    if ((fMasterNode || masternodeConfig.getCount() > -1) && fTxIndex == false) {
+        return InitError("Enabling Masternode support requires turning on transaction indexing."
+                         "Please add txindex=1 to your configuration and start with -reindex");
+    }
+
+    if (fMasterNode) {
+        LogPrintf("IS OBFUSCATION MASTER NODE\n");
         strMasterNodeAddr = GetArg("-masternodeaddr", "");
 
         LogPrintf(" addr %s\n", strMasterNodeAddr.c_str());
 
-        if(!strMasterNodeAddr.empty()){
+        if (!strMasterNodeAddr.empty()) {
             CService addrTest = CService(strMasterNodeAddr);
             if (!addrTest.IsValid()) {
                 return InitError("Invalid -masternodeaddr address: " + strMasterNodeAddr);
@@ -1569,14 +1459,13 @@ bool AppInit2(boost::thread_group& threadGroup)
         }
 
         strMasterNodePrivKey = GetArg("-masternodeprivkey", "");
-        if(!strMasterNodePrivKey.empty()){
+        if (!strMasterNodePrivKey.empty()) {
             std::string errorMessage;
 
             CKey key;
             CPubKey pubkey;
 
-            if(!darkSendSigner.SetKey(strMasterNodePrivKey, errorMessage, key, pubkey))
-            {
+            if (!obfuscationSigner.SetKey(strMasterNodePrivKey, errorMessage, key, pubkey)) {
                 return InitError(_("Invalid masternodeprivkey. Please see documenation."));
             }
 
@@ -1587,66 +1476,77 @@ bool AppInit2(boost::thread_group& threadGroup)
         }
     }
 
-    fEnableLuxsend = GetBoolArg("-enabledarksend", false);
+    //get the mode of budget voting for this masternode
+    strBudgetMode = GetArg("-budgetvotemode", "auto");
 
-    nDarksendRounds = GetArg("-darksendrounds", 2);
-    if(nDarksendRounds > 16) nDarksendRounds = 16;
-    if(nDarksendRounds < 1) nDarksendRounds = 1;
+    if (GetBoolArg("-mnconflock", true) && pwalletMain) {
+        LOCK(pwalletMain->cs_wallet);
+        LogPrintf("Locking Masternodes:\n");
+        uint256 mnTxHash;
+        BOOST_FOREACH (CMasternodeConfig::CMasternodeEntry mne, masternodeConfig.getEntries()) {
+            LogPrintf("  %s %s\n", mne.getTxHash(), mne.getOutputIndex());
+            mnTxHash.SetHex(mne.getTxHash());
+            COutPoint outpoint = COutPoint(mnTxHash, boost::lexical_cast<unsigned int>(mne.getOutputIndex()));
+            pwalletMain->LockCoin(outpoint);
+        }
+    }
+
+    fEnableObfuscation = GetBoolArg("-enableobfuscation", false);
+
+    nObfuscationRounds = GetArg("-obfuscationrounds", 2);
+    if (nObfuscationRounds > 16) nObfuscationRounds = 16;
+    if (nObfuscationRounds < 1) nObfuscationRounds = 1;
 
     nLiquidityProvider = GetArg("-liquidityprovider", 0); //0-100
-    if(nLiquidityProvider != 0) {
-        darkSendPool.SetMinBlockSpacing(std::min(nLiquidityProvider,100)*15);
-        fEnableLuxsend = true;
-        nDarksendRounds = 99999;
+    if (nLiquidityProvider != 0) {
+        obfuscationPool.SetMinBlockSpacing(std::min(nLiquidityProvider, 100) * 15);
+        fEnableObfuscation = true;
+        nObfuscationRounds = 99999;
     }
 
-    nAnonymizeLuxAmount = GetArg("-anonymizeLuxamount", 0);
-    if(nAnonymizeLuxAmount > 999999) nAnonymizeLuxAmount = 999999;
-    if(nAnonymizeLuxAmount < 2) nAnonymizeLuxAmount = 2;
+    nAnonymizeLuxAmount = GetArg("-anonymizeluxamount", 0);
+    if (nAnonymizeLuxAmount > 999999) nAnonymizeLuxAmount = 999999;
+    if (nAnonymizeLuxAmount < 2) nAnonymizeLuxAmount = 2;
 
-    bool fEnableInstantX = GetBoolArg("-enableinstantx", true);
-    if(fEnableInstantX){
-        nInstantXDepth = GetArg("-instantxdepth", 5);
-        if(nInstantXDepth > 60) nInstantXDepth = 60;
-        if(nInstantXDepth < 0) nAnonymizeLuxAmount = 0;
-    } else {
-        nInstantXDepth = 0;
-    }
+    fEnableSwiftTX = GetBoolArg("-enableswifttx", fEnableSwiftTX);
+    nSwiftTXDepth = GetArg("-swifttxdepth", nSwiftTXDepth);
+    nSwiftTXDepth = std::min(std::max(nSwiftTXDepth, 0), 60);
 
-    //lite mode disables all Masternode and Luxsend related functionality
+    //lite mode disables all Masternode and Obfuscation related functionality
     fLiteMode = GetBoolArg("-litemode", false);
-    if(fMasterNode && fLiteMode){
+    if (fMasterNode && fLiteMode) {
         return InitError("You can not start a masternode in litemode");
     }
 
     LogPrintf("fLiteMode %d\n", fLiteMode);
-    LogPrintf("nInstantXDepth %d\n", nInstantXDepth);
-    LogPrintf("Luxsend rounds %d\n", nDarksendRounds);
-    LogPrintf("Anonymize Lux Amount %d\n", nAnonymizeLuxAmount);
-
+    LogPrintf("nSwiftTXDepth %d\n", nSwiftTXDepth);
+    LogPrintf("Obfuscation rounds %d\n", nObfuscationRounds);
+    LogPrintf("Anonymize LUX Amount %d\n", nAnonymizeLuxAmount);
+    LogPrintf("Budget Mode %s\n", strBudgetMode.c_str());
 
     /* Denominations
-   A note about convertability. Within Luxsend pools, each denomination
-   is convertable to another.
-   For example:
-   1Lux+1000 == (.1Lux+100)*10
-   10Lux+10000 == (1Lux+1000)*10
-*/
-    darkSendDenominations.push_back( (100000      * COIN)+100000000 );
-    darkSendDenominations.push_back( (10000       * COIN)+10000000 );
-    darkSendDenominations.push_back( (1000        * COIN)+1000000 );
-    darkSendDenominations.push_back( (100         * COIN)+100000 );
-    darkSendDenominations.push_back( (10          * COIN)+10000 );
-    darkSendDenominations.push_back( (1           * COIN)+1000 );
-    darkSendDenominations.push_back( (.1          * COIN)+100 );
+
+       A note about convertability. Within Obfuscation pools, each denomination
+       is convertable to another.
+
+       For example:
+       1LUX+1000 == (.1LUX+100)*10
+       10LUX+10000 == (1LUX+1000)*10
+    */
+    obfuscationDenominations.push_back((10000 * COIN) + 10000000);
+    obfuscationDenominations.push_back((1000 * COIN) + 1000000);
+    obfuscationDenominations.push_back((100 * COIN) + 100000);
+    obfuscationDenominations.push_back((10 * COIN) + 10000);
+    obfuscationDenominations.push_back((1 * COIN) + 1000);
+    obfuscationDenominations.push_back((.1 * COIN) + 100);
     /* Disabled till we need them
-    darkSendDenominations.push_back( (.01      * COIN)+10 );
-    darkSendDenominations.push_back( (.001     * COIN)+1 );
+    obfuscationDenominations.push_back( (.01      * COIN)+10 );
+    obfuscationDenominations.push_back( (.001     * COIN)+1 );
     */
 
-    darkSendPool.InitCollateralAddress();
+    obfuscationPool.InitCollateralAddress();
 
-    threadGroup.create_thread(boost::bind(&ThreadCheckDarkSendPool));
+    threadGroup.create_thread(boost::bind(&ThreadCheckObfuscationPool));
 
     // ********************************************************* Step 11: start node
 

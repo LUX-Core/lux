@@ -19,6 +19,7 @@
 
 #include <QJsonObject>
 #include <QJsonArray>
+#include <QNetworkReply>
 
 namespace Ui {
     class tradingDialog;
@@ -57,6 +58,19 @@ private slots:
     void on_LoadKeys_clicked();
     void on_SaveKeys_clicked();
     void on_GenDepositBTN_clicked();
+    void showMarketHistoryWhenReplyFinished();
+    void showBalanceOfLUXOnTradingTab();
+    void showBalanceOfBTCOnTradingTab();
+    void showOrderBookOnTradingTab();
+    void showMarketHistoryOnTradingTab();
+    void showBalanceOfBTCOnSendTab();
+    void showBalanceOfLUXOnSendTab();
+    void showBalanceOfLUXOnBalanceTab();
+    void showBalanceOfBTCOnBalanceTab();
+    void showOpenOrders();
+    void showAccountHistory();
+    void slotReadyRead();
+    void slotError1(QNetworkReply::NetworkError e);
 
     void CalculateBuyCostLabel();
     void on_Buy_Max_Amount_clicked();
@@ -94,7 +108,7 @@ private slots:
     QString BuyLUX(QString OrderType, double Quantity, double Rate);
     QString SellLUX(QString OrderType, double Quantity, double Rate);
     QString Withdraw(double Amount, QString Address, QString Coin);
-    QString GetMarketHistory();
+    void GetMarketHistory();
     QString GetMarketSummary();
     QString GetOrderBook();
     QString GetOpenOrders();
@@ -103,6 +117,7 @@ private slots:
     QString GetDepositAddress();
     unsigned char* HMAC_SHA256_SIGNER(QString UrlToSign,QString Secretkey);
     QString sendRequest(QString url, QString method = "GET", QString body = QString("{\"market\":\"LUX/BTC\"}"));// "{\"gender\":\"male\"}");
+    void sendRequest1(QString url, std::function<void (void)> funcForCallAfterReceiveResponse, QString method = "GET", QString body = QString("{\"market\":\"LUX/BTC\"}"));// "{\"gender\":\"male\"}");
     //QString sendRequest(QString url);
     string encryptDecrypt(string toEncrypt, string password);
     char * base64(const unsigned char *input, int length);
@@ -124,7 +139,7 @@ private:
     WalletModel *model;
     QCustomPlot* derPlot;
     QCPFinancial *ohlc;
-
+    QNetworkAccessManager *qmanager;
 
 };
 

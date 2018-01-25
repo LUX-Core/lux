@@ -68,8 +68,8 @@ void ProcessMessageInstantX(CNode* pfrom, std::string& strCommand, CDataStream& 
         CValidationState state;
 
 
-        if (AcceptToMemoryPool(mempool, state, tx, true, &fMissingInputs))
-//        if (AcceptToMemoryPool(mempool, tx, true, &fMissingInputs))
+        //if (AcceptToMemoryPool(mempool, state, tx, true, &fMissingInputs))
+        if (AcceptToMemoryPool(mempool, tx, true, &fMissingInputs))
         {
             vector<CInv> vInv;
             vInv.push_back(inv);
@@ -236,7 +236,7 @@ int64_t CreateNewLock(CTransaction tx)
         This prevents attackers from using transaction mallibility to predict which masternodes
         they'll use.
     */
-    int nBlockHeight = (pindexBestHeader->nHeight - nTxAge)+4;
+    int nBlockHeight = (pindexBest->nHeight - nTxAge)+4;
 
     if (!mapTxLocks.count(tx.GetHash())){
         LogPrintf("CreateNewLock - New Transaction Lock %s !\n", tx.GetHash().ToString().c_str());
@@ -440,7 +440,7 @@ int64_t GetAverageVoteTime()
 
 void CleanTransactionLocksList()
 {
-    if(pindexBestHeader == NULL) return;
+    if(pindexBest == NULL) return;
 
     std::map<uint256, CTransactionLock>::iterator it = mapTxLocks.begin();
 

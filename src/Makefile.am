@@ -93,20 +93,25 @@ BITCOIN_CORE_H = \
   primitives/transaction.h \
   core_io.h \
   crypter.h \
-  darksend.h \
+  obfuscation.h \
+  obfuscation-relay.h \
   db.h \
   eccryptoverify.h \
   ecwrapper.h \
   hash.h \
   init.h \
   kernel.h \
-  instantx.h \
+  swifttx.h \
   key.h \
   keystore.h \
   leveldbwrapper.h \
   limitedmap.h \
   main.h \
   masternode.h \
+  masternode-payments.h \
+  masternode-budget.h \
+  masternode-sync.h \
+  masternodeman.h \
   masternodeconfig.h \
   merkleblock.h \
   miner.h \
@@ -161,9 +166,9 @@ JSON_H = \
   json/json_spirit_writer_template.h
 
 obj/build.h: FORCE
-	@$(MKDIR_P) $(builddir)/obj
-	@$(top_srcdir)/share/genbuild.sh $(abs_top_builddir)/src/obj/build.h \
-	  $(abs_top_srcdir)
+	@$(MKDIR_P) "$(builddir)/obj"
+	@$(top_srcdir)/share/genbuild.sh "$(abs_top_builddir)/src/obj/build.h" \
+	  "$(abs_top_srcdir)"
 libbitcoin_util_a-clientversion.$(OBJEXT): obj/build.h
 
 # server: shared between luxd and lux-qt
@@ -184,7 +189,8 @@ libbitcoin_server_a_SOURCES = \
   pow.cpp \
   rest.cpp \
   rpcblockchain.cpp \
-  rpcdarksend.cpp \
+  rpcmasternode.cpp \
+  rpcmasternode-budget.cpp \
   rpcmining.cpp \
   rpcmisc.cpp \
   rpcnet.cpp \
@@ -205,12 +211,17 @@ libbitcoin_wallet_a_CPPFLAGS = $(BITCOIN_INCLUDES)
 libbitcoin_wallet_a_SOURCES = \
   activemasternode.cpp \
   bip38.cpp \
-  darksend.cpp \
+  obfuscation.cpp \
+  obfuscation-relay.cpp \
   db.cpp \
   crypter.cpp \
-  instantx.cpp \
+  swifttx.cpp \
   masternode.cpp \
+  masternode-budget.cpp \
+  masternode-payments.cpp \
+  masternode-sync.cpp \
   masternodeconfig.cpp \
+  masternodeman.cpp \
   rpcdump.cpp \
   rpcwallet.cpp \
   kernel.cpp \

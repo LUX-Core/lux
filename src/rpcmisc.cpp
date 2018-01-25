@@ -9,7 +9,7 @@
 #include "clientversion.h"
 #include "init.h"
 #include "main.h"
-//#include "masternode-sync.h"
+#include "masternode-sync.h"
 #include "net.h"
 #include "netbase.h"
 #include "rpcserver.h"
@@ -115,87 +115,92 @@ Value getinfo(const Array& params, bool fHelp)
     return obj;
 }
 
-//Value mnsync(const Array& params, bool fHelp)
-//{
-//    if (fHelp || params.size() != 1)
-//        throw runtime_error(
-//            "mnsync [status|reset]\n"
-//            "Returns the sync status or resets sync.\n");
-//
-//    std::string strMode = params[0].get_str();
-//
-//    if (strMode == "status") {
-//        Object obj;
-//
-//        obj.push_back(Pair("IsBlockchainSynced", masternodeSync.IsBlockchainSynced()));
-//        obj.push_back(Pair("lastMasternodeList", masternodeSync.lastMasternodeList));
-//        obj.push_back(Pair("lastMasternodeWinner", masternodeSync.lastMasternodeWinner));
-//        obj.push_back(Pair("lastBudgetItem", masternodeSync.lastBudgetItem));
-//        obj.push_back(Pair("lastFailure", masternodeSync.lastFailure));
-//        obj.push_back(Pair("nCountFailures", masternodeSync.nCountFailures));
-//        obj.push_back(Pair("sumMasternodeList", masternodeSync.sumMasternodeList));
-//        obj.push_back(Pair("sumMasternodeWinner", masternodeSync.sumMasternodeWinner));
-//        obj.push_back(Pair("sumBudgetItemProp", masternodeSync.sumBudgetItemProp));
-//        obj.push_back(Pair("sumBudgetItemFin", masternodeSync.sumBudgetItemFin));
-//        obj.push_back(Pair("countMasternodeList", masternodeSync.countMasternodeList));
-//        obj.push_back(Pair("countMasternodeWinner", masternodeSync.countMasternodeWinner));
-//        obj.push_back(Pair("countBudgetItemProp", masternodeSync.countBudgetItemProp));
-//        obj.push_back(Pair("countBudgetItemFin", masternodeSync.countBudgetItemFin));
-//        obj.push_back(Pair("RequestedMasternodeAssets", masternodeSync.RequestedMasternodeAssets));
-//        obj.push_back(Pair("RequestedMasternodeAttempt", masternodeSync.RequestedMasternodeAttempt));
-//
-//
-//        return obj;
-//    }
-//
-//    if (strMode == "reset") {
-//        masternodeSync.Reset();
-//        return "success";
-//    }
-//    return "failure";
-//}
+Value mnsync(const Array& params, bool fHelp)
+{
+    if (fHelp || params.size() != 1)
+        throw runtime_error(
+            "mnsync [status|reset]\n"
+            "Returns the sync status or resets sync.\n");
+
+    std::string strMode = params[0].get_str();
+
+    if (strMode == "status") {
+        Object obj;
+
+        obj.push_back(Pair("IsBlockchainSynced", masternodeSync.IsBlockchainSynced()));
+        obj.push_back(Pair("lastMasternodeList", masternodeSync.lastMasternodeList));
+        obj.push_back(Pair("lastMasternodeWinner", masternodeSync.lastMasternodeWinner));
+        obj.push_back(Pair("lastBudgetItem", masternodeSync.lastBudgetItem));
+        obj.push_back(Pair("lastFailure", masternodeSync.lastFailure));
+        obj.push_back(Pair("nCountFailures", masternodeSync.nCountFailures));
+        obj.push_back(Pair("sumMasternodeList", masternodeSync.sumMasternodeList));
+        obj.push_back(Pair("sumMasternodeWinner", masternodeSync.sumMasternodeWinner));
+        obj.push_back(Pair("sumBudgetItemProp", masternodeSync.sumBudgetItemProp));
+        obj.push_back(Pair("sumBudgetItemFin", masternodeSync.sumBudgetItemFin));
+        obj.push_back(Pair("countMasternodeList", masternodeSync.countMasternodeList));
+        obj.push_back(Pair("countMasternodeWinner", masternodeSync.countMasternodeWinner));
+        obj.push_back(Pair("countBudgetItemProp", masternodeSync.countBudgetItemProp));
+        obj.push_back(Pair("countBudgetItemFin", masternodeSync.countBudgetItemFin));
+        obj.push_back(Pair("RequestedMasternodeAssets", masternodeSync.RequestedMasternodeAssets));
+        obj.push_back(Pair("RequestedMasternodeAttempt", masternodeSync.RequestedMasternodeAttempt));
+
+
+        return obj;
+    }
+
+    if (strMode == "reset") {
+        masternodeSync.Reset();
+        return "success";
+    }
+    return "failure";
+}
 
 #ifdef ENABLE_WALLET
 class DescribeAddressVisitor : public boost::static_visitor<Object>
 {
-public:
-    Object operator()(const CNoDestination &dest) const { return Object(); }
+private:
+    isminetype mine;
 
-    Object operator()(const CKeyID& keyID) const {
+public:
+    DescribeAddressVisitor(isminetype mineIn) : mine(mineIn) {}
+
+    Object operator()(const CNoDestination& dest) const { return Object(); }
+
+    Object operator()(const CKeyID& keyID) const
+    {
         Object obj;
         CPubKey vchPubKey;
-        pwalletMain->GetPubKey(keyID, vchPubKey);
         obj.push_back(Pair("isscript", false));
-        obj.push_back(Pair("pubkey", HexStr(vchPubKey)));
-        obj.push_back(Pair("iscompressed", vchPubKey.IsCompressed()));
+        if (mine == ISMINE_SPENDABLE) {
+            pwalletMain->GetPubKey(keyID, vchPubKey);
+            obj.push_back(Pair("pubkey", HexStr(vchPubKey)));
+            obj.push_back(Pair("iscompressed", vchPubKey.IsCompressed()));
+        }
         return obj;
     }
 
-    Object operator()(const CScriptID& scriptID) const{
+    Object operator()(const CScriptID& scriptID) const
+    {
         Object obj;
         obj.push_back(Pair("isscript", true));
-        CScript subscript;
-        pwalletMain->GetCScript(scriptID, subscript);
-        std::vector<CTxDestination> addresses;
-        txnouttype whichType;
-        int nRequired;
-        ExtractDestinations(subscript, whichType, addresses, nRequired);
-        obj.push_back(Pair("script", GetTxnOutputType(whichType)));
-        obj.push_back(Pair("hex", HexStr(subscript.begin(), subscript.end())));
-        Array a;
-        BOOST_FOREACH (const CTxDestination& addr, addresses)
-            a.push_back(CBitcoinAddress(addr).ToString());
-        obj.push_back(Pair("addresses", a));
-        if (whichType == TX_MULTISIG)
-            obj.push_back(Pair("sigsrequired", nRequired));
+        if (mine != ISMINE_NO) {
+            CScript subscript;
+            pwalletMain->GetCScript(scriptID, subscript);
+            std::vector<CTxDestination> addresses;
+            txnouttype whichType;
+            int nRequired;
+            ExtractDestinations(subscript, whichType, addresses, nRequired);
+            obj.push_back(Pair("script", GetTxnOutputType(whichType)));
+            obj.push_back(Pair("hex", HexStr(subscript.begin(), subscript.end())));
+            Array a;
+            BOOST_FOREACH (const CTxDestination& addr, addresses)
+                a.push_back(CBitcoinAddress(addr).ToString());
+            obj.push_back(Pair("addresses", a));
+            if (whichType == TX_MULTISIG)
+                obj.push_back(Pair("sigsrequired", nRequired));
+        }
         return obj;
     }
-
-//    Object operator()(const CStealthAddress &stxAddr) const {
-//        Object obj;
-//        obj.push_back(Pair("todo", true));
-//        return obj;
-//    }
 };
 #endif
 
@@ -205,12 +210,17 @@ public:
 Value spork(const Array& params, bool fHelp)
 {
     if (params.size() == 1 && params[0].get_str() == "show") {
-        std::map<int, CSporkMessage>::iterator it = mapSporksActive.begin();
-
         Object ret;
-        while(it != mapSporksActive.end()) {
-            ret.push_back(Pair(sporkManager.GetSporkNameByID(it->second.nSporkID), it->second.nValue));
-            it++;
+        for (int nSporkID = SPORK_START; nSporkID <= SPORK_END; nSporkID++) {
+            if (sporkManager.GetSporkNameByID(nSporkID) != "Unknown")
+                ret.push_back(Pair(sporkManager.GetSporkNameByID(nSporkID), GetSporkValue(nSporkID)));
+        }
+        return ret;
+    } else if (params.size() == 1 && params[0].get_str() == "active") {
+        Object ret;
+        for (int nSporkID = SPORK_START; nSporkID <= SPORK_END; nSporkID++) {
+            if (sporkManager.GetSporkNameByID(nSporkID) != "Unknown")
+                ret.push_back(Pair(sporkManager.GetSporkNameByID(nSporkID), IsSporkActive(nSporkID)));
         }
         return ret;
     } else if (params.size() == 2) {
@@ -269,10 +279,11 @@ Value validateaddress(const Array& params, bool fHelp)
         string currentAddress = address.ToString();
         ret.push_back(Pair("address", currentAddress));
 #ifdef ENABLE_WALLET
-        bool mine = pwalletMain ? IsMine(*pwalletMain, dest) : false;
-        ret.push_back(Pair("ismine", mine));
-        if (mine) {
-            Object detail = boost::apply_visitor(DescribeAddressVisitor(), dest);
+        isminetype mine = pwalletMain ? IsMine(*pwalletMain, dest) : ISMINE_NO;
+        ret.push_back(Pair("ismine", (mine & ISMINE_SPENDABLE) ? true : false));
+        if (mine != ISMINE_NO) {
+            ret.push_back(Pair("iswatchonly", (mine & ISMINE_WATCH_ONLY) ? true : false));
+            Object detail = boost::apply_visitor(DescribeAddressVisitor(mine), dest);
             ret.insert(ret.end(), detail.begin(), detail.end());
         }
         if (pwalletMain && pwalletMain->mapAddressBook.count(dest))
@@ -449,34 +460,34 @@ Value setmocktime(const Array& params, bool fHelp)
     return Value::null;
 }
 
-//#ifdef ENABLE_WALLET
-//Value getstakingstatus(const Array& params, bool fHelp)
-//{
-//    if (fHelp || params.size() != 0)
-//        throw runtime_error(
-//            "getstakingstatus\n"
-//            "Returns an object containing various staking information.\n"
-//            "\nResult:\n"
-//            "{\n"
-//            "  \"validtime\": true|false,          (boolean) if the chain tip is within staking phases\n"
-//            "  \"haveconnections\": true|false,    (boolean) if network connections are present\n"
-//            "  \"walletunlocked\": true|false,     (boolean) if the wallet is unlocked\n"
-//            "  \"mintablecoins\": true|false,      (boolean) if the wallet has mintable coins\n"
-//            "  \"enoughcoins\": true|false,        (boolean) if available coins are greater than reserve balance\n"
-//            "  \"mnsync\": true|false,             (boolean) if masternode data is synced\n"
-//            "}\n"
-//            "\nExamples:\n" +
-//            HelpExampleCli("getstakingstatus", "") + HelpExampleRpc("getstakingstatus", ""));
-//
-//    Object obj;
-//    obj.push_back(Pair("validtime", chainActive.Tip()->nTime > 1471482000));
-//    obj.push_back(Pair("haveconnections", !vNodes.empty()));
-//    if (pwalletMain) {
-//        obj.push_back(Pair("walletunlocked", !pwalletMain->IsLocked()));
-//        obj.push_back(Pair("mintablecoins", pwalletMain->MintableCoins()));
-//        obj.push_back(Pair("enoughcoins", nReserveBalance <= pwalletMain->GetBalance()));
-//    }
-//    obj.push_back(Pair("mnsync", masternodeSync.IsSynced()));
-//    return obj;
-//}
-//#endif // ENABLE_WALLET
+#ifdef ENABLE_WALLET
+Value getstakingstatus(const Array& params, bool fHelp)
+{
+    if (fHelp || params.size() != 0)
+        throw runtime_error(
+            "getstakingstatus\n"
+            "Returns an object containing various staking information.\n"
+            "\nResult:\n"
+            "{\n"
+            "  \"validtime\": true|false,          (boolean) if the chain tip is within staking phases\n"
+            "  \"haveconnections\": true|false,    (boolean) if network connections are present\n"
+            "  \"walletunlocked\": true|false,     (boolean) if the wallet is unlocked\n"
+            "  \"mintablecoins\": true|false,      (boolean) if the wallet has mintable coins\n"
+            "  \"enoughcoins\": true|false,        (boolean) if available coins are greater than reserve balance\n"
+            "  \"mnsync\": true|false,             (boolean) if masternode data is synced\n"
+            "}\n"
+            "\nExamples:\n" +
+            HelpExampleCli("getstakingstatus", "") + HelpExampleRpc("getstakingstatus", ""));
+
+    Object obj;
+    obj.push_back(Pair("validtime", chainActive.Tip()->nTime > 1471482000));
+    obj.push_back(Pair("haveconnections", !vNodes.empty()));
+    if (pwalletMain) {
+        obj.push_back(Pair("walletunlocked", !pwalletMain->IsLocked()));
+        obj.push_back(Pair("mintablecoins", pwalletMain->MintableCoins()));
+        obj.push_back(Pair("enoughcoins", nReserveBalance <= pwalletMain->GetBalance()));
+    }
+    obj.push_back(Pair("mnsync", masternodeSync.IsSynced()));
+    return obj;
+}
+#endif // ENABLE_WALLET

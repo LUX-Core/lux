@@ -645,16 +645,16 @@ void CMasternodeMan::ProcessMasternodeConnections()
 
     LOCK(cs_vNodes);
     BOOST_FOREACH (CNode* pnode, vNodes) {
-        if (pnode->fObfuScationMaster) {
-            if (obfuScationPool.pSubmittedToMasternode != NULL && pnode->addr == obfuScationPool.pSubmittedToMasternode->addr) continue;
+        if (pnode->fObfuscationMaster) {
+            if (obfuscationPool.pSubmittedToMasternode != NULL && pnode->addr == obfuscationPool.pSubmittedToMasternode->addr) continue;
             LogPrintf("Closing Masternode connection %s \n", pnode->addr.ToString());
-            pnode->fObfuScationMaster = false;
+            pnode->fObfuscationMaster = false;
             pnode->Release();
         }
     }
 }
 
-void CMasternodeMan::ProcessMessage(CNode* pfrom, std::string& strCommand, CDataStream& vRecv)
+void CMasternodeMan::ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv, bool &isMNCommand)
 {
     if (fLiteMode) return; //disable all Obfuscation/Masternode related functionality
     if (!masternodeSync.IsBlockchainSynced()) return;
@@ -662,6 +662,8 @@ void CMasternodeMan::ProcessMessage(CNode* pfrom, std::string& strCommand, CData
     LOCK(cs_process_message);
 
     if (strCommand == "mnb") { //Masternode Broadcast
+        isMNCommand = true;
+        
         CMasternodeBroadcast mnb;
         vRecv >> mnb;
 
@@ -682,14 +684,14 @@ void CMasternodeMan::ProcessMessage(CNode* pfrom, std::string& strCommand, CData
 
         // make sure the vout that was signed is related to the transaction that spawned the Masternode
         //  - this is expensive, so it's only done once per Masternode
-        if (!obfuScationSigner.IsVinAssociatedWithPubkey(mnb.vin, mnb.pubKeyCollateralAddress)) {
+        if (!obfuscationSigner.IsVinAssociatedWithPubkey(mnb.vin, mnb.pubKeyCollateralAddress)) {
             LogPrintf("mnb - Got mismatched pubkey and vin\n");
             Misbehaving(pfrom->GetId(), 33);
             return;
         }
 
         // make sure it's still unspent
-        //  - this is checked later by .check() in many places and by ThreadCheckObfuScationPool()
+        //  - this is checked later by .check() in many places and by ThreadCheckObfuscationPool()
         if (mnb.CheckInputsAndAdd(nDoS)) {
             // use this as a peer
             addrman.Add(CAddress(mnb.addr), pfrom->addr, 2 * 60 * 60);
@@ -703,6 +705,8 @@ void CMasternodeMan::ProcessMessage(CNode* pfrom, std::string& strCommand, CData
     }
 
     else if (strCommand == "mnp") { //Masternode Ping
+        isMNCommand = true;
+        
         CMasternodePing mnp;
         vRecv >> mnp;
 
@@ -728,7 +732,10 @@ void CMasternodeMan::ProcessMessage(CNode* pfrom, std::string& strCommand, CData
         // we might have to ask for a masternode entry once
         AskForMN(pfrom, mnp.vin);
 
-    } else if (strCommand == "dseg") { //Get Masternode list or specific entry
+    }
+
+    else if (strCommand == "dseg") { //Get Masternode list or specific entry
+        isMNCommand = true;
 
         CTxIn vin;
         vRecv >> vin;
@@ -781,13 +788,15 @@ void CMasternodeMan::ProcessMessage(CNode* pfrom, std::string& strCommand, CData
             LogPrintf("dseg - Sent %d Masternode entries to %s\n", nInvCount, pfrom->addr.ToString());
         }
     }
+
     /*
      * IT'S SAFE TO REMOVE THIS IN FURTHER VERSIONS
      * AFTER MIGRATION TO V12 IS DONE
      */
 
     // Light version for OLD MASSTERNODES - fake pings, no self-activation
-    else if (strCommand == "dsee") { //ObfuScation Election Entry
+    else if (strCommand == "dsee") { //Obfuscation Election Entry
+        isMNCommand = true;
 
         if (IsSporkActive(SPORK_10_MASTERNODE_PAY_UPDATED_NODES)) return;
 
@@ -849,7 +858,7 @@ void CMasternodeMan::ProcessMessage(CNode* pfrom, std::string& strCommand, CData
         }
 
         std::string errorMessage = "";
-        if (!obfuScationSigner.VerifyMessage(pubkey, vchSig, strMessage, errorMessage)) {
+        if (!obfuscationSigner.VerifyMessage(pubkey, vchSig, strMessage, errorMessage)) {
             LogPrintf("dsee - Got bad Masternode address signature\n");
             Misbehaving(pfrom->GetId(), 100);
             return;
@@ -903,7 +912,7 @@ void CMasternodeMan::ProcessMessage(CNode* pfrom, std::string& strCommand, CData
         mapSeenDsee.insert(make_pair(vin.prevout, pubkey));
         // make sure the vout that was signed is related to the transaction that spawned the Masternode
         //  - this is expensive, so it's only done once per Masternode
-        if (!obfuScationSigner.IsVinAssociatedWithPubkey(vin, pubkey)) {
+        if (!obfuscationSigner.IsVinAssociatedWithPubkey(vin, pubkey)) {
             LogPrintf("dsee - Got mismatched pubkey and vin\n");
             Misbehaving(pfrom->GetId(), 100);
             return;
@@ -913,11 +922,11 @@ void CMasternodeMan::ProcessMessage(CNode* pfrom, std::string& strCommand, CData
         LogPrint("masternode", "dsee - Got NEW OLD Masternode entry %s\n", addr.ToString().c_str());
 
         // make sure it's still unspent
-        //  - this is checked later by .check() in many places and by ThreadCheckObfuScationPool()
+        //  - this is checked later by .check() in many places and by ThreadCheckObfuscationPool()
 
         CValidationState state;
         CMutableTransaction tx = CMutableTransaction();
-        CTxOut vout = CTxOut(9999.99 * COIN, obfuScationPool.collateralPubKey);
+        CTxOut vout = CTxOut(9999.99 * COIN, obfuscationPool.collateralPubKey);
         tx.vin.push_back(vin);
         tx.vout.push_back(vout);
 
@@ -991,7 +1000,8 @@ void CMasternodeMan::ProcessMessage(CNode* pfrom, std::string& strCommand, CData
         }
     }
 
-    else if (strCommand == "dseep") { //ObfuScation Election Entry Ping
+    else if (strCommand == "dseep") { //Obfuscation Election Entry Ping
+        isMNCommand = true;
 
         if (IsSporkActive(SPORK_10_MASTERNODE_PAY_UPDATED_NODES)) return;
 
@@ -1030,7 +1040,7 @@ void CMasternodeMan::ProcessMessage(CNode* pfrom, std::string& strCommand, CData
                 std::string strMessage = pmn->addr.ToString() + boost::lexical_cast<std::string>(sigTime) + boost::lexical_cast<std::string>(stop);
 
                 std::string errorMessage = "";
-                if (!obfuScationSigner.VerifyMessage(pmn->pubKeyMasternode, vchSig, strMessage, errorMessage)) {
+                if (!obfuscationSigner.VerifyMessage(pmn->pubKeyMasternode, vchSig, strMessage, errorMessage)) {
                     LogPrintf("dseep - Got bad Masternode address signature %s \n", vin.ToString().c_str());
                     //Misbehaving(pfrom->GetId(), 100);
                     return;

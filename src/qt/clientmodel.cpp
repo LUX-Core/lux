@@ -14,8 +14,8 @@
 #include "checkpoints.h"
 #include "clientversion.h"
 #include "main.h"
-//#include "masternode-sync.h"
-//#include "masternodeman.h"
+#include "masternode-sync.h"
+#include "masternodeman.h"
 #include "net.h"
 #include "ui_interface.h"
 #include "util.h"
@@ -62,16 +62,16 @@ int ClientModel::getNumConnections(unsigned int flags) const
 
     int nNum = 0;
     BOOST_FOREACH (CNode* pnode, vNodes)
-    if (flags & (pnode->fInbound ? CONNECTIONS_IN : CONNECTIONS_OUT))
-        nNum++;
+        if (flags & (pnode->fInbound ? CONNECTIONS_IN : CONNECTIONS_OUT))
+            nNum++;
 
     return nNum;
 }
 
-//QString ClientModel::getMasternodeCountString() const
-//{
-//    return tr("Total: %1 (OBF compatible: %2 / Enabled: %3)").arg(QString::number((int)mnodeman.size())).arg(QString::number((int)mnodeman.CountEnabled(ActiveProtocol()))).arg(QString::number((int)mnodeman.CountEnabled()));
-//}
+QString ClientModel::getMasternodeCountString() const
+{
+    return tr("Total: %1 (OBF compatible: %2 / Enabled: %3)").arg(QString::number((int)mnodeman.size())).arg(QString::number((int)mnodeman.CountEnabled(ActiveProtocol()))).arg(QString::number((int)mnodeman.CountEnabled()));
+}
 
 int ClientModel::getNumBlocks() const
 {
@@ -127,13 +127,13 @@ void ClientModel::updateTimer()
 
     // check for changed number of blocks we have, number of blocks peers claim to have, reindexing state and importing state
     if (cachedNumBlocks != newNumBlocks ||
-        cachedReindexing != fReindex || cachedImporting != fImporting /*||
-        masternodeSync.RequestedMasternodeAttempt != prevAttempt || masternodeSync.RequestedMasternodeAssets != prevAssets*/) {
+        cachedReindexing != fReindex || cachedImporting != fImporting ||
+        masternodeSync.RequestedMasternodeAttempt != prevAttempt || masternodeSync.RequestedMasternodeAssets != prevAssets) {
         cachedNumBlocks = newNumBlocks;
         cachedReindexing = fReindex;
         cachedImporting = fImporting;
-//        prevAttempt = masternodeSync.RequestedMasternodeAttempt;
-//        prevAssets = masternodeSync.RequestedMasternodeAssets;
+        prevAttempt = masternodeSync.RequestedMasternodeAttempt;
+        prevAssets = masternodeSync.RequestedMasternodeAssets;
 
         emit numBlocksChanged(newNumBlocks);
     }
@@ -240,23 +240,23 @@ static void ShowProgress(ClientModel* clientmodel, const std::string& title, int
 {
     // emits signal "showProgress"
     QMetaObject::invokeMethod(clientmodel, "showProgress", Qt::QueuedConnection,
-                              Q_ARG(QString, QString::fromStdString(title)),
-                              Q_ARG(int, nProgress));
+        Q_ARG(QString, QString::fromStdString(title)),
+        Q_ARG(int, nProgress));
 }
 
 static void NotifyNumConnectionsChanged(ClientModel* clientmodel, int newNumConnections)
 {
     // Too noisy: qDebug() << "NotifyNumConnectionsChanged : " + QString::number(newNumConnections);
     QMetaObject::invokeMethod(clientmodel, "updateNumConnections", Qt::QueuedConnection,
-                              Q_ARG(int, newNumConnections));
+        Q_ARG(int, newNumConnections));
 }
 
 static void NotifyAlertChanged(ClientModel* clientmodel, const uint256& hash, ChangeType status)
 {
     qDebug() << "NotifyAlertChanged : " + QString::fromStdString(hash.GetHex()) + " status=" + QString::number(status);
     QMetaObject::invokeMethod(clientmodel, "updateAlert", Qt::QueuedConnection,
-                              Q_ARG(QString, QString::fromStdString(hash.GetHex())),
-                              Q_ARG(int, status));
+        Q_ARG(QString, QString::fromStdString(hash.GetHex())),
+        Q_ARG(int, status));
 }
 
 void ClientModel::subscribeToCoreSignals()

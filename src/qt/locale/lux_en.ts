@@ -1279,7 +1279,7 @@ Address: %4
     </message>
     <message>
         <location line="+196"/>
-        <source>Non-anonymized input selected. &lt;b&gt;Luxsend will be disabled.&lt;/b&gt;&lt;br&gt;&lt;br&gt;If you still want to use Luxsend, please deselect all non-nonymized inputs first and then check Luxsend checkbox again.</source>
+        <source>Non-anonymized input selected. &lt;b&gt;Obfuscation will be disabled.&lt;/b&gt;&lt;br&gt;&lt;br&gt;If you still want to use Obfuscation, please deselect all non-nonymized inputs first and then check Obfuscation checkbox again.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1947,10 +1947,10 @@ Please check the address and try again.</source>
     </message>
 </context>
 <context>
-    <name>LuxsendConfig</name>
+    <name>ObfuscationConfig</name>
     <message>
-        <location filename="../forms/luxsendconfig.ui" line="+14"/>
-        <source>Configure Luxsend</source>
+        <location filename="../forms/obfuscationconfig.ui" line="+14"/>
+        <source>Configure Obfuscation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2009,25 +2009,25 @@ Please check the address and try again.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../luxsendconfig.cpp" line="+42"/>
+        <location filename="../obfuscationconfig.cpp" line="+42"/>
         <location line="+14"/>
         <location line="+14"/>
-        <source>Luxsend Configuration</source>
+        <source>Obfuscation Configuration</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-27"/>
-        <source>Luxsend was successfully set to basic (%1 and 2 rounds). You can change this at any time by opening LUX&apos;s configuration screen.</source>
+        <source>Obfuscation was successfully set to basic (%1 and 2 rounds). You can change this at any time by opening LUX&apos;s configuration screen.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+14"/>
-        <source>Luxsend was successfully set to high (%1 and 8 rounds). You can change this at any time by opening LUX&apos;s configuration screen.</source>
+        <source>Obfuscation was successfully set to high (%1 and 8 rounds). You can change this at any time by opening LUX&apos;s configuration screen.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+14"/>
-        <source>Luxsend was successfully set to maximum (%1 and 16 rounds). You can change this at any time by opening LUX&apos;s configuration screen.</source>
+        <source>Obfuscation was successfully set to maximum (%1 and 16 rounds). You can change this at any time by opening LUX&apos;s configuration screen.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2143,12 +2143,12 @@ Please check the address and try again.</source>
     </message>
     <message>
         <location line="+3"/>
-        <source>Luxsend rounds to use</source>
+        <source>Obfuscation rounds to use</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+24"/>
-        <source>This amount acts as a threshold to turn off Luxsend once it&apos;s reached.</source>
+        <source>This amount acts as a threshold to turn off Obfuscation once it&apos;s reached.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2194,7 +2194,7 @@ Please check the address and try again.</source>
     <message>
         <location line="+21"/>
         <source>Language missing or translation incomplete? Help contributing translations here:
-https://www.transifex.com/216k155/216k155-translations</source>
+https://www.transifex.com/lux-project/lux-project-translations</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2451,7 +2451,7 @@ https://www.transifex.com/216k155/216k155-translations</source>
     </message>
     <message>
         <location line="+27"/>
-        <source>Luxsend Balance:</source>
+        <source>Obfuscation Balance:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2466,12 +2466,12 @@ https://www.transifex.com/216k155/216k155-translations</source>
     </message>
     <message>
         <location line="+516"/>
-        <source>Try to manually submit a Luxsend request.</source>
+        <source>Try to manually submit a Obfuscation request.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+22"/>
-        <source>Reset the current status of Luxsend (can interrupt Luxsend if it&apos;s in the process of Mixing, which can cost you money!)</source>
+        <source>Reset the current status of Obfuscation (can interrupt Obfuscation if it&apos;s in the process of Mixing, which can cost you money!)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2480,7 +2480,7 @@ https://www.transifex.com/216k155/216k155-translations</source>
         <location line="+11"/>
         <location line="+10"/>
         <location line="+12"/>
-        <source>Luxsend</source>
+        <source>Obfuscation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2594,28 +2594,28 @@ https://www.transifex.com/216k155/216k155-translations</source>
     </message>
     <message>
         <location line="+44"/>
-        <source>Last Luxsend message:
+        <source>Last Obfuscation message:
 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+27"/>
-        <source>Luxsend was successfully reset.</source>
+        <source>Obfuscation was successfully reset.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+11"/>
-        <source>If you don&apos;t want to see internal Luxsend fees/transactions select &quot;Most Common&quot; as Type on the &quot;Transactions&quot; tab.</source>
+        <source>If you don&apos;t want to see internal Obfuscation fees/transactions select &quot;Most Common&quot; as Type on the &quot;Transactions&quot; tab.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+10"/>
-        <source>Luxsend requires at least %1 to use.</source>
+        <source>Obfuscation requires at least %1 to use.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+12"/>
-        <source>Wallet is locked and user declined to unlock. Disabling Luxsend.</source>
+        <source>Wallet is locked and user declined to unlock. Disabling Obfuscation.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2627,13 +2627,13 @@ https://www.transifex.com/216k155/216k155-translations</source>
         <location line="-208"/>
         <location line="+291"/>
         <location line="+89"/>
-        <source>Start Luxsend</source>
+        <source>Start Obfuscation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-378"/>
         <location line="+381"/>
-        <source>Stop Luxsend</source>
+        <source>Stop Obfuscation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3622,7 +3622,7 @@ https://www.transifex.com/216k155/216k155-translations</source>
     </message>
     <message>
         <location line="+579"/>
-        <source>Luxsend</source>
+        <source>Obfuscation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3862,7 +3862,7 @@ https://www.transifex.com/216k155/216k155-translations</source>
     </message>
     <message>
         <location line="-341"/>
-        <source>(luxsend requires this amount to be rounded up to the nearest %1).</source>
+        <source>(obfuscation requires this amount to be rounded up to the nearest %1).</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4616,27 +4616,27 @@ https://www.transifex.com/216k155/216k155-translations</source>
     </message>
     <message>
         <location line="+2"/>
-        <source>Received via Luxsend</source>
+        <source>Received via Obfuscation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+11"/>
-        <source>Luxsend Denominate</source>
+        <source>Obfuscation Denominate</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
-        <source>Luxsend Collateral Payment</source>
+        <source>Obfuscation Collateral Payment</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
-        <source>Luxsend Make Collateral Inputs</source>
+        <source>Obfuscation Make Collateral Inputs</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
-        <source>Luxsend Create Denominations</source>
+        <source>Obfuscation Create Denominations</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4770,22 +4770,22 @@ https://www.transifex.com/216k155/216k155-translations</source>
     </message>
     <message>
         <location line="+1"/>
-        <source>Luxsend Make Collateral Inputs</source>
+        <source>Obfuscation Make Collateral Inputs</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
-        <source>Luxsend Create Denominations</source>
+        <source>Obfuscation Create Denominations</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
-        <source>Luxsend Denominate</source>
+        <source>Obfuscation Denominate</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
-        <source>Luxsend Collateral Payment</source>
+        <source>Obfuscation Collateral Payment</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5068,7 +5068,7 @@ https://www.transifex.com/216k155/216k155-translations</source>
     </message>
     <message>
         <location line="+3"/>
-        <source>Disable all LUX specific functionality (Masternodes, Luxsend, SwiftTX, Budgeting) (0-1, default: %u)</source>
+        <source>Disable all LUX specific functionality (Masternodes, Obfuscation, SwiftTX, Budgeting) (0-1, default: %u)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5083,7 +5083,7 @@ https://www.transifex.com/216k155/216k155-translations</source>
     </message>
     <message>
         <location line="+3"/>
-        <source>Enable use of automated luxsend for funds stored in this wallet (0-1, default: %u)</source>
+        <source>Enable use of automated obfuscation for funds stored in this wallet (0-1, default: %u)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5183,7 +5183,7 @@ https://www.transifex.com/216k155/216k155-translations</source>
     </message>
     <message>
         <location line="+2"/>
-        <source>Luxsend uses exact denominated amounts to send funds, you might simply need to anonymize some more coins.</source>
+        <source>Obfuscation uses exact denominated amounts to send funds, you might simply need to anonymize some more coins.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5193,7 +5193,7 @@ https://www.transifex.com/216k155/216k155-translations</source>
     </message>
     <message>
         <location line="+2"/>
-        <source>Provide liquidity to Luxsend by infrequently mixing coins on a continual basis (0-100, default: %u, 1=very frequent, high fees, 100=very infrequent, low fees)</source>
+        <source>Provide liquidity to Obfuscation by infrequently mixing coins on a continual basis (0-100, default: %u, 1=very frequent, high fees, 100=very infrequent, low fees)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5268,12 +5268,12 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <location line="+2"/>
-        <source>Unable to locate enough Luxsend denominated funds for this transaction.</source>
+        <source>Unable to locate enough Obfuscation denominated funds for this transaction.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
-        <source>Unable to locate enough Luxsend non-denominated funds for this transaction that are not equal 10000 LUX.</source>
+        <source>Unable to locate enough Obfuscation non-denominated funds for this transaction that are not equal 10000 LUX.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5630,7 +5630,7 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <location line="+1"/>
-        <source>Error: You already have pending entries in the Luxsend pool</source>
+        <source>Error: You already have pending entries in the Obfuscation pool</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5810,12 +5810,12 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <location line="+1"/>
-        <source>Last Luxsend was too recent.</source>
+        <source>Last Obfuscation was too recent.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
-        <source>Last successful Luxsend action was too recent.</source>
+        <source>Last successful Obfuscation action was too recent.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5980,22 +5980,22 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <location line="+1"/>
-        <source>Luxsend is idle.</source>
+        <source>Obfuscation is idle.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
-        <source>Luxsend options:</source>
+        <source>Obfuscation options:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
-        <source>Luxsend request complete:</source>
+        <source>Obfuscation request complete:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
-        <source>Luxsend request incomplete:</source>
+        <source>Obfuscation request incomplete:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6400,7 +6400,7 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <location line="+1"/>
-        <source>Value more than Luxsend pool maximum allows.</source>
+        <source>Value more than Obfuscation pool maximum allows.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

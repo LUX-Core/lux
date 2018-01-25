@@ -174,7 +174,7 @@
     <name>MultiSendDialog</name>
     </context>
 <context>
-    <name>LuxsendConfig</name>
+    <name>ObfuscationConfig</name>
     </context>
 <context>
     <name>OpenURIDialog</name>

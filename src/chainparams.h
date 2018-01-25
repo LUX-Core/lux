@@ -90,7 +90,7 @@ public:
     virtual const Checkpoints::CCheckpointData& Checkpoints() const = 0;
     int PoolMaxTransactions() const { return nPoolMaxTransactions; }
     std::string SporkKey() const { return strSporkKey; }
-    std::string ObfuscationPoolDummyAddress() const { return strObfuscationPoolDummyAddress; }
+    std::string ObfuscationPoolCollateralAddress() const { return strObfuscationPoolCollateralAddress; }
     int64_t StartMasternodePayments() const { return nStartMasternodePayments; }
     CBaseChainParams::Network NetworkID() const { return networkID; }
 
@@ -132,7 +132,7 @@ protected:
     bool fHeadersFirstSyncingActive;
     int nPoolMaxTransactions;
     std::string strSporkKey;
-    std::string strObfuscationPoolDummyAddress;
+    std::string strObfuscationPoolCollateralAddress;
     int64_t nStartMasternodePayments;
 };
 
@@ -177,9 +177,7 @@ void SelectParams(CBaseChainParams::Network network);
  */
 bool SelectParamsFromCommandLine();
 
-inline bool TestNet() {
-    // Note: it's deliberate that this returns "false" for regression test mode.
-    return Params().NetworkID() == CBaseChainParams::TESTNET;
-}
+// Note: it's deliberate that this returns "false" for regression test mode.
+inline bool IsTestNet() { return Params().NetworkID() == CBaseChainParams::TESTNET; }
 
 #endif // BITCOIN_CHAINPARAMS_H

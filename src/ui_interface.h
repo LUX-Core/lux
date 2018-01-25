@@ -15,7 +15,6 @@
 class CBasicKeyStore;
 class CWallet;
 class uint256;
-class CAdrenalineNodeConfig;
 
 /** General change type (added, updated, removed). */
 enum ChangeType {
@@ -102,8 +101,6 @@ public:
 
     /** New block has been accepted */
     boost::signals2::signal<void(const uint256& hash)> NotifyBlockTip;
-
-    boost::signals2::signal<void (CAdrenalineNodeConfig nodeConfig)> NotifyAdrenalineNodeChanged;
 };
 
 extern CClientUIInterface uiInterface;

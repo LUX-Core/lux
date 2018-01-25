@@ -78,7 +78,7 @@ void OptionsModel::Init()
     if (!settings.contains("nAnonymizeLuxAmount"))
         settings.setValue("nAnonymizeLuxAmount", 1000);
 
-    nDarksendRounds = settings.value("nDarksendRounds").toLongLong();
+    nObfuscationRounds = settings.value("nObfuscationRounds").toLongLong();
     nAnonymizeLuxAmount = settings.value("nAnonymizeLuxAmount").toLongLong();
 
     if (!settings.contains("fShowMasternodesTab"))
@@ -225,8 +225,8 @@ QVariant OptionsModel::data(const QModelIndex& index, int role) const
             return settings.value("nDatabaseCache");
         case ThreadsScriptVerif:
             return settings.value("nThreadsScriptVerif");
-        case LuxsendRounds:
-            return QVariant(nDarksendRounds);
+        case ObfuscationRounds:
+            return QVariant(nObfuscationRounds);
         case AnonymizeLuxAmount:
             return QVariant(nAnonymizeLuxAmount);
         case Listen:
@@ -332,10 +332,10 @@ bool OptionsModel::setData(const QModelIndex& index, const QVariant& value, int 
                 setRestartRequired(true);
             }
             break;
-        case LuxsendRounds:
-            nDarksendRounds = value.toInt();
-            settings.setValue("nDarksendRounds", nDarksendRounds);
-            emit darksendRoundsChanged(nDarksendRounds);
+        case ObfuscationRounds:
+            nObfuscationRounds = value.toInt();
+            settings.setValue("nObfuscationRounds", nObfuscationRounds);
+            emit obfuscationRoundsChanged(nObfuscationRounds);
             break;
         case AnonymizeLuxAmount:
             nAnonymizeLuxAmount = value.toInt();

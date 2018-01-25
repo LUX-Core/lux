@@ -4,13 +4,24 @@ define(_CLIENT_VERSION_MAJOR, 4)
 define(_CLIENT_VERSION_MINOR, 0)
 define(_CLIENT_VERSION_REVISION, 0)
 define(_CLIENT_VERSION_BUILD, 0)
-define(_CLIENT_VERSION_IS_RELEASE, true)
+define(_CLIENT_VERSION_IS_RELEASE, false)
 define(_COPYRIGHT_YEAR, 2017)
 AC_INIT([Lux Core],[_CLIENT_VERSION_MAJOR._CLIENT_VERSION_MINOR._CLIENT_VERSION_REVISION],[www.luxcore.io],[lux])
 AC_CONFIG_SRCDIR([src/main.cpp])
 AC_CONFIG_HEADERS([src/config/lux-config.h])
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_MACRO_DIR([build-aux/m4])
+
+BITCOIN_DAEMON_NAME=luxd
+BITCOIN_GUI_NAME=lux-qt
+BITCOIN_CLI_NAME=lux-cli
+BITCOIN_TX_NAME=lux-tx
+
+dnl Unless the user specified ARFLAGS, force it to be cr
+AC_ARG_VAR(ARFLAGS, [Flags for the archiver, defaults to <cr> if not set])
+if test "x${ARFLAGS+set}" != "xset"; then
+  ARFLAGS="cr"
+fi
 
 AC_CANONICAL_HOST
 
@@ -177,6 +188,21 @@ if test "x$enable_debug" = xyes; then
 
     if test "x$GXX" = xyes; then
         CXXFLAGS="-g3 -O0 -DDEBUG"
+    fi
+fi
+
+# Enable dump extra debug info
+AC_ARG_ENABLE([debug-xdump],
+    [AS_HELP_STRING([--enable-xdebug],
+                    [dump extra debug info on stderr (or stdout) (default is no)])],
+    [enable_debug_xdump=$enableval],
+    [enable_debug_xdump=no])
+if test "x$enable_debug_xdump" = xyes; then
+    if test "x$GCC" = xyes; then
+        CFLAGS="-DDEBUG_DUMP_STAKING_INFO"
+    fi
+    if test "x$GXX" = xyes; then
+        CXXFLAGS="-DDEBUG_DUMP_STAKING_INFO"
     fi
 fi
 
@@ -859,7 +885,7 @@ if test x$bitcoin_enable_qt != xno; then
   AC_MSG_CHECKING([whether to build test_lux-qt])
   if test x$use_tests$bitcoin_enable_qt_test = xyesyes; then
     AC_MSG_RESULT([yes])
-    BUILD_TEST_QT="test"
+    BUILD_TEST_QT="yes"
   else
     AC_MSG_RESULT([no])
   fi
