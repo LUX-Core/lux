@@ -361,7 +361,7 @@ public:
      *        dssub    | Obfuscation Subscribe To
      * \param vRecv
      */
-    void ProcessMessageObfuscation(CNode* pfrom, std::string& strCommand, CDataStream& vRecv);
+    void ProcessMessage(CNode* pfrom, std::string& strCommand, CDataStream& vRecv, bool &isObfuscationCommand);
 
     void InitCollateralAddress()
     {

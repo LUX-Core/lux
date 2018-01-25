@@ -32,13 +32,15 @@ int nCompleteTXLocks;
 //         Send "txvote", CTransaction, Signature, Approve
 //step 3.) Top 1 masternode, waits for SWIFTTX_SIGNATURES_REQUIRED messages. Upon success, sends "txlock'
 
-void ProcessMessageSwiftTX(CNode* pfrom, std::string& strCommand, CDataStream& vRecv)
+void ProcessSwiftTX(CNode* pfrom, std::string& strCommand, CDataStream& vRecv, bool &isSwiftTXCmd)
 {
     if (fLiteMode) return; //disable all obfuscation/masternode related functionality
     if (!IsSporkActive(SPORK_2_SWIFTTX)) return;
     if (!masternodeSync.IsBlockchainSynced()) return;
 
     if (strCommand == "ix") {
+        isSwiftTXCmd = true;
+        
         //LogPrintf("ProcessMessageSwiftTX::ix\n");
         CDataStream vMsg(vRecv);
         CTransaction tx;
@@ -119,8 +121,11 @@ void ProcessMessageSwiftTX(CNode* pfrom, std::string& strCommand, CDataStream& v
 
             return;
         }
-    } else if (strCommand == "txlvote") //SwiftTX Lock Consensus Votes
-    {
+    }
+
+    else if (strCommand == "txlvote") { //SwiftTX Lock Consensus Votes
+        isSwiftTXCmd = true;
+        
         CConsensusVote ctx;
         vRecv >> ctx;
 

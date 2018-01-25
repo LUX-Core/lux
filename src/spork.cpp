@@ -25,11 +25,13 @@ CSporkManager sporkManager;
 std::map<uint256, CSporkMessage> mapSporks;
 std::map<int, CSporkMessage> mapSporksActive;
 
-void ProcessSpork(CNode* pfrom, std::string& strCommand, CDataStream& vRecv)
+void ProcessSpork(CNode* pfrom, std::string& strCommand, CDataStream& vRecv, bool &isSporkCommand)
 {
     if (fLiteMode) return; //disable all obfuscation/masternode related functionality
-
+    
     if (strCommand == "spork") {
+        isSporkCommand = true;
+
         //LogPrintf("ProcessSpork::spork\n");
         CDataStream vMsg(vRecv);
         CSporkMessage spork;
@@ -58,21 +60,21 @@ void ProcessSpork(CNode* pfrom, std::string& strCommand, CDataStream& vRecv)
         mapSporks[hash] = spork;
         mapSporksActive[spork.nSporkID] = spork;
         sporkManager.Relay(spork);
+        return;
     }
         //does a task if needed		
 //      ExecuteSpork(spork.nSporkID, spork.nValue);
 
-         if (strCommand == "getsporks") {
+    else if (strCommand == "getsporks") {
+        isSporkCommand = true;
 
         std::map<int, CSporkMessage>::iterator it = mapSporksActive.begin();
-
         while (it != mapSporksActive.end()) {
             pfrom->PushMessage("spork", it->second);
             it++;
         }
     }
 }
-
 
 // grab the value of the spork on the network, or the default
 int64_t GetSporkValue(int nSporkID)

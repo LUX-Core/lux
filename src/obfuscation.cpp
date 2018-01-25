@@ -43,12 +43,13 @@ CActiveMasternode activeMasternode;
         udjinm6   - udjinm6@dashpay.io
 */
 
-void CObfuscationPool::ProcessMessageObfuscation(CNode* pfrom, std::string& strCommand, CDataStream& vRecv)
+void CObfuscationPool::ProcessMessage(CNode* pfrom, std::string& strCommand, CDataStream& vRecv, bool &isObfuscationCommand)
 {
     if (fLiteMode) return; //disable all Obfuscation/Masternode related functionality
     if (!masternodeSync.IsBlockchainSynced()) return;
 
     if (strCommand == "dsa") { //Obfuscation Accept Into Pool
+        isObfuscationCommand = true;
 
         int errorID;
 
@@ -99,7 +100,11 @@ void CObfuscationPool::ProcessMessageObfuscation(CNode* pfrom, std::string& strC
             return;
         }
 
-    } else if (strCommand == "dsq") { //Obfuscation Queue
+    }
+
+    else if (strCommand == "dsq") { //Obfuscation Queue
+        isObfuscationCommand = true;
+
         TRY_LOCK(cs_obfuscation, lockRecv);
         if (!lockRecv) return;
 
@@ -153,7 +158,11 @@ void CObfuscationPool::ProcessMessageObfuscation(CNode* pfrom, std::string& strC
             dsq.time = GetTime();
         }
 
-    } else if (strCommand == "dsi") { //Obfuscation vIn
+    }
+
+    else if (strCommand == "dsi") { //Obfuscation vIn
+        isObfuscationCommand = true;
+
         int errorID;
 
         if (pfrom->nVersion < ActiveProtocol()) {
@@ -278,7 +287,11 @@ void CObfuscationPool::ProcessMessageObfuscation(CNode* pfrom, std::string& strC
             pfrom->PushMessage("dssu", sessionID, GetState(), GetEntriesCount(), MASTERNODE_REJECTED, errorID);
         }
 
-    } else if (strCommand == "dssu") { //Obfuscation status update
+    }
+
+    else if (strCommand == "dssu") { //Obfuscation status update
+        isObfuscationCommand = true;
+
         if (pfrom->nVersion < ActiveProtocol()) {
             return;
         }
@@ -305,7 +318,10 @@ void CObfuscationPool::ProcessMessageObfuscation(CNode* pfrom, std::string& strC
 
         StatusUpdate(state, entriesCount, accepted, errorID, sessionIDMessage);
 
-    } else if (strCommand == "dss") { //Obfuscation Sign Final Tx
+    }
+
+    else if (strCommand == "dss") { //Obfuscation Sign Final Tx
+        isObfuscationCommand = true;
 
         if (pfrom->nVersion < ActiveProtocol()) {
             return;
@@ -327,7 +343,11 @@ void CObfuscationPool::ProcessMessageObfuscation(CNode* pfrom, std::string& strC
             obfuscationPool.Check();
             RelayStatus(obfuscationPool.sessionID, obfuscationPool.GetState(), obfuscationPool.GetEntriesCount(), MASTERNODE_RESET);
         }
-    } else if (strCommand == "dsf") { //Obfuscation Final tx
+    }
+
+    else if (strCommand == "dsf") { //Obfuscation Final tx
+        isObfuscationCommand = true;
+
         if (pfrom->nVersion < ActiveProtocol()) {
             return;
         }
@@ -350,7 +370,10 @@ void CObfuscationPool::ProcessMessageObfuscation(CNode* pfrom, std::string& strC
         //check to see if input is spent already? (and probably not confirmed)
         SignFinalTransaction(txNew, pfrom);
 
-    } else if (strCommand == "dsc") { //Obfuscation Complete
+    }
+
+    else if (strCommand == "dsc") { //Obfuscation Complete
+        isObfuscationCommand = true;
 
         if (pfrom->nVersion < ActiveProtocol()) {
             return;

@@ -939,7 +939,7 @@ void CBudgetManager::NewBlock()
     LogPrintf("CBudgetManager::NewBlock - PASSED\n");
 }
 
-void CBudgetManager::ProcessMessage(CNode* pfrom, std::string& strCommand, CDataStream& vRecv)
+void CBudgetManager::ProcessMessage(CNode* pfrom, std::string& strCommand, CDataStream& vRecv, bool &isMBCommand)
 {
     // lite mode is not supported
     if (fLiteMode) return;
@@ -948,6 +948,8 @@ void CBudgetManager::ProcessMessage(CNode* pfrom, std::string& strCommand, CData
     LOCK(cs_budget);
 
     if (strCommand == "mnvs") { //Masternode vote sync
+        isMBCommand = true;
+            
         uint256 nProp;
         vRecv >> nProp;
 
@@ -966,7 +968,9 @@ void CBudgetManager::ProcessMessage(CNode* pfrom, std::string& strCommand, CData
         LogPrintf("mnvs - Sent Masternode votes to %s\n", pfrom->addr.ToString());
     }
 
-    if (strCommand == "mprop") { //Masternode Proposal
+    else if (strCommand == "mprop") { //Masternode Proposal
+        isMBCommand = true;
+        
         CBudgetProposalBroadcast budgetProposalBroadcast;
         vRecv >> budgetProposalBroadcast;
 
@@ -1002,7 +1006,9 @@ void CBudgetManager::ProcessMessage(CNode* pfrom, std::string& strCommand, CData
         CheckOrphanVotes();
     }
 
-    if (strCommand == "mvote") { //Masternode Vote
+    else if (strCommand == "mvote") { //Masternode Vote
+        isMBCommand = true;
+        
         CBudgetVote vote;
         vRecv >> vote;
         vote.fValid = true;
@@ -1038,7 +1044,9 @@ void CBudgetManager::ProcessMessage(CNode* pfrom, std::string& strCommand, CData
         LogPrintf("mvote - new budget vote - %s\n", vote.GetHash().ToString());
     }
 
-    if (strCommand == "fbs") { //Finalized Budget Suggestion
+    else if (strCommand == "fbs") { //Finalized Budget Suggestion
+        isMBCommand = true;
+        
         CFinalizedBudgetBroadcast finalizedBudgetBroadcast;
         vRecv >> finalizedBudgetBroadcast;
 
@@ -1075,7 +1083,9 @@ void CBudgetManager::ProcessMessage(CNode* pfrom, std::string& strCommand, CData
         CheckOrphanVotes();
     }
 
-    if (strCommand == "fbvote") { //Finalized Budget Vote
+    else if (strCommand == "fbvote") { //Finalized Budget Vote
+        isMBCommand = true;
+        
         CFinalizedBudgetVote vote;
         vRecv >> vote;
         vote.fValid = true;

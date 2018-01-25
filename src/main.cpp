@@ -4605,11 +4605,13 @@ void static ProcessGetData(CNode* pfrom)
     }
 }
 
-bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, int64_t nTimeReceived)
+static bool ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, int64_t nTimeReceived)
 {
     RandAddSeedPerfmon();
-    if (fDebug)
+    if (fDebug) {
         LogPrintf("received: %s (%u bytes) peer=%d\n", SanitizeString(strCommand), vRecv.size(), pfrom->id);
+    }
+
     if (mapArgs.count("-dropmessagestest") && GetRand(atoi(mapArgs["-dropmessagestest"])) == 0) {
         LogPrintf("dropmessagestest DROPPING RECV MESSAGE\n");
         return true;
@@ -5091,8 +5093,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
     }
 
 
-    else if (strCommand == "headers" && Params().HeadersFirstSyncingActive() && !fImporting && !fReindex) // Ignore headers received while importing
-    {
+    else if (strCommand == "headers" && Params().HeadersFirstSyncingActive() && !fImporting && !fReindex) { // Ignore headers received while importing
         std::vector<CBlockHeader> headers;
 
         // Bypass the normal CBlock deserialization, as we don't want to risk deserializing 2000 full blocks.
@@ -5149,8 +5150,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
         CheckBlockIndex();
     }
 
-    else if (strCommand == "block" && !fImporting && !fReindex) // Ignore blocks received while importing
-    {
+    else if (strCommand == "block" && !fImporting && !fReindex) { // Ignore blocks received while importing
         CBlock block;
         vRecv >> block;
         uint256 hashBlock = block.GetHash();
@@ -5399,17 +5399,19 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
                 LogPrint("net", "Unparseable reject message received\n");
             }
         }
-    } else {
-        //probably one the extensions
-        obfuscationPool.ProcessMessageObfuscation(pfrom, strCommand, vRecv);
-        mnodeman.ProcessMessage(pfrom, strCommand, vRecv);
-        budget.ProcessMessage(pfrom, strCommand, vRecv);
-        masternodePayments.ProcessMessageMasternodePayments(pfrom, strCommand, vRecv);
-        ProcessMessageSwiftTX(pfrom, strCommand, vRecv);
-        ProcessSpork(pfrom, strCommand, vRecv);
-        masternodeSync.ProcessMessage(pfrom, strCommand, vRecv);
     }
 
+
+    else {
+        bool processed = false;
+        if (!processed) obfuscationPool.ProcessMessage(pfrom, strCommand, vRecv, processed);
+        if (!processed) mnodeman.ProcessMessage(pfrom, strCommand, vRecv, processed);
+        if (!processed) budget.ProcessMessage(pfrom, strCommand, vRecv, processed);
+        if (!processed) masternodePayments.ProcessMessage(pfrom, strCommand, vRecv, processed);
+        if (!processed) ProcessSwiftTX(pfrom, strCommand, vRecv, processed);
+        if (!processed) ProcessSpork(pfrom, strCommand, vRecv, processed);
+        if (!processed) masternodeSync.ProcessMessage(pfrom, strCommand, vRecv, processed);
+    }
 
     return true;
 }

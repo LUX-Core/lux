@@ -654,7 +654,7 @@ void CMasternodeMan::ProcessMasternodeConnections()
     }
 }
 
-void CMasternodeMan::ProcessMessage(CNode* pfrom, std::string& strCommand, CDataStream& vRecv)
+void CMasternodeMan::ProcessMessage(CNode* pfrom, std::string& strCommand, CDataStream& vRecv, bool &isMNCommand)
 {
     if (fLiteMode) return; //disable all Obfuscation/Masternode related functionality
     if (!masternodeSync.IsBlockchainSynced()) return;
@@ -662,6 +662,8 @@ void CMasternodeMan::ProcessMessage(CNode* pfrom, std::string& strCommand, CData
     LOCK(cs_process_message);
 
     if (strCommand == "mnb") { //Masternode Broadcast
+        isMNCommand = true;
+        
         CMasternodeBroadcast mnb;
         vRecv >> mnb;
 
@@ -703,6 +705,8 @@ void CMasternodeMan::ProcessMessage(CNode* pfrom, std::string& strCommand, CData
     }
 
     else if (strCommand == "mnp") { //Masternode Ping
+        isMNCommand = true;
+        
         CMasternodePing mnp;
         vRecv >> mnp;
 
@@ -728,7 +732,10 @@ void CMasternodeMan::ProcessMessage(CNode* pfrom, std::string& strCommand, CData
         // we might have to ask for a masternode entry once
         AskForMN(pfrom, mnp.vin);
 
-    } else if (strCommand == "dseg") { //Get Masternode list or specific entry
+    }
+
+    else if (strCommand == "dseg") { //Get Masternode list or specific entry
+        isMNCommand = true;
 
         CTxIn vin;
         vRecv >> vin;
@@ -781,6 +788,7 @@ void CMasternodeMan::ProcessMessage(CNode* pfrom, std::string& strCommand, CData
             LogPrintf("dseg - Sent %d Masternode entries to %s\n", nInvCount, pfrom->addr.ToString());
         }
     }
+
     /*
      * IT'S SAFE TO REMOVE THIS IN FURTHER VERSIONS
      * AFTER MIGRATION TO V12 IS DONE
@@ -788,6 +796,7 @@ void CMasternodeMan::ProcessMessage(CNode* pfrom, std::string& strCommand, CData
 
     // Light version for OLD MASSTERNODES - fake pings, no self-activation
     else if (strCommand == "dsee") { //Obfuscation Election Entry
+        isMNCommand = true;
 
         if (IsSporkActive(SPORK_10_MASTERNODE_PAY_UPDATED_NODES)) return;
 
@@ -992,6 +1001,7 @@ void CMasternodeMan::ProcessMessage(CNode* pfrom, std::string& strCommand, CData
     }
 
     else if (strCommand == "dseep") { //Obfuscation Election Entry Ping
+        isMNCommand = true;
 
         if (IsSporkActive(SPORK_10_MASTERNODE_PAY_UPDATED_NODES)) return;
 

@@ -330,14 +330,15 @@ int CMasternodePayments::GetMinMasternodePaymentsProto()
 {    return ActiveProtocol();
 }
 
-void CMasternodePayments::ProcessMessageMasternodePayments(CNode* pfrom, std::string& strCommand, CDataStream& vRecv)
+void CMasternodePayments::ProcessMessage(CNode* pfrom, std::string& strCommand, CDataStream& vRecv, bool &isPaymentCommand)
 {
     if (!masternodeSync.IsBlockchainSynced()) return;
 
     if (fLiteMode) return; //disable all Obfuscation/Masternode related functionality
 
-
     if (strCommand == "mnget") { //Masternode Payments Request Sync
+        isPaymentCommand = true;
+        
         if (fLiteMode) return;   //disable all Obfuscation/Masternode related functionality
 
         int nCountNeeded;
@@ -354,7 +355,11 @@ void CMasternodePayments::ProcessMessageMasternodePayments(CNode* pfrom, std::st
         pfrom->FulfilledRequest("mnget");
         masternodePayments.Sync(pfrom, nCountNeeded);
         LogPrintf("mnget - Sent Masternode winners to %s\n", pfrom->addr.ToString().c_str());
-    } else if (strCommand == "mnw") { //Masternode Payments Declare Winner
+    }
+
+    else if (strCommand == "mnw") { //Masternode Payments Declare Winner
+        isPaymentCommand = true;
+        
         //this is required in litemodef
         CMasternodePaymentWinner winner;
         vRecv >> winner;
