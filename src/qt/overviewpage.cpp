@@ -146,7 +146,7 @@ OverviewPage::OverviewPage(QWidget* parent) : QWidget(parent),
                 ui->toggleObfuscation->setText(tr("Stop Obfuscation"));
             }
             timer = new QTimer(this);
-            connect(timer, SIGNAL(timeout()), this, SLOT(obfuScationStatus()));
+            connect(timer, SIGNAL(timeout()), this, SLOT(obfuscationStatus()));
             timer->start(1000);
         }
     }
@@ -163,7 +163,7 @@ void OverviewPage::handleTransactionClicked(const QModelIndex& index)
 
 OverviewPage::~OverviewPage()
 {
-    if (!fLiteMode && !fMasterNode) disconnect(timer, SIGNAL(timeout()), this, SLOT(obfuScationStatus()));
+    if (!fLiteMode && !fMasterNode) disconnect(timer, SIGNAL(timeout()), this, SLOT(obfuscationStatus()));
     delete ui;
 }
 
@@ -415,19 +415,19 @@ void OverviewPage::updateObfuscationProgress()
 }
 
 
-void OverviewPage::obfuScationStatus()
+void OverviewPage::obfuscationStatus()
 {
     static int64_t nLastDSProgressBlockTime = 0;
 
     int nBestHeight = chainActive.Tip()->nHeight;
 
     // we we're processing more then 1 block per second, we'll just leave
-    if (((nBestHeight - obfuScationPool.cachedNumBlocks) / (GetTimeMillis() - nLastDSProgressBlockTime + 1) > 1)) return;
+    if (((nBestHeight - obfuscationPool.cachedNumBlocks) / (GetTimeMillis() - nLastDSProgressBlockTime + 1) > 1)) return;
     nLastDSProgressBlockTime = GetTimeMillis();
 
     if (!fEnableObfuscation) {
-        if (nBestHeight != obfuScationPool.cachedNumBlocks) {
-            obfuScationPool.cachedNumBlocks = nBestHeight;
+        if (nBestHeight != obfuscationPool.cachedNumBlocks) {
+            obfuscationPool.cachedNumBlocks = nBestHeight;
             updateObfuscationProgress();
 
             ui->obfuscationEnabled->setText(tr("Disabled"));
@@ -439,15 +439,15 @@ void OverviewPage::obfuScationStatus()
     }
 
     // check obfuscation status and unlock if needed
-    if (nBestHeight != obfuScationPool.cachedNumBlocks) {
+    if (nBestHeight != obfuscationPool.cachedNumBlocks) {
         // Balance and number of transactions might have changed
-        obfuScationPool.cachedNumBlocks = nBestHeight;
+        obfuscationPool.cachedNumBlocks = nBestHeight;
         updateObfuscationProgress();
 
         ui->obfuscationEnabled->setText(tr("Enabled"));
     }
 
-    QString strStatus = QString(obfuScationPool.GetStatus().c_str());
+    QString strStatus = QString(obfuscationPool.GetStatus().c_str());
 
     QString s = tr("Last Obfuscation message:\n") + strStatus;
 
@@ -456,11 +456,11 @@ void OverviewPage::obfuScationStatus()
 
     ui->obfuscationStatus->setText(s);
 
-    if (obfuScationPool.sessionDenom == 0) {
+    if (obfuscationPool.sessionDenom == 0) {
         ui->labelSubmittedDenom->setText(tr("N/A"));
     } else {
         std::string out;
-        obfuScationPool.GetDenominationsToString(obfuScationPool.sessionDenom, out);
+        obfuscationPool.GetDenominationsToString(obfuscationPool.sessionDenom, out);
         QString s2(out.c_str());
         ui->labelSubmittedDenom->setText(s2);
     }
@@ -468,12 +468,12 @@ void OverviewPage::obfuScationStatus()
 
 void OverviewPage::obfuscationAuto()
 {
-    obfuScationPool.DoAutomaticDenominating();
+    obfuscationPool.DoAutomaticDenominating();
 }
 
 void OverviewPage::obfuscationReset()
 {
-    obfuScationPool.Reset();
+    obfuscationPool.Reset();
 
     QMessageBox::warning(this, tr("Obfuscation"),
         tr("Obfuscation was successfully reset."),
@@ -507,7 +507,7 @@ void OverviewPage::toggleObfuscation()
             WalletModel::UnlockContext ctx(walletModel->requestUnlock(false));
             if (!ctx.isValid()) {
                 //unlock was cancelled
-                obfuScationPool.cachedNumBlocks = std::numeric_limits<int>::max();
+                obfuscationPool.cachedNumBlocks = std::numeric_limits<int>::max();
                 QMessageBox::warning(this, tr("Obfuscation"),
                     tr("Wallet is locked and user declined to unlock. Disabling Obfuscation."),
                     QMessageBox::Ok, QMessageBox::Ok);
@@ -518,11 +518,11 @@ void OverviewPage::toggleObfuscation()
     }
 
     fEnableObfuscation = !fEnableObfuscation;
-    obfuScationPool.cachedNumBlocks = std::numeric_limits<int>::max();
+    obfuscationPool.cachedNumBlocks = std::numeric_limits<int>::max();
 
     if (!fEnableObfuscation) {
         ui->toggleObfuscation->setText(tr("Start Obfuscation"));
-        obfuScationPool.UnlockCoins();
+        obfuscationPool.UnlockCoins();
     } else {
         ui->toggleObfuscation->setText(tr("Stop Obfuscation"));
 

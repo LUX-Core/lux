@@ -66,13 +66,13 @@ Value obfuscation(const Array& params, bool fHelp)
 
     if (params[0].get_str() == "auto") {
         if (fMasterNode)
-            return "ObfuScation is not supported from masternodes";
+            return "Obfuscation is not supported from masternodes";
 
-        return "DoAutomaticDenominating " + (obfuScationPool.DoAutomaticDenominating() ? "successful" : ("failed: " + obfuScationPool.GetStatus()));
+        return "DoAutomaticDenominating " + (obfuscationPool.DoAutomaticDenominating() ? "successful" : ("failed: " + obfuscationPool.GetStatus()));
     }
 
     if (params[0].get_str() == "reset") {
-        obfuScationPool.Reset();
+        obfuscationPool.Reset();
         return "successfully reset obfuscation";
     }
 
@@ -110,9 +110,9 @@ Value getpoolinfo(const Array& params, bool fHelp)
 
     Object obj;
     obj.push_back(Pair("current_masternode", mnodeman.GetCurrentMasterNode()->addr.ToString()));
-    obj.push_back(Pair("state", obfuScationPool.GetState()));
-    obj.push_back(Pair("entries", obfuScationPool.GetEntriesCount()));
-    obj.push_back(Pair("entries_accepted", obfuScationPool.GetCountEntriesAccepted()));
+    obj.push_back(Pair("state", obfuscationPool.GetState()));
+    obj.push_back(Pair("entries", obfuscationPool.GetEntriesCount()));
+    obj.push_back(Pair("entries_accepted", obfuscationPool.GetCountEntriesAccepted()));
     return obj;
 }
 

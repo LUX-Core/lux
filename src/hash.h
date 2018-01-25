@@ -272,10 +272,8 @@ void BIP32Hash(const unsigned char chainCode[32], unsigned int nChild, unsigned 
 
 /* ----------- Phi1612 Hash ------------------------------------------------ */
 
-
 template<typename T1>
 inline uint256 Phi1612(const T1 pbegin, const T1 pend)
-
 {
     sph_skein512_context     ctx_skein;
     sph_jh512_context ctx_jh;
@@ -318,6 +316,7 @@ inline uint256 Phi1612(const T1 pbegin, const T1 pend)
 
     return hash[5].trim256();
 }
+
 void scrypt_hash(const char* pass, unsigned int pLen, const char* salt, unsigned int sLen, char* output, unsigned int N, unsigned int r, unsigned int p, unsigned int dkLen);
 
 #endif // BITCOIN_HASH_H

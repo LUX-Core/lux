@@ -38,7 +38,7 @@ public:
     void updateObfuscationProgress();
 
 public slots:
-    void obfuScationStatus();
+    void obfuscationStatus();
     void setBalance(const CAmount& balance, const CAmount& unconfirmedBalance, const CAmount& immatureBalance, const CAmount& anonymizedBalance, const CAmount& watchOnlyBalance, const CAmount& watchUnconfBalance, const CAmount& watchImmatureBalance);
 
 signals:
