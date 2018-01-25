@@ -1387,7 +1387,7 @@ bool AppInit2(boost::thread_group& threadGroup)
             MilliSleep(10);
     }
 
-    // ********************************************************* Step 10: setup ObfuScation
+    // ********************************************************* Step 10: setup Obfuscation
 
     uiInterface.InitMessage(_("Loading masternode cache..."));
 

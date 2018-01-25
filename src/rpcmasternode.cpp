@@ -66,7 +66,7 @@ Value obfuscation(const Array& params, bool fHelp)
 
     if (params[0].get_str() == "auto") {
         if (fMasterNode)
-            return "ObfuScation is not supported from masternodes";
+            return "Obfuscation is not supported from masternodes";
 
         return "DoAutomaticDenominating " + (obfuscationPool.DoAutomaticDenominating() ? "successful" : ("failed: " + obfuscationPool.GetStatus()));
     }
