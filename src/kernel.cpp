@@ -32,7 +32,7 @@ static const int STAKE_TIMESTAMP_MASK = 15;
 // ratio of group interval length between the last group and the first group
 static const int MODIFIER_INTERVAL_RATIO = 3;
 
-static const int LAST_MULTIPLIED_BLOCK = 160*1000; // 160K
+static const int LAST_MULTIPLIED_BLOCK = 180*1000; // 180K
 
 // Modifier interval: time to elapse before new modifier is computed
 // Set to 3-hour for production network and 20-minute for test network
