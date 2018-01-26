@@ -365,7 +365,7 @@ public:
 
     void InitCollateralAddress()
     {
-        SetCollateralAddress(Params().ObfuscationPoolCollateralAddress());
+        SetCollateralAddress(Params().ObfuscationPoolDummyAddress());
     }
 
     void SetMinBlockSpacing(int minBlockSpacingIn)
