@@ -1,4 +1,4 @@
-// Copyright (c) 2009-2010 Satoshi Nakamoto
+// Copyright (c) 2009-2010 Satoshi Nakamoto             -*- c++ -*-
 // Copyright (c) 2009-2014 The Bitcoin developers
 // Copyright (c) 2014-2015 The Dash developers
 // Copyright (c) 2015-2017 The LUX developers
@@ -35,15 +35,15 @@ extern bool fMasterNode;
 extern bool fLiteMode;
 extern bool fEnableSwiftTX;
 extern int nSwiftTXDepth;
-extern int nObfuscationRounds;
+extern int nDarksendRounds;
 extern int nAnonymizeLuxAmount;
 extern int nLiquidityProvider;
-extern bool fEnableObfuscation;
+extern bool fEnableLuxsend;
 extern int64_t enforceMasternodePaymentsTime;
 extern std::string strMasterNodeAddr;
 extern int keysLoaded;
 extern bool fSucessfullyLoaded;
-extern std::vector<int64_t> obfuscationDenominations;
+extern std::vector<int64_t> darkSendDenominations;
 extern std::string strBudgetMode;
 
 extern std::map<std::string, std::string> mapArgs;

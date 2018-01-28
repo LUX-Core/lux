@@ -79,9 +79,9 @@ void ObfuscationConfig::configure(bool enabled, int coins, int rounds)
 {
     QSettings settings;
 
-    settings.setValue("nObfuscationRounds", rounds);
+    settings.setValue("nDarksendRounds", rounds);
     settings.setValue("nAnonymizeLuxAmount", coins);
 
-    nObfuscationRounds = rounds;
+    nDarksendRounds = rounds;
     nAnonymizeLuxAmount = coins;
 }

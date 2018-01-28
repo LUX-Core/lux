@@ -11,12 +11,11 @@
 #include "checkpoints.h"
 #include "coincontrol.h"
 #include "kernel.h"
-#include "masternode-budget.h"
 #include "net.h"
 #include "script/script.h"
 #include "script/sign.h"
 #include "spork.h"
-#include "swifttx.h"
+#include "instantx.h"
 #include "timedata.h"
 #include "util.h"
 #include "utilmoneystr.h"
@@ -423,41 +422,6 @@ void CWallet::AddToSpends(const uint256& wtxid)
 
     BOOST_FOREACH (const CTxIn& txin, thisTx.vin)
         AddToSpends(txin.prevout, wtxid);
-}
-
-bool CWallet::GetMasternodeVinAndKeys(CTxIn& txinRet, CPubKey& pubKeyRet, CKey& keyRet, std::string strTxHash, std::string strOutputIndex)
-{
-    // wait for reindex and/or import to finish
-    if (fImporting || fReindex) return false;
-
-    // Find possible candidates
-    std::vector<COutput> vPossibleCoins;
-    AvailableCoins(vPossibleCoins, true, NULL, false, ONLY_10000);
-    if (vPossibleCoins.empty()) {
-        LogPrintf("CWallet::GetMasternodeVinAndKeys -- Could not locate any valid masternode vin\n");
-        return false;
-    }
-
-    if (strTxHash.empty()) // No output specified, select the first one
-        return GetVinAndKeysFromOutput(vPossibleCoins[0], txinRet, pubKeyRet, keyRet);
-
-    // Find specific vin
-    uint256 txHash = uint256S(strTxHash);
-
-    int nOutputIndex;
-    try {
-        nOutputIndex = std::stoi(strOutputIndex.c_str());
-    } catch (const std::exception& e) {
-        LogPrintf("%s: %s on strOutputIndex\n", __func__, e.what());
-        return false;
-    }
-
-    BOOST_FOREACH (COutput& out, vPossibleCoins)
-        if (out.tx->GetHash() == txHash && out.i == nOutputIndex) // found it!
-            return GetVinAndKeysFromOutput(out, txinRet, pubKeyRet, keyRet);
-
-    LogPrintf("CWallet::GetMasternodeVinAndKeys -- Could not locate specified masternode vin\n");
-    return false;
 }
 
 bool CWallet::GetVinAndKeysFromOutput(COutput out, CTxIn& txinRet, CPubKey& pubKeyRet, CKey& keyRet)
@@ -889,7 +853,7 @@ int CWallet::GetInputObfuscationRounds(CTxIn in) const
 {
     LOCK(cs_wallet);
     int realObfuscationRounds = GetRealInputObfuscationRounds(in, 0);
-    return realObfuscationRounds > nObfuscationRounds ? nObfuscationRounds : realObfuscationRounds;
+    return realObfuscationRounds > nDarksendRounds ? nDarksendRounds : realObfuscationRounds;
 }
 
 bool CWallet::IsDenominated(const CTxIn& txin) const
@@ -922,7 +886,7 @@ bool CWallet::IsDenominated(const CTransaction& tx) const
 
 bool CWallet::IsDenominatedAmount(int64_t nInputAmount) const
 {
-    BOOST_FOREACH (int64_t d, obfuscationDenominations)
+    BOOST_FOREACH (int64_t d, darkSendDenominations)
         if (nInputAmount == d)
             return true;
     return false;
@@ -1326,7 +1290,7 @@ CAmount CWallet::GetNormalizedAnonymizedBalance() const
                 if (pcoin->GetDepthInMainChain() < 0) continue;
 
                 int rounds = GetInputObfuscationRounds(vin);
-                nTotal += pcoin->vout[i].nValue * rounds / nObfuscationRounds;
+                nTotal += pcoin->vout[i].nValue * rounds / nDarksendRounds;
             }
         }
     }
@@ -1345,6 +1309,41 @@ CAmount CWallet::GetDenominatedBalance(bool unconfirmed) const
             const CWalletTx* pcoin = &(*it).second;
 
             nTotal += pcoin->GetDenominatedCredit(unconfirmed);
+        }
+    }
+
+    return nTotal;
+}
+
+CAmount CWallet::GetDenominatedBalance(bool onlyDenom, bool onlyUnconfirmed) const 
+{
+    int64_t nTotal = 0;
+    {
+        LOCK(cs_wallet);
+        for (map<uint256, CWalletTx>::const_iterator it = mapWallet.begin(); it != mapWallet.end(); ++it) {
+            const CWalletTx* pcoin = &(*it).second;
+
+            int nDepth = pcoin->GetDepthInMainChain();
+
+            // skip conflicted
+            if(nDepth < 0) continue;
+
+            bool unconfirmed = (!IsFinalTx(*pcoin) || (!pcoin->IsTrusted() && nDepth == 0));
+            if(onlyUnconfirmed != unconfirmed) continue;
+
+            for (unsigned int i = 0; i < pcoin->vout.size(); i++) {
+                //isminetype mine = IsMine(pcoin->vout[i]);
+                bool mine = IsMine(pcoin->vout[i]);
+                //COutput out = COutput(pcoin, i, nDepth, (mine & ISMINE_SPENDABLE) != ISMINE_NO);
+                COutput out = COutput(pcoin, i, nDepth, mine);
+
+                if(IsSpent(out.tx->GetHash(), i)) continue;
+//                if(pcoin->IsSpent(i)) continue;
+                if(!IsMine(pcoin->vout[i])) continue;
+                if(onlyDenom != IsDenominatedAmount(pcoin->vout[i].nValue)) continue;
+
+                nTotal += pcoin->vout[i].nValue;
+            }
         }
     }
 
@@ -1455,28 +1454,80 @@ void CWallet::AvailableCoins(vector<COutput>& vCoins, bool fOnlyConfirmed, const
             for (unsigned int i = 0; i < pcoin->vout.size(); i++) {
                 bool found = false;
                 if (nCoinType == ONLY_DENOMINATED) {
+                    //should make this a vector
                     found = IsDenominatedAmount(pcoin->vout[i].nValue);
-                } else if (nCoinType == ONLY_NOT10000IFMN) {
-                    found = !(fMasterNode && pcoin->vout[i].nValue == 16120 * COIN);
-                } else if (nCoinType == ONLY_NONDENOMINATED_NOT10000IFMN) {
+                } else if (nCoinType == ONLY_NONDENOMINATED || nCoinType == ONLY_NONDENOMINATED_NOTMN) {
+                    found = true;
                     if (IsCollateralAmount(pcoin->vout[i].nValue)) continue; // do not use collateral amounts
                     found = !IsDenominatedAmount(pcoin->vout[i].nValue);
-                    if (found && fMasterNode) found = pcoin->vout[i].nValue != 16120 * COIN; // do not use Hot MN funds
-                } else if (nCoinType == ONLY_10000) {
-                    found = pcoin->vout[i].nValue == 16120 * COIN;
+                    if (found && nCoinType == ONLY_NONDENOMINATED_NOTMN) found = (pcoin->vout[i].nValue != GetMNCollateral(chainActive.Tip()->nHeight) * COIN); // do not use Hot MN funds
                 } else {
                     found = true;
                 }
                 if (!found) continue;
 
                 isminetype mine = IsMine(pcoin->vout[i]);
-                if (!(IsSpent(wtxid, i)) && mine != ISMINE_NO &&
-                    (!IsLockedCoin((*it).first, i) || nCoinType == ONLY_10000) &&
-                    (pcoin->vout[i].nValue > 0 || fIncludeZeroValue) &&
-                    (!coinControl || !coinControl->HasSelected() || coinControl->fAllowOtherInputs || coinControl->IsSelected((*it).first, i)))
-                    vCoins.push_back(COutput(pcoin, i, nDepth,
-                        ((mine & ISMINE_SPENDABLE) != ISMINE_NO) ||
-                            (coinControl && coinControl->fAllowWatchOnly && (mine & ISMINE_WATCH_SOLVABLE) != ISMINE_NO)));
+                if (!(IsSpent(wtxid, i)) && mine &&
+                    !IsLockedCoin((*it).first, i) && pcoin->vout[i].nValue > 0 &&
+                    (!coinControl || !coinControl->HasSelected() || coinControl->IsSelected((*it).first, i)))
+                    vCoins.push_back(COutput(pcoin, i, nDepth, mine));
+            }
+        }
+    }
+}
+
+void CWallet::AvailableCoinsMN(vector<COutput>& vCoins, bool fOnlyConfirmed, const CCoinControl *coinControl, AvailableCoinsType coin_type, bool useIX) const
+{
+    vCoins.clear();
+
+    {
+        LOCK2(cs_main, cs_wallet);
+        for (map<uint256, CWalletTx>::const_iterator it = mapWallet.begin(); it != mapWallet.end(); ++it) {
+            const uint256& wtxid = it->first;
+            const CWalletTx* pcoin = &(*it).second;
+
+            if (!IsFinalTx(*pcoin))
+                continue;
+
+            if (fOnlyConfirmed && !pcoin->IsTrusted())
+                continue;
+
+            if (pcoin->IsCoinBase() && pcoin->GetBlocksToMaturity() > 0)
+                continue;
+
+            if(pcoin->IsCoinStake() && pcoin->GetBlocksToMaturity() > 0)
+                continue;
+
+            int nDepth = pcoin->GetDepthInMainChain();
+            if (nDepth <= 0) // LuxNOTE: coincontrol fix / ignore 0 confirm
+                continue;
+
+            // do not use IX for inputs that have less then 6 blockchain confirmations
+            if (useIX && nDepth < 6)
+                continue;
+
+            for (unsigned int i = 0; i < pcoin->vout.size(); i++) {
+                bool found = false;
+                if(coin_type == ONLY_DENOMINATED) {
+                    //should make this a vector
+
+                    found = IsDenominatedAmount(pcoin->vout[i].nValue);
+                } else if(coin_type == ONLY_NONDENOMINATED || coin_type == ONLY_NONDENOMINATED_NOTMN) {
+                    found = true;
+                    if (IsCollateralAmount(pcoin->vout[i].nValue)) continue; // do not use collateral amounts
+                    found = !IsDenominatedAmount(pcoin->vout[i].nValue);
+                    if(found && coin_type == ONLY_NONDENOMINATED_NOTMN) found = (pcoin->vout[i].nValue != GetMNCollateral(chainActive.Tip()->nHeight)*COIN); // do not use MN funds
+                } else {
+                    found = true;
+                }
+                if(!found) continue;
+
+                bool mine = IsMine(pcoin->vout[i]);
+
+                if (!(IsSpent(wtxid, i)) &&
+                    !IsLockedCoin((*it).first, i) && pcoin->vout[i].nValue > 0 &&
+                    (!coinControl || !coinControl->HasSelected() || coinControl->IsSelected((*it).first, i)))
+                    vCoins.push_back(COutput(pcoin, i, nDepth, mine));
             }
         }
     }
@@ -1551,7 +1602,7 @@ bool less_then_denom(const COutput& out1, const COutput& out2)
 
     bool found1 = false;
     bool found2 = false;
-    BOOST_FOREACH (int64_t d, obfuscationDenominations) // loop through predefined denoms
+    BOOST_FOREACH (int64_t d, darkSendDenominations) // loop through predefined denoms
     {
         if (pcoin1->vout[out1.i].nValue == d) found1 = true;
         if (pcoin2->vout[out2.i].nValue == d) found2 = true;
@@ -1728,7 +1779,7 @@ bool CWallet::SelectCoins(const CAmount& nTargetValue, set<pair<const CWalletTx*
                 CTxIn vin = CTxIn(out.tx->GetHash(), out.i);
                 int rounds = GetInputObfuscationRounds(vin);
                 // make sure it's actually anonymized
-                if (rounds < nObfuscationRounds) continue;
+                if (rounds < nDarksendRounds) continue;
             }
 
             nValueRet += out.tx->vout[out.i].nValue;
@@ -1740,7 +1791,7 @@ bool CWallet::SelectCoins(const CAmount& nTargetValue, set<pair<const CWalletTx*
     //if we're doing only denominated, we need to round up to the nearest .1 LUX
     if (coin_type == ONLY_DENOMINATED) {
         // Make outputs by looping through denominations, from large to small
-        BOOST_FOREACH (int64_t v, obfuscationDenominations) {
+        BOOST_FOREACH (int64_t v, darkSendDenominations) {
             BOOST_FOREACH (const COutput& out, vCoins) {
                 if (out.tx->vout[out.i].nValue == v                                               //make sure it's the denom we're looking for
                     && nValueRet + out.tx->vout[out.i].nValue < nTargetValue + (0.1 * COIN) + 100 //round the amount up to .1 LUX over
@@ -1748,7 +1799,7 @@ bool CWallet::SelectCoins(const CAmount& nTargetValue, set<pair<const CWalletTx*
                     CTxIn vin = CTxIn(out.tx->GetHash(), out.i);
                     int rounds = GetInputObfuscationRounds(vin);
                     // make sure it's actually anonymized
-                    if (rounds < nObfuscationRounds) continue;
+                    if (rounds < nDarksendRounds) continue;
                     nValueRet += out.tx->vout[out.i].nValue;
                     setCoinsRet.insert(make_pair(out.tx, out.i));
                 }
@@ -1770,7 +1821,7 @@ struct CompareByPriority {
     }
 };
 
-bool CWallet::SelectCoinsByDenominations(int nDenom, int64_t nValueMin, int64_t nValueMax, std::vector<CTxIn>& vCoinsRet, std::vector<COutput>& vCoinsRet2, int64_t& nValueRet, int nObfuscationRoundsMin, int nObfuscationRoundsMax)
+bool CWallet::SelectCoinsByDenominations(int nDenom, int64_t nValueMin, int64_t nValueMax, std::vector<CTxIn>& vCoinsRet, std::vector<COutput>& vCoinsRet2, int64_t& nValueRet, int nDarksendRoundsMin, int nDarksendRoundsMax)
 {
     vCoinsRet.clear();
     nValueRet = 0;
@@ -1815,8 +1866,8 @@ bool CWallet::SelectCoinsByDenominations(int nDenom, int64_t nValueMin, int64_t 
             CTxIn vin = CTxIn(out.tx->GetHash(), out.i);
 
             int rounds = GetInputObfuscationRounds(vin);
-            if (rounds >= nObfuscationRoundsMax) continue;
-            if (rounds < nObfuscationRoundsMin) continue;
+            if (rounds >= nDarksendRoundsMax) continue;
+            if (rounds < nDarksendRoundsMin) continue;
 
             if (fFound10000 && fFound1000 && fFound100 && fFound10 && fFound1 && fFoundDot1) { //if fulfilled
                 //we can return this for submission
@@ -1875,7 +1926,7 @@ bool CWallet::SelectCoinsByDenominations(int nDenom, int64_t nValueMin, int64_t 
     return (nValueRet >= nValueMin && fFound10000 && fFound1000 && fFound100 && fFound10 && fFound1 && fFoundDot1);
 }
 
-bool CWallet::SelectCoinsDark(CAmount nValueMin, CAmount nValueMax, std::vector<CTxIn>& setCoinsRet, CAmount& nValueRet, int nObfuscationRoundsMin, int nObfuscationRoundsMax) const
+bool CWallet::SelectCoinsDark(CAmount nValueMin, CAmount nValueMax, std::vector<CTxIn>& setCoinsRet, CAmount& nValueRet, int nDarksendRoundsMin, int nDarksendRoundsMax) const
 {
     CCoinControl* coinControl = NULL;
 
@@ -1883,26 +1934,25 @@ bool CWallet::SelectCoinsDark(CAmount nValueMin, CAmount nValueMax, std::vector<
     nValueRet = 0;
 
     vector<COutput> vCoins;
-    AvailableCoins(vCoins, true, coinControl, nObfuscationRoundsMin < 0 ? ONLY_NONDENOMINATED_NOT10000IFMN : ONLY_DENOMINATED);
+    AvailableCoins(vCoins, true, coinControl, nDarksendRoundsMin < 0 ? ONLY_NONDENOMINATED_NOTMN : ONLY_DENOMINATED);
 
     set<pair<const CWalletTx*, unsigned int> > setCoinsRet2;
 
     //order the array so largest nondenom are first, then denominations, then very small inputs.
     sort(vCoins.rbegin(), vCoins.rend(), CompareByPriority());
 
+    //the first thing we get is a fee input, then we'll use as many denominated as possible. then the rest
     BOOST_FOREACH (const COutput& out, vCoins) {
-        //do not allow inputs less than 1 CENT
-        if (out.tx->vout[out.i].nValue < CENT) continue;
-        //do not allow collaterals to be selected
-        if (IsCollateralAmount(out.tx->vout[out.i].nValue)) continue;
-        if (fMasterNode && out.tx->vout[out.i].nValue == 10000 * COIN) continue; //masternode input
+        //there's no reason to allow inputs less than 1 COIN into DS (other than denominations smaller than that amount)
+        if (out.tx->vout[out.i].nValue < 1*COIN && out.tx->vout[out.i].nValue != (.1*COIN)+100) continue;
+        if (fMasterNode && out.tx->vout[out.i].nValue == GetMNCollateral(chainActive.Tip()->nHeight)*COIN) continue; //masternode input
 
         if (nValueRet + out.tx->vout[out.i].nValue <= nValueMax) {
             CTxIn vin = CTxIn(out.tx->GetHash(), out.i);
 
-            int rounds = GetInputObfuscationRounds(vin);
-            if (rounds >= nObfuscationRoundsMax) continue;
-            if (rounds < nObfuscationRoundsMin) continue;
+            int rounds = GetInputLuxsendRounds(vin);
+            if (rounds >= nDarksendRoundsMax) continue;
+            if (rounds < nDarksendRoundsMin) continue;
 
             vin.prevPubKey = out.tx->vout[out.i].scriptPubKey; // the inputs PubKey
             nValueRet += out.tx->vout[out.i].nValue;
@@ -1985,7 +2035,11 @@ bool CWallet::HasCollateralInputs(bool fOnlyConfirmed) const
 
 bool CWallet::IsCollateralAmount(int64_t nInputAmount) const
 {
-    return nInputAmount != 0 && nInputAmount % OBFUSCATION_COLLATERAL == 0 && nInputAmount < OBFUSCATION_COLLATERAL * 5 && nInputAmount > OBFUSCATION_COLLATERAL;
+    return  nInputAmount == (DARKSEND_COLLATERAL * 5)+DARKSEND_FEE ||
+            nInputAmount == (DARKSEND_COLLATERAL * 4)+DARKSEND_FEE ||
+            nInputAmount == (DARKSEND_COLLATERAL * 3)+DARKSEND_FEE ||
+            nInputAmount == (DARKSEND_COLLATERAL * 2)+DARKSEND_FEE ||
+            nInputAmount == (DARKSEND_COLLATERAL * 1)+DARKSEND_FEE;
 }
 
 bool CWallet::CreateCollateralTransaction(CMutableTransaction& txCollateral, std::string& strReason)
@@ -2018,9 +2072,9 @@ bool CWallet::CreateCollateralTransaction(CMutableTransaction& txCollateral, std
     BOOST_FOREACH (CTxIn v, vCoinsCollateral)
         txCollateral.vin.push_back(v);
 
-    if (nValueIn2 - OBFUSCATION_COLLATERAL - nFeeRet > 0) {
+    if (nValueIn2 - DARKSEND_COLLATERAL - nFeeRet > 0) {
         //pay collateral charge in fees
-        CTxOut vout3 = CTxOut(nValueIn2 - OBFUSCATION_COLLATERAL, scriptChange);
+        CTxOut vout3 = CTxOut(nValueIn2 - DARKSEND_COLLATERAL, scriptChange);
         txCollateral.vout.push_back(vout3);
     }
 
@@ -2038,40 +2092,6 @@ bool CWallet::CreateCollateralTransaction(CMutableTransaction& txCollateral, std
 
     return true;
 }
-
-bool CWallet::GetBudgetSystemCollateralTX(CTransaction& tx, uint256 hash, bool useIX)
-{
-    CWalletTx wtx;
-    if (GetBudgetSystemCollateralTX(wtx, hash, useIX)) {
-        tx = (CTransaction)wtx;
-        return true;
-    }
-    return false;
-}
-
-bool CWallet::GetBudgetSystemCollateralTX(CWalletTx& tx, uint256 hash, bool useIX)
-{
-    // make our change address
-    CReserveKey reservekey(pwalletMain);
-
-    CScript scriptChange;
-    scriptChange << OP_RETURN << ToByteVector(hash);
-
-    int64_t nFeeRet = 0;
-    std::string strFail = "";
-    vector<pair<CScript, int64_t> > vecSend;
-    vecSend.push_back(make_pair(scriptChange, BUDGET_FEE_TX));
-
-    CCoinControl* coinControl = NULL;
-    bool success = CreateTransaction(vecSend, tx, reservekey, nFeeRet, strFail, coinControl, ALL_COINS, useIX, (CAmount)0);
-    if (!success) {
-        LogPrintf("GetBudgetSystemCollateralTX: Error - %s\n", strFail);
-        return false;
-    }
-
-    return true;
-}
-
 
 bool CWallet::ConvertList(std::vector<CTxIn> vCoins, std::vector<int64_t>& vecAmounts)
 {
@@ -2168,9 +2188,9 @@ bool CWallet::CreateTransaction(const vector<pair<CScript, CAmount> >& vecSend,
                 if (!SelectCoins(nTotalValue, setCoins, nValueIn, coinControl, coin_type, useIX)) {
                     if (coin_type == ALL_COINS) {
                         strFailReason = _("Insufficient funds.");
-                    } else if (coin_type == ONLY_NOT10000IFMN) {
+                    } else if (coin_type == ONLY_NONDENOMINATED) {
                         strFailReason = _("Unable to locate enough funds for this transaction that are not equal 10000 LUX.");
-                    } else if (coin_type == ONLY_NONDENOMINATED_NOT10000IFMN) {
+                    } else if (coin_type == ONLY_NONDENOMINATED_NOTMN) {
                         strFailReason = _("Unable to locate enough Obfuscation non-denominated funds for this transaction that are not equal 10000 LUX.");
                     } else {
                         strFailReason = _("Unable to locate enough Obfuscation denominated funds for this transaction.");
@@ -2178,7 +2198,7 @@ bool CWallet::CreateTransaction(const vector<pair<CScript, CAmount> >& vecSend,
                     }
 
                     if (useIX) {
-                        strFailReason += " " + _("SwiftTX requires inputs with at least 6 confirmations, you might need to wait a few minutes and try again.");
+                        strFailReason += " " + _("InstantX requires inputs with at least 6 confirmations, you might need to wait a few minutes and try again.");
                     }
 
                     return false;
@@ -2480,7 +2500,69 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
     }
 
     //Masternode payment
-    FillBlockPayee(txNew, nMinFee, true);
+    int payments = 1;
+
+    // start masternode payments
+    bool bMasterNodePayment = true; // note was false, set true to test
+
+    if (Params().NetworkID() == CBaseChainParams::TESTNET) {
+        if (GetTime() > START_MASTERNODE_PAYMENTS_TESTNET) {
+            bMasterNodePayment = true;
+        }
+    } else {
+        if (GetTime() > START_MASTERNODE_PAYMENTS) {
+            bMasterNodePayment = true;
+        }
+    }
+
+    CScript payee;
+    bool hasPayment = true;
+    if (bMasterNodePayment) {
+        //spork
+        if (!masternodePayments.GetBlockPayee(chainActive.Tip()->nHeight+1, payee)) {
+            int winningNode = GetCurrentMasterNode(1);
+                if (winningNode >= 0) {
+                    payee =GetScriptForDestination(vecMasternodes[winningNode].pubkey.GetID());
+                } else {
+                    LogPrintf("CreateCoinStake: Failed to detect masternode to pay\n");
+                    hasPayment = false;
+                }
+        }
+    }
+
+    if (hasPayment) {
+        payments = txNew.vout.size() + 1;
+        txNew.vout.resize(payments);
+
+        txNew.vout[payments-1].scriptPubKey = payee;
+        txNew.vout[payments-1].nValue = 0;
+
+        CTxDestination address1;
+        ExtractDestination(payee, address1);
+        CBitcoinAddress address2(address1);
+
+        LogPrintf("Masternode payment to %s\n", address2.ToString().c_str());
+    }
+
+    int64_t blockValue = nCredit;
+    int64_t masternodePayment = GetMasternodePayment(chainActive.Tip()->nHeight+1, nReward);
+
+    // Set output amount
+    if (!hasPayment && txNew.vout.size() == 3) { // 2 stake outputs, stake was split, no masternode payment
+        txNew.vout[1].nValue = (blockValue / 2 / CENT) * CENT;
+        txNew.vout[2].nValue = blockValue - txNew.vout[1].nValue;
+    } else if (hasPayment && txNew.vout.size() == 4) { // 2 stake outputs, stake was split, plus a masternode payment
+        txNew.vout[payments-1].nValue = masternodePayment;
+        blockValue -= masternodePayment;
+        txNew.vout[1].nValue = (blockValue / 2 / CENT) * CENT;
+        txNew.vout[2].nValue = blockValue - txNew.vout[1].nValue;
+    } else if (!hasPayment && txNew.vout.size() == 2) { // only 1 stake output, was not split, no masternode payment
+        txNew.vout[1].nValue = blockValue;
+    } else if (hasPayment && txNew.vout.size() == 3) { // only 1 stake output, was not split, plus a masternode payment
+        txNew.vout[payments-1].nValue = masternodePayment;
+        blockValue -= masternodePayment;
+        txNew.vout[1].nValue = blockValue;
+    }
 
     // Sign
     int nIn = 0;
@@ -2584,133 +2666,147 @@ int64_t CWallet::GetTotalValue(std::vector<CTxIn> vCoins)
     return nTotalValue;
 }
 
-string CWallet::PrepareObfuscationDenominate(int minRounds, int maxRounds)
+std::string CWallet::PrepareLuxsendDenominate(int minRounds, int maxRounds)
 {
     if (IsLocked())
         return _("Error: Wallet locked, unable to create transaction!");
 
-    if (obfuscationPool.GetState() != POOL_STATUS_ERROR && obfuscationPool.GetState() != POOL_STATUS_SUCCESS)
-        if (obfuscationPool.GetEntriesCount() > 0)
-            return _("Error: You already have pending entries in the Obfuscation pool");
+    if(darkSendPool.GetState() != POOL_STATUS_ERROR && darkSendPool.GetState() != POOL_STATUS_SUCCESS)
+        if(darkSendPool.GetMyTransactionCount() > 0)
+            return _("Error: You already have pending entries in the Luxsend pool");
 
     // ** find the coins we'll use
     std::vector<CTxIn> vCoins;
-    std::vector<CTxIn> vCoinsResult;
     std::vector<COutput> vCoins2;
     int64_t nValueIn = 0;
     CReserveKey reservekey(this);
 
     /*
         Select the coins we'll use
-
         if minRounds >= 0 it means only denominated inputs are going in and coming out
     */
-    if (minRounds >= 0) {
-        if (!SelectCoinsByDenominations(obfuscationPool.sessionDenom, 0.1 * COIN, OBFUSCATION_POOL_MAX, vCoins, vCoins2, nValueIn, minRounds, maxRounds))
-            return _("Error: Can't select current denominated inputs");
+    if(minRounds >= 0){
+        if (!SelectCoinsByDenominations(darkSendPool.sessionDenom, 0.1*COIN, DARKSEND_POOL_MAX, vCoins, vCoins2, nValueIn, minRounds, maxRounds))
+            return _("Insufficient funds");
     }
 
-    LogPrintf("PrepareObfuscationDenominate - preparing obfuscation denominate . Got: %d \n", nValueIn);
+    // calculate total value out
+    int64_t nTotalValue = GetTotalValue(vCoins);
+    LogPrintf("PrepareLuxsendDenominate - preparing darksend denominate . Got: %d \n", nTotalValue);
 
-    {
-        LOCK(cs_wallet);
-        BOOST_FOREACH (CTxIn v, vCoins)
-            LockCoin(v.prevout);
-    }
+    //--------------
+    BOOST_FOREACH(CTxIn v, vCoins)
+                    LockCoin(v.prevout);
 
-    int64_t nValueLeft = nValueIn;
+    // denominate our funds
+    int64_t nValueLeft = nTotalValue;
     std::vector<CTxOut> vOut;
+    std::vector<int64_t> vDenoms;
 
     /*
         TODO: Front load with needed denominations (e.g. .1, 1 )
     */
 
-    // Make outputs by looping through denominations: try to add every needed denomination, repeat up to 5-10 times.
-    // This way we can be pretty sure that it should have at least one of each needed denomination.
-    // NOTE: No need to randomize order of inputs because they were
-    // initially shuffled in CWallet::SelectCoinsByDenominations already.
-    int nStep = 0;
-    int nStepsMax = 5 + GetRandInt(5);
-    while (nStep < nStepsMax) {
-        BOOST_FOREACH (int64_t v, obfuscationDenominations) {
-            // only use the ones that are approved
-            bool fAccepted = false;
-            if ((obfuscationPool.sessionDenom & (1 << 0)) && v == ((10000 * COIN) + 10000000)) {
-                fAccepted = true;
-            } else if ((obfuscationPool.sessionDenom & (1 << 1)) && v == ((1000 * COIN) + 1000000)) {
-                fAccepted = true;
-            } else if ((obfuscationPool.sessionDenom & (1 << 2)) && v == ((100 * COIN) + 100000)) {
-                fAccepted = true;
-            } else if ((obfuscationPool.sessionDenom & (1 << 3)) && v == ((10 * COIN) + 10000)) {
-                fAccepted = true;
-            } else if ((obfuscationPool.sessionDenom & (1 << 4)) && v == ((1 * COIN) + 1000)) {
-                fAccepted = true;
-            } else if ((obfuscationPool.sessionDenom & (1 << 5)) && v == ((.1 * COIN) + 100)) {
-                fAccepted = true;
-            }
-            if (!fAccepted) continue;
+    /*
+        Add all denominations once
+        The beginning of the list is front loaded with each possible
+        denomination in random order. This means we'll at least get 1
+        of each that is required as outputs.
+    */
+    BOOST_FOREACH(int64_t d, darkSendDenominations){
+                    vDenoms.push_back(d);
+                    vDenoms.push_back(d);
+                }
 
-            // try to add it
-            if (nValueLeft - v >= 0) {
-                // Note: this relies on a fact that both vectors MUST have same size
-                std::vector<CTxIn>::iterator it = vCoins.begin();
-                std::vector<COutput>::iterator it2 = vCoins2.begin();
-                while (it2 != vCoins2.end()) {
-                    // we have matching inputs
-                    if ((*it2).tx->vout[(*it2).i].nValue == v) {
-                        // add new input in resulting vector
-                        vCoinsResult.push_back(*it);
-                        // remove corresponting items from initial vectors
-                        vCoins.erase(it);
-                        vCoins2.erase(it2);
+    //randomize the order of these denominations
+    std::random_shuffle (vDenoms.begin(), vDenoms.end());
 
+    /*
+        Build a long list of denominations
+        Next we'll build a long random list of denominations to add.
+        Eventually as the algorithm goes through these it'll find the ones
+        it nees to get exact change.
+    */
+    for(int i = 0; i <= 500; i++)
+        BOOST_FOREACH(int64_t d, darkSendDenominations)
+                        vDenoms.push_back(d);
+
+    //randomize the order of inputs we get back
+    std::random_shuffle (vDenoms.begin() + (int)darkSendDenominations.size() + 1, vDenoms.end());
+
+    // Make outputs by looping through denominations randomly
+    BOOST_REVERSE_FOREACH(int64_t v, vDenoms){
+                    //only use the ones that are approved
+                    bool fAccepted = false;
+                    if((darkSendPool.sessionDenom & (1 << 0))      && v == ((100000*COIN) +100000000)) {fAccepted = true;}
+                    else if((darkSendPool.sessionDenom & (1 << 1)) && v == ((10000*COIN)  +10000000)) {fAccepted = true;}
+                    else if((darkSendPool.sessionDenom & (1 << 2)) && v == ((1000*COIN)   +1000000)) {fAccepted = true;}
+                    else if((darkSendPool.sessionDenom & (1 << 3)) && v == ((100*COIN)    +100000)) {fAccepted = true;}
+                    else if((darkSendPool.sessionDenom & (1 << 4)) && v == ((10*COIN)     +10000)) {fAccepted = true;}
+                    else if((darkSendPool.sessionDenom & (1 << 5)) && v == ((1*COIN)      +1000)) {fAccepted = true;}
+                    else if((darkSendPool.sessionDenom & (1 << 6)) && v == ((.1*COIN)     +100)) {fAccepted = true;}
+                    if(!fAccepted) continue;
+
+                    int nOutputs = 0;
+
+                    // add each output up to 10 times until it can't be added again
+                    if(nValueLeft - v >= 0 && nOutputs <= 10) {
                         CScript scriptChange;
                         CPubKey vchPubKey;
-                        // use a unique change address
+                        //use a unique change address
                         assert(reservekey.GetReservedKey(vchPubKey)); // should never fail, as we just unlocked
-                        scriptChange = GetScriptForDestination(vchPubKey.GetID());
+                        scriptChange =GetScriptForDestination(vchPubKey.GetID());
                         reservekey.KeepKey();
 
-                        // add new output
                         CTxOut o(v, scriptChange);
                         vOut.push_back(o);
 
-                        // subtract denomination amount
+                        //increment outputs and subtract denomination amount
+                        nOutputs++;
                         nValueLeft -= v;
-
-                        break;
                     }
-                    ++it;
-                    ++it2;
+
+                    if(nValueLeft == 0) break;
                 }
-            }
-        }
 
-        nStep++;
+    //back up mode , incase we couldn't successfully make the outputs for some reason
+    if(vOut.size() > 40 || darkSendPool.GetDenominations(vOut) != darkSendPool.sessionDenom || nValueLeft != 0){
+        vOut.clear();
+        nValueLeft = nTotalValue;
 
-        if (nValueLeft == 0) break;
+        // Make outputs by looping through denominations, from small to large
+
+        BOOST_FOREACH(const COutput& out, vCoins2){
+                        CScript scriptChange;
+                        CPubKey vchPubKey;
+                        //use a unique change address
+                        assert(reservekey.GetReservedKey(vchPubKey)); // should never fail, as we just unlocked
+                        scriptChange =GetScriptForDestination(vchPubKey.GetID());
+                        reservekey.KeepKey();
+
+                        CTxOut o(out.tx->vout[out.i].nValue, scriptChange);
+                        vOut.push_back(o);
+
+                        //increment outputs and subtract denomination amount
+                        nValueLeft -= out.tx->vout[out.i].nValue;
+
+                        if(nValueLeft == 0) break;
+                    }
+
     }
 
-    {
-        // unlock unused coins
-        LOCK(cs_wallet);
-        BOOST_FOREACH (CTxIn v, vCoins)
-            UnlockCoin(v.prevout);
-    }
-
-    if (obfuscationPool.GetDenominations(vOut) != obfuscationPool.sessionDenom) {
-        // unlock used coins on failure
-        LOCK(cs_wallet);
-        BOOST_FOREACH (CTxIn v, vCoinsResult)
-            UnlockCoin(v.prevout);
+    if(darkSendPool.GetDenominations(vOut) != darkSendPool.sessionDenom)
         return "Error: can't make current denominated outputs";
-    }
 
-    // randomize the output order
-    std::random_shuffle(vOut.begin(), vOut.end());
+    // we don't support change at all
+    if(nValueLeft != 0)
+        return "Error: change left-over in pool. Must use denominations only";
 
-    // We also do not care about full amount as long as we have right denominations, just pass what we found
-    obfuscationPool.SendObfuscationDenominate(vCoinsResult, vOut, nValueIn - nValueLeft);
+
+    //randomize the output order
+    std::random_shuffle (vOut.begin(), vOut.end());
+
+    darkSendPool.SendLuxsendDenominate(vCoins, vOut, nValueIn);
 
     return "";
 }
@@ -3587,7 +3683,7 @@ int CMerkleTx::GetDepthInMainChain(const CBlockIndex*& pindexRet, bool enableIX)
     if (enableIX) {
         if (nResult < 6) {
             int signatures = GetTransactionLockSignatures();
-            if (signatures >= SWIFTTX_SIGNATURES_REQUIRED) {
+            if (signatures >= INSTANTX_SIGNATURES_REQUIRED) {
                 return nSwiftTXDepth + nResult;
             }
         }
@@ -3612,8 +3708,8 @@ bool CMerkleTx::AcceptToMemoryPool(bool fLimitFree, bool fRejectInsaneFee, bool 
 
 int CMerkleTx::GetTransactionLockSignatures() const
 {
-    if (fLargeWorkForkFound || fLargeWorkInvalidChainFound) return -2;
-    if (!IsSporkActive(SPORK_2_SWIFTTX)) return -3;
+    //if (fLargeWorkForkFound || fLargeWorkInvalidChainFound) return -2;
+    if (!IsSporkActive(SPORK_1_MASTERNODE_PAYMENTS_ENFORCEMENT)) return -3;
     if (!fEnableSwiftTX) return -1;
 
     //compile consessus vote

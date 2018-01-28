@@ -9,7 +9,6 @@
 #include "clientversion.h"
 #include "init.h"
 #include "main.h"
-#include "masternode-sync.h"
 #include "net.h"
 #include "netbase.h"
 #include "rpcserver.h"
@@ -115,46 +114,6 @@ Value getinfo(const Array& params, bool fHelp)
     return obj;
 }
 
-Value mnsync(const Array& params, bool fHelp)
-{
-    if (fHelp || params.size() != 1)
-        throw runtime_error(
-            "mnsync [status|reset]\n"
-            "Returns the sync status or resets sync.\n");
-
-    std::string strMode = params[0].get_str();
-
-    if (strMode == "status") {
-        Object obj;
-
-        obj.push_back(Pair("IsBlockchainSynced", masternodeSync.IsBlockchainSynced()));
-        obj.push_back(Pair("lastMasternodeList", masternodeSync.lastMasternodeList));
-        obj.push_back(Pair("lastMasternodeWinner", masternodeSync.lastMasternodeWinner));
-        obj.push_back(Pair("lastBudgetItem", masternodeSync.lastBudgetItem));
-        obj.push_back(Pair("lastFailure", masternodeSync.lastFailure));
-        obj.push_back(Pair("nCountFailures", masternodeSync.nCountFailures));
-        obj.push_back(Pair("sumMasternodeList", masternodeSync.sumMasternodeList));
-        obj.push_back(Pair("sumMasternodeWinner", masternodeSync.sumMasternodeWinner));
-        obj.push_back(Pair("sumBudgetItemProp", masternodeSync.sumBudgetItemProp));
-        obj.push_back(Pair("sumBudgetItemFin", masternodeSync.sumBudgetItemFin));
-        obj.push_back(Pair("countMasternodeList", masternodeSync.countMasternodeList));
-        obj.push_back(Pair("countMasternodeWinner", masternodeSync.countMasternodeWinner));
-        obj.push_back(Pair("countBudgetItemProp", masternodeSync.countBudgetItemProp));
-        obj.push_back(Pair("countBudgetItemFin", masternodeSync.countBudgetItemFin));
-        obj.push_back(Pair("RequestedMasternodeAssets", masternodeSync.RequestedMasternodeAssets));
-        obj.push_back(Pair("RequestedMasternodeAttempt", masternodeSync.RequestedMasternodeAttempt));
-
-
-        return obj;
-    }
-
-    if (strMode == "reset") {
-        masternodeSync.Reset();
-        return "success";
-    }
-    return "failure";
-}
-
 #ifdef ENABLE_WALLET
 class DescribeAddressVisitor : public boost::static_visitor<Object>
 {
@@ -211,16 +170,10 @@ Value spork(const Array& params, bool fHelp)
 {
     if (params.size() == 1 && params[0].get_str() == "show") {
         Object ret;
-        for (int nSporkID = SPORK_START; nSporkID <= SPORK_END; nSporkID++) {
-            if (sporkManager.GetSporkNameByID(nSporkID) != "Unknown")
-                ret.push_back(Pair(sporkManager.GetSporkNameByID(nSporkID), GetSporkValue(nSporkID)));
-        }
-        return ret;
-    } else if (params.size() == 1 && params[0].get_str() == "active") {
-        Object ret;
-        for (int nSporkID = SPORK_START; nSporkID <= SPORK_END; nSporkID++) {
-            if (sporkManager.GetSporkNameByID(nSporkID) != "Unknown")
-                ret.push_back(Pair(sporkManager.GetSporkNameByID(nSporkID), IsSporkActive(nSporkID)));
+        std::map<int, CSporkMessage>::iterator it = mapSporksActive.begin();
+        while (it != mapSporksActive.end()) {
+            ret.push_back(Pair(sporkManager.GetSporkNameByID(it->second.nSporkID), it->second.nValue));
+            it++;
         }
         return ret;
     } else if (params.size() == 2) {
@@ -474,7 +427,6 @@ Value getstakingstatus(const Array& params, bool fHelp)
             "  \"walletunlocked\": true|false,     (boolean) if the wallet is unlocked\n"
             "  \"mintablecoins\": true|false,      (boolean) if the wallet has mintable coins\n"
             "  \"enoughcoins\": true|false,        (boolean) if available coins are greater than reserve balance\n"
-            "  \"mnsync\": true|false,             (boolean) if masternode data is synced\n"
             "}\n"
             "\nExamples:\n" +
             HelpExampleCli("getstakingstatus", "") + HelpExampleRpc("getstakingstatus", ""));
@@ -487,7 +439,6 @@ Value getstakingstatus(const Array& params, bool fHelp)
         obj.push_back(Pair("mintablecoins", pwalletMain->MintableCoins()));
         obj.push_back(Pair("enoughcoins", nReserveBalance <= pwalletMain->GetBalance()));
     }
-    obj.push_back(Pair("mnsync", masternodeSync.IsSynced()));
     return obj;
 }
 #endif // ENABLE_WALLET

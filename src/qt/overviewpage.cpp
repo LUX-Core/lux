@@ -140,7 +140,7 @@ OverviewPage::OverviewPage(QWidget* parent) : QWidget(parent),
             ui->obfuscationReset->setText("(" + tr("Disabled") + ")");
             ui->frameObfuscation->setEnabled(false);
         } else {
-            if (!fEnableObfuscation) {
+            if (!fEnableLuxsend) {
                 ui->toggleObfuscation->setText(tr("Start Obfuscation"));
             } else {
                 ui->toggleObfuscation->setText(tr("Stop Obfuscation"));
@@ -317,7 +317,7 @@ void OverviewPage::updateObfuscationProgress()
 
         // when balance is zero just show info from settings
         strAnonymizeLuxAmount = strAnonymizeLuxAmount.remove(strAnonymizeLuxAmount.indexOf("."), BitcoinUnits::decimals(nDisplayUnit) + 1);
-        strAmountAndRounds = strAnonymizeLuxAmount + " / " + tr("%n Rounds", "", nObfuscationRounds);
+        strAmountAndRounds = strAnonymizeLuxAmount + " / " + tr("%n Rounds", "", nDarksendRounds);
 
         ui->labelAmountRounds->setToolTip(tr("No inputs detected"));
         ui->labelAmountRounds->setText(strAmountAndRounds);
@@ -352,7 +352,7 @@ void OverviewPage::updateObfuscationProgress()
         ui->labelAmountRounds->setToolTip(tr("Found enough compatible inputs to anonymize %1")
                                               .arg(strAnonymizeLuxAmount));
         strAnonymizeLuxAmount = strAnonymizeLuxAmount.remove(strAnonymizeLuxAmount.indexOf("."), BitcoinUnits::decimals(nDisplayUnit) + 1);
-        strAmountAndRounds = strAnonymizeLuxAmount + " / " + tr("%n Rounds", "", nObfuscationRounds);
+        strAmountAndRounds = strAnonymizeLuxAmount + " / " + tr("%n Rounds", "", nDarksendRounds);
     } else {
         QString strMaxToAnonymize = BitcoinUnits::formatHtmlWithUnit(nDisplayUnit, nMaxToAnonymize, false, BitcoinUnits::separatorAlways);
         ui->labelAmountRounds->setToolTip(tr("Not enough compatible inputs to anonymize <span style='color:red;'>%1</span>,<br>"
@@ -362,7 +362,7 @@ void OverviewPage::updateObfuscationProgress()
         strMaxToAnonymize = strMaxToAnonymize.remove(strMaxToAnonymize.indexOf("."), BitcoinUnits::decimals(nDisplayUnit) + 1);
         strAmountAndRounds = "<span style='color:red;'>" +
                              QString(BitcoinUnits::factor(nDisplayUnit) == 1 ? "" : "~") + strMaxToAnonymize +
-                             " / " + tr("%n Rounds", "", nObfuscationRounds) + "</span>";
+                             " / " + tr("%n Rounds", "", nDarksendRounds) + "</span>";
     }
     ui->labelAmountRounds->setText(strAmountAndRounds);
 
@@ -389,7 +389,7 @@ void OverviewPage::updateObfuscationProgress()
 
     // apply some weights to them ...
     float denomWeight = 1;
-    float anonNormWeight = nObfuscationRounds;
+    float anonNormWeight = nDarksendRounds;
     float anonFullWeight = 2;
     float fullWeight = denomWeight + anonNormWeight + anonFullWeight;
     // ... and calculate the whole progress
@@ -405,7 +405,7 @@ void OverviewPage::updateObfuscationProgress()
                           tr("Denominated") + ": %2%<br/>" +
                           tr("Mixed") + ": %3%<br/>" +
                           tr("Anonymized") + ": %4%<br/>" +
-                          tr("Denominated inputs have %5 of %n rounds on average", "", nObfuscationRounds))
+                          tr("Denominated inputs have %5 of %n rounds on average", "", nDarksendRounds))
                              .arg(progress)
                              .arg(denomPart)
                              .arg(anonNormPart)
@@ -425,7 +425,7 @@ void OverviewPage::obfuscationStatus()
     if (((nBestHeight - obfuscationPool.cachedNumBlocks) / (GetTimeMillis() - nLastDSProgressBlockTime + 1) > 1)) return;
     nLastDSProgressBlockTime = GetTimeMillis();
 
-    if (!fEnableObfuscation) {
+    if (!fEnableLuxsend) {
         if (nBestHeight != obfuscationPool.cachedNumBlocks) {
             obfuscationPool.cachedNumBlocks = nBestHeight;
             updateObfuscationProgress();
@@ -491,7 +491,7 @@ void OverviewPage::toggleObfuscation()
             QMessageBox::Ok, QMessageBox::Ok);
         settings.setValue("hasMixed", "hasMixed");
     }
-    if (!fEnableObfuscation) {
+    if (!fEnableLuxsend) {
         int64_t balance = currentBalance;
         float minAmount = 14.90 * COIN;
         if (balance < minAmount) {
@@ -517,10 +517,10 @@ void OverviewPage::toggleObfuscation()
         }
     }
 
-    fEnableObfuscation = !fEnableObfuscation;
+    fEnableLuxsend = !fEnableLuxsend;
     obfuscationPool.cachedNumBlocks = std::numeric_limits<int>::max();
 
-    if (!fEnableObfuscation) {
+    if (!fEnableLuxsend) {
         ui->toggleObfuscation->setText(tr("Start Obfuscation"));
         obfuscationPool.UnlockCoins();
     } else {

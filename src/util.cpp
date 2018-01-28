@@ -112,15 +112,15 @@ string strMasterNodeAddr = "";
 bool fLiteMode = false;
 bool fEnableSwiftTX = true;
 int nSwiftTXDepth = 5;
-int nObfuscationRounds = 2;
+int nDarksendRounds = 2;
 int nAnonymizeLuxAmount = 1000;
 int nLiquidityProvider = 0;
 /** Spork enforcement enabled time */
 int64_t enforceMasternodePaymentsTime = 4085657524;
 bool fSucessfullyLoaded = false;
-bool fEnableObfuscation = false;
+bool fEnableLuxsend = false;
 /** All denominations used by obfuscation */
-std::vector<int64_t> obfuscationDenominations;
+std::vector<int64_t> darkSendDenominations;
 string strBudgetMode = "";
 
 map<string, string> mapArgs;
