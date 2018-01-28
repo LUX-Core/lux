@@ -7,7 +7,7 @@
 
 [![Build history](https://buildstats.info/travisci/chart/216k155/lux?branch=lux-autoconf)](https://travis-ci.org/216k155/lux?branch=lux-autoconf)
 
-| [Website](https://luxcore.io) | [PoS Web Wallet]() | [Block Explorer](https://explorer.luxcore.io/) | [Blog](https://reddit.com/r/LUXCoin) | [Forum](https://bitcointalk.org/index.php?topic=2254046.0)| [Telegram](https://t.me/LUXcoinOfficialChat) | [Twitter](https://twitter.com/LUX_Coin) |
+[Website](https://luxcore.io) | [PoS Web Wallet]() | [Block Explorer](https://explorer.luxcore.io/) | [Blog](https://reddit.com/r/LUXCoin) | [Forum](https://bitcointalk.org/index.php?topic=2254046.0) | [Telegram](https://t.me/LUXcoinOfficialChat) | [Twitter](https://twitter.com/LUX_Coin)
 
 Features
 =============
@@ -31,7 +31,7 @@ In addition, without Luxgate and Pmn, Bitcoin and Ethereum cannot interact with 
 
 | Specification | Value |
 |:-----------|:-----------|
-| Total Blocks | `6,000,000` |
+| Total Blocks | `60,000,000` |
 | Block Size | `4MB` |
 | Block Time | `60s` |
 | PoW Reward | `10 LUX` |
@@ -150,7 +150,69 @@ NOTE: Building with Qt4 is still supported, however, could result in a broken UI
 
 Then you can either run the command-line daemon using `src/Luxd` and `src/Lux-cli`, or you can run the Qt GUI using `src/qt/Lux-qt`
 
-For in-depth description of Sparknet and how to use Lux for interacting with contracts, please see [sparknet-guide](doc/sparknet-guide.md).
+Setup and Build: Arch Linux
+-----------------------------------
+This example lists the steps necessary to setup and build a command line only, non-wallet distribution of the latest changes on Arch Linux:
+
+    pacman -S git base-devel boost libevent python
+    git clone https://github.com/216k155/lux
+    cd lux/
+    ./autogen.sh
+    ./configure --without-miniupnpc --disable-tests
+    make check
+
+Note:
+Enabling wallet support requires either compiling against a Berkeley DB newer than 4.8 (package `db`) using `--with-incompatible-bdb`,
+or building and depending on a local version of Berkeley DB 4.8. The readily available Arch Linux packages are currently built using
+`--with-incompatible-bdb` according to the 
+As mentioned above, when maintaining portability of the wallet between the standard Bitcoin Core distributions and independently built
+node software is desired, Berkeley DB 4.8 must be used.
+
+
+ARM Cross-compilation
+-------------------
+These steps can be performed on, for example, an Ubuntu VM. The depends system
+will also work on other Linux distributions, however the commands for
+installing the toolchain will be different.
+
+Make sure you install the build requirements mentioned above.
+Then, install the toolchain and curl:
+
+    sudo apt-get install g++-arm-linux-gnueabihf curl
+
+To build executables for ARM:
+
+    cd depends
+    make HOST=arm-linux-gnueabihf NO_QT=1
+    cd ..
+    ./configure --prefix=$PWD/depends/arm-linux-gnueabihf --enable-glibc-back-compat --enable-reduce-exports LDFLAGS=-static-libstdc++
+    make
+
+For further documentation on the depends system see [README.md](../depends/README.md) in the depends directory.
+
+Building on FreeBSD
+--------------------
+
+Clang is installed by default as `cc` compiler, this makes it easier to get
+started than on [OpenBSD](build-openbsd.md). Installing dependencies:
+
+    pkg install autoconf automake libtool pkgconf
+    pkg install boost-libs openssl libevent
+    pkg install gmake
+
+You need to use GNU make (`gmake`) instead of `make`.
+(`libressl` instead of `openssl` will also work)
+
+For the wallet (optional):
+
+    ./contrib/install_db4.sh `pwd`
+    setenv BDB_PREFIX $PWD/db4
+
+Then build using:
+
+    ./autogen.sh
+    ./configure BDB_CFLAGS="-I${BDB_PREFIX}/include" BDB_LIBS="-L${BDB_PREFIX}/lib -ldb_cxx"
+    gmake
 
 License
 -------
