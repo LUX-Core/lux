@@ -40,7 +40,7 @@ bool IsIXTXValid(const CTransaction& txCollateral);
 // if two conflicting locks are approved by the network, they will cancel out
 bool CheckForConflictingLocks(CTransaction& tx);
 
-void ProcessMessageInstantX(CNode* pfrom, std::string& strCommand, CDataStream& vRecv);
+void ProcessInstantX(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv, bool &isInstantXCommand);
 
 //check if we need to vote on this transaction
 void DoConsensusVote(CTransaction& tx, int64_t nBlockHeight);
@@ -70,7 +70,6 @@ public:
 
     template <typename Stream, typename Operation>
     inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion) {
-	unsigned int nSerSize = 0;
         READWRITE(txHash);
         READWRITE(vinMasternode);
         READWRITE(vchMasterNodeSignature);

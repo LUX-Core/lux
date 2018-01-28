@@ -72,13 +72,13 @@ void OptionsModel::Init()
         settings.setValue("fCoinControlFeatures", false);
     fCoinControlFeatures = settings.value("fCoinControlFeatures", false).toBool();
 
-    if (!settings.contains("nObfuscationRounds"))
-        settings.setValue("nObfuscationRounds", 2);
+    if (!settings.contains("nDarksendRounds"))
+        settings.setValue("nDarksendRounds", 2);
 
     if (!settings.contains("nAnonymizeLuxAmount"))
         settings.setValue("nAnonymizeLuxAmount", 1000);
 
-    nObfuscationRounds = settings.value("nObfuscationRounds").toLongLong();
+    nDarksendRounds = settings.value("nDarksendRounds").toLongLong();
     nAnonymizeLuxAmount = settings.value("nAnonymizeLuxAmount").toLongLong();
 
     if (!settings.contains("fShowMasternodesTab"))
@@ -144,8 +144,8 @@ void OptionsModel::Init()
     if (!SoftSetArg("-lang", settings.value("language").toString().toStdString()))
         addOverriddenOption("-lang");
 
-    if (settings.contains("nObfuscationRounds"))
-        SoftSetArg("-obfuscationrounds", settings.value("nObfuscationRounds").toString().toStdString());
+    if (settings.contains("nDarksendRounds"))
+        SoftSetArg("-obfuscationrounds", settings.value("nDarksendRounds").toString().toStdString());
     if (settings.contains("nAnonymizeLuxAmount"))
         SoftSetArg("-anonymizeluxamount", settings.value("nAnonymizeLuxAmount").toString().toStdString());
 
@@ -226,7 +226,7 @@ QVariant OptionsModel::data(const QModelIndex& index, int role) const
         case ThreadsScriptVerif:
             return settings.value("nThreadsScriptVerif");
         case ObfuscationRounds:
-            return QVariant(nObfuscationRounds);
+            return QVariant(nDarksendRounds);
         case AnonymizeLuxAmount:
             return QVariant(nAnonymizeLuxAmount);
         case Listen:
@@ -333,9 +333,9 @@ bool OptionsModel::setData(const QModelIndex& index, const QVariant& value, int 
             }
             break;
         case ObfuscationRounds:
-            nObfuscationRounds = value.toInt();
-            settings.setValue("nObfuscationRounds", nObfuscationRounds);
-            emit obfuscationRoundsChanged(nObfuscationRounds);
+            nDarksendRounds = value.toInt();
+            settings.setValue("nDarksendRounds", nDarksendRounds);
+            emit obfuscationRoundsChanged(nDarksendRounds);
             break;
         case AnonymizeLuxAmount:
             nAnonymizeLuxAmount = value.toInt();
