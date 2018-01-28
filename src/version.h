@@ -1,4 +1,4 @@
-// Copyright (c) 2012-2014 The Bitcoin developers
+// Copyright (c) 2012-2014 The Bitcoin developers       -*- c++ -*-
 // Copyright (c) 2014-2015 The Dash developers
 // Copyright (c) 2015-2017 The LUX developers
 // Distributed under the MIT software license, see the accompanying

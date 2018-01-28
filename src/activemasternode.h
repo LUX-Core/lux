@@ -1,4 +1,4 @@
-// Copyright (c) 2009-2010 Satoshi Nakamoto
+// Copyright (c) 2009-2010 Satoshi Nakamoto                     -*- c++ -*-
 // Copyright (c) 2009-2012 The Bitcoin developers
 // Copyright (c) 2015-2016 The Dash developers
 // Distributed under the MIT/X11 software license, see the accompanying

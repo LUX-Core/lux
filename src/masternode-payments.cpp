@@ -327,7 +327,8 @@ void CMasternodePayments::FillBlockPayee(CMutableTransaction& txNew, int64_t nFe
 }
 
 int CMasternodePayments::GetMinMasternodePaymentsProto()
-{    return ActiveProtocol();
+{
+    return ActiveProtocol();
 }
 
 void CMasternodePayments::ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv, bool &isPaymentCommand)
