@@ -1195,9 +1195,7 @@ bool AcceptToMemoryPool(CTxMemPool& pool, CValidationState& state, const CTransa
         unsigned int nSigOps = GetLegacySigOpCount(tx);
         nSigOps += GetP2SHSigOpCount(tx, view);
         if (nSigOps > MAX_TX_SIGOPS)
-            return state.DoS(0,
-                error("AcceptToMemoryPool : too many sigops %s, %d > %d",
-                    hash.ToString(), nSigOps, MAX_TX_SIGOPS),
+            return state.DoS(0, error("AcceptToMemoryPool : too many sigops %s, %d > %d", hash.ToString(), nSigOps, MAX_TX_SIGOPS),
                 REJECT_NONSTANDARD, "bad-txns-too-many-sigops");
 
         CAmount nValueOut = tx.GetValueOut();
