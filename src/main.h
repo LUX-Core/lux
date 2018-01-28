@@ -1,4 +1,4 @@
-// Copyright (c) 2009-2010 Satoshi Nakamoto
+// Copyright (c) 2009-2010 Satoshi Nakamoto             -*- c++ -*-
 // Copyright (c) 2009-2014 The Bitcoin developers
 // Copyright (c) 2014-2015 The Dash developers
 // Copyright (c) 2015-2017 The LUX developers
@@ -50,8 +50,16 @@ class CValidationState;
 
 struct CBlockTemplate;
 struct CNodeStateStats;
-/**Segit**/
+/**SegWit**/
 static const int SERIALIZE_TRANSACTION_NO_WITNESS = 0x40000000;
+
+#define START_MASTERNODE_PAYMENTS_TESTNET 1432907775
+#define START_MASTERNODE_PAYMENTS 1432907775
+
+static const int64_t DARKSEND_COLLATERAL = (16120*COIN); //161.20 LUX
+static const int64_t DARKSEND_FEE = (0.002*COIN); // reward masternode
+static const int64_t DARKSEND_POOL_MAX = (1999999.99*COIN);
+
 /** Default for -blockmaxsize and -blockminsize, which control the range of sizes the mining code will create **/
 static const unsigned int DEFAULT_BLOCK_MAX_SIZE = 6000000;
 static const unsigned int DEFAULT_BLOCK_MIN_SIZE = 0;
@@ -116,6 +124,7 @@ static const unsigned char REJECT_CHECKPOINT = 0x43;
 static const int64_t STATIC_POS_REWARD = 1 * COIN; //Constant reward 8%
 
 inline bool IsProtocolV2(int nHeight) { return IsTestNet() || nHeight > 0; }
+inline int64_t GetMNCollateral(int nHeight) { return nHeight>=30000 ? 16120 : 1999999; }
 
 struct BlockHasher {
     size_t operator()(const uint256& hash) const { return hash.GetLow64(); }

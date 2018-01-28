@@ -1,4 +1,4 @@
-// Copyright (c) 2009-2010 Satoshi Nakamoto
+// Copyright (c) 2009-2010 Satoshi Nakamoto                     -*- c++ -*-
 // Copyright (c) 2009-2014 The Bitcoin developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
@@ -33,6 +33,9 @@
 class CAddrMan;
 class CBlockIndex;
 class CNode;
+class CTxIn;
+class CTxOut;
+class CPubKey;
 
 namespace boost
 {
@@ -69,7 +72,7 @@ void AddressCurrentlyConnected(const CService& addr);
 CNode* FindNode(const CNetAddr& ip);
 CNode* FindNode(const std::string& addrName);
 CNode* FindNode(const CService& ip);
-CNode* ConnectNode(CAddress addrConnect, const char* pszDest = NULL, bool obfuscationMaster = false);
+CNode* ConnectNode(CAddress addrConnect, const char* pszDest = NULL, bool darkSendMaster = false);
 bool OpenNetworkConnection(const CAddress& addrConnect, CSemaphoreGrant* grantOutbound = NULL, const char* strDest = NULL, bool fOneShot = false);
 void MapPort(bool fUseUPnP);
 unsigned short GetListenPort();
@@ -259,7 +262,7 @@ public:
     // Connecting to verify connectability/status or connecting for sending/relaying single message
     // (even if it's relative to mixing e.g. for blinding) should NOT set this to 'true'.
     // For such cases node should be released manually (preferably right after corresponding code).
-    bool fObfuscationMaster;
+    bool fDarkSendMaster; // bool fObfuScationMaster;
     CSemaphoreGrant grantOutbound;
     CCriticalSection cs_filter;
     CBloomFilter* pfilter;
@@ -656,6 +659,15 @@ void RelayTransaction(const CTransaction& tx);
 void RelayTransaction(const CTransaction& tx, const CDataStream& ss);
 void RelayTransactionLockReq(const CTransaction& tx, bool relayToAll = false);
 void RelayInv(CInv& inv);
+
+void RelayDarkSendFinalTransaction(const int sessionID, const CTransaction& txNew);
+void RelayDarkSendIn(const std::vector<CTxIn>& in, const int64_t& nAmount, const CTransaction& txCollateral, const std::vector<CTxOut>& out);
+void RelayDarkSendStatus(const int sessionID, const int newState, const int newEntriesCount, const int newAccepted, const std::string error="");
+void RelayDarkSendElectionEntry(const CTxIn &vin, const CService addr, const std::vector<unsigned char> vchSig, const int64_t nNow, const CPubKey pubkey, const CPubKey pubkey2, const int count, const int current, const int64_t lastUpdated, const int protocolVersion);
+void SendDarkSendElectionEntry(const CTxIn &vin, const CService addr, const std::vector<unsigned char> vchSig, const int64_t nNow, const CPubKey pubkey, const CPubKey pubkey2, const int count, const int current, const int64_t lastUpdated, const int protocolVersion);
+void RelayDarkSendElectionEntryPing(const CTxIn &vin, const std::vector<unsigned char> vchSig, const int64_t nNow, const bool stop);
+void SendDarkSendElectionEntryPing(const CTxIn &vin, const std::vector<unsigned char> vchSig, const int64_t nNow, const bool stop);
+void RelayDarkSendCompletedTransaction(const int sessionID, const bool error, const std::string errorMessage);
 
 /** Access to the (IP) address database (peers.dat) */
 class CAddrDB

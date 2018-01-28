@@ -304,7 +304,7 @@ Value masternode(const Array& params, bool fHelp)
             } else if (strCommand == "activeseconds") {
                 obj.push_back(Pair(mn.addr.ToString().c_str(),       (int64_t)(mn.lastTimeSeen - mn.now)));
             } else if (strCommand == "rank") {
-                obj.push_back(Pair(mn.addr.ToString().c_str(),       (int)(GetMasternodeRank(mn.vin, pindexBestHeader->nHeight))));
+                obj.push_back(Pair(mn.addr.ToString().c_str(),       (int)(GetMasternodeRank(mn.vin, chainActive.Tip()->nHeight))));
             }
         }
         return obj;
@@ -506,7 +506,7 @@ Value masternode(const Array& params, bool fHelp)
     {
         Object obj;
 
-        for(int nHeight = pindexBestHeader->nHeight-10; nHeight < pindexBestHeader->nHeight+20; nHeight++)
+        for(int nHeight = chainActive.Tip()->nHeight-10; nHeight < chainActive.Tip()->nHeight+20; nHeight++)
         {
             CScript payee;
             if(masternodePayments.GetBlockPayee(nHeight, payee)){

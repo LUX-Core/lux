@@ -1,6 +1,3 @@
-
-
-
 #include "uint256.h"
 #include "sync.h"
 #include "net.h"
@@ -32,13 +29,14 @@ int nCompleteTXLocks;
 //step 2.) Top 10 masternodes, open connect to top 1 masternode. Send "txvote", CTransaction, Signature, Approve
 //step 3.) Top 1 masternode, waits for 10 messages. Upon success, sends "txlock'
 
-void ProcessMessageInstantX(CNode* pfrom, std::string& strCommand, CDataStream& vRecv)
+void ProcessInstantX(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv, bool &isInstantXCommand)
 {
     if(fLiteMode) return; //disable all darksend/masternode related functionality
     if(!IsSporkActive(SPORK_1_MASTERNODE_PAYMENTS_ENFORCEMENT)) return;
 
-    if (strCommand == "txlreq")
-    {
+    if (strCommand == "txlreq") {
+        isInstantXCommand = true;
+        
         //LogPrintf("ProcessMessageInstantX::txlreq\n");
         CDataStream vMsg(vRecv);
         CTransaction tx;
@@ -68,9 +66,7 @@ void ProcessMessageInstantX(CNode* pfrom, std::string& strCommand, CDataStream& 
         CValidationState state;
 
 
-        //if (AcceptToMemoryPool(mempool, state, tx, true, &fMissingInputs))
-        if (AcceptToMemoryPool(mempool, tx, true, &fMissingInputs))
-        {
+        if (AcceptToMemoryPool(mempool, state, tx, true, &fMissingInputs)) {
             vector<CInv> vInv;
             vInv.push_back(inv);
             LOCK(cs_vNodes);
@@ -122,8 +118,10 @@ void ProcessMessageInstantX(CNode* pfrom, std::string& strCommand, CDataStream& 
             return;
         }
     }
-    else if (strCommand == "txlvote") //InstantX Lock Consensus Votes
-    {
+
+    else if (strCommand == "txlvote") { //InstantX Lock Consensus Votes
+        isInstantXCommand = true;
+        
         CConsensusVote ctx;
         vRecv >> ctx;
 
@@ -236,7 +234,7 @@ int64_t CreateNewLock(CTransaction tx)
         This prevents attackers from using transaction mallibility to predict which masternodes
         they'll use.
     */
-    int nBlockHeight = (pindexBest->nHeight - nTxAge)+4;
+    int nBlockHeight = (chainActive.Tip()->nHeight - nTxAge)+4;
 
     if (!mapTxLocks.count(tx.GetHash())){
         LogPrintf("CreateNewLock - New Transaction Lock %s !\n", tx.GetHash().ToString().c_str());
@@ -440,7 +438,7 @@ int64_t GetAverageVoteTime()
 
 void CleanTransactionLocksList()
 {
-    if(pindexBest == NULL) return;
+    if(chainActive.Tip() == NULL) return;
 
     std::map<uint256, CTransactionLock>::iterator it = mapTxLocks.begin();
 

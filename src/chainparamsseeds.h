@@ -1,3 +1,4 @@
+// -*- c++ -*-
 #ifndef BITCOIN_CHAINPARAMSSEEDS_H
 #define BITCOIN_CHAINPARAMSSEEDS_H
 /**
