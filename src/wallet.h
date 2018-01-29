@@ -430,10 +430,10 @@ public:
     bool GetBudgetSystemCollateralTX(CTransaction& tx, uint256 hash, bool useIX);
     bool GetBudgetSystemCollateralTX(CWalletTx& tx, uint256 hash, bool useIX);
 
-    // get the Obfuscation chain depth for a given input
-    int GetRealInputObfuscationRounds(CTxIn in, int rounds) const;
+    // get the DarkSend chain depth for a given input
+    int GetRealInputDarkSendRounds(CTxIn in, int rounds) const;
     // respect current settings
-    int GetInputObfuscationRounds(CTxIn in) const;
+    int GetInputDarkSendRounds(CTxIn in) const;
 
     bool IsDenominated(const CTxIn& txin) const;
     bool IsDenominated(const CTransaction& tx) const;
@@ -978,7 +978,7 @@ public:
             if (pwallet->IsSpent(hashTx, i) || pwallet->IsLockedCoin(hashTx, i)) continue;
             if (fMasterNode && vout[i].nValue == 16120 * COIN) continue; // do not count MN-like outputs
 
-            const int rounds = pwallet->GetInputObfuscationRounds(vin);
+            const int rounds = pwallet->GetInputDarkSendRounds(vin);
             if (rounds >= -2 && rounds < nDarksendRounds) {
                 nCredit += pwallet->GetCredit(txout, ISMINE_SPENDABLE);
                 if (!MoneyRange(nCredit))
@@ -1011,7 +1011,7 @@ public:
 
             if (pwallet->IsSpent(hashTx, i) || !pwallet->IsDenominated(vin)) continue;
 
-            const int rounds = pwallet->GetInputObfuscationRounds(vin);
+            const int rounds = pwallet->GetInputDarkSendRounds(vin);
             if (rounds >= nDarksendRounds) {
                 nCredit += pwallet->GetCredit(txout, ISMINE_SPENDABLE);
                 if (!MoneyRange(nCredit))
@@ -1185,7 +1185,7 @@ public:
         fSpendable = fSpendableIn;
     }
 
-    //Used with Obfuscation. Will return largest nondenom, then denominations, then very small inputs
+    //Used with DarkSend. Will return largest nondenom, then denominations, then very small inputs
     int Priority() const
     {
         BOOST_FOREACH (int64_t d, darkSendDenominations)

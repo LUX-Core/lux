@@ -183,10 +183,10 @@ SET(SOURCES
 	./src/json/json_spirit_writer.cpp
 	./src/kernel.cpp
 	./src/leveldbwrapper.cpp
-    ./src/masternodeconfig.cpp
+        ./src/masternodeconfig.cpp
 	./src/miner.cpp
 	./src/darksend.cpp
-    ./src/primitives/block.cpp
+        ./src/primitives/block.cpp
 	./src/primitives/transaction.cpp
 	./src/script/bitcoinconsensus.cpp
 	./src/script/interpreter.cpp

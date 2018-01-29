@@ -22,7 +22,7 @@ packages:
 - "ca-certificates"
 - "python"
 remotes:
-- "url": "https://github.com/216k155/lux.git"
+- "url": "https://github.com/lux-project/lux.git"
   "dir": "lux"
 files: []
 script: |

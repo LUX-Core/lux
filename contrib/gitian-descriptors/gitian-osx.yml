@@ -28,7 +28,7 @@ packages:
 - "python-setuptools"
 - "fonts-tuffy"
 remotes:
-- "url": "https://github.com/216k155/lux.git"
+- "url": "https://github.com/lux-project/lux.git"
   "dir": "lux"
 files:
 - "MacOSX10.11.sdk.tar.gz"
