@@ -623,7 +623,9 @@ int main(int argc, char* argv[])
     if (!masternodeConfig.read(strErr)) {
         QMessageBox::critical(0, QObject::tr("LUX Core"),
             QObject::tr("Error reading masternode configuration file: %1").arg(strErr.c_str()));
+#if defined(REQUIRE_MASTERNODE_CONFIG)
         return false;
+#endif
     }
 
     /// 8. URI IPC sending

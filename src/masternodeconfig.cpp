@@ -20,10 +20,12 @@ bool CMasternodeConfig::read(boost::filesystem::path path) {
         if (line.empty()) {
             continue;
         }
+
         std::istringstream iss(line);
         std::string alias, ip, privKey, txHash, outputIndex;
         if (!(iss >> alias >> ip >> privKey >> txHash >> outputIndex)) {
-            LogPrintf("CMasternodeConfig::read - Could not parse masternode.conf. Line: %s\n", line.c_str());
+            if (alias.substr(0,1) == "#") continue;
+            LogPrintf("CMasternodeConfig::read - Could not parse masternode.conf. Line: %s\n", line);
             streamConfig.close();
             return false;
         }
