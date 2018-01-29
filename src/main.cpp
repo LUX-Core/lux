@@ -956,9 +956,11 @@ bool CheckTransaction(const CTransaction& tx, CValidationState& state)
     if (tx.vin.empty())
         return state.DoS(10, error("CheckTransaction() : vin empty"),
             REJECT_INVALID, "bad-txns-vin-empty");
+
     if (tx.vout.empty())
         return state.DoS(10, error("CheckTransaction() : vout empty"),
             REJECT_INVALID, "bad-txns-vout-empty");
+
     // Size limits
     if (::GetSerializeSize(tx, SER_NETWORK, PROTOCOL_VERSION) > MAX_BLOCK_SIZE)
         return state.DoS(100, error("CheckTransaction() : size limits failed"),
@@ -966,19 +968,21 @@ bool CheckTransaction(const CTransaction& tx, CValidationState& state)
 
     // Check for negative or overflow output values
     CAmount nValueOut = 0;
-    BOOST_FOREACH (const CTxOut& txout, tx.vout) {
+    for (int i = 0; i < tx.vout.size(); ++i) {
+        const CTxOut& txout = tx.vout[i];
         if (txout.IsEmpty() && !tx.IsCoinBase() && !tx.IsCoinStake())
-            return state.DoS(100, error("CheckTransaction(): txout empty for user transaction"));
+            return state.DoS(100, error("%s: tx.vout[%d] empty for user transaction", __func__, i));
 
         if (txout.nValue < 0)
-            return state.DoS(100, error("CheckTransaction() : txout.nValue negative"),
+            return state.DoS(100, error("%s: tx.vout[%d].nValue negative", __func__, i),
                 REJECT_INVALID, "bad-txns-vout-negative");
+
         if (txout.nValue > MAX_MONEY)
-            return state.DoS(100, error("CheckTransaction() : txout.nValue too high"),
+            return state.DoS(100, error("%s: tx.vout[%d].nValue too high (%d)", __func__, i, txout.nValue),
                 REJECT_INVALID, "bad-txns-vout-toolarge");
-        nValueOut += txout.nValue;
-        if (!MoneyRange(nValueOut))
-            return state.DoS(100, error("CheckTransaction() : txout total out of range"),
+
+        if (!MoneyRange((nValueOut += txout.nValue)))
+            return state.DoS(100, error("%s: tx.vout[%d]: ValueOut (%d) out of range", __func__, i, nValueOut),
                 REJECT_INVALID, "bad-txns-txouttotal-toolarge");
     }
 
@@ -3141,14 +3145,16 @@ bool CheckBlock(const CBlock& block, CValidationState& state, bool fCheckPOW, bo
                 return state.DoS(100, error("%s: more than one coinstake", __func__));
     }
 
-    LogPrintf("%s: skipping transaction locking checks\n", __func__);
+    LogPrint("debug", "%s: checking transactions, block %s (%s)\n", __func__, block.GetHash().GetHex(), s);
 
     // -------------------------------------------
 
     // Check transactions
     BOOST_FOREACH (const CTransaction& tx, block.vtx)
-        if (!CheckTransaction(tx, state))
+        if (!CheckTransaction(tx, state)) {
+            LogPrint("debug", "%s: invalid transaction %s", __func__, tx.ToString());
             return error("%s: CheckTransaction failed", __func__);
+        }
 
     unsigned int nSigOps = 0;
     BOOST_FOREACH (const CTransaction& tx, block.vtx) {
