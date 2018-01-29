@@ -140,8 +140,6 @@ SET(SERVER_A
 	./src/rpcblockchain.cpp
 	./src/rpcclient.cpp
 	./src/rpcdump.cpp
-	./src/rpcmasternode-budget.cpp
-	./src/rpcmasternode.cpp
 	./src/rpcmining.cpp
 	./src/rpcmisc.cpp
 	./src/rpcnet.cpp
@@ -185,16 +183,10 @@ SET(SOURCES
 	./src/json/json_spirit_writer.cpp
 	./src/kernel.cpp
 	./src/leveldbwrapper.cpp
-	./src/masternode-budget.cpp
-	./src/masternode-payments.cpp
-	./src/masternode-sync.cpp
-	./src/masternode.cpp
-	./src/masternodeconfig.cpp
-	./src/masternodeman.cpp
+        ./src/masternodeconfig.cpp
 	./src/miner.cpp
-	./src/obfuscation-relay.cpp
-	./src/obfuscation.cpp
-	./src/primitives/block.cpp
+	./src/darksend.cpp
+        ./src/primitives/block.cpp
 	./src/primitives/transaction.cpp
 	./src/script/bitcoinconsensus.cpp
 	./src/script/interpreter.cpp
@@ -303,5 +295,4 @@ add_subdirectory(src/qt)
 if ($ENV{COVERAGE})
     add_custom_target(xcov COMMAND ./XcodeCoverage/exportenv.sh )
 endif()
-
 
