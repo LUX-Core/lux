@@ -67,7 +67,7 @@ public:
     int64_t nTimeSigned;
 
     uint256 GetHash(){
-        uint256 n = Hash(BEGIN(nSporkID), END(nTimeSigned));
+        uint256 n = Phi1612(BEGIN(nSporkID), END(nTimeSigned));
         return n;
     }
 
