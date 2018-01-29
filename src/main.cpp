@@ -968,23 +968,22 @@ bool CheckTransaction(const CTransaction& tx, CValidationState& state)
 
     // Check for negative or overflow output values
     CAmount nValueOut = 0;
-    for (int i = 0; i < tx.vout.size(); ++i) {
-        const CTxOut& txout = tx.vout[i];
+    BOOST_FOREACH (const CTxOut& txout, tx.vout) {
         if (txout.IsEmpty() && !tx.IsCoinBase() && !tx.IsCoinStake())
-            return state.DoS(100, error("%s: tx.vout[%d] empty for user transaction", __func__, i));
+            return state.DoS(100, error("CheckTransaction(): txout empty for user transaction"));
 
         if (txout.nValue < 0)
-            return state.DoS(100, error("%s: tx.vout[%d].nValue negative", __func__, i),
+            return state.DoS(100, error("CheckTransaction() : txout.nValue negative"),
                 REJECT_INVALID, "bad-txns-vout-negative");
-
         if (txout.nValue > MAX_MONEY)
-            return state.DoS(100, error("%s: tx.vout[%d].nValue too high (%d)", __func__, i, txout.nValue),
+            return state.DoS(100, error("CheckTransaction() : txout.nValue too high"),
                 REJECT_INVALID, "bad-txns-vout-toolarge");
-
-        if (!MoneyRange((nValueOut += txout.nValue)))
-            return state.DoS(100, error("%s: tx.vout[%d]: ValueOut (%d) out of range", __func__, i, nValueOut),
+        nValueOut += txout.nValue;
+        if (!MoneyRange(nValueOut))
+            return state.DoS(100, error("CheckTransaction() : txout total out of range"),
                 REJECT_INVALID, "bad-txns-txouttotal-toolarge");
     }
+
 
     // Check for duplicate inputs
     set<COutPoint> vInOutPoints;
