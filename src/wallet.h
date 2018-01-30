@@ -207,6 +207,9 @@ public:
     bool fCombineDust;
     CAmount nAutoCombineThreshold;
 
+    std::map<std::string, CAdrenalineNodeConfig> mapMyAdrenalineNodes;
+    bool AddAdrenalineNodeConfig(CAdrenalineNodeConfig nodeConfig);
+
     CWallet()
     {
         SetNull();
@@ -387,8 +390,8 @@ public:
     CAmount GetAnonymizedBalance() const;
     double GetAverageAnonymizedRounds() const;
     CAmount GetNormalizedAnonymizedBalance() const;
-    CAmount GetDenominatedBalance(bool unconfirmed = false) const;
-    CAmount GetDenominatedBalance(bool onlyDenom=true, bool onlyUnconfirmed=false) const;
+    CAmount GetDenominatedBalance(bool unconfirmed/*=false*/) const;
+    CAmount GetDenominatedBalance(bool onlyDenom/*=true*/, bool onlyUnconfirmed/*=false*/) const;
     CAmount GetWatchOnlyBalance() const;
     CAmount GetUnconfirmedWatchOnlyBalance() const;
     CAmount GetImmatureWatchOnlyBalance() const;

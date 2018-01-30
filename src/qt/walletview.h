@@ -1,4 +1,4 @@
-// Copyright (c) 2011-2013 The Bitcoin developers
+// Copyright (c) 2011-2013 The Bitcoin developers           -*- c++ -*-
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -6,7 +6,7 @@
 #define BITCOIN_QT_WALLETVIEW_H
 
 #include "amount.h"
-#include "masternodelist.h"
+#include "masternodemanager.h"
 #include "tradingdialog.h"
 
 #include <QStackedWidget>
@@ -66,7 +66,7 @@ private:
     ReceiveCoinsDialog* receiveCoinsPage;
     SendCoinsDialog* sendCoinsPage;
     BlockExplorer* explorerWindow;
-    MasternodeList* masternodeListPage;
+    MasternodeManager* masternodeManagerPage;
 
     TransactionView* transactionView;
 

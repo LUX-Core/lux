@@ -143,7 +143,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QSpinBox" name="obfuscationRounds">
+          <widget class="QSpinBox" name="darksendRounds">
            <property name="minimum">
             <number>2</number>
            </property>

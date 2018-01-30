@@ -9,7 +9,7 @@
 #include "walletmodeltransaction.h"
 
 #include "allocators.h" /* for SecureString */
-#include "swifttx.h"
+#include "instantx.h"
 #include "wallet.h"
 
 #include <map>

@@ -60,7 +60,7 @@ tradingDialog::tradingDialog(QWidget *parent) :
     qDebug() <<  "Expected this";
 
 
-    QWidget* a1 = ui->priceChart;
+    //QWidget* a1 = ui->priceChart;
     QVBoxLayout* plotLay = new QVBoxLayout();
     ui->priceChart->setLayout(plotLay);
 
@@ -262,7 +262,7 @@ QString tradingDialog::Withdraw(double Amount, QString Address, QString Coin){
     timeval curTime;
     gettimeofday(&curTime, NULL);
     long nonce = curTime.tv_usec;
-    sprintf(tmp_nonce, "%d", nonce);
+    sprintf(tmp_nonce, "%ld", nonce);
 
     QJsonObject stats_obj;
     stats_obj["Currency"] = Coin;
@@ -614,7 +614,7 @@ void tradingDialog::ParseAndPopulateMarketHistoryTable(QString Response){
 
 void tradingDialog::ParseAndPopulatePriceChart(QString Response){
 
-    int itteration = 0, RowCount = 0;
+    int itteration = 0;
     QJsonArray    jsonArray    = GetResultArrayFromJSONObject(Response);
     QJsonObject   obj;
     double binSize = 60*15;

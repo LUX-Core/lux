@@ -7,8 +7,6 @@
 #include "transactionrecord.h"
 
 #include "base58.h"
-#include "obfuscation.h"
-#include "swifttx.h"
 #include "timedata.h"
 #include "wallet.h"
 
@@ -156,7 +154,7 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const CWallet* 
 
                     if (wallet->IsCollateralAmount(txout.nValue)) sub.type = TransactionRecord::ObfuscationMakeCollaterals;
                     if (wallet->IsDenominatedAmount(txout.nValue)) sub.type = TransactionRecord::ObfuscationCreateDenominations;
-                    if (nDebit - wtx.GetValueOut() == OBFUSCATION_COLLATERAL) sub.type = TransactionRecord::ObfuscationCollateralPayment;
+                    if (nDebit - wtx.GetValueOut() == DARKSEND_COLLATERAL) sub.type = TransactionRecord::ObfuscationCollateralPayment;
                 }
             }
 
@@ -241,7 +239,7 @@ void TransactionRecord::updateStatus(const CWalletTx& wtx)
     status.countsForBalance = wtx.IsTrusted() && !(wtx.GetBlocksToMaturity() > 0);
     status.depth = wtx.GetDepthInMainChain();
     status.cur_num_blocks = chainActive.Height();
-    status.cur_num_ix_locks = nCompleteTXLocks;
+    //status.cur_num_ix_locks = nCompleteTXLocks;
 
     if (!IsFinalTx(wtx, chainActive.Height() + 1)) {
         if (wtx.nLockTime < LOCKTIME_THRESHOLD) {
@@ -287,7 +285,7 @@ void TransactionRecord::updateStatus(const CWalletTx& wtx)
 bool TransactionRecord::statusUpdateNeeded()
 {
     AssertLockHeld(cs_main);
-    return status.cur_num_blocks != chainActive.Height() || status.cur_num_ix_locks != nCompleteTXLocks;
+    return status.cur_num_blocks != chainActive.Height() /*|| status.cur_num_ix_locks != nCompleteTXLocks*/;
 }
 
 QString TransactionRecord::getTxID() const
