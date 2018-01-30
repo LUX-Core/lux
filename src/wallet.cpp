@@ -2560,18 +2560,19 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
     }
 
     // Check vout values.
-    for (int i = 0; i < txNew.vout.size(); ++i) {
-        auto nValue = txNew.vout[i].nValue;
-        if (nValue < 0 || nValue > MAX_MONEY) {
-            return error("%s: bad nValue (vout[%d].nValue = %d)", __func__, i, nValue);
+    unsigned i = 0;
+    for (auto &vout : txNew.vout) {
+        if (vout.nValue < 0 || vout.nValue > MAX_MONEY) {
+            return error("%s: bad nValue (vout[%d].nValue = %d)", __func__, i, vout.nValue);
         }
+        i += 1;
     }
 
     // Sign
-    int nIn = 0;
-    BOOST_FOREACH (const CWalletTx* pcoin, vwtxPrev) {
-        if (!SignSignature(*this, *pcoin, txNew, nIn++))
-            return error("%s: failed to sign coinstake", __func__);
+    i = 0;
+    for (const CWalletTx* pcoin : vwtxPrev) {
+        if (!SignSignature(*this, *pcoin, txNew, i++))
+            return error("%s: failed to sign coinstake (%d)", __func__, i);
     }
 
     // Successfully generated coinstake
