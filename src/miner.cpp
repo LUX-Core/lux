@@ -372,7 +372,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
 
         nLastBlockTx = nBlockTx;
         nLastBlockSize = nBlockSize;
-        LogPrintf("%s: total size %u (%s, nFees=%d)\n", nBlockSize, ct, nFees);
+        LogPrintf("%s: total size %u (%s, nFees=%d)\n", __func__, nBlockSize, ct, nFees);
 
         // Compute final coinbase transaction.
         pblock->vtx[0].vin[0].scriptSig = CScript() << nHeight << OP_0;
