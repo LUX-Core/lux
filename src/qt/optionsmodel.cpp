@@ -225,7 +225,7 @@ QVariant OptionsModel::data(const QModelIndex& index, int role) const
             return settings.value("nDatabaseCache");
         case ThreadsScriptVerif:
             return settings.value("nThreadsScriptVerif");
-        case ObfuscationRounds:
+        case DarksendRounds:
             return QVariant(nDarksendRounds);
         case AnonymizeLuxAmount:
             return QVariant(nAnonymizeLuxAmount);
@@ -332,7 +332,7 @@ bool OptionsModel::setData(const QModelIndex& index, const QVariant& value, int 
                 setRestartRequired(true);
             }
             break;
-        case ObfuscationRounds:
+        case DarksendRounds:
             nDarksendRounds = value.toInt();
             settings.setValue("nDarksendRounds", nDarksendRounds);
             emit obfuscationRoundsChanged(nDarksendRounds);

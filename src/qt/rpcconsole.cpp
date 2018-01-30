@@ -325,8 +325,10 @@ void RPCConsole::setClientModel(ClientModel* model)
         setNumBlocks(model->getNumBlocks());
         connect(model, SIGNAL(numBlocksChanged(int)), this, SLOT(setNumBlocks(int)));
 
+#if 0
         setMasternodeCount(model->getMasternodeCountString());
         connect(model, SIGNAL(strMasternodesChanged(QString)), this, SLOT(setMasternodeCount(QString)));
+#endif
 
         updateTrafficStats(model->getTotalBytesRecv(), model->getTotalBytesSent());
         connect(model, SIGNAL(bytesChanged(quint64, quint64)), this, SLOT(updateTrafficStats(quint64, quint64)));

@@ -30,7 +30,7 @@
 #endif
 
 #include "init.h"
-#include "masternodelist.h"
+#include "masternodemanager.h"
 #include "ui_interface.h"
 #include "util.h"
 
@@ -873,42 +873,11 @@ void BitcoinGUI::setNumBlocks(int count)
     tooltip = tr("Processed %n blocks of transaction history.", "", count);
 
     // Set icon state: spinning if catching up, tick otherwise
-    //    if(secs < 25*60) // 90*60 for bitcoin but we are 4x times faster
-    if (masternodeSync.IsBlockchainSynced()) {
-        QString strSyncStatus;
-        tooltip = tr("Up to date") + QString(".<br>") + tooltip;
-
-        if (masternodeSync.IsSynced()) {
-            progressBarLabel->setVisible(false);
-            progressBar->setVisible(false);
-            labelBlocksIcon->setPixmap(QIcon(":/icons/synced").pixmap(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE));
-        } else {
-            int nAttempt;
-            int progress = 0;
-
-            labelBlocksIcon->setPixmap(QIcon(QString(
-                                                 ":/movies/spinner-%1")
-                                                 .arg(spinnerFrame, 3, 10, QChar('0')))
-                                           .pixmap(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE));
-            spinnerFrame = (spinnerFrame + 1) % SPINNER_FRAMES;
-
+    if (secs < 25*60) { // 90*60 for bitcoin but we are 4x times faster
 #ifdef ENABLE_WALLET
-            if (walletFrame)
-                walletFrame->showOutOfSyncWarning(false);
+        if (walletFrame)
+            walletFrame->showOutOfSyncWarning(false);
 #endif // ENABLE_WALLET
-
-            nAttempt = masternodeSync.RequestedMasternodeAttempt < MASTERNODE_SYNC_THRESHOLD ?
-                           masternodeSync.RequestedMasternodeAttempt + 1 :
-                           MASTERNODE_SYNC_THRESHOLD;
-            progress = nAttempt + (masternodeSync.RequestedMasternodeAssets - 1) * MASTERNODE_SYNC_THRESHOLD;
-            progressBar->setMaximum(4 * MASTERNODE_SYNC_THRESHOLD);
-            progressBar->setFormat(tr("Synchronizing additional data: %p%"));
-            progressBar->setValue(progress);
-        }
-
-        strSyncStatus = QString(masternodeSync.GetSyncStatus().c_str());
-        progressBarLabel->setText(strSyncStatus);
-        tooltip = strSyncStatus + QString("<br>") + tooltip;
     } else {
         // Represent time from last generated block in human readable text
         QString timeBehindText;

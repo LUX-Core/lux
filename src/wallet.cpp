@@ -3765,3 +3765,12 @@ bool CMerkleTx::IsTransactionLockTimedOut() const
 
     return false;
 }
+
+bool CWallet::AddAdrenalineNodeConfig(CAdrenalineNodeConfig nodeConfig)
+{
+    bool rv = CWalletDB(strWalletFile).WriteAdrenalineNodeConfig(nodeConfig.sAlias, nodeConfig);
+    if(rv)
+	uiInterface.NotifyAdrenalineNodeChanged(nodeConfig);
+
+    return rv;
+}

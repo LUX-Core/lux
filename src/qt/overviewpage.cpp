@@ -12,8 +12,7 @@
 #include "guiconstants.h"
 #include "guiutil.h"
 #include "init.h"
-#include "obfuscation.h"
-#include "obfuscationconfig.h"
+#include "darksend.h"
 #include "optionsmodel.h"
 #include "transactionfilterproxy.h"
 #include "transactiontablemodel.h"
@@ -304,8 +303,6 @@ void OverviewPage::showOutOfSyncWarning(bool fShow)
 
 void OverviewPage::updateObfuscationProgress()
 {
-    if (!masternodeSync.IsBlockchainSynced() || ShutdownRequested()) return;
-
     if (!pwalletMain) return;
 
     QString strAmountAndRounds;
@@ -334,8 +331,8 @@ void OverviewPage::updateObfuscationProgress()
         TRY_LOCK(cs_main, lockMain);
         if (!lockMain) return;
 
-        nDenominatedConfirmedBalance = pwalletMain->GetDenominatedBalance();
-        nDenominatedUnconfirmedBalance = pwalletMain->GetDenominatedBalance(true);
+        nDenominatedConfirmedBalance = pwalletMain->GetDenominatedBalance(false);
+        nDenominatedUnconfirmedBalance = pwalletMain->GetDenominatedBalance(true, false);
         nAnonymizableBalance = pwalletMain->GetAnonymizableBalance();
         nNormalizedAnonymizedBalance = pwalletMain->GetNormalizedAnonymizedBalance();
         nAverageAnonymizedRounds = pwalletMain->GetAverageAnonymizedRounds();
@@ -414,15 +411,15 @@ void OverviewPage::updateObfuscationProgress()
     ui->obfuscationProgress->setToolTip(strToolPip);
 }
 
-
 void OverviewPage::obfuscationStatus()
 {
+#if 0
     static int64_t nLastDSProgressBlockTime = 0;
 
     int nBestHeight = chainActive.Tip()->nHeight;
 
     // we we're processing more then 1 block per second, we'll just leave
-    if (((nBestHeight - obfuscationPool.cachedNumBlocks) / (GetTimeMillis() - nLastDSProgressBlockTime + 1) > 1)) return;
+    //if (((nBestHeight - obfuscationPool.cachedNumBlocks) / (GetTimeMillis() - nLastDSProgressBlockTime + 1) > 1)) return;
     nLastDSProgressBlockTime = GetTimeMillis();
 
     if (!fEnableLuxsend) {
@@ -464,24 +461,30 @@ void OverviewPage::obfuscationStatus()
         QString s2(out.c_str());
         ui->labelSubmittedDenom->setText(s2);
     }
+#endif
 }
 
 void OverviewPage::obfuscationAuto()
 {
+#if 0
     obfuscationPool.DoAutomaticDenominating();
+#endif
 }
 
 void OverviewPage::obfuscationReset()
 {
+#if 0
     obfuscationPool.Reset();
 
     QMessageBox::warning(this, tr("Obfuscation"),
         tr("Obfuscation was successfully reset."),
         QMessageBox::Ok, QMessageBox::Ok);
+#endif
 }
 
 void OverviewPage::toggleObfuscation()
 {
+#if 0
     QSettings settings;
     // Popup some information on first mixing
     QString hasMixed = settings.value("hasMixed").toString();
@@ -534,4 +537,5 @@ void OverviewPage::toggleObfuscation()
             dlg.exec();
         }
     }
+#endif
 }
