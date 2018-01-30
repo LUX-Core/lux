@@ -967,13 +967,15 @@ bool CheckTransaction(const CTransaction& tx, CValidationState& state)
             REJECT_INVALID, "bad-txns-oversize");
 
     // Check for negative or overflow output values
+    unsigned i = 0;
     CAmount nValueOut = 0;
-    BOOST_FOREACH (const CTxOut& txout, tx.vout) {
+    for (const CTxOut& txout : tx.vout) {
         if (txout.IsEmpty() && !tx.IsCoinBase() && !tx.IsCoinStake())
             return state.DoS(100, error("CheckTransaction(): txout empty for user transaction"));
 
         if (txout.nValue < 0)
-            return state.DoS(100, error("CheckTransaction() : txout.nValue negative"),
+            return state.DoS(100, error("%s: tx.vout[%d].nValue negative (%s, empty=%s, coinstake=%s)", __func__, i,
+                                        txout.ToString(), (txout.IsEmpty()?"yes":"no"), (tx.IsCoinStake()?"yes":"no")),
                 REJECT_INVALID, "bad-txns-vout-negative");
         if (txout.nValue > MAX_MONEY)
             return state.DoS(100, error("CheckTransaction() : txout.nValue too high"),
@@ -982,6 +984,8 @@ bool CheckTransaction(const CTransaction& tx, CValidationState& state)
         if (!MoneyRange(nValueOut))
             return state.DoS(100, error("CheckTransaction() : txout total out of range"),
                 REJECT_INVALID, "bad-txns-txouttotal-toolarge");
+
+        i += 1;
     }
 
 
@@ -3149,11 +3153,14 @@ bool CheckBlock(const CBlock& block, CValidationState& state, bool fCheckPOW, bo
     // -------------------------------------------
 
     // Check transactions
-    BOOST_FOREACH (const CTransaction& tx, block.vtx)
+    unsigned int nTx = 0;
+    BOOST_FOREACH (const CTransaction& tx, block.vtx) {
         if (!CheckTransaction(tx, state)) {
             LogPrint("debug", "%s: invalid transaction %s", __func__, tx.ToString());
-            return error("%s: CheckTransaction failed", __func__);
+            return error("%s: CheckTransaction failed (nTx=%d, reason: %s)", __func__, nTx, state.GetRejectReason());
         }
+        ++nTx;
+    }
 
     unsigned int nSigOps = 0;
     BOOST_FOREACH (const CTransaction& tx, block.vtx) {
@@ -3184,7 +3191,7 @@ bool CheckWork(const CBlock &block, CBlockIndex* const pindexPrev)
 //    }
 
     if (block.IsProofOfWork() && pindexPrev->nHeight + 1 > Params().LAST_POW_BLOCK())
-        return  error("%s: reject proof-of-work at height %d", __func__, pindexPrev->nHeight + 1);
+        return error("%s: reject proof-of-work at height %d", __func__, pindexPrev->nHeight + 1);
 
     if (block.nBits != nBitsRequired)
         return error("%s: incorrect proof of work at %d", __func__, pindexPrev->nHeight + 1);
