@@ -18,7 +18,7 @@ static const CAmount CENT = 1000000;
 
 /** No amount larger than this (in satoshi) is valid */
 static const CAmount MAX_MONEY = 500000000 * COIN;
-static const CAmount MIN_TX_FEE = 10000;
+static const CAmount MIN_TX_FEE = 1000;
 static const CAmount MAX_TX_FEE = MAX_MONEY / 10; // Properly impossible to have this fee!
 static const CAmount MAX_BK_FEE = MAX_MONEY / 2; // Properly impossible to have this fee!
 
