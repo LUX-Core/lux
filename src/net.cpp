@@ -1691,11 +1691,11 @@ void RelayTransaction(const CTransaction& tx, const CDataStream& ss)
         if (!pnode->fRelayTxes)
             continue;
         LOCK(pnode->cs_filter);
-        if (pnode->pfilter) {
-            if (pnode->pfilter->IsRelevantAndUpdate(tx))
-                pnode->PushInventory(inv);
-        } else
+        if (pnode->pfilter==nullptr || pnode->pfilter->IsRelevantAndUpdate(tx)) {
             pnode->PushInventory(inv);
+        } else if (pnode->pfilter) {
+            LogPrintf("%s: filtered tx: %s\n", __func__, tx.GetHash().GetHex());
+        }
     }
 }
 
