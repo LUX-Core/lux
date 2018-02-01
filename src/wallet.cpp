@@ -1115,7 +1115,7 @@ void CWalletTx::RelayWalletTransaction(std::string strCommand)
     if (!IsCoinBase()) {
         if (GetDepthInMainChain() == 0) {
             uint256 hash = GetHash();
-            LogPrintf("Relaying wtx %s\n", hash.ToString());
+            LogPrintf("%s: wtx %s (command=%s)\n", __func__, hash.ToString(), strCommand);
 
             if (strCommand == "ix") {
                 mapTxLockReq.insert(make_pair(hash, (CTransaction) * this));
