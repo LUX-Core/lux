@@ -440,40 +440,24 @@ public:
 
     bool IsDenominated(const CTxIn& txin) const;
     bool IsDenominated(const CTransaction& tx) const;
-
     bool IsDenominatedAmount(int64_t nInputAmount) const;
 
     isminetype IsMine(const CTxIn& txin) const;
-    CAmount GetDebit(const CTxIn& txin, const isminefilter& filter) const;
-    isminetype IsMine(const CTxOut& txout) const
-    {
-        return ::IsMine(*this, txout.scriptPubKey);
-    }
-    CAmount GetCredit(const CTxOut& txout, const isminefilter& filter) const
-    {
-        if (!MoneyRange(txout.nValue))
-            throw std::runtime_error("CWallet::GetCredit() : value out of range");
-        return ((IsMine(txout) & filter) ? txout.nValue : 0);
-    }
-    bool IsChange(const CTxOut& txout) const;
-    CAmount GetChange(const CTxOut& txout) const
-    {
-        if (!MoneyRange(txout.nValue))
-            throw std::runtime_error("CWallet::GetChange() : value out of range");
-        return (IsChange(txout) ? txout.nValue : 0);
-    }
+    isminetype IsMine(const CTxOut& txout) const { return ::IsMine(*this, txout.scriptPubKey); }
     bool IsMine(const CTransaction& tx) const
     {
         BOOST_FOREACH (const CTxOut& txout, tx.vout)
-            if (IsMine(txout))
-                return true;
+            if (IsMine(txout) != ISMINE_NO) return true;
         return false;
     }
+
     /** should probably be renamed to IsRelevantToMe */
     bool IsFromMe(const CTransaction& tx) const
     {
         return (GetDebit(tx, ISMINE_ALL) > 0);
     }
+
+    CAmount GetDebit(const CTxIn& txin, const isminefilter& filter) const;
     CAmount GetDebit(const CTransaction& tx, const isminefilter& filter) const
     {
         CAmount nDebit = 0;
@@ -483,6 +467,13 @@ public:
                 throw std::runtime_error("CWallet::GetDebit() : value out of range");
         }
         return nDebit;
+    }
+
+    CAmount GetCredit(const CTxOut& txout, const isminefilter& filter) const
+    {
+        if (!MoneyRange(txout.nValue))
+            throw std::runtime_error("CWallet::GetCredit() : value out of range");
+        return ((IsMine(txout) & filter) ? txout.nValue : 0);
     }
     CAmount GetCredit(const CTransaction& tx, const isminefilter& filter) const
     {
@@ -494,6 +485,15 @@ public:
         }
         return nCredit;
     }
+
+    bool IsChange(const CTxOut& txout) const;
+
+    CAmount GetChange(const CTxOut& txout) const
+    {
+        if (!MoneyRange(txout.nValue))
+            throw std::runtime_error("CWallet::GetChange() : value out of range");
+        return (IsChange(txout) ? txout.nValue : 0);
+    }
     CAmount GetChange(const CTransaction& tx) const
     {
         CAmount nChange = 0;
@@ -504,6 +504,7 @@ public:
         }
         return nChange;
     }
+
     void SetBestChain(const CBlockLocator& loc);
 
     DBErrors LoadWallet(bool& fFirstRunRet);
@@ -517,12 +518,9 @@ public:
 
     void Inventory(const uint256& hash)
     {
-        {
-            LOCK(cs_wallet);
-            std::map<uint256, int>::iterator mi = mapRequestCount.find(hash);
-            if (mi != mapRequestCount.end())
-                (*mi).second++;
-        }
+        LOCK(cs_wallet);
+        std::map<uint256, int>::iterator mi = mapRequestCount.find(hash);
+        if (mi != mapRequestCount.end()) (*mi).second++;
     }
 
     unsigned int GetKeyPoolSize()
@@ -1155,7 +1153,8 @@ public:
             if (parent == NULL)
                 return false;
             const CTxOut& parentOut = parent->vout[txin.prevout.n];
-            if (pwallet->IsMine(parentOut) != ISMINE_SPENDABLE)
+            const isminetype t = pwallet->IsMine(parentOut);
+            if (t != ISMINE_SPENDABLE)
                 return false;
         }
         return true;
