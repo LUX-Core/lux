@@ -1687,15 +1687,20 @@ void RelayTransaction(const CTransaction& tx, const CDataStream& ss)
         vRelayExpiration.push_back(std::make_pair(GetTime() + 15 * 60, inv));
     }
     LOCK(cs_vNodes);
+    unsigned nRelayed = 0;
     BOOST_FOREACH (CNode* pnode, vNodes) {
         if (!pnode->fRelayTxes)
             continue;
-        LOCK(pnode->cs_filter);
-        if (pnode->pfilter==nullptr || pnode->pfilter->IsRelevantAndUpdate(tx)) {
-            pnode->PushInventory(inv);
-        } else if (pnode->pfilter) {
-            LogPrintf("%s: filtered tx: %s\n", __func__, tx.GetHash().GetHex());
+        if (pnode->nVersion >= ActiveProtocol()) {
+            LOCK(pnode->cs_filter);
+            if (pnode->pfilter==nullptr || pnode->pfilter->IsRelevantAndUpdate(tx)) {
+                pnode->PushInventory(inv);
+                ++nRelayed;
+            }
         }
+    }
+    if (nRelayed == 0) {
+        LogPrintf("%s: tx %s not relayed\n", __func__, tx.GetHash().GetHex());
     }
 }
 

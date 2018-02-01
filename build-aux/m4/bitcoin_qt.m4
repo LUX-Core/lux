@@ -254,6 +254,8 @@ AC_DEFUN([BITCOIN_QT_CONFIGURE],[
   AC_SUBST(QT_TEST_LIBS)
   AC_SUBST(QT_SELECT, qt${bitcoin_qt_got_major_vers})
   AC_SUBST(MOC_DEFS)
+
+  QT_LDFLAGS="$QT_LDFLAGS -Wl,-rpath=$qt_lib_path"
 ])
 
 dnl All macros below are internal and should _not_ be used from the main
@@ -506,4 +508,3 @@ AC_DEFUN([_BITCOIN_QT_FIND_LIBS_WITHOUT_PKGCONFIG],[
   CXXFLAGS="$TEMP_CXXFLAGS"
   LIBS="$TEMP_LIBS"
 ])
-
