@@ -25,7 +25,8 @@ class CBlockHeader
 {
 public:
     // header
-    static const int32_t CURRENT_VERSION=3;
+    static const int32_t CURRENT_VERSION=7;
+    
     int32_t nVersion;
     uint256 hashPrevBlock;
     uint256 hashMerkleRoot;
@@ -104,9 +105,19 @@ public:
     template <typename Stream, typename Operation>
     inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion) {
         READWRITE(*(CBlockHeader*)this);
+#       if 1
+        if (!(nType & SER_GETHASH)) {
+            READWRITE(vtx);
+            READWRITE(vchBlockSig);
+        } else if (ser_action.ForRead()) {
+            const_cast<CBlock*>(this)->vtx.clear();
+            const_cast<CBlock*>(this)->vchBlockSig.clear();
+        }
+#       else
         READWRITE(vtx);
 	if(vtx.size() > 1 && vtx[1].IsCoinStake())
-		READWRITE(vchBlockSig);
+            READWRITE(vchBlockSig);
+#       endif
     }
 
     void SetNull()
