@@ -1342,7 +1342,7 @@ Value listaccounts(const Array& params, bool fHelp)
         if (params[1].get_bool())
             includeWatchonly = includeWatchonly | ISMINE_WATCH_ONLY;
 
-    map<string, CAmount> mapAccountBalances;
+    map<string, CAmount> mapAccountBalances, immatureBalances;
     BOOST_FOREACH (const PAIRTYPE(CTxDestination, CAddressBookData) & entry, pwalletMain->mapAddressBook) {
         if (IsMine(*pwalletMain, entry.first) & includeWatchonly) // This address belongs to me
             mapAccountBalances[entry.second.name] = 0;
@@ -1367,6 +1367,9 @@ Value listaccounts(const Array& params, bool fHelp)
                     mapAccountBalances[pwalletMain->mapAddressBook[r.destination].name] += r.amount;
                 else
                     mapAccountBalances[""] += r.amount;
+        } else {
+            auto nImmatureCredit = wtx.GetImmatureCredit();
+            if (nImmatureCredit > 0) immatureBalances[wtx.strFromAccount] += nImmatureCredit;
         }
     }
 
@@ -1375,9 +1378,15 @@ Value listaccounts(const Array& params, bool fHelp)
     BOOST_FOREACH (const CAccountingEntry& entry, acentries)
         mapAccountBalances[entry.strAccount] += entry.nCreditDebit;
 
-    Object ret;
+    Object ret, imm;
     BOOST_FOREACH (const PAIRTYPE(string, CAmount) & accountBalance, mapAccountBalances) {
         ret.push_back(Pair(accountBalance.first, ValueFromAmount(accountBalance.second)));
+    }
+    if (!immatureBalances.empty()) {
+        for (auto const &i : immatureBalances) {
+            imm.push_back(Pair(i.first, ValueFromAmount(i.second)));
+        }
+        ret.emplace_back("immature", imm);
     }
     return ret;
 }
