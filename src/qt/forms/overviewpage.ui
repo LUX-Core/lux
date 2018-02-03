@@ -461,7 +461,7 @@
            <item row="2" column="0">
             <widget class="QLabel" name="labelAnonymizedText">
              <property name="text">
-              <string>Obfuscation Balance:</string>
+              <string>Luxsend Balance:</string>
              </property>
             </widget>
            </item>
@@ -510,7 +510,7 @@
             </widget>
            </item>
            <item row="0" column="1">
-            <widget class="QLabel" name="obfuscationEnabled">
+            <widget class="QLabel" name="LuxsendEnabled">
              <property name="text">
               <string>Enabled/Disabled</string>
              </property>
@@ -987,7 +987,7 @@
            <enum>Qt::Horizontal</enum>
           </property>
          </widget>
-         <widget class="QLabel" name="obfuscationStatus">
+         <widget class="QLabel" name="LuxsendStatus">
           <property name="geometry">
            <rect>
             <x>10</x>
@@ -1028,7 +1028,7 @@
            </sizepolicy>
           </property>
           <property name="toolTip">
-           <string>Try to manually submit a Obfuscation request.</string>
+           <string>Try to manually submit a Luxsend request.</string>
           </property>
           <property name="text">
            <string>Try Mix</string>
@@ -1050,7 +1050,7 @@
            </sizepolicy>
           </property>
           <property name="toolTip">
-           <string>Reset the current status of Obfuscation (can interrupt Obfuscation if it's in the process of Mixing, which can cost you money!)</string>
+           <string>Reset the current status of Luxsend (can interrupt Luxsend if it's in the process of Mixing, which can cost you money!)</string>
           </property>
           <property name="autoFillBackground">
            <bool>false</bool>
@@ -1078,7 +1078,7 @@
               </font>
              </property>
              <property name="text">
-              <string>Obfuscation</string>
+              <string>Luxsend</string>
              </property>
             </widget>
            </item>

@@ -140,9 +140,9 @@ OverviewPage::OverviewPage(QWidget* parent) : QWidget(parent),
             ui->frameObfuscation->setEnabled(false);
         } else {
             if (!fEnableLuxsend) {
-                ui->toggleObfuscation->setText(tr("Start Obfuscation"));
+                ui->toggleObfuscation->setText(tr("Start Luxsend"));
             } else {
-                ui->toggleObfuscation->setText(tr("Stop Obfuscation"));
+                ui->toggleObfuscation->setText(tr("Stop Luxsend"));
             }
             timer = new QTimer(this);
             connect(timer, SIGNAL(timeout()), this, SLOT(obfuscationStatus()));

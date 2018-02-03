@@ -1,12 +1,8 @@
 # Version 4.0.0
 ===============
 +Wallet version upgraded
-+Upgraded bip38
-+Added priv functions
 +New Wallet UI
-+Speed up block sync, strict database requests have been freed as code has been added to fix most of the corruption issues
-+Fixed masternode payment system, activated budget system and enabled spork implementation.
-+Added trading api
++Upgraded masternode system
 +Added 1 click build wins, linux & osx
 +Added Cryptopia trading UI 
 

@@ -1,3 +1,22 @@
+Skip to content
+This repository
+Search
+Pull requests
+Issues
+Marketplace
+Explore
+ @216k155
+ Sign out
+ Unwatch 2
+  Star 0  Fork 26 duzy/lux
+forked from 216k155/lux
+ Code  Pull requests 0  Projects 0  Wiki  Insights
+Branch: merging-master… Find file Copy pathlux/build-aux/m4/bitcoin_qt.m4
+98a328a  2 days ago
+@duzy duzy Qt: add rpath to qt libdir
+2 contributors @216k155 @duzy
+RawBlameHistory     
+Executable File  511 lines (478 sloc)  20.1 KB
 dnl Helper for cases where a qt dependency is not met.
 dnl Output: If qt version is auto, set bitcoin_enable_qt to false. Else, exit.
 AC_DEFUN([BITCOIN_QT_FAIL],[
@@ -508,3 +527,15 @@ AC_DEFUN([_BITCOIN_QT_FIND_LIBS_WITHOUT_PKGCONFIG],[
   CXXFLAGS="$TEMP_CXXFLAGS"
   LIBS="$TEMP_LIBS"
 ])
+© 2018 GitHub, Inc.
+Terms
+Privacy
+Security
+Status
+Help
+Contact GitHub
+API
+Training
+Shop
+Blog
+About

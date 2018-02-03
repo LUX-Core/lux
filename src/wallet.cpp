@@ -25,6 +25,7 @@
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/thread.hpp>
 
+#define SELECT_COINS_FROM_ACCOUNT true
 
 using namespace std;
 
@@ -952,11 +953,7 @@ int CWalletTx::GetRequestCount() const
     return nRequests;
 }
 
-void CWalletTx::GetAmounts(list<COutputEntry>& listReceived,
-    list<COutputEntry>& listSent,
-    CAmount& nFee,
-    string& strSentAccount,
-    const isminefilter& filter) const
+void CWalletTx::GetAmounts(list<COutputEntry>& listReceived, list<COutputEntry>& listSent, CAmount& nFee, string& strSentAccount, const isminefilter& filter) const
 {
     nFee = 0;
     listReceived.clear();
@@ -1469,7 +1466,7 @@ void CWallet::AvailableCoins(vector<COutput>& vCoins, bool fOnlyConfirmed, const
             if ((pcoin->IsCoinBase() || pcoin->IsCoinStake()) && pcoin->GetBlocksToMaturity() > 0)
                 continue;
 
-            int nDepth = pcoin->GetDepthInMainChain(false);
+            const int nDepth = pcoin->GetDepthInMainChain(false);
             // do not use IX for inputs that have less then 6 blockchain confirmations
             if (fUseIX && nDepth < 6)
                 continue;
@@ -1485,20 +1482,30 @@ void CWallet::AvailableCoins(vector<COutput>& vCoins, bool fOnlyConfirmed, const
                     //should make this a vector
                     found = IsDenominatedAmount(pcoin->vout[i].nValue);
                 } else if (nCoinType == ONLY_NONDENOMINATED || nCoinType == ONLY_NONDENOMINATED_NOTMN) {
-                    found = true;
-                    if (IsCollateralAmount(pcoin->vout[i].nValue)) continue; // do not use collateral amounts
-                    found = !IsDenominatedAmount(pcoin->vout[i].nValue);
-                    if (found && nCoinType == ONLY_NONDENOMINATED_NOTMN) found = (pcoin->vout[i].nValue != GetMNCollateral(chainActive.Tip()->nHeight) * COIN); // do not use Hot MN funds
+                    // Do not use collateral or denominated amounts.
+                    found = !IsCollateralAmount(pcoin->vout[i].nValue);
+                    if (found) found = !IsDenominatedAmount(pcoin->vout[i].nValue);
+                    if (found && nCoinType == ONLY_NONDENOMINATED_NOTMN) // do not use Hot MN funds
+                        found = (pcoin->vout[i].nValue != GetMNCollateral(chainActive.Tip()->nHeight) * COIN);
                 } else {
                     found = true;
                 }
                 if (!found) continue;
 
                 isminetype mine = IsMine(pcoin->vout[i]);
-                if (!(IsSpent(wtxid, i)) && mine &&
-                    !IsLockedCoin((*it).first, i) && pcoin->vout[i].nValue > 0 &&
-                    (!coinControl || !coinControl->HasSelected() || coinControl->IsSelected((*it).first, i)))
-                    vCoins.push_back(COutput(pcoin, i, nDepth, mine));
+                if (mine && !(IsSpent(wtxid, i)) && !IsLockedCoin((*it).first, i) && pcoin->vout[i].nValue > 0 &&
+                    (!coinControl || !coinControl->HasSelected() || coinControl->IsSelected((*it).first, i))) {
+                    COutput output(pcoin, i, nDepth, mine);
+#if defined(DEBUG_DUMP_STAKING_INFO)
+                    std::cout
+                        << __func__ << ": "
+                        << "depth=" << nDepth << ", "
+                        << "type=" << nCoinType << ", "
+                        << output.ToString()
+                        << std::endl ;
+#endif
+                    vCoins.push_back(output);
+                }
             }
         }
     }
@@ -1523,10 +1530,10 @@ void CWallet::AvailableCoinsMN(vector<COutput>& vCoins, bool fOnlyConfirmed, con
             if (pcoin->IsCoinBase() && pcoin->GetBlocksToMaturity() > 0)
                 continue;
 
-            if(pcoin->IsCoinStake() && pcoin->GetBlocksToMaturity() > 0)
+            if (pcoin->IsCoinStake() && pcoin->GetBlocksToMaturity() > 0)
                 continue;
 
-            int nDepth = pcoin->GetDepthInMainChain();
+            const int nDepth = pcoin->GetDepthInMainChain();
             if (nDepth <= 0) // LuxNOTE: coincontrol fix / ignore 0 confirm
                 continue;
 
@@ -1538,7 +1545,6 @@ void CWallet::AvailableCoinsMN(vector<COutput>& vCoins, bool fOnlyConfirmed, con
                 bool found = false;
                 if(coin_type == ONLY_DENOMINATED) {
                     //should make this a vector
-
                     found = IsDenominatedAmount(pcoin->vout[i].nValue);
                 } else if(coin_type == ONLY_NONDENOMINATED || coin_type == ONLY_NONDENOMINATED_NOTMN) {
                     found = true;
@@ -1683,7 +1689,7 @@ bool CWallet::MintableCoins()
     return false;
 }
 
-bool CWallet::SelectCoinsMinConf(const CAmount& nTargetValue, int nConfMine, int nConfTheirs, vector<COutput> vCoins, set<pair<const CWalletTx*, unsigned int> >& setCoinsRet, CAmount& nValueRet) const
+bool CWallet::SelectCoinsMinConf(const std::string &account, const CAmount& nTargetValue, int nConfMine, int nConfTheirs, vector<COutput> vCoins, set<pair<const CWalletTx*, unsigned int> >& setCoinsRet, CAmount& nValueRet) const
 {
     setCoinsRet.clear();
     nValueRet = 0;
@@ -1710,6 +1716,8 @@ bool CWallet::SelectCoinsMinConf(const CAmount& nTargetValue, int nConfMine, int
                 continue;
 
             const CWalletTx* pcoin = output.tx;
+            if (pcoin->strFromAccount != account)
+                continue;
 
             //            if (fDebug) LogPrint("selectcoins", "value %s confirms %d\n", FormatMoney(pcoin->vout[output.i].nValue), output.nDepth);
             if (output.nDepth < (pcoin->IsFromMe(ISMINE_ALL) ? nConfMine : nConfTheirs))
@@ -1790,7 +1798,7 @@ bool CWallet::SelectCoinsMinConf(const CAmount& nTargetValue, int nConfMine, int
     return true;
 }
 
-bool CWallet::SelectCoins(const CAmount& nTargetValue, set<pair<const CWalletTx*, unsigned int> >& setCoinsRet, CAmount& nValueRet, const CCoinControl* coinControl, AvailableCoinsType coin_type, bool useIX) const
+bool CWallet::SelectCoins(const std::string &account, const CAmount& nTargetValue, set<pair<const CWalletTx*, unsigned int> >& setCoinsRet, CAmount& nValueRet, const CCoinControl* coinControl, AvailableCoinsType coin_type, bool useIX) const
 {
     // Note: this function should never be used for "always free" tx types like dstx
 
@@ -1800,8 +1808,7 @@ bool CWallet::SelectCoins(const CAmount& nTargetValue, set<pair<const CWalletTx*
     // coin control -> return all selected outputs (we want all selected to go into the transaction for sure)
     if (coinControl && coinControl->HasSelected()) {
         BOOST_FOREACH (const COutput& out, vCoins) {
-            if (!out.fSpendable)
-                continue;
+            if (!out.fSpendable) continue;
 
             if (coin_type == ONLY_DENOMINATED) {
                 CTxIn vin = CTxIn(out.tx->GetHash(), out.i);
@@ -1810,8 +1817,20 @@ bool CWallet::SelectCoins(const CAmount& nTargetValue, set<pair<const CWalletTx*
                 if (rounds < nDarksendRounds) continue;
             }
 
-            nValueRet += out.tx->vout[out.i].nValue;
-            setCoinsRet.insert(make_pair(out.tx, out.i));
+            const CTxOut& txout = out.tx->vout[out.i];
+            
+#           if defined(SELECT_COINS_FROM_ACCOUNT)&&SELECT_COINS_FROM_ACCOUNT
+            CTxDestination address;
+            if (ExtractDestination(txout.scriptPubKey, address) && IsAccountAddress(account, address)) {
+                nValueRet += txout.nValue;
+                setCoinsRet.insert(make_pair(out.tx, out.i));
+            }
+#           else
+            if (out.tx->strFromAccount == account) {
+                nValueRet += txout.nValue;
+                setCoinsRet.insert(make_pair(out.tx, out.i));
+            }
+#           endif
         }
         return (nValueRet >= nTargetValue);
     }
@@ -1821,24 +1840,37 @@ bool CWallet::SelectCoins(const CAmount& nTargetValue, set<pair<const CWalletTx*
         // Make outputs by looping through denominations, from large to small
         BOOST_FOREACH (int64_t v, darkSendDenominations) {
             BOOST_FOREACH (const COutput& out, vCoins) {
-                if (out.tx->vout[out.i].nValue == v                                               //make sure it's the denom we're looking for
-                    && nValueRet + out.tx->vout[out.i].nValue < nTargetValue + (0.1 * COIN) + 100 //round the amount up to .1 LUX over
+                const CTxOut& txout = out.tx->vout[out.i];
+                if (txout.nValue == v //make sure it's the denom we're looking for
+                    && nValueRet + txout.nValue < nTargetValue + (0.1 * COIN) + 100 //round the amount up to .1 LUX over
                     ) {
+
                     CTxIn vin = CTxIn(out.tx->GetHash(), out.i);
                     int rounds = GetInputDarkSendRounds(vin);
-                    // make sure it's actually anonymized
-                    if (rounds < nDarksendRounds) continue;
-                    nValueRet += out.tx->vout[out.i].nValue;
-                    setCoinsRet.insert(make_pair(out.tx, out.i));
+                    if (rounds < nDarksendRounds) // make sure it's actually anonymized
+                        continue;
+
+#                   if defined(SELECT_COINS_FROM_ACCOUNT)&&SELECT_COINS_FROM_ACCOUNT
+                    CTxDestination address;
+                    if (ExtractDestination(txout.scriptPubKey, address) && IsAccountAddress(account, address)) {
+                        nValueRet += txout.nValue;
+                        setCoinsRet.insert(make_pair(out.tx, out.i));
+                    }
+#                   else
+                    if (out.tx->strFromAccount == account) {
+                        nValueRet += txout.nValue;
+                        setCoinsRet.insert(make_pair(out.tx, out.i));
+                    }
+#                   endif
                 }
             }
         }
         return (nValueRet >= nTargetValue);
     }
 
-    return (SelectCoinsMinConf(nTargetValue, 1, 6, vCoins, setCoinsRet, nValueRet) ||
-            SelectCoinsMinConf(nTargetValue, 1, 1, vCoins, setCoinsRet, nValueRet) ||
-            (bSpendZeroConfChange && SelectCoinsMinConf(nTargetValue, 0, 1, vCoins, setCoinsRet, nValueRet)));
+    return (SelectCoinsMinConf(account, nTargetValue, 1, 6, vCoins, setCoinsRet, nValueRet) ||
+            SelectCoinsMinConf(account, nTargetValue, 1, 1, vCoins, setCoinsRet, nValueRet) ||
+            (bSpendZeroConfChange && SelectCoinsMinConf(account, nTargetValue, 0, 1, vCoins, setCoinsRet, nValueRet)));
 }
 
 struct CompareByPriority {
@@ -2136,16 +2168,16 @@ bool CWallet::ConvertList(std::vector<CTxIn> vCoins, std::vector<int64_t>& vecAm
     return true;
 }
 
-bool CWallet::CreateTransaction(const vector<pair<CScript, CAmount> >& vecSend,
-    CWalletTx& wtxNew,
-    CReserveKey& reservekey,
-    CAmount& nFeeRet,
-    std::string& strFailReason,
-    const CCoinControl* coinControl,
-    AvailableCoinsType coin_type,
-    bool useIX,
-    CAmount nFeePay)
+bool CWallet::CreateTransaction(const vector<pair<CScript, CAmount> >& vecSend, CWalletTx& wtxNew, CReserveKey& reservekey, CAmount& nFeeRet, std::string& strFailReason, const CCoinControl* coinControl, AvailableCoinsType coin_type, bool useIX, CAmount nFeePay)
 {
+#if defined(DEBUG_DUMP_STAKING_INFO)
+    std::cout
+        << __func__ << ": " << vecSend.size() << ": "
+        << vecSend[0].first.ToString() << ", "
+        << vecSend[0].second
+        << std::endl ;
+#endif
+    
     if (useIX && nFeePay < CENT) nFeePay = CENT;
 
     CAmount nValue = 0;
@@ -2212,7 +2244,7 @@ bool CWallet::CreateTransaction(const vector<pair<CScript, CAmount> >& vecSend,
                 set<pair<const CWalletTx*, unsigned int> > setCoins;
                 CAmount nValueIn = 0;
 
-                if (!SelectCoins(nTotalValue, setCoins, nValueIn, coinControl, coin_type, useIX)) {
+                if (!SelectCoins(wtxNew.strFromAccount, nTotalValue, setCoins, nValueIn, coinControl, coin_type, useIX)) {
                     if (coin_type == ALL_COINS) {
                         strFailReason = _("Insufficient funds.");
                     } else if (coin_type == ONLY_NONDENOMINATED) {
@@ -2231,6 +2263,13 @@ bool CWallet::CreateTransaction(const vector<pair<CScript, CAmount> >& vecSend,
                     return false;
                 }
 
+#if defined(DEBUG_DUMP_STAKING_INFO)
+                for (auto &coin : setCoins) {
+                    std::cout
+                        << coin.first->GetHash().GetHex() << ", " << coin.second << "\n"
+                        << coin.first->ToString() << std::endl ;
+                }
+#endif
 
                 BOOST_FOREACH (PAIRTYPE(const CWalletTx*, unsigned int) pcoin, setCoins) {
                     CAmount nCredit = pcoin.first->vout[pcoin.second].nValue;
@@ -2564,7 +2603,7 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
         ExtractDestination(payee, address1);
         CBitcoinAddress address2(address1);
 
-        LogPrintf("%s: Masternode payment to %s\n", __func__, address2.ToString().c_str());
+        LogPrintf("%s: Masternode payment to %s\n", __func__, address2.ToString());
     }
 
     int64_t blockValue = nCredit;
@@ -2616,6 +2655,14 @@ bool CWallet::CommitTransaction(CWalletTx& wtxNew, CReserveKey& reservekey, std:
     {
         LOCK2(cs_main, cs_wallet);
         LogPrintf("%s: command=%s\n%s", __func__, strCommand, wtxNew.ToString());
+#if defined(DEBUG_DUMP_STAKING_INFO)
+        std::cout
+            << __func__ << ": command=" << strCommand
+            << ", " << wtxNew.GetHash().GetHex()
+            << "\n"
+            << wtxNew.ToString()
+            << std::endl ;
+#endif
         {
             // This is only to keep the database open to defeat the auto-flush for the
             // duration of this scope.  This is the only place where this optimization
@@ -3201,7 +3248,7 @@ set<set<CTxDestination> > CWallet::GetAddressGroupings()
     return ret;
 }
 
-set<CTxDestination> CWallet::GetAccountAddresses(string strAccount) const
+set<CTxDestination> CWallet::GetAccountAddresses(const std::string &strAccount) const
 {
     LOCK(cs_wallet);
     set<CTxDestination> result;
@@ -3212,6 +3259,18 @@ set<CTxDestination> CWallet::GetAccountAddresses(string strAccount) const
             result.insert(address);
     }
     return result;
+}
+
+bool CWallet::IsAccountAddress(const std::string &strAccount, const CTxDestination &address) const
+{
+    LOCK(cs_wallet);
+    auto it = mapAddressBook.find(address);
+    if (it != mapAddressBook.end()) {
+        if (it->second.name == strAccount) {
+            return true;
+        }
+    }
+    return false;
 }
 
 bool CReserveKey::GetReservedKey(CPubKey& pubkey)
