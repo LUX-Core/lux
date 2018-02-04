@@ -1145,10 +1145,9 @@ bool AcceptToMemoryPool(CTxMemPool& pool, CValidationState& state, const CTransa
             // only helps filling in pfMissingInputs (to determine missing vs spent).
             BOOST_FOREACH (const CTxIn txin, tx.vin) {
                 if (!view.HaveCoins(txin.prevout.hash)) {
-                    std::cout
-                        << __func__ << ": " << tx.GetHash().GetHex()
-                        << " missing " << txin.prevout.hash.GetHex()
-                        << std::endl ;
+#                   if defined(DEBUG_DUMP_STAKING_INFO)&&defined(DEBUG_DUMP_AcceptToMemoryPool)
+                    DEBUG_DUMP_AcceptToMemoryPool();
+#                   endif
                     if (pfMissingInputs)
                         *pfMissingInputs = true;
                     return false;
@@ -4813,10 +4812,9 @@ static bool ProcessMessage(CNode* pfrom, const string &strCommand, CDataStream& 
 
         mapAlreadyAskedFor.erase(inv);
 
-        std::cout
-            << __func__ << ": " << inv.ToString() << "\n"
-            << tx.ToString()
-            << std::endl ;
+#       if defined(DEBUG_DUMP_STAKING_INFO)&&defined(DEBUG_DUMP_Message_TX)
+        DEBUG_DUMP_Message_TX();
+#       endif
 
         if (AcceptToMemoryPool(mempool, state, tx, true, &fMissingInputs, false, ignoreFees)) {
             mempool.check(pcoinsTip);
