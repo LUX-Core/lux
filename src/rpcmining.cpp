@@ -183,8 +183,7 @@ Value setgenerate(const Array& params, bool fHelp)
             blockHashes.push_back(pblock->GetHash().GetHex());
         }
         return blockHashes;
-    } else // Not -regtest: start generate thread, return immediately
-    {
+    } else { // Not -regtest: start generate thread, return immediately
         mapArgs["-gen"] = (fGenerate ? "1" : "0");
         mapArgs["-genproclimit"] = itostr(nGenProcLimit);
         GenerateBitcoins(fGenerate, pwalletMain, nGenProcLimit);

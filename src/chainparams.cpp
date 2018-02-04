@@ -189,12 +189,13 @@ public:
     {
         networkID = CBaseChainParams::TESTNET;
         strNetworkID = "test";
-        pchMessageStart[0] = 0x45;
-        pchMessageStart[1] = 0x76;
-        pchMessageStart[2] = 0x65;
-        pchMessageStart[3] = 0xba;
+        pchMessageStart[0] = 0x54;
+        pchMessageStart[1] = 0x67;
+        pchMessageStart[2] = 0x56;
+        pchMessageStart[3] = 0xab;
         vAlertPubKey = ParseHex("000010e83b2703ccf322f7dbd62dd5855ac7c10bd055814ce121ba32607d573b8810c02c0582aed05b4deb9c4b77b26d92428c61256cd42774babea0a073b2ed0c9");
-        nDefaultPort = 18065;
+        nDefaultPort = 28333;
+        bnProofOfWorkLimit = ~uint256(0) >> 1;
         nEnforceBlockUpgradeMajority = 51;
         nRejectBlockOutdatedMajority = 75;
         nToCheckBlockUpgradeMajority = 100;
@@ -215,7 +216,7 @@ public:
 
         vFixedSeeds.clear();
         vSeeds.clear();
-        vSeeds.push_back(CDNSSeedData("88.198.192.110", "88.198.192.110"));
+        vSeeds.push_back(CDNSSeedData("luxtest1", "88.198.192.110"));
 
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1, 139); // Testnet lux addresses start with 'x' or 'y'
         base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1, 19);  // Testnet lux script addresses start with '8' or '9'
@@ -259,7 +260,6 @@ public:
     {
         networkID = CBaseChainParams::REGTEST;
         strNetworkID = "regtest";
-        strNetworkID = "regtest";
         pchMessageStart[0] = 0xa1;
         pchMessageStart[1] = 0xcf;
         pchMessageStart[2] = 0x7e;
@@ -269,6 +269,7 @@ public:
         nRejectBlockOutdatedMajority = 950;
         nToCheckBlockUpgradeMajority = 1000;
         nMinerThreads = 1;
+        nMaturity = 2;
         nTargetTimespan = 24 * 60 * 60; // Lux: 1 day
         nTargetSpacing = 1 * 60;        // Lux: 1 minutes
         bnProofOfWorkLimit = ~uint256(0) >> 1;
