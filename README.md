@@ -108,7 +108,7 @@ Once the source code is ready the build steps are below.
 
     # Note autogen will prompt to install some more dependencies if needed
     ./autogen.sh
-    ./configure 
+    ./configure --disable-tests
     make -j4
 
 ### Build on OSX
