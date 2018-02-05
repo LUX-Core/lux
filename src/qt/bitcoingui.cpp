@@ -873,10 +873,14 @@ void BitcoinGUI::setNumBlocks(int count)
     tooltip = tr("Processed %n blocks of transaction history.", "", count);
 
     // Set icon state: spinning if catching up, tick otherwise
-    if (secs < 25*60) { // 90*60 for bitcoin but we are 4x times faster
+    if (secs < 90*60) { // 90*60 for bitcoin but we are 4x times faster
 #ifdef ENABLE_WALLET
+        tooltip = tr("Up to date") + QString(".<br>") + tooltip;
+        labelBlocksIcon->setPixmap(QIcon(":/icons/synced").pixmap(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE));
         if (walletFrame)
             walletFrame->showOutOfSyncWarning(false);
+        progressBarLabel->setVisible(false);
+        progressBar->setVisible(false);
 #endif // ENABLE_WALLET
     } else {
         // Represent time from last generated block in human readable text
