@@ -98,12 +98,12 @@ public:
          * The characters are rarely used upper ASCII, not valid as UTF-8, and produce
          * a large 4-byte int at any alignment.
          */
-        pchMessageStart[0] = 0x64;
-        pchMessageStart[1] = 0x1a;
-        pchMessageStart[2] = 0x84;
-        pchMessageStart[3] = 0x3l;
+        pchMessageStart[0] = /*0x64*/ 0xa1;
+        pchMessageStart[1] = /*0x1a*/ 0xa6;
+        pchMessageStart[2] = /*0x84*/ 0xa1;
+        pchMessageStart[3] = /*0x3l*/ 0xa2;
         vAlertPubKey = ParseHex("042d13c016ed91528241bcff222989769417eb10cdb679228c91e26e26900eb9fd053cd9f16a9a2894ad5ebbd551be1a4bd23bd55023679be17f0bd3a16e6fbeba");
-        nDefaultPort = 28666;
+        nDefaultPort = /*28666*/ 26868;
         bnProofOfWorkLimit = ~uint256(0) >> 20; // LUX starting difficulty is 1 / 2^12
         nSubsidyHalvingInterval = 210000;
         nMaxReorganizationDepth = 100;
@@ -140,11 +140,18 @@ public:
 
         assert(hashGenesisBlock == uint256("0x00000759bb3da130d7c9aedae170da8335f5a0d01a9007e4c8d3ccd08ace6a42"));
         assert(genesis.hashMerkleRoot == uint256("0xe08ae0cfc35a1d70e6764f347fdc54355206adeb382446dd54c32cd0201000d3"));
+	
+// Single node address
 
-        vSeeds.push_back(CDNSSeedData("sd1", "45.77.44.147"));
-        vSeeds.push_back(CDNSSeedData("sd2", "207.246.96.37"));        // Single node address
+        vSeeds.push_back(CDNSSeedData("sd1", "45.77.44.147")); // Singapore
+	vSeeds.push_back(CDNSSeedData("sd2", "108.61.208.4")); // Paris
+        vSeeds.push_back(CDNSSeedData("sd3", "45.76.33.22")); // Amsterdam
+	vSeeds.push_back(CDNSSeedData("sd3", "207.246.96.37")); // Los Angeless
+
+#if 0
         vSeeds.push_back(CDNSSeedData("sd3", "45.32.245.217")); // SIN - AU
         vSeeds.push_back(CDNSSeedData("sd4", "45.76.118.90")); // US - AU
+#endif
 
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,48); // LUX Start letter L
         base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1,48);
@@ -168,7 +175,7 @@ public:
         nPoolMaxTransactions = 3;
         strSporkKey = "04a983220ea7a38a7106385003fef77896538a382a0dcc389cc45f3c98751d9af423a097789757556259351198a8aaa628a1fd644c3232678c5845384c744ff8d7";
       
-        strObfuscationPoolDummyAddress = "LR4VL9Pu9spxdSnGUTM1QvLJgfh8hCzS1J";
+        strObfuscationPoolDummyAddress = "LgcjpYxWa5EB9KCYaRtpPgG8kgiWRvJY38";
         nStartMasternodePayments = 1507656633; // 10/10/2017
     }
 
