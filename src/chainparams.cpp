@@ -98,10 +98,10 @@ public:
          * The characters are rarely used upper ASCII, not valid as UTF-8, and produce
          * a large 4-byte int at any alignment.
          */
-        pchMessageStart[0] = /*0x64*/ 0xa1;
-        pchMessageStart[1] = /*0x1a*/ 0xa6;
-        pchMessageStart[2] = /*0x84*/ 0xa1;
-        pchMessageStart[3] = /*0x3l*/ 0xa2;
+        pchMessageStart[0] = /*0x64*/ 0xf9;
+        pchMessageStart[1] = /*0x1a*/ 0x73;
+        pchMessageStart[2] = /*0x84*/ 0xc9;
+        pchMessageStart[3] = /*0x3l*/ 0xa7;
         vAlertPubKey = ParseHex("042d13c016ed91528241bcff222989769417eb10cdb679228c91e26e26900eb9fd053cd9f16a9a2894ad5ebbd551be1a4bd23bd55023679be17f0bd3a16e6fbeba");
         nDefaultPort = /*28666*/ 26868;
         bnProofOfWorkLimit = ~uint256(0) >> 20; // LUX starting difficulty is 1 / 2^12
