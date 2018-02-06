@@ -273,8 +273,6 @@ AC_DEFUN([BITCOIN_QT_CONFIGURE],[
   AC_SUBST(QT_TEST_LIBS)
   AC_SUBST(QT_SELECT, qt${bitcoin_qt_got_major_vers})
   AC_SUBST(MOC_DEFS)
-
-  QT_LDFLAGS="$QT_LDFLAGS -Wl,-rpath=$qt_lib_path"
 ])
 
 dnl All macros below are internal and should _not_ be used from the main
@@ -483,7 +481,7 @@ AC_DEFUN([_BITCOIN_QT_FIND_LIBS_WITHOUT_PKGCONFIG],[
   BITCOIN_QT_CHECK([
     LIBS=
     if test x$qt_lib_path != x; then
-      LIBS="$LIBS -L$qt_lib_path"
+      LIBS="$LIBS -L$qt_lib_path -Wl,-rpath=$qt_lib_path"
     fi
 
     if test x$TARGET_OS = xwindows; then
@@ -508,7 +506,7 @@ AC_DEFUN([_BITCOIN_QT_FIND_LIBS_WITHOUT_PKGCONFIG],[
   BITCOIN_QT_CHECK([
     LIBS=
     if test x$qt_lib_path != x; then
-      LIBS="-L$qt_lib_path"
+      LIBS="-L$qt_lib_path -Wl,-rpath=$qt_lib_path"
     fi
     AC_CHECK_LIB([${QT_LIB_PREFIX}Test],      [main],, have_qt_test=no)
     AC_CHECK_HEADER([QTest],, have_qt_test=no)
@@ -516,7 +514,7 @@ AC_DEFUN([_BITCOIN_QT_FIND_LIBS_WITHOUT_PKGCONFIG],[
     if test x$use_dbus != xno; then
       LIBS=
       if test x$qt_lib_path != x; then
-        LIBS="-L$qt_lib_path"
+        LIBS="-L$qt_lib_path -Wl,-rpath=$qt_lib_path"
       fi
       AC_CHECK_LIB([${QT_LIB_PREFIX}DBus],      [main],, have_qt_dbus=no)
       AC_CHECK_HEADER([QtDBus],, have_qt_dbus=no)
