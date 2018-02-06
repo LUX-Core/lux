@@ -10,7 +10,7 @@
 #include "base58.h"
 #include "checkpoints.h"
 #include "coincontrol.h"
-#include "kernel.h"
+#include "stake.h"
 #include "net.h"
 #include "script/script.h"
 #include "script/sign.h"
@@ -2456,7 +2456,7 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
         nTxNewTime = GetAdjustedTime();
 
         //iterates each utxo inside of CheckStakeKernelHash()
-        if (CheckStakeKernelHash(pindex->pprev, nBits, block, *pcoin.first, prevoutStake, nTxNewTime, hashProofOfStake)) {
+        if (stake->CheckHash(pindex->pprev, nBits, block, *pcoin.first, prevoutStake, nTxNewTime, hashProofOfStake)) {
             //Double check that this will pass time requirements
             if (nTxNewTime <= chainActive.Tip()->GetMedianTimePast()) {
                 LogPrintf("%s: kernel found, but it is too far in the past \n", __func__);

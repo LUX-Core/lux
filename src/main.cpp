@@ -13,7 +13,7 @@
 #include "checkpoints.h"
 #include "checkqueue.h"
 #include "init.h"
-#include "kernel.h"
+#include "stake.h"
 #include "masternode.h"
 #include "merkleblock.h"
 #include "net.h"
@@ -2923,12 +2923,12 @@ CBlockIndex* AddToBlockIndex(const CBlock& block)
         // ppcoin: compute stake modifier
         uint64_t nStakeModifier = 0;
         bool fGeneratedStakeModifier = false;
-        if (!ComputeNextStakeModifier(pindexNew->pprev, nStakeModifier, fGeneratedStakeModifier))
+        if (!stake->ComputeNextModifier(pindexNew->pprev, nStakeModifier, fGeneratedStakeModifier))
             LogPrintf("%s: ComputeNextStakeModifier() failed \n", __func__);
 
         pindexNew->SetStakeModifier(nStakeModifier, fGeneratedStakeModifier);
-        pindexNew->nStakeModifierChecksum = GetStakeModifierChecksum(pindexNew);
-        if (!CheckStakeModifierCheckpoints(pindexNew->nHeight, pindexNew->nStakeModifierChecksum))
+        pindexNew->nStakeModifierChecksum = stake->GetModifierChecksum(pindexNew);
+        if (!stake->CheckModifierCheckpoints(pindexNew->nHeight, pindexNew->nStakeModifierChecksum))
             LogPrintf("%s: Rejected by stake modifier checkpoint height=%d, modifier=%s \n", __func__, pindexNew->nHeight, boost::lexical_cast<std::string>(nStakeModifier));
 
         DEBUG_DUMP_STAKING_INFO_AddToBlockIndex();
@@ -3094,7 +3094,7 @@ bool CheckBlock(const CBlock& block, CValidationState& state, bool fCheckPOW, bo
     // 3 minute future drift for PoS
     auto const nBlockTimeLimit = GetAdjustedTime() + (block.IsProofOfStake() ? 180 : 7200);
 
-    LogPrint("debug", "%s: block=%s (%s) %d %d\n", __func__, block.GetHash().GetHex(), s, 
+    LogPrint("debug", "%s: block=%s (%s %d %d)\n", __func__, block.GetHash().GetHex(), s,
              block.GetBlockTime(), nBlockTimeLimit);
 
     // Check block time, reject far future blocks.
@@ -3201,7 +3201,7 @@ bool CheckWork(const CBlock &block, CBlockIndex* const pindexPrev)
     if (block.IsProofOfStake()) {
         uint256 hashProofOfStake;
         uint256 hash = block.GetHash();
-        if (!CheckProofOfStake(pindexPrev, block, hashProofOfStake)) {
+        if (!stake->CheckProof(pindexPrev, block, hashProofOfStake)) {
             return error("%s: invalid proof-of-stake (block %s)\n", __func__, hash.GetHex());
         }
         if (mapProofOfStake.count(hash)) {
