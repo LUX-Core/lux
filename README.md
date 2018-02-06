@@ -1,10 +1,3 @@
-NOTICE
-=====
-
-Master branch is being updated and currently unstable. Please download the latest precompiled version here!
-[v3.0.4](https://github.com/216k155/lux/releases/tag/v3.0.4)
-
-
 ![LUX Logo](https://i.imgur.com/mRMr5A1.png)
 
 "Empowered By Intelligence" 
@@ -108,7 +101,7 @@ Once the source code is ready the build steps are below.
 
     # Note autogen will prompt to install some more dependencies if needed
     ./autogen.sh
-    ./configure 
+    ./configure --disable-tests
     make -j4
 
 ### Build on OSX
@@ -146,7 +139,7 @@ NOTE: Building with Qt4 is still supported, however, could result in a broken UI
     You can disable the GUI build by passing `--without-gui` to configure.
 
         ./autogen.sh
-        ./configure
+        ./configure --disable-tests
         make
 
 3.  It is recommended to build and run the unit tests:
