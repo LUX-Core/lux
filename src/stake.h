@@ -47,6 +47,9 @@ public://!<DuzyDoc>TODO: private
     std::map<uint256, int64_t> mapRejectedBlocks;
 
 public:
+
+    //!<DuzyDoc>: Stake::Pointer() - returns the staking pointer
+    static Stake *Pointer();
     
     //!<DuzyDoc>: Stake::ComputeNextModifier - compute the hash modifier for proof-of-stake
     bool ComputeNextModifier(const CBlockIndex* pindexPrev, uint64_t& nStakeModifier, bool& fGeneratedStakeModifier);

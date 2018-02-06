@@ -35,7 +35,7 @@ static const int MODIFIER_INTERVAL_RATIO = 3;
 
 static const int LAST_MULTIPLIED_BLOCK = 180*1000; // 180K
 
-Stake * const stake = nullptr;
+Stake * const stake = Stake::Pointer();
 
 StakeKernel::StakeKernel()
 {
@@ -52,8 +52,6 @@ Stake::Stake()
     , mapHashedBlocks()
     , mapRejectedBlocks()
 {
-    assert(stake == nullptr);
-    const_cast<Stake*&>(stake) = this;
 }
 
 Stake::~Stake()
@@ -503,4 +501,5 @@ bool Stake::IsActive()
     return nStaking;
 }
 
-Stake Stake::kernel;
+Stake  Stake::kernel;
+Stake *Stake::Pointer() { return &kernel; }
