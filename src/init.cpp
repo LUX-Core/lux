@@ -18,6 +18,7 @@
 #include "compat/sanity.h"
 #include "key.h"
 #include "main.h"
+#include "stake.h"
 #include "masternodeconfig.h"
 #include "miner.h"
 #include "net.h"
