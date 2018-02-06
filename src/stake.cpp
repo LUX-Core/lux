@@ -7,6 +7,7 @@
 
 #include "db.h"
 #include "stake.h"
+#include "main.h"
 #include "script/interpreter.h"
 #include "timedata.h"
 #if defined(DEBUG_DUMP_STAKING_INFO)
@@ -36,7 +37,20 @@ static const int LAST_MULTIPLIED_BLOCK = 180*1000; // 180K
 
 Stake * const stake = nullptr;
 
+StakeKernel::StakeKernel()
+{
+    //!<DuzyDoc>TODO: kernel initialization
+}
+
 Stake::Stake()
+    : nStakeMinAge(36 * 60 * 60)
+    , nReserveBalance(0)
+    , nLastCoinStakeSearchInterval(0)
+    , nLastCoinStakeSearchTime(GetAdjustedTime())
+    , setStakeSeen()
+    , mapProofOfStake()
+    , mapHashedBlocks()
+    , mapRejectedBlocks()
 {
     assert(stake == nullptr);
     const_cast<Stake*&>(stake) = this;

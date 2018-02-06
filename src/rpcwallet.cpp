@@ -1957,17 +1957,17 @@ Value reservebalance(const Array& params, bool fHelp)
             nAmount = (nAmount / CENT) * CENT; // round to cent
             if (nAmount < 0)
                 throw runtime_error("amount cannot be negative.\n");
-            nReserveBalance = nAmount;
+            stake->nReserveBalance = nAmount;
         } else {
             if (params.size() > 1)
                 throw runtime_error("cannot specify amount to turn off reserve.\n");
-            nReserveBalance = 0;
+            stake->nReserveBalance = 0;
         }
     }
 
     Object result;
-    result.push_back(Pair("reserve", (nReserveBalance > 0)));
-    result.push_back(Pair("amount", ValueFromAmount(nReserveBalance)));
+    result.push_back(Pair("reserve", (stake->nReserveBalance > 0)));
+    result.push_back(Pair("amount", ValueFromAmount(stake->nReserveBalance)));
     return result;
 }
 
