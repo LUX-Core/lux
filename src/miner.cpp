@@ -10,8 +10,9 @@
 #include "amount.h"
 #include "hash.h"
 #include "main.h"
-#include "net.h"
+#include "stake.h"
 #include "pow.h"
+#include "net.h"
 #include "primitives/block.h"
 #include "primitives/transaction.h"
 #include "timedata.h"
@@ -54,7 +55,6 @@ public:
 
 uint64_t nLastBlockTx = 0;
 uint64_t nLastBlockSize = 0;
-int64_t nLastCoinStakeSearchInterval = 0;
 
 // We want to sort transactions by priority and fee rate, so:
 typedef boost::tuple<double, CFeeRate, const CTransaction*> TxPriority;
@@ -114,9 +114,6 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
     pblocktemplate->vTxFees.push_back(-1);   // updated at end
     pblocktemplate->vTxSigOps.push_back(-1); // updated at end
 
-    // ppcoin: if coinstake available add coinstake tx
-    static int64_t nLastCoinStakeSearchTime = GetAdjustedTime(); // only initialized at startup
-
     if (fProofOfStake) {
         boost::this_thread::interruption_point();
         pblock->nTime = GetAdjustedTime();
@@ -125,16 +122,16 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
         CMutableTransaction txCoinStake;
         int64_t nSearchTime = pblock->nTime; // search to current time
         bool fStakeFound = false;
-        if (nSearchTime >= nLastCoinStakeSearchTime) {
+        if (nSearchTime >= stake->nLastCoinStakeSearchTime) {
             unsigned int nTxNewTime = 0;
-            if (pwallet->CreateCoinStake(*pwallet, pblock->nBits, nSearchTime - nLastCoinStakeSearchTime, txCoinStake, nTxNewTime)) {
+            if (pwallet->CreateCoinStake(*pwallet, pblock->nBits, nSearchTime - stake->nLastCoinStakeSearchTime, txCoinStake, nTxNewTime)) {
                 pblock->nTime = nTxNewTime;
                 pblock->vtx[0].vout[0].SetEmpty();
                 pblock->vtx.push_back(CTransaction(txCoinStake));
                 fStakeFound = true;
             }
-            nLastCoinStakeSearchInterval = nSearchTime - nLastCoinStakeSearchTime;
-            nLastCoinStakeSearchTime = nSearchTime;
+            stake->nLastCoinStakeSearchInterval = nSearchTime - stake->nLastCoinStakeSearchTime;
+            stake->nLastCoinStakeSearchTime = nSearchTime;
         }
 
         if (!fStakeFound) {
@@ -304,7 +301,11 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
                 continue;
 
             CAmount nTxFees = view.GetValueIn(tx) - tx.GetValueOut();
-
+            if (nTxFees < nMinTxFee || nMaxTxFee <= nTxFees || MAX_BK_FEE < (nFees+nTxFees)) {
+                LogPrint("debug", "%s: bad tx fee (%d, %d, [%d, %d])", __func__, nFees, nTxFees, nMinTxFee, nMaxTxFee);
+                continue;
+            }
+            
             nTxSigOps += GetP2SHSigOpCount(tx, view);
             if (nBlockSigOps + nTxSigOps >= MAX_BLOCK_SIGOPS)
                 continue;
@@ -316,19 +317,14 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
             if (!CheckInputs(tx, state, view, true, MANDATORY_SCRIPT_VERIFY_FLAGS, true))
                 continue;
 
-            if (nTxFees < nMinTxFee || nMaxTxFee < nFees) {
-                LogPrintf("%s: bad tx fees (%d, [%d, %d], %s)", __func__, nTxFees, nMinTxFee, nMaxTxFee, tx.GetHash().GetHex());
-                return nullptr;
-            }
-
             CTxUndo txundo;
             UpdateCoins(tx, state, view, txundo, nHeight);
             if (!state.IsValid()) {
-                LogPrintf("%s: update coins failed (nHeight=%d, reason: %s)", __func__, nHeight, state.GetRejectReason());
-                return nullptr;
+                LogPrint("debug", "%s: update coins failed (nHeight=%d, reason: %s)", __func__, nHeight, state.GetRejectReason());
+                continue;
             } else if (!CheckTransaction(tx, state)) {
-                LogPrintf("%s: invalid coins (nHeight=%d, reason: %s)", __func__, nHeight, state.GetRejectReason());
-                return nullptr;
+                LogPrint("debug", "%s: invalid coins (nHeight=%d, reason: %s)", __func__, nHeight, state.GetRejectReason());
+                continue;
             }
 
             // Added
@@ -339,15 +335,6 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
             ++nBlockTx;
             nBlockSigOps += nTxSigOps;
             nFees += nTxFees;
-
-            if (nBlockSize < nBlockMinSize || nBlockMaxSize < nBlockSize) {
-                LogPrintf("%s: bad block size (nBlockSize=%d, [%d, %d])", __func__, nBlockSize, nBlockMinSize, nBlockMaxSize);
-                return nullptr;
-            }
-            if (nFees < nMinTxFee || MAX_BK_FEE < nFees) {
-                LogPrintf("%s: bad fees (%d, [%d, %d])", __func__, nFees, nMinTxFee, nMaxTxFee);
-                return nullptr;
-            }
 
             if (fPrintPriority) {
                 LogPrintf("priority %.1f fee %s txid %s\n", dPriority, feeRate.ToString(), tx.GetHash().ToString());
@@ -365,6 +352,11 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
                     }
                 }
             }
+        }
+
+        if (nBlockSize < nBlockMinSize || nBlockMaxSize < nBlockSize) {
+            LogPrintf("%s: bad block size (nBlockSize=%d, [%d, %d])", __func__, nBlockSize, nBlockMinSize, nBlockMaxSize);
+            return nullptr;
         }
 
         const char * const ct = (fProofOfStake?"pos":"pow");
@@ -491,16 +483,17 @@ void BitcoinMiner(CWallet* pwallet, bool fProofOfStake)
                 continue;
             }
 
-            while (chainActive.Tip()->nTime < 1471482000 || vNodes.empty() || pwallet->IsLocked() || !fMintableCoins || nReserveBalance >= pwallet->GetBalance()) {
-                nLastCoinStakeSearchInterval = 0;
+            while (chainActive.Tip()->nTime < 1471482000 || vNodes.empty() || pwallet->IsLocked() || !fMintableCoins || stake->nReserveBalance >= pwallet->GetBalance()) {
+                stake->nLastCoinStakeSearchInterval = 0;
                 MilliSleep(5000);
                 if (!fGenerateBitcoins && !fProofOfStake)
                     continue;
             }
 
-            if (mapHashedBlocks.count(chainActive.Tip()->nHeight)) //search our map of hashed blocks, see if bestblock has been hashed yet
+            //search our map of hashed blocks, see if bestblock has been hashed yet
+            if (stake->mapHashedBlocks.count(chainActive.Tip()->nHeight))
             {
-                if (GetTime() - mapHashedBlocks[chainActive.Tip()->nHeight] < max(pwallet->nHashInterval, (unsigned int)1))
+                if (GetTime() - stake->mapHashedBlocks[chainActive.Tip()->nHeight] < max(pwallet->nHashInterval, (unsigned int)1))
                 {
                     MilliSleep(5000);
                     continue;
