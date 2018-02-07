@@ -301,7 +301,11 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
                 continue;
 
             CAmount nTxFees = view.GetValueIn(tx) - tx.GetValueOut();
-
+            if (nTxFees < nMinTxFee || nMaxTxFee <= nTxFees || MAX_BK_FEE < (nFees+nTxFees)) {
+                LogPrint("debug", "%s: bad tx fee (%d, %d, [%d, %d])", __func__, nFees, nTxFees, nMinTxFee, nMaxTxFee);
+                continue;
+            }
+            
             nTxSigOps += GetP2SHSigOpCount(tx, view);
             if (nBlockSigOps + nTxSigOps >= MAX_BLOCK_SIGOPS)
                 continue;
@@ -313,19 +317,14 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
             if (!CheckInputs(tx, state, view, true, MANDATORY_SCRIPT_VERIFY_FLAGS, true))
                 continue;
 
-            if (nTxFees < nMinTxFee || nMaxTxFee < nFees) {
-                LogPrintf("%s: bad tx fees (%d, [%d, %d], %s)", __func__, nTxFees, nMinTxFee, nMaxTxFee, tx.GetHash().GetHex());
-                return nullptr;
-            }
-
             CTxUndo txundo;
             UpdateCoins(tx, state, view, txundo, nHeight);
             if (!state.IsValid()) {
-                LogPrintf("%s: update coins failed (nHeight=%d, reason: %s)", __func__, nHeight, state.GetRejectReason());
-                return nullptr;
+                LogPrint("debug", "%s: update coins failed (nHeight=%d, reason: %s)", __func__, nHeight, state.GetRejectReason());
+                continue;
             } else if (!CheckTransaction(tx, state)) {
-                LogPrintf("%s: invalid coins (nHeight=%d, reason: %s)", __func__, nHeight, state.GetRejectReason());
-                return nullptr;
+                LogPrint("debug", "%s: invalid coins (nHeight=%d, reason: %s)", __func__, nHeight, state.GetRejectReason());
+                continue;
             }
 
             // Added
@@ -336,15 +335,6 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
             ++nBlockTx;
             nBlockSigOps += nTxSigOps;
             nFees += nTxFees;
-
-            if (nBlockSize < nBlockMinSize || nBlockMaxSize < nBlockSize) {
-                LogPrintf("%s: bad block size (nBlockSize=%d, [%d, %d])", __func__, nBlockSize, nBlockMinSize, nBlockMaxSize);
-                return nullptr;
-            }
-            if (nFees < nMinTxFee || MAX_BK_FEE < nFees) {
-                LogPrintf("%s: bad fees (%d, [%d, %d])", __func__, nFees, nMinTxFee, nMaxTxFee);
-                return nullptr;
-            }
 
             if (fPrintPriority) {
                 LogPrintf("priority %.1f fee %s txid %s\n", dPriority, feeRate.ToString(), tx.GetHash().ToString());
@@ -362,6 +352,11 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
                     }
                 }
             }
+        }
+
+        if (nBlockSize < nBlockMinSize || nBlockMaxSize < nBlockSize) {
+            LogPrintf("%s: bad block size (nBlockSize=%d, [%d, %d])", __func__, nBlockSize, nBlockMinSize, nBlockMaxSize);
+            return nullptr;
         }
 
         const char * const ct = (fProofOfStake?"pos":"pow");
