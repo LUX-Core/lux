@@ -696,7 +696,10 @@ bool AppInit2(boost::thread_group& threadGroup)
     }
 
     if (mapArgs.count("-reservebalance")) {
-        if (!ParseMoney(mapArgs["-reservebalance"], stake->nReserveBalance)) {
+        CAmount amount = 0;
+        if (ParseMoney(mapArgs["-reservebalance"], amount)) {
+            stake->ReserveBalance(amount);
+        } else {
             InitError(_("Invalid amount for -reservebalance=<amount>"));
             return false;
         }

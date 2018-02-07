@@ -116,25 +116,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
 
     if (fProofOfStake) {
         boost::this_thread::interruption_point();
-        pblock->nTime = GetAdjustedTime();
-        CBlockIndex* pindexPrev = chainActive.Tip();
-        pblock->nBits = GetNextWorkRequired(pindexPrev, pblock);
-        CMutableTransaction txCoinStake;
-        int64_t nSearchTime = pblock->nTime; // search to current time
-        bool fStakeFound = false;
-        if (nSearchTime >= stake->nLastCoinStakeSearchTime) {
-            unsigned int nTxNewTime = 0;
-            if (pwallet->CreateCoinStake(*pwallet, pblock->nBits, nSearchTime - stake->nLastCoinStakeSearchTime, txCoinStake, nTxNewTime)) {
-                pblock->nTime = nTxNewTime;
-                pblock->vtx[0].vout[0].SetEmpty();
-                pblock->vtx.push_back(CTransaction(txCoinStake));
-                fStakeFound = true;
-            }
-            stake->nLastCoinStakeSearchInterval = nSearchTime - stake->nLastCoinStakeSearchTime;
-            stake->nLastCoinStakeSearchTime = nSearchTime;
-        }
-
-        if (!fStakeFound) {
+        if (!stake->CreateBlockStake(pwallet, pblock)) {
             LogPrintf("%s: no coin stake (nBits=%d)\n", __func__, pblock->nBits);
             return NULL;
         }
@@ -483,21 +465,17 @@ void BitcoinMiner(CWallet* pwallet, bool fProofOfStake)
                 continue;
             }
 
-            while (chainActive.Tip()->nTime < 1471482000 || vNodes.empty() || pwallet->IsLocked() || !fMintableCoins || stake->nReserveBalance >= pwallet->GetBalance()) {
-                stake->nLastCoinStakeSearchInterval = 0;
+            while (chainActive.Tip()->nTime < 1471482000 || vNodes.empty() || pwallet->IsLocked() || !fMintableCoins || stake->GetReservedBalance() >= pwallet->GetBalance()) {
+                stake->ResetInterval();
                 MilliSleep(5000);
                 if (!fGenerateBitcoins && !fProofOfStake)
                     continue;
             }
 
-            //search our map of hashed blocks, see if bestblock has been hashed yet
-            if (stake->mapHashedBlocks.count(chainActive.Tip()->nHeight))
-            {
-                if (GetTime() - stake->mapHashedBlocks[chainActive.Tip()->nHeight] < max(pwallet->nHashInterval, (unsigned int)1))
-                {
-                    MilliSleep(5000);
-                    continue;
-                }
+            // Check if bestblock has been staked yet
+            if (stake->IsBlockStaked(chainActive.Tip()->nHeight)) {
+                MilliSleep(5000);
+                continue;
             }
         }
 

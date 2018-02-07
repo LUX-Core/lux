@@ -1958,17 +1958,17 @@ Value reservebalance(const Array& params, bool fHelp)
             nAmount = (nAmount / CENT) * CENT; // round to cent
             if (nAmount < 0)
                 throw runtime_error("amount cannot be negative.\n");
-            stake->nReserveBalance = nAmount;
+            stake->ReserveBalance(nAmount);
         } else {
             if (params.size() > 1)
                 throw runtime_error("cannot specify amount to turn off reserve.\n");
-            stake->nReserveBalance = 0;
+            stake->ReserveBalance(0);
         }
     }
 
     Object result;
-    result.push_back(Pair("reserve", (stake->nReserveBalance > 0)));
-    result.push_back(Pair("amount", ValueFromAmount(stake->nReserveBalance)));
+    result.push_back(Pair("reserve", (stake->GetReservedBalance() > 0)));
+    result.push_back(Pair("amount", ValueFromAmount(stake->GetReservedBalance())));
     return result;
 }
 
@@ -1991,8 +1991,8 @@ Value setstakesplitthreshold(const Array& params, bool fHelp)
         bool fFileBacked = pwalletMain->fFileBacked;
 
         Object result;
-        pwalletMain->nStakeSplitThreshold = nStakeSplitThreshold;
-        result.push_back(Pair("split stake threshold set to ", int(pwalletMain->nStakeSplitThreshold)));
+        stake->SetSplitThreshold(nStakeSplitThreshold);
+        result.push_back(Pair("split stake threshold set to ", int(nStakeSplitThreshold)));
         if (fFileBacked) {
             walletdb.WriteStakeSplitThreshold(nStakeSplitThreshold);
             result.push_back(Pair("saved to wallet.dat ", "true"));
@@ -2012,7 +2012,7 @@ Value getstakesplitthreshold(const Array& params, bool fHelp)
             "Returns the set splitstakethreshold\n");
 
     Object result;
-    result.push_back(Pair("split stake threshold set to ", int(pwalletMain->nStakeSplitThreshold)));
+    result.push_back(Pair("split stake threshold set to ", int(stake->GetSplitThreshold())));
     return result;
 }
 

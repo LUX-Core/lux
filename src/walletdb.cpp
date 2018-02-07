@@ -14,6 +14,7 @@
 #include "util.h"
 #include "utiltime.h"
 #include "wallet.h"
+#include "stake.h"
 
 #include <boost/filesystem.hpp>
 #include <boost/foreach.hpp>
@@ -614,7 +615,9 @@ bool ReadKeyValue(CWallet* pwallet, CDataStream& ssKey, CDataStream& ssValue, CW
             ssValue >> pwallet->nOrderPosNext;
         } else if (strType == "stakeSplitThreshold") //presstab HyperStake
         {
-            ssValue >> pwallet->nStakeSplitThreshold;
+            uint64_t threshold = 0;
+            ssValue >> threshold;
+            stake->SetSplitThreshold(threshold);
         } else if (strType == "multisend") //presstab HyperStake
         {
             unsigned int i;
