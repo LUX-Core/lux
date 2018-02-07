@@ -11,7 +11,9 @@ WalletFrame {
 }
 
 QStatusBar {
-    background-color:#ffffff;
+    background-color:#061431;
+	min-height:3em;
+	color: #fff !important;
 }
 
 .QFrame {
@@ -21,6 +23,7 @@ QStatusBar {
 
 QMenuBar {
     background-color:#fff;
+	min-height:2em;
 }
 
 QMenuBar::item {
@@ -47,14 +50,15 @@ QMenu::item:selected {
 
 QToolBar {
     background-color:#061532;
-    border:0px solid #000;
+    border-top: 1px solid #061431;
+	border-bottom: 1px solid #061431;
     padding:0;
     margin:0;
 }
 
 QToolBar > QToolButton {
     background-color:#061532;
-    border:0px solid #333;
+    border:0px solid #061532;
     min-height:2.5em;
     padding: 0em 1em;
     font-weight:bold;
@@ -62,8 +66,8 @@ QToolBar > QToolButton {
 }
 
 QToolBar > QToolButton:checked {
-    background-color:#fff;
-    color:#333;
+    background-color:#40c2dc;
+    color:#fff;
     font-weight:bold;
 }
 
@@ -72,16 +76,17 @@ QMessageBox {
 }
 
 QProgressBar {
-    color:#d2d2d2;
-    border:2px solid grey;
-    border-radius:5px;
-    background-color:transparent;
+    color:#061431;
+    border: none;
+    background-color: #d2d5da;
+	min-height:2em;
 }
 
 QProgressBar::chunk {
     background-color:#40c2dc;
     width: 20px;
 }
+
 
 QTabWidget {
     background-color:#f2f2f2;
@@ -122,19 +127,35 @@ QTextEdit {
     color:#333;
 }
 
+
+QWidget .QFrame#frame > .QLabel#progressBarLabel {
+    color: #ffffff;
+}
+
+
+QHBoxLayout {
+     background-color: red;
+     border-style: outset;
+     border-width: 2px;
+     border-color: #ff0000;
+     min-width: 10em;
+     padding: 6px;
+ }
+
 /****************************************************************************************/
 
 QLabel { /* Base Text Size & Color */
     font-size:12px;
-    color:#333333;
+    color:#061431;
 }
 
+
 .QRadioButton { /* Radio Button Labels */
-    color:#333333;
+    color:#061431;
 }
 
 .QCheckBox { /* Checkbox Labels */
-    color:#333333;
+    color:#061431;
     background-color:transparent;
 }
 
@@ -149,7 +170,7 @@ QLabel { /* Base Text Size & Color */
     outline:0;
     padding:3px;
     background-color:#fcfcfc;
-    color:#333333;
+    color:#061431;
 }
 
 .QLineEdit:!focus {
@@ -162,7 +183,8 @@ QLabel { /* Base Text Size & Color */
 
 /****************************************************************************************/
 
-QPushButton { /* Global Button Style */
+/*
+QPushButton {
     background-color:qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: .01 #64ACD2, stop: .1 #061532, stop: .95 #061532, stop: 1 #1D80B5);
     border:0;
     border-radius:3px;
@@ -178,6 +200,25 @@ QPushButton { /* Global Button Style */
 QPushButton:hover {
     background-color:qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: .01 #00aeaa, stop: .1 #00aeca, stop: .95 #00aeba, stop: 1 #40c2dc);
 }
+*/
+
+
+QPushButton {
+    background-color: #061431;
+    border:0;
+    color:#ffffff;
+    font-size:12px;
+    font-weight:bold;
+    padding-left:25px;
+    padding-right:25px;
+    padding-top:5px;
+    padding-bottom:5px;
+}
+
+QPushButton:hover {
+    background-color: #40c2dc;
+}
+
 
 QPushButton:focus {
     border:none;
@@ -300,9 +341,9 @@ QHeaderView { /* Table Header */
 
 QHeaderView::section { /* Table Header Sections */
     qproperty-alignment:center;
-    background-color:qlineargradient(x1: 0, y1: 0, x2: 0, y2: 0.25, stop: 0 #061532, stop: 1 #40c2dc);
+    background-color: #40c2dc;
     color:#fff;
-    min-height:25px;
+    min-height:40px;
     font-weight:bold;
     font-size:11px;
     border:0;
@@ -478,14 +519,6 @@ QDialog .QTabWidget QTabBar::tab {
     padding-top:5px;
     padding-bottom:5px;
     border-top: 1px solid #d7d7d7;
-}
-
-QDialog .QTabWidget QTabBar::tab:first {
-    border-left: 1px solid #d7d7d7;
-}
-
-QDialog .QTabWidget QTabBar::tab:last {
-    border-right: 1px solid #d7d7d7;
 }
 
 QDialog .QTabWidget QTabBar::tab:selected, QDialog .QTabWidget QTabBar::tab:hover {
@@ -807,13 +840,15 @@ QWidget .QFrame#frame > .QLabel {
     min-height:30px;
 }
 
-QWidget .QFrame#frame .QLabel#label_5 { /* Wallet Label */
+QWidget .QFrame#frame .QLabel#label_5 { /* Wallet Balance Label */
     qproperty-alignment: 'AlignVCenter | AlignRight';
     min-width:160px;
     background-color:transparent;
-    color:#fff;
+    color:#061431;
     margin-right:5px;
     padding-right:5px;
+	font-size:14px;
+	font-weight: bold;
 }
 
 QWidget .QFrame#frame .QLabel#labelWalletStatus { /* Wallet Sync Status */
@@ -1284,7 +1319,7 @@ QDialog#SendCoinsDialog QLabel#label {
 QDialog#SendCoinsDialog QLabel#labelBalance {
     margin-left:0px;
     padding-left:0px;
-    color:#333333;
+    color:#061431;
     /* font-weight:bold;
     border-radius:5px;
     padding-top:20px;
@@ -1586,12 +1621,12 @@ TransactionView QComboBox {
 }
 
 QLabel#transactionSumLabel { /* Example of setObjectName for widgets without name */
-    color:#333333;
+    color:#061431;
     font-weight:bold;
 }
 
 QLabel#transactionSum { /* Example of setObjectName for widgets without name */
-    color:#333333;
+    color:#061431;
 }
 
 /**************************** TRANSACTION DETAILS DIALOG ********************************/
