@@ -183,11 +183,10 @@ AC_ARG_ENABLE([debug],
 
 if test "x$enable_debug" = xyes; then
     if test "x$GCC" = xyes; then
-        CFLAGS="-g3 -O0 -DDEBUG"
+        CFLAGS="-g -ggdb -DDEBUG"
     fi
-
     if test "x$GXX" = xyes; then
-        CXXFLAGS="-g3 -O0 -DDEBUG"
+        CXXFLAGS="-g -ggdb -DDEBUG"
     fi
 fi
 
@@ -199,10 +198,10 @@ AC_ARG_ENABLE([debug-xdump],
     [enable_debug_xdump=no])
 if test "x$enable_debug_xdump" = xyes; then
     if test "x$GCC" = xyes; then
-        CFLAGS="-DDEBUG_DUMP_STAKING_INFO"
+        CFLAGS="$CFLAGS -DDEBUG_DUMP_STAKING_INFO"
     fi
     if test "x$GXX" = xyes; then
-        CXXFLAGS="-DDEBUG_DUMP_STAKING_INFO"
+        CXXFLAGS="$CXXFLAGS -DDEBUG_DUMP_STAKING_INFO"
     fi
 fi
 

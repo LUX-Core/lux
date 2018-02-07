@@ -7,7 +7,7 @@
 
 #include "main.h"
 #include "pow.h"
-#include "uint256.h"
+#include "stake.h"
 
 #include <stdint.h>
 
@@ -254,17 +254,17 @@ bool CBlockTreeDB::LoadBlockIndexGuts()
 
                 // ppcoin: build setStakeSeen
                 if (pindexNew->IsProofOfStake()) {
-                    setStakeSeen.emplace(pindexNew->prevoutStake, pindexNew->nStakeTime);
+                    stake->setStakeSeen.emplace(pindexNew->prevoutStake, pindexNew->nStakeTime);
                     auto const hash(pindexNew->GetBlockHash());
                     if (pindexNew->hashProofOfStake == 0) {
                         return error("%s: zero stake (block %s)", __func__, hash.GetHex());
-                    } else if (mapProofOfStake.count(hash)) {
-                        auto const &h = mapProofOfStake[hash];
+                    } else if (stake->mapProofOfStake.count(hash)) {
+                        auto const &h = stake->mapProofOfStake[hash];
                         if (h != pindexNew->hashProofOfStake)
                             return error("%s: diverged stake %s, %s (block %s)\n", __func__, 
                                          pindexNew->hashProofOfStake.GetHex(), h.GetHex(), hash.GetHex());
                     } else {
-                        mapProofOfStake.emplace(hash, pindexNew->hashProofOfStake);
+                        stake->mapProofOfStake.emplace(hash, pindexNew->hashProofOfStake);
                     }
                 }
 

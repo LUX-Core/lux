@@ -141,17 +141,20 @@ public:
         assert(hashGenesisBlock == uint256("0x00000759bb3da130d7c9aedae170da8335f5a0d01a9007e4c8d3ccd08ace6a42"));
         assert(genesis.hashMerkleRoot == uint256("0xe08ae0cfc35a1d70e6764f347fdc54355206adeb382446dd54c32cd0201000d3"));
 	
-        // Fixed node seeds, DNS seeds	
- 	// TODO: vSeeds.push_back("seed.luxcore.io");
-        vSeeds.push_back(CDNSSeedData("luxraw1", "45.77.44.147")); 
- 	vSeeds.push_back(CDNSSeedData("luxraw2", "108.61.208.4"));  
-        vSeeds.push_back(CDNSSeedData("luxraw3", "45.76.33.22"));   
-	vSeeds.push_back(CDNSSeedData("luxraw4", "207.246.96.37")); 
-        vSeeds.push_back(CDNSSeedData("luxraw5", "45.76.118.90"));  
-          		        		  
+        // Fixed node seeds
+        vSeeds.push_back(CDNSSeedData("luxraw1", "45.77.44.147"));  // Singapore
+	vSeeds.push_back(CDNSSeedData("luxraw2", "108.61.208.4"));  // Paris
+        vSeeds.push_back(CDNSSeedData("luxraw3", "45.76.33.22"));   // Amsterdam
+	vSeeds.push_back(CDNSSeedData("luxraw4", "207.246.96.37")); // Los Angeless
+        vSeeds.push_back(CDNSSeedData("luxraw5", "45.76.118.90"));  // US - AU
+        //vSeeds.push_back(CDNSSeedData("luxraw6", "45.32.245.217")); // SIN - AU
+
+        // DNS seeds
+        // TODO: vSeeds.push_back("seed.luxcore.io");
+
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,48); // LUX Start letter L
         base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1,48);
-        base58Prefixes[SECRET_KEY] =     std::vector<unsigned char>(1,155);
+        base58Prefixes[SECRET_KEY]     = std::vector<unsigned char>(1,155);
         base58Prefixes[EXT_PUBLIC_KEY] = boost::assign::list_of(0x07)(0x28)(0xA2)(0x4E).convert_to_container<std::vector<unsigned char> >();
         base58Prefixes[EXT_SECRET_KEY] = boost::assign::list_of(0x03)(0xD8)(0xA1)(0xE5).convert_to_container<std::vector<unsigned char> >();
 

@@ -9,6 +9,7 @@
 #include "clientversion.h"
 #include "init.h"
 #include "main.h"
+#include "stake.h"
 #include "net.h"
 #include "netbase.h"
 #include "rpcserver.h"
@@ -104,12 +105,7 @@ Value getinfo(const Array& params, bool fHelp)
     obj.push_back(Pair("paytxfee", ValueFromAmount(payTxFee.GetFeePerK())));
 #endif
     obj.push_back(Pair("relayfee", ValueFromAmount(::minRelayTxFee.GetFeePerK())));
-    bool nStaking = false;
-    if (mapHashedBlocks.count(chainActive.Tip()->nHeight))
-        nStaking = true;
-    else if (mapHashedBlocks.count(chainActive.Tip()->nHeight - 1) && nLastCoinStakeSearchInterval)
-        nStaking = true;
-    obj.push_back(Pair("staking status", (nStaking ? "Staking Active" : "Staking Not Active")));
+    obj.push_back(Pair("staking status", (stake->IsActive() ? "Staking Active" : "Staking Not Active")));
     obj.push_back(Pair("errors", GetWarnings("statusbar")));
     return obj;
 }
@@ -437,7 +433,7 @@ Value getstakingstatus(const Array& params, bool fHelp)
     if (pwalletMain) {
         obj.push_back(Pair("walletunlocked", !pwalletMain->IsLocked()));
         obj.push_back(Pair("mintablecoins", pwalletMain->MintableCoins()));
-        obj.push_back(Pair("enoughcoins", nReserveBalance <= pwalletMain->GetBalance()));
+        obj.push_back(Pair("enoughcoins", stake->nReserveBalance <= pwalletMain->GetBalance()));
     }
     return obj;
 }

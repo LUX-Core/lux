@@ -99,7 +99,7 @@ BITCOIN_CORE_H = \
   ecwrapper.h \
   hash.h \
   init.h \
-  kernel.h \
+  stake.h \
   instantx.h \
   key.h \
   keystore.h \
@@ -213,7 +213,7 @@ libbitcoin_wallet_a_SOURCES = \
   masternodeconfig.cpp \
   rpcdump.cpp \
   rpcwallet.cpp \
-  kernel.cpp \
+  stake.cpp \
   wallet.cpp \
   wallet_ismine.cpp \
   walletdb.cpp \

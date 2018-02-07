@@ -11,7 +11,6 @@
 #include "amount.h"
 #include "base58.h"
 #include "crypter.h"
-#include "kernel.h"
 #include "key.h"
 #include "keystore.h"
 #include "main.h"

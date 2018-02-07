@@ -10,7 +10,7 @@
 #include "base58.h"
 #include "checkpoints.h"
 #include "coincontrol.h"
-#include "kernel.h"
+#include "stake.h"
 #include "net.h"
 #include "script/script.h"
 #include "script/sign.h"
@@ -1655,7 +1655,7 @@ bool CWallet::SelectStakeCoins(std::set<std::pair<const CWalletTx*, unsigned int
             continue;
 
         //check for min age
-        if (GetTime() - out.tx->GetTxTime() < nStakeMinAge)
+        if (GetTime() - out.tx->GetTxTime() < stake->nStakeMinAge)
             continue;
 
         //check that it is matured
@@ -1672,16 +1672,16 @@ bool CWallet::SelectStakeCoins(std::set<std::pair<const CWalletTx*, unsigned int
 bool CWallet::MintableCoins()
 {
     int64_t nBalance = GetBalance();
-    if (mapArgs.count("-reservebalance") && !ParseMoney(mapArgs["-reservebalance"], nReserveBalance))
+    if (mapArgs.count("-reservebalance") && !ParseMoney(mapArgs["-reservebalance"], stake->nReserveBalance))
         return error("MintableCoins() : invalid reserve balance amount");
-    if (nBalance <= nReserveBalance)
+    if (nBalance <= stake->nReserveBalance)
         return false;
 
     vector<COutput> vCoins;
     AvailableCoins(vCoins, true);
 
     BOOST_FOREACH (const COutput& out, vCoins) {
-        if (GetTime() - out.tx->GetTxTime() > nStakeMinAge)
+        if (GetTime() - out.tx->GetTxTime() > stake->nStakeMinAge)
             return true;
     }
 
@@ -2405,10 +2405,10 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
     // Choose coins to use
     int64_t nBalance = GetBalance();
 
-    if (mapArgs.count("-reservebalance") && !ParseMoney(mapArgs["-reservebalance"], nReserveBalance))
+    if (mapArgs.count("-reservebalance") && !ParseMoney(mapArgs["-reservebalance"], stake->nReserveBalance))
         return error("%s: invalid reserve balance amount", __func__);
 
-    if (nBalance <= nReserveBalance)
+    if (nBalance <= stake->nReserveBalance)
         return false;
 
     // presstab HyperStake - Initialize as static and don't update the set on every run of CreateCoinStake() in order to lighten resource use
@@ -2417,7 +2417,7 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
 
     if (GetTime() - nLastStakeSetUpdate > nStakeSetUpdateTime) {
         setStakeCoins.clear();
-        if (!SelectStakeCoins(setStakeCoins, nBalance - nReserveBalance))
+        if (!SelectStakeCoins(setStakeCoins, nBalance - stake->nReserveBalance))
             return false;
 
         nLastStakeSetUpdate = GetTime();
@@ -2456,7 +2456,7 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
         nTxNewTime = GetAdjustedTime();
 
         //iterates each utxo inside of CheckStakeKernelHash()
-        if (CheckStakeKernelHash(pindex->pprev, nBits, block, *pcoin.first, prevoutStake, nTxNewTime, hashProofOfStake)) {
+        if (stake->CheckHash(pindex->pprev, nBits, block, *pcoin.first, prevoutStake, nTxNewTime, hashProofOfStake)) {
             //Double check that this will pass time requirements
             if (nTxNewTime <= chainActive.Tip()->GetMedianTimePast()) {
                 LogPrintf("%s: kernel found, but it is too far in the past \n", __func__);
@@ -2517,7 +2517,7 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
         if (fKernelFound)
             break; // if kernel is found stop searching
     }
-    if (nCredit == 0 || nCredit > nBalance - nReserveBalance)
+    if (nCredit == 0 || nCredit > nBalance - stake->nReserveBalance)
         return false;
 
     // Calculate reward

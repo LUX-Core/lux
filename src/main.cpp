@@ -13,7 +13,7 @@
 #include "checkpoints.h"
 #include "checkqueue.h"
 #include "init.h"
-#include "kernel.h"
+#include "stake.h"
 #include "masternode.h"
 #include "merkleblock.h"
 #include "net.h"
@@ -57,9 +57,6 @@ const int LAST_HEIGHT_FEE_BLOCK = 180000;
 CCriticalSection cs_main;
 
 BlockMap mapBlockIndex;
-set<pair<COutPoint, unsigned int> > setStakeSeen;
-map<unsigned int, unsigned int> mapHashedBlocks;
-map<uint256, uint256> mapProofOfStake;
 CChain chainActive;
 int64_t nTimeBestReceived = 0;
 CWaitableCriticalSection csBestBlock;
@@ -72,9 +69,6 @@ bool fIsBareMultisigStd = true;
 bool fCheckBlockIndex = false;
 unsigned int nCoinCacheSize = 5000;
 bool fAlerts = DEFAULT_ALERTS;
-
-unsigned int nStakeMinAge = 36 * 60 * 60;
-int64_t nReserveBalance = 0;
 
 uint256 bnProofOfStakeLimit = (~uint256(0) >> 20);
 uint256 bnProofOfStakeLimitV2 = (~uint256(0) >> 34);
@@ -93,8 +87,6 @@ struct COrphanTx {
 };
 map<uint256, COrphanTx> mapOrphanTransactions;
 map<uint256, set<uint256> > mapOrphanTransactionsByPrev;
-
-map<uint256, int64_t> mapRejectedBlocks;
 
 void EraseOrphansFor(NodeId peer);
 
@@ -932,7 +924,7 @@ bool GetCoinAge(const CTransaction& tx, const unsigned int nTxTime, uint64_t& nC
         // Read block header
         CBlockHeader prevblock = pindex->GetBlockHeader();
 
-        if (prevblock.nTime + nStakeMinAge > nTxTime)
+        if (prevblock.nTime + stake->nStakeMinAge > nTxTime)
             continue; // only count coins meeting min age requirement
 
         if (nTxTime < prevblock.nTime) {
@@ -2892,7 +2884,7 @@ CBlockIndex* AddToBlockIndex(const CBlock& block)
 
     //mark as PoS seen
     if (pindexNew->IsProofOfStake())
-        setStakeSeen.insert(make_pair(pindexNew->prevoutStake, pindexNew->nStakeTime));
+        stake->setStakeSeen.insert(make_pair(pindexNew->prevoutStake, pindexNew->nStakeTime));
 
     pindexNew->phashBlock = &((*mi).first);
     BlockMap::iterator miPrev = mapBlockIndex.find(block.hashPrevBlock);
@@ -2913,8 +2905,8 @@ CBlockIndex* AddToBlockIndex(const CBlock& block)
 
         // ppcoin: record proof-of-stake hash value
         if (pindexNew->IsProofOfStake()) {
-            if (mapProofOfStake.count(hash)) {
-                pindexNew->hashProofOfStake = mapProofOfStake[hash];
+            if (stake->mapProofOfStake.count(hash)) {
+                pindexNew->hashProofOfStake = stake->mapProofOfStake[hash];
             } else {
                 LogPrintf("%s: zero stake (%s)\n", __func__, hash.GetHex());
             }
@@ -2923,12 +2915,12 @@ CBlockIndex* AddToBlockIndex(const CBlock& block)
         // ppcoin: compute stake modifier
         uint64_t nStakeModifier = 0;
         bool fGeneratedStakeModifier = false;
-        if (!ComputeNextStakeModifier(pindexNew->pprev, nStakeModifier, fGeneratedStakeModifier))
+        if (!stake->ComputeNextModifier(pindexNew->pprev, nStakeModifier, fGeneratedStakeModifier))
             LogPrintf("%s: ComputeNextStakeModifier() failed \n", __func__);
 
         pindexNew->SetStakeModifier(nStakeModifier, fGeneratedStakeModifier);
-        pindexNew->nStakeModifierChecksum = GetStakeModifierChecksum(pindexNew);
-        if (!CheckStakeModifierCheckpoints(pindexNew->nHeight, pindexNew->nStakeModifierChecksum))
+        pindexNew->nStakeModifierChecksum = stake->GetModifierChecksum(pindexNew);
+        if (!stake->CheckModifierCheckpoints(pindexNew->nHeight, pindexNew->nStakeModifierChecksum))
             LogPrintf("%s: Rejected by stake modifier checkpoint height=%d, modifier=%s \n", __func__, pindexNew->nHeight, boost::lexical_cast<std::string>(nStakeModifier));
 
         DEBUG_DUMP_STAKING_INFO_AddToBlockIndex();
@@ -3094,7 +3086,7 @@ bool CheckBlock(const CBlock& block, CValidationState& state, bool fCheckPOW, bo
     // 3 minute future drift for PoS
     auto const nBlockTimeLimit = GetAdjustedTime() + (block.IsProofOfStake() ? 180 : 7200);
 
-    LogPrint("debug", "%s: block=%s (%s) %d %d\n", __func__, block.GetHash().GetHex(), s, 
+    LogPrint("debug", "%s: block=%s (%s %d %d)\n", __func__, block.GetHash().GetHex(), s,
              block.GetBlockTime(), nBlockTimeLimit);
 
     // Check block time, reject far future blocks.
@@ -3201,16 +3193,16 @@ bool CheckWork(const CBlock &block, CBlockIndex* const pindexPrev)
     if (block.IsProofOfStake()) {
         uint256 hashProofOfStake;
         uint256 hash = block.GetHash();
-        if (!CheckProofOfStake(pindexPrev, block, hashProofOfStake)) {
+        if (!stake->CheckProof(pindexPrev, block, hashProofOfStake)) {
             return error("%s: invalid proof-of-stake (block %s)\n", __func__, hash.GetHex());
         }
-        if (mapProofOfStake.count(hash)) {
-            auto const &h = mapProofOfStake[hash];
+        if (stake->mapProofOfStake.count(hash)) {
+            auto const &h = stake->mapProofOfStake[hash];
             if (h != hashProofOfStake)
                 return error("%s: diverged stake %s, %s (block %s)\n", __func__, 
                              hashProofOfStake.GetHex(), h.GetHex(), hash.GetHex());
         } else {
-            mapProofOfStake.emplace(hash, hashProofOfStake);
+            stake->mapProofOfStake.emplace(hash, hashProofOfStake);
         }
     }
     return true;
@@ -3467,7 +3459,7 @@ bool ProcessNewBlock(CValidationState& state, CNode* pfrom, CBlock* pblock, CDis
 
     // Limited duplicity on stake: prevents block flood attack
     // Duplicate stake allowed only when there is orphan child block
-    if (pblock->IsProofOfStake() && setStakeSeen.count(pblock->GetProofOfStake()) && !mapBlockIndex.count(pblock->hashPrevBlock))
+    if (pblock->IsProofOfStake() && stake->setStakeSeen.count(pblock->GetProofOfStake()) && !mapBlockIndex.count(pblock->hashPrevBlock))
         return error("%s: duplicate proof-of-stake (%s, %d) for block %s", __func__,
                      pblock->GetProofOfStake().first.ToString(),
                      pblock->GetProofOfStake().second,

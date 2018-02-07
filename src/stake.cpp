@@ -6,15 +6,16 @@
 #include <boost/lexical_cast.hpp>
 
 #include "db.h"
-#include "kernel.h"
+#include "stake.h"
+#include "main.h"
 #include "script/interpreter.h"
 #include "timedata.h"
 #if defined(DEBUG_DUMP_STAKING_INFO)
 #  include "DEBUG_DUMP_STAKING_INFO.hpp"
 #endif
 
-#ifndef DEBUG_DUMP_STAKING_INFO_CheckStakeKernelHash
-#  define DEBUG_DUMP_STAKING_INFO_CheckStakeKernelHash() (void)0
+#ifndef DEBUG_DUMP_STAKING_INFO_CheckHash
+#  define DEBUG_DUMP_STAKING_INFO_CheckHash() (void)0
 #endif
 #ifndef DEBUG_DUMP_MULTIFIER
 #  define DEBUG_DUMP_MULTIFIER() (void)0
@@ -33,6 +34,29 @@ static const int STAKE_TIMESTAMP_MASK = 15;
 static const int MODIFIER_INTERVAL_RATIO = 3;
 
 static const int LAST_MULTIPLIED_BLOCK = 180*1000; // 180K
+
+Stake * const stake = Stake::Pointer();
+
+StakeKernel::StakeKernel()
+{
+    //!<DuzyDoc>TODO: kernel initialization
+}
+
+Stake::Stake()
+    : nStakeMinAge(36 * 60 * 60)
+    , nReserveBalance(0)
+    , nLastCoinStakeSearchInterval(0)
+    , nLastCoinStakeSearchTime(GetAdjustedTime())
+    , setStakeSeen()
+    , mapProofOfStake()
+    , mapHashedBlocks()
+    , mapRejectedBlocks()
+{
+}
+
+Stake::~Stake()
+{
+}
 
 // Modifier interval: time to elapse before new modifier is computed
 // Set to 3-hour for production network and 20-minute for test network
@@ -151,7 +175,7 @@ static bool FindModifierBlockFromCandidates(vector<pair<int64_t, uint256> >& vSo
 // block. This is to make it difficult for an attacker to gain control of
 // additional bits in the stake modifier, even after generating a chain of
 // blocks.
-bool ComputeNextStakeModifier(const CBlockIndex* pindexPrev, uint64_t& nStakeModifier, bool& fGeneratedStakeModifier)
+bool Stake::ComputeNextModifier(const CBlockIndex* pindexPrev, uint64_t& nStakeModifier, bool& fGeneratedStakeModifier)
 {
     nStakeModifier = 0;
     fGeneratedStakeModifier = false;
@@ -325,7 +349,7 @@ bool MultiplyStakeTarget(uint256 &bnTarget, int nModifierHeight, int64_t nModifi
 }
 
 //instead of looping outside and reinitializing variables many times, we will give a nTimeTx and also search interval so that we can do all the hashing here
-bool CheckStakeKernelHash(const CBlockIndex* pindexPrev, unsigned int nBits, const CBlock &blockFrom, const CTransaction &txPrev, const COutPoint &prevout, unsigned int& nTimeTx, uint256& hashProofOfStake)
+bool Stake::CheckHash(const CBlockIndex* pindexPrev, unsigned int nBits, const CBlock &blockFrom, const CTransaction &txPrev, const COutPoint &prevout, unsigned int& nTimeTx, uint256& hashProofOfStake)
 {
     unsigned int nTimeBlockFrom = blockFrom.GetBlockTime();
 
@@ -364,7 +388,7 @@ bool CheckStakeKernelHash(const CBlockIndex* pindexPrev, unsigned int nBits, con
                   blockFrom.GetBlockTime(), txPrev.nTime, prevout.n, nTimeTx,
                   hashProofOfStake.ToString());
 #       endif
-        DEBUG_DUMP_STAKING_INFO_CheckStakeKernelHash();
+        DEBUG_DUMP_STAKING_INFO_CheckHash();
     }
 
     if (hashProofOfStake > bnTarget && nStakeModifierHeight <= LAST_MULTIPLIED_BLOCK) {
@@ -379,7 +403,7 @@ bool CheckStakeKernelHash(const CBlockIndex* pindexPrev, unsigned int nBits, con
 }
 
 // Check kernel hash target and coinstake signature
-bool CheckProofOfStake(CBlockIndex* const pindexPrev, const CBlock &block, uint256& hashProofOfStake)
+bool Stake::CheckProof(CBlockIndex* const pindexPrev, const CBlock &block, uint256& hashProofOfStake)
 {
     const CTransaction &tx = block.vtx[1];
     if (!tx.IsCoinStake())
@@ -411,7 +435,7 @@ bool CheckProofOfStake(CBlockIndex* const pindexPrev, const CBlock &block, uint2
         return error("%s: failed to find block", __func__);
 
     unsigned int nTime = block.nTime;
-    if (!CheckStakeKernelHash(pindexPrev, block.nBits, prevBlock, txPrev, txin.prevout, nTime, hashProofOfStake))
+    if (!this->CheckHash(pindexPrev, block.nBits, prevBlock, txPrev, txin.prevout, nTime, hashProofOfStake))
         // may occur during initial download or if behind on block chain sync
         return error("%s: check kernel failed on coinstake %s, hashProof=%s \n", __func__, 
                      tx.GetHash().ToString().c_str(), hashProofOfStake.ToString().c_str());
@@ -429,7 +453,7 @@ bool CheckCoinStakeTimestamp(int64_t nTimeBlock, int64_t nTimeTx)
 #endif
 
 // Get stake modifier checksum
-unsigned int GetStakeModifierChecksum(const CBlockIndex* pindex)
+unsigned int Stake::GetModifierChecksum(const CBlockIndex* pindex)
 {
     assert(pindex->pprev || pindex->GetBlockHash() == Params().HashGenesisBlock());
     // Hash previous checksum with flags, hashProofOfStake and nStakeModifier
@@ -443,7 +467,7 @@ unsigned int GetStakeModifierChecksum(const CBlockIndex* pindex)
 }
 
 // Check stake modifier hard checkpoints
-bool CheckStakeModifierCheckpoints(int nHeight, unsigned int nStakeModifierChecksum)
+bool Stake::CheckModifierCheckpoints(int nHeight, unsigned int nStakeModifierChecksum)
 {
     if (!IsTestNet()) return true; // Testnet has no checkpoints
 
@@ -466,3 +490,16 @@ bool CheckStakeModifierCheckpoints(int nHeight, unsigned int nStakeModifierCheck
     }
     return true;
 }
+
+bool Stake::IsActive()
+{
+    bool nStaking = false;
+    if (mapHashedBlocks.count(chainActive.Tip()->nHeight))
+        nStaking = true;
+    else if (mapHashedBlocks.count(chainActive.Tip()->nHeight - 1) && nLastCoinStakeSearchInterval)
+        nStaking = true;
+    return nStaking;
+}
+
+Stake  Stake::kernel;
+Stake *Stake::Pointer() { return &kernel; }
