@@ -452,8 +452,7 @@ void BitcoinMiner(CWallet* pwallet, bool fProofOfStake)
     static bool fMintableCoins = false;
     static int nMintableLastCheck = 0;
 
-    if (fProofOfStake && (GetTime() - nMintableLastCheck > 5 * 60)) // 5 minute check time
-    {
+    if (fProofOfStake && (GetTime() - nMintableLastCheck > 5 * 60)) { // 5 minute check time
         nMintableLastCheck = GetTime();
         fMintableCoins = pwallet->MintableCoins();
     }
@@ -608,10 +607,9 @@ void static ThreadBitcoinMiner(void* parg)
     LogPrintf("ThreadBitcoinMiner exiting\n");
 }
 
-void GenerateBitcoins(bool fGenerate, CWallet* pwallet, int nThreads)
+void GenerateBitcoins(CWallet* pwallet, int nThreads)
 {
     static boost::thread_group* minerThreads = NULL;
-    fGenerateBitcoins = fGenerate;
 
     if (nThreads < 0) {
         // In regtest threads defaults to 1
@@ -627,12 +625,12 @@ void GenerateBitcoins(bool fGenerate, CWallet* pwallet, int nThreads)
         minerThreads = NULL;
     }
 
-    if (nThreads == 0 || !fGenerate)
-        return;
-
-    minerThreads = new boost::thread_group();
-    for (int i = 0; i < nThreads; i++)
-        minerThreads->create_thread(boost::bind(&ThreadBitcoinMiner, pwallet));
+    if (nThreads > 0) {
+        fGenerateBitcoins = true;
+        minerThreads = new boost::thread_group();
+        for (int i = 0; i < nThreads; i++)
+            minerThreads->create_thread(boost::bind(&ThreadBitcoinMiner, pwallet));
+    }
 }
 
 #endif // ENABLE_WALLET

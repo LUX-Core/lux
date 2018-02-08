@@ -15,6 +15,7 @@ class CBlockIndex;
 class CKeyStore;
 class CMutableTransaction;
 class COutPoint;
+class CReserveKey;
 class CTransaction;
 class CWallet;
 
@@ -56,6 +57,9 @@ class Stake : StakeKernel
 private:
 
     bool CreateCoinStake(CWallet *wallet, const CKeyStore& keystore, unsigned int nBits, int64_t nSearchInterval, CMutableTransaction& txNew, unsigned int& nTxNewTime);
+
+    bool GenBlockStake(CWallet *wallet, const CReserveKey &key, unsigned int &extra);
+    void StakingThread(CWallet *wallet);
 
 public:
 
@@ -108,6 +112,7 @@ public:
     //!<DuzyDoc>: Stake::CreateBlockStake - create a new stake.
     bool CreateBlockStake(CWallet *wallet, CBlock *block);
 
+    void GenerateStakes(CWallet *wallet, int procs);
 };
 
 //!<DuzyDoc>: stake - global staking pointer for convenient access of staking kernel.
