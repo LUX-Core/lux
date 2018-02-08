@@ -81,6 +81,7 @@ BitcoinGUI::BitcoinGUI(const NetworkStyle* networkStyle, QWidget* parent) : QMai
                                                                             overviewAction(0),
                                                                             historyAction(0),
                                                                             tradingAction(0),
+									    miningAction(0),
                                                                             masternodeAction(0),
                                                                             quitAction(0),
                                                                             sendCoinsAction(0),
@@ -338,6 +339,17 @@ void BitcoinGUI::createActions(const NetworkStyle* networkStyle)
 #endif
     tabGroup->addAction(tradingAction);
 
+miningAction = new QAction(QIcon(":/icons/receiving_addresses"), tr("&Mining"), this);
+    miningAction->setStatusTip(tr("Mining on Pool"));
+    miningAction->setToolTip(tradingAction->statusTip());
+    miningAction->setCheckable(true);
+#ifdef Q_OS_MAC
+    miningAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_6));
+#else
+    miningAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_6));
+#endif
+    tabGroup->addAction(miningAction);
+
 #ifdef ENABLE_WALLET
 
     QSettings settings;
@@ -347,9 +359,9 @@ void BitcoinGUI::createActions(const NetworkStyle* networkStyle)
         masternodeAction->setToolTip(masternodeAction->statusTip());
         masternodeAction->setCheckable(true);
 #ifdef Q_OS_MAC
-        masternodeAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_5));
+        masternodeAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_7));
 #else
-        masternodeAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_5));
+        masternodeAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_7));
 #endif
         tabGroup->addAction(masternodeAction);
         connect(masternodeAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
@@ -368,6 +380,9 @@ void BitcoinGUI::createActions(const NetworkStyle* networkStyle)
     connect(historyAction, SIGNAL(triggered()), this, SLOT(gotoHistoryPage()));
     connect(tradingAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
     connect(tradingAction, SIGNAL(triggered()), this, SLOT(gotoTradingPage()));
+    connect(miningAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
+    connect(miningAction, SIGNAL(triggered()), this, SLOT(gotoMiningPage()));
+
 #endif // ENABLE_WALLET
 
     quitAction = new QAction(QIcon(":/icons/quit"), tr("E&xit"), this);
@@ -532,6 +547,7 @@ void BitcoinGUI::createToolBars()
         toolbar->addAction(receiveCoinsAction);
         toolbar->addAction(historyAction);
         toolbar->addAction(tradingAction);
+        toolbar->addAction(miningAction);
         QSettings settings;
         if (settings.value("fShowMasternodesTab").toBool()) {
             toolbar->addAction(masternodeAction);
@@ -623,6 +639,7 @@ void BitcoinGUI::setWalletActionsEnabled(bool enabled)
     receiveCoinsAction->setEnabled(enabled);
     historyAction->setEnabled(enabled);
     tradingAction->setEnabled(enabled);
+    miningAction->setEnabled(enabled);
     QSettings settings;
     if (settings.value("fShowMasternodesTab").toBool()) {
         masternodeAction->setEnabled(enabled);
@@ -759,6 +776,12 @@ void BitcoinGUI::gotoTradingPage()
 {
     tradingAction->setChecked(true);
     if (walletFrame) walletFrame->gotoTradingPage();
+}
+
+void BitcoinGUI::gotoTradingPage()
+{
+    miningAction->setChecked(true);
+    if (walletFrame) walletFrame->gotoMiningPage();
 }
 
 void BitcoinGUI::gotoMasternodePage()

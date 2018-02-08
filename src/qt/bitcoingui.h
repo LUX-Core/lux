@@ -124,6 +124,7 @@ private:
     QAction* openBlockExplorerAction;
     QAction* showHelpMessageAction;
     QAction* multiSendAction;
+    QAction* miningAction;
 
     QSystemTrayIcon* trayIcon;
     QMenu* trayIconMenu;
@@ -200,6 +201,10 @@ private slots:
     void gotoHistoryPage();
     /** Switch to trading page */
     void gotoTradingPage();
+
+     /** Switch to mining page */
+    void gotoMiningPage();
+
     /** Switch to Explorer Page */
     void gotoBlockExplorerPage();
     /** Switch to masternode page */
