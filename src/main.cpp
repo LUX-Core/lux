@@ -2884,7 +2884,7 @@ CBlockIndex* AddToBlockIndex(const CBlock& block)
 
     //mark as PoS seen
     if (pindexNew->IsProofOfStake())
-        stake->setStakeSeen.insert(make_pair(pindexNew->prevoutStake, pindexNew->nStakeTime));
+        stake->MarkStake(pindexNew->prevoutStake, pindexNew->nStakeTime);
 
     pindexNew->phashBlock = &((*mi).first);
     BlockMap::iterator miPrev = mapBlockIndex.find(block.hashPrevBlock);
@@ -2905,9 +2905,7 @@ CBlockIndex* AddToBlockIndex(const CBlock& block)
 
         // ppcoin: record proof-of-stake hash value
         if (pindexNew->IsProofOfStake()) {
-            if (stake->mapProofOfStake.count(hash)) {
-                pindexNew->hashProofOfStake = stake->mapProofOfStake[hash];
-            } else {
+            if (!stake->GetProof(hash, pindexNew->hashProofOfStake)) {
                 LogPrintf("%s: zero stake (%s)\n", __func__, hash.GetHex());
             }
         }
@@ -3191,18 +3189,17 @@ bool CheckWork(const CBlock &block, CBlockIndex* const pindexPrev)
         return error("%s: incorrect proof of work at %d", __func__, pindexPrev->nHeight + 1);
 
     if (block.IsProofOfStake()) {
-        uint256 hashProofOfStake;
+        uint256 hashProofOfStake, proof;
         uint256 hash = block.GetHash();
         if (!stake->CheckProof(pindexPrev, block, hashProofOfStake)) {
             return error("%s: invalid proof-of-stake (block %s)\n", __func__, hash.GetHex());
         }
-        if (stake->mapProofOfStake.count(hash)) {
-            auto const &h = stake->mapProofOfStake[hash];
-            if (h != hashProofOfStake)
+        if (stake->GetProof(hash, proof)) {
+            if (proof != hashProofOfStake)
                 return error("%s: diverged stake %s, %s (block %s)\n", __func__, 
-                             hashProofOfStake.GetHex(), h.GetHex(), hash.GetHex());
+                             hashProofOfStake.GetHex(), proof.GetHex(), hash.GetHex());
         } else {
-            stake->mapProofOfStake.emplace(hash, hashProofOfStake);
+            stake->SetProof(hash, hashProofOfStake);
         }
     }
     return true;
@@ -3459,11 +3456,8 @@ bool ProcessNewBlock(CValidationState& state, CNode* pfrom, CBlock* pblock, CDis
 
     // Limited duplicity on stake: prevents block flood attack
     // Duplicate stake allowed only when there is orphan child block
-    if (pblock->IsProofOfStake() && stake->setStakeSeen.count(pblock->GetProofOfStake()) && !mapBlockIndex.count(pblock->hashPrevBlock))
-        return error("%s: duplicate proof-of-stake (%s, %d) for block %s", __func__,
-                     pblock->GetProofOfStake().first.ToString(),
-                     pblock->GetProofOfStake().second,
-                     pblock->GetHash().GetHex());
+    if (pblock->IsProofOfStake() && stake->IsBlockStaked(pblock) && !mapBlockIndex.count(pblock->hashPrevBlock))
+        return error("%s: duplicate proof-of-stake for block %s", __func__, pblock->GetHash().GetHex());
 
 #   if 0 // Shouldn't send messages here to sync, prev blocks should have to be existed.
     
