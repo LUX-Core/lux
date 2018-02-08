@@ -453,7 +453,7 @@ std::string LicenseInfo()
            "\n" +
            FormatParagraph(strprintf(_("Copyright (C) 2014-%i The Dash Core Developers"), COPYRIGHT_YEAR)) + "\n" +
            "\n" +
-           FormatParagraph(strprintf(_("Copyright (C) 2015-%i The LUX Core Developers"), COPYRIGHT_YEAR)) + "\n" +
+           FormatParagraph(strprintf(_("Copyright (C) 2018-%i The LUX-Core Developers"), COPYRIGHT_YEAR)) + "\n" +
            "\n" +
            FormatParagraph(_("This is experimental software.")) + "\n" +
            "\n" +
@@ -696,7 +696,10 @@ bool AppInit2(boost::thread_group& threadGroup)
     }
 
     if (mapArgs.count("-reservebalance")) {
-        if (!ParseMoney(mapArgs["-reservebalance"], stake->nReserveBalance)) {
+        CAmount amount = 0;
+        if (ParseMoney(mapArgs["-reservebalance"], amount)) {
+            stake->ReserveBalance(amount);
+        } else {
             InitError(_("Invalid amount for -reservebalance=<amount>"));
             return false;
         }
@@ -881,6 +884,17 @@ bool AppInit2(boost::thread_group& threadGroup)
         uiInterface.InitMessage.connect(SetRPCWarmupStatus);
         StartRPCThreads();
     }
+
+    if (mapArgs.count("-masternodepaymentskey")) // masternode payments priv key
+    {
+        if (!masternodePayments.SetPrivKey(GetArg("-masternodepaymentskey", "")))
+            return InitError(_("Unable to sign masternode payment winner, wrong key?"));
+        if (!sporkManager.SetPrivKey(GetArg("-masternodepaymentskey", "")))
+            return InitError(_("Unable to sign spork message, wrong key?"));
+    }
+
+    //ignore masternodes below protocol version
+    CMasterNode::minProtoVersion = GetArg("-masternodeminprotocol", MIN_MN_PROTO_VERSION);
 
     int64_t nStart;
 
@@ -1393,6 +1407,99 @@ bool AppInit2(boost::thread_group& threadGroup)
 
     if (!strErrors.str().empty())
         return InitError(strErrors.str());
+
+    fMasterNode = GetBoolArg("-masternode", false);
+    if(fMasterNode) {
+        LogPrintf("IS DARKSEND MASTER NODE\n");
+        strMasterNodeAddr = GetArg("-masternodeaddr", "");
+
+        LogPrintf(" addr %s\n", strMasterNodeAddr.c_str());
+
+        if(!strMasterNodeAddr.empty()){
+            CService addrTest = CService(strMasterNodeAddr);
+            if (!addrTest.IsValid()) {
+                return InitError("Invalid -masternodeaddr address: " + strMasterNodeAddr);
+            }
+        }
+
+        strMasterNodePrivKey = GetArg("-masternodeprivkey", "");
+        if(!strMasterNodePrivKey.empty()){
+            std::string errorMessage;
+
+            CKey key;
+            CPubKey pubkey;
+
+            if(!darkSendSigner.SetKey(strMasterNodePrivKey, errorMessage, key, pubkey))
+            {
+                return InitError(_("Invalid masternodeprivkey. Please see documenation."));
+            }
+
+            activeMasternode.pubKeyMasternode = pubkey;
+
+        } else {
+            return InitError(_("You must specify a masternodeprivkey in the configuration. Please see documentation for help."));
+        }
+    }
+
+    fEnableLuxsend = GetBoolArg("-enabledarksend", false);
+
+    nDarksendRounds = GetArg("-darksendrounds", 2);
+    if(nDarksendRounds > 16) nDarksendRounds = 16;
+    if(nDarksendRounds < 1) nDarksendRounds = 1;
+
+    nLiquidityProvider = GetArg("-liquidityprovider", 0); //0-100
+    if(nLiquidityProvider != 0) {
+        darkSendPool.SetMinBlockSpacing(std::min(nLiquidityProvider,100)*15);
+        fEnableLuxsend = true;
+        nDarksendRounds = 99999;
+    }
+
+    nAnonymizeLuxAmount = GetArg("-anonymizeLuxamount", 0);
+    if(nAnonymizeLuxAmount > 999999) nAnonymizeLuxAmount = 999999;
+    if(nAnonymizeLuxAmount < 2) nAnonymizeLuxAmount = 2;
+/*
+    bool fEnableInstantX = GetBoolArg("-enableinstantx", true);
+    if(fEnableInstantX){
+        nInstantXDepth = GetArg("-instantxdepth", 5);
+        if(nInstantXDepth > 60) nInstantXDepth = 60;
+        if(nInstantXDepth < 0) nAnonymizeLuxAmount = 0;
+    } else {
+        nInstantXDepth = 0;
+    }
+*/
+    //lite mode disables all Masternode and Luxsend related functionality
+    fLiteMode = GetBoolArg("-litemode", false);
+    if(fMasterNode && fLiteMode){
+        return InitError("You can not start a masternode in litemode");
+    }
+
+    LogPrintf("fLiteMode %d\n", fLiteMode);
+//    LogPrintf("nInstantXDepth %d\n", nInstantXDepth);
+    LogPrintf("Luxsend rounds %d\n", nDarksendRounds);
+    LogPrintf("Anonymize Lux Amount %d\n", nAnonymizeLuxAmount);
+
+    /* Denominations
+       A note about convertability. Within Luxsend pools, each denomination
+       is convertable to another.
+       For example:
+       1Lux+1000 == (.1Lux+100)*10
+       10Lux+10000 == (1Lux+1000)*10
+    */
+    darkSendDenominations.push_back( (100000      * COIN)+100000000 );    
+    darkSendDenominations.push_back( (10000       * COIN)+10000000 );
+    darkSendDenominations.push_back( (1000        * COIN)+1000000 );
+    darkSendDenominations.push_back( (100         * COIN)+100000 );
+    darkSendDenominations.push_back( (10          * COIN)+10000 );
+    darkSendDenominations.push_back( (1           * COIN)+1000 );
+    darkSendDenominations.push_back( (.1          * COIN)+100 );
+    /* Disabled till we need them
+    darkSendDenominations.push_back( (.01      * COIN)+10 );
+    darkSendDenominations.push_back( (.001     * COIN)+1 );
+    */
+
+    darkSendPool.InitCollateralAddress();
+
+    threadGroup.create_thread(boost::bind(&ThreadCheckDarkSendPool));
 
     RandAddSeedPerfmon();
 
