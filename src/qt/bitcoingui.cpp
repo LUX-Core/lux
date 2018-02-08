@@ -210,9 +210,10 @@ BitcoinGUI::BitcoinGUI(const NetworkStyle* networkStyle, QWidget* parent) : QMai
     // Progress bar and label for blocks download
     progressBarLabel = new QLabel();
     progressBarLabel->setVisible(true);
-	progressBarLabel->setStyleSheet("color: #ffffff; margin-left: 10px; margin-right: 10px;");
+	progressBarLabel->setStyleSheet("color: #ffffff; margin-left: 10px; margin-right: 10px; border: 0px solid #ff0000;");
     progressBar = new GUIUtil::ProgressBar();
     progressBar->setAlignment(Qt::AlignCenter);
+	progressBar->setStyleSheet("border: 0px solid #ff0000;");
     progressBar->setVisible(true);
 
     // Override style sheet for progress bar for styles that have a segmented progress bar,

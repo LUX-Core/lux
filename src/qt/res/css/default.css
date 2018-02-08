@@ -4,7 +4,7 @@
 
 
 WalletFrame {
-    border-image: url(':/images/walletFrame_bg') 0 0 0 0 stretch stretch;
+    background-image: url(':/images/walletFrame_bg') 0 0 0 0 stretch stretch;
     border-top:0px solid #000;
     margin:0;
     padding:0;
@@ -18,7 +18,7 @@ QStatusBar {
 
 .QFrame {
     background-color:transparent;
-    border:0px solid #fff;
+	border: 0px solid #ffff;
 }
 
 QMenuBar {
@@ -94,7 +94,7 @@ QTabWidget {
 
 QTabWidget::pane {
     background-color:#f2f2f2;
-    border:1px solid #c2c2c2;
+    border:0px solid #c2c2c2;
 }
 
 QTabBar {
@@ -130,16 +130,14 @@ QTextEdit {
 
 QWidget .QFrame#frame > .QLabel#progressBarLabel {
     color: #ffffff;
+	border: none !important;
+	border: 0px solid #061431;
 }
 
 
 QHBoxLayout {
-     background-color: red;
-     border-style: outset;
-     border-width: 2px;
-     border-color: #ff0000;
-     min-width: 10em;
-     padding: 6px;
+     border-width: 0px;
+     border-color: #061431;
  }
 
 /****************************************************************************************/
