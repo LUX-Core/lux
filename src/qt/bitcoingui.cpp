@@ -81,7 +81,7 @@ BitcoinGUI::BitcoinGUI(const NetworkStyle* networkStyle, QWidget* parent) : QMai
                                                                             overviewAction(0),
                                                                             historyAction(0),
                                                                             tradingAction(0),
-									    miningAction(0),
+									      miningAction(0),
                                                                             masternodeAction(0),
                                                                             quitAction(0),
                                                                             sendCoinsAction(0),
@@ -107,6 +107,7 @@ BitcoinGUI::BitcoinGUI(const NetworkStyle* networkStyle, QWidget* parent) : QMai
                                                                             notificator(0),
                                                                             rpcConsole(0),
                                                                             explorerWindow(0),
+									      miningWindow(0),
                                                                             prevBlocks(0),
                                                                             spinnerFrame(0)
 {
@@ -150,6 +151,9 @@ BitcoinGUI::BitcoinGUI(const NetworkStyle* networkStyle, QWidget* parent) : QMai
         /** Create wallet frame*/
         walletFrame = new WalletFrame(this);
         explorerWindow = new BlockExplorer(this);
+
+	  miningWindow = new MiningDialog(this);
+
     } else
 #endif // ENABLE_WALLET
     {
@@ -251,6 +255,10 @@ BitcoinGUI::BitcoinGUI(const NetworkStyle* networkStyle, QWidget* parent) : QMai
     // prevents an open debug window from becoming stuck/unusable on client shutdown
     connect(quitAction, SIGNAL(triggered()), explorerWindow, SLOT(hide()));
 
+	connect(miningAction, SIGNAL(triggered()), miningWindow, SLOT(show()));
+
+        connect(quitAction, SIGNAL(triggered()), miningWindow, SLOT(hide()));
+
     // Install event filter to be able to catch status tip events (QEvent::StatusTip)
     this->installEventFilter(this);
 
@@ -348,7 +356,8 @@ miningAction = new QAction(QIcon(":/icons/receiving_addresses"), tr("&Mining"), 
 #else
     miningAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_6));
 #endif
-    tabGroup->addAction(miningAction);
+
+//    tabGroup->addAction(miningAction);
 
 #ifdef ENABLE_WALLET
 
@@ -380,8 +389,8 @@ miningAction = new QAction(QIcon(":/icons/receiving_addresses"), tr("&Mining"), 
     connect(historyAction, SIGNAL(triggered()), this, SLOT(gotoHistoryPage()));
     connect(tradingAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
     connect(tradingAction, SIGNAL(triggered()), this, SLOT(gotoTradingPage()));
-    connect(miningAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
-    connect(miningAction, SIGNAL(triggered()), this, SLOT(gotoMiningPage()));
+  /*  connect(miningAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
+      connect(miningAction, SIGNAL(triggered()), this, SLOT(gotoMiningPage()));*/
 
 #endif // ENABLE_WALLET
 
@@ -523,6 +532,9 @@ void BitcoinGUI::createMenuBar()
         tools->addAction(openNetworkAction);
         tools->addAction(openPeersAction);
         tools->addAction(openRepairAction);
+
+	  tools->addAction(miningAction);
+
         tools->addSeparator();
         tools->addAction(openConfEditorAction);
         tools->addAction(openMNConfEditorAction);
@@ -547,7 +559,7 @@ void BitcoinGUI::createToolBars()
         toolbar->addAction(receiveCoinsAction);
         toolbar->addAction(historyAction);
         toolbar->addAction(tradingAction);
-        toolbar->addAction(miningAction);
+      //  toolbar->addAction(miningAction);
         QSettings settings;
         if (settings.value("fShowMasternodesTab").toBool()) {
             toolbar->addAction(masternodeAction);
@@ -778,7 +790,7 @@ void BitcoinGUI::gotoTradingPage()
     if (walletFrame) walletFrame->gotoTradingPage();
 }
 
-void BitcoinGUI::gotoTradingPage()
+void BitcoinGUI::gotoMiningPage()
 {
     miningAction->setChecked(true);
     if (walletFrame) walletFrame->gotoMiningPage();

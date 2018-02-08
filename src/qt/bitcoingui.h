@@ -19,6 +19,8 @@
 #include <QPushButton>
 #include <QSystemTrayIcon>
 
+#include "miningdialog.h" // (TODO: UI)
+
 class ClientModel;
 class NetworkStyle;
 class Notificator;
@@ -131,6 +133,8 @@ private:
     Notificator* notificator;
     RPCConsole* rpcConsole;
     BlockExplorer* explorerWindow;
+
+      MiningDialog* miningWindow;
 
     /** Keep track of previous number of blocks, to detect progress */
     int prevBlocks;
