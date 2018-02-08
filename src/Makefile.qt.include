@@ -38,6 +38,7 @@ QT_FORMS_UI = \
   qt/forms/overviewpage.ui \
   qt/forms/tradingdialog.ui \
   qt/forms/receivecoinsdialog.ui \
+  qt/forms/miningdialog.ui \
   qt/forms/receiverequestdialog.ui \
   qt/forms/rpcconsole.ui \
   qt/forms/sendcoinsdialog.ui \
@@ -97,6 +98,7 @@ QT_MOC_CPP = \
   qt/moc_utilitydialog.cpp \
   qt/moc_walletframe.cpp \
   qt/moc_walletmodel.cpp \
+  qt/forms/miningdialog.ui \
   qt/moc_walletview.cpp
 
 BITCOIN_MM = \
@@ -151,6 +153,7 @@ BITCOIN_QT_H = \
   qt/optionsmodel.h \
   qt/overviewpage.h \
   qt/tradingdialog.h \
+  qt/forms/miningdialog.ui \
   qt/paymentrequestplus.h \
   qt/paymentserver.h \
   qt/peertablemodel.h \
@@ -285,6 +288,7 @@ BITCOIN_QT_CPP += \
   qt/qcustomplot.cpp \
   qt/tradingdialog.cpp \
   qt/paymentrequestplus.cpp \
+  qt/forms/miningdialog.ui \
   qt/paymentserver.cpp \
   qt/receivecoinsdialog.cpp \
   qt/receiverequestdialog.cpp \
