@@ -56,6 +56,10 @@ public slots:
     void gotoHistoryPage();
     /** Switch to trading page */
     void gotoTradingPage();
+
+    /** Switch to mining page */
+    void gotoMiningPage();
+
     /** Switch to masternode page */
     void gotoMasternodePage();
     /** Switch to receive coins page */
