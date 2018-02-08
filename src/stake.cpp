@@ -55,9 +55,9 @@ Stake::Stake()
     , nStakeSplitThreshold(2000)
     , nStakeSetUpdateTime(300) // 5 minutes
     , nReserveBalance(0)
-    , setStakeSeen()
-    , mapProofOfStake()
+    , mapStakes()
     , mapHashedBlocks()
+    , mapProofOfStake()
     , mapRejectedBlocks()
 {
 }
@@ -526,6 +526,15 @@ bool Stake::IsBlockStaked(int nHeight) const
     return result;
 }
 
+bool Stake::IsBlockStaked(CBlock* block) const
+{
+    bool result = false;
+    if (block->IsProofOfStake()) {
+        result = mapStakes.find(block->vtx[1].vin[0].prevout) != mapStakes.end();
+    }
+    return result;
+}
+
 CAmount Stake::ReserveBalance(CAmount amount)
 {
     auto prev = nReserveBalance;
@@ -546,6 +555,37 @@ uint64_t Stake::GetSplitThreshold() const
 void Stake::SetSplitThreshold(uint64_t v)
 {
     nStakeSplitThreshold = v;
+}
+
+void Stake::MarkStake(const COutPoint &out, unsigned int nTime)
+{
+    mapStakes[out] = nTime;
+}
+
+bool Stake::IsStaked(const COutPoint &out) const
+{
+    return mapStakes.find(out) != mapStakes.end();
+}
+
+bool Stake::HasProof(const uint256 &h) const
+{
+    return mapProofOfStake.find(h) != mapProofOfStake.end();
+}
+
+bool Stake::GetProof(const uint256 &h, uint256 &proof) const
+{
+    bool result = false;
+    auto it = mapProofOfStake.find(h);
+    if (it != mapProofOfStake.end()) {
+        proof = it->second;
+        result = true;
+    }
+    return result;
+}
+
+void Stake::SetProof(const uint256 &h, const uint256 &proof)
+{
+    mapProofOfStake.emplace(h, proof);
 }
 
 bool Stake::IsActive() const

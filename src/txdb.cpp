@@ -254,17 +254,17 @@ bool CBlockTreeDB::LoadBlockIndexGuts()
 
                 // ppcoin: build setStakeSeen
                 if (pindexNew->IsProofOfStake()) {
-                    stake->setStakeSeen.emplace(pindexNew->prevoutStake, pindexNew->nStakeTime);
+                    stake->MarkStake(pindexNew->prevoutStake, pindexNew->nStakeTime);
                     auto const hash(pindexNew->GetBlockHash());
+                    uint256 proof;
                     if (pindexNew->hashProofOfStake == 0) {
                         return error("%s: zero stake (block %s)", __func__, hash.GetHex());
-                    } else if (stake->mapProofOfStake.count(hash)) {
-                        auto const &h = stake->mapProofOfStake[hash];
-                        if (h != pindexNew->hashProofOfStake)
+                    } else if (stake->GetProof(hash, proof)) {
+                        if (proof != pindexNew->hashProofOfStake)
                             return error("%s: diverged stake %s, %s (block %s)\n", __func__, 
-                                         pindexNew->hashProofOfStake.GetHex(), h.GetHex(), hash.GetHex());
+                                         pindexNew->hashProofOfStake.GetHex(), proof.GetHex(), hash.GetHex());
                     } else {
-                        stake->mapProofOfStake.emplace(hash, pindexNew->hashProofOfStake);
+                        stake->SetProof(hash, pindexNew->hashProofOfStake);
                     }
                 }
 

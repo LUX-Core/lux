@@ -48,12 +48,9 @@ class Stake : StakeKernel
 
     CAmount nReserveBalance;
     
-public://!<DuzyDoc>TODO: private
-
-
-    std::set<std::pair<COutPoint, unsigned int> > setStakeSeen;
-    std::map<uint256, uint256> mapProofOfStake;
+    std::map<COutPoint, unsigned int> mapStakes;
     std::map<unsigned int, unsigned int> mapHashedBlocks;
+    std::map<uint256, uint256> mapProofOfStake;
     std::map<uint256, int64_t> mapRejectedBlocks;
 
 private:
@@ -88,6 +85,7 @@ public:
 
     //!<DuzyDoc>: Stake::IsBlockStaked - check if block is staked.
     bool IsBlockStaked(int nHeight) const;
+    bool IsBlockStaked(CBlock* block) const;
 
     CAmount ReserveBalance(CAmount amount);
     CAmount GetReservedBalance() const;
@@ -95,6 +93,13 @@ public:
     uint64_t GetSplitThreshold() const;
     void SetSplitThreshold(uint64_t v);
 
+    void MarkStake(const COutPoint &out, unsigned int nTime);
+    bool IsStaked(const COutPoint &out) const;
+
+    bool HasProof(const uint256 &h) const;
+    bool GetProof(const uint256 &h, uint256 &proof) const;
+    void SetProof(const uint256 &h, const uint256 &proof);
+    
     //!<DuzyDoc>: Stake::ResetInterval - reset stake interval.
     void ResetInterval();
     

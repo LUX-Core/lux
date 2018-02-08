@@ -155,11 +155,6 @@ public:
     bool SignBlock(const CKeyStore& keystore);
     bool CheckBlockSignature() const;
 
-    std::pair<COutPoint, unsigned int> GetProofOfStake() const
-    {
-        return IsProofOfStake()? std::make_pair(vtx[1].vin[0].prevout, nTime) : std::make_pair(COutPoint(), (unsigned int)0);
-    }
-
     // Build the in-memory merkle tree for this block and return the merkle root.
     // If non-NULL, *mutated is set to whether mutation was detected in the merkle
     // tree (a duplication of transactions in the block leading to an identical
