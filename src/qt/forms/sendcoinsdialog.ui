@@ -1234,6 +1234,12 @@
              </property>
              <item>
               <widget class="QCheckBox" name="checkBoxFreeTx">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
+               <property name="mouseTracking">
+                <bool>true</bool>
+               </property>
                <property name="text">
                 <string>Send as zero-fee transaction if possible</string>
                </property>
@@ -1241,6 +1247,9 @@
              </item>
              <item>
               <widget class="QLabel" name="labelFreeTx">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
                <property name="text">
                 <string>(confirmation may take longer)</string>
                </property>

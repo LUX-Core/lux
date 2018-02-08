@@ -50,6 +50,7 @@ public:
 			return outputIndex;
 		}
 
+        bool castOutputIndex(int& n);
 		void setOutputIndex(const std::string& outputIndex) {
 			this->outputIndex = outputIndex;
 		}
@@ -84,10 +85,11 @@ public:
 	}
 
 	void clear();
-    bool read(boost::filesystem::path path);
-	void add(std::string alias, std::string ip, std::string privKey, std::string txHash, std::string outputIndex);
+    bool read(std::string& strErr);
+    void add(std::string alias, std::string ip, std::string privKey, std::string txHash, std::string outputIndex);
 
-	std::vector<CMasternodeEntry>& getEntries() {
+	std::vector<CMasternodeEntry>& getEntries() 
+    {
 		return entries;
 	}
 
