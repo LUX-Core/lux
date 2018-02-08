@@ -186,7 +186,7 @@ Value setgenerate(const Array& params, bool fHelp)
     } else { // Not -regtest: start generate thread, return immediately
         mapArgs["-gen"] = (fGenerate ? "1" : "0");
         mapArgs["-genproclimit"] = itostr(nGenProcLimit);
-        GenerateBitcoins(fGenerate, pwalletMain, nGenProcLimit);
+        GenerateBitcoins(pwalletMain, nGenProcLimit);
     }
 
     return Value::null;

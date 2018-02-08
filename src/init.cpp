@@ -166,7 +166,7 @@ void PrepareShutdown()
 #ifdef ENABLE_WALLET
     if (pwalletMain)
         bitdb.Flush(false);
-    GenerateBitcoins(false, NULL, 0);
+    GenerateBitcoins(NULL, 0);
 #endif
     StopNode();
     UnregisterNodeSignals(GetNodeSignals());
@@ -1516,8 +1516,14 @@ bool AppInit2(boost::thread_group& threadGroup)
 
 #ifdef ENABLE_WALLET
     // Generate coins in the background
-    if (pwalletMain)
-        GenerateBitcoins(GetBoolArg("-gen", false), pwalletMain, GetArg("-genproclimit", 1));
+    if (GetBoolArg("-gen", false) && pwalletMain) {
+        GenerateBitcoins(pwalletMain, GetArg("-genproclimit", 1));
+    }
+    if (GetBoolArg("-staking", true) && pwalletMain) {
+        stake->GenerateStakes(pwalletMain, 1);
+    } else {
+        LogPrintf("Staking disabled\n");
+    }
 #endif
 
     // ********************************************************* Step 12: finished
