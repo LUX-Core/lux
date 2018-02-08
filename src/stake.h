@@ -5,14 +5,18 @@
 #define BITCOIN_STAKING_H__DUZY
 
 #include "uint256.h"
+#include "amount.h"
 #include <map>
 #include <set>
 
 //!<DuzyDoc>: Class Declarations
-class CBlockIndex;
 class CBlock;
+class CBlockIndex;
+class CKeyStore;
+class CMutableTransaction;
 class COutPoint;
 class CTransaction;
+class CWallet;
 
 struct StakeKernel //!<DuzyDoc>TODO: private
 {
@@ -34,17 +38,27 @@ class Stake : StakeKernel
 
     static Stake kernel;
 
+    int64_t nStakeInterval;
+    int64_t nLastStakeTime;
+
+    unsigned int nHashInterval;
+    unsigned int nStakeMinAge;
+    uint64_t nStakeSplitThreshold;
+    int nStakeSetUpdateTime;
+
+    CAmount nReserveBalance;
+    
 public://!<DuzyDoc>TODO: private
 
-    unsigned int nStakeMinAge;
-    int64_t nReserveBalance;
-    int64_t nLastCoinStakeSearchInterval;
-    int64_t nLastCoinStakeSearchTime;
 
     std::set<std::pair<COutPoint, unsigned int> > setStakeSeen;
     std::map<uint256, uint256> mapProofOfStake;
     std::map<unsigned int, unsigned int> mapHashedBlocks;
     std::map<uint256, int64_t> mapRejectedBlocks;
+
+private:
+
+    bool CreateCoinStake(CWallet *wallet, const CKeyStore& keystore, unsigned int nBits, int64_t nSearchInterval, CMutableTransaction& txNew, unsigned int& nTxNewTime);
 
 public:
 
@@ -69,7 +83,25 @@ public:
     bool CheckModifierCheckpoints(int nHeight, unsigned int nStakeModifierChecksum);
 
     //!<DuzyDoc>: Stake::IsActive - check if staking is active.
-    bool IsActive();
+    bool IsActive() const;
+    bool HasStaked() const;
+
+    //!<DuzyDoc>: Stake::IsBlockStaked - check if block is staked.
+    bool IsBlockStaked(int nHeight) const;
+
+    CAmount ReserveBalance(CAmount amount);
+    CAmount GetReservedBalance() const;
+
+    uint64_t GetSplitThreshold() const;
+    void SetSplitThreshold(uint64_t v);
+
+    //!<DuzyDoc>: Stake::ResetInterval - reset stake interval.
+    void ResetInterval();
+    
+    unsigned int GetStakeAge(unsigned int nTime) const;
+
+    //!<DuzyDoc>: Stake::CreateBlockStake - create a new stake.
+    bool CreateBlockStake(CWallet *wallet, CBlock *block);
 
 };
 
