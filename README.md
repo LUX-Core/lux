@@ -2,6 +2,8 @@
 
 "Empowered By Intelligence" 
 
+Luxcore is GNU AGPLv3 licensed.
+
 [![Build Status](https://travis-ci.org/216k155/lux.svg?branch=lux-autoconf)](https://travis-ci.org/216k155/lux)
 <a href="https://discord.gg/27xFP5Y"><img src="https://discordapp.com/api/guilds/364500397999652866/embed.png" alt="Discord server" /></a>
 
@@ -39,9 +41,9 @@ In addition, without Luxgate and Pmn, Bitcoin and Ethereum cannot interact with 
 | Stake Time | `36 hours` |
 | Masternode Requirement | `16,120 LUX` |
 | Masternode Reward | `40% PoS Block ` |
-| Port | `28666` |
+| Port | `26868` |
 | RPC Port | `9888` |
-| Masternode Port | `28666` |
+| Masternode Port | `26868` |
 
 
 Build Lux wallet
@@ -77,12 +79,12 @@ Once the source code is ready the build steps are below.
 
     PATH=$(echo "$PATH" | sed -e 's/:\/mnt.*//g') # strip out problematic Windows %PATH% imported var
     cd depends
-    make HOST=x86_64-w64-mingw32 -j4
+    make HOST=x86_64-w64-mingw32 -j$(nproc)
     cd ..
     ./autogen.sh # not required when building from tarball
     CONFIG_SITE=$PWD/depends/x86_64-w64-mingw32/share/config.site 
     ./configure --prefix=`pwd`/depends/x86_64-w64-mingw32 --disable-tests
-    make HOST=x86_64-w64-mingw32 -j4
+    make HOST=x86_64-w64-mingw32 -j$(nproc)
 
 ### Build on Ubuntu
 
@@ -102,7 +104,7 @@ Once the source code is ready the build steps are below.
     # Note autogen will prompt to install some more dependencies if needed
     ./autogen.sh
     ./configure --disable-tests
-    make -j4
+    make -j$(nproc)
 
 ### Build on OSX
 
@@ -159,7 +161,7 @@ This example lists the steps necessary to setup and build a command line only, n
     cd lux/
     ./autogen.sh
     ./configure --without-miniupnpc --disable-tests
-    make check
+    make -j$(nproc)
 
 Note:
 Enabling wallet support requires either compiling against a Berkeley DB newer than 4.8 (package `db`) using `--with-incompatible-bdb`,
@@ -186,7 +188,7 @@ To build executables for ARM:
     make HOST=arm-linux-gnueabihf NO_QT=1
     cd ..
     ./configure --prefix=$PWD/depends/arm-linux-gnueabihf --enable-glibc-back-compat --enable-reduce-exports LDFLAGS=-static-libstdc++
-    make
+    make -j$(nproc)
 
 For further documentation on the depends system see [README.md](../depends/README.md) in the depends directory.
 
@@ -213,11 +215,6 @@ Then build using:
     ./autogen.sh
     ./configure BDB_CFLAGS="-I${BDB_PREFIX}/include" BDB_LIBS="-L${BDB_PREFIX}/lib -ldb_cxx"
     gmake
-
-License
--------
-
-Luxcore is GPLv3 licensed.
 
 Development Process
 -------------------
