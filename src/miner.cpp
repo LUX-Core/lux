@@ -440,7 +440,7 @@ static bool fGenerateBitcoins = false;
 
 void BitcoinMiner(CWallet* pwallet, bool fProofOfStake)
 {
-    LogPrintf("LUXMiner started\n");
+    LogPrintf("LUXMiner started (%s)\n", (fProofOfStake ? "PoS" : "PoW"));
     SetThreadPriority(THREAD_PRIORITY_LOWEST);
     RenameThread("lux-miner");
 
@@ -458,13 +458,25 @@ void BitcoinMiner(CWallet* pwallet, bool fProofOfStake)
     }
 
     while (fGenerateBitcoins || fProofOfStake) {
+        {
+            LOCK(cs_vNodes);
+            if (vNodes.empty()) {
+                MilliSleep(1000);
+                continue;
+            }
+        }
+
+        CBlockIndex * const pindexPrev = chainActive.Tip();
+        if (!pindexPrev) continue;
         if (fProofOfStake) {
-            if (chainActive.Tip()->nHeight < Params().LAST_POW_BLOCK()) {
+#if 0
+            if (pindexPrev->nHeight < Params().LAST_POW_BLOCK()) {
                 MilliSleep(5000);
                 continue;
             }
+#endif
 
-            while (chainActive.Tip()->nTime < 1471482000 || vNodes.empty() || pwallet->IsLocked() || !fMintableCoins || stake->GetReservedBalance() >= pwallet->GetBalance()) {
+            while (/*pindexPrev->nTime < 1471482000 ||*/ vNodes.empty() || pwallet->IsLocked() || !fMintableCoins || stake->GetReservedBalance() >= pwallet->GetBalance()) {
                 stake->ResetInterval();
                 MilliSleep(5000);
                 if (!fGenerateBitcoins && !fProofOfStake)
@@ -472,7 +484,7 @@ void BitcoinMiner(CWallet* pwallet, bool fProofOfStake)
             }
 
             // Check if bestblock has been staked yet
-            if (stake->IsBlockStaked(chainActive.Tip()->nHeight)) {
+            if (stake->IsBlockStaked(pindexPrev->nHeight)) {
                 MilliSleep(5000);
                 continue;
             }
@@ -482,9 +494,6 @@ void BitcoinMiner(CWallet* pwallet, bool fProofOfStake)
         // Create new block
         //
         unsigned int nTransactionsUpdatedLast = mempool.GetTransactionsUpdated();
-        CBlockIndex* pindexPrev = chainActive.Tip();
-        if (!pindexPrev)
-            continue;
 
         std::unique_ptr<CBlockTemplate> pblocktemplate(CreateNewBlockWithKey(reservekey, pwallet, fProofOfStake));
         if (!pblocktemplate.get())
