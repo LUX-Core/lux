@@ -1519,11 +1519,6 @@ bool AppInit2(boost::thread_group& threadGroup)
     if (GetBoolArg("-gen", false) && pwalletMain) {
         GenerateBitcoins(pwalletMain, GetArg("-genproclimit", 1));
     }
-    if (GetBoolArg("-staking", true) && pwalletMain) {
-        stake->GenerateStakes(pwalletMain, 1);
-    } else {
-        LogPrintf("Staking disabled\n");
-    }
 #endif
 
     // ********************************************************* Step 12: finished

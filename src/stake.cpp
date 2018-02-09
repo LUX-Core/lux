@@ -901,7 +901,7 @@ bool Stake::GenBlockStake(CWallet *wallet, const CReserveKey &key, unsigned int 
 
 void Stake::StakingThread(CWallet *wallet)
 {
-    LogPrintf("%s: started!", __func__);
+    LogPrintf("%s: started!\n", __func__);
     
     SetThreadPriority(THREAD_PRIORITY_LOWEST);
 
@@ -943,7 +943,7 @@ void Stake::StakingThread(CWallet *wallet)
         LogPrintf("%s: exception", __func__);
     }
 
-    LogPrintf("%s: done!", __func__);
+    LogPrintf("%s: done!\n", __func__);
 }
 
 void Stake::GenerateStakes(CWallet *wallet, int procs)
