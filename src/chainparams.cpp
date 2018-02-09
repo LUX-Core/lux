@@ -140,7 +140,9 @@ public:
 
         assert(hashGenesisBlock == uint256("0x00000759bb3da130d7c9aedae170da8335f5a0d01a9007e4c8d3ccd08ace6a42"));
         assert(genesis.hashMerkleRoot == uint256("0xe08ae0cfc35a1d70e6764f347fdc54355206adeb382446dd54c32cd0201000d3"));
-	
+
+        vSeeds.push_back(CDNSSeedData("luxcore", "209.250.254.156"));
+        vSeeds.push_back(CDNSSeedData("luxcore", "45.77.233.25"));
         vSeeds.push_back(CDNSSeedData("luxcore.com.au", "seed.luxcore.com.au"));
         vSeeds.push_back(CDNSSeedData("luxcore.io", "luxseed1.luxcore.io"));
         vSeeds.push_back(CDNSSeedData("luxcore.io", "luxseed2.luxcore.io"));
@@ -168,7 +170,7 @@ public:
 
         nPoolMaxTransactions = 3;
         strSporkKey = "04a983220ea7a38a7106385003fef77896538a382a0dcc389cc45f3c98751d9af423a097789757556259351198a8aaa628a1fd644c3232678c5845384c744ff8d7";
-      
+
         strObfuscationPoolDummyAddress = "LgcjpYxWa5EB9KCYaRtpPgG8kgiWRvJY38";
         nStartMasternodePayments = 1507656633; // 10/10/2017
     }
