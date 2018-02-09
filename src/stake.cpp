@@ -894,9 +894,21 @@ bool Stake::GenBlockStake(CWallet *wallet, const CReserveKey &key, unsigned int 
     }
 
     SetThreadPriority(THREAD_PRIORITY_NORMAL);
-    ProcessBlockFound(block, *wallet, const_cast<CReserveKey &>(key));
+
+    bool result = true;
+    uint256 proof1, proof2;
+    auto hash = block->GetHash();
+    if (CheckProof(tip, *block, proof1)) {
+        ProcessBlockFound(block, *wallet, const_cast<CReserveKey &>(key));
+    } else if (!GetProof(hash, proof2)) {
+        SetProof(hash, proof1);
+    } else if (proof1 != proof2) {
+        result = error("%s: diverged stake %s, %s (block %s)\n", __func__, 
+                       proof1.GetHex(), proof2.GetHex(), hash.GetHex());
+    }
+
     SetThreadPriority(THREAD_PRIORITY_LOWEST);
-    return true;
+    return result;
 }
 
 void Stake::StakingThread(CWallet *wallet)
@@ -946,8 +958,9 @@ void Stake::StakingThread(CWallet *wallet)
     LogPrintf("%s: done!\n", __func__);
 }
 
-void Stake::GenerateStakes(CWallet *wallet, int procs)
+void Stake::GenerateStakes(boost::thread_group &group, CWallet *wallet, int procs)
 {
+#if 0
     static std::unique_ptr<boost::thread_group> StakingThreads(new boost::thread_group);
     if (procs == 0) {
         nStakingInterrupped = true;
@@ -960,6 +973,11 @@ void Stake::GenerateStakes(CWallet *wallet, int procs)
     for (int i = 0; i < procs; ++i) {
         StakingThreads->create_thread(boost::bind(&Stake::StakingThread, this, wallet));
     }
+#else
+    for (int i = 0; i < procs; ++i) {
+        group.create_thread(boost::bind(&Stake::StakingThread, this, wallet));
+    }
+#endif
 }
 
 Stake *Stake::Pointer() { return &kernel; }

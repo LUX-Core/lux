@@ -19,6 +19,8 @@ class CReserveKey;
 class CTransaction;
 class CWallet;
 
+namespace boost { class thread_group; }
+
 struct StakeKernel //!<DuzyDoc>TODO: private
 {
     //!<DuzyDoc>TODO: fields
@@ -112,7 +114,7 @@ public:
     //!<DuzyDoc>: Stake::CreateBlockStake - create a new stake.
     bool CreateBlockStake(CWallet *wallet, CBlock *block);
 
-    void GenerateStakes(CWallet *wallet, int procs);
+    void GenerateStakes(boost::thread_group &group, CWallet *wallet, int procs);
 };
 
 //!<DuzyDoc>: stake - global staking pointer for convenient access of staking kernel.
