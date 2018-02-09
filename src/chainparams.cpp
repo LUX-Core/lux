@@ -144,7 +144,7 @@ public:
         vSeeds.push_back(CDNSSeedData("luxcore", "5.189.142.181"));
         vSeeds.push_back(CDNSSeedData("luxcore1", "5.77.44.147"));
         vSeeds.push_back(CDNSSeedData("luxcore2", "209.250.254.156"));
-        vSeeds.push_back(CDNSSeedData("luxcore3", 45.76.114.209"));
+        vSeeds.push_back(CDNSSeedData("luxcore3", "45.76.114.209"));
         vSeeds.push_back(CDNSSeedData("luxcore4", "luxseed1.luxcore.io"));
         vSeeds.push_back(CDNSSeedData("luxcore5", "luxseed2.luxcore.io"));
         vSeeds.push_back(CDNSSeedData("luxcore6", "luxseed3.luxcore.io"));
