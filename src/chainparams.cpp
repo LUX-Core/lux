@@ -98,10 +98,10 @@ public:
          * The characters are rarely used upper ASCII, not valid as UTF-8, and produce
          * a large 4-byte int at any alignment.
          */
-        pchMessageStart[0] = /*0x64*/ 0xf9;
-        pchMessageStart[1] = /*0x1a*/ 0x73;
-        pchMessageStart[2] = /*0x84*/ 0xc9;
-        pchMessageStart[3] = /*0x3l*/ 0xa7;
+        pchMessageStart[0] = 0xf9;
+        pchMessageStart[1] = 0x73;
+        pchMessageStart[2] = 0xc9;
+        pchMessageStart[3] = 0xa7;
         vAlertPubKey = ParseHex("042d13c016ed91528241bcff222989769417eb10cdb679228c91e26e26900eb9fd053cd9f16a9a2894ad5ebbd551be1a4bd23bd55023679be17f0bd3a16e6fbeba");
         nDefaultPort = /*28666*/ 26868;
         bnProofOfWorkLimit = ~uint256(0) >> 20; // LUX starting difficulty is 1 / 2^12
@@ -141,14 +141,14 @@ public:
         assert(hashGenesisBlock == uint256("0x00000759bb3da130d7c9aedae170da8335f5a0d01a9007e4c8d3ccd08ace6a42"));
         assert(genesis.hashMerkleRoot == uint256("0xe08ae0cfc35a1d70e6764f347fdc54355206adeb382446dd54c32cd0201000d3"));
 
-        vSeeds.push_back(CDNSSeedData("luxcore", "209.250.254.156"));
-        vSeeds.push_back(CDNSSeedData("luxcore", "45.77.233.25"));
-        vSeeds.push_back(CDNSSeedData("luxcore.com.au", "seed.luxcore.com.au"));
-        vSeeds.push_back(CDNSSeedData("luxcore.io", "luxseed1.luxcore.io"));
-        vSeeds.push_back(CDNSSeedData("luxcore.io", "luxseed2.luxcore.io"));
-        vSeeds.push_back(CDNSSeedData("luxcore.io", "luxseed3.luxcore.io"));
-        vSeeds.push_back(CDNSSeedData("luxcore.io", "luxseed4.luxcore.io"));
-        vSeeds.push_back(CDNSSeedData("luxcore.io", "luxseed5.luxcore.io"));
+        vSeeds.push_back(CDNSSeedData("luxcore", "5.189.142.181"));
+        vSeeds.push_back(CDNSSeedData("luxcore1", "5.77.44.147"));
+        vSeeds.push_back(CDNSSeedData("luxcore2", "209.250.254.156"));
+        vSeeds.push_back(CDNSSeedData("luxcore3", 45.76.114.209"));
+        vSeeds.push_back(CDNSSeedData("luxcore4", "luxseed1.luxcore.io"));
+        vSeeds.push_back(CDNSSeedData("luxcore5", "luxseed2.luxcore.io"));
+        vSeeds.push_back(CDNSSeedData("luxcore6", "luxseed3.luxcore.io"));
+        vSeeds.push_back(CDNSSeedData("luxcore7", "luxseed4.luxcore.io"));
 
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,48); // LUX Start letter L
         base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1,48);
