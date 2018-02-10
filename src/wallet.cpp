@@ -3327,29 +3327,39 @@ void CWallet::AutoCombineDust()
         CReserveKey keyChange(this); // this change address does not end up being used, because change is returned with coin control switch
         string strErr;
         int64_t nFeeRet = 0;
-
+#if 0
         //get the fee amount
         CWalletTx wtxdummy;
         CreateTransaction(vecSend, wtxdummy, keyChange, nFeeRet, strErr, coinControl, ALL_COINS, false, CAmount(0));
+
         vecSend[0].second = nTotalRewardsValue - nFeeRet - 500;
 
-        // Added 5% fee tp prevent "Insufficient funds" errors
+        if (!CreateTransaction(vecSend, wtx, keyChange, nFeeRet, strErr, coinControl, ALL_COINS, false, CAmount(0))) {
+            LogPrintf("AutoCombineDust createtransaction failed, reason: %s\n", strErr);
+            continue;
+        }
+#endif
+
+#if 1
+       // Added 5% fee tp prevent "Insufficient funds" errors
         vecSend[0].second = nTotalRewardsValue - (nTotalRewardsValue / 5);
 
         if (!CreateTransaction(vecSend, wtx, keyChange, nFeeRet, strErr, coinControl, ALL_COINS, false, CAmount(0))) {
             LogPrintf("AutoCombineDust createtransaction failed, reason: %s\n", strErr);
             continue;
         }
+#endif
 
+#if 1
         //we don't combine below the threshold unless the fees are 0 to avoid paying fees over fees over fees
         if (nTotalRewardsValue < nAutoCombineThreshold * COIN && nFeeRet > 0)
             continue;
-
+#else
         if (!CommitTransaction(wtx, keyChange)) {
             LogPrintf("AutoCombineDust transaction commit failed\n");
             continue;
         }
-
+#endif
         LogPrintf("AutoCombineDust sent transaction\n");
 
         delete coinControl;
@@ -3615,3 +3625,4 @@ bool CWallet::AddAdrenalineNodeConfig(CAdrenalineNodeConfig nodeConfig)
 
     return rv;
 }
+
