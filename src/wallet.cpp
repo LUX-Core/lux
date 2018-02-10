@@ -3327,7 +3327,7 @@ void CWallet::AutoCombineDust()
         CReserveKey keyChange(this); // this change address does not end up being used, because change is returned with coin control switch
         string strErr;
         int64_t nFeeRet = 0;
-#if 0
+#if 1
         //get the fee amount
         CWalletTx wtxdummy;
         CreateTransaction(vecSend, wtxdummy, keyChange, nFeeRet, strErr, coinControl, ALL_COINS, false, CAmount(0));
@@ -3340,7 +3340,7 @@ void CWallet::AutoCombineDust()
         }
 #endif
 
-#if 1
+#if 0
        // Added 5% fee tp prevent "Insufficient funds" errors
         vecSend[0].second = nTotalRewardsValue - (nTotalRewardsValue / 5);
 
@@ -3350,7 +3350,7 @@ void CWallet::AutoCombineDust()
         }
 #endif
 
-#if 1
+#if 0
         //we don't combine below the threshold unless the fees are 0 to avoid paying fees over fees over fees
         if (nTotalRewardsValue < nAutoCombineThreshold * COIN && nFeeRet > 0)
             continue;
