@@ -898,13 +898,11 @@ bool Stake::GenBlockStake(CWallet *wallet, const CReserveKey &key, unsigned int 
     bool result = true;
     uint256 proof1, proof2;
     auto hash = block->GetHash();
-
-    std::cout
-        << __func__
-        << ": " << hash.GetHex()
-        << std::endl ;
-
-    if (CheckProof(tip, *block, proof1)) {
+    auto good = CheckProof(tip, *block, proof1);
+#if defined(DEBUG_DUMP_STAKE_CHECK)
+    DEBUG_DUMP_STAKE_CHECK();
+#endif
+    if (good) {
 #if defined(DEBUG_DUMP_STAKE_FOUND)
         DEBUG_DUMP_STAKE_FOUND();
 #endif
