@@ -2077,9 +2077,14 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
         return false;
 
     // verify that the view's current state corresponds to the previous block
-    uint256 hashPrevBlock = pindex->pprev == NULL ? uint256(0) : pindex->pprev->GetBlockHash();
-    if (hashPrevBlock != view.GetBestBlock())
-        LogPrintf("%s: hashPrev=%s view=%s\n", __func__, hashPrevBlock.GetHex(), view.GetBestBlock().GetHex());
+    uint256 hashPrevBlock;
+    if (pindex->pprev) {
+        hashPrevBlock = pindex->pprev->GetBlockHash();
+    }
+    if (hashPrevBlock != view.GetBestBlock()) {
+        LogPrintf("%s: block=%s,%d prev=%s best=%s\n", __func__, pindex->GetBlockHash().GetHex(), pindex->nHeight, view.GetBestBlock().GetHex(), hashPrevBlock.GetHex());
+        return error("%s: previous block not best", __func__);
+    }
 
     assert(hashPrevBlock == view.GetBestBlock());
 
