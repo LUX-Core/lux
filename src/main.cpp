@@ -4830,7 +4830,6 @@ static bool ProcessMessage(CNode* pfrom, const string &strCommand, CDataStream& 
                     // anyone relaying LegitTxX banned)
                     CValidationState stateDummy;
 
-
                     if (setMisbehaving.count(fromPeer))
                         continue;
                     if (AcceptToMemoryPool(mempool, stateDummy, orphanTx, true, &fMissingInputs2)) {
