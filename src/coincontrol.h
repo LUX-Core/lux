@@ -34,7 +34,7 @@ public:
         destChange = CNoDestination();
         setSelected.clear();
         useSwiftTX = false;
-        useObfuscation = true;
+        useObfuscation = false;
         fAllowOtherInputs = false;
         fAllowWatchOnly = false;
         nMinimumTotalFee = 0;
@@ -72,6 +72,18 @@ public:
     {
         vOutpoints.assign(setSelected.begin(), setSelected.end());
     }
+
+    unsigned int QuantitySelected()
+    {
+        return setSelected.size();
+    }
+
+    void SetSelection(std::set<COutPoint> setSelected)
+    {
+        this->setSelected.clear();
+        this->setSelected = setSelected;
+    }
+
 
 private:
     std::set<COutPoint> setSelected;
