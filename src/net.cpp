@@ -1600,7 +1600,7 @@ void StartNode(boost::thread_group& threadGroup)
     threadGroup.create_thread(boost::bind(&LoopForever<void (*)()>, "dumpaddr", &DumpAddresses, DUMP_ADDRESSES_INTERVAL * 1000));
 
     if (GetBoolArg("-staking", true) && pwalletMain) {
-#if 0
+#if 1
         stake->GenerateStakes(threadGroup, pwalletMain, 1);
         (void) &ThreadStakeMinter;
 #else
