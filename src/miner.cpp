@@ -469,7 +469,7 @@ void BitcoinMiner(CWallet* pwallet, bool fProofOfStake)
         CBlockIndex * const pindexPrev = chainActive.Tip();
         if (!pindexPrev) continue;
         if (fProofOfStake) {
-#if 0
+#if 1
             if (pindexPrev->nHeight < Params().LAST_POW_BLOCK()) {
                 MilliSleep(5000);
                 continue;
