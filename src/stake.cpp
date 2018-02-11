@@ -405,12 +405,12 @@ bool Stake::CheckHash(const CBlockIndex* pindexPrev, unsigned int nBits, const C
         DEBUG_DUMP_STAKING_INFO_CheckHash();
     }
 
-    if (hashProofOfStake > bnTarget && nStakeModifierHeight <= LAST_MULTIPLIED_BLOCK) {
-        DEBUG_DUMP_MULTIFIER();
-        if (!MultiplyStakeTarget(bnTarget, nStakeModifierHeight, nStakeModifierTime, nValueIn)) {
-            return error("%s: cant adjust stake target %s, %d, %d", __func__, bnTarget.GetHex(), nStakeModifierHeight, nStakeModifierTime);
-        }
-    }
+//    if (hashProofOfStake > bnTarget && nStakeModifierHeight <= LAST_MULTIPLIED_BLOCK) {
+//        DEBUG_DUMP_MULTIFIER();
+//        if (!MultiplyStakeTarget(bnTarget, nStakeModifierHeight, nStakeModifierTime, nValueIn)) {
+//            return error("%s: cant adjust stake target %s, %d, %d", __func__, bnTarget.GetHex(), nStakeModifierHeight, nStakeModifierTime);
+//        }
+//    }
 
     // Now check if proof-of-stake hash meets target protocol
     return !(hashProofOfStake > bnTarget);
@@ -733,11 +733,6 @@ bool Stake::CreateCoinStake(CWallet *wallet, const CKeyStore& keystore, unsigned
     if (nCredit == 0 || nCredit > nBalance - nReserveBalance)
         return false;
 
-    // Calculate reward
-    const CBlockIndex* pIndex0 = chainActive.Tip();
-    uint64_t nReward = GetProofOfWorkReward(0, pIndex0->nHeight);
-    nCredit += nReward;
-
     int64_t nMinFee = 0;
     while (true) {
         // Set output amount
@@ -763,6 +758,19 @@ bool Stake::CreateCoinStake(CWallet *wallet, const CKeyStore& keystore, unsigned
                 LogPrintf("%s: fee for coinstake %s\n", __func__, FormatMoney(nMinFee).c_str());
             break;
         }
+    }
+    // Calculate reward
+    const CBlockIndex* pIndex0 = chainActive.Tip();
+    int64_t nReward;
+    {
+        uint64_t nCoinAge;
+        uint64_t nFees;
+
+        nReward = GetProofOfStakeReward(nCoinAge, nFees,  pIndex0->nHeight + 1);
+        if (nReward <= 0)
+            return false;
+
+        nCredit += nReward;
     }
 
     //Masternode payment

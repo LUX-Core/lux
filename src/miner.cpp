@@ -134,6 +134,14 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
     pblocktemplate->vTxFees.push_back(-1);   // updated at end
     pblocktemplate->vTxSigOps.push_back(-1); // updated at end
 
+    if (fProofOfStake) {
+        boost::this_thread::interruption_point();
+        if (!stake->CreateBlockStake(pwallet, pblock)) {
+            LogPrintf("%s: no coin stake (nBits=%d)\n", __func__, pblock->nBits);
+            return NULL;
+        }
+    }
+
     // Largest block you're willing to create:
     unsigned int nBlockMaxSize = GetArg("-blockmaxsize", DEFAULT_BLOCK_MAX_SIZE);
     // Limit to betweeen 1K and MAX_BLOCK_SIZE-1K for sanity:
@@ -276,6 +284,13 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
             unsigned int nTxSigOps = GetLegacySigOpCount(tx);
             if (nBlockSigOps + nTxSigOps >= MAX_BLOCK_SIGOPS)
                 continue;
+
+            // Timestamp limit
+            if (tx.nTime > GetAdjustedTime() || (fProofOfStake && tx.nTime > pblock->vtx[0].nTime))
+                continue;
+
+//            // Transaction fee
+//            int64_t nMinFee = GetMinFee(tx, nBlockSize, GMF_BLOCK);
 
             // Skip free transactions if we're past the minimum block size:
             const uint256& hash = tx.GetHash();
@@ -692,6 +707,8 @@ void ThreadStakeMiner(CWallet *pwallet)
         //
         // Create new block
         //
+        std::cout << "New Block\n";
+
         std::unique_ptr<CBlockTemplate> pblocktemplate(CreateNewBlockWithKey(reservekey, pwallet, true));
 
 
@@ -701,7 +718,8 @@ void ThreadStakeMiner(CWallet *pwallet)
         CBlock* pblock = &pblocktemplate->block;
 //        if (!pblock.get())
 //            return;
-
+        std::cout << "New Block: " << pblock->IsProofOfStake() << std::endl;
+        std::cout << "New Block: " << pblock->vtx.size() << std::endl;
         // Trying to sign a block
         if (pblock->SignBlock(*pwallet))
         {
