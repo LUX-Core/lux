@@ -19,6 +19,7 @@
 #include "primitives/transaction.h"
 #include "ui_interface.h"
 #include "wallet.h"
+#include "miner.h"
 #include "stake.h"
 
 #ifdef WIN32
@@ -1399,22 +1400,22 @@ void ThreadMessageHandler()
     }
 }
 
-// ppcoin: stake minter thread
-void static ThreadStakeMinter()
-{
-    boost::this_thread::interruption_point();
-    LogPrintf("ThreadStakeMinter started\n");
-    CWallet* pwallet = pwalletMain;
-    try {
-        BitcoinMiner(pwallet, true);
-        boost::this_thread::interruption_point();
-    } catch (std::exception& e) {
-        LogPrintf("ThreadStakeMinter() exception \n");
-    } catch (...) {
-        LogPrintf("ThreadStakeMinter() error \n");
-    }
-    LogPrintf("ThreadStakeMinter exiting,\n");
-}
+//// ppcoin: stake minter thread
+//void static ThreadStakeMinter()
+//{
+//    boost::this_thread::interruption_point();
+//    LogPrintf("ThreadStakeMinter started\n");
+//    CWallet* pwallet = pwalletMain;
+//    try {
+//        BitcoinMiner(pwallet, true);
+//        boost::this_thread::interruption_point();
+//    } catch (std::exception& e) {
+//        LogPrintf("ThreadStakeMinter() exception \n");
+//    } catch (...) {
+//        LogPrintf("ThreadStakeMinter() error \n");
+//    }
+//    LogPrintf("ThreadStakeMinter exiting,\n");
+//}
 
 bool BindListenPort(const CService& addrBind, string& strError, bool fWhitelisted)
 {
@@ -1600,12 +1601,12 @@ void StartNode(boost::thread_group& threadGroup)
     threadGroup.create_thread(boost::bind(&LoopForever<void (*)()>, "dumpaddr", &DumpAddresses, DUMP_ADDRESSES_INTERVAL * 1000));
 
     if (GetBoolArg("-staking", true) && pwalletMain) {
-#if 1
-        stake->GenerateStakes(threadGroup, pwalletMain, 1);
-        (void) &ThreadStakeMinter;
-#else
-        threadGroup.create_thread(boost::bind(&TraceThread<void (*)()>, "stakemint", &ThreadStakeMinter));
-#endif
+//#if 1
+//        stake->GenerateStakes(threadGroup, pwalletMain, 1);
+//        (void) &ThreadStakeMinter;
+//#else
+        threadGroup.create_thread(boost::bind(&ThreadStakeMiner, pwalletMain));
+//#endif
     } else {
         LogPrintf("Staking disabled\n");
     }
