@@ -211,6 +211,7 @@ QPushButton {
     padding-right:25px;
     padding-top:5px;
     padding-bottom:5px;
+	margin-right: 10px;
 }
 
 QPushButton:hover {
@@ -224,6 +225,32 @@ QPushButton:focus {
 }
 
 QPushButton:pressed {
+    border:1px solid #333;
+}
+
+QPushButtonGrey {
+    border: 1px solid #061431;
+    color:#061431;
+    font-size:12px;
+    font-weight:bold;
+    padding-left:25px;
+    padding-right:25px;
+    padding-top:5px;
+    padding-bottom:5px;
+	margin: 5px;
+}
+
+QPushButtonGrey:hover {
+    background-color: #40c2dc;
+}
+
+
+QPushButtonGrey:focus {
+    border:none;
+    outline:none;
+}
+
+QPushButtonGrey:pressed {
     border:1px solid #333;
 }
 
