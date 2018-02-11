@@ -7,13 +7,17 @@
 
 #include "db.h"
 #include "stake.h"
+#include "init.h"
 #include "main.h"
+#include "miner.h"
 #include "wallet.h"
 #include "masternode.h"
 #include "utilmoneystr.h"
 #include "script/sign.h"
 #include "script/interpreter.h"
 #include "timedata.h"
+#include <boost/thread.hpp>
+#include <atomic>
 #if defined(DEBUG_DUMP_STAKING_INFO)
 #  include "DEBUG_DUMP_STAKING_INFO.hpp"
 #endif
@@ -38,6 +42,8 @@ static const int STAKE_TIMESTAMP_MASK = 15;
 static const int MODIFIER_INTERVAL_RATIO = 3;
 
 static const int LAST_MULTIPLIED_BLOCK = 180*1000; // 180K
+
+static std::atomic<bool> nStakingInterrupped;
 
 Stake * const stake = Stake::Pointer();
 
@@ -399,12 +405,12 @@ bool Stake::CheckHash(const CBlockIndex* pindexPrev, unsigned int nBits, const C
         DEBUG_DUMP_STAKING_INFO_CheckHash();
     }
 
-    if (hashProofOfStake > bnTarget && nStakeModifierHeight <= LAST_MULTIPLIED_BLOCK) {
-        DEBUG_DUMP_MULTIFIER();
-        if (!MultiplyStakeTarget(bnTarget, nStakeModifierHeight, nStakeModifierTime, nValueIn)) {
-            return error("%s: cant adjust stake target %s, %d, %d", __func__, bnTarget.GetHex(), nStakeModifierHeight, nStakeModifierTime);
-        }
-    }
+//    if (hashProofOfStake > bnTarget && nStakeModifierHeight <= LAST_MULTIPLIED_BLOCK) {
+//        DEBUG_DUMP_MULTIFIER();
+//        if (!MultiplyStakeTarget(bnTarget, nStakeModifierHeight, nStakeModifierTime, nValueIn)) {
+//            return error("%s: cant adjust stake target %s, %d, %d", __func__, bnTarget.GetHex(), nStakeModifierHeight, nStakeModifierTime);
+//        }
+//    }
 
     // Now check if proof-of-stake hash meets target protocol
     return !(hashProofOfStake > bnTarget);
@@ -727,11 +733,6 @@ bool Stake::CreateCoinStake(CWallet *wallet, const CKeyStore& keystore, unsigned
     if (nCredit == 0 || nCredit > nBalance - nReserveBalance)
         return false;
 
-    // Calculate reward
-    const CBlockIndex* pIndex0 = chainActive.Tip();
-    uint64_t nReward = GetProofOfWorkReward(0, pIndex0->nHeight);
-    nCredit += nReward;
-
     int64_t nMinFee = 0;
     while (true) {
         // Set output amount
@@ -757,6 +758,19 @@ bool Stake::CreateCoinStake(CWallet *wallet, const CKeyStore& keystore, unsigned
                 LogPrintf("%s: fee for coinstake %s\n", __func__, FormatMoney(nMinFee).c_str());
             break;
         }
+    }
+    // Calculate reward
+    const CBlockIndex* pIndex0 = chainActive.Tip();
+    int64_t nReward;
+    {
+        uint64_t nCoinAge;
+        uint64_t nFees;
+
+        nReward = GetProofOfStakeReward(nCoinAge, nFees,  pIndex0->nHeight + 1);
+        if (nReward <= 0)
+            return false;
+
+        nCredit += nReward;
     }
 
     //Masternode payment
@@ -867,5 +881,112 @@ bool Stake::CreateBlockStake(CWallet *wallet, CBlock *block)
     return result;
 }
 
-Stake  Stake::kernel;
+bool Stake::GenBlockStake(CWallet *wallet, const CReserveKey &key, unsigned int &extra)
+{
+    CBlockIndex *tip = nullptr;
+    {
+        LOCK(cs_main);
+        tip = chainActive.Tip();
+    }
+
+    std::unique_ptr<CBlockTemplate> blocktemplate(CreateNewBlockWithKey(const_cast<CReserveKey &>(key), wallet, true));
+    if (!blocktemplate) {
+        return error("Cant create new block.", __func__);
+    }
+    
+    CBlock * const block = &blocktemplate->block;
+    IncrementExtraNonce(block, tip, extra);
+
+    if (block->SignBlock(*wallet)) {
+        return error("Cant sign new block.", __func__);
+    }
+
+    SetThreadPriority(THREAD_PRIORITY_NORMAL);
+
+    bool result = true;
+    uint256 proof1, proof2;
+    auto hash = block->GetHash();
+    if (CheckProof(tip, *block, proof1)) {
+        ProcessBlockFound(block, *wallet, const_cast<CReserveKey &>(key));
+    } else if (!GetProof(hash, proof2)) {
+        SetProof(hash, proof1);
+    } else if (proof1 != proof2) {
+        result = error("%s: diverged stake %s, %s (block %s)\n", __func__, 
+                       proof1.GetHex(), proof2.GetHex(), hash.GetHex());
+    }
+
+    SetThreadPriority(THREAD_PRIORITY_LOWEST);
+    return result;
+}
+
+void Stake::StakingThread(CWallet *wallet)
+{
+    LogPrintf("%s: started!\n", __func__);
+    
+    SetThreadPriority(THREAD_PRIORITY_LOWEST);
+
+    try {
+        boost::this_thread::interruption_point();
+        unsigned int extra = 0;
+        CReserveKey reserve(wallet);
+        while (!nStakingInterrupped && !ShutdownRequested()) {
+            {
+                LOCK(cs_vNodes);
+                if (vNodes.empty()) {
+                    MilliSleep(1000);
+                    continue;
+                }
+            }
+            while (wallet->IsLocked() || nReserveBalance >= wallet->GetBalance()) {
+                nStakeInterval = 0;
+                MilliSleep(5000);
+                continue;
+            }
+            {
+                LOCK(cs_main);
+                auto tip = chainActive.Tip();
+                if (tip->nHeight < Params().LAST_POW_BLOCK() || IsBlockStaked(tip->nHeight)) {
+                    MilliSleep(5000);
+                    continue;
+                }
+            }
+            if (GenBlockStake(wallet, reserve, extra)) {
+                MilliSleep(1000);
+            } else {
+                MilliSleep(5000);
+            }
+        }
+        boost::this_thread::interruption_point();
+    } catch (std::exception& e) {
+        LogPrintf("%s: exception", __func__);
+    } catch (...) {
+        LogPrintf("%s: exception", __func__);
+    }
+
+    LogPrintf("%s: done!\n", __func__);
+}
+
+void Stake::GenerateStakes(boost::thread_group &group, CWallet *wallet, int procs)
+{
+#if 0
+    static std::unique_ptr<boost::thread_group> StakingThreads(new boost::thread_group);
+    if (procs == 0) {
+        nStakingInterrupped = true;
+        StakingThreads->interrupt_all();
+        StakingThreads->join_all();
+        nStakingInterrupped = false;
+        return;
+    }
+
+    for (int i = 0; i < procs; ++i) {
+        StakingThreads->create_thread(boost::bind(&Stake::StakingThread, this, wallet));
+    }
+#else
+    for (int i = 0; i < procs; ++i) {
+        group.create_thread(boost::bind(&Stake::StakingThread, this, wallet));
+    }
+#endif
+}
+
 Stake *Stake::Pointer() { return &kernel; }
+Stake  Stake::kernel;

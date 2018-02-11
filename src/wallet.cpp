@@ -43,7 +43,7 @@ bool bSpendZeroConfChange = true;
 bool fSendFreeTransactions = false;
 bool fPayAtLeastCustomFee = true;
 
-/** 
+/**
  * Fees smaller than this (in duffs) are considered zero fee (for transaction creation)
  * We are ~100 times smaller then bitcoin now (2015-06-23), set minTxFee 10 times higher
  * so it's still 10 times lower comparing to bitcoin.
@@ -223,7 +223,7 @@ bool CWallet::Unlock(const SecureString& strWalletPassphrase, bool anonymizeOnly
     }
 
     strWalletPassphraseFinal = strWalletPassphrase;
-    
+
 
     CCrypter crypter;
     CKeyingMaterial vMasterKey;
@@ -248,7 +248,7 @@ bool CWallet::ChangeWalletPassphrase(const SecureString& strOldWalletPassphrase,
 {
     bool fWasLocked = IsLocked();
     SecureString strOldWalletPassphraseFinal = strOldWalletPassphrase;
-    
+
     {
         LOCK(cs_wallet);
         Lock();
@@ -1344,7 +1344,7 @@ CAmount CWallet::GetDenominatedBalance(bool unconfirmed) const
     return nTotal;
 }
 
-CAmount CWallet::GetDenominatedBalance(bool onlyDenom, bool onlyUnconfirmed) const 
+CAmount CWallet::GetDenominatedBalance(bool onlyDenom, bool onlyUnconfirmed) const
 {
     int64_t nTotal = 0;
     {
@@ -1814,7 +1814,7 @@ bool CWallet::SelectCoins(const std::string &account, const CAmount& nTargetValu
             }
 
             const CTxOut& txout = out.tx->vout[out.i];
-            
+
 #           if defined(SELECT_COINS_FROM_ACCOUNT)&&SELECT_COINS_FROM_ACCOUNT
             CTxDestination address;
             if (ExtractDestination(txout.scriptPubKey, address) && IsAccountAddress(account, address)) {
@@ -2169,7 +2169,7 @@ bool CWallet::CreateTransaction(const vector<pair<CScript, CAmount> >& vecSend, 
 #   if defined(DEBUG_DUMP_STAKING_INFO) && defined(DEBUG_DUMP_CreateTransaction_1)
     DEBUG_DUMP_CreateTransaction_1();
 #   endif
-    
+
     if (useIX && nFeePay < CENT) nFeePay = CENT;
 
     CAmount nValue = 0;
@@ -2286,10 +2286,29 @@ bool CWallet::CreateTransaction(const vector<pair<CScript, CAmount> >& vecSend, 
                     // change transaction isn't always pay-to-lux-address
                     CScript scriptChange;
 
+                     bool combineChange = false;
+
                     // coin control: send change to custom address
-                    if (coinControl && !boost::get<CNoDestination>(&coinControl->destChange))
+
+                 if (coinControl && !boost::get<CNoDestination>(&coinControl->destChange))
+                   {
+
                         scriptChange = GetScriptForDestination(coinControl->destChange);
 
+                            vector<CTxOut>::iterator it = txNew.vout.begin();
+                        while (it != txNew.vout.end())
+                       {
+                            if (scriptChange == it->scriptPubKey)
+                           {
+                                it->nValue += nChange;
+                                nChange = 0;
+                                reservekey.ReturnKey();
+                                combineChange = true;
+                                break;
+                            }
+                            ++it;
+                        }
+                    }
                     // no coin control: send change to newly generated address
                     else {
                         // Note: We use a new key here to keep it from being obvious which side is the change.
@@ -2308,18 +2327,26 @@ bool CWallet::CreateTransaction(const vector<pair<CScript, CAmount> >& vecSend, 
                         scriptChange = GetScriptForDestination(vchPubKey.GetID());
                     }
 
-                    CTxOut newTxOut(nChange, scriptChange);
+                    if (!combineChange) {
+
+                         CTxOut newTxOut(nChange, scriptChange);
 
                     // Never create dust outputs; if we would, just
                     // add the dust to the fee.
-                    if (newTxOut.IsDust(::minRelayTxFee)) {
+
+                     if (newTxOut.IsDust(::minRelayTxFee)) {
+
                         nFeeRet += nChange;
                         nChange = 0;
                         reservekey.ReturnKey();
                     } else {
+
                         // Insert change txn at random position:
+
                         vector<CTxOut>::iterator position = txNew.vout.begin() + GetRandInt(txNew.vout.size() + 1);
+
                         txNew.vout.insert(position, newTxOut);
+                        }
                     }
                 } else
                     reservekey.ReturnKey();
@@ -2728,7 +2755,7 @@ bool CWallet::SetDefaultKey(const CPubKey& vchPubKey)
 
 /**
  * Mark old keypool keys as used,
- * and generate all new keys 
+ * and generate all new keys
  */
 bool CWallet::NewKeyPool()
 {
@@ -3257,6 +3284,10 @@ void CWallet::AutoCombineDust()
         CCoinControl* coinControl = new CCoinControl();
         CAmount nTotalRewardsValue = 0;
         BOOST_FOREACH (const COutput& out, vCoins) {
+
+            if (!out.fSpendable)
+                continue;
+
             //no coins should get this far if they dont have proper maturity, this is double checking
             if (out.tx->IsCoinStake() && out.tx->GetDepthInMainChain() < COINBASE_MATURITY + 1)
                 continue;
@@ -3282,27 +3313,53 @@ void CWallet::AutoCombineDust()
         CScript scriptPubKey = GetScriptForDestination(it->first.Get());
         vecSend.push_back(make_pair(scriptPubKey, nTotalRewardsValue));
 
+         //Send change to same address
+        CTxDestination destMyAddress;
+        if (!ExtractDestination(scriptPubKey, destMyAddress))
+        {
+            LogPrintf("AutoCombineDust: failed to extract destination\n");
+            continue;
+        }
+        coinControl->destChange = destMyAddress;
+
         // Create the transaction and commit it to the network
         CWalletTx wtx;
         CReserveKey keyChange(this); // this change address does not end up being used, because change is returned with coin control switch
         string strErr;
         int64_t nFeeRet = 0;
-
+#if 1
         //get the fee amount
         CWalletTx wtxdummy;
         CreateTransaction(vecSend, wtxdummy, keyChange, nFeeRet, strErr, coinControl, ALL_COINS, false, CAmount(0));
+
         vecSend[0].second = nTotalRewardsValue - nFeeRet - 500;
 
         if (!CreateTransaction(vecSend, wtx, keyChange, nFeeRet, strErr, coinControl, ALL_COINS, false, CAmount(0))) {
             LogPrintf("AutoCombineDust createtransaction failed, reason: %s\n", strErr);
             continue;
         }
+#endif
 
+#if 0
+       // Added 5% fee tp prevent "Insufficient funds" errors
+        vecSend[0].second = nTotalRewardsValue - (nTotalRewardsValue / 5);
+
+        if (!CreateTransaction(vecSend, wtx, keyChange, nFeeRet, strErr, coinControl, ALL_COINS, false, CAmount(0))) {
+            LogPrintf("AutoCombineDust createtransaction failed, reason: %s\n", strErr);
+            continue;
+        }
+#endif
+
+#if 0
+        //we don't combine below the threshold unless the fees are 0 to avoid paying fees over fees over fees
+        if (nTotalRewardsValue < nAutoCombineThreshold * COIN && nFeeRet > 0)
+            continue;
+#else
         if (!CommitTransaction(wtx, keyChange)) {
             LogPrintf("AutoCombineDust transaction commit failed\n");
             continue;
         }
-
+#endif
         LogPrintf("AutoCombineDust sent transaction\n");
 
         delete coinControl;
@@ -3568,3 +3625,4 @@ bool CWallet::AddAdrenalineNodeConfig(CAdrenalineNodeConfig nodeConfig)
 
     return rv;
 }
+

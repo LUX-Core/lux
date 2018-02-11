@@ -113,10 +113,9 @@ BitcoinGUI::BitcoinGUI(const NetworkStyle* networkStyle, QWidget* parent) : QMai
 {
     /* Open CSS when configured */
     this->setStyleSheet(GUIUtil::loadStyleSheet());
-
-    GUIUtil::restoreWindowGeometry("nWindow", QSize(850, 550), this);
-
+    resize(1185, 735);
     QString windowTitle = tr("Luxcore") + " - ";
+
 #ifdef ENABLE_WALLET
     /* if compiled with wallet support, -disablewallet can still disable the wallet */
     enableWallet = !GetBoolArg("-disablewallet", false);
@@ -570,6 +569,7 @@ void BitcoinGUI::createToolBars()
         /** Create additional container for toolbar and walletFrame and make it the central widget.
             This is a workaround mostly for toolbar styling on Mac OS but should work fine for every other OSes too.
         */
+		
         QVBoxLayout* layout = new QVBoxLayout;
         layout->addWidget(toolbar);
         layout->addWidget(walletFrame);
@@ -577,6 +577,7 @@ void BitcoinGUI::createToolBars()
         layout->setContentsMargins(QMargins());
         QWidget* containerWidget = new QWidget();
         containerWidget->setLayout(layout);
+		setMinimumSize(200, 200);
         setCentralWidget(containerWidget);
     }
 }
