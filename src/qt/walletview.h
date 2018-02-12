@@ -9,8 +9,6 @@
 #include "masternodemanager.h"
 #include "tradingdialog.h"
 
-#include "miningdialog.h"
-
 #include <QStackedWidget>
 
 class BitcoinGUI;
@@ -22,8 +20,6 @@ class SendCoinsRecipient;
 class TransactionView;
 class WalletModel;
 class BlockExplorer;
-
-class MiningDialog;
 
 QT_BEGIN_NAMESPACE
 class QLabel;
@@ -67,7 +63,6 @@ private:
     OverviewPage* overviewPage;
     QWidget* transactionsPage;
     tradingDialog* tradingPage;
-      MiningDialog* miningPage;
     ReceiveCoinsDialog* receiveCoinsPage;
     SendCoinsDialog* sendCoinsPage;
     BlockExplorer* explorerWindow;
@@ -100,9 +95,6 @@ public slots:
     void gotoVerifyMessageTab(QString addr = "");
     /** Show MultiSend Dialog */
     void gotoMultiSendDialog();
-
-    /** Show Mining Dialog */
-    void gotoMiningPage();
 
     /** Show BIP 38 tool - default to Encryption tab */
     void gotoBip38Tool();

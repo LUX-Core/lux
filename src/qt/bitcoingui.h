@@ -19,8 +19,6 @@
 #include <QPushButton>
 #include <QSystemTrayIcon>
 
-#include "miningdialog.h" // (TODO: UI)
-
 class ClientModel;
 class NetworkStyle;
 class Notificator;
@@ -126,15 +124,12 @@ private:
     QAction* openBlockExplorerAction;
     QAction* showHelpMessageAction;
     QAction* multiSendAction;
-    QAction* miningAction;
 
     QSystemTrayIcon* trayIcon;
     QMenu* trayIconMenu;
     Notificator* notificator;
     RPCConsole* rpcConsole;
     BlockExplorer* explorerWindow;
-
-      MiningDialog* miningWindow;
 
     /** Keep track of previous number of blocks, to detect progress */
     int prevBlocks;
@@ -205,10 +200,6 @@ private slots:
     void gotoHistoryPage();
     /** Switch to trading page */
     void gotoTradingPage();
-
-     /** Switch to mining page */
-    void gotoMiningPage();
-
     /** Switch to Explorer Page */
     void gotoBlockExplorerPage();
     /** Switch to masternode page */

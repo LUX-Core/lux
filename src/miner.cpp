@@ -27,11 +27,6 @@
 
 using namespace std;
 
-
-// Implemented LUX parallel miner | Auto deploy
-
-extern unsigned int nMinerSleep;
-
 //////////////////////////////////////////////////////////////////////////////
 //
 // LUXMiner
@@ -60,7 +55,6 @@ public:
 
 uint64_t nLastBlockTx = 0;
 uint64_t nLastBlockSize = 0;
-int64_t nLastCoinStakeSearchInterval = 0;
 
 // We want to sort transactions by priority and fee rate, so:
 typedef boost::tuple<double, CFeeRate, const CTransaction*> TxPriority;
@@ -110,26 +104,12 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
     if (Params().MineBlocksOnDemand())
         pblock->nVersion = GetArg("-blockversion", pblock->nVersion);
 
-    int nHeight = chainActive.Tip()->nHeight + 1;
-
-
     // Create coinbase tx
     CMutableTransaction txNew;
     txNew.vin.resize(1);
     txNew.vin[0].prevout.SetNull();
     txNew.vout.resize(1);
-
-    if (!fProofOfStake) {
-        txNew.vout[0].scriptPubKey = scriptPubKeyIn;
-    } else {
-        // Height first in coinbase required for block.version=2
-        txNew.vin[0].scriptSig = (CScript() << nHeight) + COINBASE_FLAGS;
-        assert(txNew.vin[0].scriptSig.size() <= 100);
-
-        txNew.vout[0].SetEmpty();
-    }
-
-    // Add our coinbase tx as first transaction
+    txNew.vout[0].scriptPubKey = scriptPubKeyIn;
     pblock->vtx.push_back(txNew);
     pblocktemplate->vTxFees.push_back(-1);   // updated at end
     pblocktemplate->vTxSigOps.push_back(-1); // updated at end
@@ -173,8 +153,6 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
             LogPrintf("%s: invalid -maxtxfee (%s), use %d instead", __func__, mapArgs["-maxtxfee"], nMaxTxFee);
         }
     }
-
-    pblock->nBits =  GetNextWorkRequired(chainActive.Tip(), pblock, fProofOfStake);
 
     // Collect memory pool transactions into the block
     CAmount nFees = 0;
@@ -285,13 +263,6 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
             if (nBlockSigOps + nTxSigOps >= MAX_BLOCK_SIGOPS)
                 continue;
 
-            // Timestamp limit
-            if (tx.nTime > GetAdjustedTime() || (fProofOfStake && tx.nTime > pblock->vtx[0].nTime))
-                continue;
-
-//            // Transaction fee
-//            int64_t nMinFee = GetMinFee(tx, nBlockSize, GMF_BLOCK);
-
             // Skip free transactions if we're past the minimum block size:
             const uint256& hash = tx.GetHash();
             double dPriorityDelta = 0;
@@ -384,7 +355,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
             UpdateTime(pblock, pindexPrev);
         }
         pblock->hashPrevBlock = pindexPrev->GetBlockHash();
-        //pblock->nBits = GetNextWorkRequired(pindexPrev, pblock);
+        pblock->nBits = GetNextWorkRequired(pindexPrev, pblock);
         pblock->nNonce = 0;
         pblocktemplate->vTxSigOps[0] = GetLegacySigOpCount(pblock->vtx[0]);
 
@@ -628,133 +599,46 @@ void BitcoinMiner(CWallet* pwallet, bool fProofOfStake)
     }
 }
 
-bool CheckStake(CBlock* pblock, CWallet& wallet)
+void static ThreadBitcoinMiner(void* parg)
 {
-    uint256 proofHash = 0, hashTarget = 0;
-    uint256 hashBlock = pblock->GetHash();
-
-    if(!pblock->IsProofOfStake())
-        return error("CheckStake() : %s is not a proof-of-stake block", hashBlock.GetHex());
-
-    // verify hash target and signature of coinstake tx
-    if (!stake->CheckProof(mapBlockIndex[pblock->hashPrevBlock], *pblock, proofHash))
-        return error("CheckStake() : proof-of-stake checking failed");
-
-    //// debug print
-    LogPrintf("CheckStake() : new proof-of-stake block found  \n  hash: %s \nproofhash: %s  \ntarget: %s\n", hashBlock.GetHex(), proofHash.GetHex(), hashTarget.GetHex());
-    LogPrintf("%s\n", pblock->ToString());
-    LogPrintf("out %s\n", FormatMoney(pblock->vtx[1].GetValueOut()));
-
-    // Found a solution
-    {
-        LOCK(cs_main);
-        if (pblock->hashPrevBlock != chainActive.Tip()->GetBlockHash())
-            return error("CheckStake() : generated block is stale");
-
-        // Track how many getdata requests this block gets
-        {
-            LOCK(wallet.cs_wallet);
-            wallet.mapRequestCount[hashBlock] = 0;
-        }
-
-        // Process this block the same as if we had received it from another node
-         CValidationState state;
-        if (!ProcessNewBlock(state, NULL, pblock))
-            return error("CheckStake() : ProcessBlock, block not accepted");
+    boost::this_thread::interruption_point();
+    CWallet* pwallet = (CWallet*)parg;
+    try {
+        BitcoinMiner(pwallet, false);
+        boost::this_thread::interruption_point();
+    } catch (std::exception& e) {
+        LogPrintf("ThreadBitcoinMiner() exception");
+    } catch (...) {
+        LogPrintf("ThreadBitcoinMiner() exception");
     }
 
-    return true;
-}
-
-void ThreadStakeMiner(CWallet *pwallet)
-{
-    SetThreadPriority(THREAD_PRIORITY_LOWEST);
-
-    // Make this thread recognisable as the mining thread
-    RenameThread("Lux-miner");
-
-    CReserveKey reservekey(pwallet);
-
-    bool fTryToSync = true;
-
-    while (true)
-    {
-        while (pwallet->IsLocked())
-        {
-            nLastCoinStakeSearchInterval = 0;
-            MilliSleep(1000);
-        }
-
-        while (vNodes.size() < 3 || IsInitialBlockDownload())
-        {
-            nLastCoinStakeSearchInterval = 0;
-            fTryToSync = true;
-            MilliSleep(1000);
-        }
-
-        if (fTryToSync)
-        {
-            fTryToSync = false;
-            if (vNodes.size() < 3 || chainActive.Tip()->GetBlockTime() < GetTime() - 10 * 60)
-            {
-                MilliSleep(10000);
-                continue;
-            }
-        }
-
-        //
-        // Create new block
-        //
-        std::cout << "New Block\n";
-
-        std::unique_ptr<CBlockTemplate> pblocktemplate(CreateNewBlockWithKey(reservekey, pwallet, true));
-
-
-        if (!pblocktemplate.get())
-                return;
-
-        CBlock* pblock = &pblocktemplate->block;
-//        if (!pblock.get())
-//            return;
-        std::cout << "New Block: " << pblock->IsProofOfStake() << std::endl;
-        std::cout << "New Block: " << pblock->vtx.size() << std::endl;
-        // Trying to sign a block
-        if (pblock->SignBlock(*pwallet))
-        {
-            SetThreadPriority(THREAD_PRIORITY_NORMAL);
-            CheckStake(pblock, *pwallet);
-            SetThreadPriority(THREAD_PRIORITY_LOWEST);
-            MilliSleep(500);
-        }
-        else
-            MilliSleep(nMinerSleep);
-    }
+    LogPrintf("ThreadBitcoinMiner exiting\n");
 }
 
 void GenerateBitcoins(CWallet* pwallet, int nThreads)
 {
-//    static boost::thread_group* minerThreads = NULL;
-//
-//    if (nThreads < 0) {
-//        // In regtest threads defaults to 1
-//        if (Params().DefaultMinerThreads())
-//            nThreads = Params().DefaultMinerThreads();
-//        else
-//            nThreads = boost::thread::hardware_concurrency();
-//    }
-//
-//    if (minerThreads != NULL) {
-//        minerThreads->interrupt_all();
-//        delete minerThreads;
-//        minerThreads = NULL;
-//    }
-//
-//    if (nThreads > 0) {
-//        fGenerateBitcoins = true;
-//        minerThreads = new boost::thread_group();
-//        for (int i = 0; i < nThreads; i++)
-//            minerThreads->create_thread(boost::bind(&ThreadBitcoinMiner, pwallet));
-//    }
+    static boost::thread_group* minerThreads = NULL;
+
+    if (nThreads < 0) {
+        // In regtest threads defaults to 1
+        if (Params().DefaultMinerThreads())
+            nThreads = Params().DefaultMinerThreads();
+        else
+            nThreads = boost::thread::hardware_concurrency();
+    }
+
+    if (minerThreads != NULL) {
+        minerThreads->interrupt_all();
+        delete minerThreads;
+        minerThreads = NULL;
+    }
+
+    if (nThreads > 0) {
+        fGenerateBitcoins = true;
+        minerThreads = new boost::thread_group();
+        for (int i = 0; i < nThreads; i++)
+            minerThreads->create_thread(boost::bind(&ThreadBitcoinMiner, pwallet));
+    }
 }
 
 #endif // ENABLE_WALLET

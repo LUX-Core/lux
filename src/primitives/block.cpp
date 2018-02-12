@@ -193,7 +193,7 @@ bool CBlock::SignBlock(const CKeyStore& keystore)
 
             //vector<unsigned char> vchSig;
             if (!key.Sign(GetHash(), vchBlockSig))
-                return false;
+                 return false;
 
             return true;
 
@@ -208,7 +208,7 @@ bool CBlock::SignBlock(const CKeyStore& keystore)
 
             //vector<unsigned char> vchSig;
             if (!key.Sign(GetHash(), vchBlockSig))
-                return false;
+                 return false;
 
             return true;
         }

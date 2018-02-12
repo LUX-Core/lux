@@ -23,8 +23,6 @@
 #include "walletmodel.h"
 #include "tradingdialog.h"
 
-#include "miningdialog.h"
-
 #include "ui_interface.h"
 
 #include <QAction>
@@ -46,9 +44,6 @@ WalletView::WalletView(QWidget* parent) : QStackedWidget(parent),
     explorerWindow = new BlockExplorer(this);
     transactionsPage = new QWidget(this);
     tradingPage = new tradingDialog(this);
-
-	miningPage = new MiningDialog(this);
-
     QVBoxLayout* vbox = new QVBoxLayout();
     QHBoxLayout* hbox_buttons = new QHBoxLayout();
     transactionView = new TransactionView(this);
@@ -77,8 +72,6 @@ WalletView::WalletView(QWidget* parent) : QStackedWidget(parent),
     transactionsPage->setLayout(vbox);
     tradingPage->setLayout(vbox);
 
-	miningPage->setLayout(vbox);
-
     receiveCoinsPage = new ReceiveCoinsDialog();
     sendCoinsPage = new SendCoinsDialog();
 
@@ -88,8 +81,6 @@ WalletView::WalletView(QWidget* parent) : QStackedWidget(parent),
     addWidget(receiveCoinsPage);
     addWidget(sendCoinsPage);
     addWidget(explorerWindow);
-
-	addWidget(miningPage);
 
     QSettings settings;
     if (settings.value("fShowMasternodesTab").toBool()) {
@@ -214,11 +205,6 @@ void WalletView::gotoHistoryPage()
 void WalletView::gotoTradingPage()
 {
     setCurrentWidget(tradingPage);
-}
-
-void WalletView::gotoMiningPage()
-{
-    setCurrentWidget(miningPage);
 }
 
 void WalletView::gotoBlockExplorerPage()

@@ -125,13 +125,6 @@ void WalletFrame::gotoTradingPage()
         i.value()->gotoTradingPage();
 }
 
-void WalletFrame::gotoMiningPage()
-{
-    QMap<QString, WalletView*>::const_iterator i;
-    for (i = mapWalletViews.constBegin(); i != mapWalletViews.constEnd(); ++i)
-        i.value()->gotoMiningPage();
-}
-
 void WalletFrame::gotoMasternodePage() // Masternode list
 {
     QMap<QString, WalletView*>::const_iterator i;

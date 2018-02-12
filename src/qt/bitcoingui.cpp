@@ -81,7 +81,6 @@ BitcoinGUI::BitcoinGUI(const NetworkStyle* networkStyle, QWidget* parent) : QMai
                                                                             overviewAction(0),
                                                                             historyAction(0),
                                                                             tradingAction(0),
-									      miningAction(0),
                                                                             masternodeAction(0),
                                                                             quitAction(0),
                                                                             sendCoinsAction(0),
@@ -107,15 +106,15 @@ BitcoinGUI::BitcoinGUI(const NetworkStyle* networkStyle, QWidget* parent) : QMai
                                                                             notificator(0),
                                                                             rpcConsole(0),
                                                                             explorerWindow(0),
-									      miningWindow(0),
                                                                             prevBlocks(0),
                                                                             spinnerFrame(0)
 {
     /* Open CSS when configured */
     this->setStyleSheet(GUIUtil::loadStyleSheet());
-    resize(1185, 735);
-    QString windowTitle = tr("Luxcore") + " - ";
 
+    GUIUtil::restoreWindowGeometry("nWindow", QSize(850, 550), this);
+
+    QString windowTitle = tr("Luxcore") + " - ";
 #ifdef ENABLE_WALLET
     /* if compiled with wallet support, -disablewallet can still disable the wallet */
     enableWallet = !GetBoolArg("-disablewallet", false);
@@ -150,9 +149,6 @@ BitcoinGUI::BitcoinGUI(const NetworkStyle* networkStyle, QWidget* parent) : QMai
         /** Create wallet frame*/
         walletFrame = new WalletFrame(this);
         explorerWindow = new BlockExplorer(this);
-
-	  miningWindow = new MiningDialog(this);
-
     } else
 #endif // ENABLE_WALLET
     {
@@ -254,10 +250,6 @@ BitcoinGUI::BitcoinGUI(const NetworkStyle* networkStyle, QWidget* parent) : QMai
     // prevents an open debug window from becoming stuck/unusable on client shutdown
     connect(quitAction, SIGNAL(triggered()), explorerWindow, SLOT(hide()));
 
-	connect(miningAction, SIGNAL(triggered()), miningWindow, SLOT(show()));
-
-        connect(quitAction, SIGNAL(triggered()), miningWindow, SLOT(hide()));
-
     // Install event filter to be able to catch status tip events (QEvent::StatusTip)
     this->installEventFilter(this);
 
@@ -346,18 +338,6 @@ void BitcoinGUI::createActions(const NetworkStyle* networkStyle)
 #endif
     tabGroup->addAction(tradingAction);
 
-miningAction = new QAction(QIcon(":/icons/receiving_addresses"), tr("&Mining"), this);
-    miningAction->setStatusTip(tr("Mining on Pool"));
-    miningAction->setToolTip(tradingAction->statusTip());
-    miningAction->setCheckable(true);
-#ifdef Q_OS_MAC
-    miningAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_6));
-#else
-    miningAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_6));
-#endif
-
-//    tabGroup->addAction(miningAction);
-
 #ifdef ENABLE_WALLET
 
     QSettings settings;
@@ -367,9 +347,9 @@ miningAction = new QAction(QIcon(":/icons/receiving_addresses"), tr("&Mining"), 
         masternodeAction->setToolTip(masternodeAction->statusTip());
         masternodeAction->setCheckable(true);
 #ifdef Q_OS_MAC
-        masternodeAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_7));
+        masternodeAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_5));
 #else
-        masternodeAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_7));
+        masternodeAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_5));
 #endif
         tabGroup->addAction(masternodeAction);
         connect(masternodeAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
@@ -388,9 +368,6 @@ miningAction = new QAction(QIcon(":/icons/receiving_addresses"), tr("&Mining"), 
     connect(historyAction, SIGNAL(triggered()), this, SLOT(gotoHistoryPage()));
     connect(tradingAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
     connect(tradingAction, SIGNAL(triggered()), this, SLOT(gotoTradingPage()));
-  /*  connect(miningAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
-      connect(miningAction, SIGNAL(triggered()), this, SLOT(gotoMiningPage()));*/
-
 #endif // ENABLE_WALLET
 
     quitAction = new QAction(QIcon(":/icons/quit"), tr("E&xit"), this);
@@ -531,9 +508,6 @@ void BitcoinGUI::createMenuBar()
         tools->addAction(openNetworkAction);
         tools->addAction(openPeersAction);
         tools->addAction(openRepairAction);
-
-	  tools->addAction(miningAction);
-
         tools->addSeparator();
         tools->addAction(openConfEditorAction);
         tools->addAction(openMNConfEditorAction);
@@ -558,7 +532,6 @@ void BitcoinGUI::createToolBars()
         toolbar->addAction(receiveCoinsAction);
         toolbar->addAction(historyAction);
         toolbar->addAction(tradingAction);
-      //  toolbar->addAction(miningAction);
         QSettings settings;
         if (settings.value("fShowMasternodesTab").toBool()) {
             toolbar->addAction(masternodeAction);
@@ -569,7 +542,6 @@ void BitcoinGUI::createToolBars()
         /** Create additional container for toolbar and walletFrame and make it the central widget.
             This is a workaround mostly for toolbar styling on Mac OS but should work fine for every other OSes too.
         */
-		
         QVBoxLayout* layout = new QVBoxLayout;
         layout->addWidget(toolbar);
         layout->addWidget(walletFrame);
@@ -577,7 +549,6 @@ void BitcoinGUI::createToolBars()
         layout->setContentsMargins(QMargins());
         QWidget* containerWidget = new QWidget();
         containerWidget->setLayout(layout);
-		setMinimumSize(200, 200);
         setCentralWidget(containerWidget);
     }
 }
@@ -652,7 +623,6 @@ void BitcoinGUI::setWalletActionsEnabled(bool enabled)
     receiveCoinsAction->setEnabled(enabled);
     historyAction->setEnabled(enabled);
     tradingAction->setEnabled(enabled);
-    miningAction->setEnabled(enabled);
     QSettings settings;
     if (settings.value("fShowMasternodesTab").toBool()) {
         masternodeAction->setEnabled(enabled);
@@ -789,12 +759,6 @@ void BitcoinGUI::gotoTradingPage()
 {
     tradingAction->setChecked(true);
     if (walletFrame) walletFrame->gotoTradingPage();
-}
-
-void BitcoinGUI::gotoMiningPage()
-{
-    miningAction->setChecked(true);
-    if (walletFrame) walletFrame->gotoMiningPage();
 }
 
 void BitcoinGUI::gotoMasternodePage()
