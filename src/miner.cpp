@@ -498,12 +498,10 @@ void BitcoinMiner(CWallet* pwallet, bool fProofOfStake)
         CBlockIndex * const pindexPrev = chainActive.Tip();
         if (!pindexPrev) continue;
         if (fProofOfStake) {
-#if 0
             if (pindexPrev->nHeight < Params().LAST_POW_BLOCK()) {
                 MilliSleep(5000);
                 continue;
             }
-#endif
 
             while (/*pindexPrev->nTime < 1471482000 ||*/ vNodes.empty() || pwallet->IsLocked() || !fMintableCoins || stake->GetReservedBalance() >= pwallet->GetBalance()) {
                 stake->ResetInterval();

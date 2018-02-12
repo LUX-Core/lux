@@ -906,7 +906,14 @@ bool Stake::GenBlockStake(CWallet *wallet, const CReserveKey &key, unsigned int 
     bool result = true;
     uint256 proof1, proof2;
     auto hash = block->GetHash();
-    if (CheckProof(tip, *block, proof1)) {
+    auto good = CheckProof(tip, *block, proof1);
+#if defined(DEBUG_DUMP_STAKE_CHECK)
+    DEBUG_DUMP_STAKE_CHECK();
+#endif
+    if (good) {
+#if defined(DEBUG_DUMP_STAKE_FOUND)
+        DEBUG_DUMP_STAKE_FOUND();
+#endif
         ProcessBlockFound(block, *wallet, const_cast<CReserveKey &>(key));
     } else if (!GetProof(hash, proof2)) {
         SetProof(hash, proof1);
@@ -930,27 +937,32 @@ void Stake::StakingThread(CWallet *wallet)
         unsigned int extra = 0;
         CReserveKey reserve(wallet);
         while (!nStakingInterrupped && !ShutdownRequested()) {
-            {
+            bool nCanStake = !IsInitialBlockDownload();
+            if  (nCanStake) {
                 LOCK(cs_vNodes);
                 if (vNodes.empty()) {
-                    MilliSleep(1000);
-                    continue;
+                    nCanStake = false;
                 }
             }
-            while (wallet->IsLocked() || nReserveBalance >= wallet->GetBalance()) {
-                nStakeInterval = 0;
-                MilliSleep(5000);
-                continue;
-            }
-            {
-                LOCK(cs_main);
-                auto tip = chainActive.Tip();
-                if (tip->nHeight < Params().LAST_POW_BLOCK() || IsBlockStaked(tip->nHeight)) {
+
+            const CBlockIndex* tip = nullptr;
+            if (nCanStake) {
+                while ((wallet->IsLocked() || nReserveBalance >= wallet->GetBalance())) {
+                    nStakeInterval = 0;
                     MilliSleep(5000);
                     continue;
                 }
+                LOCK(cs_main);
+                tip = chainActive.Tip();
+                if (/*tip->nHeight < Params().LAST_POW_BLOCK() ||*/ IsBlockStaked(tip->nHeight)) {
+                    nCanStake = false;
+                }
             }
-            if (GenBlockStake(wallet, reserve, extra)) {
+
+#if defined(DEBUG_DUMP_STAKING_THREAD)
+            DEBUG_DUMP_STAKING_THREAD();
+#endif
+            if (nCanStake && GenBlockStake(wallet, reserve, extra)) {
                 MilliSleep(1000);
             } else {
                 MilliSleep(5000);
