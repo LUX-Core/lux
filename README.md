@@ -1,4 +1,4 @@
-![LUX Logo](https://luxcore.io/images/logo.png)
+![LUX Logo](https://github.com/216k155/lux/blob/master/src/qt/res/images/lux_logo_horizontal.png)
 
 "Empowered By Intelligence" 
 
