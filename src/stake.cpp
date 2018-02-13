@@ -899,11 +899,11 @@ bool Stake::GenBlockStake(CWallet *wallet, const CReserveKey &key, unsigned int 
     uint256 proof1, proof2;
     auto hash = block->GetHash();
     auto good = CheckProof(tip, *block, proof1);
-#if defined(DEBUG_DUMP_STAKE_CHECK)
+#if defined(DEBUG_DUMP_STAKE_CHECK)&&defined(DEBUG_DUMP_STAKING_INFO)
     DEBUG_DUMP_STAKE_CHECK();
 #endif
     if (good) {
-#if defined(DEBUG_DUMP_STAKE_FOUND)
+#if defined(DEBUG_DUMP_STAKE_FOUND)&&defined(DEBUG_DUMP_STAKING_INFO)
         DEBUG_DUMP_STAKE_FOUND();
 #endif
         ProcessBlockFound(block, *wallet, const_cast<CReserveKey &>(key));
@@ -951,7 +951,7 @@ void Stake::StakingThread(CWallet *wallet)
                 }
             }
 
-#if defined(DEBUG_DUMP_STAKING_THREAD)
+#if defined(DEBUG_DUMP_STAKING_THREAD)&&defined(DEBUG_DUMP_STAKING_INFO)
             DEBUG_DUMP_STAKING_THREAD();
 #endif
             if (nCanStake && GenBlockStake(wallet, reserve, extra)) {

@@ -248,14 +248,15 @@ bool CBlockTreeDB::LoadBlockIndexGuts()
                 pindexNew->hashProofOfStake = diskindex.hashProofOfStake;
 
                 if (pindexNew->IsProofOfWork() && pindexNew->nHeight <= Params().LAST_POW_BLOCK()) {
-                    if (!CheckProofOfWork(pindexNew->GetBlockHash(), pindexNew->nBits))
-                        return error("%s: CheckProofOfWork failed: %s", __func__, pindexNew->ToString());
+                    auto const &hash(pindexNew->GetBlockHash());
+                    if (!CheckProofOfWork(hash, pindexNew->nBits))
+                        return error("%s: CheckProofOfWork failed: %s", __func__, hash.GetHex(), pindexNew->nBits);
                 }
 
                 // ppcoin: build setStakeSeen
                 if (pindexNew->IsProofOfStake()) {
                     stake->MarkStake(pindexNew->prevoutStake, pindexNew->nStakeTime);
-                    auto const hash(pindexNew->GetBlockHash());
+                    auto const &hash(pindexNew->GetBlockHash());
                     uint256 proof;
                     if (pindexNew->hashProofOfStake == 0) {
                         return error("%s: zero stake (block %s)", __func__, hash.GetHex());
