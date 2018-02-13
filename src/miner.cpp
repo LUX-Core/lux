@@ -112,25 +112,27 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
 
     int nHeight = chainActive.Tip()->nHeight + 1;
 
-
     // Create coinbase tx
     CMutableTransaction txNew;
     txNew.vin.resize(1);
     txNew.vin[0].prevout.SetNull();
     txNew.vout.resize(1);
 
-    if (!fProofOfStake) {
-        txNew.vout[0].scriptPubKey = scriptPubKeyIn;
-    } else {
+    if (fProofOfStake) {
         // Height first in coinbase required for block.version=2
         txNew.vin[0].scriptSig = (CScript() << nHeight) + COINBASE_FLAGS;
         assert(txNew.vin[0].scriptSig.size() <= 100);
-
         txNew.vout[0].SetEmpty();
+    } else {
+        txNew.vout[0].scriptPubKey = scriptPubKeyIn;
     }
 
     // Add our coinbase tx as first transaction
     pblock->vtx.push_back(txNew);
+    if (fProofOfStake && !stake->CreateBlockStake(pwallet, pblock)) {
+        return nullptr;
+    }
+
     pblocktemplate->vTxFees.push_back(-1);   // updated at end
     pblocktemplate->vTxSigOps.push_back(-1); // updated at end
 
@@ -166,7 +168,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
         }
     }
 
-    pblock->nBits =  GetNextWorkRequired(chainActive.Tip(), pblock, fProofOfStake);
+    pblock->nBits = GetNextWorkRequired(chainActive.Tip(), pblock, fProofOfStake);
 
     // Collect memory pool transactions into the block
     CAmount nFees = 0;
