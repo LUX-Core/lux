@@ -79,10 +79,18 @@ CBlockTreeDB::CBlockTreeDB(size_t nCacheSize, bool fMemory, bool fWipe) : CLevel
 
 bool CBlockTreeDB::WriteBlockIndex(const CDiskBlockIndex& blockindex)
 {
+    auto const &hash = blockindex.GetBlockHash();
     if (blockindex.IsProofOfStake() && blockindex.hashProofOfStake == 0) {
-        return error("%s: zero stake (block %s)", __func__, blockindex.GetBlockHash().GetHex());
+        uint256 hashProofOfStake;
+        if (stake->GetProof(hash, hashProofOfStake)) {
+            CDiskBlockIndex blockindexFixed(&blockindex);
+            blockindexFixed.hashProofOfStake = hashProofOfStake;
+            return Write(make_pair('b', hash), blockindexFixed);
+        } else {
+            return error("%s: zero stake (block %s)", __func__, hash.GetHex());
+        }
     }
-    return Write(make_pair('b', blockindex.GetBlockHash()), blockindex);
+    return Write(make_pair('b', hash), blockindex);
 }
 
 bool CBlockTreeDB::WriteBlockFileInfo(int nFile, const CBlockFileInfo& info)
@@ -248,14 +256,18 @@ bool CBlockTreeDB::LoadBlockIndexGuts()
                 pindexNew->hashProofOfStake = diskindex.hashProofOfStake;
 
                 if (pindexNew->IsProofOfWork() && pindexNew->nHeight <= Params().LAST_POW_BLOCK()) {
-                    if (!CheckProofOfWork(pindexNew->GetBlockHash(), pindexNew->nBits))
-                        return error("%s: CheckProofOfWork failed: %s", __func__, pindexNew->ToString());
+                    auto const &hash(pindexNew->GetBlockHash());
+                    if (!CheckProofOfWork(hash, pindexNew->nBits)) {
+                        unsigned int nBits = 0;
+                        if (chainActive.Height() > 0) nBits = chainActive.Tip()->nBits;
+                        return error("%s: CheckProofOfWork failed: %s %d (%d, %d, %d)", __func__, hash.GetHex(), pindexNew->nHeight, pindexNew->nBits, (unsigned int)-1, nBits);
+                    }
                 }
 
                 // ppcoin: build setStakeSeen
                 if (pindexNew->IsProofOfStake()) {
                     stake->MarkStake(pindexNew->prevoutStake, pindexNew->nStakeTime);
-                    auto const hash(pindexNew->GetBlockHash());
+                    auto const &hash(pindexNew->GetBlockHash());
                     uint256 proof;
                     if (pindexNew->hashProofOfStake == 0) {
                         return error("%s: zero stake (block %s)", __func__, hash.GetHex());

@@ -33,6 +33,7 @@
 #include "db.h"
 #include "wallet.h"
 #include "walletdb.h"
+#include "miner.h"
 #endif
 
 #include <fstream>
@@ -59,6 +60,7 @@ int nWalletBackups = 10;
 #endif
 bool fFeeEstimatesInitialized = false;
 bool fRestartRequested = false; // true: restart false: shutdown
+unsigned int nMinerSleep;
 
 #ifdef WIN32
 // Win32 LevelDB doesn't use filedescriptors, and the ones used for
@@ -632,6 +634,7 @@ bool AppInit2(boost::thread_group& threadGroup)
 
     // ********************************************************* Step 2: parameter interactions
     // Set this early so that parameter interactions go to console
+    nMinerSleep = GetArg("-minersleep", 500);
     fPrintToConsole = GetBoolArg("-printtoconsole", false);
     fLogTimestamps = GetBoolArg("-logtimestamps", true);
     fLogIPs = GetBoolArg("-logips", false);

@@ -405,7 +405,7 @@ bool Stake::CheckHash(const CBlockIndex* pindexPrev, unsigned int nBits, const C
         DEBUG_DUMP_STAKING_INFO_CheckHash();
     }
 
-    if (hashProofOfStake > bnTarget && nStakeModifierHeight <= LAST_MULTIPLIED_BLOCK) {
+    if (hashProofOfStake > bnTarget && nStakeModifierHeight < 174453 && nStakeModifierHeight <= LAST_MULTIPLIED_BLOCK) {
         DEBUG_DUMP_MULTIFIER();
         if (!MultiplyStakeTarget(bnTarget, nStakeModifierHeight, nStakeModifierTime, nValueIn)) {
             return error("%s: cant adjust stake target %s, %d, %d", __func__, bnTarget.GetHex(), nStakeModifierHeight, nStakeModifierTime);
@@ -419,9 +419,12 @@ bool Stake::CheckHash(const CBlockIndex* pindexPrev, unsigned int nBits, const C
 // Check kernel hash target and coinstake signature
 bool Stake::CheckProof(CBlockIndex* const pindexPrev, const CBlock &block, uint256& hashProofOfStake)
 {
+    if (block.vtx.size() < 2)
+        return error("%s: called on non-coinstake %s", __func__, block.ToString());
+    
     const CTransaction &tx = block.vtx[1];
     if (!tx.IsCoinStake())
-        return error("%s: called on non-coinstake %s", __func__, tx.GetHash().ToString().c_str());
+        return error("%s: called on non-coinstake %s", __func__, tx.ToString());
 
     // Kernel (input 0) must match the stake hash target per coin age (nBits)
     const CTxIn& txin = tx.vin[0];
@@ -883,14 +886,18 @@ bool Stake::GenBlockStake(CWallet *wallet, const CReserveKey &key, unsigned int 
 
     std::unique_ptr<CBlockTemplate> blocktemplate(CreateNewBlockWithKey(const_cast<CReserveKey &>(key), wallet, true));
     if (!blocktemplate) {
-        return error("Cant create new block.", __func__);
+        return false; // No stake available.
     }
     
     CBlock * const block = &blocktemplate->block;
+    if (!block->IsProofOfStake()) {
+        return error("%s: Created non-staked block:\n%s", __func__, block->ToString());
+    }
+    
     IncrementExtraNonce(block, tip, extra);
 
     if (block->SignBlock(*wallet)) {
-        return error("Cant sign new block.", __func__);
+        return error("%s: Cant sign new block.", __func__);
     }
 
     SetThreadPriority(THREAD_PRIORITY_NORMAL);
@@ -899,13 +906,14 @@ bool Stake::GenBlockStake(CWallet *wallet, const CReserveKey &key, unsigned int 
     uint256 proof1, proof2;
     auto hash = block->GetHash();
     auto good = CheckProof(tip, *block, proof1);
-#if defined(DEBUG_DUMP_STAKE_CHECK)
+#if defined(DEBUG_DUMP_STAKE_CHECK)&&defined(DEBUG_DUMP_STAKING_INFO)
     DEBUG_DUMP_STAKE_CHECK();
 #endif
     if (good) {
-#if defined(DEBUG_DUMP_STAKE_FOUND)
+#if defined(DEBUG_DUMP_STAKE_FOUND)&&defined(DEBUG_DUMP_STAKING_INFO)
         DEBUG_DUMP_STAKE_FOUND();
 #endif
+        LogPrintf("%s: found stake %s!\n", __func__, hash.GetHex());
         ProcessBlockFound(block, *wallet, const_cast<CReserveKey &>(key));
     } else if (!GetProof(hash, proof2)) {
         SetProof(hash, proof1);
@@ -951,7 +959,7 @@ void Stake::StakingThread(CWallet *wallet)
                 }
             }
 
-#if defined(DEBUG_DUMP_STAKING_THREAD)
+#if defined(DEBUG_DUMP_STAKING_THREAD)&&defined(DEBUG_DUMP_STAKING_INFO)
             DEBUG_DUMP_STAKING_THREAD();
 #endif
             if (nCanStake && GenBlockStake(wallet, reserve, extra)) {
@@ -962,9 +970,9 @@ void Stake::StakingThread(CWallet *wallet)
         }
         boost::this_thread::interruption_point();
     } catch (std::exception& e) {
-        LogPrintf("%s: exception", __func__);
+        LogPrintf("%s: exception (%s)\n", __func__, e.what());
     } catch (...) {
-        LogPrintf("%s: exception", __func__);
+        LogPrintf("%s: exception\n", __func__);
     }
 
     LogPrintf("%s: done!\n", __func__);

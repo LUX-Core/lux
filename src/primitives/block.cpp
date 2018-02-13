@@ -176,42 +176,13 @@ bool CBlock::SignBlock(const CKeyStore& keystore)
     }
     else
     {
-        const CTxOut& txout = vtx[1].vout[1];
+       if (!vtx[0].vout[0].IsEmpty())
+        return false;
 
-        if (!Solver(txout.scriptPubKey, whichType, vSolutions))
-            return false;
-
-        if (whichType == TX_PUBKEYHASH)
-        {
-
-            CKeyID keyID;
-            keyID = CKeyID(uint160(vSolutions[0]));
-
-            CKey key;
-            if (!keystore.GetKey(keyID, key))
-                return false;
-
-            //vector<unsigned char> vchSig;
-            if (!key.Sign(GetHash(), vchBlockSig))
-                 return false;
-
-            return true;
-
-        }
-        else if(whichType == TX_PUBKEY)
-        {
-            CKeyID keyID;
-            keyID = CPubKey(vSolutions[0]).GetID();
-            CKey key;
-            if (!keystore.GetKey(keyID, key))
-                return false;
-
-            //vector<unsigned char> vchSig;
-            if (!key.Sign(GetHash(), vchBlockSig))
-                 return false;
-
-            return true;
-        }
+    // if we are trying to sign
+    //    a complete proof-of-stake block
+    if (IsProofOfStake())
+        return true;
     }
 
     LogPrintf("Sign failed\n");
