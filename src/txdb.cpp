@@ -79,10 +79,18 @@ CBlockTreeDB::CBlockTreeDB(size_t nCacheSize, bool fMemory, bool fWipe) : CLevel
 
 bool CBlockTreeDB::WriteBlockIndex(const CDiskBlockIndex& blockindex)
 {
+    auto const &hash = blockindex.GetBlockHash();
     if (blockindex.IsProofOfStake() && blockindex.hashProofOfStake == 0) {
-        return error("%s: zero stake (block %s)", __func__, blockindex.GetBlockHash().GetHex());
+        uint256 hashProofOfStake;
+        if (stake->GetProof(hash, hashProofOfStake)) {
+            CDiskBlockIndex blockindexFixed(&blockindex);
+            blockindexFixed.hashProofOfStake = hashProofOfStake;
+            return Write(make_pair('b', hash), blockindexFixed);
+        } else {
+            return error("%s: zero stake (block %s)", __func__, hash.GetHex());
+        }
     }
-    return Write(make_pair('b', blockindex.GetBlockHash()), blockindex);
+    return Write(make_pair('b', hash), blockindex);
 }
 
 bool CBlockTreeDB::WriteBlockFileInfo(int nFile, const CBlockFileInfo& info)
