@@ -364,15 +364,14 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
         LogPrintf("%s: total size %u (%s, nFees=%d)\n", __func__, nBlockSize, ct, nFees);
 
         // Compute final coinbase transaction.
+        pblock->nNonce = 0;
+        pblock->hashPrevBlock = pindexPrev->GetBlockHash();
         pblock->vtx[0].vin[0].scriptSig = CScript() << nHeight << OP_0;
         if (!fProofOfStake) {
             pblock->vtx[0].vout[0].nValue = GetProofOfWorkReward(nFees, pindexPrev->nHeight+1);
             pblocktemplate->vTxFees[0] = -nFees;
             UpdateTime(pblock, pindexPrev);
         }
-        pblock->hashPrevBlock = pindexPrev->GetBlockHash();
-        //pblock->nBits = GetNextWorkRequired(pindexPrev, pblock);
-        pblock->nNonce = 0;
         pblocktemplate->vTxSigOps[0] = GetLegacySigOpCount(pblock->vtx[0]);
 
         CValidationState state;
