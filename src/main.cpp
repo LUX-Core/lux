@@ -2182,10 +2182,11 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
             }
 
             nValueIn += view.GetValueIn(tx);
-            if (!tx.IsCoinStake())
-                nFees += view.GetValueIn(tx) - tx.GetValueOut();
-            if (tx.IsCoinStake())
+            if (tx.IsCoinStake()) {
                 nStakeReward = view.GetValueIn(tx) - tx.GetValueOut();
+            } else { 
+                nFees += view.GetValueIn(tx) - tx.GetValueOut();
+            }
 
             std::vector<CScriptCheck> vChecks;
             if (!CheckInputs(tx, state, view, fScriptChecks, flags, false, nScriptCheckThreads ? &vChecks : NULL))
