@@ -80,15 +80,25 @@ CBlockTreeDB::CBlockTreeDB(size_t nCacheSize, bool fMemory, bool fWipe) : CLevel
 bool CBlockTreeDB::WriteBlockIndex(const CDiskBlockIndex& blockindex)
 {
     auto const &hash = blockindex.GetBlockHash();
-    if (blockindex.IsProofOfStake() && blockindex.hashProofOfStake == 0) {
-        uint256 hashProofOfStake;
-        if (stake->GetProof(hash, hashProofOfStake)) {
-            CDiskBlockIndex blockindexFixed(&blockindex);
-            blockindexFixed.hashProofOfStake = hashProofOfStake;
-            return Write(make_pair('b', hash), blockindexFixed);
-        } else {
-            return error("%s: zero stake (block %s)", __func__, hash.GetHex());
+    if (blockindex.IsProofOfStake()) {
+        if (blockindex.hashProofOfStake == 0) {
+            uint256 hashProofOfStake;
+            if (stake->GetProof(hash, hashProofOfStake)) {
+                CDiskBlockIndex blockindexFixed(&blockindex);
+                blockindexFixed.hashProofOfStake = hashProofOfStake;
+                return Write(make_pair('b', hash), blockindexFixed);
+            } else {
+#               if 0
+                LogPrint("debug", "%s: zero stake block %s", __func__, hash.GetHex());
+#               else
+                return error("%s: zero stake (block %s)", __func__, hash.GetHex());
+#               endif
+            }
         }
+#   if 0
+    } else if (!CheckProofOfWork(hash, blockindex.nBits)) {
+        LogPrint("debug", "%s: bad work block %d %d %s", __func__, blockindex.nBits, blockindex.nHeight, hash.GetHex()); //return error("%s: invalid proof of work: %d %d %s", __func__, blockindex.nBits, blockindex.nHeight, hash.GetHex());
+#   endif
     }
     return Write(make_pair('b', hash), blockindex);
 }
