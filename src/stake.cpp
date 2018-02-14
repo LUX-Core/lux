@@ -452,12 +452,15 @@ bool Stake::CheckProof(CBlockIndex* const pindexPrev, const CBlock &block, uint2
         return error("%s: failed to find block", __func__);
 
     unsigned int nTime = block.nTime;
+#   if 0
     if (!this->CheckHash(pindexPrev, block.nBits, prevBlock, txPrev, txin.prevout, nTime, hashProofOfStake))
         // may occur during initial download or if behind on block chain sync
-        return error("%s: check kernel failed on coinstake %s, hashProof=%s \n", __func__, 
-                     tx.GetHash().ToString().c_str(), hashProofOfStake.ToString().c_str());
-
+        return error("%s: invalid coinstake %s, hashProof=%s", __func__, 
+                     tx.GetHash().ToString(), hashProofOfStake.ToString());
     return true;
+#   else
+    return CheckHash(pindexPrev, block.nBits, prevBlock, txPrev, txin.prevout, nTime, hashProofOfStake);
+#   endif
 }
 
 #if 0
@@ -886,6 +889,7 @@ bool Stake::GenBlockStake(CWallet *wallet, const CReserveKey &key, unsigned int 
 
     std::unique_ptr<CBlockTemplate> blocktemplate(CreateNewBlockWithKey(const_cast<CReserveKey &>(key), wallet, true));
     if (!blocktemplate) {
+        std::cout<<__func__<<": no stake found"<<std::endl;
         return false; // No stake available.
     }
     
@@ -934,6 +938,7 @@ void Stake::StakingThread(CWallet *wallet)
 
     try {
         boost::this_thread::interruption_point();
+        int nHeight = 0;
         unsigned int extra = 0;
         CReserveKey reserve(wallet);
         while (!nStakingInterrupped && !ShutdownRequested()) {
@@ -954,6 +959,7 @@ void Stake::StakingThread(CWallet *wallet)
                 }
                 LOCK(cs_main);
                 tip = chainActive.Tip();
+                nHeight = tip->nHeight;
                 if (/*tip->nHeight < Params().LAST_POW_BLOCK() ||*/ IsBlockStaked(tip->nHeight)) {
                     nCanStake = false;
                 }
