@@ -130,7 +130,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
     // Add our coinbase tx as first transaction
     pblock->vtx.push_back(txNew);
     if (fProofOfStake && !stake->CreateBlockStake(pwallet, pblock)) {
-        LogPrintf("%s: no available block stake %s!\n", __func__);
+        LogPrintf("%s: no available block stake!\n", __func__);
         return nullptr;
     }
 
@@ -647,7 +647,7 @@ bool CheckStake(CBlock* pblock, CWallet& wallet)
         }
 
         // Process this block the same as if we had received it from another node
-         CValidationState state;
+        CValidationState state;
         if (!ProcessNewBlock(state, NULL, pblock))
             return error("CheckStake() : ProcessBlock, block not accepted");
     }
