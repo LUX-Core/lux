@@ -769,8 +769,9 @@ bool Stake::CreateCoinStake(CWallet *wallet, const CKeyStore& keystore, unsigned
             nMinFee = nFeeNeeded;
             continue; // try signing again
         } else {
-            if (fDebug)
-                LogPrintf("%s: fee for coinstake %s\n", __func__, FormatMoney(nMinFee).c_str());
+            if (fDebug) {
+                LogPrintf("%s: fee for coinstake %s (%s)\n", __func__, FormatMoney(nMinFee), FormatMoney(nFeeNeeded));
+            }
             break;
         }
     }
@@ -904,9 +905,11 @@ bool Stake::GenBlockStake(CWallet *wallet, const CReserveKey &key, unsigned int 
     
     IncrementExtraNonce(block, tip, extra);
 
+#if 0
     if (block->SignBlock(*wallet)) {
         return error("%s: Cant sign new block.", __func__);
     }
+#endif
 
     SetThreadPriority(THREAD_PRIORITY_NORMAL);
 
@@ -921,12 +924,13 @@ bool Stake::GenBlockStake(CWallet *wallet, const CReserveKey &key, unsigned int 
 #if defined(DEBUG_DUMP_STAKE_FOUND)&&defined(DEBUG_DUMP_STAKING_INFO)
         DEBUG_DUMP_STAKE_FOUND();
 #endif
-        LogPrintf("%s: found stake %s!\n", __func__, hash.GetHex());
+        LogPrintf("%s: found stake %s for block %s!\n%s\n", __func__, 
+                  proof1.GetHex(), hash.GetHex(), block->ToString());
         ProcessBlockFound(block, *wallet, const_cast<CReserveKey &>(key));
     } else if (!GetProof(hash, proof2)) {
         SetProof(hash, proof1);
     } else if (proof1 != proof2) {
-        result = error("%s: diverged stake %s, %s (block %s)\n", __func__, 
+        result = error("%s: diverged stake %s, %s (block %s)", __func__, 
                        proof1.GetHex(), proof2.GetHex(), hash.GetHex());
     }
 
@@ -980,7 +984,7 @@ void Stake::StakingThread(CWallet *wallet)
         }
         boost::this_thread::interruption_point();
     } catch (std::exception& e) {
-        LogPrintf("%s: exception (%s)\n", __func__, e.what());
+        LogPrintf("%s: exception: %s\n", __func__, e.what());
     } catch (...) {
         LogPrintf("%s: exception\n", __func__);
     }
