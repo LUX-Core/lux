@@ -769,8 +769,9 @@ bool Stake::CreateCoinStake(CWallet *wallet, const CKeyStore& keystore, unsigned
             nMinFee = nFeeNeeded;
             continue; // try signing again
         } else {
-            if (fDebug)
-                LogPrintf("%s: fee for coinstake %s\n", __func__, FormatMoney(nMinFee).c_str());
+            if (fDebug) {
+                LogPrintf("%s: fee for coinstake %s (%s)\n", __func__, FormatMoney(nMinFee), FormatMoney(nFeeNeeded));
+            }
             break;
         }
     }
@@ -921,7 +922,7 @@ bool Stake::GenBlockStake(CWallet *wallet, const CReserveKey &key, unsigned int 
 #if defined(DEBUG_DUMP_STAKE_FOUND)&&defined(DEBUG_DUMP_STAKING_INFO)
         DEBUG_DUMP_STAKE_FOUND();
 #endif
-        LogPrintf("%s: found stake %s!\n", __func__, hash.GetHex());
+        LogPrintf("%s: found stake %s, block %s!\n", __func__, proof1.GetHex(), hash.GetHex());
         ProcessBlockFound(block, *wallet, const_cast<CReserveKey &>(key));
     } else if (!GetProof(hash, proof2)) {
         SetProof(hash, proof1);

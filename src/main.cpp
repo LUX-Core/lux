@@ -3513,9 +3513,14 @@ bool ProcessNewBlock(CValidationState& state, CNode* pfrom, CBlock* pblock, CDis
         if (pwalletMain->fCombineDust)
             pwalletMain->AutoCombineDust();
     }
-
-    LogPrintf("%s: ACCEPTED %d %s (%d)\n", __func__, pindex->nHeight, pindex->GetBlockHash().GetHex(),
-              chainActive.Tip()->nHeight);
+    
+    const char * const s = pindex->IsProofOfStake() ? "pos" : "pow";
+    if (fDebug) {
+        LogPrintf("%s: ACCEPTED %d %s (%s)\n%s\n", __func__, pindex->nHeight, pindex->GetBlockHash().GetHex(), s,
+                  pblock->ToString());
+    } else {
+        LogPrintf("%s: ACCEPTED %d %s (%s)\n", __func__, pindex->nHeight, pindex->GetBlockHash().GetHex(), s);
+    }
 
     return true;
 }
