@@ -905,9 +905,11 @@ bool Stake::GenBlockStake(CWallet *wallet, const CReserveKey &key, unsigned int 
     
     IncrementExtraNonce(block, tip, extra);
 
+#if 0
     if (block->SignBlock(*wallet)) {
         return error("%s: Cant sign new block.", __func__);
     }
+#endif
 
     SetThreadPriority(THREAD_PRIORITY_NORMAL);
 
@@ -922,7 +924,8 @@ bool Stake::GenBlockStake(CWallet *wallet, const CReserveKey &key, unsigned int 
 #if defined(DEBUG_DUMP_STAKE_FOUND)&&defined(DEBUG_DUMP_STAKING_INFO)
         DEBUG_DUMP_STAKE_FOUND();
 #endif
-        LogPrintf("%s: found stake %s, block %s!\n", __func__, proof1.GetHex(), hash.GetHex());
+        LogPrintf("%s: found stake %s, block %s!\n%s\n", __func__, proof1.GetHex(), hash.GetHex(),
+                  block->ToString());
         ProcessBlockFound(block, *wallet, const_cast<CReserveKey &>(key));
     } else if (!GetProof(hash, proof2)) {
         SetProof(hash, proof1);

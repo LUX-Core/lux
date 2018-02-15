@@ -3464,7 +3464,7 @@ bool ProcessNewBlock(CValidationState& state, CNode* pfrom, CBlock* pblock, CDis
     if (pblock->IsProofOfStake() && stake->IsBlockStaked(pblock) && !mapBlockIndex.count(pblock->hashPrevBlock))
         return error("%s: duplicate proof-of-stake for block %s", __func__, pblock->GetHash().GetHex());
 
-#   if 0 // Shouldn't send messages here to sync, prev blocks should have to be existed.
+#   if 1 // Shouldn't send messages here to sync, prev blocks should have to be existed.
     
     // Check if the prev block is our prev block, if not then request sync and return false
     else if (pblock->GetHash() != Params().HashGenesisBlock() && pfrom != NULL) {
@@ -3474,6 +3474,7 @@ bool ProcessNewBlock(CValidationState& state, CNode* pfrom, CBlock* pblock, CDis
             return false;
         }
     }
+    
 #   endif
 
     CBlockIndex* pindex = NULL;
