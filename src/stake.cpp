@@ -1004,6 +1004,7 @@ void Stake::GenerateStakes(boost::thread_group &group, CWallet *wallet, int proc
         StakingThreads->create_thread(boost::bind(&Stake::StakingThread, this, wallet));
     }
 #else
+    nStakingInterrupped = procs == 0;
     for (int i = 0; i < procs; ++i) {
         group.create_thread(boost::bind(&Stake::StakingThread, this, wallet));
     }
