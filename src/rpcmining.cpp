@@ -162,7 +162,7 @@ Value setgenerate(const Array& params, bool fHelp)
         }
         unsigned int nExtraNonce = 0;
         Array blockHashes;
-        while (nHeight < nHeightEnd) {
+        while (!nStakingInterrupped && !ShutdownRequested() && nHeight < nHeightEnd) {
             std::unique_ptr<CBlockTemplate> pblocktemplate(CreateNewBlockWithKey(reservekey, pwalletMain, false));
             if (!pblocktemplate.get())
                 throw JSONRPCError(RPC_INTERNAL_ERROR, "Wallet keypool empty");

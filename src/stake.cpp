@@ -229,7 +229,7 @@ bool Stake::ComputeNextModifier(const CBlockIndex* pindexPrev, uint64_t& nStakeM
     const CBlockIndex* pindex = pindexPrev;
     while (pindex && pindex->GetBlockTime() >= nSelectionTime) {
         if (pindex->IsProofOfStake() && pindex->hashProofOfStake == 0) {
-            return error("%s: zero stake (block %s)", __func__, pindex->GetBlockHash().GetHex());
+            return error("%s: zero stake block %s", __func__, pindex->GetBlockHash().GetHex());
         }
         vSortedCandidates.push_back(make_pair(pindex->GetBlockTime(), pindex->GetBlockHash()));
         pindex = pindex->pprev;
