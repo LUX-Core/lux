@@ -374,9 +374,11 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
         }
         pblocktemplate->vTxSigOps[0] = GetLegacySigOpCount(pblock->vtx[0]);
 
+        
+
         CValidationState state;
         if (!TestBlockValidity(state, *pblock, pindexPrev, false, false)) {
-            LogPrintf("%s: TestBlockValidity failed (%s)\n", __func__, ct);
+            if (!fProofOfStake) LogPrintf("%s: TestBlockValidity failed (%s)\n", __func__, ct);
             return NULL;
         }
     }

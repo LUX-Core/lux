@@ -147,17 +147,18 @@ bool CBlock::SignBlock(const CKeyStore& keystore)
     std::vector<valtype> vSolutions;
     txnouttype whichType;
 
-    if(!IsProofOfStake())
-    {
-        for(unsigned int i = 0; i < vtx[0].vout.size(); i++)
-        {
+    if (IsProofOfStake()) {
+        // if we are trying to sign
+        //    a complete proof-of-stake block
+        return vtx[0].vout[0].IsEmpty();
+    } else {
+        for (unsigned int i = 0; i < vtx[0].vout.size(); i++) {
             const CTxOut& txout = vtx[0].vout[i];
 
             if (!Solver(txout.scriptPubKey, whichType, vSolutions))
                 continue;
 
-            if (whichType == TX_PUBKEY)
-            {
+            if (whichType == TX_PUBKEY) {
                 // Sign
                 CKeyID keyID;
                 keyID = CKeyID(uint160(vSolutions[0]));
@@ -166,23 +167,12 @@ bool CBlock::SignBlock(const CKeyStore& keystore)
                 if (!keystore.GetKey(keyID, key))
                     return false;
 
-                //vector<unsigned char> vchSig;
                 if (!key.Sign(GetHash(), vchBlockSig))
-                     return false;
+                    return false;
 
                 return true;
             }
         }
-    }
-    else
-    {
-       if (!vtx[0].vout[0].IsEmpty())
-        return false;
-
-    // if we are trying to sign
-    //    a complete proof-of-stake block
-    if (IsProofOfStake())
-        return true;
     }
 
     LogPrintf("Sign failed\n");
