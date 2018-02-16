@@ -56,10 +56,11 @@ Stake::Stake()
     : StakeKernel()
     , nStakeInterval(0)
     , nLastStakeTime(GetAdjustedTime())
-    , nHashInterval(22)
-    , nStakeMinAge(36 * 60 * 60)
+    , nLastSelectTime(GetTime())
+    , nSelectionPeriod(0)
     , nStakeSplitThreshold(2000)
-    , nStakeSetUpdateTime(300) // 5 minutes
+    , nStakeMinAge(-1)
+    , nHashInterval(22)
     , nReserveBalance(0)
     , mapStakes()
     , mapHashedBlocks()
@@ -83,7 +84,7 @@ static inline unsigned int GetInterval()
 // Get time weight
 int64_t Stake::GetWeight(int64_t nIntervalBeginning, int64_t nIntervalEnd)
 {
-    return nIntervalEnd - nIntervalBeginning - nStakeMinAge;
+    return nIntervalEnd - nIntervalBeginning - GetStakeAge(0);
 }
 #endif
 
@@ -229,7 +230,7 @@ bool Stake::ComputeNextModifier(const CBlockIndex* pindexPrev, uint64_t& nStakeM
     const CBlockIndex* pindex = pindexPrev;
     while (pindex && pindex->GetBlockTime() >= nSelectionTime) {
         if (pindex->IsProofOfStake() && pindex->hashProofOfStake == 0) {
-            return error("%s: zero stake (block %s)", __func__, pindex->GetBlockHash().GetHex());
+            return error("%s: zero stake block %s", __func__, pindex->GetBlockHash().GetHex());
         }
         vSortedCandidates.push_back(make_pair(pindex->GetBlockTime(), pindex->GetBlockHash()));
         pindex = pindex->pprev;
@@ -367,11 +368,12 @@ bool Stake::CheckHash(const CBlockIndex* pindexPrev, unsigned int nBits, const C
 {
     unsigned int nTimeBlockFrom = blockFrom.GetBlockTime();
 
-    if (nTimeTx < txPrev.nTime)  // Transaction timestamp violation
-        return error("%s: nTime violation", __func__);
+    if (nTimeTx < txPrev.nTime) {  // Transaction timestamp violation
+        return false; //error("%s: nTime violation (nTime=%d, nTimeTx=%d)", __func__, txPrev.nTime, nTimeTx);
+    }
 
-    if (nTimeBlockFrom + nStakeMinAge > nTimeTx) // Min age requirement
-        return error("%s: min age violation", __func__);
+    if (GetStakeAge(nTimeBlockFrom) > nTimeTx) // Min age requirement
+        return false; //error("%s: min age violation (nBlockTime=%d, nTimeTx=%d)", __func__, nTimeBlockFrom, nTimeTx);
 
     // Base target
     uint256 bnTarget;
@@ -408,7 +410,11 @@ bool Stake::CheckHash(const CBlockIndex* pindexPrev, unsigned int nBits, const C
     if (hashProofOfStake > bnTarget && nStakeModifierHeight < 174453 && nStakeModifierHeight <= LAST_MULTIPLIED_BLOCK) {
         DEBUG_DUMP_MULTIFIER();
         if (!MultiplyStakeTarget(bnTarget, nStakeModifierHeight, nStakeModifierTime, nValueIn)) {
+#           if 1
+            return false;
+#           else
             return error("%s: cant adjust stake target %s, %d, %d", __func__, bnTarget.GetHex(), nStakeModifierHeight, nStakeModifierTime);
+#           endif
         }
     }
 
@@ -452,12 +458,15 @@ bool Stake::CheckProof(CBlockIndex* const pindexPrev, const CBlock &block, uint2
         return error("%s: failed to find block", __func__);
 
     unsigned int nTime = block.nTime;
-    if (!this->CheckHash(pindexPrev, block.nBits, prevBlock, txPrev, txin.prevout, nTime, hashProofOfStake))
+#   if 0
+    if (!CheckHash(pindexPrev, block.nBits, prevBlock, txPrev, txin.prevout, nTime, hashProofOfStake))
         // may occur during initial download or if behind on block chain sync
-        return error("%s: check kernel failed on coinstake %s, hashProof=%s \n", __func__, 
-                     tx.GetHash().ToString().c_str(), hashProofOfStake.ToString().c_str());
-
+        return error("%s: invalid coinstake %s, hashProof=%s", __func__, 
+                     tx.GetHash().ToString(), hashProofOfStake.ToString());
     return true;
+#   else
+    return CheckHash(pindexPrev, block.nBits, prevBlock, txPrev, txin.prevout, nTime, hashProofOfStake);
+#   endif
 }
 
 #if 0
@@ -510,6 +519,10 @@ bool Stake::CheckModifierCheckpoints(int nHeight, unsigned int nStakeModifierChe
 
 unsigned int Stake::GetStakeAge(unsigned int nTime) const
 {
+    if (nStakeMinAge == (unsigned int)(-1)) {
+        auto that = const_cast<Stake*>(this);
+        that->nStakeMinAge = Params().StakingMinAge();
+    }
     return nStakeMinAge + nTime;
 }
 
@@ -608,6 +621,44 @@ bool Stake::IsActive() const
     return nStaking;
 }
 
+bool Stake::SelectStakeCoins(CWallet *wallet, std::set<std::pair<const CWalletTx*, unsigned int> >& stakecoins, const int64_t targetAmount)
+{
+    auto const nTime = GetTime();
+    if (nSelectionPeriod <= 0) {
+        nSelectionPeriod = Params().StakingRoundPeriod();
+    }
+    if (nTime - nLastSelectTime < nSelectionPeriod) {
+        return false;
+    }
+    
+    int64_t selectedAmount = 0;
+    vector<COutput> coins;
+    wallet->AvailableCoins(coins, true);
+    stakecoins.clear();
+    for (auto const &out : coins) {
+        //make sure not to outrun target amount
+        if (selectedAmount + out.tx->vout[out.i].nValue > targetAmount)
+            continue;
+
+        //check for min age
+        auto const nAge = stake->GetStakeAge(out.tx->GetTxTime());
+        if (nTime < nAge) continue;
+
+        //check that it is matured
+        if (out.nDepth < (out.tx->IsCoinStake() ? Params().COINBASE_MATURITY() : 10))
+            continue;
+
+        //add to our stake set
+        stakecoins.insert(make_pair(out.tx, out.i));
+        selectedAmount += out.tx->vout[out.i].nValue;
+    }
+    if (!stakecoins.empty()) {
+        nLastSelectTime = nTime;
+        return true;
+    }
+    return false;
+}
+
 bool Stake::CreateCoinStake(CWallet *wallet, const CKeyStore& keystore, unsigned int nBits, int64_t nSearchInterval, CMutableTransaction& txNew, unsigned int& nTxNewTime)
 {
     txNew.vin.clear();
@@ -621,26 +672,20 @@ bool Stake::CreateCoinStake(CWallet *wallet, const CKeyStore& keystore, unsigned
     // Choose coins to use
     int64_t nBalance = wallet->GetBalance();
 
-    if (mapArgs.count("-reservebalance") && !ParseMoney(mapArgs["-reservebalance"], nReserveBalance))
+    if (mapArgs.count("-reservebalance") && !ParseMoney(mapArgs["-reservebalance"], nReserveBalance)) {
         return error("%s: invalid reserve balance amount", __func__);
-
-    if (nBalance <= nReserveBalance)
-        return false;
-
-    // presstab HyperStake - Initialize as static and don't update the set on every run of CreateCoinStake() in order to lighten resource use
-    static std::set<pair<const CWalletTx*, unsigned int> > setStakeCoins;
-    static int nLastStakeSetUpdate = 0;
-
-    if (GetTime() - nLastStakeSetUpdate > nStakeSetUpdateTime) {
-        setStakeCoins.clear();
-        if (!wallet->SelectStakeCoins(setStakeCoins, nBalance - nReserveBalance))
-            return false;
-
-        nLastStakeSetUpdate = GetTime();
     }
 
-    if (setStakeCoins.empty())
+    if (nBalance <= nReserveBalance) {
         return false;
+    }
+
+    // presstab HyperStake - Initialize as static and don't update the set on every run of
+    // CreateCoinStake() in order to lighten resource use
+    static std::set<pair<const CWalletTx*, unsigned int> > setStakeCoins;
+    if (!SelectStakeCoins(wallet, setStakeCoins, nBalance - nReserveBalance)) {
+        return false;
+    }
 
     vector<const CWalletTx*> vwtxPrev;
 
@@ -675,13 +720,13 @@ bool Stake::CreateCoinStake(CWallet *wallet, const CKeyStore& keystore, unsigned
         if (CheckHash(pindex->pprev, nBits, block, *pcoin.first, prevoutStake, nTxNewTime, hashProofOfStake)) {
             //Double check that this will pass time requirements
             if (nTxNewTime <= chainActive.Tip()->GetMedianTimePast()) {
-                LogPrintf("%s: kernel found, but it is too far in the past \n", __func__);
+                LogPrintf("%s: stake found, but it is too far in the past \n", __func__);
                 continue;
             }
 
             // Found a kernel
             if (fDebug && GetBoolArg("-printcoinstake", false))
-                LogPrintf("%s: kernel found\n", __func__);
+                LogPrintf("%s: stake found\n", __func__);
 
             vector<valtype> vSolutions;
             txnouttype whichType;
@@ -733,8 +778,10 @@ bool Stake::CreateCoinStake(CWallet *wallet, const CKeyStore& keystore, unsigned
         if (fKernelFound)
             break; // if kernel is found stop searching
     }
-    if (nCredit == 0 || nCredit > nBalance - nReserveBalance)
+
+    if (nCredit == 0 || nCredit > nBalance - nReserveBalance) {
         return false;
+    }
 
     // Calculate reward
     const CBlockIndex* pIndex0 = chainActive.Tip();
@@ -752,8 +799,9 @@ bool Stake::CreateCoinStake(CWallet *wallet, const CKeyStore& keystore, unsigned
 
         // Limit size
         unsigned int nBytes = ::GetSerializeSize(txNew, SER_NETWORK, PROTOCOL_VERSION);
-        if (nBytes >= DEFAULT_BLOCK_MAX_SIZE / 5)
+        if (nBytes >= DEFAULT_BLOCK_MAX_SIZE / 5) {
             return error("%s: exceeded coinstake size limit", __func__);
+        }
 
         CAmount nFeeNeeded = wallet->GetMinimumFee(nBytes, nTxConfirmTarget, mempool);
 
@@ -762,8 +810,9 @@ bool Stake::CreateCoinStake(CWallet *wallet, const CKeyStore& keystore, unsigned
             nMinFee = nFeeNeeded;
             continue; // try signing again
         } else {
-            if (fDebug)
-                LogPrintf("%s: fee for coinstake %s\n", __func__, FormatMoney(nMinFee).c_str());
+            if (fDebug) {
+                LogPrintf("%s: fee for coinstake %s (%s)\n", __func__, FormatMoney(nMinFee), FormatMoney(nFeeNeeded));
+            }
             break;
         }
     }
@@ -845,12 +894,14 @@ bool Stake::CreateCoinStake(CWallet *wallet, const CKeyStore& keystore, unsigned
     // Sign
     i = 0;
     for (const CWalletTx* pcoin : vwtxPrev) {
-        if (!SignSignature(*wallet, *pcoin, txNew, i++))
+        if (!SignSignature(*wallet, *pcoin, txNew, i++)) {
             return error("%s: failed to sign coinstake (%d)", __func__, i);
+        }
     }
 
-    // Successfully generated coinstake
-    nLastStakeSetUpdate = 0; //this will trigger stake set to repopulate next round
+    // Successfully generated coinstake, reset select timestamp to 
+    // start next round as soon as possible.
+    nLastSelectTime = 0;
     return true;
 }
 
@@ -896,7 +947,7 @@ bool Stake::GenBlockStake(CWallet *wallet, const CReserveKey &key, unsigned int 
     
     IncrementExtraNonce(block, tip, extra);
 
-    if (block->SignBlock(*wallet)) {
+    if (!block->SignBlock(*wallet)) {
         return error("%s: Cant sign new block.", __func__);
     }
 
@@ -913,12 +964,13 @@ bool Stake::GenBlockStake(CWallet *wallet, const CReserveKey &key, unsigned int 
 #if defined(DEBUG_DUMP_STAKE_FOUND)&&defined(DEBUG_DUMP_STAKING_INFO)
         DEBUG_DUMP_STAKE_FOUND();
 #endif
-        LogPrintf("%s: found stake %s!\n", __func__, hash.GetHex());
+        LogPrintf("%s: found stake %s, block %s\n%s\n", __func__, 
+                  proof1.GetHex(), hash.GetHex(), block->ToString());
         ProcessBlockFound(block, *wallet, const_cast<CReserveKey &>(key));
     } else if (!GetProof(hash, proof2)) {
         SetProof(hash, proof1);
     } else if (proof1 != proof2) {
-        result = error("%s: diverged stake %s, %s (block %s)\n", __func__, 
+        result = error("%s: diverged stake %s, %s (block %s)", __func__, 
                        proof1.GetHex(), proof2.GetHex(), hash.GetHex());
     }
 
@@ -934,43 +986,54 @@ void Stake::StakingThread(CWallet *wallet)
 
     try {
         boost::this_thread::interruption_point();
+        int nHeight = 0;
         unsigned int extra = 0;
         CReserveKey reserve(wallet);
         while (!nStakingInterrupped && !ShutdownRequested()) {
+            std::size_t nNodes = 0;
             bool nCanStake = !IsInitialBlockDownload();
             if  (nCanStake) {
                 LOCK(cs_vNodes);
-                if (vNodes.empty()) {
+                if ((nNodes = vNodes.size()) == 0) {
                     nCanStake = false;
                 }
             }
 
             const CBlockIndex* tip = nullptr;
             if (nCanStake) {
-                while ((wallet->IsLocked() || nReserveBalance >= wallet->GetBalance())) {
-                    nStakeInterval = 0;
-                    MilliSleep(5000);
-                    continue;
+                while (wallet->IsLocked() || nReserveBalance >= wallet->GetBalance()) {
+                    if (!nStakingInterrupped && !ShutdownRequested()) {
+                        nStakeInterval = 0;
+                        MilliSleep(3000);
+                        continue;
+                    } else {
+                        nCanStake = false; break;
+                    }
                 }
-                LOCK(cs_main);
-                tip = chainActive.Tip();
-                if (/*tip->nHeight < Params().LAST_POW_BLOCK() ||*/ IsBlockStaked(tip->nHeight)) {
-                    nCanStake = false;
+                if (nCanStake) {
+                    LOCK(cs_main);
+                    tip = chainActive.Tip();
+                    nHeight = tip->nHeight;
+                    if (/*tip->nHeight < Params().LAST_POW_BLOCK() ||*/ IsBlockStaked(tip->nHeight)) {
+                        nCanStake = false;
+                    }
                 }
+            } else {
+                continue;
             }
 
 #if defined(DEBUG_DUMP_STAKING_THREAD)&&defined(DEBUG_DUMP_STAKING_INFO)
             DEBUG_DUMP_STAKING_THREAD();
 #endif
             if (nCanStake && GenBlockStake(wallet, reserve, extra)) {
-                MilliSleep(1000);
+                MilliSleep(1500);
             } else {
-                MilliSleep(5000);
+                MilliSleep(1000);
             }
         }
         boost::this_thread::interruption_point();
     } catch (std::exception& e) {
-        LogPrintf("%s: exception (%s)\n", __func__, e.what());
+        LogPrintf("%s: exception: %s\n", __func__, e.what());
     } catch (...) {
         LogPrintf("%s: exception\n", __func__);
     }
@@ -994,6 +1057,7 @@ void Stake::GenerateStakes(boost::thread_group &group, CWallet *wallet, int proc
         StakingThreads->create_thread(boost::bind(&Stake::StakingThread, this, wallet));
     }
 #else
+    nStakingInterrupped = procs == 0;
     for (int i = 0; i < procs; ++i) {
         group.create_thread(boost::bind(&Stake::StakingThread, this, wallet));
     }

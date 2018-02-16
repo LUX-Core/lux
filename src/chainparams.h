@@ -92,6 +92,8 @@ public:
     std::string SporkKey() const { return strSporkKey; }
     std::string ObfuscationPoolDummyAddress() const { return strObfuscationPoolDummyAddress; }
     int64_t StartMasternodePayments() const { return nStartMasternodePayments; }
+    int64_t StakingRoundPeriod() const { return nStakingRoundPeriod; }
+    int64_t StakingMinAge() const { return nStakingMinAge; }
     CBaseChainParams::Network NetworkID() const { return networkID; }
 
 protected:
@@ -134,6 +136,8 @@ protected:
     std::string strSporkKey;
     std::string strObfuscationPoolDummyAddress;
     int64_t nStartMasternodePayments;
+    int64_t nStakingRoundPeriod;
+    int64_t nStakingMinAge;
 };
 
 /** 

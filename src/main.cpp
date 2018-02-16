@@ -2182,10 +2182,11 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
             }
 
             nValueIn += view.GetValueIn(tx);
-            if (!tx.IsCoinStake())
-                nFees += view.GetValueIn(tx) - tx.GetValueOut();
-            if (tx.IsCoinStake())
+            if (tx.IsCoinStake()) {
                 nStakeReward = view.GetValueIn(tx) - tx.GetValueOut();
+            } else { 
+                nFees += view.GetValueIn(tx) - tx.GetValueOut();
+            }
 
             std::vector<CScriptCheck> vChecks;
             if (!CheckInputs(tx, state, view, fScriptChecks, flags, false, nScriptCheckThreads ? &vChecks : NULL))
@@ -3463,7 +3464,7 @@ bool ProcessNewBlock(CValidationState& state, CNode* pfrom, CBlock* pblock, CDis
     if (pblock->IsProofOfStake() && stake->IsBlockStaked(pblock) && !mapBlockIndex.count(pblock->hashPrevBlock))
         return error("%s: duplicate proof-of-stake for block %s", __func__, pblock->GetHash().GetHex());
 
-#   if 0 // Shouldn't send messages here to sync, prev blocks should have to be existed.
+#   if 1 // Shouldn't send messages here to sync, prev blocks should have to be existed.
     
     // Check if the prev block is our prev block, if not then request sync and return false
     else if (pblock->GetHash() != Params().HashGenesisBlock() && pfrom != NULL) {
@@ -3473,6 +3474,7 @@ bool ProcessNewBlock(CValidationState& state, CNode* pfrom, CBlock* pblock, CDis
             return false;
         }
     }
+    
 #   endif
 
     CBlockIndex* pindex = NULL;
@@ -3512,9 +3514,14 @@ bool ProcessNewBlock(CValidationState& state, CNode* pfrom, CBlock* pblock, CDis
         if (pwalletMain->fCombineDust)
             pwalletMain->AutoCombineDust();
     }
-
-    LogPrintf("%s: ACCEPTED %d %s (%d)\n", __func__, pindex->nHeight, pindex->GetBlockHash().GetHex(),
-              chainActive.Tip()->nHeight);
+    
+    auto const &hash = pindex->GetBlockHash();
+    const char * const s = pindex->IsProofOfStake() ? "pos" : "pow";
+    if (fDebug) {
+        LogPrintf("%s: ACCEPTED %d %s (%s)\n%s\n", __func__, pindex->nHeight, hash.GetHex(), s, pblock->ToString());
+    } else {
+        LogPrintf("%s: ACCEPTED %d %s (%s)\n", __func__, pindex->nHeight, hash.GetHex(), s);
+    }
 
     return true;
 }

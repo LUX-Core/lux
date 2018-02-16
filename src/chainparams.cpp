@@ -173,6 +173,9 @@ public:
 
         strObfuscationPoolDummyAddress = "LgcjpYxWa5EB9KCYaRtpPgG8kgiWRvJY38";
         nStartMasternodePayments = 1507656633; // 10/10/2017
+
+        nStakingRoundPeriod = 300; // 5 minutes a round
+        nStakingMinAge = 36 * 60 * 60;
     }
 
     const Checkpoints::CCheckpointData& Checkpoints() const
@@ -245,6 +248,9 @@ public:
         strSporkKey = "04348C2F50F90267E64FACC65BFDC9D0EB147D090872FB97ABAE92E9A36E6CA60983E28E741F8E7277B11A7479B626AC115BA31463AC48178A5075C5A9319D4A38";
         strObfuscationPoolDummyAddress = "LPGq7DZbqZ8Vb3tfLH8Z8VHqeV4fsK68oX";
         nStartMasternodePayments = 1420837558; //Fri, 09 Jan 2015 21:05:58 GMT
+
+        nStakingRoundPeriod = 5; // 5 seconds a round
+        nStakingMinAge = 360; // 6 minutes
     }
     const Checkpoints::CCheckpointData& Checkpoints() const
     {

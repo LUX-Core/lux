@@ -18,6 +18,7 @@ class COutPoint;
 class CReserveKey;
 class CTransaction;
 class CWallet;
+class CWalletTx;
 
 namespace boost { class thread_group; }
 
@@ -43,11 +44,11 @@ class Stake : StakeKernel
 
     int64_t nStakeInterval;
     int64_t nLastStakeTime;
-
-    unsigned int nHashInterval;
-    unsigned int nStakeMinAge;
+    int64_t nLastSelectTime;
+    int64_t nSelectionPeriod;
     uint64_t nStakeSplitThreshold;
-    int nStakeSetUpdateTime;
+    unsigned int nStakeMinAge;
+    unsigned int nHashInterval;
 
     CAmount nReserveBalance;
     
@@ -58,6 +59,7 @@ class Stake : StakeKernel
 
 private:
 
+    bool SelectStakeCoins(CWallet *wallet, std::set<std::pair<const CWalletTx*, unsigned int> >& stakecoins, const int64_t targetAmount);
     bool CreateCoinStake(CWallet *wallet, const CKeyStore& keystore, unsigned int nBits, int64_t nSearchInterval, CMutableTransaction& txNew, unsigned int& nTxNewTime);
 
     bool GenBlockStake(CWallet *wallet, const CReserveKey &key, unsigned int &extra);

@@ -226,6 +226,8 @@ bool CBlockTreeDB::LoadBlockIndexGuts()
     ssKeySet << make_pair('b', uint256(0));
     pcursor->Seek(ssKeySet.str());
 
+    CBlockIndex* pindexPrev = nullptr;
+
     // Load mapBlockIndex
     while (pcursor->Valid()) {
         boost::this_thread::interruption_point();
@@ -268,9 +270,12 @@ bool CBlockTreeDB::LoadBlockIndexGuts()
                 if (pindexNew->IsProofOfWork() && pindexNew->nHeight <= Params().LAST_POW_BLOCK()) {
                     auto const &hash(pindexNew->GetBlockHash());
                     if (!CheckProofOfWork(hash, pindexNew->nBits)) {
-                        unsigned int nBits = 0;
-                        if (chainActive.Height() > 0) nBits = chainActive.Tip()->nBits;
-                        return error("%s: CheckProofOfWork failed: %s %d (%d, %d, %d)", __func__, hash.GetHex(), pindexNew->nHeight, pindexNew->nBits, (unsigned int)-1, nBits);
+                        unsigned int nBits = pindexPrev ? pindexPrev->nBits : 0;
+#                       if 0
+                        LogPrint("debug", "%s: CheckProofOfWork failed: %d %s (%d, %d)\n", __func__, pindexNew->nHeight, hash.GetHex(), pindexNew->nBits, nBits);
+#                       else
+                        return error("%s: CheckProofOfWork failed: %d %s (%d, %d)", __func__, pindexNew->nHeight, hash.GetHex(), pindexNew->nBits, nBits);
+#                       endif
                     }
                 }
 
@@ -290,6 +295,7 @@ bool CBlockTreeDB::LoadBlockIndexGuts()
                     }
                 }
 
+                pindexPrev = pindexNew;
                 pcursor->Next();
             } else {
                 break; // if shutdown requested or finished loading block index
