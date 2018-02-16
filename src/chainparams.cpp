@@ -141,14 +141,14 @@ public:
         assert(hashGenesisBlock == uint256("0x00000759bb3da130d7c9aedae170da8335f5a0d01a9007e4c8d3ccd08ace6a42"));
         assert(genesis.hashMerkleRoot == uint256("0xe08ae0cfc35a1d70e6764f347fdc54355206adeb382446dd54c32cd0201000d3"));
 
-        vSeeds.push_back(CDNSSeedData("luxcore", "5.189.142.181"));
-        vSeeds.push_back(CDNSSeedData("luxcore1", "5.77.44.147"));
-        vSeeds.push_back(CDNSSeedData("luxcore2", "209.250.254.156"));
-        vSeeds.push_back(CDNSSeedData("luxcore3", "45.76.114.209"));
-        vSeeds.push_back(CDNSSeedData("luxcore4", "luxseed1.luxcore.io"));
-        vSeeds.push_back(CDNSSeedData("luxcore5", "luxseed2.luxcore.io"));
-        vSeeds.push_back(CDNSSeedData("luxcore6", "luxseed3.luxcore.io"));
-        vSeeds.push_back(CDNSSeedData("luxcore7", "luxseed4.luxcore.io"));
+        vSeeds.push_back(CDNSSeedData("luxseed1.luxcore.io", "luxseed1.luxcore.io")); // DNSSeed
+        vSeeds.push_back(CDNSSeedData("luxseed2.luxcore.io", "luxseed2.luxcore.io")); // DNSSeed
+        vSeeds.push_back(CDNSSeedData("luxseed3.luxcore.io", "luxseed3.luxcore.io")); // DNSSeed
+        vSeeds.push_back(CDNSSeedData("luxseed4.luxcore.io", "luxseed4.luxcore.io")); // DNSSeed
+        vSeeds.push_back(CDNSSeedData("209.250.254.156", "209.250.254.156")); // Non-standard DNS request
+        vSeeds.push_back(CDNSSeedData("45.76.114.209", "45.76.114.209")); // Non-standard DNS request
+        vSeeds.push_back(CDNSSeedData("5.189.142.181", "5.189.142.181")); // Non-standard DNS request
+        vSeeds.push_back(CDNSSeedData("5.77.44.147", "5.77.44.147")); // Non-standard DNS request
 
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,48); // LUX Start letter L
         base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1,48);
@@ -173,7 +173,7 @@ public:
 
         strObfuscationPoolDummyAddress = "LgcjpYxWa5EB9KCYaRtpPgG8kgiWRvJY38";
         nStartMasternodePayments = 1507656633; // 10/10/2017
-        
+
         nStakingRoundPeriod = 300; // 5 minutes a round
         nStakingMinAge = 36 * 60 * 60;
     }
