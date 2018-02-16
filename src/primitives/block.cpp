@@ -150,7 +150,7 @@ bool CBlock::SignBlock(const CKeyStore& keystore)
     if (IsProofOfStake()) {
         // if we are trying to sign
         //    a complete proof-of-stake block
-        return vtx[0].vout[0].IsEmpty();
+        return vtx[0].vout[0].IsEmpty() && vtx.size() > 1 && vtx[1].IsCoinStake();
     } else {
         for (unsigned int i = 0; i < vtx[0].vout.size(); i++) {
             const CTxOut& txout = vtx[0].vout[i];
@@ -183,6 +183,12 @@ bool CBlock::CheckBlockSignature() const
 {
     if (IsProofOfWork())
         return vchBlockSig.empty();
+
+    if (IsProofOfStake()) {
+        // if we are trying to sign
+        //    a complete proof-of-stake block
+        return vtx[0].vout[0].IsEmpty();
+    }
 
     std::vector<valtype> vSolutions;
     txnouttype whichType;

@@ -1643,32 +1643,6 @@ bool less_then_denom(const COutput& out1, const COutput& out2)
     return (!found1 && found2);
 }
 
-bool CWallet::SelectStakeCoins(std::set<std::pair<const CWalletTx*, unsigned int> >& setCoins, int64_t nTargetAmount) const
-{
-    vector<COutput> vCoins;
-    AvailableCoins(vCoins, true);
-    int64_t nAmountSelected = 0;
-
-    BOOST_FOREACH (const COutput& out, vCoins) {
-        //make sure not to outrun target amount
-        if (nAmountSelected + out.tx->vout[out.i].nValue > nTargetAmount)
-            continue;
-
-        //check for min age
-        if (GetTime() - out.tx->GetTxTime() < stake->GetStakeAge(0))
-            continue;
-
-        //check that it is matured
-        if (out.nDepth < (out.tx->IsCoinStake() ? Params().COINBASE_MATURITY() : 10))
-            continue;
-
-        //add to our stake set
-        setCoins.insert(make_pair(out.tx, out.i));
-        nAmountSelected += out.tx->vout[out.i].nValue;
-    }
-    return true;
-}
-
 bool CWallet::MintableCoins()
 {
     if (GetBalance() <= stake->GetReservedBalance())
@@ -1678,7 +1652,7 @@ bool CWallet::MintableCoins()
     AvailableCoins(vCoins, true);
 
     BOOST_FOREACH (const COutput& out, vCoins) {
-        if (GetTime() - out.tx->GetTxTime() > stake->GetStakeAge(0))
+        if (GetTime() > stake->GetStakeAge(out.tx->GetTxTime()))
             return true;
     }
 

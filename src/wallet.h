@@ -156,7 +156,6 @@ class CWallet : public CCryptoKeyStore, public CValidationInterface
 
 public:
     bool MintableCoins();
-    bool SelectStakeCoins(std::set<std::pair<const CWalletTx*, unsigned int> >& setCoins, int64_t nTargetAmount) const;
     bool SelectCoinsDark(int64_t nValueMin, int64_t nValueMax, std::vector<CTxIn>& setCoinsRet, int64_t& nValueRet, int nDarksendRoundsMin, int nDarksendRoundsMax) const;
     bool SelectCoinsByDenominations(int nDenom, int64_t nValueMin, int64_t nValueMax, std::vector<CTxIn>& vCoinsRet, std::vector<COutput>& vCoinsRet2, int64_t& nValueRet, int nDarksendRoundsMin, int nDarksendRoundsMax);
     bool SelectCoinsDarkDenominated(int64_t nTargetValue, std::vector<CTxIn>& setCoinsRet, int64_t& nValueRet) const;
