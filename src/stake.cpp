@@ -60,7 +60,7 @@ Stake::Stake()
     , nSelectionPeriod(0)
     , nStakeSplitThreshold(2000)
     , nStakeMinAge(-1)
-    , nHashInterval(22)
+    , nHashInterval(-1)
     , nReserveBalance(0)
     , mapStakes()
     , mapHashedBlocks()
@@ -536,11 +536,26 @@ bool Stake::HasStaked() const
     return nLastStakeTime > 0 && nStakeInterval > 0;
 }
 
+bool Stake::MarkBlockStaked(int nHeight, unsigned int nTime)
+{
+    bool result = false;
+    auto it = mapHashedBlocks.find(nHeight);
+    if (it == mapHashedBlocks.end()) {
+        auto res = mapHashedBlocks.emplace((unsigned int) nHeight, nTime);
+        result = res.second && res.first != mapHashedBlocks.end();
+    }
+    return result;
+}
+
 bool Stake::IsBlockStaked(int nHeight) const
 {
     bool result = false;
     auto it = mapHashedBlocks.find(nHeight);
     if (it != mapHashedBlocks.end()) {
+        if (nHashInterval == (unsigned int)-1) {
+            auto that = const_cast<Stake*>(this);
+            that->nHashInterval = Params().StakingInterval();
+        }
         if (GetTime() - it->second < max(nHashInterval, (unsigned int)1)) {
             result = true;
         }

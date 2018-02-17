@@ -95,6 +95,8 @@ public:
     bool IsBlockStaked(int nHeight) const;
     bool IsBlockStaked(CBlock* block) const;
 
+    bool MarkBlockStaked(int nHeight, unsigned int nTime);
+
     CAmount ReserveBalance(CAmount amount);
     CAmount GetReservedBalance() const;
 

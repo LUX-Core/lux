@@ -38,10 +38,10 @@ public:
         EXT_PUBLIC_KEY, // BIP32
         EXT_SECRET_KEY, // BIP32
         EXT_COIN_TYPE,  // BIP44
-        
+
         MAX_BASE58_TYPES
     };
-    
+
     const uint256& HashGenesisBlock() const { return hashGenesisBlock; }
     const MessageStartChars& MessageStart() const { return pchMessageStart; }
     const std::vector<unsigned char>& AlertKey() const { return vAlertPubKey; }
@@ -53,7 +53,7 @@ public:
     int RejectBlockOutdatedMajority() const { return nRejectBlockOutdatedMajority; }
     int ToCheckBlockUpgradeMajority() const { return nToCheckBlockUpgradeMajority; }
     int MaxReorganizationDepth() const { return nMaxReorganizationDepth; }
-    
+
     /** Used if GenerateBitcoins is called with a negative number of threads */
     int DefaultMinerThreads() const { return nMinerThreads; }
     const CBlock& GenesisBlock() const { return genesis; }
@@ -96,10 +96,10 @@ public:
     int64_t StakingInterval() const { return nStakingInterval; }
     int64_t StakingMinAge() const { return nStakingMinAge; }
     CBaseChainParams::Network NetworkID() const { return networkID; }
-    
+
 protected:
     CChainParams() {}
-    
+
     uint256 hashGenesisBlock;
     MessageStartChars pchMessageStart;
     //! Raw pub key bytes for the broadcast alert signing key.
@@ -142,7 +142,7 @@ protected:
     int64_t nStakingMinAge;
 };
 
-/**
+/** 
  * Modifiable parameters interface is used by test cases to adapt the parameters in order
  * to test specific features more easily. Test cases should always restore the previous
  * values after finalization.
@@ -187,4 +187,3 @@ bool SelectParamsFromCommandLine();
 inline bool IsTestNet() { return Params().NetworkID() == CBaseChainParams::TESTNET; }
 
 #endif // BITCOIN_CHAINPARAMS_H
-

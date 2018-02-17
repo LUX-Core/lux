@@ -3502,8 +3502,11 @@ bool ProcessNewBlock(CValidationState& state, CNode* pfrom, CBlock* pblock, CDis
         }
     }
 
-    if (!ActivateBestChain(state, pblock))
+    if (ActivateBestChain(state, pblock)) {
+        stake->MarkBlockStaked(pindex->nHeight, pindex->nTime);
+    } else {
         return error("%s: ActivateBestChain failed", __func__);
+    }
 
     if (pwalletMain) {
         // If turned on MultiSend will send a transaction (or more) on the after maturity of a stake
@@ -3514,7 +3517,7 @@ bool ProcessNewBlock(CValidationState& state, CNode* pfrom, CBlock* pblock, CDis
         if (pwalletMain->fCombineDust)
             pwalletMain->AutoCombineDust();
     }
-    
+
     auto const &hash = pindex->GetBlockHash();
     const char * const s = pindex->IsProofOfStake() ? "pos" : "pow";
     if (fDebug) {
