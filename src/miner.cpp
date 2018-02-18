@@ -300,7 +300,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
 
             CAmount nTxFees = view.GetValueIn(tx) - tx.GetValueOut();
             if (nTxFees < nMinTxFee || nMaxTxFee <= nTxFees || MAX_BK_FEE < (nFees+nTxFees)) {
-                LogPrint("debug", "%s: bad tx fee (%d, %d, [%d, %d])", __func__, nFees, nTxFees, nMinTxFee, nMaxTxFee);
+                LogPrint("debug", "%s: bad tx fee (%d, %d, [%d, %d])\n", __func__, nFees, nTxFees, nMinTxFee, nMaxTxFee);
                 continue;
             }
             
@@ -361,7 +361,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
 
         nLastBlockTx = nBlockTx;
         nLastBlockSize = nBlockSize;
-        LogPrintf("%s: total size %u (%s, nFees=%d)\n", __func__, nBlockSize, ct, nFees);
+        LogPrint("debug", "%s: total size %u (%s, nFees=%d)\n", __func__, nBlockSize, ct, nFees);
 
         // Compute final coinbase transaction.
         pblock->nNonce = 0;

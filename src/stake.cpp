@@ -705,12 +705,14 @@ bool Stake::CreateCoinStake(CWallet *wallet, const CKeyStore& keystore, unsigned
     vector<const CWalletTx*> vwtxPrev;
 
     int64_t nCredit = 0;
+    uint256 bnCentSecond = 0; // coin age in the unit of cent-seconds
     CScript scriptPubKeyKernel;
 
     //prevent staking a time that won't be accepted
     if (GetAdjustedTime() <= chainActive.Tip()->nTime)
         MilliSleep(10000);
 
+    const CBlockIndex* pIndex0 = chainActive.Tip();
     BOOST_FOREACH (PAIRTYPE(const CWalletTx*, unsigned int) pcoin, setStakeCoins) {
         //make sure that enough time has elapsed between
         CBlockIndex* pindex = NULL;
@@ -772,8 +774,10 @@ bool Stake::CreateCoinStake(CWallet *wallet, const CKeyStore& keystore, unsigned
             } else
                 scriptPubKeyOut = scriptPubKeyKernel;
 
+            auto nValueIn = pcoin.first->vout[pcoin.second].nValue;
             txNew.vin.push_back(CTxIn(pcoin.first->GetHash(), pcoin.second));
-            nCredit += pcoin.first->vout[pcoin.second].nValue;
+            bnCentSecond += uint256(nValueIn) * (nTxNewTime - pIndex0->nTime);
+            nCredit += nValueIn;
             vwtxPrev.push_back(pcoin.first);
             txNew.vout.push_back(CTxOut(0, scriptPubKeyOut));
 
@@ -799,8 +803,8 @@ bool Stake::CreateCoinStake(CWallet *wallet, const CKeyStore& keystore, unsigned
     }
 
     // Calculate reward
-    const CBlockIndex* pIndex0 = chainActive.Tip();
-    uint64_t nReward = GetProofOfWorkReward(0, pIndex0->nHeight);
+    uint256 bnCoinDay = bnCentSecond / COIN / (24 * 60 * 60);
+    uint64_t nReward = GetProofOfStakeReward(bnCoinDay.GetCompact(), 0, pIndex0->nHeight);
     nCredit += nReward;
 
     int64_t nMinFee = 0;
@@ -826,7 +830,7 @@ bool Stake::CreateCoinStake(CWallet *wallet, const CKeyStore& keystore, unsigned
             continue; // try signing again
         } else {
             if (fDebug) {
-                LogPrintf("%s: fee for coinstake %s (%s)\n", __func__, FormatMoney(nMinFee), FormatMoney(nFeeNeeded));
+                LogPrint("debug", "%s: fee for coinstake %s (%s)\n", __func__, FormatMoney(nMinFee), FormatMoney(nFeeNeeded));
             }
             break;
         }
@@ -874,7 +878,7 @@ bool Stake::CreateCoinStake(CWallet *wallet, const CKeyStore& keystore, unsigned
         ExtractDestination(payee, address1);
         CBitcoinAddress address2(address1);
 
-        LogPrintf("%s: Masternode payment to %s\n", __func__, address2.ToString());
+        LogPrint("debug", "%s: Masternode payment to %s\n", __func__, address2.ToString());
     }
 
     int64_t blockValue = nCredit;
