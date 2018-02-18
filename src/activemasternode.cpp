@@ -415,10 +415,6 @@ vector<COutput> CActiveMasternode::SelectCoinsMasternode() {
     // Retrieve all possible outputs
     pwalletMain->AvailableCoinsMN(vCoins);
 
-    std::cout
-        << __func__ << ": selected " << vCoins.size() << " masternode coins"
-        << std::endl ;
-
     // Filter
     BOOST_FOREACH(const COutput& out, vCoins) {
         if(out.tx->vout[out.i].nValue == GetMNCollateral(chainActive.Tip()->nHeight)*COIN) {  //exactly 16120 LUX

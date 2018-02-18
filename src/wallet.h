@@ -41,7 +41,7 @@ extern bool fSendFreeTransactions;
 extern bool fPayAtLeastCustomFee;
 
 //! -paytxfee default
-static const CAmount DEFAULT_TRANSACTION_FEE = 0;
+static const CAmount DEFAULT_TRANSACTION_FEE = 1000;
 //! -paytxfee will warn if called with a higher fee than this amount (in satoshis) per KB
 static const CAmount nHighTransactionFeeWarning = 0.1 * COIN;
 //! -maxtxfee default
@@ -123,7 +123,7 @@ public:
     StringMap destdata;
 };
 
-/** 
+/**
  * A CWallet is an extension of a keystore, which also maintains a set of transactions and balances,
  * and provides the ability to create new transactions.
  */
@@ -345,7 +345,7 @@ public:
 
     void GetKeyBirthTimes(std::map<CKeyID, int64_t>& mapKeyBirth) const;
 
-    /** 
+    /**
      * Increment the next transaction order id
      * @return next transaction order id
      */
@@ -533,13 +533,13 @@ public:
     //! Get wallet transactions that conflict with given transaction (spend same outputs)
     std::set<uint256> GetConflicts(const uint256& txid) const;
 
-    /** 
+    /**
      * Address book entry changed.
      * @note called with lock cs_wallet held.
      */
     boost::signals2::signal<void(CWallet* wallet, const CTxDestination& address, const std::string& label, bool isMine, const std::string& purpose, ChangeType status)> NotifyAddressBookChanged;
 
-    /** 
+    /**
      * Wallet transaction added, removed or updated.
      * @note called with lock cs_wallet held.
      */
@@ -674,7 +674,7 @@ public:
     bool IsTransactionLockTimedOut() const;
 };
 
-/** 
+/**
  * A transaction with a bunch of additional info that only the owner cares about.
  * It includes any unrecorded transactions needed to link it back to the block chain.
  */
@@ -1221,7 +1221,7 @@ public:
 };
 
 
-/** 
+/**
  * Account information.
  * Stored in wallet with key "acc"+string account name.
  */
@@ -1252,7 +1252,7 @@ public:
 };
 
 
-/** 
+/**
  * Internal transfers.
  * Database key is acentry<account><counter>.
  */

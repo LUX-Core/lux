@@ -976,6 +976,7 @@ bool Stake::GenBlockStake(CWallet *wallet, const CReserveKey &key, unsigned int 
     uint256 proof1, proof2;
     auto hash = block->GetHash();
     auto good = CheckProof(tip, *block, proof1);
+
 #if defined(DEBUG_DUMP_STAKE_CHECK)&&defined(DEBUG_DUMP_STAKING_INFO)
     DEBUG_DUMP_STAKE_CHECK();
 #endif
@@ -1005,7 +1006,7 @@ void Stake::StakingThread(CWallet *wallet)
 
     try {
         boost::this_thread::interruption_point();
-        int nHeight = 0;
+        int nHeight = 0; (void)nHeight;
         unsigned int extra = 0;
         CReserveKey reserve(wallet);
         while (!nStakingInterrupped && !ShutdownRequested()) {
