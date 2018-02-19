@@ -25,34 +25,32 @@ void CActiveMasternode::ManageStatus() {
         return;
     }
 
-    if(status == MASTERNODE_INPUT_TOO_NEW || status == MASTERNODE_NOT_CAPABLE || status == MASTERNODE_SYNC_IN_PROCESS) {
+    if (status == MASTERNODE_INPUT_TOO_NEW || status == MASTERNODE_NOT_CAPABLE || status == MASTERNODE_SYNC_IN_PROCESS) {
         status = MASTERNODE_NOT_PROCESSED;
     }
 
-    if(status == MASTERNODE_NOT_PROCESSED) {
-        if(strMasterNodeAddr.empty()) {
-            if(!GetLocal(service)) {
+    if (status == MASTERNODE_NOT_PROCESSED) {
+        if (strMasterNodeAddr.empty()) {
+            if (!GetLocal(service)) {
                 notCapableReason = "Can't detect external address. Please use the masternodeaddr configuration option.";
                 status = MASTERNODE_NOT_CAPABLE;
                 LogPrintf("CActiveMasternode::ManageStatus() - not capable: %s\n", notCapableReason.c_str());
                 return;
             }
         } else {
-        	service = CService(strMasterNodeAddr, true);
+            service = CService(strMasterNodeAddr, true);
         }
 
         LogPrintf("CActiveMasternode::ManageStatus() - Checking inbound connection to '%s'\n", service.ToString().c_str());
 
-                  
-            if(!ConnectNode((CAddress)service, service.ToString().c_str())) {
-                notCapableReason = "Could not connect to " + service.ToString();
-                status = MASTERNODE_NOT_CAPABLE;
-                LogPrintf("CActiveMasternode::ManageStatus() - not capable: %s\n", notCapableReason.c_str());
-                return;
-            }
-        
+        if (!ConnectNode((CAddress)service, service.ToString().c_str())) {
+            notCapableReason = "Could not connect to " + service.ToString();
+            status = MASTERNODE_NOT_CAPABLE;
+            LogPrintf("CActiveMasternode::ManageStatus() - not capable: %s\n", notCapableReason.c_str());
+            return;
+        }
 
-        if(pwalletMain->IsLocked()) {
+        if (pwalletMain->IsLocked()) {
             notCapableReason = "Wallet is locked.";
             status = MASTERNODE_NOT_CAPABLE;
             LogPrintf("CActiveMasternode::ManageStatus() - not capable: %s\n", notCapableReason.c_str());
@@ -68,7 +66,6 @@ void CActiveMasternode::ManageStatus() {
         CKey keyCollateralAddress;
 
         if(GetMasterNodeVin(vin, pubKeyCollateralAddress, keyCollateralAddress)) {
-
             if(GetInputAge(vin) < MASTERNODE_MIN_CONFIRMATIONS) {
                 LogPrintf("CActiveMasternode::ManageStatus() - Input must have least %d confirmations - %d confirmations\n", MASTERNODE_MIN_CONFIRMATIONS, GetInputAge(vin));
                 status = MASTERNODE_INPUT_TOO_NEW;
@@ -102,7 +99,7 @@ void CActiveMasternode::ManageStatus() {
     }
 
     //send to all peers
-    if(!Dseep(errorMessage)) {
+    if (!Dseep(errorMessage)) {
     	LogPrintf("CActiveMasternode::ManageStatus() - Error on Ping: %s", errorMessage.c_str());
     }
 }

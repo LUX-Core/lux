@@ -18,6 +18,7 @@
 #include "timedata.h"
 #include "util.h"
 #include "utilmoneystr.h"
+#include "masternode.h"
 #ifdef ENABLE_WALLET
 #include "wallet.h"
 #endif
@@ -129,10 +130,9 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
 
     // Add our coinbase tx as first transaction
     pblock->vtx.push_back(txNew);
-    if (fProofOfStake && !stake->CreateBlockStake(pwallet, pblock)) {
+    if (fProofOfStake && !stake->CreateBlockStake(pwallet, pblock))
         return nullptr;
-    }
-
+    
     pblocktemplate->vTxFees.push_back(-1);   // updated at end
     pblocktemplate->vTxSigOps.push_back(-1); // updated at end
 
@@ -366,18 +366,37 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
         // Compute final coinbase transaction.
         pblock->nNonce = 0;
         pblock->hashPrevBlock = pindexPrev->GetBlockHash();
-        pblock->vtx[0].vin[0].scriptSig = CScript() << nHeight << OP_0;
-        if (!fProofOfStake) {
-            pblock->vtx[0].vout[0].nValue = GetProofOfWorkReward(nFees, pindexPrev->nHeight+1);
+        if (fProofOfStake) {
+#           if 0
+            if (!stake->CreateBlockStake(pwallet, pblock)) return nullptr;
+#           endif
+        } else {
+            auto &tx = pblock->vtx[0];
+            CScript payeeScript;
+            auto nReward = GetProofOfWorkReward(nFees, pindexPrev->nHeight+1);
+            if (SelectMasternodePayee(payeeScript)) {                
+                tx.vout.resize(2);
+                tx.vout[1].scriptPubKey = payeeScript;
+                tx.vout[1].nValue = (nReward / 5 / CENT) * CENT;
+                tx.vout[0].nValue = nReward - tx.vout[1].nValue;
+
+                CTxDestination txDest;
+                ExtractDestination(payeeScript, txDest);
+                CBitcoinAddress address(txDest);
+                LogPrintf("%s: Masternode payment to %s (pow)\n", __func__, address.ToString());
+            } else {
+                tx.vout[0].nValue = nReward;
+            }
             pblocktemplate->vTxFees[0] = -nFees;
             UpdateTime(pblock, pindexPrev);
         }
+        pblock->vtx[0].vin[0].scriptSig = CScript() << nHeight << OP_0;
         pblocktemplate->vTxSigOps[0] = GetLegacySigOpCount(pblock->vtx[0]);
 
         CValidationState state;
         if (!TestBlockValidity(state, *pblock, pindexPrev, false, false)) {
             if (!fProofOfStake) LogPrintf("%s: TestBlockValidity failed (%s)\n", __func__, ct);
-            return NULL;
+            return nullptr;
         }
     }
 

@@ -1412,13 +1412,11 @@ bool AppInit2(boost::thread_group& threadGroup)
         return InitError(strErrors.str());
 
     fMasterNode = GetBoolArg("-masternode", false);
-    if(fMasterNode) {
+    if (fMasterNode) {
         LogPrintf("IS DARKSEND MASTER NODE\n");
+        
         strMasterNodeAddr = GetArg("-masternodeaddr", "");
-
-        LogPrintf(" addr %s\n", strMasterNodeAddr.c_str());
-
-        if(!strMasterNodeAddr.empty()){
+        if (!strMasterNodeAddr.empty()) {
             CService addrTest = CService(strMasterNodeAddr);
             if (!addrTest.IsValid()) {
                 return InitError("Invalid -masternodeaddr address: " + strMasterNodeAddr);
@@ -1426,19 +1424,17 @@ bool AppInit2(boost::thread_group& threadGroup)
         }
 
         strMasterNodePrivKey = GetArg("-masternodeprivkey", "");
-        if(!strMasterNodePrivKey.empty()){
+        if (!strMasterNodePrivKey.empty()) {
             std::string errorMessage;
 
             CKey key;
             CPubKey pubkey;
 
-            if(!darkSendSigner.SetKey(strMasterNodePrivKey, errorMessage, key, pubkey))
-            {
+            if (!darkSendSigner.SetKey(strMasterNodePrivKey, errorMessage, key, pubkey)) {
                 return InitError(_("Invalid masternodeprivkey. Please see documenation."));
             }
 
             activeMasternode.pubKeyMasternode = pubkey;
-
         } else {
             return InitError(_("You must specify a masternodeprivkey in the configuration. Please see documentation for help."));
         }
@@ -1447,38 +1443,28 @@ bool AppInit2(boost::thread_group& threadGroup)
     fEnableLuxsend = GetBoolArg("-enabledarksend", false);
 
     nDarksendRounds = GetArg("-darksendrounds", 2);
-    if(nDarksendRounds > 16) nDarksendRounds = 16;
-    if(nDarksendRounds < 1) nDarksendRounds = 1;
+    if (nDarksendRounds > 16) nDarksendRounds = 16;
+    if (nDarksendRounds < 1) nDarksendRounds = 1;
 
     nLiquidityProvider = GetArg("-liquidityprovider", 0); //0-100
-    if(nLiquidityProvider != 0) {
+    if (nLiquidityProvider != 0) {
         darkSendPool.SetMinBlockSpacing(std::min(nLiquidityProvider,100)*15);
         fEnableLuxsend = true;
         nDarksendRounds = 99999;
     }
 
     nAnonymizeLuxAmount = GetArg("-anonymizeLuxamount", 0);
-    if(nAnonymizeLuxAmount > 999999) nAnonymizeLuxAmount = 999999;
-    if(nAnonymizeLuxAmount < 2) nAnonymizeLuxAmount = 2;
-/*
-    bool fEnableInstantX = GetBoolArg("-enableinstantx", true);
-    if(fEnableInstantX){
-        nInstantXDepth = GetArg("-instantxdepth", 5);
-        if(nInstantXDepth > 60) nInstantXDepth = 60;
-        if(nInstantXDepth < 0) nAnonymizeLuxAmount = 0;
-    } else {
-        nInstantXDepth = 0;
-    }
-*/
+    if (nAnonymizeLuxAmount > 999999) nAnonymizeLuxAmount = 999999;
+    if (nAnonymizeLuxAmount < 2) nAnonymizeLuxAmount = 2;
+
     //lite mode disables all Masternode and Luxsend related functionality
     fLiteMode = GetBoolArg("-litemode", false);
-    if(fMasterNode && fLiteMode){
+    if (fMasterNode && fLiteMode) {
         return InitError("You can not start a masternode in litemode");
     }
 
     LogPrintf("fLiteMode %d\n", fLiteMode);
-//    LogPrintf("nInstantXDepth %d\n", nInstantXDepth);
-    LogPrintf("Luxsend rounds %d\n", nDarksendRounds);
+    LogPrintf("LUX darksend rounds %d\n", nDarksendRounds);
     LogPrintf("Anonymize Lux Amount %d\n", nAnonymizeLuxAmount);
 
     /* Denominations

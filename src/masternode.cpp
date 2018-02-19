@@ -442,26 +442,25 @@ int GetCurrentMasterNode(int mod, int64_t nBlockHeight, int minProtocol)
     LOCK(cs_masternodes);
     // scan for winner
     BOOST_FOREACH(CMasterNode mn, vecMasternodes) {
-                    mn.Check();
-                    if(mn.protocolVersion < minProtocol) continue;
-                    if(!mn.IsEnabled()) {
-                        i++;
-                        continue;
-                    }
+        mn.Check();
+        if (mn.protocolVersion < minProtocol) continue;
+        if (!mn.IsEnabled()) {
+            i++;
+            continue;
+        }
 
-                    // calculate the score for each masternode
-                    uint256 n = mn.CalculateScore(mod, nBlockHeight);
-                    unsigned int n2 = 0;
-                    memcpy(&n2, &n, sizeof(n2));
+        // calculate the score for each masternode
+        uint256 n = mn.CalculateScore(mod, nBlockHeight);
+        unsigned int n2 = 0;
+        memcpy(&n2, &n, sizeof(n2));
 
-                    // determine the winner
-                    if(n2 > score){
-                        score = n2;
-                        winner = i;
-                    }
-                    i++;
-                }
-
+        // determine the winner
+        if (n2 > score) {
+            score = n2;
+            winner = i;
+        }
+        i++;
+    }
     return winner;
 }
 
@@ -849,4 +848,37 @@ bool CMasternodePayments::SetPrivKey(std::string strPrivKey)
     } else {
         return false;
     }
+}
+
+bool MasternodePaymentsEnabled()
+{
+    bool result = false;
+    if (Params().NetworkID()==CBaseChainParams::TESTNET || Params().NetworkID()==CBaseChainParams::REGTEST) {
+        if (GetTime() > START_MASTERNODE_PAYMENTS_TESTNET) {
+            result = true;
+        }
+    } else {
+        if (GetTime() > START_MASTERNODE_PAYMENTS) {
+            result = true;
+        }
+    }
+    return result;
+}
+
+bool SelectMasternodePayee(CScript &payeeScript)
+{
+    bool result = false;
+    if (MasternodePaymentsEnabled()) {
+        //spork
+        if (!masternodePayments.GetBlockPayee(chainActive.Tip()->nHeight+1, payeeScript)) {
+            int winningNode = GetCurrentMasterNode(1);
+            if (winningNode >= 0) {
+                payeeScript = GetScriptForDestination(vecMasternodes[winningNode].pubkey.GetID());
+                result = true;
+            } else {
+                LogPrintf("%s: Failed to detect masternode to pay\n", __func__);
+            }
+        }
+    }
+    return result;
 }
