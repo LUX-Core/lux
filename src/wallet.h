@@ -19,6 +19,7 @@
 #include "ui_interface.h"
 #include "util.h"
 #include "wallet_ismine.h"
+#include "validationinterface.h"
 #include "walletdb.h"
 
 #include <algorithm>
