@@ -6,7 +6,7 @@
 #define BITCOIN_ZMQ_ZMQCONFIG_H
 
 #if defined(HAVE_CONFIG_H)
-#include "config/pivx-config.h"
+#include "config/lux-config.h"
 #endif
 
 #include <stdarg.h>
@@ -19,6 +19,6 @@
 #include "primitives/block.h"
 #include "primitives/transaction.h"
 
-void zmqError(const char *str);
+void zmqError(const char* str);
 
 #endif // BITCOIN_ZMQ_ZMQCONFIG_H
