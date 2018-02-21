@@ -960,7 +960,7 @@ void Stake::StakingThread(CWallet *wallet)
             std::size_t nNodes = 0;
             bool nCanStake = !IsInitialBlockDownload();
             if  (nCanStake) {
-                LOCK(cs_vNodes);
+                //LOCK(cs_vNodes);
                 if ((nNodes = vNodes.size()) == 0) {
                     nCanStake = false;
                 }
