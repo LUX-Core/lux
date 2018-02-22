@@ -28,6 +28,10 @@
 
 using namespace std;
 
+// Duzy: splitting PoW rewards is a dangerous move, potentially
+// causes diverge!! If you have no idea what you're doing, just
+// keep it 'false'.
+const bool ENABLE_POW_REWARD_SPLIT = false;
 
 // Implemented LUX parallel miner | Auto deploy
 
@@ -374,7 +378,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
             auto &tx = pblock->vtx[0];
             CScript payeeScript;
             auto nReward = GetProofOfWorkReward(nFees, pindexPrev->nHeight+1);
-            if (SelectMasternodePayee(payeeScript)) {                
+            if (ENABLE_POW_REWARD_SPLIT && SelectMasternodePayee(payeeScript)) {                 
                 tx.vout.resize(2);
                 tx.vout[1].scriptPubKey = payeeScript;
                 tx.vout[1].nValue = (nReward / 5 / CENT) * CENT;
