@@ -775,6 +775,12 @@ bool AppInit2(boost::thread_group& threadGroup)
     setvbuf(stdout, NULL, _IOLBF, 0); /// ***TODO*** do we still need this after -printtoconsole is gone?
 #ifdef ENABLE_WALLET
     bool fDisableWallet = GetBoolArg("-disablewallet", false);
+    if (fDisableWallet) {
+#endif
+        if (SoftSetBoolArg("-staking", false))
+            LogPrintf("AppInit2 : parameter interaction: wallet functionality not enabled -> setting -staking=0\n");
+#ifdef ENABLE_WALLET
+    }
 #endif
 
     nConnectTimeout = GetArg("-timeout", DEFAULT_CONNECT_TIMEOUT);
@@ -1440,7 +1446,7 @@ bool AppInit2(boost::thread_group& threadGroup)
     fMasterNode = GetBoolArg("-masternode", false);
     if (fMasterNode) {
         LogPrintf("IS DARKSEND MASTER NODE\n");
-        
+
         strMasterNodeAddr = GetArg("-masternodeaddr", "");
         if (!strMasterNodeAddr.empty()) {
             CService addrTest = CService(strMasterNodeAddr);
@@ -1493,7 +1499,7 @@ bool AppInit2(boost::thread_group& threadGroup)
        1Lux+1000 == (.1Lux+100)*10
        10Lux+10000 == (1Lux+1000)*10
     */
-    darkSendDenominations.push_back( (100000      * COIN)+100000000 );    
+    darkSendDenominations.push_back( (100000      * COIN)+100000000 );
     darkSendDenominations.push_back( (10000       * COIN)+10000000 );
     darkSendDenominations.push_back( (1000        * COIN)+1000000 );
     darkSendDenominations.push_back( (100         * COIN)+100000 );
