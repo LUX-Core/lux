@@ -215,6 +215,7 @@ RES_ICONS = \
   qt/res/icons/lock_open.png \
   qt/res/icons/masternodes.png \
   qt/res/icons/overview.png \
+  qt/res/icons/smartcontract.png \
   qt/res/icons/qrcode.png \
   qt/res/icons/quit.png \
   qt/res/icons/receive.png \

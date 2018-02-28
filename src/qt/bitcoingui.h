@@ -91,6 +91,7 @@ private:
     QProgressDialog* progressDialog;
 
     QMenuBar* appMenuBar;
+    QAction* smartToken;
     QAction* overviewAction;
     QAction* historyAction;
     QAction* tradingAction;
@@ -204,6 +205,8 @@ private slots:
     void gotoBlockExplorerPage();
     /** Switch to masternode page */
     void gotoMasternodePage();
+    /** Switch to gotoSmartTokenPage*/
+    void gotoSmartTokenPage();
     /** Switch to receive coins page */
     void gotoReceiveCoinsPage();
     /** Switch to send coins page */

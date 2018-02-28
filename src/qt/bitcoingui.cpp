@@ -82,6 +82,7 @@ BitcoinGUI::BitcoinGUI(const NetworkStyle* networkStyle, QWidget* parent) : QMai
                                                                             historyAction(0),
                                                                             tradingAction(0),
                                                                             masternodeAction(0),
+                                                                            smartToken(0),
                                                                             quitAction(0),
                                                                             sendCoinsAction(0),
                                                                             usedSendingAddressesAction(0),
@@ -220,7 +221,7 @@ BitcoinGUI::BitcoinGUI(const NetworkStyle* networkStyle, QWidget* parent) : QMai
     // See https://qt-project.org/doc/qt-4.8/gallery.html
     QString curStyle = QApplication::style()->metaObject()->className();
     if (curStyle == "QWindowsStyle" || curStyle == "QWindowsXPStyle") {
-        
+
     }
 
     statusBar()->addWidget(progressBarLabel);
@@ -281,6 +282,9 @@ BitcoinGUI::~BitcoinGUI()
 void BitcoinGUI::createActions(const NetworkStyle* networkStyle)
 {
     QActionGroup* tabGroup = new QActionGroup(this);
+
+
+
 
     overviewAction = new QAction(QIcon(":/icons/overview"), tr("&Overview"), this);
     overviewAction->setStatusTip(tr("Show general overview of wallet"));
@@ -353,12 +357,28 @@ void BitcoinGUI::createActions(const NetworkStyle* networkStyle)
         tabGroup->addAction(masternodeAction);
         connect(masternodeAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
         connect(masternodeAction, SIGNAL(triggered()), this, SLOT(gotoMasternodePage()));
+
+
+    smartToken = new QAction(QIcon(":/icons/smartcontract"), tr("&Smart Contracts"), this);
+    smartToken->setStatusTip(tr("Add Smart token"));
+    smartToken->setToolTip(smartToken->statusTip());
+    smartToken->setCheckable(true);
+    #ifdef Q_OS_MAC
+        smartToken->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_1));
+    #else
+        smartToken->setShortcut(QKeySequence(Qt::ALT + Qt::Key_1));
+    #endif
+        tabGroup->addAction(smartToken);
+
     }
+
 
     // These showNormalIfMinimized are needed because Send Coins and Receive Coins
     // can be triggered from the tray menu, and need to show the GUI to be useful.
     connect(overviewAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
     connect(overviewAction, SIGNAL(triggered()), this, SLOT(gotoOverviewPage()));
+    connect(smartToken, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
+    connect(smartToken, SIGNAL(triggered()), this, SLOT(gotoOverviewPage()));
     connect(sendCoinsAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
     connect(sendCoinsAction, SIGNAL(triggered()), this, SLOT(gotoSendCoinsPage()));
     connect(receiveCoinsAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
@@ -535,13 +555,14 @@ void BitcoinGUI::createToolBars()
         if (settings.value("fShowMasternodesTab").toBool()) {
             toolbar->addAction(masternodeAction);
         }
+        toolbar->addAction(smartToken);
         toolbar->setMovable(false); // remove unused icon in upper left corner
         overviewAction->setChecked(true);
 
         /** Create additional container for toolbar and walletFrame and make it the central widget.
             This is a workaround mostly for toolbar styling on Mac OS but should work fine for every other OSes too.
         */
-		
+
         QVBoxLayout* layout = new QVBoxLayout;
         layout->addWidget(toolbar);
         layout->addWidget(walletFrame);
@@ -628,6 +649,7 @@ void BitcoinGUI::setWalletActionsEnabled(bool enabled)
     if (settings.value("fShowMasternodesTab").toBool()) {
         masternodeAction->setEnabled(enabled);
     }
+    smartToken->setEnabled(enabled);
     encryptWalletAction->setEnabled(enabled);
     backupWalletAction->setEnabled(enabled);
     changePassphraseAction->setEnabled(enabled);
@@ -745,6 +767,11 @@ void BitcoinGUI::openClicked()
 }
 
 void BitcoinGUI::gotoOverviewPage()
+{
+    overviewAction->setChecked(true);
+    if (walletFrame) walletFrame->gotoOverviewPage();
+}
+void BitcoinGUI::gotoSmartTokenPage()
 {
     overviewAction->setChecked(true);
     if (walletFrame) walletFrame->gotoOverviewPage();
