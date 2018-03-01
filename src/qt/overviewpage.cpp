@@ -127,25 +127,25 @@ OverviewPage::OverviewPage(QWidget* parent) : QWidget(parent),
 
     // init "out of sync" warning labels
     ui->labelWalletStatus->setText("(" + tr("out of sync") + ")");
-    ui->labelObfuscationSyncStatus->setText("(" + tr("out of sync") + ")");
+    ui->labelDarksendSyncStatus->setText("(" + tr("out of sync") + ")");
     ui->labelTransactionsStatus->setText("(" + tr("out of sync") + ")");
 
     if (fLiteMode) {
-        ui->frameObfuscation->setVisible(false);
+        ui->frameDarksend->setVisible(false);
     } else {
         if (fMasterNode) {
-            ui->toggleObfuscation->setText("(" + tr("Disabled") + ")");
-            ui->obfuscationAuto->setText("(" + tr("Disabled") + ")");
-            ui->obfuscationReset->setText("(" + tr("Disabled") + ")");
-            ui->frameObfuscation->setEnabled(false);
+            ui->toggleDarksend->setText("(" + tr("Disabled") + ")");
+            ui->darksendAuto->setText("(" + tr("Disabled") + ")");
+            ui->darksendReset->setText("(" + tr("Disabled") + ")");
+            ui->frameDarksend->setEnabled(false);
         } else {
-            if (!fEnableLuxsend) {
-                ui->toggleObfuscation->setText(tr("Start Luxsend"));
+            if (!fEnableDarksend) {
+                ui->toggleDarksend->setText(tr("Start Luxsend"));
             } else {
-                ui->toggleObfuscation->setText(tr("Stop Luxsend"));
+                ui->toggleDarksend->setText(tr("Stop Luxsend"));
             }
             timer = new QTimer(this);
-            connect(timer, SIGNAL(timeout()), this, SLOT(obfuscationStatus()));
+            connect(timer, SIGNAL(timeout()), this, SLOT(darksendStatus()));
             timer->start(1000);
         }
     }
@@ -162,7 +162,7 @@ void OverviewPage::handleTransactionClicked(const QModelIndex& index)
 
 OverviewPage::~OverviewPage()
 {
-    if (!fLiteMode && !fMasterNode) disconnect(timer, SIGNAL(timeout()), this, SLOT(obfuscationStatus()));
+    if (!fLiteMode && !fMasterNode) disconnect(timer, SIGNAL(timeout()), this, SLOT(darksendStatus()));
     delete ui;
 }
 
@@ -199,7 +199,7 @@ void OverviewPage::setBalance(const CAmount& balance, const CAmount& unconfirmed
     ui->labelImmatureText->setVisible(showImmature || showWatchOnlyImmature);
     ui->labelWatchImmature->setVisible(showWatchOnlyImmature); // show watch-only immature balance
 
-    updateObfuscationProgress();
+    updateDarksendProgress();
 
     static int cachedTxLocks = 0;
 
@@ -262,9 +262,9 @@ void OverviewPage::setWalletModel(WalletModel* model)
 
         connect(model->getOptionsModel(), SIGNAL(displayUnitChanged(int)), this, SLOT(updateDisplayUnit()));
 
-        connect(ui->obfuscationAuto, SIGNAL(clicked()), this, SLOT(obfuscationAuto()));
-        connect(ui->obfuscationReset, SIGNAL(clicked()), this, SLOT(obfuscationReset()));
-        connect(ui->toggleObfuscation, SIGNAL(clicked()), this, SLOT(toggleObfuscation()));
+        connect(ui->darksendAuto, SIGNAL(clicked()), this, SLOT(darksendAuto()));
+        connect(ui->darksendReset, SIGNAL(clicked()), this, SLOT(darksendReset()));
+        connect(ui->toggleDarksend, SIGNAL(clicked()), this, SLOT(toggleDarksend()));
         updateWatchOnlyLabels(model->haveWatchOnly());
         connect(model, SIGNAL(notifyWatchonlyChanged(bool)), this, SLOT(updateWatchOnlyLabels(bool)));
     }
@@ -297,11 +297,11 @@ void OverviewPage::updateAlerts(const QString& warnings)
 void OverviewPage::showOutOfSyncWarning(bool fShow)
 {
     ui->labelWalletStatus->setVisible(fShow);
-    ui->labelObfuscationSyncStatus->setVisible(fShow);
+    ui->labelDarksendSyncStatus->setVisible(fShow);
     ui->labelTransactionsStatus->setVisible(fShow);
 }
 
-void OverviewPage::updateObfuscationProgress()
+void OverviewPage::updateDarksendProgress()
 {
     if (!pwalletMain) return;
 
@@ -309,8 +309,8 @@ void OverviewPage::updateObfuscationProgress()
     QString strAnonymizeLuxAmount = BitcoinUnits::formatHtmlWithUnit(nDisplayUnit, nAnonymizeLuxAmount * COIN, false, BitcoinUnits::separatorAlways);
 
     if (currentBalance == 0) {
-        ui->obfuscationProgress->setValue(0);
-        ui->obfuscationProgress->setToolTip(tr("No inputs detected"));
+        ui->darksendProgress->setValue(0);
+        ui->darksendProgress->setToolTip(tr("No inputs detected"));
 
         // when balance is zero just show info from settings
         strAnonymizeLuxAmount = strAnonymizeLuxAmount.remove(strAnonymizeLuxAmount.indexOf("."), BitcoinUnits::decimals(nDisplayUnit) + 1);
@@ -396,7 +396,7 @@ void OverviewPage::updateObfuscationProgress()
     float progress = denomPartCalc + anonNormPartCalc + anonFullPartCalc;
     if (progress >= 100) progress = 100;
 
-    ui->obfuscationProgress->setValue(progress);
+    ui->darksendProgress->setValue(progress);
 
     QString strToolPip = ("<b>" + tr("Overall progress") + ": %1%</b><br/>" +
                           tr("Denominated") + ": %2%<br/>" +
@@ -408,10 +408,10 @@ void OverviewPage::updateObfuscationProgress()
                              .arg(anonNormPart)
                              .arg(anonFullPart)
                              .arg(nAverageAnonymizedRounds);
-    ui->obfuscationProgress->setToolTip(strToolPip);
+    ui->darksendProgress->setToolTip(strToolPip);
 }
 
-void OverviewPage::obfuscationStatus()
+void OverviewPage::darksendStatus()
 {
 #if 0
     static int64_t nLastDSProgressBlockTime = 0;
@@ -419,88 +419,88 @@ void OverviewPage::obfuscationStatus()
     int nBestHeight = chainActive.Tip()->nHeight;
 
     // we we're processing more then 1 block per second, we'll just leave
-    //if (((nBestHeight - obfuscationPool.cachedNumBlocks) / (GetTimeMillis() - nLastDSProgressBlockTime + 1) > 1)) return;
+    //if (((nBestHeight - darksendPool.cachedNumBlocks) / (GetTimeMillis() - nLastDSProgressBlockTime + 1) > 1)) return;
     nLastDSProgressBlockTime = GetTimeMillis();
 
-    if (!fEnableLuxsend) {
-        if (nBestHeight != obfuscationPool.cachedNumBlocks) {
-            obfuscationPool.cachedNumBlocks = nBestHeight;
-            updateObfuscationProgress();
+    if (!fEnableDarksend) {
+        if (nBestHeight != darksendPool.cachedNumBlocks) {
+            darksendPool.cachedNumBlocks = nBestHeight;
+            updateDarksendProgress();
 
-            ui->obfuscationEnabled->setText(tr("Disabled"));
-            ui->obfuscationStatus->setText("");
-            ui->toggleObfuscation->setText(tr("Start Obfuscation"));
+            ui->darksendEnabled->setText(tr("Disabled"));
+            ui->darksendStatus->setText("");
+            ui->toggleDarksend->setText(tr("Start Luxsend"));
         }
 
         return;
     }
 
-    // check obfuscation status and unlock if needed
-    if (nBestHeight != obfuscationPool.cachedNumBlocks) {
+    // check darksend status and unlock if needed
+    if (nBestHeight != darksendPool.cachedNumBlocks) {
         // Balance and number of transactions might have changed
-        obfuscationPool.cachedNumBlocks = nBestHeight;
-        updateObfuscationProgress();
+        darksendPool.cachedNumBlocks = nBestHeight;
+        updateDarksendProgress();
 
-        ui->obfuscationEnabled->setText(tr("Enabled"));
+        ui->darksendEnabled->setText(tr("Enabled"));
     }
 
-    QString strStatus = QString(obfuscationPool.GetStatus().c_str());
+    QString strStatus = QString(darksendPool.GetStatus().c_str());
 
-    QString s = tr("Last Obfuscation message:\n") + strStatus;
+    QString s = tr("Last Darksend message:\n") + strStatus;
 
-    if (s != ui->obfuscationStatus->text())
-        LogPrintf("Last Obfuscation message: %s\n", strStatus.toStdString());
+    if (s != ui->darksendStatus->text())
+        LogPrintf("Last Darksend message: %s\n", strStatus.toStdString());
 
-    ui->obfuscationStatus->setText(s);
+    ui->darksendStatus->setText(s);
 
-    if (obfuscationPool.sessionDenom == 0) {
+    if (darksendPool.sessionDenom == 0) {
         ui->labelSubmittedDenom->setText(tr("N/A"));
     } else {
         std::string out;
-        obfuscationPool.GetDenominationsToString(obfuscationPool.sessionDenom, out);
+        darksendPool.GetDenominationsToString(darksendPool.sessionDenom, out);
         QString s2(out.c_str());
         ui->labelSubmittedDenom->setText(s2);
     }
 #endif
 }
 
-void OverviewPage::obfuscationAuto()
+void OverviewPage::darksendAuto()
 {
 #if 0
-    obfuscationPool.DoAutomaticDenominating();
+    darksendPool.DoAutomaticDenominating();
 #endif
 }
 
-void OverviewPage::obfuscationReset()
+void OverviewPage::darksendReset()
 {
 #if 0
-    obfuscationPool.Reset();
+    darksendPool.Reset();
 
-    QMessageBox::warning(this, tr("Obfuscation"),
-        tr("Obfuscation was successfully reset."),
+    QMessageBox::warning(this, tr("Darksend"),
+        tr("Darksend was successfully reset."),
         QMessageBox::Ok, QMessageBox::Ok);
 #endif
 }
 
-void OverviewPage::toggleObfuscation()
+void OverviewPage::toggleDarksend()
 {
 #if 0
     QSettings settings;
     // Popup some information on first mixing
     QString hasMixed = settings.value("hasMixed").toString();
     if (hasMixed.isEmpty()) {
-        QMessageBox::information(this, tr("Obfuscation"),
-            tr("If you don't want to see internal Obfuscation fees/transactions select \"Most Common\" as Type on the \"Transactions\" tab."),
+        QMessageBox::information(this, tr("Darksend"),
+            tr("If you don't want to see internal Darksend fees/transactions select \"Most Common\" as Type on the \"Transactions\" tab."),
             QMessageBox::Ok, QMessageBox::Ok);
         settings.setValue("hasMixed", "hasMixed");
     }
-    if (!fEnableLuxsend) {
+    if (!fEnableDarksend) {
         int64_t balance = currentBalance;
         float minAmount = 14.90 * COIN;
         if (balance < minAmount) {
             QString strMinAmount(BitcoinUnits::formatWithUnit(nDisplayUnit, minAmount));
-            QMessageBox::warning(this, tr("Obfuscation"),
-                tr("Obfuscation requires at least %1 to use.").arg(strMinAmount),
+            QMessageBox::warning(this, tr("Darksend"),
+                tr("Darksend requires at least %1 to use.").arg(strMinAmount),
                 QMessageBox::Ok, QMessageBox::Ok);
             return;
         }
@@ -510,29 +510,29 @@ void OverviewPage::toggleObfuscation()
             WalletModel::UnlockContext ctx(walletModel->requestUnlock(false));
             if (!ctx.isValid()) {
                 //unlock was cancelled
-                obfuscationPool.cachedNumBlocks = std::numeric_limits<int>::max();
-                QMessageBox::warning(this, tr("Obfuscation"),
-                    tr("Wallet is locked and user declined to unlock. Disabling Obfuscation."),
+                darksendPool.cachedNumBlocks = std::numeric_limits<int>::max();
+                QMessageBox::warning(this, tr("Darksend"),
+                    tr("Wallet is locked and user declined to unlock. Disabling Darksend."),
                     QMessageBox::Ok, QMessageBox::Ok);
-                if (fDebug) LogPrintf("Wallet is locked and user declined to unlock. Disabling Obfuscation.\n");
+                if (fDebug) LogPrintf("Wallet is locked and user declined to unlock. Disabling Darksend.\n");
                 return;
             }
         }
     }
 
-    fEnableLuxsend = !fEnableLuxsend;
-    obfuscationPool.cachedNumBlocks = std::numeric_limits<int>::max();
+    fEnableDarksend = !fEnableDarksend;
+    darksendPool.cachedNumBlocks = std::numeric_limits<int>::max();
 
-    if (!fEnableLuxsend) {
-        ui->toggleObfuscation->setText(tr("Start Obfuscation"));
-        obfuscationPool.UnlockCoins();
+    if (!fEnableDarksend) {
+        ui->toggleDarksend->setText(tr("Start Luxsend"));
+        darksendPool.UnlockCoins();
     } else {
-        ui->toggleObfuscation->setText(tr("Stop Obfuscation"));
+        ui->toggleDarksend->setText(tr("Stop Luxsend"));
 
-        /* show obfuscation configuration if client has defaults set */
+        /* show darksend configuration if client has defaults set */
 
         if (nAnonymizeLuxAmount == 0) {
-            ObfuscationConfig dlg(this);
+            DarksendConfig dlg(this);
             dlg.setModel(walletModel);
             dlg.exec();
         }

@@ -1045,7 +1045,7 @@ Adresse: %4</translation>
     </message>
     </context>
 <context>
-    <name>ObfuscationConfig</name>
+    <name>DarksendConfig</name>
     </context>
 <context>
     <name>OpenURIDialog</name>
@@ -1124,7 +1124,7 @@ Adresse: %4</translation>
         <translation>Status:</translation>
     </message>
     <message>
-        <source>Obfuscation Balance:</source>
+        <source>Darksend Balance:</source>
         <translation>Verschleierter Betrag:</translation>
     </message>
     <message>
@@ -1136,7 +1136,7 @@ Adresse: %4</translation>
         <translation>Aktiviert/Deaktiviert</translation>
     </message>
     <message>
-        <source>Obfuscation</source>
+        <source>Darksend</source>
         <translation>Verschleierung</translation>
     </message>
     <message>
@@ -1216,7 +1216,7 @@ Adresse: %4</translation>
         <translation><numerusform>Gestückelte Inputs haben im Durchschnitt %5 von %n Runde</numerusform><numerusform>Gestückelte Inputs haben im Durchschnitt %5 von %n Runden</numerusform></translation>
     </message>
     <message>
-        <source>Wallet is locked and user declined to unlock. Disabling Obfuscation.</source>
+        <source>Wallet is locked and user declined to unlock. Disabling Darksend.</source>
         <translation>Wallet ist gesperrt und der Benutzer verweigert die Entsperrung. Verschleierung deaktiviert.</translation>
     </message>
     <message>
@@ -1224,11 +1224,11 @@ Adresse: %4</translation>
         <translation>Genug kompatible Inputs zum Anonymisieren von %1 gefunden</translation>
     </message>
     <message>
-        <source>Start Obfuscation</source>
+        <source>Start Luxsend</source>
         <translation>Verschleierung starten</translation>
     </message>
     <message>
-        <source>Stop Obfuscation</source>
+        <source>Stop Luxsend</source>
         <translation>Verschleierung stoppen</translation>
     </message>
     <message>
@@ -1551,7 +1551,7 @@ Adresse: %4</translation>
         <translation>Minimieren</translation>
     </message>
     <message>
-        <source>Obfuscation</source>
+        <source>Darksend</source>
         <translation>Verschleierung</translation>
     </message>
     <message>
@@ -2039,23 +2039,23 @@ Adresse: %4</translation>
         <translation>Empfangen von</translation>
     </message>
     <message>
-        <source>Received via Obfuscation</source>
+        <source>Received via Darksend</source>
         <translation>über/durch Verschleierung empfangen</translation>
     </message>
     <message>
-        <source>Obfuscation Denominate</source>
+        <source>Darksend Denominate</source>
         <translation>Stückelung der Verschleierung</translation>
     </message>
     <message>
-        <source>Obfuscation Collateral Payment</source>
+        <source>Darksend Collateral Payment</source>
         <translation>Sicherheitspfandzahlung für Verschleierung</translation>
     </message>
     <message>
-        <source>Obfuscation Make Collateral Inputs</source>
+        <source>Darksend Make Collateral Inputs</source>
         <translation>Verschleierung Erzeugung des Sicherheitspfand</translation>
     </message>
     <message>
-        <source>Obfuscation Create Denominations</source>
+        <source>Darksend Create Denominations</source>
         <translation>Verschleierung Erzeugung der Stückelung</translation>
     </message>
     <message>
@@ -2075,7 +2075,7 @@ Adresse: %4</translation>
         <translation>Erarbeitet</translation>
     </message>
     <message>
-        <source>Obfuscated</source>
+        <source>Darksend</source>
         <translation>Verschleiert</translation>
     </message>
     <message>
@@ -2154,23 +2154,23 @@ Adresse: %4</translation>
         <translation>Überwiesen an</translation>
     </message>
     <message>
-        <source>Obfuscated</source>
+        <source>Darksend</source>
         <translation>Verschleiert</translation>
     </message>
     <message>
-        <source>Obfuscation Make Collateral Inputs</source>
+        <source>Darksend Make Collateral Inputs</source>
         <translation>Verschleierung Erzeugung des Sicherheitspfand</translation>
     </message>
     <message>
-        <source>Obfuscation Create Denominations</source>
+        <source>Darksend Create Denominations</source>
         <translation>Verschleierung Erzeugung der Stückelung</translation>
     </message>
     <message>
-        <source>Obfuscation Denominate</source>
+        <source>Darksend Denominate</source>
         <translation>Stückelung der Verschleierung</translation>
     </message>
     <message>
-        <source>Obfuscation Collateral Payment</source>
+        <source>Darksend Collateral Payment</source>
         <translation>Sicherheitspfandzahlung für Verschleierung</translation>
     </message>
     <message>
@@ -2481,7 +2481,7 @@ Adresse: %4</translation>
         <translation>Benutzername für JSON-RPC-Verbindungen</translation>
     </message>
     <message>
-        <source>Value more than Obfuscation pool maximum allows.</source>
+        <source>Value more than Darksend pool maximum allows.</source>
         <translation>Wert höher als der vom Verschleierungspool maximal erlaubte.</translation>
     </message>
     <message>

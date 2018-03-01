@@ -1,5 +1,5 @@
-#include "obfuscationconfig.h"
-#include "ui_obfuscationconfig.h"
+#include "darksendconfig.h"
+#include "ui_darksendconfig.h"
 
 #include "bitcoinunits.h"
 #include "guiconstants.h"
@@ -12,8 +12,8 @@
 #include <QPushButton>
 #include <QSettings>
 
-ObfuscationConfig::ObfuscationConfig(QWidget* parent) : QDialog(parent),
-                                                        ui(new Ui::ObfuscationConfig),
+DarksendConfig::DarksendConfig(QWidget* parent) : QDialog(parent),
+                                                        ui(new Ui::DarksendConfig),
                                                         model(0)
 {
     ui->setupUi(this);
@@ -23,59 +23,59 @@ ObfuscationConfig::ObfuscationConfig(QWidget* parent) : QDialog(parent),
     connect(ui->buttonMax, SIGNAL(clicked()), this, SLOT(clickMax()));
 }
 
-ObfuscationConfig::~ObfuscationConfig()
+DarksendConfig::~DarksendConfig()
 {
     delete ui;
 }
 
-void ObfuscationConfig::setModel(WalletModel* model)
+void DarksendConfig::setModel(WalletModel* model)
 {
     this->model = model;
 }
 
-void ObfuscationConfig::clickBasic()
+void DarksendConfig::clickBasic()
 {
     configure(true, 1000, 2);
 
     QString strAmount(BitcoinUnits::formatWithUnit(
         model->getOptionsModel()->getDisplayUnit(), 1000 * COIN));
-    QMessageBox::information(this, tr("Obfuscation Configuration"),
+    QMessageBox::information(this, tr("Darksend Configuration"),
         tr(
-            "Obfuscation was successfully set to basic (%1 and 2 rounds). You can change this at any time by opening LUX's configuration screen.")
+            "Darksend was successfully set to basic (%1 and 2 rounds). You can change this at any time by opening LUX's configuration screen.")
             .arg(strAmount));
 
     close();
 }
 
-void ObfuscationConfig::clickHigh()
+void DarksendConfig::clickHigh()
 {
     configure(true, 1000, 8);
 
     QString strAmount(BitcoinUnits::formatWithUnit(
         model->getOptionsModel()->getDisplayUnit(), 1000 * COIN));
-    QMessageBox::information(this, tr("Obfuscation Configuration"),
+    QMessageBox::information(this, tr("Darksend Configuration"),
         tr(
-            "Obfuscation was successfully set to high (%1 and 8 rounds). You can change this at any time by opening LUX's configuration screen.")
+            "Darksend was successfully set to high (%1 and 8 rounds). You can change this at any time by opening LUX's configuration screen.")
             .arg(strAmount));
 
     close();
 }
 
-void ObfuscationConfig::clickMax()
+void DarksendConfig::clickMax()
 {
     configure(true, 1000, 16);
 
     QString strAmount(BitcoinUnits::formatWithUnit(
         model->getOptionsModel()->getDisplayUnit(), 1000 * COIN));
-    QMessageBox::information(this, tr("Obfuscation Configuration"),
+    QMessageBox::information(this, tr("Darksend Configuration"),
         tr(
-            "Obfuscation was successfully set to maximum (%1 and 16 rounds). You can change this at any time by opening LUX's configuration screen.")
+            "Darksend was successfully set to maximum (%1 and 16 rounds). You can change this at any time by opening LUX's configuration screen.")
             .arg(strAmount));
 
     close();
 }
 
-void ObfuscationConfig::configure(bool enabled, int coins, int rounds)
+void DarksendConfig::configure(bool enabled, int coins, int rounds)
 {
     QSettings settings;
 

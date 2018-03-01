@@ -90,7 +90,7 @@ public:
     virtual const Checkpoints::CCheckpointData& Checkpoints() const = 0;
     int PoolMaxTransactions() const { return nPoolMaxTransactions; }
     std::string SporkKey() const { return strSporkKey; }
-    std::string ObfuscationPoolDummyAddress() const { return strObfuscationPoolDummyAddress; }
+    std::string DarksendPoolDummyAddress() const { return strDarksendPoolDummyAddress; }
     int64_t StartMasternodePayments() const { return nStartMasternodePayments; }
     int64_t StakingRoundPeriod() const { return nStakingRoundPeriod; }
     int64_t StakingInterval() const { return nStakingInterval; }
@@ -135,7 +135,7 @@ protected:
     bool fHeadersFirstSyncingActive;
     int nPoolMaxTransactions;
     std::string strSporkKey;
-    std::string strObfuscationPoolDummyAddress;
+    std::string strDarksendPoolDummyAddress;
     int64_t nStartMasternodePayments;
     int64_t nStakingRoundPeriod;
     int64_t nStakingInterval;

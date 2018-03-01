@@ -1279,7 +1279,7 @@ Address: %4
     </message>
     <message>
         <location line="+196"/>
-        <source>Non-anonymized input selected. &lt;b&gt;Obfuscation will be disabled.&lt;/b&gt;&lt;br&gt;&lt;br&gt;If you still want to use Obfuscation, please deselect all non-nonymized inputs first and then check Obfuscation checkbox again.</source>
+        <source>Non-anonymized input selected. &lt;b&gt;Darksend will be disabled.&lt;/b&gt;&lt;br&gt;&lt;br&gt;If you still want to use Darksend, please deselect all non-nonymized inputs first and then check Darksend checkbox again.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1947,10 +1947,10 @@ Please check the address and try again.</source>
     </message>
 </context>
 <context>
-    <name>ObfuscationConfig</name>
+    <name>DarksendConfig</name>
     <message>
-        <location filename="../forms/obfuscationconfig.ui" line="+14"/>
-        <source>Configure Obfuscation</source>
+        <location filename="../forms/darksendconfig.ui" line="+14"/>
+        <source>Configure Darksend</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2009,25 +2009,25 @@ Please check the address and try again.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../obfuscationconfig.cpp" line="+42"/>
+        <location filename="../darksendconfig.cpp" line="+42"/>
         <location line="+14"/>
         <location line="+14"/>
-        <source>Obfuscation Configuration</source>
+        <source>Darksend Configuration</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-27"/>
-        <source>Obfuscation was successfully set to basic (%1 and 2 rounds). You can change this at any time by opening LUX&apos;s configuration screen.</source>
+        <source>Darksend was successfully set to basic (%1 and 2 rounds). You can change this at any time by opening LUX&apos;s configuration screen.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+14"/>
-        <source>Obfuscation was successfully set to high (%1 and 8 rounds). You can change this at any time by opening LUX&apos;s configuration screen.</source>
+        <source>Darksend was successfully set to high (%1 and 8 rounds). You can change this at any time by opening LUX&apos;s configuration screen.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+14"/>
-        <source>Obfuscation was successfully set to maximum (%1 and 16 rounds). You can change this at any time by opening LUX&apos;s configuration screen.</source>
+        <source>Darksend was successfully set to maximum (%1 and 16 rounds). You can change this at any time by opening LUX&apos;s configuration screen.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2143,12 +2143,12 @@ Please check the address and try again.</source>
     </message>
     <message>
         <location line="+3"/>
-        <source>Obfuscation rounds to use</source>
+        <source>Darksend rounds to use</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+24"/>
-        <source>This amount acts as a threshold to turn off Obfuscation once it&apos;s reached.</source>
+        <source>This amount acts as a threshold to turn off Darksend once it&apos;s reached.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2451,7 +2451,7 @@ https://www.transifex.com/lux-project/lux-project-translations</source>
     </message>
     <message>
         <location line="+27"/>
-        <source>Obfuscation Balance:</source>
+        <source>Darksend Balance:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2466,12 +2466,12 @@ https://www.transifex.com/lux-project/lux-project-translations</source>
     </message>
     <message>
         <location line="+516"/>
-        <source>Try to manually submit a Obfuscation request.</source>
+        <source>Try to manually submit a Darksend request.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+22"/>
-        <source>Reset the current status of Obfuscation (can interrupt Obfuscation if it&apos;s in the process of Mixing, which can cost you money!)</source>
+        <source>Reset the current status of Darksend (can interrupt Darksend if it&apos;s in the process of Mixing, which can cost you money!)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2480,7 +2480,7 @@ https://www.transifex.com/lux-project/lux-project-translations</source>
         <location line="+11"/>
         <location line="+10"/>
         <location line="+12"/>
-        <source>Obfuscation</source>
+        <source>Darksend</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2594,28 +2594,28 @@ https://www.transifex.com/lux-project/lux-project-translations</source>
     </message>
     <message>
         <location line="+44"/>
-        <source>Last Obfuscation message:
+        <source>Last Darksend message:
 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+27"/>
-        <source>Obfuscation was successfully reset.</source>
+        <source>Darksend was successfully reset.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+11"/>
-        <source>If you don&apos;t want to see internal Obfuscation fees/transactions select &quot;Most Common&quot; as Type on the &quot;Transactions&quot; tab.</source>
+        <source>If you don&apos;t want to see internal Darksend fees/transactions select &quot;Most Common&quot; as Type on the &quot;Transactions&quot; tab.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+10"/>
-        <source>Obfuscation requires at least %1 to use.</source>
+        <source>Darksend requires at least %1 to use.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+12"/>
-        <source>Wallet is locked and user declined to unlock. Disabling Obfuscation.</source>
+        <source>Wallet is locked and user declined to unlock. Disabling Darksend.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2627,13 +2627,13 @@ https://www.transifex.com/lux-project/lux-project-translations</source>
         <location line="-208"/>
         <location line="+291"/>
         <location line="+89"/>
-        <source>Start Obfuscation</source>
+        <source>Start Luxsend</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-378"/>
         <location line="+381"/>
-        <source>Stop Obfuscation</source>
+        <source>Stop Luxsend</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3622,7 +3622,7 @@ https://www.transifex.com/lux-project/lux-project-translations</source>
     </message>
     <message>
         <location line="+579"/>
-        <source>Obfuscation</source>
+        <source>Darksend</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3862,7 +3862,7 @@ https://www.transifex.com/lux-project/lux-project-translations</source>
     </message>
     <message>
         <location line="-341"/>
-        <source>(obfuscation requires this amount to be rounded up to the nearest %1).</source>
+        <source>(darksend requires this amount to be rounded up to the nearest %1).</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4616,27 +4616,27 @@ https://www.transifex.com/lux-project/lux-project-translations</source>
     </message>
     <message>
         <location line="+2"/>
-        <source>Received via Obfuscation</source>
+        <source>Received via Darksend</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+11"/>
-        <source>Obfuscation Denominate</source>
+        <source>Darksend Denominate</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
-        <source>Obfuscation Collateral Payment</source>
+        <source>Darksend Collateral Payment</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
-        <source>Obfuscation Make Collateral Inputs</source>
+        <source>Darksend Make Collateral Inputs</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
-        <source>Obfuscation Create Denominations</source>
+        <source>Darksend Create Denominations</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4666,8 +4666,8 @@ https://www.transifex.com/lux-project/lux-project-translations</source>
     </message>
     <message>
         <location line="+10"/>
-        <source>Obfuscated</source>
-        <translation>Obfuscated</translation>
+        <source>Darksend</source>
+        <translation>Darksend</translation>
     </message>
     <message>
         <location line="+31"/>
@@ -4765,27 +4765,27 @@ https://www.transifex.com/lux-project/lux-project-translations</source>
     </message>
     <message>
         <location line="+1"/>
-        <source>Obfuscated</source>
-        <translation>Obfuscated</translation>
+        <source>Darksend</source>
+        <translation>Darksend</translation>
     </message>
     <message>
         <location line="+1"/>
-        <source>Obfuscation Make Collateral Inputs</source>
+        <source>Darksend Make Collateral Inputs</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
-        <source>Obfuscation Create Denominations</source>
+        <source>Darksend Create Denominations</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
-        <source>Obfuscation Denominate</source>
+        <source>Darksend Denominate</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
-        <source>Obfuscation Collateral Payment</source>
+        <source>Darksend Collateral Payment</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5068,7 +5068,7 @@ https://www.transifex.com/lux-project/lux-project-translations</source>
     </message>
     <message>
         <location line="+3"/>
-        <source>Disable all LUX specific functionality (Masternodes, Obfuscation, SwiftTX, Budgeting) (0-1, default: %u)</source>
+        <source>Disable all LUX specific functionality (Masternodes, Darksend, SwiftTX, Budgeting) (0-1, default: %u)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5083,7 +5083,7 @@ https://www.transifex.com/lux-project/lux-project-translations</source>
     </message>
     <message>
         <location line="+3"/>
-        <source>Enable use of automated obfuscation for funds stored in this wallet (0-1, default: %u)</source>
+        <source>Enable use of automated darksend for funds stored in this wallet (0-1, default: %u)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5183,7 +5183,7 @@ https://www.transifex.com/lux-project/lux-project-translations</source>
     </message>
     <message>
         <location line="+2"/>
-        <source>Obfuscation uses exact denominated amounts to send funds, you might simply need to anonymize some more coins.</source>
+        <source>Darksend uses exact denominated amounts to send funds, you might simply need to anonymize some more coins.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5193,7 +5193,7 @@ https://www.transifex.com/lux-project/lux-project-translations</source>
     </message>
     <message>
         <location line="+2"/>
-        <source>Provide liquidity to Obfuscation by infrequently mixing coins on a continual basis (0-100, default: %u, 1=very frequent, high fees, 100=very infrequent, low fees)</source>
+        <source>Provide liquidity to Darksend by infrequently mixing coins on a continual basis (0-100, default: %u, 1=very frequent, high fees, 100=very infrequent, low fees)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5268,12 +5268,12 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <location line="+2"/>
-        <source>Unable to locate enough Obfuscation denominated funds for this transaction.</source>
+        <source>Unable to locate enough Darksend denominated funds for this transaction.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
-        <source>Unable to locate enough Obfuscation non-denominated funds for this transaction that are not equal 10000 LUX.</source>
+        <source>Unable to locate enough Darksend non-denominated funds for this transaction that are not equal 10000 LUX.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5630,7 +5630,7 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <location line="+1"/>
-        <source>Error: You already have pending entries in the Obfuscation pool</source>
+        <source>Error: You already have pending entries in the Darksend pool</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5810,12 +5810,12 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <location line="+1"/>
-        <source>Last Obfuscation was too recent.</source>
+        <source>Last Darksend was too recent.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
-        <source>Last successful Obfuscation action was too recent.</source>
+        <source>Last successful Darksend action was too recent.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5980,22 +5980,22 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <location line="+1"/>
-        <source>Obfuscation is idle.</source>
+        <source>Darksend is idle.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
-        <source>Obfuscation options:</source>
+        <source>Darksend options:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
-        <source>Obfuscation request complete:</source>
+        <source>Darksend request complete:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
-        <source>Obfuscation request incomplete:</source>
+        <source>Darksend request incomplete:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6400,7 +6400,7 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <location line="+1"/>
-        <source>Value more than Obfuscation pool maximum allows.</source>
+        <source>Value more than Darksend pool maximum allows.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

@@ -5216,7 +5216,7 @@ static bool ProcessMessage(CNode* pfrom, const string &strCommand, CDataStream& 
     else {
         bool processed = false;
 #       if 0
-        if (!processed) obfuscationPool.ProcessMessage(pfrom, strCommand, vRecv, processed);
+        if (!processed) darksendPool.ProcessMessage(pfrom, strCommand, vRecv, processed);
         if (!processed) mnodeman.ProcessMessage(pfrom, strCommand, vRecv, processed);
         if (!processed) budget.ProcessMessage(pfrom, strCommand, vRecv, processed);
         if (!processed) masternodePayments.ProcessMessage(pfrom, strCommand, vRecv, processed);
@@ -5224,7 +5224,7 @@ static bool ProcessMessage(CNode* pfrom, const string &strCommand, CDataStream& 
         if (!processed) ProcessSpork(pfrom, strCommand, vRecv, processed);
         if (!processed) masternodeSync.ProcessMessage(pfrom, strCommand, vRecv, processed);
 #       else
-        if (!processed) ProcessLuxsend(pfrom, strCommand, vRecv, processed);
+        if (!processed) ProcessDarksend(pfrom, strCommand, vRecv, processed);
         if (!processed) ProcessMasternode(pfrom, strCommand, vRecv, processed);
         if (!processed) ProcessInstantX(pfrom, strCommand, vRecv, processed);
         if (!processed) ProcessSpork(pfrom, strCommand, vRecv, processed);

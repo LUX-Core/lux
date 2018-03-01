@@ -15,8 +15,8 @@ class CDarkSendPool;
 class CDarkSendSigner;
 class CMasterNodeVote;
 class CBitcoinAddress;
-class CLuxsendQueue;
-class CLuxsendBroadcastTx;
+class CDarksendQueue;
+class CDarksendBroadcastTx;
 class CActiveMasternode;
 
 #define POOL_MAX_TRANSACTIONS                  3 // wait for X transactions to merge and publish
@@ -40,16 +40,16 @@ class CActiveMasternode;
 
 extern CDarkSendPool darkSendPool;
 extern CDarkSendSigner darkSendSigner;
-extern std::vector<CLuxsendQueue> vecLuxsendQueue;
+extern std::vector<CDarksendQueue> vecDarksendQueue;
 extern std::string strMasterNodePrivKey;
-extern map<uint256, CLuxsendBroadcastTx> mapLuxsendBroadcastTxes;
+extern map<uint256, CDarksendBroadcastTx> mapDarksendBroadcastTxes;
 extern CActiveMasternode activeMasternode;
 
-//specific messages for the Luxsend protocol
-void ProcessLuxsend(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv, bool &isLuxsend);
+//specific messages for the Darksend protocol
+void ProcessDarksend(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv, bool &isDarksend);
 
 // get the darksend chain depth for a given input
-int GetInputLuxsendRounds(CTxIn in, int rounds=0);
+int GetInputDarksendRounds(CTxIn in, int rounds=0);
 
 
 // An input in the darksend pool
@@ -128,7 +128,7 @@ public:
 //
 // A currently inprogress darksend merge and denomination information
 //
-class CLuxsendQueue
+class CDarksendQueue
 {
 public:
     CTxIn vin;
@@ -137,7 +137,7 @@ public:
     bool ready; //ready for submit
     std::vector<unsigned char> vchSig;
 
-    CLuxsendQueue()
+    CDarksendQueue()
     {
         nDenom = 0;
         vin = CTxIn();
@@ -192,7 +192,7 @@ public:
 };
 
 // store darksend tx signature information
-class CLuxsendBroadcastTx
+class CDarksendBroadcastTx
 {
 public:
     CTransaction tx;
@@ -213,7 +213,7 @@ public:
     bool VerifyMessage(CPubKey pubkey, std::vector<unsigned char>& vchSig, std::string strMessage, std::string& errorMessage);
 };
 
-class CLuxsendSession
+class CDarksendSession
 {
 
 };
@@ -373,12 +373,12 @@ public:
     // Is this amount compatible with other client in the pool?
     bool IsCompatibleWithSession(int64_t nAmount, CTransaction txCollateral, std::string& strReason);
 
-    // Passively run Luxsend in the background according to the configuration in settings (only for QT)
+    // Passively run Darksend in the background according to the configuration in settings (only for QT)
     bool DoAutomaticDenominating(bool fDryRun=false, bool ready=false);
-    bool PrepareLuxsendDenominate();
+    bool PrepareDarksendDenominate();
 
 
-    // check for process in Luxsend
+    // check for process in Darksend
     void Check();
     // charge fees to bad actors
     void ChargeFees();
@@ -396,7 +396,7 @@ public:
     // are all inputs signed?
     bool SignaturesComplete();
     // as a client, send a transaction to a masternode to start the denomination process
-    void SendLuxsendDenominate(std::vector<CTxIn>& vin, std::vector<CTxOut>& vout, int64_t amount);
+    void SendDarksendDenominate(std::vector<CTxIn>& vin, std::vector<CTxOut>& vout, int64_t amount);
     // get masternode updates about the progress of darksend
     bool StatusUpdate(int newState, int newEntriesCount, int newAccepted, std::string& error, int newSessionID=0);
 

@@ -61,27 +61,27 @@ SendCoinsDialog::SendCoinsDialog(QWidget* parent) : QDialog(parent),
 
     // LUX specific
     QSettings settings;
-    if (!settings.contains("bUseObfuscation"))
-        settings.setValue("bUseObfuscation", false);
+    if (!settings.contains("bUseDarksend"))
+        settings.setValue("bUseDarksend", false);
     if (!settings.contains("bUseSwiftTX"))
         settings.setValue("bUseSwiftTX", false);
 
-    bool useObfuscation = settings.value("bUseObfuscation").toBool();
+    bool useDarksend = settings.value("bUseDarksend").toBool();
     bool useSwiftTX = settings.value("bUseSwiftTX").toBool();
     if (fLiteMode) {
-        ui->checkUseObfuscation->setChecked(false);
-        ui->checkUseObfuscation->setVisible(false);
+        ui->checkUseDarksend->setChecked(false);
+        ui->checkUseDarksend->setVisible(false);
         ui->checkSwiftTX->setVisible(false);
-        CoinControlDialog::coinControl->useObfuscation = false;
+        CoinControlDialog::coinControl->useDarksend = false;
         CoinControlDialog::coinControl->useSwiftTX = false;
     } else {
-        ui->checkUseObfuscation->setChecked(useObfuscation);
+        ui->checkUseDarksend->setChecked(useDarksend);
         ui->checkSwiftTX->setChecked(useSwiftTX);
-        CoinControlDialog::coinControl->useObfuscation = useObfuscation;
+        CoinControlDialog::coinControl->useDarksend = useDarksend;
         CoinControlDialog::coinControl->useSwiftTX = useSwiftTX;
     }
 
-    connect(ui->checkUseObfuscation, SIGNAL(stateChanged(int)), this, SLOT(updateDisplayUnit()));
+    connect(ui->checkUseDarksend, SIGNAL(stateChanged(int)), this, SLOT(updateDisplayUnit()));
     connect(ui->checkSwiftTX, SIGNAL(stateChanged(int)), this, SLOT(updateSwiftTX()));
 
     // Coin Control: clipboard actions
@@ -269,14 +269,14 @@ void SendCoinsDialog::on_sendButton_clicked()
     QString strFee = "";
     recipients[0].inputType = ONLY_DENOMINATED;
 
-    if (ui->checkUseObfuscation->isChecked()) {
+    if (ui->checkUseDarksend->isChecked()) {
         recipients[0].inputType = ONLY_DENOMINATED;
         strFunds = tr("using") + " <b>" + tr("anonymous funds") + "</b>";
         QString strNearestAmount(
             BitcoinUnits::formatWithUnit(
                 model->getOptionsModel()->getDisplayUnit(), 0.1 * COIN));
         strFee = QString(tr(
-            "(obfuscation requires this amount to be rounded up to the nearest %1).")
+            "(darksend requires this amount to be rounded up to the nearest %1).")
                              .arg(strNearestAmount));
     } else {
         recipients[0].inputType = ALL_COINS;
@@ -572,8 +572,8 @@ void SendCoinsDialog::setBalance(const CAmount& balance, const CAmount& unconfir
     if (model && model->getOptionsModel()) {
         uint64_t bal = 0;
         QSettings settings;
-        settings.setValue("bUseObfuscation", ui->checkUseObfuscation->isChecked());
-        if (ui->checkUseObfuscation->isChecked()) {
+        settings.setValue("bUseDarksend", ui->checkUseDarksend->isChecked());
+        if (ui->checkUseDarksend->isChecked()) {
             bal = anonymizedBalance;
         } else {
             bal = balance;
@@ -590,7 +590,7 @@ void SendCoinsDialog::updateDisplayUnit()
 
     setBalance(model->getBalance(), model->getUnconfirmedBalance(), model->getImmatureBalance(), model->getAnonymizedBalance(),
         model->getWatchBalance(), model->getWatchUnconfirmedBalance(), model->getWatchImmatureBalance());
-    CoinControlDialog::coinControl->useObfuscation = ui->checkUseObfuscation->isChecked();
+    CoinControlDialog::coinControl->useDarksend = ui->checkUseDarksend->isChecked();
     coinControlUpdateLabels();
     ui->customFee->setDisplayUnit(model->getOptionsModel()->getDisplayUnit());
     updateMinFeeLabel();
@@ -943,7 +943,7 @@ void SendCoinsDialog::coinControlUpdateLabels()
             CoinControlDialog::payAmounts.append(entry->getValue().amount);
     }
 
-    ui->checkUseObfuscation->setChecked(CoinControlDialog::coinControl->useObfuscation);
+    ui->checkUseDarksend->setChecked(CoinControlDialog::coinControl->useDarksend);
 
     if (CoinControlDialog::coinControl->HasSelected()) {
         // actual coin control calculation

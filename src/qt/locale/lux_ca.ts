@@ -490,9 +490,9 @@
     </message>
     </context>
 <context>
-    <name>ObfuscationConfig</name>
+    <name>DarksendConfig</name>
     <message>
-        <source>Configure Obfuscation</source>
+        <source>Configure Darksend</source>
         <translation>Configurar Ofuscació</translation>
     </message>
     </context>
@@ -537,7 +537,7 @@
         <translation>Estat:</translation>
     </message>
     <message>
-        <source>Obfuscation</source>
+        <source>Darksend</source>
         <translation>Ofuscació</translation>
     </message>
     <message>
@@ -549,11 +549,11 @@
         <translation>Desactivat</translation>
     </message>
     <message>
-        <source>Start Obfuscation</source>
+        <source>Start Luxsend</source>
         <translation>Iniciar Ofuscació</translation>
     </message>
     <message>
-        <source>Stop Obfuscation</source>
+        <source>Stop Luxsend</source>
         <translation>Aturar Ofuscació</translation>
     </message>
     <message>
@@ -780,7 +780,7 @@
         <translation>no</translation>
     </message>
     <message>
-        <source>Obfuscation</source>
+        <source>Darksend</source>
         <translation>Ofuscació</translation>
     </message>
     <message>
@@ -948,7 +948,7 @@
         <translation>Adreça</translation>
     </message>
     <message>
-        <source>Obfuscated</source>
+        <source>Darksend</source>
         <translation>Ofuscat</translation>
     </message>
     </context>
@@ -975,7 +975,7 @@
         <translation>Aquest any</translation>
     </message>
     <message>
-        <source>Obfuscated</source>
+        <source>Darksend</source>
         <translation>Ofuscat</translation>
     </message>
     <message>
@@ -1050,7 +1050,7 @@
         <translation>Informació</translation>
     </message>
     <message>
-        <source>Obfuscation options:</source>
+        <source>Darksend options:</source>
         <translation>Opcions d'ofuscació:</translation>
     </message>
     <message>

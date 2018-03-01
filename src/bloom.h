@@ -37,7 +37,7 @@ enum bloomflags {
  * 
  * Because bloom filters are probabilistic, an SPV node can increase the false-
  * positive rate, making us send them transactions which aren't actually theirs, 
- * allowing clients to trade more bandwidth for more privacy by obfuscating which
+ * allowing clients to trade more bandwidth for more privacy by darksend which
  * keys are owned by them.
  */
 class CBloomFilter

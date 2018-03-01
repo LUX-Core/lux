@@ -1020,7 +1020,7 @@ Veuillez vérifier l'adresse et réessayer.</translation>
     </message>
 </context>
 <context>
-    <name>ObfuscationConfig</name>
+    <name>DarksendConfig</name>
     <message>
         <source>Basic Privacy</source>
         <translation>Confidentialité de base</translation>

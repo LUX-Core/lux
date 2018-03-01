@@ -145,7 +145,7 @@ void OptionsModel::Init()
         addOverriddenOption("-lang");
 
     if (settings.contains("nDarksendRounds"))
-        SoftSetArg("-obfuscationrounds", settings.value("nDarksendRounds").toString().toStdString());
+        SoftSetArg("-darksendrounds", settings.value("nDarksendRounds").toString().toStdString());
     if (settings.contains("nAnonymizeLuxAmount"))
         SoftSetArg("-anonymizeluxamount", settings.value("nAnonymizeLuxAmount").toString().toStdString());
 
@@ -335,7 +335,7 @@ bool OptionsModel::setData(const QModelIndex& index, const QVariant& value, int 
         case DarksendRounds:
             nDarksendRounds = value.toInt();
             settings.setValue("nDarksendRounds", nDarksendRounds);
-            emit obfuscationRoundsChanged(nDarksendRounds);
+            emit darksendRoundsChanged(nDarksendRounds);
             break;
         case AnonymizeLuxAmount:
             nAnonymizeLuxAmount = value.toInt();

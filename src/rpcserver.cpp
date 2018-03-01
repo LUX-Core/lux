@@ -255,7 +255,7 @@ static const CRPCCommand vRPCCommands[] =
         {"blockchain", "getblockhash", &getblockhash, true, false, false},
         {"blockchain", "getblockheader", &getblockheader, false, false, false},
         {"blockchain", "getchaintips", &getchaintips, true, false, false},
-        {"blockchain", "getdifficulty", &getdifficulty, true, false, false},
+        {"blockchain", "getpowdifficulty", &getpowdifficulty, true, false, false},
         {"blockchain", "getmempoolinfo", &getmempoolinfo, true, true, false},
         {"blockchain", "getrawmempool", &getrawmempool, true, false, false},
         {"blockchain", "gettxout", &gettxout, true, false, false},
@@ -308,7 +308,7 @@ static const CRPCCommand vRPCCommands[] =
         //{"lux", "mnsync", &mnsync, true, true, false},
         {"lux", "spork", &spork, true, true, false},
 #ifdef ENABLE_WALLET
-        //{"lux", "obfuscation", &obfuscation, false, false, true}, /* not threadSafe because of SendMoney */
+        //{"lux", "darksend", &darksend, false, false, true}, /* not threadSafe because of SendMoney */
 
         /* Wallet */
         {"wallet", "addmultisigaddress", &addmultisigaddress, true, false, true},

@@ -154,7 +154,7 @@
     </message>
     </context>
 <context>
-    <name>ObfuscationConfig</name>
+    <name>DarksendConfig</name>
     </context>
 <context>
     <name>OpenURIDialog</name>
