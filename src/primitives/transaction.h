@@ -68,13 +68,14 @@ public:
     uint32_t nSequence;
     CScript prevPubKey;
 
-    CTxIn()
-    {
-        nSequence = std::numeric_limits<unsigned int>::max();
+        static const uint32_t SEQUENCE_FINAL = 0xffffffff;
+
+    CTxIn(){
+        nSequence = SEQUENCE_FINAL;
     }
 
-    explicit CTxIn(COutPoint prevoutIn, CScript scriptSigIn=CScript(), uint32_t nSequenceIn=std::numeric_limits<unsigned int>::max());
-    CTxIn(uint256 hashPrevTx, uint32_t nOut, CScript scriptSigIn=CScript(), uint32_t nSequenceIn=std::numeric_limits<uint32_t>::max());
+    explicit CTxIn(COutPoint prevoutIn, CScript scriptSigIn=CScript(), uint32_t nSequenceIn=SEQUENCE_FINAL);
+    CTxIn(uint256 hashPrevTx, uint32_t nOut, CScript scriptSigIn=CScript(), uint32_t nSequenceIn=SEQUENCE_FINAL);
 
     ADD_SERIALIZE_METHODS;
 
@@ -85,9 +86,8 @@ public:
         READWRITE(nSequence);
     }
 
-    bool IsFinal() const
-    {
-        return (nSequence == std::numeric_limits<uint32_t>::max());
+    bool IsFinal() const{
+        return (nSequence == SEQUENCE_FINAL);
     }
 
     friend bool operator==(const CTxIn& a, const CTxIn& b)

@@ -12,12 +12,7 @@
 #include "utilstrencodings.h"
 #include "util.h"
 
-uint256 CBlockHeader::GetHash() const
-{
-//    return HashQuark(BEGIN(nVersion), END(nNonce));
-    if (nVersion > 6)
-        return Phi1612(BEGIN(nVersion), END(nNonce));
-
+uint256 CBlockHeader::GetHash() const{
     return Phi1612(BEGIN(nVersion), END(nNonce));
 }
 
