@@ -199,8 +199,8 @@ public:
     bool fCombineDust;
     CAmount nAutoCombineThreshold;
 
-    std::map<std::string, CAdrenalineNodeConfig> mapMyAdrenalineNodes;
-    bool AddAdrenalineNodeConfig(CAdrenalineNodeConfig nodeConfig);
+    std::map<std::string, CLuxNodeConfig> mapMyLuxNodes;
+    bool AddLuxNodeConfig(CLuxNodeConfig nodeConfig);
 
     CWallet()
     {

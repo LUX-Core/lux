@@ -30,8 +30,8 @@ QT_FORMS_UI = \
   qt/forms/helpmessagedialog.ui \
   qt/forms/intro.ui \
   qt/forms/masternodemanager.ui \
-  qt/forms/addeditadrenalinenode.ui \
-  qt/forms/adrenalinenodeconfigdialog.ui \
+  qt/forms/addeditluxnode.ui \
+  qt/forms/luxnodeconfigdialog.ui \
   qt/forms/multisenddialog.ui \
   qt/forms/openuridialog.ui \
   qt/forms/optionsdialog.ui \
@@ -66,8 +66,8 @@ QT_MOC_CPP = \
   qt/moc_macdockiconhandler.cpp \
   qt/moc_macnotificationhandler.cpp \
   qt/moc_masternodemanager.cpp \
-  qt/moc_addeditadrenalinenode.cpp \
-  qt/moc_adrenalinenodeconfigdialog.cpp \
+  qt/moc_addeditluxnode.cpp \
+  qt/moc_luxnodeconfigdialog.cpp \
   qt/moc_multisenddialog.cpp \
   qt/moc_notificator.cpp \
   qt/moc_openuridialog.cpp \
@@ -141,8 +141,8 @@ BITCOIN_QT_H = \
   qt/macdockiconhandler.h \
   qt/macnotificationhandler.h \
   qt/masternodemanager.h \
-  qt/addeditadrenalinenode.h \
-  qt/adrenalinenodeconfigdialog.h \
+  qt/addeditluxnode.h \
+  qt/luxnodeconfigdialog.h \
   qt/multisenddialog.h \
   qt/networkstyle.h \
   qt/notificator.h \
@@ -250,8 +250,8 @@ BITCOIN_QT_CPP = \
   qt/guiutil.cpp \
   qt/intro.cpp \
   qt/masternodemanager.cpp \
-  qt/addeditadrenalinenode.cpp \
-  qt/adrenalinenodeconfigdialog.cpp \
+  qt/addeditluxnode.cpp \
+  qt/luxnodeconfigdialog.cpp \
   qt/networkstyle.cpp \
   qt/notificator.cpp \
   qt/optionsdialog.cpp \
@@ -278,8 +278,8 @@ BITCOIN_QT_CPP += \
   qt/darksendconfig.cpp \
   qt/editaddressdialog.cpp \
   qt/masternodemanager.cpp \
-  qt/addeditadrenalinenode.cpp \
-  qt/adrenalinenodeconfigdialog.cpp \
+  qt/addeditluxnode.cpp \
+  qt/luxnodeconfigdialog.cpp \
   qt/multisenddialog.cpp \
   qt/openuridialog.cpp \
   qt/overviewpage.cpp \

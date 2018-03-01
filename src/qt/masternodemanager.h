@@ -37,7 +37,7 @@ public:
 
 public slots:
     void updateNodeList();
-    void updateAdrenalineNode(QString alias, QString addr, QString privkey, QString collateral);
+    void updateLuxNode(QString alias, QString addr, QString privkey, QString collateral);
     
 signals:
 
