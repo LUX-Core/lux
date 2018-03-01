@@ -461,7 +461,7 @@
            <item row="2" column="0">
             <widget class="QLabel" name="labelAnonymizedText">
              <property name="text">
-              <string>Darksend Balance:</string>
+              <string>Luxsend Balance:</string>
              </property>
             </widget>
            </item>
@@ -1078,7 +1078,7 @@
               </font>
              </property>
              <property name="text">
-              <string>Darksend</string>
+              <string>Luxsend</string>
              </property>
             </widget>
            </item>
