@@ -392,7 +392,7 @@ std::string HelpMessage(HelpMessageMode mode)
     strUsage += "                         " + _("If <category> is not supplied, output all debugging information.") + "\n";
     strUsage += "                         " + _("<category> can be:\n");
     strUsage += "                           addrman, alert, bench, coindb, db, lock, rand, rpc, selectcoins, mempool, net,\n";        // Don't translate these and qt below
-    strUsage += "                           lux (or specifically: darksend, swifttx, masternode, mnpayments, mnbudget)"; // Don't translate these and qt below
+    strUsage += "                           lux (or specifically: darksend, instantx, masternode, mnpayments, mnbudget)"; // Don't translate these and qt below
     if (mode == HMM_BITCOIN_QT)
         strUsage += ", qt";
     strUsage += ".\n";
@@ -419,7 +419,7 @@ std::string HelpMessage(HelpMessageMode mode)
     }
     strUsage += "  -shrinkdebugfile       " + _("Shrink debug.log file on client startup (default: 1 when no -debug)") + "\n";
     strUsage += "  -testnet               " + _("Use the test network") + "\n";
-    strUsage += "  -litemode=<n>          " + strprintf(_("Disable all LUX specific functionality (Masternodes, Darksend, SwiftTX, Budgeting) (0-1, default: %u)"), 0) + "\n";
+    strUsage += "  -litemode=<n>          " + strprintf(_("Disable all LUX specific functionality (Masternodes, Darksend, InstanTX, Budgeting) (0-1, default: %u)"), 0) + "\n";
 
     strUsage += "\n" + _("Masternode options:") + "\n";
     strUsage += "  -masternode=<n>            " + strprintf(_("Enable the client to act as a masternode (0-1, default: %u)"), 0) + "\n";
@@ -435,9 +435,9 @@ std::string HelpMessage(HelpMessageMode mode)
     strUsage += "  -anonymizeluxamount=<n>     " + strprintf(_("Keep N LUX anonymized (default: %u)"), 0) + "\n";
     strUsage += "  -liquidityprovider=<n>       " + strprintf(_("Provide liquidity to Darksend by infrequently mixing coins on a continual basis (0-100, default: %u, 1=very frequent, high fees, 100=very infrequent, low fees)"), 0) + "\n";
 
-    strUsage += "\n" + _("SwiftTX options:") + "\n";
-    strUsage += "  -enableswifttx=<n>    " + strprintf(_("Enable swifttx, show confirmations for locked transactions (bool, default: %s)"), "true") + "\n";
-    strUsage += "  -swifttxdepth=<n>     " + strprintf(_("Show N confirmations for a successfully locked transaction (0-9999, default: %u)"), nSwiftTXDepth) + "\n";
+    strUsage += "\n" + _("InstanTX options:") + "\n";
+    strUsage += "  -enableinstantx=<n>    " + strprintf(_("Enable instantx, show confirmations for locked transactions (bool, default: %s)"), "true") + "\n";
+    strUsage += "  -instantxdepth=<n>     " + strprintf(_("Show N confirmations for a successfully locked transaction (0-9999, default: %u)"), nInstanTXDepth) + "\n";
 
     strUsage += "\n" + _("Node relay options:") + "\n";
     strUsage += "  -datacarrier           " + strprintf(_("Relay and mine data carrier transactions (default: %u)"), 1) + "\n";
@@ -712,9 +712,9 @@ bool AppInit2(boost::thread_group& threadGroup)
             LogPrintf("AppInit2 : parameter interaction: -zapwallettxes=<mode> -> setting -rescan=1\n");
     }
 
-    if (!GetBoolArg("-enableswifttx", fEnableSwiftTX)) {
-        if (SoftSetArg("-swifttxdepth", 0))
-            LogPrintf("AppInit2 : parameter interaction: -enableswifttx=false -> setting -nSwiftTXDepth=0\n");
+    if (!GetBoolArg("-enableinstantx", fEnableInstanTX)) {
+        if (SoftSetArg("-instantxdepth", 0))
+            LogPrintf("AppInit2 : parameter interaction: -enableinstantx=false -> setting -nInstanTXDepth=0\n");
     }
 
     if (mapArgs.count("-reservebalance")) {

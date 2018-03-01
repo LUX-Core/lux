@@ -3541,7 +3541,7 @@ int CMerkleTx::GetDepthInMainChain(const CBlockIndex*& pindexRet, bool enableIX)
         if (nResult < 6) {
             int signatures = GetTransactionLockSignatures();
             if (signatures >= INSTANTX_SIGNATURES_REQUIRED) {
-                return nSwiftTXDepth + nResult;
+                return nInstanTXDepth + nResult;
             }
         }
     }
@@ -3567,7 +3567,7 @@ int CMerkleTx::GetTransactionLockSignatures() const
 {
     //if (fLargeWorkForkFound || fLargeWorkInvalidChainFound) return -2;
     if (!IsSporkActive(SPORK_1_MASTERNODE_PAYMENTS_ENFORCEMENT)) return -3;
-    if (!fEnableSwiftTX) return -1;
+    if (!fEnableInstanTX) return -1;
 
     //compile consessus vote
     std::map<uint256, CTransactionLock>::iterator i = mapTxLocks.find(GetHash());
@@ -3580,7 +3580,7 @@ int CMerkleTx::GetTransactionLockSignatures() const
 
 bool CMerkleTx::IsTransactionLockTimedOut() const
 {
-    if (!fEnableSwiftTX) return 0;
+    if (!fEnableInstanTX) return 0;
 
     //compile consessus vote
     std::map<uint256, CTransactionLock>::iterator i = mapTxLocks.find(GetHash());

@@ -45,13 +45,13 @@ QT_TRANSLATE_NOOP("lux-core", ""
 "Delete all wallet transactions and only recover those parts of the "
 "blockchain through -rescan on startup"),
 QT_TRANSLATE_NOOP("lux-core", ""
-"Disable all LUX specific functionality (Masternodes, Darksend, SwiftTX, "
+"Disable all LUX specific functionality (Masternodes, Darksend, InstanTX, "
 "Budgeting) (0-1, default: %u)"),
 QT_TRANSLATE_NOOP("lux-core", ""
 "Distributed under the MIT software license, see the accompanying file "
 "COPYING or <http://www.opensource.org/licenses/mit-license.php>."),
 QT_TRANSLATE_NOOP("lux-core", ""
-"Enable swifttx, show confirmations for locked transactions (bool, default: "
+"Enable instantx, show confirmations for locked transactions (bool, default: "
 "%s)"),
 QT_TRANSLATE_NOOP("lux-core", ""
 "Enable use of automated darksend for funds stored in this wallet (0-1, "
@@ -137,7 +137,7 @@ QT_TRANSLATE_NOOP("lux-core", ""
 "Show N confirmations for a successfully locked transaction (0-9999, default: "
 "%u)"),
 QT_TRANSLATE_NOOP("lux-core", ""
-"SwiftTX requires inputs with at least 6 confirmations, you might need to "
+"InstanTX requires inputs with at least 6 confirmations, you might need to "
 "wait a few minutes and try again."),
 QT_TRANSLATE_NOOP("lux-core", ""
 "This is a pre-release test build - use at your own risk - do not use for "
@@ -383,7 +383,7 @@ QT_TRANSLATE_NOOP("lux-core", "Stop running after importing blocks from disk (de
 QT_TRANSLATE_NOOP("lux-core", "Submitted following entries to masternode: %u / %d"),
 QT_TRANSLATE_NOOP("lux-core", "Submitted to masternode, waiting for more entries ( %u / %d ) %s"),
 QT_TRANSLATE_NOOP("lux-core", "Submitted to masternode, waiting in queue %s"),
-QT_TRANSLATE_NOOP("lux-core", "SwiftTX options:"),
+QT_TRANSLATE_NOOP("lux-core", "InstanTX options:"),
 QT_TRANSLATE_NOOP("lux-core", "Synchronization failed"),
 QT_TRANSLATE_NOOP("lux-core", "Synchronization finished"),
 QT_TRANSLATE_NOOP("lux-core", "Synchronization pending..."),

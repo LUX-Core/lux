@@ -1611,8 +1611,8 @@ Adresse: %4</translation>
         <translation>Empfänge&amp;r hinzufügen</translation>
     </message>
     <message>
-        <source>SwiftTX</source>
-        <translation>SwiftTX</translation>
+        <source>InstanTX</source>
+        <translation>InstanTX</translation>
     </message>
     <message>
         <source>Balance:</source>
@@ -1797,16 +1797,16 @@ Adresse: %4</translation>
         <translation>in Konflikt stehend</translation>
     </message>
     <message>
-        <source>%1/offline (verified via swifttx)</source>
-        <translation>%1/offline (Überprüft durch SwiftTX)</translation>
+        <source>%1/offline (verified via instantx)</source>
+        <translation>%1/offline (Überprüft durch InstanTX)</translation>
     </message>
     <message>
-        <source>%1/confirmed (verified via swifttx)</source>
-        <translation>%1/bestätigt (Überprüft durch SwiftTX)</translation>
+        <source>%1/confirmed (verified via instantx)</source>
+        <translation>%1/bestätigt (Überprüft durch InstanTX)</translation>
     </message>
     <message>
-        <source>%1 confirmations (verified via swifttx)</source>
-        <translation>%1 Bestätigungen (Überprüft durch SwiftTX)</translation>
+        <source>%1 confirmations (verified via instantx)</source>
+        <translation>%1 Bestätigungen (Überprüft durch InstanTX)</translation>
     </message>
     <message>
         <source>%1/offline</source>
@@ -1821,24 +1821,24 @@ Adresse: %4</translation>
         <translation>%1 Bestätigungen</translation>
     </message>
     <message>
-        <source>%1/offline (SwiftTX verification in progress - %2 of %3 signatures)</source>
-        <translation>%1/offline (Überprüfung durch SwiftTX - %2 von %3 Signaturen)</translation>
+        <source>%1/offline (InstanTX verification in progress - %2 of %3 signatures)</source>
+        <translation>%1/offline (Überprüfung durch InstanTX - %2 von %3 Signaturen)</translation>
     </message>
     <message>
-        <source>%1/confirmed (SwiftTX verification in progress - %2 of %3 signatures )</source>
-        <translation>%1/bestätigt (Überprüfung durch SwiftTX - %2 von %3 Signaturen)</translation>
+        <source>%1/confirmed (InstanTX verification in progress - %2 of %3 signatures )</source>
+        <translation>%1/bestätigt (Überprüfung durch InstanTX - %2 von %3 Signaturen)</translation>
     </message>
     <message>
-        <source>%1 confirmations (SwiftTX verification in progress - %2 of %3 signatures)</source>
-        <translation>%1 Bestätigungen (Überprüfung durch SwiftTX - %2 von %3 Signaturen)</translation>
+        <source>%1 confirmations (InstanTX verification in progress - %2 of %3 signatures)</source>
+        <translation>%1 Bestätigungen (Überprüfung durch InstanTX - %2 von %3 Signaturen)</translation>
     </message>
     <message>
-        <source>%1/offline (SwiftTX verification failed)</source>
-        <translation>%1/offline (Überprüfung durch SwiftTX fehlgeschlagen)</translation>
+        <source>%1/offline (InstanTX verification failed)</source>
+        <translation>%1/offline (Überprüfung durch InstanTX fehlgeschlagen)</translation>
     </message>
     <message>
-        <source>%1/confirmed (SwiftTX verification failed)</source>
-        <translation>%1/bestätigt (Überprüfung durch SwiftTX fehlgeschlagen)</translation>
+        <source>%1/confirmed (InstanTX verification failed)</source>
+        <translation>%1/bestätigt (Überprüfung durch InstanTX fehlgeschlagen)</translation>
     </message>
     <message>
         <source>Status</source>
@@ -2307,8 +2307,8 @@ Adresse: %4</translation>
         <translation>LUXs überweisen</translation>
     </message>
     <message>
-        <source>SwiftTX doesn't support sending values that high yet. Transactions are currently limited to %1 LUX.</source>
-        <translation>SwiftTX unterstützt das Versenden von Beträgen dieser Höhe noch nicht. Transaktionen sind zur Zeit auf maximal %1 LUX begrenzt.</translation>
+        <source>InstanTX doesn't support sending values that high yet. Transactions are currently limited to %1 LUX.</source>
+        <translation>InstanTX unterstützt das Versenden von Beträgen dieser Höhe noch nicht. Transaktionen sind zur Zeit auf maximal %1 LUX begrenzt.</translation>
     </message>
 </context>
 <context>

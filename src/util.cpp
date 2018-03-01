@@ -110,8 +110,8 @@ bool fMasterNode = false;
 string strMasterNodePrivKey = "";
 string strMasterNodeAddr = "";
 bool fLiteMode = false;
-bool fEnableSwiftTX = true;
-int nSwiftTXDepth = 5;
+bool fEnableInstanTX = true;
+int nInstanTXDepth = 5;
 int nDarksendRounds = 2;
 int nAnonymizeLuxAmount = 1000;
 int nLiquidityProvider = 0;
@@ -234,7 +234,7 @@ bool LogAcceptCategory(const char* category)
             // "lux" is a composite category enabling all LUX-related debug output
             if (ptrCategory->count(string("lux"))) {
                 ptrCategory->insert(string("darksend"));
-                ptrCategory->insert(string("swifttx"));
+                ptrCategory->insert(string("instantx"));
                 ptrCategory->insert(string("masternode"));
                 ptrCategory->insert(string("mnpayments"));
                 ptrCategory->insert(string("mnbudget"));

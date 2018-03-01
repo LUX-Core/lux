@@ -63,26 +63,26 @@ SendCoinsDialog::SendCoinsDialog(QWidget* parent) : QDialog(parent),
     QSettings settings;
     if (!settings.contains("bUseDarksend"))
         settings.setValue("bUseDarksend", false);
-    if (!settings.contains("bUseSwiftTX"))
-        settings.setValue("bUseSwiftTX", false);
+    if (!settings.contains("bUseInstanTX"))
+        settings.setValue("bUseInstanTX", false);
 
     bool useDarksend = settings.value("bUseDarksend").toBool();
-    bool useSwiftTX = settings.value("bUseSwiftTX").toBool();
+    bool useInstanTX = settings.value("bUseInstanTX").toBool();
     if (fLiteMode) {
         ui->checkUseDarksend->setChecked(false);
         ui->checkUseDarksend->setVisible(false);
-        ui->checkSwiftTX->setVisible(false);
+        ui->checkInstanTX->setVisible(false);
         CoinControlDialog::coinControl->useDarksend = false;
-        CoinControlDialog::coinControl->useSwiftTX = false;
+        CoinControlDialog::coinControl->useInstanTX = false;
     } else {
         ui->checkUseDarksend->setChecked(useDarksend);
-        ui->checkSwiftTX->setChecked(useSwiftTX);
+        ui->checkInstanTX->setChecked(useInstanTX);
         CoinControlDialog::coinControl->useDarksend = useDarksend;
-        CoinControlDialog::coinControl->useSwiftTX = useSwiftTX;
+        CoinControlDialog::coinControl->useInstanTX = useInstanTX;
     }
 
     connect(ui->checkUseDarksend, SIGNAL(stateChanged(int)), this, SLOT(updateDisplayUnit()));
-    connect(ui->checkSwiftTX, SIGNAL(stateChanged(int)), this, SLOT(updateSwiftTX()));
+    connect(ui->checkInstanTX, SIGNAL(stateChanged(int)), this, SLOT(updateInstanTX()));
 
     // Coin Control: clipboard actions
     QAction* clipboardQuantityAction = new QAction(tr("Copy quantity"), this);
@@ -283,12 +283,12 @@ void SendCoinsDialog::on_sendButton_clicked()
         strFunds = tr("using") + " <b>" + tr("any available funds (not recommended)") + "</b>";
     }
 
-    if (ui->checkSwiftTX->isChecked()) {
-        recipients[0].useSwiftTX = true;
+    if (ui->checkInstanTX->isChecked()) {
+        recipients[0].useInstanTX = true;
         strFunds += " ";
-        strFunds += tr("and SwiftTX");
+        strFunds += tr("and InstanTX");
     } else {
-        recipients[0].useSwiftTX = false;
+        recipients[0].useInstanTX = false;
     }
 
 
@@ -597,11 +597,11 @@ void SendCoinsDialog::updateDisplayUnit()
     updateSmartFeeLabel();
 }
 
-void SendCoinsDialog::updateSwiftTX()
+void SendCoinsDialog::updateInstanTX()
 {
     QSettings settings;
-    settings.setValue("bUseSwiftTX", ui->checkSwiftTX->isChecked());
-    CoinControlDialog::coinControl->useSwiftTX = ui->checkSwiftTX->isChecked();
+    settings.setValue("bUseInstanTX", ui->checkInstanTX->isChecked());
+    CoinControlDialog::coinControl->useInstanTX = ui->checkInstanTX->isChecked();
     coinControlUpdateLabels();
 }
 

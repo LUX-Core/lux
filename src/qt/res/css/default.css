@@ -1313,7 +1313,7 @@ QDialog#SendCoinsDialog .QCheckBox#checkUseDarksend { /* Darksend Checkbox */
     padding-bottom:18px;
 }
 
-QDialog#SendCoinsDialog .QCheckBox#checkSwiftTX { /* SwiftTX Checkbox */
+QDialog#SendCoinsDialog .QCheckBox#checkInstanTX { /* InstanTX Checkbox */
     color:#616161;
     font-weight:bold;
     background:transparent;

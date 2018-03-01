@@ -33,8 +33,8 @@
 
 extern bool fMasterNode;
 extern bool fLiteMode;
-extern bool fEnableSwiftTX;
-extern int nSwiftTXDepth;
+extern bool fEnableInstanTX;
+extern int nInstanTXDepth;
 extern int nDarksendRounds;
 extern int nAnonymizeLuxAmount;
 extern int nLiquidityProvider;

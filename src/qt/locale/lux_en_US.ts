@@ -2916,8 +2916,8 @@ https://www.transifex.com/lux-project/lux-project-translations</translation>
         <translation>Add &amp;Recipient</translation>
     </message>
     <message>
-        <source>SwiftTX</source>
-        <translation>SwiftTX</translation>
+        <source>InstanTX</source>
+        <translation>InstanTX</translation>
     </message>
     <message>
         <source>Balance:</source>
@@ -2980,8 +2980,8 @@ https://www.transifex.com/lux-project/lux-project-translations</translation>
         <translation>any available funds (not recommended)</translation>
     </message>
     <message>
-        <source>and SwiftTX</source>
-        <translation>and SwiftTX</translation>
+        <source>and InstanTX</source>
+        <translation>and InstanTX</translation>
     </message>
     <message>
         <source>%1 to %2</source>
@@ -3342,16 +3342,16 @@ https://www.transifex.com/lux-project/lux-project-translations</translation>
         <translation>conflicted</translation>
     </message>
     <message>
-        <source>%1/offline (verified via swifttx)</source>
-        <translation>%1/offline (verified via swifttx)</translation>
+        <source>%1/offline (verified via instantx)</source>
+        <translation>%1/offline (verified via instantx)</translation>
     </message>
     <message>
-        <source>%1/confirmed (verified via swifttx)</source>
-        <translation>%1/confirmed (verified via swifttx)</translation>
+        <source>%1/confirmed (verified via instantx)</source>
+        <translation>%1/confirmed (verified via instantx)</translation>
     </message>
     <message>
-        <source>%1 confirmations (verified via swifttx)</source>
-        <translation>%1 confirmations (verified via swifttx)</translation>
+        <source>%1 confirmations (verified via instantx)</source>
+        <translation>%1 confirmations (verified via instantx)</translation>
     </message>
     <message>
         <source>%1/offline</source>
@@ -3366,24 +3366,24 @@ https://www.transifex.com/lux-project/lux-project-translations</translation>
         <translation>%1 confirmations</translation>
     </message>
     <message>
-        <source>%1/offline (SwiftTX verification in progress - %2 of %3 signatures)</source>
-        <translation>%1/offline (SwiftTX verification in progress - %2 of %3 signatures)</translation>
+        <source>%1/offline (InstanTX verification in progress - %2 of %3 signatures)</source>
+        <translation>%1/offline (InstanTX verification in progress - %2 of %3 signatures)</translation>
     </message>
     <message>
-        <source>%1/confirmed (SwiftTX verification in progress - %2 of %3 signatures )</source>
-        <translation>%1/confirmed (SwiftTX verification in progress - %2 of %3 signatures )</translation>
+        <source>%1/confirmed (InstanTX verification in progress - %2 of %3 signatures )</source>
+        <translation>%1/confirmed (InstanTX verification in progress - %2 of %3 signatures )</translation>
     </message>
     <message>
-        <source>%1 confirmations (SwiftTX verification in progress - %2 of %3 signatures)</source>
-        <translation>%1 confirmations (SwiftTX verification in progress - %2 of %3 signatures)</translation>
+        <source>%1 confirmations (InstanTX verification in progress - %2 of %3 signatures)</source>
+        <translation>%1 confirmations (InstanTX verification in progress - %2 of %3 signatures)</translation>
     </message>
     <message>
-        <source>%1/offline (SwiftTX verification failed)</source>
-        <translation>%1/offline (SwiftTX verification failed)</translation>
+        <source>%1/offline (InstanTX verification failed)</source>
+        <translation>%1/offline (InstanTX verification failed)</translation>
     </message>
     <message>
-        <source>%1/confirmed (SwiftTX verification failed)</source>
-        <translation>%1/confirmed (SwiftTX verification failed)</translation>
+        <source>%1/confirmed (InstanTX verification failed)</source>
+        <translation>%1/confirmed (InstanTX verification failed)</translation>
     </message>
     <message>
         <source>Status</source>
@@ -3860,8 +3860,8 @@ https://www.transifex.com/lux-project/lux-project-translations</translation>
         <translation>Send Coins</translation>
     </message>
     <message>
-        <source>SwiftTX doesn't support sending values that high yet. Transactions are currently limited to %1 LUX.</source>
-        <translation>SwiftTX doesn't support sending values that high yet. Transactions are currently limited to %1 LUX.</translation>
+        <source>InstanTX doesn't support sending values that high yet. Transactions are currently limited to %1 LUX.</source>
+        <translation>InstanTX doesn't support sending values that high yet. Transactions are currently limited to %1 LUX.</translation>
     </message>
 </context>
 <context>
@@ -3950,16 +3950,16 @@ https://www.transifex.com/lux-project/lux-project-translations</translation>
         <translation>Delete all wallet transactions and only recover those parts of the blockchain through -rescan on startup</translation>
     </message>
     <message>
-        <source>Disable all LUX specific functionality (Masternodes, Darksend, SwiftTX, Budgeting) (0-1, default: %u)</source>
-        <translation>Disable all LUX specific functionality (Masternodes, Darksend, SwiftTX, Budgeting) (0-1, default: %u)</translation>
+        <source>Disable all LUX specific functionality (Masternodes, Darksend, InstanTX, Budgeting) (0-1, default: %u)</source>
+        <translation>Disable all LUX specific functionality (Masternodes, Darksend, InstanTX, Budgeting) (0-1, default: %u)</translation>
     </message>
     <message>
         <source>Distributed under the MIT software license, see the accompanying file COPYING or &lt;http://www.opensource.org/licenses/mit-license.php&gt;.</source>
         <translation>Distributed under the MIT software license, see the accompanying file COPYING or &lt;http://www.opensource.org/licenses/mit-license.php&gt;.</translation>
     </message>
     <message>
-        <source>Enable swifttx, show confirmations for locked transactions (bool, default: %s)</source>
-        <translation>Enable swifttx, show confirmations for locked transactions (bool, default: %s)</translation>
+        <source>Enable instantx, show confirmations for locked transactions (bool, default: %s)</source>
+        <translation>Enable instantx, show confirmations for locked transactions (bool, default: %s)</translation>
     </message>
     <message>
         <source>Enable use of automated darksend for funds stored in this wallet (0-1, default: %u)</source>
@@ -4082,8 +4082,8 @@ https://www.transifex.com/lux-project/lux-project-translations</translation>
         <translation>Show N confirmations for a successfully locked transaction (0-9999, default: %u)</translation>
     </message>
     <message>
-        <source>SwiftTX requires inputs with at least 6 confirmations, you might need to wait a few minutes and try again.</source>
-        <translation>SwiftTX requires inputs with at least 6 confirmations, you might need to wait a few minutes and try again.</translation>
+        <source>InstanTX requires inputs with at least 6 confirmations, you might need to wait a few minutes and try again.</source>
+        <translation>InstanTX requires inputs with at least 6 confirmations, you might need to wait a few minutes and try again.</translation>
     </message>
     <message>
         <source>This is a pre-release test build - use at your own risk - do not use for mining or merchant applications</source>
@@ -4900,8 +4900,8 @@ for example: alertnotify=echo %%s | mail -s "LUX Alert" admin@foo.com
         <translation>Submitted to masternode, waiting in queue %s</translation>
     </message>
     <message>
-        <source>SwiftTX options:</source>
-        <translation>SwiftTX options:</translation>
+        <source>InstanTX options:</source>
+        <translation>InstanTX options:</translation>
     </message>
     <message>
         <source>Synchronization failed</source>

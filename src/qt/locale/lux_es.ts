@@ -2913,8 +2913,8 @@ https://www.transifex.com/lux-project/lux-project-translations</translation>
         <translation>Añadir Destinata&amp;rio</translation>
     </message>
     <message>
-        <source>SwiftTX</source>
-        <translation>SwiftTX</translation>
+        <source>InstanTX</source>
+        <translation>InstanTX</translation>
     </message>
     <message>
         <source>Balance:</source>
@@ -2973,8 +2973,8 @@ https://www.transifex.com/lux-project/lux-project-translations</translation>
         <translation>cualquier fondo disponible (no recomendado)</translation>
     </message>
     <message>
-        <source>and SwiftTX</source>
-        <translation>y SwiftTX</translation>
+        <source>and InstanTX</source>
+        <translation>y InstanTX</translation>
     </message>
     <message>
         <source>%1 to %2</source>

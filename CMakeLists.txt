@@ -195,7 +195,7 @@ SET(SOURCES
 	./src/script/sigcache.cpp
 	./src/script/sign.cpp
 	./src/script/standard.cpp
-	./src/swifttx.cpp
+	./src/instantx.cpp
 	./src/timedata.cpp
 	./src/txdb.cpp
 	./src/txmempool.cpp

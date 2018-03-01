@@ -14,7 +14,7 @@ class CCoinControl
 public:
     CTxDestination destChange;
     bool useDarksend;
-    bool useSwiftTX;
+    bool useInstanTX;
     bool fSplitBlock;
     int nSplitBlock;
     //! If false, allows unselected inputs, but requires all selected inputs be used
@@ -33,7 +33,7 @@ public:
     {
         destChange = CNoDestination();
         setSelected.clear();
-        useSwiftTX = false;
+        useInstanTX = false;
         useDarksend = true;
         fAllowOtherInputs = false;
         fAllowWatchOnly = false;

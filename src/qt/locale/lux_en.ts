@@ -3728,8 +3728,8 @@ https://www.transifex.com/lux-project/lux-project-translations</source>
     </message>
     <message>
         <location line="+57"/>
-        <source>SwiftTX</source>
-        <translation>SwiftTX</translation>
+        <source>InstanTX</source>
+        <translation>InstanTX</translation>
     </message>
     <message>
         <location line="+7"/>
@@ -3811,8 +3811,8 @@ https://www.transifex.com/lux-project/lux-project-translations</source>
     </message>
     <message>
         <location line="+6"/>
-        <source>and SwiftTX</source>
-        <translation>and SwiftTX</translation>
+        <source>and InstanTX</source>
+        <translation>and InstanTX</translation>
     </message>
     <message>
         <location line="+23"/>
@@ -4286,18 +4286,18 @@ https://www.transifex.com/lux-project/lux-project-translations</source>
     </message>
     <message>
         <location line="-31"/>
-        <source>%1/offline (verified via swifttx)</source>
-        <translation>%1/offline (verified via swifttx)</translation>
+        <source>%1/offline (verified via instantx)</source>
+        <translation>%1/offline (verified via instantx)</translation>
     </message>
     <message>
         <location line="+2"/>
-        <source>%1/confirmed (verified via swifttx)</source>
-        <translation>%1/confirmed (verified via swifttx)</translation>
+        <source>%1/confirmed (verified via instantx)</source>
+        <translation>%1/confirmed (verified via instantx)</translation>
     </message>
     <message>
         <location line="+2"/>
-        <source>%1 confirmations (verified via swifttx)</source>
-        <translation>%1 confirmations (verified via swifttx)</translation>
+        <source>%1 confirmations (verified via instantx)</source>
+        <translation>%1 confirmations (verified via instantx)</translation>
     </message>
     <message>
         <location line="+29"/>
@@ -4317,28 +4317,28 @@ https://www.transifex.com/lux-project/lux-project-translations</source>
     </message>
     <message>
         <location line="-26"/>
-        <source>%1/offline (SwiftTX verification in progress - %2 of %3 signatures)</source>
-        <translation>%1/offline (SwiftTX verification in progress - %2 of %3 signatures)</translation>
+        <source>%1/offline (InstanTX verification in progress - %2 of %3 signatures)</source>
+        <translation>%1/offline (InstanTX verification in progress - %2 of %3 signatures)</translation>
     </message>
     <message>
         <location line="+2"/>
-        <source>%1/confirmed (SwiftTX verification in progress - %2 of %3 signatures )</source>
-        <translation>%1/confirmed (SwiftTX verification in progress - %2 of %3 signatures )</translation>
+        <source>%1/confirmed (InstanTX verification in progress - %2 of %3 signatures )</source>
+        <translation>%1/confirmed (InstanTX verification in progress - %2 of %3 signatures )</translation>
     </message>
     <message>
         <location line="+2"/>
-        <source>%1 confirmations (SwiftTX verification in progress - %2 of %3 signatures)</source>
-        <translation>%1 confirmations (SwiftTX verification in progress - %2 of %3 signatures)</translation>
+        <source>%1 confirmations (InstanTX verification in progress - %2 of %3 signatures)</source>
+        <translation>%1 confirmations (InstanTX verification in progress - %2 of %3 signatures)</translation>
     </message>
     <message>
         <location line="+6"/>
-        <source>%1/offline (SwiftTX verification failed)</source>
-        <translation>%1/offline (SwiftTX verification failed)</translation>
+        <source>%1/offline (InstanTX verification failed)</source>
+        <translation>%1/offline (InstanTX verification failed)</translation>
     </message>
     <message>
         <location line="+2"/>
-        <source>%1/confirmed (SwiftTX verification failed)</source>
-        <translation>%1/confirmed (SwiftTX verification failed)</translation>
+        <source>%1/confirmed (InstanTX verification failed)</source>
+        <translation>%1/confirmed (InstanTX verification failed)</translation>
     </message>
     <message>
         <location line="+32"/>
@@ -4957,7 +4957,7 @@ https://www.transifex.com/lux-project/lux-project-translations</source>
     <message>
         <location line="-18"/>
         <location line="+9"/>
-        <source>SwiftTX doesn&apos;t support sending values that high yet. Transactions are currently limited to %1 LUX.</source>
+        <source>InstanTX doesn&apos;t support sending values that high yet. Transactions are currently limited to %1 LUX.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5068,7 +5068,7 @@ https://www.transifex.com/lux-project/lux-project-translations</source>
     </message>
     <message>
         <location line="+3"/>
-        <source>Disable all LUX specific functionality (Masternodes, Darksend, SwiftTX, Budgeting) (0-1, default: %u)</source>
+        <source>Disable all LUX specific functionality (Masternodes, Darksend, InstanTX, Budgeting) (0-1, default: %u)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5078,8 +5078,8 @@ https://www.transifex.com/lux-project/lux-project-translations</source>
     </message>
     <message>
         <location line="+3"/>
-        <source>Enable swifttx, show confirmations for locked transactions (bool, default: %s)</source>
-        <translation type="unfinished">Enable swifttx, show confirmations for locked transactions (bool, default: %s)</translation>
+        <source>Enable instantx, show confirmations for locked transactions (bool, default: %s)</source>
+        <translation type="unfinished">Enable instantx, show confirmations for locked transactions (bool, default: %s)</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -5233,8 +5233,8 @@ https://www.transifex.com/lux-project/lux-project-translations</source>
     </message>
     <message>
         <location line="+3"/>
-        <source>SwiftTX requires inputs with at least 6 confirmations, you might need to wait a few minutes and try again.</source>
-        <translation type="unfinished">SwiftTX requires inputs with at least 6 confirmations, you might need to wait a few minutes and try again.</translation>
+        <source>InstanTX requires inputs with at least 6 confirmations, you might need to wait a few minutes and try again.</source>
+        <translation type="unfinished">InstanTX requires inputs with at least 6 confirmations, you might need to wait a few minutes and try again.</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -6240,8 +6240,8 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <location line="+1"/>
-        <source>SwiftTX options:</source>
-        <translation type="unfinished">SwiftTX options:</translation>
+        <source>InstanTX options:</source>
+        <translation type="unfinished">InstanTX options:</translation>
     </message>
     <message>
         <location line="+1"/>

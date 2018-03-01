@@ -886,7 +886,7 @@ int GetIXConfirmations(uint256 nTXHash)
         sigs = (*i).second.CountSignatures();
     }
     if (sigs >= INSTANTX_SIGNATURES_REQUIRED) {
-        return nSwiftTXDepth;
+        return nInstanTXDepth;
     }
     return 0;
 }
@@ -1094,7 +1094,7 @@ bool AcceptToMemoryPool(CTxMemPool& pool, CValidationState& state, const CTransa
     if (pool.exists(hash))
         return false;
 
-    // ----------- swiftTX transaction scanning -----------
+    // ----------- INSTANTX transaction scanning -----------
 
     BOOST_FOREACH (const CTxIn& in, tx.vin) {
         if (mapLockedInputs.count(in.prevout)) {
@@ -1280,7 +1280,7 @@ bool AcceptableInputs(CTxMemPool& pool, CValidationState& state, const CTransact
     if (pool.exists(hash))
         return false;
 
-    // ----------- swiftTX transaction scanning -----------
+    // ----------- INSTANTX transaction scanning -----------
 
     BOOST_FOREACH (const CTxIn& in, tx.vin) {
         if (mapLockedInputs.count(in.prevout)) {
@@ -2531,7 +2531,7 @@ bool DisconnectBlocksAndReprocess(int blocks)
 /*
     DisconnectBlockAndInputs
 
-    Remove conflicting blocks for successful SwiftTX transaction locks
+    Remove conflicting blocks for successful InstanTX transaction locks
     This should be very rare (Probably will never happen)
 */
 // ***TODO*** clean up here
@@ -5220,7 +5220,7 @@ static bool ProcessMessage(CNode* pfrom, const string &strCommand, CDataStream& 
         if (!processed) mnodeman.ProcessMessage(pfrom, strCommand, vRecv, processed);
         if (!processed) budget.ProcessMessage(pfrom, strCommand, vRecv, processed);
         if (!processed) masternodePayments.ProcessMessage(pfrom, strCommand, vRecv, processed);
-        if (!processed) ProcessSwiftTX(pfrom, strCommand, vRecv, processed);
+        if (!processed) ProcessInstanTX(pfrom, strCommand, vRecv, processed);
         if (!processed) ProcessSpork(pfrom, strCommand, vRecv, processed);
         if (!processed) masternodeSync.ProcessMessage(pfrom, strCommand, vRecv, processed);
 #       else
