@@ -90,7 +90,7 @@ void MemTable::Add(SequenceNumber s, ValueType type,
   size_t key_size = key.size();
   size_t val_size = value.size();
   size_t internal_key_size = key_size + 8;
-  const size_t encoded_len =
+  const unsigned int encoded_len =
       VarintLength(internal_key_size) + internal_key_size +
       VarintLength(val_size) + val_size;
   char* buf = arena_.Allocate(encoded_len);
