@@ -129,10 +129,12 @@ OverviewPage::OverviewPage(QWidget* parent) : QWidget(parent),
     ui->labelWalletStatus->setText("(" + tr("out of sync") + ")");
     ui->labelDarksendSyncStatus->setText("(" + tr("out of sync") + ")");
     ui->labelTransactionsStatus->setText("(" + tr("out of sync") + ")");
-
-    if (fLiteMode) {
+#if 0
+    if (!fLiteMode) {
         ui->frameDarksend->setVisible(false);
-    } else {
+    }
+#else
+       {
         if (fMasterNode) {
             ui->toggleDarksend->setText("(" + tr("Disabled") + ")");
             ui->darksendAuto->setText("(" + tr("Disabled") + ")");
@@ -149,6 +151,7 @@ OverviewPage::OverviewPage(QWidget* parent) : QWidget(parent),
             timer->start(1000);
         }
     }
+#endif
 
     // start with displaying the "out of sync" warnings
     showOutOfSyncWarning(true);
@@ -162,8 +165,7 @@ void OverviewPage::handleTransactionClicked(const QModelIndex& index)
 
 OverviewPage::~OverviewPage()
 {
-    if (!fLiteMode && !fMasterNode) disconnect(timer, SIGNAL(timeout()), this, SLOT(darksendStatus()));
-    delete ui;
+
 }
 
 void OverviewPage::setBalance(const CAmount& balance, const CAmount& unconfirmedBalance, const CAmount& immatureBalance, const CAmount& anonymizedBalance, const CAmount& watchOnlyBalance, const CAmount& watchUnconfBalance, const CAmount& watchImmatureBalance)

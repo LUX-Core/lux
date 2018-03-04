@@ -1202,8 +1202,6 @@ CAmount CWallet::GetBalance() const
 
 CAmount CWallet::GetAnonymizableBalance() const
 {
-    if (fLiteMode) return 0;
-
     CAmount nTotal = 0;
     {
         LOCK2(cs_main, cs_wallet);
@@ -1258,8 +1256,6 @@ CAmount CWallet::GetAnonymizedBalance() const
 // that's ok as long as we use it for informational purposes only
 double CWallet::GetAverageAnonymizedRounds() const
 {
-    if (fLiteMode) return 0;
-
     double fTotal = 0;
     double fCount = 0;
 
@@ -1301,8 +1297,6 @@ double CWallet::GetAverageAnonymizedRounds() const
 // that's ok as long as we use it for informational purposes only
 CAmount CWallet::GetNormalizedAnonymizedBalance() const
 {
-    if (fLiteMode) return 0;
-
     CAmount nTotal = 0;
 
     {
@@ -1329,8 +1323,6 @@ CAmount CWallet::GetNormalizedAnonymizedBalance() const
 
 CAmount CWallet::GetDenominatedBalance(bool unconfirmed) const
 {
-    if (fLiteMode) return 0;
-
     CAmount nTotal = 0;
     {
         LOCK2(cs_main, cs_wallet);
