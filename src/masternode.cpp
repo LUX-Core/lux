@@ -49,8 +49,6 @@ void ProcessMasternode(CNode* pfrom, const std::string& strCommand, CDataStream&
     if (strCommand == "dsee") { //DarkSend Election Entry
         isMasternodeCommand = true;
 
-        if(fLiteMode) return; //disable all darksend/masternode related functionality
-
         bool fIsInitialDownload = IsInitialBlockDownload();
         if(fIsInitialDownload) return;
 
@@ -203,8 +201,6 @@ void ProcessMasternode(CNode* pfrom, const std::string& strCommand, CDataStream&
 
     else if (strCommand == "dseep") { //DarkSend Election Entry Ping
         isMasternodeCommand = true;
-
-        if(fLiteMode) return; //disable all darksend/masternode related functionality
         bool fIsInitialDownload = IsInitialBlockDownload();
         if(fIsInitialDownload) return;
 
@@ -280,7 +276,6 @@ void ProcessMasternode(CNode* pfrom, const std::string& strCommand, CDataStream&
     else if (strCommand == "dseg") { //Get masternode list or specific entry
         isMasternodeCommand = true;
 
-        if(fLiteMode) return; //disable all darksend/masternode related functionality
         CTxIn vin;
         vRecv >> vin;
 
@@ -333,8 +328,6 @@ void ProcessMasternode(CNode* pfrom, const std::string& strCommand, CDataStream&
     else if (strCommand == "mnget") { //Masternode Payments Request Sync
         isMasternodeCommand = true;
 
-        if(fLiteMode) return; //disable all darksend/masternode related functionality
-
         /*if(pfrom->HasFulfilledRequest("mnget")) {
             LogPrintf("mnget - peer already asked me for the list\n");
             Misbehaving(pfrom->GetId(), 20);
@@ -350,7 +343,6 @@ void ProcessMasternode(CNode* pfrom, const std::string& strCommand, CDataStream&
     else if (strCommand == "mnw") { //Masternode Payments Declare Winner
         isMasternodeCommand = true;
 
-        //this is required in litemode
         CMasternodePaymentWinner winner;
         int a = 0;
         vRecv >> winner >> a;

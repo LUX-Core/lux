@@ -32,7 +32,6 @@
 //LUX only features
 
 extern bool fMasterNode;
-extern bool fLiteMode;
 extern bool fEnableInstanTX;
 extern int nInstanTXDepth;
 extern int nDarksendRounds;

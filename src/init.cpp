@@ -419,7 +419,6 @@ std::string HelpMessage(HelpMessageMode mode)
     }
     strUsage += "  -shrinkdebugfile       " + _("Shrink debug.log file on client startup (default: 1 when no -debug)") + "\n";
     strUsage += "  -testnet               " + _("Use the test network") + "\n";
-    strUsage += "  -litemode=<n>          " + strprintf(_("Disable all LUX specific functionality (Masternodes, Darksend, InstanTX, Budgeting) (0-1, default: %u)"), 0) + "\n";
 
     strUsage += "\n" + _("Masternode options:") + "\n";
     strUsage += "  -masternode=<n>            " + strprintf(_("Enable the client to act as a masternode (0-1, default: %u)"), 0) + "\n";
@@ -1484,13 +1483,6 @@ bool AppInit2(boost::thread_group& threadGroup)
     if (nAnonymizeLuxAmount > 999999) nAnonymizeLuxAmount = 999999;
     if (nAnonymizeLuxAmount < 2) nAnonymizeLuxAmount = 2;
 
-    //lite mode disables all Masternode and Darksend related functionality
-    fLiteMode = GetBoolArg("-litemode", false);
-    if (fMasterNode && fLiteMode) {
-        return InitError("You can not start a masternode in litemode");
-    }
-
-    LogPrintf("fLiteMode %d\n", fLiteMode);
     LogPrintf("LUX darksend rounds %d\n", nDarksendRounds);
     LogPrintf("Anonymize Lux Amount %d\n", nAnonymizeLuxAmount);
 

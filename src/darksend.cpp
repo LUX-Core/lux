@@ -52,11 +52,9 @@ int RequestedMasterNodeList = 0;
 
 void ProcessDarksend(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv, bool &isDarksend)
 {
-    if(fLiteMode) return; //disable all darksend/masternode related functionality
-
     if (strCommand == "dsf") { //DarkSend Final tx
         isDarksend = true;
-        
+
         if (pfrom->nVersion < darkSendPool.MIN_PEER_PROTO_VERSION) {
             return;
         }
@@ -81,7 +79,7 @@ void ProcessDarksend(CNode* pfrom, const std::string& strCommand, CDataStream& v
 
     else if (strCommand == "dsc") { //DarkSend Complete
         isDarksend = true;
-        
+
         if (pfrom->nVersion < darkSendPool.MIN_PEER_PROTO_VERSION) {
             return;
         }
@@ -212,7 +210,7 @@ void ProcessDarksend(CNode* pfrom, const std::string& strCommand, CDataStream& v
 
     else if (strCommand == "dsi") { //DarkSend vIn
         isDarksend = true;
-        
+
         std::string error = "";
         if (pfrom->nVersion < darkSendPool.MIN_PEER_PROTO_VERSION) {
             LogPrintf("dsi -- incompatible version! \n");
@@ -339,7 +337,7 @@ void ProcessDarksend(CNode* pfrom, const std::string& strCommand, CDataStream& v
 
     else if (strCommand == "dssub") { //DarkSend Subscribe To
         isDarksend = true;
-        
+
         if (pfrom->nVersion < darkSendPool.MIN_PEER_PROTO_VERSION) {
             return;
         }
@@ -383,7 +381,7 @@ void ProcessDarksend(CNode* pfrom, const std::string& strCommand, CDataStream& v
 
     else if (strCommand == "dss") { //DarkSend Sign Final Tx
         isDarksend = true;
-        
+
         if (pfrom->nVersion < darkSendPool.MIN_PEER_PROTO_VERSION) {
             return;
         }
@@ -1291,7 +1289,7 @@ bool CDarkSendPool::SignFinalTransaction(const CTransaction& finalTransactionNew
                     LogPrintf("CDarkSendPool::Sign - My entries are not correct! Refusing to sign. %d entries %d target. \n", foundOutputs, targetOuputs);
                     return false;
                 }
-				
+
                 if (fDebug) LogPrintf("CDarkSendPool::Sign - Signing my input %i\n", mine);
                 if (!SignSignature(*pwalletMain, prevPubKey, finalTransaction, mine, int(SIGHASH_ALL|SIGHASH_ANYONECANPAY))) { // changes scriptSig
                     if(fDebug) LogPrintf("CDarkSendPool::Sign - Unable to sign my own transaction! \n");
@@ -2119,8 +2117,6 @@ bool CDarksendQueue::CheckSignature()
 //TODO: Rename/move to core
 void ThreadCheckDarkSendPool()
 {
-    if(fLiteMode) return; //disable all darksend/masternode related functionality
-
     // Make this thread recognisable as the wallet flushing thread
     RenameThread("Lux-darksend");
 
@@ -2162,7 +2158,7 @@ void ThreadCheckDarkSendPool()
                     if(fDebug) LogPrintf("Sending masternode entry - %s \n", mn.addr.ToString().c_str());
                     BOOST_FOREACH(CNode* pnode, vNodes) {
                         pnode->PushMessage("dsee", mn.vin, mn.addr, mn.sig, mn.now, mn.pubkey, mn.pubkey2, count, i, mn.lastTimeSeen, mn.protocolVersion);
-                    }   
+                    }
                 }
                 i++;
             }

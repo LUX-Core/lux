@@ -28,11 +28,9 @@ CSporkManager sporkManager;
 
 void ProcessSpork(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv, bool &isSporkCommand)
 {
-    if(fLiteMode) return; //disable all darksend/masternode related functionality
-
     if (strCommand == "spork") {
         isSporkCommand = true;
-        
+
         //LogPrintf("ProcessSpork::spork\n");
         CDataStream vMsg(vRecv);
         CSporkMessage spork;
