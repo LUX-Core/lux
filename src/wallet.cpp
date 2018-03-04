@@ -1678,8 +1678,6 @@ bool CWallet::SelectCoinsMinConf(const std::string &account, const CAmount& nTar
                 continue;
 
             const CWalletTx* pcoin = output.tx;
-            if (pcoin->strFromAccount != account)
-                continue;
 
             //            if (fDebug) LogPrint("selectcoins", "value %s confirms %d\n", FormatMoney(pcoin->vout[output.i].nValue), output.nDepth);
             if (output.nDepth < (pcoin->IsFromMe(ISMINE_ALL) ? nConfMine : nConfTheirs))
