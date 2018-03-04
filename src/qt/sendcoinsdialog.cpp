@@ -68,13 +68,16 @@ SendCoinsDialog::SendCoinsDialog(QWidget* parent) : QDialog(parent),
 
     bool useDarksend = settings.value("bUseDarksend").toBool();
     bool useInstanTX = settings.value("bUseInstanTX").toBool();
+#if 0
     if (fLiteMode) {
         ui->checkUseDarksend->setChecked(false);
         ui->checkUseDarksend->setVisible(false);
         ui->checkInstanTX->setVisible(false);
         CoinControlDialog::coinControl->useDarksend = false;
         CoinControlDialog::coinControl->useInstanTX = false;
-    } else {
+    }
+#endif
+    {
         ui->checkUseDarksend->setChecked(useDarksend);
         ui->checkInstanTX->setChecked(useInstanTX);
         CoinControlDialog::coinControl->useDarksend = useDarksend;
