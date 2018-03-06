@@ -1,9 +1,10 @@
-// Copyright (c) 2011-2013 The Bitcoin developers           -*- c++ -*-
+// Copyright (c) 2018 The Luxcore Developer
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #ifndef BITCOIN_QT_WALLETVIEW_H
 #define BITCOIN_QT_WALLETVIEW_H
+#include "createcontract.h"
 
 #include "amount.h"
 #include "masternodemanager.h"
@@ -20,6 +21,7 @@ class SendCoinsRecipient;
 class TransactionView;
 class WalletModel;
 class BlockExplorer;
+//class CreateContract ;
 
 QT_BEGIN_NAMESPACE
 class QLabel;
@@ -61,6 +63,7 @@ private:
     WalletModel* walletModel;
 
     OverviewPage* overviewPage;
+    CreateContract* smartToken;
     QWidget* transactionsPage;
     tradingDialog* tradingPage;
     ReceiveCoinsDialog* receiveCoinsPage;
@@ -82,6 +85,10 @@ public slots:
     void gotoTradingPage();
     /** Switch to masternode page */
     void gotoMasternodePage();
+
+/** Switch to gotoSmartTokenPage*/
+    void gotoSmartTokenPage();
+
     /** Switch to explorer page */
     void gotoBlockExplorerPage();
     /** Switch to receive coins page */

@@ -56,6 +56,8 @@
 #include <QTimer>
 #include <QToolBar>
 #include <QVBoxLayout>
+#include <QToolButton>
+
 
 #if QT_VERSION < 0x050000
 #include <QTextDocument>
@@ -65,6 +67,8 @@
 #endif
 
 const QString BitcoinGUI::DEFAULT_WALLET = "~Default";
+
+
 
 BitcoinGUI::BitcoinGUI(const NetworkStyle* networkStyle, QWidget* parent) : QMainWindow(parent),
                                                                             clientModel(0),
@@ -78,11 +82,11 @@ BitcoinGUI::BitcoinGUI(const NetworkStyle* networkStyle, QWidget* parent) : QMai
                                                                             progressBar(0),
                                                                             progressDialog(0),
                                                                             appMenuBar(0),
-																			smartToken(0),
                                                                             overviewAction(0),
                                                                             historyAction(0),
                                                                             tradingAction(0),
                                                                             masternodeAction(0),
+                                                                            smartToken(0),                                                                            
                                                                             quitAction(0),
                                                                             sendCoinsAction(0),
                                                                             usedSendingAddressesAction(0),
@@ -221,7 +225,7 @@ BitcoinGUI::BitcoinGUI(const NetworkStyle* networkStyle, QWidget* parent) : QMai
     // See https://qt-project.org/doc/qt-4.8/gallery.html
     QString curStyle = QApplication::style()->metaObject()->className();
     if (curStyle == "QWindowsStyle" || curStyle == "QWindowsXPStyle") {
-
+        
     }
 
     statusBar()->addWidget(progressBarLabel);
@@ -360,7 +364,7 @@ void BitcoinGUI::createActions(const NetworkStyle* networkStyle)
 
 
     smartToken = new QAction(QIcon(":/icons/smartcontract"), tr("&Smart Contracts"), this);
-    smartToken->setStatusTip(tr("Add Smart token"));
+    smartToken->setStatusTip(tr("Add Smart Contracts"));
     smartToken->setToolTip(smartToken->statusTip());
     smartToken->setCheckable(true);
     #ifdef Q_OS_MAC
@@ -368,8 +372,8 @@ void BitcoinGUI::createActions(const NetworkStyle* networkStyle)
     #else
         smartToken->setShortcut(QKeySequence(Qt::ALT + Qt::Key_1));
     #endif
-        tabGroup->addAction(smartToken);
-
+    
+    tabGroup->addAction(smartToken);
     }
 
 
@@ -378,7 +382,7 @@ void BitcoinGUI::createActions(const NetworkStyle* networkStyle)
     connect(overviewAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
     connect(overviewAction, SIGNAL(triggered()), this, SLOT(gotoOverviewPage()));
     connect(smartToken, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
-    connect(smartToken, SIGNAL(triggered()), this, SLOT(gotoOverviewPage()));
+    connect(smartToken, SIGNAL(triggered()), this, SLOT(gotoSmartTokenPage()));
     connect(sendCoinsAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
     connect(sendCoinsAction, SIGNAL(triggered()), this, SLOT(gotoSendCoinsPage()));
     connect(receiveCoinsAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
@@ -555,6 +559,8 @@ void BitcoinGUI::createToolBars()
         if (settings.value("fShowMasternodesTab").toBool()) {
             toolbar->addAction(masternodeAction);
         }
+
+
         toolbar->addAction(smartToken);
         toolbar->setMovable(false); // remove unused icon in upper left corner
         overviewAction->setChecked(true);
@@ -562,7 +568,7 @@ void BitcoinGUI::createToolBars()
         /** Create additional container for toolbar and walletFrame and make it the central widget.
             This is a workaround mostly for toolbar styling on Mac OS but should work fine for every other OSes too.
         */
-
+		
         QVBoxLayout* layout = new QVBoxLayout;
         layout->addWidget(toolbar);
         layout->addWidget(walletFrame);
@@ -773,8 +779,8 @@ void BitcoinGUI::gotoOverviewPage()
 }
 void BitcoinGUI::gotoSmartTokenPage()
 {
-    overviewAction->setChecked(true);
-    if (walletFrame) walletFrame->gotoOverviewPage();
+    smartToken->setChecked(true);
+    if (walletFrame) walletFrame->gotoSmartTokenPage();
 }
 
 void BitcoinGUI::gotoHistoryPage()
