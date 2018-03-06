@@ -109,7 +109,6 @@ using namespace std;
 bool fMasterNode = false;
 string strMasterNodePrivKey = "";
 string strMasterNodeAddr = "";
-bool fLiteMode = false;
 bool fEnableInstanTX = true;
 int nInstanTXDepth = 5;
 int nDarksendRounds = 2;

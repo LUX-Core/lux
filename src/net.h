@@ -263,6 +263,7 @@ public:
     // (even if it's relative to mixing e.g. for blinding) should NOT set this to 'true'.
     // For such cases node should be released manually (preferably right after corresponding code).
     bool fDarkSendMaster; // bool fDarksendMaster;
+     bool fMasternode;
     CSemaphoreGrant grantOutbound;
     CCriticalSection cs_filter;
     CBloomFilter* pfilter;
@@ -322,6 +323,8 @@ private:
     static uint64_t nTotalBytesRecv;
     static uint64_t nTotalBytesSent;
 
+    CCriticalSection cs_nRefCount;
+
     CNode(const CNode&);
     void operator=(const CNode&);
 
@@ -333,6 +336,7 @@ public:
 
     int GetRefCount()
     {
+        LOCK(cs_nRefCount);
         assert(nRefCount >= 0);
         return nRefCount;
     }
@@ -359,13 +363,16 @@ public:
 
     CNode* AddRef()
     {
+        LOCK(cs_nRefCount);
         nRefCount++;
         return this;
     }
 
     void Release()
     {
+        LOCK(cs_nRefCount);
         nRefCount--;
+        assert(nRefCount >= 0);
     }
 
 

@@ -1,7 +1,7 @@
 #include "masternodemanager.h"
 #include "ui_masternodemanager.h"
-#include "addeditadrenalinenode.h"
-#include "adrenalinenodeconfigdialog.h"
+#include "addeditluxnode.h"
+#include "luxnodeconfigdialog.h"
 
 #include "sync.h"
 #include "clientmodel.h"
@@ -64,7 +64,7 @@ MasternodeManager::~MasternodeManager()
     delete ui;
 }
 
-static void NotifyAdrenalineNodeUpdated(MasternodeManager *page, CAdrenalineNodeConfig nodeConfig)
+static void NotifyLuxNodeUpdated(MasternodeManager *page, CLuxNodeConfig nodeConfig)
 {
     // alias, address, privkey, collateral address
     QString alias = QString::fromStdString(nodeConfig.sAlias);
@@ -72,7 +72,7 @@ static void NotifyAdrenalineNodeUpdated(MasternodeManager *page, CAdrenalineNode
     QString privkey = QString::fromStdString(nodeConfig.sMasternodePrivKey);
     QString collateral = QString::fromStdString(nodeConfig.sCollateralAddress);
     
-    QMetaObject::invokeMethod(page, "updateAdrenalineNode", Qt::QueuedConnection,
+    QMetaObject::invokeMethod(page, "updateLuxNode", Qt::QueuedConnection,
                               Q_ARG(QString, alias),
                               Q_ARG(QString, addr),
                               Q_ARG(QString, privkey),
@@ -83,13 +83,13 @@ static void NotifyAdrenalineNodeUpdated(MasternodeManager *page, CAdrenalineNode
 void MasternodeManager::subscribeToCoreSignals()
 {
     // Connect signals to core
-    uiInterface.NotifyAdrenalineNodeChanged.connect(boost::bind(&NotifyAdrenalineNodeUpdated, this, _1));
+    uiInterface.NotifyLuxNodeChanged.connect(boost::bind(&NotifyLuxNodeUpdated, this, _1));
 }
 
 void MasternodeManager::unsubscribeFromCoreSignals()
 {
     // Disconnect signals from core
-    uiInterface.NotifyAdrenalineNodeChanged.disconnect(boost::bind(&NotifyAdrenalineNodeUpdated, this, _1));
+    uiInterface.NotifyLuxNodeChanged.disconnect(boost::bind(&NotifyLuxNodeUpdated, this, _1));
 }
 
 void MasternodeManager::on_tableWidget_2_itemSelectionChanged()
@@ -104,7 +104,7 @@ void MasternodeManager::on_tableWidget_2_itemSelectionChanged()
     }
 }
 
-void MasternodeManager::updateAdrenalineNode(QString alias, QString addr, QString privkey, QString collateral)
+void MasternodeManager::updateLuxNode(QString alias, QString addr, QString privkey, QString collateral)
 {
     LOCK(cs_adrenaline);
     bool bFound = false;
@@ -191,9 +191,9 @@ void MasternodeManager::updateNodeList()
     if(pwalletMain)
     {
         LOCK(cs_adrenaline);
-        BOOST_FOREACH(PAIRTYPE(std::string, CAdrenalineNodeConfig) adrenaline, pwalletMain->mapMyAdrenalineNodes)
+        BOOST_FOREACH(PAIRTYPE(std::string, CLuxNodeConfig) adrenaline, pwalletMain->mapMyLuxNodes)
         {
-            updateAdrenalineNode(QString::fromStdString(adrenaline.second.sAlias), QString::fromStdString(adrenaline.second.sAddress), QString::fromStdString(adrenaline.second.sMasternodePrivKey), QString::fromStdString(adrenaline.second.sCollateralAddress));
+            updateLuxNode(QString::fromStdString(adrenaline.second.sAlias), QString::fromStdString(adrenaline.second.sAddress), QString::fromStdString(adrenaline.second.sMasternodePrivKey), QString::fromStdString(adrenaline.second.sCollateralAddress));
         }
     }
 }
@@ -217,7 +217,7 @@ void MasternodeManager::setWalletModel(WalletModel *model)
 
 void MasternodeManager::on_createButton_clicked()
 {
-    AddEditAdrenalineNode* aenode = new AddEditAdrenalineNode();
+    AddEditLuxNode* aenode = new AddEditLuxNode();
     aenode->exec();
 }
 
@@ -260,9 +260,9 @@ void MasternodeManager::on_getConfigButton_clicked()
     QModelIndex index = selected.at(0);
     int r = index.row();
     std::string sAddress = ui->tableWidget_2->item(r, 1)->text().toStdString();
-    CAdrenalineNodeConfig c = pwalletMain->mapMyAdrenalineNodes[sAddress];
+    CLuxNodeConfig c = pwalletMain->mapMyLuxNodes[sAddress];
     std::string sPrivKey = c.sMasternodePrivKey;
-    AdrenalineNodeConfigDialog* d = new AdrenalineNodeConfigDialog(this, QString::fromStdString(sAddress), QString::fromStdString(sPrivKey));
+    LuxNodeConfigDialog* d = new LuxNodeConfigDialog(this, QString::fromStdString(sAddress), QString::fromStdString(sPrivKey));
     d->exec();
 }
 
@@ -281,15 +281,15 @@ void MasternodeManager::on_removeButton_clicked()
         QModelIndex index = selected.at(0);
         int r = index.row();
         std::string sAddress = ui->tableWidget_2->item(r, 1)->text().toStdString();
-        CAdrenalineNodeConfig c = pwalletMain->mapMyAdrenalineNodes[sAddress];
+        CLuxNodeConfig c = pwalletMain->mapMyLuxNodes[sAddress];
         CWalletDB walletdb(pwalletMain->strWalletFile);
-        pwalletMain->mapMyAdrenalineNodes.erase(sAddress);
-        walletdb.EraseAdrenalineNodeConfig(c.sAddress);
+        pwalletMain->mapMyLuxNodes.erase(sAddress);
+        walletdb.EraseLuxNodeConfig(c.sAddress);
         ui->tableWidget_2->clearContents();
         ui->tableWidget_2->setRowCount(0);
-        BOOST_FOREACH(PAIRTYPE(std::string, CAdrenalineNodeConfig) adrenaline, pwalletMain->mapMyAdrenalineNodes)
+        BOOST_FOREACH(PAIRTYPE(std::string, CLuxNodeConfig) adrenaline, pwalletMain->mapMyLuxNodes)
         {
-            updateAdrenalineNode(QString::fromStdString(adrenaline.second.sAlias), QString::fromStdString(adrenaline.second.sAddress), QString::fromStdString(adrenaline.second.sMasternodePrivKey), QString::fromStdString(adrenaline.second.sCollateralAddress));
+            updateLuxNode(QString::fromStdString(adrenaline.second.sAlias), QString::fromStdString(adrenaline.second.sAddress), QString::fromStdString(adrenaline.second.sMasternodePrivKey), QString::fromStdString(adrenaline.second.sCollateralAddress));
         }
     }
 }
@@ -305,7 +305,7 @@ void MasternodeManager::on_startButton_clicked()
     QModelIndex index = selected.at(0);
     int r = index.row();
     std::string sAddress = ui->tableWidget_2->item(r, 1)->text().toStdString();
-    CAdrenalineNodeConfig c = pwalletMain->mapMyAdrenalineNodes[sAddress];
+    CLuxNodeConfig c = pwalletMain->mapMyLuxNodes[sAddress];
 
     std::string errorMessage;
     bool result = activeMasternode.RegisterByPubKey(c.sAddress, c.sMasternodePrivKey, c.sCollateralAddress, errorMessage);
@@ -330,7 +330,7 @@ void MasternodeManager::on_stopButton_clicked()
     QModelIndex index = selected.at(0);
     int r = index.row();
     std::string sAddress = ui->tableWidget_2->item(r, 1)->text().toStdString();
-    CAdrenalineNodeConfig c = pwalletMain->mapMyAdrenalineNodes[sAddress];
+    CLuxNodeConfig c = pwalletMain->mapMyLuxNodes[sAddress];
 
     std::string errorMessage;
     bool result = activeMasternode.StopMasterNode(c.sAddress, c.sMasternodePrivKey, errorMessage);
@@ -349,9 +349,9 @@ void MasternodeManager::on_stopButton_clicked()
 void MasternodeManager::on_startAllButton_clicked()
 {
     std::string results;
-    BOOST_FOREACH(PAIRTYPE(std::string, CAdrenalineNodeConfig) adrenaline, pwalletMain->mapMyAdrenalineNodes)
+    BOOST_FOREACH(PAIRTYPE(std::string, CLuxNodeConfig) adrenaline, pwalletMain->mapMyLuxNodes)
     {
-        CAdrenalineNodeConfig c = adrenaline.second;
+        CLuxNodeConfig c = adrenaline.second;
 	std::string errorMessage;
         bool result = activeMasternode.RegisterByPubKey(c.sAddress, c.sMasternodePrivKey, c.sCollateralAddress, errorMessage);
 	if(result)
@@ -372,9 +372,9 @@ void MasternodeManager::on_startAllButton_clicked()
 void MasternodeManager::on_stopAllButton_clicked()
 {
     std::string results;
-    BOOST_FOREACH(PAIRTYPE(std::string, CAdrenalineNodeConfig) adrenaline, pwalletMain->mapMyAdrenalineNodes)
+    BOOST_FOREACH(PAIRTYPE(std::string, CLuxNodeConfig) adrenaline, pwalletMain->mapMyLuxNodes)
     {
-        CAdrenalineNodeConfig c = adrenaline.second;
+        CLuxNodeConfig c = adrenaline.second;
 	std::string errorMessage;
         bool result = activeMasternode.StopMasterNode(c.sAddress, c.sMasternodePrivKey, errorMessage);
 	if(result)

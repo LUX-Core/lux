@@ -29,7 +29,7 @@ std::map<int64_t, uint256> mapCacheBlockHashes;
 
 // manage the masternode connections
 void ProcessMasternodeConnections(){
-    LOCK(cs_vNodes);
+    //LOCK(cs_vNodes);
 
     BOOST_FOREACH(CNode* pnode, vNodes)
                 {
@@ -48,8 +48,6 @@ void ProcessMasternode(CNode* pfrom, const std::string& strCommand, CDataStream&
 
     if (strCommand == "dsee") { //DarkSend Election Entry
         isMasternodeCommand = true;
-        
-        if(fLiteMode) return; //disable all darksend/masternode related functionality
 
         bool fIsInitialDownload = IsInitialBlockDownload();
         if(fIsInitialDownload) return;
@@ -203,8 +201,6 @@ void ProcessMasternode(CNode* pfrom, const std::string& strCommand, CDataStream&
 
     else if (strCommand == "dseep") { //DarkSend Election Entry Ping
         isMasternodeCommand = true;
-        
-        if(fLiteMode) return; //disable all darksend/masternode related functionality
         bool fIsInitialDownload = IsInitialBlockDownload();
         if(fIsInitialDownload) return;
 
@@ -275,12 +271,11 @@ void ProcessMasternode(CNode* pfrom, const std::string& strCommand, CDataStream&
         int64_t askAgain = GetTime()+(60*60*24);
         askedForMasternodeListEntry[vin.prevout] = askAgain;
 
-    } 
+    }
 
     else if (strCommand == "dseg") { //Get masternode list or specific entry
         isMasternodeCommand = true;
-        
-        if(fLiteMode) return; //disable all darksend/masternode related functionality
+
         CTxIn vin;
         vRecv >> vin;
 
@@ -332,8 +327,6 @@ void ProcessMasternode(CNode* pfrom, const std::string& strCommand, CDataStream&
 
     else if (strCommand == "mnget") { //Masternode Payments Request Sync
         isMasternodeCommand = true;
-        
-        if(fLiteMode) return; //disable all darksend/masternode related functionality
 
         /*if(pfrom->HasFulfilledRequest("mnget")) {
             LogPrintf("mnget - peer already asked me for the list\n");
@@ -349,8 +342,7 @@ void ProcessMasternode(CNode* pfrom, const std::string& strCommand, CDataStream&
 
     else if (strCommand == "mnw") { //Masternode Payments Declare Winner
         isMasternodeCommand = true;
-        
-        //this is required in litemode
+
         CMasternodePaymentWinner winner;
         int a = 0;
         vRecv >> winner >> a;
@@ -817,7 +809,7 @@ void CMasternodePayments::Relay(CMasternodePaymentWinner& winner)
 
     vector<CInv> vInv;
     vInv.push_back(inv);
-    LOCK(cs_vNodes);
+    //LOCK(cs_vNodes);
     BOOST_FOREACH(CNode* pnode, vNodes){
                     pnode->PushMessage("inv", vInv);
                 }

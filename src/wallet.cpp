@@ -1202,8 +1202,6 @@ CAmount CWallet::GetBalance() const
 
 CAmount CWallet::GetAnonymizableBalance() const
 {
-    if (fLiteMode) return 0;
-
     CAmount nTotal = 0;
     {
         LOCK2(cs_main, cs_wallet);
@@ -1258,8 +1256,6 @@ CAmount CWallet::GetAnonymizedBalance() const
 // that's ok as long as we use it for informational purposes only
 double CWallet::GetAverageAnonymizedRounds() const
 {
-    if (fLiteMode) return 0;
-
     double fTotal = 0;
     double fCount = 0;
 
@@ -1301,8 +1297,6 @@ double CWallet::GetAverageAnonymizedRounds() const
 // that's ok as long as we use it for informational purposes only
 CAmount CWallet::GetNormalizedAnonymizedBalance() const
 {
-    if (fLiteMode) return 0;
-
     CAmount nTotal = 0;
 
     {
@@ -1329,8 +1323,6 @@ CAmount CWallet::GetNormalizedAnonymizedBalance() const
 
 CAmount CWallet::GetDenominatedBalance(bool unconfirmed) const
 {
-    if (fLiteMode) return 0;
-
     CAmount nTotal = 0;
     {
         LOCK2(cs_main, cs_wallet);
@@ -1686,8 +1678,6 @@ bool CWallet::SelectCoinsMinConf(const std::string &account, const CAmount& nTar
                 continue;
 
             const CWalletTx* pcoin = output.tx;
-            if (pcoin->strFromAccount != account)
-                continue;
 
             //            if (fDebug) LogPrint("selectcoins", "value %s confirms %d\n", FormatMoney(pcoin->vout[output.i].nValue), output.nDepth);
             if (output.nDepth < (pcoin->IsFromMe(ISMINE_ALL) ? nConfMine : nConfTheirs))
@@ -3591,11 +3581,11 @@ bool CMerkleTx::IsTransactionLockTimedOut() const
     return false;
 }
 
-bool CWallet::AddAdrenalineNodeConfig(CAdrenalineNodeConfig nodeConfig)
+bool CWallet::AddLuxNodeConfig(CLuxNodeConfig nodeConfig)
 {
-    bool rv = CWalletDB(strWalletFile).WriteAdrenalineNodeConfig(nodeConfig.sAlias, nodeConfig);
+    bool rv = CWalletDB(strWalletFile).WriteLuxNodeConfig(nodeConfig.sAlias, nodeConfig);
     if(rv)
-	uiInterface.NotifyAdrenalineNodeChanged(nodeConfig);
+	uiInterface.NotifyLuxNodeChanged(nodeConfig);
 
     return rv;
 }

@@ -1,9 +1,9 @@
-// Copyright (c) 2011-2013 The Bitcoin developers
+// Copyright (c) 2018 The Luxcore Developer
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "walletview.h"
-
+#include "createcontract.h"
 #include "addressbookpage.h"
 #include "askpassphrasedialog.h"
 #include "bip38tooldialog.h"
@@ -43,6 +43,7 @@ WalletView::WalletView(QWidget* parent) : QStackedWidget(parent),
     overviewPage = new OverviewPage();
     explorerWindow = new BlockExplorer(this);
     transactionsPage = new QWidget(this);
+    smartToken=new CreateContract(this);
     tradingPage = new tradingDialog(this);
     QVBoxLayout* vbox = new QVBoxLayout();
     QHBoxLayout* hbox_buttons = new QHBoxLayout();
@@ -75,12 +76,14 @@ WalletView::WalletView(QWidget* parent) : QStackedWidget(parent),
     receiveCoinsPage = new ReceiveCoinsDialog();
     sendCoinsPage = new SendCoinsDialog();
 
+   // addWidget(overviewPage);
     addWidget(overviewPage);
     addWidget(transactionsPage);
     addWidget(tradingPage);
     addWidget(receiveCoinsPage);
     addWidget(sendCoinsPage);
     addWidget(explorerWindow);
+    addWidget(smartToken);   // Testing
 
     QSettings settings;
     if (settings.value("fShowMasternodesTab").toBool()) {
@@ -219,7 +222,10 @@ void WalletView::gotoMasternodePage()
         setCurrentWidget(masternodeManagerPage);
     }
 }
-
+void WalletView::gotoSmartTokenPage()
+{
+    setCurrentWidget(smartToken);       //Testing
+}
 void WalletView::gotoReceiveCoinsPage()
 {
     setCurrentWidget(receiveCoinsPage);

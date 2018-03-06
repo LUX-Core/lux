@@ -346,24 +346,9 @@ CAmount GetMinRelayFee(const CTransaction& tx, unsigned int nBytes, bool fAllowF
      if (tx.vin.size() == 0 && fAllowWitness) {
          /* We read a dummy or an empty vin. */
          s >> flags;
-         if (flags != 0) {
-           s >> tx.vin;
-             s >> tx.vout;
-         }
      } else {
          /* We read a non-empty vin. Assume a normal vout follows. */
          s >> tx.vout;
-     }
-     if ((flags & 1) && fAllowWitness) {
-         /* The witness flag is present, and we support witnesses. */
-         flags ^= 1;
-         for (size_t i = 0; i < tx.vin.size(); i++) {
-             s >> tx.vin[i].scriptWitness.stack;
-         }
-     }
-     if (flags) {
-         /* Unknown flag in the serialization */
-         throw std::ios_base::failure("Unknown transaction optional data");
      }
      s >> tx.nLockTime;
  }
@@ -700,20 +685,4 @@ struct CBlockTemplate {
     std::vector<int64_t> vTxSigOps;
 };
 
-/*
-class CValidationInterface
-{
-protected:
-    virtual void SyncTransaction(const CTransaction& tx, const CBlock* pblock){};
-    virtual void EraseFromWallet(const uint256& hash){};
-    virtual void SetBestChain(const CBlockLocator& locator){};
-    virtual bool UpdatedTransaction(const uint256& hash) { return false; };
-    virtual void Inventory(const uint256& hash){};
-    virtual void ResendWalletTransactions(){};
-    virtual void BlockChecked(const CBlock&, const CValidationState&){};
-    friend void ::RegisterValidationInterface(CValidationInterface*);
-    friend void ::UnregisterValidationInterface(CValidationInterface*);
-    friend void ::UnregisterAllValidationInterfaces();
-};
-*/
 #endif // BITCOIN_MAIN_H

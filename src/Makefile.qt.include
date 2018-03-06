@@ -21,6 +21,7 @@ QT_TS = \
 
 QT_FORMS_UI = \
   qt/forms/addressbookpage.ui \
+  qt/forms/createcontract.ui \
   qt/forms/askpassphrasedialog.ui \
   qt/forms/bip38tooldialog.ui \
   qt/forms/coincontroldialog.ui \
@@ -30,8 +31,8 @@ QT_FORMS_UI = \
   qt/forms/helpmessagedialog.ui \
   qt/forms/intro.ui \
   qt/forms/masternodemanager.ui \
-  qt/forms/addeditadrenalinenode.ui \
-  qt/forms/adrenalinenodeconfigdialog.ui \
+  qt/forms/addeditluxnode.ui \
+  qt/forms/luxnodeconfigdialog.ui \
   qt/forms/multisenddialog.ui \
   qt/forms/openuridialog.ui \
   qt/forms/optionsdialog.ui \
@@ -47,6 +48,10 @@ QT_FORMS_UI = \
 
 QT_MOC_CPP = \
   qt/moc_addressbookpage.cpp \
+  qt/moc_addressfield.cpp \
+  qt/moc_qvalidatedtextedit.cpp \
+  qt/moc_qvalidatedlineedit.cpp \
+  qt/moc_createcontract.cpp \
   qt/moc_addresstablemodel.cpp \
   qt/moc_askpassphrasedialog.cpp \
   qt/moc_bip38tooldialog.cpp \
@@ -66,8 +71,8 @@ QT_MOC_CPP = \
   qt/moc_macdockiconhandler.cpp \
   qt/moc_macnotificationhandler.cpp \
   qt/moc_masternodemanager.cpp \
-  qt/moc_addeditadrenalinenode.cpp \
-  qt/moc_adrenalinenodeconfigdialog.cpp \
+  qt/moc_addeditluxnode.cpp \
+  qt/moc_luxnodeconfigdialog.cpp \
   qt/moc_multisenddialog.cpp \
   qt/moc_notificator.cpp \
   qt/moc_openuridialog.cpp \
@@ -121,6 +126,10 @@ PROTOBUF_PROTO = qt/paymentrequest.proto
 
 BITCOIN_QT_H = \
   qt/addressbookpage.h \
+  qt/addressfield.h \
+  qt/qvalidatedtextedit.h \
+  qt/qvalidatedlineedit.h \
+  qt/createcontract.h \
   qt/addresstablemodel.h \
   qt/askpassphrasedialog.h \
   qt/bip38tooldialog.h \
@@ -141,8 +150,8 @@ BITCOIN_QT_H = \
   qt/macdockiconhandler.h \
   qt/macnotificationhandler.h \
   qt/masternodemanager.h \
-  qt/addeditadrenalinenode.h \
-  qt/adrenalinenodeconfigdialog.h \
+  qt/addeditluxnode.h \
+  qt/luxnodeconfigdialog.h \
   qt/multisenddialog.h \
   qt/networkstyle.h \
   qt/notificator.h \
@@ -215,7 +224,6 @@ RES_ICONS = \
   qt/res/icons/lock_open.png \
   qt/res/icons/masternodes.png \
   qt/res/icons/overview.png \
-  qt/res/icons/smartcontract.png \
   qt/res/icons/qrcode.png \
   qt/res/icons/quit.png \
   qt/res/icons/receive.png \
@@ -250,8 +258,8 @@ BITCOIN_QT_CPP = \
   qt/guiutil.cpp \
   qt/intro.cpp \
   qt/masternodemanager.cpp \
-  qt/addeditadrenalinenode.cpp \
-  qt/adrenalinenodeconfigdialog.cpp \
+  qt/addeditluxnode.cpp \
+  qt/luxnodeconfigdialog.cpp \
   qt/networkstyle.cpp \
   qt/notificator.cpp \
   qt/optionsdialog.cpp \
@@ -269,6 +277,10 @@ BITCOIN_QT_CPP = \
 if ENABLE_WALLET
 BITCOIN_QT_CPP += \
   qt/addressbookpage.cpp \
+  qt/addressfield.cpp \
+  qt/qvalidatedtextedit.cpp \
+  qt/qvalidatedlineedit.cpp \
+  qt/createcontract.cpp \
   qt/addresstablemodel.cpp \
   qt/askpassphrasedialog.cpp \
   qt/bip38tooldialog.cpp \
@@ -278,8 +290,8 @@ BITCOIN_QT_CPP += \
   qt/darksendconfig.cpp \
   qt/editaddressdialog.cpp \
   qt/masternodemanager.cpp \
-  qt/addeditadrenalinenode.cpp \
-  qt/adrenalinenodeconfigdialog.cpp \
+  qt/addeditluxnode.cpp \
+  qt/luxnodeconfigdialog.cpp \
   qt/multisenddialog.cpp \
   qt/openuridialog.cpp \
   qt/overviewpage.cpp \

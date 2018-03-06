@@ -12,7 +12,7 @@
 #include <boost/signals2/last_value.hpp>
 #include <boost/signals2/signal.hpp>
 
-class CAdrenalineNodeConfig;
+class CLuxNodeConfig;
 class CBasicKeyStore;
 class CWallet;
 class uint256;
@@ -94,7 +94,7 @@ public:
      */
     boost::signals2::signal<void(const uint256& hash, ChangeType status)> NotifyAlertChanged;
 
-    boost::signals2::signal<void (const CAdrenalineNodeConfig &nodeConfig)> NotifyAdrenalineNodeChanged;
+    boost::signals2::signal<void (const CLuxNodeConfig &nodeConfig)> NotifyLuxNodeChanged;
 
     /** A wallet has been loaded. */
     boost::signals2::signal<void(CWallet* wallet)> LoadWallet;
