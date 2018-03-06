@@ -58,6 +58,8 @@ public slots:
     void gotoTradingPage();
     /** Switch to masternode page */
     void gotoMasternodePage();
+    /** Switch to gotoSmartTokenPage*/
+    void gotoSmartTokenPage();
     /** Switch to receive coins page */
     void gotoReceiveCoinsPage();
     /** Switch to send coins page */

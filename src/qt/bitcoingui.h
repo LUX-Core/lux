@@ -31,6 +31,7 @@ class WalletFrame;
 class WalletModel;
 class MasternodeList;
 
+
 class CWallet;
 
 QT_BEGIN_NAMESPACE
