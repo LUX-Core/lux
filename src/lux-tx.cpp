@@ -149,6 +149,7 @@ static void RegisterLoad(const string& strInput)
     }
 
     if (ferror(f)) {
+        fclose(f);
         string strErr = "Error reading file " + filename;
         throw runtime_error(strErr);
     }
