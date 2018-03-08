@@ -1,2 +1,0 @@
-/usr/bin/ar qc libethashseal.a  CMakeFiles/ethashseal.dir/Ethash.cpp.o CMakeFiles/ethashseal.dir/EthashAux.cpp.o CMakeFiles/ethashseal.dir/EthashClient.cpp.o CMakeFiles/ethashseal.dir/GenesisInfo.cpp.o CMakeFiles/ethashseal.dir/EthashProofOfWork.cpp.o CMakeFiles/ethashseal.dir/EthashCPUMiner.cpp.o
-/usr/bin/ranlib libethashseal.a
