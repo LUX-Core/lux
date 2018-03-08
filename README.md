@@ -92,7 +92,7 @@ Once the source code is ready the build steps are below.
     sudo apt-get install software-properties-common
     sudo add-apt-repository ppa:bitcoin/bitcoin
     sudo apt-get update
-    sudo apt-get install libdb4.8-dev libdb4.8++-dev
+    sudo apt-get install libdb4.8-dev libdb4.8++-dev libleveldb-dev
 
     # If you want to build the Qt GUI:
     sudo apt-get install libqt5gui5 libqt5core5a libqt5dbus5 qttools5-dev qttools5-dev-tools libprotobuf-dev protobuf-compiler
@@ -102,6 +102,7 @@ Once the source code is ready the build steps are below.
     cd lux
 
     # Note autogen will prompt to install some more dependencies if needed
+    git submodule update --init
     ./autogen.sh
     ./configure --disable-tests
     make -j$(nproc)
