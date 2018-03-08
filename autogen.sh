@@ -7,3 +7,7 @@ if [ -z ${LIBTOOLIZE} ] && GLIBTOOLIZE="`which glibtoolize 2>/dev/null`"; then
   export LIBTOOLIZE
 fi
 autoreconf --install --force --warnings=all
+cd src/cpp-ethereum
+git submodule update --init
+cmake .
+
