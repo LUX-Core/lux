@@ -1,0 +1,2 @@
+/usr/bin/ar qc libwebthree.a  CMakeFiles/webthree.dir/WebThree.cpp.o
+/usr/bin/ranlib libwebthree.a

@@ -1,0 +1,2 @@
+/usr/bin/ar qc libethcore.a  CMakeFiles/ethcore.dir/Common.cpp.o CMakeFiles/ethcore.dir/Precompiled.cpp.o CMakeFiles/ethcore.dir/BlockHeader.cpp.o CMakeFiles/ethcore.dir/KeyManager.cpp.o CMakeFiles/ethcore.dir/SealEngine.cpp.o CMakeFiles/ethcore.dir/BasicAuthority.cpp.o CMakeFiles/ethcore.dir/CommonJS.cpp.o CMakeFiles/ethcore.dir/ChainOperationParams.cpp.o CMakeFiles/ethcore.dir/TransactionBase.cpp.o CMakeFiles/ethcore.dir/LogEntry.cpp.o
+/usr/bin/ranlib libethcore.a
