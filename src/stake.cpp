@@ -960,7 +960,7 @@ void Stake::StakingThread(CWallet *wallet)
             std::size_t nNodes = 0;
             bool nCanStake = !IsInitialBlockDownload();
             if  (nCanStake) {
-                //LOCK(cs_vNodes);
+                LOCK(cs_vNodes); // Lock nodes for security.
                 if ((nNodes = vNodes.size()) == 0) {
                     nCanStake = false;
                 }
@@ -986,6 +986,8 @@ void Stake::StakingThread(CWallet *wallet)
                     }
                 }
             } else {
+                // Give a break to avoid interrupting other jobs too much (e.g. syncing)
+                MilliSleep(3000);
                 continue;
             }
 
