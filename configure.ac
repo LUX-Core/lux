@@ -551,14 +551,10 @@ fi
 LEVELDB_CPPFLAGS=
 LIBLEVELDB=
 LIBMEMENV=
-AM_CONDITIONAL([EMBEDDED_LEVELDB],[false])
+AM_CONDITIONAL([EMBEDDED_LEVELDB],[true])
 AC_SUBST(LEVELDB_CPPFLAGS)
 AC_SUBST(LIBLEVELDB)
 AC_SUBST(LIBMEMENV)
-
-AC_CHECK_LIB([leveldb],      [main],AC_SUBST([LIBLEVELDB],[-lleveldb]), AC_MSG_ERROR(LIBLEVELDB missing))
-AC_CHECK_LIB([memenv],      [main],AC_SUBST([LIBMEMENV],[-lmemenv]), AC_MSG_ERROR(LIBMEMENV missing))
-LIBLEVELDB="$LIBLEVELDB $LIBMEMENV"
 
 if test x$enable_wallet != xno; then
     dnl Check for libdb_cxx only if wallet enabled
