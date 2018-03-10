@@ -1781,7 +1781,7 @@ bool CWallet::SelectCoins(const std::string &account, const CAmount& nTargetValu
 
 #           if defined(SELECT_COINS_FROM_ACCOUNT)&&SELECT_COINS_FROM_ACCOUNT
             CTxDestination address;
-            if (ExtractDestination(txout.scriptPubKey, address) && IsAccountAddress(account, address)) {
+            if (ExtractDestination(txout.scriptPubKey, address) && out.tx->strFromAccount == account) {
                 nValueRet += txout.nValue;
                 setCoinsRet.insert(make_pair(out.tx, out.i));
             }
@@ -1812,7 +1812,7 @@ bool CWallet::SelectCoins(const std::string &account, const CAmount& nTargetValu
 
 #                   if defined(SELECT_COINS_FROM_ACCOUNT)&&SELECT_COINS_FROM_ACCOUNT
                     CTxDestination address;
-                    if (ExtractDestination(txout.scriptPubKey, address) && IsAccountAddress(account, address)) {
+                    if (ExtractDestination(txout.scriptPubKey, address) && out.tx->strFromAccount == account) {
                         nValueRet += txout.nValue;
                         setCoinsRet.insert(make_pair(out.tx, out.i));
                     }
