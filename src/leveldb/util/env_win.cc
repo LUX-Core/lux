@@ -724,7 +724,6 @@ void Win32Logger::Logv( const char* format, va_list ap )
         // Print the message
         if (p < limit) {
             va_list backup_ap;
-            va_start (backup_ap, format);
             va_copy(backup_ap, ap);
             p += vsnprintf(p, limit - p, format, backup_ap);
             va_end(backup_ap);

@@ -72,7 +72,7 @@ Note that for WSL the Lux Core source path MUST be somewhere in the default moun
 The next three steps are an example of how to acquire the source in an appropriate way.
 
     cd /usr/src
-    sudo git clone https://github.com/216k155/lux.git
+    git clone https://github.com/216k155/lux.git --recursive
     sudo chmod -R a+rw lux
     
 Once the source code is ready the build steps are below.
@@ -124,7 +124,7 @@ Then install [Homebrew](https://brew.sh).
 
 #### Dependencies
 
-    brew install cmake automake berkeley-db4 libtool boost --c++11 --without-single --without-static miniupnpc openssl pkg-config protobuf qt5 libevent imagemagick --with-librsvg
+    brew install cmake automake berkeley-db4 leveldb libtool boost --c++11 --without-single --without-static miniupnpc openssl pkg-config protobuf qt5 libevent imagemagick --with-librsvg
 
 NOTE: Building with Qt4 is still supported, however, could result in a broken UI. Building with Qt5 is recommended.
 
@@ -133,7 +133,7 @@ NOTE: Building with Qt4 is still supported, however, could result in a broken UI
 1. Clone the Lux source code and cd into `Lux`
 
         git clone --recursive https://github.com/216k155/lux.git
-        cd Lux
+        cd lux
 
 2.  Build Luxcore:
 
