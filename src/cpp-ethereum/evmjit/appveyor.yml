@@ -1,0 +1,17 @@
+version: "{build}"
+branches:
+  only:
+  - develop
+configuration:
+  - Debug
+  - Release
+cache:
+  - deps -> cmake/ProjectLLVM.cmake
+before_build: |
+  if not exist build mkdir build
+  cd build
+  cmake -G "Visual Studio 14 2015 Win64" ..
+build:
+  project: c:/projects/evmjit/build/evmjit.sln
+  parallel: true
+  verbosity: minimal

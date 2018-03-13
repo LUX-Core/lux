@@ -1,0 +1,11 @@
+dependencies:
+  override:
+    - scripts/install_cmake.sh
+    - PATH=~/.local/bin:$PATH BUILD_TYPE=RelWithDebInfo scripts/build.sh
+  cache_directories:
+    - deps  # Cache llvm build
+    - ~/.local
+
+test:
+  override:
+    - cd build && ctest
