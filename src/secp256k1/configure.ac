@@ -127,7 +127,7 @@ AC_ARG_ENABLE(module_ecdh,
 AC_ARG_ENABLE(module_recovery,
     AS_HELP_STRING([--enable-module-recovery],[enable ECDSA pubkey recovery module (default is no)]),
     [enable_module_recovery=$enableval],
-    [enable_module_recovery=yes])
+    [enable_module_recovery=no])
 
 AC_ARG_ENABLE(jni,
     AS_HELP_STRING([--enable-jni],[enable libsecp256k1_jni (default is auto)]),
