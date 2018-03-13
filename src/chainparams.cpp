@@ -59,7 +59,9 @@ static Checkpoints::MapCheckpoints mapCheckpoints =
             ( 6901,   uint256("0x0000000000034bab666179e364e0cce7c19eaa255f1e4afd2170356acfa1a3ac") )
             ( 25318,   uint256("0x092a04ee669d2d2241aba0ec9dcecb548c9cea9ff114b0ee52cdc7ddac98a1f4") )
             ( 97176,   uint256("0x000000000004e4aac7926e7dbd778f21b15b62f0e4c1d424ac9e5a9889c1724a") )
-            ( 122237,   uint256("0x10f6d17326a0c439f61a21c44a172885469bb60668a0d77be82eead7209183b0") );
+            ( 122237,   uint256("0x10f6d17326a0c439f61a21c44a172885469bb60668a0d77be82eead7209183b0") )
+            ( 203690,   uint256("0x00000000000180e78502c3c952f00bf8bba2bc9ffef60e7188c8763582f26ef4") );
+
 static const Checkpoints::CCheckpointData data = {
     &mapCheckpoints,
     1514488096, // * UNIX timestamp of last checkpoint block
@@ -174,7 +176,7 @@ public:
         strDarksendPoolDummyAddress = "LgcjpYxWa5EB9KCYaRtpPgG8kgiWRvJY38";
         nStartMasternodePayments = 1507656633; // 10/10/2017
 
-        nStakingRoundPeriod = 300; // 5 minutes a round
+        nStakingRoundPeriod = 120; // 2 minutes a round
         nStakingInterval = 22;
         nStakingMinAge = 36 * 60 * 60;
     }

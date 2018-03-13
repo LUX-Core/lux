@@ -32,7 +32,7 @@
 #include <libscrypt/libscrypt.h>
 #include <libdevcore/SHA3.h>
 #include <libdevcore/RLP.h>
-#include "AES.h"
+#include "libdevcrypto/AES.h"
 #include "CryptoPP.h"
 #include "Exceptions.h"
 using namespace std;
@@ -326,7 +326,7 @@ h256 crypto::kdf(Secret const& _priv, h256 const& _hash)
 	sha3mac(Secret::random().ref(), _priv.ref(), s.ref());
 	s ^= _hash;
 	sha3(s.ref(), s.ref());
-	
+
 	if (!s || !_hash || !_priv)
 		BOOST_THROW_EXCEPTION(InvalidState());
 	return s;
