@@ -1,3 +1,0 @@
-[submodule "src/cpp-ethereum"]
-	path = src/cpp-ethereum
-	url = https://github.com/ethereum/cpp-ethereum.git

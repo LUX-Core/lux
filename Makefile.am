@@ -1,5 +1,5 @@
 ACLOCAL_AMFLAGS = -I build-aux/m4
-SUBDIRS = src/cpp-ethereum src
+SUBDIRS = src
 .PHONY: deploy FORCE
 
 GZIP_ENV="-9n"
