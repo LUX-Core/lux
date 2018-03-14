@@ -1,0 +1,146 @@
+# Copyright (c) 2016 The Bitcoin Core developers
+# Distributed under the MIT software license, see the accompanying
+# file COPYING or http://www.opensource.org/licenses/mit-license.php.
+
+LIBCRYPTOPP_INT = cryptopp/libcryptopp.a
+
+EXTRA_LIBRARIES += $(LIBCRYPTOPP_INT)
+
+LIBCRYPTOPP += $(LIBCRYPTOPP_INT)
+
+CRYPTOPP_CPPFLAGS += -I$(srcdir)/cryptopp/include
+
+CRYPTOPP_CPPFLAGS_INT =
+CRYPTOPP_CPPFLAGS_INT += -I$(srcdir)/cryptopp
+CRYPTOPP_CPPFLAGS_INT += $(CRYPTOPP_TARGET_FLAGS)
+
+cryptopp_libcryptopp_a_CPPFLAGS = $(AM_CPPFLAGS) $(CRYPTOPP_CPPFLAGS_INT) $(CRYPTOPP_CPPFLAGS)
+# TODO, don't assume x86
+cryptopp_libcryptopp_a_CXXFLAGS = $(AM_CXXFLAGS) -DNDEBUG -fPIC -O2 -g2
+
+cryptopp_libcryptopp_a_SOURCES=
+cryptopp_libcryptopp_a_SOURCES += cryptopp/cryptlib.cpp
+cryptopp_libcryptopp_a_SOURCES += cryptopp/cpu.cpp
+cryptopp_libcryptopp_a_SOURCES += cryptopp/integer.cpp
+
+cryptopp_libcryptopp_a_SOURCES += cryptopp/algebra.cpp
+cryptopp_libcryptopp_a_SOURCES += cryptopp/algparam.cpp
+cryptopp_libcryptopp_a_SOURCES += cryptopp/asn.cpp
+cryptopp_libcryptopp_a_SOURCES += cryptopp/basecode.cpp
+cryptopp_libcryptopp_a_SOURCES += cryptopp/dsa.cpp
+cryptopp_libcryptopp_a_SOURCES += cryptopp/des.cpp
+cryptopp_libcryptopp_a_SOURCES += cryptopp/dessp.cpp
+cryptopp_libcryptopp_a_SOURCES += cryptopp/dll.cpp
+cryptopp_libcryptopp_a_SOURCES += cryptopp/ec2n.cpp
+cryptopp_libcryptopp_a_SOURCES += cryptopp/eccrypto.cpp
+cryptopp_libcryptopp_a_SOURCES += cryptopp/ecp.cpp
+cryptopp_libcryptopp_a_SOURCES += cryptopp/eprecomp.cpp
+cryptopp_libcryptopp_a_SOURCES += cryptopp/filters.cpp
+cryptopp_libcryptopp_a_SOURCES += cryptopp/fips140.cpp
+cryptopp_libcryptopp_a_SOURCES += cryptopp/gf2n.cpp
+cryptopp_libcryptopp_a_SOURCES += cryptopp/gfpcrypt.cpp
+cryptopp_libcryptopp_a_SOURCES += cryptopp/hex.cpp
+cryptopp_libcryptopp_a_SOURCES += cryptopp/hmac.cpp
+cryptopp_libcryptopp_a_SOURCES += cryptopp/hrtimer.cpp
+cryptopp_libcryptopp_a_SOURCES += cryptopp/iterhash.cpp
+cryptopp_libcryptopp_a_SOURCES += cryptopp/keccak.cpp
+cryptopp_libcryptopp_a_SOURCES += cryptopp/misc.cpp
+cryptopp_libcryptopp_a_SOURCES += cryptopp/modes.cpp
+cryptopp_libcryptopp_a_SOURCES += cryptopp/mqueue.cpp
+cryptopp_libcryptopp_a_SOURCES += cryptopp/nbtheory.cpp
+cryptopp_libcryptopp_a_SOURCES += cryptopp/oaep.cpp
+cryptopp_libcryptopp_a_SOURCES += cryptopp/osrng.cpp
+cryptopp_libcryptopp_a_SOURCES += cryptopp/polynomi.cpp
+cryptopp_libcryptopp_a_SOURCES += cryptopp/pubkey.cpp
+cryptopp_libcryptopp_a_SOURCES += cryptopp/queue.cpp
+cryptopp_libcryptopp_a_SOURCES += cryptopp/randpool.cpp
+cryptopp_libcryptopp_a_SOURCES += cryptopp/rdtables.cpp
+cryptopp_libcryptopp_a_SOURCES += cryptopp/rijndael.cpp
+cryptopp_libcryptopp_a_SOURCES += cryptopp/rng.cpp
+cryptopp_libcryptopp_a_SOURCES += cryptopp/sha.cpp
+cryptopp_libcryptopp_a_SOURCES += cryptopp/strciphr.cpp
+cryptopp_libcryptopp_a_SOURCES += cryptopp/winpipes.cpp
+cryptopp_libcryptopp_a_SOURCES += cryptopp/sha3.cpp
+
+cryptopp_libcryptopp_a_SOURCES += cryptopp/cryptlib.h
+cryptopp_libcryptopp_a_SOURCES += cryptopp/cpu.h
+cryptopp_libcryptopp_a_SOURCES += cryptopp/integer.h
+
+cryptopp_libcryptopp_a_SOURCES += cryptopp/algebra.h
+cryptopp_libcryptopp_a_SOURCES += cryptopp/algparam.h
+cryptopp_libcryptopp_a_SOURCES += cryptopp/asn.h
+cryptopp_libcryptopp_a_SOURCES += cryptopp/basecode.h
+cryptopp_libcryptopp_a_SOURCES += cryptopp/dsa.h
+cryptopp_libcryptopp_a_SOURCES += cryptopp/des.h
+cryptopp_libcryptopp_a_SOURCES += cryptopp/dll.h
+cryptopp_libcryptopp_a_SOURCES += cryptopp/ec2n.h
+cryptopp_libcryptopp_a_SOURCES += cryptopp/eccrypto.h
+cryptopp_libcryptopp_a_SOURCES += cryptopp/ecp.h
+cryptopp_libcryptopp_a_SOURCES += cryptopp/eprecomp.h
+cryptopp_libcryptopp_a_SOURCES += cryptopp/filters.h
+cryptopp_libcryptopp_a_SOURCES += cryptopp/fips140.h
+cryptopp_libcryptopp_a_SOURCES += cryptopp/gf2n.h
+cryptopp_libcryptopp_a_SOURCES += cryptopp/gfpcrypt.h
+cryptopp_libcryptopp_a_SOURCES += cryptopp/hex.h
+cryptopp_libcryptopp_a_SOURCES += cryptopp/hmac.h
+cryptopp_libcryptopp_a_SOURCES += cryptopp/hrtimer.h
+cryptopp_libcryptopp_a_SOURCES += cryptopp/iterhash.h
+cryptopp_libcryptopp_a_SOURCES += cryptopp/keccak.h
+cryptopp_libcryptopp_a_SOURCES += cryptopp/misc.h
+cryptopp_libcryptopp_a_SOURCES += cryptopp/modes.h
+cryptopp_libcryptopp_a_SOURCES += cryptopp/mqueue.h
+cryptopp_libcryptopp_a_SOURCES += cryptopp/nbtheory.h
+cryptopp_libcryptopp_a_SOURCES += cryptopp/oaep.h
+cryptopp_libcryptopp_a_SOURCES += cryptopp/osrng.h
+cryptopp_libcryptopp_a_SOURCES += cryptopp/polynomi.h
+cryptopp_libcryptopp_a_SOURCES += cryptopp/pubkey.h
+cryptopp_libcryptopp_a_SOURCES += cryptopp/queue.h
+cryptopp_libcryptopp_a_SOURCES += cryptopp/randpool.h
+cryptopp_libcryptopp_a_SOURCES += cryptopp/rijndael.h
+cryptopp_libcryptopp_a_SOURCES += cryptopp/rng.h
+cryptopp_libcryptopp_a_SOURCES += cryptopp/sha.h
+cryptopp_libcryptopp_a_SOURCES += cryptopp/strciphr.h
+cryptopp_libcryptopp_a_SOURCES += cryptopp/winpipes.h
+cryptopp_libcryptopp_a_SOURCES += cryptopp/sha3.h
+cryptopp_libcryptopp_a_SOURCES += cryptopp/aes.h
+cryptopp_libcryptopp_a_SOURCES += cryptopp/factory.h
+cryptopp_libcryptopp_a_SOURCES += cryptopp/config.h
+cryptopp_libcryptopp_a_SOURCES += cryptopp/dmac.h
+cryptopp_libcryptopp_a_SOURCES += cryptopp/drbg.h
+cryptopp_libcryptopp_a_SOURCES += cryptopp/esign.h
+cryptopp_libcryptopp_a_SOURCES += cryptopp/fhmqv.h
+cryptopp_libcryptopp_a_SOURCES += cryptopp/hkdf.h
+cryptopp_libcryptopp_a_SOURCES += cryptopp/hmqv.h
+cryptopp_libcryptopp_a_SOURCES += cryptopp/lubyrack.h
+cryptopp_libcryptopp_a_SOURCES += cryptopp/mersenne.h
+cryptopp_libcryptopp_a_SOURCES += cryptopp/modarith.h
+cryptopp_libcryptopp_a_SOURCES += cryptopp/modexppc.h
+cryptopp_libcryptopp_a_SOURCES += cryptopp/nr.h
+cryptopp_libcryptopp_a_SOURCES += cryptopp/pwdbased.h
+cryptopp_libcryptopp_a_SOURCES += cryptopp/secblock.h
+cryptopp_libcryptopp_a_SOURCES += cryptopp/siphash.h
+cryptopp_libcryptopp_a_SOURCES += cryptopp/trunhash.h
+cryptopp_libcryptopp_a_SOURCES += cryptopp/validate.h
+cryptopp_libcryptopp_a_SOURCES += cryptopp/words.h
+cryptopp_libcryptopp_a_SOURCES += cryptopp/seckey.h
+cryptopp_libcryptopp_a_SOURCES += cryptopp/stdcpp.h
+cryptopp_libcryptopp_a_SOURCES += cryptopp/trap.h
+cryptopp_libcryptopp_a_SOURCES += cryptopp/smartptr.h
+cryptopp_libcryptopp_a_SOURCES += cryptopp/simple.h
+cryptopp_libcryptopp_a_SOURCES += cryptopp/argnames.h
+cryptopp_libcryptopp_a_SOURCES += cryptopp/dh.h
+cryptopp_libcryptopp_a_SOURCES += cryptopp/mqv.h
+cryptopp_libcryptopp_a_SOURCES += cryptopp/ecpoint.h
+cryptopp_libcryptopp_a_SOURCES += cryptopp/fltrimpl.h
+cryptopp_libcryptopp_a_SOURCES += cryptopp/oids.h
+cryptopp_libcryptopp_a_SOURCES += cryptopp/ossig.h
+cryptopp_libcryptopp_a_SOURCES += cryptopp/pch.h
+cryptopp_libcryptopp_a_SOURCES += cryptopp/cbcmac.h
+cryptopp_libcryptopp_a_SOURCES += cryptopp/trdlocal.h
+cryptopp_libcryptopp_a_SOURCES += cryptopp/ccm.h
+cryptopp_libcryptopp_a_SOURCES += cryptopp/*.h
+
+if TARGET_WINDOWS
+else
+endif
+
