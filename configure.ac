@@ -211,7 +211,8 @@ if test "x$enable_debug_xdump" = xyes; then
     fi
 fi
 
-CPPFLAGS="$CPPFLAGS -DLUX_BUILD"
+CPPFLAGS="-Wno-unknown-pragmas $CPPFLAGS -DLUX_BUILD"
+CXXFLAGS="-Wno-unknown-pragmas $CXXFLAGS"
 
 ## TODO: Remove these hard-coded paths and flags. They are here for the sake of
 ##       compatibility with the legacy buildsystem.
