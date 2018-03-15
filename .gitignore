@@ -8,6 +8,7 @@ reset-files.bash
 
 *.exe
 src/lux
+!src/lux/
 src/luxd
 src/lux-cli
 src/lux-tx

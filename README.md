@@ -1,6 +1,6 @@
 ![LUX Logo](https://github.com/216k155/lux/blob/master/src/qt/res/images/lux_logo_horizontal.png)
 
-"Empowered By Intelligence" 
+"Empowered By Intelligence"
 
 Luxcore is GNU AGPLv3 licensed.
 
@@ -16,7 +16,7 @@ Features
 
 * Luxgate - Parallel masternode / masternode
 * Segwit
-* Smart contract 
+* Smart contract
 * Luxgate
 * New PHI1612 PoW/PoS hybrid algorithm
 * Static PoS
@@ -56,7 +56,7 @@ The first step is to install the mingw-w64 cross-compilation tool chain. Due to 
 Common steps to install mingw32 cross compiler tool chain:
 
     sudo apt install g++-mingw-w64-x86-64
-    
+
 Ubuntu Xenial 16.04 and Windows Subsystem for Linux
 
     sudo apt install software-properties-common
@@ -64,7 +64,7 @@ Ubuntu Xenial 16.04 and Windows Subsystem for Linux
     sudo apt update
     sudo apt upgrade
     sudo update-alternatives --config x86_64-w64-mingw32-g++ # Set the default mingw32 g++ compiler option to posix.
-    
+
 Once the tool chain is installed the build steps are common:
 
 Note that for WSL the Lux Core source path MUST be somewhere in the default mount file system, for example /usr/src/lux, AND not under /mnt/d/. If this is not the case the dependency autoconf scripts will fail. This means you cannot use a directory that located directly on the host Windows file system to perform the build.
@@ -72,9 +72,9 @@ Note that for WSL the Lux Core source path MUST be somewhere in the default moun
 The next three steps are an example of how to acquire the source in an appropriate way.
 
     cd /usr/src
-    sudo git clone https://github.com/216k155/lux.git
+    git clone https://github.com/216k155/lux.git --recursive
     sudo chmod -R a+rw lux
-    
+
 Once the source code is ready the build steps are below.
 
     PATH=$(echo "$PATH" | sed -e 's/:\/mnt.*//g') # strip out problematic Windows %PATH% imported var
@@ -82,7 +82,7 @@ Once the source code is ready the build steps are below.
     make HOST=x86_64-w64-mingw32 -j$(nproc)
     cd ..
     ./autogen.sh # not required when building from tarball
-    CONFIG_SITE=$PWD/depends/x86_64-w64-mingw32/share/config.site 
+    CONFIG_SITE=$PWD/depends/x86_64-w64-mingw32/share/config.site
     ./configure --prefix=`pwd`/depends/x86_64-w64-mingw32 --disable-tests
     make HOST=x86_64-w64-mingw32 -j$(nproc)
 
@@ -97,8 +97,8 @@ Once the source code is ready the build steps are below.
     # If you want to build the Qt GUI:
     sudo apt-get install libqt5gui5 libqt5core5a libqt5dbus5 qttools5-dev qttools5-dev-tools libprotobuf-dev protobuf-compiler
 
-    git clone https://github.com/216k155/lux --recursive
-    
+    git clone https://github.com/216k155/lux
+
     cd lux
 
     # Note autogen will prompt to install some more dependencies if needed
@@ -123,7 +123,7 @@ Then install [Homebrew](https://brew.sh).
 
 #### Dependencies
 
-    brew install cmake automake berkeley-db4 libtool boost --c++11 --without-single --without-static miniupnpc openssl pkg-config protobuf qt5 libevent imagemagick --with-librsvg
+    brew install cmake automake berkeley-db4 leveldb libtool boost --c++11 --without-single --without-static miniupnpc openssl pkg-config protobuf qt5 libevent imagemagick --with-librsvg
 
 NOTE: Building with Qt4 is still supported, however, could result in a broken UI. Building with Qt5 is recommended.
 
@@ -132,7 +132,7 @@ NOTE: Building with Qt4 is still supported, however, could result in a broken UI
 1. Clone the Lux source code and cd into `Lux`
 
         git clone --recursive https://github.com/216k155/lux.git
-        cd Lux
+        cd lux
 
 2.  Build Luxcore:
 
@@ -166,7 +166,7 @@ This example lists the steps necessary to setup and build a command line only, n
 Note:
 Enabling wallet support requires either compiling against a Berkeley DB newer than 4.8 (package `db`) using `--with-incompatible-bdb`,
 or building and depending on a local version of Berkeley DB 4.8. The readily available Arch Linux packages are currently built using
-`--with-incompatible-bdb` according to the 
+`--with-incompatible-bdb` according to the
 As mentioned above, when maintaining portability of the wallet between the standard Bitcoin Core distributions and independently built
 node software is desired, Berkeley DB 4.8 must be used.
 

@@ -3,13 +3,13 @@ echo "The first argument to this shell script should be 11 or 13 based on the OS
 echo "e.g. ./build-mac.sh 13"
 echo "Please install homebrew first too"
 if [ -z "$1" ]; then exit 1; fi
-brew install autoconf automake pkg-config libtool librsvg
+brew install autoconf automake pkg-config libtool librsvg cryptopp
 # echo $1
 export MAKEJOBS=-j3
 # export HOST=x86_64-apple-darwin13
 export HOST="x86_64-apple-darwin$1"
 export PACKAGES="cmake imagemagick libcap-dev librsvg2-bin libz-dev libbz2-dev libtiff-tools python-dev"
-export BITCOIN_CONFIG="--enable-reduce-exports"
+export BITCOIN_CONFIG="--enable-reduce-exports --disable-tests"
 # export OSX_SDK="10.13"
 export OSX_SDK="10.$1"
 export GOAL="deploy"

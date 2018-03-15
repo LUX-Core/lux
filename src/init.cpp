@@ -155,6 +155,7 @@ public:
 
 static CCoinsViewDB* pcoinsdbview = NULL;
 static CCoinsViewErrorCatcher* pcoinscatcher = NULL;
+static std::unique_ptr<ECCVerifyHandle> globalVerifyHandle;
 
 /** Preparing steps before shutting down or restarting the wallet */
 void PrepareShutdown()
@@ -249,6 +250,8 @@ void Shutdown()
     delete pwalletMain;
     pwalletMain = NULL;
 #endif
+    globalVerifyHandle.reset();
+    ECC_Stop();
     LogPrintf("%s: done\n", __func__);
 }
 
@@ -570,6 +573,9 @@ void ThreadImport(std::vector<boost::filesystem::path> vImportFiles)
  */
 bool InitSanityCheck(void)
 {
+    ECC_Start();
+    globalVerifyHandle.reset(new ECCVerifyHandle());
+
     if (!ECC_InitSanityCheck()) {
         InitError("OpenSSL appears to lack support for elliptic curve cryptography. For more "
                   "information, visit https://en.bitcoin.it/wiki/OpenSSL_and_EC_Libraries");
@@ -775,6 +781,12 @@ bool AppInit2(boost::thread_group& threadGroup)
     setvbuf(stdout, NULL, _IOLBF, 0); /// ***TODO*** do we still need this after -printtoconsole is gone?
 #ifdef ENABLE_WALLET
     bool fDisableWallet = GetBoolArg("-disablewallet", false);
+    if (fDisableWallet) {
+#endif
+        if (SoftSetBoolArg("-staking", false))
+            LogPrintf("AppInit2 : parameter interaction: wallet functionality not enabled -> setting -staking=0\n");
+#ifdef ENABLE_WALLET
+    }
 #endif
 
     nConnectTimeout = GetArg("-timeout", DEFAULT_CONNECT_TIMEOUT);
@@ -1440,7 +1452,7 @@ bool AppInit2(boost::thread_group& threadGroup)
     fMasterNode = GetBoolArg("-masternode", false);
     if (fMasterNode) {
         LogPrintf("IS DARKSEND MASTER NODE\n");
-        
+
         strMasterNodeAddr = GetArg("-masternodeaddr", "");
         if (!strMasterNodeAddr.empty()) {
             CService addrTest = CService(strMasterNodeAddr);
@@ -1493,7 +1505,7 @@ bool AppInit2(boost::thread_group& threadGroup)
        1Lux+1000 == (.1Lux+100)*10
        10Lux+10000 == (1Lux+1000)*10
     */
-    darkSendDenominations.push_back( (100000      * COIN)+100000000 );    
+    darkSendDenominations.push_back( (100000      * COIN)+100000000 );
     darkSendDenominations.push_back( (10000       * COIN)+10000000 );
     darkSendDenominations.push_back( (1000        * COIN)+1000000 );
     darkSendDenominations.push_back( (100         * COIN)+100000 );
