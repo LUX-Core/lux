@@ -40,7 +40,7 @@ cp -r "$LEVELDB_DIR/helpers/memenv/memenv.h" "$INCLUDE_DIR/leveldb/helpers/memen
 # Build eth dependencies
 cd ..
 ./autogen.sh Windows $PLATFORM $INSTALL_DIR
-./configure --prefix=$PWD/depends/$PLATFORM --host=$PLATFORM --disable-tests
+./configure --prefix=$PWD/depends/$PLATFORM --host=$PLATFORM --disable-tests --disable-zmq
 
 # Build the application
 make -j4 #&& make install
