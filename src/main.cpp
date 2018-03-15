@@ -51,8 +51,21 @@ using namespace std;
 const int LAST_HEIGHT_FEE_BLOCK = 180000;
 
 /**
- * Global state
+ * Global LuxState
  */
+
+////////////////////////////// lux
+#include <iostream>
+#include <bitset>
+#include "pubkey.h"
+
+std::unique_ptr<LuxState> globalState;
+std::shared_ptr<dev::eth::SealEngineFace> globalSealEngine;
+bool fRecordLogOpcodes = false;
+bool fIsVMlogFile = false;
+bool fGettingValuesDGP = false;
+//////////////////////////////
+
 
 CCriticalSection cs_main;
 

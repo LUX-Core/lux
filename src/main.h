@@ -40,6 +40,31 @@
 
 #include <boost/unordered_map.hpp>
 
+/**
+ * Global LuxState
+ */
+
+/////////////////////////////////////////// lux
+#include <lux/luxstate.h>
+#include <lux/luxDGP.h>
+#include <libethereum/ChainParams.h>
+#include <libethashseal/Ethash.h>
+#include <libethashseal/GenesisInfo.h>
+#include <script/standard.h>
+#include <lux/storageresults.h>
+///////////////////////////////////////////
+
+extern std::unique_ptr<LuxState> globalState;
+extern std::shared_ptr<dev::eth::SealEngineFace> globalSealEngine;
+extern bool fRecordLogOpcodes;
+extern bool fIsVMlogFile;
+extern bool fGettingValuesDGP;
+
+struct EthTransactionParams;
+using valtype = std::vector<unsigned char>;
+using ExtractLuxTX = std::pair<std::vector<LuxTransaction>, std::vector<EthTransactionParams>>;
+///////////////////////////////////////////
+
 class CBlockIndex;
 class CBlockTreeDB;
 class CBloomFilter;
