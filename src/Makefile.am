@@ -35,6 +35,7 @@ LIBBITCOIN_CRYPTO=crypto/libbitcoin_crypto.a
 LIBBITCOIN_UNIVALUE=univalue/libbitcoin_univalue.a
 LIBBITCOINQT=qt/libbitcoinqt.a
 LIBSECP256K1=secp256k1/libsecp256k1.la
+LIBCRYPTOPP=cryptopp/libcryptopp.a
 
 $(LIBSECP256K1): $(wildcard secp256k1/src/*) $(wildcard secp256k1/include/*)
 	$(AM_V_at)$(MAKE) $(AM_MAKEFLAGS) -C $(@D) $(@F)
@@ -159,7 +160,11 @@ BITCOIN_CORE_H = \
   zmq/zmqabstractnotifier.h \
   zmq/zmqconfig.h \
   zmq/zmqnotificationinterface.h \
-  zmq/zmqpublishnotifier.h
+  zmq/zmqpublishnotifier.h \
+  lux/luxstate.h \
+  lux/luxtransaction.h \
+  lux/luxDGP.h \
+  lux/storageresults.h
 
 JSON_H = \
   json/json_spirit.h \
@@ -179,7 +184,8 @@ obj/build.h: FORCE
 libbitcoin_util_a-clientversion.$(OBJEXT): obj/build.h
 
 # server: shared between luxd and lux-qt
-libbitcoin_server_a_CPPFLAGS = $(BITCOIN_INCLUDES) $(MINIUPNPC_CPPFLAGS)
+libbitcoin_server_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES) $(MINIUPNPC_CPPFLAGS) $(EVENT_CFLAGS) $(EVENT_PTHREADS_CFLAGS)
+libbitcoin_server_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 libbitcoin_server_a_SOURCES = \
   addrman.cpp \
   alert.cpp \
@@ -207,6 +213,10 @@ libbitcoin_server_a_SOURCES = \
   txdb.cpp \
   txmempool.cpp \
   validationinterface.cpp \
+  lux/luxstate.cpp \
+  lux/luxtransaction.cpp \
+  lux/luxDGP.cpp \
+  lux/storageresults.cpp \
   $(JSON_H) \
   $(BITCOIN_CORE_H)
 
@@ -278,22 +288,21 @@ crypto_libbitcoin_crypto_a_SOURCES = \
   crypto/sph_gost.h \
   crypto/sph_cubehash.h \
   crypto/sph_echo.h \
-    cpp-ethereum/utils/libscrypt/b64.c \
-    cpp-ethereum/utils/libscrypt/b64.h \
-    cpp-ethereum/utils/libscrypt/crypto-mcf.c \
-    cpp-ethereum/utils/libscrypt/crypto_scrypt-check.c \
-    cpp-ethereum/utils/libscrypt/crypto_scrypt-hash.c \
-    cpp-ethereum/utils/libscrypt/crypto_scrypt-hexconvert.c \
-    cpp-ethereum/utils/libscrypt/crypto_scrypt-hexconvert.h \
-    cpp-ethereum/utils/libscrypt/crypto_scrypt-nosse.c \
-    cpp-ethereum/utils/libscrypt/crypto-scrypt-saltgen.c \
-    cpp-ethereum/utils/libscrypt/libscrypt.h \
-    cpp-ethereum/utils/libscrypt/sha256.c \
-    cpp-ethereum/utils/libscrypt/sha256.h \
-    cpp-ethereum/utils/libscrypt/slowequals.c \
-    cpp-ethereum/utils/libscrypt/slowequals.h \
-    cpp-ethereum/utils/libscrypt/sysendian.h
-
+  cpp-ethereum/utils/libscrypt/b64.c \
+  cpp-ethereum/utils/libscrypt/b64.h \
+  cpp-ethereum/utils/libscrypt/crypto-mcf.c \
+  cpp-ethereum/utils/libscrypt/crypto_scrypt-check.c \
+  cpp-ethereum/utils/libscrypt/crypto_scrypt-hash.c \
+  cpp-ethereum/utils/libscrypt/crypto_scrypt-hexconvert.c \
+  cpp-ethereum/utils/libscrypt/crypto_scrypt-hexconvert.h \
+  cpp-ethereum/utils/libscrypt/crypto_scrypt-nosse.c \
+  cpp-ethereum/utils/libscrypt/crypto-scrypt-saltgen.c \
+  cpp-ethereum/utils/libscrypt/libscrypt.h \
+  cpp-ethereum/utils/libscrypt/sha256.c \
+  cpp-ethereum/utils/libscrypt/sha256.h \
+  cpp-ethereum/utils/libscrypt/slowequals.c \
+  cpp-ethereum/utils/libscrypt/slowequals.h \
+  cpp-ethereum/utils/libscrypt/sysendian.h
 
 # univalue JSON library
 univalue_libbitcoin_univalue_a_SOURCES = \
@@ -304,7 +313,9 @@ univalue_libbitcoin_univalue_a_SOURCES = \
   univalue/univalue.h
 
 # common: shared between luxd, and lux-qt and non-server tools
-libbitcoin_common_a_CPPFLAGS = $(BITCOIN_INCLUDES)
+libbitcoin_common_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES) -DLUX_BUILD
+libbitcoin_common_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+libbitcoin_common_a_CFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS) -std=c99 -fPIC
 libbitcoin_common_a_SOURCES = \
   allocators.cpp \
   amount.cpp \
@@ -557,6 +568,7 @@ luxd_LDADD = \
   $(LIBBITCOIN_CRYPTO) \
   $(LIBLEVELDB) \
   $(LIBMEMENV) \
+  $(LIBCRYPTOPP) \
   $(LIBSECP256K1)
 
 if ENABLE_ZMQ
@@ -573,7 +585,7 @@ if TARGET_WINDOWS
 luxd_SOURCES += luxd-res.rc
 endif
 
-luxd_LDADD += $(BOOST_LIBS) $(BDB_LIBS) $(SSL_LIBS) $(CRYPTO_LIBS) $(MINIUPNPC_LIBS)
+luxd_LDADD += $(BOOST_LIBS) $(BDB_LIBS) $(SSL_LIBS) $(CRYPTO_LIBS) $(MINIUPNPC_LIBS) $(EVENT_PTHREADS_LIBS) $(EVENT_LIBS)
 luxd_CPPFLAGS = $(BITCOIN_INCLUDES)
 luxd_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
 
@@ -585,6 +597,7 @@ lux_cli_LDADD = \
   $(BOOST_LIBS) \
   $(SSL_LIBS) \
   $(CRYPTO_LIBS) \
+  $(LIBCRYPTOPP) \
   $(LIBSECP256K1)
 
 lux_cli_SOURCES = \
@@ -601,7 +614,8 @@ lux_tx_LDADD = \
   $(LIBBITCOIN_CRYPTO) \
   $(LIBSECP256K1) \
   $(BOOST_LIBS) \
-  $(CRYPTO_LIBS)
+  $(CRYPTO_LIBS) \
+  $(LIBCRYPTOPP)
 
 lux_tx_SOURCES = lux-tx.cpp
 lux_tx_CPPFLAGS = $(BITCOIN_INCLUDES)
@@ -641,7 +655,7 @@ endif
 
 libbitcoinconsensus_la_LDFLAGS = -no-undefined $(RELDFLAGS)
 libbitcoinconsensus_la_LIBADD = $(CRYPTO_LIBS) $(BOOST_LIBS) $(LIBSECP256K1)
-libbitcoinconsensus_la_CPPFLAGS = $(CRYPTO_CFLAGS) -I$(builddir)/obj -I$(srcdir)/secp256k1/include -DBUILD_BITCOIN_INTERNAL
+libbitcoinconsensus_la_CPPFLAGS = $(CRYPTO_CFLAGS) $(BITCOIN_INCLUDES) -I$(builddir)/obj -I$(srcdir)/secp256k1/include -DBUILD_BITCOIN_INTERNAL
 if USE_LIBSECP256K1
 libbitcoinconsensus_la_LIBADD += secp256k1/libsecp256k1.la
 endif
@@ -664,6 +678,7 @@ clean-local:
 	-$(MAKE) -C leveldb clean
 	-$(MAKE) -C secp256k1 clean
 	rm -f leveldb/*/*.gcno leveldb/helpers/memenv/*.gcno
+	-rm -f cryptopp/*.o
 	-rm -f config.h
 
 .rc.o:
@@ -677,6 +692,8 @@ clean-local:
 %.pb.cc %.pb.h: %.proto
 	@test -f $(PROTOC)
 	$(AM_V_GEN) $(PROTOC) --cpp_out=$(@D) --proto_path=$(abspath $(<D) $<)
+
+include Makefile.cryptopp.include
 
 if ENABLE_TESTS
 include Makefile.test.include
