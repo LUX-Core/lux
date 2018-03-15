@@ -15,6 +15,12 @@
 #include <string>
 #include <vector>
 
+//////////////////////////////////////// lux
+#include <libdevcore/Common.h>
+#include <libdevcore/CommonData.h>
+#include <libdevcore/FixedHash.h>
+////////////////////////////////////////
+
 class uint_error : public std::runtime_error
 {
 public:
@@ -326,12 +332,12 @@ public:
      * The lower 23 bits are the mantissa.
      * Bit number 24 (0x800000) represents the sign of N.
      * N = (-1^sign) * mantissa * 256^(exponent-3)
-     * 
+     *
      * Satoshi's original implementation used BN_bn2mpi() and BN_mpi2bn().
      * MPI uses the most significant bit of the first byte as sign.
      * Thus 0x1234560000 is compact (0x05123456)
      * and  0xc0de000000 is compact (0x0600c0de)
-     * 
+     *
      * Bitcoin only uses this "compact" format for encoding difficulty
      * targets, which are unsigned 256bit quantities.  Thus, all the
      * complexities of the sign bit and using base 256 are probably an
@@ -389,5 +395,35 @@ inline uint512 uint512S(const std::string& str)
     rv.SetHex(str);
     return rv;
 }
+
+
+////////////////////////////////////////////////////// lux
+inline dev::h256 uintToh256(const uint256& in)
+{
+    std::vector<unsigned char> vHashBlock;
+    vHashBlock.assign(in.begin(), in.end());
+    return dev::h256(vHashBlock);
+}
+
+inline uint256 h256Touint(const dev::h256& in)
+{
+    std::vector<unsigned char> vHashBlock = in.asBytes();
+    return uint256(vHashBlock);
+}
+
+inline dev::u256 uintTou256(const uint256& in)
+{
+    std::vector<unsigned char> rawValue;
+    rawValue.assign(in.begin(), in.end());
+    return dev::fromBigEndian<dev::u256, dev::bytes>(rawValue);
+}
+
+inline uint256 u256Touint(const dev::u256& in)
+{
+    std::vector<unsigned char> rawValue(32, 0);
+    dev::toBigEndian<dev::u256, dev::bytes>(in, rawValue);
+    return uint256(rawValue);
+}
+//////////////////////////////////////////////////////
 
 #endif // BITCOIN_UINT256_H
