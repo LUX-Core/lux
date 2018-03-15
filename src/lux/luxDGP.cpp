@@ -105,8 +105,11 @@ void LuxDGP::initStorageTemplate(const dev::Address& addr){
     storageTemplate = state->storage(addr);
 }
 
-void LuxDGP::initDataTemplate(const dev::Address& addr, std::vector<unsigned char>& data){
-    dataTemplate = CallContract(addr, data)[0].execRes.output;
+void LuxDGP::initDataTemplate(const dev::Address& addr, std::vector<unsigned char>& data)
+{
+#if 0
+dataTemplate = CallContract(addr, data)[0].execRes.output;
+#endif
 }
 
 void LuxDGP::createParamsInstance(){

@@ -16,9 +16,9 @@
 #include <vector>
 
 //////////////////////////////////////// lux
-#include <libdevcore/Common.h>
-#include <libdevcore/CommonData.h>
-#include <libdevcore/FixedHash.h>
+#include <cpp-ethereum/libdevcore/Common.h>
+#include <cpp-ethereum/libdevcore/CommonData.h>
+#include <cpp-ethereum/libdevcore/FixedHash.h>
 ////////////////////////////////////////
 
 class uint_error : public std::runtime_error

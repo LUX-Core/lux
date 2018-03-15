@@ -1,4 +1,4 @@
-#include <sm/storageresults.h>
+#include <lux/storageresults.h>
 
 StorageResults::StorageResults(std::string const& _path){
 	path = _path + "/resultsDB";
@@ -104,7 +104,7 @@ bool StorageResults::readResult(dev::h256 const& _key, std::vector<TransactionRe
 	delete db;
 
 	if(!s.IsNotFound() && s.ok()){
-        
+
         TransactionReceiptInfoSerialized tris;
 
 		dev::RLP state(value);
