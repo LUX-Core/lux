@@ -12,7 +12,7 @@
 #include "script/script.h"
 #include "script/sign.h"
 #include "ui_interface.h" // for _(...)
-#include "univalue/univalue.h"
+#include <univalue.h>
 #include "util.h"
 #include "utilmoneystr.h"
 #include "utilstrencodings.h"
