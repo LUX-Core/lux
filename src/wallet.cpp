@@ -1781,16 +1781,12 @@ bool CWallet::SelectCoins(const std::string &account, const CAmount& nTargetValu
 
 #           if defined(SELECT_COINS_FROM_ACCOUNT)&&SELECT_COINS_FROM_ACCOUNT
             CTxDestination address;
-            if (ExtractDestination(txout.scriptPubKey, address) && out.tx->strFromAccount == account) {
-                nValueRet += txout.nValue;
-                setCoinsRet.insert(make_pair(out.tx, out.i));
-            }
-#           else
+            if (ExtractDestination(txout.scriptPubKey, address))
+#			endif
             if (out.tx->strFromAccount == account) {
                 nValueRet += txout.nValue;
                 setCoinsRet.insert(make_pair(out.tx, out.i));
             }
-#           endif
         }
         return (nValueRet >= nTargetValue);
     }
@@ -1812,16 +1808,12 @@ bool CWallet::SelectCoins(const std::string &account, const CAmount& nTargetValu
 
 #                   if defined(SELECT_COINS_FROM_ACCOUNT)&&SELECT_COINS_FROM_ACCOUNT
                     CTxDestination address;
-                    if (ExtractDestination(txout.scriptPubKey, address) && out.tx->strFromAccount == account) {
-                        nValueRet += txout.nValue;
-                        setCoinsRet.insert(make_pair(out.tx, out.i));
-                    }
-#                   else
+                    if (ExtractDestination(txout.scriptPubKey, address))
+#                   endif
                     if (out.tx->strFromAccount == account) {
                         nValueRet += txout.nValue;
                         setCoinsRet.insert(make_pair(out.tx, out.i));
                     }
-#                   endif
                 }
             }
         }
@@ -2985,18 +2977,6 @@ set<CTxDestination> CWallet::GetAccountAddresses(const std::string &strAccount) 
             result.insert(address);
     }
     return result;
-}
-
-bool CWallet::IsAccountAddress(const std::string &strAccount, const CTxDestination &address) const
-{
-    LOCK(cs_wallet);
-    auto it = mapAddressBook.find(address);
-    if (it != mapAddressBook.end()) {
-        if (it->second.name == strAccount) {
-            return true;
-        }
-    }
-    return false;
 }
 
 bool CReserveKey::GetReservedKey(CPubKey& pubkey)
