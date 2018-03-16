@@ -418,10 +418,8 @@ bool static ConnectSocketDirectly(const CService& addrConnect, SOCKET& hSocketRe
 #endif
 
     // Set to non-blocking
-    if (!SetSocketNonBlocking(hSocket, true)) {
-        CloseSocket(hSocket);
+    if (!SetSocketNonBlocking(hSocket, true))
         return error("ConnectSocketDirectly: Setting socket to non-blocking failed, error %s\n", NetworkErrorString(WSAGetLastError()));
-    }
 
     if (connect(hSocket, (struct sockaddr*)&sockaddr, len) == SOCKET_ERROR) {
         int nErr = WSAGetLastError();

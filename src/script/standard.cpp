@@ -32,14 +32,14 @@ const char* GetTxnOutputType(txnouttype t)
 {
     switch (t)
     {
-        case TX_NONSTANDARD: return "nonstandard";
-        case TX_PUBKEY: return "pubkey";
-        case TX_PUBKEYHASH: return "pubkeyhash";
-        case TX_SCRIPTHASH: return "scripthash";
-        case TX_MULTISIG: return "multisig";
-        case TX_NULL_DATA: return "nulldata";
-        case TX_CREATE: return "create";
-        case TX_CALL: return "call";
+    case TX_NONSTANDARD: return "nonstandard";
+    case TX_PUBKEY: return "pubkey";
+    case TX_PUBKEYHASH: return "pubkeyhash";
+    case TX_SCRIPTHASH: return "scripthash";
+    case TX_MULTISIG: return "multisig";
+    case TX_NULL_DATA: return "nulldata";
+    case TX_CREATE: return "create";
+    case TX_CALL: return "call";
     }
     return NULL;
 }
@@ -251,19 +251,19 @@ int ScriptSigArgsExpected(txnouttype t, const std::vector<std::vector<unsigned c
 {
     switch (t)
     {
-        case TX_NONSTANDARD:
-        case TX_NULL_DATA:
+    case TX_NONSTANDARD:
+    case TX_NULL_DATA:
+        return -1;
+    case TX_PUBKEY:
+        return 1;
+    case TX_PUBKEYHASH:
+        return 2;
+    case TX_MULTISIG:
+        if (vSolutions.size() < 1 || vSolutions[0].size() < 1)
             return -1;
-        case TX_PUBKEY:
-            return 1;
-        case TX_PUBKEYHASH:
-            return 2;
-        case TX_MULTISIG:
-            if (vSolutions.size() < 1 || vSolutions[0].size() < 1)
-                return -1;
-            return vSolutions[0][0] + 1;
-        case TX_SCRIPTHASH:
-            return 1; // doesn't include args needed by the script
+        return vSolutions[0][0] + 1;
+    case TX_SCRIPTHASH:
+        return 1; // doesn't include args needed by the script
     }
     return -1;
 }

@@ -343,7 +343,7 @@ public:
      * in the last Params().ToCheckBlockUpgradeMajority() blocks, starting at pstart
      * and going backwards.
      */
-    //static bool IsSuperMajority(int minVersion, const CBlockIndex* pstart, unsigned int nRequired);
+    static bool IsSuperMajority(int minVersion, const CBlockIndex* pstart, unsigned int nRequired);
 
     std::string ToString() const
     {

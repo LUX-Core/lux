@@ -105,11 +105,8 @@ void LuxDGP::initStorageTemplate(const dev::Address& addr){
     storageTemplate = state->storage(addr);
 }
 
-void LuxDGP::initDataTemplate(const dev::Address& addr, std::vector<unsigned char>& data)
-{
-#if 0
-dataTemplate = CallContract(addr, data)[0].execRes.output;
-#endif
+void LuxDGP::initDataTemplate(const dev::Address& addr, std::vector<unsigned char>& data){
+    dataTemplate = CallContract(addr, data)[0].execRes.output;
 }
 
 void LuxDGP::createParamsInstance(){
@@ -202,7 +199,7 @@ dev::eth::EVMSchedule LuxDGP::createEVMSchedule(){
 
     if(uint32Values.size() >= 39){
         schedule.tierStepGas = {{uint32Values[0], uint32Values[1], uint32Values[2], uint32Values[3],
-                                        uint32Values[4], uint32Values[5], uint32Values[6], uint32Values[7]}};
+                                uint32Values[4], uint32Values[5], uint32Values[6], uint32Values[7]}};
         schedule.expGas = uint32Values[8];
         schedule.expByteGas = uint32Values[9];
         schedule.sha3Gas = uint32Values[10];
