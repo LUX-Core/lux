@@ -570,9 +570,6 @@ void ThreadImport(std::vector<boost::filesystem::path> vImportFiles)
  */
 bool InitSanityCheck(void)
 {
-    ECC_Start();
-    globalVerifyHandle.reset(new ECCVerifyHandle());
-
     if (!ECC_InitSanityCheck()) {
         InitError("OpenSSL appears to lack support for elliptic curve cryptography. For more "
                   "information, visit https://en.bitcoin.it/wiki/OpenSSL_and_EC_Libraries");
