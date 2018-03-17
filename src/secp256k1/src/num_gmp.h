@@ -15,6 +15,6 @@ typedef struct {
     mp_limb_t data[2*NUM_LIMBS];
     int neg;
     int limbs;
-} secp256k1_num;
+} secp256k1_num_t;
 
 #endif
