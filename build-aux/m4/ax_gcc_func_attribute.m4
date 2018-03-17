@@ -73,7 +73,7 @@
 #   and this notice are preserved.  This file is offered as-is, without any
 #   warranty.
 
-#serial 2
+#serial 3
 
 AC_DEFUN([AX_GCC_FUNC_ATTRIBUTE], [
     AS_VAR_PUSHDEF([ac_var], [ax_cv_have_func_attribute_$1])
@@ -102,6 +102,9 @@ AC_DEFUN([AX_GCC_FUNC_ATTRIBUTE], [
                 ],
                 [const], [
                     int foo( void ) __attribute__(($1));
+                ],
+                [constructor_priority], [
+                    int foo( void ) __attribute__((__constructor__(65535/2)));
                 ],
                 [constructor], [
                     int foo( void ) __attribute__(($1));
@@ -180,6 +183,8 @@ AC_DEFUN([AX_GCC_FUNC_ATTRIBUTE], [
                 [visibility], [
                     int foo_def( void ) __attribute__(($1("default")));
                     int foo_hid( void ) __attribute__(($1("hidden")));
+                    int foo_int( void ) __attribute__(($1("internal")));
+                    int foo_pro( void ) __attribute__(($1("protected")));
                 ],
                 [warning], [
                     int foo( void ) __attribute__(($1("")));

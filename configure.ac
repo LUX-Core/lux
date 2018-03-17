@@ -70,6 +70,7 @@ if test "x${OBJCXX+set}" = "x"; then
 fi
 AC_PROG_OBJCXX
 ])
+
 dnl Libtool init checks.
 LT_INIT([pic-only])
 

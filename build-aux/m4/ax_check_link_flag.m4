@@ -53,18 +53,19 @@
 #   modified version of the Autoconf Macro, you may extend this special
 #   exception to the GPL to apply to your modified version as well.
 
-#serial 2
+#serial 4
 
 AC_DEFUN([AX_CHECK_LINK_FLAG],
-[AS_VAR_PUSHDEF([CACHEVAR],[ax_cv_check_ldflags_$4_$1])dnl
+[AC_PREREQ(2.64)dnl for _AC_LANG_PREFIX and AS_VAR_IF
+AS_VAR_PUSHDEF([CACHEVAR],[ax_cv_check_ldflags_$4_$1])dnl
 AC_CACHE_CHECK([whether the linker accepts $1], CACHEVAR, [
   ax_check_save_flags=$LDFLAGS
   LDFLAGS="$LDFLAGS $4 $1"
-  AC_LINK_IFELSE([AC_LANG_PROGRAM()],
+  AC_LINK_IFELSE([m4_default([$5],[AC_LANG_PROGRAM()])],
     [AS_VAR_SET(CACHEVAR,[yes])],
     [AS_VAR_SET(CACHEVAR,[no])])
   LDFLAGS=$ax_check_save_flags])
-AS_IF([test x"AS_VAR_GET(CACHEVAR)" = xyes],
+AS_VAR_IF(CACHEVAR,yes,
   [m4_default([$2], :)],
   [m4_default([$3], :)])
 AS_VAR_POPDEF([CACHEVAR])dnl
