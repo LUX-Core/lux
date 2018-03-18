@@ -403,8 +403,8 @@ void BitcoinGUI::createActions(const NetworkStyle* networkStyle)
     connect(historyAction, SIGNAL(triggered()), this, SLOT(gotoHistoryPage()));
     connect(stakingAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
     connect(stakingAction, SIGNAL(triggered()), this, SLOT(gotoStakingPage()));
-    connect(stakingAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
-    connect(stakingAction, SIGNAL(triggered()), this, SLOT(gotoTradingPage()));
+    connect(tradingAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
+    connect(tradingAction, SIGNAL(triggered()), this, SLOT(gotoTradingPage()));
 #endif // ENABLE_WALLET
 
     quitAction = new QAction(QIcon(":/icons/quit"), tr("E&xit"), this);
