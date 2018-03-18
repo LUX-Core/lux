@@ -323,14 +323,16 @@ void BitcoinGUI::createActions(const NetworkStyle* networkStyle)
 #endif
     tabGroup->addAction(receiveCoinsAction);
 
+	// Qt::Key_4 is reserved for Staking tab
+
     historyAction = new QAction(QIcon(":/icons/history"), tr("&Transactions"), this);
     historyAction->setStatusTip(tr("Browse transaction history"));
     historyAction->setToolTip(historyAction->statusTip());
     historyAction->setCheckable(true);
 #ifdef Q_OS_MAC
-    historyAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_4));
+    historyAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_5));
 #else
-    historyAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_4));
+    historyAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_5));
 #endif
     tabGroup->addAction(historyAction);
 
@@ -339,9 +341,9 @@ void BitcoinGUI::createActions(const NetworkStyle* networkStyle)
     tradingAction->setToolTip(tradingAction->statusTip());
     tradingAction->setCheckable(true);
 #ifdef Q_OS_MAC
-    tradingAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_5));
+    tradingAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_6));
 #else
-    tradingAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_5));
+    tradingAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_6));
 #endif
     tabGroup->addAction(tradingAction);
 
@@ -354,9 +356,9 @@ void BitcoinGUI::createActions(const NetworkStyle* networkStyle)
         masternodeAction->setToolTip(masternodeAction->statusTip());
         masternodeAction->setCheckable(true);
 #ifdef Q_OS_MAC
-        masternodeAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_5));
+        masternodeAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_7));
 #else
-        masternodeAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_5));
+        masternodeAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_7));
 #endif
         tabGroup->addAction(masternodeAction);
         connect(masternodeAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
@@ -368,9 +370,9 @@ void BitcoinGUI::createActions(const NetworkStyle* networkStyle)
     smartToken->setToolTip(smartToken->statusTip());
     smartToken->setCheckable(true);
     #ifdef Q_OS_MAC
-        smartToken->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_1));
+        smartToken->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_8));
     #else
-        smartToken->setShortcut(QKeySequence(Qt::ALT + Qt::Key_1));
+        smartToken->setShortcut(QKeySequence(Qt::ALT + Qt::Key_8));
     #endif
     
     tabGroup->addAction(smartToken);
