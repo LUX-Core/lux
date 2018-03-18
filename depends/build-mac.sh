@@ -1,20 +1,18 @@
 # /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-echo "The first argument to this shell script should be 11 or 13 based on the OS you're using to compile, 13 being high sierra."
-echo "e.g. ./build-mac.sh 13"
 echo "Please install homebrew first too"
-if [ -z "$1" ]; then exit 1; fi
 brew install autoconf automake pkg-config libtool librsvg cryptopp
-# echo $1
-export MAKEJOBS=-j3
-# export HOST=x86_64-apple-darwin13
-export HOST="x86_64-apple-darwin$1"
-export PACKAGES="cmake imagemagick libcap-dev librsvg2-bin libz-dev libbz2-dev libtiff-tools python-dev"
+brew install autoconf automake berkeley-db4 libtool boost miniupnpc openssl pkg-config protobuf qt5 libzmq
+brew install cmake automake berkeley-db4 leveldb libtool boost --c++11 --without-single --without-static miniupnpc openssl pkg-config protobuf qt5 libevent imagemagick --with-librsvg
+export MAKEJOBS=-j4
+export HOST="x86_64-apple-darwin11"
 export BITCOIN_CONFIG="--enable-reduce-exports --disable-tests"
-# export OSX_SDK="10.13"
-export OSX_SDK="10.$1"
+export OSX_SDK="10.11"
 export GOAL="deploy"
 mkdir -p depends/SDKs depends/sdk-sources
-make -C depends HOST=$HOST $DEP_OPTS
+cd depends/SDKs
+curl -sL https://github.com/phracker/MacOSX-SDKs/releases/download/MacOSX10.11.sdk/MacOSX10.11.sdk.tar.xz | tar xJ
+cd ..
+make -C depends HOST=$HOST
 export TRAVIS_COMMIT_LOG=`git log --format=fuller -1`
 export BASE_OUTDIR=$(pwd)/out
 export OUTDIR=$BASE_OUTDIR/1/1-$HOST
