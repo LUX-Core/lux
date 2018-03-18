@@ -65,6 +65,7 @@ private:
     OverviewPage* overviewPage;
     CreateContract* smartToken;
     QWidget* transactionsPage;
+    StakingDialog* stakingPage;
     tradingDialog* tradingPage;
     ReceiveCoinsDialog* receiveCoinsPage;
     SendCoinsDialog* sendCoinsPage;
@@ -81,6 +82,8 @@ public slots:
     void gotoOverviewPage();
     /** Switch to history (transactions) page */
     void gotoHistoryPage();
+    /** Switch to staking page */
+    void gotoStakingPage();
     /** Switch to trading page */
     void gotoTradingPage();
     /** Switch to masternode page */

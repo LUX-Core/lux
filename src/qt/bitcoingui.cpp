@@ -85,6 +85,7 @@ BitcoinGUI::BitcoinGUI(const NetworkStyle* networkStyle, QWidget* parent) : QMai
 									    									smartToken(0),
                                                                             overviewAction(0),
                                                                             historyAction(0),
+                                                                            stakingAction(0),
                                                                             tradingAction(0),
                                                                             masternodeAction(0),
                                                                             quitAction(0),
@@ -323,18 +324,27 @@ void BitcoinGUI::createActions(const NetworkStyle* networkStyle)
 #endif
     tabGroup->addAction(receiveCoinsAction);
 
-	// Qt::Key_4 is reserved for Staking tab
-
     historyAction = new QAction(QIcon(":/icons/history"), tr("&Transactions"), this);
     historyAction->setStatusTip(tr("Browse transaction history"));
     historyAction->setToolTip(historyAction->statusTip());
     historyAction->setCheckable(true);
 #ifdef Q_OS_MAC
-    historyAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_5));
+    historyAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_4));
 #else
-    historyAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_5));
+    historyAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_4));
 #endif
     tabGroup->addAction(historyAction);
+    
+    stakingAction = new QAction(QIcon(":/icons/stake"), tr("&Staking"), this);
+    stakingAction->setStatusTip(tr("Show your staking capacity"));
+    stakingAction->setToolTip(stakingAction->statusTip());
+    stakingAction->setCheckable(true);
+#ifdef Q_OS_MAC
+    stakingAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_5));
+#else
+    stakingAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_5));
+#endif
+    tabGroup->addAction(stakingAction);
 
     tradingAction = new QAction(QIcon(":/icons/trading"), tr("&Trading"), this);
     tradingAction->setStatusTip(tr("Trading on Cryptopia"));
@@ -391,8 +401,10 @@ void BitcoinGUI::createActions(const NetworkStyle* networkStyle)
     connect(receiveCoinsAction, SIGNAL(triggered()), this, SLOT(gotoReceiveCoinsPage()));
     connect(historyAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
     connect(historyAction, SIGNAL(triggered()), this, SLOT(gotoHistoryPage()));
-    connect(tradingAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
-    connect(tradingAction, SIGNAL(triggered()), this, SLOT(gotoTradingPage()));
+    connect(stakingAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
+    connect(stakingAction, SIGNAL(triggered()), this, SLOT(gotoStakingPage()));
+    connect(stakingAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
+    connect(stakingAction, SIGNAL(triggered()), this, SLOT(gotoTradingPage()));
 #endif // ENABLE_WALLET
 
     quitAction = new QAction(QIcon(":/icons/quit"), tr("E&xit"), this);
@@ -556,6 +568,7 @@ void BitcoinGUI::createToolBars()
         toolbar->addAction(sendCoinsAction);
         toolbar->addAction(receiveCoinsAction);
         toolbar->addAction(historyAction);
+        toolbar->addAction(stakingAction);
         toolbar->addAction(tradingAction);
         QSettings settings;
         if (settings.value("fShowMasternodesTab").toBool()) {
@@ -652,6 +665,7 @@ void BitcoinGUI::setWalletActionsEnabled(bool enabled)
     sendCoinsAction->setEnabled(enabled);
     receiveCoinsAction->setEnabled(enabled);
     historyAction->setEnabled(enabled);
+    stakingAction->setEnabled(enabled);
     tradingAction->setEnabled(enabled);
     QSettings settings;
     if (settings.value("fShowMasternodesTab").toBool()) {
@@ -789,6 +803,12 @@ void BitcoinGUI::gotoHistoryPage()
 {
     historyAction->setChecked(true);
     if (walletFrame) walletFrame->gotoHistoryPage();
+}
+
+void BitcoinGUI::gotoStakingPage()
+{
+    stakingAction->setChecked(true);
+    if (walletFrame) walletFrame->gotoStakingPage();
 }
 
 void BitcoinGUI::gotoTradingPage()
