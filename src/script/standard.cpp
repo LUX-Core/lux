@@ -364,30 +364,30 @@ bool ExtractDestinations(const CScript& scriptPubKey, txnouttype& typeRet, vecto
 
 namespace
 {
-    class CScriptVisitor : public boost::static_visitor<bool>
-    {
-    private:
-        CScript *script;
-    public:
-        CScriptVisitor(CScript *scriptin) { script = scriptin; }
+class CScriptVisitor : public boost::static_visitor<bool>
+{
+private:
+    CScript *script;
+public:
+    CScriptVisitor(CScript *scriptin) { script = scriptin; }
 
-        bool operator()(const CNoDestination &dest) const {
-            script->clear();
-            return false;
-        }
+    bool operator()(const CNoDestination &dest) const {
+        script->clear();
+        return false;
+    }
 
-        bool operator()(const CKeyID &keyID) const {
-            script->clear();
-            *script << OP_DUP << OP_HASH160 << ToByteVector(keyID) << OP_EQUALVERIFY << OP_CHECKSIG;
-            return true;
-        }
+    bool operator()(const CKeyID &keyID) const {
+        script->clear();
+        *script << OP_DUP << OP_HASH160 << ToByteVector(keyID) << OP_EQUALVERIFY << OP_CHECKSIG;
+        return true;
+    }
 
-        bool operator()(const CScriptID &scriptID) const {
-            script->clear();
-            *script << OP_HASH160 << ToByteVector(scriptID) << OP_EQUAL;
-            return true;
-        }
-    };
+    bool operator()(const CScriptID &scriptID) const {
+        script->clear();
+        *script << OP_HASH160 << ToByteVector(scriptID) << OP_EQUAL;
+        return true;
+    }
+};
 }
 
 CScript GetScriptForDestination(const CTxDestination& dest)
