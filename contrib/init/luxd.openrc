@@ -16,7 +16,7 @@ BITCOIND_USER=${BITCOIND_USER:-lux}
 BITCOIND_GROUP=${BITCOIND_GROUP:-lux}
 BITCOIND_BIN=${BITCOIND_BIN:-/usr/bin/luxd}
 
-name="LUX Core Daemon"
+name="Luxcore Daemon"
 description="LUX crypto-currency p2p network daemon"
 
 command="/usr/bin/luxd"

@@ -1,9 +1,9 @@
-LUX Core
+Luxcore
 =====================
 
 Setup
 ---------------------
-[LUX Core](http://luxcore.io) is the original LUX client and it builds the backbone of the network. However, it downloads and stores the entire history of LUX transactions; depending on the speed of your computer and network connection, the synchronization process can take anywhere from a few hours to a day or more. Thankfully you only have to do this once.
+[Luxcore](http://luxcore.io) is the original LUX client and it builds the backbone of the network. However, it downloads and stores the entire history of LUX transactions; depending on the speed of your computer and network connection, the synchronization process can take anywhere from a few hours to a day or more. Thankfully you only have to do this once.
 
 Running
 ---------------------

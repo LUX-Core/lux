@@ -478,8 +478,8 @@
         <translation>Registerkartenleiste</translation>
     </message>
     <message>
-        <source>LUX Core</source>
-        <translation>LUX Core</translation>
+        <source>Luxcore</source>
+        <translation>Luxcore</translation>
     </message>
     <message>
         <source>Send coins to a LUX address</source>
@@ -498,12 +498,12 @@
         <translation>Masternodes durchsuchen</translation>
     </message>
     <message>
-        <source>&amp;About LUX Core</source>
-        <translation>Über.LUX Core</translation>
+        <source>&amp;About Luxcore</source>
+        <translation>Über.Luxcore</translation>
     </message>
     <message>
-        <source>Show information about LUX Core</source>
-        <translation>Zeigt Informationen über LUX Core</translation>
+        <source>Show information about Luxcore</source>
+        <translation>Zeigt Informationen über Luxcore</translation>
     </message>
     <message>
         <source>Modify configuration options for LUX</source>
@@ -819,16 +819,16 @@ Adresse: %4</translation>
         <translation>Version</translation>
     </message>
     <message>
-        <source>LUX Core</source>
-        <translation>LUX Core</translation>
+        <source>Luxcore</source>
+        <translation>Luxcore</translation>
     </message>
     <message>
         <source>(%1-bit)</source>
         <translation>(%1-Bit)</translation>
     </message>
     <message>
-        <source>About LUX Core</source>
-        <translation>Über LUX Core</translation>
+        <source>About Luxcore</source>
+        <translation>Über Luxcore</translation>
     </message>
     <message>
         <source>Command-line options</source>
@@ -874,16 +874,16 @@ Adresse: %4</translation>
         <translation>Willkommen</translation>
     </message>
     <message>
-        <source>Welcome to LUX Core.</source>
-        <translation>Willkommen zu LUX Core.</translation>
+        <source>Welcome to Luxcore.</source>
+        <translation>Willkommen zu Luxcore.</translation>
     </message>
     <message>
-        <source>As this is the first time the program is launched, you can choose where LUX Core will store its data.</source>
-        <translation>Da dies das erste Mal ist, dass Sie LUX Core starten, legen Sie jetzt bitte fest, an welchem Ort die Daten gespeichert werden sollen.</translation>
+        <source>As this is the first time the program is launched, you can choose where Luxcore will store its data.</source>
+        <translation>Da dies das erste Mal ist, dass Sie Luxcore starten, legen Sie jetzt bitte fest, an welchem Ort die Daten gespeichert werden sollen.</translation>
     </message>
     <message>
-        <source>LUX Core will download and store a copy of the LUX block chain. At least %1GB of data will be stored in this directory, and it will grow over time. The wallet will also be stored in this directory.</source>
-        <translation>LUX Core wird die Blockchain laden und lokal speichern. Dafür sind mindestens %1GB freier Speicherplatz erforderlich. Der Speicherbedarf wird mit der Zeit anwachsen. Die Wallet wird ebenfalls in diesem Verzeichnis gespeichert.</translation>
+        <source>Luxcore will download and store a copy of the LUX block chain. At least %1GB of data will be stored in this directory, and it will grow over time. The wallet will also be stored in this directory.</source>
+        <translation>Luxcore wird die Blockchain laden und lokal speichern. Dafür sind mindestens %1GB freier Speicherplatz erforderlich. Der Speicherbedarf wird mit der Zeit anwachsen. Die Wallet wird ebenfalls in diesem Verzeichnis gespeichert.</translation>
     </message>
     <message>
         <source>Use the default data directory</source>
@@ -894,8 +894,8 @@ Adresse: %4</translation>
         <translation>Ein benutzerdefiniertes Datenverzeichnis verwenden:</translation>
     </message>
     <message>
-        <source>LUX Core</source>
-        <translation>LUX Core</translation>
+        <source>Luxcore</source>
+        <translation>Luxcore</translation>
     </message>
     <message>
         <source>Error: Specified data directory "%1" cannot be created.</source>
@@ -1709,8 +1709,8 @@ Adresse: %4</translation>
 <context>
     <name>ShutdownWindow</name>
     <message>
-        <source>LUX Core is shutting down...</source>
-        <translation>LUX Core wird beendet...</translation>
+        <source>Luxcore is shutting down...</source>
+        <translation>Luxcore wird beendet...</translation>
     </message>
     <message>
         <source>Do not shut down the computer until this window disappears.</source>
@@ -1751,8 +1751,8 @@ Adresse: %4</translation>
 <context>
     <name>SplashScreen</name>
     <message>
-        <source>LUX Core</source>
-        <translation>LUX Core</translation>
+        <source>Luxcore</source>
+        <translation>Luxcore</translation>
     </message>
     <message>
         <source>Version %1</source>
@@ -1767,8 +1767,8 @@ Adresse: %4</translation>
         <translation>Die Dash Core Entwickler</translation>
     </message>
     <message>
-        <source>The LUX Core developers</source>
-        <translation>Die LUX Core Entwickler</translation>
+        <source>The Luxcore developers</source>
+        <translation>Die Luxcore Entwickler</translation>
     </message>
     <message>
         <source>[testnet]</source>
@@ -2501,8 +2501,8 @@ Adresse: %4</translation>
         <translation>Wallet gesperrt.</translation>
     </message>
     <message>
-        <source>Wallet needed to be rewritten: restart LUX Core to complete</source>
-        <translation>Wallet musste neu geschrieben werden: Bitte LUX Core neu starten</translation>
+        <source>Wallet needed to be rewritten: restart Luxcore to complete</source>
+        <translation>Wallet musste neu geschrieben werden: Bitte Luxcore neu starten</translation>
     </message>
     <message>
         <source>Wallet options:</source>

@@ -602,8 +602,8 @@
         <translation>Tabs toolbar</translation>
     </message>
     <message>
-        <source>LUX Core</source>
-        <translation>LUX Core</translation>
+        <source>Luxcore</source>
+        <translation>Luxcore</translation>
     </message>
     <message>
         <source>Send coins to a LUX address</source>
@@ -622,12 +622,12 @@
         <translation>Browse masternodes</translation>
     </message>
     <message>
-        <source>&amp;About LUX Core</source>
-        <translation>&amp;About LUX Core</translation>
+        <source>&amp;About Luxcore</source>
+        <translation>&amp;About Luxcore</translation>
     </message>
     <message>
-        <source>Show information about LUX Core</source>
-        <translation>Show information about LUX Core</translation>
+        <source>Show information about Luxcore</source>
+        <translation>Show information about Luxcore</translation>
     </message>
     <message>
         <source>Modify configuration options for LUX</source>
@@ -682,12 +682,12 @@
         <translation>Block explorer window</translation>
     </message>
     <message>
-        <source>Show the LUX Core help message to get a list with possible LUX command-line options</source>
-        <translation>Show the LUX Core help message to get a list with possible LUX command-line options</translation>
+        <source>Show the Luxcore help message to get a list with possible LUX command-line options</source>
+        <translation>Show the Luxcore help message to get a list with possible LUX command-line options</translation>
     </message>
     <message>
-        <source>LUX Core client</source>
-        <translation>LUX Core client</translation>
+        <source>Luxcore client</source>
+        <translation>Luxcore client</translation>
     </message>
     <message numerus="yes">
         <source>%n active connection(s) to LUX network</source>
@@ -1184,16 +1184,16 @@ Address: %4
         <translation>version</translation>
     </message>
     <message>
-        <source>LUX Core</source>
-        <translation>LUX Core</translation>
+        <source>Luxcore</source>
+        <translation>Luxcore</translation>
     </message>
     <message>
         <source>(%1-bit)</source>
         <translation>(%1-bit)</translation>
     </message>
     <message>
-        <source>About LUX Core</source>
-        <translation>About LUX Core</translation>
+        <source>About Luxcore</source>
+        <translation>About Luxcore</translation>
     </message>
     <message>
         <source>Command-line options</source>
@@ -1239,16 +1239,16 @@ Address: %4
         <translation>Welcome</translation>
     </message>
     <message>
-        <source>Welcome to LUX Core.</source>
-        <translation>Welcome to LUX Core.</translation>
+        <source>Welcome to Luxcore.</source>
+        <translation>Welcome to Luxcore.</translation>
     </message>
     <message>
-        <source>As this is the first time the program is launched, you can choose where LUX Core will store its data.</source>
-        <translation>As this is the first time the program is launched, you can choose where LUX Core will store its data.</translation>
+        <source>As this is the first time the program is launched, you can choose where Luxcore will store its data.</source>
+        <translation>As this is the first time the program is launched, you can choose where Luxcore will store its data.</translation>
     </message>
     <message>
-        <source>LUX Core will download and store a copy of the LUX block chain. At least %1GB of data will be stored in this directory, and it will grow over time. The wallet will also be stored in this directory.</source>
-        <translation>LUX Core will download and store a copy of the LUX block chain. At least %1GB of data will be stored in this directory, and it will grow over time. The wallet will also be stored in this directory.</translation>
+        <source>Luxcore will download and store a copy of the LUX block chain. At least %1GB of data will be stored in this directory, and it will grow over time. The wallet will also be stored in this directory.</source>
+        <translation>Luxcore will download and store a copy of the LUX block chain. At least %1GB of data will be stored in this directory, and it will grow over time. The wallet will also be stored in this directory.</translation>
     </message>
     <message>
         <source>Use the default data directory</source>
@@ -1259,8 +1259,8 @@ Address: %4
         <translation>Use a custom data directory:</translation>
     </message>
     <message>
-        <source>LUX Core</source>
-        <translation>LUX Core</translation>
+        <source>Luxcore</source>
+        <translation>Luxcore</translation>
     </message>
     <message>
         <source>Error: Specified data directory "%1" cannot be created.</source>
@@ -3146,8 +3146,8 @@ https://www.transifex.com/lux-project/lux-project-translations</translation>
 <context>
     <name>ShutdownWindow</name>
     <message>
-        <source>LUX Core is shutting down...</source>
-        <translation>LUX Core is shutting down...</translation>
+        <source>Luxcore is shutting down...</source>
+        <translation>Luxcore is shutting down...</translation>
     </message>
     <message>
         <source>Do not shut down the computer until this window disappears.</source>
@@ -3296,8 +3296,8 @@ https://www.transifex.com/lux-project/lux-project-translations</translation>
 <context>
     <name>SplashScreen</name>
     <message>
-        <source>LUX Core</source>
-        <translation>LUX Core</translation>
+        <source>Luxcore</source>
+        <translation>Luxcore</translation>
     </message>
     <message>
         <source>Version %1</source>
@@ -3312,8 +3312,8 @@ https://www.transifex.com/lux-project/lux-project-translations</translation>
         <translation>The Dash Core developers</translation>
     </message>
     <message>
-        <source>The LUX Core developers</source>
-        <translation>The LUX Core developers</translation>
+        <source>The Luxcore developers</source>
+        <translation>The Luxcore developers</translation>
     </message>
     <message>
         <source>[testnet]</source>
@@ -3930,8 +3930,8 @@ https://www.transifex.com/lux-project/lux-project-translations</translation>
         <translation>Bind to given address to listen for JSON-RPC connections. Use [host]:port notation for IPv6. This option can be specified multiple times (default: bind to all interfaces)</translation>
     </message>
     <message>
-        <source>Cannot obtain a lock on data directory %s. LUX Core is probably already running.</source>
-        <translation>Cannot obtain a lock on data directory %s. LUX Core is probably already running.</translation>
+        <source>Cannot obtain a lock on data directory %s. Luxcore is probably already running.</source>
+        <translation>Cannot obtain a lock on data directory %s. Luxcore is probably already running.</translation>
     </message>
     <message>
         <source>Change automatic finalized budget voting behavior. mode=auto: Vote for only exact finalized budget match to my generated budget. (string, default: auto)</source>
@@ -4118,8 +4118,8 @@ for example: alertnotify=echo %%s | mail -s "LUX Alert" admin@foo.com
 </translation>
     </message>
     <message>
-        <source>Unable to bind to %s on this computer. LUX Core is probably already running.</source>
-        <translation>Unable to bind to %s on this computer. LUX Core is probably already running.</translation>
+        <source>Unable to bind to %s on this computer. Luxcore is probably already running.</source>
+        <translation>Unable to bind to %s on this computer. Luxcore is probably already running.</translation>
     </message>
     <message>
         <source>Unable to locate enough Darksend denominated funds for this transaction.</source>
@@ -4146,8 +4146,8 @@ for example: alertnotify=echo %%s | mail -s "LUX Alert" admin@foo.com
         <translation>Warning: -paytxfee is set very high! This is the transaction fee you will pay if you send a transaction.</translation>
     </message>
     <message>
-        <source>Warning: Please check that your computer's date and time are correct! If your clock is wrong LUX Core will not work properly.</source>
-        <translation>Warning: Please check that your computer's date and time are correct! If your clock is wrong LUX Core will not work properly.</translation>
+        <source>Warning: Please check that your computer's date and time are correct! If your clock is wrong Luxcore will not work properly.</source>
+        <translation>Warning: Please check that your computer's date and time are correct! If your clock is wrong Luxcore will not work properly.</translation>
     </message>
     <message>
         <source>Warning: The network does not appear to fully agree! Some miners appear to be experiencing issues.</source>
@@ -4300,8 +4300,8 @@ for example: alertnotify=echo %%s | mail -s "LUX Alert" admin@foo.com
         <translation>Copyright (C) 2014-%i The Dash Core Developers</translation>
     </message>
     <message>
-        <source>Copyright (C) 2015-%i The LUX Core Developers</source>
-        <translation>Copyright (C) 2015-%i The LUX Core Developers</translation>
+        <source>Copyright (C) 2015-%i The Luxcore Developers</source>
+        <translation>Copyright (C) 2015-%i The Luxcore Developers</translation>
     </message>
     <message>
         <source>Corrupted block database detected</source>
@@ -4372,8 +4372,8 @@ for example: alertnotify=echo %%s | mail -s "LUX Alert" admin@foo.com
         <translation>Error loading wallet.dat: Wallet corrupted</translation>
     </message>
     <message>
-        <source>Error loading wallet.dat: Wallet requires newer version of LUX Core</source>
-        <translation>Error loading wallet.dat: Wallet requires newer version of LUX Core</translation>
+        <source>Error loading wallet.dat: Wallet requires newer version of Luxcore</source>
+        <translation>Error loading wallet.dat: Wallet requires newer version of Luxcore</translation>
     </message>
     <message>
         <source>Error opening block database</source>
@@ -4484,8 +4484,8 @@ for example: alertnotify=echo %%s | mail -s "LUX Alert" admin@foo.com
         <translation>Information</translation>
     </message>
     <message>
-        <source>Initialization sanity check failed. LUX Core is shutting down.</source>
-        <translation>Initialization sanity check failed. LUX Core is shutting down.</translation>
+        <source>Initialization sanity check failed. Luxcore is shutting down.</source>
+        <translation>Initialization sanity check failed. Luxcore is shutting down.</translation>
     </message>
     <message>
         <source>Input is not valid.</source>
@@ -5048,8 +5048,8 @@ for example: alertnotify=echo %%s | mail -s "LUX Alert" admin@foo.com
         <translation>Wallet is locked.</translation>
     </message>
     <message>
-        <source>Wallet needed to be rewritten: restart LUX Core to complete</source>
-        <translation>Wallet needed to be rewritten: restart LUX Core to complete</translation>
+        <source>Wallet needed to be rewritten: restart Luxcore to complete</source>
+        <translation>Wallet needed to be rewritten: restart Luxcore to complete</translation>
     </message>
     <message>
         <source>Wallet options:</source>

@@ -2194,7 +2194,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
             nValueIn += view.GetValueIn(tx);
             if (tx.IsCoinStake()) {
                 nStakeReward = view.GetValueIn(tx) - tx.GetValueOut();
-            } else { 
+            } else {
                 nFees += view.GetValueIn(tx) - tx.GetValueOut();
             }
 
@@ -2247,7 +2247,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
 
     if (!control.Wait())
         return state.DoS(100, false);
-    
+
     int64_t nTime2 = GetTimeMicros();
     nTimeVerify += nTime2 - nTimeStart;
     LogPrint("bench", "    - Verify %u txins: %.2fms (%.3fms/txin) [%.2fs]\n", nInputs - 1, 0.001 * (nTime2 - nTimeStart), nInputs <= 1 ? 0 : 0.001 * (nTime2 - nTimeStart) / (nInputs - 1), nTimeVerify * 0.000001);
@@ -3214,7 +3214,7 @@ bool CheckWork(const CBlock &block, CBlockIndex* const pindexPrev)
         }
         if (stake->GetProof(hash, proof)) {
             if (proof != hashProofOfStake)
-                return error("%s: diverged stake %s, %s (block %s)\n", __func__, 
+                return error("%s: diverged stake %s, %s (block %s)\n", __func__,
                              hashProofOfStake.GetHex(), proof.GetHex(), hash.GetHex());
         } else {
             stake->SetProof(hash, hashProofOfStake);
@@ -3477,7 +3477,7 @@ bool ProcessNewBlock(CValidationState& state, CNode* pfrom, CBlock* pblock, CDis
         return error("%s: duplicate proof-of-stake for block %s", __func__, pblock->GetHash().GetHex());
 
 #   if 1 // Shouldn't send messages here to sync, prev blocks should have to be existed.
-    
+
     // Check if the prev block is our prev block, if not then request sync and return false
     else if (pblock->GetHash() != Params().HashGenesisBlock() && pfrom != NULL) {
         BlockMap::iterator mi = mapBlockIndex.find(pblock->hashPrevBlock);
@@ -3486,7 +3486,7 @@ bool ProcessNewBlock(CValidationState& state, CNode* pfrom, CBlock* pblock, CDis
             return false;
         }
     }
-    
+
 #   endif
 
     CBlockIndex* pindex = NULL;
@@ -3506,7 +3506,7 @@ bool ProcessNewBlock(CValidationState& state, CNode* pfrom, CBlock* pblock, CDis
         }
 
         CheckBlockIndex();
-        
+
         if (ret) {
             break;
         } else {
@@ -3541,6 +3541,15 @@ bool ProcessNewBlock(CValidationState& state, CNode* pfrom, CBlock* pblock, CDis
     return true;
 }
 
+bool IsWitnessEnabled(const CBlockIndex* pindexPrev){
+    LOCK(cs_main);
+    return true;
+}
+
+bool IsWitnessLocked(const CBlockIndex* pindexPrev){
+    LOCK(cs_main);
+    return true;
+}
 bool TestBlockValidity(CValidationState& state, const CBlock& block, CBlockIndex* const pindexPrev, bool fCheckPOW, bool fCheckMerkleRoot)
 {
     AssertLockHeld(cs_main);

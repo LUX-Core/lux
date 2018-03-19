@@ -562,8 +562,8 @@
         <translation>Панель вкладок</translation>
     </message>
     <message>
-        <source>LUX Core</source>
-        <translation>LUX Core</translation>
+        <source>Luxcore</source>
+        <translation>Luxcore</translation>
     </message>
     <message>
         <source>Send coins to a LUX address</source>
@@ -582,12 +582,12 @@
         <translation>Обзор мастернод</translation>
     </message>
     <message>
-        <source>&amp;About LUX Core</source>
-        <translation>&amp;О LUX Core</translation>
+        <source>&amp;About Luxcore</source>
+        <translation>&amp;О Luxcore</translation>
     </message>
     <message>
-        <source>Show information about LUX Core</source>
-        <translation>Показать информацию о LUX Core</translation>
+        <source>Show information about Luxcore</source>
+        <translation>Показать информацию о Luxcore</translation>
     </message>
     <message>
         <source>Modify configuration options for LUX</source>
@@ -630,8 +630,8 @@
         <translation>Окно обзора блока</translation>
     </message>
     <message>
-        <source>LUX Core client</source>
-        <translation>Клиент LUX Core</translation>
+        <source>Luxcore client</source>
+        <translation>Клиент Luxcore</translation>
     </message>
     <message numerus="yes">
         <source>%n active connection(s) to LUX network</source>
@@ -1008,16 +1008,16 @@ Address: %4
         <translation>версия</translation>
     </message>
     <message>
-        <source>LUX Core</source>
-        <translation>LUX Core</translation>
+        <source>Luxcore</source>
+        <translation>Luxcore</translation>
     </message>
     <message>
         <source>(%1-bit)</source>
         <translation>(%1-бит)</translation>
     </message>
     <message>
-        <source>About LUX Core</source>
-        <translation>О LUX Core</translation>
+        <source>About Luxcore</source>
+        <translation>О Luxcore</translation>
     </message>
     <message>
         <source>Command-line options</source>
@@ -1059,16 +1059,16 @@ Address: %4
         <translation>Добро пожаловать</translation>
     </message>
     <message>
-        <source>Welcome to LUX Core.</source>
-        <translation>Добро пожаловать в LUX Core.</translation>
+        <source>Welcome to Luxcore.</source>
+        <translation>Добро пожаловать в Luxcore.</translation>
     </message>
     <message>
-        <source>As this is the first time the program is launched, you can choose where LUX Core will store its data.</source>
-        <translation>Поскольку это первый запуск программы, вы можете выбрать, где будут храниться данные LUX Core.</translation>
+        <source>As this is the first time the program is launched, you can choose where Luxcore will store its data.</source>
+        <translation>Поскольку это первый запуск программы, вы можете выбрать, где будут храниться данные Luxcore.</translation>
     </message>
     <message>
-        <source>LUX Core will download and store a copy of the LUX block chain. At least %1GB of data will be stored in this directory, and it will grow over time. The wallet will also be stored in this directory.</source>
-        <translation>LUX Core загрузит и сохранит копию цепочки блоков LUX. Каталог будет занимать около %1GB и со временем размер будет увеличиваться. Кроме того, в этом каталоге будет храниться кошелек.</translation>
+        <source>Luxcore will download and store a copy of the LUX block chain. At least %1GB of data will be stored in this directory, and it will grow over time. The wallet will also be stored in this directory.</source>
+        <translation>Luxcore загрузит и сохранит копию цепочки блоков LUX. Каталог будет занимать около %1GB и со временем размер будет увеличиваться. Кроме того, в этом каталоге будет храниться кошелек.</translation>
     </message>
     <message>
         <source>Use the default data directory</source>
@@ -1079,8 +1079,8 @@ Address: %4
         <translation>Использовать другой каталог данных:</translation>
     </message>
     <message>
-        <source>LUX Core</source>
-        <translation>LUX Core</translation>
+        <source>Luxcore</source>
+        <translation>Luxcore</translation>
     </message>
     <message>
         <source>Error: Specified data directory "%1" cannot be created.</source>
@@ -1866,8 +1866,8 @@ https://www.transifex.com/lux-project/lux-project-translations</translation>
 <context>
     <name>SplashScreen</name>
     <message>
-        <source>LUX Core</source>
-        <translation>LUX Core</translation>
+        <source>Luxcore</source>
+        <translation>Luxcore</translation>
     </message>
     </context>
 <context>
@@ -1992,8 +1992,8 @@ https://www.transifex.com/lux-project/lux-project-translations</translation>
         <translation>Copyright (C) 2014-%i Разработчики Dash Core</translation>
     </message>
     <message>
-        <source>Copyright (C) 2015-%i The LUX Core Developers</source>
-        <translation>Copyright (C) 2015-%i Разработчики LUX Core</translation>
+        <source>Copyright (C) 2015-%i The Luxcore Developers</source>
+        <translation>Copyright (C) 2015-%i Разработчики Luxcore</translation>
     </message>
     <message>
         <source>Corrupted block database detected</source>
