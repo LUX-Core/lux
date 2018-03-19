@@ -374,12 +374,10 @@ std::vector<CTxOut> CondensingTX::createVout(){
             nVouts[b.first] = count;
             count++;
         }
-#if 0
         if(count > MAX_CONTRACT_VOUTS){
             voutOverflow=true;
             return outs;
         }
-#endif
     }
     return outs;
 }

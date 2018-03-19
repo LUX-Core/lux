@@ -182,3 +182,25 @@ std::string CTransaction::ToString() const
         str += "    " + vout[i].ToString() + "\n";
     return str;
 }
+
+///////////////////////////////////////////////////////////// lux
+bool CTransaction::HasCreateOrCall() const{
+    for(const CTxOut& v : vout){
+        if(v.scriptPubKey.HasOpCreate() || v.scriptPubKey.HasOpCall()){
+            return true;
+        }
+    }
+    return false;
+}
+
+
+
+bool CTransaction::HasOpSpend() const{
+    for(const CTxIn& i : vin){
+        if(i.scriptSig.HasOpSpend()){
+            return true;
+        }
+    }
+    return false;
+}
+/////////////////////////////////////////////////////////////
