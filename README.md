@@ -67,7 +67,7 @@ Ubuntu Xenial 16.04 and Windows Subsystem for Linux
 
 Once the tool chain is installed the build steps are common:
 
-Note that for WSL the Lux Core source path MUST be somewhere in the default mount file system, for example /usr/src/lux, AND not under /mnt/d/. If this is not the case the dependency autoconf scripts will fail. This means you cannot use a directory that located directly on the host Windows file system to perform the build.
+Note that for WSL the Luxcore source path MUST be somewhere in the default mount file system, for example /usr/src/lux, AND not under /mnt/d/. If this is not the case the dependency autoconf scripts will fail. This means you cannot use a directory that located directly on the host Windows file system to perform the build.
 
 The next three steps are an example of how to acquire the source in an appropriate way.
 
@@ -127,7 +127,7 @@ Then install [Homebrew](https://brew.sh).
 
 NOTE: Building with Qt4 is still supported, however, could result in a broken UI. Building with Qt5 is recommended.
 
-#### Build Lux Core
+#### Build Luxcore
 
 1. Clone the Lux source code and cd into `Lux`
 

@@ -68,10 +68,10 @@ static bool AppInitRPC(int argc, char* argv[])
     //
     ParseParameters(argc, argv);
     if (argc < 2 || mapArgs.count("-?") || mapArgs.count("-help") || mapArgs.count("-version")) {
-        std::string strUsage = _("Lux Core RPC client version") + " " + FormatFullVersion() + "\n";
+        std::string strUsage = _("Luxcore RPC client version") + " " + FormatFullVersion() + "\n";
         if (!mapArgs.count("-version")) {
             strUsage += "\n" + _("Usage:") + "\n" +
-                        "  lux-cli [options] <command> [params]  " + _("Send command to Lux Core") + "\n" +
+                        "  lux-cli [options] <command> [params]  " + _("Send command to Luxcore") + "\n" +
                         "  lux-cli [options] help                " + _("List commands") + "\n" +
                         "  lux-cli [options] help <command>      " + _("Get help for a command") + "\n";
 

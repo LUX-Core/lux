@@ -214,12 +214,12 @@
         <translation>&amp;Eines</translation>
     </message>
     <message>
-        <source>LUX Core</source>
-        <translation>LUX Core</translation>
+        <source>Luxcore</source>
+        <translation>Luxcore</translation>
     </message>
     <message>
-        <source>&amp;About LUX Core</source>
-        <translation>&amp;Sobre LUX Core</translation>
+        <source>&amp;About Luxcore</source>
+        <translation>&amp;Sobre Luxcore</translation>
     </message>
     <message numerus="yes">
         <source>%n active connection(s) to LUX network</source>
@@ -392,12 +392,12 @@
         <translation>versió</translation>
     </message>
     <message>
-        <source>LUX Core</source>
-        <translation>LUX Core</translation>
+        <source>Luxcore</source>
+        <translation>Luxcore</translation>
     </message>
     <message>
-        <source>About LUX Core</source>
-        <translation>Sobre LUX Core</translation>
+        <source>About Luxcore</source>
+        <translation>Sobre Luxcore</translation>
     </message>
     <message>
         <source>Usage:</source>
@@ -415,12 +415,12 @@
         <translation>Benvingut</translation>
     </message>
     <message>
-        <source>Welcome to LUX Core.</source>
-        <translation>Benvingut a LUX Core.</translation>
+        <source>Welcome to Luxcore.</source>
+        <translation>Benvingut a Luxcore.</translation>
     </message>
     <message>
-        <source>LUX Core</source>
-        <translation>LUX Core</translation>
+        <source>Luxcore</source>
+        <translation>Luxcore</translation>
     </message>
     <message>
         <source>Error</source>
@@ -888,8 +888,8 @@
 <context>
     <name>SplashScreen</name>
     <message>
-        <source>LUX Core</source>
-        <translation>LUX Core</translation>
+        <source>Luxcore</source>
+        <translation>Luxcore</translation>
     </message>
     <message>
         <source>Version %1</source>

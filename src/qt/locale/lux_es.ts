@@ -602,7 +602,7 @@
         <translation>Herramienta de pestañas</translation>
     </message>
     <message>
-        <source>LUX Core</source>
+        <source>Luxcore</source>
         <translation>Núcleo LUX</translation>
     </message>
     <message>
@@ -622,11 +622,11 @@
         <translation>Explorar masternodos</translation>
     </message>
     <message>
-        <source>&amp;About LUX Core</source>
+        <source>&amp;About Luxcore</source>
         <translation>&amp;Sobre el núcleo de LUX</translation>
     </message>
     <message>
-        <source>Show information about LUX Core</source>
+        <source>Show information about Luxcore</source>
         <translation>Mostrar información sobre el núcleo de LUX</translation>
     </message>
     <message>
@@ -682,12 +682,12 @@
         <translation>Ventana del explorador de bloques</translation>
     </message>
     <message>
-        <source>Show the LUX Core help message to get a list with possible LUX command-line options</source>
-        <translation>Mostrar la ayuda de LUX Core para obtener una lista de posibles opciones en línea de comandos</translation>
+        <source>Show the Luxcore help message to get a list with possible LUX command-line options</source>
+        <translation>Mostrar la ayuda de Luxcore para obtener una lista de posibles opciones en línea de comandos</translation>
     </message>
     <message>
-        <source>LUX Core client</source>
-        <translation>Cliente LUX Core</translation>
+        <source>Luxcore client</source>
+        <translation>Cliente Luxcore</translation>
     </message>
     <message numerus="yes">
         <source>%n active connection(s) to LUX network</source>
@@ -1184,7 +1184,7 @@ MultiEnvío: %1</translation>
         <translation>versión</translation>
     </message>
     <message>
-        <source>LUX Core</source>
+        <source>Luxcore</source>
         <translation>Núcleo LUX</translation>
     </message>
     <message>
@@ -1192,8 +1192,8 @@ MultiEnvío: %1</translation>
         <translation>(%1-bit)</translation>
     </message>
     <message>
-        <source>About LUX Core</source>
-        <translation>Acerca de LUX Core</translation>
+        <source>About Luxcore</source>
+        <translation>Acerca de Luxcore</translation>
     </message>
     <message>
         <source>Command-line options</source>
@@ -1239,16 +1239,16 @@ MultiEnvío: %1</translation>
         <translation>Bienvenido/a</translation>
     </message>
     <message>
-        <source>Welcome to LUX Core.</source>
-        <translation>Bienvenido/a a LUX Core.</translation>
+        <source>Welcome to Luxcore.</source>
+        <translation>Bienvenido/a a Luxcore.</translation>
     </message>
     <message>
-        <source>As this is the first time the program is launched, you can choose where LUX Core will store its data.</source>
-        <translation>Al ser la primera vez que se inicia el programa, usted puede elegir dónde guardará LUX Core sus datos.</translation>
+        <source>As this is the first time the program is launched, you can choose where Luxcore will store its data.</source>
+        <translation>Al ser la primera vez que se inicia el programa, usted puede elegir dónde guardará Luxcore sus datos.</translation>
     </message>
     <message>
-        <source>LUX Core will download and store a copy of the LUX block chain. At least %1GB of data will be stored in this directory, and it will grow over time. The wallet will also be stored in this directory.</source>
-        <translation>LUX Core descargará y guardará una copia de la cadena de bloques LUX. Por lo menos %1GB de datos serán guardados en esta carpeta, y crecerá con el tiempo. El monedero también se guardará en esta carpeta.</translation>
+        <source>Luxcore will download and store a copy of the LUX block chain. At least %1GB of data will be stored in this directory, and it will grow over time. The wallet will also be stored in this directory.</source>
+        <translation>Luxcore descargará y guardará una copia de la cadena de bloques LUX. Por lo menos %1GB de datos serán guardados en esta carpeta, y crecerá con el tiempo. El monedero también se guardará en esta carpeta.</translation>
     </message>
     <message>
         <source>Use the default data directory</source>
@@ -1259,7 +1259,7 @@ MultiEnvío: %1</translation>
         <translation>Usar una carpeta de datos personalizada:</translation>
     </message>
     <message>
-        <source>LUX Core</source>
+        <source>Luxcore</source>
         <translation>Núcleo LUX</translation>
     </message>
     <message>
@@ -3113,7 +3113,7 @@ https://www.transifex.com/lux-project/lux-project-translations</translation>
 <context>
     <name>SplashScreen</name>
     <message>
-        <source>LUX Core</source>
+        <source>Luxcore</source>
         <translation>Núcleo LUX</translation>
     </message>
     </context>

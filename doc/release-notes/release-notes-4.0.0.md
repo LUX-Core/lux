@@ -1,4 +1,4 @@
-LUX Core version 4.0.0 is now available from:
+Luxcore version 4.0.0 is now available from:
 
   <https://github.com/216k155/lux/releases>
 
@@ -12,7 +12,7 @@ Please report bugs using the issue tracker at github:
 Recommended Update
 ==============
 
-LUX Core v4.0.0 is a recommended, semi-mandatory update for all users. This release contains transaction creation bug fixes for zLUX spends, automint calculation adjustments, and other various updates/fixes.
+Luxcore v4.0.0 is a recommended, semi-mandatory update for all users. This release contains transaction creation bug fixes for zLUX spends, automint calculation adjustments, and other various updates/fixes.
 
 zLUX spending requires this update.
 
@@ -24,7 +24,7 @@ If you are running an older version, shut it down. Wait until it has completely 
 Compatibility
 ==============
 
-LUX Core is extensively tested on multiple operating systems using
+Luxcore is extensively tested on multiple operating systems using
 the Linux kernel, macOS 10.8+, and Windows Vista and later.
 
 Microsoft ended support for Windows XP on [April 8th, 2014](https://www.microsoft.com/en-us/WindowsForBusiness/end-of-xp-support),
@@ -32,7 +32,7 @@ No attempt is made to prevent installing or running the software on Windows XP, 
 can still do so at your own risk but be aware that there are known instabilities and issues.
 Please do not report issues about Windows XP to the issue tracker.
 
-LUX Core should also work on most other Unix-like systems but is not
+Luxcore should also work on most other Unix-like systems but is not
 frequently tested on them.
 
 ### :exclamation::exclamation::exclamation: MacOS 10.13 High Sierra :exclamation::exclamation::exclamation:

@@ -562,8 +562,8 @@
         <translation>Schede degli strumenti</translation>
     </message>
     <message>
-        <source>LUX Core</source>
-        <translation>LUX Core</translation>
+        <source>Luxcore</source>
+        <translation>Luxcore</translation>
     </message>
     <message>
         <source>Send coins to a LUX address</source>
@@ -582,8 +582,8 @@
         <translation>Esplora i masternodes</translation>
     </message>
     <message>
-        <source>Show information about LUX Core</source>
-        <translation>Visualizza informazioni su LUX Core</translation>
+        <source>Show information about Luxcore</source>
+        <translation>Visualizza informazioni su Luxcore</translation>
     </message>
     <message>
         <source>Modify configuration options for LUX</source>
@@ -614,8 +614,8 @@
         <translation>Finestra Block Explorer</translation>
     </message>
     <message>
-        <source>Show the LUX Core help message to get a list with possible LUX command-line options</source>
-        <translation>Mostra il messaggio di aiuto LUX Core per ottenere un elenco con le possibili opzioni di riga di comando LUX</translation>
+        <source>Show the Luxcore help message to get a list with possible LUX command-line options</source>
+        <translation>Mostra il messaggio di aiuto Luxcore per ottenere un elenco con le possibili opzioni di riga di comando LUX</translation>
     </message>
     <message>
         <source>Synchronizing with network...</source>
@@ -716,15 +716,15 @@ MultiSend: %1</translation>
 <context>
     <name>HelpMessageDialog</name>
     <message>
-        <source>LUX Core</source>
-        <translation>LUX Core</translation>
+        <source>Luxcore</source>
+        <translation>Luxcore</translation>
     </message>
     </context>
 <context>
     <name>Intro</name>
     <message>
-        <source>LUX Core</source>
-        <translation>LUX Core</translation>
+        <source>Luxcore</source>
+        <translation>Luxcore</translation>
     </message>
     <message>
         <source>Error</source>
@@ -920,8 +920,8 @@ MultiSend: %1</translation>
 <context>
     <name>SplashScreen</name>
     <message>
-        <source>LUX Core</source>
-        <translation>LUX Core</translation>
+        <source>Luxcore</source>
+        <translation>Luxcore</translation>
     </message>
     </context>
 <context>
