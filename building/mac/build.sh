@@ -10,8 +10,5 @@ export CPPFLAGS="-I/usr/local/opt/openssl/include"
 export PKG_CONFIG_PATH="/usr/local/opt/openssl/lib/pkgconfig"
 
 ./autogen.sh
-./configure --with-gui=qt5 --with-boost=$(brew --prefix boost@1.60) --disable-tests
+./configure --with-gui=qt5 --with-boost=$(brew --prefix boost@1.60) --disable-tests --disable-zmq
 make check
-
-# For debugging purposes
-cat src/test-suite.log
