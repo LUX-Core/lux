@@ -32,7 +32,22 @@ AH_BOTTOM([#endif //LUX_CONFIG_H])
 dnl faketime breaks configure and is only needed for make. Disable it here.
 unset FAKETIME
 
-dnl Automake init set-up and checks
+if test "x${CXXFLAGS+set}" = "xset"; then
+  CXXFLAGS_overridden=yes
+else
+  CXXFLAGS_overridden=no
+fi
+
+if test "x${CFLAGS+set}" = "xset"; then
+  CFLAGS_overridden=yes
+else
+  CFLAGS_overridden=no
+fi
+
+dnl ==============================================================
+dnl Setup for automake
+dnl ==============================================================
+
 AM_INIT_AUTOMAKE([no-define subdir-objects foreign])
 
 dnl faketime messes with timestamps and causes configure to be re-run.
@@ -313,38 +328,18 @@ case $host in
        AC_CHECK_PROG([PORT],port, port)
        if test x$PORT = xport; then
          dnl add default macports paths
-         CPPFLAGS="$CPPFLAGS -isystem /opt/local/include"
-         LIBS="$LIBS -L/opt/local/lib"
-         if test -d /opt/local/include/db48; then
-           CPPFLAGS="$CPPFLAGS -I/opt/local/include/db48"
-           LIBS="$LIBS -L/opt/local/lib/db48"
-         fi
+         CPPFLAGS="$CPPFLAGS -isystem /opt/local/include -I/opt/local/include/db48"
+         LIBS="$LIBS -L/opt/local/lib -L/opt/local/lib/db48"
        fi
 
-       AC_PATH_PROGS([RSVG_CONVERT], [rsvg-convert rsvg],rsvg-convert)
        AC_CHECK_PROG([BREW],brew, brew)
        if test x$BREW = xbrew; then
-         dnl These Homebrew packages may be keg-only, meaning that they won't be found
-         dnl in expected paths because they may conflict with system files. Ask
-         dnl Homebrew where each one is located, then adjust paths accordingly.
-         dnl It's safe to add these paths even if the functionality is disabled by
-         dnl the user (--without-wallet or --without-gui for example).
-
-         openssl_prefix=`$BREW --prefix openssl 2>/dev/null`
-         bdb_prefix=`$BREW --prefix berkeley-db4 2>/dev/null`
-         qt5_prefix=`$BREW --prefix qt5 2>/dev/null`
-         if test x$openssl_prefix != x; then
-           PKG_CONFIG_PATH="$openssl_prefix/lib/pkgconfig:$PKG_CONFIG_PATH"
-           export PKG_CONFIG_PATH
-         fi
-         if test x$bdb_prefix != x; then
-           CPPFLAGS="$CPPFLAGS -I$bdb_prefix/include"
-           LIBS="$LIBS -L$bdb_prefix/lib"
-         fi
-         if test x$qt5_prefix != x; then
-           PKG_CONFIG_PATH="$qt5_prefix/lib/pkgconfig:$PKG_CONFIG_PATH"
-           export PKG_CONFIG_PATH
-         fi
+         dnl add default homebrew paths
+         openssl_prefix=`$BREW --prefix openssl`
+         bdb_prefix=`$BREW --prefix berkeley-db4`
+         export PKG_CONFIG_PATH="$openssl_prefix/lib/pkgconfig:$PKG_CONFIG_PATH"
+         CPPFLAGS="$CPPFLAGS -I$bdb_prefix/include"
+         LIBS="$LIBS -L$bdb_prefix/lib"
        fi
      else
        case $build_os in
@@ -355,26 +350,14 @@ case $host in
            AC_PATH_TOOL([INSTALLNAMETOOL], [install_name_tool], install_name_tool)
            AC_PATH_TOOL([OTOOL], [otool], otool)
            AC_PATH_PROGS([GENISOIMAGE], [genisoimage mkisofs],genisoimage)
-           AC_PATH_PROGS([RSVG_CONVERT], [rsvg-convert rsvg],rsvg-convert)
-           AC_PATH_PROGS([IMAGEMAGICK_CONVERT], [convert],convert)
-           AC_PATH_PROGS([TIFFCP], [tiffcp],tiffcp)
-
-           dnl libtool will try to strip the static lib, which is a problem for
-           dnl cross-builds because strip attempts to call a hard-coded ld,
-           dnl which may not exist in the path. Stripping the .a is not
-           dnl necessary, so just disable it.
-           old_striplib=
            ;;
        esac
      fi
 
-     AX_CHECK_LINK_FLAG([[-Wl,-headerpad_max_install_names]], [LDFLAGS="$LDFLAGS -Wl,-headerpad_max_install_names"])
      CPPFLAGS="$CPPFLAGS -DMAC_OSX"
      ;;
-   *linux*)
-     TARGET_OS=linux
-     ;;
    *)
+     CPPFLAGS="$CPPFLAGS"
      ;;
 esac
 
@@ -383,7 +366,7 @@ if test x$use_comparison_tool != xno; then
 fi
 
 if test x$use_comparison_tool_reorg_tests != xno; then
-  if test x$use_comparison_tool = x; then
+  if test x$use_comparison_tool == x; then
     AC_MSG_ERROR("comparison tool reorg tests but comparison tool was not specified")
   fi
   AC_SUBST(COMPARISON_TOOL_REORG_TESTS, 1)
@@ -391,20 +374,20 @@ else
   AC_SUBST(COMPARISON_TOOL_REORG_TESTS, 0)
 fi
 
-if test x$use_lcov = xyes; then
-  if test x$LCOV = x; then
+if test x$use_lcov == xyes; then
+  if test x$LCOV == x; then
     AC_MSG_ERROR("lcov testing requested but lcov not found")
   fi
-  if test x$GCOV = x; then
+  if test x$GCOV == x; then
     AC_MSG_ERROR("lcov testing requested but gcov not found")
   fi
-  if test x$JAVA = x; then
+  if test x$JAVA == x; then
     AC_MSG_ERROR("lcov testing requested but java not found")
   fi
-  if test x$GENHTML = x; then
+  if test x$GENHTML == x; then
     AC_MSG_ERROR("lcov testing requested but genhtml not found")
   fi
-  if test x$use_comparison_tool = x; then
+  if test x$use_comparison_tool == x; then
     AC_MSG_ERROR("lcov testing requested but comparison tool was not specified")
   fi
   LCOV="$LCOV --gcov-tool=$GCOV"
@@ -417,6 +400,7 @@ AC_C_BIGENDIAN([AC_MSG_ERROR("Big Endian not supported")])
 
 dnl Check for pthread compile/link requirements
 AX_PTHREAD
+INCLUDES="$INCLUDES $PTHREAD_CFLAGS"
 
 # The following macro will add the necessary defines to lux-config.h, but
 # they also need to be passed down to any subprojects. Pull the results out of
