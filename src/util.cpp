@@ -203,14 +203,22 @@ static boost::once_flag debugPrintInitFlag = BOOST_ONCE_INIT;
 static FILE* fileout = NULL;
 static boost::mutex* mutexDebugLog = NULL;
 
+/////////////////////////////////////////////////////////////////////// // lux
+static FILE* fileoutVM = NULL;
+///////////////////////////////////////////////////////////////////////
+
 static void DebugPrintInit()
 {
     assert(fileout == NULL);
+    assert(fileoutVM == NULL); // lux
     assert(mutexDebugLog == NULL);
 
     boost::filesystem::path pathDebug = GetDataDir() / "debug.log";
+    boost::filesystem::path pathDebugVM = GetDataDir() / "vm.log"; // lux
     fileout = fopen(pathDebug.string().c_str(), "a");
+    fileoutVM = fopen(pathDebugVM.string().c_str(), "a"); // lux
     if (fileout) setbuf(fileout, NULL); // unbuffered
+    if (fileoutVM) setbuf(fileoutVM, NULL); // unbuffered // lux
 
     mutexDebugLog = new boost::mutex();
 }
@@ -249,8 +257,15 @@ bool LogAcceptCategory(const char* category)
     return true;
 }
 
-int LogPrintStr(const std::string& str)
+int LogPrintStr(const std::string& str, bool useVMLog)
 {
+//////////////////////////////// // lux
+    FILE* file = fileout;
+    if(useVMLog){
+        file = fileoutVM;
+    }
+////////////////////////////////
+
     int ret = 0; // Returns total number of characters written
     if (fPrintToConsole) {
         // print to console
@@ -260,7 +275,7 @@ int LogPrintStr(const std::string& str)
         static bool fStartedNewLine = true;
         boost::call_once(&DebugPrintInit, debugPrintInitFlag);
 
-        if (fileout == NULL)
+        if (file == NULL)
             return ret;
 
         boost::mutex::scoped_lock scoped_lock(*mutexDebugLog);
@@ -269,19 +284,19 @@ int LogPrintStr(const std::string& str)
         if (fReopenDebugLog) {
             fReopenDebugLog = false;
             boost::filesystem::path pathDebug = GetDataDir() / "debug.log";
-            if (freopen(pathDebug.string().c_str(), "a", fileout) != NULL)
-                setbuf(fileout, NULL); // unbuffered
+            if (freopen(pathDebug.string().c_str(), "a", file) != NULL)
+                setbuf(file, NULL); // unbuffered
         }
 
         // Debug print useful for profiling
         if (fLogTimestamps && fStartedNewLine)
-            ret += fprintf(fileout, "%s ", DateTimeStrFormat("%Y-%m-%d %H:%M:%S", GetTime()).c_str());
+            ret += fprintf(file, "%s ", DateTimeStrFormat("%Y-%m-%d %H:%M:%S", GetTime()).c_str());
         if (!str.empty() && str[str.size() - 1] == '\n')
             fStartedNewLine = true;
         else
             fStartedNewLine = false;
 
-        ret = fwrite(str.data(), 1, str.size(), fileout);
+        ret = fwrite(str.data(), 1, str.size(), file);
     }
 
     return ret;

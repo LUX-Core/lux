@@ -61,7 +61,7 @@ void SetupEnvironment();
 /** Return true if log accepts specified category */
 bool LogAcceptCategory(const char* category);
 /** Send a string to the log output */
-int LogPrintStr(const std::string& str);
+int LogPrintStr(const std::string& str, bool useVMLog = false);
 
 #define LogPrintf(...) LogPrint(NULL, __VA_ARGS__)
 
