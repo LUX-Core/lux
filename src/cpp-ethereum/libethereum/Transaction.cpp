@@ -92,6 +92,7 @@ std::ostream& dev::eth::operator<<(std::ostream& _out, TransactionException cons
 		case TransactionException::OutOfStack: _out << "OutOfStack"; break;
 		case TransactionException::StackUnderflow: _out << "StackUnderflow"; break;
 		case TransactionException::CreateWithValue: _out << "CreateWithValue"; break;
+		case TransactionException::NoInformation: _out << "NoInformation"; break;
 		default: _out << "Unknown"; break;
 	}
 	return _out;
