@@ -695,7 +695,7 @@ if len(config.add_resources) > 0 and verbose >= 2:
     print("+ Adding additional resources +")
 
 for p in config.add_resources:
-    t = os.path.join(applicationBundle.resourcesPath, os.path.basename(p))
+    t = os.path.join(applicationBundle.path, "Contents", "Frameworks")
     if verbose >= 3:
         print(p, "->", t)
     if os.path.isdir(p):
