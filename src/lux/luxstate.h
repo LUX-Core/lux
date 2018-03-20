@@ -68,6 +68,8 @@ public:
 
     void setRootUTXO(dev::h256 const& _r) { cacheUTXO.clear(); stateUTXO.setRoot(_r); }
 
+    void setCacheUTXO(dev::Address const& address, Vin const& vin) { cacheUTXO.insert(std::make_pair(address, vin)); }
+
     dev::h256 rootHashUTXO() const { return stateUTXO.root(); }
 
     std::unordered_map<dev::Address, Vin> vins() const; // temp
