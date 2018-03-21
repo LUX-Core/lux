@@ -2085,12 +2085,14 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
     AssertLockHeld(cs_main);
 
     ///////////////////////////////////////////////// // lux
-
+#if 0
     LuxDGP luxDGP(globalState.get(), fGettingValuesDGP);
     globalSealEngine->setLuxSchedule(luxDGP.getGasSchedule(pindex->nHeight + 1));
-    uint32_t sizeBlockDGP = luxDGP.getBlockSize(pindex->nHeight + 1);
-    uint64_t minGasPrice = luxDGP.getMinGasPrice(pindex->nHeight + 1);
-    uint64_t blockGasLimit = luxDGP.getBlockGasLimit(pindex->nHeight + 1);
+#endif
+    uint32_t sizeBlockDGP = 0;//luxDGP.getBlockSize(pindex->nHeight + 1);
+    uint64_t minGasPrice = 0;//luxDGP.getMinGasPrice(pindex->nHeight + 1);
+    uint64_t blockGasLimit = 0;//luxDGP.getBlockGasLimit(pindex->nHeight + 1);
+
 #if 0
     dgpMaxBlockSize = sizeBlockDGP ? sizeBlockDGP : dgpMaxBlockSize;
     updateBlockSizeParams(dgpMaxBlockSize);
