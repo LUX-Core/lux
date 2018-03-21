@@ -7,7 +7,7 @@ export QT_LIBS="-F/usr/local/opt/qt@5.5/lib -framework QtWidgets -framework QtGu
 
 export LDFLAGS="-L/usr/local/opt/openssl/lib"
 export CPPFLAGS="-I/usr/local/opt/openssl/include"
-export PKG_CONFIG_PATH="/usr/local/opt/openssl/lib/pkgconfig"
+export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:usr/local/opt/openssl/lib/pkgconfig
 
 ./autogen.sh
 ./configure --with-gui=qt5 --with-boost=$(brew --prefix boost@1.60) --disable-tests --disable-zmq
