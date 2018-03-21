@@ -2094,9 +2094,8 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
 #if 0
     dgpMaxBlockSize = sizeBlockDGP ? sizeBlockDGP : dgpMaxBlockSize;
     updateBlockSizeParams(dgpMaxBlockSize);
-    std::vector<CTxOut> checkVouts;
 #endif
-
+    std::vector<CTxOut> checkVouts;
     uint64_t countCumulativeGasUsed = 0;
 
     CBlock checkBlock(block.GetBlockHeader());
@@ -2189,6 +2188,9 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
     int64_t nValueOut = 0;
     int64_t nValueIn = 0;
     int64_t nStakeReward = 0;
+    uint64_t blockGasUsed = 0;
+    CAmount gasRefunds=0;
+
     for (unsigned int i = 0; i < block.vtx.size(); i++) {
         const CTransaction& tx = block.vtx[i];
 
