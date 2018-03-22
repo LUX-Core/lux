@@ -8,6 +8,7 @@
 
 #include "amount.h"
 #include "masternodemanager.h"
+#include "stakingdialog.h"
 #include "tradingdialog.h"
 
 #include <QStackedWidget>

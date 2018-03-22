@@ -37,7 +37,6 @@ QT_FORMS_UI = \
   qt/forms/openuridialog.ui \
   qt/forms/optionsdialog.ui \
   qt/forms/overviewpage.ui \
-  qt/forms/stakingdialog.ui \
   qt/forms/tradingdialog.ui \
   qt/forms/receivecoinsdialog.ui \
   qt/forms/receiverequestdialog.ui \
@@ -161,6 +160,7 @@ BITCOIN_QT_H = \
   qt/optionsdialog.h \
   qt/optionsmodel.h \
   qt/overviewpage.h \
+  qt/stakingtablemodel.h \
   qt/stakingdialog.h \
   qt/tradingdialog.h \
   qt/paymentrequestplus.h \
@@ -235,6 +235,7 @@ RES_ICONS = \
   qt/res/icons/staking_active.png \
   qt/res/icons/staking_inactive.png \
   qt/res/icons/synced.png \
+  qt/res/icons/stake.png \
   qt/res/icons/trade.png \
   qt/res/icons/transaction0.png \
   qt/res/icons/transaction2.png \
@@ -299,6 +300,8 @@ BITCOIN_QT_CPP += \
   qt/openuridialog.cpp \
   qt/overviewpage.cpp \
   qt/qcustomplot.cpp \
+  qt/stakingtablemodel.cpp \
+  qt/stakingfilterproxy.cpp \
   qt/stakingdialog.cpp \
   qt/tradingdialog.cpp \
   qt/paymentrequestplus.cpp \
