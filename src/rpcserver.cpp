@@ -264,6 +264,9 @@ static const CRPCCommand vRPCCommands[] =
         {"blockchain", "invalidateblock", &invalidateblock, true, true, false},
         {"blockchain", "reconsiderblock", &reconsiderblock, true, true, false},
 
+        /*Smart Contract*/
+        {"blockchain", "callcontract", &callcontract,true, true, false },
+
         /* Mining */
         {"mining", "getblocktemplate", &getblocktemplate, true, false, false},
         {"mining", "getmininginfo", &getmininginfo, true, false, false},
