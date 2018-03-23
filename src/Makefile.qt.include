@@ -79,6 +79,7 @@ QT_MOC_CPP = \
   qt/moc_optionsdialog.cpp \
   qt/moc_optionsmodel.cpp \
   qt/moc_overviewpage.cpp \
+  qt/moc_stakingdialog.cpp \
   qt/moc_tradingdialog.cpp \
   qt/moc_qcustomplot.cpp \
   qt/moc_peertablemodel.cpp \
@@ -159,6 +160,8 @@ BITCOIN_QT_H = \
   qt/optionsdialog.h \
   qt/optionsmodel.h \
   qt/overviewpage.h \
+  qt/stakingtablemodel.h \
+  qt/stakingdialog.h \
   qt/tradingdialog.h \
   qt/paymentrequestplus.h \
   qt/paymentserver.h \
@@ -232,6 +235,7 @@ RES_ICONS = \
   qt/res/icons/staking_active.png \
   qt/res/icons/staking_inactive.png \
   qt/res/icons/synced.png \
+  qt/res/icons/stake.png \
   qt/res/icons/trade.png \
   qt/res/icons/transaction0.png \
   qt/res/icons/transaction2.png \
@@ -296,6 +300,9 @@ BITCOIN_QT_CPP += \
   qt/openuridialog.cpp \
   qt/overviewpage.cpp \
   qt/qcustomplot.cpp \
+  qt/stakingtablemodel.cpp \
+  qt/stakingfilterproxy.cpp \
+  qt/stakingdialog.cpp \
   qt/tradingdialog.cpp \
   qt/paymentrequestplus.cpp \
   qt/paymentserver.cpp \
