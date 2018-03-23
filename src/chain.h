@@ -171,6 +171,8 @@ public:
     unsigned int nTime;
     unsigned int nBits;
     unsigned int nNonce;
+    uint256 hashStateRoot; // lux
+    uint256 hashUTXORoot; // lux
 
     //! (memory only) Sequential id assigned to distinguish order in which blocks are received.
     uint32_t nSequenceId;
@@ -203,6 +205,8 @@ public:
         nTime = 0;
         nBits = 0;
         nNonce = 0;
+        hashStateRoot  = uint256(); // lux
+        hashUTXORoot   = uint256(); // lux
     }
 
     CBlockIndex()
@@ -219,6 +223,8 @@ public:
         nTime = block.nTime;
         nBits = block.nBits;
         nNonce = block.nNonce;
+        hashStateRoot  = block.hashStateRoot; // lux
+        hashUTXORoot   = block.hashUTXORoot; // lux
 
         //Proof of Stake
         bnChainTrust = 0;
@@ -269,6 +275,8 @@ public:
         block.nTime = nTime;
         block.nBits = nBits;
         block.nNonce = nNonce;
+        block.hashStateRoot  = hashStateRoot; // lux
+        block.hashUTXORoot   = hashUTXORoot; // lux
         return block;
     }
 
@@ -443,6 +451,10 @@ public:
         READWRITE(nTime);
         READWRITE(nBits);
         READWRITE(nNonce);
+#if 0
+        READWRITE(hashStateRoot); // lux
+        READWRITE(hashUTXORoot); // lux
+#endif
     }
 
     uint256 GetBlockHash() const
@@ -454,6 +466,8 @@ public:
         block.nTime = nTime;
         block.nBits = nBits;
         block.nNonce = nNonce;
+        block.hashStateRoot   = hashStateRoot; // lux
+        block.hashUTXORoot    = hashUTXORoot; // lux
         return block.GetHash();
     }
 

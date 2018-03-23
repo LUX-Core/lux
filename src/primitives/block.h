@@ -33,6 +33,8 @@ public:
     uint32_t nTime;
     uint32_t nBits;
     uint32_t nNonce;
+    uint256 hashStateRoot; // lux
+    uint256 hashUTXORoot; // lux
 
     CBlockHeader()
     {
@@ -50,6 +52,10 @@ public:
         READWRITE(nTime);
         READWRITE(nBits);
         READWRITE(nNonce);
+#if 0
+        READWRITE(hashStateRoot); // lux
+        READWRITE(hashUTXORoot); // lux
+#endif
     }
 
     void SetNull()
@@ -60,6 +66,8 @@ public:
         nTime = 0;
         nBits = 0;
         nNonce = 0;
+        hashStateRoot = 0; // lux
+        hashUTXORoot = 0; // lux
     }
 
     bool IsNull() const
@@ -138,6 +146,8 @@ public:
         block.nTime          = nTime;
         block.nBits          = nBits;
         block.nNonce         = nNonce;
+        block.hashStateRoot  = hashStateRoot; // lux
+        block.hashUTXORoot   = hashUTXORoot; // lux
         return block;
     }
 
