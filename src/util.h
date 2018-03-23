@@ -247,4 +247,6 @@ void TraceThread(const char* name, Callable func)
     }
 }
 
+bool CheckHex(const std::string& str);
+
 #endif // BITCOIN_UTIL_H
