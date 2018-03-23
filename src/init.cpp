@@ -317,6 +317,7 @@ std::string HelpMessage(HelpMessageMode mode)
 #ifndef WIN32
     strUsage += "  -pid=<file>            " + strprintf(_("Specify pid file (default: %s)"), "luxd.pid") + "\n";
 #endif
+    strUsage += "  -record-log-opcodes    " + _("Logs all EVM LOG opcode operations to the file vmExecLogs.json") + "\n";
     strUsage += "  -reindex               " + _("Rebuild block chain index from current blk000??.dat files") + " " + _("on startup") + "\n";
 #if !defined(WIN32)
     strUsage += "  -sysperms              " + _("Create new files with system default permissions, instead of umask 077 (only effective with disabled wallet functionality)") + "\n";
@@ -1300,7 +1301,7 @@ bool AppInit2(boost::thread_group& threadGroup)
                 if (!GetBoolArg("-logevents", false))
                 {
                     pstorageresult->wipeResults();
-                    pblocktree->WipeHeightIndex();
+//                  pblocktree->WipeHeightIndex();
                     fLogEvents = false;
                     pblocktree->WriteFlag("logevents", fLogEvents);
                 }
