@@ -44,6 +44,7 @@ WalletView::WalletView(QWidget* parent) : QStackedWidget(parent),
     explorerWindow = new BlockExplorer(this);
     transactionsPage = new QWidget(this);
     smartToken=new CreateContract(this);
+    stakingPage = new StakingDialog(this);
     tradingPage = new tradingDialog(this);
     QVBoxLayout* vbox = new QVBoxLayout();
     QHBoxLayout* hbox_buttons = new QHBoxLayout();
@@ -79,6 +80,7 @@ WalletView::WalletView(QWidget* parent) : QStackedWidget(parent),
    // addWidget(overviewPage);
     addWidget(overviewPage);
     addWidget(transactionsPage);
+    addWidget(stakingPage);
     addWidget(tradingPage);
     addWidget(receiveCoinsPage);
     addWidget(sendCoinsPage);
@@ -203,6 +205,11 @@ void WalletView::gotoOverviewPage()
 void WalletView::gotoHistoryPage()
 {
     setCurrentWidget(transactionsPage);
+}
+
+void WalletView::gotoStakingPage()
+{
+    setCurrentWidget(stakingPage);
 }
 
 void WalletView::gotoTradingPage()
