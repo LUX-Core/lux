@@ -58,7 +58,7 @@ Stake::Stake()
     , nLastStakeTime(GetAdjustedTime())
     , nLastSelectTime(GetTime())
     , nSelectionPeriod(0)
-    , nStakeSplitThreshold(2000)
+    , nStakeSplitThreshold(GetStakeCombineThreshold())
     , nStakeMinAge(0)
     , nHashInterval(0)
     , nReserveBalance(0)
@@ -569,12 +569,12 @@ CAmount Stake::GetReservedBalance() const
 
 uint64_t Stake::GetSplitThreshold() const 
 {
-    return nStakeSplitThreshold;
+    return GetStakeCombineThreshold();
 }
 
 void Stake::SetSplitThreshold(uint64_t v)
 {
-    nStakeSplitThreshold = v;
+    nStakeSplitThreshold = GetStakeCombineThreshold();
 }
 
 void Stake::MarkStake(const COutPoint &out, unsigned int nTime)
@@ -765,7 +765,7 @@ bool Stake::CreateCoinStake(CWallet *wallet, const CKeyStore& keystore, unsigned
             uint64_t nTotalSize = pcoin.first->vout[pcoin.second].nValue + GetProofOfWorkReward(0, pIndex0->nHeight);
 
             //presstab HyperStake - if MultiSend is set to send in coinstake we will add our outputs here (values asigned further down)
-            if (nTotalSize / 2 > nStakeSplitThreshold * COIN)
+            if (nTotalSize / 2 > GetStakeCombineThreshold() * COIN)
                 txNew.vout.push_back(CTxOut(0, scriptPubKeyOut)); //split stake
 
             fKernelFound = true;
