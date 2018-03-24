@@ -98,7 +98,7 @@ AC_PATH_TOOL(STRIP, strip)
 AC_PATH_TOOL(GCOV, gcov)
 AC_PATH_PROG(LCOV, lcov)
 AC_PATH_PROG(JAVA, java)
-AC_PATH_PROGS([PYTHON], [python3 python2.7 python2 python])
+AC_PATH_PROGS([PYTHON], [python3.6 python3.5 python3.4 python3 python2.7 python2 python])
 AC_PATH_PROG(GENHTML, genhtml)
 AC_PATH_PROG([GIT], [git])
 AC_PATH_PROG(CCACHE,ccache)
@@ -328,18 +328,38 @@ case $host in
        AC_CHECK_PROG([PORT],port, port)
        if test x$PORT = xport; then
          dnl add default macports paths
-         CPPFLAGS="$CPPFLAGS -isystem /opt/local/include -I/opt/local/include/db48"
-         LIBS="$LIBS -L/opt/local/lib -L/opt/local/lib/db48"
+         CPPFLAGS="$CPPFLAGS -isystem /opt/local/include"
+         LIBS="$LIBS -L/opt/local/lib"
+         if test -d /opt/local/include/db48; then
+           CPPFLAGS="$CPPFLAGS -I/opt/local/include/db48"
+           LIBS="$LIBS -L/opt/local/lib/db48"
+         fi
        fi
 
+       AC_PATH_PROGS([RSVG_CONVERT], [rsvg-convert rsvg],rsvg-convert)
        AC_CHECK_PROG([BREW],brew, brew)
        if test x$BREW = xbrew; then
-         dnl add default homebrew paths
-         openssl_prefix=`$BREW --prefix openssl`
-         bdb_prefix=`$BREW --prefix berkeley-db4`
-         export PKG_CONFIG_PATH="$openssl_prefix/lib/pkgconfig:$PKG_CONFIG_PATH"
-         CPPFLAGS="$CPPFLAGS -I$bdb_prefix/include"
-         LIBS="$LIBS -L$bdb_prefix/lib"
+         dnl These Homebrew packages may be keg-only, meaning that they won't be found
+         dnl in expected paths because they may conflict with system files. Ask
+         dnl Homebrew where each one is located, then adjust paths accordingly.
+         dnl It's safe to add these paths even if the functionality is disabled by
+         dnl the user (--without-wallet or --without-gui for example).
+
+         openssl_prefix=`$BREW --prefix openssl 2>/dev/null`
+         bdb_prefix=`$BREW --prefix berkeley-db4 2>/dev/null`
+         qt5_prefix=`$BREW --prefix qt5 2>/dev/null`
+         if test x$openssl_prefix != x; then
+           PKG_CONFIG_PATH="$openssl_prefix/lib/pkgconfig:$PKG_CONFIG_PATH"
+           export PKG_CONFIG_PATH
+         fi
+         if test x$bdb_prefix != x; then
+           CPPFLAGS="$CPPFLAGS -I$bdb_prefix/include"
+           LIBS="$LIBS -L$bdb_prefix/lib"
+         fi
+         if test x$qt5_prefix != x; then
+           PKG_CONFIG_PATH="$qt5_prefix/lib/pkgconfig:$PKG_CONFIG_PATH"
+           export PKG_CONFIG_PATH
+         fi
        fi
      else
        case $build_os in
@@ -350,16 +370,40 @@ case $host in
            AC_PATH_TOOL([INSTALLNAMETOOL], [install_name_tool], install_name_tool)
            AC_PATH_TOOL([OTOOL], [otool], otool)
            AC_PATH_PROGS([GENISOIMAGE], [genisoimage mkisofs],genisoimage)
+           AC_PATH_PROGS([RSVG_CONVERT], [rsvg-convert rsvg],rsvg-convert)
+           AC_PATH_PROGS([IMAGEMAGICK_CONVERT], [convert],convert)
+           AC_PATH_PROGS([TIFFCP], [tiffcp],tiffcp)
+
+           dnl libtool will try to strip the static lib, which is a problem for
+           dnl cross-builds because strip attempts to call a hard-coded ld,
+           dnl which may not exist in the path. Stripping the .a is not
+           dnl necessary, so just disable it.
+           old_striplib=
            ;;
        esac
      fi
 
+     AX_CHECK_LINK_FLAG([[-Wl,-headerpad_max_install_names]], [LDFLAGS="$LDFLAGS -Wl,-headerpad_max_install_names"])
      CPPFLAGS="$CPPFLAGS -DMAC_OSX"
+     OBJCXXFLAGS="$CXXFLAGS"
+     ;;
+   *linux*)
+     TARGET_OS=linux
      ;;
    *)
      CPPFLAGS="$CPPFLAGS"
      ;;
 esac
+
+if test x$use_pkgconfig = xyes; then
+  m4_ifndef([PKG_PROG_PKG_CONFIG], [AC_MSG_ERROR(PKG_PROG_PKG_CONFIG macro not found. Please install pkg-config and re-run autogen.sh.)])
+  m4_ifdef([PKG_PROG_PKG_CONFIG], [
+  PKG_PROG_PKG_CONFIG
+  if test x"$PKG_CONFIG" = "x"; then
+    AC_MSG_ERROR(pkg-config not found.)
+  fi
+  ])
+fi
 
 if test x$use_comparison_tool != xno; then
   AC_SUBST(JAVA_COMPARISON_TOOL, $use_comparison_tool)
@@ -391,8 +435,12 @@ if test x$use_lcov == xyes; then
     AC_MSG_ERROR("lcov testing requested but comparison tool was not specified")
   fi
   LCOV="$LCOV --gcov-tool=$GCOV"
+  AX_CHECK_LINK_FLAG([[--coverage]], [LDFLAGS="$LDFLAGS --coverage"],
+    [AC_MSG_ERROR("lcov testing requested but --coverage linker flag does not work")])
   AX_CHECK_COMPILE_FLAG([--coverage],[CXXFLAGS="$CXXFLAGS --coverage"],
     [AC_MSG_ERROR("lcov testing requested but --coverage flag does not work")])
+  AC_DEFINE(USE_COVERAGE, 1, [Define this symbol if coverage is enabled])
+  CXXFLAGS="$CXXFLAGS -Og"
 fi
 
 dnl Require little endian
@@ -429,6 +477,10 @@ AX_GCC_FUNC_ATTRIBUTE([dllimport])
 
 if test x$use_glibc_compat != xno; then
 
+  #glibc absorbed clock_gettime in 2.17. librt (its previous location) is safe to link
+  #in anyway for back-compat.
+  AC_CHECK_LIB([rt],[clock_gettime],, AC_MSG_ERROR(lib missing))
+
   #__fdelt_chk's params and return type have changed from long unsigned int to long int.
   # See which one is present here.
   AC_MSG_CHECKING(__fdelt_chk type)
@@ -442,7 +494,13 @@ if test x$use_glibc_compat != xno; then
     [ fdelt_type="long int"])
   AC_MSG_RESULT($fdelt_type)
   AC_DEFINE_UNQUOTED(FDELT_TYPE, $fdelt_type,[parameter and return value type for __fdelt_chk])
+else
+  AC_SEARCH_LIBS([clock_gettime],[rt])
+fi
 
+if test x$TARGET_OS != xwindows; then
+  # All windows code is PIC, forcing it on just adds useless compile warnings
+  AX_CHECK_COMPILE_FLAG([-fPIC],[PIC_FLAGS="-fPIC"])
 fi
 
 if test x$use_hardening != xno; then
@@ -458,6 +516,7 @@ if test x$use_hardening != xno; then
 
   AX_CHECK_LINK_FLAG([[-Wl,--dynamicbase]], [HARDENED_LDFLAGS="$HARDENED_LDFLAGS -Wl,--dynamicbase"])
   AX_CHECK_LINK_FLAG([[-Wl,--nxcompat]], [HARDENED_LDFLAGS="$HARDENED_LDFLAGS -Wl,--nxcompat"])
+  AX_CHECK_LINK_FLAG([[-Wl,--high-entropy-va]], [HARDENED_LDFLAGS="$HARDENED_LDFLAGS -Wl,--high-entropy-va"])
   AX_CHECK_LINK_FLAG([[-Wl,-z,relro]], [HARDENED_LDFLAGS="$HARDENED_LDFLAGS -Wl,-z,relro"])
   AX_CHECK_LINK_FLAG([[-Wl,-z,now]], [HARDENED_LDFLAGS="$HARDENED_LDFLAGS -Wl,-z,now"])
 
@@ -489,6 +548,9 @@ AC_SEARCH_LIBS([getaddrinfo_a], [anl], [AC_DEFINE(HAVE_GETADDRINFO_A, 1, [Define
 AC_SEARCH_LIBS([inet_pton], [nsl resolv], [AC_DEFINE(HAVE_INET_PTON, 1, [Define this symbol if you have inet_pton])])
 
 AC_CHECK_DECLS([strnlen])
+
+# Check for daemon(3), unrelated to --with-daemon (although used by it)
+AC_CHECK_DECLS([daemon])
 
 AC_CHECK_DECLS([le32toh, le64toh, htole32, htole64, be32toh, be64toh, htobe32, htobe64],,,
 		[#if HAVE_ENDIAN_H
@@ -524,15 +586,32 @@ AC_LINK_IFELSE([AC_LANG_SOURCE([
   ]
 )
 
-if test x$use_reduce_exports != xno; then
-  AX_CHECK_COMPILE_FLAG([-fvisibility=hidden],[RE_CXXFLAGS="-fvisibility=hidden"],
+TEMP_LDFLAGS="$LDFLAGS"
+LDFLAGS="$TEMP_LDFLAGS $PTHREAD_CFLAGS"
+AC_MSG_CHECKING([for thread_local support])
+AC_LINK_IFELSE([AC_LANG_SOURCE([
+  #include <thread>
+  static thread_local int foo = 0;
+  static void run_thread() { foo++;}
+  int main(){
+  for(int i = 0; i < 10; i++) { std::thread(run_thread).detach();}
+  return foo;
+  }
+  ])],
   [
-    if test x$use_reduce_exports = xyes; then
-      AC_MSG_ERROR([Cannot set default symbol visibility. Use --disable-reduced-exports.])
-    fi
-    AC_MSG_WARN([Cannot set default symbol visibility. Disabling reduced exports.])
-    use_reduce_exports=no
-  ])
+    AC_DEFINE(HAVE_THREAD_LOCAL,1,[Define if thread_local is supported.])
+    AC_MSG_RESULT(yes)
+  ],
+  [
+    AC_MSG_RESULT(no)
+  ]
+)
+LDFLAGS="$TEMP_LDFLAGS"
+
+# Check for reduced exports
+if test x$use_reduce_exports = xyes; then
+  AX_CHECK_COMPILE_FLAG([-fvisibility=hidden],[RE_CXXFLAGS="-fvisibility=hidden"],
+  [AC_MSG_ERROR([Cannot set default symbol visibility. Use --disable-reduce-exports.])])
 fi
 
 LEVELDB_CPPFLAGS=
@@ -740,6 +819,12 @@ if test x$use_pkgconfig = xyes; then
       if test x$use_qr != xno; then
         BITCOIN_QT_CHECK([PKG_CHECK_MODULES([QR], [libqrencode], [have_qrencode=yes], [have_qrencode=no])])
       fi
+      if test x$build_bitcoin_utils$build_bitcoind$bitcoin_enable_qt$use_tests != xnononono; then
+        PKG_CHECK_MODULES([EVENT], [libevent],, [AC_MSG_ERROR(libevent not found.)])
+        if test x$TARGET_OS != xwindows; then
+          PKG_CHECK_MODULES([EVENT_PTHREADS], [libevent_pthreads],, [AC_MSG_ERROR(libevent_pthreads not found.)])
+        fi
+      fi
 
       if test "x$use_zmq" = "xyes"; then
         PKG_CHECK_MODULES([ZMQ],[libzmq >= 4],
@@ -760,6 +845,14 @@ else
   AC_CHECK_HEADER([openssl/ssl.h],, AC_MSG_ERROR(libssl headers missing),)
   AC_CHECK_LIB([ssl],         [main],SSL_LIBS=-lssl, AC_MSG_ERROR(libssl missing))
 
+  if test x$build_bitcoin_utils$build_bitcoind$bitcoin_enable_qt$use_tests != xnononono; then
+    AC_CHECK_HEADER([event2/event.h],, AC_MSG_ERROR(libevent headers missing),)
+    AC_CHECK_LIB([event],[main],EVENT_LIBS=-levent,AC_MSG_ERROR(libevent missing))
+    if test x$TARGET_OS != xwindows; then
+      AC_CHECK_LIB([event_pthreads],[main],EVENT_PTHREADS_LIBS=-levent_pthreads,AC_MSG_ERROR(libevent_pthreads missing))
+    fi
+  fi
+
   if test "x$use_zmq" = "xyes"; then
     AC_CHECK_HEADER([zmq.h],
       [AC_DEFINE([ENABLE_ZMQ],[1],[Define to 1 to enable ZMQ functions])],
@@ -774,6 +867,15 @@ else
     AC_DEFINE_UNQUOTED([ENABLE_ZMQ],[0],[Define to 1 to enable ZMQ functions])
   fi
 
+  if test "x$use_zmq" = "xyes"; then
+    dnl Assume libzmq was built for static linking
+    case $host in
+      *mingw*)
+        ZMQ_CFLAGS="$ZMQ_CFLAGS -DZMQ_STATIC"
+      ;;
+    esac
+  fi
+
   BITCOIN_QT_CHECK(AC_CHECK_LIB([protobuf] ,[main],[PROTOBUF_LIBS=-lprotobuf], BITCOIN_QT_FAIL(libprotobuf not found)))
   if test x$use_qr != xno; then
     BITCOIN_QT_CHECK([AC_CHECK_LIB([qrencode], [main],[QR_LIBS=-lqrencode], [have_qrencode=no])])
@@ -782,10 +884,10 @@ else
 fi
 
 AC_CHECK_LIB([crypto],[RAND_egd],[],[
-  AC_ARG_WITH([libressl],
-    [AS_HELP_STRING([--with-libressl],[Build with system LibreSSL (default is no; DANGEROUS; NOT SUPPORTED)])],
-    [AC_MSG_WARN([Detected LibreSSL: This is NOT supported, and may break consensus compatibility!])],
-    [AC_MSG_ERROR([Detected LibreSSL: This is NOT supported, and may break consensus compatibility!])]
+  AC_ARG_WITH([unsupported-ssl],
+    [AS_HELP_STRING([--with-unsupported-ssl],[Build with system SSL (default is no; DANGEROUS; NOT SUPPORTED; You should use OpenSSL 1.0)])],
+    [AC_MSG_WARN([Detected unsupported SSL version: This is NOT supported, and may break consensus compatibility! Use '--with-unsupported-ssl' if you don't care])],
+    [AC_MSG_ERROR([Detected unsupported SSL version: This is NOT supported, and may break consensus compatibility! Use '--with-unsupported-ssl' if you don't care])]
   )
 ])
 
