@@ -17,7 +17,7 @@
   <string>APPL</string>
 
   <key>CFBundleGetInfoString</key>
-  <string>@CLIENT_VERSION_MAJOR@.@CLIENT_VERSION_MINOR@.@CLIENT_VERSION_REVISION@, Copyright © 2009-@COPYRIGHT_YEAR@ The Bitcoin Core developers, 2014-@COPYRIGHT_YEAR@ The Dash Core developers, 2015-@COPYRIGHT_YEAR@ The Luxcore developers</string>
+  <string>@CLIENT_VERSION_MAJOR@.@CLIENT_VERSION_MINOR@.@CLIENT_VERSION_REVISION@, Copyright © 2009-@COPYRIGHT_YEAR@ The Bitcoin Core developers, 2014-@COPYRIGHT_YEAR@ The Dash Core developers, 2017-@COPYRIGHT_YEAR@ The Luxcore developers</string>
 
   <key>CFBundleShortVersionString</key>
   <string>@CLIENT_VERSION_MAJOR@.@CLIENT_VERSION_MINOR@.@CLIENT_VERSION_REVISION@</string>
@@ -29,10 +29,16 @@
   <string>????</string>
 
   <key>CFBundleExecutable</key>
-  <string>LUX-Qt</string>
+  <string>Lux-Qt</string>
+
+  <key>CFBundleName</key>
+  <string>Lux-Qt</string>
+
+  <key>LSHasLocalizedDisplayName</key>
+  <true/>
 
   <key>CFBundleIdentifier</key>
-  <string>io.lux.Lux-Qt</string>
+  <string>io.luxcore.Lux-Qt</string>
 
   <key>CFBundleURLTypes</key>
   <array>
@@ -40,7 +46,7 @@
       <key>CFBundleTypeRole</key>
       <string>Editor</string>
       <key>CFBundleURLName</key>
-      <string>io.lux.LuxPayment</string>
+      <string>io.luxcore.LuxPayment</string>
       <key>CFBundleURLSchemes</key>
       <array>
         <string>lux</string>
@@ -78,7 +84,7 @@
       <string>Editor</string>
       <key>LSItemContentTypes</key>
       <array>
-        <string>io.lux.paymentrequest</string>
+        <string>io.luxcore.paymentrequest</string>
       </array>
       <key>LSHandlerRank</key>
       <string>Owner</string>
