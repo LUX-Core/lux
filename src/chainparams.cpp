@@ -88,6 +88,35 @@ static const Checkpoints::CCheckpointData dataRegtest = {
     0
 };
 
+static CBlock CreateGenesisBlock(const char* pszTimestamp, uint32_t nTime, uint32_t nNonce, uint32_t nBits, int32_t nVersion) {
+    CMutableTransaction txNew;
+    txNew.nVersion = 1;
+    txNew.nTime = nTime;
+    txNew.nLockTime = 0;
+    txNew.vin.resize(1);
+    txNew.vout.resize(1);
+    txNew.vin[0].scriptSig = CScript() << 0 << CScriptNum(42) << vector<unsigned char>((const unsigned char*)pszTimestamp, (const unsigned char*)pszTimestamp + strlen(pszTimestamp));
+    txNew.vout[0].SetEmpty();
+
+    CBlock genesis;
+    genesis.hashPrevBlock = 0;
+    genesis.nTime    = nTime;
+    genesis.nBits    = nBits;
+    genesis.nNonce   = nNonce;
+    genesis.nVersion = nVersion;
+    genesis.vtx.push_back(txNew);
+    genesis.hashMerkleRoot = genesis.BuildMerkleTree();
+
+    return genesis;
+}
+
+static CBlock CreateGenesisBlock(uint32_t nTime, uint32_t nNonce, uint32_t nBits, int32_t nVersion)
+{
+    const char* pszTimestamp = "Lux - Implemented New PHI Algo PoW/PoS Hybird - Parallel Masternode - ThankYou - 216k155";
+    return CreateGenesisBlock(pszTimestamp, nTime, nNonce, nBits, nVersion);
+}
+
+
 class CMainParams : public CChainParams
 {
 public:
