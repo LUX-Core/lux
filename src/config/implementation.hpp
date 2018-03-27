@@ -2918,7 +2918,7 @@ struct table : boost::unordered::detail::functions<typename Types::hasher,
             max_load_ = 0;
         }
 
-        BOOST_ASSERT(!size_);
+        //BOOST_ASSERT(!size_);
     }
 
     void clear()
@@ -2929,7 +2929,7 @@ struct table : boost::unordered::detail::functions<typename Types::hasher,
         delete_nodes(get_previous_start(), link_pointer());
         clear_buckets();
 
-        BOOST_ASSERT(!size_);
+        //BOOST_ASSERT(!size_);
     }
 
     void clear_buckets()
