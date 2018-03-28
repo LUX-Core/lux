@@ -4,10 +4,10 @@
 
 Luxcore is GNU AGPLv3 licensed.
 
-[![Build Status](https://travis-ci.org/216k155/lux.svg?branch=lux-autoconf)](https://travis-ci.org/216k155/lux)
+[![Build Status](https://travis-ci.org/216k155/lux.svg?branch=master)](https://travis-ci.org/216k155/lux)
 <a href="https://discord.gg/27xFP5Y"><img src="https://discordapp.com/api/guilds/364500397999652866/embed.png" alt="Discord server" /></a>
 
-[![Build history](https://buildstats.info/travisci/chart/216k155/lux?branch=lux-autoconf)](https://travis-ci.org/216k155/lux?branch=lux-autoconf)
+[![Build history](https://buildstats.info/travisci/chart/216k155/lux?branch=master)](https://travis-ci.org/216k155/lux?branch=master)
 
 [Website](https://luxcore.io) — [PoS Web Wallet]() — [Block Explorer](https://explorer.luxcore.io/) — [Blog](https://reddit.com/r/LUXCoin) — [Forum](https://bitcointalk.org/index.php?topic=2254046.0) — [Telegram](https://t.me/LUXcoinOfficialChat) — [Twitter](https://twitter.com/LUX_Coin)
 
