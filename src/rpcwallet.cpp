@@ -1971,7 +1971,7 @@ Value reservebalance(const Array& params, bool fHelp)
     result.push_back(Pair("amount", ValueFromAmount(stake->GetReservedBalance())));
     return result;
 }
-
+/*
 // presstab HyperStake
 Value setstakesplitthreshold(const Array& params, bool fHelp)
 {
@@ -2015,7 +2015,7 @@ Value getstakesplitthreshold(const Array& params, bool fHelp)
     result.push_back(Pair("split stake threshold set to ", int(stake->GetSplitThreshold())));
     return result;
 }
-
+*/
 Value autocombinerewards(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() < 1)

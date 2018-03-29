@@ -102,7 +102,6 @@ static const CRPCConvertParam vRPCConvertParams[] =
         {"mnbudgetvoteraw", 4},
         {"reservebalance", 0},
         {"reservebalance", 1},
-        {"setstakesplitthreshold", 0},
         {"autocombinerewards", 0},
         {"autocombinerewards", 1}};
 

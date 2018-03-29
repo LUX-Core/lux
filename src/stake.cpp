@@ -43,6 +43,10 @@ static const int MODIFIER_INTERVAL_RATIO = 3;
 
 static const int LAST_MULTIPLIED_BLOCK = 180*1000; // 180K
 
+static const bool ENABLE_ADVANCED_STAKING = true;
+
+static const int ADVANCED_STAKING_HEIGHT = 225000;
+
 static std::atomic<bool> nStakingInterrupped;
 
 Stake * const stake = Stake::Pointer();
@@ -367,6 +371,16 @@ bool Stake::CheckHash(const CBlockIndex* pindexPrev, unsigned int nBits, const C
     if (GetStakeAge(nTimeBlockFrom) > nTimeTx) // Min age requirement
         return false; //error("%s: min age violation (nBlockTime=%d, nTimeTx=%d)", __func__, nTimeBlockFrom, nTimeTx);
 
+    if (nHashInterval < Params().StakingInterval()) {
+        nHashInterval = Params().StakingInterval();
+    }
+    if (nSelectionPeriod < Params().StakingRoundPeriod()) {
+        nSelectionPeriod = Params().StakingRoundPeriod();
+    }
+    if (nStakeMinAge < Params().StakingMinAge()) {
+        nStakeMinAge = Params().StakingMinAge();
+    }
+
     // Base target
     uint256 bnTarget;
     bnTarget.SetCompact(nBits);
@@ -382,7 +396,11 @@ bool Stake::CheckHash(const CBlockIndex* pindexPrev, unsigned int nBits, const C
 
     // Calculate hash
     CDataStream ss(SER_GETHASH, 0);
-    ss << nStakeModifier << nTimeBlockFrom << txPrev.nTime << prevout.hash << prevout.n << nTimeTx;
+    ss << nStakeModifier << nTimeBlockFrom << txPrev.nTime << prevout.hash << prevout.n << nTimeTx ;
+    if (ENABLE_ADVANCED_STAKING && (mapArgs.count("-regtest") || nStakeModifierHeight >= ADVANCED_STAKING_HEIGHT)) {
+        ss << nHashInterval << nSelectionPeriod << nStakeMinAge << nStakeSplitThreshold
+           << bnWeight << nStakeModifierTime ;
+    }
     hashProofOfStake = Hash(ss.begin(), ss.end());
 
     if (fDebug) {
