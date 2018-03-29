@@ -2935,7 +2935,7 @@ CBlockIndex* AddToBlockIndex(const CBlock& block)
         uint64_t nStakeModifier = 0;
         bool fGeneratedStakeModifier = false;
         if (!stake->ComputeNextModifier(pindexNew->pprev, nStakeModifier, fGeneratedStakeModifier))
-            LogPrintf("%s: ComputeNextStakeModifier() failed \n", __func__);
+            LogPrintf("%s: ComputeNextModifier() failed \n", __func__);
 
         pindexNew->SetStakeModifier(nStakeModifier, fGeneratedStakeModifier);
         pindexNew->nStakeModifierChecksum = stake->GetModifierChecksum(pindexNew);
