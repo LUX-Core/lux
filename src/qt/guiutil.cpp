@@ -268,8 +268,13 @@ QString getSaveFileName(QWidget* parent, const QString& caption, const QString& 
     } else {
         myDir = dir;
     }
+
+    /**
+     * This is a bug of QT. We should not use Native dialog as a workaround.
+     **/
+
     /* Directly convert path to native OS path separators */
-    QString result = QDir::toNativeSeparators(QFileDialog::getSaveFileName(parent, caption, myDir, filter, &selectedFilter));
+    QString result = QDir::toNativeSeparators(QFileDialog::getSaveFileName(parent, caption, myDir, filter, &selectedFilter, QFileDialog::Option::DontUseNativeDialog));
 
     /* Extract first suffix from filter pattern "Description (*.foo)" or "Description (*.foo *.bar ...) */
     QRegExp filter_re(".* \\(\\*\\.(.*)[ \\)]");
