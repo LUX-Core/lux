@@ -661,6 +661,11 @@ bool CheckStake(CBlock* pblock, CWallet& wallet)
         if (pblock->hashPrevBlock != chainActive.Tip()->GetBlockHash())
             return error("CheckStake() : generated block is stale");
 
+        COutPoint outp = pblock->vtx[1].vin[0].prevout;
+        if(wallet.IsSpent(outp.hash, outp.n)){
+            return error("CheckStake() : generated block became invalid due to stake UTXO being spent");
+        }
+
         // Track how many getdata requests this block gets
         {
             LOCK(wallet.cs_wallet);
