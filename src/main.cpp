@@ -991,6 +991,16 @@ bool CheckTransaction(const CTransaction& tx, CValidationState& state)
             return state.DoS(100, error("CheckTransaction() : txout total out of range"),
                 REJECT_INVALID, "bad-txns-txouttotal-toolarge");
 
+        /////////////////////////////////////////////////////////// // lux
+        if (txout.scriptPubKey.HasOpCall() || txout.scriptPubKey.HasOpCreate()) {
+            std::vector<valtype> vSolutions;
+            txnouttype whichType;
+            if (!Solver(txout.scriptPubKey, whichType, vSolutions, true)) {
+                return state.DoS(100, false, REJECT_INVALID, "bad-txns-contract-nonstandard");
+            }
+        }
+        ///////////////////////////////////////////////////////////
+
         i += 1;
     }
 
