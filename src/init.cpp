@@ -377,6 +377,16 @@ std::string HelpMessage(HelpMessageMode mode)
     strUsage += "                           " + _("(1 = keep tx meta data e.g. account owner and payment request information, 2 = drop tx meta data)") + "\n";
 #endif
 
+#if ENABLE_ZMQ
+    strUsage += "\n" + _("ZeroMQ notification options:")+ "\n";
+    strUsage += "  -zmqpubhashblock=<address>" + _("Enable publish hash block in <address>") + "\n";
+    strUsage += "  -zmqpubhashtx=<address>  " + _("Enable publish hash transaction in <address>") + "\n";
+    strUsage += "  -zmqpubhashtxlock=<address>  " + _("Enable publish hash transaction (locked via InstanTX) in <address>") + "\n";
+    strUsage += "  -zmqpubrawblock=<address>  " + _("Enable publish raw block in <address>") + "\n";
+    strUsage += "  -zmqpubrawtx=<address>  " + _("Enable publish raw transaction in <address>") + "\n";
+    strUsage += "  -zmqpubrawtxlock=<address>  " + _("Enable publish raw transaction (locked via InstanTX) in <address>") + "\n";
+#endif
+
     strUsage += "\n" + _("Debugging/Testing options:") + "\n";
     if (GetBoolArg("-help-debug", false)) {
         strUsage += "  -checkpoints           " + strprintf(_("Only accept block chain matching built-in checkpoints (default: %u)"), 1) + "\n";

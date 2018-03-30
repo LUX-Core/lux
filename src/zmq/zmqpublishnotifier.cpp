@@ -177,12 +177,10 @@ bool CZMQPublishRawBlockNotifier::NotifyBlock(const CBlockIndex *pindex)
 {
     LogPrint("zmq", "zmq: Publish rawblock %s\n", pindex->GetBlockHash().GetHex());
 
-// XX42    const Consensus::Params& consensusParams = Params().GetConsensus();
     CDataStream ss(SER_NETWORK, PROTOCOL_VERSION);
     {
         LOCK(cs_main);
         CBlock block;
-// XX42        if(!ReadBlockFromDisk(block, pindex, consensusParams))
         if(!ReadBlockFromDisk(block, pindex))
         {
             zmqError("Can't read block from disk");

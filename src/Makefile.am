@@ -92,6 +92,7 @@ BITCOIN_CORE_H = \
   coincontrol.h \
   coins.h \
   compat.h \
+  compat/sanity.h \
   compressor.h \
   primitives/block.h \
   primitives/transaction.h \
