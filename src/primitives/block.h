@@ -13,6 +13,7 @@
 
 /** The maximum allowed size for a serialized block, in bytes (network rule) */
 static const unsigned int MAX_BLOCK_SIZE = 6000000;
+static const int SC_BLOCK_VERSION = 8;
 
 /** Nodes collect new transactions into a block, hash them into a hash tree,
  * and scan through nonce values to make the block's hash satisfy proof-of-work
@@ -52,10 +53,10 @@ public:
         READWRITE(nTime);
         READWRITE(nBits);
         READWRITE(nNonce);
-#if 0
-        READWRITE(hashStateRoot); // lux
-        READWRITE(hashUTXORoot); // lux
-#endif
+        if (this->nVersion >= SC_BLOCK_VERSION) {
+            READWRITE(hashStateRoot); // lux
+            READWRITE(hashUTXORoot); // lux
+        }
     }
 
     void SetNull()
@@ -123,7 +124,7 @@ public:
         }
 #       else
         READWRITE(vtx);
-	if(vtx.size() > 1 && vtx[1].IsCoinStake())
+    if(vtx.size() > 1 && vtx[1].IsCoinStake())
             READWRITE(vchBlockSig);
 #       endif
     }

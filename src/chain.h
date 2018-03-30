@@ -451,10 +451,10 @@ public:
         READWRITE(nTime);
         READWRITE(nBits);
         READWRITE(nNonce);
-#if 0
-        READWRITE(hashStateRoot); // lux
-        READWRITE(hashUTXORoot); // lux
-#endif
+        if (this->nVersion > SC_BLOCK_VERSION) {
+            READWRITE(hashStateRoot); // lux
+            READWRITE(hashUTXORoot); // lux
+        }
     }
 
     uint256 GetBlockHash() const
