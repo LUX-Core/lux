@@ -1832,7 +1832,21 @@ bool CheckInputs(const CTransaction& tx, CValidationState& state, const CCoinsVi
 
         // While checking, GetBestBlock() refers to the parent block.
         // This is also true for mempool checks.
-        CBlockIndex* pindexPrev = mapBlockIndex.find(inputs.GetBestBlock())->second;
+
+        BlockMap::iterator mi = mapBlockIndex.find(inputs.GetBestBlock());
+        if (mi == mapBlockIndex.end())
+        {
+            LogPrintf("%s (line %d): Cannot find best block\n", __FUNCTION__, __LINE__);
+            return state.Invalid(error("Cannot find best block"));
+        }
+
+        CBlockIndex* pindexPrev = mi->second;
+        if (!pindexPrev)
+        {
+            LogPrintf("%s (line %d): Cannot find the parent of current best block\n", __FUNCTION__, __LINE__);
+            return state.Invalid(error("Cannot find the parent of current best block"));
+        }
+
         int nSpendHeight = pindexPrev->nHeight + 1;
         CAmount nValueIn = 0;
         CAmount nFees = 0;
