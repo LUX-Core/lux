@@ -72,7 +72,7 @@ Note that for WSL the Luxcore source path MUST be somewhere in the default mount
 The next three steps are an example of how to acquire the source in an appropriate way.
 
     cd /usr/src
-    git clone https://github.com/216k155/lux.git --recursive
+    git clone https://github.com/216k155/lux.git
     sudo chmod -R a+rw lux
 
 Once the source code is ready the build steps are below.
@@ -92,12 +92,12 @@ Once the source code is ready the build steps are below.
     sudo apt-get install software-properties-common
     sudo add-apt-repository ppa:bitcoin/bitcoin
     sudo apt-get update
-    sudo apt-get install libdb4.8-dev libdb4.8++-dev
+    sudo apt-get install libdb4.8-dev libdb4.8++-dev libzmq3-dev
 
     # If you want to build the Qt GUI:
     sudo apt-get install libqt5gui5 libqt5core5a libqt5dbus5 qttools5-dev qttools5-dev-tools libprotobuf-dev protobuf-compiler
 
-    git clone https://github.com/216k155/lux
+    git clone https://github.com/216k155/lux.git
 
     cd lux
 
@@ -131,7 +131,7 @@ NOTE: Building with Qt4 is still supported, however, could result in a broken UI
 
 1. Clone the Lux source code and cd into `Lux`
 
-        git clone --recursive https://github.com/216k155/lux.git
+        git clone https://github.com/216k155/lux.git
         cd lux
 
 2.  Build Luxcore:
