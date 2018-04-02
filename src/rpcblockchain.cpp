@@ -215,6 +215,64 @@ Value getrawmempool(const Array& params, bool fHelp)
     }
 }
 
+Value getblockhashes(const Array& params, bool fHelp)
+{
+    if (fHelp || params.size() < 2)
+        throw runtime_error(
+                "getblockhashes timestamp\n"
+                        "\nReturns array of hashes of blocks within the timestamp range provided.\n"
+                        "\nArguments:\n"
+                        "1. high         (numeric, required) The newer block timestamp\n"
+                        "2. low          (numeric, required) The older block timestamp\n"
+                        "3. options      (string, required) A json object\n"
+                        "    {\n"
+                        "      \"noOrphans\":true   (boolean) will only include blocks on the main chain\n"
+                        "      \"logicalTimes\":true   (boolean) will include logical timestamps with hashes\n"
+                        "    }\n"
+                        "\nResult:\n"
+                        "[\n"
+                        "  \"hash\"         (string) The block hash\n"
+                        "]\n"
+                        "[\n"
+                        "  {\n"
+                        "    \"blockhash\": (string) The block hash\n"
+                        "    \"logicalts\": (numeric) The logical timestamp\n"
+                        "  }\n"
+                        "]\n"
+                        "\nExamples:\n"
+                + HelpExampleCli("getblockhashes", "1522073246 1521473246")
+                + HelpExampleRpc("getblockhashes", "1522073246, 1521473246")
+                + HelpExampleCli("getblockhashes", "1522073246 1521473246 '{\"noOrphans\":false, \"logicalTimes\":true}'")
+        );
+
+    unsigned int high = params[0].get_int();
+    unsigned int low = params[1].get_int();
+    bool fActiveOnly = false;
+    bool fLogicalTS = false;
+    Array a;
+    int nHeight = chainActive.Height();
+
+    unsigned time = GetTime();
+    for (int i = 0; i <= nHeight; i++) {
+        int blockTime = getBlockTimeByHeight(i);
+        if(blockTime>low && blockTime<high){
+            CBlockIndex* pblockindex =chainActive[i];
+            a.push_back(pblockindex->GetBlockHash().GetHex());
+        }
+    }
+    return a;
+
+}
+
+int getBlockTimeByHeight(int nHeight){
+    CBlock block;
+    CBlockIndex* pblockindex =chainActive[nHeight];
+    std::string strHash = pblockindex->GetBlockHash().GetHex();
+    uint256 hash(strHash);
+    CBlockIndex* pblockindex2 = mapBlockIndex[hash];
+        return pblockindex2->GetBlockTime();
+    }
+
 Value getblockhash(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() != 1)
