@@ -2509,24 +2509,23 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
     nTimeVerify += nTime2 - nTimeStart;
     LogPrint("bench", "    - Verify %u txins: %.2fms (%.3fms/txin) [%.2fs]\n", nInputs - 1, 0.001 * (nTime2 - nTimeStart), nInputs <= 1 ? 0 : 0.001 * (nTime2 - nTimeStart) / (nInputs - 1), nTimeVerify * 0.000001);
 
-    ////////////////////////////////////////////////////////////////// // qtum
-    checkBlock.BuildMerkleTree();
-    checkBlock.hashStateRoot = h256Touint(globalState->rootHash());
-    checkBlock.hashUTXORoot = h256Touint(globalState->rootHashUTXO());
+    ////////////////////////////////////////////////////////////////// // lux
+    checkBlock.hashMerkleRoot = checkBlock.BuildMerkleTree();
+    checkBlock.hashStateRoot = uint256(0);//h256Touint(globalState->rootHash());
+    checkBlock.hashUTXORoot = uint256(0);//h256Touint(globalState->rootHashUTXO());
 
     //If this error happens, it probably means that something with AAL created transactions didn't match up to what is expected
-    if((checkBlock.GetHash() != block.GetHash()) && !fJustCheck)
-    {
+    if ((checkBlock.GetHash() != block.GetHash()) && !fJustCheck) {
         LogPrintf("Actual block data does not match block expected by AAL\n");
         //Something went wrong with AAL, compare different elements and determine what the problem is
-        if(checkBlock.hashMerkleRoot != block.hashMerkleRoot){
+        if (checkBlock.hashMerkleRoot != block.hashMerkleRoot) {
             //there is a mismatched tx, so go through and determine which txs
-            if(block.vtx.size() > checkBlock.vtx.size()){
+            if (block.vtx.size() > checkBlock.vtx.size()) {
                 LogPrintf("Unexpected AAL transactions in block. Actual txs: %i, expected txs: %i\n", block.vtx.size(), checkBlock.vtx.size());
-                for(size_t i=0;i<block.vtx.size();i++){
-                    if(i > checkBlock.vtx.size()){
+                for (size_t i=0;i<block.vtx.size();i++) {
+                    if (i > checkBlock.vtx.size()) {
                         LogPrintf("Unexpected transaction: %s\n", block.vtx[i].ToString());
-                    }else {
+                    } else {
                         if (block.vtx[i].GetHash() != block.vtx[i].GetHash()) {
                             LogPrintf("Mismatched transaction at entry %i\n", i);
                             LogPrintf("Actual: %s\n", block.vtx[i].ToString());
@@ -2534,12 +2533,12 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
                         }
                     }
                 }
-            }else if(block.vtx.size() < checkBlock.vtx.size()){
+            } else if (block.vtx.size() < checkBlock.vtx.size()) {
                 LogPrintf("Actual block is missing AAL transactions. Actual txs: %i, expected txs: %i\n", block.vtx.size(), checkBlock.vtx.size());
-                for(size_t i=0;i<checkBlock.vtx.size();i++){
-                    if(i > block.vtx.size()){
+                for (size_t i=0;i<checkBlock.vtx.size();i++) {
+                    if (i > block.vtx.size()) {
                         LogPrintf("Missing transaction: %s\n", checkBlock.vtx[i].ToString());
-                    }else {
+                    } else {
                         if (block.vtx[i].GetHash() != block.vtx[i].GetHash()) {
                             LogPrintf("Mismatched transaction at entry %i\n", i);
                             LogPrintf("Actual: %s\n", block.vtx[i].ToString());
@@ -2547,9 +2546,9 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
                         }
                     }
                 }
-            }else{
+            } else {
                 //count is correct, but a tx is wrong
-                for(size_t i=0;i<checkBlock.vtx.size();i++){
+                for (size_t i=0;i<checkBlock.vtx.size();i++) {
                     if (block.vtx[i].GetHash() != block.vtx[i].GetHash()) {
                         LogPrintf("Mismatched transaction at entry %i\n", i);
                         LogPrintf("Actual: %s\n", block.vtx[i].ToString());
@@ -2558,10 +2557,11 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
                 }
             }
         }
-        if(checkBlock.hashUTXORoot != block.hashUTXORoot){
+
+        if (checkBlock.hashUTXORoot != block.hashUTXORoot) {
             LogPrintf("Actual block data does not match hashUTXORoot expected by AAL block\n");
         }
-        if(checkBlock.hashStateRoot != block.hashStateRoot){
+        if (checkBlock.hashStateRoot != block.hashStateRoot) {
             LogPrintf("Actual block data does not match hashStateRoot expected by AAL block\n");
         }
 
@@ -2569,11 +2569,15 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
                          REJECT_INVALID, "incorrect-transactions-or-hashes-block");
     }
 
+#if 0
+
+#endif
+
     if (fJustCheck)
     {
         dev::h256 prevHashStateRoot(dev::sha3(dev::rlp("")));
         dev::h256 prevHashUTXORoot(dev::sha3(dev::rlp("")));
-        if(pindex->pprev->hashStateRoot != uint256() && pindex->pprev->hashUTXORoot != uint256()){
+        if (pindex->pprev->hashStateRoot != uint256() && pindex->pprev->hashUTXORoot != uint256()) {
             prevHashStateRoot = uintToh256(pindex->pprev->hashStateRoot);
             prevHashUTXORoot = uintToh256(pindex->pprev->hashUTXORoot);
         }
@@ -2582,9 +2586,6 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
         return true;
     }
 //////////////////////////////////////////////////////////////////
-
-    if (fJustCheck)
-        return true;
 
     // Write undo information to disk
     if (pindex->GetUndoPos().IsNull() || !pindex->IsValid(BLOCK_VALID_SCRIPTS)) {
