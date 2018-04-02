@@ -1265,16 +1265,16 @@ bool AppInit2(boost::thread_group& threadGroup)
                 pstorageresult = new StorageResults(luxStateDir.string());
 
                 if(chainActive.Tip() != NULL){
-#if 0
+//#if 0
                     globalState->setRoot(uintToh256(chainActive.Tip()->hashStateRoot));
                     globalState->setRootUTXO(uintToh256(chainActive.Tip()->hashUTXORoot));
-#endif
+//#endif
                 } else {
-#if 0
+//#if 0
                     globalState->setRoot(dev::sha3(dev::rlp("")));
                     globalState->setRootUTXO(uintToh256(uint256())/*uintToh256(chainparams.GenesisBlock().hashUTXORoot)*/);
                     globalState->populateFrom(cp.genesisState);
-#endif
+//#endif
                 }
                 globalState->db().commit();
                 globalState->dbUtxo().commit();

@@ -2103,15 +2103,15 @@ bool DisconnectBlock(CBlock& block, CValidationState& state, CBlockIndex* pindex
 
     // move best block pointer to prevout block
     view.SetBestBlock(pindex->pprev->GetBlockHash());
-#if 0
-    globalState->setRoot(uintToh256(pindex->pprev->hashStateRoot)); // qtum
-    globalState->setRootUTXO(uintToh256(pindex->pprev->hashUTXORoot)); // qtum
+//#if 0
+    globalState->setRoot(uintToh256(pindex->pprev->hashStateRoot)); // lux
+    globalState->setRootUTXO(uintToh256(pindex->pprev->hashUTXORoot)); // lux
 
     if(pfClean == NULL && fLogEvents){
         pstorageresult->deleteResults(block.vtx);
-        pblocktree->EraseHeightIndex(pindex->nHeight);
+//        pblocktree->EraseHeightIndex(pindex->nHeight);
     }
-#endif
+//#endif
     if (pfClean) {
         *pfClean = fClean;
         return true;
@@ -2511,8 +2511,8 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
 
     ////////////////////////////////////////////////////////////////// // lux
     checkBlock.hashMerkleRoot = checkBlock.BuildMerkleTree();
-    checkBlock.hashStateRoot = uint256(0);//h256Touint(globalState->rootHash());
-    checkBlock.hashUTXORoot = uint256(0);//h256Touint(globalState->rootHashUTXO());
+    checkBlock.hashStateRoot = /*uint256(0);*/h256Touint(globalState->rootHash());
+    checkBlock.hashUTXORoot = /*uint256(0);*/h256Touint(globalState->rootHashUTXO());
 
     //If this error happens, it probably means that something with AAL created transactions didn't match up to what is expected
     if ((checkBlock.GetHash() != block.GetHash()) && !fJustCheck) {
@@ -2568,10 +2568,6 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
         return state.DoS(100, error("ConnectBlock(): Incorrect AAL transactions or hashes (hashStateRoot, hashUTXORoot)"),
                          REJECT_INVALID, "incorrect-transactions-or-hashes-block");
     }
-
-#if 0
-
-#endif
 
     if (fJustCheck)
     {
