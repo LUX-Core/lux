@@ -92,6 +92,8 @@ Value getnewaddress(const Array& params, bool fHelp)
             "\nExamples:\n" +
             HelpExampleCli("getnewaddress", "") + HelpExampleCli("getnewaddress", "\"\"") + HelpExampleCli("getnewaddress", "\"myaccount\"") + HelpExampleRpc("getnewaddress", "\"myaccount\""));
 
+    LOCK2(cs_main, pwalletMain->cs_wallet);
+
     // Parse the account first so we don't generate a key if there's an error
     string strAccount;
     if (params.size() > 0)
@@ -159,6 +161,8 @@ Value getaccountaddress(const Array& params, bool fHelp)
             "\nExamples:\n" +
             HelpExampleCli("getaccountaddress", "") + HelpExampleCli("getaccountaddress", "\"\"") + HelpExampleCli("getaccountaddress", "\"myaccount\"") + HelpExampleRpc("getaccountaddress", "\"myaccount\""));
 
+    LOCK2(cs_main, pwalletMain->cs_wallet);
+
     // Parse the account first so we don't generate a key if there's an error
     string strAccount = AccountFromValue(params[0]);
 
@@ -181,6 +185,8 @@ Value getrawchangeaddress(const Array& params, bool fHelp)
             "\"address\"    (string) The address\n"
             "\nExamples:\n" +
             HelpExampleCli("getrawchangeaddress", "") + HelpExampleRpc("getrawchangeaddress", ""));
+
+    LOCK2(cs_main, pwalletMain->cs_wallet);
 
     if (!pwalletMain->IsLocked())
         pwalletMain->TopUpKeyPool();
@@ -209,6 +215,8 @@ Value setaccount(const Array& params, bool fHelp)
             "2. \"account\"         (string, required) The account to assign the address to.\n"
             "\nExamples:\n" +
             HelpExampleCli("setaccount", "\"LgAskSorXfCYUweZcCTpGNtpcFotS2rqDF\" \"tabby\"") + HelpExampleRpc("setaccount", "\"LgAskSorXfCYUweZcCTpGNtpcFotS2rqDF\", \"tabby\""));
+
+    LOCK2(cs_main, pwalletMain->cs_wallet);
 
     CBitcoinAddress address(params[0].get_str());
     if (!address.IsValid())
@@ -248,6 +256,8 @@ Value getaccount(const Array& params, bool fHelp)
             "\nExamples:\n" +
             HelpExampleCli("getaccount", "\"LgAskSorXfCYUweZcCTpGNtpcFotS2rqDF\"") + HelpExampleRpc("getaccount", "\"LgAskSorXfCYUweZcCTpGNtpcFotS2rqDF\""));
 
+    LOCK2(cs_main, pwalletMain->cs_wallet);
+
     CBitcoinAddress address(params[0].get_str());
     if (!address.IsValid())
         throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid LUX address");
@@ -275,6 +285,8 @@ Value getaddressesbyaccount(const Array& params, bool fHelp)
             "]\n"
             "\nExamples:\n" +
             HelpExampleCli("getaddressesbyaccount", "\"tabby\"") + HelpExampleRpc("getaddressesbyaccount", "\"tabby\""));
+
+    LOCK2(cs_main, pwalletMain->cs_wallet);
 
     string strAccount = AccountFromValue(params[0]);
 
@@ -510,6 +522,8 @@ Value getreceivedbyaddress(const Array& params, bool fHelp)
             "\nThe amount with at least 6 confirmation, very safe\n" + HelpExampleCli("getreceivedbyaddress", "\"LgAskSorXfCYUweZcCTpGNtpcFotS2rqDF\" 6") +
             "\nAs a json rpc call\n" + HelpExampleRpc("getreceivedbyaddress", "\"LgAskSorXfCYUweZcCTpGNtpcFotS2rqDF\", 6"));
 
+    LOCK2(cs_main, pwalletMain->cs_wallet);
+
     // lux address
     CBitcoinAddress address = CBitcoinAddress(params[0].get_str());
     if (!address.IsValid())
@@ -557,6 +571,8 @@ Value getreceivedbyaccount(const Array& params, bool fHelp)
             "\nAmount received at the tabby account including unconfirmed amounts with zero confirmations\n" + HelpExampleCli("getreceivedbyaccount", "\"tabby\" 0") +
             "\nThe amount with at least 6 confirmation, very safe\n" + HelpExampleCli("getreceivedbyaccount", "\"tabby\" 6") +
             "\nAs a json rpc call\n" + HelpExampleRpc("getreceivedbyaccount", "\"tabby\", 6"));
+
+    LOCK2(cs_main, pwalletMain->cs_wallet);
 
     // Minimum confirmations
     int nMinDepth = 1;
@@ -639,6 +655,8 @@ Value getbalance(const Array& params, bool fHelp)
             "\nThe total amount in the default account with at least 1 confirmation\n" + HelpExampleCli("getbalance", "\"\"") +
             "\nThe total amount in the account named tabby with at least 6 confirmations\n" + HelpExampleCli("getbalance", "\"tabby\" 6") +
             "\nAs a json rpc call\n" + HelpExampleRpc("getbalance", "\"tabby\", 6"));
+
+    LOCK2(cs_main, pwalletMain->cs_wallet);
 
     if (params.size() == 0)
         return ValueFromAmount(pwalletMain->GetBalance());
@@ -782,6 +800,8 @@ Value sendfrom(const Array& params, bool fHelp)
             "\nSend 0.01 from the tabby account to the given address, funds must have at least 6 confirmations\n" + HelpExampleCli("sendfrom", "\"tabby\" \"LgAskSorXfCYUweZcCTpGNtpcFotS2rqDF\" 0.01 6 \"donation\" \"seans outpost\"") +
             "\nAs a json rpc call\n" + HelpExampleRpc("sendfrom", "\"tabby\", \"LgAskSorXfCYUweZcCTpGNtpcFotS2rqDF\", 0.01, 6, \"donation\", \"seans outpost\""));
 
+    LOCK2(cs_main, pwalletMain->cs_wallet);
+
     string strAccount = AccountFromValue(params[0]);
     CBitcoinAddress address(params[1].get_str());
     if (!address.IsValid())
@@ -834,6 +854,8 @@ Value sendmany(const Array& params, bool fHelp)
             HelpExampleCli("sendmany", "\"tabby\" \"{\\\"LcnqiuG9q6WS5K6dR5tYtthMfJh9Uxopxg\\\":0.01,\\\"LcnqiuG9q6WS5K6dR5tYtthMfJh9Uxopxg\\\":0.02}\"") +
             "\nSend two amounts to two different addresses setting the confirmation and comment:\n" + HelpExampleCli("sendmany", "\"tabby\" \"{\\\"LgAskSorXfCYUweZcCTpGNtpcFotS2rqDF\\\":0.01,\\\"LcnqiuG9q6WS5K6dR5tYtthMfJh9Uxopxg\\\":0.02}\" 6 \"testing\"") +
             "\nAs a json rpc call\n" + HelpExampleRpc("sendmany", "\"tabby\", \"{\\\"LgAskSorXfCYUweZcCTpGNtpcFotS2rqDF\\\":0.01,\\\"LcnqiuG9q6WS5K6dR5tYtthMfJh9Uxopxg\\\":0.02}\", 6, \"testing\""));
+
+    LOCK2(cs_main, pwalletMain->cs_wallet);
 
     string strAccount = AccountFromValue(params[0]);
     Object sendTo = params[1].get_obj();
@@ -915,6 +937,8 @@ Value addmultisigaddress(const Array& params, bool fHelp)
                      "\nAs json rpc call\n" + HelpExampleRpc("addmultisigaddress", "2, \"[\\\"LcnqiuG9q6WS5K6dR5tYtthMfJh9Uxopxg\\\",\\\"LcnqiuG9q6WS5K6dR5tYtthMfJh9Uxopxg\\\"]\"");
         throw runtime_error(msg);
     }
+
+    LOCK2(cs_main, pwalletMain->cs_wallet);
 
     string strAccount;
     if (params.size() > 2)
@@ -1509,6 +1533,8 @@ Value gettransaction(const Array& params, bool fHelp)
             "\nExamples:\n" +
             HelpExampleCli("gettransaction", "\"3efa8c583a6b3f17b1f424a86c5ae65d98baff0292b760c9e64951f1823abfbd\"") + HelpExampleCli("gettransaction", "\"3efa8c583a6b3f17b1f424a86c5ae65d98baff0292b760c9e64951f1823abfbd\" true") + HelpExampleRpc("gettransaction", "\"3efa8c583a6b3f17b1f424a86c5ae65d98baff0292b760c9e64951f1823abfbd\""));
 
+    LOCK2(cs_main, pwalletMain->cs_wallet);
+
     uint256 hash;
     hash.SetHex(params[0].get_str());
 
@@ -1555,6 +1581,8 @@ Value backupwallet(const Array& params, bool fHelp)
             "\nExamples:\n" +
             HelpExampleCli("backupwallet", "\"backup.dat\"") + HelpExampleRpc("backupwallet", "\"backup.dat\""));
 
+    LOCK2(cs_main, pwalletMain->cs_wallet);
+
     string strDest = params[0].get_str();
     if (!BackupWallet(*pwalletMain, strDest))
         throw JSONRPCError(RPC_WALLET_ERROR, "Error: Wallet backup failed!");
@@ -1574,6 +1602,8 @@ Value keypoolrefill(const Array& params, bool fHelp)
                                         "1. newsize     (numeric, optional, default=100) The new keypool size\n"
                                         "\nExamples:\n" +
             HelpExampleCli("keypoolrefill", "") + HelpExampleRpc("keypoolrefill", ""));
+
+    LOCK2(cs_main, pwalletMain->cs_wallet);
 
     // 0 is interpreted by TopUpKeyPool() as the default keypool size given by -keypool
     unsigned int kpSize = 0;
@@ -1670,6 +1700,8 @@ Value walletpassphrasechange(const Array& params, bool fHelp)
             "2. \"newpassphrase\"      (string) The new passphrase\n"
             "\nExamples:\n" +
             HelpExampleCli("walletpassphrasechange", "\"old one\" \"new one\"") + HelpExampleRpc("walletpassphrasechange", "\"old one\", \"new one\""));
+
+    LOCK2(cs_main, pwalletMain->cs_wallet);
 
     if (fHelp)
         return true;
@@ -1808,6 +1840,8 @@ Value lockunspent(const Array& params, bool fHelp)
             "\nUnlock the transaction again\n" + HelpExampleCli("lockunspent", "true \"[{\\\"txid\\\":\\\"bd4b76f46a6aef596c135d28e2a84c21546a9da8c2c75b272a5763a2718f1cb1\\\",\\\"vout\\\":1}]\"") +
             "\nAs a json rpc call\n" + HelpExampleRpc("lockunspent", "false, \"[{\\\"txid\\\":\\\"bd4b76f46a6aef596c135d28e2a84c21546a9da8c2c75b272a5763a2718f1cb1\\\",\\\"vout\\\":1}]\""));
 
+    LOCK2(cs_main, pwalletMain->cs_wallet);
+
     if (params.size() == 1)
         RPCTypeCheck(params, list_of(bool_type));
     else
@@ -1926,6 +1960,8 @@ Value getwalletinfo(const Array& params, bool fHelp)
             "}\n"
             "\nExamples:\n" +
             HelpExampleCli("getwalletinfo", "") + HelpExampleRpc("getwalletinfo", ""));
+
+    LOCK2(cs_main, pwalletMain->cs_wallet);
 
     Object obj;
     obj.push_back(Pair("walletversion", pwalletMain->GetVersion()));

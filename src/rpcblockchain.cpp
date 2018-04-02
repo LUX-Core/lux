@@ -113,6 +113,7 @@ Value getblockcount(const Array& params, bool fHelp)
             "\nExamples:\n" +
             HelpExampleCli("getblockcount", "") + HelpExampleRpc("getblockcount", ""));
 
+    LOCK(cs_main);
     return chainActive.Height();
 }
 
@@ -127,6 +128,7 @@ Value getbestblockhash(const Array& params, bool fHelp)
             "\nExamples\n" +
             HelpExampleCli("getbestblockhash", "") + HelpExampleRpc("getbestblockhash", ""));
 
+    LOCK(cs_main);
     return chainActive.Tip()->GetBlockHash().GetHex();
 }
 
@@ -141,6 +143,7 @@ Value getpowdifficulty(const Array& params, bool fHelp)
             "\nExamples:\n" +
             HelpExampleCli("getpowdifficulty", "") + HelpExampleRpc("getpowdifficulty", ""));
 
+    LOCK(cs_main);
     return GetPoWDifficulty();
 }
 
@@ -174,6 +177,8 @@ Value getrawmempool(const Array& params, bool fHelp)
             "]\n"
             "\nExamples\n" +
             HelpExampleCli("getrawmempool", "true") + HelpExampleRpc("getrawmempool", "true"));
+
+    LOCK(cs_main);
 
     bool fVerbose = false;
     if (params.size() > 0)
@@ -245,6 +250,8 @@ Value getblockhashes(const Array& params, bool fHelp)
                 + HelpExampleCli("getblockhashes", "1522073246 1521473246 '{\"noOrphans\":false, \"logicalTimes\":true}'")
         );
 
+    LOCK(cs_main);
+
     unsigned int high = params[0].get_int();
     unsigned int low = params[1].get_int();
     bool fActiveOnly = false;
@@ -285,6 +292,8 @@ Value getblockhash(const Array& params, bool fHelp)
             "\"hash\"         (string) The block hash\n"
             "\nExamples:\n" +
             HelpExampleCli("getblockhash", "1000") + HelpExampleRpc("getblockhash", "1000"));
+
+    LOCK(cs_main);
 
     int nHeight = params[0].get_int();
     if (nHeight < 0 || nHeight > chainActive.Height())
@@ -327,6 +336,8 @@ Value getblock(const Array& params, bool fHelp)
             "\"data\"             (string) A string that is serialized, hex-encoded data for block 'hash'.\n"
             "\nExamples:\n" +
             HelpExampleCli("getblock", "\"00000000000fd08c2fb661d2fcb0d49abb3a91e5f27082ce64feed3b4dede2e2\"") + HelpExampleRpc("getblock", "\"00000000000fd08c2fb661d2fcb0d49abb3a91e5f27082ce64feed3b4dede2e2\""));
+
+    LOCK(cs_main);
 
     std::string strHash = params[0].get_str();
     uint256 hash(strHash);
@@ -378,6 +389,8 @@ Value getblockheader(const Array& params, bool fHelp)
             "\nExamples:\n" +
             HelpExampleCli("getblockheader", "\"00000000000fd08c2fb661d2fcb0d49abb3a91e5f27082ce64feed3b4dede2e2\"") + HelpExampleRpc("getblockheader", "\"00000000000fd08c2fb661d2fcb0d49abb3a91e5f27082ce64feed3b4dede2e2\""));
 
+    LOCK(cs_main);
+
     std::string strHash = params[0].get_str();
     uint256 hash(strHash);
 
@@ -423,6 +436,8 @@ Value gettxoutsetinfo(const Array& params, bool fHelp)
             "}\n"
             "\nExamples:\n" +
             HelpExampleCli("gettxoutsetinfo", "") + HelpExampleRpc("gettxoutsetinfo", ""));
+
+    LOCK(cs_main);
 
     Object ret;
 
@@ -528,6 +543,8 @@ Value verifychain(const Array& params, bool fHelp)
             "true|false       (boolean) Verified or not\n"
             "\nExamples:\n" +
             HelpExampleCli("verifychain", "") + HelpExampleRpc("verifychain", ""));
+
+    LOCK(cs_main);
 
     int nCheckLevel = GetArg("-checklevel", 3);
     int nCheckDepth = GetArg("-checkblocks", 288);
