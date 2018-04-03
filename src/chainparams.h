@@ -11,6 +11,7 @@
 #include "primitives/block.h"
 #include "protocol.h"
 #include "uint256.h"
+#include "consensus/params.h"
 
 #include <vector>
 
@@ -43,6 +44,7 @@ public:
     };
 
     const uint256& HashGenesisBlock() const { return hashGenesisBlock; }
+    const Consensus::Params& GetConsensus() const { return consensus; }
     const MessageStartChars& MessageStart() const { return pchMessageStart; }
     const std::vector<unsigned char>& AlertKey() const { return vAlertPubKey; }
     int GetDefaultPort() const { return nDefaultPort; }
@@ -101,6 +103,7 @@ protected:
     CChainParams() {}
 
     uint256 hashGenesisBlock;
+    Consensus::Params consensus;
     MessageStartChars pchMessageStart;
     //! Raw pub key bytes for the broadcast alert signing key.
     std::vector<unsigned char> vAlertPubKey;
