@@ -20,6 +20,7 @@ using namespace std;
 
 extern void TxToJSON(const CTransaction& tx, const uint256 hashBlock, UniValue& entry);
 void ScriptPubKeyToJSON(const CScript& scriptPubKey, UniValue& out, bool fIncludeHex);
+int getBlockTimeByHeight(int nHeight);
 
 double GetPoWDifficulty(const CBlockIndex* blockindex)
 {
@@ -260,18 +261,17 @@ UniValue getblockhashes(const UniValue& params, bool fHelp)
 
     unsigned int high = params[0].get_int();
     unsigned int low = params[1].get_int();
-    bool fActiveOnly = false;
-    bool fLogicalTS = false;
+    UniValue a(UniValue::VARR);
     int nHeight = chainActive.Height();
 
-    unsigned time = GetTime();
     for (int i = 0; i <= nHeight; i++) {
-        int blockTime = getBlockTimeByHeight(i);
-        if(blockTime>low && blockTime<high){
+        unsigned int blockTime = getBlockTimeByHeight(i);
+        if (blockTime > low && blockTime < high) {
             CBlockIndex* pblockindex =chainActive[i];
             a.push_back(pblockindex->GetBlockHash().GetHex());
         }
     }
+    return a;
 }
 
 int getBlockTimeByHeight(int nHeight){

@@ -91,7 +91,7 @@ void TxToJSON(const CTransaction& tx, const uint256 hashBlock, UniValue& entry)
     }
     entry.push_back(Pair("vout", vout));
 
-    if (!hashBlock.IsNull()) {
+    if (hashBlock != uint256()) {
         entry.push_back(Pair("blockhash", hashBlock.GetHex()));
         BlockMap::iterator mi = mapBlockIndex.find(hashBlock);
         if (mi != mapBlockIndex.end() && (*mi).second) {
@@ -241,7 +241,7 @@ UniValue listunspent(const UniValue& params, bool fHelp)
 
     set<CBitcoinAddress> setAddress;
     if (params.size() > 2) {
-        Univalue inputs = params[2].get_array();
+        UniValue inputs = params[2].get_array();
         BOOST_FOREACH (UniValue& input, inputs) {
             CBitcoinAddress address(input.get_str());
             if (!address.IsValid())

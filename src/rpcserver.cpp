@@ -198,7 +198,7 @@ string CRPCTable::help(string strCommand) const
 #endif
 
         try {
-            UniValue params;
+            UniValue params(UniValue::VARR);
             rpcfn_type pfn = pcmd->actor;
             if (setDone.insert(pfn).second)
                 (*pfn)(params, true);

@@ -2034,7 +2034,7 @@ UniValue reservebalance(const UniValue& params, bool fHelp)
         }
     }
 
-    UniValue result;
+    UniValue result(UniValue::VOBJ);
     result.push_back(Pair("reserve", (stake->GetReservedBalance() > 0)));
     result.push_back(Pair("amount", ValueFromAmount(stake->GetReservedBalance())));
     return result;
