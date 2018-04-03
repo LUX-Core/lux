@@ -16,9 +16,11 @@
 #include "util.h"
 #include "utilmoneystr.h"
 
+#include <boost/tokenizer.hpp>
+
+#include "univalue/univalue.h"
+
 #include <fstream>
-using namespace json_spirit;
-using namespace std;
 
 void SendMoney(const CTxDestination &address, CAmount nValue, CWalletTx& wtxNew, AvailableCoinsType coin_type)
 {
@@ -52,7 +54,7 @@ void SendMoney(const CTxDestination &address, CAmount nValue, CWalletTx& wtxNew,
         throw JSONRPCError(RPC_WALLET_ERROR, "Error: The transaction was rejected! This might happen if some of the coins in your wallet were already spent, such as if you used a copy of wallet.dat and coins were spent in the copy but not marked as spent here.");
 }
 
-Value darksend(const Array& params, bool fHelp)
+UniValue darksend(const UniValue& params, bool fHelp)
 {
     if (fHelp || params.size() == 0)
         throw runtime_error(
@@ -100,14 +102,14 @@ Value darksend(const Array& params, bool fHelp)
 }
 
 
-Value getpoolinfo(const Array& params, bool fHelp)
+UniValue getpoolinfo(const UniValue& params, bool fHelp)
 {
     if (fHelp || params.size() != 0)
         throw runtime_error(
             "getpoolinfo\n"
             "Returns an object containing anonymous pool-related information.");
 
-    Object obj;
+    UniValue obj(UniValue::VOBJ);
     obj.push_back(Pair("current_masternode",        GetCurrentMasterNode()));
     obj.push_back(Pair("state",        darkSendPool.GetState()));
     obj.push_back(Pair("entries",      darkSendPool.GetEntriesCount()));
@@ -116,7 +118,7 @@ Value getpoolinfo(const Array& params, bool fHelp)
 }
 
 
-Value masternode(const Array& params, bool fHelp)
+UniValue masternode(const UniValue& params, bool fHelp)
 {
     string strCommand;
     if (params.size() >= 1)
@@ -187,7 +189,7 @@ Value masternode(const Array& params, bool fHelp)
 
     	bool found = false;
 
-		Object statusObj;
+        UniValue resultsObj(UniValue::VARR);
 		statusObj.push_back(Pair("alias", alias));
 
     	BOOST_FOREACH(CMasternodeConfig::CMasternodeEntry mne, masternodeConfig.getEntries()) {
@@ -235,8 +237,7 @@ Value masternode(const Array& params, bool fHelp)
 		int successful = 0;
 		int fail = 0;
 
-
-		Object resultsObj;
+        UniValue resultsObj(UniValue::VARR);
 
 		BOOST_FOREACH(CMasternodeConfig::CMasternodeEntry mne, masternodeConfig.getEntries()) {
 			total++;
@@ -244,7 +245,7 @@ Value masternode(const Array& params, bool fHelp)
 			std::string errorMessage;
 			bool result = activeMasternode.StopMasterNode(mne.getIp(), mne.getPrivKey(), errorMessage);
 
-			Object statusObj;
+            UniValue statusObj(UniValue::VOBJ);
 			statusObj.push_back(Pair("alias", mne.getAlias()));
 			statusObj.push_back(Pair("result", result ? "successful" : "failed"));
 
@@ -259,7 +260,7 @@ Value masternode(const Array& params, bool fHelp)
 		}
 		pwalletMain->Lock();
 
-		Object returnObj;
+        UniValue returnObj(UniValue::VOBJ);
 		returnObj.push_back(Pair("overall", "Successfully stopped " + boost::lexical_cast<std::string>(successful) + " masternodes, failed to stop " +
 				boost::lexical_cast<std::string>(fail) + ", total " + boost::lexical_cast<std::string>(total)));
 		returnObj.push_back(Pair("detail", resultsObj));
@@ -281,7 +282,7 @@ Value masternode(const Array& params, bool fHelp)
                 "list supports 'active', 'vin', 'pubkey', 'lastseen', 'activeseconds', 'rank', 'protocol'\n");
         }
 
-        Object obj;
+        UniValue resultsObj(UniValue::VARR);
         BOOST_FOREACH(CMasterNode mn, vecMasternodes) {
             mn.Check();
 
@@ -375,7 +376,9 @@ Value masternode(const Array& params, bool fHelp)
 
     	bool found = false;
 
-		Object statusObj;
+        UniValue resultsObj(UniValue::VARR);
+        UniValue statusObj(UniValue::VOBJ);
+
 		statusObj.push_back(Pair("alias", alias));
 
     	BOOST_FOREACH(CMasternodeConfig::CMasternodeEntry mne, masternodeConfig.getEntries()) {
@@ -398,7 +401,7 @@ Value masternode(const Array& params, bool fHelp)
     	}
 
     	pwalletMain->Lock();
-    	return statusObj;
+        resultsObj.push_back(statusObj);
 
     }
 
@@ -427,7 +430,7 @@ Value masternode(const Array& params, bool fHelp)
 		int successful = 0;
 		int fail = 0;
 
-		Object resultsObj;
+        UniValue resultsObj(UniValue::VARR);
 
 		BOOST_FOREACH(CMasternodeConfig::CMasternodeEntry mne, masternodeConfig.getEntries()) {
 			total++;
@@ -435,7 +438,7 @@ Value masternode(const Array& params, bool fHelp)
 			std::string errorMessage;
 			bool result = activeMasternode.Register(mne.getIp(), mne.getPrivKey(), mne.getTxHash(), mne.getOutputIndex(), errorMessage);
 
-			Object statusObj;
+            UniValue statusObj(UniValue::VOBJ);
 			statusObj.push_back(Pair("alias", mne.getAlias()));
 			statusObj.push_back(Pair("result", result ? "succesful" : "failed"));
 
@@ -551,7 +554,7 @@ Value masternode(const Array& params, bool fHelp)
     	std::vector<CMasternodeConfig::CMasternodeEntry> mnEntries;
     	mnEntries = masternodeConfig.getEntries();
 
-        Object resultObj;
+        UniValue resultsObj(UniValue::VARR);
 
         BOOST_FOREACH(CMasternodeConfig::CMasternodeEntry mne, masternodeConfig.getEntries()) {
     		Object mnObj;

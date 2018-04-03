@@ -315,7 +315,7 @@ static bool findSighashFlags(int& flags, const string& flagStr)
 uint256 ParseHashUO(map<string, UniValue>& o, string strKey)
 {
     if (!o.count(strKey))
-        return 0;
+        return uint256();
     return ParseHashUV(o[strKey], strKey);
 }
 
@@ -353,7 +353,7 @@ static void MutateTxSign(CMutableTransaction& tx, const string& flagStr)
     UniValue keysObj = registers["privatekeys"];
     fGivenKeys = true;
 
-    for (unsigned int kidx = 0; kidx < keysObj.count(); kidx++) {
+    for (unsigned int kidx = 0; kidx < keysObj.size(); kidx++) {
         if (!keysObj[kidx].isStr())
             throw runtime_error("privatekey not a string");
         CBitcoinSecret vchSecret;
@@ -370,7 +370,7 @@ static void MutateTxSign(CMutableTransaction& tx, const string& flagStr)
         throw runtime_error("prevtxs register variable must be set.");
     UniValue prevtxsObj = registers["prevtxs"];
     {
-        for (unsigned int previdx = 0; previdx < prevtxsObj.count(); previdx++) {
+        for (unsigned int previdx = 0; previdx < prevtxsObj.size(); previdx++) {
             UniValue prevOut = prevtxsObj[previdx];
             if (!prevOut.isObject())
                 throw runtime_error("expected prevtxs internal object");
@@ -484,7 +484,7 @@ static void MutateTx(CMutableTransaction& tx, const string& command, const strin
 static void OutputTxJSON(const CTransaction& tx)
 {
     UniValue entry(UniValue::VOBJ);
-    TxToUniv(tx, 0, entry);
+    TxToUniv(tx, uint256(), entry);
 
     string jsonOutput = entry.write(4);
     fprintf(stdout, "%s\n", jsonOutput.c_str());

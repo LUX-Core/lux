@@ -286,7 +286,7 @@ bytes importCode(json_spirit::mObject& _o)
 			code = fromHex(compileLLL(_o["code"].get_str()));
 		else
 			code = fromHex(_o["code"].get_str().substr(2));
-	else if (_o["code"].type() == json_spirit::array_type)
+	else if (_o["code"].type() == UniValue_type)
 	{
 		code.clear();
 		for (auto const& j: _o["code"].get_array())
@@ -322,7 +322,7 @@ void checkOutput(bytesConstRef _output, json_spirit::mObject& _o)
 
 	if (expectedOutput.find("#") == 0)
 		BOOST_CHECK(_output.size() == toInt(expectedOutput.substr(1)));
-	else if (_o["out"].type() == json_spirit::array_type)
+	else if (_o["out"].type() == UniValue_type)
 		for (auto const& d: _o["out"].get_array())
 		{
 			BOOST_CHECK_MESSAGE(_output[j] == toInt(d), "Output byte [" << j << "] different!");
