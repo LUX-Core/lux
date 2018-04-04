@@ -27,7 +27,9 @@
 
 #include <QDir>
 #include <QKeyEvent>
+#include <QMenu>
 #include <QScrollBar>
+#include <QSignalMapper>
 #include <QThread>
 #include <QTime>
 #include <QStringList>

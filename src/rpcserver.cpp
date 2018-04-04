@@ -1015,10 +1015,11 @@ std::vector<std::string> CRPCTable::listCommands() const
 {
     std::vector<std::string> commandList;
     typedef std::map<std::string, const CRPCCommand*> commandMap;
-
+#if 0 // TODO fix warning: typedef ‘commandMap’ locally defined but not used
     std::transform( mapCommands.begin(), mapCommands.end(),
                    std::back_inserter(commandList),
                    boost::bind(&commandMap::UniValue::VType::first,_1) );
+#endif
     return commandList;
 }
 

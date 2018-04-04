@@ -178,7 +178,7 @@ UniValue getrawtransaction(const UniValue& params, bool fHelp)
         fVerbose = (params[1].get_int() != 0);
 
     CTransaction tx;
-    uint256 hashBlock = 0;
+    uint256 hashBlock;
     if (!GetTransaction(hash, tx, hashBlock, true))
         throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "No information available about transaction");
 
@@ -242,7 +242,9 @@ UniValue listunspent(const UniValue& params, bool fHelp)
     set<CBitcoinAddress> setAddress;
     if (params.size() > 2) {
         UniValue inputs = params[2].get_array();
-        BOOST_FOREACH (UniValue& input, inputs) {
+         for (unsigned int i = 0; i < inputs.size(); i++) {
+
+            UniValue input = inputs[i];
             CBitcoinAddress address(input.get_str());
             if (!address.IsValid())
                 throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, string("Invalid lux address: ") + input.get_str());
