@@ -375,7 +375,7 @@ void BitcoinGUI::createActions(const NetworkStyle* networkStyle)
         tabGroup->addAction(masternodeAction);
         connect(masternodeAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
         connect(masternodeAction, SIGNAL(triggered()), this, SLOT(gotoMasternodePage()));
-
+    }
 
     smartToken = new QAction(QIcon(":/icons/smartcontract"), tr("&Smart Contracts"), this);
     smartToken->setStatusTip(tr("Add Smart Contracts"));
@@ -388,7 +388,6 @@ void BitcoinGUI::createActions(const NetworkStyle* networkStyle)
     #endif
     
     tabGroup->addAction(smartToken);
-    }
 
 
     // These showNormalIfMinimized are needed because Send Coins and Receive Coins
