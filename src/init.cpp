@@ -327,7 +327,7 @@ std::string HelpMessage(HelpMessageMode mode)
     strUsage += "  -sysperms              " + _("Create new files with system default permissions, instead of umask 077 (only effective with disabled wallet functionality)") + "\n";
 #endif
     strUsage += "  -txindex               " + strprintf(_("Maintain a full transaction index, used by the getrawtransaction rpc call (default: %u)"), 0) + "\n";
-    
+
     strUsage += "  -logevents             " + strprintf(_("Maintain a full EVM log index, used by searchlogs and gettransactionreceipt rpc calls (default: %u)"), false) + "\n";
 
     strUsage += "\n" + _("Connection options:") + "\n";
@@ -1150,7 +1150,7 @@ bool AppInit2(boost::thread_group& threadGroup)
     }
 
     BOOST_FOREACH (string strDest, mapMultiArgs["-seednode"])
-        AddOneShot(strDest);
+    AddOneShot(strDest);
 
 #if ENABLE_ZMQ
     pzmqNotificationInterface = CZMQNotificationInterface::CreateWithArguments(mapArgs);
@@ -1264,20 +1264,22 @@ bool AppInit2(boost::thread_group& threadGroup)
 
                 pstorageresult = new StorageResults(luxStateDir.string());
 
-                if(chainActive.Tip() != NULL){
-//#if 0
+                if(chainActive.Tip() != NULL && chainActive.Tip()->nHeight >= Params().FirstSCBlock()){
+#if 0
                     globalState->setRoot(uintToh256(chainActive.Tip()->hashStateRoot));
                     globalState->setRootUTXO(uintToh256(chainActive.Tip()->hashUTXORoot));
-//#endif
-                } else {
-//#if 0
+                    globalState->db().commit();
+                    globalState->dbUtxo().commit();
+#endif
+                }/* else {
+#if 0
                     globalState->setRoot(dev::sha3(dev::rlp("")));
-                    globalState->setRootUTXO(uintToh256(uint256())/*uintToh256(chainparams.GenesisBlock().hashUTXORoot)*/);
+                    globalState->setRootUTXO(uintToh256(uint256())*//*uintToh256(chainparams.GenesisBlock().hashUTXORoot)*//*);
                     globalState->populateFrom(cp.genesisState);
-//#endif
-                }
-                globalState->db().commit();
-                globalState->dbUtxo().commit();
+#endif
+                }*/
+//                globalState->db().commit();
+//                globalState->dbUtxo().commit();
 
                 fRecordLogOpcodes = IsArgSet("-record-log-opcodes");
                 fIsVMlogFile = boost::filesystem::exists(GetDataDir() / "vmExecLogs.json");
@@ -1301,7 +1303,7 @@ bool AppInit2(boost::thread_group& threadGroup)
                     strLoadError = _("You need to rebuild the database using -reindex-chainstate to enable -logevents");
                     break;
                 }
-                
+
                 if (!GetBoolArg("-logevents", false))
                 {
                     pstorageresult->wipeResults();
@@ -1309,10 +1311,10 @@ bool AppInit2(boost::thread_group& threadGroup)
                     fLogEvents = false;
                     pblocktree->WriteFlag("logevents", fLogEvents);
                 }
-                
+
                 uiInterface.InitMessage(_("Verifying blocks..."));
                 if (!CVerifyDB().VerifyDB(pcoinsdbview, GetArg("-checklevel", 3),
-                        GetArg("-checkblocks", 500))) {
+                                          GetArg("-checkblocks", 500))) {
                     strLoadError = _("Corrupted block database detected");
                     break;
                 }
@@ -1329,8 +1331,8 @@ bool AppInit2(boost::thread_group& threadGroup)
             // first suggest a reindex
             if (!fReset) {
                 bool fRet = uiInterface.ThreadSafeMessageBox(
-                    strLoadError + ".\n\n" + _("Do you want to rebuild the block database now?"),
-                    "", CClientUIInterface::MSG_ERROR | CClientUIInterface::BTN_ABORT);
+                        strLoadError + ".\n\n" + _("Do you want to rebuild the block database now?"),
+                        "", CClientUIInterface::MSG_ERROR | CClientUIInterface::BTN_ABORT);
                 if (fRet) {
                     fReindex = true;
                     fRequestShutdown = false;
@@ -1496,7 +1498,7 @@ bool AppInit2(boost::thread_group& threadGroup)
     std::vector<boost::filesystem::path> vImportFiles;
     if (mapArgs.count("-loadblock")) {
         BOOST_FOREACH (string strFile, mapMultiArgs["-loadblock"])
-            vImportFiles.push_back(strFile);
+        vImportFiles.push_back(strFile);
     }
     threadGroup.create_thread(boost::bind(&ThreadImport, vImportFiles));
     if (chainActive.Tip() == NULL) {
