@@ -146,7 +146,7 @@ uint256 ParseHashV(const UniValue& v, string strName)
         strHex = v.get_str();
     if (!IsHex(strHex)) // Note: IsHex("") is false
         throw JSONRPCError(RPC_INVALID_PARAMETER, strName + " must be hexadecimal string (not '" + strHex + "')");
-    uint256 result;
+    uint256 result = uint256();
     result.SetHex(strHex);
     return result;
 }
@@ -1014,8 +1014,8 @@ UniValue CRPCTable::execute(const std::string& strMethod, const UniValue& params
 std::vector<std::string> CRPCTable::listCommands() const
 {
     std::vector<std::string> commandList;
-    typedef std::map<std::string, const CRPCCommand*> commandMap;
 #if 0 // TODO fix warning: typedef ‘commandMap’ locally defined but not used
+    typedef std::map<std::string, const CRPCCommand*> commandMap;
     std::transform( mapCommands.begin(), mapCommands.end(),
                    std::back_inserter(commandList),
                    boost::bind(&commandMap::UniValue::VType::first,_1) );

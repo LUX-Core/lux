@@ -168,7 +168,7 @@ UniValue setgenerate(const UniValue& params, bool fHelp)
         unsigned int nExtraNonce = 0;
         UniValue blockHashes(UniValue::VARR);
         while (nHeight < nHeightEnd) {
-            auto_ptr<CBlockTemplate> pblocktemplate(CreateNewBlockWithKey(reservekey, pwalletMain, false));
+            unique_ptr<CBlockTemplate> pblocktemplate(CreateNewBlockWithKey(reservekey, pwalletMain, false));
             if (!pblocktemplate.get())
                 throw JSONRPCError(RPC_INTERNAL_ERROR, "Wallet keypool empty");
             CBlock* pblock = &pblocktemplate->block;
@@ -440,7 +440,7 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
 
     if (!lpval.isNull()) {
         // Wait to respond until either the best block changes, OR a minute has passed and there are more transactions
-        uint256 hashWatchedChain;
+        uint256 hashWatchedChain = uint256();
         boost::system_time checktxtime;
         unsigned int nTransactionsUpdatedLastLP;
 

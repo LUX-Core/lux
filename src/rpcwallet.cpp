@@ -1428,7 +1428,8 @@ UniValue listaccounts(const UniValue& params, bool fHelp)
     BOOST_FOREACH (const CAccountingEntry& entry, acentries)
         mapAccountBalances[entry.strAccount] += entry.nCreditDebit;
 
-    UniValue ret(UniValue::VOBJ), imm;
+    UniValue ret(UniValue::VOBJ);
+    UniValue imm(UniValue::VOBJ);
     BOOST_FOREACH (const PAIRTYPE(string, CAmount) & accountBalance, mapAccountBalances) {
         ret.push_back(Pair(accountBalance.first, ValueFromAmount(accountBalance.second)));
     }
@@ -1483,7 +1484,7 @@ UniValue listsinceblock(const UniValue& params, bool fHelp)
     isminefilter filter = ISMINE_SPENDABLE;
 
     if (params.size() > 0) {
-        uint256 blockId = 0;
+        uint256 blockId = uint256();
 
         blockId.SetHex(params[0].get_str());
         BlockMap::iterator it = mapBlockIndex.find(blockId);
@@ -1514,7 +1515,7 @@ UniValue listsinceblock(const UniValue& params, bool fHelp)
     }
 
     CBlockIndex* pblockLast = chainActive[chainActive.Height() + 1 - target_confirms];
-    uint256 lastblock = pblockLast ? pblockLast->GetBlockHash() : 0;
+    uint256 lastblock = pblockLast ? pblockLast->GetBlockHash() : uint256();
 
     UniValue ret(UniValue::VOBJ);
     ret.push_back(Pair("transactions", transactions));
