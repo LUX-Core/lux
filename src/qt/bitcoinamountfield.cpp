@@ -45,6 +45,7 @@ public:
     {
         bool valid = false;
         CAmount val = parse(input, &valid);
+        val = qMax(val, minAmount);
         if (valid) {
             input = BitcoinUnits::format(currentUnit, val, false, BitcoinUnits::separatorAlways);
             lineEdit()->setText(input);
@@ -67,7 +68,7 @@ public:
         bool valid = false;
         CAmount val = value(&valid);
         val = val + steps * singleStep;
-        val = qMin(qMax(val, CAmount(0)), BitcoinUnits::maxMoney());
+        val = qMin(qMax(val, minAmount), BitcoinUnits::maxMoney());
         setValue(val);
     }
 
@@ -118,9 +119,22 @@ public:
         return cachedMinimumSizeHint;
     }
 
+    CAmount minimum() const
+    {
+        return minAmount;
+    }
+
+    void setMinimum(const CAmount& min)
+    {
+        minAmount = min;
+        Q_EMIT valueChanged();
+    }
+
+
 private:
     int currentUnit;
     CAmount singleStep;
+    CAmount minAmount;
     mutable QSize cachedMinimumSizeHint;
 
     /**
@@ -165,7 +179,7 @@ protected:
         bool valid = false;
         CAmount val = value(&valid);
         if (valid) {
-            if (val > 0)
+            if (val > minAmount)
                 rv |= StepDownEnabled;
             if (val < BitcoinUnits::maxMoney())
                 rv |= StepUpEnabled;
@@ -287,4 +301,14 @@ void BitcoinAmountField::setDisplayUnit(int newUnit)
 void BitcoinAmountField::setSingleStep(const CAmount& step)
 {
     amount->setSingleStep(step);
+}
+
+CAmount BitcoinAmountField::minimum() const
+{
+    return amount->minimum();
+}
+
+void BitcoinAmountField::setMinimum(const CAmount& min)
+{
+    amount->setMinimum(min);
 }

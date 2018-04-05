@@ -64,6 +64,8 @@ public:
     enum BlockSource getBlockSource() const;
     //! Return warnings to be displayed in status bar
     QString getStatusBarWarnings() const;
+    //! Get the information about the needed gas
+    void getGasInfo(uint64_t& blockGasLimit, uint64_t& minGasPrice, uint64_t& nGasPrice) const;
 
     QString formatFullVersion() const;
     QString formatBuildDate() const;
