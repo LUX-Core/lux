@@ -25,7 +25,7 @@ Check out the source code in the following directory hierarchy.
 
     cd /path/to/your/toplevel/build
     git clone https://github.com/216k155/gitian.sigs.git
-    git clone https://github.com/216k155/lux-detached-sigs.git
+    git clone https://github.com/216k155/detached-sigs.git
     git clone https://github.com/devrandom/gitian-builder.git
     git clone https://github.com/216k155/lux.git
 
@@ -177,7 +177,7 @@ Codesigner only: Sign the windows binaries:
 
 Codesigner only: Commit the detached codesign payloads:
 
-    cd ~/lux-detached-sigs
+    cd ~/detached-sigs
     checkout the appropriate branch for this release series
     rm -rf *
     tar xf signature-osx.tar.gz
@@ -190,7 +190,7 @@ Codesigner only: Commit the detached codesign payloads:
 Non-codesigners: wait for Windows/OS X detached signatures:
 
 - Once the Windows/OS X builds each have 3 matching signatures, they will be signed with their respective release keys.
-- Detached signatures will then be committed to the [lux-detached-sigs](https://github.com/LUX-Project/lux-detached-sigs) repository, which can be combined with the unsigned apps to create signed binaries.
+- Detached signatures will then be committed to the [detached-sigs](https://github.com/LUX-Project/detached-sigs) repository, which can be combined with the unsigned apps to create signed binaries.
 
 Create (and optionally verify) the signed OS X binary:
 

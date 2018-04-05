@@ -1,13 +1,19 @@
 ---
-name: "lux-win-2.2"
+name: "lux-aarch64-1.2"
 enable_cache: true
 suites:
-- "trusty"
+- "xenial"
 architectures:
 - "amd64"
-packages: 
+packages:
 - "curl"
-- "g++"
+- "g++-aarch64-linux-gnu"
+- "g++-4.9-aarch64-linux-gnu"
+- "gcc-4.9-aarch64-linux-gnu"
+- "binutils-aarch64-linux-gnu"
+- "g++-4.9-multilib"
+- "gcc-4.9-multilib"
+- "binutils-gold"
 - "git-core"
 - "pkg-config"
 - "autoconf"
@@ -15,24 +21,23 @@ packages:
 - "automake"
 - "faketime"
 - "bsdmainutils"
-- "mingw-w64"
-- "g++-mingw-w64"
-- "nsis"
-- "zip"
 - "ca-certificates"
 - "python"
+reference_datetime: "2018-04-05 00:00:00"
 remotes:
 - "url": "https://github.com/216k155/lux.git"
   "dir": "lux"
 files: []
 script: |
+
   WRAP_DIR=$HOME/wrapped
-  HOSTS="x86_64-w64-mingw32 i686-w64-mingw32"
-  CONFIGFLAGS="--enable-reduce-exports --disable-bench --disable-tests"
-  FAKETIME_HOST_PROGS="g++ ar ranlib nm windres strip objcopy"
-  FAKETIME_PROGS="date makensis zip"
+  HOSTS="aarch64-linux-gnu"
+  CONFIGFLAGS="--enable-glibc-back-compat --enable-reduce-exports --disable-bench --disable-tests"
+  FAKETIME_HOST_PROGS=""
+  FAKETIME_PROGS="date ar ranlib nm"
   HOST_CFLAGS="-O2 -g"
-  HOST_CXXFLAGS="-O2 -g"
+  HOST_CXXFLAGS="-O2 -g -Wno-deprecated-declarations"
+  HOST_LDFLAGS=-static-libstdc++
 
   export QT_RCC_TEST=1
   export GZIP="-9n"
@@ -70,49 +75,57 @@ script: |
   done
   }
 
-  function create_per-host_linker_wrapper {
-  # This is only needed for trusty, as the mingw linker leaks a few bytes of
-  # heap, causing non-determinism. See discussion in https://github.com/bitcoin/bitcoin/pull/6900
-  for i in $HOSTS; do
-    mkdir -p ${WRAP_DIR}/${i}
-    for prog in collect2; do
-        echo '#!/bin/bash' > ${WRAP_DIR}/${i}/${prog}
-        REAL=$(${i}-gcc -print-prog-name=${prog})
-        echo "export MALLOC_PERTURB_=255" >> ${WRAP_DIR}/${i}/${prog}
-        echo "${REAL} \$@" >> $WRAP_DIR/${i}/${prog}
-        chmod +x ${WRAP_DIR}/${i}/${prog}
-    done
-    for prog in gcc g++; do
-        echo '#!/bin/bash' > ${WRAP_DIR}/${i}-${prog}
-        echo "REAL=\`which -a ${i}-${prog} | grep -v ${WRAP_DIR}/${i}-${prog} | head -1\`" >> ${WRAP_DIR}/${i}-${prog}
-        echo 'export LD_PRELOAD=/usr/lib/x86_64-linux-gnu/faketime/libfaketime.so.1' >> ${WRAP_DIR}/${i}-${prog}
-        echo "export FAKETIME=\"$1\"" >> ${WRAP_DIR}/${i}-${prog}
-        echo "export COMPILER_PATH=${WRAP_DIR}/${i}" >> ${WRAP_DIR}/${i}-${prog}
-        echo "\$REAL \$@" >> $WRAP_DIR/${i}-${prog}
-        chmod +x ${WRAP_DIR}/${i}-${prog}
-    done
-  done
-  }
-
   # Faketime for depends so intermediate results are comparable
   export PATH_orig=${PATH}
   create_global_faketime_wrappers "2000-01-01 12:00:00"
   create_per-host_faketime_wrappers "2000-01-01 12:00:00"
-  create_per-host_linker_wrapper "2000-01-01 12:00:00"
   export PATH=${WRAP_DIR}:${PATH}
+
+  EXTRA_INCLUDES_BASE=$WRAP_DIR/extra_includes
+  mkdir -p $EXTRA_INCLUDES_BASE
+
+  # x86 needs /usr/include/i386-linux-gnu/asm pointed to /usr/include/x86_64-linux-gnu/asm,
+  # but we can't write there. Instead, create a link here and force it to be included in the
+  # search paths by wrapping gcc/g++.
+
+  mkdir -p $EXTRA_INCLUDES_BASE/i686-pc-linux-gnu
+  rm -f $WRAP_DIR/extra_includes/i686-pc-linux-gnu/asm
+  ln -s /usr/include/x86_64-linux-gnu/asm $EXTRA_INCLUDES_BASE/i686-pc-linux-gnu/asm
+
+  for prog in gcc g++; do
+  rm -f ${WRAP_DIR}/${prog}
+  cat << EOF > ${WRAP_DIR}/${prog}
+  #!/bin/bash
+  REAL="`which -a ${prog} | grep -v ${WRAP_DIR}/${prog} | head -1`"
+  for var in "\$@"
+  do
+    if [ "\$var" = "-m32" ]; then
+      export C_INCLUDE_PATH="$EXTRA_INCLUDES_BASE/i686-pc-linux-gnu"
+      export CPLUS_INCLUDE_PATH="$EXTRA_INCLUDES_BASE/i686-pc-linux-gnu"
+      break
+    fi
+  done
+  \$REAL \$@
+  EOF
+  chmod +x ${WRAP_DIR}/${prog}
+  done
 
   cd lux
   BASEPREFIX=`pwd`/depends
   # Build dependencies for each host
   for i in $HOSTS; do
+    EXTRA_INCLUDES="$EXTRA_INCLUDES_BASE/$i"
+    if [ -d "$EXTRA_INCLUDES" ]; then
+      export HOST_ID_SALT="$EXTRA_INCLUDES"
+    fi
     make ${MAKEOPTS} -C ${BASEPREFIX} HOST="${i}"
+    unset HOST_ID_SALT
   done
 
   # Faketime for binaries
   export PATH=${PATH_orig}
   create_global_faketime_wrappers "${REFERENCE_DATETIME}"
   create_per-host_faketime_wrappers "${REFERENCE_DATETIME}"
-  create_per-host_linker_wrapper "${REFERENCE_DATETIME}"
   export PATH=${WRAP_DIR}:${PATH}
 
   # Create the release tarball using (arbitrarily) the first host
@@ -121,14 +134,11 @@ script: |
   make dist
   SOURCEDIST=`echo lux-*.tar.gz`
   DISTNAME=`echo ${SOURCEDIST} | sed 's/.tar.*//'`
-
   # Correct tar file order
   mkdir -p temp
   pushd temp
   tar xf ../$SOURCEDIST
   find lux-* | sort | tar --no-recursion --mode='u+rw,go+r-w,a+X' --owner=0 --group=0 -c -T - | gzip -9n > ../$SOURCEDIST
-  mkdir -p $OUTDIR/src
-  cp ../$SOURCEDIST $OUTDIR/src
   popd
 
   ORIGPATH="$PATH"
@@ -141,26 +151,21 @@ script: |
     mkdir -p ${INSTALLPATH}
     tar --strip-components=1 -xf ../$SOURCEDIST
 
-    CONFIG_SITE=${BASEPREFIX}/${i}/share/config.site ./configure --prefix=/ --disable-ccache --disable-maintainer-mode --disable-dependency-tracking ${CONFIGFLAGS} CFLAGS="${HOST_CFLAGS}" CXXFLAGS="${HOST_CXXFLAGS}"
+    CONFIG_SITE=${BASEPREFIX}/${i}/share/config.site ./configure --prefix=/ --disable-ccache --disable-maintainer-mode --disable-dependency-tracking ${CONFIGFLAGS} CFLAGS="${HOST_CFLAGS}" CXXFLAGS="${HOST_CXXFLAGS}" LDFLAGS="${HOST_LDFLAGS}"
     make ${MAKEOPTS}
-    make deploy
+
     make install DESTDIR=${INSTALLPATH}
-    cp -f lux-*setup*.exe $OUTDIR/
     cd installed
-    mv ${DISTNAME}/bin/*.dll ${DISTNAME}/lib/
     find . -name "lib*.la" -delete
     find . -name "lib*.a" -delete
     rm -rf ${DISTNAME}/lib/pkgconfig
-    find ${DISTNAME}/bin -type f -executable -exec ${i}-objcopy --only-keep-debug {} {}.dbg \; -exec ${i}-strip -s {} \; -exec ${i}-objcopy --add-gnu-debuglink={}.dbg {} \;
-    find ${DISTNAME}/lib -type f -exec ${i}-objcopy --only-keep-debug {} {}.dbg \; -exec ${i}-strip -s {} \; -exec ${i}-objcopy --add-gnu-debuglink={}.dbg {} \;
-    find ${DISTNAME} -not -name "*.dbg"  -type f | sort | zip -X@ ${OUTDIR}/${DISTNAME}-${i}.zip
-    find ${DISTNAME} -name "*.dbg"  -type f | sort | zip -X@ ${OUTDIR}/${DISTNAME}-${i}-debug.zip
+    find ${DISTNAME}/bin -type f -executable -exec ../contrib/devtools/split-debug.sh {} {} {}.dbg \;
+    #find ${DISTNAME}/lib -type f -exec ../contrib/devtools/split-debug.sh {} {} {}.dbg \;
+    find ${DISTNAME} -not -name "*.dbg" | sort | tar --no-recursion --mode='u+rw,go+r-w,a+X' --owner=0 --group=0 -c -T - | gzip -9n > ${OUTDIR}/${DISTNAME}-${i}.tar.gz
+    find ${DISTNAME} -name "*.dbg" | sort | tar --no-recursion --mode='u+rw,go+r-w,a+X' --owner=0 --group=0 -c -T - | gzip -9n > ${OUTDIR}/${DISTNAME}-${i}-debug.tar.gz
     cd ../../
+    rm -rf distsrc-${i}
   done
-  cd $OUTDIR
-  rename 's/-setup\.exe$/-setup-unsigned.exe/' *-setup.exe
-  find . -name "*-setup-unsigned.exe" | sort | tar --no-recursion --mode='u+rw,go+r-w,a+X' --owner=0 --group=0 -c -T - | gzip -9n > ${OUTDIR}/${DISTNAME}-win-unsigned.tar.gz
-  mv ${OUTDIR}/${DISTNAME}-x86_64-*-debug.zip ${OUTDIR}/${DISTNAME}-win64-debug.zip
-  mv ${OUTDIR}/${DISTNAME}-i686-*-debug.zip ${OUTDIR}/${DISTNAME}-win32-debug.zip
-  mv ${OUTDIR}/${DISTNAME}-x86_64-*.zip ${OUTDIR}/${DISTNAME}-win64.zip
-  mv ${OUTDIR}/${DISTNAME}-i686-*.zip ${OUTDIR}/${DISTNAME}-win32.zip
+  mkdir -p $OUTDIR/src
+  mkdir -p $OUTDIR/src
+  mv $SOURCEDIST $OUTDIR/src
