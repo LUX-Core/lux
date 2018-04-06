@@ -324,19 +324,17 @@ void BitcoinGUI::createActions(const NetworkStyle* networkStyle)
 #endif
     tabGroup->addAction(receiveCoinsAction);
 
-	// Qt::Key_4 is reserved for Staking tab
-
     historyAction = new QAction(QIcon(":/icons/history"), tr("&Transactions"), this);
     historyAction->setStatusTip(tr("Browse transaction history"));
     historyAction->setToolTip(historyAction->statusTip());
     historyAction->setCheckable(true);
 #ifdef Q_OS_MAC
-    historyAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_5));
+    historyAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_4));
 #else
-    historyAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_5));
+    historyAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_4));
 #endif
     tabGroup->addAction(historyAction);
-    
+
     stakingAction = new QAction(QIcon(":/icons/stake"), tr("&Staking"), this);
     stakingAction->setStatusTip(tr("Show your staking capacity"));
     stakingAction->setToolTip(stakingAction->statusTip());
@@ -361,6 +359,12 @@ void BitcoinGUI::createActions(const NetworkStyle* networkStyle)
 
 #ifdef ENABLE_WALLET
 
+    smartToken = new QAction(QIcon(":/icons/smartcontract"), tr("&Smart Contracts"), this);
+    smartToken->setStatusTip(tr("Add Smart Contracts"));
+    smartToken->setToolTip(smartToken->statusTip());
+    smartToken->setCheckable(true);
+    tabGroup->addAction(smartToken);
+
     masternodeAction = new QAction(QIcon(":/icons/masternodes"), tr("&Masternodes"), this);
     QSettings settings;
     if (settings.value("fShowMasternodesTab").toBool()) {
@@ -369,26 +373,23 @@ void BitcoinGUI::createActions(const NetworkStyle* networkStyle)
         masternodeAction->setCheckable(true);
 #ifdef Q_OS_MAC
         masternodeAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_7));
+        smartToken->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_8));
 #else
         masternodeAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_7));
+        smartToken->setShortcut(QKeySequence(Qt::ALT + Qt::Key_8));
 #endif
         tabGroup->addAction(masternodeAction);
         connect(masternodeAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
         connect(masternodeAction, SIGNAL(triggered()), this, SLOT(gotoMasternodePage()));
     }
-
-    smartToken = new QAction(QIcon(":/icons/smartcontract"), tr("&Smart Contracts"), this);
-    smartToken->setStatusTip(tr("Add Smart Contracts"));
-    smartToken->setToolTip(smartToken->statusTip());
-    smartToken->setCheckable(true);
-    #ifdef Q_OS_MAC
-        smartToken->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_8));
-    #else
-        smartToken->setShortcut(QKeySequence(Qt::ALT + Qt::Key_8));
-    #endif
-    
-    tabGroup->addAction(smartToken);
-
+    else
+    {
+#ifdef Q_OS_MAC
+        smartToken->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_7));
+#else
+        smartToken->setShortcut(QKeySequence(Qt::ALT + Qt::Key_7));
+#endif
+    }
 
     // These showNormalIfMinimized are needed because Send Coins and Receive Coins
     // can be triggered from the tray menu, and need to show the GUI to be useful.
