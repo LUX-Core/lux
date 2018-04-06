@@ -35,27 +35,27 @@ QT_END_NAMESPACE
 namespace GUIUtil
 {
 // Create human-readable string from date
-QString dateTimeStr(const QDateTime& datetime);
-QString dateTimeStr(qint64 nTime);
+    QString dateTimeStr(const QDateTime& datetime);
+    QString dateTimeStr(qint64 nTime);
 
 // Render LUX addresses in monospace font
-QFont bitcoinAddressFont();
+    QFont bitcoinAddressFont();
 
 // Set up widgets for address and amounts
-void setupAddressWidget(QValidatedLineEdit* widget, QWidget* parent);
-void setupAmountWidget(QLineEdit* widget, QWidget* parent);
+    void setupAddressWidget(QValidatedLineEdit* widget, QWidget* parent);
+    void setupAmountWidget(QLineEdit* widget, QWidget* parent);
 
 // Parse "lux:" URI into recipient object, return true on successful parsing
-bool parseBitcoinURI(const QUrl& uri, SendCoinsRecipient* out);
-bool parseBitcoinURI(QString uri, SendCoinsRecipient* out);
-QString formatBitcoinURI(const SendCoinsRecipient& info);
+    bool parseBitcoinURI(const QUrl& uri, SendCoinsRecipient* out);
+    bool parseBitcoinURI(QString uri, SendCoinsRecipient* out);
+    QString formatBitcoinURI(const SendCoinsRecipient& info);
 
 // Returns true if given address+amount meets "dust" definition
-bool isDust(const QString& address, const CAmount& amount);
+    bool isDust(const QString& address, const CAmount& amount);
 
 // HTML escaping for rich text controls
-QString HtmlEscape(const QString& str, bool fMultiLine = false);
-QString HtmlEscape(const std::string& str, bool fMultiLine = false);
+    QString HtmlEscape(const QString& str, bool fMultiLine = false);
+    QString HtmlEscape(const std::string& str, bool fMultiLine = false);
 
 /** Copy a field of the currently selected entry of a view to the clipboard. Does nothing if nothing
         is selected.
@@ -63,9 +63,9 @@ QString HtmlEscape(const std::string& str, bool fMultiLine = false);
        @param[in] role    Data role to extract from the model
        @see  TransactionView::copyLabel, TransactionView::copyAmount, TransactionView::copyAddress
      */
-void copyEntryData(QAbstractItemView* view, int column, int role = Qt::EditRole);
+    void copyEntryData(QAbstractItemView* view, int column, int role = Qt::EditRole);
 
-void setClipboard(const QString& str);
+    void setClipboard(const QString& str);
 
 /** Get save filename, mimics QFileDialog::getSaveFileName, except that it appends a default suffix
         when no suffix is provided by the user.
@@ -77,7 +77,7 @@ void setClipboard(const QString& str);
       @param[out] selectedSuffixOut  Pointer to return the suffix (file type) that was selected (or 0).
                   Can be useful when choosing the save file format based on suffix.
      */
-QString getSaveFileName(QWidget* parent, const QString& caption, const QString& dir, const QString& filter, QString* selectedSuffixOut);
+    QString getSaveFileName(QWidget* parent, const QString& caption, const QString& dir, const QString& filter, QString* selectedSuffixOut);
 
 /** Get open filename, convenience wrapper for QFileDialog::getOpenFileName.
 
@@ -88,50 +88,50 @@ QString getSaveFileName(QWidget* parent, const QString& caption, const QString& 
       @param[out] selectedSuffixOut  Pointer to return the suffix (file type) that was selected (or 0).
                   Can be useful when choosing the save file format based on suffix.
      */
-QString getOpenFileName(QWidget* parent, const QString& caption, const QString& dir, const QString& filter, QString* selectedSuffixOut);
+    QString getOpenFileName(QWidget* parent, const QString& caption, const QString& dir, const QString& filter, QString* selectedSuffixOut);
 
 /** Get connection type to call object slot in GUI thread with invokeMethod. The call will be blocking.
 
        @returns If called from the GUI thread, return a Qt::DirectConnection.
                 If called from another thread, return a Qt::BlockingQueuedConnection.
     */
-Qt::ConnectionType blockingGUIThreadConnection();
+    Qt::ConnectionType blockingGUIThreadConnection();
 
 // Determine whether a widget is hidden behind other windows
-bool isObscured(QWidget* w);
+    bool isObscured(QWidget* w);
 
 // Open debug.log
-void openDebugLogfile();
+    void openDebugLogfile();
 
 // Open lux.conf
-void openConfigfile();
+    void openConfigfile();
 
 // Open masternode.conf
-void openMNConfigfile();
+    void openMNConfigfile();
 
 // Browse backup folder
-void showBackups();
+    void showBackups();
 
 // Replace invalid default fonts with known good ones
-void SubstituteFonts(const QString& language);
+    void SubstituteFonts(const QString& language);
 
 /** Qt event filter that intercepts ToolTipChange events, and replaces the tooltip with a rich text
       representation if needed. This assures that Qt can word-wrap long tooltip messages.
       Tooltips longer than the provided size threshold (in characters) are wrapped.
      */
-class ToolTipToRichTextFilter : public QObject
-{
-    Q_OBJECT
+    class ToolTipToRichTextFilter : public QObject
+    {
+        Q_OBJECT
 
-public:
-    explicit ToolTipToRichTextFilter(int size_threshold, QObject* parent = 0);
+    public:
+        explicit ToolTipToRichTextFilter(int size_threshold, QObject* parent = 0);
 
-protected:
-    bool eventFilter(QObject* obj, QEvent* evt);
+    protected:
+        bool eventFilter(QObject* obj, QEvent* evt);
 
-private:
-    int size_threshold;
-};
+    private:
+        int size_threshold;
+    };
 
 /**
      * Makes a QTableView last column feel as if it was being resized from its left border.
@@ -143,78 +143,78 @@ private:
      * This helper object takes care of this issue.
      *
      */
-class TableViewLastColumnResizingFixer : public QObject
-{
-    Q_OBJECT
+    class TableViewLastColumnResizingFixer : public QObject
+    {
+        Q_OBJECT
 
-public:
-    TableViewLastColumnResizingFixer(QTableView* table, int lastColMinimumWidth, int allColsMinimumWidth);
-    void stretchColumnWidth(int column);
+    public:
+        TableViewLastColumnResizingFixer(QTableView* table, int lastColMinimumWidth, int allColsMinimumWidth);
+        void stretchColumnWidth(int column);
 
-private:
-    QTableView* tableView;
-    int lastColumnMinimumWidth;
-    int allColumnsMinimumWidth;
-    int lastColumnIndex;
-    int columnCount;
-    int secondToLastColumnIndex;
+    private:
+        QTableView* tableView;
+        int lastColumnMinimumWidth;
+        int allColumnsMinimumWidth;
+        int lastColumnIndex;
+        int columnCount;
+        int secondToLastColumnIndex;
 
-    void adjustTableColumnsWidth();
-    int getAvailableWidthForColumn(int column);
-    int getColumnsWidth();
-    void connectViewHeadersSignals();
-    void disconnectViewHeadersSignals();
-    void setViewHeaderResizeMode(int logicalIndex, QHeaderView::ResizeMode resizeMode);
-    void resizeColumn(int nColumnIndex, int width);
+        void adjustTableColumnsWidth();
+        int getAvailableWidthForColumn(int column);
+        int getColumnsWidth();
+        void connectViewHeadersSignals();
+        void disconnectViewHeadersSignals();
+        void setViewHeaderResizeMode(int logicalIndex, QHeaderView::ResizeMode resizeMode);
+        void resizeColumn(int nColumnIndex, int width);
 
-private slots:
-    void on_sectionResized(int logicalIndex, int oldSize, int newSize);
-    void on_geometriesChanged();
-};
+    private slots:
+                void on_sectionResized(int logicalIndex, int oldSize, int newSize);
+        void on_geometriesChanged();
+    };
 
 /**
      * Extension to QTableWidgetItem that facilitates proper ordering for "DHMS"
      * strings (primarily used in the masternode's "active" listing).
      */
-class DHMSTableWidgetItem : public QTableWidgetItem
-{
-public:
-    DHMSTableWidgetItem(const int64_t seconds);
-    virtual bool operator<(QTableWidgetItem const& item) const;
+    class DHMSTableWidgetItem : public QTableWidgetItem
+    {
+    public:
+        DHMSTableWidgetItem(const int64_t seconds);
+        virtual bool operator<(QTableWidgetItem const& item) const;
 
-private:
-    // Private backing value for DHMS string, used for sorting.
-    int64_t value;
-};
+    private:
+        // Private backing value for DHMS string, used for sorting.
+        int64_t value;
+    };
 
-bool GetStartOnSystemStartup();
-bool SetStartOnSystemStartup(bool fAutoStart);
+    bool GetStartOnSystemStartup();
+    bool SetStartOnSystemStartup(bool fAutoStart);
 
 /** Save window size and position */
-void saveWindowGeometry(const QString& strSetting, QWidget* parent);
+    void saveWindowGeometry(const QString& strSetting, QWidget* parent);
 /** Restore window size and position */
-void restoreWindowGeometry(const QString& strSetting, const QSize& defaultSizeIn, QWidget* parent);
+    void restoreWindowGeometry(const QString& strSetting, const QSize& defaultSizeIn, QWidget* parent);
 
 /** Load global CSS theme */
-QString loadStyleSheet();
+    QString loadStyleSheet();
 
 /** Check whether a theme is not build-in */
-bool isExternal(QString theme);
+    bool isExternal(QString theme);
 
 /* Convert QString to OS specific boost path through UTF-8 */
-boost::filesystem::path qstringToBoostPath(const QString& path);
+    boost::filesystem::path qstringToBoostPath(const QString& path);
 
 /* Convert OS specific boost path to QString through UTF-8 */
-QString boostPathToQString(const boost::filesystem::path& path);
+    QString boostPathToQString(const boost::filesystem::path& path);
 
 /* Convert seconds into a QString with days, hours, mins, secs */
-QString formatDurationStr(int secs);
+    QString formatDurationStr(int secs);
 
 /* Format CNodeStats.nServices bitmask into a user-readable string */
-QString formatServicesStr(quint64 mask);
+    QString formatServicesStr(quint64 mask);
 
 /* Format a CNodeCombinedStats.dPingTime into a user-readable string or display N/A, if 0*/
-QString formatPingTime(double dPingTime);
+    QString formatPingTime(double dPingTime);
 
 #if defined(Q_OS_MAC) && QT_VERSION >= 0x050000
 // workaround for Qt OSX Bug:
@@ -228,8 +228,11 @@ class ProgressBar : public QProgressBar
     }
 };
 #else
-typedef QProgressBar ProgressBar;
+    typedef QProgressBar ProgressBar;
 #endif
+
+    void formatToolButtons(QToolButton* btn1, QToolButton* btn2 = 0, QToolButton* btn3 = 0);
+
 
 } // namespace GUIUtil
 
