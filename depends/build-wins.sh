@@ -42,12 +42,13 @@ cp ../src/config/condition_variable.hpp "$INCLUDE_DIR/boost/thread/win32/conditi
 # Build eth dependencies
 cd ..
 ./autogen.sh Windows $PLATFORM $INSTALL_DIR
-./configure --prefix=$PWD/depends/$PLATFORM --host=$PLATFORM --disable-tests --disable-zmq
+./configure --prefix=$PWD/depends/$PLATFORM --host=$PLATFORM --disable-tests
 
 # Build the application
-make -j4 #&& make install
+make -j$(nproc)
 
 # Remove the symbols for release
 cd $INSTALL_DIR/bin
 /usr/bin/$PLATFORM-strip *
 cd $OLD_PATH
+
