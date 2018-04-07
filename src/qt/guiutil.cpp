@@ -56,6 +56,7 @@
 #include <QSettings>
 #include <QTextDocument> // for Qt::mightBeRichText
 #include <QThread>
+#include <QToolButton>
 
 #if QT_VERSION < 0x050000
 #include <QUrl>

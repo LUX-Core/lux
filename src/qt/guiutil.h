@@ -28,6 +28,7 @@ class QFont;
 class QLineEdit;
 class QUrl;
 class QWidget;
+class QToolButton;
 QT_END_NAMESPACE
 
 /** Utility functions used by the LUX Qt UI.
