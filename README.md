@@ -78,19 +78,14 @@ The next three steps are an example of how to acquire the source in an appropria
 Once the source code is ready the build steps are below.
 
     PATH=$(echo "$PATH" | sed -e 's/:\/mnt.*//g')
-    cd depends
-    make HOST=x86_64-w64-mingw32 -j$(nproc)
-    cd ..
-    ./autogen.sh
-    CONFIG_SITE=$PWD/depends/x86_64-w64-mingw32/share/config.site
-    ./configure --prefix=`pwd`/depends/x86_64-w64-mingw32 --disable-tests
-    make HOST=x86_64-w64-mingw32 -j$(nproc)
+    cd lux/depends
+    ./build-wins.sh
 
 ### Build on Ubuntu
 
     git clone https://github.com/216k155/lux.git
 
-    cd lux    
+    cd lux
     ./install-dependencies.sh
     ./autogen.sh
     ./configure --disable-tests
