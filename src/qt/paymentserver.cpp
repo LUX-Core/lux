@@ -291,14 +291,33 @@ PaymentServer::PaymentServer(QObject* parent, bool startLocalServer) : QObject(p
     if (startLocalServer) {
         uriServer = new QLocalServer(this);
 
-        if (!uriServer->listen(name)) {
-            // constructor is called early in init, so don't use "emit message()" here
-            QMessageBox::critical(0, tr("Payment request error"),
-                tr("Cannot start lux: click-to-pay handler"));
-        } else {
-            connect(uriServer, SIGNAL(newConnection()), this, SLOT(handleURIConnection()));
-            connect(this, SIGNAL(receivedPaymentACK(QString)), this, SLOT(handlePaymentACK(QString)));
+        // In some case, it takes time to cleaning up old sokets leftover from a crash
+        // So, we need to retry it a couple of time
+        int max_tries = 20;
+
+        while (max_tries > 0)
+        {
+            if (uriServer->listen(name))
+            {
+                connect(uriServer, SIGNAL(newConnection()), this, SLOT(handleURIConnection()));
+                connect(this, SIGNAL(receivedPaymentACK(QString)), this, SLOT(handlePaymentACK(QString)));
+                return;
+            }
+
+            max_tries -= 1;
+            if ((max_tries % 5) == 0)
+            {
+                // Retry to clean up old socket leftover from a crash
+                // after 5 seconds
+                QLocalServer::removeServer(name);
+            }
+
+            MilliSleep(1000);
         }
+
+        // constructor is called early in init, so don't use "emit message()" here
+        QMessageBox::critical(0, tr("Payment request error"),
+            tr("Cannot start lux: click-to-pay handler"));
     }
 }
 
