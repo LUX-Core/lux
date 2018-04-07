@@ -37,6 +37,7 @@ cp -r "$LEVELDB_DIR/include/leveldb" "$INCLUDE_DIR"
 mkdir "$INCLUDE_DIR/leveldb/helpers"
 cp -r "$LEVELDB_DIR/helpers/memenv/memenv.h" "$INCLUDE_DIR/leveldb/helpers/memenv.h"
 cp ../src/config/implementation.hpp "$INCLUDE_DIR/boost/unordered/detail/implementation.hpp"
+cp ../src/config/condition_variable.hpp "$INCLUDE_DIR/boost/thread/win32/condition_variable.hpp"
 
 # Build eth dependencies
 cd ..
