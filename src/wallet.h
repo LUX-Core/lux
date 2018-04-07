@@ -58,6 +58,7 @@ class COutput;
 class CReserveKey;
 class CScript;
 class CWalletTx;
+class CContractBookData;
 
 /** (client) version numbers for particular wallet features */
 enum WalletFeature {
@@ -266,6 +267,8 @@ public:
 
     std::map<CTxDestination, CAddressBookData> mapAddressBook;
 
+    std::map<std::string, CContractBookData> mapContractBook;
+
     CPubKey vchDefaultKey;
 
     std::set<COutPoint> setLockedCoins;
@@ -346,6 +349,9 @@ public:
     bool EncryptWallet(const SecureString& strWalletPassphrase);
 
     void GetKeyBirthTimes(std::map<CKeyID, int64_t>& mapKeyBirth) const;
+
+    //! Adds a contract data tuple to the store, without saving it to disk
+    bool LoadContractData(const std::string &address, const std::string &key, const std::string &value);
 
     /**
      * Increment the next transaction order id
@@ -501,6 +507,10 @@ public:
 
     bool DelAddressBook(const CTxDestination& address);
 
+    bool SetContractBook(const std::string& strAddress, const std::string& strName, const std::string& strAbi);
+
+    bool DelContractBook(const std::string& strAddress);
+
     bool UpdatedTransaction(const uint256& hashTx);
 
     void Inventory(const uint256& hash)
@@ -545,6 +555,11 @@ public:
      * @note called with lock cs_wallet held.
      */
     boost::signals2::signal<void(CWallet* wallet, const uint256& hashTx, ChangeType status)> NotifyTransactionChanged;
+
+    /** Contract book entry changed. */
+    boost::signals2::signal<void (CWallet *wallet, const std::string &address,
+            const std::string &label, const std::string &abi,
+            ChangeType status)> NotifyContractBookChanged;
 
     /** Show progress e.g. for rescan */
     boost::signals2::signal<void(const std::string& title, int nProgress)> ShowProgress;
@@ -1330,5 +1345,17 @@ public:
 private:
     std::vector<char> _ssExtra;
 };
+
+/** Contract book data */
+class CContractBookData
+{
+public:
+    std::string name;
+    std::string abi;
+
+    CContractBookData()
+    {}
+};
+
 
 #endif // BITCOIN_WALLET_H
