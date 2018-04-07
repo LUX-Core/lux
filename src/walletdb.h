@@ -160,6 +160,12 @@ public:
     /// Erase destination data tuple from wallet database
     bool EraseDestData(const std::string& address, const std::string& key);
 
+    /// Write contract data key,value tuple to database
+    bool WriteContractData(const std::string &address, const std::string &key, const std::string &value);
+    /// Erase contract data tuple from wallet database
+    bool EraseContractData(const std::string &address, const std::string &key);
+
+
     bool WriteAccountingEntry(const CAccountingEntry& acentry);
     CAmount GetAccountCreditDebit(const std::string& strAccount);
     void ListAccountCreditDebit(const std::string& strAccount, std::list<CAccountingEntry>& acentries);

@@ -1021,3 +1021,15 @@ bool CWalletDB::EraseDestData(const std::string& address, const std::string& key
     nWalletDBUpdated++;
     return Erase(std::make_pair(std::string("destdata"), std::make_pair(address, key)));
 }
+
+bool CWalletDB::WriteContractData(const string &address, const string &key, const string &value)
+{
+    nWalletDBUpdated++;
+    return Write(std::make_pair(std::string("contractdata"), std::make_pair(address, key)), value);
+}
+
+bool CWalletDB::EraseContractData(const string &address, const string &key)
+{
+    nWalletDBUpdated++;
+    return Erase(std::make_pair(std::string("contractdata"), std::make_pair(address, key)));
+}
