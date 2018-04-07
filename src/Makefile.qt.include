@@ -25,11 +25,13 @@ QT_FORMS_UI = \
   qt/forms/callcontract.ui \
   qt/forms/bip38tooldialog.ui \
   qt/forms/coincontroldialog.ui \
+  qt/forms/contractbookpage.ui \
   qt/forms/contractresult.ui \
   qt/forms/createcontract.ui \
   qt/forms/blockexplorer.ui \
   qt/forms/darksendconfig.ui \
   qt/forms/editaddressdialog.ui \
+  qt/forms/editcontractinfodialog.ui \
   qt/forms/helpmessagedialog.ui \
   qt/forms/intro.ui \
   qt/forms/masternodemanager.ui \
@@ -49,6 +51,10 @@ QT_FORMS_UI = \
   qt/forms/transactiondescdialog.ui
 
 QT_MOC_CPP = \
+  qt/moc_abifunctionfield.cpp \
+  qt/moc_abiparam.cpp \
+  qt/moc_abiparamitem.cpp \
+  qt/moc_abiparamsfield.cpp \
   qt/moc_addressbookpage.cpp \
   qt/moc_addressfield.cpp \
   qt/moc_qvalidatedtextedit.cpp \
@@ -61,13 +67,19 @@ QT_MOC_CPP = \
   qt/moc_bitcoinamountfield.cpp \
   qt/moc_bitcoingui.cpp \
   qt/moc_bitcoinunits.cpp \
+  qt/moc_callcontract.cpp \
   qt/moc_blockexplorer.cpp \
   qt/moc_clientmodel.cpp \
   qt/moc_coincontroldialog.cpp \
   qt/moc_coincontroltreewidget.cpp \
+  qt/moc_contractbookpage.cpp \
+  qt/moc_contractresult.cpp \
+  qt/moc_contracttablemodel.cpp \
+  qt/moc_createcontract.cpp \
   qt/moc_csvmodelwriter.cpp \
   qt/moc_darksendconfig.cpp \
   qt/moc_editaddressdialog.cpp \
+  qt/moc_editcontractinfodialog.cpp \
   qt/moc_guiutil.cpp \
   qt/moc_intro.cpp \
   qt/moc_macdockiconhandler.cpp \
@@ -96,6 +108,7 @@ QT_MOC_CPP = \
   qt/moc_sendcoinsentry.cpp \
   qt/moc_signverifymessagedialog.cpp \
   qt/moc_splashscreen.cpp \
+  qt/moc_tabbarinfo.cpp \
   qt/moc_trafficgraphwidget.cpp \
   qt/moc_transactiondesc.cpp \
   qt/moc_transactiondescdialog.cpp \
@@ -148,9 +161,16 @@ BITCOIN_QT_H = \
   qt/clientmodel.h \
   qt/coincontroldialog.h \
   qt/coincontroltreewidget.h \
+  qt/contractabi.h \
+  qt/contractbookpage.h \
+  qt/contractresult.h \
+  qt/contracttablemodel.h \
+  qt/createcontract.h \
   qt/csvmodelwriter.h \
   qt/darksendconfig.h \
   qt/editaddressdialog.h \
+  qt/editcontractinfodialog.h \
+  qt/execrpccommand.h \
   qt/guiconstants.h \
   qt/guiutil.h \
   qt/intro.h \
@@ -183,6 +203,7 @@ BITCOIN_QT_H = \
   qt/sendcoinsentry.h \
   qt/signverifymessagedialog.h \
   qt/splashscreen.h \
+  qt/tabbarinfo.h \
   qt/trafficgraphwidget.h \
   qt/transactiondesc.h \
   qt/transactiondescdialog.h \
@@ -281,12 +302,17 @@ BITCOIN_QT_CPP = \
   qt/qvaluecombobox.cpp \
   qt/rpcconsole.cpp \
   qt/splashscreen.cpp \
+  qt/tabbarinfo.cpp \
   qt/trafficgraphwidget.cpp \
   qt/utilitydialog.cpp \
   qt/winshutdownmonitor.cpp
 
 if ENABLE_WALLET
 BITCOIN_QT_CPP += \
+  qt/abifunctionfield.cpp \
+  qt/abiparam.cpp \
+  qt/abiparamitem.cpp \
+  qt/abiparamsfield.cpp \
   qt/addressbookpage.cpp \
   qt/addressfield.cpp \
   qt/qvalidatedtextedit.cpp \
@@ -296,10 +322,18 @@ BITCOIN_QT_CPP += \
   qt/askpassphrasedialog.cpp \
   qt/bip38tooldialog.cpp \
   qt/blockexplorer.cpp \
+  qt/callcontract.cpp \
   qt/coincontroldialog.cpp \
   qt/coincontroltreewidget.cpp \
+  qt/contractabi.cpp \
+  qt/contractbookpage.cpp \
+  qt/contractresult.cpp \
+  qt/contracttablemodel.cpp \
+  qt/createcontract.cpp \
   qt/darksendconfig.cpp \
   qt/editaddressdialog.cpp \
+  qt/execrpccommand.cpp \
+  qt/editcontractinfodialog.cpp \
   qt/masternodemanager.cpp \
   qt/addeditluxnode.cpp \
   qt/luxnodeconfigdialog.cpp \

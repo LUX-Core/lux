@@ -1,50 +1,56 @@
-#ifndef CREATECONTRACT_H
-#define CREATECONTRACT_H
+#ifndef CALLCONTRACT_H
+#define CALLCONTRACT_H
 
 #include <QWidget>
 
 class WalletModel;
 class ClientModel;
+class ContractTableModel;
 class ExecRPCCommand;
 class ABIFunctionField;
 class ContractABI;
 class TabBarInfo;
 
 namespace Ui {
-    class CreateContract;
+class CallContract;
 }
 
-class CreateContract : public QWidget {
+class CallContract : public QWidget
+{
     Q_OBJECT
 
 public:
-    explicit CreateContract(QWidget *parent = 0);
-    ~CreateContract();
+    explicit CallContract(QWidget *parent = 0);
+    ~CallContract();
 
-    void setLinkLabels();
     void setClientModel(ClientModel *clientModel);
     void setModel(WalletModel *model);
-    bool isValidBytecode();
+    bool isValidContractAddress();
     bool isValidInterfaceABI();
     bool isDataValid();
+    void setContractAddress(const QString &address);
 
-public slots:
-            void on_clearAllClicked();
-    void on_createContractClicked();
+Q_SIGNALS:
+
+public Q_SLOTS:
+    void on_clearAllClicked();
+    void on_callContractClicked();
     void on_numBlocksChanged();
-    void on_updateCreateButton();
+    void on_updateCallContractButton();
     void on_newContractABI();
-
-private slots:
+    void on_saveInfoClicked();
+    void on_loadInfoClicked();
+    void on_pasteAddressClicked();
+    void on_contractAddressChanged();
 
 private:
     QString toDataHex(int func, QString& errorMessage);
 
 private:
-
-    Ui::CreateContract *ui;
+    Ui::CallContract *ui;
     WalletModel* m_model;
     ClientModel* m_clientModel;
+    ContractTableModel* m_contractModel;
     ExecRPCCommand* m_execRPCCommand;
     ABIFunctionField* m_ABIFunctionField;
     ContractABI* m_contractABI;
@@ -52,4 +58,4 @@ private:
     int m_results;
 };
 
-#endif // CREATECONTRACT_H
+#endif // CALLCONTRACT_H

@@ -5,7 +5,6 @@
 #include <QToolButton>
 #include "qvalidatedlineedit.h"
 
-class PlatformStyle;
 class ParameterABI;
 
 class ABIParamItem : public QWidget
@@ -13,7 +12,7 @@ class ABIParamItem : public QWidget
     Q_OBJECT
 public:
 
-    explicit ABIParamItem(const PlatformStyle *platformStyle, const ParameterABI &param, QWidget *parent = 0);
+    explicit ABIParamItem(const ParameterABI &param, QWidget *parent = 0);
 
     QString getValue();
     void setFixed(bool isFixed);

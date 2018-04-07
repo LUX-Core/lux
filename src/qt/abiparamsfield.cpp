@@ -1,14 +1,12 @@
 #include "abiparamsfield.h"
 #include "abiparam.h"
-#include "platformstyle.h"
 
 #include "QStringList"
 
-ABIParamsField::ABIParamsField(const PlatformStyle *platformStyle, QWidget *parent) :
+ABIParamsField::ABIParamsField( QWidget *parent) :
     QWidget(parent),
     m_mainLayout(new QVBoxLayout(this))
 {
-    m_platfromStyle = platformStyle;
     m_mainLayout->setSpacing(10);
     m_mainLayout->setContentsMargins(0,0,30,0);
     this->setLayout(m_mainLayout);
@@ -21,7 +19,7 @@ void ABIParamsField::updateParamsField(const FunctionABI &function)
     int paramId = 0;
     for(std::vector<ParameterABI>::const_iterator param = function.inputs.begin(); param != function.inputs.end(); ++param)
     {
-        ABIParam *paramFiled = new ABIParam(m_platfromStyle, paramId, *param);
+        ABIParam *paramFiled = new ABIParam(paramId, *param);
         m_listParams.append(paramFiled);
         m_mainLayout->addWidget(paramFiled);
 

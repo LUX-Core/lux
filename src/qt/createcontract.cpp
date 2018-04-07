@@ -12,7 +12,7 @@
 #include "addressfield.h"
 #include "abifunctionfield.h"
 #include "contractabi.h"
-//#include "tabbarinfo.h"
+#include "tabbarinfo.h"
 #include "contractresult.h"
 #include "sendcoinsdialog.h"
 //#include "styleSheet.h"
@@ -41,7 +41,7 @@ CreateContract::CreateContract(QWidget *parent) :
         m_execRPCCommand(0),
         m_ABIFunctionField(0),
         m_contractABI(0),
-//        m_tabInfo(0),
+        m_tabInfo(0),
         m_results(1)
 {
     // Setup ui components
@@ -53,10 +53,10 @@ CreateContract::CreateContract(QWidget *parent) :
     ui->labelBytecode->setToolTip(tr("The bytecode of the contract"));
     ui->labelSenderAddress->setToolTip(tr("The quantum address that will be used to create the contract."));
 
-#if 0
+
     m_tabInfo = new TabBarInfo(ui->stackedWidget);
     m_tabInfo->addTab(0, tr("Create Contract"));
-#endif
+
 
     // Set defaults
     ui->lineEditGasPrice->setValue(DEFAULT_GAS_PRICE);
@@ -162,7 +162,7 @@ void CreateContract::on_clearAllClicked()
     ui->lineEditGasPrice->setValue(DEFAULT_GAS_PRICE);
     ui->lineEditSenderAddress->setCurrentIndex(-1);
     ui->textEditInterface->clear();
-//    m_tabInfo->clear();
+    m_tabInfo->clear();
 }
 
 void CreateContract::on_createContractClicked()
@@ -216,8 +216,8 @@ void CreateContract::on_createContractClicked()
                 int position = ui->stackedWidget->count() - 1;
                 m_results = position == 1 ? 1 : m_results + 1;
 
-//                m_tabInfo->addTab(position, tr("Result %1").arg(m_results));
-//                m_tabInfo->setCurrent(position);
+                m_tabInfo->addTab(position, tr("Result %1").arg(m_results));
+                m_tabInfo->setCurrent(position);
             }
             else
             {

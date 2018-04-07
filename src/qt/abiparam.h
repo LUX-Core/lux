@@ -8,7 +8,6 @@
 #include "contractabi.h"
 #include "abiparamitem.h"
 
-class PlatformStyle;
 class ParameterABI;
 /**
  * @brief The ABIParam class ABI parameter widget
@@ -23,7 +22,7 @@ public:
      * @param name Name of the parameter
      * @param parent Parent windows for the GUI control
      */
-    explicit ABIParam(const PlatformStyle *platformStyle, int ID, const ParameterABI &param, QWidget *parent = 0);
+    explicit ABIParam(int ID, const ParameterABI &param, QWidget *parent = 0);
 
     /**
      * @brief getValue Get the value of the parameter
@@ -47,7 +46,6 @@ private:
     QVBoxLayout *m_paramItemsLayout;
     ParameterABI m_param;
     QList<ABIParamItem*> m_listParamItems;
-    const PlatformStyle *m_platformStyle;
     QSpacerItem *m_vSpacer;
     QSpacerItem *m_hSpacer;
 };

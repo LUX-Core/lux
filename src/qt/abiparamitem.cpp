@@ -1,11 +1,10 @@
 #include "abiparamitem.h"
 #include "contractabi.h"
-#include "platformstyle.h"
 
 #include <QHBoxLayout>
 #include <QRegularExpressionValidator>
 
-ABIParamItem::ABIParamItem(const PlatformStyle *platformStyle, const ParameterABI &param, QWidget *parent) :
+ABIParamItem::ABIParamItem(const ParameterABI &param, QWidget *parent) :
     QWidget(parent),
     m_buttonAdd(new QToolButton(this)),
     m_buttonRemove(new QToolButton(this)),
@@ -16,8 +15,8 @@ ABIParamItem::ABIParamItem(const PlatformStyle *platformStyle, const ParameterAB
     mainLayout->setSpacing(2);
     mainLayout->setContentsMargins(0,0,0,0);
 
-    m_buttonAdd->setIcon(platformStyle->MultiStatesIcon(":/icons/add", PlatformStyle::PushButton));
-    m_buttonRemove->setIcon(platformStyle->MultiStatesIcon(":/icons/remove", PlatformStyle::PushButton));
+    m_buttonAdd->setIcon(QIcon(":/icons/add"));
+    m_buttonRemove->setIcon(QIcon(":/icons/remove"));
 
     m_buttonAdd->setFixedSize(30,30);
     m_buttonRemove->setFixedSize(30,30);

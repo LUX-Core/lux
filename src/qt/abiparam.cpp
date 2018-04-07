@@ -1,19 +1,17 @@
 #include "abiparam.h"
 #include "contractabi.h"
 #include "abiparamitem.h"
-#include "platformstyle.h"
 
 #include <QHBoxLayout>
 #include <QRegularExpressionValidator>
 
-ABIParam::ABIParam(const PlatformStyle *platformStyle, int ID, const ParameterABI &param, QWidget *parent) :
+ABIParam::ABIParam( int ID, const ParameterABI &param, QWidget *parent) :
     QWidget(parent),
     m_ParamID(ID),
     m_paramName(0),
     m_mainLayout(0),
     m_paramItemsLayout(0),
     m_param(param),
-    m_platformStyle(platformStyle),
     m_vSpacer(0),
     m_hSpacer(0)
 {
@@ -54,7 +52,7 @@ ABIParam::ABIParam(const PlatformStyle *platformStyle, int ID, const ParameterAB
         {
             for(size_t i = 0; i < param.decodeType().length(); i++)
             {
-                ABIParamItem *m_paramValue = new ABIParamItem(m_platformStyle, m_param, this);
+                ABIParamItem *m_paramValue = new ABIParamItem(m_param, this);
                 m_paramValue->setFixed(true);
                 m_paramItemsLayout->addWidget(m_paramValue);
                 m_listParamItems.append(m_paramValue);
@@ -67,7 +65,7 @@ ABIParam::ABIParam(const PlatformStyle *platformStyle, int ID, const ParameterAB
     }
     else
     {
-        ABIParamItem *m_paramValue = new ABIParamItem(m_platformStyle, m_param, this);
+        ABIParamItem *m_paramValue = new ABIParamItem(m_param, this);
         m_paramValue->setFixed(true);
         m_paramItemsLayout->addWidget(m_paramValue);
         m_listParamItems.append(m_paramValue);
@@ -116,7 +114,7 @@ void ABIParam::addNewParamItem(int position)
     }
     else
     {
-        ABIParamItem *item = new ABIParamItem(m_platformStyle, m_param, this);
+        ABIParamItem *item = new ABIParamItem(m_param, this);
         m_listParamItems.insert(position, item);
         m_paramItemsLayout->insertWidget(position, item);
 
