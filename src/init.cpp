@@ -1201,11 +1201,13 @@ bool AppInit2(boost::thread_group& threadGroup)
     nCoinCacheSize = nTotalCache / 300; // coins in memory require around 300 bytes
 
     bool fLoaded = false;
-    while (!fLoaded) {
+    while (!fLoaded && !fRequestShutdown) {
         bool fReset = fReindex;
         std::string strLoadError;
 
         uiInterface.InitMessage(_("Loading block index..."));
+
+        LOCK(cs_main);
 
         nStart = GetTimeMillis();
         do {
@@ -1224,6 +1226,17 @@ bool AppInit2(boost::thread_group& threadGroup)
                 if (fReindex)
                     pblocktree->WriteReindexing(true);
 
+                if (fRequestShutdown)
+                {
+                    LogPrintf("Shutdown requested. Exiting.\n");
+                    return false;
+                }
+
+                // LoadBlockIndex will load fTxIndex from the db, or set it if
+                // we're reindexing. It will also load fHavePruned if we've
+                // ever removed a block file from disk.
+                // Note that it also sets fReindex based on the disk flag!
+                // From here on out fReindex and fReset mean something different!
                 if (!LoadBlockIndex()) {
                     strLoadError = _("Error loading block database");
                     break;
@@ -1253,7 +1266,7 @@ bool AppInit2(boost::thread_group& threadGroup)
                     break;
                 }
             } catch (std::exception& e) {
-                if (fDebug) LogPrintf("%s\n", e.what());
+                LogPrintf("%s\n", e.what());
                 strLoadError = _("Error opening block database");
                 break;
             }
@@ -1261,7 +1274,7 @@ bool AppInit2(boost::thread_group& threadGroup)
             fLoaded = true;
         } while (false);
 
-        if (!fLoaded) {
+        if (!fLoaded && !fRequestShutdown) {
             // first suggest a reindex
             if (!fReset) {
                 bool fRet = uiInterface.ThreadSafeMessageBox(
