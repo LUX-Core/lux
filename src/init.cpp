@@ -1020,8 +1020,22 @@ bool AppInit2(boost::thread_group& threadGroup)
                 // failure is ok (well, not really, but it's not worse than what we started with)
             }
 
+            int max_tries = 10;
+            bool isSuccess = false;
             // try again
-            if (!bitdb.Open(GetDataDir())) {
+            while (max_tries > 0)
+            {
+                if (bitdb.Open(GetDataDir())) {
+                    isSuccess = true;
+                    break;
+                }
+
+                max_tries--;
+                MilliSleep(300);
+            }
+
+            if (!isSuccess)
+            {
                 // if it still fails, it probably means we can't even create the database env
                 string msg = strprintf(_("Error initializing wallet database environment %s!"), strDataDir);
                 return InitError(msg);
