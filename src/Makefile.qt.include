@@ -47,6 +47,7 @@ QT_FORMS_UI = \
   qt/forms/rpcconsole.ui \
   qt/forms/sendcoinsdialog.ui \
   qt/forms/sendcoinsentry.ui \
+  qt/forms/sendtocontract.ui \
   qt/forms/signverifymessagedialog.ui \
   qt/forms/transactiondescdialog.ui
 
@@ -106,6 +107,7 @@ QT_MOC_CPP = \
   qt/moc_rpcconsole.cpp \
   qt/moc_sendcoinsdialog.cpp \
   qt/moc_sendcoinsentry.cpp \
+  qt/moc_sendtocontract.cpp \
   qt/moc_signverifymessagedialog.cpp \
   qt/moc_splashscreen.cpp \
   qt/moc_tabbarinfo.cpp \
@@ -159,6 +161,7 @@ BITCOIN_QT_H = \
   qt/bitcoinunits.h \
   qt/blockexplorer.h \
   qt/clientmodel.h \
+  qt/callcontract.h \
   qt/coincontroldialog.h \
   qt/coincontroltreewidget.h \
   qt/contractabi.h \
@@ -201,6 +204,7 @@ BITCOIN_QT_H = \
   qt/rpcconsole.h \
   qt/sendcoinsdialog.h \
   qt/sendcoinsentry.h \
+  qt/sendtocontract.h \
   qt/signverifymessagedialog.h \
   qt/splashscreen.h \
   qt/tabbarinfo.h \
@@ -352,6 +356,7 @@ BITCOIN_QT_CPP += \
   qt/recentrequeststablemodel.cpp \
   qt/sendcoinsdialog.cpp \
   qt/sendcoinsentry.cpp \
+  qt/sendtocontract.cpp \
   qt/signverifymessagedialog.cpp \
   qt/transactiondesc.cpp \
   qt/transactiondescdialog.cpp \
