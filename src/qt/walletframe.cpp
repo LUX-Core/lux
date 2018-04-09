@@ -138,12 +138,28 @@ void WalletFrame::gotoMasternodePage() // Masternode list
     for (i = mapWalletViews.constBegin(); i != mapWalletViews.constEnd(); ++i)
         i.value()->gotoMasternodePage();
 }
-void WalletFrame::gotoSmartTokenPage()
+
+void WalletFrame::gotoCreateContractPage()
 {
     QMap<QString, WalletView*>::const_iterator i;
     for (i = mapWalletViews.constBegin(); i != mapWalletViews.constEnd(); ++i)
-        i.value()->gotoSmartTokenPage();
+        i.value()->gotoCreateContractPage();
 }
+
+void WalletFrame::gotoSendToContractPage()
+{
+    QMap<QString, WalletView*>::const_iterator i;
+    for (i = mapWalletViews.constBegin(); i != mapWalletViews.constEnd(); ++i)
+        i.value()->gotoSendToContractPage();
+}
+
+void WalletFrame::gotoCallContractPage()
+{
+    QMap<QString, WalletView*>::const_iterator i;
+    for (i = mapWalletViews.constBegin(); i != mapWalletViews.constEnd(); ++i)
+        i.value()->gotoCallContractPage();
+}
+
 void WalletFrame::gotoBlockExplorerPage()
 {
     QMap<QString, WalletView*>::const_iterator i;

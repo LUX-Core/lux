@@ -92,7 +92,6 @@ private:
     QProgressDialog* progressDialog;
 
     QMenuBar* appMenuBar;
-    QAction* smartToken;
     QAction* overviewAction;
     QAction* historyAction;
     QAction* stakingAction;
@@ -127,6 +126,9 @@ private:
     QAction* openBlockExplorerAction;
     QAction* showHelpMessageAction;
     QAction* multiSendAction;
+    QAction* smartContractAction;
+    QAction* createContractAction;
+    QAction* sendToContractAction;
 
     QSystemTrayIcon* trayIcon;
     QMenu* trayIconMenu;
@@ -209,8 +211,12 @@ private slots:
     void gotoBlockExplorerPage();
     /** Switch to masternode page */
     void gotoMasternodePage();
-    /** Switch to gotoSmartTokenPage*/
-    void gotoSmartTokenPage();
+    /** Switch to create contract page */
+    void gotoCreateContractPage();
+    /** Switch to send contract page */
+    void gotoSendToContractPage();
+    /** Switch to call contract page */
+    void gotoCallContractPage();
     /** Switch to receive coins page */
     void gotoReceiveCoinsPage();
     /** Switch to send coins page */

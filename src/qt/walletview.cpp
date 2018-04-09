@@ -22,6 +22,9 @@
 #include "transactionview.h"
 #include "walletmodel.h"
 #include "tradingdialog.h"
+#include "createcontract.h"
+#include "callcontract.h"
+#include "sendtocontract.h"
 
 #include "ui_interface.h"
 
@@ -43,7 +46,9 @@ WalletView::WalletView(QWidget* parent) : QStackedWidget(parent),
     overviewPage = new OverviewPage();
     explorerWindow = new BlockExplorer(this);
     transactionsPage = new QWidget(this);
-    smartToken=new CreateContract(this);
+    createContractPage = new CreateContract(this);
+    sendToContractPage = new SendToContract(this);
+    callContractPage = new CallContract(this);
     stakingPage = new StakingDialog(this);
     tradingPage = new tradingDialog(this);
     QVBoxLayout* vbox = new QVBoxLayout();
@@ -85,7 +90,9 @@ WalletView::WalletView(QWidget* parent) : QStackedWidget(parent),
     addWidget(receiveCoinsPage);
     addWidget(sendCoinsPage);
     addWidget(explorerWindow);
-    addWidget(smartToken);   // Testing
+    addWidget(createContractPage);   // Testing
+    addWidget(sendToContractPage);   // Testing
+    addWidget(callContractPage);   // Testing
 
     QSettings settings;
     if (settings.value("fShowMasternodesTab").toBool()) {
@@ -229,10 +236,21 @@ void WalletView::gotoMasternodePage()
         setCurrentWidget(masternodeManagerPage);
     }
 }
-void WalletView::gotoSmartTokenPage()
+void WalletView::gotoCreateContractPage()
 {
-    setCurrentWidget(smartToken);       //Testing
+    setCurrentWidget(createContractPage);       //Testing
 }
+
+void WalletView::gotoSendToContractPage()
+{
+    setCurrentWidget(sendToContractPage);
+}
+
+void WalletView::gotoCallContractPage()
+{
+    setCurrentWidget(callContractPage);
+}
+
 void WalletView::gotoReceiveCoinsPage()
 {
     setCurrentWidget(receiveCoinsPage);

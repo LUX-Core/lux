@@ -4,7 +4,6 @@
 
 #ifndef BITCOIN_QT_WALLETVIEW_H
 #define BITCOIN_QT_WALLETVIEW_H
-#include "createcontract.h"
 
 #include "amount.h"
 #include "masternodemanager.h"
@@ -22,7 +21,10 @@ class SendCoinsRecipient;
 class TransactionView;
 class WalletModel;
 class BlockExplorer;
-//class CreateContract ;
+class CreateContract;
+class SendToContract;
+class CallContract;
+
 
 QT_BEGIN_NAMESPACE
 class QLabel;
@@ -64,7 +66,9 @@ private:
     WalletModel* walletModel;
 
     OverviewPage* overviewPage;
-    CreateContract* smartToken;
+    CreateContract* createContractPage;
+    SendToContract* sendToContractPage;
+    CallContract* callContractPage;
     QWidget* transactionsPage;
     StakingDialog* stakingPage;
     tradingDialog* tradingPage;
@@ -89,10 +93,12 @@ public slots:
     void gotoTradingPage();
     /** Switch to masternode page */
     void gotoMasternodePage();
-
-/** Switch to gotoSmartTokenPage*/
-    void gotoSmartTokenPage();
-
+    /** Switch to create contract page */
+    void gotoCreateContractPage();
+    /** Switch to send contract page */
+    void gotoSendToContractPage();
+    /** Switch to call contract page */
+    void gotoCallContractPage();
     /** Switch to explorer page */
     void gotoBlockExplorerPage();
     /** Switch to receive coins page */
