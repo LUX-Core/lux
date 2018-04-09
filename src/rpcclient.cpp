@@ -14,8 +14,10 @@
 #include <set>
 #include <stdint.h>
 
+#include <boost/algorithm/string/case_conv.hpp> // for to_lower()
+#include "univalue/univalue.h"
+
 using namespace std;
-using namespace json_spirit;
 
 class CRPCConvertParam
 {
@@ -72,6 +74,9 @@ static const CRPCConvertParam vRPCConvertParams[] =
         {"listunspent", 2},
         {"getblock", 1},
         {"getblockheader", 1},
+        { "getblockhashes", 0 },
+        { "getblockhashes", 1 },
+        { "getblockhashes", 2 },
         {"gettransaction", 1},
         {"getrawtransaction", 1},
         {"createrawtransaction", 0},
@@ -132,10 +137,25 @@ CRPCConvertTable::CRPCConvertTable()
 
 static CRPCConvertTable rpcCvtTable;
 
-/** Convert strings to command-specific RPC representation */
-Array RPCConvertValues(const std::string& strMethod, const std::vector<std::string>& strParams)
+
+
+/** Non-RFC4627 JSON parser, accepts internal values (such as numbers, true, false, null)
+ * as well as objects and arrays.
+ */
+UniValue ParseNonRFCJSONValue(const std::string& strVal)
 {
-    Array params;
+    UniValue jVal;
+    if (!jVal.read(std::string("[")+strVal+std::string("]")) ||
+        !jVal.isArray() || jVal.size()!=1)
+        throw runtime_error(string("Error parsing JSON:")+strVal);
+    return jVal[0];
+}
+
+
+/** Convert strings to command-specific RPC representation */
+UniValue RPCConvertValues(const std::string& strMethod, const std::vector<std::string>& strParams)
+{
+    UniValue params(UniValue::VARR);;
 
     for (unsigned int idx = 0; idx < strParams.size(); idx++) {
         const std::string& strVal = strParams[idx];
@@ -143,14 +163,9 @@ Array RPCConvertValues(const std::string& strMethod, const std::vector<std::stri
         // insert string value directly
         if (!rpcCvtTable.convert(strMethod, idx)) {
             params.push_back(strVal);
-        }
-
+        } else {
         // parse string as JSON, insert bool/number/object/etc. value
-        else {
-            Value jVal;
-            if (!read_string(strVal, jVal))
-                throw runtime_error(string("Error parsing JSON:") + strVal);
-            params.push_back(jVal);
+                params.push_back(ParseNonRFCJSONValue(strVal));
         }
     }
 

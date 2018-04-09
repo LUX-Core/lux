@@ -290,6 +290,26 @@ bool static Bind(const CService& addr, unsigned int flags)
     return true;
 }
 
+void OnRPCStopped()
+{
+    cvBlockChange.notify_all();
+    LogPrint("rpc", "RPC stopped.\n");
+}
+
+void OnRPCPreCommand(const CRPCCommand& cmd)
+{
+#ifdef ENABLE_WALLET
+    if (cmd.reqWallet && !pwalletMain)
+        throw JSONRPCError(RPC_METHOD_NOT_FOUND, "Method not found (disabled)");
+#endif
+
+    // Observe safe mode
+    string strWarning = GetWarnings("rpc");
+    if (strWarning != "" && !GetBoolArg("-disablesafemode", false) &&
+        !cmd.okSafeMode)
+        throw JSONRPCError(RPC_FORBIDDEN_BY_SAFE_MODE, string("Safe mode: ") + strWarning);
+}
+
 std::string HelpMessage(HelpMessageMode mode)
 {
     // When adding new options to the categories, please keep and ensure alphabetical ordering.
@@ -919,6 +939,8 @@ bool AppInit2(boost::thread_group& threadGroup)
      */
     if (fServer) {
         uiInterface.InitMessage.connect(SetRPCWarmupStatus);
+        RPCServer::OnStopped(&OnRPCStopped);
+        RPCServer::OnPreCommand(&OnRPCPreCommand);
         StartRPCThreads();
     }
 

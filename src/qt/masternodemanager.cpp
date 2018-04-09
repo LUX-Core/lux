@@ -16,7 +16,6 @@
 #include <boost/lexical_cast.hpp>
 #include <fstream>
 
-using namespace json_spirit;
 using namespace std;
 
 #include <QAbstractItemDelegate>
@@ -32,6 +31,7 @@ using namespace std;
 #include <QThread>
 #include <QtConcurrent/QtConcurrent>
 #include <QScrollBar>
+#include <QMessageBox>
 
 MasternodeManager::MasternodeManager(QWidget *parent) :
     QWidget(parent),
