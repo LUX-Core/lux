@@ -361,6 +361,7 @@ void BitcoinGUI::createActions(const NetworkStyle* networkStyle)
 
 #ifdef ENABLE_WALLET
 
+    masternodeAction = new QAction(QIcon(":/icons/masternodes"), tr("&Masternodes"), this);
     QSettings settings;
     if (settings.value("fShowMasternodesTab").toBool()) {
         masternodeAction->setStatusTip(tr("Browse masternodes"));
