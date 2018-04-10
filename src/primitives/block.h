@@ -54,8 +54,8 @@ public:
     void SetNull()
     {
         nVersion = 0;
-        hashPrevBlock.SetNull();
-        hashMerkleRoot.SetNull();
+        hashPrevBlock = 0;
+        hashMerkleRoot = 0;
         nTime = 0;
         nBits = 0;
         nNonce = 0;
@@ -104,7 +104,6 @@ public:
     template <typename Stream, typename Operation>
     inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion) {
         READWRITE(*(CBlockHeader*)this);
-#       if 1
         if (!(nType & SER_GETHASH)) {
             READWRITE(vtx);
             READWRITE(vchBlockSig);
@@ -112,11 +111,6 @@ public:
             const_cast<CBlock*>(this)->vtx.clear();
             const_cast<CBlock*>(this)->vchBlockSig.clear();
         }
-#       else
-        READWRITE(vtx);
-	if(vtx.size() > 1 && vtx[1].IsCoinStake())
-            READWRITE(vchBlockSig);
-#       endif
     }
 
     void SetNull()
@@ -198,5 +192,8 @@ struct CBlockLocator
         return vHave.empty();
     }
 };
+
+/** Compute the consensus-critical block cost (see BIP 141). */
+int64_t GetBlockCost(const CBlock& tx);
 
 #endif // BITCOIN_PRIMITIVES_BLOCK_H

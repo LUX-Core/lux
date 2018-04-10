@@ -258,6 +258,11 @@ public:
     inline CScriptNum& operator+=( const CScriptNum& rhs)       { return operator+=(rhs.m_value);  }
     inline CScriptNum& operator-=( const CScriptNum& rhs)       { return operator-=(rhs.m_value);  }
 
+    inline CScriptNum operator&(   const int64_t& rhs)    const { return CScriptNum(m_value & rhs);}
+    inline CScriptNum operator&(   const CScriptNum& rhs) const { return operator&(rhs.m_value);   }
+
+    inline CScriptNum& operator&=( const CScriptNum& rhs)       { return operator&=(rhs.m_value);  }
+
     inline CScriptNum operator-()                         const
     {
         assert(m_value != std::numeric_limits<int64_t>::min());
@@ -283,6 +288,12 @@ public:
         assert(rhs == 0 || (rhs > 0 && m_value >= std::numeric_limits<int64_t>::min() + rhs) ||
                            (rhs < 0 && m_value <= std::numeric_limits<int64_t>::max() + rhs));
         m_value -= rhs;
+        return *this;
+    }
+
+    inline CScriptNum& operator&=( const int64_t& rhs)
+    {
+        m_value &= rhs;
         return *this;
     }
 
@@ -387,16 +398,10 @@ protected:
     }
 public:
     CScript() { }
+    CScript(const CScript& b) : CScriptBase(b.begin(), b.end()) { }
     CScript(const_iterator pbegin, const_iterator pend) : CScriptBase(pbegin, pend) { }
     CScript(std::vector<unsigned char>::const_iterator pbegin, std::vector<unsigned char>::const_iterator pend) : CScriptBase(pbegin, pend) { }
     CScript(const unsigned char* pbegin, const unsigned char* pend) : CScriptBase(pbegin, pend) { }
-
-    ADD_SERIALIZE_METHODS;
-
-    template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action) {
-        READWRITE(static_cast<CScriptBase&>(*this));
-    }
 
     CScript& operator+=(const CScript& b)
     {
@@ -645,10 +650,11 @@ public:
      */
     bool IsUnspendable() const
     {
-        return (size() > 0 && *begin() == OP_RETURN || (size() > MAX_SCRIPT_SIZE);
+        return ((size() > 0 && *begin() == OP_RETURN) || (size() > MAX_SCRIPT_SIZE));
     }
 
     std::string ToString() const;
+
     void clear()
     {
         CScriptBase::clear();
@@ -670,6 +676,15 @@ struct CScriptWitness
     void SetNull() { stack.clear(); stack.shrink_to_fit(); }
 
     std::string ToString() const;
+};
+
+class CReserveScript
+{
+public:
+    CScript reserveScript;
+    virtual void KeepScript() {}
+    CReserveScript() {}
+    virtual ~CReserveScript() {}
 };
 
 #endif // BITCOIN_SCRIPT_SCRIPT_H

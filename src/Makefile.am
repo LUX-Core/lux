@@ -121,6 +121,7 @@ BITCOIN_CORE_H = \
   net.h \
   noui.h \
   pow.h \
+  prevector.h \
   protocol.h \
   pubkey.h \
   random.h \
@@ -151,6 +152,7 @@ BITCOIN_CORE_H = \
   utiltime.h \
   validationinterface.h \
   version.h \
+  versionbits.h \
   wallet.h \
   wallet_ismine.h \
   walletdb.h \
@@ -194,6 +196,7 @@ libbitcoin_server_a_SOURCES = \
   txdb.cpp \
   txmempool.cpp \
   validationinterface.cpp \
+  versionbits.cpp \
   $(BITCOIN_CORE_H)
 
 if ENABLE_ZMQ

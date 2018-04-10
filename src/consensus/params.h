@@ -8,6 +8,28 @@
 #include "uint256.h"
 
 namespace Consensus {
+
+    enum DeploymentPos
+    {
+        DEPLOYMENT_TESTDUMMY,
+        DEPLOYMENT_CSV, // Deployment of BIP68, BIP112, and BIP113.
+        DEPLOYMENT_SEGWIT, // Deployment of BIP141 and BIP143
+        // NOTE: Also add new deployments to VersionBitsDeploymentInfo in versionbits.cpp
+        MAX_VERSION_BITS_DEPLOYMENTS
+    };
+
+    /**
+     * Struct for each individual consensus rule change using BIP9.
+     */
+    struct BIP9Deployment {
+        /** Bit position to select the particular bit in nVersion. */
+        int bit;
+        /** Start MedianTime for version bits miner confirmation. Can be a date in the past */
+        int64_t nStartTime;
+        /** Timeout/expiry MedianTime for the deployment attempt. */
+        int64_t nTimeout;
+    };
+
     /**
      * Parameters that influence chain consensus.
      */
