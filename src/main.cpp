@@ -26,7 +26,7 @@
 #include "util.h"
 #include "utilmoneystr.h"
 
-#include <univalue.h>
+#include "univalue/univalue.h"
 #include <sstream>
 
 #include <boost/algorithm/string/replace.hpp>

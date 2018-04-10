@@ -6,7 +6,7 @@
 #include <vector>
 #include <string>
 #include <map>
-#include <univalue.h>
+#include "univalue/univalue.h"
 
 #include <boost/test/unit_test.hpp>
 

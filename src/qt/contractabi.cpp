@@ -1,5 +1,5 @@
 #include "contractabi.h"
-#include "univalue.h"
+#include "univalue/univalue.h"
 #include "libethcore/ABI.h"
 #include <math.h>
 

@@ -1,7 +1,7 @@
 #include "execrpccommand.h"
 #include "rpcconsole.h"
 #include <QJsonDocument>
-#include <univalue.h>
+#include "univalue/univalue.h"
 
 ExecRPCCommand::ExecRPCCommand(const QString &command, const QStringList &mandatory, const QStringList &optional, const QMap<QString, QString>& translations, QObject *parent)
     : QObject(parent)
