@@ -92,8 +92,6 @@ BITCOIN_CORE_H = \
   coincontrol.h \
   coins.h \
   compat.h \
-  compat/byteswap.h \
-  compat/endian.h \
   compat/sanity.h \
   compressor.h \
   consensus/params.h \
@@ -123,7 +121,6 @@ BITCOIN_CORE_H = \
   net.h \
   noui.h \
   pow.h \
-  prevector.h \
   protocol.h \
   pubkey.h \
   random.h \
@@ -424,7 +421,6 @@ libbitcoinconsensus_la_SOURCES = \
   script/script.cpp \
   script/interpreter.cpp \
   script/bitcoinconsensus.cpp \
-  span.h \
   uint256.cpp \
   utilstrencodings.cpp
 
