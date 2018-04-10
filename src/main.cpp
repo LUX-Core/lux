@@ -1760,8 +1760,9 @@ CAmount GetMasternodePayment(int nHeight, int64_t blockValue, int nMasternodeCou
 
 bool IsInitialBlockDownload()
 {
+    const CChainParams& chainParams = Params();
     LOCK(cs_main);
-    if (fImporting || fReindex || chainActive.Height() < Checkpoints::GetTotalBlocksEstimate())
+    if (fImporting || fReindex || chainActive.Height() < Checkpoints::GetTotalBlocksEstimate(chainParams.Checkpoints()))
         return true;
     static bool lockIBDState = false;
     if (lockIBDState)
@@ -1938,7 +1939,21 @@ bool CheckInputs(const CTransaction& tx, CValidationState& state, const CCoinsVi
 
         // While checking, GetBestBlock() refers to the parent block.
         // This is also true for mempool checks.
-        CBlockIndex* pindexPrev = mapBlockIndex.find(inputs.GetBestBlock())->second;
+
+        BlockMap::iterator mi = mapBlockIndex.find(inputs.GetBestBlock());
+        if (mi == mapBlockIndex.end())
+        {
+            LogPrintf("%s (line %d): Cannot find best block\n", __FUNCTION__, __LINE__);
+            return state.Invalid(error("Cannot find best block"));
+        }
+
+        CBlockIndex* pindexPrev = mi->second;
+        if (!pindexPrev)
+        {
+            LogPrintf("%s (line %d): Cannot find the parent of current best block\n", __FUNCTION__, __LINE__);
+            return state.Invalid(error("Cannot find the parent of current best block"));
+        }
+
         int nSpendHeight = pindexPrev->nHeight + 1;
         CAmount nValueIn = 0;
         CAmount nFees = 0;
@@ -2184,6 +2199,7 @@ static int64_t nTimeTotal = 0;
 
 bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pindex, CCoinsViewCache& view, bool fJustCheck)
 {
+    const CChainParams& chainParams = Params();
     AssertLockHeld(cs_main);
 
     ///////////////////////////////////////////////// // lux
@@ -2236,7 +2252,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
         return state.DoS(100, error("%s: PoW period ended", __func__),
                          REJECT_INVALID, "PoW-ended");
 
-    bool fScriptChecks = pindex->nHeight >= Checkpoints::GetTotalBlocksEstimate();
+    bool fScriptChecks = pindex->nHeight >= Checkpoints::GetTotalBlocksEstimate(chainParams.Checkpoints());
 
     // Do not allow blocks that contain transactions which 'overwrite' older transactions,
     // unless those are already completely spent.
@@ -2654,60 +2670,60 @@ static bool FlushStateToDisk(CValidationState& state, FlushStateMode mode)
 
     while (retries > 0)
     {
-        bool isExceptionOccured = false;
-        try {
-            if ((mode == FLUSH_STATE_ALWAYS) ||
-                ((mode == FLUSH_STATE_PERIODIC || mode == FLUSH_STATE_IF_NEEDED) && pcoinsTip->GetCacheSize() > nCoinCacheSize) ||
-                (mode == FLUSH_STATE_PERIODIC && GetTimeMicros() > nLastWrite + DATABASE_WRITE_INTERVAL * 1000000)) {
-                // Typical CCoins structures on disk are around 100 bytes in size.
-                // Pushing a new one to the database can cause it to be written
-                // twice (once in the log, and once in the tables). This is already
-                // an overestimation, as most will delete an existing entry or
-                // overwrite one. Still, use a conservative safety factor of 2.
-                if (!CheckDiskSpace(100 * 2 * 2 * pcoinsTip->GetCacheSize()))
-                    return state.Error("out of disk space");
-                // First make sure all block and undo data is flushed to disk.
-                FlushBlockFile();
-                // Then update all block file information (which may refer to block and undo files).
-                bool fileschanged = false;
-                for (set<int>::iterator it = setDirtyFileInfo.begin(); it != setDirtyFileInfo.end();) {
-                    if (!pblocktree->WriteBlockFileInfo(*it, vinfoBlockFile[*it])) {
-                        return state.Abort("Failed to write to block index");
-                    }
-                    fileschanged = true;
-                    setDirtyFileInfo.erase(it++);
-                }
-                if (fileschanged && !pblocktree->WriteLastBlockFile(nLastBlockFile)) {
-                    return state.Abort("Failed to write to block index");
-                }
-                for (set<CBlockIndex*>::iterator it = setDirtyBlockIndex.begin(); it != setDirtyBlockIndex.end();) {
-                    if (!pblocktree->WriteBlockIndex(CDiskBlockIndex(*it))) {
-                        return state.Abort("Failed to write to block index");
-                    }
-                    setDirtyBlockIndex.erase(it++);
-                }
-                pblocktree->Sync();
-                // Finally flush the chainstate (which may refer to block index entries).
-                if (!pcoinsTip->Flush())
-                    return state.Abort("Failed to write to coin database");
-                // Update best block in wallet (so we can detect restored wallets).
-                if (mode != FLUSH_STATE_IF_NEEDED) {
-                    g_signals.SetBestChain(chainActive.GetLocator());
-                }
-                nLastWrite = GetTimeMicros();
-            }
-        } catch (const std::runtime_error& e) {
-            isExceptionOccured = true;
+		bool isExceptionOccured = false;
+		try {
+		    if ((mode == FLUSH_STATE_ALWAYS) ||
+		        ((mode == FLUSH_STATE_PERIODIC || mode == FLUSH_STATE_IF_NEEDED) && pcoinsTip->GetCacheSize() > nCoinCacheSize) ||
+		        (mode == FLUSH_STATE_PERIODIC && GetTimeMicros() > nLastWrite + DATABASE_WRITE_INTERVAL * 1000000)) {
+		        // Typical CCoins structures on disk are around 100 bytes in size.
+		        // Pushing a new one to the database can cause it to be written
+		        // twice (once in the log, and once in the tables). This is already
+		        // an overestimation, as most will delete an existing entry or
+		        // overwrite one. Still, use a conservative safety factor of 2.
+		        if (!CheckDiskSpace(100 * 2 * 2 * pcoinsTip->GetCacheSize()))
+		            return state.Error("out of disk space");
+		        // First make sure all block and undo data is flushed to disk.
+		        FlushBlockFile();
+		        // Then update all block file information (which may refer to block and undo files).
+		        bool fileschanged = false;
+		        for (set<int>::iterator it = setDirtyFileInfo.begin(); it != setDirtyFileInfo.end();) {
+		            if (!pblocktree->WriteBlockFileInfo(*it, vinfoBlockFile[*it])) {
+		                return state.Abort("Failed to write to block index");
+		            }
+		            fileschanged = true;
+		            setDirtyFileInfo.erase(it++);
+		        }
+		        if (fileschanged && !pblocktree->WriteLastBlockFile(nLastBlockFile)) {
+		            return state.Abort("Failed to write to block index");
+		        }
+		        for (set<CBlockIndex*>::iterator it = setDirtyBlockIndex.begin(); it != setDirtyBlockIndex.end();) {
+		            if (!pblocktree->WriteBlockIndex(CDiskBlockIndex(*it))) {
+		                return state.Abort("Failed to write to block index");
+		            }
+		            setDirtyBlockIndex.erase(it++);
+		        }
+		        pblocktree->Sync();
+		        // Finally flush the chainstate (which may refer to block index entries).
+		        if (!pcoinsTip->Flush())
+		            return state.Abort("Failed to write to coin database");
+		        // Update best block in wallet (so we can detect restored wallets).
+		        if (mode != FLUSH_STATE_IF_NEEDED) {
+		            g_signals.SetBestChain(chainActive.GetLocator());
+		        }
+		        nLastWrite = GetTimeMicros();
+		    }
+		} catch (const std::runtime_error& e) {
+		    isExceptionOccured = true;
 
-            strErr = strprintf("System error while flushing: %s", e.what());
-            LogPrintf("%s\n", strErr);
-        }
+		    strErr = strprintf("System error while flushing: %s", e.what());
+		    LogPrintf("%s\n", strErr);
+		}
 
-        if (!isExceptionOccured)
-        {
-            return true;
-        }
-        retries--;
+		if (!isExceptionOccured)
+		{
+			return true;
+		}
+		retries--;
     }
 
     return state.Abort(strErr);
@@ -2722,6 +2738,7 @@ void FlushStateToDisk()
 /** Update chainActive and related internal data structures. */
 void static UpdateTip(CBlockIndex* pindexNew)
 {
+    const CChainParams& chainParams = Params();
     chainActive.SetTip(pindexNew);
 
     // New best block
@@ -2729,9 +2746,9 @@ void static UpdateTip(CBlockIndex* pindexNew)
     mempool.AddTransactionsUpdated(1);
 
     LogPrintf("UpdateTip: new best=%s  height=%d  log2_work=%.8g  tx=%lu  date=%s progress=%f  cache=%u\n",
-              chainActive.Tip()->GetBlockHash().ToString(), chainActive.Height(), log(chainActive.Tip()->nChainWork.getdouble()) / log(2.0), (unsigned long)chainActive.Tip()->nChainTx,
-              DateTimeStrFormat("%Y-%m-%d %H:%M:%S", chainActive.Tip()->GetBlockTime()),
-              Checkpoints::GuessVerificationProgress(chainActive.Tip()), (unsigned int)pcoinsTip->GetCacheSize());
+        chainActive.Tip()->GetBlockHash().ToString(), chainActive.Height(), log(chainActive.Tip()->nChainWork.getdouble()) / log(2.0), (unsigned long)chainActive.Tip()->nChainTx,
+        DateTimeStrFormat("%Y-%m-%d %H:%M:%S", chainActive.Tip()->GetBlockTime()),
+        Checkpoints::GuessVerificationProgress(chainParams.Checkpoints(), chainActive.Tip()), (unsigned int)pcoinsTip->GetCacheSize());
 
     cvBlockChange.notify_all();
 
@@ -3112,6 +3129,7 @@ static bool ActivateBestChainStep(CValidationState& state, CBlockIndex* pindexMo
  */
 bool ActivateBestChain(CValidationState& state, CBlock* pblock)
 {
+    const CChainParams& chainParams = Params();
     CBlockIndex* pindexNewTip = NULL;
     CBlockIndex* pindexMostWork = NULL;
     do {
@@ -3144,7 +3162,7 @@ bool ActivateBestChain(CValidationState& state, CBlock* pblock)
         if (!fInitialDownload) {
             uint256 hashNewTip = pindexNewTip->GetBlockHash();
             // Relay inventory, but don't relay old inventory during initial block download.
-            int nBlockEstimate = Checkpoints::GetTotalBlocksEstimate();
+            int nBlockEstimate = Checkpoints::GetTotalBlocksEstimate(chainParams.Checkpoints());
             {
                 LOCK(cs_vNodes);
                 BOOST_FOREACH (CNode* pnode, vNodes)
@@ -3285,7 +3303,7 @@ CBlockIndex* AddToBlockIndex(const CBlock& block)
         uint64_t nStakeModifier = 0;
         bool fGeneratedStakeModifier = false;
         if (!stake->ComputeNextModifier(pindexNew->pprev, nStakeModifier, fGeneratedStakeModifier))
-            LogPrintf("%s: ComputeNextStakeModifier() failed \n", __func__);
+            LogPrintf("%s: ComputeNextModifier() failed \n", __func__);
 
         pindexNew->SetStakeModifier(nStakeModifier, fGeneratedStakeModifier);
         pindexNew->nStakeModifierChecksum = stake->GetModifierChecksum(pindexNew);
@@ -3540,6 +3558,10 @@ bool CheckBlock(const CBlock& block, CValidationState& state, bool fCheckPOW, bo
 
 bool CheckWork(const CBlock &block, CBlockIndex* const pindexPrev)
 {
+#if 0
+    const CChainParams& chainParams = Params();
+    const Consensus::Params& consensusParams = chainParams.GetConsensus();
+#endif
     if (pindexPrev == NULL)
         return error("%s: null pindexPrev for block %s", __func__, block.GetHash().GetHex());
 
@@ -3580,6 +3602,7 @@ bool CheckWork(const CBlock &block, CBlockIndex* const pindexPrev)
 
 bool ContextualCheckBlockHeader(const CBlockHeader& block, CValidationState& state, CBlockIndex* const pindexPrev)
 {
+    const CChainParams& chainParams = Params();
     uint256 hash = block.GetHash();
 
     if (hash == Params().HashGenesisBlock())
@@ -3601,12 +3624,12 @@ bool ContextualCheckBlockHeader(const CBlockHeader& block, CValidationState& sta
 //    }
 
     // Check that the block chain matches the known block chain up to a checkpoint
-    if (!Checkpoints::CheckBlock(nHeight, hash))
+    if (!Checkpoints::CheckBlock(chainParams.Checkpoints(), nHeight, hash))
         return state.DoS(100, error("%s : rejected by checkpoint lock-in at %d", __func__, nHeight),
                          REJECT_CHECKPOINT, "checkpoint mismatch");
 
     // Don't accept any forks from the main chain prior to last checkpoint
-    CBlockIndex* pcheckpoint = Checkpoints::GetLastCheckpoint();
+    CBlockIndex* pcheckpoint = Checkpoints::GetLastCheckpoint(chainParams.Checkpoints());
     if (pcheckpoint && nHeight < pcheckpoint->nHeight)
         return state.DoS(0, error("%s : forked chain older than last checkpoint (height %d)", __func__, nHeight));
 /*
@@ -4016,6 +4039,7 @@ CBlockIndex* InsertBlockIndex(uint256 hash)
 
 bool static LoadBlockIndexDB()
 {
+    const CChainParams& chainparams = Params();
     if (!pblocktree->LoadBlockIndexGuts())
         return false;
 
@@ -4193,9 +4217,9 @@ bool static LoadBlockIndexDB()
     PruneBlockIndexCandidates();
 
     LogPrintf("%s: hashBestChain=%s height=%d date=%s progress=%f\n", __func__,
-              chainActive.Tip()->GetBlockHash().ToString(), chainActive.Height(),
-              DateTimeStrFormat("%Y-%m-%d %H:%M:%S", chainActive.Tip()->GetBlockTime()),
-              Checkpoints::GuessVerificationProgress(chainActive.Tip()));
+        chainActive.Tip()->GetBlockHash().ToString(), chainActive.Height(),
+        DateTimeStrFormat("%Y-%m-%d %H:%M:%S", chainActive.Tip()->GetBlockTime()),
+        Checkpoints::GuessVerificationProgress(chainparams.Checkpoints(), chainActive.Tip()));
 
     return true;
 }

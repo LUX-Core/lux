@@ -103,7 +103,18 @@ bool CDBEnv::Open(const boost::filesystem::path& pathIn)
             nEnvFlags,
         S_IRUSR | S_IWUSR);
     if (ret != 0)
+    {
+        LogPrintf("CDBEnv::Open : Error %d opening database environment: %s\n", ret, DbEnv::strerror(ret));
+
+        // According to Berkeley DB specification, we must call dbenv.close() method on failure
+        int ret = dbenv.close(0);
+        if (ret != 0)
+        {
+            LogPrintf("CDBEnv::Open : Error %d shutting down database environment: %s\n", ret, DbEnv::strerror(ret));
+        }
+
         return error("CDBEnv::Open : Error %d opening database environment: %s\n", ret, DbEnv::strerror(ret));
+    }
 
     fDbEnvInit = true;
     fMockDb = false;
@@ -135,8 +146,18 @@ void CDBEnv::MakeMock()
             DB_THREAD |
             DB_PRIVATE,
         S_IRUSR | S_IWUSR);
-    if (ret > 0)
+    if (ret != 0)
+    {
+        LogPrintf("CDBEnv::MakeMock : Error %d opening database environment: %s\n", ret, DbEnv::strerror(ret));
+
+        // According to Berkeley DB specification, we must call dbenv.close() method on failure
+        int ret = dbenv.close(0);
+        if (ret != 0)
+        {
+            LogPrintf("CDBEnv::MakeMock : Error %d shutting down database environment: %s\n", ret, DbEnv::strerror(ret));
+        }
         throw runtime_error(strprintf("CDBEnv::MakeMock : Error %d opening database environment.", ret));
+    }
 
     fDbEnvInit = true;
     fMockDb = true;

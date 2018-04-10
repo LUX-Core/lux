@@ -155,7 +155,7 @@ class FrameworkInfo(object):
 class ApplicationBundleInfo(object):
     def __init__(self, path):
         self.path = path
-        appName = "LUX-Qt"
+        appName = "lux-qt"
         self.binaryPath = os.path.join(path, "Contents", "MacOS", appName)
         if not os.path.exists(self.binaryPath):
             raise RuntimeError("Could not find bundle binary for " + path)
@@ -215,6 +215,9 @@ def getFrameworks(binaryPath, verbose):
     otoolLines.pop(0) # First line is the inspected binary
     if ".framework" in binaryPath or binaryPath.endswith(".dylib"):
         otoolLines.pop(0) # Frameworks and dylibs list themselves as a dependency.
+
+    # Need to add a dylib file here that macdeployqtplus doesn't catch otherwise.
+    otoolLines.append("/usr/local/Cellar/boost@1.57/1.57.0/lib/libboost_system-mt.dylib (compatibility version 0.0.0, current version 0.0.0)")
 
     libraries = []
     for line in otoolLines:
@@ -475,12 +478,9 @@ Plugins=PlugIns
 """
 
 ap = ArgumentParser(description="""Improved version of macdeployqt.
-
 Outputs a ready-to-deploy app in a folder "dist" and optionally wraps it in a .dmg file.
 Note, that the "dist" folder will be deleted before deploying on each run.
-
 Optionally, Qt translation files (.qm) and additional resources can be added to the bundle.
-
 Also optionally signs the .app bundle; set the CODESIGNARGS environment variable to pass arguments
 to the codesign tool.
 E.g. CODESIGNARGS='--sign "Developer ID Application: ..." --keychain /encrypted/foo.keychain'""")
@@ -604,7 +604,7 @@ else:
 
 # ------------------------------------------------
 
-target = os.path.join("dist", "LUX-Qt.app")
+target = os.path.join("dist", "lux-qt.app")
 
 if verbose >= 2:
     print("+ Copying source bundle +")
@@ -695,7 +695,7 @@ if len(config.add_resources) > 0 and verbose >= 2:
     print("+ Adding additional resources +")
 
 for p in config.add_resources:
-    t = os.path.join(applicationBundle.path, "Contents", "Frameworks")
+    t = os.path.join(applicationBundle.resourcesPath, os.path.basename(p))
     if verbose >= 3:
         print(p, "->", t)
     if os.path.isdir(p):

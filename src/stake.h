@@ -70,6 +70,11 @@ public:
     //!<DuzyDoc>: Stake::Pointer() - returns the staking pointer
     static Stake *Pointer();
     
+    static int64_t GetStakeCombineThreshold()
+    {
+        return 100;
+    }
+
     //!<DuzyDoc>: Stake::ComputeNextModifier - compute the hash modifier for proof-of-stake
     bool ComputeNextModifier(const CBlockIndex* pindexPrev, uint64_t& nStakeModifier, bool& fGeneratedStakeModifier);
 

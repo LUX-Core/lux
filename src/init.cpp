@@ -297,6 +297,26 @@ bool static Bind(const CService& addr, unsigned int flags)
     return true;
 }
 
+void OnRPCStopped()
+{
+    cvBlockChange.notify_all();
+    LogPrint("rpc", "RPC stopped.\n");
+}
+
+void OnRPCPreCommand(const CRPCCommand& cmd)
+{
+#ifdef ENABLE_WALLET
+    if (cmd.reqWallet && !pwalletMain)
+        throw JSONRPCError(RPC_METHOD_NOT_FOUND, "Method not found (disabled)");
+#endif
+
+    // Observe safe mode
+    string strWarning = GetWarnings("rpc");
+    if (strWarning != "" && !GetBoolArg("-disablesafemode", false) &&
+        !cmd.okSafeMode)
+        throw JSONRPCError(RPC_FORBIDDEN_BY_SAFE_MODE, string("Safe mode: ") + strWarning);
+}
+
 std::string HelpMessage(HelpMessageMode mode)
 {
     // When adding new options to the categories, please keep and ensure alphabetical ordering.
@@ -385,6 +405,16 @@ std::string HelpMessage(HelpMessageMode mode)
         strUsage += "  -windowtitle=<name>  " + _("Wallet window title") + "\n";
     strUsage += "  -zapwallettxes=<mode>    " + _("Delete all wallet transactions and only recover those parts of the blockchain through -rescan on startup") + "\n";
     strUsage += "                           " + _("(1 = keep tx meta data e.g. account owner and payment request information, 2 = drop tx meta data)") + "\n";
+#endif
+
+#if ENABLE_ZMQ
+    strUsage += "\n" + _("ZeroMQ notification options:")+ "\n";
+    strUsage += "  -zmqpubhashblock=<address>" + _("Enable publish hash block in <address>") + "\n";
+    strUsage += "  -zmqpubhashtx=<address>  " + _("Enable publish hash transaction in <address>") + "\n";
+    strUsage += "  -zmqpubhashtxlock=<address>  " + _("Enable publish hash transaction (locked via InstanTX) in <address>") + "\n";
+    strUsage += "  -zmqpubrawblock=<address>  " + _("Enable publish raw block in <address>") + "\n";
+    strUsage += "  -zmqpubrawtx=<address>  " + _("Enable publish raw transaction in <address>") + "\n";
+    strUsage += "  -zmqpubrawtxlock=<address>  " + _("Enable publish raw transaction (locked via InstanTX) in <address>") + "\n";
 #endif
 
     strUsage += "\n" + _("Debugging/Testing options:") + "\n";
@@ -922,6 +952,8 @@ bool AppInit2(boost::thread_group& threadGroup)
      */
     if (fServer) {
         uiInterface.InitMessage.connect(SetRPCWarmupStatus);
+        RPCServer::OnStopped(&OnRPCStopped);
+        RPCServer::OnPreCommand(&OnRPCPreCommand);
         StartRPCThreads();
     }
 
@@ -1023,8 +1055,22 @@ bool AppInit2(boost::thread_group& threadGroup)
                 // failure is ok (well, not really, but it's not worse than what we started with)
             }
 
+            int max_tries = 10;
+            bool isSuccess = false;
             // try again
-            if (!bitdb.Open(GetDataDir())) {
+            while (max_tries > 0)
+            {
+                if (bitdb.Open(GetDataDir())) {
+                    isSuccess = true;
+                    break;
+                }
+
+                max_tries--;
+                MilliSleep(300);
+            }
+
+            if (!isSuccess)
+            {
                 // if it still fails, it probably means we can't even create the database env
                 string msg = strprintf(_("Error initializing wallet database environment %s!"), strDataDir);
                 return InitError(msg);
@@ -1204,11 +1250,13 @@ bool AppInit2(boost::thread_group& threadGroup)
     nCoinCacheSize = nTotalCache / 300; // coins in memory require around 300 bytes
 
     bool fLoaded = false;
-    while (!fLoaded) {
+    while (!fLoaded && !fRequestShutdown) {
         bool fReset = fReindex;
         std::string strLoadError;
 
         uiInterface.InitMessage(_("Loading block index..."));
+
+        LOCK(cs_main);
 
         nStart = GetTimeMillis();
         do {
@@ -1232,6 +1280,17 @@ bool AppInit2(boost::thread_group& threadGroup)
                     pblocktree->WriteReindexing(true);
                 }
 
+                if (fRequestShutdown)
+                {
+                    LogPrintf("Shutdown requested. Exiting.\n");
+                    return false;
+                }
+
+                // LoadBlockIndex will load fTxIndex from the db, or set it if
+                // we're reindexing. It will also load fHavePruned if we've
+                // ever removed a block file from disk.
+                // Note that it also sets fReindex based on the disk flag!
+                // From here on out fReindex and fReset mean something different!
                 if (!LoadBlockIndex()) {
                     strLoadError = _("Error loading block database");
                     break;
@@ -1319,7 +1378,7 @@ bool AppInit2(boost::thread_group& threadGroup)
                     break;
                 }
             } catch (std::exception& e) {
-                if (fDebug) LogPrintf("%s\n", e.what());
+                LogPrintf("%s\n", e.what());
                 strLoadError = _("Error opening block database");
                 break;
             }
@@ -1327,7 +1386,7 @@ bool AppInit2(boost::thread_group& threadGroup)
             fLoaded = true;
         } while (false);
 
-        if (!fLoaded) {
+        if (!fLoaded && !fRequestShutdown) {
             // first suggest a reindex
             if (!fReset) {
                 bool fRet = uiInterface.ThreadSafeMessageBox(

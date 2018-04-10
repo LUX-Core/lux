@@ -1,17 +1,9 @@
-DIST_SUBDIRS = secp256k1 univalue
+DIST_SUBDIRS = secp256k1
 AM_LDFLAGS = $(PTHREAD_CFLAGS) $(LIBTOOL_LDFLAGS)
 AM_CXXFLAGS = $(HARDENED_CXXFLAGS) $(ERROR_CXXFLAGS) -DETH_FATDB=1
 AM_CPPFLAGS = $(HARDENED_CPPFLAGS) -DLUX_BUILD
 EXTRA_LIBRARIES =
 
-if EMBEDDED_UNIVALUE
-LIBUNIVALUE = univalue/libunivalue.la
-
-$(LIBUNIVALUE): $(wildcard univalue/lib/*) $(wildcard univalue/include/*)
-	$(AM_V_at)$(MAKE) $(AM_MAKEFLAGS) -C $(@D) $(@F)
-else
-LIBUNIVALUE = $(UNIVALUE_LIBS)
-endif
 
 if EMBEDDED_LEVELDB
 LEVELDB_CPPFLAGS += -I$(srcdir)/leveldb/include
@@ -32,7 +24,6 @@ BITCOIN_CONFIG_INCLUDES=-I$(builddir)/config
 BITCOIN_INCLUDES=-I$(builddir) -I$(builddir)/obj $(BOOST_CPPFLAGS) $(LEVELDB_CPPFLAGS) $(CRYPTO_CFLAGS) $(SSL_CFLAGS) -I$(srcdir)/cpp-ethereum/utils
 
 BITCOIN_INCLUDES += -I$(srcdir)/secp256k1/include
-BITCOIN_INCLUDES += $(UNIVALUE_CFLAGS)
 
 BITCOIN_INCLUDES += -I$(srcdir)/cpp-ethereum
 
@@ -42,7 +33,7 @@ LIBBITCOIN_COMMON=libbitcoin_common.a
 LIBBITCOIN_CLI=libbitcoin_cli.a
 LIBBITCOIN_UTIL=libbitcoin_util.a
 LIBBITCOIN_CRYPTO=crypto/libbitcoin_crypto.a
-
+LIBBITCOIN_UNIVALUE=univalue/libbitcoin_univalue.a
 LIBBITCOINQT=qt/libbitcoinqt.a
 LIBSECP256K1=secp256k1/libsecp256k1.la
 LIBCRYPTOPP=cryptopp/libcryptopp.a
@@ -56,6 +47,7 @@ EXTRA_LIBRARIES += \
   crypto/libbitcoin_crypto.a \
   libbitcoin_util.a \
   libbitcoin_common.a \
+  univalue/libbitcoin_univalue.a \
   libbitcoin_server.a \
   libbitcoin_cli.a
 if ENABLE_WALLET
@@ -86,7 +78,7 @@ if BUILD_BITCOIN_UTILS
 endif
 
 .PHONY: FORCE
-# lux core #
+# Luxcore #
 BITCOIN_CORE_H = \
   activemasternode.h \
   addrman.h \
@@ -106,7 +98,9 @@ BITCOIN_CORE_H = \
   coincontrol.h \
   coins.h \
   compat.h \
+  compat/sanity.h \
   compressor.h \
+  consensus/params.h \
   primitives/block.h \
   primitives/transaction.h \
   core_io.h \
@@ -175,17 +169,6 @@ BITCOIN_CORE_H = \
   lux/luxDGP.h \
   lux/storageresults.h
 
-JSON_H = \
-  json/json_spirit.h \
-  json/json_spirit_error_position.h \
-  json/json_spirit_reader.h \
-  json/json_spirit_reader_template.h \
-  json/json_spirit_stream_reader.h \
-  json/json_spirit_utils.h \
-  json/json_spirit_value.h \
-  json/json_spirit_writer.h \
-  json/json_spirit_writer_template.h
-
 obj/build.h: FORCE
 	@$(MKDIR_P) $(builddir)/obj
 	@$(top_srcdir)/share/genbuild.sh $(abs_top_builddir)/src/obj/build.h \
@@ -226,7 +209,6 @@ libbitcoin_server_a_SOURCES = \
   lux/luxtransaction.cpp \
   lux/luxDGP.cpp \
   lux/storageresults.cpp \
-  $(JSON_H) \
   $(BITCOIN_CORE_H)
 
 if ENABLE_ZMQ
@@ -313,7 +295,13 @@ crypto_libbitcoin_crypto_a_SOURCES = \
   cpp-ethereum/utils/libscrypt/slowequals.h \
   cpp-ethereum/utils/libscrypt/sysendian.h
 
-
+# univalue JSON library
+univalue_libbitcoin_univalue_a_SOURCES = \
+  univalue/univalue.cpp \
+  univalue/univalue_read.cpp \
+  univalue/univalue_write.cpp \
+  univalue/univalue_escapes.h \
+  univalue/univalue.h
 
 # common: shared between luxd, and lux-qt and non-server tools
 libbitcoin_common_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES) -DLUX_BUILD
@@ -566,7 +554,7 @@ nodist_libbitcoin_util_a_SOURCES = $(srcdir)/obj/build.h
 luxd_LDADD = \
   $(LIBBITCOIN_SERVER) \
   $(LIBBITCOIN_COMMON) \
-  $(LIBUNIVALUE) \
+  $(LIBBITCOIN_UNIVALUE) \
   $(LIBBITCOIN_UTIL) \
   $(LIBBITCOIN_CRYPTO) \
   $(LIBLEVELDB) \
@@ -596,7 +584,7 @@ luxd_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
 # lux-cli binary #
 lux_cli_LDADD = \
   $(LIBBITCOIN_CLI) \
-  $(LIBUNIVALUE) \
+  $(LIBBITCOIN_UNIVALUE) \
   $(LIBBITCOIN_UTIL) \
   $(BOOST_LIBS) \
   $(SSL_LIBS) \
@@ -612,7 +600,7 @@ lux_cli_CPPFLAGS = $(BITCOIN_INCLUDES)
 
 # lux-tx binary #
 lux_tx_LDADD = \
-  $(LIBUNIVALUE) \
+  $(LIBBITCOIN_UNIVALUE) \
   $(LIBBITCOIN_COMMON) \
   $(LIBBITCOIN_UTIL) \
   $(LIBBITCOIN_CRYPTO) \

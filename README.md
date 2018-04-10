@@ -4,10 +4,10 @@
 
 Luxcore is GNU AGPLv3 licensed.
 
-[![Build Status](https://travis-ci.org/216k155/lux.svg?branch=lux-autoconf)](https://travis-ci.org/216k155/lux)
+[![Build Status](https://travis-ci.org/216k155/lux.svg?branch=master)](https://travis-ci.org/216k155/lux)
 <a href="https://discord.gg/27xFP5Y"><img src="https://discordapp.com/api/guilds/364500397999652866/embed.png" alt="Discord server" /></a>
 
-[![Build history](https://buildstats.info/travisci/chart/216k155/lux?branch=lux-autoconf)](https://travis-ci.org/216k155/lux?branch=lux-autoconf)
+[![Build history](https://buildstats.info/travisci/chart/216k155/lux?branch=master)](https://travis-ci.org/216k155/lux?branch=master)
 
 [Website](https://luxcore.io) — [PoS Web Wallet]() — [Block Explorer](https://explorer.luxcore.io/) — [Blog](https://reddit.com/r/LUXCoin) — [Forum](https://bitcointalk.org/index.php?topic=2254046.0) — [Telegram](https://t.me/LUXcoinOfficialChat) — [Twitter](https://twitter.com/LUX_Coin)
 
@@ -72,36 +72,26 @@ Note that for WSL the Luxcore source path MUST be somewhere in the default mount
 The next three steps are an example of how to acquire the source in an appropriate way.
 
     cd /usr/src
-    git clone https://github.com/216k155/lux.git --recursive
+    git clone https://github.com/216k155/lux.git
     sudo chmod -R a+rw lux
 
 Once the source code is ready the build steps are below.
 
-    PATH=$(echo "$PATH" | sed -e 's/:\/mnt.*//g') # strip out problematic Windows %PATH% imported var
+    PATH=$(echo "$PATH" | sed -e 's/:\/mnt.*//g')
     cd depends
     make HOST=x86_64-w64-mingw32 -j$(nproc)
     cd ..
-    ./autogen.sh # not required when building from tarball
+    ./autogen.sh
     CONFIG_SITE=$PWD/depends/x86_64-w64-mingw32/share/config.site
     ./configure --prefix=`pwd`/depends/x86_64-w64-mingw32 --disable-tests
     make HOST=x86_64-w64-mingw32 -j$(nproc)
 
 ### Build on Ubuntu
 
-    sudo apt-get install build-essential libtool autotools-dev automake pkg-config libssl-dev libevent-dev bsdmainutils git cmake libboost-all-dev
-    sudo apt-get install software-properties-common
-    sudo add-apt-repository ppa:bitcoin/bitcoin
-    sudo apt-get update
-    sudo apt-get install libdb4.8-dev libdb4.8++-dev
+    git clone https://github.com/216k155/lux.git
 
-    # If you want to build the Qt GUI:
-    sudo apt-get install libqt5gui5 libqt5core5a libqt5dbus5 qttools5-dev qttools5-dev-tools libprotobuf-dev protobuf-compiler
-
-    git clone https://github.com/216k155/lux
-
-    cd lux
-
-    # Note autogen will prompt to install some more dependencies if needed
+    cd lux    
+    ./install-dependencies.sh
     ./autogen.sh
     ./configure --disable-tests
     make -j$(nproc)
@@ -131,7 +121,7 @@ NOTE: Building with Qt4 is still supported, however, could result in a broken UI
 
 1. Clone the Lux source code and cd into `Lux`
 
-        git clone --recursive https://github.com/216k155/lux.git
+        git clone https://github.com/216k155/lux.git
         cd lux
 
 2.  Build Luxcore:
@@ -140,17 +130,11 @@ NOTE: Building with Qt4 is still supported, however, could result in a broken UI
 
     You can disable the GUI build by passing `--without-gui` to configure.
 
+        export LDFLAGS=-L/usr/local/opt/openssl/lib;export CPPFLAGS=-I/usr/local/opt/openssl/include
         ./autogen.sh
         ./configure --disable-tests
-        make
-
-3.  It is recommended to build and run the unit tests:
-
-        make check
-
-### Run
-
-Then you can either run the command-line daemon using `src/Luxd` and `src/Lux-cli`, or you can run the Qt GUI using `src/qt/Lux-qt`
+        make -j$(nproc)
+        make deploy
 
 Setup and Build: Arch Linux
 -----------------------------------

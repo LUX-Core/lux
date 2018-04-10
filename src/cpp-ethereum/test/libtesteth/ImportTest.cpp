@@ -433,7 +433,7 @@ int ImportTest::compareStates(State const& _stateExpect, State const& _statePost
 
 void parseJsonStrValueIntoVector(json_spirit::mValue const& _json, vector<string>& _out)
 {
-	if (_json.type() == json_spirit::array_type)
+	if (_json.type() == UniValue_type)
 	{
 		for (auto const& val: _json.get_array())
 			_out.push_back(val.get_str());
@@ -444,7 +444,7 @@ void parseJsonStrValueIntoVector(json_spirit::mValue const& _json, vector<string
 
 void parseJsonIntValueIntoVector(json_spirit::mValue const& _json, vector<int>& _out)
 {
-	if (_json.type() == json_spirit::array_type)
+	if (_json.type() == UniValue_type)
 	{
 		for (auto const& val: _json.get_array())
 			_out.push_back(val.get_int());

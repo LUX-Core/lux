@@ -92,6 +92,10 @@ public:
 
 void UpdateTime(CBlockHeader* pblock, const CBlockIndex* pindexPrev)
 {
+#if 0
+    const CChainParams& chainParams = Params();
+    const Consensus::Params& consensusParams = chainParams.GetConsensus();
+#endif
     pblock->nTime = std::max(pindexPrev->GetMedianTimePast() + 1, GetAdjustedTime());
 
     // Updating time can change work required on testnet:
@@ -660,6 +664,11 @@ bool CheckStake(CBlock* pblock, CWallet& wallet)
         LOCK(cs_main);
         if (pblock->hashPrevBlock != chainActive.Tip()->GetBlockHash())
             return error("CheckStake() : generated block is stale");
+
+        COutPoint outp = pblock->vtx[1].vin[0].prevout;
+        if(wallet.IsSpent(outp.hash, outp.n)){
+            return error("CheckStake() : generated block became invalid due to stake UTXO being spent");
+        }
 
         // Track how many getdata requests this block gets
         {
