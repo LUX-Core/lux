@@ -103,10 +103,10 @@ UniValue blockHeaderToJSON(const CBlock& block, const CBlockIndex* blockindex)
     return result;
 }
 
-//////////////////////////////////////////////////////////////////////////// // lux
-Object executionResultToJSON(const dev::eth::ExecutionResult& exRes)
+//////////////////////////////////////////////////////////////////////////// // qtum
+UniValue executionResultToJSON(const dev::eth::ExecutionResult& exRes)
 {
-    Object result;
+    UniValue result(UniValue::VOBJ);
     result.push_back(Pair("gasUsed", CAmount(exRes.gasUsed)));
     std::stringstream ss;
     ss << exRes.excepted;
@@ -120,18 +120,18 @@ Object executionResultToJSON(const dev::eth::ExecutionResult& exRes)
     return result;
 }
 
-Object transactionReceiptToJSON(const dev::eth::TransactionReceipt& txRec)
+UniValue transactionReceiptToJSON(const dev::eth::TransactionReceipt& txRec)
 {
-    Object result;
+    UniValue result(UniValue::VOBJ);
     result.push_back(Pair("stateRoot", txRec.stateRoot().hex()));
     result.push_back(Pair("gasUsed", CAmount(txRec.gasUsed())));
     result.push_back(Pair("bloom", txRec.bloom().hex()));
-    Array logEntries;
+    UniValue logEntries(UniValue::VARR);
     dev::eth::LogEntries logs = txRec.log();
     for(dev::eth::LogEntry log : logs){
-        Object logEntrie;
+        UniValue logEntrie(UniValue::VOBJ);
         logEntrie.push_back(Pair("address", log.address.hex()));
-        Array topics;
+        UniValue topics(UniValue::VARR);
         for(dev::h256 l : log.topics){
             topics.push_back(l.hex());
         }
@@ -463,7 +463,7 @@ UniValue getblockheader(const UniValue& params, bool fHelp)
 }
 
 ////////////////////////////////////////////////////////////////////// // lux
-Value callcontract(const Array& params, bool fHelp)
+UniValue callcontract(const UniValue& params, bool fHelp)
 {
     if (fHelp || params.size() < 2)
         throw runtime_error(
@@ -514,7 +514,7 @@ Value callcontract(const Array& params, bool fHelp)
         writeVMlog(execResults);
     }
 
-    Object result;
+    UniValue result(UniValue::VOBJ);
     result.push_back(Pair("address", strAddr));
     result.push_back(Pair("executionResult", executionResultToJSON(execResults[0].execRes)));
     result.push_back(Pair("transactionReceipt", transactionReceiptToJSON(execResults[0].txRec)));
