@@ -12,16 +12,16 @@ class ContractABI;
 class TabBarInfo;
 
 namespace Ui {
-class CallContract;
+class CallContractPage;
 }
 
-class CallContract : public QWidget
+class CallContractPage : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit CallContract(QWidget *parent = 0);
-    ~CallContract();
+    explicit CallContractPage(QWidget *parent = 0);
+    ~CallContractPage();
 
     void setClientModel(ClientModel *clientModel);
     void setModel(WalletModel *model);
@@ -47,7 +47,7 @@ private:
     QString toDataHex(int func, QString& errorMessage);
 
 private:
-    Ui::CallContract *ui;
+    Ui::CallContractPage *ui;
     WalletModel* m_model;
     ClientModel* m_clientModel;
     ContractTableModel* m_contractModel;

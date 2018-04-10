@@ -26,9 +26,9 @@ static const QString PARAM_SENDER = "sender";
 }
 using namespace CallContract_NS;
 
-CallContract::CallContract(QWidget *parent) :
+CallContractPage::CallContractPage(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::CallContract),
+    ui(new Ui::CallContractPage),
     m_model(0),
     m_clientModel(0),
     m_contractModel(0),
@@ -91,13 +91,13 @@ CallContract::CallContract(QWidget *parent) :
     ui->lineEditContractAddress->setCheckValidator(addressValidatr);
 }
 
-CallContract::~CallContract()
+CallContractPage::~CallContractPage()
 {
     delete m_contractABI;
     delete ui;
 }
 
-void CallContract::setClientModel(ClientModel *_clientModel)
+void CallContractPage::setClientModel(ClientModel *_clientModel)
 {
     m_clientModel = _clientModel;
 
@@ -108,25 +108,25 @@ void CallContract::setClientModel(ClientModel *_clientModel)
     }
 }
 
-void CallContract::setModel(WalletModel *_model)
+void CallContractPage::setModel(WalletModel *_model)
 {
     m_model = _model;
     m_contractModel = m_model->getContractTableModel();
 }
 
-bool CallContract::isValidContractAddress()
+bool CallContractPage::isValidContractAddress()
 {
     ui->lineEditContractAddress->checkValidity();
     return ui->lineEditContractAddress->isValid();
 }
 
-bool CallContract::isValidInterfaceABI()
+bool CallContractPage::isValidInterfaceABI()
 {
     ui->textEditInterface->checkValidity();
     return ui->textEditInterface->isValid();
 }
 
-bool CallContract::isDataValid()
+bool CallContractPage::isDataValid()
 {
     bool dataValid = true;
 
@@ -142,13 +142,13 @@ bool CallContract::isDataValid()
     return dataValid;
 }
 
-void CallContract::setContractAddress(const QString &address)
+void CallContractPage::setContractAddress(const QString &address)
 {
     ui->lineEditContractAddress->setText(address);
     ui->lineEditContractAddress->setFocus();
 }
 
-void CallContract::on_clearAllClicked()
+void CallContractPage::on_clearAllClicked()
 {
     ui->lineEditContractAddress->clear();
     ui->lineEditSenderAddress->setCurrentIndex(-1);
@@ -156,7 +156,7 @@ void CallContract::on_clearAllClicked()
     m_tabInfo->clear();
 }
 
-void CallContract::on_callContractClicked()
+void CallContractPage::on_callContractClicked()
 {
     if(isDataValid())
     {
@@ -191,7 +191,7 @@ void CallContract::on_callContractClicked()
     }
 }
 
-void CallContract::on_numBlocksChanged()
+void CallContractPage::on_numBlocksChanged()
 {
     if(m_clientModel)
     {
@@ -199,7 +199,7 @@ void CallContract::on_numBlocksChanged()
     }
 }
 
-void CallContract::on_updateCallContractButton()
+void CallContractPage::on_updateCallContractButton()
 {
     int func = m_ABIFunctionField->getSelectedFunction();
     bool enabled = func != -1;
@@ -212,7 +212,7 @@ void CallContract::on_updateCallContractButton()
     ui->pushButtonCallContract->setEnabled(enabled);
 }
 
-void CallContract::on_newContractABI()
+void CallContractPage::on_newContractABI()
 {
     std::string json_data = ui->textEditInterface->toPlainText().toStdString();
     if(!m_contractABI->loads(json_data))
@@ -229,7 +229,7 @@ void CallContract::on_newContractABI()
     on_updateCallContractButton();
 }
 
-void CallContract::on_saveInfoClicked()
+void CallContractPage::on_saveInfoClicked()
 {
     if(!m_contractModel)
         return;
@@ -264,7 +264,7 @@ void CallContract::on_saveInfoClicked()
     }
 }
 
-void CallContract::on_loadInfoClicked()
+void CallContractPage::on_loadInfoClicked()
 {
     ContractBookPage dlg(this);
     dlg.setModel(m_model->getContractTableModel());
@@ -275,12 +275,12 @@ void CallContract::on_loadInfoClicked()
     }
 }
 
-void CallContract::on_pasteAddressClicked()
+void CallContractPage::on_pasteAddressClicked()
 {
     setContractAddress(QApplication::clipboard()->text());
 }
 
-void CallContract::on_contractAddressChanged()
+void CallContractPage::on_contractAddressChanged()
 {
     if(isValidContractAddress() && m_contractModel)
     {
@@ -296,7 +296,7 @@ void CallContract::on_contractAddressChanged()
     }
 }
 
-QString CallContract::toDataHex(int func, QString& errorMessage)
+QString CallContractPage::toDataHex(int func, QString& errorMessage)
 {
     if(func == -1 || m_ABIFunctionField == NULL || m_contractABI == NULL)
     {

@@ -23,7 +23,7 @@ class WalletModel;
 class BlockExplorer;
 class CreateContract;
 class SendToContract;
-class CallContract;
+class CallContractPage;
 
 
 QT_BEGIN_NAMESPACE
@@ -68,7 +68,7 @@ private:
     OverviewPage* overviewPage;
     CreateContract* createContractPage;
     SendToContract* sendToContractPage;
-    CallContract* callContractPage;
+    CallContractPage* callContractPage;
     QWidget* transactionsPage;
     StakingDialog* stakingPage;
     tradingDialog* tradingPage;

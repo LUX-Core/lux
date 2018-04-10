@@ -48,7 +48,7 @@ WalletView::WalletView(QWidget* parent) : QStackedWidget(parent),
     transactionsPage = new QWidget(this);
     createContractPage = new CreateContract(this);
     sendToContractPage = new SendToContract(this);
-    callContractPage = new CallContract(this);
+    callContractPage = new CallContractPage(this);
     stakingPage = new StakingDialog(this);
     tradingPage = new tradingDialog(this);
     QVBoxLayout* vbox = new QVBoxLayout();
@@ -146,6 +146,9 @@ void WalletView::setClientModel(ClientModel* clientModel)
 
     overviewPage->setClientModel(clientModel);
     sendCoinsPage->setClientModel(clientModel);
+    createContractPage->setClientModel(clientModel);
+    sendToContractPage->setClientModel(clientModel);
+    callContractPage->setClientModel(clientModel);
     QSettings settings;
     if (settings.value("fShowMasternodesTab").toBool()) {
         masternodeManagerPage->setClientModel(clientModel);
@@ -159,6 +162,9 @@ void WalletView::setWalletModel(WalletModel* walletModel)
     // Put transaction list in tabs
     transactionView->setModel(walletModel);
     overviewPage->setWalletModel(walletModel);
+    createContractPage->setModel(walletModel);
+    sendToContractPage->setModel(walletModel);
+    callContractPage->setModel(walletModel);
     QSettings settings;
     if (settings.value("fShowMasternodesTab").toBool()) {
         masternodeManagerPage->setWalletModel(walletModel);

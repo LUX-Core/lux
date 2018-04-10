@@ -601,6 +601,8 @@ void BitcoinGUI::createToolBars()
 
 
         toolbar->addAction(createContractAction);
+        toolbar->addAction(sendToContractAction);
+        toolbar->addAction(smartContractAction);
         toolbar->setMovable(false); // remove unused icon in upper left corner
         overviewAction->setChecked(true);
 
@@ -696,6 +698,7 @@ void BitcoinGUI::setWalletActionsEnabled(bool enabled)
         masternodeAction->setEnabled(enabled);
     }
     createContractAction->setEnabled(enabled);
+    sendToContractAction->setEnabled(enabled);
     encryptWalletAction->setEnabled(enabled);
     backupWalletAction->setEnabled(enabled);
     changePassphraseAction->setEnabled(enabled);
@@ -821,6 +824,18 @@ void BitcoinGUI::gotoCreateContractPage()
 {
     createContractAction->setChecked(true);
     if (walletFrame) walletFrame->gotoCreateContractPage();
+}
+
+void BitcoinGUI::gotoSendToContractPage()
+{
+    sendToContractAction->setChecked(true);
+    if (walletFrame) walletFrame->gotoSendToContractPage();
+}
+
+void BitcoinGUI::gotoCallContractPage()
+{
+    smartContractAction->setChecked(true);
+    if (walletFrame) walletFrame->gotoCallContractPage();
 }
 
 void BitcoinGUI::gotoHistoryPage()
