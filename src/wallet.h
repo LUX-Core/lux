@@ -1357,5 +1357,12 @@ public:
     {}
 };
 
+struct CRecipient
+{
+    CScript scriptPubKey;
+    CAmount nAmount;
+    bool fSubtractFeeFromAmount;
+};
+
 
 #endif // BITCOIN_WALLET_H
