@@ -6,6 +6,8 @@
 #ifndef BITCOIN_BITCOINCONSENSUS_H
 #define BITCOIN_BITCOINCONSENSUS_H
 
+#include <stdint.h>
+
 #if defined(BUILD_BITCOIN_INTERNAL) && defined(HAVE_CONFIG_H)
 #include "config/lux-config.h"
   #if defined(_WIN32)
@@ -31,7 +33,7 @@
 extern "C" {
 #endif
 
-#define BITCOINCONSENSUS_API_VER 0
+#define BITCOINCONSENSUS_API_VER 0 //TODO: should the version be upgraded?
 
 typedef enum bitcoinconsensus_error_t
 {
@@ -39,6 +41,7 @@ typedef enum bitcoinconsensus_error_t
     bitcoinconsensus_ERR_TX_INDEX,
     bitcoinconsensus_ERR_TX_SIZE_MISMATCH,
     bitcoinconsensus_ERR_TX_DESERIALIZE,
+    bitcoinconsensus_ERR_AMOUNT_REQUIRED,
 } bitcoinconsensus_error;
 
 /** Script verification flags */
@@ -55,6 +58,10 @@ enum
 /// the additional constraints specified by flags.
 /// If not NULL, err will contain an error/success code for the operation
 EXPORT_SYMBOL int bitcoinconsensus_verify_script(const unsigned char *scriptPubKey, unsigned int scriptPubKeyLen,
+                                                 const unsigned char *txTo        , unsigned int txToLen,
+                                                 unsigned int nIn, unsigned int flags, bitcoinconsensus_error* err);
+
+EXPORT_SYMBOL int bitcoinconsensus_verify_script_with_amount(const unsigned char *scriptPubKey, unsigned int scriptPubKeyLen, int64_t amount,
                                     const unsigned char *txTo        , unsigned int txToLen,
                                     unsigned int nIn, unsigned int flags, bitcoinconsensus_error* err);
 

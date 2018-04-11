@@ -125,7 +125,7 @@ CTransaction::CTransaction() : hash(0), wit(CTxWitness()), vin(), vout(), nVersi
 CTransaction::CTransaction(const CMutableTransaction &tx) : wit(tx.wit), vin(tx.vin), vout(tx.vout), nVersion(tx.nVersion), nTime(tx.nTime), nLockTime(tx.nLockTime) {
     UpdateHash();
 }
-CTransaction::CTransaction(CMutableTransaction &&tx) : vin(std::move(tx.vin)), vout(std::move(tx.vout)),  wit(std::move(tx.wit)), nVersion(tx.nVersion), nTime(0), nLockTime(tx.nLockTime) {}
+CTransaction::CTransaction(CMutableTransaction &&tx) : wit(std::move(tx.wit)), vin(std::move(tx.vin)), vout(std::move(tx.vout)), nVersion(tx.nVersion), nTime(0), nLockTime(tx.nLockTime) {}
 
 CTransaction& CTransaction::operator=(const CTransaction &tx) {
     *const_cast<int*>(&nVersion) = tx.nVersion;
