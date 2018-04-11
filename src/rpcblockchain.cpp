@@ -11,7 +11,6 @@
 #include "rpcserver.h"
 #include "sync.h"
 #include "util.h"
-#include "base58.h"
 
 #include <stdint.h>
 
@@ -102,48 +101,6 @@ UniValue blockHeaderToJSON(const CBlock& block, const CBlockIndex* blockindex)
     result.push_back(Pair("nonce", (uint64_t)block.nNonce));
     return result;
 }
-
-//////////////////////////////////////////////////////////////////////////// // qtum
-UniValue executionResultToJSON(const dev::eth::ExecutionResult& exRes)
-{
-    UniValue result(UniValue::VOBJ);
-    result.push_back(Pair("gasUsed", CAmount(exRes.gasUsed)));
-    std::stringstream ss;
-    ss << exRes.excepted;
-    result.push_back(Pair("excepted", ss.str()));
-    result.push_back(Pair("newAddress", exRes.newAddress.hex()));
-    result.push_back(Pair("output", HexStr(exRes.output)));
-    result.push_back(Pair("codeDeposit", static_cast<int32_t>(exRes.codeDeposit)));
-    result.push_back(Pair("gasRefunded", CAmount(exRes.gasRefunded)));
-    result.push_back(Pair("depositSize", static_cast<int32_t>(exRes.depositSize)));
-    result.push_back(Pair("gasForDeposit", CAmount(exRes.gasForDeposit)));
-    return result;
-}
-
-UniValue transactionReceiptToJSON(const dev::eth::TransactionReceipt& txRec)
-{
-    UniValue result(UniValue::VOBJ);
-    result.push_back(Pair("stateRoot", txRec.stateRoot().hex()));
-    result.push_back(Pair("gasUsed", CAmount(txRec.gasUsed())));
-    result.push_back(Pair("bloom", txRec.bloom().hex()));
-    UniValue logEntries(UniValue::VARR);
-    dev::eth::LogEntries logs = txRec.log();
-    for(dev::eth::LogEntry log : logs){
-        UniValue logEntrie(UniValue::VOBJ);
-        logEntrie.push_back(Pair("address", log.address.hex()));
-        UniValue topics(UniValue::VARR);
-        for(dev::h256 l : log.topics){
-            topics.push_back(l.hex());
-        }
-        logEntrie.push_back(Pair("topics", topics));
-        logEntrie.push_back(Pair("data", HexStr(log.data)));
-        logEntries.push_back(logEntrie);
-    }
-    result.push_back(Pair("log", logEntries));
-    return result;
-}
-////////////////////////////////////////////////////////////////////////////
-
 
 UniValue getblockcount(const UniValue& params, bool fHelp)
 {
@@ -461,67 +418,6 @@ UniValue getblockheader(const UniValue& params, bool fHelp)
 
     return blockHeaderToJSON(block, pblockindex);
 }
-
-////////////////////////////////////////////////////////////////////// // lux
-UniValue callcontract(const UniValue& params, bool fHelp)
-{
-    if (fHelp || params.size() < 2)
-        throw runtime_error(
-                "callcontract \"address\" \"data\" ( address )\n"
-                "\nArgument:\n"
-                "1. \"address\"          (string, required) The account address\n"
-                "2. \"data\"             (string, required) The data hex string\n"
-                "3. address              (string, optional) The sender address hex string\n"
-                "4. gasLimit             (string, optional) The gas limit for executing the contract\n"
-        );
-
-    LOCK(cs_main);
-
-    std::string strAddr = params[0].get_str();
-    std::string data = params[1].get_str();
-
-    if(data.size() % 2 != 0 || !CheckHex(data))
-        throw JSONRPCError(RPC_TYPE_ERROR, "Invalid data (data not hex)");
-
-    if(strAddr.size() != 40 || !CheckHex(strAddr))
-        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Incorrect address");
-
-    dev::Address addrAccount(strAddr);
-    if(!globalState->addressInUse(addrAccount))
-        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Address does not exist");
-
-    dev::Address senderAddress;
-    if(params.size() == 3){
-        CBitcoinAddress luxSenderAddress(params[2].get_str());
-        if(luxSenderAddress.IsValid()){
-            CKeyID keyid;
-            luxSenderAddress.GetKeyID(keyid);
-            senderAddress = dev::Address(HexStr(valtype(keyid.begin(),keyid.end())));
-        }else{
-            senderAddress = dev::Address(params[2].get_str());
-        }
-
-    }
-    uint64_t gasLimit=0;
-    if(params.size() == 4){
-        gasLimit = params[3].get_int();
-    }
-
-
-    std::vector<ResultExecute> execResults = CallContract(addrAccount, ParseHex(data), senderAddress, gasLimit);
-
-    if(fRecordLogOpcodes){
-        writeVMlog(execResults);
-    }
-
-    UniValue result(UniValue::VOBJ);
-    result.push_back(Pair("address", strAddr));
-    result.push_back(Pair("executionResult", executionResultToJSON(execResults[0].execRes)));
-    result.push_back(Pair("transactionReceipt", transactionReceiptToJSON(execResults[0].txRec)));
-
-    return result;
-}
-
 
 UniValue gettxoutsetinfo(const UniValue& params, bool fHelp)
 {
