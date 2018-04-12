@@ -6,6 +6,7 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "chainparams.h"
+#include "consensus/merkle.h"
 
 #include "random.h"
 #include "util.h"
@@ -24,6 +25,27 @@ struct SeedSpec6 {
 };
 
 #include "chainparamsseeds.h"
+
+static CBlock CreateGenesisBlock(const char* pszTimestamp, const CScript& genesisOutputScript, uint32_t nTime, uint32_t nNonce, uint32_t nBits, int32_t nVersion, const CAmount& genesisReward)
+{
+    CMutableTransaction txNew;
+    txNew.nVersion = 1;
+    txNew.vin.resize(1);
+    txNew.vout.resize(1);
+    txNew.vin[0].scriptSig = CScript() << 486604799 << CScriptNum(4) << std::vector<unsigned char>((const unsigned char*)pszTimestamp, (const unsigned char*)pszTimestamp + strlen(pszTimestamp));
+    txNew.vout[0].nValue = genesisReward;
+    txNew.vout[0].scriptPubKey = genesisOutputScript;
+
+    CBlock genesis;
+    genesis.nTime    = nTime;
+    genesis.nBits    = nBits;
+    genesis.nNonce   = nNonce;
+    genesis.nVersion = nVersion;
+    genesis.vtx.push_back(txNew);
+    genesis.hashPrevBlock.SetNull();
+    genesis.hashMerkleRoot = BlockMerkleRoot(genesis);
+    return genesis;
+}
 
 /**
  * Main network
@@ -95,6 +117,26 @@ public:
     {
         networkID = CBaseChainParams::MAIN;
         strNetworkID = "main";
+        consensus.nSubsidyHalvingInterval = 210000;
+        consensus.nMajorityEnforceBlockUpgrade = 750;
+        consensus.nMajorityRejectBlockOutdated = 950;
+        consensus.nMajorityWindow = 1000;
+        //consensus.BIP34Height = 227931;
+        //consensus.BIP34Hash = uint256S("0x000000000000024b89b42a942fe0d9fea3bb44ab7bd1b19115dd6a759c0808b8");
+        consensus.powLimit = uint256(0) >> 20; // LUX starting difficulty is 1 / 2^12
+        consensus.nPowTargetTimespan = 36 * 60 * 60; // LUX: 1 36hrs
+        consensus.nPowTargetSpacing = 2 * 60;  // LUX: 2 minute
+        consensus.nEnforceBlockUpgradeMajority = 750;
+        consensus.nRejectBlockOutdatedMajority = 950;
+        consensus.nToCheckBlockUpgradeMajority = 1000;
+        //consensus.fPowAllowMinDifficultyBlocks = false;
+        //consensus.fPowNoRetargeting = false;
+        consensus.nRuleChangeActivationThreshold = 1026; // 95% of 1080 is 1026
+        consensus.nMinerConfirmationWindow = 1080; // nPowTargetTimespan / nPowTargetSpacing
+        // Deployment of SegWit (BIP141 and BIP143)
+        consensus.vDeployments[Consensus::DEPLOYMENT_SEGWIT].bit = 1;
+        consensus.vDeployments[Consensus::DEPLOYMENT_SEGWIT].nStartTime = 0; //TODO: ?
+        consensus.vDeployments[Consensus::DEPLOYMENT_SEGWIT].nTimeout = 0; // Never / undefined
         /**
          * The message start string is designed to be unlikely to occur in normal data.
          * The characters are rarely used upper ASCII, not valid as UTF-8, and produce
@@ -106,15 +148,8 @@ public:
         pchMessageStart[3] = 0xa7;
         vAlertPubKey = ParseHex("042d13c016ed91528241bcff222989769417eb10cdb679228c91e26e26900eb9fd053cd9f16a9a2894ad5ebbd551be1a4bd23bd55023679be17f0bd3a16e6fbeba");
         nDefaultPort = /*28666*/ 26868;
-        bnProofOfWorkLimit = ~uint256(0) >> 20; // LUX starting difficulty is 1 / 2^12
-        nSubsidyHalvingInterval = 210000;
         nMaxReorganizationDepth = 100;
-        nEnforceBlockUpgradeMajority = 750;
-        nRejectBlockOutdatedMajority = 950;
-        nToCheckBlockUpgradeMajority = 1000;
         nMinerThreads = 0;
-        nTargetTimespan = 20 * 60; // LUX: 1 36hrs
-        nTargetSpacing = 2 * 60;  // LUX: 2 minute
         nLastPOWBlock = 6000000;
         nMaturity = 79;
         nMasternodeCountDrift = 20;
@@ -138,7 +173,7 @@ public:
         genesis.nBits = 0x1e0fffff;
         genesis.nNonce = 986946;
 
-        hashGenesisBlock = genesis.GetHash();
+        consensus.hashGenesisBlock = genesis.GetHash();
 
         assert(hashGenesisBlock == uint256("0x00000759bb3da130d7c9aedae170da8335f5a0d01a9007e4c8d3ccd08ace6a42"));
         assert(genesis.hashMerkleRoot == uint256("0xe08ae0cfc35a1d70e6764f347fdc54355206adeb382446dd54c32cd0201000d3"));
@@ -196,6 +231,27 @@ class CTestNetParams : public CMainParams
 public:
     CTestNetParams()
     {
+        consensus.nSubsidyHalvingInterval = 210000;
+        consensus.nMajorityEnforceBlockUpgrade = 750;
+        consensus.nMajorityRejectBlockOutdated = 950;
+        consensus.nMajorityWindow = 1000;
+        //consensus.BIP34Height = 227931;
+        //consensus.BIP34Hash = uint256S("0x000000000000024b89b42a942fe0d9fea3bb44ab7bd1b19115dd6a759c0808b8");
+        consensus.powLimit = ~uint256(0) >> 1;
+        consensus.nPowTargetTimespan = 24 * 60 * 60; // LUX: 1 day //TODO: change it for testnet
+        consensus.nPowTargetSpacing = 60;  // LUX: 1 minute //TODO: change it for testnet
+        consensus.nEnforceBlockUpgradeMajority = 51;
+        consensus.nRejectBlockOutdatedMajority = 75;
+        consensus.nToCheckBlockUpgradeMajority = 100;
+        //consensus.fPowAllowMinDifficultyBlocks = false;
+        //consensus.fPowNoRetargeting = false;
+        consensus.nRuleChangeActivationThreshold = 1368; // 95% of 1440 is
+        consensus.nMinerConfirmationWindow = 1440; // nPowTargetTimespan / nPowTargetSpacing
+        // Deployment of SegWit (BIP141 and BIP143)
+        consensus.vDeployments[Consensus::DEPLOYMENT_SEGWIT].bit = 1;
+        consensus.vDeployments[Consensus::DEPLOYMENT_SEGWIT].nStartTime = 0;
+        consensus.vDeployments[Consensus::DEPLOYMENT_SEGWIT].nTimeout = 0; // Never / undefined
+
         networkID = CBaseChainParams::TESTNET;
         strNetworkID = "test";
         pchMessageStart[0] = 0x54;
@@ -204,13 +260,7 @@ public:
         pchMessageStart[3] = 0xab;
         vAlertPubKey = ParseHex("000010e83b2703ccf322f7dbd62dd5855ac7c10bd055814ce121ba32607d573b8810c02c0582aed05b4deb9c4b77b26d92428c61256cd42774babea0a073b2ed0c9");
         nDefaultPort = 28333;
-        bnProofOfWorkLimit = ~uint256(0) >> 1;
-        nEnforceBlockUpgradeMajority = 51;
-        nRejectBlockOutdatedMajority = 75;
-        nToCheckBlockUpgradeMajority = 100;
         nMinerThreads = 0;
-        nTargetTimespan = 30 * 60; // LUX: 1 day
-        nTargetSpacing = 3 * 60;  // LUX: 1 minute
         nLastPOWBlock = 6000000;
         nMaturity = 79;
         nModifierUpdateBlock = 51197; //approx Mon, 17 Apr 2017 04:00:00 GMT
@@ -220,8 +270,8 @@ public:
         genesis.nTime = 1504344001;
         genesis.nNonce = 1454059;
 
-        hashGenesisBlock = genesis.GetHash();
-//        assert(hashGenesisBlock == uint256("0"));
+        consensus.hashGenesisBlock = genesis.GetHash();
+//      assert(hashGenesisBlock == uint256("0"));
 
         vFixedSeeds.clear();
         vSeeds.clear();
@@ -273,14 +323,34 @@ public:
     {
         networkID = CBaseChainParams::REGTEST;
         strNetworkID = "regtest";
+
+        consensus.nSubsidyHalvingInterval = 150;
+        consensus.nMajorityEnforceBlockUpgrade = 750;
+        consensus.nMajorityRejectBlockOutdated = 950;
+        consensus.nMajorityWindow = 1000;
+        consensus.BIP34Height = -1; // BIP34 has not necessarily activated on regtest
+        consensus.BIP34Hash = uint256();
+        consensus.powLimit = uint256S("7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
+        consensus.nPowTargetTimespan = 24 * 60 * 60; // Lux: 1 day
+        consensus.nPowTargetSpacing = 10 * 60;
+        consensus.fPowAllowMinDifficultyBlocks = true;
+        consensus.fPowNoRetargeting = true;
+        consensus.nRuleChangeActivationThreshold = 108; // 75% for testchains
+        consensus.nMinerConfirmationWindow = 144; // Faster than normal for regtest (144 instead of 2016)
+        consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].bit = 28;
+        consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nStartTime = 0;
+        consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nTimeout = 999999999999ULL;
+        consensus.vDeployments[Consensus::DEPLOYMENT_CSV].bit = 0;
+        consensus.vDeployments[Consensus::DEPLOYMENT_CSV].nStartTime = 0;
+        consensus.vDeployments[Consensus::DEPLOYMENT_CSV].nTimeout = 999999999999ULL;
+        consensus.vDeployments[Consensus::DEPLOYMENT_SEGWIT].bit = 1;
+        consensus.vDeployments[Consensus::DEPLOYMENT_SEGWIT].nStartTime = 0;
+        consensus.vDeployments[Consensus::DEPLOYMENT_SEGWIT].nTimeout = 999999999999ULL;
+
         pchMessageStart[0] = 0xa1;
         pchMessageStart[1] = 0xcf;
         pchMessageStart[2] = 0x7e;
         pchMessageStart[3] = 0xac;
-        nSubsidyHalvingInterval = 150;
-        nEnforceBlockUpgradeMajority = 750;
-        nRejectBlockOutdatedMajority = 950;
-        nToCheckBlockUpgradeMajority = 1000;
         nMinerThreads = 1;
         nMaturity = 2;
         nTargetTimespan = 24 * 60 * 60; // Lux: 1 day

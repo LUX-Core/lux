@@ -23,6 +23,8 @@
 #include "wallet.h"
 #endif
 
+#include "consensus/validation.h"
+
 #include <boost/thread.hpp>
 #include <boost/tuple/tuple.hpp>
 

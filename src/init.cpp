@@ -9,6 +9,8 @@
 #include "config/lux-config.h"
 #endif
 
+#include "policy/policy.h"
+
 #include "init.h"
 
 #include "activemasternode.h"
@@ -16,6 +18,7 @@
 #include "amount.h"
 #include "checkpoints.h"
 #include "compat/sanity.h"
+#include "consensus/validation.h"
 #include "key.h"
 #include "main.h"
 #include "stake.h"

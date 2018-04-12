@@ -58,21 +58,14 @@ static const int64_t DARKSEND_COLLATERAL = (16120*COIN); //161.20 LUX
 static const int64_t DARKSEND_FEE = (0.002*COIN); // reward masternode
 static const int64_t DARKSEND_POOL_MAX = (1999999.99*COIN);
 
-/** Default for -blockmaxsize and -blockminsize, which control the range of sizes the mining code will create **/
-static const unsigned int DEFAULT_BLOCK_MAX_SIZE = 6000000;
-static const unsigned int DEFAULT_BLOCK_MIN_SIZE = 0;
 /** The maximum size for mined blocks */
 static const unsigned int MAX_BLOCK_SIZE_GEN = MAX_BLOCK_SIZE/2;
-/** Default for -blockprioritysize, maximum space for zero/low-fee transactions **/
-static const unsigned int DEFAULT_BLOCK_PRIORITY_SIZE = 50000;
 /** Default for accepting alerts from the P2P network. */
 static const bool DEFAULT_ALERTS = true;
 /** The maximum size for transactions we're willing to relay/mine */
 static const unsigned int MAX_STANDARD_TX_SIZE = MAX_BLOCK_SIZE_GEN/5;
 /** The maximum allowed number of signature check operations in a block (network rule) */
 static const unsigned int MAX_BLOCK_SIGOPS = MAX_BLOCK_SIZE / 50;
-/** Maximum number of signature check operations in an IsStandard() P2SH script */
-static const unsigned int MAX_P2SH_SIGOPS = 15;
 /** Default for -maxorphantx, maximum number of orphan transactions kept in memory */
 static const unsigned int DEFAULT_MAX_ORPHAN_TRANSACTIONS = MAX_BLOCK_SIZE/100;
 /** The maximum size of a blk?????.dat file (since 0.8) */
@@ -81,8 +74,6 @@ static const unsigned int MAX_BLOCKFILE_SIZE = 0x8000000; // 128 MiB
 static const unsigned int BLOCKFILE_CHUNK_SIZE = 0x1000000; // 16 MiB
 /** The pre-allocation chunk size for rev?????.dat files (since 0.8) */
 static const unsigned int UNDOFILE_CHUNK_SIZE = 0x100000; // 1 MiB
-/** Coinbase transaction outputs can only be spent after this number of new blocks (network rule) */
-static const int COINBASE_MATURITY = 79;
 /** Threshold for nLockTime: below this value it is interpreted as block number, otherwise as UNIX timestamp. */
 static const unsigned int LOCKTIME_THRESHOLD = 500000000; // Tue Nov  5 00:53:20 1985 UTC
 /** Maximum number of script-checking threads allowed */
@@ -107,15 +98,6 @@ static const unsigned int DATABASE_WRITE_INTERVAL = 3600;
 static const unsigned int MAX_REJECT_MESSAGE_LENGTH = 111;
 /** Bloomfilter setting. */
 static const bool DEFAULT_PEERBLOOMFILTERS = true;
-/** "reject" message codes */
-static const unsigned char REJECT_MALFORMED = 0x01;
-static const unsigned char REJECT_INVALID = 0x10;
-static const unsigned char REJECT_OBSOLETE = 0x11;
-static const unsigned char REJECT_DUPLICATE = 0x12;
-static const unsigned char REJECT_NONSTANDARD = 0x40;
-static const unsigned char REJECT_DUST = 0x41;
-static const unsigned char REJECT_INSUFFICIENTFEE = 0x42;
-static const unsigned char REJECT_CHECKPOINT = 0x43;
 
 static const unsigned int DEFAULT_BYTES_PER_SIGOP = 20;
 
@@ -144,6 +126,8 @@ extern bool fReindex;
 extern int nScriptCheckThreads;
 extern bool fTxIndex;
 extern bool fIsBareMultisigStd;
+extern bool fRequireStandard;
+extern unsigned int nBytesPerSigOp;
 extern bool fCheckBlockIndex;
 extern unsigned int nCoinCacheSize;
 extern CFeeRate minRelayTxFee;
@@ -182,7 +166,7 @@ void UnregisterNodeSignals(CNodeSignals& nodeSignals);
  * @param[out]  dbp     If pblock is stored to disk (or already there), this will be set to its location.
  * @return True if state.IsValid()
  */
-bool ProcessNewBlock(CValidationState& state, CNode* pfrom, CBlock* pblock, CDiskBlockPos* dbp = NULL);
+bool ProcessNewBlock(CValidationState& state, const CChainParams& chainparams, CNode* pfrom, const CBlock* pblock, CDiskBlockPos* dbp = NULL);
 /** Check whether enough disk space is available for an incoming block */
 bool CheckDiskSpace(uint64_t nAdditionalBytes = 0);
 /** Open a block file (blk?????.dat) */
@@ -192,9 +176,9 @@ FILE* OpenUndoFile(const CDiskBlockPos& pos, bool fReadOnly = false);
 /** Translation to a filesystem path */
 boost::filesystem::path GetBlockPosFilename(const CDiskBlockPos& pos, const char* prefix);
 /** Import blocks from an external file */
-bool LoadExternalBlockFile(FILE* fileIn, CDiskBlockPos* dbp = NULL);
+bool LoadExternalBlockFile(const CChainParams& chainparams, FILE* fileIn, CDiskBlockPos* dbp = NULL);
 /** Initialize a new block tree database + block data on disk */
-bool InitBlockIndex();
+bool InitBlockIndex(const CChainParams& chainparams);
 /** Load the block tree and coins database from disk */
 bool LoadBlockIndex();
 /** Unload database information */
@@ -222,13 +206,11 @@ bool IsInitialBlockDownload();
 /** Format a string that describes several potential problems detected by the core */
 std::string GetWarnings(std::string strFor);
 /** Retrieve a transaction (from memory pool, or from disk, if possible) */
-bool GetTransaction(const uint256& hash, CTransaction& tx, uint256& hashBlock, bool fAllowSlow = false);
+bool GetTransaction(const uint256& hash, CTransaction& tx, const Consensus::Params& params, uint256& hashBlock, bool fAllowSlow = false);
 /** Find the best known block, and make it the tip of the block chain */
 
 bool DisconnectBlocksAndReprocess(int blocks);
 
-/** Check whether witness commitments are required for block. */
-bool IsWitnessEnabled(const CBlockIndex* pindexPrev);
 bool IsWitnessLocked(const CBlockIndex* pindexPrev);
 
 // ***TODO***
@@ -465,6 +447,7 @@ class CScriptCheck
 {
 private:
     CScript scriptPubKey;
+    CAmount amount;
     const CTransaction* ptxTo;
     unsigned int nIn;
     unsigned int nFlags;
@@ -472,9 +455,10 @@ private:
     ScriptError error;
 
 public:
-    CScriptCheck() : ptxTo(0), nIn(0), nFlags(0), cacheStore(false), error(SCRIPT_ERR_UNKNOWN_ERROR) {}
-    CScriptCheck(const CCoins& txFromIn, const CTransaction& txToIn, unsigned int nInIn, unsigned int nFlagsIn, bool cacheIn) : scriptPubKey(txFromIn.vout[txToIn.vin[nInIn].prevout.n].scriptPubKey),
-                                                                                                                                ptxTo(&txToIn), nIn(nInIn), nFlags(nFlagsIn), cacheStore(cacheIn), error(SCRIPT_ERR_UNKNOWN_ERROR) {}
+    CScriptCheck(): amount(0), ptxTo(0), nIn(0), nFlags(0), cacheStore(false), error(SCRIPT_ERR_UNKNOWN_ERROR) {}
+    CScriptCheck(const CCoins& txFromIn, const CTransaction& txToIn, unsigned int nInIn, unsigned int nFlagsIn, bool cacheIn) :
+        scriptPubKey(txFromIn.vout[txToIn.vin[nInIn].prevout.n].scriptPubKey), amount(txFromIn.vout[txToIn.vin[nInIn].prevout.n].nValue),
+        ptxTo(&txToIn), nIn(nInIn), nFlags(nFlagsIn), cacheStore(cacheIn), error(SCRIPT_ERR_UNKNOWN_ERROR) {}
 
     bool operator()();
 
@@ -494,8 +478,8 @@ public:
 
 /** Functions for disk access for blocks */
 bool WriteBlockToDisk(CBlock& block, CDiskBlockPos& pos);
-bool ReadBlockFromDisk(CBlock& block, const CDiskBlockPos& pos);
-bool ReadBlockFromDisk(CBlock& block, const CBlockIndex* pindex);
+bool ReadBlockFromDisk(CBlock& block, const CDiskBlockPos& pos, const Consensus::Params& consensusParams);
+bool ReadBlockFromDisk(CBlock& block, const CBlockIndex* pindex, const Consensus::Params& consensusParams);
 
 
 /** Functions for validating blocks and updating the block tree */
@@ -522,7 +506,7 @@ bool ContextualCheckBlockHeader(const CBlockHeader& block, CValidationState& sta
 bool ContextualCheckBlock(const CBlock& block, CValidationState& state, CBlockIndex* pindexPrev);
 
 /** Check a block is completely valid from start to finish (only works on top of our current best block, with cs_main held) */
-bool TestBlockValidity(CValidationState& state, const CBlock& block, CBlockIndex* pindexPrev, bool fCheckPOW = true, bool fCheckMerkleRoot = true);
+bool TestBlockValidity(CValidationState& state, const CChainParams& chainparams, const CBlock& block, CBlockIndex* pindexPrev, bool fCheckPOW = true, bool fCheckMerkleRoot = true);
 
 /** Check whether witness commitments are required for block. */
 bool IsWitnessEnabled(const CBlockIndex* pindexPrev, const Consensus::Params& params);
@@ -590,93 +574,20 @@ public:
     }
 };
 
-/** Capture information about block/transaction validation */
-class CValidationState
-{
-private:
-    enum mode_state {
-        MODE_VALID,   //! everything ok
-        MODE_INVALID, //! network rule violation (DoS value may be set)
-        MODE_ERROR,   //! run-time error
-    } mode;
-    int nDoS;
-    std::string strRejectReason;
-    unsigned char chRejectCode;
-    bool corruptionPossible;
-
-public:
-    CValidationState() : mode(MODE_VALID), nDoS(0), chRejectCode(0), corruptionPossible(false) {}
-    bool DoS(int level, bool ret = false, unsigned char chRejectCodeIn = 0, std::string strRejectReasonIn = "", bool corruptionIn = false)
-    {
-        chRejectCode = chRejectCodeIn;
-        strRejectReason = strRejectReasonIn;
-        corruptionPossible = corruptionIn;
-        if (mode == MODE_ERROR)
-            return ret;
-        nDoS += level;
-        mode = MODE_INVALID;
-        return ret;
-    }
-    bool Invalid(bool ret = false,
-        unsigned char _chRejectCode = 0,
-        std::string _strRejectReason = "")
-    {
-        return DoS(0, ret, _chRejectCode, _strRejectReason);
-    }
-    bool Error(std::string strRejectReasonIn = "")
-    {
-        if (mode == MODE_VALID)
-            strRejectReason = strRejectReasonIn;
-        mode = MODE_ERROR;
-        return false;
-    }
-    bool Abort(const std::string& msg)
-    {
-        AbortNode(msg);
-        return Error(msg);
-    }
-    bool IsValid() const
-    {
-        return mode == MODE_VALID;
-    }
-    bool IsInvalid() const
-    {
-        return mode == MODE_INVALID;
-    }
-    bool IsError() const
-    {
-        return mode == MODE_ERROR;
-    }
-    bool IsInvalid(int& nDoSOut) const
-    {
-        if (IsInvalid()) {
-            nDoSOut = nDoS;
-            return true;
-        }
-        return false;
-    }
-    bool CorruptionPossible() const
-    {
-        return corruptionPossible;
-    }
-    unsigned char GetRejectCode() const { return chRejectCode; }
-    std::string GetRejectReason() const { return strRejectReason; }
-};
-
 /** RAII wrapper for VerifyDB: Verify consistency of the block and coin databases */
 class CVerifyDB
 {
 public:
     CVerifyDB();
     ~CVerifyDB();
-    bool VerifyDB(CCoinsView* coinsview, int nCheckLevel, int nCheckDepth);
+    bool VerifyDB(const CChainParams& chainparams, CCoinsView* coinsview, int nCheckLevel, int nCheckDepth);
 };
 
 /** Find the last common block between the parameter chain and a locator. */
 CBlockIndex* FindForkInGlobalIndex(const CChain& chain, const CBlockLocator& locator);
 
 /** Mark a block as invalid. */
-bool InvalidateBlock(CValidationState& state, CBlockIndex* pindex);
+bool InvalidateBlock(CValidationState& state, const CChainParams& chainparams, CBlockIndex* pindex);
 
 /** Remove invalidity status from a block and its descendants. */
 bool ReconsiderBlock(CValidationState& state, CBlockIndex* pindex);

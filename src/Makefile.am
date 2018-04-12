@@ -416,6 +416,7 @@ libbitcoinconsensus_la_SOURCES = \
   consensus/merkle.cpp \
   consensus/merkle.h \
   consensus/params.h \
+  consensus/validation.h \
   crypto/hmac_sha512.cpp \
   crypto/scrypt.cpp \
   crypto/sha1.cpp \
