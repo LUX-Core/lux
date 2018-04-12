@@ -2622,19 +2622,18 @@ UniValue createcontract(const UniValue& params, bool fHelp){
     CReserveKey reservekey(pwalletMain);
     CAmount nFeeRequired;
     std::string strError;
-    vector<CRecipient> vecSend;
-    int nChangePosRet = -1;
-    CRecipient recipient = {scriptPubKey, 0, false};
-    vecSend.push_back(recipient);
+    vector<pair<CScript, CAmount> > vecSend;
+    vecSend.push_back(make_pair(scriptPubKey, 0));
 
-    if (!pwalletMain->CreateTransaction(vecSend, wtx, reservekey, nFeeRequired, nChangePosRet, strError, &coinControl, true, nGasFee, fHasSender)) {
+    if (!pwalletMain->CreateTransaction(vecSend, wtx, reservekey, nFeeRequired, strError, &coinControl,  ALL_COINS,
+                                        false, (CAmount)0, nGasFee)) {
         if (nFeeRequired > pwalletMain->GetBalance())
             strError = strprintf("Error: This transaction requires a transaction fee of at least %s because of its amount, complexity, or use of recently received funds!", FormatMoney(nFeeRequired));
         throw JSONRPCError(RPC_WALLET_ERROR, strError);
     }
 
     CTxDestination txSenderDest;
-    ExtractDestination(pwalletMain->mapWallet[wtx.tx->vin[0].prevout.hash].tx->vout[wtx.tx->vin[0].prevout.n].scriptPubKey,txSenderDest);
+    ExtractDestination(pwalletMain->mapWallet[wtx.vin[0].prevout.hash].vout[wtx.vin[0].prevout.n].scriptPubKey,txSenderDest);
 
     if (fHasSender && !(senderAddress.Get() == txSenderDest)){
         throw JSONRPCError(RPC_TYPE_ERROR, "Sender could not be set, transaction was not committed!");
@@ -2643,7 +2642,7 @@ UniValue createcontract(const UniValue& params, bool fHelp){
     UniValue result(UniValue::VOBJ);
     if(fBroadcast){
         CValidationState state;
-        if (!pwalletMain->CommitTransaction(wtx, reservekey, g_connman.get(), state))
+        if (!pwalletMain->CommitTransaction(wtx, reservekey))
             throw JSONRPCError(RPC_WALLET_ERROR, "Error: The transaction was rejected! This might happen if some of the coins in your wallet were already spent, such as if you used a copy of the wallet and coins were spent in the copy but not marked as spent here.");
 
         std::string txId=wtx.GetHash().GetHex();
@@ -2660,7 +2659,7 @@ UniValue createcontract(const UniValue& params, bool fHelp){
         vector<unsigned char> contractAddress(20);
         vector<unsigned char> txIdAndVout(wtx.GetHash().begin(), wtx.GetHash().end());
         uint32_t voutNumber=0;
-        BOOST_FOREACH(const CTxOut& txout, wtx.tx->vout) {
+        BOOST_FOREACH(const CTxOut& txout, wtx.vout) {
             if(txout.scriptPubKey.HasOpCreate()){
                 std::vector<unsigned char> voutNumberChrs;
                 if (voutNumberChrs.size() < sizeof(voutNumber))voutNumberChrs.resize(sizeof(voutNumber));
@@ -2674,7 +2673,7 @@ UniValue createcontract(const UniValue& params, bool fHelp){
         CRIPEMD160().Write(SHA256TxVout.data(), SHA256TxVout.size()).Finalize(contractAddress.data());
         result.push_back(Pair("address", HexStr(contractAddress)));
     }else{
-        string strHex = EncodeHexTx(*wtx.tx, RPCSerializationFlags());
+        string strHex = EncodeHexTx(static_cast<CTransaction>(wtx));
         result.push_back(Pair("raw transaction", strHex));
     }
     return result;
@@ -2799,7 +2798,7 @@ UniValue sendtocontract(const UniValue& params, bool fHelp){
         BOOST_FOREACH(const COutput& out, vecOutputs) {
 
             CTxDestination address;
-            const CScript& scriptPubKey = out.tx->tx->vout[out.i].scriptPubKey;
+            const CScript& scriptPubKey = out.tx->vout[out.i].scriptPubKey;
             bool fValidAddress = ExtractDestination(scriptPubKey, address);
 
             CBitcoinAddress destAdress(address);
@@ -2845,19 +2844,20 @@ UniValue sendtocontract(const UniValue& params, bool fHelp){
     CReserveKey reservekey(pwalletMain);
     CAmount nFeeRequired;
     std::string strError;
-    vector<CRecipient> vecSend;
-    int nChangePosRet = -1;
-    CRecipient recipient = {scriptPubKey, nAmount, false};
-    vecSend.push_back(recipient);
+    vector<pair<CScript, CAmount> > vecSend;
+//    int nChangePosRet = -1;
+    vecSend.push_back(make_pair(scriptPubKey, nAmount));
 
-    if (!pwalletMain->CreateTransaction(vecSend, wtx, reservekey, nFeeRequired, nChangePosRet, strError, &coinControl, true, nGasFee, fHasSender)) {
+
+    if (!pwalletMain->CreateTransaction(vecSend, wtx, reservekey, nFeeRequired, strError, &coinControl, ALL_COINS,
+                                        false, (CAmount)0, nGasFee)) {
         if (nFeeRequired > pwalletMain->GetBalance())
             strError = strprintf("Error: This transaction requires a transaction fee of at least %s because of its amount, complexity, or use of recently received funds!", FormatMoney(nFeeRequired));
         throw JSONRPCError(RPC_WALLET_ERROR, strError);
     }
 
     CTxDestination txSenderDest;
-    ExtractDestination(pwalletMain->mapWallet[wtx.tx->vin[0].prevout.hash].tx->vout[wtx.tx->vin[0].prevout.n].scriptPubKey,txSenderDest);
+    ExtractDestination(pwalletMain->mapWallet[wtx.vin[0].prevout.hash].vout[wtx.vin[0].prevout.n].scriptPubKey,txSenderDest);
 
     if (fHasSender && !(senderAddress.Get() == txSenderDest)){
         throw JSONRPCError(RPC_TYPE_ERROR, "Sender could not be set, transaction was not committed!");
@@ -2869,7 +2869,7 @@ UniValue sendtocontract(const UniValue& params, bool fHelp){
 
 
         CValidationState state;
-        if (!pwalletMain->CommitTransaction(wtx, reservekey, g_connman.get(), state))
+        if (!pwalletMain->CommitTransaction(wtx, reservekey))
             throw JSONRPCError(RPC_WALLET_ERROR, "Error: The transaction was rejected! This might happen if some of the coins in your wallet were already spent, such as if you used a copy of the wallet and coins were spent in the copy but not marked as spent here.");
 
         std::string txId=wtx.GetHash().GetHex();
@@ -2882,7 +2882,7 @@ UniValue sendtocontract(const UniValue& params, bool fHelp){
         result.push_back(Pair("sender", txSenderAdress.ToString()));
         result.push_back(Pair("hash160", HexStr(valtype(keyid.begin(),keyid.end()))));
     }else{
-        string strHex = EncodeHexTx(*wtx.tx, RPCSerializationFlags());
+        string strHex = EncodeHexTx(static_cast<CTransaction>(wtx));
         result.push_back(Pair("raw transaction", strHex));
     }
 
