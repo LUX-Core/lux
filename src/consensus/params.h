@@ -34,16 +34,15 @@ namespace Consensus {
      * Parameters that influence chain consensus.
      */
     struct Params {
-        uint256 hashGenesisBlock;
+        bool fPowAllowMinDifficultyBlocks;
         int nSubsidyHalvingInterval;
         BIP9Deployment vDeployments[MAX_VERSION_BITS_DEPLOYMENTS];
         /** Used to check majorities for block version upgrade */
-        int nEnforceBlockUpgradeMajority;
-        int nRejectBlockOutdatedMajority;
-        int nToCheckBlockUpgradeMajority;
+        int nMajorityEnforceBlockUpgrade;
+        int nMajorityRejectBlockOutdated;
+        int nMajorityWindow;
         /** Proof of work parameters */
         int nLastPOWBlock;
-        uint256 powLimit;
         /**
          * Minimum blocks including miner confirmation of the total of 2016 blocks in a retargetting period,
          * (nPowTargetTimespan / nPowTargetSpacing) which is also used for BIP9 deployments.
@@ -57,6 +56,8 @@ namespace Consensus {
         int64_t nStakingRoundPeriod;
         int64_t nStakingInterval;
         int64_t nStakingMinAge;
+        uint256 powLimit;
+        uint256 hashGenesisBlock;
     };
 } // namespace Consensus
 

@@ -564,7 +564,7 @@ bool Stake::IsBlockStaked(int nHeight) const
     return result;
 }
 
-bool Stake::IsBlockStaked(CBlock* block) const
+bool Stake::IsBlockStaked(const CBlock* block) const
 {
     bool result = false;
     if (block->IsProofOfStake()) {

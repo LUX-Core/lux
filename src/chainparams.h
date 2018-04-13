@@ -51,9 +51,9 @@ public:
     const uint256& ProofOfWorkLimit() const { return consensus.powLimit; }
     int SubsidyHalvingInterval() const { return consensus.nSubsidyHalvingInterval; }
     /** Used to check majorities for block version upgrade */
-    int EnforceBlockUpgradeMajority() const { return consensus.nEnforceBlockUpgradeMajority; }
-    int RejectBlockOutdatedMajority() const { return consensus.nRejectBlockOutdatedMajority; }
-    int ToCheckBlockUpgradeMajority() const { return consensus.nToCheckBlockUpgradeMajority; }
+    int EnforceBlockUpgradeMajority() const { return consensus.nMajorityEnforceBlockUpgrade; }
+    int RejectBlockOutdatedMajority() const { return consensus.nMajorityRejectBlockOutdated; }
+    int MajorityWindow() const { return consensus.nMajorityWindow; }
     int MaxReorganizationDepth() const { return nMaxReorganizationDepth; }
 
     /** Used if GenerateBitcoins is called with a negative number of threads */
@@ -120,7 +120,7 @@ protected:
     std::vector<CAddress> vFixedSeeds;
     bool fRequireRPCPassword;
     bool fMiningRequiresPeers;
-    bool fAllowMinDifficultyBlocks;
+
     bool fDefaultConsistencyChecks;
     bool fRequireStandard;
     bool fMineBlocksOnDemand;
