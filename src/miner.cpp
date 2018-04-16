@@ -98,13 +98,13 @@ public:
     }
 };
 
-void UpdateTime(CBlockHeader* pblock, const Consensus::Params& consensusParams, const CBlockIndex* pindexPrev)
+void UpdateTime(CBlockHeader* pblock, const Consensus::Params& consensusParams, const CBlockIndex* pindexPrev, bool isProofOfStake)
 {
     pblock->nTime = std::max(pindexPrev->GetMedianTimePast() + 1, GetAdjustedTime());
 
     // Updating time can change work required on testnet:
     if (consensusParams.fPowAllowMinDifficultyBlocks)
-        pblock->nBits = GetNextWorkRequired(pindexPrev, pblock, consensusParams);
+        pblock->nBits = GetNextWorkRequired(pindexPrev, pblock, consensusParams, isProofOfStake);
 }
 
 CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, bool fProofOfStake)
@@ -124,7 +124,8 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
     if (chainparams.MineBlocksOnDemand())
         pblock->nVersion = GetArg("-blockversion", pblock->nVersion);
 
-    int nHeight = chainActive.Tip()->nHeight + 1;
+    CBlockIndex* pindexPrev = chainActive.Tip();
+    int nHeight = pindexPrev->nHeight + 1;
 
     // Create coinbase tx
     CMutableTransaction txNew;
@@ -138,7 +139,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
     // -promiscuousmempoolflags is used.
     // TODO: replace this with a call to main to assess validity of a mempool
     // transaction (which in most cases can be a no-op).
-    fIncludeWitness = IsWitnessEnabled(pindexPrev, chainparams.GetConsensus());
+    bool fIncludeWitness = IsWitnessEnabled(pindexPrev, chainparams.GetConsensus());
 
     if (fProofOfStake) {
         // Height first in coinbase required for block.version=2
@@ -281,6 +282,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
 
         TxPriorityCompare comparer(fSortedByFee);
         std::make_heap(vecPriority.begin(), vecPriority.end(), comparer);
+        CTxMemPool::txiter iter;
 
         while (!vecPriority.empty()) {
             // Take highest priority transaction off the priority queue:
@@ -392,12 +394,12 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
         // Compute final coinbase transaction.
         pblock->nNonce = 0;
         pblock->hashPrevBlock = pindexPrev->GetBlockHash();
+        CMutableTransaction tx(pblock->vtx[0]);
         if (fProofOfStake) {
 #           if 0
             if (!stake->CreateBlockStake(pwallet, pblock)) return nullptr;
 #           endif
         } else {
-            auto &tx = pblock->vtx[0];
             CScript payeeScript;
             auto nReward = GetProofOfWorkReward(nFees, pindexPrev->nHeight+1);
             if (ENABLE_POW_REWARD_SPLIT && SelectMasternodePayee(payeeScript)) {                 
@@ -414,13 +416,15 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
                 tx.vout[0].nValue = nReward;
             }
             pblocktemplate->vTxFees[0] = -nFees;
-            UpdateTime(pblock, pindexPrev);
         }
-        pblock->vtx[0].vin[0].scriptSig = CScript() << nHeight << OP_0;
+        tx.vin[0].scriptSig = CScript() << nHeight << OP_0;
+        pblock->vtx[0] = CTransaction(tx);
         pblocktemplate->vTxSigOps[0] = GetLegacySigOpCount(pblock->vtx[0]);
+        const CChainParams& chainparams = Params();
+        UpdateTime(pblock, chainparams.GetConsensus(), pindexPrev, fProofOfStake);
 
         CValidationState state;
-        if (!TestBlockValidity(state, *pblock, pindexPrev, false, false)) {
+        if (!TestBlockValidity(state, chainparams, *pblock, pindexPrev, false, false)) {
             if (!fProofOfStake) LogPrintf("%s: TestBlockValidity failed (%s)\n", __func__, ct);
             return nullptr;
         }
@@ -487,8 +491,9 @@ bool ProcessBlockFound(CBlock* pblock, CWallet& wallet, CReserveKey& reservekey)
     }
 
     // Process this block the same as if we had received it from another node
+    const CChainParams& chainparams = Params();
     CValidationState state;
-    if (!ProcessNewBlock(state, NULL, pblock)) {
+    if (!ProcessNewBlock(state, chainparams, NULL, pblock)) {
         return error("LUXMiner : ProcessNewBlock, block not accepted");
     }
 
@@ -651,7 +656,7 @@ void BitcoinMiner(CWallet* pwallet, bool fProofOfStake)
                 break;
 
             // Update nTime every few seconds
-            UpdateTime(pblock, pindexPrev);
+            UpdateTime(pblock, Params().GetConsensus(), pindexPrev, fProofOfStake);
             if (Params().AllowMinDifficultyBlocks()) {
                 // Changing pblock->nTime can change work required on testnet:
                 hashTarget.SetCompact(pblock->nBits);
@@ -695,8 +700,9 @@ bool CheckStake(CBlock* pblock, CWallet& wallet)
         }
 
         // Process this block the same as if we had received it from another node
+        const CChainParams& chainparams = Params();
         CValidationState state;
-        if (!ProcessNewBlock(state, NULL, pblock))
+        if (!ProcessNewBlock(state, chainparams, NULL, pblock))
             return error("CheckStake() : ProcessBlock, block not accepted");
     }
 

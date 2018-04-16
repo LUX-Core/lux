@@ -470,7 +470,7 @@ UniValue masternode(const UniValue& params, bool fHelp)
         if(activeMasternode.status == MASTERNODE_SYNC_IN_PROCESS) return "sync in process. Must wait until client is synced to start.";
 
         CTxIn vin = CTxIn();
-        CPubKey pubkey = CScript();
+        CPubKey pubkey = CPubKey();
         CKey key;
         bool found = activeMasternode.GetMasterNodeVin(vin, pubkey, key);
         if(!found){
@@ -541,7 +541,7 @@ UniValue masternode(const UniValue& params, bool fHelp)
 
         CService addr = CService(strAddress);
 
-        if(ConnectNode((CAddress)addr, NULL, true)){
+        if(ConnectNode(CAddress(addr, NODE_NETWORK), NULL, true)){
             return "successfully connected";
         } else {
             return "error connecting";

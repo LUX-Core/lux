@@ -6,6 +6,7 @@
 #ifndef BITCOIN_MINER_H
 #define BITCOIN_MINER_H
 
+#include "consensus/params.h"
 #include <stdint.h>
 
 class CBlock;
@@ -26,7 +27,7 @@ bool ProcessBlockFound(CBlock* pblock, CWallet& wallet, CReserveKey& reservekey)
 /** Modify the extranonce in a block */
 void IncrementExtraNonce(CBlock* pblock, CBlockIndex* pindexPrev, unsigned int& nExtraNonce);
 /** Check mined block */
-void UpdateTime(CBlockHeader* block, const CBlockIndex* pindexPrev);
+void UpdateTime(CBlockHeader* block, const Consensus::Params& consensusParams, const CBlockIndex* pindexPrev, bool isProofOfStake);
 
 void BitcoinMiner(CWallet* pwallet, bool fProofOfStake);
 

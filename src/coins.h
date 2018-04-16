@@ -459,7 +459,7 @@ public:
     bool HaveInputs(const CTransaction& tx) const;
 
     //! Return priority of tx at height nHeight
-    double GetPriority(const CTransaction& tx, int nHeight) const;
+    double GetPriority(const CTransaction& tx, int nHeight, CAmount &inChainInputValue) const;
 
     const CTxOut& GetOutputFor(const CTxIn& input) const;
 

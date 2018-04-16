@@ -8,6 +8,8 @@
 #include "db.h"
 #include "stake.h"
 #include "init.h"
+#include "chainparams.h"
+#include "policy/policy.h"
 #include "main.h"
 #include "miner.h"
 #include "wallet.h"
@@ -448,11 +450,14 @@ bool Stake::CheckProof(CBlockIndex* const pindexPrev, const CBlock &block, uint2
     // First try finding the previous transaction in database
     uint256 prevBlockHash;
     CTransaction txPrev;
-    if (!GetTransaction(txin.prevout.hash, txPrev, prevBlockHash, true))
+    const Consensus::Params& consensusparams = Params().GetConsensus();
+    if (!GetTransaction(txin.prevout.hash, txPrev, consensusparams, prevBlockHash, true))
         return error("%s: read txPrev failed");
 
     //verify signature and script
-    if (!VerifyScript(txin.scriptSig, txPrev.vout[txin.prevout.n].scriptPubKey, STANDARD_SCRIPT_VERIFY_FLAGS, TransactionSignatureChecker(&tx, 0)))
+    const CAmount& amount = txPrev.vout[txin.prevout.n].nValue;
+    bool fIsVerified = VerifyScript(txin.scriptSig, txPrev.vout[txin.prevout.n].scriptPubKey, tx.wit.vtxinwit.size() > 0 ? &tx.wit.vtxinwit[0].scriptWitness : NULL, STANDARD_SCRIPT_VERIFY_FLAGS, TransactionSignatureChecker(&tx, 0, amount));
+    if (!fIsVerified)
         return error("%s: VerifySignature failed on coinstake %s", __func__, tx.GetHash().ToString().c_str());
 
     CBlockIndex* pindex = NULL;
@@ -464,7 +469,7 @@ bool Stake::CheckProof(CBlockIndex* const pindexPrev, const CBlock &block, uint2
 
     // Read block header
     CBlock prevBlock;
-    if (!ReadBlockFromDisk(prevBlock, pindex->GetBlockPos()))
+    if (!ReadBlockFromDisk(prevBlock, pindex->GetBlockPos(), consensusparams))
         return error("%s: failed to find block", __func__);
 
     unsigned int nTime = block.nTime;
@@ -878,9 +883,20 @@ bool Stake::CreateCoinStake(CWallet *wallet, const CKeyStore& keystore, unsigned
     // Sign
     i = 0;
     for (const CWalletTx* pcoin : vCoins) {
-        if (!SignSignature(*wallet, *pcoin, txNew, i++)) {
+
+        const CTxIn& txin = txNew.vin[i];
+        const CScript& prevPubKey = txNew.vout[txin.prevout.n].scriptPubKey;
+        const CAmount& amount = txNew.vout[txin.prevout.n].nValue;
+        SignatureData sigdata;
+        bool fIsSigned = ProduceSignature(MutableTransactionSignatureCreator(&keystore, &txNew, i++, amount, SIGHASH_ALL/*TODO: should it always be SIGHASH_ALL?*/), prevPubKey, sigdata);
+
+        if (!fIsSigned) {
             return error("%s: failed to sign coinstake (%d)", __func__, i);
         }
+
+        /*if (!SignSignature(*wallet, *pcoin, txNew, i++)) {
+            return error("%s: failed to sign coinstake (%d)", __func__, i);
+        }*/
     }
 
     // Successfully generated coinstake, reset select timestamp to 
@@ -895,7 +911,7 @@ bool Stake::CreateBlockStake(CWallet *wallet, CBlock *block)
     int64_t nTime = GetAdjustedTime();
     CBlockIndex* tip = chainActive.Tip();
     block->nTime = nTime;
-    block->nBits = GetNextWorkRequired(tip, block);
+    block->nBits = GetNextWorkRequired(tip, block, Params().GetConsensus(), true);
     if (nTime >= nLastStakeTime) {
         CMutableTransaction tx;
         unsigned int txTime = 0;
