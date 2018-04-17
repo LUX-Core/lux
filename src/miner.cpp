@@ -344,7 +344,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
                 continue;
 
             CTxUndo txundo;
-            UpdateCoins(tx, state, view, txundo, nHeight);
+            UpdateCoins(tx, view, nHeight);
             if (!state.IsValid()) {
                 LogPrint("debug", "%s: update coins failed (nHeight=%d, reason: %s)", __func__, nHeight, state.GetRejectReason());
                 continue;

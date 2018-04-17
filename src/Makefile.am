@@ -96,17 +96,16 @@ BITCOIN_CORE_H = \
   compressor.h \
   consensus/consensus.h \
   consensus/params.h \
-  primitives/block.h \
-  primitives/transaction.h \
   core_io.h \
+  core_memusage.h \
   crypter.h \
   darksend.h \
   db.h \
   eccryptoverify.h \
   ecwrapper.h \
   hash.h \
+  indirectmap.h \
   init.h \
-  stake.h \
   instantx.h \
   key.h \
   keystore.h \
@@ -115,15 +114,19 @@ BITCOIN_CORE_H = \
   main.h \
   masternode.h \
   masternodeconfig.h \
+  memusage.h \
   merkleblock.h \
   miner.h \
   mruset.h \
   netbase.h \
   net.h \
   noui.h \
+  policy/fees.h \
   policy/policy.h \
   pow.h \
   prevector.h \
+  primitives/block.h \
+  primitives/transaction.h \
   protocol.h \
   pubkey.h \
   random.h \
@@ -138,6 +141,7 @@ BITCOIN_CORE_H = \
   script/script_error.h \
   serialize.h \
   spork.h \
+  stake.h \
   streams.h \
   sync.h \
   threadsafety.h \
@@ -184,6 +188,7 @@ libbitcoin_server_a_SOURCES = \
   miner.cpp \
   net.cpp \
   noui.cpp \
+  policy/fees.cpp \
   policy/policy.cpp \
   pow.cpp \
   rest.cpp \

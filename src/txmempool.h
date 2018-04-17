@@ -10,6 +10,7 @@
 
 #include "amount.h"
 #include "coins.h"
+#include "policy/fees.h"
 #include "primitives/transaction.h"
 #include "sync.h"
 
@@ -249,10 +250,16 @@ class CTxMemPool
 private:
     bool fSanityCheck; //! Normally false, true if -checkmempool or -regtest
     unsigned int nTransactionsUpdated;
-    CMinerPolicyEstimator* minerPolicyEstimator;
+    CBlockPolicyEstimator* blockPolicyEstimator;
 
-    CFeeRate minRelayFee; //! Passed to constructor to avoid dependency on main
     uint64_t totalTxSize; //! sum of all mempool tx' byte sizes
+    uint64_t cachedInnerUsage; //!< sum of dynamic memory usage of all the map elements (NOT the maps themselves)
+
+    CFeeRate minReasonableRelayFee;
+
+    mutable int64_t lastRollingFeeUpdate;
+    mutable bool blockSinceLastRollingFeeBump;
+    mutable double rollingMinimumFeeRate; //!< minimum fee to get into the pool, decreases exponentially
 
 public:
     mutable CCriticalSection cs;
@@ -306,6 +313,14 @@ public:
 
     typedef std::map<txiter, setEntries, CompareIteratorByHash> cacheMap;
 
+    struct TxLinks {
+        setEntries parents;
+        setEntries children;
+    };
+
+    typedef std::map<txiter, TxLinks, CompareIteratorByHash> txlinksMap;
+    txlinksMap mapLinks;
+
     const setEntries & GetMemPoolParents(txiter entry) const;
     const setEntries & GetMemPoolChildren(txiter entry) const;
 
@@ -328,6 +343,7 @@ public:
     void pruneSpent(const uint256& hash, CCoins& coins);
     unsigned int GetTransactionsUpdated() const;
     void AddTransactionsUpdated(unsigned int n);
+    CFeeRate GetMinFee(size_t sizelimit) const;
     /**
      * Check that none of this transactions inputs are in the mempool, and thus
      * the tx is not dependent on other mempool transactions to be included in a block.
@@ -367,6 +383,8 @@ public:
     /** Write/Read estimates to disk */
     bool WriteFeeEstimates(CAutoFile& fileout) const;
     bool ReadFeeEstimates(CAutoFile& filein);
+
+    size_t DynamicMemoryUsage() const;
 
 private:
     void UpdateParent(txiter entry, txiter parent, bool add);

@@ -21,6 +21,7 @@
 #include "masternode.h"
 #include "merkleblock.h"
 #include "net.h"
+#include "policy/fees.h"
 #include "policy/policy.h"
 #include "pow.h"
 #include "primitives/block.h"
@@ -95,6 +96,7 @@ uint256 bnProofOfStakeLimitV2 = (~uint256(0) >> 34);
  * so it's still 10 times lower comparing to bitcoin.
  */
 CFeeRate minRelayTxFee = CFeeRate(10000);
+FeeFilterRounder filterRounder(::minRelayTxFee);
 
 CTxMemPool mempool(::minRelayTxFee);
 
@@ -1382,7 +1384,7 @@ bool GetTransaction(const uint256& hash, CTransaction& txOut, const Consensus::P
                 file >> header;
                 fseek(file.Get(), postx.nTxOffset, SEEK_CUR);
                 file >> txOut;
-            } catch (const std::exception &e) {
+            } catch (const std::exception& e) {
                 return error("%s: Deserialize or I/O error - %s", __func__, e.what());
             }
             hashBlock = header.GetHash();
@@ -2370,6 +2372,18 @@ void FlushStateToDisk()
     FlushStateToDisk(state, FLUSH_STATE_ALWAYS);
 }
 
+CAmount GetBlockSubsidy(int nHeight, const Consensus::Params& consensusParams) {
+    int halvings = nHeight / consensusParams.nSubsidyHalvingInterval;
+    // Force block reward to zero when right shift is undefined.
+    if (halvings >= 64)
+        return 0;
+
+    CAmount nSubsidy = 50 * COIN;
+    // Subsidy is cut in half every 210,000 blocks which will occur approximately every 4 years.
+    nSubsidy >>= halvings;
+    return nSubsidy;
+}
+
 /** Update chainActive and related internal data structures. */
 void static UpdateTip(CBlockIndex* pindexNew, const CChainParams& chainParams)
 {
@@ -2428,7 +2442,7 @@ void static UpdateTip(CBlockIndex* pindexNew, const CChainParams& chainParams)
 }
 
 /** Disconnect chainActive's tip. */
-bool static DisconnectTip(CValidationState& state, const CChainParams& chainparams)
+static bool DisconnectTip(CValidationState& state, const CChainParams& chainparams)
 {
     CBlockIndex* pindexDelete = chainActive.Tip();
     assert(pindexDelete);
@@ -4484,7 +4498,7 @@ void static ProcessGetData(CNode* pfrom, const Consensus::Params& consensusParam
                     if (!ReadBlockFromDisk(block, (*mi).second, consensusParams))
                         assert(!"cannot load block from disk");
                     if (inv.type == MSG_BLOCK)
-                        pfrom->PushMessage("block", block); //TODO push message with flag NO_WITNESS
+                        pfrom->PushMessage("block", block); //TODO: push message with flag NO_WITNESS
                     else if (inv.type == MSG_WITNESS_BLOCK)
                         pfrom->PushMessage("block", block);
                     else // MSG_FILTERED_BLOCK)
@@ -4502,7 +4516,7 @@ void static ProcessGetData(CNode* pfrom, const Consensus::Params& consensusParam
                             typedef std::pair<unsigned int, uint256> PairType;
                             BOOST_FOREACH (PairType& pair, merkleBlock.vMatchedTxn)
                                 if (!pfrom->setInventoryKnown.count(CInv(MSG_TX, pair.second)))
-                                    pfrom->PushMessage("tx", block.vtx[pair.first]); //TODO push message with flag NO_WITNESS
+                                    pfrom->PushMessage("tx", block.vtx[pair.first]); //TODO: push message with flag NO_WITNESS
                         }
                         // else
                         // no response
@@ -4515,7 +4529,7 @@ void static ProcessGetData(CNode* pfrom, const Consensus::Params& consensusParam
                         // wait for other stuff first.
                         vector<CInv> vInv;
                         vInv.push_back(CInv(MSG_BLOCK, chainActive.Tip()->GetBlockHash()));
-                        pfrom->PushMessage("inv", vInv); //TODO push message with flag NO_WITNESS
+                        pfrom->PushMessage("inv", vInv); //TODO: push message with flag NO_WITNESS
                         pfrom->hashContinue = 0;
                     }
                 }
@@ -4526,7 +4540,7 @@ void static ProcessGetData(CNode* pfrom, const Consensus::Params& consensusParam
                     LOCK(cs_mapRelay);
                     map<CInv, CDataStream>::iterator mi = mapRelay.find(inv);
                     if (mi != mapRelay.end()) {
-                        pfrom->PushMessage(inv.GetCommand(), (*mi).second); //TODO push message with flags
+                        pfrom->PushMessage(inv.GetCommand(), (*mi).second); //TODO: push message with flags
                         pushed = true;
                     }
                 }
@@ -4546,7 +4560,7 @@ void static ProcessGetData(CNode* pfrom, const Consensus::Params& consensusParam
                         CDataStream ss(SER_NETWORK, PROTOCOL_VERSION);
                         ss.reserve(1000);
                         ss << mapTxLockVote[inv.hash];
-                        pfrom->PushMessage("txlvote", ss); //TODO push message with flags
+                        pfrom->PushMessage("txlvote", ss); //TODO: push message with flags
                         pushed = true;
                     }
                 }
