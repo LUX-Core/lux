@@ -32,6 +32,11 @@ public:
     explicit RPCConsole(QWidget* parent);
     ~RPCConsole();
 
+    static bool RPCParseCommandLine(std::string &strResult, const std::string &strCommand, bool fExecute, std::string * const pstrFilteredOut = NULL);
+    static bool RPCExecuteCommandLine(std::string &strResult, const std::string &strCommand, std::string * const pstrFilteredOut = NULL) {
+        return RPCParseCommandLine(strResult, strCommand, true, pstrFilteredOut);
+    }
+
     void setClientModel(ClientModel* model);
 
     enum MessageClass {
@@ -62,6 +67,9 @@ private slots:
 
 public slots:
     void clear();
+    void fontBigger();
+    void fontSmaller();
+    void setFontSize(int newSize);
 
     /** Wallet repair options */
     void walletSalvage();
@@ -130,9 +138,11 @@ private:
 
     Ui::RPCConsole* ui;
     ClientModel* clientModel;
+    QString cmdBeforeBrowsing;
     QStringList history;
     int historyPtr;
     NodeId cachedNodeid;
+    int consoleFontSize;
     QMenu *contextMenu;
 };
 

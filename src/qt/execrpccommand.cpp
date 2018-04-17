@@ -65,8 +65,7 @@ bool ExecRPCCommand::exec(const QMap<QString, QString> &params, QVariant &result
             errorMessage = tr("Parse error: unbalanced ' or \"");
         }
 #endif
-    }
-    catch (UniValue& objError) {
+    } catch (UniValue& objError) {
         try { // Nice formatting for standard-format error
 
             int code = find_value(objError, "code").get_int();

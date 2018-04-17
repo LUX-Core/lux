@@ -782,7 +782,7 @@ UniValue reconsiderblock(const UniValue& params, bool fHelp)
     }
 
     if (!state.IsValid()) {
-        throw JSONRPCError(RPC_DATABASE_ERROR, state.GetRejectReason());b v
+        throw JSONRPCError(RPC_DATABASE_ERROR, state.GetRejectReason());
     }
 
     return NullUniValue;
