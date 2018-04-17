@@ -811,10 +811,26 @@ QDialog#RPCConsole QLineEdit#lineEdit { /* Console Input */
     margin-right:5px;
 }
 
+QDialog#RPCConsole QPushButton#fontSmallerButton { /* Console Smaller Button */
+    background-color:transparent;
+    padding-left:10px;
+    padding-right:10px;
+}
+
+QDialog#RPCConsole QPushButton#fontBiggerButton { /* Console Bigger Button */
+    background-color:transparent;
+    padding-left:10px;
+    padding-right:10px;
+}
+
 QDialog#RPCConsole QPushButton#clearButton { /* Console Clear Button */
     background-color:transparent;
     padding-left:10px;
     padding-right:10px;
+}
+
+QDialog#RPCConsole QPushButton#promptIcon { /* Console Clear Button */
+    background-color:transparent;
 }
 
 QDialog#RPCConsole .QGroupBox #line { /* Network In Line */
