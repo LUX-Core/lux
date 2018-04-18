@@ -5,7 +5,7 @@
 
 #include "script/sign.h"
 
-#include "policy.h"
+#include "policy/policy.h"
 #include "primitives/transaction.h"
 #include "key.h"
 #include "keystore.h"

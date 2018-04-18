@@ -2,7 +2,7 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-
+#include "consensus/validation.h"
 #include "darksend.h"
 #include "main.h"
 #include "init.h"
@@ -258,7 +258,7 @@ void ProcessDarksend(CNode* pfrom, const std::string& strCommand, CDataStream& v
             bool missingTx = false;
 
             CValidationState state;
-            CTransaction tx;
+            CMutableTransaction tx;
 
             BOOST_FOREACH(CTxOut o, out){
                 nValueOut += o.nValue;
@@ -286,7 +286,7 @@ void ProcessDarksend(CNode* pfrom, const std::string& strCommand, CDataStream& v
                 CTransaction tx2;
                 uint256 hash;
                 //if(GetTransaction(i.prevout.hash, tx2, hash, true)){
-		if(GetTransaction(i.prevout.hash, tx2, hash)){
+		if(GetTransaction(i.prevout.hash, tx2, Params().GetConsensus(), hash)){
                     if(tx2.vout.size() > i.prevout.n) {
                         nValueIn += tx2.vout[i.prevout.n].nValue;
                     }
@@ -317,7 +317,7 @@ void ProcessDarksend(CNode* pfrom, const std::string& strCommand, CDataStream& v
             }
 
             bool* pfMissingInputs = nullptr;
-	    if (!AcceptableInputs(mempool, state, tx, false, pfMissingInputs)) {
+	    if (!AcceptableInputs(mempool, state, CTransaction(tx), false, pfMissingInputs)) {
                 LogPrintf("dsi -- transaction not valid! \n");
                 error = _("Transaction not valid.");
                 pfrom->PushMessage("dssu", darkSendPool.sessionID, darkSendPool.GetState(), darkSendPool.GetEntriesCount(), MASTERNODE_REJECTED, error);
@@ -538,7 +538,7 @@ void CDarkSendPool::Check()
 
         if (fMasterNode) {
             // make our new transaction
-            CTransaction txNew;
+            CMutableTransaction txNew;
             for(unsigned int i = 0; i < entries.size(); i++){
                 BOOST_FOREACH(const CTxOut v, entries[i].vout)
                     txNew.vout.push_back(v);
@@ -551,7 +551,7 @@ void CDarkSendPool::Check()
 
             if(fDebug) LogPrintf("Transaction 1: %s\n", txNew.ToString().c_str());
 
-            SignFinalTransaction(txNew, NULL);
+            SignFinalTransaction(CTransaction(txNew), NULL);
 
             // request signatures from clients
             RelayDarkSendFinalTransaction(sessionID, txNew);
@@ -905,7 +905,7 @@ void CDarkSendPool::CheckTimeout(){
 
 // check to see if the signature is valid
 bool CDarkSendPool::SignatureValid(const CScript& newSig, const CTxIn& newVin){
-    CTransaction txNew;
+    CMutableTransaction txNew;
     txNew.vin.clear();
     txNew.vout.clear();
 
@@ -932,7 +932,29 @@ bool CDarkSendPool::SignatureValid(const CScript& newSig, const CTxIn& newVin){
         int n = found;
         txNew.vin[n].scriptSig = newSig;
         if (fDebug) LogPrintf("CDarkSendPool::SignatureValid() - Sign with sig %s\n", newSig.ToString().substr(0,24).c_str());
-        if (!VerifyScript(txNew.vin[n].scriptSig, sigPubKey, SCRIPT_VERIFY_P2SH | SCRIPT_VERIFY_STRICTENC, TransactionSignatureChecker(&txNew, i))) {
+
+        //TODO: !IMPORTANT Script verifying may not work with witness scripts for dark send TXs, should be thoroughly tested
+
+        CTransaction txPrev;
+        uint256 prevBlockHash;
+        //Find previous transaction with the same output as txNew input
+        if (!GetTransaction(txNew.vin[n].prevout.hash, txPrev, Params().GetConsensus(), prevBlockHash)) {
+            if(fDebug) LogPrintf("CDarkSendPool::SignatureValid() - Signing - Failed to get previous transaction %u\n", n);
+            return false;
+        }
+
+        const CAmount& amount = txPrev.vout[txNew.vin[n].prevout.n].nValue;
+        CScriptWitness *witness;
+        int flags = SCRIPT_VERIFY_P2SH | SCRIPT_VERIFY_STRICTENC;
+        //If transaction contains witness, then witness script should be verified
+        if (n < txNew.wit.vtxinwit.size()) {
+            witness = &txNew.wit.vtxinwit[n].scriptWitness;
+            flags |= SCRIPT_VERIFY_WITNESS;
+        } else {
+            witness = nullptr;
+        }
+
+        if (!VerifyScript(txNew.vin[n].scriptSig, sigPubKey, witness, flags, MutableTransactionSignatureChecker(&txNew, n, amount))) {
             if(fDebug) LogPrintf("CDarkSendPool::SignatureValid() - Signing - Error signing input %u\n", n);
             return false;
         }
@@ -964,7 +986,7 @@ bool CDarkSendPool::IsCollateralValid(const CTransaction& txCollateral){
         CTransaction tx2;
         uint256 hash;
         //if(GetTransaction(i.prevout.hash, tx2, hash, true)){
-	if(GetTransaction(i.prevout.hash, tx2, hash)){
+	if(GetTransaction(i.prevout.hash, tx2, Params().GetConsensus(), hash)){
             if(tx2.vout.size() > i.prevout.n) {
                 nValueIn += tx2.vout[i.prevout.n].nValue;
             }
@@ -1291,7 +1313,10 @@ bool CDarkSendPool::SignFinalTransaction(const CTransaction& finalTransactionNew
                 }
 
                 if (fDebug) LogPrintf("CDarkSendPool::Sign - Signing my input %i\n", mine);
-                if (!SignSignature(*pwalletMain, prevPubKey, finalTransaction, mine, int(SIGHASH_ALL|SIGHASH_ANYONECANPAY))) { // changes scriptSig
+                const CAmount& amount = finalTransaction.vout[finalTransaction.vin[mine].prevout.n].nValue;
+                SignatureData sigdata;
+                bool isSigned = ProduceSignature(MutableTransactionSignatureCreator(pwalletMain, &finalTransaction, mine, amount, SIGHASH_ALL), prevPubKey, sigdata); // changes scriptSig
+                if (!isSigned) {
                     if(fDebug) LogPrintf("CDarkSendPool::Sign - Unable to sign my own transaction! \n");
                     // not sure what to do here, it will timeout...?
                 }
@@ -1515,7 +1540,7 @@ bool CDarkSendPool::DoAutomaticDenominating(bool fDryRun, bool ready)
                 }
 
                 // connect to masternode and submit the queue request
-                if(ConnectNode((CAddress)addr, NULL, true)){
+                if(ConnectNode(CAddress(addr, NODE_NETWORK), NULL, true)){
                     submittedToMasternode = addr;
 
                     LOCK(cs_vNodes);
@@ -1576,7 +1601,7 @@ bool CDarkSendPool::DoAutomaticDenominating(bool fDryRun, bool ready)
 
             lastTimeChanged = GetTimeMillis();
             LogPrintf("DoAutomaticDenominating -- attempt %d connection to masternode %s\n", i, vecMasternodes[i].addr.ToString().c_str());
-            if(ConnectNode((CAddress)vecMasternodes[i].addr, NULL, true)){
+            if(ConnectNode(CAddress(vecMasternodes[i].addr, NODE_NETWORK), NULL, true)){
                 submittedToMasternode = vecMasternodes[i].addr;
 
                 LOCK(cs_vNodes);
@@ -1995,7 +2020,7 @@ bool CDarkSendSigner::IsVinAssociatedWithPubkey(CTxIn& vin, CPubKey& pubkey){
     CTransaction txVin;
     uint256 hash;
     //if(GetTransaction(vin.prevout.hash, txVin, hash, true)){
-    if(GetTransaction(vin.prevout.hash, txVin, hash)){
+    if(GetTransaction(vin.prevout.hash, txVin, Params().GetConsensus(), hash)){
         BOOST_FOREACH(CTxOut out, txVin.vout){
             if(out.nValue == GetMNCollateral(chainActive.Tip()->nHeight)*COIN){
                 if(out.scriptPubKey == payee2) return true;

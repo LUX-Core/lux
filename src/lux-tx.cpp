@@ -429,15 +429,31 @@ static void MutateTxSign(CMutableTransaction& tx, const string& flagStr)
         const CScript& prevPubKey = coins->vout[txin.prevout.n].scriptPubKey;
 
         txin.scriptSig.clear();
+
+        CTransaction txPrev;
+        uint256 prevBlockHash;
+        //Find previous transaction with the same output as txNew input
+        if (!GetTransaction(mergedTx.vin[i].prevout.hash, txPrev, Params().GetConsensus(), prevBlockHash)) {
+            if(fDebug) LogPrintf("CDarkSendPool::MutateTxSign() - Signing - Failed to get previous transaction %u\n", n);
+            //TODO: probably should raise exception here
+            return;
+        }
+        const CAmount& amount = txPrev.vout[txin.prevout.n].nValue;
+        SignatureData sigdata;
         // Only sign SIGHASH_SINGLE if there's a corresponding output:
         if (!fHashSingle || (i < mergedTx.vout.size()))
-            SignSignature(keystore, prevPubKey, mergedTx, i, nHashType);
+            ProduceSignature(MutableTransactionSignatureCreator(&keystore, &mergedTx, i, amount, nHashType), prevPubKey, sigdata);
 
         // ... and merge in other signatures:
         BOOST_FOREACH (const CTransaction& txv, txVariants) {
-            txin.scriptSig = CombineSignatures(prevPubKey, mergedTx, i, txin.scriptSig, txv.vin[i].scriptSig);
+            sigdata = CombineSignatures(prevPubKey, TransactionSignatureChecker(&mergedTx, i, amount), sigdata, DataFromTransaction(txv, i));
         }
-        if (!VerifyScript(txin.scriptSig, prevPubKey, STANDARD_SCRIPT_VERIFY_FLAGS, MutableTransactionSignatureChecker(&mergedTx, i)))
+
+        UpdateTransaction(mergedTx, i, sigdata);
+
+        //If transaction contains witness, then witness script should be verified
+        const CScriptWitness *witness = (i < mergedTx.wit.vtxinwit.size()) ? mergedTx.wit.vtxinwit[i].scriptWitness : NULL;
+        if (!VerifyScript(txin.scriptSig, prevPubKey, witness, STANDARD_SCRIPT_VERIFY_FLAGS, MutableTransactionSignatureChecker(&mergedTx, i, amount)))
             fComplete = false;
     }
 

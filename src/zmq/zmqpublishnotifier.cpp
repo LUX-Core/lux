@@ -181,7 +181,7 @@ bool CZMQPublishRawBlockNotifier::NotifyBlock(const CBlockIndex *pindex)
     {
         LOCK(cs_main);
         CBlock block;
-        if(!ReadBlockFromDisk(block, pindex))
+        if(!ReadBlockFromDisk(block, pindex, Params().GetConsensus()))
         {
             zmqError("Can't read block from disk");
             return false;

@@ -282,7 +282,6 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
 
         TxPriorityCompare comparer(fSortedByFee);
         std::make_heap(vecPriority.begin(), vecPriority.end(), comparer);
-        CTxMemPool::txiter iter;
 
         while (!vecPriority.empty()) {
             // Take highest priority transaction off the priority queue:
@@ -299,7 +298,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
                 continue;
 
             // cannot accept witness transactions into a non-witness block
-            if (!fIncludeWitness && !iter->GetTx().wit.IsNull())
+            if (!fIncludeWitness && !tx.wit.IsNull())
                 continue;
 
             // Legacy limits on sigOps:

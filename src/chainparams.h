@@ -73,9 +73,9 @@ public:
     bool SkipProofOfWorkCheck() const { return fSkipProofOfWorkCheck; }
     /** Make standard checks */
     bool RequireStandard() const { return fRequireStandard; }
-    int64_t TargetTimespan() const { return consensus.nTargetTimespan; }
-    int64_t TargetSpacing() const { return consensus.nTargetSpacing; }
-    int64_t Interval() const { return consensus.nTargetTimespan / consensus.nTargetSpacing; }
+    int64_t TargetTimespan() const { return consensus.nPowTargetTimespan; }
+    int64_t TargetSpacing() const { return consensus.nPowTargetSpacing; }
+    int64_t Interval() const { return consensus.nPowTargetTimespan / consensus.nPowTargetSpacing; }
     int LAST_POW_BLOCK() const { return consensus.nLastPOWBlock; }
     int COINBASE_MATURITY() const { return nMaturity; }
     int ModifierUpgradeBlock() const { return nModifierUpdateBlock; }

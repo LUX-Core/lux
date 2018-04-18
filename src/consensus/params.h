@@ -35,6 +35,7 @@ namespace Consensus {
      */
     struct Params {
         bool fPowAllowMinDifficultyBlocks;
+        bool fPowNoRetargeting;
         int nSubsidyHalvingInterval;
         BIP9Deployment vDeployments[MAX_VERSION_BITS_DEPLOYMENTS];
         /** Used to check majorities for block version upgrade */
@@ -50,12 +51,8 @@ namespace Consensus {
          */
         uint32_t nRuleChangeActivationThreshold;
         uint32_t nMinerConfirmationWindow;
-        int64_t nTargetSpacing;
-        int64_t nTargetTimespan;
-        /** Proof of stake parameters */
-        int64_t nStakingRoundPeriod;
-        int64_t nStakingInterval;
-        int64_t nStakingMinAge;
+        int64_t nPowTargetSpacing;
+        int64_t nPowTargetTimespan;
         uint256 powLimit;
         uint256 hashGenesisBlock;
     };

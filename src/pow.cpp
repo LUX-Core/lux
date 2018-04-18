@@ -23,8 +23,8 @@ const CBlockIndex* GetLastBlockIndex(const CBlockIndex* pindex, bool fProofOfSta
 
 unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHeader* pblock, const Consensus::Params& consenusParams, bool fProofOfStake)
 {
-    int64_t nTargetSpacing = consenusParams.nTargetSpacing;
-    int64_t nTargetTimespan = consenusParams.nTargetTimespan;
+    int64_t nTargetSpacing = consenusParams.nPowTargetSpacing;
+    int64_t nTargetTimespan = consenusParams.nPowTargetTimespan;
     uint256 bnTargetLimit(Params().ProofOfWorkLimit());
     if(fProofOfStake) {
         bnTargetLimit = GetProofOfStakeLimit(pindexLast->nHeight);

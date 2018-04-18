@@ -194,7 +194,7 @@ std::string BlockToString(CBlockIndex* pBlock)
         return "";
 
     CBlock block;
-    ReadBlockFromDisk(block, pBlock);
+    ReadBlockFromDisk(block, pBlock, Params().GetConsensus());
 
     int64_t Fees = 0;
     int64_t OutVolume = 0;
