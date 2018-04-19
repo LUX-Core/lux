@@ -150,7 +150,7 @@ void CreateContract::setClientModel(ClientModel *_clientModel)
 
     if (m_clientModel)
     {
-        connect(m_clientModel, SIGNAL(tipChanged()), this, SLOT(on_numBlocksChanged()));
+        connect(m_clientModel, SIGNAL(numBlocksChanged()), this, SLOT(on_numBlocksChanged()));
         on_numBlocksChanged();
     }
 }
@@ -210,14 +210,16 @@ void CreateContract::on_createContractClicked()
             // Execute RPC command line
             if(errorMessage.isEmpty() && m_execRPCCommand->exec(lstParams, result, resultJson, errorMessage))
             {
+                std::cout << resultJson.toUtf8().constData() << std::endl;
                 ContractResult *widgetResult = new ContractResult(ui->stackedWidget);
                 widgetResult->setResultData(result, FunctionABI(), QList<QStringList>(), ContractResult::CreateResult);
-                ui->stackedWidget->addWidget(widgetResult);
-                int position = ui->stackedWidget->count() - 1;
-                m_results = position == 1 ? 1 : m_results + 1;
-
-                m_tabInfo->addTab(position, tr("Result %1").arg(m_results));
-                m_tabInfo->setCurrent(position);
+//                ui->stackedWidget->addWidget(widgetResult);
+//                int position = ui->stackedWidget->count() - 1;
+//                m_results = position == 1 ? 1 : m_results + 1;
+//
+//                m_tabInfo->addTab(position, tr("Result %1").arg(m_results));
+//                m_tabInfo->setCurrent(position);
+                widgetResult->show();
             }
             else
             {
@@ -237,7 +239,7 @@ void CreateContract::on_numBlocksChanged()
         m_clientModel->getGasInfo(blockGasLimit, minGasPrice, nGasPrice);
 
         ui->labelGasLimit->setToolTip(tr("Gas limit. Default = %1, Max = %2").arg(DEFAULT_GAS_LIMIT_OP_CREATE).arg(blockGasLimit));
-        ui->labelGasPrice->setToolTip(tr("Gas price: QTUM price per gas unit. Default = %1, Min = %2").arg(QString::fromStdString(FormatMoney(DEFAULT_GAS_PRICE))).arg(QString::fromStdString(FormatMoney(minGasPrice))));
+        ui->labelGasPrice->setToolTip(tr("Gas price: LUX price per gas unit. Default = %1, Min = %2").arg(QString::fromStdString(FormatMoney(DEFAULT_GAS_PRICE))).arg(QString::fromStdString(FormatMoney(minGasPrice))));
         ui->lineEditGasPrice->setMinimum(minGasPrice);
         ui->lineEditGasLimit->setMaximum(blockGasLimit);
 
