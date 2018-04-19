@@ -55,7 +55,6 @@ bool ExecRPCCommand::exec(const QMap<QString, QString> &params, QVariant &result
     try {
         std::string strResult;
         std::string strCommand = commandLine.join(' ').toStdString();
-#if 0
         if (RPCConsole::RPCExecuteCommandLine(strResult, strCommand)) {
             resultJson = strResult.c_str();
             QJsonDocument doc = QJsonDocument::fromJson(strResult.c_str());
@@ -64,7 +63,6 @@ bool ExecRPCCommand::exec(const QMap<QString, QString> &params, QVariant &result
         } else {
             errorMessage = tr("Parse error: unbalanced ' or \"");
         }
-#endif
     } catch (UniValue& objError) {
         try { // Nice formatting for standard-format error
 

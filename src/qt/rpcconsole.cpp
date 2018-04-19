@@ -662,12 +662,15 @@ void RPCConsole::clear()
 
     // Set default style sheet
     ui->messagesWidget->document()->setDefaultStyleSheet(
+    QString(
         "table { }"
         "td.time { color: #808080; padding-top: 3px; } "
-        "td.message { font-family: Courier, Courier New, Lucida Console, monospace; font-size: 12px; } " // Todo: Remove fixed font-size
+        "td.message { font-family: Courier, Courier New, Lucida Console, monospace; font-size: %1; } " // Todo: Remove fixed font-size
         "td.cmd-request { color: #006060; } "
         "td.cmd-error { color: red; } "
-        "b { color: #006060; } ");
+        "b { color: #006060; } "
+        ).arg(QString("%1pt").arg(consoleFontSize))
+        );
 
     message(CMD_REPLY, (tr("Welcome to the LUX RPC console.") + "<br>" +
                            tr("Use up and down arrows to navigate history, and <b>Ctrl-L</b> to clear screen.") + "<br>" +
