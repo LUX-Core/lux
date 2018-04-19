@@ -2518,7 +2518,7 @@ UniValue createcontract(const UniValue& params, bool fHelp){
 
     uint64_t nGasLimit=DEFAULT_GAS_LIMIT_OP_CREATE;
     if (params.size() > 1){
-        nGasLimit = params[1].get_int64();
+        nGasLimit = std::stoll(params[1].get_str());
         if (nGasLimit > blockGasLimit)
             throw JSONRPCError(RPC_TYPE_ERROR, "Invalid value for gasLimit (Maximum is: "+i64tostr(blockGasLimit)+")");
         if (nGasLimit < MINIMUM_GAS_LIMIT)
@@ -2616,7 +2616,7 @@ UniValue createcontract(const UniValue& params, bool fHelp){
         throw JSONRPCError(RPC_WALLET_INSUFFICIENT_FUNDS, "Insufficient funds");
 
     // Build OP_EXEC script
-    CScript scriptPubKey = CScript() << CScriptNum(VersionVM::GetEVMDefault().toRaw()) << CScriptNum(nGasLimit) << CScriptNum(nGasPrice) << ParseHex(bytecode) <<OP_CREATE;
+    CScript scriptPubKey = CScript() << CScriptNum(VersionVM::GetEVMDefault().toRaw()) << CScriptNum(nGasLimit) << CScriptNum(nGasPrice) << ParseHex(bytecode) << OP_CREATE;
 
     // Create and send the transaction
     CReserveKey reservekey(pwalletMain);
