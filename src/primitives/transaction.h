@@ -191,7 +191,7 @@ public:
         // So dust is a txout less than 1820 *3 = 5460 duffs
         // with default -minrelaytxfee = minRelayTxFee = 10000 duffs per kB.
         size_t nSize = GetSerializeSize(SER_DISK,0)+148u;
-        return (nValue < 3*minRelayTxFee.GetFee(nSize));
+        return (nValue < 3*minRelayTxFee.GetFee(nSize) && !this->scriptPubKey.HasOpCreate() && !this->scriptPubKey.HasOpCall());
     }
 
     friend bool operator==(const CTxOut& a, const CTxOut& b)
