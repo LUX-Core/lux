@@ -170,12 +170,12 @@ void ClientModel::updateAlert(const QString& hash, int status)
 
 void ClientModel::getGasInfo(uint64_t& blockGasLimit, uint64_t& minGasPrice, uint64_t& nGasPrice) const
 {
-//    LOCK(cs_main);
+    LOCK(cs_main);
 
-//    QtumDGP qtumDGP(globalState.get(), fGettingValuesDGP);
-    blockGasLimit = 0;//qtumDGP.getBlockGasLimit(chainActive.Height());
-    minGasPrice = 0;//CAmount(qtumDGP.getMinGasPrice(chainActive.Height()));
-    nGasPrice = 0;//(minGasPrice>DEFAULT_GAS_PRICE)?minGasPrice:DEFAULT_GAS_PRICE;
+    LuxDGP luxDGP(globalState.get(), fGettingValuesDGP);
+    blockGasLimit = luxDGP.getBlockGasLimit(chainActive.Height());
+    minGasPrice = CAmount(luxDGP.getMinGasPrice(chainActive.Height()));
+    nGasPrice = (minGasPrice>DEFAULT_GAS_PRICE) ? minGasPrice : DEFAULT_GAS_PRICE;
 }
 
 bool ClientModel::inInitialBlockDownload() const
