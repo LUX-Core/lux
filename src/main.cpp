@@ -31,6 +31,7 @@
 #include "script/script.h"
 #include "script/sigcache.h"
 #include "script/standard.h"
+#include "timedata.h"
 #include "txdb.h"
 #include "txmempool.h"
 #include "ui_interface.h"
@@ -3241,7 +3242,7 @@ bool CheckWork(const CBlock &block, CBlockIndex* const pindexPrev)
     if (pindexPrev == NULL)
         return error("%s: null pindexPrev for block %s", __func__, block.GetHash().GetHex());
 
-    unsigned int nBitsRequired = GetNextWorkRequired(pindexPrev, &block, block.IsProofOfStake());
+    unsigned int nBitsRequired = GetNextWorkRequired(pindexPrev, &block, Params().GetConsensus(), block.IsProofOfStake());
 
 //    if (block.IsProofOfWork() && (pindexPrev->nHeight + 1 <= 68589)) {
 //        double n1 = ConvertBitsToDouble(block.nBits);

@@ -10,6 +10,7 @@
 #include "base58.h"
 #include "checkpoints.h"
 #include "coincontrol.h"
+#include "consensus/validation.h"
 #include "stake.h"
 #include "net.h"
 #include "script/script.h"
@@ -19,6 +20,7 @@
 #include "timedata.h"
 #include "util.h"
 #include "utilmoneystr.h"
+#include "script/interpreter.h"
 
 #include <assert.h>
 
@@ -165,7 +167,7 @@ bool CWallet::AddCScript(const CScript& redeemScript)
         return false;
     if (!fFileBacked)
         return true;
-    return CWalletDB(strWalletFile).WriteCScript(Hash160(redeemScript), redeemScript);
+    return CWalletDB(strWalletFile).WriteCScript(Hash160(redeemScript.begin(), redeemScript.end()), redeemScript);
 }
 
 bool CWallet::LoadCScript(const CScript& redeemScript)
@@ -2093,7 +2095,15 @@ bool CWallet::CreateCollateralTransaction(CMutableTransaction& txCollateral, std
 
     int vinNumber = 0;
     BOOST_FOREACH (CTxIn v, txCollateral.vin) {
-        if (!SignSignature(*this, v.prevPubKey, txCollateral, vinNumber, int(SIGHASH_ALL | SIGHASH_ANYONECANPAY))) {
+        CTransaction txPrev;
+        uint256 prevBlockHash;
+        //Find previous transaction with the same output as txNew input
+        if (!GetTransaction(v.prevout.hash, txPrev, Params().GetConsensus(), prevBlockHash)) {
+            strReason = "CDarkSendPool::MutateTxSign() - Signing - Failed to get previous transaction\n";
+            return false;
+        }
+        const CAmount& amount = txPrev.vout[v.prevout.n].nValue;
+        if (!SignSignature(*this, v.prevPubKey, txCollateral, vinNumber, amount, int(SIGHASH_ALL | SIGHASH_ANYONECANPAY))) {
             BOOST_FOREACH (CTxIn v, vCoinsCollateral)
                 UnlockCoin(v.prevout);
 
@@ -2315,7 +2325,7 @@ bool CWallet::CreateTransaction(const vector<pair<CScript, CAmount> >& vecSend, 
                 // Sign
                 int nIn = 0;
                 BOOST_FOREACH (const PAIRTYPE(const CWalletTx*, unsigned int) & coin, setCoins)
-                    if (!SignSignature(*this, *coin.first, txNew, nIn++)) {
+                    if (!SignSignature(*coin.first->GetWallet(), (CTransaction)*coin.first ,txNew, nIn++, SIGHASH_ALL)/*SignSignature(*this, *coin.first, txNew, nIn++)*//*TODO: ???????*/) {
                         strFailReason = _("Signing transaction failed");
                         return false;
                     }

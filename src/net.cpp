@@ -71,6 +71,9 @@ struct ListenSocket {
 };
 }
 
+/** Services this node implementation cares about */
+ServiceFlags nRelevantServices = NODE_NETWORK;
+
 //
 // Global state variables
 //

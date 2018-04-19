@@ -742,6 +742,8 @@ public:
         Init(pwalletIn);
     }
 
+    const CWallet* GetWallet() const { return pwallet; }
+
     void Init(const CWallet* pwalletIn)
     {
         pwallet = pwalletIn;

@@ -9,6 +9,7 @@
 #include "core_io.h"
 #include "keystore.h"
 #include "primitives/transaction.h"
+#include "script/interpreter.h"
 #include "script/script.h"
 #include "script/sign.h"
 #include "ui_interface.h" // for _(...)
@@ -16,6 +17,7 @@
 #include "util.h"
 #include "utilmoneystr.h"
 #include "utilstrencodings.h"
+#include "main.h"
 
 #include <stdio.h>
 
@@ -434,7 +436,7 @@ static void MutateTxSign(CMutableTransaction& tx, const string& flagStr)
         uint256 prevBlockHash;
         //Find previous transaction with the same output as txNew input
         if (!GetTransaction(mergedTx.vin[i].prevout.hash, txPrev, Params().GetConsensus(), prevBlockHash)) {
-            if(fDebug) LogPrintf("CDarkSendPool::MutateTxSign() - Signing - Failed to get previous transaction %u\n", n);
+            if(fDebug) LogPrintf("CDarkSendPool::MutateTxSign() - Signing - Failed to get previous transaction\n");
             //TODO: probably should raise exception here
             return;
         }
@@ -446,13 +448,13 @@ static void MutateTxSign(CMutableTransaction& tx, const string& flagStr)
 
         // ... and merge in other signatures:
         BOOST_FOREACH (const CTransaction& txv, txVariants) {
-            sigdata = CombineSignatures(prevPubKey, TransactionSignatureChecker(&mergedTx, i, amount), sigdata, DataFromTransaction(txv, i));
+            sigdata = CombineSignatures(prevPubKey, MutableTransactionSignatureChecker(&mergedTx, i, amount), sigdata, DataFromTransaction(txv, i));
         }
 
         UpdateTransaction(mergedTx, i, sigdata);
 
         //If transaction contains witness, then witness script should be verified
-        const CScriptWitness *witness = (i < mergedTx.wit.vtxinwit.size()) ? mergedTx.wit.vtxinwit[i].scriptWitness : NULL;
+        const CScriptWitness *witness = (i < mergedTx.wit.vtxinwit.size()) ? &mergedTx.wit.vtxinwit[i].scriptWitness : nullptr;
         if (!VerifyScript(txin.scriptSig, prevPubKey, witness, STANDARD_SCRIPT_VERIFY_FLAGS, MutableTransactionSignatureChecker(&mergedTx, i, amount)))
             fComplete = false;
     }

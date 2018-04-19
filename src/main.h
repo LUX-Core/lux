@@ -212,7 +212,6 @@ bool IsWitnessLocked(const CBlockIndex* pindexPrev);
 // ***TODO***
 double ConvertBitsToDouble(unsigned int nBits);
 CAmount GetMasternodePayment(int nHeight, int64_t blockValue, int nMasternodeCount = 0);
-unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHeader* pblock, bool fProofOfStake);
 uint256 GetProofOfStakeLimit(int nHeight);
 inline unsigned int GetTargetSpacing(int nHeight) { return IsProtocolV2(nHeight) ? 240 : 60; }
 
@@ -403,7 +402,7 @@ int64_t GetTransactionSigOpCost(const CTransaction& tx, const CCoinsViewCache& i
 int32_t ComputeBlockVersion(const CBlockIndex* pindexPrev, const Consensus::Params& params);
 
 /** Apply the effects of this transaction on the UTXO set represented by view */
-void UpdateCoins(const CTransaction& tx, CCoinsViewCache& inputs, int nHeight);
+void UpdateCoins(const CTransaction& tx, CValidationState& state, CCoinsViewCache& inputs, CTxUndo& txundo, int nHeight);
 
 /** Context-independent validity checks */
 bool CheckTransaction(const CTransaction& tx, CValidationState& state);
@@ -476,7 +475,7 @@ public:
 
 
 /** Functions for disk access for blocks */
-bool WriteBlockToDisk(CBlock& block, CDiskBlockPos& pos);
+bool WriteBlockToDisk(const CBlock& block, CDiskBlockPos& pos);
 bool ReadBlockFromDisk(CBlock& block, const CDiskBlockPos& pos, const Consensus::Params& consensusParams);
 bool ReadBlockFromDisk(CBlock& block, const CBlockIndex* pindex, const Consensus::Params& consensusParams);
 

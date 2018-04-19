@@ -191,7 +191,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
         }
     }
 
-    pblock->nBits = GetNextWorkRequired(chainActive.Tip(), pblock, fProofOfStake);
+    pblock->nBits = GetNextWorkRequired(chainActive.Tip(), pblock, chainparams.GetConsensus(), fProofOfStake);
 
     // Collect memory pool transactions into the block
     CAmount nFees = 0;
@@ -343,7 +343,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
                 continue;
 
             CTxUndo txundo;
-            UpdateCoins(tx, view, nHeight);
+            UpdateCoins(tx, state, view, txundo, nHeight);
             if (!state.IsValid()) {
                 LogPrint("debug", "%s: update coins failed (nHeight=%d, reason: %s)", __func__, nHeight, state.GetRejectReason());
                 continue;

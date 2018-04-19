@@ -1176,7 +1176,7 @@ void CDarkSendPool::SendDarksendDenominate(std::vector<CTxIn>& vin, std::vector<
         int64_t nValueOut = 0;
 
         CValidationState state;
-        CTransaction tx;
+        CMutableTransaction tx;
 
         BOOST_FOREACH(const CTxOut o, vout){
             nValueOut += o.nValue;
@@ -1190,7 +1190,7 @@ void CDarkSendPool::SendDarksendDenominate(std::vector<CTxIn>& vin, std::vector<
         }
 
 	bool* pfMissingInputs = nullptr;
-	if(!AcceptableInputs(mempool, state, tx, false, pfMissingInputs)){
+	if(!AcceptableInputs(mempool, state, CTransaction(tx), false, pfMissingInputs)){
             LogPrintf("dsi -- transaction not valid! %s \n", tx.ToString().c_str());
             return;
         }
@@ -1315,11 +1315,12 @@ bool CDarkSendPool::SignFinalTransaction(const CTransaction& finalTransactionNew
                 if (fDebug) LogPrintf("CDarkSendPool::Sign - Signing my input %i\n", mine);
                 const CAmount& amount = finalTransaction.vout[finalTransaction.vin[mine].prevout.n].nValue;
                 SignatureData sigdata;
-                bool isSigned = ProduceSignature(MutableTransactionSignatureCreator(pwalletMain, &finalTransaction, mine, amount, SIGHASH_ALL), prevPubKey, sigdata); // changes scriptSig
+                bool isSigned = ProduceSignature(MutableTransactionSignatureCreator(pwalletMain, &finalTransaction, (unsigned int)mine, amount, SIGHASH_ALL), prevPubKey, sigdata); // changes scriptSig
                 if (!isSigned) {
                     if(fDebug) LogPrintf("CDarkSendPool::Sign - Unable to sign my own transaction! \n");
                     // not sure what to do here, it will timeout...?
                 }
+                UpdateTransaction(finalTransaction, (unsigned int)mine, sigdata);
 
                 sigs.push_back(finalTransaction.vin[mine]);
                 if (fDebug) LogPrintf(" -- dss %d %d %s\n", mine, (int)sigs.size(), finalTransaction.vin[mine].scriptSig.ToString().c_str());

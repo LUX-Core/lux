@@ -10,6 +10,7 @@
 #include "activemasternode.h"
 #include "darksend.h"
 #include "spork.h"
+#include "consensus/validation.h"
 #include <boost/lexical_cast.hpp>
 
 using namespace std;
@@ -183,7 +184,7 @@ bool IsIXTXValid(const CTransaction& txCollateral){
         CTransaction tx2;
         uint256 hash;
         //if(GetTransaction(i.prevout.hash, tx2, hash, true)){
-	if(GetTransaction(i.prevout.hash, tx2, hash)){
+	if(GetTransaction(i.prevout.hash, tx2, Params().GetConsensus(), hash)){
             if(tx2.vout.size() > i.prevout.n) {
                 nValueIn += tx2.vout[i.prevout.n].nValue;
             }

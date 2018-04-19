@@ -917,7 +917,9 @@ bool Stake::CreateBlockStake(CWallet *wallet, CBlock *block)
         unsigned int txTime = 0;
         if (CreateCoinStake(wallet, *wallet, block->nBits, nTime - nLastStakeTime, tx, txTime)) {
             block->nTime = txTime;
-            block->vtx[0].vout[0].SetEmpty();
+            CMutableTransaction buftx = CMutableTransaction(block->vtx[0]);
+            buftx.vout[0].SetEmpty();
+            block->vtx[0] = CTransaction(buftx);
             block->vtx.push_back(CTransaction(tx));
             result = true;
         }
