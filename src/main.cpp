@@ -751,7 +751,7 @@ bool IsStandardTx(const CTransaction& tx, string& reason)
         else if ((whichType == TX_MULTISIG) && (!fIsBareMultisigStd)) {
             reason = "bare-multisig";
             return false;
-        } else if (txout.nValue == 0) {
+        } else if (txout.nValue == 0 && !txout.scriptPubKey.HasOpCreate() && !txout.scriptPubKey.HasOpCall()) {
             reason = "dust";
             return false;
         }
@@ -1324,10 +1324,10 @@ bool AcceptToMemoryPool(CTxMemPool& pool, CValidationState& state, const CTransa
             }
         }
 
-        if (fRejectInsaneFee && nFees > ::minRelayTxFee.GetFee(nSize) * 10000)
+        if (fRejectInsaneFee && nFees > ::minRelayTxFee.GetFee(nSize) * 1000000)
             return error("AcceptToMemoryPool: : insane fees %s, %d > %d",
                          hash.ToString(),
-                         nFees, ::minRelayTxFee.GetFee(nSize) * 10000);
+                         nFees, ::minRelayTxFee.GetFee(nSize) * 1000000);
 
         // Check against previous transactions
         // This is done last to help prevent CPU exhaustion denial-of-service attacks.
@@ -6058,7 +6058,7 @@ public:
 
 /////////////////////////////////////////////////////////////////////// lux
 bool CheckSenderScript(const CCoinsViewCache& view, const CTransaction& tx){
-    CScript script = view.AccessCoins(tx.vin[0].prevout.hash)->vout[0].scriptPubKey;
+    CScript script = view.AccessCoins(tx.vin[0].prevout.hash)->vout[tx.vin[0].prevout.n].scriptPubKey;
     if(!script.IsPayToPubkeyHash() && !script.IsPayToPubkey()){
         return false;
     }
