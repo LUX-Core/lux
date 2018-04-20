@@ -88,6 +88,35 @@ static const Checkpoints::CCheckpointData dataRegtest = {
     0
 };
 
+static CBlock CreateGenesisBlock(const char* pszTimestamp, uint32_t nTime, uint32_t nNonce, uint32_t nBits, int32_t nVersion) {
+    CMutableTransaction txNew;
+    txNew.nVersion = 1;
+    txNew.nTime = nTime;
+    txNew.nLockTime = 0;
+    txNew.vin.resize(1);
+    txNew.vout.resize(1);
+    txNew.vin[0].scriptSig = CScript() << 0 << CScriptNum(42) << vector<unsigned char>((const unsigned char*)pszTimestamp, (const unsigned char*)pszTimestamp + strlen(pszTimestamp));
+    txNew.vout[0].SetEmpty();
+
+    CBlock genesis;
+    genesis.hashPrevBlock = 0;
+    genesis.nTime    = nTime;
+    genesis.nBits    = nBits;
+    genesis.nNonce   = nNonce;
+    genesis.nVersion = nVersion;
+    genesis.vtx.push_back(txNew);
+    genesis.hashMerkleRoot = genesis.BuildMerkleTree();
+
+    return genesis;
+}
+
+static CBlock CreateGenesisBlock(uint32_t nTime, uint32_t nNonce, uint32_t nBits, int32_t nVersion)
+{
+    const char* pszTimestamp = "Lux - Implemented New PHI Algo PoW/PoS Hybird - Parallel Masternode - ThankYou - 216k155";
+    return CreateGenesisBlock(pszTimestamp, nTime, nNonce, nBits, nVersion);
+}
+
+
 class CMainParams : public CChainParams
 {
 public:
@@ -120,23 +149,7 @@ public:
         nMasternodeCountDrift = 20;
         nModifierUpdateBlock = 615800;
 
-        const char* pszTimestamp = "Lux - Implemented New PHI Algo PoW/PoS Hybird - Parallel Masternode - ThankYou - 216k155"; // Input Activation code to activate blockchain
-        CMutableTransaction txNew;
-        txNew.nVersion = 1;
-        txNew.nTime = 1507656633;
-        txNew.nLockTime = 0;
-        txNew.vin.resize(1);
-        txNew.vout.resize(1);
-        txNew.vin[0].scriptSig = CScript() << 0 << CScriptNum(42) << vector<unsigned char>((const unsigned char*)pszTimestamp, (const unsigned char*)pszTimestamp + strlen(pszTimestamp));
-        txNew.vout[0].SetEmpty();
-
-        genesis.vtx.push_back(txNew);
-        genesis.hashPrevBlock = 0;
-        genesis.hashMerkleRoot = genesis.BuildMerkleTree();
-        genesis.nVersion = 1;
-        genesis.nTime = 1507656633; //10/10/2017
-        genesis.nBits = 0x1e0fffff;
-        genesis.nNonce = 986946;
+        genesis = CreateGenesisBlock(1507656633, 986946, 0x1e0fffff, 1);
 
         hashGenesisBlock = genesis.GetHash();
 
@@ -217,16 +230,19 @@ public:
         nModifierUpdateBlock = 51197; //approx Mon, 17 Apr 2017 04:00:00 GMT
 
         //! Modify the testnet genesis block so the timestamp is valid for a later start.
-        genesis.nBits  = 0x1e0fffff;
-        genesis.nTime = 1504344001;
-        genesis.nNonce = 1454059;
+        genesis = CreateGenesisBlock(1522058086, 1283285, 0x1e0fffff, 1);
 
         hashGenesisBlock = genesis.GetHash();
-//        assert(hashGenesisBlock == uint256("0"));
+
+        std::cout << "hashGenesisBlock: " << hashGenesisBlock.GetHex() << std::endl;
+        std::cout << "hashMerkleRoot: " << genesis.hashMerkleRoot.GetHex() << std::endl;
+
+        assert(hashGenesisBlock == uint256("0x00000d686773acd14bfa2275fe38e4d3b1c1c3a575dac55fcf224cb8676aca95"));
+        assert(genesis.hashMerkleRoot == uint256("0x7a0758eb06a38457127643fe9a8ad2d5f536f9a5f8ea9e06736ad0be0dcffd24"));
 
         vFixedSeeds.clear();
         vSeeds.clear();
-        vSeeds.push_back(CDNSSeedData("luxtest1", "88.198.192.110"));
+//        vSeeds.push_back(CDNSSeedData("luxtest1", "88.198.192.110"));
 
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1, 139); // Testnet lux addresses start with 'x' or 'y'
         base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1, 19);  // Testnet lux script addresses start with '8' or '9'
