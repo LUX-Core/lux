@@ -229,15 +229,12 @@ public:
         nModifierUpdateBlock = 51197; //approx Mon, 17 Apr 2017 04:00:00 GMT
 
         //! Modify the testnet genesis block so the timestamp is valid for a later start.
-        genesis = CreateGenesisBlock(1522058086, 1283285, 0x1e0fffff, 1);
+        genesis = CreateGenesisBlock(1524197443, 1689341, 0x1e0fffff, 1);
 
         hashGenesisBlock = genesis.GetHash();
 
-        std::cout << "hashGenesisBlock: " << hashGenesisBlock.GetHex() << std::endl;
-        std::cout << "hashMerkleRoot: " << genesis.hashMerkleRoot.GetHex() << std::endl;
-
-        assert(hashGenesisBlock == uint256("0x00000d686773acd14bfa2275fe38e4d3b1c1c3a575dac55fcf224cb8676aca95"));
-        assert(genesis.hashMerkleRoot == uint256("0x7a0758eb06a38457127643fe9a8ad2d5f536f9a5f8ea9e06736ad0be0dcffd24"));
+        assert(hashGenesisBlock == uint256("0x000006638f9df4340b70bbfd07c5f70848d5ba4726943b25f0404b957032cdff"));
+        assert(genesis.hashMerkleRoot == uint256("0x17488cf3ea75228c007ad7249d54b6d9593dddfea67cc6e5869023fb91278852"));
 
         vFixedSeeds.clear();
         vSeeds.clear();
