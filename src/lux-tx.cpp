@@ -29,7 +29,7 @@ using namespace std;
 
 static bool fCreateBlank;
 static map<string, UniValue> registers;
-CClientUIInterface uiInterface;
+//CClientUIInterface uiInterface;
 
 static bool AppInitRawTx(int argc, char* argv[])
 {
