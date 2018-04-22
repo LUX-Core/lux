@@ -212,10 +212,10 @@ public:
     {
         networkID = CBaseChainParams::TESTNET;
         strNetworkID = "test";
-        pchMessageStart[0] = 0x54;
-        pchMessageStart[1] = 0x67;
-        pchMessageStart[2] = 0x56;
-        pchMessageStart[3] = 0xab;
+        pchMessageStart[0] = 0x53;
+        pchMessageStart[1] = 0x66;
+        pchMessageStart[2] = 0x55;
+        pchMessageStart[3] = 0xac;
         vAlertPubKey = ParseHex("000010e83b2703ccf322f7dbd62dd5855ac7c10bd055814ce121ba32607d573b8810c02c0582aed05b4deb9c4b77b26d92428c61256cd42774babea0a073b2ed0c9");
         nDefaultPort = 28333;
         bnProofOfWorkLimit = ~uint256(0) >> 1;
@@ -230,20 +230,20 @@ public:
         nModifierUpdateBlock = 51197; //approx Mon, 17 Apr 2017 04:00:00 GMT
 
         //! Modify the testnet genesis block so the timestamp is valid for a later start.
-        genesis = CreateGenesisBlock(1524197443, 1689341, 0x1e0fffff, 1);
+        genesis = CreateGenesisBlock(1524402689, 239627, 0x1e0fffff, 1);
 
         hashGenesisBlock = genesis.GetHash();
 
-        assert(hashGenesisBlock == uint256("0x000006638f9df4340b70bbfd07c5f70848d5ba4726943b25f0404b957032cdff"));
-        assert(genesis.hashMerkleRoot == uint256("0x17488cf3ea75228c007ad7249d54b6d9593dddfea67cc6e5869023fb91278852"));
+        assert(hashGenesisBlock == uint256("0x00000386e7cb0041f5b4583093a9cbe64bcf167f3291dbd1574ee83f6aac9966"));
+        assert(genesis.hashMerkleRoot == uint256("0x39f9afdc907a5a62083439b6aa19cd565f5f4892e457bc77604db980f55346f9"));
 
         vFixedSeeds.clear();
         vSeeds.clear();
 //        vSeeds.push_back(CDNSSeedData("luxtest1", "88.198.192.110"));
 
-        base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1, 139); // Testnet lux addresses start with 'x' or 'y'
-        base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1, 19);  // Testnet lux script addresses start with '8' or '9'
-        base58Prefixes[SECRET_KEY] = std::vector<unsigned char>(1, 239);     // Testnet private keys start with '9' or 'c' (Bitcoin defaults)
+        base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1, 48); // Testnet lux addresses start with 'l'
+        base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1, 48);  // Testnet lux script addresses start with 'l'
+        base58Prefixes[SECRET_KEY] = std::vector<unsigned char>(1, 155);     // Testnet private keys start with '9' or 'c' (Bitcoin defaults)
         // Testnet lux BIP32 pubkeys start with 'DRKV'
         base58Prefixes[EXT_PUBLIC_KEY] = boost::assign::list_of(0x3a)(0x80)(0x61)(0xa0).convert_to_container<std::vector<unsigned char> >();
         // Testnet lux BIP32 prvkeys start with 'DRKP'
@@ -264,7 +264,7 @@ public:
         nPoolMaxTransactions = 2;
         strSporkKey = "04348C2F50F90267E64FACC65BFDC9D0EB147D090872FB97ABAE92E9A36E6CA60983E28E741F8E7277B11A7479B626AC115BA31463AC48178A5075C5A9319D4A38";
         strDarksendPoolDummyAddress = "LPGq7DZbqZ8Vb3tfLH8Z8VHqeV4fsK68oX";
-        nStartMasternodePayments = 1420837558; //Fri, 09 Jan 2015 21:05:58 GMT
+        nStartMasternodePayments = 1524402689; //Fri, 09 Jan 2015 21:05:58 GMT
 
         nStakingRoundPeriod = 5; // 5 seconds a round
         nStakingInterval = 30; // 30 seconds

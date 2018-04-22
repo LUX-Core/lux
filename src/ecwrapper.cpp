@@ -13,39 +13,41 @@
 
 namespace
 {
-/**
- * Perform ECDSA key recovery (see SEC1 4.1.6) for curves over (mod p)-fields
- * recid selects which key is recovered
- * if check is non-zero, additional checks are performed
- */
+    void ECDSA_SIG_get0();
+
+    /**
+     * Perform ECDSA key recovery (see SEC1 4.1.6) for curves over (mod p)-fields
+     * recid selects which key is recovered
+     * if check is non-zero, additional checks are performed
+     */
     int ECDSA_SIG_recover_key_GFp(EC_KEY* eckey, ECDSA_SIG* ecsig, const unsigned char* msg, int msglen, int recid, int check)
     {
         if (!eckey) return 0;
 
         int ret = 0;
-        BN_CTX* ctx = NULL;
+        BN_CTX* ctx = nullptr;
 
-        BIGNUM* x = NULL;
-        BIGNUM* e = NULL;
-        BIGNUM* order = NULL;
-        BIGNUM* sor = NULL;
-        BIGNUM* eor = NULL;
-        BIGNUM* field = NULL;
-        EC_POINT* R = NULL;
-        EC_POINT* O = NULL;
-        EC_POINT* Q = NULL;
-        BIGNUM* rr = NULL;
-        BIGNUM* zero = NULL;
+        BIGNUM* x = nullptr;
+        BIGNUM* e = nullptr;
+        BIGNUM* order = nullptr;
+        BIGNUM* sor = nullptr;
+        BIGNUM* eor = nullptr;
+        BIGNUM* field = nullptr;
+        EC_POINT* R = nullptr;
+        EC_POINT* O = nullptr;
+        EC_POINT* Q = nullptr;
+        BIGNUM* rr = nullptr;
+        BIGNUM* zero = nullptr;
         int n = 0;
         int i = recid / 2;
 
 #if OPENSSL_VERSION_NUMBER >= 0x10100000L
         const BIGNUM *sig_r, *sig_s;
-    ECDSA_SIG_get0(ecsig, &sig_r, &sig_s);
+        ECDSA_SIG_get0();
 #endif
 
         const EC_GROUP* group = EC_KEY_get0_group(eckey);
-        if ((ctx = BN_CTX_new()) == NULL) {
+        if ((ctx = BN_CTX_new()) == nullptr) {
             ret = -1;
             goto err;
         }
@@ -73,7 +75,7 @@ namespace
             goto err;
         }
         field = BN_CTX_get(ctx);
-        if (!EC_GROUP_get_curve_GFp(group, field, NULL, NULL, ctx)) {
+        if (!EC_GROUP_get_curve_GFp(group, field, nullptr, nullptr, ctx)) {
             ret = -2;
             goto err;
         }
@@ -81,7 +83,7 @@ namespace
             ret = 0;
             goto err;
         }
-        if ((R = EC_POINT_new(group)) == NULL) {
+        if ((R = EC_POINT_new(group)) == nullptr) {
             ret = -2;
             goto err;
         }
@@ -90,11 +92,11 @@ namespace
             goto err;
         }
         if (check) {
-            if ((O = EC_POINT_new(group)) == NULL) {
+            if ((O = EC_POINT_new(group)) == nullptr) {
                 ret = -2;
                 goto err;
             }
-            if (!EC_POINT_mul(group, O, NULL, R, order, ctx)) {
+            if (!EC_POINT_mul(group, O, nullptr, R, order, ctx)) {
                 ret = -2;
                 goto err;
             }
@@ -103,7 +105,7 @@ namespace
                 goto err;
             }
         }
-        if ((Q = EC_POINT_new(group)) == NULL) {
+        if ((Q = EC_POINT_new(group)) == nullptr) {
             ret = -2;
             goto err;
         }
@@ -162,10 +164,14 @@ namespace
             BN_CTX_end(ctx);
             BN_CTX_free(ctx);
         }
-        if (R != NULL) EC_POINT_free(R);
-        if (O != NULL) EC_POINT_free(O);
-        if (Q != NULL) EC_POINT_free(Q);
+        if (R != nullptr) EC_POINT_free(R);
+        if (O != nullptr) EC_POINT_free(O);
+        if (Q != nullptr) EC_POINT_free(Q);
         return ret;
+    }
+
+    void ECDSA_SIG_get0() {
+
     }
 
 } // anon namespace
@@ -173,7 +179,7 @@ namespace
 CECKey::CECKey()
 {
     pkey = EC_KEY_new_by_curve_name(NID_secp256k1);
-    assert(pkey != NULL);
+    assert(pkey != nullptr);
 }
 
 CECKey::~CECKey()
@@ -184,7 +190,7 @@ CECKey::~CECKey()
 void CECKey::GetPubKey(std::vector<unsigned char>& pubkey, bool fCompressed)
 {
     EC_KEY_set_conv_form(pkey, fCompressed ? POINT_CONVERSION_COMPRESSED : POINT_CONVERSION_UNCOMPRESSED);
-    int nSize = i2o_ECPublicKey(pkey, NULL);
+    int nSize = i2o_ECPublicKey(pkey, nullptr);
     assert(nSize);
     assert(nSize <= 65);
     pubkey.clear();
@@ -196,7 +202,7 @@ void CECKey::GetPubKey(std::vector<unsigned char>& pubkey, bool fCompressed)
 
 bool CECKey::SetPubKey(const unsigned char* pubkey, size_t size)
 {
-    return o2i_ECPublicKey(&pkey, &pubkey, size) != NULL;
+    return o2i_ECPublicKey(&pkey, &pubkey, size) != nullptr;
 }
 
 bool CECKey::Verify(const uint256& hash, const std::vector<unsigned char>& vchSig)
@@ -205,14 +211,14 @@ bool CECKey::Verify(const uint256& hash, const std::vector<unsigned char>& vchSi
         return false;
 
     // New versions of OpenSSL will reject non-canonical DER signatures. de/re-serialize first.
-    unsigned char* norm_der = NULL;
+    unsigned char* norm_der = nullptr;
     ECDSA_SIG* norm_sig = ECDSA_SIG_new();
     const unsigned char* sigptr = &vchSig[0];
     assert(norm_sig);
-    if (d2i_ECDSA_SIG(&norm_sig, &sigptr, vchSig.size()) == NULL) {
+    if (d2i_ECDSA_SIG(&norm_sig, &sigptr, vchSig.size()) == nullptr) {
         /* As of OpenSSL 1.0.0p d2i_ECDSA_SIG frees and nulls the pointer on
          * error. But OpenSSL's own use of this function redundantly frees the
-         * result. As ECDSA_SIG_free(NULL) is a no-op, and in the absence of a
+         * result. As ECDSA_SIG_free(nullptr) is a no-op, and in the absence of a
          * clear contract for the function behaving the same way is more
          * conservative.
          */
@@ -236,11 +242,11 @@ bool CECKey::Recover(const uint256& hash, const unsigned char* p64, int rec)
         return false;
     ECDSA_SIG* sig = ECDSA_SIG_new();
 #if OPENSSL_VERSION_NUMBER >= 0x10100000L
-    BIGNUM *sig_r = NULL;
-    BIGNUM *sig_s = NULL;
+    BIGNUM *sig_r = nullptr;
+    BIGNUM *sig_s = nullptr;
     if (!(sig_r = BN_bin2bn(&p64[0],  32, nullptr)) ||
         !(sig_s = BN_bin2bn(&p64[32], 32, nullptr)) ||
-	!ECDSA_SIG_set0(sig, sig_r, sig_s)) {
+	!ECDSA_SIG_set0()) {
 	    BN_free(sig_r);
 	    BN_free(sig_s);
 	    return false;
@@ -282,10 +288,14 @@ bool CECKey::TweakPublic(const unsigned char vchTweak[32])
 bool CECKey::SanityCheck()
 {
     EC_KEY* pkey = EC_KEY_new_by_curve_name(NID_secp256k1);
-    if (pkey == NULL)
+    if (pkey == nullptr)
         return false;
     EC_KEY_free(pkey);
 
     // TODO Is there more EC functionality that could be missing?
     return true;
+}
+
+bool CECKey::ECDSA_SIG_set0() {
+    return false;
 }

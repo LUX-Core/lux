@@ -9,6 +9,7 @@
 #include <vector>
 
 #include <openssl/ec.h>
+#include <openssl/ecdsa.h>
 
 class uint256;
 
@@ -36,6 +37,8 @@ public:
 
     bool TweakPublic(const unsigned char vchTweak[32]);
     static bool SanityCheck();
+
+    bool ECDSA_SIG_set0();
 };
 
 #endif // BITCOIN_ECWRAPPER_H

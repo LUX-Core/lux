@@ -15,7 +15,7 @@
 #include <QMessageBox>
 #include <set>
 
-extern double GetPoWDifficulty(const CBlockIndex* blockindex = NULL);
+extern double GetDifficulty(const CBlockIndex* blockindex = NULL);
 
 inline std::string utostr(unsigned int n)
 {
@@ -235,7 +235,7 @@ std::string BlockToString(CBlockIndex* pBlock)
             _("Fees"), ValueToString(Fees),
             _("Generated"), ValueToString(Generated),
             _("Timestamp"), TimeToString(block.nTime),
-            _("Difficulty"), strprintf("%.4f", GetPoWDifficulty(pBlock)),
+            _("Difficulty"), strprintf("%.4f", GetDifficulty(pBlock)),
             _("Bits"), utostr(block.nBits),
             _("Nonce"), utostr(block.nNonce),
             _("Version"), itostr(block.nVersion),

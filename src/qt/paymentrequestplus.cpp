@@ -8,6 +8,8 @@
 //
 
 #include "paymentrequestplus.h"
+#include "../script/script.h"
+#include "../amount.h"
 
 #include <stdexcept>
 
@@ -72,7 +74,7 @@ bool PaymentRequestPlus::getMerchant(X509_STORE* certStore, QString& merchant) c
 
     // One day we'll support more PKI types, but just
     // x509 for now:
-    const EVP_MD* digestAlgorithm = NULL;
+    const EVP_MD* digestAlgorithm = nullptr;
     if (paymentRequest.pki_type() == "x509+sha256") {
         digestAlgorithm = EVP_sha256();
     } else if (paymentRequest.pki_type() == "x509+sha1") {
@@ -107,7 +109,7 @@ bool PaymentRequestPlus::getMerchant(X509_STORE* certStore, QString& merchant) c
         }
 #endif
         const unsigned char* data = (const unsigned char*)certChain.certificate(i).data();
-        X509* cert = d2i_X509(NULL, &data, certChain.certificate(i).size());
+        X509* cert = d2i_X509(nullptr, &data, certChain.certificate(i).size());
         if (cert)
             certs.push_back(cert);
     }
@@ -132,7 +134,7 @@ bool PaymentRequestPlus::getMerchant(X509_STORE* certStore, QString& merchant) c
         return false;
     }
 
-    char* website = NULL;
+    char* website = nullptr;
     bool fResult = true;
     try {
         if (!X509_STORE_CTX_init(store_ctx, certStore, signing_cert, chain)) {
@@ -165,7 +167,7 @@ bool PaymentRequestPlus::getMerchant(X509_STORE* certStore, QString& merchant) c
 
         EVP_PKEY* pubkey = X509_get_pubkey(signing_cert);
         EVP_MD_CTX_init(ctx);
-        if (!EVP_VerifyInit_ex(ctx, digestAlgorithm, NULL) ||
+        if (!EVP_VerifyInit_ex(ctx, digestAlgorithm, nullptr) ||
                 !EVP_VerifyUpdate(ctx, data_to_verify.data(), data_to_verify.size()) ||
                 !EVP_VerifyFinal(ctx, (const unsigned char*)paymentRequest.signature().data(), paymentRequest.signature().size(), pubkey)) {
             throw SSLVerifyError("Bad signature, invalid PaymentRequest.");
@@ -176,7 +178,7 @@ bool PaymentRequestPlus::getMerchant(X509_STORE* certStore, QString& merchant) c
 #endif
 
         // OpenSSL API for getting human printable strings from certs is baroque.
-        int textlen = X509_NAME_get_text_by_NID(certname, NID_commonName, NULL, 0);
+        int textlen = X509_NAME_get_text_by_NID(certname, NID_commonName, nullptr, 0);
         website = new char[textlen + 1];
         if (X509_NAME_get_text_by_NID(certname, NID_commonName, website, textlen + 1) == textlen && textlen > 0) {
             merchant = website;
@@ -208,4 +210,12 @@ QList<std::pair<CScript, CAmount> > PaymentRequestPlus::getPayTo() const
         result.append(make_pair(s, details.outputs(i).amount()));
     }
     return result;
+}
+
+struct env_md_ctx_st *PaymentRequestPlus::EVP_MD_CTX_new() const {
+    return nullptr;
+}
+
+void PaymentRequestPlus::EVP_MD_CTX_free(env_md_ctx_st *pSt) const {
+
 }
