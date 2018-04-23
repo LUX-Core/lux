@@ -66,7 +66,7 @@ SendToContract::SendToContract(QWidget *parent) :
     ui->scrollAreaFunction->setWidget(m_ABIFunctionField);
     ui->lineEditAmount->setEnabled(true);
     ui->labelContractAddress->setToolTip(tr("The contract address that will receive the funds and data."));
-    ui->labelAmount->setToolTip(tr("The amount in QTUM to send. Default = 0."));
+    ui->labelAmount->setToolTip(tr("The amount in Lux to send. Default = 0."));
     ui->labelSenderAddress->setToolTip(tr("The quantum address that will be used as sender."));
 
     m_tabInfo = new TabBarInfo(ui->stackedWidget);
@@ -262,7 +262,7 @@ void SendToContract::on_numBlocksChanged()
         m_clientModel->getGasInfo(blockGasLimit, minGasPrice, nGasPrice);
 
         ui->labelGasLimit->setToolTip(tr("Gas limit: Default = %1, Max = %2.").arg(DEFAULT_GAS_LIMIT_OP_SEND).arg(blockGasLimit));
-        ui->labelGasPrice->setToolTip(tr("Gas price: QTUM price per gas unit. Default = %1, Min = %2.").arg(QString::fromStdString(FormatMoney(DEFAULT_GAS_PRICE))).arg(QString::fromStdString(FormatMoney(minGasPrice))));
+        ui->labelGasPrice->setToolTip(tr("Gas price: LUX price per gas unit. Default = %1, Min = %2.").arg(QString::fromStdString(FormatMoney(DEFAULT_GAS_PRICE))).arg(QString::fromStdString(FormatMoney(minGasPrice))));
         ui->lineEditGasPrice->setMinimum(minGasPrice);
         ui->lineEditGasLimit->setMaximum(blockGasLimit);
 
@@ -300,18 +300,15 @@ void SendToContract::on_newContractABI()
     on_updateSendToContractButton();
 }
 
-void SendToContract::on_functionChanged()
-{
+void SendToContract::on_functionChanged() {
     bool payable = isFunctionPayable();
     ui->lineEditAmount->setEnabled(payable);
-    if(!payable)
-    {
+    if(!payable) {
         ui->lineEditAmount->clear();
     }
 }
 
-void SendToContract::on_saveInfoClicked()
-{
+void SendToContract::on_saveInfoClicked() {
     if(!m_contractModel)
         return;
 
@@ -331,56 +328,45 @@ void SendToContract::on_saveInfoClicked()
     EditContractInfoDialog::Mode dlgMode = row > -1 ? EditContractInfoDialog::EditContractInfo : EditContractInfoDialog::NewContractInfo;
     EditContractInfoDialog dlg(dlgMode, this);
     dlg.setModel(m_contractModel);
-    if(dlgMode == EditContractInfoDialog::EditContractInfo)
-    {
+    if(dlgMode == EditContractInfoDialog::EditContractInfo) {
         dlg.loadRow(row);
     }
     dlg.setAddress(ui->lineEditContractAddress->text());
     dlg.setABI(ui->textEditInterface->toPlainText());
-    if(dlg.exec())
-    {
+    if(dlg.exec()) {
         ui->lineEditContractAddress->setText(dlg.getAddress());
         ui->textEditInterface->setText(dlg.getABI());
         on_contractAddressChanged();
     }
 }
 
-void SendToContract::on_loadInfoClicked()
-{
+void SendToContract::on_loadInfoClicked() {
     ContractBookPage dlg(this);
     dlg.setModel(m_model->getContractTableModel());
-    if(dlg.exec())
-    {
+    if(dlg.exec()) {
         ui->lineEditContractAddress->setText(dlg.getAddressValue());
         on_contractAddressChanged();
     }
 }
 
-void SendToContract::on_pasteAddressClicked()
-{
+void SendToContract::on_pasteAddressClicked() {
     setContractAddress(QApplication::clipboard()->text());
 }
 
-void SendToContract::on_contractAddressChanged()
-{
-    if(isValidContractAddress() && m_contractModel)
-    {
+void SendToContract::on_contractAddressChanged() {
+    if(isValidContractAddress() && m_contractModel) {
         QString contractAddress = ui->lineEditContractAddress->text();
-        if(m_contractModel->lookupAddress(contractAddress) > -1)
-        {
+        if(m_contractModel->lookupAddress(contractAddress) > -1) {
             QString contractAbi = m_contractModel->abiForAddress(contractAddress);
-            if(ui->textEditInterface->toPlainText() != contractAbi)
-            {
+            if(ui->textEditInterface->toPlainText() != contractAbi) {
                 ui->textEditInterface->setText(m_contractModel->abiForAddress(contractAddress));
             }
         }
     }
 }
 
-QString SendToContract::toDataHex(int func, QString& errorMessage)
-{
-    if(func == -1 || m_ABIFunctionField == NULL || m_contractABI == NULL)
-    {
+QString SendToContract::toDataHex(int func, QString& errorMessage) {
+    if(func == -1 || m_ABIFunctionField == NULL || m_contractABI == NULL) {
         std::string defSelector = FunctionABI::defaultSelector();
         return QString::fromStdString(defSelector);
     }
@@ -389,19 +375,15 @@ QString SendToContract::toDataHex(int func, QString& errorMessage)
     std::vector<std::vector<std::string>> values = m_ABIFunctionField->getValuesVector();
     FunctionABI function = m_contractABI->functions[func];
     std::vector<ParameterABI::ErrorType> errors;
-    if(function.abiIn(values, strData, errors))
-    {
+    if(function.abiIn(values, strData, errors)) {
         return QString::fromStdString(strData);
-    }
-    else
-    {
+    } else {
         errorMessage = function.errorMessage(errors, true);
     }
     return "";
 }
 
-bool SendToContract::isFunctionPayable()
-{
+bool SendToContract::isFunctionPayable() {
     int func = m_ABIFunctionField->getSelectedFunction();
     if(func < 0) return true;
     FunctionABI function = m_contractABI->functions[func];

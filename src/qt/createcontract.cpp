@@ -205,11 +205,9 @@ void CreateContract::on_createContractClicked()
         SendConfirmationDialog confirmationDialog(tr("Confirm contract creation."), questionString, 3, this);
         confirmationDialog.exec();
         QMessageBox::StandardButton retval = (QMessageBox::StandardButton)confirmationDialog.result();
-        if(retval == QMessageBox::Yes)
-        {
+        if(retval == QMessageBox::Yes) {
             // Execute RPC command line
-            if(errorMessage.isEmpty() && m_execRPCCommand->exec(lstParams, result, resultJson, errorMessage))
-            {
+            if(errorMessage.isEmpty() && m_execRPCCommand->exec(lstParams, result, resultJson, errorMessage)) {
                 std::cout << resultJson.toUtf8().constData() << std::endl;
                 ContractResult *widgetResult = new ContractResult(ui->stackedWidget);
                 widgetResult->setResultData(result, FunctionABI(), QList<QStringList>(), ContractResult::CreateResult);
@@ -220,9 +218,7 @@ void CreateContract::on_createContractClicked()
 //                m_tabInfo->addTab(position, tr("Result %1").arg(m_results));
 //                m_tabInfo->setCurrent(position);
                 widgetResult->show();
-            }
-            else
-            {
+            } else {
                 QMessageBox::warning(this, tr("Create contract"), errorMessage);
             }
         }

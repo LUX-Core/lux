@@ -284,7 +284,7 @@ QModelIndex ContractTableModel::index(int row, int column, const QModelIndex &pa
 void ContractTableModel::updateEntry(const QString &address,
         const QString &label, const QString &abi, int status)
 {
-    // Update contract book model from Qtum core
+    // Update contract book model from Lux core
     priv->updateEntry(address, label, abi, status);
 }
 
