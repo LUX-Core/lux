@@ -294,6 +294,7 @@ template<typename Stream, typename Operation, typename TxType>
 inline void SerializeTransaction(TxType& tx, Stream& s, Operation ser_action, int nType, int nVersion) {
     READWRITE(*const_cast<int32_t*>(&tx.nVersion));
     unsigned char flags = 0;
+    READWRITE(*const_cast<uint32_t*>(&tx.nTime));
     if (ser_action.ForRead()) {
         const_cast<std::vector<CTxIn>*>(&tx.vin)->clear();
         const_cast<std::vector<CTxOut>*>(&tx.vout)->clear();

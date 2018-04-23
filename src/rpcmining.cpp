@@ -21,6 +21,7 @@
 #include "script/script.h"
 #include "script/script_error.h"
 #include "validationinterface.h"
+#include "versionbits.h"
 #ifdef ENABLE_WALLET
 #include "db.h"
 #include "wallet.h"
@@ -309,6 +310,15 @@ static UniValue BIP22ValidationResult(const CValidationState& state)
     return "valid?";
 }
 
+std::string gbt_vb_name(const Consensus::DeploymentPos pos) {
+    const struct BIP9DeploymentInfo& vbinfo = VersionBitsDeploymentInfo[pos];
+    std::string s = vbinfo.name;
+    if (!vbinfo.gbt_force) {
+        s.insert(s.begin(), '!');
+    }
+    return s;
+}
+
 UniValue getblocktemplate(const UniValue& params, bool fHelp)
 {
     if (fHelp || params.size() > 1)
@@ -332,17 +342,25 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
             "\nResult:\n"
             "{\n"
             "  \"version\" : n,                    (numeric) The block version\n"
+            "  \"rules\" : [ \"rulename\", ... ],    (array of strings) specific block rules that are to be enforced\n"
+            "  \"vbavailable\" : {                 (json object) set of pending, supported versionbit (BIP 9) softfork deployments\n"
+            "      \"rulename\" : bitnumber        (numeric) identifies the bit number as indicating acceptance and readiness for the named softfork rule\n"
+            "      ,...\n"
+            "  },\n"
+            "  \"vbrequired\" : n,                 (numeric) bit mask of versionbits the server requires set in submissions\n"
             "  \"previousblockhash\" : \"xxxx\",    (string) The hash of current highest block\n"
             "  \"transactions\" : [                (array) contents of non-coinbase transactions that should be included in the next block\n"
             "      {\n"
             "         \"data\" : \"xxxx\",          (string) transaction data encoded in hexadecimal (byte-for-byte)\n"
-            "         \"hash\" : \"xxxx\",          (string) hash/id encoded in little-endian hexadecimal\n"
+            "         \"txid\" : \"xxxx\",          (string) transaction id encoded in little-endian hexadecimal\n"
+            "         \"hash\" : \"xxxx\",          (string) hash encoded in little-endian hexadecimal (including witness data)\n"
             "         \"depends\" : [              (array) array of numbers \n"
             "             n                        (numeric) transactions before this one (by 1-based index in 'transactions' list) that must be present in the final block if this one is\n"
             "             ,...\n"
             "         ],\n"
-            "         \"fee\": n,                   (numeric) difference in value between transaction inputs and outputs (in duffs); for coinbase transactions, this is a negative Number of the total collected block fees (ie, not including the block subsidy); if key is not present, fee is unknown and clients MUST NOT assume there isn't one\n"
-            "         \"sigops\" : n,               (numeric) total number of SigOps, as counted for purposes of block limits; if key is not present, sigop count is unknown and clients MUST NOT assume there aren't any\n"
+            "         \"fee\": n,                   (numeric) difference in value between transaction inputs and outputs (in Satoshis); for coinbase transactions, this is a negative Number of the total collected block fees (ie, not including the block subsidy); if key is not present, fee is unknown and clients MUST NOT assume there isn't one\n"
+            "         \"sigops\" : n,               (numeric) total SigOps cost, as counted for purposes of block limits; if key is not present, sigop cost is unknown and clients MUST NOT assume it is zero\n"
+            "         \"cost\" : n,                 (numeric) total transaction size cost, as counted for purposes of block limits\n"
             "         \"required\" : true|false     (boolean) if provided and true, this transaction must be in the final block\n"
             "      }\n"
             "      ,...\n"
@@ -359,8 +377,9 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
             "     ,...\n"
             "  ],\n"
             "  \"noncerange\" : \"00000000ffffffff\",   (string) A range of valid nonces\n"
-            "  \"sigoplimit\" : n,                 (numeric) limit of sigops in blocks\n"
+            "  \"sigoplimit\" : n,                 (numeric) cost limit of sigops in blocks\n"
             "  \"sizelimit\" : n,                  (numeric) limit of block size\n"
+            "  \"costlimit\" : n,                  (numeric) limit of block cost\n"
             "  \"curtime\" : ttt,                  (numeric) current timestamp in seconds since epoch (Jan 1 1970 GMT)\n"
             "  \"bits\" : \"xxx\",                 (string) compressed target of next block\n"
             "  \"height\" : n                      (numeric) The height of the next block\n"
@@ -388,7 +407,10 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
 
     std::string strMode = "template";
     UniValue lpval = NullUniValue;
-    if (params.size() > 0) {
+    std::set<std::string> setClientRules;
+    int64_t nMaxVersionPreVB = -1;
+    if (params.size() > 0)
+    {
         const UniValue& oparam = params[0].get_obj();
         const UniValue& modeval = find_value(oparam, "mode");
         if (modeval.isStr())
@@ -426,6 +448,20 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
             CValidationState state;
             TestBlockValidity(state, Params(), block, pindexPrev, false, true);
             return BIP22ValidationResult(state);
+        }
+
+        const UniValue& aClientRules = find_value(oparam, "rules");
+        if (aClientRules.isArray()) {
+            for (unsigned int i = 0; i < aClientRules.size(); ++i) {
+                const UniValue& v = aClientRules[i];
+                setClientRules.insert(v.get_str());
+            }
+        } else {
+            // NOTE: It is important that this NOT be read if versionbits is supported
+            const UniValue& uvMaxVersion = find_value(oparam, "maxversion");
+            if (uvMaxVersion.isNum()) {
+                nMaxVersionPreVB = uvMaxVersion.get_int64();
+            }
         }
     }
 
@@ -536,8 +572,8 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
         UniValue entry(UniValue::VOBJ);
 
         entry.push_back(Pair("data", EncodeHexTx(tx)));
-
-        entry.push_back(Pair("hash", txHash.GetHex()));
+        entry.push_back(Pair("txid", txHash.GetHex()));
+        entry.push_back(Pair("hash", tx.GetWitnessHash().GetHex()));
 
         UniValue deps(UniValue::VARR);
         BOOST_FOREACH (const CTxIn& in, tx.vin) {
@@ -549,6 +585,7 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
         int index_in_template = i - 1;
         entry.push_back(Pair("fee", pblocktemplate->vTxFees[index_in_template]));
         entry.push_back(Pair("sigops", pblocktemplate->vTxSigOps[index_in_template]));
+        entry.push_back(Pair("cost", GetTransactionCost(tx)));
 
         transactions.push_back(entry);
     }
@@ -566,9 +603,9 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
 
 			UniValue entry(UniValue::VOBJ);
 
-			entry.push_back(Pair("data", EncodeHexTx(tx)));
-
-			entry.push_back(Pair("hash", txHash.GetHex()));
+            entry.push_back(Pair("data", EncodeHexTx(tx)));
+            entry.push_back(Pair("txid", txHash.GetHex()));
+            entry.push_back(Pair("hash", tx.GetWitnessHash().GetHex()));
 
 			UniValue deps(UniValue::VARR);
 			BOOST_FOREACH (const CTxIn& in, tx.vin) {
@@ -602,6 +639,49 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
 
     UniValue result(UniValue::VOBJ);
     result.push_back(Pair("capabilities", aCaps));
+
+    UniValue aRules(UniValue::VARR);
+    UniValue vbavailable(UniValue::VOBJ);
+    for (int i = 0; i < (int)Consensus::MAX_VERSION_BITS_DEPLOYMENTS; ++i) {
+        Consensus::DeploymentPos pos = Consensus::DeploymentPos(i);
+        ThresholdState state = VersionBitsState(pindexPrev, Params().GetConsensus(), pos, versionbitscache);
+        switch (state) {
+            case THRESHOLD_DEFINED:
+            case THRESHOLD_FAILED:
+                // Not exposed to GBT at all
+                break;
+            case THRESHOLD_LOCKED_IN:
+                // Ensure bit is set in block version
+                pblock->nVersion |= VersionBitsMask(Params().GetConsensus(), pos);
+                // FALL THROUGH to get vbavailable set...
+            case THRESHOLD_STARTED:
+            {
+                const struct BIP9DeploymentInfo& vbinfo = VersionBitsDeploymentInfo[pos];
+                vbavailable.push_back(Pair(gbt_vb_name(pos), Params().GetConsensus().vDeployments[pos].bit));
+                if (setClientRules.find(vbinfo.name) == setClientRules.end()) {
+                    if (!vbinfo.gbt_force) {
+                        // If the client doesn't support this, don't indicate it in the [default] version
+                        pblock->nVersion &= ~VersionBitsMask(Params().GetConsensus(), pos);
+                    }
+                }
+                break;
+            }
+            case THRESHOLD_ACTIVE:
+            {
+                // Add to rules only
+                const struct BIP9DeploymentInfo& vbinfo = VersionBitsDeploymentInfo[pos];
+                aRules.push_back(gbt_vb_name(pos));
+                if (setClientRules.find(vbinfo.name) == setClientRules.end()) {
+                    // Not supported by the client; make sure it's safe to proceed
+                    if (!vbinfo.gbt_force) {
+                        // If we do anything other than throw an exception here, be sure version/force isn't sent to old clients
+                        throw JSONRPCError(RPC_INVALID_PARAMETER, strprintf("Support for '%s' rule requires explicit client support", vbinfo.name));
+                    }
+                }
+                break;
+            }
+        }
+    }
     result.push_back(Pair("version", pblock->nVersion));
     result.push_back(Pair("previousblockhash", pblock->hashPrevBlock.GetHex()));
     result.push_back(Pair("transactions", transactions));
@@ -618,6 +698,9 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
     result.push_back(Pair("curtime", pblock->GetBlockTime()));
     result.push_back(Pair("bits", strprintf("%08x", pblock->nBits)));
     result.push_back(Pair("height", (int64_t)(pindexPrev->nHeight + 1)));
+    if (!pblocktemplate->vchCoinbaseCommitment.empty()) {
+        result.push_back(Pair("default_witness_commitment", HexStr(pblocktemplate->vchCoinbaseCommitment.begin(), pblocktemplate->vchCoinbaseCommitment.end())));
+    }
     result.push_back(Pair("votes", aVotes));
 
     UniValue aMasternode(UniValue::VOBJ);
@@ -783,25 +866,25 @@ UniValue estimatesmartfee(const UniValue& params, bool fHelp)
 {
     if (fHelp || params.size() != 1)
         throw runtime_error(
-                "estimatesmartfee nblocks\n"
-                "\nWARNING: This interface is unstable and may disappear or change!\n"
-                "\nEstimates the approximate fee per kilobyte needed for a transaction to begin\n"
-                "confirmation within nblocks blocks if possible and return the number of blocks\n"
-                "for which the estimate is valid.\n"
-                "\nArguments:\n"
-                "1. nblocks     (numeric)\n"
-                "\nResult:\n"
-                "{\n"
-                "  \"feerate\" : x.x,     (numeric) estimate fee-per-kilobyte (in BTC)\n"
-                "  \"blocks\" : n         (numeric) block number where estimate was found\n"
-                "}\n"
-                "\n"
-                "A negative value is returned if not enough transactions and blocks\n"
-                "have been observed to make an estimate for any number of blocks.\n"
-                "However it will not return a value below the mempool reject fee.\n"
-                "\nExample:\n"
-                + HelpExampleCli("estimatesmartfee", "6")
-        );
+            "estimatesmartfee nblocks\n"
+            "\nWARNING: This interface is unstable and may disappear or change!\n"
+            "\nEstimates the approximate fee per kilobyte needed for a transaction to begin\n"
+            "confirmation within nblocks blocks if possible and return the number of blocks\n"
+            "for which the estimate is valid.\n"
+            "\nArguments:\n"
+            "1. nblocks     (numeric)\n"
+            "\nResult:\n"
+            "{\n"
+            "  \"feerate\" : x.x,     (numeric) estimate fee-per-kilobyte (in BTC)\n"
+            "  \"blocks\" : n         (numeric) block number where estimate was found\n"
+            "}\n"
+            "\n"
+            "A negative value is returned if not enough transactions and blocks\n"
+            "have been observed to make an estimate for any number of blocks.\n"
+            "However it will not return a value below the mempool reject fee.\n"
+            "\nExample:\n"
+            + HelpExampleCli("estimatesmartfee", "6")
+            );
 
     RPCTypeCheck(params, boost::assign::list_of(UniValue::VNUM));
 
@@ -819,25 +902,25 @@ UniValue estimatesmartpriority(const UniValue& params, bool fHelp)
 {
     if (fHelp || params.size() != 1)
         throw runtime_error(
-                "estimatesmartpriority nblocks\n"
-                "\nWARNING: This interface is unstable and may disappear or change!\n"
-                "\nEstimates the approximate priority a zero-fee transaction needs to begin\n"
-                "confirmation within nblocks blocks if possible and return the number of blocks\n"
-                "for which the estimate is valid.\n"
-                "\nArguments:\n"
-                "1. nblocks     (numeric)\n"
-                "\nResult:\n"
-                "{\n"
-                "  \"priority\" : x.x,    (numeric) estimated priority\n"
-                "  \"blocks\" : n         (numeric) block number where estimate was found\n"
-                "}\n"
-                "\n"
-                "A negative value is returned if not enough transactions and blocks\n"
-                "have been observed to make an estimate for any number of blocks.\n"
-                "However if the mempool reject fee is set it will return 1e9 * MAX_MONEY.\n"
-                "\nExample:\n"
-                + HelpExampleCli("estimatesmartpriority", "6")
-        );
+            "estimatesmartpriority nblocks\n"
+            "\nWARNING: This interface is unstable and may disappear or change!\n"
+            "\nEstimates the approximate priority a zero-fee transaction needs to begin\n"
+            "confirmation within nblocks blocks if possible and return the number of blocks\n"
+            "for which the estimate is valid.\n"
+            "\nArguments:\n"
+            "1. nblocks     (numeric)\n"
+            "\nResult:\n"
+            "{\n"
+            "  \"priority\" : x.x,    (numeric) estimated priority\n"
+            "  \"blocks\" : n         (numeric) block number where estimate was found\n"
+            "}\n"
+            "\n"
+            "A negative value is returned if not enough transactions and blocks\n"
+            "have been observed to make an estimate for any number of blocks.\n"
+            "However if the mempool reject fee is set it will return 1e9 * MAX_MONEY.\n"
+            "\nExample:\n"
+            + HelpExampleCli("estimatesmartpriority", "6")
+            );
 
     RPCTypeCheck(params, boost::assign::list_of(UniValue::VNUM));
 

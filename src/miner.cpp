@@ -127,6 +127,8 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
     CBlockIndex* pindexPrev = chainActive.Tip();
     int nHeight = pindexPrev->nHeight + 1;
 
+    pblock->nVersion = ComputeBlockVersion(pindexPrev, chainparams.GetConsensus());
+
     // Create coinbase tx
     CMutableTransaction txNew;
     txNew.vin.resize(1);
@@ -419,6 +421,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
         tx.vin[0].scriptSig = CScript() << nHeight << OP_0;
         pblock->vtx[0] = CTransaction(tx);
         pblocktemplate->vTxSigOps[0] = GetLegacySigOpCount(pblock->vtx[0]);
+        pblocktemplate->vchCoinbaseCommitment = GenerateCoinbaseCommitment(*pblock, pindexPrev, chainparams.GetConsensus());
         const CChainParams& chainparams = Params();
         UpdateTime(pblock, chainparams.GetConsensus(), pindexPrev, fProofOfStake);
 

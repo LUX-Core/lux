@@ -28,6 +28,7 @@
 #include "txmempool.h"
 #include "uint256.h"
 #include "undo.h"
+#include "versionbits.h"
 
 #include <algorithm>
 #include <exception>
@@ -602,10 +603,13 @@ extern CCoinsViewCache* pcoinsTip;
 /** Global variable that points to the active block tree (protected by cs_main) */
 extern CBlockTreeDB* pblocktree;
 
+extern VersionBitsCache versionbitscache;
+
 struct CBlockTemplate {
     CBlock block;
     std::vector<CAmount> vTxFees;
     std::vector<int64_t> vTxSigOps;
+    std::vector<unsigned char> vchCoinbaseCommitment;
 };
 
 /** Reject codes greater or equal to this can be returned by AcceptToMemPool
