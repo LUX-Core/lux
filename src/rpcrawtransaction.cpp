@@ -524,39 +524,52 @@ UniValue signrawtransaction(const UniValue& params, bool fHelp)
             + HelpRequiringPassphrase() + "\n"
 #endif
 
-                                          "\nArguments:\n"
-                                          "1. \"hexstring\"     (string, required) The transaction hex string\n"
-                                          "2. \"prevtxs\"       (string, optional) An json array of previous dependent transaction outputs\n"
-                                          "     [               (json array of json objects, or 'null' if none provided)\n"
-                                          "       {\n"
-                                          "         \"txid\":\"id\",             (string, required) The transaction id\n"
-                                          "         \"vout\":n,                  (numeric, required) The output number\n"
-                                          "         \"scriptPubKey\": \"hex\",   (string, required) script key\n"
-                                          "         \"redeemScript\": \"hex\"    (string, required for P2SH) redeem script\n"
-                                          "       }\n"
-                                          "       ,...\n"
-                                          "    ]\n"
-                                          "3. \"privatekeys\"     (string, optional) A json array of base58-encoded private keys for signing\n"
-                                          "    [                  (json array of strings, or 'null' if none provided)\n"
-                                          "      \"privatekey\"   (string) private key in base58-encoding\n"
-                                          "      ,...\n"
-                                          "    ]\n"
-                                          "4. \"sighashtype\"     (string, optional, default=ALL) The signature hash type. Must be one of\n"
-                                          "       \"ALL\"\n"
-                                          "       \"NONE\"\n"
-                                          "       \"SINGLE\"\n"
-                                          "       \"ALL|ANYONECANPAY\"\n"
-                                          "       \"NONE|ANYONECANPAY\"\n"
-                                          "       \"SINGLE|ANYONECANPAY\"\n"
+            "\nArguments:\n"
+            "1. \"hexstring\"     (string, required) The transaction hex string\n"
+            "2. \"prevtxs\"       (string, optional) An json array of previous dependent transaction outputs\n"
+            "     [               (json array of json objects, or 'null' if none provided)\n"
+            "       {\n"
+            "         \"txid\":\"id\",             (string, required) The transaction id\n"
+            "         \"vout\":n,                  (numeric, required) The output number\n"
+            "         \"scriptPubKey\": \"hex\",   (string, required) script key\n"
+            "         \"redeemScript\": \"hex\",   (string, required for P2SH or P2WSH) redeem script\n"
+            "         \"amount\": value            (numeric, required) The amount spent\n"
+            "       }\n"
+            "       ,...\n"
+            "    ]\n"
+            "3. \"privatekeys\"     (string, optional) A json array of base58-encoded private keys for signing\n"
+            "    [                  (json array of strings, or 'null' if none provided)\n"
+            "      \"privatekey\"   (string) private key in base58-encoding\n"
+            "      ,...\n"
+            "    ]\n"
+            "4. \"sighashtype\"     (string, optional, default=ALL) The signature hash type. Must be one of\n"
+            "       \"ALL\"\n"
+            "       \"NONE\"\n"
+            "       \"SINGLE\"\n"
+            "       \"ALL|ANYONECANPAY\"\n"
+            "       \"NONE|ANYONECANPAY\"\n"
+            "       \"SINGLE|ANYONECANPAY\"\n"
 
-                                          "\nResult:\n"
-                                          "{\n"
-                                          "  \"hex\": \"value\",   (string) The raw transaction with signature(s) (hex-encoded string)\n"
-                                          "  \"complete\": n       (numeric) if transaction has a complete set of signature (0 if not)\n"
-                                          "}\n"
+            "\nResult:\n"
+            "{\n"
+            "  \"hex\" : \"value\",           (string) The hex-encoded raw transaction with signature(s)\n"
+            "  \"complete\" : true|false,   (boolean) If the transaction has a complete set of signatures\n"
+            "  \"errors\" : [                 (json array of objects) Script verification errors (if there are any)\n"
+            "    {\n"
+            "      \"txid\" : \"hash\",           (string) The hash of the referenced, previous transaction\n"
+            "      \"vout\" : n,                (numeric) The index of the output to spent and used as input\n"
+            "      \"scriptSig\" : \"hex\",       (string) The hex-encoded signature script\n"
+            "      \"sequence\" : n,            (numeric) Script sequence number\n"
+            "      \"error\" : \"text\"           (string) Verification or signing error related to the input\n"
+            "    }\n"
+            "    ,...\n"
+            "  ]\n"
+            "}\n"
 
-                                          "\nExamples:\n" +
-            HelpExampleCli("signrawtransaction", "\"myhex\"") + HelpExampleRpc("signrawtransaction", "\"myhex\""));
+            "\nExamples:\n"
+            + HelpExampleCli("signrawtransaction", "\"myhex\"")
+            + HelpExampleRpc("signrawtransaction", "\"myhex\"")
+        );
 
     LOCK(cs_main);
 
@@ -657,7 +670,10 @@ UniValue signrawtransaction(const UniValue& params, bool fHelp)
                 if ((unsigned int)nOut >= coins->vout.size())
                     coins->vout.resize(nOut + 1);
                 coins->vout[nOut].scriptPubKey = scriptPubKey;
-                coins->vout[nOut].nValue = 0; // we don't know the actual output value
+                coins->vout[nOut].nValue = 0;
+                if (prevOut.exists("amount")) {
+                    coins->vout[nOut].nValue = AmountFromValue(find_value(prevOut, "amount"));
+                }
             }
 
             // if redeemScript given and not using the local wallet (private keys

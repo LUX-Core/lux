@@ -373,6 +373,9 @@ bool AreInputsStandard(const CTransaction& tx, const CCoinsViewCache& mapInputs)
  */
 unsigned int GetLegacySigOpCount(const CTransaction& tx);
 
+/** Get the BIP9 state for a given deployment at the current tip. */
+ThresholdState VersionBitsTipState(const Consensus::Params& params, Consensus::DeploymentPos pos);
+
 /**
  * Count ECDSA signature operations in pay-to-script-hash inputs.
  *

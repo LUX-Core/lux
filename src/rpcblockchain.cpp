@@ -562,6 +562,26 @@ UniValue verifychain(const UniValue& params, bool fHelp)
     return CVerifyDB().VerifyDB(Params(), pcoinsTip, nCheckLevel, nCheckDepth);
 }
 
+static UniValue BIP9SoftForkDesc(const Consensus::Params& consensusParams, Consensus::DeploymentPos id)
+{
+    UniValue rv(UniValue::VOBJ);
+    const ThresholdState thresholdState = VersionBitsTipState(consensusParams, id);
+    switch (thresholdState) {
+        case THRESHOLD_DEFINED: rv.push_back(Pair("status", "defined")); break;
+        case THRESHOLD_STARTED: rv.push_back(Pair("status", "started")); break;
+        case THRESHOLD_LOCKED_IN: rv.push_back(Pair("status", "locked_in")); break;
+        case THRESHOLD_ACTIVE: rv.push_back(Pair("status", "active")); break;
+        case THRESHOLD_FAILED: rv.push_back(Pair("status", "failed")); break;
+    }
+    if (THRESHOLD_STARTED == thresholdState)
+    {
+        rv.push_back(Pair("bit", consensusParams.vDeployments[id].bit));
+    }
+    rv.push_back(Pair("startTime", consensusParams.vDeployments[id].nStartTime));
+    rv.push_back(Pair("timeout", consensusParams.vDeployments[id].nTimeout));
+    return rv;
+}
+
 UniValue getblockchaininfo(const UniValue& params, bool fHelp)
 {
     if (fHelp || params.size() != 0)
@@ -571,26 +591,45 @@ UniValue getblockchaininfo(const UniValue& params, bool fHelp)
             "\nResult:\n"
             "{\n"
             "  \"chain\": \"xxxx\",        (string) current network name as defined in BIP70 (main, test, regtest)\n"
-            "  \"height\": xxxxxx,         (numeric) the current number of blocks (height) processed in the server\n"
-                    "  \"headers\": xxxxxx,        (numeric) the current number of headers we have validated\n"
-            "  \"peak\": \"...\",          (string) the hash of the main chain top block\n"
+            "  \"blocks\": xxxxxx,         (numeric) the current number of blocks processed in the server\n"
+            "  \"headers\": xxxxxx,        (numeric) the current number of headers we have validated\n"
+            "  \"bestblockhash\": \"...\", (string) the hash of the currently best block\n"
             "  \"difficulty\": xxxxxx,     (numeric) the current difficulty\n"
+            "  \"mediantime\": xxxxxx,     (numeric) median time for the current best block\n"
             "  \"verificationprogress\": xxxx, (numeric) estimate of verification progress [0..1]\n"
             "  \"chainwork\": \"xxxx\"     (string) total amount of work in active chain, in hexadecimal\n"
+            "  \"bip9_softforks\": {          (object) status of BIP9 softforks in progress\n"
+            "     \"xxxx\" : {                (string) name of the softfork\n"
+            "        \"status\": \"xxxx\",    (string) one of \"defined\", \"started\", \"lockedin\", \"active\", \"failed\"\n"
+            "        \"bit\": xx,             (numeric) the bit, 0-28, in the block version field used to signal this soft fork\n"
+            "        \"startTime\": xx,       (numeric) the minimum median time past of a block at which the bit gains its meaning\n"
+            "        \"timeout\": xx          (numeric) the median time past of a block at which the deployment is considered failed if not yet locked in\n"
+            "     }\n"
+            "  }\n"
             "}\n"
-            "\nExamples:\n" +
-            HelpExampleCli("getblockchaininfo", "") + HelpExampleRpc("getblockchaininfo", ""));
+            "\nExamples:\n"
+            + HelpExampleCli("getblockchaininfo", "")
+            + HelpExampleRpc("getblockchaininfo", "")
+        );
 
     LOCK(cs_main);
-
+    CBlockIndex* tip = chainActive.Tip();
     UniValue obj(UniValue::VOBJ);
-    obj.push_back(Pair("chain", Params().NetworkIDString()));
-    obj.push_back(Pair("height", (int)chainActive.Height()));
-    obj.push_back(Pair("headers", pindexBestHeader ? pindexBestHeader->nHeight : -1));
-    obj.push_back(Pair("peak", chainActive.Tip()->GetBlockHash().GetHex()));
-    obj.push_back(Pair("difficulty", (double)GetPoWDifficulty()));
-    obj.push_back(Pair("verificationprogress", Checkpoints::GuessVerificationProgress(Params().Checkpoints(), chainActive.Tip())));
-    obj.push_back(Pair("chainwork", chainActive.Tip()->nChainWork.GetHex()));
+    obj.push_back(Pair("chain",                 Params().NetworkIDString()));
+    obj.push_back(Pair("blocks",                chainActive.Height()));
+    obj.push_back(Pair("headers",               pindexBestHeader ? pindexBestHeader->nHeight : -1));
+    obj.push_back(Pair("bestblockhash",         chainActive.Tip()->GetBlockHash().GetHex()));
+    obj.push_back(Pair("difficulty",            GetPoWDifficulty(tip)));
+    obj.push_back(Pair("mediantime",            (int64_t)chainActive.Tip()->GetMedianTimePast()));
+    obj.push_back(Pair("verificationprogress",  Checkpoints::GuessVerificationProgress(Params().Checkpoints(), chainActive.Tip())));
+    obj.push_back(Pair("chainwork",             chainActive.Tip()->nChainWork.GetHex()));
+
+    const Consensus::Params& consensusParams = Params().GetConsensus();
+    UniValue bip9_softforks(UniValue::VOBJ);
+    bip9_softforks.push_back(Pair("csv", BIP9SoftForkDesc(consensusParams, Consensus::DEPLOYMENT_CSV)));
+    bip9_softforks.push_back(Pair("segwit", BIP9SoftForkDesc(consensusParams, Consensus::DEPLOYMENT_SEGWIT)));
+    obj.push_back(Pair("bip9_softforks", bip9_softforks));
+
     return obj;
 }
 

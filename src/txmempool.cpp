@@ -196,7 +196,7 @@ void CTxMemPool::AddTransactionsUpdated(unsigned int n)
 }
 
 
-bool CTxMemPool::addUnchecked(const uint256& hash, const CTxMemPoolEntry& entry)
+bool CTxMemPool::addUnchecked(const uint256& hash, const CTxMemPoolEntry& entry, bool fCurrentEstimate)
 {
     // Add to memory pool without checking anything.
     // Used by main.cpp AcceptToMemoryPool(), which DOES do
@@ -209,6 +209,7 @@ bool CTxMemPool::addUnchecked(const uint256& hash, const CTxMemPoolEntry& entry)
             mapNextTx[tx.vin[i].prevout] = CInPoint(&tx, i);
         nTransactionsUpdated++;
         totalTxSize += entry.GetTxSize();
+        minerPolicyEstimator->processTransaction(entry, fCurrentEstimate);
     }
     return true;
 }
@@ -291,6 +292,7 @@ void CTxMemPool::remove(const CTransaction& origTx, std::list<CTransaction>& rem
             totalTxSize -= mapTx[hash].GetTxSize();
             mapTx.erase(hash);
             nTransactionsUpdated++;
+            minerPolicyEstimator->removeTx(hash);
         }
     }
 }
@@ -348,14 +350,14 @@ void CTxMemPool::removeForBlock(const std::vector<CTransaction>& vtx, unsigned i
         if (mapTx.count(hash))
             entries.push_back(mapTx[hash]);
     }
-//    minerPolicyEstimator->seenBlock(entries, nBlockHeight, minRelayFee);
-    minerPolicyEstimator->processBlock(nBlockHeight, entries, fCurrentEstimate);
+
     BOOST_FOREACH (const CTransaction& tx, vtx) {
         std::list<CTransaction> dummy;
         remove(tx, dummy, false);
         removeConflicts(tx, conflicts);
         ClearPrioritisation(tx.GetHash());
     }
+    minerPolicyEstimator->processBlock(nBlockHeight, entries, fCurrentEstimate);
 }
 
 
