@@ -226,16 +226,16 @@ public:
         nTargetTimespan = 30 * 60; // LUX: 1 day
         nTargetSpacing = 3 * 60;  // LUX: 1 minute
         nLastPOWBlock = 6000000;
-        nMaturity = 79;
+        nMaturity = 2;
         nModifierUpdateBlock = 51197; //approx Mon, 17 Apr 2017 04:00:00 GMT
 
         //! Modify the testnet genesis block so the timestamp is valid for a later start.
-        genesis = CreateGenesisBlock(1524402689, 239627, 0x1e0fffff, 1);
+        genesis = CreateGenesisBlock(1524545768, 570354, 0x1e0fffff, 1);
 
         hashGenesisBlock = genesis.GetHash();
 
-        assert(hashGenesisBlock == uint256("0x00000386e7cb0041f5b4583093a9cbe64bcf167f3291dbd1574ee83f6aac9966"));
-        assert(genesis.hashMerkleRoot == uint256("0x39f9afdc907a5a62083439b6aa19cd565f5f4892e457bc77604db980f55346f9"));
+        assert(hashGenesisBlock == uint256("0x000007902f27377577fdf300e4df3fee6ccabb93b534c4df22f0364eea5d3329"));
+        assert(genesis.hashMerkleRoot == uint256("0xd13af5c8979e28c4e968ff212cbb30073c37341fb7ccd98f83eda52b6e5fb0c9"));
 
         vFixedSeeds.clear();
         vSeeds.clear();
