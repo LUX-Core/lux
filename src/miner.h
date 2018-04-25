@@ -24,6 +24,10 @@ void GenerateBitcoins(CWallet* pwallet, int nThreads);
 CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, bool fProofOfStake);
 CBlockTemplate* CreateNewBlockWithKey(CReserveKey& reservekey, CWallet* pwallet, bool fProofOfStake);
 bool ProcessBlockFound(CBlock* pblock, CWallet& wallet, CReserveKey& reservekey);
+/** Do mining precalculation */
+void FormatHashBuffers(CBlock* pblock, char* pmidstate, char* pdata, char* phash1);
+/** Base sha256 mining transform */
+void SHA256Transform(void* pstate, void* pinput, const void* pinit);
 /** Modify the extranonce in a block */
 void IncrementExtraNonce(CBlock* pblock, CBlockIndex* pindexPrev, unsigned int& nExtraNonce);
 /** Check mined block */
