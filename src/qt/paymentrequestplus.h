@@ -40,10 +40,6 @@ public:
 private:
     payments::PaymentRequest paymentRequest;
     payments::PaymentDetails details;
-
-    struct env_md_ctx_st *EVP_MD_CTX_new() const;
-
-    void EVP_MD_CTX_free(env_md_ctx_st *pSt) const;
 };
 
 #endif // BITCOIN_QT_PAYMENTREQUESTPLUS_H
