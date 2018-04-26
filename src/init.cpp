@@ -594,6 +594,29 @@ void ThreadImport(std::vector<boost::filesystem::path> vImportFiles)
     }
 }
 
+static bool LockDataDirectory(bool probeOnly, bool try_lock = true)
+{
+    std::string strDataDir = GetDataDir().string();
+
+    // Make sure only a single Bitcoin process is using the data directory.
+    boost::filesystem::path pathLockFile = GetDataDir() / ".lock";
+    FILE* file = fopen(pathLockFile.string().c_str(), "a"); // empty lock file; created if it doesn't exist.
+    if (file) fclose(file);
+
+    try {
+        static boost::interprocess::file_lock lock(pathLockFile.string().c_str());
+        if (try_lock && !lock.try_lock()) {
+            return InitError(strprintf(_("Cannot obtain a lock on data directory %s. %s is probably already running."), strDataDir, _(PACKAGE_NAME)));
+        }
+        if (probeOnly) {
+            lock.unlock();
+        }
+    } catch(const boost::interprocess::interprocess_exception& e) {
+        return InitError(strprintf(_("Cannot obtain a lock on data directory %s. %s is probably already running.") + " %s.", strDataDir, _(PACKAGE_NAME), e.what()));
+    }
+    return true;
+}
+
 /** Sanity checks
  *  Ensure that LUX is running in a usable environment with all
  *  necessary library support.
@@ -955,7 +978,7 @@ bool AppInit2(boost::thread_group& threadGroup)
     //ignore masternodes below protocol version
     CMasterNode::minProtoVersion = GetArg("-masternodeminprotocol", MIN_MN_PROTO_VERSION);
 
-    int64_t nStart;
+    int64_t nStart = GetTimeMillis();
 
 // ********************************************************* Step 5: Backup wallet and verify wallet database integrity
 #ifdef ENABLE_WALLET
@@ -1610,4 +1633,10 @@ bool AppInit2(boost::thread_group& threadGroup)
 #endif
 
     return !fRequestShutdown;
+}
+
+void UnlockDataDirectory()
+{
+    // Try lock and unlock
+    LockDataDirectory(true, false);
 }

@@ -68,40 +68,43 @@ bool Solver(const CKeyStore& keystore, const CScript& scriptPubKey, uint256 hash
     CKeyID keyID;
     switch (whichTypeRet)
     {
-    case TX_NONSTANDARD:
-    case TX_NULL_DATA:
-    {
-        LogPrintf("*** null data \n");
-        return false;
-    }
-    case TX_PUBKEY:
-        keyID = CPubKey(vSolutions[0]).GetID();
-        if(!Sign1(keyID, keystore, hash, nHashType, scriptSigRet))
-        {
-            LogPrintf("*** Sign1 failed \n");
-            return false;
-        }
-        return true;
-    case TX_PUBKEYHASH:
-        keyID = CKeyID(uint160(vSolutions[0]));
-        if (!Sign1(keyID, keystore, hash, nHashType, scriptSigRet))
-        {
-            LogPrintf("*** solver failed to sign \n");
-            return false;
-        }
-        else
-        {
-            CPubKey vch;
-            keystore.GetPubKey(keyID, vch);
-            scriptSigRet << ToByteVector(vch);
-        }
-        return true;
-    case TX_SCRIPTHASH:
-        return keystore.GetCScript(uint160(vSolutions[0]), scriptSigRet);
+		case TX_NONSTANDARD:
+		case TX_NULL_DATA:
+		{
+		    LogPrintf("*** null data \n");
+		    return false;
+		}
+		case TX_PUBKEY:
+		    keyID = CPubKey(vSolutions[0]).GetID();
+		    if(!Sign1(keyID, keystore, hash, nHashType, scriptSigRet))
+		    {
+		        LogPrintf("*** Sign1 failed \n");
+		        return false;
+		    }
+		    return true;
+		case TX_PUBKEYHASH:
+		    keyID = CKeyID(uint160(vSolutions[0]));
+		    if (!Sign1(keyID, keystore, hash, nHashType, scriptSigRet))
+		    {
+		        LogPrintf("*** solver failed to sign \n");
+		        return false;
+		    }
+		    else
+		    {
+		        CPubKey vch;
+		        keystore.GetPubKey(keyID, vch);
+		        scriptSigRet << ToByteVector(vch);
+		    }
+		    return true;
+		case TX_SCRIPTHASH:
+		    return keystore.GetCScript(uint160(vSolutions[0]), scriptSigRet);
 
-    case TX_MULTISIG:
-        scriptSigRet << OP_0; // workaround CHECKMULTISIG bug
-        return (SignN(vSolutions, keystore, hash, nHashType, scriptSigRet));
+		case TX_MULTISIG:
+		    scriptSigRet << OP_0; // workaround CHECKMULTISIG bug
+		    return (SignN(vSolutions, keystore, hash, nHashType, scriptSigRet));
+
+		default:
+		    break;
     }
     LogPrintf("*** solver no case met \n");
     return false;
@@ -221,40 +224,42 @@ static CScript CombineSignatures(const CScript& scriptPubKey, const CTransaction
 {
     switch (txType)
     {
-    case TX_NONSTANDARD:
-    case TX_NULL_DATA:
-        // Don't know anything about this, assume bigger one is correct:
-        if (sigs1.size() >= sigs2.size())
-            return PushAll(sigs1);
-        return PushAll(sigs2);
-    case TX_PUBKEY:
-    case TX_PUBKEYHASH:
-        // Signatures are bigger than placeholders or empty scripts:
-        if (sigs1.empty() || sigs1[0].empty())
-            return PushAll(sigs2);
-        return PushAll(sigs1);
-    case TX_SCRIPTHASH:
-        if (sigs1.empty() || sigs1.back().empty())
-            return PushAll(sigs2);
-        else if (sigs2.empty() || sigs2.back().empty())
-            return PushAll(sigs1);
-        else
-        {
-            // Recur to combine:
-            valtype spk = sigs1.back();
-            CScript pubKey2(spk.begin(), spk.end());
+		case TX_NONSTANDARD:
+		case TX_NULL_DATA:
+		    // Don't know anything about this, assume bigger one is correct:
+		    if (sigs1.size() >= sigs2.size())
+		        return PushAll(sigs1);
+		    return PushAll(sigs2);
+		case TX_PUBKEY:
+		case TX_PUBKEYHASH:
+		    // Signatures are bigger than placeholders or empty scripts:
+		    if (sigs1.empty() || sigs1[0].empty())
+		        return PushAll(sigs2);
+		    return PushAll(sigs1);
+		case TX_SCRIPTHASH:
+		    if (sigs1.empty() || sigs1.back().empty())
+		        return PushAll(sigs2);
+		    else if (sigs2.empty() || sigs2.back().empty())
+		        return PushAll(sigs1);
+		    else
+		    {
+		        // Recur to combine:
+		        valtype spk = sigs1.back();
+		        CScript pubKey2(spk.begin(), spk.end());
 
-            txnouttype txType2;
-            vector<vector<unsigned char> > vSolutions2;
-            Solver(pubKey2, txType2, vSolutions2);
-            sigs1.pop_back();
-            sigs2.pop_back();
-            CScript result = CombineSignatures(pubKey2, txTo, nIn, txType2, vSolutions2, sigs1, sigs2);
-            result << spk;
-            return result;
-        }
-    case TX_MULTISIG:
-        return CombineMultisig(scriptPubKey, txTo, nIn, vSolutions, sigs1, sigs2);
+		        txnouttype txType2;
+		        vector<vector<unsigned char> > vSolutions2;
+		        Solver(pubKey2, txType2, vSolutions2);
+		        sigs1.pop_back();
+		        sigs2.pop_back();
+		        CScript result = CombineSignatures(pubKey2, txTo, nIn, txType2, vSolutions2, sigs1, sigs2);
+		        result << spk;
+		        return result;
+		    }
+		case TX_MULTISIG:
+		    return CombineMultisig(scriptPubKey, txTo, nIn, vSolutions, sigs1, sigs2);
+		default:
+			break;
     }
 
     return CScript();

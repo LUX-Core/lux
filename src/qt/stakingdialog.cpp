@@ -160,6 +160,7 @@ void StakingDialog::setModel(WalletModel *model)
 
 void StakingDialog::chooseStakingInterval(int idx)
 {
+    /*
     int interval = 10;
     switch(stakingCombo->itemData(idx).toInt())
     {
@@ -180,8 +181,9 @@ void StakingDialog::chooseStakingInterval(int idx)
             break;
         case Staking90days:
             interval = 60*24*90;
-            break;
+            break;       
     }
+    */
 }
 
 void StakingDialog::exportClicked()

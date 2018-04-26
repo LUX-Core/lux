@@ -70,7 +70,7 @@ public:
     //!<DuzyDoc>: Stake::Pointer() - returns the staking pointer
     static Stake *Pointer();
     
-    static int64_t GetStakeCombineThreshold()
+    static uint64_t GetStakeCombineThreshold()
     {
         return 100;
     }
