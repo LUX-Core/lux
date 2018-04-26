@@ -2324,11 +2324,20 @@ bool CWallet::CreateTransaction(const vector<pair<CScript, CAmount> >& vecSend, 
 
                 // Sign
                 int nIn = 0;
-                BOOST_FOREACH (const PAIRTYPE(const CWalletTx*, unsigned int) & coin, setCoins)
-                    if (!SignSignature(*coin.first->GetWallet(), (CTransaction)*coin.first ,txNew, nIn++, SIGHASH_ALL)/*SignSignature(*this, *coin.first, txNew, nIn++)*//*TODO: ???????*/) {
+                CTransaction txNewConst(txNew);
+                BOOST_FOREACH (const PAIRTYPE(const CWalletTx*, unsigned int) & coin, setCoins) {
+                    bool signSuccess;
+                    const CScript& scriptPubKey = coin.first->vout[coin.second].scriptPubKey;
+                    SignatureData sigdata;
+                    signSuccess = ProduceSignature(TransactionSignatureCreator(this, &txNewConst, nIn, coin.first->vout[coin.second].nValue, SIGHASH_ALL), scriptPubKey, sigdata);
+                    if (!signSuccess) {
                         strFailReason = _("Signing transaction failed");
                         return false;
+                    } else {
+                        UpdateTransaction(txNew, nIn, sigdata);
                     }
+                    nIn++;
+                }
 
                 // Embed the constructed transaction data in wtxNew.
                 *static_cast<CTransaction*>(&wtxNew) = CTransaction(txNew);
