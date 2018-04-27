@@ -670,6 +670,15 @@ bool CWallet::AddToWallet(const CWalletTx& wtxIn, bool fFromLoadWallet)
                 wtx.fFromMe = wtxIn.fFromMe;
                 fUpdated = true;
             }
+            // If we have a witness-stripped version of this transaction, and we
+            // see a new version with a witness, then we must be upgrading a pre-segwit
+            // wallet.  Store the new version of the transaction with the witness,
+            // as the stripped-version must be invalid.
+            // TODO: Store all versions of the transaction, instead of just one.
+            if (wtxIn.HasWitness() && !wtx.HasWitness()) {
+                wtx = wtxIn; //TODO: Will this break something?
+                fUpdated = true;
+            }
         }
 
         //// debug print
@@ -3137,6 +3146,24 @@ public:
             Process(script);
     }
 
+    void operator()(const WitnessV0ScriptHash& scriptID)
+    {
+        CScriptID id;
+        CRIPEMD160().Write(scriptID.begin(), 32).Finalize(id.begin());
+        CScript script;
+        if (keystore.GetCScript(id, script)) {
+            Process(script);
+        }
+    }
+
+    void operator()(const WitnessV0KeyHash& keyid)
+    {
+        CKeyID id(keyid);
+        if (keystore.HaveKey(id)) {
+            vKeys.push_back(id);
+        }
+    }
+
     void operator()(const CNoDestination& none) {}
 };
 
@@ -3231,6 +3258,28 @@ bool CWallet::GetDestData(const CTxDestination& dest, const std::string& key, st
         }
     }
     return false;
+}
+
+void CWallet::LearnRelatedScripts(const CPubKey& key)
+{
+    if (key.IsCompressed()) {
+        CTxDestination witdest = WitnessV0KeyHash(key.GetID());
+        CScript witprog = GetScriptForDestination(witdest);
+        // Make sure the resulting program is solvable.
+        assert(IsSolvable(*this, witprog));
+        AddCScript(witprog);
+    }
+}
+
+CTxDestination GetDestinationForKey(const CPubKey& key)
+{
+    if (key.IsCompressed()) {
+        CTxDestination witdest = WitnessV0KeyHash(key.GetID());
+        CScript witprog = GetScriptForDestination(witdest);
+        return CScriptID(witprog);
+    } else {
+        return key.GetID();
+    }
 }
 
 void CWallet::AutoCombineDust()

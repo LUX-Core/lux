@@ -61,6 +61,20 @@ public:
     friend bool operator<(const CNoDestination &a, const CNoDestination &b) { return true; }
 };
 
+struct WitnessV0ScriptHash : public uint160
+{
+    WitnessV0ScriptHash() : uint160() {}
+    explicit WitnessV0ScriptHash(const uint160& hash) : uint160(hash) {}
+    using uint160::uint160;
+};
+
+struct WitnessV0KeyHash : public uint160
+{
+    WitnessV0KeyHash() : uint160() {}
+    explicit WitnessV0KeyHash(const uint160& hash) : uint160(hash) {}
+    using uint160::uint160;
+};
+
 /** 
  * A txout script template with a specific destination. It is either:
  *  * CNoDestination: no destination set
@@ -68,7 +82,7 @@ public:
  *  * CScriptID: TX_SCRIPTHASH destination
  *  A CTxDestination is the internal data type encoded in a CBitcoinAddress
  */
-typedef boost::variant<CNoDestination, CKeyID, CScriptID> CTxDestination;
+typedef boost::variant<CNoDestination, CKeyID, CScriptID, WitnessV0ScriptHash, WitnessV0KeyHash> CTxDestination;
 
 const char* GetTxnOutputType(txnouttype t);
 

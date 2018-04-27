@@ -229,6 +229,8 @@ public:
 
     bool operator()(const CKeyID& id) const { return addr->Set(id); }
     bool operator()(const CScriptID& id) const { return addr->Set(id); }
+    bool operator()(const WitnessV0KeyHash& id) const { return addr->Set(id); }
+    bool operator()(const WitnessV0ScriptHash& id) const { return addr->Set(id); }
     bool operator()(const CNoDestination& no) const { return false; }
 };
 
@@ -246,6 +248,18 @@ bool CBitcoinAddress::Set(const CScriptID& id)
     return true;
 }
 
+bool CBitcoinAddress::Set(const WitnessV0KeyHash& id)
+{
+    SetData(Params().Base58Prefix(CChainParams::WIT_PUBKEY_ADDRESS), &id, 20);
+    return true;
+}
+
+bool CBitcoinAddress::Set(const WitnessV0ScriptHash& id)
+{
+    SetData(Params().Base58Prefix(CChainParams::WIT_SCRIPT_ADDRESS), &id, 20);
+    return true;
+}
+
 bool CBitcoinAddress::Set(const CTxDestination& dest)
 {
     return boost::apply_visitor(CBitcoinAddressVisitor(this), dest);
@@ -260,7 +274,9 @@ bool CBitcoinAddress::IsValid(const CChainParams& params) const
 {
     bool fCorrectSize = vchData.size() == 20;
     bool fKnownVersion = vchVersion == params.Base58Prefix(CChainParams::PUBKEY_ADDRESS) ||
-                         vchVersion == params.Base58Prefix(CChainParams::SCRIPT_ADDRESS);
+                         vchVersion == params.Base58Prefix(CChainParams::SCRIPT_ADDRESS) ||
+                         vchVersion == params.Base58Prefix(CChainParams::WIT_PUBKEY_ADDRESS) ||
+                         vchVersion == params.Base58Prefix(CChainParams::WIT_SCRIPT_ADDRESS);
     return fCorrectSize && fKnownVersion;
 }
 
@@ -274,6 +290,10 @@ CTxDestination CBitcoinAddress::Get() const
         return CKeyID(id);
     else if (vchVersion == Params().Base58Prefix(CChainParams::SCRIPT_ADDRESS))
         return CScriptID(id);
+    else if (vchVersion == Params().Base58Prefix(CChainParams::WIT_PUBKEY_ADDRESS))
+        return WitnessV0KeyHash(id);
+    else if (vchVersion == Params().Base58Prefix(CChainParams::WIT_SCRIPT_ADDRESS))
+        return WitnessV0ScriptHash(id);
     else
         return CNoDestination();
 }

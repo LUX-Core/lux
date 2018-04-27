@@ -164,6 +164,16 @@ public:
     bool HasCollateralInputs(bool fOnlyConfirmed = true) const;
     bool IsCollateralAmount(int64_t nInputAmount) const;
     int CountInputsWithAmount(int64_t nInputAmount);
+    /**
+     * Explicitly make the wallet learn the related scripts for outputs to the
+     * given key.
+     */
+    void LearnRelatedScripts(const CPubKey& key);
+    /**
+     * Get a destination of the requested type (if possible) to the specified key.
+     * The caller must make sure LearnRelatedScripts has been called beforehand.
+     */
+    CTxDestination GetDestinationForKey(const CPubKey& key);
 
     bool SelectCoinsCollateral(std::vector<CTxIn>& setCoinsRet, int64_t& nValueRet) const;
 
