@@ -25,6 +25,26 @@ struct SeedSpec6 {
 
 #include "chainparamsseeds.h"
 
+bool CheckProof(uint256 hash, unsigned int nBits)
+{
+    bool fNegative;
+    bool fOverflow;
+    uint256 bnTarget;
+
+
+    bnTarget.SetCompact(nBits, &fNegative, &fOverflow);
+
+    // Check range
+    if (fNegative || bnTarget == 0 || fOverflow)
+        return false; //error("CheckProofOfWork() : nBits below minimum work");
+
+    // Check proof of work matches claimed amount
+    if (hash > bnTarget)
+        return false; //error("CheckProofOfWork() : hash doesn't match nBits");
+
+    return true;
+}
+
 /**
  * Main network
  */
@@ -230,12 +250,21 @@ public:
         nModifierUpdateBlock = 51197; //approx Mon, 17 Apr 2017 04:00:00 GMT
 
         //! Modify the testnet genesis block so the timestamp is valid for a later start.
-        genesis = CreateGenesisBlock(1524545768, 570354, 0x1e0fffff, 1);
+        const char* pszTimestamp = "Lux - Smart contract testnet";
+        genesis = CreateGenesisBlock(pszTimestamp, 1524628441, 511745, 0x1e0fffff, 1);
 
         hashGenesisBlock = genesis.GetHash();
 
-        assert(hashGenesisBlock == uint256("0x000007902f27377577fdf300e4df3fee6ccabb93b534c4df22f0364eea5d3329"));
-        assert(genesis.hashMerkleRoot == uint256("0xd13af5c8979e28c4e968ff212cbb30073c37341fb7ccd98f83eda52b6e5fb0c9"));
+//                while (!CheckProof(genesis.GetHash(), genesis.nBits)) {
+//                    genesis.nNonce++;
+//                }
+//
+//                std::cout << genesis.nNonce << std::endl;
+//                std::cout << genesis.GetHash().GetHex() << std::endl;
+//                std::cout << genesis.hashMerkleRoot.GetHex() << std::endl;
+
+        assert(hashGenesisBlock == uint256("0x00000411efe9f3ab38489bc27dc11acc53fd886c23ecaba723c24841021a0c48"));
+        assert(genesis.hashMerkleRoot == uint256("0x99b4b9acddc84cc4ae5a06e5bc6e7d644949bcf3bf9e7421b76e848144a64be5"));
 
         vFixedSeeds.clear();
         vSeeds.clear();
@@ -269,7 +298,7 @@ public:
         nStakingRoundPeriod = 5; // 5 seconds a round
         nStakingInterval = 30; // 30 seconds
         nStakingMinAge = 360; // 6 minutes
-        nFirstSCBlock = 1000;
+        nFirstSCBlock = 300;
     }
     const Checkpoints::CCheckpointData& Checkpoints() const
     {

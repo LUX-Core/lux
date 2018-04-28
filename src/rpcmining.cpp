@@ -321,8 +321,8 @@ UniValue getwork(const UniValue& params, bool fHelp) {
     if (vNodes.empty())
         throw JSONRPCError(RPC_CLIENT_NOT_CONNECTED, "Lux is not connected!");
 
-//    if (IsInitialBlockDownload())
-//        throw JSONRPCError(RPC_CLIENT_IN_INITIAL_DOWNLOAD, "Lux is downloading blocks...");
+    if (IsInitialBlockDownload())
+        throw JSONRPCError(RPC_CLIENT_IN_INITIAL_DOWNLOAD, "Lux is downloading blocks...");
 
     if (chainActive.Tip()->nHeight >= Params().LAST_POW_BLOCK())
         throw JSONRPCError(RPC_MISC_ERROR, "No more PoW blocks");
