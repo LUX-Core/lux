@@ -25,6 +25,7 @@ class CMasterKey;
 class CScript;
 class CWallet;
 class CWalletTx;
+class CTokenInfo;
 class uint160;
 class uint256;
 
@@ -116,6 +117,9 @@ public:
 
     bool WriteTx(uint256 hash, const CWalletTx& wtx);
     bool EraseTx(uint256 hash);
+
+    bool WriteToken(const CTokenInfo& wtoken);
+    bool EraseToken(uint256 hash);
 
     bool WriteLuxNodeConfig(std::string sAlias, const CLuxNodeConfig& nodeConfig);
     bool ReadLuxNodeConfig(std::string sAlias, CLuxNodeConfig& nodeConfig);

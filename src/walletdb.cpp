@@ -25,7 +25,7 @@
 
 using namespace boost;
 using namespace std;
-
+static std::atomic<unsigned int> nWalletDBUpdateCounter;
 static uint64_t nAccountingEntryNumber = 0;
 
 //
@@ -654,6 +654,17 @@ bool ReadKeyValue(CWallet* pwallet, CDataStream& ssKey, CDataStream& ssValue, CW
                 strErr = "Error reading wallet database: LoadDestData failed";
                 return false;
             }
+        } else if (strType == "token") {
+            uint256 hash;
+            ssKey >> hash;
+            CTokenInfo wtoken;
+            ssValue >> wtoken;
+            if (wtoken.GetHash() != hash) {
+                strErr = "Error reading wallet database: CTokenInfo corrupt";
+                return false;
+            }
+
+            pwallet->LoadToken(wtoken);
         }
     } catch (...) {
         return false;
@@ -1033,4 +1044,16 @@ bool CWalletDB::EraseContractData(const string &address, const string &key)
 {
     nWalletDBUpdated++;
     return Erase(std::make_pair(std::string("contractdata"), std::make_pair(address, key)));
+}
+
+bool CWalletDB::WriteToken(const CTokenInfo &wtoken)
+{
+    nWalletDBUpdateCounter++;
+    return Write(std::make_pair(std::string("token"), wtoken.GetHash()), wtoken);
+}
+
+bool CWalletDB::EraseToken(uint256 hash)
+{
+    nWalletDBUpdateCounter++;
+    return Erase(std::make_pair(std::string("token"), hash));
 }

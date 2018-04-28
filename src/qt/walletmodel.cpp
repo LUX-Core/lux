@@ -701,3 +701,8 @@ bool WalletModel::isMine(CTxDestination address)
 {
     return IsMine(*wallet, address);
 }
+
+bool WalletModel::AddTokenEntry(const CTokenInfo &token)
+{
+    return wallet->AddTokenEntry(token);
+}
