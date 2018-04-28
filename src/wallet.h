@@ -169,11 +169,6 @@ public:
      * given key.
      */
     void LearnRelatedScripts(const CPubKey& key);
-    /**
-     * Get a destination of the requested type (if possible) to the specified key.
-     * The caller must make sure LearnRelatedScripts has been called beforehand.
-     */
-    CTxDestination GetDestinationForKey(const CPubKey& key);
 
     bool SelectCoinsCollateral(std::vector<CTxIn>& setCoinsRet, int64_t& nValueRet) const;
 
@@ -1342,5 +1337,11 @@ public:
 private:
     std::vector<char> _ssExtra;
 };
+
+/**
+ * Get a destination of the requested type (if possible) to the specified key.
+ * The caller must make sure LearnRelatedScripts has been called beforehand.
+ */
+CTxDestination GetDestinationForKey(const CPubKey& key);
 
 #endif // BITCOIN_WALLET_H

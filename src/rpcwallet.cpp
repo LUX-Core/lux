@@ -107,7 +107,7 @@ UniValue getnewaddress(const UniValue& params, bool fHelp)
         throw JSONRPCError(RPC_WALLET_KEYPOOL_RAN_OUT, "Error: Keypool ran out, please call keypoolrefill first");
 
     pwalletMain->LearnRelatedScripts(newKey);
-    CTxDestination dest = pwalletMain->GetDestinationForKey(newKey);
+    CTxDestination dest = GetDestinationForKey(newKey);
 
     pwalletMain->SetAddressBook(dest, strAccount, "receive");
 
@@ -201,7 +201,7 @@ UniValue getrawchangeaddress(const UniValue& params, bool fHelp)
     reservekey.KeepKey();
 
     pwalletMain->LearnRelatedScripts(vchPubKey);
-    CTxDestination dest = pwalletMain->GetDestinationForKey(vchPubKey);
+    CTxDestination dest = GetDestinationForKey(vchPubKey);
 
     return CBitcoinAddress(dest).ToString();
 }
