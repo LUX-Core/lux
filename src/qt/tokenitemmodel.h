@@ -13,12 +13,14 @@ class TokenItemModel : public QAbstractItemModel
     Q_OBJECT
 public:
     enum DataRole{
-        AddressRole = Qt::UserRole + 1,
-        NameRole = Qt::UserRole + 2,
-        SymbolRole = Qt::UserRole + 3,
-        DecimalsRole = Qt::UserRole + 4,
-        SenderRole = Qt::UserRole + 5,
-        BalanceRole = Qt::UserRole + 6,
+        Hash = Qt::UserRole + 1,
+        AddressRole = Qt::UserRole + 2,
+        NameRole = Qt::UserRole + 3,
+        SymbolRole = Qt::UserRole + 4,
+        DecimalsRole = Qt::UserRole + 5,
+        SenderRole = Qt::UserRole + 6,
+        BalanceRole = Qt::UserRole + 7,
+        RawBalanceRole = Qt::UserRole + 8,
     };
 
     TokenItemModel(CWallet *wallet, WalletModel *parent = 0);

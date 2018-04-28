@@ -11,6 +11,7 @@
 class TokenViewDelegate;
 class WalletModel;
 class ClientModel;
+class TokenItemModel;
 namespace Ui {
 class LSRToken;
 }
@@ -32,6 +33,8 @@ public Q_SLOTS:
     void on_goToSendTokenPage();
     void on_goToReceiveTokenPage();
     void on_goToAddTokenPage();
+    void on_currentTokenChanged(QModelIndex index);
+    void on_dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles = QVector<int>());
 
 private:
     Ui::LSRToken *ui;
@@ -40,10 +43,12 @@ private:
     AddTokenPage* m_addTokenPage;
     WalletModel* m_model;
     ClientModel* m_clientModel;
+    TokenItemModel* m_tokenModel;
     TokenViewDelegate* m_tokenDelegate;
     QAction *m_sendAction;
     QAction *m_receiveAction;
     QAction *m_addTokenAction;
+    QString m_selectedTokenHash;
 };
 
 #endif // LSRTOKEN_H

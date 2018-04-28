@@ -17,8 +17,7 @@ public:
     TokenItemEntry()
     {}
 
-    TokenItemEntry(const uint256& tokenHash, const CTokenInfo& _tokenInfo):
-        tokenInfo(_tokenInfo)
+    TokenItemEntry(const uint256& tokenHash, const CTokenInfo& tokenInfo)
     {
         hash = QString::fromStdString(tokenHash.ToString());
         createTime.setTime_t(tokenInfo.nCreateTime);
@@ -40,7 +39,6 @@ public:
         senderAddress = obj.senderAddress;
         totalSupply = obj.totalSupply;
         balance = obj.balance;
-        tokenInfo = obj.tokenInfo;
     }
 
     bool update(Token* tokenAbi)
@@ -57,8 +55,8 @@ public:
             return false;
 
         bool ret = true;
-        tokenAbi->setAddress(tokenInfo.strContractAddress);
-        tokenAbi->setSender(tokenInfo.strSenderAddress);
+        tokenAbi->setAddress(contractAddress.toStdString());
+        tokenAbi->setSender(senderAddress.toStdString());
         std::string strBalance;
         ret &= tokenAbi->balanceOf(strBalance);
         if(ret)
@@ -86,9 +84,6 @@ public:
     QString senderAddress;
     QString totalSupply;
     int256_t balance;
-
-private:
-    CTokenInfo tokenInfo;
 };
 
 Q_DECLARE_METATYPE(TokenItemEntry)
@@ -281,6 +276,9 @@ QVariant TokenItemModel::data(const QModelIndex &index, int role) const
     TokenItemEntry *rec = static_cast<TokenItemEntry*>(index.internalPointer());
 
     switch (role) {
+    case TokenItemModel::Hash:
+        return rec->hash;
+        break;
     case TokenItemModel::AddressRole:
         return rec->contractAddress;
         break;
@@ -298,6 +296,9 @@ QVariant TokenItemModel::data(const QModelIndex &index, int role) const
         break;
     case TokenItemModel::BalanceRole:
         return BitcoinUnits::formatToken(rec->decimals, rec->balance, false, BitcoinUnits::separatorAlways);
+        break;
+    case TokenItemModel::RawBalanceRole:
+        return QString::fromStdString(rec->balance.str());
         break;
     default:
         break;

@@ -77,6 +77,7 @@ LSRToken::LSRToken(QWidget *parent) :
         ui(new Ui::LSRToken),
         m_model(0),
         m_clientModel(0),
+        m_tokenModel(0),
         m_tokenDelegate(0)
 {
     ui->setupUi(this);
@@ -109,6 +110,7 @@ LSRToken::LSRToken(QWidget *parent) :
     connect(m_sendAction, SIGNAL(triggered()), this, SLOT(on_goToSendTokenPage()));
     connect(m_receiveAction, SIGNAL(triggered()), this, SLOT(on_goToReceiveTokenPage()));
     connect(m_addTokenAction, SIGNAL(triggered()), this, SLOT(on_goToAddTokenPage()));
+    connect(ui->tokensList, SIGNAL(clicked(QModelIndex)), this, SLOT(on_currentTokenChanged(QModelIndex)));
 
     on_goToSendTokenPage();
 }
@@ -122,7 +124,10 @@ void LSRToken::setModel(WalletModel *_model)
 {
     m_model = _model;
     m_addTokenPage->setModel(m_model);
-    ui->tokensList->setModel(m_model->getTokenItemModel());
+    m_sendTokenPage->setModel(m_model);
+    m_tokenModel = m_model->getTokenItemModel();
+    ui->tokensList->setModel(m_tokenModel);
+    connect(m_tokenModel, SIGNAL(dataChanged(QModelIndex,QModelIndex,QVector<int>)), SLOT(on_dataChanged(QModelIndex,QModelIndex,QVector<int>)));
 }
 
 void LSRToken::setClientModel(ClientModel *_clientModel)
@@ -150,3 +155,31 @@ void LSRToken::on_goToAddTokenPage()
     ui->stackedWidget->setCurrentIndex(2);
 }
 
+void LSRToken::on_currentTokenChanged(QModelIndex index)
+{
+    if(m_tokenModel)
+    {
+        m_selectedTokenHash = m_tokenModel->data(index, TokenItemModel::Hash).toString();
+        std::string address = m_tokenModel->data(index, TokenItemModel::AddressRole).toString().toStdString();
+        std::string symbol = m_tokenModel->data(index, TokenItemModel::SymbolRole).toString().toStdString();
+        std::string sender = m_tokenModel->data(index, TokenItemModel::SenderRole).toString().toStdString();
+        int8_t decimals = m_tokenModel->data(index, TokenItemModel::DecimalsRole).toInt();
+        std::string balance = m_tokenModel->data(index, TokenItemModel::RawBalanceRole).toString().toStdString();
+        m_sendTokenPage->setTokenData(address, sender, symbol, decimals, balance);
+    }
+}
+
+void LSRToken::on_dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)
+{
+    Q_UNUSED(bottomRight);
+    Q_UNUSED(roles);
+
+    if(m_tokenModel)
+    {
+        QString tokenHash = m_tokenModel->data(topLeft, TokenItemModel::Hash).toString();
+        if(tokenHash == m_selectedTokenHash)
+        {
+            on_currentTokenChanged(topLeft);
+        }
+    }
+}

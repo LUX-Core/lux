@@ -633,6 +633,26 @@ bool WalletModel::isSpent(const COutPoint& outpoint) const
     return wallet->IsSpent(outpoint.hash, outpoint.n);
 }
 
+bool WalletModel::isUnspentAddress(const std::string &luxAddress) const
+{
+    LOCK2(cs_main, wallet->cs_wallet);
+
+    std::vector<COutput> vecOutputs;
+    wallet->AvailableCoins(vecOutputs);
+    BOOST_FOREACH(const COutput& out, vecOutputs)
+    {
+        CTxDestination address;
+        const CScript& scriptPubKey = out.tx->vout[out.i].scriptPubKey;
+        bool fValidAddress = ExtractDestination(scriptPubKey, address);
+
+        if(fValidAddress && CBitcoinAddress(address).ToString() == luxAddress && out.tx->vout[out.i].nValue)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
 // AvailableCoins + LockedCoins grouped by wallet address (put change in one group with wallet address)
 void WalletModel::listCoins(std::map<QString, std::vector<COutput> >& mapCoins) const
 {

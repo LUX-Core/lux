@@ -64,6 +64,19 @@ struct TokenData
     {}
 };
 
+bool ToHash160(const std::string& strLuxAddress, std::string& strHash160)
+{
+    CBitcoinAddress luxAddress(strLuxAddress);
+    if(luxAddress.IsValid()){
+        CKeyID keyid;
+        luxAddress.GetKeyID(keyid);
+        strHash160 = HexStr(valtype(keyid.begin(),keyid.end()));
+    }else{
+        return false;
+    }
+    return true;
+}
+
 Token::Token():
         d(0)
 {
@@ -331,12 +344,8 @@ bool Token::burn(const std::string &_value, bool &success, bool sendTo)
 bool Token::balanceOf(std::string &result, bool sendTo)
 {
     std::string spender = d->lstParams[PARAM_SENDER].toStdString();
-    CBitcoinAddress luxSenderAddress(spender);
-    if(luxSenderAddress.IsValid()){
-        CKeyID keyid;
-        luxSenderAddress.GetKeyID(keyid);
-        spender = HexStr(valtype(keyid.begin(),keyid.end()));
-    }else{
+    if(!ToHash160(spender, spender))
+    {
         return false;
     }
 
@@ -404,8 +413,14 @@ bool Token::symbol(std::string &result, bool sendTo)
 
 bool Token::transfer(const std::string &_to, const std::string &_value, bool sendTo)
 {
+    std::string to = _to;
+    if(!ToHash160(to, to))
+    {
+        return false;
+    }
+
     std::vector<std::string> input;
-    input.push_back(_to);
+    input.push_back(to);
     input.push_back(_value);
     std::vector<std::string> output;
 

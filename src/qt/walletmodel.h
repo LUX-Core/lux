@@ -208,6 +208,7 @@ public:
     bool isMine(CTxDestination address);
     void getOutputs(const std::vector<COutPoint>& vOutpoints, std::vector<COutput>& vOutputs);
     bool isSpent(const COutPoint& outpoint) const;
+    bool isUnspentAddress(const std::string& address) const;
     void listCoins(std::map<QString, std::vector<COutput> >& mapCoins) const;
 
     bool isLockedCoin(uint256 hash, unsigned int n) const;

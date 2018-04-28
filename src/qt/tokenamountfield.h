@@ -32,6 +32,8 @@ public:
     void setTotalSupply(const int256_t &value);
     void setDecimalUnits(int value);
 
+    QString text() const;
+
 Q_SIGNALS:
     void valueChanged();
 
