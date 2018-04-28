@@ -2,6 +2,8 @@
 #include "token.h"
 #include "walletmodel.h"
 #include "wallet.h"
+#include "bitcoinunits.h"
+
 #include <boost/foreach.hpp>
 
 #include <QDateTime>
@@ -11,7 +13,11 @@
 class TokenItemEntry
 {
 public:
-    TokenItemEntry(const uint256& tokenHash, const CTokenInfo& tokenInfo)
+    TokenItemEntry()
+    {}
+
+    TokenItemEntry(const uint256& tokenHash, const CTokenInfo& _tokenInfo):
+        tokenInfo(_tokenInfo)
     {
         hash = QString::fromStdString(tokenHash.ToString());
         createTime.setTime_t(tokenInfo.nCreateTime);
@@ -22,6 +28,42 @@ public:
         senderAddress = QString::fromStdString(tokenInfo.strSenderAddress);
     }
 
+    TokenItemEntry( const TokenItemEntry &obj)
+    {
+        hash = obj.hash;
+        createTime = obj.createTime;
+        contractAddress = obj.contractAddress;
+        tokenName = obj.tokenName;
+        tokenSymbol = obj.tokenSymbol;
+        decimals = obj.decimals;
+        senderAddress = obj.senderAddress;
+        totalSupply = obj.totalSupply;
+        balance = obj.balance;
+        tokenInfo = obj.tokenInfo;
+    }
+
+    bool update(Token* tokenAbi)
+    {
+        if(!tokenAbi)
+            return false;
+
+        bool ret = true;
+        tokenAbi->setAddress(tokenInfo.strContractAddress);
+        tokenAbi->setSender(tokenInfo.strSenderAddress);
+        std::string strBalance;
+        ret &= tokenAbi->balanceOf(strBalance);
+        if(ret)
+        {
+            int256_t val(strBalance);
+            balance = BitcoinUnits::formatToken(tokenInfo.nDecimals, val, false, BitcoinUnits::separatorAlways);
+        }
+
+        return ret;
+    }
+
+    ~TokenItemEntry()
+    {}
+
     QString hash;
     QDateTime createTime;
     QString contractAddress;
@@ -31,16 +73,18 @@ public:
     QString senderAddress;
     QString totalSupply;
     QString balance;
+
+private:
+    CTokenInfo tokenInfo;
 };
+
+Q_DECLARE_METATYPE(TokenItemEntry)
 
 struct TokenItemEntryLessThan
 {
     bool operator()(const TokenItemEntry &a, const TokenItemEntry &b) const
     {
-        if(a.tokenSymbol == b.tokenSymbol)
-            return a.contractAddress < b.contractAddress;
-
-        return a.tokenSymbol < b.tokenSymbol;
+        return a.hash < b.hash;
     }
 };
 
@@ -64,7 +108,12 @@ public:
             {
                 const uint256& tokenHash = item.first;
                 const CTokenInfo& tokenInfo = item.second;
-                cachedTokenItem.append(TokenItemEntry(tokenHash, tokenInfo));
+                TokenItemEntry tokenItem(tokenHash, tokenInfo);
+                if(parent)
+                {
+                    tokenItem.update(parent->getTokenAbi());
+                }
+                cachedTokenItem.append(tokenItem);
             }
         }
         qSort(cachedTokenItem.begin(), cachedTokenItem.end(), TokenItemEntryLessThan());
@@ -99,6 +148,7 @@ public:
                 qWarning() << "TokenItemPriv::updateEntry: Warning: Got CT_UPDATED, but entry is not in model";
                 break;
             }
+            cachedTokenItem[lowerIndex] = item;
             parent->emitDataChanged(lowerIndex);
             break;
         case CT_DELETED:
@@ -217,24 +267,42 @@ QVariant TokenItemModel::data(const QModelIndex &index, int role) const
 
     TokenItemEntry *rec = static_cast<TokenItemEntry*>(index.internalPointer());
 
-    if(role == Qt::DisplayRole || role == Qt::EditRole)
-    {
-        switch(index.column())
-        {
-            return QVariant();
-        }
-    }
-    else if (role == Qt::FontRole)
-    {
-        return QFont();
+    switch (role) {
+    case TokenItemModel::AddressRole:
+        return rec->contractAddress;
+        break;
+    case TokenItemModel::NameRole:
+        return rec->tokenName;
+        break;
+    case TokenItemModel::SymbolRole:
+        return rec->tokenSymbol;
+        break;
+    case TokenItemModel::DecimalsRole:
+        return rec->decimals;
+        break;
+    case TokenItemModel::SenderRole:
+        return rec->senderAddress;
+        break;
+    case TokenItemModel::BalanceRole:
+        return rec->balance;
+        break;
+    default:
+        break;
     }
 
     return QVariant();
 }
 
-void TokenItemModel::updateToken(const QString &hash, int status, bool showToken)
+Token *TokenItemModel::getTokenAbi()
 {
+    return d->tokenAbi;
+}
 
+void TokenItemModel::updateToken(const QVariant &token, int status, bool showToken)
+{
+    TokenItemEntry tokenEntry = token.value<TokenItemEntry>();
+    tokenEntry.update(getTokenAbi());
+    d->priv->updateEntry(tokenEntry, status);
 }
 
 void TokenItemModel::emitDataChanged(int idx)
@@ -253,8 +321,12 @@ public:
     {
         QString strHash = QString::fromStdString(hash.GetHex());
         qDebug() << "NotifyTokenChanged: " + strHash + " status= " + QString::number(status);
+
+        TokenItemEntry tokenEntry(hash, tokenInfo);
+        QVariant token;
+        token.setValue(tokenEntry);
         QMetaObject::invokeMethod(tim, "updateToken", Qt::QueuedConnection,
-                                  Q_ARG(QString, strHash),
+                                  Q_ARG(QVariant, token),
                                   Q_ARG(int, status),
                                   Q_ARG(bool, showToken));
     }

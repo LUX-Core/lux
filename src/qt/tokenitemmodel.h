@@ -5,12 +5,22 @@
 
 class CWallet;
 class WalletModel;
+class Token;
 struct TokenModelData;
 
 class TokenItemModel : public QAbstractItemModel
 {
     Q_OBJECT
 public:
+    enum DataRole{
+        AddressRole = Qt::UserRole + 1,
+        NameRole = Qt::UserRole + 2,
+        SymbolRole = Qt::UserRole + 3,
+        DecimalsRole = Qt::UserRole + 4,
+        SenderRole = Qt::UserRole + 5,
+        BalanceRole = Qt::UserRole + 6,
+    };
+
     TokenItemModel(CWallet *wallet, WalletModel *parent = 0);
     ~TokenItemModel();
 
@@ -24,8 +34,10 @@ public:
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
     /*@}*/
 
-public Q_SLOTS:
-    void updateToken(const QString &hash, int status, bool showToken);
+    Token *getTokenAbi();
+
+private Q_SLOTS:
+    void updateToken(const QVariant &token, int status, bool showToken);
 
 private:
     /** Notify listeners that data changed. */

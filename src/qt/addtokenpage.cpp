@@ -5,12 +5,14 @@
 #include "wallet.h"
 #include "walletmodel.h"
 #include "token.h"
+#include "clientmodel.h"
 
 AddTokenPage::AddTokenPage(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::AddTokenPage),
     m_tokenABI(0),
-    m_model(0)
+    m_model(0),
+    m_clientModel(0)
 {
     ui->setupUi(this);
     m_tokenABI = new Token();
@@ -27,12 +29,23 @@ AddTokenPage::~AddTokenPage()
     m_tokenABI = 0;
 }
 
+void AddTokenPage::setClientModel(ClientModel *clientModel)
+{
+    m_clientModel = clientModel;
+    if (m_clientModel)
+    {
+        connect(m_clientModel, SIGNAL(numBlocksChanged(int,QDateTime,double,bool)), this, SLOT(on_numBlocksChanged()));
+        on_numBlocksChanged();
+    }
+}
+
 void AddTokenPage::clearAll()
 {
     ui->lineEditContractAddress->setText("");
     ui->lineEditTokenName->setText("");
     ui->lineEditTokenSymbol->setText("");
     ui->lineEditDecimals->setText("");
+    ui->lineEditSenderAddress->setCurrentIndex(-1);
 }
 
 void AddTokenPage::setModel(WalletModel *_model)
@@ -52,6 +65,7 @@ void AddTokenPage::on_confirmButton_clicked()
     tokenInfo.strTokenName = ui->lineEditTokenName->text().toStdString();
     tokenInfo.strTokenSymbol = ui->lineEditTokenSymbol->text().toStdString();
     tokenInfo.nDecimals = ui->lineEditDecimals->text().toInt();
+    tokenInfo.strSenderAddress = ui->lineEditSenderAddress->currentText().toStdString();
 
     if(m_model)
     {
@@ -78,4 +92,9 @@ void AddTokenPage::on_addressChanged()
         enableConfirm = ret;
     }
     ui->confirmButton->setEnabled(enableConfirm);
+}
+
+void AddTokenPage::on_numBlocksChanged()
+{
+    ui->lineEditSenderAddress->on_refresh();
 }

@@ -11,6 +11,7 @@
 #include "recentrequeststablemodel.h"
 #include "transactiontablemodel.h"
 #include "contracttablemodel.h"
+#include "tokenitemmodel.h"
 
 #include "base58.h"
 #include "db.h"
@@ -44,6 +45,7 @@ WalletModel::WalletModel(CWallet* wallet, OptionsModel* optionsModel, QObject* p
     contractTableModel = new ContractTableModel(wallet, this);
     transactionTableModel = new TransactionTableModel(wallet, this);
     recentRequestsTableModel = new RecentRequestsTableModel(wallet, this);
+    tokenItemModel = new TokenItemModel(wallet, this);
 
     // This timer will be fired repeatedly to update the balance
     pollTimer = new QTimer(this);
@@ -401,6 +403,11 @@ TransactionTableModel *WalletModel::getTransactionTableModel()
 RecentRequestsTableModel* WalletModel::getRecentRequestsTableModel()
 {
     return recentRequestsTableModel;
+}
+
+TokenItemModel *WalletModel::getTokenItemModel()
+{
+    return tokenItemModel;
 }
 
 WalletModel::EncryptionStatus WalletModel::getEncryptionStatus() const
