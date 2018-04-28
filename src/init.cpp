@@ -875,6 +875,18 @@ bool AppInit2(boost::thread_group& threadGroup)
     bSpendZeroConfChange = GetArg("-spendzeroconfchange", true);
     fSendFreeTransactions = GetArg("-sendfreetransactions", false);
 
+    g_address_type = ParseOutputType(GetArg("-addresstype", ""));
+    if (g_address_type == OUTPUT_TYPE_NONE) {
+        return InitError(strprintf(_("Unknown address type '%s'"), GetArg("-addresstype", "")));
+    }
+
+    // If changetype is set in config file or parameter, check that it's valid.
+    // Default to OUTPUT_TYPE_NONE if not set.
+    g_change_type = ParseOutputType(GetArg("-changetype", ""), OUTPUT_TYPE_NONE);
+    if (g_change_type == OUTPUT_TYPE_NONE && !GetArg("-changetype", "").empty()) {
+        return InitError(strprintf(_("Unknown change type '%s'"), GetArg("-changetype", "")));
+    }
+
     std::string strWalletFile = GetArg("-wallet", "wallet.dat");
 #endif // ENABLE_WALLET
 
