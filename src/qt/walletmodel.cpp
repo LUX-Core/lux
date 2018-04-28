@@ -131,7 +131,7 @@ void WalletModel::pollBalanceChanged()
     TRY_LOCK(wallet->cs_wallet, lockWallet);
     if (!lockWallet)
         return;
-
+    bool cachedNumBlocksChanged = chainActive.Height() != cachedNumBlocks;
     if (fForceCheckBalanceChanged || chainActive.Height() != cachedNumBlocks || nDarksendRounds != cachedDarksendRounds || cachedTxLocks != nCompleteTXLocks) {
         fForceCheckBalanceChanged = false;
 
@@ -140,8 +140,12 @@ void WalletModel::pollBalanceChanged()
         cachedDarksendRounds = nDarksendRounds;
 
         checkBalanceChanged();
-        if (transactionTableModel) {
+        if (transactionTableModel)
             transactionTableModel->updateConfirmations();
+
+        if(cachedNumBlocksChanged)
+        {
+            checkTokenBalanceChanged();
         }
     }
 }
@@ -183,6 +187,14 @@ void WalletModel::checkBalanceChanged()
         cachedWatchImmatureBalance = newWatchImmatureBalance;
         emit balanceChanged(newBalance, newUnconfirmedBalance, newImmatureBalance, newAnonymizedBalance,
             newWatchOnlyBalance, newWatchUnconfBalance, newWatchImmatureBalance);
+    }
+}
+
+void WalletModel::checkTokenBalanceChanged()
+{
+    if(tokenItemModel)
+    {
+        tokenItemModel->checkTokenBalanceChanged();
     }
 }
 

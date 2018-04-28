@@ -36,6 +36,9 @@ public:
 
     Token *getTokenAbi();
 
+public Q_SLOTS:
+    void checkTokenBalanceChanged();
+
 private Q_SLOTS:
     void updateToken(const QVariant &token, int status, bool showToken);
 

@@ -17,6 +17,7 @@
 #include "transactionfilterproxy.h"
 #include "transactiontablemodel.h"
 #include "walletmodel.h"
+#include "tokenitemmodel.h"
 
 #include <QAbstractItemDelegate>
 #include <QPainter>

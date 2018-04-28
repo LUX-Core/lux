@@ -251,6 +251,7 @@ private:
     void subscribeToCoreSignals();
     void unsubscribeFromCoreSignals();
     void checkBalanceChanged();
+    void checkTokenBalanceChanged();
 
 signals:
     // Signal that balance in wallet changed
