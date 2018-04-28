@@ -78,7 +78,7 @@ string AccountFromValue(const UniValue& value)
 
 UniValue getnewaddress(const UniValue& params, bool fHelp)
 {
-    if (fHelp || params.size() > 1)
+    if (fHelp || params.size() > 2)
         throw runtime_error(
             "getnewaddress ( \"account\" )\n"
             "\nReturns a new LUX address for receiving payments.\n"
@@ -116,11 +116,14 @@ UniValue getnewaddress(const UniValue& params, bool fHelp)
         throw JSONRPCError(RPC_WALLET_KEYPOOL_RAN_OUT, "Error: Keypool ran out, please call keypoolrefill first");
 
     pwalletMain->LearnRelatedScripts(newKey, output_type);
+    std::cout << "Related scripts are learned" << std::endl; //TODO: remove
     CTxDestination dest = GetDestinationForKey(newKey, output_type);
-
-    pwalletMain->SetAddressBook(dest, strAccount, "receive");
-
-    return CBitcoinAddress(dest).ToString();
+    std::cout << "GetDestination" << std::endl; //TODO: remove
+    if (!pwalletMain->SetAddressBook(dest, strAccount, "receive")) std::cout << "Failed to set address book" << std::endl; //TODO: remove stdout
+    std::cout << "SetAddressBook" << std::endl; //TODO: remove
+    CBitcoinAddress address = CBitcoinAddress(dest);
+    std::cout << address.ToString() << std::endl; //TODO: remove
+    return address.ToString();
 }
 
 

@@ -133,7 +133,12 @@ bool CWalletDB::WriteMasterKey(unsigned int nID, const CMasterKey& kMasterKey)
 bool CWalletDB::WriteCScript(const uint160& hash, const CScript& redeemScript)
 {
     nWalletDBUpdated++;
-    return Write(std::make_pair(std::string("cscript"), hash), redeemScript, false);
+    //TODO: remove if
+    if (!Write(std::make_pair(std::string("cscript"), hash), redeemScript, false)) {
+        std::cout << "Failed to write script to WalletDB" << std::endl;
+        return false;
+    }
+    return true;
 }
 
 bool CWalletDB::WriteWatchOnly(const CScript& dest)
