@@ -137,6 +137,10 @@ void WalletView::setBitcoinGUI(BitcoinGUI* gui)
 
         // Pass through transaction notifications
         connect(this, SIGNAL(incomingTransaction(QString, int, CAmount, QString, QString)), gui, SLOT(incomingTransaction(QString, int, CAmount, QString, QString)));
+
+        // Clicking on add token button sends you to add token page
+        connect(overviewPage, SIGNAL(addTokenClicked(bool)), gui, SLOT(gotoLSRTokenPage(bool)));
+
     }
 }
 
@@ -255,6 +259,13 @@ void WalletView::gotoSendToContractPage()
 void WalletView::gotoCallContractPage()
 {
     setCurrentWidget(callContractPage);
+}
+
+void WalletView::gotoLSRTokenPage(bool toAddTokenPage)
+{
+    setCurrentWidget(LSRTokenPage);
+    if(toAddTokenPage)
+        LSRTokenPage->on_goToAddTokenPage();
 }
 
 void WalletView::gotoReceiveCoinsPage()

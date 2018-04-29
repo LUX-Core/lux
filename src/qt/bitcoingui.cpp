@@ -19,11 +19,13 @@
 #include "rpcconsole.h"
 #include "utilitydialog.h"
 #include "stake.h"
+#include "main.h"
 
 #ifdef ENABLE_WALLET
 #include "blockexplorer.h"
 #include "walletframe.h"
 #include "walletmodel.h"
+#include "wallet.h"
 #endif // ENABLE_WALLET
 
 #ifdef Q_OS_MAC
@@ -50,6 +52,7 @@
 #include <QProgressBar>
 #include <QProgressDialog>
 #include <QSettings>
+#include <QShortcut>
 #include <QStackedWidget>
 #include <QStatusBar>
 #include <QStyle>
@@ -57,7 +60,8 @@
 #include <QToolBar>
 #include <QVBoxLayout>
 #include <QToolButton>
-
+#include <QDockWidget>
+#include <QSizeGrip>
 
 #if QT_VERSION < 0x050000
 #include <QTextDocument>
@@ -861,6 +865,12 @@ void BitcoinGUI::gotoMasternodePage()
         masternodeAction->setChecked(true);
         if (walletFrame) walletFrame->gotoMasternodePage();
     }
+}
+
+void BitcoinGUI::gotoLSRTokenPage(bool toAddTokenPage)
+{
+    LSRTokenAction->setChecked(true);
+    if (walletFrame) walletFrame->gotoLSRTokenPage(toAddTokenPage);
 }
 
 void BitcoinGUI::gotoReceiveCoinsPage()

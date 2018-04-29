@@ -23,10 +23,14 @@
 #include <QPainter>
 #include <QSettings>
 #include <QTimer>
+#include <QStandardItem>
+#include <QStandardItemModel>
+#include <QSortFilterProxyModel>
 
 #define DECORATION_SIZE 48
 #define ICON_OFFSET 16
 #define NUM_ITEMS 5
+#define TOKEN_SIZE 24
 
 class TxViewDelegate : public QAbstractItemDelegate
 {
@@ -99,6 +103,44 @@ public:
 
     int unit;
 };
+
+class TknViewDelegate : public QAbstractItemDelegate
+{
+public:
+    TknViewDelegate(QObject *parent) :
+            QAbstractItemDelegate(parent)
+    {}
+
+    void paint(QPainter *painter, const QStyleOptionViewItem &option,
+               const QModelIndex &index) const
+    {
+        painter->save();
+
+        QString tokenName = index.data(TokenItemModel::NameRole).toString();
+        QString tokenBalance = index.data(TokenItemModel::BalanceRole).toString();
+        QString tokenSymbol = index.data(TokenItemModel::SymbolRole).toString();
+        tokenBalance.append(" " + tokenSymbol);
+
+        QRect mainRect = option.rect;
+        mainRect.setWidth(option.rect.width());
+
+        int margin = 4;
+        int nameWidth = mainRect.width() / 3;
+        QRect nameRect(mainRect.topLeft(), QSize(nameWidth - margin, TOKEN_SIZE));
+        painter->drawText(nameRect, Qt::AlignLeft|Qt::AlignVCenter, tokenName);
+
+        QRect tokenBalanceRect(nameRect.right() + margin, mainRect.top(), nameWidth * 2, TOKEN_SIZE);
+        painter->drawText(tokenBalanceRect, Qt::AlignLeft|Qt::AlignVCenter, tokenBalance);
+
+        painter->restore();
+    }
+
+    QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
+    {
+        return QSize(TOKEN_SIZE, TOKEN_SIZE);
+    }
+};
+
 #include "overviewpage.moc"
 
 OverviewPage::OverviewPage(QWidget* parent) : QWidget(parent),
@@ -112,6 +154,7 @@ OverviewPage::OverviewPage(QWidget* parent) : QWidget(parent),
                                               currentWatchUnconfBalance(-1),
                                               currentWatchImmatureBalance(-1),
                                               txdelegate(new TxViewDelegate()),
+                                              tkndelegate(new TknViewDelegate(this)),
                                               filter(0)
 {
     nDisplayUnit = 0; // just make sure it's not unitialized
@@ -125,6 +168,7 @@ OverviewPage::OverviewPage(QWidget* parent) : QWidget(parent),
 
     connect(ui->listTransactions, SIGNAL(clicked(QModelIndex)), this, SLOT(handleTransactionClicked(QModelIndex)));
 
+    ui->listTokens->setItemDelegate(tkndelegate);
 
     // init "out of sync" warning labels
     ui->labelWalletStatus->setText("(" + tr("out of sync") + ")");
@@ -272,6 +316,18 @@ void OverviewPage::setWalletModel(WalletModel* model)
         connect(model, SIGNAL(notifyWatchonlyChanged(bool)), this, SLOT(updateWatchOnlyLabels(bool)));
     }
 
+    if(model && model->getTokenItemModel())
+    {
+        // Sort tokens by name
+        QSortFilterProxyModel *proxyModel = new QSortFilterProxyModel(this);
+        TokenItemModel* tokenModel = model->getTokenItemModel();
+        proxyModel->setSourceModel(tokenModel);
+        proxyModel->sort(0, Qt::AscendingOrder);
+
+        // Set tokens model
+        ui->listTokens->setModel(proxyModel);
+    }
+
     // update the display unit, to not use the default ("LUX")
     updateDisplayUnit();
 }
@@ -302,6 +358,11 @@ void OverviewPage::showOutOfSyncWarning(bool fShow)
     ui->labelWalletStatus->setVisible(fShow);
     ui->labelDarksendSyncStatus->setVisible(fShow);
     ui->labelTransactionsStatus->setVisible(fShow);
+}
+
+void OverviewPage::on_buttonAddToken_clicked()
+{
+    Q_EMIT addTokenClicked(true);
 }
 
 void OverviewPage::updateDarksendProgress()
