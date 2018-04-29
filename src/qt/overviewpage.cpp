@@ -31,6 +31,8 @@
 #define ICON_OFFSET 16
 #define NUM_ITEMS 5
 #define TOKEN_SIZE 24
+#define MARGIN 4
+#define NAME_WIDTH 120
 
 class TxViewDelegate : public QAbstractItemDelegate
 {
@@ -124,12 +126,20 @@ public:
         QRect mainRect = option.rect;
         mainRect.setWidth(option.rect.width());
 
-        int margin = 4;
-        int nameWidth = mainRect.width() / 3;
-        QRect nameRect(mainRect.topLeft(), QSize(nameWidth - margin, TOKEN_SIZE));
-        painter->drawText(nameRect, Qt::AlignLeft|Qt::AlignVCenter, tokenName);
+        QFont font = option.font;
 
-        QRect tokenBalanceRect(nameRect.right() + margin, mainRect.top(), nameWidth * 2, TOKEN_SIZE);
+        QFontMetrics fmName(font);
+        QString clippedName = fmName.elidedText(tokenName, Qt::ElideRight, NAME_WIDTH);
+
+        QString balanceString = tokenBalance;
+        balanceString.append(tokenSymbol);
+        QFontMetrics fmBalance(font);
+        int balanceWidth = fmBalance.width(balanceString);
+
+        QRect nameRect(mainRect.topLeft(), QSize(NAME_WIDTH, TOKEN_SIZE));
+        painter->drawText(nameRect, Qt::AlignLeft|Qt::AlignVCenter, clippedName);
+
+        QRect tokenBalanceRect(nameRect.right() + MARGIN, mainRect.top(), balanceWidth, TOKEN_SIZE);
         painter->drawText(tokenBalanceRect, Qt::AlignLeft|Qt::AlignVCenter, tokenBalance);
 
         painter->restore();
@@ -137,7 +147,15 @@ public:
 
     QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
     {
-        return QSize(TOKEN_SIZE, TOKEN_SIZE);
+        QFont font = option.font;
+
+        QString balanceString = index.data(TokenItemModel::BalanceRole).toString();
+        balanceString.append(" " + index.data(TokenItemModel::SymbolRole).toString());
+        QFontMetrics fm(font);
+        int balanceWidth = fm.width(balanceString);
+
+        int width = NAME_WIDTH + balanceWidth + MARGIN;
+        return QSize(width, TOKEN_SIZE);
     }
 };
 

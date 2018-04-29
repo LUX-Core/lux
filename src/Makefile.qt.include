@@ -119,7 +119,7 @@ QT_MOC_CPP = \
   qt/moc_tokendescdialog.cpp \
   qt/moc_tokenitemmodel.cpp \
   qt/moc_tokenfilterproxy.cpp \
-  qt/moc_tokenview.cpp \
+  qt/moc_tokentransactionview.cpp \
   qt/moc_tokentransactiontablemodel.cpp \
   qt/moc_tokentransactiondesc.cpp \
   qt/moc_trafficgraphwidget.cpp \
@@ -210,6 +210,7 @@ BITCOIN_QT_H = \
   qt/paymentserver.h \
   qt/peertablemodel.h \
   qt/platformstyle.h \
+  qt/lsrtoken.h \
   qt/qvalidatedlineedit.h \
   qt/qvalidatedtextedit.h \
   qt/qvaluecombobox.h \
@@ -228,7 +229,7 @@ BITCOIN_QT_H = \
   qt/tokendescdialog.h \
   qt/tokenitemmodel.h \
   qt/tokenfilterproxy.h \
-  qt/tokenview.h \
+  qt/tokentransactionview.h \
   qt/tokentransactionrecord.h \
   qt/tokentransactiontablemodel.h \
   qt/tokentransactiondesc.h \
@@ -328,7 +329,6 @@ BITCOIN_QT_CPP = \
   qt/optionsdialog.cpp \
   qt/optionsmodel.cpp \
   qt/peertablemodel.cpp \
-  qt/platformstyle.cpp \
   qt/qvalidatedlineedit.cpp \
   qt/qvalidatedtextedit.cpp \
   qt/qvaluecombobox.cpp \
@@ -392,7 +392,7 @@ BITCOIN_QT_CPP += \
   qt/signverifymessagedialog.cpp \
   qt/tokendescdialog.cpp \
   qt/tokenfilterproxy.cpp \
-  qt/tokenview.cpp \
+  qt/tokentransactionview.cpp \
   qt/tokentransactionrecord.cpp \
   qt/tokentransactiontablemodel.cpp \
   qt/tokentransactiondesc.cpp \

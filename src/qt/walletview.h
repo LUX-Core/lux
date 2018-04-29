@@ -16,7 +16,7 @@
 class BitcoinGUI;
 class ClientModel;
 class OverviewPage;
-class PlatformStyle;
+//class PlatformStyle;
 class ReceiveCoinsDialog;
 class SendCoinsDialog;
 class SendCoinsRecipient;

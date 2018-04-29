@@ -6,7 +6,7 @@
 #include <QWidget>
 #include <QKeyEvent>
 
-class PlatformStyle;
+//class PlatformStyle;
 class TokenFilterProxy;
 class WalletModel;
 
@@ -18,11 +18,11 @@ class QMenu;
 class QTableView;
 QT_END_NAMESPACE
 
-class TokenView : public QWidget
+class TokenTransactionView : public QWidget
 {
     Q_OBJECT
 public:
-    explicit TokenView(QWidget *parent = 0);
+    explicit TokenTransactionView(QWidget *parent = 0);
 
     void setModel(WalletModel *model);
 

@@ -15,7 +15,7 @@
 #include "multisenddialog.h"
 #include "optionsmodel.h"
 #include "overviewpage.h"
-#include "platformstyle.h"
+//#include "platformstyle.h"
 #include "receivecoinsdialog.h"
 #include "sendcoinsdialog.h"
 #include "signverifymessagedialog.h"

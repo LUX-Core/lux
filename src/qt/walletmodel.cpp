@@ -12,6 +12,7 @@
 #include "transactiontablemodel.h"
 #include "contracttablemodel.h"
 #include "tokenitemmodel.h"
+#include "tokentransactiontablemodel.h"
 
 #include "base58.h"
 #include "db.h"
@@ -34,7 +35,11 @@ WalletModel::WalletModel(CWallet* wallet, OptionsModel* optionsModel, QObject* p
                                                                                          contractTableModel(0),
                                                                                          transactionTableModel(0),
                                                                                          recentRequestsTableModel(0),
-                                                                                         cachedBalance(0), cachedUnconfirmedBalance(0), cachedImmatureBalance(0),
+                                                                                         cachedBalance(0),
+                                                                                         tokenItemModel(0),
+                                                                                         tokenTransactionTableModel(0),
+                                                                                         cachedUnconfirmedBalance(0),
+                                                                                         cachedImmatureBalance(0),
                                                                                          cachedEncryptionStatus(Unencrypted),
                                                                                          cachedNumBlocks(0)
 {
@@ -46,6 +51,7 @@ WalletModel::WalletModel(CWallet* wallet, OptionsModel* optionsModel, QObject* p
     transactionTableModel = new TransactionTableModel(wallet, this);
     recentRequestsTableModel = new RecentRequestsTableModel(wallet, this);
     tokenItemModel = new TokenItemModel(wallet, this);
+    tokenTransactionTableModel = new TokenTransactionTableModel(wallet, this);
 
     // This timer will be fired repeatedly to update the balance
     pollTimer = new QTimer(this);
@@ -142,6 +148,9 @@ void WalletModel::pollBalanceChanged()
         checkBalanceChanged();
         if (transactionTableModel)
             transactionTableModel->updateConfirmations();
+
+        if(tokenTransactionTableModel)
+            tokenTransactionTableModel->updateConfirmations();
 
         if(cachedNumBlocksChanged)
         {
@@ -421,6 +430,12 @@ TokenItemModel *WalletModel::getTokenItemModel()
 {
     return tokenItemModel;
 }
+
+TokenTransactionTableModel *WalletModel::getTokenTransactionTableModel()
+{
+    return tokenTransactionTableModel;
+}
+
 
 WalletModel::EncryptionStatus WalletModel::getEncryptionStatus() const
 {

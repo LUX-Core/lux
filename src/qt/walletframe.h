@@ -10,7 +10,7 @@
 
 class BitcoinGUI;
 class ClientModel;
-class PlatformStyle;
+//class PlatformStyle;
 class SendCoinsRecipient;
 class WalletModel;
 class WalletView;

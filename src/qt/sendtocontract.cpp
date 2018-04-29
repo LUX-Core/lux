@@ -1,6 +1,6 @@
 #include "sendtocontract.h"
 #include "ui_sendtocontract.h"
-#include "platformstyle.h"
+//#include "platformstyle.h"
 #include "walletmodel.h"
 #include "clientmodel.h"
 #include "guiconstants.h"

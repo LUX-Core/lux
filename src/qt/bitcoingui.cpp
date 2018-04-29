@@ -16,7 +16,7 @@
 #include "openuridialog.h"
 #include "optionsdialog.h"
 #include "optionsmodel.h"
-#include "platformstyle.h"
+//#include "platformstyle.h"
 #include "rpcconsole.h"
 #include "utilitydialog.h"
 #include "stake.h"

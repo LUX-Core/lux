@@ -4,7 +4,7 @@
 #include "guiconstants.h"
 #include "guiutil.h"
 #include "optionsmodel.h"
-#include "platformstyle.h"
+//#include "platformstyle.h"
 #include "tokentransactiondesc.h"
 #include "tokentransactionrecord.h"
 #include "walletmodel.h"
@@ -230,13 +230,13 @@ public:
     }
 };
 
-TokenTransactionTableModel::TokenTransactionTableModel(const PlatformStyle *_platformStyle, CWallet* _wallet, WalletModel *parent):
+TokenTransactionTableModel::TokenTransactionTableModel(CWallet* _wallet, WalletModel *parent):
         QAbstractTableModel(parent),
         wallet(_wallet),
         walletModel(parent),
         priv(new TokenTransactionTablePriv(_wallet, this)),
-        fProcessingQueuedTransactions(false),
-        platformStyle(_platformStyle)
+        fProcessingQueuedTransactions(false)
+
 {
     columns << QString() << QString() << tr("Date") << tr("Type") << tr("Label") << tr("Name") << tr("Amount");
     priv->refreshWallet();
@@ -464,7 +464,6 @@ QVariant TokenTransactionTableModel::data(const QModelIndex &index, int role) co
     case Qt::DecorationRole:
     {
         QIcon icon = qvariant_cast<QIcon>(index.data(RawDecorationRole));
-        return platformStyle->TextColorIcon(icon);
     }
     case Qt::DisplayRole:
         switch(index.column())

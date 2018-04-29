@@ -12,8 +12,8 @@
 class TokenViewDelegate;
 class WalletModel;
 class ClientModel;
-class TokenView;
-class PlatformStyle;
+class TokenTransactionView;
+//class PlatformStyle;
 
 namespace Ui {
 class LSRToken;
@@ -52,7 +52,7 @@ private:
     QAction *m_receiveAction;
     QAction *m_addTokenAction;
     QString m_selectedTokenHash;
-    TokenView *m_tokenView;
+    TokenTransactionView *m_tokenTransactionView;
 };
 
 #endif // LSRTOKEN_H

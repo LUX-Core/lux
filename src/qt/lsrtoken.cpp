@@ -2,8 +2,8 @@
 #include "ui_lsrtoken.h"
 #include "tokenitemmodel.h"
 #include "walletmodel.h"
-#include "tokenview.h"
-#include "platformstyle.h"
+#include "tokentransactionview.h"
+//#include "platformstyle.h"
 
 #include <QPainter>
 #include <QAbstractItemDelegate>
@@ -14,7 +14,7 @@
 #include <QSortFilterProxyModel>
 
 #define DECORATION_SIZE 54
-#define SYMBOL_WIDTH 80
+#define SYMBOL_WIDTH 100
 #define MARGIN 5
 
 class TokenViewDelegate : public QAbstractItemDelegate
@@ -57,10 +57,13 @@ public:
         QRect decorationRect(mainRect.topLeft(), QSize(DECORATION_SIZE, DECORATION_SIZE));
         tokenIcon.paint(painter, decorationRect);
 
+        QFontMetrics fmName(option.font);
+        QString clippedSymbol = fmName.elidedText(tokenSymbol, Qt::ElideRight, SYMBOL_WIDTH);
+
         QColor foreground = option.palette.color(QPalette::Text);
         painter->setPen(foreground);
         QRect tokenSymbolRect(decorationRect.right() + MARGIN, mainRect.top(), SYMBOL_WIDTH, DECORATION_SIZE);
-        painter->drawText(tokenSymbolRect, Qt::AlignLeft|Qt::AlignVCenter, tokenSymbol);
+        painter->drawText(tokenSymbolRect, Qt::AlignLeft|Qt::AlignVCenter, clippedSymbol);
 
         int amountWidth = (mainRect.width() - decorationRect.width() - 2 * MARGIN - tokenSymbolRect.width());
         QRect tokenBalanceRect(tokenSymbolRect.right(), mainRect.top(), amountWidth, DECORATION_SIZE);
@@ -82,7 +85,7 @@ LSRToken::LSRToken(QWidget *parent) :
     m_clientModel(0),
     m_tokenModel(0),
     m_tokenDelegate(0),
-    m_tokenView(0)
+    m_tokenTransactionView(0)
 {
     ui->setupUi(this);
 
@@ -98,8 +101,8 @@ LSRToken::LSRToken(QWidget *parent) :
     ui->stackedWidget->addWidget(m_receiveTokenPage);
     ui->stackedWidget->addWidget(m_addTokenPage);
 
-    m_tokenView = new TokenView(this);
-    ui->tokenViewLayout->addWidget(m_tokenView);
+    m_tokenTransactionView = new TokenTransactionView(this);
+    ui->tokenViewLayout->addWidget(m_tokenTransactionView);
 
     ui->tokensList->setItemDelegate(m_tokenDelegate);
 
@@ -135,7 +138,7 @@ void LSRToken::setModel(WalletModel *_model)
     m_model = _model;
     m_addTokenPage->setModel(m_model);
     m_sendTokenPage->setModel(m_model);
-    m_tokenView->setModel(_model);
+    m_tokenTransactionView->setModel(_model);
     if(m_model && m_model->getTokenItemModel())
     {
         // Sort tokens by symbol

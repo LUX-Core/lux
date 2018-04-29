@@ -3,7 +3,7 @@
 
 #include <QWidget>
 
-class PlatformStyle;
+//class PlatformStyle;
 class WalletModel;
 class ClientModel;
 class ContractTableModel;
