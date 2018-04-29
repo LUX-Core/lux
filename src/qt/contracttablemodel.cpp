@@ -3,7 +3,7 @@
 #include "guiutil.h"
 #include "walletmodel.h"
 
-//#include "wallet/wallet.h"
+#include "wallet.h"
 
 #include <boost/foreach.hpp>
 

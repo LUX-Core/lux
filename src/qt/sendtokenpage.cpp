@@ -157,6 +157,7 @@ void SendTokenPage::on_confirmClicked()
         uint64_t gasLimit = ui->lineEditGasLimit->value();
         CAmount gasPrice = ui->lineEditGasPrice->value();
 
+
         m_tokenABI->setAddress(m_selectedToken->address);
         m_tokenABI->setSender(m_selectedToken->sender);
         m_tokenABI->setGasLimit(QString::number(gasLimit).toStdString());

@@ -120,6 +120,8 @@ QT_MOC_CPP = \
   qt/moc_tokenitemmodel.cpp \
   qt/moc_tokenfilterproxy.cpp \
   qt/moc_tokenview.cpp \
+  qt/moc_tokentransactiontablemodel.cpp \
+  qt/moc_tokentransactiondesc.cpp \
   qt/moc_trafficgraphwidget.cpp \
   qt/moc_transactiondesc.cpp \
   qt/moc_transactiondescdialog.cpp \
@@ -227,6 +229,9 @@ BITCOIN_QT_H = \
   qt/tokenitemmodel.h \
   qt/tokenfilterproxy.h \
   qt/tokenview.h \
+  qt/tokentransactionrecord.h \
+  qt/tokentransactiontablemodel.h \
+  qt/tokentransactiondesc.h \
   qt/trafficgraphwidget.h \
   qt/transactiondesc.h \
   qt/transactiondescdialog.h \
@@ -388,6 +393,9 @@ BITCOIN_QT_CPP += \
   qt/tokendescdialog.cpp \
   qt/tokenfilterproxy.cpp \
   qt/tokenview.cpp \
+  qt/tokentransactionrecord.cpp \
+  qt/tokentransactiontablemodel.cpp \
+  qt/tokentransactiondesc.cpp \
   qt/transactiondesc.cpp \
   qt/transactiondescdialog.cpp \
   qt/transactionfilterproxy.cpp \

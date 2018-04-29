@@ -18,7 +18,7 @@
 #include <lux/luxstate.h>
 #include <lux/luxtransaction.h>
 #include <lux/luxDGP.h>
-//#include <validation.h>
+#include <main.h>
 ///////////////////////////////////////////////////////////
 
 using namespace std;
