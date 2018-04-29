@@ -74,11 +74,11 @@ bool TokenFilterProxy::filterAcceptsRow(int sourceRow, const QModelIndex &source
 {
     QModelIndex index = sourceModel()->index(sourceRow, 0, sourceParent);
 
-    int type = index.data(TokenTableModel::TypeRole).toInt();
-    QDateTime datetime = index.data(TokenTableModel::DateRole).toDateTime();
-    QString address = index.data(TokenTableModel::AddressRole).toString();
-    qint64 amount = llabs(index.data(TokenTableModel::AmountRole).toLongLong());
-    QString tokenName = index.data(TokenTableModel::NameRole).toString();
+    int type = index.data(TokenTransactionTableModel::TypeRole).toInt();
+    QDateTime datetime = index.data(TokenTransactionTableModel::DateRole).toDateTime();
+    QString address = index.data(TokenTransactionTableModel::AddressRole).toString();
+    qint64 amount = llabs(index.data(TokenTransactionTableModel::AmountRole).toLongLong());
+    QString tokenName = index.data(TokenTransactionTableModel::NameRole).toString();
 
     if(!(TYPE(type) & typeFilter))
         return false;

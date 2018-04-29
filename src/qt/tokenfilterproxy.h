@@ -2,46 +2,9 @@
 #define TOKENFILTERPROXY_H
 
 #include "amount.h"
-
+#include "tokentransactiontablemodel.h"
 #include <QDateTime>
 #include <QSortFilterProxyModel>
-
-
-//test model
-#include <QAbstractTableModel>
-
-class TokenTableModel : public QAbstractTableModel{
-public:
-    TokenTableModel();
-    enum DataRole{
-        DateRole = Qt::UserRole + 1,
-        TypeRole = Qt::UserRole + 2,
-        AddressRole = Qt::UserRole + 3,
-        NameRole = Qt::UserRole + 4,
-        SymbolRole = Qt::UserRole + 5,
-        AmountRole = Qt::UserRole + 6,
-        TokenPlainTextRole = Qt::UserRole + 7,
-        TxIdRole = Qt::UserRole + 8,
-        LongDescriptionRole = Qt::UserRole + 9
-    };
-
-    enum ColumnIndex {
-        Status = 0,
-        Date = 1,
-        Type = 2,
-        ToAddress = 3,
-        Name = 4,
-        Amount = 5
-    };
-
-    enum TypeEnum
-    {
-        Received,
-        Sent,
-        ToYourself
-    };
-};
-//----------
 
 class TokenFilterProxy : public QSortFilterProxyModel
 {

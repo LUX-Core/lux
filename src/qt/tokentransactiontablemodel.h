@@ -28,7 +28,8 @@ public:
         Date = 1,
         Type = 2,
         ToAddress = 3,
-        Amount = 4
+        Name = 4,
+        Amount = 5
     };
 
     /** Roles to get specific information from a transaction row.
@@ -41,6 +42,8 @@ public:
         DateRole,
         /** Long description (HTML format) */
         LongDescriptionRole,
+        /** Token name */
+        NameRole,
         /** Address of transaction */
         AddressRole,
         /** Label of address related to transaction */

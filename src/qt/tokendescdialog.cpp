@@ -10,8 +10,8 @@ TokenDescDialog::TokenDescDialog(const QModelIndex &idx, QWidget *parent) :
     ui(new Ui::TokenDescDialog)
 {
     ui->setupUi(this);
-    setWindowTitle(tr("Details for %1").arg(idx.data(TokenTableModel::TxIdRole).toString()));
-    QString desc = idx.data(TokenTableModel::LongDescriptionRole).toString();
+    setWindowTitle(tr("Details for %1").arg(idx.data(TokenTransactionTableModel::TxHashRole).toString()));
+    QString desc = idx.data(TokenTransactionTableModel::LongDescriptionRole).toString();
     ui->detailText->setHtml(desc);
 }
 

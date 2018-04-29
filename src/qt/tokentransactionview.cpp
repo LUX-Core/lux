@@ -3,6 +3,7 @@
 #include "walletmodel.h"
 //#include "platformstyle.h"
 #include "tokentransactiontablemodel.h"
+#include "tokentransactionrecord.h"
 #include "tokenfilterproxy.h"
 #include "guiutil.h"
 #include "optionsmodel.h"
@@ -55,9 +56,9 @@ TokenTransactionView::TokenTransactionView(QWidget *parent) :
 
 
     typeWidget->addItem(tr("All"), TokenFilterProxy::ALL_TYPES);
-    typeWidget->addItem(tr("Received with"), TokenFilterProxy::TYPE(TokenTableModel::Received));
-    typeWidget->addItem(tr("Sent to"), TokenFilterProxy::TYPE(TokenTableModel::Sent));
-    typeWidget->addItem(tr("To yourself"), TokenFilterProxy::TYPE(TokenTableModel::ToYourself));
+    typeWidget->addItem(tr("Received with"), TokenFilterProxy::TYPE(TokenTransactionRecord::RecvWithAddress));
+    typeWidget->addItem(tr("Sent to"), TokenFilterProxy::TYPE(TokenTransactionRecord::SendToAddress));
+    typeWidget->addItem(tr("To yourself"), TokenFilterProxy::TYPE(TokenTransactionRecord::SendToSelf));
     hlayout->addWidget(typeWidget);
 
     addressWidget = new QLineEdit(this);
@@ -152,16 +153,16 @@ void TokenTransactionView::setModel(WalletModel *_model)
         tokenView->setSelectionBehavior(QAbstractItemView::SelectRows);
         tokenView->setSelectionMode(QAbstractItemView::ExtendedSelection);
         tokenView->setSortingEnabled(true);
-        tokenView->sortByColumn(TokenTableModel::Date, Qt::DescendingOrder);
+        tokenView->sortByColumn(TokenTransactionTableModel::Date, Qt::DescendingOrder);
         tokenView->verticalHeader()->hide();
 
-        tokenView->setColumnWidth(TokenTableModel::Status, STATUS_COLUMN_WIDTH);
-        tokenView->setColumnWidth(TokenTableModel::Date, DATE_COLUMN_WIDTH);
-        tokenView->setColumnWidth(TokenTableModel::Type, TYPE_COLUMN_WIDTH);
-        tokenView->setColumnWidth(TokenTableModel::Name, NAME_COLUMN_WIDTH);
-        tokenView->setColumnWidth(TokenTableModel::Amount, AMOUNT_MINIMUM_COLUMN_WIDTH);
+        tokenView->setColumnWidth(TokenTransactionTableModel::Status, STATUS_COLUMN_WIDTH);
+        tokenView->setColumnWidth(TokenTransactionTableModel::Date, DATE_COLUMN_WIDTH);
+        tokenView->setColumnWidth(TokenTransactionTableModel::Type, TYPE_COLUMN_WIDTH);
+        tokenView->setColumnWidth(TokenTransactionTableModel::Name, NAME_COLUMN_WIDTH);
+        tokenView->setColumnWidth(TokenTransactionTableModel::Amount, AMOUNT_MINIMUM_COLUMN_WIDTH);
 
-        //columnResizingFixer = new GUIUtil::TableViewLastColumnResizingFixer(tokenView, AMOUNT_MINIMUM_COLUMN_WIDTH, MINIMUM_COLUMN_WIDTH, this);
+        columnResizingFixer = new GUIUtil::TableViewLastColumnResizingFixer(tokenView, AMOUNT_MINIMUM_COLUMN_WIDTH, MINIMUM_COLUMN_WIDTH);
     }
 }
 
@@ -214,7 +215,7 @@ void TokenTransactionView::updateNameWidget()
 void TokenTransactionView::resizeEvent(QResizeEvent *event)
 {
     QWidget::resizeEvent(event);
-    //columnResizingFixer->stretchColumnWidth(TokenTableModel::ToAddress);
+    columnResizingFixer->stretchColumnWidth(TokenTransactionTableModel::ToAddress);
 }
 
 bool TokenTransactionView::eventFilter(QObject *obj, QEvent *event)
@@ -224,7 +225,7 @@ bool TokenTransactionView::eventFilter(QObject *obj, QEvent *event)
         QKeyEvent *ke = static_cast<QKeyEvent *>(event);
         if (ke->key() == Qt::Key_C && ke->modifiers().testFlag(Qt::ControlModifier))
         {
-            GUIUtil::copyEntryData(tokenView, 0, TokenTableModel::TokenPlainTextRole);
+            GUIUtil::copyEntryData(tokenView, 0, TokenTransactionTableModel::TxPlainTextRole);
             return true;
         }
     }
@@ -268,22 +269,22 @@ void TokenTransactionView::showDetails()
 
 void TokenTransactionView::copyAddress()
 {
-    GUIUtil::copyEntryData(tokenView, 0, TokenTableModel::AddressRole);
+    GUIUtil::copyEntryData(tokenView, 0, TokenTransactionTableModel::AddressRole);
 }
 
 void TokenTransactionView::copyAmount()
 {
-    GUIUtil::copyEntryData(tokenView, 0, TokenTableModel::AmountRole);
+    GUIUtil::copyEntryData(tokenView, 0, TokenTransactionTableModel::AmountRole);
 }
 
 void TokenTransactionView::copyTxID()
 {
-    GUIUtil::copyEntryData(tokenView, 0, TokenTableModel::TxIdRole);
+    GUIUtil::copyEntryData(tokenView, 0, TokenTransactionTableModel::TxHashRole);
 }
 
 void TokenTransactionView::copyTxPlainText()
 {
-    GUIUtil::copyEntryData(tokenView, 0, TokenTableModel::TokenPlainTextRole);
+    GUIUtil::copyEntryData(tokenView, 0, TokenTransactionTableModel::TxPlainTextRole);
 }
 
 void TokenTransactionView::chooseDate(int idx)

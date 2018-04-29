@@ -78,7 +78,7 @@ public:
         cachedWallet.clear();
         {
             LOCK2(cs_main, wallet->cs_wallet);
-            for(std::map<uint256, CWalletTx>::iterator it = wallet->mapWallet.begin(); it != wallet->mapWallet.end(); ++it)
+            for(std::map<uint256, CTokenTx>::iterator it = wallet->mapTokenTx.begin(); it != wallet->mapTokenTx.end(); ++it)
             {
                 cachedWallet.append(TokenTransactionRecord::decomposeTransaction(wallet, it->second)); 
             }
@@ -127,8 +127,8 @@ public:
             {
                 LOCK2(cs_main, wallet->cs_wallet);
                 // Find transaction in wallet
-                std::map<uint256, CWalletTx>::iterator mi = wallet->mapWallet.find(hash);
-                if(mi == wallet->mapWallet.end())
+                std::map<uint256, CTokenTx>::iterator mi = wallet->mapTokenTx.find(hash);
+                if(mi == wallet->mapTokenTx.end())
                 {
                     qWarning() << "TokenTransactionTablePriv::updateWallet: Warning: Got CT_NEW, but transaction is not in wallet";
                     break;
@@ -191,9 +191,9 @@ public:
                 TRY_LOCK(wallet->cs_wallet, lockWallet);
                 if(lockWallet && rec->statusUpdateNeeded())
                 {
-                    std::map<uint256, CWalletTx>::iterator mi = wallet->mapWallet.find(rec->hash);
+                    std::map<uint256, CTokenTx>::iterator mi = wallet->mapTokenTx.find(rec->hash);
 
-                    if(mi != wallet->mapWallet.end())
+                    if(mi != wallet->mapTokenTx.end())
                     {
                         rec->updateStatus(mi->second);
                     }
@@ -208,8 +208,8 @@ public:
     {
         {
             LOCK2(cs_main, wallet->cs_wallet);
-            std::map<uint256, CWalletTx>::iterator mi = wallet->mapWallet.find(rec->hash);
-            if(mi != wallet->mapWallet.end())
+            std::map<uint256, CTokenTx>::iterator mi = wallet->mapTokenTx.find(rec->hash);
+            if(mi != wallet->mapTokenTx.end())
             {
                 return TokenTransactionDesc::toHTML(wallet, mi->second, rec, unit);
             }
@@ -220,10 +220,10 @@ public:
     QString getTxHex(TokenTransactionRecord *rec)
     {
         LOCK2(cs_main, wallet->cs_wallet);
-        std::map<uint256, CWalletTx>::iterator mi = wallet->mapWallet.find(rec->hash);
-        if(mi != wallet->mapWallet.end())
+        std::map<uint256, CTokenTx>::iterator mi = wallet->mapTokenTx.find(rec->hash);
+        if(mi != wallet->mapTokenTx.end())
         {
-            std::string strHex = EncodeHexTx(static_cast<CTransaction>(mi->second));
+            std::string strHex;
             return QString::fromStdString(strHex);
         }
         return QString();
@@ -639,9 +639,9 @@ static std::vector< TokenTransactionNotification > vQueueNotifications;
 static void NotifyTokenTransactionChanged(TokenTransactionTableModel *ttm, CWallet *wallet, const uint256 &hash, ChangeType status)
 {
     // Find transaction in wallet
-    std::map<uint256, CWalletTx>::iterator mi = wallet->mapWallet.find(hash);
+    std::map<uint256, CTokenTx>::iterator mi = wallet->mapTokenTx.find(hash);
     // Determine whether to show transaction or not (determine this here so that no relocking is needed in GUI thread)
-    bool showTransaction = mi != wallet->mapWallet.end();
+    bool showTransaction = mi != wallet->mapTokenTx.end();
 
     TokenTransactionNotification notification(hash, status, showTransaction);
 

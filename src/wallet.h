@@ -23,6 +23,7 @@
 #include "walletdb.h"
 
 #include <algorithm>
+#include <atomic>
 #include <map>
 #include <set>
 #include <stdexcept>
@@ -57,8 +58,10 @@ class CCoinControl;
 class COutput;
 class CReserveKey;
 class CScript;
+class CTxMemPool;
 class CWalletTx;
 class CContractBookData;
+class CTokenTx;
 
 /** (client) version numbers for particular wallet features */
 enum WalletFeature {
@@ -387,6 +390,8 @@ public:
     int64_t nTimeFirstKey;
 
     std::map<uint256, CTokenInfo> mapToken;
+
+    std::map<uint256, CTokenTx> mapTokenTx;
 
     const CWalletTx* GetWalletTx(const uint256& hash) const;
 
@@ -1473,6 +1478,39 @@ public:
 
     uint256 GetHash() const;
 };
+
+class CTokenTx
+{
+public:
+    static const int CURRENT_VERSION=1;
+    int nVersion;
+    int64_t nTime;
+
+    CTokenTx()
+    {
+        SetNull();
+    }
+
+    ADD_SERIALIZE_METHODS;
+
+    template <typename Stream, typename Operation>
+    inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion) {
+        if (!(s.GetType() & SER_GETHASH))
+        {
+            READWRITE(nVersion);
+        }
+        READWRITE(nTime);
+    }
+
+    void SetNull()
+    {
+        nVersion = CTokenTx::CURRENT_VERSION;
+        nTime = 0;
+    }
+
+    uint256 GetHash() const;
+};
+
 
 
 #endif // BITCOIN_WALLET_H

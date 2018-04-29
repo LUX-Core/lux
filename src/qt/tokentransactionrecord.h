@@ -8,7 +8,7 @@
 #include <QString>
 
 class CWallet;
-class CWalletTx;
+class CTokenTx;
 
 /** UI model for token transaction status. The token transaction status is the part of a token transaction that will change over time.
  */
@@ -83,7 +83,7 @@ public:
 
     /** Decompose Token transaction into a record.
      */
-    static QList<TokenTransactionRecord> decomposeTransaction(const CWallet *wallet, const CWalletTx &wtx);
+    static QList<TokenTransactionRecord> decomposeTransaction(const CWallet *wallet, const CTokenTx &wtx);
 
     /** @name Immutable token transaction attributes
       @{*/
@@ -95,12 +95,14 @@ public:
     CAmount credit;
     /**@}*/
 
+    QString getTxID() const;
+
     /** Status: can change with block chain update */
     TokenTransactionStatus status;
 
     /** Update status from core wallet tx.
      */
-    void updateStatus(const CWalletTx &wtx);
+    void updateStatus(const CTokenTx &wtx);
 
     /** Return whether a status update is needed.
      */
