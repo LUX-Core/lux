@@ -8,8 +8,10 @@
 #include "token.h"
 #include "bitcoinunits.h"
 #include "wallet.h"
+#include "walletmodel.h"
 #include "guiutil.h"
 #include "sendcoinsdialog.h"
+#include "bitcoinaddressvalidator.h"
 
 static const CAmount SINGLE_STEP = static_cast<const CAmount>(0.00000001 * COIN);
 
@@ -19,6 +21,9 @@ struct SelectedToken {
     std::string symbol;
     int8_t decimals;
     std::string balance;
+    SelectedToken():
+            decimals(0)
+    {}
 };
 
 SendTokenPage::SendTokenPage(QWidget *parent) :
@@ -47,6 +52,8 @@ SendTokenPage::SendTokenPage(QWidget *parent) :
     connect(ui->lineEditPayTo, SIGNAL(textChanged(QString)), SLOT(on_updateConfirmButton()));
     connect(ui->lineEditAmount, SIGNAL(textChanged(QString)), SLOT(on_updateConfirmButton()));
     connect(ui->confirmButton, SIGNAL(clicked()), SLOT(on_confirmClicked()));
+
+    ui->lineEditPayTo->setCheckValidator(new BitcoinAddressCheckValidator(parent));
 }
 
 SendTokenPage::~SendTokenPage()
@@ -83,6 +90,28 @@ void SendTokenPage::clearAll()
     ui->lineEditGasPrice->setValue(DEFAULT_GAS_PRICE);
 }
 
+bool SendTokenPage::isValidAddress()
+{
+    ui->lineEditPayTo->checkValidity();
+    return ui->lineEditPayTo->isValid();
+}
+
+bool SendTokenPage::isDataValid()
+{
+    bool dataValid = true;
+
+    if(!isValidAddress())
+        dataValid = false;
+    if(!ui->lineEditAmount->validate())
+        dataValid = false;
+    if(ui->lineEditAmount->value(0) <= 0)
+    {
+        ui->lineEditAmount->setValid(false);
+        dataValid = false;
+    }
+    return dataValid;
+}
+
 void SendTokenPage::on_clearButton_clicked()
 {
     clearAll();
@@ -117,6 +146,9 @@ void SendTokenPage::on_updateConfirmButton()
 
 void SendTokenPage::on_confirmClicked()
 {
+    if(!isDataValid())
+        return;
+
     if(m_model && m_model->isUnspentAddress(m_selectedToken->sender))
     {
         int unit = m_model->getOptionsModel()->getDisplayUnit();
@@ -158,12 +190,39 @@ void SendTokenPage::on_confirmClicked()
 
 void SendTokenPage::setTokenData(std::string address, std::string sender, std::string symbol, int8_t decimals, std::string balance)
 {
+    // Update data with the current token
+    int decimalDiff = decimals - m_selectedToken->decimals;
     m_selectedToken->address = address;
     m_selectedToken->sender = sender;
     m_selectedToken->symbol = symbol;
     m_selectedToken->decimals = decimals;
     m_selectedToken->balance = balance;
 
+    // Convert values for different number of decimals
+    int256_t totalSupply(balance);
+    int256_t value(ui->lineEditAmount->value());
+    if(value != 0)
+    {
+        for(int i = 0; i < decimalDiff; i++)
+        {
+            value *= 10;
+        }
+        for(int i = decimalDiff; i < 0; i++)
+        {
+            value /= 10;
+        }
+    }
+    if(value > totalSupply)
+    {
+        value = totalSupply;
+    }
+
+    // Update the amount field with the current token data
+    ui->lineEditAmount->clear();
     ui->lineEditAmount->setDecimalUnits(decimals);
-    ui->lineEditAmount->setTotalSupply(int256_t(balance));
+    ui->lineEditAmount->setTotalSupply(totalSupply);
+    if(value != 0)
+    {
+        ui->lineEditAmount->setValue(value);
+    }
 }

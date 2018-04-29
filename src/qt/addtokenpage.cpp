@@ -6,18 +6,31 @@
 #include "walletmodel.h"
 #include "token.h"
 #include "clientmodel.h"
+#include "qvalidatedlineedit.h"
+#include "contractabi.h"
+
+#include <QRegularExpressionValidator>
 
 AddTokenPage::AddTokenPage(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::AddTokenPage),
-    m_tokenABI(0),
-    m_model(0),
-    m_clientModel(0)
+        QWidget(parent),
+        ui(new Ui::AddTokenPage),
+        m_tokenABI(0),
+        m_model(0),
+        m_clientModel(0)
 {
     ui->setupUi(this);
+    (void)ui->lineEditContractAddress;
+    (void)ui->lineEditTokenName;
+    (void)ui->lineEditTokenSymbol;
+    (void)ui->lineEditDecimals;
     m_tokenABI = new Token();
 
     connect(ui->lineEditContractAddress, SIGNAL(textChanged(const QString &)), this, SLOT(on_addressChanged()));
+    connect(ui->lineEditTokenName, SIGNAL(textChanged(const QString &)), SLOT(on_updateConfirmButton()));
+    connect(ui->lineEditTokenSymbol, SIGNAL(textChanged(const QString &)), SLOT(on_updateConfirmButton()));
+
+    ((QValidatedLineEdit*)ui->lineEditSenderAddress->lineEdit())->setEmptyIsValid(false);
+    m_validTokenAddress = false;
 }
 
 AddTokenPage::~AddTokenPage()
@@ -37,6 +50,12 @@ void AddTokenPage::setClientModel(ClientModel *clientModel)
         connect(m_clientModel, SIGNAL(numBlocksChanged(int,QDateTime,double,bool)), this, SLOT(on_numBlocksChanged()));
         on_numBlocksChanged();
     }
+}
+
+bool AddTokenPage::isValidSenderAddress()
+{
+    ((QValidatedLineEdit*)ui->lineEditSenderAddress->lineEdit())->checkValidity();
+    return ((QValidatedLineEdit*)ui->lineEditSenderAddress->lineEdit())->isValid();
 }
 
 void AddTokenPage::clearAll()
@@ -60,24 +79,26 @@ void AddTokenPage::on_clearButton_clicked()
 
 void AddTokenPage::on_confirmButton_clicked()
 {
-    CTokenInfo tokenInfo;
-    tokenInfo.strContractAddress = ui->lineEditContractAddress->text().toStdString();
-    tokenInfo.strTokenName = ui->lineEditTokenName->text().toStdString();
-    tokenInfo.strTokenSymbol = ui->lineEditTokenSymbol->text().toStdString();
-    tokenInfo.nDecimals = ui->lineEditDecimals->text().toInt();
-    tokenInfo.strSenderAddress = ui->lineEditSenderAddress->currentText().toStdString();
-
-    if(m_model)
+    if(isValidSenderAddress())
     {
-        m_model->AddTokenEntry(tokenInfo);
-    }
+        CTokenInfo tokenInfo;
+        tokenInfo.strContractAddress = ui->lineEditContractAddress->text().toStdString();
+        tokenInfo.strTokenName = ui->lineEditTokenName->text().toStdString();
+        tokenInfo.strTokenSymbol = ui->lineEditTokenSymbol->text().toStdString();
+        tokenInfo.nDecimals = ui->lineEditDecimals->text().toInt();
+        tokenInfo.strSenderAddress = ui->lineEditSenderAddress->currentText().toStdString();
 
-    clearAll();
+        if(m_model)
+        {
+            m_model->AddTokenEntry(tokenInfo);
+        }
+
+        clearAll();
+    }
 }
 
 void AddTokenPage::on_addressChanged()
 {
-    bool enableConfirm = false;
     QString tokenAddress = ui->lineEditContractAddress->text();
     if(m_tokenABI)
     {
@@ -89,12 +110,27 @@ void AddTokenPage::on_addressChanged()
         ui->lineEditTokenName->setText(QString::fromStdString(name));
         ui->lineEditTokenSymbol->setText(QString::fromStdString(symbol));
         ui->lineEditDecimals->setText(QString::fromStdString(decimals));
-        enableConfirm = ret;
+        m_validTokenAddress = ret;
     }
-    ui->confirmButton->setEnabled(enableConfirm);
+    ui->confirmButton->setEnabled(m_validTokenAddress);
 }
 
 void AddTokenPage::on_numBlocksChanged()
 {
     ui->lineEditSenderAddress->on_refresh();
+}
+
+void AddTokenPage::on_updateConfirmButton()
+{
+    bool enabled = true;
+    if(ui->lineEditTokenName->text().isEmpty())
+    {
+        enabled = false;
+    }
+    if(ui->lineEditTokenSymbol->text().isEmpty())
+    {
+        enabled = false;
+    }
+    enabled &= m_validTokenAddress;
+    ui->confirmButton->setEnabled(enabled);
 }

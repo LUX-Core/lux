@@ -7,7 +7,7 @@ class WalletModel;
 class ClientModel;
 
 namespace Ui {
-class AddTokenPage;
+    class AddTokenPage;
 }
 
 class AddTokenPage : public QWidget
@@ -20,21 +20,23 @@ public:
     void clearAll();
     void setModel(WalletModel *_model);
     void setClientModel(ClientModel *clientModel);
+    bool isValidSenderAddress();
 
 private Q_SLOTS:
-    void on_clearButton_clicked();
+            void on_clearButton_clicked();
     void on_confirmButton_clicked();
     void on_addressChanged();
     void on_numBlocksChanged();
+    void on_updateConfirmButton();
 
-Q_SIGNALS:
-    void on_addNewToken(QString _address, QString _name, QString _symbol, int _decimals, double _balance);
+    Q_SIGNALS:
 
 private:
     Ui::AddTokenPage *ui;
     Token *m_tokenABI;
     WalletModel* m_model;
     ClientModel* m_clientModel;
+    bool m_validTokenAddress;
 };
 
 #endif // ADDTOKENPAGE_H

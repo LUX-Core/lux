@@ -23,6 +23,8 @@ public:
     void setModel(WalletModel *_model);
     void setClientModel(ClientModel *clientModel);
     void clearAll();
+    bool isValidAddress();
+    bool isDataValid();
 
     void setTokenData(std::string address, std::string sender, std::string symbol, int8_t decimals, std::string balance);
 
