@@ -15,6 +15,7 @@
 #include "multisenddialog.h"
 #include "optionsmodel.h"
 #include "overviewpage.h"
+#include "platformstyle.h"
 #include "receivecoinsdialog.h"
 #include "sendcoinsdialog.h"
 #include "signverifymessagedialog.h"
@@ -43,19 +44,20 @@ WalletView::WalletView(QWidget* parent) : QStackedWidget(parent),
                                           walletModel(0)
 {
     // Create tabs
-    overviewPage = new OverviewPage();
+    overviewPage = new OverviewPage(this);
     explorerWindow = new BlockExplorer(this);
     transactionsPage = new QWidget(this);
     createContractPage = new CreateContract(this);
     sendToContractPage = new SendToContract(this);
     callContractPage = new CallContractPage(this);
+    LSRTokenPage = new LSRToken(this);
     stakingPage = new StakingDialog(this);
     tradingPage = new tradingDialog(this);
     QVBoxLayout* vbox = new QVBoxLayout();
     QHBoxLayout* hbox_buttons = new QHBoxLayout();
     transactionView = new TransactionView(this);
     vbox->addWidget(transactionView);
-    QPushButton* exportButton = new QPushButton(tr("&Export"), this);
+    QPushButton *exportButton = new QPushButton(tr("&Export"), this);
     exportButton->setToolTip(tr("Export the data in the current tab to a file"));
 #ifndef Q_OS_MAC // Icons on push buttons are very uncommon on Mac
     exportButton->setIcon(QIcon(":/icons/export"));

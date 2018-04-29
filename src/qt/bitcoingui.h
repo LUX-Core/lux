@@ -24,6 +24,7 @@ class NetworkStyle;
 class Notificator;
 class OptionsModel;
 class BlockExplorer;
+class PlatformStyle;
 class RPCConsole;
 class SendCoinsRecipient;
 class UnitDisplayStatusBarControl;
@@ -38,6 +39,7 @@ QT_BEGIN_NAMESPACE
 class QAction;
 class QProgressBar;
 class QProgressDialog;
+class QDockWidget;
 QT_END_NAMESPACE
 
 /**

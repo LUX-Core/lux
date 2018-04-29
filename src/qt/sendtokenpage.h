@@ -10,6 +10,7 @@ struct SelectedToken;
 
 namespace Ui {
 class SendTokenPage;
+
 }
 
 class SendTokenPage : public QWidget

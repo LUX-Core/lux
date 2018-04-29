@@ -49,6 +49,7 @@ QT_FORMS_UI = \
   qt/forms/sendcoinsentry.ui \
   qt/forms/sendtocontract.ui \
   qt/forms/signverifymessagedialog.ui \
+  qt/forms/tokendescdialog.ui \
   qt/forms/transactiondescdialog.ui
 
 QT_MOC_CPP = \
@@ -101,6 +102,7 @@ QT_MOC_CPP = \
   qt/moc_peertablemodel.cpp \
   qt/moc_paymentserver.cpp \
   qt/moc_qvalidatedlineedit.cpp \
+  qt/moc_qvalidatedtextedit.cpp \
   qt/moc_qvaluecombobox.cpp \
   qt/moc_receivecoinsdialog.cpp \
   qt/moc_receiverequestdialog.cpp \
@@ -110,10 +112,14 @@ QT_MOC_CPP = \
   qt/moc_sendcoinsentry.cpp \
   qt/moc_sendtocontract.cpp \
   qt/moc_sendtokenpage.cpp \
-  qt/moc_tokenitemmodel.cpp \
   qt/moc_signverifymessagedialog.cpp \
   qt/moc_splashscreen.cpp \
   qt/moc_tabbarinfo.cpp \
+  qt/moc_tokenamountfield.cpp \
+  qt/moc_tokendescdialog.cpp \
+  qt/moc_tokenitemmodel.cpp \
+  qt/moc_tokenfilterproxy.cpp \
+  qt/moc_tokenview.cpp \
   qt/moc_trafficgraphwidget.cpp \
   qt/moc_transactiondesc.cpp \
   qt/moc_transactiondescdialog.cpp \
@@ -179,6 +185,7 @@ BITCOIN_QT_H = \
   qt/editaddressdialog.h \
   qt/editcontractinfodialog.h \
   qt/execrpccommand.h \
+  qt/eventlog.h \
   qt/guiconstants.h \
   qt/guiutil.h \
   qt/intro.h \
@@ -202,6 +209,7 @@ BITCOIN_QT_H = \
   qt/peertablemodel.h \
   qt/platformstyle.h \
   qt/qvalidatedlineedit.h \
+  qt/qvalidatedtextedit.h \
   qt/qvaluecombobox.h \
   qt/receivecoinsdialog.h \
   qt/receiverequestdialog.h \
@@ -214,8 +222,11 @@ BITCOIN_QT_H = \
   qt/splashscreen.h \
   qt/tabbarinfo.h \
   qt/token.h \
-  qt/tokenitemmodel.h \
   qt/tokenamountfield.h \
+  qt/tokendescdialog.h \
+  qt/tokenitemmodel.h \
+  qt/tokenfilterproxy.h \
+  qt/tokenview.h \
   qt/trafficgraphwidget.h \
   qt/transactiondesc.h \
   qt/transactiondescdialog.h \
@@ -314,6 +325,7 @@ BITCOIN_QT_CPP = \
   qt/peertablemodel.cpp \
   qt/platformstyle.cpp \
   qt/qvalidatedlineedit.cpp \
+  qt/qvalidatedtextedit.cpp \
   qt/qvaluecombobox.cpp \
   qt/rpcconsole.cpp \
   qt/splashscreen.cpp \
@@ -351,6 +363,8 @@ BITCOIN_QT_CPP += \
   qt/editaddressdialog.cpp \
   qt/execrpccommand.cpp \
   qt/editcontractinfodialog.cpp \
+  qt/eventlog.cpp \
+  qt/navigationbar.cpp \
   qt/masternodemanager.cpp \
   qt/addeditluxnode.cpp \
   qt/luxnodeconfigdialog.cpp \
@@ -371,6 +385,9 @@ BITCOIN_QT_CPP += \
   qt/sendcoinsentry.cpp \
   qt/sendtocontract.cpp \
   qt/signverifymessagedialog.cpp \
+  qt/tokendescdialog.cpp \
+  qt/tokenfilterproxy.cpp \
+  qt/tokenview.cpp \
   qt/transactiondesc.cpp \
   qt/transactiondescdialog.cpp \
   qt/transactionfilterproxy.cpp \

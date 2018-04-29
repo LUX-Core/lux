@@ -2,6 +2,8 @@
 #include "ui_lsrtoken.h"
 #include "tokenitemmodel.h"
 #include "walletmodel.h"
+#include "tokenview.h"
+#include "platformstyle.h"
 
 #include <QPainter>
 #include <QAbstractItemDelegate>
@@ -74,12 +76,13 @@ public:
 };
 
 LSRToken::LSRToken(QWidget *parent) :
-        QWidget(parent),
-        ui(new Ui::LSRToken),
-        m_model(0),
-        m_clientModel(0),
-        m_tokenModel(0),
-        m_tokenDelegate(0)
+    QWidget(parent),
+    ui(new Ui::LSRToken),
+    m_model(0),
+    m_clientModel(0),
+    m_tokenModel(0),
+    m_tokenDelegate(0),
+    m_tokenView(0)
 {
     ui->setupUi(this);
 
@@ -88,9 +91,15 @@ LSRToken::LSRToken(QWidget *parent) :
     m_addTokenPage = new AddTokenPage(this);
     m_tokenDelegate = new TokenViewDelegate(this);
 
+    m_sendTokenPage->setEnabled(false);
+    m_receiveTokenPage->setEnabled(false);
+
     ui->stackedWidget->addWidget(m_sendTokenPage);
     ui->stackedWidget->addWidget(m_receiveTokenPage);
     ui->stackedWidget->addWidget(m_addTokenPage);
+
+    m_tokenView = new TokenView(this);
+    ui->tokenViewLayout->addWidget(m_tokenView);
 
     ui->tokensList->setItemDelegate(m_tokenDelegate);
 
@@ -126,6 +135,7 @@ void LSRToken::setModel(WalletModel *_model)
     m_model = _model;
     m_addTokenPage->setModel(m_model);
     m_sendTokenPage->setModel(m_model);
+    m_tokenView->setModel(_model);
     if(m_model && m_model->getTokenItemModel())
     {
         // Sort tokens by symbol
@@ -186,6 +196,11 @@ void LSRToken::on_currentTokenChanged(QModelIndex index)
         std::string balance = m_tokenModel->data(index, TokenItemModel::RawBalanceRole).toString().toStdString();
         m_sendTokenPage->setTokenData(address, sender, symbol, decimals, balance);
         m_receiveTokenPage->setAddress(QString::fromStdString(sender));
+
+        if(!m_sendTokenPage->isEnabled())
+            m_sendTokenPage->setEnabled(true);
+        if(!m_receiveTokenPage->isEnabled())
+            m_receiveTokenPage->setEnabled(true);
     }
 }
 

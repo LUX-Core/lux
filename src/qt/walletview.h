@@ -1,4 +1,5 @@
 // Copyright (c) 2018 The Luxcore Developer
+// Copyright (c) 2018 The Luxcore Developer
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -15,6 +16,7 @@
 class BitcoinGUI;
 class ClientModel;
 class OverviewPage;
+class PlatformStyle;
 class ReceiveCoinsDialog;
 class SendCoinsDialog;
 class SendCoinsRecipient;
@@ -43,7 +45,7 @@ class WalletView : public QStackedWidget
     Q_OBJECT
 
 public:
-    explicit WalletView(QWidget* parent);
+    explicit WalletView(QWidget *parent);
     ~WalletView();
 
     void setBitcoinGUI(BitcoinGUI* gui);
@@ -81,6 +83,7 @@ private:
 
     QProgressDialog* progressDialog;
     QLabel* transactionSum;
+    //const PlatformStyle *platformStyle;
 
 public slots:
     /** Switch to overview (home) page */

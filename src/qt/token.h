@@ -3,6 +3,20 @@
 #include <string>
 #include <vector>
 
+struct TokenEvent{
+    std::string m_address;
+    std::string m_sender;
+    std::string m_receiver;
+    std::string m_value;
+
+    TokenEvent(std::string address, std::string sender, std::string receiver, std::string value){
+        m_address = address;
+        m_sender = sender;
+        m_receiver = receiver;
+        m_value = value;
+    }
+};
+
 struct TokenData;
 
 class Token
@@ -36,11 +50,13 @@ public:
     bool allowance(const std::string& _from, const std::string& _to, std::string& result, bool sendTo = false);
 
     // ABI Events
-    bool Transfer(const std::string& from, const std::string& to, const std::string& value, bool sendTo = false);
-    bool Burn(const std::string& from, const std::string& value, bool sendTo = false);
+    void listenForAddresses(const std::vector<std::string>& contractAddresses);
+    bool transferEvents(int fromBlock, int toBlock, std::vector<TokenEvent>& tokenEvents);
+    bool burnEvents(int fromBlock, int toBlock, std::vector<TokenEvent>& tokenEvents);
 
 private:
     bool exec(const std::vector<std::string>& input, int func, std::vector<std::string>& output, bool sendTo);
+    bool execEvents(int fromBlock, int toBlock, int func, std::vector<TokenEvent> &tokenEvents);
 
     Token(Token const&);
     Token& operator=(Token const&);

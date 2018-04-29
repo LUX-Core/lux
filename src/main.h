@@ -69,7 +69,9 @@ using ExtractLuxTX = std::pair<std::vector<LuxTransaction>, std::vector<EthTrans
 class CBlockIndex;
 class CBlockTreeDB;
 class CBloomFilter;
+class CChainParams;
 class CInv;
+class CConnman;
 class CScriptCheck;
 class CValidationInterface;
 class CValidationState;
@@ -126,6 +128,8 @@ static const bool DEFAULT_PEERBLOOMFILTERS = true;
 static const unsigned int DEFAULT_BYTES_PER_SIGOP = 20;
 
 static const int64_t STATIC_POS_REWARD = 1 * COIN; //Constant reward 8%
+
+static const bool DEFAULT_LOGEVENTS = true;
 
 ////////////////////////////////////////////////////// lux
 static const uint64_t DEFAULT_GAS_LIMIT_OP_CREATE=2500000;

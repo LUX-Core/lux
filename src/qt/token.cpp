@@ -5,6 +5,8 @@
 #include "utilmoneystr.h"
 #include "base58.h"
 #include "utilstrencodings.h"
+#include "eventlog.h"
+#include "libethcore/ABI.h"
 
 namespace Token_NS
 {
@@ -27,6 +29,7 @@ struct TokenData
     std::string address;
     ExecRPCCommand* call;
     ExecRPCCommand* send;
+    EventLog* eventLog;
     ContractABI* ABI;
     int funcName;
     int funcApprove;
@@ -42,6 +45,7 @@ struct TokenData
     int funcAllowance;
     int evtTransfer;
     int evtBurn;
+    std::vector<std::string> contractAddresses;
 
     TokenData():
             call(0),
@@ -99,7 +103,9 @@ Token::Token():
     lstOptional.append(PARAM_GASPRICE);
     lstOptional.append(PARAM_SENDER);
     d->send = new ExecRPCCommand(PRC_SENDTO, lstMandatory, lstOptional, QMap<QString, QString>());
+    d->eventLog = new EventLog();
 
+    // Compute functions indexes
     d->ABI = new ContractABI();
     if(d->ABI->loads(TOKEN_ABI))
     {
@@ -470,25 +476,19 @@ bool Token::allowance(const std::string &_from, const std::string &_to, std::str
     return true;
 }
 
-bool Token::Transfer(const std::string &from, const std::string &to, const std::string &value, bool sendTo)
+void Token::listenForAddresses(const std::vector<std::string> &contractAddresses)
 {
-    std::vector<std::string> input;
-    input.push_back(from);
-    input.push_back(to);
-    input.push_back(value);
-    std::vector<std::string> output;
-
-    return exec(input, d->evtTransfer, output, sendTo);
+    d->contractAddresses = contractAddresses;
 }
 
-bool Token::Burn(const std::string &from, const std::string &value, bool sendTo)
+bool Token::transferEvents(int fromBlock, int toBlock, std::vector<TokenEvent> &tokenEvents)
 {
-    std::vector<std::string> input;
-    input.push_back(from);
-    input.push_back(value);
-    std::vector<std::string> output;
+    return execEvents(fromBlock, toBlock, d->evtTransfer, tokenEvents);
+}
 
-    return exec(input, d->evtBurn, output, sendTo);
+bool Token::burnEvents(int fromBlock, int toBlock, std::vector<TokenEvent> &tokenEvents)
+{
+    return execEvents(fromBlock, toBlock, d->evtBurn, tokenEvents);
 }
 
 bool Token::exec(const std::vector<std::string> &input, int func, std::vector<std::string> &output, bool sendTo)
@@ -530,6 +530,51 @@ bool Token::exec(const std::vector<std::string> &input, int func, std::vector<st
             std::vector<std::string> param = values[i];
             output.push_back(param.size() ? param[0] : "");
         }
+    }
+
+    return true;
+}
+
+bool Token::execEvents(int fromBlock, int toBlock, int func, std::vector<TokenEvent> &tokenEvents)
+{
+    // Check parameters
+    if(func == -1 || fromBlock < 0 || toBlock < 0 || fromBlock > toBlock)
+        return false;
+
+    //  Get function
+    FunctionABI function = d->ABI->functions[func];
+
+    // Search for events
+    QVariant result;
+    if(!(d->eventLog->search(fromBlock, toBlock, function.selector(), d->contractAddresses, result)))
+        return false;
+
+    // Parse the result events
+    QList<QVariant> list = result.toList();
+    for(int i = 0; i < list.size(); i++)
+    {
+        QVariantMap variantMap = list[i].toMap();
+
+        QList<QVariant> listLog = variantMap.value("log").toList();
+        QVariantMap variantLog = listLog[0].toMap();
+        QList<QVariant> topicsList = variantLog.value("topics").toList();
+
+        std::string contractAddress = variantMap.value("contractAddress").toString().toStdString();
+        std::string from = topicsList[1].toString().toStdString();
+        std::string to = topicsList[2].toString().toStdString();
+        std::string data = variantLog.value("data").toString().toStdString();
+
+        //parse value
+        std::string value;
+        int HEX_INSTRUCTION_SIZE = 64;
+        size_t pos = 0;
+        dev::bytes rawData = dev::fromHex(data.substr(pos, HEX_INSTRUCTION_SIZE));
+        dev::bytesConstRef o(&rawData);
+        dev::u256 outData = dev::eth::ABIDeserialiser<dev::u256>::deserialise(o);
+        value = outData.str();
+
+        TokenEvent tokenEvent(contractAddress, from, to, value);
+        tokenEvents.push_back(tokenEvent);
     }
 
     return true;
