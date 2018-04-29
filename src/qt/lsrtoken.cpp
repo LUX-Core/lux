@@ -9,6 +9,7 @@
 #include <QStandardItemModel>
 #include <QActionGroup>
 #include <iostream>
+#include <QSortFilterProxyModel>
 
 #define DECORATION_SIZE 54
 #define SYMBOL_WIDTH 80
@@ -125,9 +126,27 @@ void LSRToken::setModel(WalletModel *_model)
     m_model = _model;
     m_addTokenPage->setModel(m_model);
     m_sendTokenPage->setModel(m_model);
-    m_tokenModel = m_model->getTokenItemModel();
-    ui->tokensList->setModel(m_tokenModel);
-    connect(m_tokenModel, SIGNAL(dataChanged(QModelIndex,QModelIndex,QVector<int>)), SLOT(on_dataChanged(QModelIndex,QModelIndex,QVector<int>)));
+    if(m_model && m_model->getTokenItemModel())
+    {
+        // Sort tokens by symbol
+        QSortFilterProxyModel *proxyModel = new QSortFilterProxyModel(this);
+        TokenItemModel* tokenModel = m_model->getTokenItemModel();
+        proxyModel->setSourceModel(tokenModel);
+        proxyModel->sort(1, Qt::AscendingOrder);
+        m_tokenModel = proxyModel;
+
+        // Set tokens model
+        ui->tokensList->setModel(m_tokenModel);
+
+        // Set current token
+        connect(m_tokenModel, SIGNAL(dataChanged(QModelIndex,QModelIndex,QVector<int>)), SLOT(on_dataChanged(QModelIndex,QModelIndex,QVector<int>)));
+        if(m_tokenModel->rowCount() > 0)
+        {
+            QModelIndex currentToken(m_tokenModel->index(0, 0));
+            ui->tokensList->setCurrentIndex(currentToken);
+            on_currentTokenChanged(currentToken);
+        }
+    }
 }
 
 void LSRToken::setClientModel(ClientModel *_clientModel)
@@ -159,13 +178,14 @@ void LSRToken::on_currentTokenChanged(QModelIndex index)
 {
     if(m_tokenModel)
     {
-        m_selectedTokenHash = m_tokenModel->data(index, TokenItemModel::Hash).toString();
+        m_selectedTokenHash = m_tokenModel->data(index, TokenItemModel::HashRole).toString();
         std::string address = m_tokenModel->data(index, TokenItemModel::AddressRole).toString().toStdString();
         std::string symbol = m_tokenModel->data(index, TokenItemModel::SymbolRole).toString().toStdString();
         std::string sender = m_tokenModel->data(index, TokenItemModel::SenderRole).toString().toStdString();
         int8_t decimals = m_tokenModel->data(index, TokenItemModel::DecimalsRole).toInt();
         std::string balance = m_tokenModel->data(index, TokenItemModel::RawBalanceRole).toString().toStdString();
         m_sendTokenPage->setTokenData(address, sender, symbol, decimals, balance);
+        m_receiveTokenPage->setAddress(QString::fromStdString(sender));
     }
 }
 
@@ -176,8 +196,9 @@ void LSRToken::on_dataChanged(const QModelIndex &topLeft, const QModelIndex &bot
 
     if(m_tokenModel)
     {
-        QString tokenHash = m_tokenModel->data(topLeft, TokenItemModel::Hash).toString();
-        if(tokenHash == m_selectedTokenHash)
+        QString tokenHash = m_tokenModel->data(topLeft, TokenItemModel::HashRole).toString();
+        if(m_selectedTokenHash.isEmpty() ||
+           tokenHash == m_selectedTokenHash)
         {
             on_currentTokenChanged(topLeft);
         }

@@ -7,11 +7,11 @@
 
 #include <QWidget>
 #include <QModelIndex>
+#include <QAbstractItemModel>
 
 class TokenViewDelegate;
 class WalletModel;
 class ClientModel;
-class TokenItemModel;
 namespace Ui {
 class LSRToken;
 }
@@ -27,7 +27,7 @@ public:
     void setModel(WalletModel *_model);
     void setClientModel(ClientModel *clientModel);
 
-Q_SIGNALS:
+    Q_SIGNALS:
 
 public Q_SLOTS:
     void on_goToSendTokenPage();
@@ -43,7 +43,7 @@ private:
     AddTokenPage* m_addTokenPage;
     WalletModel* m_model;
     ClientModel* m_clientModel;
-    TokenItemModel* m_tokenModel;
+    QAbstractItemModel* m_tokenModel;
     TokenViewDelegate* m_tokenDelegate;
     QAction *m_sendAction;
     QAction *m_receiveAction;

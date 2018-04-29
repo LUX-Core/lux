@@ -37,7 +37,6 @@ public:
         tokenSymbol = obj.tokenSymbol;
         decimals = obj.decimals;
         senderAddress = obj.senderAddress;
-        totalSupply = obj.totalSupply;
         balance = obj.balance;
     }
 
@@ -82,7 +81,6 @@ public:
     QString tokenSymbol;
     quint8 decimals;
     QString senderAddress;
-    QString totalSupply;
     int256_t balance;
 };
 
@@ -204,8 +202,7 @@ TokenItemModel::TokenItemModel(CWallet *wallet, WalletModel *parent):
     d(0)
 {
     d = new TokenModelData();
-    d->columns << tr("Hash") << tr("Create Time") << tr("Contract Address") << tr("Token Name") << tr("Token Symbol");
-    d->columns << tr("Decimals") << tr("Sender Address") << tr("Total Supply") << tr("Balance");
+    d->columns << tr("Token Name") << tr("Token Symbol") << tr("Balance");
     d->tokenAbi = new Token();
     d->wallet = wallet;
     d->walletModel = parent;
@@ -276,7 +273,20 @@ QVariant TokenItemModel::data(const QModelIndex &index, int role) const
     TokenItemEntry *rec = static_cast<TokenItemEntry*>(index.internalPointer());
 
     switch (role) {
-    case TokenItemModel::Hash:
+    case Qt::DisplayRole:
+    switch(index.column())
+    {
+    case Name:
+        return rec->tokenName;
+    case Symbol:
+        return rec->tokenSymbol;
+    case Balance:
+        return BitcoinUnits::formatToken(rec->decimals, rec->balance, false, BitcoinUnits::separatorAlways);
+    default:
+        break;
+    }
+        break;
+    case TokenItemModel::HashRole:
         return rec->hash;
         break;
     case TokenItemModel::AddressRole:

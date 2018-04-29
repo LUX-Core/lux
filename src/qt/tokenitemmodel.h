@@ -12,8 +12,14 @@ class TokenItemModel : public QAbstractItemModel
 {
     Q_OBJECT
 public:
+    enum ColumnIndex {
+        Name = 0,
+        Symbol = 1,
+        Balance = 2,
+    };
+
     enum DataRole{
-        Hash = Qt::UserRole + 1,
+        HashRole = Qt::UserRole + 1,
         AddressRole = Qt::UserRole + 2,
         NameRole = Qt::UserRole + 3,
         SymbolRole = Qt::UserRole + 4,
