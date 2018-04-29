@@ -8,6 +8,8 @@
 
 #include "addresstablemodel.h"
 #include "guiconstants.h"
+#include "guiutil.h"
+#include "paymentserver.h"
 #include "recentrequeststablemodel.h"
 #include "transactiontablemodel.h"
 #include "contracttablemodel.h"
@@ -28,7 +30,7 @@
 #include <QDebug>
 #include <QSet>
 #include <QTimer>
-
+#include <boost/foreach.hpp>
 using namespace std;
 
 WalletModel::WalletModel(CWallet* wallet, OptionsModel* optionsModel, QObject* parent) : QObject(parent), wallet(wallet), optionsModel(optionsModel), addressTableModel(0),
@@ -36,8 +38,6 @@ WalletModel::WalletModel(CWallet* wallet, OptionsModel* optionsModel, QObject* p
                                                                                          transactionTableModel(0),
                                                                                          recentRequestsTableModel(0),
                                                                                          cachedBalance(0),
-                                                                                         tokenItemModel(0),
-                                                                                         tokenTransactionTableModel(0),
                                                                                          cachedUnconfirmedBalance(0),
                                                                                          cachedImmatureBalance(0),
                                                                                          cachedEncryptionStatus(Unencrypted),
@@ -45,7 +45,6 @@ WalletModel::WalletModel(CWallet* wallet, OptionsModel* optionsModel, QObject* p
 {
     fHaveWatchOnly = wallet->HaveWatchOnly();
     fForceCheckBalanceChanged = false;
-
     addressTableModel = new AddressTableModel(wallet, this);
     contractTableModel = new ContractTableModel(wallet, this);
     transactionTableModel = new TransactionTableModel(wallet, this);

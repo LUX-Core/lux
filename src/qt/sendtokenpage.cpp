@@ -15,7 +15,7 @@
 #include "sendtocontract.h"
 #include "bitcoinaddressvalidator.h"
 
-static const CAmount SINGLE_STEP = static_cast<const CAmount>(0.00000001 * COIN);
+static const CAmount SINGLE_STEP = 0.00000001*COIN;
 
 struct SelectedToken {
     std::string address;
