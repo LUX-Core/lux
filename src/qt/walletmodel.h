@@ -153,10 +153,11 @@ public:
     void encryptKey(const CKey key, const std::string& pwd, const std::string& slt, std::vector<unsigned char>& crypted);
     void decryptKey(const std::vector<unsigned char>& crypted, const std::string& slt, const std::string& pwd, CKey& key);
 
-    bool AddTokenEntry(const CTokenInfo& token);
+    bool addTokenEntry(const CTokenInfo& token);
 
-    bool AddTokenTxEntry(const CTokenTx& tokenTx, bool fFlushOnClose=true);
+    bool addTokenTxEntry(const CTokenTx& tokenTx, bool fFlushOnClose=true);
 
+    bool existTokenEntry(const CTokenInfo& token);
 
     // Check address for validity
     bool validateAddress(const QString& address);

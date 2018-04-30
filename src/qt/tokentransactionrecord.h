@@ -64,7 +64,7 @@ public:
     static const int RecommendedNumConfirmations = 10;
 
     TokenTransactionRecord():
-            hash(), txid(), time(0), type(Other), address(""), debit(0), credit(0)
+            hash(), txid(), time(0), type(Other), address(""), debit(0), credit(0), label("")
     {
     }
 
@@ -83,6 +83,7 @@ public:
     dev::s256 credit;
     std::string tokenSymbol;
     uint8_t decimals;
+    std::string label;
     /**@}*/
 
     QString getTxID() const;

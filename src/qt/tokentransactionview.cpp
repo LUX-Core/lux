@@ -146,7 +146,9 @@ void TokenTransactionView::setModel(WalletModel *_model)
     this->model = _model;
     if(_model)
     {
-        updateNameWidget();
+        refreshNameWidget();
+        connect(model->getTokenItemModel(), SIGNAL(rowsInserted(QModelIndex,int,int)),this, SLOT(addToNameWidget(QModelIndex,int,int)));
+
         tokenProxyModel = new TokenFilterProxy(this);
         tokenProxyModel->setSourceModel(_model->getTokenTransactionTableModel());
         tokenProxyModel->setDynamicSortFilter(true);
@@ -210,14 +212,27 @@ QWidget *TokenTransactionView::createDateRangeWidget()
     return dateRangeWidget;
 }
 
-void TokenTransactionView::updateNameWidget()
+void TokenTransactionView::refreshNameWidget()
 {
     if(model)
-        for(int i = 0; i < model->getTokenItemModel()->rowCount(); i++)
+    {
+        TokenItemModel *tim = model->getTokenItemModel();
+        for(int i = 0; i < tim->rowCount(); i++)
         {
-            QString name = model->getTokenItemModel()->data(model->getTokenItemModel()->index(i, 0), TokenItemModel::SymbolRole).toString();
+            QString name = tim->data(tim->index(i, 0), TokenItemModel::SymbolRole).toString();
             nameWidget->addItem(name, name);
         }
+    }
+}
+
+void TokenTransactionView::addToNameWidget(const QModelIndex &parent, int start, int /*end*/)
+{
+    if(model)
+    {
+        TokenItemModel *tim = model->getTokenItemModel();
+        QString name = tim->index(start, TokenItemModel::Symbol, parent).data().toString();
+        nameWidget->addItem(name, name);
+    }
 }
 
 void TokenTransactionView::resizeEvent(QResizeEvent *event)

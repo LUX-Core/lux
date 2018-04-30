@@ -161,7 +161,7 @@
        <item>
         <widget class="QCheckBox" name="logEvents">
          <property name="text">
-          <string>Enable  log &amp;event</string>
+          <string>Enable  log &amp;events</string>
          </property>
         </widget>
        </item>

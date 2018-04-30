@@ -32,6 +32,7 @@ QList<TokenTransactionRecord> TokenTransactionRecord::decomposeTransaction(const
         rec.txid = wtx.transactionHash;
         rec.tokenSymbol = tokenSymbol;
         rec.decimals = decimals;
+        rec.label = wtx.strLabel;
         dev::s256 net = rec.credit + rec.debit;
 
         // Determine type

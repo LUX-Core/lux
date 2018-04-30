@@ -65,7 +65,6 @@ private:
     QDateTimeEdit *dateTo;
 
     QWidget *createDateRangeWidget();
-    void updateNameWidget();
 
     GUIUtil::TableViewLastColumnResizingFixer *columnResizingFixer;
 
@@ -89,6 +88,8 @@ public Q_SLOTS:
     void chooseName(int idx);
     void changedPrefix(const QString &prefix);
     void changedAmount(const QString &amount);
+    void addToNameWidget(const QModelIndex& parent, int start, int /*end*/);
+    void refreshNameWidget();
 };
 
 #endif // TOKENVIEW_H

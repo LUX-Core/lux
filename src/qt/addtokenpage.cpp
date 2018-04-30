@@ -93,14 +93,21 @@ void AddTokenPage::on_confirmButton_clicked()
 
         if(m_model)
         {
-            m_model->AddTokenEntry(tokenInfo);
-        }
+            if(m_model->existTokenEntry(tokenInfo))
+            {
+                QMessageBox::information(this, tr("Token exist"), tr("The token already exist with the specified contract and sender addresses."));
+            }
+            else
+            {
+                m_model->addTokenEntry(tokenInfo);
 
-        clearAll();
+                clearAll();
 
-        if(!fLogEvents)
-        {
-            QMessageBox::information(this, tr("Log events"), tr("Enable log events from the option menu in order to receive token transactions."));
+                if(!fLogEvents)
+                {
+                    QMessageBox::information(this, tr("Log events"), tr("Enable log events from the option menu in order to receive token transactions."));
+                }
+            }
         }
     }
 }

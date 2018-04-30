@@ -755,10 +755,21 @@ bool WalletModel::isMine(CTxDestination address)
     return IsMine(*wallet, address);
 }
 
-bool WalletModel::AddTokenEntry(const CTokenInfo &token) {
+bool WalletModel::addTokenEntry(const CTokenInfo &token) {
     return wallet->AddTokenEntry(token, true);
 }
 
-bool WalletModel::AddTokenTxEntry(const CTokenTx& tokenTx, bool fFlushOnClose) {
+bool WalletModel::addTokenTxEntry(const CTokenTx& tokenTx, bool fFlushOnClose) {
     return wallet->AddTokenTxEntry(tokenTx, fFlushOnClose);
 }
+
+bool WalletModel::existTokenEntry(const CTokenInfo &token)
+{
+    LOCK2(cs_main, wallet->cs_wallet);
+
+    uint256 hash = token.GetHash();
+    std::map<uint256, CTokenInfo>::iterator it = wallet->mapToken.find(hash);
+
+    return it != wallet->mapToken.end();
+}
+

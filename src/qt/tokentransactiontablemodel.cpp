@@ -316,9 +316,13 @@ QString TokenTransactionTableModel::formatTxDate(const TokenTransactionRecord *w
 /* Look up address in address book, if found return label (address)
    otherwise just return (address)
  */
-QString TokenTransactionTableModel::lookupAddress(const std::string &address, bool tooltip) const
+QString TokenTransactionTableModel::lookupAddress(const std::string &address, const std::string &_label, bool tooltip) const
 {
-    QString label = walletModel->getAddressTableModel()->labelForAddress(QString::fromStdString(address));
+    QString label = QString::fromStdString(_label);
+    if(label.isEmpty())
+    {
+        label = walletModel->getAddressTableModel()->labelForAddress(QString::fromStdString(address));
+    }
     QString description;
     if(!label.isEmpty())
     {
@@ -372,7 +376,7 @@ QString TokenTransactionTableModel::formatTxToAddress(const TokenTransactionReco
         return QString::fromStdString(wtx->address);
     case TokenTransactionRecord::RecvWithAddress:
     case TokenTransactionRecord::SendToAddress:
-        return lookupAddress(wtx->address, tooltip);
+        return lookupAddress(wtx->address, wtx->label, tooltip);
     case TokenTransactionRecord::SendToOther:
         return QString::fromStdString(wtx->address);
     case TokenTransactionRecord::SendToSelf:
