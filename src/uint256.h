@@ -211,6 +211,11 @@ public:
         return ret;
     }
 
+    void SetNull()
+    {
+        memset(pn, 0, sizeof(pn));
+    }
+
     int CompareTo(const base_uint& b) const;
     bool EqualTo(uint64_t b) const;
 
@@ -346,6 +351,8 @@ public:
     uint256& SetCompact(uint32_t nCompact, bool* pfNegative = NULL, bool* pfOverflow = NULL);
     uint32_t GetCompact(bool fNegative = false) const;
     uint64_t GetHash(const uint256& salt) const;
+
+    void SetNull();
 };
 
 /* uint256 from const char *.

@@ -238,7 +238,7 @@ TokenTransactionTableModel::TokenTransactionTableModel(CWallet* _wallet, WalletM
         fProcessingQueuedTransactions(false)
 
 {
-    columns << QString() << QString() << tr("Date") << tr("Type") << tr("Label") << tr("Name") << tr("Amount");
+    columns << QString() << tr("Date") << tr("Type") << tr("Label") << tr("Name") << tr("Amount");
     priv->refreshWallet();
 
     subscribeToCoreSignals();

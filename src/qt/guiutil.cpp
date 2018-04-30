@@ -559,17 +559,19 @@ void TableViewLastColumnResizingFixer::on_geometriesChanged()
  * Initializes all internal variables and prepares the
  * the resize modes of the last 2 columns of the table and
  */
-TableViewLastColumnResizingFixer::TableViewLastColumnResizingFixer(QTableView* table, int lastColMinimumWidth, int allColsMinimumWidth) : tableView(table),
-                                                                                                                                          lastColumnMinimumWidth(lastColMinimumWidth),
-                                                                                                                                          allColumnsMinimumWidth(allColsMinimumWidth)
-{
-    columnCount = tableView->horizontalHeader()->count();
-    lastColumnIndex = columnCount - 1;
-    secondToLastColumnIndex = columnCount - 2;
-    tableView->horizontalHeader()->setMinimumSectionSize(allColumnsMinimumWidth);
-    setViewHeaderResizeMode(secondToLastColumnIndex, QHeaderView::Interactive);
-    setViewHeaderResizeMode(lastColumnIndex, QHeaderView::Interactive);
-}
+    TableViewLastColumnResizingFixer::TableViewLastColumnResizingFixer(QTableView* table, int lastColMinimumWidth, int allColsMinimumWidth, QObject *parent, int columnStretch) :
+            QObject(parent),
+            tableView(table),
+            lastColumnMinimumWidth(lastColMinimumWidth),
+            allColumnsMinimumWidth(allColsMinimumWidth)
+    {
+        columnCount = tableView->horizontalHeader()->count();
+        lastColumnIndex = columnCount - 1;
+        secondToLastColumnIndex = columnCount - columnStretch;
+        tableView->horizontalHeader()->setMinimumSectionSize(allColumnsMinimumWidth);
+        setViewHeaderResizeMode(secondToLastColumnIndex, QHeaderView::Interactive);
+        setViewHeaderResizeMode(lastColumnIndex, QHeaderView::Interactive);
+    }
 
 /**
  * Class constructor.

@@ -56,8 +56,8 @@ TokenTransactionView::TokenTransactionView(QWidget *parent) :
 
 
     typeWidget->addItem(tr("All"), TokenFilterProxy::ALL_TYPES);
-    typeWidget->addItem(tr("Received with"), TokenFilterProxy::TYPE(TokenTransactionRecord::RecvWithAddress));
-    typeWidget->addItem(tr("Sent to"), TokenFilterProxy::TYPE(TokenTransactionRecord::SendToAddress));
+    typeWidget->addItem(tr("Received"), TokenFilterProxy::TYPE(TokenTransactionRecord::RecvWithAddress));
+    typeWidget->addItem(tr("Sent"), TokenFilterProxy::TYPE(TokenTransactionRecord::SendToAddress));
     typeWidget->addItem(tr("To yourself"), TokenFilterProxy::TYPE(TokenTransactionRecord::SendToSelf));
     hlayout->addWidget(typeWidget);
 
@@ -162,7 +162,7 @@ void TokenTransactionView::setModel(WalletModel *_model)
         tokenView->setColumnWidth(TokenTransactionTableModel::Name, NAME_COLUMN_WIDTH);
         tokenView->setColumnWidth(TokenTransactionTableModel::Amount, AMOUNT_MINIMUM_COLUMN_WIDTH);
 
-        columnResizingFixer = new GUIUtil::TableViewLastColumnResizingFixer(tokenView, AMOUNT_MINIMUM_COLUMN_WIDTH, MINIMUM_COLUMN_WIDTH);
+        columnResizingFixer = new GUIUtil::TableViewLastColumnResizingFixer(tokenView, AMOUNT_MINIMUM_COLUMN_WIDTH, MINIMUM_COLUMN_WIDTH, this, 2);
     }
 }
 

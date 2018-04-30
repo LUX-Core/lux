@@ -18,6 +18,7 @@
 #include "primitives/transaction.h"
 #include "ui_interface.h"
 #include "util.h"
+#include "uint256.h"
 #include "wallet_ismine.h"
 #include "validationinterface.h"
 #include "walletdb.h"
@@ -1292,7 +1293,7 @@ public:
         if (tx->vout[i].nValue < 1 * COIN) return 20000;
 
         //nondenom return largest first
-        return -(tx->vout[i].nValue / COIN);
+        return static_cast<int>(-(tx->vout[i].nValue / COIN));
     }
 
     CAmount Value() const
@@ -1485,6 +1486,11 @@ public:
     static const int CURRENT_VERSION=1;
     int nVersion;
     int64_t nTime;
+    std::string strContractAddress;
+    std::string strSenderAddress;
+    std::string strReceiverAddress;
+    uint256 nValue;
+    uint256 transactionHash;
 
     CTokenTx()
     {
@@ -1498,14 +1504,24 @@ public:
         if (!(s.GetType() & SER_GETHASH))
         {
             READWRITE(nVersion);
+            READWRITE(nTime);
         }
-        READWRITE(nTime);
+        READWRITE(strContractAddress);
+        READWRITE(strSenderAddress);
+        READWRITE(strReceiverAddress);
+        READWRITE(nValue);
+        READWRITE(transactionHash);
     }
 
     void SetNull()
     {
         nVersion = CTokenTx::CURRENT_VERSION;
         nTime = 0;
+        strContractAddress = "";
+        strSenderAddress = "";
+        strReceiverAddress = "";
+        nValue.SetNull();
+        transactionHash.SetNull();
     }
 
     uint256 GetHash() const;

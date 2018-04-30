@@ -34,6 +34,7 @@ class COutput;
 class CPubKey;
 class CWallet;
 class CTokenInfo;
+class CTokenTx;
 class uint256;
 
 QT_BEGIN_NAMESPACE
@@ -153,6 +154,8 @@ public:
     void decryptKey(const std::vector<unsigned char>& crypted, const std::string& slt, const std::string& pwd, CKey& key);
 
     bool AddTokenEntry(const CTokenInfo& token);
+    bool AddTokenTxEntry(const CTokenTx& tokenTx, bool fFlushOnClose=true);
+
 
     // Check address for validity
     bool validateAddress(const QString& address);

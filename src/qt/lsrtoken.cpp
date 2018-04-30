@@ -12,6 +12,7 @@
 #include <QActionGroup>
 #include <iostream>
 #include <QSortFilterProxyModel>
+#include <QSizePolicy>
 
 #define DECORATION_SIZE 54
 #define SYMBOL_WIDTH 100
@@ -102,6 +103,7 @@ LSRToken::LSRToken(QWidget *parent) :
     ui->stackedWidget->addWidget(m_addTokenPage);
 
     m_tokenTransactionView = new TokenTransactionView(this);
+    m_tokenTransactionView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     ui->tokenViewLayout->addWidget(m_tokenTransactionView);
 
     ui->tokensList->setItemDelegate(m_tokenDelegate);
