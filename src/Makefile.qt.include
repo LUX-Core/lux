@@ -142,6 +142,7 @@ QT_MOC = \
   qt/bitcoinamountfield.moc \
   qt/intro.moc \
   qt/tokenamountfield.moc \
+  qt/tokenitemmodel.moc \
   qt/overviewpage.moc \
   qt/rpcconsole.moc
 

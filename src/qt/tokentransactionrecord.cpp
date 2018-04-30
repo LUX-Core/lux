@@ -48,6 +48,11 @@ QList<TokenTransactionRecord> TokenTransactionRecord::decomposeTransaction(const
             rec.type = SendToAddress;
         }
 
+        if(net)
+        {
+            rec.status.countsForBalance = true;
+        }
+
         // Set address
         switch (rec.type) {
         case SendToSelf:

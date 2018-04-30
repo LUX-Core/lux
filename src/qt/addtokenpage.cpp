@@ -8,8 +8,10 @@
 #include "clientmodel.h"
 #include "qvalidatedlineedit.h"
 #include "contractabi.h"
+#include "main.h"
 
 #include <QRegularExpressionValidator>
+#include <QMessageBox>
 
 AddTokenPage::AddTokenPage(QWidget *parent) :
         QWidget(parent),
@@ -48,7 +50,7 @@ void AddTokenPage::setClientModel(ClientModel *clientModel)
     m_clientModel = clientModel;
     if (m_clientModel)
     {
-        connect(m_clientModel, SIGNAL(numBlocksChanged(int,QDateTime,double,bool)), this, SLOT(on_numBlocksChanged()));
+        connect(m_clientModel, SIGNAL(textChanged(int,QDateTime,double,bool)), this, SLOT(on_numBlocksChanged()));
         on_numBlocksChanged();
     }
 }
@@ -95,6 +97,11 @@ void AddTokenPage::on_confirmButton_clicked()
         }
 
         clearAll();
+
+        if(!fLogEvents)
+        {
+            QMessageBox::information(this, tr("Log events"), tr("Enable log events from the option menu in order to receive token transactions."));
+        }
     }
 }
 

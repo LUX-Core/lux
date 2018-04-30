@@ -68,7 +68,7 @@ public:
 
 private:
     bool exec(const std::vector<std::string>& input, int func, std::vector<std::string>& output, bool sendTo);
-    bool execEvents(int fromBlock, int toBlock, int func, std::vector<TokenEvent> &tokenEvents);
+    bool execEvents(int64_t fromBlock, int64_t toBlock, int func, std::vector<TokenEvent> &tokenEvents);
 
     Token(Token const&);
     Token& operator=(Token const&);

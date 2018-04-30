@@ -98,8 +98,6 @@ void EventLog::setAddresses(const std::vector<std::string> addresses)
 
 void EventLog::setTopics(const std::vector<std::string> topics)
 {
-    std::vector<std::string> topics;
-    topics.push_back(eventName);
     m_lstParams[PARAM_TOPICS] = createJsonString("topics", topics);
 }
 

@@ -35,8 +35,8 @@ public:
 
 private:
     // Set command data
-    void setStartBlock(int fromBlock);
-    void setEndBlock(int toBlock);
+    void setStartBlock(int64_t fromBlock);
+    void setEndBlock(int64_t toBlock);
     void setAddresses(const std::vector<std::string> addresses);
     void setTopics(const std::vector<std::string> topics);
 

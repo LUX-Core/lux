@@ -6,7 +6,7 @@
 #include "base58.h"
 #include "utilstrencodings.h"
 #include "eventlog.h"
-//#include "libethcore/ABI.h"
+#include "libethcore/ABI.h"
 
 namespace Token_NS
 {
@@ -555,10 +555,10 @@ bool Token::exec(const std::vector<std::string> &input, int func, std::vector<st
     return true;
 }
 
-bool Token::execEvents(int fromBlock, int toBlock, int func, std::vector<TokenEvent> &tokenEvents)
+bool Token::execEvents(int64_t fromBlock, int64_t toBlock, int func, std::vector<TokenEvent> &tokenEvents)
 {
     // Check parameters
-    if(func == -1 || fromBlock < 0 || toBlock < 0 || fromBlock > toBlock)
+    if(func == -1 || fromBlock < 0)
         return false;
 
     //  Get function
@@ -607,8 +607,8 @@ bool Token::execEvents(int fromBlock, int toBlock, int func, std::vector<TokenEv
             dev::u256 outData = dev::eth::ABIDeserialiser<dev::u256>::deserialise(o);
             tokenEvent.value = u256Touint(outData);
 
-        TokenEvent tokenEvent(contractAddress, from, to, value);
-        tokenEvents.push_back(tokenEvent);
+            tokenEvents.push_back(tokenEvent);
+        }
     }
 
     return true;

@@ -71,11 +71,9 @@ TokenTransactionView::TokenTransactionView(QWidget *parent) :
     hlayout->addWidget(addressWidget);
 
     nameWidget = new QComboBox(this);
-    if (platformStyle->getUseExtraSpacing()) {
-        nameWidget->setFixedWidth(NAME_COLUMN_WIDTH + 1);
-    } else {
-        nameWidget->setFixedWidth(NAME_COLUMN_WIDTH);
-    }
+
+    nameWidget->setFixedWidth(NAME_COLUMN_WIDTH);
+
     nameWidget->addItem(tr("All"), "");
 
     hlayout->addWidget(nameWidget);

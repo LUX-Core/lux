@@ -3550,24 +3550,21 @@ bool CWallet::MultiSend()
     return true;
 }
 
-bool CWallet::LoadToken(const CTokenInfo &token)
-{
+bool CWallet::LoadToken(const CTokenInfo &token) {
     uint256 hash = token.GetHash();
     mapToken[hash] = token;
 
     return true;
 }
 
-bool CWallet::LoadTokenTx(const CTokenTx &tokenTx)
-{
+bool CWallet::LoadTokenTx(const CTokenTx &tokenTx) {
     uint256 hash = tokenTx.GetHash();
     mapTokenTx[hash] = tokenTx;
 
     return true;
 }
 
-bool CWallet::AddTokenEntry(const CTokenInfo &token, bool fFlushOnClose)
-{
+bool CWallet::AddTokenEntry(const CTokenInfo &token, bool fFlushOnClose) {
     LOCK(cs_wallet);
 
     CWalletDB walletdb(strWalletFile, "r+", fFlushOnClose);
@@ -3577,14 +3574,18 @@ bool CWallet::AddTokenEntry(const CTokenInfo &token, bool fFlushOnClose)
     bool fInsertedNew = true;
 
     std::map<uint256, CTokenInfo>::iterator it = mapToken.find(hash);
-    if(it!=mapToken.end())
-    {
+    if(it!=mapToken.end()) {
         fInsertedNew = false;
     }
 
     // Write to disk
-    CTokenInfo wtoken(token);
-    wtoken.nCreateTime = GetAdjustedTime();
+    CTokenInfo wtoken = token;
+    if(!fInsertedNew) {
+        wtoken.nCreateTime = GetAdjustedTime();
+    } else {
+        wtoken.nCreateTime = it->second.nCreateTime;
+    }
+
     if (!walletdb.WriteToken(wtoken))
         return false;
 
@@ -3597,8 +3598,7 @@ bool CWallet::AddTokenEntry(const CTokenInfo &token, bool fFlushOnClose)
     return true;
 }
 
-bool CWallet::AddTokenTxEntry(const CTokenTx &tokenTx, bool fFlushOnClose)
-{
+bool CWallet::AddTokenTxEntry(const CTokenTx &tokenTx, bool fFlushOnClose) {
     LOCK(cs_wallet);
 
     CWalletDB walletdb(strWalletFile, "r+", fFlushOnClose);
@@ -3608,43 +3608,45 @@ bool CWallet::AddTokenTxEntry(const CTokenTx &tokenTx, bool fFlushOnClose)
     bool fInsertedNew = true;
 
     std::map<uint256, CTokenTx>::iterator it = mapTokenTx.find(hash);
-    if(it!=mapTokenTx.end())
-    {
+    if(it!=mapTokenTx.end()) {
         fInsertedNew = false;
     }
 
     // Write to disk
-    if (!walletdb.WriteTokenTx(tokenTx))
+    CTokenTx wtokenTx = tokenTx;
+    if(fInsertedNew) {
+        wtokenTx.nCreateTime = GetAdjustedTime();
+    } else {
+        wtokenTx.nCreateTime = it->second.nCreateTime;
+    }
+
+    if (!walletdb.WriteTokenTx(wtokenTx))
         return false;
 
-    mapTokenTx[hash] = tokenTx;
+    mapTokenTx[hash] = wtokenTx;
 
     NotifyTokenTransactionChanged(this, hash, fInsertedNew ? CT_NEW : CT_UPDATED);
 
-    LogPrintf("AddTokenTxEntry %s\n", tokenTx.GetHash().ToString());
+    LogPrintf("AddTokenTxEntry %s\n", wtokenTx.GetHash().ToString());
 
     return true;
 }
 
-CKeyPool::CKeyPool()
-{
+CKeyPool::CKeyPool() {
     nTime = GetTime();
 }
 
-CKeyPool::CKeyPool(const CPubKey& vchPubKeyIn)
-{
+CKeyPool::CKeyPool(const CPubKey& vchPubKeyIn) {
     nTime = GetTime();
     vchPubKey = vchPubKeyIn;
 }
 
-CWalletKey::CWalletKey(int64_t nExpires)
-{
+CWalletKey::CWalletKey(int64_t nExpires) {
     nTimeCreated = (nExpires ? GetTime() : 0);
     nTimeExpires = nExpires;
 }
 
-int CMerkleTx::SetMerkleBranch(const CBlock& block)
-{
+int CMerkleTx::SetMerkleBranch(const CBlock& block) {
     AssertLockHeld(cs_main);
     CBlock blockTmp;
 

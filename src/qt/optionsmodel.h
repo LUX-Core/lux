@@ -42,6 +42,7 @@ public:
         CoinControlFeatures, // bool
         ThreadsScriptVerif,  // int
         DatabaseCache,       // int
+        LogEvents,           // bool
         SpendZeroConfChange, // bool
         DarksendRounds,      // int
         AnonymizeLuxAmount,  //int
