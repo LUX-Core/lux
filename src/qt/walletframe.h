@@ -29,11 +29,11 @@ public:
     explicit WalletFrame(BitcoinGUI *_gui = 0);
     ~WalletFrame();
 
-    void setClientModel(ClientModel* clientModel);
+    void setClientModel(ClientModel *clientModel);
 
-    bool addWallet(const QString& name, WalletModel* walletModel);
+    bool addWallet(const QString& name, WalletModel *walletModel);
     bool setCurrentWallet(const QString& name);
-    bool removeWallet(const QString& name);
+    bool removeWallet(const QString &name);
     void removeAllWallets();
 
     bool handlePaymentRequest(const SendCoinsRecipient& recipient);

@@ -6,7 +6,7 @@
 
 #include "bitcoingui.h"
 #include "walletview.h"
-
+#include "wallet.h"
 #include <cstdio>
 
 #include <QHBoxLayout>
@@ -237,40 +237,40 @@ void WalletFrame::backupWallet()
 
 void WalletFrame::changePassphrase()
 {
-    WalletView* walletView = currentWalletView();
+    WalletView *walletView = currentWalletView();
     if (walletView)
         walletView->changePassphrase();
 }
 
 void WalletFrame::unlockWallet()
 {
-    WalletView* walletView = currentWalletView();
+    WalletView *walletView = currentWalletView();
     if (walletView)
         walletView->unlockWallet();
 }
 
 void WalletFrame::lockWallet()
 {
-    WalletView* walletView = currentWalletView();
+    WalletView *walletView = currentWalletView();
     if (walletView)
         walletView->lockWallet();
 }
 
 void WalletFrame::usedSendingAddresses()
 {
-    WalletView* walletView = currentWalletView();
+    WalletView *walletView = currentWalletView();
     if (walletView)
         walletView->usedSendingAddresses();
 }
 
 void WalletFrame::usedReceivingAddresses()
 {
-    WalletView* walletView = currentWalletView();
+    WalletView *walletView = currentWalletView();
     if (walletView)
         walletView->usedReceivingAddresses();
 }
 
-WalletView* WalletFrame::currentWalletView()
+WalletView *WalletFrame::currentWalletView()
 {
     return qobject_cast<WalletView*>(walletStack->currentWidget());
 }
