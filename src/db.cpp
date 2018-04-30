@@ -239,10 +239,11 @@ void CDBEnv::CheckpointLSN(const std::string& strFile)
 }
 
 
-CDB::CDB(const std::string& strFilename, const char* pszMode) : pdb(NULL), activeTxn(NULL)
+CDB::CDB(const std::string& strFilename, const char* pszMode, bool fFlushOnCloseIn) : pdb(NULL), activeTxn(NULL)
 {
     int ret;
     fReadOnly = (!strchr(pszMode, '+') && !strchr(pszMode, 'w'));
+    fFlushOnClose = fFlushOnCloseIn;
     if (strFilename.empty())
         return;
 
@@ -319,7 +320,8 @@ void CDB::Close()
     activeTxn = NULL;
     pdb = NULL;
 
-    Flush();
+    if (fFlushOnClose)
+        Flush();
 
     {
         LOCK(bitdb.cs_db);

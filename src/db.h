@@ -101,8 +101,9 @@ protected:
     std::string strFile;
     DbTxn* activeTxn;
     bool fReadOnly;
+    bool fFlushOnClose;
 
-    explicit CDB(const std::string& strFilename, const char* pszMode = "r+");
+    explicit CDB(const std::string& strFilename, const char* pszMode = "r+", bool fFlushOnCloseIn=true);
     ~CDB() { Close(); }
 
 public:

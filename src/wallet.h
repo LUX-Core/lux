@@ -33,6 +33,11 @@
 #include <utility>
 #include <vector>
 
+#include <boost/shared_ptr.hpp>
+#include <boost/thread.hpp>
+
+extern CWallet* pwalletMain;
+
 /**
  * Settings
  */
@@ -473,6 +478,8 @@ public:
 
     bool LoadToken(const CTokenInfo &token);
 
+    bool LoadTokenTx(const CTokenTx &tokenTx);
+
     //! Adds a contract data tuple to the store, without saving it to disk
     bool LoadContractData(const std::string &address, const std::string &key, const std::string &value);
 
@@ -494,7 +501,7 @@ public:
     TxItems OrderedTxItems(std::list<CAccountingEntry>& acentries, std::string strAccount = "");
 
     void MarkDirty();
-    bool AddToWallet(const CWalletTx& wtxIn, bool fFromLoadWallet = false);
+    bool AddToWallet(const CWalletTx& wtxIn, bool fFromLoadWallet = false, bool fFlushOnClose=true);
     void SyncTransaction(const CTransaction& tx, const CBlock* pblock);
     bool AddToWalletIfInvolvingMe(const CTransaction& tx, const CBlock* pblock, bool fUpdate);
     void EraseFromWallet(const uint256& hash);
@@ -531,7 +538,9 @@ public:
     bool MultiSend();
     void AutoCombineDust();
 
-    bool AddTokenEntry(const CTokenInfo &token);
+    bool AddTokenEntry(const CTokenInfo &token, bool fFlushOnClose=true);
+
+    bool AddTokenTxEntry(const CTokenTx& tokenTx, bool fFlushOnClose=true);
 
     static CFeeRate minTxFee;
     static CAmount GetMinimumFee(unsigned int nTxBytes, unsigned int nConfirmTarget, const CTxMemPool& pool);
@@ -1454,7 +1463,7 @@ public:
 
     template <typename Stream, typename Operation>
     inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion) {
-        if (!(s.GetType() & SER_GETHASH))
+        if (!(nType & SER_GETHASH))
         {
             READWRITE(nVersion);
             READWRITE(nCreateTime);
@@ -1492,8 +1501,7 @@ public:
     uint256 nValue;
     uint256 transactionHash;
 
-    CTokenTx()
-    {
+    CTokenTx() {
         SetNull();
     }
 
@@ -1501,7 +1509,7 @@ public:
 
     template <typename Stream, typename Operation>
     inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion) {
-        if (!(s.GetType() & SER_GETHASH))
+        if (!(nType & SER_GETHASH))
         {
             READWRITE(nVersion);
             READWRITE(nTime);

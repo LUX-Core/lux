@@ -154,6 +154,7 @@ public:
     void decryptKey(const std::vector<unsigned char>& crypted, const std::string& slt, const std::string& pwd, CKey& key);
 
     bool AddTokenEntry(const CTokenInfo& token);
+
     bool AddTokenTxEntry(const CTokenTx& tokenTx, bool fFlushOnClose=true);
 
 
@@ -283,6 +284,8 @@ signals:
 
     // Watch-only address added
     void notifyWatchonlyChanged(bool fHaveWatchonly);
+
+    void AddTokenTxEntry(bool fHaveWatchonly);
 
 public slots:
     /* Wallet status might have changed */

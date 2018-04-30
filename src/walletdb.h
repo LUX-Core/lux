@@ -17,6 +17,8 @@
 #include <utility>
 #include <vector>
 
+static const bool DEFAULT_FLUSHWALLET = true;
+
 class CAccount;
 class CAccountingEntry;
 struct CBlockLocator;
@@ -26,6 +28,7 @@ class CScript;
 class CWallet;
 class CWalletTx;
 class CTokenInfo;
+class CTokenTx;
 class uint160;
 class uint256;
 
@@ -105,7 +108,7 @@ public:
 class CWalletDB : public CDB
 {
 public:
-    CWalletDB(const std::string& strFilename, const char* pszMode = "r+") : CDB(strFilename, pszMode)
+    CWalletDB(const std::string& strFilename, const char* pszMode = "r+", bool fFlushOnClose = true) : CDB(strFilename, pszMode, fFlushOnClose)
     {
     }
 
@@ -120,6 +123,9 @@ public:
 
     bool WriteToken(const CTokenInfo& wtoken);
     bool EraseToken(uint256 hash);
+
+    bool WriteTokenTx(const CTokenTx& wTokenTx);
+    bool EraseTokenTx(uint256 hash);
 
     bool WriteLuxNodeConfig(std::string sAlias, const CLuxNodeConfig& nodeConfig);
     bool ReadLuxNodeConfig(std::string sAlias, CLuxNodeConfig& nodeConfig);
@@ -189,5 +195,7 @@ private:
 };
 
 bool BackupWallet(const CWallet& wallet, const std::string& strDest);
+
+void ThreadFlushWalletDB();
 
 #endif // BITCOIN_WALLETDB_H

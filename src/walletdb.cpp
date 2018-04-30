@@ -16,7 +16,10 @@
 #include "utiltime.h"
 #include "wallet.h"
 #include "stake.h"
+#include "main.h"
+#include <atomic>
 
+#include <boost/version.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/foreach.hpp>
 #include <boost/scoped_ptr.hpp>
@@ -665,6 +668,17 @@ bool ReadKeyValue(CWallet* pwallet, CDataStream& ssKey, CDataStream& ssValue, CW
             }
 
             pwallet->LoadToken(wtoken);
+        } else if (strType == "tokentx") {
+            uint256 hash;
+            ssKey >> hash;
+            CTokenTx wTokenTx;
+            ssValue >> wTokenTx;
+            if (wTokenTx.GetHash() != hash) {
+                strErr = "Error reading wallet database: CTokenTx corrupt";
+                return false;
+            }
+
+            pwallet->LoadTokenTx(wTokenTx);
         }
     } catch (...) {
         return false;
@@ -1048,12 +1062,24 @@ bool CWalletDB::EraseContractData(const string &address, const string &key)
 
 bool CWalletDB::WriteToken(const CTokenInfo &wtoken)
 {
-    nWalletDBUpdateCounter++;
+    nWalletDBUpdated++;
     return Write(std::make_pair(std::string("token"), wtoken.GetHash()), wtoken);
 }
 
 bool CWalletDB::EraseToken(uint256 hash)
 {
-    nWalletDBUpdateCounter++;
+    nWalletDBUpdated++;
     return Erase(std::make_pair(std::string("token"), hash));
+}
+
+bool CWalletDB::WriteTokenTx(const CTokenTx &wTokenTx)
+{
+    nWalletDBUpdated++;
+    return Write(std::make_pair(std::string("tokentx"), wTokenTx.GetHash()), wTokenTx);
+}
+
+bool CWalletDB::EraseTokenTx(uint256 hash)
+{
+    nWalletDBUpdated++;
+    return Erase(std::make_pair(std::string("tokentx"), hash));
 }

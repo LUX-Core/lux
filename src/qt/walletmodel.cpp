@@ -755,7 +755,10 @@ bool WalletModel::isMine(CTxDestination address)
     return IsMine(*wallet, address);
 }
 
-bool WalletModel::AddTokenEntry(const CTokenInfo &token)
-{
-    return wallet->AddTokenEntry(token);
+bool WalletModel::AddTokenEntry(const CTokenInfo &token) {
+    return wallet->AddTokenEntry(token, true);
+}
+
+bool WalletModel::AddTokenTxEntry(const CTokenTx& tokenTx, bool fFlushOnClose) {
+    return wallet->AddTokenTxEntry(tokenTx, fFlushOnClose);
 }
