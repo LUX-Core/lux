@@ -143,7 +143,7 @@ void WalletView::setBitcoinGUI(BitcoinGUI* gui)
         connect(this, SIGNAL(incomingTransaction(QString, int, CAmount, QString, QString)), gui, SLOT(incomingTransaction(QString, int, CAmount, QString, QString)));
 
         // Pass through token transaction notifications
-        connect(this, SIGNAL(incomingTokenTransaction(QString,QString,QString,QString,QString)), gui, SLOT(incomingTokenTransaction(QString,QString,QString,QString,QString)));
+        connect(this, SIGNAL(incomingTokenTransaction(QString,QString,QString,QString,QString,QString)), gui, SLOT(incomingTokenTransaction(QString,QString,QString,QString,QString,QString)));
 
         // Clicking on add token button sends you to add token page
         connect(overviewPage, SIGNAL(addTokenClicked(bool)), gui, SLOT(gotoLSRTokenPage(bool)));
@@ -243,8 +243,9 @@ void WalletView::processNewTokenTransaction(const QModelIndex &parent, int start
     //QModelIndex index = ttm->index(start, 0, parent);
     QString address = ttm->index(start, TokenTransactionTableModel::AddressRole, parent).data().toString();
     QString label = ttm->index(start, TokenTransactionTableModel::LabelRole, parent).data().toString();
+    QString title = ttm->index(start, TokenTransactionTableModel::TypeRole, parent).data().toString();
 
-    emit incomingTokenTransaction(date, amount, type, address, label);
+    emit incomingTokenTransaction(date, amount, type, address, label, title);
 }
 
 void WalletView::gotoOverviewPage()

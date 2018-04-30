@@ -587,6 +587,8 @@ QVariant TokenTransactionTableModel::data(const QModelIndex &index, int role) co
     case FormattedAmountRole:
         // Used for copy/export, so don't include separators
         return formatTxAmount(rec, false, BitcoinUnits::separatorNever);
+    case FormattedAmountWithUnitRole:
+        return formatTxAmountWithUnit(rec, false, BitcoinUnits::separatorAlways);
     case StatusRole:
         return rec->status.status;
     }

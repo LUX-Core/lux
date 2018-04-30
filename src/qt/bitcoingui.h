@@ -199,7 +199,7 @@ public slots:
     void incomingTransaction(const QString& date, int unit, const CAmount& amount, const QString& type, const QString& address);
 
     /** Show incoming token transaction notification for new transactions. */
-    void incomingTokenTransaction(const QString& date, const QString& amount, const QString& type, const QString& address, const QString& label);
+    void incomingTokenTransaction(const QString& date, const QString& amount, const QString& type, const QString& address, const QString& label, const QString& title);
 
 #endif // ENABLE_WALLET
 

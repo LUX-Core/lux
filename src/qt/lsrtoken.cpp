@@ -129,7 +129,7 @@ LSRToken::LSRToken(QWidget *parent) :
     QAction *copyTokenNameAction = new QAction(tr("Copy token name"), this);
     QAction *copySenderAction = new QAction(tr("Copy sender address"), this);
 
-    contextMenu = new QMenu(this);
+    contextMenu = new QMenu(ui->tokensList);
     contextMenu->addAction(copyTokenAddressAction);
     contextMenu->addAction(copyTokenBalanceAction);
     contextMenu->addAction(copyTokenNameAction);
