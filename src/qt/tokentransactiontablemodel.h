@@ -90,6 +90,7 @@ private:
     QString formatTxDate(const TokenTransactionRecord *wtx) const;
     QString formatTxType(const TokenTransactionRecord *wtx) const;
     QString formatTxToAddress(const TokenTransactionRecord *wtx, bool tooltip) const;
+    QString formatTxTokenSymbol(const TokenTransactionRecord *wtx) const;
     QString formatTxAmount(const TokenTransactionRecord *wtx, bool showUnconfirmed=true, BitcoinUnits::SeparatorStyle separators=BitcoinUnits::separatorStandard) const;
     QString formatTooltip(const TokenTransactionRecord *rec) const;
     QVariant txStatusDecoration(const TokenTransactionRecord *wtx) const;

@@ -6,6 +6,9 @@
 #include <QDateTime>
 #include <QSortFilterProxyModel>
 
+#include <boost/multiprecision/cpp_int.hpp>
+using namespace boost::multiprecision;
+
 class TokenFilterProxy : public QSortFilterProxyModel
 {
     Q_OBJECT
@@ -28,7 +31,7 @@ public:
       @note Type filter takes a bit field created with TYPE() or ALL_TYPES
      */
     void setTypeFilter(quint32 modes);
-    void setMinAmount(const CAmount& minimum);
+    void setMinAmount(const int256_t& minimum);
     void setName(const QString _name);
 
     /** Set maximum number of rows returned, -1 if unlimited. */
@@ -45,7 +48,7 @@ private:
     QString addrPrefix;
     QString name;
     quint32 typeFilter;
-    CAmount minAmount;
+    int256_t minAmount;
     int limitRows;
     bool showInactive;
 };

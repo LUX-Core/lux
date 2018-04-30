@@ -41,7 +41,7 @@ void TokenFilterProxy::setTypeFilter(quint32 modes)
     invalidateFilter();
 }
 
-void TokenFilterProxy::setMinAmount(const CAmount &minimum)
+void TokenFilterProxy::setMinAmount(const int256_t &minimum)
 {
     this->minAmount = minimum;
     invalidateFilter();
@@ -77,7 +77,8 @@ bool TokenFilterProxy::filterAcceptsRow(int sourceRow, const QModelIndex &source
     int type = index.data(TokenTransactionTableModel::TypeRole).toInt();
     QDateTime datetime = index.data(TokenTransactionTableModel::DateRole).toDateTime();
     QString address = index.data(TokenTransactionTableModel::AddressRole).toString();
-    qint64 amount = llabs(index.data(TokenTransactionTableModel::AmountRole).toLongLong());
+    int256_t amount(index.data(TokenTransactionTableModel::AmountRole).toString().toStdString());
+    amount = amount < 0 ? - amount : amount;
     QString tokenName = index.data(TokenTransactionTableModel::NameRole).toString();
 
     if(!(TYPE(type) & typeFilter))

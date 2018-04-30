@@ -22,6 +22,9 @@
 #include <QScrollBar>
 #include <QTableView>
 #include <QVBoxLayout>
+#include <QRegularExpressionValidator>
+
+#define paternTokenAmount "^[0-9]{1,59}\\.{1,1}[0-9]{0,18}"
 
 TokenTransactionView::TokenTransactionView(QWidget *parent) :
     QWidget(parent),
@@ -81,7 +84,11 @@ TokenTransactionView::TokenTransactionView(QWidget *parent) :
 #endif
 
     amountWidget->setFixedWidth(AMOUNT_MINIMUM_COLUMN_WIDTH);
-    amountWidget->setValidator(new QDoubleValidator(0, 1e20, 8, this));
+    QRegularExpression regEx;
+    regEx.setPattern(paternTokenAmount);
+    QRegularExpressionValidator *validator = new QRegularExpressionValidator(amountWidget);
+    validator->setRegularExpression(regEx);
+    amountWidget->setValidator(validator);
     hlayout->addWidget(amountWidget);
 
     QVBoxLayout *vlayout = new QVBoxLayout(this);
@@ -362,8 +369,8 @@ void TokenTransactionView::changedAmount(const QString &amount)
 {
     if(!tokenProxyModel)
         return;
-    CAmount amount_parsed = 0;
-    if(BitcoinUnits::parse(model->getOptionsModel()->getDisplayUnit(), amount, &amount_parsed))
+    int256_t amount_parsed = 0;
+    if(BitcoinUnits::parseToken(18, amount, &amount_parsed))
     {
         tokenProxyModel->setMinAmount(amount_parsed);
     }

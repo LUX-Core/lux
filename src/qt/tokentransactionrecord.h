@@ -91,8 +91,10 @@ public:
     qint64 time;
     Type type;
     std::string address;
-    CAmount debit;
-    CAmount credit;
+    dev::s256 debit;
+    dev::s256 credit;
+    std::string tokenSymbol;
+    uint8_t decimals;
     /**@}*/
 
     QString getTxID() const;

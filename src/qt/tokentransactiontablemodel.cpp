@@ -380,6 +380,11 @@ QString TokenTransactionTableModel::formatTxToAddress(const TokenTransactionReco
     }
 }
 
+QString TokenTransactionTableModel::formatTxTokenSymbol(const TokenTransactionRecord *wtx) const
+{
+    return QString::fromStdString(wtx->tokenSymbol);
+}
+
 QVariant TokenTransactionTableModel::addressColor(const TokenTransactionRecord *wtx) const
 {
     // Show addresses without label in a less visible color
@@ -402,7 +407,7 @@ QVariant TokenTransactionTableModel::addressColor(const TokenTransactionRecord *
 
 QString TokenTransactionTableModel::formatTxAmount(const TokenTransactionRecord *wtx, bool showUnconfirmed, BitcoinUnits::SeparatorStyle separators) const
 {
-    QString str = BitcoinUnits::format(walletModel->getOptionsModel()->getDisplayUnit(), wtx->credit + wtx->debit, false, separators);
+    QString str = BitcoinUnits::formatToken(wtx->decimals, wtx->credit + wtx->debit, false, separators);
     if(showUnconfirmed)
     {
         if(!wtx->status.countsForBalance)
@@ -474,6 +479,8 @@ QVariant TokenTransactionTableModel::data(const QModelIndex &index, int role) co
             return formatTxType(rec);
         case ToAddress:
             return formatTxToAddress(rec, false);
+        case Name:
+            return formatTxTokenSymbol(rec);
         case Amount:
             return formatTxAmount(rec, true, BitcoinUnits::separatorAlways);
         }
@@ -491,7 +498,7 @@ QVariant TokenTransactionTableModel::data(const QModelIndex &index, int role) co
         case ToAddress:
             return formatTxToAddress(rec, true);
         case Amount:
-            return qint64(rec->credit + rec->debit);
+            return QString::fromStdString((rec->credit + rec->debit).str());
         }
         break;
     case Qt::ToolTipRole:
@@ -519,12 +526,14 @@ QVariant TokenTransactionTableModel::data(const QModelIndex &index, int role) co
         return QDateTime::fromTime_t(static_cast<uint>(rec->time));
     case LongDescriptionRole:
         return priv->describe(rec, walletModel->getOptionsModel()->getDisplayUnit());
+    case NameRole:
+        return QString::fromStdString(rec->tokenSymbol);
     case AddressRole:
         return QString::fromStdString(rec->address);
     case LabelRole:
         return walletModel->getAddressTableModel()->labelForAddress(QString::fromStdString(rec->address));
     case AmountRole:
-        return qint64(rec->credit + rec->debit);
+        return QString::fromStdString((rec->credit + rec->debit).str());
     case TxHashRole:
         return QString::fromStdString(rec->hash.ToString());
     case TxHexRole:

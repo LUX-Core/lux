@@ -542,6 +542,8 @@ public:
 
     bool AddTokenTxEntry(const CTokenTx& tokenTx, bool fFlushOnClose=true);
 
+    bool GetTokenTxDetails(const CTokenTx &wtx, uint256& credit, uint256& debit, std::string& tokenSymbol, uint8_t& decimals) const;
+
     static CFeeRate minTxFee;
     static CAmount GetMinimumFee(unsigned int nTxBytes, unsigned int nConfirmTarget, const CTxMemPool& pool);
 
