@@ -13,7 +13,7 @@ class TokenViewDelegate;
 class WalletModel;
 class ClientModel;
 class TokenTransactionView;
-//class PlatformStyle;
+class QMenu;
 
 namespace Ui {
 class LSRToken;
@@ -38,6 +38,11 @@ public Q_SLOTS:
     void on_goToAddTokenPage();
     void on_currentTokenChanged(QModelIndex index);
     void on_dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles = QVector<int>());
+    void contextualMenu(const QPoint &);
+    void copyTokenAddress();
+    void copyTokenBalance();
+    void copyTokenName();
+    void copySenderAddress();
 
 private:
     Ui::LSRToken *ui;
@@ -53,6 +58,7 @@ private:
     QAction *m_addTokenAction;
     QString m_selectedTokenHash;
     TokenTransactionView *m_tokenTransactionView;
+    QMenu *contextMenu;
 };
 
 #endif // LSRTOKEN_H

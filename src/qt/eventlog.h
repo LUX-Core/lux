@@ -29,14 +29,16 @@ public:
      * @param result
      * @return
      */
-    bool search(int fromBlock, int toBlock, const std::string& eventName, const std::vector<std::string>& addresses, QVariant& result);
+    bool searchTokenTx(int64_t fromBlock, int64_t toBlock, std::string strContractAddress, std::string strSenderAddress, QVariant& result);
+
+    bool search(int64_t fromBlock, int64_t toBlock, const std::vector<std::string> addresses, const std::vector<std::string> topics, QVariant& result);
 
 private:
     // Set command data
     void setStartBlock(int fromBlock);
     void setEndBlock(int toBlock);
     void setAddresses(const std::vector<std::string> addresses);
-    void setEventName(const std::string &eventName);
+    void setTopics(const std::vector<std::string> topics);
 
     ExecRPCCommand* m_RPCCommand;
     QMap<QString, QString> m_lstParams;

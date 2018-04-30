@@ -25,10 +25,11 @@ QList<TokenTransactionRecord> TokenTransactionRecord::decomposeTransaction(const
     {
         // Get token transaction data
         TokenTransactionRecord rec;
-        rec.time = wtx.nTime;
+        rec.time = wtx.nCreateTime;
         rec.credit = dev::u2s(uintTou256(credit));
         rec.debit = -dev::u2s(uintTou256(debit));
-        rec.hash = wtx.transactionHash;
+        rec.hash = wtx.GetHash();
+        rec.txid = wtx.transactionHash;
         rec.tokenSymbol = tokenSymbol;
         rec.decimals = decimals;
         dev::s256 net = rec.credit + rec.debit;
@@ -49,14 +50,14 @@ QList<TokenTransactionRecord> TokenTransactionRecord::decomposeTransaction(const
 
         // Set address
         switch (rec.type) {
+        case SendToSelf:
         case SendToAddress:
         case SendToOther:
-            rec.address = wtx.strSenderAddress;
+            rec.address = wtx.strReceiverAddress;
             break;
-        case SendToSelf:
         case RecvWithAddress:
         case RecvFromOther:
-            rec.address = wtx.strReceiverAddress;
+            rec.address = wtx.strSenderAddress;
         default:
             break;
         }
@@ -69,10 +70,37 @@ QList<TokenTransactionRecord> TokenTransactionRecord::decomposeTransaction(const
     return parts;
 }
 
-void TokenTransactionRecord::updateStatus(const CTokenTx &wtx)
+void TokenTransactionRecord::updateStatus(const CWallet *wallet, const CTokenTx &wtx)
 {
     AssertLockHeld(cs_main);
     // Determine transaction status
+    status.cur_num_blocks = chainActive.Height();
+    if(wtx.blockNumber == -1)
+    {
+        status.depth = 0;
+    }
+    else
+    {
+        status.depth = status.cur_num_blocks - wtx.blockNumber + 1;
+    }
+
+    auto mi = wallet->mapWallet.find(wtx.transactionHash);
+    if (mi != wallet->mapWallet.end() && (GetAdjustedTime() - mi->second.nTimeReceived > 2 * 60) && mi->second.GetRequestCount() == 0)
+    {
+        status.status = TokenTransactionStatus::Offline;
+    }
+    else if (status.depth == 0)
+    {
+        status.status = TokenTransactionStatus::Unconfirmed;
+    }
+    else if (status.depth < RecommendedNumConfirmations)
+    {
+        status.status = TokenTransactionStatus::Confirming;
+    }
+    else
+    {
+        status.status = TokenTransactionStatus::Confirmed;
+    }
 }
 
 bool TokenTransactionRecord::statusUpdateNeeded()

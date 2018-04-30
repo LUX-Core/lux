@@ -43,6 +43,7 @@
 #if BOOST_FILESYSTEM_VERSION >= 3
 #include <boost/filesystem/detail/utf8_codecvt_facet.hpp>
 #endif
+#include <boost/scoped_array.hpp>
 
 #include <QAbstractItemView>
 #include <QApplication>
@@ -58,6 +59,7 @@
 #include <QTextDocument> // for Qt::mightBeRichText
 #include <QThread>
 #include <QToolButton>
+#include <QMouseEvent>
 
 #if QT_VERSION < 0x050000
 #include <QUrl>
@@ -255,6 +257,19 @@ void copyEntryData(QAbstractItemView* view, int column, int role)
         setClipboard(selection.at(0).data(role).toString());
     }
 }
+
+    void copyEntryDataFromList(QAbstractItemView *view, int role)
+    {
+        if(!view || !view->selectionModel())
+            return;
+        QModelIndexList selection = view->selectionModel()->selectedIndexes();
+
+        if(!selection.isEmpty())
+        {
+            // Copy first item
+            setClipboard(selection.at(0).data(role).toString());
+        }
+    }
 
     QString getEntryData(QAbstractItemView *view, int column, int role)
     {

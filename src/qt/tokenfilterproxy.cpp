@@ -9,6 +9,11 @@ const QDateTime TokenFilterProxy::MIN_DATE = QDateTime::fromTime_t(0);
 // Last date that can be represented (far in the future)
 const QDateTime TokenFilterProxy::MAX_DATE = QDateTime::fromTime_t(0xFFFFFFFF);
 
+int256_t abs_int256(const int256_t& value)
+{
+    return value > 0 ? value : -value;
+}
+
 TokenFilterProxy::TokenFilterProxy(QObject *parent) :
     QSortFilterProxyModel(parent),
     dateFrom(MIN_DATE),
@@ -78,7 +83,7 @@ bool TokenFilterProxy::filterAcceptsRow(int sourceRow, const QModelIndex &source
     QDateTime datetime = index.data(TokenTransactionTableModel::DateRole).toDateTime();
     QString address = index.data(TokenTransactionTableModel::AddressRole).toString();
     int256_t amount(index.data(TokenTransactionTableModel::AmountRole).toString().toStdString());
-    amount = amount < 0 ? - amount : amount;
+    amount = abs_int256(amount);
     QString tokenName = index.data(TokenTransactionTableModel::NameRole).toString();
 
     if(!(TYPE(type) & typeFilter))
@@ -93,4 +98,20 @@ bool TokenFilterProxy::filterAcceptsRow(int sourceRow, const QModelIndex &source
         return false;
 
     return true;
+}
+
+bool TokenFilterProxy::lessThan(const QModelIndex &left, const QModelIndex &right) const
+{
+    if(left.column() == TokenTransactionTableModel::Amount &&
+            right.column() == TokenTransactionTableModel::Amount)
+    {
+        int256_t amountLeft(left.data(TokenTransactionTableModel::AmountRole).toString().toStdString());
+        amountLeft = abs_int256(amountLeft);
+
+        int256_t amountRight(right.data(TokenTransactionTableModel::AmountRole).toString().toStdString());
+        amountRight = abs_int256(amountRight);
+
+        return amountLeft < amountRight;
+    }
+    return QSortFilterProxyModel::lessThan(left, right);
 }

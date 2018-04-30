@@ -71,9 +71,11 @@ TokenTransactionView::TokenTransactionView(QWidget *parent) :
     hlayout->addWidget(addressWidget);
 
     nameWidget = new QComboBox(this);
-
-    nameWidget->setFixedWidth(TYPE_COLUMN_WIDTH);
-
+    if (platformStyle->getUseExtraSpacing()) {
+        nameWidget->setFixedWidth(NAME_COLUMN_WIDTH + 1);
+    } else {
+        nameWidget->setFixedWidth(NAME_COLUMN_WIDTH);
+    }
     nameWidget->addItem(tr("All"), "");
 
     hlayout->addWidget(nameWidget);
@@ -138,6 +140,7 @@ TokenTransactionView::TokenTransactionView(QWidget *parent) :
     connect(copyTxIDAction, SIGNAL(triggered()), this, SLOT(copyTxID()));
     connect(copyTxPlainText, SIGNAL(triggered()), this, SLOT(copyTxPlainText()));
     connect(showDetailsAction, SIGNAL(triggered()), this, SLOT(showDetails()));
+    connect(tokenView, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(showDetails()));
 }
 
 void TokenTransactionView::setModel(WalletModel *_model)

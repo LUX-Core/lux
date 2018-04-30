@@ -16,12 +16,12 @@ class TokenTransactionDesc: public QObject
     Q_OBJECT
 
 public:
-    static QString toHTML(CWallet *wallet, CTokenTx &wtx, TokenTransactionRecord *rec, int unit);
+    static QString toHTML(CWallet *wallet, CTokenTx &wtx, TokenTransactionRecord *rec);
 
 private:
     TokenTransactionDesc() {}
 
-    static QString FormatTxStatus(const CTokenTx& wtx);
+    static QString FormatTxStatus(CWallet *wallet, const CTokenTx& wtx);
 };
 
 #endif // BITCOIN_QT_TOKENTRANSACTIONDESC_H

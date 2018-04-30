@@ -195,7 +195,8 @@ public:
 
                     if(mi != wallet->mapTokenTx.end())
                     {
-                        rec->updateStatus(mi->second);
+                        CTokenTx wtx(mi->second);
+                        rec->updateStatus(wallet, wtx);
                     }
                 }
             }
@@ -204,14 +205,14 @@ public:
         return 0;
     }
 
-    QString describe(TokenTransactionRecord *rec, int unit)
+    QString describe(TokenTransactionRecord *rec)
     {
         {
             LOCK2(cs_main, wallet->cs_wallet);
             std::map<uint256, CTokenTx>::iterator mi = wallet->mapTokenTx.find(rec->hash);
             if(mi != wallet->mapTokenTx.end())
             {
-                return TokenTransactionDesc::toHTML(wallet, mi->second, rec, unit);
+                return TokenTransactionDesc::toHTML(wallet, mi->second, rec);
             }
         }
         return QString();
@@ -220,10 +221,10 @@ public:
     QString getTxHex(TokenTransactionRecord *rec)
     {
         LOCK2(cs_main, wallet->cs_wallet);
-        std::map<uint256, CTokenTx>::iterator mi = wallet->mapTokenTx.find(rec->hash);
-        if(mi != wallet->mapTokenTx.end())
+        std::map<uint256, CWalletTx>::iterator mi = wallet->mapWallet.find(rec->txid);
+        if(mi != wallet->mapWallet.end())
         {
-            std::string strHex;
+            std::string strHex = EncodeHexTx(static_cast<CTransaction>(mi->second));
             return QString::fromStdString(strHex);
         }
         return QString();
@@ -497,6 +498,8 @@ QVariant TokenTransactionTableModel::data(const QModelIndex &index, int role) co
             return formatTxType(rec);
         case ToAddress:
             return formatTxToAddress(rec, true);
+        case Name:
+            return formatTxTokenSymbol(rec);
         case Amount:
             return QString::fromStdString((rec->credit + rec->debit).str());
         }
@@ -525,7 +528,7 @@ QVariant TokenTransactionTableModel::data(const QModelIndex &index, int role) co
     case DateRole:
         return QDateTime::fromTime_t(static_cast<uint>(rec->time));
     case LongDescriptionRole:
-        return priv->describe(rec, walletModel->getOptionsModel()->getDisplayUnit());
+        return priv->describe(rec);
     case NameRole:
         return QString::fromStdString(rec->tokenSymbol);
     case AddressRole:
@@ -535,7 +538,7 @@ QVariant TokenTransactionTableModel::data(const QModelIndex &index, int role) co
     case AmountRole:
         return QString::fromStdString((rec->credit + rec->debit).str());
     case TxHashRole:
-        return QString::fromStdString(rec->hash.ToString());
+        return QString::fromStdString(rec->txid.ToString());
     case TxHexRole:
         return priv->getTxHex(rec);
     case TxPlainTextRole:
@@ -543,6 +546,7 @@ QVariant TokenTransactionTableModel::data(const QModelIndex &index, int role) co
             QString details;
             QDateTime date = QDateTime::fromTime_t(static_cast<uint>(rec->time));
             QString txLabel = walletModel->getAddressTableModel()->labelForAddress(QString::fromStdString(rec->address));
+            QString symbol = QString::fromStdString(rec->tokenSymbol);
 
             details.append(date.toString("M/d/yy HH:mm"));
             details.append(" ");
@@ -564,6 +568,7 @@ QVariant TokenTransactionTableModel::data(const QModelIndex &index, int role) co
                 details.append(" ");
             }
             details.append(formatTxAmount(rec, false, BitcoinUnits::separatorNever));
+            details.append(" " + symbol);
             return details;
         }
     case ConfirmedRole:
@@ -600,6 +605,8 @@ QVariant TokenTransactionTableModel::headerData(int section, Qt::Orientation ori
                 return tr("Type of transaction.");
             case ToAddress:
                 return tr("User-defined intent/purpose of the transaction.");
+            case Name:
+                return tr("Token name.");
             case Amount:
                 return tr("Amount removed from or added to balance.");
             }

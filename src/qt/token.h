@@ -2,18 +2,28 @@
 #define TOKEN_H
 #include <string>
 #include <vector>
+#include "uint256.h"
 
 struct TokenEvent{
-    std::string m_address;
-    std::string m_sender;
-    std::string m_receiver;
-    std::string m_value;
+    std::string address;
+    std::string sender;
+    std::string receiver;
+    uint256 blockHash;
+    uint64_t blockNumber;
+    uint256 transactionHash;
+    uint256 value;
 
-    TokenEvent(std::string address, std::string sender, std::string receiver, std::string value){
-        m_address = address;
-        m_sender = sender;
-        m_receiver = receiver;
-        m_value = value;
+    TokenEvent()
+    {
+        SetNull();
+    }
+
+    void SetNull()
+    {
+        blockHash.SetNull();
+        blockNumber = 0;
+        transactionHash.SetNull();
+        value.SetNull();
     }
 };
 
@@ -53,9 +63,8 @@ public:
     bool allowance(const std::string& _from, const std::string& _to, std::string& result, bool sendTo = false);
 
     // ABI Events
-    void listenForAddresses(const std::vector<std::string>& contractAddresses);
-    bool transferEvents(int fromBlock, int toBlock, std::vector<TokenEvent>& tokenEvents);
-    bool burnEvents(int fromBlock, int toBlock, std::vector<TokenEvent>& tokenEvents);
+    bool transferEvents(std::vector<TokenEvent>& tokenEvents, int64_t fromBlock = 0, int64_t toBlock = -1);
+    bool burnEvents(std::vector<TokenEvent>& tokenEvents, int64_t fromBlock = 0, int64_t toBlock = -1);
 
 private:
     bool exec(const std::vector<std::string>& input, int func, std::vector<std::string>& output, bool sendTo);

@@ -350,6 +350,11 @@ QString BitcoinUnits::formatToken(int decimal_units, const int256_t& nIn, bool f
     return quotient_str;
 }
 
+QString BitcoinUnits::formatTokenWithUnit(const QString unit, int decimals, const int256_t &amount, bool plussign, BitcoinUnits::SeparatorStyle separators)
+{
+    return formatToken(decimals, amount, plussign, separators) + " " + unit;
+}
+
 QString BitcoinUnits::getAmountColumnTitle(int unit)
 {
     QString amountTitle = QObject::tr("Amount");

@@ -64,20 +64,7 @@ public:
     static const int RecommendedNumConfirmations = 10;
 
     TokenTransactionRecord():
-            hash(), time(0), type(Other), address(""), debit(0), credit(0)
-    {
-    }
-
-    TokenTransactionRecord(uint256 _hash, qint64 _time):
-            hash(_hash), time(_time), type(Other), address(""), debit(0),
-            credit(0)
-    {
-    }
-
-    TokenTransactionRecord(uint256 _hash, qint64 _time,
-                Type _type, const std::string &_address,
-                const CAmount& _debit, const CAmount& _credit):
-            hash(_hash), time(_time), type(_type), address(_address), debit(_debit), credit(_credit)
+            hash(), txid(), time(0), type(Other), address(""), debit(0), credit(0)
     {
     }
 
@@ -88,6 +75,7 @@ public:
     /** @name Immutable token transaction attributes
       @{*/
     uint256 hash;
+    uint256 txid;
     qint64 time;
     Type type;
     std::string address;
@@ -104,7 +92,7 @@ public:
 
     /** Update status from core wallet tx.
      */
-    void updateStatus(const CTokenTx &wtx);
+    void updateStatus(const CWallet *wallet, const CTokenTx &wtx);
 
     /** Return whether a status update is needed.
      */

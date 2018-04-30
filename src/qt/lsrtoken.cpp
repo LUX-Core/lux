@@ -13,6 +13,7 @@
 #include <iostream>
 #include <QSortFilterProxyModel>
 #include <QSizePolicy>
+#include <QMenu>
 
 #define DECORATION_SIZE 54
 #define SYMBOL_WIDTH 100
@@ -107,6 +108,7 @@ LSRToken::LSRToken(QWidget *parent) :
     ui->tokenViewLayout->addWidget(m_tokenTransactionView);
 
     ui->tokensList->setItemDelegate(m_tokenDelegate);
+    ui->tokensList->setContextMenuPolicy(Qt::CustomContextMenu);
 
     QActionGroup *actionGroup = new QActionGroup(this);
     m_sendAction = new QAction(tr("Send"), actionGroup);
@@ -122,10 +124,27 @@ LSRToken::LSRToken(QWidget *parent) :
     ui->receiveButton->setDefaultAction(m_receiveAction);
     ui->addTokenButton->setDefaultAction(m_addTokenAction);
 
+    QAction *copyTokenAddressAction = new QAction(tr("Copy token address"), this);
+    QAction *copyTokenBalanceAction = new QAction(tr("Copy token balance"), this);
+    QAction *copyTokenNameAction = new QAction(tr("Copy token name"), this);
+    QAction *copySenderAction = new QAction(tr("Copy sender address"), this);
+
+    contextMenu = new QMenu(this);
+    contextMenu->addAction(copyTokenAddressAction);
+    contextMenu->addAction(copyTokenBalanceAction);
+    contextMenu->addAction(copyTokenNameAction);
+    contextMenu->addAction(copySenderAction);
+
+    connect(copyTokenAddressAction, SIGNAL(triggered(bool)), this, SLOT(copyTokenAddress()));
+    connect(copyTokenBalanceAction, SIGNAL(triggered(bool)), this, SLOT(copyTokenBalance()));
+    connect(copyTokenNameAction, SIGNAL(triggered(bool)), this, SLOT(copyTokenName()));
+    connect(copySenderAction, SIGNAL(triggered(bool)), this, SLOT(copySenderAddress()));
+
     connect(m_sendAction, SIGNAL(triggered()), this, SLOT(on_goToSendTokenPage()));
     connect(m_receiveAction, SIGNAL(triggered()), this, SLOT(on_goToReceiveTokenPage()));
     connect(m_addTokenAction, SIGNAL(triggered()), this, SLOT(on_goToAddTokenPage()));
     connect(ui->tokensList, SIGNAL(clicked(QModelIndex)), this, SLOT(on_currentTokenChanged(QModelIndex)));
+    connect(ui->tokensList, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(contextualMenu(QPoint)));
 
     on_goToSendTokenPage();
 }
@@ -223,4 +242,37 @@ void LSRToken::on_dataChanged(const QModelIndex &topLeft, const QModelIndex &bot
             on_currentTokenChanged(topLeft);
         }
     }
+}
+
+void LSRToken::contextualMenu(const QPoint &point)
+{
+    QModelIndex index = ui->tokensList->indexAt(point);
+    QModelIndexList selection = ui->tokensList->selectionModel()->selectedIndexes();
+    if (selection.empty())
+        return;
+
+    if(index.isValid())
+    {
+        contextMenu->exec(QCursor::pos());
+    }
+}
+
+void LSRToken::copyTokenAddress()
+{
+    GUIUtil::copyEntryDataFromList(ui->tokensList, TokenItemModel::AddressRole);
+}
+
+void LSRToken::copyTokenBalance()
+{
+    GUIUtil::copyEntryDataFromList(ui->tokensList, TokenItemModel::BalanceRole);
+}
+
+void LSRToken::copyTokenName()
+{
+    GUIUtil::copyEntryDataFromList(ui->tokensList, TokenItemModel::NameRole);
+}
+
+void LSRToken::copySenderAddress()
+{
+    GUIUtil::copyEntryDataFromList(ui->tokensList, TokenItemModel::SenderRole);
 }

@@ -106,7 +106,9 @@ public:
     //! Parse string to token amount
     static bool parseToken(int decimal_units, const QString &value, int256_t *val_out);
     //! Format token as string
-    static QString formatToken(int decimal_units, const int256_t& amount, bool plussign=false, SeparatorStyle separators=separatorStandard);
+    static QString formatToken(int decimal_units, const int256_t& amount, bool plussign=false, SeparatorStyle separators=separatorStandard); //! Format token as string
+    //! Format token as string (with unit)
+    static QString formatTokenWithUnit(const QString unit, int decimals, const int256_t& amount, bool plussign=false, SeparatorStyle separators=separatorStandard);
     ///@}
 
     //! @name AbstractListModel implementation
