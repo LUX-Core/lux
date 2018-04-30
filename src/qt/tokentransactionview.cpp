@@ -148,6 +148,7 @@ void TokenTransactionView::setModel(WalletModel *_model)
     {
         refreshNameWidget();
         connect(model->getTokenItemModel(), SIGNAL(rowsInserted(QModelIndex,int,int)),this, SLOT(addToNameWidget(QModelIndex,int,int)));
+        connect(model->getTokenItemModel(), SIGNAL(rowsAboutToBeRemoved(QModelIndex,int,int)),this, SLOT(removeFromNameWidget(QModelIndex,int,int)));
 
         tokenProxyModel = new TokenFilterProxy(this);
         tokenProxyModel->setSourceModel(_model->getTokenTransactionTableModel());
@@ -220,7 +221,8 @@ void TokenTransactionView::refreshNameWidget()
         for(int i = 0; i < tim->rowCount(); i++)
         {
             QString name = tim->data(tim->index(i, 0), TokenItemModel::SymbolRole).toString();
-            nameWidget->addItem(name, name);
+            if(nameWidget->findText(name) == -1)
+                nameWidget->addItem(name, name);
         }
     }
 }
@@ -231,7 +233,31 @@ void TokenTransactionView::addToNameWidget(const QModelIndex &parent, int start,
     {
         TokenItemModel *tim = model->getTokenItemModel();
         QString name = tim->index(start, TokenItemModel::Symbol, parent).data().toString();
-        nameWidget->addItem(name, name);
+        if(nameWidget->findText(name) == -1)
+            nameWidget->addItem(name, name);
+    }
+}
+
+void TokenTransactionView::removeFromNameWidget(const QModelIndex &parent, int start, int /*end*/)
+{
+    if(model)
+    {
+        TokenItemModel *tim = model->getTokenItemModel();
+        QString name = tim->index(start, TokenItemModel::Symbol, parent).data().toString();
+        int nameCount = 0;
+
+        for(int i = 0; i < tim->rowCount(); i++)
+        {
+            QString checkName = tim->index(i, TokenItemModel::Symbol, parent).data().toString();
+            if(name == checkName)
+            {
+                nameCount++;
+            }
+        }
+
+        int nameIndex = nameWidget->findText(name);
+        if(nameCount == 1 && nameIndex != -1)
+            nameWidget->removeItem(nameIndex);
     }
 }
 

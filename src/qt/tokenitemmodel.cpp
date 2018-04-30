@@ -6,6 +6,7 @@
 #include "main.h"
 
 #include <boost/foreach.hpp>
+#include <algorithm>
 
 #include <QDateTime>
 #include <QFont>
@@ -18,9 +19,9 @@ public:
     TokenItemEntry()
     {}
 
-    TokenItemEntry(const uint256& tokenHash, const CTokenInfo& tokenInfo)
+    TokenItemEntry(uint256 tokenHash, CTokenInfo tokenInfo)
     {
-        hash = QString::fromStdString(tokenHash.ToString());
+        hash = tokenHash;
         createTime.setTime_t(tokenInfo.nCreateTime);
         contractAddress = QString::fromStdString(tokenInfo.strContractAddress);
         tokenName = QString::fromStdString(tokenInfo.strTokenName);
@@ -75,7 +76,7 @@ public:
     ~TokenItemEntry()
     {}
 
-    QString hash;
+    uint256 hash;
     QDateTime createTime;
     QString contractAddress;
     QString tokenName;
@@ -84,8 +85,6 @@ public:
     QString senderAddress;
     int256_t balance;
 };
-
-Q_DECLARE_METATYPE(TokenItemEntry)
 
 class TokenTxWorker : public QObject
 {
@@ -98,11 +97,10 @@ public:
         wallet(_wallet), first(true) {}
 
 private Q_SLOTS:
-    void updateTokenTx(const QVariant &token)
+    void updateTokenTx(const QString &hash)
     {
 
-        TokenItemEntry tokenEntry = token.value<TokenItemEntry>();
-        uint256 tokenHash = uint256S(tokenEntry.hash.toStdString());
+        uint256 tokenHash = uint256S(hash.toStdString());
         int64_t fromBlock = 0;
         int64_t toBlock = -1;
         CTokenInfo tokenInfo;
@@ -182,6 +180,14 @@ struct TokenItemEntryLessThan
     {
         return a.hash < b.hash;
     }
+    bool operator()(const TokenItemEntry &a, const uint256 &b) const
+    {
+        return a.hash < b;
+    }
+    bool operator()(const uint256 &a, const TokenItemEntry &b) const
+    {
+        return a < b.hash;
+    }
 };
 
 class TokenItemPriv
@@ -199,12 +205,9 @@ public:
         cachedTokenItem.clear();
         {
             LOCK2(cs_main, wallet->cs_wallet);
-
-            BOOST_FOREACH(const PAIRTYPE(uint256, CTokenInfo)& item, wallet->mapToken)
+            for(std::map<uint256, CTokenInfo>::iterator it = wallet->mapToken.begin(); it != wallet->mapToken.end(); ++it)
             {
-                const uint256& tokenHash = item.first;
-                const CTokenInfo& tokenInfo = item.second;
-                TokenItemEntry tokenItem(tokenHash, tokenInfo);
+                TokenItemEntry tokenItem(it->first, it->second);
                 if(parent)
                 {
                     tokenItem.update(parent->getTokenAbi());
@@ -212,7 +215,7 @@ public:
                 cachedTokenItem.append(tokenItem);
             }
         }
-        qSort(cachedTokenItem.begin(), cachedTokenItem.end(), TokenItemEntryLessThan());
+        std::sort(cachedTokenItem.begin(), cachedTokenItem.end(), TokenItemEntryLessThan());
     }
 
     void updateEntry(const TokenItemEntry &item, int status)
@@ -278,34 +281,24 @@ public:
     }
 };
 
-struct TokenModelData
-{
-    Token *tokenAbi;
-    QStringList columns;
-    WalletModel *walletModel;
-    CWallet *wallet;
-    TokenItemPriv* priv;
-    TokenTxWorker* worker;
-    QThread t;
-};
-
-TokenItemModel::TokenItemModel(CWallet *wallet, WalletModel *parent):
+TokenItemModel::TokenItemModel(CWallet *_wallet, WalletModel *parent):
     QAbstractItemModel(parent),
-    d(0)
+    tokenAbi(0),
+    walletModel(parent),
+    wallet(_wallet),
+    priv(0),
+    worker(0)
 {
-    d = new TokenModelData();
-    d->columns << tr("Token Name") << tr("Token Symbol") << tr("Balance");
-    d->tokenAbi = new Token();
-    d->wallet = wallet;
-    d->walletModel = parent;
+    columns << tr("Token Name") << tr("Token Symbol") << tr("Balance");
+    tokenAbi = new Token();
 
-    d->priv = new TokenItemPriv(wallet, this);
-    d->priv->refreshTokenItem();
+    priv = new TokenItemPriv(wallet, this);
+    priv->refreshTokenItem();
 
-    d->worker = new TokenTxWorker(wallet);
-    d->worker->moveToThread(&(d->t));
+    worker = new TokenTxWorker(wallet);
+    worker->moveToThread(&(t));
 
-    d->t.start();
+    t.start();
 
     subscribeToCoreSignals();
 }
@@ -314,35 +307,29 @@ TokenItemModel::~TokenItemModel()
 {
     unsubscribeFromCoreSignals();
 
-    if(d)
+    t.quit();
+    t.wait();
+
+    if(tokenAbi)
     {
-        d->t.quit();
-        d->t.wait();
+        delete tokenAbi;
+        tokenAbi = 0;
+    }
 
-        if(d->tokenAbi)
-        {
-            delete d->tokenAbi;
-            d->tokenAbi = 0;
-        }
-
-        if(d->priv)
-        {
-            delete d->priv;
-            d->priv = 0;
-        }
-
-        delete d;
-        d = 0;
+    if(priv)
+    {
+        delete priv;
+        priv = 0;
     }
 }
 
 QModelIndex TokenItemModel::index(int row, int column, const QModelIndex &parent) const
 {
     Q_UNUSED(parent);
-    TokenItemEntry *data = d->priv->index(row);
+    TokenItemEntry *data = priv->index(row);
     if(data)
     {
-        return createIndex(row, column, d->priv->index(row));
+        return createIndex(row, column, priv->index(row));
     }
     return QModelIndex();
 }
@@ -356,13 +343,13 @@ QModelIndex TokenItemModel::parent(const QModelIndex &child) const
 int TokenItemModel::rowCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent);
-    return d->priv->size();
+    return priv->size();
 }
 
 int TokenItemModel::columnCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent);
-    return d->columns.length();
+    return columns.length();
 }
 
 QVariant TokenItemModel::data(const QModelIndex &index, int role) const
@@ -387,7 +374,7 @@ QVariant TokenItemModel::data(const QModelIndex &index, int role) const
     }
         break;
     case TokenItemModel::HashRole:
-        return rec->hash;
+        return QString::fromStdString(rec->hash.ToString());
         break;
     case TokenItemModel::AddressRole:
         return rec->contractAddress;
@@ -419,74 +406,82 @@ QVariant TokenItemModel::data(const QModelIndex &index, int role) const
 
 Token *TokenItemModel::getTokenAbi()
 {
-    return d->tokenAbi;
+    return tokenAbi;
 }
 
-void TokenItemModel::updateToken(const QVariant &token, int status, bool showToken)
+void TokenItemModel::updateToken(const QString &hash, int status, bool showToken)
 {
-    TokenItemEntry tokenEntry = token.value<TokenItemEntry>();
+    // Find token in wallet
+    LOCK2(cs_main, wallet->cs_wallet);
+
+    uint256 updated;
+    updated.SetHex(hash.toStdString());
+    std::map<uint256, CTokenInfo>::iterator mi = wallet->mapToken.find(updated);
+    showToken &= mi != wallet->mapToken.end();
+
+    TokenItemEntry tokenEntry;
     if(showToken)
     {
+        tokenEntry = TokenItemEntry(mi->first, mi->second);
         tokenEntry.update(getTokenAbi());
     }
-    d->priv->updateEntry(tokenEntry, status);
+    else
+    {
+        tokenEntry.hash = updated;
+    }
+    priv->updateEntry(tokenEntry, status);
 }
 
 void TokenItemModel::checkTokenBalanceChanged()
 {
-    if(!d->priv && !d->tokenAbi)
+    if(!priv && !tokenAbi)
         return;
 
-    for(int i = 0; i < d->priv->cachedTokenItem.size(); i++)
+    for(int i = 0; i < priv->cachedTokenItem.size(); i++)
     {
-        TokenItemEntry tokenEntry = d->priv->cachedTokenItem[i];
+        TokenItemEntry tokenEntry = priv->cachedTokenItem[i];
         bool modified = false;
-        tokenEntry.update(d->tokenAbi, modified);
+        tokenEntry.update(tokenAbi, modified);
         if(modified)
         {
-            d->priv->cachedTokenItem[i] = tokenEntry;
+            priv->cachedTokenItem[i] = tokenEntry;
             emitDataChanged(i);
         }
 
         // Search for token transactions
         if(fLogEvents)
         {
-            QVariant token;
-            token.setValue(tokenEntry);
-            QMetaObject::invokeMethod(d->worker, "updateTokenTx", Qt::QueuedConnection,
-                                      Q_ARG(QVariant, token));
+            QString hash = QString::fromStdString(tokenEntry.hash.ToString());
+            QMetaObject::invokeMethod(worker, "updateTokenTx", Qt::QueuedConnection,
+                                      Q_ARG(QString, hash));
         }
     }
 }
 
 void TokenItemModel::emitDataChanged(int idx)
 {
-    Q_EMIT dataChanged(index(idx, 0, QModelIndex()), index(idx, d->columns.length()-1, QModelIndex()));
+    Q_EMIT dataChanged(index(idx, 0, QModelIndex()), index(idx, columns.length()-1, QModelIndex()));
 }
 
 struct TokenNotification
 {
 public:
     TokenNotification() {}
-    TokenNotification(uint256 _hash, CTokenInfo _tokenInfo, ChangeType _status, bool _showToken):
-        hash(_hash), tokenInfo(_tokenInfo), status(_status), showToken(_showToken) {}
+    TokenNotification(uint256 _hash, ChangeType _status, bool _showToken):
+        hash(_hash), status(_status), showToken(_showToken) {}
 
     void invoke(QObject *tim)
     {
         QString strHash = QString::fromStdString(hash.GetHex());
         qDebug() << "NotifyTokenChanged: " + strHash + " status= " + QString::number(status);
 
-        TokenItemEntry tokenEntry(hash, tokenInfo);
-        QVariant token;
-        token.setValue(tokenEntry);
         QMetaObject::invokeMethod(tim, "updateToken", Qt::QueuedConnection,
-                                  Q_ARG(QVariant, token),
+                                  Q_ARG(QString, strHash),
                                   Q_ARG(int, status),
                                   Q_ARG(bool, showToken));
     }
 private:
     uint256 hash;
-    CTokenInfo tokenInfo;
     ChangeType status;
     bool showToken;
 };
@@ -497,24 +492,19 @@ static void NotifyTokenChanged(TokenItemModel *tim, CWallet *wallet, const uint2
     LOCK2(cs_main, wallet->cs_wallet);
     std::map<uint256, CTokenInfo>::iterator mi = wallet->mapToken.find(hash);
     bool showToken = mi != wallet->mapToken.end();
-    CTokenInfo tokenInfo;
-    if(showToken)
-    {
-        tokenInfo = mi->second;
-    }
 
-    TokenNotification notification(hash, tokenInfo, status, showToken);
+    TokenNotification notification(hash, status, showToken);
     notification.invoke(tim);
 }
 
 void TokenItemModel::subscribeToCoreSignals()
 {
     // Connect signals to wallet
-    d->wallet->NotifyTokenChanged.connect(boost::bind(NotifyTokenChanged, this, _1, _2, _3));
+    wallet->NotifyTokenChanged.connect(boost::bind(NotifyTokenChanged, this, _1, _2, _3));
 }
 
 void TokenItemModel::unsubscribeFromCoreSignals()
 {
     // Disconnect signals from wallet
-    d->wallet->NotifyTokenChanged.disconnect(boost::bind(NotifyTokenChanged, this, _1, _2, _3));
+    wallet->NotifyTokenChanged.disconnect(boost::bind(NotifyTokenChanged, this, _1, _2, _3));
 }

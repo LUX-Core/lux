@@ -2,11 +2,15 @@
 #define TOKENITEMMODEL_H
 
 #include <QAbstractItemModel>
+#include <QStringList>
+#include <QThread>
 
 class CWallet;
 class WalletModel;
 class Token;
-struct TokenModelData;
+class TokenItemPriv;
+class TokenTxWorker;
+class TokenItemEntry;
 
 class TokenItemModel : public QAbstractItemModel
 {
@@ -48,7 +52,7 @@ public Q_SLOTS:
     void checkTokenBalanceChanged();
 
 private Q_SLOTS:
-    void updateToken(const QVariant &token, int status, bool showToken);
+    void updateToken(const QString &hash, int status, bool showToken);
 
 private:
     /** Notify listeners that data changed. */
@@ -56,7 +60,13 @@ private:
     void subscribeToCoreSignals();
     void unsubscribeFromCoreSignals();
 
-    TokenModelData *d;
+    Token *tokenAbi;
+    QStringList columns;
+    WalletModel *walletModel;
+    CWallet *wallet;
+    TokenItemPriv* priv;
+    TokenTxWorker* worker;
+    QThread t;
 
     friend class TokenItemPriv;
 };

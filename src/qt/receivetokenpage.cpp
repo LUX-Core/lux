@@ -32,9 +32,16 @@ void ReceiveTokenPage::on_copyAddressClicked()
 void ReceiveTokenPage::createQRCode()
 {
     SendCoinsRecipient info;
-    info.address = m_address;
-    if(ReceiveRequestDialog::createQRCode(ui->lblQRCode, info))
+    if(!m_address.isEmpty())
     {
-        ui->lblQRCode->setScaledContents(true);
+        info.address = m_address;
+        if(ReceiveRequestDialog::createQRCode(ui->lblQRCode, info))
+        {
+            ui->lblQRCode->setScaledContents(true);
+        }
+    }
+    else
+    {
+        ui->lblQRCode->clear();
     }
 }

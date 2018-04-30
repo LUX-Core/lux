@@ -70,6 +70,10 @@ public:
         QRect tokenSymbolRect(decorationRect.right() + MARGIN, decorationRect.top(), SYMBOL_WIDTH, decorationSize / 2);
         painter->drawText(tokenSymbolRect, Qt::AlignLeft|Qt::AlignTop, clippedSymbol);
 
+        QFont font = option.font;
+        font.setBold(true);
+        painter->setFont(font);
+
         int amountWidth = (mainRect.width() - decorationRect.width() - 2 * MARGIN - tokenSymbolRect.width()- leftTopMargin);
         QRect tokenBalanceRect(tokenSymbolRect.right(), decorationRect.top(), amountWidth, decorationSize / 2);
         painter->drawText(tokenBalanceRect, Qt::AlignRight|Qt::AlignTop, tokenBalance);
@@ -183,9 +187,11 @@ void LSRToken::setModel(WalletModel *_model)
 
         // Set tokens model
         ui->tokensList->setModel(m_tokenModel);
+        connect(ui->tokensList->selectionModel(), SIGNAL(currentChanged(QModelIndex,QModelIndex)), this, SLOT(on_currentChanged(QModelIndex,QModelIndex)));
 
         // Set current token
         connect(m_tokenModel, SIGNAL(dataChanged(QModelIndex,QModelIndex,QVector<int>)), SLOT(on_dataChanged(QModelIndex,QModelIndex,QVector<int>)));
+        connect(m_tokenModel, SIGNAL(rowsInserted(QModelIndex,int,int)), this, SLOT(on_rowsInserted(QModelIndex,int,int)));
         if(m_tokenModel->rowCount() > 0)
         {
             QModelIndex currentToken(m_tokenModel->index(0, 0));
@@ -224,19 +230,28 @@ void LSRToken::on_currentTokenChanged(QModelIndex index)
 {
     if(m_tokenModel)
     {
-        m_selectedTokenHash = m_tokenModel->data(index, TokenItemModel::HashRole).toString();
-        std::string address = m_tokenModel->data(index, TokenItemModel::AddressRole).toString().toStdString();
-        std::string symbol = m_tokenModel->data(index, TokenItemModel::SymbolRole).toString().toStdString();
-        std::string sender = m_tokenModel->data(index, TokenItemModel::SenderRole).toString().toStdString();
-        int8_t decimals = m_tokenModel->data(index, TokenItemModel::DecimalsRole).toInt();
-        std::string balance = m_tokenModel->data(index, TokenItemModel::RawBalanceRole).toString().toStdString();
-        m_sendTokenPage->setTokenData(address, sender, symbol, decimals, balance);
-        m_receiveTokenPage->setAddress(QString::fromStdString(sender));
+        if(index.isValid())
+        {
+            m_selectedTokenHash = m_tokenModel->data(index, TokenItemModel::HashRole).toString();
+            std::string address = m_tokenModel->data(index, TokenItemModel::AddressRole).toString().toStdString();
+            std::string symbol = m_tokenModel->data(index, TokenItemModel::SymbolRole).toString().toStdString();
+            std::string sender = m_tokenModel->data(index, TokenItemModel::SenderRole).toString().toStdString();
+            int8_t decimals = m_tokenModel->data(index, TokenItemModel::DecimalsRole).toInt();
+            std::string balance = m_tokenModel->data(index, TokenItemModel::RawBalanceRole).toString().toStdString();
+            m_sendTokenPage->setTokenData(address, sender, symbol, decimals, balance);
+            m_receiveTokenPage->setAddress(QString::fromStdString(sender));
 
-        if(!m_sendTokenPage->isEnabled())
-            m_sendTokenPage->setEnabled(true);
-        if(!m_receiveTokenPage->isEnabled())
-            m_receiveTokenPage->setEnabled(true);
+            if(!m_sendTokenPage->isEnabled())
+                m_sendTokenPage->setEnabled(true);
+            if(!m_receiveTokenPage->isEnabled())
+                m_receiveTokenPage->setEnabled(true);
+        }
+        else
+        {
+            m_sendTokenPage->setEnabled(false);
+            m_receiveTokenPage->setEnabled(false);
+            m_receiveTokenPage->setAddress(QString::fromStdString(""));
+        }
     }
 }
 
@@ -253,6 +268,27 @@ void LSRToken::on_dataChanged(const QModelIndex &topLeft, const QModelIndex &bot
         {
             on_currentTokenChanged(topLeft);
         }
+    }
+}
+
+void LSRToken::on_currentChanged(QModelIndex current, QModelIndex previous)
+{
+    Q_UNUSED(previous);
+
+    on_currentTokenChanged(current);
+}
+
+void LSRToken::on_rowsInserted(QModelIndex index, int first, int last)
+{
+    Q_UNUSED(index);
+    Q_UNUSED(first);
+    Q_UNUSED(last);
+
+    if(m_tokenModel->rowCount() == 1)
+    {
+        QModelIndex currentToken(m_tokenModel->index(0, 0));
+        ui->tokensList->setCurrentIndex(currentToken);
+        on_currentTokenChanged(currentToken);
     }
 }
 

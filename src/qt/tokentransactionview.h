@@ -89,6 +89,7 @@ public Q_SLOTS:
     void changedPrefix(const QString &prefix);
     void changedAmount(const QString &amount);
     void addToNameWidget(const QModelIndex& parent, int start, int /*end*/);
+    void removeFromNameWidget(const QModelIndex& parent, int start, int);
     void refreshNameWidget();
 };
 
