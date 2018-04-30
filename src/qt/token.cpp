@@ -47,6 +47,8 @@ struct TokenData
     int evtBurn;
     std::vector<std::string> contractAddresses;
 
+    std::string txid;
+
     TokenData():
             call(0),
             send(0),
@@ -228,6 +230,11 @@ void Token::clear()
     setAmount("0");
     setGasPrice(FormatMoney(DEFAULT_GAS_PRICE));
     setGasLimit(std::to_string(DEFAULT_GAS_LIMIT_OP_SEND));
+}
+
+std::string Token::getTxId()
+{
+    return d->txid;
 }
 
 bool Token::name(std::string &result, bool sendTo)
@@ -493,6 +500,7 @@ bool Token::burnEvents(int fromBlock, int toBlock, std::vector<TokenEvent> &toke
 
 bool Token::exec(const std::vector<std::string> &input, int func, std::vector<std::string> &output, bool sendTo)
 {
+    d->txid = "";
     if(func == -1)
         return false;
     std::string strData;
@@ -530,6 +538,11 @@ bool Token::exec(const std::vector<std::string> &input, int func, std::vector<st
             std::vector<std::string> param = values[i];
             output.push_back(param.size() ? param[0] : "");
         }
+    }
+    else
+    {
+        QVariantMap variantMap = result.toMap();
+        d->txid = variantMap.value("txid").toString().toStdString();
     }
 
     return true;

@@ -13,12 +13,15 @@
 #include "consensus/validation.h"
 #include "stake.h"
 #include "net.h"
+#include "main.h"
 #include "script/script.h"
 #include "script/sign.h"
 #include "spork.h"
 #include "instantx.h"
 #include "timedata.h"
+#include "txmempool.h"
 #include "util.h"
+#include "ui_interface.h"
 #include "utilmoneystr.h"
 #include "script/interpreter.h"
 
@@ -3594,13 +3597,13 @@ bool CWallet::AddTokenEntry(const CTokenInfo &token, bool fFlushOnClose)
     return true;
 }
 
-bool CWallet::AddTokenTxEntry(const CTokenTx &token, bool fFlushOnClose)
+bool CWallet::AddTokenTxEntry(const CTokenTx &tokenTx, bool fFlushOnClose)
 {
     LOCK(cs_wallet);
 
     CWalletDB walletdb(strWalletFile, "r+", fFlushOnClose);
 
-    uint256 hash = token.GetHash();
+    uint256 hash = tokenTx.GetHash();
 
     bool fInsertedNew = true;
 
@@ -3611,15 +3614,14 @@ bool CWallet::AddTokenTxEntry(const CTokenTx &token, bool fFlushOnClose)
     }
 
     // Write to disk
-    CTokenTx wTokenTx(token);
-    if (!walletdb.WriteTokenTx(wTokenTx))
+    if (!walletdb.WriteTokenTx(tokenTx))
         return false;
 
-    mapTokenTx[hash] = wTokenTx;
+    mapTokenTx[hash] = tokenTx;
 
     NotifyTokenTransactionChanged(this, hash, fInsertedNew ? CT_NEW : CT_UPDATED);
 
-    LogPrintf("AddTokenTxEntry %s\n", wTokenTx.GetHash().ToString());
+    LogPrintf("AddTokenTxEntry %s\n", tokenTx.GetHash().ToString());
 
     return true;
 }

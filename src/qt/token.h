@@ -34,6 +34,9 @@ public:
     void setSender(const std::string &sender);
     void clear();
 
+    // Get transaction data
+    std::string getTxId();
+
     // ABI Functions
     bool name(std::string& result, bool sendTo = false);
     bool approve(const std::string& _spender, const std::string& _value, bool& success, bool sendTo = false);
