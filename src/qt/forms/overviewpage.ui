@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>960</width>
-    <height>615</height>
+    <height>617</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -23,7 +23,7 @@
    <item>
     <widget class="QLabel" name="labelAlerts">
      <property name="visible">
-      <bool>false</bool>
+      <bool>true</bool>
      </property>
      <property name="styleSheet">
       <string notr="true">background-color: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 0, stop:0 #F0D0A0, stop:1 #F8D488); color:#000000;</string>
@@ -1236,10 +1236,20 @@
         </widget>
        </item>
        <item>
-        <layout class="QVBoxLayout" name="horizontalLayout_3">
-         <property name="spacing">
-          <number>12</number>
+        <spacer name="verticalSpacer_4">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
          </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
          <item>
           <widget class="QLabel" name="labelTokens">
            <property name="font">
@@ -1249,10 +1259,27 @@
             </font>
            </property>
            <property name="text">
-            <string>    LSR Tokens</string>
+            <string>                             LSR Tokens</string>
            </property>
           </widget>
          </item>
+         <item>
+          <spacer name="horizontalSpacer_6">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QVBoxLayout" name="horizontalLayout_3">
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout_4">
            <property name="leftMargin">
@@ -1268,6 +1295,18 @@
              </property>
              <property name="styleSheet">
               <string notr="true">QListView { background: transparent; }</string>
+             </property>
+             <property name="frameShape">
+              <enum>QFrame::NoFrame</enum>
+             </property>
+             <property name="verticalScrollBarPolicy">
+              <enum>Qt::ScrollBarAlwaysOff</enum>
+             </property>
+             <property name="horizontalScrollBarPolicy">
+              <enum>Qt::ScrollBarAlwaysOff</enum>
+             </property>
+             <property name="selectionMode">
+              <enum>QAbstractItemView::NoSelection</enum>
              </property>
             </widget>
            </item>

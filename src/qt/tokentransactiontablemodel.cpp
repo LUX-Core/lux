@@ -419,6 +419,13 @@ QString TokenTransactionTableModel::formatTxAmount(const TokenTransactionRecord 
     return QString(str);
 }
 
+QString TokenTransactionTableModel::formatTxAmountWithUnit(const TokenTransactionRecord *wtx, bool showUnconfirmed, BitcoinUnits::SeparatorStyle separators) const
+{
+    QString unit = QString::fromStdString(wtx->tokenSymbol);
+    QString str = BitcoinUnits::formatTokenWithUnit(unit, wtx->decimals, wtx->credit + wtx->debit, false, separators);
+    return QString(str);
+}
+
 QVariant TokenTransactionTableModel::txStatusDecoration(const TokenTransactionRecord *wtx) const
 {
     switch(wtx->status.status)

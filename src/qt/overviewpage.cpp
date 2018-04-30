@@ -187,6 +187,9 @@ OverviewPage::OverviewPage(QWidget* parent) : QWidget(parent),
     connect(ui->listTransactions, SIGNAL(clicked(QModelIndex)), this, SLOT(handleTransactionClicked(QModelIndex)));
 
     ui->listTokens->setItemDelegate(tkndelegate);
+    ui->listTokens->setIconSize(QSize(DECORATION_SIZE, DECORATION_SIZE));
+    //ui->listTokens->setMinimumHeight(NUM_ITEMS * (DECORATION_SIZE + 2));
+    ui->listTokens->setAttribute(Qt::WA_MacShowFocusRect, false);
 
     // init "out of sync" warning labels
     ui->labelWalletStatus->setText("(" + tr("out of sync") + ")");

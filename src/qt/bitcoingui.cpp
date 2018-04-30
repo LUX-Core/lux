@@ -1144,6 +1144,21 @@ void BitcoinGUI::incomingTransaction(const QString& date, int unit, const CAmoun
 
     pwalletMain->fMultiSendNotify = false;
 }
+
+void BitcoinGUI::incomingTokenTransaction(const QString& date, const QString& amount, const QString& type, const QString& address, const QString& label)
+{
+    // On new transaction, make an info balloon
+    QString msg = tr("Date: %1\n").arg(date) +
+                  tr("Amount: %1\n").arg(amount) +
+                  tr("Type: %1\n").arg(type);
+    if (!label.isEmpty())
+        msg += tr("Label: %1\n").arg(label);
+    else if (!address.isEmpty())
+        msg += tr("Address: %1\n").arg(address);
+    message((amount)<0 ? tr("Sent transaction") : tr("Incoming transaction"),
+             msg, CClientUIInterface::MSG_INFORMATION);
+}
+
 #endif // ENABLE_WALLET
 
 void BitcoinGUI::dragEnterEvent(QDragEnterEvent* event)
