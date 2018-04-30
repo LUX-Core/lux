@@ -544,6 +544,10 @@ public:
 
     bool GetTokenTxDetails(const CTokenTx &wtx, uint256& credit, uint256& debit, std::string& tokenSymbol, uint8_t& decimals) const;
 
+    bool IsTokenTxMine(const CTokenTx &wtx) const;
+
+    bool RemoveTokenEntry(const uint256& tokenHash, bool fFlushOnClose=true);
+
     static CFeeRate minTxFee;
     static CAmount GetMinimumFee(unsigned int nTxBytes, unsigned int nConfirmTarget, const CTxMemPool& pool);
 

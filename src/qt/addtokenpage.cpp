@@ -55,12 +55,6 @@ void AddTokenPage::setClientModel(ClientModel *clientModel)
     }
 }
 
-bool AddTokenPage::isValidSenderAddress()
-{
-    ((QValidatedLineEdit*)ui->lineEditSenderAddress->lineEdit())->checkValidity();
-    return ((QValidatedLineEdit*)ui->lineEditSenderAddress->lineEdit())->isValid();
-}
-
 void AddTokenPage::clearAll()
 {
     ui->lineEditContractAddress->setText("");
@@ -82,7 +76,7 @@ void AddTokenPage::on_clearButton_clicked()
 
 void AddTokenPage::on_confirmButton_clicked()
 {
-    if(isValidSenderAddress())
+    if(ui->lineEditSenderAddress->isValidAddress())
     {
         CTokenInfo tokenInfo;
         tokenInfo.strContractAddress = ui->lineEditContractAddress->text().toStdString();

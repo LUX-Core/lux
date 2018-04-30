@@ -118,13 +118,23 @@ public:
     {
         painter->save();
 
-        QString tokenName = index.data(TokenItemModel::NameRole).toString();
+        QIcon tokenIcon/*(":/icons/token")*/;
+        QString tokenName = index.data(TokenItemModel::NameRole).toString() + ":";
         QString tokenBalance = index.data(TokenItemModel::BalanceRole).toString();
         QString tokenSymbol = index.data(TokenItemModel::SymbolRole).toString();
         tokenBalance.append(" " + tokenSymbol);
+        QString receiveAddress = index.data(TokenItemModel::SenderRole).toString();
 
         QRect mainRect = option.rect;
         mainRect.setWidth(option.rect.width());
+
+        QColor rowColor = index.row() % 2 ? QColor("#ededed") : QColor("#e3e3e3");
+        painter->fillRect(mainRect, rowColor);
+
+        int decorationSize = TOKEN_SIZE - 20;
+        int leftTopMargin = 10;
+        QRect decorationRect(mainRect.topLeft() + QPoint(leftTopMargin, leftTopMargin), QSize(decorationSize, decorationSize));
+        tokenIcon.paint(painter, decorationRect);
 
         QFont font = option.font;
 
@@ -136,11 +146,19 @@ public:
         QFontMetrics fmBalance(font);
         int balanceWidth = fmBalance.width(balanceString);
 
-        QRect nameRect(mainRect.topLeft(), QSize(NAME_WIDTH, TOKEN_SIZE));
+        QRect nameRect(decorationRect.right() + MARGIN, decorationRect.top(), NAME_WIDTH, decorationSize / 2);
         painter->drawText(nameRect, Qt::AlignLeft|Qt::AlignVCenter, clippedName);
 
-        QRect tokenBalanceRect(nameRect.right() + MARGIN, mainRect.top(), balanceWidth, TOKEN_SIZE);
+        font.setBold(true);
+        painter->setFont(font);
+        QRect tokenBalanceRect(nameRect.right() + MARGIN, decorationRect.top(), balanceWidth, decorationSize / 2);
         painter->drawText(tokenBalanceRect, Qt::AlignLeft|Qt::AlignVCenter, tokenBalance);
+
+        QFont addressFont = option.font;
+        addressFont.setPixelSize(addressFont.pixelSize() * 0.9);
+        painter->setFont(addressFont);
+        QRect receiveAddressRect(decorationRect.right() + MARGIN, nameRect.bottom(), mainRect.width() - decorationSize, decorationSize / 2);
+        painter->drawText(receiveAddressRect, Qt::AlignLeft|Qt::AlignBottom, receiveAddress);
 
         painter->restore();
     }
@@ -148,13 +166,14 @@ public:
     QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
     {
         QFont font = option.font;
+        font.setBold(true);
 
         QString balanceString = index.data(TokenItemModel::BalanceRole).toString();
         balanceString.append(" " + index.data(TokenItemModel::SymbolRole).toString());
         QFontMetrics fm(font);
         int balanceWidth = fm.width(balanceString);
 
-        int width = NAME_WIDTH + balanceWidth + MARGIN;
+        int width = TOKEN_SIZE - 10 + NAME_WIDTH + balanceWidth + 2*MARGIN;
         return QSize(width, TOKEN_SIZE);
     }
 };

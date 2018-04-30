@@ -20,7 +20,6 @@ public:
     void clearAll();
     void setModel(WalletModel *_model);
     void setClientModel(ClientModel *clientModel);
-    bool isValidSenderAddress();
 
 private Q_SLOTS:
             void on_clearButton_clicked();

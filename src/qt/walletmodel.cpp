@@ -773,3 +773,7 @@ bool WalletModel::existTokenEntry(const CTokenInfo &token)
     return it != wallet->mapToken.end();
 }
 
+bool WalletModel::removeTokenEntry(const std::string &sHash)
+{
+    return wallet->RemoveTokenEntry(uint256S(sHash), true);
+}

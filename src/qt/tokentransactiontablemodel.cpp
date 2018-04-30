@@ -672,6 +672,11 @@ static void NotifyTokenTransactionChanged(TokenTransactionTableModel *ttm, CWall
     // Determine whether to show transaction or not (determine this here so that no relocking is needed in GUI thread)
     bool showTransaction = mi != wallet->mapTokenTx.end();
 
+    if(showTransaction)
+    {
+        showTransaction = wallet->IsTokenTxMine(mi->second);
+    }
+
     TokenTransactionNotification notification(hash, status, showTransaction);
 
     if (fQueueNotifications)

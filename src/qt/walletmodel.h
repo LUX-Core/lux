@@ -159,6 +159,8 @@ public:
 
     bool existTokenEntry(const CTokenInfo& token);
 
+    bool removeTokenEntry(const std::string& sHash);
+
     // Check address for validity
     bool validateAddress(const QString& address);
 

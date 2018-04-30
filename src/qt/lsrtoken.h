@@ -43,6 +43,7 @@ public Q_SLOTS:
     void copyTokenBalance();
     void copyTokenName();
     void copySenderAddress();
+    void removeToken();
 
 private:
     Ui::LSRToken *ui;
