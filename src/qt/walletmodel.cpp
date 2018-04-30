@@ -612,6 +612,7 @@ WalletModel::UnlockContext::UnlockContext(WalletModel* wallet, bool valid, bool 
 {
     if(!relock)
     {
+        // TODO: require wallet unlock for token staking
     }
 }
 

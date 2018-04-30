@@ -100,6 +100,7 @@ private:
     QVariant txAddressDecoration(const TokenTransactionRecord *wtx) const;
 
 public Q_SLOTS:
+    void emitDataChanged(int index);
     /* New transaction, or transaction changed status */
     void updateTransaction(const QString &hash, int status, bool showTransaction);
     void updateConfirmations();

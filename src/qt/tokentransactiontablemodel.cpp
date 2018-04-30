@@ -161,8 +161,35 @@ public:
             parent->endRemoveRows();
             break;
         case CT_UPDATED:
-            // Miscellaneous updates -- nothing to do, status update will take care of this, and is only computed for
-            // visible transactions.
+                if(!inModel)
+                {
+                    qWarning() << "TokenTransactionTablePriv::updateWallet: Warning: Got CT_UPDATED, but entry is not in model";
+                    break;
+                }
+                if(showTransaction)
+                {
+                    LOCK2(cs_main, wallet->cs_wallet);
+                    // Find transaction in wallet
+                    std::map<uint256, CTokenTx>::iterator mi = wallet->mapTokenTx.find(hash);
+                    if(mi == wallet->mapTokenTx.end())
+                    {
+                        qWarning() << "TokenTransactionTablePriv::updateWallet: Warning: Got CT_UPDATED, but transaction is not in wallet";
+                        break;
+                    }
+                    // Updated -- update at the right position
+                    QList<TokenTransactionRecord> toUpdate =
+                            TokenTransactionRecord::decomposeTransaction(wallet, mi->second);
+                    if(!toUpdate.isEmpty()) /* only if something to insert */
+                    {
+                        int update_idx = lowerIndex;
+                        Q_FOREACH(const TokenTransactionRecord &rec, toUpdate)
+                        {
+                            cachedWallet[update_idx] = rec;
+                            parent->emitDataChanged(update_idx);
+                            update_idx += 1;
+                        }
+                    }
+                }
             break;
         }
     }
@@ -637,6 +664,11 @@ QModelIndex TokenTransactionTableModel::index(int row, int column, const QModelI
         return createIndex(row, column, priv->index(row));
     }
     return QModelIndex();
+}
+
+void TokenTransactionTableModel::emitDataChanged(int idx)
+{
+    Q_EMIT dataChanged(index(idx, 0, QModelIndex()), index(idx, columns.length()-1, QModelIndex()));
 }
 
 // queue notifications to show a non freezing progress dialog e.g. for rescan
