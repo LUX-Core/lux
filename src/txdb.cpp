@@ -228,6 +228,10 @@ bool CBlockTreeDB::LoadBlockIndexGuts()
 
     CBlockIndex* pindexPrev = nullptr;
 
+    int nDiscarded = 0;
+    int nFirstDiscarded = INT_MAX;
+    CLevelDBBatch batch;
+
     // Load mapBlockIndex
     while (pcursor->Valid()) {
         boost::this_thread::interruption_point();
@@ -258,7 +262,7 @@ bool CBlockTreeDB::LoadBlockIndexGuts()
                 pindexNew->nStatus = diskindex.nStatus;
                 pindexNew->nTx = diskindex.nTx;
 
-                //Proof Of Stake
+                // Proof Of Stake
                 pindexNew->nMint = diskindex.nMint;
                 pindexNew->nMoneySupply = diskindex.nMoneySupply;
                 pindexNew->nFlags = diskindex.nFlags;
@@ -267,25 +271,24 @@ bool CBlockTreeDB::LoadBlockIndexGuts()
                 pindexNew->nStakeTime = diskindex.nStakeTime;
                 pindexNew->hashProofOfStake = diskindex.hashProofOfStake;
 
-                if (pindexNew->IsProofOfWork() && pindexNew->nHeight <= Params().LAST_POW_BLOCK()) {
+                bool isPoW = (diskindex.nNonce != 0) && pindexNew->nHeight <= Params().LAST_POW_BLOCK();
+                if (isPoW) {
                     auto const &hash(pindexNew->GetBlockHash());
                     if (!CheckProofOfWork(hash, pindexNew->nBits, Params().GetConsensus())) {
                         unsigned int nBits = pindexPrev ? pindexPrev->nBits : 0;
-#                       if 0
-                        LogPrint("debug", "%s: CheckProofOfWork failed: %d %s (%d, %d)\n", __func__, pindexNew->nHeight, hash.GetHex(), pindexNew->nBits, nBits);
-#                       else
                         return error("%s: CheckProofOfWork failed: %d %s (%d, %d)", __func__, pindexNew->nHeight, hash.GetHex(), pindexNew->nBits, nBits);
-#                       endif
                     }
-                }
-
-                // ppcoin: build setStakeSeen
-                if (pindexNew->IsProofOfStake()) {
+                } else {
                     stake->MarkStake(pindexNew->prevoutStake, pindexNew->nStakeTime);
                     auto const &hash(pindexNew->GetBlockHash());
                     uint256 proof;
                     if (pindexNew->hashProofOfStake == 0) {
-                        return error("%s: zero stake (block %s)", __func__, hash.GetHex());
+                        LogPrint("debug", "skip invalid indexed orphan block %d %s with empty data\n", pindexNew->nHeight, hash.GetHex());
+                        nDiscarded++;
+                        nFirstDiscarded = diskindex.nHeight < nFirstDiscarded ? diskindex.nHeight : nFirstDiscarded;
+                        batch.Erase(make_pair('b', hash));
+                        pcursor->Next();
+                        continue;
                     } else if (stake->GetProof(hash, proof)) {
                         if (proof != pindexNew->hashProofOfStake)
                             return error("%s: diverged stake %s, %s (block %s)\n", __func__, 
@@ -302,6 +305,14 @@ bool CBlockTreeDB::LoadBlockIndexGuts()
             }
         } catch (std::exception& e) {
             return error("%s : Deserialize or I/O error - %s", __func__, e.what());
+        }
+    }
+
+    if (nDiscarded) {
+        if (WriteBatch(batch)) {
+            LogPrintf("pruned %d orphaned blocks from disk index\n", nDiscarded);
+        } else {
+            return error("%d invalid blocks in disk index, restart with -reindex is required! (first was %d)\n", nDiscarded, nFirstDiscarded);
         }
     }
 
