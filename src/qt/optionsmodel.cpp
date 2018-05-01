@@ -84,6 +84,10 @@ void OptionsModel::Init()
     if (!settings.contains("fShowMasternodesTab"))
         settings.setValue("fShowMasternodesTab", masternodeConfig.getCount());
 
+    if (!settings.contains("fparallelMasterNode"))
+        settings.setValue("fparallelMasterNode", false);
+    fparallelMasterNode = settings.value("fparallelMasterNode", false).toBool();
+
     // These are shared with the core or have a command-line parameter
     // and we want command-line parameters to overwrite the GUI settings.
     //
@@ -226,6 +230,10 @@ QVariant OptionsModel::data(const QModelIndex& index, int role) const
             return settings.value("language");
         case CoinControlFeatures:
             return fCoinControlFeatures;
+        case showMasternodesTab:
+             return fshowMasternodesTab;
+         case parallelMasterNode:
+              return fparallelMasterNode;
         case DatabaseCache:
             return settings.value("nDatabaseCache");
         case LogEvents:
@@ -354,6 +362,17 @@ bool OptionsModel::setData(const QModelIndex& index, const QVariant& value, int 
             settings.setValue("fCoinControlFeatures", fCoinControlFeatures);
             emit coinControlFeaturesChanged(fCoinControlFeatures);
             break;
+        case showMasternodesTab:
+            fshowMasternodesTab = value.toBool();
+            settings.setValue("fshowMasternodesTab", fshowMasternodesTab);
+            emit showMasternodesTabChanged(fshowMasternodesTab);
+             break;
+         case parallelMasterNode:
+             fparallelMasterNode = value.toBool();
+             settings.setValue("fparallelMasterNode", fparallelMasterNode);
+             emit parallelMasterNodeChanged(fparallelMasterNode);
+             break;
+
         case DatabaseCache:
             if (settings.value("nDatabaseCache") != value) {
                 settings.setValue("nDatabaseCache", value);

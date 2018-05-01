@@ -52,6 +52,9 @@
 #include <QThread>
 #include <QTimer>
 #include <QTranslator>
+#include <QSslConfiguration>
+#include <QFile>
+#include <QProcess>
 
 #if defined(QT_STATICPLUGIN)
 #include <QtPlugin>
@@ -224,6 +227,8 @@ public:
     /// Get window identifier of QMainWindow (BitcoinGUI)
     WId getMainWinId() const;
 
+    void restoreWallet();
+
 public slots:
     void initializeResult(int retval);
     void shutdownResult(int retval);
@@ -250,6 +255,9 @@ private:
     int returnValue;
 
     void startThread();
+
+    QString restorePath;
+    QString restoreParam;
 };
 
 #include "lux.moc"
@@ -362,6 +370,7 @@ BitcoinApplication::~BitcoinApplication()
     }
     delete optionsModel;
     optionsModel = 0;
+
 }
 
 #ifdef ENABLE_WALLET
@@ -433,6 +442,8 @@ void BitcoinApplication::requestShutdown()
     pollShutdownTimer->stop();
 
 #ifdef ENABLE_WALLET
+    restoreParam= walletModel->getRestoreParam();
+    restorePath = walletModel->getRestorePath();
     window->removeAllWallets();
     delete walletModel;
     walletModel = 0;
@@ -515,6 +526,39 @@ WId BitcoinApplication::getMainWinId() const
         return 0;
 
     return window->winId();
+}
+
+void BitcoinApplication::restoreWallet()
+{
+#ifdef ENABLE_WALLET
+    // Restart the wallet if needed
+    if(!restorePath.isEmpty())
+    {
+        // Create command line
+        QString commandLine;
+        QStringList arg = arguments();
+        if(!arg.contains(restoreParam))
+        {
+            arg.append(restoreParam);
+        }
+        commandLine = arg.join(' ');
+
+        // Copy the new wallet.dat to the data folder
+        boost::filesystem::path path = GetDataDir() / "wallet.dat";
+        QString pathWallet = QString::fromStdString(path.string());
+        QFile::remove(pathWallet);
+        if(QFile::copy(restorePath, pathWallet))
+        {
+            // Unlock the data folder
+            UnlockDataDirectory();
+            QThread::currentThread()->sleep(2);
+
+            // Create new process and start the wallet
+            QProcess *process = new QProcess();
+            process->start(commandLine);
+        }
+    }
+#endif
 }
 
 #ifndef BITCOIN_QT_TEST
@@ -681,6 +725,7 @@ int main(int argc, char* argv[])
         PrintExceptionContinue(NULL, "Runaway exception");
         app.handleRunawayException(QString::fromStdString(strMiscWarning));
     }
+    app.restoreWallet();
     return app.getReturnValue();
 }
 #endif // BITCOIN_QT_TEST

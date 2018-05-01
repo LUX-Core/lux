@@ -3883,8 +3883,8 @@ https://www.transifex.com/lux-project/lux-project-translations</translation>
         <translation>Backup Wallet</translation>
     </message>
     <message>
-        <source>Wallet Data (*.dat)</source>
-        <translation>Wallet Data (*.dat)</translation>
+        <source>Wallet (*.dat)</source>
+        <translation>Wallet (*.dat)</translation>
     </message>
     <message>
         <source>Backup Failed</source>

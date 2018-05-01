@@ -26,12 +26,18 @@
 #include "wallet.h"
 #include "walletdb.h" // for BackupWallet
 #include <stdint.h>
+#include "timedata.h"
+#include "util.h"
+
+#include <stdint.h>
 
 #include <QDebug>
 #include <QSet>
 #include <QTimer>
+#include <QFile>
+
 #include <boost/foreach.hpp>
-using namespace std;
+#include <boost/filesystem.hpp>
 
 WalletModel::WalletModel(CWallet* wallet, OptionsModel* optionsModel, QObject* parent) : QObject(parent), wallet(wallet), optionsModel(optionsModel), addressTableModel(0),
                                                                                          contractTableModel(0),
@@ -492,6 +498,23 @@ bool WalletModel::backupWallet(const QString& filename)
     return BackupWallet(*wallet, filename.toLocal8Bit().data());
 }
 
+bool WalletModel::restoreWallet(const QString &filename, const QString &param)
+{
+    if(QFile::exists(filename))
+    {
+        boost::filesystem::path pathWalletBak = GetDataDir() / strprintf("wallet.%d.bak", GetTime());
+        QString walletBak = QString::fromStdString(pathWalletBak.string());
+        if(backupWallet(walletBak))
+        {
+            restorePath = filename;
+            restoreParam = param;
+            return true;
+        }
+    }
+
+    return false;
+}
+
 // Handlers for core signals
 static void NotifyKeyStoreStatusChanged(WalletModel* walletmodel, CCryptoKeyStore* wallet)
 {
@@ -580,6 +603,7 @@ void WalletModel::unsubscribeFromCoreSignals()
     wallet->NotifyTransactionChanged.disconnect(boost::bind(NotifyTransactionChanged, this, _1, _2, _3));
     wallet->ShowProgress.disconnect(boost::bind(ShowProgress, this, _1, _2));
     wallet->NotifyWatchonlyChanged.disconnect(boost::bind(NotifyWatchonlyChanged, this, _1));
+    wallet->NotifyContractBookChanged.disconnect(boost::bind(NotifyContractBookChanged, this, _1, _2, _3, _4, _5));
     wallet->NotifyContractBookChanged.disconnect(boost::bind(NotifyContractBookChanged, this, _1, _2, _3, _4, _5));
 }
 
@@ -790,3 +814,14 @@ bool WalletModel::removeTokenEntry(const std::string &sHash)
 {
     return wallet->RemoveTokenEntry(uint256S(sHash), true);
 }
+
+QString WalletModel::getRestorePath()
+{
+    return restorePath;
+}
+
+QString WalletModel::getRestoreParam()
+{
+    return restoreParam;
+}
+

@@ -2330,7 +2330,7 @@ Adresse: %4</translation>
         <translation>Wallet sichern</translation>
     </message>
     <message>
-        <source>Wallet Data (*.dat)</source>
+        <source>Wallet (*.dat)</source>
         <translation>Wallet-Daten (*.dat)</translation>
     </message>
     <message>

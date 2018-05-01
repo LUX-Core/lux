@@ -184,7 +184,9 @@ public:
     // Is wallet unlocked for anonymization only?
     bool isAnonymizeOnlyUnlocked();
     // Wallet backup
-    bool backupWallet(const QString& filename);
+    bool backupWallet(const QString &filename);
+    // Restore backup
+    bool restoreWallet(const QString &filename, const QString &param);
 
     // RAI object for unlocking wallet, returned by requestUnlock()
     class UnlockContext
@@ -227,6 +229,9 @@ public:
     void loadReceiveRequests(std::vector<std::string>& vReceiveRequests);
     bool saveReceiveRequest(const std::string& sAddress, const int64_t nId, const std::string& sRequest);
 
+    QString getRestorePath();
+    QString getRestoreParam();
+
 private:
     CWallet* wallet;
     bool fHaveWatchOnly;
@@ -257,6 +262,9 @@ private:
     int cachedDarksendRounds;
 
     QTimer* pollTimer;
+
+    QString restorePath;
+    QString restoreParam;
 
     void subscribeToCoreSignals();
     void unsubscribeFromCoreSignals();

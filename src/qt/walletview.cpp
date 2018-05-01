@@ -27,6 +27,8 @@
 #include "createcontract.h"
 #include "callcontract.h"
 #include "sendtocontract.h"
+#include "lsrtoken.h"
+#include "restoredialog.h"
 
 #include "ui_interface.h"
 
@@ -384,7 +386,7 @@ void WalletView::backupWallet()
 {
     QString filename = GUIUtil::getSaveFileName(this,
         tr("Backup Wallet"), QString(),
-        tr("Wallet Data (*.dat)"), NULL);
+        tr("Wallet (*.dat)"), NULL);
 
     if (filename.isEmpty())
         return;
@@ -396,6 +398,13 @@ void WalletView::backupWallet()
         emit message(tr("Backup Successful"), tr("The wallet data was successfully saved to %1.").arg(filename),
             CClientUIInterface::MSG_INFORMATION);
     }
+}
+
+void WalletView::restoreWallet()
+{
+    RestoreDialog dlg(this);
+    dlg.setModel(walletModel);
+    dlg.exec();
 }
 
 void WalletView::changePassphrase()
