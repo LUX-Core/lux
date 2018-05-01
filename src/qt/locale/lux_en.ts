@@ -4985,8 +4985,8 @@ https://www.transifex.com/lux-project/lux-project-translations</source>
     </message>
     <message>
         <location line="+1"/>
-        <source>Wallet Data (*.dat)</source>
-        <translation>Wallet Data (*.dat)</translation>
+        <source>Wallet (*.dat)</source>
+        <translation>Wallet (*.dat)</translation>
     </message>
     <message>
         <location line="+6"/>

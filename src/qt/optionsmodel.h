@@ -40,6 +40,8 @@ public:
         Theme,               // QString
         Language,            // QString
         CoinControlFeatures, // bool
+        showMasternodesTab, // bool
+        parallelMasterNode, // bool
         ThreadsScriptVerif,  // int
         DatabaseCache,       // int
         SpendZeroConfChange, // bool
@@ -66,6 +68,8 @@ public:
     QString getThirdPartyTxUrls() { return strThirdPartyTxUrls; }
     bool getProxySettings(QNetworkProxy& proxy) const;
     bool getCoinControlFeatures() { return fCoinControlFeatures; }
+    bool getshowMasternodesTab() { return fshowMasternodesTab; }
+    bool getparallelMasterNode() { return fparallelMasterNode; }
     const QString& getOverriddenByCommandLine() { return strOverriddenByCommandLine; }
 
     /* Restart flag helper */
@@ -81,6 +85,8 @@ private:
     int nDisplayUnit;
     QString strThirdPartyTxUrls;
     bool fCoinControlFeatures;
+    bool fshowMasternodesTab;
+    bool fparallelMasterNode;
     /* settings that were overriden by command-line */
     QString strOverriddenByCommandLine;
 
@@ -92,6 +98,8 @@ signals:
     void darksendRoundsChanged(int);
     void anonymizeLuxAmountChanged(int);
     void coinControlFeaturesChanged(bool);
+    void showMasternodesTabChanged(bool);
+    void parallelMasterNodeChanged(bool);
 };
 
 #endif // BITCOIN_QT_OPTIONSMODEL_H

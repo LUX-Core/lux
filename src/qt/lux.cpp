@@ -52,6 +52,9 @@
 #include <QThread>
 #include <QTimer>
 #include <QTranslator>
+#include <QSslConfiguration>
+#include <QFile>
+#include <QProcess>
 
 #if defined(QT_STATICPLUGIN)
 #include <QtPlugin>
@@ -224,7 +227,7 @@ public:
     /// Get window identifier of QMainWindow (BitcoinGUI)
     WId getMainWinId() const;
 
-    //void restoreWallet();
+    void restoreWallet();
 
 public slots:
     void initializeResult(int retval);
@@ -253,8 +256,8 @@ private:
 
     void startThread();
 
-   // QString restorePath;
-   // QString restoreParam;
+    QString restorePath;
+    QString restoreParam;
 };
 
 #include "lux.moc"
@@ -368,7 +371,6 @@ BitcoinApplication::~BitcoinApplication()
     }
     delete optionsModel;
     optionsModel = 0;
-
 }
 
 #ifdef ENABLE_WALLET
@@ -440,14 +442,11 @@ void BitcoinApplication::requestShutdown()
     pollShutdownTimer->stop();
 
 #ifdef ENABLE_WALLET
-    if (walletModel)
-    {
-       // restoreParam= walletModel->getRestoreParam();
-       // restorePath = walletModel->getRestorePath();
-        window->removeAllWallets();
-        delete walletModel;
-        walletModel = 0;
-    }
+    restoreParam= walletModel->getRestoreParam();
+    restorePath = walletModel->getRestorePath();
+    window->removeAllWallets();
+    delete walletModel;
+    walletModel = 0;
 #endif
     delete clientModel;
     clientModel = 0;
@@ -528,7 +527,7 @@ WId BitcoinApplication::getMainWinId() const
 
     return window->winId();
 }
-/*
+
 void BitcoinApplication::restoreWallet()
 {
 #ifdef ENABLE_WALLET
@@ -561,7 +560,7 @@ void BitcoinApplication::restoreWallet()
     }
 #endif
 }
-*/
+
 #ifndef BITCOIN_QT_TEST
 int main(int argc, char* argv[])
 {
@@ -619,9 +618,6 @@ int main(int argc, char* argv[])
         help.showOrPrint();
         return 1;
     }
-
-    // Show End User License agreement window
-    Eula::showDialog();
 
     /// 5. Now that settings and translations are available, ask user for data directory
     // User language is set up: pick a data directory
@@ -729,7 +725,7 @@ int main(int argc, char* argv[])
         PrintExceptionContinue(NULL, "Runaway exception");
         app.handleRunawayException(QString::fromStdString(strMiscWarning));
     }
-    //app.restoreWallet();
+    app.restoreWallet();
     return app.getReturnValue();
 }
 #endif // BITCOIN_QT_TEST

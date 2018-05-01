@@ -111,6 +111,7 @@ private:
     QAction* toggleHideAction;
     QAction* encryptWalletAction;
     QAction* backupWalletAction;
+    QAction *restoreWalletAction;
     QAction* changePassphraseAction;
     QAction* unlockWalletAction;
     QAction* lockWalletAction;
