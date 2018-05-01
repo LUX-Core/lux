@@ -35,6 +35,7 @@ QT_FORMS_UI = \
   qt/forms/editcontractinfodialog.ui \
   qt/forms/helpmessagedialog.ui \
   qt/forms/intro.ui \
+  qt/forms/eula.ui \
   qt/forms/masternodemanager.ui \
   qt/forms/addeditluxnode.ui \
   qt/forms/lsrtoken.ui \
@@ -90,6 +91,7 @@ QT_MOC_CPP = \
   qt/moc_editcontractinfodialog.cpp \
   qt/moc_guiutil.cpp \
   qt/moc_intro.cpp \
+  qt/moc_eula.cpp \
   qt/moc_macdockiconhandler.cpp \
   qt/moc_macnotificationhandler.cpp \
   qt/moc_masternodemanager.cpp \
@@ -150,6 +152,7 @@ QT_MOC = \
   qt/lux.moc \
   qt/bitcoinamountfield.moc \
   qt/intro.moc \
+  qt/eula.moc \
   qt/tokenamountfield.moc \
   qt/tokenitemmodel.moc \
   qt/overviewpage.moc \
@@ -201,6 +204,7 @@ BITCOIN_QT_H = \
   qt/guiconstants.h \
   qt/guiutil.h \
   qt/intro.h \
+  qt/eula.h \
   qt/macdockiconhandler.h \
   qt/macnotificationhandler.h \
   qt/masternodemanager.h \
@@ -333,6 +337,7 @@ BITCOIN_QT_CPP = \
   qt/csvmodelwriter.cpp \
   qt/guiutil.cpp \
   qt/intro.cpp \
+  qt/eula.cpp \
   qt/masternodemanager.cpp \
   qt/addeditluxnode.cpp \
   qt/luxnodeconfigdialog.cpp \
