@@ -131,6 +131,10 @@ void OptionsModel::Init()
     if (!SoftSetBoolArg("-listen", settings.value("fListen").toBool()))
         addOverriddenOption("-listen");
 
+    if (!settings.contains("fNotUseChangeAddress"))
+        settings.setValue("fNotUseChangeAddress", DEFAULT_NOT_USE_CHANGE_ADDRESS);
+        fNotUseChangeAddress = settings.value("fNotUseChangeAddress").toBool();
+
     if (!settings.contains("fUseProxy"))
         settings.setValue("fUseProxy", false);
     if (!settings.contains("addrProxy"))
@@ -246,6 +250,8 @@ QVariant OptionsModel::data(const QModelIndex& index, int role) const
             return QVariant(nAnonymizeLuxAmount);
         case Listen:
             return settings.value("fListen");
+        case NotUseChangeAddress:
+            return settings.value("fNotUseChangeAddress");
         default:
             return QVariant();
         }
@@ -395,6 +401,12 @@ bool OptionsModel::setData(const QModelIndex& index, const QVariant& value, int 
             if (settings.value("fListen") != value) {
                 settings.setValue("fListen", value);
                 setRestartRequired(true);
+            }
+            break;
+        case NotUseChangeAddress:
+             if (settings.value("fNotUseChangeAddress") != value) {
+                 settings.setValue("fNotUseChangeAddress", value);
+                 fNotUseChangeAddress = value.toBool();
             }
             break;
         default:

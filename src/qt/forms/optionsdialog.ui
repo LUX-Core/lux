@@ -272,6 +272,13 @@
             </property>
            </widget>
           </item>
+             <item>
+                 <widget class="QCheckBox" name="notUseChangeAddress">
+                     <property name="text">
+                         <string>Don't use change &amp;address</string>
+                     </property>
+                 </widget>
+             </item>
          </layout>
         </widget>
        </item>

@@ -20,6 +20,8 @@ namespace Token_NS
     static const QString PARAM_GASLIMIT = "gaslimit";
     static const QString PARAM_GASPRICE = "gasprice";
     static const QString PARAM_SENDER = "sender";
+    static const QString PARAM_BROADCAST = "broadcast";
+    static const QString PARAM_CHANGE_TO_SENDER = "changeToSender";
 }
 using namespace Token_NS;
 
@@ -116,6 +118,8 @@ Token::Token():
     lstOptional.append(PARAM_GASLIMIT);
     lstOptional.append(PARAM_GASPRICE);
     lstOptional.append(PARAM_SENDER);
+    lstOptional.append(PARAM_BROADCAST);
+    lstOptional.append(PARAM_CHANGE_TO_SENDER);
     d->send = new ExecRPCCommand(PRC_SENDTO, lstMandatory, lstOptional, QMap<QString, QString>());
     d->eventLog = new EventLog();
 
@@ -242,6 +246,9 @@ void Token::clear()
     setAmount("0");
     setGasPrice(FormatMoney(DEFAULT_GAS_PRICE));
     setGasLimit(std::to_string(DEFAULT_GAS_LIMIT_OP_SEND));
+
+    d->lstParams[PARAM_BROADCAST] = "true";
+    d->lstParams[PARAM_CHANGE_TO_SENDER] = "true";
 }
 
 std::string Token::getTxId()

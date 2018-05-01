@@ -42,6 +42,20 @@ public:
     virtual void close() = 0;
 };
 
+class JSONRPCRequest
+{
+public:
+    UniValue id;
+    std::string strMethod;
+    UniValue params;
+    bool fHelp;
+    std::string URI;
+    std::string authUser;
+
+    JSONRPCRequest() { id = NullUniValue; params = NullUniValue; fHelp = false; }
+    void parse(const UniValue& valRequest);
+};
+
 /** Start RPC threads */
 void StartRPCThreads();
 /**
@@ -55,8 +69,13 @@ void StopRPCThreads();
 /** Query whether RPC is running */
 bool IsRPCRunning();
 
+
+
+
+
 /** 
- * Set the RPC warmup status.  When this is done, all RPC calls will error out
+ * Set
+ * the RPC warmup status.  When this is done, all RPC calls will error out
  * immediately with RPC_IN_WARMUP.
  */
 void SetRPCWarmupStatus(const std::string& newStatus);

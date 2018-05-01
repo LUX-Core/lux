@@ -49,6 +49,7 @@ public:
         DarksendRounds,      // int
         AnonymizeLuxAmount,  //int
         ShowMasternodesTab,  // bool
+        NotUseChangeAddress,  // bool
         Listen,              // bool
         OptionIDRowCount,
     };

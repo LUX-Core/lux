@@ -832,6 +832,8 @@ void RPCRunLater(const std::string& name, boost::function<void(void)> func, int6
 }
 
 class JSONRequest
+
+
 {
 public:
     UniValue id;
@@ -841,6 +843,7 @@ public:
     JSONRequest() { id = NullUniValue; }
     void parse(const UniValue& valRequest);
 };
+
 
 void JSONRequest::parse(const UniValue& valRequest)
 {

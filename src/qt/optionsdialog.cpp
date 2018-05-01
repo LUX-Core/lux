@@ -191,7 +191,7 @@ void OptionsDialog::setMapper()
     mapper->addMapping(ui->coinControlFeatures, OptionsModel::CoinControlFeatures);
     mapper->addMapping(ui->showMasternodesTab, OptionsModel::showMasternodesTab);
     mapper->addMapping(ui->parallelMasterNode, OptionsModel::parallelMasterNode);
-
+    mapper->addMapping(ui->notUseChangeAddress, OptionsModel::NotUseChangeAddress);
 
     /* Network */
     mapper->addMapping(ui->mapPortUpnp, OptionsModel::MapPortUPnP);
