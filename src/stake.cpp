@@ -876,11 +876,15 @@ bool Stake::CreateCoinStake(CWallet *wallet, const CKeyStore& keystore, unsigned
     }
 
     // Sign
-    i = 0;
+    int nIn = 0;
     for (const CWalletTx* pcoin : vCoins) {
-        if (!SignSignature(*wallet, *pcoin, txNew, i++)) {
-            return error("%s: failed to sign coinstake (%d)", __func__, i);
+        if (!SignSignature(keystore, *pcoin, txNew, nIn++, SIGHASH_ALL)) {
+            return error("%s: failed to sign coinstake (%d)", __func__, nIn);
         }
+
+        /*if (!SignSignature(*wallet, *pcoin, txNew, i++)) {
+            return error("%s: failed to sign coinstake (%d)", __func__, i);
+        }*/
     }
 
     // Successfully generated coinstake, reset select timestamp to 
