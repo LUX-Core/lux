@@ -224,6 +224,8 @@ public:
     /// Get window identifier of QMainWindow (BitcoinGUI)
     WId getMainWinId() const;
 
+    void restoreWallet();
+
 public slots:
     void initializeResult(int retval);
     void shutdownResult(int retval);
@@ -250,9 +252,13 @@ private:
     int returnValue;
 
     void startThread();
+
+    QString restorePath;
+    QString restoreParam;
 };
 
 #include "lux.moc"
+#include "eula.h"
 
 BitcoinCore::BitcoinCore() : QObject()
 {
@@ -362,6 +368,7 @@ BitcoinApplication::~BitcoinApplication()
     }
     delete optionsModel;
     optionsModel = 0;
+
 }
 
 #ifdef ENABLE_WALLET
@@ -433,9 +440,14 @@ void BitcoinApplication::requestShutdown()
     pollShutdownTimer->stop();
 
 #ifdef ENABLE_WALLET
-    window->removeAllWallets();
-    delete walletModel;
-    walletModel = 0;
+    if (walletModel)
+    {
+        restoreParam= walletModel->getRestoreParam();
+        restorePath = walletModel->getRestorePath();
+        window->removeAllWallets();
+        delete walletModel;
+        walletModel = 0;
+    }
 #endif
     delete clientModel;
     clientModel = 0;
@@ -517,6 +529,39 @@ WId BitcoinApplication::getMainWinId() const
     return window->winId();
 }
 
+void BitcoinApplication::restoreWallet()
+{
+#ifdef ENABLE_WALLET
+    // Restart the wallet if needed
+    if(!restorePath.isEmpty())
+    {
+        // Create command line
+        QString commandLine;
+        QStringList arg = arguments();
+        if(!arg.contains(restoreParam))
+        {
+            arg.append(restoreParam);
+        }
+        commandLine = arg.join(' ');
+
+        // Copy the new wallet.dat to the data folder
+        boost::filesystem::path path = GetDataDir() / "wallet.dat";
+        QString pathWallet = QString::fromStdString(path.string());
+        QFile::remove(pathWallet);
+        if(QFile::copy(restorePath, pathWallet))
+        {
+            // Unlock the data folder
+            UnlockDataDirectory();
+            QThread::currentThread()->sleep(2);
+
+            // Create new process and start the wallet
+            QProcess *process = new QProcess();
+            process->start(commandLine);
+        }
+    }
+#endif
+}
+
 #ifndef BITCOIN_QT_TEST
 int main(int argc, char* argv[])
 {
@@ -574,6 +619,9 @@ int main(int argc, char* argv[])
         help.showOrPrint();
         return 1;
     }
+
+    // Show End User License agreement window
+    Eula::showDialog();
 
     /// 5. Now that settings and translations are available, ask user for data directory
     // User language is set up: pick a data directory
@@ -681,6 +729,7 @@ int main(int argc, char* argv[])
         PrintExceptionContinue(NULL, "Runaway exception");
         app.handleRunawayException(QString::fromStdString(strMiscWarning));
     }
+    app.restoreWallet();
     return app.getReturnValue();
 }
 #endif // BITCOIN_QT_TEST
