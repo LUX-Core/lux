@@ -678,7 +678,7 @@ bool CWallet::AddToWallet(const CWalletTx& wtxIn, bool fFromLoadWallet)
             // as the stripped-version must be invalid.
             // TODO: Store all versions of the transaction, instead of just one.
             if (wtxIn.HasWitness() && !wtx.HasWitness()) {
-                wtx = wtxIn; //TODO: Will this break something?
+                wtx = wtxIn;
                 fUpdated = true;
             }
         }
@@ -3267,11 +3267,7 @@ void CWallet::LearnRelatedScripts(const CPubKey& key, OutputType type)
         CTxDestination witdest = WitnessV0KeyHash(key.GetID());
         CScript witprog = GetScriptForDestination(witdest);
         // Make sure the resulting program is solvable.
-        if (!IsSolvable(*this, witprog)) {
-            std::cout << "Not solvable" << std::endl;
-            assert(false);
-        }
-        //assert(IsSolvable(*this, witprog));
+        assert(IsSolvable(*this, witprog));
         if (AddCScript(witprog)) {
             std::cout << "AddCSript failed" << std::endl;
         }
@@ -3285,8 +3281,9 @@ CTxDestination GetDestinationForKey(const CPubKey& key, OutputType type)
     case OUTPUT_TYPE_P2SH_SEGWIT:
         if (!key.IsCompressed()) return key.GetID();
         CTxDestination witdest = WitnessV0KeyHash(key.GetID());
-        CScript witprog = GetScriptForDestination(witdest);
-        return CScriptID(witprog);
+        /*CScript witprog = GetScriptForDestination(witdest);
+        return CScriptID(witprog);*/
+        return witdest;
     }
 }
 

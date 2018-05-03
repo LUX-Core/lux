@@ -116,13 +116,9 @@ UniValue getnewaddress(const UniValue& params, bool fHelp)
         throw JSONRPCError(RPC_WALLET_KEYPOOL_RAN_OUT, "Error: Keypool ran out, please call keypoolrefill first");
 
     pwalletMain->LearnRelatedScripts(newKey, output_type);
-    std::cout << "Related scripts are learned" << std::endl; //TODO: remove
     CTxDestination dest = GetDestinationForKey(newKey, output_type);
-    std::cout << "GetDestination" << std::endl; //TODO: remove
-    if (!pwalletMain->SetAddressBook(dest, strAccount, "receive")) std::cout << "Failed to set address book" << std::endl; //TODO: remove stdout
-    std::cout << "SetAddressBook" << std::endl; //TODO: remove
+    pwalletMain->SetAddressBook(dest, strAccount, "receive");
     CBitcoinAddress address = CBitcoinAddress(dest);
-    std::cout << address.ToString() << std::endl; //TODO: remove
     return address.ToString();
 }
 

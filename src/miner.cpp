@@ -420,9 +420,8 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
         }
         tx.vin[0].scriptSig = CScript() << nHeight << OP_0;
         pblock->vtx[0] = CTransaction(tx);
-        pblocktemplate->vTxSigOps[0] = GetLegacySigOpCount(pblock->vtx[0]);
+        pblocktemplate->vTxSigOps[0] = WITNESS_SCALE_FACTOR * GetLegacySigOpCount(pblock->vtx[0]);
         pblocktemplate->vchCoinbaseCommitment = GenerateCoinbaseCommitment(*pblock, pindexPrev, chainparams.GetConsensus());
-        const CChainParams& chainparams = Params();
         UpdateTime(pblock, chainparams.GetConsensus(), pindexPrev, fProofOfStake);
 
         CValidationState state;

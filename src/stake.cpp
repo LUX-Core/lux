@@ -881,22 +881,11 @@ bool Stake::CreateCoinStake(CWallet *wallet, const CKeyStore& keystore, unsigned
     }
 
     // Sign
-    i = 0;
+    int nIn = 0;
     for (const CWalletTx* pcoin : vCoins) {
-
-        const CTxIn& txin = txNew.vin[i];
-        const CScript& prevPubKey = txNew.vout[txin.prevout.n].scriptPubKey;
-        const CAmount& amount = txNew.vout[txin.prevout.n].nValue;
-        SignatureData sigdata;
-        bool fIsSigned = ProduceSignature(MutableTransactionSignatureCreator(&keystore, &txNew, i++, amount, SIGHASH_ALL/*TODO: should it always be SIGHASH_ALL?*/), prevPubKey, sigdata);
-
-        if (!fIsSigned) {
-            return error("%s: failed to sign coinstake (%d)", __func__, i);
+        if (!SignSignature(keystore, *pcoin, txNew, nIn++, SIGHASH_ALL)) {
+            return error("%s: failed to sign coinstake (%d)", __func__, nIn);
         }
-
-        /*if (!SignSignature(*wallet, *pcoin, txNew, i++)) {
-            return error("%s: failed to sign coinstake (%d)", __func__, i);
-        }*/
     }
 
     // Successfully generated coinstake, reset select timestamp to 
