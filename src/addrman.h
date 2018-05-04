@@ -458,6 +458,7 @@ public:
     //! Return the number of (unique) addresses in all tables.
     int size()
     {
+        LOCK(cs);
         return vRandom.size();
     }
 
@@ -477,9 +478,9 @@ public:
     //! Add a single address.
     bool Add(const CAddress& addr, const CNetAddr& source, int64_t nTimePenalty = 0)
     {
+        LOCK(cs);
         bool fRet = false;
         {
-            LOCK(cs);
             Check();
             fRet |= Add_(addr, source, nTimePenalty);
             Check();
@@ -492,9 +493,9 @@ public:
     //! Add multiple addresses.
     bool Add(const std::vector<CAddress>& vAddr, const CNetAddr& source, int64_t nTimePenalty = 0)
     {
+        LOCK(cs);
         int nAdd = 0;
         {
-            LOCK(cs);
             Check();
             for (std::vector<CAddress>::const_iterator it = vAddr.begin(); it != vAddr.end(); it++)
                 nAdd += Add_(*it, source, nTimePenalty) ? 1 : 0;
@@ -508,23 +509,19 @@ public:
     //! Mark an entry as accessible.
     void Good(const CService& addr, int64_t nTime = GetAdjustedTime())
     {
-        {
             LOCK(cs);
             Check();
             Good_(addr, nTime);
             Check();
-        }
     }
 
     //! Mark an entry as connection attempted to.
     void Attempt(const CService& addr, int64_t nTime = GetAdjustedTime())
     {
-        {
             LOCK(cs);
             Check();
             Attempt_(addr, nTime);
             Check();
-        }
     }
 
     /**
@@ -559,12 +556,10 @@ public:
     //! Mark an entry as currently-connected-to.
     void Connected(const CService& addr, int64_t nTime = GetAdjustedTime())
     {
-        {
             LOCK(cs);
             Check();
             Connected_(addr, nTime);
             Check();
-        }
     }
 };
 

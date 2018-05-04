@@ -960,9 +960,9 @@ bool CheckTransaction(const CTransaction& tx, CValidationState& state)
     unsigned i = 0;
     CAmount nValueOut = 0;
     for (const CTxOut& txout : tx.vout) {
-        if (txout.IsEmpty() && !tx.IsCoinBase() && !tx.IsCoinStake())
-            return state.DoS(100, error("CheckTransaction(): txout empty for user transaction"));
-
+        //Removed tx out empty in function CheckTransaction , CHECKSEQUENCEVERIFY doesn't have non-empty tx out
+        //if (txout.IsEmpty() && !tx.IsCoinBase() && !tx.IsCoinStake())
+        //    return state.DoS(100, error("CheckTransaction(): txout empty for user transaction"));
         if (txout.nValue < 0)
             return state.DoS(100, error("%s: tx.vout[%d].nValue negative (%s, empty=%s, coinstake=%s)", __func__, i,
                                         txout.ToString(), (txout.IsEmpty()?"yes":"no"), (tx.IsCoinStake()?"yes":"no")),
@@ -3471,6 +3471,7 @@ CBlockIndex* CBlockIndex::GetAncestor(int height)
             pindexWalk = pindexWalk->pskip;
             heightWalk = heightSkip;
         } else {
+            assert(pindexWalk->pprev);
             pindexWalk = pindexWalk->pprev;
             heightWalk--;
         }
