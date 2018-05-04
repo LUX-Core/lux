@@ -364,6 +364,9 @@ bool MultiplyStakeTarget(uint256 &bnTarget, int nModifierHeight, int64_t nModifi
 //instead of looping outside and reinitializing variables many times, we will give a nTimeTx and also search interval so that we can do all the hashing here
 bool Stake::CheckHash(const CBlockIndex* pindexPrev, unsigned int nBits, const CBlock &blockFrom, const CTransaction &txPrev, const COutPoint &prevout, unsigned int& nTimeTx, uint256& hashProofOfStake)
 {
+    if (pindexPrev == nullptr)
+        return false;
+
     unsigned int nTimeBlockFrom = blockFrom.GetBlockTime();
 
     if (nTimeTx < txPrev.nTime) {  // Transaction timestamp violation
@@ -729,6 +732,10 @@ bool Stake::CreateCoinStake(CWallet *wallet, const CKeyStore& keystore, unsigned
                 LogPrintf("%s: failed to find block index \n", __func__);
             continue;
         }
+
+        //this is genesis block, which supposedly should not be stake block, so skip it
+        if (pindex->pprev == nullptr)
+            continue;
 
         // Read block header
         CBlockHeader block = pindex->GetBlockHeader();
