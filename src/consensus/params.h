@@ -36,7 +36,6 @@ namespace Consensus {
     struct Params {
         bool fPowAllowMinDifficultyBlocks;
         bool fPowNoRetargeting;
-        int nSubsidyHalvingInterval;
         BIP9Deployment vDeployments[MAX_VERSION_BITS_DEPLOYMENTS];
         /** Used to check majorities for block version upgrade */
         int nMajorityEnforceBlockUpgrade;
