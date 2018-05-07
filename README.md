@@ -78,19 +78,14 @@ The next three steps are an example of how to acquire the source in an appropria
 Once the source code is ready the build steps are below.
 
     PATH=$(echo "$PATH" | sed -e 's/:\/mnt.*//g')
-    cd depends
-    make HOST=x86_64-w64-mingw32 -j$(nproc)
-    cd ..
-    ./autogen.sh
-    CONFIG_SITE=$PWD/depends/x86_64-w64-mingw32/share/config.site
-    ./configure --prefix=`pwd`/depends/x86_64-w64-mingw32 --disable-tests
-    make HOST=x86_64-w64-mingw32 -j$(nproc)
+    cd lux/depends
+    ./build-wins.sh
 
 ### Build on Ubuntu
 
     git clone https://github.com/216k155/lux.git
 
-    cd lux    
+    cd lux
     ./install-dependencies.sh
     ./autogen.sh
     ./configure --disable-tests
@@ -109,30 +104,27 @@ Install the OS X command line tools:
 
 When the popup appears, click `Install`.
 
-Then install [Homebrew](https://brew.sh).
+Then install [Homebrew](https://brew.sh)
+
+    /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 
 #### Dependencies
 
-    brew install cmake automake berkeley-db4 leveldb libtool boost --c++11 --without-single --without-static miniupnpc openssl pkg-config protobuf qt5 libevent imagemagick --with-librsvg
+    brew install cmake automake berkeley-db4 leveldb libtool boost@1.66 --c++11 --without-single --without-static miniupnpc openssl pkg-config protobuf qt5 libevent imagemagick --with-librsvg
 
-NOTE: Building with Qt4 is still supported, however, could result in a broken UI. Building with Qt5 is recommended.
+Link boost 1.66
+    
+    brew link boost@1.66 --force
 
 #### Build Luxcore
 
-1. Clone the Lux source code and cd into `Lux`
+Clone the Lux source code and cd into lux
 
         git clone https://github.com/216k155/lux.git
         cd lux
-
-2.  Build Luxcore:
-
-    Configure and build the headless Lux binaries as well as the GUI (if Qt is found).
-
-    You can disable the GUI build by passing `--without-gui` to configure.
-
         export LDFLAGS=-L/usr/local/opt/openssl/lib;export CPPFLAGS=-I/usr/local/opt/openssl/include
         ./autogen.sh
-        ./configure --disable-tests
+        ./configure --disable-tests 
         make -j$(nproc)
         make deploy
 

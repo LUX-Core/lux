@@ -8,6 +8,7 @@
 #include "walletdb.h"
 
 #include "base58.h"
+#include "consensus/validation.h"
 #include "protocol.h"
 #include "serialize.h"
 #include "sync.h"
@@ -132,7 +133,19 @@ bool CWalletDB::WriteMasterKey(unsigned int nID, const CMasterKey& kMasterKey)
 bool CWalletDB::WriteCScript(const uint160& hash, const CScript& redeemScript)
 {
     nWalletDBUpdated++;
-    return Write(std::make_pair(std::string("cscript"), hash), redeemScript, false);
+    std::pair<std::string, uint160> pair = std::make_pair(std::string("cscript"), hash);
+
+    try {
+        if (!Write(pair, redeemScript, false)) {
+            std::cout << "Failed to write script to WalletDB" << std::endl;
+            return false;
+        }
+    } catch(std::bad_alloc e) {
+        std::cout << "bad_alloc in CWalletDB::WriteCScript::Write" << std::endl;
+        return false;
+    }
+
+    return true;
 }
 
 bool CWalletDB::WriteWatchOnly(const CScript& dest)

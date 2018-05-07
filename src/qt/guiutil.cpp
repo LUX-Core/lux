@@ -18,6 +18,7 @@
 #include "script/script.h"
 #include "script/standard.h"
 #include "util.h"
+#include "protocol.h"
 
 #ifdef WIN32
 #ifdef _WIN32_WINNT
@@ -913,6 +914,9 @@ QString formatServicesStr(quint64 mask)
             switch (check) {
             case NODE_NETWORK:
                 strList.append(QObject::tr("NETWORK"));
+                break;
+            case NODE_WITNESS:
+                strList.append(QObject::tr("WITNESS"));
                 break;
             default:
                 strList.append(QString("%1[%2]").arg(QObject::tr("UNKNOWN")).arg(check));

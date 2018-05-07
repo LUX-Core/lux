@@ -8,6 +8,8 @@
 #include "db.h"
 #include "stake.h"
 #include "init.h"
+#include "chainparams.h"
+#include "policy/policy.h"
 #include "main.h"
 #include "miner.h"
 #include "wallet.h"
@@ -362,6 +364,9 @@ bool MultiplyStakeTarget(uint256 &bnTarget, int nModifierHeight, int64_t nModifi
 //instead of looping outside and reinitializing variables many times, we will give a nTimeTx and also search interval so that we can do all the hashing here
 bool Stake::CheckHash(const CBlockIndex* pindexPrev, unsigned int nBits, const CBlock &blockFrom, const CTransaction &txPrev, const COutPoint &prevout, unsigned int& nTimeTx, uint256& hashProofOfStake)
 {
+    if (pindexPrev == nullptr)
+        return false;
+
     unsigned int nTimeBlockFrom = blockFrom.GetBlockTime();
 
     if (nTimeTx < txPrev.nTime) {  // Transaction timestamp violation
@@ -448,11 +453,14 @@ bool Stake::CheckProof(CBlockIndex* const pindexPrev, const CBlock &block, uint2
     // First try finding the previous transaction in database
     uint256 prevBlockHash;
     CTransaction txPrev;
-    if (!GetTransaction(txin.prevout.hash, txPrev, prevBlockHash, true))
+    const Consensus::Params& consensusparams = Params().GetConsensus();
+    if (!GetTransaction(txin.prevout.hash, txPrev, consensusparams, prevBlockHash, true))
         return error("%s: read txPrev failed");
 
     //verify signature and script
-    if (!VerifyScript(txin.scriptSig, txPrev.vout[txin.prevout.n].scriptPubKey, STANDARD_SCRIPT_VERIFY_FLAGS, TransactionSignatureChecker(&tx, 0)))
+    const CAmount& amount = txPrev.vout[txin.prevout.n].nValue;
+    bool fIsVerified = VerifyScript(txin.scriptSig, txPrev.vout[txin.prevout.n].scriptPubKey, tx.wit.vtxinwit.size() > 0 ? &tx.wit.vtxinwit[0].scriptWitness : NULL, STANDARD_SCRIPT_VERIFY_FLAGS, TransactionSignatureChecker(&tx, 0, amount));
+    if (!fIsVerified)
         return error("%s: VerifySignature failed on coinstake %s", __func__, tx.GetHash().ToString().c_str());
 
     CBlockIndex* pindex = NULL;
@@ -464,7 +472,7 @@ bool Stake::CheckProof(CBlockIndex* const pindexPrev, const CBlock &block, uint2
 
     // Read block header
     CBlock prevBlock;
-    if (!ReadBlockFromDisk(prevBlock, pindex->GetBlockPos()))
+    if (!ReadBlockFromDisk(prevBlock, pindex->GetBlockPos(), consensusparams))
         return error("%s: failed to find block", __func__);
 
     unsigned int nTime = block.nTime;
@@ -564,7 +572,7 @@ bool Stake::IsBlockStaked(int nHeight) const
     return result;
 }
 
-bool Stake::IsBlockStaked(CBlock* block) const
+bool Stake::IsBlockStaked(const CBlock* block) const
 {
     bool result = false;
     if (block->IsProofOfStake()) {
@@ -725,6 +733,10 @@ bool Stake::CreateCoinStake(CWallet *wallet, const CKeyStore& keystore, unsigned
             continue;
         }
 
+        //this is genesis block, which supposedly should not be stake block, so skip it
+        if (pindex->pprev == nullptr)
+            continue;
+
         // Read block header
         CBlockHeader block = pindex->GetBlockHeader();
 
@@ -876,10 +888,10 @@ bool Stake::CreateCoinStake(CWallet *wallet, const CKeyStore& keystore, unsigned
     }
 
     // Sign
-    i = 0;
+    int nIn = 0;
     for (const CWalletTx* pcoin : vCoins) {
-        if (!SignSignature(*wallet, *pcoin, txNew, i++)) {
-            return error("%s: failed to sign coinstake (%d)", __func__, i);
+        if (!SignSignature(keystore, *pcoin, txNew, nIn++, SIGHASH_ALL)) {
+            return error("%s: failed to sign coinstake (%d)", __func__, nIn);
         }
     }
 
@@ -895,13 +907,15 @@ bool Stake::CreateBlockStake(CWallet *wallet, CBlock *block)
     int64_t nTime = GetAdjustedTime();
     CBlockIndex* tip = chainActive.Tip();
     block->nTime = nTime;
-    block->nBits = GetNextWorkRequired(tip, block);
+    block->nBits = GetNextWorkRequired(tip, block, Params().GetConsensus(), true);
     if (nTime >= nLastStakeTime) {
         CMutableTransaction tx;
         unsigned int txTime = 0;
         if (CreateCoinStake(wallet, *wallet, block->nBits, nTime - nLastStakeTime, tx, txTime)) {
             block->nTime = txTime;
-            block->vtx[0].vout[0].SetEmpty();
+            CMutableTransaction buftx = CMutableTransaction(block->vtx[0]);
+            buftx.vout[0].SetEmpty();
+            block->vtx[0] = CTransaction(buftx);
             block->vtx.push_back(CTransaction(tx));
             result = true;
         }

@@ -31,7 +31,7 @@ commitFiles=true
 read -d '' usage <<- EOF
 Usage: $scriptName [-c|u|v|b|s|B|o|h|j|m|] signer version
 
-Run this script from the directory containing the lux, gitian-builder, gitian.sigs, and lux-detached-sigs.
+Run this script from the directory containing the lux, gitian-builder, gitian.sigs, and detached-sigs.
 
 Arguments:
 signer          GPG signer to sign each build assert file
@@ -92,6 +92,7 @@ while :; do
 		linux=false
 		windows=false
 		osx=false
+		aarch64=false
 		if [[ "$2" = *"l"* ]]
 		then
 		    linux=true
@@ -103,6 +104,10 @@ while :; do
 		if [[ "$2" = *"x"* ]]
 		then
 		    osx=true
+		fi
+		if [[ "$2" = *"a"* ]]
+		then
+		    aarch64=true
 		fi
 		shift
 	    else
@@ -179,6 +184,8 @@ done
 if [[ $lxc = true ]]
 then
     export USE_LXC=1
+    export LXC_BRIDGE=lxcbr0
+    sudo ifconfig lxcbr0 up 10.0.2.2
 fi
 
 # Check for OSX SDK
@@ -189,7 +196,7 @@ then
 fi
 
 # Get signer
-if [[ -n "$1" ]]
+if [[ -n"$1" ]]
 then
     SIGNER=$1
     shift
@@ -231,7 +238,7 @@ if [[ $setup = true ]]
 then
     sudo apt-get install ruby apache2 git apt-cacher-ng python-vm-builder qemu-kvm qemu-utils
     git clone https://github.com/216k155/gitian.sigs.git
-    git clone https://github.com/216k155/lux-detached-sigs.git
+    git clone https://github.com/216k155/detached-sigs.git
     git clone https://github.com/devrandom/gitian-builder.git
     pushd ./gitian-builder
     if [[ -n "$USE_LXC" ]]
@@ -254,7 +261,7 @@ popd
 if [[ $build = true ]]
 then
 	# Make output folder
-	mkdir -p ./lux-binaries/${VERSION}
+	mkdir -p ./lux/${VERSION}
 
 	# Build Dependencies
 	echo ""
@@ -298,6 +305,14 @@ then
 	    mv build/out/lux-*-osx-unsigned.tar.gz inputs/lux-osx-unsigned.tar.gz
 	    mv build/out/lux-*.tar.gz build/out/lux-*.dmg ../lux-binaries/${VERSION}
 	fi
+	if [[ $aarch64 = true ]]
+    	then
+    	    echo ""
+    	    echo "Compiling ${VERSION} AArch64"
+    	    echo ""
+    	    ./bin/gbuild -j ${proc} -m ${mem} --commit lux=${COMMIT} --url lux=${url} ../lux/contrib/gitian-descriptors/gitian-aarch64.yml
+    	    ./bin/gsign -p $signProg --signer $SIGNER --release ${VERSION}-aarch64 --destination ../gitian.sigs/ ../lux/contrib/gitian-descriptors/gitian-aarch64.yml
+    	    mv build/out/lux-*.tar.gz build/out/src/lux-*.tar.gz ../lux-binaries/${VERSION}
 	popd
 
         if [[ $commitFiles = true ]]
@@ -308,6 +323,7 @@ then
             echo ""
             pushd gitian.sigs
             git add ${VERSION}-linux/${SIGNER}
+            git add ${VERSION}-aarch64/${SIGNER}
             git add ${VERSION}-win-unsigned/${SIGNER}
             git add ${VERSION}-osx-unsigned/${SIGNER}
             git commit -a -m "Add ${VERSION} unsigned sigs for ${SIGNER}"
@@ -334,6 +350,11 @@ then
 	echo "Verifying v${VERSION} Mac OSX"
 	echo ""
 	./bin/gverify -v -d ../gitian.sigs/ -r ${VERSION}-osx-unsigned ../lux/contrib/gitian-descriptors/gitian-osx.yml
+	# Signed AArch64
+    	echo ""
+    	echo "Verifying v${VERSION} AArch64"
+    	echo ""
+    	./bin/gverify -v -d ../gitian.sigs/ -r ${VERSION}-aarch64 ../lux/contrib/gitian-descriptors/gitian-aarch64.yml
 	# Signed Windows
 	echo ""
 	echo "Verifying v${VERSION} Signed Windows"

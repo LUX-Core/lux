@@ -107,6 +107,7 @@ static bool rest_block(AcceptedConnection* conn,
         throw RESTERR(HTTP_BAD_REQUEST, "Invalid hash: " + hashStr);
 
     CBlock block;
+    const Consensus::Params consensusParams = Params().GetConsensus();
     CBlockIndex* pblockindex = NULL;
     {
         LOCK(cs_main);
@@ -114,7 +115,7 @@ static bool rest_block(AcceptedConnection* conn,
             throw RESTERR(HTTP_NOT_FOUND, hashStr + " not found");
 
         pblockindex = mapBlockIndex[hash];
-        if (!ReadBlockFromDisk(block, pblockindex))
+        if (!ReadBlockFromDisk(block, pblockindex, consensusParams))
             throw RESTERR(HTTP_NOT_FOUND, hashStr + " not found");
     }
 
@@ -179,9 +180,10 @@ static bool rest_tx(AcceptedConnection* conn,
     if (!ParseHashStr(hashStr, hash))
         throw RESTERR(HTTP_BAD_REQUEST, "Invalid hash: " + hashStr);
 
+    const Consensus::Params consensusParams = Params().GetConsensus();
     CTransaction tx;
     uint256 hashBlock = uint256();
-    if (!GetTransaction(hash, tx, hashBlock, true))
+    if (!GetTransaction(hash, tx, consensusParams, hashBlock, true))
         throw RESTERR(HTTP_NOT_FOUND, hashStr + " not found");
 
     CDataStream ssTx(SER_NETWORK, PROTOCOL_VERSION);

@@ -1,5 +1,6 @@
 #include "masternode.h"
 #include "activemasternode.h"
+#include "consensus/validation.h"
 #include "darksend.h"
 #include "primitives/transaction.h"
 #include "main.h"
@@ -154,13 +155,13 @@ void ProcessMasternode(CNode* pfrom, const std::string& strCommand, CDataStream&
         //  - this is checked later by .check() in many places and by ThreadCheckDarkSendPool()
 
         CValidationState state;
-        CTransaction tx = CTransaction();
+        CMutableTransaction tx = CMutableTransaction();
         CTxOut vout = CTxOut((GetMNCollateral(chainActive.Tip()->nHeight)-1)*COIN, darkSendPool.collateralPubKey);
         tx.vin.push_back(vin);
         tx.vout.push_back(vout);
         //if(AcceptableInputs(mempool, state, tx)){
         bool pfMissingInputs;
-        if(AcceptableInputs(mempool, state, tx, false, &pfMissingInputs)){
+        if(AcceptableInputs(mempool, state, CTransaction(tx), false, &pfMissingInputs)){
             if(fDebug) LogPrintf("dsee - Accepted masternode entry %i %i\n", count, current);
 
             if(GetInputAge(vin) < MASTERNODE_MIN_CONFIRMATIONS){
@@ -170,7 +171,7 @@ void ProcessMasternode(CNode* pfrom, const std::string& strCommand, CDataStream&
             }
 
             // use this as a peer
-            addrman.Add(CAddress(addr), pfrom->addr, 2*60*60);
+            addrman.Add(CAddress(addr, NODE_NETWORK), pfrom->addr, 2*60*60);
 
             // add our masternode
             CMasterNode mn(addr, vin, pubkey, vchSig, sigTime, pubkey2, protocolVersion);
@@ -603,13 +604,13 @@ void CMasterNode::Check()
 
     if(!unitTest){
         CValidationState state;
-        CTransaction tx = CTransaction();
+        CMutableTransaction tx = CMutableTransaction();
         CTxOut vout = CTxOut((GetMNCollateral(chainActive.Tip()->nHeight)-1)*COIN, darkSendPool.collateralPubKey);
         tx.vin.push_back(vin);
         tx.vout.push_back(vout);
 
         bool pfMissingInputs;
-        if (!AcceptableInputs(mempool, state, tx, false, &pfMissingInputs)) {
+        if (!AcceptableInputs(mempool, state, CTransaction(tx), false, &pfMissingInputs)) {
             enabled = 3;
             return;
         }
