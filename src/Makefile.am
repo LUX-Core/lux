@@ -449,7 +449,6 @@ libbitcoin_common_a_SOURCES = \
   cpp-ethereum/libethereum/TransactionQueue.cpp \
   cpp-ethereum/libethereum/BlockQueue.cpp \
   cpp-ethereum/libethcore/BlockHeader.cpp \
-  cpp-ethereum/libdevcore/RLP.cpp \
   cpp-ethereum/libethereum/TransactionReceipt.cpp \
   cpp-ethereum/libethcore/SealEngine.cpp \
   cpp-ethereum/libdevcore/TrieHash.cpp \
@@ -485,7 +484,6 @@ libbitcoin_common_a_SOURCES = \
   cpp-ethereum/libethereum/TransactionQueue.h \
   cpp-ethereum/libethereum/BlockQueue.h \
   cpp-ethereum/libethcore/BlockHeader.h \
-  cpp-ethereum/libdevcore/RLP.h \
   cpp-ethereum/libethereum/TransactionReceipt.h \
   cpp-ethereum/libethcore/SealEngine.h \
   cpp-ethereum/libdevcore/TrieHash.h \
@@ -675,7 +673,7 @@ endif
 
 libbitcoinconsensus_la_LDFLAGS = -no-undefined $(RELDFLAGS)
 libbitcoinconsensus_la_LIBADD = $(LIBSECP256K1) $(CRYPTO_LIBS) $(BOOST_LIBS)
-libbitcoinconsensus_la_CPPFLAGS = $(CRYPTO_CFLAGS) -I$(builddir)/obj -I$(srcdir)/secp256k1/include -DBUILD_BITCOIN_INTERNAL
+libbitcoinconsensus_la_CPPFLAGS = $(CRYPTO_CFLAGS) $(BITCOIN_INCLUDES) -I$(builddir)/obj -I$(srcdir)/secp256k1/include -DBUILD_BITCOIN_INTERNAL
 
 endif
 

@@ -1039,9 +1039,9 @@ bool AcceptToMemoryPool(CTxMemPool& pool, CValidationState& state, const CTransa
             }
         }
 
+        CAmount inChainInputValue;
         CAmount nValueOut = tx.GetValueOut();
         CAmount nFees = nValueIn - nValueOut;
-        double dPriority = view.GetPriority(tx, chainActive.Height());
 
         dev::u256 txMinGasPrice = 0;
 
@@ -1122,9 +1122,6 @@ bool AcceptToMemoryPool(CTxMemPool& pool, CValidationState& state, const CTransa
         }
         ////////////////////////////////////////////////////////////
 
-        CAmount inChainInputValue;
-        CAmount nValueOut = tx.GetValueOut();
-        CAmount nFees = nValueIn - nValueOut;
         double dPriority = view.GetPriority(tx, chainActive.Height(), inChainInputValue);
         CTxMemPoolEntry entry(tx, nFees, GetTime(), dPriority, chainActive.Height(), pool.HasNoInputsOf(tx));
 
@@ -6164,9 +6161,9 @@ bool CheckSenderScript(const CCoinsViewCache& view, const CTransaction& tx){
 std::vector<ResultExecute> CallContract(const dev::Address& addrContract, std::vector<unsigned char> opcode, const dev::Address& sender, uint64_t gasLimit){
     CBlock block;
     CMutableTransaction tx;
-
+    const CChainParams& chainparams = Params();
     CBlockIndex* pblockindex = mapBlockIndex[chainActive.Tip()->GetBlockHash()];
-    ReadBlockFromDisk(block, pblockindex);
+    ReadBlockFromDisk(block, pblockindex, chainparams.GetConsensus());
     block.nTime = GetAdjustedTime();
 
     if(block.IsProofOfStake())
@@ -6206,6 +6203,7 @@ bool CheckMinGasPrice(std::vector<EthTransactionParams>& etps, const uint64_t& m
 valtype GetSenderAddress(const CTransaction& tx, const CCoinsViewCache* coinsView, const std::vector<CTransaction>* blockTxs){
     CScript script;
     bool scriptFilled=false; //can't use script.empty() because an empty script is technically valid
+    const CChainParams& chainparams = Params();
 
     // First check the current (or in-progress) block for zero-confirmation change spending that won't yet be in txindex
     if(blockTxs){
@@ -6225,7 +6223,7 @@ valtype GetSenderAddress(const CTransaction& tx, const CCoinsViewCache* coinsVie
     {
         CTransaction txPrevout;
         uint256 hashBlock;
-        if(GetTransaction(tx.vin[0].prevout.hash, txPrevout, hashBlock, true)){
+        if(GetTransaction(tx.vin[0].prevout.hash, txPrevout, chainparams.GetConsensus(), hashBlock, true)){
             script = txPrevout.vout[tx.vin[0].prevout.n].scriptPubKey;
         } else {
             LogPrintf("Error fetching transaction details of tx %s. This will probably cause more errors", tx.vin[0].prevout.hash.ToString());
@@ -6431,7 +6429,7 @@ bool LuxTxConverter::extractionLuxTransactions(ExtractLuxTX& luxtx){
 }
 
 bool LuxTxConverter::receiveStack(const CScript& scriptPubKey){
-    EvalScript(stack, scriptPubKey, SCRIPT_EXEC_BYTE_CODE, BaseSignatureChecker(), nullptr);
+    EvalScript(stack, scriptPubKey, SCRIPT_EXEC_BYTE_CODE, BaseSignatureChecker(), SIGVERSION_BASE, nullptr);
     if (stack.empty())
         return false;
 

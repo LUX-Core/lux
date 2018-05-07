@@ -19,6 +19,7 @@
 #include "walletdb.h"
 #include "stake.h"
 #include "coincontrol.h"
+#include "consensus/validation.h"
 
 #include <stdint.h>
 
