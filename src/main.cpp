@@ -1201,8 +1201,7 @@ bool AcceptToMemoryPool(CTxMemPool& pool, CValidationState& state, const CTransa
 
         CAmount nValueOut = tx.GetValueOut();
         CAmount nFees = nValueIn - nValueOut;
-        CAmount inChainInputValue;
-        double dPriority = view.GetPriority(tx, chainActive.Height(), inChainInputValue);
+        double dPriority = view.GetPriority(tx, chainActive.Height());
 
         dev::u256 txMinGasPrice = 0;
 
@@ -1282,16 +1281,9 @@ bool AcceptToMemoryPool(CTxMemPool& pool, CValidationState& state, const CTransa
                 return state.DoS(100, false, REJECT_INVALID, "bad-txns-incorrect-format");
         }
         ////////////////////////////////////////////////////////////
-        bool fSpendsCoinbase = false;
-        BOOST_FOREACH(const CTxIn &txin, tx.vin) {
-            const Coin &coin = view.AccessCoin(txin.prevout);
-            if (coin.IsCoinBase() || coin.IsCoinStake()) {
-                fSpendsCoinbase = true;
-                break;
-            }
-        }
 
-        CTxMemPoolEntry entry(tx, nFees, GetTime(), dPriority, chainActive.Height(), inChainInputValue, fSpendsCoinbase);
+
+        CTxMemPoolEntry entry(tx, nFees, GetTime(), dPriority, chainActive.Height());
         unsigned int nSize = entry.GetTxSize();
 
         // Don't accept it if it can't get into a block
@@ -2804,23 +2796,15 @@ bool static DisconnectTip(CValidationState& state)
     if (!FlushStateToDisk(state, FLUSH_STATE_ALWAYS))
         return false;
     // Resurrect mempool transactions from the disconnected block.
-    std::vector<uint256> vHashUpdate;
     BOOST_FOREACH (const CTransaction& tx, block.vtx) {
         // ignore validation errors in resurrected transactions
+        list<CTransaction> removed;
         CValidationState stateDummy;
-        if (tx.IsCoinBase() || tx.IsCoinStake() || !AcceptToMemoryPool(mempool, stateDummy, tx, false, NULL)) {
-            mempool.removeRecursive(tx, MemPoolRemovalReason::REORG);
-        } else if (mempool.exists(tx.GetHash())) {
-            vHashUpdate.push_back(tx.GetHash());
-        }
+        if (tx.IsCoinBase() || tx.IsCoinStake() || !AcceptToMemoryPool(mempool, stateDummy, tx, false, NULL))
+            mempool.remove(tx, removed, true);
     }
-        // AcceptToMemoryPool/addUnchecked all assume that new mempool entries have
-        // no in-mempool children, which is generally not true when adding
-        // previously-confirmed transactions back to the mempool.
-        // UpdateTransactionsFromBlock finds descendants of any transactions in this
-        // block that were added back and cleans up the mempool state.
-        mempool.UpdateTransactionsFromBlock(vHashUpdate);
-
+    mempool.removeCoinbaseSpends(pcoinsTip, pindexDelete->nHeight);
+    mempool.check(pcoinsTip);
     // Update chainActive and related variables.
     UpdateTip(pindexDelete->pprev);
     // Let wallets know transactions went from 1-confirmed to
@@ -2861,19 +2845,12 @@ bool static ConnectTip(CValidationState& state, CBlockIndex* pindexNew, CBlock* 
     int64_t nTime3;
     LogPrint("bench", "  - Load block from disk: %.2fms [%.2fs]\n", (nTime2 - nTime1) * 0.001, nTimeReadFromDisk * 0.000001);
     {
-
-        dev::h256 oldHashStateRoot(globalState->rootHash()); // lux
-        dev::h256 oldHashUTXORoot(globalState->rootHashUTXO()); // lux
         CInv inv(MSG_BLOCK, pindexNew->GetBlockHash());
         bool rv = ConnectBlock(*pblock, state, pindexNew, view);
         g_signals.BlockChecked(*pblock, state);
         if (!rv) {
             if (state.IsInvalid())
                 InvalidBlockFound(pindexNew, state);
-
-            globalState->setRoot(oldHashStateRoot); // lux
-            globalState->setRootUTXO(oldHashUTXORoot); // lux
-
             return error("ConnectTip() : ConnectBlock %s failed", pindexNew->GetBlockHash().ToString());
         }
         mapBlockSource.erase(inv.hash);
@@ -2897,11 +2874,16 @@ bool static ConnectTip(CValidationState& state, CBlockIndex* pindexNew, CBlock* 
     LogPrint("bench", "  - Writing chainstate: %.2fms [%.2fs]\n", (nTime5 - nTime4) * 0.001, nTimeChainState * 0.000001);
 
     // Remove conflicting transactions from the mempool.
-    mempool.removeForBlock(pblock->vtx, pindexNew->nHeight);
+    list<CTransaction> txConflicted;
+    mempool.removeForBlock(pblock->vtx, pindexNew->nHeight, txConflicted);
     mempool.check(pcoinsTip);
     // Update chainActive & related variables.
     UpdateTip(pindexNew);
-
+    // Tell wallet about transactions that went from mempool
+    // to conflicted:
+    BOOST_FOREACH (const CTransaction& tx, txConflicted) {
+        SyncWithWallets(tx, NULL);
+    }
     // ... and about transactions that got confirmed:
     BOOST_FOREACH (const CTransaction& tx, pblock->vtx) {
         SyncWithWallets(tx, pblock);
@@ -2934,69 +2916,69 @@ bool DisconnectBlocksAndReprocess(int blocks)
     Remove conflicting blocks for successful InstanTX transaction locks
     This should be very rare (Probably will never happen)
 */
-//// ***TODO*** clean up here
-//bool DisconnectBlockAndInputs(CValidationState& state, CTransaction txLock)
-//{
-//    // All modifications to the coin state will be done in this cache.
-//    // Only when all have succeeded, we push it to pcoinsTip.
-//    //    CCoinsViewCache view(*pcoinsTip, true);
-//
-//    CBlockIndex* BlockReading = chainActive.Tip();
-//    CBlockIndex* pindexNew = NULL;
-//
-//    bool foundConflictingTx = false;
-//
-//    //remove anything conflicting in the memory pool
-//    list<CTransaction> txConflicted;
-//    mempool.removeConflicts(txLock, txConflicted);
-//
-//
-//    // List of what to disconnect (typically nothing)
-//    vector<CBlockIndex*> vDisconnect;
-//
-//    for (unsigned int i = 1; BlockReading && BlockReading->nHeight > 0 && !foundConflictingTx && i < 6; i++) {
-//        vDisconnect.push_back(BlockReading);
-//        pindexNew = BlockReading->pprev; //new best block
-//
-//        CBlock block;
-//        if (!ReadBlockFromDisk(block, BlockReading))
-//            return state.Abort(_("Failed to read block"));
-//
-//        // Queue memory transactions to resurrect.
-//        // We only do this for blocks after the last checkpoint (reorganisation before that
-//        // point should only happen with -reindex/-loadblock, or a misbehaving peer.
-//        BOOST_FOREACH (const CTransaction& tx, block.vtx) {
-//            if (!tx.IsCoinBase()) {
-//                BOOST_FOREACH (const CTxIn& in1, txLock.vin) {
-//                    BOOST_FOREACH (const CTxIn& in2, tx.vin) {
-//                        if (in1.prevout == in2.prevout) foundConflictingTx = true;
-//                    }
-//                }
-//            }
-//        }
-//
-//        if (BlockReading->pprev == NULL) {
-//            assert(BlockReading);
-//            break;
-//        }
-//        BlockReading = BlockReading->pprev;
-//    }
-//
-//    if (!foundConflictingTx) {
-//        LogPrintf("DisconnectBlockAndInputs: Can't find a conflicting transaction to inputs\n");
-//        return false;
-//    }
-//
-//    if (vDisconnect.size() > 0) {
-//        LogPrintf("REORGANIZE: Disconnect Conflicting Blocks %lli blocks; %s..\n", vDisconnect.size(), pindexNew->GetBlockHash().ToString());
-//        BOOST_FOREACH (CBlockIndex* pindex, vDisconnect) {
-//            LogPrintf(" -- disconnect %s\n", pindex->GetBlockHash().ToString());
-//            DisconnectTip(state);
-//        }
-//    }
-//
-//    return true;
-//}
+// ***TODO*** clean up here
+bool DisconnectBlockAndInputs(CValidationState& state, CTransaction txLock)
+{
+    // All modifications to the coin state will be done in this cache.
+    // Only when all have succeeded, we push it to pcoinsTip.
+    //    CCoinsViewCache view(*pcoinsTip, true);
+
+    CBlockIndex* BlockReading = chainActive.Tip();
+    CBlockIndex* pindexNew = NULL;
+
+    bool foundConflictingTx = false;
+
+    //remove anything conflicting in the memory pool
+    list<CTransaction> txConflicted;
+    mempool.removeConflicts(txLock, txConflicted);
+
+
+    // List of what to disconnect (typically nothing)
+    vector<CBlockIndex*> vDisconnect;
+
+    for (unsigned int i = 1; BlockReading && BlockReading->nHeight > 0 && !foundConflictingTx && i < 6; i++) {
+        vDisconnect.push_back(BlockReading);
+        pindexNew = BlockReading->pprev; //new best block
+
+        CBlock block;
+        if (!ReadBlockFromDisk(block, BlockReading))
+            return state.Abort(_("Failed to read block"));
+
+        // Queue memory transactions to resurrect.
+        // We only do this for blocks after the last checkpoint (reorganisation before that
+        // point should only happen with -reindex/-loadblock, or a misbehaving peer.
+        BOOST_FOREACH (const CTransaction& tx, block.vtx) {
+            if (!tx.IsCoinBase()) {
+                BOOST_FOREACH (const CTxIn& in1, txLock.vin) {
+                    BOOST_FOREACH (const CTxIn& in2, tx.vin) {
+                        if (in1.prevout == in2.prevout) foundConflictingTx = true;
+                    }
+                }
+            }
+        }
+
+        if (BlockReading->pprev == NULL) {
+            assert(BlockReading);
+            break;
+        }
+        BlockReading = BlockReading->pprev;
+    }
+
+    if (!foundConflictingTx) {
+        LogPrintf("DisconnectBlockAndInputs: Can't find a conflicting transaction to inputs\n");
+        return false;
+    }
+
+    if (vDisconnect.size() > 0) {
+        LogPrintf("REORGANIZE: Disconnect Conflicting Blocks %lli blocks; %s..\n", vDisconnect.size(), pindexNew->GetBlockHash().ToString());
+        BOOST_FOREACH (CBlockIndex* pindex, vDisconnect) {
+            LogPrintf(" -- disconnect %s\n", pindex->GetBlockHash().ToString());
+            DisconnectTip(state);
+        }
+    }
+
+    return true;
+}
 
 
 /**

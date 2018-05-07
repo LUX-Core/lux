@@ -110,7 +110,6 @@ BITCOIN_CORE_H = \
   eccryptoverify.h \
   ecwrapper.h \
   hash.h \
-  indirectmap.h \
   init.h \
   stake.h \
   instantx.h \
