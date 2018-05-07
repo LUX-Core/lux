@@ -2268,16 +2268,15 @@ bool CWallet::CreateTransaction(const vector<pair<CScript, CAmount> >& vecSend, 
 
                     // coin control: send change to custom address
 
-                 if (coinControl && !boost::get<CNoDestination>(&coinControl->destChange))
-                   {
-
+                    if (coinControl && !boost::get<CNoDestination>(&coinControl->destChange))
+                    {
                         scriptChange = GetScriptForDestination(coinControl->destChange);
 
-                            vector<CTxOut>::iterator it = txNew.vout.begin();
+                        vector<CTxOut>::iterator it = txNew.vout.begin();
                         while (it != txNew.vout.end())
-                       {
+                        {
                             if (scriptChange == it->scriptPubKey)
-                           {
+                            {
                                 it->nValue += nChange;
                                 nChange = 0;
                                 reservekey.ReturnKey();
@@ -2302,7 +2301,10 @@ bool CWallet::CreateTransaction(const vector<pair<CScript, CAmount> >& vecSend, 
                         ret = reservekey.GetReservedKey(vchPubKey);
                         assert(ret); // should never fail, as we just unlocked
 
-                        scriptChange = GetScriptForDestination(vchPubKey.GetID());
+                        const OutputType change_type = TransactionChangeType(vecSend);
+
+                        LearnRelatedScripts(vchPubKey, change_type);
+                        scriptChange = GetScriptForDestination(GetDestinationForKey(vchPubKey, change_type));
                     }
 
                     if (!combineChange) {
@@ -3268,22 +3270,48 @@ void CWallet::LearnRelatedScripts(const CPubKey& key, OutputType type)
         CScript witprog = GetScriptForDestination(witdest);
         // Make sure the resulting program is solvable.
         assert(IsSolvable(*this, witprog));
-        if (AddCScript(witprog)) {
-            std::cout << "AddCSript failed" << std::endl;
+        AddCScript(witprog);
+    }
+}
+
+OutputType CWallet::TransactionChangeType(const std::vector<std::pair<CScript, CAmount> >& vecSend)
+{
+    // If -changetype is specified, always use that change type.
+    if (g_change_type != OUTPUT_TYPE_NONE) {
+        return g_change_type;
+    }
+
+    // if g_address_type is legacy, use legacy address as change (even
+    // if some of the outputs are P2WPKH or P2WSH).
+    if (g_address_type == OUTPUT_TYPE_LEGACY) {
+        return OUTPUT_TYPE_LEGACY;
+    }
+
+    // if any destination is P2WPKH or P2WSH, use P2WPKH for the change
+    // output.
+    for (const auto& recipient : vecSend) {
+        // Check if any destination contains a witness program:
+        int witnessversion = 0;
+        std::vector<unsigned char> witnessprogram;
+        if (recipient.first.IsWitnessProgram(witnessversion, witnessprogram)) {
+            return OUTPUT_TYPE_P2SH_SEGWIT;
         }
     }
+
+    // else use g_address_type for change
+    return g_address_type;
 }
 
 CTxDestination GetDestinationForKey(const CPubKey& key, OutputType type)
 {
     switch (type) {
-    case OUTPUT_TYPE_LEGACY: return key.GetID();
-    case OUTPUT_TYPE_P2SH_SEGWIT:
-        if (!key.IsCompressed()) return key.GetID();
-        CTxDestination witdest = WitnessV0KeyHash(key.GetID());
-        /*CScript witprog = GetScriptForDestination(witdest);
-        return CScriptID(witprog);*/
-        return witdest;
+        case OUTPUT_TYPE_LEGACY: return key.GetID();
+        case OUTPUT_TYPE_P2SH_SEGWIT:
+            if (!key.IsCompressed()) return key.GetID();
+            CTxDestination witdest = WitnessV0KeyHash(key.GetID());
+            /*CScript witprog = GetScriptForDestination(witdest);
+            return CScriptID(witprog);*/
+            return witdest;
     }
 }
 

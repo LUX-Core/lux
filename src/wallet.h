@@ -179,6 +179,8 @@ public:
      */
     void LearnRelatedScripts(const CPubKey& key, OutputType);
 
+    OutputType TransactionChangeType(const std::vector<std::pair<CScript, CAmount> >& vecSend);
+
     bool SelectCoinsCollateral(std::vector<CTxIn>& setCoinsRet, int64_t& nValueRet) const;
 
     /*

@@ -107,7 +107,7 @@ void UpdateTime(CBlockHeader* pblock, const Consensus::Params& consensusParams, 
         pblock->nBits = GetNextWorkRequired(pindexPrev, pblock, consensusParams, isProofOfStake);
 }
 
-CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, bool fProofOfStake)
+CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, bool fProofOfStake, bool fMineWitnessTx)
 {
     CReserveKey reservekey(pwallet);
     const CChainParams& chainparams = Params();
@@ -141,7 +141,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
     // -promiscuousmempoolflags is used.
     // TODO: replace this with a call to main to assess validity of a mempool
     // transaction (which in most cases can be a no-op).
-    bool fIncludeWitness = IsWitnessEnabled(pindexPrev, chainparams.GetConsensus());
+    bool fIncludeWitness = IsWitnessEnabled(pindexPrev, chainparams.GetConsensus()) && fMineWitnessTx;
 
     if (fProofOfStake) {
         // Height first in coinbase required for block.version=2
