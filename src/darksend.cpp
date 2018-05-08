@@ -496,13 +496,13 @@ void CDarkSendPool::SetNull(bool clearEverything){
 }
 
 bool CDarkSendPool::SetCollateralAddress(std::string strAddress){
-    CBitcoinAddress address;
-    if (!address.SetString(strAddress))
+    CTxDestination dest = DecodeDestination(strAddress);
+    if (!IsValidDestination(dest))
     {
         LogPrintf("CDarkSendPool::SetCollateralAddress - Invalid DarkSend collateral address\n");
         return false;
     }
-    collateralPubKey= GetScriptForDestination(address.Get());
+    collateralPubKey= GetScriptForDestination(dest);
     return true;
 }
 

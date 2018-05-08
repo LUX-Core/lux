@@ -145,7 +145,7 @@ void AddressField::on_editingFinished()
 
 void AddressField::appendAddress(const QString &strAddress)
 {
-    /*CBitcoinAddress address(strAddress.toStdString());
+    /*CTxDestination address = DecodeDestination(strAddress.toStdString());
     if(!m_stringList.contains(strAddress) &&
             IsMine(*pwalletMain, address.Get()))
     {

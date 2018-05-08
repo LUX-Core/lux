@@ -491,13 +491,6 @@ bool CConsensusVote::SignatureValid()
     //LogPrintf("verify addr %s \n", vecMasternodes[1].addr.ToString().c_str());
     //LogPrintf("verify addr %d %s \n", n, vecMasternodes[n].addr.ToString().c_str());
 
-    CScript pubkey;
-    pubkey =GetScriptForDestination(vecMasternodes[n].pubkey2.GetID());
-    CTxDestination address1;
-    ExtractDestination(pubkey, address1);
-    CBitcoinAddress address2(address1);
-    //LogPrintf("verify pubkey2 %s \n", address2.ToString().c_str());
-
     if(!darkSendSigner.VerifyMessage(vecMasternodes[n].pubkey2, vchMasterNodeSignature, strMessage, errorMessage)) {
         LogPrintf("InstantX::CConsensusVote::SignatureValid() - Verify message failed\n");
         return false;
@@ -526,7 +519,7 @@ bool CConsensusVote::Sign()
     pubkey =GetScriptForDestination(pubkey2.GetID());
     CTxDestination address1;
     ExtractDestination(pubkey, address1);
-    CBitcoinAddress address2(address1);
+    //CTxDestination address2(address1);
     //LogPrintf("signing pubkey2 %s \n", address2.ToString().c_str());
 
     if(!darkSendSigner.SignMessage(strMessage, errorMessage, vchMasterNodeSignature, key2)) {

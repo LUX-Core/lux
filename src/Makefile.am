@@ -134,6 +134,7 @@ BITCOIN_CORE_H = \
   rpcclient.h \
   rpcprotocol.h \
   rpcserver.h \
+  rpcutil.h \
   rpcwallet.h \
   script/interpreter.h \
   script/script.h \
@@ -361,6 +362,7 @@ libbitcoin_util_a_SOURCES = \
   clientversion.cpp \
   random.cpp \
   rpcprotocol.cpp \
+  rpcutil.cpp \
   sync.cpp \
   uint256.cpp \
   util.cpp \

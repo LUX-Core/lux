@@ -411,8 +411,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
 
                 CTxDestination txDest;
                 ExtractDestination(payeeScript, txDest);
-                CBitcoinAddress address(txDest);
-                LogPrintf("%s: Masternode payment to %s (pow)\n", __func__, address.ToString());
+                LogPrintf("%s: Masternode payment to %s (pow)\n", __func__, EncodeDestination(txDest));
             } else {
                 tx.vout[0].nValue = nReward;
             }

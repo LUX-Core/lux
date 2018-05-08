@@ -7,6 +7,7 @@
 #include "bitcoinaddressvalidator.h"
 
 #include "base58.h"
+#include "script/standard.h"
 
 /* Base58 characters are:
      "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
@@ -83,8 +84,8 @@ QValidator::State BitcoinAddressCheckValidator::validate(QString& input, int& po
 {
     Q_UNUSED(pos);
     // Validate the passed LUX address
-    CBitcoinAddress addr(input.toStdString());
-    if (addr.IsValid())
+    CTxDestination addr = DecodeDestination(input.toStdString());
+    if (IsValidDestination(addr))
         return QValidator::Acceptable;
 
     return QValidator::Invalid;

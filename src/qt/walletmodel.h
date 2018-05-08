@@ -11,6 +11,7 @@
 #include "allocators.h" /* for SecureString */
 #include "instantx.h"
 #include "wallet.h"
+#include "script/standard.h"
 
 #include <map>
 #include <vector>
@@ -197,7 +198,7 @@ public:
     UnlockContext requestUnlock(bool relock = false);
 
     bool getPubKey(const CKeyID& address, CPubKey& vchPubKeyOut) const;
-    bool isMine(CBitcoinAddress address);
+    bool isMine(CTxDestination address);
     void getOutputs(const std::vector<COutPoint>& vOutpoints, std::vector<COutput>& vOutputs);
     bool isSpent(const COutPoint& outpoint) const;
     void listCoins(std::map<QString, std::vector<COutput> >& mapCoins) const;

@@ -10,6 +10,7 @@
 #include "ui_interface.h"
 #include "util.h"
 #include "utilstrencodings.h"
+#include "script/standard.h"
 #include <QDateTime>
 #include <QKeyEvent>
 #include <QMessageBox>
@@ -55,12 +56,11 @@ static std::string ScriptToString(const CScript& Script, bool Long = false, bool
         return "unknown";
 
     CTxDestination Dest;
-    CBitcoinAddress Address;
-    if (ExtractDestination(Script, Dest) && Address.Set(Dest)) {
+    if (ExtractDestination(Script, Dest)) {
         if (Highlight)
-            return "<span class=\"addr\">" + Address.ToString() + "</span>";
+            return "<span class=\"addr\">" + EncodeDestination(Dest) + "</span>";
         else
-            return makeHRef(Address.ToString());
+            return makeHRef(EncodeDestination(Dest));
     } else
         return Long ? "<pre>" + FormatScript(Script) + "</pre>" : _("Non-standard script");
 }
@@ -372,7 +372,7 @@ std::string TxToString(uint256 BlockHash, const CTransaction& tx)
     return Content;
 }
 
-std::string AddressToString(const CBitcoinAddress& Address)
+std::string AddressToString(const CTxDestination& Address)
 {
     std::string TxLabels[] =
         {
@@ -420,7 +420,7 @@ std::string AddressToString(const CBitcoinAddress& Address)
     TxContent += "</table>";
 
     std::string Content;
-    Content += "<h1>" + _("Transactions to/from") + "&nbsp;<span>" + Address.ToString() + "</span></h1>";
+    Content += "<h1>" + _("Transactions to/from") + "&nbsp;<span>" + EncodeDestination(Address) + "</span></h1>";
     Content += TxContent;
     return Content;
 }
@@ -510,9 +510,8 @@ bool BlockExplorer::switchTo(const QString& query)
     }
 
     // If the query is not an integer, nor a block hash, nor a transaction hash, assume an address
-    CBitcoinAddress Address;
-    Address.SetString(query.toUtf8().constData());
-    if (Address.IsValid()) {
+    CTxDestination Address = DecodeDestination(query.toUtf8().constData());
+    if (IsValidDestination(Address)) {
         std::string Content = AddressToString(Address);
         if (Content.empty())
             return false;

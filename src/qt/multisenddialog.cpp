@@ -86,7 +86,7 @@ void MultiSendDialog::on_addButton_clicked()
 {
     bool fValidConversion = false;
     std::string strAddress = ui->multiSendAddressEdit->text().toStdString();
-    if (!CBitcoinAddress(strAddress).IsValid()) {
+    if (!IsValidDestination(DecodeDestination(strAddress))) {
         ui->message->setProperty("status", "error");
         ui->message->style()->polish(ui->message);
         ui->message->setText(tr("The entered address:\n") + ui->multiSendAddressEdit->text() + tr(" is invalid.\nPlease check the address and try again."));
@@ -165,7 +165,7 @@ void MultiSendDialog::on_activateButton_clicked()
         strRet = "Unable to activate MultiSend, check MultiSend vector\n";
     else if (!(ui->multiSendStakeCheckBox->isChecked() || ui->multiSendMasternodeCheckBox->isChecked())) {
         strRet = "Need to select to send on stake and/or masternode rewards\n";
-    } else if (CBitcoinAddress(pwalletMain->vMultiSend[0].first).IsValid()) {
+    } else if (IsValidDestination(DecodeDestination(pwalletMain->vMultiSend[0].first))) {
         pwalletMain->fMultiSendStake = ui->multiSendStakeCheckBox->isChecked();
         pwalletMain->fMultiSendMasternodeReward = ui->multiSendMasternodeCheckBox->isChecked();
 

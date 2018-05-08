@@ -7,6 +7,7 @@
 #include "bech32.h"
 #include "hash.h"
 #include "uint256.h"
+#include "utilstrencodings.h"
 
 #include <assert.h>
 #include <boost/variant/apply_visitor.hpp>
