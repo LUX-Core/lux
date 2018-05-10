@@ -581,6 +581,22 @@ CChainParams& Params(CBaseChainParams::Network network)
     }
 }
 
+CChainParams* CreateChainParams(CBaseChainParams::Network network)
+{
+    switch (network) {
+    case CBaseChainParams::MAIN:
+        return new CMainParams();
+    case CBaseChainParams::TESTNET:
+        return new CTestNetParams();
+    case CBaseChainParams::REGTEST:
+        return new CRegTestParams();
+    case CBaseChainParams::SEGWITTEST:
+        return new CSegWitTestnet();
+    default:
+        throw std::runtime_error(strprintf("%s: Unknown chain.", __func__));
+    }
+}
+
 void SelectParams(CBaseChainParams::Network network)
 {
     SelectBaseParams(network);

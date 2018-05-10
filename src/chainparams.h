@@ -139,6 +139,13 @@ protected:
 };
 
 /**
+ * Creates and returns a CChainParams* of the chosen chain.
+ * @returns a CChainParams* of the chosen chain.
+ * @throws a std::runtime_error if the chain is not supported.
+ */
+CChainParams* CreateChainParams(CBaseChainParams::Network network);
+
+/**
  * Modifiable parameters interface is used by test cases to adapt the parameters in order
  * to test specific features more easily. Test cases should always restore the previous
  * values after finalization.

@@ -196,7 +196,7 @@ void WalletModel::updateWatchOnlyFlag(bool fHaveWatchonly)
 bool WalletModel::validateAddress(const QString& address)
 {
     CTxDestination addressParsed = DecodeDestination(address.toStdString());
-    return addressParsed.IsValid();
+    return IsValidDestination(addressParsed);
 }
 
 WalletModel::SendCoinsReturn WalletModel::prepareTransaction(WalletModelTransaction& transaction, const CCoinControl* coinControl)
