@@ -167,8 +167,7 @@ public:
         CPubKey vchPubKey;
         obj.push_back(Pair("isscript", false));
         obj.push_back(Pair("iswitness", false));
-        if (mine == ISMINE_SPENDABLE) {
-            pwalletMain->GetPubKey(keyID, vchPubKey);
+        if (pwalletMain && pwalletMain->GetPubKey(keyID, vchPubKey)) {
             obj.push_back(Pair("pubkey", HexStr(vchPubKey)));
             obj.push_back(Pair("iscompressed", vchPubKey.IsCompressed()));
         }
@@ -178,13 +177,11 @@ public:
     UniValue operator()(const CScriptID& scriptID) const
     {
         UniValue obj(UniValue::VOBJ);
+        CScript subscript;
         obj.push_back(Pair("isscript", true));
         obj.push_back(Pair("iswitness", false));
-        if (mine != ISMINE_NO) {
-            CScript subscript;
-            if (pwalletMain->GetCScript(scriptID, subscript)) {
-                ProcessSubScript(subscript, obj, true);
-            }
+        if (pwalletMain && pwalletMain->GetCScript(scriptID, subscript)) {
+            ProcessSubScript(subscript, obj, true);
         }
         return obj;
     }
@@ -197,8 +194,7 @@ public:
         obj.push_back(Pair("iswitness", true));
         obj.push_back(Pair("witness_version", 0));
         obj.push_back(Pair("witness_program", HexStr(id.begin(), id.end())));
-        if (mine == ISMINE_SPENDABLE) {
-            pwalletMain->GetPubKey(CKeyID(id), vchPubKey);
+        if (pwalletMain && pwalletMain->GetPubKey(CKeyID(id), vchPubKey)) {
             obj.push_back(Pair("pubkey", HexStr(vchPubKey)));
         }
         return obj;
