@@ -90,7 +90,7 @@ bool CPubKey::Derive(CPubKey& pubkeyChild, unsigned char ccChild[32], unsigned i
 {
     assert(IsValid());
     assert((nChild >> 31) == 0);
-    assert(begin() + 33 == end());
+    assert(begin() + COMPRESSED_PUBLIC_KEY_SIZE == end());
     unsigned char out[64];
     BIP32Hash(cc, nChild, *begin(), begin() + 1, out);
     memcpy(ccChild, out + 32, 32);
@@ -117,8 +117,8 @@ void CExtPubKey::Encode(unsigned char code[74]) const
     code[7] = (nChild >> 8) & 0xFF;
     code[8] = (nChild >> 0) & 0xFF;
     memcpy(code + 9, vchChainCode, 32);
-    assert(pubkey.size() == 33);
-    memcpy(code + 41, pubkey.begin(), 33);
+    assert(pubkey.size() == CPubKey::COMPRESSED_PUBLIC_KEY_SIZE);
+    memcpy(code + 41, pubkey.begin(), CPubKey::COMPRESSED_PUBLIC_KEY_SIZE);
 }
 
 void CExtPubKey::Decode(const unsigned char code[74])
