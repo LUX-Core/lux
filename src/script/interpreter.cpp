@@ -1354,7 +1354,7 @@ size_t CountWitnessSigOps(const CScript& scriptSig, const CScript& scriptPubKey,
     if ((flags & SCRIPT_VERIFY_WITNESS) == 0) {
         return 0;
     }
-    assert((flags & SCRIPT_VERIFY_P2SH) != 0);
+    //assert((flags & SCRIPT_VERIFY_P2SH) != 0);
 
     int witnessversion;
     std::vector<unsigned char> witnessprogram;
