@@ -54,4 +54,9 @@ typedef enum ScriptError_t
 
 const char* ScriptErrorString(const ScriptError error);
 
+enum
+{
+    // BIP65 Atomic Swap Support CLTV
+            SCRIPT_VERIFY_CHECKLOCKTIMEVERIFY = (1U << 6),
+};
 #endif // BITCOIN_SCRIPT_SCRIPT_ERROR_H
