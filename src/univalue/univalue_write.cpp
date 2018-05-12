@@ -54,6 +54,13 @@ string UniValue::write(unsigned int prettyIndent,
     case VNUM:
         s += val;
         break;
+    case VREAL:
+        {
+            std::stringstream ss;
+            ss << std::showpoint << std::fixed << std::setprecision(8) << get_real();
+            s += ss.str();
+        }
+        break;
     case VBOOL:
         s += (val == "1" ? "true" : "false");
         break;
