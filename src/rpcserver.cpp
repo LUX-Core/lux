@@ -822,17 +822,6 @@ void RPCRunLater(const std::string& name, boost::function<void(void)> func, int6
     deadlineTimers[name]->async_wait(boost::bind(RPCRunHandler, _1, func));
 }
 
-class JSONRequest
-{
-public:
-    UniValue id;
-    string strMethod;
-    UniValue params;
-
-    JSONRequest() { id = NullUniValue; }
-    void parse(const UniValue& valRequest);
-};
-
 void JSONRequest::parse(const UniValue& valRequest)
 {
     // Parse request
@@ -884,7 +873,7 @@ static UniValue JSONRPCExecOne(const UniValue& req)
     return rpc_result;
 }
 
-static string JSONRPCExecBatch(const UniValue& vReq)
+string JSONRPCExecBatch(const UniValue& vReq)
 {
     UniValue ret(UniValue::VARR);
     for (unsigned int reqIdx = 0; reqIdx < vReq.size(); reqIdx++)

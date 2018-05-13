@@ -129,6 +129,9 @@ BITCOIN_CORE_H = \
   random.h \
   rpcclient.h \
   rpcprotocol.h \
+  httprpc.h \
+  httpserver.h \
+  luxcontrol.h \
   rpcserver.h \
   script/interpreter.h \
   script/script.h \
@@ -191,6 +194,9 @@ libbitcoin_server_a_SOURCES = \
   rpcmisc.cpp \
   rpcnet.cpp \
   rpcrawtransaction.cpp \
+  httprpc.cpp \
+  httpserver.cpp \
+  luxcontrol.cpp \
   rpcserver.cpp \
   script/sigcache.cpp \
   timedata.cpp \
