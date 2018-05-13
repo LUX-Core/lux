@@ -224,7 +224,7 @@ public:
     /// Get window identifier of QMainWindow (BitcoinGUI)
     WId getMainWinId() const;
 
-    void restoreWallet();
+    //void restoreWallet();
 
 public slots:
     void initializeResult(int retval);
@@ -253,8 +253,8 @@ private:
 
     void startThread();
 
-    QString restorePath;
-    QString restoreParam;
+   // QString restorePath;
+   // QString restoreParam;
 };
 
 #include "lux.moc"
@@ -442,8 +442,8 @@ void BitcoinApplication::requestShutdown()
 #ifdef ENABLE_WALLET
     if (walletModel)
     {
-        restoreParam= walletModel->getRestoreParam();
-        restorePath = walletModel->getRestorePath();
+       // restoreParam= walletModel->getRestoreParam();
+       // restorePath = walletModel->getRestorePath();
         window->removeAllWallets();
         delete walletModel;
         walletModel = 0;
@@ -528,7 +528,7 @@ WId BitcoinApplication::getMainWinId() const
 
     return window->winId();
 }
-
+/*
 void BitcoinApplication::restoreWallet()
 {
 #ifdef ENABLE_WALLET
@@ -561,7 +561,7 @@ void BitcoinApplication::restoreWallet()
     }
 #endif
 }
-
+*/
 #ifndef BITCOIN_QT_TEST
 int main(int argc, char* argv[])
 {
@@ -729,7 +729,7 @@ int main(int argc, char* argv[])
         PrintExceptionContinue(NULL, "Runaway exception");
         app.handleRunawayException(QString::fromStdString(strMiscWarning));
     }
-    app.restoreWallet();
+    //app.restoreWallet();
     return app.getReturnValue();
 }
 #endif // BITCOIN_QT_TEST
