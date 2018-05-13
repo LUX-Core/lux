@@ -44,6 +44,8 @@ static bool fRPCInWarmup = true;
 static std::string rpcWarmupStatus("RPC server started");
 static CCriticalSection cs_rpcWarmup;
 
+static std::vector<RPCTimerInterface*> timerInterfaces;
+
 //! These are created by StartRPCThreads, destroyed in StopRPCThreads
 static asio::io_service* rpc_io_service = NULL;
 static map<string, boost::shared_ptr<deadline_timer> > deadlineTimers;
@@ -819,6 +821,18 @@ void RPCRunHandler(const boost::system::error_code& err, boost::function<void(vo
         func();
 }
 
+void RPCRegisterTimerInterface(RPCTimerInterface *iface)
+{
+    timerInterfaces.push_back(iface);
+}
+
+void RPCUnregisterTimerInterface(RPCTimerInterface *iface)
+{
+    std::vector<RPCTimerInterface*>::iterator i = std::find(timerInterfaces.begin(), timerInterfaces.end(), iface);
+    assert(i != timerInterfaces.end());
+    timerInterfaces.erase(i);
+}
+
 void RPCRunLater(const std::string& name, boost::function<void(void)> func, int64_t nSeconds)
 {
     assert(rpc_io_service != NULL);
@@ -830,20 +844,6 @@ void RPCRunLater(const std::string& name, boost::function<void(void)> func, int6
     deadlineTimers[name]->expires_from_now(posix_time::seconds(nSeconds));
     deadlineTimers[name]->async_wait(boost::bind(RPCRunHandler, _1, func));
 }
-
-class JSONRequest
-
-
-{
-public:
-    UniValue id;
-    string strMethod;
-    UniValue params;
-
-    JSONRequest() { id = NullUniValue; }
-    void parse(const UniValue& valRequest);
-};
-
 
 void JSONRequest::parse(const UniValue& valRequest)
 {
@@ -896,7 +896,7 @@ static UniValue JSONRPCExecOne(const UniValue& req)
     return rpc_result;
 }
 
-static string JSONRPCExecBatch(const UniValue& vReq)
+string JSONRPCExecBatch(const UniValue& vReq)
 {
     UniValue ret(UniValue::VARR);
     for (unsigned int reqIdx = 0; reqIdx < vReq.size(); reqIdx++)

@@ -233,7 +233,7 @@ bool LookupNumeric(const char* pszName, CService& addr, int portDefault)
 /**
  * Convert milliseconds to a struct timeval for select.
  */
-struct timeval static MillisToTimeval(int64_t nTimeout)
+struct timeval MillisToTimeval(int64_t nTimeout)
 {
     struct timeval timeout;
     timeout.tv_sec = nTimeout / 1000;

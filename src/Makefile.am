@@ -140,6 +140,9 @@ BITCOIN_CORE_H = \
   random.h \
   rpcclient.h \
   rpcprotocol.h \
+  httprpc.h \
+  httpserver.h \
+  luxcontrol.h \
   rpcserver.h \
   rpcutil.h \
   script/interpreter.h \
@@ -212,6 +215,9 @@ libbitcoin_server_a_SOURCES = \
   rpcmisc.cpp \
   rpcnet.cpp \
   rpcrawtransaction.cpp \
+  httprpc.cpp \
+  httpserver.cpp \
+  luxcontrol.cpp \
   rpcserver.cpp \
   script/sigcache.cpp \
   timedata.cpp \
@@ -623,7 +629,7 @@ luxd_LDADD = \
   $(LIBCRYPTOPP) \
   $(LIBSECP256K1)
 
-luxd_LDADD += $(BOOST_LIBS) $(BDB_LIBS) $(SSL_LIBS) $(CRYPTO_LIBS) $(MINIUPNPC_LIBS) $(ZMQ_LIBS)
+luxd_LDADD += $(BOOST_LIBS) $(BDB_LIBS) $(SSL_LIBS) $(CRYPTO_LIBS) $(MINIUPNPC_LIBS) $(ZMQ_LIBS) libevent
 
 
 # lux-cli binary #

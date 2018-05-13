@@ -32,6 +32,17 @@ namespace RPCServer
 class CBlockIndex;
 class CNetAddr;
 
+class JSONRequest
+{
+public:
+    UniValue id;
+    std::string strMethod;
+    UniValue params;
+
+    JSONRequest() { id = NullUniValue; }
+    void parse(const UniValue& valRequest);
+};
+
 class AcceptedConnection
 {
 public:
@@ -122,6 +133,39 @@ public:
     bool threadSafe;
     bool reqWallet;
 };
+
+/** Opaque base class for timers returned by NewTimerFunc.
+ * This provides no methods at the moment, but makes sure that delete
+ * cleans up the whole state.
+ */
+class RPCTimerBase
+{
+public:
+    virtual ~RPCTimerBase() {}
+};
+
+/**
+* RPC timer "driver".
+ */
+class RPCTimerInterface
+{
+public:
+    virtual ~RPCTimerInterface() {}
+    /** Implementation name */
+    virtual const char *Name() = 0;
+    /** Factory function for timers.
+     * RPC will call the function to create a timer that will call func in *millis* milliseconds.
+     * @note As the RPC mechanism is backend-neutral, it can use different implementations of timers.
+     * This is needed to cope with the case in which there is no HTTP server, but
+     * only GUI RPC console, and to break the dependency of pcserver on httprpc.
+     */
+    virtual RPCTimerBase* NewTimer(boost::function<void(void)>& func, int64_t millis) = 0;
+};
+
+/** Register factory function for timers */
+void RPCRegisterTimerInterface(RPCTimerInterface *iface);
+/** Unregister factory function for timers */
+void RPCUnregisterTimerInterface(RPCTimerInterface *iface);
 
 /**
  * LUX RPC command dispatcher.
@@ -302,5 +346,6 @@ extern bool HTTPReq_REST(AcceptedConnection* conn,
     std::string& strURI,
     std::map<std::string, std::string>& mapHeaders,
     bool fRun);
+std::string JSONRPCExecBatch(const UniValue& vReq);
 
 #endif // BITCOIN_RPCSERVER_H
