@@ -29,6 +29,12 @@ static const unsigned int MAX_P2SH_SIGOPS = 15;
 static const unsigned int MAX_STANDARD_TX_SIGOPS_COST = MAX_BLOCK_SIGOPS_COST/5;
 /** Default for -maxmempool, maximum megabytes of mempool memory usage */
 static const unsigned int DEFAULT_MAX_MEMPOOL_SIZE = 300;
+/** Default for -blockmaxweight, which controls the range of block weights the mining code will create **/
+static const unsigned int DEFAULT_BLOCK_MAX_WEIGHT = 7600000;
+/** Default for -blockmintxfee, which sets the minimum feerate for a transaction in blocks created by mining code **/
+static const unsigned int DEFAULT_BLOCK_MIN_TX_FEE = 400000;
+/** The maximum weight for transactions we're willing to relay/mine */
+static const unsigned int MAX_STANDARD_TX_WEIGHT = 400000;
 /**
  * Standard script verification flags that standard transactions will comply
  * with. However scripts violating these flags may still be present in valid
