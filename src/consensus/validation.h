@@ -7,6 +7,8 @@
 #define BITCOIN_CONSENSUS_VALIDATION_H
 
 #include <string>
+#include <sstream>
+#include "tinyformat.h"
 
 /** "reject" message codes */
 static const unsigned char REJECT_MALFORMED = 0x01;
@@ -84,5 +86,14 @@ public:
     std::string GetRejectReason() const { return strRejectReason; }
     std::string GetDebugMessage() const { return strDebugMessage; }
 };
+
+/** Convert CValidationState to a human-readable message for logging */
+std::string FormatStateMessage(const CValidationState &state)
+{
+    return strprintf("%s%s (code %i)",
+                     state.GetRejectReason(),
+                     state.GetDebugMessage().empty() ? "" : ", "+state.GetDebugMessage(),
+                     state.GetRejectCode());
+}
 
 #endif // BITCOIN_CONSENSUS_VALIDATION_H
