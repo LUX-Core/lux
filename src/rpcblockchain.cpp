@@ -189,9 +189,8 @@ UniValue getrawmempool(const UniValue& params, bool fHelp)
     if (fVerbose) {
         LOCK(mempool.cs);
         UniValue o(UniValue::VOBJ);
-        BOOST_FOREACH (const PAIRTYPE(uint256, CTxMemPoolEntry) & entry, mempool.mapTx) {
-            const uint256& hash = entry.first;
-            const CTxMemPoolEntry& e = entry.second;
+        BOOST_FOREACH(const CTxMemPoolEntry& e, mempool.mapTx) {
+            const uint256& hash = e.GetTx().GetHash();;
             UniValue info(UniValue::VOBJ);
             info.push_back(Pair("size", (int)e.GetTxSize()));
             info.push_back(Pair("fee", ValueFromAmount(e.GetFee())));
@@ -501,6 +500,7 @@ UniValue gettxout(const UniValue& params, bool fHelp)
     std::string strHash = params[0].get_str();
     uint256 hash(strHash);
     int n = params[1].get_int();
+    COutPoint out(hash, n);
     bool fMempool = true;
     if (params.size() > 2)
         fMempool = params[2].get_bool();
@@ -509,15 +509,14 @@ UniValue gettxout(const UniValue& params, bool fHelp)
     if (fMempool) {
         LOCK(mempool.cs);
         CCoinsViewMemPool view(pcoinsTip, mempool);
-        if (!view.GetCoins(hash, coins))
+        if (!view.GetCoin(out, coins) || mempool.isSpent(out)) { // TODO: filtering spent coins should be done by the CCoinsViewMemPool
             return NullUniValue;
-        mempool.pruneSpent(hash, coins); // TODO: this should be done by the CCoinsViewMemPool
+        }
     } else {
-        if (!pcoinsTip->GetCoins(hash, coins))
+        if (!pcoinsTip->GetCoins(hash, coins)) {
             return NullUniValue;
+        }
     }
-    if (n < 0 || (unsigned int)n >= coins.vout.size() || coins.vout[n].IsNull())
-        return NullUniValue;
 
     BlockMap::iterator it = mapBlockIndex.find(pcoinsTip->GetBestBlock());
     CBlockIndex* pindex = it->second;
