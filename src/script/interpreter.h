@@ -105,18 +105,35 @@ enum
     //
     SCRIPT_VERIFY_MINIMALIF = (1U << 13),
 
+    // Signature(s) must be empty vector if an CHECK(MULTI)SIG operation failed
+    //
+    SCRIPT_VERIFY_NULLFAIL = (1U << 14),
+
     // Public keys in segregated witness scripts must be compressed
     //
     SCRIPT_VERIFY_WITNESS_PUBKEYTYPE = (1U << 15),
+
+    // Performs the compiled byte code
+    //
+    SCRIPT_EXEC_BYTE_CODE = (1U << 30),
 };
 
 bool CheckSignatureEncoding(const std::vector<unsigned char> &vchSig, unsigned int flags, ScriptError* serror);
+
+struct PrecomputedTransactionData
+{
+    uint256 hashPrevouts, hashSequence, hashOutputs;
+
+    PrecomputedTransactionData(const CTransaction& tx);
+};
 
 enum SigVersion
 {
     SIGVERSION_BASE = 0,
     SIGVERSION_WITNESS_V0 = 1,
 };
+
+bool CheckSignatureEncoding(const std::vector<unsigned char> &vchSig, unsigned int flags, ScriptError* serror);
 
 uint256 SignatureHash(const CScript &scriptCode, const CTransaction& txTo, unsigned int nIn, int nHashType, const CAmount& amount, SigVersion sigversion);
 
@@ -126,6 +143,11 @@ public:
     virtual bool CheckSig(const std::vector<unsigned char>& scriptSig, const std::vector<unsigned char>& vchPubKey, const CScript& scriptCode, SigVersion sigversion) const
     {
         return false;
+    }
+
+    virtual bool CheckLockTime(const CScriptNum& nLockTime) const
+    {
+         return false;
     }
 
     virtual bool CheckSequence(const CScriptNum& nSequence) const
@@ -149,6 +171,7 @@ protected:
 public:
     TransactionSignatureChecker(const CTransaction* txToIn, unsigned int nInIn, const CAmount& amountIn) : txTo(txToIn), nIn(nInIn), amount(amountIn) {}
     bool CheckSig(const std::vector<unsigned char>& scriptSig, const std::vector<unsigned char>& vchPubKey, const CScript& scriptCode, SigVersion sigversion) const;
+    bool CheckLockTime(const CScriptNum& nLockTime) const override;
     bool CheckSequence(const CScriptNum& nSequence) const override;
 };
 
