@@ -2220,7 +2220,7 @@ bool CWallet::CreateTransaction(const vector<pair<CScript, CAmount> >& vecSend, 
     CAmount nValue = 0;
 
     BOOST_FOREACH (const PAIRTYPE(CScript, CAmount) & s, vecSend) {
-        if (nValue < 0) {
+        if (nValue < 0 || s.second < 0) {
             strFailReason = _("Transaction amounts must be positive");
             return false;
         }
@@ -2366,7 +2366,11 @@ bool CWallet::CreateTransaction(const vector<pair<CScript, CAmount> >& vecSend, 
                         CPubKey vchPubKey;
                         bool ret;
                         ret = reservekey.GetReservedKey(vchPubKey);
-                        assert(ret); // should never fail, as we just unlocked
+                        if (!ret)
+                        {
+                            strFailReason = _("Keypool ran out, please call keypoolrefill first");
+                            return false;
+                        }
 
                         const OutputType change_type = TransactionChangeType(vecSend);
 
