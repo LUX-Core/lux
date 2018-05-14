@@ -81,8 +81,8 @@ bool static IsCompressedOrUncompressedPubKey(const valtype &vchPubKey) {
             return false;
         }
     } else {
-          //  Non-canonical public key: neither compressed nor uncompressed
-          return false;
+        //  Non-canonical public key: neither compressed nor uncompressed
+        return false;
     }
     return true;
 }
@@ -818,7 +818,7 @@ bool EvalScript(vector<vector<unsigned char> >& stack, const CScript& script, un
                     // Subset of script starting at the most recent codeseparator
                     CScript scriptCode(pbegincodehash, pend);
 
-                    // Drop the signature, since there's no way for a signature to sign itself
+                    // Drop the signature in pre-segwit scripts but not segwit scripts
                     if (sigversion == SIGVERSION_BASE) {
                         scriptCode.FindAndDelete(CScript(vchSig));
                     }
@@ -1314,8 +1314,19 @@ bool VerifyScript(const CScript& scriptSig, const CScript& scriptPubKey, const C
                 stack.resize(1);
             }
         }
-        /*else
-            return set_success(serror);*/
+    }
+
+    // The CLEANSTACK check is only performed after potential P2SH evaluation,
+    // as the non-P2SH evaluation of a P2SH script will obviously not result in
+    // a clean stack (the P2SH inputs remain). The same holds for witness evaluation.
+    if ((flags & SCRIPT_VERIFY_CLEANSTACK) != 0) {
+        // Disallow CLEANSTACK without P2SH, as otherwise a switch CLEANSTACK->P2SH+CLEANSTACK
+        // would be possible, which is not a softfork (and P2SH should be one).
+        //assert((flags & SCRIPT_VERIFY_P2SH) != 0);
+        assert((flags & SCRIPT_VERIFY_WITNESS) != 0);
+        if (stack.size() != 1) {
+            return set_error(serror, SCRIPT_ERR_CLEANSTACK);
+        }
     }
 
     if (flags & SCRIPT_VERIFY_WITNESS) {
