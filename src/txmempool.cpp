@@ -13,6 +13,7 @@
 #include "util.h"
 #include "utilmoneystr.h"
 #include "version.h"
+#include "script/interpreter.h"
 
 #include <boost/circular_buffer.hpp>
 
@@ -388,6 +389,7 @@ void CTxMemPool::check(const CCoinsViewCache* pcoins) const
         checkTotal += it->second.GetTxSize();
         const CTransaction& tx = it->second.GetTx();
         bool fDependsWait = false;
+        PrecomputedTransactionData txdata(tx);
         BOOST_FOREACH (const CTxIn& txin, tx.vin) {
             // Check that every mempool transaction's inputs refer to available coins, or other mempool tx's.
             std::map<uint256, CTxMemPoolEntry>::const_iterator it2 = mapTx.find(txin.prevout.hash);
@@ -411,7 +413,7 @@ void CTxMemPool::check(const CCoinsViewCache* pcoins) const
         else {
             CValidationState state;
             CTxUndo undo;
-            assert(CheckInputs(tx, state, mempoolDuplicate, false, 0, false, NULL));
+            assert(CheckInputs(tx, state, mempoolDuplicate, false, 0, false, txdata, NULL));
             UpdateCoins(tx, state, mempoolDuplicate, undo, 1000000);
         }
     }
@@ -420,12 +422,13 @@ void CTxMemPool::check(const CCoinsViewCache* pcoins) const
         const CTxMemPoolEntry* entry = waitingOnDependants.front();
         waitingOnDependants.pop_front();
         CValidationState state;
+        PrecomputedTransactionData txdata(entry->GetTx());
         if (!mempoolDuplicate.HaveInputs(entry->GetTx())) {
             waitingOnDependants.push_back(entry);
             stepsSinceLastRemove++;
             assert(stepsSinceLastRemove < waitingOnDependants.size());
         } else {
-            assert(CheckInputs(entry->GetTx(), state, mempoolDuplicate, false, 0, false, NULL));
+            assert(CheckInputs(entry->GetTx(), state, mempoolDuplicate, false, 0, false, txdata, NULL));
             CTxUndo undo;
             CValidationState state;
             UpdateCoins(entry->GetTx(), state, mempoolDuplicate, undo, 1000000);
