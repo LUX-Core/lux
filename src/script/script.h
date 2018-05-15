@@ -355,8 +355,6 @@ public:
         return result;
     }
 
-    static const size_t nMaxNumSize = 4;
-
 private:
     static int64_t set_vch(const std::vector<unsigned char>& vch)
     {
