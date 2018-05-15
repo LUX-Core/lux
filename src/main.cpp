@@ -1099,7 +1099,7 @@ bool AcceptToMemoryPool(CTxMemPool& pool, CValidationState& state, const CTransa
                 // Only the witness is missing, so the transaction itself may be fine.
                 state.SetCorruptionPossible();
             }
-            return error("AcceptableInputs: : ConnectInputs failed %s", hash.ToString());
+            return error("AcceptToMemoryPool: : CheckInputs failed %s", hash.ToString());
         }
 
         // Check again against just the consensus-critical mandatory script
