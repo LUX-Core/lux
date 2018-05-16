@@ -140,6 +140,24 @@ static const uint64_t MINIMUM_GAS_LIMIT = 10000;
 
 static const uint64_t MEMPOOL_MIN_GAS_LIMIT = 22000;
 
+/** The maximum allowed size for a serialized block, in bytes (only for buffer size limits) */
+extern unsigned int dgpMaxBlockSerSize;
+/** The maximum allowed weight for a block, see BIP 141 (network rule) */
+extern unsigned int dgpMaxBlockWeight;
+/** The maximum allowed size for a block excluding witness data, in bytes (network rule) */
+extern unsigned int dgpMaxBlockBaseSize;
+
+extern unsigned int dgpMaxBlockSize; // qtum
+
+/** The maximum allowed number of signature check operations in a block (network rule) */
+extern int64_t dgpMaxBlockSigOps;
+
+extern unsigned int dgpMaxProtoMsgLength;
+
+extern unsigned int dgpMaxTxSigOps;
+void updateBlockSizeParams(unsigned int newBlockSize);
+
+
 //////////////////////////////////////////////////////
 
 inline bool IsProtocolV2(int nHeight) { return IsTestNet() || nHeight > 0; }
@@ -491,7 +509,7 @@ ThresholdState VersionBitsTipState(const Consensus::Params& params, Consensus::D
  */
 unsigned int GetP2SHSigOpCount(const CTransaction& tx, const CCoinsViewCache& mapInputs);
 
-CAmount GetBlockSubsidy(int nHeight, const Consensus::Params& consensusParams);
+//CAmount GetBlockSubsidy(int nHeight, const Consensus::Params& consensusParams);
 
 /**
  * Check whether all inputs of this transaction are valid (no double spends, scripts & sigs, amounts)
@@ -716,12 +734,6 @@ extern StorageResults *pstorageresult;
 
 extern VersionBitsCache versionbitscache;
 
-struct CBlockTemplate {
-    CBlock block;
-    std::vector<CAmount> vTxFees;
-    std::vector<int64_t> vTxSigOps;
-    std::vector<unsigned char> vchCoinbaseCommitment;
-};
 
 /** Reject codes greater or equal to this can be returned by AcceptToMemPool
  * for transactions, to signal internal conditions. They cannot and should not
@@ -735,6 +747,7 @@ static const unsigned int REJECT_ALREADY_KNOWN = 0x101;
 /** Transaction conflicts with a transaction already known */
 static const unsigned int REJECT_CONFLICT = 0x102;
 
+int GetSpendHeight(const CCoinsViewCache& inputs);
 
 //////////////////////////////////////////////////////// lux
 std::vector<ResultExecute> CallContract(const dev::Address& addrContract, std::vector<unsigned char> opcode, const dev::Address& sender = dev::Address(), uint64_t gasLimit=0);

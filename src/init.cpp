@@ -183,7 +183,7 @@ void PrepareShutdown()
 #ifdef ENABLE_WALLET
     if (pwalletMain)
         bitdb.Flush(false);
-    GenerateBitcoins(NULL, 0);
+//    GenerateBitcoins(NULL, 0);
 #endif
     StopNode();
     UnregisterNodeSignals(GetNodeSignals());
@@ -1698,7 +1698,7 @@ bool AppInit2(boost::thread_group& threadGroup)
 #ifdef ENABLE_WALLET
     // Generate coins in the background
     if (GetBoolArg("-gen", false) && pwalletMain) {
-        GenerateBitcoins(pwalletMain, GetArg("-genproclimit", 1));
+//        GenerateBitcoins(pwalletMain, GetArg("-genproclimit", 1));
     }
 #endif
 

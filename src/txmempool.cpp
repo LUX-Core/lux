@@ -13,19 +13,21 @@
 #include "util.h"
 #include "utilmoneystr.h"
 #include "version.h"
+#include "core_memusage.h"
+#include "policy/policy.h"
 
 #include <boost/circular_buffer.hpp>
 
 CTxMemPoolEntry::CTxMemPoolEntry(const CTransactionRef& _tx, const CAmount& _nFee,
                     int64_t _nTime, double _entryPriority, unsigned int _entryHeight,
-                    CAmount _inChainInputValue, bool spendsCoinbase,
-                    int64_t nSigOpsCost, LockPoints lp, bool poolHasNoInputsOf, CAmount _nMinGasPrice = 0):
+                    CAmount _inChainInputValue, bool _spendsCoinbase,
+                    int64_t _sigOpsCost, LockPoints lp, bool poolHasNoInputsOf, CAmount _nMinGasPrice):
     tx(_tx), nFee(_nFee), nTime(_nTime), entryPriority(_entryPriority), entryHeight(_entryHeight),
     inChainInputValue(_inChainInputValue),
     spendsCoinbase(_spendsCoinbase), sigOpCost(_sigOpsCost), lockPoints(lp),
     nMinGasPrice(_nMinGasPrice), hadNoDependencies(poolHasNoInputsOf)
 {
-    nTxWeight = GetTransactionWeight(*tx);
+    nTxWeight = GetTransactionCost(*tx);
     nModSize = tx->CalculateModifiedSize(GetTxSize());
     nUsageSize = RecursiveDynamicUsage(*tx) + memusage::DynamicUsage(tx);
 
@@ -336,7 +338,7 @@ void CTxMemPoolEntry::UpdateDescendantState(int64_t modifySize, CAmount modifyFe
     assert(int64_t(nCountWithDescendants) > 0);
 }
 
-void CTxMemPoolEntry::UpdateAncestorState(int64_t modifySize, CAmount modifyFee, int64_t modifyCount, int modifySigOps)
+void CTxMemPoolEntry::UpdateAncestorState(int64_t modifySize, CAmount modifyFee, int64_t modifyCount, int64_t modifySigOps)
 {
     nSizeWithAncestors += modifySize;
     assert(int64_t(nSizeWithAncestors) > 0);
@@ -536,8 +538,8 @@ void CTxMemPool::removeForReorg(const CCoinsViewCache *pcoins, unsigned int nMem
     for (indexed_transaction_set::const_iterator it = mapTx.begin(); it != mapTx.end(); it++) {
         const CTransaction& tx = it->GetTx();
         LockPoints lp = it->GetLockPoints();
-        bool validLP =  TestLockPointValidity(&lp);
-        if (!CheckFinalTx(tx, flags) || !CheckSequenceLocks(tx, flags, &lp, validLP)) {
+//        bool validLP =  TestLockPointValidity(&lp);
+        if (!CheckFinalTx(tx, flags) /*|| !CheckSequenceLocks(tx, flags, &lp, validLP)*/) {
             // Note if CheckSequenceLocks fails the LockPoints may still be invalid
             // So it's critical that we remove the tx and not depend on the LockPoints.
             txToRemove.insert(it);
@@ -546,17 +548,17 @@ void CTxMemPool::removeForReorg(const CCoinsViewCache *pcoins, unsigned int nMem
                 indexed_transaction_set::const_iterator it2 = mapTx.find(txin.prevout.hash);
                 if (it2 != mapTx.end())
                     continue;
-                const Coin &coin = pcoins->AccessCoin(txin.prevout);
-                if (nCheckFrequency != 0) assert(!coin.IsSpent());
-                if (coin.IsSpent() || (coin.IsCoinBase() && ((signed long)nMemPoolHeight) - coin.nHeight < COINBASE_MATURITY)) {
+                const CCoins* coins = pcoins->AccessCoins(txin.prevout.hash);
+                if (nCheckFrequency != 0) assert(coins);
+                if (!coins || ((coins->IsCoinBase() || coins->IsCoinStake()) && ((signed long)nMemPoolHeight) - coins->nHeight < COINBASE_MATURITY)) {
                     txToRemove.insert(it);
                     break;
                 }
             }
         }
-        if (!validLP) {
-            mapTx.modify(it, update_lock_points(lp));
-        }
+//        if (!validLP) {
+//            mapTx.modify(it, update_lock_points(lp));
+//        }
     }
     setEntries setAllRemoves;
     for (txiter it : txToRemove) {
@@ -598,7 +600,7 @@ void CTxMemPool::removeForBlock(const std::vector<CTransaction>& vtx, unsigned i
             entries.push_back(&*i);
     }
     // Before the txs in the new block have been removed from the mempool, update policy estimates
-    minerPolicyEstimator->processBlock(nBlockHeight, entries);
+    minerPolicyEstimator->processBlock(nBlockHeight, entries, !IsInitialBlockDownload());
     for (const auto& tx : vtx)
     {
         txiter it = mapTx.find(tx.GetHash());
@@ -676,7 +678,7 @@ void CTxMemPool::check(const CCoinsViewCache *pcoins) const
                     parentSigOpCost += it2->GetSigOpCost();
                 }
             } else {
-                assert(pcoins->HaveCoin(txin.prevout));
+                assert(pcoins->HaveCoins(txin.prevout.hash));
             }
             // Check whether its inputs are marked in mapNextTx.
             auto it3 = mapNextTx.find(txin.prevout);
@@ -726,11 +728,13 @@ void CTxMemPool::check(const CCoinsViewCache *pcoins) const
         if (fDependsWait)
             waitingOnDependants.push_back(&(*it));
         else {
+            CTxUndo undo;
             CValidationState state;
-            bool fCheckResult = tx.IsCoinBase() ||
-                Consensus::CheckTxInputs(tx, state, mempoolDuplicate, nSpendHeight);
-            assert(fCheckResult);
-            UpdateCoins(tx, mempoolDuplicate, 1000000);
+//            bool fCheckResult = tx.IsCoinBase() ||
+                    assert(CheckInputs(tx, state, mempoolDuplicate, false, 0, false, NULL));
+//                Consensus::CheckTxInputs(tx, state, mempoolDuplicate, nSpendHeight);
+//            assert(fCheckResult);
+            UpdateCoins(tx, state, mempoolDuplicate, undo, 1000000);
         }
     }
     unsigned int stepsSinceLastRemove = 0;
@@ -743,10 +747,14 @@ void CTxMemPool::check(const CCoinsViewCache *pcoins) const
             stepsSinceLastRemove++;
             assert(stepsSinceLastRemove < waitingOnDependants.size());
         } else {
-            bool fCheckResult = entry->GetTx().IsCoinBase() ||
-                Consensus::CheckTxInputs(entry->GetTx(), state, mempoolDuplicate, nSpendHeight);
-            assert(fCheckResult);
-            UpdateCoins(entry->GetTx(), mempoolDuplicate, 1000000);
+
+//            bool fCheckResult = entry->GetTx().IsCoinBase() ||
+//                Consensus::CheckTxInputs(entry->GetTx(), state, mempoolDuplicate, nSpendHeight);
+            assert(CheckInputs(entry->GetTx(), state, mempoolDuplicate, false, 0, false, NULL));
+//            assert(fCheckResult);
+            CTxUndo undo;
+            CValidationState state;
+            UpdateCoins(entry->GetTx(), state, mempoolDuplicate, undo, 1000000);
             stepsSinceLastRemove = 0;
         }
     }
@@ -902,7 +910,7 @@ CTxMemPool::ReadFeeEstimates(CAutoFile& filein)
         if (nVersionRequired > CLIENT_VERSION)
             return error("CTxMemPool::ReadFeeEstimates(): up-version (%d) fee estimate file", nVersionRequired);
         LOCK(cs);
-        minerPolicyEstimator->Read(filein, nVersionThatWrote);
+        minerPolicyEstimator->Read(filein);
     }
     catch (const std::exception&) {
         LogPrintf("CTxMemPool::ReadFeeEstimates(): unable to read policy estimator data (non-fatal)\n");
@@ -968,17 +976,17 @@ bool CCoinsViewMemPool::GetCoin(const COutPoint &outpoint, CCoins &coin) const {
     CTransactionRef ptx = mempool.get(outpoint.hash);
     if (ptx) {
         if (outpoint.n < ptx->vout.size()) {
-            coin = Coin(ptx->vout[outpoint.n], MEMPOOL_HEIGHT, false, false);
+            coin = CCoins(*ptx, MEMPOOL_HEIGHT);
             return true;
         } else {
             return false;
         }
     }
-    return (base->GetCoin(outpoint, coin) && !coin.IsSpent());
+    return (base->GetCoins(outpoint.hash, coin) /*&& !coin.IsSpent()*/);
 }
 
 bool CCoinsViewMemPool::HaveCoin(const COutPoint &outpoint) const {
-    return mempool.exists(outpoint) || base->HaveCoin(outpoint);
+    return mempool.exists(outpoint) || base->HaveCoins(outpoint.hash);
 }
 
 size_t CTxMemPool::DynamicMemoryUsage() const {

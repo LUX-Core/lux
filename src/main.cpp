@@ -82,6 +82,35 @@ std::shared_ptr<dev::eth::SealEngineFace> globalSealEngine;
 bool fRecordLogOpcodes = false;
 bool fIsVMlogFile = false;
 bool fGettingValuesDGP = false;
+
+
+/** The maximum allowed size for a serialized block, in bytes (only for buffer size limits) */
+unsigned int dgpMaxBlockSerSize = 8000000;
+/** The maximum allowed weight for a block, see BIP 141 (network rule) */
+unsigned int dgpMaxBlockWeight = 8000000;
+/** The maximum allowed size for a block excluding witness data, in bytes (network rule) */
+unsigned int dgpMaxBlockBaseSize = 2000000;
+
+unsigned int dgpMaxBlockSize = 2000000; // qtum
+
+///** The maximum allowed number of signature check operations in a block (network rule) */
+int64_t dgpMaxBlockSigOps = 80000;
+
+unsigned int dgpMaxProtoMsgLength = 8000000;
+
+unsigned int dgpMaxTxSigOps = 16000;
+
+void updateBlockSizeParams(unsigned int newBlockSize){
+    unsigned int newSizeForParams=WITNESS_SCALE_FACTOR*newBlockSize;
+    dgpMaxBlockSerSize=newSizeForParams;
+    dgpMaxBlockWeight=newSizeForParams;
+    dgpMaxBlockBaseSize=newBlockSize;
+    dgpMaxBlockSigOps=(int64_t)(newSizeForParams/100);
+    dgpMaxTxSigOps = (unsigned int)(dgpMaxBlockSigOps/5);
+    dgpMaxProtoMsgLength=newSizeForParams;
+}
+
+
 //////////////////////////////
 
 
@@ -987,6 +1016,7 @@ bool AcceptToMemoryPool(CTxMemPool& pool, CValidationState& state, const CTransa
         CCoinsViewCache view(&dummy);
 
         CAmount nValueIn = 0;
+        LockPoints lp;
         {
             LOCK(pool.cs);
             CCoinsViewMemPool viewMemPool(pcoinsTip, pool);
@@ -1123,7 +1153,7 @@ bool AcceptToMemoryPool(CTxMemPool& pool, CValidationState& state, const CTransa
         ////////////////////////////////////////////////////////////
 
         double dPriority = view.GetPriority(tx, chainActive.Height(), inChainInputValue);
-        CTxMemPoolEntry entry(tx, nFees, GetTime(), dPriority, chainActive.Height(), pool.HasNoInputsOf(tx));
+        CTxMemPoolEntry entry(MakeTransactionRef(tx), nFees, GetTime(), dPriority, chainActive.Height(), inChainInputValue, fSpendsCoinbase, nSigOpsCost,  lp, pool.HasNoInputsOf(tx),CAmount(txMinGasPrice));
 
         // Check that the transaction doesn't have an excessive number of
         // sigops, making it impossible to mine. Since the coinbase transaction
@@ -1265,6 +1295,7 @@ bool AcceptableInputs(CTxMemPool& pool, CValidationState& state, const CTransact
         CCoinsViewCache view(&dummy);
 
         CAmount nValueIn = 0;
+        LockPoints lp;
         {
             LOCK(pool.cs);
             CCoinsViewMemPool viewMemPool(pcoinsTip, pool);
@@ -1313,8 +1344,88 @@ bool AcceptableInputs(CTxMemPool& pool, CValidationState& state, const CTransact
         CAmount inChainInputValue;
         CAmount nValueOut = tx.GetValueOut();
         CAmount nFees = nValueIn - nValueOut;
+
+        dev::u256 txMinGasPrice = 0;
+
+        //////////////////////////////////////////////////////////// // lux
+        if(tx.HasCreateOrCall()){
+
+            if(!CheckSenderScript(view, tx)){
+                return state.DoS(1, false, REJECT_INVALID, "bad-txns-invalid-sender-script");
+            }
+
+            LuxDGP luxDGP(globalState.get(), fGettingValuesDGP);
+            uint64_t minGasPrice = luxDGP.getMinGasPrice(chainActive.Tip()->nHeight + 1);
+            uint64_t blockGasLimit = luxDGP.getBlockGasLimit(chainActive.Tip()->nHeight + 1);
+            size_t count = 0;
+            for(const CTxOut& o : tx.vout)
+                count += o.scriptPubKey.HasOpCreate() || o.scriptPubKey.HasOpCall() ? 1 : 0;
+            LuxTxConverter converter(tx, NULL);
+            ExtractLuxTX resultConverter;
+            if(!converter.extractionLuxTransactions(resultConverter)){
+                return state.DoS(100, error("AcceptToMempool(): Contract transaction of the wrong format"), REJECT_INVALID, "bad-tx-bad-contract-format");
+            }
+            std::vector<LuxTransaction> luxTransactions = resultConverter.first;
+            std::vector<EthTransactionParams> luxETP = resultConverter.second;
+
+            dev::u256 sumGas = dev::u256(0);
+            dev::u256 gasAllTxs = dev::u256(0);
+            for(LuxTransaction luxTransaction : luxTransactions){
+                sumGas += luxTransaction.gas() * luxTransaction.gasPrice();
+
+                if(sumGas > dev::u256(INT64_MAX)) {
+                    return state.DoS(100, error("AcceptToMempool(): Transaction's gas stipend overflows"), REJECT_INVALID, "bad-tx-gas-stipend-overflow");
+                }
+
+                if(sumGas > dev::u256(nFees)) {
+                    return state.DoS(100, error("AcceptToMempool(): Transaction fee does not cover the gas stipend"), REJECT_INVALID, "bad-txns-fee-notenough");
+                }
+
+                if(txMinGasPrice != 0) {
+                    txMinGasPrice = std::min(txMinGasPrice, luxTransaction.gasPrice());
+                } else {
+                    txMinGasPrice = luxTransaction.gasPrice();
+                }
+                VersionVM v = luxTransaction.getVersion();
+                if(v.format!=0)
+                    return state.DoS(100, error("AcceptToMempool(): Contract execution uses unknown version format"), REJECT_INVALID, "bad-tx-version-format");
+                if(v.rootVM != 1)
+                    return state.DoS(100, error("AcceptToMempool(): Contract execution uses unknown root VM"), REJECT_INVALID, "bad-tx-version-rootvm");
+                if(v.vmVersion != 0)
+                    return state.DoS(100, error("AcceptToMempool(): Contract execution uses unknown VM version"), REJECT_INVALID, "bad-tx-version-vmversion");
+                if(v.flagOptions != 0)
+                    return state.DoS(100, error("AcceptToMempool(): Contract execution uses unknown flag options"), REJECT_INVALID, "bad-tx-version-flags");
+
+                //check gas limit is not less than minimum mempool gas limit
+                if(luxTransaction.gas() < GetArg("-minmempoolgaslimit", MEMPOOL_MIN_GAS_LIMIT))
+                    return state.DoS(100, error("AcceptToMempool(): Contract execution has lower gas limit than allowed to accept into mempool"), REJECT_INVALID, "bad-tx-too-little-mempool-gas");
+
+                //check gas limit is not less than minimum gas limit (unless it is a no-exec tx)
+                if(luxTransaction.gas() < MINIMUM_GAS_LIMIT && v.rootVM != 0)
+                    return state.DoS(100, error("AcceptToMempool(): Contract execution has lower gas limit than allowed"), REJECT_INVALID, "bad-tx-too-little-gas");
+
+                if(luxTransaction.gas() > UINT32_MAX)
+                    return state.DoS(100, error("AcceptToMempool(): Contract execution can not specify greater gas limit than can fit in 32-bits"), REJECT_INVALID, "bad-tx-too-much-gas");
+
+                gasAllTxs += luxTransaction.gas();
+                if(gasAllTxs > dev::u256(blockGasLimit))
+                    return state.DoS(1, false, REJECT_INVALID, "bad-txns-gas-exceeds-blockgaslimit");
+
+                //don't allow less than DGP set minimum gas price to prevent MPoS greedy mining/spammers
+                if(v.rootVM!=0 && (uint64_t)luxTransaction.gasPrice() < minGasPrice)
+                    return state.DoS(100, error("AcceptToMempool(): Contract execution has lower gas price than allowed"), REJECT_INVALID, "bad-tx-low-gas-price");
+            }
+
+            if(!CheckMinGasPrice(luxETP, minGasPrice))
+                return state.DoS(100, false, REJECT_INVALID, "bad-txns-small-gasprice");
+
+            if(count > luxTransactions.size())
+                return state.DoS(100, false, REJECT_INVALID, "bad-txns-incorrect-format");
+        }
+        ////////////////////////////////////////////////////////////
+
         double dPriority = view.GetPriority(tx, chainActive.Height(), inChainInputValue);
-        CTxMemPoolEntry entry(tx, nFees, GetTime(), dPriority, chainActive.Height(), pool.HasNoInputsOf(tx));
+        CTxMemPoolEntry entry(MakeTransactionRef(tx), nFees, GetTime(), dPriority, chainActive.Height(), inChainInputValue, fSpendsCoinbase, nSigOpsCost,  lp, pool.HasNoInputsOf(tx), CAmount(txMinGasPrice));
 
         // Check for non-standard pay-to-script-hash in inputs
         // for any real tx this will be checked on AcceptToMemoryPool anyway
@@ -1418,7 +1529,10 @@ bool GetTransaction(const uint256& hash, CTransaction& txOut, const Consensus::P
 
     LOCK(cs_main);
 
-    if (mempool.lookup(hash, txOut)) {
+    CTransactionRef ptx = mempool.get(hash);
+    if (ptx)
+    {
+        txOut = *ptx.get();
         return true;
     }
 
@@ -2671,17 +2785,17 @@ void FlushStateToDisk()
     FlushStateToDisk(state, FLUSH_STATE_ALWAYS);
 }
 
-CAmount GetBlockSubsidy(int nHeight, const Consensus::Params& consensusParams) {
-    int halvings = nHeight / consensusParams.nSubsidyHalvingInterval;
-    // Force block reward to zero when right shift is undefined.
-    if (halvings >= 64)
-        return 0;
-
-    CAmount nSubsidy = 50 * COIN;
-    // Subsidy is cut in half every 210,000 blocks which will occur approximately every 4 years.
-    nSubsidy >>= halvings;
-    return nSubsidy;
-}
+//CAmount GetBlockSubsidy(int nHeight, const Consensus::Params& consensusParams) {
+//    int halvings = nHeight / consensusParams.nSubsidyHalvingInterval;
+//    // Force block reward to zero when right shift is undefined.
+//    if (halvings >= 64)
+//        return 0;
+//
+//    CAmount nSubsidy = 50 * COIN;
+//    // Subsidy is cut in half every 210,000 blocks which will occur approximately every 4 years.
+//    nSubsidy >>= halvings;
+//    return nSubsidy;
+//}
 
 /** Update chainActive and related internal data structures. */
 void static UpdateTip(CBlockIndex* pindexNew, const CChainParams& chainParams)
@@ -2763,14 +2877,22 @@ static bool DisconnectTip(CValidationState& state, const CChainParams& chainpara
     if (!FlushStateToDisk(state, FLUSH_STATE_ALWAYS))
         return false;
     // Resurrect mempool transactions from the disconnected block.
+    std::vector<uint256> vHashUpdate;
     BOOST_FOREACH (const CTransaction& tx, block.vtx) {
         // ignore validation errors in resurrected transactions
-        list<CTransaction> removed;
         CValidationState stateDummy;
-        if (tx.IsCoinBase() || tx.IsCoinStake() || !AcceptToMemoryPool(mempool, stateDummy, tx, false, NULL))
-            mempool.remove(tx, removed, true);
+        if (tx.IsCoinBase() || tx.IsCoinStake() || !AcceptToMemoryPool(mempool, stateDummy, tx, false, NULL)) {
+            mempool.removeRecursive(tx, MemPoolRemovalReason::REORG);
+        } else if (mempool.exists(tx.GetHash())) {
+            vHashUpdate.push_back(tx.GetHash());
+        }
     }
-    mempool.removeCoinbaseSpends(pcoinsTip, pindexDelete->nHeight);
+        // AcceptToMemoryPool/addUnchecked all assume that new mempool entries have
+        // no in-mempool children, which is generally not true when adding
+        // previously-confirmed transactions back to the mempool.
+        // UpdateTransactionsFromBlock finds descendants of any transactions in this
+        // block that were added back and cleans up the mempool state.
+    mempool.UpdateTransactionsFromBlock(vHashUpdate);
     mempool.check(pcoinsTip);
     // Update chainActive and related variables.
     UpdateTip(pindexDelete->pprev, chainparams);
@@ -2813,11 +2935,20 @@ bool static ConnectTip(CValidationState& state, const CChainParams& chainparams,
     LogPrint("bench", "  - Load block from disk: %.2fms [%.2fs]\n", (nTime2 - nTime1) * 0.001, nTimeReadFromDisk * 0.000001);
     {
         CInv inv(MSG_BLOCK, pindexNew->GetBlockHash());
+
+
+//        dev::h256 oldHashStateRoot(globalState->rootHash()); // lux
+//        dev::h256 oldHashUTXORoot(globalState->rootHashUTXO()); // lux
+
         bool rv = ConnectBlock(*pblock, state, pindexNew, view, chainparams);
         GetMainSignals().BlockChecked(*pblock, state);
         if (!rv) {
             if (state.IsInvalid())
                 InvalidBlockFound(pindexNew, state);
+
+//            globalState->setRoot(oldHashStateRoot); // lux
+//            globalState->setRootUTXO(oldHashUTXORoot); // lux
+
             return error("ConnectTip() : ConnectBlock %s failed", pindexNew->GetBlockHash().ToString());
         }
         mapBlockSource.erase(inv.hash);
@@ -2842,7 +2973,7 @@ bool static ConnectTip(CValidationState& state, const CChainParams& chainparams,
 
     // Remove conflicting transactions from the mempool.
     list<CTransaction> txConflicted;
-    mempool.removeForBlock(pblock->vtx, pindexNew->nHeight, txConflicted, !IsInitialBlockDownload());
+    mempool.removeForBlock(pblock->vtx, pindexNew->nHeight/*, txConflicted, !IsInitialBlockDownload()*/);
     mempool.check(pcoinsTip);
     // Update chainActive & related variables.
     UpdateTip(pindexNew, chainparams);
@@ -2886,70 +3017,70 @@ bool DisconnectBlocksAndReprocess(int blocks)
     This should be very rare (Probably will never happen)
 */
 // ***TODO*** clean up here
-bool DisconnectBlockAndInputs(CValidationState& state, CTransaction txLock)
-{
-    // All modifications to the coin state will be done in this cache.
-    // Only when all have succeeded, we push it to pcoinsTip.
-    //    CCoinsViewCache view(*pcoinsTip, true);
-
-    const CChainParams& chainParams = Params();
-
-    CBlockIndex* BlockReading = chainActive.Tip();
-    CBlockIndex* pindexNew = NULL;
-
-    bool foundConflictingTx = false;
-
-    //remove anything conflicting in the memory pool
-    list<CTransaction> txConflicted;
-    mempool.removeConflicts(txLock, txConflicted);
-
-
-    // List of what to disconnect (typically nothing)
-    vector<CBlockIndex*> vDisconnect;
-
-    for (unsigned int i = 1; BlockReading && BlockReading->nHeight > 0 && !foundConflictingTx && i < 6; i++) {
-        vDisconnect.push_back(BlockReading);
-        pindexNew = BlockReading->pprev; //new best block
-
-        CBlock block;
-        if (!ReadBlockFromDisk(block, BlockReading, chainParams.GetConsensus()))
-            return state.Error(_("Failed to read block"));
-
-        // Queue memory transactions to resurrect.
-        // We only do this for blocks after the last checkpoint (reorganisation before that
-        // point should only happen with -reindex/-loadblock, or a misbehaving peer.
-        BOOST_FOREACH (const CTransaction& tx, block.vtx) {
-            if (!tx.IsCoinBase()) {
-                BOOST_FOREACH (const CTxIn& in1, txLock.vin) {
-                    BOOST_FOREACH (const CTxIn& in2, tx.vin) {
-                        if (in1.prevout == in2.prevout) foundConflictingTx = true;
-                    }
-                }
-            }
-        }
-
-        if (BlockReading->pprev == NULL) {
-            assert(BlockReading);
-            break;
-        }
-        BlockReading = BlockReading->pprev;
-    }
-
-    if (!foundConflictingTx) {
-        LogPrintf("DisconnectBlockAndInputs: Can't find a conflicting transaction to inputs\n");
-        return false;
-    }
-
-    if (vDisconnect.size() > 0) {
-        LogPrintf("REORGANIZE: Disconnect Conflicting Blocks %lli blocks; %s..\n", vDisconnect.size(), pindexNew->GetBlockHash().ToString());
-        BOOST_FOREACH (CBlockIndex* pindex, vDisconnect) {
-            LogPrintf(" -- disconnect %s\n", pindex->GetBlockHash().ToString());
-            DisconnectTip(state, chainParams);
-        }
-    }
-
-    return true;
-}
+//bool DisconnectBlockAndInputs(CValidationState& state, CTransaction txLock)
+//{
+//    // All modifications to the coin state will be done in this cache.
+//    // Only when all have succeeded, we push it to pcoinsTip.
+//    //    CCoinsViewCache view(*pcoinsTip, true);
+//
+//    const CChainParams& chainParams = Params();
+//
+//    CBlockIndex* BlockReading = chainActive.Tip();
+//    CBlockIndex* pindexNew = NULL;
+//
+//    bool foundConflictingTx = false;
+//
+//    //remove anything conflicting in the memory pool
+//    list<CTransaction> txConflicted;
+//    mempool.removeConflicts(txLock, txConflicted);
+//
+//
+//    // List of what to disconnect (typically nothing)
+//    vector<CBlockIndex*> vDisconnect;
+//
+//    for (unsigned int i = 1; BlockReading && BlockReading->nHeight > 0 && !foundConflictingTx && i < 6; i++) {
+//        vDisconnect.push_back(BlockReading);
+//        pindexNew = BlockReading->pprev; //new best block
+//
+//        CBlock block;
+//        if (!ReadBlockFromDisk(block, BlockReading, chainParams.GetConsensus()))
+//            return state.Error(_("Failed to read block"));
+//
+//        // Queue memory transactions to resurrect.
+//        // We only do this for blocks after the last checkpoint (reorganisation before that
+//        // point should only happen with -reindex/-loadblock, or a misbehaving peer.
+//        BOOST_FOREACH (const CTransaction& tx, block.vtx) {
+//            if (!tx.IsCoinBase()) {
+//                BOOST_FOREACH (const CTxIn& in1, txLock.vin) {
+//                    BOOST_FOREACH (const CTxIn& in2, tx.vin) {
+//                        if (in1.prevout == in2.prevout) foundConflictingTx = true;
+//                    }
+//                }
+//            }
+//        }
+//
+//        if (BlockReading->pprev == NULL) {
+//            assert(BlockReading);
+//            break;
+//        }
+//        BlockReading = BlockReading->pprev;
+//    }
+//
+//    if (!foundConflictingTx) {
+//        LogPrintf("DisconnectBlockAndInputs: Can't find a conflicting transaction to inputs\n");
+//        return false;
+//    }
+//
+//    if (vDisconnect.size() > 0) {
+//        LogPrintf("REORGANIZE: Disconnect Conflicting Blocks %lli blocks; %s..\n", vDisconnect.size(), pindexNew->GetBlockHash().ToString());
+//        BOOST_FOREACH (CBlockIndex* pindex, vDisconnect) {
+//            LogPrintf(" -- disconnect %s\n", pindex->GetBlockHash().ToString());
+//            DisconnectTip(state, chainParams);
+//        }
+//    }
+//
+//    return true;
+//}
 
 
 /**
@@ -4847,7 +4978,9 @@ void static ProcessGetData(CNode* pfrom, const Consensus::Params& consensusParam
 
                 if (!pushed && inv.type == MSG_TX) { //TODO: probably should check for MSG_TX_WITNESS too
                     CTransaction tx;
-                    if (mempool.lookup(inv.hash, tx)) {
+                    CTransactionRef ptx = mempool.get(inv.hash);
+                    if (ptx) {
+                        tx = *ptx.get();
                         CDataStream ss(SER_NETWORK, PROTOCOL_VERSION);
                         ss.reserve(1000); //TODO: if we check for MSG_TX_WITNESS, should this value be changed?
                         ss << tx;
@@ -5509,8 +5642,9 @@ static bool ProcessMessage(CNode* pfrom, const string &strCommand, CDataStream& 
         BOOST_FOREACH (uint256& hash, vtxid) {
             CInv inv(MSG_TX, hash);
             CTransaction tx;
-            bool fInMemPool = mempool.lookup(hash, tx);
-            if (!fInMemPool) continue; // another thread removed since queryHashes, maybe...
+            CTransactionRef ptx = mempool.get(hash);
+            if (!ptx) continue;
+            tx = *ptx.get();
             if ((pfrom->pfilter && pfrom->pfilter->IsRelevantAndUpdate(tx)) ||
                 (!pfrom->pfilter))
                 vInv.push_back(inv);
@@ -6130,6 +6264,12 @@ std::string CBlockFileInfo::ToString() const
     return strprintf("CBlockFileInfo(blocks=%u, size=%u, heights=%u...%u, time=%s...%s)", nBlocks, nSize, nHeightFirst, nHeightLast, DateTimeStrFormat("%Y-%m-%d", nTimeFirst), DateTimeStrFormat("%Y-%m-%d", nTimeLast));
 }
 
+int GetSpendHeight(const CCoinsViewCache& inputs)
+{
+    LOCK(cs_main);
+    CBlockIndex* pindexPrev = mapBlockIndex.find(inputs.GetBestBlock())->second;
+    return pindexPrev->nHeight + 1;
+}
 
 class CMainCleanup
 {
