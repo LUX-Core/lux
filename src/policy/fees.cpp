@@ -397,35 +397,40 @@ void CBlockPolicyEstimator::processTransaction(const CTxMemPoolEntry& entry, boo
     LogPrint("estimatefee", "\n");
 }
 
-void CBlockPolicyEstimator::processBlockTx(unsigned int nBlockHeight, const CTxMemPoolEntry& entry)
+bool CBlockPolicyEstimator::processBlockTx(unsigned int nBlockHeight, const CTxMemPoolEntry* entry)
 {
-    if (!entry.WasClearAtEntry()) {
+    if (!entry->WasClearAtEntry()) {
         // This transaction depended on other transactions in the mempool to
         // be included in a block before it was able to be included, so
         // we shouldn't include it in our calculations
-        return;
+        return false;
     }
+
+//    if (!removeTx(entry->GetTx().GetHash())) {
+//        // This transaction wasn't being tracked for fee estimation
+//        return false;
+//    }
 
     // How many blocks did it take for miners to include this transaction?
     // blocksToConfirm is 1-based, so a transaction included in the earliest
     // possible block has confirmation count of 1
-    int blocksToConfirm = nBlockHeight - entry.GetHeight();
+    int blocksToConfirm = nBlockHeight - entry->GetHeight();
     if (blocksToConfirm <= 0) {
         // This can't happen because we don't process transactions from a block with a height
         // lower than our greatest seen height
         LogPrint("estimatefee", "Blockpolicy error Transaction had negative blocksToConfirm\n");
-        return;
+        return false;
     }
 
-    // Fees are stored and reported as BTC-per-kb:
-    CFeeRate feeRate(entry.GetFee(), entry.GetTxSize());
+    // Feerates are stored and reported as BTC-per-kb:
+    CFeeRate feeRate(entry->GetFee(), entry->GetTxSize());
 
     // Want the priority of the tx at confirmation.  The priority when it
     // entered the mempool could easily be very small and change quickly
-    double curPri = entry.GetPriority(nBlockHeight);
+    double curPri = entry->GetPriority(nBlockHeight);
 
     // Record this as a priority estimate
-    if (entry.GetFee() == 0 || isPriDataPoint(feeRate, curPri)) {
+    if (entry->GetFee() == 0 || isPriDataPoint(feeRate, curPri)) {
         priStats.Record(blocksToConfirm, curPri);
     }
     // Record this as a fee estimate
@@ -435,7 +440,7 @@ void CBlockPolicyEstimator::processBlockTx(unsigned int nBlockHeight, const CTxM
 }
 
 void CBlockPolicyEstimator::processBlock(unsigned int nBlockHeight,
-                                         std::vector<CTxMemPoolEntry>& entries, bool fCurrentEstimate)
+                                         std::vector<const CTxMemPoolEntry*>& entries, bool fCurrentEstimate)
 {
     if (nBlockHeight <= nBestSeenHeight) {
         // Ignore side chains and re-orgs; assuming they are random
