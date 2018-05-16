@@ -8,7 +8,6 @@
 
 #include <string>
 #include <sstream>
-#include "tinyformat.h"
 
 /** "reject" message codes */
 static const unsigned char REJECT_MALFORMED = 0x01;
@@ -88,12 +87,6 @@ public:
 };
 
 /** Convert CValidationState to a human-readable message for logging */
-std::string FormatStateMessage(const CValidationState &state)
-{
-    return strprintf("%s%s (code %i)",
-                     state.GetRejectReason(),
-                     state.GetDebugMessage().empty() ? "" : ", "+state.GetDebugMessage(),
-                     state.GetRejectCode());
-}
+std::string FormatStateMessage(const CValidationState &state);
 
 #endif // BITCOIN_CONSENSUS_VALIDATION_H
