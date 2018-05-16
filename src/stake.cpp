@@ -933,7 +933,7 @@ bool Stake::GenBlockStake(CWallet *wallet, const CReserveKey &key, unsigned int 
         tip = chainActive.Tip();
     }
 
-    std::unique_ptr<CBlockTemplate> blocktemplate(CreateNewBlockWithKey(const_cast<CReserveKey &>(key), wallet, true));
+    std::unique_ptr<CBlockTemplate> blocktemplate(BlockAssembler(Params()).CreateNewBlockWithKey(const_cast<CReserveKey &>(key), true));
     if (!blocktemplate) {
         return false; // No stake available.
     }

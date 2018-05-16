@@ -140,81 +140,81 @@ UniValue setgenerate(const UniValue& params, bool fHelp)
             "\nTurn off generation\n" + HelpExampleCli("setgenerate", "false") +
             "\nUsing json rpc\n" + HelpExampleRpc("setgenerate", "true, 1"));
 
-    if (pwalletMain == NULL)
-        throw JSONRPCError(RPC_METHOD_NOT_FOUND, "Method not found (disabled)");
-
-    bool fGenerate = true;
-    if (params.size() > 0)
-        fGenerate = params[0].get_bool();
-
-    int nGenProcLimit = -1;
-    if (params.size() > 1) {
-        nGenProcLimit = params[1].get_int();
-        if (nGenProcLimit == 0)
-            fGenerate = false;
-    }
-
-    // -regtest mode: don't return until nGenProcLimit blocks are generated
-    if (fGenerate && Params().MineBlocksOnDemand()) {
-        int nHeightStart = 0;
-        int nHeightEnd = 0;
-        int nHeight = 0;
-        int nGenerate = (nGenProcLimit > 0 ? nGenProcLimit : 1);
-        CReserveKey reservekey(pwalletMain);
-
-        { // Don't keep cs_main locked
-            LOCK(cs_main);
-            nHeightStart = chainActive.Height();
-            nHeight = nHeightStart;
-            nHeightEnd = nHeightStart + nGenerate;
-        }
-        unsigned int nExtraNonce = 0;
-        UniValue blockHashes(UniValue::VARR);
-        while (nHeight < nHeightEnd) {
-            unique_ptr<CBlockTemplate> pblocktemplate(CreateNewBlockWithKey(reservekey, pwalletMain, false));
-            if (!pblocktemplate.get())
-                throw JSONRPCError(RPC_INTERNAL_ERROR, "Wallet keypool empty");
-            CBlock* pblock = &pblocktemplate->block;
-            {
-                LOCK(cs_main);
-                IncrementExtraNonce(pblock, chainActive.Tip(), nExtraNonce);
-            }
-            while (!ShutdownRequested() && !CheckProofOfWork(pblock->GetHash(), pblock->nBits, Params().GetConsensus())) {
-                // Yes, there is a chance every nonce could fail to satisfy the -regtest
-                // target -- 1 in 2^(2^32). That ain't gonna happen.
-                ++pblock->nNonce;
-            }
-            CValidationState state;
-            if (!ShutdownRequested() && !ProcessNewBlock(state, Params(), NULL, pblock))
-                throw JSONRPCError(RPC_INTERNAL_ERROR, "ProcessNewBlock, block not accepted");
-            ++nHeight;
-            blockHashes.push_back(pblock->GetHash().GetHex());
-        }
-        return blockHashes;
-    } else { // Not -regtest: start generate thread, return immediately
-        mapArgs["-gen"] = (fGenerate ? "1" : "0");
-        mapArgs["-genproclimit"] = itostr(nGenProcLimit);
-        GenerateBitcoins(pwalletMain, nGenProcLimit);
-    }
+//    if (pwalletMain == NULL)
+//        throw JSONRPCError(RPC_METHOD_NOT_FOUND, "Method not found (disabled)");
+//
+//    bool fGenerate = true;
+//    if (params.size() > 0)
+//        fGenerate = params[0].get_bool();
+//
+//    int nGenProcLimit = -1;
+//    if (params.size() > 1) {
+//        nGenProcLimit = params[1].get_int();
+//        if (nGenProcLimit == 0)
+//            fGenerate = false;
+//    }
+//
+//    // -regtest mode: don't return until nGenProcLimit blocks are generated
+//    if (fGenerate && Params().MineBlocksOnDemand()) {
+//        int nHeightStart = 0;
+//        int nHeightEnd = 0;
+//        int nHeight = 0;
+//        int nGenerate = (nGenProcLimit > 0 ? nGenProcLimit : 1);
+//        CReserveKey reservekey(pwalletMain);
+//
+//        { // Don't keep cs_main locked
+//            LOCK(cs_main);
+//            nHeightStart = chainActive.Height();
+//            nHeight = nHeightStart;
+//            nHeightEnd = nHeightStart + nGenerate;
+//        }
+//        unsigned int nExtraNonce = 0;
+//        UniValue blockHashes(UniValue::VARR);
+//        while (nHeight < nHeightEnd) {
+//            unique_ptr<CBlockTemplate> pblocktemplate(CreateNewBlockWithKey(reservekey, pwalletMain, false));
+//            if (!pblocktemplate.get())
+//                throw JSONRPCError(RPC_INTERNAL_ERROR, "Wallet keypool empty");
+//            CBlock* pblock = &pblocktemplate->block;
+//            {
+//                LOCK(cs_main);
+//                IncrementExtraNonce(pblock, chainActive.Tip(), nExtraNonce);
+//            }
+//            while (!ShutdownRequested() && !CheckProofOfWork(pblock->GetHash(), pblock->nBits, Params().GetConsensus())) {
+//                // Yes, there is a chance every nonce could fail to satisfy the -regtest
+//                // target -- 1 in 2^(2^32). That ain't gonna happen.
+//                ++pblock->nNonce;
+//            }
+//            CValidationState state;
+//            if (!ShutdownRequested() && !ProcessNewBlock(state, Params(), NULL, pblock))
+//                throw JSONRPCError(RPC_INTERNAL_ERROR, "ProcessNewBlock, block not accepted");
+//            ++nHeight;
+//            blockHashes.push_back(pblock->GetHash().GetHex());
+//        }
+//        return blockHashes;
+//    } else { // Not -regtest: start generate thread, return immediately
+//        mapArgs["-gen"] = (fGenerate ? "1" : "0");
+//        mapArgs["-genproclimit"] = itostr(nGenProcLimit);
+////        GenerateBitcoins(pwalletMain, nGenProcLimit);
+//    }
 
     return NullUniValue;
 }
 
 UniValue gethashespersec(const UniValue& params, bool fHelp)
 {
-    if (fHelp || params.size() != 0)
-        throw runtime_error(
-            "gethashespersec\n"
-            "\nReturns a recent hashes per second performance measurement while generating.\n"
-            "See the getgenerate and setgenerate calls to turn generation on and off.\n"
-            "\nResult:\n"
-            "n            (numeric) The recent hashes per second when generation is on (will return 0 if generation is off)\n"
-            "\nExamples:\n" +
-            HelpExampleCli("gethashespersec", "") + HelpExampleRpc("gethashespersec", ""));
-
-    if (GetTimeMillis() - nHPSTimerStart > 8000)
-        return (int64_t)0;
-    return (int64_t)dHashesPerSec;
+//    if (fHelp || params.size() != 0)
+//        throw runtime_error(
+//            "gethashespersec\n"
+//            "\nReturns a recent hashes per second performance measurement while generating.\n"
+//            "See the getgenerate and setgenerate calls to turn generation on and off.\n"
+//            "\nResult:\n"
+//            "n            (numeric) The recent hashes per second when generation is on (will return 0 if generation is off)\n"
+//            "\nExamples:\n" +
+//            HelpExampleCli("gethashespersec", "") + HelpExampleRpc("gethashespersec", ""));
+//
+//    if (GetTimeMillis() - nHPSTimerStart > 8000)
+//        return (int64_t)0;
+//    return (int64_t)dHashesPerSec;
 }
 #endif
 
@@ -535,7 +535,7 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
     // Update block
     static CBlockIndex* pindexPrev;
     static int64_t nStart;
-    static CBlockTemplate* pblocktemplate;
+    static std::unique_ptr<CBlockTemplate> pblocktemplate;
     if (pindexPrev != chainActive.Tip() ||
         (mempool.GetTransactionsUpdated() != nTransactionsUpdatedLast && GetTime() - nStart > 5)) {
         // Clear pindexPrev so future calls make a new block, despite any failures from here on
@@ -547,12 +547,8 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
         nStart = GetTime();
 
         // Create new block
-        if (pblocktemplate) {
-            delete pblocktemplate;
-            pblocktemplate = NULL;
-        }
         CScript scriptDummy = CScript() << OP_TRUE;
-        pblocktemplate = CreateNewBlock(scriptDummy, pwalletMain, false);
+        pblocktemplate = BlockAssembler(Params()).CreateNewBlock(scriptDummy);
         if (!pblocktemplate)
             throw JSONRPCError(RPC_OUT_OF_MEMORY, "Out of memory");
 
@@ -596,7 +592,7 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
 
         int index_in_template = i - 1;
         entry.push_back(Pair("fee", pblocktemplate->vTxFees[index_in_template]));
-        int64_t nTxSigOps = pblocktemplate->vTxSigOps[index_in_template];
+        int64_t nTxSigOps = pblocktemplate->vTxSigOpsCost[index_in_template];
         if (fPreSegWit) {
             assert(nTxSigOps % WITNESS_SCALE_FACTOR == 0);
             nTxSigOps /= WITNESS_SCALE_FACTOR;
@@ -633,7 +629,7 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
 
 			int index_in_template = j - 1;
 			entry.push_back(Pair("fee", pblocktemplate->vTxFees[index_in_template]));
-			entry.push_back(Pair("sigops", pblocktemplate->vTxSigOps[index_in_template]));
+			entry.push_back(Pair("sigops", pblocktemplate->vTxSigOpsCost[index_in_template]));
 
 			coinbasetxn.push_back(entry);
 		}
@@ -799,7 +795,7 @@ UniValue getwork(const UniValue& params, bool fHelp) {
         static unsigned int nTransactionsUpdatedLast;
         static CBlockIndex* pindexPrev;
         static int64_t nStart;
-        static CBlockTemplate* pblocktemplate;
+        static std::unique_ptr<CBlockTemplate> pblocktemplate;
 
         if (pindexPrev != chainActive.Tip() ||
             (mempool.GetTransactionsUpdated() != nTransactionsUpdatedLast && GetTime() - nStart > 60)) {
@@ -822,7 +818,14 @@ UniValue getwork(const UniValue& params, bool fHelp) {
             // Create new block
             CReserveKey reservekey(pwalletMain);
 
-            pblocktemplate = CreateNewBlockWithKey(reservekey, pwalletMain, false);
+            CPubKey pubkey;
+            reservekey.GetReservedKey(pubkey);
+
+            CScript scriptPubKey = CScript() << ToByteVector(pubkey) << OP_CHECKSIG;
+
+            pblocktemplate = BlockAssembler(Params()).CreateNewBlockWithKey(reservekey, false);
+
+//            pblocktemplate = CreateNewBlockWithKey(reservekey, pwalletMain, false);
             if (!pblocktemplate)
                 throw JSONRPCError(RPC_OUT_OF_MEMORY, "Out of memory");
 
