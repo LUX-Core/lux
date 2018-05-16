@@ -355,14 +355,12 @@ CAmount GetMinRelayFee(const CTransaction& tx, unsigned int nBytes, bool fAllowF
      s << tx.vin;
      s << tx.vout;
      if (flags & 1) {
-         for (size_t i = 0; i < tx.vin.size(); i++) {
-             s << tx.vin[i].scriptWitness.stack;
+         for (size_t i = 0; i < tx.wit.vtxinwit.size(); i++) {
+             s << tx.wit.vtxinwit[i].scriptWitness.stack;
          }
      }
      s << tx.nLockTime;
  }
-
-bool AreInputsStandard(const CTransaction& tx, const CCoinsViewCache& mapInputs);
 
 /**
  * Count ECDSA signature operations the old-fashioned (pre-0.6) way
