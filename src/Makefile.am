@@ -137,6 +137,7 @@ BITCOIN_CORE_H = \
   protocol.h \
   pubkey.h \
   random.h \
+  reverselock.h \
   rpcclient.h \
   rpcprotocol.h \
   httprpc.h \
@@ -144,6 +145,7 @@ BITCOIN_CORE_H = \
   luxcontrol.h \
   rpcserver.h \
   rpcutil.h \
+  scheme.h \
   script/interpreter.h \
   script/script.h \
   script/sigcache.h \
@@ -383,6 +385,7 @@ libbitcoin_common_a_SOURCES = \
   netbase.cpp \
   protocol.cpp \
   pubkey.cpp \
+  scheme.cpp \
   script/interpreter.cpp \
   script/script.cpp \
   script/sign.cpp \
@@ -651,7 +654,7 @@ lux_cli_LDADD += $(BOOST_LIBS) $(SSL_LIBS) $(CRYPTO_LIBS) $(EVENT_LIBS)
 
 # lux-tx binary #
 lux_tx_CPPFLAGS = $(BITCOIN_INCLUDES)
-lux_tx_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS) 
+lux_tx_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
 lux_tx_SOURCES =  \
   lux-tx.cpp \
   $(libbitcoin_common_a_SOURCES) \

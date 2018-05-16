@@ -8,6 +8,7 @@
 
 #include <string>
 
+class CScheme;
 class CWallet;
 
 namespace boost
@@ -21,7 +22,7 @@ void StartShutdown();
 bool ShutdownRequested();
 void Shutdown();
 void PrepareShutdown();
-bool AppInit2(boost::thread_group& threadGroup);
+bool AppInit2(boost::thread_group& threadGroup, CScheme& scheme);
 
 /** The help message mode determines what help message to show */
 enum HelpMessageMode {

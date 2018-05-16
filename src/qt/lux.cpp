@@ -30,6 +30,7 @@
 #include "init.h"
 #include "main.h"
 #include "rpcserver.h"
+#include "scheme.h"
 #include "ui_interface.h"
 #include "util.h"
 
@@ -189,6 +190,7 @@ signals:
 
 private:
     boost::thread_group threadGroup;
+    CScheme scheme;
 
     /// Flag indicating a restart
     bool execute_restart;
@@ -279,7 +281,7 @@ void BitcoinCore::initialize()
 
     try {
         qDebug() << __func__ << ": Running AppInit2 in thread";
-        int rv = AppInit2(threadGroup);
+        int rv = AppInit2(threadGroup, scheme);
         if (rv) {
             /* Start a dummy RPC thread if no RPC thread is active yet
              * to handle timeouts.

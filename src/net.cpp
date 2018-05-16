@@ -17,6 +17,7 @@
 #include "miner.h"
 #include "darksend.h"
 #include "primitives/transaction.h"
+#include "scheme.h"
 #include "ui_interface.h"
 #include "wallet.h"
 #include "miner.h"
@@ -1697,7 +1698,7 @@ void static Discover(boost::thread_group& threadGroup)
 #endif
 }
 
-void StartNode(boost::thread_group& threadGroup)
+void StartNode(boost::thread_group& threadGroup, CScheme& scheme)
 {
     uiInterface.InitMessage(_("Loading addresses..."));
     // Load addresses for peers.dat
@@ -1758,7 +1759,7 @@ void StartNode(boost::thread_group& threadGroup)
     threadGroup.create_thread(boost::bind(&TraceThread<void (*)()>, "msghand", &ThreadMessageHandler));
 
     // Dump network addresses
-    threadGroup.create_thread(boost::bind(&LoopForever<void (*)()>, "dumpaddr", &DumpData, DUMP_ADDRESSES_INTERVAL * 1000));
+    scheme.schemeEvery(&DumpData, DUMP_ADDRESSES_INTERVAL);
 
     if (GetBoolArg("-staking", true) && pwalletMain) {
 #if 1
