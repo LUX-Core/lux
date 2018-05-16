@@ -160,3 +160,15 @@ int64_t GetVirtualTransactionSize(const CTransaction& tx)
 {
     return GetVirtualTransactionSize(GetTransactionCost(tx));
 }
+
+int64_t GetVirtualTransactionSize(int64_t nWeight, int64_t nSigOpCost)
+{
+    return (std::max(nWeight, nSigOpCost * nBytesPerSigOp) + WITNESS_SCALE_FACTOR - 1) / WITNESS_SCALE_FACTOR;
+}
+
+int64_t GetVirtualTransactionSize(const CTransaction& tx, int64_t nSigOpCost)
+{
+    return GetVirtualTransactionSize(GetTransactionCost(tx), nSigOpCost);
+}
+
+CFeeRate incrementalRelayFee = CFeeRate(DEFAULT_INCREMENTAL_RELAY_FEE);

@@ -35,6 +35,8 @@ static const unsigned int DEFAULT_BLOCK_MAX_WEIGHT = 7600000;
 static const unsigned int DEFAULT_BLOCK_MIN_TX_FEE = 400000;
 /** The maximum weight for transactions we're willing to relay/mine */
 static const unsigned int MAX_STANDARD_TX_WEIGHT = 400000;
+
+static const unsigned int DEFAULT_INCREMENTAL_RELAY_FEE = 10000;
 /**
  * Standard script verification flags that standard transactions will comply
  * with. However scripts violating these flags may still be present in valid
@@ -77,5 +79,9 @@ bool AreInputsStandard(const CTransaction& tx, const CCoinsViewCache& mapInputs)
 /** Compute the virtual transaction size (cost reinterpreted as bytes). */
 int64_t GetVirtualTransactionSize(int64_t nCost);
 int64_t GetVirtualTransactionSize(const CTransaction& tx);
+int64_t GetVirtualTransactionSize(int64_t nWeight, int64_t nSigOpCost);
+int64_t GetVirtualTransactionSize(const CTransaction& tx, int64_t nSigOpCost);
+
+extern CFeeRate incrementalRelayFee;
 
 #endif // BITCOIN_POLICY_POLICY_H
