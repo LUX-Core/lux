@@ -151,10 +151,8 @@ enum opcodetype
 
     // expansion
     OP_NOP1 = 0xb0,
-    OP_CHECKLOCKTIMEVERIFY = 0xb1,
-    OP_NOP2 = OP_CHECKLOCKTIMEVERIFY,
-    OP_CHECKSEQUENCEVERIFY = 0xb2,
-    OP_NOP3 = OP_CHECKSEQUENCEVERIFY,
+    OP_NOP2 = 0xb1,
+    OP_NOP3 = 0xb2,
     OP_NOP4 = 0xb3,
     OP_NOP5 = 0xb4,
     OP_NOP6 = 0xb5,
@@ -199,10 +197,7 @@ public:
         m_value = n;
     }
 
-    static const size_t nDefaultMaxNumSize = 4;
-
-    explicit CScriptNum(const std::vector<unsigned char>& vch, bool fRequireMinimal,
-                        const size_t nMaxNumSize = nDefaultMaxNumSize)
+    explicit CScriptNum(const std::vector<unsigned char>& vch, bool fRequireMinimal)
     {
         if (vch.size() > nMaxNumSize) {
             throw scriptnum_error("script number overflow");
@@ -250,11 +245,6 @@ public:
     inline CScriptNum& operator+=( const CScriptNum& rhs)       { return operator+=(rhs.m_value);  }
     inline CScriptNum& operator-=( const CScriptNum& rhs)       { return operator-=(rhs.m_value);  }
 
-    inline CScriptNum operator&(   const int64_t& rhs)    const { return CScriptNum(m_value & rhs);}
-    inline CScriptNum operator&(   const CScriptNum& rhs) const { return operator&(rhs.m_value);   }
-
-    inline CScriptNum& operator&=( const CScriptNum& rhs)       { return operator&=(rhs.m_value);  }
-
     inline CScriptNum operator-()                         const
     {
         assert(m_value != std::numeric_limits<int64_t>::min());
@@ -280,12 +270,6 @@ public:
         assert(rhs == 0 || (rhs > 0 && m_value >= std::numeric_limits<int64_t>::min() + rhs) ||
                            (rhs < 0 && m_value <= std::numeric_limits<int64_t>::max() + rhs));
         m_value -= rhs;
-        return *this;
-    }
-
-    inline CScriptNum& operator&=( const int64_t& rhs)
-    {
-        m_value &= rhs;
         return *this;
     }
 
@@ -606,7 +590,6 @@ public:
     bool IsPayToScriptHash() const;
 
     /** Called by IsStandardTx and P2SH/BIP62 VerifyScript (which makes it consensus-critical). */
-    bool IsPushOnly(const_iterator pc) const;
     bool IsPushOnly() const;
 
     /**
