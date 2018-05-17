@@ -195,7 +195,9 @@ SignatureData DataFromTransaction(const CMutableTransaction& tx, unsigned int nI
     SignatureData data;
     assert(tx.vin.size() > nIn);
     data.scriptSig = tx.vin[nIn].scriptSig;
-    data.scriptWitness = tx.wit.vtxinwit[nIn].scriptWitness;
+    if (tx.wit.vtxinwit.size() > nIn) {
+        data.scriptWitness = tx.wit.vtxinwit[nIn].scriptWitness;
+    }
     return data;
 }
 
