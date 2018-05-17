@@ -179,7 +179,8 @@ UniValue setgenerate(const UniValue& params, bool fHelp)
 //                LOCK(cs_main);
 //                IncrementExtraNonce(pblock, chainActive.Tip(), nExtraNonce);
 //            }
-//            while (!ShutdownRequested() && !CheckProofOfWork(pblock->GetHash(), pblock->nBits, Params().GetConsensus())) {
+//            //TODO: Phi2_hash hardfork block here !!!
+//            while (!ShutdownRequested() && !CheckProofOfWork(pblock->GetHash(/*nHeight+1 >= Params().SwitchPhi2Block()*/), pblock->nBits, Params().GetConsensus())) {
 //                // Yes, there is a chance every nonce could fail to satisfy the -regtest
 //                // target -- 1 in 2^(2^32). That ain't gonna happen.
 //                ++pblock->nNonce;

@@ -75,14 +75,22 @@ public:
         return (nBits == 0);
     }
 
-    uint256 GetHash() const;
+//TODO: Phi2_hash hardfork block here !!!
+#if 0
+    uint256 GetHash(bool phi2block = false) const;
 
-    int64_t GetBlockTime() const
-    {
+    int64_t GetBlockTime() const {
         return (int64_t)nTime;
     }
-};
+#else
+    uint256 GetHash() const;
 
+    int64_t GetBlockTime() const {
+        return (int64_t)nTime;
+    }
+#endif
+
+};
 
 class CBlock : public CBlockHeader
 {

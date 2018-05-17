@@ -146,6 +146,10 @@ public:
         consensus.nLastPOWBlock = 6000000;
         //TODO: set CSV parameters for mainnet
 
+        //TODO: Phi2_hash hardfork block here !!!
+        nSwitchPhi2Block = 300000;
+        //nFirstSCBlock = 300000;
+
         /**
          * The message start string is designed to be unlikely to occur in normal data.
          * The characters are rarely used upper ASCII, not valid as UTF-8, and produce
@@ -275,6 +279,10 @@ public:
         genesis.nBits  = 0x1e0fffff;
         genesis.nTime = 1504344001;
         genesis.nNonce = 1454059;
+
+        //TODO: Phi2_hash hardfork block here !!!
+        //nSwitchPhi2Block = 300000;
+        //nFirstSCBlock = 300000;
 
         consensus.hashGenesisBlock = genesis.GetHash();
 //      assert(hashGenesisBlock == uint256("0"));
@@ -468,6 +476,10 @@ public:
         consensus.vDeployments[Consensus::DEPLOYMENT_CSV].nStartTime = 0;
         consensus.vDeployments[Consensus::DEPLOYMENT_CSV].nTimeout = 999999999999ULL;
         consensus.nLastPOWBlock = 6000000;
+
+        //TODO: Phi2_hash hardfork block here !!!
+        nSwitchPhi2Block = 1000;
+        //nFirstSCBlock = 300000;
 
         /**
          * The message start string is designed to be unlikely to occur in normal data.
