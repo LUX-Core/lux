@@ -1040,9 +1040,6 @@ bool AcceptToMemoryPool(CTxMemPool& pool, CValidationState& state, const CTransa
             return state.DoS(0, error("AcceptToMemoryPool : too many sigops %s, %d > %d", hash.ToString(), nSigOpsCost, MAX_STANDARD_TX_SIGOPS_COST),
                 REJECT_NONSTANDARD, "bad-txns-too-many-sigops");
 
-
-
-
         // Don't accept it if it can't get into a block
         // but prioritise dstx and don't check fees for it
         if (!ignoreFees) {

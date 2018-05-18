@@ -2332,10 +2332,9 @@ bool CWallet::CreateTransaction(const vector<pair<CScript, CAmount> >& vecSend, 
                     // change transaction isn't always pay-to-lux-address
                     CScript scriptChange;
 
-                     bool combineChange = false;
+                    bool combineChange = false;
 
                     // coin control: send change to custom address
-
                     if (coinControl && !boost::get<CNoDestination>(&coinControl->destChange))
                     {
                         scriptChange = GetScriptForDestination(coinControl->destChange);
