@@ -15,7 +15,6 @@
 #include "pubkey.h"
 #include "script/script.h"
 #include "uint256.h"
-#include <iostream>
 
 using namespace std;
 
@@ -1385,7 +1384,6 @@ static bool VerifyWitnessProgram(const CScriptWitness& witness, int witversion, 
             }
         } else if (program.size() == 20) {
             // Special case for pay-to-pubkeyhash; signature + pubkey in witness
-            std::cout << "VerifyWitnessProgram: witness stack size - " << witness.stack.size() << std::endl;
             if (witness.stack.size() != 2) {
                 return set_error(serror, SCRIPT_ERR_WITNESS_PROGRAM_MISMATCH); // 2 items in witness
             }
