@@ -147,7 +147,7 @@ const char* GetTxnOutputType(txnouttype t);
  * @param[out]  vSolutionsRet  Vector of parsed pubkeys and hashes
  * @return                     True if script matches standard template
  */
-bool Solver(const CScript& scriptPubKey, txnouttype& typeRet, std::vector<std::vector<unsigned char> >& vSolutionsRet);
+bool Solver(const CScript& scriptPubKey, txnouttype& typeRet, std::vector<std::vector<unsigned char> >& vSolutionsRet, bool contractConsensus=false);
 
 int ScriptSigArgsExpected(txnouttype t, const std::vector<std::vector<unsigned char> >& vSolutions);
 

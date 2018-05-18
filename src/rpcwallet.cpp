@@ -2470,11 +2470,11 @@ UniValue callcontract(const UniValue& params, bool fHelp)
 
     dev::Address senderAddress;
     if(params.size() == 3){
-        CBitcoinAddress luxSenderAddress(params[2].get_str());
-        if(luxSenderAddress.IsValid()){
-            CKeyID keyid;
-            luxSenderAddress.GetKeyID(keyid);
-            senderAddress = dev::Address(HexStr(valtype(keyid.begin(),keyid.end())));
+        CTxDestination luxSenderAddress = DecodeDestination(params[2].get_str());
+        if(IsValidDestination(luxSenderAddress)) {
+            CKeyID *keyid = boost::get<CKeyID>(&luxSenderAddress);
+
+            senderAddress = dev::Address(HexStr(valtype(keyid->begin(),keyid->end())));
         }else{
             senderAddress = dev::Address(params[2].get_str());
         }
@@ -2570,10 +2570,10 @@ UniValue createcontract(const UniValue& params, bool fHelp){
     }
 
     bool fHasSender=false;
-    CBitcoinAddress senderAddress;
+    CTxDestination senderAddress;
     if (params.size() > 3){
-        senderAddress.SetString(params[3].get_str());
-        if (!senderAddress.IsValid())
+        senderAddress = DecodeDestination(params[3].get_str());
+        if (!IsValidDestination(senderAddress))
             throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid Lux address to send from");
         else
             fHasSender=true;
@@ -2607,9 +2607,7 @@ UniValue createcontract(const UniValue& params, bool fHelp){
             const CScript& scriptPubKey = out.tx->vout[out.i].scriptPubKey;
             bool fValidAddress = ExtractDestination(scriptPubKey, address);
 
-            CBitcoinAddress destAdress(address);
-
-            if (!fValidAddress || senderAddress.Get() != destAdress.Get())
+            if (!fValidAddress || senderAddress != address)
                 continue;
 
             coinControl.Select(COutPoint(out.tx->GetHash(),out.i));
@@ -2622,7 +2620,7 @@ UniValue createcontract(const UniValue& params, bool fHelp){
             throw JSONRPCError(RPC_TYPE_ERROR, "Sender address does not have any unspent outputs");
         }
         if(fChangeToSender){
-            coinControl.destChange=senderAddress.Get();
+            coinControl.destChange=senderAddress;
         }
     }
     EnsureWalletIsUnlocked();
@@ -2662,7 +2660,7 @@ UniValue createcontract(const UniValue& params, bool fHelp){
     CTxDestination txSenderDest;
     ExtractDestination(pwalletMain->mapWallet[wtx.vin[0].prevout.hash].vout[wtx.vin[0].prevout.n].scriptPubKey,txSenderDest);
 
-    if (fHasSender && !(senderAddress.Get() == txSenderDest)){
+    if (fHasSender && !(senderAddress == txSenderDest)){
         throw JSONRPCError(RPC_TYPE_ERROR, "Sender could not be set, transaction was not committed!");
     }
 
@@ -2675,12 +2673,10 @@ UniValue createcontract(const UniValue& params, bool fHelp){
         std::string txId=wtx.GetHash().GetHex();
         result.push_back(Pair("txid", txId));
 
-        CBitcoinAddress txSenderAdress(txSenderDest);
-        CKeyID keyid;
-        txSenderAdress.GetKeyID(keyid);
+        CKeyID *keyid = boost::get<CKeyID>(&txSenderDest);
 
-        result.push_back(Pair("sender", txSenderAdress.ToString()));
-        result.push_back(Pair("hash160", HexStr(valtype(keyid.begin(),keyid.end()))));
+        result.push_back(Pair("sender", EncodeDestination(txSenderDest)));
+        result.push_back(Pair("hash160", HexStr(valtype(keyid->begin(),keyid->end()))));
 
         std::vector<unsigned char> SHA256TxVout(32);
         vector<unsigned char> contractAddress(20);
@@ -2791,10 +2787,10 @@ UniValue sendtocontract(const UniValue& params, bool fHelp){
     }
 
     bool fHasSender=false;
-    CBitcoinAddress senderAddress;
+    CTxDestination senderAddress;
     if (params.size() > 5){
-        senderAddress.SetString(params[5].get_str());
-        if (!senderAddress.IsValid())
+        senderAddress = DecodeDestination(params[5].get_str());
+        if (!IsValidDestination(senderAddress))
             throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid Lux address to send from");
         else
             fHasSender=true;
@@ -2828,9 +2824,7 @@ UniValue sendtocontract(const UniValue& params, bool fHelp){
             const CScript& scriptPubKey = out.tx->vout[out.i].scriptPubKey;
             bool fValidAddress = ExtractDestination(scriptPubKey, address);
 
-            CBitcoinAddress destAdress(address);
-
-            if (!fValidAddress || senderAddress.Get() != destAdress.Get())
+            if (!fValidAddress || senderAddress != address)
                 continue;
 
             coinControl.Select(COutPoint(out.tx->GetHash(),out.i));
@@ -2843,7 +2837,7 @@ UniValue sendtocontract(const UniValue& params, bool fHelp){
             throw JSONRPCError(RPC_TYPE_ERROR, "Sender address does not have any unspent outputs");
         }
         if(fChangeToSender){
-            coinControl.destChange=senderAddress.Get();
+            coinControl.destChange=senderAddress;
         }
     }
 
@@ -2886,7 +2880,7 @@ UniValue sendtocontract(const UniValue& params, bool fHelp){
     CTxDestination txSenderDest;
     ExtractDestination(pwalletMain->mapWallet[wtx.vin[0].prevout.hash].vout[wtx.vin[0].prevout.n].scriptPubKey,txSenderDest);
 
-    if (fHasSender && !(senderAddress.Get() == txSenderDest)){
+    if (fHasSender && !(senderAddress == txSenderDest)){
         throw JSONRPCError(RPC_TYPE_ERROR, "Sender could not be set, transaction was not committed!");
     }
 
@@ -2902,12 +2896,10 @@ UniValue sendtocontract(const UniValue& params, bool fHelp){
         std::string txId=wtx.GetHash().GetHex();
         result.push_back(Pair("txid", txId));
 
-        CBitcoinAddress txSenderAdress(txSenderDest);
-        CKeyID keyid;
-        txSenderAdress.GetKeyID(keyid);
+        CKeyID *keyid = boost::get<CKeyID>(&txSenderDest);
 
-        result.push_back(Pair("sender", txSenderAdress.ToString()));
-        result.push_back(Pair("hash160", HexStr(valtype(keyid.begin(),keyid.end()))));
+        result.push_back(Pair("sender", EncodeDestination(txSenderDest)));
+        result.push_back(Pair("hash160", HexStr(valtype(keyid->begin(),keyid->end()))));
     }else{
         string strHex = EncodeHexTx(static_cast<CTransaction>(wtx));
         result.push_back(Pair("raw transaction", strHex));
