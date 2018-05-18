@@ -893,7 +893,8 @@ void Serialize(Stream& os, const CScript& v, int nType, int nVersion)
 template <typename Stream>
 void Unserialize(Stream& is, CScript& v, int nType, int nVersion)
 {
-    Unserialize(is, (std::vector<unsigned char>&)v, nType, nVersion);
+    //TODO: replace prevector with CScriptBase
+    Unserialize(is, (prevector<28,unsigned char>&)v, nType, nVersion);
 }
 
 

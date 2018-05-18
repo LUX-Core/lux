@@ -496,13 +496,13 @@ void CDarkSendPool::SetNull(bool clearEverything){
 }
 
 bool CDarkSendPool::SetCollateralAddress(std::string strAddress){
-    CBitcoinAddress address;
-    if (!address.SetString(strAddress))
+    CTxDestination dest = DecodeDestination(strAddress);
+    if (!IsValidDestination(dest))
     {
         LogPrintf("CDarkSendPool::SetCollateralAddress - Invalid DarkSend collateral address\n");
         return false;
     }
-    collateralPubKey= GetScriptForDestination(address.Get());
+    collateralPubKey= GetScriptForDestination(dest);
     return true;
 }
 
@@ -947,7 +947,7 @@ bool CDarkSendPool::SignatureValid(const CScript& newSig, const CTxIn& newVin){
         CScriptWitness *witness;
         int flags = SCRIPT_VERIFY_P2SH | SCRIPT_VERIFY_STRICTENC;
         //If transaction contains witness, then witness script should be verified
-        if (n < txNew.wit.vtxinwit.size()) {
+        if (n < (int)txNew.wit.vtxinwit.size()) {
             witness = &txNew.wit.vtxinwit[n].scriptWitness;
             flags |= SCRIPT_VERIFY_WITNESS;
         } else {

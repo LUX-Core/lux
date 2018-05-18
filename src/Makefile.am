@@ -87,6 +87,7 @@ BITCOIN_CORE_H = \
   allocators.h \
   amount.h \
   base58.h \
+  bech32.h \
   bip38.h \
   bloom.h \
   chain.h \
@@ -140,6 +141,7 @@ BITCOIN_CORE_H = \
   rpcclient.h \
   rpcprotocol.h \
   rpcserver.h \
+  rpcutil.h \
   rpcwallet.h \
   script/interpreter.h \
   script/script.h \
@@ -356,6 +358,7 @@ libbitcoin_common_a_SOURCES = \
   allocators.cpp \
   amount.cpp \
   base58.cpp \
+  bech32.cpp \
   bip38.cpp \
   chainparams.cpp \
   coins.cpp \
@@ -571,6 +574,7 @@ libbitcoin_util_a_SOURCES = \
   clientversion.cpp \
   random.cpp \
   rpcprotocol.cpp \
+  rpcutil.cpp \
   sync.cpp \
   uint256.cpp \
   util.cpp \

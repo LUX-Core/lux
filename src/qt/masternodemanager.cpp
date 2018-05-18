@@ -172,11 +172,10 @@ void MasternodeManager::updateNodeList()
 	QTableWidgetItem *lastSeenItem = new QTableWidgetItem(QString::fromStdString(DateTimeStrFormat("%Y-%m-%d %H:%M:%S", mn.lastTimeSeen)));
 	
 	CScript pubkey;
-        pubkey =GetScriptForDestination(mn.pubkey.GetID());
-        CTxDestination address1;
-        ExtractDestination(pubkey, address1);
-        CBitcoinAddress address2(address1);
-	QTableWidgetItem *pubkeyItem = new QTableWidgetItem(QString::fromStdString(address2.ToString()));
+    pubkey = GetScriptForDestination(mn.pubkey.GetID());
+    CTxDestination address1;
+    ExtractDestination(pubkey, address1);
+	QTableWidgetItem *pubkeyItem = new QTableWidgetItem(QString::fromStdString(EncodeDestination(address1)));
 	
 	ui->tableWidget->setItem(mnRow, 0, addressItem);
 	ui->tableWidget->setItem(mnRow, 1, rankItem);
