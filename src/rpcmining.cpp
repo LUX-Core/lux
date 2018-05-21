@@ -844,7 +844,7 @@ UniValue getwork(const UniValue& params, bool fHelp) {
         CBlock* pblock = &pblocktemplate->block; // pointer for convenience
 
         // Update nTime
-        UpdateTime(pblock, Params().GetConsensus(), pindexPrev, false); //TODO: isProofOfStake
+        UpdateTime(pblock, Params().GetConsensus(), pindexPrev, false);
         pblock->nNonce = 0;
 
         // Update nExtraNonce
