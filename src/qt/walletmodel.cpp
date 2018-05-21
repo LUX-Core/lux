@@ -674,3 +674,8 @@ bool WalletModel::isMine(CTxDestination address)
 bool WalletModel::IsSpendable(const CTxDestination& dest) const {
     return IsMine(*wallet, dest) & ISMINE_SPENDABLE;
 }
+
+OutputType WalletModel::getDefaultAddressType() const
+{
+    return g_address_type;
+}
