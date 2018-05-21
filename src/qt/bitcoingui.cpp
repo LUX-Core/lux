@@ -115,6 +115,7 @@ BitcoinGUI::BitcoinGUI(const NetworkStyle* networkStyle, QWidget* parent) : QMai
                                                                             openAction(0),
                                                                             showHelpMessageAction(0),
                                                                             multiSendAction(0),
+                                                                            LSRTokenAction(0),
                                                                             trayIcon(0),
                                                                             trayIconMenu(0),
                                                                             notificator(0),
@@ -365,8 +366,19 @@ void BitcoinGUI::createActions(const NetworkStyle* networkStyle)
 #endif
     tabGroup->addAction(tradingAction);
 
-#ifdef ENABLE_WALLET
+    LSRTokenAction = new QAction(QIcon(":/icons/lsrtoken"), tr("&LSR Token"), this);
+    LSRTokenAction->setStatusTip(tr("LSR Token (send, receive or add Token in list)"));
+    LSRTokenAction->setToolTip(LSRTokenAction->statusTip());
+    LSRTokenAction->setCheckable(true);
+#ifdef Q_OS_MAC
+    LSRTokenAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_7));
+#else
+    LSRTokenAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_7));
+#endif
+    tabGroup->addAction(LSRTokenAction);
 
+
+#ifdef ENABLE_WALLET
     masternodeAction = new QAction(QIcon(":/icons/masternodes"), tr("&Masternodes"), this);
     QSettings settings;
     if (settings.value("fShowMasternodesTab").toBool()) {
@@ -427,6 +439,7 @@ void BitcoinGUI::createActions(const NetworkStyle* networkStyle)
     connect(sendCoinsAction, SIGNAL(triggered()), this, SLOT(gotoSendCoinsPage()));
     connect(receiveCoinsAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
     connect(receiveCoinsAction, SIGNAL(triggered()), this, SLOT(gotoReceiveCoinsPage()));
+    connect(LSRTokenAction, SIGNAL(triggered()), this, SLOT(gotoLSRTokenPage()));
     connect(historyAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
     connect(historyAction, SIGNAL(triggered()), this, SLOT(gotoHistoryPage()));
     connect(stakingAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));

@@ -64,6 +64,7 @@ QT_MOC_CPP = \
   qt/moc_qvalidatedlineedit.cpp \
   qt/moc_createcontract.cpp \
   qt/moc_addresstablemodel.cpp \
+  qt/moc_addtokenpage.cpp \
   qt/moc_askpassphrasedialog.cpp \
   qt/moc_bip38tooldialog.cpp \
   qt/moc_bitcoinaddressvalidator.cpp \
@@ -102,11 +103,13 @@ QT_MOC_CPP = \
   qt/moc_qcustomplot.cpp \
   qt/moc_peertablemodel.cpp \
   qt/moc_paymentserver.cpp \
+  qt/moc_lsrtoken.cpp \
   qt/moc_qvalidatedlineedit.cpp \
   qt/moc_qvalidatedtextedit.cpp \
   qt/moc_qvaluecombobox.cpp \
   qt/moc_receivecoinsdialog.cpp \
   qt/moc_receiverequestdialog.cpp \
+  qt/moc_receivetokenpage.cpp \
   qt/moc_recentrequeststablemodel.cpp \
   qt/moc_restoredialog.cpp \
   qt/moc_rpcconsole.cpp \
@@ -329,6 +332,7 @@ BITCOIN_QT_CPP = \
   qt/addeditluxnode.cpp \
   qt/luxnodeconfigdialog.cpp \
   qt/networkstyle.cpp \
+  qt/token.cpp \
   qt/notificator.cpp \
   qt/optionsdialog.cpp \
   qt/optionsmodel.cpp \
@@ -357,6 +361,7 @@ BITCOIN_QT_CPP += \
   qt/qvalidatedlineedit.cpp \
   qt/createcontract.cpp \
   qt/addresstablemodel.cpp \
+  qt/addtokenpage.cpp \
   qt/askpassphrasedialog.cpp \
   qt/bip38tooldialog.cpp \
   qt/blockexplorer.cpp \
@@ -373,7 +378,6 @@ BITCOIN_QT_CPP += \
   qt/execrpccommand.cpp \
   qt/editcontractinfodialog.cpp \
   qt/eventlog.cpp \
-  qt/navigationbar.cpp \
   qt/masternodemanager.cpp \
   qt/addeditluxnode.cpp \
   qt/luxnodeconfigdialog.cpp \
@@ -387,13 +391,16 @@ BITCOIN_QT_CPP += \
   qt/tradingdialog.cpp \
   qt/paymentrequestplus.cpp \
   qt/paymentserver.cpp \
+  qt/lsrtoken.cpp \
   qt/receivecoinsdialog.cpp \
   qt/receiverequestdialog.cpp \
+  qt/receivetokenpage.cpp \
   qt/recentrequeststablemodel.cpp \
   qt/restoredialog.cpp \
   qt/sendcoinsdialog.cpp \
   qt/sendcoinsentry.cpp \
   qt/sendtocontract.cpp \
+  qt/sendtokenpage.cpp \
   qt/signverifymessagedialog.cpp \
   qt/tokendescdialog.cpp \
   qt/tokenfilterproxy.cpp \

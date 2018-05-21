@@ -26,6 +26,7 @@ class BlockExplorer;
 class CreateContract;
 class SendToContract;
 class CallContractPage;
+class LSRToken;
 
 
 QT_BEGIN_NAMESPACE
@@ -71,6 +72,7 @@ private:
     CreateContract* createContractPage;
     SendToContract* sendToContractPage;
     CallContractPage* callContractPage;
+    LSRToken* LSRTokenPage;
     QWidget* transactionsPage;
     StakingDialog* stakingPage;
     tradingDialog* tradingPage;

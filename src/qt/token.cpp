@@ -72,12 +72,11 @@ struct TokenData
 };
 
 bool ToHash160(const std::string& strLuxAddress, std::string& strHash160)
-{
-    CBitcoinAddress luxAddress(strLuxAddress);
-    if(luxAddress.IsValid()){
-        CKeyID keyid;
-        luxAddress.GetKeyID(keyid);
-        strHash160 = HexStr(valtype(keyid.begin(),keyid.end()));
+{   
+    CTxDestination luxAddress = DecodeDestination(strLuxAddress);
+    if(IsValidDestination(luxAddress)){     
+        CKeyID *keyid = boost::get<CKeyID>(&luxAddress);
+        strHash160 = HexStr(valtype(keyid->begin(),keyid->end()));
     }else{
         return false;
     }
@@ -88,10 +87,9 @@ bool ToLuxAddress(const std::string& strHash160, std::string& strLuxAddress)
 {
     uint160 key(ParseHex(strHash160.c_str()));
     CKeyID keyid(key);
-    CBitcoinAddress luxAddress;
-    luxAddress.Set(keyid);
-    if(luxAddress.IsValid()){
-        strLuxAddress = luxAddress.ToString();
+    
+    if(IsValidDestination(CTxDestination(keyid))){
+        strLuxAddress = EncodeDestination(CTxDestination(keyid));
         return true;
     }
     return false;

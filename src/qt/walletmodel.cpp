@@ -696,7 +696,7 @@ bool WalletModel::isUnspentAddress(const std::string &luxAddress) const
         const CScript& scriptPubKey = out.tx->vout[out.i].scriptPubKey;
         bool fValidAddress = ExtractDestination(scriptPubKey, address);
 
-        if(fValidAddress && CBitcoinAddress(address).ToString() == luxAddress && out.tx->vout[out.i].nValue)
+        if(fValidAddress && EncodeDestination(address) == luxAddress && out.tx->vout[out.i].nValue)
         {
             return true;
         }
