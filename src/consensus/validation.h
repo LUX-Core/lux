@@ -8,10 +8,12 @@
 
 #include <string>
 #include <sstream>
+#include <vector>
 
 class CCoinsViewCache;
 class CTransaction;
-
+class CBlockIndex;
+struct LockPoints;
 
 /** "reject" message codes */
 static const unsigned char REJECT_MALFORMED = 0x01;
@@ -103,5 +105,31 @@ namespace Consensus {
     bool CheckTxInputs(const CTransaction& tx, CValidationState& state, const CCoinsViewCache& inputs, int nSpendHeight);
 
 } // namespace Consensus
+
+
+/**
+ * Test whether the LockPoints height and time are still valid on the current chain
+ */
+bool TestLockPointValidity(const LockPoints* lp);
+
+/**
+ * Check if transaction is final per BIP 68 sequence numbers and can be included in a block.
+ * Consensus critical. Takes as input a list of heights at which tx's inputs (in order) confirmed.
+ */
+bool SequenceLocks(const CTransaction &tx, int flags, std::vector<int>* prevHeights, const CBlockIndex& block);
+
+/**
+ * Check if transaction will be BIP 68 final in the next block to be created.
+ *
+ * Simulates calling SequenceLocks() with data from the tip of the current active chain.
+ * Optionally stores in LockPoints the resulting height and time calculated and the hash
+ * of the block needed for calculation or skips the calculation and uses the LockPoints
+ * passed in for evaluation.
+ * The LockPoints should not be considered valid if CheckSequenceLocks returns false.
+ *
+ * See consensus/consensus.h for flag definitions.
+ */
+bool CheckSequenceLocks(const CTransaction &tx, int flags, LockPoints* lp = NULL, bool useExistingLockPoints = false);
+
 
 #endif // BITCOIN_CONSENSUS_VALIDATION_H

@@ -1054,6 +1054,14 @@ bool AcceptToMemoryPool(CTxMemPool& pool, CValidationState& state, const CTransa
 
             // we have all inputs cached now, so switch back to dummy, so we don't need to keep lock on mempool
             view.SetBackend(dummy);
+
+            // Only accept BIP68 sequence locked transactions that can be mined in the next
+            // block; we don't want our mempool filled up with transactions that can't
+            // be mined yet.
+            // Must keep pool.cs for this unless we change CheckSequenceLocks to take a
+            // CoinsViewCache instead of create its own
+            if (!CheckSequenceLocks(tx, STANDARD_LOCKTIME_VERIFY_FLAGS, &lp))
+                return state.DoS(0, false, REJECT_NONSTANDARD, "non-BIP68-final");
         }
 
         // Check for non-standard pay-to-script-hash in inputs
@@ -1344,6 +1352,14 @@ bool AcceptableInputs(CTxMemPool& pool, CValidationState& state, const CTransact
 
             // we have all inputs cached now, so switch back to dummy, so we don't need to keep lock on mempool
             view.SetBackend(dummy);
+
+            // Only accept BIP68 sequence locked transactions that can be mined in the next
+            // block; we don't want our mempool filled up with transactions that can't
+            // be mined yet.
+            // Must keep pool.cs for this unless we change CheckSequenceLocks to take a
+            // CoinsViewCache instead of create its own
+            if (!CheckSequenceLocks(tx, STANDARD_LOCKTIME_VERIFY_FLAGS, &lp))
+                return state.DoS(0, false, REJECT_NONSTANDARD, "non-BIP68-final");
         }
 
         int64_t nSigOpsCost = GetTransactionSigOpCost(tx, view, STANDARD_SCRIPT_VERIFY_FLAGS);
@@ -1610,7 +1626,6 @@ bool GetTransaction(const uint256& hash, CTransaction& txOut, const Consensus::P
 
     return false;
 }
-
 
 //////////////////////////////////////////////////////////////////////////////
 //

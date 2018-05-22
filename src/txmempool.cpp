@@ -538,8 +538,8 @@ void CTxMemPool::removeForReorg(const CCoinsViewCache *pcoins, unsigned int nMem
     for (indexed_transaction_set::const_iterator it = mapTx.begin(); it != mapTx.end(); it++) {
         const CTransaction& tx = it->GetTx();
         LockPoints lp = it->GetLockPoints();
-//        bool validLP =  TestLockPointValidity(&lp);
-        if (!CheckFinalTx(tx, flags) /*|| !CheckSequenceLocks(tx, flags, &lp, validLP)*/) {
+        bool validLP =  TestLockPointValidity(&lp);
+        if (!CheckFinalTx(tx, flags) || !CheckSequenceLocks(tx, flags, &lp, validLP)) {
             // Note if CheckSequenceLocks fails the LockPoints may still be invalid
             // So it's critical that we remove the tx and not depend on the LockPoints.
             txToRemove.insert(it);
@@ -556,9 +556,9 @@ void CTxMemPool::removeForReorg(const CCoinsViewCache *pcoins, unsigned int nMem
                 }
             }
         }
-//        if (!validLP) {
-//            mapTx.modify(it, update_lock_points(lp));
-//        }
+        if (!validLP) {
+            mapTx.modify(it, update_lock_points(lp));
+        }
     }
     setEntries setAllRemoves;
     for (txiter it : txToRemove) {
