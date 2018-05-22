@@ -98,10 +98,9 @@ public:
     int64_t StakingRoundPeriod() const { return nStakingRoundPeriod; }
     int64_t StakingInterval() const { return nStakingInterval; }
     int64_t StakingMinAge() const { return nStakingMinAge; }
-    int FirstSCBlock() const { return nFirstSCBlock; }
     CBaseChainParams::Network NetworkID() const { return networkID; }
     //TODO: Phi2_hash hardfork block here !!!
-    //int FirstSCBlock() const { return nFirstSCBlock; }
+    int FirstSCBlock() const { return nFirstSCBlock; }
     int SwitchPhi2Block() const { return nSwitchPhi2Block; }
 
 protected:

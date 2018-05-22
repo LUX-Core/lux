@@ -148,7 +148,7 @@ public:
 
         //TODO: Phi2_hash hardfork block here !!!
         nSwitchPhi2Block = 300000;
-        //nFirstSCBlock = 300000;
+        nFirstSCBlock = 300000;
 
         /**
          * The message start string is designed to be unlikely to occur in normal data.
@@ -227,7 +227,6 @@ public:
         nStakingRoundPeriod = 120; // 2 minutes a round
         nStakingInterval = 22;
         nStakingMinAge = 36 * 60 * 60;
-        nFirstSCBlock = 400000;
     }
 
     const Checkpoints::CCheckpointData& Checkpoints() const
