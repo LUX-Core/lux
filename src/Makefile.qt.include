@@ -21,6 +21,7 @@ QT_TS = \
 
 QT_FORMS_UI = \
   qt/forms/addressbookpage.ui \
+  qt/forms/addtokenpage.ui \
   qt/forms/askpassphrasedialog.ui \
   qt/forms/callcontract.ui \
   qt/forms/bip38tooldialog.ui \
@@ -36,6 +37,7 @@ QT_FORMS_UI = \
   qt/forms/intro.ui \
   qt/forms/masternodemanager.ui \
   qt/forms/addeditluxnode.ui \
+  qt/forms/lsrtoken.ui \
   qt/forms/luxnodeconfigdialog.ui \
   qt/forms/multisenddialog.ui \
   qt/forms/openuridialog.ui \
@@ -43,10 +45,12 @@ QT_FORMS_UI = \
   qt/forms/overviewpage.ui \
   qt/forms/tradingdialog.ui \
   qt/forms/receivecoinsdialog.ui \
+  qt/forms/receivetokenpage.ui \
   qt/forms/receiverequestdialog.ui \
   qt/forms/restoredialog.ui \
   qt/forms/rpcconsole.ui \
   qt/forms/sendcoinsdialog.ui \
+  qt/forms/sendtokenpage.ui \
   qt/forms/sendcoinsentry.ui \
   qt/forms/sendtocontract.ui \
   qt/forms/signverifymessagedialog.ui \
