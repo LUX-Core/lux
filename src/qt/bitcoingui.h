@@ -96,7 +96,6 @@ private:
     QMenuBar* appMenuBar;
     QAction* overviewAction;
     QAction* historyAction;
-    QAction* stakingAction;
     QAction* tradingAction;
     QAction* masternodeAction;
     QAction* quitAction;
@@ -211,8 +210,6 @@ private slots:
     void gotoOverviewPage();
     /** Switch to history (transactions) page */
     void gotoHistoryPage();
-    /** Switch to staking page */
-    void gotoStakingPage();
     /** Switch to trading page */
     void gotoTradingPage();
     /** Switch to Explorer Page */

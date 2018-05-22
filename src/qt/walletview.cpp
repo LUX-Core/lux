@@ -55,7 +55,6 @@ WalletView::WalletView(QWidget* parent) : QStackedWidget(parent),
     sendToContractPage = new SendToContract(this);
     callContractPage = new CallContractPage(this);
     LSRTokenPage = new LSRToken(this);
-    stakingPage = new StakingDialog(this);
     tradingPage = new tradingDialog(this);
     QVBoxLayout* vbox = new QVBoxLayout();
     QHBoxLayout* hbox_buttons = new QHBoxLayout();
@@ -88,10 +87,9 @@ WalletView::WalletView(QWidget* parent) : QStackedWidget(parent),
     receiveCoinsPage = new ReceiveCoinsDialog();
     sendCoinsPage = new SendCoinsDialog();
 
-   // addWidget(overviewPage);
     addWidget(overviewPage);
     addWidget(transactionsPage);
-    addWidget(stakingPage);
+
     addWidget(tradingPage);
     addWidget(receiveCoinsPage);
     addWidget(sendCoinsPage);
@@ -261,11 +259,6 @@ void WalletView::gotoOverviewPage()
 void WalletView::gotoHistoryPage()
 {
     setCurrentWidget(transactionsPage);
-}
-
-void WalletView::gotoStakingPage()
-{
-    setCurrentWidget(stakingPage);
 }
 
 void WalletView::gotoTradingPage()
