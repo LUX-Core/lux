@@ -271,6 +271,11 @@ void BIP32Hash(const unsigned char chainCode[32], unsigned int nChild, unsigned 
 //int HMAC_SHA512_Final(unsigned char *pmd, HMAC_SHA512_CTX *pctx);
 
 /* ----------- Phi1612 Hash ------------------------------------------------ */
+//TODO: Phi2_hash hardfork block here !!!
+#if 0
+template<typename T1>
+inline uint256 phi2_hash(const T1 pbegin, const T1 pend);
+#else
 
 template<typename T1>
 inline uint256 Phi1612(const T1 pbegin, const T1 pend)
@@ -282,11 +287,6 @@ inline uint256 Phi1612(const T1 pbegin, const T1 pend)
     sph_gost512_context      ctx_gost;
     sph_echo512_context ctx_echo;
     static unsigned char pblank[1];
-
-#ifndef QT_NO_DEBUG
-    //std::string strhash;
-    //strhash = "";
-#endif
 
     uint512 hash[17];
 
@@ -316,7 +316,7 @@ inline uint256 Phi1612(const T1 pbegin, const T1 pend)
 
     return hash[5].trim256();
 }
-
+#endif
 void scrypt_hash(const char* pass, unsigned int pLen, const char* salt, unsigned int sLen, char* output, unsigned int N, unsigned int r, unsigned int p, unsigned int dkLen);
 
 /** Optimized SipHash-2-4 implementation for uint256.

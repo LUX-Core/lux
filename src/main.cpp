@@ -1653,8 +1653,8 @@ bool WriteBlockToDisk(const CBlock& block, CDiskBlockPos& pos)
 
     return true;
 }
-
-bool ReadBlockFromDisk(CBlock& block, const CDiskBlockPos& pos, const Consensus::Params& consensusParams)
+//TODO: Phi2_hash hardfork block here !!!
+bool ReadBlockFromDisk(CBlock& block, const CDiskBlockPos& pos,/*int nHeight,*/const Consensus::Params& consensusParams)
 {
     block.SetNull();
 
@@ -1672,7 +1672,8 @@ bool ReadBlockFromDisk(CBlock& block, const CDiskBlockPos& pos, const Consensus:
 
     // Check the header
     if (block.IsProofOfWork()) {
-        if (!CheckProofOfWork(block.GetHash(), block.nBits, consensusParams))
+        //TODO: Phi2_hash hardfork block here !!!
+        if (!CheckProofOfWork(block.GetHash(/*nHeight >= Params().SwitchPhi2Block()*/), block.nBits, consensusParams))
             return error("ReadBlockFromDisk : Errors in block header");
     } else {
         // TODO: CheckProofOfStake(block, ...)
@@ -1681,9 +1682,9 @@ bool ReadBlockFromDisk(CBlock& block, const CDiskBlockPos& pos, const Consensus:
     return true;
 }
 
-bool ReadBlockFromDisk(CBlock& block, const CBlockIndex* pindex, const Consensus::Params& consensusParams)
-{
-    if (!ReadBlockFromDisk(block, pindex->GetBlockPos(), consensusParams))
+bool ReadBlockFromDisk(CBlock& block, const CBlockIndex* pindex, const Consensus::Params& consensusParams) {
+    //TODO: Phi2_hash hardfork block here !!!
+    if (!ReadBlockFromDisk(block, pindex->GetBlockPos(),/*pindex->nHeight,*/consensusParams))
         return false;
     if (block.GetHash() != pindex->GetBlockHash()) {
         LogPrintf("%s : block=%s index=%s\n", __func__, block.GetHash().GetHex(), pindex->GetBlockHash().GetHex());
@@ -3596,10 +3597,21 @@ bool FindUndoPos(CValidationState& state, int nFile, CDiskBlockPos& pos, unsigne
     return true;
 }
 
-bool CheckBlockHeader(const CBlockHeader& block, CValidationState& state, const Consensus::Params& consensusParams, bool fCheckPOW)
-{
+bool CheckBlockHeader(const CBlockHeader& block, CValidationState& state, const Consensus::Params& consensusParams, bool fCheckPOW) {
+//TODO: Phi2_hash hardfork block here !!!
+/*
+    // Get prev block index
+    CBlockIndex* pindexPrev = NULL;
+    int nHeight = 0;
+    BlockMap::iterator mi = mapBlockIndex.find(block.hashPrevBlock);
+    if (mi != mapBlockIndex.end()) {
+        pindexPrev = (*mi).second;
+        nHeight = pindexPrev->nHeight + 1;
+    }
+*/
     // Check proof of work matches claimed amount
-    if (fCheckPOW && !CheckProofOfWork(block.GetHash(), block.nBits, consensusParams))
+    //TODO: Phi2_hash hardfork block here !!!/*
+    if (fCheckPOW && !CheckProofOfWork(block.GetHash(/*nHeight >= Params().SwitchPhi2Block()*/), block.nBits, consensusParams))
         return state.DoS(50, error("%s: proof of work failed", __func__),
             REJECT_INVALID, "high-hash");
     return true;
@@ -4675,7 +4687,15 @@ bool LoadExternalBlockFile(const CChainParams& chainparams, FILE* fileIn, CDiskB
                     std::pair<std::multimap<uint256, CDiskBlockPos>::iterator, std::multimap<uint256, CDiskBlockPos>::iterator> range = mapBlocksUnknownParent.equal_range(head);
                     while (range.first != range.second) {
                         std::multimap<uint256, CDiskBlockPos>::iterator it = range.first;
+
+                        //TODO: Phi2_hash hardfork block here !!!
+#if 0
+                        uint256 hash = block.GetHash();
+                        int nHeight = mapBlockIndex[hash]->nHeight;
+                        if (ReadBlockFromDisk(block, it->second, nHeight, chainparams.GetConsensus())) {
+#else
                         if (ReadBlockFromDisk(block, it->second, chainparams.GetConsensus())) {
+#endif
                             LogPrintf("%s: Processing out of order child %s of %s\n", __func__, block.GetHash().ToString(),
                                 head.ToString());
                             CValidationState dummy;

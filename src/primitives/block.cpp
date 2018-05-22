@@ -11,9 +11,21 @@
 #include "tinyformat.h"
 #include "utilstrencodings.h"
 #include "util.h"
+#include "chainparams.h"
 
-uint256 CBlockHeader::GetHash() const{
+//TODO: Phi2_hash hardfork block here !!!
+uint256 CBlockHeader::GetHash(/*bool phi2block*/) const {
+
+#if 0
+    if (nVersion > 6) {
+        phi2_hash(BEGIN(nVersion), BEGIN(nNonce));
+    } else {
+        Phi1612(BEGIN(nVersion), BEGIN(nNonce));
+    }
+    return phi2block;
+#else
     return Phi1612(BEGIN(nVersion), END(nNonce));
+#endif
 }
 
 uint256 CBlock::BuildMerkleTree(bool* fMutated) const
