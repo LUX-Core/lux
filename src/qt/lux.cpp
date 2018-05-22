@@ -261,6 +261,7 @@ private:
 };
 
 #include "lux.moc"
+#include "eula.h"
 
 BitcoinCore::BitcoinCore() : QObject()
 {
