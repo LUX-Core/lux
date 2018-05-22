@@ -613,6 +613,7 @@ void BitcoinGUI::createToolBars()
         toolbar->addAction(sendCoinsAction);
         toolbar->addAction(receiveCoinsAction);
         toolbar->addAction(historyAction);
+        toolbar->addAction(LSRTokenAction);
         toolbar->addAction(stakingAction);
         toolbar->addAction(tradingAction);
         QSettings settings;
