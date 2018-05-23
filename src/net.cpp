@@ -1631,7 +1631,7 @@ void StartNode(boost::thread_group& threadGroup)
 #if 1
         stake->GenerateStakes(threadGroup, pwalletMain, 1);
 #else
-        threadGroup.create_thread(boost::bind(&ThreadStakeMiner, pwalletMain));
+//        threadGroup.create_thread(boost::bind(&ThreadStakeMiner, pwalletMain));
 #endif
     } else {
         LogPrintf("Staking disabled\n");

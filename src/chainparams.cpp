@@ -352,17 +352,20 @@ public:
         fRequireRPCPassword = true;
         fMiningRequiresPeers = true;
         fDefaultConsistencyChecks = false;
-        fRequireStandard = false;
+        fRequireStandard = true;
         fMineBlocksOnDemand = false;
-        fTestnetToBeDeprecatedFieldRPC = true;
+        fSkipProofOfWorkCheck = false;
+        fTestnetToBeDeprecatedFieldRPC = false;
+        fHeadersFirstSyncingActive = false;
 
-        nPoolMaxTransactions = 2;
+        nPoolMaxTransactions = 3;
         strSporkKey = "04348C2F50F90267E64FACC65BFDC9D0EB147D090872FB97ABAE92E9A36E6CA60983E28E741F8E7277B11A7479B626AC115BA31463AC48178A5075C5A9319D4A38";
-        strDarksendPoolDummyAddress = "LPGq7DZbqZ8Vb3tfLH8Z8VHqeV4fsK68oX";
-        nStartMasternodePayments = 1524402689; //Fri, 09 Jan 2015 21:05:58 GMT
 
-        nStakingRoundPeriod = 5; // 5 seconds a round
-        nStakingInterval = 30; // 30 seconds
+        strDarksendPoolDummyAddress = "LPGq7DZbqZ8Vb3tfLH8Z8VHqeV4fsK68oX";
+        nStartMasternodePayments = 1507656633; //Fri, 09 Jan 2015 21:05:58 GMT
+
+        nStakingRoundPeriod = 120; // 5 seconds a round
+        nStakingInterval = 22; // 30 seconds
         nStakingMinAge = 360; // 6 minutes
         nFirstSCBlock = 1000;
     }
