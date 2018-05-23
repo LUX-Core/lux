@@ -6,6 +6,7 @@
 #define BITCOIN_QT_OPTIONSDIALOG_H
 
 #include <QDialog>
+#include <QValidator>
 
 class OptionsModel;
 class QValidatedLineEdit;

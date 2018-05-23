@@ -192,6 +192,7 @@ void OptionsDialog::setMapper()
     mapper->addMapping(ui->showMasternodesTab, OptionsModel::showMasternodesTab);
     mapper->addMapping(ui->parallelMasterNode, OptionsModel::parallelMasterNode);
     mapper->addMapping(ui->notUseChangeAddress, OptionsModel::NotUseChangeAddress);
+    mapper->addMapping(ui->zeroBalanceAddressToken, OptionsModel::ZeroBalanceAddressToken);
 
     /* Network */
     mapper->addMapping(ui->mapPortUpnp, OptionsModel::MapPortUPnP);

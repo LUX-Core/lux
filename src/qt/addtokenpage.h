@@ -27,6 +27,7 @@ private Q_SLOTS:
     void on_addressChanged();
     void on_numBlocksChanged();
     void on_updateConfirmButton();
+    void on_zeroBalanceAddressToken(bool enable);
 
     Q_SIGNALS:
 
