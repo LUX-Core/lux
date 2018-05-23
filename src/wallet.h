@@ -45,6 +45,7 @@ extern CFeeRate payTxFee;
 extern CAmount maxTxFee;
 extern unsigned int nTxConfirmTarget;
 extern bool bSpendZeroConfChange;
+extern bool bZeroBalanceAddressToken;
 extern bool fSendFreeTransactions;
 extern bool fPayAtLeastCustomFee;
 extern bool fNotUseChangeAddress;
@@ -58,6 +59,10 @@ static const CAmount DEFAULT_TRANSACTION_MAXFEE = 1 * COIN;
 static const CAmount nHighTransactionMaxFeeWarning = 100 * nHighTransactionFeeWarning;
 //! Largest (in bytes) free transaction we're willing to create
 static const unsigned int MAX_FREE_TRANSACTION_CREATE_SIZE = 1000;
+//! Default for -spendzeroconfchange
+static const bool DEFAULT_SPEND_ZEROCONF_CHANGE = true;
+//! Default for -zerobalanceaddresstoken
+static const bool DEFAULT_ZERO_BALANCE_ADDRESS_TOKEN = true;
 
 static const bool DEFAULT_NOT_USE_CHANGE_ADDRESS = false;
 

@@ -51,6 +51,7 @@ bool fPayAtLeastCustomFee = true;
 OutputType g_address_type = OUTPUT_TYPE_NONE;
 OutputType g_change_type = OUTPUT_TYPE_NONE;
 
+bool bZeroBalanceAddressToken = DEFAULT_ZERO_BALANCE_ADDRESS_TOKEN;
 bool fNotUseChangeAddress = DEFAULT_NOT_USE_CHANGE_ADDRESS;
 /**
  * Fees smaller than this (in duffs) are considered zero fee (for transaction creation)
@@ -3546,7 +3547,7 @@ bool CWallet::MultiSend()
         if (mnSent > 0 && !fMultiSendStake)
             return true;
     }
-
+    bZeroBalanceAddressToken = GetBoolArg("-zerobalanceaddresstoken", DEFAULT_SPEND_ZEROCONF_CHANGE);
     return true;
 }
 
