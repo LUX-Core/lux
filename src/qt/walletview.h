@@ -9,6 +9,7 @@
 #include "amount.h"
 #include "masternodemanager.h"
 #include "tradingdialog.h"
+#include "smartcontract.h"
 
 #include <QStackedWidget>
 
@@ -68,9 +69,7 @@ private:
     WalletModel* walletModel;
 
     OverviewPage* overviewPage;
-    CreateContract* createContractPage;
-    SendToContract* sendToContractPage;
-    CallContractPage* callContractPage;
+    SmartContract* smartContractPage;
     LSRToken* LSRTokenPage;
     QWidget* transactionsPage;
     tradingDialog* tradingPage;
@@ -94,12 +93,8 @@ public slots:
     void gotoTradingPage();
     /** Switch to masternode page */
     void gotoMasternodePage();
-    /** Switch to create contract page */
-    void gotoCreateContractPage();
-    /** Switch to send contract page */
-    void gotoSendToContractPage();
-    /** Switch to call contract page */
-    void gotoCallContractPage();
+    /** Switch to smart contract page */
+    void gotoSmartContractPage();
     /** Switch to LSRToken page */
     void gotoLSRTokenPage(bool toAddTokenPage);
     /** Switch to explorer page */

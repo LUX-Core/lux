@@ -142,25 +142,11 @@ void WalletFrame::gotoLSRTokenPage(bool toAddTokenPage)
         i.value()->gotoLSRTokenPage(toAddTokenPage);
 }
 
-void WalletFrame::gotoCreateContractPage()
+void WalletFrame::gotoSmartContractPage()
 {
     QMap<QString, WalletView*>::const_iterator i;
     for (i = mapWalletViews.constBegin(); i != mapWalletViews.constEnd(); ++i)
-        i.value()->gotoCreateContractPage();
-}
-
-void WalletFrame::gotoSendToContractPage()
-{
-    QMap<QString, WalletView*>::const_iterator i;
-    for (i = mapWalletViews.constBegin(); i != mapWalletViews.constEnd(); ++i)
-        i.value()->gotoSendToContractPage();
-}
-
-void WalletFrame::gotoCallContractPage()
-{
-    QMap<QString, WalletView*>::const_iterator i;
-    for (i = mapWalletViews.constBegin(); i != mapWalletViews.constEnd(); ++i)
-        i.value()->gotoCallContractPage();
+        i.value()->gotoSmartContractPage();
 }
 
 void WalletFrame::gotoBlockExplorerPage()
