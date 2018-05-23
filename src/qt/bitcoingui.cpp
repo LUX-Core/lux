@@ -88,8 +88,6 @@ BitcoinGUI::BitcoinGUI(const NetworkStyle* networkStyle, QWidget* parent) : QMai
                                                                             progressDialog(0),
                                                                             appMenuBar(0),
                                                                             smartContractAction(0),
-                                                                            createContractAction(0),
-                                                                            sendToContractAction(0),
                                                                             overviewAction(0),
                                                                             historyAction(0),
                                                                             tradingAction(0),
@@ -383,46 +381,22 @@ void BitcoinGUI::createActions(const NetworkStyle* networkStyle)
         connect(masternodeAction, SIGNAL(triggered()), this, SLOT(gotoMasternodePage()));
     }
 
-    createContractAction = new QAction(QIcon(":/icons/smartcontract"), tr("&Smart Contracts"), this);
-    createContractAction->setStatusTip(tr("Add Smart Contracts"));
-    createContractAction->setToolTip(createContractAction->statusTip());
-    createContractAction->setCheckable(true);
-    #ifdef Q_OS_MAC
-        createContractAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_8));
-    #else
-        createContractAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_8));
-    #endif
-
-    tabGroup->addAction(createContractAction);
-
-    smartContractAction = new QAction(QIcon(":/icons/smartcontract"), tr("Call"), this);
+    smartContractAction = new QAction(QIcon(":/icons/smartcontract"), tr("&Smart Contracts"), this);
+    smartContractAction->setStatusTip(tr("Smart Contracts Actions"));
+    smartContractAction->setToolTip(smartContractAction->statusTip());
     smartContractAction->setCheckable(true);
     #ifdef Q_OS_MAC
-        smartContractAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_0));
+        smartContractAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_8));
     #else
-        smartContractAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_0));
+        smartContractAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_8));
     #endif
-    tabGroup->addAction(smartContractAction);
-
-    sendToContractAction = new QAction(QIcon(":/icons/smartcontract"), tr("Send To"), this);
-    sendToContractAction->setCheckable(true);
-    #ifdef Q_OS_MAC
-        sendToContractAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_9));
-    #else
-        sendToContractAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_9));
-    #endif
-    tabGroup->addAction(sendToContractAction);
 
     // These showNormalIfMinimized are needed because Send Coins and Receive Coins
     // can be triggered from the tray menu, and need to show the GUI to be useful.
     connect(overviewAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
     connect(overviewAction, SIGNAL(triggered()), this, SLOT(gotoOverviewPage()));
-    connect(createContractAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
-    connect(createContractAction, SIGNAL(triggered()), this, SLOT(gotoCreateContractPage()));
-    connect(sendToContractAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
-    connect(sendToContractAction, SIGNAL(triggered()), this, SLOT(gotoSendToContractPage()));
     connect(smartContractAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
-    connect(smartContractAction, SIGNAL(triggered()), this, SLOT(gotoCallContractPage()));
+    connect(smartContractAction, SIGNAL(triggered()), this, SLOT(gotoSmartContractPage()));
     connect(sendCoinsAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
     connect(sendCoinsAction, SIGNAL(triggered()), this, SLOT(gotoSendCoinsPage()));
     connect(receiveCoinsAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
@@ -605,8 +579,6 @@ void BitcoinGUI::createToolBars()
         if (settings.value("fShowMasternodesTab").toBool()) {
             toolbar->addAction(masternodeAction);
         }
-        toolbar->addAction(createContractAction);
-        toolbar->addAction(sendToContractAction);
         toolbar->addAction(smartContractAction);
         toolbar->setMovable(false); // remove unused icon in upper left corner
         overviewAction->setChecked(true);
@@ -706,8 +678,7 @@ void BitcoinGUI::setWalletActionsEnabled(bool enabled)
     if (settings.value("fShowMasternodesTab").toBool()) {
         masternodeAction->setEnabled(enabled);
     }
-    createContractAction->setEnabled(enabled);
-    sendToContractAction->setEnabled(enabled);
+    smartContractAction->setEnabled(enabled);
     encryptWalletAction->setEnabled(enabled);
     backupWalletAction->setEnabled(enabled);
     restoreWalletAction->setEnabled(enabled);
@@ -830,22 +801,10 @@ void BitcoinGUI::gotoOverviewPage()
     overviewAction->setChecked(true);
     if (walletFrame) walletFrame->gotoOverviewPage();
 }
-void BitcoinGUI::gotoCreateContractPage()
-{
-    createContractAction->setChecked(true);
-    if (walletFrame) walletFrame->gotoCreateContractPage();
-}
-
-void BitcoinGUI::gotoSendToContractPage()
-{
-    sendToContractAction->setChecked(true);
-    if (walletFrame) walletFrame->gotoSendToContractPage();
-}
-
-void BitcoinGUI::gotoCallContractPage()
+void BitcoinGUI::gotoSmartContractPage()
 {
     smartContractAction->setChecked(true);
-    if (walletFrame) walletFrame->gotoCallContractPage();
+    if (walletFrame) walletFrame->gotoSmartContractPage();
 }
 
 void BitcoinGUI::gotoHistoryPage()

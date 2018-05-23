@@ -129,8 +129,6 @@ private:
     QAction* showHelpMessageAction;
     QAction* multiSendAction;
     QAction* smartContractAction;
-    QAction* createContractAction;
-    QAction* sendToContractAction;
     QAction* LSRTokenAction;
 
     QSystemTrayIcon* trayIcon;
@@ -216,12 +214,8 @@ private slots:
     void gotoBlockExplorerPage();
     /** Switch to masternode page */
     void gotoMasternodePage();
-    /** Switch to create contract page */
-    void gotoCreateContractPage();
-    /** Switch to send contract page */
-    void gotoSendToContractPage();
-    /** Switch to call contract page */
-    void gotoCallContractPage();
+    /** Switch to smart contract page */
+    void gotoSmartContractPage();
     /** Switch to LSRToken page page */
     void gotoLSRTokenPage(bool toAddTokenPage = false);
     /** Switch to receive coins page */
