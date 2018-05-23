@@ -606,7 +606,8 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
         entry.push_back(Pair("fee", pblocktemplate->vTxFees[index_in_template]));
         int64_t nTxSigOps = pblocktemplate->vTxSigOpsCost[index_in_template];
         if (fPreSegWit) {
-            assert(nTxSigOps % WITNESS_SCALE_FACTOR == 0);
+            //TODO
+            //assert(nTxSigOps % WITNESS_SCALE_FACTOR == 0);
             nTxSigOps /= WITNESS_SCALE_FACTOR;
         }
         entry.push_back(Pair("sigops", nTxSigOps));
@@ -847,7 +848,7 @@ UniValue getwork(const UniValue& params, bool fHelp) {
         CBlock* pblock = &pblocktemplate->block; // pointer for convenience
 
         // Update nTime
-        UpdateTime(pblock, Params().GetConsensus(), pindexPrev, false); //TODO: isProofOfStake
+        UpdateTime(pblock, Params().GetConsensus(), pindexPrev, false);
         pblock->nNonce = 0;
 
         // Update nExtraNonce

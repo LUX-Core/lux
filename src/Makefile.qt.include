@@ -195,6 +195,7 @@ BITCOIN_QT_H = \
   qt/contracttablemodel.h \
   qt/createcontract.h \
   qt/csvmodelwriter.h \
+  qt/customlist.h \
   qt/darksendconfig.h \
   qt/editaddressdialog.h \
   qt/editcontractinfodialog.h \

@@ -5296,6 +5296,9 @@ static bool ProcessMessage(CNode* pfrom, const string &strCommand, CDataStream& 
         BOOST_FOREACH (CAddress& addr, vAddr) {
             boost::this_thread::interruption_point();
 
+            if ((addr.nServices & REQUIRED_SERVICES) != REQUIRED_SERVICES)
+                continue;
+
             if (addr.nTime <= 100000000 || addr.nTime > nNow + 10 * 60)
                 addr.nTime = nNow - 5 * 24 * 60 * 60;
             pfrom->AddAddressKnown(addr);
@@ -5540,7 +5543,7 @@ static bool ProcessMessage(CNode* pfrom, const string &strCommand, CDataStream& 
                         vEraseQueue.push_back(orphanHash);
                     } else if (!fMissingInputs2) {
                         int nDos = 0;
-                        if (stateDummy.IsInvalid(nDos) && nDos > 0 && State(fromPeer)->fHaveWitness) { //TODO: check corruption?
+                        if (stateDummy.IsInvalid(nDos) && nDos > 0 && (!state.CorruptionPossible() || State(fromPeer)->fHaveWitness)) {
                             // Punish peer that gave us an invalid orphan tx
                             Misbehaving(fromPeer, nDos);
                             setMisbehaving.insert(fromPeer);
@@ -5581,7 +5584,7 @@ static bool ProcessMessage(CNode* pfrom, const string &strCommand, CDataStream& 
                 state.GetRejectReason());
             pfrom->PushMessage("reject", strCommand, state.GetRejectCode(),
                 state.GetRejectReason().substr(0, MAX_REJECT_MESSAGE_LENGTH), inv.hash);
-            if (nDoS > 0)
+            if (nDoS > 0 && (!state.CorruptionPossible() || State(pfrom->id)->fHaveWitness))
                 Misbehaving(pfrom->GetId(), nDoS);
         }
     }

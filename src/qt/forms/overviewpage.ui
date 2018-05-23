@@ -1214,7 +1214,7 @@
            </layout>
           </item>
           <item>
-           <widget class="QListView" name="listTransactions">
+           <widget class="CustomList" name="listTransactions">
             <property name="styleSheet">
              <string notr="true">QListView { background: transparent; }</string>
             </property>
