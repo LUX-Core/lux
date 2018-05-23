@@ -203,19 +203,19 @@ UniValue setgenerate(const UniValue& params, bool fHelp)
 
 UniValue gethashespersec(const UniValue& params, bool fHelp)
 {
-//    if (fHelp || params.size() != 0)
-//        throw runtime_error(
-//            "gethashespersec\n"
-//            "\nReturns a recent hashes per second performance measurement while generating.\n"
-//            "See the getgenerate and setgenerate calls to turn generation on and off.\n"
-//            "\nResult:\n"
-//            "n            (numeric) The recent hashes per second when generation is on (will return 0 if generation is off)\n"
-//            "\nExamples:\n" +
-//            HelpExampleCli("gethashespersec", "") + HelpExampleRpc("gethashespersec", ""));
-//
+    if (fHelp || params.size() != 0)
+        throw runtime_error(
+            "gethashespersec\n"
+            "\nReturns a recent hashes per second performance measurement while generating.\n"
+            "See the getgenerate and setgenerate calls to turn generation on and off.\n"
+            "\nResult:\n"
+            "n            (numeric) The recent hashes per second when generation is on (will return 0 if generation is off)\n"
+            "\nExamples:\n" +
+            HelpExampleCli("gethashespersec", "") + HelpExampleRpc("gethashespersec", ""));
+
 //    if (GetTimeMillis() - nHPSTimerStart > 8000)
 //        return (int64_t)0;
-//    return (int64_t)dHashesPerSec;
+    return (int64_t)0;/*dHashesPerSec*/;
 }
 #endif
 
@@ -786,7 +786,7 @@ UniValue getwork(const UniValue& params, bool fHelp) {
 
     // Disable checking block downloading and number of connected nodes for segwittest network
     // because it is tested locally, without any nodes connected, and with significant amount of time between blocks
-    if (Params().NetworkID() != CBaseChainParams::SEGWITTEST) {
+    if (Params().NetworkID() != CBaseChainParams::SEGWITTEST && Params().NetworkID() != CBaseChainParams::TESTNET) {
         if (vNodes.empty())
             throw JSONRPCError(RPC_CLIENT_NOT_CONNECTED, "Lux is not connected!");
 
@@ -831,8 +831,6 @@ UniValue getwork(const UniValue& params, bool fHelp) {
 
             CPubKey pubkey;
             reservekey.GetReservedKey(pubkey);
-
-            CScript scriptPubKey = CScript() << ToByteVector(pubkey) << OP_CHECKSIG;
 
             pblocktemplate = BlockAssembler(Params()).CreateNewBlockWithKey(reservekey, false);
 
