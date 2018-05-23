@@ -48,6 +48,26 @@ static CBlock CreateGenesisBlock(const char* pszTimestamp, const CScript& genesi
     return genesis;
 }
 
+bool CheckProof(uint256 hash, unsigned int nBits)
+{
+    bool fNegative;
+    bool fOverflow;
+    uint256 bnTarget;
+
+
+    bnTarget.SetCompact(nBits, &fNegative, &fOverflow);
+
+    // Check range
+    if (fNegative || bnTarget == 0 || fOverflow)
+        return false; //error("CheckProofOfWork() : nBits below minimum work");
+
+    // Check proof of work matches claimed amount
+    if (hash > bnTarget)
+        return false; //error("CheckProofOfWork() : hash doesn't match nBits");
+
+    return true;
+}
+
 /**
  * Main network
  */
@@ -275,16 +295,41 @@ public:
         nModifierUpdateBlock = 51197; //approx Mon, 17 Apr 2017 04:00:00 GMT
 
         //! Modify the testnet genesis block so the timestamp is valid for a later start.
-        genesis.nBits  = 0x1e0fffff;
-        genesis.nTime = 1504344001;
-        genesis.nNonce = 1454059;
+        const char* pszTimestamp = "Lux - Testnet"; // Input Activation code to activate blockchain
+        CMutableTransaction txNew;
+        txNew.nVersion = 1;
+        txNew.nTime = 1526972773;
+        txNew.nLockTime = 0;
+        txNew.vin.resize(1);
+        txNew.vout.resize(1);
+        txNew.vin[0].scriptSig = CScript() << 0 << CScriptNum(42) << vector<unsigned char>((const unsigned char*)pszTimestamp, (const unsigned char*)pszTimestamp + strlen(pszTimestamp));
+        txNew.vout[0].SetEmpty();
+
+        genesis.SetNull();
+        genesis.vtx.push_back(txNew);
+        genesis.hashPrevBlock = 0;
+        genesis.hashMerkleRoot = genesis.BuildMerkleTree();
+        genesis.nVersion = 1;
+        genesis.nTime = 1526972773; //05/22/2018 @ 7:06am (UTC)
+        genesis.nBits = 0x1e0fffff;
+        genesis.nNonce = 1495954;
+
+//        while (!CheckProof(genesis.GetHash(), genesis.nBits)) {
+//            genesis.nNonce ++;
+//        }
+//
+//        std::cout << genesis.nNonce << std::endl;
+//        std::cout << genesis.GetHash().GetHex() << std::endl;
+//        std::cout << genesis.hashMerkleRoot.GetHex() << std::endl;
 
         //TODO: Phi2_hash hardfork block here !!!
         //nSwitchPhi2Block = 300000;
         //nFirstSCBlock = 300000;
 
         consensus.hashGenesisBlock = genesis.GetHash();
-//      assert(hashGenesisBlock == uint256("0"));
+
+        assert(consensus.hashGenesisBlock == uint256("0x000003d08448849b1427c274769656c6f752cd7d844219a837ee1160a499dfd7"));
+        assert(genesis.hashMerkleRoot == uint256("0xea749497d038c5ab4ab99e49727f43647a24860aba6f4e3a77d5c9e53a6b3b69"));
 
         vFixedSeeds.clear();
         vSeeds.clear();
@@ -428,26 +473,6 @@ public:
     virtual void setSkipProofOfWorkCheck(bool afSkipProofOfWorkCheck) { fSkipProofOfWorkCheck = afSkipProofOfWorkCheck; }
 };
 static CUnitTestParams unitTestParams;
-
-bool CheckProof(uint256 hash, unsigned int nBits)
-{
-    bool fNegative;
-    bool fOverflow;
-    uint256 bnTarget;
-
-
-    bnTarget.SetCompact(nBits, &fNegative, &fOverflow);
-
-    // Check range
-    if (fNegative || bnTarget == 0 || fOverflow)
-        return false; //error("CheckProofOfWork() : nBits below minimum work");
-
-    // Check proof of work matches claimed amount
-    if (hash > bnTarget)
-        return false; //error("CheckProofOfWork() : hash doesn't match nBits");
-
-    return true;
-}
 
 class CSegWitTestnet : public CChainParams
 {
