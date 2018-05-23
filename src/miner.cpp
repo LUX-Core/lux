@@ -360,14 +360,14 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
 
     nBlockMaxSize = blockSizeDGP ? blockSizeDGP : nBlockMaxSize;
 
-    dev::h256 oldHashStateRoot(globalState->rootHash());
-    dev::h256 oldHashUTXORoot(globalState->rootHashUTXO());
+//    dev::h256 oldHashStateRoot(globalState->rootHash());
+//    dev::h256 oldHashUTXORoot(globalState->rootHashUTXO());
     addPriorityTxs(minGasPrice);
     addPackageTxs(minGasPrice);
-    pblock->hashStateRoot = uint256(h256Touint(dev::h256(globalState->rootHash())));
-    pblock->hashUTXORoot = uint256(h256Touint(dev::h256(globalState->rootHashUTXO())));
-    globalState->setRoot(oldHashStateRoot);
-    globalState->setRootUTXO(oldHashUTXORoot);
+//    pblock->hashStateRoot = uint256(h256Touint(dev::h256(globalState->rootHash())));
+//    pblock->hashUTXORoot = uint256(h256Touint(dev::h256(globalState->rootHashUTXO())));
+//    globalState->setRoot(oldHashStateRoot);
+//    globalState->setRootUTXO(oldHashUTXORoot);
 
     //this should already be populated by AddBlock in case of contracts, but if no contracts
     //then it won't get populated
@@ -477,8 +477,8 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateEmptyBlock(const CScript& 
 
     //////////////////////////////////////////////////////// lux
     //state shouldn't change here for an empty block, but if it's not valid it'll fail in CheckBlock later
-    pblock->hashStateRoot = uint256(h256Touint(dev::h256(globalState->rootHash())));
-    pblock->hashUTXORoot = uint256(h256Touint(dev::h256(globalState->rootHashUTXO())));
+//    pblock->hashStateRoot = uint256(h256Touint(dev::h256(globalState->rootHash())));
+//    pblock->hashUTXORoot = uint256(h256Touint(dev::h256(globalState->rootHashUTXO())));
 
     RebuildRefundTransaction();
     ////////////////////////////////////////////////////////
@@ -638,8 +638,8 @@ bool BlockAssembler::AttemptToAddContractToBlock(CTxMemPool::txiter iter, uint64
         return false;
     }
 
-    dev::h256 oldHashStateRoot(globalState->rootHash());
-    dev::h256 oldHashUTXORoot(globalState->rootHashUTXO());
+//    dev::h256 oldHashStateRoot(globalState->rootHash());
+//    dev::h256 oldHashUTXORoot(globalState->rootHashUTXO());
     // operate on local vars first, then later apply to `this`
     uint64_t nBlockWeight = this->nBlockWeight;
     uint64_t nBlockSize = this->nBlockSize;
@@ -675,22 +675,22 @@ bool BlockAssembler::AttemptToAddContractToBlock(CTxMemPool::txiter iter, uint64
     ByteCodeExec exec(*pblock, luxTransactions, hardBlockGasLimit);
     if(!exec.performByteCode()){
         //error, don't add contract
-        globalState->setRoot(oldHashStateRoot);
-        globalState->setRootUTXO(oldHashUTXORoot);
+//        globalState->setRoot(oldHashStateRoot);
+//        globalState->setRootUTXO(oldHashUTXORoot);
         return false;
     }
 
     ByteCodeExecResult testExecResult;
     if(!exec.processingResults(testExecResult)){
-        globalState->setRoot(oldHashStateRoot);
-        globalState->setRootUTXO(oldHashUTXORoot);
+//        globalState->setRoot(oldHashStateRoot);
+//        globalState->setRootUTXO(oldHashUTXORoot);
         return false;
     }
 
     if(bceResult.usedGas + testExecResult.usedGas > softBlockGasLimit){
         //if this transaction could cause block gas limit to be exceeded, then don't add it
-        globalState->setRoot(oldHashStateRoot);
-        globalState->setRootUTXO(oldHashUTXORoot);
+//        globalState->setRoot(oldHashStateRoot);
+//        globalState->setRootUTXO(oldHashUTXORoot);
         return false;
     }
 
@@ -732,8 +732,8 @@ bool BlockAssembler::AttemptToAddContractToBlock(CTxMemPool::txiter iter, uint64
     if (nBlockSigOpsCost * WITNESS_SCALE_FACTOR > (uint64_t)dgpMaxBlockSigOps ||
         nBlockSize > dgpMaxBlockSerSize) {
         //contract will not be added to block, so revert state to before we tried
-        globalState->setRoot(oldHashStateRoot);
-        globalState->setRootUTXO(oldHashUTXORoot);
+//        globalState->setRoot(oldHashStateRoot);
+//        globalState->setRootUTXO(oldHashUTXORoot);
         return false;
     }
 
