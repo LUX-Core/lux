@@ -224,7 +224,7 @@ void BlockAssembler::RebuildRefundTransaction(){
         contrTx.vout[refundtx].nValue -= bceResult.refundSender;
     } else {
         refundtx=1;
-        int64_t nCoinAge;
+        int64_t nCoinAge = 0; // This value is not used in GetProofOfStakeReward
         contrTx.vout[refundtx].nValue = GetProofOfStakeReward(nCoinAge, nFees, nHeight);
         contrTx.vout[refundtx].nValue -= bceResult.refundSender;
     }

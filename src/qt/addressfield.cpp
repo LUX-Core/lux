@@ -58,6 +58,7 @@ bool AddressField::isValidAddress()
 
    // ((QValidatedLineEdit*)lineEdit())->checkValidity();   Testing
    // return ((QValidatedLineEdit*)lineEdit())->isValid();
+   return true;
 }
 
 void AddressField::setComboBoxEditable(bool editable)

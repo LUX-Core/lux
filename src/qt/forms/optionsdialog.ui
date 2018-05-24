@@ -165,7 +165,7 @@
         </layout>
        </item>
        <item>
-        <spacer name="verticalSpacer_Main">
+        <spacer name="verticalSpacer_Main1">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>

@@ -437,6 +437,8 @@ bool CBlockPolicyEstimator::processBlockTx(unsigned int nBlockHeight, const CTxM
     else if (isFeeDataPoint(feeRate, curPri)) {
         feeStats.Record(blocksToConfirm, (double)feeRate.GetFeePerK());
     }
+
+    return true;
 }
 
 void CBlockPolicyEstimator::processBlock(unsigned int nBlockHeight,

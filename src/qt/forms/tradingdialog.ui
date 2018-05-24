@@ -4875,8 +4875,6 @@
       <zorder>label232_13</zorder>
       <zorder>label232_15</zorder>
       <zorder>CS_Max_Amount</zorder>
-      <zorder>verticalSpacer_3</zorder>
-      <zorder>horizontalSpacer_6</zorder>
       <zorder>CSPasteButton</zorder>
      </widget>
      <widget class="QWidget" name="MarketHistory">
@@ -5378,8 +5376,6 @@
       <zorder>label_26</zorder>
       <zorder>WithdrawAddress</zorder>
       <zorder>WithdrawUnitsBtn</zorder>
-      <zorder>horizontalSpacer_4</zorder>
-      <zorder>verticalSpacer</zorder>
       <zorder>WithdrawPasteButton</zorder>
       <zorder>DepositCopyButton</zorder>
      </widget>
@@ -5586,8 +5582,6 @@
       <zorder>label232_17</zorder>
       <zorder>label_28</zorder>
       <zorder>PasswordInput</zorder>
-      <zorder>horizontalSpacer_3</zorder>
-      <zorder>verticalSpacer_2</zorder>
       <zorder>KeyPasteButton</zorder>
       <zorder>SecretPasteButton</zorder>
      </widget>
