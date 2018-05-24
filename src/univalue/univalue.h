@@ -17,7 +17,7 @@
 
 class UniValue {
 public:
-    enum VType { VNULL, VOBJ, VARR, VSTR, VNUM, VBOOL, };
+    enum VType { VNULL, VOBJ, VARR, VSTR, VNUM, VREAL, VBOOL, };
 
     UniValue() { typ = VNULL; }
     UniValue(UniValue::VType initialType, const std::string& initialStr = "") {
