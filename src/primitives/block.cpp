@@ -15,15 +15,11 @@
 #include "versionbits.h"
 
 uint256 CBlockHeader::GetHash(bool phi2block) const {
-#if 0
     if (nVersion > VERSIONBITS_LAST_OLD_BLOCK_VERSION && phi2block) {
         return phi2_hash(BEGIN(nVersion), BEGIN(nNonce));
     } else {
         return Phi1612(BEGIN(nVersion), BEGIN(nNonce));
     }
-#else
-    return Phi1612(BEGIN(nVersion), END(nNonce));
-#endif
 }
 
 uint256 CBlock::BuildMerkleTree(bool* fMutated) const
