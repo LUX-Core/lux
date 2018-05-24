@@ -12,17 +12,15 @@
 #include "utilstrencodings.h"
 #include "util.h"
 #include "chainparams.h"
+#include "versionbits.h"
 
-//TODO: Phi2_hash hardfork block here !!!
-uint256 CBlockHeader::GetHash(/*bool phi2block*/) const {
-
+uint256 CBlockHeader::GetHash(bool phi2block) const {
 #if 0
-    if (nVersion > 6) {
-        phi2_hash(BEGIN(nVersion), BEGIN(nNonce));
+    if (nVersion > VERSIONBITS_LAST_OLD_BLOCK_VERSION && phi2block) {
+        return phi2_hash(BEGIN(nVersion), BEGIN(nNonce));
     } else {
-        Phi1612(BEGIN(nVersion), BEGIN(nNonce));
+        return Phi1612(BEGIN(nVersion), BEGIN(nNonce));
     }
-    return phi2block;
 #else
     return Phi1612(BEGIN(nVersion), END(nNonce));
 #endif

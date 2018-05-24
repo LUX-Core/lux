@@ -166,7 +166,6 @@ public:
         consensus.nLastPOWBlock = 6000000;
         //TODO: set CSV parameters for mainnet
 
-        //TODO: Phi2_hash hardfork block here !!!
         nSwitchPhi2Block = 300000;
         nFirstSCBlock = 300000;
 
@@ -220,7 +219,7 @@ public:
         //vSeeds.push_back(CDNSSeedData("5.77.44.147", "5.77.44.147")); // Non-standard DNS request
 
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,48); // LUX Start letter L
-        base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1,48);
+        base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1,48); //TODO: change start letter for script address
         base58Prefixes[SECRET_KEY]     = std::vector<unsigned char>(1,155);
         base58Prefixes[EXT_PUBLIC_KEY] = boost::assign::list_of(0x07)(0x28)(0xA2)(0x4E).convert_to_container<std::vector<unsigned char> >();
         base58Prefixes[EXT_SECRET_KEY] = boost::assign::list_of(0x03)(0xD8)(0xA1)(0xE5).convert_to_container<std::vector<unsigned char> >();
@@ -504,8 +503,7 @@ public:
         consensus.vDeployments[Consensus::DEPLOYMENT_CSV].nTimeout = 999999999999ULL;
         consensus.nLastPOWBlock = 6000000;
 
-        //TODO: Phi2_hash hardfork block here !!!
-        nSwitchPhi2Block = 1000;
+        nSwitchPhi2Block = 1200;
         //nFirstSCBlock = 300000;
 
         /**
