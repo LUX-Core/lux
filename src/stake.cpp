@@ -472,7 +472,7 @@ bool Stake::CheckProof(CBlockIndex* const pindexPrev, const CBlock &block, uint2
 
     // Read block header
     CBlock prevBlock;
-    if (!ReadBlockFromDisk(prevBlock, pindex->GetBlockPos(), consensusparams))
+    if (!ReadBlockFromDisk(prevBlock, pindex->GetBlockPos(), pindex->nHeight, consensusparams))
         return error("%s: failed to find block", __func__);
 
     unsigned int nTime = block.nTime;

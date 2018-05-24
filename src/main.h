@@ -609,8 +609,7 @@ public:
 
 /** Functions for disk access for blocks */
 bool WriteBlockToDisk(const CBlock& block, CDiskBlockPos& pos);
-//TODO: Phi2_hash hardfork block here !!!
-bool ReadBlockFromDisk(CBlock& block, const CDiskBlockPos& pos, /*int nHeight,*/const Consensus::Params& consensusParams);
+bool ReadBlockFromDisk(CBlock& block, const CDiskBlockPos& pos, int nHeight, const Consensus::Params& consensusParams);
 bool ReadBlockFromDisk(CBlock& block, const CBlockIndex* pindex, const Consensus::Params& consensusParams);
 
 
