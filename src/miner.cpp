@@ -283,8 +283,7 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
     if(txProofTime == 0) {
         txProofTime = GetAdjustedTime();
     }
-//    if(fProofOfStake)
-//        txProofTime &= ~STAKE_TIMESTAMP_MASK;
+
     pblock->nTime = txProofTime;
     if (!fProofOfStake)
         UpdateTime(pblock, chainparams.GetConsensus(), pindexPrev, fProofOfStake);
@@ -295,13 +294,6 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
                       ? nMedianTimePast
                       : pblock->GetBlockTime();
 
-    // Decide whether to include witness transactions
-    // This is only needed in case the witness softfork activation is reverted
-    // (which would require a very deep reorganization) or when
-    // -promiscuousmempoolflags is used.
-    // TODO: replace this with a call to main to assess validity of a mempool
-    // transaction (which in most cases can be a no-op).
-    fIncludeWitness = IsWitnessEnabled(pindexPrev, chainparams.GetConsensus());
 
     nLastBlockTx = nBlockTx;
     nLastBlockSize = nBlockSize;
@@ -312,35 +304,31 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
     coinbaseTx.vin.resize(1);
     coinbaseTx.vin[0].prevout.SetNull();
     coinbaseTx.vout.resize(1);
-    if (fProofOfStake)
-    {
-        // Make the coinbase tx empty in case of proof of stake
+
+    // Decide whether to include witness transactions
+    // This is only needed in case the witness softfork activation is reverted
+    // (which would require a very deep reorganization) or when
+    // -promiscuousmempoolflags is used.
+    // TODO: replace this with a call to main to assess validity of a mempool
+    // transaction (which in most cases can be a no-op).
+    fIncludeWitness = IsWitnessEnabled(pindexPrev, chainparams.GetConsensus());
+    if (fProofOfStake){
+        // Height first in coinbase required for block.version=2
+        coinbaseTx.vin[0].scriptSig = (CScript() << nHeight) + COINBASE_FLAGS;
+        assert(coinbaseTx.vin[0].scriptSig.size() <= 100);
         coinbaseTx.vout[0].SetEmpty();
-    }
-    else
-    {
+    } else {
         coinbaseTx.vout[0].scriptPubKey = scriptPubKeyIn;
+        coinbaseTx.vin[0].scriptSig = CScript() << nHeight << OP_0;
         coinbaseTx.vout[0].nValue = GetProofOfWorkReward(nFees, nHeight);
     }
-    coinbaseTx.vin[0].scriptSig = CScript() << nHeight << OP_0;
+
     originalRewardTx = coinbaseTx;
+
     pblock->vtx[0] = std::move(coinbaseTx);
 
-    // Create coinstake transaction.
-    if(fProofOfStake)
-    {
-        CMutableTransaction coinstakeTx;
-        coinstakeTx.vout.resize(2);
-        coinstakeTx.vout[0].SetEmpty();
-        coinstakeTx.vout[1].scriptPubKey = scriptPubKeyIn;
-        originalRewardTx = coinstakeTx;
-        pblock->vtx[1] = std::move(coinstakeTx);
-
-        //this just makes CBlock::IsProofOfStake to return true
-        //real prevoutstake info is filled in later in SignBlock
-//        pblock->prevoutStake.n=0;
-
-    }
+    if (fProofOfStake && !stake->CreateBlockStake(pwalletMain, pblock))
+        return nullptr;
 
     //////////////////////////////////////////////////////// lux
     LuxDGP luxDGP(globalState.get(), fGettingValuesDGP);
@@ -390,8 +378,9 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
     pblocktemplate->vTxSigOpsCost[0] = WITNESS_SCALE_FACTOR * GetLegacySigOpCount(pblock->vtx[0]);
 
     CValidationState state;
-    if (!fProofOfStake && !TestBlockValidity(state, chainparams, *pblock, pindexPrev, false, false)) {
-        throw std::runtime_error(strprintf("%s: TestBlockValidity failed: %s", __func__, FormatStateMessage(state)));
+    if (!TestBlockValidity(state, chainparams, *pblock, pindexPrev, false, false)) {
+        if (!fProofOfStake) LogPrintf("%s: TestBlockValidity failed \n", __func__);
+        return nullptr;
     }
 
     return std::move(pblocktemplate);
@@ -1006,7 +995,7 @@ void IncrementExtraNonce(CBlock* pblock, const CBlockIndex* pindexPrev, unsigned
     txCoinbase.vin[0].scriptSig = (CScript() << nHeight << CScriptNum(nExtraNonce)) + COINBASE_FLAGS;
     assert(txCoinbase.vin[0].scriptSig.size() <= 100);
 
-    pblock->vtx[0] = std::move(txCoinbase);
+    pblock->vtx[0] = std::move(CTransaction(txCoinbase));
     pblock->hashMerkleRoot = BlockMerkleRoot(*pblock);
 }
 

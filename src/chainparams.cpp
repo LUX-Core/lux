@@ -298,7 +298,7 @@ public:
         const char* pszTimestamp = "Lux - Testnet"; // Input Activation code to activate blockchain
         CMutableTransaction txNew;
         txNew.nVersion = 1;
-        txNew.nTime = 1526972773;
+        txNew.nTime = 1527136450;
         txNew.nLockTime = 0;
         txNew.vin.resize(1);
         txNew.vout.resize(1);
@@ -310,9 +310,9 @@ public:
         genesis.hashPrevBlock = 0;
         genesis.hashMerkleRoot = genesis.BuildMerkleTree();
         genesis.nVersion = 1;
-        genesis.nTime = 1526972773; //05/22/2018 @ 7:06am (UTC)
+        genesis.nTime = 1527136450; //05/24/2018 @ 3:43am (UTC)
         genesis.nBits = 0x1e0fffff;
-        genesis.nNonce = 1495954;
+        genesis.nNonce = 1726211;
 
 //        while (!CheckProof(genesis.GetHash(), genesis.nBits)) {
 //            genesis.nNonce ++;
@@ -328,8 +328,8 @@ public:
 
         consensus.hashGenesisBlock = genesis.GetHash();
 
-        assert(consensus.hashGenesisBlock == uint256("0x000003d08448849b1427c274769656c6f752cd7d844219a837ee1160a499dfd7"));
-        assert(genesis.hashMerkleRoot == uint256("0xea749497d038c5ab4ab99e49727f43647a24860aba6f4e3a77d5c9e53a6b3b69"));
+        assert(consensus.hashGenesisBlock == uint256("0x000007ca66b6b483b04d9db084c156454641671a8e3f675acfad84dce62155a3"));
+        assert(genesis.hashMerkleRoot == uint256("0xd05b292ba9057b90cb08ffac4595a87654592d63ea0ab7a382247b2f0de4e842"));
 
         vFixedSeeds.clear();
         vSeeds.clear();

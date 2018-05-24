@@ -834,7 +834,6 @@ UniValue getwork(const UniValue& params, bool fHelp) {
 
             pblocktemplate = BlockAssembler(Params()).CreateNewBlockWithKey(reservekey, false);
 
-//            pblocktemplate = CreateNewBlockWithKey(reservekey, pwalletMain, false);
             if (!pblocktemplate)
                 throw JSONRPCError(RPC_OUT_OF_MEMORY, "Out of memory");
 
