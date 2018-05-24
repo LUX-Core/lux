@@ -1011,7 +1011,7 @@ bool AppInit2(boost::thread_group& threadGroup)
     //ignore masternodes below protocol version
     CMasterNode::minProtoVersion = GetArg("-masternodeminprotocol", MIN_MN_PROTO_VERSION);
 
-    int64_t nStart;
+    int64_t nStart = 0;
 
 // ********************************************************* Step 5: Backup wallet and verify wallet database integrity
 #ifdef ENABLE_WALLET

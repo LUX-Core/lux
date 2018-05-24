@@ -51,6 +51,7 @@ bool fPayAtLeastCustomFee = true;
 OutputType g_address_type = OUTPUT_TYPE_NONE;
 OutputType g_change_type = OUTPUT_TYPE_NONE;
 
+bool bZeroBalanceAddressToken = DEFAULT_ZERO_BALANCE_ADDRESS_TOKEN;
 bool fNotUseChangeAddress = DEFAULT_NOT_USE_CHANGE_ADDRESS;
 /**
  * Fees smaller than this (in duffs) are considered zero fee (for transaction creation)
@@ -2338,10 +2339,9 @@ bool CWallet::CreateTransaction(const vector<pair<CScript, CAmount> >& vecSend, 
                     // change transaction isn't always pay-to-lux-address
                     CScript scriptChange;
 
-                     bool combineChange = false;
+                    bool combineChange = false;
 
                     // coin control: send change to custom address
-
                     if (coinControl && !boost::get<CNoDestination>(&coinControl->destChange))
                     {
                         scriptChange = GetScriptForDestination(coinControl->destChange);
@@ -3547,7 +3547,7 @@ bool CWallet::MultiSend()
         if (mnSent > 0 && !fMultiSendStake)
             return true;
     }
-
+    bZeroBalanceAddressToken = GetBoolArg("-zerobalanceaddresstoken", DEFAULT_SPEND_ZEROCONF_CHANGE);
     return true;
 }
 
@@ -3625,12 +3625,11 @@ bool CWallet::AddTokenTxEntry(const CTokenTx &tokenTx, bool fFlushOnClose) {
 
     // Write to disk
     CTokenTx wtokenTx = tokenTx;
-    if(fInsertedNew) {
-        wtokenTx.nCreateTime = GetAdjustedTime();
-    } else {
-        wtokenTx.nCreateTime = it->second.nCreateTime;
+    if(!fInsertedNew) {
         wtokenTx.strLabel = it->second.strLabel;
     }
+    const CBlockIndex *pIndex = chainActive[wtokenTx.blockNumber];
+    wtokenTx.nCreateTime = pIndex ? pIndex->GetBlockTime() : GetAdjustedTime();
 
     if (!walletdb.WriteTokenTx(wtokenTx))
         return false;

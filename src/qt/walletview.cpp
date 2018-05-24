@@ -24,9 +24,7 @@
 #include "transactionview.h"
 #include "walletmodel.h"
 #include "tradingdialog.h"
-#include "createcontract.h"
-#include "callcontract.h"
-#include "sendtocontract.h"
+#include "smartcontract.h"
 #include "lsrtoken.h"
 #include "restoredialog.h"
 
@@ -51,9 +49,7 @@ WalletView::WalletView(QWidget* parent) : QStackedWidget(parent),
     overviewPage = new OverviewPage(this);
     explorerWindow = new BlockExplorer(this);
     transactionsPage = new QWidget(this);
-    createContractPage = new CreateContract(this);
-    sendToContractPage = new SendToContract(this);
-    callContractPage = new CallContractPage(this);
+    smartContractPage = new SmartContract(this);
     LSRTokenPage = new LSRToken(this);
     tradingPage = new tradingDialog(this);
     QVBoxLayout* vbox = new QVBoxLayout();
@@ -94,9 +90,7 @@ WalletView::WalletView(QWidget* parent) : QStackedWidget(parent),
     addWidget(receiveCoinsPage);
     addWidget(sendCoinsPage);
     addWidget(explorerWindow);
-    addWidget(createContractPage);   // Testing
-    addWidget(sendToContractPage);   // Testing
-    addWidget(callContractPage);   // Testing
+    addWidget(smartContractPage);   // Testing
     addWidget(LSRTokenPage); 
 
     QSettings settings;
@@ -158,9 +152,7 @@ void WalletView::setClientModel(ClientModel* clientModel)
 
     overviewPage->setClientModel(clientModel);
     sendCoinsPage->setClientModel(clientModel);
-    createContractPage->setClientModel(clientModel);
-    sendToContractPage->setClientModel(clientModel);
-    callContractPage->setClientModel(clientModel);
+    smartContractPage->setClientModel(clientModel);
     LSRTokenPage->setClientModel(clientModel);
     QSettings settings;
     if (settings.value("fShowMasternodesTab").toBool()) {
@@ -175,9 +167,7 @@ void WalletView::setWalletModel(WalletModel* walletModel)
     // Put transaction list in tabs
     transactionView->setModel(walletModel);
     overviewPage->setWalletModel(walletModel);
-    createContractPage->setModel(walletModel);
-    sendToContractPage->setModel(walletModel);
-    callContractPage->setModel(walletModel);
+    smartContractPage->setModel(walletModel);
     LSRTokenPage->setModel(walletModel);
     QSettings settings;
     if (settings.value("fShowMasternodesTab").toBool()) {
@@ -278,19 +268,9 @@ void WalletView::gotoMasternodePage()
         setCurrentWidget(masternodeManagerPage);
     }
 }
-void WalletView::gotoCreateContractPage()
+void WalletView::gotoSmartContractPage()
 {
-    setCurrentWidget(createContractPage);       //Testing
-}
-
-void WalletView::gotoSendToContractPage()
-{
-    setCurrentWidget(sendToContractPage);
-}
-
-void WalletView::gotoCallContractPage()
-{
-    setCurrentWidget(callContractPage);
+    setCurrentWidget(smartContractPage);       //Testing
 }
 
 void WalletView::gotoLSRTokenPage(bool toAddTokenPage)

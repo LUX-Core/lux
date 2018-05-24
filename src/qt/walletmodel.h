@@ -18,6 +18,8 @@
 
 #include <QObject>
 
+enum OutputType : int;
+
 class AddressTableModel;
 class OptionsModel;
 class RecentRequestsTableModel;
@@ -220,6 +222,7 @@ public:
     bool isSpent(const COutPoint& outpoint) const;
     bool isUnspentAddress(const std::string& address) const;
     void listCoins(std::map<QString, std::vector<COutput> >& mapCoins) const;
+    bool IsSpendable(const CTxDestination& dest) const;
 
     bool isLockedCoin(uint256 hash, unsigned int n) const;
     void lockCoin(COutPoint& output);
@@ -231,6 +234,8 @@ public:
 
     QString getRestorePath();
     QString getRestoreParam();
+
+    OutputType getDefaultAddressType() const;
 
 private:
     CWallet* wallet;

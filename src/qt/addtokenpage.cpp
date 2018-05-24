@@ -9,6 +9,8 @@
 #include "qvalidatedlineedit.h"
 #include "contractabi.h"
 #include "main.h"
+#include "addresstablemodel.h"
+#include "optionsmodel.h"
 
 #include <QRegularExpressionValidator>
 #include <QMessageBox>
@@ -31,6 +33,7 @@ AddTokenPage::AddTokenPage(QWidget *parent) :
     connect(ui->lineEditTokenName, SIGNAL(textChanged(const QString &)), SLOT(on_updateConfirmButton()));
     connect(ui->lineEditTokenSymbol, SIGNAL(textChanged(const QString &)), SLOT(on_updateConfirmButton()));
 
+    ui->lineEditSenderAddress->setAddressColumn(AddressTableModel::Address);
     if(ui->lineEditSenderAddress->isEditable())
         ((QValidatedLineEdit*)ui->lineEditSenderAddress->lineEdit())->setEmptyIsValid(false);
     m_validTokenAddress = false;
@@ -67,6 +70,8 @@ void AddTokenPage::clearAll()
 void AddTokenPage::setModel(WalletModel *_model)
 {
     m_model = _model;
+    on_zeroBalanceAddressToken(bZeroBalanceAddressToken);
+    connect(m_model->getOptionsModel(), SIGNAL(zeroBalanceAddressTokenChanged(bool)), this, SLOT(on_zeroBalanceAddressToken(bool)));
 }
 
 void AddTokenPage::on_clearButton_clicked()
@@ -142,4 +147,14 @@ void AddTokenPage::on_updateConfirmButton()
     }
     enabled &= m_validTokenAddress;
     ui->confirmButton->setEnabled(enabled);
+}
+
+void AddTokenPage::on_zeroBalanceAddressToken(bool enable)
+{
+    QAbstractItemModel *addressTableModel = 0;
+    if(enable && m_model)
+    {
+        addressTableModel = m_model->getAddressTableModel();
+    }
+    ui->lineEditSenderAddress->setAddressTableModel(addressTableModel);
 }

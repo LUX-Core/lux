@@ -115,5 +115,5 @@ bool TokenTransactionRecord::statusUpdateNeeded()
 
 QString TokenTransactionRecord::getTxID() const
 {
-    return QString::fromStdString(hash.ToString());
+    return QString::fromStdString(txid.ToString());
 }

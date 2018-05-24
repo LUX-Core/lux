@@ -142,7 +142,6 @@ BITCOIN_CORE_H = \
   rpcprotocol.h \
   rpcserver.h \
   rpcutil.h \
-  rpcwallet.h \
   script/interpreter.h \
   script/script.h \
   script/sigcache.h \

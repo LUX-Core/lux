@@ -55,6 +55,7 @@ QT_FORMS_UI = \
   qt/forms/sendcoinsentry.ui \
   qt/forms/sendtocontract.ui \
   qt/forms/signverifymessagedialog.ui \
+  qt/forms/smartcontract.ui \
   qt/forms/tokendescdialog.ui \
   qt/forms/transactiondescdialog.ui
 
@@ -123,6 +124,7 @@ QT_MOC_CPP = \
   qt/moc_sendtocontract.cpp \
   qt/moc_sendtokenpage.cpp \
   qt/moc_signverifymessagedialog.cpp \
+  qt/moc_smartcontract.cpp \
   qt/moc_splashscreen.cpp \
   qt/moc_tabbarinfo.cpp \
   qt/moc_tokenamountfield.cpp \
@@ -195,6 +197,7 @@ BITCOIN_QT_H = \
   qt/contracttablemodel.h \
   qt/createcontract.h \
   qt/csvmodelwriter.h \
+  qt/customlist.h \
   qt/darksendconfig.h \
   qt/editaddressdialog.h \
   qt/editcontractinfodialog.h \
@@ -234,6 +237,7 @@ BITCOIN_QT_H = \
   qt/sendcoinsentry.h \
   qt/sendtocontract.h \
   qt/signverifymessagedialog.h \
+  qt/smartcontract.h \
   qt/splashscreen.h \
   qt/tabbarinfo.h \
   qt/token.h \
@@ -344,6 +348,7 @@ BITCOIN_QT_CPP = \
   qt/optionsdialog.cpp \
   qt/optionsmodel.cpp \
   qt/peertablemodel.cpp \
+  qt/platformstyle.cpp \
   qt/qvalidatedlineedit.cpp \
   qt/qvalidatedtextedit.cpp \
   qt/qvaluecombobox.cpp \
@@ -406,6 +411,7 @@ BITCOIN_QT_CPP += \
   qt/sendtocontract.cpp \
   qt/sendtokenpage.cpp \
   qt/signverifymessagedialog.cpp \
+  qt/smartcontract.cpp \
   qt/tokendescdialog.cpp \
   qt/tokenfilterproxy.cpp \
   qt/tokentransactionview.cpp \
