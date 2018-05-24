@@ -1,10 +1,10 @@
 ![LUX Logo](https://github.com/216k155/lux/blob/master/src/qt/res/images/lux_logo_horizontal.png)
 
-"Empowered By Intelligence"
+"FIRST OF ITS KIND"
 
 Luxcore is GNU AGPLv3 licensed.
 
-[![Build Status](https://travis-ci.org/216k155/lux.svg?branch=master)](https://travis-ci.org/216k155/lux)
+[![Build Status](https://travis-ci.org/216k155/lux.svg?branch=master)](https://travis-ci.org/216k155/lux) [![GitHub version](https://badge.fury.io/gh/216k155%2Flux.svg)](https://badge.fury.io/gh/216k155%2Flux.svg)
 <a href="https://discord.gg/27xFP5Y"><img src="https://discordapp.com/api/guilds/364500397999652866/embed.png" alt="Discord server" /></a>
 
 [![Build history](https://buildstats.info/travisci/chart/216k155/lux?branch=master)](https://travis-ci.org/216k155/lux?branch=master)
