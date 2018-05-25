@@ -275,6 +275,8 @@ crypto_libbitcoin_crypto_a_SOURCES = \
   crypto/skein.c \
   crypto/gost.c \
   crypto/fugue.c \
+  crypto/lyra2/Lyra2.c \
+  crypto/lyra2/Sponge.c  \
   crypto/common.h \
   crypto/sha256.h \
   crypto/sha512.h \
@@ -291,6 +293,8 @@ crypto_libbitcoin_crypto_a_SOURCES = \
   crypto/sph_gost.h \
   crypto/sph_cubehash.h \
   crypto/sph_echo.h \
+  crypto/lyra2/Lyra2.h \
+    crypto/lyra2/Sponge.h \
   cpp-ethereum/utils/libscrypt/b64.c \
   cpp-ethereum/utils/libscrypt/b64.h \
   cpp-ethereum/utils/libscrypt/crypto-mcf.c \
