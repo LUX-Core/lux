@@ -819,12 +819,7 @@ fi
 fi
 
 if test x$use_pkgconfig = xyes; then
-
-  if test x"$PKG_CONFIG" = "x"; then
-    AC_MSG_ERROR(pkg-config not found.)
-  fi
-
-  : #NOP
+  : dnl
   m4_ifdef(
     [PKG_CHECK_MODULES],
     [

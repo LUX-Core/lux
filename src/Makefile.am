@@ -28,7 +28,6 @@ BITCOIN_INCLUDES += -I$(srcdir)/secp256k1/include
 BITCOIN_INCLUDES += -I$(srcdir)/cpp-ethereum
 
 LIBBITCOIN_SERVER=libbitcoin_server.a
-LIBBITCOIN_WALLET=libbitcoin_wallet.a
 LIBBITCOIN_COMMON=libbitcoin_common.a
 LIBBITCOIN_CONSENSUS=libbitcoin_consensus.a
 LIBBITCOIN_CLI=libbitcoin_cli.a
@@ -629,12 +628,12 @@ luxd_LDADD = \
   $(LIBCRYPTOPP) \
   $(LIBSECP256K1)
 
-luxd_LDADD += $(BOOST_LIBS) $(BDB_LIBS) $(SSL_LIBS) $(CRYPTO_LIBS) $(MINIUPNPC_LIBS) $(ZMQ_LIBS) libevent
+luxd_LDADD += $(BOOST_LIBS) $(BDB_LIBS) $(SSL_LIBS) $(CRYPTO_LIBS) $(MINIUPNPC_LIBS) $(ZMQ_LIBS) $(EVENT_PTHREADS_LIBS) $(EVENT_LIBS)
 
 
 # lux-cli binary #
 lux_cli_SOURCES = lux-cli.cpp
-lux_cli_CPPFLAGS = $(BITCOIN_INCLUDES)
+lux_cli_CPPFLAGS = $(BITCOIN_INCLUDES) $(EVENT_CFLAGS)
 
 if TARGET_WINDOWS
 lux_cli_SOURCES += lux-cli-res.rc
@@ -647,12 +646,12 @@ lux_cli_LDADD = \
   $(LIBBITCOIN_CRYPTO) \
   $(LIBSECP256K1)
 
-lux_cli_LDADD += $(BOOST_LIBS) $(SSL_LIBS) $(CRYPTO_LIBS)
+lux_cli_LDADD += $(BOOST_LIBS) $(SSL_LIBS) $(CRYPTO_LIBS) $(EVENT_LIBS)
 #
 
 # lux-tx binary #
 lux_tx_CPPFLAGS = $(BITCOIN_INCLUDES)
-lux_tx_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
+lux_tx_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS) 
 lux_tx_SOURCES =  \
   lux-tx.cpp \
   $(libbitcoin_common_a_SOURCES) \
@@ -672,7 +671,7 @@ lux_tx_LDADD = \
   $(LIBSECP256K1) \
   $(LIBCRYPTOPP)
 
-lux_tx_LDADD += $(BOOST_LIBS) $(BDB_LIBS) $(SSL_LIBS) $(CRYPTO_LIBS) $(MINIUPNPC_LIBS) $(ZMQ_LIBS)
+lux_tx_LDADD += $(BOOST_LIBS) $(BDB_LIBS) $(SSL_LIBS) $(CRYPTO_LIBS) $(EVENT_PTHREADS_LIBS) $(EVENT_LIBS) $(MINIUPNPC_LIBS) $(ZMQ_LIBS)
 #
 
 # bitcoinconsensus library #
