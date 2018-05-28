@@ -50,6 +50,8 @@
 #include <boost/filesystem/fstream.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/thread.hpp>
+#include <boost/unordered_map.hpp>
+
 #if defined(DEBUG_DUMP_STAKING_INFO)
 #  include "DEBUG_DUMP_STAKING_INFO.hpp"
 #endif
@@ -113,7 +115,6 @@ void updateBlockSizeParams(unsigned int newBlockSize){
 
 
 //////////////////////////////
-
 
 CCriticalSection cs_main;
 

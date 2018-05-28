@@ -348,6 +348,17 @@ UniValue getnettotals(const UniValue& params, bool fHelp)
     return obj;
 }
 
+UniValue switchnetwork(const UniValue& params, bool fHelp) {
+    if (fHelp || params.size() != 0)
+        throw runtime_error(
+            "switchnetwork\n"
+            "Toggle all network activity temporarily.");
+
+    SetNetworkActive(!fNetworkActive);
+
+    return fNetworkActive;
+}
+
 static UniValue GetNetworksInfo()
 {
     UniValue networks;
