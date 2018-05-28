@@ -1329,8 +1329,7 @@ bool AppInit2(boost::thread_group& threadGroup, CScheme& scheme)
                     pblocktree->WriteReindexing(true);
                 }
 
-                if (fRequestShutdown)
-                {
+                if (fRequestShutdown) {
                     LogPrintf("Shutdown requested. Exiting.\n");
                     return false;
                 }
@@ -1352,7 +1351,7 @@ bool AppInit2(boost::thread_group& threadGroup, CScheme& scheme)
 
                 /////////////////////////////////////////////////////////// lux
                 if((IsArgSet("-dgpstorage") && IsArgSet("-dgpevm")) || (!IsArgSet("-dgpstorage") && IsArgSet("-dgpevm")) ||
-                   (!IsArgSet("-dgpstorage") && !IsArgSet("-dgpevm"))){
+                   (!IsArgSet("-dgpstorage") && !IsArgSet("-dgpevm"))) {
                     fGettingValuesDGP = true;
                 } else {
                     fGettingValuesDGP = false;
@@ -1373,26 +1372,19 @@ bool AppInit2(boost::thread_group& threadGroup, CScheme& scheme)
                 pstorageresult = new StorageResults(luxStateDir.string());
 
                 if(chainActive.Tip() != NULL && chainActive.Tip()->nHeight >= Params().FirstSCBlock()){
-//#if 0
                     globalState->setRoot(uintToh256(chainActive.Tip()->hashStateRoot));
                     globalState->setRootUTXO(uintToh256(chainActive.Tip()->hashUTXORoot));
-                    globalState->db().commit();
-                    globalState->dbUtxo().commit();
-//#endif
-                }/* else {
-#if 0
+                } else {
                     globalState->setRoot(dev::sha3(dev::rlp("")));
-                    globalState->setRootUTXO(uintToh256(uint256())*//*uintToh256(chainparams.GenesisBlock().hashUTXORoot)*//*);
+                    globalState->setRootUTXO(uintToh256(chainparams.GenesisBlock().hashUTXORoot));
                     globalState->populateFrom(cp.genesisState);
-#endif
-                }*/
-//                globalState->db().commit();
-//                globalState->dbUtxo().commit();
+                }
+                globalState->db().commit();
+                globalState->dbUtxo().commit();
 
                 fRecordLogOpcodes = IsArgSet("-record-log-opcodes");
                 fIsVMlogFile = boost::filesystem::exists(GetDataDir() / "vmExecLogs.json");
                 ///////////////////////////////////////////////////////////
-
 
                 // Initialize the block index (no-op if non-empty database was already loaded)
                 if (!InitBlockIndex(chainparams)) {
