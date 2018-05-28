@@ -152,6 +152,9 @@ private:
     /** Create system tray menu (or setup the dock menu) */
     void createTrayIconMenu();
 
+    /** Update UI with latest network info from model. */
+    void updateNetworkState();
+
     /** Enable or disable all wallet-related actions */
     void setWalletActionsEnabled(bool enabled);
 
@@ -169,6 +172,8 @@ signals:
 public slots:
     /** Set number of connections shown in the UI */
     void setNumConnections(int count);
+    /** Set network state shown in the UI */
+    void setNetworkActive(bool networkActive);
     /** Set number of blocks shown in the UI */
     void setNumBlocks(int count);
     /** Get restart command-line parameters and request restart */

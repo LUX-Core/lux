@@ -488,6 +488,8 @@ void RPCConsole::setClientModel(ClientModel* model)
         setNumBlocks(model->getNumBlocks());
         connect(model, SIGNAL(numBlocksChanged(int)), this, SLOT(setNumBlocks(int)));
 
+        updateNetworkState();
+        connect(model, SIGNAL(networkActiveChanged(bool)), this, SLOT(setNetworkActive(bool)));
 #if 0
         setMasternodeCount(model->getMasternodeCountString());
         connect(model, SIGNAL(strMasternodesChanged(QString)), this, SLOT(setMasternodeCount(QString)));
@@ -701,6 +703,15 @@ void RPCConsole::message(int category, const QString& message, bool html)
     ui->messagesWidget->append(out);
 }
 
+void RPCConsole::updateNetworkState()
+{
+    QString text = QString::number(clientModel->getNumConnections());
+    if(!clientModel->getNetworkActive())
+        text += " (" + tr("Network activity disabled") + ")";
+
+    ui->numberOfConnections->setText(text);
+}
+
 void RPCConsole::setNumConnections(int count)
 {
     if (!clientModel)
@@ -710,7 +721,12 @@ void RPCConsole::setNumConnections(int count)
     connections += tr("In:") + " " + QString::number(clientModel->getNumConnections(CONNECTIONS_IN)) + " / ";
     connections += tr("Out:") + " " + QString::number(clientModel->getNumConnections(CONNECTIONS_OUT)) + ")";
 
-    ui->numberOfConnections->setText(connections);
+    updateNetworkState();
+}
+
+void RPCConsole::setNetworkActive(bool networkActive)
+{
+    updateNetworkState();
 }
 
 void RPCConsole::setNumBlocks(int count)
@@ -1055,4 +1071,9 @@ void RPCConsole::disconnectSelectedNode()
 void RPCConsole::showBackups()
 {
     GUIUtil::showBackups();
+}
+
+void RPCConsole::on_switchNetworkActiveButton_clicked()
+{
+    clientModel->setNetworkActive(!clientModel->getNetworkActive());
 }

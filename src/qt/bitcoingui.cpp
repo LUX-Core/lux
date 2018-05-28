@@ -607,8 +607,9 @@ void BitcoinGUI::setClientModel(ClientModel* clientModel)
         createTrayIconMenu();
 
         // Keep up to date with client
-        setNumConnections(clientModel->getNumConnections());
+        updateNetworkState();
         connect(clientModel, SIGNAL(numConnectionsChanged(int)), this, SLOT(setNumConnections(int)));
+        connect(clientModel, SIGNAL(networkActiveChanged(bool)), this, SLOT(setNetworkActive(bool)));
 
         setNumBlocks(clientModel->getNumBlocks());
         connect(clientModel, SIGNAL(numBlocksChanged(int)), this, SLOT(setNumBlocks(int)));
@@ -874,8 +875,9 @@ void BitcoinGUI::gotoBlockExplorerPage()
 
 #endif // ENABLE_WALLET
 
-void BitcoinGUI::setNumConnections(int count)
+void BitcoinGUI::updateNetworkState()
 {
+    int count = clientModel->getNumConnections();
     QString icon;
     switch (count) {
     case 0:
@@ -901,12 +903,22 @@ void BitcoinGUI::setNumConnections(int count)
         break;
     }
     QIcon connectionItem = QIcon(icon).pixmap(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE);
-    labelConnectionsIcon->setIcon(connectionItem);
-    labelConnectionsIcon->setToolTip(tr("%n active connection(s) to LUX network", "", count));
+    //labelConnectionsIcon->setIcon(connectionItem);
+    if (clientModel->getNetworkActive())
+        labelConnectionsIcon->setToolTip(tr("%n active connection(s) to Bitcoin network", "", count));
+    else
+        labelConnectionsIcon->setToolTip(tr("Network activity disabled"));
 }
 
-void BitcoinGUI::setNumBlocks(int count)
-{
+void BitcoinGUI::setNetworkActive(bool networkActive) {
+    updateNetworkState();
+}
+
+void BitcoinGUI::setNumConnections(int count) {
+    updateNetworkState();
+}
+
+void BitcoinGUI::setNumBlocks(int count) {
     if (!clientModel)
         return;
 

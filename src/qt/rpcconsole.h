@@ -53,6 +53,8 @@ protected:
 private slots:
     void on_lineEdit_returnPressed();
     void on_tabWidget_currentChanged(int index);
+    /** Switch network activity */
+    void on_switchNetworkActiveButton_clicked();
     /** open the debug.log from the current datadir */
     void on_openDebugLogfileButton_clicked();
     /** change the time range of the network traffic graph */
@@ -83,6 +85,8 @@ public slots:
     void message(int category, const QString& message, bool html = false);
     /** Set number of connections shown in the UI */
     void setNumConnections(int count);
+    /** Set network state shown in the UI */
+    void setNetworkActive(bool networkActive);
     /** Set number of blocks shown in the UI */
     void setNumBlocks(int count);
     /** Set number of masternodes shown in the UI */
@@ -125,6 +129,8 @@ private:
     static QString FormatBytes(quint64 bytes);
     void startExecutor();
     void setTrafficGraphRange(int mins);
+    /** Update UI with latest network info from model. */
+    void updateNetworkState();
     /** Build parameter list for restart */
     void buildParameterlist(QString arg);
     /** show detailed information on ui about selected node */
