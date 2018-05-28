@@ -2152,15 +2152,15 @@ bool DisconnectBlock(CBlock& block, CValidationState& state, CBlockIndex* pindex
     // move best block pointer to prevout block
     view.SetBestBlock(pindex->pprev->GetBlockHash());
 //#if 0
-//    if (pindex->nHeight >= Params().FirstSCBlock()) {
+    if (pindex->nHeight >= Params().FirstSCBlock()) {
         globalState->setRoot(uintToh256(pindex->pprev->hashStateRoot)); // lux
         globalState->setRootUTXO(uintToh256(pindex->pprev->hashUTXORoot)); // lux
 
         if (pfClean == NULL && fLogEvents) {
             pstorageresult->deleteResults(block.vtx);
-//        pblocktree->EraseHeightIndex(pindex->nHeight);
+            //pblocktree->EraseHeightIndex(pindex->nHeight);
         }
-//    }
+   }
 //#endif
     if (pfClean) {
         *pfClean = fClean;
@@ -2454,7 +2454,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
         }
 
 ///////////////////////////////////////////////////////////////////////////////////////// lux
-//        if (pindex->nHeight >= Params().FirstSCBlock()) {
+        if (pindex->nHeight >= Params().FirstSCBlock()) {
             bool hasOpSpend = tx.HasOpSpend();
 
             if(!hasOpSpend) {
@@ -2581,7 +2581,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
                         dev::g_logPost(std::string("Address : " + re.execRes.newAddress.hex()), NULL);
                 }
             }
-//        }
+        }
 /////////////////////////////////////////////////////////////////////////////////////////
 
         CTxUndo undoDummy;
@@ -2633,7 +2633,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
     LogPrint("bench", "    - Verify %u txins: %.2fms (%.3fms/txin) [%.2fs]\n", nInputs - 1, 0.001 * (nTime2 - nTimeStart), nInputs <= 1 ? 0 : 0.001 * (nTime2 - nTimeStart) / (nInputs - 1), nTimeVerify * 0.000001);
 
     ////////////////////////////////////////////////////////////////// // lux
-//    if (pindex->nHeight >= Params().FirstSCBlock()) {
+    if (pindex->nHeight >= Params().FirstSCBlock()) {
         checkBlock.hashMerkleRoot = checkBlock.BuildMerkleTree();
         checkBlock.hashStateRoot = /*uint256(0);*/h256Touint(globalState->rootHash());
         checkBlock.hashUTXORoot = /*uint256(0);*/h256Touint(globalState->rootHashUTXO());
@@ -2695,10 +2695,10 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
                              error("ConnectBlock(): Incorrect AAL transactions or hashes (hashStateRoot, hashUTXORoot)"),
                              REJECT_INVALID, "incorrect-transactions-or-hashes-block");
         }
-//    }
+    }
 
     if (fJustCheck) {
-//        if (pindex->nHeight >= Params().FirstSCBlock()) {
+        if (pindex->nHeight >= Params().FirstSCBlock()) {
             dev::h256 prevHashStateRoot(dev::sha3(dev::rlp("")));
             dev::h256 prevHashUTXORoot(dev::sha3(dev::rlp("")));
             if (pindex->pprev->hashStateRoot != uint256() && pindex->pprev->hashUTXORoot != uint256()) {
@@ -2707,7 +2707,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
             }
             globalState->setRoot(prevHashStateRoot);
             globalState->setRootUTXO(prevHashUTXORoot);
-//        }
+        }
         return true;
     }
 //////////////////////////////////////////////////////////////////

@@ -144,12 +144,15 @@ public:
         consensus.fPowNoRetargeting = false;
         consensus.nRuleChangeActivationThreshold = 1026; // 95% of 1080 is 1026
         consensus.nMinerConfirmationWindow = 1080; // nPowTargetTimespan / nPowTargetSpacing
+        consensus.nLastPOWBlock = 6000000;
         // Deployment of SegWit (BIP141 and BIP143)
         consensus.vDeployments[Consensus::DEPLOYMENT_SEGWIT].bit = 1;
         consensus.vDeployments[Consensus::DEPLOYMENT_SEGWIT].nStartTime = 0; //TODO: ?
         consensus.vDeployments[Consensus::DEPLOYMENT_SEGWIT].nTimeout = 1557187200; // TODO: ?? - just some random date - 05.07.2019
-        consensus.nLastPOWBlock = 6000000;
         //TODO: set CSV parameters for mainnet
+        consensus.vDeployments[Consensus::DEPLOYMENT_CSV].bit = 0;
+        consensus.vDeployments[Consensus::DEPLOYMENT_CSV].nStartTime = 0; //TODO: ?
+        consensus.vDeployments[Consensus::DEPLOYMENT_CSV].nTimeout = 1557187200; // TODO: ?? - just some random date - 05.07.2019
 
         nSwitchPhi2Block = 300000;
         nFirstSCBlock = 300000;
@@ -188,6 +191,8 @@ public:
         genesis.nTime = 1507656633; //10/10/2017
         genesis.nBits = 0x1e0fffff;
         genesis.nNonce = 986946;
+        genesis.hashStateRoot = uint256(h256Touint(dev::h256("e965ffd002cd6ad0e2dc402b8044de833e06b23127ea8c3d80aec91410771495"))); // lux
+        genesis.hashUTXORoot = uint256(h256Touint(dev::sha3(dev::rlp("")))); // lux
 
         consensus.hashGenesisBlock = genesis.GetHash();
 

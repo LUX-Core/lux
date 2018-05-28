@@ -1371,7 +1371,7 @@ bool AppInit2(boost::thread_group& threadGroup, CScheme& scheme)
 
                 pstorageresult = new StorageResults(luxStateDir.string());
 
-                if(chainActive.Tip() != NULL /*&& chainActive.Tip()->nHeight >= Params().FirstSCBlock()*/){
+                if(chainActive.Tip() != NULL && chainActive.Tip()->nHeight >= Params().FirstSCBlock()){
                     globalState->setRoot(uintToh256(chainActive.Tip()->hashStateRoot));
                     globalState->setRootUTXO(uintToh256(chainActive.Tip()->hashUTXORoot));
                 } else {
