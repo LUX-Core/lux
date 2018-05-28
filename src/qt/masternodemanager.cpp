@@ -45,7 +45,7 @@ MasternodeManager::MasternodeManager(QWidget *parent) :
     ui->getConfigButton->setEnabled(false);
     ui->startButton->setEnabled(false);
     ui->stopButton->setEnabled(false);
-    ui->copyAddressButton->setEnabled(false);
+    //ui->copyAddressButton->setEnabled(false);
 
     subscribeToCoreSignals();
 
@@ -100,7 +100,7 @@ void MasternodeManager::on_tableWidget_2_itemSelectionChanged()
         ui->getConfigButton->setEnabled(true);
         ui->startButton->setEnabled(true);
         ui->stopButton->setEnabled(true);
-	ui->copyAddressButton->setEnabled(true);
+	   //ui->copyAddressButton->setEnabled(true);
     }
 }
 

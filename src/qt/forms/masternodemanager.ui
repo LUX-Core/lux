@@ -14,16 +14,7 @@
    <string>Form</string>
   </property>
   <layout class="QVBoxLayout" name="topLayout">
-   <property name="leftMargin">
-    <number>0</number>
-   </property>
-   <property name="topMargin">
-    <number>0</number>
-   </property>
-   <property name="rightMargin">
-    <number>0</number>
-   </property>
-   <property name="bottomMargin">
+   <property name="margin">
     <number>0</number>
    </property>
    <item>
@@ -38,7 +29,7 @@
        </property>
        <widget class="QWidget" name="tab">
         <attribute name="title">
-         <string>Lux Masternodes Network</string>
+         <string>Masternodes Network</string>
         </attribute>
         <layout class="QGridLayout" name="gridLayout">
          <item row="1" column="0">
@@ -87,7 +78,7 @@
            </column>
           </widget>
          </item>
-          <item row="2" column="0">
+         <item row="5" column="0">
           <widget class="QTableWidget" name="tableWidget_3">
            <property name="editTriggers">
             <set>QAbstractItemView::NoEditTriggers</set>
@@ -144,7 +135,7 @@
            <item>
             <widget class="QLabel" name="label_2">
              <property name="text">
-              <string>Lux Masternodes Activated:</string>
+              <string>Masternodes Activated:</string>
              </property>
             </widget>
            </item>
@@ -170,48 +161,27 @@
            </item>
           </layout>
          </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="label">
+           <property name="text">
+            <string>Parallel Masternodes</string>
+           </property>
+          </widget>
+         </item>
         </layout>
        </widget>
        <widget class="QWidget" name="tab_2">
         <attribute name="title">
-         <string>My Lux Masternode</string>
+         <string>Masternode Configuration</string>
         </attribute>
         <layout class="QGridLayout" name="gridLayout_2">
-         <item row="0" column="0">
+         <item row="1" column="0">
           <layout class="QVBoxLayout" name="verticalLayout_2">
            <property name="bottomMargin">
             <number>0</number>
            </property>
            <item>
-            <layout class="QHBoxLayout" name="horizontalLayout">
-             <item>
-              <widget class="QPushButton" name="createButton">
-               <property name="text">
-                <string>&amp;Create...</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPushButton" name="copyAddressButton">
-               <property name="text">
-                <string>Copy &amp;Address</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <spacer name="horizontalSpacer">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>40</width>
-                 <height>20</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-            </layout>
+            <layout class="QHBoxLayout" name="horizontalLayout"/>
            </item>
            <item>
             <widget class="QTableWidget" name="tableWidget_2">
@@ -257,6 +227,20 @@
              <property name="bottomMargin">
               <number>0</number>
              </property>
+            </layout>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_4">
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+             <item>
+              <widget class="QPushButton" name="createButton">
+               <property name="text">
+                <string>&amp;Create...</string>
+               </property>
+              </widget>
+             </item>
              <item>
               <widget class="QPushButton" name="editButton">
                <property name="text">
@@ -278,23 +262,10 @@
                </property>
               </widget>
              </item>
-             <item>
-              <spacer name="horizontalSpacer_2">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>40</width>
-                 <height>20</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
             </layout>
            </item>
            <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_4">
+            <layout class="QHBoxLayout" name="horizontalLayout_5">
              <property name="bottomMargin">
               <number>0</number>
              </property>
@@ -306,58 +277,25 @@
               </widget>
              </item>
              <item>
-              <widget class="QPushButton" name="stopButton">
+              <widget class="QPushButton" name="startAllButton">
                <property name="text">
-                <string>Sto&amp;p</string>
+                <string>&amp;Start All</string>
                </property>
               </widget>
              </item>
              <item>
-              <spacer name="horizontalSpacer_4">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>40</width>
-                 <height>20</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-            </layout>
-           </item>
-           <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_5">
-             <property name="bottomMargin">
-              <number>0</number>
-             </property>
-             <item>
-              <widget class="QPushButton" name="startAllButton">
+              <widget class="QPushButton" name="stopButton">
                <property name="text">
-                <string>S&amp;tart All</string>
+                <string>&amp;Stop</string>
                </property>
               </widget>
              </item>
              <item>
               <widget class="QPushButton" name="stopAllButton">
                <property name="text">
-                <string>St&amp;op All</string>
+                <string>&amp;Stop All</string>
                </property>
               </widget>
-             </item>
-             <item>
-              <spacer name="horizontalSpacer_5">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>40</width>
-                 <height>20</height>
-                </size>
-               </property>
-              </spacer>
              </item>
             </layout>
            </item>

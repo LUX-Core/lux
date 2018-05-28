@@ -211,12 +211,12 @@ void CreateContract::on_createContractClicked()
                 std::cout << resultJson.toUtf8().constData() << std::endl;
                 ContractResult *widgetResult = new ContractResult(ui->stackedWidget);
                 widgetResult->setResultData(result, FunctionABI(), QList<QStringList>(), ContractResult::CreateResult);
-//                ui->stackedWidget->addWidget(widgetResult);
-//                int position = ui->stackedWidget->count() - 1;
-//                m_results = position == 1 ? 1 : m_results + 1;
-//
-//                m_tabInfo->addTab(position, tr("Result %1").arg(m_results));
-//                m_tabInfo->setCurrent(position);
+                ui->stackedWidget->addWidget(widgetResult);
+                int position = ui->stackedWidget->count() - 1;
+                m_results = position == 1 ? 1 : m_results + 1;
+
+                m_tabInfo->addTab(position, tr("Result %1").arg(m_results));
+                m_tabInfo->setCurrent(position);
                 widgetResult->show();
             } else {
                 QMessageBox::warning(this, tr("Create contract"), errorMessage);
