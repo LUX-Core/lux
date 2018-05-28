@@ -199,6 +199,7 @@ libbitcoin_server_a_SOURCES = \
   bloom.cpp \
   chain.cpp \
   checkpoints.cpp \
+  consensus/validation.cpp \
   init.cpp \
   leveldbwrapper.cpp \
   main.cpp \
@@ -301,7 +302,7 @@ crypto_libbitcoin_crypto_a_SOURCES = \
   crypto/sph_cubehash.h \
   crypto/sph_echo.h \
   crypto/lyra2/Lyra2.h \
-    crypto/lyra2/Sponge.h \
+  crypto/lyra2/Sponge.h \
   cpp-ethereum/utils/libscrypt/b64.c \
   cpp-ethereum/utils/libscrypt/b64.h \
   cpp-ethereum/utils/libscrypt/crypto-mcf.c \
@@ -327,17 +328,23 @@ univalue_libbitcoin_univalue_a_SOURCES = \
   univalue/univalue.h
 
 # consensus: shared between all executables that validate any consensus rules.
-libbitcoin_consensus_a_CPPFLAGS = $(BITCOIN_INCLUDES)
+libbitcoin_consensus_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
 libbitcoin_consensus_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 libbitcoin_consensus_a_SOURCES = \
+  allocators.cpp \
   amount.h \
+  chainparamsbase.cpp \
+  coins.cpp \
   consensus/merkle.cpp \
   consensus/merkle.h \
   consensus/params.h \
-  consensus/validation.h \
-  consensus/validation.cpp \
+  cpp-ethereum/libdevcore/CommonData.cpp \
+  cpp-ethereum/libdevcore/CommonData.h \
+  eccryptoverify.cpp \
+  ecwrapper.cpp \
   hash.cpp \
   hash.h \
+  key.cpp \
   prevector.h \
   primitives/block.cpp \
   primitives/block.h \
@@ -345,6 +352,7 @@ libbitcoin_consensus_a_SOURCES = \
   primitives/transaction.h \
   pubkey.cpp \
   pubkey.h \
+  random.cpp \
   script/bitcoinconsensus.cpp \
   script/interpreter.cpp \
   script/interpreter.h \
@@ -352,12 +360,17 @@ libbitcoin_consensus_a_SOURCES = \
   script/script.h \
   script/script_error.cpp \
   script/script_error.h \
+  script/standard.cpp \
   serialize.h \
   tinyformat.h \
   uint256.cpp \
   uint256.h \
+  util.h \
+  util.cpp \
+  utilmoneystr.cpp \
   utilstrencodings.cpp \
   utilstrencodings.h \
+  utiltime.cpp \
   version.h
 
 # common: shared between luxd, and lux-qt and non-server tools
