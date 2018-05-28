@@ -72,6 +72,7 @@ static const ServiceFlags REQUIRED_SERVICES = NODE_NETWORK;
 unsigned int ReceiveFloodSize();
 unsigned int SendBufferSize();
 
+void SetNetworkActive(bool active);
 void AddOneShot(std::string strDest);
 bool RecvLine(SOCKET hSocket, std::string& strLine);
 void AddressCurrentlyConnected(const CService& addr);
@@ -132,6 +133,7 @@ CAddress GetLocalAddress(const CNetAddr* paddrPeer = NULL);
 
 extern bool fDiscover;
 extern bool fListen;
+extern bool fNetworkActive;
 extern ServiceFlags nLocalServices;
 extern ServiceFlags nRelevantServices;
 extern uint64_t nLocalHostNonce;

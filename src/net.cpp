@@ -80,6 +80,7 @@ ServiceFlags nRelevantServices = NODE_NETWORK;
 //
 bool fDiscover = true;
 bool fListen = true;
+bool fNetworkActive = true;
 ServiceFlags nLocalServices = NODE_NETWORK;
 CCriticalSection cs_mapLocalHost;
 map<CNetAddr, LocalServiceInfo> mapLocalHost;
@@ -984,7 +985,10 @@ void ThreadSocketHandler()
                 } else if (CNode::IsBanned(addr) && !whitelisted) {
                     LogPrintf("connection from %s dropped (banned)\n", addr.ToString());
                     CloseSocket(hSocket);
-                } else {
+                } else if (!fNetworkActive) {
+                    printf("connection from %s dropped (not accepting new connections)\n", addr.ToString().c_str());
+                    //closesocket(hSocket);
+                  } else {
                     CNode* pnode = new CNode(hSocket, addr, "", true);
                     pnode->AddRef();
                     pnode->fWhitelisted = whitelisted;
@@ -1463,6 +1467,8 @@ bool OpenNetworkConnection(const CAddress& addrConnect, CSemaphoreGrant* grantOu
     // Initiate outbound network connection
     //
     boost::this_thread::interruption_point();
+    if (!fNetworkActive)
+        return false;
     if (!pszDest) {
         if (IsLocal(addrConnect) ||
             FindNode((CNetAddr)addrConnect) || CNode::IsBanned(addrConnect) ||
@@ -1786,6 +1792,25 @@ bool StopNode()
     }
 
     return true;
+}
+
+void SetNetworkActive(bool active)
+{
+    if (fDebug)
+        printf("SetNetworkActive: %s\n", active ? "true" : "false");
+
+    if (!active) {
+        fNetworkActive = false;
+
+        LOCK(cs_vNodes);
+        // Close sockets to all nodes
+        BOOST_FOREACH(CNode* pnode, vNodes)
+        {
+            pnode->CloseSocketDisconnect();
+        }
+    } else {
+        fNetworkActive = true;
+    }
 }
 
 class CNetCleanup
