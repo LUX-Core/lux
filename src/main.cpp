@@ -2152,7 +2152,7 @@ bool DisconnectBlock(CBlock& block, CValidationState& state, CBlockIndex* pindex
     // move best block pointer to prevout block
     view.SetBestBlock(pindex->pprev->GetBlockHash());
 //#if 0
-    if (pindex->nHeight >= Params().FirstSCBlock()) {
+//    if (pindex->nHeight >= Params().FirstSCBlock()) {
         globalState->setRoot(uintToh256(pindex->pprev->hashStateRoot)); // lux
         globalState->setRootUTXO(uintToh256(pindex->pprev->hashUTXORoot)); // lux
 
@@ -2160,7 +2160,7 @@ bool DisconnectBlock(CBlock& block, CValidationState& state, CBlockIndex* pindex
             pstorageresult->deleteResults(block.vtx);
 //        pblocktree->EraseHeightIndex(pindex->nHeight);
         }
-    }
+//    }
 //#endif
     if (pfClean) {
         *pfClean = fClean;
@@ -2291,7 +2291,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
     globalSealEngine->setLuxSchedule(luxDGP.getGasSchedule(pindex->nHeight + 1));
 #endif
     uint64_t minGasPrice = 0;//luxDGP.getMinGasPrice(pindex->nHeight + 1);
-    uint64_t blockGasLimit = 0;//luxDGP.getBlockGasLimit(pindex->nHeight + 1);
+    uint64_t blockGasLimit = DEFAULT_BLOCK_GAS_LIMIT_DGP;//luxDGP.getBlockGasLimit(pindex->nHeight + 1);
 
 #if 0
     uint32_t sizeBlockDGP = 0;//luxDGP.getBlockSize(pindex->nHeight + 1);
@@ -2454,7 +2454,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
         }
 
 ///////////////////////////////////////////////////////////////////////////////////////// lux
-        if (pindex->nHeight >= Params().FirstSCBlock()) {
+//        if (pindex->nHeight >= Params().FirstSCBlock()) {
             bool hasOpSpend = tx.HasOpSpend();
 
             if(!hasOpSpend) {
@@ -2581,7 +2581,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
                         dev::g_logPost(std::string("Address : " + re.execRes.newAddress.hex()), NULL);
                 }
             }
-        }
+//        }
 /////////////////////////////////////////////////////////////////////////////////////////
 
         CTxUndo undoDummy;
@@ -2633,10 +2633,10 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
     LogPrint("bench", "    - Verify %u txins: %.2fms (%.3fms/txin) [%.2fs]\n", nInputs - 1, 0.001 * (nTime2 - nTimeStart), nInputs <= 1 ? 0 : 0.001 * (nTime2 - nTimeStart) / (nInputs - 1), nTimeVerify * 0.000001);
 
     ////////////////////////////////////////////////////////////////// // lux
-    if (pindex->nHeight >= Params().FirstSCBlock()) {
+//    if (pindex->nHeight >= Params().FirstSCBlock()) {
         checkBlock.hashMerkleRoot = checkBlock.BuildMerkleTree();
-        checkBlock.hashStateRoot = uint256(0);/*h256Touint(globalState->rootHash())*/;
-        checkBlock.hashUTXORoot = uint256(0);/*h256Touint(globalState->rootHashUTXO())*/;
+        checkBlock.hashStateRoot = /*uint256(0);*/h256Touint(globalState->rootHash());
+        checkBlock.hashUTXORoot = /*uint256(0);*/h256Touint(globalState->rootHashUTXO());
 
         //If this error happens, it probably means that something with AAL created transactions didn't match up to what is expected
         if ((checkBlock.GetHash() != block.GetHash()) && !fJustCheck) {
@@ -2695,18 +2695,18 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
                              error("ConnectBlock(): Incorrect AAL transactions or hashes (hashStateRoot, hashUTXORoot)"),
                              REJECT_INVALID, "incorrect-transactions-or-hashes-block");
         }
-    }
+//    }
 
     if (fJustCheck) {
 //        if (pindex->nHeight >= Params().FirstSCBlock()) {
-//            dev::h256 prevHashStateRoot(dev::sha3(dev::rlp("")));
-//            dev::h256 prevHashUTXORoot(dev::sha3(dev::rlp("")));
-//            if (pindex->pprev->hashStateRoot != uint256() && pindex->pprev->hashUTXORoot != uint256()) {
-//                prevHashStateRoot = uintToh256(pindex->pprev->hashStateRoot);
-//                prevHashUTXORoot = uintToh256(pindex->pprev->hashUTXORoot);
-//            }
-//            globalState->setRoot(prevHashStateRoot);
-//            globalState->setRootUTXO(prevHashUTXORoot);
+            dev::h256 prevHashStateRoot(dev::sha3(dev::rlp("")));
+            dev::h256 prevHashUTXORoot(dev::sha3(dev::rlp("")));
+            if (pindex->pprev->hashStateRoot != uint256() && pindex->pprev->hashUTXORoot != uint256()) {
+                prevHashStateRoot = uintToh256(pindex->pprev->hashStateRoot);
+                prevHashUTXORoot = uintToh256(pindex->pprev->hashUTXORoot);
+            }
+            globalState->setRoot(prevHashStateRoot);
+            globalState->setRootUTXO(prevHashUTXORoot);
 //        }
         return true;
     }
@@ -2978,8 +2978,8 @@ bool static ConnectTip(CValidationState& state, const CChainParams& chainparams,
         CInv inv(MSG_BLOCK, pindexNew->GetBlockHash());
 
 
-//        dev::h256 oldHashStateRoot(globalState->rootHash()); // lux
-//        dev::h256 oldHashUTXORoot(globalState->rootHashUTXO()); // lux
+        dev::h256 oldHashStateRoot(globalState->rootHash()); // lux
+        dev::h256 oldHashUTXORoot(globalState->rootHashUTXO()); // lux
 
         bool rv = ConnectBlock(*pblock, state, pindexNew, view, chainparams);
         GetMainSignals().BlockChecked(*pblock, state);
@@ -2987,8 +2987,8 @@ bool static ConnectTip(CValidationState& state, const CChainParams& chainparams,
             if (state.IsInvalid())
                 InvalidBlockFound(pindexNew, state);
 
-//            globalState->setRoot(oldHashStateRoot); // lux
-//            globalState->setRootUTXO(oldHashUTXORoot); // lux
+            globalState->setRoot(oldHashStateRoot); // lux
+            globalState->setRootUTXO(oldHashUTXORoot); // lux
 
             return error("ConnectTip() : ConnectBlock %s failed", pindexNew->GetBlockHash().ToString());
         }
@@ -4186,8 +4186,16 @@ bool TestBlockValidity(CValidationState& state, const CChainParams& chainparams,
         return false;
     if (block.IsProofOfStake() && !stake->CheckProof(pindexPrev, block, index.hashProofOfStake))
         return false;
-    if (!ConnectBlock(block, state, &index, viewNew, chainparams, true))
+
+    dev::h256 oldHashStateRoot(globalState->rootHash()); // lux
+    dev::h256 oldHashUTXORoot(globalState->rootHashUTXO()); // lux
+
+    if (!ConnectBlock(block, state, &index, viewNew, chainparams, true)) {
+        globalState->setRoot(oldHashStateRoot); // lux
+        globalState->setRootUTXO(oldHashUTXORoot); // lux
+        std::cout << "ConnectBlock\n";
         return false;
+    }
 
     assert(state.IsValid());
 

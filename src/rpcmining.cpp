@@ -815,7 +815,7 @@ UniValue getwork(const UniValue& params, bool fHelp) {
                 // Deallocate old blocks since they're obsolete now
                 mapNewBlock.clear();
                 BOOST_FOREACH(CBlockTemplate* pblocktemplate, vNewBlockTemplate)
-                delete pblocktemplate;
+                    delete pblocktemplate;
                 vNewBlockTemplate.clear();
             }
 
