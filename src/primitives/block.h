@@ -53,8 +53,8 @@ public:
         READWRITE(nBits);
         READWRITE(nNonce);
 //        if (this->nVersion >= SC_BLOCK_VERSION) {
-//            READWRITE(hashStateRoot); // lux
-//            READWRITE(hashUTXORoot); // lux
+            READWRITE(hashStateRoot);       // lux
+            READWRITE(hashUTXORoot);        // lux
 //        }
     }
 

@@ -17,6 +17,12 @@
 
 #include <boost/assign/list_of.hpp>
 
+///////////////////////////////////////////// // lux
+#include <libdevcore/SHA3.h>
+#include <libdevcore/RLP.h>
+//#include "arith_uint256.h"
+/////////////////////////////////////////////
+
 using namespace std;
 using namespace boost::assign;
 
@@ -276,7 +282,7 @@ public:
         const char* pszTimestamp = "Lux - Testnet"; // Input Activation code to activate blockchain
         CMutableTransaction txNew;
         txNew.nVersion = 1;
-        txNew.nTime = 1527136450;
+        txNew.nTime = 1527232652;
         txNew.nLockTime = 0;
         txNew.vin.resize(1);
         txNew.vout.resize(1);
@@ -288,9 +294,11 @@ public:
         genesis.hashPrevBlock = 0;
         genesis.hashMerkleRoot = genesis.BuildMerkleTree();
         genesis.nVersion = 1;
-        genesis.nTime = 1527136450; //05/24/2018 @ 3:43am (UTC)
+        genesis.nTime = 1527232652; //05/25/2018 @ 7:17am (UTC)
         genesis.nBits = 0x1e0fffff;
-        genesis.nNonce = 1726211;
+        genesis.nNonce = 174749;
+        genesis.hashStateRoot = uint256(h256Touint(dev::h256("e965ffd002cd6ad0e2dc402b8044de833e06b23127ea8c3d80aec91410771495"))); // lux
+        genesis.hashUTXORoot = uint256(h256Touint(dev::sha3(dev::rlp("")))); // lux
 
 //        while (!CheckProof(genesis.GetHash(), genesis.nBits)) {
 //            genesis.nNonce ++;
@@ -306,13 +314,13 @@ public:
 
         consensus.hashGenesisBlock = genesis.GetHash();
 
-        assert(consensus.hashGenesisBlock == uint256("0x000007ca66b6b483b04d9db084c156454641671a8e3f675acfad84dce62155a3"));
-        assert(genesis.hashMerkleRoot == uint256("0xd05b292ba9057b90cb08ffac4595a87654592d63ea0ab7a382247b2f0de4e842"));
+        assert(consensus.hashGenesisBlock == uint256("0x00000c384779f87def7714b9f8d2bdb308114fc8653973f8ad64f739ed245982"));
+        assert(genesis.hashMerkleRoot == uint256("0x83b4c898e56cbec1951915b6cbd014ab4463406463a4292467bebf1dfa442a22"));
 
         vFixedSeeds.clear();
         vSeeds.clear();
-        vSeeds.push_back(CDNSSeedData("luxtest1", "108.160.141.118"));
-        vSeeds.push_back(CDNSSeedData("luxtest2", "45.76.53.201"));
+//        vSeeds.push_back(CDNSSeedData("luxtest1", "108.160.141.118"));
+//        vSeeds.push_back(CDNSSeedData("luxtest2", "45.76.53.201"));
 
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1, 48); // Testnet lux addresses start with 'l'
         base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1, 63);  // Testnet lux script addresses start with 'S'
