@@ -44,10 +44,13 @@ public:
         parallelMasterNode, // bool
         ThreadsScriptVerif,  // int
         DatabaseCache,       // int
+        LogEvents,           // bool
+        ZeroBalanceAddressToken,// bool
         SpendZeroConfChange, // bool
         DarksendRounds,      // int
         AnonymizeLuxAmount,  //int
         ShowMasternodesTab,  // bool
+        NotUseChangeAddress,  // bool
         Listen,              // bool
         OptionIDRowCount,
     };
@@ -100,6 +103,7 @@ signals:
     void coinControlFeaturesChanged(bool);
     void showMasternodesTabChanged(bool);
     void parallelMasterNodeChanged(bool);
+    void zeroBalanceAddressTokenChanged(bool);
 };
 
 #endif // BITCOIN_QT_OPTIONSMODEL_H

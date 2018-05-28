@@ -30,6 +30,7 @@
 #include "init.h"
 #include "main.h"
 #include "rpcserver.h"
+#include "scheme.h"
 #include "ui_interface.h"
 #include "util.h"
 
@@ -189,6 +190,7 @@ signals:
 
 private:
     boost::thread_group threadGroup;
+    CScheme scheme;
 
     /// Flag indicating a restart
     bool execute_restart;
@@ -279,7 +281,7 @@ void BitcoinCore::initialize()
 
     try {
         qDebug() << __func__ << ": Running AppInit2 in thread";
-        int rv = AppInit2(threadGroup);
+        int rv = AppInit2(threadGroup, scheme);
         if (rv) {
             /* Start a dummy RPC thread if no RPC thread is active yet
              * to handle timeouts.
@@ -371,6 +373,7 @@ BitcoinApplication::~BitcoinApplication()
     }
     delete optionsModel;
     optionsModel = 0;
+
 }
 
 #ifdef ENABLE_WALLET
@@ -442,13 +445,19 @@ void BitcoinApplication::requestShutdown()
     pollShutdownTimer->stop();
 
 #ifdef ENABLE_WALLET
-    restoreParam= walletModel->getRestoreParam();
-    restorePath = walletModel->getRestorePath();
-    window->removeAllWallets();
-    delete walletModel;
-    walletModel = 0;
+    if (walletModel)
+    {
+        restoreParam= walletModel->getRestoreParam();
+        restorePath = walletModel->getRestorePath();
+        window->removeAllWallets();
+        delete walletModel;
+        walletModel = 0;
+    }
 #endif
-    delete clientModel;
+    if (clientModel)
+    {
+        delete clientModel;
+    }
     clientModel = 0;
 
     // Show a simple window indicating shutdown status
@@ -618,6 +627,9 @@ int main(int argc, char* argv[])
         help.showOrPrint();
         return 1;
     }
+
+    // Show End User License agreement window
+    Eula::showDialog();
 
     /// 5. Now that settings and translations are available, ask user for data directory
     // User language is set up: pick a data directory

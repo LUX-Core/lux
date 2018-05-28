@@ -18,6 +18,10 @@ public:
     explicit QValidatedLineEdit(QWidget* parent);
     void clear();
     void setCheckValidator(const QValidator* v);
+    bool isValid();
+
+    bool getEmptyIsValid() const;
+    void setEmptyIsValid(bool value);
 
 protected:
     void focusInEvent(QFocusEvent* evt);
@@ -26,14 +30,18 @@ protected:
 private:
     bool valid;
     const QValidator* checkValidator;
+    bool emptyIsValid;
 
 public slots:
     void setValid(bool valid);
     void setEnabled(bool enabled);
+    void checkValidity();
+
+Q_SIGNALS:
+    void validationDidChange(QValidatedLineEdit *validatedLineEdit);
 
 private slots:
     void markValid();
-    void checkValidity();
 };
 
 #endif // BITCOIN_QT_QVALIDATEDLINEEDIT_H

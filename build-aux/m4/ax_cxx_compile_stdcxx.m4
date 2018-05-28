@@ -63,6 +63,7 @@ AC_DEFUN([AX_CXX_COMPILE_STDCXX], [dnl
         [m4_fatal([invalid fourth argument `$4' to AX_CXX_COMPILE_STDCXX])])
   AC_LANG_PUSH([C++])dnl
   ac_success=no
+
   m4_if([$4], [nodefault], [], [dnl
   AC_CACHE_CHECK(whether $CXX supports C++$1 features by default,
   ax_cv_cxx_compile_cxx$1,

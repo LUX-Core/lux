@@ -10,6 +10,7 @@
 
 class BitcoinGUI;
 class ClientModel;
+//class PlatformStyle;
 class SendCoinsRecipient;
 class WalletModel;
 class WalletView;
@@ -25,14 +26,14 @@ class WalletFrame : public QFrame
     Q_OBJECT
 
 public:
-    explicit WalletFrame(BitcoinGUI* _gui = 0);
+    explicit WalletFrame(BitcoinGUI *_gui = 0);
     ~WalletFrame();
 
-    void setClientModel(ClientModel* clientModel);
+    void setClientModel(ClientModel *clientModel);
 
-    bool addWallet(const QString& name, WalletModel* walletModel);
+    bool addWallet(const QString& name, WalletModel *walletModel);
     bool setCurrentWallet(const QString& name);
-    bool removeWallet(const QString& name);
+    bool removeWallet(const QString &name);
     void removeAllWallets();
 
     bool handlePaymentRequest(const SendCoinsRecipient& recipient);
@@ -54,14 +55,14 @@ public slots:
     void gotoOverviewPage();
     /** Switch to history (transactions) page */
     void gotoHistoryPage();
-    /** Switch to staking page */
-    void gotoStakingPage();
     /** Switch to trading page */
     void gotoTradingPage();
     /** Switch to masternode page */
     void gotoMasternodePage();
-    /** Switch to gotoSmartTokenPage*/
-    void gotoSmartTokenPage();
+    /** Switch to smart contract page */
+    void gotoSmartContractPage();
+    /** Switch to LSRToken page */
+    void gotoLSRTokenPage(bool toAddTokenPage);
     /** Switch to receive coins page */
     void gotoReceiveCoinsPage();
     /** Switch to send coins page */

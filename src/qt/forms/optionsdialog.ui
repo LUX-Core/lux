@@ -38,6 +38,13 @@
         </widget>
        </item>
        <item>
+        <widget class="QCheckBox" name="logEvents">
+         <property name="text">
+          <string>Enable  log &amp;events</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <layout class="QHBoxLayout" name="horizontalLayout_2_Main">
          <item>
           <widget class="QLabel" name="databaseCacheLabel">
@@ -158,7 +165,7 @@
         </layout>
        </item>
        <item>
-        <spacer name="verticalSpacer_Main">
+        <spacer name="verticalSpacer_Main1">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>
@@ -265,6 +272,30 @@
             </property>
            </widget>
           </item>
+           <item>
+            <widget class="QCheckBox" name="zeroBalanceAddressToken">
+             <property name="text">
+              <string>Enable &amp;zero balance for receiver token address</string>
+             </property>
+            </widget>
+           </item>
+          <item>
+           <widget class="QCheckBox" name="parallelMasterNode">
+            <property name="toolTip">
+             <string>Coming soon</string>
+            </property>
+            <property name="text">
+             <string>&amp;Activate Parallel Masternode</string>
+            </property>
+           </widget>
+          </item>
+             <item>
+                 <widget class="QCheckBox" name="notUseChangeAddress">
+                     <property name="text">
+                         <string>Don't use change &amp;address</string>
+                     </property>
+                 </widget>
+             </item>
          </layout>
         </widget>
        </item>

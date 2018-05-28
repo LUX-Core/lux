@@ -1,7 +1,17 @@
-#include <sm/storageresults.h>
+#include <lux/storageresults.h>
 
 StorageResults::StorageResults(std::string const& _path){
 	path = _path + "/resultsDB";
+    options.create_if_missing = true;
+    leveldb::Status status = leveldb::DB::Open(options, path, &db);
+    assert(status.ok());
+    LogPrintf("Opened LevelDB successfully\n");
+}
+
+StorageResults::~StorageResults()
+{
+    delete db;
+    db = NULL;
 }
 
 void StorageResults::addResult(dev::h256 hashTx, std::vector<TransactionReceiptInfo>& result){
@@ -9,26 +19,21 @@ void StorageResults::addResult(dev::h256 hashTx, std::vector<TransactionReceiptI
 }
 
 void StorageResults::wipeResults(){
-	leveldb::Status result = leveldb::DestroyDB(path, leveldb::Options());
+    LogPrintf("Wiping LevelDB in %s\n", path);
+    leveldb::Status result = leveldb::DestroyDB(path, leveldb::Options());
 }
 
-void StorageResults::deleteResults(std::vector<CTransactionRef> const& txs){
-    leveldb::DB* db;
-    leveldb::Options options;
-    options.create_if_missing = true;
-    leveldb::Status status = leveldb::DB::Open(options, path, &db);
-    assert(status.ok());
+void StorageResults::deleteResults(std::vector<CTransaction> const& txs){
 
-    for(CTransactionRef tx : txs){
-        dev::h256 hashTx = uintToh256(tx->GetHash());
+    for(CTransaction tx : txs){
+        dev::h256 hashTx = uintToh256(tx.GetHash());
         m_cache_result.erase(hashTx);
 
         std::string keyTemp = hashTx.hex();
 	    leveldb::Slice key(keyTemp);
-        status = db->Delete(leveldb::WriteOptions(), key);
+        leveldb::Status status = db->Delete(leveldb::WriteOptions(), key);
         assert(status.ok());
     }
-    delete db;
 }
 
 std::vector<TransactionReceiptInfo> StorageResults::getResult(dev::h256 const& hashTx){
@@ -45,17 +50,12 @@ std::vector<TransactionReceiptInfo> StorageResults::getResult(dev::h256 const& h
 
 void StorageResults::commitResults(){
     if(m_cache_result.size()){
-        leveldb::DB* db;
-        leveldb::Options options;
-        options.create_if_missing = true;
-        leveldb::Status status = leveldb::DB::Open(options, path, &db);
-        assert(status.ok());
 
         for (auto const& i: m_cache_result){
             std::string valueTemp;
             std::string keyTemp = i.first.hex();
             leveldb::Slice key(keyTemp);
-            status = db->Get(leveldb::ReadOptions(), key, &valueTemp);
+            leveldb::Status status = db->Get(leveldb::ReadOptions(), key, &valueTemp);
 
             if(status.IsNotFound()){
 
@@ -72,11 +72,12 @@ void StorageResults::commitResults(){
                     tris.gasUsed.push_back(dev::u256(i.second[j].gasUsed));
                     tris.contractAddresses.push_back(i.second[j].contractAddress);
                     tris.logs.push_back(logEntriesSerialization(i.second[j].logs));
+                    tris.excepted.push_back(uint32_t(static_cast<int>(i.second[j].excepted)));
                 }
 
-                dev::RLPStream streamRLP(10);
+                dev::RLPStream streamRLP(11);
                 streamRLP << tris.blockHashes << tris.blockNumbers << tris.transactionHashes << tris.transactionIndexes << tris.senders;
-                streamRLP << tris.receivers << tris.cumulativeGasUsed << tris.gasUsed << tris.contractAddresses << tris.logs;
+                streamRLP << tris.receivers << tris.cumulativeGasUsed << tris.gasUsed << tris.contractAddresses << tris.logs << tris.excepted;
 
                 dev::bytes data = streamRLP.out();
                 std::string stringData(data.begin(), data.end());
@@ -86,25 +87,18 @@ void StorageResults::commitResults(){
             }
         }
         m_cache_result.clear();
-        delete db;
     }
 }
 
 bool StorageResults::readResult(dev::h256 const& _key, std::vector<TransactionReceiptInfo>& _result){
-    leveldb::DB* db;
-	leveldb::Options options;
-	options.create_if_missing = true;
-	leveldb::Status status = leveldb::DB::Open(options, path, &db);
-	assert(status.ok());
 
-	std::string value;
-	std::string keyTemp = _key.hex();
-	leveldb::Slice key(keyTemp);
-	leveldb::Status s = db->Get(leveldb::ReadOptions(), key, &value);
-	delete db;
+    std::string value;
+    std::string keyTemp = _key.hex();;
+    leveldb::Slice key(keyTemp);
+    leveldb::Status s = db->Get(leveldb::ReadOptions(), key, &value);
 
 	if(!s.IsNotFound() && s.ok()){
-        
+
         TransactionReceiptInfoSerialized tris;
 
 		dev::RLP state(value);
@@ -118,10 +112,14 @@ bool StorageResults::readResult(dev::h256 const& _key, std::vector<TransactionRe
         tris.gasUsed = state[7].toVector<dev::u256>();
         tris.contractAddresses = state[8].toVector<dev::h160>();
         tris.logs = state[9].toVector<logEntriesSerializ>();
+        if(state.itemCount() == 11)
+            tris.excepted = state[10].toVector<uint32_t>();
 
         for(size_t j = 0; j < tris.blockHashes.size(); j++){
             TransactionReceiptInfo tri{h256Touint(tris.blockHashes[j]), tris.blockNumbers[j], h256Touint(tris.transactionHashes[j]), tris.transactionIndexes[j], tris.senders[j],
-                                       tris.receivers[j], uint64_t(tris.cumulativeGasUsed[j]), uint64_t(tris.gasUsed[j]), tris.contractAddresses[j], logEntriesDeserialize(tris.logs[j])};
+                                       tris.receivers[j], uint64_t(tris.cumulativeGasUsed[j]), uint64_t(tris.gasUsed[j]), tris.contractAddresses[j], logEntriesDeserialize(tris.logs[j]),
+                                       state.itemCount() == 11 ? static_cast<dev::eth::TransactionException>(tris.excepted[j]) : dev::eth::TransactionException::NoInformation
+                                    };
             _result.push_back(tri);
         }
 		return true;

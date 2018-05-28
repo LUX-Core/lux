@@ -1,6 +1,6 @@
 #include "luxDGP.h"
 
-void luxDGP::initDataEIP158(){
+void LuxDGP::initDataEIP158(){
     std::vector<uint32_t> tempData = {dev::eth::EIP158Schedule.tierStepGas[0], dev::eth::EIP158Schedule.tierStepGas[1], dev::eth::EIP158Schedule.tierStepGas[2],
                                       dev::eth::EIP158Schedule.tierStepGas[3], dev::eth::EIP158Schedule.tierStepGas[4], dev::eth::EIP158Schedule.tierStepGas[5],
                                       dev::eth::EIP158Schedule.tierStepGas[6], dev::eth::EIP158Schedule.tierStepGas[7], dev::eth::EIP158Schedule.expGas,
@@ -17,7 +17,7 @@ void luxDGP::initDataEIP158(){
     dataEIP158Schedule = tempData;
 }
 
-bool luxDGP::checkLimitSchedule(const std::vector<uint32_t>& defaultData, const std::vector<uint32_t>& checkData){
+bool LuxDGP::checkLimitSchedule(const std::vector<uint32_t>& defaultData, const std::vector<uint32_t>& checkData){
     if(defaultData.size() == 39 && checkData.size() == 39){
         for(size_t i = 0; i < defaultData.size(); i++){
             uint32_t max = defaultData[i] * 1000 > 0 ? defaultData[i] * 1000 : 1 * 1000;
@@ -31,7 +31,7 @@ bool luxDGP::checkLimitSchedule(const std::vector<uint32_t>& defaultData, const 
     return false;
 }
 
-dev::eth::EVMSchedule luxDGP::getGasSchedule(unsigned int blockHeight){
+dev::eth::EVMSchedule LuxDGP::getGasSchedule(unsigned int blockHeight){
     clear();
     dev::eth::EVMSchedule schedule = dev::eth::EIP158Schedule;
     if(initStorages(GasScheduleDGP, blockHeight, ParseHex("26fadbe2"))){
@@ -40,7 +40,7 @@ dev::eth::EVMSchedule luxDGP::getGasSchedule(unsigned int blockHeight){
     return schedule;
 }
 
-uint64_t luxDGP::getUint64FromDGP(unsigned int blockHeight, const dev::Address& contract, std::vector<unsigned char> data){
+uint64_t LuxDGP::getUint64FromDGP(unsigned int blockHeight, const dev::Address& contract, std::vector<unsigned char> data){
     uint64_t value = 0;
     if(initStorages(contract, blockHeight, data)){
         if(!dgpevm){
@@ -52,7 +52,7 @@ uint64_t luxDGP::getUint64FromDGP(unsigned int blockHeight, const dev::Address& 
     return value;
 }
 
-uint32_t luxDGP::getBlockSize(unsigned int blockHeight){
+uint32_t LuxDGP::getBlockSize(unsigned int blockHeight){
     clear();
     uint32_t result = DEFAULT_BLOCK_SIZE_DGP;
     uint32_t blockSize = getUint64FromDGP(blockHeight, BlockSizeDGP, ParseHex("92ac3c62"));
@@ -62,7 +62,7 @@ uint32_t luxDGP::getBlockSize(unsigned int blockHeight){
     return result;
 }
 
-uint64_t luxDGP::getMinGasPrice(unsigned int blockHeight){
+uint64_t LuxDGP::getMinGasPrice(unsigned int blockHeight){
     clear();
     uint64_t result = DEFAULT_MIN_GAS_PRICE_DGP;
     uint64_t minGasPrice = getUint64FromDGP(blockHeight, GasPriceDGP, ParseHex("3fb58819"));
@@ -72,7 +72,7 @@ uint64_t luxDGP::getMinGasPrice(unsigned int blockHeight){
     return result;
 }
 
-uint64_t luxDGP::getBlockGasLimit(unsigned int blockHeight){
+uint64_t LuxDGP::getBlockGasLimit(unsigned int blockHeight){
     clear();
     uint64_t result = DEFAULT_BLOCK_GAS_LIMIT_DGP;
     uint64_t blockGasLimit = getUint64FromDGP(blockHeight, BlockGasLimitDGP, ParseHex("2cc8377d"));
@@ -82,7 +82,7 @@ uint64_t luxDGP::getBlockGasLimit(unsigned int blockHeight){
     return result;
 }
 
-bool luxDGP::initStorages(const dev::Address& addr, unsigned int blockHeight, std::vector<unsigned char> data){
+bool LuxDGP::initStorages(const dev::Address& addr, unsigned int blockHeight, std::vector<unsigned char> data){
     initStorageDGP(addr);
     createParamsInstance();
     dev::Address address = getAddressForBlock(blockHeight);
@@ -97,19 +97,19 @@ bool luxDGP::initStorages(const dev::Address& addr, unsigned int blockHeight, st
     return false;
 }
 
-void luxDGP::initStorageDGP(const dev::Address& addr){
+void LuxDGP::initStorageDGP(const dev::Address& addr){
     storageDGP = state->storage(addr);
 }
 
-void luxDGP::initStorageTemplate(const dev::Address& addr){
+void LuxDGP::initStorageTemplate(const dev::Address& addr){
     storageTemplate = state->storage(addr);
 }
 
-void luxDGP::initDataTemplate(const dev::Address& addr, std::vector<unsigned char>& data){
+void LuxDGP::initDataTemplate(const dev::Address& addr, std::vector<unsigned char>& data){
     dataTemplate = CallContract(addr, data)[0].execRes.output;
 }
 
-void luxDGP::createParamsInstance(){
+void LuxDGP::createParamsInstance(){
     dev::h256 paramsInstanceHash = sha3(dev::h256("0000000000000000000000000000000000000000000000000000000000000000"));
     if(storageDGP.count(paramsInstanceHash)){
         dev::u256 paramsInstanceSize = storageDGP.find(paramsInstanceHash)->second.second;
@@ -124,7 +124,7 @@ void luxDGP::createParamsInstance(){
     }
 }
 
-dev::Address luxDGP::getAddressForBlock(unsigned int blockHeight){
+dev::Address LuxDGP::getAddressForBlock(unsigned int blockHeight){
     for(auto i = paramsInstance.rbegin(); i != paramsInstance.rend(); i++){
         if(i->first <= blockHeight)
             return i->second;
@@ -136,7 +136,7 @@ static inline bool sortPairs(const std::pair<dev::u256, dev::u256>& a, const std
     return a.first < b.first;
 }
 
-void luxDGP::parseStorageScheduleContract(std::vector<uint32_t>& uint32Values){
+void LuxDGP::parseStorageScheduleContract(std::vector<uint32_t>& uint32Values){
     std::vector<std::pair<dev::u256, dev::u256>> data;
     for(size_t i = 0; i < 5; i++){
         dev::h256 gasScheduleHash = sha3(dev::h256(dev::u256(i)));
@@ -162,7 +162,7 @@ void luxDGP::parseStorageScheduleContract(std::vector<uint32_t>& uint32Values){
     }
 }
 
-void luxDGP::parseDataScheduleContract(std::vector<uint32_t>& uint32Values){
+void LuxDGP::parseDataScheduleContract(std::vector<uint32_t>& uint32Values){
     size_t size = dataTemplate.size() / 32;
     for(size_t i = 0; i < size; i++){
         std::vector<unsigned char> value = std::vector<unsigned char>(dataTemplate.begin() + (i * 32), dataTemplate.begin() + ((i+1) * 32));
@@ -171,20 +171,20 @@ void luxDGP::parseDataScheduleContract(std::vector<uint32_t>& uint32Values){
     }
 }
 
-void luxDGP::parseStorageOneUint64(uint64_t& value){
+void LuxDGP::parseStorageOneUint64(uint64_t& value){
     dev::h256 blockSizeHash = sha3(dev::h256(dev::u256(0)));
     if(storageTemplate.count(blockSizeHash)){
         value = uint64_t(storageTemplate.find(blockSizeHash)->second.second);
     }
 }
 
-void luxDGP::parseDataOneUint64(uint64_t& value){
+void LuxDGP::parseDataOneUint64(uint64_t& value){
     if(dataTemplate.size() == 32){
         value = uint64_t(dev::u256(dev::h256(dataTemplate)));
     }
 }
 
-dev::eth::EVMSchedule luxDGP::createEVMSchedule(){
+dev::eth::EVMSchedule LuxDGP::createEVMSchedule(){
     dev::eth::EVMSchedule schedule = dev::eth::EIP158Schedule;
     std::vector<uint32_t> uint32Values;
 
@@ -235,7 +235,7 @@ dev::eth::EVMSchedule luxDGP::createEVMSchedule(){
     return schedule;
 }
 
-void luxDGP::clear(){
+void LuxDGP::clear(){
     templateContract = dev::Address();
     storageDGP.clear();
     storageTemplate.clear();

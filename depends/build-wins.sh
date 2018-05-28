@@ -44,6 +44,8 @@ cd ..
 ./autogen.sh Windows $PLATFORM $INSTALL_DIR
 ./configure --prefix=$PWD/depends/$PLATFORM --host=$PLATFORM --disable-tests && make clean && make -j$(nproc)
 
+# Build the application
+make -j$(nproc)
 
 # Remove the symbols for release
 cd $INSTALL_DIR/bin

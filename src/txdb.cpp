@@ -96,7 +96,7 @@ bool CBlockTreeDB::WriteBlockIndex(const CDiskBlockIndex& blockindex)
             }
         }
 #   if 0
-    } else if (!CheckProofOfWork(hash, blockindex.nBits)) {
+    } else if (!CheckProofOfWork(hash, blockindex.nBits, Params().GetConsensus())) {
         LogPrint("debug", "%s: bad work block %d %d %s", __func__, blockindex.nBits, blockindex.nHeight, hash.GetHex()); //return error("%s: invalid proof of work: %d %d %s", __func__, blockindex.nBits, blockindex.nHeight, hash.GetHex());
 #   endif
     }
@@ -274,7 +274,7 @@ bool CBlockTreeDB::LoadBlockIndexGuts()
                 bool isPoW = (diskindex.nNonce != 0) && pindexNew->nHeight <= Params().LAST_POW_BLOCK();
                 if (isPoW) {
                     auto const &hash(pindexNew->GetBlockHash());
-                    if (!CheckProofOfWork(hash, pindexNew->nBits)) {
+                    if (!CheckProofOfWork(hash, pindexNew->nBits, Params().GetConsensus())) {
                         unsigned int nBits = pindexPrev ? pindexPrev->nBits : 0;
                         return error("%s: CheckProofOfWork failed: %d %s (%d, %d)", __func__, pindexNew->nHeight, hash.GetHex(), pindexNew->nBits, nBits);
                     }

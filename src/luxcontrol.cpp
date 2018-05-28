@@ -721,7 +721,7 @@ static void LuxControlThread()
     event_base_dispatch(gBase);
 }
 
-void StartLuxControl(boost::thread_group& threadGroup/*, CScheduler& scheduler*/)
+void StartLuxControl(boost::thread_group& threadGroup/*, CScheme& scheme*/)
 {
     assert(!gBase);
 #ifdef WIN32

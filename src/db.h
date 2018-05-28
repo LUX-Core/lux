@@ -101,8 +101,9 @@ protected:
     std::string strFile;
     DbTxn* activeTxn;
     bool fReadOnly;
+    bool fFlushOnClose;
 
-    explicit CDB(const std::string& strFilename, const char* pszMode = "r+");
+    explicit CDB(const std::string& strFilename, const char* pszMode = "r+", bool fFlushOnCloseIn=true);
     ~CDB() { Close(); }
 
 public:
@@ -165,7 +166,7 @@ protected:
         // Value
         CDataStream ssValue(SER_DISK, CLIENT_VERSION);
         ssValue.reserve(10000);
-        ssValue << value;
+        ssValue << value; //bad_alloc here
         Dbt datValue(&ssValue[0], ssValue.size());
 
         // Write

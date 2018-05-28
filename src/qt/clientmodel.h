@@ -62,8 +62,14 @@ public:
     bool inInitialBlockDownload() const;
     //! Return true if core is importing blocks
     enum BlockSource getBlockSource() const;
+    //! Return true if network activity in core is enabled
+    bool getNetworkActive() const;
+    //! Switch network activity state in core
+    void setNetworkActive(bool active);
     //! Return warnings to be displayed in status bar
     QString getStatusBarWarnings() const;
+    //! Get the information about the needed gas
+    void getGasInfo(uint64_t& blockGasLimit, uint64_t& minGasPrice, uint64_t& nGasPrice) const;
 
     QString formatFullVersion() const;
     QString formatBuildDate() const;
@@ -91,6 +97,7 @@ private:
 signals:
     void numConnectionsChanged(int count);
     void numBlocksChanged(int count);
+    void networkActiveChanged(bool networkActive);
     void strMasternodesChanged(const QString& strMasternodes);
     void alertsChanged(const QString& warnings);
     void bytesChanged(quint64 totalBytesIn, quint64 totalBytesOut);
@@ -105,6 +112,7 @@ public slots:
     void updateTimer();
     void updateMnTimer();
     void updateNumConnections(int numConnections);
+    void updateNetworkActive(bool networkActive);
     void updateAlert(const QString& hash, int status);
 };
 

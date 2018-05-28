@@ -28,6 +28,7 @@ std::string HelpMessageCli()
     strUsage += "  -conf=<file>           " + strprintf(_("Specify configuration file (default: %s)"), "lux.conf") + "\n";
     strUsage += "  -datadir=<dir>         " + _("Specify data directory") + "\n";
     strUsage += "  -testnet               " + _("Use the test network") + "\n";
+    strUsage += "  -segwittest               " + _("Use the SegWit test network") + "\n";
     strUsage += "  -regtest               " + _("Enter regression test mode, which uses a special chain in which blocks can be "
                                                 "solved instantly. This is intended for regression testing tools and app development.") +
                 "\n";

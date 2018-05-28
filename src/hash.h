@@ -1,7 +1,7 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto                     -*- c++ -*-
 // Copyright (c) 2009-2014 The Bitcoin developers
 // Copyright (c) 2014-2015 The Dash developers
-// Copyright (c) 2015-2017 The LUX developers
+// Copyright (c) 2015-2018 The LUX developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -21,11 +21,16 @@
 #include "crypto/sph_fugue.h"
 #include "crypto/sph_gost.h"
 #include "crypto/sph_echo.h"
+#include "crypto/lyra2/Lyra2.h"
+
+#include "crypto/common.h"
 
 #include <iomanip>
 #include <openssl/sha.h>
 #include <sstream>
 #include <vector>
+
+#define PHI2_ALGO_ENABLE
 
 using namespace std;
 
@@ -273,6 +278,56 @@ void BIP32Hash(const unsigned char chainCode[32], unsigned int nChild, unsigned 
 /* ----------- Phi1612 Hash ------------------------------------------------ */
 
 template<typename T1>
+inline uint256 phi2_hash(const T1 pbegin, const T1 pend)
+{
+    unsigned char hash[128] = { 0 };
+    unsigned char hashA[64] = { 0 };
+    unsigned char hashB[64] = { 0 };
+    static unsigned char pblank[1];
+    uint512 output;
+
+    sph_cubehash512_context ctx_cubehash;
+    sph_jh512_context ctx_jh;
+    sph_gost512_context ctx_gost;
+    sph_echo512_context ctx_echo;
+    sph_skein512_context ctx_skein;
+
+    sph_cubehash512_init(&ctx_cubehash);
+    sph_cubehash512(&ctx_cubehash, (pbegin == pend ? pblank : static_cast<const void*>(&pbegin[0])), 80);
+    sph_cubehash512_close(&ctx_cubehash, (void*)hashB);
+
+    LYRA2(&hashA[ 0], 32, &hashB[ 0], 32, &hashB[ 0], 32, 1, 8, 8);
+    LYRA2(&hashA[32], 32, &hashB[32], 32, &hashB[32], 32, 1, 8, 8);
+
+    sph_jh512_init(&ctx_jh);
+    sph_jh512(&ctx_jh, (const void*)hashA, 64);
+    sph_jh512_close(&ctx_jh, (void*)hash);
+
+    if (hash[0] & 1) {
+        sph_gost512_init(&ctx_gost);
+        sph_gost512(&ctx_gost, (const void*)hash, 64);
+        sph_gost512_close(&ctx_gost, (void*)hash);
+    } else {
+        sph_echo512_init(&ctx_echo);
+        sph_echo512(&ctx_echo, (const void*)hash, 64);
+        sph_echo512_close(&ctx_echo, (void*)hash);
+
+        sph_echo512_init(&ctx_echo);
+        sph_echo512(&ctx_echo, (const void*)hash, 64);
+        sph_echo512_close(&ctx_echo, (void*)hash);
+    }
+    sph_skein512_init(&ctx_skein);
+    sph_skein512(&ctx_skein, (const void*)hash, 64);
+    sph_skein512_close(&ctx_skein, (void*)hash);
+
+    for (int i=0; i<32; i++)
+        hash[i] ^= hash[i+32];
+
+    memcpy((void *) &output, hash, 32);
+    return output.trim256();
+}
+
+template<typename T1>
 inline uint256 Phi1612(const T1 pbegin, const T1 pend)
 {
     sph_skein512_context     ctx_skein;
@@ -282,11 +337,6 @@ inline uint256 Phi1612(const T1 pbegin, const T1 pend)
     sph_gost512_context      ctx_gost;
     sph_echo512_context ctx_echo;
     static unsigned char pblank[1];
-
-#ifndef QT_NO_DEBUG
-    //std::string strhash;
-    //strhash = "";
-#endif
 
     uint512 hash[17];
 
@@ -317,6 +367,20 @@ inline uint256 Phi1612(const T1 pbegin, const T1 pend)
     return hash[5].trim256();
 }
 
+
 void scrypt_hash(const char* pass, unsigned int pLen, const char* salt, unsigned int sLen, char* output, unsigned int N, unsigned int r, unsigned int p, unsigned int dkLen);
+
+/** Optimized SipHash-2-4 implementation for uint256.
+ *
+ *  It is identical to:
+ *    SipHasher(k0, k1)
+ *      .Write(val.GetUint64(0))
+ *      .Write(val.GetUint64(1))
+ *      .Write(val.GetUint64(2))
+ *      .Write(val.GetUint64(3))
+ *      .Finalize()
+ */
+uint64_t SipHashUint256(uint64_t k0, uint64_t k1, const uint256& val);
+uint64_t SipHashUint256Extra(uint64_t k0, uint64_t k1, const uint256& val, uint32_t extra);
 
 #endif // BITCOIN_HASH_H

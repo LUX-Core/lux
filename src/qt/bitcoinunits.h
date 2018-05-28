@@ -11,6 +11,8 @@
 
 #include <QAbstractListModel>
 #include <QString>
+#include <boost/multiprecision/cpp_int.hpp>
+using namespace boost::multiprecision;
 
 // U+2009 THIN SPACE = UTF-8 E2 80 89
 #define REAL_THIN_SP_CP 0x2009
@@ -51,7 +53,7 @@ class BitcoinUnits : public QAbstractListModel
     Q_OBJECT
 
 public:
-    explicit BitcoinUnits(QObject* parent);
+    explicit BitcoinUnits(QObject *parent);
 
     /** LUX units.
       @note Source: https://en.bitcoin.it/wiki/Units . Please add only sensible ones
@@ -84,6 +86,8 @@ public:
     static QString description(int unit);
     //! Number of Satoshis (1e-8) per unit
     static qint64 factor(int unit);
+    //! Token factor from decimals
+    static int256_t tokenFactor(int unit);
     //! Number of decimals left
     static int decimals(int unit);
     //! Format as string
@@ -96,9 +100,15 @@ public:
     static QString floorWithUnit(int unit, const CAmount& amount, bool plussign = false, SeparatorStyle separators = separatorStandard);
     static QString floorHtmlWithUnit(int unit, const CAmount& amount, bool plussign = false, SeparatorStyle separators = separatorStandard);
     //! Parse string to coin amount
-    static bool parse(int unit, const QString& value, CAmount* val_out);
+    static bool parse(int unit, const QString &value, CAmount *val_out);
     //! Gets title for amount column including current display unit if optionsModel reference available */
     static QString getAmountColumnTitle(int unit);
+    //! Parse string to token amount
+    static bool parseToken(int decimal_units, const QString &value, int256_t *val_out);
+    //! Format token as string
+    static QString formatToken(int decimal_units, const int256_t& amount, bool plussign=false, SeparatorStyle separators=separatorStandard); //! Format token as string
+    //! Format token as string (with unit)
+    static QString formatTokenWithUnit(const QString unit, int decimals, const int256_t& amount, bool plussign=false, SeparatorStyle separators=separatorStandard);
     ///@}
 
     //! @name AbstractListModel implementation
@@ -108,8 +118,8 @@ public:
         /** Unit identifier */
         UnitRole = Qt::UserRole
     };
-    int rowCount(const QModelIndex& parent) const;
-    QVariant data(const QModelIndex& index, int role) const;
+    int rowCount(const QModelIndex &parent) const;
+    QVariant data(const QModelIndex &index, int role) const;
     ///@}
 
     static QString removeSpaces(QString text)

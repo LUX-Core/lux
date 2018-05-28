@@ -12,6 +12,7 @@
 #include "optionsmodel.h"
 #include "receiverequestdialog.h"
 #include "recentrequeststablemodel.h"
+#include "../wallet.h"
 #include "walletmodel.h"
 
 #include <QAction>
@@ -33,6 +34,12 @@ ReceiveCoinsDialog::ReceiveCoinsDialog(QWidget* parent) : QDialog(parent),
     ui->showRequestButton->setIcon(QIcon());
     ui->removeRequestButton->setIcon(QIcon());
 #endif
+
+    if (model->getDefaultAddressType() == OUTPUT_TYPE_BECH32) {
+        ui->useBech32->setCheckState(Qt::Checked);
+    } else {
+        ui->useBech32->setCheckState(Qt::Unchecked);
+    }
 
     // context menu actions
     QAction* copyLabelAction = new QAction(tr("Copy label"), this);
@@ -78,7 +85,7 @@ void ReceiveCoinsDialog::setModel(WalletModel* model)
             SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this,
             SLOT(recentRequestsView_selectionChanged(QItemSelection, QItemSelection)));
         // Last 2 columns are set by the columnResizingFixer, when the table geometry is ready.
-        columnResizingFixer = new GUIUtil::TableViewLastColumnResizingFixer(tableView, AMOUNT_MINIMUM_COLUMN_WIDTH, DATE_COLUMN_WIDTH);
+        columnResizingFixer = new GUIUtil::TableViewLastColumnResizingFixer(tableView, AMOUNT_MINIMUM_COLUMN_WIDTH, DATE_COLUMN_WIDTH, this, 2);
     }
 }
 
@@ -92,7 +99,6 @@ void ReceiveCoinsDialog::clear()
     ui->reqAmount->clear();
     ui->reqLabel->setText("");
     ui->reqMessage->setText("");
-    ui->reuseAddress->setChecked(false);
     updateDisplayUnit();
 }
 
@@ -120,23 +126,17 @@ void ReceiveCoinsDialog::on_receiveButton_clicked()
 
     QString address;
     QString label = ui->reqLabel->text();
-    if (ui->reuseAddress->isChecked()) {
-        /* Choose existing receiving address */
-        AddressBookPage dlg(AddressBookPage::ForSelection, AddressBookPage::ReceivingTab, this);
-        dlg.setModel(model->getAddressTableModel());
-        if (dlg.exec()) {
-            address = dlg.getReturnValue();
-            if (label.isEmpty()) /* If no label provided, use the previously used label */
-            {
-                label = model->getAddressTableModel()->labelForAddress(address);
-            }
-        } else {
-            return;
-        }
+    /* Generate new receiving address */
+    OutputType address_type;
+    if (ui->useBech32->isChecked()) {
+        address_type = OutputType::OUTPUT_TYPE_BECH32;
     } else {
-        /* Generate new receiving address */
-        address = model->getAddressTableModel()->addRow(AddressTableModel::Receive, label, "");
+        address_type = model->getDefaultAddressType();
+        if (address_type == OutputType::OUTPUT_TYPE_BECH32) {
+            address_type = OutputType::OUTPUT_TYPE_P2SH_SEGWIT;
+        }
     }
+    address = model->getAddressTableModel()->addRow(AddressTableModel::Receive, label, "", address_type);
     SendCoinsRecipient info(address, label,
         ui->reqAmount->value(), ui->reqMessage->text());
     ReceiveRequestDialog* dialog = new ReceiveRequestDialog(this);

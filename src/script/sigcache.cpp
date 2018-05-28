@@ -43,16 +43,12 @@ public:
 
     void Set(const uint256 &hash, const std::vector<unsigned char>& vchSig, const CPubKey& pubKey)
     {
-        // DoS prevention: limit cache size to less than 10MB
-        // (~200 bytes per cache entry times 50,000 entries)
-        // Since there are a maximum of 20,000 signature operations per block
-        // 50,000 is a reasonable default.
-        int64_t nMaxCacheSize = GetArg("-maxsigcachesize", 50000);
+        size_t nMaxCacheSize = GetArg("-maxsigcachesize", DEFAULT_MAX_SIG_CACHE_SIZE) * ((size_t) 1 << 20);
         if (nMaxCacheSize <= 0) return;
 
         boost::unique_lock<boost::shared_mutex> lock(cs_sigcache);
 
-        while (static_cast<int64_t>(setValid.size()) > nMaxCacheSize)
+        while (static_cast<size_t>(setValid.size()) > nMaxCacheSize)
         {
             // Evict a random entry. Random because that helps
             // foil would-be DoS attackers who might try to pre-generate

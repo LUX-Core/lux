@@ -21,18 +21,24 @@ QT_TS = \
 
 QT_FORMS_UI = \
   qt/forms/addressbookpage.ui \
-  qt/forms/createcontract.ui \
+  qt/forms/addtokenpage.ui \
   qt/forms/askpassphrasedialog.ui \
+  qt/forms/callcontract.ui \
   qt/forms/bip38tooldialog.ui \
   qt/forms/coincontroldialog.ui \
+  qt/forms/contractbookpage.ui \
+  qt/forms/contractresult.ui \
+  qt/forms/createcontract.ui \
   qt/forms/blockexplorer.ui \
   qt/forms/darksendconfig.ui \
   qt/forms/editaddressdialog.ui \
+  qt/forms/editcontractinfodialog.ui \
   qt/forms/helpmessagedialog.ui \
   qt/forms/intro.ui \
   qt/forms/eula.ui \
   qt/forms/masternodemanager.ui \
   qt/forms/addeditluxnode.ui \
+  qt/forms/lsrtoken.ui \
   qt/forms/luxnodeconfigdialog.ui \
   qt/forms/multisenddialog.ui \
   qt/forms/openuridialog.ui \
@@ -40,34 +46,50 @@ QT_FORMS_UI = \
   qt/forms/overviewpage.ui \
   qt/forms/tradingdialog.ui \
   qt/forms/receivecoinsdialog.ui \
+  qt/forms/receivetokenpage.ui \
   qt/forms/receiverequestdialog.ui \
   qt/forms/restoredialog.ui \
   qt/forms/rpcconsole.ui \
   qt/forms/sendcoinsdialog.ui \
+  qt/forms/sendtokenpage.ui \
   qt/forms/sendcoinsentry.ui \
+  qt/forms/sendtocontract.ui \
   qt/forms/signverifymessagedialog.ui \
+  qt/forms/smartcontract.ui \
+  qt/forms/tokendescdialog.ui \
   qt/forms/transactiondescdialog.ui
 
 QT_MOC_CPP = \
+  qt/moc_abifunctionfield.cpp \
+  qt/moc_abiparam.cpp \
+  qt/moc_abiparamitem.cpp \
+  qt/moc_abiparamsfield.cpp \
   qt/moc_addressbookpage.cpp \
   qt/moc_addressfield.cpp \
   qt/moc_qvalidatedtextedit.cpp \
   qt/moc_qvalidatedlineedit.cpp \
   qt/moc_createcontract.cpp \
   qt/moc_addresstablemodel.cpp \
+  qt/moc_addtokenpage.cpp \
   qt/moc_askpassphrasedialog.cpp \
   qt/moc_bip38tooldialog.cpp \
   qt/moc_bitcoinaddressvalidator.cpp \
   qt/moc_bitcoinamountfield.cpp \
   qt/moc_bitcoingui.cpp \
   qt/moc_bitcoinunits.cpp \
+  qt/moc_callcontract.cpp \
   qt/moc_blockexplorer.cpp \
   qt/moc_clientmodel.cpp \
   qt/moc_coincontroldialog.cpp \
   qt/moc_coincontroltreewidget.cpp \
+  qt/moc_contractbookpage.cpp \
+  qt/moc_contractresult.cpp \
+  qt/moc_contracttablemodel.cpp \
+  qt/moc_createcontract.cpp \
   qt/moc_csvmodelwriter.cpp \
   qt/moc_darksendconfig.cpp \
   qt/moc_editaddressdialog.cpp \
+  qt/moc_editcontractinfodialog.cpp \
   qt/moc_guiutil.cpp \
   qt/moc_intro.cpp \
   qt/moc_eula.cpp \
@@ -82,22 +104,36 @@ QT_MOC_CPP = \
   qt/moc_optionsdialog.cpp \
   qt/moc_optionsmodel.cpp \
   qt/moc_overviewpage.cpp \
-  qt/moc_stakingdialog.cpp \
   qt/moc_tradingdialog.cpp \
+  qt/moc_tokenamountfield.cpp \
   qt/moc_qcustomplot.cpp \
   qt/moc_peertablemodel.cpp \
   qt/moc_paymentserver.cpp \
+  qt/moc_lsrtoken.cpp \
   qt/moc_qvalidatedlineedit.cpp \
+  qt/moc_qvalidatedtextedit.cpp \
   qt/moc_qvaluecombobox.cpp \
   qt/moc_receivecoinsdialog.cpp \
   qt/moc_receiverequestdialog.cpp \
+  qt/moc_receivetokenpage.cpp \
   qt/moc_recentrequeststablemodel.cpp \
   qt/moc_restoredialog.cpp \
   qt/moc_rpcconsole.cpp \
   qt/moc_sendcoinsdialog.cpp \
   qt/moc_sendcoinsentry.cpp \
+  qt/moc_sendtocontract.cpp \
+  qt/moc_sendtokenpage.cpp \
   qt/moc_signverifymessagedialog.cpp \
+  qt/moc_smartcontract.cpp \
   qt/moc_splashscreen.cpp \
+  qt/moc_tabbarinfo.cpp \
+  qt/moc_tokenamountfield.cpp \
+  qt/moc_tokendescdialog.cpp \
+  qt/moc_tokenitemmodel.cpp \
+  qt/moc_tokenfilterproxy.cpp \
+  qt/moc_tokentransactionview.cpp \
+  qt/moc_tokentransactiontablemodel.cpp \
+  qt/moc_tokentransactiondesc.cpp \
   qt/moc_trafficgraphwidget.cpp \
   qt/moc_transactiondesc.cpp \
   qt/moc_transactiondescdialog.cpp \
@@ -118,6 +154,8 @@ QT_MOC = \
   qt/bitcoinamountfield.moc \
   qt/intro.moc \
   qt/eula.moc \
+  qt/tokenamountfield.moc \
+  qt/tokenitemmodel.moc \
   qt/overviewpage.moc \
   qt/rpcconsole.moc
 
@@ -131,12 +169,17 @@ PROTOBUF_H = qt/paymentrequest.pb.h
 PROTOBUF_PROTO = qt/paymentrequest.proto
 
 BITCOIN_QT_H = \
+  qt/abifunctionfield.h \
+  qt/abiparam.h \
+  qt/abiparamitem.h \
+  qt/abiparamsfield.h \
   qt/addressbookpage.h \
   qt/addressfield.h \
   qt/qvalidatedtextedit.h \
   qt/qvalidatedlineedit.h \
   qt/createcontract.h \
   qt/addresstablemodel.h \
+  qt/addtokenpage.h \
   qt/askpassphrasedialog.h \
   qt/bip38tooldialog.h \
   qt/bitcoinaddressvalidator.h \
@@ -145,11 +188,21 @@ BITCOIN_QT_H = \
   qt/bitcoinunits.h \
   qt/blockexplorer.h \
   qt/clientmodel.h \
+  qt/callcontract.h \
   qt/coincontroldialog.h \
   qt/coincontroltreewidget.h \
+  qt/contractabi.h \
+  qt/contractbookpage.h \
+  qt/contractresult.h \
+  qt/contracttablemodel.h \
+  qt/createcontract.h \
   qt/csvmodelwriter.h \
+  qt/customlist.h \
   qt/darksendconfig.h \
   qt/editaddressdialog.h \
+  qt/editcontractinfodialog.h \
+  qt/execrpccommand.h \
+  qt/eventlog.h \
   qt/guiconstants.h \
   qt/guiutil.h \
   qt/intro.h \
@@ -166,14 +219,14 @@ BITCOIN_QT_H = \
   qt/optionsdialog.h \
   qt/optionsmodel.h \
   qt/overviewpage.h \
-  qt/stakingtablemodel.h \
-  qt/stakingdialog.h \
   qt/tradingdialog.h \
   qt/paymentrequestplus.h \
   qt/paymentserver.h \
   qt/peertablemodel.h \
   qt/platformstyle.h \
+  qt/lsrtoken.h \
   qt/qvalidatedlineedit.h \
+  qt/qvalidatedtextedit.h \
   qt/qvaluecombobox.h \
   qt/receivecoinsdialog.h \
   qt/receiverequestdialog.h \
@@ -182,8 +235,20 @@ BITCOIN_QT_H = \
   qt/rpcconsole.h \
   qt/sendcoinsdialog.h \
   qt/sendcoinsentry.h \
+  qt/sendtocontract.h \
   qt/signverifymessagedialog.h \
+  qt/smartcontract.h \
   qt/splashscreen.h \
+  qt/tabbarinfo.h \
+  qt/token.h \
+  qt/tokenamountfield.h \
+  qt/tokendescdialog.h \
+  qt/tokenitemmodel.h \
+  qt/tokenfilterproxy.h \
+  qt/tokentransactionview.h \
+  qt/tokentransactionrecord.h \
+  qt/tokentransactiontablemodel.h \
+  qt/tokentransactiondesc.h \
   qt/trafficgraphwidget.h \
   qt/transactiondesc.h \
   qt/transactiondescdialog.h \
@@ -207,6 +272,7 @@ RES_ICONS = \
   qt/res/icons/bitcoin_testnet.ico \
   qt/res/icons/bitcoin_testnet.png \
   qt/res/icons/browse.png \
+  qt/res/icons/chevron.png \
   qt/res/icons/clock1.png \
   qt/res/icons/clock2.png \
   qt/res/icons/clock3.png \
@@ -228,13 +294,17 @@ RES_ICONS = \
   qt/res/icons/eye_minus.png \
   qt/res/icons/eye_plus.png \
   qt/res/icons/filesave.png \
+  qt/res/icons/fontbigger.png \
+  qt/res/icons/fontsmaller.png \
   qt/res/icons/history.png \
   qt/res/icons/key.png \
   qt/res/icons/lock_closed.png \
   qt/res/icons/lock_open.png \
   qt/res/icons/masternodes.png \
   qt/res/icons/overview.png \
+  qt/res/icons/smartcontract.png \
   qt/res/icons/qrcode.png \
+  qt/res/icons/lsrtoken.png \
   qt/res/icons/quit.png \
   qt/res/icons/receive.png \
   qt/res/icons/remove.png \
@@ -273,34 +343,53 @@ BITCOIN_QT_CPP = \
   qt/addeditluxnode.cpp \
   qt/luxnodeconfigdialog.cpp \
   qt/networkstyle.cpp \
+  qt/token.cpp \
   qt/notificator.cpp \
   qt/optionsdialog.cpp \
   qt/optionsmodel.cpp \
   qt/peertablemodel.cpp \
   qt/platformstyle.cpp \
   qt/qvalidatedlineedit.cpp \
+  qt/qvalidatedtextedit.cpp \
   qt/qvaluecombobox.cpp \
   qt/rpcconsole.cpp \
   qt/splashscreen.cpp \
+  qt/tabbarinfo.cpp \
+  qt/tokenitemmodel.cpp \
+  qt/tokenamountfield.cpp \
   qt/trafficgraphwidget.cpp \
   qt/utilitydialog.cpp \
   qt/winshutdownmonitor.cpp
 
 if ENABLE_WALLET
 BITCOIN_QT_CPP += \
+  qt/abifunctionfield.cpp \
+  qt/abiparam.cpp \
+  qt/abiparamitem.cpp \
+  qt/abiparamsfield.cpp \
   qt/addressbookpage.cpp \
   qt/addressfield.cpp \
   qt/qvalidatedtextedit.cpp \
   qt/qvalidatedlineedit.cpp \
   qt/createcontract.cpp \
   qt/addresstablemodel.cpp \
+  qt/addtokenpage.cpp \
   qt/askpassphrasedialog.cpp \
   qt/bip38tooldialog.cpp \
   qt/blockexplorer.cpp \
+  qt/callcontract.cpp \
   qt/coincontroldialog.cpp \
   qt/coincontroltreewidget.cpp \
+  qt/contractabi.cpp \
+  qt/contractbookpage.cpp \
+  qt/contractresult.cpp \
+  qt/contracttablemodel.cpp \
+  qt/createcontract.cpp \
   qt/darksendconfig.cpp \
   qt/editaddressdialog.cpp \
+  qt/execrpccommand.cpp \
+  qt/editcontractinfodialog.cpp \
+  qt/eventlog.cpp \
   qt/masternodemanager.cpp \
   qt/addeditluxnode.cpp \
   qt/luxnodeconfigdialog.cpp \
@@ -308,19 +397,27 @@ BITCOIN_QT_CPP += \
   qt/openuridialog.cpp \
   qt/overviewpage.cpp \
   qt/qcustomplot.cpp \
-  qt/stakingtablemodel.cpp \
-  qt/stakingfilterproxy.cpp \
-  qt/stakingdialog.cpp \
   qt/tradingdialog.cpp \
   qt/paymentrequestplus.cpp \
   qt/paymentserver.cpp \
+  qt/lsrtoken.cpp \
   qt/receivecoinsdialog.cpp \
   qt/receiverequestdialog.cpp \
+  qt/receivetokenpage.cpp \
   qt/recentrequeststablemodel.cpp \
   qt/restoredialog.cpp \
   qt/sendcoinsdialog.cpp \
   qt/sendcoinsentry.cpp \
+  qt/sendtocontract.cpp \
+  qt/sendtokenpage.cpp \
   qt/signverifymessagedialog.cpp \
+  qt/smartcontract.cpp \
+  qt/tokendescdialog.cpp \
+  qt/tokenfilterproxy.cpp \
+  qt/tokentransactionview.cpp \
+  qt/tokentransactionrecord.cpp \
+  qt/tokentransactiontablemodel.cpp \
+  qt/tokentransactiondesc.cpp \
   qt/transactiondesc.cpp \
   qt/transactiondescdialog.cpp \
   qt/transactionfilterproxy.cpp \
@@ -399,8 +496,9 @@ endif
 if ENABLE_ZMQ
 qt_lux_qt_LDADD += $(LIBBITCOIN_ZMQ) $(ZMQ_LIBS)
 endif
-qt_lux_qt_LDADD += $(LIBBITCOIN_CLI) $(LIBBITCOIN_COMMON) $(LIBBITCOIN_UTIL) $(LIBBITCOIN_CRYPTO) $(LIBBITCOIN_UNIVALUE) $(LIBLEVELDB) $(LIBMEMENV) \
-  $(BOOST_LIBS) $(QT_LIBS) $(QT_DBUS_LIBS) $(QR_LIBS) $(PROTOBUF_LIBS) $(BDB_LIBS) $(SSL_LIBS) $(CRYPTO_LIBS) $(MINIUPNPC_LIBS) $(LIBSECP256K1)
+qt_lux_qt_LDADD += $(LIBBITCOIN_CLI) $(LIBBITCOIN_COMMON) $(LIBBITCOIN_CONSENSUS) $(LIBBITCOIN_UTIL) $(LIBBITCOIN_CRYPTO) $(LIBBITCOIN_UNIVALUE) $(LIBLEVELDB) $(LIBMEMENV) \
+  $(BOOST_LIBS) $(QT_LIBS) $(QT_DBUS_LIBS) $(QR_LIBS) $(PROTOBUF_LIBS) $(BDB_LIBS) $(SSL_LIBS) $(CRYPTO_LIBS) $(MINIUPNPC_LIBS) $(LIBSECP256K1) \
+  $(LIBCRYPTOPP)
 qt_lux_qt_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(QT_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
 qt_lux_qt_LIBTOOLFLAGS = --tag CXX
 

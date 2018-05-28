@@ -15,13 +15,17 @@
 #include "multisenddialog.h"
 #include "optionsmodel.h"
 #include "overviewpage.h"
+//#include "platformstyle.h"
 #include "receivecoinsdialog.h"
 #include "sendcoinsdialog.h"
 #include "signverifymessagedialog.h"
 #include "transactiontablemodel.h"
+#include "tokentransactiontablemodel.h"
 #include "transactionview.h"
 #include "walletmodel.h"
 #include "tradingdialog.h"
+#include "smartcontract.h"
+#include "lsrtoken.h"
 #include "restoredialog.h"
 
 #include "ui_interface.h"
@@ -36,22 +40,23 @@
 #include <QSettings>
 #include <QVBoxLayout>
 
+
 WalletView::WalletView(QWidget* parent) : QStackedWidget(parent),
                                           clientModel(0),
                                           walletModel(0)
 {
     // Create tabs
-    overviewPage = new OverviewPage();
+    overviewPage = new OverviewPage(this);
     explorerWindow = new BlockExplorer(this);
     transactionsPage = new QWidget(this);
-    smartToken=new CreateContract(this);
-    stakingPage = new StakingDialog(this);
+    smartContractPage = new SmartContract(this);
+    LSRTokenPage = new LSRToken(this);
     tradingPage = new tradingDialog(this);
     QVBoxLayout* vbox = new QVBoxLayout();
     QHBoxLayout* hbox_buttons = new QHBoxLayout();
     transactionView = new TransactionView(this);
     vbox->addWidget(transactionView);
-    QPushButton* exportButton = new QPushButton(tr("&Export"), this);
+    QPushButton *exportButton = new QPushButton(tr("&Export"), this);
     exportButton->setToolTip(tr("Export the data in the current tab to a file"));
 #ifndef Q_OS_MAC // Icons on push buttons are very uncommon on Mac
     exportButton->setIcon(QIcon(":/icons/export"));
@@ -78,15 +83,15 @@ WalletView::WalletView(QWidget* parent) : QStackedWidget(parent),
     receiveCoinsPage = new ReceiveCoinsDialog();
     sendCoinsPage = new SendCoinsDialog();
 
-   // addWidget(overviewPage);
     addWidget(overviewPage);
     addWidget(transactionsPage);
-    addWidget(stakingPage);
+
     addWidget(tradingPage);
     addWidget(receiveCoinsPage);
     addWidget(sendCoinsPage);
     addWidget(explorerWindow);
-    addWidget(smartToken);   // Testing
+    addWidget(smartContractPage);   // Testing
+    addWidget(LSRTokenPage);
 
     QSettings settings;
     if (settings.value("fShowMasternodesTab").toBool()) {
@@ -131,6 +136,13 @@ void WalletView::setBitcoinGUI(BitcoinGUI* gui)
 
         // Pass through transaction notifications
         connect(this, SIGNAL(incomingTransaction(QString, int, CAmount, QString, QString)), gui, SLOT(incomingTransaction(QString, int, CAmount, QString, QString)));
+
+        // Pass through token transaction notifications
+        connect(this, SIGNAL(incomingTokenTransaction(QString,QString,QString,QString,QString,QString)), gui, SLOT(incomingTokenTransaction(QString,QString,QString,QString,QString,QString)));
+
+        // Clicking on add token button sends you to add token page
+        connect(overviewPage, SIGNAL(addTokenClicked(bool)), gui, SLOT(gotoLSRTokenPage(bool)));
+
     }
 }
 
@@ -140,6 +152,8 @@ void WalletView::setClientModel(ClientModel* clientModel)
 
     overviewPage->setClientModel(clientModel);
     sendCoinsPage->setClientModel(clientModel);
+    smartContractPage->setClientModel(clientModel);
+    LSRTokenPage->setClientModel(clientModel);
     QSettings settings;
     if (settings.value("fShowMasternodesTab").toBool()) {
         masternodeManagerPage->setClientModel(clientModel);
@@ -153,6 +167,8 @@ void WalletView::setWalletModel(WalletModel* walletModel)
     // Put transaction list in tabs
     transactionView->setModel(walletModel);
     overviewPage->setWalletModel(walletModel);
+    smartContractPage->setModel(walletModel);
+    LSRTokenPage->setModel(walletModel);
     QSettings settings;
     if (settings.value("fShowMasternodesTab").toBool()) {
         masternodeManagerPage->setWalletModel(walletModel);
@@ -171,6 +187,10 @@ void WalletView::setWalletModel(WalletModel* walletModel)
         // Balloon pop-up for new transaction
         connect(walletModel->getTransactionTableModel(), SIGNAL(rowsInserted(QModelIndex, int, int)),
             this, SLOT(processNewTransaction(QModelIndex, int, int)));
+
+        // Balloon pop-up for new token transaction
+        connect(walletModel->getTokenTransactionTableModel(), SIGNAL(rowsInserted(QModelIndex,int,int)),
+                this, SLOT(processNewTokenTransaction(QModelIndex,int,int)));
 
         // Ask for passphrase if needed
         connect(walletModel, SIGNAL(requireUnlock()), this, SLOT(unlockWallet()));
@@ -194,8 +214,31 @@ void WalletView::processNewTransaction(const QModelIndex& parent, int start, int
     qint64 amount = ttm->index(start, TransactionTableModel::Amount, parent).data(Qt::EditRole).toULongLong();
     QString type = ttm->index(start, TransactionTableModel::Type, parent).data().toString();
     QString address = ttm->index(start, TransactionTableModel::ToAddress, parent).data().toString();
+    QString label = ttm->index(start, TransactionTableModel::LabelRole, parent).data().toString();
 
-    emit incomingTransaction(date, walletModel->getOptionsModel()->getDisplayUnit(), amount, type, address);
+    emit incomingTransaction(date, walletModel->getOptionsModel()->getDisplayUnit(), amount, type, address, label);
+}
+
+// ----------------------------------------------------------------------------------------------- //
+void WalletView::processNewTokenTransaction(const QModelIndex &parent, int start, int /*end*/)
+{
+    // Prevent balloon-spam when initial block download is in progress
+    if (!walletModel || !clientModel || clientModel->inInitialBlockDownload())
+        return;
+
+    TokenTransactionTableModel* ttm = walletModel->getTokenTransactionTableModel();
+    if (!ttm || ttm->processingQueuedTransactions())
+        return;
+
+    QString date = ttm->index(start, TokenTransactionTableModel::Date, parent).data().toString();
+    QString amount(ttm->index(start, TokenTransactionTableModel::Amount, parent).data(TokenTransactionTableModel::FormattedAmountWithUnitRole).toString());
+    QString type = ttm->index(start, TokenTransactionTableModel::Type, parent).data().toString();
+    //QModelIndex index = ttm->index(start, 0, parent);
+    QString address = ttm->index(start, TokenTransactionTableModel::AddressRole, parent).data().toString();
+    QString label = ttm->index(start, TokenTransactionTableModel::LabelRole, parent).data().toString();
+    QString title = ttm->index(start, TokenTransactionTableModel::TypeRole, parent).data().toString();
+
+    emit incomingTokenTransaction(date, amount, type, address, label, title);
 }
 
 void WalletView::gotoOverviewPage()
@@ -206,11 +249,6 @@ void WalletView::gotoOverviewPage()
 void WalletView::gotoHistoryPage()
 {
     setCurrentWidget(transactionsPage);
-}
-
-void WalletView::gotoStakingPage()
-{
-    setCurrentWidget(stakingPage);
 }
 
 void WalletView::gotoTradingPage()
@@ -230,10 +268,18 @@ void WalletView::gotoMasternodePage()
         setCurrentWidget(masternodeManagerPage);
     }
 }
-void WalletView::gotoSmartTokenPage()
+void WalletView::gotoSmartContractPage()
 {
-    setCurrentWidget(smartToken);       //Testing
+    setCurrentWidget(smartContractPage);       //Testing
 }
+
+void WalletView::gotoLSRTokenPage(bool toAddTokenPage)
+{
+    setCurrentWidget(LSRTokenPage);
+    if(toAddTokenPage)
+        LSRTokenPage->on_goToAddTokenPage();
+}
+
 void WalletView::gotoReceiveCoinsPage()
 {
     setCurrentWidget(receiveCoinsPage);

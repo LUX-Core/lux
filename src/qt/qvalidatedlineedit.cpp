@@ -9,7 +9,8 @@
 
 QValidatedLineEdit::QValidatedLineEdit(QWidget* parent) : QLineEdit(parent),
                                                           valid(true),
-                                                          checkValidator(0)
+                                                          checkValidator(0),
+                                                          emptyIsValid(true)
 {
     connect(this, SIGNAL(textChanged(QString)), this, SLOT(markValid()));
 }
@@ -43,6 +44,16 @@ void QValidatedLineEdit::focusOutEvent(QFocusEvent* evt)
     QLineEdit::focusOutEvent(evt);
 }
 
+bool QValidatedLineEdit::getEmptyIsValid() const
+{
+    return emptyIsValid;
+}
+
+void QValidatedLineEdit::setEmptyIsValid(bool value)
+{
+    emptyIsValid = value;
+}
+
 void QValidatedLineEdit::markValid()
 {
     // As long as a user is typing ensure we display state as valid
@@ -70,7 +81,7 @@ void QValidatedLineEdit::setEnabled(bool enabled)
 
 void QValidatedLineEdit::checkValidity()
 {
-    if (text().isEmpty()) {
+    if (emptyIsValid && text().isEmpty()) {
         setValid(true);
     } else if (hasAcceptableInput()) {
         setValid(true);
@@ -86,9 +97,25 @@ void QValidatedLineEdit::checkValidity()
         }
     } else
         setValid(false);
+
+    Q_EMIT validationDidChange(this);
 }
 
 void QValidatedLineEdit::setCheckValidator(const QValidator* v)
 {
     checkValidator = v;
+}
+
+bool QValidatedLineEdit::isValid()
+{
+    // use checkValidator in case the QValidatedLineEdit is disabled
+    if (checkValidator)
+    {
+        QString address = text();
+        int pos = 0;
+        if (checkValidator->validate(address, pos) == QValidator::Acceptable)
+            return true;
+    }
+
+    return valid;
 }

@@ -153,7 +153,12 @@ void ClientModel::updateNumConnections(int numConnections)
     emit numConnectionsChanged(numConnections);
 }
 
-void ClientModel::updateAlert(const QString& hash, int status)
+void ClientModel::updateNetworkActive(bool networkActive)
+{
+    emit networkActiveChanged(networkActive);
+}
+
+void ClientModel::updateAlert(const QString &hash, int status)
 {
     // Show error message notification for new alert
     if (status == CT_NEW) {
@@ -166,6 +171,16 @@ void ClientModel::updateAlert(const QString& hash, int status)
     }
 
     emit alertsChanged(getStatusBarWarnings());
+}
+
+void ClientModel::getGasInfo(uint64_t& blockGasLimit, uint64_t& minGasPrice, uint64_t& nGasPrice) const
+{
+    LOCK(cs_main);
+
+    LuxDGP luxDGP(globalState.get(), fGettingValuesDGP);
+    blockGasLimit = luxDGP.getBlockGasLimit(chainActive.Height());
+    minGasPrice = CAmount(luxDGP.getMinGasPrice(chainActive.Height()));
+    nGasPrice = (minGasPrice>DEFAULT_GAS_PRICE) ? minGasPrice : DEFAULT_GAS_PRICE;
 }
 
 bool ClientModel::inInitialBlockDownload() const
@@ -183,6 +198,16 @@ enum BlockSource ClientModel::getBlockSource() const
         return BLOCK_SOURCE_NETWORK;
 
     return BLOCK_SOURCE_NONE;
+}
+
+void ClientModel::setNetworkActive(bool active)
+{
+    SetNetworkActive(active);
+}
+
+bool ClientModel::getNetworkActive() const
+{
+    return fNetworkActive;
 }
 
 QString ClientModel::getStatusBarWarnings() const
@@ -241,7 +266,13 @@ static void NotifyNumConnectionsChanged(ClientModel* clientmodel, int newNumConn
         Q_ARG(int, newNumConnections));
 }
 
-static void NotifyAlertChanged(ClientModel* clientmodel, const uint256& hash, ChangeType status)
+static void NotifyNetworkActiveChanged(ClientModel *clientmodel, bool networkActive)
+{
+    QMetaObject::invokeMethod(clientmodel, "updateNetworkActive", Qt::QueuedConnection,
+                              Q_ARG(bool, networkActive));
+}
+
+static void NotifyAlertChanged(ClientModel *clientmodel, const uint256 &hash, ChangeType status)
 {
     qDebug() << "NotifyAlertChanged : " + QString::fromStdString(hash.GetHex()) + " status=" + QString::number(status);
     QMetaObject::invokeMethod(clientmodel, "updateAlert", Qt::QueuedConnection,
@@ -254,6 +285,7 @@ void ClientModel::subscribeToCoreSignals()
     // Connect signals to client
     uiInterface.ShowProgress.connect(boost::bind(ShowProgress, this, _1, _2));
     uiInterface.NotifyNumConnectionsChanged.connect(boost::bind(NotifyNumConnectionsChanged, this, _1));
+    uiInterface.NotifyNetworkActiveChanged.connect(boost::bind(NotifyNetworkActiveChanged, this, _1));
     uiInterface.NotifyAlertChanged.connect(boost::bind(NotifyAlertChanged, this, _1, _2));
 }
 
@@ -262,5 +294,6 @@ void ClientModel::unsubscribeFromCoreSignals()
     // Disconnect signals from client
     uiInterface.ShowProgress.disconnect(boost::bind(ShowProgress, this, _1, _2));
     uiInterface.NotifyNumConnectionsChanged.disconnect(boost::bind(NotifyNumConnectionsChanged, this, _1));
+    uiInterface.NotifyNetworkActiveChanged.disconnect(boost::bind(NotifyNetworkActiveChanged, this, _1));
     uiInterface.NotifyAlertChanged.disconnect(boost::bind(NotifyAlertChanged, this, _1, _2));
 }

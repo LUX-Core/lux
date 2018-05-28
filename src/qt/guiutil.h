@@ -28,6 +28,7 @@ class QFont;
 class QLineEdit;
 class QUrl;
 class QWidget;
+class QToolButton;
 QT_END_NAMESPACE
 
 /** Utility functions used by the LUX Qt UI.
@@ -66,6 +67,8 @@ QString HtmlEscape(const std::string& str, bool fMultiLine = false);
 void copyEntryData(QAbstractItemView* view, int column, int role = Qt::EditRole);
 
     QString getEntryData(QAbstractItemView *view, int column, int role);
+
+void copyEntryDataFromList(QAbstractItemView *view, int role=Qt::EditRole);
 
 void setClipboard(const QString& str);
 
@@ -150,7 +153,7 @@ class TableViewLastColumnResizingFixer : public QObject
     Q_OBJECT
 
 public:
-    TableViewLastColumnResizingFixer(QTableView* table, int lastColMinimumWidth, int allColsMinimumWidth);
+    TableViewLastColumnResizingFixer(QTableView* table, int lastColMinimumWidth, int allColsMinimumWidth, QObject *parent, int columnStretch = 2);
     void stretchColumnWidth(int column);
 
 private:
@@ -232,6 +235,9 @@ class ProgressBar : public QProgressBar
 #else
 typedef QProgressBar ProgressBar;
 #endif
+
+    void formatToolButtons(QToolButton* btn1, QToolButton* btn2 = 0, QToolButton* btn3 = 0);
+
 
 } // namespace GUIUtil
 

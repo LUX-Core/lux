@@ -85,7 +85,7 @@ void AddEditLuxNode::on_okButton_clicked()
             walletdb.WriteAccount(c.sAlias, account);
         }
 
-        c.sCollateralAddress = CBitcoinAddress(account.vchPubKey.GetID()).ToString();
+        c.sCollateralAddress = EncodeDestination(account.vchPubKey.GetID());
 
         pwalletMain->mapMyLuxNodes.insert(make_pair(c.sAddress, c));
 	walletdb.WriteLuxNodeConfig(c.sAddress, c);

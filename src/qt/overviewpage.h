@@ -8,14 +8,15 @@
 #include "amount.h"
 
 #include <QWidget>
+#include <memory>
 
 class ClientModel;
 class TransactionFilterProxy;
 class TxViewDelegate;
+class TknViewDelegate;
 class WalletModel;
 
-namespace Ui
-{
+namespace Ui {
 class OverviewPage;
 }
 
@@ -43,6 +44,7 @@ public slots:
 
 signals:
     void transactionClicked(const QModelIndex& index);
+    void addTokenClicked(bool toAddTokenPage);
 
 private:
     QTimer* timer;
@@ -59,6 +61,7 @@ private:
     int nDisplayUnit;
 
     TxViewDelegate* txdelegate;
+    TknViewDelegate *tkndelegate;
     TransactionFilterProxy* filter;
 
 private slots:
@@ -69,6 +72,7 @@ private slots:
     void handleTransactionClicked(const QModelIndex& index);
     void updateAlerts(const QString& warnings);
     void updateWatchOnlyLabels(bool showWatchOnly);
+    void on_buttonAddToken_clicked();
 };
 
 #endif // BITCOIN_QT_OVERVIEWPAGE_H

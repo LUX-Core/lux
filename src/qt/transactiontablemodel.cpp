@@ -26,12 +26,12 @@
 
 // Amount column is right-aligned it contains numbers
 static int column_alignments[] = {
-    Qt::AlignLeft | Qt::AlignVCenter, /* status */
-    Qt::AlignLeft | Qt::AlignVCenter, /* watchonly */
-    Qt::AlignLeft | Qt::AlignVCenter, /* date */
-    Qt::AlignLeft | Qt::AlignVCenter, /* type */
-    Qt::AlignLeft | Qt::AlignVCenter, /* address */
-    Qt::AlignRight | Qt::AlignVCenter /* amount */
+        Qt::AlignLeft | Qt::AlignVCenter, /* status */
+        Qt::AlignLeft | Qt::AlignVCenter, /* watchonly */
+        Qt::AlignLeft | Qt::AlignVCenter, /* date */
+        Qt::AlignLeft | Qt::AlignVCenter, /* type */
+        Qt::AlignLeft | Qt::AlignVCenter, /* address */
+        Qt::AlignRight | Qt::AlignVCenter /* amount */
 };
 
 // Comparison operator for sort/binary search of model tx list
@@ -94,9 +94,9 @@ public:
 
         // Find bounds of this transaction in model
         QList<TransactionRecord>::iterator lower = qLowerBound(
-            cachedWallet.begin(), cachedWallet.end(), hash, TxLessThan());
+                cachedWallet.begin(), cachedWallet.end(), hash, TxLessThan());
         QList<TransactionRecord>::iterator upper = qUpperBound(
-            cachedWallet.begin(), cachedWallet.end(), hash, TxLessThan());
+                cachedWallet.begin(), cachedWallet.end(), hash, TxLessThan());
         int lowerIndex = (lower - cachedWallet.begin());
         int upperIndex = (upper - cachedWallet.begin());
         bool inModel = (lower != upper);
@@ -109,52 +109,52 @@ public:
         }
 
         qDebug() << "    inModel=" + QString::number(inModel) +
-                        " Index=" + QString::number(lowerIndex) + "-" + QString::number(upperIndex) +
-                        " showTransaction=" + QString::number(showTransaction) + " derivedStatus=" + QString::number(status);
+                    " Index=" + QString::number(lowerIndex) + "-" + QString::number(upperIndex) +
+                    " showTransaction=" + QString::number(showTransaction) + " derivedStatus=" + QString::number(status);
 
         switch (status) {
-        case CT_NEW:
-            if (inModel) {
-                qWarning() << "TransactionTablePriv::updateWallet : Warning: Got CT_NEW, but transaction is already in model";
-                break;
-            }
-            if (showTransaction) {
-                LOCK2(cs_main, wallet->cs_wallet);
-                // Find transaction in wallet
-                std::map<uint256, CWalletTx>::iterator mi = wallet->mapWallet.find(hash);
-                if (mi == wallet->mapWallet.end()) {
-                    qWarning() << "TransactionTablePriv::updateWallet : Warning: Got CT_NEW, but transaction is not in wallet";
+            case CT_NEW:
+                if (inModel) {
+                    qWarning() << "TransactionTablePriv::updateWallet : Warning: Got CT_NEW, but transaction is already in model";
                     break;
                 }
-                // Added -- insert at the right position
-                QList<TransactionRecord> toInsert =
-                    TransactionRecord::decomposeTransaction(wallet, mi->second);
-                if (!toInsert.isEmpty()) /* only if something to insert */
-                {
-                    parent->beginInsertRows(QModelIndex(), lowerIndex, lowerIndex + toInsert.size() - 1);
-                    int insert_idx = lowerIndex;
-                    foreach (const TransactionRecord& rec, toInsert) {
-                        cachedWallet.insert(insert_idx, rec);
-                        insert_idx += 1;
+                if (showTransaction) {
+                    LOCK2(cs_main, wallet->cs_wallet);
+                    // Find transaction in wallet
+                    std::map<uint256, CWalletTx>::iterator mi = wallet->mapWallet.find(hash);
+                    if (mi == wallet->mapWallet.end()) {
+                        qWarning() << "TransactionTablePriv::updateWallet : Warning: Got CT_NEW, but transaction is not in wallet";
+                        break;
                     }
-                    parent->endInsertRows();
+                    // Added -- insert at the right position
+                    QList<TransactionRecord> toInsert =
+                            TransactionRecord::decomposeTransaction(wallet, mi->second);
+                    if (!toInsert.isEmpty()) /* only if something to insert */
+                    {
+                        parent->beginInsertRows(QModelIndex(), lowerIndex, lowerIndex + toInsert.size() - 1);
+                        int insert_idx = lowerIndex;
+                        foreach (const TransactionRecord& rec, toInsert) {
+                            cachedWallet.insert(insert_idx, rec);
+                            insert_idx += 1;
+                        }
+                        parent->endInsertRows();
+                    }
                 }
-            }
-            break;
-        case CT_DELETED:
-            if (!inModel) {
-                qWarning() << "TransactionTablePriv::updateWallet : Warning: Got CT_DELETED, but transaction is not in model";
                 break;
-            }
-            // Removed -- remove entire transaction from table
-            parent->beginRemoveRows(QModelIndex(), lowerIndex, upperIndex - 1);
-            cachedWallet.erase(lower, upper);
-            parent->endRemoveRows();
-            break;
-        case CT_UPDATED:
-            // Miscellaneous updates -- nothing to do, status update will take care of this, and is only computed for
-            // visible transactions.
-            break;
+            case CT_DELETED:
+                if (!inModel) {
+                    qWarning() << "TransactionTablePriv::updateWallet : Warning: Got CT_DELETED, but transaction is not in model";
+                    break;
+                }
+                // Removed -- remove entire transaction from table
+                parent->beginRemoveRows(QModelIndex(), lowerIndex, upperIndex - 1);
+                cachedWallet.erase(lower, upper);
+                parent->endRemoveRows();
+                break;
+            case CT_UPDATED:
+                // Miscellaneous updates -- nothing to do, status update will take care of this, and is only computed for
+                // visible transactions.
+                break;
         }
     }
 

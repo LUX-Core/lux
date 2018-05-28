@@ -6,13 +6,14 @@
 #ifndef BITCOIN_PRIMITIVES_BLOCK_H
 #define BITCOIN_PRIMITIVES_BLOCK_H
 
-#include "primitives/transaction.h"
+#include <primitives/transaction.h>
+#include <serialize.h>
+#include <uint256.h>
 #include "keystore.h"
-#include "serialize.h"
-#include "uint256.h"
 
 /** The maximum allowed size for a serialized block, in bytes (network rule) */
 static const unsigned int MAX_BLOCK_SIZE = 6000000;
+static const int SC_BLOCK_VERSION = 8;
 
 /** Nodes collect new transactions into a block, hash them into a hash tree,
  * and scan through nonce values to make the block's hash satisfy proof-of-work
@@ -33,6 +34,8 @@ public:
     uint32_t nTime;
     uint32_t nBits;
     uint32_t nNonce;
+    uint256 hashStateRoot; // lux
+    uint256 hashUTXORoot; // lux
 
     CBlockHeader()
     {
@@ -44,22 +47,27 @@ public:
     template <typename Stream, typename Operation>
     inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion) {
         READWRITE(this->nVersion);
-        nVersion = this->nVersion;
         READWRITE(hashPrevBlock);
         READWRITE(hashMerkleRoot);
         READWRITE(nTime);
         READWRITE(nBits);
         READWRITE(nNonce);
+//        if (this->nVersion >= SC_BLOCK_VERSION) {
+//            READWRITE(hashStateRoot); // lux
+//            READWRITE(hashUTXORoot); // lux
+//        }
     }
 
     void SetNull()
     {
-        nVersion = CBlockHeader::CURRENT_VERSION;
+        nVersion = 0;
         hashPrevBlock = 0;
         hashMerkleRoot = 0;
         nTime = 0;
         nBits = 0;
         nNonce = 0;
+        hashStateRoot = 0; // lux
+        hashUTXORoot = 0; // lux
     }
 
     bool IsNull() const
@@ -67,14 +75,13 @@ public:
         return (nBits == 0);
     }
 
-    uint256 GetHash() const;
+    uint256 GetHash(bool phi2block = false) const;
 
-    int64_t GetBlockTime() const
-    {
+    int64_t GetBlockTime() const {
         return (int64_t)nTime;
     }
-};
 
+};
 
 class CBlock : public CBlockHeader
 {
@@ -105,7 +112,6 @@ public:
     template <typename Stream, typename Operation>
     inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion) {
         READWRITE(*(CBlockHeader*)this);
-#       if 1
         if (!(nType & SER_GETHASH)) {
             READWRITE(vtx);
             READWRITE(vchBlockSig);
@@ -113,11 +119,6 @@ public:
             const_cast<CBlock*>(this)->vtx.clear();
             const_cast<CBlock*>(this)->vchBlockSig.clear();
         }
-#       else
-        READWRITE(vtx);
-	if(vtx.size() > 1 && vtx[1].IsCoinStake())
-            READWRITE(vchBlockSig);
-#       endif
     }
 
     void SetNull()
@@ -138,6 +139,8 @@ public:
         block.nTime          = nTime;
         block.nBits          = nBits;
         block.nNonce         = nNonce;
+        block.hashStateRoot  = hashStateRoot; // lux
+        block.hashUTXORoot   = hashUTXORoot; // lux
         return block;
     }
 
@@ -178,10 +181,7 @@ struct CBlockLocator
 
     CBlockLocator() {}
 
-    CBlockLocator(const std::vector<uint256>& vHaveIn)
-    {
-        vHave = vHaveIn;
-    }
+    explicit CBlockLocator(const std::vector<uint256>& vHaveIn) : vHave(vHaveIn) {}
 
     ADD_SERIALIZE_METHODS;
 
@@ -197,10 +197,13 @@ struct CBlockLocator
         vHave.clear();
     }
 
-    bool IsNull()
+    bool IsNull() const
     {
         return vHave.empty();
     }
 };
+
+/** Compute the consensus-critical block cost (see BIP 141). */
+int64_t GetBlockCost(const CBlock& tx);
 
 #endif // BITCOIN_PRIMITIVES_BLOCK_H

@@ -24,6 +24,7 @@ class NetworkStyle;
 class Notificator;
 class OptionsModel;
 class BlockExplorer;
+//class PlatformStyle;
 class RPCConsole;
 class SendCoinsRecipient;
 class UnitDisplayStatusBarControl;
@@ -38,6 +39,7 @@ QT_BEGIN_NAMESPACE
 class QAction;
 class QProgressBar;
 class QProgressDialog;
+class QDockWidget;
 QT_END_NAMESPACE
 
 /**
@@ -92,10 +94,8 @@ private:
     QProgressDialog* progressDialog;
 
     QMenuBar* appMenuBar;
-    QAction* smartToken;
     QAction* overviewAction;
     QAction* historyAction;
-    QAction* stakingAction;
     QAction* tradingAction;
     QAction* masternodeAction;
     QAction* quitAction;
@@ -111,7 +111,7 @@ private:
     QAction* toggleHideAction;
     QAction* encryptWalletAction;
     QAction* backupWalletAction;
-    QAction *restoreWalletAction;
+    QAction* restoreWalletAction;
     QAction* changePassphraseAction;
     QAction* unlockWalletAction;
     QAction* lockWalletAction;
@@ -128,6 +128,8 @@ private:
     QAction* openBlockExplorerAction;
     QAction* showHelpMessageAction;
     QAction* multiSendAction;
+    QAction* smartContractAction;
+    QAction* LSRTokenAction;
 
     QSystemTrayIcon* trayIcon;
     QMenu* trayIconMenu;
@@ -150,6 +152,9 @@ private:
     /** Create system tray menu (or setup the dock menu) */
     void createTrayIconMenu();
 
+    /** Update UI with latest network info from model. */
+    void updateNetworkState();
+
     /** Enable or disable all wallet-related actions */
     void setWalletActionsEnabled(bool enabled);
 
@@ -167,6 +172,8 @@ signals:
 public slots:
     /** Set number of connections shown in the UI */
     void setNumConnections(int count);
+    /** Set network state shown in the UI */
+    void setNetworkActive(bool networkActive);
     /** Set number of blocks shown in the UI */
     void setNumBlocks(int count);
     /** Get restart command-line parameters and request restart */
@@ -194,6 +201,10 @@ public slots:
 
     /** Show incoming transaction notification for new transactions. */
     void incomingTransaction(const QString& date, int unit, const CAmount& amount, const QString& type, const QString& address);
+
+    /** Show incoming token transaction notification for new transactions. */
+    void incomingTokenTransaction(const QString& date, const QString& amount, const QString& type, const QString& address, const QString& label, const QString& title);
+
 #endif // ENABLE_WALLET
 
 private slots:
@@ -202,16 +213,16 @@ private slots:
     void gotoOverviewPage();
     /** Switch to history (transactions) page */
     void gotoHistoryPage();
-    /** Switch to staking page */
-    void gotoStakingPage();
     /** Switch to trading page */
     void gotoTradingPage();
     /** Switch to Explorer Page */
     void gotoBlockExplorerPage();
     /** Switch to masternode page */
     void gotoMasternodePage();
-    /** Switch to gotoSmartTokenPage*/
-    void gotoSmartTokenPage();
+    /** Switch to smart contract page */
+    void gotoSmartContractPage();
+    /** Switch to LSRToken page page */
+    void gotoLSRTokenPage(bool toAddTokenPage = false);
     /** Switch to receive coins page */
     void gotoReceiveCoinsPage();
     /** Switch to send coins page */

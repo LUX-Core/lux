@@ -44,6 +44,8 @@ static bool fRPCInWarmup = true;
 static std::string rpcWarmupStatus("RPC server started");
 static CCriticalSection cs_rpcWarmup;
 
+static std::vector<RPCTimerInterface*> timerInterfaces;
+
 //! These are created by StartRPCThreads, destroyed in StopRPCThreads
 static asio::io_service* rpc_io_service = NULL;
 static map<string, boost::shared_ptr<deadline_timer> > deadlineTimers;
@@ -274,11 +276,16 @@ static const CRPCCommand vRPCCommands[] =
         /* P2P networking */
         {"network", "getnetworkinfo", &getnetworkinfo, true, false, false},
         {"network", "addnode", &addnode, true, true, false},
+        //{"network", "disconnectnode", &disconnectnode, true, true, false},
         {"network", "getaddednodeinfo", &getaddednodeinfo, true, true, false},
         {"network", "getconnectioncount", &getconnectioncount, true, false, false},
         {"network", "getnettotals", &getnettotals, true, true, false},
         {"network", "getpeerinfo", &getpeerinfo, true, false, false},
         {"network", "ping", &ping, true, false, false},
+        {"network", "setban", &setban, true, false, false},
+        {"network", "listbanned", &listbanned, true, false, false},
+        {"network", "clearbanned", &clearbanned, true, false, false},
+        {"network", "switchnetwork", &switchnetwork, true, false, false },
 
         /* Block chain and UTXO */
         {"blockchain", "getblockchaininfo", &getblockchaininfo, true, false, false},
@@ -289,7 +296,7 @@ static const CRPCCommand vRPCCommands[] =
         {"blockchain", "getblockhashes", &getblockhashes, true, false, false},
         {"blockchain", "getblockheader", &getblockheader, false, false, false},
         {"blockchain", "getchaintips", &getchaintips, true, false, false},
-        {"blockchain", "getpowdifficulty", &getpowdifficulty, true, false, false},
+        {"blockchain", "getdifficulty", &getdifficulty, true, false, false},
         {"blockchain", "getmempoolinfo", &getmempoolinfo, true, true, false},
         {"blockchain", "getrawmempool", &getrawmempool, true, false, false},
         {"blockchain", "gettxout", &gettxout, true, false, false},
@@ -298,8 +305,14 @@ static const CRPCCommand vRPCCommands[] =
         {"blockchain", "invalidateblock", &invalidateblock, true, true, false},
         {"blockchain", "reconsiderblock", &reconsiderblock, true, true, false},
 
+        /*Smart Contract*/
+        {"blockchain", "callcontract", &callcontract,true, true, false },
+        {"blockchain", "createcontract", &createcontract,true, true, false },
+        {"blockchain", "sendtocontract", &sendtocontract,true, true, false },
+
         /* Mining */
         {"mining", "getblocktemplate", &getblocktemplate, true, false, false},
+        {"mining", "getwork", &getwork, true, false, false},
         {"mining", "getmininginfo", &getmininginfo, true, false, false},
         {"mining", "getnetworkhashps", &getnetworkhashps, true, false, false},
         {"mining", "prioritisetransaction", &prioritisetransaction, true, false, false},
@@ -323,10 +336,13 @@ static const CRPCCommand vRPCCommands[] =
 
         /* Utility functions */
         {"util", "createmultisig", &createmultisig, true, true, false},
+        {"util", "createwitnessaddress", &createwitnessaddress, true, true, false},
         {"util", "validateaddress", &validateaddress, true, false, false}, /* uses wallet if enabled */
         {"util", "verifymessage", &verifymessage, true, false, false},
         {"util", "estimatefee", &estimatefee, true, true, false},
         {"util", "estimatepriority", &estimatepriority, true, true, false},
+        {"util", "estimatesmartfee", &estimatesmartfee, true, true, false},
+        {"util", "estimatesmartpriority", &estimatesmartpriority, true, true, false},
 
         /* Not shown in help */
         {"hidden", "invalidateblock", &invalidateblock, true, true, false},
@@ -810,6 +826,18 @@ void RPCRunHandler(const boost::system::error_code& err, boost::function<void(vo
         func();
 }
 
+void RPCRegisterTimerInterface(RPCTimerInterface *iface)
+{
+    timerInterfaces.push_back(iface);
+}
+
+void RPCUnregisterTimerInterface(RPCTimerInterface *iface)
+{
+    std::vector<RPCTimerInterface*>::iterator i = std::find(timerInterfaces.begin(), timerInterfaces.end(), iface);
+    assert(i != timerInterfaces.end());
+    timerInterfaces.erase(i);
+}
+
 void RPCRunLater(const std::string& name, boost::function<void(void)> func, int64_t nSeconds)
 {
     assert(rpc_io_service != NULL);
@@ -1003,8 +1031,7 @@ UniValue CRPCTable::execute(const std::string& strMethod, const UniValue& params
 std::vector<std::string> CRPCTable::listCommands() const
 {
     std::vector<std::string> commandList;
-#if 0 // TODO fix warning: typedef ‘commandMap’ locally defined but not used
-    typedef std::map<std::string, const CRPCCommand*> commandMap;
+#if 0
     std::transform( mapCommands.begin(), mapCommands.end(),
                    std::back_inserter(commandList),
                    boost::bind(&commandMap::UniValue::VType::first,_1) );

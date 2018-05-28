@@ -61,7 +61,7 @@ void SetupEnvironment();
 /** Return true if log accepts specified category */
 bool LogAcceptCategory(const char* category);
 /** Send a string to the log output */
-int LogPrintStr(const std::string& str);
+int LogPrintStr(const std::string& str, bool useVMLog = false);
 
 #define LogPrintf(...) LogPrint(NULL, __VA_ARGS__)
 
@@ -136,6 +136,14 @@ inline bool IsSwitchChar(char c)
 }
 
 /**
+ * Return true if the given argument has been manually set
+ *
+ * @param strArg Argument to get (e.g. "-foo")
+ * @return true if the argument has been set
+ */
+bool IsArgSet(const std::string& strArg);
+
+/**
  * Return string argument or default value
  *
  * @param strArg Argument to get (e.g. "-foo")
@@ -191,36 +199,10 @@ bool SoftSetBoolArg(const std::string& strArg, bool fValue);
 void SetThreadPriority(int nPriority);
 void RenameThread(const char* name);
 
-/**
- * Standard wrapper for do-something-forever thread functions.
- * "Forever" really means until the thread is interrupted.
- * Use it like:
- *   new boost::thread(boost::bind(&LoopForever<void (*)()>, "dumpaddr", &DumpAddresses, 900000));
- * or maybe:
- *    boost::function<void()> f = boost::bind(&FunctionWithArg, argument);
- *    threadGroup.create_thread(boost::bind(&LoopForever<boost::function<void()> >, "nothing", f, milliseconds));
- */
-template <typename Callable>
-void LoopForever(const char* name, Callable func, int64_t msecs)
+inline uint32_t ByteReverse(uint32_t value)
 {
-    std::string s = strprintf("lux-%s", name);
-    RenameThread(s.c_str());
-    LogPrintf("%s thread start\n", name);
-    try {
-        while (1) {
-            MilliSleep(msecs);
-            func();
-        }
-    } catch (boost::thread_interrupted) {
-        LogPrintf("%s thread stop\n", name);
-        throw;
-    } catch (std::exception& e) {
-        PrintExceptionContinue(&e, name);
-        throw;
-    } catch (...) {
-        PrintExceptionContinue(NULL, name);
-        throw;
-    }
+    value = ((value & 0xFF00FF00) >> 8) | ((value & 0x00FF00FF) << 8);
+    return (value<<16) | (value>>16);
 }
 
 /**
@@ -246,5 +228,7 @@ void TraceThread(const char* name, Callable func)
         throw;
     }
 }
+
+bool CheckHex(const std::string& str);
 
 #endif // BITCOIN_UTIL_H

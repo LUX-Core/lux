@@ -11,17 +11,23 @@
 #include "allocators.h" /* for SecureString */
 #include "instantx.h"
 #include "wallet.h"
+#include "script/standard.h"
 
 #include <map>
 #include <vector>
 
 #include <QObject>
 
+enum OutputType : int;
+
 class AddressTableModel;
 class OptionsModel;
 class RecentRequestsTableModel;
 class TransactionTableModel;
 class WalletModelTransaction;
+class ContractTableModel;
+class TokenItemModel;
+class TokenTransactionTableModel;
 
 class CCoinControl;
 class CKeyID;
@@ -29,6 +35,8 @@ class COutPoint;
 class COutput;
 class CPubKey;
 class CWallet;
+class CTokenInfo;
+class CTokenTx;
 class uint256;
 
 QT_BEGIN_NAMESPACE
@@ -127,8 +135,11 @@ public:
 
     OptionsModel* getOptionsModel();
     AddressTableModel* getAddressTableModel();
+    ContractTableModel *getContractTableModel();
     TransactionTableModel* getTransactionTableModel();
     RecentRequestsTableModel* getRecentRequestsTableModel();
+    TokenItemModel *getTokenItemModel();
+    TokenTransactionTableModel *getTokenTransactionTableModel();
 
     CAmount getBalance(const CCoinControl* coinControl = NULL) const;
     CAmount getUnconfirmedBalance() const;
@@ -143,6 +154,14 @@ public:
     bool setAddressBook(const CTxDestination& address, const string& strName, const string& strPurpose);
     void encryptKey(const CKey key, const std::string& pwd, const std::string& slt, std::vector<unsigned char>& crypted);
     void decryptKey(const std::vector<unsigned char>& crypted, const std::string& slt, const std::string& pwd, CKey& key);
+
+    bool addTokenEntry(const CTokenInfo& token);
+
+    bool addTokenTxEntry(const CTokenTx& tokenTx, bool fFlushOnClose=true);
+
+    bool existTokenEntry(const CTokenInfo& token);
+
+    bool removeTokenEntry(const std::string& sHash);
 
     // Check address for validity
     bool validateAddress(const QString& address);
@@ -192,17 +211,18 @@ public:
         WalletModel* wallet;
         bool valid;
         mutable bool relock; // mutable, as it can be set to false by copying
-
         void CopyFrom(const UnlockContext& rhs);
     };
 
     UnlockContext requestUnlock(bool relock = false);
 
     bool getPubKey(const CKeyID& address, CPubKey& vchPubKeyOut) const;
-    bool isMine(CBitcoinAddress address);
+    bool isMine(CTxDestination address);
     void getOutputs(const std::vector<COutPoint>& vOutpoints, std::vector<COutput>& vOutputs);
     bool isSpent(const COutPoint& outpoint) const;
+    bool isUnspentAddress(const std::string& address) const;
     void listCoins(std::map<QString, std::vector<COutput> >& mapCoins) const;
+    bool IsSpendable(const CTxDestination& dest) const;
 
     bool isLockedCoin(uint256 hash, unsigned int n) const;
     void lockCoin(COutPoint& output);
@@ -215,6 +235,8 @@ public:
     QString getRestorePath();
     QString getRestoreParam();
 
+    OutputType getDefaultAddressType() const;
+
 private:
     CWallet* wallet;
     bool fHaveWatchOnly;
@@ -225,8 +247,11 @@ private:
     OptionsModel* optionsModel;
 
     AddressTableModel* addressTableModel;
+    ContractTableModel *contractTableModel;
     TransactionTableModel* transactionTableModel;
     RecentRequestsTableModel* recentRequestsTableModel;
+    TokenItemModel *tokenItemModel;
+    TokenTransactionTableModel *tokenTransactionTableModel;
 
     // Cache some values to be able to detect changes
     CAmount cachedBalance;
@@ -249,6 +274,7 @@ private:
     void subscribeToCoreSignals();
     void unsubscribeFromCoreSignals();
     void checkBalanceChanged();
+    void checkTokenBalanceChanged();
 
 signals:
     // Signal that balance in wallet changed
@@ -274,6 +300,8 @@ signals:
     // Watch-only address added
     void notifyWatchonlyChanged(bool fHaveWatchonly);
 
+    void AddTokenTxEntry(bool fHaveWatchonly);
+
 public slots:
     /* Wallet status might have changed */
     void updateStatus();
@@ -285,6 +313,8 @@ public slots:
     void updateWatchOnlyFlag(bool fHaveWatchonly);
     /* Current, immature or unconfirmed balance might have changed - emit 'balanceChanged' if so */
     void pollBalanceChanged();
+    /* New, updated or removed contract book entry */
+    void updateContractBook(const QString &address, const QString &label, const QString &abi, int status);
 };
 
 #endif // BITCOIN_QT_WALLETMODEL_H

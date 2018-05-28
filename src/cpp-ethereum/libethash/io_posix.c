@@ -29,6 +29,8 @@
 #include <stdlib.h>
 #include <pwd.h>
 
+extern int fileno(FILE *stream);
+
 FILE* ethash_fopen(char const* file_name, char const* mode)
 {
 	return fopen(file_name, mode);

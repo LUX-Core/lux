@@ -1,28 +1,33 @@
 // Copyright (c) 2018 The Luxcore Developer
+// Copyright (c) 2018 The Luxcore Developer
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #ifndef BITCOIN_QT_WALLETVIEW_H
 #define BITCOIN_QT_WALLETVIEW_H
-#include "createcontract.h"
 
 #include "amount.h"
 #include "masternodemanager.h"
-#include "stakingdialog.h"
 #include "tradingdialog.h"
+#include "smartcontract.h"
 
 #include <QStackedWidget>
 
 class BitcoinGUI;
 class ClientModel;
 class OverviewPage;
+//class PlatformStyle;
 class ReceiveCoinsDialog;
 class SendCoinsDialog;
 class SendCoinsRecipient;
 class TransactionView;
 class WalletModel;
 class BlockExplorer;
-//class CreateContract ;
+class CreateContract;
+class SendToContract;
+class CallContractPage;
+class LSRToken;
+
 
 QT_BEGIN_NAMESPACE
 class QLabel;
@@ -41,7 +46,7 @@ class WalletView : public QStackedWidget
     Q_OBJECT
 
 public:
-    explicit WalletView(QWidget* parent);
+    explicit WalletView(QWidget *parent);
     ~WalletView();
 
     void setBitcoinGUI(BitcoinGUI* gui);
@@ -64,9 +69,9 @@ private:
     WalletModel* walletModel;
 
     OverviewPage* overviewPage;
-    CreateContract* smartToken;
+    SmartContract* smartContractPage;
+    LSRToken* LSRTokenPage;
     QWidget* transactionsPage;
-    StakingDialog* stakingPage;
     tradingDialog* tradingPage;
     ReceiveCoinsDialog* receiveCoinsPage;
     SendCoinsDialog* sendCoinsPage;
@@ -77,22 +82,21 @@ private:
 
     QProgressDialog* progressDialog;
     QLabel* transactionSum;
+    //const PlatformStyle *platformStyle;
 
 public slots:
     /** Switch to overview (home) page */
     void gotoOverviewPage();
     /** Switch to history (transactions) page */
     void gotoHistoryPage();
-    /** Switch to staking page */
-    void gotoStakingPage();
     /** Switch to trading page */
     void gotoTradingPage();
     /** Switch to masternode page */
     void gotoMasternodePage();
-
-/** Switch to gotoSmartTokenPage*/
-    void gotoSmartTokenPage();
-
+    /** Switch to smart contract page */
+    void gotoSmartContractPage();
+    /** Switch to LSRToken page */
+    void gotoLSRTokenPage(bool toAddTokenPage);
     /** Switch to explorer page */
     void gotoBlockExplorerPage();
     /** Switch to receive coins page */
@@ -115,6 +119,13 @@ public slots:
         The new items are those between start and end inclusive, under the given parent item.
     */
     void processNewTransaction(const QModelIndex& parent, int start, int /*end*/);
+
+    /** Show incoming token transaction notification for new token transactions.
+
+        The new items are those between start and end inclusive, under the given parent item.
+    */
+    void processNewTokenTransaction(const QModelIndex& parent, int start, int /*end*/);
+
     /** Encrypt the wallet */
     void encryptWallet(bool status);
     /** Backup the wallet */
@@ -150,7 +161,11 @@ signals:
     /** Encryption status of wallet changed */
     void encryptionStatusChanged(int status);
     /** Notify that a new transaction appeared */
-    void incomingTransaction(const QString& date, int unit, const CAmount& amount, const QString& type, const QString& address);
+    void incomingTransaction(const QString& date, int unit, const CAmount& amount, const QString& type, const QString& address, const QString& label);
+    /** Notify that a new token transaction appeared */
+    void incomingTokenTransaction(const QString& date, const QString& amount, const QString& type, const QString& address, const QString& label, const QString& title);
+    /** Notify that the out of sync warning icon has been pressed */
+    void outOfSyncWarningClicked();
 };
 
 #endif // BITCOIN_QT_WALLETVIEW_H

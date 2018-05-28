@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>960</width>
-    <height>615</height>
+    <height>617</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -23,7 +23,7 @@
    <item>
     <widget class="QLabel" name="labelAlerts">
      <property name="visible">
-      <bool>false</bool>
+      <bool>true</bool>
      </property>
      <property name="styleSheet">
       <string notr="true">background-color: qlineargradient(x1: 0, y1: 0, x2: 1, y2: 0, stop:0 #F0D0A0, stop:1 #F8D488); color:#000000;</string>
@@ -1158,6 +1158,13 @@
            </spacer>
           </item>
           <item>
+           <widget class="Line" name="line_2">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
            <layout class="QHBoxLayout" name="horizontalLayout_2">
             <item>
              <widget class="QLabel" name="label_4">
@@ -1207,7 +1214,7 @@
            </layout>
           </item>
           <item>
-           <widget class="QListView" name="listTransactions">
+           <widget class="CustomList" name="listTransactions">
             <property name="styleSheet">
              <string notr="true">QListView { background: transparent; }</string>
             </property>
@@ -1227,6 +1234,102 @@
           </item>
          </layout>
         </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_4">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <item>
+          <widget class="QLabel" name="labelTokens">
+           <property name="font">
+            <font>
+             <weight>75</weight>
+             <bold>true</bold>
+            </font>
+           </property>
+           <property name="text">
+            <string>                             LSR Tokens</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_6">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QVBoxLayout" name="horizontalLayout_31">
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_41">
+           <property name="leftMargin">
+            <number>10</number>
+           </property>
+           <property name="rightMargin">
+            <number>10</number>
+           </property>
+           <item alignment="Qt::AlignVCenter">
+            <widget class="QListView" name="listTokens">
+             <property name="enabled">
+              <bool>true</bool>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">QListView { background: transparent; }</string>
+             </property>
+             <property name="frameShape">
+              <enum>QFrame::NoFrame</enum>
+             </property>
+             <property name="verticalScrollBarPolicy">
+              <enum>Qt::ScrollBarAlwaysOff</enum>
+             </property>
+             <property name="horizontalScrollBarPolicy">
+              <enum>Qt::ScrollBarAlwaysOff</enum>
+             </property>
+             <property name="selectionMode">
+              <enum>QAbstractItemView::NoSelection</enum>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_51">
+           <property name="spacing">
+            <number>6</number>
+           </property>
+           <item alignment="Qt::AlignHCenter|Qt::AlignVCenter">
+            <widget class="QPushButton" name="buttonAddToken">
+             <property name="toolTip">
+              <string>Go to token page</string>
+             </property>
+             <property name="text">
+              <string>Add Token</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
        </item>
        <item>
         <spacer name="verticalSpacer_2">

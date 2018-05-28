@@ -21,10 +21,10 @@ const CBlockIndex* GetLastBlockIndex(const CBlockIndex* pindex, bool fProofOfSta
     return pindex;
 }
 
-unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHeader* pblock, bool fProofOfStake)
+unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHeader* pblock, const Consensus::Params& consenusParams, bool fProofOfStake)
 {
-    int64_t nTargetSpacing = 120;
-    int64_t nTargetTimespan = 30 * 60;
+    int64_t nTargetSpacing = consenusParams.nPowTargetSpacing;
+    int64_t nTargetTimespan = consenusParams.nPowTargetTimespan;
     uint256 bnTargetLimit(Params().ProofOfWorkLimit());
     if(fProofOfStake) {
         bnTargetLimit = GetProofOfStakeLimit(pindexLast->nHeight);
@@ -59,7 +59,8 @@ unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHead
     return bnNew.GetCompact();
 }
 
-bool CheckProofOfWork(uint256 hash, unsigned int nBits)
+/** Check whether a block hash satisfies the proof-of-work requirement specified by nBits */
+bool CheckProofOfWork(uint256 hash, unsigned int nBits, const Consensus::Params& consensusParams)
 {
     bool fNegative;
     bool fOverflow;

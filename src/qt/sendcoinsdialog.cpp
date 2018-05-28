@@ -22,6 +22,7 @@
 #include "ui_interface.h"
 #include "utilmoneystr.h"
 #include "wallet.h"
+#include "../script/standard.h"
 
 #include <QMessageBox>
 #include <QScrollBar>
@@ -230,7 +231,7 @@ void SendCoinsDialog::on_sendButton_clicked()
         SendCoinsEntry* entry = qobject_cast<SendCoinsEntry*>(ui->entries->itemAt(i)->widget());
 
         //UTXO splitter - address should be our own
-        CBitcoinAddress address = entry->getValue().address.toStdString();
+        CTxDestination address = DecodeDestination(entry->getValue().address.toStdString());
         if (!model->isMine(address) && ui->splitBlockCheckBox->checkState() == Qt::Checked) {
             CoinControlDialog::coinControl->fSplitBlock = false;
             ui->splitBlockCheckBox->setCheckState(Qt::Unchecked);
@@ -757,7 +758,8 @@ void SendCoinsDialog::updateSmartFeeLabel()
         return;
 
     int nBlocksToConfirm = (int)25 - (int)std::max(0, std::min(24, ui->sliderSmartFee->value()));
-    CFeeRate feeRate = mempool.estimateFee(nBlocksToConfirm);
+    int estimateFoundAtBlocks = nBlocksToConfirm;
+    CFeeRate feeRate = mempool.estimateSmartFee(nBlocksToConfirm, &estimateFoundAtBlocks);
     if (feeRate <= CFeeRate(0)) // not enough data => minfee
     {
         ui->labelSmartFee->setText(BitcoinUnits::formatWithUnit(model->getOptionsModel()->getDisplayUnit(), CWallet::minTxFee.GetFeePerK()) + "/kB");
@@ -899,22 +901,32 @@ void SendCoinsDialog::coinControlChangeEdited(const QString& text)
         CoinControlDialog::coinControl->destChange = CNoDestination();
         ui->labelCoinControlChangeLabel->setStyleSheet("QLabel{color:red;}");
 
-        CBitcoinAddress addr = CBitcoinAddress(text.toStdString());
+        CTxDestination addr = DecodeDestination(text.toStdString());
 
         if (text.isEmpty()) // Nothing entered
         {
             ui->labelCoinControlChangeLabel->setText("");
-        } else if (!addr.IsValid()) // Invalid address
+        } else if (!IsValidDestination(addr)) // Invalid address
         {
             ui->labelCoinControlChangeLabel->setText(tr("Warning: Invalid LUX address"));
         } else // Valid address
         {
-            CPubKey pubkey;
-            CKeyID keyid;
-            addr.GetKeyID(keyid);
-            if (!model->getPubKey(keyid, pubkey)) // Unknown change address
+            if (!model->IsSpendable(addr)) // Unknown change address
             {
                 ui->labelCoinControlChangeLabel->setText(tr("Warning: Unknown change address"));
+
+                // confirmation dialog
+                QMessageBox::StandardButton btnRetVal = QMessageBox::question(this, tr("Confirm custom change address"), tr("The address you selected for change is not part of this wallet. Any or all funds in your wallet may be sent to this address. Are you sure?"),
+                    QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Cancel);
+
+                if(btnRetVal == QMessageBox::Yes)
+                    CoinControlDialog::coinControl->destChange = addr;
+                else
+                {
+                    ui->lineEditCoinControlChange->setText("");
+                    ui->labelCoinControlChangeLabel->setStyleSheet("QLabel{color:black;}");
+                    ui->labelCoinControlChangeLabel->setText("");
+                }
             } else // Known change address
             {
                 ui->labelCoinControlChangeLabel->setStyleSheet("QLabel{color:black;}");
@@ -926,7 +938,7 @@ void SendCoinsDialog::coinControlChangeEdited(const QString& text)
                 else
                     ui->labelCoinControlChangeLabel->setText(tr("(no label)"));
 
-                CoinControlDialog::coinControl->destChange = addr.Get();
+                CoinControlDialog::coinControl->destChange = addr;
             }
         }
     }
@@ -960,5 +972,48 @@ void SendCoinsDialog::coinControlUpdateLabels()
         ui->labelCoinControlAutomaticallySelected->show();
         ui->widgetCoinControl->hide();
         ui->labelCoinControlInsuffFunds->hide();
+    }
+}
+
+
+SendConfirmationDialog::SendConfirmationDialog(const QString &title, const QString &text, int _secDelay,
+                                               QWidget *parent) :
+        QMessageBox(QMessageBox::Question, title, text, QMessageBox::Yes | QMessageBox::Cancel, parent), secDelay(_secDelay)
+{
+    setDefaultButton(QMessageBox::Cancel);
+    yesButton = button(QMessageBox::Yes);
+    updateYesButton();
+    connect(&countDownTimer, SIGNAL(timeout()), this, SLOT(countDown()));
+}
+
+int SendConfirmationDialog::exec()
+{
+    updateYesButton();
+    countDownTimer.start(1000);
+    return QMessageBox::exec();
+}
+
+void SendConfirmationDialog::countDown()
+{
+    secDelay--;
+    updateYesButton();
+
+    if(secDelay <= 0)
+    {
+        countDownTimer.stop();
+    }
+}
+
+void SendConfirmationDialog::updateYesButton()
+{
+    if(secDelay > 0)
+    {
+        yesButton->setEnabled(false);
+        yesButton->setText(tr("Yes") + " (" + QString::number(secDelay) + ")");
+    }
+    else
+    {
+        yesButton->setEnabled(true);
+        yesButton->setText(tr("Yes"));
     }
 }

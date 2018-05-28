@@ -87,8 +87,8 @@ UniValue darksend(const UniValue& params, bool fHelp)
             "<amount> is a real and is rounded to the nearest 0.00000001"
             + HelpRequiringPassphrase());
 
-    CBitcoinAddress address(params[0].get_str());
-    if (!address.IsValid())
+    CTxDestination dest = DecodeDestination(params[0].get_str());
+    if (!IsValidDestination(dest))
         throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid Lux address");
 
     // Amount
@@ -96,7 +96,7 @@ UniValue darksend(const UniValue& params, bool fHelp)
 
     // Wallet comments
     CWalletTx wtx;
-    SendMoney(address.Get(), nAmount, wtx, ONLY_DENOMINATED);
+    SendMoney(dest, nAmount, wtx, ONLY_DENOMINATED);
    
     return wtx.GetHash().GetHex();
 }
@@ -295,9 +295,9 @@ UniValue masternode(const UniValue& params, bool fHelp)
                 pubkey =GetScriptForDestination(mn.pubkey.GetID());
                 CTxDestination address1;
                 ExtractDestination(pubkey, address1);
-                CBitcoinAddress address2(address1);
+                CTxDestination address2(address1);
 
-                obj.push_back(Pair(mn.addr.ToString().c_str(),       address2.ToString().c_str()));
+                obj.push_back(Pair(mn.addr.ToString().c_str(),       EncodeDestination(address2)));
             } else if (strCommand == "protocol") {
                 obj.push_back(Pair(mn.addr.ToString().c_str(),       (int64_t)mn.protocolVersion));
             } else if (strCommand == "lastseen") {
@@ -470,7 +470,7 @@ UniValue masternode(const UniValue& params, bool fHelp)
         if(activeMasternode.status == MASTERNODE_SYNC_IN_PROCESS) return "sync in process. Must wait until client is synced to start.";
 
         CTxIn vin = CTxIn();
-        CPubKey pubkey = CScript();
+        CPubKey pubkey = CPubKey();
         CKey key;
         bool found = activeMasternode.GetMasterNodeVin(vin, pubkey, key);
         if(!found){
@@ -514,10 +514,10 @@ UniValue masternode(const UniValue& params, bool fHelp)
             if(masternodePayments.GetBlockPayee(nHeight, payee)){
                 CTxDestination address1;
                 ExtractDestination(payee, address1);
-                CBitcoinAddress address2(address1);
-                obj.push_back(Pair(boost::lexical_cast<std::string>(nHeight),       address2.ToString().c_str()));
+                CTxDestination address2(address1);
+                obj.push_back(Pair(boost::lexical_cast<std::string>(nHeight), EncodeDestination(address2)));
             } else {
-                obj.push_back(Pair(boost::lexical_cast<std::string>(nHeight),       ""));
+                obj.push_back(Pair(boost::lexical_cast<std::string>(nHeight), ""));
             }
         }
 
@@ -541,7 +541,7 @@ UniValue masternode(const UniValue& params, bool fHelp)
 
         CService addr = CService(strAddress);
 
-        if(ConnectNode((CAddress)addr, NULL, true)){
+        if(ConnectNode(CAddress(addr, NODE_NETWORK), NULL, true)){
             return "successfully connected";
         } else {
             return "error connecting";

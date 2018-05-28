@@ -1,6 +1,6 @@
 #include <sstream>
 #include <util.h>
-#include <validation.h>
+#include <main.h>
 #include "luxstate.h"
 
 using namespace std;
@@ -77,7 +77,7 @@ ResultExecute LuxState::execute(EnvInfo const& _envInfo, SealEngineFace const& _
             } else {
                 printfErrorLog(res.excepted);
             }
-            
+
             lux::commit(cacheUTXO, stateUTXO, m_cache);
             cacheUTXO.clear();
             bool removeEmptyAccounts = _envInfo.number() >= _sealEngine.chainParams().u256Param("EIP158ForkBlock");
@@ -89,13 +89,8 @@ ResultExecute LuxState::execute(EnvInfo const& _envInfo, SealEngineFace const& _
         printfErrorLog(dev::eth::toTransactionException(_e));
         res.excepted = dev::eth::toTransactionException(_e);
         res.gasUsed = _t.gas();
-        if(_p != Permanence::Reverted){
-            deleteAccounts(_sealEngine.deleteAddresses);
-            commit(CommitBehaviour::RemoveEmptyAccounts);
-        } else {
-            m_cache.clear();
-            cacheUTXO.clear();
-        }
+        m_cache.clear();
+        cacheUTXO.clear();
     }
 
     if(!_t.isCreation())
@@ -158,7 +153,7 @@ Vin* LuxState::vin(dev::Address const& _addr)
         std::string stateBack = stateUTXO.at(_addr);
         if (stateBack.empty())
             return nullptr;
-            
+
         dev::RLP state(stateBack);
         auto i = cacheUTXO.emplace(
             std::piecewise_construct,
@@ -177,7 +172,7 @@ Vin* LuxState::vin(dev::Address const& _addr)
 
 //     lux::commit(cacheUTXO, stateUTXO, m_cache);
 //     cacheUTXO.clear();
-        
+
 //     m_touched += dev::eth::commit(m_cache, m_state);
 //     m_changeLog.clear();
 //     m_cache.clear();
@@ -231,13 +226,13 @@ dev::Address LuxState::createLuxAddress(dev::h256 hashTx, uint32_t voutNumber){
 	if (voutNumberChrs.size() < sizeof(voutNumber))voutNumberChrs.resize(sizeof(voutNumber));
 	std::memcpy(voutNumberChrs.data(), &voutNumber, sizeof(voutNumber));
 	txIdAndVout.insert(txIdAndVout.end(),voutNumberChrs.begin(),voutNumberChrs.end());
-		
+
 	std::vector<unsigned char> SHA256TxVout(32);
     CSHA256().Write(txIdAndVout.data(), txIdAndVout.size()).Finalize(SHA256TxVout.data());
 
 	std::vector<unsigned char> hashTxIdAndVout(20);
     CRIPEMD160().Write(SHA256TxVout.data(), SHA256TxVout.size()).Finalize(hashTxIdAndVout.data());
-		
+
 	return dev::Address(hashTxIdAndVout);
 }
 

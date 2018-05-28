@@ -30,7 +30,8 @@
         <file alias="history">res/icons/history.png</file>
         <file alias="stake">res/icons/stake.png</file>
         <file alias="overview">res/icons/overview.png</file>
-         <file alias="smartcontract">res/icons/smartcontract.png</file>
+        <file alias="smartcontract">res/icons/smartcontract.png</file>
+        <file alias="lsrtoken">res/icons/lsrtoken.png</file>
         <file alias="masternodes">res/icons/masternodes.png</file>
 		<file alias="trading">res/icons/trade.png</file>
         <file alias="export">res/icons/export.png</file>
@@ -55,6 +56,9 @@
         <file alias="browse">res/icons/browse.png</file>
         <file alias="staking_active">res/icons/staking_active.png</file>
         <file alias="staking_inactive">res/icons/staking_inactive.png</file>
+        <file alias="fontbigger">res/icons/fontbigger.png</file>
+        <file alias="fontsmaller">res/icons/fontsmaller.png</file>
+        <file alias="promticon">res/icons/chevron.png</file>
     </qresource>
     <qresource prefix="/css">
         <file alias="default">res/css/default.css</file>

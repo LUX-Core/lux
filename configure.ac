@@ -4,7 +4,7 @@ define(_CLIENT_VERSION_MAJOR, 4)
 define(_CLIENT_VERSION_MINOR, 3)
 define(_CLIENT_VERSION_REVISION, 2)
 define(_CLIENT_VERSION_BUILD, 0)
-define(_CLIENT_VERSION_IS_RELEASE, true)
+define(_CLIENT_VERSION_IS_RELEASE, false)
 define(_COPYRIGHT_YEAR, 2018)
 AC_INIT([Luxcore],[_CLIENT_VERSION_MAJOR._CLIENT_VERSION_MINOR._CLIENT_VERSION_REVISION],[www.luxcore.io],[lux])
 AC_CONFIG_SRCDIR([src/main.cpp])
@@ -228,6 +228,9 @@ if test "x$enable_debug_xdump" = xyes; then
         CXXFLAGS="$CXXFLAGS -DDEBUG_DUMP_STAKING_INFO"
     fi
 fi
+
+CPPFLAGS="-Wno-unknown-pragmas $CPPFLAGS -DLUX_BUILD"
+CXXFLAGS="-Wno-unknown-pragmas $CXXFLAGS"
 
 ## TODO: Remove these hard-coded paths and flags. They are here for the sake of
 ##       compatibility with the legacy buildsystem.
@@ -622,6 +625,14 @@ AC_SUBST(LEVELDB_CPPFLAGS)
 AC_SUBST(LIBLEVELDB)
 AC_SUBST(LIBMEMENV)
 
+
+CRYPTOPP_CPPFLAGS=
+LIBCRYPTOPP=
+AM_CONDITIONAL([EMBEDDED_CRYPTOPP],[true])
+AC_SUBST(CRYPTOPP_CPPFLAGS)
+AC_SUBST(LIBCRYPTOPP)
+
+
 if test x$enable_wallet != xno; then
     dnl Check for libdb_cxx only if wallet enabled
     BITCOIN_FIND_BDB48
@@ -661,12 +672,16 @@ fi
 
 if test x$use_boost = xyes; then
 
+dnl Minimum required Boost version
+define(MINIMUM_REQUIRED_BOOST, 1.58.0)
+
 dnl Check for boost libs
-AX_BOOST_BASE
+AX_BOOST_BASE([MINIMUM_REQUIRED_BOOST])
 AX_BOOST_SYSTEM
 AX_BOOST_FILESYSTEM
 AX_BOOST_PROGRAM_OPTIONS
 AX_BOOST_THREAD
+AX_BOOST_RANDOM
 AX_BOOST_CHRONO
 
 dnl Boost 1.56 through 1.62 allow using std::atomic instead of its own atomic
@@ -745,7 +760,7 @@ fi
 
 if test x$use_boost = xyes; then
 
-BOOST_LIBS="$BOOST_LDFLAGS $BOOST_SYSTEM_LIB $BOOST_FILESYSTEM_LIB $BOOST_PROGRAM_OPTIONS_LIB $BOOST_THREAD_LIB"
+BOOST_LIBS="$BOOST_LDFLAGS $BOOST_SYSTEM_LIB $BOOST_FILESYSTEM_LIB $BOOST_PROGRAM_OPTIONS_LIB $BOOST_THREAD_LIB $BOOST_CHRONO_LIB $BOOST_RANDOM_LIB"
 
 dnl Boost >= 1.50 uses sleep_for rather than the now-deprecated sleep, however
 dnl it was broken from 1.50 to 1.52 when backed by nanosleep. Use sleep_for if
@@ -804,12 +819,7 @@ fi
 fi
 
 if test x$use_pkgconfig = xyes; then
-
-  if test x"$PKG_CONFIG" = "x"; then
-    AC_MSG_ERROR(pkg-config not found.)
-  fi
-
-  : #NOP
+  : dnl
   m4_ifdef(
     [PKG_CHECK_MODULES],
     [
@@ -884,12 +894,12 @@ else
 fi
 
 AC_CHECK_LIB([crypto],[EVP_DecryptFinal_ex],[],[
-   AC_ARG_WITH([libressl],
-     [AS_HELP_STRING([--with-libressl],[Build with system LibreSSL (default is no; DANGEROUS; NOT SUPPORTED)])],
-     [AC_MSG_WARN([Detected LibreSSL: This is NOT supported, and may break consensus compatibility!])],
-     [AC_MSG_ERROR([Detected LibreSSL: This is NOT supported, and may break consensus compatibility!])]
-   )
- ])
+  AC_ARG_WITH([libressl],
+    [AS_HELP_STRING([--with-libressl],[Build with system LibreSSL (default is no; DANGEROUS; NOT SUPPORTED)])],
+    [AC_MSG_WARN([Detected LibreSSL: This is NOT supported, and may break consensus compatibility!])],
+    [AC_MSG_ERROR([Detected LibreSSL: This is NOT supported, and may break consensus compatibility!])]
+  )
+])
 
 CFLAGS_TEMP="$CFLAGS"
 LIBS_TEMP="$LIBS"
@@ -898,6 +908,54 @@ LIBS="$LIBS $SSL_LIBS $CRYPTO_LIBS"
 AC_CHECK_HEADER([openssl/ec.h],, AC_MSG_ERROR(OpenSSL ec header missing),)
 CFLAGS="$CFLAGS_TEMP"
 LIBS="$LIBS_TEMP"
+
+dnl univalue check
+
+need_bundled_univalue=yes
+
+if test x$build_bitcoin_utils$build_bitcoind$bitcoin_enable_qt$use_tests$use_bench = xnonononono; then
+  need_bundled_univalue=no
+else
+
+if test x$system_univalue != xno ; then
+  found_univalue=no
+  if test x$use_pkgconfig = xyes; then
+    : #NOP
+    m4_ifdef(
+      [PKG_CHECK_MODULES],
+      [
+        PKG_CHECK_MODULES([UNIVALUE],[libunivalue],[found_univalue=yes],[true])
+      ]
+    )
+  else
+    AC_CHECK_HEADER([univalue.h],[
+      AC_CHECK_LIB([univalue],  [main],[
+        UNIVALUE_LIBS=-lunivalue
+        found_univalue=yes
+      ],[true])
+    ],[true])
+  fi
+
+  if test x$found_univalue = xyes ; then
+    system_univalue=yes
+    need_bundled_univalue=no
+  elif test x$system_univalue = xyes ; then
+    AC_MSG_ERROR([univalue not found])
+  else
+    system_univalue=no
+  fi
+fi
+
+if test x$need_bundled_univalue = xyes ; then
+  UNIVALUE_CFLAGS='-I$(srcdir)/univalue/include'
+  UNIVALUE_LIBS='univalue/libunivalue.la'
+fi
+
+fi
+
+AM_CONDITIONAL([EMBEDDED_UNIVALUE],[test x$need_bundled_univalue = xyes])
+AC_SUBST(UNIVALUE_CFLAGS)
+AC_SUBST(UNIVALUE_LIBS)
 
 BITCOIN_QT_PATH_PROGS([PROTOC], [protoc],$protoc_bin_path)
 
@@ -1103,7 +1161,7 @@ PKGCONFIG_LIBDIR_TEMP="$PKG_CONFIG_LIBDIR"
 unset PKG_CONFIG_LIBDIR
 PKG_CONFIG_LIBDIR="$PKGCONFIG_LIBDIR_TEMP"
 
-ac_configure_args="${ac_configure_args} --disable-shared --with-pic"
+ac_configure_args="${ac_configure_args} --disable-shared --with-pic --with-bignum=no --enable-module-recovery --enable-module-ecdh --enable-experimental"
 AC_CONFIG_SUBDIRS([src/secp256k1])
 
 AC_OUTPUT

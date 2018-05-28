@@ -18,6 +18,7 @@
 #include "script/script.h"
 #include "script/standard.h"
 #include "util.h"
+#include "protocol.h"
 
 #ifdef WIN32
 #ifdef _WIN32_WINNT
@@ -42,6 +43,7 @@
 #if BOOST_FILESYSTEM_VERSION >= 3
 #include <boost/filesystem/detail/utf8_codecvt_facet.hpp>
 #endif
+#include <boost/scoped_array.hpp>
 
 #include <QAbstractItemView>
 #include <QApplication>
@@ -56,6 +58,8 @@
 #include <QSettings>
 #include <QTextDocument> // for Qt::mightBeRichText
 #include <QThread>
+#include <QToolButton>
+#include <QMouseEvent>
 
 #if QT_VERSION < 0x050000
 #include <QUrl>
@@ -217,7 +221,7 @@ QString formatBitcoinURI(const SendCoinsRecipient& info)
 
 bool isDust(const QString& address, const CAmount& amount)
 {
-    CTxDestination dest = CBitcoinAddress(address.toStdString()).Get();
+    CTxDestination dest = DecodeDestination(address.toStdString());
     CScript script = GetScriptForDestination(dest);
     CTxOut txOut(amount, script);
     return txOut.IsDust(::minRelayTxFee);
@@ -253,6 +257,19 @@ void copyEntryData(QAbstractItemView* view, int column, int role)
         setClipboard(selection.at(0).data(role).toString());
     }
 }
+
+    void copyEntryDataFromList(QAbstractItemView *view, int role)
+    {
+        if(!view || !view->selectionModel())
+            return;
+        QModelIndexList selection = view->selectionModel()->selectedIndexes();
+
+        if(!selection.isEmpty())
+        {
+            // Copy first item
+            setClipboard(selection.at(0).data(role).toString());
+        }
+    }
 
     QString getEntryData(QAbstractItemView *view, int column, int role)
     {
@@ -557,17 +574,19 @@ void TableViewLastColumnResizingFixer::on_geometriesChanged()
  * Initializes all internal variables and prepares the
  * the resize modes of the last 2 columns of the table and
  */
-TableViewLastColumnResizingFixer::TableViewLastColumnResizingFixer(QTableView* table, int lastColMinimumWidth, int allColsMinimumWidth) : tableView(table),
-                                                                                                                                          lastColumnMinimumWidth(lastColMinimumWidth),
-                                                                                                                                          allColumnsMinimumWidth(allColsMinimumWidth)
-{
-    columnCount = tableView->horizontalHeader()->count();
-    lastColumnIndex = columnCount - 1;
-    secondToLastColumnIndex = columnCount - 2;
-    tableView->horizontalHeader()->setMinimumSectionSize(allColumnsMinimumWidth);
-    setViewHeaderResizeMode(secondToLastColumnIndex, QHeaderView::Interactive);
-    setViewHeaderResizeMode(lastColumnIndex, QHeaderView::Interactive);
-}
+    TableViewLastColumnResizingFixer::TableViewLastColumnResizingFixer(QTableView* table, int lastColMinimumWidth, int allColsMinimumWidth, QObject *parent, int columnStretch) :
+            QObject(parent),
+            tableView(table),
+            lastColumnMinimumWidth(lastColMinimumWidth),
+            allColumnsMinimumWidth(allColsMinimumWidth)
+    {
+        columnCount = tableView->horizontalHeader()->count();
+        lastColumnIndex = columnCount - 1;
+        secondToLastColumnIndex = columnCount - columnStretch;
+        tableView->horizontalHeader()->setMinimumSectionSize(allColumnsMinimumWidth);
+        setViewHeaderResizeMode(secondToLastColumnIndex, QHeaderView::Interactive);
+        setViewHeaderResizeMode(lastColumnIndex, QHeaderView::Interactive);
+    }
 
 /**
  * Class constructor.
@@ -913,6 +932,9 @@ QString formatServicesStr(quint64 mask)
             case NODE_NETWORK:
                 strList.append(QObject::tr("NETWORK"));
                 break;
+            case NODE_WITNESS:
+                strList.append(QObject::tr("WITNESS"));
+                break;
             default:
                 strList.append(QString("%1[%2]").arg(QObject::tr("UNKNOWN")).arg(check));
             }
@@ -929,5 +951,18 @@ QString formatPingTime(double dPingTime)
 {
     return dPingTime == 0 ? QObject::tr("N/A") : QString(QObject::tr("%1 ms")).arg(QString::number((int)(dPingTime * 1000), 10));
 }
+
+    void formatToolButtons(QToolButton *btn1, QToolButton *btn2, QToolButton *btn3)
+    {
+        QList<QToolButton *> btnList;
+        if(btn1) btnList.append(btn1);
+        if(btn2) btnList.append(btn2);
+        if(btn3) btnList.append(btn3);
+        for(int i = 0; i < btnList.count(); i++)
+        {
+            QToolButton* btn = btnList[i];
+            btn->setIconSize(QSize(16, 16));
+        }
+    }
 
 } // namespace GUIUtil

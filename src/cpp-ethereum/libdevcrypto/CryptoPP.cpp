@@ -27,10 +27,9 @@
 #include <libdevcore/Assertions.h>
 #include <libdevcore/SHA3.h>
 #include "ECDHE.h"
-// TODO Add cryptopp dependencies
-#if 0
+
 static_assert(CRYPTOPP_VERSION == 570, "Wrong Crypto++ version");
-#endif
+
 using namespace std;
 using namespace dev;
 using namespace dev::crypto;

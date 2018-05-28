@@ -8,9 +8,18 @@
 
 #ifdef USE_SECP256K1
 #include <secp256k1.h>
+#include <secp256k1_recovery.h>
 #else
+#include <secp256k1.h>
+#include <secp256k1_recovery.h>
 #include "ecwrapper.h"
 #endif
+
+namespace
+{
+/* Global secp256k1_context object used for verification. */
+    secp256k1_context* secp256k1_context_verify = NULL;
+}
 
 bool CPubKey::Verify(const uint256& hash, const std::vector<unsigned char>& vchSig) const
 {
@@ -90,7 +99,7 @@ bool CPubKey::Derive(CPubKey& pubkeyChild, unsigned char ccChild[32], unsigned i
 {
     assert(IsValid());
     assert((nChild >> 31) == 0);
-    assert(begin() + 33 == end());
+    assert(begin() + COMPRESSED_PUBLIC_KEY_SIZE == end());
     unsigned char out[64];
     BIP32Hash(cc, nChild, *begin(), begin() + 1, out);
     memcpy(ccChild, out + 32, 32);
@@ -117,8 +126,8 @@ void CExtPubKey::Encode(unsigned char code[74]) const
     code[7] = (nChild >> 8) & 0xFF;
     code[8] = (nChild >> 0) & 0xFF;
     memcpy(code + 9, vchChainCode, 32);
-    assert(pubkey.size() == 33);
-    memcpy(code + 41, pubkey.begin(), 33);
+    assert(pubkey.size() == CPubKey::COMPRESSED_PUBLIC_KEY_SIZE);
+    memcpy(code + 41, pubkey.begin(), CPubKey::COMPRESSED_PUBLIC_KEY_SIZE);
 }
 
 void CExtPubKey::Decode(const unsigned char code[74])
@@ -137,4 +146,26 @@ bool CExtPubKey::Derive(CExtPubKey& out, unsigned int nChild) const
     memcpy(&out.vchFingerprint[0], &id, 4);
     out.nChild = nChild;
     return pubkey.Derive(out.pubkey, out.vchChainCode, nChild, vchChainCode);
+}
+
+/* static */ int ECCVerifyHandle::refcount = 0;
+
+ECCVerifyHandle::ECCVerifyHandle()
+{
+    if (refcount == 0) {
+        assert(secp256k1_context_verify == NULL);
+        secp256k1_context_verify = secp256k1_context_create(SECP256K1_CONTEXT_VERIFY);
+        assert(secp256k1_context_verify != NULL);
+    }
+    refcount++;
+}
+
+ECCVerifyHandle::~ECCVerifyHandle()
+{
+    refcount--;
+    if (refcount == 0) {
+        assert(secp256k1_context_verify != NULL);
+        secp256k1_context_destroy(secp256k1_context_verify);
+        secp256k1_context_verify = NULL;
+    }
 }

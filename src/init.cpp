@@ -14,22 +14,29 @@
 #include "activemasternode.h"
 #include "addrman.h"
 #include "amount.h"
+#include "chain.h"
+#include "chainparams.h"
 #include "checkpoints.h"
 #include "compat/sanity.h"
+#include "consensus/validation.h"
 #include "key.h"
 #include "main.h"
 #include "stake.h"
 #include "masternodeconfig.h"
 #include "miner.h"
 #include "net.h"
+#include "policy/policy.h"
 #include "rpcserver.h"
 #include "script/standard.h"
+#include "scheme.h"
 #include "spork.h"
 #include "txdb.h"
+#include "script/sigcache.h"
 #include "ui_interface.h"
 #include "util.h"
 #include "utilmoneystr.h"
 #include "validationinterface.h"
+#include "random.h"
 #ifdef ENABLE_WALLET
 #include "db.h"
 #include "wallet.h"
@@ -155,6 +162,7 @@ public:
 
 static CCoinsViewDB* pcoinsdbview = NULL;
 static CCoinsViewErrorCatcher* pcoinscatcher = NULL;
+static std::unique_ptr<ECCVerifyHandle> globalVerifyHandle;
 
 /** Preparing steps before shutting down or restarting the wallet */
 void PrepareShutdown()
@@ -177,7 +185,7 @@ void PrepareShutdown()
 #ifdef ENABLE_WALLET
     if (pwalletMain)
         bitdb.Flush(false);
-    GenerateBitcoins(NULL, 0);
+//    GenerateBitcoins(NULL, 0);
 #endif
     StopNode();
     UnregisterNodeSignals(GetNodeSignals());
@@ -208,6 +216,10 @@ void PrepareShutdown()
         pcoinsdbview = NULL;
         delete pblocktree;
         pblocktree = NULL;
+//        delete pstorageresult;
+//        pstorageresult = NULL;
+//        delete globalState.release();
+//        globalSealEngine.reset();
     }
 #ifdef ENABLE_WALLET
     if (pwalletMain)
@@ -249,6 +261,8 @@ void Shutdown()
     delete pwalletMain;
     pwalletMain = NULL;
 #endif
+    globalVerifyHandle.reset();
+    ECC_Stop();
     LogPrintf("%s: done\n", __func__);
 }
 
@@ -334,11 +348,14 @@ std::string HelpMessage(HelpMessageMode mode)
 #ifndef WIN32
     strUsage += "  -pid=<file>            " + strprintf(_("Specify pid file (default: %s)"), "luxd.pid") + "\n";
 #endif
+    strUsage += "  -record-log-opcodes    " + _("Logs all EVM LOG opcode operations to the file vmExecLogs.json") + "\n";
     strUsage += "  -reindex               " + _("Rebuild block chain index from current blk000??.dat files") + " " + _("on startup") + "\n";
 #if !defined(WIN32)
     strUsage += "  -sysperms              " + _("Create new files with system default permissions, instead of umask 077 (only effective with disabled wallet functionality)") + "\n";
 #endif
     strUsage += "  -txindex               " + strprintf(_("Maintain a full transaction index, used by the getrawtransaction rpc call (default: %u)"), 0) + "\n";
+
+    strUsage += "  -logevents             " + strprintf(_("Maintain a full EVM log index, used by searchlogs and gettransactionreceipt rpc calls (default: %u)"), false) + "\n";
 
     strUsage += "\n" + _("Connection options:") + "\n";
     strUsage += "  -addnode=<ip>          " + _("Add a node to connect to and attempt to keep the connection open") + "\n";
@@ -449,6 +466,7 @@ std::string HelpMessage(HelpMessageMode mode)
     }
     strUsage += "  -shrinkdebugfile       " + _("Shrink debug.log file on client startup (default: 1 when no -debug)") + "\n";
     strUsage += "  -testnet               " + _("Use the test network") + "\n";
+    strUsage += "  -segwittest               " + _("Use the SegWit test network") + "\n";
 
     strUsage += "\n" + _("Masternode options:") + "\n";
     strUsage += "  -masternode=<n>            " + strprintf(_("Enable the client to act as a masternode (0-1, default: %u)"), 0) + "\n";
@@ -538,7 +556,7 @@ struct CImportingNow {
 void ThreadImport(std::vector<boost::filesystem::path> vImportFiles)
 {
     RenameThread("lux-loadblk");
-
+    const CChainParams& chainparams = Params();
     // -reindex
     if (fReindex) {
         CImportingNow imp;
@@ -551,14 +569,14 @@ void ThreadImport(std::vector<boost::filesystem::path> vImportFiles)
             if (!file)
                 break; // This error is logged in OpenBlockFile
             LogPrintf("Reindexing block file blk%05u.dat...\n", (unsigned int)nFile);
-            LoadExternalBlockFile(file, &pos);
+            LoadExternalBlockFile(chainparams, file, &pos);
             nFile++;
         }
         pblocktree->WriteReindexing(false);
         fReindex = false;
         LogPrintf("Reindexing finished\n");
         // To avoid ending up in a situation without genesis block, re-try initializing (no-op if reindexing worked):
-        InitBlockIndex();
+        InitBlockIndex(chainparams);
     }
 
     // hardcoded $DATADIR/bootstrap.dat
@@ -569,7 +587,7 @@ void ThreadImport(std::vector<boost::filesystem::path> vImportFiles)
             CImportingNow imp;
             filesystem::path pathBootstrapOld = GetDataDir() / "bootstrap.dat.old";
             LogPrintf("Importing bootstrap.dat...\n");
-            LoadExternalBlockFile(file);
+            LoadExternalBlockFile(chainparams, file);
             RenameOver(pathBootstrap, pathBootstrapOld);
         } else {
             LogPrintf("Warning: Could not open bootstrap file %s\n", pathBootstrap.string());
@@ -582,7 +600,7 @@ void ThreadImport(std::vector<boost::filesystem::path> vImportFiles)
         if (file) {
             CImportingNow imp;
             LogPrintf("Importing blocks file %s...\n", path.string());
-            LoadExternalBlockFile(file);
+            LoadExternalBlockFile(chainparams, file);
         } else {
             LogPrintf("Warning: Could not open blocks file %s\n", path.string());
         }
@@ -623,6 +641,9 @@ static bool LockDataDirectory(bool probeOnly, bool try_lock = true)
  */
 bool InitSanityCheck(void)
 {
+    ECC_Start();
+    globalVerifyHandle.reset(new ECCVerifyHandle());
+
     if (!ECC_InitSanityCheck()) {
         InitError("OpenSSL appears to lack support for elliptic curve cryptography. For more "
                   "information, visit https://en.bitcoin.it/wiki/OpenSSL_and_EC_Libraries");
@@ -638,7 +659,7 @@ bool InitSanityCheck(void)
 /** Initialize lux.
  *  @pre Parameters should be parsed and config file should be read.
  */
-bool AppInit2(boost::thread_group& threadGroup)
+bool AppInit2(boost::thread_group& threadGroup, CScheme& scheme)
 {
 // ********************************************************* Step 1: setup
 #ifdef _MSC_VER
@@ -704,6 +725,8 @@ bool AppInit2(boost::thread_group& threadGroup)
 #endif
 
     // ********************************************************* Step 2: parameter interactions
+    const CChainParams& chainparams = Params();
+
     // Set this early so that parameter interactions go to console
     nMinerSleep = GetArg("-minersleep", 500);
     fPrintToConsole = GetBoolArg("-printtoconsole", false);
@@ -811,8 +834,8 @@ bool AppInit2(boost::thread_group& threadGroup)
         InitWarning(_("Warning: Unsupported argument -benchmark ignored, use -debug=bench."));
 
     // Checkmempool and checkblockindex default to true in regtest mode
-    mempool.setSanityCheck(GetBoolArg("-checkmempool", Params().DefaultConsistencyChecks()));
-    fCheckBlockIndex = GetBoolArg("-checkblockindex", Params().DefaultConsistencyChecks());
+    mempool.setSanityCheck(GetBoolArg("-checkmempool", chainparams.DefaultConsistencyChecks()));
+    fCheckBlockIndex = GetBoolArg("-checkblockindex", chainparams.DefaultConsistencyChecks());
     Checkpoints::fEnabled = GetBoolArg("-checkpoints", true);
 
     // -par=0 means autodetect, but nScriptCheckThreads==0 means no concurrency
@@ -828,12 +851,6 @@ bool AppInit2(boost::thread_group& threadGroup)
     setvbuf(stdout, NULL, _IOLBF, 0); /// ***TODO*** do we still need this after -printtoconsole is gone?
 #ifdef ENABLE_WALLET
     bool fDisableWallet = GetBoolArg("-disablewallet", false);
-    if (fDisableWallet) {
-#endif
-        if (SoftSetBoolArg("-staking", false))
-            LogPrintf("AppInit2 : parameter interaction: wallet functionality not enabled -> setting -staking=0\n");
-#ifdef ENABLE_WALLET
-    }
 #endif
 
     nConnectTimeout = GetArg("-timeout", DEFAULT_CONNECT_TIMEOUT);
@@ -890,6 +907,18 @@ bool AppInit2(boost::thread_group& threadGroup)
     bSpendZeroConfChange = GetArg("-spendzeroconfchange", true);
     fSendFreeTransactions = GetArg("-sendfreetransactions", false);
 
+    g_address_type = ParseOutputType(GetArg("-addresstype", ""));
+    if (g_address_type == OUTPUT_TYPE_NONE) {
+        return InitError(strprintf(_("Unknown address type '%s'"), GetArg("-addresstype", "")));
+    }
+
+    // If changetype is set in config file or parameter, check that it's valid.
+    // Default to OUTPUT_TYPE_NONE if not set.
+    g_change_type = ParseOutputType(GetArg("-changetype", ""), OUTPUT_TYPE_NONE);
+    if (g_change_type == OUTPUT_TYPE_NONE && !GetArg("-changetype", "").empty()) {
+        return InitError(strprintf(_("Unknown change type '%s'"), GetArg("-changetype", "")));
+    }
+
     std::string strWalletFile = GetArg("-wallet", "wallet.dat");
 #endif // ENABLE_WALLET
 
@@ -900,7 +929,7 @@ bool AppInit2(boost::thread_group& threadGroup)
 
 
     if (GetBoolArg("-peerbloomfilters", false))
-        nLocalServices |= NODE_BLOOM;
+        nLocalServices = ServiceFlags(nLocalServices | NODE_BLOOM);
 
     // ********************************************************* Step 4: application initialization: dir lock, daemonize, pidfile, debug log
 
@@ -935,6 +964,12 @@ bool AppInit2(boost::thread_group& threadGroup)
 #ifdef ENABLE_WALLET
     LogPrintf("Using BerkeleyDB version %s\n", DbEnv::version(0, 0, 0));
 #endif
+
+    ////////////////////////////////////////////////////////////////////// // lux
+    dev::g_logPost = [&](std::string const& s, char const* c){ LogPrintStr(s + '\n', true); };
+    dev::g_logPost(std::string("\n\n\n\n\n\n\n\n\n\n"), NULL);
+    //////////////////////////////////////////////////////////////////////
+
     if (!fLogTimestamps)
         LogPrintf("Startup time: %s\n", DateTimeStrFormat("%Y-%m-%d %H:%M:%S", GetTime()));
     LogPrintf("Default data directory %s\n", GetDefaultDataDir().string());
@@ -954,6 +989,10 @@ bool AppInit2(boost::thread_group& threadGroup)
         if (!sporkManager.SetPrivKey(GetArg("-sporkkey", "")))
             return InitError(_("Unable to sign spork message, wrong key?"));
     }
+
+    // Start the lightweight task scheme thread
+    CScheme::Function serviceLoop = boost::bind(&CScheme::serviceQueue, &scheme);
+    threadGroup.create_thread(boost::bind(&TraceThread<CScheme::Function>, "scheme", serviceLoop));
 
     /* Start the RPC server already.  It will be started in "warmup" mode
      * and not really process calls already (but it will signify connections
@@ -978,7 +1017,7 @@ bool AppInit2(boost::thread_group& threadGroup)
     //ignore masternodes below protocol version
     CMasterNode::minProtoVersion = GetArg("-masternodeminprotocol", MIN_MN_PROTO_VERSION);
 
-    int64_t nStart = GetTimeMillis();
+    int64_t nStart = 0;
 
 // ********************************************************* Step 5: Backup wallet and verify wallet database integrity
 #ifdef ENABLE_WALLET
@@ -1276,14 +1315,19 @@ bool AppInit2(boost::thread_group& threadGroup)
                 delete pcoinsdbview;
                 delete pcoinscatcher;
                 delete pblocktree;
+                delete pstorageresult;
 
                 pblocktree = new CBlockTreeDB(nBlockTreeDBCache, false, fReindex);
                 pcoinsdbview = new CCoinsViewDB(nCoinDBCache, false, fReindex);
                 pcoinscatcher = new CCoinsViewErrorCatcher(pcoinsdbview);
                 pcoinsTip = new CCoinsViewCache(pcoinscatcher);
 
-                if (fReindex)
+                if (fReindex) {
+                    boost::filesystem::path stateDir = GetDataDir() / "stateLux";
+                    StorageResults storageRes(stateDir.string());
+                    storageRes.wipeResults();
                     pblocktree->WriteReindexing(true);
+                }
 
                 if (fRequestShutdown)
                 {
@@ -1303,11 +1347,55 @@ bool AppInit2(boost::thread_group& threadGroup)
 
                 // If the loaded chain has a wrong genesis, bail out immediately
                 // (we're likely using a testnet datadir, or the other way around).
-                if (!mapBlockIndex.empty() && mapBlockIndex.count(Params().HashGenesisBlock()) == 0)
+                if (!mapBlockIndex.empty() && mapBlockIndex.count(chainparams.GetConsensus().hashGenesisBlock) == 0)
                     return InitError(_("Incorrect or no genesis block found. Wrong datadir for network?"));
 
+                /////////////////////////////////////////////////////////// lux
+                if((IsArgSet("-dgpstorage") && IsArgSet("-dgpevm")) || (!IsArgSet("-dgpstorage") && IsArgSet("-dgpevm")) ||
+                   (!IsArgSet("-dgpstorage") && !IsArgSet("-dgpevm"))){
+                    fGettingValuesDGP = true;
+                } else {
+                    fGettingValuesDGP = false;
+                }
+
+                dev::eth::Ethash::init();
+
+                boost::filesystem::path luxStateDir = GetDataDir() / "stateLux";
+
+                bool fStatus = boost::filesystem::exists(luxStateDir);
+                const std::string dirLux(luxStateDir.string());
+                const dev::h256 hashDB(dev::sha3(dev::rlp("")));
+                dev::eth::BaseState existsLuxState = fStatus ? dev::eth::BaseState::PreExisting : dev::eth::BaseState::Empty;
+                globalState = std::unique_ptr<LuxState>(new LuxState(dev::u256(0), LuxState::openDB(dirLux, hashDB, dev::WithExisting::Trust), dirLux, existsLuxState));
+                dev::eth::ChainParams cp((dev::eth::genesisInfo(dev::eth::Network::luxMainNetwork)));
+                globalSealEngine = std::unique_ptr<dev::eth::SealEngineFace>(cp.createSealEngine());
+
+                pstorageresult = new StorageResults(luxStateDir.string());
+
+                if(chainActive.Tip() != NULL && chainActive.Tip()->nHeight >= Params().FirstSCBlock()){
+//#if 0
+                    globalState->setRoot(uintToh256(chainActive.Tip()->hashStateRoot));
+                    globalState->setRootUTXO(uintToh256(chainActive.Tip()->hashUTXORoot));
+                    globalState->db().commit();
+                    globalState->dbUtxo().commit();
+//#endif
+                }/* else {
+#if 0
+                    globalState->setRoot(dev::sha3(dev::rlp("")));
+                    globalState->setRootUTXO(uintToh256(uint256())*//*uintToh256(chainparams.GenesisBlock().hashUTXORoot)*//*);
+                    globalState->populateFrom(cp.genesisState);
+#endif
+                }*/
+//                globalState->db().commit();
+//                globalState->dbUtxo().commit();
+
+                fRecordLogOpcodes = IsArgSet("-record-log-opcodes");
+                fIsVMlogFile = boost::filesystem::exists(GetDataDir() / "vmExecLogs.json");
+                ///////////////////////////////////////////////////////////
+
+
                 // Initialize the block index (no-op if non-empty database was already loaded)
-                if (!InitBlockIndex()) {
+                if (!InitBlockIndex(chainparams)) {
                     strLoadError = _("Error initializing block database");
                     break;
                 }
@@ -1318,8 +1406,22 @@ bool AppInit2(boost::thread_group& threadGroup)
                     break;
                 }
 
+                // Check for changed -logevents state
+                if (fLogEvents != GetBoolArg("-logevents", false) && !fLogEvents) {
+                    strLoadError = _("You need to rebuild the database using -reindex-chainstate to enable -logevents");
+                    break;
+                }
+
+                if (!GetBoolArg("-logevents", false))
+                {
+                    pstorageresult->wipeResults();
+//                  pblocktree->WipeHeightIndex();
+                    fLogEvents = false;
+                    pblocktree->WriteFlag("logevents", fLogEvents);
+                }
+
                 uiInterface.InitMessage(_("Verifying blocks..."));
-                if (!CVerifyDB().VerifyDB(pcoinsdbview, GetArg("-checklevel", 3),
+                if (!CVerifyDB().VerifyDB(chainparams, pcoinsdbview, GetArg("-checklevel", 3),
                         GetArg("-checkblocks", 500))) {
                     strLoadError = _("Corrupted block database detected");
                     break;
@@ -1493,12 +1595,24 @@ bool AppInit2(boost::thread_group& threadGroup)
 #endif // !ENABLE_WALLET
     // ********************************************************* Step 9: import blocks
 
+    if (chainparams.GetConsensus().vDeployments[Consensus::DEPLOYMENT_SEGWIT].nTimeout != 0) {
+        // Only advertize witness capabilities if they have a reasonable start time.
+        // This allows us to have the code merged without a defined softfork, by setting its
+        // end time to 0.
+        // Note that setting NODE_WITNESS is never required: the only downside from not
+        // doing so is that after activation, no upgraded nodes will fetch from you.
+        nLocalServices = ServiceFlags(nLocalServices | NODE_WITNESS);
+        // Only care about others providing witness capabilities if there is a softfork
+        // defined.
+        nRelevantServices = ServiceFlags(nRelevantServices | NODE_WITNESS);
+    }
+
     if (mapArgs.count("-blocknotify"))
         uiInterface.NotifyBlockTip.connect(BlockNotifyCallback);
 
     // scan for better chains in the block chain database, that are not yet connected in the active best chain
     CValidationState state;
-    if (!ActivateBestChain(state))
+    if (!ActivateBestChain(state, chainparams))
         strErrors << "Failed to connect best block";
 
     std::vector<boost::filesystem::path> vImportFiles;
@@ -1608,12 +1722,12 @@ bool AppInit2(boost::thread_group& threadGroup)
     LogPrintf("mapAddressBook.size() = %u\n", pwalletMain ? pwalletMain->mapAddressBook.size() : 0);
 #endif
 
-    StartNode(threadGroup);
+    StartNode(threadGroup, scheme);
 
 #ifdef ENABLE_WALLET
     // Generate coins in the background
     if (GetBoolArg("-gen", false) && pwalletMain) {
-        GenerateBitcoins(pwalletMain, GetArg("-genproclimit", 1));
+//        GenerateBitcoins(pwalletMain, GetArg("-genproclimit", 1));
     }
 #endif
 

@@ -1,11 +1,14 @@
 ![LUX Logo](https://github.com/216k155/lux/blob/master/src/qt/res/images/lux_logo_horizontal.png)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2F216k155%2Flux.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2F216k155%2Flux?ref=badge_shield)
 
-"Empowered By Intelligence"
+"FIRST OF ITS KIND"
 
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2F216k155%2Flux.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2F216k155%2Flux?ref=badge_shield) [![Build Status](https://travis-ci.org/216k155/lux.svg?branch=master)](https://travis-ci.org/216k155/lux) [![GitHub version](https://badge.fury.io/gh/216k155%2Flux.svg)](https://badge.fury.io/gh/216k155%2Flux.svg)
+Luxcore is GNU AGPLv3 licensed.
+
+[![Build Status](https://travis-ci.org/216k155/lux.svg?branch=master)](https://travis-ci.org/216k155/lux) [![GitHub version](https://badge.fury.io/gh/216k155%2Flux.svg)](https://badge.fury.io/gh/216k155%2Flux.svg)
 <a href="https://discord.gg/27xFP5Y"><img src="https://discordapp.com/api/guilds/364500397999652866/embed.png" alt="Discord server" /></a>
 
-[![Build history](https://buildstats.info/travisci/chart/216k155/lux?branch=master)](https://travis-ci.org/216k155/lux?branch=master)
+[![Build history](https://buildstats.info/travisci/chart/216k155/lux?branch=master)](https://travis-ci.org/216k155/lux?branch=master) [![Build history](https://buildstats.info/travisci/chart/216k155/lux?branch=SC-Consensus)](https://travis-ci.org/216k155/lux?branch=SC-Consensus)
 
 [Website](https://luxcore.io) — [LUXtre + LUXGate](https://github.com/216k155/luxtre) - [PoS Web Wallet](https://lux.poswallet.io) — [Block Explorer](https://explorer.luxcore.io/) — [Blog](https://reddit.com/r/LUXCoin) — [Forum](https://bitcointalk.org/index.php?topic=2254046.0) — [Telegram](https://t.me/LUXcoinOfficialChat) — [Twitter](https://twitter.com/LUX_Coin)
 
@@ -111,7 +114,7 @@ Then install [Homebrew](https://brew.sh)
     brew install cmake automake berkeley-db4 leveldb libtool boost@1.66 --c++11 --without-single --without-static miniupnpc openssl pkg-config protobuf qt5 libevent imagemagick --with-librsvg
 
 Link boost 1.66
-    
+
     brew link boost@1.66 --force
 
 #### Build Luxcore
@@ -122,7 +125,7 @@ Clone the Lux source code and cd into lux
         cd lux
         export LDFLAGS=-L/usr/local/opt/openssl/lib;export CPPFLAGS=-I/usr/local/opt/openssl/include
         ./autogen.sh
-        ./configure --disable-tests 
+        ./configure --disable-tests
         make -j$(nproc)
         make deploy
 

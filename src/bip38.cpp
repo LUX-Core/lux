@@ -12,6 +12,9 @@
 #include <string>
 
 
+static secp256k1_context* secp256k1_context_sign = NULL;
+
+
 /** 39 bytes - 78 characters
  * 1) Prefix - 2 bytes - 4 chars - strKey[0..3]
  * 2) Flagbyte - 1 byte - 2 chars - strKey[4..5]
@@ -46,8 +49,13 @@ void ComputePassfactor(std::string ownersalt, uint256 prefactor, uint256& passfa
 bool ComputePasspoint(uint256 passfactor, CPubKey& passpoint)
 {
     //passpoint is the ec_mult of passfactor on secp256k1
-    int clen = 65;
-    return secp256k1_ec_pubkey_create(UBEGIN(passpoint), &clen, passfactor.begin(), true) != 0;
+
+    secp256k1_pubkey pubkey;
+    size_t clen = 65;
+    int ret = secp256k1_ec_pubkey_create(secp256k1_context_sign, &pubkey, passfactor.begin());
+    assert(ret);
+
+    return secp256k1_ec_pubkey_serialize(secp256k1_context_sign, UBEGIN(passpoint), &clen, &pubkey, SECP256K1_EC_COMPRESSED ) != 0;
 }
 
 void ComputeSeedBPass(CPubKey passpoint, std::string strAddressHash, std::string strOwnerSalt, uint512& seedBPass)
@@ -215,14 +223,14 @@ bool BIP38_Decrypt(std::string strPassphrase, std::string strEncryptedKey, uint2
 
     //multiply passfactor by factorb mod N to yield the priv key
     privKey = factorB;
-    if (!secp256k1_ec_privkey_tweak_mul(privKey.begin(), passfactor.begin()))
+    if (!secp256k1_ec_privkey_tweak_mul(secp256k1_context_sign, privKey.begin(), passfactor.begin()))
         return false;
 
     //double check that the address hash matches our final privkey
     CKey k;
     k.Set(privKey.begin(), privKey.end(), fCompressed);
     CPubKey pubkey = k.GetPubKey();
-    string address = CBitcoinAddress(pubkey.GetID()).ToString();
+    string address = EncodeDestination(pubkey.GetID());
 
     return strAddressHash == AddressToBip38Hash(address);
 }

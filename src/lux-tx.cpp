@@ -4,11 +4,12 @@
 
 #include "base58.h"
 #include "clientversion.h"
+#include "consensus/consensus.h"
 #include "coins.h"
 #include "core_io.h"
 #include "keystore.h"
-#include "primitives/block.h" // for MAX_BLOCK_SIZE
 #include "primitives/transaction.h"
+#include "script/interpreter.h"
 #include "script/script.h"
 #include "script/sign.h"
 #include "ui_interface.h" // for _(...)
@@ -16,6 +17,7 @@
 #include "util.h"
 #include "utilmoneystr.h"
 #include "utilstrencodings.h"
+#include "main.h"
 
 #include <stdio.h>
 
@@ -27,7 +29,7 @@ using namespace std;
 
 static bool fCreateBlank;
 static map<string, UniValue> registers;
-CClientUIInterface uiInterface;
+//CClientUIInterface uiInterface;
 
 static bool AppInitRawTx(int argc, char* argv[])
 {
@@ -149,7 +151,6 @@ static void RegisterLoad(const string& strInput)
     }
 
     if (ferror(f)) {
-        fclose(f);
         string strErr = "Error reading file " + filename;
         throw runtime_error(strErr);
     }
@@ -194,7 +195,7 @@ static void MutateTxAddInput(CMutableTransaction& tx, const string& strInput)
     uint256 txid(strTxid);
 
     static const unsigned int minTxOutSz = 9;
-    static const unsigned int maxVout = MAX_BLOCK_SIZE / minTxOutSz;
+    static const unsigned int maxVout = MAX_BLOCK_BASE_SIZE / minTxOutSz;
 
     // extract and validate vout
     string strVout = strInput.substr(pos + 1, string::npos);
@@ -224,12 +225,12 @@ static void MutateTxAddOutAddr(CMutableTransaction& tx, const string& strInput)
 
     // extract and validate ADDRESS
     string strAddr = strInput.substr(pos + 1, string::npos);
-    CBitcoinAddress addr(strAddr);
-    if (!addr.IsValid())
+    CTxDestination dest = DecodeDestination(strAddr);
+    if (!IsValidDestination(dest))
         throw runtime_error("invalid TX output address");
 
     // build standard output script via GetScriptForDestination()
-    CScript scriptPubKey = GetScriptForDestination(addr.Get());
+    CScript scriptPubKey = GetScriptForDestination(dest);
 
     // construct TxOut, append to transaction output list
     CTxOut txout(value, scriptPubKey);
@@ -429,15 +430,31 @@ static void MutateTxSign(CMutableTransaction& tx, const string& flagStr)
         const CScript& prevPubKey = coins->vout[txin.prevout.n].scriptPubKey;
 
         txin.scriptSig.clear();
+
+        CTransaction txPrev;
+        uint256 prevBlockHash;
+        //Find previous transaction with the same output as txNew input
+        if (!GetTransaction(mergedTx.vin[i].prevout.hash, txPrev, Params().GetConsensus(), prevBlockHash)) {
+            if(fDebug) LogPrintf("CDarkSendPool::MutateTxSign() - Signing - Failed to get previous transaction\n");
+            //TODO: probably should raise exception here
+            return;
+        }
+        const CAmount& amount = txPrev.vout[txin.prevout.n].nValue;
+        SignatureData sigdata;
         // Only sign SIGHASH_SINGLE if there's a corresponding output:
         if (!fHashSingle || (i < mergedTx.vout.size()))
-            SignSignature(keystore, prevPubKey, mergedTx, i, nHashType);
+            ProduceSignature(MutableTransactionSignatureCreator(&keystore, &mergedTx, i, amount, nHashType), prevPubKey, sigdata);
 
         // ... and merge in other signatures:
         BOOST_FOREACH (const CTransaction& txv, txVariants) {
-            txin.scriptSig = CombineSignatures(prevPubKey, mergedTx, i, txin.scriptSig, txv.vin[i].scriptSig);
+            sigdata = CombineSignatures(prevPubKey, MutableTransactionSignatureChecker(&mergedTx, i, amount), sigdata, DataFromTransaction(txv, i));
         }
-        if (!VerifyScript(txin.scriptSig, prevPubKey, STANDARD_SCRIPT_VERIFY_FLAGS, MutableTransactionSignatureChecker(&mergedTx, i)))
+
+        UpdateTransaction(mergedTx, i, sigdata);
+
+        //If transaction contains witness, then witness script should be verified
+        const CScriptWitness *witness = (i < mergedTx.wit.vtxinwit.size()) ? &mergedTx.wit.vtxinwit[i].scriptWitness : nullptr;
+        if (!VerifyScript(txin.scriptSig, prevPubKey, witness, STANDARD_SCRIPT_VERIFY_FLAGS, MutableTransactionSignatureChecker(&mergedTx, i, amount)))
             fComplete = false;
     }
 
@@ -559,7 +576,7 @@ static int CommandLineRawTx(int argc, char* argv[])
             if (strHexTx == "-") // "-" implies standard input
                 strHexTx = readStdin();
 
-            if (!DecodeHexTx(txDecodeTmp, strHexTx))
+            if (!DecodeHexTx(txDecodeTmp, strHexTx, true))
                 throw runtime_error("invalid transaction encoding");
 
             startArg = 2;

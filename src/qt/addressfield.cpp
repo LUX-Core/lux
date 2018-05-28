@@ -4,7 +4,7 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "addressfield.h"
-//#include "wallet/wallet.h"
+#include "wallet.h"
 //#include "base58.h"
 #include "qvalidatedlineedit.h"
 #include "bitcoinaddressvalidator.h"
@@ -58,7 +58,6 @@ bool AddressField::isValidAddress()
 
    // ((QValidatedLineEdit*)lineEdit())->checkValidity();   Testing
    // return ((QValidatedLineEdit*)lineEdit())->isValid();
-   
    return true;
 }
 
@@ -147,7 +146,7 @@ void AddressField::on_editingFinished()
 
 void AddressField::appendAddress(const QString &strAddress)
 {
-    /*CBitcoinAddress address(strAddress.toStdString());
+    /*CTxDestination address = DecodeDestination(strAddress.toStdString());
     if(!m_stringList.contains(strAddress) &&
             IsMine(*pwalletMain, address.Get()))
     {

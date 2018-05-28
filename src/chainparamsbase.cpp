@@ -70,6 +70,16 @@ public:
 };
 static CBaseUnitTestParams unitTestParams;
 
+class CBaseSegwitTestParams : public CBaseMainParams {
+public:
+    CBaseSegwitTestParams() {
+        networkID = CBaseChainParams::SEGWITTEST;
+        strDataDir = "segwittest";
+        nRPCPort = 9666;
+    }
+};
+static CBaseSegwitTestParams segwitTestParams;
+
 static CBaseChainParams* pCurrentBaseParams = 0;
 
 const CBaseChainParams& BaseParams()
@@ -93,6 +103,9 @@ void SelectBaseParams(CBaseChainParams::Network network)
     case CBaseChainParams::UNITTEST:
         pCurrentBaseParams = &unitTestParams;
         break;
+    case CBaseChainParams::SEGWITTEST:
+        pCurrentBaseParams = &segwitTestParams;
+        break;
     default:
         assert(false && "Unimplemented network");
         return;
@@ -103,6 +116,7 @@ CBaseChainParams::Network NetworkIdFromCommandLine()
 {
     bool fRegTest = GetBoolArg("-regtest", false);
     bool fTestNet = GetBoolArg("-testnet", false);
+    bool fSegWitTestNet = GetBoolArg("-segwittest", false);
 
     if (fTestNet && fRegTest)
         return CBaseChainParams::MAX_NETWORK_TYPES;
@@ -110,6 +124,8 @@ CBaseChainParams::Network NetworkIdFromCommandLine()
         return CBaseChainParams::REGTEST;
     if (fTestNet)
         return CBaseChainParams::TESTNET;
+    if (fSegWitTestNet)
+        return CBaseChainParams::SEGWITTEST;
     return CBaseChainParams::MAIN;
 }
 

@@ -96,6 +96,8 @@ enum BlockStatus: uint32_t {
     BLOCK_FAILED_VALID = 32, //! stage after last reached validness failed
     BLOCK_FAILED_CHILD = 64, //! descends from failed block
     BLOCK_FAILED_MASK = BLOCK_FAILED_VALID | BLOCK_FAILED_CHILD,
+
+    BLOCK_OPT_WITNESS = 128, //!< block data in blk*.data was received with a witness-enforcing client
 };
 
 /** The block chain is a tree shaped structure starting with the
@@ -171,6 +173,8 @@ public:
     unsigned int nTime;
     unsigned int nBits;
     unsigned int nNonce;
+    uint256 hashStateRoot; // lux
+    uint256 hashUTXORoot; // lux
 
     //! (memory only) Sequential id assigned to distinguish order in which blocks are received.
     uint32_t nSequenceId;
@@ -203,6 +207,8 @@ public:
         nTime = 0;
         nBits = 0;
         nNonce = 0;
+        hashStateRoot  = uint256(); // lux
+        hashUTXORoot   = uint256(); // lux
     }
 
     CBlockIndex()
@@ -219,6 +225,8 @@ public:
         nTime = block.nTime;
         nBits = block.nBits;
         nNonce = block.nNonce;
+        hashStateRoot  = block.hashStateRoot; // lux
+        hashUTXORoot   = block.hashUTXORoot; // lux
 
         //Proof of Stake
         bnChainTrust = 0;
@@ -269,6 +277,8 @@ public:
         block.nTime = nTime;
         block.nBits = nBits;
         block.nNonce = nNonce;
+        block.hashStateRoot  = hashStateRoot; // lux
+        block.hashUTXORoot   = hashUTXORoot; // lux
         return block;
     }
 
@@ -343,7 +353,7 @@ public:
      * in the last Params().ToCheckBlockUpgradeMajority() blocks, starting at pstart
      * and going backwards.
      */
-    static bool IsSuperMajority(int minVersion, const CBlockIndex* pstart, unsigned int nRequired);
+    static bool IsSuperMajority(int minVersion, const CBlockIndex* pstart, unsigned int nRequired, const Consensus::Params&);
 
     std::string ToString() const
     {
@@ -443,6 +453,10 @@ public:
         READWRITE(nTime);
         READWRITE(nBits);
         READWRITE(nNonce);
+//        if (this->nVersion > SC_BLOCK_VERSION) {
+//            READWRITE(hashStateRoot); // lux
+//            READWRITE(hashUTXORoot); // lux
+//        }
     }
 
     uint256 GetBlockHash() const
@@ -454,6 +468,8 @@ public:
         block.nTime = nTime;
         block.nBits = nBits;
         block.nNonce = nNonce;
+        block.hashStateRoot   = hashStateRoot; // lux
+        block.hashUTXORoot    = hashUTXORoot; // lux
         return block.GetHash();
     }
 

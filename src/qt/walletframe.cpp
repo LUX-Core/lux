@@ -6,20 +6,23 @@
 
 #include "bitcoingui.h"
 #include "walletview.h"
-
+#include "wallet.h"
 #include <cstdio>
 
 #include <QHBoxLayout>
 #include <QLabel>
 
-WalletFrame::WalletFrame(BitcoinGUI* _gui) : QFrame(_gui),
-                                             gui(_gui)
+WalletFrame::WalletFrame(BitcoinGUI *_gui) :
+    QFrame(_gui),
+    gui(_gui)
 {
     // Leave HBox hook for adding a list view later
     QHBoxLayout* walletFrameLayout = new QHBoxLayout(this);
     setContentsMargins(0, 0, 0, 0);
     walletStack = new QStackedWidget(this);
-    walletFrameLayout->setContentsMargins(0, 0, 0, 0);
+    walletStack->setObjectName("walletStack");
+    walletStack->setStyleSheet("#walletStack {border: 1px solid #c4c1bd;}");
+    walletFrameLayout->setContentsMargins(0,0,0,0);
     walletFrameLayout->addWidget(walletStack);
 
     QLabel* noWallet = new QLabel(tr("No wallet has been loaded."));
@@ -41,7 +44,7 @@ bool WalletFrame::addWallet(const QString& name, WalletModel* walletModel)
     if (!gui || !clientModel || !walletModel || mapWalletViews.count(name) > 0)
         return false;
 
-    WalletView* walletView = new WalletView(this);
+    WalletView *walletView = new WalletView(this);
     walletView->setBitcoinGUI(gui);
     walletView->setClientModel(clientModel);
     walletView->setWalletModel(walletModel);
@@ -118,13 +121,6 @@ void WalletFrame::gotoHistoryPage()
         i.value()->gotoHistoryPage();
 }
 
-void WalletFrame::gotoStakingPage()
-{
-    QMap<QString, WalletView*>::const_iterator i;
-    for (i = mapWalletViews.constBegin(); i != mapWalletViews.constEnd(); ++i)
-        i.value()->gotoStakingPage();
-}
-
 void WalletFrame::gotoTradingPage()
 {
     QMap<QString, WalletView*>::const_iterator i;
@@ -138,12 +134,21 @@ void WalletFrame::gotoMasternodePage() // Masternode list
     for (i = mapWalletViews.constBegin(); i != mapWalletViews.constEnd(); ++i)
         i.value()->gotoMasternodePage();
 }
-void WalletFrame::gotoSmartTokenPage()
+
+void WalletFrame::gotoLSRTokenPage(bool toAddTokenPage)
 {
     QMap<QString, WalletView*>::const_iterator i;
     for (i = mapWalletViews.constBegin(); i != mapWalletViews.constEnd(); ++i)
-        i.value()->gotoSmartTokenPage();
+        i.value()->gotoLSRTokenPage(toAddTokenPage);
 }
+
+void WalletFrame::gotoSmartContractPage()
+{
+    QMap<QString, WalletView*>::const_iterator i;
+    for (i = mapWalletViews.constBegin(); i != mapWalletViews.constEnd(); ++i)
+        i.value()->gotoSmartContractPage();
+}
+
 void WalletFrame::gotoBlockExplorerPage()
 {
     QMap<QString, WalletView*>::const_iterator i;
@@ -218,40 +223,40 @@ void WalletFrame::restoreWallet()
 
 void WalletFrame::changePassphrase()
 {
-    WalletView* walletView = currentWalletView();
+    WalletView *walletView = currentWalletView();
     if (walletView)
         walletView->changePassphrase();
 }
 
 void WalletFrame::unlockWallet()
 {
-    WalletView* walletView = currentWalletView();
+    WalletView *walletView = currentWalletView();
     if (walletView)
         walletView->unlockWallet();
 }
 
 void WalletFrame::lockWallet()
 {
-    WalletView* walletView = currentWalletView();
+    WalletView *walletView = currentWalletView();
     if (walletView)
         walletView->lockWallet();
 }
 
 void WalletFrame::usedSendingAddresses()
 {
-    WalletView* walletView = currentWalletView();
+    WalletView *walletView = currentWalletView();
     if (walletView)
         walletView->usedSendingAddresses();
 }
 
 void WalletFrame::usedReceivingAddresses()
 {
-    WalletView* walletView = currentWalletView();
+    WalletView *walletView = currentWalletView();
     if (walletView)
         walletView->usedReceivingAddresses();
 }
 
-WalletView* WalletFrame::currentWalletView()
+WalletView *WalletFrame::currentWalletView()
 {
     return qobject_cast<WalletView*>(walletStack->currentWidget());
 }

@@ -213,7 +213,7 @@ void TransactionView::setModel(WalletModel* model)
         // Note: it's a good idea to connect this signal AFTER the model is set
         connect(transactionView->selectionModel(), SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this, SLOT(computeSum()));
 
-        columnResizingFixer = new GUIUtil::TableViewLastColumnResizingFixer(transactionView, AMOUNT_MINIMUM_COLUMN_WIDTH, MINIMUM_COLUMN_WIDTH);
+        columnResizingFixer = new GUIUtil::TableViewLastColumnResizingFixer(transactionView, AMOUNT_MINIMUM_COLUMN_WIDTH, MINIMUM_COLUMN_WIDTH, this, 2);
 
         if (model->getOptionsModel()) {
             // Add third party transaction URLs to context menu

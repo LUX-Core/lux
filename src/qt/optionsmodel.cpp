@@ -102,6 +102,11 @@ void OptionsModel::Init()
     if (!SoftSetArg("-dbcache", settings.value("nDatabaseCache").toString().toStdString()))
         addOverriddenOption("-dbcache");
 
+    if (!settings.contains("fLogEvents"))
+        settings.setValue("fLogEvents", fLogEvents);
+    if (!SoftSetBoolArg("-logevents", settings.value("fLogEvents").toBool()))
+        addOverriddenOption("-logevents");
+
     if (!settings.contains("nThreadsScriptVerif"))
         settings.setValue("nThreadsScriptVerif", DEFAULT_SCRIPTCHECK_THREADS);
     if (!SoftSetArg("-par", settings.value("nThreadsScriptVerif").toString().toStdString()))
@@ -114,6 +119,10 @@ void OptionsModel::Init()
     if (!SoftSetBoolArg("-spendzeroconfchange", settings.value("bSpendZeroConfChange").toBool()))
         addOverriddenOption("-spendzeroconfchange");
 #endif
+    if (!settings.contains("bZeroBalanceAddressToken"))
+        settings.setValue("bZeroBalanceAddressToken", true);
+    if (!SoftSetBoolArg("-zerobalanceaddresstoken", settings.value("bZeroBalanceAddressToken").toBool()))
+        addOverriddenOption("-zerobalanceaddresstoken");
 
     // Network
     if (!settings.contains("fUseUPnP"))
@@ -125,6 +134,10 @@ void OptionsModel::Init()
         settings.setValue("fListen", DEFAULT_LISTEN);
     if (!SoftSetBoolArg("-listen", settings.value("fListen").toBool()))
         addOverriddenOption("-listen");
+
+    if (!settings.contains("fNotUseChangeAddress"))
+        settings.setValue("fNotUseChangeAddress", DEFAULT_NOT_USE_CHANGE_ADDRESS);
+        fNotUseChangeAddress = settings.value("fNotUseChangeAddress").toBool();
 
     if (!settings.contains("fUseProxy"))
         settings.setValue("fUseProxy", false);
@@ -213,6 +226,8 @@ QVariant OptionsModel::data(const QModelIndex& index, int role) const
         case ShowMasternodesTab:
             return settings.value("fShowMasternodesTab");
 #endif
+        case ZeroBalanceAddressToken:
+            return settings.value("bZeroBalanceAddressToken");
         case DisplayUnit:
             return nDisplayUnit;
         case ThirdPartyTxUrls:
@@ -231,6 +246,8 @@ QVariant OptionsModel::data(const QModelIndex& index, int role) const
               return fparallelMasterNode;
         case DatabaseCache:
             return settings.value("nDatabaseCache");
+        case LogEvents:
+            return settings.value("fLogEvents");
         case ThreadsScriptVerif:
             return settings.value("nThreadsScriptVerif");
         case DarksendRounds:
@@ -239,6 +256,8 @@ QVariant OptionsModel::data(const QModelIndex& index, int role) const
             return QVariant(nAnonymizeLuxAmount);
         case Listen:
             return settings.value("fListen");
+        case NotUseChangeAddress:
+            return settings.value("fNotUseChangeAddress");
         default:
             return QVariant();
         }
@@ -312,6 +331,11 @@ bool OptionsModel::setData(const QModelIndex& index, const QVariant& value, int 
             }
             break;
 #endif
+        case ZeroBalanceAddressToken:
+            bZeroBalanceAddressToken = value.toBool();
+            settings.setValue("bZeroBalanceAddressToken", bZeroBalanceAddressToken);
+            Q_EMIT zeroBalanceAddressTokenChanged(bZeroBalanceAddressToken);
+            break;
         case DisplayUnit:
             setDisplayUnit(value);
             break;
@@ -372,6 +396,12 @@ bool OptionsModel::setData(const QModelIndex& index, const QVariant& value, int 
                 setRestartRequired(true);
             }
             break;
+        case LogEvents:
+            if (settings.value("fLogEvents") != value) {
+               settings.setValue("fLogEvents", value);
+               setRestartRequired(true);
+            }
+           break;
         case ThreadsScriptVerif:
             if (settings.value("nThreadsScriptVerif") != value) {
                 settings.setValue("nThreadsScriptVerif", value);
@@ -382,6 +412,12 @@ bool OptionsModel::setData(const QModelIndex& index, const QVariant& value, int 
             if (settings.value("fListen") != value) {
                 settings.setValue("fListen", value);
                 setRestartRequired(true);
+            }
+            break;
+        case NotUseChangeAddress:
+             if (settings.value("fNotUseChangeAddress") != value) {
+                 settings.setValue("fNotUseChangeAddress", value);
+                 fNotUseChangeAddress = value.toBool();
             }
             break;
         default:

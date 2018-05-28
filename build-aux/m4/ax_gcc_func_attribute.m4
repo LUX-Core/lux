@@ -31,6 +31,7 @@
 #    cold
 #    const
 #    constructor
+#    constructor_priority for constructor attribute with priority
 #    deprecated
 #    destructor
 #    dllexport

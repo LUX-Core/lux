@@ -8,6 +8,7 @@
 #include "walletdb.h"
 
 #include "base58.h"
+#include "consensus/validation.h"
 #include "protocol.h"
 #include "serialize.h"
 #include "sync.h"
@@ -15,7 +16,10 @@
 #include "utiltime.h"
 #include "wallet.h"
 #include "stake.h"
+#include "main.h"
+#include <atomic>
 
+#include <boost/version.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/foreach.hpp>
 #include <boost/scoped_ptr.hpp>
@@ -24,7 +28,7 @@
 
 using namespace boost;
 using namespace std;
-
+static std::atomic<unsigned int> nWalletDBUpdateCounter;
 static uint64_t nAccountingEntryNumber = 0;
 
 //
@@ -132,7 +136,7 @@ bool CWalletDB::WriteMasterKey(unsigned int nID, const CMasterKey& kMasterKey)
 bool CWalletDB::WriteCScript(const uint160& hash, const CScript& redeemScript)
 {
     nWalletDBUpdated++;
-    return Write(std::make_pair(std::string("cscript"), hash), redeemScript, false);
+    return Write(std::make_pair(std::string("cscript"), hash), *(const CScriptBase*)(&redeemScript), false);
 }
 
 bool CWalletDB::WriteWatchOnly(const CScript& dest)
@@ -432,11 +436,11 @@ bool ReadKeyValue(CWallet* pwallet, CDataStream& ssKey, CDataStream& ssValue, CW
         if (strType == "name") {
             string strAddress;
             ssKey >> strAddress;
-            ssValue >> pwallet->mapAddressBook[CBitcoinAddress(strAddress).Get()].name;
+            ssValue >> pwallet->mapAddressBook[DecodeDestination(strAddress)].name;
         } else if (strType == "purpose") {
             string strAddress;
             ssKey >> strAddress;
-            ssValue >> pwallet->mapAddressBook[CBitcoinAddress(strAddress).Get()].purpose;
+            ssValue >> pwallet->mapAddressBook[DecodeDestination(strAddress)].purpose;
         } else if (strType == "tx") {
             uint256 hash;
             ssKey >> hash;
@@ -624,7 +628,7 @@ bool ReadKeyValue(CWallet* pwallet, CDataStream& ssKey, CDataStream& ssValue, CW
             ssKey >> i;
             std::pair<std::string, int> pMultiSend;
             ssValue >> pMultiSend;
-            if (CBitcoinAddress(pMultiSend.first).IsValid()) {
+            if (IsValidDestination(DecodeDestination(pMultiSend.first))) {
                 pwallet->vMultiSend.push_back(pMultiSend);
             }
         } else if (strType == "msettingsv2") //presstab HyperStake
@@ -649,10 +653,32 @@ bool ReadKeyValue(CWallet* pwallet, CDataStream& ssKey, CDataStream& ssValue, CW
             ssKey >> strAddress;
             ssKey >> strKey;
             ssValue >> strValue;
-            if (!pwallet->LoadDestData(CBitcoinAddress(strAddress).Get(), strKey, strValue)) {
+            if (!pwallet->LoadDestData(DecodeDestination(strAddress), strKey, strValue)) {
                 strErr = "Error reading wallet database: LoadDestData failed";
                 return false;
             }
+        } else if (strType == "token") {
+            uint256 hash;
+            ssKey >> hash;
+            CTokenInfo wtoken;
+            ssValue >> wtoken;
+            if (wtoken.GetHash() != hash) {
+                strErr = "Error reading wallet database: CTokenInfo corrupt";
+                return false;
+            }
+
+            pwallet->LoadToken(wtoken);
+        } else if (strType == "tokentx") {
+            uint256 hash;
+            ssKey >> hash;
+            CTokenTx wTokenTx;
+            ssValue >> wTokenTx;
+            if (wTokenTx.GetHash() != hash) {
+                strErr = "Error reading wallet database: CTokenTx corrupt";
+                return false;
+            }
+
+            pwallet->LoadTokenTx(wTokenTx);
         }
     } catch (...) {
         return false;
@@ -1020,4 +1046,40 @@ bool CWalletDB::EraseDestData(const std::string& address, const std::string& key
 {
     nWalletDBUpdated++;
     return Erase(std::make_pair(std::string("destdata"), std::make_pair(address, key)));
+}
+
+bool CWalletDB::WriteContractData(const string &address, const string &key, const string &value)
+{
+    nWalletDBUpdated++;
+    return Write(std::make_pair(std::string("contractdata"), std::make_pair(address, key)), value);
+}
+
+bool CWalletDB::EraseContractData(const string &address, const string &key)
+{
+    nWalletDBUpdated++;
+    return Erase(std::make_pair(std::string("contractdata"), std::make_pair(address, key)));
+}
+
+bool CWalletDB::WriteToken(const CTokenInfo &wtoken)
+{
+    nWalletDBUpdated++;
+    return Write(std::make_pair(std::string("token"), wtoken.GetHash()), wtoken);
+}
+
+bool CWalletDB::EraseToken(uint256 hash)
+{
+    nWalletDBUpdated++;
+    return Erase(std::make_pair(std::string("token"), hash));
+}
+
+bool CWalletDB::WriteTokenTx(const CTokenTx &wTokenTx)
+{
+    nWalletDBUpdated++;
+    return Write(std::make_pair(std::string("tokentx"), wTokenTx.GetHash()), wTokenTx);
+}
+
+bool CWalletDB::EraseTokenTx(uint256 hash)
+{
+    nWalletDBUpdated++;
+    return Erase(std::make_pair(std::string("tokentx"), hash));
 }

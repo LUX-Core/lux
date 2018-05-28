@@ -19,10 +19,10 @@
 #   is necessary on AIX to use the special cc_r compiler alias.)
 #
 #   NOTE: You are assumed to not only compile your program with these flags,
-#   but also link it with them as well. e.g. you should link with
+#   but also to link with them as well. For example, you might link with
 #   $PTHREAD_CC $CFLAGS $PTHREAD_CFLAGS $LDFLAGS ... $PTHREAD_LIBS $LIBS
 #
-#   If you are only building threads programs, you may wish to use these
+#   If you are only building threaded programs, you may wish to use these
 #   variables in your default LIBS, CFLAGS, and CC:
 #
 #     LIBS="$PTHREAD_LIBS $LIBS"
@@ -30,8 +30,8 @@
 #     CC="$PTHREAD_CC"
 #
 #   In addition, if the PTHREAD_CREATE_JOINABLE thread-attribute constant
-#   has a nonstandard name, defines PTHREAD_CREATE_JOINABLE to that name
-#   (e.g. PTHREAD_CREATE_UNDETACHED on AIX).
+#   has a nonstandard name, this macro defines PTHREAD_CREATE_JOINABLE to
+#   that name (e.g. PTHREAD_CREATE_UNDETACHED on AIX).
 #
 #   Also HAVE_PTHREAD_PRIO_INHERIT is defined if pthread is found and the
 #   PTHREAD_PRIO_INHERIT symbol is defined when compiling with
@@ -141,9 +141,11 @@ ax_pthread_flags="pthreads none -Kthread -pthread -pthreads -mthreads pthread --
 #           (Note: HP C rejects this with "bad form for `-t' option")
 # -pthreads: Solaris/gcc (Note: HP C also rejects)
 # -mt: Sun Workshop C (may only link SunOS threads [-lthread], but it
-#      doesn't hurt to check since this sometimes defines pthreads too;
-#      also defines -D_REENTRANT)
-#      ... -mt is also the pthreads flag for HP/aCC
+#      doesn't hurt to check since this sometimes defines pthreads and
+#      -D_REENTRANT too), HP C (must be checked before -lpthread, which
+#      is present but should not be used directly; and before -mthreads,
+#      because the compiler interprets this as "-mt" + "-hreads")
+# -mthreads: Mingw32/gcc, Lynx/gcc
 # pthread: Linux, etcetera
 # --thread-safe: KAI C++
 # pthread-config: use pthread-config program (for GNU Pth library)
@@ -186,11 +188,11 @@ case $host_os in
 
         # On Solaris (at least, for some versions), libc contains stubbed
         # (non-functional) versions of the pthreads routines, so link-based
-        # tests will erroneously succeed.  (We need to link with -pthreads/-mt/
-        # -lpthread.)  (The stubs are missing pthread_cleanup_push, or rather
-        # a function called by this macro, so we could check for that, but
-        # who knows whether they'll stub that too in a future libc.)  So,
-        # we'll just look for -pthreads and -lpthread first:
+        # tests will erroneously succeed. (N.B.: The stubs are missing
+        # pthread_cleanup_push, or rather a function called by this macro,
+        # so we could check for that, but who knows whether they'll stub
+        # that too in a future libc.)  So we'll check first for the
+        # standard Solaris way of linking pthreads (-mt -lpthread).
 
         ax_pthread_flags="-mt,pthread pthread $ax_pthread_flags"
         ;;
