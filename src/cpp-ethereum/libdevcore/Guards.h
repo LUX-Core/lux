@@ -24,12 +24,19 @@
 #include <mutex>
 #include <condition_variable>
 #include <atomic>
+
+#ifndef __APPLE__
 #pragma warning(push)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
+#endif
+
 #include <boost/thread.hpp>
+
+#ifndef __APPLE__
 #pragma warning(pop)
 #pragma GCC diagnostic pop
+#endif
 
 namespace dev
 {

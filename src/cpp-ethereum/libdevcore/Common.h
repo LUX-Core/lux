@@ -45,12 +45,20 @@
 #include <functional>
 #include <string>
 #include <chrono>
+
+#ifndef __APPLE__
 #pragma warning(push)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
+#endif
+
 #include <boost/multiprecision/cpp_int.hpp>
+
+#ifndef __APPLE__
 #pragma warning(pop)
 #pragma GCC diagnostic pop
+#endif
+
 #include "vector_ref.h"
 
 // CryptoPP defines byte in the global namespace, so must we.
