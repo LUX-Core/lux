@@ -357,22 +357,31 @@ BitcoinApplication::~BitcoinApplication()
         emit stopThread();
         coreThread->wait();
         qDebug() << __func__ << ": Stopped thread";
+        delete coreThread;
+        coreThread = 0;
     }
 
     delete window;
     window = 0;
+    delete clientModel;
+    clientModel = 0;
 #ifdef ENABLE_WALLET
     delete paymentServer;
     paymentServer = 0;
+    delete walletModel;
+    walletModel = 0;
 #endif
     // Delete Qt-settings if user clicked on "Reset Options"
-    QSettings settings;
-    if (optionsModel->resetSettings) {
-        settings.clear();
-        settings.sync();
+    if (optionsModel != 0)
+    {
+        QSettings settings;
+        if (optionsModel->resetSettings) {
+            settings.clear();
+            settings.sync();
+        }
+        delete optionsModel;
+        optionsModel = 0;
     }
-    delete optionsModel;
-    optionsModel = 0;
 
 }
 
