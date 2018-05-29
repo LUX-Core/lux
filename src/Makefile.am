@@ -320,12 +320,14 @@ crypto_libbitcoin_crypto_a_SOURCES = \
   cpp-ethereum/utils/libscrypt/sysendian.h
 
 # univalue JSON library
+univalue_libbitcoin_univalue_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
 univalue_libbitcoin_univalue_a_SOURCES = \
   univalue/univalue.cpp \
   univalue/univalue_read.cpp \
   univalue/univalue_write.cpp \
   univalue/univalue_escapes.h \
-  univalue/univalue.h
+  univalue/univalue.h \
+  $(BITCOIN_CORE_H)
 
 # consensus: shared between all executables that validate any consensus rules.
 libbitcoin_consensus_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
@@ -693,7 +695,10 @@ lux_tx_LDADD += $(BOOST_LIBS) $(BDB_LIBS) $(SSL_LIBS) $(CRYPTO_LIBS) $(EVENT_PTH
 # bitcoinconsensus library #
 if BUILD_BITCOIN_LIBS
 include_HEADERS = script/bitcoinconsensus.h
-libbitcoinconsensus_la_SOURCES = $(crypto_libbitcoin_crypto_a_SOURCES) $(libbitcoin_consensus_a_SOURCES)
+
+libbitcoinconsensus_la_SOURCES = \
+  $(libbitcoin_consensus_a_SOURCES) \
+  $(BITCOIN_CORE_H)
 
 if GLIBC_BACK_COMPAT
   libbitcoinconsensus_la_SOURCES += compat/glibc_compat.cpp
@@ -701,7 +706,7 @@ if GLIBC_BACK_COMPAT
 endif
 
 libbitcoinconsensus_la_LDFLAGS = -no-undefined $(RELDFLAGS)
-libbitcoinconsensus_la_LIBADD = $(LIBSECP256K1) $(CRYPTO_LIBS) $(BOOST_LIBS)
+libbitcoinconsensus_la_LIBADD = $(LIBSECP256K1) $(CRYPTO_LIBS) $(BOOST_LIBS) $(SSL_LIBS) $(LIBBITCOIN_CRYPTO)
 libbitcoinconsensus_la_CPPFLAGS = $(CRYPTO_CFLAGS) $(BITCOIN_INCLUDES) -I$(builddir)/obj -I$(srcdir)/secp256k1/include -DBUILD_BITCOIN_INTERNAL
 
 endif
