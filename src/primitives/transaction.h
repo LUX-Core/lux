@@ -73,7 +73,6 @@ public:
     CScript scriptSig;
     uint32_t nSequence;
     CScript prevPubKey;
-    CScriptWitness scriptWitness; //! Only serialized through CTransaction
 
     /* Setting nSequence to this value for every input in a transaction
      * disables nLockTime. */
@@ -482,8 +481,8 @@ public:
 
     bool HasWitness() const
     {
-        for (size_t i = 0; i < vin.size(); i++) {
-            if (!vin[i].scriptWitness.IsNull()) {
+        for (size_t i = 0; i < wit.vtxinwit.size(); i++) {
+            if (!wit.vtxinwit[i].scriptWitness.IsNull()) {
                 return true;
             }
         }
@@ -530,8 +529,8 @@ struct CMutableTransaction
 
     bool HasWitness() const
     {
-        for (size_t i = 0; i < vin.size(); i++) {
-            if (!vin[i].scriptWitness.IsNull()) {
+        for (size_t i = 0; i < wit.vtxinwit.size(); i++) {
+            if (!wit.vtxinwit[i].scriptWitness.IsNull()) {
                 return true;
             }
         }
