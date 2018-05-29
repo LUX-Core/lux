@@ -280,7 +280,7 @@
             </widget>
            </item>
           <item>
-           <widget class="QCheckBox" name="parallelMasterNode">
+           <widget class="QCheckBox" name="parallelMasterNode1">
             <property name="toolTip">
              <string>Coming soon</string>
             </property>
