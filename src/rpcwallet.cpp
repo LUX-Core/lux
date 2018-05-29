@@ -2793,7 +2793,7 @@ UniValue sendtocontract(const UniValue& params, bool fHelp){
 
     CAmount nAmount = 0;
     if (params.size() > 2){
-        nAmount = AmountFromValue(params[2]);
+        nAmount = params[2].get_int64();
         if (nAmount < 0)
             throw JSONRPCError(RPC_TYPE_ERROR, "Invalid amount for send");
     }
