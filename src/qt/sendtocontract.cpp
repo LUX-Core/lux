@@ -230,22 +230,14 @@ void SendToContract::on_sendToContractClicked()
         SendConfirmationDialog confirmationDialog(tr("Confirm sending to contract."), questionString, 3, this);
         confirmationDialog.exec();
         QMessageBox::StandardButton retval = (QMessageBox::StandardButton)confirmationDialog.result();
-        if(retval == QMessageBox::Yes)
-        {
+        if(retval == QMessageBox::Yes) {
             // Execute RPC command line
-            if(errorMessage.isEmpty() && m_execRPCCommand->exec(lstParams, result, resultJson, errorMessage))
-            {
-                ContractResult *widgetResult = new ContractResult(ui->stackedWidget);
+            if(errorMessage.isEmpty() && m_execRPCCommand->exec(lstParams, result, resultJson, errorMessage)) {
+                ContractResult *widgetResult = new ContractResult();
+                widgetResult->setWindowTitle("Result");
                 widgetResult->setResultData(result, FunctionABI(), m_ABIFunctionField->getParamsValues(), ContractResult::SendToResult);
-                ui->stackedWidget->addWidget(widgetResult);
-                int position = ui->stackedWidget->count() - 1;
-                m_results = position == 1 ? 1 : m_results + 1;
-
-                m_tabInfo->addTab(position, tr("Result %1").arg(m_results));
-                m_tabInfo->setCurrent(position);
-            }
-            else
-            {
+                widgetResult->show();
+            } else {
                 QMessageBox::warning(this, tr("Send to contract"), errorMessage);
             }
         }

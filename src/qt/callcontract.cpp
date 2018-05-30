@@ -158,8 +158,7 @@ void CallContractPage::on_clearAllClicked()
 
 void CallContractPage::on_callContractClicked()
 {
-    if(isDataValid())
-    {
+    if(isDataValid()) {
         // Initialize variables
         QMap<QString, QString> lstParams;
         QVariant result;
@@ -173,19 +172,12 @@ void CallContractPage::on_callContractClicked()
         ExecRPCCommand::appendParam(lstParams, PARAM_SENDER, ui->lineEditSenderAddress->currentText());
 
         // Execute RPC command line
-        if(errorMessage.isEmpty() && m_execRPCCommand->exec(lstParams, result, resultJson, errorMessage))
-        {
-            ContractResult *widgetResult = new ContractResult(ui->stackedWidget);
+        if(errorMessage.isEmpty() && m_execRPCCommand->exec(lstParams, result, resultJson, errorMessage)) {
+            ContractResult *widgetResult = new ContractResult();
+            widgetResult->setWindowTitle("Result");
             widgetResult->setResultData(result, m_contractABI->functions[func], m_ABIFunctionField->getParamsValues(), ContractResult::CallResult);
-            ui->stackedWidget->addWidget(widgetResult);
-            int position = ui->stackedWidget->count() - 1;
-            m_results = position == 1 ? 1 : m_results + 1;
-
-            m_tabInfo->addTab(position, tr("Result %1").arg(m_results));
-            m_tabInfo->setCurrent(position);
-        }
-        else
-        {
+            widgetResult->show();
+        } else {
             QMessageBox::warning(this, tr("Call contract"), errorMessage);
         }
     }
