@@ -17,20 +17,10 @@ ContractBookPage::ContractBookPage(QWidget *parent) :
 {
     ui->setupUi(this);
 
-//    SetObjectStyleSheet(ui->tableView, StyleSheetNames::TableViewLight);
-
-
-        ui->newContractInfo->setIcon(QIcon(":/icons/add"));
-        ui->copyAddress->setIcon(QIcon(":/icons/editcopy"));
-        ui->deleteContractInfo->setIcon(QIcon(":/icons/remove"));
-        ui->exportButton->setIcon(QIcon(":/icons/export"));
-
-
-//    SetObjectStyleSheet(ui->newContractInfo, StyleSheetNames::ButtonWhite);
-//    SetObjectStyleSheet(ui->copyAddress, StyleSheetNames::ButtonWhite);
-//    SetObjectStyleSheet(ui->deleteContractInfo, StyleSheetNames::ButtonWhite);
-//    SetObjectStyleSheet(ui->exportButton, StyleSheetNames::ButtonBlue);
-//    SetObjectStyleSheet(ui->chooseContractInfo, StyleSheetNames::ButtonBlue);
+    ui->newContractInfo->setIcon(QIcon(":/icons/add"));
+    ui->copyAddress->setIcon(QIcon(":/icons/editcopy"));
+    ui->deleteContractInfo->setIcon(QIcon(":/icons/remove"));
+    ui->exportButton->setIcon(QIcon(":/icons/export"));
 
     setWindowTitle(tr("Choose the contract for send/call"));
     ui->labelExplanation->setText(tr("These are your saved contracts. Always check the contract address and the ABI before sending/calling."));
