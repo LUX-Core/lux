@@ -1147,20 +1147,31 @@ int CWallet::ScanForWalletTransactions(CBlockIndex* pindexStart, bool fUpdate)
 void CWallet::ReacceptWalletTransactions()
 {
     LOCK2(cs_main, cs_wallet);
-    BOOST_FOREACH (PAIRTYPE(const uint256, CWalletTx) & item, mapWallet) {
-        const uint256& wtxid = item.first;
-        CWalletTx& wtx = item.second;
+    std::map<int64_t, CWalletTx*> mapSorted;
+
+    BOOST_FOREACH (PAIRTYPE(const uint256, CWalletTx) & item, mapWallet)
+    {
+        const uint256 &wtxid = item.first;
+        CWalletTx &wtx = item.second;
         assert(wtx.GetHash() == wtxid);
 
         int nDepth = wtx.GetDepthInMainChain();
 
         if (!wtx.IsCoinBase() && nDepth < 0 && !wtx.IsCoinStake()) {
+            mapSorted.insert(std::make_pair(wtx.nOrderPos, &wtx));
+        }
+    }
+
+    // Try to add wallet transactions back to memory pool
+    BOOST_FOREACH(PAIRTYPE(const int64_t, CWalletTx*)& item, mapSorted)
+    {
+        CWalletTx& wtx = *(item.second);
+
             // Try to add to memory pool
             LOCK(mempool.cs);
             wtx.AcceptToMemoryPool(false);
         }
     }
-}
 
 bool CWalletTx::InMempool() const
 {
