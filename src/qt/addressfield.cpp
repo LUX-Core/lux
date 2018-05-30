@@ -5,7 +5,8 @@
 
 #include "addressfield.h"
 #include "wallet.h"
-//#include "base58.h"
+//#include "validation.h"
+#include "base58.h"
 #include "qvalidatedlineedit.h"
 #include "bitcoinaddressvalidator.h"
 #include <boost/foreach.hpp>
@@ -56,9 +57,8 @@ bool AddressField::isValidAddress()
             return false;
     }
 
-   // ((QValidatedLineEdit*)lineEdit())->checkValidity();   Testing
-   // return ((QValidatedLineEdit*)lineEdit())->isValid();
-   return true;
+    ((QValidatedLineEdit*)lineEdit())->checkValidity();
+    return ((QValidatedLineEdit*)lineEdit())->isValid();
 }
 
 void AddressField::setComboBoxEditable(bool editable)
@@ -80,14 +80,14 @@ void AddressField::on_refresh()
     // Initialize variables
     QString currentAddress = currentText();
     m_stringList.clear();
-   // vector<COutput> vecOutputs; Testing
-   // assert(pwalletMain != NULL); Testing 
+    vector<COutput> vecOutputs;
+    assert(pwalletMain != NULL);
 
     // Fill the list with address
     if(m_addressType == AddressField::UTXO)
     {
         // Fill the list with UTXO
-       // LOCK2(cs_main, pwalletMain->cs_wallet);   Testing
+        LOCK2(cs_main, pwalletMain->cs_wallet);
 
         // Add all available addresses if 0 address ballance for token is enabled
         if(m_addressTableModel)
@@ -105,25 +105,25 @@ void AddressField::on_refresh()
             }
 
             // Include zero or unconfirmed coins too
-          //  pwalletMain->AvailableCoins(vecOutputs, false, NULL, true);   Testing
+            pwalletMain->AvailableCoins(vecOutputs, false, NULL, true);
         }
         else
         {
             // List only the spendable coins
-           // pwalletMain->AvailableCoins(vecOutputs);   Testing
+            pwalletMain->AvailableCoins(vecOutputs);
         }
 
-       /* BOOST_FOREACH(const COutput& out, vecOutputs) {
+        BOOST_FOREACH(const COutput& out, vecOutputs) {
             CTxDestination address;
-            const CScript& scriptPubKey = out.tx->tx->vout[out.i].scriptPubKey;
+            const CScript& scriptPubKey = out.tx->vout[out.i].scriptPubKey;
             bool fValidAddress = ExtractDestination(scriptPubKey, address);
 
             if (fValidAddress)
             {
-                QString strAddress = QString::fromStdString(CBitcoinAddress(address).ToString());
+                QString strAddress = QString::fromStdString(EncodeDestination(address));
                 appendAddress(strAddress);
             }
-        }*/   //Testing
+        }
     }
 
     // Update the current index
@@ -146,13 +146,11 @@ void AddressField::on_editingFinished()
 
 void AddressField::appendAddress(const QString &strAddress)
 {
-    /*CTxDestination address = DecodeDestination(strAddress.toStdString());
-    if(!m_stringList.contains(strAddress) &&
-            IsMine(*pwalletMain, address.Get()))
+    CTxDestination dest = DecodeDestination(strAddress.toStdString());
+    if(!m_stringList.contains(strAddress) && IsMine(*pwalletMain, dest))
     {
         m_stringList.append(strAddress);
-    }*/    //Testing
-    return;
+    }
 }
 
 void AddressField::setReceive(const QString &receive)
