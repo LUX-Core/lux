@@ -679,6 +679,17 @@ bool ReadKeyValue(CWallet* pwallet, CDataStream& ssKey, CDataStream& ssValue, CW
             }
 
             pwallet->LoadTokenTx(wTokenTx);
+        }else if (strType == "contractdata")
+        {
+            std::string strAddress, strKey, strValue;
+            ssKey >> strAddress;
+            ssKey >> strKey;
+            ssValue >> strValue;
+            if (!pwallet->LoadContractData(strAddress, strKey, strValue))
+            {
+                strErr = "Error reading wallet database: LoadContractData failed";
+                return false;
+            }
         }
     } catch (...) {
         return false;
