@@ -101,6 +101,7 @@ public:
     CBaseChainParams::Network NetworkID() const { return networkID; }
     int FirstSCBlock() const { return nFirstSCBlock; }
     int SwitchPhi2Block() const { return nSwitchPhi2Block; }
+    int64_t PruneAfterHeight() const { return nPruneAfterHeight; }
 
 protected:
     CChainParams() {}
@@ -140,6 +141,7 @@ protected:
     int64_t nStakingMinAge;
     int nFirstSCBlock;
     int nSwitchPhi2Block;
+    uint64_t nPruneAfterHeight;
 };
 
 /**

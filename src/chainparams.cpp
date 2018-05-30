@@ -156,7 +156,7 @@ public:
 
         nSwitchPhi2Block = 300000;
         nFirstSCBlock = 300000;
-
+        nPruneAfterHeight = 300000;
         /**
          * The message start string is designed to be unlikely to occur in normal data.
          * The characters are rarely used upper ASCII, not valid as UTF-8, and produce
@@ -316,6 +316,7 @@ public:
         //TODO: Phi2_hash hardfork block here !!!
         //nSwitchPhi2Block = 300000;
         //nFirstSCBlock = 300000;
+        //nPruneAfterHeight = 100000;
 
         consensus.hashGenesisBlock = genesis.GetHash();
 
@@ -498,6 +499,7 @@ public:
 
         nSwitchPhi2Block = 1200;
         //nFirstSCBlock = 300000;
+        //nPruneAfterHeight = 100000;
 
         /**
          * The message start string is designed to be unlikely to occur in normal data.
