@@ -2,7 +2,6 @@
 #include "ui_contractresult.h"
 #include "guiconstants.h"
 #include "contractabi.h"
-//#include "styleSheet.h"
 
 #include <QMessageBox>
 

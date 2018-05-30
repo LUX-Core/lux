@@ -167,11 +167,9 @@ void CreateContract::on_clearAllClicked()
 
 void CreateContract::on_createContractClicked()
 {
-    if(isDataValid())
-    {
+    if(isDataValid()) {
         WalletModel::UnlockContext ctx(m_model->requestUnlock());
-        if(!ctx.isValid())
-        {
+        if(!ctx.isValid()) {
             return;
         }
 
@@ -186,8 +184,7 @@ void CreateContract::on_createContractClicked()
         int func = m_ABIFunctionField->getSelectedFunction();
 
         // Check for high gas price
-        if(gasPrice > HIGH_GASPRICE)
-        {
+        if(gasPrice > HIGH_GASPRICE) {
             QString message = tr("The Gas Price is too high, are you sure you want to possibly spend a max of %1 for this transaction?");
             if(QMessageBox::question(this, tr("High Gas price"), message.arg(BitcoinUnits::formatWithUnit(unit, gasLimit * gasPrice))) == QMessageBox::No)
                 return;
@@ -208,15 +205,9 @@ void CreateContract::on_createContractClicked()
         if(retval == QMessageBox::Yes) {
             // Execute RPC command line
             if(errorMessage.isEmpty() && m_execRPCCommand->exec(lstParams, result, resultJson, errorMessage)) {
-                std::cout << resultJson.toUtf8().constData() << std::endl;
-                ContractResult *widgetResult = new ContractResult(ui->stackedWidget);
+                ContractResult *widgetResult = new ContractResult();
+                widgetResult->setWindowTitle("Result");
                 widgetResult->setResultData(result, FunctionABI(), QList<QStringList>(), ContractResult::CreateResult);
-                ui->stackedWidget->addWidget(widgetResult);
-                int position = ui->stackedWidget->count() - 1;
-                m_results = position == 1 ? 1 : m_results + 1;
-
-                m_tabInfo->addTab(position, tr("Result %1").arg(m_results));
-                m_tabInfo->setCurrent(position);
                 widgetResult->show();
             } else {
                 QMessageBox::warning(this, tr("Create contract"), errorMessage);
