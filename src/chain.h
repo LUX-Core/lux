@@ -7,6 +7,7 @@
 #define BITCOIN_CHAIN_H
 
 #include "pow.h"
+#include "consensus/params.h"
 #include "primitives/block.h"
 #include "tinyformat.h"
 #include "uint256.h"
@@ -453,7 +454,7 @@ public:
         READWRITE(nTime);
         READWRITE(nBits);
         READWRITE(nNonce);
-        if (this->nVersion > SC_BLOCK_VERSION) {
+        if (nHeight >= Params().FirstSCBlock()) {
             READWRITE(hashStateRoot); // lux
             READWRITE(hashUTXORoot); // lux
         }
