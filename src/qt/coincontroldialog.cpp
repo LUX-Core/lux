@@ -13,6 +13,7 @@
 #include "init.h"
 #include "optionsmodel.h"
 #include "walletmodel.h"
+#include "clientmodel.h"
 
 #include "coincontrol.h"
 #include "main.h"
@@ -39,6 +40,7 @@ CCoinControl* CoinControlDialog::coinControl = new CCoinControl();
 
 CoinControlDialog::CoinControlDialog(QWidget* parent) : QDialog(parent),
                                                         ui(new Ui::CoinControlDialog),
+                                                        clientModel(0),
                                                         model(0)
 {
     ui->setupUi(this);
@@ -173,6 +175,15 @@ void CoinControlDialog::setModel(WalletModel* model)
         updateLabelLocked();
         CoinControlDialog::updateLabels(model, this);
     }
+}
+
+void CoinControlDialog::setClientModel(ClientModel* clientModel) {
+    this->clientModel = clientModel;
+    connect(clientModel, SIGNAL(numBlocksChanged(int)), this, SLOT(updateInfoInDialog()));
+}
+
+void CoinControlDialog::updateInfoInDialog() {
+    updateView();
 }
 
 // helper function str_pad

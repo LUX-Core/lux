@@ -17,6 +17,7 @@
 #include <QTreeWidgetItem>
 
 class WalletModel;
+class ClientModel;
 
 class CCoinControl;
 class CTxMemPool;
@@ -35,6 +36,7 @@ public:
     ~CoinControlDialog();
 
     void setModel(WalletModel* model);
+    void setClientModel(ClientModel* clientModel);
 
     // static because also called from sendcoinsdialog
     static void updateLabels(WalletModel*, QDialog*);
@@ -47,6 +49,7 @@ public:
 private:
     Ui::CoinControlDialog* ui;
     WalletModel* model;
+    ClientModel* clientModel;
     int sortColumn;
     Qt::SortOrder sortOrder;
 
@@ -122,6 +125,9 @@ private slots:
     void buttonSelectAllClicked();
     void buttonToggleLockClicked();
     void updateLabelLocked();
+
+public slots:
+    void updateInfoInDialog();
 };
 
 #endif // BITCOIN_QT_COINCONTROLDIALOG_H
