@@ -435,7 +435,13 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
             if (!DecodeHexBlk(block, dataval.get_str()))
                 throw JSONRPCError(RPC_DESERIALIZATION_ERROR, "Block decode failed");
 
-            uint256 hash = block.GetHash();
+            BlockMap::iterator prev_block_it = mapBlockIndex.find(block.hashPrevBlock);
+            bool usePhi2 = false;
+            if (prev_block_it != mapBlockIndex.end()) {
+                usePhi2 = prev_block_it->second->nHeight >= Params().SwitchPhi2Block();
+            }
+
+            uint256 hash = block.GetHash(usePhi2);
             BlockMap::iterator mi = mapBlockIndex.find(hash);
             if (mi != mapBlockIndex.end()) {
                 CBlockIndex* pindex = mi->second;
@@ -940,7 +946,13 @@ UniValue submitblock(const UniValue& params, bool fHelp)
     if (!DecodeHexBlk(block, params[0].get_str()))
         throw JSONRPCError(RPC_DESERIALIZATION_ERROR, "Block decode failed");
 
-    uint256 hash = block.GetHash();
+    BlockMap::iterator prev_block_it = mapBlockIndex.find(block.hashPrevBlock);
+    bool usePhi2 = false;
+    if (prev_block_it != mapBlockIndex.end()) {
+        usePhi2 = prev_block_it->second->nHeight >= Params().SwitchPhi2Block();
+    }
+
+    uint256 hash = block.GetHash(usePhi2);
     bool fBlockPresent = false;
     {
         LOCK(cs_main);
@@ -957,7 +969,7 @@ UniValue submitblock(const UniValue& params, bool fHelp)
     }
 
     CValidationState state;
-    submitblock_StateCatcher sc(block.GetHash());
+    submitblock_StateCatcher sc(block.GetHash(usePhi2));
     RegisterValidationInterface(&sc);
     bool fAccepted = ProcessNewBlock(state, Params(), NULL, &block);
     UnregisterValidationInterface(&sc);
