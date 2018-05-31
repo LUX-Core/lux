@@ -349,6 +349,7 @@ std::string HelpMessage(HelpMessageMode mode)
     strUsage += "  -pid=<file>            " + strprintf(_("Specify pid file (default: %s)"), "luxd.pid") + "\n";
 #endif
     strUsage += "  -record-log-opcodes    " + _("Logs all EVM LOG opcode operations to the file vmExecLogs.json") + "\n";
+    strUsage += "  -reindex-chainstate    " + _("Rebuild chain state from the currently indexed blocks") + "\n";
     strUsage += "  -reindex               " + _("Rebuild block chain index from current blk000??.dat files") + " " + _("on startup") + "\n";
 #if !defined(WIN32)
     strUsage += "  -sysperms              " + _("Create new files with system default permissions, instead of umask 077 (only effective with disabled wallet functionality)") + "\n";
@@ -1258,6 +1259,7 @@ bool AppInit2(boost::thread_group& threadGroup, CScheme& scheme)
     // ********************************************************* Step 7: load block chain
 
     fReindex = GetBoolArg("-reindex", false);
+    bool fReindexChainState = GetBoolArg("-reindex-chainstate", false);
 
     // Upgrading to 0.8; hard-link the old blknnnn.dat files into /blocks/
     filesystem::path blocksDir = GetDataDir() / "blocks";
@@ -1318,7 +1320,7 @@ bool AppInit2(boost::thread_group& threadGroup, CScheme& scheme)
                 delete pstorageresult;
 
                 pblocktree = new CBlockTreeDB(nBlockTreeDBCache, false, fReindex);
-                pcoinsdbview = new CCoinsViewDB(nCoinDBCache, false, fReindex);
+                pcoinsdbview = new CCoinsViewDB(nCoinDBCache, false, fReindex || fReindexChainState);
                 pcoinscatcher = new CCoinsViewErrorCatcher(pcoinsdbview);
                 pcoinsTip = new CCoinsViewCache(pcoinscatcher);
 
