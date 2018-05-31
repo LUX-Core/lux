@@ -143,6 +143,7 @@ BITCOIN_QT_H = \
   qt/coincontroldialog.h \
   qt/coincontroltreewidget.h \
   qt/csvmodelwriter.h \
+  qt/customlist.h \
   qt/darksendconfig.h \
   qt/editaddressdialog.h \
   qt/guiconstants.h \
