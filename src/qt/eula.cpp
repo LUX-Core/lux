@@ -5,22 +5,17 @@
 #include "eula.h"
 #include "ui_eula.h"
 #include "masternode.h"
+#include "clientversion.h"
 
 #include <QSettings>
 #include <QCloseEvent>
-#include <QMessageBox>
-
 
 Eula::Eula(QWidget* parent) : QDialog(parent),
-                              ui(new Ui::Eula),
-                              state(ST_CONTINUE),
-                              isButtonClicked(false)
+                              ui(new Ui::Eula)
 {
     ui->setupUi(this);
     
-    mSettingsFile = QApplication::applicationDirPath().left(1) + ":/.settings.ini";
-
-	//Set fix size window
+    //Set fix size window
     this->setFixedSize(this->width(),this->height());
 
     // Remove minimize button
@@ -304,68 +299,72 @@ Eula::~Eula()
 
 void Eula::on_cancel_clicked()
 {
-	state = ST_EXIT;
-	isButtonClicked = true;
-    close();
+    exit(0);
 }
 
 void Eula::on_next_clicked()
 {
-	QSettings settings(mSettingsFile, QSettings::NativeFormat);
+    QSettings settings;
     
     if (ui->radAccept->isChecked())
     {
-       state = ST_CONTINUE;
-       settings.setValue("EulaStatus", ui->checkBox->isChecked());
+        settings.setValue(QString::fromStdString(FormatFullVersion()), ui->checkBox->isChecked());
+        close();
     }
     else
     {
-       state = ST_EXIT;
-       settings.setValue("EulaStatus", false);
+        settings.setValue(QString::fromStdString(FormatFullVersion()), false);
+        exit(0);
     }
-    isButtonClicked = true;
-    close();
 }
 
 void Eula::showDialog()
 {
-	bool isDialogHiding = false;
-	Eula eula;
-	
-	QSettings settings(eula.mSettingsFile, QSettings::NativeFormat);
-	isDialogHiding = settings.value("EulaStatus", isDialogHiding).toBool();
-	
-	if(isDialogHiding)
-	{
-	    return;
-	}
+    bool isDialogHiding = false;
+    QSettings settings;
 
-	eula.setWindowIcon(QIcon(":icons/bitcoin"));
-	
-	eula.exec();
-	if (eula.state == ST_EXIT)
-	{
-        exit(0);
+    if (settings.contains("luxVersion"))
+    {
+        std::string storeVersion = settings.value("luxVersion").toString().toStdString();
+        if (storeVersion.compare(FormatFullVersion()) == 0)
+        {
+            isDialogHiding = settings.value(QString::fromStdString(storeVersion)).toBool();
+        }
+        else
+        {
+            settings.remove(QString::fromStdString(storeVersion));
+            settings.setValue("luxVersion", QString::fromStdString(FormatFullVersion()));
+        }
     }
+    else
+    {
+        settings.setValue("luxVersion", QString::fromStdString(FormatFullVersion()));
+    }
+	
+    if(isDialogHiding)
+    {
+        return;
+    }
+
+    Eula eula;
+    eula.setWindowIcon(QIcon(":icons/bitcoin"));
+    eula.exec();
 }
 
 
 void Eula::closeEvent (QCloseEvent *event)
 {
-	if(isButtonClicked) return;
-	
-	QSettings settings(mSettingsFile, QSettings::NativeFormat);
+    QSettings settings;
     
     if (ui->radAccept->isChecked())
     {
-       state = ST_CONTINUE;
-       settings.setValue("EulaStatus", ui->checkBox->isChecked());
+        settings.setValue(QString::fromStdString(FormatFullVersion()), ui->checkBox->isChecked());
+        close();
     }
     else
     {
-       state = ST_EXIT;
-       settings.setValue("EulaStatus", false);
+        settings.setValue(QString::fromStdString(FormatFullVersion()), false);
+        exit(0);
     }
-    close();
 }
 

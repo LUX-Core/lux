@@ -6,7 +6,6 @@
 #define LUX_QT_EULA_H
 
 #include <QDialog>
-#include <QThread>
 
 namespace Ui {
 class Eula;
@@ -22,23 +21,13 @@ public:
     
     static void showDialog();
     
-    enum Status {
-        ST_CONTINUE,
-        ST_EXIT
-    };
-    
-    
 private slots:
     void on_cancel_clicked();
     void on_next_clicked();
 
 private:
     Ui::Eula *ui;
-    int state;
     void closeEvent(QCloseEvent *event);
-    bool isButtonClicked;
-    QString mSettingsFile;
-    
 };
 
 #endif // LUX_QT_EULA_H
