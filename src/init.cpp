@@ -218,8 +218,8 @@ void PrepareShutdown()
         pblocktree = NULL;
 //        delete pstorageresult;
 //        pstorageresult = NULL;
-//        delete globalState.release();
-//        globalSealEngine.reset();
+        delete globalState.release();
+        globalSealEngine.reset();
     }
 #ifdef ENABLE_WALLET
     if (pwalletMain)

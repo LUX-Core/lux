@@ -253,7 +253,7 @@ public:
         consensus.nMajorityWindow = 100;
         //consensus.BIP34Height = 227931;
         //consensus.BIP34Hash = uint256S("0x000000000000024b89b42a942fe0d9fea3bb44ab7bd1b19115dd6a759c0808b8");
-        consensus.powLimit = ~uint256(0) >> 20; // LUX starting difficulty is 1 / 2^12
+        consensus.powLimit = ~uint256(0) >> 10; // LUX starting difficulty is 1 / 2^12
         consensus.nPowTargetTimespan = 30 * 60; //36 * 60 * 60; // LUX: 1 36hrs
         consensus.nPowTargetSpacing = 2 * 60;  // LUX: 2 minute
         consensus.fPowAllowMinDifficultyBlocks = false;
@@ -282,7 +282,7 @@ public:
         const char* pszTimestamp = "Lux - Testnet"; // Input Activation code to activate blockchain
         CMutableTransaction txNew;
         txNew.nVersion = 1;
-        txNew.nTime = 1527588495;
+        txNew.nTime = 1527664240;
         txNew.nLockTime = 0;
         txNew.vin.resize(1);
         txNew.vout.resize(1);
@@ -294,9 +294,9 @@ public:
         genesis.hashPrevBlock = 0;
         genesis.hashMerkleRoot = genesis.BuildMerkleTree();
         genesis.nVersion = 1;
-        genesis.nTime = 1527588495; //05/29/2018 @ 5:00am (UTC)
+        genesis.nTime = 1527664240; //05/29/2018 @ 5:00am (UTC)
         genesis.nBits = 0x1e0fffff;
-        genesis.nNonce = 1538671;
+        genesis.nNonce = 1153266;
         genesis.hashStateRoot = uint256(h256Touint(dev::h256("e965ffd002cd6ad0e2dc402b8044de833e06b23127ea8c3d80aec91410771495"))); // lux
         genesis.hashUTXORoot = uint256(h256Touint(dev::sha3(dev::rlp("")))); // lux
 
@@ -314,8 +314,8 @@ public:
 
         consensus.hashGenesisBlock = genesis.GetHash();
 
-        assert(consensus.hashGenesisBlock == uint256("0x000005e999302dd869f0f3c8e5e3b14ad24075ef04526baa20e49c880e36b77f"));
-        assert(genesis.hashMerkleRoot == uint256("0xce95e20a0807b9171becbd9eca1088d68c08090bb648f7e64492b13b37a5a929"));
+        assert(consensus.hashGenesisBlock == uint256("0x00000ed61786c92e01948df9f543fc2effc17a025ec14f743ec1848dff81233b"));
+        assert(genesis.hashMerkleRoot == uint256("0x484415096c0c3f026838b97854d02bbf38aad5449938ef62f1fdd51c371a1696"));
 
         vFixedSeeds.clear();
         vSeeds.clear();
