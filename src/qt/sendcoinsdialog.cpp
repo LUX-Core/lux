@@ -876,6 +876,7 @@ void SendCoinsDialog::coinControlButtonClicked()
 {
     CoinControlDialog dlg;
     dlg.setModel(model);
+    dlg.setClientModel(clientModel);
     dlg.exec();
     coinControlUpdateLabels();
 }
