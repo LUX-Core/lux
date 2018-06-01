@@ -224,8 +224,6 @@ void BlockAssembler::RebuildRefundTransaction(){
         contrTx.vout[refundtx].nValue -= bceResult.refundSender;
     } else {
         refundtx=1;
-        int64_t nCoinAge = 0; // This value is not used in GetProofOfStakeReward
-        contrTx.vout[refundtx].nValue = GetProofOfStakeReward(nCoinAge, nFees, nHeight);
         contrTx.vout[refundtx].nValue -= bceResult.refundSender;
     }
 
@@ -236,7 +234,7 @@ void BlockAssembler::RebuildRefundTransaction(){
         contrTx.vout[i]=vout;
         i++;
     }
-    pblock->vtx[refundtx] = std::move(contrTx);
+    pblock->vtx[refundtx] = std::move(CTransaction(contrTx));
 }
 
 std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlockWithKey(CReserveKey& reservekey, bool fProofOfStake, int64_t* pTotalFees, int32_t txProofTime, int32_t nTimeLimit)
@@ -312,7 +310,7 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
     // TODO: replace this with a call to main to assess validity of a mempool
     // transaction (which in most cases can be a no-op).
     fIncludeWitness = IsWitnessEnabled(pindexPrev, chainparams.GetConsensus());
-    if (fProofOfStake){
+    if (fProofOfStake) {
         // Height first in coinbase required for block.version=2
         coinbaseTx.vin[0].scriptSig = (CScript() << nHeight) + COINBASE_FLAGS;
         assert(coinbaseTx.vin[0].scriptSig.size() <= 100);
@@ -329,6 +327,9 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
 
     if (fProofOfStake && !stake->CreateBlockStake(pwalletMain, pblock))
         return nullptr;
+
+    if (fProofOfStake)
+        originalRewardTx = CMutableTransaction(pblock->vtx[1]);
 
     //////////////////////////////////////////////////////// lux
     LuxDGP luxDGP(globalState.get(), fGettingValuesDGP);
