@@ -158,7 +158,7 @@ public:
         //This is not used now, because we need to check this bit in block.h using versionbits, which results in cyclic
         //dependency block <- versionbits <- chain <- block
         //TODO: fix cyclic dependency
-        consensus.vDeployments[Consensus::SMART_CONTRACTS_HARDFORK].bit = 2;
+        consensus.vDeployments[Consensus::SMART_CONTRACTS_HARDFORK].bit = 30;
 
         nSwitchPhi2Block = 300000;
         nFirstSCBlock = 300000;
