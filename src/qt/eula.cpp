@@ -11,7 +11,8 @@
 #include <QCloseEvent>
 
 Eula::Eula(QWidget* parent) : QDialog(parent),
-                              ui(new Ui::Eula)
+                              ui(new Ui::Eula),
+                              isRemembered(false)
 {
     ui->setupUi(this);
     
@@ -304,18 +305,7 @@ void Eula::on_cancel_clicked()
 
 void Eula::on_next_clicked()
 {
-    QSettings settings;
-    
-    if (ui->radAccept->isChecked())
-    {
-        settings.setValue(QString::fromStdString(FormatFullVersion()), ui->checkBox->isChecked());
-        close();
-    }
-    else
-    {
-        settings.setValue(QString::fromStdString(FormatFullVersion()), false);
-        exit(0);
-    }
+    close();
 }
 
 void Eula::showDialog()
@@ -323,22 +313,29 @@ void Eula::showDialog()
     bool isDialogHiding = false;
     QSettings settings;
 
-    if (settings.contains("luxVersion"))
+    QString currentVersion = tr("lux_") + QString::fromStdString(strprintf("%d%d%d%d",
+                             CLIENT_VERSION_MAJOR,
+                             CLIENT_VERSION_MINOR,
+                             CLIENT_VERSION_REVISION,
+                             CLIENT_VERSION_BUILD
+                             ));
+
+    if (settings.contains(tr("luxVersion")))
     {
-        std::string storeVersion = settings.value("luxVersion").toString().toStdString();
-        if (storeVersion.compare(FormatFullVersion()) == 0)
+        QString storeVersion = settings.value(tr("luxVersion")).toString();
+        if (QString::compare(storeVersion, currentVersion, Qt::CaseInsensitive) == 0)
         {
-            isDialogHiding = settings.value(QString::fromStdString(storeVersion)).toBool();
+            isDialogHiding = settings.value(storeVersion).toBool();
         }
         else
         {
-            settings.remove(QString::fromStdString(storeVersion));
-            settings.setValue("luxVersion", QString::fromStdString(FormatFullVersion()));
+            settings.remove(storeVersion);
+            settings.setValue(tr("luxVersion"), currentVersion);
         }
     }
     else
     {
-        settings.setValue("luxVersion", QString::fromStdString(FormatFullVersion()));
+        settings.setValue(tr("luxVersion"), currentVersion);
     }
 	
     if(isDialogHiding)
@@ -349,22 +346,26 @@ void Eula::showDialog()
     Eula eula;
     eula.setWindowIcon(QIcon(":icons/bitcoin"));
     eula.exec();
+
+    settings.setValue(currentVersion, eula.isEulaRemembered());
 }
 
 
 void Eula::closeEvent (QCloseEvent *event)
 {
-    QSettings settings;
-    
     if (ui->radAccept->isChecked())
     {
-        settings.setValue(QString::fromStdString(FormatFullVersion()), ui->checkBox->isChecked());
-        close();
+        isRemembered = ui->checkBox->isChecked();
     }
     else
     {
-        settings.setValue(QString::fromStdString(FormatFullVersion()), false);
         exit(0);
     }
 }
+
+bool Eula::isEulaRemembered()
+{
+    return isRemembered;
+}
+
 

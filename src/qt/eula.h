@@ -19,15 +19,19 @@ public:
     explicit Eula(QWidget *parent = 0);
     ~Eula();
     
+    bool isEulaRemembered();
     static void showDialog();
     
 private slots:
     void on_cancel_clicked();
     void on_next_clicked();
 
+protected:
+    void closeEvent(QCloseEvent *event);
+
 private:
     Ui::Eula *ui;
-    void closeEvent(QCloseEvent *event);
+    bool isRemembered;
 };
 
 #endif // LUX_QT_EULA_H
