@@ -130,6 +130,7 @@ BITCOIN_CORE_H = \
   noui.h \
   policy/fees.h \
   policy/policy.h \
+  rbf.h \
   pow.h \
   prevector.h \
   primitives/block.h \
@@ -262,6 +263,7 @@ libbitcoin_wallet_a_SOURCES = \
   wallet.cpp \
   wallet_ismine.cpp \
   walletdb.cpp \
+  rbf.cpp \
   $(BITCOIN_CORE_H)
 
 # crypto primitives library
