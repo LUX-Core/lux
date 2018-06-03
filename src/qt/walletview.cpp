@@ -91,7 +91,7 @@ WalletView::WalletView(QWidget* parent) : QStackedWidget(parent),
     addWidget(sendCoinsPage);
     addWidget(explorerWindow);
     addWidget(smartContractPage);   // Testing
-    addWidget(LSRTokenPage); 
+    addWidget(LSRTokenPage);
 
     QSettings settings;
     if (settings.value("fShowMasternodesTab").toBool()) {

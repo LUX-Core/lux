@@ -262,6 +262,16 @@
             </property>
            </widget>
           </item>
+          <item>
+           <widget class="QCheckBox" name="parallelMasterNode">
+            <property name="toolTip">
+             <string>Coming soon</string>
+            </property>
+            <property name="text">
+             <string>&amp;Activate Parallel Masternode</string>
+            </property>
+           </widget>
+          </item>
            <item>
             <widget class="QCheckBox" name="zeroBalanceAddressToken">
              <property name="text">
@@ -270,7 +280,7 @@
             </widget>
            </item>
           <item>
-           <widget class="QCheckBox" name="parallelMasterNode">
+           <widget class="QCheckBox" name="parallelMasterNode1">
             <property name="toolTip">
              <string>Coming soon</string>
             </property>

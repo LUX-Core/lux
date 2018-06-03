@@ -60,7 +60,6 @@ tradingDialog::tradingDialog(QWidget *parent) :
     qDebug() <<  "Expected this";
 
 
-    //QWidget* a1 = ui->priceChart;
     QVBoxLayout* plotLay = new QVBoxLayout();
     ui->priceChart->setLayout(plotLay);
 
@@ -778,7 +777,7 @@ QString tradingDialog::sendRequest(QString url, QString method, QString body){
 
     req.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
 
-    QNetworkReply *reply = NULL;
+    QNetworkReply *reply;
     if(method == "GET") {
         reply = mgr.get(req);
     } else if(method == "POST") {
@@ -822,9 +821,7 @@ QString tradingDialog::sendRequest(QString url, QString method, QString body){
         req.setRawHeader("Content-Type", "application/json");
 
         reply = mgr.post(req, body.toUtf8());
-    } else {
-		return "Error";
-	}
+    }
 
     eventLoop.exec(); // blocks stack until "finished()" has been called
 
@@ -858,7 +855,7 @@ void tradingDialog::sendRequest1(QString url, std::function<void (void)> funcFor
 
     req.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
 
-    QNetworkReply *reply = NULL;
+    QNetworkReply *reply;
     //reply = qmanager->get(req);
 
     //printf("REPLY STARTED %s\n",url.toStdString().c_str());
@@ -908,9 +905,7 @@ void tradingDialog::sendRequest1(QString url, std::function<void (void)> funcFor
         req.setRawHeader("Content-Type", "application/json");
 
         reply = qmanager->post(req, body.toUtf8());
-    } else {
-		return;
-	}
+    }
 
     connect( reply, &QNetworkReply::finished, this, [reply, this, funcForCallAfterReceiveResponse](){
         funcForCallAfterReceiveResponse();
@@ -1155,12 +1150,9 @@ char * tradingDialog::base64(const unsigned char *input, int length)
 
     b64 = BIO_new(BIO_f_base64());
     bmem = BIO_new(BIO_s_mem());
-
     b64 = BIO_push(b64, bmem);
-
     BIO_write(b64, input, length);
     (void)BIO_flush(b64);
-
     BIO_get_mem_ptr(b64, &bptr);
 
     char *buff = (char *)malloc(bptr->length);
@@ -1376,9 +1368,6 @@ string tradingDialog::encryptDecrypt(string toEncrypt, string password) {
 
     for (unsigned int i = 0; i < toEncrypt.size(); i++)
         output[i] = toEncrypt[i] ^ key[i % (strlen(key) / sizeof(char))];
-        
-    delete[] key;
-    
     return output;
 }
 

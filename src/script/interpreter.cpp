@@ -13,6 +13,7 @@
 #include "crypto/sha256.h"
 #include "eccryptoverify.h"
 #include "pubkey.h"
+#include "main.h"
 #include "script/script.h"
 #include "uint256.h"
 
