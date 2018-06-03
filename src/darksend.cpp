@@ -12,6 +12,7 @@
 #include "masternode.h"
 #include "instantx.h"
 #include "ui_interface.h"
+#include "wallet.h"
 //#include "random.h"
 
 #include <openssl/rand.h>
@@ -648,7 +649,7 @@ void CDarkSendPool::Check()
     if((state == POOL_STATUS_ERROR || state == POOL_STATUS_SUCCESS) && GetTimeMillis()-lastTimeChanged >= 10000) {
         if(fDebug) LogPrintf("CDarkSendPool::Check() -- RESETTING MESSAGE \n");
         SetNull(true);
-        if(fMasterNode) RelayDarkSendStatus(darkSendPool.sessionID, darkSendPool.GetState(), darkSendPool.GetEntriesCount(), MASTERNODE_RESET);
+        if(fMasterNode) RelayDarkSendStatus(sessionID, GetState(), GetEntriesCount(), MASTERNODE_RESET);
         UnlockCoins();
     }
 }
@@ -1430,6 +1431,7 @@ bool CDarkSendPool::DoAutomaticDenominating(bool fDryRun, bool ready)
 
     // ** find the coins we'll use
     std::vector<CTxIn> vCoins;
+    std::vector<CTxIn> vCoinsResult;
     std::vector<COutput> vCoins2;
     int64_t nValueMin = CENT;
     int64_t nValueIn = 0;
