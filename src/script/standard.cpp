@@ -9,7 +9,6 @@
 #include "script/script.h"
 #include "util.h"
 #include "utilstrencodings.h"
-#include "standard.h"
 
 
 #include <boost/foreach.hpp>
