@@ -395,14 +395,10 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
             "  },\n"
             "  \"masternode_payments_started\" :   true|false, (boolean) true, if masternode payments started\n"
             "  \"masternode_payments_enforced\" :  true|false, (boolean) true, if masternode payments are enforced\n"
-            "  \"payee\" : \"xxx\",                (string) required payee for the next block\n"
-            "  \"payee_amount\" : n,               (numeric) required amount to pay\n"
             "  \"votes\" : [\n                     (array) show vote candidates\n"
             "        { ... }                       (json object) vote candidate\n"
             "        ,...\n"
-            "  ],\n"
-            "  \"masternode_payments\" :           true|false,  (boolean) true, if masternode payments are enabled\n"
-            "  \"enforce_masternode_payments\" :   true|false,  (boolean) true, if masternode payments are enforced\n"
+            "  ]\n"
             "}\n"
 
             "\nExamples:\n" +
@@ -753,21 +749,13 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
     if (pblock->payee != CScript()) {
         CTxDestination address1;
         ExtractDestination(pblock->payee, address1);
-        result.push_back(Pair("payee", EncodeDestination(address1)));
-        result.push_back(Pair("payee_amount", (int64_t)pblock->vtx[0].vout[1].nValue));
         aMasternode.push_back(Pair("payee", EncodeDestination(address1)));
         aMasternode.push_back(Pair("script", HexStr(pblock->vtx[0].vout[1].scriptPubKey)));
         aMasternode.push_back(Pair("amount", (int64_t)pblock->vtx[0].vout[1].nValue));
-
-    } else {
-        result.push_back(Pair("payee", ""));
-        result.push_back(Pair("payee_amount", 0));
     }
 
     result.push_back(Pair("masternode", aMasternode));
-    result.push_back(Pair("masternode_payments", pblock->nTime > Params().StartMasternodePayments()));
-    result.push_back(Pair("enforce_masternode_payments", true));
-    result.push_back(Pair("masternode_payments_started", true));
+    result.push_back(Pair("masternode_payments_started", pblock->nTime > Params().StartMasternodePayments()));
     result.push_back(Pair("masternode_payments_enforced", true));
 
     return result;
