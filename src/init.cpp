@@ -1808,9 +1808,11 @@ bool AppInit2(boost::thread_group& threadGroup, CScheme& scheme)
     if (pwalletMain) {
         // Add wallet transactions that aren't already in a block to mapTransactions
         pwalletMain->ReacceptWalletTransactions();
-
+        std::atomic<bool> fFlushSchemed(false);
         // Run a thread to flush wallet periodically
-        threadGroup.create_thread(boost::bind(&ThreadFlushWalletDB, boost::ref(pwalletMain->strWalletFile)));
+        if (!fFlushSchemed.exchange(true)) {
+        scheme.schemeEvery(MaybeFlushWalletDB, 500);
+    }
     }
 #endif
 

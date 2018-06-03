@@ -638,7 +638,7 @@ bool CWallet::AddToWallet(const CWalletTx& wtxIn, bool fFromLoadWallet, bool fFl
             if (mapWallet.count(txin.prevout.hash)) {
                 CWalletTx& prevtx = mapWallet[txin.prevout.hash];
                 if (prevtx.nIndex == -1 && !prevtx.hashUnset()) {
-                    (prevtx.hashBlock, wtx.GetHash());
+                    (wtx.GetHash(), prevtx.hashBlock);
                 }
             }
         }
@@ -791,7 +791,7 @@ bool CWallet::AbandonTransaction(const uint256& hashTx)
 {
     LOCK2(cs_main, cs_wallet);
 
-    CWalletDB walletdb("r+");
+    CWalletDB walletdb(strWalletFile, "r+");
 
     std::set<uint256> todo;
     std::set<uint256> done;
@@ -3068,6 +3068,7 @@ int64_t CWallet::GetOldestKeyPoolTime()
 {
     int64_t nIndex = 0;
     CKeyPool keypool;
+    CWalletDB walletdb(strWalletFile);
     ReserveKeyFromKeyPool(nIndex, keypool);
     if (nIndex == -1)
         return GetTime();
@@ -4159,4 +4160,14 @@ bool CWallet::RemoveTokenEntry(const uint256 &tokenHash, bool fFlushOnClose)
     LogPrintf("RemoveTokenEntry %s\n", tokenHash.ToString());
 
     return true;
+}
+
+void CWallet::postInitProcess(boost::thread_group& threadGroup)
+{
+    // Add wallet transactions that aren't already in a block to mempool
+    // Do this here as mempool requires genesis block to be loaded
+    ReacceptWalletTransactions();
+
+    // Run a thread to flush wallet periodically
+    threadGroup.create_thread(boost::bind(&ThreadFlushWalletDB, boost::ref(this->strWalletFile)));
 }

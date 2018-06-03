@@ -189,7 +189,7 @@ public:
     DBErrors ZapWalletTx(CWallet* pwallet, std::vector<CWalletTx>& vWtx);
     static bool Recover(CDBEnv& dbenv, std::string filename, bool fOnlyKeys);
     static bool Recover(CDBEnv& dbenv, std::string filename);
-
+    static unsigned int GetUpdateCounter();
 private:
     CWalletDB(const CWalletDB&);
     void operator=(const CWalletDB&);
@@ -199,6 +199,8 @@ private:
 
 bool BackupWallet(const CWallet& wallet, const std::string& strDest);
 
-void ThreadFlushWalletDB();
+void MaybeFlushWalletDB();
+
+void ThreadFlushWalletDB(const std::string& strFile);
 
 #endif // BITCOIN_WALLETDB_H

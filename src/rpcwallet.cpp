@@ -659,7 +659,6 @@ UniValue getreceivedbyaccount(const UniValue& params, bool fHelp)
     return (double)nAmount / (double)COIN;
 }
 
-
 CAmount GetAccountBalance(CWalletDB& walletdb, const string& strAccount, int nMinDepth, const isminefilter& filter)
 {
     CAmount nBalance = 0;

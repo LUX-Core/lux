@@ -406,6 +406,31 @@ DBErrors CWalletDB::ReorderTransactions(CWallet* pwallet)
     return DB_LOAD_OK;
 }
 
+void MaybeFlushWalletDB() {
+    static std::atomic<bool> fOneThread;
+    if (fOneThread.exchange(true)) {
+        return;
+    }
+    if (!GetBoolArg("-flushwallet", DEFAULT_FLUSHWALLET)) {
+        return;
+    }
+
+    static unsigned int nLastSeen = CWalletDB::GetUpdateCounter();
+    static unsigned int nLastFlushed = CWalletDB::GetUpdateCounter();
+    static int64_t nLastWalletUpdate = GetTime();
+
+    if (nLastSeen != CWalletDB::GetUpdateCounter()) {
+        nLastSeen = CWalletDB::GetUpdateCounter();
+        nLastWalletUpdate = GetTime();
+    }
+
+    if (nLastFlushed != CWalletDB::GetUpdateCounter() && GetTime() - nLastWalletUpdate >= 2) {
+        const std::string& strFile = pwalletMain->strWalletFile;
+            nLastFlushed = CWalletDB::GetUpdateCounter();
+    }
+    fOneThread = false;
+    }
+
 class CWalletScanState
 {
 public:
@@ -1099,4 +1124,9 @@ bool CWalletDB::EraseTokenTx(uint256 hash)
 {
     nWalletDBUpdated++;
     return Erase(std::make_pair(std::string("tokentx"), hash));
+}
+
+unsigned int CWalletDB::GetUpdateCounter()
+{
+    return nWalletDBUpdateCounter;
 }

@@ -257,6 +257,7 @@ public:
 */
 class CWallet : public CCryptoKeyStore, public CValidationInterface
 {
+    static std::atomic<bool> fFlushSchemed;
     CWalletDB* pwalletdbEncryption;
 
     //! the current wallet version: clients below this version are not able to load the wallet
@@ -757,6 +758,8 @@ public:
 
     /* Mark a transaction (and it in-wallet descendants) as abandoned so its inputs may be respent. */
     bool AbandonTransaction(const uint256& hashTx);
+
+    void postInitProcess(boost::thread_group& threadGroup);
 };
 
 /** A key allocated from the key pool. */
@@ -1572,7 +1575,5 @@ public:
 
     uint256 GetHash() const;
 };
-
-
 
 #endif // BITCOIN_WALLET_H
