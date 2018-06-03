@@ -182,7 +182,8 @@ class CMerkleTx : public CTransaction
 {
 private:
     int GetDepthInMainChainINTERNAL(const CBlockIndex*& pindexRet) const;
-
+    /** Constant used in hashBlock to indicate tx has been abandoned */
+    static const uint256 ABANDON_HASH;
 public:
     uint256 hashBlock;
     std::vector<uint256> vMerkleBranch;
@@ -243,6 +244,9 @@ public:
     }
     int GetBlocksToMaturity() const;
     bool AcceptToMemoryPool(bool fLimitFree = true, bool fRejectInsaneFee = true, bool ignoreFees = false);
+    bool hashUnset() const { return (hashBlock.IsNull() || hashBlock == ABANDON_HASH); }
+    bool isAbandoned() const { return (hashBlock == ABANDON_HASH); }
+    void setAbandoned() { hashBlock = ABANDON_HASH; }
     int GetTransactionLockSignatures() const;
     bool IsTransactionLockTimedOut() const;
 };
@@ -280,6 +284,9 @@ class CWallet : public CCryptoKeyStore, public CValidationInterface
     TxSpends mapTxSpends;
     void AddToSpends(const COutPoint& outpoint, const uint256& wtxid);
     void AddToSpends(const uint256& wtxid);
+    /* Mark a transaction (and its in-wallet descendants) as conflicting with a particular block. */
+    //void MarkConflicted(const uint256& hashBlock, const uint256& hashTx);
+
 
     void SyncMetaData(std::pair<TxSpends::iterator, TxSpends::iterator>);
 
@@ -388,6 +395,11 @@ public:
     }
 
     std::map<uint256, CWalletTx> mapWallet;
+    std::list<CAccountingEntry> laccentries;
+
+    typedef std::pair<CWalletTx*, CAccountingEntry*> TxPair;
+    typedef std::multimap<int64_t, TxPair > TxItems;
+    TxItems wtxOrdered;
 
     int64_t nOrderPosNext;
     std::map<uint256, int> mapRequestCount;
@@ -497,16 +509,6 @@ public:
     int64_t IncOrderPosNext(CWalletDB* pwalletdb = NULL);
     bool GetAccountDestination(CTxDestination &dest, std::string strAccount, bool bForceNew = false);
 
-    typedef std::pair<CWalletTx*, CAccountingEntry*> TxPair;
-    typedef std::multimap<int64_t, TxPair> TxItems;
-
-    /**
-     * Get the wallet's activity log
-     * @return multimap of ordered transactions and accounting entries
-     * @warning Returned pointers are *only* valid within the scope of passed acentries
-     */
-    TxItems OrderedTxItems(std::list<CAccountingEntry>& acentries, std::string strAccount = "");
-
     void MarkDirty();
     bool AddToWallet(const CWalletTx& wtxIn, bool fFromLoadWallet = false, bool fFlushOnClose=true);
     void SyncTransaction(const CTransaction& tx, const CBlock* pblock);
@@ -540,6 +542,7 @@ public:
     bool CreateTransaction(CScript scriptPubKey, const CAmount& nValue, CWalletTx& wtxNew, CReserveKey& reservekey, CAmount& nFeeRet, std::string& strFailReason, const CCoinControl* coinControl = NULL, AvailableCoinsType coin_type = ALL_COINS, bool useIX = false, CAmount nFeePay = 0);
     bool CommitTransaction(CWalletTx& wtxNew, CReserveKey& reservekey, std::string strCommand = "tx");
     std::string PrepareDarksendDenominate(int minRounds, int maxRounds);
+    bool AddAccountingEntry(const CAccountingEntry&, CWalletDB & pwalletdb);
     bool CreateCollateralTransaction(CMutableTransaction& txCollateral, std::string& strReason);
     bool ConvertList(std::vector<CTxIn> vCoins, std::vector<int64_t>& vecAmounts);
     bool MultiSend();
@@ -748,6 +751,12 @@ public:
      * This function will automatically add the necessary scripts to the wallet.
      */
     CTxDestination AddAndGetDestinationForScript(const CScript& script, OutputType);
+
+    /** Return whether transaction can be abandoned */
+    bool TransactionCanBeAbandoned(const uint256& hashTx) const;
+
+    /* Mark a transaction (and it in-wallet descendants) as abandoned so its inputs may be respent. */
+    bool AbandonTransaction(const uint256& hashTx);
 };
 
 /** A key allocated from the key pool. */

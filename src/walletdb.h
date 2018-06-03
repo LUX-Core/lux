@@ -162,6 +162,9 @@ public:
 
     bool WriteMinVersion(int nVersion);
 
+    /// This writes directly to the database, and will not update the CWallet's cached accounting entries!
+    /// Use wallet.AddAccountingEntry instead, to write *and* update its caches.
+    bool WriteAccountingEntry_Backend(const CAccountingEntry& acentry);
     bool ReadAccount(const std::string& strAccount, CAccount& account);
     bool WriteAccount(const std::string& strAccount, const CAccount& account);
 
@@ -176,7 +179,7 @@ public:
     bool EraseContractData(const std::string &address, const std::string &key);
 
 
-    bool WriteAccountingEntry(const CAccountingEntry& acentry);
+    //bool WriteAccountingEntry(const CAccountingEntry& acentry);
     CAmount GetAccountCreditDebit(const std::string& strAccount);
     void ListAccountCreditDebit(const std::string& strAccount, std::list<CAccountingEntry>& acentries);
 
