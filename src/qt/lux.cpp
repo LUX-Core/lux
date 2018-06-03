@@ -647,7 +647,7 @@ int main(int argc, char* argv[])
     } catch (std::exception& e) {
         QMessageBox::critical(0, QObject::tr("Luxcore"),
             QObject::tr("Error: Cannot parse configuration file: %1. Only use key=value syntax.").arg(e.what()));
-        return false;
+        return 1;
     }
 
     /// 7. Determine network (and switch to network specific options)
@@ -680,7 +680,7 @@ int main(int argc, char* argv[])
         QMessageBox::critical(0, QObject::tr("Luxcore"),
             QObject::tr("Error reading masternode configuration file: %1").arg(strErr.c_str()));
 #if defined(REQUIRE_MASTERNODE_CONFIG)
-        return false;
+        return 1;
 #endif
     }
 
