@@ -218,8 +218,8 @@ void PrepareShutdown()
         pblocktree = NULL;
 //        delete pstorageresult;
 //        pstorageresult = NULL;
-//        delete globalState.release();
-//        globalSealEngine.reset();
+        delete globalState.release();
+        globalSealEngine.reset();
     }
 #ifdef ENABLE_WALLET
     if (pwalletMain)
@@ -353,6 +353,7 @@ std::string HelpMessage(HelpMessageMode mode)
                                               _("Warning: Reverting this setting requires re-downloading the entire blockchain.") + " " +
                                               _("(default: 0 = disable pruning blocks,") + " " +
                                               strprintf(_(">%u = target size in MiB to use for block files)"), MIN_DISK_SPACE_FOR_BLOCK_FILES / 1024 / 1024) + "\n";
+    strUsage += "  -reindex-chainstate    " + _("Rebuild chain state from the currently indexed blocks") + "\n";
     strUsage += "  -reindex               " + _("Rebuild block chain index from current blk000??.dat files") + " " + _("on startup") + "\n";
 #if !defined(WIN32)
     strUsage += "  -sysperms              " + _("Create new files with system default permissions, instead of umask 077 (only effective with disabled wallet functionality)") + "\n";
@@ -1307,6 +1308,7 @@ bool AppInit2(boost::thread_group& threadGroup, CScheme& scheme)
     // ********************************************************* Step 7: load block chain
 
     fReindex = GetBoolArg("-reindex", false);
+    bool fReindexChainState = GetBoolArg("-reindex-chainstate", false);
 
     // Upgrading to 0.8; hard-link the old blknnnn.dat files into /blocks/
     filesystem::path blocksDir = GetDataDir() / "blocks";
@@ -1367,7 +1369,7 @@ bool AppInit2(boost::thread_group& threadGroup, CScheme& scheme)
                 delete pstorageresult;
 
                 pblocktree = new CBlockTreeDB(nBlockTreeDBCache, false, fReindex);
-                pcoinsdbview = new CCoinsViewDB(nCoinDBCache, false, fReindex);
+                pcoinsdbview = new CCoinsViewDB(nCoinDBCache, false, fReindex || fReindexChainState);
                 pcoinscatcher = new CCoinsViewErrorCatcher(pcoinsdbview);
                 pcoinsTip = new CCoinsViewCache(pcoinscatcher);
 

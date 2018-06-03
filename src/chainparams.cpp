@@ -258,17 +258,17 @@ public:
         consensus.nMajorityWindow = 100;
         //consensus.BIP34Height = 227931;
         //consensus.BIP34Hash = uint256S("0x000000000000024b89b42a942fe0d9fea3bb44ab7bd1b19115dd6a759c0808b8");
-        consensus.powLimit = ~uint256(0) >> 1;
-        consensus.nPowTargetTimespan = 24 * 60 * 60; // LUX: 1 day //TODO: change it for testnet
-        consensus.nPowTargetSpacing = 60;  // LUX: 1 minute //TODO: change it for testnet
+        consensus.powLimit = ~uint256(0) >> 10; // LUX starting difficulty is 1 / 2^12
+        consensus.nPowTargetTimespan = 30 * 60; //36 * 60 * 60; // LUX: 1 36hrs
+        consensus.nPowTargetSpacing = 2 * 60;  // LUX: 2 minute
         consensus.fPowAllowMinDifficultyBlocks = false;
         consensus.fPowNoRetargeting = false;
         consensus.nRuleChangeActivationThreshold = 1368; // 95% of 1440 is
         consensus.nMinerConfirmationWindow = 1440; // nPowTargetTimespan / nPowTargetSpacing
         // Deployment of SegWit (BIP141 and BIP143)
         consensus.vDeployments[Consensus::DEPLOYMENT_SEGWIT].bit = 1;
-        consensus.vDeployments[Consensus::DEPLOYMENT_SEGWIT].nStartTime = 0;
-        consensus.vDeployments[Consensus::DEPLOYMENT_SEGWIT].nTimeout = 0; // Never / undefined
+        consensus.vDeployments[Consensus::DEPLOYMENT_SEGWIT].nStartTime = 1577836800;
+        consensus.vDeployments[Consensus::DEPLOYMENT_SEGWIT].nTimeout = 1577836900; // Never / undefined
         consensus.nLastPOWBlock = 6000000;
 
         networkID = CBaseChainParams::TESTNET;
@@ -280,14 +280,14 @@ public:
         vAlertPubKey = ParseHex("000010e83b2703ccf322f7dbd62dd5855ac7c10bd055814ce121ba32607d573b8810c02c0582aed05b4deb9c4b77b26d92428c61256cd42774babea0a073b2ed0c9");
         nDefaultPort = 28333;
         nMinerThreads = 0;
-        nMaturity = 79;
+        nMaturity = 10;
         nModifierUpdateBlock = 51197; //approx Mon, 17 Apr 2017 04:00:00 GMT
 
         //! Modify the testnet genesis block so the timestamp is valid for a later start.
         const char* pszTimestamp = "Lux - Testnet"; // Input Activation code to activate blockchain
         CMutableTransaction txNew;
         txNew.nVersion = 1;
-        txNew.nTime = 1527232652;
+        txNew.nTime = 1527664240;
         txNew.nLockTime = 0;
         txNew.vin.resize(1);
         txNew.vout.resize(1);
@@ -299,9 +299,9 @@ public:
         genesis.hashPrevBlock = 0;
         genesis.hashMerkleRoot = genesis.BuildMerkleTree();
         genesis.nVersion = 1;
-        genesis.nTime = 1527232652; //05/25/2018 @ 7:17am (UTC)
+        genesis.nTime = 1527664240; //05/29/2018 @ 5:00am (UTC)
         genesis.nBits = 0x1e0fffff;
-        genesis.nNonce = 174749;
+        genesis.nNonce = 1153266;
         genesis.hashStateRoot = uint256(h256Touint(dev::h256("e965ffd002cd6ad0e2dc402b8044de833e06b23127ea8c3d80aec91410771495"))); // lux
         genesis.hashUTXORoot = uint256(h256Touint(dev::sha3(dev::rlp("")))); // lux
 
@@ -320,8 +320,8 @@ public:
 
         consensus.hashGenesisBlock = genesis.GetHash();
 
-        assert(consensus.hashGenesisBlock == uint256("0x00000c384779f87def7714b9f8d2bdb308114fc8653973f8ad64f739ed245982"));
-        assert(genesis.hashMerkleRoot == uint256("0x83b4c898e56cbec1951915b6cbd014ab4463406463a4292467bebf1dfa442a22"));
+        assert(consensus.hashGenesisBlock == uint256("0x00000ed61786c92e01948df9f543fc2effc17a025ec14f743ec1848dff81233b"));
+        assert(genesis.hashMerkleRoot == uint256("0x484415096c0c3f026838b97854d02bbf38aad5449938ef62f1fdd51c371a1696"));
 
         vFixedSeeds.clear();
         vSeeds.clear();
