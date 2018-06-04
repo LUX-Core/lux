@@ -25,6 +25,8 @@
 #include "util.h"
 #include "utilmoneystr.h"
 #include "validationinterface.h"
+#include "masternode.h"
+
 #ifdef ENABLE_WALLET
 #include "wallet.h"
 #endif
@@ -316,9 +318,27 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
         assert(coinbaseTx.vin[0].scriptSig.size() <= 100);
         coinbaseTx.vout[0].SetEmpty();
     } else {
-        coinbaseTx.vout[0].scriptPubKey = scriptPubKeyIn;
+        CAmount totalReward = GetProofOfWorkReward(nFees, nHeight);
+        CAmount minerReward, mnReward;
+        CScript mnPayee;
+
+        if (nHeight >= chainparams.FirstSplitRewardBlock() && SelectMasternodePayee(mnPayee)) {
+            coinbaseTx.vout.resize(2);
+            //set masternode payee and 20% reward
+            mnReward = totalReward * 0.2;
+            coinbaseTx.vout[1].scriptPubKey = mnPayee;
+            coinbaseTx.vout[1].nValue = mnReward;
+
+            //miner's reward is everything that left after possibly inaccurate division
+            minerReward = totalReward - mnReward;
+        } else {
+            minerReward = totalReward;
+        }
+        assert(minerReward + mnReward == totalReward);
+
         coinbaseTx.vin[0].scriptSig = CScript() << nHeight << OP_0;
-        coinbaseTx.vout[0].nValue = GetProofOfWorkReward(nFees, nHeight);
+        coinbaseTx.vout[0].scriptPubKey = scriptPubKeyIn;
+        coinbaseTx.vout[0].nValue = minerReward;
     }
 
     originalRewardTx = coinbaseTx;
