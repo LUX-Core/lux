@@ -2270,7 +2270,8 @@ int32_t ComputeBlockVersion(const CBlockIndex* pindexPrev, const Consensus::Para
     for (int i = 0; i < (int)Consensus::MAX_VERSION_BITS_DEPLOYMENTS; i++) {
         ThresholdState state = VersionBitsState(pindexPrev, params, (Consensus::DeploymentPos)i, versionbitscache);
         if ((Consensus::DeploymentPos)i == Consensus::SMART_CONTRACTS_HARDFORK) {
-            if (pindexPrev->nHeight + 1 >= Params().FirstSCBlock()) {
+            int nextHeight = pindexPrev != nullptr ? pindexPrev->nHeight + 1 : 1;
+            if (nextHeight >= Params().FirstSCBlock()) {
                 nVersion |= VersionBitsMask(params, (Consensus::DeploymentPos)i);
             }
         } else {
