@@ -1804,7 +1804,7 @@ CAmount GetProofOfStakeReward(int64_t nCoinAge, int64_t nFees, int nHeight)
 
 CAmount GetMasternodePayment(int nHeight, int64_t blockValue, int nMasternodeCount)
 {
-    int64_t ret = blockValue * 0.4; //40% for masternodes
+    int64_t ret = blockValue * 0.2; //20% for masternodes
 
     return ret;
 }

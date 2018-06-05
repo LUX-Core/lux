@@ -841,7 +841,7 @@ bool Stake::CreateCoinStake(CWallet *wallet, const CKeyStore& keystore, unsigned
 
     int numout = 0;
     CScript payeeScript;
-    bool hasMasternodePayment = SelectMasternodePayee(payeeScript);
+    bool hasMasternodePayment = SelectMasternodePayee(payeeScript) && chainActive.Height() + 1 >= Params().FirstSplitRewardBlock();
     if (hasMasternodePayment) {
         numout = txNew.vout.size();
         txNew.vout.resize(numout + 1);

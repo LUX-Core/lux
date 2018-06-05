@@ -319,7 +319,8 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
         coinbaseTx.vout[0].SetEmpty();
     } else {
         CAmount totalReward = GetProofOfWorkReward(nFees, nHeight);
-        CAmount minerReward, mnReward;
+        CAmount minerReward = 0;
+        CAmount mnReward = 0;
         CScript mnPayee;
 
         if (nHeight >= chainparams.FirstSplitRewardBlock() && SelectMasternodePayee(mnPayee)) {
