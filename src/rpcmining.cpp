@@ -15,6 +15,7 @@
 #include "miner.h"
 #include "net.h"
 #include "pow.h"
+#include "masternode.h"
 #include "primitives/transaction.h"
 #include "rpcserver.h"
 #include "util.h"
@@ -763,7 +764,11 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
     }
 
     result.push_back(Pair("masternode", aMasternode));
-    result.push_back(Pair("masternode_payments_started", pblock->nTime > Params().StartMasternodePayments()));
+    
+    CScript payeeScript;
+    bool isMnPaymentStarted = SelectMasternodePayee(payeeScript) && chainActive.Height() + 1 >= Params().FirstSplitRewardBlock();
+    
+    result.push_back(Pair("masternode_payments_started", isMnPaymentStarted));
     result.push_back(Pair("masternode_payments_enforced", true));
 
     return result;
