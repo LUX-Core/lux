@@ -13,6 +13,7 @@
 #include "guiutil.h"
 #include "init.h"
 #include "darksend.h"
+#include "darksendconfig.h"
 #include "optionsmodel.h"
 #include "transactionfilterproxy.h"
 #include "transactiontablemodel.h"
@@ -415,18 +416,18 @@ void OverviewPage::updateDarksendProgress()
 
 void OverviewPage::darksendStatus()
 {
-#if 0
+
     static int64_t nLastDSProgressBlockTime = 0;
 
     int nBestHeight = chainActive.Tip()->nHeight;
 
     // we we're processing more then 1 block per second, we'll just leave
-    //if (((nBestHeight - darksendPool.cachedNumBlocks) / (GetTimeMillis() - nLastDSProgressBlockTime + 1) > 1)) return;
+    //if (((nBestHeight - darkSendPool.cachedNumBlocks) / (GetTimeMillis() - nLastDSProgressBlockTime + 1) > 1)) return;
     nLastDSProgressBlockTime = GetTimeMillis();
 
     if (!fEnableDarksend) {
-        if (nBestHeight != darksendPool.cachedNumBlocks) {
-            darksendPool.cachedNumBlocks = nBestHeight;
+        if (nBestHeight != darkSendPool.cachedNumBlocks) {
+            darkSendPool.cachedNumBlocks = nBestHeight;
             updateDarksendProgress();
 
             ui->darksendEnabled->setText(tr("Disabled"));
@@ -438,15 +439,15 @@ void OverviewPage::darksendStatus()
     }
 
     // check darksend status and unlock if needed
-    if (nBestHeight != darksendPool.cachedNumBlocks) {
+    if (nBestHeight != darkSendPool.cachedNumBlocks) {
         // Balance and number of transactions might have changed
-        darksendPool.cachedNumBlocks = nBestHeight;
+        darkSendPool.cachedNumBlocks = nBestHeight;
         updateDarksendProgress();
 
         ui->darksendEnabled->setText(tr("Enabled"));
     }
 
-    QString strStatus = QString(darksendPool.GetStatus().c_str());
+    QString strStatus = QString(darkSendPool.GetState());
 
     QString s = tr("Last Darksend message:\n") + strStatus;
 
@@ -455,38 +456,38 @@ void OverviewPage::darksendStatus()
 
     ui->darksendStatus->setText(s);
 
-    if (darksendPool.sessionDenom == 0) {
+    if (darkSendPool.sessionDenom == 0) {
         ui->labelSubmittedDenom->setText(tr("N/A"));
     } else {
         std::string out;
-        darksendPool.GetDenominationsToString(darksendPool.sessionDenom, out);
+        darkSendPool.GetDenominationsToString(darkSendPool.sessionDenom, out);
         QString s2(out.c_str());
         ui->labelSubmittedDenom->setText(s2);
     }
-#endif
+
 }
 
 void OverviewPage::darksendAuto()
 {
-#if 0
-    darksendPool.DoAutomaticDenominating();
-#endif
+
+    darkSendPool.DoAutomaticDenominating();
+
 }
 
 void OverviewPage::darksendReset()
 {
-#if 0
-    darksendPool.Reset();
+
+    darkSendPool.Reset();
 
     QMessageBox::warning(this, tr("Darksend"),
         tr("Darksend was successfully reset."),
         QMessageBox::Ok, QMessageBox::Ok);
-#endif
+
 }
 
 void OverviewPage::toggleDarksend()
 {
-#if 0
+
     QSettings settings;
     // Popup some information on first mixing
     QString hasMixed = settings.value("hasMixed").toString();
@@ -512,7 +513,7 @@ void OverviewPage::toggleDarksend()
             WalletModel::UnlockContext ctx(walletModel->requestUnlock(false));
             if (!ctx.isValid()) {
                 //unlock was cancelled
-                darksendPool.cachedNumBlocks = std::numeric_limits<int>::max();
+                darkSendPool.cachedNumBlocks = std::numeric_limits<int>::max();
                 QMessageBox::warning(this, tr("Darksend"),
                     tr("Wallet is locked and user declined to unlock. Disabling Darksend."),
                     QMessageBox::Ok, QMessageBox::Ok);
@@ -523,11 +524,11 @@ void OverviewPage::toggleDarksend()
     }
 
     fEnableDarksend = !fEnableDarksend;
-    darksendPool.cachedNumBlocks = std::numeric_limits<int>::max();
+    darkSendPool.cachedNumBlocks = std::numeric_limits<int>::max();
 
     if (!fEnableDarksend) {
         ui->toggleDarksend->setText(tr("Start Luxsend"));
-        darksendPool.UnlockCoins();
+        darkSendPool.UnlockCoins();
     } else {
         ui->toggleDarksend->setText(tr("Stop Luxsend"));
 
@@ -539,5 +540,5 @@ void OverviewPage::toggleDarksend()
             dlg.exec();
         }
     }
-#endif
+
 }
