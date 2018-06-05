@@ -229,8 +229,8 @@ if test "x$enable_debug_xdump" = xyes; then
     fi
 fi
 
-CPPFLAGS="-Wno-unknown-pragmas $CPPFLAGS -DLUX_BUILD"
-CXXFLAGS="-Wno-unknown-pragmas -Wno-implicit-fallthrough $CXXFLAGS"
+CPPFLAGS="-Wno-inconsistent-missing-override -Wno-unknown-pragmas -Wno-implicit-fallthrough $CPPFLAGS -DLUX_BUILD"
+CXXFLAGS="-Wno-inconsistent-missing-override -Wno-unknown-pragmas -Wno-implicit-fallthrough $CXXFLAGS"
 
 ## TODO: Remove these hard-coded paths and flags. They are here for the sake of
 ##       compatibility with the legacy buildsystem.
