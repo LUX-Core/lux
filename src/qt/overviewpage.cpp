@@ -191,7 +191,7 @@ OverviewPage::OverviewPage(QWidget* parent) : QWidget(parent),
                                               currentWatchOnlyBalance(-1),
                                               currentWatchUnconfBalance(-1),
                                               currentWatchImmatureBalance(-1),
-                                              txdelegate(new TxViewDelegate()),
+                                          txdelegate(new TxViewDelegate()),
                                               tkndelegate(new TknViewDelegate(this)),
                                               filter(0)
 {
@@ -565,24 +565,30 @@ void OverviewPage::darksendStatus()
         QString s2(out.c_str());
         ui->labelSubmittedDenom->setText(s2);
     }
+
 }
 
 void OverviewPage::darksendAuto()
 {
+
     darkSendPool.DoAutomaticDenominating();
+
 }
 
 void OverviewPage::darksendReset()
 {
+
     darkSendPool.Reset();
 
     QMessageBox::warning(this, tr("Darksend"),
         tr("Darksend was successfully reset."),
         QMessageBox::Ok, QMessageBox::Ok);
+
 }
 
 void OverviewPage::toggleDarksend()
 {
+
     QSettings settings;
     // Popup some information on first mixing
     QString hasMixed = settings.value("hasMixed").toString();
@@ -635,4 +641,5 @@ void OverviewPage::toggleDarksend()
             dlg.exec();
         }
     }
+
 }
