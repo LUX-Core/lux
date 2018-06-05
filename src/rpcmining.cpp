@@ -431,7 +431,15 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
             if (!DecodeHexBlk(block, dataval.get_str()))
                 throw JSONRPCError(RPC_DESERIALIZATION_ERROR, "Block decode failed");
 
-            uint256 hash = block.GetHash();
+            BlockMap::iterator prevBlockIt = mapBlockIndex.find(block.hashPrevBlock);
+            bool usePhi2 = false;
+            if (prevBlockIt != mapBlockIndex.end()) {
+                if (prevBlockIt->second->nHeight + 1 >= Params().SwitchPhi2Block()) {
+                    usePhi2 = true;
+                }
+            }
+
+            uint256 hash = block.GetHash(usePhi2);
             BlockMap::iterator mi = mapBlockIndex.find(hash);
             if (mi != mapBlockIndex.end()) {
                 CBlockIndex* pindex = mi->second;
@@ -891,14 +899,15 @@ class submitblock_StateCatcher : public CValidationInterface
 public:
     uint256 hash;
     bool found;
+    bool usePhi2;
     CValidationState state;
 
-    submitblock_StateCatcher(const uint256& hashIn) : hash(hashIn), found(false), state(){};
+    submitblock_StateCatcher(const uint256& hashIn, bool usePhi2) : hash(hashIn), found(false), usePhi2(usePhi2), state(){};
 
 protected:
     virtual void BlockChecked(const CBlock& block, const CValidationState& stateIn)
     {
-        if (block.GetHash() != hash)
+        if (block.GetHash(usePhi2) != hash)
             return;
         found = true;
         state = stateIn;
@@ -928,7 +937,15 @@ UniValue submitblock(const UniValue& params, bool fHelp)
     if (!DecodeHexBlk(block, params[0].get_str()))
         throw JSONRPCError(RPC_DESERIALIZATION_ERROR, "Block decode failed");
 
-    uint256 hash = block.GetHash();
+    BlockMap::iterator prevBlockIt = mapBlockIndex.find(block.hashPrevBlock);
+    bool usePhi2 = false;
+    if (prevBlockIt != mapBlockIndex.end()) {
+        if (prevBlockIt->second->nHeight + 1 >= Params().SwitchPhi2Block()) {
+            usePhi2 = true;
+        }
+    }
+
+    uint256 hash = block.GetHash(usePhi2);
     bool fBlockPresent = false;
     {
         LOCK(cs_main);
@@ -945,7 +962,7 @@ UniValue submitblock(const UniValue& params, bool fHelp)
     }
 
     CValidationState state;
-    submitblock_StateCatcher sc(block.GetHash());
+    submitblock_StateCatcher sc(block.GetHash(usePhi2), usePhi2);
     RegisterValidationInterface(&sc);
     bool fAccepted = ProcessNewBlock(state, Params(), NULL, &block);
     UnregisterValidationInterface(&sc);
