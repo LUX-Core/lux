@@ -229,9 +229,6 @@ if test "x$enable_debug_xdump" = xyes; then
     fi
 fi
 
-CPPFLAGS="-Wno-inconsistent-missing-override -Wno-unknown-pragmas -Wno-implicit-fallthrough $CPPFLAGS -DLUX_BUILD"
-CXXFLAGS="-Wno-inconsistent-missing-override -Wno-unknown-pragmas -Wno-implicit-fallthrough $CXXFLAGS"
-
 ## TODO: Remove these hard-coded paths and flags. They are here for the sake of
 ##       compatibility with the legacy buildsystem.
 ##
@@ -397,6 +394,18 @@ case $host in
      CPPFLAGS="$CPPFLAGS"
      ;;
 esac
+
+if test x$TARGET_OS = xwindows; then
+	CPPFLAGS="-Wno-unknown-pragmas $CPPFLAGS -DLUX_BUILD"
+	CXXFLAGS="-Wno-unknown-pragmas $CXXFLAGS"
+elif test x$TARGET_OS = xdarwin; then
+	CPPFLAGS="-Wno-inconsistent-missing-override -Wno-unknown-pragmas -Wno-implicit-fallthrough $CPPFLAGS -DLUX_BUILD"
+	CXXFLAGS="-Wno-inconsistent-missing-override -Wno-unknown-pragmas -Wno-implicit-fallthrough $CXXFLAGS"
+else
+	CPPFLAGS="-Wno-unknown-pragmas -Wno-implicit-fallthrough $CPPFLAGS -DLUX_BUILD"
+	CXXFLAGS="-Wno-unknown-pragmas -Wno-implicit-fallthrough $CXXFLAGS"
+fi
+
 
 if test x$use_pkgconfig = xyes; then
   m4_ifndef([PKG_PROG_PKG_CONFIG], [AC_MSG_ERROR(PKG_PROG_PKG_CONFIG macro not found. Please install pkg-config and re-run autogen.sh.)])

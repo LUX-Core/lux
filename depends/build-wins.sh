@@ -20,6 +20,16 @@ if [ ! -f $CC ]; then
    sudo apt-get install build-essential libtool autotools-dev automake cmake pkg-config bsdmainutils curl g++-mingw-w64-x86-64 mingw-w64-x86-64-dev g++-mingw-w64-i686 mingw-w64-i686-dev -y
 fi
 
+if [ -z "$(echo $JAVA_HOME)" ]; then
+   sudo apt install oracle-java8-set-default
+fi
+
+if [ ! -f "$JAVA_HOME/include/jni_md.h" ]; then
+   if [ -f "$JAVA_HOME/include/linux/jni_md.h" ]; then
+      sudo ln -s "$JAVA_HOME/include/linux/jni_md.h" "$JAVA_HOME/include/jni_md.h"
+   fi
+fi
+
 # Make dependencies
 make HOST=$PLATFORM
 
@@ -28,21 +38,21 @@ LEVELDB_DIR="../src/leveldb"
 cd $LEVELDB_DIR
 CC="$CC" CXX="$CXX" TARGET_OS="NATIVE_WINDOWS" make
 cd $OLD_PATH
-rm "$LIB_DIR/libleveldb.a"
-rm "$LIB_DIR/libmemenv.a"
-rm -r "$INCLUDE_DIR/leveldb"
-cp "$LEVELDB_DIR/out-static/libleveldb.a" "$LIB_DIR/libleveldb.a"
-cp "$LEVELDB_DIR/out-static/libmemenv.a" "$LIB_DIR/libmemenv.a"
-cp -r "$LEVELDB_DIR/include/leveldb" "$INCLUDE_DIR"
+
+[ -f "$LIB_DIR/libleveldb.a" ] && rm "$LIB_DIR/libleveldb.a"
+[ -f "$LIB_DIR/libmemenv.a"  ] && rm "$LIB_DIR/libmemenv.a"
+[ -d "$INCLUDE_DIR/leveldb"  ] && rm -r "$INCLUDE_DIR/leveldb"
+[ -f "$LEVELDB_DIR/libleveldb.a"    ] && cp "$LEVELDB_DIR/libleveldb.a" "$LIB_DIR/libleveldb.a"
+[ -f "$LEVELDB_DIR/libmemenv.a"     ] && cp "$LEVELDB_DIR/libmemenv.a" "$LIB_DIR/libmemenv.a"
+[ -d "$LEVELDB_DIR/include/leveldb" ] && cp -r "$LEVELDB_DIR/include/leveldb" "$INCLUDE_DIR"
 mkdir "$INCLUDE_DIR/leveldb/helpers"
-cp -r "$LEVELDB_DIR/helpers/memenv/memenv.h" "$INCLUDE_DIR/leveldb/helpers/memenv.h"
+[ -f "$LEVELDB_DIR/helpers/memenv/memenv.h" ] && cp -r "$LEVELDB_DIR/helpers/memenv/memenv.h" "$INCLUDE_DIR/leveldb/helpers/memenv.h"
 cp ../src/config/implementation.hpp "$INCLUDE_DIR/boost/unordered/detail/implementation.hpp"
 cp ../src/config/condition_variable.hpp "$INCLUDE_DIR/boost/thread/win32/condition_variable.hpp"
 
-# Build eth dependencies
 cd ..
-./autogen.sh Windows $PLATFORM $INSTALL_DIR
-./configure --prefix=$PWD/depends/$PLATFORM --host=$PLATFORM --disable-tests && make clean && make -j$(nproc)
+./autogen.sh windows $PLATFORM $INSTALL_DIR
+./configure --prefix=$PWD/depends/$PLATFORM --host=$PLATFORM --disable-tests --disable-shared CPPFLAGS="-DMINIUPNP_STATICLIB"
 
 # Build the application
 make -j$(nproc)
