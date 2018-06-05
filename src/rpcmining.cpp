@@ -764,12 +764,8 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
     }
 
     result.push_back(Pair("masternode", aMasternode));
-    
-    CScript payeeScript;
-    bool isMnPaymentStarted = SelectMasternodePayee(payeeScript) && chainActive.Height() + 1 >= Params().FirstSplitRewardBlock();
-    
-    result.push_back(Pair("masternode_payments_started", isMnPaymentStarted));
-    result.push_back(Pair("masternode_payments_enforced", true));
+    result.push_back(Pair("masternode_payments_started", (pindexPrev->nHeight + 1) >= Params().FirstSplitRewardBlock()));
+    result.push_back(Pair("masternode_payments_enforced", MasternodePaymentsEnabled()));
 
     return result;
 }
