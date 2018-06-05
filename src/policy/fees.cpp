@@ -13,6 +13,12 @@
 #include "txmempool.h"
 #include "util.h"
 
+#ifdef WIN32
+static const double MIN_PRIORITY = 10;
+static const double MAX_PRIORITY = 1e16;
+#endif
+
+
 void TxConfirmStats::Initialize(std::vector<double>& defaultBuckets,
                                 unsigned int maxConfirms, double _decay, std::string _dataTypeString)
 {
