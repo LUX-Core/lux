@@ -1720,7 +1720,8 @@ bool ReadBlockFromDisk(CBlock& block, const CDiskBlockPos& pos, int nHeight, con
 bool ReadBlockFromDisk(CBlock& block, const CBlockIndex* pindex, const Consensus::Params& consensusParams) {
     if (!ReadBlockFromDisk(block, pindex->GetBlockPos(), pindex->nHeight, consensusParams))
         return false;
-    if (block.GetHash() != pindex->GetBlockHash()) {
+    //both phi1612 and phi2 hashes do not match indexed hash
+    if (block.GetHash() != pindex->GetBlockHash() && block.GetHash(true) != pindex->GetBlockHash()) {
         LogPrintf("%s : block=%s index=%s\n", __func__, block.GetHash().GetHex(), pindex->GetBlockHash().GetHex());
         return error("ReadBlockFromDisk(CBlock&, CBlockIndex*) : GetHash() doesn't match index");
     }
@@ -2596,7 +2597,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
                             heightIndexes[key].first = CHeightTxIndexKey(pindex->nHeight, resultExec[k].execRes.newAddress);
                         }
                         heightIndexes[key].second.push_back(tx.GetHash());
-                        tri.push_back(TransactionReceiptInfo{block.GetHash(), uint32_t(pindex->nHeight), tx.GetHash(), uint32_t(i), resultConvertLuxTX.first[k].from(), resultConvertLuxTX.first[k].to(),
+                        tri.push_back(TransactionReceiptInfo{block.GetHash(pindex->nHeight >= Params().SwitchPhi2Block()), uint32_t(pindex->nHeight), tx.GetHash(), uint32_t(i), resultConvertLuxTX.first[k].from(), resultConvertLuxTX.first[k].to(),
                                                              countCumulativeGasUsed, uint64_t(resultExec[k].execRes.gasUsed), resultExec[k].execRes.newAddress, resultExec[k].txRec.log(), resultExec[k].execRes.excepted});
                     }
 
@@ -2681,7 +2682,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
         checkBlock.hashUTXORoot = /*uint256(0);*/h256Touint(globalState->rootHashUTXO());
 
         //If this error happens, it probably means that something with AAL created transactions didn't match up to what is expected
-        if ((checkBlock.GetHash() != block.GetHash()) && !fJustCheck) {
+        if ((checkBlock.GetHash() != block.GetHash(pindex->nHeight >= Params().SwitchPhi2Block())) && !fJustCheck) {
             LogPrintf("Actual block data does not match block expected by AAL\n");
             //Something went wrong with AAL, compare different elements and determine what the problem is
             if (checkBlock.hashMerkleRoot != block.hashMerkleRoot) {
@@ -3465,8 +3466,14 @@ bool ReconsiderBlock(CValidationState& state, CBlockIndex* pindex)
 
 CBlockIndex* AddToBlockIndex(const CBlock& block)
 {
+    BlockMap::iterator prev_block_it = mapBlockIndex.find(block.hashPrevBlock);
+    bool usePhi2 = false;
+    if (prev_block_it != mapBlockIndex.end()) {
+        usePhi2 = prev_block_it->second->nHeight >= Params().SwitchPhi2Block();
+    }
+
     // Check for duplicate
-    uint256 hash = block.GetHash();
+    uint256 hash = block.GetHash(usePhi2);
     BlockMap::iterator it = mapBlockIndex.find(hash);
     if (it != mapBlockIndex.end())
         return it->second;
@@ -3828,7 +3835,12 @@ bool CheckWork(const CBlock &block, CBlockIndex* const pindexPrev)
 bool ContextualCheckBlockHeader(const CBlockHeader& block, CValidationState& state, const Consensus::Params& consensusParams, CBlockIndex* const pindexPrev)
 {
     const CChainParams& chainParams = Params();
-    uint256 hash = block.GetHash();
+    uint256 hash;
+    if (pindexPrev) {
+        hash = block.GetHash(pindexPrev->nHeight + 1 >= Params().SwitchPhi2Block());
+    } else {
+        hash = block.GetHash();
+    }
 
     if (hash == Params().HashGenesisBlock())
         return true;
@@ -3945,8 +3957,15 @@ bool IsWitnessEnabled(const CBlockIndex* pindexPrev, const Consensus::Params& pa
 bool AcceptBlockHeader(const CBlock& block, CValidationState& state, const CChainParams& chainparams, CBlockIndex** ppindex)
 {
     AssertLockHeld(cs_main);
+
+    BlockMap::iterator prev_block_it = mapBlockIndex.find(block.hashPrevBlock);
+    bool usePhi2 = false;
+    if (prev_block_it != mapBlockIndex.end()) {
+        usePhi2 = prev_block_it->second->nHeight >= Params().SwitchPhi2Block();
+    }
+
     // Check for duplicate
-    uint256 hash = block.GetHash();
+    uint256 hash = block.GetHash(usePhi2);
     BlockMap::iterator miSelf = mapBlockIndex.find(hash);
     CBlockIndex* pindex = NULL;
 
@@ -4862,6 +4881,16 @@ bool LoadExternalBlockFile(const CChainParams& chainparams, FILE* fileIn, CDiskB
                     continue;
                 }
 
+                BlockMap::iterator prev_block_it = mapBlockIndex.find(block.hashPrevBlock);
+                bool usePhi2 = false;
+                if (prev_block_it != mapBlockIndex.end()) {
+                    usePhi2 = prev_block_it->second->nHeight >= Params().SwitchPhi2Block();
+                }
+
+                if (usePhi2) {
+                    hash = block.GetHash(usePhi2);
+                }
+
                 // process in case the block isn't known yet
                 if (mapBlockIndex.count(hash) == 0 || (mapBlockIndex[hash]->nStatus & BLOCK_HAVE_DATA) == 0) {
                     CValidationState state;
@@ -4883,15 +4912,21 @@ bool LoadExternalBlockFile(const CChainParams& chainparams, FILE* fileIn, CDiskB
                     while (range.first != range.second) {
                         std::multimap<uint256, CDiskBlockPos>::iterator it = range.first;
 
-                        uint256 hash = block.GetHash();
+                        BlockMap::iterator prev_block_it = mapBlockIndex.find(block.hashPrevBlock);
+                        bool usePhi2 = false;
+                        if (prev_block_it != mapBlockIndex.end()) {
+                            usePhi2 = prev_block_it->second->nHeight >= Params().SwitchPhi2Block();
+                        }
+
+                        uint256 hash = block.GetHash(usePhi2);
                         int nHeight = mapBlockIndex[hash]->nHeight;
                         if (ReadBlockFromDisk(block, it->second, nHeight, chainparams.GetConsensus())) {
-                            LogPrintf("%s: Processing out of order child %s of %s\n", __func__, block.GetHash().ToString(),
+                            LogPrintf("%s: Processing out of order child %s of %s\n", __func__, block.GetHash(usePhi2).ToString(),
                                 head.ToString());
                             CValidationState dummy;
                             if (ProcessNewBlock(dummy, chainparams, NULL, &block, &it->second)) {
                                 nLoaded++;
-                                queue.push_back(block.GetHash());
+                                queue.push_back(block.GetHash(usePhi2));
                             }
                         }
                         range.first++;
@@ -5885,7 +5920,14 @@ static bool ProcessMessage(CNode* pfrom, const string &strCommand, CDataStream& 
     else if (strCommand == "block" && !fImporting && !fReindex) { // Ignore blocks received while importing
         CBlock block;
         vRecv >> block;
-        uint256 hashBlock = block.GetHash();
+
+        BlockMap::iterator prev_block_it = mapBlockIndex.find(block.hashPrevBlock);
+        bool usePhi2 = false;
+        if (prev_block_it != mapBlockIndex.end()) {
+            usePhi2 = prev_block_it->second->nHeight >= Params().SwitchPhi2Block();
+        }
+
+        uint256 hashBlock = block.GetHash(usePhi2);
         CInv inv(MSG_BLOCK, hashBlock);
         LogPrint("net", "received block %s peer=%d\n", inv.hash.ToString(), pfrom->id);
 

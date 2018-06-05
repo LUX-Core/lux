@@ -3784,8 +3784,14 @@ int CMerkleTx::SetMerkleBranch(const CBlock& block) {
     AssertLockHeld(cs_main);
     CBlock blockTmp;
 
+    BlockMap::iterator prev_block_it = mapBlockIndex.find(block.hashPrevBlock);
+    bool usePhi2 = false;
+    if (prev_block_it != mapBlockIndex.end()) {
+        usePhi2 = prev_block_it->second->nHeight >= Params().SwitchPhi2Block();
+    }
+
     // Update the tx's hashBlock
-    hashBlock = block.GetHash();
+    hashBlock = block.GetHash(usePhi2);
 
     // Locate the transaction
     for (nIndex = 0; nIndex < (int)block.vtx.size(); nIndex++)

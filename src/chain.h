@@ -471,7 +471,7 @@ public:
         block.nNonce = nNonce;
         block.hashStateRoot   = hashStateRoot; // lux
         block.hashUTXORoot    = hashUTXORoot; // lux
-        return block.GetHash();
+        return block.GetHash(nHeight >= Params().SwitchPhi2Block());
     }
 
     std::string ToString() const
