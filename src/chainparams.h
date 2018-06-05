@@ -102,6 +102,7 @@ public:
     int FirstSCBlock() const { return nFirstSCBlock; }
     int SwitchPhi2Block() const { return nSwitchPhi2Block; }
     int64_t PruneAfterHeight() const { return nPruneAfterHeight; }
+    int FirstSplitRewardBlock() const { return nSplitRewardBlock; }
 
 protected:
     CChainParams() {}
@@ -141,6 +142,7 @@ protected:
     int64_t nStakingMinAge;
     int nFirstSCBlock;
     int nSwitchPhi2Block;
+    int nSplitRewardBlock;
     uint64_t nPruneAfterHeight;
 };
 

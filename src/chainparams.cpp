@@ -163,6 +163,8 @@ public:
         nSwitchPhi2Block = 300000;
         nFirstSCBlock = 300000;
         nPruneAfterHeight = 300000;
+        nSplitRewardBlock = 300000;
+
         /**
          * The message start string is designed to be unlikely to occur in normal data.
          * The characters are rarely used upper ASCII, not valid as UTF-8, and produce
@@ -323,6 +325,8 @@ public:
         //nSwitchPhi2Block = 300000;
         //nFirstSCBlock = 300000;
         //nPruneAfterHeight = 100000;
+
+        nSplitRewardBlock = 1000;
 
         consensus.hashGenesisBlock = genesis.GetHash();
 
