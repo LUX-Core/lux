@@ -123,7 +123,7 @@ BitcoinGUI::BitcoinGUI(const NetworkStyle* networkStyle, QWidget* parent) : QMai
 {
     /* Open CSS when configured */
     this->setStyleSheet(GUIUtil::loadStyleSheet());
-    resize(1080, 735);
+    resize(1200, 735);
     QString windowTitle = tr("Luxcore") + " - ";
 
 #ifdef ENABLE_WALLET
