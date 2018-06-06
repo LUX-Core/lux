@@ -104,11 +104,8 @@ Clone the Lux source code and cd into lux
 
         git clone https://github.com/216k155/lux.git
         cd lux
-        export LDFLAGS=-L/usr/local/opt/openssl/lib;export CPPFLAGS=-I/usr/local/opt/openssl/include
-        ./autogen.sh
-        ./configure --disable-tests
-        make -j$(nproc)
-        make deploy
+        ./building/mac/requirements.sh
+        ./building/mac/build.sh
 
 Setup and Build: Arch Linux
 -----------------------------------
