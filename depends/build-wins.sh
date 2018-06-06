@@ -8,6 +8,7 @@ PLATFORM="i686-w64-mingw32"
 if [ "$1" = "x64" ]; then
     PLATFORM="x86_64-w64-mingw32"
 fi
+
 CC="/usr/bin/$PLATFORM-gcc-posix"
 CXX="/usr/bin/$PLATFORM-g++-posix"
 OLD_PATH=`pwd`
@@ -15,9 +16,30 @@ INSTALL_DIR="$OLD_PATH/$PLATFORM"
 LIB_DIR="$INSTALL_DIR/lib"
 INCLUDE_DIR="$INSTALL_DIR/include"
 
+sudo apt install software-properties-common
+sudo add-apt-repository "deb http://archive.ubuntu.com/ubuntu zesty universe"
+sudo apt update
+sudo apt upgrade
+
 # Install development tools if needed
 if [ ! -f $CC ]; then
    sudo apt-get install build-essential libtool autotools-dev automake cmake pkg-config bsdmainutils curl g++-mingw-w64-x86-64 mingw-w64-x86-64-dev g++-mingw-w64-i686 mingw-w64-i686-dev -y
+fi
+
+#Double check whether we have the expected toolchain
+if [ ! -f $CC ]; then
+	CC=""
+    CXX=""
+	[ -f "/usr/bin/$PLATFORM-gcc" ] && CC="/usr/bin/$PLATFORM-gcc"
+	[ -f "/usr/bin/$PLATFORM-g++" ] && CXX="/usr/bin/$PLATFORM-g++"
+else
+    sudo update-alternatives --set $PLATFORM-gcc /usr/bin/$PLATFORM-gcc-posix
+	sudo update-alternatives --set $PLATFORM-g++ /usr/bin/$PLATFORM-g++-posix
+fi
+
+if [ -z "$CC" ] || [ -z "$CXX" ]; then
+	echo "No expected toolchain existing. Quit compilation process"
+	exit
 fi
 
 if [ -z "$(echo $JAVA_HOME)" ]; then
@@ -52,7 +74,7 @@ cp ../src/config/condition_variable.hpp "$INCLUDE_DIR/boost/thread/win32/conditi
 
 cd ..
 ./autogen.sh windows $PLATFORM $INSTALL_DIR
-./configure --prefix=$PWD/depends/$PLATFORM --host=$PLATFORM --disable-tests --disable-shared CPPFLAGS="-DMINIUPNP_STATICLIB"
+./configure --prefix=$PWD/depends/$PLATFORM --host=$PLATFORM --disable-tests --disable-shared CPPFLAGS="-DMINIUPNP_STATICLIB" CFLAGS="-std=c99"
 
 # Build the application
 make -j$(nproc)
