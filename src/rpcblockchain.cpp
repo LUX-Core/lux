@@ -368,6 +368,75 @@ UniValue getblock(const UniValue& params, bool fHelp)
     return blockToJSON(block, pblockindex);
 }
 
+UniValue getstorage(const UniValue& params, bool fHelp)
+{
+    if (fHelp || params.size() < 1)
+        throw std::runtime_error(
+            "getstorage \"address\"\n"
+            "\nArgument:\n"
+            "1. \"address\"          (string, required) The address to get the storage from\n"
+            "2. \"blockNum\"         (string, optional) Number of block to get state from, \"latest\" keyword supported. Latest if not passed.\n"
+            "3. \"index\"            (number, optional) Zero-based index position of the storage\n"
+        );
+
+    LOCK(cs_main);
+
+    std::string strAddr = params[0].get_str();
+    if(strAddr.size() != 40 || !CheckHex(strAddr))
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Incorrect address"); 
+
+    TemporaryState ts(globalState);
+    if (params.size() > 1)
+    {
+        if (params[1].isNum())
+        {
+            auto blockNum = params[1].get_int();
+            if((blockNum < 0 && blockNum != -1) || blockNum > chainActive.Height())
+                throw JSONRPCError(RPC_INVALID_PARAMS, "Incorrect block number");
+
+            if(blockNum != -1)
+                ts.SetRoot(uintToh256(chainActive[blockNum]->hashStateRoot), uintToh256(chainActive[blockNum]->hashUTXORoot));
+                
+        } else {
+            throw JSONRPCError(RPC_INVALID_PARAMS, "Incorrect block number");
+        }
+    }
+
+    dev::Address addrAccount(strAddr);
+    if(!globalState->addressInUse(addrAccount))
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Address does not exist");
+    
+    UniValue result(UniValue::VOBJ);
+
+    bool onlyIndex = params.size() > 2;
+    unsigned index = 0;
+    if (onlyIndex)
+        index = params[2].get_int();
+
+    auto storage(globalState->storage(addrAccount));
+
+    if (onlyIndex)
+    {
+        if (index >= storage.size())
+        {
+            std::ostringstream stringStream;
+            stringStream << "Storage size: " << storage.size() << " got index: " << index;
+            throw JSONRPCError(RPC_INVALID_PARAMS, stringStream.str());
+        }
+        auto elem = std::next(storage.begin(), index);
+        UniValue e(UniValue::VOBJ);
+
+        storage = {{elem->first, {elem->second.first, elem->second.second}}};
+    } 
+    for (const auto& j: storage)
+    {
+        UniValue e(UniValue::VOBJ);
+        e.push_back(Pair(dev::toHex(j.second.first), dev::toHex(j.second.second)));
+        result.push_back(Pair(j.first.hex(), e));
+    }
+    return result;
+}
+
 UniValue getblockheader(const UniValue& params, bool fHelp)
 {
     if (fHelp || params.size() < 1 || params.size() > 2)

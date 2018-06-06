@@ -347,6 +347,9 @@ extern UniValue masternode(const UniValue& params, bool fHelp);
 //extern UniValue mnfinalbudget(const UniValue& params, bool fHelp);
 //extern UniValue mnsync(const UniValue& params, bool fHelp);
 
+
+extern UniValue getstorage(const UniValue& params, bool fHelp);
+
 // in rest.cpp
 extern bool HTTPReq_REST(AcceptedConnection* conn,
     std::string& strURI,
