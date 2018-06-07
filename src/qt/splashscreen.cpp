@@ -26,7 +26,7 @@ SplashScreen::SplashScreen(Qt::WindowFlags f, const NetworkStyle* networkStyle) 
 {
     // set reference point, paddings
     int paddingLeft = 14;
-    int paddingTop = 525;
+    int paddingTop = 755;
     int titleVersionVSpace = 17;
     int titleCopyrightVSpace = 32;
 
@@ -112,7 +112,7 @@ static void InitMessage(SplashScreen* splash, const std::string& message)
         Qt::QueuedConnection,
         Q_ARG(QString, QString::fromStdString(message)),
         Q_ARG(int, Qt::AlignBottom | Qt::AlignHCenter),
-        Q_ARG(QColor, QColor(64, 194, 220)));
+        Q_ARG(QColor, QColor(255, 255, 255)));
 }
 
 static void ShowProgress(SplashScreen* splash, const std::string& title, int nProgress)
