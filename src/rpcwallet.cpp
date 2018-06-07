@@ -22,6 +22,7 @@
 #include "consensus/validation.h"
 #include "rbf.h"
 #include <stdint.h>
+#include <string>
 
 #include "univalue/univalue.h"
 #include "rpcutil.h"
@@ -2485,6 +2486,10 @@ UniValue multisend(const UniValue& params, bool fHelp)
 ////////////////////////////////////////////////////////////////////// // lux
 UniValue callcontract(const UniValue& params, bool fHelp)
 {
+    if (chainActive.Height() < Params().FirstSCBlock()) {
+        throw JSONRPCError(RPC_VERIFY_ERROR, "Smart contracts hardfork is not active yet. Activation block number - " + std::to_string(Params().FirstSCBlock()));
+    }
+
     if (fHelp || params.size() < 2)
         throw runtime_error(
                 "callcontract \"address\" \"data\" ( address )\n"
@@ -2546,6 +2551,10 @@ UniValue createcontract(const UniValue& params, bool fHelp){
 
     if (!EnsureWalletIsAvailable(fHelp))
         return NullUniValue;
+
+    if (chainActive.Height() < Params().FirstSCBlock()) {
+        throw JSONRPCError(RPC_VERIFY_ERROR, "Smart contracts hardfork is not active yet. Activation block number - " + std::to_string(Params().FirstSCBlock()));
+    }
 
     LOCK2(cs_main, pwalletMain->cs_wallet);
     LuxDGP luxDGP(globalState.get(), fGettingValuesDGP);
@@ -2749,6 +2758,10 @@ UniValue sendtocontract(const UniValue& params, bool fHelp){
 
     if (!EnsureWalletIsAvailable(fHelp))
         return NullUniValue;
+
+    if (chainActive.Height() < Params().FirstSCBlock()) {
+        throw JSONRPCError(RPC_VERIFY_ERROR, "Smart contracts hardfork is not active yet. Activation block number - " + std::to_string(Params().FirstSCBlock()));
+    }
 
     LOCK2(cs_main, pwalletMain->cs_wallet);
     LuxDGP luxDGP(globalState.get(), fGettingValuesDGP);

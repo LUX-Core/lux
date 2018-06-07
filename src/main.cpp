@@ -1126,7 +1126,7 @@ bool AcceptToMemoryPool(CTxMemPool& pool, CValidationState& state, const CTransa
         dev::u256 txMinGasPrice = 0;
 
         //////////////////////////////////////////////////////////// // lux
-        if(tx.HasCreateOrCall()){
+        if(chainActive.Height() >= chainparams.FirstSCBlock() && tx.HasCreateOrCall()){
 
             if(!CheckSenderScript(view, tx)){
                 return state.DoS(1, false, REJECT_INVALID, "bad-txns-invalid-sender-script");
@@ -1416,7 +1416,7 @@ bool AcceptableInputs(CTxMemPool& pool, CValidationState& state, const CTransact
         dev::u256 txMinGasPrice = 0;
 
         //////////////////////////////////////////////////////////// // lux
-        if(tx.HasCreateOrCall()){
+        if(chainActive.Height() > Params().FirstSCBlock() && tx.HasCreateOrCall()){
 
             if(!CheckSenderScript(view, tx)){
                 return state.DoS(1, false, REJECT_INVALID, "bad-txns-invalid-sender-script");
