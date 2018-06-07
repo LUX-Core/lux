@@ -3787,7 +3787,7 @@ int CMerkleTx::SetMerkleBranch(const CBlock& block) {
     BlockMap::iterator prev_block_it = mapBlockIndex.find(block.hashPrevBlock);
     bool usePhi2 = false;
     if (prev_block_it != mapBlockIndex.end()) {
-        usePhi2 = prev_block_it->second->nHeight >= Params().SwitchPhi2Block();
+        usePhi2 = prev_block_it->second->nHeight + 1 >= Params().SwitchPhi2Block();
     }
 
     // Update the tx's hashBlock

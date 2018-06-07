@@ -1036,10 +1036,16 @@ bool ProcessBlockFound(CBlock* pblock, CWallet& wallet, CReserveKey& reservekey)
     // Remove key from key pool
     reservekey.KeepKey();
 
+    BlockMap::iterator prev_block_it = mapBlockIndex.find(pblock->hashPrevBlock);
+    bool usePhi2 = false;
+    if (prev_block_it != mapBlockIndex.end()) {
+        usePhi2 = prev_block_it->second->nHeight + 1 >= Params().SwitchPhi2Block();
+    }
+
     // Track how many getdata requests this block gets
     {
         LOCK(wallet.cs_wallet);
-        wallet.mapRequestCount[pblock->GetHash()] = 0;
+        wallet.mapRequestCount[pblock->GetHash(usePhi2)] = 0;
     }
 
     // Process this block the same as if we had received it from another node

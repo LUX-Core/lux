@@ -1628,7 +1628,14 @@ bool GetTransaction(const uint256& hash, CTransaction& txOut, const Consensus::P
             } catch (const std::exception& e) {
                 return error("%s: Deserialize or I/O error - %s", __func__, e.what());
             }
-            hashBlock = header.GetHash();
+
+            bool usePhi2 = false;
+            BlockMap::iterator mi = mapBlockIndex.find(header.hashPrevBlock);
+            if (mi != mapBlockIndex.end()) {
+                usePhi2 = mi->second->nHeight + 1 >= Params().SwitchPhi2Block();
+            }
+
+            hashBlock = header.GetHash(usePhi2);
             if (txOut.GetHash() != hash)
                 return error("%s: txid mismatch", __func__);
             return true;
@@ -2365,6 +2372,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
 
     // Special case for the genesis block, skipping connection of its transactions
     // (its coinbase is unspendable)
+    //Genesis block's hash cannot be calculated using PHI2, so no need to check PHI2 block hash
     if (block.GetHash() == chainparams.GetConsensus().hashGenesisBlock) {
         view.SetBestBlock(pindex->GetBlockHash());
         return true;
@@ -2681,8 +2689,9 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
         checkBlock.hashStateRoot = /*uint256(0);*/h256Touint(globalState->rootHash());
         checkBlock.hashUTXORoot = /*uint256(0);*/h256Touint(globalState->rootHashUTXO());
 
+        bool usePhi2 = pindex->nHeight >= Params().SwitchPhi2Block();
         //If this error happens, it probably means that something with AAL created transactions didn't match up to what is expected
-        if ((checkBlock.GetHash() != block.GetHash(pindex->nHeight >= Params().SwitchPhi2Block())) && !fJustCheck) {
+        if ((checkBlock.GetHash(usePhi2) != block.GetHash(usePhi2)) && !fJustCheck) {
             LogPrintf("Actual block data does not match block expected by AAL\n");
             //Something went wrong with AAL, compare different elements and determine what the problem is
             if (checkBlock.hashMerkleRoot != block.hashMerkleRoot) {
@@ -3347,6 +3356,7 @@ bool ActivateBestChain(CValidationState& state, const CChainParams& chainparams,
         boost::this_thread::interruption_point();
 
         bool fInitialDownload;
+        bool usePhi2 = false;
         while (true) {
             TRY_LOCK(cs_main, lockMain);
             if (!lockMain) {
@@ -3360,7 +3370,10 @@ bool ActivateBestChain(CValidationState& state, const CChainParams& chainparams,
             if (pindexMostWork == NULL || pindexMostWork == chainActive.Tip())
                 return true;
 
-            if (!ActivateBestChainStep(state, chainparams, pindexMostWork, pblock && pblock->GetHash() == pindexMostWork->GetBlockHash() ? pblock : NULL))
+            //Active chain's tip will be updated after ActivateBestChainStep, when block is added, so add 1 to active height
+            usePhi2 = chainActive.Height() + 1 >= Params().SwitchPhi2Block();
+
+            if (!ActivateBestChainStep(state, chainparams, pindexMostWork, pblock && pblock->GetHash(usePhi2) == pindexMostWork->GetBlockHash() ? pblock : NULL))
                 return false;
 
             pindexNewTip = chainActive.Tip();
@@ -3469,7 +3482,7 @@ CBlockIndex* AddToBlockIndex(const CBlock& block)
     BlockMap::iterator prev_block_it = mapBlockIndex.find(block.hashPrevBlock);
     bool usePhi2 = false;
     if (prev_block_it != mapBlockIndex.end()) {
-        usePhi2 = prev_block_it->second->nHeight >= Params().SwitchPhi2Block();
+        usePhi2 = prev_block_it->second->nHeight + 1 >= Params().SwitchPhi2Block();
     }
 
     // Check for duplicate
@@ -3677,16 +3690,14 @@ bool FindUndoPos(CValidationState& state, int nFile, CDiskBlockPos& pos, unsigne
 
 bool CheckBlockHeader(const CBlockHeader& block, CValidationState& state, const Consensus::Params& consensusParams, bool fCheckPOW) {
     // Get prev block index
-    CBlockIndex* pindexPrev = NULL;
-    int nHeight = 0;
+    bool usePhi2 = false;
     BlockMap::iterator mi = mapBlockIndex.find(block.hashPrevBlock);
     if (mi != mapBlockIndex.end()) {
-        pindexPrev = (*mi).second;
-        nHeight = pindexPrev->nHeight + 1;
+        usePhi2 = mi->second->nHeight + 1 >= Params().SwitchPhi2Block();
     }
 
     // Check proof of work matches claimed amount
-    if (fCheckPOW && !CheckProofOfWork(block.GetHash(nHeight >= Params().SwitchPhi2Block()), block.nBits, consensusParams))
+    if (fCheckPOW && !CheckProofOfWork(block.GetHash(usePhi2), block.nBits, consensusParams))
         return state.DoS(50, error("%s: proof of work failed", __func__),
             REJECT_INVALID, "high-hash");
     return true;
@@ -3961,7 +3972,7 @@ bool AcceptBlockHeader(const CBlock& block, CValidationState& state, const CChai
     BlockMap::iterator prev_block_it = mapBlockIndex.find(block.hashPrevBlock);
     bool usePhi2 = false;
     if (prev_block_it != mapBlockIndex.end()) {
-        usePhi2 = prev_block_it->second->nHeight >= Params().SwitchPhi2Block();
+        usePhi2 = prev_block_it->second->nHeight + 1 >= Params().SwitchPhi2Block();
     }
 
     // Check for duplicate
@@ -4016,6 +4027,7 @@ bool AcceptBlock(const CBlock& block, CValidationState& state, const CChainParam
 
     // Get prev block index
     CBlockIndex* pindexPrev = NULL;
+    //Genesis block's hash cannot be calculated using PHI2, so no need to check PHI2 block hash
     if (block.GetHash() != chainparams.GetConsensus().hashGenesisBlock) {
         BlockMap::iterator mi = mapBlockIndex.find(block.hashPrevBlock);
         if (mi == mapBlockIndex.end())
@@ -4186,6 +4198,8 @@ bool ProcessNewBlock(CValidationState& state, const CChainParams& chainparams, C
     if (!pblock->CheckBlockSignature())
         return error("%s: bad block signature", __func__);
 
+    bool usePhi2 = false;
+
     // Limited duplicity on stake: prevents block flood attack
     // Duplicate stake allowed only when there is orphan child block
     if (pblock->IsProofOfStake() && stake->IsBlockStaked(pblock) && !mapBlockIndex.count(pblock->hashPrevBlock))
@@ -4199,6 +4213,8 @@ bool ProcessNewBlock(CValidationState& state, const CChainParams& chainparams, C
         if (mi == mapBlockIndex.end()) {
             pfrom->PushMessage("getblocks", chainActive.GetLocator(), uint256(0));
             return false;
+        } else {
+            usePhi2 = mi->second->nHeight + 1 >= Params().SwitchPhi2Block();
         }
     }
 
@@ -4212,7 +4228,7 @@ bool ProcessNewBlock(CValidationState& state, const CChainParams& chainparams, C
             continue;
         }
 
-        MarkBlockAsReceived(pblock->GetHash());
+        MarkBlockAsReceived(pblock->GetHash(usePhi2));
 
         // Store to disk
         bool ret = AcceptBlock(*pblock, state, chainparams, &pindex, dbp);
@@ -4884,7 +4900,7 @@ bool LoadExternalBlockFile(const CChainParams& chainparams, FILE* fileIn, CDiskB
                 BlockMap::iterator prev_block_it = mapBlockIndex.find(block.hashPrevBlock);
                 bool usePhi2 = false;
                 if (prev_block_it != mapBlockIndex.end()) {
-                    usePhi2 = prev_block_it->second->nHeight >= Params().SwitchPhi2Block();
+                    usePhi2 = prev_block_it->second->nHeight + 1 >= Params().SwitchPhi2Block();
                 }
 
                 if (usePhi2) {
@@ -5924,7 +5940,7 @@ static bool ProcessMessage(CNode* pfrom, const string &strCommand, CDataStream& 
         BlockMap::iterator prev_block_it = mapBlockIndex.find(block.hashPrevBlock);
         bool usePhi2 = false;
         if (prev_block_it != mapBlockIndex.end()) {
-            usePhi2 = prev_block_it->second->nHeight >= Params().SwitchPhi2Block();
+            usePhi2 = prev_block_it->second->nHeight + 1 >= Params().SwitchPhi2Block();
         }
 
         uint256 hashBlock = block.GetHash(usePhi2);
@@ -6731,9 +6747,16 @@ UniValue vmLogToJSON(const ResultExecute& execRes, const CTransaction& tx, const
     if(tx != CTransaction())
         result.push_back(Pair("txid", tx.GetHash().GetHex()));
     result.push_back(Pair("address", execRes.execRes.newAddress.hex()));
-    if(block.GetHash() != CBlock().GetHash()){
+
+    BlockMap::iterator prev_block_it = mapBlockIndex.find(block.hashPrevBlock);
+    bool usePhi2 = false;
+    if (prev_block_it != mapBlockIndex.end()) {
+        usePhi2 = prev_block_it->second->nHeight + 1 >= Params().SwitchPhi2Block();
+    }
+
+    if(block.GetHash(usePhi2) != CBlock().GetHash(usePhi2)){
         result.push_back(Pair("time", block.GetBlockTime()));
-        result.push_back(Pair("blockhash", block.GetHash().GetHex()));
+        result.push_back(Pair("blockhash", block.GetHash(usePhi2).GetHex()));
         result.push_back(Pair("blockheight", chainActive.Tip()->nHeight + 1));
     } else {
         result.push_back(Pair("time", GetAdjustedTime()));
