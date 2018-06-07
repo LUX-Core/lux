@@ -777,7 +777,7 @@ QString tradingDialog::sendRequest(QString url, QString method, QString body){
 
     req.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
 
-    QNetworkReply *reply;
+    QNetworkReply *reply = NULL;
     if(method == "GET") {
         reply = mgr.get(req);
     } else if(method == "POST") {
@@ -825,6 +825,11 @@ QString tradingDialog::sendRequest(QString url, QString method, QString body){
 
     eventLoop.exec(); // blocks stack until "finished()" has been called
 
+    if (!reply)
+    {
+        return "Error";
+    }
+
     if (reply->error() == QNetworkReply::NoError) {
         //success
         Response = reply->readAll();
@@ -855,7 +860,7 @@ void tradingDialog::sendRequest1(QString url, std::function<void (void)> funcFor
 
     req.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
 
-    QNetworkReply *reply;
+    QNetworkReply *reply = NULL;
     //reply = qmanager->get(req);
 
     //printf("REPLY STARTED %s\n",url.toStdString().c_str());
@@ -906,6 +911,8 @@ void tradingDialog::sendRequest1(QString url, std::function<void (void)> funcFor
 
         reply = qmanager->post(req, body.toUtf8());
     }
+
+    if (!reply) return;
 
     connect( reply, &QNetworkReply::finished, this, [reply, this, funcForCallAfterReceiveResponse](){
         funcForCallAfterReceiveResponse();
