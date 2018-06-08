@@ -13,12 +13,13 @@
 class CBlock;
 class CBlockIndex;
 class CKeyStore;
-class CMutableTransaction;
 class COutPoint;
 class CReserveKey;
 class CTransaction;
 class CWallet;
 class CWalletTx;
+
+struct CMutableTransaction;
 
 namespace boost { class thread_group; }
 
