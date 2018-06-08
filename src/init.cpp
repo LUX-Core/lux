@@ -28,7 +28,7 @@
 #include "policy/policy.h"
 #include "rpcserver.h"
 #include "script/standard.h"
-#include "scheme.h"
+#include "scheduler.h"
 #include "spork.h"
 #include "txdb.h"
 #include "script/sigcache.h"
@@ -682,7 +682,7 @@ bool InitSanityCheck(void)
 /** Initialize lux.
  *  @pre Parameters should be parsed and config file should be read.
  */
-bool AppInit2(boost::thread_group& threadGroup, CScheme& scheme)
+bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
 {
 // ********************************************************* Step 1: setup
 #ifdef _MSC_VER
@@ -1040,9 +1040,9 @@ bool AppInit2(boost::thread_group& threadGroup, CScheme& scheme)
             return InitError(_("Unable to sign spork message, wrong key?"));
     }
 
-    // Start the lightweight task scheme thread
-    CScheme::Function serviceLoop = boost::bind(&CScheme::serviceQueue, &scheme);
-    threadGroup.create_thread(boost::bind(&TraceThread<CScheme::Function>, "scheme", serviceLoop));
+    // Start the lightweight task scheduler thread
+    CScheduler::Function serviceLoop = boost::bind(&CScheduler::serviceQueue, &scheduler);
+    threadGroup.create_thread(boost::bind(&TraceThread<CScheduler::Function>, "scheduler", serviceLoop));
 
     /* Start the RPC server already.  It will be started in "warmup" mode
      * and not really process calls already (but it will signify connections
@@ -1791,7 +1791,7 @@ bool AppInit2(boost::thread_group& threadGroup, CScheme& scheme)
     LogPrintf("mapAddressBook.size() = %u\n", pwalletMain ? pwalletMain->mapAddressBook.size() : 0);
 #endif
 
-    StartNode(threadGroup, scheme);
+    StartNode(threadGroup, scheduler);
 
 #ifdef ENABLE_WALLET
     // Generate coins in the background
@@ -1809,10 +1809,10 @@ bool AppInit2(boost::thread_group& threadGroup, CScheme& scheme)
     if (pwalletMain) {
         // Add wallet transactions that aren't already in a block to mapTransactions
         pwalletMain->ReacceptWalletTransactions();
-        std::atomic<bool> fFlushSchemed(false);
+        std::atomic<bool> fFlushScheduled(false);
         // Run a thread to flush wallet periodically
-        if (!fFlushSchemed.exchange(true)) {
-        scheme.schemeEvery(MaybeFlushWalletDB, 500);
+        if (!fFlushScheduled.exchange(true)) {
+        scheduler.scheduleEvery(MaybeFlushWalletDB, 500);
     }
     }
 #endif

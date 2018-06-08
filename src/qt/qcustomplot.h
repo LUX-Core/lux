@@ -2475,7 +2475,7 @@ protected:
 
   The data is stored in a sorted fashion, which allows very quick lookups by the sorted key as well
   as retrieval of ranges (see \ref findBegin, \ref findEnd, \ref keyRange) using binary search. The
-  container uses a preallocation and a postallocation scheme, such that appending and prepending
+  container uses a preallocation and a postallocation scheduler, such that appending and prepending
   data (with respect to the sort key) is very fast and minimizes reallocations. If data is added
   which needs to be inserted between existing keys, the merge usually can be done quickly too,
   using the fact that existing data is always sorted. The user can further improve performance by

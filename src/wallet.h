@@ -253,7 +253,7 @@ public:
 */
 class CWallet : public CCryptoKeyStore, public CValidationInterface
 {
-    static std::atomic<bool> fFlushSchemed;
+    static std::atomic<bool> fFlushScheduled;
     CWalletDB* pwalletdbEncryption;
 
     //! the current wallet version: clients below this version are not able to load the wallet

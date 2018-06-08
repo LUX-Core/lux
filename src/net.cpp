@@ -17,7 +17,7 @@
 #include "miner.h"
 #include "darksend.h"
 #include "primitives/transaction.h"
-#include "scheme.h"
+#include "scheduler.h"
 #include "ui_interface.h"
 #include "wallet.h"
 #include "miner.h"
@@ -1709,7 +1709,7 @@ void static Discover(boost::thread_group& threadGroup)
 #endif
 }
 
-void StartNode(boost::thread_group& threadGroup, CScheme& scheme)
+void StartNode(boost::thread_group& threadGroup, CScheduler& scheduler)
 {
     uiInterface.InitMessage(_("Loading addresses..."));
     // Load addresses for peers.dat
@@ -1771,7 +1771,7 @@ void StartNode(boost::thread_group& threadGroup, CScheme& scheme)
 
     // Dump network addresses every 900 secs
     // The second input is milliseconds. So, we must re-calculate the input time interval
-    scheme.schemeEvery(&DumpData, DUMP_ADDRESSES_INTERVAL * 1000);
+    scheduler.scheduleEvery(&DumpData, DUMP_ADDRESSES_INTERVAL * 1000);
 
     if (GetBoolArg("-staking", true) && pwalletMain) {
 #if 1

@@ -36,7 +36,7 @@
 
 class CAddrMan;
 class CBlockIndex;
-class CScheme;
+class CScheduler;
 class CNode;
 class CTxIn;
 class CTxOut;
@@ -86,7 +86,7 @@ bool OpenNetworkConnection(const CAddress& addrConnect, CSemaphoreGrant* grantOu
 void MapPort(bool fUseUPnP);
 unsigned short GetListenPort();
 bool BindListenPort(const CService& bindAddr, std::string& strError, bool fWhitelisted = false);
-void StartNode(boost::thread_group& threadGroup, CScheme& scheme);
+void StartNode(boost::thread_group& threadGroup, CScheduler& scheduler);
 bool StopNode();
 void SocketSendData(CNode* pnode);
 

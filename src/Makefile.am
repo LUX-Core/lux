@@ -146,7 +146,7 @@ BITCOIN_CORE_H = \
   luxcontrol.h \
   rpcserver.h \
   rpcutil.h \
-  scheme.h \
+  scheduler.h \
   script/interpreter.h \
   script/script.h \
   script/sigcache.h \
@@ -402,7 +402,7 @@ libbitcoin_common_a_SOURCES = \
   netbase.cpp \
   protocol.cpp \
   pubkey.cpp \
-  scheme.cpp \
+  scheduler.cpp \
   script/interpreter.cpp \
   script/script.cpp \
   script/sign.cpp \
