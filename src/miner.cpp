@@ -222,20 +222,28 @@ void BlockAssembler::RebuildRefundTransaction(){
     CMutableTransaction contrTx(originalRewardTx);
     if (!pblock->IsProofOfStake()) {
         refundtx=0;
-        contrTx.vout[refundtx].nValue = GetProofOfWorkReward(nFees, nHeight);
         contrTx.vout[refundtx].nValue -= bceResult.refundSender;
+
+        int i=contrTx.vout.size();
+        contrTx.vout.resize(contrTx.vout.size()+bceResult.refundOutputs.size());
+        for(CTxOut& vout : bceResult.refundOutputs){
+            contrTx.vout[i]=vout;
+            i++;
+        }
     } else {
         refundtx=1;
-        contrTx.vout[refundtx].nValue -= bceResult.refundSender;
+//        contrTx.vout[refundtx].nValue -= bceResult.refundSender;
+//
+//        int i=contrTx.vout.size();
+//        contrTx.vout.resize(contrTx.vout.size()+bceResult.refundOutputs.size());
+//        for(CTxOut& vout : bceResult.refundOutputs){
+//            contrTx.vout[i]=vout;
+//            i++;
+//        }
     }
 
     //note, this will need changed for MPoS
-    int i=contrTx.vout.size();
-    contrTx.vout.resize(contrTx.vout.size()+bceResult.refundOutputs.size());
-    for(CTxOut& vout : bceResult.refundOutputs){
-        contrTx.vout[i]=vout;
-        i++;
-    }
+
     pblock->vtx[refundtx] = std::move(CTransaction(contrTx));
 }
 
