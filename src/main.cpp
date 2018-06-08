@@ -2195,7 +2195,7 @@ bool DisconnectBlock(CBlock& block, CValidationState& state, CBlockIndex* pindex
     // move best block pointer to prevout block
     view.SetBestBlock(pindex->pprev->GetBlockHash());
 //#if 0
-//    if (pindex->nHeight >= Params().FirstSCBlock()) {
+      if (pindex->nHeight >= Params().FirstSCBlock()) {
         globalState->setRoot(uintToh256(pindex->pprev->hashStateRoot)); // lux
         globalState->setRootUTXO(uintToh256(pindex->pprev->hashUTXORoot)); // lux
 
@@ -2203,7 +2203,7 @@ bool DisconnectBlock(CBlock& block, CValidationState& state, CBlockIndex* pindex
             pstorageresult->deleteResults(block.vtx);
             //pblocktree->EraseHeightIndex(pindex->nHeight);
         }
-//   }
+   }
 //#endif
     if (pfClean) {
         *pfClean = fClean;
