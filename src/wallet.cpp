@@ -236,16 +236,16 @@ bool CWallet::Unlock(const SecureString& strWalletPassphrase, bool anonymizeOnly
 
 
     CCrypter crypter;
-    CKeyingMaterial vMasterKey;
+    CKeyingMaterial _vMasterKey;
 
     {
         LOCK(cs_wallet);
         BOOST_FOREACH (const MasterKeyMap::value_type& pMasterKey, mapMasterKeys) {
             if (!crypter.SetKeyFromPassphrase(strWalletPassphraseFinal, pMasterKey.second.vchSalt, pMasterKey.second.nDeriveIterations, pMasterKey.second.nDerivationMethod))
                 return false;
-            if (!crypter.Decrypt(pMasterKey.second.vchCryptedKey, vMasterKey))
+            if (!crypter.Decrypt(pMasterKey.second.vchCryptedKey, _vMasterKey))
                 continue; // try another master key
-            if (CCryptoKeyStore::Unlock(vMasterKey)) {
+            if (CCryptoKeyStore::Unlock(_vMasterKey)) {
                 fWalletUnlockAnonymizeOnly = anonymizeOnly;
                 return true;
             }
@@ -264,13 +264,13 @@ bool CWallet::ChangeWalletPassphrase(const SecureString& strOldWalletPassphrase,
         Lock();
 
         CCrypter crypter;
-        CKeyingMaterial vMasterKey;
+        CKeyingMaterial _vMasterKey;
         BOOST_FOREACH (MasterKeyMap::value_type& pMasterKey, mapMasterKeys) {
             if (!crypter.SetKeyFromPassphrase(strOldWalletPassphraseFinal, pMasterKey.second.vchSalt, pMasterKey.second.nDeriveIterations, pMasterKey.second.nDerivationMethod))
                 return false;
-            if (!crypter.Decrypt(pMasterKey.second.vchCryptedKey, vMasterKey))
+            if (!crypter.Decrypt(pMasterKey.second.vchCryptedKey, _vMasterKey))
                 return false;
-            if (CCryptoKeyStore::Unlock(vMasterKey)) {
+            if (CCryptoKeyStore::Unlock(_vMasterKey)) {
                 int64_t nStartTime = GetTimeMillis();
                 crypter.SetKeyFromPassphrase(strNewWalletPassphrase, pMasterKey.second.vchSalt, pMasterKey.second.nDeriveIterations, pMasterKey.second.nDerivationMethod);
                 pMasterKey.second.nDeriveIterations = pMasterKey.second.nDeriveIterations * (100 / ((double)(GetTimeMillis() - nStartTime)));
@@ -286,7 +286,7 @@ bool CWallet::ChangeWalletPassphrase(const SecureString& strOldWalletPassphrase,
 
                 if (!crypter.SetKeyFromPassphrase(strNewWalletPassphrase, pMasterKey.second.vchSalt, pMasterKey.second.nDeriveIterations, pMasterKey.second.nDerivationMethod))
                     return false;
-                if (!crypter.Encrypt(vMasterKey, pMasterKey.second.vchCryptedKey))
+                if (!crypter.Encrypt(_vMasterKey, pMasterKey.second.vchCryptedKey))
                     return false;
                 CWalletDB(strWalletFile).WriteMasterKey(pMasterKey.first, pMasterKey.second);
                 if (fWasLocked)
@@ -472,11 +472,11 @@ bool CWallet::EncryptWallet(const SecureString& strWalletPassphrase)
     if (IsCrypted())
         return false;
 
-    CKeyingMaterial vMasterKey;
+    CKeyingMaterial _vMasterKey;
     RandAddSeedPerfmon();
 
-    vMasterKey.resize(WALLET_CRYPTO_KEY_SIZE);
-    GetRandBytes(&vMasterKey[0], WALLET_CRYPTO_KEY_SIZE);
+    _vMasterKey.resize(WALLET_CRYPTO_KEY_SIZE);
+    GetRandBytes(&_vMasterKey[0], WALLET_CRYPTO_KEY_SIZE);
 
     CMasterKey kMasterKey;
     RandAddSeedPerfmon();
@@ -500,7 +500,7 @@ bool CWallet::EncryptWallet(const SecureString& strWalletPassphrase)
 
     if (!crypter.SetKeyFromPassphrase(strWalletPassphrase, kMasterKey.vchSalt, kMasterKey.nDeriveIterations, kMasterKey.nDerivationMethod))
         return false;
-    if (!crypter.Encrypt(vMasterKey, kMasterKey.vchCryptedKey))
+    if (!crypter.Encrypt(_vMasterKey, kMasterKey.vchCryptedKey))
         return false;
 
     {
@@ -517,7 +517,7 @@ bool CWallet::EncryptWallet(const SecureString& strWalletPassphrase)
             pwalletdbEncryption->WriteMasterKey(nMasterKeyMaxID, kMasterKey);
         }
 
-        if (!EncryptKeys(vMasterKey)) {
+        if (!EncryptKeys(_vMasterKey)) {
             if (fFileBacked) {
                 pwalletdbEncryption->TxnAbort();
                 delete pwalletdbEncryption;

@@ -416,10 +416,10 @@ public:
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion)
+    inline void SerializationOp(Stream& s, Operation ser_action, int nType, int _nVersion)
     {
         if (!(nType & SER_GETHASH))
-            READWRITE(VARINT(nVersion));
+            READWRITE(VARINT(_nVersion));
 
         READWRITE(VARINT(nHeight));
         READWRITE(VARINT(nStatus));
