@@ -290,7 +290,6 @@ extern UniValue listaddressgroupings(const UniValue& params, bool fHelp);
 extern UniValue listaccounts(const UniValue& params, bool fHelp);
 extern UniValue listsinceblock(const UniValue& params, bool fHelp);
 extern UniValue gettransaction(const UniValue& params, bool fHelp);
-extern UniValue abandontransaction(const UniValue& params, bool fHelp);
 extern UniValue backupwallet(const UniValue& params, bool fHelp);
 extern UniValue keypoolrefill(const UniValue& params, bool fHelp);
 extern UniValue walletpassphrase(const UniValue& params, bool fHelp);
@@ -346,6 +345,10 @@ extern UniValue masternode(const UniValue& params, bool fHelp);
 //extern UniValue mnbudgetvoteraw(const UniValue& params, bool fHelp);
 //extern UniValue mnfinalbudget(const UniValue& params, bool fHelp);
 //extern UniValue mnsync(const UniValue& params, bool fHelp);
+
+
+extern UniValue getstorage(const UniValue& params, bool fHelp);
+extern UniValue listcontracts(const UniValue& params, bool fHelp);
 
 // in rest.cpp
 extern bool HTTPReq_REST(AcceptedConnection* conn,

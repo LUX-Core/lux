@@ -22,6 +22,7 @@
 #include "consensus/validation.h"
 #include "rbf.h"
 #include <stdint.h>
+#include <string>
 
 #include "univalue/univalue.h"
 #include "rpcutil.h"
@@ -817,7 +818,7 @@ UniValue movecmd(const UniValue& params, bool fHelp)
     debit.nTime = nNow;
     debit.strOtherAccount = strTo;
     debit.strComment = strComment;
-    pwalletMain->AddAccountingEntry(debit, walletdb);
+    walletdb.WriteAccountingEntry(debit);
 
     // Credit
     CAccountingEntry credit;
@@ -827,7 +828,7 @@ UniValue movecmd(const UniValue& params, bool fHelp)
     credit.nTime = nNow;
     credit.strOtherAccount = strFrom;
     credit.strComment = strComment;
-    pwalletMain->AddAccountingEntry(credit, walletdb);
+    walletdb.WriteAccountingEntry(credit);
 
     if (!walletdb.TxnCommit())
         throw JSONRPCError(RPC_DATABASE_ERROR, "database error");
@@ -1404,7 +1405,8 @@ UniValue listtransactions(const UniValue& params, bool fHelp)
 
     UniValue ret(UniValue::VARR);
 
-    const CWallet::TxItems & txOrdered = pwalletMain->wtxOrdered;
+    std::list<CAccountingEntry> acentries;
+    CWallet::TxItems txOrdered = pwalletMain->OrderedTxItems(acentries, strAccount);
 
     // iterate backwards until we have nCount items to return:
     for (CWallet::TxItems::const_reverse_iterator it = txOrdered.rbegin(); it != txOrdered.rend(); ++it) {
@@ -1502,7 +1504,8 @@ UniValue listaccounts(const UniValue& params, bool fHelp)
         }
     }
 
-    const list<CAccountingEntry> & acentries = pwalletMain->laccentries;
+    list<CAccountingEntry> acentries;
+    CWalletDB(pwalletMain->strWalletFile).ListAccountCreditDebit("*", acentries);
     BOOST_FOREACH (const CAccountingEntry& entry, acentries)
         mapAccountBalances[entry.strAccount] += entry.nCreditDebit;
 
@@ -2495,6 +2498,10 @@ UniValue callcontract(const UniValue& params, bool fHelp)
                 "4. gasLimit             (string, optional) The gas limit for executing the contract\n"
         );
 
+    if (chainActive.Height() < Params().FirstSCBlock()) {
+        throw JSONRPCError(RPC_VERIFY_ERROR, "Smart contracts hardfork is not active yet. Activation block number - " + std::to_string(Params().FirstSCBlock()));
+    }
+
     LOCK(cs_main);
 
     std::string strAddr = params[0].get_str();
@@ -2579,6 +2586,9 @@ UniValue createcontract(const UniValue& params, bool fHelp){
                 + HelpExampleCli("createcontract", "\"60606040525b33600060006101000a81548173ffffffffffffffffffffffffffffffffffffffff02191690836c010000000000000000000000009081020402179055506103786001600050819055505b600c80605b6000396000f360606040526008565b600256\" 6000000 "+FormatMoney(minGasPrice)+" \"LgAskSorXfCYUweZcCTpGNtpcFotS2rqDF\" true")
         );
 
+    if (chainActive.Height() < Params().FirstSCBlock()) {
+        throw JSONRPCError(RPC_VERIFY_ERROR, "Smart contracts hardfork is not active yet. Activation block number - " + std::to_string(Params().FirstSCBlock()));
+    }
 
     string bytecode=params[0].get_str();
 
@@ -2783,6 +2793,9 @@ UniValue sendtocontract(const UniValue& params, bool fHelp){
                 + HelpExampleCli("sendtocontract", "\"c6ca2697719d00446d4ea51f6fac8fd1e9310214\" \"54f6127f\" 12.0015 6000000 "+FormatMoney(minGasPrice)+" \"LgAskSorXfCYUweZcCTpGNtpcFotS2rqDF\"")
         );
 
+    if (chainActive.Height() < Params().FirstSCBlock()) {
+        throw JSONRPCError(RPC_VERIFY_ERROR, "Smart contracts hardfork is not active yet. Activation block number - " + std::to_string(Params().FirstSCBlock()));
+    }
 
     std::string contractaddress = params[0].get_str();
     if(contractaddress.size() != 40 || !CheckHex(contractaddress))
@@ -2949,38 +2962,4 @@ UniValue sendtocontract(const UniValue& params, bool fHelp){
     }
 
     return result;
-}
-
-UniValue abandontransaction(const UniValue& params, bool fHelp)
-{
-    if (!EnsureWalletIsAvailable(fHelp))
-        return NullUniValue;
-
-    if (fHelp || params.size() != 1)
-        throw runtime_error(
-                "abandontransaction \"txid\"\n"
-                "\nMark in-wallet transaction <txid> as abandoned\n"
-                "This will mark this transaction and all its in-wallet descendants as abandoned which will allow\n"
-                "for their inputs to be respent.  It can be used to replace \"stuck\" or evicted transactions.\n"
-                "It only works on transactions which are not included in a block and are not currently in the mempool.\n"
-                "It has no effect on transactions which are already conflicted or abandoned.\n"
-                "\nArguments:\n"
-                "1. \"txid\"    (string, required) The transaction id\n"
-                "\nResult:\n"
-                "\nExamples:\n"
-                + HelpExampleCli("abandontransaction", "\"1075db55d416d3ca199f55b6084e2115b9345e16c5cf302fc80e9d5fbf5d48d\"")
-                + HelpExampleRpc("abandontransaction", "\"1075db55d416d3ca199f55b6084e2115b9345e16c5cf302fc80e9d5fbf5d48d\"")
-        );
-
-    LOCK2(cs_main, pwalletMain->cs_wallet);
-
-    uint256 hash;
-    hash.SetHex(params[0].get_str());
-
-    if (!pwalletMain->mapWallet.count(hash))
-        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid or non-wallet transaction id");
-    if (!pwalletMain->AbandonTransaction(hash))
-        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Transaction not eligible for abandonment");
-
-    return NullUniValue;
 }

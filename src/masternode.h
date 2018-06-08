@@ -241,6 +241,7 @@ public:
     bool GetBlockPayee(int nBlockHeight, CScript& payee);
 };
 
+bool MasternodePaymentsEnabled();
 bool SelectMasternodePayee(CScript &payeeScript);
 
 #endif

@@ -222,20 +222,28 @@ void BlockAssembler::RebuildRefundTransaction(){
     CMutableTransaction contrTx(originalRewardTx);
     if (!pblock->IsProofOfStake()) {
         refundtx=0;
-        contrTx.vout[refundtx].nValue = GetProofOfWorkReward(nFees, nHeight);
         contrTx.vout[refundtx].nValue -= bceResult.refundSender;
+
+        int i=contrTx.vout.size();
+        contrTx.vout.resize(contrTx.vout.size()+bceResult.refundOutputs.size());
+        for(CTxOut& vout : bceResult.refundOutputs){
+            contrTx.vout[i]=vout;
+            i++;
+        }
     } else {
         refundtx=1;
-        contrTx.vout[refundtx].nValue -= bceResult.refundSender;
+//        contrTx.vout[refundtx].nValue -= bceResult.refundSender;
+//
+//        int i=contrTx.vout.size();
+//        contrTx.vout.resize(contrTx.vout.size()+bceResult.refundOutputs.size());
+//        for(CTxOut& vout : bceResult.refundOutputs){
+//            contrTx.vout[i]=vout;
+//            i++;
+//        }
     }
 
     //note, this will need changed for MPoS
-    int i=contrTx.vout.size();
-    contrTx.vout.resize(contrTx.vout.size()+bceResult.refundOutputs.size());
-    for(CTxOut& vout : bceResult.refundOutputs){
-        contrTx.vout[i]=vout;
-        i++;
-    }
+
     pblock->vtx[refundtx] = std::move(CTransaction(contrTx));
 }
 
@@ -329,6 +337,10 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
             mnReward = totalReward * 0.2;
             coinbaseTx.vout[1].scriptPubKey = mnPayee;
             coinbaseTx.vout[1].nValue = mnReward;
+
+            CTxDestination txDest;
+            ExtractDestination(mnPayee, txDest);
+            LogPrintf("%s: Masternode payment to %s (pow)\n", __func__, EncodeDestination(txDest));
 
             //miner's reward is everything that left after possibly inaccurate division
             minerReward = totalReward - mnReward;
@@ -1036,10 +1048,16 @@ bool ProcessBlockFound(CBlock* pblock, CWallet& wallet, CReserveKey& reservekey)
     // Remove key from key pool
     reservekey.KeepKey();
 
+    BlockMap::iterator prev_block_it = mapBlockIndex.find(pblock->hashPrevBlock);
+    bool usePhi2 = false;
+    if (prev_block_it != mapBlockIndex.end()) {
+        usePhi2 = prev_block_it->second->nHeight + 1 >= Params().SwitchPhi2Block();
+    }
+
     // Track how many getdata requests this block gets
     {
         LOCK(wallet.cs_wallet);
-        wallet.mapRequestCount[pblock->GetHash()] = 0;
+        wallet.mapRequestCount[pblock->GetHash(usePhi2)] = 0;
     }
 
     // Process this block the same as if we had received it from another node

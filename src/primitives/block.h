@@ -96,7 +96,6 @@ public:
     std::vector<unsigned char> vchBlockSig;
 
     // memory only
-    mutable CScript payee;
     mutable std::vector<uint256> vMerkleTree;
 
     CBlock()
@@ -129,7 +128,6 @@ public:
         CBlockHeader::SetNull();
         vtx.clear();
         vMerkleTree.clear();
-        payee = CScript();
         vchBlockSig.clear();
     }
 

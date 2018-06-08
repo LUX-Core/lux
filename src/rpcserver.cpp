@@ -306,7 +306,9 @@ static const CRPCCommand vRPCCommands[] =
         {"blockchain", "reconsiderblock", &reconsiderblock, true, true, false},
 
         /*Smart Contract*/
+        {"blockchain", "getstorage", &getstorage,true, true, false },
         {"blockchain", "callcontract", &callcontract,true, true, false },
+        {"blockchain", "listcontracts", &listcontracts,true, true, false },
         {"blockchain", "createcontract", &createcontract,true, true, false },
         {"blockchain", "sendtocontract", &sendtocontract,true, true, false },
 
@@ -379,7 +381,6 @@ static const CRPCCommand vRPCCommands[] =
         {"wallet", "getreceivedbyaddress", &getreceivedbyaddress, false, false, true},
         {"wallet", "getstakingstatus", &getstakingstatus, false, false, true},
         {"wallet", "gettransaction", &gettransaction, false, false, true},
-        {"wallet", "abandontransaction", &abandontransaction, false, false, true },
         {"wallet", "getunconfirmedbalance", &getunconfirmedbalance, false, false, true},
         {"wallet", "getwalletinfo", &getwalletinfo, false, false, true},
         {"wallet", "importprivkey", &importprivkey, true, false, true},

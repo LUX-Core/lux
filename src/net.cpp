@@ -1769,8 +1769,9 @@ void StartNode(boost::thread_group& threadGroup, CScheme& scheme)
     // Process messages
     threadGroup.create_thread(boost::bind(&TraceThread<void (*)()>, "msghand", &ThreadMessageHandler));
 
-    // Dump network addresses
-    scheme.schemeEvery(&DumpData, DUMP_ADDRESSES_INTERVAL);
+    // Dump network addresses every 900 secs
+    // The second input is milliseconds. So, we must re-calculate the input time interval
+    scheme.schemeEvery(&DumpData, DUMP_ADDRESSES_INTERVAL * 1000);
 
     if (GetBoolArg("-staking", true) && pwalletMain) {
 #if 1

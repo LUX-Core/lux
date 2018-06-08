@@ -52,25 +52,7 @@ In addition, without Luxgate and Pmn, Bitcoin and Ethereum cannot interact with 
 Build Lux wallet
 ----------
 
-### Building for 64-bit Windows
-
-The first step is to install the mingw-w64 cross-compilation tool chain. Due to different Ubuntu packages for each distribution and problems with the Xenial packages the steps for each are different.
-
-Common steps to install mingw32 cross compiler tool chain:
-
-    sudo apt install g++-mingw-w64-x86-64
-
-Ubuntu Xenial 16.04 and Windows Subsystem for Linux
-
-    sudo apt install software-properties-common
-    sudo add-apt-repository "deb http://archive.ubuntu.com/ubuntu zesty universe"
-    sudo apt update
-    sudo apt upgrade
-    sudo update-alternatives --config x86_64-w64-mingw32-g++ # Set the default mingw32 g++ compiler option to posix.
-
-Once the tool chain is installed the build steps are common:
-
-Note that for WSL the Luxcore source path MUST be somewhere in the default mount file system, for example /usr/src/lux, AND not under /mnt/d/. If this is not the case the dependency autoconf scripts will fail. This means you cannot use a directory that located directly on the host Windows file system to perform the build.
+### Building for 32-bit Windows
 
 The next three steps are an example of how to acquire the source in an appropriate way.
 
@@ -125,11 +107,8 @@ Clone the Lux source code and cd into lux
 
         git clone https://github.com/216k155/lux.git
         cd lux
-        export LDFLAGS=-L/usr/local/opt/openssl/lib;export CPPFLAGS=-I/usr/local/opt/openssl/include
-        ./autogen.sh
-        ./configure --disable-tests
-        make -j$(nproc)
-        make deploy
+        ./building/mac/requirements.sh
+        ./building/mac/build.sh
 
 Setup and Build: Arch Linux
 -----------------------------------

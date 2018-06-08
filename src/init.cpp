@@ -1435,7 +1435,8 @@ bool AppInit2(boost::thread_group& threadGroup, CScheme& scheme)
                 globalState->db().commit();
                 globalState->dbUtxo().commit();
 
-                fRecordLogOpcodes = IsArgSet("-record-log-opcodes");
+
+                fRecordLogOpcodes = GetBoolArg("-record-log-opcodes", true);
                 fIsVMlogFile = boost::filesystem::exists(GetDataDir() / "vmExecLogs.json");
                 ///////////////////////////////////////////////////////////
 

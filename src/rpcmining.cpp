@@ -15,6 +15,7 @@
 #include "miner.h"
 #include "net.h"
 #include "pow.h"
+#include "masternode.h"
 #include "primitives/transaction.h"
 #include "rpcserver.h"
 #include "util.h"
@@ -754,17 +755,18 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
     result.push_back(Pair("votes", aVotes));
 
     UniValue aMasternode(UniValue::VOBJ);
-    if (pblock->payee != CScript()) {
-        CTxDestination address1;
-        ExtractDestination(pblock->payee, address1);
-        aMasternode.push_back(Pair("payee", EncodeDestination(address1)));
+    CScript mnPayee;
+    if (SelectMasternodePayee(mnPayee)) {
+        CTxDestination mnTxDest;
+        ExtractDestination(mnPayee, mnTxDest);
+        aMasternode.push_back(Pair("payee", EncodeDestination(mnTxDest)));
         aMasternode.push_back(Pair("script", HexStr(pblock->vtx[0].vout[1].scriptPubKey)));
         aMasternode.push_back(Pair("amount", (int64_t)pblock->vtx[0].vout[1].nValue));
     }
 
     result.push_back(Pair("masternode", aMasternode));
-    result.push_back(Pair("masternode_payments_started", pblock->nTime > Params().StartMasternodePayments()));
-    result.push_back(Pair("masternode_payments_enforced", true));
+    result.push_back(Pair("masternode_payments_started", (pindexPrev->nHeight + 1) >= Params().FirstSplitRewardBlock()));
+    result.push_back(Pair("masternode_payments_enforced", MasternodePaymentsEnabled()));
 
     return result;
 }
