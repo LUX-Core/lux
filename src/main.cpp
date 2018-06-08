@@ -245,6 +245,8 @@ int nQueuedValidatedHeaders = 0;
 /** Number of preferable block download peers. */
 int nPreferredDownload = 0;
 
+// int g_outbound_peers_with_protect_from_disconnect = 0;
+
 /** Dirty block index entries. */
 set<CBlockIndex*> setDirtyBlockIndex;
 
@@ -1640,6 +1642,8 @@ bool GetTransaction(const uint256& hash, CTransaction& txOut, const Consensus::P
                 return error("%s: txid mismatch", __func__);
             return true;
         }
+
+        return false;
     }
 
     if (fAllowSlow) { // use coin database to locate block that contains transaction, and scan it
@@ -3542,6 +3546,7 @@ CBlockIndex* AddToBlockIndex(const CBlock& block)
 
         DEBUG_DUMP_STAKING_INFO_AddToBlockIndex();
     }
+  //  pindexNew->nTimeMax = (pindexNew->pprev ? std::max(pindexNew->pprev->nTimeMax, pindexNew->nTime) : pindexNew->nTime);
     pindexNew->nChainWork = (pindexNew->pprev ? pindexNew->pprev->nChainWork : 0) + GetBlockProof(*pindexNew);
     pindexNew->RaiseValidity(BLOCK_VALID_TREE);
     if (pindexBestHeader == NULL || pindexBestHeader->nChainWork < pindexNew->nChainWork)
@@ -5515,11 +5520,6 @@ static bool ProcessMessage(CNode* pfrom, const string &strCommand, CDataStream& 
                 pfrom->fGetAddr = true;
             }
             addrman.Good(pfrom->addr);
-        } else {
-            if (((CNetAddr)pfrom->addr) == (CNetAddr)addrFrom) {
-                addrman.Add(addrFrom, addrFrom);
-                addrman.Good(addrFrom);
-            }
         }
 
         // Relay alerts
