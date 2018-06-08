@@ -125,8 +125,8 @@ int64_t nTimeBestReceived = 0;
 CWaitableCriticalSection csBestBlock;
 CConditionVariable cvBlockChange;
 int nScriptCheckThreads = 0;
-bool fImporting = false;
-bool fReindex = false;
+std::atomic_bool fImporting(false);
+std::atomic_bool fReindex(false);
 bool fLogEvents = false;
 bool fTxIndex = true;
 bool fIsBareMultisigStd = true;
@@ -4723,7 +4723,7 @@ bool static LoadBlockIndexDB()
     // Check whether we need to continue reindexing
     bool fReindexing = false;
     pblocktree->ReadReindexing(fReindexing);
-    fReindex |= fReindexing;
+    if(fReindexing) fReindex = true;
 
     // Check whether we have a transaction index
     pblocktree->ReadFlag("txindex", fTxIndex);
