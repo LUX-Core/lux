@@ -348,6 +348,7 @@ extern UniValue masternode(const UniValue& params, bool fHelp);
 
 
 extern UniValue getstorage(const UniValue& params, bool fHelp);
+extern UniValue listcontracts(const UniValue& params, bool fHelp);
 
 // in rest.cpp
 extern bool HTTPReq_REST(AcceptedConnection* conn,

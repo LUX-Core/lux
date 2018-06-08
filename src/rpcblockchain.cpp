@@ -437,6 +437,52 @@ UniValue getstorage(const UniValue& params, bool fHelp)
     return result;
 }
 
+UniValue listcontracts(const UniValue& params, bool fHelp)
+{
+        if (fHelp)
+                throw std::runtime_error(
+                                "listcontracts (start maxDisplay)\n"
+                                "\nArgument:\n"
+                                "1. start     (numeric or string, optional) The starting account index, default 1\n"
+                                "2. maxDisplay       (numeric or string, optional) Max accounts to list, default 20\n"
+                );
+
+        LOCK(cs_main);
+
+        int start=1;
+        if (params.size() > 0){
+                start = params[0].get_int();
+                if (start<= 0)
+                        throw JSONRPCError(RPC_TYPE_ERROR, "Invalid start, min=1");
+        }
+
+        int maxDisplay=20;
+        if (params.size() > 1){
+                maxDisplay = params[1].get_int();
+                if (maxDisplay <= 0)
+                        throw JSONRPCError(RPC_TYPE_ERROR, "Invalid maxDisplay");
+        }
+
+        UniValue result(UniValue::VOBJ);
+
+        auto map = globalState->addresses();
+        int contractsCount=(int)map.size();
+
+        if (contractsCount>0 && start > contractsCount)
+                throw JSONRPCError(RPC_TYPE_ERROR, "start greater than max index "+ itostr(contractsCount));
+
+        int itStartPos=std::min(start-1,contractsCount);
+        int i=0;
+        for (auto it = std::next(map.begin(),itStartPos); it!=map.end(); it++)
+        {
+                result.push_back(Pair(it->first.hex(),ValueFromAmount(CAmount(globalState->balance(it->first)))));
+                i++;
+                if(i==maxDisplay)break;
+        }
+
+        return result;
+}
+
 UniValue getblockheader(const UniValue& params, bool fHelp)
 {
     if (fHelp || params.size() < 1 || params.size() > 2)
