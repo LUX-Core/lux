@@ -2488,10 +2488,6 @@ UniValue multisend(const UniValue& params, bool fHelp)
 ////////////////////////////////////////////////////////////////////// // lux
 UniValue callcontract(const UniValue& params, bool fHelp)
 {
-    if (chainActive.Height() < Params().FirstSCBlock()) {
-        throw JSONRPCError(RPC_VERIFY_ERROR, "Smart contracts hardfork is not active yet. Activation block number - " + std::to_string(Params().FirstSCBlock()));
-    }
-
     if (fHelp || params.size() < 2)
         throw runtime_error(
                 "callcontract \"address\" \"data\" ( address )\n"
@@ -2501,6 +2497,10 @@ UniValue callcontract(const UniValue& params, bool fHelp)
                 "3. address              (string, optional) The sender address hex string\n"
                 "4. gasLimit             (string, optional) The gas limit for executing the contract\n"
         );
+
+    if (chainActive.Height() < Params().FirstSCBlock()) {
+        throw JSONRPCError(RPC_VERIFY_ERROR, "Smart contracts hardfork is not active yet. Activation block number - " + std::to_string(Params().FirstSCBlock()));
+    }
 
     LOCK(cs_main);
 
@@ -2554,10 +2554,6 @@ UniValue createcontract(const UniValue& params, bool fHelp){
     if (!EnsureWalletIsAvailable(fHelp))
         return NullUniValue;
 
-    if (chainActive.Height() < Params().FirstSCBlock()) {
-        throw JSONRPCError(RPC_VERIFY_ERROR, "Smart contracts hardfork is not active yet. Activation block number - " + std::to_string(Params().FirstSCBlock()));
-    }
-
     LOCK2(cs_main, pwalletMain->cs_wallet);
     LuxDGP luxDGP(globalState.get(), fGettingValuesDGP);
     uint64_t blockGasLimit = luxDGP.getBlockGasLimit(chainActive.Height());
@@ -2590,6 +2586,9 @@ UniValue createcontract(const UniValue& params, bool fHelp){
                 + HelpExampleCli("createcontract", "\"60606040525b33600060006101000a81548173ffffffffffffffffffffffffffffffffffffffff02191690836c010000000000000000000000009081020402179055506103786001600050819055505b600c80605b6000396000f360606040526008565b600256\" 6000000 "+FormatMoney(minGasPrice)+" \"LgAskSorXfCYUweZcCTpGNtpcFotS2rqDF\" true")
         );
 
+    if (chainActive.Height() < Params().FirstSCBlock()) {
+        throw JSONRPCError(RPC_VERIFY_ERROR, "Smart contracts hardfork is not active yet. Activation block number - " + std::to_string(Params().FirstSCBlock()));
+    }
 
     string bytecode=params[0].get_str();
 
@@ -2761,10 +2760,6 @@ UniValue sendtocontract(const UniValue& params, bool fHelp){
     if (!EnsureWalletIsAvailable(fHelp))
         return NullUniValue;
 
-    if (chainActive.Height() < Params().FirstSCBlock()) {
-        throw JSONRPCError(RPC_VERIFY_ERROR, "Smart contracts hardfork is not active yet. Activation block number - " + std::to_string(Params().FirstSCBlock()));
-    }
-
     LOCK2(cs_main, pwalletMain->cs_wallet);
     LuxDGP luxDGP(globalState.get(), fGettingValuesDGP);
     uint64_t blockGasLimit = luxDGP.getBlockGasLimit(chainActive.Height());
@@ -2798,6 +2793,9 @@ UniValue sendtocontract(const UniValue& params, bool fHelp){
                 + HelpExampleCli("sendtocontract", "\"c6ca2697719d00446d4ea51f6fac8fd1e9310214\" \"54f6127f\" 12.0015 6000000 "+FormatMoney(minGasPrice)+" \"LgAskSorXfCYUweZcCTpGNtpcFotS2rqDF\"")
         );
 
+    if (chainActive.Height() < Params().FirstSCBlock()) {
+        throw JSONRPCError(RPC_VERIFY_ERROR, "Smart contracts hardfork is not active yet. Activation block number - " + std::to_string(Params().FirstSCBlock()));
+    }
 
     std::string contractaddress = params[0].get_str();
     if(contractaddress.size() != 40 || !CheckHex(contractaddress))
