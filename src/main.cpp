@@ -1126,7 +1126,7 @@ bool AcceptToMemoryPool(CTxMemPool& pool, CValidationState& state, const CTransa
         dev::u256 txMinGasPrice = 0;
 
         //////////////////////////////////////////////////////////// // lux
-        if(chainActive.Height() >= chainparams.FirstSCBlock() && tx.HasCreateOrCall()){
+        if(chainActive.Height() >= chainparams.FirstSCBlock() && tx.HasCreateOrCall()) {
 
             if(!CheckSenderScript(view, tx)){
                 return state.DoS(1, false, REJECT_INVALID, "bad-txns-invalid-sender-script");
@@ -1416,7 +1416,7 @@ bool AcceptableInputs(CTxMemPool& pool, CValidationState& state, const CTransact
         dev::u256 txMinGasPrice = 0;
 
         //////////////////////////////////////////////////////////// // lux
-        if(chainActive.Height() > Params().FirstSCBlock() && tx.HasCreateOrCall()){
+        if(chainActive.Height() >= Params().FirstSCBlock() && tx.HasCreateOrCall()) {
 
             if(!CheckSenderScript(view, tx)){
                 return state.DoS(1, false, REJECT_INVALID, "bad-txns-invalid-sender-script");
@@ -2195,7 +2195,7 @@ bool DisconnectBlock(CBlock& block, CValidationState& state, CBlockIndex* pindex
     // move best block pointer to prevout block
     view.SetBestBlock(pindex->pprev->GetBlockHash());
 //#if 0
-    if (pindex->nHeight >= Params().FirstSCBlock()) {
+//    if (pindex->nHeight >= Params().FirstSCBlock()) {
         globalState->setRoot(uintToh256(pindex->pprev->hashStateRoot)); // lux
         globalState->setRootUTXO(uintToh256(pindex->pprev->hashUTXORoot)); // lux
 
@@ -2203,7 +2203,7 @@ bool DisconnectBlock(CBlock& block, CValidationState& state, CBlockIndex* pindex
             pstorageresult->deleteResults(block.vtx);
             //pblocktree->EraseHeightIndex(pindex->nHeight);
         }
-   }
+//   }
 //#endif
     if (pfClean) {
         *pfClean = fClean;
@@ -2336,10 +2336,10 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
     AssertLockHeld(cs_main);
 
     ///////////////////////////////////////////////// // lux
-#if 0
+//#if 0
     LuxDGP luxDGP(globalState.get(), fGettingValuesDGP);
     globalSealEngine->setLuxSchedule(luxDGP.getGasSchedule(pindex->nHeight + 1));
-#endif
+//#endif
     uint64_t minGasPrice = 0;//luxDGP.getMinGasPrice(pindex->nHeight + 1);
     uint64_t blockGasLimit = DEFAULT_BLOCK_GAS_LIMIT_DGP;//luxDGP.getBlockGasLimit(pindex->nHeight + 1);
 
@@ -2686,8 +2686,8 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
     ////////////////////////////////////////////////////////////////// // lux
     if (pindex->nHeight >= Params().FirstSCBlock()) {
         checkBlock.hashMerkleRoot = checkBlock.BuildMerkleTree();
-        checkBlock.hashStateRoot = /*uint256(0);*/h256Touint(globalState->rootHash());
-        checkBlock.hashUTXORoot = /*uint256(0);*/h256Touint(globalState->rootHashUTXO());
+        checkBlock.hashStateRoot = h256Touint(globalState->rootHash());
+        checkBlock.hashUTXORoot = h256Touint(globalState->rootHashUTXO());
 
         bool usePhi2 = pindex->nHeight >= Params().SwitchPhi2Block();
         //If this error happens, it probably means that something with AAL created transactions didn't match up to what is expected
@@ -2750,7 +2750,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
     }
 
     if (fJustCheck) {
-        if (pindex->nHeight >= Params().FirstSCBlock()) {
+//        if (pindex->nHeight >= Params().FirstSCBlock()) {
             dev::h256 prevHashStateRoot(dev::sha3(dev::rlp("")));
             dev::h256 prevHashUTXORoot(dev::sha3(dev::rlp("")));
             if (pindex->pprev->hashStateRoot != uint256() && pindex->pprev->hashUTXORoot != uint256()) {
@@ -2759,7 +2759,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
             }
             globalState->setRoot(prevHashStateRoot);
             globalState->setRootUTXO(prevHashUTXORoot);
-        }
+//        }
         return true;
     }
 //////////////////////////////////////////////////////////////////
@@ -3859,6 +3859,9 @@ bool ContextualCheckBlockHeader(const CBlockHeader& block, CValidationState& sta
     assert(pindexPrev);
 
     int nHeight = pindexPrev->nHeight + 1;
+
+    if (chainActive.Height() - nHeight >= Params().FirstSCBlock() && !(block.nVersion & (1 << 30)))
+        return state.DoS(1, error("%s: smart contracts hardfork is not active yet. (height %d)", __func__, nHeight));
 
     //If this is a reorg, check that it is not too depp
     if (chainActive.Height() - nHeight >= Params().MaxReorganizationDepth())
