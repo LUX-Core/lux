@@ -2816,12 +2816,16 @@ enum FlushStateMode {
     FLUSH_STATE_ALWAYS
 };
 
+
+static bool FlushStateToDisk(CValidationState &state, FlushStateMode mode, int nManualPruneHeight=0);
+static void FindFilesToPruneManual(std::set<int>& setFilesToPrune, int nManualPruneHeight);
+
 /**
  * Update the on-disk chain state.
  * The caches and indexes are flushed if either they're too large, forceWrite is set, or
  * fast is not set and it's been a while since the last write.
  */
-static bool FlushStateToDisk(CValidationState& state, FlushStateMode mode)
+static bool FlushStateToDisk(CValidationState& state, FlushStateMode mode, int nManualPruneHeight)
 {
     LOCK2(cs_main, cs_LastBlockFile);
     static int64_t nLastWrite = 0;
@@ -2830,12 +2834,20 @@ static bool FlushStateToDisk(CValidationState& state, FlushStateMode mode)
 
     while (retries > 0)
     {
-		bool isExceptionOccured = false;
+        bool isExceptionOccured = false;
         std::set<int> setFilesToPrune;
         bool fFlushForPrune = false;
-		try {
-            if (fPruneMode && fCheckForPruning) {
-                FindFilesToPrune(setFilesToPrune, Params().PruneAfterHeight());
+        try
+        {
+            if (fPruneMode && (fCheckForPruning || nManualPruneHeight > 0) && !fReindex)
+            {
+                if (nManualPruneHeight > 0) {
+                    FindFilesToPruneManual(setFilesToPrune, nManualPruneHeight);
+                } else {
+                    FindFilesToPrune(setFilesToPrune, Params().PruneAfterHeight());
+                    fCheckForPruning = false;
+                }
+
                 if (!setFilesToPrune.empty()) {
                     fFlushForPrune = true;
                     if (!fHavePruned) {
@@ -4390,6 +4402,38 @@ void UnlinkPrunedFiles(std::set<int>& setFilesToPrune)
     }
 }
 
+/* This function is called from the RPC code for pruneblockchain */
+void PruneBlockFilesManual(int nManualPruneHeight)
+{
+    CValidationState state;
+    if (!FlushStateToDisk(state, FLUSH_STATE_NONE, nManualPruneHeight)) {
+        LogPrintf("%s: failed to flush state (%s)\n", __func__, FormatStateMessage(state));
+    }
+}
+
+
+/* Calculate the block/rev files to delete based on height specified by user with RPC command pruneblockchain */
+static void FindFilesToPruneManual(std::set<int>& setFilesToPrune, int nManualPruneHeight)
+{
+    assert(fPruneMode && nManualPruneHeight > 0);
+
+    LOCK2(cs_main, cs_LastBlockFile);
+    if (chainActive.Tip() == nullptr)
+        return;
+
+    // last block to prune is the lesser of (user-specified height, MIN_BLOCKS_TO_KEEP from the tip)
+    unsigned int nLastBlockWeCanPrune = std::min((unsigned int)nManualPruneHeight, (unsigned int) (chainActive.Tip()->nHeight - MIN_BLOCKS_TO_KEEP));
+    int count=0;
+    for (int fileNumber = 0; fileNumber < nLastBlockFile; fileNumber++) {
+        if (vinfoBlockFile[fileNumber].nSize == 0 || vinfoBlockFile[fileNumber].nHeightLast > nLastBlockWeCanPrune)
+            continue;
+        PruneOneBlockFile(fileNumber);
+        setFilesToPrune.insert(fileNumber);
+        count++;
+    }
+    LogPrintf("Prune (Manual): prune_height=%d removed %d blk/rev pairs\n", nLastBlockWeCanPrune, count);
+}
+
 /* Calculate the block/rev files that should be deleted to remain under target*/
 void FindFilesToPrune(std::set<int>& setFilesToPrune, uint64_t nPruneAfterHeight)
 {
@@ -4527,6 +4571,8 @@ bool static LoadBlockIndexDB()
     for (auto const &item : vSortedByHeight) {
         CBlockIndex* pindex = item.second;
         pindex->nChainWork = (pindex->pprev ? pindex->pprev->nChainWork : 0) + GetBlockProof(*pindex);
+        pindex->nTimeMax = (pindex->pprev ? std::max(pindex->pprev->nTimeMax, pindex->nTime) : pindex->nTime);
+
         // We can link the chain of blocks for which we've received transactions at some point.
         // Pruned nodes may have deleted the block.
         if (pindex->nTx > 0) {

@@ -336,6 +336,8 @@ bool AbortNode(const std::string& msg, const std::string& userMessage = "");
 bool GetNodeStateStats(NodeId nodeid, CNodeStateStats& stats);
 /** Increase a node's misbehavior score. */
 void Misbehaving(NodeId nodeid, int howmuch);
+/** This function is called from the RPC code for pruneblockchain */
+void PruneBlockFilesManual(int nManualPruneHeight);
 /** Flush all state, indexes and buffers to disk. */
 void FlushStateToDisk();
 /** Prune block files and flush state to disk. */
