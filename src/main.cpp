@@ -71,6 +71,10 @@ using namespace std;
 
 const int LAST_HEIGHT_FEE_BLOCK = 180000;
 
+static const bool ENABLE_POS_REWARD_CHANGED = true;
+
+static const int POS_REWARD_CHANGED_BLOCK = 300000;
+
 /**
  * Global LuxState
  */
@@ -1816,8 +1820,12 @@ CAmount GetProofOfStakeReward(int64_t nCoinAge, int64_t nFees, int nHeight)
 
 CAmount GetMasternodePayment(int nHeight, int64_t blockValue, int nMasternodeCount)
 {
-    int64_t ret = blockValue * 0.2; //20% for masternodes
-
+    int64_t ret = blockValue * 0.4;
+    if (ENABLE_POS_REWARD_CHANGED && (mapArgs.count("-testnet") || nHeight >= POS_REWARD_CHANGED_BLOCK)) {
+        ret = blockValue * 0.4/2; //20% for masternode
+    } else {
+        ret = blockValue * 0.4; //40% for masternode
+    }
     return ret;
 }
 
