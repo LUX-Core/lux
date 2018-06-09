@@ -14,6 +14,8 @@
 
 #include <boost/foreach.hpp>
 
+static const int nCheckpointSpan = 500;
+
 namespace Checkpoints
 {
 /**
@@ -97,5 +99,26 @@ CBlockIndex* GetLastCheckpoint(const CCheckpointData& data)
     }
     return NULL;
 }
+
+// Automatically select a suitable sync-checkpoint
+    const CBlockIndex* AutoSelectSyncCheckpoint()
+    {
+        const CBlockIndex *pindexBest = chainActive.Tip();
+        const CBlockIndex *pindex = pindexBest;
+        // Search backward for a block within max span and maturity window
+        while (pindex->pprev && pindex->nHeight + nCheckpointSpan > pindexBest->nHeight)
+            pindex = pindex->pprev;
+        return pindex;
+    }
+
+    // Check against synchronized checkpoint
+    bool CheckSync(int nHeight)
+    {
+        const CBlockIndex* pindexSync = AutoSelectSyncCheckpoint();
+
+        if (nHeight <= pindexSync->nHeight)
+            return false;
+        return true;
+    }
 
 } // namespace Checkpoints

@@ -37,6 +37,12 @@ CBlockIndex* GetLastCheckpoint(const CCheckpointData& data);
 
 double GuessVerificationProgress(const CCheckpointData& data, CBlockIndex* pindex, bool fSigchecks = true);
 
+//! Returns last CBlockIndex* from the auto selected checkpoint
+    const CBlockIndex* AutoSelectSyncCheckpoint();
+
+//! Check against automatically selected checkpoint
+    bool CheckSync(int nHeight);
+
 extern bool fEnabled;
 
 } //namespace Checkpoints
