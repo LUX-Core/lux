@@ -285,10 +285,10 @@ public:
 
         networkID = CBaseChainParams::TESTNET;
         strNetworkID = "test";
-        pchMessageStart[0] = 0x53;
-        pchMessageStart[1] = 0x66;
-        pchMessageStart[2] = 0x55;
-        pchMessageStart[3] = 0xac;
+        pchMessageStart[0] = 0x54;
+        pchMessageStart[1] = 0x67;
+        pchMessageStart[2] = 0x51;
+        pchMessageStart[3] = 0xab;
         vAlertPubKey = ParseHex("000010e83b2703ccf322f7dbd62dd5855ac7c10bd055814ce121ba32607d573b8810c02c0582aed05b4deb9c4b77b26d92428c61256cd42774babea0a073b2ed0c9");
         nDefaultPort = 28333;
         nMinerThreads = 0;
@@ -320,7 +320,7 @@ public:
 //        while (!CheckProof(genesis.GetHash(), genesis.nBits)) {
 //            genesis.nNonce ++;
 //        }
-//
+
 //        std::cout << genesis.nNonce << std::endl;
 //        std::cout << genesis.GetHash().GetHex() << std::endl;
 //        std::cout << genesis.hashMerkleRoot.GetHex() << std::endl;
@@ -335,10 +335,10 @@ public:
         assert(consensus.hashGenesisBlock == uint256("0x00000ed61786c92e01948df9f543fc2effc17a025ec14f743ec1848dff81233b"));
         assert(genesis.hashMerkleRoot == uint256("0x484415096c0c3f026838b97854d02bbf38aad5449938ef62f1fdd51c371a1696"));
 
-        vFixedSeeds.clear();
-        vSeeds.clear();
-//        vSeeds.push_back(CDNSSeedData("luxtest1", "108.160.141.118"));
-//        vSeeds.push_back(CDNSSeedData("luxtest2", "45.76.53.201"));
+       // vFixedSeeds.clear();
+        //vSeeds.clear();
+        vSeeds.push_back(CDNSSeedData("luxtest1", "108.160.141.118"));
+        vSeeds.push_back(CDNSSeedData("luxtest2", "45.76.53.201"));
 
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1, 48); // Testnet lux addresses start with 'l'
         base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1, 63);  // Testnet lux script addresses start with 'S'
