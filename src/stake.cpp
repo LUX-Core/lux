@@ -950,9 +950,15 @@ bool Stake::GenBlockStake(CWallet *wallet, const CReserveKey &key, unsigned int 
 
     SetThreadPriority(THREAD_PRIORITY_NORMAL);
 
+    BlockMap::iterator prev_block_it = mapBlockIndex.find(block->hashPrevBlock);
+    bool usePhi2 = false;
+    if (prev_block_it != mapBlockIndex.end()) {
+        usePhi2 = prev_block_it->second->nHeight + 1 >= Params().SwitchPhi2Block();
+    }
+
     bool result = true;
     uint256 proof1, proof2;
-    auto hash = block->GetHash();
+    auto hash = block->GetHash(usePhi2);
     auto good = CheckProof(tip, *block, proof1);
 
 #if defined(DEBUG_DUMP_STAKE_CHECK)&&defined(DEBUG_DUMP_STAKING_INFO)
