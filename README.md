@@ -68,7 +68,15 @@ Once the source code is ready the build steps are below.
 
 ### Build on Ubuntu
 
+Add bitcoin repository for Berkeley DB 4.8
+
+    sudo add-apt-repository ppa:bitcoin/bitcoin
+
+Clone lux repository
+
     git clone https://github.com/216k155/lux.git
+
+Build lux 
 
     cd lux
     ./install-dependencies.sh
@@ -213,5 +221,3 @@ not straightforward.
 
 ## License
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2F216k155%2Flux.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2F216k155%2Flux?ref=badge_large)
-
-
