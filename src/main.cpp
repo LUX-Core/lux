@@ -2762,7 +2762,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
     }
 
     if (fJustCheck) {
-//        if (pindex->nHeight >= Params().FirstSCBlock()) {
+        if (pindex->nHeight >= Params().FirstSCBlock()) {
             dev::h256 prevHashStateRoot(dev::sha3(dev::rlp("")));
             dev::h256 prevHashUTXORoot(dev::sha3(dev::rlp("")));
             if (pindex->pprev->hashStateRoot != uint256() && pindex->pprev->hashUTXORoot != uint256()) {
@@ -2771,7 +2771,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
             }
             globalState->setRoot(prevHashStateRoot);
             globalState->setRootUTXO(prevHashUTXORoot);
-//        }
+        }
         return true;
     }
 //////////////////////////////////////////////////////////////////
