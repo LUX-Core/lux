@@ -62,6 +62,10 @@ void ProcessMasternode(CNode* pfrom, const std::string& strCommand, CDataStream&
 //
 class CMasterNode
 {
+private:
+    boost::filesystem::path GetMasternodeConfigFile;
+    std::string strMagicMessage;
+
 public:
 	static int minProtoVersion;
     CService addr;
@@ -78,7 +82,6 @@ public:
     bool unitTest;
     bool allowFreeTx;
     int protocolVersion;
-
     //the dsq count from the last dsq broadcast of this node
     int64_t nLastDsq;
 
@@ -212,6 +215,16 @@ private:
     bool enabled;
 
 public:
+
+    enum ReadResult {
+        Ok,
+        FileError,
+        HashReadError,
+        IncorrectHash,
+        IncorrectMagicMessage,
+        IncorrectMagicNumber,
+        IncorrectFormat
+    };
 
     CMasternodePayments() {
         strMainPubKey = "04760f1bfc2b50a9eb1c6f8ecd3adfd5aa7f674eee729719808a48dc1f44f8c3efe81e90293b79ca9905373a9e63194a4054307d463864ca9336a16204c605e4a7";
