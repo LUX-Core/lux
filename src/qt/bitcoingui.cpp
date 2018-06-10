@@ -905,7 +905,7 @@ void BitcoinGUI::updateNetworkState()
     QIcon connectionItem = QIcon(icon).pixmap(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE);
     //labelConnectionsIcon->setIcon(connectionItem);
     if (clientModel->getNetworkActive())
-        labelConnectionsIcon->setToolTip(tr("%n active connection(s) to Bitcoin network", "", count));
+        labelConnectionsIcon->setToolTip(tr("%n active connection(s) to Luxcore network", "", count));
     else
         labelConnectionsIcon->setToolTip(tr("Network activity disabled"));
 }
