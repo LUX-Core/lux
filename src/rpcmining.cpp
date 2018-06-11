@@ -756,15 +756,13 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
 
     bool mnStarted = (pindexPrev->nHeight + 1) >= Params().FirstSplitRewardBlock();
     UniValue aMasternode(UniValue::VOBJ);
-    CScript mnPayee;
-    if (mnStarted && SelectMasternodePayee(mnPayee)) {
+    if (mnStarted && pblock->vtx[0].vout.size() > 1) {
         CTxDestination mnTxDest;
-        ExtractDestination(mnPayee, mnTxDest);
+        // todo: check if vout offset is always correct (with segwit)
+        ExtractDestination(pblock->vtx[0].vout[1].scriptPubKey, mnTxDest);
         aMasternode.push_back(Pair("payee", EncodeDestination(mnTxDest)));
-        aMasternode.push_back(Pair("script", HexStr(mnPayee.begin(), mnPayee.end())));
-        if (pblock->vtx[0].vout.size() > 1) { // todo: check if offset is always correct
-            aMasternode.push_back(Pair("amount", (int64_t)pblock->vtx[0].vout[1].nValue));
-        }
+        aMasternode.push_back(Pair("script", HexStr(pblock->vtx[0].vout[1].scriptPubKey)));
+        aMasternode.push_back(Pair("amount", (int64_t)pblock->vtx[0].vout[1].nValue));
     }
 
     result.push_back(Pair("masternode", aMasternode));
