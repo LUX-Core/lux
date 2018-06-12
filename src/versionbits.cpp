@@ -109,6 +109,58 @@ ThresholdState AbstractThresholdConditionChecker::GetStateFor(const CBlockIndex*
     return state;
 }
 
+BIP9Stats AbstractThresholdConditionChecker::GetStateStatisticsFor(const CBlockIndex* pindex, const Consensus::Params& params) const
+{
+    BIP9Stats stats = {};
+
+    stats.period = Period(params);
+    stats.threshold = Threshold(params);
+
+    if (pindex == nullptr)
+        return stats;
+
+    // Find beginning of period
+    const CBlockIndex* pindexEndOfPrevPeriod = pindex->GetAncestor(pindex->nHeight - ((pindex->nHeight + 1) % stats.period));
+    stats.elapsed = pindex->nHeight - pindexEndOfPrevPeriod->nHeight;
+
+    // Count from current block to beginning of period
+    int count = 0;
+    const CBlockIndex* currentIndex = pindex;
+    while (pindexEndOfPrevPeriod->nHeight != currentIndex->nHeight){
+        if (Condition(currentIndex, params))
+            count++;
+        currentIndex = currentIndex->pprev;
+    }
+
+    stats.count = count;
+    stats.possible = (stats.period - stats.threshold ) >= (stats.elapsed - count);
+
+    return stats;
+}
+
+int AbstractThresholdConditionChecker::GetStateSinceHeightFor(const CBlockIndex* pindexPrev, const Consensus::Params& params, ThresholdConditionCache& cache) const
+{
+    const ThresholdState initialState = GetStateFor(pindexPrev, params, cache);
+
+    if (initialState == THRESHOLD_DEFINED) {
+        return 0;
+    }
+
+    const int nPeriod = Period(params);
+
+    pindexPrev = pindexPrev->GetAncestor(pindexPrev->nHeight - ((pindexPrev->nHeight + 1) % nPeriod));
+
+    const CBlockIndex* previousPeriodParent = pindexPrev->GetAncestor(pindexPrev->nHeight - nPeriod);
+
+    while (previousPeriodParent != nullptr && GetStateFor(previousPeriodParent, params, cache) == initialState) {
+        pindexPrev = previousPeriodParent;
+        previousPeriodParent = pindexPrev->GetAncestor(pindexPrev->nHeight - nPeriod);
+    }
+
+    // Adjust the result because right now we point to the parent block.
+    return pindexPrev->nHeight + 1;
+}
+
 namespace
 {
 /**

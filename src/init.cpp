@@ -1702,6 +1702,8 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
             MilliSleep(10);
     }
 
+    // Add wallet transactions that aren't already in a block to mempool
+    // Do this here as mempool requires genesis block to be loaded
 #ifdef ENABLE_WALLET
     if (pwalletMain)
         pwalletMain->ReacceptWalletTransactions();
