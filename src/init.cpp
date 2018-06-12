@@ -1667,6 +1667,9 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
 #endif // !ENABLE_WALLET
     // ********************************************************* Step 9: import blocks
 
+    if (!CheckDiskSpace())
+        return false;
+
     if (chainparams.GetConsensus().vDeployments[Consensus::DEPLOYMENT_SEGWIT].nTimeout != 0) {
         // Only advertize witness capabilities if they have a reasonable start time.
         // This allows us to have the code merged without a defined softfork, by setting its
@@ -1699,107 +1702,12 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
             MilliSleep(10);
     }
 
+#ifdef ENABLE_WALLET
+    if (pwalletMain)
+        pwalletMain->ReacceptWalletTransactions();
+#endif
+
     // ********************************************************* Step 10: setup Darksend
-
-    fMasterNode = GetBoolArg("-masternode", false);
-
-    if ((fMasterNode || masternodeConfig.getCount() > -1) && fTxIndex == false) {
-        return InitError("Enabling Masternode support requires turning on transaction indexing."
-                         "Please add txindex=1 to your configuration and start with -reindex");
-    }
-
-    if (fMasterNode) {
-        LogPrintf("IS DARKSEND MASTER NODE\n");
-        strMasterNodeAddr = GetArg("-masternodeaddr", "");
-
-        LogPrintf(" addr %s\n", strMasterNodeAddr.c_str());
-
-        if (!strMasterNodeAddr.empty()) {
-            CService addrTest = CService(strMasterNodeAddr);
-            if (!addrTest.IsValid()) {
-                return InitError("Invalid -masternodeaddr address: " + strMasterNodeAddr);
-            }
-        }
-
-        strMasterNodePrivKey = GetArg("-masternodeprivkey", "");
-        if (!strMasterNodePrivKey.empty()) {
-            std::string errorMessage;
-
-            CKey key;
-            CPubKey pubkey;
-
-            if (!darkSendSigner.SetKey(strMasterNodePrivKey, errorMessage, key, pubkey)) {
-                return InitError(_("Invalid masternodeprivkey. Please see documenation."));
-            }
-
-            activeMasternode.pubKeyMasternode = pubkey;
-
-        } else {
-            return InitError(_("You must specify a masternodeprivkey in the configuration. Please see documentation for help."));
-        }
-    }
-
-    if (GetBoolArg("-mnconflock", true) && pwalletMain) {
-        LOCK(pwalletMain->cs_wallet);
-        LogPrintf("Locking Masternodes:\n");
-        uint256 mnTxHash;
-        BOOST_FOREACH (CMasternodeConfig::CMasternodeEntry mne, masternodeConfig.getEntries()) {
-                        LogPrintf("  %s %s\n", mne.getTxHash(), mne.getOutputIndex());
-                        mnTxHash.SetHex(mne.getTxHash());
-                        COutPoint outpoint = COutPoint(mnTxHash, boost::lexical_cast<unsigned int>(mne.getOutputIndex()));
-                        pwalletMain->LockCoin(outpoint);
-                    }
-    }
-
-    fEnableDarksend = GetBoolArg("-enabledarksend", false);
-
-    nDarksendRounds = GetArg("-darksendrounds", 2);
-    if (nDarksendRounds > 16) nDarksendRounds = 16;
-    if (nDarksendRounds < 1) nDarksendRounds = 1;
-
-    nLiquidityProvider = GetArg("-liquidityprovider", 0); //0-100
-    if (nLiquidityProvider != 0) {
-        darkSendPool.SetMinBlockSpacing(std::min(nLiquidityProvider, 100) * 15);
-        fEnableDarksend = true;
-        nDarksendRounds = 99999;
-    }
-
-    nAnonymizeLuxAmount = GetArg("-anonymizefolmamount", 0);
-    if (nAnonymizeLuxAmount > 999999) nAnonymizeLuxAmount = 999999;
-    if (nAnonymizeLuxAmount < 2) nAnonymizeLuxAmount = 2;
-
-    nInstanTXDepth = GetBoolArg("-enableinstantx", fEnableInstanTX);
-    nInstanTXDepth = GetArg("-instantxdepth", fEnableInstanTX);
-    nInstanTXDepth = std::min(std::max(nInstanTXDepth, 0), 60);
-
-    LogPrintf("nInstanTXDepth %d\n", nInstanTXDepth);
-    LogPrintf("Darksend rounds %d\n", nDarksendRounds);
-    LogPrintf("Anonymize Lux Amount %d\n", nAnonymizeLuxAmount);
-
-    /* Denominations
-
-       A note about convertability. Within Obfuscation pools, each denomination
-       is convertable to another.
-
-       For example:
-       1FLM+1000 == (.1FLM+100)*10
-       10FLM+10000 == (1FLM+1000)*10
-    */
-    darkSendDenominations.push_back((10000 * COIN) + 10000000);
-    darkSendDenominations.push_back((1000 * COIN) + 1000000);
-    darkSendDenominations.push_back((100 * COIN) + 100000);
-    darkSendDenominations.push_back((10 * COIN) + 10000);
-    darkSendDenominations.push_back((1 * COIN) + 1000);
-    darkSendDenominations.push_back((.1 * COIN) + 100);
-
-    darkSendPool.InitCollateralAddress();
-
-    threadGroup.create_thread(boost::bind(&ThreadCheckDarkSendPool));
-
-    // ********************************************************* Step 11: start node
-
-    if (!CheckDiskSpace())
-        return false;
 
     if (!strErrors.str().empty())
         return InitError(strErrors.str());
@@ -1875,6 +1783,8 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
     darkSendPool.InitCollateralAddress();
 
     threadGroup.create_thread(boost::bind(&ThreadCheckDarkSendPool));
+
+    // ********************************************************* Step 11: start node
 
     RandAddSeedPerfmon();
 
