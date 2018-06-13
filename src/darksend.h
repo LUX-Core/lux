@@ -45,7 +45,7 @@ extern map<uint256, CDarksendBroadcastTx> mapDarksendBroadcastTxes;
 extern CActiveMasternode activeMasternode;
 
 //specific messages for the Darksend protocol
-void ProcessDarksend(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv, bool &isDarksend);
+void ProcessMessageDarksend(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv, bool &isDarksend);
 
 // get the darksend chain depth for a given input
 int GetInputDarksendRounds(CTxIn in, int rounds=0);

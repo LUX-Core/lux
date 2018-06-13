@@ -5852,6 +5852,7 @@ static bool ProcessMessage(CNode* pfrom, const string &strCommand, CDataStream& 
             mempool.check(pcoinsTip);
             RelayTransaction(tx);
             vWorkQueue.push_back(inv.hash);
+            vEraseQueue.push_back(inv.hash);
 
             LogPrint("mempool", "AcceptToMemoryPool: peer=%d %s : accepted %s (poolsz %u)\n",
                 pfrom->id, pfrom->cleanSubVer,
@@ -5875,6 +5876,8 @@ static bool ProcessMessage(CNode* pfrom, const string &strCommand, CDataStream& 
                     // resolution (that is, feeding people an invalid transaction based on LegitTxX in order to get
                     // anyone relaying LegitTxX banned)
                     CValidationState stateDummy;
+
+                    vEraseQueue.push_back(orphanHash);
 
                     if (setMisbehaving.count(fromPeer))
                         continue;
@@ -5911,7 +5914,9 @@ static bool ProcessMessage(CNode* pfrom, const string &strCommand, CDataStream& 
             unsigned int nEvicted = LimitOrphanTxSize(nMaxOrphanTx);
             if (nEvicted > 0)
                 LogPrint("mempool", "mapOrphan overflow, removed %u tx\n", nEvicted);
-        } else if (pfrom->fWhitelisted) {
+        }
+
+        else if (pfrom->fWhitelisted) {
             // Always relay transactions received from whitelisted peers, even
             // if they are already in the mempool (allowing the node to function
             // as a gateway for nodes hidden behind it).
@@ -6263,12 +6268,18 @@ static bool ProcessMessage(CNode* pfrom, const string &strCommand, CDataStream& 
         if (!processed) ProcessSpork(pfrom, strCommand, vRecv, processed);
         if (!processed) masternodeSync.ProcessMessage(pfrom, strCommand, vRecv, processed);
 #       else
-        if (!processed) ProcessDarksend(pfrom, strCommand, vRecv, processed);
+        if (!processed) ProcessMessageDarksend(pfrom, strCommand, vRecv, processed);
         if (!processed) ProcessMasternode(pfrom, strCommand, vRecv, processed);
+        if (!processed) ProcessMasternodeConnections();
         if (!processed) ProcessInstantX(pfrom, strCommand, vRecv, processed);
         if (!processed) ProcessSpork(pfrom, strCommand, vRecv, processed);
 #       endif
     }
+
+    // Update the last seen time for this node's address
+    if (pfrom->fNetworkNode)
+        if (strCommand == "version" || strCommand == "addr" || strCommand == "inv" || strCommand == "getdata" || strCommand == "ping")
+            AddressCurrentlyConnected(pfrom->addr);
 
     return true;
 }

@@ -297,6 +297,8 @@ bool GetTransaction(const uint256& hash, CTransaction& tx, const Consensus::Para
 
 bool DisconnectBlocksAndReprocess(int blocks);
 
+bool DisconnectBlockAndInputs(CValidationState& state, CTransaction& tx);
+
 bool IsWitnessLocked(const CBlockIndex* pindexPrev);
 
 // ***TODO***

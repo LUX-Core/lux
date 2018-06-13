@@ -51,8 +51,10 @@ int RequestedMasterNodeList = 0;
         eduffield - evan@darkcoin.io
 */
 
-void ProcessDarksend(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv, bool &isDarksend)
+void ProcessMessageDarksend(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv, bool &isDarksend)
 {
+    if(IsInitialBlockDownload()) return;
+
     if (strCommand == "dsf") { //DarkSend Final tx
         isDarksend = true;
 
@@ -154,9 +156,7 @@ void ProcessDarksend(CNode* pfrom, const std::string& strCommand, CDataStream& v
             pfrom->PushMessage("dssu", darkSendPool.sessionID, darkSendPool.GetState(), darkSendPool.GetEntriesCount(), MASTERNODE_ACCEPTED, error);
             return;
         }
-    }
-
-    else if (strCommand == "dsq") { //DarkSend Queue
+    } else if (strCommand == "dsq") { //DarkSend Queue
         isDarksend = true;
 
         if (pfrom->nVersion < darkSendPool.MIN_PEER_PROTO_VERSION) {
