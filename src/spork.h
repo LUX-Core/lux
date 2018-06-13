@@ -18,17 +18,20 @@
 using namespace std;
 using namespace boost;
 
+#define SPORK_START                                           10001
+#define SPORK_END                                             10005
 // Don't ever reuse these IDs for other sporks
 #define SPORK_1_MASTERNODE_PAYMENTS_ENFORCEMENT               10000
 #define SPORK_2_MAX_VALUE                                     10002
 #define SPORK_3_REPLAY_BLOCKS                                 10003
 #define SPORK_4_NOTUSED                                       10004
-
+#define SPORK_5_RECONSIDER_BLOCKS                             10005
 
 #define SPORK_1_MASTERNODE_PAYMENTS_ENFORCEMENT_DEFAULT       2428537599  //2015-4-8 23:59:59 GMT
 #define SPORK_2_MAX_VALUE_DEFAULT                             10000        //500 Lux 
 #define SPORK_3_REPLAY_BLOCKS_DEFAULT                         0
 #define SPORK_4_RECONVERGE_DEFAULT                            1420070400  //2047-1-1
+#define SPORK_5_RECONSIDER_BLOCKS_DEFAULT                     0
 
 class CSporkMessage;
 class CSporkManager;
@@ -43,6 +46,9 @@ class CSporkManager;
 
 using namespace std;
 using namespace boost;
+
+class CSporkMessage;
+class CSporkManager;
 
 extern std::map<uint256, CSporkMessage> mapSporks;
 extern std::map<int, CSporkMessage> mapSporksActive;
