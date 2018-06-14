@@ -484,7 +484,6 @@ public:
         //When it is fixed, this check should look like this
         //if(this->nVersion & VersionBitsMask(Params().GetConsensus(), Consensus::SMART_CONTRACTS_HARDFORK))
         if ((this->nVersion & (1 << 30)) != 0) {
-            std::cout << "DISK BLOCK INDEX " << nHeight << " state READ/WRITE" << std::endl;
             READWRITE(hashStateRoot);       // lux
             READWRITE(hashUTXORoot);        // lux
         }

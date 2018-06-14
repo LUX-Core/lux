@@ -10,7 +10,6 @@
 #include <serialize.h>
 #include <uint256.h>
 #include "keystore.h"
-#include <iostream>
 
 /** The maximum allowed size for a serialized block, in bytes (network rule) */
 static const unsigned int MAX_BLOCK_SIZE = 6000000;
@@ -57,7 +56,6 @@ public:
         //When it is fixed, this check should look like this
         //if(this->nVersion & VersionBitsMask(Params().GetConsensus(), Consensus::SMART_CONTRACTS_HARDFORK))
         if ((this->nVersion & (1 << 30)) != 0) {
-            std::cout << "BLOCK state READ/WRITE" << std::endl;
             READWRITE(hashStateRoot);       // lux
             READWRITE(hashUTXORoot);        // lux
         }
