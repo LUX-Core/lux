@@ -98,7 +98,7 @@ unsigned int dgpMaxBlockWeight = 8000000;
 /** The maximum allowed size for a block excluding witness data, in bytes (network rule) */
 unsigned int dgpMaxBlockBaseSize = 2000000;
 
-unsigned int dgpMaxBlockSize = 2000000; // qtum
+unsigned int dgpMaxBlockSize = 2000000; // lux
 
 ///** The maximum allowed number of signature check operations in a block (network rule) */
 int64_t dgpMaxBlockSigOps = 80000;
@@ -2207,7 +2207,7 @@ bool DisconnectBlock(CBlock& block, CValidationState& state, CBlockIndex* pindex
     // move best block pointer to prevout block
     view.SetBestBlock(pindex->pprev->GetBlockHash());
 //#if 0
-      if (pindex->nHeight >= Params().FirstSCBlock()) {
+      if (pindex->nHeight > Params().FirstSCBlock()) {
         globalState->setRoot(uintToh256(pindex->pprev->hashStateRoot)); // lux
         globalState->setRootUTXO(uintToh256(pindex->pprev->hashUTXORoot)); // lux
 
@@ -4791,6 +4791,16 @@ bool CVerifyDB::VerifyDB(const CChainParams& chainparams, CCoinsView* coinsview,
     CBlockIndex* pindexFailure = NULL;
     int nGoodTransactions = 0;
     CValidationState state;
+
+    ////////////////////////////////////////////////////////////////////////// // lux
+    dev::h256 oldHashStateRoot;
+    dev::h256 oldHashUTXORoot;
+    if (chainActive.Tip()->nHeight >= chainparams.FirstSCBlock()) {
+        oldHashStateRoot = dev::h256(globalState->rootHash());
+        oldHashUTXORoot = dev::h256(globalState->rootHashUTXO());
+    }
+    //////////////////////////////////////////////////////////////////////////
+
     for (CBlockIndex* pindex = chainActive.Tip(); pindex && pindex->pprev; pindex = pindex->pprev) {
         boost::this_thread::interruption_point();
         uiInterface.ShowProgress(_("Verifying blocks..."), std::max(1, std::min(99, (int)(((double)(chainActive.Height() - pindex->nHeight)) / (double)nCheckDepth * (nCheckLevel >= 4 ? 50 : 100)))));
@@ -4840,8 +4850,26 @@ bool CVerifyDB::VerifyDB(const CChainParams& chainparams, CCoinsView* coinsview,
             CBlock block;
             if (!ReadBlockFromDisk(block, pindex, chainparams.GetConsensus()))
                 return error("VerifyDB() : *** ReadBlockFromDisk failed at %d, hash=%s", pindex->nHeight, pindex->GetBlockHash().ToString());
-            if (!ConnectBlock(block, state, pindex, coins, chainparams))
+
+            dev::h256 oldHashStateRoot;
+            dev::h256 oldHashUTXORoot;
+            if (chainActive.Tip()->nHeight >= chainparams.FirstSCBlock()) {
+                oldHashStateRoot = dev::h256(globalState->rootHash());
+                oldHashUTXORoot = dev::h256(globalState->rootHashUTXO());
+            }
+
+            if (!ConnectBlock(block, state, pindex, coins, chainparams)) {
+                if (chainActive.Tip()->nHeight >= chainparams.FirstSCBlock()) {
+                    globalState->setRoot(oldHashStateRoot); // lux
+                    globalState->setRootUTXO(oldHashUTXORoot); // lux
+                }
                 return error("VerifyDB() : *** found unconnectable block at %d, hash=%s", pindex->nHeight, pindex->GetBlockHash().ToString());
+            }
+        }
+    } else {
+        if (chainActive.Tip()->nHeight >= chainparams.FirstSCBlock()) {
+            globalState->setRoot(oldHashStateRoot); // lux
+            globalState->setRootUTXO(oldHashUTXORoot); // lux
         }
     }
 
