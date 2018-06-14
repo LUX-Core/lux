@@ -241,6 +241,8 @@ std::string BlockToString(CBlockIndex* pBlock)
             _("Version"), itostr(block.nVersion),
             _("Hash"), "<pre>" + block.GetHash().GetHex() + "</pre>",
             _("Merkle Root"), "<pre>" + block.hashMerkleRoot.GetHex() + "</pre>",
+            _("State Root"), "<pre>" + block.hashStateRoot.GetHex() + "</pre>",
+            _("UTXO Root"), "<pre>" + block.hashUTXORoot.GetHex() + "</pre>",
             // _("Hash Whole Block"), "<pre>" + block.hashWholeBlock.GetHex() + "</pre>"
             // _("Miner Signature"), "<pre>" + block.MinerSignature.ToString() + "</pre>"
         };
