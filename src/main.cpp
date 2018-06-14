@@ -2348,10 +2348,10 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
     AssertLockHeld(cs_main);
 
     ///////////////////////////////////////////////// // lux
-//#if 0
+#if 0
     LuxDGP luxDGP(globalState.get(), fGettingValuesDGP);
     globalSealEngine->setLuxSchedule(luxDGP.getGasSchedule(pindex->nHeight + 1));
-//#endif
+#endif
     uint64_t minGasPrice = 0;//luxDGP.getMinGasPrice(pindex->nHeight + 1);
     uint64_t blockGasLimit = DEFAULT_BLOCK_GAS_LIMIT_DGP;//luxDGP.getBlockGasLimit(pindex->nHeight + 1);
 
@@ -3078,19 +3078,22 @@ bool static ConnectTip(CValidationState& state, const CChainParams& chainparams,
     LogPrint("bench", "  - Load block from disk: %.2fms [%.2fs]\n", (nTime2 - nTime1) * 0.001, nTimeReadFromDisk * 0.000001);
     {
         CInv inv(MSG_BLOCK, pindexNew->GetBlockHash());
-
-
-        dev::h256 oldHashStateRoot(globalState->rootHash()); // lux
-        dev::h256 oldHashUTXORoot(globalState->rootHashUTXO()); // lux
+        dev::h256 oldHashStateRoot;
+        dev::h256 oldHashUTXORoot;
+        if (pindexNew->nHeight >= chainparams.FirstSCBlock()) {
+            oldHashStateRoot = dev::h256(globalState->rootHash()); // lux
+            oldHashUTXORoot = dev::h256(globalState->rootHashUTXO()); // lux
+        }
 
         bool rv = ConnectBlock(*pblock, state, pindexNew, view, chainparams);
         GetMainSignals().BlockChecked(*pblock, state);
         if (!rv) {
             if (state.IsInvalid())
                 InvalidBlockFound(pindexNew, state);
-
-            globalState->setRoot(oldHashStateRoot); // lux
-            globalState->setRootUTXO(oldHashUTXORoot); // lux
+            if (pindexNew->nHeight >= chainparams.FirstSCBlock()) {
+                globalState->setRoot(oldHashStateRoot); // lux
+                globalState->setRootUTXO(oldHashUTXORoot); // lux
+            }
 
             return error("ConnectTip() : ConnectBlock %s failed", pindexNew->GetBlockHash().ToString());
         }
@@ -4325,13 +4328,17 @@ bool TestBlockValidity(CValidationState& state, const CChainParams& chainparams,
     if (block.IsProofOfStake() && !stake->CheckProof(pindexPrev, block, index.hashProofOfStake))
         return false;
 
-    dev::h256 oldHashStateRoot(globalState->rootHash()); // lux
-    dev::h256 oldHashUTXORoot(globalState->rootHashUTXO()); // lux
-
+    dev::h256 oldHashStateRoot;
+    dev::h256 oldHashUTXORoot;
+    if (index.nHeight >= chainparams.FirstSCBlock()) {
+        oldHashStateRoot = dev::h256(globalState->rootHash()); // lux
+        oldHashUTXORoot = dev::h256(globalState->rootHashUTXO()); // lux
+    }
     if (!ConnectBlock(block, state, &index, viewNew, chainparams, true)) {
-        globalState->setRoot(oldHashStateRoot); // lux
-        globalState->setRootUTXO(oldHashUTXORoot); // lux
-        std::cout << "ConnectBlock\n";
+        if (index.nHeight >= chainparams.FirstSCBlock()) {
+            globalState->setRoot(oldHashStateRoot); // lux
+            globalState->setRootUTXO(oldHashUTXORoot); // lux
+        }
         return false;
     }
 
