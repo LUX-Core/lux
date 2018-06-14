@@ -1427,9 +1427,9 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
 
                 pstorageresult = new StorageResults(luxStateDir.string());
 
-                if(pindexBestHeader != nullptr && pindexBestHeader->nHeight > Params().FirstSCBlock()){
-                    globalState->setRoot(uintToh256(pindexBestHeader->hashStateRoot));
-                    globalState->setRootUTXO(uintToh256(pindexBestHeader->hashUTXORoot));
+                if(chainActive.Tip() != nullptr && chainActive.Tip()->nHeight > Params().FirstSCBlock()){
+                    globalState->setRoot(uintToh256(chainActive.Tip()->hashStateRoot));
+                    globalState->setRootUTXO(uintToh256(chainActive.Tip()->hashUTXORoot));
                 } else {
                     globalState->setRoot(dev::sha3(dev::rlp("")));
                     globalState->setRootUTXO(uintToh256(chainparams.GenesisBlock().hashUTXORoot));
