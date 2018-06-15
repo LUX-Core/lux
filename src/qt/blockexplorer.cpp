@@ -239,7 +239,7 @@ std::string BlockToString(CBlockIndex* pBlock)
             _("Bits"), utostr(block.nBits),
             _("Nonce"), utostr(block.nNonce),
             _("Version"), itostr(block.nVersion),
-            _("Hash"), "<pre>" + block.GetHash().GetHex() + "</pre>",
+            _("Hash"), "<pre>" + block.GetHash(pBlock->nHeight >= Params().SwitchPhi2Block()).GetHex() + "</pre>",
             _("Merkle Root"), "<pre>" + block.hashMerkleRoot.GetHex() + "</pre>",
             _("State Root"), "<pre>" + block.hashStateRoot.GetHex() + "</pre>",
             _("UTXO Root"), "<pre>" + block.hashUTXORoot.GetHex() + "</pre>",
