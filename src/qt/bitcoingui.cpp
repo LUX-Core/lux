@@ -385,6 +385,8 @@ void BitcoinGUI::createActions(const NetworkStyle* networkStyle)
     smartContractAction->setStatusTip(tr("Smart Contracts Actions"));
     smartContractAction->setToolTip(smartContractAction->statusTip());
     smartContractAction->setCheckable(true);
+    tabGroup->addAction(smartContractAction);
+
     #ifdef Q_OS_MAC
         smartContractAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_8));
     #else
