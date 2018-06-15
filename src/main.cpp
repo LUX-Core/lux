@@ -1726,7 +1726,24 @@ bool ReadBlockFromDisk(CBlock& block, const CDiskBlockPos& pos, int nHeight, con
         if (!CheckProofOfWork(block.GetHash(nHeight >= Params().SwitchPhi2Block()), block.nBits, consensusParams))
             return error("ReadBlockFromDisk : Errors in block header");
     } else {
-        // TODO: CheckProofOfStake(block, ...)
+        uint256 hashProofOfStake;
+        uint256 hash = block.GetHash(nHeight >= Params().SwitchPhi2Block());
+
+        // Get prev block index
+        CBlockIndex* pindexPrev = NULL;
+        CValidationState state;
+        const CChainParams& chainparams = Params();
+
+        //Genesis block's hash cannot be calculated using PHI2, so no need to check PHI2 block hash
+        if (block.GetHash() != chainparams.GetConsensus().hashGenesisBlock) {
+            BlockMap::iterator mi = mapBlockIndex.find(block.hashPrevBlock);
+            if (mi == mapBlockIndex.end())
+                return state.DoS(0, error("%s : prev block %s not found", __func__, block.hashPrevBlock.GetHex()), 0, "bad-prevblk");
+            pindexPrev = (*mi).second;
+        }
+         
+         if (!stake->CheckProof(pindexPrev, block, hashProofOfStake))
+            return error("%s: invalid proof-of-stake (block %s)\n", __func__, hash.GetHex());
     }
 
     return true;
