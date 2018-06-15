@@ -176,7 +176,7 @@ public:
         pchMessageStart[2] = 0xc9;
         pchMessageStart[3] = 0xa7;
         vAlertPubKey = ParseHex("042d13c016ed91528241bcff222989769417eb10cdb679228c91e26e26900eb9fd053cd9f16a9a2894ad5ebbd551be1a4bd23bd55023679be17f0bd3a16e6fbeba");
-        nDefaultPort = /*28666*/ 26868;
+        nDefaultPort = /*28666*/ /*26868*/ 16868;
         nMaxReorganizationDepth = 100;
         nMinerThreads = 0;
         nMaturity = 79;
@@ -219,8 +219,8 @@ public:
         //vSeeds.push_back(CDNSSeedData("5.77.44.147", "5.77.44.147")); // Non-standard DNS request
         #endif
 
-        vSeeds.push_back(CDNSSeedData("165.227.226.249", "165.227.226.249")); // Non-standard DNS request
-        vSeeds.push_back(CDNSSeedData("165.227.64.166", "165.227.64.166")); // Non-standard DNS request
+        vSeeds.push_back(CDNSSeedData("45.77.238.204", "45.77.238.204")); // Non-standard DNS request
+        vSeeds.push_back(CDNSSeedData("149.28.164.12", "149.28.164.12")); // Non-standard DNS request
 
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,48); // LUX address start with 'L'
         base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1,63); // LUX script addresses start with 'S'
