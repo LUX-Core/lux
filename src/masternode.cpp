@@ -861,9 +861,7 @@ bool MasternodePaymentsEnabled()
 bool SelectMasternodePayee(CScript &payeeScript)
 {
     bool result = false;
-
-    if ((chainActive.Tip()->nHeight + 1) >= Params().FirstSplitRewardBlock() && MasternodePaymentsEnabled())
-    {
+    if (MasternodePaymentsEnabled()) {
         //spork
         if (!masternodePayments.GetBlockPayee(chainActive.Tip()->nHeight+1, payeeScript)) {
             int winningNode = GetCurrentMasterNode(1);
