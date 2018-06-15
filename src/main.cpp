@@ -1727,7 +1727,6 @@ bool ReadBlockFromDisk(CBlock& block, const CDiskBlockPos& pos, int nHeight, con
             return error("ReadBlockFromDisk : Errors in block header");
     } else {
         uint256 hashProofOfStake;
-        uint256 hash = block.GetHash(nHeight >= Params().SwitchPhi2Block());
 
         // Get prev block index
         CBlockIndex* pindexPrev = NULL;
@@ -1743,7 +1742,7 @@ bool ReadBlockFromDisk(CBlock& block, const CDiskBlockPos& pos, int nHeight, con
         }
          
          if (!stake->CheckProof(pindexPrev, block, hashProofOfStake))
-            return error("%s: invalid proof-of-stake (block %s)\n", __func__, hash.GetHex());
+            return error("%s: invalid proof-of-stake (block %s)\n", __func__, block.GetHash().GetHex());
     }
 
     return true;
