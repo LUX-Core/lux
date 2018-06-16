@@ -638,6 +638,8 @@ bool Stake::IsActive() const
 {
     bool nStaking = false;
     auto tip = chainActive.Tip();
+    if (GetBoolArg("-staking", DEFAULT_STAKE) == false)
+        return false;
     if (mapHashedBlocks.count(tip->nHeight))
         nStaking = true;
     else if (mapHashedBlocks.count(tip->nHeight - 1) && HasStaked())
@@ -984,7 +986,7 @@ bool Stake::GenBlockStake(CWallet *wallet, const CReserveKey &key, unsigned int 
 
 void Stake::StakingThread(CWallet *wallet)
 {
-    LogPrintf("%s: started!\n", __func__);
+    LogPrintf("staking thread started!\n");
     
     SetThreadPriority(THREAD_PRIORITY_LOWEST);
 
@@ -1049,6 +1051,10 @@ void Stake::StakingThread(CWallet *wallet)
 
 void Stake::GenerateStakes(boost::thread_group &group, CWallet *wallet, int procs)
 {
+    if (GetBoolArg("-staking", DEFAULT_STAKE) == false) {
+        LogPrintf("staking is disabled\n");
+        return;
+    }
 #if 0
     static std::unique_ptr<boost::thread_group> StakingThreads(new boost::thread_group);
     if (procs == 0) {

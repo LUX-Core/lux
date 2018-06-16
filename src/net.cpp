@@ -1773,7 +1773,7 @@ void StartNode(boost::thread_group& threadGroup, CScheduler& scheduler)
     // The second input is milliseconds. So, we must re-calculate the input time interval
     scheduler.scheduleEvery(&DumpData, DUMP_ADDRESSES_INTERVAL * 1000);
 
-    if (GetBoolArg("-staking", true) && pwalletMain) {
+    if (GetBoolArg("-staking", DEFAULT_STAKE) && pwalletMain) {
 #if 1
         stake->GenerateStakes(threadGroup, pwalletMain, 1);
 #else

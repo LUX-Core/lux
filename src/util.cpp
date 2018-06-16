@@ -383,16 +383,24 @@ int64_t GetArg(const std::string& strArg, int64_t nDefault)
 bool GetBoolArg(const std::string& strArg, bool fDefault)
 {
     if (mapArgs.count(strArg)) {
+
+        int n = fDefault ? 1 : 0;
+
+        // sample: -testnet
         if (mapArgs[strArg].empty())
             return true;
 
-        int n;
         try {
-            n = std::stoi(mapArgs[strArg]);
+            // stoi() doesn't handle boolean strings
+            if (mapArgs[strArg] == "false")
+                n = 0;
+            else if (mapArgs[strArg] == "true")
+                n = 1;
+            else
+                n = std::stoi(mapArgs[strArg]);
         } catch (const std::exception& e) {
-            return fDefault;
         }
-        return n;
+        return (n != 0);
     }
     return fDefault;
 }
