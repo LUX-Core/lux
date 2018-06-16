@@ -81,6 +81,11 @@ UniValue getinfo(const UniValue& params, bool fHelp)
     GetProxy(NET_IPV4, proxy);
 
     UniValue obj(UniValue::VOBJ);
+
+    UniValue diff(UniValue::VOBJ);
+    CBlockIndex* powTip = GetLastBlockOfType(0);
+    CBlockIndex* posTip = GetLastBlockOfType(1);
+
     obj.push_back(Pair("version", CLIENT_VERSION));
     obj.push_back(Pair("protocolversion", PROTOCOL_VERSION));
 #ifdef ENABLE_WALLET
@@ -93,7 +98,11 @@ UniValue getinfo(const UniValue& params, bool fHelp)
     obj.push_back(Pair("timeoffset", GetTimeOffset()));
     obj.push_back(Pair("connections", (int)vNodes.size()));
     obj.push_back(Pair("proxy", (proxy.IsValid() ? proxy.ToStringIPPort() : string())));
-    obj.push_back(Pair("difficulty", (double)GetDifficulty()));
+
+    diff.push_back(Pair("proof-of-work", (double)GetDifficulty(powTip)));
+    diff.push_back(Pair("proof-of-stake", (double)GetDifficulty(posTip)));
+    obj.push_back(Pair("difficulty", diff));
+
     obj.push_back(Pair("testnet", Params().NetworkIDString() != "main"));
     obj.push_back(Pair("networkactive", fNetworkActive));
 #ifdef ENABLE_WALLET

@@ -245,10 +245,11 @@ UniValue getmininginfo(const UniValue& params, bool fHelp)
             HelpExampleCli("getmininginfo", "") + HelpExampleRpc("getmininginfo", ""));
 
     UniValue obj(UniValue::VOBJ);
+    CBlockIndex* powTip = GetLastBlockOfType(0);
     obj.push_back(Pair("blocks", (int)chainActive.Height()));
     obj.push_back(Pair("currentblocksize", (uint64_t)nLastBlockSize));
     obj.push_back(Pair("currentblocktx", (uint64_t)nLastBlockTx));
-    obj.push_back(Pair("difficulty", (double)GetDifficulty()));
+    obj.push_back(Pair("difficulty", (double)GetDifficulty(powTip)));
     obj.push_back(Pair("errors", GetWarnings("statusbar")));
     obj.push_back(Pair("genproclimit", (int)GetArg("-genproclimit", -1)));
     obj.push_back(Pair("networkhashps", getnetworkhashps(params, false)));
