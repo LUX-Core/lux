@@ -221,6 +221,11 @@ public:
 
         vSeeds.push_back(CDNSSeedData("45.77.238.204", "45.77.238.204")); // Non-standard DNS request
         vSeeds.push_back(CDNSSeedData("149.28.164.12", "149.28.164.12")); // Non-standard DNS request
+        vSeeds.push_back(CDNSSeedData("149.28.166.108", "149.28.166.108")); // Non-standard DNS request
+        vSeeds.push_back(CDNSSeedData("45.76.112.169", "45.76.112.169")); // Non-standard DNS request
+        vSeeds.push_back(CDNSSeedData("149.28.165.193", "149.28.165.193")); // Non-standard DNS request
+        vSeeds.push_back(CDNSSeedData("45.32.188.164", "45.32.188.164")); // Non-standard DNS request
+        vSeeds.push_back(CDNSSeedData("149.28.169.58", "149.28.169.58")); // Non-standard DNS request
 
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,48); // LUX address start with 'L'
         base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1,63); // LUX script addresses start with 'S'
