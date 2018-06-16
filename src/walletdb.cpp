@@ -406,7 +406,8 @@ DBErrors CWalletDB::ReorderTransactions(CWallet* pwallet)
     return DB_LOAD_OK;
 }
 
-void MaybeFlushWalletDB() {
+void MaybeFlushWalletDB()
+{
     static std::atomic<bool> fOneThread;
     if (fOneThread.exchange(true)) {
         return;
@@ -425,11 +426,10 @@ void MaybeFlushWalletDB() {
     }
 
     if (nLastFlushed != CWalletDB::GetUpdateCounter() && GetTime() - nLastWalletUpdate >= 2) {
-        const std::string& strFile = pwalletMain->strWalletFile;
-            nLastFlushed = CWalletDB::GetUpdateCounter();
+        nLastFlushed = CWalletDB::GetUpdateCounter();
     }
     fOneThread = false;
-    }
+}
 
 class CWalletScanState
 {
