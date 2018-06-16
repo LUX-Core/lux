@@ -265,7 +265,7 @@ public:
 static CMainParams mainParams;
 
 /**
- * Testnet (v3)
+ * Testnet
  */
 class CTestNetParams : public CMainParams
 {
@@ -306,10 +306,10 @@ public:
         nModifierUpdateBlock = 51197; //approx Mon, 17 Apr 2017 04:00:00 GMT
 
         //! Modify the testnet genesis block so the timestamp is valid for a later start.
-        const char* pszTimestamp = "Lux - Testnet"; // Input Activation code to activate blockchain
+        const char* pszTimestamp = "Lux - Testnet 1"; // Input Activation code to activate blockchain
         CMutableTransaction txNew;
         txNew.nVersion = 1;
-        txNew.nTime = 1527664240;
+        txNew.nTime = 1528954643;
         txNew.nLockTime = 0;
         txNew.vin.resize(1);
         txNew.vout.resize(1);
@@ -321,9 +321,9 @@ public:
         genesis.hashPrevBlock = 0;
         genesis.hashMerkleRoot = genesis.BuildMerkleTree();
         genesis.nVersion = 1;
-        genesis.nTime = 1527664240; //05/29/2018 @ 5:00am (UTC)
+        genesis.nTime = 1528954643; // 14 June 2018 @ 5:37am (UTC)
         genesis.nBits = 0x1e0fffff;
-        genesis.nNonce = 1153266;
+        genesis.nNonce = 7170961;
         genesis.hashStateRoot = uint256(h256Touint(dev::h256("e965ffd002cd6ad0e2dc402b8044de833e06b23127ea8c3d80aec91410771495"))); // lux
         genesis.hashUTXORoot = uint256(h256Touint(dev::sha3(dev::rlp("")))); // lux
 
@@ -335,20 +335,20 @@ public:
 //        std::cout << genesis.GetHash().GetHex() << std::endl;
 //        std::cout << genesis.hashMerkleRoot.GetHex() << std::endl;
 
-        nSplitRewardBlock = 100;
-        nSwitchPhi2Block = 300;
-        nFirstSCBlock = 500;
-        nPruneAfterHeight = 700;
+        nSwitchPhi2Block = 1000;
+        nSplitRewardBlock = 1500;
+        nPruneAfterHeight = 5000;
+        nFirstSCBlock = 10000;
 
         consensus.hashGenesisBlock = genesis.GetHash();
 
-        assert(consensus.hashGenesisBlock == uint256("0x00000ed61786c92e01948df9f543fc2effc17a025ec14f743ec1848dff81233b"));
-        assert(genesis.hashMerkleRoot == uint256("0x484415096c0c3f026838b97854d02bbf38aad5449938ef62f1fdd51c371a1696"));
+        assert(consensus.hashGenesisBlock == uint256("0x00000b773a72afd051c6fe34c6d9c8e1ba78b1556263c807a1ca7d7a200cda82"));
+        assert(genesis.hashMerkleRoot == uint256("0xd158bc48409667ffc5c66829d53aa6d1f241ce4984f54d8685b16d234ef78b3f"));
 
-       // vFixedSeeds.clear();
+        //vFixedSeeds.clear();
         //vSeeds.clear();
-        vSeeds.push_back(CDNSSeedData("luxtest1", "108.160.141.118"));
-        vSeeds.push_back(CDNSSeedData("luxtest2", "45.76.53.201"));
+        vSeeds.push_back(CDNSSeedData("luxtest1", "140.82.45.100"));
+        vSeeds.push_back(CDNSSeedData("luxtest2", "144.202.3.186"));
 
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1, 48); // Testnet lux addresses start with 'l'
         base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1, 63);  // Testnet lux script addresses start with 'S'
@@ -370,19 +370,18 @@ public:
         fRequireStandard = true;
         fMineBlocksOnDemand = false;
         fSkipProofOfWorkCheck = false;
-        fTestnetToBeDeprecatedFieldRPC = false;
+        fTestnetToBeDeprecatedFieldRPC = true;
         fHeadersFirstSyncingActive = false;
 
         nPoolMaxTransactions = 3;
         strSporkKey = "04348C2F50F90267E64FACC65BFDC9D0EB147D090872FB97ABAE92E9A36E6CA60983E28E741F8E7277B11A7479B626AC115BA31463AC48178A5075C5A9319D4A38";
 
         strDarksendPoolDummyAddress = "LPGq7DZbqZ8Vb3tfLH8Z8VHqeV4fsK68oX";
-        nStartMasternodePayments = 1507656633; //Fri, 09 Jan 2015 21:05:58 GMT
+        nStartMasternodePayments = 1528954643; //Fri, 09 Jan 2015 21:05:58 GMT
 
         nStakingRoundPeriod = 120; // 5 seconds a round
         nStakingInterval = 22; // 30 seconds
         nStakingMinAge = 360; // 6 minutes
-        nFirstSCBlock = 1000;
     }
     const Checkpoints::CCheckpointData& Checkpoints() const
     {
