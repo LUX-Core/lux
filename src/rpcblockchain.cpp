@@ -51,6 +51,22 @@ double GetDifficulty(const CBlockIndex* blockindex)
     return dDiff;
 }
 
+CBlockIndex* GetLastBlockOfType(const int nPoS) // 0: PoW; 1: PoS
+{
+    CBlockIndex* pBlock = chainActive.Tip();
+    while (pBlock && pBlock->nHeight > 0) {
+        bool isValid = false;
+        isValid = (nPoS && pBlock->IsProofOfStake()) || (!nPoS && !pBlock->IsProofOfStake());
+        if (isValid)
+            return pBlock;
+
+        if (pBlock->nHeight > 1)
+            pBlock = chainActive[pBlock->nHeight-1];
+        else
+            pBlock = pBlock->pprev;
+    }
+    return NULL;
+}
 
 UniValue blockToJSON(const CBlock& block, const CBlockIndex* blockindex, bool txDetails = false)
 {
@@ -779,13 +795,13 @@ UniValue getblockchaininfo(const UniValue& params, bool fHelp)
         );
 
     LOCK(cs_main);
-    CBlockIndex* tip = chainActive.Tip();
+    CBlockIndex* powTip = GetLastBlockOfType(0);
     UniValue obj(UniValue::VOBJ);
     obj.push_back(Pair("chain",                 Params().NetworkIDString()));
     obj.push_back(Pair("blocks",                chainActive.Height()));
     obj.push_back(Pair("headers",               pindexBestHeader ? pindexBestHeader->nHeight : -1));
     obj.push_back(Pair("bestblockhash",         chainActive.Tip()->GetBlockHash().GetHex()));
-    obj.push_back(Pair("difficulty",            (double)GetDifficulty(tip)));
+    obj.push_back(Pair("difficulty",            (double)GetDifficulty(powTip)));
     obj.push_back(Pair("mediantime",            (int64_t)chainActive.Tip()->GetMedianTimePast()));
     obj.push_back(Pair("verificationprogress",  Checkpoints::GuessVerificationProgress(Params().Checkpoints(), chainActive.Tip())));
     obj.push_back(Pair("chainwork",             chainActive.Tip()->nChainWork.GetHex()));
