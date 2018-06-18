@@ -164,9 +164,10 @@ UniValue getdifficulty(const UniValue& params, bool fHelp)
             HelpExampleCli("getdifficulty", "") + HelpExampleRpc("getdifficulty", ""));
 
     LOCK(cs_main);
-    return GetDifficulty();
-}
 
+    CBlockIndex* powTip = GetLastBlockOfType(0);
+    return GetDifficulty(powTip);
+}
 
 UniValue getrawmempool(const UniValue& params, bool fHelp)
 {

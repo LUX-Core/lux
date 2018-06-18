@@ -240,6 +240,7 @@ UniValue getmininginfo(const UniValue& params, bool fHelp)
             "  \"pooledtx\": n              (numeric) The size of the mem pool\n"
             "  \"testnet\": true|false      (boolean) If using testnet or not\n"
             "  \"chain\": \"xxxx\",         (string) current network name as defined in BIP70 (main, test, regtest)\n"
+            "  \"algo\" : \"phi2\"          (string) The current proof-of-work algorithm name\n"
             "}\n"
             "\nExamples:\n" +
             HelpExampleCli("getmininginfo", "") + HelpExampleRpc("getmininginfo", ""));
@@ -256,6 +257,7 @@ UniValue getmininginfo(const UniValue& params, bool fHelp)
     obj.push_back(Pair("pooledtx", (uint64_t)mempool.size()));
     obj.push_back(Pair("testnet", Params().NetworkIDString() != "main"));
     obj.push_back(Pair("chain", Params().NetworkIDString()));
+    obj.push_back(Pair("algo", chainActive.Height() > Params().SwitchPhi2Block() ? "phi2" : "phi1612"));
 #ifdef ENABLE_WALLET
     obj.push_back(Pair("segwit", IsWitnessEnabled(chainActive.Tip(), Params().GetConsensus()) ));
     obj.push_back(Pair("generate", getgenerate(params, false)));
@@ -781,6 +783,7 @@ UniValue getwork(const UniValue& params, bool fHelp) {
         throw runtime_error(
                 "getwork [data]\n"
                 "If [data] is not specified, returns formatted hash data to work on:\n"
+                "  \"algo\" : current proof-of-work algorithm name\n"
                 "  \"midstate\" : precomputed hash state after hashing the first half of the data (DEPRECATED)\n" // deprecated
                 "  \"data\" : block data\n"
                 "  \"target\" : little endian hash target\n"
@@ -864,6 +867,7 @@ UniValue getwork(const UniValue& params, bool fHelp) {
         uint256 hashTarget = uint256().SetCompact(pblock->nBits);
 
         UniValue result(UniValue::VOBJ);
+        result.push_back(Pair("algo", chainActive.Height() > Params().SwitchPhi2Block() ? "phi2" : "phi1612"));
         //result.push_back(Pair("midstate", HexStr(BEGIN(pmidstate), END(pmidstate)))); // deprecated
         if (pblock->nVersion & (1 << 30))
             result.push_back(Pair("data", HexStr(BEGIN(pdata), END(pdata))));
