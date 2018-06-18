@@ -132,6 +132,9 @@
               <property name="horizontalScrollBarPolicy">
                <enum>Qt::ScrollBarAlwaysOff</enum>
               </property>
+              <property name="acceptRichText">
+               <bool>false</bool>
+              </property>
              </widget>
             </item>
             <item row="0" column="0">
@@ -186,6 +189,9 @@
               </property>
               <property name="horizontalScrollBarPolicy">
                <enum>Qt::ScrollBarAlwaysOff</enum>
+              </property>
+              <property name="acceptRichText">
+               <bool>false</bool>
               </property>
              </widget>
             </item>

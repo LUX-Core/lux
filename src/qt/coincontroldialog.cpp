@@ -40,8 +40,8 @@ CCoinControl* CoinControlDialog::coinControl = new CCoinControl();
 
 CoinControlDialog::CoinControlDialog(QWidget* parent) : QDialog(parent),
                                                         ui(new Ui::CoinControlDialog),
-                                                        clientModel(0),
-                                                        model(0)
+                                                        model(0),
+                                                        clientModel(0)
 {
     ui->setupUi(this);
 
