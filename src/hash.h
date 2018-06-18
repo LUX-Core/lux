@@ -285,6 +285,7 @@ inline uint256 phi2_hash(const T1 pbegin, const T1 pend)
     unsigned char hashB[64] = { 0 };
     static unsigned char pblank[1];
     uint512 output;
+    int len = (pend - pbegin) * sizeof(pbegin[0]);
 
     sph_cubehash512_context ctx_cubehash;
     sph_jh512_context ctx_jh;
@@ -293,7 +294,7 @@ inline uint256 phi2_hash(const T1 pbegin, const T1 pend)
     sph_skein512_context ctx_skein;
 
     sph_cubehash512_init(&ctx_cubehash);
-    sph_cubehash512(&ctx_cubehash, (pbegin == pend ? pblank : static_cast<const void*>(&pbegin[0])), 80);
+    sph_cubehash512(&ctx_cubehash, (pbegin == pend ? pblank : static_cast<const void*>(&pbegin[0])), len);
     sph_cubehash512_close(&ctx_cubehash, (void*)hashB);
 
     LYRA2(&hashA[ 0], 32, &hashB[ 0], 32, &hashB[ 0], 32, 1, 8, 8);
