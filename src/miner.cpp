@@ -37,51 +37,10 @@
 #include <queue>
 #include <utility>
 
-int static FormatHashBlocks(void* pbuffer, unsigned int len)
+void FormatHashBuffers(CBlock* pblock, char* pmidstate, char* pdata)
 {
-    unsigned char* pdata = (unsigned char*)pbuffer;
-    unsigned int blocks = 1 + ((len + 8) / 64);
-    unsigned char* pend = pdata + 64 * blocks;
-    memset(pdata + len, 0, 64 * blocks - len);
-    pdata[len] = 0x80;
-    unsigned int bits = len * 8;
-    pend[-1] = (bits >> 0) & 0xff;
-    pend[-2] = (bits >> 8) & 0xff;
-    pend[-3] = (bits >> 16) & 0xff;
-    pend[-4] = (bits >> 24) & 0xff;
-    return blocks;
-}
-
-static const unsigned int pSHA256InitState[8] =
-        {0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19};
-
-void SHA256Transform(void* pstate, void* pinput, const void* pinit)
-{
-    SHA256_CTX ctx;
-    unsigned char data[64];
-
-    SHA256_Init(&ctx);
-
-    for (int i = 0; i < 16; i++)
-        ((uint32_t*)data)[i] = ByteReverse(((uint32_t*)pinput)[i]);
-
-    for (int i = 0; i < 8; i++)
-        ctx.h[i] = ((uint32_t*)pinit)[i];
-
-    SHA256_Update(&ctx, data, sizeof(data));
-    for (int i = 0; i < 8; i++)
-        ((uint32_t*)pstate)[i] = ctx.h[i];
-}
-
-
-void FormatHashBuffers(CBlock* pblock, char* pmidstate, char* pdata, char* phash1)
-{
-    //
-    // Pre-build hash buffers
-    //
-    struct
-    {
-        struct unnamed2
+    struct {
+        struct unnamed
         {
             int nVersion;
             uint256 hashPrevBlock;
@@ -89,13 +48,11 @@ void FormatHashBuffers(CBlock* pblock, char* pmidstate, char* pdata, char* phash
             unsigned int nTime;
             unsigned int nBits;
             unsigned int nNonce;
-        }
-                block;
-        unsigned char pchPadding0[64];
-        uint256 hash1;
-        unsigned char pchPadding1[64];
-    }
-            tmp;
+            uint256 hashStateRoot;
+            uint256 hashUTXORoot;
+        } block;
+    } tmp;
+
     memset(&tmp, 0, sizeof(tmp));
 
     tmp.block.nVersion       = pblock->nVersion;
@@ -104,19 +61,25 @@ void FormatHashBuffers(CBlock* pblock, char* pmidstate, char* pdata, char* phash
     tmp.block.nTime          = pblock->nTime;
     tmp.block.nBits          = pblock->nBits;
     tmp.block.nNonce         = pblock->nNonce;
-
-    FormatHashBlocks(&tmp.block, sizeof(tmp.block));
-    FormatHashBlocks(&tmp.hash1, sizeof(tmp.hash1));
+    // SC fields
+    tmp.block.hashStateRoot  = pblock->hashStateRoot;
+    tmp.block.hashUTXORoot   = pblock->hashUTXORoot;
 
     // Byte swap all the input buffer
     for (unsigned int i = 0; i < sizeof(tmp)/4; i++)
         ((unsigned int*)&tmp)[i] = ByteReverse(((unsigned int*)&tmp)[i]);
 
-    // Precalc the first half of the first hash, which stays constant
-    SHA256Transform(pmidstate, &tmp.block, pSHA256InitState);
+    // Precalc the first half of the first hash algo, which stays constant
+    // midstate requires cubehash on phi2, but this field is not used...
+    // sph_cubehash512_context ctx_cubehash;
+    // sph_cubehash512_init(&ctx_cubehash);
+    // sph_cubehash512(&ctx_cubehash, pdata, 64);
+    // memcpy(pmidstate, ctx_cubehash.state, 128);
 
-    memcpy(pdata, &tmp.block, 128);
-    memcpy(phash1, &tmp.hash1, 64);
+    if (tmp.block.nVersion & (1 << 30))
+        memcpy(pdata, &tmp.block, 144);
+    else
+        memcpy(pdata, &tmp.block, 80);
 }
 
 //////////////////////////////////////////////////////////////////////////////

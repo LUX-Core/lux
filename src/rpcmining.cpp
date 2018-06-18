@@ -257,6 +257,7 @@ UniValue getmininginfo(const UniValue& params, bool fHelp)
     obj.push_back(Pair("testnet", Params().NetworkIDString() != "main"));
     obj.push_back(Pair("chain", Params().NetworkIDString()));
 #ifdef ENABLE_WALLET
+    obj.push_back(Pair("segwit", IsWitnessEnabled(chainActive.Tip(), Params().GetConsensus()) ));
     obj.push_back(Pair("generate", getgenerate(params, false)));
     obj.push_back(Pair("hashespersec", gethashespersec(params, false)));
 #endif
@@ -782,7 +783,6 @@ UniValue getwork(const UniValue& params, bool fHelp) {
                 "If [data] is not specified, returns formatted hash data to work on:\n"
                 "  \"midstate\" : precomputed hash state after hashing the first half of the data (DEPRECATED)\n" // deprecated
                 "  \"data\" : block data\n"
-                "  \"hash1\" : formatted hash buffer for second hash (DEPRECATED)\n" // deprecated
                 "  \"target\" : little endian hash target\n"
                 "If [data] is specified, tries to solve the block and returns true if it was successful.");
 
@@ -857,29 +857,29 @@ UniValue getwork(const UniValue& params, bool fHelp) {
         // Save
         mapNewBlock[pblock->hashMerkleRoot] = make_pair(pblock, pblock->vtx[0].vin[0].scriptSig);
 
-        // Pre-build hash buffers
-        char pmidstate[32];
-        char pdata[128];
-        char phash1[64];
-        FormatHashBuffers(pblock, pmidstate, pdata, phash1);
+        char pmidstate[128] = { 0 };
+        char pdata[144] = { 0 };
+        FormatHashBuffers(pblock, pmidstate, pdata);
 
         uint256 hashTarget = uint256().SetCompact(pblock->nBits);
 
         UniValue result(UniValue::VOBJ);
-        result.push_back(Pair("midstate", HexStr(BEGIN(pmidstate), END(pmidstate)))); // deprecated
-        result.push_back(Pair("data",     HexStr(BEGIN(pdata), END(pdata))));
-        result.push_back(Pair("hash1",    HexStr(BEGIN(phash1), END(phash1)))); // deprecated
+        //result.push_back(Pair("midstate", HexStr(BEGIN(pmidstate), END(pmidstate)))); // deprecated
+        if (pblock->nVersion & (1 << 30))
+            result.push_back(Pair("data", HexStr(BEGIN(pdata), END(pdata))));
+        else
+            result.push_back(Pair("data", HexStr(BEGIN(pdata), &pdata[128])));
         result.push_back(Pair("target",   HexStr(BEGIN(hashTarget), END(hashTarget))));
         return result;
     } else {
         // Parse parameters
         vector<unsigned char> vchData = ParseHex(params[0].get_str());
-        if (vchData.size() != 128)
+        if (vchData.size() != 80 && vchData.size() != 128 && vchData.size() != 144)
             throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter");
-        CBlock* pdata = (CBlock*)&vchData[0];
 
+        CBlock* pdata = (CBlock*)&vchData[0];
         // Byte reverse
-        for (int i = 0; i < 128/4; i++)
+        for (size_t i = 0; i < vchData.size()/sizeof(unsigned int); i++)
             ((unsigned int*)pdata)[i] = ByteReverse(((unsigned int*)pdata)[i]);
 
         // Get saved block
@@ -889,6 +889,11 @@ UniValue getwork(const UniValue& params, bool fHelp) {
 
         pblock->nTime = pdata->nTime;
         pblock->nNonce = pdata->nNonce;
+        if (pdata->nVersion & (1 << 30)) {
+            pblock->hashStateRoot = pdata->hashStateRoot;
+            pblock->hashUTXORoot = pdata->hashUTXORoot;
+        }
+
         CMutableTransaction newTx(pblock->vtx[0]);
         // Use CMutableTransaction when creating a new transaction instead of CTransaction.  CTransaction public variables are all const now.
         newTx.vin[0].scriptSig = mapNewBlock[pdata->hashMerkleRoot].second; // Oh, why? because vin is const in CTransaction now.
