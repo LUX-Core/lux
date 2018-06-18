@@ -71,12 +71,12 @@ void FormatHashBuffers(CBlock* pblock, char* pmidstate, char* pdata)
 
     // Precalc the first half of the first hash algo, which stays constant
     // midstate requires cubehash on phi2, but this field is not used...
-    // sph_cubehash512_context ctx_cubehash;
-    // sph_cubehash512_init(&ctx_cubehash);
-    // sph_cubehash512(&ctx_cubehash, pdata, 64);
-    // memcpy(pmidstate, ctx_cubehash.state, 128);
+    sph_cubehash512_context ctx_cubehash;
+    sph_cubehash512_init(&ctx_cubehash);
+    sph_cubehash512(&ctx_cubehash, pdata, 64);
+    memcpy(pmidstate, ctx_cubehash.state, 128);
 
-    if (tmp.block.nVersion & (1 << 30))
+    if (pblock->nVersion & (1 << 30))
         memcpy(pdata, &tmp.block, 144);
     else
         memcpy(pdata, &tmp.block, 80);

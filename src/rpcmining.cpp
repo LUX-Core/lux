@@ -868,7 +868,7 @@ UniValue getwork(const UniValue& params, bool fHelp) {
 
         UniValue result(UniValue::VOBJ);
         result.push_back(Pair("algo", chainActive.Height() > Params().SwitchPhi2Block() ? "phi2" : "phi1612"));
-        //result.push_back(Pair("midstate", HexStr(BEGIN(pmidstate), END(pmidstate)))); // deprecated
+        result.push_back(Pair("midstate", HexStr(BEGIN(pmidstate), END(pmidstate))));
         if (pblock->nVersion & (1 << 30))
             result.push_back(Pair("data", HexStr(BEGIN(pdata), END(pdata))));
         else
