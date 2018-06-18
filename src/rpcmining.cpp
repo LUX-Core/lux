@@ -355,7 +355,9 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
             "      ,...\n"
             "  },\n"
             "  \"vbrequired\" : n,                 (numeric) bit mask of versionbits the server requires set in submissions\n"
-            "  \"previousblockhash\" : \"xxxx\",    (string) The hash of current highest block\n"
+            "  \"previousblockhash\" : \"xxxx\",     (string) The hash of current highest block\n"
+            "  \"stateroot\" : \"xxxx\",             (string) The state root hash of current block for smart contracts\n"
+            "  \"utxoroot\" : \"xxxx\",              (string) The UTXO root hash of current block for smart contracts\n"
             "  \"transactions\" : [                (array) contents of non-coinbase transactions that should be included in the next block\n"
             "      {\n"
             "         \"data\" : \"xxxx\",          (string) transaction data encoded in hexadecimal (byte-for-byte)\n"
@@ -720,6 +722,14 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
     }
 
     result.push_back(Pair("previousblockhash", pblock->hashPrevBlock.GetHex()));
+    if (pindexPrev->nHeight + 1 >= Params().FirstSCBlock()) {
+        result.push_back(Pair("stateroot", pblock->hashStateRoot.GetHex()));
+        result.push_back(Pair("utxoroot", pblock->hashUTXORoot.GetHex()));
+    } else {
+        // not added in gbt for pre-sc testnet compatibility (80 bytes header)
+        //result.push_back(Pair("stateroot", uint256(0).GetHex()));
+        //result.push_back(Pair("utxoroot", uint256(0).GetHex()));
+    }
     result.push_back(Pair("transactions", transactions));
     result.push_back(Pair("coinbaseaux", aux));
     result.push_back(Pair("coinbasevalue", (int64_t)pblock->vtx[0].GetValueOut()));
