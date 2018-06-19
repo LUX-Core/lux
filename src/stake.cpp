@@ -455,7 +455,7 @@ bool Stake::CheckProof(CBlockIndex* const pindexPrev, const CBlock &block, uint2
     CTransaction txPrev;
     const Consensus::Params& consensusparams = Params().GetConsensus();
     if (!GetTransaction(txin.prevout.hash, txPrev, consensusparams, prevBlockHash, true))
-        return error("%s: read txPrev failed");
+        return error("%s: read txPrev failed", __func__);
 
     //verify signature and script
     const CAmount& amount = txPrev.vout[txin.prevout.n].nValue;
