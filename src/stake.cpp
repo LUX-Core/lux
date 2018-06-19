@@ -846,7 +846,7 @@ bool Stake::CreateCoinStake(CWallet *wallet, const CKeyStore& keystore, unsigned
 
         CTxDestination txDest;
         ExtractDestination(payeeScript, txDest);
-        LogPrintf("%s: Masternode payment to %s (pos)\n", __func__, EncodeDestination(txDest));
+        if (fDebug) LogPrintf("%s: Masternode payment to %s (pos)\n", __func__, EncodeDestination(txDest));
     }
 
     int64_t blockValue = nCredit;
