@@ -257,7 +257,7 @@ UniValue getmininginfo(const UniValue& params, bool fHelp)
     obj.push_back(Pair("pooledtx", (uint64_t)mempool.size()));
     obj.push_back(Pair("testnet", Params().NetworkIDString() != "main"));
     obj.push_back(Pair("chain", Params().NetworkIDString()));
-    obj.push_back(Pair("algo", chainActive.Height() > Params().SwitchPhi2Block() ? "phi2" : "phi1612"));
+    obj.push_back(Pair("algo", (chainActive.Height()+1) < Params().SwitchPhi2Block() ? "phi1612" : "phi2"));
 #ifdef ENABLE_WALLET
     obj.push_back(Pair("segwit", IsWitnessEnabled(chainActive.Tip(), Params().GetConsensus()) ));
     obj.push_back(Pair("generate", getgenerate(params, false)));
@@ -861,7 +861,7 @@ UniValue getwork(const UniValue& params, bool fHelp) {
         uint256 hashTarget = uint256().SetCompact(pblock->nBits);
 
         UniValue result(UniValue::VOBJ);
-        result.push_back(Pair("algo", chainActive.Height() > Params().SwitchPhi2Block() ? "phi2" : "phi1612"));
+        result.push_back(Pair("algo", (chainActive.Height()+1) < Params().SwitchPhi2Block() ? "phi1612" : "phi2"));
         result.push_back(Pair("midstate", HexStr(BEGIN(pmidstate), END(pmidstate))));
         if (pblock->nVersion & (1 << 30))
             result.push_back(Pair("data", HexStr(BEGIN(pdata), END(pdata))));
