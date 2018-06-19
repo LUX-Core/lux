@@ -402,8 +402,8 @@ elif test x$TARGET_OS = xdarwin; then
 	CPPFLAGS="-Wno-inconsistent-missing-override -Wno-unknown-pragmas -Wno-implicit-fallthrough $CPPFLAGS -DLUX_BUILD"
 	CXXFLAGS="-Wno-inconsistent-missing-override -Wno-unknown-pragmas -Wno-implicit-fallthrough $CXXFLAGS"
 else
-	CPPFLAGS="-Wno-unknown-pragmas -Wno-implicit-fallthrough $CPPFLAGS -DLUX_BUILD"
-	CXXFLAGS="-Wno-unknown-pragmas -Wno-implicit-fallthrough $CXXFLAGS"
+	CPPFLAGS="-Wno-unknown-pragmas -Wno-deprecated -Wno-implicit-fallthrough $CPPFLAGS -DLUX_BUILD"
+	CXXFLAGS="-Wno-unknown-pragmas $CXXFLAGS"
 fi
 
 
