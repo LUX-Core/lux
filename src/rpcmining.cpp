@@ -325,6 +325,8 @@ std::string gbt_vb_name(const Consensus::DeploymentPos pos) {
     return s;
 }
 
+extern void UpdateUncommittedBlockStructures(CBlock& block, const CBlockIndex* pindexPrev, const Consensus::Params& consensusParams);
+
 UniValue getblocktemplate(const UniValue& params, bool fHelp)
 {
     if (fHelp || params.size() > 1)
@@ -455,6 +457,11 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
             // TestBlockValidity only supports blocks built on the current Tip
             if (block.hashPrevBlock != pindexPrev->GetBlockHash())
                 return "inconclusive-not-best-prevblk";
+
+            if (block.vtx[0].wit.vtxinwit.size() < 1) {
+                UpdateUncommittedBlockStructures(block, pindexPrev, Params().GetConsensus());
+            }
+
             CValidationState state;
             TestBlockValidity(state, Params(), block, pindexPrev, false, true);
             return BIP22ValidationResult(state);
@@ -950,8 +957,10 @@ UniValue submitblock(const UniValue& params, bool fHelp)
     {
         LOCK(cs_main);
         CBlockIndex* pindexPrev = LookupBlockIndex(block.hashPrevBlock);
-        usePhi2 = pindexPrev ? pindexPrev->nHeight + 1 >= Params().SwitchPhi2Block() : false;
-
+            usePhi2 = pindexPrev ? pindexPrev->nHeight + 1 >= Params().SwitchPhi2Block() : false;
+            if (block.vtx[0].wit.vtxinwit.size() < 1) {
+                UpdateUncommittedBlockStructures(block, pindexPrev, Params().GetConsensus());
+            }
         uint256 hash = block.GetHash(usePhi2);
         fBlockPresent = false;
 
