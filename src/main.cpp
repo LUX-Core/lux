@@ -2713,7 +2713,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
 
     ////////////////////////////////////////////////////////////////// // lux
     if (pindex->nHeight >= Params().FirstSCBlock()) {
-        checkBlock.hashMerkleRoot = checkBlock.BuildMerkleTree();
+        checkBlock.hashMerkleRoot = BlockMerkleRoot(checkBlock);
         checkBlock.hashStateRoot = h256Touint(globalState->rootHash());
         checkBlock.hashUTXORoot = h256Touint(globalState->rootHashUTXO());
 
@@ -3736,8 +3736,13 @@ bool CheckBlockHeader(const CBlockHeader& block, CValidationState& state, const 
     // Get prev block index
     bool usePhi2 = false;
     BlockMap::iterator mi = mapBlockIndex.find(block.hashPrevBlock);
+    int nBlockHeight = 0;
     if (mi != mapBlockIndex.end()) {
-        usePhi2 = mi->second->nHeight + 1 >= Params().SwitchPhi2Block();
+        nBlockHeight = mi->second->nHeight + 1;
+        usePhi2 = nBlockHeight >= Params().SwitchPhi2Block();
+        if (nBlockHeight >= Params().FirstSCBlock() && (block.hashStateRoot == uint256(0) || block.hashUTXORoot == uint256(0))) {
+            return error("utxo root or state root uninitialized after smart-contract hardfork");
+        }
     }
 
     // Check proof of work matches claimed amount
@@ -3773,7 +3778,7 @@ bool CheckBlock(const CBlock& block, CValidationState& state, const Consensus::P
     // Check the merkle root.
     if (fCheckMerkleRoot) {
         bool mutated;
-        uint256 hashMerkleRoot2 = block.BuildMerkleTree(&mutated);
+        uint256 hashMerkleRoot2 = BlockMerkleRoot(block, &mutated);
         if (block.hashMerkleRoot != hashMerkleRoot2)
             return state.DoS(100, error("%s: invalid merkle root", __func__),
                 REJECT_INVALID, "bad-txnmrklroot", true);
