@@ -109,9 +109,8 @@ void TxToJSON(const CTransaction& tx, const uint256 hashBlock, UniValue& entry)
 
     if (hashBlock != uint256()) {
         entry.push_back(Pair("blockhash", hashBlock.GetHex()));
-        BlockMap::iterator mi = mapBlockIndex.find(hashBlock);
-        if (mi != mapBlockIndex.end() && (*mi).second) {
-            CBlockIndex* pindex = (*mi).second;
+        CBlockIndex* pindex = LookupBlockIndex(hashBlock);
+        if (pindex) {
             if (chainActive.Contains(pindex)) {
                 entry.push_back(Pair("confirmations", 1 + chainActive.Height() - pindex->nHeight));
                 entry.push_back(Pair("time", pindex->GetBlockTime()));

@@ -463,11 +463,8 @@ bool Stake::CheckProof(CBlockIndex* const pindexPrev, const CBlock &block, uint2
     if (!fIsVerified)
         return error("%s: VerifySignature failed on coinstake %s", __func__, tx.GetHash().ToString().c_str());
 
-    CBlockIndex* pindex = NULL;
-    BlockMap::iterator it = mapBlockIndex.find(prevBlockHash);
-    if (it != mapBlockIndex.end())
-        pindex = it->second;
-    else
+    CBlockIndex* pindex = LookupBlockIndex(prevBlockHash);
+    if (!pindex)
         return error("%s: read block failed", __func__);
 
     // Read block header
@@ -725,11 +722,8 @@ bool Stake::CreateCoinStake(CWallet *wallet, const CKeyStore& keystore, unsigned
     const CBlockIndex* pIndex0 = chainActive.Tip();
     BOOST_FOREACH (PAIRTYPE(const CWalletTx*, unsigned int) pcoin, stakeCoins) {
         //make sure that enough time has elapsed between
-        CBlockIndex* pindex = NULL;
-        BlockMap::iterator it = mapBlockIndex.find(pcoin.first->hashBlock);
-        if (it != mapBlockIndex.end()) {
-            pindex = it->second;
-        } else {
+        CBlockIndex* pindex = LookupBlockIndex(pcoin.first->hashBlock);
+        if (!pindex) {
             if (fDebug)
                 LogPrintf("%s: failed to find block index \n", __func__);
             continue;
@@ -952,10 +946,11 @@ bool Stake::GenBlockStake(CWallet *wallet, const CReserveKey &key, unsigned int 
 
     SetThreadPriority(THREAD_PRIORITY_NORMAL);
 
-    BlockMap::iterator prev_block_it = mapBlockIndex.find(block->hashPrevBlock);
-    bool usePhi2 = false;
-    if (prev_block_it != mapBlockIndex.end()) {
-        usePhi2 = prev_block_it->second->nHeight + 1 >= Params().SwitchPhi2Block();
+    bool usePhi2;
+    {
+        LOCK(cs_main);
+        CBlockIndex* pindexPrev = LookupBlockIndex(block->hashPrevBlock);
+        usePhi2 = pindexPrev ? pindexPrev->nHeight + 1 >= Params().SwitchPhi2Block() : false;
     }
 
     bool result = true;

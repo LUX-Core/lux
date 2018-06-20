@@ -353,12 +353,10 @@ std::string TxToString(uint256 BlockHash, const CTransaction& tx)
             _("Hash"), "<pre>" + Hash + "</pre>",
         };
 
-    // std::map<uint256, CBlockIndex*>::iterator iter = mapBlockIndex.find(BlockHash);
-    BlockMap::iterator iter = mapBlockIndex.find(BlockHash);
-    if (iter != mapBlockIndex.end()) {
-        CBlockIndex* pIndex = iter->second;
-        Labels[0 * 2 + 1] = makeHRef(itostr(pIndex->nHeight));
-        Labels[5 * 2 + 1] = TimeToString(pIndex->nTime);
+    CBlockIndex* pindex = LookupBlockIndex(BlockHash);
+    if (pindex) {
+        Labels[0 * 2 + 1] = makeHRef(itostr(pindex->nHeight));
+        Labels[5 * 2 + 1] = TimeToString(pindex->nTime);
     }
 
     std::string Content;
@@ -496,10 +494,9 @@ bool BlockExplorer::switchTo(const QString& query)
     // If the query is not an integer, assume it is a block hash
     uint256 hash = uint256S(query.toUtf8().constData());
 
-    // std::map<uint256, CBlockIndex*>::iterator iter = mapBlockIndex.find(hash);
-    BlockMap::iterator iter = mapBlockIndex.find(hash);
-    if (iter != mapBlockIndex.end()) {
-        setBlock(iter->second);
+    CBlockIndex* pindex = LookupBlockIndex(hash);
+    if (pindex) {
+        setBlock(pindex);
         return true;
     }
 

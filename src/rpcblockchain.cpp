@@ -702,8 +702,7 @@ UniValue gettxout(const UniValue& params, bool fHelp)
         }
     }
 
-    BlockMap::iterator it = mapBlockIndex.find(pcoinsTip->GetBestBlock());
-    CBlockIndex* pindex = it->second;
+    CBlockIndex* pindex = LookupBlockIndex(pcoinsTip->GetBestBlock());
     ret.push_back(Pair("bestblock", pindex->GetBlockHash().GetHex()));
     if ((unsigned int)coins.nHeight == MEMPOOL_HEIGHT)
         ret.push_back(Pair("confirmations", 0));

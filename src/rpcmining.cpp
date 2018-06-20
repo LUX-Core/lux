@@ -438,18 +438,12 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
             if (!DecodeHexBlk(block, dataval.get_str()))
                 throw JSONRPCError(RPC_DESERIALIZATION_ERROR, "Block decode failed");
 
-            BlockMap::iterator prevBlockIt = mapBlockIndex.find(block.hashPrevBlock);
-            bool usePhi2 = false;
-            if (prevBlockIt != mapBlockIndex.end()) {
-                if (prevBlockIt->second->nHeight + 1 >= Params().SwitchPhi2Block()) {
-                    usePhi2 = true;
-                }
-            }
+            CBlockIndex* pindexPrev = LookupBlockIndex(block.hashPrevBlock);
+            bool usePhi2 = pindexPrev ? pindexPrev->nHeight + 1 >= Params().SwitchPhi2Block() : false;
 
             uint256 hash = block.GetHash(usePhi2);
-            BlockMap::iterator mi = mapBlockIndex.find(hash);
-            if (mi != mapBlockIndex.end()) {
-                CBlockIndex* pindex = mi->second;
+            CBlockIndex* pindex = LookupBlockIndex(hash);
+            if (pindex) {
                 if (pindex->IsValid(BLOCK_VALID_SCRIPTS))
                     return "duplicate";
                 if (pindex->nStatus & BLOCK_FAILED_MASK)
@@ -457,7 +451,7 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
                 return "duplicate-inconclusive";
             }
 
-            CBlockIndex* const pindexPrev = chainActive.Tip();
+            pindexPrev = chainActive.Tip();
             // TestBlockValidity only supports blocks built on the current Tip
             if (block.hashPrevBlock != pindexPrev->GetBlockHash())
                 return "inconclusive-not-best-prevblk";
@@ -952,21 +946,17 @@ UniValue submitblock(const UniValue& params, bool fHelp)
     if (!DecodeHexBlk(block, params[0].get_str()))
         throw JSONRPCError(RPC_DESERIALIZATION_ERROR, "Block decode failed");
 
-    BlockMap::iterator prevBlockIt = mapBlockIndex.find(block.hashPrevBlock);
-    bool usePhi2 = false;
-    if (prevBlockIt != mapBlockIndex.end()) {
-        if (prevBlockIt->second->nHeight + 1 >= Params().SwitchPhi2Block()) {
-            usePhi2 = true;
-        }
-    }
-
-    uint256 hash = block.GetHash(usePhi2);
-    bool fBlockPresent = false;
+    bool usePhi2, fBlockPresent;
     {
         LOCK(cs_main);
-        BlockMap::iterator mi = mapBlockIndex.find(hash);
-        if (mi != mapBlockIndex.end()) {
-            CBlockIndex* pindex = mi->second;
+        CBlockIndex* pindexPrev = LookupBlockIndex(block.hashPrevBlock);
+        usePhi2 = pindexPrev ? pindexPrev->nHeight + 1 >= Params().SwitchPhi2Block() : false;
+
+        uint256 hash = block.GetHash(usePhi2);
+        fBlockPresent = false;
+
+        CBlockIndex* pindex = LookupBlockIndex(hash);
+        if (pindex) {
             if (pindex->IsValid(BLOCK_VALID_SCRIPTS))
                 return "duplicate";
             if (pindex->nStatus & BLOCK_FAILED_MASK)

@@ -1569,9 +1569,7 @@ UniValue listsinceblock(const UniValue& params, bool fHelp)
         uint256 blockId = uint256();
 
         blockId.SetHex(params[0].get_str());
-        BlockMap::iterator it = mapBlockIndex.find(blockId);
-        if (it != mapBlockIndex.end())
-            pindex = it->second;
+        pindex = LookupBlockIndex(blockId);
     }
 
     if (params.size() > 1) {

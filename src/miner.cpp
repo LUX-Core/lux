@@ -1011,10 +1011,11 @@ bool ProcessBlockFound(CBlock* pblock, CWallet& wallet, CReserveKey& reservekey)
     // Remove key from key pool
     reservekey.KeepKey();
 
-    BlockMap::iterator prev_block_it = mapBlockIndex.find(pblock->hashPrevBlock);
-    bool usePhi2 = false;
-    if (prev_block_it != mapBlockIndex.end()) {
-        usePhi2 = prev_block_it->second->nHeight + 1 >= Params().SwitchPhi2Block();
+    bool usePhi2;
+    {
+        LOCK(cs_main);
+        CBlockIndex* pindexPrev = LookupBlockIndex(pblock->hashPrevBlock);
+        usePhi2 = pindexPrev ? pindexPrev->nHeight + 1 >= Params().SwitchPhi2Block() : false;
     }
 
     // Track how many getdata requests this block gets
