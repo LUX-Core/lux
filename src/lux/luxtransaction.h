@@ -21,7 +21,8 @@ struct VersionVM{
         return *(uint32_t*)this;
     }
     static VersionVM fromRaw(uint32_t val){
-        VersionVM x = *(VersionVM*)&val;
+        VersionVM x;
+        memcpy(&x, &val, sizeof(uint32_t));
         return x;
     }
     static VersionVM GetNoExec(){
