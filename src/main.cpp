@@ -3729,7 +3729,7 @@ bool CheckBlockHeader(const CBlockHeader& block, CValidationState& state, const 
     if (pindexPrev) {
         nBlockHeight = pindexPrev->nHeight + 1;
         usePhi2 = nBlockHeight >= chainparams.SwitchPhi2Block();
-        bool isScVersioned = block.nVersion & consensusParams.vDeployments[Consensus::SMART_CONTRACTS_HARDFORK].bit;
+        bool isScVersioned = block.nVersion & (1 << consensusParams.vDeployments[Consensus::SMART_CONTRACTS_HARDFORK].bit);
         if (nBlockHeight >= chainparams.FirstSCBlock() && !isScVersioned) {
             return error("invalid block version after smart-contract hardfork");
         }
