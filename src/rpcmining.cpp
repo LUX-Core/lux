@@ -325,8 +325,6 @@ std::string gbt_vb_name(const Consensus::DeploymentPos pos) {
     return s;
 }
 
-extern void UpdateUncommittedBlockStructures(CBlock& block, const CBlockIndex* pindexPrev, const Consensus::Params& consensusParams);
-
 UniValue getblocktemplate(const UniValue& params, bool fHelp)
 {
     if (fHelp || params.size() > 1)
@@ -953,17 +951,14 @@ UniValue submitblock(const UniValue& params, bool fHelp)
     if (!DecodeHexBlk(block, params[0].get_str()))
         throw JSONRPCError(RPC_DESERIALIZATION_ERROR, "Block decode failed");
 
-    bool usePhi2, fBlockPresent;
+    bool usePhi2, fBlockPresent = false;
     {
         LOCK(cs_main);
         CBlockIndex* pindexPrev = LookupBlockIndex(block.hashPrevBlock);
-            usePhi2 = pindexPrev ? pindexPrev->nHeight + 1 >= Params().SwitchPhi2Block() : false;
-            if (block.vtx[0].wit.vtxinwit.size() < 1) {
-                UpdateUncommittedBlockStructures(block, pindexPrev, Params().GetConsensus());
-            }
-        uint256 hash = block.GetHash(usePhi2);
-        fBlockPresent = false;
+        UpdateUncommittedBlockStructures(block, pindexPrev, Params().GetConsensus());
 
+        usePhi2 = pindexPrev ? pindexPrev->nHeight + 1 >= Params().SwitchPhi2Block() : false;
+        uint256 hash = block.GetHash(usePhi2);
         CBlockIndex* pindex = LookupBlockIndex(hash);
         if (pindex) {
             if (pindex->IsValid(BLOCK_VALID_SCRIPTS))
