@@ -3724,9 +3724,18 @@ bool CheckBlockHeader(const CBlockHeader& block, CValidationState& state, const 
     // Get prev block index
     bool usePhi2 = false;
     int nBlockHeight = 0;
+    const CChainParams& chainparams = Params();
     CBlockIndex* pindexPrev = LookupBlockIndex(block.hashPrevBlock);
     if (pindexPrev) {
-        usePhi2 = pindexPrev->nHeight + 1 >= Params().SwitchPhi2Block();
+        nBlockHeight = pindexPrev->nHeight + 1;
+        usePhi2 = nBlockHeight >= chainparams.SwitchPhi2Block();
+        bool isScVersioned = block.nVersion & consensusParams.vDeployments[Consensus::SMART_CONTRACTS_HARDFORK].bit;
+        if (nBlockHeight >= chainparams.FirstSCBlock() && !isScVersioned) {
+            return error("invalid block version after smart-contract hardfork");
+        }
+        if (nBlockHeight >= chainparams.FirstSCBlock() && (block.hashStateRoot == uint256(0) || block.hashUTXORoot == uint256(0))) {
+            return error("utxo root or state root uninitialized after smart-contract hardfork");
+        }
     }
 
     // Check proof of work matches claimed amount
@@ -5489,6 +5498,30 @@ uint32_t GetFetchFlags(CNode* pfrom, CBlockIndex* pprev, const Consensus::Params
     return nFetchFlags;
 }
 
+/**
+ * Parses major version from version string.
+ *
+ * Version string is expected to be [any text]:X.X[.X[any text]].
+ * As an example, Luxcore uses /Luxcore:X.X.X/ version string. So, this function will
+ * return 5 for /Luxcore:5.0.0/ or 0 if it couldn't find ":" or "." delimeters, or if no digits are between
+ * those delimeters, or if string verison is empty
+ * @param cleanVersion Luxcore wallet version as a string
+ * @return Major Luxcore major version or 0
+ */
+int GetMajorVersionFromVersion(const string& cleanVersion) {
+    size_t delimPos = cleanVersion.find(":");
+    size_t dotPos = cleanVersion.find(".", delimPos + 1);
+    if (delimPos != string::npos && dotPos != string::npos && dotPos < cleanVersion.length()) {
+        string strMajorVer = cleanVersion.substr(delimPos + 1, dotPos - delimPos);
+        istringstream ss(strMajorVer);
+        int majorVersion;
+        ss >> majorVersion;
+        return majorVersion;
+    } else {
+        return 0;
+    }
+}
+
 static bool ProcessMessage(CNode* pfrom, const string &strCommand, CDataStream& vRecv, int64_t nTimeReceived, const CChainParams& chainparams)
 {
     RandAddSeedPerfmon();
@@ -5499,6 +5532,13 @@ static bool ProcessMessage(CNode* pfrom, const string &strCommand, CDataStream& 
     if (mapArgs.count("-dropmessagestest") && GetRand(atoi(mapArgs["-dropmessagestest"])) == 0) {
         LogPrintf("dropmessagestest DROPPING RECV MESSAGE\n");
         return true;
+    }
+
+    //reject any message from not upgraded peer, which has already sent us their version, if current chain is after the hardfork
+    if (pfrom->cleanSubVer != "" && GetMajorVersionFromVersion(pfrom->cleanSubVer) < CLIENT_VERSION_MAJOR && chainActive.Height() >= chainparams.SwitchPhi2Block()) {
+        pfrom->PushMessage("reject", strCommand, REJECT_OBSOLETE);
+        pfrom->fDisconnect = true;
+        return false;
     }
 
     if (strCommand == "version") {
@@ -5540,6 +5580,12 @@ static bool ProcessMessage(CNode* pfrom, const string &strCommand, CDataStream& 
         if (!vRecv.empty()) {
             vRecv >> LIMITED_STRING(pfrom->strSubVer, 256);
             pfrom->cleanSubVer = SanitizeString(pfrom->strSubVer);
+        }
+        //disconnect nodes, which are not upgraded, but the current best block is after hardfork
+        if (GetMajorVersionFromVersion(pfrom->cleanSubVer) < CLIENT_VERSION_MAJOR && chainActive.Height() >= chainparams.SwitchPhi2Block()) {
+            pfrom->PushMessage("reject", strCommand, REJECT_OBSOLETE);
+            pfrom->fDisconnect = true;
+            return false;
         }
         if (!vRecv.empty())
             vRecv >> pfrom->nStartingHeight;
