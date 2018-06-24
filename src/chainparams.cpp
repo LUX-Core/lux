@@ -148,12 +148,12 @@ public:
         consensus.nLastPOWBlock = 6000000;
         // Deployment of SegWit (BIP141 and BIP143)
         consensus.vDeployments[Consensus::DEPLOYMENT_SEGWIT].bit = 1;
-        consensus.vDeployments[Consensus::DEPLOYMENT_SEGWIT].nStartTime = 1529469440;
-        consensus.vDeployments[Consensus::DEPLOYMENT_SEGWIT].nTimeout = 1557187200; // TODO: ?? - just some random date - 05.07.2019
-        //TODO: set CSV parameters for mainnet
+        consensus.vDeployments[Consensus::DEPLOYMENT_SEGWIT].nStartTime = 1530428034; // 01/07/2018
+        consensus.vDeployments[Consensus::DEPLOYMENT_SEGWIT].nTimeout = 1561964034; // 01/07/2019
+
         consensus.vDeployments[Consensus::DEPLOYMENT_CSV].bit = 0;
-        consensus.vDeployments[Consensus::DEPLOYMENT_CSV].nStartTime = 1529469440;
-        consensus.vDeployments[Consensus::DEPLOYMENT_CSV].nTimeout = 1557187200; // TODO: ?? - just some random date - 05.07.2019
+        consensus.vDeployments[Consensus::DEPLOYMENT_CSV].nStartTime = 1530428034; // 01/07/2018
+        consensus.vDeployments[Consensus::DEPLOYMENT_CSV].nTimeout = 1561964034; // 01/07/2019
 
         //SMART_CONTRACTS_HARDFORK deployment does not require start time and timeout, because it uses block number
         //This is not used now, because we need to check this bit in block.h using versionbits, which results in cyclic
@@ -162,7 +162,7 @@ public:
         consensus.vDeployments[Consensus::SMART_CONTRACTS_HARDFORK].bit = 30;
 
         nSwitchPhi2Block = 300000;
-        nFirstSCBlock = 300000;
+        nFirstSCBlock = 400000;
         nPruneAfterHeight = 300000;
         nSplitRewardBlock = 300000;
 
@@ -176,7 +176,7 @@ public:
         pchMessageStart[2] = 0xc9;
         pchMessageStart[3] = 0xa7;
         vAlertPubKey = ParseHex("042d13c016ed91528241bcff222989769417eb10cdb679228c91e26e26900eb9fd053cd9f16a9a2894ad5ebbd551be1a4bd23bd55023679be17f0bd3a16e6fbeba");
-        nDefaultPort = /*28666*/ /*26868*/ 16120;
+        nDefaultPort = 16120;
         nMaxReorganizationDepth = 100;
         nMinerThreads = 0;
         nMaturity = 79;
@@ -195,7 +195,7 @@ public:
 
         genesis.vtx.push_back(txNew);
         genesis.hashPrevBlock = 0;
-        genesis.hashMerkleRoot = genesis.BuildMerkleTree();
+        genesis.hashMerkleRoot = BlockMerkleRoot(genesis);
         genesis.nVersion = 1;
         genesis.nTime = 1507656633; //10/10/2017
         genesis.nBits = 0x1e0fffff;
@@ -208,24 +208,13 @@ public:
         assert(consensus.hashGenesisBlock == uint256("0x00000759bb3da130d7c9aedae170da8335f5a0d01a9007e4c8d3ccd08ace6a42"));
         assert(genesis.hashMerkleRoot == uint256("0xe08ae0cfc35a1d70e6764f347fdc54355206adeb382446dd54c32cd0201000d3"));
 
-        #if 0
-        vSeeds.push_back(CDNSSeedData("luxseed1.luxcore.io", "luxseed1.luxcore.io")); // DNSSeed
-        vSeeds.push_back(CDNSSeedData("luxseed2.luxcore.io", "luxseed2.luxcore.io")); // DNSSeed
-        vSeeds.push_back(CDNSSeedData("luxseed3.luxcore.io", "luxseed3.luxcore.io")); // DNSSeed
-        vSeeds.push_back(CDNSSeedData("luxseed4.luxcore.io", "luxseed4.luxcore.io")); // DNSSeed
-        vSeeds.push_back(CDNSSeedData("209.250.254.156", "209.250.254.156")); // Non-standard DNS request
-        vSeeds.push_back(CDNSSeedData("45.76.114.209", "45.76.114.209")); // Non-standard DNS request
-        vSeeds.push_back(CDNSSeedData("5.189.142.181", "5.189.142.181")); // Non-standard DNS request
-        //vSeeds.push_back(CDNSSeedData("5.77.44.147", "5.77.44.147")); // Non-standard DNS request
-        #endif
-
-        vSeeds.push_back(CDNSSeedData("45.77.238.204", "45.77.238.204")); // Non-standard DNS request
-        vSeeds.push_back(CDNSSeedData("149.28.164.12", "149.28.164.12")); // Non-standard DNS request
-        vSeeds.push_back(CDNSSeedData("149.28.166.108", "149.28.166.108")); // Non-standard DNS request
-        vSeeds.push_back(CDNSSeedData("45.76.112.169", "45.76.112.169")); // Non-standard DNS request
-        vSeeds.push_back(CDNSSeedData("149.28.165.193", "149.28.165.193")); // Non-standard DNS request
-        vSeeds.push_back(CDNSSeedData("45.32.188.164", "45.32.188.164")); // Non-standard DNS request
-        vSeeds.push_back(CDNSSeedData("149.28.169.58", "149.28.169.58")); // Non-standard DNS request
+        vSeeds.push_back(CDNSSeedData("45.76.124.11", "45.76.124.11"));     // Main seed
+        vSeeds.push_back(CDNSSeedData("45.77.236.142", "45.77.236.142"));   // Chain state seed
+        vSeeds.push_back(CDNSSeedData("45.76.122.71", "45.76.122.71"));     // Global state seed
+        vSeeds.push_back(CDNSSeedData("45.76.120.198", "45.76.120.198"));   // Global State seed
+        vSeeds.push_back(CDNSSeedData("107.191.56.29", "107.191.56.29"));   // Global state seed
+        vSeeds.push_back(CDNSSeedData("45.77.233.136", "45.77.233.136"));   // Global State seed
+        vSeeds.push_back(CDNSSeedData("149.28.167.166", "149.28.167.166")); // Global State seed
 
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,48); // LUX address start with 'L'
         base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1,63); // LUX script addresses start with 'S'
@@ -319,7 +308,7 @@ public:
         genesis.SetNull();
         genesis.vtx.push_back(txNew);
         genesis.hashPrevBlock = 0;
-        genesis.hashMerkleRoot = genesis.BuildMerkleTree();
+        genesis.hashMerkleRoot = BlockMerkleRoot(genesis);
         genesis.nVersion = 1;
         genesis.nTime = 1528954643; // 14 June 2018 @ 5:37am (UTC)
         genesis.nBits = 0x1e0fffff;
@@ -554,7 +543,7 @@ public:
 
         genesis.vtx.push_back(txNew);
         genesis.hashPrevBlock = 0;
-        genesis.hashMerkleRoot = genesis.BuildMerkleTree();
+        genesis.hashMerkleRoot = BlockMerkleRoot(genesis);
         genesis.nVersion = 1;
         genesis.nTime = 1524645689;
         genesis.nBits = 0x1e0fffff;
