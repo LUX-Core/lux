@@ -4257,6 +4257,10 @@ bool ProcessNewBlock(CValidationState& state, const CChainParams& chainparams, C
 
 #   endif
 
+        // Reject old fork chain block
+        if (pblock->GetHash() == uint256("0x251ef80e9ddb76de573ac3126fadddd1a3160dce03a93590c924b9f939c2890b"))
+            return error("%s: blacklisted blockhash %s", __func__, pblock->GetHash().GetHex());
+   
     CBlockIndex* pindex = NULL;
     while (true) {
         TRY_LOCK(cs_main, lockMain);

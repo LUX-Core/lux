@@ -177,7 +177,7 @@ public:
         pchMessageStart[2] = 0xc9;
         pchMessageStart[3] = 0xa7;
         vAlertPubKey = ParseHex("042d13c016ed91528241bcff222989769417eb10cdb679228c91e26e26900eb9fd053cd9f16a9a2894ad5ebbd551be1a4bd23bd55023679be17f0bd3a16e6fbeba");
-        nDefaultPort = 16120;
+        nDefaultPort = 16868;
         nMaxReorganizationDepth = 100;
         nMinerThreads = 0;
         nMaturity = 79;
@@ -209,13 +209,10 @@ public:
         assert(consensus.hashGenesisBlock == uint256("0x00000759bb3da130d7c9aedae170da8335f5a0d01a9007e4c8d3ccd08ace6a42"));
         assert(genesis.hashMerkleRoot == uint256("0xe08ae0cfc35a1d70e6764f347fdc54355206adeb382446dd54c32cd0201000d3"));
 
-        vSeeds.push_back(CDNSSeedData("45.76.124.11", "45.76.124.11"));     // Main seed
-        vSeeds.push_back(CDNSSeedData("45.77.236.142", "45.77.236.142"));   // Chain state seed
-        vSeeds.push_back(CDNSSeedData("45.76.122.71", "45.76.122.71"));     // Global state seed
-        vSeeds.push_back(CDNSSeedData("45.76.120.198", "45.76.120.198"));   // Global State seed
-        vSeeds.push_back(CDNSSeedData("107.191.56.29", "107.191.56.29"));   // Global state seed
-        vSeeds.push_back(CDNSSeedData("45.77.233.136", "45.77.233.136"));   // Global State seed
-        vSeeds.push_back(CDNSSeedData("149.28.167.166", "149.28.167.166")); // Global State seed
+        vSeeds.push_back(CDNSSeedData("149.28.163.40", "149.28.163.40"));        // Main seed
+        vSeeds.push_back(CDNSSeedData("207.148.83.62", "207.148.83.62"));        // Chain state seed
+        vSeeds.push_back(CDNSSeedData("207.148.81.88", "207.148.81.88"));        // Global state seed
+        vSeeds.push_back(CDNSSeedData("149.28.172.147", "149.28.172.147"));      // Main seed
 
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,48); // LUX address start with 'L'
         base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1,63); // LUX script addresses start with 'S'
