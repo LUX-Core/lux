@@ -28,18 +28,18 @@ fi
 
 #Double check whether we have the expected toolchain
 if [ ! -f $CC ]; then
-	CC=""
+    CC=""
     CXX=""
-	[ -f "/usr/bin/$PLATFORM-gcc" ] && CC="/usr/bin/$PLATFORM-gcc"
-	[ -f "/usr/bin/$PLATFORM-g++" ] && CXX="/usr/bin/$PLATFORM-g++"
+    [ -f "/usr/bin/$PLATFORM-gcc" ] && CC="/usr/bin/$PLATFORM-gcc"
+    [ -f "/usr/bin/$PLATFORM-g++" ] && CXX="/usr/bin/$PLATFORM-g++"
 else
     sudo update-alternatives --set $PLATFORM-gcc /usr/bin/$PLATFORM-gcc-posix
-	sudo update-alternatives --set $PLATFORM-g++ /usr/bin/$PLATFORM-g++-posix
+    sudo update-alternatives --set $PLATFORM-g++ /usr/bin/$PLATFORM-g++-posix
 fi
 
 if [ -z "$CC" ] || [ -z "$CXX" ]; then
-	echo "No expected toolchain existing. Quit compilation process"
-	exit
+    echo "No expected toolchain existing. Quit compilation process"
+    exit
 fi
 
 if [ -z "$(echo $JAVA_HOME)" ]; then
@@ -53,7 +53,7 @@ if [ ! -f "$JAVA_HOME/include/jni_md.h" ]; then
 fi
 
 # Make dependencies
-make HOST=$PLATFORM
+make HOST=$PLATFORM -j$(nproc)
 
 # Build from source code leveldb
 LEVELDB_DIR="../src/leveldb"
@@ -79,8 +79,13 @@ cd ..
 # Build the application
 make -j$(nproc)
 
+RELEASE="$OLD_PATH/Release"
+mkdir -p "$RELEASE"
+
 # Remove the symbols for release
-cd $INSTALL_DIR/bin
+[ -f "./src/qt/lux-qt.exe" ] && cp "./src/qt/lux-qt.exe" "$RELEASE"
+
+cd "$RELEASE"
 /usr/bin/$PLATFORM-strip *
 cd $OLD_PATH
 
