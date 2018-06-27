@@ -3804,21 +3804,26 @@ bool CheckForMasternodePayment(const CTransaction& tx, const CBlockHeader& heade
         }
     }
 
+    // Divide to keep a check precision of 0.01 LUX
+    totalReward /= 1000000;
+
     // during initial download (old blocks), only check the amounts, not via the "current" pub keys
     if (!hasMasternodePayment && tx.vout.size() >= 2) {
         BOOST_FOREACH(const CTxOut& txout, tx.vout) {
-            if (tx.IsCoinBase() && txout.nValue == (totalReward * 0.2f)) {
+            if (tx.IsCoinBase() && (txout.nValue/1000000) == (totalReward * 0.2f)) {
                 hasMasternodePayment = true;
                 masternodePayment = txout.nValue;
                 break;
             }
-            if (tx.IsCoinStake() && tx.vout.size() >= 3 && txout.nValue > 0 && txout.nValue <= (totalReward * 0.4f)) {
+            if (tx.IsCoinStake() && tx.vout.size() >= 3 && txout.nValue > 0 && (txout.nValue/1000000) <= (totalReward * 0.4f)) {
                 hasMasternodePayment = true;
                 masternodePayment = txout.nValue;
                 break;
             }
         }
     }
+
+    masternodePayment /= 1000000;
 
     // If tx is coinbase (PoW) and current height is after the hardfork, then tx should send 20% of the reward to a masternode
     if (tx.IsCoinBase()) {
@@ -3933,8 +3938,8 @@ bool CheckBlock(const CBlock& block, CValidationState& state, const Consensus::P
             LogPrint("debug", "%s: invalid transaction %s", __func__, tx.ToString());
             return error("%s: CheckTransaction failed (nTx=%d, reason: %s)", __func__, nTx, state.GetRejectReason());
         }
-        // ignore first PoS segwit tx for masternode checks
-        if (block.IsProofOfStake() && nTx == 0 && tx.wit.vtxinwit.size())
+        // ignore first PoS tx for masternode checks, this vout tx type is "nonstandard"
+        if (block.IsProofOfStake() && nTx == 0)
             continue;
 
         if (fCheckPOW && !CheckForMasternodePayment(tx, block)) {
