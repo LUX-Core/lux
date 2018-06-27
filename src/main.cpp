@@ -3805,7 +3805,7 @@ bool CheckForMasternodePayment(const CTransaction& tx, const CBlockHeader& heade
     }
 
     // during initial download (old blocks), only check the amounts, not via the "current" pub keys
-    if (!masternodePayment && tx.vout.size() >= 2) {
+    if (!hasMasternodePayment && tx.vout.size() >= 2) {
         BOOST_FOREACH(const CTxOut& txout, tx.vout) {
             if (tx.IsCoinBase() && txout.nValue == (totalReward * 0.2f)) {
                 hasMasternodePayment = true;
