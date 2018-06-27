@@ -3757,7 +3757,8 @@ bool CheckForMasternodePayment(const CTransaction& tx, const CBlockHeader& heade
         return true;
 
     const CBlockIndex* pindexPrev = LookupBlockIndex(header.hashPrevBlock);
-    bool usePhi2 = pindexPrev ? pindexPrev->nHeight + 1 >= chainParams.SwitchPhi2Block() : false;
+    const int nHeight = pindexPrev ? pindexPrev->nHeight + 1 : 0;
+    bool usePhi2 = nHeight >= chainParams.SwitchPhi2Block();
 
     // Check if a block is already accepted. These blocks cannot be checked for masternode payments,
     // because we don't know, which masternodes is active at that moment of accepting this block,
@@ -3771,6 +3772,9 @@ bool CheckForMasternodePayment(const CTransaction& tx, const CBlockHeader& heade
     uint32_t mnPaymentsStartDate = 0;
     if (chainParams.NetworkID() == CBaseChainParams::TESTNET/*|| chainParams.NetworkID() == CBaseChainParams::REGTEST*/) {
         mnPaymentsStartDate = START_MASTERNODE_PAYMENTS_TESTNET;
+        // avoid the few testnet blocks without reward due to temporary lack of online MN
+        if (nHeight == 3241 || nHeight == 3777 || nHeight == 5072) return true;
+        if (nHeight >= 7494 && nHeight <= 7660) return true;
     } else {
         mnPaymentsStartDate = START_MASTERNODE_PAYMENTS;
     }
@@ -3781,7 +3785,7 @@ bool CheckForMasternodePayment(const CTransaction& tx, const CBlockHeader& heade
     // Calculate total reward and find masternode payment txout
     CAmount totalReward = 0, masternodePayment = 0;
     if (tx.IsCoinStake()) {
-        totalReward = GetProofOfStakeReward(0, 0, pindexPrev->nHeight + 1);
+        totalReward = GetProofOfStakeReward(0, 0, nHeight);
     } else BOOST_FOREACH(const CTxOut& txout, tx.vout) {
         totalReward += txout.nValue;
     }
@@ -3805,17 +3809,19 @@ bool CheckForMasternodePayment(const CTransaction& tx, const CBlockHeader& heade
     }
 
     // Divide to keep a check precision of 0.01 LUX
-    totalReward /= 1000000;
+    const int nPrecision = 1000000;
+
+    totalReward /= nPrecision;
 
     // during initial download (old blocks), only check the amounts, not via the "current" pub keys
     if (!hasMasternodePayment && tx.vout.size() >= 2) {
         BOOST_FOREACH(const CTxOut& txout, tx.vout) {
-            if (tx.IsCoinBase() && (txout.nValue/1000000) == (totalReward * 0.2f)) {
+            if (tx.IsCoinBase() && (txout.nValue/nPrecision) == (totalReward * 0.2f)) {
                 hasMasternodePayment = true;
                 masternodePayment = txout.nValue;
                 break;
             }
-            if (tx.IsCoinStake() && tx.vout.size() >= 3 && txout.nValue > 0 && (txout.nValue/1000000) <= (totalReward * 0.4f)) {
+            if (tx.IsCoinStake() && tx.vout.size() >= 3 && txout.nValue > 0 && (txout.nValue/nPrecision) <= (totalReward * 0.4f)) {
                 hasMasternodePayment = true;
                 masternodePayment = txout.nValue;
                 break;
@@ -3823,11 +3829,11 @@ bool CheckForMasternodePayment(const CTransaction& tx, const CBlockHeader& heade
         }
     }
 
-    masternodePayment /= 1000000;
+    masternodePayment /= nPrecision;
 
     // If tx is coinbase (PoW) and current height is after the hardfork, then tx should send 20% of the reward to a masternode
     if (tx.IsCoinBase()) {
-        if (pindexPrev->nHeight + 1 < chainParams.FirstSplitRewardBlock())
+        if (nHeight < chainParams.FirstSplitRewardBlock())
             return true;
 
         // Tx is coinbase, PoW split reward is active, but no masternode payment is found or payment amount is null
@@ -3843,7 +3849,7 @@ bool CheckForMasternodePayment(const CTransaction& tx, const CBlockHeader& heade
         if (!hasMasternodePayment || masternodePayment == 0)
             return false;
 
-        if (pindexPrev->nHeight + 1 < chainParams.FirstSplitRewardBlock())
+        if (nHeight < chainParams.FirstSplitRewardBlock())
             return (totalReward * 0.4f) == masternodePayment;
         else
             return (totalReward * 0.2f) == masternodePayment;
