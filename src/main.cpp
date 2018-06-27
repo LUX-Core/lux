@@ -3778,22 +3778,45 @@ bool CheckForMasternodePayment(const CTransaction& tx, const CBlockHeader& heade
     if (header.nTime < mnPaymentsStartDate)
         return true;
 
+    // Calculate total reward and find masternode payment txout
+    CAmount totalReward = 0, masternodePayment = 0;
+    if (tx.IsCoinStake()) {
+        totalReward = GetProofOfStakeReward(0, 0, pindexPrev->nHeight + 1);
+    } else BOOST_FOREACH(const CTxOut& txout, tx.vout) {
+        totalReward += txout.nValue;
+    }
+
     // Retrieve a list of masternodes' scriptPubKeys
     std::vector<CScript> vmnScripts(vecMasternodes.size());
     BOOST_FOREACH(const CMasterNode& mn, vecMasternodes) {
         vmnScripts.push_back(GetScriptForDestination(mn.pubkey.GetID()));
     }
 
-    // Calculate total reward and find masternode payment txout
-    CAmount totalReward = 0, masternodePayment = 0;
     bool hasMasternodePayment = false;
-    BOOST_FOREACH(const CTxOut& txout, tx.vout) {
-        totalReward += txout.nValue;
-        auto it = std::find(vmnScripts.begin(), vmnScripts.end(), txout.scriptPubKey);
-        if (it != vmnScripts.end()) {
-            hasMasternodePayment = true;
-            masternodePayment = txout.nValue;
-            break;
+    if (tx.vout.size() >= 2 && tx.nTime > (GetTime() - 3600)) {
+        BOOST_FOREACH(const CTxOut& txout, tx.vout) {
+            auto it = std::find(vmnScripts.begin(), vmnScripts.end(), txout.scriptPubKey);
+            if (it != vmnScripts.end()) {
+                hasMasternodePayment = true;
+                masternodePayment = txout.nValue;
+                break;
+            }
+        }
+    }
+
+    // during initial download (old blocks), only check the amounts, not via the "current" pub keys
+    if (!masternodePayment && tx.vout.size() >= 2) {
+        BOOST_FOREACH(const CTxOut& txout, tx.vout) {
+            if (tx.IsCoinBase() && txout.nValue == (totalReward * 0.2f)) {
+                hasMasternodePayment = true;
+                masternodePayment = txout.nValue;
+                break;
+            }
+            if (tx.IsCoinStake() && tx.vout.size() >= 3 && txout.nValue > 0 && txout.nValue <= (totalReward * 0.4f)) {
+                hasMasternodePayment = true;
+                masternodePayment = txout.nValue;
+                break;
+            }
         }
     }
 
@@ -3806,7 +3829,7 @@ bool CheckForMasternodePayment(const CTransaction& tx, const CBlockHeader& heade
         if (!hasMasternodePayment || masternodePayment == 0)
             return false;
 
-        return totalReward * 0.2f == masternodePayment;
+        return (totalReward * 0.2f) == masternodePayment;
     }
 
     // If tx is coinstake, then masternode payment should be 40% of reward before the hardfork and 20% after
@@ -3816,9 +3839,9 @@ bool CheckForMasternodePayment(const CTransaction& tx, const CBlockHeader& heade
             return false;
 
         if (pindexPrev->nHeight + 1 < chainParams.FirstSplitRewardBlock())
-            return totalReward * 0.4f == masternodePayment;
+            return (totalReward * 0.4f) == masternodePayment;
         else
-            return totalReward * 0.2f == masternodePayment;
+            return (totalReward * 0.2f) == masternodePayment;
     }
 
     return false;
@@ -3910,7 +3933,11 @@ bool CheckBlock(const CBlock& block, CValidationState& state, const Consensus::P
             LogPrint("debug", "%s: invalid transaction %s", __func__, tx.ToString());
             return error("%s: CheckTransaction failed (nTx=%d, reason: %s)", __func__, nTx, state.GetRejectReason());
         }
-        if (!CheckForMasternodePayment(tx, block)) {
+        // ignore first PoS segwit tx for masternode checks
+        if (block.IsProofOfStake() && nTx == 0 && tx.wit.vtxinwit.size())
+            continue;
+
+        if (fCheckPOW && !CheckForMasternodePayment(tx, block)) {
             LogPrint("debug", "%s: invalid masternode payment in %s", __func__, tx.ToString());
             return error("%s: CheckForMasternodePayment failed (nTx=%d)", __func__, nTx);
         }
