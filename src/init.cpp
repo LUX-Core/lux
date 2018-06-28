@@ -382,7 +382,7 @@ std::string HelpMessage(HelpMessageMode mode)
     strUsage += "  -onlynet=<net>         " + _("Only connect to nodes in network <net> (ipv4, ipv6 or onion)") + "\n";
     strUsage += "  -permitbaremultisig    " + strprintf(_("Relay non-P2SH multisig (default: %u)"), 1) + "\n";
     strUsage += "  -port=<port>           " +
-                strprintf(_("Listen for connections on <port> (default: %u or testnet: %u)"), 16969, 28333) + "\n";
+                strprintf(_("Listen for connections on <port> (default: %u or testnet: %u)"), 26969, 28333) + "\n";
     strUsage += "  -proxy=<ip:port>       " + _("Connect through SOCKS5 proxy") + "\n";
     strUsage += "  -seednode=<ip>         " + _("Connect to a node to retrieve peer addresses, and disconnect") + "\n";
     strUsage += "  -timeout=<n>           " + strprintf(_("Specify connection timeout in milliseconds (minimum: 1, default: %d)"), DEFAULT_CONNECT_TIMEOUT) + "\n";
