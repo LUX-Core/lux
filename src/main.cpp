@@ -1734,7 +1734,7 @@ bool ReadBlockFromDisk(CBlock& block, const CDiskBlockPos& pos, int nHeight, con
         }
 
          if (!stake->CheckProof(pindexPrev, block, hashProofOfStake))
-            return error("%s: invalid proof-of-stake (block %s)\n", __func__, block.GetHash().GetHex());
+            return error("%s: invalid proof-of-stake (block %s)", __func__, block.GetHash().GetHex());
     }
 
     return true;
@@ -4349,7 +4349,7 @@ void CBlockIndex::BuildSkip()
 
 bool ProcessNewBlock(CValidationState& state, const CChainParams& chainparams, CNode* pfrom, const CBlock* pblock, CDiskBlockPos* dbp)
 {
-    int nHeight = chainActive.Tip()->nHeight + 1;
+    int nHeight = chainActive.Height() + 1;
     bool usePhi2 = false;
 
     // Preliminary checks
