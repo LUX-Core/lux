@@ -69,9 +69,9 @@ using namespace std;
 
 #define MAX_DATA_FLUSH_RETRY 10
 
-// Security to avoid blocks from last hard fork attampts
+/* Security to avoid blocks from last hard fork attampts
 #define SNAPSHOT_VALID_TIME  1530150000 // June 28, 2018 01:40 AM GMT
-#define SNAPSHOT_BLOCK       299500
+#define SNAPSHOT_BLOCK       299500 */
 
 const int LAST_HEIGHT_FEE_BLOCK = 180000;
 

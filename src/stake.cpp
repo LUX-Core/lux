@@ -429,7 +429,16 @@ bool Stake::CheckHash(const CBlockIndex* pindexPrev, unsigned int nBits, const C
 }
 
 // Check kernel hash target and coinstake signature
-bool Stake::CheckProof(CBlockIndex* const pindexPrev, const CBlock& block, uint256& hashProofOfStake) {
+bool Stake::CheckProof(CBlockIndex* const pindexPrev, const CBlock &block, uint256& hashProofOfStake)
+{
+    int nBlockHeight = chainActive.Tip()->nHeight + 1;
+
+    // Reject all invalid block from other forks
+    if (nBlockHeight > SNAPSHOT_BLOCK && block.nTime < SNAPSHOT_VALID_TIME )
+    {
+        return error("%s: Invalid block (block '%d' time too old (%x) for %s)", __func__, chainActive.Tip()->nHeight + 1, block.nTime, block.GetHash().GetHex());
+    }
+
     if (block.vtx.size() < 2)
         return error("%s: called on non-coinstake %s", __func__, block.ToString());
 
@@ -471,6 +480,13 @@ bool Stake::CheckProof(CBlockIndex* const pindexPrev, const CBlock& block, uint2
                      tx.GetHash().ToString(), hashProofOfStake.ToString());
     return true;
 #   else
+    int txOutSize = txPrev.vout.size() - 1;
+    uint64_t totalReward = GetProofOfStakeReward(0, 0, chainActive.Tip()->nHeight);
+    int64_t mnReward = GetMasternodePayment(chainActive.Tip()->nHeight + 1, totalReward);
+
+    if (txPrev.vout[txOutSize].nValue != mnReward) {
+        return error("%s: Invalid MasterNode payment for PoS", __func__);
+    }
     return CheckHash(pindexPrev, block.nBits, prevBlock, txPrev, txin.prevout, nTime, hashProofOfStake);
 #   endif
 }
