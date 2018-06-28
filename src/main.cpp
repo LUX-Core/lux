@@ -3745,6 +3745,119 @@ bool CheckBlockHeader(const CBlockHeader& block, CValidationState& state, const 
     return true;
 }
 
+bool CheckForMasternodePayment(const CTransaction& tx, const CBlockHeader& header) {
+    // Regular transactions don't have to share anything with masternodes
+    if (!tx.IsCoinBase() && !tx.IsCoinStake())
+        return true;
+
+    const CChainParams& chainParams = Params();
+
+    // Special check for genesis block, which is guaranteed to not has a masternode payment
+    if (header.GetHash() == chainParams.HashGenesisBlock())
+        return true;
+
+    const CBlockIndex* pindexPrev = LookupBlockIndex(header.hashPrevBlock);
+    const int nHeight = pindexPrev ? pindexPrev->nHeight + 1 : 0;
+    bool usePhi2 = nHeight >= chainParams.SwitchPhi2Block();
+
+    // Check if a block is already accepted. These blocks cannot be checked for masternode payments,
+    // because we don't know, which masternodes is active at that moment of accepting this block,
+    // so that why we can't verify if tx from this block was actually rewards the masternode and doesn't
+    // simply split the block subsidy which AFAIK and some pools do.
+    // So, if we found a block in the block index, then return true as if this tx has a valid masternode payment.
+    const CBlockIndex* pindex = LookupBlockIndex(header.GetHash(usePhi2));
+    if (pindex)
+        return true;
+
+    uint32_t mnPaymentsStartDate = 0;
+    if (chainParams.NetworkID() == CBaseChainParams::TESTNET/*|| chainParams.NetworkID() == CBaseChainParams::REGTEST*/) {
+        mnPaymentsStartDate = START_MASTERNODE_PAYMENTS_TESTNET;
+        // avoid the few testnet blocks without reward due to temporary lack of online MN
+        if (nHeight == 3241 || nHeight == 3777 || nHeight == 5072) return true;
+        if (nHeight >= 7494 && nHeight <= 7660) return true;
+    } else {
+        mnPaymentsStartDate = START_MASTERNODE_PAYMENTS;
+    }
+    // If masternode payments haven't started yet, then everything is OK
+    if (header.nTime < mnPaymentsStartDate)
+        return true;
+
+    // Calculate total reward and find masternode payment txout
+    CAmount totalReward = 0, masternodePayment = 0;
+    if (tx.IsCoinStake()) {
+        totalReward = GetProofOfStakeReward(0, 0, nHeight);
+    } else BOOST_FOREACH(const CTxOut& txout, tx.vout) {
+        totalReward += txout.nValue;
+    }
+
+    // Retrieve a list of masternodes' scriptPubKeys
+    std::vector<CScript> vmnScripts(vecMasternodes.size());
+    BOOST_FOREACH(const CMasterNode& mn, vecMasternodes) {
+        vmnScripts.push_back(GetScriptForDestination(mn.pubkey.GetID()));
+    }
+
+    bool hasMasternodePayment = false;
+    if (tx.vout.size() >= 2 && tx.nTime > (GetTime() - 3600)) {
+        BOOST_FOREACH(const CTxOut& txout, tx.vout) {
+            auto it = std::find(vmnScripts.begin(), vmnScripts.end(), txout.scriptPubKey);
+            if (it != vmnScripts.end()) {
+                hasMasternodePayment = true;
+                masternodePayment = txout.nValue;
+                break;
+            }
+        }
+    }
+
+    // Divide to keep a check precision of 0.01 LUX
+    const int nPrecision = 1000000;
+
+    totalReward /= nPrecision;
+
+    // during initial download (old blocks), only check the amounts, not via the "current" pub keys
+    if (!hasMasternodePayment && tx.vout.size() >= 2) {
+        BOOST_FOREACH(const CTxOut& txout, tx.vout) {
+            if (tx.IsCoinBase() && (txout.nValue/nPrecision) == (totalReward * 0.2f)) {
+                hasMasternodePayment = true;
+                masternodePayment = txout.nValue;
+                break;
+            }
+            if (tx.IsCoinStake() && tx.vout.size() >= 3 && txout.nValue > 0 && (txout.nValue/nPrecision) <= (totalReward * 0.4f)) {
+                hasMasternodePayment = true;
+                masternodePayment = txout.nValue;
+                break;
+            }
+        }
+    }
+
+    masternodePayment /= nPrecision;
+
+    // If tx is coinbase (PoW) and current height is after the hardfork, then tx should send 20% of the reward to a masternode
+    if (tx.IsCoinBase()) {
+        if (nHeight < chainParams.FirstSplitRewardBlock())
+            return true;
+
+        // Tx is coinbase, PoW split reward is active, but no masternode payment is found or payment amount is null
+        if (!hasMasternodePayment || masternodePayment == 0)
+            return false;
+
+        return (totalReward * 0.2f) == masternodePayment;
+    }
+
+    // If tx is coinstake, then masternode payment should be 40% of reward before the hardfork and 20% after
+    if (tx.IsCoinStake()) {
+        // Tx is coinstake, but no masternode payment is found or payment amount is null
+        if (!hasMasternodePayment || masternodePayment == 0)
+            return false;
+
+        if (nHeight < chainParams.FirstSplitRewardBlock())
+            return (totalReward * 0.4f) == masternodePayment;
+        else
+            return (totalReward * 0.2f) == masternodePayment;
+    }
+
+    return false;
+}
+
 bool CheckBlock(const CBlock& block, CValidationState& state, const Consensus::Params& consensusParams, bool fCheckPOW, bool fCheckMerkleRoot, bool fCheckSig)
 {
     const char * const s = block.IsProofOfStake() ? "pos" : "pow";
@@ -3830,6 +3943,14 @@ bool CheckBlock(const CBlock& block, CValidationState& state, const Consensus::P
         if (!CheckTransaction(tx, state)) {
             LogPrint("debug", "%s: invalid transaction %s", __func__, tx.ToString());
             return error("%s: CheckTransaction failed (nTx=%d, reason: %s)", __func__, nTx, state.GetRejectReason());
+        }
+        // ignore first PoS tx for masternode checks, this vout tx type is "nonstandard"
+        if (block.IsProofOfStake() && nTx == 0)
+            continue;
+
+        if (fCheckPOW && !CheckForMasternodePayment(tx, block)) {
+            LogPrint("debug", "%s: invalid masternode payment in %s", __func__, tx.ToString());
+            return error("%s: CheckForMasternodePayment failed (nTx=%d)", __func__, nTx);
         }
         ++nTx;
     }
