@@ -791,13 +791,13 @@ UniValue getwork(const UniValue& params, bool fHelp) {
 
     // Disable checking block downloading and number of connected nodes for segwittest network
     // because it is tested locally, without any nodes connected, and with significant amount of time between blocks
-    /* if (Params().NetworkID() != CBaseChainParams::SEGWITTEST) {
+    if (Params().NetworkID() != CBaseChainParams::SEGWITTEST) {
          if (vNodes.empty())
              throw JSONRPCError(RPC_CLIENT_NOT_CONNECTED, "Lux is not connected!");
 
-         if (IsInitialBlockDownload() && Params().NetworkID() != CBaseChainParams::TESTNET)
+         if (IsInitialBlockDownload())
              throw JSONRPCError(RPC_CLIENT_IN_INITIAL_DOWNLOAD, "Lux is downloading blocks...");
-     }*/
+    }
 
     if (chainActive.Tip()->nHeight >= Params().LAST_POW_BLOCK())
         throw JSONRPCError(RPC_MISC_ERROR, "No more PoW blocks");
