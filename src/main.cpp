@@ -3782,18 +3782,24 @@ bool CheckForMasternodePayment(const CTransaction& tx, const CBlockHeader& heade
     CAmount totalReward = 0, masternodePayment = 0;
     if (tx.IsCoinStake()) {
         totalReward = GetProofOfStakeReward(0, 0, nHeight);
-    } else BOOST_FOREACH(const CTxOut& txout, tx.vout) {
-        totalReward += txout.nValue;
-    }
-
-    // Retrieve a list of masternodes' scriptPubKeys
-    std::vector<CScript> vmnScripts(vecMasternodes.size());
-    BOOST_FOREACH(const CMasterNode& mn, vecMasternodes) {
-        vmnScripts.push_back(GetScriptForDestination(mn.pubkey.GetID()));
+    } else {
+        // Avoid costly checks early on first PoW blocks
+        if (nHeight < chainParams.FirstSplitRewardBlock())
+            return true;
+        BOOST_FOREACH(const CTxOut& txout, tx.vout) {
+            totalReward += txout.nValue;
+        }
     }
 
     bool hasMasternodePayment = false;
     if (tx.vout.size() >= 2 && tx.nTime > (GetTime() - 3600)) {
+
+        // Retrieve a list of masternodes' scriptPubKeys
+        std::vector<CScript> vmnScripts(vecMasternodes.size());
+        BOOST_FOREACH(const CMasterNode& mn, vecMasternodes) {
+            vmnScripts.push_back(GetScriptForDestination(mn.pubkey.GetID()));
+        }
+
         BOOST_FOREACH(const CTxOut& txout, tx.vout) {
             auto it = std::find(vmnScripts.begin(), vmnScripts.end(), txout.scriptPubKey);
             if (it != vmnScripts.end()) {
@@ -3829,8 +3835,6 @@ bool CheckForMasternodePayment(const CTransaction& tx, const CBlockHeader& heade
 
     // If tx is coinbase (PoW) and current height is after the hardfork, then tx should send 20% of the reward to a masternode
     if (tx.IsCoinBase()) {
-        if (nHeight < chainParams.FirstSplitRewardBlock())
-            return true;
 
         // Tx is coinbase, PoW split reward is active, but no masternode payment is found or payment amount is null
         if (!hasMasternodePayment || masternodePayment == 0)
@@ -3840,7 +3844,8 @@ bool CheckForMasternodePayment(const CTransaction& tx, const CBlockHeader& heade
     }
 
     // If tx is coinstake, then masternode payment should be 40% of reward before the hardfork and 20% after
-    if (tx.IsCoinStake()) {
+    else {
+
         // Tx is coinstake, but no masternode payment is found or payment amount is null
         if (!hasMasternodePayment || masternodePayment == 0)
             return false;
