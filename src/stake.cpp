@@ -20,6 +20,7 @@
 #include "timedata.h"
 #include <boost/thread.hpp>
 #include <atomic>
+
 #if defined(DEBUG_DUMP_STAKING_INFO)
 #  include "DEBUG_DUMP_STAKING_INFO.hpp"
 #endif
@@ -43,7 +44,7 @@ static const int STAKE_TIMESTAMP_MASK = 15;
 // ratio of group interval length between the last group and the first group
 static const int MODIFIER_INTERVAL_RATIO = 3;
 
-static const int LAST_MULTIPLIED_BLOCK = 180*1000; // 180K
+static const int LAST_MULTIPLIED_BLOCK = 180 * 1000; // 180K
 
 static const bool ENABLE_ADVANCED_STAKING = true;
 
@@ -51,10 +52,9 @@ static const int ADVANCED_STAKING_HEIGHT = 225000;
 
 static std::atomic<bool> nStakingInterrupped;
 
-Stake * const stake = Stake::Pointer();
+Stake* const stake = Stake::Pointer();
 
-StakeKernel::StakeKernel()
-{
+StakeKernel::StakeKernel() {
     //!<DuzyDoc>TODO: kernel initialization
 }
 
@@ -75,20 +75,16 @@ Stake::Stake()
 {
 }
 
-Stake::~Stake()
-{
-}
+Stake::~Stake() {}
 
 // Modifier interval: time to elapse before new modifier is computed
 // Set to 3-hour for production network and 20-minute for test network
-static inline unsigned int GetInterval()
-{
+static inline unsigned int GetInterval() {
     return IsTestNet() ? MODIFIER_INTERVAL_TESTNET : MODIFIER_INTERVAL;
 }
 
 // Get the last stake modifier and its generation time from a given block
-static bool GetLastStakeModifier(const CBlockIndex* pindex, uint64_t& nStakeModifier, int64_t& nModifierTime)
-{
+static bool GetLastStakeModifier(const CBlockIndex* pindex, uint64_t& nStakeModifier, int64_t& nModifierTime) {
     if (!pindex)
         return error("%s: null pindex", __func__);
 
@@ -104,15 +100,13 @@ static bool GetLastStakeModifier(const CBlockIndex* pindex, uint64_t& nStakeModi
 }
 
 // Get selection interval (nSection in seconds)
-static int64_t GetSelectionInterval(int nSection)
-{
+static int64_t GetSelectionInterval(int nSection) {
     assert(nSection >= 0 && nSection < 64);
-    return ( GetInterval() * 63 / (63 + ((63 - nSection) * (MODIFIER_INTERVAL_RATIO - 1))));;
+    return (GetInterval() * 63 / (63 + ((63 - nSection) * (MODIFIER_INTERVAL_RATIO - 1))));;
 }
 
 // Get stake modifier selection time (in seconds)
-static int64_t GetSelectionTime()
-{
+static int64_t GetSelectionTime() {
     int64_t nSelectionTime = 0;
     for (int nSection = 0; nSection < 64; nSection++) {
         nSelectionTime += GetSelectionInterval(nSection);
@@ -123,13 +117,13 @@ static int64_t GetSelectionTime()
 // Finds a block from the candidate blocks in vSortedCandidates, excluding
 // already selected blocks in vSelectedBlocks, and with timestamp up to
 // nSelectionTime.
-static bool FindModifierBlockFromCandidates(vector<pair<int64_t, uint256> >& vSortedCandidates, map<uint256, const CBlockIndex*>& mSelectedBlocks, int64_t nSelectionTime, uint64_t nStakeModifierPrev, const CBlockIndex*& pindexSelected)
-{
+static bool FindModifierBlockFromCandidates(vector <pair<int64_t, uint256>>& vSortedCandidates, map<uint256, const CBlockIndex*>& mSelectedBlocks, int64_t nSelectionTime, uint64_t nStakeModifierPrev,
+                                            const CBlockIndex*& pindexSelected) {
     uint256 hashBest = 0;
 
     pindexSelected = nullptr;
 
-    for (auto &item : vSortedCandidates) {
+    for (auto& item : vSortedCandidates) {
         if (!mapBlockIndex.count(item.second))
             return error("%s: invalid candidate block %s", __func__, item.second.GetHex());
 
@@ -137,14 +131,14 @@ static bool FindModifierBlockFromCandidates(vector<pair<int64_t, uint256> >& vSo
         if (pindex->IsProofOfStake() && pindex->hashProofOfStake == 0) {
             return error("%s: zero stake (block %s)", __func__, item.second.GetHex());
         }
-        
+
         if (pindexSelected && pindex->GetBlockTime() > nSelectionTime) break;
         if (mSelectedBlocks.count(pindex->GetBlockHash()) > 0) continue;
 
         // compute the selection hash by hashing an input that is unique to that block
         CDataStream ss(SER_GETHASH, 0);
         ss << uint256(pindex->IsProofOfStake() ? pindex->hashProofOfStake : pindex->GetBlockHash())
-           << nStakeModifierPrev ;
+           << nStakeModifierPrev;
 
         uint256 hashSelection(Hash(ss.begin(), ss.end()));
 
@@ -188,8 +182,7 @@ static bool FindModifierBlockFromCandidates(vector<pair<int64_t, uint256> >& vSo
 // block. This is to make it difficult for an attacker to gain control of
 // additional bits in the stake modifier, even after generating a chain of
 // blocks.
-bool Stake::ComputeNextModifier(const CBlockIndex* pindexPrev, uint64_t& nStakeModifier, bool& fGeneratedStakeModifier)
-{
+bool Stake::ComputeNextModifier(const CBlockIndex* pindexPrev, uint64_t& nStakeModifier, bool& fGeneratedStakeModifier) {
     nStakeModifier = 0;
     fGeneratedStakeModifier = false;
 
@@ -221,7 +214,7 @@ bool Stake::ComputeNextModifier(const CBlockIndex* pindexPrev, uint64_t& nStakeM
         return true;
 
     // Sort candidate blocks by timestamp
-    vector<pair<int64_t, uint256> > vSortedCandidates;
+    vector< pair<int64_t, uint256> > vSortedCandidates;
     vSortedCandidates.reserve(64 * GetInterval() / GetTargetSpacing(pindexPrev->nHeight));
 
     int64_t nSelectionTime = nPrevRounds * GetInterval() - GetSelectionTime();
@@ -328,8 +321,7 @@ bool GetKernelStakeModifier(uint256 hashBlockFrom, uint64_t& nStakeModifier, int
 }
 #endif
 
-bool MultiplyStakeTarget(uint256 &bnTarget, int nModifierHeight, int64_t nModifierTime, int64_t nWeight)
-{
+bool MultiplyStakeTarget(uint256& bnTarget, int nModifierHeight, int64_t nModifierTime, int64_t nWeight) {
     typedef std::pair<uint32_t, const char*> mult;
 
 #   if 0
@@ -340,13 +332,13 @@ bool MultiplyStakeTarget(uint256 &bnTarget, int nModifierHeight, int64_t nModifi
     static std::map<int, mult> stakeTargetMultipliers;
     if (stakeTargetMultipliers.empty()) {
         std::multimap<int, mult> mm = boost::assign::map_list_of
-#           include "multipliers.i"
+#include "multipliers.i"
             ;
         for (auto i = mm.begin(); i != mm.end();) {
             auto p = stakeTargetMultipliers.emplace(i->first, i->second).first;
             for (auto e = mm.upper_bound(i->first); i != e; ++i) {
-                if (i->second.first < p->second.first) continue; 
-                if (i->second.first > p->second.first) p->second = i->second; 
+                if (i->second.first < p->second.first) continue;
+                if (i->second.first > p->second.first) p->second = i->second;
                 else if (uint256(i->second.second) > uint256(p->second.second)) p->second = i->second;
             }
         }
@@ -354,7 +346,7 @@ bool MultiplyStakeTarget(uint256 &bnTarget, int nModifierHeight, int64_t nModifi
 #   endif
 
     if (stakeTargetMultipliers.count(nModifierHeight)) {
-        const mult &m = stakeTargetMultipliers[nModifierHeight];
+        const mult& m = stakeTargetMultipliers[nModifierHeight];
         bnTarget = bnTarget * m.first + uint256(m.second);
         return true;
     }
@@ -362,8 +354,7 @@ bool MultiplyStakeTarget(uint256 &bnTarget, int nModifierHeight, int64_t nModifi
 }
 
 //instead of looping outside and reinitializing variables many times, we will give a nTimeTx and also search interval so that we can do all the hashing here
-bool Stake::CheckHash(const CBlockIndex* pindexPrev, unsigned int nBits, const CBlock &blockFrom, const CTransaction &txPrev, const COutPoint &prevout, unsigned int& nTimeTx, uint256& hashProofOfStake)
-{
+bool Stake::CheckHash(const CBlockIndex* pindexPrev, unsigned int nBits, const CBlock& blockFrom, const CTransaction& txPrev, const COutPoint& prevout, unsigned int& nTimeTx, uint256& hashProofOfStake) {
     if (pindexPrev == nullptr)
         return false;
 
@@ -401,10 +392,10 @@ bool Stake::CheckHash(const CBlockIndex* pindexPrev, unsigned int nBits, const C
 
     // Calculate hash
     CDataStream ss(SER_GETHASH, 0);
-    ss << nStakeModifier << nTimeBlockFrom << txPrev.nTime << prevout.hash << prevout.n << nTimeTx ;
+    ss << nStakeModifier << nTimeBlockFrom << txPrev.nTime << prevout.hash << prevout.n << nTimeTx;
     if (ENABLE_ADVANCED_STAKING && (mapArgs.count("-regtest") || nStakeModifierHeight >= ADVANCED_STAKING_HEIGHT)) {
         ss << nHashInterval << nSelectionPeriod << nStakeMinAge << nStakeSplitThreshold
-           << bnWeight << nStakeModifierTime ;
+           << bnWeight << nStakeModifierTime;
     }
     hashProofOfStake = Hash(ss.begin(), ss.end());
 
@@ -438,12 +429,11 @@ bool Stake::CheckHash(const CBlockIndex* pindexPrev, unsigned int nBits, const C
 }
 
 // Check kernel hash target and coinstake signature
-bool Stake::CheckProof(CBlockIndex* const pindexPrev, const CBlock &block, uint256& hashProofOfStake)
-{
+bool Stake::CheckProof(CBlockIndex* const pindexPrev, const CBlock& block, uint256& hashProofOfStake) {
     if (block.vtx.size() < 2)
         return error("%s: called on non-coinstake %s", __func__, block.ToString());
-    
-    const CTransaction &tx = block.vtx[1];
+
+    const CTransaction& tx = block.vtx[1];
     if (!tx.IsCoinStake())
         return error("%s: called on non-coinstake %s", __func__, tx.ToString());
 
@@ -459,7 +449,8 @@ bool Stake::CheckProof(CBlockIndex* const pindexPrev, const CBlock &block, uint2
 
     //verify signature and script
     const CAmount& amount = txPrev.vout[txin.prevout.n].nValue;
-    bool fIsVerified = VerifyScript(txin.scriptSig, txPrev.vout[txin.prevout.n].scriptPubKey, tx.wit.vtxinwit.size() > 0 ? &tx.wit.vtxinwit[0].scriptWitness : NULL, STANDARD_SCRIPT_VERIFY_FLAGS, TransactionSignatureChecker(&tx, 0, amount));
+    bool fIsVerified = VerifyScript(txin.scriptSig, txPrev.vout[txin.prevout.n].scriptPubKey, tx.wit.vtxinwit.size() > 0 ? &tx.wit.vtxinwit[0].scriptWitness : NULL, STANDARD_SCRIPT_VERIFY_FLAGS,
+                                    TransactionSignatureChecker(&tx, 0, amount));
     if (!fIsVerified)
         return error("%s: VerifySignature failed on coinstake %s", __func__, tx.GetHash().ToString().c_str());
 
@@ -485,8 +476,7 @@ bool Stake::CheckProof(CBlockIndex* const pindexPrev, const CBlock &block, uint2
 }
 
 // Get stake modifier checksum
-unsigned int Stake::GetModifierChecksum(const CBlockIndex* pindex)
-{
+unsigned int Stake::GetModifierChecksum(const CBlockIndex* pindex) {
     assert(pindex->pprev || pindex->GetBlockHash() == Params().HashGenesisBlock());
     // Hash previous checksum with flags, hashProofOfStake and nStakeModifier
     CDataStream ss(SER_GETHASH, 0);
@@ -499,8 +489,7 @@ unsigned int Stake::GetModifierChecksum(const CBlockIndex* pindex)
 }
 
 // Check stake modifier hard checkpoints
-bool Stake::CheckModifierCheckpoints(int nHeight, unsigned int nStakeModifierChecksum)
-{
+bool Stake::CheckModifierCheckpoints(int nHeight, unsigned int nStakeModifierChecksum) {
     if (!IsTestNet()) return true; // Testnet has no checkpoints
 
     // Hard checkpoints of stake modifiers to ensure they are deterministic
@@ -523,8 +512,7 @@ bool Stake::CheckModifierCheckpoints(int nHeight, unsigned int nStakeModifierChe
     return true;
 }
 
-unsigned int Stake::GetStakeAge(unsigned int nTime) const
-{
+unsigned int Stake::GetStakeAge(unsigned int nTime) const {
     if (nStakeMinAge < Params().StakingMinAge()) {
         auto that = const_cast<Stake*>(this);
         that->nStakeMinAge = Params().StakingMinAge();
@@ -532,18 +520,15 @@ unsigned int Stake::GetStakeAge(unsigned int nTime) const
     return nStakeMinAge + nTime;
 }
 
-void Stake::ResetInterval()
-{
+void Stake::ResetInterval() {
     nStakeInterval = 0;
 }
 
-bool Stake::HasStaked() const
-{
+bool Stake::HasStaked() const {
     return nLastStakeTime > 0 && nStakeInterval > 0;
 }
 
-bool Stake::MarkBlockStaked(int nHeight, unsigned int nTime)
-{
+bool Stake::MarkBlockStaked(int nHeight, unsigned int nTime) {
     bool result = false;
     auto it = mapHashedBlocks.find(nHeight);
     if (it == mapHashedBlocks.end()) {
@@ -553,8 +538,7 @@ bool Stake::MarkBlockStaked(int nHeight, unsigned int nTime)
     return result;
 }
 
-bool Stake::IsBlockStaked(int nHeight) const
-{
+bool Stake::IsBlockStaked(int nHeight) const {
     bool result = false;
     auto it = mapHashedBlocks.find(nHeight);
     if (it != mapHashedBlocks.end()) {
@@ -562,15 +546,14 @@ bool Stake::IsBlockStaked(int nHeight) const
             auto that = const_cast<Stake*>(this);
             that->nHashInterval = Params().StakingInterval();
         }
-        if (GetTime() - it->second < max(nHashInterval, (unsigned int)1)) {
+        if (GetTime() - it->second < max(nHashInterval, (unsigned int) 1)) {
             result = true;
         }
     }
     return result;
 }
 
-bool Stake::IsBlockStaked(const CBlock* block) const
-{
+bool Stake::IsBlockStaked(const CBlock* block) const {
     bool result = false;
     if (block->IsProofOfStake()) {
         result = mapStakes.find(block->vtx[1].vin[0].prevout) != mapStakes.end();
@@ -578,45 +561,37 @@ bool Stake::IsBlockStaked(const CBlock* block) const
     return result;
 }
 
-CAmount Stake::ReserveBalance(CAmount amount)
-{
+CAmount Stake::ReserveBalance(CAmount amount) {
     auto prev = nReserveBalance;
     nReserveBalance = amount;
     return prev;
 }
 
-CAmount Stake::GetReservedBalance() const
-{
+CAmount Stake::GetReservedBalance() const {
     return nReserveBalance;
 }
 
-uint64_t Stake::GetSplitThreshold() const 
-{
+uint64_t Stake::GetSplitThreshold() const {
     return GetStakeCombineThreshold();
 }
 
-void Stake::SetSplitThreshold(uint64_t v)
-{
+void Stake::SetSplitThreshold(uint64_t v) {
     nStakeSplitThreshold = GetStakeCombineThreshold();
 }
 
-void Stake::MarkStake(const COutPoint &out, unsigned int nTime)
-{
+void Stake::MarkStake(const COutPoint& out, unsigned int nTime) {
     mapStakes[out] = nTime;
 }
 
-bool Stake::IsStaked(const COutPoint &out) const
-{
+bool Stake::IsStaked(const COutPoint& out) const {
     return mapStakes.find(out) != mapStakes.end();
 }
 
-bool Stake::HasProof(const uint256 &h) const
-{
+bool Stake::HasProof(const uint256& h) const {
     return mapProofOfStake.find(h) != mapProofOfStake.end();
 }
 
-bool Stake::GetProof(const uint256 &h, uint256 &proof) const
-{
+bool Stake::GetProof(const uint256& h, uint256& proof) const {
     bool result = false;
     auto it = mapProofOfStake.find(h);
     if (it != mapProofOfStake.end()) {
@@ -626,13 +601,11 @@ bool Stake::GetProof(const uint256 &h, uint256 &proof) const
     return result;
 }
 
-void Stake::SetProof(const uint256 &h, const uint256 &proof)
-{
+void Stake::SetProof(const uint256& h, const uint256& proof) {
     mapProofOfStake.emplace(h, proof);
 }
 
-bool Stake::IsActive() const
-{
+bool Stake::IsActive() const {
     bool nStaking = false;
     auto tip = chainActive.Tip();
     if (GetBoolArg("-staking", DEFAULT_STAKE) == false)
@@ -644,8 +617,7 @@ bool Stake::IsActive() const
     return nStaking;
 }
 
-bool Stake::SelectStakeCoins(CWallet *wallet, std::set<std::pair<const CWalletTx*, unsigned int> >& stakecoins, const int64_t targetAmount)
-{
+bool Stake::SelectStakeCoins(CWallet* wallet, std::set <std::pair<const CWalletTx*, unsigned int>>& stakecoins, const int64_t targetAmount) {
     auto const nTime = GetTime();
     if (nSelectionPeriod < Params().StakingRoundPeriod()) {
         nSelectionPeriod = Params().StakingRoundPeriod();
@@ -653,12 +625,12 @@ bool Stake::SelectStakeCoins(CWallet *wallet, std::set<std::pair<const CWalletTx
     if (nTime - nLastSelectTime < nSelectionPeriod) {
         return false;
     }
-    
+
     int64_t selectedAmount = 0;
     vector<COutput> coins;
     wallet->AvailableCoins(coins, true);
     stakecoins.clear();
-    for (auto const &out : coins) {
+    for (auto const& out : coins) {
         //make sure not to outrun target amount
         if (selectedAmount + out.tx->vout[out.i].nValue > targetAmount)
             continue;
@@ -682,8 +654,7 @@ bool Stake::SelectStakeCoins(CWallet *wallet, std::set<std::pair<const CWalletTx
     return false;
 }
 
-bool Stake::CreateCoinStake(CWallet *wallet, const CKeyStore& keystore, unsigned int nBits, int64_t nSearchInterval, CMutableTransaction& txNew, unsigned int& nTxNewTime)
-{
+bool Stake::CreateCoinStake(CWallet* wallet, const CKeyStore& keystore, unsigned int nBits, int64_t nSearchInterval, CMutableTransaction& txNew, unsigned int& nTxNewTime) {
     txNew.vin.clear();
     txNew.vout.clear();
 
@@ -705,7 +676,7 @@ bool Stake::CreateCoinStake(CWallet *wallet, const CKeyStore& keystore, unsigned
 
     // presstab HyperStake - Initialize as static and don't update the set on every run of
     // CreateCoinStake() in order to lighten resource use
-    static std::set<pair<const CWalletTx*, unsigned int> > stakeCoins;
+    static std::set< pair<const CWalletTx*, unsigned int> > stakeCoins;
     if (!SelectStakeCoins(wallet, stakeCoins, nBalance - nReserveBalance)) {
         return false;
     }
@@ -720,7 +691,7 @@ bool Stake::CreateCoinStake(CWallet *wallet, const CKeyStore& keystore, unsigned
         MilliSleep(10000);
 
     const CBlockIndex* pIndex0 = chainActive.Tip();
-    BOOST_FOREACH (PAIRTYPE(const CWalletTx*, unsigned int) pcoin, stakeCoins) {
+    BOOST_FOREACH(PAIRTYPE(const CWalletTx*, unsigned int) pcoin, stakeCoins) {
         //make sure that enough time has elapsed between
         CBlockIndex* pindex = LookupBlockIndex(pcoin.first->hashBlock);
         if (!pindex) {
@@ -850,7 +821,7 @@ bool Stake::CreateCoinStake(CWallet *wallet, const CKeyStore& keystore, unsigned
     }
 
     int64_t blockValue = nCredit;
-    int64_t masternodePayment = GetMasternodePayment(chainActive.Tip()->nHeight+1, nReward);
+    int64_t masternodePayment = GetMasternodePayment(chainActive.Tip()->nHeight + 1, nReward);
 
     // Set output amount
     if (hasMasternodePayment) {
@@ -875,7 +846,7 @@ bool Stake::CreateCoinStake(CWallet *wallet, const CKeyStore& keystore, unsigned
 
     // Check vout values.
     unsigned i = 0;
-    for (auto &vout : txNew.vout) {
+    for (auto& vout : txNew.vout) {
         if (vout.nValue < 0 || vout.nValue > MAX_MONEY) {
             return error("%s: bad nValue (vout[%d].nValue = %d)", __func__, i, vout.nValue);
         }
@@ -896,8 +867,7 @@ bool Stake::CreateCoinStake(CWallet *wallet, const CKeyStore& keystore, unsigned
     return true;
 }
 
-bool Stake::CreateBlockStake(CWallet *wallet, CBlock *block)
-{
+bool Stake::CreateBlockStake(CWallet* wallet, CBlock* block) {
     bool result = false;
     int64_t nTime = GetAdjustedTime();
     CBlockIndex* tip = chainActive.Tip();
@@ -920,24 +890,23 @@ bool Stake::CreateBlockStake(CWallet *wallet, CBlock *block)
     return result;
 }
 
-bool Stake::GenBlockStake(CWallet *wallet, const CReserveKey &key, unsigned int &extra)
-{
-    CBlockIndex *tip = nullptr;
+bool Stake::GenBlockStake(CWallet* wallet, const CReserveKey& key, unsigned int& extra) {
+    CBlockIndex* tip = nullptr;
     {
         LOCK(cs_main);
         tip = chainActive.Tip();
     }
 
-    std::unique_ptr<CBlockTemplate> blocktemplate(BlockAssembler(Params()).CreateNewBlockWithKey(const_cast<CReserveKey &>(key), true, true));
+    std::unique_ptr <CBlockTemplate> blocktemplate(BlockAssembler(Params()).CreateNewBlockWithKey(const_cast<CReserveKey&>(key), true, true));
     if (!blocktemplate) {
         return false; // No stake available.
     }
-    
-    CBlock * const block = &blocktemplate->block;
+
+    CBlock* const block = &blocktemplate->block;
     if (!block->IsProofOfStake()) {
         return error("%s: Created non-staked block:\n%s", __func__, block->ToString());
     }
-    
+
     IncrementExtraNonce(block, tip, extra);
 
     if (!block->SignBlock(*wallet)) {
@@ -958,20 +927,20 @@ bool Stake::GenBlockStake(CWallet *wallet, const CReserveKey &key, unsigned int 
     auto hash = block->GetHash(usePhi2);
     auto good = CheckProof(tip, *block, proof1);
 
-#if defined(DEBUG_DUMP_STAKE_CHECK)&&defined(DEBUG_DUMP_STAKING_INFO)
+#if defined(DEBUG_DUMP_STAKE_CHECK) && defined(DEBUG_DUMP_STAKING_INFO)
     DEBUG_DUMP_STAKE_CHECK();
 #endif
     if (good) {
-#if defined(DEBUG_DUMP_STAKE_FOUND)&&defined(DEBUG_DUMP_STAKING_INFO)
+#if defined(DEBUG_DUMP_STAKE_FOUND) && defined(DEBUG_DUMP_STAKING_INFO)
         DEBUG_DUMP_STAKE_FOUND();
 #endif
-        LogPrintf("%s: found stake %s, block %s\n%s\n", __func__, 
+        LogPrintf("%s: found stake %s, block %s\n%s\n", __func__,
                   proof1.GetHex(), hash.GetHex(), block->ToString());
-        ProcessBlockFound(block, *wallet, const_cast<CReserveKey &>(key));
+        ProcessBlockFound(block, *wallet, const_cast<CReserveKey&>(key));
     } else if (!GetProof(hash, proof2)) {
         SetProof(hash, proof1);
     } else if (proof1 != proof2) {
-        result = error("%s: diverged stake %s, %s (block %s)", __func__, 
+        result = error("%s: diverged stake %s, %s (block %s)", __func__,
                        proof1.GetHex(), proof2.GetHex(), hash.GetHex());
     }
 
@@ -979,21 +948,21 @@ bool Stake::GenBlockStake(CWallet *wallet, const CReserveKey &key, unsigned int 
     return result;
 }
 
-void Stake::StakingThread(CWallet *wallet)
-{
+void Stake::StakingThread(CWallet* wallet) {
     LogPrintf("staking thread started!\n");
-    
+
     SetThreadPriority(THREAD_PRIORITY_LOWEST);
 
     try {
         boost::this_thread::interruption_point();
-        int nHeight = 0; (void)nHeight;
+        int nHeight = 0;
+        (void) nHeight;
         unsigned int extra = 0;
         CReserveKey reserve(wallet);
         while (!nStakingInterrupped && !ShutdownRequested()) {
             std::size_t nNodes = 0;
             bool nCanStake = !IsInitialBlockDownload();
-            if  (nCanStake) {
+            if (nCanStake) {
                 LOCK(cs_vNodes); // Lock nodes for security.
                 if ((nNodes = vNodes.size()) == 0) {
                     nCanStake = false;
@@ -1008,7 +977,8 @@ void Stake::StakingThread(CWallet *wallet)
                         MilliSleep(3000);
                         continue;
                     } else {
-                        nCanStake = false; break;
+                        nCanStake = false;
+                        break;
                     }
                 }
                 if (nCanStake) {
@@ -1025,7 +995,7 @@ void Stake::StakingThread(CWallet *wallet)
                 continue;
             }
 
-#if defined(DEBUG_DUMP_STAKING_THREAD)&&defined(DEBUG_DUMP_STAKING_INFO)
+#if defined(DEBUG_DUMP_STAKING_THREAD) && defined(DEBUG_DUMP_STAKING_INFO)
             DEBUG_DUMP_STAKING_THREAD();
 #endif
             if (nCanStake && GenBlockStake(wallet, reserve, extra)) {
@@ -1044,8 +1014,7 @@ void Stake::StakingThread(CWallet *wallet)
     LogPrintf("%s: done!\n", __func__);
 }
 
-void Stake::GenerateStakes(boost::thread_group &group, CWallet *wallet, int procs)
-{
+void Stake::GenerateStakes(boost::thread_group& group, CWallet* wallet, int procs) {
     if (GetBoolArg("-staking", DEFAULT_STAKE) == false) {
         LogPrintf("staking is disabled\n");
         return;
@@ -1071,5 +1040,6 @@ void Stake::GenerateStakes(boost::thread_group &group, CWallet *wallet, int proc
 #endif
 }
 
-Stake *Stake::Pointer() { return &kernel; }
+Stake* Stake::Pointer() { return &kernel; }
+
 Stake  Stake::kernel;
