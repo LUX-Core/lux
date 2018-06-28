@@ -69,6 +69,10 @@ using namespace std;
 
 #define MAX_DATA_FLUSH_RETRY 10
 
+// Security to avoid blocks from last hard fork attampts
+#define SNAPSHOT_VALID_TIME  1530150000 // June 28, 2018 01:40 AM GMT
+#define SNAPSHOT_BLOCK       299500
+
 const int LAST_HEIGHT_FEE_BLOCK = 180000;
 
 static const bool ENABLE_POS_REWARD_CHANGED = true;
@@ -4227,6 +4231,12 @@ void CBlockIndex::BuildSkip()
 
 bool ProcessNewBlock(CValidationState& state, const CChainParams& chainparams, CNode* pfrom, const CBlock* pblock, CDiskBlockPos* dbp)
 {
+    int nHeight = chainActive.Tip()->nHeight + 1;
+
+    // Reject all blocks from old chain forks
+    if (nHeight > SNAPSHOT_BLOCK && pblock->nTime < SNAPSHOT_VALID_TIME)
+        return error("%s: Invalid block %d, time too old (%x) for %s", __func__, nHeight, pblock->nTime, pblock->GetHash().GetHex());
+
     // Preliminary checks
     if (!CheckBlock(*pblock, state, chainparams.GetConsensus()))
         return error("%s: block not passing checks", __func__);
@@ -4242,8 +4252,6 @@ bool ProcessNewBlock(CValidationState& state, const CChainParams& chainparams, C
     if (pblock->IsProofOfStake() && stake->IsBlockStaked(pblock) && !mapBlockIndex.count(pblock->hashPrevBlock))
         return error("%s: duplicate proof-of-stake for block %s", __func__, pblock->GetHash().GetHex());
 
-#   if 1 // Shouldn't send messages here to sync, prev blocks should have to be existed.
-
     // Check if the prev block is our prev block, if not then request sync and return false
     else if (pblock->GetHash() != chainparams.GetConsensus().hashGenesisBlock && pfrom != NULL) {
         CBlockIndex* pindexPrev = LookupBlockIndex(pblock->hashPrevBlock);
@@ -4255,12 +4263,6 @@ bool ProcessNewBlock(CValidationState& state, const CChainParams& chainparams, C
         }
     }
 
-#   endif
-
-        // Reject old fork chain block
-        if (pblock->GetHash() == uint256("0x251ef80e9ddb76de573ac3126fadddd1a3160dce03a93590c924b9f939c2890b"))
-            return error("%s: blacklisted blockhash %s", __func__, pblock->GetHash().GetHex());
-   
     CBlockIndex* pindex = NULL;
     while (true) {
         TRY_LOCK(cs_main, lockMain);
