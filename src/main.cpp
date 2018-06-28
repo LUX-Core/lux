@@ -69,10 +69,6 @@ using namespace std;
 
 #define MAX_DATA_FLUSH_RETRY 10
 
-/* Security to avoid blocks from last hard fork attampts
-#define SNAPSHOT_VALID_TIME  1530150000 // June 28, 2018 01:40 AM GMT
-#define SNAPSHOT_BLOCK       299500 */
-
 const int LAST_HEIGHT_FEE_BLOCK = 180000;
 
 static const bool ENABLE_POS_REWARD_CHANGED = true;
@@ -4349,10 +4345,7 @@ void CBlockIndex::BuildSkip()
 bool ProcessNewBlock(CValidationState& state, const CChainParams& chainparams, CNode* pfrom, const CBlock* pblock, CDiskBlockPos* dbp)
 {
     int nHeight = chainActive.Tip()->nHeight + 1;
-
-    // Reject all blocks from old chain forks
-    if (nHeight > SNAPSHOT_BLOCK && pblock->nTime < SNAPSHOT_VALID_TIME)
-        return error("%s: Invalid block %d, time too old (%x) for %s", __func__, nHeight, pblock->nTime, pblock->GetHash().GetHex());
+    bool usePhi2 = false;
 
     // Preliminary checks
     if (!CheckBlock(*pblock, state, chainparams.GetConsensus()))
@@ -4361,8 +4354,6 @@ bool ProcessNewBlock(CValidationState& state, const CChainParams& chainparams, C
     // Check proof-of-stake block signature
     if (!pblock->CheckBlockSignature())
         return error("%s: bad block signature", __func__);
-
-    bool usePhi2 = false;
 
     // Limited duplicity on stake: prevents block flood attack
     // Duplicate stake allowed only when there is orphan child block
@@ -4376,8 +4367,15 @@ bool ProcessNewBlock(CValidationState& state, const CChainParams& chainparams, C
             pfrom->PushMessage("getblocks", chainActive.GetLocator(), uint256(0));
             return false;
         } else {
-            usePhi2 = pindexPrev->nHeight + 1 >= Params().SwitchPhi2Block();
+            nHeight = pindexPrev->nHeight + 1;
+            usePhi2 = nHeight >= Params().SwitchPhi2Block();
         }
+    }
+
+    // Reject all blocks from old chain forks
+    if (nHeight > SNAPSHOT_BLOCK && pblock->nTime < SNAPSHOT_VALID_TIME) {
+        return error("%s: Invalid block %d, time too old (%x) for %s",
+                __func__, nHeight, pblock->nTime, pblock->GetHash().GetHex());
     }
 
     CBlockIndex* pindex = NULL;
