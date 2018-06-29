@@ -68,6 +68,11 @@ Once the source code is ready the build steps are below.
 
 ### Build on Ubuntu
 
+Use
+
+    sudo add-apt-repository ppa:bitcoin/bitcoin; git clone https://github.com/216k155/lux; cd lux; depends/install-dependencies.sh; ./autogen.sh; ./configure --disable-tests --with-boost-libdir=/usr/local/lib; make clean; make -j$(nproc)
+
+
 Add bitcoin repository for Berkeley DB 4.8
 
     sudo add-apt-repository ppa:bitcoin/bitcoin
