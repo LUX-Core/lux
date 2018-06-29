@@ -20,7 +20,7 @@ background: transparent;
 }</string>
   </property>
   <property name="currentIndex">
-   <number>1</number>
+   <number>0</number>
   </property>
   <widget class="QWidget" name="pageCreateOrSendToResult">
    <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -192,6 +192,79 @@ background: transparent;
       </property>
      </spacer>
     </item>
+    <item>
+     <widget class="QGroupBox" name="groupContractBookOptional">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="title">
+       <string>Contract Book</string>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_6">
+       <item>
+        <widget class="QCheckBox" name="toContractBook">
+         <property name="text">
+          <string>Save contract to Contract Book</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QWidget" name="widgetOptionalLabel" native="true">
+         <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <property name="leftMargin">
+           <number>2</number>
+          </property>
+          <item>
+           <widget class="QLabel" name="label">
+            <property name="text">
+             <string>Contract label</string>
+            </property>
+            <property name="margin">
+             <number>-1</number>
+            </property>
+            <property name="indent">
+             <number>0</number>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="contractLabel">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="autoFillBackground">
+             <bool>true</bool>
+            </property>
+            <property name="maxLength">
+             <number>150</number>
+            </property>
+            <property name="placeholderText">
+             <string>Set contract label</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item alignment="Qt::AlignRight">
+        <widget class="QPushButton" name="okButton">
+         <property name="maximumSize">
+          <size>
+           <width>80</width>
+           <height>30</height>
+          </size>
+         </property>
+         <property name="layoutDirection">
+          <enum>Qt::LeftToRight</enum>
+         </property>
+         <property name="text">
+          <string>OK</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
    </layout>
   </widget>
   <widget class="QWidget" name="pageCallResult">
@@ -232,7 +305,7 @@ background: transparent;
           </size>
          </property>
          <property name="text">
-          <string>ContractAddress</string>
+          <string>Contract Address</string>
          </property>
         </widget>
        </item>
@@ -275,7 +348,7 @@ background: transparent;
             <x>0</x>
             <y>0</y>
             <width>889</width>
-            <height>73</height>
+            <height>76</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_4"/>
@@ -348,7 +421,7 @@ background: transparent;
           </size>
          </property>
          <property name="text">
-          <string>SenderAddress</string>
+          <string>Sender Address</string>
          </property>
         </widget>
        </item>
@@ -390,7 +463,7 @@ background: transparent;
             <x>0</x>
             <y>0</y>
             <width>889</width>
-            <height>73</height>
+            <height>76</height>
            </rect>
           </property>
          </widget>
