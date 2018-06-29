@@ -43,11 +43,13 @@ void ContractResult::setResultData(QVariant result, FunctionABI function, QList<
     case CreateResult:
         updateCreateResult(result);
         setCurrentWidget(ui->pageCreateOrSendToResult);
+        ui->groupContractBookOptional->setVisible(true);
         break;
 
     case SendToResult:
         updateSendToResult(result);
         setCurrentWidget(ui->pageCreateOrSendToResult);
+        ui->groupContractBookOptional->setVisible(false);
         break;
 
     case CallResult:
