@@ -6973,7 +6973,7 @@ valtype GetSenderAddress(const CTransaction& tx, const CCoinsViewCache* coinsVie
         }
     }
     if(!scriptFilled && coinsView){
-        script = coinsView->AccessCoins(tx.vin[0].prevout.hash)->vout[0].scriptPubKey;
+        script = coinsView->AccessCoins(tx.vin[0].prevout.hash)->vout[tx.vin[0].prevout.n].scriptPubKey;
         scriptFilled = true;
     }
     if(!scriptFilled)
