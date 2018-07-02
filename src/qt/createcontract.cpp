@@ -208,6 +208,8 @@ void CreateContract::on_createContractClicked()
                 ContractResult *widgetResult = new ContractResult();
                 widgetResult->setWindowTitle("Result");
                 widgetResult->setResultData(result, FunctionABI(), QList<QStringList>(), ContractResult::CreateResult);
+                widgetResult->setModel(m_model);
+                widgetResult->setABIText(ui->textEditInterface->toPlainText());
                 widgetResult->show();
             } else {
                 QMessageBox::warning(this, tr("Create contract"), errorMessage);

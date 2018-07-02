@@ -2,19 +2,39 @@
 #include "ui_contractresult.h"
 #include "guiconstants.h"
 #include "contractabi.h"
+#include "contracttablemodel.h"
+#include "walletmodel.h"
 
 #include <QMessageBox>
+#include <QCheckBox>
 
 ContractResult::ContractResult(QWidget *parent) :
     QStackedWidget(parent),
     ui(new Ui::ContractResult)
 {
     ui->setupUi(this);
+
+    connect(ui->toContractBook, SIGNAL(stateChanged(int)), SLOT(on_toContractBookStateChanged()));
+    connect(ui->okButton, SIGNAL(clicked()), SLOT(on_okButtonClicked()));
 }
 
 ContractResult::~ContractResult()
 {
     delete ui;
+}
+
+void ContractResult::on_toContractBookStateChanged() {
+    ui->contractLabel->setEnabled(ui->toContractBook->isChecked());
+}
+
+void ContractResult::on_okButtonClicked() {
+    if (!ui->toContractBook->isChecked()) {
+        close();
+        return;
+    }
+
+    walletModel->getContractTableModel()->addRow(ui->contractLabel->text(), ui->lineEditContractAddress->text(), abiText);
+    close();
 }
 
 void ContractResult::setResultData(QVariant result, FunctionABI function, QList<QStringList> paramValues, ContractTxType type)
@@ -23,11 +43,13 @@ void ContractResult::setResultData(QVariant result, FunctionABI function, QList<
     case CreateResult:
         updateCreateResult(result);
         setCurrentWidget(ui->pageCreateOrSendToResult);
+        ui->groupContractBookOptional->setVisible(true);
         break;
 
     case SendToResult:
         updateSendToResult(result);
         setCurrentWidget(ui->pageCreateOrSendToResult);
+        ui->groupContractBookOptional->setVisible(false);
         break;
 
     case CallResult:
