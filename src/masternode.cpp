@@ -112,7 +112,7 @@ void ProcessMasternode(CNode* pfrom, const std::string& strCommand, CDataStream&
 
 
         //search existing masternode list, this is where we update existing masternodes with new dsee broadcasts
-        LOCK(cs_masternodes);
+        //LOCK(cs_masternodes);
         BOOST_FOREACH(CMasterNode& mn, vecMasternodes) {
             if (mn.vin.prevout == vin.prevout) {
                 // count == -1 when it's a new entry
@@ -418,7 +418,7 @@ int GetCurrentMasterNode(int mod, int64_t nBlockHeight, int minProtocol) {
     int i = 0;
     unsigned int score = 0;
     int winner = -1;
-    LOCK(cs_masternodes);
+    //LOCK(cs_masternodes);
     // scan for winner
     BOOST_FOREACH(CMasterNode mn, vecMasternodes) {
         mn.Check();
@@ -478,7 +478,7 @@ int GetMasternodeByRank(int findRank, int64_t nBlockHeight, int minProtocol) {
 }
 
 int GetMasternodeRank(CTxIn& vin, int64_t nBlockHeight, int minProtocol) {
-    LOCK(cs_masternodes);
+    //LOCK(cs_masternodes);
     std::vector< pair<unsigned int, CTxIn> > vecMasternodeScores;
 
     BOOST_FOREACH(CMasterNode & mn, vecMasternodes) {
