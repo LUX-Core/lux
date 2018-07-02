@@ -84,6 +84,9 @@ mkdir -p "$RELEASE"
 
 # Remove the symbols for release
 [ -f "./src/qt/lux-qt.exe" ] && cp "./src/qt/lux-qt.exe" "$RELEASE"
+[ -f "./src/luxd.exe" ] && cp "./src/luxd.exe" "$RELEASE"
+[ -f "./src/lux-cli.exe" ] && cp "./src/lux-cli.exe" "$RELEASE"
+
 
 cd "$RELEASE"
 /usr/bin/$PLATFORM-strip *
