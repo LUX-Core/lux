@@ -807,6 +807,72 @@ void SocketSendData(CNode* pnode)
 
 static list<CNode*> vNodesDisconnected;
 
+static void AcceptConnection(const ListenSocket& hListenSocket) {
+
+    struct sockaddr_storage sockaddr;
+    socklen_t len = sizeof(sockaddr);
+    SOCKET hSocket = accept(hListenSocket.socket, (struct sockaddr *) &sockaddr, &len);
+    CAddress addr;
+    int nInbound = 0;
+    int nMaxOutbound = 0;
+    int nMaxInbound = nMaxConnections - (nMaxOutbound);
+
+    if (hSocket != INVALID_SOCKET)
+        if (!addr.SetSockAddr((const struct sockaddr *) &sockaddr))
+            LogPrintf("Warning: Unknown socket family\n");
+
+    bool whitelisted = hListenSocket.whitelisted || CNode::IsWhitelistedRange(addr);{
+        LOCK(cs_vNodes);
+        BOOST_FOREACH (CNode *pnode, vNodes)if (pnode->fInbound)
+                            nInbound++;
+    }
+
+    if (hSocket == INVALID_SOCKET) {
+        int nErr = WSAGetLastError();
+        if (nErr != WSAEWOULDBLOCK)
+            LogPrintf("socket error accept failed: %s\n", NetworkErrorString(nErr));
+        return;
+    }
+
+    if (!IsSelectableSocket(hSocket)) {
+        LogPrintf("connection from %s dropped: non-selectable socket\n", addr.ToString());
+        CloseSocket(hSocket);
+        return;
+    }
+
+    if (CNode::IsBanned(addr) && !whitelisted) {
+        LogPrintf("connection from %s dropped (banned)\n", addr.ToString());
+        CloseSocket(hSocket);
+        return;
+    }
+
+    if (nInbound >= nMaxInbound) {
+        LogPrint("net", "connection from %s dropped (full)\n", addr.ToString());
+        CloseSocket(hSocket);
+        return;
+    }
+
+    if (nInbound >= nMaxConnections - MAX_OUTBOUND_CONNECTIONS) {
+        LogPrint("net", "connection from %s dropped (full)\n", addr.ToString());
+        CloseSocket(hSocket);
+        return;
+    }
+
+    if (!fNetworkActive) {
+        printf("connection from %s dropped (not accepting new connections)\n", addr.ToString().c_str());
+        //closesocket(hSocket);
+        return;
+    }
+
+        CNode *pnode = new CNode(hSocket, addr, "", true);
+        pnode->AddRef();
+        pnode->fWhitelisted = whitelisted;
+        {
+            LOCK(cs_vNodes);
+            vNodes.push_back(pnode);
+        }
+    }
+
 void ThreadSocketHandler()
 {
     unsigned int nPrevNodeCount = 0;
@@ -959,50 +1025,7 @@ void ThreadSocketHandler()
         //
         BOOST_FOREACH (const ListenSocket& hListenSocket, vhListenSocket) {
             if (hListenSocket.socket != INVALID_SOCKET && FD_ISSET(hListenSocket.socket, &fdsetRecv)) {
-                struct sockaddr_storage sockaddr;
-                socklen_t len = sizeof(sockaddr);
-                SOCKET hSocket = accept(hListenSocket.socket, (struct sockaddr*)&sockaddr, &len);
-                CAddress addr;
-                int nInbound = 0;
-
-                if (hSocket != INVALID_SOCKET)
-                    if (!addr.SetSockAddr((const struct sockaddr*)&sockaddr))
-                        LogPrintf("Warning: Unknown socket family\n");
-
-                bool whitelisted = hListenSocket.whitelisted || CNode::IsWhitelistedRange(addr);
-                {
-                    LOCK(cs_vNodes);
-                    BOOST_FOREACH (CNode* pnode, vNodes)
-                        if (pnode->fInbound)
-                            nInbound++;
-                }
-
-                if (hSocket == INVALID_SOCKET) {
-                    int nErr = WSAGetLastError();
-                    if (nErr != WSAEWOULDBLOCK)
-                        LogPrintf("socket error accept failed: %s\n", NetworkErrorString(nErr));
-                } else if (!IsSelectableSocket(hSocket)) {
-                    LogPrintf("connection from %s dropped: non-selectable socket\n", addr.ToString());
-                    CloseSocket(hSocket);
-                } else if (nInbound >= nMaxConnections - MAX_OUTBOUND_CONNECTIONS) {
-                    LogPrint("net", "connection from %s dropped (full)\n", addr.ToString());
-                    CloseSocket(hSocket);
-                } else if (CNode::IsBanned(addr) && !whitelisted) {
-                    LogPrintf("connection from %s dropped (banned)\n", addr.ToString());
-                    CloseSocket(hSocket);
-                } else if (!fNetworkActive) {
-                    printf("connection from %s dropped (not accepting new connections)\n", addr.ToString().c_str());
-                    //closesocket(hSocket);
-                  } else {
-                    CNode* pnode = new CNode(hSocket, addr, "", true);
-                    pnode->AddRef();
-                    pnode->fWhitelisted = whitelisted;
-
-                    {
-                        LOCK(cs_vNodes);
-                        vNodes.push_back(pnode);
-                    }
-                }
+                AcceptConnection(hListenSocket);
             }
         }
 
@@ -1292,20 +1315,19 @@ void static ProcessOneShot()
     CAddress addr;
     CSemaphoreGrant grant(*semOutbound, true);
     if (grant) {
-        if (!OpenNetworkConnection(addr, &grant, strDest.c_str(), true))
+        if (!OpenNetworkConnection(addr, false, &grant, strDest.c_str(), true))
             AddOneShot(strDest);
     }
 }
 
-void ThreadOpenConnections()
-{
+void ThreadOpenConnections() {
     // Connect to specific addresses
     if (mapArgs.count("-connect") && mapMultiArgs["-connect"].size() > 0) {
         for (int64_t nLoop = 0;; nLoop++) {
             ProcessOneShot();
             BOOST_FOREACH (string strAddr, mapMultiArgs["-connect"]) {
                 CAddress addr;
-                OpenNetworkConnection(addr, NULL, strAddr.c_str());
+                OpenNetworkConnection(addr, false, NULL, strAddr.c_str());
                 for (int i = 0; i < 10 && i < nLoop; i++) {
                     MilliSleep(500);
                 }
@@ -1382,8 +1404,8 @@ void ThreadOpenConnections()
                 continue;
 
             // only consider nodes missing relevant services after 40 failed attemps
-            if ((addr.nServices & nRelevantServices) != nRelevantServices && nTries < 40)
-                continue;    
+            if ((addr.nServices & nRelevantServices) != nRelevantServices && (nTries < 40))
+                continue;
 
             // do not allow non-default ports, unless after 50 invalid addresses selected already
             if (addr.GetPort() != Params().GetDefaultPort() && nTries < 50)
@@ -1394,8 +1416,60 @@ void ThreadOpenConnections()
         }
 
         if (addrConnect.IsValid())
-            OpenNetworkConnection(addrConnect, &grant);
+            OpenNetworkConnection(addrConnect, (int)setConnected.size() >= std::min(nMaxConnections - 1, 2), &grant, NULL, false);
     }
+}
+
+std::vector<AddedNodeInfo> GetAddedNodeInfo()
+{
+    std::vector<AddedNodeInfo> ret;
+
+    std::list<std::string> lAddresses(0);
+    {
+        LOCK(cs_vAddedNodes);
+        ret.reserve(vAddedNodes.size());
+        BOOST_FOREACH(const std::string& strAddNode, vAddedNodes)
+                        lAddresses.push_back(strAddNode);
+    }
+
+
+    // Build a map of all already connected addresses (by IP:port and by name) to inbound/outbound and resolved CService
+    std::map<CService, bool> mapConnected;
+    std::map<std::string, std::pair<bool, CService>> mapConnectedByName;
+    {
+        LOCK(cs_vNodes);
+        for (const CNode* pnode : vNodes) {
+            if (pnode->addr.IsValid()) {
+                mapConnected[pnode->addr] = pnode->fInbound;
+            }
+            if (!pnode->addrName.empty()) {
+                mapConnectedByName[pnode->addrName] = std::make_pair(pnode->fInbound, static_cast<const CService&>(pnode->addr));
+            }
+        }
+    }
+
+    BOOST_FOREACH(const std::string& strAddNode, lAddresses) {
+                    CService service(strAddNode, Params().GetDefaultPort());
+                    if (service.IsValid()) {
+                        // strAddNode is an IP:port
+                        auto it = mapConnected.find(service);
+                        if (it != mapConnected.end()) {
+                            ret.push_back(AddedNodeInfo{strAddNode, service, true, it->second});
+                        } else {
+                            ret.push_back(AddedNodeInfo{strAddNode, CService(), false, false});
+                        }
+                    } else {
+                        // strAddNode is a name
+                        auto it = mapConnectedByName.find(strAddNode);
+                        if (it != mapConnectedByName.end()) {
+                            ret.push_back(AddedNodeInfo{strAddNode, it->second.second, true, it->second.first});
+                        } else {
+                            ret.push_back(AddedNodeInfo{strAddNode, CService(), false, false});
+                        }
+                    }
+                }
+
+    return ret;
 }
 
 void ThreadOpenAddedConnections()
@@ -1405,68 +1479,25 @@ void ThreadOpenAddedConnections()
         vAddedNodes = mapMultiArgs["-addnode"];
     }
 
-    if (HaveNameProxy()) {
-        while (true) {
-            list<string> lAddresses(0);
-            {
-                LOCK(cs_vAddedNodes);
-                BOOST_FOREACH (string& strAddNode, vAddedNodes)
-                    lAddresses.push_back(strAddNode);
-            }
-            BOOST_FOREACH (string& strAddNode, lAddresses) {
-                CAddress addr;
+    for (unsigned int i = 0; true; i++)
+    {
+        std::vector<AddedNodeInfo> vInfo = GetAddedNodeInfo();
+        for (const AddedNodeInfo& info : vInfo) {
+            if (!info.fConnected) {
                 CSemaphoreGrant grant(*semOutbound);
-                OpenNetworkConnection(addr, &grant, strAddNode.c_str());
+                // If strAddedNode is an IP/port, decode it immediately, so
+                // OpenNetworkConnection can detect existing connections to that IP/port.
+                CService service(info.strAddedNode, Params().GetDefaultPort());
+                OpenNetworkConnection(CAddress(service, NODE_NONE), false, &grant, info.strAddedNode.c_str(), false);
                 MilliSleep(500);
             }
-            MilliSleep(120000); // Retry every 2 minutes
-        }
-    }
-
-    for (unsigned int i = 0; true; i++) {
-        list<string> lAddresses(0);
-        {
-            LOCK(cs_vAddedNodes);
-            BOOST_FOREACH (string& strAddNode, vAddedNodes)
-                lAddresses.push_back(strAddNode);
-        }
-
-        list<vector<CService> > lservAddressesToAdd(0);
-        BOOST_FOREACH (string& strAddNode, lAddresses) {
-            vector<CService> vservNode(0);
-            if (Lookup(strAddNode.c_str(), vservNode, Params().GetDefaultPort(), fNameLookup, 0)) {
-                lservAddressesToAdd.push_back(vservNode);
-                {
-                    LOCK(cs_setservAddNodeAddresses);
-                    BOOST_FOREACH (CService& serv, vservNode)
-                        setservAddNodeAddresses.insert(serv);
-                }
-            }
-        }
-        // Attempt to connect to each IP for each addnode entry until at least one is successful per addnode entry
-        // (keeping in mind that addnode entries can have many IPs if fNameLookup)
-        {
-            LOCK(cs_vNodes);
-            BOOST_FOREACH (CNode* pnode, vNodes)
-                for (list<vector<CService> >::iterator it = lservAddressesToAdd.begin(); it != lservAddressesToAdd.end(); it++)
-                    BOOST_FOREACH (CService& addrNode, *(it))
-                        if (pnode->addr == addrNode) {
-                            it = lservAddressesToAdd.erase(it);
-                            it--;
-                            break;
-                        }
-        }
-        BOOST_FOREACH (vector<CService>& vserv, lservAddressesToAdd) {
-            CSemaphoreGrant grant(*semOutbound);
-            OpenNetworkConnection(CAddress(vserv[i % vserv.size()], NODE_NONE), &grant);
-            MilliSleep(500);
         }
         MilliSleep(120000); // Retry every 2 minutes
     }
 }
 
 // if successful, this moves the passed grant to the constructed node
-bool OpenNetworkConnection(const CAddress& addrConnect, CSemaphoreGrant* grantOutbound, const char* pszDest, bool fOneShot)
+bool OpenNetworkConnection(const CAddress& addrConnect, bool fCountFailure, CSemaphoreGrant *grantOutbound, const char *pszDest, bool fOneShot, bool fAddnode)
 {
     //
     // Initiate outbound network connection
@@ -1497,15 +1528,13 @@ bool OpenNetworkConnection(const CAddress& addrConnect, CSemaphoreGrant* grantOu
 }
 
 
-void ThreadMessageHandler()
-{
+void ThreadMessageHandler() {
     boost::mutex condition_mutex;
     boost::unique_lock<boost::mutex> lock(condition_mutex);
 
     SetThreadPriority(THREAD_PRIORITY_BELOW_NORMAL);
     while (true) {
-        vector<CNode*> vNodesCopy;
-        {
+        vector<CNode*> vNodesCopy;{
             LOCK(cs_vNodes);
             vNodesCopy = vNodes;
             BOOST_FOREACH (CNode* pnode, vNodesCopy) {
@@ -1548,8 +1577,6 @@ void ThreadMessageHandler()
             }
             boost::this_thread::interruption_point();
         }
-
-
         {
             LOCK(cs_vNodes);
             BOOST_FOREACH (CNode* pnode, vNodesCopy)
@@ -1578,8 +1605,7 @@ void ThreadMessageHandler()
 //    LogPrintf("ThreadStakeMinter exiting,\n");
 //}
 
-bool BindListenPort(const CService& addrBind, string& strError, bool fWhitelisted)
-{
+bool BindListenPort(const CService& addrBind, string& strError, bool fWhitelisted) {
     strError = "";
     int nOne = 1;
 
@@ -1666,8 +1692,7 @@ bool BindListenPort(const CService& addrBind, string& strError, bool fWhiteliste
     return true;
 }
 
-void static Discover(boost::thread_group& threadGroup)
-{
+void static Discover(boost::thread_group& threadGroup) {
     if (!fDiscover)
         return;
 
@@ -1709,12 +1734,10 @@ void static Discover(boost::thread_group& threadGroup)
 #endif
 }
 
-void StartNode(boost::thread_group& threadGroup, CScheduler& scheduler)
-{
+void StartNode(boost::thread_group& threadGroup, CScheduler& scheduler) {
     uiInterface.InitMessage(_("Loading addresses..."));
     // Load addresses for peers.dat
-    int64_t nStart = GetTimeMillis();
-    {
+    int64_t nStart = GetTimeMillis();{
         CAddrDB adb;
         if (!adb.Read(addrman))
             LogPrintf("Invalid or missing peers.dat; recreating\n");
@@ -1784,8 +1807,7 @@ void StartNode(boost::thread_group& threadGroup, CScheduler& scheduler)
     }
 }
 
-bool StopNode()
-{
+bool StopNode() {
     LogPrintf("StopNode()\n");
     MapPort(false);
     if (semOutbound)
@@ -1800,8 +1822,7 @@ bool StopNode()
     return true;
 }
 
-void SetNetworkActive(bool active)
-{
+void SetNetworkActive(bool active) {
     if (fDebug)
         printf("SetNetworkActive: %s\n", active ? "true" : "false");
 
@@ -1810,8 +1831,7 @@ void SetNetworkActive(bool active)
 
         LOCK(cs_vNodes);
         // Close sockets to all nodes
-        BOOST_FOREACH(CNode* pnode, vNodes)
-        {
+        BOOST_FOREACH(CNode* pnode, vNodes) {
             pnode->CloseSocketDisconnect();
         }
     } else {
@@ -1821,8 +1841,7 @@ void SetNetworkActive(bool active)
     uiInterface.NotifyNetworkActiveChanged(fNetworkActive);
 }
 
-class CNetCleanup
-{
+class CNetCleanup {
 public:
     CNetCleanup() {}
 
@@ -1857,16 +1876,14 @@ public:
     }
 } instance_of_cnetcleanup;
 
-void CExplicitNetCleanup::callCleanup()
-{
+void CExplicitNetCleanup::callCleanup() {
     // Explicit call to destructor of CNetCleanup because it's not implicitly called
     // when the wallet is restarted from within the wallet itself.
     CNetCleanup* tmp = new CNetCleanup();
     delete tmp; // Stroustrup's gonna kill me for that
 }
 
-void RelayTransaction(const CTransaction& tx)
-{
+void RelayTransaction(const CTransaction& tx) {
     CDataStream ss(SER_NETWORK, PROTOCOL_VERSION);
     ss.reserve(10000);
     ss << tx;
