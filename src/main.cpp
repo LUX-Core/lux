@@ -6055,7 +6055,7 @@ static bool ProcessMessage(CNode* pfrom, const string &strCommand, CDataStream& 
             vEraseQueue.push_back(inv.hash);
 
             LogPrint("mempool", "AcceptToMemoryPool: peer=%d %s : accepted %s (poolsz %u)\n",
-                pfrom->id, pfrom->cleanSubVer,
+                pfrom->id,
                 tx.GetHash().ToString(),
                 mempool.mapTx.size());
 
@@ -6127,7 +6127,7 @@ static bool ProcessMessage(CNode* pfrom, const string &strCommand, CDataStream& 
         int nDoS = 0;
         if (state.IsInvalid(nDoS)) {
             LogPrint("mempool", "%s from peer=%d %s was not accepted into the memory pool: %s\n", tx.GetHash().ToString(),
-                pfrom->id, pfrom->cleanSubVer,
+                pfrom->id,
                 state.GetRejectReason());
             pfrom->PushMessage("reject", strCommand, state.GetRejectCode(),
                 state.GetRejectReason().substr(0, MAX_REJECT_MESSAGE_LENGTH), inv.hash);
@@ -6338,7 +6338,6 @@ static bool ProcessMessage(CNode* pfrom, const string &strCommand, CDataStream& 
         if (!(sProblem.empty())) {
             LogPrint("net", "pong peer=%d %s: %s, %x expected, %x received, %u bytes\n",
                 pfrom->id,
-                pfrom->cleanSubVer,
                 sProblem,
                 pfrom->nPingNonceSent,
                 nonce,

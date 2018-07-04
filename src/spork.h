@@ -59,7 +59,7 @@ extern std::map<int, CSporkMessage> mapSporksActive;
 extern CSporkManager sporkManager;
 
 void ProcessSpork(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv, bool &isSporkCommand);
-long GetSporkValue(int nSporkID);
+int GetSporkValue(int nSporkID);
 bool IsSporkActive(int nSporkID);
 void ExecuteSpork(int nSporkID, int nValue);
 
