@@ -210,10 +210,15 @@ public:
         assert(consensus.hashGenesisBlock == uint256("0x00000759bb3da130d7c9aedae170da8335f5a0d01a9007e4c8d3ccd08ace6a42"));
         assert(genesis.hashMerkleRoot == uint256("0xe08ae0cfc35a1d70e6764f347fdc54355206adeb382446dd54c32cd0201000d3"));
 
+        vSeeds.push_back(CDNSSeedData("140.82.21.110", "140.82.21.110"));        // Luxgate seed
         vSeeds.push_back(CDNSSeedData("149.28.163.40", "149.28.163.40"));        // Main seed
         vSeeds.push_back(CDNSSeedData("207.148.83.62", "207.148.83.62"));        // Chain state seed
         vSeeds.push_back(CDNSSeedData("207.148.81.88", "207.148.81.88"));        // Global state seed
         vSeeds.push_back(CDNSSeedData("149.28.172.147", "149.28.172.147"));      // Main seed
+        ////////////////////////////////////////////////////////////////////////////////////////////////
+        vSeeds.push_back(CDNSSeedData("45.32.86.162", "45.32.86.162"));           // DNSSeed
+        vSeeds.push_back(CDNSSeedData("45.77.127.10", "45.77.127.10"));           // DNSSeed
+        vSeeds.push_back(CDNSSeedData("45.32.146.237", "45.32.146.237"));         // DNSSeed
 
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,48); // LUX address start with 'L'
         base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1,63); // LUX script addresses start with 'S'
