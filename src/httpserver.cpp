@@ -464,6 +464,10 @@ void InterruptHTTPServer()
         }
         evhttp_set_gencb(eventHTTP, http_reject_request_cb, NULL);
     }
+        // Force-exit after a predefined time
+        if (eventBase) {
+        struct timeval tv; tv.tv_sec = 10; tv.tv_usec = 0; event_base_loopexit(eventBase, &tv);
+    }
     if (workQueue)
         workQueue->Interrupt();
 }
