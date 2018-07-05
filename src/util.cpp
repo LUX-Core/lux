@@ -125,6 +125,7 @@ string strBudgetMode = "";
 map<string, string> mapArgs;
 map<string, vector<string> > mapMultiArgs;
 bool fDebug = false;
+bool fDebugMnSecurity = false;
 bool fPrintToConsole = false;
 bool fPrintToDebugLog = true;
 bool fDaemon = false;

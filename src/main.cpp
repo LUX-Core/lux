@@ -3792,11 +3792,15 @@ bool CheckForMasternodePayment(const CTransaction& tx, const CBlockHeader& heade
         // Avoid costly checks early on first PoW blocks
         if (nHeight < chainParams.FirstSplitRewardBlock())
             return true;
+        LOCK(cs_main);
         BOOST_FOREACH(const CTxOut& txout, tx.vout) {
             totalReward += txout.nValue;
         }
     }
 
+    if (fDebugMnSecurity) LogPrintf("%s: totalReward = %ld \n",__func__, totalReward);
+
+    // New block
     bool hasMasternodePayment = false;
     if (tx.vout.size() >= 2 && tx.nTime > (GetTime() - 3600)) {
 
@@ -3806,11 +3810,13 @@ bool CheckForMasternodePayment(const CTransaction& tx, const CBlockHeader& heade
             vmnScripts.push_back(GetScriptForDestination(mn.pubkey.GetID()));
         }
 
+        LOCK(cs_main);
         BOOST_FOREACH(const CTxOut& txout, tx.vout) {
             auto it = std::find(vmnScripts.begin(), vmnScripts.end(), txout.scriptPubKey);
             if (it != vmnScripts.end()) {
                 hasMasternodePayment = true;
                 masternodePayment = txout.nValue;
+                if (fDebugMnSecurity) LogPrintf("%s: masternodePayment = %ld \n",__func__, masternodePayment);
                 break;
             }
         }
@@ -3820,49 +3826,40 @@ bool CheckForMasternodePayment(const CTransaction& tx, const CBlockHeader& heade
     const int nPrecision = 1000000;
 
     totalReward /= nPrecision;
+    CAmount roundMnAward = 999999999;
 
-    // during initial download (old blocks), only check the amounts, not via the "current" pub keys
+    if (tx.IsCoinBase()) {
+        roundMnAward = (CAmount) (totalReward * 0.2f);
+    }
+
+    if (tx.IsCoinStake() && tx.vout.size() >= 3) {
+        roundMnAward = GetMasternodePayment(nHeight, totalReward);
+    }
+
+    // Old blocks sync from other nodes: check the amounts, not via the "current" pub keys
     if (!hasMasternodePayment && tx.vout.size() >= 2) {
+        CAmount roundMnPayment = 0;
+
+        LOCK(cs_main);
         BOOST_FOREACH(const CTxOut& txout, tx.vout) {
-            if (tx.IsCoinBase() && (txout.nValue/nPrecision) == (totalReward * 0.2f)) {
-                hasMasternodePayment = true;
-                masternodePayment = txout.nValue;
-                break;
-            }
-            if (tx.IsCoinStake() && tx.vout.size() >= 3 && txout.nValue > 0 && (txout.nValue/nPrecision) <= (totalReward * 0.4f)) {
-                hasMasternodePayment = true;
-                masternodePayment = txout.nValue;
-                break;
-            }
+            roundMnPayment = (CAmount) (txout.nValue / nPrecision);
+            if (roundMnAward == roundMnPayment)  return true;
+            if (fDebugMnSecurity) LogPrintf("%s: roundMnAward = %ld roundMnPayment = %ld \n",__func__, roundMnAward, roundMnPayment);
         }
     }
 
     masternodePayment /= nPrecision;
 
-    // If tx is coinbase (PoW) and current height is after the hardfork, then tx should send 20% of the reward to a masternode
-    if (tx.IsCoinBase()) {
-
-        // Tx is coinbase, PoW split reward is active, but no masternode payment is found or payment amount is null
-        if (!hasMasternodePayment || masternodePayment == 0)
-            return false;
-
-        return (totalReward * 0.2f) == masternodePayment;
+    if (fDebugMnSecurity) {
+        LogPrintf("%s: hasMasternodePayment (%s) \n",__func__, hasMasternodePayment ? "NOT NULL": "NULL");
+        LogPrintf("%s: roundMnAward (%ld) masternodePayment (%ld)\n",__func__, roundMnAward, masternodePayment);
     }
 
-    // If tx is coinstake, then masternode payment should be 40% of reward before the hardfork and 20% after
-    else {
+    // no masternode payment is found or payment amount is null
+    if (!hasMasternodePayment || masternodePayment == 0)
+        return false;
 
-        // Tx is coinstake, but no masternode payment is found or payment amount is null
-        if (!hasMasternodePayment || masternodePayment == 0)
-            return false;
-
-        if (nHeight < chainParams.FirstSplitRewardBlock())
-            return (totalReward * 0.4f) == masternodePayment;
-        else
-            return (totalReward * 0.2f) == masternodePayment;
-    }
-
-    return false;
+    return (roundMnAward == masternodePayment);
 }
 
 bool CheckBlock(const CBlock& block, CValidationState& state, const Consensus::Params& consensusParams, bool fCheckPOW, bool fCheckMerkleRoot, bool fCheckSig)

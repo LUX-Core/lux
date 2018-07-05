@@ -860,6 +860,9 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
     if (GetBoolArg("-nodebug", false) || find(categories.begin(), categories.end(), string("0")) != categories.end())
         fDebug = false;
 
+    // check for -mnsec
+    fDebugMnSecurity = GetBoolArg("-mnsec", false);
+
     // Check for -debugnet
     if (GetBoolArg("-debugnet", false))
         InitWarning(_("Warning: Unsupported argument -debugnet ignored, use -debug=net."));

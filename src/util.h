@@ -48,6 +48,7 @@ extern std::string strBudgetMode;
 extern std::map<std::string, std::string> mapArgs;
 extern std::map<std::string, std::vector<std::string> > mapMultiArgs;
 extern bool fDebug;
+extern bool fDebugMnSecurity;
 extern bool fPrintToConsole;
 extern bool fPrintToDebugLog;
 extern bool fServer;
