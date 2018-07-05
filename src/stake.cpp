@@ -471,22 +471,8 @@ bool Stake::CheckProof(CBlockIndex* const pindexPrev, const CBlock &block, uint2
         return error("%s: failed to find block", __func__);
 
     unsigned int nTime = block.nTime;
-#   if 1
-    if (!CheckHash(pindexPrev, block.nBits, prevBlock, txPrev, txin.prevout, nTime, hashProofOfStake))
-        // may occur during initial download or if behind on block chain sync
-        return error("%s: invalid coinstake %s, hashProof=%s", __func__, 
-                     tx.GetHash().ToString(), hashProofOfStake.ToString());
-    return true;
-#   else
-    int txOutSize = txPrev.vout.size() - 1;
-    CAmount totalReward = GetProofOfStakeReward(0, 0, nBlockHeight);
-    CAmount mnReward = GetMasternodePayment(nBlockHeight, totalReward);
-
-    if (txPrev.vout[txOutSize].nValue != mnReward)
-        return error("%s: Invalid MasterNode payment for PoS block %d", __func__, nBlockHeight);
 
     return CheckHash(pindexPrev, block.nBits, prevBlock, txPrev, txin.prevout, nTime, hashProofOfStake);
-#   endif
 }
 
 // Get stake modifier checksum
