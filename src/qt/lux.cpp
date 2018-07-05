@@ -447,6 +447,7 @@ void BitcoinApplication::requestInitialize()
 
 void BitcoinApplication::requestShutdown()
 {
+    ShutdownWindow::showShutdownWindow(window);
     qDebug() << __func__ << ": Requesting shutdown";
     startThread();
     window->hide();
@@ -468,9 +469,6 @@ void BitcoinApplication::requestShutdown()
         delete clientModel;
     }
     clientModel = 0;
-
-    // Show a simple window indicating shutdown status
-    ShutdownWindow::showShutdownWindow(window);
 
     // Request shutdown from core thread
     emit requestedShutdown();

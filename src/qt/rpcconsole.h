@@ -11,6 +11,10 @@
 #include "net.h"
 
 #include <QDialog>
+#include <QThread>
+#include <QWidget>
+#include <QCompleter>
+
 class QMenu;
 class ClientModel;
 
@@ -150,6 +154,9 @@ private:
     NodeId cachedNodeid;
     int consoleFontSize;
     QMenu *contextMenu;
+    QCompleter *autoCompleter;
+    QThread thread;
+
 };
 
 #endif // BITCOIN_QT_RPCCONSOLE_H

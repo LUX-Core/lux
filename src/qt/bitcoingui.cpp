@@ -642,6 +642,12 @@ void BitcoinGUI::setClientModel(ClientModel* clientModel)
             // Disable context menu on tray icon
             trayIconMenu->clear();
         }
+        // Propagate cleared model to child objects
+        rpcConsole->setClientModel(nullptr);
+#ifdef ENABLE_WALLET
+        walletFrame->setClientModel(nullptr);
+#endif // ENABLE_WALLET
+        unitDisplayControl->setOptionsModel(nullptr);
     }
 }
 
@@ -882,27 +888,11 @@ void BitcoinGUI::updateNetworkState()
     int count = clientModel->getNumConnections();
     QString icon;
     switch (count) {
-    case 0:
-        icon = ":/icons/connect_0";
-        break;
-    case 1:
-    case 2:
-    case 3:
-        icon = ":/icons/connect_1";
-        break;
-    case 4:
-    case 5:
-    case 6:
-        icon = ":/icons/connect_2";
-        break;
-    case 7:
-    case 8:
-    case 9:
-        icon = ":/icons/connect_3";
-        break;
-    default:
-        icon = ":/icons/connect_4";
-        break;
+    case 0: icon = ":/icons/connect_0"; break;
+    case 1: case 2: case 3: icon = ":/icons/connect_1"; break;
+    case 4: case 5: case 6: icon = ":/icons/connect_2"; break;
+    case 7: case 8: case 9: icon = ":/icons/connect_3"; break;
+    default: icon = ":/icons/connect_4"; break;
     }
     QIcon connectionItem = QIcon(icon).pixmap(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE);
     //labelConnectionsIcon->setIcon(connectionItem);

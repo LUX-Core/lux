@@ -417,7 +417,6 @@ RPCConsole::RPCConsole(QWidget* parent) : QDialog(parent),
     ui->berkeleyDBVersion->hide();
 #endif
 
-    startExecutor();
     setTrafficGraphRange(INITIAL_TRAFFIC_GRAPH_MINS);
 
     ui->peerHeading->setText(tr("Select a peer to view detailed information."));
@@ -430,7 +429,6 @@ RPCConsole::RPCConsole(QWidget* parent) : QDialog(parent),
 RPCConsole::~RPCConsole()
 {
     GUIUtil::saveWindowGeometry("nRPCConsoleWindow", this);
-    emit stopExecutor();
     delete ui;
 }
 
@@ -461,6 +459,14 @@ bool RPCConsole::eventFilter(QObject* obj, QEvent* event)
                 return true;
             }
             break;
+            case Qt::Key_Return:
+            case Qt::Key_Enter:
+                // forward these events to lineEdit
+                if(obj == autoCompleter->popup()) {
+                    QApplication::postEvent(ui->lineEdit, new QKeyEvent(*keyevt));
+                    return true;
+                }
+                break;
         default:
             // Typing in messages widget brings focus to line edit, and redirects key there
             // Exclude most combinations and keys that emit no text, except paste shortcuts
@@ -532,6 +538,26 @@ void RPCConsole::setClientModel(ClientModel* model)
         ui->startupTime->setText(model->formatClientStartupTime());
 
         ui->networkName->setText(QString::fromStdString(Params().NetworkIDString()));
+
+        //Setup autocomplete and attach it
+        QStringList wordList;
+        std::vector<std::string> commandList = tableRPC.listCommands();
+        for (size_t i = 0; i < commandList.size(); ++i)
+        {
+            wordList << commandList[i].c_str();
+        }
+
+        autoCompleter = new QCompleter(wordList, this);
+        ui->lineEdit->setCompleter(autoCompleter);
+        autoCompleter->popup()->installEventFilter(this);
+        // Start thread to execute RPC commands.
+        startExecutor();
+    }
+    if (!model) {
+        // Client model is being set to 0, this means shutdown() is about to be called.
+        // Make sure we clean up the executor thread
+        emit stopExecutor();
+        thread.wait();
     }
 }
 
@@ -806,9 +832,8 @@ void RPCConsole::browseHistory(int offset)
 
 void RPCConsole::startExecutor()
 {
-    QThread* thread = new QThread;
     RPCExecutor* executor = new RPCExecutor();
-    executor->moveToThread(thread);
+    executor->moveToThread(&thread);
 
     // Replies from executor object must go to this object
     connect(executor, SIGNAL(reply(int, QString)), this, SLOT(message(int, QString)));
@@ -816,16 +841,13 @@ void RPCConsole::startExecutor()
     connect(this, SIGNAL(cmdRequest(QString)), executor, SLOT(request(QString)));
 
     // On stopExecutor signal
-    // - queue executor for deletion (in execution thread)
-    // - quit the Qt event loop in the execution thread
-    connect(this, SIGNAL(stopExecutor()), executor, SLOT(deleteLater()));
-    connect(this, SIGNAL(stopExecutor()), thread, SLOT(quit()));
-    // Queue the thread for deletion (in this thread) when it is finished
-    connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
+    connect(this, SIGNAL(stopExecutor()), &thread, SLOT(quit()));
+    connect(&thread, SIGNAL(finished()), executor, SLOT(deleteLater()), Qt::DirectConnection);
+    connect(&thread, SIGNAL(finished()), this, SLOT(test()), Qt::DirectConnection);
 
     // Default implementation of QThread::run() simply spins up an event loop in the thread,
     // which is what we want.
-    thread->start();
+    thread.start();
 }
 
 void RPCConsole::on_tabWidget_currentChanged(int index)
