@@ -1840,7 +1840,7 @@ CAmount GetMasternodePayment(int nHeight, int64_t blockValue, int nMasternodeCou
 bool IsInitialBlockDownload()
 {
     const CChainParams& chainParams = Params();
-    LOCK(cs_main);
+    //LOCK(cs_main);
     if (fImporting || fReindex || chainActive.Height() < Checkpoints::GetTotalBlocksEstimate(chainParams.Checkpoints()))
         return true;
     // ~144 blocks behind -> 2 x fork detection time
