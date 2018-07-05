@@ -30,8 +30,9 @@ using namespace std;
 static bool fCreateBlank;
 static map<string, UniValue> registers;
 //CClientUIInterface uiInterface;
+static const int CONTINUE_EXECUTION=-1;
 
-static bool AppInitRawTx(int argc, char* argv[])
+static int AppInitRawTx(int argc, char* argv[])
 {
     //
     // Parameters
@@ -41,7 +42,7 @@ static bool AppInitRawTx(int argc, char* argv[])
     // Check for -testnet or -regtest parameter (Params() calls are only valid after this clause)
     if (!SelectParamsFromCommandLine()) {
         fprintf(stderr, "Error: Invalid combination of -regtest and -testnet.\n");
-        return false;
+        return EXIT_FAILURE;
     }
 
     fCreateBlank = GetBoolArg("-create", false);
@@ -90,9 +91,13 @@ static bool AppInitRawTx(int argc, char* argv[])
         strUsage += "\n";
         fprintf(stdout, "%s", strUsage.c_str());
 
-        return false;
+        if (argc < 2) {
+            fprintf(stderr, "Error: too few parameters\n");
+            return EXIT_FAILURE;
+        }
+        return EXIT_SUCCESS;
     }
-    return true;
+    return CONTINUE_EXECUTION;
 }
 
 static void RegisterSetJson(const string& key, const string& rawJson)
@@ -618,13 +623,13 @@ static int CommandLineRawTx(int argc, char* argv[])
     return nRet;
 }
 
-int main(int argc, char* argv[])
-{
+int main(int argc, char* argv[]) {
     SetupEnvironment();
 
     try {
-        if (!AppInitRawTx(argc, argv))
-            return EXIT_FAILURE;
+        int ret = AppInitRawTx(argc, argv);
+        if (ret != CONTINUE_EXECUTION)
+            return ret;
     } catch (std::exception& e) {
         PrintExceptionContinue(&e, "AppInitRawTx()");
         return EXIT_FAILURE;
