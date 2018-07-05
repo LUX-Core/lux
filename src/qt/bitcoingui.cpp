@@ -276,8 +276,7 @@ BitcoinGUI::BitcoinGUI(const NetworkStyle* networkStyle, QWidget* parent) : QMai
     setStakingStatus();
 }
 
-BitcoinGUI::~BitcoinGUI()
-{
+BitcoinGUI::~BitcoinGUI() {
     // Unsubscribe from notifications from core
     unsubscribeFromCoreSignals();
 
@@ -290,13 +289,8 @@ BitcoinGUI::~BitcoinGUI()
 #endif
 }
 
-void BitcoinGUI::createActions(const NetworkStyle* networkStyle)
-{
+void BitcoinGUI::createActions(const NetworkStyle* networkStyle) {
     QActionGroup* tabGroup = new QActionGroup(this);
-
-
-
-
     overviewAction = new QAction(QIcon(":/icons/overview"), tr("&Overview"), this);
     overviewAction->setStatusTip(tr("Show general overview of wallet"));
     overviewAction->setToolTip(overviewAction->statusTip());
@@ -489,6 +483,7 @@ void BitcoinGUI::createActions(const NetworkStyle* networkStyle)
     connect(optionsAction, SIGNAL(triggered()), this, SLOT(optionsClicked()));
     connect(toggleHideAction, SIGNAL(triggered()), this, SLOT(toggleHidden()));
     connect(showHelpMessageAction, SIGNAL(triggered()), this, SLOT(showHelpMessageClicked()));
+
 #ifdef ENABLE_WALLET
     if (walletFrame) {
         connect(encryptWalletAction, SIGNAL(triggered(bool)), walletFrame, SLOT(encryptWallet(bool)));
@@ -508,8 +503,7 @@ void BitcoinGUI::createActions(const NetworkStyle* networkStyle)
 #endif // ENABLE_WALLET
 }
 
-void BitcoinGUI::createMenuBar()
-{
+void BitcoinGUI::createMenuBar() {
 #ifdef Q_OS_MAC
     // Create a decoupled menu bar on Mac which stays even if the window is closed
     appMenuBar = new QMenuBar();
@@ -543,6 +537,7 @@ void BitcoinGUI::createMenuBar()
         settings->addAction(multiSendAction);
         settings->addSeparator();
     }
+
     settings->addAction(optionsAction);
 
     if (walletFrame) {
@@ -566,8 +561,7 @@ void BitcoinGUI::createMenuBar()
     help->addAction(aboutQtAction);
 }
 
-void BitcoinGUI::createToolBars()
-{
+void BitcoinGUI::createToolBars() {
     if (walletFrame) {
         QToolBar* toolbar = new QToolBar(tr("Tabs toolbar"));
         toolbar->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
@@ -600,8 +594,7 @@ void BitcoinGUI::createToolBars()
     }
 }
 
-void BitcoinGUI::setClientModel(ClientModel* clientModel)
-{
+void BitcoinGUI::setClientModel(ClientModel* clientModel) {
     this->clientModel = clientModel;
     if (clientModel) {
         // Create system tray menu (or setup the dock menu) that late to prevent users from calling actions,
@@ -676,8 +669,7 @@ void BitcoinGUI::removeAllWallets()
 }
 #endif // ENABLE_WALLET
 
-void BitcoinGUI::setWalletActionsEnabled(bool enabled)
-{
+void BitcoinGUI::setWalletActionsEnabled(bool enabled) {
     overviewAction->setEnabled(enabled);
     sendCoinsAction->setEnabled(enabled);
     receiveCoinsAction->setEnabled(enabled);
@@ -700,8 +692,7 @@ void BitcoinGUI::setWalletActionsEnabled(bool enabled)
     openAction->setEnabled(enabled);
 }
 
-void BitcoinGUI::createTrayIcon(const NetworkStyle* networkStyle)
-{
+void BitcoinGUI::createTrayIcon(const NetworkStyle* networkStyle) {
 #ifndef Q_OS_MAC
     trayIcon = new QSystemTrayIcon(this);
     QString toolTip = tr("Luxcore client") + " " + networkStyle->getTitleAddText();
@@ -713,8 +704,7 @@ void BitcoinGUI::createTrayIcon(const NetworkStyle* networkStyle)
     notificator = new Notificator(QApplication::applicationName(), trayIcon, this);
 }
 
-void BitcoinGUI::createTrayIconMenu()
-{
+void BitcoinGUI::createTrayIconMenu() {
 #ifndef Q_OS_MAC
     // return if trayIcon is unset (only on non-Mac OSes)
     if (!trayIcon)
@@ -761,8 +751,7 @@ void BitcoinGUI::createTrayIconMenu()
 }
 
 #ifndef Q_OS_MAC
-void BitcoinGUI::trayIconActivated(QSystemTrayIcon::ActivationReason reason)
-{
+void BitcoinGUI::trayIconActivated(QSystemTrayIcon::ActivationReason reason) {
     if (reason == QSystemTrayIcon::Trigger) {
         // Click on system tray icon triggers show/hide of the main window
         toggleHidden();
@@ -770,8 +759,7 @@ void BitcoinGUI::trayIconActivated(QSystemTrayIcon::ActivationReason reason)
 }
 #endif
 
-void BitcoinGUI::optionsClicked()
-{
+void BitcoinGUI::optionsClicked() {
     if (!clientModel || !clientModel->getOptionsModel())
         return;
 
@@ -780,8 +768,7 @@ void BitcoinGUI::optionsClicked()
     dlg.exec();
 }
 
-void BitcoinGUI::aboutClicked()
-{
+void BitcoinGUI::aboutClicked() {
     if (!clientModel)
         return;
 
@@ -789,8 +776,7 @@ void BitcoinGUI::aboutClicked()
     dlg.exec();
 }
 
-void BitcoinGUI::showHelpMessageClicked()
-{
+void BitcoinGUI::showHelpMessageClicked() {
     HelpMessageDialog* help = new HelpMessageDialog(this, false);
     help->setAttribute(Qt::WA_DeleteOnClose);
     help->show();
@@ -883,8 +869,7 @@ void BitcoinGUI::gotoBlockExplorerPage()
 
 #endif // ENABLE_WALLET
 
-void BitcoinGUI::updateNetworkState()
-{
+void BitcoinGUI::updateNetworkState() {
     int count = clientModel->getNumConnections();
     QString icon;
     switch (count) {
@@ -1007,8 +992,7 @@ void BitcoinGUI::setNumBlocks(int count) {
     progressBar->setToolTip(tooltip);
 }
 
-void BitcoinGUI::message(const QString& title, const QString& message, unsigned int style, bool* ret)
-{
+void BitcoinGUI::message(const QString& title, const QString& message, unsigned int style, bool* ret) {
     QString strTitle = tr("Luxcore"); // default title
     // Default to information icon
     int nMBoxIcon = QMessageBox::Information;
@@ -1046,7 +1030,6 @@ void BitcoinGUI::message(const QString& title, const QString& message, unsigned 
         nMBoxIcon = QMessageBox::Warning;
         nNotifyIcon = Notificator::Warning;
     }
-
     // Display message
     if (style & CClientUIInterface::MODAL) {
         // Check for buttons, use OK as default, if none was supplied
@@ -1063,8 +1046,7 @@ void BitcoinGUI::message(const QString& title, const QString& message, unsigned 
         notificator->notify((Notificator::Class)nNotifyIcon, strTitle, message);
 }
 
-void BitcoinGUI::changeEvent(QEvent* e)
-{
+void BitcoinGUI::changeEvent(QEvent* e) {
     QMainWindow::changeEvent(e);
 #ifndef Q_OS_MAC // Ignored on Mac
     if (e->type() == QEvent::WindowStateChange) {
@@ -1079,8 +1061,7 @@ void BitcoinGUI::changeEvent(QEvent* e)
 #endif
 }
 
-void BitcoinGUI::closeEvent(QCloseEvent* event)
-{
+void BitcoinGUI::closeEvent(QCloseEvent* event) {
 #ifndef Q_OS_MAC // Ignored on Mac
     if (clientModel && clientModel->getOptionsModel()) {
         if (!clientModel->getOptionsModel()->getMinimizeOnClose()) {
@@ -1125,15 +1106,13 @@ void BitcoinGUI::incomingTokenTransaction(const QString& date, const QString& am
 
 #endif // ENABLE_WALLET
 
-void BitcoinGUI::dragEnterEvent(QDragEnterEvent* event)
-{
+void BitcoinGUI::dragEnterEvent(QDragEnterEvent* event) {
     // Accept only URIs
     if (event->mimeData()->hasUrls())
         event->acceptProposedAction();
 }
 
-void BitcoinGUI::dropEvent(QDropEvent* event)
-{
+void BitcoinGUI::dropEvent(QDropEvent* event) {
     if (event->mimeData()->hasUrls()) {
         foreach (const QUrl& uri, event->mimeData()->urls()) {
             emit receivedURI(uri.toString());
@@ -1142,8 +1121,7 @@ void BitcoinGUI::dropEvent(QDropEvent* event)
     event->acceptProposedAction();
 }
 
-bool BitcoinGUI::eventFilter(QObject* object, QEvent* event)
-{
+bool BitcoinGUI::eventFilter(QObject* object, QEvent* event) {
     // Catch status tip events
     if (event->type() == QEvent::StatusTip) {
         // Prevent adding text from setStatusTip(), if we currently use the status bar for displaying other stuff
@@ -1153,8 +1131,7 @@ bool BitcoinGUI::eventFilter(QObject* object, QEvent* event)
     return QMainWindow::eventFilter(object, event);
 }
 
-void BitcoinGUI::setStakingStatus()
-{
+void BitcoinGUI::setStakingStatus() {
     if (pwalletMain)
         fMultiSend = pwalletMain->isMultiSendEnabled();
 
@@ -1226,8 +1203,7 @@ void BitcoinGUI::setEncryptionStatus(int status)
 }
 #endif // ENABLE_WALLET
 
-void BitcoinGUI::showNormalIfMinimized(bool fToggleHidden)
-{
+void BitcoinGUI::showNormalIfMinimized(bool fToggleHidden) {
     if (!clientModel)
         return;
 
@@ -1245,13 +1221,11 @@ void BitcoinGUI::showNormalIfMinimized(bool fToggleHidden)
         hide();
 }
 
-void BitcoinGUI::toggleHidden()
-{
+void BitcoinGUI::toggleHidden() {
     showNormalIfMinimized(true);
 }
 
-void BitcoinGUI::detectShutdown()
-{
+void BitcoinGUI::detectShutdown() {
     if (ShutdownRequested()) {
         if (rpcConsole)
             rpcConsole->hide();
@@ -1259,8 +1233,7 @@ void BitcoinGUI::detectShutdown()
     }
 }
 
-void BitcoinGUI::showProgress(const QString& title, int nProgress)
-{
+void BitcoinGUI::showProgress(const QString& title, int nProgress) {
     if (nProgress == 0) {
         progressDialog = new QProgressDialog(title, "", 0, 100);
         progressDialog->setWindowModality(Qt::ApplicationModal);
@@ -1277,8 +1250,7 @@ void BitcoinGUI::showProgress(const QString& title, int nProgress)
         progressDialog->setValue(nProgress);
 }
 
-static bool ThreadSafeMessageBox(BitcoinGUI* gui, const std::string& message, const std::string& caption, unsigned int style)
-{
+static bool ThreadSafeMessageBox(BitcoinGUI* gui, const std::string& message, const std::string& caption, unsigned int style) {
     bool modal = (style & CClientUIInterface::MODAL);
     // The SECURE flag has no effect in the Qt GUI.
     // bool secure = (style & CClientUIInterface::SECURE);
@@ -1294,27 +1266,21 @@ static bool ThreadSafeMessageBox(BitcoinGUI* gui, const std::string& message, co
     return ret;
 }
 
-void BitcoinGUI::subscribeToCoreSignals()
-{
+void BitcoinGUI::subscribeToCoreSignals() {
     // Connect signals to client
     uiInterface.ThreadSafeMessageBox.connect(boost::bind(ThreadSafeMessageBox, this, _1, _2, _3));
 }
 
-void BitcoinGUI::unsubscribeFromCoreSignals()
-{
+void BitcoinGUI::unsubscribeFromCoreSignals() {
     // Disconnect signals from client
     uiInterface.ThreadSafeMessageBox.disconnect(boost::bind(ThreadSafeMessageBox, this, _1, _2, _3));
 }
 
 /** Get restart command-line parameters and request restart */
-void BitcoinGUI::handleRestart(QStringList args)
-{
+void BitcoinGUI::handleRestart(QStringList args) {
     if (!ShutdownRequested())
         emit requestedRestart(args);
 }
-
-
-
 
 UnitDisplayStatusBarControl::UnitDisplayStatusBarControl() : optionsModel(0),
                                                              menu(0)
@@ -1324,14 +1290,12 @@ UnitDisplayStatusBarControl::UnitDisplayStatusBarControl() : optionsModel(0),
 }
 
 /** So that it responds to button clicks */
-void UnitDisplayStatusBarControl::mousePressEvent(QMouseEvent* event)
-{
+void UnitDisplayStatusBarControl::mousePressEvent(QMouseEvent* event) {
     onDisplayUnitsClicked(event->pos());
 }
 
 /** Creates context menu, its actions, and wires up all the relevant signals for mouse events. */
-void UnitDisplayStatusBarControl::createContextMenu()
-{
+void UnitDisplayStatusBarControl::createContextMenu() {
     menu = new QMenu();
     foreach (BitcoinUnits::Unit u, BitcoinUnits::availableUnits()) {
         QAction* menuAction = new QAction(QString(BitcoinUnits::name(u)), this);
@@ -1342,8 +1306,7 @@ void UnitDisplayStatusBarControl::createContextMenu()
 }
 
 /** Lets the control know about the Options Model (and its signals) */
-void UnitDisplayStatusBarControl::setOptionsModel(OptionsModel* optionsModel)
-{
+void UnitDisplayStatusBarControl::setOptionsModel(OptionsModel* optionsModel) {
     if (optionsModel) {
         this->optionsModel = optionsModel;
 
@@ -1356,8 +1319,7 @@ void UnitDisplayStatusBarControl::setOptionsModel(OptionsModel* optionsModel)
 }
 
 /** When Display Units are changed on OptionsModel it will refresh the display text of the control on the status bar */
-void UnitDisplayStatusBarControl::updateDisplayUnit(int newUnits)
-{
+void UnitDisplayStatusBarControl::updateDisplayUnit(int newUnits) {
     if (Params().NetworkID() == CBaseChainParams::MAIN) {
         setPixmap(QIcon(":/icons/unit_" + BitcoinUnits::id(newUnits)).pixmap(39, STATUSBAR_ICONSIZE));
     } else {
@@ -1366,15 +1328,13 @@ void UnitDisplayStatusBarControl::updateDisplayUnit(int newUnits)
 }
 
 /** Shows context menu with Display Unit options by the mouse coordinates */
-void UnitDisplayStatusBarControl::onDisplayUnitsClicked(const QPoint& point)
-{
+void UnitDisplayStatusBarControl::onDisplayUnitsClicked(const QPoint& point) {
     QPoint globalPos = mapToGlobal(point);
     menu->exec(globalPos);
 }
 
 /** Tells underlying optionsModel to update its current display unit. */
-void UnitDisplayStatusBarControl::onMenuSelection(QAction* action)
-{
+void UnitDisplayStatusBarControl::onMenuSelection(QAction* action) {
     if (action) {
         optionsModel->setDisplayUnit(action->data());
     }
