@@ -107,12 +107,6 @@ static int AppInitRPC(int argc, char* argv[])
 
 UniValue CallRPC(const string& strMethod, const UniValue& params)
 {
-    if (mapArgs["-rpcuser"] == "" && mapArgs["-rpcpassword"] == "")
-        throw runtime_error(strprintf(
-            _("You must set rpcpassword=<password> in the configuration file:\n%s\n"
-              "If the file does not exist, create it with owner-readable-only file permissions."),
-            GetConfigFile().string().c_str()));
-
     // Connect to localhost
     bool fUseSSL = GetBoolArg("-rpcssl", false);
     asio::io_service io_service;
@@ -126,10 +120,20 @@ UniValue CallRPC(const string& strMethod, const UniValue& params)
     if (!fConnected)
         throw CConnectionFailed("couldn't connect to server");
 
+    // Find credentials to use
+    std::string strRPCUserColonPass;
+    if (mapArgs["-rpcpassword"] == "") {
+        // Try fall back to cookie-based authentication if no password is provided
+        if (!GetAuthCookie(&strRPCUserColonPass)) {
+            throw runtime_error(strprintf(_("You must set rpcpassword=<password> in the configuration file:\n%s\n" "If the file does not exist, create it with owner-readable-only file permissions."), GetConfigFile().string().c_str()));
+        }
+    } else {
+        strRPCUserColonPass = mapArgs["-rpcuser"] + ":" + mapArgs["-rpcpassword"];
+    }
+
     // HTTP basic authentication
-    string strUserPass64 = EncodeBase64(mapArgs["-rpcuser"] + ":" + mapArgs["-rpcpassword"]);
     map<string, string> mapRequestHeaders;
-    mapRequestHeaders["Authorization"] = string("Basic ") + strUserPass64;
+    mapRequestHeaders["Authorization"] = string("Basic ") + EncodeBase64(strRPCUserColonPass);
 
     // Send request
     string strRequest = JSONRPCRequest(strMethod, params, 1);
