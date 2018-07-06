@@ -39,15 +39,20 @@ In addition, without Luxgate and Pmn, Bitcoin and Ethereum cannot interact with 
 | Total Blocks | `6,000,000` |
 | Block Size | `4MB` |
 | Block Time | `60s` |
+| PoW Block Time | `120s`   |
 | PoW Reward | `10 LUX` |
 | PoS Reward | `1 LUX` |
-| Stake Time | `36 hours` |
+| Stake Time | `36 hours` | 
 | Masternode Requirement | `16,120 LUX` |
-| Masternode Reward | `40% PoS Block ` |
-| Port | `26868` |
+| Masternode Reward | `20% PoW/PoS` |
+| Port | `26969` |
 | RPC Port | `9888` |
-| Masternode Port | `26868` |
+| Masternode Port | `26969` |
+| Lux legacy address start with | `L` |
+| p2sh-segwit address start with | `S` |
+| Bech32 address start with | `bc` |
 
+* NOTE: "getrawchangeaddress p2sh-segwit" to get p2sh-segwit address 
 
 Build Lux wallet
 ----------
