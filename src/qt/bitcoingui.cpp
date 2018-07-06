@@ -1076,7 +1076,7 @@ void BitcoinGUI::closeEvent(QCloseEvent* event) {
 void BitcoinGUI::incomingTransaction(const QString& date, int unit, const CAmount& amount, const QString& type, const QString& address, const QString& label)
 {
     QString msg = tr("Date: %1\n").arg(date) +
-                  tr("Amount: %1\n").arg(amount) +
+                  tr("Amount: %1\n").arg(BitcoinUnits::formatWithUnit(unit, amount, true)) +
                   tr("Type: %1\n").arg(type);
     if (!label.isEmpty())
         msg += tr("Label: %1\n").arg(label);
@@ -1339,3 +1339,4 @@ void UnitDisplayStatusBarControl::onMenuSelection(QAction* action) {
         optionsModel->setDisplayUnit(action->data());
     }
 }
+
