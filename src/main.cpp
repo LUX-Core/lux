@@ -769,7 +769,7 @@ int GetInputAge(CTxIn& vin)
 
         if (coins) {
             if (coins->nHeight < 0) return 0;
-            return (chainActive.Tip()->nHeight + 1) - coins->nHeight;
+            return (chainActive.Height() + 1) - coins->nHeight;
         } else
             return -1;
     }
@@ -1135,8 +1135,8 @@ bool AcceptToMemoryPool(CTxMemPool& pool, CValidationState& state, const CTransa
             }
 
             LuxDGP luxDGP(globalState.get(), fGettingValuesDGP);
-            uint64_t minGasPrice = luxDGP.getMinGasPrice(chainActive.Tip()->nHeight + 1);
-            uint64_t blockGasLimit = luxDGP.getBlockGasLimit(chainActive.Tip()->nHeight + 1);
+            uint64_t minGasPrice = luxDGP.getMinGasPrice(chainActive.Height() + 1);
+            uint64_t blockGasLimit = luxDGP.getBlockGasLimit(chainActive.Height() + 1);
             size_t count = 0;
             for(const CTxOut& o : tx.vout)
                 count += o.scriptPubKey.HasOpCreate() || o.scriptPubKey.HasOpCall() ? 1 : 0;
@@ -1425,8 +1425,8 @@ bool AcceptableInputs(CTxMemPool& pool, CValidationState& state, const CTransact
             }
 
             LuxDGP luxDGP(globalState.get(), fGettingValuesDGP);
-            uint64_t minGasPrice = luxDGP.getMinGasPrice(chainActive.Tip()->nHeight + 1);
-            uint64_t blockGasLimit = luxDGP.getBlockGasLimit(chainActive.Tip()->nHeight + 1);
+            uint64_t minGasPrice = luxDGP.getMinGasPrice(chainActive.Height() + 1);
+            uint64_t blockGasLimit = luxDGP.getBlockGasLimit(chainActive.Height() + 1);
             size_t count = 0;
             for(const CTxOut& o : tx.vout)
                 count += o.scriptPubKey.HasOpCreate() || o.scriptPubKey.HasOpCall() ? 1 : 0;
@@ -4575,7 +4575,7 @@ static void FindFilesToPruneManual(std::set<int>& setFilesToPrune, int nManualPr
         return;
 
     // last block to prune is the lesser of (user-specified height, MIN_BLOCKS_TO_KEEP from the tip)
-    unsigned int nLastBlockWeCanPrune = std::min((unsigned int)nManualPruneHeight, (unsigned int) (chainActive.Tip()->nHeight - MIN_BLOCKS_TO_KEEP));
+    unsigned int nLastBlockWeCanPrune = std::min((unsigned int)nManualPruneHeight, (unsigned int) (chainActive.Height() - MIN_BLOCKS_TO_KEEP));
     int count=0;
     for (int fileNumber = 0; fileNumber < nLastBlockFile; fileNumber++) {
         if (vinfoBlockFile[fileNumber].nSize == 0 || vinfoBlockFile[fileNumber].nHeightLast > nLastBlockWeCanPrune)
@@ -4594,11 +4594,11 @@ void FindFilesToPrune(std::set<int>& setFilesToPrune, uint64_t nPruneAfterHeight
     if (chainActive.Tip() == NULL || nPruneTarget == 0) {
         return;
     }
-    if (chainActive.Tip()->nHeight <= Params().PruneAfterHeight()) {
+    if (chainActive.Height() <= Params().PruneAfterHeight()) {
         return;
     }
 
-    unsigned int nLastBlockWeMustKeep = chainActive.Tip()->nHeight - MIN_BLOCKS_TO_KEEP;
+    unsigned int nLastBlockWeMustKeep = chainActive.Height() - MIN_BLOCKS_TO_KEEP;
     uint64_t nCurrentUsage = CalculateCurrentUsage();
     // We don't check to prune until after we've allocated new space for files
     // So we should leave a buffer under our target to account for another allocation
@@ -4933,7 +4933,7 @@ bool CVerifyDB::VerifyDB(const CChainParams& chainparams, CCoinsView* coinsview,
     ////////////////////////////////////////////////////////////////////////// // lux
     dev::h256 oldHashStateRoot;
     dev::h256 oldHashUTXORoot;
-    if (chainActive.Tip()->nHeight >= chainparams.FirstSCBlock()) {
+    if (chainActive.Height() >= chainparams.FirstSCBlock()) {
         oldHashStateRoot = dev::h256(globalState->rootHash());
         oldHashUTXORoot = dev::h256(globalState->rootHashUTXO());
     }
@@ -4991,13 +4991,13 @@ bool CVerifyDB::VerifyDB(const CChainParams& chainparams, CCoinsView* coinsview,
 
             dev::h256 oldHashStateRoot;
             dev::h256 oldHashUTXORoot;
-            if (chainActive.Tip()->nHeight >= chainparams.FirstSCBlock()) {
+            if (chainActive.Height() >= chainparams.FirstSCBlock()) {
                 oldHashStateRoot = dev::h256(globalState->rootHash());
                 oldHashUTXORoot = dev::h256(globalState->rootHashUTXO());
             }
 
             if (!ConnectBlock(block, state, pindex, coins, chainparams)) {
-                if (chainActive.Tip()->nHeight >= chainparams.FirstSCBlock()) {
+                if (chainActive.Height() >= chainparams.FirstSCBlock()) {
                     globalState->setRoot(oldHashStateRoot); // lux
                     globalState->setRootUTXO(oldHashUTXORoot); // lux
                 }
@@ -5005,7 +5005,7 @@ bool CVerifyDB::VerifyDB(const CChainParams& chainparams, CCoinsView* coinsview,
             }
         }
     } else {
-        if (chainActive.Tip()->nHeight >= chainparams.FirstSCBlock()) {
+        if (chainActive.Height() >= chainparams.FirstSCBlock()) {
             globalState->setRoot(oldHashStateRoot); // lux
             globalState->setRootUTXO(oldHashUTXORoot); // lux
         }
@@ -6935,7 +6935,7 @@ std::vector<ResultExecute> CallContract(const dev::Address& addrContract, std::v
 
 
     LuxDGP luxDGP(globalState.get(), fGettingValuesDGP);
-    uint64_t blockGasLimit = luxDGP.getBlockGasLimit(chainActive.Tip()->nHeight + 1);
+    uint64_t blockGasLimit = luxDGP.getBlockGasLimit(chainActive.Height() + 1);
 
     if(gasLimit == 0){
         gasLimit = blockGasLimit - 1;
@@ -7018,10 +7018,10 @@ UniValue vmLogToJSON(const ResultExecute& execRes, const CTransaction& tx, const
     if(block.GetHash(usePhi2) != CBlock().GetHash(usePhi2)){
         result.push_back(Pair("time", block.GetBlockTime()));
         result.push_back(Pair("blockhash", block.GetHash(usePhi2).GetHex()));
-        result.push_back(Pair("blockheight", chainActive.Tip()->nHeight + 1));
+        result.push_back(Pair("blockheight", chainActive.Height() + 1));
     } else {
         result.push_back(Pair("time", GetAdjustedTime()));
-        result.push_back(Pair("blockheight", chainActive.Tip()->nHeight));
+        result.push_back(Pair("blockheight", chainActive.Height()));
     }
     UniValue logEntries(UniValue::VARR);
     dev::eth::LogEntries logs = execRes.txRec.log();

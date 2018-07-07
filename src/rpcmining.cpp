@@ -799,7 +799,7 @@ UniValue getwork(const UniValue& params, bool fHelp) {
              throw JSONRPCError(RPC_CLIENT_IN_INITIAL_DOWNLOAD, "Lux is downloading blocks...");
     }
 
-    if (chainActive.Tip()->nHeight >= Params().LAST_POW_BLOCK())
+    if (chainActive.Height() >= Params().LAST_POW_BLOCK())
         throw JSONRPCError(RPC_MISC_ERROR, "No more PoW blocks");
 
     typedef map<uint256, pair<CBlock*, CScript> > mapNewBlock_t;

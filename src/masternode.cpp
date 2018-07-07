@@ -153,7 +153,7 @@ void ProcessMasternode(CNode* pfrom, const std::string& strCommand, CDataStream&
 
         CValidationState state;
         CMutableTransaction tx = CMutableTransaction();
-        CTxOut vout = CTxOut((GetMNCollateral(chainActive.Tip()->nHeight) - 1) * COIN, darkSendPool.collateralPubKey);
+        CTxOut vout = CTxOut((GetMNCollateral(chainActive.Height()) - 1) * COIN, darkSendPool.collateralPubKey);
         tx.vin.push_back(vin);
         tx.vout.push_back(vout);
         //if(AcceptableInputs(mempool, state, tx)){
@@ -345,12 +345,12 @@ void ProcessMasternode(CNode* pfrom, const std::string& strCommand, CDataStream&
 
         uint256 hash = winner.GetHash();
         if (mapSeenMasternodeVotes.count(hash)) {
-            if (fDebug) LogPrintf("mnw - seen vote %s Height %d bestHeight %d\n", hash.ToString().c_str(), winner.nBlockHeight, chainActive.Tip()->nHeight);
+            if (fDebug) LogPrintf("mnw - seen vote %s Height %d bestHeight %d\n", hash.ToString().c_str(), winner.nBlockHeight, chainActive.Height());
             return;
         }
 
-        if (winner.nBlockHeight < chainActive.Tip()->nHeight - 10 || winner.nBlockHeight > chainActive.Tip()->nHeight + 20) {
-            LogPrintf("mnw - winner out of range %s Height %d bestHeight %d\n", winner.vin.ToString().c_str(), winner.nBlockHeight, chainActive.Tip()->nHeight);
+        if (winner.nBlockHeight < chainActive.Height() - 10 || winner.nBlockHeight > chainActive.Height() + 20) {
+            LogPrintf("mnw - winner out of range %s Height %d bestHeight %d\n", winner.vin.ToString().c_str(), winner.nBlockHeight, chainActive.Height());
             return;
         }
 
@@ -360,7 +360,7 @@ void ProcessMasternode(CNode* pfrom, const std::string& strCommand, CDataStream&
             return;
         }
 
-        LogPrintf("mnw - winning vote  %s Height %d bestHeight %d\n", winner.vin.ToString().c_str(), winner.nBlockHeight, chainActive.Tip()->nHeight);
+        LogPrintf("mnw - winning vote  %s Height %d bestHeight %d\n", winner.vin.ToString().c_str(), winner.nBlockHeight, chainActive.Height());
 
         if (!masternodePayments.CheckSignature(winner)) {
             LogPrintf("mnw - invalid signature\n");
@@ -514,7 +514,7 @@ bool GetBlockHash(uint256& hash, int nBlockHeight) {
     if (chainActive.Tip() == NULL) return false;
 
     if (nBlockHeight == 0)
-        nBlockHeight = chainActive.Tip()->nHeight;
+        nBlockHeight = chainActive.Height();
 
     if (mapCacheBlockHashes.count(nBlockHeight)) {
         hash = mapCacheBlockHashes[nBlockHeight];
@@ -524,10 +524,10 @@ bool GetBlockHash(uint256& hash, int nBlockHeight) {
     const CBlockIndex* BlockLastSolved = chainActive.Tip();
     const CBlockIndex* BlockReading = chainActive.Tip();
 
-    if (BlockLastSolved == NULL || BlockLastSolved->nHeight == 0 || chainActive.Tip()->nHeight + 1 < nBlockHeight) return false;
+    if (BlockLastSolved == NULL || BlockLastSolved->nHeight == 0 || chainActive.Height() + 1 < nBlockHeight) return false;
 
     int nBlocksAgo = 0;
-    if (nBlockHeight > 0) nBlocksAgo = (chainActive.Tip()->nHeight + 1) - nBlockHeight;
+    if (nBlockHeight > 0) nBlocksAgo = (chainActive.Height() + 1) - nBlockHeight;
     assert(nBlocksAgo >= 0);
 
     int n = 0;
@@ -587,7 +587,7 @@ void CMasterNode::Check() {
     if (!unitTest) {
         CValidationState state;
         CMutableTransaction tx = CMutableTransaction();
-        CTxOut vout = CTxOut((GetMNCollateral(chainActive.Tip()->nHeight) - 1) * COIN, darkSendPool.collateralPubKey);
+        CTxOut vout = CTxOut((GetMNCollateral(chainActive.Height()) - 1) * COIN, darkSendPool.collateralPubKey);
         tx.vin.push_back(vin);
         tx.vout.push_back(vout);
 
@@ -717,7 +717,7 @@ void CMasternodePayments::CleanPaymentList() {
 
     vector<CMasternodePaymentWinner>::iterator it;
     for (it = vWinning.begin(); it < vWinning.end(); it++) {
-        if (chainActive.Tip()->nHeight - (*it).nBlockHeight > nLimit) {
+        if (chainActive.Height() - (*it).nBlockHeight > nLimit) {
             if (fDebug) LogPrintf("CMasternodePayments::CleanPaymentList - Removing old masternode payment - block %d\n", (*it).nBlockHeight);
             vWinning.erase(it);
             break;
@@ -791,7 +791,7 @@ void CMasternodePayments::Relay(CMasternodePaymentWinner& winner) {
 void CMasternodePayments::Sync(CNode* node) {
     int a = 0;
     BOOST_FOREACH(CMasternodePaymentWinner& winner, vWinning)
-        if (winner.nBlockHeight >= chainActive.Tip()->nHeight - 10 && winner.nBlockHeight <= chainActive.Tip()->nHeight + 20)
+        if (winner.nBlockHeight >= chainActive.Height() - 10 && winner.nBlockHeight <= chainActive.Height() + 20)
             node->PushMessage("mnw", winner, a);
 }
 
@@ -831,7 +831,7 @@ bool SelectMasternodePayee(CScript& payeeScript) {
     bool result = false;
     if (MasternodePaymentsEnabled()) {
         //spork
-        if (!masternodePayments.GetBlockPayee(chainActive.Tip()->nHeight + 1, payeeScript)) {
+        if (!masternodePayments.GetBlockPayee(chainActive.Height() + 1, payeeScript)) {
             int winningNode = GetCurrentMasterNode(1);
             if (winningNode >= 0) {
                 payeeScript = GetScriptForDestination(vecMasternodes[winningNode].pubkey.GetID());

@@ -608,6 +608,8 @@ void Stake::SetProof(const uint256& h, const uint256& proof) {
 bool Stake::IsActive() const {
     bool nStaking = false;
     auto tip = chainActive.Tip();
+    if (!tip) return false;
+
     if (GetBoolArg("-staking", DEFAULT_STAKE) == false)
         return false;
     if (mapHashedBlocks.count(tip->nHeight))
@@ -821,7 +823,7 @@ bool Stake::CreateCoinStake(CWallet* wallet, const CKeyStore& keystore, unsigned
     }
 
     int64_t blockValue = nCredit;
-    int64_t masternodePayment = GetMasternodePayment(chainActive.Tip()->nHeight + 1, nReward);
+    int64_t masternodePayment = GetMasternodePayment(chainActive.Height() + 1, nReward);
 
     // Set output amount
     if (hasMasternodePayment) {

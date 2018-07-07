@@ -41,14 +41,14 @@ void ProcessSpork(CNode* pfrom, const std::string& strCommand, CDataStream& vRec
         // Seach by ID only
         if (mapSporks.count(hash) && mapSporksActive.count(spork.nSporkID)) {
             if (mapSporksActive[spork.nSporkID].nTimeSigned >= spork.nTimeSigned) {
-                if (fDebug) LogPrintf("spork - seen %s block %d \n", hash.ToString().c_str(), chainActive.Tip()->nHeight);
+                if (fDebug) LogPrintf("spork - seen %s block %d \n", hash.ToString().c_str(), chainActive.Height());
                 return;
             } else {
-                if (fDebug) LogPrintf("spork - got updated spork %s block %d \n", hash.ToString().c_str(), chainActive.Tip()->nHeight);
+                if (fDebug) LogPrintf("spork - got updated spork %s block %d \n", hash.ToString().c_str(), chainActive.Height());
             }
         }
 
-        LogPrintf("spork - new %s ID %d Time %d bestHeight %d\n", hash.ToString().c_str(), spork.nSporkID, spork.nValue, chainActive.Tip()->nHeight);
+        LogPrintf("spork - new %s ID %d Time %d bestHeight %d\n", hash.ToString().c_str(), spork.nSporkID, spork.nValue, chainActive.Height());
 
         if (!sporkManager.CheckSignature(spork)) {
             LogPrintf("spork - invalid signature\n");

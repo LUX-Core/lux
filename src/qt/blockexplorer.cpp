@@ -481,7 +481,7 @@ bool BlockExplorer::switchTo(const QString& query)
     bool IsOk;
     int64_t AsInt = query.toInt(&IsOk);
     // If query is integer, get hash from height
-    if (IsOk && AsInt >= 0 && AsInt <= chainActive.Tip()->nHeight) {
+    if (IsOk && AsInt >= 0 && AsInt <= chainActive.Height()) {
         std::string hex = getexplorerBlockHash(AsInt);
         uint256 hash = uint256S(hex);
         CBlockIndex* pIndex = mapBlockIndex[hash];

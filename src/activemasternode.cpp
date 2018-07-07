@@ -414,7 +414,7 @@ vector<COutput> CActiveMasternode::SelectCoinsMasternode() {
 
     // Filter
     BOOST_FOREACH(const COutput& out, vCoins) {
-        if (out.tx->vout[out.i].nValue == GetMNCollateral(chainActive.Tip()->nHeight) * COIN) {  //exactly DARKSEND_COLLATERAL LUX
+        if (out.tx->vout[out.i].nValue == GetMNCollateral(chainActive.Height()) * COIN) {  //exactly DARKSEND_COLLATERAL LUX
             filteredCoins.push_back(out);
         }
     }

@@ -147,10 +147,10 @@ public:
 
         if(cacheInputAge == 0){
             cacheInputAge = GetInputAge(vin);
-            cacheInputAgeBlock = chainActive.Tip()->nHeight;
+            cacheInputAgeBlock = chainActive.Height();
         }
 
-        return cacheInputAge+(chainActive.Tip()->nHeight-cacheInputAgeBlock);
+        return cacheInputAge + (chainActive.Height() - cacheInputAgeBlock);
     }
 };
 

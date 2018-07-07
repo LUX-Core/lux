@@ -299,7 +299,7 @@ UniValue masternode(const UniValue& params, bool fHelp) {
             } else if (strCommand == "activeseconds") {
                 obj.push_back(Pair(mn.addr.ToString().c_str(), (int64_t)(mn.lastTimeSeen - mn.now)));
             } else if (strCommand == "rank") {
-                obj.push_back(Pair(mn.addr.ToString().c_str(), (int) (GetMasternodeRank(mn.vin, chainActive.Tip()->nHeight))));
+                obj.push_back(Pair(mn.addr.ToString().c_str(), (int) (GetMasternodeRank(mn.vin, chainActive.Height()))));
             }
         }
         return obj;
@@ -505,7 +505,7 @@ UniValue masternode(const UniValue& params, bool fHelp) {
     if (strCommand == "winners") {
         UniValue obj(UniValue::VOBJ);
 
-        for (int nHeight = chainActive.Tip()->nHeight - 10; nHeight < chainActive.Tip()->nHeight + 20; nHeight++) {
+        for (int nHeight = chainActive.Height() - 10; nHeight < chainActive.Height() + 20; nHeight++) {
             CScript payee;
             if (masternodePayments.GetBlockPayee(nHeight, payee)) {
                 CTxDestination address1;
