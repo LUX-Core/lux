@@ -72,7 +72,7 @@ CWallet* pwalletMain = NULL;
 int nWalletBackups = 10;
 #endif
 bool fFeeEstimatesInitialized = false;
-bool fRestartRequested = false; // true: restart false: shutdown
+std::atomic<bool> fRestartRequested(false); // true: restart false: shutdown
 unsigned int nMinerSleep;
 
 #if ENABLE_ZMQ
