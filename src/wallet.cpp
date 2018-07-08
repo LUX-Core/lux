@@ -88,7 +88,7 @@ const CWalletTx* CWallet::GetWalletTx(const uint256& hash) const
     return &(it->second);
 }
 
-CPubKey CWallet::GenerateNewKey()
+CPubKey CWallet::GenerateNewKey(bool internal)
 {
     AssertLockHeld(cs_wallet);                                 // mapKeyMetadata
     bool fCompressed = CanSupportFeature(FEATURE_COMPRPUBKEY); // default to compressed public keys if we want 0.6.0 wallets
@@ -595,7 +595,7 @@ bool CWallet::GetAccountDestination(CTxDestination &dest, std::string strAccount
 
     // Generate a new key
     if (bForceNew) {
-        if (!GetKeyFromPool(account.vchPubKey))
+        if (!GetKeyFromPool(account.vchPubKey, false))
             return false;
 
         LearnRelatedScripts(account.vchPubKey, g_address_type);
@@ -2398,7 +2398,7 @@ bool CWallet::CreateTransaction(const vector<pair<CScript, CAmount> >& vecSend, 
                         // Reserve a new key pair from key pool
                         CPubKey vchPubKey;
                         bool ret;
-                        ret = reservekey.GetReservedKey(vchPubKey);
+                        ret = reservekey.GetReservedKey(vchPubKey, true);
                         if (!ret)
                         {
                             strFailReason = _("Keypool ran out, please call keypoolrefill first");
@@ -2834,15 +2834,29 @@ bool CWallet::NewKeyPool()
         if (IsLocked())
             return false;
 
-        int64_t nKeys = max(GetArg("-keypool", 1000), (int64_t)0);
-        for (int i = 0; i < nKeys; i++) {
-            int64_t nIndex = i + 1;
-            walletdb.WritePool(nIndex, CKeyPool(GenerateNewKey()));
-            setKeyPool.insert(nIndex);
-        }
-        LogPrintf("CWallet::NewKeyPool wrote %d new keys\n", nKeys);
+        TopUpKeyPool();
+        LogPrintf("CWallet::NewKeyPool rewrote keypool\n");
     }
     return true;
+}
+
+size_t CWallet::KeypoolCountExternalKeys()
+{
+    AssertLockHeld(cs_wallet); // setKeyPool
+
+    CWalletDB walletdb(strWalletFile);
+
+    // count amount of external keys
+    size_t amountE = 0;
+    for(const int64_t& id : setKeyPool)
+    {
+        CKeyPool tmpKeypool;
+        if (!walletdb.ReadPool(id, tmpKeypool))
+            throw std::runtime_error(std::string(__func__) + ": read failed");
+        amountE += !tmpKeypool.fInternal;
+    }
+
+    return amountE;
 }
 
 bool CWallet::TopUpKeyPool(unsigned int kpSize)
@@ -2853,23 +2867,40 @@ bool CWallet::TopUpKeyPool(unsigned int kpSize)
         if (IsLocked())
             return false;
 
-        CWalletDB walletdb(strWalletFile);
-
         // Top up key pool
         unsigned int nTargetSize;
         if (kpSize > 0)
             nTargetSize = kpSize;
         else
-            nTargetSize = max(GetArg("-keypool", 1000), (int64_t)0);
+            nTargetSize = std::max(GetArg("-keypool", 100), (int64_t) 0);
 
-        while (setKeyPool.size() < (nTargetSize + 1)) {
+        //while (setKeyPool.size() < (nTargetSize + 1))
+        // count amount of available keys (internal, external)
+        // make sure the keypool of external keys fits the user selected target (-keypool)
+        // generate +20% internal keys (minimum 2 keys)
+        int64_t amountExternal = KeypoolCountExternalKeys();
+        int64_t amountInternal = setKeyPool.size() - amountExternal;
+        int64_t targetInternal = max((int64_t)ceil(nTargetSize * 0.2), (int64_t) 2);
+        int64_t missingExternal = max( (int64_t)(nTargetSize - amountExternal), (int64_t) 0);
+        int64_t missingInternal = max(targetInternal - amountInternal, (int64_t) 0);
+
+        bool internal = false;
+        CWalletDB walletdb(strWalletFile);
+
+        for (int64_t i = missingInternal + missingExternal; i--;) {
             int64_t nEnd = 1;
+
+            if (i < missingInternal)
+                internal = true;
+
             if (!setKeyPool.empty())
                 nEnd = *(--setKeyPool.end()) + 1;
-            if (!walletdb.WritePool(nEnd, CKeyPool(GenerateNewKey())))
+
+            if (!walletdb.WritePool(nEnd, CKeyPool(GenerateNewKey(internal), internal)))
                 throw runtime_error("TopUpKeyPool() : writing generated key failed");
             setKeyPool.insert(nEnd);
-            LogPrintf("keypool added key %d, size=%u\n", nEnd, setKeyPool.size());
+            LogPrintf("keypool added key %d, size=%u, internal=%d\n", nEnd, setKeyPool.size(), internal);
+
             double dProgress = 100.f * nEnd / (nTargetSize + 1);
             if (dProgress < 100.1) {
                 std::string strMsg = strprintf(_("Loading wallet... (%3.2f %%)"), dProgress);
@@ -2880,7 +2911,7 @@ bool CWallet::TopUpKeyPool(unsigned int kpSize)
     return true;
 }
 
-void CWallet::ReserveKeyFromKeyPool(int64_t& nIndex, CKeyPool& keypool)
+void CWallet::ReserveKeyFromKeyPool(int64_t& nIndex, CKeyPool& keypool, bool internal)
 {
     nIndex = -1;
     keypool.vchPubKey = CPubKey();
@@ -2896,14 +2927,25 @@ void CWallet::ReserveKeyFromKeyPool(int64_t& nIndex, CKeyPool& keypool)
 
         CWalletDB walletdb(strWalletFile);
 
-        nIndex = *(setKeyPool.begin());
-        setKeyPool.erase(setKeyPool.begin());
-        if (!walletdb.ReadPool(nIndex, keypool))
-            throw runtime_error("ReserveKeyFromKeyPool() : read failed");
-        if (!HaveKey(keypool.vchPubKey.GetID()))
-            throw runtime_error("ReserveKeyFromKeyPool() : unknown key in key pool");
-        assert(keypool.vchPubKey.IsValid());
-        //LogPrintf("keypool reserve %d\n", nIndex);
+        // try to find a key that matches the internal/external filter
+        for(const int64_t& id : setKeyPool) {
+            CKeyPool tmpKeypool;
+
+            if (!walletdb.ReadPool(id, tmpKeypool))
+                throw std::runtime_error(std::string(__func__) + ": read failed");
+
+            if (!HaveKey(tmpKeypool.vchPubKey.GetID()))
+                throw std::runtime_error(std::string(__func__) + ": unknown key in key pool");
+
+            if (tmpKeypool.fInternal == internal) {
+                nIndex = id;
+                keypool = tmpKeypool;
+                setKeyPool.erase(id);
+                assert(keypool.vchPubKey.IsValid());
+                LogPrintf("keypool reserve %d\n", nIndex);
+                return;
+            }
+        }
     }
 }
 
@@ -2927,16 +2969,16 @@ void CWallet::ReturnKey(int64_t nIndex)
     //LogPrintf("keypool return %d\n", nIndex);
 }
 
-bool CWallet::GetKeyFromPool(CPubKey& result)
+bool CWallet::GetKeyFromPool(CPubKey& result, bool internal)
 {
     int64_t nIndex = 0;
     CKeyPool keypool;
     {
         LOCK(cs_wallet);
-        ReserveKeyFromKeyPool(nIndex, keypool);
+        ReserveKeyFromKeyPool(nIndex, keypool, internal);
         if (nIndex == -1) {
             if (IsLocked()) return false;
-            result = GenerateNewKey();
+            result = GenerateNewKey(internal);
             return true;
         }
         KeepKey(nIndex);
@@ -2950,7 +2992,7 @@ int64_t CWallet::GetOldestKeyPoolTime()
     int64_t nIndex = 0;
     CKeyPool keypool;
     CWalletDB walletdb(strWalletFile);
-    ReserveKeyFromKeyPool(nIndex, keypool);
+    ReserveKeyFromKeyPool(nIndex, keypool, internal);
     if (nIndex == -1)
         return GetTime();
     ReturnKey(nIndex);
@@ -3091,11 +3133,11 @@ set<CTxDestination> CWallet::GetAccountAddresses(const std::string &strAccount) 
     return result;
 }
 
-bool CReserveKey::GetReservedKey(CPubKey& pubkey)
+bool CReserveKey::GetReservedKey(CPubKey& pubkey, bool internal)
 {
     if (nIndex == -1) {
         CKeyPool keypool;
-        pwallet->ReserveKeyFromKeyPool(nIndex, keypool);
+        pwallet->ReserveKeyFromKeyPool(nIndex, keypool, internal);
         if (nIndex != -1)
             vchPubKey = keypool.vchPubKey;
         else {
@@ -3649,11 +3691,13 @@ bool CWallet::AddTokenTxEntry(const CTokenTx &tokenTx, bool fFlushOnClose) {
 
 CKeyPool::CKeyPool() {
     nTime = GetTime();
+    fInternal = false;
 }
 
-CKeyPool::CKeyPool(const CPubKey& vchPubKeyIn) {
+CKeyPool::CKeyPool(const CPubKey& vchPubKeyIn, bool internalIn) {
     nTime = GetTime();
     vchPubKey = vchPubKeyIn;
+    fInternal = internalIn;
 }
 
 CWalletKey::CWalletKey(int64_t nExpires) {
