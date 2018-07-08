@@ -1120,12 +1120,21 @@ int CWallet::ScanForWalletTransactions(CBlockIndex* pindexStart, bool fUpdate)
         while (pindex && nTimeFirstKey && (pindex->GetBlockTime() < (nTimeFirstKey - 7200)))
             pindex = chainActive.Next(pindex);
 
+        fAbortRescan = false;
         ShowProgress(_("Rescanning..."), 0); // show rescan progress in GUI as dialog or on splashscreen, if -rescan on startup
+
         double dProgressStart = Checkpoints::GuessVerificationProgress(chainParams.Checkpoints(), pindex, false);
         double dProgressTip = Checkpoints::GuessVerificationProgress(chainParams.Checkpoints(), chainActive.Tip(), false);
-        while (pindex) {
+        double dProgressCurrent = dProgressStart;
+
+        while (pindex && !fAbortRescan && !ShutdownRequested()) {
             if (pindex->nHeight % 100 == 0 && dProgressTip - dProgressStart > 0.0)
-                ShowProgress(_("Rescanning..."), std::max(1, std::min(99, (int)((Checkpoints::GuessVerificationProgress(chainParams.Checkpoints(), pindex, false) - dProgressStart) / (dProgressTip - dProgressStart) * 100))));
+                ShowProgress(_("Rescanning..."), std::max(1, std::min(99, (int)((dProgressCurrent - dProgressStart) / (dProgressTip - dProgressStart) * 100))));
+
+            if (GetTime() >= nNow + 60) {
+                nNow = GetTime();
+                LogPrintf("Still rescanning. At block %d. Progress=%f\n", pindex->nHeight, dProgressCurrent);
+            }
 
             CBlock block;
             ReadBlockFromDisk(block, pindex, Params().GetConsensus());
@@ -1134,11 +1143,17 @@ int CWallet::ScanForWalletTransactions(CBlockIndex* pindexStart, bool fUpdate)
                     ret++;
             }
             pindex = chainActive.Next(pindex);
-            if (GetTime() >= nNow + 60) {
-                nNow = GetTime();
-                LogPrintf("Still rescanning. At block %d. Progress=%f\n", pindex->nHeight, Checkpoints::GuessVerificationProgress(chainParams.Checkpoints(), pindex));
-            }
+
+            // Update current progress
+            dProgressCurrent = Checkpoints::GuessVerificationProgress(chainParams.Checkpoints(), pindex);
         }
+
+        if (pindex && fAbortRescan) {
+            LogPrintf("Rescan aborted at block %d. Progress=%f\n", pindex->nHeight, dProgressCurrent);
+        } else if (pindex && ShutdownRequested()) {
+            LogPrintf("Rescan interrupted by shutdown request at block %d. Progress=%f\n", pindex->nHeight, dProgressCurrent);
+        }
+
         ShowProgress(_("Rescanning..."), 100); // hide progress dialog in GUI
     }
     return ret;

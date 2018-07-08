@@ -445,8 +445,13 @@ void WalletView::showProgress(const QString& title, int nProgress)
             progressDialog->close();
             progressDialog->deleteLater();
         }
-    } else if (progressDialog)
-        progressDialog->setValue(nProgress);
+    } else if (progressDialog) {
+        if (progressDialog->wasCanceled()) {
+            getWalletModel()->getCurrentWallet()->AbortRescan();
+        } else {
+            progressDialog->setValue(nProgress);
+        }
+    }
 }
 
 /** Update wallet with the sum of the selected transactions */
