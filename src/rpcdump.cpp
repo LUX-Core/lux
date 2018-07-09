@@ -97,53 +97,60 @@ UniValue importprivkey(const UniValue& params, bool fHelp)
             "\nImport using a label and without rescan\n" + HelpExampleCli("importprivkey", "\"mykey\" \"testing\" false") +
             "\nAs a JSON-RPC call\n" + HelpExampleRpc("importprivkey", "\"mykey\", \"testing\", false"));
 
-//    LOCK2(cs_main, pwalletMain->cs_wallet);
-
-    EnsureWalletIsUnlocked();
-
-    string strSecret = params[0].get_str();
-    string strLabel = "";
-    if (params.size() > 1)
-        strLabel = params[1].get_str();
-
     // Whether to perform rescan after import
     bool fRescan = true;
-    if (params.size() > 2)
-        fRescan = params[2].get_bool();
 
-    CBitcoinSecret vchSecret;
-    bool fGood = vchSecret.SetString(strSecret);
-
-    if (!fGood) throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid private key encoding");
-
-    CKey key = vchSecret.GetKey();
-    if (!key.IsValid()) throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Private key outside allowed range");
-
-    CPubKey pubkey = key.GetPubKey();
-    assert(key.VerifyPubKey(pubkey));
-    CKeyID vchAddress = pubkey.GetID();
     {
-        pwalletMain->MarkDirty();
-        // We don't know which corresponding address will be used; label them all
-        for (const auto& dest : GetAllDestinationsForKey(pubkey)) {
-            pwalletMain->SetAddressBook(dest, strLabel, "receive");
+        LOCK2(cs_main, pwalletMain->cs_wallet);
+
+        EnsureWalletIsUnlocked();
+
+        string strSecret = params[0].get_str();
+        string strLabel = "";
+        if (params.size() > 1)
+            strLabel = params[1].get_str();
+
+        if (params.size() > 2)
+            fRescan = params[2].get_bool();
+
+        CBitcoinSecret vchSecret;
+        bool fGood = vchSecret.SetString(strSecret);
+
+        if (!fGood) throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid private key encoding");
+
+        CKey key = vchSecret.GetKey();
+        if (!key.IsValid()) throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Private key outside allowed range");
+
+        CPubKey pubkey = key.GetPubKey();
+        assert(key.VerifyPubKey(pubkey));
+        CKeyID vchAddress = pubkey.GetID();
+        {
+            pwalletMain->MarkDirty();
+            // We don't know which corresponding address will be used; label them all
+            for (const auto& dest : GetAllDestinationsForKey(pubkey)) {
+                pwalletMain->SetAddressBook(dest, strLabel, "receive");
+            }
+
+            // Don't throw error in case a key is already there
+            if (pwalletMain->HaveKey(vchAddress))
+                return NullUniValue;
+
+            pwalletMain->mapKeyMetadata[vchAddress].nCreateTime = 1;
+
+            if (!pwalletMain->AddKeyPubKey(key, pubkey))
+                throw JSONRPCError(RPC_WALLET_ERROR, "Error adding key to wallet");
+
+            // whenever a key is imported, we need to scan the whole chain
+            pwalletMain->nTimeFirstKey = 1; // 0 would be considered 'no value'
+            pwalletMain->LearnAllRelatedScripts(pubkey);
         }
+    }
 
-        // Don't throw error in case a key is already there
-        if (pwalletMain->HaveKey(vchAddress))
-            return NullUniValue;
+    if (fRescan) {
+        pwalletMain->ScanForWalletTransactions(chainActive.Genesis(), true);
 
-        pwalletMain->mapKeyMetadata[vchAddress].nCreateTime = 1;
-
-        if (!pwalletMain->AddKeyPubKey(key, pubkey))
-            throw JSONRPCError(RPC_WALLET_ERROR, "Error adding key to wallet");
-
-        // whenever a key is imported, we need to scan the whole chain
-        pwalletMain->nTimeFirstKey = 1; // 0 would be considered 'no value'
-        pwalletMain->LearnAllRelatedScripts(pubkey);
-
-        if (fRescan) {
-            pwalletMain->ScanForWalletTransactions(chainActive.Genesis(), true);
+        if (pwalletMain->IsAbortingRescan()) {
+            throw JSONRPCError(RPC_MISC_ERROR, "Rescan aborted by user.");
         }
     }
 
