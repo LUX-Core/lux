@@ -16,7 +16,7 @@
  */
 bool TransactionRecord::showTransaction(const CWalletTx& wtx)
 {
-    if (wtx.IsCoinBase()) {
+    if (wtx.IsCoinBase() || wtx.IsCoinStake()) {
         // Ensures we show generated coins / mined transactions at depth 1
         if (!wtx.IsInMainChain()) {
             return false;
