@@ -146,31 +146,15 @@ UniValue importprivkey(const UniValue& params, bool fHelp)
         }
     }
 
-    string msg = "";
     if (fRescan) {
         pwalletMain->ScanForWalletTransactions(chainActive.Genesis(), true);
 
         if (pwalletMain->IsAbortingRescan()) {
-            msg =  _("Rescan aborted by user. Please restart your Luxcore wallet with '-rescan' option. Otherwise, transaction data");
-            msg += _(" or address book entries might be missing or incorrect");
-            LogPrintf("%s: %s\n", __func__, msg);
-            throw JSONRPCError(RPC_MISC_ERROR, msg);
-        }
-        else
-        {
-            msg =  _("'importprivkey' with 'Rescan' option finished successfully. Please restart your Luxcore wallet. Otherwise, transaction data");
-            msg += _(" or address book entries might be missing or incorrect");
+            throw JSONRPCError(RPC_MISC_ERROR, "Rescan aborted by user.");
         }
     }
-    else
-    {
-        msg =  _("'importprivkey' finished successfully. Please restart Luxcore wallet with '-rescan' option. Otherwise, transaction data");
-        msg += _(" or address book entries might be missing or incorrect");
-    }
 
-    LogPrintf("%s: %s\n", __func__, msg);
-
-    return msg;
+    return NullUniValue;
 }
 
 UniValue importaddress(const UniValue& params, bool fHelp)

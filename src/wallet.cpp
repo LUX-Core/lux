@@ -1044,6 +1044,8 @@ void CWalletTx::GetAmounts(list<COutputEntry>& listReceived, list<COutputEntry>&
         //   2) the output is to us (received)
         if (nDebit > 0) {
             // Don't report 'change' txouts
+            //if (pwallet->IsChange(txout))
+            //continue;
             fIsMine = pwallet->IsMine(txout);
         } else if (!(fIsMine & filter))
             continue;
@@ -1111,6 +1113,7 @@ bool CWalletTx::WriteToDisk()
  */
 int CWallet::ScanForWalletTransactions(CBlockIndex* pindexStart, bool fUpdate)
 {
+    const CChainParams& chainParams = Params();
     int ret = 0;
     int64_t nNow = GetTime();
 
@@ -1126,30 +1129,23 @@ int CWallet::ScanForWalletTransactions(CBlockIndex* pindexStart, bool fUpdate)
         fAbortRescan = false;
         ShowProgress(_("Rescanning..."), 0); // show rescan progress in GUI as dialog or on splashscreen, if -rescan on startup
 
-        int dProgressTip;
+        double dProgressStart;
+        double dProgressTip;
         {
             LOCK(cs_main);
-            dProgressTip = chainActive.Height();
+            dProgressStart = Checkpoints::GuessVerificationProgress(chainParams.Checkpoints(), pindex, false);
+            dProgressTip = Checkpoints::GuessVerificationProgress(chainParams.Checkpoints(), chainActive.Tip(), false);
         }
 
-        int dProgressStart = pindex->nHeight;
-        int dProgressCurrent = dProgressStart;
-        int dProgressTotal = dProgressTip - dProgressStart;
-        int dProgressShow = 0;
-        int dProgressShowPrev = 0;
+        double dProgressCurrent = dProgressStart;
+        double dProgressTotal = dProgressTip - dProgressStart;
+        int    dProgressShow = 0;
 
         while (pindex && !fAbortRescan && !ShutdownRequested()) {
-            dProgressShow = std::min(99, (int) (((dProgressCurrent - dProgressStart) * 100) / dProgressTotal));
-            dProgressShow = std::max(1, dProgressShow);
+            dProgressShow = std::max(1, (int) (((dProgressCurrent - dProgressStart) * 100) / dProgressTotal));
             
             if ((pindex->nHeight % 100 == 0) && (dProgressTotal > 0))
-            {
-                if (dProgressShowPrev != dProgressShow)
-                {
-                    dProgressShowPrev = dProgressShow;
-                    ShowProgress(_("Rescanning..."), dProgressShow);
-                }
-            }
+                ShowProgress(_("Rescanning..."), dProgressShow);
 
             if (GetTime() >= nNow + 60) {
                 nNow = GetTime();
@@ -1159,17 +1155,20 @@ int CWallet::ScanForWalletTransactions(CBlockIndex* pindexStart, bool fUpdate)
             CBlock block;
             ReadBlockFromDisk(block, pindex, Params().GetConsensus());
             {
-                LOCK(cs_wallet);
+                LOCK2(cs_main, cs_wallet);
                 BOOST_FOREACH (CTransaction& tx, block.vtx) {
                     if (AddToWalletIfInvolvingMe(tx, &block, fUpdate))
                         ret++;
-                    }
+                }
             }
 
-            pindex = chainActive.Next(pindex);
+            {
+                LOCK(cs_main);
+                pindex = chainActive.Next(pindex);
 
-            // Update current height
-            if (pindex) dProgressCurrent = pindex->nHeight;
+                // Update current progress
+                dProgressCurrent = Checkpoints::GuessVerificationProgress(chainParams.Checkpoints(), pindex);
+            }
         }
 
         if (pindex && fAbortRescan) {
