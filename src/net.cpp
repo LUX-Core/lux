@@ -359,8 +359,13 @@ CCriticalSection CNode::cs_totalBytesSent;
 
 CNode* FindNode(const CNetAddr& ip)
 {
-    LOCK(cs_vNodes);
-    for (CNode* pnode : vNodes)
+    vector<CNode*> vNodesCopy;
+    {
+        LOCK(cs_vNodes);
+        vNodesCopy = vNodes;
+    }
+
+    for (CNode* pnode : vNodesCopy)
         if ((CNetAddr)pnode->addr == ip)
             return (pnode);
     return NULL;
@@ -368,8 +373,13 @@ CNode* FindNode(const CNetAddr& ip)
 
 CNode* FindNode(const CSubNet& subNet)
 {
-    LOCK(cs_vNodes);
-    for (CNode* pnode : vNodes)
+    vector<CNode*> vNodesCopy;
+    {
+        LOCK(cs_vNodes);
+        vNodesCopy = vNodes;
+    }
+
+    for (CNode* pnode : vNodesCopy)
         if (subNet.Match((CNetAddr)pnode->addr))
             return (pnode);
     return NULL;
@@ -377,8 +387,13 @@ CNode* FindNode(const CSubNet& subNet)
 
 CNode* FindNode(const std::string& addrName)
 {
-    LOCK(cs_vNodes);
-    for (CNode* pnode : vNodes)
+    vector<CNode*> vNodesCopy;
+    {
+        LOCK(cs_vNodes);
+        vNodesCopy = vNodes;
+    }
+
+    for (CNode* pnode : vNodesCopy)
         if (pnode->addrName == addrName)
             return (pnode);
     return NULL;
@@ -386,8 +401,13 @@ CNode* FindNode(const std::string& addrName)
 
 CNode* FindNode(const CService& addr)
 {
-    LOCK(cs_vNodes);
-    for (CNode* pnode : vNodes) {
+    vector<CNode*> vNodesCopy;
+    {
+        LOCK(cs_vNodes);
+        vNodesCopy = vNodes;
+    }
+
+    for (CNode* pnode : vNodesCopy ) {
         if (Params().NetworkID() == CBaseChainParams::REGTEST) {
             //if using regtest, just check the IP
             if ((CNetAddr)pnode->addr == (CNetAddr)addr)
@@ -821,11 +841,17 @@ static void AcceptConnection(const ListenSocket& hListenSocket) {
         if (!addr.SetSockAddr((const struct sockaddr *) &sockaddr))
             LogPrintf("Warning: Unknown socket family\n");
 
-    bool whitelisted = hListenSocket.whitelisted || CNode::IsWhitelistedRange(addr);{
+    bool whitelisted = hListenSocket.whitelisted || CNode::IsWhitelistedRange(addr);
+
+    vector<CNode*> vNodesCopy;
+    {
         LOCK(cs_vNodes);
-        BOOST_FOREACH (CNode *pnode, vNodes)if (pnode->fInbound)
-                            nInbound++;
+        vNodesCopy = vNodes;
     }
+    
+    BOOST_FOREACH (CNode *pnode, vNodesCopy)
+        if (pnode->fInbound)
+            nInbound++;
 
     if (hSocket == INVALID_SOCKET) {
         int nErr = WSAGetLastError();
@@ -881,15 +907,19 @@ void ThreadSocketHandler()
         // Disconnect nodes
         //
         {
-            LOCK(cs_vNodes);
+            vector<CNode*> vNodesCopy;
+            {
+                LOCK(cs_vNodes);
+                vNodesCopy = vNodes;
+            }
+
             // Disconnect unused nodes
-            vector<CNode*> vNodesCopy = vNodes;
             BOOST_FOREACH (CNode* pnode, vNodesCopy) {
                 if (pnode->fDisconnect ||
                     (pnode->GetRefCount() <= 0 && pnode->vRecvMsg.empty() && pnode->nSendSize == 0 && pnode->ssSend.empty())) {
 
-                    //LogPrintf("ThreadSocketHandler -- removing node: peer=%d addr=%s nRefCount=%d fNetworkNode=%d fInbound=%d fMasternode=%d\n",
-                      //        pnode->id, pnode->addr.ToString(), pnode->GetRefCount(), pnode->fNetworkNode, pnode->fInbound, pnode->fMasternode);
+                    // Lock the node to avoid race
+                    LOCK(cs_vNodes);
 
                     // remove from vNodes
                     vNodes.erase(remove(vNodes.begin(), vNodes.end(), pnode), vNodes.end());
@@ -965,8 +995,14 @@ void ThreadSocketHandler()
         }
 
         {
-            LOCK(cs_vNodes);
-            BOOST_FOREACH (CNode* pnode, vNodes) {
+            // Use local variable to avoid the lock the whole processing here.
+            // This will save unneccessary time for other threads to wait for the lock
+            vector<CNode*> vNodesCopy;
+            {
+                LOCK(cs_vNodes);
+                vNodesCopy = vNodes;
+            }
+            BOOST_FOREACH (CNode* pnode, vNodesCopy) {
                 if (pnode->hSocket == INVALID_SOCKET)
                     continue;
                 FD_SET(pnode->hSocket, &fdsetError);
@@ -1036,9 +1072,11 @@ void ThreadSocketHandler()
         {
             LOCK(cs_vNodes);
             vNodesCopy = vNodes;
-            BOOST_FOREACH (CNode* pnode, vNodesCopy)
-                pnode->AddRef();
         }
+
+        BOOST_FOREACH (CNode* pnode, vNodesCopy)
+                pnode->AddRef();
+
         BOOST_FOREACH (CNode* pnode, vNodesCopy) {
             boost::this_thread::interruption_point();
 
@@ -1365,13 +1403,16 @@ void ThreadOpenConnections() {
         // Do this here so we don't have to critsect vNodes inside mapAddresses critsect.
         int nOutbound = 0;
         set<vector<unsigned char> > setConnected;
+        vector<CNode*> vNodesCopy;
         {
             LOCK(cs_vNodes);
-            BOOST_FOREACH (CNode* pnode, vNodes) {
-                if (!pnode->fInbound) {
-                    setConnected.insert(pnode->addr.GetGroup());
-                    nOutbound++;
-                }
+            vNodesCopy = vNodes;
+        }
+
+        BOOST_FOREACH (CNode* pnode, vNodesCopy) {
+            if (!pnode->fInbound) {
+                setConnected.insert(pnode->addr.GetGroup());
+                nOutbound++;
             }
         }
 
@@ -1436,15 +1477,19 @@ std::vector<AddedNodeInfo> GetAddedNodeInfo()
     // Build a map of all already connected addresses (by IP:port and by name) to inbound/outbound and resolved CService
     std::map<CService, bool> mapConnected;
     std::map<std::string, std::pair<bool, CService>> mapConnectedByName;
+    vector<CNode*> vNodesCopy;
     {
         LOCK(cs_vNodes);
-        for (const CNode* pnode : vNodes) {
-            if (pnode->addr.IsValid()) {
-                mapConnected[pnode->addr] = pnode->fInbound;
-            }
-            if (!pnode->addrName.empty()) {
-                mapConnectedByName[pnode->addrName] = std::make_pair(pnode->fInbound, static_cast<const CService&>(pnode->addr));
-            }
+        vNodesCopy = vNodes;
+    }
+
+    for (const CNode* pnode : vNodesCopy) {
+        if (pnode->addr.IsValid()) {
+            mapConnected[pnode->addr] = pnode->fInbound;
+        }
+
+        if (!pnode->addrName.empty()) {
+            mapConnectedByName[pnode->addrName] = std::make_pair(pnode->fInbound, static_cast<const CService&>(pnode->addr));
         }
     }
 
@@ -1534,13 +1579,15 @@ void ThreadMessageHandler() {
 
     SetThreadPriority(THREAD_PRIORITY_BELOW_NORMAL);
     while (true) {
-        vector<CNode*> vNodesCopy;{
+        vector<CNode*> vNodesCopy;
+        {
             LOCK(cs_vNodes);
             vNodesCopy = vNodes;
-            BOOST_FOREACH (CNode* pnode, vNodesCopy) {
-                pnode->AddRef();
-            }
         }
+
+        BOOST_FOREACH (CNode* pnode, vNodesCopy) {
+            pnode->AddRef();
+        }      
 
         // Poll the connected nodes for messages
         CNode* pnodeTrickle = NULL;
@@ -1905,9 +1952,14 @@ void RelayTransaction(const CTransaction& tx, const CDataStream& ss)
         mapRelay.insert(std::make_pair(inv, ss));
         vRelayExpiration.push_back(std::make_pair(GetTime() + 15 * 60, inv));
     }
-    LOCK(cs_vNodes);
+
+    vector<CNode*> vNodesCopy;
+    {
+        LOCK(cs_vNodes);
+        vNodesCopy = vNodes;
+    }
     unsigned nRelayed = 0;
-    BOOST_FOREACH (CNode* pnode, vNodes) {
+    BOOST_FOREACH (CNode* pnode, vNodesCopy) {
         if (!pnode->fRelayTxes)
             continue;
         if (pnode->nVersion >= ActiveProtocol()) {
@@ -1928,8 +1980,13 @@ void RelayTransactionLockReq(const CTransaction& tx, bool relayToAll)
     CInv inv(MSG_TXLOCK_REQUEST, tx.GetHash());
 
     //broadcast the new lock
-    LOCK(cs_vNodes);
-    BOOST_FOREACH (CNode* pnode, vNodes) {
+    vector<CNode*> vNodesCopy;
+    {
+        LOCK(cs_vNodes);
+        vNodesCopy = vNodes;
+    }
+
+    BOOST_FOREACH (CNode* pnode, vNodesCopy) {
         if (!relayToAll && !pnode->fRelayTxes)
             continue;
 
@@ -1939,8 +1996,13 @@ void RelayTransactionLockReq(const CTransaction& tx, bool relayToAll)
 
 void RelayInv(CInv& inv)
 {
-    LOCK(cs_vNodes);
-    BOOST_FOREACH (CNode* pnode, vNodes) {
+    vector<CNode*> vNodesCopy;
+    {
+        LOCK(cs_vNodes);
+        vNodesCopy = vNodes;
+    }
+
+    BOOST_FOREACH (CNode* pnode, vNodesCopy) {
         if (pnode->nVersion >= ActiveProtocol())
             pnode->PushInventory(inv);
     }
@@ -1948,16 +2010,26 @@ void RelayInv(CInv& inv)
 
 void RelayDarkSendFinalTransaction(const int sessionID, const CTransaction& txNew)
 {
-    LOCK(cs_vNodes);
-    BOOST_FOREACH(CNode* pnode, vNodes) {
+    vector<CNode*> vNodesCopy;
+    {
+        LOCK(cs_vNodes);
+        vNodesCopy = vNodes;
+    }
+
+    BOOST_FOREACH(CNode* pnode, vNodesCopy) {
         pnode->PushMessage("dsf", sessionID, txNew);
     }
 }
 
 void RelayDarkSendIn(const std::vector<CTxIn>& in, const int64_t& nAmount, const CTransaction& txCollateral, const std::vector<CTxOut>& out)
 {
-    LOCK(cs_vNodes);
-    BOOST_FOREACH(CNode* pnode, vNodes) {
+    vector<CNode*> vNodesCopy;
+    {
+        LOCK(cs_vNodes);
+        vNodesCopy = vNodes;
+    }
+
+    BOOST_FOREACH(CNode* pnode, vNodesCopy) {
         if((CNetAddr)darkSendPool.submittedToMasternode != (CNetAddr)pnode->addr) continue;
         LogPrintf("RelayDarkSendIn - found master, relaying message - %s \n", pnode->addr.ToString().c_str());
         pnode->PushMessage("dsi", in, nAmount, txCollateral, out);
@@ -1966,16 +2038,26 @@ void RelayDarkSendIn(const std::vector<CTxIn>& in, const int64_t& nAmount, const
 
 void RelayDarkSendStatus(const int sessionID, const int newState, const int newEntriesCount, const int newAccepted, const std::string error)
 {
-    LOCK(cs_vNodes);
-    BOOST_FOREACH(CNode* pnode, vNodes) {
+    vector<CNode*> vNodesCopy;
+    {
+        LOCK(cs_vNodes);
+        vNodesCopy = vNodes;
+    }
+
+    BOOST_FOREACH(CNode* pnode, vNodesCopy) {
         pnode->PushMessage("dssu", sessionID, newState, newEntriesCount, newAccepted, error);
     }
 }
 
 void RelayDarkSendElectionEntry(const CTxIn &vin, const CService addr, const std::vector<unsigned char> vchSig, const int64_t nNow, const CPubKey pubkey, const CPubKey pubkey2, const int count, const int current, const int64_t lastUpdated, const int protocolVersion)
 {
-    LOCK(cs_vNodes);
-    BOOST_FOREACH(CNode* pnode, vNodes) {
+    vector<CNode*> vNodesCopy;
+    {
+        LOCK(cs_vNodes);
+        vNodesCopy = vNodes;
+    }
+
+    BOOST_FOREACH(CNode* pnode, vNodesCopy) {
         if(!pnode->fRelayTxes) continue;
         pnode->PushMessage("dsee", vin, addr, vchSig, nNow, pubkey, pubkey2, count, current, lastUpdated, protocolVersion);
     }
@@ -1983,16 +2065,26 @@ void RelayDarkSendElectionEntry(const CTxIn &vin, const CService addr, const std
 
 void SendDarkSendElectionEntry(const CTxIn &vin, const CService addr, const std::vector<unsigned char> vchSig, const int64_t nNow, const CPubKey pubkey, const CPubKey pubkey2, const int count, const int current, const int64_t lastUpdated, const int protocolVersion)
 {
-    LOCK(cs_vNodes);
-    BOOST_FOREACH(CNode* pnode, vNodes) {
+    vector<CNode*> vNodesCopy;
+    {
+        LOCK(cs_vNodes);
+        vNodesCopy = vNodes;
+    }
+
+    BOOST_FOREACH(CNode* pnode, vNodesCopy) {
         pnode->PushMessage("dsee", vin, addr, vchSig, nNow, pubkey, pubkey2, count, current, lastUpdated, protocolVersion);
     }
 }
 
 void RelayDarkSendElectionEntryPing(const CTxIn &vin, const std::vector<unsigned char> vchSig, const int64_t nNow, const bool stop)
 {
-    LOCK(cs_vNodes);
-    BOOST_FOREACH(CNode* pnode, vNodes) {
+    vector<CNode*> vNodesCopy;
+    {
+        LOCK(cs_vNodes);
+        vNodesCopy = vNodes;
+    }
+
+    BOOST_FOREACH(CNode* pnode, vNodesCopy) {
         if(!pnode->fRelayTxes) continue;
         pnode->PushMessage("dseep", vin, vchSig, nNow, stop);
     }
@@ -2000,16 +2092,26 @@ void RelayDarkSendElectionEntryPing(const CTxIn &vin, const std::vector<unsigned
 
 void SendDarkSendElectionEntryPing(const CTxIn &vin, const std::vector<unsigned char> vchSig, const int64_t nNow, const bool stop)
 {
-    LOCK(cs_vNodes);
-    BOOST_FOREACH(CNode* pnode, vNodes) {
+    vector<CNode*> vNodesCopy;
+    {
+        LOCK(cs_vNodes);
+        vNodesCopy = vNodes;
+    }
+
+    BOOST_FOREACH(CNode* pnode, vNodesCopy) {
         pnode->PushMessage("dseep", vin, vchSig, nNow, stop);
     }
 }
 
 void RelayDarkSendCompletedTransaction(const int sessionID, const bool error, const std::string errorMessage)
 {
-    LOCK(cs_vNodes);
-    BOOST_FOREACH(CNode* pnode, vNodes) {
+    vector<CNode*> vNodesCopy;
+    {
+        LOCK(cs_vNodes);
+        vNodesCopy = vNodes;
+    }
+
+    BOOST_FOREACH(CNode* pnode, vNodesCopy) {
         pnode->PushMessage("dsc", sessionID, error, errorMessage);
     }
 }

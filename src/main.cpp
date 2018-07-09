@@ -1718,24 +1718,10 @@ bool ReadBlockFromDisk(CBlock& block, const CDiskBlockPos& pos, int nHeight, con
     if (block.IsProofOfWork()) {
         if (!CheckProofOfWork(block.GetHash(nHeight >= Params().SwitchPhi2Block()), block.nBits, consensusParams))
             return error("ReadBlockFromDisk : Errors in block header");
-    } else {
-        uint256 hashProofOfStake;
-
-        // Get prev block index
-        CBlockIndex* pindexPrev = NULL;
-        CValidationState state;
-        const CChainParams& chainparams = Params();
-
-        //Genesis block's hash cannot be calculated using PHI2, so no need to check PHI2 block hash
-        if (block.GetHash() != chainparams.GetConsensus().hashGenesisBlock) {
-            pindexPrev = LookupBlockIndex(block.hashPrevBlock);
-            if (!pindexPrev)
-                return state.DoS(0, error("%s : prev block %s not found", __func__, block.hashPrevBlock.GetHex()), 0, "bad-prevblk");
-        }
-
-         if (!stake->CheckProof(pindexPrev, block, hashProofOfStake))
-            return error("%s: invalid proof-of-stake (block %s)", __func__, block.GetHash().GetHex());
     }
+
+    // There is no need to validate PoS blocks' headers as they can be loaded out of order from disk, which makes PoS
+    // blocks  impossible to validate. They will be validated later in CheckBlock and ConnectBlock
 
     return true;
 }
@@ -3425,8 +3411,13 @@ bool ActivateBestChain(CValidationState& state, const CChainParams& chainparams,
             // Relay inventory, but don't relay old inventory during initial block download.
             int nBlockEstimate = Checkpoints::GetTotalBlocksEstimate(chainparams.Checkpoints());
             if (nLocalServices & NODE_NETWORK) {
-                LOCK(cs_vNodes);
-                BOOST_FOREACH (CNode* pnode, vNodes)
+                vector<CNode*> vNodesCopy;
+                {
+                    LOCK(cs_vNodes);
+                    vNodesCopy = vNodes;
+                }
+
+                BOOST_FOREACH (CNode* pnode, vNodesCopy)
                     if (chainActive.Height() > (pnode->nStartingHeight != -1 ? pnode->nStartingHeight - 2000 : nBlockEstimate))
                         pnode->PushInventory(CInv(MSG_BLOCK, hashNewTip));
             }
@@ -5843,7 +5834,12 @@ static bool ProcessMessage(CNode* pfrom, const string &strCommand, CDataStream& 
             if (addr.nTime > nSince && !pfrom->fGetAddr && vAddr.size() <= 10 && addr.IsRoutable()) {
                 // Relay to a limited number of other nodes
                 {
-                    LOCK(cs_vNodes);
+                    vector<CNode*> vNodesCopy;
+                    {
+                        LOCK(cs_vNodes);
+                        vNodesCopy = vNodes;
+                    }
+
                     // Use deterministic randomness to send to the same nodes for 24 hours
                     // at a time so the setAddrKnowns of the chosen nodes prevent repeats
                     static uint256 hashSalt;
@@ -5853,7 +5849,7 @@ static bool ProcessMessage(CNode* pfrom, const string &strCommand, CDataStream& 
                     uint256 hashRand = hashSalt ^ (hashAddr << 32) ^ ((GetTime() + hashAddr) / (24 * 60 * 60));
                     hashRand = Hash(BEGIN(hashRand), END(hashRand));
                     multimap<uint256, CNode*> mapMix;
-                    BOOST_FOREACH (CNode* pnode, vNodes) {
+                    BOOST_FOREACH (CNode* pnode, vNodesCopy) {
                         if (pnode->nVersion < CADDR_TIME_VERSION)
                             continue;
                         unsigned int nPointer;
@@ -6356,8 +6352,13 @@ static bool ProcessMessage(CNode* pfrom, const string &strCommand, CDataStream& 
                 // Relay
                 pfrom->setKnown.insert(alertHash);
                 {
-                    LOCK(cs_vNodes);
-                    BOOST_FOREACH (CNode* pnode, vNodes)
+                    vector<CNode*> vNodesCopy;
+                    {
+                        LOCK(cs_vNodes);
+                        vNodesCopy = vNodes;
+                    }
+
+                    BOOST_FOREACH (CNode* pnode, vNodesCopy)
                         alert.RelayTo(pnode);
                 }
             } else {
