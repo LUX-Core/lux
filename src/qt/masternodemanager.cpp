@@ -158,8 +158,10 @@ void MasternodeManager::updateNodeList()
     ui->countLabel->setText("Updating...");
     ui->tableWidget->clearContents();
     ui->tableWidget->setRowCount(0);
-    BOOST_FOREACH(CMasterNode mn, vecMasternodes) 
+    BOOST_FOREACH(CMasterNode &mn, vecMasternodes)
     {
+        if (ShutdownRequested()) return;
+        
         int mnRow = 0;
         ui->tableWidget->insertRow(0);
 
@@ -172,9 +174,9 @@ void MasternodeManager::updateNodeList()
 	QTableWidgetItem *lastSeenItem = new QTableWidgetItem(QString::fromStdString(DateTimeStrFormat("%Y-%m-%d %H:%M:%S", mn.lastTimeSeen)));
 	
 	CScript pubkey;
-    pubkey = GetScriptForDestination(mn.pubkey.GetID());
-    CTxDestination address1;
-    ExtractDestination(pubkey, address1);
+        pubkey = GetScriptForDestination(mn.pubkey.GetID());
+        CTxDestination address1;
+        ExtractDestination(pubkey, address1);
 	QTableWidgetItem *pubkeyItem = new QTableWidgetItem(QString::fromStdString(EncodeDestination(address1)));
 	
 	ui->tableWidget->setItem(mnRow, 0, addressItem);
