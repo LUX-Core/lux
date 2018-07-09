@@ -1623,7 +1623,7 @@ void CWallet::AvailableCoinsMN(vector<COutput>& vCoins, bool fOnlyConfirmed, con
             if (fOnlyConfirmed && !pcoin->IsTrusted())
                 continue;
 
-            if (pcoin->IsCoinBase() && pcoin->GetBlocksToMaturity() > 0)
+            if ((pcoin->IsCoinBase() || pcoin->IsCoinStake()) && pcoin->GetBlocksToMaturity() > 0)
                 continue;
 
             if (pcoin->IsCoinStake() && pcoin->GetBlocksToMaturity() > 0)
@@ -3029,7 +3029,7 @@ std::map<CTxDestination, CAmount> CWallet::GetAddressBalances()
             if (!IsFinalTx(*pcoin) || !pcoin->IsTrusted())
                 continue;
 
-            if (pcoin->IsCoinBase() && pcoin->GetBlocksToMaturity() > 0)
+            if ((pcoin->IsCoinBase() || pcoin->IsCoinStake()) && pcoin->GetBlocksToMaturity() > 0)
                 continue;
 
             int nDepth = pcoin->GetDepthInMainChain();
