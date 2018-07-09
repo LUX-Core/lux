@@ -1266,7 +1266,8 @@ void ListTransactions(const CWalletTx& wtx, const string& strAccount, int nMinDe
                 entry.push_back(Pair("label", pwalletMain->mapAddressBook[s.destination].name));
             }
             entry.push_back(Pair("vout", s.vout));
-            entry.push_back(Pair("fee", ValueFromAmount(-nFee)));
+            if (!wtx.IsCoinStake())
+                entry.push_back(Pair("fee", ValueFromAmount(-nFee)));
             if (fLong)
                 WalletTxToJSON(wtx, entry);
             ret.push_back(entry);
