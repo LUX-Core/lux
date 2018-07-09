@@ -600,7 +600,7 @@ UniValue getreceivedbyaddress(const UniValue& params, bool fHelp)
     CAmount nAmount = 0;
     for (map<uint256, CWalletTx>::iterator it = pwalletMain->mapWallet.begin(); it != pwalletMain->mapWallet.end(); ++it) {
         const CWalletTx& wtx = (*it).second;
-        if (wtx.IsCoinBase() || !IsFinalTx(wtx))
+        if (wtx.IsCoinBase() || wtx.IsCoinStake() || !IsFinalTx(wtx))
             continue;
 
         BOOST_FOREACH (const CTxOut& txout, wtx.vout)
@@ -646,7 +646,7 @@ UniValue getreceivedbyaccount(const UniValue& params, bool fHelp)
     CAmount nAmount = 0;
     for (map<uint256, CWalletTx>::iterator it = pwalletMain->mapWallet.begin(); it != pwalletMain->mapWallet.end(); ++it) {
         const CWalletTx& wtx = (*it).second;
-        if (wtx.IsCoinBase() || !IsFinalTx(wtx))
+        if (wtx.IsCoinBase() || wtx.IsCoinStake() || !IsFinalTx(wtx))
             continue;
 
         BOOST_FOREACH (const CTxOut& txout, wtx.vout) {
@@ -1077,7 +1077,7 @@ UniValue ListReceived(const UniValue& params, bool fByAccounts)
     for (map<uint256, CWalletTx>::iterator it = pwalletMain->mapWallet.begin(); it != pwalletMain->mapWallet.end(); ++it) {
         const CWalletTx& wtx = (*it).second;
 
-        if (wtx.IsCoinBase() || !IsFinalTx(wtx))
+        if (wtx.IsCoinBase() || wtx.IsCoinStake() || !IsFinalTx(wtx))
             continue;
 
         int nDepth = wtx.GetDepthInMainChain();
@@ -1275,6 +1275,7 @@ void ListTransactions(const CWalletTx& wtx, const string& strAccount, int nMinDe
 
     // Received
     if (listReceived.size() > 0 && wtx.GetDepthInMainChain() >= nMinDepth) {
+        bool stop = false;
         BOOST_FOREACH (const COutputEntry& r, listReceived) {
             string account;
             if (pwalletMain->mapAddressBook.count(r.destination))
@@ -1285,7 +1286,7 @@ void ListTransactions(const CWalletTx& wtx, const string& strAccount, int nMinDe
                     entry.push_back(Pair("involvesWatchonly", true));
                 entry.push_back(Pair("account", account));
                 MaybePushAddress(entry, r.destination);
-                if (wtx.IsCoinBase()) {
+                if (wtx.IsCoinBase() || wtx.IsCoinStake()) {
                     if (wtx.GetDepthInMainChain() < 1)
                         entry.push_back(Pair("category", "orphan"));
                     else if (wtx.GetBlocksToMaturity() > 0)
@@ -1295,7 +1296,12 @@ void ListTransactions(const CWalletTx& wtx, const string& strAccount, int nMinDe
                 } else {
                     entry.push_back(Pair("category", "receive"));
                 }
-                entry.push_back(Pair("amount", ValueFromAmount(r.amount)));
+                if (!wtx.IsCoinStake())
+                    entry.push_back(Pair("amount", ValueFromAmount(r.amount)));
+                else {
+                    entry.push_back(Pair("amount", ValueFromAmount(-nFee)));
+                    stop = true;
+                }
                 if (pwalletMain->mapAddressBook.count(r.destination)) {
                     entry.push_back(Pair("label", account));
                 }
@@ -1303,6 +1309,8 @@ void ListTransactions(const CWalletTx& wtx, const string& strAccount, int nMinDe
                 if (fLong)
                     WalletTxToJSON(wtx, entry);
                 ret.push_back(entry);
+                if (stop)
+                    break;
             }
         }
     }

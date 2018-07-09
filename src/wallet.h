@@ -833,6 +833,7 @@ public:
     char fFromMe;
     std::string strFromAccount;
     int64_t nOrderPos; //! position in ordered transaction list
+    std::vector<char> vfAlreadySpent;
 
     // memory only
     mutable bool fDebitCached;
@@ -894,6 +895,7 @@ public:
         nTimeSmart = 0;
         fFromMe = false;
         strFromAccount.clear();
+        vfAlreadySpent.clear();
         fDebitCached = false;
         fCreditCached = false;
         fImmatureCreditCached = false;
@@ -983,15 +985,56 @@ public:
         fChangeCached = false;
     }
 
-    void BindWallet(CWallet* pwalletIn)
-    {
+    void BindWallet(CWallet* pwalletIn) {
         pwallet = pwalletIn;
         MarkDirty();
     }
 
+    bool UpdateSpent(const std::vector<char>& vfNewSpent) {
+        bool fReturn = false;
+        for (unsigned int i = 0; i < vfNewSpent.size(); i++) {
+            if (i == vfAlreadySpent.size())
+                break;
+
+            if (vfNewSpent[i] && !vfAlreadySpent[i]) {
+                vfAlreadySpent[i] = true;
+                fReturn = true;
+                fAvailableCreditCached = false;
+            }
+        }
+        return fReturn;
+    }
+
+    void MarkSpent(unsigned int nOut) {
+        if (nOut >= vout.size())
+            throw std::runtime_error("CWalletTx::MarkSpent() : out of range");
+        vfAlreadySpent.resize(vout.size());
+        if (!vfAlreadySpent[nOut]) {
+            vfAlreadySpent[nOut] = true;
+            fAvailableCreditCached = false;
+        }
+    }
+
+    void MarkUnspent(unsigned int nOut) {
+        if (nOut >= vout.size())
+            throw std::runtime_error("CWalletTx::MarkUnspent() : out of range");
+        vfAlreadySpent.resize(vout.size());
+        if (vfAlreadySpent[nOut]) {
+            vfAlreadySpent[nOut] = false;
+            fAvailableCreditCached = false;
+        }
+    }
+
+    bool IsSpent(unsigned int nOut) const {
+        if (nOut >= vout.size())
+            throw std::runtime_error("CWalletTx::IsSpent() : out of range");
+        if (nOut >= vfAlreadySpent.size())
+            return false;
+        return (!!vfAlreadySpent[nOut]);
+    }
+
     //! filter decides which addresses will count towards the debit
-    CAmount GetDebit(const isminefilter& filter) const
-    {
+    CAmount GetDebit(const isminefilter& filter) const {
         if (vin.empty())
             return 0;
 

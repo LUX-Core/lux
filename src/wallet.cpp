@@ -1034,14 +1034,17 @@ void CWalletTx::GetAmounts(list<COutputEntry>& listReceived, list<COutputEntry>&
     // Sent/received.
     for (unsigned int i = 0; i < vout.size(); ++i) {
         const CTxOut& txout = vout[i];
+
+        if (txout.scriptPubKey.empty())
+            continue;
+
         isminetype fIsMine = pwallet->IsMine(txout);
         // Only need to handle txouts if AT LEAST one of these is true:
         //   1) they debit from us (sent)
         //   2) the output is to us (received)
         if (nDebit > 0) {
             // Don't report 'change' txouts
-            if (pwallet->IsChange(txout))
-                continue;
+            fIsMine = pwallet->IsMine(txout);
         } else if (!(fIsMine & filter))
             continue;
 
