@@ -59,17 +59,41 @@ Build Lux wallet
 
 ### Building for 32-bit Windows
 
-The next three steps are an example of how to acquire the source in an appropriate way.
+The next three steps are an example of how to acquire the source and build in an appropriate way.
+        
+Acquire the source and install dependencies.
 
-    cd /usr/src
     git clone https://github.com/216k155/lux.git
     sudo chmod -R a+rw lux
-
-Once the source code is ready the build steps are below.
-
-    PATH=$(echo "$PATH" | sed -e 's/:\/mnt.*//g')
     cd lux/depends
+    ./install-dependencies.sh
+    
+Set the default mingw-w32 g++ compiler option to auto (option 0) by default.
+
+    sudo update-alternatives --config i686-w64-mingw32-g++
+    
+Build in the usual way.
+
     ./build-wins.sh
+    
+### Building for 64-bit Windows   
+
+The next three steps are an example of how to acquire the source and build in an appropriate way.
+        
+Acquire the source and install dependencies.
+
+    git clone https://github.com/216k155/lux.git
+    sudo chmod -R a+rw lux
+    cd lux/depends
+    ./install-dependencies.sh
+    
+Set the default mingw-w64 g++ compiler option to posix (option 1).
+
+    sudo update-alternatives --config x86_64-w64-mingw32-g++
+    
+Build in the usual way.
+
+    ./build-wins.sh x64
 
 ### Build on Ubuntu
 
