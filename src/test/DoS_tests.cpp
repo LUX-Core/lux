@@ -46,7 +46,7 @@ BOOST_AUTO_TEST_SUITE(DoS_tests)
 BOOST_AUTO_TEST_CASE(DoS_banning)
 {
     CNode::ClearBanned();
-    CAddress addr1(ip(0xa0b0c001));
+    CAddress addr1(ip(0xa0b0c001), NODE_NETWORK);
     CNode dummyNode1(INVALID_SOCKET, addr1, "", true);
     dummyNode1.nVersion = 1;
     Misbehaving(dummyNode1.GetId(), 100); // Should get banned
@@ -54,7 +54,7 @@ BOOST_AUTO_TEST_CASE(DoS_banning)
     BOOST_CHECK(CNode::IsBanned(addr1));
     BOOST_CHECK(!CNode::IsBanned(ip(0xa0b0c001|0x0000ff00))); // Different IP, not banned
 
-    CAddress addr2(ip(0xa0b0c002));
+    CAddress addr2(ip(0xa0b0c002), NODE_NETWORK);
     CNode dummyNode2(INVALID_SOCKET, addr2, "", true);
     dummyNode2.nVersion = 1;
     Misbehaving(dummyNode2.GetId(), 50);
@@ -70,7 +70,7 @@ BOOST_AUTO_TEST_CASE(DoS_banscore)
 {
     CNode::ClearBanned();
     mapArgs["-banscore"] = "111"; // because 11 is my favorite number
-    CAddress addr1(ip(0xa0b0c001));
+    CAddress addr1(ip(0xa0b0c001), NODE_NETWORK);
     CNode dummyNode1(INVALID_SOCKET, addr1, "", true);
     dummyNode1.nVersion = 1;
     Misbehaving(dummyNode1.GetId(), 100);
@@ -91,7 +91,7 @@ BOOST_AUTO_TEST_CASE(DoS_bantime)
     int64_t nStartTime = GetTime();
     SetMockTime(nStartTime); // Overrides future calls to GetTime()
 
-    CAddress addr(ip(0xa0b0c001));
+    CAddress addr(ip(0xa0b0c001), NODE_NETWORK);
     CNode dummyNode(INVALID_SOCKET, addr, "", true);
     dummyNode.nVersion = 1;
 
@@ -149,7 +149,7 @@ BOOST_AUTO_TEST_CASE(DoS_mapOrphans)
         tx.vout.resize(1);
         tx.vout[0].nValue = 1*CENT;
         tx.vout[0].scriptPubKey = GetScriptForDestination(key.GetPubKey().GetID());
-        SignSignature(keystore, txPrev, tx, 0);
+        SignSignature(keystore, txPrev, tx, 0, SIGHASH_ALL);
 
         AddOrphanTx(tx, i);
     }
@@ -169,7 +169,7 @@ BOOST_AUTO_TEST_CASE(DoS_mapOrphans)
             tx.vin[j].prevout.n = j;
             tx.vin[j].prevout.hash = txPrev.GetHash();
         }
-        SignSignature(keystore, txPrev, tx, 0);
+        SignSignature(keystore, txPrev, tx, 0, SIGHASH_ALL);
         // Re-use same signature for other inputs
         // (they don't have to be valid for this test)
         for (unsigned int j = 1; j < tx.vin.size(); j++)

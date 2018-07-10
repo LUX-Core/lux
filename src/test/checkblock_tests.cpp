@@ -6,9 +6,8 @@
 // Unit tests for block.CheckBlock()
 //
 
-
-
 #include "clientversion.h"
+#include "consensus/validation.h"
 #include "main.h"
 #include "utiltime.h"
 
@@ -60,7 +59,7 @@ BOOST_AUTO_TEST_CASE(May15)
 
         // After May 15'th, big blocks are OK:
         forkingBlock.nTime = tMay15; // Invalidates PoW
-        BOOST_CHECK(CheckBlock(forkingBlock, state, false, false));
+        BOOST_CHECK(CheckBlock(forkingBlock, state, Params().GetConsensus(), false, false));
     }
 
     SetMockTime(0);

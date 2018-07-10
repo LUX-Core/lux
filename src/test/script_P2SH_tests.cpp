@@ -105,7 +105,7 @@ BOOST_AUTO_TEST_CASE(sign)
     }
     for (int i = 0; i < 8; i++)
     {
-        BOOST_CHECK_MESSAGE(SignSignature(keystore, txFrom, txTo[i], 0), strprintf("SignSignature %d", i));
+        BOOST_CHECK_MESSAGE(SignSignature(keystore, txFrom, txTo[i], 0, SIGHASH_ALL), strprintf("SignSignature %d", i));
     }
     // All of the above should be OK, and the txTos have valid signatures
     // Check to make sure signature verification fails if we use the wrong ScriptSig:
@@ -202,7 +202,7 @@ BOOST_AUTO_TEST_CASE(set)
     }
     for (int i = 0; i < 4; i++)
     {
-        BOOST_CHECK_MESSAGE(SignSignature(keystore, txFrom, txTo[i], 0), strprintf("SignSignature %d", i));
+        BOOST_CHECK_MESSAGE(SignSignature(keystore, txFrom, txTo[i], 0, SIGHASH_ALL), strprintf("SignSignature %d", i));
         BOOST_CHECK_MESSAGE(IsStandardTx(txTo[i], reason), strprintf("txTo[%d].IsStandard", i));
     }
 }
@@ -331,9 +331,9 @@ BOOST_AUTO_TEST_CASE(AreInputsStandard)
         txTo.vin[i].prevout.n = i;
         txTo.vin[i].prevout.hash = txFrom.GetHash();
     }
-    BOOST_CHECK(SignSignature(keystore, txFrom, txTo, 0));
-    BOOST_CHECK(SignSignature(keystore, txFrom, txTo, 1));
-    BOOST_CHECK(SignSignature(keystore, txFrom, txTo, 2));
+    BOOST_CHECK(SignSignature(keystore, txFrom, txTo, 0, SIGHASH_ALL));
+    BOOST_CHECK(SignSignature(keystore, txFrom, txTo, 1, SIGHASH_ALL));
+    BOOST_CHECK(SignSignature(keystore, txFrom, txTo, 2, SIGHASH_ALL));
     // SignSignature doesn't know how to sign these. We're
     // not testing validating signatures, so just create
     // dummy signatures that DO include the correct P2SH scripts:

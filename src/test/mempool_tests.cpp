@@ -3,6 +3,7 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "main.h"
+#include "test_lux.cpp"
 #include "txmempool.h"
 #include "util.h"
 
@@ -14,7 +15,7 @@ BOOST_AUTO_TEST_SUITE(mempool_tests)
 BOOST_AUTO_TEST_CASE(MempoolRemoveTest)
 {
     // Test CTxMemPool::remove functionality
-
+    TestMemPoolEntryHelper entry;
     // Parent transaction with three children,
     // and three grand-children:
     CMutableTransaction txParent;
@@ -51,52 +52,54 @@ BOOST_AUTO_TEST_CASE(MempoolRemoveTest)
 
 
     CTxMemPool testPool(CFeeRate(0));
-    std::list<CTransaction> removed;
 
     // Nothing in pool, remove should do nothing:
-    testPool.remove(txParent, removed, true);
-    BOOST_CHECK_EQUAL(removed.size(), 0);
+    unsigned int poolSize = testPool.size();
+    testPool.removeRecursive(txParent);
+    BOOST_CHECK_EQUAL(testPool.size(), poolSize);
 
     // Just the parent:
-    testPool.addUnchecked(txParent.GetHash(), CTxMemPoolEntry(txParent, 0, 0, 0.0, 1));
-    testPool.remove(txParent, removed, true);
-    BOOST_CHECK_EQUAL(removed.size(), 1);
-    removed.clear();
+    testPool.addUnchecked(txParent.GetHash(), entry.FromTx(txParent));
+    poolSize = testPool.size();
+    testPool.removeRecursive(txParent);
+    BOOST_CHECK_EQUAL(testPool.size(), poolSize - 1);
     
     // Parent, children, grandchildren:
-    testPool.addUnchecked(txParent.GetHash(), CTxMemPoolEntry(txParent, 0, 0, 0.0, 1));
+    testPool.addUnchecked(txParent.GetHash(), entry.FromTx(txParent));
     for (int i = 0; i < 3; i++)
     {
-        testPool.addUnchecked(txChild[i].GetHash(), CTxMemPoolEntry(txChild[i], 0, 0, 0.0, 1));
-        testPool.addUnchecked(txGrandChild[i].GetHash(), CTxMemPoolEntry(txGrandChild[i], 0, 0, 0.0, 1));
+        testPool.addUnchecked(txChild[i].GetHash(), entry.FromTx(txChild[i]));
+        testPool.addUnchecked(txGrandChild[i].GetHash(), entry.FromTx(txGrandChild[i]));
     }
     // Remove Child[0], GrandChild[0] should be removed:
-    testPool.remove(txChild[0], removed, true);
-    BOOST_CHECK_EQUAL(removed.size(), 2);
-    removed.clear();
+    poolSize = testPool.size();
+    testPool.removeRecursive(txChild[0]);
+    BOOST_CHECK_EQUAL(testPool.size(), poolSize - 2);
     // ... make sure grandchild and child are gone:
-    testPool.remove(txGrandChild[0], removed, true);
-    BOOST_CHECK_EQUAL(removed.size(), 0);
-    testPool.remove(txChild[0], removed, true);
-    BOOST_CHECK_EQUAL(removed.size(), 0);
+    poolSize = testPool.size();
+    testPool.removeRecursive(txGrandChild[0]);
+    BOOST_CHECK_EQUAL(testPool.size(), poolSize);
+    poolSize = testPool.size();
+    testPool.removeRecursive(txChild[0]);
+    BOOST_CHECK_EQUAL(testPool.size(), poolSize);
     // Remove parent, all children/grandchildren should go:
-    testPool.remove(txParent, removed, true);
-    BOOST_CHECK_EQUAL(removed.size(), 5);
-    BOOST_CHECK_EQUAL(testPool.size(), 0);
-    removed.clear();
+    poolSize = testPool.size();
+    testPool.removeRecursive(txParent);
+    BOOST_CHECK_EQUAL(testPool.size(), poolSize - 5);
+    BOOST_CHECK_EQUAL(testPool.size(), 0U);
 
     // Add children and grandchildren, but NOT the parent (simulate the parent being in a block)
     for (int i = 0; i < 3; i++)
     {
-        testPool.addUnchecked(txChild[i].GetHash(), CTxMemPoolEntry(txChild[i], 0, 0, 0.0, 1));
-        testPool.addUnchecked(txGrandChild[i].GetHash(), CTxMemPoolEntry(txGrandChild[i], 0, 0, 0.0, 1));
+        testPool.addUnchecked(txChild[i].GetHash(), entry.FromTx(txChild[i]));
+        testPool.addUnchecked(txGrandChild[i].GetHash(), entry.FromTx(txGrandChild[i]));
     }
     // Now remove the parent, as might happen if a block-re-org occurs but the parent cannot be
     // put into the mempool (maybe because it is non-standard):
-    testPool.remove(txParent, removed, true);
-    BOOST_CHECK_EQUAL(removed.size(), 6);
-    BOOST_CHECK_EQUAL(testPool.size(), 0);
-    removed.clear();
+    poolSize = testPool.size();
+    testPool.removeRecursive(txParent);
+    BOOST_CHECK_EQUAL(testPool.size(), poolSize - 6);
+    BOOST_CHECK_EQUAL(testPool.size(), 0U);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

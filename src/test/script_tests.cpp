@@ -855,14 +855,14 @@ BOOST_AUTO_TEST_CASE(script_combineSigs)
     BOOST_CHECK(combined.empty());
 
     // Single signature case:
-    SignSignature(keystore, txFrom, txTo, 0); // changes scriptSig
+    SignSignature(keystore, txFrom, txTo, 0, SIGHASH_ALL); // changes scriptSig
     combined = CombineSignatures(scriptPubKey, txTo, 0, scriptSig, empty);
     BOOST_CHECK(combined == scriptSig);
     combined = CombineSignatures(scriptPubKey, txTo, 0, empty, scriptSig);
     BOOST_CHECK(combined == scriptSig);
     CScript scriptSigCopy = scriptSig;
     // Signing again will give a different, valid signature:
-    SignSignature(keystore, txFrom, txTo, 0);
+    SignSignature(keystore, txFrom, txTo, 0, SIGHASH_ALL);
     combined = CombineSignatures(scriptPubKey, txTo, 0, scriptSigCopy, scriptSig);
     BOOST_CHECK(combined == scriptSigCopy || combined == scriptSig);
 
@@ -870,13 +870,13 @@ BOOST_AUTO_TEST_CASE(script_combineSigs)
     CScript pkSingle; pkSingle << ToByteVector(keys[0].GetPubKey()) << OP_CHECKSIG;
     keystore.AddCScript(pkSingle);
     scriptPubKey = GetScriptForDestination(CScriptID(pkSingle));
-    SignSignature(keystore, txFrom, txTo, 0);
+    SignSignature(keystore, txFrom, txTo, 0, SIGHASH_ALL);
     combined = CombineSignatures(scriptPubKey, txTo, 0, scriptSig, empty);
     BOOST_CHECK(combined == scriptSig);
     combined = CombineSignatures(scriptPubKey, txTo, 0, empty, scriptSig);
     BOOST_CHECK(combined == scriptSig);
     scriptSigCopy = scriptSig;
-    SignSignature(keystore, txFrom, txTo, 0);
+    SignSignature(keystore, txFrom, txTo, 0, SIGHASH_ALL);
     combined = CombineSignatures(scriptPubKey, txTo, 0, scriptSigCopy, scriptSig);
     BOOST_CHECK(combined == scriptSigCopy || combined == scriptSig);
     // dummy scriptSigCopy with placeholder, should always choose non-placeholder:
@@ -889,7 +889,7 @@ BOOST_AUTO_TEST_CASE(script_combineSigs)
     // Hardest case:  Multisig 2-of-3
     scriptPubKey = GetScriptForMultisig(2, pubkeys);
     keystore.AddCScript(scriptPubKey);
-    SignSignature(keystore, txFrom, txTo, 0);
+    SignSignature(keystore, txFrom, txTo, 0, SIGHASH_ALL);
     combined = CombineSignatures(scriptPubKey, txTo, 0, scriptSig, empty);
     BOOST_CHECK(combined == scriptSig);
     combined = CombineSignatures(scriptPubKey, txTo, 0, empty, scriptSig);
