@@ -71,8 +71,6 @@ using namespace std;
 
 const int LAST_HEIGHT_FEE_BLOCK = 180000;
 
-static const bool ENABLE_POS_REWARD_CHANGED = true;
-
 static const int POS_REWARD_CHANGED_BLOCK = 300000;
 
 /**
@@ -1813,11 +1811,11 @@ CAmount GetProofOfStakeReward(int64_t nCoinAge, int64_t nFees, int nHeight)
     return nSubsidy + nFees;
 }
 
-CAmount GetMasternodePayment(int nHeight, int64_t blockValue, int nMasternodeCount)
+CAmount GetMasternodePosReward(int nHeight, CAmount blockValue)
 {
-    int64_t ret = blockValue * 0.4;
-    if (ENABLE_POS_REWARD_CHANGED && (mapArgs.count("-testnet") || nHeight >= POS_REWARD_CHANGED_BLOCK)) {
-        ret = blockValue * 0.4/2; //20% for masternode
+    CAmount ret;
+    if (nHeight >= POS_REWARD_CHANGED_BLOCK || IsTestNet()) {
+        ret = blockValue * 0.2; //20% for masternode
     } else {
         ret = blockValue * 0.4; //40% for masternode
     }
@@ -3824,9 +3822,8 @@ bool CheckForMasternodePayment(const CTransaction& tx, const CBlockHeader& heade
     if (tx.IsCoinBase()) {
         roundMnAward = (CAmount) (totalReward * 0.2f);
     }
-
-    if (tx.IsCoinStake() && tx.vout.size() >= 3) {
-        roundMnAward = GetMasternodePayment(nHeight, totalReward);
+    else if (tx.vout.size() >= 3) {
+	roundMnAward = GetMasternodePosReward(nHeight, totalReward);
     }
 
     // Old blocks sync from other nodes: check the amounts, not via the "current" pub keys

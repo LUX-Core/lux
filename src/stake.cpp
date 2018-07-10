@@ -393,7 +393,7 @@ bool Stake::CheckHash(const CBlockIndex* pindexPrev, unsigned int nBits, const C
     // Calculate hash
     CDataStream ss(SER_GETHASH, 0);
     ss << nStakeModifier << nTimeBlockFrom << txPrev.nTime << prevout.hash << prevout.n << nTimeTx;
-    if (ENABLE_ADVANCED_STAKING && (mapArgs.count("-regtest") || nStakeModifierHeight >= ADVANCED_STAKING_HEIGHT)) {
+    if (ENABLE_ADVANCED_STAKING && (GetBoolArg("-regtest", false) || nStakeModifierHeight >= ADVANCED_STAKING_HEIGHT)) {
         ss << nHashInterval << nSelectionPeriod << nStakeMinAge << nStakeSplitThreshold
            << bnWeight << nStakeModifierTime;
     }
@@ -608,8 +608,6 @@ void Stake::SetProof(const uint256& h, const uint256& proof) {
 bool Stake::IsActive() const {
     bool nStaking = false;
     auto tip = chainActive.Tip();
-    if (!tip) return false;
-
     if (GetBoolArg("-staking", DEFAULT_STAKE) == false)
         return false;
     if (mapHashedBlocks.count(tip->nHeight))
@@ -820,8 +818,8 @@ bool Stake::CreateCoinStake(CWallet* wallet, const CKeyStore& keystore, unsigned
         if (fDebug) LogPrintf("%s: Masternode payment to %s (pos)\n", __func__, EncodeDestination(txDest));
     }
 
-    int64_t blockValue = nCredit;
-    int64_t masternodePayment = GetMasternodePayment(chainActive.Height() + 1, nReward);
+    CAmount blockValue = nCredit;
+    CAmount masternodePayment = GetMasternodePosReward(chainActive.Height() + 1, nReward);
 
     // Set output amount
     if (hasMasternodePayment) {

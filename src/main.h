@@ -313,7 +313,7 @@ bool IsWitnessLocked(const CBlockIndex* pindexPrev);
 
 // ***TODO***
 double ConvertBitsToDouble(unsigned int nBits);
-CAmount GetMasternodePayment(int nHeight, int64_t blockValue, int nMasternodeCount = 0);
+CAmount GetMasternodePosReward(int nHeight, CAmount blockValue);
 uint256 GetProofOfStakeLimit(int nHeight);
 inline unsigned int GetTargetSpacing(int nHeight) { return IsProtocolV2(nHeight) ? 240 : 60; }
 
