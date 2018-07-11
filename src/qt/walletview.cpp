@@ -442,6 +442,7 @@ void WalletView::showProgress(const QString& title, int nProgress)
         progressDialog->setValue(0);
     } else if (nProgress == 100) {
         if (progressDialog) {
+            progressDialog->close();
             progressDialog->deleteLater();
         }
     } else if (progressDialog) {
