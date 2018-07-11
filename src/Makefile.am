@@ -264,6 +264,9 @@ libbitcoin_wallet_a_SOURCES = \
   wallet_ismine.cpp \
   walletdb.cpp \
   rbf.cpp \
+  script/sign.cpp \
+  miner.cpp \
+  crypter.cpp \
   $(BITCOIN_CORE_H)
 
 # crypto primitives library
@@ -756,8 +759,4 @@ endif
 
 if ENABLE_QT
 include Makefile.qt.include
-endif
-
-if ENABLE_QT_TESTS
-include Makefile.qttest.include
 endif

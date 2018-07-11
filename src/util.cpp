@@ -368,16 +368,8 @@ std::string GetArg(const std::string& strArg, const std::string& strDefault)
 
 int64_t GetArg(const std::string& strArg, int64_t nDefault)
 {
-    if (mapArgs.count(strArg)) {
-        int64_t n;
-        try {
-            n = std::stoi(mapArgs[strArg]);
-        } catch (const std::exception& e) {
-            return nDefault;
-        }
-
-        return n;
-    }
+    if (mapArgs.count(strArg))
+        return atoi64(mapArgs[strArg]);
     return nDefault;
 }
 
