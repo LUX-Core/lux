@@ -56,8 +56,11 @@ int ClientModel::getNumConnections(unsigned int flags) const
 {
     // Use local variable to avoid the lock here. This will save
     // unneccessary time to wait for the lock 
-    //LOCK(cs_vNodes);
-    vector<CNode*> vNodesCopy = vNodes;
+    vector<CNode*> vNodesCopy;
+    {
+        LOCK(cs_vNodes);
+        vNodesCopy = vNodes;
+    }
 
     if (flags == CONNECTIONS_ALL) // Shortcut if we want total
         return vNodesCopy.size();
