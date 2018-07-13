@@ -293,8 +293,8 @@ void OverviewPage::setBalance(const CAmount& balance, const CAmount& unconfirmed
 
     if (cachedTxLocks != nCompleteTXLocks) {
         cachedTxLocks = nCompleteTXLocks;
-        ui->listTransactions->update();
     }
+    ui->listTransactions->update();
 }
 
 // show/hide watch-only labels
