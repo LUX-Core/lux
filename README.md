@@ -252,6 +252,13 @@ code. This is especially important for large or high-risk changes. It is useful
 to add a test plan to the pull request description if testing the changes is
 not straightforward.
 
+### Issue
+
+ We try to prompt our users for the basic information We always need for new issues.
+ Please fill out the issue template below and submit it to our discord channel
+  <a href="https://discord.gg/27xFP5Y"><img src="https://discordapp.com/api/guilds/364500397999652866/embed.png" alt="Discord server" /></a>
+ 
+ [ISSUE_TEMPLATE](doc/template/ISSUE_TEMPLATE_example.md)
 
 ## License
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2F216k155%2Flux.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2F216k155%2Flux?ref=badge_large)
