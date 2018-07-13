@@ -361,7 +361,7 @@ CNode* FindNode(const CNetAddr& ip)
 {
     vector<CNode*> vNodesCopy;
     {
-        LOCK(cs_vNodes);
+        //LOCK(cs_vNodes);
         vNodesCopy = vNodes;
     }
 
@@ -375,7 +375,7 @@ CNode* FindNode(const CSubNet& subNet)
 {
     vector<CNode*> vNodesCopy;
     {
-        LOCK(cs_vNodes);
+        //LOCK(cs_vNodes);
         vNodesCopy = vNodes;
     }
 
@@ -389,7 +389,7 @@ CNode* FindNode(const std::string& addrName)
 {
     vector<CNode*> vNodesCopy;
     {
-        LOCK(cs_vNodes);
+        //LOCK(cs_vNodes);
         vNodesCopy = vNodes;
     }
 
@@ -403,7 +403,7 @@ CNode* FindNode(const CService& addr)
 {
     vector<CNode*> vNodesCopy;
     {
-        LOCK(cs_vNodes);
+        //LOCK(cs_vNodes);
         vNodesCopy = vNodes;
     }
 
@@ -845,7 +845,7 @@ static void AcceptConnection(const ListenSocket& hListenSocket) {
 
     vector<CNode*> vNodesCopy;
     {
-        LOCK(cs_vNodes);
+        //LOCK(cs_vNodes);
         vNodesCopy = vNodes;
     }
     
@@ -909,7 +909,7 @@ void ThreadSocketHandler()
         {
             vector<CNode*> vNodesCopy;
             {
-                LOCK(cs_vNodes);
+                //LOCK(cs_vNodes);
                 vNodesCopy = vNodes;
             }
 
@@ -999,7 +999,7 @@ void ThreadSocketHandler()
             // This will save unneccessary time for other threads to wait for the lock
             vector<CNode*> vNodesCopy;
             {
-                LOCK(cs_vNodes);
+                // LOCK(cs_vNodes);
                 vNodesCopy = vNodes;
             }
             BOOST_FOREACH (CNode* pnode, vNodesCopy) {
@@ -1070,7 +1070,7 @@ void ThreadSocketHandler()
         //
         vector<CNode*> vNodesCopy;
         {
-            LOCK(cs_vNodes);
+            // LOCK(cs_vNodes);
             vNodesCopy = vNodes;
         }
 
@@ -1405,7 +1405,7 @@ void ThreadOpenConnections() {
         set<vector<unsigned char> > setConnected;
         vector<CNode*> vNodesCopy;
         {
-            LOCK(cs_vNodes);
+            //LOCK(cs_vNodes);
             vNodesCopy = vNodes;
         }
 
@@ -1479,7 +1479,7 @@ std::vector<AddedNodeInfo> GetAddedNodeInfo()
     std::map<std::string, std::pair<bool, CService>> mapConnectedByName;
     vector<CNode*> vNodesCopy;
     {
-        LOCK(cs_vNodes);
+        //LOCK(cs_vNodes);
         vNodesCopy = vNodes;
     }
 
@@ -1581,7 +1581,7 @@ void ThreadMessageHandler() {
     while (true) {
         vector<CNode*> vNodesCopy;
         {
-            LOCK(cs_vNodes);
+            //LOCK(cs_vNodes);
             vNodesCopy = vNodes;
         }
 
@@ -1955,7 +1955,7 @@ void RelayTransaction(const CTransaction& tx, const CDataStream& ss)
 
     vector<CNode*> vNodesCopy;
     {
-        LOCK(cs_vNodes);
+        //LOCK(cs_vNodes);
         vNodesCopy = vNodes;
     }
     unsigned nRelayed = 0;
@@ -1979,10 +1979,10 @@ void RelayTransactionLockReq(const CTransaction& tx, bool relayToAll)
 {
     CInv inv(MSG_TXLOCK_REQUEST, tx.GetHash());
 
-    //broadcast the new lock
+    //broadcast the new node 
     vector<CNode*> vNodesCopy;
     {
-        LOCK(cs_vNodes);
+        //LOCK(cs_vNodes);
         vNodesCopy = vNodes;
     }
 
@@ -1998,7 +1998,7 @@ void RelayInv(CInv& inv)
 {
     vector<CNode*> vNodesCopy;
     {
-        LOCK(cs_vNodes);
+        //LOCK(cs_vNodes);
         vNodesCopy = vNodes;
     }
 
@@ -2012,7 +2012,7 @@ void RelayDarkSendFinalTransaction(const int sessionID, const CTransaction& txNe
 {
     vector<CNode*> vNodesCopy;
     {
-        LOCK(cs_vNodes);
+        //LOCK(cs_vNodes);
         vNodesCopy = vNodes;
     }
 
@@ -2025,7 +2025,7 @@ void RelayDarkSendIn(const std::vector<CTxIn>& in, const int64_t& nAmount, const
 {
     vector<CNode*> vNodesCopy;
     {
-        LOCK(cs_vNodes);
+        //LOCK(cs_vNodes);
         vNodesCopy = vNodes;
     }
 
@@ -2040,7 +2040,7 @@ void RelayDarkSendStatus(const int sessionID, const int newState, const int newE
 {
     vector<CNode*> vNodesCopy;
     {
-        LOCK(cs_vNodes);
+        //LOCK(cs_vNodes);
         vNodesCopy = vNodes;
     }
 
@@ -2053,7 +2053,7 @@ void RelayDarkSendElectionEntry(const CTxIn &vin, const CService addr, const std
 {
     vector<CNode*> vNodesCopy;
     {
-        LOCK(cs_vNodes);
+        //LOCK(cs_vNodes);
         vNodesCopy = vNodes;
     }
 
@@ -2067,7 +2067,7 @@ void SendDarkSendElectionEntry(const CTxIn &vin, const CService addr, const std:
 {
     vector<CNode*> vNodesCopy;
     {
-        LOCK(cs_vNodes);
+        //LOCK(cs_vNodes);
         vNodesCopy = vNodes;
     }
 
@@ -2080,7 +2080,7 @@ void RelayDarkSendElectionEntryPing(const CTxIn &vin, const std::vector<unsigned
 {
     vector<CNode*> vNodesCopy;
     {
-        LOCK(cs_vNodes);
+        //LOCK(cs_vNodes);
         vNodesCopy = vNodes;
     }
 
@@ -2094,7 +2094,7 @@ void SendDarkSendElectionEntryPing(const CTxIn &vin, const std::vector<unsigned 
 {
     vector<CNode*> vNodesCopy;
     {
-        LOCK(cs_vNodes);
+       // LOCK(cs_vNodes);
         vNodesCopy = vNodes;
     }
 
@@ -2107,7 +2107,7 @@ void RelayDarkSendCompletedTransaction(const int sessionID, const bool error, co
 {
     vector<CNode*> vNodesCopy;
     {
-        LOCK(cs_vNodes);
+        //LOCK(cs_vNodes);
         vNodesCopy = vNodes;
     }
 

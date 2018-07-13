@@ -107,6 +107,7 @@ using namespace std;
 
 //LUX only features
 bool fMasterNode = false;
+std::atomic<bool> hideLogMessage(false);
 string strMasterNodePrivKey = "";
 string strMasterNodeAddr = "";
 bool fEnableInstanTX = true;

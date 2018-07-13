@@ -30,6 +30,7 @@
 #include <boost/thread/exceptions.hpp>
 
 //LUX only features
+extern std::atomic<bool> hideLogMessage;
 
 extern bool fMasterNode;
 extern bool fEnableInstanTX;

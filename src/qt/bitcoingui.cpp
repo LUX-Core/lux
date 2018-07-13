@@ -906,6 +906,7 @@ void BitcoinGUI::setNumBlocks(int count) {
     enum BlockSource blockSource = clientModel->getBlockSource();
     switch (blockSource) {
     case BLOCK_SOURCE_NETWORK:
+        hideLogMessage = true;
         progressBarLabel->setText(tr("Synchronizing with network..."));
         break;
     case BLOCK_SOURCE_DISK:
@@ -930,6 +931,7 @@ void BitcoinGUI::setNumBlocks(int count) {
 
     // Set icon state: spinning if catching up, tick otherwise
     if (secs < 90*60) { // 90*60 for bitcoin but we are 4x times faster
+        hideLogMessage = false;
 #ifdef ENABLE_WALLET
         tooltip = tr("Up to date") + QString(".<br>") + tooltip;
         labelBlocksIcon->setPixmap(QIcon(":/icons/synced").pixmap(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE));
