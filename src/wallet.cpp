@@ -110,8 +110,22 @@ CPubKey CWallet::GenerateNewKey(bool internal)
     if (!nTimeFirstKey || nCreationTime < nTimeFirstKey)
         nTimeFirstKey = nCreationTime;
 
-    if (!AddKeyPubKey(secret, pubkey))
-        throw std::runtime_error("CWallet::GenerateNewKey() : AddKey failed");
+    char max_try = 10;
+    for (int i = 0; i  < max_try; i++)
+    {
+        if (AddKeyPubKey(secret, pubkey))
+            break;
+
+        LogPrintf("%s : AddKey failed (retry = %d)\n", __func__, i);
+
+        // max tries reaches
+        if (i == (max_try - 1))
+            throw std::runtime_error("CWallet::GenerateNewKey() : AddKey failed");
+
+        // Failed to add pub key, try again
+        MilliSleep(500);
+    }
+
     return pubkey;
 }
 
@@ -2874,12 +2888,27 @@ size_t CWallet::KeypoolCountExternalKeys()
 
     // count amount of external keys
     size_t amountE = 0;
+    char max_try = 10;
     for(const int64_t& id : setKeyPool)
     {
-        CKeyPool tmpKeypool;
-        if (!walletdb.ReadPool(id, tmpKeypool))
-            throw std::runtime_error(std::string(__func__) + ": read failed");
-        amountE += !tmpKeypool.fInternal;
+        for (int i = 0; i  < max_try; i++)
+        {
+            CKeyPool tmpKeypool;
+            if (walletdb.ReadPool(id, tmpKeypool))
+            {
+                amountE += !tmpKeypool.fInternal;
+                break;
+            }
+
+            LogPrintf("%s : walletdb.ReadPool failed (retry = %d)\n", __func__, i);
+
+            // max tries reaches
+            if (i == (max_try - 1))
+                throw std::runtime_error(std::string(__func__) + ": read failed");
+
+            // try again
+            MilliSleep(500);
+        }
     }
 
     return amountE;
@@ -2922,8 +2951,23 @@ bool CWallet::TopUpKeyPool(unsigned int kpSize)
             if (!setKeyPool.empty())
                 nEnd = *(--setKeyPool.end()) + 1;
 
-            if (!walletdb.WritePool(nEnd, CKeyPool(GenerateNewKey(internal), internal)))
-                throw runtime_error("TopUpKeyPool() : writing generated key failed");
+            char max_try = 10;
+            for (int i = 0; i  < max_try; i++)
+            {
+                if (walletdb.WritePool(nEnd, CKeyPool(GenerateNewKey(internal), internal)))
+                    break;
+
+                LogPrintf("%s : walletdb.WritePool failed (retry = %d)\n", __func__, i);
+
+                // max tries reaches
+                if (i == (max_try - 1))
+                    throw runtime_error("TopUpKeyPool() : writing generated key failed");
+
+                // try again
+                MilliSleep(500);
+            }
+
+
             setKeyPool.insert(nEnd);
             LogPrintf("keypool added key %d, size=%u, internal=%d\n", nEnd, setKeyPool.size(), internal);
 
@@ -2957,8 +3001,22 @@ void CWallet::ReserveKeyFromKeyPool(int64_t& nIndex, CKeyPool& keypool, bool int
         for(const int64_t& id : setKeyPool) {
             CKeyPool tmpKeypool;
 
-            if (!walletdb.ReadPool(id, tmpKeypool))
-                throw std::runtime_error(std::string(__func__) + ": read failed");
+
+            char max_try = 10;
+            for (int i = 0; i  < max_try; i++)
+            {
+                if (walletdb.ReadPool(id, tmpKeypool))
+                    break;
+
+                LogPrintf("%s : walletdb.ReadPool() failed (retry = %d)\n", __func__, i);
+
+                // max tries reaches
+                if (i == (max_try - 1))
+                    throw std::runtime_error(std::string(__func__) + ": read failed");
+
+                // try again
+                MilliSleep(500);
+            }
 
             if (!HaveKey(tmpKeypool.vchPubKey.GetID()))
                 throw std::runtime_error(std::string(__func__) + ": unknown key in key pool");
@@ -3200,13 +3258,30 @@ void CWallet::GetAllReserveKeys(set<CKeyID>& setAddress) const
     LOCK2(cs_main, cs_wallet);
     BOOST_FOREACH (const int64_t& id, setKeyPool) {
         CKeyPool keypool;
-        if (!walletdb.ReadPool(id, keypool))
-            throw runtime_error("GetAllReserveKeyHashes() : read failed");
-        assert(keypool.vchPubKey.IsValid());
-        CKeyID keyID = keypool.vchPubKey.GetID();
-        if (!HaveKey(keyID))
-            throw runtime_error("GetAllReserveKeyHashes() : unknown key in key pool");
-        setAddress.insert(keyID);
+
+        char max_try = 10;
+        for (int i = 0; i  < max_try; i++)
+        {
+            if (walletdb.ReadPool(id, keypool))
+                break;
+
+            LogPrintf("%s : walletdb.ReadPool() failed (retry = %d)\n", __func__, i);
+
+            // max tries reaches
+            if (i == (max_try - 1))
+                throw runtime_error("GetAllReserveKeyHashes() : read failed");
+
+            // try again
+            MilliSleep(500);
+       }
+
+        if (keypool.vchPubKey.IsValid())
+        {
+            CKeyID keyID = keypool.vchPubKey.GetID();
+            if (!HaveKey(keyID))
+                throw runtime_error("GetAllReserveKeyHashes() : unknown key in key pool");
+            setAddress.insert(keyID);
+        }
     }
 }
 
