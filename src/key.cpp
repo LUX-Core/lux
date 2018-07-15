@@ -136,6 +136,15 @@ void CKey::MakeNewKey(bool fCompressedIn) {
     fCompressed = fCompressedIn;
 }
 
+bool CKey::SetPrivKey(const CPrivKey& privkey, bool fCompressedIn)
+{
+    if (!ec_privkey_import_der(secp256k1_context_sign, (unsigned char*)begin(), &privkey[0], privkey.size()))
+        return false;
+    fCompressed = fCompressedIn;
+    fValid = true;
+    return true;
+}
+
 uint256 CKey::GetPrivKey_256() {
     void* key = keydata.data();
     uint256* key_256 = (uint256*)key;
