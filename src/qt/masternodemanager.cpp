@@ -51,12 +51,10 @@ MasternodeManager::MasternodeManager(QWidget *parent) :
 
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(updateNodeList()));
-    if(!GetBoolArg("-reindexaddr", false))
         timer->start(1000);
+
         fFilterUpdated = true;
 	nTimeFilterUpdated = GetTime();
-
-    updateNodeList();
 }
 
 MasternodeManager::~MasternodeManager()

@@ -460,7 +460,7 @@ UniValue masternode(const UniValue& params, bool fHelp) {
         if (activeMasternode.status == MASTERNODE_SYNC_IN_PROCESS) return "sync in process. Must wait until client is synced to start.";
 
         CTxIn vin = CTxIn();
-        CPubKey pubkey = CPubKey();
+        CPubKey pubkey;
         CKey key;
         bool found = activeMasternode.GetMasterNodeVin(vin, pubkey, key);
         if (!found) {

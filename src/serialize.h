@@ -1033,6 +1033,12 @@ public:
         return *this;
     }
 
+    /** Pretend _nSize bytes are written, without specifying them. */
+    void seek(size_t _nSize)
+    {
+        this->nSize += _nSize;
+    }
+
     template <typename T>
     CSizeComputer& operator<<(const T& obj)
     {

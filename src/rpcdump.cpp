@@ -472,7 +472,7 @@ UniValue bip38encrypt(const UniValue& params, bool fHelp)
         throw JSONRPCError(RPC_WALLET_ERROR, "Private key for address " + strAddress + " is not known");
 
     uint256 privKey = vchSecret.GetPrivKey_256();
-    string encryptedOut = BIP38_Encrypt(strAddress, strPassphrase, privKey);
+    string encryptedOut = BIP38_Encrypt(strAddress, strPassphrase, privKey, vchSecret.IsCompressed());
 
     UniValue result(UniValue::VOBJ);
     result.push_back(Pair("Addess", strAddress));

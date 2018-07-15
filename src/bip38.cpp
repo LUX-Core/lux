@@ -5,14 +5,12 @@
 #include "pubkey.h"
 #include "util.h"
 #include "utilstrencodings.h"
+#include "random.h"
 
 #include <openssl/aes.h>
 #include <openssl/sha.h>
 #include <secp256k1.h>
 #include <string>
-
-
-static secp256k1_context* secp256k1_context_sign = NULL;
 
 
 /** 39 bytes - 78 characters
@@ -48,14 +46,33 @@ void ComputePassfactor(std::string ownersalt, uint256 prefactor, uint256& passfa
 
 bool ComputePasspoint(uint256 passfactor, CPubKey& passpoint)
 {
-    //passpoint is the ec_mult of passfactor on secp256k1
-
-    secp256k1_pubkey pubkey;
     size_t clen = 65;
-    int ret = secp256k1_ec_pubkey_create(secp256k1_context_sign, &pubkey, passfactor.begin());
-    assert(ret);
+    secp256k1_context *ctx = secp256k1_context_create(SECP256K1_CONTEXT_SIGN);
+    assert(ctx != nullptr);
+    {
+        // Pass in a random blinding seed to the secp256k1 context.
+        std::vector<unsigned char, secure_allocator<unsigned char>> vseed(32);
+        GetRandBytes(vseed.data(), 32);
+        bool ret = secp256k1_context_randomize(ctx, vseed.data());
+        assert(ret);
+    }
+    secp256k1_pubkey pubkey;
 
-    return secp256k1_ec_pubkey_serialize(secp256k1_context_sign, UBEGIN(passpoint), &clen, &pubkey, SECP256K1_EC_COMPRESSED ) != 0;
+    if (!secp256k1_ec_pubkey_create(ctx, &pubkey, passfactor.begin())) {
+        secp256k1_context_destroy(ctx);
+        return false;
+    }
+
+    secp256k1_ec_pubkey_serialize(ctx, (unsigned char*)passpoint.begin(), &clen, &pubkey, SECP256K1_EC_COMPRESSED);
+    secp256k1_context_destroy(ctx);
+
+    if (passpoint.size() != clen)
+        return false;
+
+    if (!passpoint.IsValid())
+        return false;
+
+    return true;
 }
 
 void ComputeSeedBPass(CPubKey passpoint, std::string strAddressHash, std::string strOwnerSalt, uint512& seedBPass)
@@ -82,7 +99,7 @@ std::string AddressToBip38Hash(std::string address)
     return HexStr(addrCheck).substr(0, 8);
 }
 
-std::string BIP38_Encrypt(std::string strAddress, std::string strPassphrase, uint256 privKey)
+std::string BIP38_Encrypt(std::string strAddress, std::string strPassphrase, uint256 privKey, bool fCompressed)
 {
     string strAddressHash = AddressToBip38Hash(strAddress);
 
@@ -111,7 +128,10 @@ std::string BIP38_Encrypt(std::string strAddress, std::string strPassphrase, uin
     uint512 encrypted2;
     AES_encrypt(block2.begin(), encrypted2.begin(), &key);
 
-    uint512 encryptedKey(ReverseEndianString("0142E0" + strAddressHash));
+    string strPrefix = "0142";
+    strPrefix += (fCompressed ? "E0" : "C0");
+
+    uint512 encryptedKey(ReverseEndianString(strPrefix + strAddressHash));
 
     //add encrypted1 to the end of encryptedKey
     encryptedKey = encryptedKey | (encrypted1 << 56);
@@ -119,7 +139,14 @@ std::string BIP38_Encrypt(std::string strAddress, std::string strPassphrase, uin
     //add encrypted2 to the end of encryptedKey
     encryptedKey = encryptedKey | (encrypted2 << (56 + 128));
 
-    //TODO: ensure +43 works on different OS
+    //Base58 checksum is the 4 bytes of dSHA256 hash of the encrypted key
+    uint256 hashChecksum = Hash(encryptedKey.begin(), encryptedKey.begin() + 39);
+    uint512 b58Checksum(hashChecksum.ToString().substr(64 - 8, 8));
+
+    // append the encrypted key with checksum (currently occupies 312 bits)
+    encryptedKey = encryptedKey | (b58Checksum << 312);
+
+    //43 bytes is the total size that we are encoding
     return EncodeBase58(encryptedKey.begin(), encryptedKey.begin() + 43);
 }
 
@@ -222,9 +249,21 @@ bool BIP38_Decrypt(std::string strPassphrase, std::string strEncryptedKey, uint2
     ComputeFactorB(seedB, factorB);
 
     //multiply passfactor by factorb mod N to yield the priv key
+    secp256k1_context *ctx = secp256k1_context_create(SECP256K1_CONTEXT_SIGN);
+    assert(ctx != nullptr);
+    {
+        // Pass in a random blinding seed to the secp256k1 context.
+        std::vector<unsigned char, secure_allocator<unsigned char>> vseed(32);
+        GetRandBytes(vseed.data(), 32);
+        bool ret = secp256k1_context_randomize(ctx, vseed.data());
+        assert(ret);
+    }
     privKey = factorB;
-    if (!secp256k1_ec_privkey_tweak_mul(secp256k1_context_sign, privKey.begin(), passfactor.begin()))
+    if (!secp256k1_ec_privkey_tweak_mul(ctx, privKey.begin(), passfactor.begin())) {
+        secp256k1_context_destroy(ctx);
         return false;
+    }
+    secp256k1_context_destroy(ctx);
 
     //double check that the address hash matches our final privkey
     CKey k;

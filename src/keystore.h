@@ -12,7 +12,7 @@
 #include "sync.h"
 
 #include <boost/signals2/signal.hpp>
-#include <boost/variant.hpp>
+
 
 class CScript;
 class CScriptID;

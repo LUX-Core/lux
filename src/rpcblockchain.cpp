@@ -209,7 +209,7 @@ UniValue getrawmempool(const UniValue& params, bool fHelp)
         LOCK(mempool.cs);
         UniValue o(UniValue::VOBJ);
         BOOST_FOREACH(const CTxMemPoolEntry& e, mempool.mapTx) {
-            const uint256& hash = e.GetTx().GetHash();;
+            const uint256& hash = e.GetTx().GetHash();
             UniValue info(UniValue::VOBJ);
             info.push_back(Pair("size", (int)e.GetTxSize()));
             info.push_back(Pair("fee", ValueFromAmount(e.GetFee())));

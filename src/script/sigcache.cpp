@@ -55,9 +55,7 @@ public:
             // and re-use a set of valid signatures just-slightly-greater
             // than our cache size.
             uint256 randomHash = GetRandHash();
-            std::vector<unsigned char> unused;
-            std::set<sigdata_type>::iterator it =
-                setValid.lower_bound(sigdata_type(randomHash, unused, unused));
+            std::set<sigdata_type>::iterator it = setValid.lower_bound(sigdata_type(randomHash));
             if (it == setValid.end())
                 it = setValid.begin();
             setValid.erase(*it);

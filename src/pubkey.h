@@ -13,23 +13,17 @@
 #include <stdexcept>
 #include <vector>
 
-/** 
- * secp256k1:
- * const unsigned int PRIVATE_KEY_SIZE = 279;
- * const unsigned int PUBLIC_KEY_SIZE  = 65;
- * const unsigned int SIGNATURE_SIZE   = 72;
- *
- * see www.keylength.com
- * script supports up to 75 for single byte push
- */
+const unsigned int BIP32_EXTKEY_SIZE = 74;
 
 /** A reference to a CKey: the Hash160 of its serialized public key */
 class CKeyID : public uint160
 {
 public:
-    CKeyID() : uint160(0) {}
-    CKeyID(const uint160& in) : uint160(in) {}
+    CKeyID() : uint160() {}
+    explicit CKeyID(const uint160& in) : uint160(in) {}
 };
+
+typedef uint256 ChainCode;
 
 /** An encapsulated public key. */
 class CPubKey
@@ -99,9 +93,9 @@ public:
     }
 
     //! Construct a public key from a byte vector.
-    CPubKey(const std::vector<unsigned char>& vch)
+    explicit CPubKey(const std::vector<unsigned char>& _vch)
     {
-        Set(vch.begin(), vch.end());
+        Set(_vch.begin(), _vch.end());
     }
 
     //! Simple read-only vector-like interface to the pubkey data.
@@ -190,6 +184,11 @@ public:
      */
     bool Verify(const uint256& hash, const std::vector<unsigned char>& vchSig) const;
 
+    /**
+     * Check whether a signature is normalized (lower-S).
+     */
+    static bool CheckLowS(const std::vector<unsigned char>& vchSig);
+
     //! Recover a public key from a compact signature.
     bool RecoverCompact(const uint256& hash, const std::vector<unsigned char>& vchSig);
 
@@ -197,7 +196,7 @@ public:
     bool Decompress();
 
     //! Derive BIP32 child pubkey.
-    bool Derive(CPubKey& pubkeyChild, unsigned char ccChild[32], unsigned int nChild, const unsigned char cc[32]) const;
+    bool Derive(CPubKey& pubkeyChild, ChainCode &ccChild, unsigned int nChild, const ChainCode& cc) const;
 
     std::vector<unsigned char> Raw() const
     {
@@ -215,18 +214,46 @@ struct CExtPubKey {
     unsigned char nDepth;
     unsigned char vchFingerprint[4];
     unsigned int nChild;
-    unsigned char vchChainCode[32];
+    ChainCode chaincode;
     CPubKey pubkey;
 
     friend bool operator==(const CExtPubKey& a, const CExtPubKey& b)
     {
-        return a.nDepth == b.nDepth && memcmp(&a.vchFingerprint[0], &b.vchFingerprint[0], 4) == 0 && a.nChild == b.nChild &&
-               memcmp(&a.vchChainCode[0], &b.vchChainCode[0], 32) == 0 && a.pubkey == b.pubkey;
+        return a.nDepth == b.nDepth &&
+            memcmp(&a.vchFingerprint[0], &b.vchFingerprint[0], sizeof(vchFingerprint)) == 0 &&
+            a.nChild == b.nChild &&
+            a.chaincode == b.chaincode &&
+            a.pubkey == b.pubkey;
     }
 
-    void Encode(unsigned char code[74]) const;
-    void Decode(const unsigned char code[74]);
+    void Encode(unsigned char code[BIP32_EXTKEY_SIZE]) const;
+    void Decode(const unsigned char code[BIP32_EXTKEY_SIZE]);
     bool Derive(CExtPubKey& out, unsigned int nChild) const;
+
+    void Serialize(CSizeComputer& s) const
+    {
+        // Optimized implementation for ::GetSerializeSize that avoids copying.
+        s.seek(BIP32_EXTKEY_SIZE + 1); // add one byte for the size (compact int)
+    }
+    template <typename Stream>
+    void Serialize(Stream& s) const
+    {
+        unsigned int len = BIP32_EXTKEY_SIZE;
+        ::WriteCompactSize(s, len);
+        unsigned char code[BIP32_EXTKEY_SIZE];
+        Encode(code);
+        s.write((const char *)&code[0], len);
+    }
+    template <typename Stream>
+    void Unserialize(Stream& s)
+    {
+        unsigned int len = ::ReadCompactSize(s);
+        unsigned char code[BIP32_EXTKEY_SIZE];
+        if (len != BIP32_EXTKEY_SIZE)
+            throw std::runtime_error("Invalid extended key size\n");
+        s.read((char *)&code[0], len);
+        Decode(code);
+    }
 };
 
 /** Users of this module must hold an ECCVerifyHandle. The constructor and

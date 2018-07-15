@@ -102,7 +102,7 @@ static bool GetLastStakeModifier(const CBlockIndex* pindex, uint64_t& nStakeModi
 // Get selection interval (nSection in seconds)
 static int64_t GetSelectionInterval(int nSection) {
     assert(nSection >= 0 && nSection < 64);
-    return (GetInterval() * 63 / (63 + ((63 - nSection) * (MODIFIER_INTERVAL_RATIO - 1))));;
+    return (GetInterval() * 63 / (63 + ((63 - nSection) * (MODIFIER_INTERVAL_RATIO - 1))));
 }
 
 // Get stake modifier selection time (in seconds)
@@ -741,11 +741,9 @@ bool Stake::CreateCoinStake(CWallet* wallet, const CKeyStore& keystore, unsigned
             } else if (whichType == TX_PUBKEYHASH) { // pay to address type
                 //convert to pay to public key type
                 CKey key;
-                if (!keystore.GetKey(uint160(vSolutions[0]), key)) {
-                    if (fDebug && GetBoolArg("-printcoinstake", false))
-                        LogPrintf("%s: failed to get key for kernel type=%d\n", __func__, whichType);
-                    break; // unable to find corresponding public key
-                }
+                CKeyID keyID = CKeyID(uint160(vSolutions[0]));
+                if (!pwalletMain->GetKey(keyID, key))
+                    return false;
 
                 scriptPubKeyOut << key.GetPubKey() << OP_CHECKSIG;
             } else {

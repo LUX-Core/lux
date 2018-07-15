@@ -11,7 +11,6 @@
 #include "crypto/ripemd160.h"
 #include "crypto/sha1.h"
 #include "crypto/sha256.h"
-#include "eccryptoverify.h"
 #include "pubkey.h"
 #include "main.h"
 #include "script/script.h"
@@ -180,13 +179,12 @@ bool static IsLowDERSignature(const valtype &vchSig, ScriptError* serror) {
     if (!IsValidSignatureEncoding(vchSig)) {
         return set_error(serror, SCRIPT_ERR_SIG_DER);
     }
-    unsigned int nLenR = vchSig[3];
-    unsigned int nLenS = vchSig[5+nLenR];
-    const unsigned char *S = &vchSig[6+nLenR];
+
+    std::vector<unsigned char> vchSigCopy(vchSig.begin(), vchSig.begin() + vchSig.size() - 1);
     // If the S value is above the order of the curve divided by two, its
     // complement modulo the order could have been used instead, which is
     // one byte shorter when encoded correctly.
-    if (!eccrypto::CheckSignatureElement(S, nLenS, true))
+    if (!CPubKey::CheckLowS(vchSigCopy))
         return set_error(serror, SCRIPT_ERR_SIG_HIGH_S);
 
     return true;
