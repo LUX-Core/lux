@@ -83,7 +83,7 @@ bool AppInit(int argc, char* argv[])
         }
 
         fprintf(stdout, "%s", strUsage.c_str());
-        return true;
+        return false;
     }
 
     try {
@@ -120,7 +120,7 @@ bool AppInit(int argc, char* argv[])
 
         if (fCommandLine) {
             fprintf(stderr, "Error: There is no RPC client functionality in luxd anymore. Use the lux-cli utility instead.\n");
-            exit(EXIT_FAILURE);
+            exit(1);
         }
 #ifndef WIN32
         fDaemon = GetBoolArg("-daemon", false);
@@ -181,5 +181,5 @@ int main(int argc, char* argv[])
     // Connect luxd signal handlers
     noui_connect();
 
-    return (AppInit(argc, argv) ? EXIT_SUCCESS : EXIT_FAILURE);
+    return (AppInit(argc, argv) ? 0 : 1);
 }

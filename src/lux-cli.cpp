@@ -20,8 +20,6 @@ using namespace std;
 using namespace boost;
 using namespace boost::asio;
 
-static const int CONTINUE_EXECUTION=-1;
-
 std::string HelpMessageCli()
 {
     string strUsage;
@@ -63,7 +61,7 @@ public:
     }
 };
 
-static int AppInitRPC(int argc, char* argv[])
+static bool AppInitRPC(int argc, char* argv[])
 {
     //
     // Parameters
@@ -81,28 +79,24 @@ static int AppInitRPC(int argc, char* argv[])
         }
 
         fprintf(stdout, "%s", strUsage.c_str());
-        if (argc < 2) {
-            fprintf(stderr, "Error: too few parameters\n");
-            return EXIT_FAILURE;
-        }
-        return EXIT_SUCCESS;
+        return false;
     }
     if (!boost::filesystem::is_directory(GetDataDir(false))) {
         fprintf(stderr, "Error: Specified data directory \"%s\" does not exist.\n", mapArgs["-datadir"].c_str());
-        return EXIT_FAILURE;
+        return false;
     }
     try {
         ReadConfigFile(mapArgs, mapMultiArgs);
     } catch (std::exception& e) {
         fprintf(stderr, "Error reading configuration file: %s\n", e.what());
-        return EXIT_FAILURE;
+        return false;
     }
     // Check for -testnet or -regtest parameter (BaseParams() calls are only valid after this clause)
     if (!SelectBaseParamsFromCommandLine()) {
         fprintf(stderr, "Error: Invalid combination of -regtest and -testnet.\n");
-        return EXIT_FAILURE;
+        return false;
     }
-    return CONTINUE_EXECUTION;
+    return true;
 }
 
 UniValue CallRPC(const string& strMethod, const UniValue& params)
@@ -244,9 +238,8 @@ int main(int argc, char* argv[])
     SetupEnvironment();
 
     try {
-        int ret = AppInitRPC(argc, argv);
-        if (ret != CONTINUE_EXECUTION)
-            return ret;
+        if (!AppInitRPC(argc, argv))
+            return EXIT_FAILURE;
     } catch (std::exception& e) {
         PrintExceptionContinue(&e, "AppInitRPC()");
         return EXIT_FAILURE;
