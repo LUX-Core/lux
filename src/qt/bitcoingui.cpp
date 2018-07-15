@@ -880,7 +880,7 @@ void BitcoinGUI::updateNetworkState() {
     default: icon = ":/icons/connect_4"; break;
     }
     QIcon connectionItem = QIcon(icon).pixmap(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE);
-    //labelConnectionsIcon->setIcon(connectionItem);
+    labelConnectionsIcon->setIcon(connectionItem);
     if (clientModel->getNetworkActive())
         labelConnectionsIcon->setToolTip(tr("%n active connection(s) to Luxcore network", "", count));
     else
