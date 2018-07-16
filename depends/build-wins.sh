@@ -43,12 +43,14 @@ if [ -z "$CC" ] || [ -z "$CXX" ]; then
 fi
 
 if [ -z "$(echo $JAVA_HOME)" ]; then
+   echo "warning: JAVA_HOME env var is not set!"
+   #sudo apt install openjdk-8-jdk
    sudo apt install oracle-java8-set-default
 fi
 
 if [ ! -f "$JAVA_HOME/include/jni_md.h" ]; then
    if [ -f "$JAVA_HOME/include/linux/jni_md.h" ]; then
-      sudo ln -s "$JAVA_HOME/include/linux/jni_md.h" "$JAVA_HOME/include/jni_md.h"
+      sudo ln -s "linux/jni_md.h" "$JAVA_HOME/include/jni_md.h"
    fi
 fi
 
@@ -74,7 +76,7 @@ cp ../src/config/condition_variable.hpp "$INCLUDE_DIR/boost/thread/win32/conditi
 
 cd ..
 ./autogen.sh windows $PLATFORM $INSTALL_DIR
-./configure --prefix=$PWD/depends/$PLATFORM --host=$PLATFORM --disable-tests --disable-shared CPPFLAGS="-DMINIUPNP_STATICLIB" CFLAGS="-std=c99"
+./configure --prefix=$PWD/depends/$PLATFORM --host=$PLATFORM --disable-tests --disable-shared CPPFLAGS="-DMINIUPNP_STATICLIB" CFLAGS="-std=c99" LDFLAGS="-static -static-libgcc -Wl,-Bstatic -lstdc++"
 
 # Build the application
 make -j$(nproc)
