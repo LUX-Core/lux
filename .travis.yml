@@ -5,6 +5,9 @@ dist: trusty
 addons:
   hostname: lux-tester
 
+git:
+  submodules: false
+
 os: linux
 language: generic
 cache:
