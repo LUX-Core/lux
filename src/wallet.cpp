@@ -3251,12 +3251,11 @@ bool CReserveKey::GetReservedKey(CPubKey& pubkey, bool internal)
 {
     if (nIndex == -1) {
         CKeyPool keypool;
-        pwallet->ReserveKeyFromKeyPool(nIndex, keypool, internal);
-        if (nIndex != -1)
-            vchPubKey = keypool.vchPubKey;
-        else {
+        if (!pwallet->ReserveKeyFromKeyPool(nIndex, keypool, internal)) {
             return false;
         }
+        vchPubKey = keypool.vchPubKey;
+        fInternal = keypool.fInternal;
     }
     assert(vchPubKey.IsValid());
     pubkey = vchPubKey;
