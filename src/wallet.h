@@ -117,45 +117,49 @@ struct CompactTallyItem {
 };
 
 /** A key pool entry */
-class CKeyPool
-{
+class CKeyPool {
 public:
     int64_t nTime;
     CPubKey vchPubKey;
+    bool fInternal; // for change outputs
 
     CKeyPool();
-    CKeyPool(const CPubKey& vchPubKeyIn);
+
+    CKeyPool(const CPubKey &vchPubKeyIn, bool internalIn);
 
     ADD_SERIALIZE_METHODS;
 
-    template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion)
-    {
+    template<typename Stream, typename Operation>
+    inline void SerializationOp(Stream &s, Operation ser_action, int nType, int nVersion) {
         if (!(nType & SER_GETHASH))
             READWRITE(nVersion);
         READWRITE(nTime);
         READWRITE(vchPubKey);
+        if (ser_action.ForRead()) { try { READWRITE(fInternal); }
+            catch (std::ios_base::failure &) {
+                /* flag as external address if we can't read the internal boolean */
+                fInternal = false;
+            }
+        } else { READWRITE(fInternal); }
     }
 };
 
 /** Address book data */
-class CAddressBookData
-{
+class CAddressBookData {
 public:
     std::string name;
     std::string purpose;
 
     CAddressBookData() : purpose("unknown") {}
 
-    typedef std::map<std::string, std::string> StringMap;
+    typedef std::map <std::string, std::string> StringMap;
     StringMap destdata;
 };
 
-typedef std::map<std::string, std::string> mapValue_t;
+typedef std::map <std::string, std::string> mapValue_t;
 
 
-static void ReadOrderPos(int64_t& nOrderPos, mapValue_t& mapValue)
-{
+static void ReadOrderPos(int64_t &nOrderPos, mapValue_t &mapValue) {
     if (!mapValue.count("n")) {
         nOrderPos = -1; // TODO: calculate elsewhere
         return;
@@ -298,6 +302,8 @@ public:
 
     bool SelectCoinsCollateral(std::vector<CTxIn>& setCoinsRet, int64_t& nValueRet) const;
 
+    void LoadKeyPool(int64_t nIndex, const CKeyPool &keypool);
+
     /*
      * Main wallet lock.
      * This lock protects all the fields added by CWallet
@@ -311,7 +317,11 @@ public:
     bool fWalletUnlockAnonymizeOnly;
     std::string strWalletFile;
 
-    std::set<int64_t> setKeyPool;
+    //std::set<int64_t> setKeyPool;
+    std::set<int64_t> setInternalKeyPool;
+    std::set<int64_t> setExternalKeyPool;
+    int64_t m_max_keypool_index = 0;
+    std::map<CKeyID, int64_t> m_pool_key_to_index;
     std::map<CKeyID, CKeyMetadata> mapKeyMetadata;
 
     typedef std::map<unsigned int, CMasterKey> MasterKeyMap;
@@ -447,8 +457,7 @@ public:
      * keystore implementation
      * Generate a new key
      */
-    CPubKey GenerateNewKey();
-
+    CPubKey GenerateNewKey(bool internal = false);
     //! Adds a key to the store, and saves it to disk.
     bool AddKeyPubKey(const CKey& key, const CPubKey& pubkey);
     //! Adds a key to the store, without saving it to disk (used by LoadWallet)
@@ -568,11 +577,12 @@ public:
     static CAmount GetMinimumFee(unsigned int nTxBytes, unsigned int nConfirmTarget, const CTxMemPool& pool);
 
     bool NewKeyPool();
+    size_t KeypoolCountExternalKeys();
     bool TopUpKeyPool(unsigned int kpSize = 0);
-    void ReserveKeyFromKeyPool(int64_t& nIndex, CKeyPool& keypool);
+    bool ReserveKeyFromKeyPool(int64_t& nIndex, CKeyPool& keypool, bool internal);
     void KeepKey(int64_t nIndex);
-    void ReturnKey(int64_t nIndex);
-    bool GetKeyFromPool(CPubKey& key);
+    void ReturnKey(int64_t nIndex, bool fInternal, const CPubKey& pubkey);
+    bool GetKeyFromPool(CPubKey &key, bool internal = false);
     int64_t GetOldestKeyPoolTime();
     void GetAllReserveKeys(std::set<CKeyID>& setAddress) const;
 
@@ -681,7 +691,7 @@ public:
     unsigned int GetKeyPoolSize()
     {
         AssertLockHeld(cs_wallet); // setKeyPool
-        return setKeyPool.size();
+        return setInternalKeyPool.size() + setExternalKeyPool.size();
     }
 
     bool SetDefaultKey(const CPubKey& vchPubKey);
@@ -766,12 +776,14 @@ protected:
     CWallet* pwallet;
     int64_t nIndex;
     CPubKey vchPubKey;
+    bool fInternal;
 
 public:
     CReserveKey(CWallet* pwalletIn)
     {
         nIndex = -1;
         pwallet = pwalletIn;
+        fInternal = false;
     }
 
     ~CReserveKey()
@@ -780,7 +792,7 @@ public:
     }
 
     void ReturnKey();
-    bool GetReservedKey(CPubKey& pubkey);
+    bool GetReservedKey(CPubKey &pubkey, bool internal = false);
     void KeepKey();
 };
 
@@ -833,7 +845,6 @@ public:
     char fFromMe;
     std::string strFromAccount;
     int64_t nOrderPos; //! position in ordered transaction list
-    std::vector<char> vfAlreadySpent;
 
     // memory only
     mutable bool fDebitCached;
@@ -895,7 +906,6 @@ public:
         nTimeSmart = 0;
         fFromMe = false;
         strFromAccount.clear();
-        vfAlreadySpent.clear();
         fDebitCached = false;
         fCreditCached = false;
         fImmatureCreditCached = false;
@@ -985,56 +995,15 @@ public:
         fChangeCached = false;
     }
 
-    void BindWallet(CWallet* pwalletIn) {
+    void BindWallet(CWallet* pwalletIn)
+    {
         pwallet = pwalletIn;
         MarkDirty();
     }
 
-    bool UpdateSpent(const std::vector<char>& vfNewSpent) {
-        bool fReturn = false;
-        for (unsigned int i = 0; i < vfNewSpent.size(); i++) {
-            if (i == vfAlreadySpent.size())
-                break;
-
-            if (vfNewSpent[i] && !vfAlreadySpent[i]) {
-                vfAlreadySpent[i] = true;
-                fReturn = true;
-                fAvailableCreditCached = false;
-            }
-        }
-        return fReturn;
-    }
-
-    void MarkSpent(unsigned int nOut) {
-        if (nOut >= vout.size())
-            throw std::runtime_error("CWalletTx::MarkSpent() : out of range");
-        vfAlreadySpent.resize(vout.size());
-        if (!vfAlreadySpent[nOut]) {
-            vfAlreadySpent[nOut] = true;
-            fAvailableCreditCached = false;
-        }
-    }
-
-    void MarkUnspent(unsigned int nOut) {
-        if (nOut >= vout.size())
-            throw std::runtime_error("CWalletTx::MarkUnspent() : out of range");
-        vfAlreadySpent.resize(vout.size());
-        if (vfAlreadySpent[nOut]) {
-            vfAlreadySpent[nOut] = false;
-            fAvailableCreditCached = false;
-        }
-    }
-
-    bool IsSpent(unsigned int nOut) const {
-        if (nOut >= vout.size())
-            throw std::runtime_error("CWalletTx::IsSpent() : out of range");
-        if (nOut >= vfAlreadySpent.size())
-            return false;
-        return (!!vfAlreadySpent[nOut]);
-    }
-
     //! filter decides which addresses will count towards the debit
-    CAmount GetDebit(const isminefilter& filter) const {
+    CAmount GetDebit(const isminefilter& filter) const
+    {
         if (vin.empty())
             return 0;
 
@@ -1063,7 +1032,7 @@ public:
     CAmount GetCredit(const isminefilter& filter) const
     {
         // Must wait until coinbase is safely deep enough in the chain before valuing it
-        if ((IsCoinBase() || IsCoinStake()) && GetBlocksToMaturity() > 0)
+        if (IsCoinBase() && GetBlocksToMaturity() > 0)
             return 0;
 
         int64_t credit = 0;
@@ -1108,7 +1077,7 @@ public:
             return 0;
 
         // Must wait until coinbase is safely deep enough in the chain before valuing it
-        if ((IsCoinBase() || IsCoinStake()) && GetBlocksToMaturity() > 0)
+        if (IsCoinBase() && GetBlocksToMaturity() > 0)
             return 0;
 
         if (fUseCache && fAvailableCreditCached)
@@ -1121,7 +1090,7 @@ public:
                 const CTxOut& txout = vout[i];
                 nCredit += pwallet->GetCredit(txout, ISMINE_SPENDABLE);
                 if (!MoneyRange(nCredit))
-                    throw std::runtime_error("CWalletTx::GetAvailableCredit() : value out of range");
+                    throw std::runtime_error(std::string(__func__) + " : value out of range");
             }
         }
 
@@ -1136,7 +1105,7 @@ public:
             return 0;
 
         // Must wait until coinbase is safely deep enough in the chain before valuing it
-        if ((IsCoinBase() || IsCoinStake()) && GetBlocksToMaturity() > 0)
+        if (IsCoinBase() && GetBlocksToMaturity() > 0)
             return 0;
 
         if (fUseCache && fAnonymizableCreditCached)
@@ -1170,7 +1139,7 @@ public:
             return 0;
 
         // Must wait until coinbase is safely deep enough in the chain before valuing it
-        if ((IsCoinBase() || IsCoinStake()) && GetBlocksToMaturity() > 0)
+        if (IsCoinBase() && GetBlocksToMaturity() > 0)
             return 0;
 
         if (fUseCache && fAnonymizedCreditCached)
@@ -1203,7 +1172,7 @@ public:
             return 0;
 
         // Must wait until coinbase is safely deep enough in the chain before valuing it
-        if ((IsCoinBase() || IsCoinStake()) && GetBlocksToMaturity() > 0)
+        if (IsCoinBase() && GetBlocksToMaturity() > 0)
             return 0;
 
         int nDepth = GetDepthInMainChain(false);
@@ -1243,7 +1212,7 @@ public:
 
     CAmount GetImmatureWatchOnlyCredit(const bool& fUseCache = true) const
     {
-        if ((IsCoinBase() || IsCoinStake()) && GetBlocksToMaturity() > 0 && IsInMainChain()) {
+        if (IsCoinBase() && GetBlocksToMaturity() > 0 && IsInMainChain()) {
             if (fUseCache && fImmatureWatchCreditCached)
                 return nImmatureWatchCreditCached;
             nImmatureWatchCreditCached = pwallet->GetCredit(*this, ISMINE_WATCH_ONLY);
@@ -1260,7 +1229,7 @@ public:
             return 0;
 
         // Must wait until coinbase is safely deep enough in the chain before valuing it
-        if ((IsCoinBase() || IsCoinStake()) && GetBlocksToMaturity() > 0)
+        if (IsCoinBase() && GetBlocksToMaturity() > 0)
             return 0;
 
         if (fUseCache && fAvailableWatchCreditCached)
