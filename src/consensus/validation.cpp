@@ -12,8 +12,7 @@
 #include "main.h"
 
 namespace Consensus {
-    bool CheckTxInputs(const CTransaction& tx, CValidationState& state, const CCoinsViewCache& inputs, int nSpendHeight)
-    {
+    bool CheckTxInputs(const CTransaction& tx, CValidationState& state, const CCoinsViewCache& inputs, int nSpendHeight) {
         // This doesn't trigger the DoS code on purpose; if it did, it would make it easier
         // for an attacker to attempt to split the network.
         if (!inputs.HaveInputs(tx))
@@ -21,15 +20,15 @@ namespace Consensus {
 
         CAmount nValueIn = 0;
         CAmount nFees = 0;
-        for (unsigned int i = 0; i < tx.vin.size(); i++)
-        {
+        for (unsigned int i = 0; i < tx.vin.size(); i++) {
             const COutPoint &prevout = tx.vin[i].prevout;
             const CCoins* coins = inputs.AccessCoins(prevout.hash);
             assert(coins);
 
             // If prev is coinbase, check that it's matured
             if (coins->IsCoinBase() || coins->IsCoinStake()) {
-                if (nSpendHeight - coins->nHeight < COINBASE_MATURITY)
+                const int maturity = IsTestNet() ? 10 : COINBASE_MATURITY; // todo: use COINBASE_MATURITY()
+                if (nSpendHeight - coins->nHeight < maturity && nSpendHeight - coins->nHeight > 0)
                     return state.Invalid(false,
                                          REJECT_INVALID, "bad-txns-premature-spend-of-coinbase",
                                          strprintf("tried to spend coinbase at depth %d", nSpendHeight - coins->nHeight));
@@ -42,8 +41,7 @@ namespace Consensus {
 
         }
 
-        if (!tx.IsCoinStake())
-        {
+        if (!tx.IsCoinStake()) {
             if (nValueIn < tx.GetValueOut())
                 return state.DoS(100, false, REJECT_INVALID, "bad-txns-in-belowout", false,
                                  strprintf("value in (%s) < value out (%s)", FormatMoney(nValueIn), FormatMoney(tx.GetValueOut())));
@@ -177,8 +175,6 @@ bool CheckSequenceLocks(const CTransaction &tx, int flags, LockPoints* lp, bool 
     AssertLockHeld(mempool.cs);
 
     CBlockIndex* tip = chainActive.Tip();
-    if (!tip) return error("%s: chainActive.Tip() = NULL", __func__);
-
     CBlockIndex index;
     index.pprev = tip;
     // CheckSequenceLocks() uses chainActive.Height()+1 to evaluate
