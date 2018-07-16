@@ -713,6 +713,7 @@ libbitcoinconsensus_la_CPPFLAGS = $(CRYPTO_CFLAGS) $(BITCOIN_INCLUDES) -I$(build
 endif
 
 CLEANFILES = leveldb/libleveldb.a leveldb/libmemenv.a
+CLEANFILES += *.a *.la crypto/*.a cryptopp/*.a qt/*.a
 CLEANFILES += *.gcda *.gcno
 CLEANFILES += compat/*.gcda compat/*.gcno
 CLEANFILES += crypto/*.gcda crypto/*.gcno
