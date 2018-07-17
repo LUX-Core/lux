@@ -99,6 +99,7 @@ BitcoinGUI::BitcoinGUI(const NetworkStyle* networkStyle, QWidget* parent) : QMai
                                                                             verifyMessageAction(0),
                                                                             bip38ToolAction(0),
                                                                             aboutAction(0),
+                                                                            checkForUpdateAction(0),
                                                                             receiveCoinsAction(0),
                                                                             optionsAction(0),
                                                                             toggleHideAction(0),
@@ -411,6 +412,12 @@ void BitcoinGUI::createActions(const NetworkStyle* networkStyle) {
     aboutAction = new QAction(networkStyle->getAppIcon(), tr("&About Luxcore"), this);
     aboutAction->setStatusTip(tr("Show information about Luxcore"));
     aboutAction->setMenuRole(QAction::AboutRole);
+
+    // Check for update menu item
+    checkForUpdateAction = new QAction(QIcon(":/icons/update"), tr("Check for &Update"), this);
+    checkForUpdateAction->setStatusTip(tr("Check whether there is an updated wallet from Luxcore"));
+    checkForUpdateAction->setMenuRole(QAction::NoRole);
+
 #if QT_VERSION < 0x050000
     aboutQtAction = new QAction(QIcon(":/trolltech/qmessagebox/images/qtlogo-64.png"), tr("About &Qt"), this);
 #else
@@ -479,6 +486,7 @@ void BitcoinGUI::createActions(const NetworkStyle* networkStyle) {
 
     connect(quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
     connect(aboutAction, SIGNAL(triggered()), this, SLOT(aboutClicked()));
+    connect(checkForUpdateAction, SIGNAL(triggered()), this, SLOT(updaterClicked()));
     connect(aboutQtAction, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
     connect(optionsAction, SIGNAL(triggered()), this, SLOT(optionsClicked()));
     connect(toggleHideAction, SIGNAL(triggered()), this, SLOT(toggleHidden()));
@@ -558,6 +566,7 @@ void BitcoinGUI::createMenuBar() {
     help->addAction(showHelpMessageAction);
     help->addSeparator();
     help->addAction(aboutAction);
+    help->addAction(checkForUpdateAction);
     help->addAction(aboutQtAction);
 }
 
@@ -777,6 +786,14 @@ void BitcoinGUI::aboutClicked() {
 
     HelpMessageDialog dlg(this, true);
     dlg.exec();
+}
+
+void BitcoinGUI::updaterClicked() {
+    if (!clientModel)
+        return;
+
+    //HelpMessageDialog dlg(this, true);
+    //dlg.exec();
 }
 
 void BitcoinGUI::showHelpMessageClicked() {

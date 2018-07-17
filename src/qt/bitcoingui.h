@@ -106,6 +106,7 @@ private:
     QAction* verifyMessageAction;
     QAction* bip38ToolAction;
     QAction* aboutAction;
+    QAction* checkForUpdateAction;
     QAction* receiveCoinsAction;
     QAction* optionsAction;
     QAction* toggleHideAction;
@@ -244,10 +245,16 @@ private slots:
 #endif // ENABLE_WALLET
     /** Show configuration dialog */
     void optionsClicked();
+
     /** Show about dialog */
     void aboutClicked();
+
+    /** Show updater dialog if any */
+    void updaterClicked();
+
     /** Show help message dialog */
     void showHelpMessageClicked();
+
 #ifndef Q_OS_MAC
     /** Handle tray icon clicked */
     void trayIconActivated(QSystemTrayIcon::ActivationReason reason);
