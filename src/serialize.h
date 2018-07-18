@@ -881,13 +881,13 @@ inline void Unserialize(Stream& is, std::vector<T, A>& v, int nType, int nVersio
  */
 inline unsigned int GetSerializeSize(const CScript& v, int nType, int nVersion)
 {
-    return GetSerializeSize((const std::vector<unsigned char>&)v, nType, nVersion);
+    return GetSerializeSize((const prevector<28,unsigned char>&)v, nType, nVersion);
 }
 
 template <typename Stream>
 void Serialize(Stream& os, const CScript& v, int nType, int nVersion)
 {
-    Serialize(os, (const std::vector<unsigned char>&)v, nType, nVersion);
+    Serialize(os, (const prevector<28,unsigned char>&)v, nType, nVersion);
 }
 
 template <typename Stream>

@@ -163,7 +163,7 @@ protected:
         // Value
         CDataStream ssValue(SER_DISK, CLIENT_VERSION);
         ssValue.reserve(10000);
-        ssValue << value; //bad_alloc here
+        ssValue << value;
         Dbt datValue(&ssValue[0], ssValue.size());
 
         // Write
