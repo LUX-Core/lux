@@ -547,11 +547,11 @@
     </message>
     <message>
         <source>Importing blocks from disk...</source>
-        <translation>Importation des bloques depuis le disque</translation>
+        <translation>Importation des blocs depuis le disque</translation>
     </message>
     <message>
         <source>Reindexing blocks on disk...</source>
-        <translation>Ré-indexation des bloques sur le disque</translation>
+        <translation>Ré-indexation des blocs sur le disque</translation>
     </message>
     <message>
         <source>Up to date</source>
@@ -1155,7 +1155,7 @@ Veuillez vérifier l'adresse et réessayer.</translation>
     </message>
     <message>
         <source>Current number of blocks</source>
-        <translation>Nombre actuel de bloques</translation>
+        <translation>Nombre actuel de blocs</translation>
     </message>
     <message>
         <source>Client version</source>
