@@ -30,6 +30,7 @@
 #include <QIcon>
 #include <QSettings>
 #include <QString>
+#include <QStringList>
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
 
@@ -154,6 +155,11 @@ CoinControlDialog::CoinControlDialog(QWidget* parent) : QDialog(parent),
         ui->radioTreeMode->click();
     if (settings.contains("nCoinControlSortColumn") && settings.contains("nCoinControlSortOrder"))
         sortView(settings.value("nCoinControlSortColumn").toInt(), ((Qt::SortOrder)settings.value("nCoinControlSortOrder").toInt()));
+    if (settings.contains("toogleLockValue"))
+    {
+        QString toogleLockValue = settings.value("toogleLockValue").toString();
+        toogleLockList = toogleLockValue.split(",");
+    }
 }
 
 CoinControlDialog::~CoinControlDialog()
@@ -162,6 +168,21 @@ CoinControlDialog::~CoinControlDialog()
     settings.setValue("nCoinControlMode", ui->radioListMode->isChecked());
     settings.setValue("nCoinControlSortColumn", sortColumn);
     settings.setValue("nCoinControlSortOrder", (int)sortOrder);
+    QString toogleLockValue;
+    QTreeWidgetItem* item;
+    ui->radioListMode->click();
+    for (int i = 0; i < ui->treeWidget->topLevelItemCount(); i++) {
+        item = ui->treeWidget->topLevelItem(i);
+        COutPoint outpt(uint256(item->text(COLUMN_TXHASH).toStdString()), item->text(COLUMN_VOUT_INDEX).toUInt());
+        if (model->isLockedCoin(uint256(item->text(COLUMN_TXHASH).toStdString()), item->text(COLUMN_VOUT_INDEX).toUInt())) {
+            if (toogleLockValue.trimmed().isEmpty()) {
+                toogleLockValue = item->text(COLUMN_TXHASH);
+            } else {
+                toogleLockValue = toogleLockValue + "," + item->text(COLUMN_TXHASH);
+            }
+        }
+    }
+    settings.setValue("toogleLockValue", toogleLockValue);
 
     delete ui;
 }
@@ -855,9 +876,14 @@ void CoinControlDialog::updateView()
             // vout index
             itemOutput->setText(COLUMN_VOUT_INDEX, QString::number(out.i));
 
+
+            COutPoint outpt(txhash, out.i);
+            if(toogleLockList.indexOf(QString::fromStdString(txhash.GetHex())) >= 0) {
+                model->lockCoin(outpt);
+                toogleLockList.removeAll(QString::fromStdString(txhash.GetHex()));
+            }
             // disable locked coins
             if (model->isLockedCoin(txhash, out.i)) {
-                COutPoint outpt(txhash, out.i);
                 coinControl->UnSelect(outpt); // just to be sure
                 itemOutput->setDisabled(true);
                 itemOutput->setIcon(COLUMN_CHECKBOX, QIcon(":/icons/lock_closed"));

@@ -14,6 +14,7 @@
 #include <QMenu>
 #include <QPoint>
 #include <QString>
+#include <QStringList>
 #include <QTreeWidgetItem>
 
 class WalletModel;
@@ -59,6 +60,7 @@ private:
     QAction* lockAction;
     QAction* unlockAction;
 
+    QStringList toogleLockList;
     QString strPad(QString, int, QString);
     void sortView(int, Qt::SortOrder);
     void updateView();
