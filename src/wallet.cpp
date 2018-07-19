@@ -1935,18 +1935,9 @@ bool CWallet::SelectCoins(const std::string &account, const CAmount& nTargetValu
                 // make sure it's actually anonymized
                 if (rounds < nDarksendRounds) continue;
             }
-
-            const CTxOut& txout = out.tx->vout[out.i];
-
-#           if defined(SELECT_COINS_FROM_ACCOUNT)&&SELECT_COINS_FROM_ACCOUNT
-            CTxDestination address;
-            if (ExtractDestination(txout.scriptPubKey, address))
-#			endif
-            if (out.tx->strFromAccount == account) {
-                nValueRet += txout.nValue;
-                setCoinsRet.insert(make_pair(out.tx, out.i));
+            nValueRet += out.tx->vout[out.i].nValue;
+            setCoinsRet.insert(make_pair(out.tx, out.i));
             }
-        }
         return (nValueRet >= nTargetValue);
     }
 
@@ -1964,18 +1955,11 @@ bool CWallet::SelectCoins(const std::string &account, const CAmount& nTargetValu
                     int rounds = GetInputDarkSendRounds(vin);
                     if (rounds < nDarksendRounds) // make sure it's actually anonymized
                         continue;
-
-#                   if defined(SELECT_COINS_FROM_ACCOUNT)&&SELECT_COINS_FROM_ACCOUNT
-                    CTxDestination address;
-                    if (ExtractDestination(txout.scriptPubKey, address))
-#                   endif
-                    if (out.tx->strFromAccount == account) {
-                        nValueRet += txout.nValue;
-                        setCoinsRet.insert(make_pair(out.tx, out.i));
+                     nValueRet += out.tx->vout[out.i].nValue;
+                    setCoinsRet.insert(make_pair(out.tx, out.i));
                     }
                 }
             }
-        }
         return (nValueRet >= nTargetValue);
     }
 

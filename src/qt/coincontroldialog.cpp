@@ -136,7 +136,7 @@ CoinControlDialog::CoinControlDialog(QWidget* parent) : QDialog(parent),
     ui->treeWidget->setColumnWidth(COLUMN_AMOUNT, 100);
     ui->treeWidget->setColumnWidth(COLUMN_LABEL, 170);
     ui->treeWidget->setColumnWidth(COLUMN_ADDRESS, 190);
-    ui->treeWidget->setColumnWidth(COLUMN_DARKSEND_ROUNDS, 88);
+    //ui->treeWidget->setColumnWidth(COLUMN_DARKSEND_ROUNDS, 88);
     ui->treeWidget->setColumnWidth(COLUMN_DATE, 80);
     ui->treeWidget->setColumnWidth(COLUMN_CONFIRMATIONS, 100);
     ui->treeWidget->setColumnWidth(COLUMN_PRIORITY, 100);
@@ -195,6 +195,7 @@ void CoinControlDialog::setModel(WalletModel* model)
         updateView();
         updateLabelLocked();
         CoinControlDialog::updateLabels(model, this);
+        CheckDialogLablesUpdated();
     }
 }
 
@@ -241,6 +242,7 @@ void CoinControlDialog::buttonSelectAllClicked()
     if (state == Qt::Unchecked)
         coinControl->UnSelectAll(); // just to be sure
     CoinControlDialog::updateLabels(model, this);
+    CheckDialogLablesUpdated();
 }
 
 // Toggle lock state
@@ -266,6 +268,7 @@ void CoinControlDialog::buttonToggleLockClicked()
         }
         ui->treeWidget->setEnabled(true);
         CoinControlDialog::updateLabels(model, this);
+        CheckDialogLablesUpdated();
     } else {
         QMessageBox msgBox;
         msgBox.setObjectName("lockMessageBox");
@@ -460,8 +463,9 @@ void CoinControlDialog::viewItemChanged(QTreeWidgetItem* item, int column)
             coinControl->UnSelect(outpt);
         else if (item->isDisabled()) // locked (this happens if "check all" through parent node)
             item->setCheckState(COLUMN_CHECKBOX, Qt::Unchecked);
-        else {
+        else
             coinControl->Select(outpt);
+			/*
             CTxIn vin(outpt);
             int rounds = pwalletMain->GetInputDarkSendRounds(vin);
             if (coinControl->useDarksend && rounds < nDarksendRounds) {
@@ -470,11 +474,13 @@ void CoinControlDialog::viewItemChanged(QTreeWidgetItem* item, int column)
                     QMessageBox::Ok, QMessageBox::Ok);
                 coinControl->useDarksend = false;
             }
-        }
+        }*/
 
         // selection changed -> update labels
-        if (ui->treeWidget->isEnabled()) // do not update on every click for (un)select all
+        if (ui->treeWidget->isEnabled()){ // do not update on every click for (un)select all
             CoinControlDialog::updateLabels(model, this);
+            CheckDialogLablesUpdated();
+        }
     }
 // todo: this is a temporary qt5 fix: when clicking a parent node in tree mode, the parent node
 //       including all childs are partially selected. But the parent node should be fully selected
@@ -526,6 +532,37 @@ void CoinControlDialog::updateLabelLocked()
         ui->labelLocked->setVisible(true);
     } else
         ui->labelLocked->setVisible(false);
+}
+
+void CoinControlDialog::CheckDialogLablesUpdated()
+{
+    if (this->parentWidget() == nullptr) {
+        CoinControlDialog::updateLabels(model, this);
+        return;
+    }
+    vector<COutPoint> vCoinControl;
+    vector<COutput> vOutputs;
+    coinControl->ListSelected(vCoinControl);
+    model->getOutputs(vCoinControl, vOutputs);
+
+    CAmount nAmount = 0;
+    unsigned int nQuantity = 0;
+    for (const COutput& out : vOutputs) {
+        // unselect already spent, very unlikely scenario, this could happen
+        // when selected are spent elsewhere, like rpc or another computer
+        uint256 txhash = out.tx->GetHash();
+        COutPoint outpt(txhash, out.i);
+        if(model->isSpent(outpt)) {
+            coinControl->UnSelect(outpt);
+            continue;
+        }
+
+        // Quantity
+        nQuantity++;
+
+        // Amount
+        nAmount += out.tx->vout[out.i].nValue;
+    }
 }
 
 void CoinControlDialog::updateLabels(WalletModel* model, QDialog* dialog)
@@ -643,12 +680,13 @@ void CoinControlDialog::updateLabels(WalletModel* model, QDialog* dialog)
 
         if (nPayAmount > 0) {
             nChange = nAmount - nPayFee - nPayAmount;
-
+/*
             // DS Fee = overpay
             if (coinControl->useDarksend && nChange > 0) {
                 nPayFee += nChange;
                 nChange = 0;
             }
+*/
             // Never create dust outputs; if we would, just add the dust to the fee.
             if (nChange > 0 && nChange < CENT) {
                 CTxOut txout(nChange, (CScript)vector<unsigned char>(24, 0));
@@ -848,7 +886,7 @@ void CoinControlDialog::updateView()
             itemOutput->setToolTip(COLUMN_DATE, GUIUtil::dateTimeStr(out.tx->GetTxTime()));
             itemOutput->setText(COLUMN_DATE_INT64, strPad(QString::number(out.tx->GetTxTime()), 20, " "));
 
-
+/*
             // ds+ rounds
             CTxIn vin = CTxIn(out.tx->GetHash(), out.i);
             int rounds = pwalletMain->GetInputDarkSendRounds(vin);
@@ -857,7 +895,7 @@ void CoinControlDialog::updateView()
                 itemOutput->setText(COLUMN_DARKSEND_ROUNDS, strPad(QString::number(rounds), 11, " "));
             else
                 itemOutput->setText(COLUMN_DARKSEND_ROUNDS, strPad(QString(tr("n/a")), 11, " "));
-
+*/
 
             // confirmations
             itemOutput->setText(COLUMN_CONFIRMATIONS, strPad(QString::number(out.nDepth), 8, " "));
@@ -876,12 +914,12 @@ void CoinControlDialog::updateView()
             // vout index
             itemOutput->setText(COLUMN_VOUT_INDEX, QString::number(out.i));
 
-
             COutPoint outpt(txhash, out.i);
-            if(toogleLockList.indexOf(QString::fromStdString(txhash.GetHex())) >= 0) {
+            if (toogleLockList.indexOf(QString::fromStdString(txhash.GetHex())) >= 0) {
                 model->lockCoin(outpt);
                 toogleLockList.removeAll(QString::fromStdString(txhash.GetHex()));
             }
+
             // disable locked coins
             if (model->isLockedCoin(txhash, out.i)) {
                 coinControl->UnSelect(outpt); // just to be sure

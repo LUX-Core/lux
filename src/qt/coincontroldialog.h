@@ -35,7 +35,7 @@ class CoinControlDialog : public QDialog
 public:
     explicit CoinControlDialog(QWidget* parent = 0);
     ~CoinControlDialog();
-
+    void CheckDialogLablesUpdated();
     void setModel(WalletModel* model);
     void setClientModel(ClientModel* clientModel);
 
@@ -70,7 +70,6 @@ private:
         COLUMN_AMOUNT,
         COLUMN_LABEL,
         COLUMN_ADDRESS,
-        COLUMN_DARKSEND_ROUNDS,
         COLUMN_DATE,
         COLUMN_CONFIRMATIONS,
         COLUMN_PRIORITY,
