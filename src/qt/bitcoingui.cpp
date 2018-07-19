@@ -127,6 +127,9 @@ BitcoinGUI::BitcoinGUI(const NetworkStyle* networkStyle, QWidget* parent) : QMai
     resize(1200, 735);
     QString windowTitle = tr("Luxcore") + " - ";
 
+    controller = new QtLuxUpdater::UpdateController(QStringLiteral("v4.3.0"), this);
+    controller->setDetailedUpdateInfo(true);
+
 #ifdef ENABLE_WALLET
     /* if compiled with wallet support, -disablewallet can still disable the wallet */
     enableWallet = !GetBoolArg("-disablewallet", false);
@@ -598,7 +601,7 @@ void BitcoinGUI::createToolBars() {
         layout->setContentsMargins(QMargins());
         QWidget* containerWidget = new QWidget();
         containerWidget->setLayout(layout);
-		setMinimumSize(200, 200);
+        setMinimumSize(200, 200);
         setCentralWidget(containerWidget);
     }
 }
@@ -792,8 +795,7 @@ void BitcoinGUI::updaterClicked() {
     if (!clientModel)
         return;
 
-    //HelpMessageDialog dlg(this, true);
-    //dlg.exec();
+    controller->start(QtLuxUpdater::UpdateController::ProgressLevel);
 }
 
 void BitcoinGUI::showHelpMessageClicked() {
