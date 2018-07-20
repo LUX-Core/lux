@@ -27,12 +27,16 @@ static const int DEFAULT_CONNECT_TIMEOUT = 5000;
 #undef SetPort
 #endif
 
+#define NATIVE_I2P_DESTINATION_SIZE     524
+#define NATIVE_I2P_B32ADDR_SIZE         60
+#define NATIVE_I2P_NET_STRING           "i2p"
+
 enum Network {
     NET_UNROUTABLE = 0,
     NET_IPV4,
     NET_IPV6,
     NET_TOR,
-
+    NET_NATIVE_I2P,
     NET_MAX,
 };
 
@@ -41,6 +45,7 @@ class CNetAddr
 {
 protected:
     unsigned char ip[16]; // in network byte order
+    unsigned char i2pDest[NATIVE_I2P_DESTINATION_SIZE]; // I2P Destination (should be array for serialization)
 
 public:
     CNetAddr();
@@ -73,6 +78,7 @@ public:
     bool IsRFC6052() const;                      // IPv6 well-known prefix (64:FF9B::/96)
     bool IsRFC6145() const;                      // IPv6 IPv4-translated address (::FFFF:0:0:0/96)
     bool IsTor() const;
+    bool IsNativeI2P() const;
     bool IsLocal() const;
     bool IsRoutable() const;
     bool IsValid() const;
@@ -85,6 +91,7 @@ public:
     bool GetInAddr(struct in_addr* pipv4Addr) const;
     std::vector<unsigned char> GetGroup() const;
     int GetReachabilityFrom(const CNetAddr* paddrPartner = NULL) const;
+    std::string GetI2PDestination() const;
 
     CNetAddr(const struct in6_addr& pipv6Addr);
     bool GetIn6Addr(struct in6_addr* pipv6Addr) const;
@@ -99,6 +106,9 @@ public:
     inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion)
     {
         READWRITE(FLATDATA(ip));
+        if (!(nType & SER_IPADDRONLY)) {
+            READWRITE(FLATDATA(i2pDest));
+        }
     }
 
     friend class CSubNet;
@@ -177,6 +187,9 @@ public:
     inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion)
     {
         READWRITE(FLATDATA(ip));
+        if (!(nType & SER_IPADDRONLY)) {
+            READWRITE(FLATDATA(i2pDest));
+        }
         unsigned short portN = htons(port);
         READWRITE(portN);
         if (ser_action.ForRead())
