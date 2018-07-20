@@ -702,6 +702,10 @@ UniValue gettxout(const UniValue& params, bool fHelp)
         }
     }
 
+    if ((unsigned int) n >= coins.vout.size()) {
+        return NullUniValue;
+    }
+
     CBlockIndex* pindex = LookupBlockIndex(pcoinsTip->GetBestBlock());
     ret.push_back(Pair("bestblock", pindex->GetBlockHash().GetHex()));
     if ((unsigned int)coins.nHeight == MEMPOOL_HEIGHT)
