@@ -32,6 +32,7 @@ LIBBITCOIN_COMMON=libbitcoin_common.a
 LIBBITCOIN_CONSENSUS=libbitcoin_consensus.a
 LIBBITCOIN_CLI=libbitcoin_cli.a
 LIBBITCOIN_UTIL=libbitcoin_util.a
+LIBBITCOIN_I2PNET=libbitcoin_i2pnet.a
 LIBBITCOIN_CRYPTO=crypto/libbitcoin_crypto.a
 LIBBITCOIN_UNIVALUE=univalue/libbitcoin_univalue.a
 LIBBITCOINQT=qt/libbitcoinqt.a
@@ -62,6 +63,7 @@ EXTRA_LIBRARIES += \
   $(LIBBITCOIN_SERVER) \
   $(LIBBITCOIN_CLI) \
   $(LIBBITCOIN_WALLET) \
+  $(LIBBITCOIN_I2PNET) \
   $(LIBBITCOIN_ZMQ)
 
 lib_LTLIBRARIES = $(LIBBITCOINCONSENSUS)
@@ -109,6 +111,8 @@ BITCOIN_CORE_H = \
   darksend.h \
   db.h \
   hash.h \
+  i2psam/i2psam.h \
+  i2p.h \
   indirectmap.h \
   init.h \
   instantx.h \
@@ -610,6 +614,12 @@ libbitcoin_util_a_SOURCES = \
   utiltime.cpp \
   $(BITCOIN_CORE_H)
 
+libbitcoin_i2pnet_a_CPPFLAGS = $(BITCOIN_INCLUDES)
+libbitcoin_i2pnet_a_SOURCES = \
+  i2psam/i2psam.cpp \
+  i2p.cpp \
+  $(BITCOIN_CORE_H)
+
 if GLIBC_BACK_COMPAT
 libbitcoin_util_a_SOURCES += compat/glibc_compat.cpp
 libbitcoin_util_a_SOURCES += compat/glibcxx_compat.cpp
@@ -642,6 +652,7 @@ luxd_LDADD = \
   $(LIBBITCOIN_ZMQ) \
   $(LIBBITCOIN_CONSENSUS) \
   $(LIBBITCOIN_CRYPTO) \
+  $(LIBBITCOIN_I2PNET) \
   $(LIBLEVELDB) \
   $(LIBMEMENV) \
   $(LIBCRYPTOPP) \
@@ -683,6 +694,7 @@ lux_tx_LDADD = \
   $(LIBBITCOIN_CONSENSUS) \
   $(LIBBITCOIN_WALLET) \
   $(LIBBITCOIN_ZMQ) \
+  $(LIBBITCOIN_I2PNET) \
   $(LIBLEVELDB) \
   $(LIBMEMENV) \
   $(LIBBITCOIN_UTIL) \
