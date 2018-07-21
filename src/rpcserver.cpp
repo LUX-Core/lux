@@ -16,6 +16,7 @@
 #include "sync.h"
 #include "utilstrencodings.h"
 #include "univalue/univalue.h"
+#include "utilmoneystr.h"
 
 #ifdef ENABLE_WALLET
 #include "wallet.h"
@@ -120,25 +121,16 @@ void RPCTypeCheckObj(const UniValue& o,
     }
 }
 
-static inline int64_t roundint64(double d)
-{
-    return (int64_t)(d > 0 ? d + 0.5 : d - 0.5);
-}
-
 CAmount AmountFromValue(const UniValue& value)
 {
-    double dAmount = value.get_real();
-    if (dAmount <= 0.0 || dAmount > 500000000.0)
+    if (!value.isReal() && !value.isNum())
+        throw JSONRPCError(RPC_TYPE_ERROR, "Amount is not a number");
+    CAmount amount;
+    if (!ParseFixedPoint(value.getValStr(), 8, &amount))
         throw JSONRPCError(RPC_TYPE_ERROR, "Invalid amount");
-    CAmount nAmount = roundint64(dAmount * COIN);
-    if (!MoneyRange(nAmount))
-        throw JSONRPCError(RPC_TYPE_ERROR, "Invalid amount");
-    return nAmount;
-}
-
-UniValue ValueFromAmount(const CAmount& amount)
-{
-    return (double)amount / (double)COIN;
+    if (!MoneyRange(amount))
+        throw JSONRPCError(RPC_TYPE_ERROR, "Amount out of range");
+    return amount;
 }
 
 uint256 ParseHashV(const UniValue& v, string strName)
