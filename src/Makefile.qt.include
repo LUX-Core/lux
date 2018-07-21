@@ -239,6 +239,7 @@ BITCOIN_QT_H = \
   qt/signverifymessagedialog.h \
   qt/smartcontract.h \
   qt/splashscreen.h \
+  qt/trafficgraphdata.h \
   qt/tabbarinfo.h \
   qt/token.h \
   qt/tokenamountfield.h \
@@ -354,6 +355,7 @@ BITCOIN_QT_CPP = \
   qt/qvaluecombobox.cpp \
   qt/rpcconsole.cpp \
   qt/splashscreen.cpp \
+  qt/trafficgraphdata.cpp \
   qt/tabbarinfo.cpp \
   qt/tokenitemmodel.cpp \
   qt/tokenamountfield.cpp \

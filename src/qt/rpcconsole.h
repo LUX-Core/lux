@@ -7,6 +7,7 @@
 
 #include "guiutil.h"
 #include "peertablemodel.h"
+#include "trafficgraphdata.h"
 
 #include "net.h"
 
@@ -132,7 +133,7 @@ signals:
 private:
     static QString FormatBytes(quint64 bytes);
     void startExecutor();
-    void setTrafficGraphRange(int mins);
+    void setTrafficGraphRange(TrafficGraphData::GraphRange range);
     /** Update UI with latest network info from model. */
     void updateNetworkState();
     /** Build parameter list for restart */
