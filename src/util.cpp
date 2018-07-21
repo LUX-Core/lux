@@ -203,6 +203,10 @@ static boost::once_flag debugPrintInitFlag = BOOST_ONCE_INIT;
  * in a thread-safe manner the first time called:
  */
 static FILE* fileout = NULL;
+
+#define MAX_FILE_SIZE 10485760  //10MB
+#define MAX_FILE_COUNT 10  //This will be set in settings
+
 static boost::mutex* mutexDebugLog = NULL;
 
 /////////////////////////////////////////////////////////////////////// // lux
@@ -259,9 +263,59 @@ bool LogAcceptCategory(const char* category)
     return true;
 }
 
+void pushDebugLog(std::string pathDebugStr, int debugNum)
+{
+    while (debugNum) {
+        std::string orginPath = pathDebugStr + ".";
+        std::string destPath = orginPath;
+        if (debugNum - 1 < 10)
+            orginPath += "0";
+        if (debugNum < 10)
+            destPath += "0";
+        orginPath += std::to_string(debugNum - 1);
+        destPath += std::to_string(debugNum);
+        if (access( destPath.c_str(), F_OK ) != -1)
+            remove(destPath.c_str());
+        rename(orginPath.c_str(), destPath.c_str());
+        debugNum--;
+    }
+
+}
+
 int LogPrintStr(const std::string& str, bool useVMLog)
 {
 //////////////////////////////// // lux
+    boost::filesystem::path pathDebug = GetDataDir() / "debug.log";
+    std::string pathDebugStr = pathDebug.string();
+    struct stat stat_buf;
+    int rc = stat(pathDebugStr.c_str(), &stat_buf);
+    int size = rc == 0 ? stat_buf.st_size : -1;
+    if (size >= MAX_FILE_SIZE) {
+        fclose(fileout);
+        int debugNum = 0;
+        while (true) {
+            std::string tempPath = pathDebugStr + ".";
+            if (debugNum < 10)
+                tempPath += "0";
+            tempPath += std::to_string(debugNum);
+            if (access( tempPath.c_str(), F_OK ) != -1)
+                debugNum++;
+            else if (debugNum < MAX_FILE_COUNT) {
+                pushDebugLog(pathDebugStr, debugNum);
+                break;
+            } else {
+                pushDebugLog(pathDebugStr, MAX_FILE_COUNT - 1);
+                break;
+            }
+        }
+        std::string nextPathDebugStr = pathDebugStr + ".00";
+        if (access( nextPathDebugStr.c_str(), F_OK ) != -1)
+            remove(nextPathDebugStr.c_str());
+        rename(pathDebugStr.c_str(), nextPathDebugStr.c_str());
+        fileout = fopen(pathDebugStr.c_str(), "wa");
+        if (fileout) setbuf(fileout, NULL); // unbuffered
+    }
+
     FILE* file = fileout;
     if(useVMLog){
         file = fileoutVM;

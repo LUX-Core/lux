@@ -64,6 +64,8 @@ void SetupEnvironment();
 bool LogAcceptCategory(const char* category);
 /** Send a string to the log output */
 int LogPrintStr(const std::string& str, bool useVMLog = false);
+/** Push debug files */
+void pushDebugLog(std::string pathDebugStr, int debugNum);
 
 #define LogPrintf(...) LogPrint(NULL, __VA_ARGS__)
 
