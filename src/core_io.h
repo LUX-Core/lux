@@ -5,6 +5,7 @@
 #ifndef BITCOIN_CORE_IO_H
 #define BITCOIN_CORE_IO_H
 
+#include "amount.h"
 #include <string>
 #include <vector>
 
@@ -23,6 +24,7 @@ extern uint256 ParseHashStr(const std::string&, const std::string& strName);
 extern std::vector<unsigned char> ParseHexUV(const UniValue& v, const std::string& strName);
 
 // core_write.cpp
+UniValue ValueFromAmount(const CAmount& amount);
 extern std::string FormatScript(const CScript& script);
 extern std::string EncodeHexTx(const CTransaction& tx);
 extern void ScriptPubKeyToUniv(const CScript& scriptPubKey, UniValue& out, bool fIncludeHex);

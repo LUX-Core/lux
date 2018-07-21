@@ -12,6 +12,7 @@
 #include "net.h"
 
 #include "addrman.h"
+#include "core_io.h"
 #include "chainparams.h"
 #include "clientversion.h"
 #include "miner.h"
