@@ -19,7 +19,9 @@
 #include <QPushButton>
 #include <QSystemTrayIcon>
 
+#if HAVE_INSTALLER
 #include "lux-installer/src/updatecontroller.h"
+#endif
 
 class ClientModel;
 class NetworkStyle;
@@ -86,7 +88,9 @@ private:
     ClientModel* clientModel;
     WalletFrame* walletFrame;
 
+#if HAVE_INSTALLER
     QtLuxUpdater::UpdateController *controller;
+#endif
 
     UnitDisplayStatusBarControl* unitDisplayControl;
     QLabel* labelStakingIcon;

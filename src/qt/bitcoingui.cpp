@@ -127,8 +127,10 @@ BitcoinGUI::BitcoinGUI(const NetworkStyle* networkStyle, QWidget* parent) : QMai
     resize(1200, 735);
     QString windowTitle = tr("Luxcore") + " - ";
 
+#if HAVE_INSTALLER
     controller = new QtLuxUpdater::UpdateController(QStringLiteral("v4.3.0"), this);
     controller->setDetailedUpdateInfo(true);
+#endif
 
 #ifdef ENABLE_WALLET
     /* if compiled with wallet support, -disablewallet can still disable the wallet */
@@ -794,8 +796,11 @@ void BitcoinGUI::aboutClicked() {
 void BitcoinGUI::updaterClicked() {
     if (!clientModel)
         return;
-
+#if HAVE_INSTALLER
     controller->start(QtLuxUpdater::UpdateController::ProgressLevel);
+#else
+    uiInterface.ThreadSafeMessageBox("This feature is available only on official build only!", "Warning", CClientUIInterface::MSG_WARNING);
+#endif
 }
 
 void BitcoinGUI::showHelpMessageClicked() {

@@ -64,8 +64,10 @@ QT_FORMS_UI = \
   qt/forms/tokendescdialog.ui \
   qt/forms/transactiondescdialog.ui
 
+if HAVE_INSTALLER
  QT_FORMS_UI += lux-installer/src/forms/updateinfodialog.ui \
                 lux-installer/src/forms/progressdialog.ui 
+endif
 
 QT_MOC_CPP = \
   qt/moc_abifunctionfield.cpp \
@@ -153,6 +155,7 @@ QT_MOC_CPP = \
   qt/moc_walletmodel.cpp \
   qt/moc_walletview.cpp
 
+if HAVE_INSTALLER
   QT_MOC_CPP += lux-installer/src/luxupdater/moc_luxupdater.cpp \
                 lux-installer/src/luxupdater/moc_simplescheduler_p.cpp \
                 lux-installer/src/luxupdater/moc_atomfeeder.cpp \
@@ -160,7 +163,7 @@ QT_MOC_CPP = \
                 lux-installer/src/moc_progressdialog_p.cpp \
                 lux-installer/src/moc_updatecontroller.cpp \
                 lux-installer/src/moc_updateinfodialog_p.cpp
-
+endif
 
 BITCOIN_MM = \
   qt/macdockiconhandler.mm \
@@ -282,6 +285,7 @@ BITCOIN_QT_H = \
   qt/winshutdownmonitor.h \
   qt/qcustomplot.h
 
+if HAVE_INSTALLER
   BITCOIN_QT_H += lux-installer/src/luxupdater/luxupdater.h \
                   lux-installer/src/luxupdater/simplescheduler_p.h \
                   lux-installer/src/luxupdater/atomfeeder.h \
@@ -289,7 +293,7 @@ BITCOIN_QT_H = \
                   lux-installer/src/progressdialog_p.h \
                   lux-installer/src/updatecontroller.h \
                   lux-installer/src/updateinfodialog_p.h
-
+endif
 
 
 RES_ICONS = \
@@ -460,7 +464,7 @@ BITCOIN_QT_CPP += \
   qt/walletmodeltransaction.cpp \
   qt/walletview.cpp
 
-
+if HAVE_INSTALLER
   BITCOIN_QT_CPP += \
   lux-installer/src/luxupdater/simplescheduler.cpp \
   lux-installer/src/luxupdater/luxupdater_p.cpp \
@@ -472,6 +476,7 @@ BITCOIN_QT_CPP += \
   lux-installer/src/progressdialog.cpp \
   lux-installer/src/updatecontroller.cpp \
   lux-installer/src/updateinfodialog.cpp
+endif
 
 endif
 
