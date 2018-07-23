@@ -1,5 +1,5 @@
-// Copyright (c) 2009-2010 Satoshi Nakamoto                     -*- c++ -*-
-// Copyright (c) 2009-2015 The Bitcoin developers
+// Copyright (c) 2009-2010 Satoshi Nakamoto
+// Copyright (c) 2009-2017 The Bitcoin Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -13,32 +13,34 @@
 #include <string>
 #include <vector>
 
-class uint512;
 class uint256;
 
-class uint_error : public std::runtime_error
-{
+class uint_error : public std::runtime_error {
 public:
     explicit uint_error(const std::string& str) : std::runtime_error(str) {}
 };
 
 /** Template base class for unsigned big integers. */
-template <unsigned int BITS>
+template<unsigned int BITS>
 class base_uint
 {
 protected:
-    enum { WIDTH = BITS / 32 };
+    static constexpr int WIDTH = BITS / 32;
     uint32_t pn[WIDTH];
-
 public:
+
     base_uint()
     {
+        static_assert(BITS/32 > 0 && BITS%32 == 0, "Template parameter BITS must be a positive multiple of 32.");
+
         for (int i = 0; i < WIDTH; i++)
             pn[i] = 0;
     }
 
     base_uint(const base_uint& b)
     {
+        static_assert(BITS/32 > 0 && BITS%32 == 0, "Template parameter BITS must be a positive multiple of 32.");
+
         for (int i = 0; i < WIDTH; i++)
             pn[i] = b.pn[i];
     }
@@ -52,6 +54,8 @@ public:
 
     base_uint(uint64_t b)
     {
+        static_assert(BITS/32 > 0 && BITS%32 == 0, "Template parameter BITS must be a positive multiple of 32.");
+
         pn[0] = (unsigned int)b;
         pn[1] = (unsigned int)(b >> 32);
         for (int i = 2; i < WIDTH; i++)
@@ -59,7 +63,6 @@ public:
     }
 
     explicit base_uint(const std::string& str);
-    explicit base_uint(const std::vector<unsigned char>& vch);
 
     bool operator!() const
     {
@@ -138,7 +141,8 @@ public:
     base_uint& operator+=(const base_uint& b)
     {
         uint64_t carry = 0;
-        for (int i = 0; i < WIDTH; i++) {
+        for (int i = 0; i < WIDTH; i++)
+        {
             uint64_t n = carry + pn[i] + b.pn[i];
             pn[i] = n & 0xffffffff;
             carry = n >> 32;
@@ -176,7 +180,7 @@ public:
     {
         // prefix operator
         int i = 0;
-        while (++pn[i] == 0 && i < WIDTH - 1)
+        while (i < WIDTH && ++pn[i] == 0)
             i++;
         return *this;
     }
@@ -193,7 +197,7 @@ public:
     {
         // prefix operator
         int i = 0;
-        while (--pn[i] == (uint32_t)-1 && i < WIDTH - 1)
+        while (i < WIDTH && --pn[i] == (uint32_t)-1)
             i++;
         return *this;
     }
@@ -233,26 +237,6 @@ public:
     void SetHex(const std::string& str);
     std::string ToString() const;
 
-    unsigned char* begin()
-    {
-        return (unsigned char*)&pn[0];
-    }
-
-    unsigned char* end()
-    {
-        return (unsigned char*)&pn[WIDTH];
-    }
-
-    const unsigned char* begin() const
-    {
-        return (unsigned char*)&pn[0];
-    }
-
-    const unsigned char* end() const
-    {
-        return (unsigned char*)&pn[WIDTH];
-    }
-
     unsigned int size() const
     {
         return sizeof(pn);
@@ -266,20 +250,18 @@ public:
 
     uint64_t GetLow64() const
     {
-        assert(WIDTH >= 2);
+        static_assert(WIDTH >= 2, "Assertion WIDTH >= 2 failed (WIDTH = BITS / 32). BITS is a template parameter.");
         return pn[0] | (uint64_t)pn[1] << 32;
     }
 };
 
 /** 256-bit unsigned big integer. */
-class arith_uint256 : public base_uint<256>
-{
+class arith_uint256 : public base_uint<256> {
 public:
     arith_uint256() {}
     arith_uint256(const base_uint<256>& b) : base_uint<256>(b) {}
     arith_uint256(uint64_t b) : base_uint<256>(b) {}
     explicit arith_uint256(const std::string& str) : base_uint<256>(str) {}
-    explicit arith_uint256(const std::vector<unsigned char>& vch) : base_uint<256>(vch) {}
 
     /**
      * The "compact" format is a representation of a whole
@@ -301,34 +283,14 @@ public:
      * complexities of the sign bit and using base 256 are probably an
      * implementation accident.
      */
-    arith_uint256& SetCompact(uint32_t nCompact, bool* pfNegative = NULL, bool* pfOverflow = NULL);
+    arith_uint256& SetCompact(uint32_t nCompact, bool *pfNegative = nullptr, bool *pfOverflow = nullptr);
     uint32_t GetCompact(bool fNegative = false) const;
 
-    friend uint256 ArithToUint256(const arith_uint256&);
-    friend arith_uint256 UintToArith256(const uint256&);
-    uint64_t GetHash(const arith_uint256& salt) const;
+    friend uint256 ArithToUint256(const arith_uint256 &);
+    friend arith_uint256 UintToArith256(const uint256 &);
 };
 
+uint256 ArithToUint256(const arith_uint256 &);
+arith_uint256 UintToArith256(const uint256 &);
 
-/** 512-bit unsigned big integer. */
-class arith_uint512 : public base_uint<512>
-{
-public:
-    arith_uint512() {}
-    arith_uint512(const base_uint<512>& b) : base_uint<512>(b) {}
-    arith_uint512(uint64_t b) : base_uint<512>(b) {}
-    explicit arith_uint512(const std::string& str) : base_uint<512>(str) {}
-    explicit arith_uint512(const std::vector<unsigned char>& vch) : base_uint<512>(vch) {}
-
-    uint64_t GetHash(const arith_uint256& salt) const;
-
-    friend arith_uint512 UintToArith512(const uint512& a);
-    friend uint512 ArithToUint512(const arith_uint512& a);
-};
-
-uint256 ArithToUint256(const arith_uint256&);
-arith_uint256 UintToArith256(const uint256&);
-uint512 ArithToUint512(const arith_uint512&);
-arith_uint512 UintToArith512(const uint512&);
-
-#endif // BITCOIN_UINT256_H
+#endif // BITCOIN_ARITH_UINT256_H

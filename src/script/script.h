@@ -1,27 +1,26 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
-// Copyright (c) 2009-2014 The Bitcoin developers
+// Copyright (c) 2009-2017 The Bitcoin Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #ifndef BITCOIN_SCRIPT_SCRIPT_H
 #define BITCOIN_SCRIPT_SCRIPT_H
 
+#include <crypto/common.h>
 #include <prevector.h>
 #include <serialize.h>
 
 #include <assert.h>
 #include <climits>
 #include <limits>
-#include "pubkey.h"
 #include <stdexcept>
 #include <stdint.h>
 #include <string.h>
 #include <string>
 #include <vector>
 
-typedef std::vector<unsigned char> valtype;
-
-static const unsigned int MAX_SCRIPT_ELEMENT_SIZE = 128000; // lux
+// Maximum number of bytes pushable to the stack
+static const unsigned int MAX_SCRIPT_ELEMENT_SIZE = 128000;
 
 // Maximum number of non-push operations per script
 static const int MAX_OPS_PER_SCRIPT = 201;
@@ -32,7 +31,11 @@ static const int MAX_PUBKEYS_PER_MULTISIG = 20;
 // Maximum script length in bytes
 static const int MAX_SCRIPT_SIZE = 129000; // (129 kb) // lux
 
-/** Threshold for nLockTime: below this value it is interpreted as block number, otherwise as UNIX timestamp. */
+// Maximum number of values on script interpreter stack
+static const int MAX_STACK_SIZE = 1000;
+
+// Threshold for nLockTime: below this value it is interpreted as block number,
+// otherwise as UNIX timestamp.
 static const unsigned int LOCKTIME_THRESHOLD = 500000000; // Tue Nov  5 00:53:20 1985 UTC
 
 template <typename T>
@@ -328,30 +331,6 @@ public:
         return serialize(m_value);
     }
 
-    ///////////////////////////////// lux
-    static uint64_t vch_to_uint64(const std::vector<unsigned char>& vch)
-    {
-        if (vch.size() > 8) {
-            throw scriptnum_error("script number overflow");
-        }
-
-        if (vch.empty())
-            return 0;
-
-        uint64_t result = 0;
-        for (size_t i = 0; i != vch.size(); ++i)
-            result |= static_cast<uint64_t>(vch[i]) << 8*i;
-
-        // If the input vector's most significant byte is 0x80, remove it from
-        // the result's msb and return a negative.
-        if (vch.back() & 0x80)
-            throw scriptnum_error("Negative gas value.");
-            // return -((uint64_t)(result & ~(0x80ULL << (8 * (vch.size() - 1)))));
-
-        return result;
-    }
-    /////////////////////////////////
-
     static std::vector<unsigned char> serialize(const int64_t& value)
     {
         if(value == 0)
@@ -407,7 +386,6 @@ private:
 };
 
 /**
- * FROM Bitcoin src:
  * We use a prevector for the script to reduce the considerable memory overhead
  *  of vectors in cases where they normally contain a small number of small elements.
  * Tests in October 2015 showed use of this reduced dbcache memory usage by 23%
@@ -437,7 +415,6 @@ protected:
     }
 public:
     CScript() { }
-    CScript(const CScript& b) : CScriptBase(b.begin(), b.end()) { }
     CScript(const_iterator pbegin, const_iterator pend) : CScriptBase(pbegin, pend) { }
     CScript(std::vector<unsigned char>::const_iterator pbegin, std::vector<unsigned char>::const_iterator pend) : CScriptBase(pbegin, pend) { }
     CScript(const unsigned char* pbegin, const unsigned char* pend) : CScriptBase(pbegin, pend) { }
@@ -445,7 +422,7 @@ public:
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion) {
+    inline void SerializationOp(Stream& s, Operation ser_action) {
         READWRITE(static_cast<CScriptBase&>(*this));
     }
 
@@ -500,14 +477,16 @@ public:
         else if (b.size() <= 0xffff)
         {
             insert(end(), OP_PUSHDATA2);
-            unsigned short nSize = b.size();
-            insert(end(), (unsigned char*)&nSize, (unsigned char*)&nSize + sizeof(nSize));
+            uint8_t _data[2];
+            WriteLE16(_data, b.size());
+            insert(end(), _data, _data + sizeof(_data));
         }
         else
         {
             insert(end(), OP_PUSHDATA4);
-            unsigned int nSize = b.size();
-            insert(end(), (unsigned char*)&nSize, (unsigned char*)&nSize + sizeof(nSize));
+            uint8_t _data[4];
+            WriteLE32(_data, b.size());
+            insert(end(), _data, _data + sizeof(_data));
         }
         insert(end(), b.begin(), b.end());
         return *this;
@@ -519,12 +498,6 @@ public:
         // If there's ever a use for pushing a script onto a script, delete this member fn
         assert(!"Warning: Pushing a CScript onto a CScript with << is probably not intended, use + to concatenate!");
         return *this;
-    }
-
-    CScript& operator<<(const CPubKey& key)
-    {
-        std::vector<unsigned char> vchKey = key.Raw();
-        return (*this) << vchKey;
     }
 
 
@@ -586,15 +559,14 @@ public:
             {
                 if (end() - pc < 2)
                     return false;
-                nSize = 0;
-                memcpy(&nSize, &pc[0], 2);
+                nSize = ReadLE16(&pc[0]);
                 pc += 2;
             }
             else if (opcode == OP_PUSHDATA4)
             {
                 if (end() - pc < 4)
                     return false;
-                memcpy(&nSize, &pc[0], 4);
+                nSize = ReadLE32(&pc[0]);
                 pc += 4;
             }
             if (end() - pc < 0 || (unsigned int)(end() - pc) < nSize)
@@ -604,7 +576,7 @@ public:
             pc += nSize;
         }
 
-        opcodeRet = static_cast<opcodetype>(opcode);
+        opcodeRet = (opcodetype)opcode;
         return true;
     }
 
@@ -616,7 +588,6 @@ public:
         assert(opcode >= OP_1 && opcode <= OP_16);
         return (int)opcode - (int)(OP_1 - 1);
     }
-
     static opcodetype EncodeOP_N(int n)
     {
         assert(n >= 0 && n <= 16);
@@ -649,9 +620,9 @@ public:
             result.insert(result.end(), pc2, end());
             *this = result;
         }
+
         return nFound;
     }
-
     int Find(opcodetype op) const
     {
         int nFound = 0;
@@ -681,10 +652,8 @@ public:
     bool IsPayToScriptHash() const;
     bool IsPayToWitnessScriptHash() const;
     bool IsWitnessProgram(int& version, std::vector<unsigned char>& program) const;
-    ///////////////////////////////////////////////// // lux
     bool IsPayToPubkey() const;
     bool IsPayToPubkeyHash() const;
-    /////////////////////////////////////////////////
 
     /** Called by IsStandardTx and P2SH/BIP62 VerifyScript (which makes it consensus-critical). */
     bool IsPushOnly(const_iterator pc) const;
@@ -703,7 +672,6 @@ public:
         return (size() > 0 && *begin() == OP_RETURN) || (size() > MAX_SCRIPT_SIZE);
     }
 
-    ///////////////////////////////////////// lux
     bool HasOpCreate() const
     {
         return Find(OP_CREATE) == 1;
@@ -713,16 +681,15 @@ public:
     {
         return Find(OP_CALL) == 1;
     }
+
     bool HasOpSpend() const
     {
         return size()==1 && *begin() == OP_SPEND;
     }
-    /////////////////////////////////////////
-
-    std::string ToString() const;
 
     void clear()
     {
+        // The default prevector::clear() does not release memory
         CScriptBase::clear();
         shrink_to_fit();
     }

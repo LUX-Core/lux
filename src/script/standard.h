@@ -1,13 +1,13 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
-// Copyright (c) 2009-2014 The Bitcoin developers
+// Copyright (c) 2009-2017 The Bitcoin Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #ifndef BITCOIN_SCRIPT_STANDARD_H
 #define BITCOIN_SCRIPT_STANDARD_H
 
-#include "script/interpreter.h"
-#include "uint256.h"
+#include <script/interpreter.h>
+#include <uint256.h>
 
 #include <boost/variant.hpp>
 
@@ -29,7 +29,7 @@ class CScript;
 class CScriptID : public uint160
 {
 public:
-    CScriptID() : uint160(0) {}
+    CScriptID() : uint160() {}
     CScriptID(const CScript& in);
     CScriptID(const uint160& in) : uint160(in) {}
 };
@@ -38,7 +38,7 @@ public:
  * Default setting for nMaxDatacarrierBytes. 80 bytes of data, +1 for OP_RETURN,
  * +2 for the pushdata opcodes.
  */
-static const unsigned int MAX_OP_RETURN_RELAY = 83; //!< bytes (+1 for OP_RETURN, +2 for the pushdata opcodes)
+static const unsigned int MAX_OP_RETURN_RELAY = 83;
 
 /**
  * A data carrying output is an unspendable output containing data. The script
@@ -68,7 +68,7 @@ enum txnouttype
     TX_PUBKEYHASH,
     TX_SCRIPTHASH,
     TX_MULTISIG,
-    TX_NULL_DATA,
+    TX_NULL_DATA, //!< unspendable OP_RETURN script that carries data
     TX_CREATE,
     TX_CALL,
     TX_WITNESS_V0_SCRIPTHASH,
@@ -149,15 +149,13 @@ const char* GetTxnOutputType(txnouttype t);
  */
 bool Solver(const CScript& scriptPubKey, txnouttype& typeRet, std::vector<std::vector<unsigned char> >& vSolutionsRet, bool contractConsensus=false);
 
-int ScriptSigArgsExpected(txnouttype t, const std::vector<std::vector<unsigned char> >& vSolutions);
-
 /**
  * Parse a standard scriptPubKey for the destination address. Assigns result to
  * the addressRet parameter and returns true if successful. For multisig
  * scripts, instead use ExtractDestinations. Currently only works for P2PK,
  * P2PKH, P2SH, P2WPKH, and P2WSH scripts.
  */
-bool ExtractDestination(const CScript& scriptPubKey, CTxDestination& addressRet, txnouttype* typeRet = NULL);
+bool ExtractDestination(const CScript& scriptPubKey, CTxDestination& addressRet);
 
 /**
  * Parse a standard scriptPubKey with one or more destination addresses. For
