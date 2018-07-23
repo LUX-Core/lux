@@ -27,26 +27,27 @@ static const int DEFAULT_CONNECT_TIMEOUT = 5000;
 #undef SetPort
 #endif
 
-#define NATIVE_I2P_DESTINATION_SIZE     524
-#define NATIVE_I2P_B32ADDR_SIZE         60
-#define NATIVE_I2P_NET_STRING           "i2p"
+#define I2P_DESTINATION_STORE 516
+#define NATIVE_I2P_B32ADDR_SIZE 60
 
 enum Network {
     NET_UNROUTABLE = 0,
     NET_IPV4,
     NET_IPV6,
     NET_TOR,
-    NET_NATIVE_I2P,
+    NET_I2P,
     NET_MAX,
 };
+
+class uint256;
+class CAddrMan;
 
 /** IP address (IPv6, or IPv4 using mapped IPv6 range (::FFFF:0:0/96)) */
 class CNetAddr
 {
 protected:
     unsigned char ip[16]; // in network byte order
-    unsigned char i2pDest[NATIVE_I2P_DESTINATION_SIZE]; // I2P Destination (should be array for serialization)
-
+    unsigned char i2pDest[I2P_DESTINATION_STORE]; // I2P Destination
 public:
     CNetAddr();
     CNetAddr(const struct in_addr& ipv4Addr);
@@ -56,12 +57,12 @@ public:
     void SetIP(const CNetAddr& ip);
 
     /**
-         * Set raw IPv4 or IPv6 address (in network byte order)
-         * @note Only NET_IPV4 and NET_IPV6 are allowed for network.
-         */
+     * Set raw IPv4 or IPv6 address (in network byte order)
+     * @note Only NET_IPV4 and NET_IPV6 are allowed for network.
+     */
     void SetRaw(Network network, const uint8_t* data);
 
-    bool SetSpecial(const std::string& strName); // for Tor addresses
+    bool SetSpecial(const std::string& strName); // for Tor & I2P addresses
     bool IsIPv4() const;                         // IPv4 mapped address (::FFFF:0:0/96, 0.0.0.0/0)
     bool IsIPv6() const;                         // IPv6 address (not mapped IPv4, not Tor)
     bool IsRFC1918() const;                      // IPv4 private networks (10.0.0.0/8, 192.168.0.0/16, 172.16.0.0/12)
@@ -78,7 +79,6 @@ public:
     bool IsRFC6052() const;                      // IPv6 well-known prefix (64:FF9B::/96)
     bool IsRFC6145() const;                      // IPv6 IPv4-translated address (::FFFF:0:0:0/96)
     bool IsTor() const;
-    bool IsNativeI2P() const;
     bool IsLocal() const;
     bool IsRoutable() const;
     bool IsValid() const;
@@ -90,11 +90,18 @@ public:
     uint64_t GetHash() const;
     bool GetInAddr(struct in_addr* pipv4Addr) const;
     std::vector<unsigned char> GetGroup() const;
-    int GetReachabilityFrom(const CNetAddr* paddrPartner = NULL) const;
-    std::string GetI2PDestination() const;
+    int GetReachabilityFrom(const CNetAddr *paddrPartner = NULL) const;
 
     CNetAddr(const struct in6_addr& pipv6Addr);
     bool GetIn6Addr(struct in6_addr* pipv6Addr) const;
+    void print() const;
+    /** I2P Specific methods */
+    bool IsI2P() const;
+    bool IsNativeI2P() const;
+    bool CheckAndSetGarlicCat( void );
+    std::string GetI2pDestination() const;
+    bool SetI2pDestination( const std::string& sBase64Dest );
+    std::string ToB32String() const;
 
     friend bool operator==(const CNetAddr& a, const CNetAddr& b);
     friend bool operator!=(const CNetAddr& a, const CNetAddr& b);
@@ -103,8 +110,7 @@ public:
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion)
-    {
+    inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion) {
         READWRITE(FLATDATA(ip));
         if (!(nType & SER_IPADDRONLY)) {
             READWRITE(FLATDATA(i2pDest));
@@ -177,6 +183,7 @@ public:
     std::string ToString() const;
     std::string ToStringPort() const;
     std::string ToStringIPPort() const;
+    void print() const;
 
     CService(const struct in6_addr& ipv6Addr, unsigned short port);
     CService(const struct sockaddr_in6& addr);
@@ -184,8 +191,7 @@ public:
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion)
-    {
+    inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion) {
         READWRITE(FLATDATA(ip));
         if (!(nType & SER_IPADDRONLY)) {
             READWRITE(FLATDATA(i2pDest));
@@ -213,12 +219,26 @@ bool Lookup(const char* pszName, std::vector<CService>& vAddr, int portDefault =
 bool LookupNumeric(const char* pszName, CService& addr, int portDefault = 0);
 bool ConnectSocket(const CService& addr, SOCKET& hSocketRet, int nTimeout, bool* outProxyConnectionFailed = 0);
 bool ConnectSocketByName(CService& addr, SOCKET& hSocketRet, const char* pszDest, int portDefault, int nTimeout, bool* outProxyConnectionFailed = 0);
+
 /** Return readable error string for a network error code */
 std::string NetworkErrorString(int err);
 /** Close socket and set hSocket to INVALID_SOCKET */
 bool CloseSocket(SOCKET& hSocket);
 /** Disable or enable blocking-mode for a socket */
 bool SetSocketNonBlocking(SOCKET& hSocket, bool fNonBlocking);
+
+/** I2P and darknet specific routines */
+bool IsDarknetOnly();
+bool IsTorOnly();
+bool IsI2POnly();
+bool IsI2PEnabled();
+bool IsBehindDarknet();
+bool IsMyDestinationShared();
+bool isValidI2pAddress( const std::string& I2pAddr );
+bool isValidI2pB32( const std::string& B32Address );
+bool isStringI2pDestination( const std::string & strName );
+std::string B32AddressFromDestination(const std::string& destination);
+uint256 GetI2pDestinationHash( const std::string& destination );
 
 /**
  * Convert milliseconds to a struct timeval for e.g. select.
