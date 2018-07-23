@@ -6277,7 +6277,9 @@ static bool ProcessMessage(CNode* pfrom, const string &strCommand, CDataStream& 
     // getaddr message mitigates the attack.
     else if ((strCommand == "getaddr") && (pfrom->fInbound)) {
         pfrom->vAddrToSend.clear();
-        vector<CAddress> vAddr = addrman.GetAddr();
+        bool fIpOnly = (pfrom->addr.nServices & NODE_I2P) != 0;
+        bool fI2pOnly = pfrom->addr.IsI2P();
+        vector<CAddress> vAddr = addrman.GetAddr( fIpOnly, fI2pOnly );
         BOOST_FOREACH (const CAddress& addr, vAddr)
             pfrom->PushAddress(addr);
     }
