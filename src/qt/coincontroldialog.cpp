@@ -704,6 +704,40 @@ void CoinControlDialog::updateLabels(WalletModel* model, QDialog* dialog)
         nAfterFee = nAmount - nPayFee;
         if (nAfterFee < 0)
             nAfterFee = 0;
+
+        // if use Split UTXO
+        if (CoinControlDialog::nSplitBlockDummy > 1 && CoinControlDialog::coinControl->fSplitBlock) {
+            map<QString, vector<COutput> > mapCoins;
+            model->listCoins(mapCoins);
+
+            if(mapCoins.size() > 0) {
+                std:map<QString, vector<COutput>>::iterator it = mapCoins.begin();
+
+                SendCoinsRecipient defRecipient;
+                defRecipient.address = (*it).first;
+                defRecipient.label = "";
+                defRecipient.amount = 100000000;
+                defRecipient.message = "default";
+                defRecipient.inputType = ALL_COINS;
+                defRecipient.useInstanTX = CoinControlDialog::coinControl->useInstanTX;
+
+                QList<SendCoinsRecipient> recipients;
+                recipients.append(defRecipient);
+
+                CoinControlDialog::coinControl->nSplitBlock = CoinControlDialog::nSplitBlockDummy;
+                
+                WalletModelTransaction currentTransaction(recipients);
+                
+                model->prepareTransaction(currentTransaction, CoinControlDialog::coinControl);
+                
+                CAmount nFee = currentTransaction.getTransactionFee() + 10;
+    
+                if (nPayFee < nFee) {
+                    nPayFee = nFee;
+                    nAfterFee = nAmount - nFee;
+                }
+            }
+        }
     }
 
     // actually update labels
