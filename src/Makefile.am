@@ -112,7 +112,7 @@ BITCOIN_CORE_H = \
   db.h \
   hash.h \
   i2psam/i2psam.h \
-  i2p.h \
+  i2pwrapper.h \
   indirectmap.h \
   init.h \
   instantx.h \
@@ -617,7 +617,7 @@ libbitcoin_util_a_SOURCES = \
 libbitcoin_i2pnet_a_CPPFLAGS = $(BITCOIN_INCLUDES)
 libbitcoin_i2pnet_a_SOURCES = \
   i2psam/i2psam.cpp \
-  i2p.cpp \
+  i2pwrapper.cpp \
   $(BITCOIN_CORE_H)
 
 if GLIBC_BACK_COMPAT
