@@ -5,17 +5,37 @@
 #ifndef BITCOIN_ADDRMAN_H
 #define BITCOIN_ADDRMAN_H
 
+//! This allows the extensions required to be compiled for the Luxcore AddrManager b32.i2p destination lookup functionality
+#define I2PADDRMAN_EXTENSIONS
+
+#include "chainparams.h"
 #include "netbase.h"
 #include "protocol.h"
 #include "random.h"
 #include "sync.h"
 #include "timedata.h"
 #include "util.h"
+#include "utilstrencodings.h"
 
 #include <map>
 #include <set>
 #include <stdint.h>
 #include <vector>
+
+/** Extended statistics about our B32.I2P address table */
+class CDestinationStats
+{
+public:
+    std::string sAddress;       // CNetAddr member
+    std::string sBase64;        // CNetAddr member
+    unsigned short uPort;       // CService member
+    int64_t nLastTry;           // CAddress member
+    uint64_t nServices;         // CAddress member
+    bool fInTried;              // CAddrInfo member, Developer preference here to say <this means its good>
+    int nAttempts;              // CAddrInfo member
+    int64_t nSuccessTime;       // CAddrInfo member
+    std::string sSource;        // CAddrInfo member, from CNetAddr of source
+};
 
 /** 
  * Extended statistics about a CAddress 
@@ -198,6 +218,13 @@ private:
     //! list of "new" buckets
     int vvNew[ADDRMAN_NEW_BUCKET_COUNT][ADDRMAN_BUCKET_SIZE];
 
+#ifdef I2PADDRMAN_EXTENSIONS
+    //! table of i2p destination address hashes, and the id assigned to them
+    // ToDO: Convert to unordered_map, so we can have immediate lookup, based on hash
+    // typedef boost::unordered_map<uint256, int, I2pHasher> I2pMap;
+    std::map<uint256, int> mapI2pHashes;
+#endif
+
 protected:
     //! Find an entry.
     CAddrInfo* Find(const CNetAddr& addr, int* pnId = NULL);
@@ -237,10 +264,19 @@ protected:
 #endif
 
     //! Select several addresses at once.
-    void GetAddr_(std::vector<CAddress>& vAddr);
+#ifdef I2PADDRMAN_EXTENSIONS
+    void GetAddr_(std::vector<CAddress> &vAddr, const bool fIpOnly, const bool fI2pOnly);
+#else
+    void GetAddr_(std::vector<CAddress> &vAddr);
+#endif
 
     //! Mark an entry as currently-connected-to.
     void Connected_(const CService& addr, int64_t nTime);
+
+#ifdef I2PADDRMAN_EXTENSIONS
+    void CheckAndDeleteB32Hash( const int nID, const CAddrInfo& aTerrible );         // Used in Shrink twice
+    CAddrInfo* LookupB32addr(const std::string& sB32addr);
+#endif
 
 public:
     /**
@@ -339,6 +375,9 @@ public:
         s >> nTried;
         int nUBuckets = 0;
         s >> nUBuckets;
+#ifdef I2PADDRMAN_EXTENSIONS
+        mapI2pHashes.clear();
+#endif
         if (nVersion != 0) {
             nUBuckets ^= (1 << 30);
         }
@@ -347,9 +386,33 @@ public:
         for (int n = 0; n < nNew; n++) {
             CAddrInfo& info = mapInfo[n];
             s >> info;
+
+#ifdef I2PADDRMAN_EXTENSIONS
+            if( (info.nServices & 0xFFFFFFFFFFFFFF00) != 0 ) {
+                LogPrint( "addrman", "While reading new %s, from %s found upper service bits set = %x, cleared.\n", info.ToString(), info.source.ToString(), info.nServices );
+                info.nServices = ServiceFlags(info.nServices & 0xFF);
+            }
+#endif
+
             mapAddr[info] = n;
             info.nRandomPos = vRandom.size();
             vRandom.push_back(n);
+
+#ifdef I2PADDRMAN_EXTENSIONS
+            if( info.CheckAndSetGarlicCat() )
+                LogPrint( "addrman", "While reading new peers, did not expect to need the garliccat fixed for destination %s\n", info.ToString() );
+            if( info.IsI2P() ) {
+                info.SetPort( 0 );              // Make sure the CService port is set to ZERO
+                uint256 b32hash = GetI2pDestinationHash( info.GetI2pDestination() );
+                if( mapI2pHashes.count( b32hash ) == 0 )
+                    mapI2pHashes[b32hash] = n;
+                else
+                    LogPrint( "addrman", "While reading new peer %s, could not create a base32 hash for one that already exists.\n", info.ToString() );
+            } else if( info.GetPort() == 0 ) {                    // not yet sure why clearnet nodes have ports zeroed..ToDo: investigating
+                LogPrint( "addrman", "While reading new peer %s, unexpected to find port set to zero, changed to default.\n", info.ToString() );
+                info.SetPort( Params().GetDefaultPort() );
+            }
+#endif
             if (nVersion != 1 || nUBuckets != ADDRMAN_NEW_BUCKET_COUNT) {
                 // In case the new table data cannot be used (nVersion unknown, or bucket count wrong),
                 // immediately try to give them a reference based on their primary source address.
@@ -368,6 +431,12 @@ public:
         for (int n = 0; n < nTried; n++) {
             CAddrInfo info;
             s >> info;
+#ifdef I2PADDRMAN_EXTENSIONS
+            if( (info.nServices & 0xFFFFFFFFFFFFFF00) != 0 ) {
+                LogPrint( "addrman", "While reading tried %s, from %s found upper service bits set = %x, cleared.\n", info.ToString(), info.source.ToString(), info.nServices );
+                info.nServices = ServiceFlags(info.nServices & 0xFF);
+            }
+#endif
             int nKBucket = info.GetTriedBucket(nKey);
             int nKBucketPos = info.GetBucketPosition(nKey, false, nKBucket);
             if (vvTried[nKBucket][nKBucketPos] == -1) {
@@ -377,6 +446,21 @@ public:
                 mapInfo[nIdCount] = info;
                 mapAddr[info] = nIdCount;
                 vvTried[nKBucket][nKBucketPos] = nIdCount;
+#ifdef I2PADDRMAN_EXTENSIONS
+                if( info.CheckAndSetGarlicCat() )
+                    LogPrint( "addrman", "While reading tried peers, did not expect to need the garliccat fixed for destination %s\n", info.ToString() );
+                if( info.IsI2P() ) {
+                    info.SetPort( 0 );              // Make sure the CService port is set to ZERO
+                    uint256 b32hash = GetI2pDestinationHash( info.GetI2pDestination() );
+                    if( mapI2pHashes.count( b32hash ) == 0 )
+                        mapI2pHashes[b32hash] = nIdCount;
+                    else
+                        LogPrint( "addrman", "While reading tried peer %s, could not create a base32 hash for one that already exists.\n", info.ToString() );
+                } else if( info.GetPort() == 0 ) {                    // not yet sure why clearnet nodes have ports zeroed..ToDo: investigating
+                    LogPrint( "addrman", "While reading tried peer %s, unexpected to find port set to zero, changed to default.\n", info.ToString() );
+                    info.SetPort( Params().GetDefaultPort() );
+                }
+#endif
                 nIdCount++;
             } else {
                 nLost++;
@@ -462,6 +546,17 @@ public:
         return vRandom.size();
     }
 
+#ifdef I2PADDRMAN_EXTENSIONS
+    //! Return the number of (unique) b32.i2p addresses in the hash table
+    int b32HashTableSize()
+    {
+        return mapI2pHashes.size();
+    }
+
+    std::string GetI2pBase64Destination(const std::string& sB32addr);
+    int CopyDestinationStats( std::vector<CDestinationStats>& vStats );
+#endif
+
     //! Consistency check
     void Check()
     {
@@ -541,13 +636,21 @@ public:
     }
 
     //! Return a bunch of addresses, selected at random.
+#ifdef I2PADDRMAN_EXTENSIONS
+    std::vector<CAddress> GetAddr(const bool fIpOnly, const bool fI2pOnly)
+#else
     std::vector<CAddress> GetAddr()
+#endif
     {
         Check();
         std::vector<CAddress> vAddr;
         {
             LOCK(cs);
+#ifdef I2PADDRMAN_EXTENSIONS
+            GetAddr_(vAddr, fIpOnly, fI2pOnly);
+#else
             GetAddr_(vAddr);
+#endif
         }
         Check();
         return vAddr;

@@ -86,6 +86,80 @@ CAddrInfo* CAddrMan::Find(const CNetAddr& addr, int* pnId)
     return NULL;
 }
 
+#ifdef I2PADDRMAN_EXTENSIONS
+/** \brief We sometimes have a vast reservoir of i2p destinations, b32.i2p addresses are simply the hash
+of those addresses, so we should be able to look them up here, if we already have the base64 string,
+we're done and never have to ask the router to lookup the destination.
+ *
+ * \param sB32addr const string&
+ * \return CAddrInfo*
+ *
+ */
+CAddrInfo* CAddrMan::LookupB32addr(const std::string& sB32addr)
+{
+    // Convert the string back into a hash, and look it up in the AddrMan map
+    if( isValidI2pB32(sB32addr) ) {
+        bool fValid;
+        std::vector<unsigned char> vchHash;
+        std::string sHash = sB32addr;
+        sHash.resize( sB32addr.size() - 8 );
+        vchHash = DecodeBase32( sHash.c_str(), &fValid );
+        uint256 uintHash( vchHash );        // Hate wasting time copying object, but vectors, strings and uint256 values dont always pass compiler checks otherwise
+        if( fValid ) {                      // Lookup the hash for a match, if found we have the CAddrInfo id
+            std::map<uint256, int>::iterator it = mapI2pHashes.find( uintHash );
+            if( it != mapI2pHashes.end() ) {
+                std::map<int, CAddrInfo>::iterator it2 = mapInfo.find((*it).second);
+                if (it2 != mapInfo.end())
+                    return &(*it2).second;
+            }
+        }
+    }
+    return NULL;
+}
+
+/** \brief Simply looks up the hash, if the id is found returns a pointer to the
+            CAddrInfo(CAddress(CService(CNetAddr()))) class object where the base64 string is stored
+ *
+ * \param sB32addr const string&
+ * \return string, null if not found or the Base64 destination string of give b32.i2p address
+ *
+ */
+std::string CAddrMan::GetI2pBase64Destination(const std::string& sB32addr)
+{
+    CAddrInfo* paddr = LookupB32addr(sB32addr);
+    return  paddr && paddr->IsI2P() ? paddr->GetI2pDestination() : std::string();
+}
+
+// Returns the number of entries processed
+int CAddrMan::CopyDestinationStats( std::vector<CDestinationStats>& vStats )
+{
+    int nSize = 0;
+    vStats.clear();
+    vStats.reserve( mapI2pHashes.size() );
+    for( std::map<uint256, int>::iterator it = mapI2pHashes.begin(); it != mapI2pHashes.end(); it++) {
+        CDestinationStats stats;
+        std::map<int, CAddrInfo>::iterator it2 = mapInfo.find((*it).second);
+        if (it2 != mapInfo.end()) {
+            CAddrInfo* paddr = &(*it2).second;
+            stats.sAddress = paddr->ToString();
+            stats.fInTried = paddr->fInTried;
+            stats.uPort = paddr->GetPort();
+            stats.nServices = paddr->nServices;
+            stats.nAttempts = paddr->nAttempts;
+            stats.nLastTry = paddr->nLastTry;
+            stats.nSuccessTime = paddr->nLastSuccess;
+            stats.sSource = paddr->source.ToString();
+            stats.sBase64 = paddr->GetI2pDestination();
+            nSize++;
+            vStats.push_back( stats );
+        }
+    }
+    assert( mapI2pHashes.size() == static_cast<unsigned long>(nSize) );
+    return nSize;
+}
+
+#endif // I2PADDRMAN_EXTENSIONS
+
 CAddrInfo* CAddrMan::Create(const CAddress& addr, const CNetAddr& addrSource, int* pnId)
 {
     int nId = nIdCount++;
@@ -95,6 +169,16 @@ CAddrInfo* CAddrMan::Create(const CAddress& addr, const CNetAddr& addrSource, in
     vRandom.push_back(nId);
     if (pnId)
         *pnId = nId;
+#ifdef I2PADDRMAN_EXTENSIONS
+    if( addr.IsI2P() ) {
+        assert( addr.IsNativeI2P() );
+        uint256 b32hash = GetI2pDestinationHash( addr.GetI2pDestination() );
+        if( mapI2pHashes.count( b32hash ) == 0 )
+            mapI2pHashes[b32hash] = nId;
+        else
+            LogPrintf( "ERROR - Can't create base32 Hash in AddrMan for one that already exists\n");
+    }
+#endif
     return &mapInfo[nId];
 }
 
@@ -132,17 +216,44 @@ void CAddrMan::Delete(int nId)
     nNew--;
 }
 
+#ifdef I2PADDRMAN_EXTENSIONS
+void CAddrMan::CheckAndDeleteB32Hash( const int nID, const CAddrInfo& aTerrible )
+{
+    if( aTerrible.IsI2P() ) {
+        uint256 b32hash = GetI2pDestinationHash( aTerrible.GetI2pDestination() );
+        if( mapI2pHashes.count( b32hash ) == 1 ) {
+            int nID2 = mapI2pHashes[ b32hash ];
+            if( nID == nID2 )            // Yap this is the one they want to delete, and it exists
+                mapI2pHashes.erase( b32hash );
+            else {
+                LogPrint( "addrman", "While attempting to erase base32 hash %s, it was unexpected that the ids differ id1=%d != id2=%d\n", b32hash.GetHex(), nID, nID2 );
+                // CAddrInfo& info2 = mapInfo[nID2];
+                // aTerrible.print();
+                // info2.print();
+            }
+        }
+        else {
+            LogPrint( "addrman", "While attempting to remove base32 hash %s, it was found to not exist.\n", b32hash.GetHex() );
+            // aTerrible.print();
+        }
+    }
+}
+#endif // I2PADDRMAN_EXTENSIONS
+
 void CAddrMan::ClearNew(int nUBucket, int nUBucketPos)
 {
     // if there is an entry in the specified bucket, delete it.
     if (vvNew[nUBucket][nUBucketPos] != -1) {
-        int nIdDelete = vvNew[nUBucket][nUBucketPos];
-        CAddrInfo& infoDelete = mapInfo[nIdDelete];
-        assert(infoDelete.nRefCount > 0);
-        infoDelete.nRefCount--;
-        vvNew[nUBucket][nUBucketPos] = -1;
-        if (infoDelete.nRefCount == 0) {
-            Delete(nIdDelete);
+    int nIdDelete = vvNew[nUBucket][nUBucketPos];
+    CAddrInfo& infoDelete = mapInfo[nIdDelete];
+    assert(infoDelete.nRefCount > 0);
+    infoDelete.nRefCount--;
+    vvNew[nUBucket][nUBucketPos] = -1;
+    if (infoDelete.nRefCount == 0) {
+#ifdef I2PADDRMAN_EXTENSIONS
+    CheckAndDeleteB32Hash( nIdDelete, infoDelete);
+#endif
+    Delete(nIdDelete);
         }
     }
 }
@@ -244,10 +355,24 @@ void CAddrMan::Good_(const CService& addr, int64_t nTime)
     MakeTried(info, nId);
 }
 
-bool CAddrMan::Add_(const CAddress& addr, const CNetAddr& source, int64_t nTimePenalty)
+bool CAddrMan::Add_(const CAddress& addrIn, const CNetAddr& source, int64_t nTimePenalty)
 {
-    if (!addr.IsRoutable())
+#ifdef I2PADDRMAN_EXTENSIONS
+    //! We now need to check for an possibly modify the CAddress object for the garliccat field, so we make a local copy
+    CAddress addr = addrIn;
+    /**
+     * Before we can add an address, even before we can test if its Routable, or use the Find command to match correctly,
+     * we need to make sure that any I2P addresses have the GarlicCat field setup correctly in the IP area of the
+     * CNetAddr portion of a given CAddress->CService->CNetAddr object, this should have already been done, but
+     * double checking it here also insures we do not get a polluted b32 hash map
+     */
+    if( addr.CheckAndSetGarlicCat() )
+        LogPrint( "addrman", "While adding an i2p destination, did not expect to need the garliccat fixed for %s\n", addr.ToString() );
+#endif
+    if( !addr.IsRoutable() ) {
+        LogPrint( "addrman", "While adding an address, did not expect to find it unroutable: %s\n", addr.ToString() );
         return false;
+    }
 
     bool fNew = false;
     int nId;
@@ -448,7 +573,11 @@ int CAddrMan::Check_()
 }
 #endif
 
+#ifdef I2PADDRMAN_EXTENSIONS
+void CAddrMan::GetAddr_(std::vector<CAddress>& vAddr, const bool fIpOnly, const bool fI2pOnly)
+#else
 void CAddrMan::GetAddr_(std::vector<CAddress>& vAddr)
+#endif
 {
     unsigned int nNodes = ADDRMAN_GETADDR_MAX_PCT * vRandom.size() / 100;
     if (nNodes > ADDRMAN_GETADDR_MAX)
@@ -464,7 +593,21 @@ void CAddrMan::GetAddr_(std::vector<CAddress>& vAddr)
         assert(mapInfo.count(vRandom[n]) == 1);
 
         const CAddrInfo& ai = mapInfo[vRandom[n]];
-        if (!ai.IsTerrible())
+        //! Don't send terrible addresses in response to GetAddr requests
+//#ifdef I2PADDRMAN_EXTENSIONS
+        //! Additional checks, don't send addresses to nodes that cant process them or don't care about them.
+        //! Inclusion of a check for RFC1918() addresses, means any local whitelisted peers that have made
+        //! it into the address manager and are RFC1918 IPs will not be globally shared with peers on the
+        //! Anoncoin network, originally done for software testing, now seems like a good idea to leave it.
+        //! CSlave: There is a logical error in the following conditional string, (!fIpOnly || !ai.IsI2P())
+        //! always return false and false so the addresses were never shared to I2P peers. Probably the
+        //! fIpOnly check is flawed as it always return true even for I2P only peers. Furthermore I think
+        //! there is no harm to share both IP and I2P address to all peers, hence those conditions are removed.
+        //if( !ai.IsTerrible() && !ai.IsRFC1918() && (!fIpOnly || !ai.IsI2P()) && (!fI2pOnly || ai.IsI2P()) )
+        if (!ai.IsTerrible() && !ai.IsRFC1918() )
+//#else
+        //if(!ai.IsTerrible())
+//#endif
             vAddr.push_back(ai);
     }
 }
