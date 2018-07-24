@@ -136,6 +136,7 @@ bool fServer = false;
 string strMiscWarning;
 bool fLogTimestamps = false;
 bool fLogIPs = false;
+bool fLogI2Ps = false;
 volatile bool fReopenDebugLog = false;
 
 /** Init OpenSSL library multithreading support */
@@ -468,6 +469,18 @@ bool SoftSetBoolArg(const std::string& strArg, bool fValue)
         return SoftSetArg(strArg, std::string("1"));
     else
         return SoftSetArg(strArg, std::string("0"));
+}
+
+void HardSetArg(const std::string& strArg, const std::string& strValue)
+{
+    if( !SoftSetArg(strArg, strValue) )         // Returns true if the param was undefined and setting its value was possible
+        mapArgs[strArg] = strValue;             // The parameter already exists, just set its value in the map
+}
+
+void HardSetBoolArg(const std::string& strArg, bool fValue)
+{
+    if( !SoftSetBoolArg(strArg, fValue) )       // If it doesn't exist, create it with the correct value
+        mapArgs[strArg] = fValue ? "1" : "0";   // The parameter already exists, just set its value in the map
 }
 
 static std::string FormatException(std::exception* pex, const char* pszThread)

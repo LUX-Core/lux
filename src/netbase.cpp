@@ -109,7 +109,7 @@ bool static LookupIntern(const char* pszName, std::vector<CNetAddr>& vIP, unsign
         }
     }
 
-/*#ifdef HAVE_GETADDRINFO_A
+#ifdef HAVE_GETADDRINFO_A
     struct in_addr ipv4_addr;
 #ifdef HAVE_INET_PTON
     if (inet_pton(AF_INET, pszName, &ipv4_addr) > 0) {
@@ -129,7 +129,7 @@ bool static LookupIntern(const char* pszName, std::vector<CNetAddr>& vIP, unsign
         return true;
     }
 #endif
-#endif*/
+#endif
 
     struct addrinfo aiHint;
     memset(&aiHint, 0, sizeof(struct addrinfo));
@@ -142,8 +142,8 @@ bool static LookupIntern(const char* pszName, std::vector<CNetAddr>& vIP, unsign
     aiHint.ai_flags = fAllowLookup ? AI_ADDRCONFIG : AI_NUMERICHOST;
 #endif
 
-    struct addrinfo* aiRes = NULL;
-/*#ifdef HAVE_GETADDRINFO_A
+    struct addrinfo *aiRes = NULL;
+#ifdef HAVE_GETADDRINFO_A
     struct gaicb gcb, *query = &gcb;
     memset(query, 0, sizeof(struct gaicb));
     gcb.ar_name = pszName;
@@ -165,9 +165,9 @@ bool static LookupIntern(const char* pszName, std::vector<CNetAddr>& vIP, unsign
         if (0 == nErr)
             aiRes = query->ar_result;
     } while (nErr == EAI_INPROGRESS);
-#else*/
+#else
     int nErr = getaddrinfo(pszName, NULL, &aiHint, &aiRes);
-//#endif
+#endif
     if (nErr)
         return false;
 

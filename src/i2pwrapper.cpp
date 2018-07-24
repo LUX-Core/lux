@@ -362,7 +362,7 @@ std::string GenerateI2pDestinationMessage( const std::string& pub, const std::st
 
 	msg += _("\nYour personal b32.i2p Destination:\n");
 	msg += b32;
-	msg += _("\n\n** Anoncoin peers now have built-in name resolution, once your on I2P for a few hours,\n");
+	msg += _("\n\n** Luxcore peers now have built-in name resolution, once your on I2P for a few hours,\n");
 	msg += _("   most peers will likely be able to find you by this Base32 hash of the Public Key.\n");
 	msg += _("   Standard I2P network Routers are not as likely to find your destination with it.\n");
 	// msg += "\n\n";
