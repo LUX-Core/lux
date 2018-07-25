@@ -44,6 +44,7 @@ public:
         parallelMasterNode, // bool
         ThreadsScriptVerif,  // int
         DatabaseCache,       // int
+        LogFileCount,       // int
         LogEvents,           // bool
         ZeroBalanceAddressToken,// bool
         SpendZeroConfChange, // bool

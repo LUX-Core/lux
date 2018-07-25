@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>576</width>
-    <height>419</height>
+    <height>441</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,7 +20,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tabMain">
       <attribute name="title">
@@ -111,6 +111,37 @@
          </item>
          <item>
           <spacer name="horizontalSpacer_3_Main">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_5_Main">
+         <item>
+          <widget class="QLabel" name="logFileCountLabel">
+           <property name="text">
+            <string>Number of debug log files</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QSpinBox" name="logFileCount">
+           <property name="minimum">
+            <number>1</number>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_5_Main">
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
            </property>
@@ -272,13 +303,13 @@
             </property>
            </widget>
           </item>
-           <item>
-            <widget class="QCheckBox" name="zeroBalanceAddressToken">
-             <property name="text">
-              <string>Enable &amp;zero balance for receiver token address</string>
-             </property>
-            </widget>
-           </item>
+          <item>
+           <widget class="QCheckBox" name="zeroBalanceAddressToken">
+            <property name="text">
+             <string>Enable &amp;zero balance for receiver token address</string>
+            </property>
+           </widget>
+          </item>
           <item>
            <widget class="QCheckBox" name="parallelMasterNode1">
             <property name="toolTip">
@@ -289,13 +320,13 @@
             </property>
            </widget>
           </item>
-             <item>
-                 <widget class="QCheckBox" name="notUseChangeAddress">
-                     <property name="text">
-                         <string>Don't use change &amp;address</string>
-                     </property>
-                 </widget>
-             </item>
+          <item>
+           <widget class="QCheckBox" name="notUseChangeAddress">
+            <property name="text">
+             <string>Don't use change &amp;address</string>
+            </property>
+           </widget>
+          </item>
          </layout>
         </widget>
        </item>
