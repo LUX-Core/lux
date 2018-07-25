@@ -2686,6 +2686,52 @@ void CWallet::AvailableCoins(std::vector<COutput> &vCoins, bool fOnlySafe, const
     }
 }
 
+std::map<CTxDestination, std::vector<COutput>> CWallet::ListCoins() const
+{
+    // TODO: Add AssertLockHeld(cs_wallet) here.
+    //
+    // Because the return value from this function contains pointers to
+    // CWalletTx objects, callers to this function really should acquire the
+    // cs_wallet lock before calling it. However, the current caller doesn't
+    // acquire this lock yet. There was an attempt to add the missing lock in
+    // https://github.com/bitcoin/bitcoin/pull/10340, but that change has been
+    // postponed until after https://github.com/bitcoin/bitcoin/pull/10244 to
+    // avoid adding some extra complexity to the Qt code.
+
+    std::map<CTxDestination, std::vector<COutput>> result;
+
+    std::vector<COutput> availableCoins;
+    AvailableCoins(availableCoins);
+
+    LOCK2(cs_main, cs_wallet);
+    for (auto& coin : availableCoins) {
+        CTxDestination address;
+        if (coin.fSpendable &&
+            ExtractDestination(FindNonChangeParentOutput(*coin.tx->tx, coin.i).scriptPubKey, address)) {
+            result[address].emplace_back(std::move(coin));
+        }
+    }
+
+    std::vector<COutPoint> lockedCoins;
+    ListLockedCoins(lockedCoins);
+    for (const auto& output : lockedCoins) {
+        auto it = mapWallet.find(output.hash);
+        if (it != mapWallet.end()) {
+            int depth = it->second.GetDepthInMainChain();
+            if (depth >= 0 && output.n < it->second.tx->vout.size() &&
+                IsMine(it->second.tx->vout[output.n]) == ISMINE_SPENDABLE) {
+                CTxDestination address;
+                if (ExtractDestination(FindNonChangeParentOutput(*it->second.tx, output.n).scriptPubKey, address)) {
+                    result[address].emplace_back(
+                        &it->second, output.n, depth, true /* spendable */, true /* solvable */, false /* safe */);
+                }
+            }
+        }
+    }
+
+    return result;
+}
+
 void CWallet::AvailableCoinsMN(vector<COutput>& vCoins, bool fOnlyConfirmed, const CCoinControl *coinControl, AvailableCoinsType coin_type, bool useIX) const
 {
     vCoins.clear();
@@ -2859,8 +2905,8 @@ bool CWallet::MintableCoins()
     return false;
 }
 
-//TODO
-bool CWallet::SelectCoinsMinConf(const std::string &account, const CAmount& nTargetValue, int nConfMine, int nConfTheirs, vector<COutput> vCoins, set<pair<const CWalletTx*, unsigned int> >& setCoinsRet, CAmount& nValueRet) const
+bool CWallet::SelectCoinsMinConf(const CAmount& nTargetValue, const int nConfMine, const int nConfTheirs, const uint64_t nMaxAncestors, std::vector<COutput> vCoins,
+                                 std::set<CInputCoin>& setCoinsRet, CAmount& nValueRet) const
 {
     setCoinsRet.clear();
     nValueRet = 0;
@@ -3444,8 +3490,8 @@ OutputType CWallet::TransactionChangeType(OutputType change_type, const std::vec
     return g_address_type;
 }
 
-//TODO
-bool CWallet::CreateTransaction(const vector<pair<CScript, CAmount> >& vecSend, CWalletTx& wtxNew, CReserveKey& reservekey, CAmount& nFeeRet, std::string& strFailReason, const CCoinControl* coinControl, AvailableCoinsType coin_type, bool useIX, CAmount nFeePay, CAmount nGasFee)
+bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CWalletTx& wtxNew, CReserveKey& reservekey, CAmount& nFeeRet,
+                                int& nChangePosInOut, std::string& strFailReason, const CCoinControl& coin_control, bool sign, AvailableCoinsType coin_type, bool useIX, CAmount nFeePay, CAmount nGasFee)
 {
 #   if defined(DEBUG_DUMP_STAKING_INFO) && defined(DEBUG_DUMP_CreateTransaction_1)
     DEBUG_DUMP_CreateTransaction_1();
@@ -3454,16 +3500,23 @@ bool CWallet::CreateTransaction(const vector<pair<CScript, CAmount> >& vecSend, 
     if (useIX && nFeePay < CENT) nFeePay = CENT;
 
     CAmount nValue = 0;
-
-    BOOST_FOREACH (const PAIRTYPE(CScript, CAmount) & s, vecSend) {
-        if (nValue < 0 || s.second < 0) {
-            strFailReason = _("Transaction amounts must be positive");
+    int nChangePosRequest = nChangePosInOut;
+    unsigned int nSubtractFeeFromAmount = 0;
+    for (const auto& recipient : vecSend)
+    {
+        if (nValue < 0 || recipient.nAmount < 0)
+        {
+            strFailReason = _("Transaction amounts must not be negative");
             return false;
         }
-        nValue += s.second;
+        nValue += recipient.nAmount;
+
+        if (recipient.fSubtractFeeFromAmount)
+            nSubtractFeeFromAmount++;
     }
-    if (vecSend.empty() || nValue < 0) {
-        strFailReason = _("Transaction amounts must be positive");
+    if (vecSend.empty())
+    {
+        strFailReason = _("Transaction must have at least one recipient");
         return false;
     }
 
@@ -3642,7 +3695,7 @@ bool CWallet::CreateTransaction(const vector<pair<CScript, CAmount> >& vecSend, 
                             return false;
                         }
 
-                        const OutputType change_type = TransactionChangeType(vecSend);
+                        const OutputType change_type = TransactionChangeType(coin_control.change_type, vecSend);
 
                         LearnRelatedScripts(vchPubKey, change_type);
                         scriptChange = GetScriptForDestination(GetDestinationForKey(vchPubKey, change_type));
@@ -5351,8 +5404,9 @@ void CMerkleTx::SetMerkleBranch(const CBlockIndex* pindex, int posInBlock) {
 
 int CMerkleTx::GetDepthInMainChainINTERNAL(const CBlockIndex*& pindexRet) const
 {
-    if (hashBlock == 0 || nIndex == -1)
+    if (hashUnset())
         return 0;
+
     AssertLockHeld(cs_main);
 
     // Find the block it claims to be in
@@ -5368,7 +5422,7 @@ int CMerkleTx::GetDepthInMainChainINTERNAL(const CBlockIndex*& pindexRet) const
     }
 
     pindexRet = pindex;
-    return chainActive.Height() - pindex->nHeight + 1;
+    return ((nIndex == -1) ? (-1) : 1) * (chainActive.Height() - pindex->nHeight + 1);
 }
 
 int CMerkleTx::GetDepthInMainChain(const CBlockIndex*& pindexRet, bool enableIX) const
@@ -5394,9 +5448,8 @@ int CMerkleTx::GetBlocksToMaturity() const
 {
     if (!(IsCoinBase() || IsCoinStake()))
         return 0;
-    return max(0, (Params().COINBASE_MATURITY() + 1) - GetDepthInMainChain());
+    return std::max(0, (Params().COINBASE_MATURITY()+1) - GetDepthInMainChain());
 }
-
 
 bool CMerkleTx::AcceptToMemoryPool(bool fLimitFree, bool fRejectInsaneFee, bool ignoreFees)
 {
@@ -5417,6 +5470,24 @@ int CMerkleTx::GetTransactionLockSignatures() const
     }
 
     return -1;
+}
+
+bool CWalletTx::AcceptToMemoryPool(const CAmount& nAbsurdFee, CValidationState& state)
+{
+    // Quick check to avoid re-setting fInMempool to false
+    if (mempool.exists(tx->GetHash())) {
+        return false;
+    }
+
+    // We must set fInMempool here - while it will be re-set to true by the
+    // entered-mempool callback, if we did not there would be a race where a
+    // user could call sendmoney in a loop and hit spurious out of funds errors
+    // because we think that the transaction they just generated's change is
+    // unavailable as we're not yet aware its in mempool.
+    bool ret = ::AcceptToMemoryPool(mempool, state, tx, nullptr /* pfMissingInputs */,
+                                nullptr /* plTxnReplaced */, false /* bypass_limits */, nAbsurdFee);
+    fInMempool = ret;
+    return ret;
 }
 
 bool CMerkleTx::IsTransactionLockTimedOut() const

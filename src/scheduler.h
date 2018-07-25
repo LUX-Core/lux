@@ -1,4 +1,4 @@
-// Copyright (c) 2015 The Bitcoin Core developers
+// Copyright (c) 2015-2017 The Bitcoin Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -10,7 +10,6 @@
 // boost::thread / boost::chrono should be ported to std::thread / std::chrono
 // when we support C++11.
 //
-#include <boost/function.hpp>
 #include <boost/chrono/chrono.hpp>
 #include <boost/thread.hpp>
 #include <map>
@@ -25,7 +24,7 @@
 //
 // CScheduler* s = new CScheduler();
 // s->scheduleFromNow(doSomething, 11); // Assuming a: void doSomething() { }
-// s->scheduleFromNow(boost::bind(Class::func, this, argument), 3);
+// s->scheduleFromNow(std::bind(Class::func, this, argument), 3);
 // boost::thread* t = new boost::thread(boost::bind(CScheduler::serviceQueue, s));
 //
 // ... then at program shutdown, clean up the thread running serviceQueue:
@@ -41,10 +40,10 @@ public:
     CScheduler();
     ~CScheduler();
 
-    typedef boost::function<void(void)> Function;
+    typedef std::function<void(void)> Function;
 
     // Call func at/after time t
-    void scheduler(Function f, boost::chrono::system_clock::time_point t=boost::chrono::system_clock::now());
+    void schedule(Function f, boost::chrono::system_clock::time_point t=boost::chrono::system_clock::now());
 
     // Convenience method: call f once deltaSeconds from now
     void scheduleFromNow(Function f, int64_t deltaMilliSeconds);
@@ -72,6 +71,9 @@ public:
     size_t getQueueInfo(boost::chrono::system_clock::time_point &first,
                         boost::chrono::system_clock::time_point &last) const;
 
+    // Returns true if there are threads actively running in serviceQueue()
+    bool AreThreadsServicingQueue() const;
+
 private:
     std::multimap<boost::chrono::system_clock::time_point, Function> taskQueue;
     boost::condition_variable newTaskScheduled;
@@ -79,7 +81,35 @@ private:
     int nThreadsServicingQueue;
     bool stopRequested;
     bool stopWhenEmpty;
-    bool shouldStop() { return stopRequested || (stopWhenEmpty && taskQueue.empty()); }
+    bool shouldStop() const { return stopRequested || (stopWhenEmpty && taskQueue.empty()); }
+};
+
+/**
+ * Class used by CScheduler clients which may schedule multiple jobs
+ * which are required to be run serially. Does not require such jobs
+ * to be executed on the same thread, but no two jobs will be executed
+ * at the same time.
+ */
+class SingleThreadedSchedulerClient {
+private:
+    CScheduler *m_pscheduler;
+
+    CCriticalSection m_cs_callbacks_pending;
+    std::list<std::function<void (void)>> m_callbacks_pending;
+    bool m_are_callbacks_running = false;
+
+    void MaybeScheduleProcessQueue();
+    void ProcessQueue();
+
+public:
+    explicit SingleThreadedSchedulerClient(CScheduler *pschedulerIn) : m_pscheduler(pschedulerIn) {}
+    void AddToProcessQueue(std::function<void (void)> func);
+
+    // Processes all remaining queue members on the calling thread, blocking until queue is empty
+    // Must be called after the CScheduler has no remaining processing threads!
+    void EmptyQueue();
+
+    size_t CallbacksPending();
 };
 
 #endif

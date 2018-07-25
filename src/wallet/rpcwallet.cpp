@@ -39,9 +39,6 @@
 
 static const std::string WALLET_ENDPOINT_BASE = "/wallet/";
 
-int64_t nWalletUnlockTime;
-static CCriticalSection cs_nWalletUnlockTime;
-
 CWallet *GetWalletForJSONRPCRequest(const JSONRPCRequest& request)
 {
     if (request.URI.substr(0, WALLET_ENDPOINT_BASE.size()) == WALLET_ENDPOINT_BASE) {
@@ -755,7 +752,7 @@ UniValue getreceivedbyaddress(const JSONRPCRequest& request)
 
         for (const CTxOut& txout : wtx.tx->vout)
             if (txout.scriptPubKey == scriptPubKey)
-                if (wtx.GetDepthInMainChain() >= nMinDepth)
+                if (wtx.GetDepthInMainChain(false) >= nMinDepth)
                     nAmount += txout.nValue;
     }
 
@@ -818,7 +815,7 @@ UniValue getreceivedbyaccount(const JSONRPCRequest& request)
         {
             CTxDestination address;
             if (ExtractDestination(txout.scriptPubKey, address) && IsMine(*pwallet, address) && setAddress.count(address)) {
-                if (wtx.GetDepthInMainChain() >= nMinDepth)
+                if (wtx.GetDepthInMainChain(false) >= nMinDepth)
                     nAmount += txout.nValue;
             }
         }
@@ -993,14 +990,14 @@ UniValue sendfrom(const JSONRPCRequest& request)
     if (request.fHelp || request.params.size() < 3 || request.params.size() > 6)
         throw std::runtime_error(
             "sendfrom \"fromaccount\" \"toaddress\" amount ( minconf \"comment\" \"comment_to\" )\n"
-            "\nDEPRECATED (use sendtoaddress). Sent an amount from an account to a bitcoin address."
+            "\nDEPRECATED (use sendtoaddress). Sent an amount from an account to a lux address."
             + HelpRequiringPassphrase(pwallet) + "\n"
             "\nArguments:\n"
             "1. \"fromaccount\"       (string, required) The name of the account to send funds from. May be the default account using \"\".\n"
             "                       Specifying an account does not influence coin selection, but it does associate the newly created\n"
             "                       transaction with the account, so the account's balance computation and transaction history can reflect\n"
             "                       the spend.\n"
-            "2. \"toaddress\"         (string, required) The bitcoin address to send funds to.\n"
+            "2. \"toaddress\"         (string, required) The lux address to send funds to.\n"
             "3. amount                (numeric or string, required) The amount in " + CURRENCY_UNIT + " (transaction fee is added on top).\n"
             "4. minconf               (numeric, optional, default=1) Only use funds with at least this many confirmations.\n"
             "5. \"comment\"           (string, optional) A comment used to store what the transaction is for. \n"
@@ -1076,7 +1073,7 @@ UniValue sendmany(const JSONRPCRequest& request)
             "1. \"fromaccount\"         (string, required) DEPRECATED. The account to send the funds from. Should be \"\" for the default account\n"
             "2. \"amounts\"             (string, required) A json object with addresses and amounts\n"
             "    {\n"
-            "      \"address\":amount   (numeric or string) The bitcoin address is the key, the numeric amount (can be string) in " + CURRENCY_UNIT + " is the value\n"
+            "      \"address\":amount   (numeric or string) The lux address is the key, the numeric amount (can be string) in " + CURRENCY_UNIT + " is the value\n"
             "      ,...\n"
             "    }\n"
             "3. minconf                 (numeric, optional, default=1) Only use the balance confirmed at least this many times.\n"
@@ -1240,7 +1237,7 @@ UniValue addmultisigaddress(const JSONRPCRequest& request)
             "}\n"
             "\nResult (DEPRECATED. To see this result in v0.16 instead, please start bitcoind with -deprecatedrpc=addmultisigaddress).\n"
             "        clients should transition to the new output api before upgrading to v0.17.\n"
-            "\"address\"                         (string) A bitcoin address associated with the keys.\n"
+            "\"address\"                         (string) A lux address associated with the keys.\n"
 
             "\nExamples:\n"
             "\nAdd a multisig address from 2 addresses\n"
@@ -1466,7 +1463,7 @@ UniValue ListReceived(CWallet * const pwallet, const UniValue& params, bool fByA
         if (wtx.IsCoinBase() || !CheckFinalTx(*wtx.tx))
             continue;
 
-        int nDepth = wtx.GetDepthInMainChain();
+        int nDepth = wtx.GetDepthInMainChain(true);
         int nBCDepth = wtx.GetDepthInMainChain(false);
         if (nDepth < nMinDepth)
             continue;
@@ -1722,7 +1719,7 @@ void ListTransactions(CWallet* const pwallet, const CWalletTx& wtx, const std::s
     }
 
     // Received
-    if (listReceived.size() > 0 && wtx.GetDepthInMainChain() >= nMinDepth)
+    if (listReceived.size() > 0 && wtx.GetDepthInMainChain(false) >= nMinDepth)
     {
         bool stop = false;
         for (const COutputEntry& r : listReceived)
@@ -1741,7 +1738,7 @@ void ListTransactions(CWallet* const pwallet, const CWalletTx& wtx, const std::s
                 MaybePushAddress(entry, r.destination);
                 if (wtx.IsCoinBase() || wtx.IsCoinStake())
                 {
-                    if (wtx.GetDepthInMainChain() < 1)
+                    if (wtx.GetDepthInMainChain(false) < 1)
                         entry.push_back(Pair("category", "orphan"));
                     else if (wtx.GetBlocksToMaturity() > 0)
                         entry.push_back(Pair("category", "immature"));
@@ -1984,7 +1981,7 @@ UniValue listaccounts(const JSONRPCRequest& request)
         std::string strSentAccount;
         std::list<COutputEntry> listReceived;
         std::list<COutputEntry> listSent;
-        int nDepth = wtx.GetDepthInMainChain();
+        int nDepth = wtx.GetDepthInMainChain(false);
         if (wtx.GetBlocksToMaturity() > 0 || nDepth < 0)
             continue;
         wtx.GetAmounts(listReceived, listSent, nFee, strSentAccount, includeWatchonly);
@@ -2971,9 +2968,9 @@ UniValue listunspent(const JSONRPCRequest& request)
             "\nArguments:\n"
             "1. minconf          (numeric, optional, default=1) The minimum confirmations to filter\n"
             "2. maxconf          (numeric, optional, default=9999999) The maximum confirmations to filter\n"
-            "3. \"addresses\"      (string) A json array of bitcoin addresses to filter\n"
+            "3. \"addresses\"      (string) A json array of lux addresses to filter\n"
             "    [\n"
-            "      \"address\"     (string) bitcoin address\n"
+            "      \"address\"     (string) lux address\n"
             "      ,...\n"
             "    ]\n"
             "4. include_unsafe (bool, optional, default=true) Include outputs that are not safe to spend\n"
@@ -2990,7 +2987,7 @@ UniValue listunspent(const JSONRPCRequest& request)
             "  {\n"
             "    \"txid\" : \"txid\",          (string) the transaction id \n"
             "    \"vout\" : n,               (numeric) the vout value\n"
-            "    \"address\" : \"address\",    (string) the bitcoin address\n"
+            "    \"address\" : \"address\",    (string) the lux address\n"
             "    \"account\" : \"account\",    (string) DEPRECATED. The associated account, or \"\" for the default account\n"
             "    \"scriptPubKey\" : \"key\",   (string) the script key\n"
             "    \"amount\" : x.xxx,         (numeric) the transaction output amount in " + CURRENCY_UNIT + "\n"
@@ -3143,7 +3140,7 @@ UniValue fundrawtransaction(const JSONRPCRequest& request)
                             "1. \"hexstring\"           (string, required) The hex string of the raw transaction\n"
                             "2. options                 (object, optional)\n"
                             "   {\n"
-                            "     \"changeAddress\"          (string, optional, default pool address) The bitcoin address to receive the change\n"
+                            "     \"changeAddress\"          (string, optional, default pool address) The lux address to receive the change\n"
                             "     \"changePosition\"         (numeric, optional, default random) The index of the change output\n"
                             "     \"change_type\"            (string, optional) The output type to use. Only valid if changeAddress is not specified. Options are \"legacy\", \"p2sh-segwit\", and \"bech32\". Default is set by -changetype.\n"
                             "     \"includeWatching\"        (boolean, optional, default false) Also select inputs which are watch only\n"
@@ -3227,7 +3224,7 @@ UniValue fundrawtransaction(const JSONRPCRequest& request)
             CTxDestination dest = DecodeDestination(options["changeAddress"].get_str());
 
             if (!IsValidDestination(dest)) {
-                throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "changeAddress must be a valid bitcoin address");
+                throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "changeAddress must be a valid lux address");
             }
 
             coinControl.destChange = dest;
