@@ -20,6 +20,7 @@ private:
 
 private Q_SLOTS:
     void addressChanged(const QString& address);
+    void copyButtonClicked();
 };
 
 #endif // HEXADDRESSCONVERTER_H

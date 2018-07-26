@@ -5,7 +5,7 @@
 #include "utilstrencodings.h"
 
 #include <iostream>
-#include <QRegularExpressionValidator>
+#include <QClipboard>
 
 #define paternAddress "^[a-fA-F0-9]{40,40}$"
 
@@ -14,7 +14,10 @@ HexAddressConverter::HexAddressConverter(QWidget *parent) :
     ui(new Ui::HexAddressConverter) {
     ui->setupUi(this);
 
+    ui->copyButton->setIcon(QIcon(":/icons/editcopy"));
+
     connect(ui->addressEdit, SIGNAL(textChanged(const QString&)), this, SLOT(addressChanged(const QString&)));
+    connect(ui->copyButton, SIGNAL(clicked()), this, SLOT(copyButtonClicked()));
 }
 
 HexAddressConverter::~HexAddressConverter() {
@@ -58,6 +61,12 @@ void HexAddressConverter::addressChanged(const QString& address) {
     if(!isAddressValid) ui->resultLabel->setText("");
 
     ui->addressEdit->setValid(isAddressValid);
+}
+
+void HexAddressConverter::copyButtonClicked() {
+    if (QClipboard * clipboard = QApplication::clipboard()) {
+        clipboard->setText(ui->resultLabel->text());
+    }
 }
 
 
