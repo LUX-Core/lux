@@ -1977,12 +1977,11 @@ bool CDarkSendSigner::IsVinAssociatedWithPubkey(CTxIn& vin, CPubKey& pubkey) {
 
     CTransaction txVin;
     uint256 hash;
-    //if(GetTransaction(vin.prevout.hash, txVin, hash, true)){
     if (GetTransaction(vin.prevout.hash, txVin, Params().GetConsensus(), hash)) {
-        BOOST_FOREACH(CTxOut out, txVin.vout) {
-            if (out.nValue == GetMNCollateral(chainActive.Height()) * COIN) {
-                if (out.scriptPubKey == payee2) return true;
-            }
+        CTxOut out = txVin.vout[vin.prevout.n];
+        if ((out.nValue == GetMNCollateral(chainActive.Height()) * COIN)
+            && (out.scriptPubKey == payee2)) {
+            return true;
         }
     }
 
