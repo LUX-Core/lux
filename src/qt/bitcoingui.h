@@ -19,7 +19,7 @@
 #include <QPushButton>
 #include <QSystemTrayIcon>
 
-#if HAVE_INSTALLER
+#ifdef ENABLE_UPDATER
 #include "lux-installer/src/updatecontroller.h"
 #endif
 
@@ -89,7 +89,7 @@ private:
     ClientModel* clientModel;
     WalletFrame* walletFrame;
 
-#if HAVE_INSTALLER
+#ifdef ENABLE_UPDATER
     QtLuxUpdater::UpdateController *controller;
 #endif
 

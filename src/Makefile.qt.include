@@ -60,7 +60,7 @@ QT_FORMS_UI = \
   qt/forms/transactiondescdialog.ui \
   qt/forms/hexaddressconverter.ui
 
-if HAVE_INSTALLER
+if ENABLE_UPDATER
  QT_FORMS_UI += lux-installer/src/forms/updateinfodialog.ui \
                 lux-installer/src/forms/progressdialog.ui 
 endif
@@ -152,7 +152,7 @@ QT_MOC_CPP = \
   qt/moc_walletview.cpp \
   qt/moc_hexaddressconverter.cpp
 
-if HAVE_INSTALLER
+if ENABLE_UPDATER
   QT_MOC_CPP += lux-installer/src/luxupdater/moc_luxupdater.cpp \
                 lux-installer/src/luxupdater/moc_simplescheduler_p.cpp \
                 lux-installer/src/luxupdater/moc_atomfeeder.cpp \
@@ -283,7 +283,7 @@ BITCOIN_QT_H = \
   qt/qcustomplot.h \
   qt/hexaddressconverter.h
 
-if HAVE_INSTALLER
+if ENABLE_UPDATER
   BITCOIN_QT_H += lux-installer/src/luxupdater/luxupdater.h \
                   lux-installer/src/luxupdater/simplescheduler_p.h \
                   lux-installer/src/luxupdater/atomfeeder.h \
@@ -463,18 +463,17 @@ BITCOIN_QT_CPP += \
   qt/walletmodeltransaction.cpp \
   qt/walletview.cpp
 
-if HAVE_INSTALLER
-  BITCOIN_QT_CPP += \
-  lux-installer/src/luxupdater/simplescheduler.cpp \
-  lux-installer/src/luxupdater/luxupdater_p.cpp \
-  lux-installer/src/luxupdater/luxupdater.cpp \
-  lux-installer/src/luxupdater/atomfeeder.cpp \
-  lux-installer/src/luxupdater/downloadmanager.cpp \
-  lux-installer/src/dialogmaster.cpp \
-  lux-installer/src/adminauthorization_x11.cpp \
-  lux-installer/src/progressdialog.cpp \
-  lux-installer/src/updatecontroller.cpp \
-  lux-installer/src/updateinfodialog.cpp
+if ENABLE_UPDATER
+  BITCOIN_QT_CPP += lux-installer/src/luxupdater/simplescheduler.cpp \
+                    lux-installer/src/luxupdater/luxupdater_p.cpp \
+                    lux-installer/src/luxupdater/luxupdater.cpp \
+                    lux-installer/src/luxupdater/atomfeeder.cpp \
+                    lux-installer/src/luxupdater/downloadmanager.cpp \
+                    lux-installer/src/dialogmaster.cpp \
+                    lux-installer/src/adminauthorization_x11.cpp \
+                    lux-installer/src/progressdialog.cpp \
+                    lux-installer/src/updatecontroller.cpp \
+                    lux-installer/src/updateinfodialog.cpp
 endif
 
 endif
