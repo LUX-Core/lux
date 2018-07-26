@@ -12,7 +12,7 @@
 #include "masternode.h"
 #include "instantx.h"
 #include "ui_interface.h"
-#include "wallet.h"
+#include "wallet/wallet.h"
 //#include "random.h"
 
 #include <openssl/rand.h>

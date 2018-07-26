@@ -1,23 +1,16 @@
 // Copyright (c) 2010 Satoshi Nakamoto
-// Copyright (c) 2009-2014 The Bitcoin developers
+// Copyright (c) 2009-2017 The Bitcoin Core developers
 // Copyright (c) 2014-2015 The Dash developers
 // Copyright (c) 2015-2017 The LUX developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "rpcclient.h"
-
-#include "rpcprotocol.h"
-#include "ui_interface.h"
-#include "util.h"
+#include <rpc/client.h>
+#include <rpc/protocol.h>
+#include <util.h>
 
 #include <set>
 #include <stdint.h>
-
-#include <boost/algorithm/string/case_conv.hpp> // for to_lower()
-#include "univalue/univalue.h"
-
-using namespace std;
 
 class CRPCConvertParam
 {
@@ -26,7 +19,13 @@ public:
     int paramIdx;           //!< 0-based idx of param to convert
     std::string paramName;  //!< parameter name
 };
-// ***TODO***
+
+/**
+ * Specify a (method, idx, name) here if the argument is a non-string RPC
+ * argument and needs to be converted from JSON.
+ *
+ * @note Parameter indexes start from 0.
+ */
 static const CRPCConvertParam vRPCConvertParams[] =
 {
     { "setmocktime", 0, "timestamp" },
@@ -38,6 +37,8 @@ static const CRPCConvertParam vRPCConvertParams[] =
     { "getnetworkhashps", 1, "height" },
     { "sendtoaddress", 1, "amount" },
     { "sendtoaddress", 4, "subtractfeefromamount" },
+    { "sendtoaddress", 5 , "replaceable" },
+    { "sendtoaddress", 6 , "conf_target" },
     { "settxfee", 0, "amount" },
     { "getsubsidy", 0, "height" },
     { "getreceivedbyaddress", 1, "minconf" },
@@ -69,9 +70,12 @@ static const CRPCConvertParam vRPCConvertParams[] =
     { "getblocktemplate", 0, "template_request" },
     { "listsinceblock", 1, "target_confirmations" },
     { "listsinceblock", 2, "include_watchonly" },
+    { "listsinceblock", 3, "include_removed" },
     { "sendmany", 1, "amounts" },
     { "sendmany", 2, "minconf" },
     { "sendmany", 4, "subtractfeefrom" },
+    { "sendmany", 5 , "replaceable" },
+    { "sendmany", 6 , "conf_target" },
     { "sendmanywithdupes", 1, "amounts" },
     { "sendmanywithdupes", 2, "minconf" },
     { "sendmanywithdupes", 4, "subtractfeefrom" },
@@ -97,17 +101,25 @@ static const CRPCConvertParam vRPCConvertParams[] =
     { "listunspent", 0, "minconf" },
     { "listunspent", 1, "maxconf" },
     { "listunspent", 2, "addresses" },
+    { "listunspent", 3, "include_unsafe" },
+    { "listunspent", 4, "query_options" },
+    { "getblock", 1, "verbosity" },
     { "getblock", 1, "verbose" },
     { "getblockheader", 1, "verbose" },
+    { "getchaintxstats", 0, "nblocks" },
     { "gettransaction", 1, "include_watchonly" },
     { "getrawtransaction", 1, "verbose" },
-    { "createrawtransaction", 0, "transactions" },
+    { "createrawtransaction", 0, "inputs" },
     { "createrawtransaction", 1, "outputs" },
     { "createrawtransaction", 2, "locktime" },
+    { "createrawtransaction", 3, "replaceable" },
+    { "decoderawtransaction", 1, "iswitness" },
     { "signrawtransaction", 1, "prevtxs" },
     { "signrawtransaction", 2, "privkeys" },
     { "sendrawtransaction", 1, "allowhighfees" },
+    { "combinerawtransaction", 0, "txs" },
     { "fundrawtransaction", 1, "options" },
+    { "fundrawtransaction", 2, "iswitness" },
     { "gettxout", 1, "n" },
     { "gettxout", 2, "include_mempool" },
     { "gettxoutproof", 0, "txids" },
@@ -125,10 +137,10 @@ static const CRPCConvertParam vRPCConvertParams[] =
     { "keypoolrefill", 0, "newsize" },
     { "getrawmempool", 0, "verbose" },
     { "estimatefee", 0, "nblocks" },
-    { "estimatepriority", 0, "nblocks" },
-    { "estimatesmartfee", 0, "nblocks" },
-    { "estimatesmartpriority", 0, "nblocks" },
-    { "prioritisetransaction", 1, "priority_delta" },
+    { "estimatesmartfee", 0, "conf_target" },
+    { "estimaterawfee", 0, "conf_target" },
+    { "estimaterawfee", 1, "threshold" },
+    { "prioritisetransaction", 1, "dummy" },
     { "prioritisetransaction", 2, "fee_delta" },
     { "setban", 2, "bantime" },
     { "setban", 3, "absolute" },
@@ -136,6 +148,10 @@ static const CRPCConvertParam vRPCConvertParams[] =
     { "getmempoolancestors", 1, "verbose" },
     { "getmempooldescendants", 1, "verbose" },
     { "bumpfee", 1, "options" },
+    { "logging", 0, "include" },
+    { "logging", 1, "exclude" },
+    { "disconnectnode", 1, "nodeid" },
+    { "addwitnessaddress", 1, "p2sh" },
     { "createcontract", 1, "gasLimit" },
     { "createcontract", 2, "gasPrice" },
     { "createcontract", 4, "broadcast" },
@@ -162,6 +178,8 @@ static const CRPCConvertParam vRPCConvertParams[] =
     { "echojson", 7, "arg7" },
     { "echojson", 8, "arg8" },
     { "echojson", 9, "arg9" },
+    { "rescanblockchain", 0, "start_height"},
+    { "rescanblockchain", 1, "stop_height"},
 };
 
 class CRPCConvertTable
@@ -196,8 +214,6 @@ CRPCConvertTable::CRPCConvertTable()
 
 static CRPCConvertTable rpcCvtTable;
 
-
-
 /** Non-RFC4627 JSON parser, accepts internal values (such as numbers, true, false, null)
  * as well as objects and arrays.
  */
@@ -206,7 +222,7 @@ UniValue ParseNonRFCJSONValue(const std::string& strVal)
     UniValue jVal;
     if (!jVal.read(std::string("[")+strVal+std::string("]")) ||
         !jVal.isArray() || jVal.size()!=1)
-        throw runtime_error(string("Error parsing JSON:")+strVal);
+        throw std::runtime_error(std::string("Error parsing JSON:")+strVal);
     return jVal[0];
 }
 
@@ -217,8 +233,8 @@ UniValue RPCConvertValues(const std::string &strMethod, const std::vector<std::s
     for (unsigned int idx = 0; idx < strParams.size(); idx++) {
         const std::string& strVal = strParams[idx];
 
-        // insert string value directly
         if (!rpcCvtTable.convert(strMethod, idx)) {
+            // insert string value directly
             params.push_back(strVal);
         } else {
             // parse string as JSON, insert bool/number/object/etc. value
@@ -234,7 +250,7 @@ UniValue RPCConvertNamedValues(const std::string &strMethod, const std::vector<s
     UniValue params(UniValue::VOBJ);
 
     for (const std::string &s: strParams) {
-        size_t pos = s.find("=");
+        size_t pos = s.find('=');
         if (pos == std::string::npos) {
             throw(std::runtime_error("No '=' in named argument '"+s+"', this needs to be present for every argument (even if it is empty)"));
         }
