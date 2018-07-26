@@ -57,7 +57,8 @@ QT_FORMS_UI = \
   qt/forms/signverifymessagedialog.ui \
   qt/forms/smartcontract.ui \
   qt/forms/tokendescdialog.ui \
-  qt/forms/transactiondescdialog.ui
+  qt/forms/transactiondescdialog.ui \
+  qt/forms/hexaddressconverter.ui
 
 QT_MOC_CPP = \
   qt/moc_abifunctionfield.cpp \
@@ -143,7 +144,8 @@ QT_MOC_CPP = \
   qt/moc_utilitydialog.cpp \
   qt/moc_walletframe.cpp \
   qt/moc_walletmodel.cpp \
-  qt/moc_walletview.cpp
+  qt/moc_walletview.cpp \
+  qt/moc_hexaddressconverter.cpp
 
 BITCOIN_MM = \
   qt/macdockiconhandler.mm \
@@ -262,7 +264,8 @@ BITCOIN_QT_H = \
   qt/walletmodeltransaction.h \
   qt/walletview.h \
   qt/winshutdownmonitor.h \
-  qt/qcustomplot.h
+  qt/qcustomplot.h \
+  qt/hexaddressconverter.h
 
 RES_ICONS = \
   qt/res/icons/add.png \
@@ -359,7 +362,8 @@ BITCOIN_QT_CPP = \
   qt/tokenamountfield.cpp \
   qt/trafficgraphwidget.cpp \
   qt/utilitydialog.cpp \
-  qt/winshutdownmonitor.cpp
+  qt/winshutdownmonitor.cpp \
+  qt/hexaddressconverter.cpp
 
 if ENABLE_WALLET
 BITCOIN_QT_CPP += \
