@@ -113,7 +113,7 @@ Clone lux repository
 Build lux 
 
     cd lux
-    ./install-dependencies.sh
+    ./depends/install-dependencies.sh
     ./autogen.sh
     ./configure --disable-tests
     make -j$(nproc)
