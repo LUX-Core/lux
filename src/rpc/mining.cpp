@@ -1113,7 +1113,7 @@ static const CRPCCommand commands[] =
     { "mining",             "prioritisetransaction",  &prioritisetransaction,  {"txid","dummy","fee_delta"} },
     { "mining",             "getblocktemplate",       &getblocktemplate,       {"template_request"} },
     { "mining",             "submitblock",            &submitblock,            {"hexdata","dummy"} },
-    { "mining",             "getwork",                &getwork,            {"hexdata","dummy"} },
+    { "mining",             "getwork",                &getwork,                {"hexdata","dummy"} },
 
 
     { "util",               "estimatefee",            &estimatefee,            {"nblocks"} },

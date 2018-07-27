@@ -6,7 +6,7 @@ TEST_SRCDIR = test
 TEST_BINARY=test/test_lux$(EXEEXT)
 
 
-EXTRA_DIST += \
+EXTRA_DIST = \
 	test/bctest.py \
 	test/bitcoin-util-test.py \
 	test/data/bitcoin-util-test.json \

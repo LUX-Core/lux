@@ -1,4 +1,4 @@
-// Copyright (c) 2014 The Bitcoin developers            -*- c++ -*-
+// Copyright (c) 2014-2017 The Bitcoin Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -9,6 +9,8 @@
 #include <assert.h>
 #include <stdint.h>
 #include <vector>
+
+static const int64_t DEFAULT_MAX_TIME_ADJUSTMENT = 70 * 60;
 
 class CNetAddr;
 
