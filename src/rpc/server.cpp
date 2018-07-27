@@ -289,21 +289,6 @@ static const CRPCCommand vRPCCommands[] =
         {"mining", "reservebalance", &reservebalance, true, true, false},
 
 #ifdef ENABLE_WALLET
-        /* Coin generation */
-        {"generating", "getgenerate", &getgenerate, true, false, false},
-        {"generating", "gethashespersec", &gethashespersec, true, false, false},
-        {"generating", "setgenerate", &setgenerate, true, true, false},
-#endif
-
-        /* Raw transactions */
-        {"rawtransactions", "createrawtransaction", &createrawtransaction, true, false, false},
-        {"rawtransactions", "decoderawtransaction", &decoderawtransaction, true, false, false},
-        {"rawtransactions", "decodescript", &decodescript, true, false, false},
-        {"rawtransactions", "getrawtransaction", &getrawtransaction, true, false, false},
-        {"rawtransactions", "sendrawtransaction", &sendrawtransaction, false, false, false},
-        {"rawtransactions", "signrawtransaction", &signrawtransaction, false, false, false}, /* uses wallet if enabled */
-
-#ifdef ENABLE_WALLET
         //{"lux", "darksend", &darksend, false, false, true}, /* not threadSafe because of SendMoney */
 
         /* Wallet */

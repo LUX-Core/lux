@@ -1,7 +1,7 @@
 // Copyright (c) 2011-2014 The Bitcoin developers
 // Copyright (c) 2014-2015 The Dash developers
 // Copyright (c) 2015-2017 The LUX developers
-// Distributed under the MIT/X11 software license, see the accompanying
+// Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "utilitydialog.h"
@@ -63,7 +63,7 @@ HelpMessageDialog::HelpMessageDialog(QWidget* parent, bool about) : QDialog(pare
         QString header = tr("Usage:") + "\n" +
                          "  lux-qt [" + tr("command-line options") + "]                     " + "\n";
 
-        QString coreOptions = QString::fromStdString(HelpMessage(HMM_BITCOIN_QT));
+        QString coreOptions = QString::fromStdString(HelpMessage(HMM_LUX_QT));
 
         QString uiOptions = tr("UI options") + ":\n" +
                             "  -choosedatadir            " + tr("Choose data directory on startup (default: 0)") + "\n" +

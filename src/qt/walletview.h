@@ -1,6 +1,6 @@
 // Copyright (c) 2018 The Luxcore Developer
 // Copyright (c) 2018 The Luxcore Developer
-// Distributed under the MIT/X11 software license, see the accompanying
+// Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #ifndef BITCOIN_QT_WALLETVIEW_H
