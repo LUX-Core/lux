@@ -1,13 +1,13 @@
 Luxcore version 4.0.0 is now available from:
 
-  <https://github.com/216k155/lux/releases>
+  <https://github.com/LUX-Core/lux/releases>
 
 This is a new minor-revision version release, including various bug fixes and
 performance improvements, as well as updated translations.
 
 Please report bugs using the issue tracker at github:
 
-  <https://github.com/216k155/lux/issues>
+  <https://github.com/LUX-Core/lux/issues>
 
 Recommended Update
 ==============
