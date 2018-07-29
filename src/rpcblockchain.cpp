@@ -552,6 +552,55 @@ UniValue pruneblockchain(const UniValue& params, bool fHelp)
     return uint64_t(height);
 }
 
+UniValue getaccountinfo(const UniValue& params, bool fHelp)
+{
+    if (fHelp || params.size() < 1)
+        throw std::runtime_error(
+                "getaccountinfo \"address\"\n"
+                "\nArgument:\n"
+                "1. \"address\"          (string, required) The account address\n"
+        );
+
+    LOCK(cs_main);
+
+    std::string strAddr = params[0].get_str();
+    if(strAddr.size() != 40 || !CheckHex(strAddr))
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Incorrect address");
+
+    dev::Address addrAccount(strAddr);
+    if(!globalState->addressInUse(addrAccount))
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Address does not exist");
+
+    UniValue result(UniValue::VOBJ);
+
+    result.push_back(Pair("address", strAddr));
+    result.push_back(Pair("balance", CAmount(globalState->balance(addrAccount))));
+    std::vector<uint8_t> code(globalState->code(addrAccount));
+    auto storage(globalState->storage(addrAccount));
+
+    UniValue storageUV(UniValue::VOBJ);
+    for (auto j: storage)
+    {
+        UniValue e(UniValue::VOBJ);
+        e.push_back(Pair(dev::toHex(j.second.first), dev::toHex(j.second.second)));
+        storageUV.push_back(Pair(j.first.hex(), e));
+    }
+
+    result.push_back(Pair("storage", storageUV));
+
+    result.push_back(Pair("code", HexStr(code.begin(), code.end())));
+
+    std::unordered_map<dev::Address, Vin> vins = globalState->vins();
+    if(vins.count(addrAccount)){
+        UniValue vin(UniValue::VOBJ);
+        valtype vchHash(vins[addrAccount].hash.asBytes());
+        vin.push_back(Pair("hash", HexStr(vchHash.rbegin(), vchHash.rend())));
+        vin.push_back(Pair("nVout", uint64_t(vins[addrAccount].nVout)));
+        vin.push_back(Pair("value", uint64_t(vins[addrAccount].value)));
+        result.push_back(Pair("vin", vin));
+    }
+    return result;
+}
 
 UniValue getblockheader(const UniValue& params, bool fHelp)
 {

@@ -1,4 +1,4 @@
-![LUX Logo](https://github.com/216k155/lux/blob/master/src/qt/res/images/lux_logo_horizontal.png)
+![LUX Logo](src/qt/res/images/lux_logo_horizontal.png)
 
 "FIRST OF ITS KIND"
 
@@ -9,7 +9,7 @@ Luxcore is GNU AGPLv3 licensed.
                                                                                                                                                      
 [![Build history](https://buildstats.info/travisci/chart/216k155/lux?branch=master)](https://travis-ci.org/216k155/lux?branch=master)
 
-[Website](https://luxcore.io) — [LUXtre + LUXGate](https://github.com/216k155/luxtre) - [PoS Web Wallet](https://lux.poswallet.io) — [Block Explorer](https://explorer.luxcore.io/) — [Blog](https://reddit.com/r/LUXCoin) — [Forum](https://bitcointalk.org/index.php?topic=2254046.0) — [Telegram](https://t.me/LUXcoinOfficialChat) — [Twitter](https://twitter.com/LUX_Coin)
+[Website](https://luxcore.io) — [LUXtre + LUXGate](https://github.com/LUX-Core/luxtre) - [PoS Web Wallet](https://lux.poswallet.io) — [Block Explorer](https://explorer.luxcore.io/) — [Blog](https://reddit.com/r/LUXCoin) — [Forum](https://bitcointalk.org/index.php?topic=2254046.0) — [Telegram](https://t.me/LUXcoinOfficialChat) — [Twitter](https://twitter.com/LUX_Coin)
 
 Features
 =============
@@ -63,7 +63,7 @@ The next three steps are an example of how to acquire the source and build in an
         
 Acquire the source and install dependencies.
 
-    git clone https://github.com/216k155/lux.git
+    git clone https://github.com/LUX-Core/lux
     sudo chmod -R a+rw lux
     cd lux/depends
     ./install-dependencies.sh
@@ -82,7 +82,7 @@ The next three steps are an example of how to acquire the source and build in an
         
 Acquire the source and install dependencies.
 
-    git clone https://github.com/216k155/lux.git
+    git clone https://github.com/LUX-Core/lux
     sudo chmod -R a+rw lux
     cd lux/depends
     ./install-dependencies.sh
@@ -99,7 +99,7 @@ Build in the usual way.
 
 Use
 
-    sudo add-apt-repository ppa:bitcoin/bitcoin; git clone https://github.com/216k155/lux; cd lux; depends/install-dependencies.sh; ./autogen.sh; ./configure --disable-tests --with-boost-libdir=/usr/local/lib; make clean; make -j$(nproc)
+    sudo add-apt-repository ppa:bitcoin/bitcoin; git clone https://github.com/LUX-Core/lux; cd lux; depends/install-dependencies.sh; ./autogen.sh; ./configure --disable-tests --with-boost-libdir=/usr/local/lib; make clean; make -j$(nproc)
 
 
 Add bitcoin repository for Berkeley DB 4.8
@@ -108,12 +108,12 @@ Add bitcoin repository for Berkeley DB 4.8
 
 Clone lux repository
 
-    git clone https://github.com/216k155/lux.git
+    git clone https://github.com/LUX-Core/lux
 
 Build lux 
 
     cd lux
-    ./install-dependencies.sh
+    ./depends/install-dependencies.sh
     ./autogen.sh
     ./configure --disable-tests
     make -j$(nproc)
@@ -147,7 +147,7 @@ Link boost 1.66
 
 Clone the Lux source code and cd into lux
 
-        git clone https://github.com/216k155/lux.git
+        git clone https://github.com/LUX-Core/lux
         cd lux
         ./building/mac/requirements.sh
         ./building/mac/build.sh
@@ -157,7 +157,7 @@ Setup and Build: Arch Linux
 This example lists the steps necessary to setup and build a command line only, non-wallet distribution of the latest changes on Arch Linux:
 
     pacman -S git base-devel boost libevent python
-    git clone https://github.com/216k155/lux
+    git clone https://github.com/LUX-Core/lux
     cd lux/
     ./autogen.sh
     ./configure --without-miniupnpc --disable-tests
@@ -220,7 +220,7 @@ Development Process
 -------------------
 
 The `master` branch is regularly built and tested, but is not guaranteed to be
-completely stable. [Tags](https://github.com/216k155/lux/tags) are created
+completely stable. [Tags](https://github.com/LUX-Core/lux/tags) are created
 regularly to indicate new official, stable release versions of Lux.
 
 The contribution workflow is described in [CONTRIBUTING.md](CONTRIBUTING.md).

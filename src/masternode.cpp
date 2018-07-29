@@ -140,10 +140,12 @@ void ProcessMasternode(CNode* pfrom, const std::string& strCommand, CDataStream&
 
         // make sure the vout that was signed is related to the transaction that spawned the masternode
         //  - this is expensive, so it's only done once per masternode
-        if (!darkSendSigner.IsVinAssociatedWithPubkey(vin, pubkey)) {
+        if (!darkSendSigner.IsVinAssociatedWithPubkey(vin, pubkey) && !IsInitialBlockDownload()) {
             LogPrintf("dsee - Got mismatched pubkey and vin\n");
-            Misbehaving(pfrom->GetId(), 100);
-            return;
+            if (!IsTestNet()) {
+                Misbehaving(pfrom->GetId(), 100);
+                return;
+            }
         }
 
         if (fDebug) LogPrintf("dsee - Got NEW masternode entry %s\n", addr.ToString().c_str());

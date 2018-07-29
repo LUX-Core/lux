@@ -105,7 +105,7 @@ CreateContract::~CreateContract()
 void CreateContract::setLinkLabels()
 {
     ui->labelSolidity->setOpenExternalLinks(true);
-    ui->labelSolidity->setText("<a href=\"https://ethereum.github.io/browser-solidity/\">Solidity compiler</a>");
+    ui->labelSolidity->setText("<a href=\"http://remix.ethereum.org/\">Solidity compiler</a>");
 
     ui->labelToken->setOpenExternalLinks(true);
     ui->labelToken->setText("<a href=\"https://ethereum.org/token#the-code\">Token template</a>");

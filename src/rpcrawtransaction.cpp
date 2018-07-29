@@ -800,3 +800,62 @@ UniValue sendrawtransaction(const UniValue& params, bool fHelp)
 
     return hashTx.GetHex();
 }
+
+UniValue gethexaddress(const UniValue& params, bool fHelp) {
+    if (fHelp || params.size() < 1 || params.size() > 1)
+        throw std::runtime_error(
+                "gethexaddress \"address\"\n"
+
+                "\nConverts a base58 pubkeyhash address to a hex address for use in smart contracts.\n"
+
+                "\nArguments:\n"
+                "1. \"address\"      (string, required) The base58 address\n"
+
+                "\nResult:\n"
+                "\"hexaddress\"      (string) The raw hex pubkeyhash address for use in smart contracts\n"
+
+                "\nExamples:\n"
+                + HelpExampleCli("gethexaddress", "\"address\"")
+                + HelpExampleRpc("gethexaddress", "\"address\"")
+        );
+
+    CTxDestination address = DecodeDestination(params[0].get_str());
+    if (!IsValidDestination(address))
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid Luxcore address");
+
+    CKeyID *keyid = boost::get<CKeyID>(&address);
+
+    if(!keyid)
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Only pubkeyhash addresses are supported");
+
+    return HexStr(valtype(keyid->begin(),keyid->end()));
+}
+
+UniValue fromhexaddress(const UniValue& params, bool fHelp) {
+    if (fHelp || params.size() < 1 || params.size() > 1)
+        throw std::runtime_error(
+                "fromhexaddress \"hexaddress\"\n"
+
+                "\nConverts a raw hex address to a base58 pubkeyhash address\n"
+
+                "\nArguments:\n"
+                "1. \"hexaddress\"      (string, required) The raw hex address\n"
+
+                "\nResult:\n"
+                "\"address\"      (string) The base58 pubkeyhash address\n"
+
+                "\nExamples:\n"
+                + HelpExampleCli("fromhexaddress", "\"hexaddress\"")
+                + HelpExampleRpc("fromhexaddress", "\"hexaddress\"")
+        );
+    if (params[0].get_str().size() != 40)
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid pubkeyhash hex size (should be 40 hex characters)");
+
+    uint160 key(ParseHex(params[0].get_str()));
+    CKeyID keyid(key);
+
+    if(!IsValidDestination(CTxDestination(keyid)))
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid Luxcore address");
+
+    return EncodeDestination(CTxDestination(keyid));
+}

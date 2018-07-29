@@ -319,6 +319,8 @@ extern UniValue decoderawtransaction(const UniValue& params, bool fHelp);
 extern UniValue decodescript(const UniValue& params, bool fHelp);
 extern UniValue signrawtransaction(const UniValue& params, bool fHelp);
 extern UniValue sendrawtransaction(const UniValue& params, bool fHelp);
+extern UniValue gethexaddress(const UniValue& params, bool fHelp);
+extern UniValue fromhexaddress(const UniValue& params, bool fHelp);
 
 extern UniValue getblockcount(const UniValue& params, bool fHelp); // in rpcblockchain.cpp
 extern UniValue getblockhashes(const UniValue& params, bool fHelp);
@@ -340,6 +342,7 @@ extern UniValue reconsiderblock(const UniValue& params, bool fHelp);
 extern UniValue darksend(const UniValue& params, bool fHelp);
 extern UniValue spork(const UniValue& params, bool fHelp);
 extern UniValue masternode(const UniValue& params, bool fHelp);
+extern UniValue getaccountinfo(const UniValue& params, bool fHelp);
 //extern UniValue masternodelist(const UniValue& params, bool fHelp);
 //extern UniValue mnbudget(const UniValue& params, bool fHelp);
 //extern UniValue mnbudgetvoteraw(const UniValue& params, bool fHelp);
