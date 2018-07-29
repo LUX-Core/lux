@@ -21,6 +21,7 @@
 #include "utilitydialog.h"
 #include "stake.h"
 #include "main.h"
+#include "hexaddressconverter.h"
 
 #ifdef ENABLE_WALLET
 #include "blockexplorer.h"
@@ -119,6 +120,7 @@ BitcoinGUI::BitcoinGUI(const NetworkStyle* networkStyle, QWidget* parent) : QMai
                                                                             notificator(0),
                                                                             rpcConsole(0),
                                                                             explorerWindow(0),
+                                                                            hexAddressWindow(0),
                                                                             prevBlocks(0),
                                                                             spinnerFrame(0)
 {
@@ -161,6 +163,7 @@ BitcoinGUI::BitcoinGUI(const NetworkStyle* networkStyle, QWidget* parent) : QMai
 #endif
 
     rpcConsole = new RPCConsole(enableWallet ? this : 0);
+    hexAddressWindow = new HexAddressConverter(this);
 #ifdef ENABLE_WALLET
     if (enableWallet) {
         /** Create wallet frame*/
@@ -263,6 +266,8 @@ BitcoinGUI::BitcoinGUI(const NetworkStyle* networkStyle, QWidget* parent) : QMai
     connect(quitAction, SIGNAL(triggered()), rpcConsole, SLOT(hide()));
 
     connect(openBlockExplorerAction, SIGNAL(triggered()), explorerWindow, SLOT(show()));
+
+    connect(openHexAddressAction, SIGNAL(triggered()), hexAddressWindow, SLOT(show()));
 
     // prevents an open debug window from becoming stuck/unusable on client shutdown
     connect(quitAction, SIGNAL(triggered()), explorerWindow, SLOT(hide()));
@@ -485,6 +490,8 @@ void BitcoinGUI::createActions(const NetworkStyle* networkStyle) {
     openBlockExplorerAction = new QAction(QIcon(":/icons/explorer"), tr("&Blockchain explorer"), this);
     openBlockExplorerAction->setStatusTip(tr("Block explorer window"));
 
+    openHexAddressAction = new QAction(QIcon(":/icons/explorer"), tr("&Hex Address Converter"), this);
+
     showHelpMessageAction = new QAction(QApplication::style()->standardIcon(QStyle::SP_MessageBoxInformation), tr("&Command-line options"), this);
     showHelpMessageAction->setMenuRole(QAction::NoRole);
     showHelpMessageAction->setStatusTip(tr("Show the Luxcore help message to get a list with possible LUX command-line options"));
@@ -564,6 +571,7 @@ void BitcoinGUI::createMenuBar() {
         tools->addAction(openConfEditorAction);
         tools->addAction(openMNConfEditorAction);
         tools->addAction(showBackupsAction);
+        tools->addAction(openHexAddressAction);
         tools->addAction(openBlockExplorerAction);
     }
 
@@ -760,6 +768,7 @@ void BitcoinGUI::createTrayIconMenu() {
     trayIconMenu->addAction(openConfEditorAction);
     trayIconMenu->addAction(openMNConfEditorAction);
     trayIconMenu->addAction(showBackupsAction);
+    trayIconMenu->addAction(openHexAddressAction);
     trayIconMenu->addAction(openBlockExplorerAction);
 #ifndef Q_OS_MAC // This is built-in on Mac
     trayIconMenu->addSeparator();

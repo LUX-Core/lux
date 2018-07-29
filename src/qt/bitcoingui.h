@@ -35,6 +35,7 @@ class UnitDisplayStatusBarControl;
 class WalletFrame;
 class WalletModel;
 class MasternodeList;
+class HexAddressConverter;
 
 
 class CWallet;
@@ -139,12 +140,14 @@ private:
     QAction* multiSendAction;
     QAction* smartContractAction;
     QAction* LSRTokenAction;
+    QAction* openHexAddressAction;
 
     QSystemTrayIcon* trayIcon;
     QMenu* trayIconMenu;
     Notificator* notificator;
     RPCConsole* rpcConsole;
     BlockExplorer* explorerWindow;
+    HexAddressConverter* hexAddressWindow;
 
     /** Keep track of previous number of blocks, to detect progress */
     int prevBlocks;

@@ -62,7 +62,8 @@ QT_FORMS_UI = \
   qt/forms/signverifymessagedialog.ui \
   qt/forms/smartcontract.ui \
   qt/forms/tokendescdialog.ui \
-  qt/forms/transactiondescdialog.ui
+  qt/forms/transactiondescdialog.ui \
+  qt/forms/hexaddressconverter.ui
 
 if HAVE_INSTALLER
  QT_FORMS_UI += lux-installer/src/forms/updateinfodialog.ui \
@@ -153,7 +154,8 @@ QT_MOC_CPP = \
   qt/moc_utilitydialog.cpp \
   qt/moc_walletframe.cpp \
   qt/moc_walletmodel.cpp \
-  qt/moc_walletview.cpp
+  qt/moc_walletview.cpp \
+  qt/moc_hexaddressconverter.cpp
 
 if HAVE_INSTALLER
   QT_MOC_CPP += lux-installer/src/luxupdater/moc_luxupdater.cpp \
@@ -283,7 +285,8 @@ BITCOIN_QT_H = \
   qt/walletmodeltransaction.h \
   qt/walletview.h \
   qt/winshutdownmonitor.h \
-  qt/qcustomplot.h
+  qt/qcustomplot.h \
+  qt/hexaddressconverter.h
 
 if HAVE_INSTALLER
   BITCOIN_QT_H += lux-installer/src/luxupdater/luxupdater.h \
@@ -394,7 +397,8 @@ BITCOIN_QT_CPP = \
   qt/tokenamountfield.cpp \
   qt/trafficgraphwidget.cpp \
   qt/utilitydialog.cpp \
-  qt/winshutdownmonitor.cpp
+  qt/winshutdownmonitor.cpp \
+  qt/hexaddressconverter.cpp
 
 if ENABLE_WALLET
 BITCOIN_QT_CPP += \
