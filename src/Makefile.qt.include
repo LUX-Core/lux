@@ -3,9 +3,13 @@
 bin_PROGRAMS += qt/lux-qt
 EXTRA_LIBRARIES += qt/libbitcoinqt.a
 
-CXXFLAGS += -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I/usr/include/x86_64-linux-gnu/qt5/QtNetwork -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -fPIC -Wno-unused-result
+if ENABLE_UPDATER
+if !TARGET_WINDOWS
+CXXFLAGS += -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I/usr/include/x86_64-linux-gnu/qt5/QtNetwork -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -fPIC -Wno-unused-result -Wno-unused-but-set-variable
 
-LIBS += -lQt5Core -lQt5Network -lQt5Widgets -lQt5Gui -lutil
+LIBS += -lQt5Core -lQt5Network -lQt5Widgets -lQt5Gui
+endif
+endif
 
 
 # lux qt core #
