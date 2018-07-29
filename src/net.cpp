@@ -1149,7 +1149,7 @@ void ThreadSocketHandler()
             }
         }
         {
-            LOCK(cs_vNodes);
+            //LOCK(cs_vNodes);
             BOOST_FOREACH (CNode* pnode, vNodesCopy)
                 pnode->Release();
         }
@@ -1626,7 +1626,7 @@ void ThreadMessageHandler() {
             boost::this_thread::interruption_point();
         }
         {
-            LOCK(cs_vNodes);
+            //LOCK(cs_vNodes);
             BOOST_FOREACH (CNode* pnode, vNodesCopy)
                 pnode->Release();
         }
