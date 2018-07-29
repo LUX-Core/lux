@@ -711,7 +711,7 @@ void CoinControlDialog::updateLabels(WalletModel* model, QDialog* dialog)
             model->listCoins(mapCoins);
 
             if(mapCoins.size() > 0) {
-                std:map<QString, vector<COutput>>::iterator it = mapCoins.begin();
+               map<QString, vector<COutput>>::iterator it = mapCoins.begin();
 
                 SendCoinsRecipient defRecipient;
                 defRecipient.address = (*it).first;
