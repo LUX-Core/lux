@@ -48,7 +48,7 @@
 #ifdef WIN32
 #define MSG_DONTWAIT 0
 #else
-typedef u_int SOCKET;
+typedef unsigned int SOCKET;
 #include "errno.h"
 #define WSAGetLastError() errno
 #define WSAEINVAL EINVAL
