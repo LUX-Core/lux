@@ -975,8 +975,7 @@ UniValue sendmany(const UniValue& params, bool fHelp)
     if (!fCreated)
         throw JSONRPCError(RPC_WALLET_INSUFFICIENT_FUNDS, strFailReason);
     if (!pwalletMain->CommitTransaction(wtx, keyChange)) {
-        strFailReason = strprintf("Transaction commit failed:: %s");
-        throw JSONRPCError(RPC_WALLET_ERROR, strFailReason);
+        throw JSONRPCError(RPC_WALLET_ERROR, string("Transaction commit failed: ")+strFailReason);
     }
 
     return wtx.GetHash().GetHex();

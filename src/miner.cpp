@@ -1000,21 +1000,22 @@ void IncrementExtraNonce(CBlock* pblock, const CBlockIndex* pindexPrev, unsigned
 
 bool ProcessBlockFound(CBlock* pblock, CWallet& wallet, CReserveKey& reservekey)
 {
-    LogPrintf("%s\n", pblock->ToString());
-    LogPrintf("generated %s\n", FormatMoney(pblock->vtx[0].vout[0].nValue));
-
-    // Found a solution
+    // Found a solution (stake)
     {
         LOCK(cs_main);
         if (pblock->hashPrevBlock != chainActive.Tip()->GetBlockHash())
             return error("LUXMiner : generated block is stale");
-    }
 
-    for(const CTxIn& vin : pblock->vtx[1].vin) {
-        if (wallet.IsSpent(vin.prevout.hash, vin.prevout.n)) {
-            return error("CheckStake() : Gen block stake is invalid - UTXO being spent ");
+        for(const CTxIn& vin : pblock->vtx[1].vin) {
+            if (wallet.IsSpent(vin.prevout.hash, vin.prevout.n)) {
+                return error("LUXMiner : Gen block stake is invalid - UTXO spent");
+            }
         }
     }
+
+    CAmount generated = GetProofOfStakeReward(0, 0, chainActive.Height()+1);
+    generated -= GetMasternodePosReward(chainActive.Height()+1, generated);
+    LogPrintf("generated %s\n", FormatMoney(generated));
 
     // Remove key from key pool
     reservekey.KeepKey();
