@@ -11,6 +11,8 @@ Luxcore is GNU AGPLv3 licensed.
 
 [Website](https://luxcore.io) — [LUXtre + LUXGate](https://github.com/LUX-Core/luxtre) - [PoS Web Wallet](https://lux.poswallet.io) — [Block Explorer](https://explorer.luxcore.io/) — [Blog](https://reddit.com/r/LUXCoin) — [Forum](https://bitcointalk.org/index.php?topic=2254046.0) — [Telegram](https://t.me/LUXcoinOfficialChat) — [Twitter](https://twitter.com/LUX_Coin)
 
+[User Manual](https://github.com/LUX-Core/lux/blob/f4a94fc8e3c34e49ebda1b05298991009a855e32/doc/LUX_QT_v5_Win_Mac_User_Guide.pdf)
+
 Features
 =============
 
