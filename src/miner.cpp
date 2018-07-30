@@ -1010,6 +1010,12 @@ bool ProcessBlockFound(CBlock* pblock, CWallet& wallet, CReserveKey& reservekey)
             return error("LUXMiner : generated block is stale");
     }
 
+    for(const CTxIn& vin : pblock->vtx[1].vin) {
+        if (wallet.IsSpent(vin.prevout.hash, vin.prevout.n)) {
+            return error("CheckStake() : Gen block stake is invalid - UTXO being spent ");
+        }
+    }
+
     // Remove key from key pool
     reservekey.KeepKey();
 
