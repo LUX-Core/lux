@@ -834,3 +834,35 @@ OutputType WalletModel::getDefaultAddressType() const
 {
     return g_address_type;
 }
+
+std::vector<CTokenInfo> WalletModel::getInvalidTokens()
+{
+    LOCK2(cs_main, wallet->cs_wallet);
+
+    std::vector<CTokenInfo> listInvalid;
+    for(auto& info : wallet->mapToken)
+    {
+        std::string strAddress = info.second.strSenderAddress;
+        CTxDestination address;
+        if(!IsMine(*wallet, address))
+        {
+            listInvalid.push_back(info.second);
+        }
+    }
+    CTxDestination address;
+    return listInvalid;
+}
+
+bool WalletModel::isMineAddress(const std::string &Address)
+{
+    LOCK2(cs_main, wallet->cs_wallet);
+
+    CTxDestination address;
+
+    if(!IsValidDestination(address) || !IsMine(*wallet, address))
+    {
+        return false;
+    }
+    return true;
+}
+
