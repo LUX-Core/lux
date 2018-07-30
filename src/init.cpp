@@ -533,7 +533,7 @@ std::string HelpMessage(HelpMessageMode mode)
     strUsage += "  -i2p.mydestination.shareaddr=1                  " + _("To share your I2P destination. Increase your network connectivity. Default=1.") + "\n";
     strUsage += "  -i2p.options.samhost=<ip or host name>          " + _("Address of the SAM bridge host. If it is not specified, value will be \"127.0.0.1\".") + "\n";
     strUsage += "  -i2p.options.samport=<port>                     " + _("Port number of the SAM bridge host. If it is not specified, value will be \"7656\".") + "\n";
-    strUsage += "  -i2p.options.sessionname=<session name>         " + _("Name of an I2P session. If it is not specified, value will be \"Anoncoin-client\"") + "\n";
+    strUsage += "  -i2p.options.sessionname=<session name>         " + _("Name of an I2P session. If it is not specified, value will be \"Luxcore-client\"") + "\n";
 
     return strUsage;
 }
@@ -1252,7 +1252,7 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
                         LogPrintf("AppInit2 : parameter interaction: -onlynet=i2p -> setting -discover=0\n");
                 } else {
                     LogPrintf("AppInit2 : You can not use onlynet=i2p, without first having warmed up the i2p router and enabled it.\n");
-                    return InitError( _("Set enabled=1 in the [i2p.options] section of your anoncoin.conf file to use onlynet=i2p") );
+                    return InitError( _("Set enabled=1 in the [i2p.options] section of your lux.conf file to use onlynet=i2p") );
                 }
             }
             if (net == NET_UNROUTABLE)
@@ -1331,7 +1331,7 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
 
         // At this point if the user has the correct configuration set, we can continue, just one more detail to check, and error out if its not setup correctly.
         if( !fI2pEnabled )  {
-            LogPrintf( "AppInit2 : To use -generatei2pdestination, the i2p router must be warmed up. Include [i2p.options] enabled=1 in your anoncoin.conf,\n" );
+            LogPrintf( "AppInit2 : To use -generatei2pdestination, the i2p router must be warmed up. Include [i2p.options] enabled=1 in your lux.conf,\n" );
             LogPrintf( "           any [i2p.mydestination] static= value will be hard set internally to static=0, while running this command.\n" );
             LogPrintf( "AppInit2 : Another option, without any configuration file at all, you can add -i2p.options.enabled=1 on the command line,\n" );
             LogPrintf( "         : the I2P SAM module will try to create a session with default values, to access the i2p router.\n" );
@@ -1347,14 +1347,14 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
     string b32doti2p;
 
 
-    // We still need the keys and b32.i2p address information setup for anoncoin-qt, if any details exist in the config file
+    // We still need the keys and b32.i2p address information setup for lux-qt, if any details exist in the config file
     // use them, if not create the Args and set them to null strings.
     if( SoftSetBoolArg("-i2p.mydestination.static", true) )    // Returns true if the param was undefined and setting its value was possible
         LogPrintf( "AppInit2 : required parameter: -i2p.mydestination.static=1 -> setting defined.\n");
     fI2pStaticDest = GetBoolArg("-i2p.mydestination.static", true);   // Now we can get a local copy of whatever the real value is set to
 
     if( SoftSetArg("-i2p.mydestination.privatekey", "") ){           // Returns true if the param was undefined and setting its value was possible
-        LogPrintf("I2P mydestination privatekey in anoncoin.conf is undefined");
+        LogPrintf("I2P mydestination privatekey in lux.conf is undefined");
         boost::filesystem::path pathI2PKeydat = GetDataDir() / "i2pkey.dat";
             if (boost::filesystem::exists(pathI2PKeydat)) {
                 FILE *file = fopen(pathI2PKeydat.string().c_str(), "r");
@@ -1370,13 +1370,13 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
                 myI2pKeys.priv = GetArg("-i2p.mydestination.privatekey", ""); // myI2pKeys.priv will be NULL in this case, preparing for DYN
             }
         } else {
-        LogPrintf("I2P mydestination privatekey in anoncoin.conf is defined, we do not need to check for file i2pkey.dat\n");
+        LogPrintf("I2P mydestination privatekey in lux.conf is defined, we do not need to check for file i2pkey.dat\n");
         myI2pKeys.priv = GetArg("-i2p.mydestination.privatekey", ""); // Now we can get a local copy of whatever the real value is set to
     }
 
     // Now we can validate the privkey, if it's a non-zero string we can use it to set the public and b32.i2p addresses for this node as well.
     // ToDo: We could do a more exhaustive test on the key, to confirm that it is correct
-    // This needs to be done with or without I2pEnabled, because Anoncoin-qt will display whatever is set under settings, if there
+    // This needs to be done with or without I2pEnabled, because lux-qt will display whatever is set under settings, if there
     // is something, we want the information available to the user.
     if( myI2pKeys.priv.size() > NATIVE_I2P_DESTINATION_SIZE && isValidI2pAddress(myI2pKeys.priv) ) {
         myI2pKeys.pub = myI2pKeys.priv.substr(0, NATIVE_I2P_DESTINATION_SIZE);
@@ -1434,7 +1434,7 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
         LogPrintf( "AppInit2 : Attempting to create an I2P SAM session..." );
         // This creates the session for the 1st time, and tries to open the i2psam socket and say hello, if that fails, we're done.
         if( !I2PSession::Instance().isSick() ) {
-            // Now we can either use a static destination address, taken from anoncoin.conf values to create a Stream Session, or
+            // Now we can either use a static destination address, taken from lux.conf values to create a Stream Session, or
             // generate a dynamic new one and initiate an I2P session stream that way...
             if( fI2pStaticDest ) {          // If everything was setup correctly we can try running static mode
                 LogPrintf( "With a static destination.\n" );
@@ -1503,8 +1503,8 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
             // LogPrintf( "MessageBox returned %s\n", fResult ? "true" : "false" );
             if( !fResult )
                 return false;
-            // This way anoncoind always shuts down, as noui_ThreadSafeMessageBox returns false,
-            // for the anoncoin-qt user, they can continue if they want to, by selecting the BTN_APPLY button.
+            // This way luxd always shuts down, as noui_ThreadSafeMessageBox returns false,
+            // for the lux-qt user, they can continue if they want to, by selecting the BTN_APPLY button.
         } else
             return InitError(_("Unable to obtain I2P SAM Session for the -generatei2pdestination command") );
     }   // fGenI2pDest

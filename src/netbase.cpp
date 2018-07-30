@@ -657,7 +657,7 @@ bool CNetAddr::SetSpecial(const std::string &strName)
         if( isValidI2pB32( strName ) ) {
             // 1st try our new local address book for the lookup....
             // NOTE: Adding this line of code was extremely expensive for the developer, it broke the build system, which could no longer link
-            // and create the Anoncoin-cli executable.  It requires that you link in the addrman.cpp/h module, as its now included here in netbase,
+            // and create the lux-cli executable.  It requires that you link in the addrman.cpp/h module, as its now included here in netbase,
             // This had  never been done until now.  You will be required to upgrade your code to support the chainparamsbase.cpp/h module concept,
             // and remove all references to chainparams.cpp/h in your build script, if your going to try and just add this one line of code.
             //  Upgrading your source base to v10 technology was the solution, but very time consuming, expensive and stressful.  It may appear to

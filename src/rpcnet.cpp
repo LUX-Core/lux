@@ -164,15 +164,17 @@ UniValue addnode(const UniValue& params, bool fHelp)
     if (fHelp || params.size() != 2 ||
         (strCommand != "onetry" && strCommand != "add" && strCommand != "remove"))
         throw runtime_error(
-            "addnode \"node\" \"add|remove|onetry\"\n"
+            "addnode \"b32.i2p|base64|ip:port|ipv6\" \"add|remove|onetry\"\n"
             "\nAttempts add or remove a node from the addnode list.\n"
             "Or try a connection to a node once.\n"
             "\nArguments:\n"
             "1. \"node\"     (string, required) The node (see getpeerinfo for nodes)\n"
             "2. \"command\"  (string, required) 'add' to add a node to the list, 'remove' to remove a node from the list, 'onetry' to try a connection to the node once\n"
-            "\nExamples:\n" +
-            HelpExampleCli("addnode", "\"192.168.0.6:51472\" \"onetry\"") + HelpExampleRpc("addnode", "\"192.168.0.6:51472\", \"onetry\""));
-
+            "\nExamples:\n"
+             + HelpExampleCli("addnode", "\"192.168.0.6:26969\" \"onetry\"")
+             + HelpExampleRpc("addnode", "\"192.168.0.6:26969\", \"add\"")
+             + HelpExampleCli("addnode", "ibtfn3cnherivbkfbytay5tx35saajauxlg2aohna2rwyci2pecq.b32.i2p remove")
+             + HelpExampleRpc("addnode", "\"ibtfn3cnherivbkfbytay5tx35saajauxlg2aohna2rwyci2pecq.b32.i2p\", \"onetry\""));
     string strNode = params[0].get_str();
 
     if (strCommand == "onetry") {
@@ -241,15 +243,17 @@ UniValue getaddednodeinfo(const UniValue& params, bool fHelp)
             "    \"connected\" : true|false,          (boolean) If connected\n"
             "    \"addresses\" : [\n"
             "       {\n"
-            "         \"address\" : \"192.168.0.201:51472\",  (string) The lux server host and port\n"
+            "         \"address\" : \"192.168.0.201:26969\",  (string) The lux server host and port\n"
             "         \"connected\" : \"outbound\"           (string) connection, inbound or outbound\n"
             "       }\n"
             "     ]\n"
             "  }\n"
             "  ,...\n"
             "]\n"
-            "\nExamples:\n" +
-            HelpExampleCli("getaddednodeinfo", "true") + HelpExampleCli("getaddednodeinfo", "true \"192.168.0.201\"") + HelpExampleRpc("getaddednodeinfo", "true, \"192.168.0.201\""));
+            "\nExamples:\n"
+            + HelpExampleCli("getaddednodeinfo", "true")
+            + HelpExampleCli("getaddednodeinfo", "true \"192.168.0.201\"")
+            + HelpExampleRpc("getaddednodeinfo", "true, \"192.168.0.201\""));
 
     std::vector<AddedNodeInfo> vInfo = GetAddedNodeInfo();
 

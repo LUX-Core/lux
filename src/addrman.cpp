@@ -598,7 +598,7 @@ void CAddrMan::GetAddr_(std::vector<CAddress>& vAddr)
         //! Additional checks, don't send addresses to nodes that cant process them or don't care about them.
         //! Inclusion of a check for RFC1918() addresses, means any local whitelisted peers that have made
         //! it into the address manager and are RFC1918 IPs will not be globally shared with peers on the
-        //! Anoncoin network, originally done for software testing, now seems like a good idea to leave it.
+        //! luxcore network, originally done for software testing, now seems like a good idea to leave it.
         //! CSlave: There is a logical error in the following conditional string, (!fIpOnly || !ai.IsI2P())
         //! always return false and false so the addresses were never shared to I2P peers. Probably the
         //! fIpOnly check is flawed as it always return true even for I2P only peers. Furthermore I think
