@@ -61,6 +61,8 @@ bool fNotUseChangeAddress = DEFAULT_NOT_USE_CHANGE_ADDRESS;
  */
 CFeeRate CWallet::minTxFee = CFeeRate(10000);
 
+const uint256 CMerkleTx::ABANDON_HASH(uint256S("0000000000000000000000000000000000000000000000000000000000000001"));
+
 /** @defgroup mapWallet
  *
  * @{
@@ -1233,6 +1235,8 @@ int CWallet::ScanForWalletTransactions(CBlockIndex* pindexStart, bool fUpdate)
 
 void CWallet::ReacceptWalletTransactions()
 {
+    if (!fBroadcastTransactions)
+        return;
     LOCK2(cs_main, cs_wallet);
     std::map<int64_t, CWalletTx*> mapSorted;
 
@@ -1271,10 +1275,13 @@ bool CWalletTx::InMempool() const
 
 void CWalletTx::RelayWalletTransaction(std::string strCommand)
 {
-    if (!IsCoinBase()) {
-        if (GetDepthInMainChain() == 0) {
+    assert(pwallet->GetBroadcastTransactions());
+    if (!IsCoinBase() && !isAbandoned() && GetDepthInMainChain() == 0)
+    {
+        /* GetDepthInMainChain already catches known conflicts. */
+        if (InMempool() || AcceptToMemoryPool(false)) {
             uint256 hash = GetHash();
-            LogPrintf("%s: wtx %s (command=%s)\n", __func__, hash.ToString(), strCommand);
+            LogPrintf("Relaying wtx %s\n", GetHash().ToString(), strCommand);
 
             if (strCommand == "ix") {
                 mapTxLockReq.insert(make_pair(hash, (CTransaction) * this));
@@ -1302,7 +1309,7 @@ void CWallet::ResendWalletTransactions()
 {
     // Do this infrequently and randomly to avoid giving away
     // that these are our transactions.
-    if (GetTime() < nNextResend)
+    if (GetTime() < nNextResend || !fBroadcastTransactions)
         return;
     bool fFirst = (nNextResend == 0);
     nNextResend = GetTime() + GetRand(30 * 60);
@@ -2600,13 +2607,15 @@ bool CWallet::CommitTransaction(CWalletTx& wtxNew, CReserveKey& reservekey, std:
         // Track how many getdata requests our transaction gets
         mapRequestCount[wtxNew.GetHash()] = 0;
 
-        // Broadcast
-        if (!wtxNew.AcceptToMemoryPool(false)) {
-            // This must not fail. The transaction has already been signed and recorded.
-            LogPrintf("CommitTransaction() : Error: Transaction not valid\n");
-            return false;
+        if (fBroadcastTransactions) {
+            // Broadcast
+            if (!wtxNew.AcceptToMemoryPool(false)) {
+                // This must not fail. The transaction has already been signed and recorded.
+                LogPrintf("CommitTransaction() : Error: Transaction not valid, %s\n");
+                return false;
+            }
+            wtxNew.RelayWalletTransaction(strCommand);
         }
-        wtxNew.RelayWalletTransaction(strCommand);
     }
     return true;
 }

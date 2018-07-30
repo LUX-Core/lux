@@ -8,6 +8,7 @@
 #include "amount.h"
 #include "base58.h"
 #include "core_io.h"
+#include "consensus/validation.h"
 #include "init.h"
 #include "net.h"
 #include "netbase.h"
@@ -973,8 +974,10 @@ UniValue sendmany(const UniValue& params, bool fHelp)
     bool fCreated = pwalletMain->CreateTransaction(vecSend, wtx, keyChange, nFeeRequired, strFailReason);
     if (!fCreated)
         throw JSONRPCError(RPC_WALLET_INSUFFICIENT_FUNDS, strFailReason);
-    if (!pwalletMain->CommitTransaction(wtx, keyChange))
-        throw JSONRPCError(RPC_WALLET_ERROR, "Transaction commit failed");
+    if (!pwalletMain->CommitTransaction(wtx, keyChange)) {
+        strFailReason = strprintf("Transaction commit failed:: %s");
+        throw JSONRPCError(RPC_WALLET_ERROR, strFailReason);
+    }
 
     return wtx.GetHash().GetHex();
 }

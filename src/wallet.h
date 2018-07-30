@@ -186,6 +186,8 @@ class CMerkleTx : public CTransaction
 {
 private:
     int GetDepthInMainChainINTERNAL(const CBlockIndex*& pindexRet) const;
+    /** Constant used in hashBlock to indicate tx has been abandoned */
+    static const uint256 ABANDON_HASH;
 
 public:
     uint256 hashBlock;
@@ -247,6 +249,7 @@ public:
     }
     int GetBlocksToMaturity() const;
     bool AcceptToMemoryPool(bool fLimitFree = true, bool fRejectInsaneFee = true, bool ignoreFees = false);
+    bool isAbandoned() const { return (hashBlock == ABANDON_HASH); }
     int GetTransactionLockSignatures() const;
     bool IsTransactionLockTimedOut() const;
 };
@@ -270,6 +273,7 @@ class CWallet : public CCryptoKeyStore, public CValidationInterface
 
     int64_t nNextResend;
     int64_t nLastResend;
+    bool fBroadcastTransactions;
 
     /**
     * Select a set of coins such that nValueRet >= nTargetValue and at least
@@ -747,6 +751,12 @@ public:
 
     /** Watch-only address added */
     boost::signals2::signal<void(bool fHaveWatchOnly)> NotifyWatchonlyChanged;
+
+    /** Inquire whether this wallet broadcasts transactions. */
+    bool GetBroadcastTransactions() const { return fBroadcastTransactions; }
+
+    /** Set whether this wallet broadcasts transactions. */
+    void SetBroadcastTransactions(bool broadcast) { fBroadcastTransactions = broadcast; }
 
     /**
      * Explicitly make the wallet learn the related scripts for outputs to the

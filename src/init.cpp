@@ -416,6 +416,7 @@ std::string HelpMessage(HelpMessageMode mode)
     strUsage += "  -maxtxfee=<amt>          " + strprintf(_("Maximum total fees to use in a single wallet transaction, setting too low may abort large transactions (default: %s)"), FormatMoney(maxTxFee)) + "\n";
     strUsage += "  -upgradewallet           " + _("Upgrade wallet to latest format") + " " + _("on startup") + "\n";
     strUsage += "  -wallet=<file>           " + _("Specify wallet file (within data directory)") + " " + strprintf(_("(default: %s)"), "wallet.dat") + "\n";
+    strUsage += "  -walletbroadcast         " + _("Make the wallet broadcast transactions") + " " + strprintf(_("(default: %u)"), true) + "\n";
     strUsage += "  -walletnotify=<cmd>      " + _("Execute command when a wallet transaction changes (%s in cmd is replaced by TxID)") + "\n";
     if (mode == HMM_BITCOIN_QT)
         strUsage += "  -windowtitle=<name>  " + _("Wallet window title") + "\n";
@@ -1677,6 +1678,7 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
                 }
             }
         }
+        pwalletMain->SetBroadcastTransactions(GetBoolArg("-walletbroadcast", true));
     }  // (!fDisableWallet)
 #else  // ENABLE_WALLET
     LogPrintf("No wallet compiled in!\n");
