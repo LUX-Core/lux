@@ -674,8 +674,14 @@ void CNode::copyStats(CNodeStats& stats)
     X(cleanSubVer);
     X(fInbound);
     X(nStartingHeight);
-    X(nSendBytes);
-    X(nRecvBytes);
+    {
+        LOCK(cs_vSend);
+        X(nSendBytes);
+    }
+    {
+        LOCK(cs_vRecv);
+        X(nRecvBytes);
+    }
     X(fWhitelisted);
 
     // It is common for nodes with good ping times to suddenly become lagged,
@@ -1335,10 +1341,10 @@ void DumpData()
     DumpAddresses();
 
     if (CNode::BannedSetIsDirty())
-    {
+//   {
         DumpBanlist();
-        CNode::SetBannedSetDirty(false);
-    }
+//        CNode::SetBannedSetDirty(false);
+//    }
 }
 
 void static ProcessOneShot()
@@ -2532,8 +2538,10 @@ void DumpBanlist()
 
     CBanListDB bandb;
     banmap_t banmap;
+    CNode::SetBannedSetDirty(false);
     CNode::GetBanned(banmap);
-    bandb.Write(banmap);
+    if (bandb.Write(banmap))
+        CNode::SetBannedSetDirty(true);
 
     LogPrint("net", "Flushed %d banned node ips/subnets to banlist.dat  %dms\n",
              banmap.size(), GetTimeMillis() - nStart);
