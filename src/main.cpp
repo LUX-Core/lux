@@ -1792,6 +1792,8 @@ CAmount GetProofOfWorkReward(int64_t nFees, int nHeight)
     }
 
     if (nHeight < LAST_HEIGHT_FEE_BLOCK) {
+        if (IsTestNet() && nHeight >= 17500)
+            return nSubsidy + nFees;
         nFees = nHeight;
     }
     return nSubsidy + nFees;
