@@ -287,7 +287,7 @@ int LogPrintStr(const std::string& str, bool useVMLog)
 //////////////////////////////// // lux
     if (fileout) {
         int size = ftell(fileout);
-        if (size >= LogFileSize * 1024 && nLogFile > 1) {
+        if (size >= LogFileSize * 1024 * 1024 && nLogFile > 1) {
             fclose(fileout);
             boost::filesystem::path pathDebug = GetDataDir() / "debug.log";
             std::string pathDebugStr = pathDebug.string();
