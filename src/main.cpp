@@ -3785,9 +3785,13 @@ bool CheckForMasternodePayment(const CTransaction& tx, const CBlockHeader& heade
         // Avoid costly checks early on first PoW blocks
         if (nHeight < chainParams.FirstSplitRewardBlock())
             return true;
-        LOCK(cs_main);
-        BOOST_FOREACH(const CTxOut& txout, tx.vout) {
-            totalReward += txout.nValue;
+        if (nHeight >= Params().FirstSCBlock()) {
+            totalReward = GetProofOfWorkReward(0, nHeight);
+        } else {
+            LOCK(cs_main);
+            BOOST_FOREACH(const CTxOut& txout, tx.vout) {
+                totalReward += txout.nValue;
+            }
         }
     }
 
