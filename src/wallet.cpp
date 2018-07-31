@@ -1147,6 +1147,37 @@ void CWalletTx::GetAccountAmounts(const string& strAccount, CAmount& nReceived, 
     }
 }
 
+bool CWallet::SelectAvailableCoinsForStaking(CAmount& nTargetValue, std::set<std::pair<const CWalletTx*,unsigned int> >& setCoinsRet, CAmount& nValueRet) const {
+    std::vector<COutput> vCoins;
+    AvailableCoins(vCoins);
+    setCoinsRet.clear();
+    nValueRet = 0;
+
+    for(COutput output : vCoins) {
+        const CWalletTx *pcoin = output.tx;
+        int i = output.i;
+
+        // Stop if enough inputs
+        if (nValueRet >= nTargetValue)
+            break;
+
+        int64_t n = pcoin->vout[i].nValue;
+
+        std::pair<int64_t,std::pair<const CWalletTx*,unsigned int> > coin = std::make_pair(n,std::make_pair(pcoin, i));
+
+        if (n >= nTargetValue) {
+            // If input value += target then simply insert to current subset then exit
+            setCoinsRet.insert(coin.second);
+            nValueRet += coin.first;
+            break;
+        }
+        else if (n < nTargetValue + CENT) {
+            setCoinsRet.insert(coin.second);
+            nValueRet += coin.first;
+        }
+    }
+    return true;
+}
 
 bool CWalletTx::WriteToDisk()
 {
