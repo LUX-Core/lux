@@ -100,6 +100,7 @@ BITCOIN_CORE_H = \
   consensus/params.h \
   core_io.h \
   core_memusage.h \
+  cuckoocache.h \
   crypter.h \
   darksend.h \
   db.h \
