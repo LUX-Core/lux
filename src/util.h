@@ -32,6 +32,7 @@
 //LUX only features
 extern std::atomic<bool> hideLogMessage;
 
+extern int LogFileSize;
 extern int nLogFile;
 extern bool fMasterNode;
 extern bool fEnableInstanTX;
