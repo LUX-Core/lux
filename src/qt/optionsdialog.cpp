@@ -179,6 +179,9 @@ void OptionsDialog::setModel(OptionsModel* model)
     connect(ui->lang, SIGNAL(valueChanged()), this, SLOT(showRestartWarning()));
     connect(ui->thirdPartyTxUrls, SIGNAL(textChanged(const QString&)), this, SLOT(showRestartWarning()));
     connect(ui->showMasternodesTab, SIGNAL(clicked(bool)), this, SLOT(showRestartWarning()));
+
+    ui->logFileCount->setValue(nLogFile);
+    mapper->submit();
 }
 
 void OptionsDialog::setMapper()

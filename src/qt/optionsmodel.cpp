@@ -17,7 +17,7 @@
 #include "init.h"
 #include "main.h"
 #include "net.h"
-#include "txdb.h" // for -dbcache -nLogFile defaults
+#include "txdb.h" // for -dbcache defaults
 
 #ifdef ENABLE_WALLET
 #include "masternodeconfig.h"
@@ -401,10 +401,9 @@ bool OptionsModel::setData(const QModelIndex& index, const QVariant& value, int 
             if (settings.value("nLogFile") != value) {
                 settings.setValue("nLogFile", value);
 
-                //Delete existing debug log files before restart
+                //Delete existing debug log files
                 boost::filesystem::path pathDebug = GetDataDir() / "debug.log";
                 std::string pathDebugStr = pathDebug.string();
-                //remove(pathDebugStr.c_str());
                 int debugNum = 1;
                 while (true) {
                     std::string tempPath = pathDebugStr + ".";
@@ -419,7 +418,10 @@ bool OptionsModel::setData(const QModelIndex& index, const QVariant& value, int 
                         break;
                     }
                 }
-                setRestartRequired(false);
+                nLogFile = value.value<int>();
+                //Set nLogfile to .conf file
+                SetParamToConfigFile("nlogfile", std::to_string(value.value<int>()));
+                setRestartRequired(true);
             }
             break;
         case LogEvents:
