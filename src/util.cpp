@@ -579,6 +579,38 @@ boost::filesystem::path GetMasternodeConfigFile()
     return pathConfigFile;
 }
 
+void SetParamToConfigFile(std::string strkey, std::string val)
+{
+    string str = strkey + "=" + val + "\n";
+    string line;
+    bool flag = false;
+
+    boost::filesystem::ifstream configFile;
+    configFile.open(GetConfigFile().string().c_str());
+    boost::filesystem::ofstream tempFile;
+    boost::filesystem::path pathTempFile = GetDataDir() / "temp.conf";
+    tempFile.open(pathTempFile.string().c_str());
+
+    if (configFile.is_open() && tempFile.is_open()) {
+        while (getline(configFile,line))
+        {
+            size_t pos = line.find(strkey.c_str());
+            if (pos!=string::npos) {
+                tempFile << str << endl;
+                flag = true;
+            } else
+                tempFile << line << endl;
+        }
+        if (!flag) {
+            tempFile << str << endl;
+        }
+        configFile.close();
+        tempFile.close();
+        remove(GetConfigFile().string().c_str());
+        rename(pathTempFile.string().c_str(), GetConfigFile().string().c_str());
+    }
+}
+
 void ReadConfigFile(map<string, string>& mapSettingsRet,
     map<string, vector<string> >& mapMultiSettingsRet)
 {

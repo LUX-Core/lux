@@ -138,6 +138,7 @@ void CreatePidFile(const boost::filesystem::path& path, pid_t pid);
 #endif
 void ReadConfigFile(std::map<std::string, std::string>& mapSettingsRet, std::map<std::string, std::vector<std::string> >& mapMultiSettingsRet);
 void WriteConfigToFile(std::string strKey, std::string strValue);
+void SetParamToConfigFile(std::string strkey, std::string val);
 #ifdef WIN32
 boost::filesystem::path GetSpecialFolderPath(int nFolder, bool fCreate = true);
 #endif
