@@ -343,7 +343,8 @@ std::string HelpMessage(HelpMessageMode mode)
     }
     strUsage += "  -datadir=<dir>         " + _("Specify data directory") + "\n";
     strUsage += "  -dbcache=<n>           " + strprintf(_("Set database cache size in megabytes (%d to %d, default: %d)"), nMinDbCache, nMaxDbCache, nDefaultDbCache) + "\n";
-    strUsage += "  -nlogfile=<n>           " + _("Set number of debug log files") + "\n";
+    strUsage += "  -nlogfile=<n>           " + _("Set the number of debug log files") + "\n";
+    strUsage += "  -logfilesize=<n>           " + _("Set the size of debug log files(MB)") + "\n";
     strUsage += "  -loadblock=<file>      " + _("Imports blocks from external blk000??.dat file") + " " + _("on startup") + "\n";
     strUsage += "  -maxorphantx=<n>       " + strprintf(_("Keep at most <n> unconnectable transactions in memory (default: %u)"), DEFAULT_MAX_ORPHAN_TRANSACTIONS) + "\n";
     strUsage += "  -par=<n>               " + strprintf(_("Set the number of script verification threads (%u to %d, 0 = auto, <0 = leave that many cores free, default: %d)"), -(int)boost::thread::hardware_concurrency(), MAX_SCRIPTCHECK_THREADS, DEFAULT_SCRIPTCHECK_THREADS) + "\n";
@@ -1475,7 +1476,8 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
                     pblocktree->WriteFlag("logevents", fLogEvents);
                 }
 
-                nLogFile = GetArg("-nlogfile", 1);
+                nLogFile = GetArg("-nlogfile", 10);
+                LogFileSize = GetArg("-logfilesize", 10);
 
                 // Check for changed -prune state.  What we are concerned about is a user who has pruned blocks
                 // in the past, but is now trying to run unpruned.

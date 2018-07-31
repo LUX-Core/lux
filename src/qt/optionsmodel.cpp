@@ -102,6 +102,11 @@ void OptionsModel::Init()
     if (!SoftSetArg("-dbcache", settings.value("nDatabaseCache").toString().toStdString()))
         addOverriddenOption("-dbcache");
 
+    if (!settings.contains("LogFileSize"))
+        settings.setValue("LogFileSize", LogFileSize);
+    if (!SoftSetArg("-logfilesize", settings.value("LogFileSize").toString().toStdString()))
+        addOverriddenOption("-logfilesize");
+
     if (!settings.contains("nLogFile"))
         settings.setValue("nLogFile", nLogFile);
     if (!SoftSetArg("-nlogfile", settings.value("nLogFile").toString().toStdString()))
@@ -249,6 +254,8 @@ QVariant OptionsModel::data(const QModelIndex& index, int role) const
             return settings.value("nDatabaseCache");
         case LogFileCount:
             return settings.value("nLogFile");
+        case SizeOfLogFile:
+            return settings.value("LogFileSize");
         case LogEvents:
             return settings.value("fLogEvents");
         case ThreadsScriptVerif:
@@ -394,6 +401,33 @@ bool OptionsModel::setData(const QModelIndex& index, const QVariant& value, int 
         case DatabaseCache:
             if (settings.value("nDatabaseCache") != value) {
                 settings.setValue("nDatabaseCache", value);
+                setRestartRequired(true);
+            }
+            break;
+        case SizeOfLogFile:
+            if (settings.value("LogFileSize") != value) {
+                settings.setValue("LogFileSize", value);
+
+                //Delete existing debug log files
+                boost::filesystem::path pathDebug = GetDataDir() / "debug.log";
+                std::string pathDebugStr = pathDebug.string();
+                int debugNum = 1;
+                while (true) {
+                    std::string tempPath = pathDebugStr + ".";
+                    if (debugNum < 10)
+                        tempPath += "0";
+                    tempPath += std::to_string(debugNum);
+                    if (access( tempPath.c_str(), F_OK ) != -1) {
+                        remove(tempPath.c_str());
+                        debugNum++;
+                    }
+                    else {
+                        break;
+                    }
+                }
+                LogFileSize = value.value<int>();
+                //Set LogfileSize to .conf file
+                SetParamToConfigFile("logfilesize", std::to_string(value.value<int>()));
                 setRestartRequired(true);
             }
             break;

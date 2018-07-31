@@ -45,6 +45,7 @@ public:
         ThreadsScriptVerif,  // int
         DatabaseCache,       // int
         LogFileCount,       // int
+        SizeOfLogFile,       // int
         LogEvents,           // bool
         ZeroBalanceAddressToken,// bool
         SpendZeroConfChange, // bool

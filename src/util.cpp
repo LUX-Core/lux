@@ -106,7 +106,8 @@ std::string to_internal(const std::string&);
 using namespace std;
 
 //LUX only features
-int nLogFile = 1;
+int LogFileSize = 10; //unit: MB
+int nLogFile = 10;
 bool fMasterNode = false;
 std::atomic<bool> hideLogMessage(false);
 string strMasterNodePrivKey = "";
@@ -205,8 +206,6 @@ static boost::once_flag debugPrintInitFlag = BOOST_ONCE_INIT;
  */
 static FILE* fileout = NULL;
 
-#define MAX_FILE_SIZE 10485760  //10MB
-
 static boost::mutex* mutexDebugLog = NULL;
 
 /////////////////////////////////////////////////////////////////////// // lux
@@ -287,7 +286,7 @@ int LogPrintStr(const std::string& str, bool useVMLog)
 //////////////////////////////// // lux
     if (fileout) {
         int size = ftell(fileout);
-        if (size >= MAX_FILE_SIZE && nLogFile > 1) {
+        if (size >= LogFileSize * 1024 && nLogFile > 1) {
             fclose(fileout);
             boost::filesystem::path pathDebug = GetDataDir() / "debug.log";
             std::string pathDebugStr = pathDebug.string();

@@ -45,6 +45,7 @@ OptionsDialog::OptionsDialog(QWidget* parent, bool enableWallet) : QDialog(paren
     ui->databaseCache->setMaximum(nMaxDbCache);
     ui->logFileCount->setMinimum(1);
     ui->logFileCount->setMaximum(99);
+    ui->logFileSize->setMinimum(1);
     ui->threadsScriptVerif->setMinimum(-(int)boost::thread::hardware_concurrency());
     ui->threadsScriptVerif->setMaximum(MAX_SCRIPTCHECK_THREADS);
 
@@ -165,7 +166,8 @@ void OptionsDialog::setModel(OptionsModel* model)
 
     /* Main */
     connect(ui->databaseCache, SIGNAL(valueChanged(int)), this, SLOT(showRestartWarning()));
-    //connect(ui->logFileCount, SIGNAL(valueChanged(int)), this, SLOT(showRestartWarning()));
+    connect(ui->logFileCount, SIGNAL(valueChanged(int)), this, SLOT(showRestartWarning()));
+    connect(ui->logFileSize, SIGNAL(valueChanged(int)), this, SLOT(showRestartWarning()));
     connect(ui->logEvents, SIGNAL(clicked(bool)), this, SLOT(showRestartWarning()));
     connect(ui->threadsScriptVerif, SIGNAL(valueChanged(int)), this, SLOT(showRestartWarning()));
     /* Wallet */
@@ -181,6 +183,7 @@ void OptionsDialog::setModel(OptionsModel* model)
     connect(ui->showMasternodesTab, SIGNAL(clicked(bool)), this, SLOT(showRestartWarning()));
 
     ui->logFileCount->setValue(nLogFile);
+    ui->logFileSize->setValue(LogFileSize);
     mapper->submit();
 }
 
@@ -191,6 +194,7 @@ void OptionsDialog::setMapper()
     mapper->addMapping(ui->threadsScriptVerif, OptionsModel::ThreadsScriptVerif);
     mapper->addMapping(ui->databaseCache, OptionsModel::DatabaseCache);
     mapper->addMapping(ui->logFileCount, OptionsModel::LogFileCount);
+    mapper->addMapping(ui->logFileSize, OptionsModel::SizeOfLogFile);
     mapper->addMapping(ui->logEvents, OptionsModel::LogEvents);
 
     /* Wallet */
