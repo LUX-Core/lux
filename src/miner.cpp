@@ -185,7 +185,31 @@ void BlockAssembler::RebuildRefundTransaction(){
     CMutableTransaction contrTx(originalRewardTx);
     if (!pblock->IsProofOfStake()) {
         refundtx=0;
-        contrTx.vout[refundtx].nValue -= bceResult.refundSender;
+
+        CAmount powReward = GetProofOfWorkReward(0, nHeight);
+        CAmount totalReward = powReward + nFees;
+        CAmount minerReward = 0;
+        CAmount mnReward = 0;
+        CScript mnPayee;
+
+        if (nHeight >= chainparams.FirstSplitRewardBlock() && SelectMasternodePayee(mnPayee)) {
+            contrTx.vout.resize(2);
+            // set masternode payee and 20% reward
+            mnReward = powReward * 0.2;
+            contrTx.vout[1].scriptPubKey = mnPayee;
+            contrTx.vout[1].nValue = mnReward;
+
+            //CTxDestination txDest;
+            //ExtractDestination(mnPayee, txDest);
+            //LogPrintf("%s: Masternode payment to %s (pow)\n", __func__, EncodeDestination(txDest));
+
+            // miner's reward is everything that left
+            minerReward = totalReward - mnReward;
+        } else {
+            minerReward = totalReward;
+        }
+        minerReward -= bceResult.refundSender;
+        contrTx.vout[0].nValue = minerReward;
 
         int i=contrTx.vout.size();
         contrTx.vout.resize(contrTx.vout.size()+bceResult.refundOutputs.size());
