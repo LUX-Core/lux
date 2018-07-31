@@ -11,7 +11,7 @@
 #include <vector>
 
 // DoS prevention: limit cache size to 40MB (over 1000000 entries on 64-bit systems).
-static const unsigned int DEFAULT_MAX_SIG_CACHE_SIZE = 40;
+static const unsigned int DEFAULT_MAX_SIG_CACHE_SIZE = 32;
 // Maximum sig cache size allowed
 static const int64_t MAX_MAX_SIG_CACHE_SIZE = 16384;
 
