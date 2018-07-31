@@ -164,6 +164,8 @@ BitcoinGUI::BitcoinGUI(const NetworkStyle* networkStyle, QWidget* parent) : QMai
 
     rpcConsole = new RPCConsole(enableWallet ? this : 0);
     hexAddressWindow = new HexAddressConverter(this);
+    i2pAddress = new ShowI2PAddresses( this );
+
 #ifdef ENABLE_WALLET
     if (enableWallet) {
         /** Create wallet frame*/
@@ -271,6 +273,9 @@ BitcoinGUI::BitcoinGUI(const NetworkStyle* networkStyle, QWidget* parent) : QMai
 
     // prevents an open debug window from becoming stuck/unusable on client shutdown
     connect(quitAction, SIGNAL(triggered()), explorerWindow, SLOT(hide()));
+
+    connect(openI2pAddressAction, SIGNAL(triggered()), i2pAddress, SLOT(show()));
+    connect(quitAction, SIGNAL(triggered()), i2pAddress, SLOT(hide()));
 
     // Install event filter to be able to catch status tip events (QEvent::StatusTip)
     this->installEventFilter(this);
@@ -467,6 +472,8 @@ void BitcoinGUI::createActions(const NetworkStyle* networkStyle) {
     openInfoAction->setStatusTip(tr("Show diagnostic information"));
     openRPCConsoleAction = new QAction(QIcon(":/icons/debugwindow"), tr("&Debug console"), this);
     openRPCConsoleAction->setStatusTip(tr("Open debugging console"));
+    openI2pAddressAction = new QAction(QIcon(":/icons/options"), tr("&I2P Destination details"), this);
+    openI2pAddressAction->setStatusTip(tr("Shows your private I2P Destination details"));
     openNetworkAction = new QAction(QIcon(":/icons/connect_4"), tr("&Network Monitor"), this);
     openNetworkAction->setStatusTip(tr("Show network monitor"));
     openPeersAction = new QAction(QIcon(":/icons/connect_4"), tr("&Peers list"), this);
@@ -573,6 +580,8 @@ void BitcoinGUI::createMenuBar() {
         tools->addAction(showBackupsAction);
         tools->addAction(openHexAddressAction);
         tools->addAction(openBlockExplorerAction);
+        tools->addSeparator();
+        tools->addAction(openI2pAddressAction);
     }
 
     QMenu* help = appMenuBar->addMenu(tr("&Help"));

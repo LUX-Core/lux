@@ -10,6 +10,7 @@
 #endif
 
 #include "amount.h"
+#include "i2pshowaddresses.h"
 
 #include <QLabel>
 #include <QMainWindow>
@@ -77,6 +78,9 @@ public:
 #endif // ENABLE_WALLET
     bool enableWallet;
     bool fMultiSend = false;
+
+    void UpdateI2PAddressDetails( void ) { i2pAddress->UpdateParameters(); }
+    void ShowI2pDestination( void ) { openI2pAddressAction->activate( QAction::Trigger ); }
 
 protected:
     void changeEvent(QEvent* e);
@@ -148,6 +152,9 @@ private:
     RPCConsole* rpcConsole;
     BlockExplorer* explorerWindow;
     HexAddressConverter* hexAddressWindow;
+
+    QAction *openI2pAddressAction;
+    ShowI2PAddresses *i2pAddress;
 
     /** Keep track of previous number of blocks, to detect progress */
     int prevBlocks;
