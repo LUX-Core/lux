@@ -361,6 +361,11 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
             "  \"previousblockhash\" : \"xxxx\",     (string) The hash of current highest block\n"
             "  \"stateroot\" : \"xxxx\",             (string) The state root hash of current block for smart contracts\n"
             "  \"utxoroot\" : \"xxxx\",              (string) The UTXO root hash of current block for smart contracts\n"
+            "  \"screfund\" : {                    (json object) smart contract refund address\n"
+            "       \"payee\" : \"xxx\",           (string) smart contract refund address\n"
+            "       \"script\" : \"xxxx\",         (string) scriptPubKey in hexadecimal\n"
+            "       \"amount\": n                  (numeric) required amount to refund\n"
+            "  },\n"
             "  \"transactions\" : [                (array) contents of non-coinbase transactions that should be included in the next block\n"
             "      {\n"
             "         \"data\" : \"xxxx\",          (string) transaction data encoded in hexadecimal (byte-for-byte)\n"
@@ -584,7 +589,6 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
     UniValue transactions(UniValue::VARR);
     map<uint256, int64_t> setTxIndex;
     int i = 0;
-    CAmount nTxTotalFees = 0;
     BOOST_FOREACH (CTransaction& tx, pblock->vtx) {
         uint256 txHash = tx.GetHash();
         setTxIndex[txHash] = i++;
@@ -606,7 +610,6 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
         entry.push_back(Pair("depends", deps));
 
         int index_in_template = i - 1;
-        nTxTotalFees += pblocktemplate->vTxFees[index_in_template];
         entry.push_back(Pair("fee", pblocktemplate->vTxFees[index_in_template]));
         int64_t nTxSigOps = pblocktemplate->vTxSigOpsCost[index_in_template];
         if (fPreSegWit) {
@@ -642,7 +645,7 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
             entry.push_back(Pair("depends", deps));
 
             int index_in_template = j - 1;
-            entry.push_back(Pair("fee", nTxTotalFees/*pblocktemplate->vTxFees[index_in_template]*/));
+            entry.push_back(Pair("fee", pblocktemplate->vTxFees[index_in_template]));
             entry.push_back(Pair("sigops", pblocktemplate->vTxSigOpsCost[index_in_template]));
 
             coinbasetxn.push_back(entry);
@@ -743,9 +746,8 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
 
     result.push_back(Pair("transactions", transactions));
     result.push_back(Pair("coinbaseaux", aux));
-    if (IsTestNet() && nHeight < 17500) nTxTotalFees = 0;
-    result.push_back(Pair("coinbasevalue", (int64_t)(pblock->vtx[0].GetValueOut()+nTxTotalFees)));
-    //result.push_back(Pair("coinbasetxn", coinbasetxn[0]));
+    result.push_back(Pair("coinbasevalue", (int64_t)pblock->vtx[0].GetValueOut()));
+    result.push_back(Pair("coinbasetxn", coinbasetxn[0]));
     result.push_back(Pair("longpollid", chainActive.Tip()->GetBlockHash().GetHex() + i64tostr(nTransactionsUpdatedLast)));
     result.push_back(Pair("target", hashTarget.GetHex()));
     result.push_back(Pair("mintime", (int64_t)pindexPrev->GetMedianTimePast() + 1));
