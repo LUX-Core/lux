@@ -315,15 +315,16 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
         assert(coinbaseTx.vin[0].scriptSig.size() <= 100);
         coinbaseTx.vout[0].SetEmpty();
     } else {
-        CAmount totalReward = GetProofOfWorkReward(nFees, nHeight);
+        CAmount powReward = GetProofOfWorkReward(0, nHeight);
+        CAmount totalReward = powReward + nFees;
         CAmount minerReward = 0;
         CAmount mnReward = 0;
         CScript mnPayee;
 
         if (nHeight >= chainparams.FirstSplitRewardBlock() && SelectMasternodePayee(mnPayee)) {
             coinbaseTx.vout.resize(2);
-            //set masternode payee and 20% reward
-            mnReward = totalReward * 0.2;
+            // set masternode 20% reward
+            mnReward = powReward * 0.2;
             coinbaseTx.vout[1].scriptPubKey = mnPayee;
             coinbaseTx.vout[1].nValue = mnReward;
 
@@ -331,12 +332,11 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
             ExtractDestination(mnPayee, txDest);
             LogPrintf("%s: Masternode payment to %s (pow)\n", __func__, EncodeDestination(txDest));
 
-            //miner's reward is everything that left after possibly inaccurate division
+            // miner's reward is everything that is left
             minerReward = totalReward - mnReward;
         } else {
             minerReward = totalReward;
         }
-        assert(minerReward + mnReward == totalReward);
 
         coinbaseTx.vin[0].scriptSig = CScript() << nHeight << OP_0;
         coinbaseTx.vout[0].scriptPubKey = scriptPubKeyIn;
@@ -383,6 +383,11 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
     //this should already be populated by AddBlock in case of contracts, but if no contracts
     //then it won't get populated
     RebuildRefundTransaction();
+
+    if (fProofOfStake && bceResult.refundOutputs.size()) {
+        // for now, avoid processing SC in PoS blocks
+        return nullptr;
+    }
     ////////////////////////////////////////////////////////
 
     pblocktemplate->vchCoinbaseCommitment = GenerateCoinbaseCommitment(*pblock, pindexPrev, chainparams.GetConsensus(), fProofOfStake);
