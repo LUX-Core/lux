@@ -857,7 +857,7 @@ bool WalletModel::isMineAddress(const std::string &Address)
 {
     LOCK2(cs_main, wallet->cs_wallet);
 
-    CTxDestination address;
+    CTxDestination address = DecodeDestination(Address);
 
     if(!IsValidDestination(address) || !IsMine(*wallet, address))
     {
