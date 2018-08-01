@@ -5,9 +5,9 @@ EXTRA_LIBRARIES += qt/libbitcoinqt.a
 
 if ENABLE_UPDATER
 if !TARGET_WINDOWS
-CXXFLAGS += -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I/usr/include/x86_64-linux-gnu/qt5/QtNetwork -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -fPIC -Wno-unused-result -Wno-unused-but-set-variable
+CXXFLAGS += -fPIC -Wno-unused-result -Wno-unused-but-set-variable
 
-LIBS += -lQt5Core -lQt5Network -lQt5Widgets -lQt5Gui
+LIBS += -lutil
 endif
 endif
 
