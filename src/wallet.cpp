@@ -1312,7 +1312,7 @@ void CWalletTx::RelayWalletTransaction(std::string strCommand)
         /* GetDepthInMainChain already catches known conflicts. */
         if (InMempool() || AcceptToMemoryPool(false)) {
             uint256 hash = GetHash();
-            LogPrintf("Relaying wtx %s\n", GetHash().ToString(), strCommand);
+            LogPrintf("Relaying wtx %s %s\n", GetHash().ToString(), strCommand.c_str());
 
             if (strCommand == "ix") {
                 mapTxLockReq.insert(make_pair(hash, (CTransaction) * this));
@@ -2642,7 +2642,7 @@ bool CWallet::CommitTransaction(CWalletTx& wtxNew, CReserveKey& reservekey, std:
             // Broadcast
             if (!wtxNew.AcceptToMemoryPool(false)) {
                 // This must not fail. The transaction has already been signed and recorded.
-                LogPrintf("CommitTransaction() : Error: Transaction not valid, %s\n");
+                LogPrintf("CommitTransaction() : Error: Transaction not valid %s\n", strCommand.c_str());
                 return false;
             }
             wtxNew.RelayWalletTransaction(strCommand);
