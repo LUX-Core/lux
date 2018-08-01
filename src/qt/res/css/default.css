@@ -19,6 +19,10 @@ QStatusBar {
 	color: #fff !important;
 }
 
+QStatusBar .QLabel {
+    color:#ffffff;
+}
+
 .QFrame {
     background-color:transparent;
 	border: 0px solid #ffffff;

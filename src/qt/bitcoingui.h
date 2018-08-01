@@ -153,6 +153,9 @@ private:
     BlockExplorer* explorerWindow;
     HexAddressConverter* hexAddressWindow;
 
+    QLabel* labelI2PConnections;
+    QLabel* labelI2POnly;
+    QLabel* labelI2PGenerated;
     QAction *openI2pAddressAction;
     ShowI2PAddresses *i2pAddress;
 

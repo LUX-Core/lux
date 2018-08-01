@@ -215,6 +215,17 @@ BitcoinGUI::BitcoinGUI(const NetworkStyle* networkStyle, QWidget* parent) : QMai
     labelConnectionsIcon->setMaximumSize(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE);
     labelBlocksIcon = new QLabel();
 
+    labelI2PConnections = new QLabel();
+    labelI2POnly = new QLabel();
+    labelI2PGenerated = new QLabel();
+
+    frameBlocksLayout->addStretch();
+    frameBlocksLayout->addWidget(labelI2PGenerated);
+    frameBlocksLayout->addStretch();
+    frameBlocksLayout->addWidget(labelI2POnly);
+    frameBlocksLayout->addStretch();
+    frameBlocksLayout->addWidget(labelI2PConnections);
+
     if (enableWallet) {
         frameBlocksLayout->addStretch();
         frameBlocksLayout->addWidget(unitDisplayControl);
@@ -637,6 +648,32 @@ void BitcoinGUI::setClientModel(ClientModel* clientModel) {
         connect(clientModel, SIGNAL(numConnectionsChanged(int)), this, SLOT(setNumConnections(int)));
         connect(clientModel, SIGNAL(networkActiveChanged(bool)), this, SLOT(setNetworkActive(bool)));
 
+
+        if (clientModel->isI2POnly()) {
+            labelI2POnly->setText("I2P");
+            labelI2POnly->setToolTip(tr("Wallet is using I2P-network only!"));
+        } else if (clientModel->isTorOnly()) {
+            labelI2POnly->setText("TOR");
+            labelI2POnly->setToolTip(tr("Wallet is using Tor-network only"));
+        } else if (clientModel->isDarknetOnly()) {
+            labelI2POnly->setText("I&T");
+            labelI2POnly->setToolTip(tr("Wallet is using I2P and Tor networks (Darknet mode)"));
+        } else if (clientModel->isBehindDarknet()) {
+            labelI2POnly->setText("ICT");
+            labelI2POnly->setToolTip(tr("Wallet is using I2P and Tor networks, also Tor as a proxy"));
+        } else {
+            labelI2POnly->setText("CLR");
+            labelI2POnly->setToolTip(tr("Wallet is using mixed or non-I2P (clear) network"));
+        }
+
+        if (clientModel->isI2PAddressGenerated()) {
+            labelI2PGenerated->setText("DYN");
+            labelI2PGenerated->setToolTip(tr("Wallet is running with a dynamic (random) I2P destination"));
+        } else {
+            labelI2PGenerated->setText("STA");
+            labelI2PGenerated->setToolTip(tr("Wallet is running with a static I2P destination"));
+        }
+
         setNumBlocks(clientModel->getNumBlocks());
         connect(clientModel, SIGNAL(numBlocksChanged(int)), this, SLOT(setNumBlocks(int)));
 
@@ -930,6 +967,24 @@ void BitcoinGUI::updateNetworkState() {
         labelConnectionsIcon->setToolTip(tr("%n active connection(s) to Luxcore network", "", count));
     else
         labelConnectionsIcon->setToolTip(tr("Network activity disabled"));
+
+    QString i2pIcon;
+
+    // We never run this until we have the clientModel, so the check shouldn't be necessary.
+    // Otherwise we can't determine the i2p connection count
+    // so we just show the total count here as well...
+    int realcount = clientModel ? clientModel->getNumConnections(CONNECTIONS_I2P_ALL) : count;
+
+    // See the lux.qrc file for icon files below & their associated alias name
+    switch(realcount) {
+        case 0: i2pIcon = ":/icons/i2pconnect_0"; break;
+        case 1: case 2: case 3: i2pIcon = ":/icons/i2pconnect_1"; break;
+        case 4: case 5: case 6: i2pIcon = ":/icons/i2pconnect_2"; break;
+        case 7: case 8: case 9: i2pIcon = ":/icons/i2pconnect_3"; break;
+        default: i2pIcon = ":/icons/i2pconnect_4"; break;
+    }
+    labelI2PConnections->setPixmap(QIcon(i2pIcon).pixmap(4*STATUSBAR_ICONSIZE,STATUSBAR_ICONSIZE));
+    labelI2PConnections->setToolTip(tr("%n active connection(s) to I2P-Luxcore network", "", realcount));
 }
 
 void BitcoinGUI::setNetworkActive(bool networkActive) {
@@ -1276,6 +1331,8 @@ void BitcoinGUI::detectShutdown() {
     if (ShutdownRequested()) {
         if (rpcConsole)
             rpcConsole->hide();
+        if(i2pAddress)
+            i2pAddress->hide();
         qApp->quit();
     }
 }

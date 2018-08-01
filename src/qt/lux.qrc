@@ -11,6 +11,11 @@
         <file alias="connect_2">res/icons/connect2_16.png</file>
         <file alias="connect_3">res/icons/connect3_16.png</file>
         <file alias="connect_4">res/icons/connect4_16.png</file>
+        <file alias="i2pconnect_0">res/icons/i2plogo_wbw_0_16.png</file>
+        <file alias="i2pconnect_1">res/icons/i2plogo_wbw_1_16.png</file>
+        <file alias="i2pconnect_2">res/icons/i2plogo_wbw_2_16.png</file>
+        <file alias="i2pconnect_3">res/icons/i2plogo_wbw_3_16.png</file>
+        <file alias="i2pconnect_4">res/icons/i2plogo_wbw_4_16.png</file>
         <file alias="transaction_0">res/icons/transaction0.png</file>
         <file alias="transaction_confirmed">res/icons/transaction2.png</file>
         <file alias="transaction_conflicted">res/icons/transaction_conflicted.png</file>

@@ -339,6 +339,11 @@ RES_ICONS = \
   qt/res/icons/fontbigger.png \
   qt/res/icons/fontsmaller.png \
   qt/res/icons/history.png \
+  qt/res/icons/i2plogo_wbw_0_16.png \
+  qt/res/icons/i2plogo_wbw_1_16.png \
+  qt/res/icons/i2plogo_wbw_2_16.png \
+  qt/res/icons/i2plogo_wbw_3_16.png \
+  qt/res/icons/i2plogo_wbw_4_16.png \
   qt/res/icons/key.png \
   qt/res/icons/lock_closed.png \
   qt/res/icons/update.ico \
