@@ -361,11 +361,11 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
             "  \"previousblockhash\" : \"xxxx\",     (string) The hash of current highest block\n"
             "  \"stateroot\" : \"xxxx\",             (string) The state root hash of current block for smart contracts\n"
             "  \"utxoroot\" : \"xxxx\",              (string) The UTXO root hash of current block for smart contracts\n"
-            "  \"screfund\" : {                    (json object) smart contract refund address\n"
+            "  \"screfund\" : [{                   (array) smart contract(s) refund address(es)\n"
             "       \"payee\" : \"xxx\",           (string) smart contract refund address\n"
             "       \"script\" : \"xxxx\",         (string) scriptPubKey in hexadecimal\n"
             "       \"amount\": n                  (numeric) required amount to refund\n"
-            "  },\n"
+            "  }],\n"
             "  \"transactions\" : [                (array) contents of non-coinbase transactions that should be included in the next block\n"
             "      {\n"
             "         \"data\" : \"xxxx\",          (string) transaction data encoded in hexadecimal (byte-for-byte)\n"
@@ -731,17 +731,19 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
     // smart contracts
     if (nHeight >= Params().FirstSCBlock()) {
         // gas refund
-        UniValue aSCrefund(UniValue::VOBJ);
-        if (pblock->vtx[0].vout.size() > 2) {
+        UniValue scrObjArray(UniValue::VARR);
+        for (size_t v=2; v < pblock->vtx[0].vout.size(); v++) {
+            UniValue aSCrefund(UniValue::VOBJ);
             CTxDestination scTxDest;
-            ExtractDestination(pblock->vtx[0].vout[2].scriptPubKey, scTxDest);
+            ExtractDestination(pblock->vtx[0].vout[v].scriptPubKey, scTxDest);
             aSCrefund.push_back(Pair("payee", EncodeDestination(scTxDest)));
-            aSCrefund.push_back(Pair("script", HexStr(pblock->vtx[0].vout[2].scriptPubKey)));
-            aSCrefund.push_back(Pair("amount", (int64_t)pblock->vtx[0].vout[2].nValue));
+            aSCrefund.push_back(Pair("script", HexStr(pblock->vtx[0].vout[v].scriptPubKey)));
+            aSCrefund.push_back(Pair("amount", (int64_t)pblock->vtx[0].vout[v].nValue));
+            scrObjArray.push_back(aSCrefund);
         }
         result.push_back(Pair("stateroot", pblock->hashStateRoot.GetHex()));
         result.push_back(Pair("utxoroot", pblock->hashUTXORoot.GetHex()));
-        result.push_back(Pair("screfund", aSCrefund));
+        result.push_back(Pair("screfund", scrObjArray));
     }
 
     result.push_back(Pair("transactions", transactions));
