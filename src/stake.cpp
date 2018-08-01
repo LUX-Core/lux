@@ -326,13 +326,13 @@ bool MultiplyStakeTarget(uint256& bnTarget, int nModifierHeight, int64_t nModifi
 
 #   if 0
     static std::map<int, mult> stakeTargetMultipliers = boost::assign::map_list_of
-#       include "multipliers.i"
+#       include "multipliers.hpp"
         ;
 #   else
     static std::map<int, mult> stakeTargetMultipliers;
     if (stakeTargetMultipliers.empty()) {
         std::multimap<int, mult> mm = boost::assign::map_list_of
-#include "multipliers.i"
+        #include "multipliers.hpp"
             ;
         for (auto i = mm.begin(); i != mm.end();) {
             auto p = stakeTargetMultipliers.emplace(i->first, i->second).first;
