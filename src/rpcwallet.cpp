@@ -2825,10 +2825,11 @@ UniValue sendtocontract(const UniValue& params, bool fHelp){
         throw JSONRPCError(RPC_TYPE_ERROR, "Invalid data (data not hex)");
 
     CAmount nAmount = 0;
-    if (params.size() > 2){
-        nAmount = params[2].get_int64();
-        if (nAmount < 0)
-            throw JSONRPCError(RPC_TYPE_ERROR, "Invalid amount for send");
+    if (params.size() > 2) {
+        UniValue uAmount = params[2];
+        if(!ParseMoney(uAmount.getValStr(), nAmount)) {
+            throw JSONRPCError(RPC_TYPE_ERROR, "Invalid value for Amount");
+        }
     }
 
     uint64_t nGasLimit=DEFAULT_GAS_LIMIT_OP_SEND;
