@@ -113,6 +113,7 @@ string strMasterNodeAddr = "";
 bool fEnableInstanTX = true;
 int nInstanTXDepth = 5;
 int nDarksendRounds = 2;
+int nWalletBackups = 10;
 int nAnonymizeLuxAmount = 1000;
 int nLiquidityProvider = 0;
 /** Spork enforcement enabled time */

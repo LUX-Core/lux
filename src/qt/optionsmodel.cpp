@@ -118,6 +118,8 @@ void OptionsModel::Init()
         settings.setValue("bSpendZeroConfChange", true);
     if (!SoftSetBoolArg("-spendzeroconfchange", settings.value("bSpendZeroConfChange").toBool()))
         addOverriddenOption("-spendzeroconfchange");
+    if (!settings.contains("nWalletBackups"))
+        settings.setValue("nWalletBackups", 10);
 #endif
     if (!settings.contains("bZeroBalanceAddressToken"))
         settings.setValue("bZeroBalanceAddressToken", true);
@@ -240,6 +242,8 @@ QVariant OptionsModel::data(const QModelIndex& index, int role) const
              return fshowMasternodesTab;
          case parallelMasterNode:
               return fparallelMasterNode;
+        case WalletBackups:
+            return QVariant(nWalletBackups);
         case DatabaseCache:
             return settings.value("nDatabaseCache");
         case LogEvents:
@@ -383,7 +387,11 @@ bool OptionsModel::setData(const QModelIndex& index, const QVariant& value, int 
              settings.setValue("fparallelMasterNode", fparallelMasterNode);
              emit parallelMasterNodeChanged(fparallelMasterNode);
              break;
-
+        case WalletBackups:
+            nWalletBackups = value.toInt();
+            settings.setValue("nWalletBackups", nWalletBackups);
+            emit walletBackupsChanged(nWalletBackups);
+            break;
         case DatabaseCache:
             if (settings.value("nDatabaseCache") != value) {
                 settings.setValue("nDatabaseCache", value);

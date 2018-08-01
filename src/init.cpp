@@ -69,7 +69,7 @@ using namespace std;
 
 #ifdef ENABLE_WALLET
 CWallet* pwalletMain = NULL;
-int nWalletBackups = 10;
+//int nWalletBackups = 10;
 #endif
 bool fFeeEstimatesInitialized = false;
 std::atomic<bool> fRestartRequested(false); // true: restart false: shutdown
