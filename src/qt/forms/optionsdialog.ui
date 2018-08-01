@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>576</width>
-    <height>441</height>
+    <height>419</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,7 +20,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tabMain">
       <attribute name="title">
@@ -320,13 +320,37 @@
             </property>
            </widget>
           </item>
-          <item>
-           <widget class="QCheckBox" name="notUseChangeAddress">
-            <property name="text">
-             <string>Don't use change &amp;address</string>
-            </property>
-           </widget>
-          </item>
+            <item>
+                 <widget class="QCheckBox" name="notUseChangeAddress">
+                     <property name="text">
+                         <string>Don't use change &amp;address</string>
+                     </property>
+                 </widget>
+            </item>
+			      <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_1_Wallet">
+                <item>
+                  <widget class="QLabel" name="walletBackupslabel">
+                    <property name="text">
+                      <string>Number of automatic wallet backups</string>
+                    </property>
+                  </widget>
+                </item>
+                <item>
+                  <widget class="QSpinBox" name="walletBackups">
+                    <property name="minimum">
+                      <number>1</number>
+                    </property>
+                    <property name="maximum">
+                      <number>20</number>
+                    </property>
+                    <property name="value">
+                      <number>10</number>
+                    </property>
+                  </widget>
+                </item>
+              </layout>
+            </item>
          </layout>
         </widget>
        </item>

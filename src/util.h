@@ -37,6 +37,7 @@ extern bool fMasterNode;
 extern bool fEnableInstanTX;
 extern int nInstanTXDepth;
 extern int nDarksendRounds;
+extern int nWalletBackups;
 extern int nAnonymizeLuxAmount;
 extern int nLiquidityProvider;
 extern bool fEnableDarksend;

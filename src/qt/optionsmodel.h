@@ -52,6 +52,7 @@ public:
         AnonymizeLuxAmount,  //int
         ShowMasternodesTab,  // bool
         NotUseChangeAddress,  // bool
+        WalletBackups,     // int
         Listen,              // bool
         OptionIDRowCount,
     };
@@ -105,6 +106,7 @@ signals:
     void showMasternodesTabChanged(bool);
     void parallelMasterNodeChanged(bool);
     void zeroBalanceAddressTokenChanged(bool);
+    void walletBackupsChanged(int);
 };
 
 #endif // BITCOIN_QT_OPTIONSMODEL_H
