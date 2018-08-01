@@ -680,8 +680,6 @@ bool Stake::CreateCoinStake(CWallet* wallet, const CKeyStore& keystore, unsigned
     if (!SelectStakeCoins(wallet, stakeCoins, nBalance - nReserveBalance)) {
         return false;
     }
-    if (stakeCoins.empty())
-        return false;
 
     int64_t nCredit = 0;
     uint256 bnCentSecond = 0; // coin age in the unit of cent-seconds
@@ -693,8 +691,7 @@ bool Stake::CreateCoinStake(CWallet* wallet, const CKeyStore& keystore, unsigned
         MilliSleep(10000);
 
     const CBlockIndex* pIndex0 = chainActive.Tip();
-    //BOOST_FOREACH(PAIRTYPE(const CWalletTx*, unsigned int) pcoin, stakeCoins)
-    for (const std::pair<const CWalletTx*,unsigned int> &pcoin : stakeCoins) {
+    BOOST_FOREACH(PAIRTYPE(const CWalletTx*, unsigned int) pcoin, stakeCoins) {
         //make sure that enough time has elapsed between
         CBlockIndex* pindex = LookupBlockIndex(pcoin.first->hashBlock);
         if (!pindex) {
@@ -771,30 +768,8 @@ bool Stake::CreateCoinStake(CWallet* wallet, const CKeyStore& keystore, unsigned
         }
         if (fKernelFound) break; // if kernel is found stop searching
     }
-    if (nCredit == 0 || nCredit > nBalance - nReserveBalance)
+    if (nCredit == 0 || nCredit > nBalance - nReserveBalance) {
         return false;
-
-    for (const std::pair<const CWalletTx*,unsigned int> &pcoin : stakeCoins) {
-        // Attempt to add more inputs. Only add coins of the same key/address as kernel
-        if (txNew.vout.size() == 2 && ((pcoin.first->vout[pcoin.second].scriptPubKey == scriptPubKeyKernel || pcoin.first->vout[pcoin.second].scriptPubKey == txNew.vout[1].scriptPubKey))
-            && pcoin.first->GetHash() != txNew.vin[0].prevout.hash) {
-
-            // Stop adding more inputs if already too many inputs
-            if (txNew.vin.size() >= 100)
-                break;
-
-            // Stop adding inputs if reached reserve limit
-            if (nCredit + pcoin.first->vout[pcoin.second].nValue > nBalance - nReserveBalance)
-                break;
-
-            // Do not add additional significant input
-            if ((unsigned)pcoin.first->vout[pcoin.second].nValue >= GetStakeCombineThreshold())
-                continue;
-
-            txNew.vin.push_back(CTxIn(pcoin.first->GetHash(), pcoin.second));
-            nCredit += pcoin.first->vout[pcoin.second].nValue;
-            vCoins.push_back(pcoin.first);
-        }
     }
 
     // Calculate reward
@@ -874,11 +849,6 @@ bool Stake::CreateCoinStake(CWallet* wallet, const CKeyStore& keystore, unsigned
             return error("%s: bad nValue (vout[%d].nValue = %d)", __func__, i, vout.nValue);
         }
         i += 1;
-    }
-
-    for (unsigned int i = 0; i < txNew.vout.size(); i++)
-    {
-        txNew.vout.push_back(txNew.vout[i]);
     }
 
     // Sign
