@@ -839,14 +839,6 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
     if (GetArg("-prune", 0)) {
         if (GetBoolArg("-txindex", false))
             return InitError(_("Prune mode is incompatible with -txindex."));
-#ifdef ENABLE_WALLET
-        if (!GetBoolArg("-disablewallet", false)) {
-            if (SoftSetBoolArg("-disablewallet", true))
-                LogPrintf("%s : parameter interaction: -prune -> setting -disablewallet=1\n", __func__);
-            else
-                return InitError(_("Can't run with a wallet in prune mode."));
-        }
-#endif
     }
 
     // ********************************************************* Step 3: parameter-to-internal-flags
