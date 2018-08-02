@@ -573,6 +573,9 @@
           </item>
           <item>
            <widget class="QLineEdit" name="splitBlockLineEdit">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="sizePolicy">
              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
               <horstretch>50</horstretch>

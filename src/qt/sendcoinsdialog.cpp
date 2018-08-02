@@ -138,8 +138,7 @@ SendCoinsDialog::SendCoinsDialog(QWidget* parent) : QDialog(parent),
     ui->groupFee->setId(ui->radioCustomFee, 1);
     ui->groupFee->button((int)std::max(0, std::min(1, settings.value("nFeeRadio").toInt())))->setChecked(true);
     ui->groupCustomFee->setId(ui->radioCustomPerKilobyte, 0);
-    ui->groupCustomFee->setId(ui->radioCustomAtLeast, 1);
-    ui->groupCustomFee->button((int)std::max(0, std::min(1, settings.value("nCustomFeeRadio").toInt())))->setChecked(true);
+    ui->groupCustomFee->button(0)->setChecked(true);
     ui->sliderSmartFee->setValue(settings.value("nSmartFeeSliderPosition").toInt());
     ui->customFee->setValue(settings.value("nTransactionFee").toLongLong());
     ui->checkBoxMinimumFee->setChecked(settings.value("fPayOnlyMinFee").toBool());
@@ -790,61 +789,14 @@ void SendCoinsDialog::splitBlockChecked(int state)
 //UTXO splitter
 void SendCoinsDialog::splitBlockLineEditChanged(const QString& text)
 {
-    if (!model || !model->getOptionsModel())
-        return;
-
-    if (CoinControlDialog::coinControl->HasSelected()) {
-        SendCoinsRecipient defRecipient;
-        defRecipient.address = "Lgm8YVKw2Njv3fcmA7Gtqeyqjf5iS3zEbL";
-        defRecipient.label = "";
-        defRecipient.amount = 100000000;
-        defRecipient.message = "default";
-        defRecipient.inputType = ALL_COINS;
-
-        QList<SendCoinsRecipient> recipients;
-        recipients.append(defRecipient);
-
-        if (CoinControlDialog::coinControl->fSplitBlock)
-            CoinControlDialog::coinControl->nSplitBlock = int(ui->splitBlockLineEdit->text().toInt());
-        if (ui->checkInstanTX->isChecked()) {
-            recipients[0].useInstanTX = true;
-        } else {
-            recipients[0].useInstanTX = false;
-        }
-
-        WalletModelTransaction currentTransaction(recipients);
-        if (model->getOptionsModel()->getCoinControlFeatures()) // coin control enabled
-            model->prepareTransaction(currentTransaction, CoinControlDialog::coinControl);
-        else
-            model->prepareTransaction(currentTransaction);
-
-        CAmount nFee = currentTransaction.getTransactionFee();
-
-        QString qAmount = ui->labelCoinControlAmount->text().left(ui->labelCoinControlAmount->text().indexOf(" ")).replace("~", "").simplified().replace(" ", "");
-        
-        //convert to CAmount        
-        CAmount nAmount;
-        ParseMoney(qAmount.toStdString().c_str(), nAmount);
-
-        CAmount nAfterFee = nAmount - nFee;
-
-        //if greater than 0 then divide after fee by the amount of blocks
-        CAmount nSize = nAmount - nFee;
         int nBlocks = text.toInt();
-        if (nAfterFee && nBlocks)
-            nSize = nAfterFee / nBlocks;
 
         //assign to split block dummy, which is used to recalculate the fee amount more outputs
         CoinControlDialog::nSplitBlockDummy = nBlocks;
 
         //update labels
-        ui->labelBlockSize->setText(QString::fromStdString(FormatMoney(nSize)));
         coinControlUpdateLabels();
 
-        ui->labelCoinControlFee->setText("~" + BitcoinUnits::formatWithUnit(model->getOptionsModel()->getDisplayUnit(), nFee));
-        ui->labelCoinControlAfterFee->setText("~" + BitcoinUnits::formatWithUnit(model->getOptionsModel()->getDisplayUnit(), nAfterFee));
-
-    } else {
         //grab the amount in Coin Control AFter Fee field
         QString qAfterFee = ui->labelCoinControlAfterFee->text().left(ui->labelCoinControlAfterFee->text().indexOf(" ")).replace("~", "").simplified().replace(" ", "");
 
@@ -854,17 +806,11 @@ void SendCoinsDialog::splitBlockLineEditChanged(const QString& text)
 
         //if greater than 0 then divide after fee by the amount of blocks
         CAmount nSize = nAfterFee;
-        int nBlocks = text.toInt();
+        
         if (nAfterFee && nBlocks)
             nSize = nAfterFee / nBlocks;
 
-        //assign to split block dummy, which is used to recalculate the fee amount more outputs
-        CoinControlDialog::nSplitBlockDummy = nBlocks;
-
-        //update labels
         ui->labelBlockSize->setText(QString::fromStdString(FormatMoney(nSize)));
-        coinControlUpdateLabels();
-    }
 }
 
 // Coin Control: copy label "Quantity" to clipboard

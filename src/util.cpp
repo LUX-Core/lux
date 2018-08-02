@@ -106,6 +106,7 @@ std::string to_internal(const std::string&);
 using namespace std;
 
 //LUX only features
+int nLogFile = 1;
 bool fMasterNode = false;
 std::atomic<bool> hideLogMessage(false);
 string strMasterNodePrivKey = "";
@@ -113,6 +114,7 @@ string strMasterNodeAddr = "";
 bool fEnableInstanTX = true;
 int nInstanTXDepth = 5;
 int nDarksendRounds = 2;
+int nWalletBackups = 10;
 int nAnonymizeLuxAmount = 1000;
 int nLiquidityProvider = 0;
 /** Spork enforcement enabled time */
@@ -203,6 +205,9 @@ static boost::once_flag debugPrintInitFlag = BOOST_ONCE_INIT;
  * in a thread-safe manner the first time called:
  */
 static FILE* fileout = NULL;
+
+#define MAX_FILE_SIZE 10485760  //10MB
+
 static boost::mutex* mutexDebugLog = NULL;
 
 /////////////////////////////////////////////////////////////////////// // lux
@@ -259,9 +264,59 @@ bool LogAcceptCategory(const char* category)
     return true;
 }
 
+void pushDebugLog(std::string pathDebugStr, int debugNum)
+{
+    while (debugNum > 1) {
+        std::string orginPath = pathDebugStr + ".";
+        std::string destPath = orginPath;
+        if (debugNum - 1 < 10)
+            orginPath += "0";
+        if (debugNum < 10)
+            destPath += "0";
+        orginPath += std::to_string(debugNum - 1);
+        destPath += std::to_string(debugNum);
+        if (access( destPath.c_str(), F_OK ) != -1)
+            remove(destPath.c_str());
+        rename(orginPath.c_str(), destPath.c_str());
+        debugNum--;
+    }
+
+}
+
 int LogPrintStr(const std::string& str, bool useVMLog)
 {
 //////////////////////////////// // lux
+    if (fileout) {
+        int size = ftell(fileout);
+        if (size >= MAX_FILE_SIZE && nLogFile > 1) {
+            fclose(fileout);
+            boost::filesystem::path pathDebug = GetDataDir() / "debug.log";
+            std::string pathDebugStr = pathDebug.string();
+            int debugNum = 1;
+            while (true) {
+                std::string tempPath = pathDebugStr + ".";
+                if (debugNum < 10)
+                    tempPath += "0";
+                tempPath += std::to_string(debugNum);
+                if (access( tempPath.c_str(), F_OK ) != -1)
+                    debugNum++;
+                else if (debugNum < nLogFile) {
+                    pushDebugLog(pathDebugStr, debugNum);
+                    break;
+                } else {
+                    pushDebugLog(pathDebugStr, nLogFile - 1);
+                    break;
+                }
+            }
+            std::string nextPathDebugStr = pathDebugStr + ".01";
+            if (access( nextPathDebugStr.c_str(), F_OK ) != -1)
+                remove(nextPathDebugStr.c_str());
+            rename(pathDebugStr.c_str(), nextPathDebugStr.c_str());
+            fileout = fopen(pathDebugStr.c_str(), "wa");
+            if (fileout) setbuf(fileout, NULL); // unbuffered
+        }
+    }
+
     FILE* file = fileout;
     if(useVMLog){
         file = fileoutVM;
@@ -553,6 +608,23 @@ void ReadConfigFile(map<string, string>& mapSettingsRet,
     ClearDatadirCache();
 }
 
+void WriteConfigToFile(std::string strKey, std::string strValue) 
+{
+    std::ifstream fin(GetConfigFile().string().c_str());
+    std::string line;
+    std::stringstream ss;
+    ss << strKey << "=" << strValue << endl;
+    while (std::getline(fin, line)) {
+        if(line.length() > 0 && line.find(strKey) == std::string::npos) {
+            ss << line << endl;
+        }
+    }
+    fin.close();
+    std::ofstream fout(GetConfigFile().string().c_str());
+    fout << ss.str() << endl;
+    fout.close();
+    ss.clear();
+}
 #ifndef WIN32
 boost::filesystem::path GetPidFile()
 {

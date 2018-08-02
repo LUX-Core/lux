@@ -17,7 +17,7 @@
 #include "init.h"
 #include "main.h"
 #include "net.h"
-#include "txdb.h" // for -dbcache defaults
+#include "txdb.h" // for -dbcache -nLogFile defaults
 
 #ifdef ENABLE_WALLET
 #include "masternodeconfig.h"
@@ -102,6 +102,11 @@ void OptionsModel::Init()
     if (!SoftSetArg("-dbcache", settings.value("nDatabaseCache").toString().toStdString()))
         addOverriddenOption("-dbcache");
 
+    if (!settings.contains("nLogFile"))
+        settings.setValue("nLogFile", nLogFile);
+    if (!SoftSetArg("-nlogfile", settings.value("nLogFile").toString().toStdString()))
+        addOverriddenOption("-nlogfile");
+
     if (!settings.contains("fLogEvents"))
         settings.setValue("fLogEvents", fLogEvents);
     if (!SoftSetBoolArg("-logevents", settings.value("fLogEvents").toBool()))
@@ -118,6 +123,8 @@ void OptionsModel::Init()
         settings.setValue("bSpendZeroConfChange", true);
     if (!SoftSetBoolArg("-spendzeroconfchange", settings.value("bSpendZeroConfChange").toBool()))
         addOverriddenOption("-spendzeroconfchange");
+    if (!settings.contains("nWalletBackups"))
+        settings.setValue("nWalletBackups", 10);
 #endif
     if (!settings.contains("bZeroBalanceAddressToken"))
         settings.setValue("bZeroBalanceAddressToken", true);
@@ -240,8 +247,12 @@ QVariant OptionsModel::data(const QModelIndex& index, int role) const
              return fshowMasternodesTab;
          case parallelMasterNode:
               return fparallelMasterNode;
+        case WalletBackups:
+            return QVariant(nWalletBackups);
         case DatabaseCache:
             return settings.value("nDatabaseCache");
+        case LogFileCount:
+            return settings.value("nLogFile");
         case LogEvents:
             return settings.value("fLogEvents");
         case ThreadsScriptVerif:
@@ -383,11 +394,41 @@ bool OptionsModel::setData(const QModelIndex& index, const QVariant& value, int 
              settings.setValue("fparallelMasterNode", fparallelMasterNode);
              emit parallelMasterNodeChanged(fparallelMasterNode);
              break;
-
+        case WalletBackups:
+            nWalletBackups = value.toInt();
+            settings.setValue("nWalletBackups", nWalletBackups);
+            WriteConfigToFile("createwalletbackups", std::to_string(nWalletBackups));
+            emit walletBackupsChanged(nWalletBackups);
+            break;
         case DatabaseCache:
             if (settings.value("nDatabaseCache") != value) {
                 settings.setValue("nDatabaseCache", value);
                 setRestartRequired(true);
+            }
+            break;
+        case LogFileCount:
+            if (settings.value("nLogFile") != value) {
+                settings.setValue("nLogFile", value);
+
+                //Delete existing debug log files before restart
+                boost::filesystem::path pathDebug = GetDataDir() / "debug.log";
+                std::string pathDebugStr = pathDebug.string();
+                //remove(pathDebugStr.c_str());
+                int debugNum = 1;
+                while (true) {
+                    std::string tempPath = pathDebugStr + ".";
+                    if (debugNum < 10)
+                        tempPath += "0";
+                    tempPath += std::to_string(debugNum);
+                    if (access( tempPath.c_str(), F_OK ) != -1) {
+                        remove(tempPath.c_str());
+                        debugNum++;
+                    }
+                    else {
+                        break;
+                    }
+                }
+                setRestartRequired(false);
             }
             break;
         case LogEvents:

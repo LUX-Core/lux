@@ -19,6 +19,10 @@
 #include <QPushButton>
 #include <QSystemTrayIcon>
 
+#ifdef ENABLE_UPDATER
+#include "lux-installer/src/updatecontroller.h"
+#endif
+
 class ClientModel;
 class NetworkStyle;
 class Notificator;
@@ -31,6 +35,7 @@ class UnitDisplayStatusBarControl;
 class WalletFrame;
 class WalletModel;
 class MasternodeList;
+class HexAddressConverter;
 
 
 class CWallet;
@@ -84,6 +89,10 @@ private:
     ClientModel* clientModel;
     WalletFrame* walletFrame;
 
+#ifdef ENABLE_UPDATER
+    QtLuxUpdater::UpdateController *controller;
+#endif
+
     UnitDisplayStatusBarControl* unitDisplayControl;
     QLabel* labelStakingIcon;
     QLabel* labelEncryptionIcon;
@@ -106,6 +115,7 @@ private:
     QAction* verifyMessageAction;
     QAction* bip38ToolAction;
     QAction* aboutAction;
+    QAction* checkForUpdateAction;
     QAction* receiveCoinsAction;
     QAction* optionsAction;
     QAction* toggleHideAction;
@@ -130,12 +140,14 @@ private:
     QAction* multiSendAction;
     QAction* smartContractAction;
     QAction* LSRTokenAction;
+    QAction* openHexAddressAction;
 
     QSystemTrayIcon* trayIcon;
     QMenu* trayIconMenu;
     Notificator* notificator;
     RPCConsole* rpcConsole;
     BlockExplorer* explorerWindow;
+    HexAddressConverter* hexAddressWindow;
 
     /** Keep track of previous number of blocks, to detect progress */
     int prevBlocks;
@@ -244,10 +256,16 @@ private slots:
 #endif // ENABLE_WALLET
     /** Show configuration dialog */
     void optionsClicked();
+
     /** Show about dialog */
     void aboutClicked();
+
+    /** Show updater dialog if any */
+    void updaterClicked();
+
     /** Show help message dialog */
     void showHelpMessageClicked();
+
 #ifndef Q_OS_MAC
     /** Handle tray icon clicked */
     void trayIconActivated(QSystemTrayIcon::ActivationReason reason);

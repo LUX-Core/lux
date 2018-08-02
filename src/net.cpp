@@ -12,6 +12,7 @@
 #include "net.h"
 
 #include "addrman.h"
+#include "core_io.h"
 #include "chainparams.h"
 #include "clientversion.h"
 #include "miner.h"
@@ -673,8 +674,14 @@ void CNode::copyStats(CNodeStats& stats)
     X(cleanSubVer);
     X(fInbound);
     X(nStartingHeight);
-    X(nSendBytes);
-    X(nRecvBytes);
+    {
+        LOCK(cs_vSend);
+        X(nSendBytes);
+    }
+    {
+        LOCK(cs_vRecv);
+        X(nRecvBytes);
+    }
     X(fWhitelisted);
 
     // It is common for nodes with good ping times to suddenly become lagged,
@@ -1148,7 +1155,7 @@ void ThreadSocketHandler()
             }
         }
         {
-            LOCK(cs_vNodes);
+            //LOCK(cs_vNodes);
             BOOST_FOREACH (CNode* pnode, vNodesCopy)
                 pnode->Release();
         }
@@ -1334,10 +1341,10 @@ void DumpData()
     DumpAddresses();
 
     if (CNode::BannedSetIsDirty())
-    {
+//   {
         DumpBanlist();
-        CNode::SetBannedSetDirty(false);
-    }
+//        CNode::SetBannedSetDirty(false);
+//    }
 }
 
 void static ProcessOneShot()
@@ -1625,7 +1632,7 @@ void ThreadMessageHandler() {
             boost::this_thread::interruption_point();
         }
         {
-            LOCK(cs_vNodes);
+            //LOCK(cs_vNodes);
             BOOST_FOREACH (CNode* pnode, vNodesCopy)
                 pnode->Release();
         }
@@ -2531,8 +2538,10 @@ void DumpBanlist()
 
     CBanListDB bandb;
     banmap_t banmap;
+    CNode::SetBannedSetDirty(false);
     CNode::GetBanned(banmap);
-    bandb.Write(banmap);
+    if (bandb.Write(banmap))
+        CNode::SetBannedSetDirty(true);
 
     LogPrint("net", "Flushed %d banned node ips/subnets to banlist.dat  %dms\n",
              banmap.size(), GetTimeMillis() - nStart);

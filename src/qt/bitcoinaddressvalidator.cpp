@@ -77,17 +77,21 @@ QValidator::State BitcoinAddressEntryValidator::validate(QString& input, int& po
     return state;
 }
 
-BitcoinAddressCheckValidator::BitcoinAddressCheckValidator(QObject* parent) : QValidator(parent)
-{
-}
+BitcoinAddressCheckValidator::BitcoinAddressCheckValidator(QObject *parent, bool allowScript) :
+        QValidator(parent),
+        bAllowScript(allowScript) {}
 
 QValidator::State BitcoinAddressCheckValidator::validate(QString& input, int& pos) const
 {
     Q_UNUSED(pos);
     // Validate the passed LUX address
     CTxDestination addr = DecodeDestination(input.toStdString());
-    if (IsValidDestination(addr))
-        return QValidator::Acceptable;
+    if (IsValidDestination(addr)) {
+        if(bAllowScript)
+            return QValidator::Acceptable;
+        else if(!IsValidDestination(addr))
+            return QValidator::Acceptable;
+    }
 
     return QValidator::Invalid;
 }

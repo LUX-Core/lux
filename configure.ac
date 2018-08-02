@@ -1,7 +1,7 @@
 dnl require autoconf 2.60 (AS_ECHO/AS_ECHO_N)
 AC_PREREQ([2.60])
 define(_CLIENT_VERSION_MAJOR, 5)
-define(_CLIENT_VERSION_MINOR, 1)
+define(_CLIENT_VERSION_MINOR, 2)
 define(_CLIENT_VERSION_REVISION, 0)
 define(_CLIENT_VERSION_BUILD, 0)
 define(_CLIENT_VERSION_IS_RELEASE, true)
@@ -126,6 +126,14 @@ AC_ARG_ENABLE([wallet],
   [enable wallet (default is yes)])],
   [enable_wallet=$enableval],
   [enable_wallet=yes])
+
+#enable auto-update feature
+AC_ARG_ENABLE([updater],
+  [AS_HELP_STRING([--enable-updater],
+  [enable auto-update (default is no)])],
+  [enable_updater=$enableval],
+  [enable_updater=no])
+
 
 AC_ARG_WITH([miniupnpc],
   [AS_HELP_STRING([--with-miniupnpc],
@@ -1012,6 +1020,17 @@ else
   AC_MSG_RESULT(no)
 fi
 
+dnl enable updater
+AC_MSG_CHECKING([if updater should be enabled])
+if test x$enable_updater != xno; then
+  AC_MSG_RESULT(yes)
+  AC_DEFINE_UNQUOTED([ENABLE_UPDATER],[1],[Define to 1 to enable auto-update functions])
+
+else
+  AC_MSG_RESULT(no)
+fi
+
+
 dnl enable upnp support
 AC_MSG_CHECKING([whether to build with support for UPnP])
 if test x$have_miniupnpc = xno; then
@@ -1104,6 +1123,7 @@ AM_CONDITIONAL([TARGET_DARWIN], [test x$TARGET_OS = xdarwin])
 AM_CONDITIONAL([BUILD_DARWIN], [test x$BUILD_OS = xdarwin])
 AM_CONDITIONAL([TARGET_WINDOWS], [test x$TARGET_OS = xwindows])
 AM_CONDITIONAL([ENABLE_WALLET],[test x$enable_wallet = xyes])
+AM_CONDITIONAL([ENABLE_UPDATER],[test x$enable_updater = xyes])
 AM_CONDITIONAL([ENABLE_TESTS],[test x$use_tests = xyes])
 AM_CONDITIONAL([ENABLE_QT],[test x$bitcoin_enable_qt = xyes])
 AM_CONDITIONAL([HAVE_QT5], [test x$bitcoin_qt_got_major_vers = x5])
@@ -1196,27 +1216,28 @@ esac
 
 echo
 echo "Options used to compile and link:"
-echo "  with wallet   = $enable_wallet"
-echo "  with gui / qt = $bitcoin_enable_qt"
+echo "  with wallet          = $enable_wallet"
+echo "  with auto-update     = $enable_updater"
+echo "  with gui / qt        = $bitcoin_enable_qt"
 if test x$bitcoin_enable_qt != xno; then
-    echo "    qt version  = $bitcoin_qt_got_major_vers"
-    echo "    with qr     = $use_qr"
+echo "  qt version           = $bitcoin_qt_got_major_vers"
+echo "  with qr              = $use_qr"
 fi
-echo "  with zmq      = $use_zmq"
-echo "  with test     = $use_tests"
-echo "  with bench    = $use_bench"
-echo "  with upnp     = $use_upnp"
-echo "  debug enabled = $enable_debug"
-echo "  werror        = $enable_werror"
+echo "  with zmq             = $use_zmq"
+echo "  with test            = $use_tests"
+echo "  with bench           = $use_bench"
+echo "  with upnp            = $use_upnp"
+echo "  debug enabled        = $enable_debug"
+echo "  werror               = $enable_werror"
 echo
-echo "  target os     = $TARGET_OS"
-echo "  build os      = $BUILD_OS"
+echo "  target os            = $TARGET_OS"
+echo "  build os             = $BUILD_OS"
 echo
-echo "  CC            = $CC"
-echo "  CFLAGS        = $CFLAGS"
-echo "  CPPFLAGS      = $CPPFLAGS"
-echo "  CXX           = $CXX"
-echo "  CXXFLAGS      = $CXXFLAGS"
-echo "  LDFLAGS       = $LDFLAGS"
-echo "  ARFLAGS       = $ARFLAGS"
+echo "  CC                   = $CC"
+echo "  CFLAGS               = $CFLAGS"
+echo "  CPPFLAGS             = $CPPFLAGS"
+echo "  CXX                  = $CXX"
+echo "  CXXFLAGS             = $CXXFLAGS"
+echo "  LDFLAGS              = $LDFLAGS"
+echo "  ARFLAGS              = $ARFLAGS"
 echo

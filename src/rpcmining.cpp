@@ -361,6 +361,11 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
             "  \"previousblockhash\" : \"xxxx\",     (string) The hash of current highest block\n"
             "  \"stateroot\" : \"xxxx\",             (string) The state root hash of current block for smart contracts\n"
             "  \"utxoroot\" : \"xxxx\",              (string) The UTXO root hash of current block for smart contracts\n"
+            "  \"screfund\" : [{                   (array) smart contract(s) refund address(es)\n"
+            "       \"payee\" : \"xxx\",           (string) smart contract refund address\n"
+            "       \"script\" : \"xxxx\",         (string) scriptPubKey in hexadecimal\n"
+            "       \"amount\": n                  (numeric) required amount to refund\n"
+            "  }],\n"
             "  \"transactions\" : [                (array) contents of non-coinbase transactions that should be included in the next block\n"
             "      {\n"
             "         \"data\" : \"xxxx\",          (string) transaction data encoded in hexadecimal (byte-for-byte)\n"
@@ -622,32 +627,29 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
     map<uint256, int64_t> setTxIndex1;
     int j = 0;
     BOOST_FOREACH (CTransaction& tx, pblock->vtx) {//Incase if multi coinbase
-		if(tx.IsCoinBase()){
-			uint256 txHash = tx.GetHash();
-			setTxIndex1[txHash] = j++;
+        if (tx.IsCoinBase()) {
+            uint256 txHash = tx.GetHash();
+            setTxIndex1[txHash] = j++;
 
-			/* if (tx.IsCoinBase())
-            continue; */
-
-			UniValue entry(UniValue::VOBJ);
+            UniValue entry(UniValue::VOBJ);
 
             entry.push_back(Pair("data", EncodeHexTx(tx)));
             entry.push_back(Pair("txid", txHash.GetHex()));
             entry.push_back(Pair("hash", tx.GetWitnessHash().GetHex()));
 
-			UniValue deps(UniValue::VARR);
-			BOOST_FOREACH (const CTxIn& in, tx.vin) {
-				if (setTxIndex.count(in.prevout.hash))
-                deps.push_back(setTxIndex[in.prevout.hash]);
-			}
-			entry.push_back(Pair("depends", deps));
+            UniValue deps(UniValue::VARR);
+            BOOST_FOREACH (const CTxIn& in, tx.vin) {
+                if (setTxIndex.count(in.prevout.hash))
+                    deps.push_back(setTxIndex[in.prevout.hash]);
+            }
+            entry.push_back(Pair("depends", deps));
 
-			int index_in_template = j - 1;
-			entry.push_back(Pair("fee", pblocktemplate->vTxFees[index_in_template]));
-			entry.push_back(Pair("sigops", pblocktemplate->vTxSigOpsCost[index_in_template]));
+            int index_in_template = j - 1;
+            entry.push_back(Pair("fee", pblocktemplate->vTxFees[index_in_template]));
+            entry.push_back(Pair("sigops", pblocktemplate->vTxSigOpsCost[index_in_template]));
 
-			coinbasetxn.push_back(entry);
-		}
+            coinbasetxn.push_back(entry);
+        }
     }
 
     UniValue aux(UniValue::VOBJ);
@@ -723,15 +725,27 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
         aMutable.push_back("version/force");
     }
 
+    int64_t nHeight = pindexPrev->nHeight + 1;
     result.push_back(Pair("previousblockhash", pblock->hashPrevBlock.GetHex()));
-    if (pindexPrev->nHeight + 1 >= Params().FirstSCBlock()) {
+
+    // smart contracts
+    if (nHeight >= Params().FirstSCBlock()) {
+        // gas refund
+        UniValue scrObjArray(UniValue::VARR);
+        for (size_t v=2; v < pblock->vtx[0].vout.size(); v++) {
+            UniValue aSCrefund(UniValue::VOBJ);
+            CTxDestination scTxDest;
+            ExtractDestination(pblock->vtx[0].vout[v].scriptPubKey, scTxDest);
+            aSCrefund.push_back(Pair("payee", EncodeDestination(scTxDest)));
+            aSCrefund.push_back(Pair("script", HexStr(pblock->vtx[0].vout[v].scriptPubKey)));
+            aSCrefund.push_back(Pair("amount", (int64_t)pblock->vtx[0].vout[v].nValue));
+            scrObjArray.push_back(aSCrefund);
+        }
         result.push_back(Pair("stateroot", pblock->hashStateRoot.GetHex()));
         result.push_back(Pair("utxoroot", pblock->hashUTXORoot.GetHex()));
-    } else {
-        // not added in gbt for pre-sc testnet compatibility (80 bytes header)
-        //result.push_back(Pair("stateroot", uint256(0).GetHex()));
-        //result.push_back(Pair("utxoroot", uint256(0).GetHex()));
+        result.push_back(Pair("screfund", scrObjArray));
     }
+
     result.push_back(Pair("transactions", transactions));
     result.push_back(Pair("coinbaseaux", aux));
     result.push_back(Pair("coinbasevalue", (int64_t)pblock->vtx[0].GetValueOut()));
@@ -753,13 +767,13 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
     result.push_back(Pair("sizelimit", nSizeLimit));
     result.push_back(Pair("curtime", pblock->GetBlockTime()));
     result.push_back(Pair("bits", strprintf("%08x", pblock->nBits)));
-    result.push_back(Pair("height", (int64_t)(pindexPrev->nHeight + 1)));
+    result.push_back(Pair("height", nHeight));
     if (!pblocktemplate->vchCoinbaseCommitment.empty() && fSupportsSegwit) {
         result.push_back(Pair("default_witness_commitment", HexStr(pblocktemplate->vchCoinbaseCommitment.begin(), pblocktemplate->vchCoinbaseCommitment.end())));
     }
     result.push_back(Pair("votes", aVotes));
 
-    bool mnStarted = (pindexPrev->nHeight + 1) >= Params().FirstSplitRewardBlock();
+    bool mnStarted = nHeight >= Params().FirstSplitRewardBlock();
     UniValue aMasternode(UniValue::VOBJ);
     if (mnStarted && pblock->vtx[0].vout.size() > 1) {
         CTxDestination mnTxDest;

@@ -238,6 +238,10 @@ public:
 
     OutputType getDefaultAddressType() const;
 
+    std::vector<CTokenInfo> getInvalidTokens();
+
+    bool isMineAddress(const std::string &Address);
+
 private:
     CWallet* wallet;
     bool fHaveWatchOnly;

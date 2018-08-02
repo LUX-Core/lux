@@ -14,6 +14,7 @@
 #include <QMenu>
 #include <QPoint>
 #include <QString>
+#include <QStringList>
 #include <QTreeWidgetItem>
 
 class WalletModel;
@@ -34,7 +35,7 @@ class CoinControlDialog : public QDialog
 public:
     explicit CoinControlDialog(QWidget* parent = 0);
     ~CoinControlDialog();
-
+    void CheckDialogLablesUpdated();
     void setModel(WalletModel* model);
     void setClientModel(ClientModel* clientModel);
 
@@ -59,6 +60,7 @@ private:
     QAction* lockAction;
     QAction* unlockAction;
 
+    QStringList toogleLockList;
     QString strPad(QString, int, QString);
     void sortView(int, Qt::SortOrder);
     void updateView();
@@ -68,7 +70,6 @@ private:
         COLUMN_AMOUNT,
         COLUMN_LABEL,
         COLUMN_ADDRESS,
-        COLUMN_DARKSEND_ROUNDS,
         COLUMN_DATE,
         COLUMN_CONFIRMATIONS,
         COLUMN_PRIORITY,

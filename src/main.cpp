@@ -1792,6 +1792,8 @@ CAmount GetProofOfWorkReward(int64_t nFees, int nHeight)
     }
 
     if (nHeight < LAST_HEIGHT_FEE_BLOCK) {
+        if (IsTestNet() && nHeight >= 17500)
+            return nSubsidy + nFees;
         nFees = nHeight;
     }
     return nSubsidy + nFees;
@@ -3783,9 +3785,13 @@ bool CheckForMasternodePayment(const CTransaction& tx, const CBlockHeader& heade
         // Avoid costly checks early on first PoW blocks
         if (nHeight < chainParams.FirstSplitRewardBlock())
             return true;
-        LOCK(cs_main);
-        BOOST_FOREACH(const CTxOut& txout, tx.vout) {
-            totalReward += txout.nValue;
+        if (nHeight >= Params().FirstSCBlock()) {
+            totalReward = GetProofOfWorkReward(0, nHeight);
+        } else {
+            LOCK(cs_main);
+            BOOST_FOREACH(const CTxOut& txout, tx.vout) {
+                totalReward += txout.nValue;
+            }
         }
     }
 
@@ -4061,7 +4067,10 @@ bool ContextualCheckBlockHeader(const CBlockHeader& block, CValidationState& sta
 
 bool ContextualCheckBlock(const CBlock& block, CValidationState& state, CBlockIndex* const pindexPrev)
 {
-    const int nHeight = pindexPrev == NULL ? 0 : pindexPrev->nHeight + 1;
+    if (!pindexPrev)
+        return false;
+
+    const int nHeight = pindexPrev->nHeight + 1;
     const Consensus::Params& consensusParams = Params().GetConsensus();
 
     // Check that all transactions are finalized
@@ -4795,11 +4804,14 @@ bool static LoadBlockIndexDB()
 
         //fix Assertion `hashPrevBlock == view.GetBestBlock()' failed. By adjusting height to the last recorded by coinsview
         CBlockIndex* pindexCoinsView = mapBlockIndex[pcoinsTip->GetBestBlock()];
-        for (unsigned int i = vinfoBlockFile[nLastBlockFile].nHeightLast + 1; i < vSortedByHeight.size(); i++)
+        if (pindexCoinsView)
         {
-            pindexLastMeta = vSortedByHeight[i].second;
-            if(pindexLastMeta->nHeight > pindexCoinsView->nHeight)
-                break;
+            for (unsigned int i = vinfoBlockFile[nLastBlockFile].nHeightLast + 1; i < vSortedByHeight.size(); i++)
+            {
+                pindexLastMeta = vSortedByHeight[i].second;
+                if(pindexLastMeta->nHeight > pindexCoinsView->nHeight)
+                    break;
+            }
         }
 
         LogPrintf("%s: Last block properly recorded: #%d %s\n", __func__, pindexLastMeta->nHeight, pindexLastMeta->GetBlockHash().GetHex());

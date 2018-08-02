@@ -8,6 +8,7 @@
 #include "amount.h"
 #include "base58.h"
 #include "core_io.h"
+#include "consensus/validation.h"
 #include "init.h"
 #include "net.h"
 #include "netbase.h"
@@ -797,6 +798,8 @@ UniValue movecmd(const UniValue& params, bool fHelp)
     string strFrom = AccountFromValue(params[0]);
     string strTo = AccountFromValue(params[1]);
     CAmount nAmount = AmountFromValue(params[2]);
+    if (nAmount <= 0)
+        throw JSONRPCError(RPC_TYPE_ERROR, "Invalid amount");
     if (params.size() > 3)
         // unused parameter, used to be nMinDepth, keep type-checking it though
         (void)params[3].get_int();
@@ -870,6 +873,8 @@ UniValue sendfrom(const UniValue& params, bool fHelp)
     if (!IsValidDestination(dest))
         throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid LUX address");
     CAmount nAmount = AmountFromValue(params[2]);
+    if (nAmount <= 0)
+        throw JSONRPCError(RPC_TYPE_ERROR, "Invalid amount");
     int nMinDepth = 1;
     if (params.size() > 3)
         nMinDepth = params[3].get_int();
@@ -969,8 +974,9 @@ UniValue sendmany(const UniValue& params, bool fHelp)
     bool fCreated = pwalletMain->CreateTransaction(vecSend, wtx, keyChange, nFeeRequired, strFailReason);
     if (!fCreated)
         throw JSONRPCError(RPC_WALLET_INSUFFICIENT_FUNDS, strFailReason);
-    if (!pwalletMain->CommitTransaction(wtx, keyChange))
-        throw JSONRPCError(RPC_WALLET_ERROR, "Transaction commit failed");
+    if (!pwalletMain->CommitTransaction(wtx, keyChange)) {
+        throw JSONRPCError(RPC_WALLET_ERROR, string("Transaction commit failed: ")+strFailReason);
+    }
 
     return wtx.GetHash().GetHex();
 }
@@ -2101,9 +2107,7 @@ UniValue settxfee(const UniValue& params, bool fHelp)
     LOCK2(cs_main, pwalletMain->cs_wallet);
 
     // Amount
-    CAmount nAmount = 0;
-    if (params[0].get_real() != 0.0)
-        nAmount = AmountFromValue(params[0]); // rejects 0.0 amounts
+    CAmount nAmount = AmountFromValue(params[0]);
 
     payTxFee = CFeeRate(nAmount, 1000);
     return true;
@@ -2821,10 +2825,11 @@ UniValue sendtocontract(const UniValue& params, bool fHelp){
         throw JSONRPCError(RPC_TYPE_ERROR, "Invalid data (data not hex)");
 
     CAmount nAmount = 0;
-    if (params.size() > 2){
-        nAmount = params[2].get_int64();
-        if (nAmount < 0)
-            throw JSONRPCError(RPC_TYPE_ERROR, "Invalid amount for send");
+    if (params.size() > 2) {
+        UniValue uAmount = params[2];
+        if(!ParseMoney(uAmount.getValStr(), nAmount)) {
+            throw JSONRPCError(RPC_TYPE_ERROR, "Invalid value for Amount");
+        }
     }
 
     uint64_t nGasLimit=DEFAULT_GAS_LIMIT_OP_SEND;

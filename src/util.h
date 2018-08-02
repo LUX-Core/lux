@@ -32,10 +32,12 @@
 //LUX only features
 extern std::atomic<bool> hideLogMessage;
 
+extern int nLogFile;
 extern bool fMasterNode;
 extern bool fEnableInstanTX;
 extern int nInstanTXDepth;
 extern int nDarksendRounds;
+extern int nWalletBackups;
 extern int nAnonymizeLuxAmount;
 extern int nLiquidityProvider;
 extern bool fEnableDarksend;
@@ -64,6 +66,8 @@ void SetupEnvironment();
 bool LogAcceptCategory(const char* category);
 /** Send a string to the log output */
 int LogPrintStr(const std::string& str, bool useVMLog = false);
+/** Push debug files */
+void pushDebugLog(std::string pathDebugStr, int debugNum);
 
 #define LogPrintf(...) LogPrint(NULL, __VA_ARGS__)
 
@@ -133,6 +137,7 @@ boost::filesystem::path GetPidFile();
 void CreatePidFile(const boost::filesystem::path& path, pid_t pid);
 #endif
 void ReadConfigFile(std::map<std::string, std::string>& mapSettingsRet, std::map<std::string, std::vector<std::string> >& mapMultiSettingsRet);
+void WriteConfigToFile(std::string strKey, std::string strValue);
 #ifdef WIN32
 boost::filesystem::path GetSpecialFolderPath(int nFolder, bool fCreate = true);
 #endif
