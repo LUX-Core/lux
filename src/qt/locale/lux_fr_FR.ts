@@ -51,11 +51,11 @@
     </message>
     <message>
         <source>Sending addresses</source>
-        <translation>Adresses d'envoie</translation>
+        <translation>Adresses d'envoi</translation>
     </message>
     <message>
         <source>Receiving addresses</source>
-        <translation>Adresses de reception</translation>
+        <translation>Adresses de réception</translation>
     </message>
     <message>
         <source>&amp;Copy Address</source>
@@ -471,11 +471,11 @@
     </message>
     <message>
         <source>Show automatically created wallet backups</source>
-        <translation>Montrer les sauvegardes de portefeuille créées automatiquements</translation>
+        <translation>Montrer les sauvegardes de portefeuille créées automatiquement</translation>
     </message>
     <message>
         <source>&amp;Sending addresses...</source>
-        <translation>Adresses d'envoie</translation>
+        <translation>Adresses d'envoi</translation>
     </message>
     <message>
         <source>&amp;Receiving addresses...</source>
@@ -527,7 +527,7 @@
     </message>
     <message>
         <source>Verify messages to ensure they were signed with specified LUX addresses</source>
-        <translation>Vérifier les messages afin de s'assurer qu'ils sont signés avec l'adresse LUX spécifié</translation>
+        <translation>Vérifier les messages afin de s'assurer qu'ils sont signés avec l'adresse LUX spécifiée</translation>
     </message>
     <message>
         <source>&amp;BIP38 tool</source>
@@ -539,7 +539,7 @@
     </message>
     <message numerus="yes">
         <source>%n active connection(s) to LUX network</source>
-        <translation><numerusform>%n connection(s) au réseau LUX</numerusform><numerusform>%n connection(s) au réseau LUX</numerusform></translation>
+        <translation><numerusform>%n connexion au réseau LUX</numerusform><numerusform>%n connexions au réseau LUX</numerusform></translation>
     </message>
     <message>
         <source>Synchronizing with network...</source>
@@ -583,7 +583,7 @@
     </message>
     <message>
         <source>Last received block was generated %1 ago.</source>
-        <translation>Le dernier bloque reçu a été généré il y a %1</translation>
+        <translation>Le dernier bloc reçu a été généré il y a %1</translation>
     </message>
     <message>
         <source>Transactions after this will not yet be visible.</source>
@@ -804,7 +804,7 @@ Adresse : %4
     </message>
     <message>
         <source>Transactions with higher priority are more likely to get included into a block.</source>
-        <translation>Les transactions avec une priorité plus haute ont plus de chance d'être incluses dans un bloque.</translation>
+        <translation>Les transactions avec une priorité plus haute ont plus de chance d'être incluses dans un bloc.</translation>
     </message>
     <message>
         <source>(no label)</source>
@@ -1085,7 +1085,7 @@ Veuillez vérifier l'adresse et réessayer.</translation>
     </message>
     <message>
         <source>Accept connections from outside</source>
-        <translation>Accepter les connections depuis l'extérieur</translation>
+        <translation>Accepter les connexions depuis l'extérieur</translation>
     </message>
     <message>
         <source>none</source>
@@ -1147,7 +1147,7 @@ Veuillez vérifier l'adresse et réessayer.</translation>
     </message>
     <message>
         <source>Number of connections</source>
-        <translation>Nombre de connections</translation>
+        <translation>Nombre de connexions</translation>
     </message>
     <message>
         <source>Network</source>
