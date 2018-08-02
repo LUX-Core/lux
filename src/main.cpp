@@ -3924,26 +3924,41 @@ bool CheckBlock(const CBlock& block, CValidationState& state, const Consensus::P
         if (block.vtx[0].vout.size() != (commitpos == -1 ? 1 : 2) || !block.vtx[0].vout[0].IsEmpty())
             return state.DoS(100, false, REJECT_INVALID, "bad-cb-missing", false, "coinbase output not empty for proof-of-stake block");
 
-
         // Second transaction must be coinstake, the rest must not be
         if (block.vtx.empty() || !block.vtx[1].IsCoinStake())
             return state.DoS(100, error("%s: second tx is not coinstake", __func__));
         for (unsigned int i = 2; i < block.vtx.size(); i++)
             if (block.vtx[i].IsCoinStake())
                 return state.DoS(100, error("%s: more than one coinstake", __func__));
+
+        //Don't allow contract opcodes in coinstake for safety
+        if(block.vtx[1].HasOpSpend() || block.vtx[1].HasCreateOrCall()){
+            return state.DoS(100, false, REJECT_INVALID, "bad-cs-contract", false, "coinstake must not contain OP_SPEND, OP_CALL, or OP_CREATE");
+        }
     }
 
     LogPrint("debug", "%s: checking transactions, block %s (%s)\n", __func__, block.GetHash().GetHex(), s);
 
     // -------------------------------------------
 
+    bool IsFinalContract=false;
     // Check transactions
     unsigned int nTx = 0;
     BOOST_FOREACH (const CTransaction& tx, block.vtx) {
         if (!CheckTransaction(tx, state)) {
             LogPrint("debug", "%s: invalid transaction %s", __func__, tx.ToString());
             return error("%s: CheckTransaction failed (nTx=%d, reason: %s)", __func__, nTx, state.GetRejectReason());
+
+            // OP_SPEND can only exist immediately after a contract tx in a block.
+            // So, fail it if the previous tx was not a contract tx
+            if (tx.HasOpSpend()) {
+                if(!IsFinalContract)
+                    return state.DoS(100, false, REJECT_INVALID, "bad-opspend-tx", false,
+                            "OP_SPEND transaction without identical contract transaction");
+            }
+            IsFinalContract = tx.HasCreateOrCall() || !tx.HasOpSpend();
         }
+
         // ignore first PoS tx for masternode checks, this vout tx type is "nonstandard"
         if (block.IsProofOfStake() && nTx == 0)
             continue;
