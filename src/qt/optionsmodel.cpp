@@ -397,6 +397,7 @@ bool OptionsModel::setData(const QModelIndex& index, const QVariant& value, int 
         case WalletBackups:
             nWalletBackups = value.toInt();
             settings.setValue("nWalletBackups", nWalletBackups);
+            WriteConfigToFile("createwalletbackups", std::to_string(nWalletBackups));
             emit walletBackupsChanged(nWalletBackups);
             break;
         case DatabaseCache:

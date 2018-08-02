@@ -608,6 +608,23 @@ void ReadConfigFile(map<string, string>& mapSettingsRet,
     ClearDatadirCache();
 }
 
+void WriteConfigToFile(std::string strKey, std::string strValue) 
+{
+    std::ifstream fin(GetConfigFile().string().c_str());
+    std::string line;
+    std::stringstream ss;
+    ss << strKey << "=" << strValue << endl;
+    while (std::getline(fin, line)) {
+        if(line.length() > 0 && line.find(strKey) == std::string::npos) {
+            ss << line << endl;
+        }
+    }
+    fin.close();
+    std::ofstream fout(GetConfigFile().string().c_str());
+    fout << ss.str() << endl;
+    fout.close();
+    ss.clear();
+}
 #ifndef WIN32
 boost::filesystem::path GetPidFile()
 {
