@@ -6085,7 +6085,7 @@ static bool ProcessMessage(CNode* pfrom, const string &strCommand, CDataStream& 
             vWorkQueue.push_back(inv.hash);
             vEraseQueue.push_back(inv.hash);
 
-            LogPrint("mempool", "AcceptToMemoryPool: peer=%d %s : accepted %s (poolsz %u)\n",
+            LogPrint("mempool", "AcceptToMemoryPool: peer=%d: accepted %s (poolsz %u)\n",
                 pfrom->id,
                 tx.GetHash().ToString(),
                 mempool.mapTx.size());
