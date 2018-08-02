@@ -2678,11 +2678,11 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
         }
         if(pindex->nHeight >= Params().FirstSCBlock()) {
             if(!CheckRefund(block, checkVouts)) {
-                return state.DoS(100, error("CheckReward(): Gas refund missing"));
+                return state.DoS(100, error("CheckRefund(): Gas refund missing"));
             }
 
             if(nReward < gasRefunds){
-                return state.DoS(100, error("CheckReward(): Block Reward is less than total gas refunds"),
+                return state.DoS(100, error("CheckRefund(): Block Reward is less than total gas refunds"),
                                  REJECT_INVALID, "bad-cs-gas-greater-than-reward");
 
             }
@@ -7001,12 +7001,19 @@ bool CheckMinGasPrice(std::vector<EthTransactionParams>& etps, const uint64_t& m
     return true;
 }
 
-bool CheckRefund(const CBlock& block, const std::vector<CTxOut>& vouts) {
+bool CheckRefund(const CBlock& block, const std::vector<CTxOut>& vouts){
     size_t offset = block.IsProofOfStake() ? 1 : 0;
+    std::vector<CTxOut> vTempVouts=block.vtx[offset].vout;
+    std::vector<CTxOut>::iterator it;
     for(size_t i = 0; i < vouts.size(); i++){
-        if(std::find(block.vtx[offset].vout.begin(), block.vtx[offset].vout.end(), vouts[i])==block.vtx[offset].vout.end())
+        it=std::find(vTempVouts.begin(), vTempVouts.end(), vouts[i]);
+        if(it==vTempVouts.end()){
             return false;
+        }else{
+            vTempVouts.erase(it);
+        }
     }
+    vTempVouts.clear();
     return true;
 }
 
