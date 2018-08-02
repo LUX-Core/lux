@@ -130,7 +130,7 @@ BitcoinGUI::BitcoinGUI(const NetworkStyle* networkStyle, QWidget* parent) : QMai
     QString windowTitle = tr("Luxcore") + " - ";
 
 #ifdef ENABLE_UPDATER
-    controller = new QtLuxUpdater::UpdateController(QStringLiteral("v4.3.0"), this);
+    controller = new QtLuxUpdater::UpdateController(QStringLiteral("v5.2.0"), this);
     controller->setDetailedUpdateInfo(true);
 #endif
 
