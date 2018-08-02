@@ -274,7 +274,7 @@ bool CCoinsViewCache::HaveInputs(const CTransaction& tx) const
 double CCoinsViewCache::GetPriority(const CTransaction& tx, int nHeight, CAmount &inChainInputValue) const
 {
     inChainInputValue = 0;
-    if (tx.IsCoinBase() || tx.IsCoinStake())
+    if (tx.IsCoinGenerated())
         return 0.0;
     double dResult = 0.0;
     for (const CTxIn& txin : tx.vin) {

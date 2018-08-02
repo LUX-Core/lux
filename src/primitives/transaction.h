@@ -465,6 +465,11 @@ public:
         return (vin.size() > 0 && (!vin[0].prevout.IsNull()) && vout.size() >= 2 && vout[0].IsEmpty());
     }
 
+    bool IsCoinGenerated() const
+    {
+        return this->IsCoinBase() || this->IsCoinStake();
+    }
+
     friend bool operator==(const CTransaction& a, const CTransaction& b)
     {
         return a.hash == b.hash;

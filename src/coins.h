@@ -174,6 +174,11 @@ public:
         return fCoinStake;
     }
 
+    bool IsCoinGenerated() const
+    {
+        return fCoinBase || fCoinStake;
+    }
+
     unsigned int GetSerializeSize(int nType, int nVersion) const
     {
         unsigned int nSize = 0;
