@@ -1305,10 +1305,10 @@ void ListTransactions(const CWalletTx& wtx, const string& strAccount, int nMinDe
                 } else {
                     entry.push_back(Pair("category", "receive"));
                 }
-                if (!wtx.IsCoinStake())
-                    entry.push_back(Pair("amount", ValueFromAmount(r.amount)));
-                else {
-                    entry.push_back(Pair("amount", ValueFromAmount(-nFee)));
+
+                entry.push_back(Pair("amount", ValueFromAmount(r.amount)));
+                if (wtx.IsCoinStake())
+                {
                     stop = true;
                 }
                 if (pwalletMain->mapAddressBook.count(r.destination)) {
