@@ -2676,15 +2676,15 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
                                         block.vtx[0].GetValueOut(), nReward, pindex->nHeight, nFees),
                              REJECT_INVALID, "bad-cb-amount");
         }
+
         if(pindex->nHeight >= Params().FirstSCBlock()) {
-            if(!CheckRefund(block, checkVouts)) {
+            bool ignoreGasRefund = (IsTestNet() && pindex->nHeight < 18500);
+            if (!CheckRefund(block, checkVouts) && !ignoreGasRefund) {
                 return state.DoS(100, error("CheckRefund(): Gas refund missing"));
             }
-
-            if(nReward < gasRefunds){
+            if (nReward < gasRefunds && !ignoreGasRefund) {
                 return state.DoS(100, error("CheckRefund(): Block Reward is less than total gas refunds"),
                                  REJECT_INVALID, "bad-cs-gas-greater-than-reward");
-
             }
         }
     }
