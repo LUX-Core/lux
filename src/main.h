@@ -833,12 +833,11 @@ std::vector<ResultExecute> CallContract(const dev::Address& addrContract, std::v
 
 bool CheckSenderScript(const CCoinsViewCache& view, const CTransaction& tx);
 
+bool CheckRefund(const CBlock& block, const std::vector<CTxOut>& vouts);
+
 bool CheckMinGasPrice(std::vector<EthTransactionParams>& etps, const uint64_t& minGasPrice);
 
 struct ByteCodeExecResult;
-
-void EnforceContractVoutLimit(ByteCodeExecResult& bcer, ByteCodeExecResult& bcerOut, const dev::h256& oldHashLuxRoot,
-                              const dev::h256& oldHashStateRoot, const std::vector<LuxTransaction>& transactions);
 
 void writeVMlog(const std::vector<ResultExecute>& res, const CTransaction& tx = CTransaction(), const CBlock& block = CBlock());
 

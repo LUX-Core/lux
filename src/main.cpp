@@ -2641,6 +2641,10 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
                         dev::g_logPost(std::string("Address : " + re.execRes.newAddress.hex()), NULL);
                 }
             }
+
+            if(nFees < gasRefunds) { //make sure it won't overflow
+                return state.DoS(1000, error("ConnectBlock(): Less total fees than gas refund fees"), REJECT_INVALID, "bad-blk-fees-greater-gasrefund");
+            }
         }
 /////////////////////////////////////////////////////////////////////////////////////////
 
@@ -2671,6 +2675,17 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
             return state.DoS(100, error("%s: reward pays too much (actual=%d vs limit=%d) (nHeight=%d, nFees=%d)", __func__,
                                         block.vtx[0].GetValueOut(), nReward, pindex->nHeight, nFees),
                              REJECT_INVALID, "bad-cb-amount");
+        }
+        if(pindex->nHeight >= Params().FirstSCBlock()) {
+            if(!CheckRefund(block, checkVouts)) {
+                return state.DoS(100, error("CheckReward(): Gas refund missing"));
+            }
+
+            if(nReward < gasRefunds){
+                return state.DoS(100, error("CheckReward(): Block Reward is less than total gas refunds"),
+                                 REJECT_INVALID, "bad-cs-gas-greater-than-reward");
+
+            }
         }
     }
 
@@ -6981,6 +6996,15 @@ std::vector<ResultExecute> CallContract(const dev::Address& addrContract, std::v
 bool CheckMinGasPrice(std::vector<EthTransactionParams>& etps, const uint64_t& minGasPrice){
     for(EthTransactionParams& etp : etps){
         if(etp.gasPrice < dev::u256(minGasPrice))
+            return false;
+    }
+    return true;
+}
+
+bool CheckRefund(const CBlock& block, const std::vector<CTxOut>& vouts) {
+    size_t offset = block.IsProofOfStake() ? 1 : 0;
+    for(size_t i = 0; i < vouts.size(); i++){
+        if(std::find(block.vtx[offset].vout.begin(), block.vtx[offset].vout.end(), vouts[i])==block.vtx[offset].vout.end())
             return false;
     }
     return true;
