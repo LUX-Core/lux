@@ -467,7 +467,7 @@ void LuxController::add_onion_cb(LuxControlConnection& _conn, const LuxControlRe
 {
     if (reply.code == 250) {
         LogPrint("lux", "lux: ADD_ONION successful\n");
-        BOOST_FOREACH(const std::string &s, reply.lines) {
+        for (const std::string &s : reply.lines) {
             std::map<std::string,std::string> m = ParseLuxReplyMapping(s);
             std::map<std::string,std::string>::iterator i;
             if ((i = m.find("ServiceID")) != m.end())
@@ -598,7 +598,7 @@ void LuxController::protocolinfo_cb(LuxControlConnection& _conn, const LuxContro
          * 250-AUTH METHODS=NULL
          * 250-AUTH METHODS=HASHEDPASSWORD
          */
-        BOOST_FOREACH(const std::string &s, reply.lines) {
+        for (const std::string &s : reply.lines) {
             std::pair<std::string,std::string> l = SplitLuxReplyLine(s);
             if (l.first == "AUTH") {
                 std::map<std::string,std::string> m = ParseLuxReplyMapping(l.second);
@@ -615,7 +615,7 @@ void LuxController::protocolinfo_cb(LuxControlConnection& _conn, const LuxContro
                 }
             }
         }
-        BOOST_FOREACH(const std::string &s, methods) {
+        for (const std::string &s : methods) {
             LogPrint("lux", "lux: Supported authentication method: %s\n", s);
         }
         // Prefer NULL, otherwise SAFECOOKIE. If a password is provided, use HASHEDPASSWORD
