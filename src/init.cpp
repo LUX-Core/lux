@@ -1142,6 +1142,8 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
         nWalletBackups = std::max(0, std::min(10, nWalletBackups));
 
         if (nWalletBackups > 0 && filesystem::exists(backupDir)) {
+            std::string dateTimeStr = DateTimeStrFormat(".%Y%m%d", GetTime());
+            int nAleadyExist = 0;
             // Keep only the last 10 backups, including the new one of course
             typedef std::multimap<std::time_t, boost::filesystem::path> folder_set_t;
             folder_set_t folder_set;
@@ -1154,6 +1156,9 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
                 // Only check regular files
                 if (boost::filesystem::is_regular_file(dir_iter->status())) {
                     currentFile = dir_iter->path().filename();
+                    if(dir_iter->path().extension().string() == dateTimeStr) {
+                        nAleadyExist = 1;
+                    }
                     // Only add the backups for the current wallet, e.g. wallet.dat.*
                     if (dir_iter->path().stem().string() == strWalletFile) {
                         folder_set.insert(folder_set_t::value_type(boost::filesystem::last_write_time(dir_iter->path()), *dir_iter));
@@ -1162,6 +1167,7 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
             }
             // Loop backward through backup files and keep the N newest ones (1 <= N <= 10)
             int counter = 0;
+            counter -= nAleadyExist;
             BOOST_REVERSE_FOREACH (PAIRTYPE(const std::time_t, boost::filesystem::path) file, folder_set) {
                 counter++;
                 if (counter >= nWalletBackups) {
@@ -1175,8 +1181,8 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
                 }
             }
 
+            if(!nAleadyExist) {
             // Create backup of the wallet
-            std::string dateTimeStr = DateTimeStrFormat(".%Y%m%d", GetTime());
             std::string backupPathStr = backupDir.string();
             backupPathStr += "/" + strWalletFile;
             std::string sourcePathStr = GetDataDir().string();
@@ -1202,6 +1208,7 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
                 }
             } else {
                 cwarn << "Not enough available space found for backup wallet on hard drive.";
+                }
             }
         }
     }  // (!fDisableWallet)
