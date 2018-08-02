@@ -1274,6 +1274,8 @@ void ListTransactions(const CWalletTx& wtx, const string& strAccount, int nMinDe
             entry.push_back(Pair("vout", s.vout));
             if (!wtx.IsCoinStake())
                 entry.push_back(Pair("fee", ValueFromAmount(-nFee)));
+            else if (s.amount == 0 && s.vout == 0)
+                continue;
             if (fLong)
                 WalletTxToJSON(wtx, entry);
             ret.push_back(entry);
