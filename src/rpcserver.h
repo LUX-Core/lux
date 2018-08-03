@@ -14,7 +14,7 @@
 #include <map>
 #include <stdint.h>
 #include <string>
-
+#include <httpserver.h>
 #include <boost/function.hpp>
 
 #include "univalue/univalue.h"
@@ -39,8 +39,49 @@ public:
     std::string strMethod;
     UniValue params;
 
-    JSONRequest() { id = NullUniValue; }
+    bool isLongPolling;
+
+    /**
+     * If using batch JSON request, this object won't get the underlying HTTPRequest.
+     */
+    JSONRequest() {
+        id = NullUniValue;
+        params = NullUniValue;
+        req = NULL;
+        isLongPolling = false;
+    };
+
+    JSONRequest(HTTPRequest *req);
+
+    /**
+     * Start long-polling
+     */
+    void PollStart();
+
+    /**
+     * Ping long-poll connection with an empty character to make sure it's still alive.
+     */
+    void PollPing();
+
+    /**
+     * Returns whether the underlying long-poll connection is still alive.
+     */
+    bool PollAlive();
+
+    /**
+     * End a long poll request.
+     */
+    void PollCancel();
+
+    /**
+     * Return the JSON result of a long poll request
+     */
+    void PollReply(const UniValue& result);
+
     void parse(const UniValue& valRequest);
+
+    // FIXME: make this private?
+    HTTPRequest *req;
 };
 
 class AcceptedConnection
@@ -63,8 +104,50 @@ public:
     std::string URI;
     std::string authUser;
 
-    JSONRPCRequest() { id = NullUniValue; params = NullUniValue; fHelp = false; }
+    bool isLongPolling;
+
+    /**
+     * If using batch JSON request, this object won't get the underlying HTTPRequest.
+     */
+    JSONRPCRequest() {
+        id = NullUniValue;
+        params = NullUniValue;
+        fHelp = false;
+        req = NULL;
+        isLongPolling = false;
+    };
+
+    JSONRPCRequest(HTTPRequest *req);
+
+    /**
+     * Start long-polling
+     */
+    void PollStart();
+
+    /**
+     * Ping long-poll connection with an empty character to make sure it's still alive.
+     */
+    void PollPing();
+
+    /**
+     * Returns whether the underlying long-poll connection is still alive.
+     */
+    bool PollAlive();
+
+    /**
+     * End a long poll request.
+     */
+    void PollCancel();
+
+    /**
+     * Return the JSON result of a long poll request
+     */
+    void PollReply(const UniValue& result);
+
     void parse(const UniValue& valRequest);
+
+    // FIXME: make this private?
+    HTTPRequest *req;
 };
 
 /** Start RPC threads */
