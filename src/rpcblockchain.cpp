@@ -11,6 +11,7 @@
 #include "main.h"
 #include "primitives/transaction.h"
 #include "rpcserver.h"
+#include "rpcwallet.cpp"
 #include "sync.h"
 #include "util.h"
 
@@ -501,6 +502,42 @@ UniValue listcontracts(const UniValue& params, bool fHelp)
         }
 
         return result;
+}
+
+UniValue gettransactionreceipt(const UniValue& params, bool fHelp)
+{
+    if (fHelp || params.size() < 1)
+        throw std::runtime_error(
+                "gettransactionreceipt \"hash\"\n"
+                "requires -logevents to be enabled"
+                "\nArgument:\n"
+                "1. \"hash\"          (string, required) The transaction hash\n"
+        );
+
+    if(!fLogEvents)
+        throw JSONRPCError(RPC_INTERNAL_ERROR, "Events indexing disabled");
+
+    LOCK(cs_main);
+
+    std::string hashTemp = params[0].get_str();
+    if(hashTemp.size() != 64){
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Incorrect hash");
+    }
+
+    uint256 hash(uint256S(hashTemp));
+
+    boost::filesystem::path stateDir = GetDataDir() / "stateLux";
+    StorageResults storageRes(stateDir.string());
+
+    std::vector<TransactionReceiptInfo> transactionReceiptInfo = storageRes.getResult(uintToh256(hash));
+
+    UniValue result(UniValue::VARR);
+    for(TransactionReceiptInfo& t : transactionReceiptInfo){
+        UniValue tri(UniValue::VOBJ);
+        transactionReceiptInfoToJSON(t, tri);
+        result.push_back(tri);
+    }
+    return result;
 }
 
 UniValue pruneblockchain(const UniValue& params, bool fHelp)
