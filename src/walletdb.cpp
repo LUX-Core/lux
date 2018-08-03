@@ -19,6 +19,7 @@
 #include "stake.h"
 #include "main.h"
 #include <atomic>
+#include "init.h"
 
 #include <boost/version.hpp>
 #include <boost/filesystem.hpp>
@@ -944,6 +945,84 @@ void ThreadFlushWalletDB(const string& strFile)
                     }
                 }
             }
+        }
+    }
+}
+
+void ThreadCheckWalletBackup()
+{
+    RenameThread("lux-backup");
+
+    unsigned int nTick = 0;
+    while (true) {
+        MilliSleep(1000);
+        nTick ++;
+
+        if(nTick > 86400) { //after 24h (86400 = 24h * 3600s)
+            std::string strWalletFile = pwalletMain->strWalletFile;
+
+            filesystem::path pathBackup = GetDataDir() / "backups";
+            filesystem::path backupFolder = pathBackup.string();
+            
+            pathBackup /= strWalletFile;
+            pathBackup += DateTimeStrFormat(".%Y%m%d", GetTime());
+
+            // Keep only the last 10 backups, including the new one of course
+            typedef std::multimap<std::time_t, filesystem::path> folder_set_t;
+            folder_set_t folder_set;
+
+            filesystem::directory_iterator end_iter;
+            backupFolder.make_preferred();
+            // Build map of backup files for current(!) wallet sorted by last write time
+            for (filesystem::directory_iterator dir_iter(backupFolder); dir_iter != end_iter; ++dir_iter) {
+                // Only check regular files
+                if (filesystem::is_regular_file(dir_iter->status())) {
+                    // Only add the backups for the current wallet, e.g. wallet.dat.*
+                    if (dir_iter->path().stem().string() == strWalletFile) {
+                        folder_set.insert(folder_set_t::value_type(filesystem::last_write_time(dir_iter->path()), *dir_iter));
+                    }
+                }
+            }
+
+            // Loop backward through backup files and keep the N newest ones (1 <= N <= 10)
+            int counter = 0;
+            BOOST_REVERSE_FOREACH (PAIRTYPE(const std::time_t, filesystem::path) file, folder_set) {
+                counter++;
+                if (counter >= nWalletBackups) {
+                    // More than nWalletBackups backups: delete oldest one(s)
+                    try {
+                        filesystem::remove(file.second);
+                        LogPrintf("Old backup deleted: %s\n", file.second);
+                    } catch (filesystem::filesystem_error& error) {
+                        LogPrintf("Failed to delete backup %s\n", error.what());
+                    }
+                }
+            }
+
+            LOCK(bitdb.cs_db);
+            if (!bitdb.mapFileUseCount.count(strWalletFile) || bitdb.mapFileUseCount[strWalletFile] == 0) {
+                // Flush log data to the dat file
+                bitdb.CloseDb(strWalletFile);
+                bitdb.CheckpointLSN(strWalletFile);
+                bitdb.mapFileUseCount.erase(strWalletFile);
+
+                // Copy wallet.dat
+                filesystem::path pathSrc = GetDataDir() / strWalletFile;
+                try {
+#if BOOST_VERSION >= 158000
+                    filesystem::copy_file(pathSrc, pathBackup, filesystem::copy_option::overwrite_if_exists);
+#else
+                    std::ifstream src(pathSrc.string(), std::ios::binary);
+                    std::ofstream dst(pathBackup.string(), std::ios::binary);
+                    dst << src.rdbuf();
+#endif
+                    LogPrintf("copied wallet.dat to %s\n", pathBackup.string());
+                } catch (const filesystem::filesystem_error& e) {
+                    LogPrintf("error copying wallet.dat to %s - %s\n", pathBackup.string(), e.what());
+                }
+            }
+            
+            nTick = 0;
         }
     }
 }

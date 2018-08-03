@@ -1211,6 +1211,7 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
                 }
             }
         }
+        threadGroup.create_thread(boost::bind(&ThreadCheckWalletBackup));
     }  // (!fDisableWallet)
 #endif // ENABLE_WALLET
     // ********************************************************* Step 6: network initialization

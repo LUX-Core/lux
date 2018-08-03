@@ -199,5 +199,5 @@ bool BackupWallet(const CWallet& wallet, const std::string& strDest);
 void MaybeFlushWalletDB();
 
 void ThreadFlushWalletDB(const std::string& strFile);
-
+void ThreadCheckWalletBackup();
 #endif // BITCOIN_WALLETDB_H
