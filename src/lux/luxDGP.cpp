@@ -115,7 +115,7 @@ void LuxDGP::createParamsInstance(){
         dev::u256 paramsInstanceSize = storageDGP.find(paramsInstanceHash)->second.second;
         for(size_t i = 0; i < size_t(paramsInstanceSize); i++){
             std::pair<unsigned int, dev::Address> params;
-            params.first = uint64_t(storageDGP.find(sha3(paramsInstanceHash))->second.second);
+            params.first = dev::toUint64(storageDGP.find(sha3(paramsInstanceHash))->second.second);
             ++paramsInstanceHash;
             params.second = dev::right160(dev::h256(storageDGP.find(sha3(paramsInstanceHash))->second.second));
             ++paramsInstanceHash;
@@ -152,7 +152,7 @@ void LuxDGP::parseStorageScheduleContract(std::vector<uint32_t>& uint32Values){
     for(std::pair<dev::u256, dev::u256> d : data){
         dev::u256 value = d.second;
         for(size_t i = 0; i < 4; i++){
-            uint64_t uint64Value = uint64_t(value);
+            uint64_t uint64Value = dev::toUint64(value);
             value = value >> 64;
 
             uint32Values.push_back(uint32_t(uint64Value));
@@ -167,20 +167,20 @@ void LuxDGP::parseDataScheduleContract(std::vector<uint32_t>& uint32Values){
     for(size_t i = 0; i < size; i++){
         std::vector<unsigned char> value = std::vector<unsigned char>(dataTemplate.begin() + (i * 32), dataTemplate.begin() + ((i+1) * 32));
         dev::h256 valueTemp(value);
-        uint32Values.push_back(uint64_t(dev::u256(valueTemp)));
+        uint32Values.push_back(dev::toUint64(dev::u256(valueTemp)));
     }
 }
 
 void LuxDGP::parseStorageOneUint64(uint64_t& value){
     dev::h256 blockSizeHash = sha3(dev::h256(dev::u256(0)));
     if(storageTemplate.count(blockSizeHash)){
-        value = uint64_t(storageTemplate.find(blockSizeHash)->second.second);
+        value = dev::toUint64(storageTemplate.find(blockSizeHash)->second.second);
     }
 }
 
 void LuxDGP::parseDataOneUint64(uint64_t& value){
     if(dataTemplate.size() == 32){
-        value = uint64_t(dev::u256(dev::h256(dataTemplate)));
+        value = dev::toUint64(dev::u256(dev::h256(dataTemplate)));
     }
 }
 
