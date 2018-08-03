@@ -808,6 +808,45 @@ bool RPCIsInWarmup(std::string* outStatus)
     return fRPCInWarmup;
 }
 
+JSONRequest::JSONRequest(HTTPRequest *req): JSONRequest() {
+    req = req;
+}
+
+bool JSONRequest::PollAlive() {
+    return !req->isConnClosed();
+}
+
+void JSONRequest::PollStart() {
+    // send an empty space to the client to ensure that it's still alive.
+    assert(!isLongPolling);
+    req->WriteHeader("Content-Type", "application/json");
+    req->WriteHeader("Connection", "close");
+    req->Chunk(std::string(" "));
+    isLongPolling = true;
+}
+
+void JSONRequest::PollPing() {
+    assert(isLongPolling);
+    // send an empty space to the client to ensure that it's still alive.
+    req->Chunk(std::string(" "));
+}
+
+void JSONRequest::PollCancel() {
+    assert(isLongPolling);
+    req->ChunkEnd();
+}
+
+void JSONRequest::PollReply(const UniValue& result) {
+    assert(isLongPolling);
+    UniValue reply(UniValue::VOBJ);
+    reply.push_back(Pair("result", result));
+    reply.push_back(Pair("error", NullUniValue));
+    reply.push_back(Pair("id", id));
+
+    req->Chunk(reply.write() + "\n");
+    req->ChunkEnd();
+}
+
 void RPCRunHandler(const boost::system::error_code& err, boost::function<void(void)> func)
 {
     if (!err)
@@ -873,7 +912,7 @@ static UniValue JSONRPCExecOne(const UniValue& req)
 {
     UniValue rpc_result(UniValue::VOBJ);
 
-    JSONRequest jreq;
+    JSONRequest jreq(NULL);
     try {
         jreq.parse(req);
 
