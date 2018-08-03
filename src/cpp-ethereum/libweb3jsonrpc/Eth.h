@@ -124,7 +124,9 @@ public:
 	virtual std::string eth_sendRawTransaction(std::string const& _rlp) override;
 	virtual bool eth_notePassword(std::string const&) override { return false; }
 	virtual Json::Value eth_syncing() override;
-	
+
+	virtual std::string eth_chainId() override;
+
 	void setTransactionDefaults(eth::TransactionSkeleton& _t);
 protected:
 
