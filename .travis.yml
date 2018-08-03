@@ -27,12 +27,15 @@ env:
     - BASE_OUTDIR=$TRAVIS_BUILD_DIR/out
     - SDK_URL=https://bitcoincore.org/depends-sources/sdks
     - PYTHON_DEBUG=1
+    - JDK=openjdk8
+    - JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+    - CFLAGS="-std=c99 -I$JAVA_HOME/include -I$JAVA_HOME/include/linux"
     - WINEDEBUG=fixme-all
   matrix:
 # ARM
     - HOST=arm-linux-gnueabihf PACKAGES="g++-arm-linux-gnueabihf libprotobuf-dev protobuf-compiler libqrencode-dev" CHECK_DOC=0 GOAL="install" BITCOIN_CONFIG="--enable-glibc-back-compat --enable-reduce-exports --disable-tests --disable-zmq"
 # Win32
-    - HOST=i686-w64-mingw32 DPKG_ADD_ARCH="i386" DEP_OPTS="NO_QT=0" PACKAGES="python3 nsis wine1.6 bc openjdk-7-jre-headless build-essential libtool autotools-dev automake cmake pkg-config bsdmainutils curl g++-mingw-w64-x86-64 mingw-w64-x86-64-dev g++-mingw-w64-i686 mingw-w64-i686-dev -y" RUN_TESTS=false GOAL="install" BITCOIN_CONFIG="--enable-reduce-exports --disable-tests --disable-zmq"
+    - HOST=i686-w64-mingw32 DPKG_ADD_ARCH="i386" DEP_OPTS="NO_QT=0" PACKAGES="python3 nsis wine1.6 bc openjdk-8-jdk build-essential libtool autotools-dev automake cmake pkg-config bsdmainutils curl g++-mingw-w64-x86-64 mingw-w64-x86-64-dev g++-mingw-w64-i686 mingw-w64-i686-dev -y" RUN_TESTS=false GOAL="install" BITCOIN_CONFIG="--enable-reduce-exports --disable-zmq"
 # Cross-Mac
     - HOST=x86_64-apple-darwin11 PACKAGES="curl librsvg2-bin libtiff-tools bsdmainutils python-setuptools cmake imagemagick libcap-dev librsvg2-bin libz-dev libbz2-dev libtiff-tools python-dev" BITCOIN_CONFIG="--enable-reduce-exports --disable-tests --disable-zmq" OSX_SDK=10.11
 
@@ -49,6 +52,7 @@ before_script:
     - mkdir -p depends/SDKs depends/sdk-sources
     - if [ -n "$OSX_SDK" -a ! -f depends/sdk-sources/MacOSX${OSX_SDK}.sdk.tar.gz ]; then curl --location --fail $SDK_URL/MacOSX${OSX_SDK}.sdk.tar.gz -o depends/sdk-sources/MacOSX${OSX_SDK}.sdk.tar.gz; fi
     - if [ -n "$OSX_SDK" -a -f depends/sdk-sources/MacOSX${OSX_SDK}.sdk.tar.gz ]; then tar -C depends/SDKs -xf depends/sdk-sources/MacOSX${OSX_SDK}.sdk.tar.gz; fi
+    - jdk_switcher use $JDK
     - make $MAKEJOBS -C depends HOST=$HOST $DEP_OPTS
     - mkdir -p src/lux-installer/src/luxupdater
     - mkdir -p src/lux-installer/src/forms
