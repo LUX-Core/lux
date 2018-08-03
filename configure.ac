@@ -407,8 +407,8 @@ if test x$TARGET_OS = xwindows; then
 	CPPFLAGS="-Wno-unknown-pragmas -Wno-deprecated-declarations -Wno-cpp $CPPFLAGS -DLUX_BUILD"
 	CXXFLAGS="-Wno-unknown-pragmas -Wno-deprecated-declarations -Wno-cpp $CXXFLAGS"
 elif test x$TARGET_OS = xdarwin; then
-	CPPFLAGS="-Wno-inconsistent-missing-override -Wno-deprecated-declarations -Wno-cpp -Wno-unknown-pragmas -Wno-implicit-fallthrough $CPPFLAGS -DLUX_BUILD"
-	CXXFLAGS="-Wno-inconsistent-missing-override -Wno-deprecated-declarations -Wno-cpp -Wno-unknown-pragmas -Wno-implicit-fallthrough $CXXFLAGS"
+	CPPFLAGS="-Wno-inconsistent-missing-override -Wno-deprecated-declarations -Wno-unknown-pragmas -Wno-implicit-fallthrough $CPPFLAGS -DLUX_BUILD"
+	CXXFLAGS="-Wno-inconsistent-missing-override -Wno-deprecated-declarations -Wno-unknown-pragmas -Wno-implicit-fallthrough $CXXFLAGS"
 else
 	CPPFLAGS="-Wno-unknown-pragmas -Wno-deprecated -Wno-deprecated-declarations -Wno-cpp -Wno-implicit-fallthrough $CPPFLAGS -DLUX_BUILD"
 	CXXFLAGS="-Wno-unknown-pragmas -Wno-deprecated-declarations -Wno-cpp $CXXFLAGS"

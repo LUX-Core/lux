@@ -725,6 +725,8 @@ CLEANFILES += zmq/*.gcda zmq/*.gcno
 DISTCLEANFILES = obj/build.h
 
 EXTRA_DIST = leveldb
+
+# workaround for travis builds
 dist_pkgdata_DATA = multipliers.hpp univalue/univalue_utffilter.h
 
 clean-local:
