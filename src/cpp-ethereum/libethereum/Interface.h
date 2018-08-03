@@ -240,6 +240,9 @@ public:
 	/// Get the seal engine.
 	virtual SealEngineFace* sealEngine() const { return nullptr; }
 
+	/// Gets the chain id
+	virtual int chainId() const { return 0; }
+
 protected:
 	int m_default = PendingBlock;
 };
