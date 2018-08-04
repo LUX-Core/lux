@@ -2211,7 +2211,7 @@ bool DisconnectBlock(CBlock& block, CValidationState& state, CBlockIndex* pindex
 
         if (pfClean == NULL && fLogEvents) {
             pstorageresult->deleteResults(block.vtx);
-            //pblocktree->EraseHeightIndex(pindex->nHeight);
+            pblocktree->EraseHeightIndex(pindex->nHeight);
         }
    }
 //#endif
@@ -2804,6 +2804,13 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
 
         pindex->RaiseValidity(BLOCK_VALID_SCRIPTS);
         setDirtyBlockIndex.insert(pindex);
+    }
+
+    if (fLogEvents) {
+        for (const auto& e: heightIndexes) {
+            if (!pblocktree->WriteHeightIndex(e.second.first, e.second.second))
+                return AbortNode("Failed to write height index");
+        }
     }
 
     if (fTxIndex)

@@ -1469,7 +1469,7 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
                 if (!GetBoolArg("-logevents", DEFAULT_LOGEVENTS))
                 {
                     pstorageresult->wipeResults();
-//                  pblocktree->WipeHeightIndex();
+                    pblocktree->WipeHeightIndex();
                     fLogEvents = false;
                     pblocktree->WriteFlag("logevents", fLogEvents);
                 }
