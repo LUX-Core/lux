@@ -4922,6 +4922,10 @@ bool static LoadBlockIndexDB()
     pblocktree->ReadFlag("txindex", fTxIndex);
     LogPrintf("%s: transaction index %s\n", __func__, fTxIndex ? "enabled" : "disabled");
 
+    // Check whether we have a transaction index
+    pblocktree->ReadFlag("logevents", fLogEvents);
+    LogPrintf("%s: log events index %s\n", __func__, fLogEvents ? "enabled" : "disabled");
+
     // If this is written true before the next client init, then we know the shutdown process failed
     pblocktree->WriteFlag("shutdown", false);
 
@@ -5072,8 +5076,17 @@ void UnloadBlockIndex()
 bool LoadBlockIndex()
 {
     // Load block index from databases
-    if (!fReindex && !LoadBlockIndexDB())
-        return false;
+    bool needs_init = fReindex;
+    if (!fReindex) {
+        bool ret = LoadBlockIndexDB();
+        if (!ret) return false;
+        needs_init = mapBlockIndex.empty();
+    }
+    if (needs_init) {
+        // Use the provided setting for -logevents in the new database
+        fLogEvents = GetBoolArg("-logevents", DEFAULT_LOGEVENTS);
+        pblocktree->WriteFlag("logevents", fLogEvents);
+    }
     return true;
 }
 

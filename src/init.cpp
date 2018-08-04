@@ -1461,12 +1461,12 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
                 }
 
                 // Check for changed -logevents state
-                if (fLogEvents != GetBoolArg("-logevents", false) && !fLogEvents) {
+                if (fLogEvents != GetBoolArg("-logevents", DEFAULT_LOGEVENTS) && !fLogEvents) {
                     strLoadError = _("You need to rebuild the database using -reindex-chainstate to enable -logevents");
                     break;
                 }
 
-                if (GetBoolArg("-logevents", false))
+                if (!GetBoolArg("-logevents", DEFAULT_LOGEVENTS))
                 {
                     pstorageresult->wipeResults();
 //                  pblocktree->WipeHeightIndex();
