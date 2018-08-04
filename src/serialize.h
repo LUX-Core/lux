@@ -1052,19 +1052,4 @@ public:
     }
 };
 
-///////////////////////////////////////////////// // lux
-template<typename Stream> inline void ser_writedata32be(Stream &s, uint32_t obj)
-{
-    obj = htobe32(obj);
-    s.write((char*)&obj, 4);
-}
-
-template<typename Stream> inline uint32_t ser_readdata32be(Stream &s)
-{
-    uint32_t obj;
-    s.read((char*)&obj, 4);
-    return be32toh(obj);
-}
-/////////////////////////////////////////////////
-
 #endif // BITCOIN_SERIALIZE_H

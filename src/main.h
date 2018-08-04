@@ -368,16 +368,11 @@ bool AcceptableInputs(CTxMemPool& pool, CValidationState& state, const CTransact
 struct CHeightTxIndexIteratorKey {
     unsigned int height;
 
-    size_t GetSerializeSize(int nType, int nVersion) const {
-        return 4;
-    }
-    template<typename Stream>
-    void Serialize(Stream& s, int nType, int nVersion) const {
-        ser_writedata32be(s, height);
-    }
-    template<typename Stream>
-    void Unserialize(Stream& s, int nType, int nVersion) {
-        height = ser_readdata32be(s);
+    ADD_SERIALIZE_METHODS;
+
+    template <typename Stream, typename Operation>
+    inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion) {
+        READWRITE(height);
     }
 
     CHeightTxIndexIteratorKey(unsigned int _height) {
@@ -397,20 +392,19 @@ struct CHeightTxIndexKey {
     unsigned int height;
     dev::h160 address;
 
-    size_t GetSerializeSize(int nType, int nVersion) const {
-        return 24;
-    }
-    template<typename Stream>
-    void Serialize(Stream& s, int nType, int nVersion) const {
-        ser_writedata32be(s, height);
-        s << address.asBytes();
-    }
-    template<typename Stream>
-    void Unserialize(Stream& s, int nType, int nVersion) {
-        height = ser_readdata32be(s);
-        valtype tmp;
-        s >> tmp;
-        address = dev::h160(tmp);
+    ADD_SERIALIZE_METHODS;
+
+    template <typename Stream, typename Operation>
+    inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion) {
+        READWRITE(height);
+        if (ser_action.ForRead()) {
+            valtype tmp;
+            READWRITE(tmp);
+            address = dev::h160(tmp);
+        } else {
+            valtype tmp = address.asBytes();
+            READWRITE(tmp);
+        }
     }
 
     CHeightTxIndexKey(unsigned int _height, dev::h160 _address) {
