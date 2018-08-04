@@ -436,6 +436,7 @@ extern UniValue getaccountinfo(const UniValue& params, bool fHelp);
 extern UniValue getstorage(const UniValue& params, bool fHelp);
 extern UniValue listcontracts(const UniValue& params, bool fHelp);
 extern UniValue gettransactionreceipt(const UniValue& params, bool fHelp);
+extern UniValue searchlogs(const UniValue& params, bool fHelp);
 extern UniValue pruneblockchain(const UniValue& params, bool fHelp);
 
 // in rest.cpp

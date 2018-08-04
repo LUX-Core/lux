@@ -303,6 +303,7 @@ static const CRPCCommand vRPCCommands[] =
         {"blockchain", "callcontract", &callcontract,true, true, false },
         {"blockchain", "listcontracts", &listcontracts,true, true, false },
         {"blockchain", "gettransactionreceipt", &gettransactionreceipt,true, true, false },
+        {"blockchain", "searchlogs", &searchlogs,true, true, false },
         {"blockchain", "createcontract", &createcontract,true, true, false },
         {"blockchain", "sendtocontract", &sendtocontract,true, true, false },
         {"blockchain", "pruneblockchain", &pruneblockchain,true, true, false },
