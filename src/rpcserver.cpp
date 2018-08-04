@@ -317,11 +317,13 @@ static const CRPCCommand vRPCCommands[] =
 
 #ifdef ENABLE_WALLET
         /* Coin generation */
+#ifdef ENABLE_CPUMINER
         {"generating", "getgenerate", &getgenerate, true, false, false},
         {"generating", "gethashespersec", &gethashespersec, true, false, false},
         {"generating", "setgenerate", &setgenerate, true, true, false},
 #endif
-
+        {"generating", "getstakingstatus", &getstakingstatus, false, false, true},
+#endif
         /* Raw transactions */
         {"rawtransactions", "createrawtransaction", &createrawtransaction, true, false, false},
         {"rawtransactions", "decoderawtransaction", &decoderawtransaction, true, false, false},
@@ -375,7 +377,6 @@ static const CRPCCommand vRPCCommands[] =
         {"wallet", "getrawchangeaddress", &getrawchangeaddress, true, false, true},
         {"wallet", "getreceivedbyaccount", &getreceivedbyaccount, false, false, true},
         {"wallet", "getreceivedbyaddress", &getreceivedbyaddress, false, false, true},
-        {"wallet", "getstakingstatus", &getstakingstatus, false, false, true},
         {"wallet", "gettransaction", &gettransaction, false, false, true},
         {"wallet", "getunconfirmedbalance", &getunconfirmedbalance, false, false, true},
         {"wallet", "getwalletinfo", &getwalletinfo, false, false, true},

@@ -452,7 +452,7 @@ std::string HelpMessage(HelpMessageMode mode)
     if (mode == HMM_BITCOIN_QT)
         strUsage += ", qt";
     strUsage += ".\n";
-#ifdef ENABLE_WALLET
+#ifdef ENABLE_CPUMINER
     strUsage += "  -gen                   " + strprintf(_("Generate coins (default: %u)"), 0) + "\n";
     strUsage += "  -genproclimit=<n>      " + strprintf(_("Set the number of threads for coin generation if enabled (-1 = all cores, default: %d)"), 1) + "\n";
 #endif
@@ -1798,6 +1798,8 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
 
     RandAddSeedPerfmon();
 
+    StartNode(threadGroup, scheduler);
+
     //// debug print
     LogPrintf("mapBlockIndex.size() = %u\n", mapBlockIndex.size());
     LogPrintf("chainActive.Height() = %d\n", chainActive.Height());
@@ -1805,15 +1807,13 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
     LogPrintf("setKeyPool.size() = %u\n", pwalletMain ? pwalletMain->GetKeyPoolSize() : 0);
     LogPrintf("mapWallet.size() = %u\n", pwalletMain ? pwalletMain->mapWallet.size() : 0);
     LogPrintf("mapAddressBook.size() = %u\n", pwalletMain ? pwalletMain->mapAddressBook.size() : 0);
-#endif
 
-    StartNode(threadGroup, scheduler);
-
-#ifdef ENABLE_WALLET
+#   ifdef ENABLE_CPUMINER
     // Generate coins in the background
     if (GetBoolArg("-gen", false) && pwalletMain) {
-//        GenerateBitcoins(pwalletMain, GetArg("-genproclimit", 1));
+        GenerateBitcoins(pwalletMain, GetArg("-genproclimit", 1));
     }
+#   endif
 #endif
 
     // ********************************************************* Step 12: finished
