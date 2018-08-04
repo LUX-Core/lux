@@ -2098,7 +2098,7 @@ void ThreadCheckDarkSendPool() {
     unsigned int c = 0;
     std::string errorMessage;
 
-    while (true) {
+    while (!ShutdownRequested()) {
         c++;
 
         MilliSleep(2500);
