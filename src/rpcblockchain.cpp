@@ -505,6 +505,62 @@ UniValue listcontracts(const UniValue& params, bool fHelp)
         return result;
 }
 
+bool getContractAddressesFromParams(const UniValue& params, std::vector<dev::h160> &addresses)
+{
+    if (params[2].isStr()) {
+        auto addrStr(params[2].get_str());
+        if (addrStr.length() != 40)
+            throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid address");
+        dev::h160 address(params[2].get_str());
+        addresses.push_back(address);
+    } else if (params[2].isObject()) {
+
+        UniValue addressValues = find_value(params[2].get_obj(), "addresses");
+        if (!addressValues.isArray()) {
+            throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Addresses is expected to be an array");
+        }
+
+        std::vector<UniValue> values = addressValues.getValues();
+
+        for (std::vector<UniValue>::iterator it = values.begin(); it != values.end(); ++it) {
+            auto addrStr(it->get_str());
+            if (addrStr.length() != 40)
+                throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid address");
+            addresses.push_back(dev::h160(addrStr));
+        }
+    } else {
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid address");
+    }
+
+    return true;
+}
+
+bool getTopicsFromParams(const UniValue& params, std::vector<std::pair<unsigned, dev::h256>> &topics)
+{
+    if (params[3].isObject()) {
+
+        UniValue topicValues = find_value(params[3].get_obj(), "topics");
+        if (!topicValues.isArray()) {
+            throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Topics is expected to be an array");
+        }
+
+        std::vector<UniValue> values = topicValues.getValues();
+
+        for (size_t i = 0; i < values.size(); ++i) {
+            auto topicStr(values[i].get_str());
+            if (topicStr == "null")
+                continue;
+            if (topicStr.length() != 64)
+                throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid topic");
+            topics.push_back({i, dev::h256(topicStr)});
+        }
+    } else {
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid topic");
+    }
+
+    return true;
+}
+
 class SearchLogsParams {
 public:
     size_t fromBlock;
