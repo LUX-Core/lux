@@ -7023,9 +7023,22 @@ bool CheckRefund(const CBlock& block, const std::vector<CTxOut>& vouts){
     std::vector<CTxOut>::iterator it;
     for(size_t i = 0; i < vouts.size(); i++){
         it=std::find(vTempVouts.begin(), vTempVouts.end(), vouts[i]);
-        if(it==vTempVouts.end()){
-            return false;
-        }else{
+        if (it==vTempVouts.end()) {
+            bool refundValid=false;
+            const int nPrecision = 1000000;
+            LogPrintf("%s: warning, unable to find exact %s\n", __func__, vouts[i].ToString().c_str());
+            for(it=vTempVouts.begin(); it!=vTempVouts.end(); it++) {
+                if (vouts[i].scriptPubKey == it->scriptPubKey && it->nValue/nPrecision == vouts[i].nValue/nPrecision) {
+                    LogPrintf("%s: found vout %s (%s)\n", __func__, it->ToString().c_str(), FormatMoney(it->nValue));
+                    refundValid = true;
+                }
+            }
+            if (!refundValid) {
+                LogPrintf("%s: Unable to find vout %s\n", __func__, vouts[i].ToString().c_str());
+                LogPrintf("%s: first block %s\n", __func__, vTempVouts.at(0).ToString().c_str());
+                return false;
+            }
+        } else {
             vTempVouts.erase(it);
         }
     }
