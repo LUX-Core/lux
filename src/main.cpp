@@ -88,7 +88,7 @@ bool fRecordLogOpcodes = false;
 bool fIsVMlogFile = false;
 bool fGettingValuesDGP = false;
 
-std::string SCVersion ("/Luxcore:5.2.0/");
+std::string SCVersion ("/Luxcore:5.2.1/");
 
 
 /** The maximum allowed size for a serialized block, in bytes (only for buffer size limits) */
