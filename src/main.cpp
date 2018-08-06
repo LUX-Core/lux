@@ -88,6 +88,8 @@ bool fRecordLogOpcodes = false;
 bool fIsVMlogFile = false;
 bool fGettingValuesDGP = false;
 
+std::string SCVersion ("/Luxcore:5.2.0/");
+
 
 /** The maximum allowed size for a serialized block, in bytes (only for buffer size limits) */
 unsigned int dgpMaxBlockSerSize = 8000000;
@@ -4384,6 +4386,14 @@ bool ProcessNewBlock(CValidationState& state, const CChainParams& chainparams, C
     int nHeight = chainActive.Height() + 1;
     bool usePhi2 = false;
 
+    // Reject the block from older version
+    if (!pfrom)
+        return error("%s: Invalid block %d, wrong chain",
+                __func__, nHeight);
+    if (pfrom->strSubVer.compare(SCVersion) < 0)
+        return error("%s: Invalid block %d, wrong chain",
+                __func__, nHeight);
+
     // Preliminary checks
     if (!CheckBlock(*pblock, state, chainparams.GetConsensus()))
         return error("%s: block not passing checks", __func__);
@@ -5742,8 +5752,9 @@ static bool ProcessMessage(CNode* pfrom, const string &strCommand, CDataStream& 
             vRecv >> LIMITED_STRING(pfrom->strSubVer, 256);
             pfrom->cleanSubVer = SanitizeString(pfrom->strSubVer);
         }
+
         //disconnect nodes, which are not upgraded, but the current best block is after hardfork
-        if (GetMajorVersionFromVersion(pfrom->cleanSubVer) < CLIENT_VERSION_MAJOR && chainActive.Height() >= chainparams.SwitchPhi2Block()) {
+        if (pfrom->strSubVer.compare(SCVersion) < 0 || (GetMajorVersionFromVersion(pfrom->cleanSubVer) < CLIENT_VERSION_MAJOR && chainActive.Height() >= chainparams.SwitchPhi2Block())) {
             pfrom->PushMessage("reject", strCommand, REJECT_OBSOLETE);
             pfrom->fDisconnect = true;
             return false;
