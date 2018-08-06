@@ -3962,6 +3962,11 @@ bool CheckBlock(const CBlock& block, CValidationState& state, const Consensus::P
     // Check transactions
     unsigned int nTx = 0;
     BOOST_FOREACH (const CTransaction& tx, block.vtx) {
+        //TODO add exceptions for already accepted PoS-contract blocks
+        if (block.IsProofOfStake() && (tx.HasOpSpend() || tx.HasCreateOrCall())) {
+            return error("%s: smart contracts are not supported yet in PoS blocks", __func__);
+        }
+
         if (!CheckTransaction(tx, state)) {
             LogPrint("debug", "%s: invalid transaction %s", __func__, tx.ToString());
             return error("%s: CheckTransaction failed (nTx=%d, reason: %s)", __func__, nTx, state.GetRejectReason());
