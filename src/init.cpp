@@ -217,8 +217,10 @@ void PrepareShutdown()
         pcoinsdbview = NULL;
         delete pblocktree;
         pblocktree = NULL;
-//        delete pstorageresult;
-//        pstorageresult = NULL;
+        if(pstorageresult != nullptr) {
+            delete pstorageresult;
+            pstorageresult = nullptr;
+        }
         delete globalState.release();
         globalSealEngine.reset();
     }
@@ -1381,10 +1383,7 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
                 pcoinscatcher = new CCoinsViewErrorCatcher(pcoinsdbview);
                 pcoinsTip = new CCoinsViewCache(pcoinscatcher);
 
-                if (fReindex) {
-                    boost::filesystem::path stateDir = GetDataDir() / "stateLux";
-                    StorageResults storageRes(stateDir.string());
-                    storageRes.wipeResults();
+                if (fReset) {
                     pblocktree->WriteReindexing(true);
                     if (fPruneMode)
                         DeleteAllBlockFiles();
@@ -1431,6 +1430,9 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
                 globalSealEngine = std::unique_ptr<dev::eth::SealEngineFace>(cp.createSealEngine());
 
                 pstorageresult = new StorageResults(luxStateDir.string());
+                if (fReset) {
+                    pstorageresult->wipeResults();
+                }
 
                 if(chainActive.Tip() != nullptr && chainActive.Tip()->nHeight > Params().FirstSCBlock()){
                     globalState->setRoot(uintToh256(chainActive.Tip()->hashStateRoot));
