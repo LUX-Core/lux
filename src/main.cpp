@@ -3118,6 +3118,7 @@ bool static ConnectTip(CValidationState& state, const CChainParams& chainparams,
             if (pindexNew->nHeight >= chainparams.FirstSCBlock()) {
                 globalState->setRoot(oldHashStateRoot); // lux
                 globalState->setRootUTXO(oldHashUTXORoot); // lux
+                pstorageresult->clearCacheResult();
             }
 
             return error("ConnectTip() : ConnectBlock %s failed", pindexNew->GetBlockHash().ToString());
@@ -4523,6 +4524,7 @@ bool TestBlockValidity(CValidationState& state, const CChainParams& chainparams,
         if (index.nHeight >= chainparams.FirstSCBlock()) {
             globalState->setRoot(oldHashStateRoot); // lux
             globalState->setRootUTXO(oldHashUTXORoot); // lux
+            pstorageresult->clearCacheResult();
         }
         return false;
     }
@@ -5054,6 +5056,7 @@ bool CVerifyDB::VerifyDB(const CChainParams& chainparams, CCoinsView* coinsview,
                 if (chainActive.Height() >= chainparams.FirstSCBlock()) {
                     globalState->setRoot(oldHashStateRoot); // lux
                     globalState->setRootUTXO(oldHashUTXORoot); // lux
+                    pstorageresult->clearCacheResult();
                 }
                 return error("VerifyDB() : *** found unconnectable block at %d, hash=%s", pindex->nHeight, pindex->GetBlockHash().ToString());
             }

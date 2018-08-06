@@ -1,43 +1,11 @@
 #include <lux/storageresults.h>
-#include <boost/filesystem.hpp>
 
 StorageResults::StorageResults(std::string const& _path){
 	path = _path + "/resultsDB";
     options.create_if_missing = true;
-    int cnt = 0;
-    int MAX_TRIES = 5;
-    leveldb::Status status;
-
-    for (cnt = 0; cnt < MAX_TRIES; cnt++)
-    {
-        leveldb::Status status = leveldb::DB::Open(options, path, &db);
-
-        if(status.ok()) {
-            LogPrintf("Opened LevelDB successfully\n");
-            return;
-        }
-
-        LogPrintf("++++++++++++++++++++++++++++++++++\n");
-        LogPrintf("%s (retry = %d): %s\n", __func__, cnt, status.ToString());
-
-        if (!boost::filesystem::exists(path + "/LOCK"))
-        {
-            if (!boost::filesystem::exists(path))
-            {
-                LogPrintf("%s: '%s' doesn't exit. Creating it ...\n", __func__, path);
-                if (!boost::filesystem::exists(_path))
-                {
-                    LogPrintf("%s: '%s' doesn't exit. Creating it ...\n", __func__, _path);
-                    boost::filesystem::create_directory(_path);
-                }
-                boost::filesystem::create_directory(path);
-            }
-            boost::filesystem::create_directory(path + "/LOCK");
-        }
-
-		LogPrintf("++++++++++++++++++++++++++++++++++\n");
-    }
+    leveldb::Status status = leveldb::DB::Open(options, path, &db);
     assert(status.ok());
+    LogPrintf("Opened LevelDB successfully\n");
 }
 
 StorageResults::~StorageResults()
@@ -48,6 +16,10 @@ StorageResults::~StorageResults()
 
 void StorageResults::addResult(dev::h256 hashTx, std::vector<TransactionReceiptInfo>& result){
 	m_cache_result.insert(std::make_pair(hashTx, result));
+}
+
+void StorageResults::clearCacheResult(){
+    m_cache_result.clear();
 }
 
 void StorageResults::wipeResults(){
