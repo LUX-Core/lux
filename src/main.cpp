@@ -4392,12 +4392,8 @@ bool ProcessNewBlock(CValidationState& state, const CChainParams& chainparams, C
     bool usePhi2 = false;
 
     // Reject the block from older version
-    if (!pfrom)
-        return error("%s: Invalid block %d, wrong chain",
-                __func__, nHeight);
-    if (pfrom->strSubVer.compare(SCVersion) < 0)
-        return error("%s: Invalid block %d, wrong chain",
-                __func__, nHeight);
+    if (pfrom && pfrom->strSubVer.compare(SCVersion) < 0)
+        return error("%s: Invalid block %d, wrong chain ver %s", __func__, nHeight, pfrom->strSubVer.c_str());
 
     // Preliminary checks
     if (!CheckBlock(*pblock, state, chainparams.GetConsensus()))
