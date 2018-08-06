@@ -422,11 +422,13 @@ bool CBlockTreeDB::EraseHeightIndex(const unsigned int &height) {
         CDataStream ssKey(slKey.data(), slKey.data() + slKey.size(), SER_DISK, CLIENT_VERSION);
         char chType;
         ssKey >> chType;
-        CHeightTxIndexKey heightTxIndex;
-        ssKey >> heightTxIndex;
-        if (chType == DB_HEIGHTINDEX && heightTxIndex.height == height) {
-            batch.Erase(std::make_pair(DB_HEIGHTINDEX, heightTxIndex));
-            pcursor->Next();
+        if (chType == DB_HEIGHTINDEX) {
+            CHeightTxIndexKey heightTxIndex;
+            ssKey >> heightTxIndex;
+            if (heightTxIndex.height == height) {
+                batch.Erase(std::make_pair(DB_HEIGHTINDEX, heightTxIndex));
+                pcursor->Next();
+            }
         } else {
             break;
         }
@@ -448,9 +450,9 @@ bool CBlockTreeDB::WipeHeightIndex() {
         CDataStream ssKey(slKey.data(), slKey.data() + slKey.size(), SER_DISK, CLIENT_VERSION);
         char chType;
         ssKey >> chType;
-        CHeightTxIndexKey heightTxIndex;
-        ssKey >> heightTxIndex;
         if (chType == DB_HEIGHTINDEX) {
+            CHeightTxIndexKey heightTxIndex;
+            ssKey >> heightTxIndex;
             batch.Erase(std::make_pair(DB_HEIGHTINDEX, heightTxIndex));
             pcursor->Next();
         } else {
