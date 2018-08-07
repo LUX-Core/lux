@@ -87,10 +87,15 @@ QValidator::State BitcoinAddressCheckValidator::validate(QString& input, int& po
     // Validate the passed LUX address
     CTxDestination addr = DecodeDestination(input.toStdString());
     if (IsValidDestination(addr)) {
-        if(bAllowScript)
+        if (bAllowScript) {
             return QValidator::Acceptable;
-        else if(!IsValidDestination(addr))
-            return QValidator::Acceptable;
+        } else {
+            CKeyID *keyid = boost::get<CKeyID>(&addr);
+            if (keyid) {
+                return QValidator::Acceptable;
+            }
+        }
+
     }
 
     return QValidator::Invalid;
