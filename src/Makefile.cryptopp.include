@@ -15,8 +15,7 @@ CRYPTOPP_CPPFLAGS_INT += -I$(srcdir)/cryptopp
 CRYPTOPP_CPPFLAGS_INT += $(CRYPTOPP_TARGET_FLAGS)
 
 cryptopp_libcryptopp_a_CPPFLAGS = $(AM_CPPFLAGS) $(CRYPTOPP_CPPFLAGS_INT) $(CRYPTOPP_CPPFLAGS)
-# TODO, don't assume x86
-cryptopp_libcryptopp_a_CXXFLAGS = $(AM_CXXFLAGS) -DNDEBUG -fPIC -O2 -g2
+cryptopp_libcryptopp_a_CXXFLAGS = $(AM_CXXFLAGS) -DNDEBUG -O2 $(PIE_FLAGS)
 
 cryptopp_libcryptopp_a_SOURCES=
 cryptopp_libcryptopp_a_SOURCES += cryptopp/cryptlib.cpp

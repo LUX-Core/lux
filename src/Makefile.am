@@ -4,6 +4,9 @@ AM_CXXFLAGS = $(HARDENED_CXXFLAGS) $(ERROR_CXXFLAGS) -DETH_FATDB=1
 AM_CPPFLAGS = $(HARDENED_CPPFLAGS) -DLUX_BUILD
 EXTRA_LIBRARIES =
 
+if !TARGET_WINDOWS
+PIE_FLAGS = -fPIC
+endif
 
 if EMBEDDED_LEVELDB
 LEVELDB_CPPFLAGS += -I$(srcdir)/leveldb/include
@@ -244,7 +247,7 @@ endif
 # wallet: shared between luxd and lux-qt, but only linked
 # when wallet enabled
 
-libbitcoin_wallet_a_CFLAGS = -fPIC
+libbitcoin_wallet_a_CFLAGS = $(PIE_FLAGS)
 libbitcoin_wallet_a_CPPFLAGS = $(BITCOIN_INCLUDES)
 libbitcoin_wallet_a_SOURCES = \
   activemasternode.cpp \
@@ -268,7 +271,7 @@ libbitcoin_wallet_a_SOURCES = \
   $(BITCOIN_CORE_H)
 
 # crypto primitives library
-crypto_libbitcoin_crypto_a_CFLAGS = -fPIC
+crypto_libbitcoin_crypto_a_CFLAGS = $(PIE_FLAGS)
 crypto_libbitcoin_crypto_a_CPPFLAGS = $(BITCOIN_CONFIG_INCLUDES) $(BITCOIN_INCLUDES) -DLUX_BUILD
 crypto_libbitcoin_crypto_a_SOURCES = \
   crypto/sha1.cpp \
@@ -381,7 +384,7 @@ libbitcoin_consensus_a_SOURCES = \
 # common: shared between luxd, and lux-qt and non-server tools
 libbitcoin_common_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES) -DLUX_BUILD
 libbitcoin_common_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-libbitcoin_common_a_CFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS) -std=c99 -fPIC
+libbitcoin_common_a_CFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS) -std=c99
 libbitcoin_common_a_SOURCES = \
   allocators.cpp \
   amount.cpp \
@@ -725,7 +728,9 @@ CLEANFILES += zmq/*.gcda zmq/*.gcno
 DISTCLEANFILES = obj/build.h
 
 EXTRA_DIST = leveldb
-dist_pkgdata_DATA = multipliers.hpp
+
+# workaround for travis builds
+dist_pkgdata_DATA = multipliers.hpp univalue/univalue_utffilter.h
 
 clean-local:
 	-$(MAKE) -C leveldb clean

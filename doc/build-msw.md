@@ -76,7 +76,7 @@ Secp256k1
 MSYS lux:
 
     ./autogen.sh
-    ./configure --enable-module-recovery --prefix /c/dev/coindeps32/Secp256k1
+    ./configure --enable-module-recovery --disable-jni --prefix /c/dev/coindeps32/Secp256k1
     make
     make install
 

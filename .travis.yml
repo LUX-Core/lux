@@ -30,11 +30,11 @@ env:
     - WINEDEBUG=fixme-all
   matrix:
 # ARM
-    - HOST=arm-linux-gnueabihf PACKAGES="g++-arm-linux-gnueabihf libprotobuf-dev protobuf-compiler libqrencode-dev" CHECK_DOC=0 GOAL="install" BITCOIN_CONFIG="--enable-glibc-back-compat --enable-reduce-exports --disable-tests --disable-zmq"
+    - HOST=arm-linux-gnueabihf PACKAGES="g++-arm-linux-gnueabihf libprotobuf-dev protobuf-compiler libqrencode-dev" CHECK_DOC=0 GOAL="install" BITCOIN_CONFIG="--enable-glibc-back-compat --enable-reduce-exports --disable-tests --disable-zmq --disable-updater"
 # Win32
-    - HOST=i686-w64-mingw32 DPKG_ADD_ARCH="i386" DEP_OPTS="NO_QT=0" PACKAGES="python3 nsis wine1.6 bc openjdk-7-jre-headless build-essential libtool autotools-dev automake cmake pkg-config bsdmainutils curl g++-mingw-w64-x86-64 mingw-w64-x86-64-dev g++-mingw-w64-i686 mingw-w64-i686-dev -y" RUN_TESTS=false GOAL="install" BITCOIN_CONFIG="--enable-reduce-exports --disable-tests --disable-zmq"
+    - HOST=i686-w64-mingw32 DPKG_ADD_ARCH="i386" DEP_OPTS="NO_QT=0" PACKAGES="python3 nsis wine1.6 bc build-essential libtool autotools-dev automake cmake pkg-config bsdmainutils curl g++-mingw-w64-x86-64 mingw-w64-x86-64-dev g++-mingw-w64-i686 mingw-w64-i686-dev -y" RUN_TESTS=false GOAL="install" BITCOIN_CONFIG="--enable-reduce-exports --disable-zmq --without-miniupnpc --disable-updater"
 # Cross-Mac
-    - HOST=x86_64-apple-darwin11 PACKAGES="curl librsvg2-bin libtiff-tools bsdmainutils python-setuptools cmake imagemagick libcap-dev librsvg2-bin libz-dev libbz2-dev libtiff-tools python-dev" BITCOIN_CONFIG="--enable-reduce-exports --disable-tests --disable-zmq" OSX_SDK=10.11
+    - HOST=x86_64-apple-darwin11 PACKAGES="curl librsvg2-bin libtiff-tools bsdmainutils python-setuptools cmake imagemagick libcap-dev librsvg2-bin libz-dev libbz2-dev libtiff-tools python-dev" BITCOIN_CONFIG="--enable-reduce-exports --without-gui --disable-tests --disable-zmq --disable-updater" OSX_SDK=10.11
 
 before_install:
     - export PATH=$(echo $PATH | tr ':' "\n" | sed '/\/opt\/python/d' | tr "\n" ":" | sed "s|::|:|g")
@@ -63,10 +63,10 @@ script:
     - BITCOIN_CONFIG_ALL="--disable-dependency-tracking --prefix=$TRAVIS_BUILD_DIR/depends/$HOST --bindir=$OUTDIR/bin --libdir=$OUTDIR/lib"
     - depends/$HOST/native/bin/ccache --max-size=$CCACHE_SIZE
     - test -n "$USE_SHELL" && eval '"$USE_SHELL" -c "./autogen.sh"' || ./autogen.sh
-    - ./configure --cache-file=config.cache $BITCOIN_CONFIG_ALL $BITCOIN_CONFIG || ( cat config.log && false)
+    - ./configure CFLAGS="-std=c99" --cache-file=config.cache $BITCOIN_CONFIG_ALL $BITCOIN_CONFIG || ( cat config.log && false)
     - make distdir PACKAGE=bitcoin VERSION=$HOST
     - cd bitcoin-$HOST
-    - ./configure --cache-file=../config.cache $BITCOIN_CONFIG_ALL $BITCOIN_CONFIG || ( cat config.log && false)
+    - ./configure CFLAGS="-std=c99" --cache-file=../config.cache $BITCOIN_CONFIG_ALL $BITCOIN_CONFIG || ( cat config.log && false)
     - make $MAKEJOBS || ( echo "Build failure. Verbose build follows.")
     - export LD_LIBRARY_PATH=$TRAVIS_BUILD_DIR/depends/$HOST/lib
     - if [ "$RUN_TESTS" = "true" ]; then make $MAKEJOBS check VERBOSE=1; fi

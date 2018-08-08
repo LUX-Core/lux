@@ -1,13 +1,13 @@
 set(LIBRARY ethash)
 
 if (CPPETHEREUM)
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu99")
 endif ()
 
 set(CMAKE_BUILD_TYPE Release)
 
 if (NOT WIN32)
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu99")
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
 endif()
 
 set(FILES 	util.h

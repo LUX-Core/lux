@@ -407,8 +407,8 @@ if test x$TARGET_OS = xwindows; then
 	CPPFLAGS="-Wno-unknown-pragmas -Wno-deprecated-declarations -Wno-cpp $CPPFLAGS -DLUX_BUILD"
 	CXXFLAGS="-Wno-unknown-pragmas -Wno-deprecated-declarations -Wno-cpp $CXXFLAGS"
 elif test x$TARGET_OS = xdarwin; then
-	CPPFLAGS="-Wno-inconsistent-missing-override -Wno-deprecated-declarations -Wno-cpp -Wno-unknown-pragmas -Wno-implicit-fallthrough $CPPFLAGS -DLUX_BUILD"
-	CXXFLAGS="-Wno-inconsistent-missing-override -Wno-deprecated-declarations -Wno-cpp -Wno-unknown-pragmas -Wno-implicit-fallthrough $CXXFLAGS"
+	CPPFLAGS="-Wno-inconsistent-missing-override -Wno-deprecated-declarations -Wno-unknown-pragmas -Wno-implicit-fallthrough $CPPFLAGS -DLUX_BUILD"
+	CXXFLAGS="-Wno-inconsistent-missing-override -Wno-deprecated-declarations -Wno-unknown-pragmas -Wno-implicit-fallthrough $CXXFLAGS"
 else
 	CPPFLAGS="-Wno-unknown-pragmas -Wno-deprecated -Wno-deprecated-declarations -Wno-cpp -Wno-implicit-fallthrough $CPPFLAGS -DLUX_BUILD"
 	CXXFLAGS="-Wno-unknown-pragmas -Wno-deprecated-declarations -Wno-cpp $CXXFLAGS"
@@ -1190,7 +1190,7 @@ PKGCONFIG_LIBDIR_TEMP="$PKG_CONFIG_LIBDIR"
 unset PKG_CONFIG_LIBDIR
 PKG_CONFIG_LIBDIR="$PKGCONFIG_LIBDIR_TEMP"
 
-ac_configure_args="${ac_configure_args} --disable-shared --with-pic --with-bignum=no --enable-module-recovery --enable-module-ecdh --enable-experimental"
+ac_configure_args="${ac_configure_args} --disable-shared --with-pic --with-bignum=no --enable-module-recovery --enable-module-ecdh --enable-experimental --disable-jni"
 AC_CONFIG_SUBDIRS([src/secp256k1])
 
 AC_OUTPUT

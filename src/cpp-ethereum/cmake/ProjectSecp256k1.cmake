@@ -14,15 +14,15 @@ if (WIN32)
         URL_HASH SHA256=d31e40f3bdc2982d2e21f21e1e7a50731bae258f5245d51e32481bbe549035c4
         UPDATE_COMMAND ./autogen.sh
         BUILD_IN_SOURCE 1
-        CONFIGURE_COMMAND ./configure 
-	            --prefix=<INSTALL_DIR>
-	    	--host=${PLATFORM}
-	    	--enable-module-ecdh
-	    	--enable-experimental
-	    	--disable-shared
-	    	--with-pic
-	    	--with-bignum=no
-	    	--enable-module-recovery
+        CONFIGURE_COMMAND ./configure
+          --prefix=<INSTALL_DIR>
+          --host=${PLATFORM}
+          --enable-experimental
+          --enable-module-ecdh
+          --enable-module-recovery
+          --disable-jni
+          --disable-shared
+          --with-bignum=no
         LOG_CONFIGURE 1
         BUILD_COMMAND make
         INSTALL_COMMAND make install
@@ -39,7 +39,7 @@ else()
             ${CMAKE_CURRENT_LIST_DIR}/secp256k1/CMakeLists.txt <SOURCE_DIR>
         CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
                    -DCMAKE_POSITION_INDEPENDENT_CODE=${BUILD_SHARED_LIBS}
-	           -DCMAKE_POSITION_INDEPENDENT_CODE=ON### lux
+                   -DCMAKE_POSITION_INDEPENDENT_CODE=ON### lux
                    ${_only_release_configuration}
         LOG_CONFIGURE 1
         BUILD_COMMAND ""

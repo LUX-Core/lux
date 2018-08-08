@@ -16,10 +16,10 @@ INSTALL_DIR="$OLD_PATH/$PLATFORM"
 LIB_DIR="$INSTALL_DIR/lib"
 INCLUDE_DIR="$INSTALL_DIR/include"
 
-sudo apt install software-properties-common
-sudo add-apt-repository "deb http://archive.ubuntu.com/ubuntu zesty universe"
-sudo apt update
-sudo apt upgrade
+#sudo apt install software-properties-common
+#sudo add-apt-repository "deb http://archive.ubuntu.com/ubuntu zesty universe"
+#sudo apt update
+#sudo apt upgrade
 
 # Install development tools if needed
 if [ ! -f $CC ]; then
@@ -40,18 +40,6 @@ fi
 if [ -z "$CC" ] || [ -z "$CXX" ]; then
     echo "No expected toolchain existing. Quit compilation process"
     exit
-fi
-
-if [ -z "$(echo $JAVA_HOME)" ]; then
-   echo "warning: JAVA_HOME env var is not set!"
-   #sudo apt install openjdk-8-jdk
-   sudo apt install oracle-java8-set-default
-fi
-
-if [ ! -f "$JAVA_HOME/include/jni_md.h" ]; then
-   if [ -f "$JAVA_HOME/include/linux/jni_md.h" ]; then
-      sudo ln -s "linux/jni_md.h" "$JAVA_HOME/include/jni_md.h"
-   fi
 fi
 
 # Make dependencies
@@ -76,10 +64,10 @@ cp ../src/config/condition_variable.hpp "$INCLUDE_DIR/boost/thread/win32/conditi
 
 cd ..
 ./autogen.sh windows $PLATFORM $INSTALL_DIR
-./configure --prefix=$PWD/depends/$PLATFORM --host=$PLATFORM --disable-tests --disable-shared CPPFLAGS="-DMINIUPNP_STATICLIB" CFLAGS="-std=c99" LDFLAGS="-static -static-libgcc -Wl,-Bstatic -lstdc++"
+./configure --prefix=$PWD/depends/$PLATFORM --host=$PLATFORM --disable-shared --enable-reduce-exports CPPFLAGS="-DMINIUPNP_STATICLIB" CFLAGS="-std=c99" LDFLAGS="-static -static-libgcc -Wl,-Bstatic -lstdc++"
 
 # Build the application
-make -j$(nproc)
+make -j$(nproc) #--trace
 
 RELEASE="$OLD_PATH/Release"
 mkdir -p "$RELEASE"
