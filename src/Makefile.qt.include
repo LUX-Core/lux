@@ -479,10 +479,15 @@ if ENABLE_UPDATER
                     lux-installer/src/luxupdater/atomfeeder.cpp \
                     lux-installer/src/luxupdater/downloadmanager.cpp \
                     lux-installer/src/dialogmaster.cpp \
-                    lux-installer/src/adminauthorization_x11.cpp \
                     lux-installer/src/progressdialog.cpp \
                     lux-installer/src/updatecontroller.cpp \
                     lux-installer/src/updateinfodialog.cpp
+if TARGET_WINDOWS
+  BITCOIN_QT_CPP += lux-installer/src/adminauthorization_win.cpp
+else
+  BITCOIN_QT_CPP += lux-installer/src/adminauthorization_x11.cpp
+endif
+
 endif
 
 endif

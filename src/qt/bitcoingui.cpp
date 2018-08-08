@@ -808,7 +808,8 @@ void BitcoinGUI::updaterClicked() {
 #ifdef ENABLE_UPDATER
     controller->start(QtLuxUpdater::UpdateController::ProgressLevel);
 #else
-    uiInterface.ThreadSafeMessageBox("This feature is available only on official build only!", "Warning", CClientUIInterface::MSG_WARNING);
+    uiInterface.ThreadSafeMessageBox("This feature is only available on official builds!",
+             "Warning", CClientUIInterface::MSG_WARNING);
 #endif
 }
 
