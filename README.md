@@ -11,8 +11,6 @@ Luxcore is GNU AGPLv3 licensed.
 
 [Website](https://luxcore.io) — [LUXtre + LUXGate](https://github.com/LUX-Core/luxtre) - [PoS Web Wallet](https://lux.poswallet.io) — [Block Explorer](https://explorer.luxcore.io/) — [Blog](https://reddit.com/r/LUXCoin) — [Forum](https://bitcointalk.org/index.php?topic=2254046.0) — [Telegram](https://t.me/LUXcoinOfficialChat) — [Twitter](https://twitter.com/LUX_Coin)
 
-[User Manual](https://github.com/LUX-Core/lux/blob/f4a94fc8e3c34e49ebda1b05298991009a855e32/doc/LUX_QT_v5_Win_Mac_User_Guide.pdf)
-
 Features
 =============
 
@@ -20,7 +18,7 @@ Features
 * Hybrid masternode
 * Static PoS
 * Segwit
-* Smart contract ( [Instruction](doc/smartcontract.md) )
+* Smart contract
 * New PHI2 PoW/PoS hybrid algorithm
 * Luxgate
 * Parallel masternode
@@ -55,6 +53,14 @@ In addition, without Luxgate and Pmn, Bitcoin and Ethereum cannot interact with 
 | Bech32 address start with | `bc` |
 
 * NOTE: "getrawchangeaddress p2sh-segwit" to get p2sh-segwit address 
+
+Instructions
+-----------
+[Lux-qt](https://github.com/LUX-Core/lux/blob/f4a94fc8e3c34e49ebda1b05298991009a855e32/doc/LUX_QT_v5_Win_Mac_User_Guide.pdf)
+
+[Smart contract](doc/smartcontract.md)
+
+[Token](https://github.com/LUX-Core/lux/blob/f4a94fc8e3c34e49ebda1b05298991009a855e32/doc/Token_Instructionsv2.pdf) (Thanks @snowfro)
 
 Build Lux wallet
 ----------
