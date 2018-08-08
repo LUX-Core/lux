@@ -56,11 +56,11 @@ In addition, without Luxgate and Pmn, Bitcoin and Ethereum cannot interact with 
 
 Instructions
 -----------
-[Lux-qt](https://github.com/LUX-Core/lux/blob/f4a94fc8e3c34e49ebda1b05298991009a855e32/doc/LUX_QT_v5_Win_Mac_User_Guide.pdf)
+[Lux-qt](https://github.com/LUX-Core/lux/blob/master/doc/LUX_QT_v5_Win_Mac_User_Guide.pdf)
 
 [Smart contract](doc/smartcontract.md)
 
-[Token](https://github.com/LUX-Core/lux/blob/f4a94fc8e3c34e49ebda1b05298991009a855e32/doc/Token_Instructionsv2.pdf) (Thanks @snowfro)
+[Token](https://github.com/LUX-Core/lux/blob/master/doc/Token_Instructionsv2.pdf) (Thanks @snowfro)
 
 Build Lux wallet
 ----------
