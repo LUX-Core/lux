@@ -880,7 +880,7 @@ bool CheckTransaction(const CTransaction& tx, CValidationState& state)
     CAmount nValueOut = 0;
     for (const CTxOut& txout : tx.vout) {
         //Removed tx out empty in function CheckTransaction , CHECKSEQUENCEVERIFY doesn't have non-empty tx out
-        //if (txout.IsEmpty() && !tx.IsCoinBase() && !tx.IsCoinStake())
+        //if (txout.IsEmpty() && !tx.IsCoinGenerated())
         //    return state.DoS(100, error("CheckTransaction(): txout empty for user transaction"));
         if (txout.nValue < 0)
             return state.DoS(100, error("%s: tx.vout[%d].nValue negative (%s, empty=%s, coinstake=%s)", __func__, i,
@@ -1116,7 +1116,7 @@ bool AcceptToMemoryPool(CTxMemPool& pool, CValidationState& state, const CTransa
         bool fSpendsCoinbase = false;
         BOOST_FOREACH(const CTxIn &txin, tx.vin) {
             const CCoins *coins = view.AccessCoins(txin.prevout.hash);
-            if (coins->IsCoinBase() || coins->IsCoinStake()) {
+            if (coins->IsCoinGenerated()) {
                 fSpendsCoinbase = true;
                 break;
             }
@@ -2044,7 +2044,7 @@ bool CheckInputs(const CTransaction& tx, CValidationState& state, const CCoinsVi
             assert(coins);
 
             // If prev is coinbase, check that it's matured
-            if (coins->IsCoinBase() || coins->IsCoinStake()) {
+            if (coins->IsCoinGenerated()) {
                 if (nSpendHeight - coins->nHeight < Params().COINBASE_MATURITY())
                     return state.Invalid(
                         error("CheckInputs() : tried to spend coinbase at depth %d, coinstake=%d", nSpendHeight - coins->nHeight, coins->IsCoinStake()),
@@ -3049,7 +3049,7 @@ static bool DisconnectTip(CValidationState& state, const CChainParams& chainpara
     BOOST_FOREACH (const CTransaction& tx, block.vtx) {
         // ignore validation errors in resurrected transactions
         CValidationState stateDummy;
-        if (tx.IsCoinBase() || tx.IsCoinStake() || !AcceptToMemoryPool(mempool, stateDummy, tx, false, NULL)) {
+        if (tx.IsCoinGenerated() || !AcceptToMemoryPool(mempool, stateDummy, tx, false, NULL)) {
             mempool.removeRecursive(tx, MemPoolRemovalReason::REORG);
         } else if (mempool.exists(tx.GetHash())) {
             vHashUpdate.push_back(tx.GetHash());
@@ -3771,7 +3771,7 @@ bool CheckBlockHeader(const CBlockHeader& block, CValidationState& state, const 
 
 bool CheckForMasternodePayment(const CTransaction& tx, const CBlockHeader& header) {
     // Regular transactions don't have to share anything with masternodes
-    if (!tx.IsCoinBase() && !tx.IsCoinStake())
+    if (!tx.IsCoinGenerated())
         return true;
 
     const CChainParams& chainParams = Params();

@@ -26,7 +26,7 @@ namespace Consensus {
             assert(coins);
 
             // If prev is coinbase, check that it's matured
-            if (coins->IsCoinBase() || coins->IsCoinStake()) {
+            if (coins->IsCoinGenerated()) {
                 const int maturity = IsTestNet() ? 10 : COINBASE_MATURITY; // todo: use COINBASE_MATURITY()
                 if (nSpendHeight - coins->nHeight < maturity && nSpendHeight - coins->nHeight > 0)
                     return state.Invalid(false,
