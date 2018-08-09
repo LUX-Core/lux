@@ -1289,8 +1289,11 @@ void ThreadDNSAddressSeed()
         (!GetBoolArg("-forcednsseed", false))) {
         MilliSleep(11 * 1000);
 
-        LOCK(cs_vNodes);
-        if (vNodes.size() >= 2) {
+        // LOCK(cs_vNodes);
+        // Avoid using DNS seeds if unnecessary to improve user privacy & reducing traffic to seed.
+        int nRelevant = 0;
+        for (auto pnode : vNodes) { nRelevant += pnode->fSuccessfullyConnected && ((pnode->nServices & nRelevantServices) == nRelevantServices); }
+        if (nRelevant >= 2) {
             LogPrintf("P2P peers available. Skipped DNS seeding.\n");
             return;
         }
