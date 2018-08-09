@@ -1182,7 +1182,7 @@ int CWallet::ScanForWalletTransactions(CBlockIndex* pindexStart, bool fUpdate)
             dProgressTip = chainActive.Height();
         }
 
-        int dProgressStart = pindex->nHeight;
+        int dProgressStart = pindex ? pindex->nHeight : 0;
         int dProgressCurrent = dProgressStart;
         int dProgressTotal = dProgressTip - dProgressStart;
         int dProgressShow = 0;
