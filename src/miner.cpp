@@ -416,7 +416,7 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
 
 bool BlockAssembler::isStillDependent(CTxMemPool::txiter iter)
 {
-    BOOST_FOREACH(CTxMemPool::txiter parent, mempool.GetMemPoolParents(iter))
+    for (CTxMemPool::txiter parent : mempool.GetMemPoolParents(iter))
     {
         if (!inBlock.count(parent)) {
             return true;
@@ -1011,7 +1011,7 @@ void BlockAssembler::addPriorityTxs(uint64_t minGasPrice)
             if(wasAdded) {
                 // This tx was successfully added, so
                 // add transactions that depend on this one to the priority queue to try again
-                BOOST_FOREACH(CTxMemPool::txiter child, mempool.GetMemPoolChildren(iter)) {
+                for (CTxMemPool::txiter child : mempool.GetMemPoolChildren(iter)) {
                     waitPriIter wpiter = waitPriMap.find(child);
                     if (wpiter != waitPriMap.end()) {
                         vecPriority.push_back(TxCoinAgePriority(wpiter->second, child));

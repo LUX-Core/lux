@@ -2,7 +2,7 @@
 
 bool SignalsOptInRBF(const CTransaction &tx)
 {
-    BOOST_FOREACH(const CTxIn &txin, tx.vin) {
+    for (const CTxIn &txin : tx.vin) {
         if (txin.nSequence < std::numeric_limits<unsigned int>::max()-1) {
             return true;
         }
@@ -33,7 +33,7 @@ bool IsRBFOptIn(const CTxMemPoolEntry &entry, CTxMemPool &pool)
     std::string dummy;
     pool.CalculateMemPoolAncestors(entry, setAncestors, noLimit, noLimit, noLimit, noLimit, dummy, false);
 
-    BOOST_FOREACH(CTxMemPool::txiter it, setAncestors) {
+    for (CTxMemPool::txiter it : setAncestors) {
         if (SignalsOptInRBF(it->GetTx())) {
             return true;
         }

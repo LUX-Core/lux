@@ -188,7 +188,7 @@ UniValue masternode(const UniValue& params, bool fHelp) {
         UniValue resultsObj(UniValue::VOBJ);
         resultsObj.push_back(Pair("alias", alias));
 
-        BOOST_FOREACH(CMasternodeConfig::CMasternodeEntry mne, masternodeConfig.getEntries()) {
+        for (CMasternodeConfig::CMasternodeEntry mne : masternodeConfig.getEntries()) {
             if (mne.getAlias() == alias) {
                 found = true;
                 std::string errorMessage;
@@ -234,7 +234,7 @@ UniValue masternode(const UniValue& params, bool fHelp) {
 
         UniValue resultsObj(UniValue::VOBJ);
 
-        BOOST_FOREACH(CMasternodeConfig::CMasternodeEntry mne, masternodeConfig.getEntries()) {
+        for (CMasternodeConfig::CMasternodeEntry mne : masternodeConfig.getEntries()) {
             total++;
 
             std::string errorMessage;
@@ -277,7 +277,7 @@ UniValue masternode(const UniValue& params, bool fHelp) {
         }
 
         UniValue obj(UniValue::VOBJ);
-        BOOST_FOREACH(CMasterNode mn, vecMasternodes) {
+        for (CMasterNode mn : vecMasternodes) {
             mn.Check();
 
             if (strCommand == "active") {
@@ -372,7 +372,7 @@ UniValue masternode(const UniValue& params, bool fHelp) {
 
         statusObj.push_back(Pair("alias", alias));
 
-        BOOST_FOREACH(CMasternodeConfig::CMasternodeEntry mne, masternodeConfig.getEntries()) {
+        for (CMasternodeConfig::CMasternodeEntry mne : masternodeConfig.getEntries()) {
             if (mne.getAlias() == alias) {
                 found = true;
                 std::string errorMessage;
@@ -422,7 +422,7 @@ UniValue masternode(const UniValue& params, bool fHelp) {
 
         UniValue resultsObj(UniValue::VOBJ);
 
-        BOOST_FOREACH(CMasternodeConfig::CMasternodeEntry mne, masternodeConfig.getEntries()) {
+        for (CMasternodeConfig::CMasternodeEntry mne : masternodeConfig.getEntries()) {
             total++;
 
             std::string errorMessage;
@@ -548,7 +548,7 @@ UniValue masternode(const UniValue& params, bool fHelp) {
 
         UniValue resultObj(UniValue::VOBJ);
 
-        BOOST_FOREACH(CMasternodeConfig::CMasternodeEntry mne, masternodeConfig.getEntries()) {
+        for (CMasternodeConfig::CMasternodeEntry mne : masternodeConfig.getEntries()) {
             UniValue mnObj(UniValue::VOBJ);
             mnObj.push_back(Pair("alias", mne.getAlias()));
             mnObj.push_back(Pair("address", mne.getIp()));
@@ -566,7 +566,7 @@ UniValue masternode(const UniValue& params, bool fHelp) {
         vector<COutput> possibleCoins = activeMasternode.SelectCoinsMasternode();
 
         UniValue obj(UniValue::VOBJ);
-        BOOST_FOREACH(COutput& out, possibleCoins) {
+        for (COutput& out : possibleCoins) {
             obj.push_back(Pair(out.tx->GetHash().ToString().c_str(), boost::lexical_cast<std::string>(out.i)));
         }
 

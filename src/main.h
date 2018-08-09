@@ -165,7 +165,7 @@ extern unsigned int dgpMaxBlockWeight;
 /** The maximum allowed size for a block excluding witness data, in bytes (network rule) */
 extern unsigned int dgpMaxBlockBaseSize;
 
-extern unsigned int dgpMaxBlockSize; // qtum
+extern unsigned int dgpMaxBlockSize; // lux
 
 /** The maximum allowed number of signature check operations in a block (network rule) */
 extern int64_t dgpMaxBlockSigOps;

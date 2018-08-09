@@ -691,7 +691,7 @@ bool Stake::CreateCoinStake(CWallet* wallet, const CKeyStore& keystore, unsigned
         MilliSleep(10000);
 
     const CBlockIndex* pIndex0 = chainActive.Tip();
-    BOOST_FOREACH(PAIRTYPE(const CWalletTx*, unsigned int) pcoin, stakeCoins) {
+    for (PAIRTYPE(const CWalletTx*, unsigned int) pcoin : stakeCoins) {
         //make sure that enough time has elapsed between
         CBlockIndex* pindex = LookupBlockIndex(pcoin.first->hashBlock);
         if (!pindex) {

@@ -90,7 +90,7 @@ void RPCTypeCheck(const UniValue& params,
     bool fAllowNull)
 {
     unsigned int i = 0;
-    BOOST_FOREACH (UniValue::VType t, typesExpected) {
+    for (UniValue::VType t : typesExpected) {
         if (params.size() <= i)
             break;
 
@@ -108,7 +108,7 @@ void RPCTypeCheckObj(const UniValue& o,
     const map<string, UniValue::VType>& typesExpected,
     bool fAllowNull)
 {
-    BOOST_FOREACH (const PAIRTYPE(string, UniValue::VType) & t, typesExpected) {
+    for (const PAIRTYPE(string, UniValue::VType) & t : typesExpected) {
         const UniValue& v = find_value(o, t.first);
         if (!fAllowNull && v.isNull())
             throw JSONRPCError(RPC_TYPE_ERROR, strprintf("Missing %s", t.first));
@@ -178,7 +178,7 @@ string CRPCTable::help(string strCommand) const
         vCommands.push_back(make_pair(mi->second->category + mi->first, mi->second));
     sort(vCommands.begin(), vCommands.end());
 
-    BOOST_FOREACH (const PAIRTYPE(string, const CRPCCommand*) & command, vCommands) {
+    for (const PAIRTYPE(string, const CRPCCommand*) & command : vCommands) {
         const CRPCCommand* pcmd = command.second;
         string strMethod = pcmd->name;
         // We already filter duplicates, but these deprecated screw up the sort order
@@ -474,7 +474,7 @@ CNetAddr BoostAsioToCNetAddr(boost::asio::ip::address address)
 bool ClientAllowed(const boost::asio::ip::address& address)
 {
     CNetAddr netaddr = BoostAsioToCNetAddr(address);
-    BOOST_FOREACH (const CSubNet& subnet, rpc_allow_subnets)
+    for (const CSubNet& subnet : rpc_allow_subnets)
         if (subnet.Match(netaddr))
             return true;
     return false;
@@ -598,7 +598,7 @@ void StartRPCThreads()
     rpc_allow_subnets.push_back(CSubNet("::1"));         // always allow IPv6 localhost
     if (mapMultiArgs.count("-rpcallowip")) {
         const vector<string>& vAllow = mapMultiArgs["-rpcallowip"];
-        BOOST_FOREACH (string strAllow, vAllow) {
+        for (string strAllow : vAllow) {
             CSubNet subnet(strAllow);
             if (!subnet.IsValid()) {
                 uiInterface.ThreadSafeMessageBox(
@@ -611,7 +611,7 @@ void StartRPCThreads()
         }
     }
     std::string strAllowed;
-    BOOST_FOREACH (const CSubNet& subnet, rpc_allow_subnets)
+    for (const CSubNet& subnet : rpc_allow_subnets)
         strAllowed += subnet.ToString() + " ";
     LogPrint("rpc", "Allowing RPC connections from: %s\n", strAllowed);
 
@@ -666,7 +666,7 @@ void StartRPCThreads()
         }
     } else if (mapArgs.count("-rpcbind")) // Specific bind address
     {
-        BOOST_FOREACH (const std::string& addr, mapMultiArgs["-rpcbind"]) {
+        for (const std::string& addr : mapMultiArgs["-rpcbind"]) {
             try {
                 vEndpoints.push_back(ParseEndpoint(addr, defaultPort));
             } catch (const boost::system::system_error&) {
@@ -688,7 +688,7 @@ void StartRPCThreads()
     bool fListening = false;
     std::string strerr;
     std::string straddress;
-    BOOST_FOREACH (const ip::tcp::endpoint& endpoint, vEndpoints) {
+    for (const ip::tcp::endpoint& endpoint : vEndpoints) {
         try {
             asio::ip::address bindAddress = endpoint.address();
             straddress = bindAddress.to_string();
@@ -756,13 +756,13 @@ void StopRPCThreads()
     // This is not done automatically by ->stop(), and in some cases the destructor of
     // asio::io_service can hang if this is skipped.
     boost::system::error_code ec;
-    BOOST_FOREACH (const boost::shared_ptr<ip::tcp::acceptor>& acceptor, rpc_acceptors) {
+    for (const boost::shared_ptr<ip::tcp::acceptor>& acceptor : rpc_acceptors) {
         acceptor->cancel(ec);
         if (ec)
             LogPrintf("%s: Warning: %s when cancelling acceptor", __func__, ec.message());
     }
     rpc_acceptors.clear();
-    BOOST_FOREACH (const PAIRTYPE(std::string, boost::shared_ptr<deadline_timer>) & timer, deadlineTimers) {
+    for (const PAIRTYPE(std::string, boost::shared_ptr<deadline_timer>) & timer : deadlineTimers) {
         timer.second->cancel(ec);
         if (ec)
             LogPrintf("%s: Warning: %s when cancelling timer", __func__, ec.message());

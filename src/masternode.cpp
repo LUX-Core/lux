@@ -32,7 +32,7 @@ std::map<int64_t, uint256> mapCacheBlockHashes;
 void ProcessMasternodeConnections() {
     //LOCK(cs_vNodes);
 
-    BOOST_FOREACH(CNode* pnode, vNodes) {
+    for (CNode* pnode : vNodes) {
         //if it's our masternode, let it be
         if (darkSendPool.submittedToMasternode == pnode->addr) continue;
 
@@ -113,7 +113,7 @@ void ProcessMasternode(CNode* pfrom, const std::string& strCommand, CDataStream&
 
         //search existing masternode list, this is where we update existing masternodes with new dsee broadcasts
         //LOCK(cs_masternodes);
-        BOOST_FOREACH(CMasterNode& mn, vecMasternodes) {
+        for (CMasterNode& mn : vecMasternodes) {
             if (mn.vin.prevout == vin.prevout) {
                 // count == -1 when it's a new entry
                 //   e.g. We don't want the entry relayed/time updated when we're syncing the list
@@ -223,7 +223,7 @@ void ProcessMasternode(CNode* pfrom, const std::string& strCommand, CDataStream&
 
         // see if we have this masternode
         LOCK(cs_masternodes);
-        BOOST_FOREACH(CMasterNode& mn, vecMasternodes) {
+        for (CMasterNode& mn : vecMasternodes) {
             if (mn.vin.prevout == vin.prevout) {
                 // take this only if it's newer
                 if (mn.lastDseep < sigTime) {
@@ -300,7 +300,7 @@ void ProcessMasternode(CNode* pfrom, const std::string& strCommand, CDataStream&
         int count = vecMasternodes.size();
         int i = 0;
 
-        BOOST_FOREACH(CMasterNode mn, vecMasternodes) {
+        for (CMasterNode mn : vecMasternodes) {
             if (mn.addr.IsRFC1918()) continue; //local network
 
             if (vin == CTxIn()) {
@@ -395,7 +395,7 @@ struct CompareValueOnly2 {
 int CountMasternodesAboveProtocol(int protocolVersion) {
     int i = 0;
     LOCK(cs_masternodes);
-    BOOST_FOREACH(CMasterNode& mn, vecMasternodes) {
+    for (CMasterNode& mn : vecMasternodes) {
         if (mn.protocolVersion < protocolVersion) continue;
         i++;
     }
@@ -408,7 +408,7 @@ int CountMasternodesAboveProtocol(int protocolVersion) {
 int GetMasternodeByVin(CTxIn& vin) {
     int i = 0;
     LOCK(cs_masternodes);
-    BOOST_FOREACH(CMasterNode& mn, vecMasternodes) {
+    for (CMasterNode& mn : vecMasternodes) {
         if (mn.vin == vin) return i;
         i++;
     }
@@ -422,7 +422,7 @@ int GetCurrentMasterNode(int mod, int64_t nBlockHeight, int minProtocol) {
     int winner = -1;
     //LOCK(cs_masternodes);
     // scan for winner
-    BOOST_FOREACH(CMasterNode mn, vecMasternodes) {
+    for (CMasterNode mn : vecMasternodes) {
         mn.Check();
         if (mn.protocolVersion < minProtocol) continue;
         if (!mn.IsEnabled()) {
@@ -452,7 +452,7 @@ int GetMasternodeByRank(int findRank, int64_t nBlockHeight, int minProtocol) {
     std::vector <pair<unsigned int, int>> vecMasternodeScores;
 
     i = 0;
-    BOOST_FOREACH(CMasterNode mn, vecMasternodes) {
+    for (CMasterNode mn : vecMasternodes) {
         mn.Check();
         if (mn.protocolVersion < minProtocol) continue;
         if (!mn.IsEnabled()) {
@@ -471,7 +471,7 @@ int GetMasternodeByRank(int findRank, int64_t nBlockHeight, int minProtocol) {
     sort(vecMasternodeScores.rbegin(), vecMasternodeScores.rend(), CompareValueOnly2());
 
     int rank = 0;
-    BOOST_FOREACH(PAIRTYPE(unsigned int, int) &s, vecMasternodeScores) {
+    for (PAIRTYPE(unsigned int, int) &s : vecMasternodeScores) {
         rank++;
         if (rank == findRank) return s.second;
     }
@@ -483,7 +483,7 @@ int GetMasternodeRank(CTxIn& vin, int64_t nBlockHeight, int minProtocol) {
     //LOCK(cs_masternodes);
     std::vector< pair<unsigned int, CTxIn> > vecMasternodeScores;
 
-    BOOST_FOREACH(CMasterNode & mn, vecMasternodes) {
+    for (CMasterNode & mn : vecMasternodes) {
         mn.Check();
 
         if (mn.protocolVersion < minProtocol) continue;
@@ -501,7 +501,7 @@ int GetMasternodeRank(CTxIn& vin, int64_t nBlockHeight, int minProtocol) {
     sort(vecMasternodeScores.rbegin(), vecMasternodeScores.rend(), CompareValueOnly());
 
     unsigned int rank = 0;
-    BOOST_FOREACH(PAIRTYPE(unsigned int, CTxIn) &s, vecMasternodeScores) {
+    for (PAIRTYPE(unsigned int, CTxIn) &s : vecMasternodeScores) {
         rank++;
         if (s.second == vin) {
             return rank;
@@ -656,7 +656,7 @@ uint64_t CMasternodePayments::CalculateScore(uint256 blockHash, CTxIn& vin) {
 }
 
 bool CMasternodePayments::GetBlockPayee(int nBlockHeight, CScript& payee) {
-    BOOST_FOREACH(CMasternodePaymentWinner& winner, vWinning) {
+    for (CMasternodePaymentWinner& winner : vWinning) {
         if (winner.nBlockHeight == nBlockHeight) {
             payee = winner.payee;
             return true;
@@ -667,7 +667,7 @@ bool CMasternodePayments::GetBlockPayee(int nBlockHeight, CScript& payee) {
 }
 
 bool CMasternodePayments::GetWinningMasternode(int nBlockHeight, CTxIn& vinOut) {
-    BOOST_FOREACH(CMasternodePaymentWinner& winner, vWinning) {
+    for (CMasternodePaymentWinner& winner : vWinning) {
         if (winner.nBlockHeight == nBlockHeight) {
             vinOut = winner.vin;
             return true;
@@ -686,7 +686,7 @@ bool CMasternodePayments::AddWinningMasternode(CMasternodePaymentWinner& winnerI
     winnerIn.score = CalculateScore(blockHash, winnerIn.vin);
 
     bool foundBlock = false;
-    BOOST_FOREACH(CMasternodePaymentWinner& winner, vWinning) {
+    for (CMasternodePaymentWinner& winner : vWinning) {
         if (winner.nBlockHeight == winnerIn.nBlockHeight) {
             foundBlock = true;
             if (winner.score < winnerIn.score) {
@@ -741,9 +741,9 @@ bool CMasternodePayments::ProcessBlock(int nBlockHeight) {
     }
 
     std::random_shuffle(vecMasternodes.begin(), vecMasternodes.end());
-    BOOST_FOREACH(CMasterNode& mn, vecMasternodes) {
+    for (CMasterNode& mn : vecMasternodes) {
         bool found = false;
-        BOOST_FOREACH(CTxIn & vin, vecLastPayments)
+        for (CTxIn & vin : vecLastPayments)
         if (mn.vin == vin) found = true;
 
         if (found) continue;
@@ -785,14 +785,14 @@ void CMasternodePayments::Relay(CMasternodePaymentWinner& winner) {
     vector <CInv> vInv;
     vInv.push_back(inv);
     //LOCK(cs_vNodes);
-    BOOST_FOREACH(CNode* pnode, vNodes) {
+    for (CNode* pnode : vNodes) {
         pnode->PushMessage("inv", vInv);
     }
 }
 
 void CMasternodePayments::Sync(CNode* node) {
     int a = 0;
-    BOOST_FOREACH(CMasternodePaymentWinner& winner, vWinning)
+    for (CMasternodePaymentWinner& winner : vWinning)
         if (winner.nBlockHeight >= chainActive.Height() - 10 && winner.nBlockHeight <= chainActive.Height() + 20)
             node->PushMessage("mnw", winner, a);
 }

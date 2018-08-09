@@ -185,7 +185,7 @@ bool CActiveMasternode::Dseep(CTxIn vin, CService service, CKey keyMasternode, C
 
     // Update Last Seen timestamp in masternode list
     bool found = false;
-    BOOST_FOREACH(CMasterNode& mn, vecMasternodes) {
+    for (CMasterNode& mn : vecMasternodes) {
         //LogPrintf(" -- %s\n", mn.vin.ToString().c_str());
         if (mn.vin == vin) {
             found = true;
@@ -274,7 +274,7 @@ bool CActiveMasternode::Register(CTxIn vin, CService service, CKey keyCollateral
 
     bool found = false;
     LOCK(cs_masternodes);
-    BOOST_FOREACH(CMasterNode& mn, vecMasternodes)
+    for (CMasterNode& mn : vecMasternodes)
         if (mn.vin == vin)
             found = true;
 
@@ -319,7 +319,7 @@ bool CActiveMasternode::GetMasterNodeVin(CTxIn& vin, CPubKey& pubkey, CKey& secr
         }
 
         bool found = false;
-        BOOST_FOREACH(COutput& out, possibleCoins) {
+        for (COutput& out : possibleCoins) {
             if (out.tx->GetHash() == txHash && out.i == outputIndex) {
                 selectedOutput = &out;
                 found = true;
@@ -361,7 +361,7 @@ bool CActiveMasternode::GetMasterNodeVinForPubKey(std::string collateralAddress,
         uint256 txHash(strTxHash);
         int outputIndex = boost::lexical_cast<int>(strOutputIndex);
         bool found = false;
-        BOOST_FOREACH(COutput& out, possibleCoins) {
+        for (COutput& out : possibleCoins) {
             if (out.tx->GetHash() == txHash && out.i == outputIndex) {
                 selectedOutput = &out;
                 found = true;
@@ -422,7 +422,7 @@ vector<COutput> CActiveMasternode::SelectCoinsMasternode() {
     pwalletMain->AvailableCoinsMN(vCoins);
 
     // Filter
-    BOOST_FOREACH(const COutput& out, vCoins) {
+    for (const COutput& out : vCoins) {
         if (out.tx->vout[out.i].nValue == GetMNCollateral(chainActive.Height()) * COIN) {  //exactly DARKSEND_COLLATERAL LUX
             filteredCoins.push_back(out);
         }
@@ -441,7 +441,7 @@ vector <COutput> CActiveMasternode::SelectCoinsMasternodeForPubKey(std::string c
     pwalletMain->AvailableCoins(vCoins);
 
     // Filter
-    BOOST_FOREACH(const COutput& out, vCoins) {
+    for (const COutput& out : vCoins) {
         if (out.tx->vout[out.i].scriptPubKey == scriptPubKey && out.tx->vout[out.i].nValue == DARKSEND_COLLATERAL) { //exactly 161.200 LUX
             filteredCoins.push_back(out);
         }

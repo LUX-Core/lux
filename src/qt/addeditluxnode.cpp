@@ -65,7 +65,7 @@ void AddEditLuxNode::on_okButton_clicked()
                  ++it)
             {
                 const CWalletTx& wtx = (*it).second;
-                BOOST_FOREACH(const CTxOut& txout, wtx.vout)
+                for (const CTxOut& txout : wtx.vout)
                     if (txout.scriptPubKey == scriptPubKey)
                         bKeyUsed = true;
             }
