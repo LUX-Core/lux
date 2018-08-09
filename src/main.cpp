@@ -3980,7 +3980,7 @@ bool CheckBlock(const CBlock& block, CValidationState& state, const Consensus::P
     unsigned int nTx = 0;
     for (const CTransaction& tx : block.vtx) {
         //TODO add exceptions for already accepted PoS-contract blocks
-        if (block.IsProofOfStake() &&  chainActive.Height() + 1 != 350039 && (tx.HasOpSpend() || tx.HasCreateOrCall())) {
+        if (block.IsProofOfStake() && !IsTestNet() && chainActive.Height() + 1 != 350039 && (tx.HasOpSpend() || tx.HasCreateOrCall())) {
             return error("%s: smart contracts are not supported yet in PoS blocks", __func__);
         }
 
