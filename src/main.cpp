@@ -3407,7 +3407,8 @@ bool ActivateBestChain(CValidationState& state, const CChainParams& chainparams,
     CBlockIndex* pindexMostWork = NULL;
     do {
         boost::this_thread::interruption_point();
-
+        if (ShutdownRequested())
+            break;
         bool fInitialDownload;
         bool usePhi2 = false;
         while (true) {
