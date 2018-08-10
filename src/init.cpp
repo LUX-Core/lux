@@ -1396,6 +1396,23 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
                     return false;
                 }
 
+                dev::eth::Ethash::init();
+
+                boost::filesystem::path luxStateDir = GetDataDir() / "stateLux";
+
+                bool fStatus = boost::filesystem::exists(luxStateDir);
+                const std::string dirLux(luxStateDir.string());
+                const dev::h256 hashDB(dev::sha3(dev::rlp("")));
+                dev::eth::BaseState existsLuxState = fStatus ? dev::eth::BaseState::PreExisting : dev::eth::BaseState::Empty;
+                globalState = std::unique_ptr<LuxState>(new LuxState(dev::u256(0), LuxState::openDB(dirLux, hashDB, dev::WithExisting::Trust), dirLux, existsLuxState));
+                dev::eth::ChainParams cp((dev::eth::genesisInfo(dev::eth::Network::luxMainNetwork)));
+                globalSealEngine = std::unique_ptr<dev::eth::SealEngineFace>(cp.createSealEngine());
+
+                pstorageresult = new StorageResults(luxStateDir.string());
+                if (fReset) {
+                    pstorageresult->wipeResults();
+                }
+
                 // LoadBlockIndex will load fTxIndex from the db, or set it if
                 // we're reindexing. It will also load fHavePruned if we've
                 // ever removed a block file from disk.
@@ -1417,23 +1434,6 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
                     fGettingValuesDGP = true;
                 } else {
                     fGettingValuesDGP = false;
-                }
-
-                dev::eth::Ethash::init();
-
-                boost::filesystem::path luxStateDir = GetDataDir() / "stateLux";
-
-                bool fStatus = boost::filesystem::exists(luxStateDir);
-                const std::string dirLux(luxStateDir.string());
-                const dev::h256 hashDB(dev::sha3(dev::rlp("")));
-                dev::eth::BaseState existsLuxState = fStatus ? dev::eth::BaseState::PreExisting : dev::eth::BaseState::Empty;
-                globalState = std::unique_ptr<LuxState>(new LuxState(dev::u256(0), LuxState::openDB(dirLux, hashDB, dev::WithExisting::Trust), dirLux, existsLuxState));
-                dev::eth::ChainParams cp((dev::eth::genesisInfo(dev::eth::Network::luxMainNetwork)));
-                globalSealEngine = std::unique_ptr<dev::eth::SealEngineFace>(cp.createSealEngine());
-
-                pstorageresult = new StorageResults(luxStateDir.string());
-                if (fReset) {
-                    pstorageresult->wipeResults();
                 }
 
                 if(chainActive.Tip() != nullptr && chainActive.Tip()->nHeight > Params().FirstSCBlock()){

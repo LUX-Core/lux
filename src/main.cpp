@@ -82,8 +82,8 @@ static const int POS_REWARD_CHANGED_BLOCK = 300000;
 #include <bitset>
 #include "pubkey.h"
 
-std::unique_ptr<LuxState> globalState;
-std::shared_ptr<dev::eth::SealEngineFace> globalSealEngine;
+std::unique_ptr<LuxState> globalState = nullptr;
+std::shared_ptr<dev::eth::SealEngineFace> globalSealEngine = nullptr;
 bool fRecordLogOpcodes = false;
 bool fIsVMlogFile = false;
 bool fGettingValuesDGP = false;
@@ -2711,6 +2711,10 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
 
     ////////////////////////////////////////////////////////////////// // lux
     if (pindex->nHeight >= Params().FirstSCBlock()) {
+
+        if (globalState == nullptr)
+            return error("%s: globalState is not yet initialized!\n", __func__);
+
         checkBlock.hashMerkleRoot = BlockMerkleRoot(checkBlock);
         checkBlock.hashStateRoot = h256Touint(globalState->rootHash());
         checkBlock.hashUTXORoot = h256Touint(globalState->rootHashUTXO());
@@ -3106,6 +3110,8 @@ bool static ConnectTip(CValidationState& state, const CChainParams& chainparams,
         dev::h256 oldHashStateRoot;
         dev::h256 oldHashUTXORoot;
         if (pindexNew->nHeight >= chainparams.FirstSCBlock()) {
+            if (globalState == nullptr)
+                return error("%s: globalState is not yet initialized!\n", __func__);
             oldHashStateRoot = dev::h256(globalState->rootHash()); // lux
             oldHashUTXORoot = dev::h256(globalState->rootHashUTXO()); // lux
         }
@@ -3120,7 +3126,6 @@ bool static ConnectTip(CValidationState& state, const CChainParams& chainparams,
                 globalState->setRootUTXO(oldHashUTXORoot); // lux
                 pstorageresult->clearCacheResult();
             }
-
             return error("ConnectTip() : ConnectBlock %s failed", pindexNew->GetBlockHash().ToString());
         }
         mapBlockSource.erase(inv.hash);
