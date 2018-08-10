@@ -1335,7 +1335,7 @@ Veuillez vérifier l'adresse et réessayer.</translation>
     </message>
     <message>
         <source>Inputs...</source>
-        <translation>Entrés...</translation>
+        <translation>Pièces...</translation>
     </message>
     <message>
         <source>Insufficient funds!</source>
