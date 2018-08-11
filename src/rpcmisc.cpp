@@ -46,6 +46,7 @@ using namespace std;
  *
  * Or alternatively, create a specific query method for the information.
  **/
+
 UniValue getinfo(const UniValue& params, bool fHelp)
 {
     if (fHelp || params.size() != 0)
@@ -118,6 +119,35 @@ UniValue getinfo(const UniValue& params, bool fHelp)
     obj.push_back(Pair("relayfee", ValueFromAmount(::minRelayTxFee.GetFeePerK())));
     obj.push_back(Pair("staking", stake->IsActive()));
     obj.push_back(Pair("errors", GetWarnings("statusbar")));
+    return obj;
+}
+
+UniValue getstateinfo(const UniValue& params, bool fHelp)
+{
+    if (fHelp || params.size() != 0)
+        throw runtime_error(
+                "getstateinfo\n"
+                "\nReturns an object containing state info.\n"
+                "\nResult:\n"
+                "{\n"
+                "  \"maxblocksize\": xxxxx,    (numeric) current maximum block size\n"
+                "  \"blockgaslimit\": xxxxx,   (numeric) current block gas limit\n"
+                "  \"mingasprice\": xxxxx,     (numeric) current minimum gas price\n"
+                "}\n"
+                "\nExamples:\n"
+                + HelpExampleCli("getstateinfo", "")
+        );
+
+
+    LOCK(cs_main);
+
+    LuxDGP luxDGP(globalState.get());
+
+    UniValue obj(UniValue::VOBJ);
+    obj.push_back(Pair("maxblocksize", (int64_t)luxDGP.getBlockSize(chainActive.Height())));
+    obj.push_back(Pair("blockgaslimit", (int64_t)luxDGP.getMinGasPrice(chainActive.Height())));
+    obj.push_back(Pair("mingasprice", (int64_t)luxDGP.getBlockGasLimit(chainActive.Height())));
+
     return obj;
 }
 
