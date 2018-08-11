@@ -1543,16 +1543,6 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
         mempool.ReadFeeEstimates(est_filein);
     fFeeEstimatesInitialized = true;
 
-    // if prune mode, unset NODE_NETWORK and prune block files
-    if (fPruneMode) {
-        LogPrintf("Unsetting NODE_NETWORK on prune mode\n");
-        nLocalServices = ServiceFlags(nLocalServices | NODE_NETWORK);
-        if (!fReindex) {
-            uiInterface.InitMessage(_("Pruning blockstore..."));
-            PruneAndFlush();
-        }
-    }
-
 // ********************************************************* Step 8: load wallet
 #ifdef ENABLE_WALLET
     if (fDisableWallet) {
@@ -1678,6 +1668,16 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
     LogPrintf("No wallet compiled in!\n");
 #endif // !ENABLE_WALLET
     // ********************************************************* Step 9: import blocks
+
+    // if prune mode, unset NODE_NETWORK and prune block files
+    if (fPruneMode) {
+        LogPrintf("Unsetting NODE_NETWORK on prune mode\n");
+        nLocalServices = ServiceFlags(nLocalServices | NODE_NETWORK);
+        if (!fReindex) {
+            uiInterface.InitMessage(_("Pruning blockstore..."));
+            PruneAndFlush();
+        }
+    }
 
     if (!CheckDiskSpace())
         return false;
