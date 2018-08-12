@@ -462,7 +462,7 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
             if (block.hashPrevBlock != pindexPrev->GetBlockHash())
                 return "inconclusive-not-best-prevblk";
 
-            if (block.vtx[0].wit.vtxinwit.size() < 1) {
+            if (block.vtx[0]->wit.vtxinwit.size() < 1) {
                 UpdateUncommittedBlockStructures(block, pindexPrev, Params().GetConsensus());
             }
 
@@ -590,7 +590,8 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
     UniValue transactions(UniValue::VARR);
     map<uint256, int64_t> setTxIndex;
     int i = 0;
-    for (CTransaction& tx : pblock->vtx) {
+    for (CTransactionRef& ptx : pblock->vtx) {
+        const CTransaction& tx = *ptx;
         uint256 txHash = tx.GetHash();
         setTxIndex[txHash] = i++;
 
@@ -627,7 +628,8 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
     UniValue coinbasetxn(UniValue::VARR);
     map<uint256, int64_t> setTxIndex1;
     int j = 0;
-    for (CTransaction& tx : pblock->vtx) {//Incase if multi coinbase
+    for (CTransactionRef& ptx : pblock->vtx) {//Incase if multi coinbase
+        const CTransaction& tx = *ptx;
         if (tx.IsCoinBase()) {
             uint256 txHash = tx.GetHash();
             setTxIndex1[txHash] = j++;
@@ -733,13 +735,13 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
     if (nHeight >= Params().FirstSCBlock()) {
         // gas refund
         UniValue scrObjArray(UniValue::VARR);
-        for (size_t v=2; v < pblock->vtx[0].vout.size(); v++) {
+        for (size_t v=2; v < pblock->vtx[0]->vout.size(); v++) {
             UniValue aSCrefund(UniValue::VOBJ);
             CTxDestination scTxDest;
-            ExtractDestination(pblock->vtx[0].vout[v].scriptPubKey, scTxDest);
+            ExtractDestination(pblock->vtx[0]->vout[v].scriptPubKey, scTxDest);
             aSCrefund.push_back(Pair("payee", EncodeDestination(scTxDest)));
-            aSCrefund.push_back(Pair("script", HexStr(pblock->vtx[0].vout[v].scriptPubKey)));
-            aSCrefund.push_back(Pair("amount", (int64_t)pblock->vtx[0].vout[v].nValue));
+            aSCrefund.push_back(Pair("script", HexStr(pblock->vtx[0]->vout[v].scriptPubKey)));
+            aSCrefund.push_back(Pair("amount", (int64_t)pblock->vtx[0]->vout[v].nValue));
             scrObjArray.push_back(aSCrefund);
         }
         result.push_back(Pair("stateroot", pblock->hashStateRoot.GetHex()));
@@ -749,7 +751,7 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
 
     result.push_back(Pair("transactions", transactions));
     result.push_back(Pair("coinbaseaux", aux));
-    result.push_back(Pair("coinbasevalue", (int64_t)pblock->vtx[0].GetValueOut()));
+    result.push_back(Pair("coinbasevalue", (int64_t)pblock->vtx[0]->GetValueOut()));
     result.push_back(Pair("coinbasetxn", coinbasetxn[0]));
     result.push_back(Pair("longpollid", chainActive.Tip()->GetBlockHash().GetHex() + i64tostr(nTransactionsUpdatedLast)));
     result.push_back(Pair("target", hashTarget.GetHex()));
@@ -776,13 +778,13 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
 
     bool mnStarted = nHeight >= Params().FirstSplitRewardBlock();
     UniValue aMasternode(UniValue::VOBJ);
-    if (mnStarted && pblock->vtx[0].vout.size() > 1) {
+    if (mnStarted && pblock->vtx[0]->vout.size() > 1) {
         CTxDestination mnTxDest;
         // todo: check if vout offset is always correct (with segwit)
-        ExtractDestination(pblock->vtx[0].vout[1].scriptPubKey, mnTxDest);
+        ExtractDestination(pblock->vtx[0]->vout[1].scriptPubKey, mnTxDest);
         aMasternode.push_back(Pair("payee", EncodeDestination(mnTxDest)));
-        aMasternode.push_back(Pair("script", HexStr(pblock->vtx[0].vout[1].scriptPubKey)));
-        aMasternode.push_back(Pair("amount", (int64_t)pblock->vtx[0].vout[1].nValue));
+        aMasternode.push_back(Pair("script", HexStr(pblock->vtx[0]->vout[1].scriptPubKey)));
+        aMasternode.push_back(Pair("amount", (int64_t)pblock->vtx[0]->vout[1].nValue));
     }
 
     result.push_back(Pair("masternode", aMasternode));
@@ -872,7 +874,7 @@ UniValue getwork(const UniValue& params, bool fHelp) {
         IncrementExtraNonce(pblock, pindexPrev, nExtraNonce);
 
         // Save
-        mapNewBlock[pblock->hashMerkleRoot] = make_pair(pblock, pblock->vtx[0].vin[0].scriptSig);
+        mapNewBlock[pblock->hashMerkleRoot] = make_pair(pblock, pblock->vtx[0]->vin[0].scriptSig);
 
         char pmidstate[128] = { 0 };
         char pdata[144] = { 0 };
@@ -912,10 +914,10 @@ UniValue getwork(const UniValue& params, bool fHelp) {
             pblock->hashUTXORoot = pdata->hashUTXORoot;
         }
 
-        CMutableTransaction newTx(pblock->vtx[0]);
+        CMutableTransaction newTx(*(pblock->vtx[0]));
         // Use CMutableTransaction when creating a new transaction instead of CTransaction.  CTransaction public variables are all const now.
         newTx.vin[0].scriptSig = mapNewBlock[pdata->hashMerkleRoot].second; // Oh, why? because vin is const in CTransaction now.
-        pblock->vtx[0] = newTx;
+        pblock->vtx[0] = MakeTransactionRef(std::move(newTx));
         pblock->hashMerkleRoot = pblock->BuildMerkleTree();
 
         CValidationState state;

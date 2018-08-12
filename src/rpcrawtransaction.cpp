@@ -193,19 +193,19 @@ UniValue getrawtransaction(const UniValue& params, bool fHelp)
     if (params.size() > 1)
         fVerbose = (params[1].get_int() != 0);
 
-    CTransaction tx;
+    CTransactionRef tx;
     uint256 hashBlock = uint256();
     if (!GetTransaction(hash, tx, Params().GetConsensus(), hashBlock, true))
         throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "No information available about transaction");
 
-    string strHex = EncodeHexTx(tx);
+    string strHex = EncodeHexTx(*tx);
 
     if (!fVerbose)
         return strHex;
 
     UniValue result(UniValue::VOBJ);
     result.push_back(Pair("hex", strHex));
-    TxToJSON(tx, hashBlock, result);
+    TxToJSON(*tx, hashBlock, result);
     return result;
 }
 
@@ -279,7 +279,7 @@ UniValue listunspent(const UniValue& params, bool fHelp)
             continue;
 
         CTxDestination address;
-        const CScript& scriptPubKey = out.tx->vout[out.i].scriptPubKey;
+        const CScript& scriptPubKey = out.tx->tx->vout[out.i].scriptPubKey;
         bool fValidAddress = ExtractDestination(scriptPubKey, address);
 
         if (destinations.size() && (!fValidAddress || !destinations.count(address)))
@@ -306,7 +306,7 @@ UniValue listunspent(const UniValue& params, bool fHelp)
         }
 
         entry.push_back(Pair("scriptPubKey", HexStr(scriptPubKey.begin(), scriptPubKey.end())));
-        entry.push_back(Pair("amount", ValueFromAmount(out.tx->vout[out.i].nValue)));
+        entry.push_back(Pair("amount", ValueFromAmount(out.tx->tx->vout[out.i].nValue)));
         entry.push_back(Pair("confirmations", out.nDepth));
         entry.push_back(Pair("spendable", out.fSpendable));
         results.push_back(entry);
@@ -453,13 +453,13 @@ UniValue decoderawtransaction(const UniValue& params, bool fHelp)
 
     RPCTypeCheck(params, {UniValue::VSTR});
 
-    CTransaction tx;
+    CMutableTransaction mtx;
 
-    if (!DecodeHexTx(tx, params[0].get_str(), true))
+    if (!DecodeHexTx(mtx, params[0].get_str(), true))
         throw JSONRPCError(RPC_DESERIALIZATION_ERROR, "TX decode failed");
 
     UniValue result(UniValue::VOBJ);
-    TxToJSON(tx, uint256(), result);
+    TxToJSON(CTransaction(std::move(mtx)), uint256(), result);
 
     return result;
 }
@@ -763,10 +763,11 @@ UniValue sendrawtransaction(const UniValue& params, bool fHelp)
     RPCTypeCheck(params, {UniValue::VSTR, UniValue::VBOOL});
 
     // parse hex string from parameter
-    CTransaction tx;
-    if (!DecodeHexTx(tx, params[0].get_str()))
+    CMutableTransaction mtx;
+    if (!DecodeHexTx(mtx, params[0].get_str()))
         throw JSONRPCError(RPC_DESERIALIZATION_ERROR, "TX decode failed");
-    uint256 hashTx = tx.GetHash();
+    CTransactionRef tx(MakeTransactionRef(std::move(mtx)));
+    uint256 hashTx = tx->GetHash();
 
     bool fOverrideFees = false;
     if (params.size() > 1)
@@ -794,7 +795,7 @@ UniValue sendrawtransaction(const UniValue& params, bool fHelp)
     } else if (fHaveChain) {
         throw JSONRPCError(RPC_TRANSACTION_ALREADY_IN_CHAIN, "transaction already in block chain");
     }
-    RelayTransaction(tx);
+    RelayTransaction(*tx);
 
     return hashTx.GetHex();
 }

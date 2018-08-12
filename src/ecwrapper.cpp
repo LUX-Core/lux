@@ -213,7 +213,7 @@ void CECKey::GetPubKey(std::vector<unsigned char>& pubkey, bool fCompressed)
     assert(nSize <= 65);
     pubkey.clear();
     pubkey.resize(nSize);
-    unsigned char* pbegin(begin_ptr(pubkey));
+    unsigned char* pbegin(pubkey.data());
     int nSize2 = i2o_ECPublicKey(pkey, &pbegin);
     assert(nSize == nSize2);
 }

@@ -7,7 +7,6 @@ reset-files.bash
 *.tar.gz
 
 *.exe
-src/lux
 src/luxd
 src/lux-cli
 src/lux-tx

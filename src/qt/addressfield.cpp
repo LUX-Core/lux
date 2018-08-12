@@ -114,7 +114,7 @@ void AddressField::on_refresh()
 
         for (const COutput& out : vecOutputs) {
             CTxDestination address;
-            const CScript& scriptPubKey = out.tx->vout[out.i].scriptPubKey;
+            const CScript& scriptPubKey = out.tx->tx->vout[out.i].scriptPubKey;
             bool fValidAddress = ExtractDestination(scriptPubKey, address);
 
             if (fValidAddress)

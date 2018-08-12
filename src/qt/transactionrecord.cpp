@@ -41,26 +41,26 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const CWallet* 
     if (wtx.IsCoinStake()) {
         TransactionRecord sub(hash, nTime);
         CTxDestination address;
-        if (!ExtractDestination(wtx.vout[1].scriptPubKey, address))
+        if (!ExtractDestination(wtx.tx->vout[1].scriptPubKey, address))
             return parts;
 
         if (!IsMine(*wallet, address)) {
             //if the address is not yours then it means you have a tx sent to you in someone elses coinstake tx
-            for (unsigned int i = 1; i < wtx.vout.size(); i++) {
+            for (unsigned int i = 1; i < wtx.tx->vout.size(); i++) {
                 CTxDestination outAddress;
-                if (ExtractDestination(wtx.vout[i].scriptPubKey, outAddress)) {
+                if (ExtractDestination(wtx.tx->vout[i].scriptPubKey, outAddress)) {
                     if (IsMine(*wallet, outAddress)) {
-                        isminetype mine = wallet->IsMine(wtx.vout[i]);
+                        isminetype mine = wallet->IsMine(wtx.tx->vout[i]);
                         sub.involvesWatchAddress = mine & ISMINE_WATCH_ONLY;
                         sub.type = TransactionRecord::MNReward;
                         sub.address = EncodeDestination(outAddress);
-                        sub.credit = wtx.vout[i].nValue;
+                        sub.credit = wtx.tx->vout[i].nValue;
                     }
                 }
             }
         } else {
             //stake reward
-            isminetype mine = wallet->IsMine(wtx.vout[1]);
+            isminetype mine = wallet->IsMine(wtx.tx->vout[1]);
             sub.involvesWatchAddress = mine & ISMINE_WATCH_ONLY;
             sub.type = TransactionRecord::StakeMint;
             sub.address = EncodeDestination(address);
@@ -71,7 +71,7 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const CWallet* 
         //
         // Credit
         //
-        for (const CTxOut& txout : wtx.vout) {
+        for (const CTxOut& txout : wtx.tx->vout) {
             isminetype mine = wallet->IsMine(txout);
             if (mine) {
                 TransactionRecord sub(hash, nTime);
@@ -101,7 +101,7 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const CWallet* 
         int nFromMe = 0;
         bool involvesWatchAddress = false;
         isminetype fAllFromMe = ISMINE_SPENDABLE;
-        for (const CTxIn& txin : wtx.vin) {
+        for (const CTxIn& txin : wtx.tx->vin) {
             if (wallet->IsMine(txin)) {
                 fAllFromMeDenom = fAllFromMeDenom && wallet->IsDenominated(txin);
                 nFromMe++;
@@ -114,7 +114,7 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const CWallet* 
         isminetype fAllToMe = ISMINE_SPENDABLE;
         bool fAllToMeDenom = true;
         int nToMe = 0;
-        for (const CTxOut& txout : wtx.vout) {
+        for (const CTxOut& txout : wtx.tx->vout) {
             if (wallet->IsMine(txout)) {
                 fAllToMeDenom = fAllToMeDenom && wallet->IsDenominatedAmount(txout.nValue);
                 nToMe++;
@@ -140,7 +140,7 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const CWallet* 
             if (mapValue["DS"] == "1") {
                 sub.type = TransactionRecord::Darksend;
                 CTxDestination address;
-                if (ExtractDestination(wtx.vout[0].scriptPubKey, address)) {
+                if (ExtractDestination(wtx.tx->vout[0].scriptPubKey, address)) {
                     // Sent to LUX Address
                     sub.address = EncodeDestination(address);
                 } else {
@@ -148,8 +148,8 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const CWallet* 
                     sub.address = mapValue["to"];
                 }
             } else {
-                for (unsigned int nOut = 0; nOut < wtx.vout.size(); nOut++) {
-                    const CTxOut& txout = wtx.vout[nOut];
+                for (unsigned int nOut = 0; nOut < wtx.tx->vout.size(); nOut++) {
+                    const CTxOut& txout = wtx.tx->vout[nOut];
                     sub.idx = parts.size();
 
                     if (wallet->IsCollateralAmount(txout.nValue)) sub.type = TransactionRecord::DarksendMakeCollaterals;
@@ -170,8 +170,8 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const CWallet* 
             //
             CAmount nTxFee = nDebit - wtx.GetValueOut();
 
-            for (unsigned int nOut = 0; nOut < wtx.vout.size(); nOut++) {
-                const CTxOut& txout = wtx.vout[nOut];
+            for (unsigned int nOut = 0; nOut < wtx.tx->vout.size(); nOut++) {
+                const CTxOut& txout = wtx.tx->vout[nOut];
                 TransactionRecord sub(hash, nTime);
                 sub.idx = parts.size();
                 sub.involvesWatchAddress = involvesWatchAddress;
@@ -238,13 +238,13 @@ void TransactionRecord::updateStatus(const CWalletTx& wtx)
     status.cur_num_blocks = chainActive.Height();
     //status.cur_num_ix_locks = nCompleteTXLocks;
 
-    if (!IsFinalTx(wtx, chainActive.Height() + 1)) {
-        if (wtx.nLockTime < LOCKTIME_THRESHOLD) {
+    if (!IsFinalTx(*wtx.tx, chainActive.Height() + 1)) {
+        if (wtx.tx->nLockTime < LOCKTIME_THRESHOLD) {
             status.status = TransactionStatus::OpenUntilBlock;
-            status.open_for = wtx.nLockTime - chainActive.Height();
+            status.open_for = wtx.tx->nLockTime - chainActive.Height();
         } else {
             status.status = TransactionStatus::OpenUntilDate;
-            status.open_for = wtx.nLockTime;
+            status.open_for = wtx.tx->nLockTime;
         }
     }
     // For generated transactions, determine maturity

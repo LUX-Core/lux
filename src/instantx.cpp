@@ -39,8 +39,9 @@ void ProcessInstantX(CNode* pfrom, const std::string& strCommand, CDataStream& v
 
         //LogPrintf("ProcessMessageInstantX::txlreq\n");
         CDataStream vMsg(vRecv);
-        CTransaction tx;
-        vRecv >> tx;
+        CTransactionRef ptx;
+        vRecv >> ptx;
+        CTransaction tx = *ptx;
 
         CInv inv(MSG_TXLOCK_REQUEST, tx.GetHash());
         pfrom->AddInventoryKnown(inv);
@@ -66,7 +67,7 @@ void ProcessInstantX(CNode* pfrom, const std::string& strCommand, CDataStream& v
         CValidationState state;
 
 
-        if (AcceptToMemoryPool(mempool, state, tx, true, &fMissingInputs)) {
+        if (AcceptToMemoryPool(mempool, state, ptx, true, &fMissingInputs)) {
             vector<CInv> vInv;
             vInv.push_back(inv);
             LOCK(cs_vNodes);
@@ -183,12 +184,12 @@ bool IsIXTXValid(const CTransaction& txCollateral) {
         nValueOut += o.nValue;
 
     for (const CTxIn i : txCollateral.vin) {
-        CTransaction tx2;
+        CTransactionRef tx2;
         uint256 hash;
         //if(GetTransaction(i.prevout.hash, tx2, hash, true)){
         if (GetTransaction(i.prevout.hash, tx2, Params().GetConsensus(), hash)) {
-            if (tx2.vout.size() > i.prevout.n) {
-                nValueIn += tx2.vout[i.prevout.n].nValue;
+            if (tx2->vout.size() > i.prevout.n) {
+                nValueIn += tx2->vout[i.prevout.n].nValue;
             }
         } else {
             missingTx = true;

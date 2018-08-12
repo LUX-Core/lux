@@ -27,10 +27,10 @@ void StorageResults::wipeResults(){
     leveldb::Status result = leveldb::DestroyDB(path, leveldb::Options());
 }
 
-void StorageResults::deleteResults(std::vector<CTransaction> const& txs){
+void StorageResults::deleteResults(std::vector<CTransactionRef> const& txs){
 
-    for(CTransaction tx : txs){
-        dev::h256 hashTx = uintToh256(tx.GetHash());
+    for (CTransactionRef tx : txs) {
+        dev::h256 hashTx = uintToh256(tx->GetHash());
         m_cache_result.erase(hashTx);
 
         std::string keyTemp = hashTx.hex();

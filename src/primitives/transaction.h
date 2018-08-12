@@ -1,22 +1,22 @@
-// Copyright (c) 2009-2010 Satoshi Nakamoto             -*- c++ -*-
-// Copyright (c) 2009-2014 The Bitcoin developers
+// Copyright (c) 2009-2010 Satoshi Nakamoto
+// Copyright (c) 2009-2017 The Bitcoin Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #ifndef BITCOIN_PRIMITIVES_TRANSACTION_H
 #define BITCOIN_PRIMITIVES_TRANSACTION_H
 
-#include "amount.h"
-#include "script/script.h"
-#include "serialize.h"
-#include "uint256.h"
-#include <memory>
-
-class CTransaction;
+#include <stdint.h>
+#include <amount.h>
+#include <script/script.h>
+#include <serialize.h>
+#include <uint256.h>
 
 static const int SERIALIZE_TRANSACTION_NO_WITNESS = 0x40000000;
 
 static const int WITNESS_SCALE_FACTOR = 4;
+
+class CTransaction;
 
 /** An outpoint - a combination of a transaction hash and an index n into its vout */
 class COutPoint
@@ -31,14 +31,14 @@ public:
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion) {
+    inline void SerializationOp(Stream& s, Operation ser_action) {
         READWRITE(hash);
         READWRITE(n);
     }
 
     void SetNull() { hash = 0; n = (uint32_t) -1; }
     bool IsNull() const { return (hash == 0 && n == (uint32_t) -1); }
-    bool IsMasternodeReward(const CTransaction* tx) const;
+    bool IsMasternodeReward(const CTransaction& tx) const;
 
     friend bool operator<(const COutPoint& a, const COutPoint& b)
     {
@@ -112,9 +112,9 @@ public:
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion) {
+    inline void SerializationOp(Stream& s, Operation ser_action) {
         READWRITE(prevout);
-        READWRITE(*(CScriptBase*)(&scriptSig));
+        READWRITE(scriptSig);
         READWRITE(nSequence);
     }
 
@@ -157,9 +157,9 @@ public:
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion) {
+    inline void SerializationOp(Stream& s, Operation ser_action) {
         READWRITE(nValue);
-        READWRITE(*(CScriptBase*)(&scriptPubKey));
+        READWRITE(scriptPubKey);
     }
 
     void SetNull()
@@ -204,7 +204,7 @@ public:
         if (scriptPubKey.IsUnspendable())
             return 0;
 
-        size_t nSize = GetSerializeSize(SER_DISK, 0);
+        size_t nSize = GetSerializeSize(*this, SER_DISK, 0);
         int witnessversion = 0;
         std::vector<unsigned char> witnessprogram;
 
@@ -247,7 +247,7 @@ public:
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion)
+    inline void SerializationOp(Stream& s, Operation ser_action)
     {
         READWRITE(scriptWitness.stack);
     }
@@ -283,7 +283,7 @@ public:
     }
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion)
+    inline void SerializationOp(Stream& s, Operation ser_action)
     {
         for (size_t n = 0; n < vtxinwit.size(); n++) {
             READWRITE(vtxinwit[n]);
@@ -314,61 +314,70 @@ struct CMutableTransaction;
  *   - CTxWitness wit;
  * - uint32_t nLockTime
  */
-template<typename Stream, typename Operation, typename TxType>
-inline void SerializeTransaction(TxType& tx, Stream& s, Operation ser_action, int nType, int nVersion) {
-    READWRITE(*const_cast<int32_t*>(&tx.nVersion));
+template<typename Stream, typename TxType>
+inline void UnserializeTransaction(TxType& tx, Stream& s) {
+    const bool fAllowWitness = !(s.GetVersion() & SERIALIZE_TRANSACTION_NO_WITNESS);
+
+    s >> tx.nVersion;
     unsigned char flags = 0;
-    READWRITE(*const_cast<uint32_t*>(&tx.nTime));
-    if (ser_action.ForRead()) {
-        const_cast<std::vector<CTxIn>*>(&tx.vin)->clear();
-        const_cast<std::vector<CTxOut>*>(&tx.vout)->clear();
-        const_cast<CTxWitness*>(&tx.wit)->SetNull();
-        /* Try to read the vin. In case the dummy is there, this will be read as an empty vector. */
-        READWRITE(*const_cast<std::vector<CTxIn>*>(&tx.vin));
-        if (tx.vin.size() == 0 && !(nVersion & SERIALIZE_TRANSACTION_NO_WITNESS)) {
-            /* We read a dummy or an empty vin. */
-            READWRITE(flags);
-            if (flags != 0) {
-                READWRITE(*const_cast<std::vector<CTxIn>*>(&tx.vin));
-                READWRITE(*const_cast<std::vector<CTxOut>*>(&tx.vout));
-            }
-        } else {
-            /* We read a non-empty vin. Assume a normal vout follows. */
-            READWRITE(*const_cast<std::vector<CTxOut>*>(&tx.vout));
-        }
-        if ((flags & 1) && !(nVersion & SERIALIZE_TRANSACTION_NO_WITNESS)) {
-            /* The witness flag is present, and we support witnesses. */
-            flags ^= 1;
-            const_cast<CTxWitness*>(&tx.wit)->vtxinwit.resize(tx.vin.size());
-            READWRITE(tx.wit);
-        }
-        if (flags) {
-            /* Unknown flag in the serialization */
-            throw std::ios_base::failure("Unknown transaction optional data");
+    s >> tx.nTime;
+    tx.vin.clear();
+    tx.vout.clear();
+    tx.wit.SetNull();
+    /* Try to read the vin. In case the dummy is there, this will be read as an empty vector. */
+    s >> tx.vin;
+    if (tx.vin.size() == 0 && fAllowWitness) {
+        /* We read a dummy or an empty vin. */
+        s >> flags;
+        if (flags != 0) {
+            s >> tx.vin;
+            s >> tx.vout;
         }
     } else {
-        // Consistency check
-        assert(tx.wit.vtxinwit.size() <= tx.vin.size());
-        if (!(nVersion & SERIALIZE_TRANSACTION_NO_WITNESS)) {
-            /* Check whether witnesses need to be serialized. */
-            if (!tx.wit.IsNull()) {
-                flags |= 1;
-            }
-        }
-        if (flags) {
-            /* Use extended format in case witnesses are to be serialized. */
-            std::vector<CTxIn> vinDummy;
-            READWRITE(vinDummy);
-            READWRITE(flags);
-        }
-        READWRITE(*const_cast<std::vector<CTxIn>*>(&tx.vin));
-        READWRITE(*const_cast<std::vector<CTxOut>*>(&tx.vout));
-        if (flags & 1) {
-            const_cast<CTxWitness*>(&tx.wit)->vtxinwit.resize(tx.vin.size());
-            READWRITE(tx.wit);
+        /* We read a non-empty vin. Assume a normal vout follows. */
+        s >> tx.vout;
+    }
+    if ((flags & 1) && fAllowWitness) {
+        /* The witness flag is present, and we support witnesses. */
+        flags ^= 1;
+        const_cast<CTxWitness*>(&tx.wit)->vtxinwit.resize(tx.vin.size());
+        s >> tx.wit;
+    }
+    if (flags) {
+        /* Unknown flag in the serialization */
+        throw std::ios_base::failure("Unknown transaction optional data");
+    }
+    s >> tx.nLockTime;
+}
+
+template<typename Stream, typename TxType>
+inline void SerializeTransaction(const TxType& tx, Stream& s) {
+    const bool fAllowWitness = !(s.GetVersion() & SERIALIZE_TRANSACTION_NO_WITNESS);
+
+    s << tx.nVersion;
+    unsigned char flags = 0;
+    s << tx.nTime;
+    // Consistency check
+    assert(tx.wit.vtxinwit.size() <= tx.vin.size());
+    if (fAllowWitness) {
+        /* Check whether witnesses need to be serialized. */
+        if (!tx.wit.IsNull()) {
+            flags |= 1;
         }
     }
-    READWRITE(*const_cast<uint32_t*>(&tx.nLockTime));
+    if (flags) {
+        /* Use extended format in case witnesses are to be serialized. */
+        std::vector<CTxIn> vinDummy;
+        s << vinDummy;
+        s << flags;
+    }
+    s << tx.vin;
+    s << tx.vout;
+    if (flags & 1) {
+        const_cast<CTxWitness*>(&tx.wit)->vtxinwit.resize(tx.vin.size());
+        s << tx.wit;
+    }
+    s << tx.nLockTime;
 }
 
 /** The basic transaction that is broadcasted on the network and contained in
@@ -410,15 +419,15 @@ public:
 
     CTransaction& operator=(const CTransaction& tx);
 
-    ADD_SERIALIZE_METHODS;
-
-    template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion) {
-        SerializeTransaction(*this, s, ser_action, nType, nVersion);
-        if (ser_action.ForRead()) {
-            UpdateHash();
-        }
+    template<typename Stream>
+    inline void Serialize(Stream& s) const {
+        SerializeTransaction(*this, s);
     }
+
+    /** This deserializing constructor is provided instead of an Unserialize method.
+     *  Unserialize is not possible, since it would require overwriting const fields. */
+    template<typename Stream>
+    CTransaction(deserialize_type, Stream& s) : CTransaction(CMutableTransaction(deserialize, s)) {}
 
     bool IsNull() const {
         return vin.empty() && vout.empty();
@@ -509,11 +518,20 @@ struct CMutableTransaction
     CMutableTransaction();
     CMutableTransaction(const CTransaction& tx);
 
-    ADD_SERIALIZE_METHODS;
+    template<typename Stream>
+    inline void Serialize(Stream& s) const {
+        SerializeTransaction(*this, s);
+    }
 
-    template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion) {
-        SerializeTransaction(*this, s, ser_action, nType, nVersion);
+
+    template<typename Stream>
+    inline void Unserialize(Stream& s) {
+        UnserializeTransaction(*this, s);
+    }
+
+    template<typename Stream>
+    CMutableTransaction(deserialize_type, Stream& s) {
+        Unserialize(s);
     }
 
     /** Compute the hash of this CMutableTransaction. This is computed on the
@@ -526,11 +544,6 @@ struct CMutableTransaction
     friend bool operator==(const CMutableTransaction& a, const CMutableTransaction& b)
     {
         return a.GetHash() == b.GetHash();
-    }
-
-    friend bool operator!=(const CMutableTransaction& a, const CMutableTransaction& b)
-    {
-        return !(a == b);
     }
 
     bool HasWitness() const

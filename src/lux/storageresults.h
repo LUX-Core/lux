@@ -43,7 +43,7 @@ public:
 
 	void addResult(dev::h256 hashTx, std::vector<TransactionReceiptInfo>& result);
 
-    void deleteResults(std::vector<CTransaction> const& txs);
+    void deleteResults(std::vector<CTransactionRef> const& txs);
 
     std::vector<TransactionReceiptInfo> getResult(dev::h256 const& hashTx);
 

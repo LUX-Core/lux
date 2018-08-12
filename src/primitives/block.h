@@ -44,7 +44,7 @@ public:
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion) {
+    inline void SerializationOp(Stream& s, Operation ser_action) {
         READWRITE(this->nVersion);
         READWRITE(hashPrevBlock);
         READWRITE(hashMerkleRoot);
@@ -90,7 +90,7 @@ class CBlock : public CBlockHeader
 {
 public:
     // network and disk
-    std::vector<CTransaction> vtx;
+    std::vector<CTransactionRef> vtx;
 
     // ppcoin: block signature - signed by one of the coin base txout[N]'s owner
     std::vector<unsigned char> vchBlockSig;
@@ -112,9 +112,9 @@ public:
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion) {
+    inline void SerializationOp(Stream& s, Operation ser_action) {
         READWRITE(*(CBlockHeader*)this);
-        if (!(nType & SER_GETHASH)) {
+        if (!(s.GetType() & SER_GETHASH)) {
             READWRITE(vtx);
             READWRITE(vchBlockSig);
         } else if (ser_action.ForRead()) {
@@ -148,7 +148,7 @@ public:
     // ppcoin: two types of block: proof-of-work or proof-of-stake
     bool IsProofOfStake() const
     {
-        return (vtx.size() > 1 && vtx[1].IsCoinStake());
+        return (vtx.size() > 1 && vtx[1]->IsCoinStake());
     }
 
     bool IsProofOfWork() const
@@ -187,8 +187,9 @@ struct CBlockLocator
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion) {
-        if (!(nType & SER_GETHASH))
+    inline void SerializationOp(Stream& s, Operation ser_action) {
+        int nVersion = s.GetVersion();
+        if (!(s.GetType() & SER_GETHASH))
             READWRITE(nVersion);
         READWRITE(vHave);
     }

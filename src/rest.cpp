@@ -181,13 +181,13 @@ static bool rest_tx(AcceptedConnection* conn,
         throw RESTERR(HTTP_BAD_REQUEST, "Invalid hash: " + hashStr);
 
     const Consensus::Params consensusParams = Params().GetConsensus();
-    CTransaction tx;
+    CTransactionRef tx;
     uint256 hashBlock = uint256();
     if (!GetTransaction(hash, tx, consensusParams, hashBlock, true))
         throw RESTERR(HTTP_NOT_FOUND, hashStr + " not found");
 
     CDataStream ssTx(SER_NETWORK, PROTOCOL_VERSION);
-    ssTx << tx;
+    ssTx << *tx;
 
     switch (rf) {
     case RF_BINARY: {
@@ -204,7 +204,7 @@ static bool rest_tx(AcceptedConnection* conn,
 
     case RF_JSON: {
         UniValue objTx(UniValue::VOBJ);
-        TxToJSON(tx, hashBlock, objTx);
+        TxToJSON(*tx, hashBlock, objTx);
         string strJSON = objTx.write() + "\n";
         conn->stream() << HTTPReply(HTTP_OK, strJSON, fRun) << std::flush;
         return true;

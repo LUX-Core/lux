@@ -148,7 +148,7 @@ public:
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion){
+    inline void SerializationOp(Stream& s, Operation ser_action){
         READWRITE(nDenom);
         READWRITE(vin);
         READWRITE(time);
@@ -280,7 +280,7 @@ public:
         cachedLastSuccess = 0;
         cachedNumBlocks = 0;
         unitTest = false;
-        txCollateral = CTransaction();
+        txCollateral = CMutableTransaction();
         minBlockSpacing = 1;
         nDsqCount = 0;
         lastNewBlock = 0;

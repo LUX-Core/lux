@@ -393,7 +393,7 @@ bool CActiveMasternode::GetVinFromOutput(COutput out, CTxIn& vin, CPubKey& pubke
     CScript pubScript;
 
     vin = CTxIn(out.tx->GetHash(), out.i);
-    pubScript = out.tx->vout[out.i].scriptPubKey; // the inputs PubKey
+    pubScript = out.tx->tx->vout[out.i].scriptPubKey; // the inputs PubKey
 
     CTxDestination address1;
     ExtractDestination(pubScript, address1);
@@ -423,7 +423,7 @@ vector<COutput> CActiveMasternode::SelectCoinsMasternode() {
 
     // Filter
     for (const COutput& out : vCoins) {
-        if (out.tx->vout[out.i].nValue == GetMNCollateral(chainActive.Height()) * COIN) {  //exactly DARKSEND_COLLATERAL LUX
+        if (out.tx->tx->vout[out.i].nValue == GetMNCollateral(chainActive.Height()) * COIN) {  //exactly DARKSEND_COLLATERAL LUX
             filteredCoins.push_back(out);
         }
     }
@@ -442,7 +442,7 @@ vector <COutput> CActiveMasternode::SelectCoinsMasternodeForPubKey(std::string c
 
     // Filter
     for (const COutput& out : vCoins) {
-        if (out.tx->vout[out.i].scriptPubKey == scriptPubKey && out.tx->vout[out.i].nValue == DARKSEND_COLLATERAL) { //exactly 161.200 LUX
+        if (out.tx->tx->vout[out.i].scriptPubKey == scriptPubKey && out.tx->tx->vout[out.i].nValue == DARKSEND_COLLATERAL) { //exactly 161.200 LUX
             filteredCoins.push_back(out);
         }
     }

@@ -75,7 +75,7 @@ public:
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion)
+    inline void SerializationOp(Stream& s, Operation ser_action)
     {
         std::string sAddress = address.toStdString();
         std::string sLabel = label.toStdString();
@@ -86,7 +86,6 @@ public:
         std::string sAuthenticatedMerchant = authenticatedMerchant.toStdString();
 
         READWRITE(this->nVersion);
-        nVersion = this->nVersion;
         READWRITE(sAddress);
         READWRITE(sLabel);
         READWRITE(amount);

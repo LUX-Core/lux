@@ -309,7 +309,7 @@ bool IsInitialBlockDownload();
 /** Format a string that describes several potential problems detected by the core */
 std::string GetWarnings(std::string strFor);
 /** Retrieve a transaction (from memory pool, or from disk, if possible) */
-bool GetTransaction(const uint256& hash, CTransaction& tx, const Consensus::Params& params, uint256& hashBlock, bool fAllowSlow = false);
+bool GetTransaction(const uint256& hash, CTransactionRef& tx, const Consensus::Params& params, uint256& hashBlock, bool fAllowSlow = false);
 /** Find the best known block, and make it the tip of the block chain */
 
 bool DisconnectBlocksAndReprocess(int blocks);
@@ -366,7 +366,8 @@ void FlushStateToDisk();
 void PruneAndFlush();
 
 /** (try to) add transaction to memory pool **/
-bool AcceptToMemoryPool(CTxMemPool& pool, CValidationState& state, const CTransaction& tx, bool fLimitFree, bool* pfMissingInputs, bool fRejectInsaneFee = false, bool ignoreFees = false);
+//TODO: Change CTransaction to CTransactionRef
+bool AcceptToMemoryPool(CTxMemPool& pool, CValidationState& state, const CTransactionRef& ptx, bool fLimitFree, bool* pfMissingInputs, bool fRejectInsaneFee = false, bool ignoreFees = false);
 
 bool AcceptableInputs(CTxMemPool& pool, CValidationState& state, const CTransaction& tx, bool fLimitFree, bool* pfMissingInputs, bool fRejectInsaneFee = false, bool isDSTX = false);
 
@@ -378,7 +379,7 @@ struct CHeightTxIndexIteratorKey {
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion) {
+    inline void SerializationOp(Stream& s, Operation ser_action) {
         READWRITE(height);
     }
 
@@ -402,7 +403,7 @@ struct CHeightTxIndexKey {
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion) {
+    inline void SerializationOp(Stream& s, Operation ser_action) {
         READWRITE(height);
         if (ser_action.ForRead()) {
             valtype tmp;
@@ -449,7 +450,7 @@ struct CDiskTxPos : public CDiskBlockPos {
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion)
+    inline void SerializationOp(Stream& s, Operation ser_action)
     {
         READWRITE(*(CDiskBlockPos*)this);
         READWRITE(VARINT(nTxOffset));
@@ -491,72 +492,6 @@ CAmount GetMinRelayFee(const CTransaction& tx, unsigned int nBytes, bool fAllowF
  * @param[in] mapInputs    Map of previous transactions that have outputs we're spending
  * @return True if all inputs (scriptSigs) use only standard transaction forms
  */
-
-/**
-  * Basic transaction serialization format:
-  * - int32_t nVersion
-  * - std::vector<CTxIn> vin
-  * - std::vector<CTxOut> vout
-  * - uint32_t nLockTime
-  *
-  * Extended transaction serialization format:
-  * - int32_t nVersion
-  * - unsigned char dummy = 0x00
-  * - unsigned char flags (!= 0)
-  * - std::vector<CTxIn> vin
-  * - std::vector<CTxOut> vout
-  * - if (flags & 1):
-  *   - CTxWitness wit;
-  * - uint32_t nLockTime
-  */
- template<typename Stream, typename TxType>
- inline void UnserializeTransaction(TxType& tx, Stream& s) {
-     const bool fAllowWitness = !(s.GetVersion() & SERIALIZE_TRANSACTION_NO_WITNESS);
-
-     s >> tx.nVersion;
-     unsigned char flags = 0;
-     tx.vin.clear();
-     tx.vout.clear();
-     /* Try to read the vin. In case the dummy is there, this will be read as an empty vector. */
-     s >> tx.vin;
-     if (tx.vin.size() == 0 && fAllowWitness) {
-         /* We read a dummy or an empty vin. */
-         s >> flags;
-     } else {
-         /* We read a non-empty vin. Assume a normal vout follows. */
-         s >> tx.vout;
-     }
-     s >> tx.nLockTime;
- }
-
- template<typename Stream, typename TxType>
- inline void SerializeTransaction(const TxType& tx, Stream& s) {
-     const bool fAllowWitness = !(s.GetVersion() & SERIALIZE_TRANSACTION_NO_WITNESS);
-
-     s << tx.nVersion;
-     unsigned char flags = 0;
-     // Consistency check
-     if (fAllowWitness) {
-         /* Check whether witnesses need to be serialized. */
-         if (tx.HasWitness()) {
-             flags |= 1;
-         }
-     }
-     if (flags) {
-         /* Use extended format in case witnesses are to be serialized. */
-         std::vector<CTxIn> vinDummy;
-         s << vinDummy;
-         s << flags;
-     }
-     s << tx.vin;
-     s << tx.vout;
-     if (flags & 1) {
-         for (size_t i = 0; i < tx.wit.vtxinwit.size(); i++) {
-             s << tx.wit.vtxinwit[i].scriptWitness.stack;
-         }
-     }
-     s << tx.nLockTime;
- }
 
 /**
  * Count ECDSA signature operations the old-fashioned (pre-0.6) way
@@ -623,7 +558,7 @@ public:
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion)
+    inline void SerializationOp(Stream& s, Operation ser_action)
     {
         READWRITE(vtxundo);
     }
@@ -732,7 +667,7 @@ public:
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion)
+    inline void SerializationOp(Stream& s, Operation ser_action)
     {
         READWRITE(VARINT(nBlocks));
         READWRITE(VARINT(nSize));
@@ -869,7 +804,7 @@ class LuxTxConverter{
 
 public:
 
-    LuxTxConverter(CTransaction tx, CCoinsViewCache* v = NULL, const std::vector<CTransaction>* blockTxs = NULL) : txBit(tx), view(v), blockTransactions(blockTxs){}
+    LuxTxConverter(CTransaction tx, CCoinsViewCache* v = NULL, const std::vector<CTransactionRef>* blockTxs = NULL) : txBit(tx), view(v), blockTransactions(blockTxs){}
 
     bool extractionLuxTransactions(ExtractLuxTX& luxTx);
 
@@ -885,7 +820,7 @@ private:
     const CCoinsViewCache* view;
     std::vector<valtype> stack;
     opcodetype opcode;
-    const std::vector<CTransaction> *blockTransactions;
+    const std::vector<CTransactionRef> *blockTransactions;
 
 };
 

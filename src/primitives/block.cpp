@@ -63,8 +63,8 @@ uint256 CBlock::BuildMerkleTree(bool* fMutated) const
     */
     vMerkleTree.clear();
     vMerkleTree.reserve(vtx.size() * 2 + 16); // Safe upper bound for the number of total nodes.
-    for (std::vector<CTransaction>::const_iterator it(vtx.begin()); it != vtx.end(); ++it)
-        vMerkleTree.push_back(it->GetHash());
+    for (const auto& ptx : vtx)
+        vMerkleTree.push_back(ptx->GetHash());
     int j = 0;
     bool mutated = false;
     for (int nSize = vtx.size(); nSize > 1; nSize = (nSize + 1) / 2)
@@ -130,9 +130,8 @@ std::string CBlock::ToString() const
         hashStateRoot.ToString(), // lux
         hashUTXORoot.ToString(), // lux
         vtx.size());
-    for (unsigned int i = 0; i < vtx.size(); i++)
-    {
-        s << "  " << vtx[i].ToString() << "\n";
+    for (const auto& tx: vtx) {
+        s << "  " << tx->ToString() << "\n";
     }
     s << "  vMerkleTree: ";
     for (unsigned int i = 0; i < vMerkleTree.size(); i++)
@@ -155,10 +154,10 @@ bool CBlock::SignBlock(const CKeyStore& keystore)
     if (IsProofOfStake()) {
         // if we are trying to sign
         //    a complete proof-of-stake block
-        return vtx[0].vout[0].IsEmpty() && vtx.size() > 1 && vtx[1].IsCoinStake();
+        return vtx[0]->vout[0].IsEmpty() && vtx.size() > 1 && vtx[1]->IsCoinStake();
     } else {
-        for (unsigned int i = 0; i < vtx[0].vout.size(); i++) {
-            const CTxOut& txout = vtx[0].vout[i];
+        for (unsigned int i = 0; i < vtx[0]->vout.size(); i++) {
+            const CTxOut& txout = vtx[0]->vout[i];
 
             if (!Solver(txout.scriptPubKey, whichType, vSolutions))
                 continue;
@@ -192,13 +191,13 @@ bool CBlock::CheckBlockSignature() const
     if (IsProofOfStake()) {
         // if we are trying to sign
         //    a complete proof-of-stake block
-        return vtx[0].vout[0].IsEmpty();
+        return vtx[0]->vout[0].IsEmpty();
     }
 
     std::vector<valtype> vSolutions;
     txnouttype whichType;
 
-    const CTxOut& txout = vtx[1].vout[1];
+    const CTxOut& txout = vtx[1]->vout[1];
 
     if (!Solver(txout.scriptPubKey, whichType, vSolutions))
         return false;

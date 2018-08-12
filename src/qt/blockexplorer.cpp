@@ -151,10 +151,10 @@ static std::string TxToRow(const CTransaction& tx, const CScript& Highlight = CS
 
 CTxOut getPrevOut(const COutPoint& out)
 {
-    CTransaction tx;
+    CTransactionRef tx;
     uint256 hashBlock;
     if (GetTransaction(out.hash, tx, Params().GetConsensus(), hashBlock, true))
-        return tx.vout[out.n];
+        return tx->vout[out.n];
     return CTxOut();
 }
 
@@ -204,7 +204,7 @@ std::string BlockToString(CBlockIndex* pBlock)
 
     std::string TxContent = table + makeHTMLTableRow(TxLabels, sizeof(TxLabels) / sizeof(std::string));
     for (unsigned int i = 0; i < block.vtx.size(); i++) {
-        const CTransaction& tx = block.vtx[i];
+        const CTransaction& tx = *block.vtx[i];
         TxContent += TxToRow(tx);
 
         int64_t In = getTxIn(tx);
@@ -501,10 +501,10 @@ bool BlockExplorer::switchTo(const QString& query)
     }
 
     // If the query is neither an integer nor a block hash, assume a transaction hash
-    CTransaction tx;
+    CTransactionRef tx;
     uint256 hashBlock = 0;
     if (GetTransaction(hash, tx, Params().GetConsensus(), hashBlock, true)) {
-        setContent(TxToString(hashBlock, tx));
+        setContent(TxToString(hashBlock, *tx));
         return true;
     }
 

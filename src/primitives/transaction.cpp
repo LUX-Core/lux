@@ -63,12 +63,12 @@ CTxOut::CTxOut(const CAmount& nValueIn, CScript scriptPubKeyIn)
     nRounds = -10;
 }
 
-bool COutPoint::IsMasternodeReward(const CTransaction* tx) const
+bool COutPoint::IsMasternodeReward(const CTransaction& tx) const
 {
-    if(!tx->IsCoinStake())
+    if(!tx.IsCoinStake())
         return false;
 
-    return (n == tx->vout.size() - 1) && (tx->vout[1].scriptPubKey != tx->vout[n].scriptPubKey);
+    return (n == tx.vout.size() - 1) && (tx.vout[1].scriptPubKey != tx.vout[n].scriptPubKey);
 }
 
 uint256 CTxOut::GetHash() const
@@ -121,7 +121,9 @@ CTransaction::CTransaction() : hash(0), wit(CTxWitness()), vin(), vout(), nVersi
 CTransaction::CTransaction(const CMutableTransaction &tx) : wit(tx.wit), vin(tx.vin), vout(tx.vout), nVersion(tx.nVersion), nTime(tx.nTime), nLockTime(tx.nLockTime) {
     UpdateHash();
 }
-CTransaction::CTransaction(CMutableTransaction &&tx) : wit(std::move(tx.wit)), vin(std::move(tx.vin)), vout(std::move(tx.vout)), nVersion(tx.nVersion), nTime(0), nLockTime(tx.nLockTime) {}
+CTransaction::CTransaction(CMutableTransaction &&tx) : wit(std::move(tx.wit)), vin(std::move(tx.vin)), vout(std::move(tx.vout)), nVersion(tx.nVersion), nTime(tx.nTime), nLockTime(tx.nLockTime) {
+    UpdateHash();
+}
 
 CTransaction& CTransaction::operator=(const CTransaction &tx) {
     *const_cast<int*>(&nVersion) = tx.nVersion;

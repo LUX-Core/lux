@@ -217,13 +217,18 @@ private:
     const LockPoints& lp;
 };
 
-// extracts a TxMemPoolEntry's transaction hash
+// extracts a transaction hash from CTxMempoolEntry or CTransactionRef
 struct mempoolentry_txid
 {
     typedef uint256 result_type;
     result_type operator() (const CTxMemPoolEntry &entry) const
     {
         return entry.GetTx().GetHash();
+    }
+
+    result_type operator() (const CTransactionRef& tx) const
+    {
+        return tx->GetHash();
     }
 };
 
@@ -611,7 +616,7 @@ public:
     void removeRecursive(const CTransaction &tx, MemPoolRemovalReason reason = MemPoolRemovalReason::UNKNOWN);
     void removeForReorg(const CCoinsViewCache *pcoins, unsigned int nMemPoolHeight, int flags);
     void removeConflicts(const CTransaction &tx);
-    void removeForBlock(const std::vector<CTransaction>& vtx, unsigned int nBlockHeight);
+    void removeForBlock(const std::vector<CTransactionRef>& vtx, unsigned int nBlockHeight);
 
     void clear();
     void _clear(); //lock free

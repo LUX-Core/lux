@@ -8,7 +8,6 @@
 #ifdef WIN32
 #include "compat.h" // for Windows API
 #endif
-#include "serialize.h"        // for begin_ptr(vec)
 #include "util.h"             // for LogPrint()
 #include "utilstrencodings.h" // for GetTime()
 
@@ -61,15 +60,15 @@ void RandAddSeedPerfmon()
     const size_t nMaxSize = 10000000; // Bail out at more than 10MB of performance data
     while (true) {
         nSize = vData.size();
-        ret = RegQueryValueExA(HKEY_PERFORMANCE_DATA, "Global", NULL, NULL, begin_ptr(vData), &nSize);
+        ret = RegQueryValueExA(HKEY_PERFORMANCE_DATA, "Global", NULL, NULL, vData.data(), &nSize);
         if (ret != ERROR_MORE_DATA || vData.size() >= nMaxSize)
             break;
         vData.resize(std::max((vData.size() * 3) / 2, nMaxSize)); // Grow size of buffer exponentially
     }
     RegCloseKey(HKEY_PERFORMANCE_DATA);
     if (ret == ERROR_SUCCESS) {
-        RAND_add(begin_ptr(vData), nSize, nSize / 100.0);
-         memory_cleanse(begin_ptr(vData), nSize);
+        RAND_add(vData.data(), nSize, nSize / 100.0);
+         memory_cleanse(vData.data(), nSize);
         LogPrint("rand", "%s: %lu bytes\n", __func__, nSize);
     } else {
         static bool warned = false; // Warn only once

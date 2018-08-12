@@ -193,7 +193,7 @@ public:
         txNew.vin[0].scriptSig = CScript() << 0 << CScriptNum(42) << vector<unsigned char>((const unsigned char*)pszTimestamp, (const unsigned char*)pszTimestamp + strlen(pszTimestamp));
         txNew.vout[0].SetEmpty();
 
-        genesis.vtx.push_back(txNew);
+        genesis.vtx.push_back(MakeTransactionRef(std::move(txNew)));
         genesis.hashPrevBlock = 0;
         genesis.hashMerkleRoot = BlockMerkleRoot(genesis);
         genesis.nVersion = 1;
@@ -317,7 +317,7 @@ public:
         txNew.vout[0].SetEmpty();
 
         genesis.SetNull();
-        genesis.vtx.push_back(txNew);
+        genesis.vtx.push_back(MakeTransactionRef(std::move(txNew)));
         genesis.hashPrevBlock = 0;
         genesis.hashMerkleRoot = BlockMerkleRoot(genesis);
         genesis.nVersion = 1;
@@ -550,7 +550,7 @@ public:
         txNew.vout[0].scriptPubKey = CScript() << ParseHex(strPubKey) << OP_CHECKSIG;
         txNew.vout[0].nValue = 21000000000000;
 
-        genesis.vtx.push_back(txNew);
+        genesis.vtx.push_back(MakeTransactionRef(std::move(txNew)));
         genesis.hashPrevBlock = 0;
         genesis.hashMerkleRoot = BlockMerkleRoot(genesis);
         genesis.nVersion = 1;

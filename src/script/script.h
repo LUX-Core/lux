@@ -407,7 +407,6 @@ private:
 };
 
 /**
- * FROM Bitcoin src:
  * We use a prevector for the script to reduce the considerable memory overhead
  *  of vectors in cases where they normally contain a small number of small elements.
  * Tests in October 2015 showed use of this reduced dbcache memory usage by 23%
@@ -445,7 +444,7 @@ public:
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion) {
+    inline void SerializationOp(Stream& s, Operation ser_action) {
         READWRITE(static_cast<CScriptBase&>(*this));
     }
 

@@ -23,30 +23,31 @@ public:
     m_remaining(txToLen)
     {}
 
-    TxInputStream& read(char* pch, size_t nSize)
+    void read(char* pch, size_t nSize)
     {
         if (nSize > m_remaining)
             throw std::ios_base::failure(std::string(__func__) + ": end of data");
 
-        if (pch == NULL)
+        if (pch == nullptr)
             throw std::ios_base::failure(std::string(__func__) + ": bad destination buffer");
 
-        if (m_data == NULL)
+        if (m_data == nullptr)
             throw std::ios_base::failure(std::string(__func__) + ": bad source buffer");
 
         memcpy(pch, m_data, nSize);
         m_remaining -= nSize;
         m_data += nSize;
-        return *this;
     }
 
     template<typename T>
     TxInputStream& operator>>(T& obj)
     {
-        ::Unserialize(*this, obj, m_type, m_version);
+        ::Unserialize(*this, obj);
         return *this;
     }
 
+    int GetVersion() const { return m_version; }
+    int GetType() const { return m_type; }
 private:
     const int m_type;
     const int m_version;
@@ -61,14 +62,13 @@ inline int set_error(bitcoinconsensus_error* ret, bitcoinconsensus_error serror)
     return 0;
 }
 
-    struct ECCryptoClosure
-    {
-        ECCVerifyHandle handle;
-    };
+struct ECCryptoClosure
+{
+    ECCVerifyHandle handle;
+};
 
-    ECCryptoClosure instance_of_eccryptoclosure;
-
-} // anon namespace
+ECCryptoClosure instance_of_eccryptoclosure;
+} // namespace
 
 static int verify_script(const unsigned char *scriptPubKey, unsigned int scriptPubKeyLen, CAmount amount,
                                     const unsigned char *txTo        , unsigned int txToLen,
@@ -76,11 +76,10 @@ static int verify_script(const unsigned char *scriptPubKey, unsigned int scriptP
 {
     try {
         TxInputStream stream(SER_NETWORK, PROTOCOL_VERSION, txTo, txToLen);
-        CTransaction tx;
-        stream >> tx;
+        CTransaction tx(deserialize, stream);
         if (nIn >= tx.vin.size())
             return set_error(err, bitcoinconsensus_ERR_TX_INDEX);
-        if (tx.GetSerializeSize(SER_NETWORK, PROTOCOL_VERSION) != txToLen)
+        if (GetSerializeSize(tx, SER_NETWORK, PROTOCOL_VERSION) != txToLen)
             return set_error(err, bitcoinconsensus_ERR_TX_SIZE_MISMATCH);
 
         // Regardless of the verification result, the tx did not error.

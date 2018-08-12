@@ -67,8 +67,9 @@ void ProcessMessageDarksend(CNode* pfrom, const std::string& strCommand, CDataSt
         }
 
         int sessionID;
-        CTransaction txNew;
-        vRecv >> sessionID >> txNew;
+        CTransactionRef ptx;
+        vRecv >> sessionID >> ptx;
+        CTransaction txNew = *ptx;
 
         if (darkSendPool.sessionID != sessionID) {
             if (fDebug) LogPrintf("dsf - message doesn't match current darksend session %d %d\n", darkSendPool.sessionID, sessionID);
@@ -124,8 +125,9 @@ void ProcessMessageDarksend(CNode* pfrom, const std::string& strCommand, CDataSt
         }
 
         int nDenom;
-        CTransaction txCollateral;
-        vRecv >> nDenom >> txCollateral;
+        CTransactionRef ptx;
+        vRecv >> nDenom >> ptx;
+        CTransaction txCollateral = *ptx;
 
         std::string error = "";
         int mn = GetMasternodeByVin(activeMasternode.vin);
@@ -229,9 +231,10 @@ void ProcessMessageDarksend(CNode* pfrom, const std::string& strCommand, CDataSt
 
         std::vector<CTxIn> in;
         int64_t nAmount;
-        CTransaction txCollateral;
         std::vector<CTxOut> out;
-        vRecv >> in >> nAmount >> txCollateral >> out;
+        CTransactionRef ptx;
+        vRecv >> in >> nAmount >> ptx >> out;
+        CTransaction txCollateral = *ptx;
 
         //do we have enough users in the current session?
         if (!darkSendPool.IsSessionReady()) {
@@ -281,11 +284,11 @@ void ProcessMessageDarksend(CNode* pfrom, const std::string& strCommand, CDataSt
 
                 if (fDebug) LogPrintf("dsi -- tx in %s\n", i.ToString().c_str());
 
-                CTransaction tx2;
+                CTransactionRef tx2;
                 uint256 hash;
                 if (GetTransaction(i.prevout.hash, tx2, Params().GetConsensus(), hash)) {
-                    if (tx2.vout.size() > i.prevout.n) {
-                        nValueIn += tx2.vout[i.prevout.n].nValue;
+                    if (tx2->vout.size() > i.prevout.n) {
+                        nValueIn += tx2->vout[i.prevout.n].nValue;
                     }
                 } else {
                     missingTx = true;
@@ -416,22 +419,22 @@ int GetInputDarksendRounds(CTxIn in, int rounds) {
     const CWalletTx* wtx = pwalletMain->GetWalletTx(in.prevout.hash);
     if (wtx != NULL) {
         // bounds check
-        if (in.prevout.n >= wtx->vout.size()) return -4;
+        if (in.prevout.n >= wtx->tx->vout.size()) return -4;
 
-        if (wtx->vout[in.prevout.n].nValue == DARKSEND_FEE) return -3;
+        if (wtx->tx->vout[in.prevout.n].nValue == DARKSEND_FEE) return -3;
 
         //make sure the final output is non-denominate
-        if (rounds == 0 && !pwalletMain->IsDenominatedAmount(wtx->vout[in.prevout.n].nValue)) return -2; //NOT DENOM
+        if (rounds == 0 && !pwalletMain->IsDenominatedAmount(wtx->tx->vout[in.prevout.n].nValue)) return -2; //NOT DENOM
 
         bool found = false;
-        for (CTxOut out : wtx->vout) {
+        for (CTxOut out : wtx->tx->vout) {
             found = pwalletMain->IsDenominatedAmount(out.nValue);
             if (found) break; // no need to loop more
         }
         if (!found) return rounds - 1; //NOT FOUND, "-1" because of the pre-mixing creation of denominated amounts
 
         // find my vin and look that up
-        for (CTxIn in2 : wtx->vin) {
+        for (CTxIn in2 : wtx->tx->vin) {
             if (pwalletMain->IsMine(in2)) {
                 //LogPrintf("rounds :: %s %s %d NEXT\n", padding.c_str(), in.ToString().c_str(), rounds);
                 int n = GetInputDarksendRounds(in2, rounds + 1);
@@ -469,7 +472,7 @@ void CDarkSendPool::SetNull(bool clearEverything) {
     sessionDenom = 0;
     sessionFoundMasternode = false;
     vecSessionCollateral.clear();
-    txCollateral = CTransaction();
+    txCollateral = CMutableTransaction();
 
     if (clearEverything) {
         myEntries.clear();
@@ -527,20 +530,21 @@ void CDarkSendPool::Check() {
 
         if (fMasterNode) {
             // make our new transaction
-            CMutableTransaction txNew;
+            CMutableTransaction mtxNew;
             for (unsigned int i = 0; i < entries.size(); i++) {
                 for (const CTxOut v : entries[i].vout)
-                    txNew.vout.push_back(v);
+                    mtxNew.vout.push_back(v);
 
                 for (const CDarkSendEntryVin s : entries[i].sev)
-                    txNew.vin.push_back(s.vin);
+                    mtxNew.vin.push_back(s.vin);
             }
             // shuffle the outputs for improved anonymity
-            std::random_shuffle(txNew.vout.begin(), txNew.vout.end(), randomizeList);
+            std::random_shuffle(mtxNew.vout.begin(), mtxNew.vout.end(), randomizeList);
 
-            if (fDebug) LogPrintf("Transaction 1: %s\n", txNew.ToString().c_str());
+            if (fDebug) LogPrintf("Transaction 1: %s\n", mtxNew.ToString().c_str());
 
-            SignFinalTransaction(CTransaction(txNew), NULL);
+            const CTransaction& txNew = CTransaction(std::move(mtxNew));
+            SignFinalTransaction(txNew, NULL);
 
             // request signatures from clients
             RelayDarkSendFinalTransaction(sessionID, txNew);
@@ -554,7 +558,7 @@ void CDarkSendPool::Check() {
         if (fDebug) LogPrintf("CDarkSendPool::Check() -- SIGNING\n");
         UpdateState(POOL_STATUS_TRANSMISSION);
 
-        CWalletTx txNew = CWalletTx(pwalletMain, finalTransaction);
+        CWalletTx txNew = CWalletTx(pwalletMain, MakeTransactionRef(std::move(finalTransaction)));
 
         LOCK2(cs_main, pwalletMain->cs_wallet);
         {
@@ -601,7 +605,7 @@ void CDarkSendPool::Check() {
 
                 if (!mapDarksendBroadcastTxes.count(txNew.GetHash())) {
                     CDarksendBroadcastTx dstx;
-                    dstx.tx = txNew;
+                    dstx.tx = *txNew.tx;
                     dstx.vin = activeMasternode.vin;
                     dstx.vchSig = vchSig;
                     dstx.sigTime = sigTime;
@@ -716,7 +720,7 @@ void CDarkSendPool::ChargeFees() {
                 if (!found && r > target) {
                     LogPrintf("CDarkSendPool::ChargeFees -- found uncooperative node (didn't send transaction). charging fees.\n");
 
-                    CWalletTx wtxCollateral = CWalletTx(pwalletMain, txCollateral);
+                    CWalletTx wtxCollateral = CWalletTx(pwalletMain, MakeTransactionRef(std::move(txCollateral)));
 
                     // Broadcast
                     if (!wtxCollateral.AcceptToMemoryPool(true)) {
@@ -736,7 +740,7 @@ void CDarkSendPool::ChargeFees() {
                     if (!s.isSigSet && r > target) {
                         LogPrintf("CDarkSendPool::ChargeFees -- found uncooperative node (didn't sign). charging fees.\n");
 
-                        CWalletTx wtxCollateral = CWalletTx(pwalletMain, v.collateral);
+                        CWalletTx wtxCollateral = CWalletTx(pwalletMain, MakeTransactionRef(v.collateral));
 
                         // Broadcast
                         if (!wtxCollateral.AcceptToMemoryPool(true)) {
@@ -773,7 +777,7 @@ void CDarkSendPool::ChargeRandomFees() {
             if (r <= 20) {
                 LogPrintf("CDarkSendPool::ChargeRandomFees -- charging random fees. %u\n", i);
 
-                CWalletTx wtxCollateral = CWalletTx(pwalletMain, txCollateral);
+                CWalletTx wtxCollateral = CWalletTx(pwalletMain, MakeTransactionRef(std::move(txCollateral)));
 
                 // Broadcast
                 if (!wtxCollateral.AcceptToMemoryPool(true)) {
@@ -918,7 +922,7 @@ bool CDarkSendPool::SignatureValid(const CScript& newSig, const CTxIn& newVin) {
 
         //TODO: !IMPORTANT Script verifying may not work with witness scripts for dark send TXs, should be thoroughly tested
 
-        CTransaction txPrev;
+        CTransactionRef txPrev;
         uint256 prevBlockHash;
         //Find previous transaction with the same output as txNew input
         if (!GetTransaction(txNew.vin[n].prevout.hash, txPrev, Params().GetConsensus(), prevBlockHash)) {
@@ -926,7 +930,7 @@ bool CDarkSendPool::SignatureValid(const CScript& newSig, const CTxIn& newVin) {
             return false;
         }
 
-        const CAmount& amount = txPrev.vout[txNew.vin[n].prevout.n].nValue;
+        const CAmount& amount = txPrev->vout[txNew.vin[n].prevout.n].nValue;
         CScriptWitness* witness;
         int flags = SCRIPT_VERIFY_P2SH | SCRIPT_VERIFY_STRICTENC;
         //If transaction contains witness, then witness script should be verified
@@ -966,11 +970,11 @@ bool CDarkSendPool::IsCollateralValid(const CTransaction& txCollateral) {
     }
 
     for (const CTxIn i : txCollateral.vin) {
-        CTransaction tx2;
+        CTransactionRef tx2;
         uint256 hash;
         if (GetTransaction(i.prevout.hash, tx2, Params().GetConsensus(), hash)) {
-            if (tx2.vout.size() > i.prevout.n) {
-                nValueIn += tx2.vout[i.prevout.n].nValue;
+            if (tx2->vout.size() > i.prevout.n) {
+                nValueIn += tx2->vout[i.prevout.n].nValue;
             }
         } else {
             missingTx = true;
@@ -1244,7 +1248,7 @@ bool CDarkSendPool::SignFinalTransaction(const CTransaction& finalTransactionNew
         return false;
     }
 
-    finalTransaction = finalTransactionNew;
+    finalTransaction = CMutableTransaction(finalTransactionNew);
     LogPrintf("CDarkSendPool::SignFinalTransaction %s\n", finalTransaction.ToString().c_str());
 
     vector <CTxIn> sigs;
@@ -1977,10 +1981,10 @@ bool CDarkSendSigner::IsVinAssociatedWithPubkey(CTxIn& vin, CPubKey& pubkey) {
     CScript payee2;
     payee2 = GetScriptForDestination(pubkey.GetID());
 
-    CTransaction txVin;
+    CTransactionRef txVin;
     uint256 hash;
     if (GetTransaction(vin.prevout.hash, txVin, Params().GetConsensus(), hash)) {
-        CTxOut out = txVin.vout[vin.prevout.n];
+        CTxOut out = txVin->vout[vin.prevout.n];
         if ((out.nValue == GetMNCollateral(chainActive.Height()) * COIN)
             && (out.scriptPubKey == payee2)) {
             return true;

@@ -130,9 +130,9 @@ public:
     ADD_SERIALIZE_METHODS;
 
     template<typename Stream, typename Operation>
-    inline void SerializationOp(Stream &s, Operation ser_action, int nType, int nVersion) {
-        if (!(nType & SER_GETHASH))
-            READWRITE(nVersion);
+    inline void SerializationOp(Stream &s, Operation ser_action) {
+        if (!(s.GetType() & SER_GETHASH))
+            READWRITE(VARINT(s.GetVersion()));
         READWRITE(nTime);
         READWRITE(vchPubKey);
         if (ser_action.ForRead()) { try { READWRITE(fInternal); }
@@ -182,7 +182,7 @@ struct COutputEntry {
 };
 
 /** A transaction with a merkle branch linking it to the block chain. */
-class CMerkleTx : public CTransaction
+class CMerkleTx
 {
 private:
     int GetDepthInMainChainINTERNAL(const CBlockIndex*& pindexRet) const;
@@ -190,6 +190,7 @@ private:
     static const uint256 ABANDON_HASH;
 
 public:
+    CTransactionRef tx;
     uint256 hashBlock;
     std::vector<uint256> vMerkleBranch;
     int nIndex;
@@ -200,11 +201,13 @@ public:
 
     CMerkleTx()
     {
+        SetTx(MakeTransactionRef());
         Init();
     }
 
-    CMerkleTx(const CTransaction& txIn) : CTransaction(txIn)
+    explicit CMerkleTx(CTransactionRef arg)
     {
+        SetTx(std::move(arg));
         Init();
     }
 
@@ -215,13 +218,17 @@ public:
         fMerkleVerified = false;
     }
 
+    void SetTx(CTransactionRef arg)
+    {
+        tx = std::move(arg);
+    }
+
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion)
+    inline void SerializationOp(Stream& s, Operation ser_action)
     {
-        READWRITE(*(CTransaction*)this);
-        nVersion = this->nVersion;
+        READWRITE(tx);
         READWRITE(hashBlock);
         READWRITE(vMerkleBranch);
         READWRITE(nIndex);
@@ -252,6 +259,51 @@ public:
     bool isAbandoned() const { return (hashBlock == ABANDON_HASH); }
     int GetTransactionLockSignatures() const;
     bool IsTransactionLockTimedOut() const;
+
+    //wrappers around CTransactionRef
+    bool IsNull() const { return tx->IsNull(); }
+
+    const uint256& GetHash() const { return tx->GetHash(); }
+
+    void UpdateHash() const { tx->UpdateHash(); }
+
+    // Compute a hash that includes both transaction and witness data
+    uint256 GetWitnessHash() const { return tx->GetWitnessHash(); }
+
+    // Return sum of txouts.
+    CAmount GetValueOut() const { return tx->GetValueOut(); }
+    // GetValueIn() is a method on CCoinsViewCache, because
+    // inputs must be known to compute value in.
+
+    // Compute priority, given priority of inputs and (optionally) tx size
+    double ComputePriority(double dPriorityInputs, unsigned int nTxSize=0) const { return tx->ComputePriority(dPriorityInputs, nTxSize); }
+
+    // Compute modified tx size for priority calculation (optionally given tx size)
+    unsigned int CalculateModifiedSize(unsigned int nTxSize=0) const { return tx->CalculateModifiedSize(nTxSize); }
+    //////////////////////////////////////// // lux
+    bool HasCreateOrCall() const { return tx->HasCreateOrCall(); }
+    bool HasOpSpend() const { return tx->HasOpSpend(); }
+    ////////////////////////////////////////
+
+    /**
+     * Get the total transaction size in bytes, including witness data.
+     * "Total Size" defined in BIP141 and BIP144.
+     * @return Total transaction size in bytes
+     */
+    unsigned int GetTotalSize() const { return tx->GetTotalSize(); }
+
+    bool IsCoinBase() const { return tx->IsCoinBase(); }
+
+    bool IsCoinStake() const { return tx->IsCoinStake(); }
+
+    bool IsCoinGenerated() const { return tx->IsCoinGenerated(); }
+
+    std::string ToString() const { return tx->ToString(); }
+
+    // ppcoin: get transaction coin age
+    bool GetCoinAge(uint64_t& nCoinAge) const { return tx->GetCoinAge(nCoinAge); }
+
+    bool HasWitness() const { return tx->HasWitness(); }
 };
 
 /**
@@ -831,9 +883,10 @@ public:
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion)
+    inline void SerializationOp(Stream& s, Operation ser_action)
     {
-        if (!(nType & SER_GETHASH))
+        int nVersion = s.GetVersion();
+        if (!(s.GetType() & SER_GETHASH))
             READWRITE(nVersion);
         READWRITE(vchPubKey);
     }
@@ -891,17 +944,7 @@ public:
         Init(NULL);
     }
 
-    CWalletTx(const CWallet* pwalletIn)
-    {
-        Init(pwalletIn);
-    }
-
-    CWalletTx(const CWallet* pwalletIn, const CMerkleTx& txIn) : CMerkleTx(txIn)
-    {
-        Init(pwalletIn);
-    }
-
-    CWalletTx(const CWallet* pwalletIn, const CTransaction& txIn) : CMerkleTx(txIn)
+    CWalletTx(const CWallet* pwalletIn, const CTransactionRef arg) : CMerkleTx(std::move(arg))
     {
         Init(pwalletIn);
     }
@@ -950,7 +993,7 @@ public:
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion)
+    inline void SerializationOp(Stream& s, Operation ser_action)
     {
         if (ser_action.ForRead())
             Init(NULL);
@@ -1016,7 +1059,7 @@ public:
     //! filter decides which addresses will count towards the debit
     CAmount GetDebit(const isminefilter& filter) const
     {
-        if (vin.empty())
+        if (tx->vin.empty())
             return 0;
 
         CAmount debit = 0;
@@ -1024,7 +1067,7 @@ public:
             if (fDebitCached)
                 debit += nDebitCached;
             else {
-                nDebitCached = pwallet->GetDebit(*this, ISMINE_SPENDABLE);
+                nDebitCached = pwallet->GetDebit(*tx, ISMINE_SPENDABLE);
                 fDebitCached = true;
                 debit += nDebitCached;
             }
@@ -1033,7 +1076,7 @@ public:
             if (fWatchDebitCached)
                 debit += nWatchDebitCached;
             else {
-                nWatchDebitCached = pwallet->GetDebit(*this, ISMINE_WATCH_ONLY);
+                nWatchDebitCached = pwallet->GetDebit(*tx, ISMINE_WATCH_ONLY);
                 fWatchDebitCached = true;
                 debit += nWatchDebitCached;
             }
@@ -1053,7 +1096,7 @@ public:
             if (fCreditCached)
                 credit += nCreditCached;
             else {
-                nCreditCached = pwallet->GetCredit(*this, ISMINE_SPENDABLE);
+                nCreditCached = pwallet->GetCredit(*tx, ISMINE_SPENDABLE);
                 fCreditCached = true;
                 credit += nCreditCached;
             }
@@ -1062,7 +1105,7 @@ public:
             if (fWatchCreditCached)
                 credit += nWatchCreditCached;
             else {
-                nWatchCreditCached = pwallet->GetCredit(*this, ISMINE_WATCH_ONLY);
+                nWatchCreditCached = pwallet->GetCredit(*tx, ISMINE_WATCH_ONLY);
                 fWatchCreditCached = true;
                 credit += nWatchCreditCached;
             }
@@ -1075,7 +1118,7 @@ public:
         if (IsCoinGenerated() && GetBlocksToMaturity() > 0 && IsInMainChain()) {
             if (fUseCache && fImmatureCreditCached)
                 return nImmatureCreditCached;
-            nImmatureCreditCached = pwallet->GetCredit(*this, ISMINE_SPENDABLE);
+            nImmatureCreditCached = pwallet->GetCredit(*tx, ISMINE_SPENDABLE);
             fImmatureCreditCached = true;
             return nImmatureCreditCached;
         }
@@ -1097,9 +1140,9 @@ public:
 
         CAmount nCredit = 0;
         uint256 hashTx = GetHash();
-        for (unsigned int i = 0; i < vout.size(); i++) {
+        for (unsigned int i = 0; i < tx->vout.size(); i++) {
             if (!pwallet->IsSpent(hashTx, i)) {
-                const CTxOut& txout = vout[i];
+                const CTxOut& txout = tx->vout[i];
                 nCredit += pwallet->GetCredit(txout, ISMINE_SPENDABLE);
                 if (!MoneyRange(nCredit))
                     throw std::runtime_error(std::string(__func__) + " : value out of range");
@@ -1125,12 +1168,12 @@ public:
 
         CAmount nCredit = 0;
         uint256 hashTx = GetHash();
-        for (unsigned int i = 0; i < vout.size(); i++) {
-            const CTxOut& txout = vout[i];
+        for (unsigned int i = 0; i < tx->vout.size(); i++) {
+            const CTxOut& txout = tx->vout[i];
             const CTxIn vin = CTxIn(hashTx, i);
 
             if (pwallet->IsSpent(hashTx, i) || pwallet->IsLockedCoin(hashTx, i)) continue;
-            if (fMasterNode && vout[i].nValue == DARKSEND_COLLATERAL) continue; // do not count MN-like outputs
+            if (fMasterNode && tx->vout[i].nValue == DARKSEND_COLLATERAL) continue; // do not count MN-like outputs
 
             const int rounds = pwallet->GetInputDarkSendRounds(vin);
             if (rounds >= -2 && rounds < nDarksendRounds) {
@@ -1159,8 +1202,8 @@ public:
 
         CAmount nCredit = 0;
         uint256 hashTx = GetHash();
-        for (unsigned int i = 0; i < vout.size(); i++) {
-            const CTxOut& txout = vout[i];
+        for (unsigned int i = 0; i < tx->vout.size(); i++) {
+            const CTxOut& txout = tx->vout[i];
             const CTxIn vin = CTxIn(hashTx, i);
 
             if (pwallet->IsSpent(hashTx, i) || !pwallet->IsDenominated(vin)) continue;
@@ -1190,7 +1233,7 @@ public:
         int nDepth = GetDepthInMainChain(false);
         if (nDepth < 0) return 0;
 
-        bool isUnconfirmed = !IsFinalTx(*this) || (!IsTrusted() && nDepth == 0);
+        bool isUnconfirmed = !IsFinalTx(*tx) || (!IsTrusted() && nDepth == 0);
         if (unconfirmed != isUnconfirmed) return 0;
 
         if (fUseCache) {
@@ -1202,10 +1245,10 @@ public:
 
         CAmount nCredit = 0;
         uint256 hashTx = GetHash();
-        for (unsigned int i = 0; i < vout.size(); i++) {
-            const CTxOut& txout = vout[i];
+        for (unsigned int i = 0; i < tx->vout.size(); i++) {
+            const CTxOut& txout = tx->vout[i];
 
-            if (pwallet->IsSpent(hashTx, i) || !pwallet->IsDenominatedAmount(vout[i].nValue)) continue;
+            if (pwallet->IsSpent(hashTx, i) || !pwallet->IsDenominatedAmount(tx->vout[i].nValue)) continue;
 
             nCredit += pwallet->GetCredit(txout, ISMINE_SPENDABLE);
             if (!MoneyRange(nCredit))
@@ -1227,7 +1270,7 @@ public:
         if (IsCoinBase() && GetBlocksToMaturity() > 0 && IsInMainChain()) {
             if (fUseCache && fImmatureWatchCreditCached)
                 return nImmatureWatchCreditCached;
-            nImmatureWatchCreditCached = pwallet->GetCredit(*this, ISMINE_WATCH_ONLY);
+            nImmatureWatchCreditCached = pwallet->GetCredit(*tx, ISMINE_WATCH_ONLY);
             fImmatureWatchCreditCached = true;
             return nImmatureWatchCreditCached;
         }
@@ -1248,9 +1291,9 @@ public:
             return nAvailableWatchCreditCached;
 
         CAmount nCredit = 0;
-        for (unsigned int i = 0; i < vout.size(); i++) {
+        for (unsigned int i = 0; i < tx->vout.size(); i++) {
             if (!pwallet->IsSpent(GetHash(), i)) {
-                const CTxOut& txout = vout[i];
+                const CTxOut& txout = tx->vout[i];
                 nCredit += pwallet->GetCredit(txout, ISMINE_WATCH_ONLY);
                 if (!MoneyRange(nCredit))
                     throw std::runtime_error("CWalletTx::GetAvailableCredit() : value out of range");
@@ -1266,7 +1309,7 @@ public:
     {
         if (fChangeCached)
             return nChangeCached;
-        nChangeCached = pwallet->GetChange(*this);
+        nChangeCached = pwallet->GetChange(*tx);
         fChangeCached = true;
         return nChangeCached;
     }
@@ -1289,7 +1332,7 @@ public:
     bool IsTrusted() const
     {
         // Quick answer in most cases
-        if (!IsFinalTx(*this))
+        if (!IsFinalTx(*tx))
             return false;
         int nDepth = GetDepthInMainChain();
         if (nDepth >= 1)
@@ -1300,12 +1343,12 @@ public:
             return false;
 
         // Trusted if all inputs are from us and are in the mempool:
-        for (const CTxIn& txin : vin) {
+        for (const CTxIn& txin : tx->vin) {
             // Transactions not sent by us: not trusted
             const CWalletTx* parent = pwallet->GetWalletTx(txin.prevout.hash);
             if (parent == NULL)
                 return false;
-            const CTxOut& parentOut = parent->vout[txin.prevout.n];
+            const CTxOut& parentOut = parent->tx->vout[txin.prevout.n];
             const isminetype t = pwallet->IsMine(parentOut);
             if (t != ISMINE_SPENDABLE)
                 return false;
@@ -1344,16 +1387,16 @@ public:
     int Priority() const
     {
         for (int64_t d : darkSendDenominations)
-            if (tx->vout[i].nValue == d) return 10000;
-        if (tx->vout[i].nValue < 1 * COIN) return 20000;
+            if (tx->tx->vout[i].nValue == d) return 10000;
+        if (tx->tx->vout[i].nValue < 1 * COIN) return 20000;
 
         //nondenom return largest first
-        return static_cast<int>(-(tx->vout[i].nValue / COIN));
+        return static_cast<int>(-(tx->tx->vout[i].nValue / COIN));
     }
 
     CAmount Value() const
     {
-        return tx->vout[i].nValue;
+        return tx->tx->vout[i].nValue;
     }
 
     std::string ToString() const;
@@ -1376,9 +1419,10 @@ public:
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion)
+    inline void SerializationOp(Stream& s, Operation ser_action)
     {
-        if (!(nType & SER_GETHASH))
+        int nVersion = s.GetVersion();
+        if (!(s.GetType() & SER_GETHASH))
             READWRITE(nVersion);
         READWRITE(vchPrivKey);
         READWRITE(nTimeCreated);
@@ -1422,9 +1466,10 @@ public:
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion)
+    inline void SerializationOp(Stream& s, Operation ser_action)
     {
-        if (!(nType & SER_GETHASH))
+        int nVersion = s.GetVersion();
+        if (!(s.GetType() & SER_GETHASH))
             READWRITE(nVersion);
         //! Note: strAccount is serialized as part of the key, not here.
         READWRITE(nCreditDebit);
@@ -1435,7 +1480,7 @@ public:
             WriteOrderPos(nOrderPos, mapValue);
 
             if (!(mapValue.empty() && _ssExtra.empty())) {
-                CDataStream ss(nType, nVersion);
+                CDataStream ss(s.GetType(), s.GetVersion());
                 ss.insert(ss.begin(), '\0');
                 ss << mapValue;
                 ss.insert(ss.end(), _ssExtra.begin(), _ssExtra.end());
@@ -1449,7 +1494,7 @@ public:
         if (ser_action.ForRead()) {
             mapValue.clear();
             if (std::string::npos != nSepPos) {
-                CDataStream ss(std::vector<char>(strComment.begin() + nSepPos + 1, strComment.end()), nType, nVersion);
+                CDataStream ss(std::vector<char>(strComment.begin() + nSepPos + 1, strComment.end()), s.GetType(), s.GetVersion());
                 ss >> mapValue;
                 _ssExtra = std::vector<char>(ss.begin(), ss.end());
             }
@@ -1510,8 +1555,8 @@ public:
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion) {
-        if (!(nType & SER_GETHASH))
+    inline void SerializationOp(Stream& s, Operation ser_action) {
+        if (!(s.GetType() & SER_GETHASH))
         {
             READWRITE(nVersion);
             READWRITE(nCreateTime);
@@ -1564,8 +1609,8 @@ public:
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion) {
-        if (!(nType & SER_GETHASH))
+    inline void SerializationOp(Stream& s, Operation ser_action) {
+        if (!(s.GetType() & SER_GETHASH))
         {
             READWRITE(nVersion);
             READWRITE(nCreateTime);
