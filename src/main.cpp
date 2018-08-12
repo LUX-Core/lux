@@ -5081,7 +5081,7 @@ bool CVerifyDB::VerifyDB(const CChainParams& chainparams, CCoinsView* coinsview,
 
 void UnloadBlockIndex()
 {
-    mapBlockIndex.clear();
+   // LOCK(cs_main);
     setBlockIndexCandidates.clear();
     chainActive.SetTip(NULL);
     pindexBestInvalid = NULL;
