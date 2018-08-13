@@ -238,7 +238,7 @@ public:
     std::string ToString() const;
 };
 
-class CTxinWitness
+class CTxInWitness
 {
 public:
     CScriptWitness scriptWitness;
@@ -253,14 +253,14 @@ public:
 
     bool IsNull() const { return scriptWitness.IsNull(); }
 
-    CTxinWitness() { }
+    CTxInWitness() { }
 };
 
 class CTxWitness
 {
 public:
     /** In case vtxinwit is missing, all entries are treated as if they were empty CTxInWitnesses */
-    std::vector<CTxinWitness> vtxinwit;
+    std::vector<CTxInWitness> vtxinwit;
 
     ADD_SERIALIZE_METHODS;
 
