@@ -139,6 +139,12 @@ static const unsigned int DATABASE_WRITE_INTERVAL = 3600;
 static const unsigned int MAX_REJECT_MESSAGE_LENGTH = 111;
 /** Bloomfilter setting. */
 static const bool DEFAULT_PEERBLOOMFILTERS = true;
+/** Relay local address average delay(s) */
+static const unsigned int RELAY_LOCAL_ADDRESS_INTERVAL = 24 * 24 * 60;
+/** Relay peer address average delay(s) */
+static const unsigned int RELAY_ADDRESS_INTERVAL = 30;
+/** Relay trickled inventory average delay(s) */
+static const unsigned int RELAY_INVENTORY_INTERVAL = 5;
 
 static const unsigned int DEFAULT_BYTES_PER_SIGOP = 20;
 
@@ -294,7 +300,7 @@ bool ProcessMessages(CNode* pfrom);
  * @param[in]   pto             The node which we are sending messages to.
  * @param[in]   fSendTrickle    When true send the trickled data, otherwise trickle the data until true.
  */
-bool SendMessages(CNode* pto, bool fSendTrickle);
+bool SendMessages(CNode* pto);
 /** Run an instance of the script checking thread */
 void ThreadScriptCheck();
 

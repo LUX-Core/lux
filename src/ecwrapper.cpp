@@ -11,8 +11,27 @@
 #include <openssl/ecdsa.h>
 #include <openssl/obj_mac.h>
 
-namespace
-{
+namespace {
+    class ecgroup_order {
+    public:
+        static const EC_GROUP* get() {
+            static const ecgroup_order wrapper;
+            return wrapper.pgroup;
+        }
+
+    private:
+        ecgroup_order()
+                : pgroup(EC_GROUP_new_by_curve_name(NID_secp256k1))
+        {
+        }
+
+        ~ecgroup_order() {
+            EC_GROUP_free(pgroup);
+        }
+
+        EC_GROUP* pgroup;
+    };
+
 /**
  * Perform ECDSA key recovery (see SEC1 4.1.6) for curves over (mod p)-fields
  * recid selects which key is recovered
@@ -65,10 +84,11 @@ namespace
             goto err;
         }
 #if OPENSSL_VERSION_NUMBER >= 0x10100000L
-        if (!BN_add(x, x, sig_r)) {
+        if (!BN_add(x, x, sig_r))
 #else
-        if (!BN_add(x, x, ecsig->r)) {
+        if (!BN_add(x, x, ecsig->r))
 #endif
+        {
             ret = -1;
             goto err;
         }
@@ -125,19 +145,21 @@ namespace
         }
         rr = BN_CTX_get(ctx);
 #if OPENSSL_VERSION_NUMBER >= 0x10100000L
-        if (!BN_mod_inverse(rr, sig_r, order, ctx)) {
+        if (!BN_mod_inverse(rr, sig_r, order, ctx))
 #else
-        if (!BN_mod_inverse(rr, ecsig->r, order, ctx)) {
+        if (!BN_mod_inverse(rr, ecsig->r, order, ctx))
 #endif
+        {
             ret = -1;
             goto err;
         }
         sor = BN_CTX_get(ctx);
 #if OPENSSL_VERSION_NUMBER >= 0x10100000L
-        if (!BN_mod_mul(sor, sig_s, rr, order, ctx)) {
+        if (!BN_mod_mul(sor, sig_s, rr, order, ctx))
 #else
-        if (!BN_mod_mul(sor, ecsig->s, rr, order, ctx)) {
+        if (!BN_mod_mul(sor, ecsig->s, rr, order, ctx))
 #endif
+        {
             ret = -1;
             goto err;
         }
@@ -170,10 +192,12 @@ namespace
 
 } // anon namespace
 
-CECKey::CECKey()
-{
-    pkey = EC_KEY_new_by_curve_name(NID_secp256k1);
+
+CECKey::CECKey() {
+    pkey = EC_KEY_new();
     assert(pkey != NULL);
+    int result = EC_KEY_set_group(pkey, ecgroup_order::get());
+    assert(result);
 }
 
 CECKey::~CECKey()
@@ -281,11 +305,9 @@ bool CECKey::TweakPublic(const unsigned char vchTweak[32])
 
 bool CECKey::SanityCheck()
 {
-    EC_KEY* pkey = EC_KEY_new_by_curve_name(NID_secp256k1);
-    if (pkey == NULL)
+    const EC_GROUP *pgroup = ecgroup_order::get();
+    if(pgroup == NULL)
         return false;
-    EC_KEY_free(pkey);
-
     // TODO Is there more EC functionality that could be missing?
     return true;
 }

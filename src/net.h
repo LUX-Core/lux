@@ -95,7 +95,7 @@ typedef int NodeId;
 struct CNodeSignals {
     boost::signals2::signal<int()> GetHeight;
     boost::signals2::signal<bool(CNode*)> ProcessMessages;
-    boost::signals2::signal<bool(CNode*, bool)> SendMessages;
+    boost::signals2::signal<bool(CNode*)> SendMessages;
     boost::signals2::signal<void(NodeId, const CNode*)> InitializeNode;
     boost::signals2::signal<void(NodeId)> FinalizeNode;
 };
@@ -371,6 +371,8 @@ public:
     mruset<CAddress> setAddrKnown;
     bool fGetAddr;
     std::set<uint256> setKnown;
+    int64_t nNextAddrSend;
+    int64_t nNextLocalAddrSend;
 
     // inventory based relay
     mruset<CInv> setInventoryKnown;
@@ -378,6 +380,7 @@ public:
     CCriticalSection cs_inventory;
     std::multimap<int64_t, CInv> mapAskFor;
     std::vector<uint256> vBlockRequested;
+    int64_t nNextInvSend;
 
     // Ping time measurement:
     // The pong reply we're expecting, or 0 if no pong expected.
@@ -793,6 +796,10 @@ struct AddedNodeInfo
     bool fConnected;
     bool fInbound;
 };
+
+
+// Return a future timestamp (microseconds)
+int64_t nNextSend(int64_t nNow, int average_interval_seconds);
 
 std::vector<AddedNodeInfo> GetAddedNodeInfo();
 
