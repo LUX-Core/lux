@@ -13,8 +13,6 @@
 #include "uint256.h"
 #include "util.h"
 
-#include <boost/foreach.hpp>
-
 using namespace std;
 
 typedef std::vector<unsigned char> valtype;

@@ -36,7 +36,6 @@
 #include <QTimer>
 #include <QFile>
 
-#include <boost/foreach.hpp>
 #include <boost/filesystem.hpp>
 
 WalletModel::WalletModel(CWallet* wallet, OptionsModel* optionsModel, QObject* parent) : QObject(parent), wallet(wallet), optionsModel(optionsModel), addressTableModel(0),

@@ -10,8 +10,6 @@
 #include "optionsmodel.h"
 #include "streams.h"
 
-#include <boost/foreach.hpp>
-
 RecentRequestsTableModel::RecentRequestsTableModel(CWallet* wallet, WalletModel* parent) : walletModel(parent)
 {
     Q_UNUSED(wallet);

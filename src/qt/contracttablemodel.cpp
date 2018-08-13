@@ -5,8 +5,6 @@
 
 #include "wallet.h"
 
-#include <boost/foreach.hpp>
-
 #include <QFont>
 #include <QDebug>
 

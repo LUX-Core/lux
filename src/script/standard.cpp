@@ -11,8 +11,6 @@
 #include "utilstrencodings.h"
 
 
-#include <boost/foreach.hpp>
-
 /////////////////////////////////////////////////////////// lux
 #include <lux/luxstate.h>
 #include <lux/luxtransaction.h>

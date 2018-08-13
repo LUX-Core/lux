@@ -65,8 +65,7 @@ unsigned int ParseScriptFlags(string strFlags)
     vector<string> words;
     split(words, strFlags, is_any_of(","));
 
-    BOOST_FOREACH(string word, words)
-    {
+    for (string word : words) {
         if (!mapFlagNames.count(word))
             BOOST_ERROR("Bad test: unknown verification flag '" << word << "'");
         flags |= mapFlagNames[word];

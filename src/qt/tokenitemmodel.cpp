@@ -5,7 +5,6 @@
 #include "bitcoinunits.h"
 #include "main.h"
 
-#include <boost/foreach.hpp>
 #include <algorithm>
 
 #include <QDateTime>

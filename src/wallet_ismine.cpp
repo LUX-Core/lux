@@ -10,8 +10,6 @@
 #include "script/script.h"
 #include "script/standard.h"
 
-#include <boost/foreach.hpp>
-
 using namespace std;
 
 typedef vector<unsigned char> valtype;

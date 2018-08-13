@@ -734,7 +734,7 @@ bool CMasternodePayments::ProcessBlock(int nBlockHeight) {
 
     std::vector <CTxIn> vecLastPayments;
     int c = 0;
-    BOOST_REVERSE_FOREACH(CMasternodePaymentWinner& winner, vWinning) {
+    for (CMasternodePaymentWinner& winner : reverse_iterate(vWinning)) {
         vecLastPayments.push_back(winner.vin);
         //if we have one full payment cycle, break
         if (++c > (int) vecMasternodes.size()) break;

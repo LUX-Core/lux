@@ -1736,7 +1736,7 @@ bool CDarkSendPool::CreateDenominated(int64_t nTotalValue) {
     }
 
     // ****** Add denoms ************ /
-    BOOST_REVERSE_FOREACH(int64_t v, darkSendDenominations) {
+    for (int64_t v : reverse_iterate(darkSendDenominations)) {
         int nOutputs = 0;
 
         // add each output up to 10 times until it can't be added again
@@ -1919,7 +1919,7 @@ int CDarkSendPool::GetDenominationsByAmounts(std::vector <int64_t>& vecAmount) {
     std::vector<CTxOut> vout1;
 
     // Make outputs by looping through denominations, from small to large
-    BOOST_REVERSE_FOREACH(int64_t v, vecAmount) {
+    for (int64_t v : reverse_iterate(vecAmount)) {
         int nOutputs = 0;
 
         CTxOut o(v, e);
@@ -1937,7 +1937,7 @@ int CDarkSendPool::GetDenominationsByAmount(int64_t nAmount, int nDenomTarget) {
     std::vector<CTxOut> vout1;
 
     // Make outputs by looping through denominations, from small to large
-    BOOST_REVERSE_FOREACH(int64_t v, darkSendDenominations) {
+    for (int64_t v : reverse_iterate(darkSendDenominations)) {
         if (nDenomTarget != 0) {
             bool fAccepted = false;
             if ((nDenomTarget & (1 << 0)) && v == ((100000 * COIN) + 100000000)) { fAccepted = true; }

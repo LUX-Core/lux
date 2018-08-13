@@ -8,8 +8,6 @@
 
 #include <stdint.h>
 
-#include <boost/foreach.hpp>
-
 /*
  * Decompose CWallet transaction to model transaction records.
  */

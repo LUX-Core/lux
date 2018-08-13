@@ -15,8 +15,6 @@
 #include "utilmoneystr.h"
 #include "utilstrencodings.h"
 
-#include <boost/foreach.hpp>
-
 using namespace std;
 
 UniValue ValueFromAmount(const CAmount& amount)

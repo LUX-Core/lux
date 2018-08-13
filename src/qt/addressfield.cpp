@@ -9,7 +9,6 @@
 #include "base58.h"
 #include "qvalidatedlineedit.h"
 #include "bitcoinaddressvalidator.h"
-#include <boost/foreach.hpp>
 #include <QLineEdit>
 #include <QCompleter>
 

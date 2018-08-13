@@ -219,7 +219,7 @@ bool IsIXTXValid(const CTransaction& txCollateral) {
 int64_t CreateNewLock(CTransaction tx) {
 
     int64_t nTxAge = 0;
-    BOOST_REVERSE_FOREACH(CTxIn i, tx.vin) {
+    for (CTxIn i : reverse_iterate(tx.vin)) {
         nTxAge = GetInputAge(i);
         if (nTxAge < 6) {
             LogPrintf("CreateNewLock - Transaction not found / too new: %d / %s\n", nTxAge, tx.GetHash().ToString().c_str());
