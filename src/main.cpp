@@ -5131,18 +5131,18 @@ bool InitBlockIndex(const CChainParams& chainparams)
             CDiskBlockPos blockPos;
             CValidationState state;
             if (!FindBlockPos(state, blockPos, nBlockSize + 8, 0, block.GetBlockTime()))
-                return error("LoadBlockIndex() : FindBlockPos failed");
+                return error("InitBlockIndex() : FindBlockPos failed");
             if (!WriteBlockToDisk(block, blockPos))
-                return error("LoadBlockIndex() : writing genesis block to disk failed");
+                return error("InitBlockIndex() : writing genesis block to disk failed");
             CBlockIndex* pindex = AddToBlockIndex(block);
             if (!ReceivedBlockTransactions(block, state, pindex, blockPos))
-                return error("LoadBlockIndex() : genesis block not accepted");
+                return error("InitBlockIndex() : genesis block not accepted");
             if (!ActivateBestChain(state, chainparams, &block))
-                return error("LoadBlockIndex() : genesis block cannot be activated");
+                return error("InitBlockIndex() : genesis block cannot be activated");
             // Force a chainstate write so that when we VerifyDB in a moment, it doesnt check stale data
             return FlushStateToDisk(state, FLUSH_STATE_ALWAYS);
         } catch (std::runtime_error& e) {
-            return error("LoadBlockIndex() : failed to initialize block database: %s", e.what());
+            return error("InitBlockIndex() : failed to initialize block database: %s", e.what());
         }
     }
 
