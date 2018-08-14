@@ -22,11 +22,9 @@
 #include <stdarg.h>
 
 #include <boost/date_time/posix_time/posix_time.hpp>
-#include <openssl/bio.h>
-#include <openssl/buffer.h>
-#include <openssl/crypto.h> // for OPENSSL_cleanse()
-#include <openssl/evp.h>
 
+#include <openssl/conf.h>
+#include <openssl/rand.h>
 
 #ifndef WIN32
 // for posix_fallocate
@@ -86,9 +84,6 @@
 #include <boost/program_options/detail/config_file.hpp>
 #include <boost/program_options/parsers.hpp>
 #include <boost/thread.hpp>
-#include <openssl/conf.h>
-#include <openssl/crypto.h>
-#include <openssl/rand.h>
 
 // Work around clang compilation problem in Boost 1.46:
 // /usr/include/boost/program_options/detail/config_file.hpp:163:17: error: call to function 'to_internal' that is neither visible in the template definition nor found by argument-dependent lookup
