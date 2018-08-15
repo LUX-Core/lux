@@ -9,10 +9,6 @@
 
 #include "paymentrequestplus.h"
 
-#include <stdexcept>
-
-#include <openssl/x509_vfy.h>
-
 #include <QDateTime>
 #include <QDebug>
 #include <QSslCertificate>

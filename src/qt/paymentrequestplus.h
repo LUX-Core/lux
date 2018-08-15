@@ -6,8 +6,9 @@
 #define BITCOIN_QT_PAYMENTREQUESTPLUS_H
 
 #include "paymentrequest.pb.h"
-
 #include "base58.h"
+
+#include <openssl/x509_vfy.h>
 
 #include <QByteArray>
 #include <QList>
