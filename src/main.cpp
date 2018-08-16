@@ -5233,7 +5233,7 @@ bool LoadExternalBlockFile(const CChainParams& chainparams, FILE* fileIn, CDiskB
                         pindexPrev = LookupBlockIndex(block.hashPrevBlock);
                         usePhi2 = pindexPrev ? pindexPrev->nHeight + 1 >= Params().SwitchPhi2Block() : false;
                         hash = block.GetHash(usePhi2);
-                        int nHeight = mapBlockIndex[hash]->nHeight;
+                        int nHeight = mapBlockIndex[hash] ? mapBlockIndex[hash]->nHeight : pindexPrev->nHeight;
                         if (ReadBlockFromDisk(block, it->second, nHeight, chainparams.GetConsensus())) {
                             LogPrintf("%s: Processing out of order child %s of %s\n", __func__, block.GetHash(usePhi2).ToString(),
                                 head.ToString());
