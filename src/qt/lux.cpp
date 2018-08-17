@@ -20,7 +20,11 @@
 #include "splashscreen.h"
 #include "utilitydialog.h"
 #include "winshutdownmonitor.h"
-
+#if 0
+//////////////////////////////// luxgate
+#include "luxgate/luxgatecore.h"
+////////////////////////////////
+#endif
 #ifdef ENABLE_WALLET
 #include "paymentserver.h"
 #include "walletmodel.h"

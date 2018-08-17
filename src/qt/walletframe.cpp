@@ -120,7 +120,14 @@ void WalletFrame::gotoHistoryPage()
     for (i = mapWalletViews.constBegin(); i != mapWalletViews.constEnd(); ++i)
         i.value()->gotoHistoryPage();
 }
-
+#if 0
+void WalletFrame::gotoLuxgatePage()
+{
+    QMap<QString, WalletView*>::const_iterator i;
+    for (i = mapWalletViews.constBegin(); i != mapWalletViews.constEnd(); ++i)
+        i.value()->gotoLuxgatePage();
+}
+#endif
 void WalletFrame::gotoTradingPage()
 {
     QMap<QString, WalletView*>::const_iterator i;

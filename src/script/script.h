@@ -480,6 +480,10 @@ public:
         return *this;
     }
 
+    CScript& operator<<(const uint160& b) { insert(end(), sizeof(b)); insert(end(), (unsigned char*)&b, (unsigned char*)&b + sizeof(b)); return *this; }
+
+    CScript& operator<<(const uint256& b) { insert(end(), sizeof(b)); insert(end(), (unsigned char*)&b, (unsigned char*)&b + sizeof(b)); return *this; }
+
     CScript& operator<<(const CScriptNum& b)
     {
         *this << b.getvch();

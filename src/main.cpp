@@ -40,7 +40,11 @@
 #include "validationinterface.h"
 #include "versionbits.h"
 #include "script/interpreter.h"
-
+#if 0
+///////////////////////////// luxgate
+#include "luxgate/luxgatecore.h"
+/////////////////////////////
+#endif
 #include "univalue/univalue.h"
 #include <atomic>
 #include <sstream>
@@ -6534,7 +6538,40 @@ static bool ProcessMessage(CNode* pfrom, const string &strCommand, CDataStream& 
             }
         }
     }
+#if 0
+    else if (strCommand == "luxgate") {
+        static bool isEnabled = LuxgateCore::isEnabled();
+        if (isEnabled){
+            std::vector<unsigned char> raw;
+            vRecv >> raw;
+            uint256 hash = Hash(raw.begin(), raw.end());
+            if (!pfrom->setKnown.count(hash)){
+                pfrom->setKnown.insert(hash);
+                {
+                    LOCK(cs_vNodes);
+                    for  (CNode * pnode : vNodes){
+                        if (pnode->setKnown.insert(hash).second){
+                            pnode->PushMessage("luxgate", raw);
+                        }
+                    }
+                }
 
+                if (raw.size() > 20 + sizeof(time_t)){
+                    static std::vector<unsigned char> zero(20, 0);
+                    std::vector<unsigned char> addr(raw.begin(), raw.begin()+20);
+                    raw.erase(raw.begin(), raw.begin()+20);
+                    raw.erase(raw.begin(), raw.begin()+sizeof(uint64_t));
+                    LuxgateCore & app = LuxgateCore::instance();
+                    if (addr != zero){
+                        app.onMessageReceived(addr, raw);
+                    } else {
+                        app.onBroadcastReceived(raw);
+                    }
+                }
+            }
+        }
+    }
+#endif
 
     else {
         bool processed = false;

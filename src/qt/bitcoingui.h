@@ -141,7 +141,11 @@ private:
     QAction* smartContractAction;
     QAction* LSRTokenAction;
     QAction* openHexAddressAction;
-
+#if 0
+////////////////////////////////////// luxgate
+    QAction* luxgateAction;
+//////////////////////////////////////
+#endif
     QSystemTrayIcon* trayIcon;
     QMenu* trayIconMenu;
     Notificator* notificator;
@@ -225,6 +229,10 @@ private slots:
     void gotoOverviewPage();
     /** Switch to history (transactions) page */
     void gotoHistoryPage();
+#if 0
+    /** Switch to luxgate page */
+    void gotoLuxgatePage();
+#endif
     /** Switch to trading page */
     void gotoTradingPage();
     /** Switch to Explorer Page */

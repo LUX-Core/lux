@@ -27,8 +27,9 @@ class CreateContract;
 class SendToContract;
 class CallContractPage;
 class LSRToken;
-
-
+#if 0
+class MessagesDialog;
+#endif
 QT_BEGIN_NAMESPACE
 class QLabel;
 class QModelIndex;
@@ -80,7 +81,10 @@ private:
     MasternodeManager* masternodeManagerPage;
 
     TransactionView* transactionView;
-
+#if 0
+    MessagesDialog* messagesPage;
+    QWidget* luxgatePage;
+#endif
     QProgressDialog* progressDialog;
     QLabel* transactionSum;
     //const PlatformStyle *platformStyle;
@@ -92,6 +96,11 @@ public slots:
     void gotoHistoryPage();
     /** Switch to trading page */
     void gotoTradingPage();
+
+#if 0
+    /** Switch to luxgate page */
+    void gotoLuxgatePage();
+#endif
     /** Switch to masternode page */
     void gotoMasternodePage();
     /** Switch to smart contract page */

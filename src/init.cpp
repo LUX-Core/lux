@@ -38,6 +38,11 @@
 #include "utilmoneystr.h"
 #include "validationinterface.h"
 #include "random.h"
+#if 0
+/////////////////////////////////// luxgate
+#include "luxgate/luxgatecore.h"
+///////////////////////////////////
+#endif
 #ifdef ENABLE_WALLET
 #include "db.h"
 #include "wallet.h"
@@ -1836,7 +1841,11 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
     }
     }
 #endif
-
+#if 0
+    // start luxgate
+    LuxgateCore & lux_gate = LuxgateCore::instance();
+    lux_gate.start();
+#endif
     return !fRequestShutdown;
 }
 

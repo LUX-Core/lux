@@ -22,7 +22,12 @@
 #include "stake.h"
 #include "main.h"
 #include "hexaddressconverter.h"
-
+#if 0
+////////////////////////////////////// luxgate
+#include "luxgate/luxgatecore.h"
+#include "luxgate/luxgatedex.h"
+//////////////////////////////////////
+#endif
 #ifdef ENABLE_WALLET
 #include "blockexplorer.h"
 #include "walletframe.h"
@@ -153,6 +158,14 @@ BitcoinGUI::BitcoinGUI(const NetworkStyle* networkStyle, QWidget* parent) : QMai
     setWindowIcon(networkStyle->getAppIcon());
 #else
     MacDockIconHandler::instance()->setIcon(networkStyle->getAppIcon());
+#endif
+#if 0
+/////////////////////////////////////////////////////////////////// luxgate
+    LuxgateDEX & e = LuxgateDEX::instance();
+    if (e.isEnabled()) {
+        windowTitle += QString(" [%1] ").arg(tr("Luxgate"));
+    }
+////////////////////////////////////////////////////////////////////
 #endif
     setWindowTitle(windowTitle);
 
@@ -370,6 +383,17 @@ void BitcoinGUI::createActions(const NetworkStyle* networkStyle) {
 
 
 #ifdef ENABLE_WALLET
+#if 0
+//////////////////////////////////////////////////////////////////////////////////////// luxgate
+    luxgateAction = new QAction(QIcon(":/icons/luxgate"), tr("&Luxgate"), this);
+    luxgateAction->setToolTip(tr("Show luxgate dialog"));
+    luxgateAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_6));
+    luxgateAction->setCheckable(true);
+    if (LuxgateCore::isEnabled()) {
+        tabGroup->addAction(luxgateAction);
+    }
+/////////////////////////////////////////////////////////////////////////////////////////
+#endif
     masternodeAction = new QAction(QIcon(":/icons/masternodes"), tr("&Masternodes"), this);
     QSettings settings;
     if (settings.value("fShowMasternodesTab").toBool()) {
@@ -413,7 +437,10 @@ void BitcoinGUI::createActions(const NetworkStyle* networkStyle) {
     connect(historyAction, SIGNAL(triggered()), this, SLOT(gotoHistoryPage()));
     connect(tradingAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
     connect(tradingAction, SIGNAL(triggered()), this, SLOT(gotoTradingPage()));
-#endif // ENABLE_WALLET
+#if 0
+    connect(luxgateAction, SIGNAL(triggered()), this, SLOT(gotoLuxgatePage()));
+#endif
+    #endif // ENABLE_WALLET
 
     quitAction = new QAction(QIcon(":/icons/quit"), tr("E&xit"), this);
     quitAction->setStatusTip(tr("Quit application"));
@@ -844,7 +871,13 @@ void BitcoinGUI::gotoHistoryPage()
     historyAction->setChecked(true);
     if (walletFrame) walletFrame->gotoHistoryPage();
 }
-
+#if 0
+void BitcoinGUI::gotoLuxgatePage()
+{
+    luxgateAction->setChecked(true);
+    if (walletFrame) walletFrame->gotoLuxgatePage();
+}
+#endif
 void BitcoinGUI::gotoTradingPage()
 {
     tradingAction->setChecked(true);

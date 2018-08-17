@@ -27,7 +27,12 @@
 #include "smartcontract.h"
 #include "lsrtoken.h"
 #include "restoredialog.h"
-
+#if 0
+////////////////////////////////////////// luxgate
+#include "luxgate/luxgatecore.h"
+#include "luxgateui/luxgatetview.h"
+//////////////////////////////////////////
+#endif
 #include "ui_interface.h"
 
 #include <QAction>
@@ -55,6 +60,11 @@ WalletView::WalletView(QWidget* parent) : QStackedWidget(parent),
     QVBoxLayout* vbox = new QVBoxLayout();
     QHBoxLayout* hbox_buttons = new QHBoxLayout();
     transactionView = new TransactionView(this);
+#if 0
+//////////////////////////////////////////////////// luxgate
+    luxgatePage = new LuxgateTxView(this)
+////////////////////////////////////////////////////
+#endif
     vbox->addWidget(transactionView);
     QPushButton *exportButton = new QPushButton(tr("&Export"), this);
     exportButton->setToolTip(tr("Export the data in the current tab to a file"));
@@ -92,7 +102,11 @@ WalletView::WalletView(QWidget* parent) : QStackedWidget(parent),
     addWidget(explorerWindow);
     addWidget(smartContractPage);   // Testing
     addWidget(LSRTokenPage);
-
+#if 0
+    if (LuxgateCore::isEnabled()) {
+        addWidget(luxgatePage);
+    }
+#endif
     QSettings settings;
     if (settings.value("fShowMasternodesTab").toBool()) {
         masternodeManagerPage = new MasternodeManager();
@@ -250,7 +264,12 @@ void WalletView::gotoHistoryPage()
 {
     setCurrentWidget(transactionsPage);
 }
-
+#if 0
+void WalletView::gotoLuxgatePage()
+{
+    setCurrentWidget(luxgatePage);
+}
+#endif
 void WalletView::gotoTradingPage()
 {
     setCurrentWidget(tradingPage);
