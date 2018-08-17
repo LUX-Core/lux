@@ -311,23 +311,14 @@
            </widget>
           </item>
           <item>
-           <widget class="QCheckBox" name="parallelMasterNode1">
-            <property name="toolTip">
-             <string>Coming soon</string>
-            </property>
+           <widget class="QCheckBox" name="notUseChangeAddress">
             <property name="text">
-             <string>&amp;Activate Parallel Masternode</string>
+             <string>Don't use change &amp;address</string>
             </property>
            </widget>
           </item>
+
             <item>
-                 <widget class="QCheckBox" name="notUseChangeAddress">
-                     <property name="text">
-                         <string>Don't use change &amp;address</string>
-                     </property>
-                 </widget>
-            </item>
-			      <item>
               <layout class="QHBoxLayout" name="horizontalLayout_1_Wallet">
                 <item>
                   <widget class="QLabel" name="walletBackupslabel">
@@ -351,6 +342,7 @@
                 </item>
               </layout>
             </item>
+
          </layout>
         </widget>
        </item>
