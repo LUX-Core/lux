@@ -351,8 +351,9 @@ public:
 
         //vFixedSeeds.clear();
         //vSeeds.clear();
-        vSeeds.push_back(CDNSSeedData("luxtest1", "140.82.45.100"));
-        vSeeds.push_back(CDNSSeedData("luxtest2", "144.202.3.186"));
+        vSeeds.push_back(CDNSSeedData("178.128.29.66", "178.128.29.66"));
+        vSeeds.push_back(CDNSSeedData("51.15.76.137", "51.15.76.137"));
+        vSeeds.push_back(CDNSSeedData("89.3.178.185", "89.3.178.185"));
 
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1, 48); // Testnet lux addresses start with 'l'
         base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1, 63);  // Testnet lux script addresses start with 'S'
