@@ -317,6 +317,10 @@ crypto_libbitcoin_crypto_a_SOURCES = \
   cpp-ethereum/utils/libscrypt/slowequals.h \
   cpp-ethereum/utils/libscrypt/sysendian.h
 
+if USE_ASM
+crypto_libbitcoin_crypto_a_SOURCES += crypto/sha256_sse4.cpp
+endif
+
 # univalue JSON library
 univalue_libbitcoin_univalue_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
 univalue_libbitcoin_univalue_a_SOURCES = \
