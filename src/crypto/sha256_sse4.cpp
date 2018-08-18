@@ -5,10 +5,16 @@
 // This is a translation to GCC extended asm syntax from YASM code by Intel
 // (available at the bottom of this file).
 
+// Note: This SSE implementation requires x64 compilation (xmm8-12 registers)
+
 #include <stdint.h>
 #include <stdlib.h>
 
 #if defined(__x86_64__) || defined(__amd64__)
+
+#ifndef __SSE4_1__
+#error "SSE4.1 not enabled, please compile with -msse4.1 C++ flag"
+#endif
 
 namespace sha256_sse4
 {

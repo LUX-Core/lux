@@ -9,11 +9,11 @@
 #include <string.h>
 #include <atomic>
 
-#if defined(__x86_64__) || defined(__amd64__)
-#if defined(USE_ASM)
+#if defined(USE_ASM) && (defined(__x86_64__) || defined(__amd64__) || defined(__i686__))
+#define CAN_USE_CPUID
 #include <cpuid.h>
-namespace sha256_sse4
-{
+#if defined(__x86_64__) || defined(__amd64__)
+namespace sha256_sse4 {
 void Transform(uint32_t* s, const unsigned char* chunk, size_t blocks);
 }
 #endif
@@ -176,17 +176,35 @@ TransformType Transform = sha256::Transform;
 
 } // namespace
 
-std::string SHA256AutoDetect()
+#ifdef CAN_USE_CPUID
+
+// We can't use __get_cpuid as it does not support subleafs.
+void inline cpuid(uint32_t leaf, uint32_t subleaf, uint32_t& a, uint32_t& b, uint32_t& c, uint32_t& d)
 {
-#if defined(USE_ASM) && (defined(__x86_64__) || defined(__amd64__))
-    uint32_t eax, ebx, ecx, edx;
-    if (__get_cpuid(1, &eax, &ebx, &ecx, &edx) && (ecx >> 19) & 1) {
-        Transform = sha256_sse4::Transform;
-        assert(SelfTest(Transform));
-        return "sse4";
-    }
+#ifdef __GNUC__
+    __cpuid_count(leaf, subleaf, a, b, c, d);
+#elif defined(USE_ASM)
+    __asm__ ("cpuid" : "=a"(a), "=b"(b), "=c"(c), "=d"(d) : "0"(leaf), "2"(subleaf));
+#endif
+}
+
 #endif
 
+std::string SHA256AutoDetect()
+{
+#ifdef CAN_USE_CPUID
+    uint32_t a = 0, b = 0, c = 0, d = 0;
+    cpuid(1, 0, a, b, c, d);
+    if ((c >> 19) & 1) { // have_sse4
+#ifdef (defined(__x86_64__) || defined(__amd64__))
+        // note: asm not compatible 32-bit
+        if (SelfTest(sha256_sse4::Transform)) {
+            Transform = sha256_sse4::Transform;
+            return "sse4";
+        }
+#endif
+    }
+#endif
     assert(SelfTest(Transform));
     return "standard";
 }
