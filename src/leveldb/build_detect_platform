@@ -159,6 +159,10 @@ case "$TARGET_OS" in
         PLATFORM_SOURCES="util/env_win.cc"
         PLATFORM_LIBS="-lshlwapi"
         PORT_FILE=port/port_win.cc
+        PLATFORM_SHARED_EXT=
+        PLATFORM_SHARED_LDFLAGS=
+        PLATFORM_SHARED_CFLAGS=
+        PLATFORM_SHARED_VERSIONED=
         CROSS_COMPILE=true
         ;;
     *)
