@@ -63,8 +63,9 @@ cp ../src/config/implementation.hpp "$INCLUDE_DIR/boost/unordered/detail/impleme
 cp ../src/config/condition_variable.hpp "$INCLUDE_DIR/boost/thread/win32/condition_variable.hpp"
 
 cd ..
+TARGET_ARCH_FLAGS="-march=core2" # arch samples: core2 atom corei7 corei7-avx
 ./autogen.sh windows $PLATFORM $INSTALL_DIR
-./configure --prefix=$PWD/depends/$PLATFORM --host=$PLATFORM --disable-shared --enable-reduce-exports CPPFLAGS="-DMINIUPNP_STATICLIB" CFLAGS="-std=c99" LDFLAGS="-static -static-libgcc -Wl,-Bstatic -lstdc++" CXXFLAGS="-march=core2"
+./configure --prefix=$PWD/depends/$PLATFORM --host=$PLATFORM --disable-shared --enable-reduce-exports CPPFLAGS="$TARGET_ARCH_FLAGS -DMINIUPNP_STATICLIB" CFLAGS="-std=c99" LDFLAGS="-static -static-libgcc -Wl,-Bstatic -lstdc++"
 
 # Build the application
 make -j$(nproc) #--trace
