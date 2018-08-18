@@ -196,7 +196,7 @@ std::string SHA256AutoDetect()
     uint32_t a = 0, b = 0, c = 0, d = 0;
     cpuid(1, 0, a, b, c, d);
     if ((c >> 19) & 1) { // have_sse4
-#ifdef (defined(__x86_64__) || defined(__amd64__))
+#if (defined(__x86_64__) || defined(__amd64__))
         // note: asm not compatible 32-bit
         if (SelfTest(sha256_sse4::Transform)) {
             Transform = sha256_sse4::Transform;
