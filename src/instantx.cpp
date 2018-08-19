@@ -22,7 +22,7 @@ std::map<uint256, CConsensusVote> mapTxLockVote;
 std::map<uint256, CTransactionLock> mapTxLocks;
 std::map<COutPoint, uint256> mapLockedInputs;
 std::map<uint256, int64_t> mapUnknownVotes; //track votes with no tx for DOS
-int nCompleteTXLocks;
+int nCompleteTXLocks = 0;
 
 //txlock - Locks transaction
 //
