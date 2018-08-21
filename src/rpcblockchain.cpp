@@ -101,7 +101,7 @@ UniValue blockToJSON(const CBlock& block, const CBlockIndex* blockindex, bool tx
     result.push_back(Pair("bits", strprintf("%08x", block.nBits)));
     result.push_back(Pair("difficulty", GetDifficulty(blockindex)));
     result.push_back(Pair("flags", strprintf("%s%s", blockindex->IsProofOfStake()?"proof-of-stake":"proof-of-work",
-                                                     blockindex->IsProofOfStake()? (blockindex->GeneratedStakeModifier()?" stake-modifier":"") : "")));
+            blockindex->IsProofOfStake() && blockindex->GeneratedStakeModifier()?" stake-modifier":"")));
     result.push_back(Pair("chainwork", blockindex->nChainWork.GetHex()));
 
     if (blockindex->pprev)
