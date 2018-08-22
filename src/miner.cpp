@@ -371,12 +371,34 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
 
     nBlockMaxSize = blockSizeDGP ? blockSizeDGP : nBlockMaxSize;
 
-    dev::h256 oldHashStateRoot(globalState->rootHash());
-    dev::h256 oldHashUTXORoot(globalState->rootHashUTXO());
+    CBlockIndex* pindexState = chainActive.Tip();
+    dev::h256 oldHashStateRoot;
+    dev::h256 oldHashUTXORoot;
+    if (chainActive.Height() >= chainparams.FirstSCBlock()) {
+        try {
+            oldHashStateRoot = dev::h256(globalState->rootHash()); // lux
+        } catch (std::exception& e) {
+            // When root node is empty, it will throw exception. We must re-initialize value
+            oldHashStateRoot = dev::sha3(dev::rlp(""));
+            if (pindexState->pprev->hashStateRoot != uint256() && pindexState->pprev->hashUTXORoot != uint256()) {
+                oldHashStateRoot = uintToh256(pindexState->pprev->hashStateRoot);
+            }
+        }
+
+        try {
+            oldHashUTXORoot = dev::h256(globalState->rootHashUTXO()); // lux
+        } catch (std::exception& e) {
+            // When root node is empty, it will throw exception. We must re-initialize value
+            oldHashUTXORoot = dev::sha3(dev::rlp(""));
+            if (pindexState->pprev->hashStateRoot != uint256() && pindexState->pprev->hashUTXORoot != uint256()) {
+                oldHashUTXORoot = uintToh256(pindexState->pprev->hashUTXORoot);
+            }
+        }
+    }
     addPriorityTxs(minGasPrice);
     addPackageTxs(minGasPrice);
-    pblock->hashStateRoot = uint256(h256Touint(dev::h256(globalState->rootHash())));
-    pblock->hashUTXORoot = uint256(h256Touint(dev::h256(globalState->rootHashUTXO())));
+    pblock->hashStateRoot = uint256(h256Touint(oldHashStateRoot));
+    pblock->hashUTXORoot = uint256(h256Touint(oldHashUTXORoot));
     globalState->setRoot(oldHashStateRoot);
     globalState->setRootUTXO(oldHashUTXORoot);
 
@@ -545,8 +567,30 @@ bool BlockAssembler::AttemptToAddContractToBlock(CTxMemPool::txiter iter, uint64
         return false;
     }
 
-    dev::h256 oldHashStateRoot(globalState->rootHash());
-    dev::h256 oldHashUTXORoot(globalState->rootHashUTXO());
+    CBlockIndex* pindexState = chainActive.Tip();
+    dev::h256 oldHashStateRoot;
+    dev::h256 oldHashUTXORoot;
+    if (chainActive.Height() >= chainparams.FirstSCBlock()) {
+        try {
+            oldHashStateRoot = dev::h256(globalState->rootHash()); // lux
+        } catch (std::exception& e) {
+            // When root node is empty, it will throw exception. We must re-initialize value
+            oldHashStateRoot = dev::sha3(dev::rlp(""));
+            if (pindexState->pprev->hashStateRoot != uint256() && pindexState->pprev->hashUTXORoot != uint256()) {
+                oldHashStateRoot = uintToh256(pindexState->pprev->hashStateRoot);
+            }
+        }
+
+        try {
+            oldHashUTXORoot = dev::h256(globalState->rootHashUTXO()); // lux
+        } catch (std::exception& e) {
+            // When root node is empty, it will throw exception. We must re-initialize value
+            oldHashUTXORoot = dev::sha3(dev::rlp(""));
+            if (pindexState->pprev->hashStateRoot != uint256() && pindexState->pprev->hashUTXORoot != uint256()) {
+                oldHashUTXORoot = uintToh256(pindexState->pprev->hashUTXORoot);
+            }
+        }
+    }
     // operate on local vars first, then later apply to `this`
     uint64_t nBlockWeight = this->nBlockWeight;
     uint64_t nBlockSize = this->nBlockSize;
