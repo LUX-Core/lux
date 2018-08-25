@@ -2214,17 +2214,14 @@ bool DisconnectBlock(CBlock& block, CValidationState& state, CBlockIndex* pindex
 
     // move best block pointer to prevout block
     view.SetBestBlock(pindex->pprev->GetBlockHash());
-//#if 0
-      if (pindex->nHeight > Params().FirstSCBlock()) {
-        globalState->setRoot(uintToh256(pindex->pprev->hashStateRoot)); // lux
-        globalState->setRootUTXO(uintToh256(pindex->pprev->hashUTXORoot)); // lux
 
-        if (pfClean == NULL && fLogEvents) {
-            pstorageresult->deleteResults(block.vtx);
-            pblocktree->EraseHeightIndex(pindex->nHeight);
-        }
-   }
-//#endif
+    setGlobalStateRoot(uintToh256(pindex->pprev->hashStateRoot));
+    setGlobalStateUTXO(uintToh256(pindex->pprev->hashUTXORoot));
+    if (fClean == false && fLogEvents) {
+        pstorageresult->deleteResults(block.vtx);
+        pblocktree->EraseHeightIndex(pindex->nHeight);
+    }
+
     if (pfClean) {
         *pfClean = fClean;
         return true;
@@ -2720,31 +2717,8 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
     ////////////////////////////////////////////////////////////////// // lux
     if (pindex->nHeight >= Params().FirstSCBlock()) {
 
-        if (globalState == nullptr)
-            return error("%s: globalState is not yet initialized!\n", __func__);
-
-        dev::h256 oldHashStateRoot;
-        dev::h256 oldHashUTXORoot;
-        try {
-            oldHashStateRoot = dev::h256(globalState->rootHash()); // lux
-        } catch (std::exception& e) {
-            // When root node is empty, it will throw exception. We must re-initialize value
-            oldHashStateRoot = dev::sha3(dev::rlp(""));
-            if (pindex->pprev->hashStateRoot != uint256() && pindex->pprev->hashUTXORoot != uint256()) {
-                oldHashStateRoot = uintToh256(pindex->pprev->hashStateRoot);
-            }
-        }
-
-        try {
-            oldHashUTXORoot = dev::h256(globalState->rootHashUTXO()); // lux
-        } catch (std::exception& e) {
-            // When root node is empty, it will throw exception. We must re-initialize value
-            oldHashUTXORoot = dev::sha3(dev::rlp(""));
-            if (pindex->pprev->hashStateRoot != uint256() && pindex->pprev->hashUTXORoot != uint256()) {
-                oldHashUTXORoot = uintToh256(pindex->pprev->hashUTXORoot);
-            }
-        }
-
+        dev::h256 oldHashStateRoot = getGlobalStateRoot(pindex);
+        dev::h256 oldHashUTXORoot = getGlobalStateUTXO(pindex);
         checkBlock.hashMerkleRoot = BlockMerkleRoot(checkBlock);
         checkBlock.hashStateRoot = h256Touint(oldHashStateRoot);
         checkBlock.hashUTXORoot = h256Touint(oldHashUTXORoot);
@@ -2817,8 +2791,8 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
                 prevHashStateRoot = uintToh256(pindex->pprev->hashStateRoot);
                 prevHashUTXORoot = uintToh256(pindex->pprev->hashUTXORoot);
             }
-            globalState->setRoot(prevHashStateRoot);
-            globalState->setRootUTXO(prevHashUTXORoot);
+            setGlobalStateRoot(prevHashStateRoot);
+            setGlobalStateUTXO(prevHashUTXORoot);
         }
         return true;
     }
@@ -3137,32 +3111,8 @@ bool static ConnectTip(CValidationState& state, const CChainParams& chainparams,
     LogPrint("bench", "  - Load block from disk: %.2fms [%.2fs]\n", (nTime2 - nTime1) * 0.001, nTimeReadFromDisk * 0.000001);
     {
         CInv inv(MSG_BLOCK, pindexNew->GetBlockHash());
-        dev::h256 oldHashStateRoot;
-        dev::h256 oldHashUTXORoot;
-        if (pindexNew->nHeight >= chainparams.FirstSCBlock()) {
-            if (globalState == nullptr)
-                return error("%s: globalState is not yet initialized!\n", __func__);
-
-            try {
-                oldHashStateRoot = dev::h256(globalState->rootHash()); // lux
-            } catch (std::exception& e) {
-                // When root node is empty, it will throw exception. We must re-initialize value
-                oldHashStateRoot = dev::sha3(dev::rlp(""));
-                if (pindexNew->pprev->hashStateRoot != uint256() && pindexNew->pprev->hashUTXORoot != uint256()) {
-                    oldHashStateRoot = uintToh256(pindexNew->pprev->hashStateRoot);
-                }
-            }
-
-            try {
-                oldHashUTXORoot = dev::h256(globalState->rootHashUTXO()); // lux
-            } catch (std::exception& e) {
-                // When root node is empty, it will throw exception. We must re-initialize value
-                oldHashUTXORoot = dev::sha3(dev::rlp(""));
-                if (pindexNew->pprev->hashStateRoot != uint256() && pindexNew->pprev->hashUTXORoot != uint256()) {
-                    oldHashUTXORoot = uintToh256(pindexNew->pprev->hashUTXORoot);
-                }
-            }
-        }
+        dev::h256 oldHashStateRoot = getGlobalStateRoot(pindexNew);
+        dev::h256 oldHashUTXORoot = getGlobalStateUTXO(pindexNew);
 
         bool rv = ConnectBlock(*pblock, state, pindexNew, view, chainparams);
         GetMainSignals().BlockChecked(*pblock, state);
@@ -3170,8 +3120,8 @@ bool static ConnectTip(CValidationState& state, const CChainParams& chainparams,
             if (state.IsInvalid())
                 InvalidBlockFound(pindexNew, state);
             if (pindexNew->nHeight >= chainparams.FirstSCBlock()) {
-                globalState->setRoot(oldHashStateRoot); // lux
-                globalState->setRootUTXO(oldHashUTXORoot); // lux
+                setGlobalStateRoot(oldHashStateRoot);
+                setGlobalStateUTXO(oldHashUTXORoot);
                 pstorageresult->clearCacheResult();
             }
             return error("ConnectTip() : ConnectBlock %s failed", pindexNew->GetBlockHash().ToString());
@@ -4591,33 +4541,13 @@ bool TestBlockValidity(CValidationState& state, const CChainParams& chainparams,
     if (block.IsProofOfStake() && !stake->CheckProof(pindexPrev, block, index.hashProofOfStake))
         return false;
 
-    dev::h256 oldHashStateRoot;
-    dev::h256 oldHashUTXORoot;
-    if (index.nHeight >= chainparams.FirstSCBlock()) {
-        try {
-            oldHashStateRoot = dev::h256(globalState->rootHash()); // lux
-        } catch (std::exception& e) {
-            // When root node is empty, it will throw exception. We must re-initialize value
-            oldHashStateRoot = dev::sha3(dev::rlp(""));
-            if (pindexPrev->hashStateRoot != uint256() && pindexPrev->hashUTXORoot != uint256()) {
-                oldHashStateRoot = uintToh256(pindexPrev->hashStateRoot);
-            }
-        }
+    dev::h256 oldHashStateRoot = getGlobalStateRoot(&index);
+    dev::h256 oldHashUTXORoot = getGlobalStateUTXO(&index);
 
-        try {
-            oldHashUTXORoot = dev::h256(globalState->rootHashUTXO()); // lux
-        } catch (std::exception& e) {
-            // When root node is empty, it will throw exception. We must re-initialize value
-            oldHashUTXORoot = dev::sha3(dev::rlp(""));
-            if (pindexPrev->hashStateRoot != uint256() && pindexPrev->hashUTXORoot != uint256()) {
-                oldHashUTXORoot = uintToh256(pindexPrev->hashUTXORoot);
-            }
-        }
-    }
     if (!ConnectBlock(block, state, &index, viewNew, chainparams, true)) {
         if (index.nHeight >= chainparams.FirstSCBlock()) {
-            globalState->setRoot(oldHashStateRoot); // lux
-            globalState->setRootUTXO(oldHashUTXORoot); // lux
+            setGlobalStateRoot(oldHashStateRoot);
+            setGlobalStateUTXO(oldHashUTXORoot);
             pstorageresult->clearCacheResult();
         }
         return false;
@@ -5078,32 +5008,9 @@ bool CVerifyDB::VerifyDB(const CChainParams& chainparams, CCoinsView* coinsview,
     int nGoodTransactions = 0;
     CValidationState state;
 
-    ////////////////////////////////////////////////////////////////////////// // lux
-    dev::h256 oldHashStateRoot;
-    dev::h256 oldHashUTXORoot;
-    if (chainActive.Height() >= chainparams.FirstSCBlock()) {
-        CBlockIndex* pindexState = chainActive.Tip();
-        try {
-            oldHashStateRoot = dev::h256(globalState->rootHash()); // lux
-        } catch (std::exception& e) {
-            // When root node is empty, it will throw exception. We must re-initialize value
-            oldHashStateRoot = dev::sha3(dev::rlp(""));
-            if (pindexState->pprev->hashStateRoot != uint256() && pindexState->pprev->hashUTXORoot != uint256()) {
-                oldHashStateRoot = uintToh256(pindexState->pprev->hashStateRoot);
-            }
-        }
-
-        try {
-            oldHashUTXORoot = dev::h256(globalState->rootHashUTXO()); // lux
-        } catch (std::exception& e) {
-            // When root node is empty, it will throw exception. We must re-initialize value
-            oldHashUTXORoot = dev::sha3(dev::rlp(""));
-            if (pindexState->pprev->hashStateRoot != uint256() && pindexState->pprev->hashUTXORoot != uint256()) {
-                oldHashUTXORoot = uintToh256(pindexState->pprev->hashUTXORoot);
-            }
-        }
-    }
-    //////////////////////////////////////////////////////////////////////////
+    CBlockIndex* pindexState = chainActive.Tip();
+    dev::h256 oldHashStateRoot = getGlobalStateRoot(pindexState);
+    dev::h256 oldHashUTXORoot = getGlobalStateUTXO(pindexState);
 
     for (pindex = chainActive.Tip(); pindex && pindex->pprev; pindex = pindex->pprev) {
         boost::this_thread::interruption_point();
@@ -5141,7 +5048,7 @@ bool CVerifyDB::VerifyDB(const CChainParams& chainparams, CCoinsView* coinsview,
             return true;
     }
     if (pindexFailure)
-        return error("VerifyDB() : *** coin database inconsistencies found (last %i blocks, %i good transactions before that)\n", chainActive.Height() - pindexFailure->nHeight + 1, nGoodTransactions);
+        return error("VerifyDB: *** coin database inconsistencies found (last %i blocks, %i good transactions before that)\n", chainActive.Height() - pindexFailure->nHeight + 1, nGoodTransactions);
 
     int block_count = chainActive.Height() - pindex->nHeight;
 
@@ -5153,46 +5060,21 @@ bool CVerifyDB::VerifyDB(const CChainParams& chainparams, CCoinsView* coinsview,
             pindex = chainActive.Next(pindex);
             CBlock block;
             if (!ReadBlockFromDisk(block, pindex, chainparams.GetConsensus()))
-                return error("VerifyDB() : *** ReadBlockFromDisk failed at %d, hash=%s", pindex->nHeight, pindex->GetBlockHash().ToString());
+                return error("VerifyDB: *** ReadBlockFromDisk failed at %d, hash=%s", pindex->nHeight, pindex->GetBlockHash().ToString());
 
-            dev::h256 oldHashStateRoot;
-            dev::h256 oldHashUTXORoot;
-            if (chainActive.Height() >= chainparams.FirstSCBlock()) {
-                try {
-                    oldHashStateRoot = dev::h256(globalState->rootHash()); // lux
-                } catch (std::exception& e) {
-                    // When root node is empty, it will throw exception. We must re-initialize value
-                    oldHashStateRoot = dev::sha3(dev::rlp(""));
-                    if (pindex->pprev->hashStateRoot != uint256() && pindex->pprev->hashUTXORoot != uint256()) {
-                        oldHashStateRoot = uintToh256(pindex->pprev->hashStateRoot);
-                    }
-                }
-
-                try {
-                    oldHashUTXORoot = dev::h256(globalState->rootHashUTXO()); // lux
-                } catch (std::exception& e) {
-                    // When root node is empty, it will throw exception. We must re-initialize value
-                    oldHashUTXORoot = dev::sha3(dev::rlp(""));
-                    if (pindex->pprev->hashStateRoot != uint256() && pindex->pprev->hashUTXORoot != uint256()) {
-                        oldHashUTXORoot = uintToh256(pindex->pprev->hashUTXORoot);
-                    }
-                }
-            }
-
+            oldHashStateRoot = getGlobalStateRoot(pindex);
+            oldHashUTXORoot = getGlobalStateUTXO(pindex);
             if (!ConnectBlock(block, state, pindex, coins, chainparams)) {
-                if (chainActive.Height() >= chainparams.FirstSCBlock()) {
-                    globalState->setRoot(oldHashStateRoot); // lux
-                    globalState->setRootUTXO(oldHashUTXORoot); // lux
+                setGlobalStateRoot(oldHashStateRoot);
+                setGlobalStateUTXO(oldHashUTXORoot);
+                if (pstorageresult != nullptr)
                     pstorageresult->clearCacheResult();
-                }
-                return error("VerifyDB() : *** found unconnectable block at %d, hash=%s", pindex->nHeight, pindex->GetBlockHash().ToString());
+                return error("VerifyDB: *** found unconnectable block at %d, hash=%s", pindex->nHeight, pindex->GetBlockHash().ToString());
             }
         }
     } else {
-        if (chainActive.Height() >= chainparams.FirstSCBlock()) {
-            globalState->setRoot(oldHashStateRoot); // lux
-            globalState->setRootUTXO(oldHashUTXORoot); // lux
-        }
+        setGlobalStateRoot(oldHashStateRoot);
+        setGlobalStateUTXO(oldHashUTXORoot);
     }
 
     LogPrintf("No coin database inconsistencies in last %i blocks (%i transactions)\n", block_count, nGoodTransactions);
