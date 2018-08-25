@@ -443,8 +443,8 @@ case $host in
 esac
 
 if test x$TARGET_OS = xwindows; then
-	CPPFLAGS="-Wno-unknown-pragmas -Wno-deprecated-declarations -Wno-cpp $CPPFLAGS -DLUX_BUILD"
-	CXXFLAGS="-Wno-unknown-pragmas -Wno-deprecated-declarations -Wno-cpp $CXXFLAGS"
+	CPPFLAGS="-Wno-unknown-pragmas -Wno-deprecated-declarations -Wno-deprecated -Wno-cpp $CPPFLAGS -DLUX_BUILD"
+	CXXFLAGS="-Wno-unknown-pragmas -Wno-deprecated-declarations -Wno-deprecated -Wno-cpp $CXXFLAGS"
 elif test x$TARGET_OS = xdarwin; then
 	CPPFLAGS="-Wno-inconsistent-missing-override -Wno-deprecated-declarations -Wno-unknown-pragmas -Wno-implicit-fallthrough $CPPFLAGS -DLUX_BUILD"
 	CXXFLAGS="-Wno-inconsistent-missing-override -Wno-deprecated-declarations -Wno-unknown-pragmas -Wno-implicit-fallthrough $CXXFLAGS"
