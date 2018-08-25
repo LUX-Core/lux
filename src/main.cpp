@@ -5655,34 +5655,42 @@ void static ProcessGetData(CNode* pfrom, const Consensus::Params& consensusParam
                         }
                     }
                 }
+
+                // Pruned nodes may have deleted the block, so check whether
+                // it's available before trying to send.
                 if (send && pindex && (pindex->nStatus & BLOCK_HAVE_DATA)) {
                     // Send block from disk
                     CBlock block;
-                    if (!ReadBlockFromDisk(block, pindex, consensusParams))
-                        assert(!"cannot load block from disk");
-                    if (inv.type == MSG_BLOCK)
-                        pfrom->PushMessage("block", block); //TODO: push message with flag NO_WITNESS
-                    else if (inv.type == MSG_WITNESS_BLOCK)
-                        pfrom->PushMessage("block", block);
-                    else // MSG_FILTERED_BLOCK)
-                    {
-                        LOCK(pfrom->cs_filter);
-                        if (pfrom->pfilter) {
-                            CMerkleBlock merkleBlock(block, *pfrom->pfilter);
-                            pfrom->PushMessage("merkleblock", merkleBlock);
-                            // CMerkleBlock just contains hashes, so also push any transactions in the block the client did not see
-                            // This avoids hurting performance by pointlessly requiring a round-trip
-                            // Note that there is currently no way for a node to request any single transactions we didnt send here -
-                            // they must either disconnect and retry or request the full block.
-                            // Thus, the protocol spec specified allows for us to provide duplicate txn here,
-                            // however we MUST always provide at least what the remote peer needs
-                            typedef std::pair<unsigned int, uint256> PairType;
-                            for (PairType& pair : merkleBlock.vMatchedTxn)
-                                if (!pfrom->setInventoryKnown.count(CInv(MSG_TX, pair.second)))
-                                    pfrom->PushMessage("tx", block.vtx[pair.first]); //TODO: push message with flag NO_WITNESS
+                    if (ReadBlockFromDisk(block, pindex, consensusParams)) {
+                        if (inv.type == MSG_BLOCK)
+                            pfrom->PushMessageWithFlag(SERIALIZE_TRANSACTION_NO_WITNESS, NetMsgType::BLOCK, block);
+                        else if (inv.type == MSG_WITNESS_BLOCK)
+                            pfrom->PushMessage(NetMsgType::BLOCK, block);
+                        else if (inv.type == MSG_WITNESS_BLOCK)
+                            pfrom->PushMessage(NetMsgType::BLOCK, block);
+                        else // MSG_FILTERED_BLOCK)
+                        {
+                            LOCK(pfrom->cs_filter);
+                            if (pfrom->pfilter) {
+                                CMerkleBlock merkleBlock(block, *pfrom->pfilter);
+                                pfrom->PushMessage(NetMsgType::MERKLEBLOCK, merkleBlock);
+                                // CMerkleBlock just contains hashes, so also push any transactions in the block the client did not see
+                                // This avoids hurting performance by pointlessly requiring a round-trip
+                                // Note that there is currently no way for a node to request any single transactions we didnt send here -
+                                // they must either disconnect and retry or request the full block.
+                                // Thus, the protocol spec specified allows for us to provide duplicate txn here,
+                                // however we MUST always provide at least what the remote peer needs
+                                typedef std::pair<unsigned int, uint256> PairType;
+                                for (PairType& pair : merkleBlock.vMatchedTxn)
+                                    if (!pfrom->setInventoryKnown.count(CInv(MSG_TX, pair.second)))
+                                        pfrom->PushMessageWithFlag(SERIALIZE_TRANSACTION_NO_WITNESS, NetMsgType::TX, block.vtx[pair.first]);
+                            }
+                            // else
+                            // no response
                         }
-                        // else
+                    } else {
                         // no response
+                        LogPrintf("ProcessGetData(): Cannot read ReadBlockFromDisk (peer=%i; block = %d)\n", pfrom->GetId(), pindex->nHeight);
                     }
 
                     // Trigger them to send a getblocks request for the next batch of inventory
