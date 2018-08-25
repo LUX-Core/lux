@@ -373,35 +373,20 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
     nBlockMaxSize = blockSizeDGP ? blockSizeDGP : nBlockMaxSize;
 
     CBlockIndex* pindexState = chainActive.Tip();
-    dev::h256 oldHashStateRoot;
-    dev::h256 oldHashUTXORoot;
-    if (chainActive.Height() >= chainparams.FirstSCBlock()) {
-        try {
-            oldHashStateRoot = dev::h256(globalState->rootHash()); // lux
-        } catch (std::exception& e) {
-            // When root node is empty, it will throw exception. We must re-initialize value
-            oldHashStateRoot = dev::sha3(dev::rlp(""));
-            if (pindexState->pprev->hashStateRoot != uint256() && pindexState->pprev->hashUTXORoot != uint256()) {
-                oldHashStateRoot = uintToh256(pindexState->pprev->hashStateRoot);
-            }
-        }
+    dev::h256 oldHashStateRoot = getGlobalStateRoot(pindexState);
+    dev::h256 oldHashUTXORoot = getGlobalStateUTXO(pindexState);
 
-        try {
-            oldHashUTXORoot = dev::h256(globalState->rootHashUTXO()); // lux
-        } catch (std::exception& e) {
-            // When root node is empty, it will throw exception. We must re-initialize value
-            oldHashUTXORoot = dev::sha3(dev::rlp(""));
-            if (pindexState->pprev->hashStateRoot != uint256() && pindexState->pprev->hashUTXORoot != uint256()) {
-                oldHashUTXORoot = uintToh256(pindexState->pprev->hashUTXORoot);
-            }
-        }
-    }
     addPriorityTxs(minGasPrice);
     addPackageTxs(minGasPrice);
-    pblock->hashStateRoot = uint256(h256Touint(oldHashStateRoot));
-    pblock->hashUTXORoot = uint256(h256Touint(oldHashUTXORoot));
-    globalState->setRoot(oldHashStateRoot);
-    globalState->setRootUTXO(oldHashUTXORoot);
+
+    if (chainActive.Height() >= chainparams.FirstSCBlock()) {
+        pblock->hashStateRoot = h256Touint(getGlobalStateRoot(pindexState));
+        pblock->hashUTXORoot = h256Touint(getGlobalStateUTXO(pindexState));
+
+        // restore old roots state after txs/scs are processed
+        setGlobalStateRoot(oldHashStateRoot);
+        setGlobalStateUTXO(oldHashUTXORoot);
+    }
 
     //this should already be populated by AddBlock in case of contracts, but if no contracts
     //then it won't get populated
@@ -569,29 +554,9 @@ bool BlockAssembler::AttemptToAddContractToBlock(CTxMemPool::txiter iter, uint64
     }
 
     CBlockIndex* pindexState = chainActive.Tip();
-    dev::h256 oldHashStateRoot;
-    dev::h256 oldHashUTXORoot;
-    if (chainActive.Height() >= chainparams.FirstSCBlock()) {
-        try {
-            oldHashStateRoot = dev::h256(globalState->rootHash()); // lux
-        } catch (std::exception& e) {
-            // When root node is empty, it will throw exception. We must re-initialize value
-            oldHashStateRoot = dev::sha3(dev::rlp(""));
-            if (pindexState->pprev->hashStateRoot != uint256() && pindexState->pprev->hashUTXORoot != uint256()) {
-                oldHashStateRoot = uintToh256(pindexState->pprev->hashStateRoot);
-            }
-        }
+    dev::h256 oldHashStateRoot = getGlobalStateRoot(pindexState);
+    dev::h256 oldHashUTXORoot = getGlobalStateUTXO(pindexState);
 
-        try {
-            oldHashUTXORoot = dev::h256(globalState->rootHashUTXO()); // lux
-        } catch (std::exception& e) {
-            // When root node is empty, it will throw exception. We must re-initialize value
-            oldHashUTXORoot = dev::sha3(dev::rlp(""));
-            if (pindexState->pprev->hashStateRoot != uint256() && pindexState->pprev->hashUTXORoot != uint256()) {
-                oldHashUTXORoot = uintToh256(pindexState->pprev->hashUTXORoot);
-            }
-        }
-    }
     // operate on local vars first, then later apply to `this`
     uint64_t nBlockWeight = this->nBlockWeight;
     uint64_t nBlockSize = this->nBlockSize;
@@ -627,22 +592,22 @@ bool BlockAssembler::AttemptToAddContractToBlock(CTxMemPool::txiter iter, uint64
     ByteCodeExec exec(*pblock, luxTransactions, hardBlockGasLimit);
     if(!exec.performByteCode()){
         //error, don't add contract
-        globalState->setRoot(oldHashStateRoot);
-        globalState->setRootUTXO(oldHashUTXORoot);
+        setGlobalStateRoot(oldHashStateRoot);
+        setGlobalStateUTXO(oldHashUTXORoot);
         return false;
     }
 
     ByteCodeExecResult testExecResult;
     if(!exec.processingResults(testExecResult)){
-        globalState->setRoot(oldHashStateRoot);
-        globalState->setRootUTXO(oldHashUTXORoot);
+        setGlobalStateRoot(oldHashStateRoot);
+        setGlobalStateUTXO(oldHashUTXORoot);
         return false;
     }
 
     if(bceResult.usedGas + testExecResult.usedGas > softBlockGasLimit){
         //if this transaction could cause block gas limit to be exceeded, then don't add it
-        globalState->setRoot(oldHashStateRoot);
-        globalState->setRootUTXO(oldHashUTXORoot);
+        setGlobalStateRoot(oldHashStateRoot);
+        setGlobalStateUTXO(oldHashUTXORoot);
         return false;
     }
 
@@ -684,8 +649,8 @@ bool BlockAssembler::AttemptToAddContractToBlock(CTxMemPool::txiter iter, uint64
     if (nBlockSigOpsCost * WITNESS_SCALE_FACTOR > (uint64_t)dgpMaxBlockSigOps ||
         nBlockSize > dgpMaxBlockSerSize) {
         //contract will not be added to block, so revert state to before we tried
-        globalState->setRoot(oldHashStateRoot);
-        globalState->setRootUTXO(oldHashUTXORoot);
+        setGlobalStateRoot(oldHashStateRoot);
+        setGlobalStateUTXO(oldHashUTXORoot);
         return false;
     }
 
