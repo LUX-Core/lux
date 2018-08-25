@@ -11,6 +11,8 @@
 #include <libethereum/Executive.h>
 #include <libethcore/SealEngine.h>
 
+#include "chain.h" // CBlockIndex
+
 using OnOpFunc = std::function<void(uint64_t, uint64_t, dev::eth::Instruction, dev::bigint, dev::bigint, 
     dev::bigint, dev::eth::VM*, dev::eth::ExtVMFace const*)>;
 using plusAndMinus = std::pair<dev::u256, dev::u256>;
@@ -192,4 +194,12 @@ private:
     bool voutOverflow = false;
 
 };
+///////////////////////////////////////////////////////////////////////////////////////////
+
+dev::h256 getGlobalStateRoot(CBlockIndex* pIndex);
+dev::h256 getGlobalStateUTXO(CBlockIndex* pIndex);
+
+void setGlobalStateRoot(dev::h256 root);
+void setGlobalStateUTXO(dev::h256 root);
+
 ///////////////////////////////////////////////////////////////////////////////////////////
