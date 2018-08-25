@@ -2370,6 +2370,16 @@ static DisconnectResult DisconnectBlock(CBlock& block, CValidationState& state, 
         setGlobalStateRoot(uintToh256(pindex->pprev->hashStateRoot));
         setGlobalStateUTXO(uintToh256(pindex->pprev->hashUTXORoot));
     }
+
+    if (fClean == false && fLogEvents) {
+        pstorageresult->deleteResults(block.vtx);
+        pblocktree->EraseHeightIndex(pindex->nHeight);
+    }
+
+    if (pfClean) {
+        *pfClean = fClean;
+        return true;
+    }
     if (fClean == false && fLogEvents) {
         pstorageresult->deleteResults(block.vtx);
         pblocktree->EraseHeightIndex(pindex->nHeight);
@@ -5375,17 +5385,19 @@ bool CVerifyDB::VerifyDB(const CChainParams& chainparams, CCoinsView* coinsview,
             pindex = chainActive.Next(pindex);
             CBlock block;
             if (!ReadBlockFromDisk(block, pindex, chainparams.GetConsensus()))
-                return error("VerifyDB: *** ReadBlockFromDisk failed at %d, hash=%s", pindex->nHeight, pindex->GetBlockHash().GetHex());
+                return error("VerifyDB: *** ReadBlockFromDisk failed at %d, hash=%s", pindex->nHeight, pindex->GetBlockHash().ToString());
+
             oldHashStateRoot = getGlobalStateRoot(pindex);
             oldHashUTXORoot = getGlobalStateUTXO(pindex);
             if (!ConnectBlock(block, state, pindex, coins, chainparams)) {
                 if (chainActive.Height() >= chainparams.FirstSCBlock()) {
                     setGlobalStateRoot(oldHashStateRoot);
                     setGlobalStateUTXO(oldHashUTXORoot);
+                    if (pstorageresult != nullptr)
+                        pstorageresult->clearCacheResult();
                 }
-                if (fLogEvents && pstorageresult != nullptr)
-                    pstorageresult->clearCacheResult();
-                return error("VerifyDB: *** found unconnectable block at %d, hash=%s", pindex->nHeight, pindex->GetBlockHash().GetHex());
+
+                return error("VerifyDB: *** found unconnectable block at %d, hash=%s", pindex->nHeight, pindex->GetBlockHash().ToString());
             }
         }
     } else if (chainActive.Height() >= chainparams.FirstSCBlock()) {
