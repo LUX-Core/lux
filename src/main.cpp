@@ -4568,8 +4568,8 @@ bool TestBlockValidity(CValidationState& state, const CChainParams& chainparams,
         } catch (std::exception& e) {
             // When root node is empty, it will throw exception. We must re-initialize value
             oldHashStateRoot = dev::sha3(dev::rlp(""));
-            if (pindexPrev->pprev->hashStateRoot != uint256() && pindexPrev->pprev->hashUTXORoot != uint256()) {
-                oldHashStateRoot = uintToh256(pindexPrev->pprev->hashStateRoot);
+            if (pindexPrev->hashStateRoot != uint256() && pindexPrev->hashUTXORoot != uint256()) {
+                oldHashStateRoot = uintToh256(pindexPrev->hashStateRoot);
             }
         }
 
@@ -4578,8 +4578,8 @@ bool TestBlockValidity(CValidationState& state, const CChainParams& chainparams,
         } catch (std::exception& e) {
             // When root node is empty, it will throw exception. We must re-initialize value
             oldHashUTXORoot = dev::sha3(dev::rlp(""));
-            if (pindexPrev->pprev->hashStateRoot != uint256() && pindexPrev->pprev->hashUTXORoot != uint256()) {
-                oldHashUTXORoot = uintToh256(pindexPrev->pprev->hashUTXORoot);
+            if (pindexPrev->hashStateRoot != uint256() && pindexPrev->hashUTXORoot != uint256()) {
+                oldHashUTXORoot = uintToh256(pindexPrev->hashUTXORoot);
             }
         }
     }
