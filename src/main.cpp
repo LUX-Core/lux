@@ -4193,7 +4193,7 @@ bool ContextualCheckBlock(const CBlock& block, CValidationState& state, CBlockIn
     //   {0xaa, 0x21, 0xa9, 0xed}, and the following 32 bytes are SHA256^2(witness root, witness nonce). In case there are
     //   multiple, the last one is used.
     bool fHaveWitness = false;
-    if (IsWitnessEnabled(pindexPrev, consensusParams)) {
+    if (VersionBitsState(pindexPrev, consensusParams, Consensus::DEPLOYMENT_SEGWIT, versionbitscache) == THRESHOLD_ACTIVE) {
         int commitpos = GetWitnessCommitmentIndex(block);
         if (commitpos != -1) {
             bool malleated = false;
@@ -4201,12 +4201,12 @@ bool ContextualCheckBlock(const CBlock& block, CValidationState& state, CBlockIn
             // The malleation check is ignored; as the transaction tree itself
             // already does not permit it, it is impossible to trigger in the
             // witness tree.
-            if (block.vtx[0].wit.vtxinwit.size() != 1 || block.vtx[0].wit.vtxinwit[0].scriptWitness.stack.size() != 1 || block.vtx[0].wit.vtxinwit[0].scriptWitness.stack[0].size() != 32) {
-                return state.DoS(100, error("%s : invalid witness nonce size", __func__), REJECT_INVALID, "bad-witness-nonce-size", true);
+            if (block.vtx[0]->wit.vtxinwit.size() != 1 || block.vtx[0]->wit.vtxinwit[0].scriptWitness.stack.size() != 1 || block.vtx[0]->wit.vtxinwit[0].scriptWitness.stack[0].size() != 32) {
+                return state.DoS(100, false, REJECT_INVALID, "bad-witness-nonce-size", true, strprintf("%s : invalid witness nonce size", __func__));
             }
-            CHash256().Write(hashWitness.begin(), 32).Write(&block.vtx[0].wit.vtxinwit[0].scriptWitness.stack[0][0], 32).Finalize(hashWitness.begin());
-            if (memcmp(hashWitness.begin(), &block.vtx[0].vout[commitpos].scriptPubKey[6], 32)) {
-                return state.DoS(100, error("%s : witness merkle commitment mismatch", __func__), REJECT_INVALID, "bad-witness-merkle-match", true);
+            CHash256().Write(hashWitness.begin(), 32).Write(&block.vtx[0]->wit.vtxinwit[0].scriptWitness.stack[0][0], 32).Finalize(hashWitness.begin());
+            if (memcmp(hashWitness.begin(), &block.vtx[0]->vout[commitpos].scriptPubKey[6], 32)) {
+                return state.DoS(100, false, REJECT_INVALID, "bad-witness-merkle-match", true, strprintf("%s : witness merkle commitment mismatch", __func__));
             }
             fHaveWitness = true;
         }
@@ -4215,8 +4215,8 @@ bool ContextualCheckBlock(const CBlock& block, CValidationState& state, CBlockIn
     // No witness data is allowed in blocks that don't commit to witness data, as this would otherwise leave room for spam
     if (!fHaveWitness) {
         for (size_t i = 0; i < block.vtx.size(); i++) {
-            if (!block.vtx[i].wit.IsNull()) {
-                return state.DoS(100, error("%s : unexpected witness data found", __func__), REJECT_INVALID, "unexpected-witness", true);
+            if (!block.vtx[i]->wit.IsNull()) {
+                return state.DoS(100, false, REJECT_INVALID, "unexpected-witness", true, strprintf("%s : unexpected witness data found", __func__));
             }
         }
     }
