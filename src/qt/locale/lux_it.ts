@@ -686,7 +686,7 @@ MultiSend: %1</translation>
 MultiSend: %1</translation>
     </message>
     <message>
-        <source>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;unlocked&lt;/b&gt; for anonimization and staking only</source>
+        <source>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;unlocked&lt;/b&gt; for anonymization and staking only</source>
         <translation>Il portafoglio è &lt;b&gt;crittografato&lt;/b&gt; e attualmente &lt;b&gt;sbloccato&lt;/b&gt; per l'anonimizzazione e il solo stacking</translation>
     </message>
     </context>
