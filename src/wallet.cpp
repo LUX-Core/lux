@@ -3257,7 +3257,11 @@ bool CReserveKey::GetReservedKey(CPubKey& pubkey, bool internal)
         vchPubKey = keypool.vchPubKey;
         fInternal = keypool.fInternal;
     }
-    assert(vchPubKey.IsValid());
+
+    if(!vchPubKey.IsValid()) {
+        LogPrintf("%s: vchPubKey is invalid\n", __func__);
+        return false;
+    }
     pubkey = vchPubKey;
     return true;
 }
