@@ -1638,9 +1638,11 @@ void ThreadMessageHandler() {
 
             // Send messages
             {
-                TRY_LOCK(pnode->cs_vSend, lockSend);
-                if (lockSend)
-                    g_signals.SendMessages(pnode);
+                //TRY_LOCK(pnode->cs_vSend, lockSend);
+                //if (lockSend)
+                // we do no need to lock here as the lock processing is implemented on
+                // subfunction of SendMessages
+                g_signals.SendMessages(pnode);
             }
             boost::this_thread::interruption_point();
         }
