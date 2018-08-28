@@ -3021,17 +3021,21 @@ bool CWallet::ReserveKeyFromKeyPool(int64_t& nIndex, CKeyPool& keypool, bool int
         nIndex = *it;
         setKeyPool.erase(it);
         if (!walletdb.ReadPool(nIndex, keypool)) {
-            throw std::runtime_error(std::string(__func__) + ": read failed");
+            LogPrintf("%s: read failed\n", __func__);
+            return false;
         }
         if (!HaveKey(keypool.vchPubKey.GetID())) {
-            throw std::runtime_error(std::string(__func__) + ": unknown key in key pool");
+            LogPrintf("%s: unknown key in key pool\n", __func__);
+            return false;
         }
         // If the key was pre-split keypool, we don't care about what type it is
         if (keypool.fInternal != internal) {
-            throw std::runtime_error(std::string(__func__) + ": keypool entry misclassified");
+            LogPrintf("%s: keypool entry misclassified\n", __func__);
+            return false;
         }
         if (!keypool.vchPubKey.IsValid()) {
-            throw std::runtime_error(std::string(__func__) + ": keypool entry invalid");
+            LogPrintf("%s: keypool entry invalid\n", __func__);
+            return false;
         }
 
         m_pool_key_to_index.erase(keypool.vchPubKey.GetID());
