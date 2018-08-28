@@ -12,7 +12,8 @@
 #include <boost/thread/locks.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/recursive_mutex.hpp>
-
+#define DEBUG_LOCKORDER
+#define DEBUG_LOCKCONTENTION
 
 ////////////////////////////////////////////////
 //                                            //

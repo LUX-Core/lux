@@ -33,6 +33,7 @@ void ProcessMasternodeConnections() {
     //LOCK(cs_vNodes);
 
     for (CNode* pnode : vNodes) {
+        if (!pnode) continue;
         //if it's our masternode, let it be
         if (darkSendPool.submittedToMasternode == pnode->addr) continue;
 
@@ -786,7 +787,8 @@ void CMasternodePayments::Relay(CMasternodePaymentWinner& winner) {
     vInv.push_back(inv);
     //LOCK(cs_vNodes);
     for (CNode* pnode : vNodes) {
-        pnode->PushMessage("inv", vInv);
+        if (pnode)
+           pnode->PushMessage("inv", vInv);
     }
 }
 

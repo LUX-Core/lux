@@ -49,7 +49,8 @@ UniValue ping(const UniValue& params, bool fHelp)
     // Request that each node send a ping during next message processing pass
     LOCK2(cs_main, cs_vNodes);
     for (CNode* pNode : vNodes) {
-        pNode->fPingQueued = true;
+        if (pNode)
+            pNode->fPingQueued = true;
     }
 
     return NullUniValue;
@@ -62,6 +63,7 @@ static void CopyNodeStats(std::vector<CNodeStats>& vstats)
     LOCK(cs_vNodes);
     vstats.reserve(vNodes.size());
     for (CNode* pnode : vNodes) {
+        if (!pnode) continue;
         CNodeStats stats;
         pnode->copyStats(stats);
         vstats.push_back(stats);

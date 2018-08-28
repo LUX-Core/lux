@@ -1518,6 +1518,7 @@ bool CDarkSendPool::DoAutomaticDenominating(bool fDryRun, bool ready) {
 
                     LOCK(cs_vNodes);
                     for (CNode * pnode : vNodes) {
+                        if (!pnode) continue;
                         if ((CNetAddr) pnode->addr != (CNetAddr) submittedToMasternode) continue;
 
                         std::string strReason;
@@ -1578,6 +1579,7 @@ bool CDarkSendPool::DoAutomaticDenominating(bool fDryRun, bool ready) {
 
                 LOCK(cs_vNodes);
                 for (CNode * pnode : vNodes) {
+                    if (!pnode) continue;
                     if ((CNetAddr) pnode->addr != (CNetAddr) vecMasternodes[i].addr) continue;
 
                     std::string strReason;
@@ -2064,8 +2066,10 @@ bool CDarksendQueue::Relay() {
 
     LOCK(cs_vNodes);
     for (CNode * pnode : vNodes) {
-        // always relay to everyone
-        pnode->PushMessage("dsq", (*this));
+        if (pnode) {
+            // always relay to everyone
+            pnode->PushMessage("dsq", (*this));
+        }
     }
 
     return true;
@@ -2131,7 +2135,8 @@ void ThreadCheckDarkSendPool() {
                     if (mn.IsEnabled()) {
                         if (fDebug) LogPrintf("Sending masternode entry - %s \n", mn.addr.ToString().c_str());
                         for (CNode * pnode : vNodes) {
-                            pnode->PushMessage("dsee", mn.vin, mn.addr, mn.sig, mn.now, mn.pubkey, mn.pubkey2, count, i, mn.lastTimeSeen, mn.protocolVersion);
+                            if (pnode)
+                                pnode->PushMessage("dsee", mn.vin, mn.addr, mn.sig, mn.now, mn.pubkey, mn.pubkey2, count, i, mn.lastTimeSeen, mn.protocolVersion);
                         }
                     }
                     i++;
@@ -2160,7 +2165,7 @@ void ThreadCheckDarkSendPool() {
             if (!fIsInitialDownload) {
                 LOCK(cs_vNodes);
                 for (CNode * pnode : vNodes) {
-                    if (pnode->nVersion >= darkSendPool.MIN_PEER_PROTO_VERSION) {
+                    if (pnode && pnode->nVersion >= darkSendPool.MIN_PEER_PROTO_VERSION) {
 
                         //keep track of who we've asked for the list
                         if (pnode->HasFulfilledRequest("mnsync")) continue;

@@ -3489,12 +3489,12 @@ bool ActivateBestChain(CValidationState& state, const CChainParams& chainparams,
             if (nLocalServices & NODE_NETWORK) {
                 vector<CNode*> vNodesCopy;
                 {
-                    //LOCK(cs_vNodes);
+                    LOCK(cs_vNodes);
                     vNodesCopy = vNodes;
                 }
 
                 for (CNode* pnode : vNodesCopy)
-                    if (chainActive.Height() > (pnode->nStartingHeight != -1 ? pnode->nStartingHeight - 2000 : nBlockEstimate))
+                    if (pnode && chainActive.Height() > (pnode->nStartingHeight != -1 ? pnode->nStartingHeight - 2000 : nBlockEstimate))
                         pnode->PushInventory(CInv(MSG_BLOCK, hashNewTip));
             }
             // Notify external listeners about the new tip.
@@ -6020,7 +6020,7 @@ static bool ProcessMessage(CNode* pfrom, const string &strCommand, CDataStream& 
                 {
                     vector<CNode*> vNodesCopy;
                     {
-                        //LOCK(cs_vNodes);
+                        LOCK(cs_vNodes);
                         vNodesCopy = vNodes;
                     }
 
@@ -6034,7 +6034,7 @@ static bool ProcessMessage(CNode* pfrom, const string &strCommand, CDataStream& 
                     hashRand = Hash(BEGIN(hashRand), END(hashRand));
                     multimap<uint256, CNode*> mapMix;
                     for (CNode* pnode : vNodesCopy) {
-                        if (pnode->nVersion < CADDR_TIME_VERSION)
+                        if (!pnode || pnode->nVersion < CADDR_TIME_VERSION)
                             continue;
                         unsigned int nPointer;
                         memcpy(&nPointer, &pnode, sizeof(nPointer));
@@ -6538,12 +6538,13 @@ static bool ProcessMessage(CNode* pfrom, const string &strCommand, CDataStream& 
                 {
                     vector<CNode*> vNodesCopy;
                     {
-                        //LOCK(cs_vNodes);
+                        LOCK(cs_vNodes);
                         vNodesCopy = vNodes;
                     }
 
                     for (CNode* pnode : vNodesCopy)
-                        alert.RelayTo(pnode);
+                        if (pnode)
+                            alert.RelayTo(pnode);
                 }
             } else {
                 // Small DoS penalty so peers that send us lots of
