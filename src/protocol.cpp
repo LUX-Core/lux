@@ -13,8 +13,7 @@
 #include <arpa/inet.h>
 #endif
 
-static const char* ppszTypeName[] =
-    {
+static const char* ppszTypeName[] = {
         "ERROR",
         "tx",
         "block",
@@ -31,7 +30,8 @@ static const char* ppszTypeName[] =
         "mn quorum",
         "mn announce",
         "mn ping",
-        "dstx"};
+        "dstx"
+};
 
 CMessageHeader::CMessageHeader()
 {
@@ -138,8 +138,10 @@ bool CInv::IsKnownType() const
 
 const char* CInv::GetCommand() const
 {
-    if (!IsKnownType())
+    if (!IsKnownType()) {
         LogPrint("net", "CInv::GetCommand() : type=%d unknown type", type);
+        return ppszTypeName[0]; // ERROR
+    }
 
     return ppszTypeName[type];
 }
