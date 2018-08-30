@@ -33,7 +33,7 @@
 #define NUM_ITEMS 5
 #define TOKEN_SIZE 24
 #define MARGIN 4
-#define NAME_WIDTH 120
+#define NAME_WIDTH 250 /* to align with txs history amounts */
 
 class TxViewDelegate : public QAbstractItemDelegate
 {
@@ -129,11 +129,11 @@ public:
         QRect mainRect = option.rect;
         mainRect.setWidth(option.rect.width());
 
-        QColor rowColor = index.row() % 2 ? QColor("#ededed") : QColor("#e3e3e3");
+        QColor rowColor = Qt::transparent; // index.row() % 2 ? QColor("#ededed") : QColor("#e3e3e3");
         painter->fillRect(mainRect, rowColor);
 
-        int decorationSize = TOKEN_SIZE - 20;
-        int leftTopMargin = 10;
+        int decorationSize = 12; // font line height (2 lines)
+        int leftTopMargin = 5;
         QRect decorationRect(mainRect.topLeft() + QPoint(leftTopMargin, leftTopMargin), QSize(decorationSize, decorationSize));
         tokenIcon.paint(painter, decorationRect);
 
@@ -147,18 +147,19 @@ public:
         QFontMetrics fmBalance(font);
         int balanceWidth = fmBalance.width(balanceString);
 
-        QRect nameRect(decorationRect.right() + MARGIN, decorationRect.top(), NAME_WIDTH, decorationSize / 2);
+        QRect nameRect(decorationRect.right() + MARGIN, decorationRect.top(), NAME_WIDTH, decorationSize);
         painter->drawText(nameRect, Qt::AlignLeft|Qt::AlignVCenter, clippedName);
 
         font.setBold(true);
         painter->setFont(font);
-        QRect tokenBalanceRect(nameRect.right() + MARGIN, decorationRect.top(), balanceWidth, decorationSize / 2);
+        QRect tokenBalanceRect(nameRect.right() + MARGIN, decorationRect.top(), balanceWidth, decorationSize);
         painter->drawText(tokenBalanceRect, Qt::AlignLeft|Qt::AlignVCenter, tokenBalance);
 
         QFont addressFont = option.font;
-        addressFont.setPixelSize(addressFont.pixelSize() * 0.9);
+        //addressFont.setPixelSize(addressFont.pixelSize() * 0.9);
         painter->setFont(addressFont);
-        QRect receiveAddressRect(decorationRect.right() + MARGIN, nameRect.bottom(), mainRect.width() - decorationSize, decorationSize / 2);
+        painter->setPen(COLOR_UNCONFIRMED);
+        QRect receiveAddressRect(decorationRect.right() + MARGIN, decorationSize, mainRect.width() - decorationSize, decorationSize * 2);
         painter->drawText(receiveAddressRect, Qt::AlignLeft|Qt::AlignBottom, receiveAddress);
 
         painter->restore();
