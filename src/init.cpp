@@ -347,7 +347,7 @@ std::string HelpMessage(HelpMessageMode mode)
     strUsage += "  -checkblocks=<n>       " + strprintf(_("How many blocks to check at startup (default: %u, 0 = all)"), 500) + "\n";
     strUsage += "  -checklevel=<n>        " + strprintf(_("How thorough the block verification of -checkblocks is (0-4, default: %u)"), 3) + "\n";
     strUsage += "  -conf=<file>           " + strprintf(_("Specify configuration file (default: %s)"), "lux.conf") + "\n";
-    strUsage += "  -luxgateconf=<file>           " + strprintf(_("Specify LuxGate configuration file (default: %s)"), "luxgateconf.json") + "\n";
+    strUsage += "  -luxgateconf=<file>           " + strprintf(_("Specify LuxGate configuration file (default: %s)"), "luxgate.json") + "\n";
     if (mode == HMM_BITCOIND) {
 #if !defined(WIN32)
         strUsage += "  -daemon                " + _("Run in the background as a daemon and accept commands") + "\n";
