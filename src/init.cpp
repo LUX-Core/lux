@@ -386,7 +386,7 @@ std::string HelpMessage(HelpMessageMode mode)
     strUsage += HelpMessageOpt("-checkblocks=<n>", strprintf(_("How many blocks to check at startup (default: %u, 0 = all)"), 500));
     strUsage += HelpMessageOpt("-checklevel=<n>", strprintf(_("How thorough the block verification of -checkblocks is (0-4, default: %u)"), 3));
     strUsage += HelpMessageOpt("-conf=<file>", strprintf(_("Specify configuration file (default: %s)"), "lux.conf"));
-    strUsage += HelpMessageOpt("-luxgateconf=<file>", strprintf(_("Specify LuxGate configuration file (default: %s)"), "luxgateconf.json"));
+    strUsage += HelpMessageOpt("-luxgateconf=<file>", strprintf(_("Specify LuxGate configuration file (default: %s)"), "luxgate.json"));
     if (mode == HMM_BITCOIND) {
 #if !defined(WIN32)
         strUsage += HelpMessageOpt("-daemon", _("Run in the background as a daemon and accept commands"));
