@@ -573,11 +573,10 @@ boost::filesystem::path GetConfigFile()
 }
 
 boost::filesystem::path GetLuxGateConfigFile() {
-    boost::filesystem::path pathConfigFile(GetArg("-luxgateconf", "luxgateconf.json"));
+    boost::filesystem::path pathConfigFile(GetArg("-luxgateconf", "luxgate.json"));
     if (!pathConfigFile.is_complete())
         pathConfigFile = GetDataDir(false) / pathConfigFile;
-
-    return boost::filesystem::canonical(pathConfigFile);
+    return pathConfigFile;
 }
 
 bool isValidBlockchainConfig(const BlockchainConfig& config) {
@@ -592,7 +591,7 @@ std::vector<BlockchainConfig> ReadLuxGateConfigFile() {
     boost::filesystem::path configPath = GetLuxGateConfigFile();
     boost::filesystem::ifstream streamConfig(configPath);
     if (!streamConfig.good()) {
-        // Create empty lux.conf if it does not exist
+        // Create empty luxgate config file if it does not exist
         FILE* configFile = fopen(configPath.string().c_str(), "a");
         if (configFile != NULL)
             fclose(configFile);
@@ -601,40 +600,46 @@ std::vector<BlockchainConfig> ReadLuxGateConfigFile() {
 
     json_spirit::Value jsonContent;
     if (!json_spirit::read(streamConfig, jsonContent)) {
-        LogPrintf("Failed to read luxgateconf.json\n");
+        LogPrintf("Failed to read luxgate config file: %s\n", configPath.string());
         return configs;
     }
 
     try {
         auto root = jsonContent.get_obj();
         if (root.size() == 0) {
-            LogPrintf("luxgateconf.json has an empty root element\n");
+            LogPrintf("luxgate config file has an empty root element: %s\n", configPath.string());
             return configs;
         }
-        auto blockchains = root[0].value_.get_array();
-        for (auto blockchain : blockchains) {
-            auto bcinfo = blockchain.get_obj();
-            BlockchainConfig bcConfig;
-            for (auto kv : bcinfo) {
-                if (kv.name_ == "ticker")
-                    bcConfig.ticker = kv.value_.get_str();
-                if (kv.name_ == "host")
-                    bcConfig.host = kv.value_.get_str();
-                if (kv.name_ == "port")
-                    bcConfig.port = (unsigned short) kv.value_.get_int();
-                if (kv.name_ == "rpcuser")
-                    bcConfig.rpcuser = kv.value_.get_str();
-                if (kv.name_ == "rpcpassword")
-                    bcConfig.rpcpassword = kv.value_.get_str();
-            }
 
-            if (isValidBlockchainConfig(bcConfig))
-                configs.push_back(bcConfig);
-            else
-                LogPrintf("Invalid config entry in luxgateconf.json\n");
+        for (auto section : root) {
+            if (section.name_ == "coins") {
+                 for (auto blockchain : section.value_.get_array()) {
+                    auto bcinfo = blockchain.get_obj();
+                    BlockchainConfig bcConfig;
+                    for (auto kv : bcinfo) {
+                        if (kv.name_ == "ticker")
+                            bcConfig.ticker = kv.value_.get_str();
+                        if (kv.name_ == "host")
+                            bcConfig.host = kv.value_.get_str();
+                        if (kv.name_ == "port")
+                            bcConfig.port = (unsigned short) kv.value_.get_int();
+                        if (kv.name_ == "rpcuser")
+                            bcConfig.rpcuser = kv.value_.get_str();
+                        if (kv.name_ == "rpcpassword")
+                            bcConfig.rpcpassword = kv.value_.get_str();
+                    }
+
+                    if (isValidBlockchainConfig(bcConfig))
+                        configs.push_back(bcConfig);
+                    else
+                        LogPrintf("Invalid config entry in %s\n", configPath.string());
+                }
+            } else {
+                LogPrintf("Ignoring unknown section \"%s\"\n", section.name_);
+            }
         }
     } catch (std::runtime_error& e) {
-        LogPrintf("Failed to parse JSON from luxgateconf.json: %s\n", e.what());
+        LogPrintf("Failed to parse JSON from %s: %s\n", configPath.string(), e.what());
         return configs;
     }
 
