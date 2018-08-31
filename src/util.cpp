@@ -19,6 +19,8 @@
 #include "utilstrencodings.h"
 #include "utiltime.h"
 
+#include <json/json_spirit_reader.h>
+
 #include <stdarg.h>
 
 #include <boost/date_time/posix_time/posix_time.hpp>
@@ -141,6 +143,10 @@ void locking_callback(int mode, int i, const char* file, int line)
     } else {
         LEAVE_CRITICAL_SECTION(*ppmutexOpenSSL[i]);
     }
+}
+
+std::string BlockchainConfig::ToString() {
+    return strprintf("ticker=%s, host=%s, port=%d, rpcuser=%s, rpcpassword=%s", ticker, host, port, rpcuser, rpcpassword);
 }
 
 // Init
@@ -564,6 +570,75 @@ boost::filesystem::path GetConfigFile()
         pathConfigFile = GetDataDir(false) / pathConfigFile;
 
     return pathConfigFile;
+}
+
+boost::filesystem::path GetLuxGateConfigFile() {
+    boost::filesystem::path pathConfigFile(GetArg("-luxgateconf", "luxgateconf.json"));
+    if (!pathConfigFile.is_complete())
+        pathConfigFile = GetDataDir(false) / pathConfigFile;
+
+    return boost::filesystem::canonical(pathConfigFile);
+}
+
+bool isValidBlockchainConfig(const BlockchainConfig& config) {
+    // ticker must be set, port must be 1-65535, rpcuser must be set
+    // host can be empty, which means localhost (for now) //TODO
+    // rpcpassword must be set
+    return config.ticker != "" && config.rpcuser != "" && config.rpcpassword != "" && config.port > 0 && config.port < 65535;
+}
+
+std::vector<BlockchainConfig> ReadLuxGateConfigFile() {
+    std::vector<BlockchainConfig> configs;
+    boost::filesystem::path configPath = GetLuxGateConfigFile();
+    boost::filesystem::ifstream streamConfig(configPath);
+    if (!streamConfig.good()) {
+        // Create empty lux.conf if it does not exist
+        FILE* configFile = fopen(configPath.string().c_str(), "a");
+        if (configFile != NULL)
+            fclose(configFile);
+        return configs; // Nothing to read, so just return empty list
+    }
+
+    json_spirit::Value jsonContent;
+    if (!json_spirit::read(streamConfig, jsonContent)) {
+        LogPrintf("Failed to read luxgateconf.json\n");
+        return configs;
+    }
+
+    try {
+        auto root = jsonContent.get_obj();
+        if (root.size() == 0) {
+            LogPrintf("luxgateconf.json has an empty root element\n");
+            return configs;
+        }
+        auto blockchains = root[0].value_.get_array();
+        for (auto blockchain : blockchains) {
+            auto bcinfo = blockchain.get_obj();
+            BlockchainConfig bcConfig;
+            for (auto kv : bcinfo) {
+                if (kv.name_ == "ticker")
+                    bcConfig.ticker = kv.value_.get_str();
+                if (kv.name_ == "host")
+                    bcConfig.host = kv.value_.get_str();
+                if (kv.name_ == "port")
+                    bcConfig.port = (unsigned short) kv.value_.get_int();
+                if (kv.name_ == "rpcuser")
+                    bcConfig.rpcuser = kv.value_.get_str();
+                if (kv.name_ == "rpcpassword")
+                    bcConfig.rpcpassword = kv.value_.get_str();
+            }
+
+            if (isValidBlockchainConfig(bcConfig))
+                configs.push_back(bcConfig);
+            else
+                LogPrintf("Invalid config entry in luxgateconf.json\n");
+        }
+    } catch (std::runtime_error&) {
+        LogPrintf("Failed to parse JSON from luxgateconf.json\n");
+        return configs;
+    }
+
+    return configs;
 }
 
 boost::filesystem::path GetMasternodeConfigFile()

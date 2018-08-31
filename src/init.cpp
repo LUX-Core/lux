@@ -14,6 +14,7 @@
 #include "activemasternode.h"
 #include "addrman.h"
 #include "amount.h"
+#include <blockchainclient.h>
 #include "chain.h"
 #include "chainparams.h"
 #include "checkpoints.h"
@@ -346,6 +347,7 @@ std::string HelpMessage(HelpMessageMode mode)
     strUsage += "  -checkblocks=<n>       " + strprintf(_("How many blocks to check at startup (default: %u, 0 = all)"), 500) + "\n";
     strUsage += "  -checklevel=<n>        " + strprintf(_("How thorough the block verification of -checkblocks is (0-4, default: %u)"), 3) + "\n";
     strUsage += "  -conf=<file>           " + strprintf(_("Specify configuration file (default: %s)"), "lux.conf") + "\n";
+    strUsage += "  -luxgateconf=<file>           " + strprintf(_("Specify LuxGate configuration file (default: %s)"), "luxgateconf.json") + "\n";
     if (mode == HMM_BITCOIND) {
 #if !defined(WIN32)
         strUsage += "  -daemon                " + _("Run in the background as a daemon and accept commands") + "\n";
@@ -1038,8 +1040,17 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
     LogPrintf("Default data directory %s\n", GetDefaultDataDir().string());
     LogPrintf("Using data directory %s\n", strDataDir);
     LogPrintf("Using config file %s\n", GetConfigFile().string());
+    LogPrintf("Using LuxGate config file %s\n", GetLuxGateConfigFile().string());
     LogPrintf("Using at most %i connections (%i file descriptors available)\n", nMaxConnections, nFD);
     std::ostringstream strErrors;
+
+    // Read LuxGate config
+    std::vector<BlockchainConfig> config = ReadLuxGateConfigFile();
+    for (BlockchainConfig conf : config) {
+        LogPrintf("BlockchainConfig: %s\n", conf.ToString().c_str());
+        CBitcoinClient client(conf);
+        LogPrintf("%s swap support - %s\n", client.ticker, client.IsSwapSupported() ? "yes" : "no");
+    }
 
     LogPrintf("Using %u threads for script verification\n", nScriptCheckThreads);
     if (nScriptCheckThreads) {
