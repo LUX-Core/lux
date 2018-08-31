@@ -9,6 +9,9 @@
 
 #include <boost/algorithm/string.hpp>
 
+// This blockchainclient used for luxgate, and its important.
+// Do not adjust if you don't understand the consequences.
+
 bool CBitcoinClient::CanConnect() {
     try {
         CallRPC("help", NullUniValue);
