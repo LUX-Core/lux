@@ -350,6 +350,11 @@ libbitcoin_consensus_a_SOURCES = \
   cpp-ethereum/libdevcore/CommonData.h \
   hash.cpp \
   hash.h \
+  json/json_spirit_error_position.h \
+  json/json_spirit_reader.h \
+  json/json_spirit_reader.cpp \
+  json/json_spirit_value.h \
+  json/json_spirit_value.cpp \
   key.cpp \
   prevector.h \
   primitives/block.cpp \
@@ -600,6 +605,11 @@ libbitcoin_util_a_SOURCES = \
   compat/glibcxx_sanity.cpp \
   chainparamsbase.cpp \
   clientversion.cpp \
+  json/json_spirit_error_position.h \
+  json/json_spirit_reader.h \
+  json/json_spirit_reader.cpp \
+  json/json_spirit_value.h \
+  json/json_spirit_value.cpp \
   random.cpp \
   rpcprotocol.cpp \
   rpcutil.cpp \
