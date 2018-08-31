@@ -78,6 +78,7 @@ BITCOIN_CORE_H = \
   base58.h \
   bech32.h \
   bip38.h \
+  blockchainclient.h \
   bloom.h \
   chain.h \
   chainparams.h \
@@ -190,6 +191,7 @@ libbitcoin_server_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 libbitcoin_server_a_SOURCES = \
   addrman.cpp \
   alert.cpp \
+  blockchainclient.cpp \
   bloom.cpp \
   chain.cpp \
   checkpoints.cpp \
