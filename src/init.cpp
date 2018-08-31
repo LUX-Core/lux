@@ -385,6 +385,7 @@ std::string HelpMessage(HelpMessageMode mode)
     strUsage += HelpMessageOpt("-checkblocks=<n>", strprintf(_("How many blocks to check at startup (default: %u, 0 = all)"), 500));
     strUsage += HelpMessageOpt("-checklevel=<n>", strprintf(_("How thorough the block verification of -checkblocks is (0-4, default: %u)"), 3));
     strUsage += HelpMessageOpt("-conf=<file>", strprintf(_("Specify configuration file (default: %s)"), "lux.conf"));
+    strUsage += HelpMessageOpt("-luxgateconf=<file>", strprintf(_("Specify LuxGate configuration file (default: %s)"), "luxgateconf.json"));
     if (mode == HMM_BITCOIND) {
 #if !defined(WIN32)
         strUsage += HelpMessageOpt("-daemon", _("Run in the background as a daemon and accept commands"));
@@ -1138,10 +1139,15 @@ bool AppInit2()
     LogPrintf("Default data directory %s\n", GetDefaultDataDir().string());
     LogPrintf("Using data directory %s\n", strDataDir);
     LogPrintf("Using config file %s\n", GetConfigFile().string());
+    LogPrintf("Using LuxGate config file %s\n", GetLuxGateConfigFile().string());
     LogPrintf("Using at most %i connections (%i file descriptors available)\n", nMaxConnections, nFD);
     std::ostringstream strErrors;
 
     InitSignatureCache();
+    // Read LuxGate config
+    std::vector<BlockchainConfig> config = ReadLuxGateConfigFile();
+    for (BlockchainConfig conf : config)
+        LogPrintf("BlockchainConfig: %s\n", conf.ToString().c_str());
 
     LogPrintf("Using %u threads for script verification\n", nScriptCheckThreads);
     if (nScriptCheckThreads) {

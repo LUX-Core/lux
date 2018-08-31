@@ -133,6 +133,17 @@ static inline bool error(const char* format)
     return false;
 }
 
+/** Connection config for connecting blockchain to LuxGate */
+struct BlockchainConfig {
+    std::string ticker;
+    std::string host;
+    int port;
+    std::string rpcuser;
+    std::string rpcpassword;
+
+    std::string ToString();
+};
+
 void PrintExceptionContinue(std::exception* pex, const char* pszThread);
 void ParseParameters(int argc, const char* const argv[]);
 void FileCommit(FILE* fileout);
@@ -149,6 +160,9 @@ boost::filesystem::path GetMasternodeConfigFile();
 boost::filesystem::path GetPidFile();
 void CreatePidFile(const boost::filesystem::path& path, pid_t pid);
 #endif
+boost::filesystem::path GetLuxGateConfigFile();
+bool isValidBlockchainConfig(const BlockchainConfig&);
+std::vector<BlockchainConfig> ReadLuxGateConfigFile();
 void ReadConfigFile(std::map<std::string, std::string>& mapSettingsRet, std::map<std::string, std::vector<std::string> >& mapMultiSettingsRet);
 void WriteConfigToFile(std::string strKey, std::string strValue);
 #ifdef WIN32
