@@ -655,8 +655,8 @@ std::vector<BlockchainConfig> ReadLuxGateConfigFile() {
             else
                 LogPrintf("Invalid config entry in luxgateconf.json\n");
         }
-    } catch (std::runtime_error&) {
-        LogPrintf("Failed to parse JSON from luxgateconf.json\n");
+    } catch (std::runtime_error& e) {
+        LogPrintf("Failed to parse JSON from luxgateconf.json: %s\n", e.what());
         return configs;
     }
 
