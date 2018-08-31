@@ -14,6 +14,7 @@
 #include "activemasternode.h"
 #include "addrman.h"
 #include "amount.h"
+#include <blockchainclient.h>
 #include "chain.h"
 #include "chainparams.h"
 #include "checkpoints.h"
@@ -1146,8 +1147,11 @@ bool AppInit2()
     InitSignatureCache();
     // Read LuxGate config
     std::vector<BlockchainConfig> config = ReadLuxGateConfigFile();
-    for (BlockchainConfig conf : config)
+    for (BlockchainConfig conf : config) {
         LogPrintf("BlockchainConfig: %s\n", conf.ToString().c_str());
+        CBitcoinClient client(conf);
+        LogPrintf("%s swap support - %s\n", client.ticker, client.IsSwapSupported() ? "yes" : "no");
+    }
 
     LogPrintf("Using %u threads for script verification\n", nScriptCheckThreads);
     if (nScriptCheckThreads) {
