@@ -1421,7 +1421,7 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
     int64_t nCoinDBCache = std::min(nTotalCache / 2, (nTotalCache / 4) + (1 << 23)); // use 50% the remaining cache for coindb cache
     nCoinDBCache = min(nCoinDBCache, nMaxCoinsDBCache << 20); // cap total coins db cache
     nTotalCache -= nCoinDBCache;
-    nCoinCacheSize = nTotalCache; // the rest goes to in-memory cache (300bytes)
+    nCoinCacheUsage = nTotalCache; // the rest goes to in-memory cache (300bytes)
 
     bool fLoaded = false;
     while (!fLoaded && !fRequestShutdown) {
