@@ -1,0 +1,82 @@
+@startuml
+
+
+' Just for better look
+skinparam shadowing false
+skinparam defaultFontColor #d8d8d8
+skinparam defaultFontName "Fira Code"
+skinparam BackgroundColor #333333
+skinparam sequenceArrowThickness 2
+skinparam roundcorner 2
+skinparam ParticipantBorderColor #black
+skinparam NoteBackgroundColor #333333
+skinparam NoteBorderColor  #d8d8d8
+skinparam sequence {
+    ArrowColor #white
+    LifeLineBorderColor #d8d8d8
+    ActorBorderColor #black
+}
+
+actor Alice #6b4c70
+participant btcA as "Alice's BTC Node"  #6b4c70
+participant luxA as "Alice's LUX Node"  #6b4c70
+participant lgA as "Alice's Luxgate" #6b4c70
+participant lgB as "Bob's Luxgate"  #007a74
+participant luxB as "Bob's LUX Node"  #007a74
+participant btcB as "Bob's BTC Node"  #007a74
+actor Bob  #007a74
+
+autonumber
+
+Bob -> lgB : Sell Y BTC for X LUX
+rnote over lgB : Create **bid_id**
+lgB -> lgA : //Broadcast//\nSellNotify(**bid_id**, "BTC\LUX", Y, X)
+... After ...
+Alice -> lgA : Buy X LUX for Y BTC
+
+rnote over lgA
+Lookup in orderbook
+Create **ask_id**
+endrnote
+
+lgA -> lgB : Buy(**bid_id**, **ask_id**, "LUX/BTC", X, Y)
+lgB -> lgA : Match(**ask_id**, **bid_id**)
+
+lgA -> btcA :  GenerateAddress
+btcA -> lgA :  **addressBTC**
+
+lgB -> luxB : GenerateAddress
+luxB -> lgB : **addressLUX**
+
+lgA -> lgB : StartSwap(**order_id**, **addressBTC**)
+lgB -> lgA : **addressLUX**
+
+rnote over lgB : Generate **secret**
+
+lgB -> btcB : Create contract sending Y BTC to **addressBTC**\nusing **secretHash**
+btcB -> lgB : **txidBTC**\nVerify tx
+
+lgB -> lgA : **txidBTC**, **secretHash**
+
+lgA -> btcA : Verify tx
+btcA -> lgA
+
+lgA -> luxA : Create contract sending X LUX\nto **addressLUX** using **secretHash**
+luxA -> lgA : **txidLUX**\nVerify tx
+
+lgA -> lgB : **txidLUX**
+
+
+lgB -> btcB : Verify tx
+btcB -> lgB
+
+lgB -> luxB : Spend LUX UTXO's using **secret**
+
+luxB -> lgB : Verify tx
+
+lgB -> lgA : //Broadcast// \nSellCompletedNotify(**bid_id**)
+
+lgA -> luxA : Find Bob's spent tx outs\nand find **secret**
+lgA -> btcA : Spend BTC UTXO's\nusing **secret**
+
+@enduml
