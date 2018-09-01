@@ -608,6 +608,7 @@ libbitcoin_util_a_SOURCES = \
   chainparamsbase.cpp \
   clientversion.cpp \
   json/json_spirit_error_position.h \
+  json/json_spirit_reader_template.h \
   json/json_spirit_reader.h \
   json/json_spirit_reader.cpp \
   json/json_spirit_value.h \
