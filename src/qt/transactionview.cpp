@@ -36,7 +36,7 @@
 #include <QVBoxLayout>
 
 TransactionView::TransactionView(QWidget* parent) : QWidget(parent), model(0), transactionProxyModel(0),
-                                                    transactionView(0)
+                                                    transactionView(0), columnResizingFixer(0)
 {
     QSettings settings;
     // Build filter row
@@ -151,7 +151,7 @@ TransactionView::TransactionView(QWidget* parent) : QWidget(parent), model(0), t
     QAction* editLabelAction = new QAction(tr("Edit label"), this);
     QAction* showDetailsAction = new QAction(tr("Show transaction details"), this);
 
-    contextMenu = new QMenu();
+    contextMenu = new QMenu(this);
     contextMenu->addAction(copyAddressAction);
     contextMenu->addAction(copyLabelAction);
     contextMenu->addAction(copyAmountAction);
@@ -213,7 +213,7 @@ void TransactionView::setModel(WalletModel* model)
         // Note: it's a good idea to connect this signal AFTER the model is set
         connect(transactionView->selectionModel(), SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this, SLOT(computeSum()));
 
-        columnResizingFixer = new GUIUtil::TableViewLastColumnResizingFixer(transactionView, AMOUNT_MINIMUM_COLUMN_WIDTH, MINIMUM_COLUMN_WIDTH, this, 2);
+        columnResizingFixer = new GUIUtil::TableViewLastColumnResizingFixer(transactionView, AMOUNT_MINIMUM_COLUMN_WIDTH, MINIMUM_COLUMN_WIDTH, this);
 
         if (model->getOptionsModel()) {
             // Add third party transaction URLs to context menu
@@ -447,8 +447,9 @@ void TransactionView::showDetails()
         return;
     QModelIndexList selection = transactionView->selectionModel()->selectedRows();
     if (!selection.isEmpty()) {
-        TransactionDescDialog dlg(selection.at(0));
-        dlg.exec();
+        TransactionDescDialog *dlg = new TransactionDescDialog(selection.at(0));
+        dlg->setAttribute(Qt::WA_DeleteOnClose);
+        dlg->show();
     }
 }
 

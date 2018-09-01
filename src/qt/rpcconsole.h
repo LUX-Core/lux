@@ -70,7 +70,13 @@ private slots:
     void showEvent(QShowEvent* event);
     void hideEvent(QHideEvent* event);
     /** Show custom context menu on Peers tab */
-    void showMenu(const QPoint& point);
+    void showPeersTableContextMenu(const QPoint& point);
+    /** Show custom context menu on Bans tab */
+    void showBanTableContextMenu(const QPoint& point);
+    /** Hides ban table if no bans are present */
+    void showOrHideBanTableIfRequired();
+    /** clear the selected node */
+    void clearSelectedNode();
 
 public slots:
     void clear();
@@ -120,6 +126,10 @@ public slots:
     void peerLayoutChanged();
     /** Disconnect a selected node on the Peers tab */
     void disconnectSelectedNode();
+    /** Ban a selected node on the Peers tab */
+    void banSelectedNode(int bantime);
+    /** Unban a selected node on the Bans tab */
+    void unbanSelectedNode();
     /** Show folder with wallet backups in default browser */
     void showBackups();
 
@@ -140,11 +150,13 @@ private:
     void buildParameterlist(QString arg);
     /** show detailed information on ui about selected node */
     void updateNodeDetail(const CNodeCombinedStats* stats);
-    void clearSelectedNode();
+
     enum ColumnWidths {
         ADDRESS_COLUMN_WIDTH = 170,
         SUBVERSION_COLUMN_WIDTH = 140,
-        PING_COLUMN_WIDTH = 80
+        PING_COLUMN_WIDTH = 80,
+        BANSUBNET_COLUMN_WIDTH = 300,
+        BANTIME_COLUMN_WIDTH = 150
     };
 
     Ui::RPCConsole* ui;
@@ -154,9 +166,10 @@ private:
     int historyPtr;
     NodeId cachedNodeid;
     int consoleFontSize;
-    QMenu *contextMenu;
     QCompleter *autoCompleter;
     QThread thread;
+    QMenu *peersTableContextMenu;
+    QMenu *banTableContextMenu;
 
 };
 
