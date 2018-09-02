@@ -88,6 +88,10 @@ void OptionsModel::Init()
         settings.setValue("fparallelMasterNode", false);
     fparallelMasterNode = settings.value("fparallelMasterNode", false).toBool();
 
+    if (!settings.contains("fNotUseChangeAddress"))
+        settings.setValue("fNotUseChangeAddress", DEFAULT_NOT_USE_CHANGE_ADDRESS);
+    fNotUseChangeAddress = settings.value("fNotUseChangeAddress", DEFAULT_NOT_USE_CHANGE_ADDRESS).toBool();
+
     // These are shared with the core or have a command-line parameter
     // and we want command-line parameters to overwrite the GUI settings.
     //
@@ -245,8 +249,10 @@ QVariant OptionsModel::data(const QModelIndex& index, int role) const
             return fCoinControlFeatures;
         case showMasternodesTab:
              return fshowMasternodesTab;
-         case parallelMasterNode:
+        case parallelMasterNode:
               return fparallelMasterNode;
+        case NotUseChangeAddress:
+              return settings.value("fNotUseChangeAddress");
         case WalletBackups:
             return QVariant(nWalletBackups);
         case DatabaseCache:
@@ -389,10 +395,16 @@ bool OptionsModel::setData(const QModelIndex& index, const QVariant& value, int 
             settings.setValue("fshowMasternodesTab", fshowMasternodesTab);
             emit showMasternodesTabChanged(fshowMasternodesTab);
              break;
-         case parallelMasterNode:
+        case parallelMasterNode:
              fparallelMasterNode = value.toBool();
              settings.setValue("fparallelMasterNode", fparallelMasterNode);
              emit parallelMasterNodeChanged(fparallelMasterNode);
+             break;
+        case NotUseChangeAddress:
+             if (settings.value("fNotUseChangeAddress") != value) {
+                settings.setValue("fNotUseChangeAddress", value);
+                fNotUseChangeAddress = value.toBool();
+             }
              break;
         case WalletBackups:
             nWalletBackups = value.toInt();
