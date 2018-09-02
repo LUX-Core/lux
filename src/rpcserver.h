@@ -440,6 +440,9 @@ extern UniValue gettransactionreceipt(const UniValue& params, bool fHelp);
 extern UniValue searchlogs(const UniValue& params, bool fHelp);
 extern UniValue pruneblockchain(const UniValue& params, bool fHelp);
 
+extern UniValue createorder(const UniValue& params, bool fHelp); 
+extern UniValue getactivecoins(const UniValue& params, bool fHelp); 
+
 // in rest.cpp
 extern bool HTTPReq_REST(AcceptedConnection* conn,
     std::string& strURI,
