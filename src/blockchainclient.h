@@ -16,8 +16,6 @@ public:
 };
 
 class CAbstractBlockchainClient {
-protected:
-    const BlockchainConfig config;
 
 public:
     CAbstractBlockchainClient(const BlockchainConfig& conf) : config(conf), ticker(conf.ticker) {}
@@ -28,7 +26,10 @@ public:
     virtual UniValue CallRPC(const std::string& strMethod, const UniValue& params) = 0;
 
     const std::string ticker;
+    const BlockchainConfig config;
 };
+
+extern std::map<std::string, std::shared_ptr<CAbstractBlockchainClient>> blockchainClientPool;
 
 class CBitcoinClient : public CAbstractBlockchainClient {
 public:

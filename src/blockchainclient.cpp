@@ -9,6 +9,8 @@
 
 #include <boost/algorithm/string.hpp>
 
+std::map<std::string, std::shared_ptr<CAbstractBlockchainClient>> blockchainClientPool;
+
 bool CBitcoinClient::CanConnect() {
     try {
         CallRPC("help", NullUniValue);

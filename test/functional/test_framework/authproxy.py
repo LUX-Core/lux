@@ -147,9 +147,11 @@ class AuthServiceProxy(object):
             raise ValueError('Cannot handle both named and positional arguments')
         postdata = json.dumps({'version': '1.1',
                                'method': self._service_name,
-                               'params': args or argsn,
+                               'params': (args or list(argsn.values())), # transform dict of named args ("{}") to []
                                'id': AuthServiceProxy.__id_count}, default=EncodeDecimal, ensure_ascii=self.ensure_ascii)
-        response = self._request('POST', self.__url.path, postdata.encode('utf-8'))
+        body = postdata.encode('utf-8')
+        print(body)
+        response = self._request('POST', self.__url.path, body)
         if response['error'] is not None:
             raise JSONRPCException(response['error'])
         elif 'result' not in response:

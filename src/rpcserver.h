@@ -442,6 +442,14 @@ extern UniValue pruneblockchain(const UniValue& params, bool fHelp);
 bool StartRPC();
 void InterruptRPC();
 void StopRPC();
+extern UniValue createorder(const UniValue& params, bool fHelp); 
+extern UniValue getactivecoins(const UniValue& params, bool fHelp); 
+
+// in rest.cpp
+extern bool HTTPReq_REST(AcceptedConnection* conn,
+    std::string& strURI,
+    std::map<std::string, std::string>& mapHeaders,
+    bool fRun);
 std::string JSONRPCExecBatch(const UniValue& vReq);
 void RPCNotifyBlockChange(bool ibd, const CBlockIndex* pindex);
 
