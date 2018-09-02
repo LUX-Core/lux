@@ -1284,7 +1284,7 @@ void CWallet::ReacceptWalletTransactions()
         CWalletTx& wtx = *(item.second);
 
             // Try to add to memory pool
-            LOCK(mempool.cs);
+            //LOCK(mempool.cs);
             wtx.AcceptToMemoryPool(false);
         }
     }
