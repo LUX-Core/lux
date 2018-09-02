@@ -296,7 +296,7 @@ WalletModel::SendCoinsReturn WalletModel::prepareTransaction(WalletModelTransact
     }
 
     {
-        LOCK2(cs_main, wallet->cs_wallet);
+        //LOCK2(cs_main, wallet->cs_wallet);
 
         transaction.newPossibleKeyChange(wallet);
         CAmount nFeeRequired = 0;
