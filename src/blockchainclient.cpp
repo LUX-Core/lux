@@ -16,6 +16,11 @@ bool CBitcoinClient::CanConnect() {
         CallRPC("help", NullUniValue);
     } catch (CClientConnectionError) {
         return false;
+    } catch (const std::runtime_error& e) {
+        // We connected to the server, but something failed after that
+        // So basically we can connect, but warn about problems after connection
+        LogPrintf("CBitcoinClient::CanConnect(): warning: %s", e.what());
+        return true;
     }
 
     return true;
