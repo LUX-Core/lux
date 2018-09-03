@@ -9,6 +9,8 @@
 
 #include <boost/algorithm/string.hpp>
 
+// This blockchainclient used for luxgate, and its important.
+// Do not adjust if you don't understand the consequences.
 std::map<std::string, std::shared_ptr<CAbstractBlockchainClient>> blockchainClientPool;
 
 bool CBitcoinClient::CanConnect() {

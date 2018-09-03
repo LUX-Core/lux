@@ -1259,7 +1259,10 @@
             </font>
            </property>
            <property name="text">
-            <string>                             LSR Tokens</string>
+            <string>LSR Tokens</string>
+           </property>
+           <property name="leftMargin">
+            <number>80</number>
            </property>
           </widget>
          </item>
