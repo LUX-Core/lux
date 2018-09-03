@@ -1217,6 +1217,9 @@ void RPCConsole::clearSelectedNode()
 
 void RPCConsole::showOrHideBanTableIfRequired()
 {
+    if (!clientModel)
+        return;
+
     bool visible = clientModel->getBanTableModel()->shouldShow();
     ui->banlistWidget->setVisible(visible);
     ui->banHeading->setVisible(visible);

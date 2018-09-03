@@ -8,6 +8,7 @@
 #define BITCOIN_QT_CLIENTMODEL_H
 
 #include <QObject>
+#include <QDateTime>
 
 class AddressTableModel;
 class BanTableModel;
