@@ -61,8 +61,16 @@ public:
 
     const std::string ticker;
     const BlockchainConfig config;
+
+    /**
+     * Should contain errors from the last CallRPC call, if any
+     */
+    std::vector<std::string> errors;
 };
 
+/**
+ * Map of blockchain clients, where key is a ticker
+ */
 extern std::map<std::string, std::shared_ptr<CAbstractBlockchainClient>> blockchainClientPool;
 
 /**
@@ -82,6 +90,8 @@ public:
      * @return true if can connect to blockchain via RPC using credentials provided in BlockchainConfig
      *
      * It checks connectivity by trying to call help RPC method on a node
+     *
+     * @note All possible exceptions CallRPC may throw are hanlded
      */
     virtual bool CanConnect() override;
 
@@ -92,6 +102,8 @@ public:
      * It checks whether atomic swaps are supported by checking node's client version.
      * CLTV was introduced in bitcoin 0.10.4, so this method checks if locally running
      * bitcoin node is running equal or higher version
+     *
+     * @note All possible exceptions CallRPC may throw are hanlded
      */
     virtual bool IsSwapSupported() override;
 
