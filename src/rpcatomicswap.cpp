@@ -1,9 +1,13 @@
-#include "rpcserver.h"
-#include "univalue/univalue.h"
-#include "sync.h"
-#include "util.h"
-#include "main.h"
-#include "blockchainclient.h"
+// Copyright (c) 2018 The Luxcore developers
+// Distributed under the MIT software license, see the accompanying
+// file COPYING or http://www.opensource.org/licenses/mit-license.php.
+
+#include <blockchainclient.h>
+#include <main.h>
+#include <rpcserver.h>
+#include <sync.h>
+#include <univalue/univalue.h>
+#include <util.h>
 
 
 UniValue createorder(const UniValue& params, bool fHelp) 
@@ -45,7 +49,11 @@ UniValue getactivecoins(const UniValue& params, bool fHelp)
         auto config = c.second->config;
         coinInfo.push_back(Pair("rpchost", config.host));
         coinInfo.push_back(Pair("rpcport", config.port));
-        coinInfo.push_back(Pair("rpcuser", config.rpcuser));
+        UniValue errors(UniValue::VARR);
+        for (std::string error : c.second->errors) {
+            errors.push_back(error);
+        }
+        coinInfo.push_back(Pair("errors", errors));
         coins.push_back(coinInfo);
     }
     result.push_back(Pair("coins", coins));

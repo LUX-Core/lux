@@ -53,6 +53,7 @@ bool CBitcoinClient::IsSwapSupported() {
 
 UniValue CBitcoinClient::CallRPC(const std::string& strMethod, const UniValue& params)
 {
+    errors.clear();
     // Connect to localhost
     bool fUseSSL = GetBoolArg("-rpcssl", false);
     boost::asio::io_service io_service;
@@ -63,8 +64,10 @@ UniValue CBitcoinClient::CallRPC(const std::string& strMethod, const UniValue& p
     boost::iostreams::stream<SSLIOStreamDevice<boost::asio::ip::tcp> > stream(d);
 
     const bool fConnected = d.connect(config.host, itostr(config.port));
-    if (!fConnected)
+    if (!fConnected) {
+        errors.push_back("couldn't connect to server");
         throw CClientConnectionError("couldn't connect to server");
+    }
 
     std::string strRPCUserColonPass;
     if (config.rpcpassword != "") {
@@ -89,21 +92,30 @@ UniValue CBitcoinClient::CallRPC(const std::string& strMethod, const UniValue& p
     std::string strReply;
     ReadHTTPMessage(stream, mapHeaders, strReply, nProto, std::numeric_limits<size_t>::max());
 
-    if (nStatus == HTTP_UNAUTHORIZED)
+    if (nStatus == HTTP_UNAUTHORIZED) {
+        errors.push_back("incorrect rpcuser or rpcpassword (authorization failed)");
         throw std::runtime_error("incorrect rpcuser or rpcpassword (authorization failed)");
-    else if (nStatus >= 400 && nStatus != HTTP_BAD_REQUEST && nStatus != HTTP_NOT_FOUND && nStatus != HTTP_INTERNAL_SERVER_ERROR)
+    }
+    else if (nStatus >= 400 && nStatus != HTTP_BAD_REQUEST && nStatus != HTTP_NOT_FOUND && nStatus != HTTP_INTERNAL_SERVER_ERROR) {
+        errors.push_back(strprintf("server returned HTTP error %d", nStatus));
         throw std::runtime_error(strprintf("server returned HTTP error %d", nStatus));
-    else if (strReply.empty())
+    } else if (strReply.empty()) {
+        errors.push_back("no response from server");
         throw std::runtime_error("no response from server");
+    }
 
     // Parse reply
     UniValue valReply(UniValue::VSTR);
-    if (!valReply.read(strReply))
+    if (!valReply.read(strReply)) {
+        errors.push_back("couldn't parse reply from server");
         throw std::runtime_error("couldn't parse reply from server");
+    }
 
     const UniValue& reply = valReply.get_obj();
-    if (reply.empty())
+    if (reply.empty()) {
+        errors.push_back("expected reply to have result, error and id properties");
         throw std::runtime_error("expected reply to have result, error and id properties");
+    }
 
     return reply;
 }
