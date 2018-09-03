@@ -598,14 +598,16 @@ boost::filesystem::path GetLuxGateConfigFile() {
     boost::filesystem::path pathConfigFile(GetArg("-luxgateconf", "luxgate.json"));
     if (!pathConfigFile.is_complete())
         pathConfigFile = GetDataDir(false) / pathConfigFile;
-    return pathConfigFile;
+    return boost::filesystem::absolute(pathConfigFile);
 }
 
 bool isValidBlockchainConfig(const BlockchainConfig& config) {
-    // ticker must be set, port must be 1-65535, rpcuser must be set
-    // host can be empty, which means localhost (for now) //TODO
-    // rpcpassword must be set
-    return config.ticker != "" && config.rpcuser != "" && config.rpcpassword != "" && config.port > 0 && config.port < 65535;
+    // ticker must be set, port must be 1000-65535, rpcuser must be set,
+    // host should be set, rpcpassword must be set
+    return config.ticker != "" &&
+           config.host != "" &&
+           config.port >= 1000 && config.port < 65535 &&
+           config.rpcuser != "" && config.rpcpassword != "";
 }
 
 std::vector<BlockchainConfig> ReadLuxGateConfigFile() {
