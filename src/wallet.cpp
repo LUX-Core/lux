@@ -2474,29 +2474,45 @@ bool CWallet::CreateTransaction(const vector<pair<CScript, CAmount> >& vecSend, 
                             ++it;
                         }
                     }
-                    // no coin control: send change to newly generated address
+                    // no coin control
                     else {
-                        // Note: We use a new key here to keep it from being obvious which side is the change.
-                        //  The drawback is that by not reusing a previous key, the change may be lost if a
-                        //  backup is restored, if the backup doesn't have the new private key for the change.
-                        //  If we reused the old key, it would be possible to add code to look for and
-                        //  rediscover unknown transactions that were written with keys of ours to recover
-                        //  post-backup change.
-
-                        // Reserve a new key pair from key pool
-                        CPubKey vchPubKey;
-                        bool ret;
-                        ret = reservekey.GetReservedKey(vchPubKey, true);
-                        if (!ret)
-                        {
-                            strFailReason = _("Keypool ran out, please call keypoolrefill first");
-                            return false;
+                        // "Don't use change address" option is enable
+                        if (fNotUseChangeAddress) {
+                            for (const PAIRTYPE(const CWalletTx*, unsigned int) & coin : setCoins) {
+                                const CScript& scriptPubKey = coin.first->vout[coin.second].scriptPubKey;
+                                CTxDestination address;
+                                if (ExtractDestination(scriptPubKey, address)) {
+                                    LogPrintf("%s: Re-using the address \"%s\"\n", __func__, EncodeDestination(address));
+                                    scriptChange = scriptPubKey;
+                                    break;
+                                }
+                            }
                         }
 
-                        const OutputType change_type = TransactionChangeType(vecSend);
+                        //send change to newly generated address
+                        else {
+                            // Note: We use a new key here to keep it from being obvious which side is the change.
+                            //  The drawback is that by not reusing a previous key, the change may be lost if a
+                            //  backup is restored, if the backup doesn't have the new private key for the change.
+                            //  If we reused the old key, it would be possible to add code to look for and
+                            //  rediscover unknown transactions that were written with keys of ours to recover
+                            //  post-backup change.
 
-                        LearnRelatedScripts(vchPubKey, change_type);
-                        scriptChange = GetScriptForDestination(GetDestinationForKey(vchPubKey, change_type));
+                            // Reserve a new key pair from key pool
+                            CPubKey vchPubKey;
+                            bool ret;
+                            ret = reservekey.GetReservedKey(vchPubKey, true);
+                            if (!ret)
+                            {
+                                strFailReason = _("Keypool ran out, please call keypoolrefill first");
+                                return false;
+                            }
+
+                            const OutputType change_type = TransactionChangeType(vecSend);
+
+                            LearnRelatedScripts(vchPubKey, change_type);
+                            scriptChange = GetScriptForDestination(GetDestinationForKey(vchPubKey, change_type));
+                        }
                     }
 
                     if (!combineChange) {
