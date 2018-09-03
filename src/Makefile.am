@@ -73,6 +73,7 @@ BITCOIN_CORE_H = \
   activemasternode.h \
   addrman.h \
   addressindex.h \
+  atomicswap.h \
   alert.h \
   allocators.h \
   amount.h \
@@ -198,6 +199,7 @@ libbitcoin_server_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 libbitcoin_server_a_SOURCES = \
   addrman.cpp \
   alert.cpp \
+  atomicswap.cpp \
   blockchainclient.cpp \
   bloom.cpp \
   chain.cpp \
