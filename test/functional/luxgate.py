@@ -113,7 +113,6 @@ class ExampleTest(LuxTestFramework):
         assert_equal(btc['ticker'], 'BTC')
         assert_equal(btc['rpchost'], '127.0.0.1')
         assert_equal(btc['rpcport'], 8332)
-        assert_equal(btc['rpcuser'], 'rpcuser')
         
         assert_equal(btc['active'], True)
         assert_equal(btc['swap_supported'], True)
@@ -129,10 +128,10 @@ class ExampleTest(LuxTestFramework):
         assert_equal(btc['ticker'], 'BTC')
         assert_equal(btc['rpchost'], '127.0.0.1')
         assert_equal(btc['rpcport'], 8339)
-        assert_equal(btc['rpcuser'], 'rpcuser')
 
         assert_equal(btc['active'], False)
         assert_equal(btc['swap_supported'], False)
+        assert_equal(btc['errors'][0], 'couldn\'t connect to server')
 
          # not implemented. Just check that luxd doesn't crash
         node1.rpc.createorder("BTC", "LUX", 1, 1)

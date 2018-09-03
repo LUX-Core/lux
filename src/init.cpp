@@ -1048,10 +1048,10 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
     std::vector<BlockchainConfig> config = ReadLuxGateConfigFile();
     for (BlockchainConfig conf : config) {
         LogPrintf("BlockchainConfig: %s\n", conf.ToString().c_str());
-        auto client = make_shared<CBitcoinClient>(conf);
+        auto client = std::make_shared<CBitcoinClient>(conf);
         bool swapIsSupported = client->IsSwapSupported();
         LogPrintf("%s swap support - %s\n", client->ticker, swapIsSupported ? "yes" : "no");
-        blockchainClientPool.insert(make_pair(client->ticker, client));
+        blockchainClientPool.insert(std::make_pair(client->ticker, client));
     }
 
     LogPrintf("Using %u threads for script verification\n", nScriptCheckThreads);
