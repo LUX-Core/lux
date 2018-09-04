@@ -234,6 +234,7 @@ AC_ARG_ENABLE([debug],
 if test "x$enable_debug" = xyes; then
     if test "x$GCC" = xyes; then
         CFLAGS="-g -ggdb -DDEBUG"
+        CPPFLAGS="-g -ggdb -DDEBUG"
     fi
     if test "x$GXX" = xyes; then
         CXXFLAGS="-g -ggdb -DDEBUG"
