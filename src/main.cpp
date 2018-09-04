@@ -4543,7 +4543,11 @@ bool IsWitnessLocked(const CBlockIndex* pindexPrev){
 bool TestBlockValidity(CValidationState& state, const CChainParams& chainparams, const CBlock& block, CBlockIndex* const pindexPrev, bool fCheckPOW, bool fCheckMerkleRoot)
 {
     AssertLockHeld(cs_main);
-    assert(pindexPrev == chainActive.Tip());
+
+    // In some case, chainActive.Tip() will return null. This will hit the assertion. So, we will
+    // checking the assertion only when chainActive.Tip() return "not null"
+    CBlockIndex *pIndex = chainActive.Tip();
+    if (pIndex) assert(pindexPrev == pIndex);
 
     CCoinsViewCache viewNew(pcoinsTip);
     CBlockIndex index(block);

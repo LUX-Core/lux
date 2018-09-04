@@ -266,6 +266,7 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
     pblocktemplate->vTxSigOpsCost.push_back(-1); // updated at end
 
     //LOCK2(cs_main, mempool.cs);
+    LOCK(cs_main);
     CBlockIndex* pindexPrev = chainActive.Tip();
     if (!pindexPrev) return nullptr;
 
