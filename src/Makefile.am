@@ -83,6 +83,7 @@ BITCOIN_CORE_H = \
   bech32.h \
   bip38.h \
   blockchainclient.h \
+  luxgate.h \
   bloom.h \
   chain.h \
   chainparams.h \
@@ -226,6 +227,7 @@ libbitcoin_server_a_SOURCES = \
   httprpc.cpp \
   httpserver.cpp \
   luxcontrol.cpp \
+  luxgate.cpp \
   rpcserver.cpp \
   script/sigcache.cpp \
   timedata.cpp \

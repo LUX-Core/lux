@@ -445,6 +445,7 @@ void StopRPC();
 extern UniValue createorder(const UniValue& params, bool fHelp); 
 extern UniValue getactivecoins(const UniValue& params, bool fHelp); 
 extern UniValue createredeemscript(const UniValue& params, bool fHelp); //TODO: for testing, remove later
+extern UniValue listorderbook(const UniValue& params, bool fHelp); 
 
 // in rest.cpp
 extern bool HTTPReq_REST(AcceptedConnection* conn,

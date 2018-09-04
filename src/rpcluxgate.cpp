@@ -5,6 +5,7 @@
 #include <atomicswap.h>
 #include <base58.h>
 #include <blockchainclient.h>
+#include <luxgate.h>
 #include <main.h>
 #include <rpcserver.h>
 #include <sync.h>
@@ -62,6 +63,30 @@ UniValue getactivecoins(const UniValue& params, bool fHelp)
         coins.push_back(coinInfo);
     }
     result.push_back(Pair("coins", coins));
+
+    return result;
+}
+
+UniValue listorderbook(const UniValue& params, bool fHelp) {
+    if (fHelp || params.size() > 0 ) {
+         throw std::runtime_error(
+             "listorderbook\n"
+             "List orderbook\n");
+    }
+
+    UniValue result(UniValue::VOBJ);
+    UniValue orders(UniValue::VARR);
+    for (auto const &entry : orderbook) {
+        auto o = entry.second;
+        UniValue orderEntry(UniValue::VOBJ);
+        orderEntry.push_back(Pair("base", o->Base()));
+        orderEntry.push_back(Pair("rev", o->Rev()));
+        orderEntry.push_back(Pair("base_amount", o->BaseAmount()));
+        orderEntry.push_back(Pair("rev_amount", o->RevAmount()));
+        orderEntry.push_back(Pair("sender", o->Sender().ToStringIPPort()));
+        orders.push_back(orders);
+    }
+    result.push_back(Pair("orders", orders));
 
     return result;
 }

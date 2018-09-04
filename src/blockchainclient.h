@@ -10,6 +10,17 @@
 
 #include <string>
 
+typedef std::string Ticker;
+
+class CClientConnectionError;
+class CAbstractBlockchainClient;
+class CBitcoinClient;
+
+/**
+ * Map of blockchain clients, where key is a ticker
+ */
+extern std::map<Ticker, std::shared_ptr<CAbstractBlockchainClient>> blockchainClientPool;
+
 /**
  * @class CClientConnectionError
  * @brief Thrown when bitcoin client cannot connect to the RPC server
@@ -59,7 +70,7 @@ public:
      */
     virtual UniValue CallRPC(const std::string& strMethod, const UniValue& params) = 0;
 
-    const std::string ticker;
+    const Ticker ticker;
     const BlockchainConfig config;
 
     /**
@@ -68,10 +79,7 @@ public:
     std::vector<std::string> errors;
 };
 
-/**
- * Map of blockchain clients, where key is a ticker
- */
-extern std::map<std::string, std::shared_ptr<CAbstractBlockchainClient>> blockchainClientPool;
+
 
 /**
  * @class CBitcoinClient
@@ -121,7 +129,7 @@ public:
      */
     virtual UniValue CallRPC(const std::string& strMethod, const UniValue& params) override;
 
-    const std::string ticker = "BTC";
+    const Ticker ticker = "BTC";
 
 private:
     /**
