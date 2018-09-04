@@ -48,6 +48,7 @@ class ExampleTest(LuxTestFramework):
         self.extra_args = [[], []]
 
 
+
     def setup_chain(self):
         super().setup_chain()
 
@@ -117,10 +118,9 @@ class ExampleTest(LuxTestFramework):
         assert_equal(btc['active'], True)
         assert_equal(btc['swap_supported'], True)
 
-
-        # not implemented. Just check that luxd doesn't crash
-        node0.rpc.createorder("BTC", "LUX", 1, 1)
-
+        #
+        # Test wrong connection
+        #
 
         node1 = self.nodes[1]
         get_coins_rs = node1.rpc.getactivecoins()
@@ -133,8 +133,14 @@ class ExampleTest(LuxTestFramework):
         assert_equal(btc['swap_supported'], False)
         assert_equal(btc['errors'][0], 'couldn\'t connect to server')
 
-         # not implemented. Just check that luxd doesn't crash
-        node1.rpc.createorder("BTC", "LUX", 1, 1)
+        #
+        # Check that orderbook is empty on start and at least works
+        #
+
+        orderbook_rs = node0.rpc.listorderbook()
+        assert_equal(0, len(orderbook_rs['orders']))
+        
+
 
 
 if __name__ == '__main__':
