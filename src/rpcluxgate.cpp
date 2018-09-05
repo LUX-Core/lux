@@ -16,6 +16,23 @@
 #include <utilstrencodings.h>
 #include <wallet.h>
 
+bool TickerIsActive(Ticker ticker) {
+    
+    if (ticker == "LUX")
+        return true;
+    
+     for (auto const &c : blockchainClientPool) { 
+         if (c.first == ticker && c.second->CanConnect() && c.second->IsSwapSupported()) {
+            return true;
+         }
+     }
+
+     return false;
+}
+
+bool OneOfTheTickersIsLUX(Ticker t1, Ticker t2) {
+    return (t1 == "LUX" || t2 == "LUX") && (t1 != t2);
+}
 
 UniValue createorder(const UniValue& params, bool fHelp) 
 {
@@ -31,7 +48,39 @@ UniValue createorder(const UniValue& params, bool fHelp)
     }
     
     LOCK(cs_main);
+
+    Ticker base = params[0].get_str();
+    Ticker rel = params[1].get_str();
+
+    if (!OneOfTheTickersIsLUX(base, rel)) 
+        throw JSONRPCError(RPC_LUXGATE_ERROR, "One of the tickers must be LUX");
+    
+    if (!TickerIsActive(base)) {
+        throw JSONRPCError(RPC_LUXGATE_ERROR, "Ticker is not active: " + base);
+    }
+    if (!TickerIsActive(rel)) {
+        throw JSONRPCError(RPC_LUXGATE_ERROR, "Ticker is not active: " + rel);
+    }
+
+    
+    CAmount baseAmount = AmountFromValue(UniValue(UniValue::VNUM, params[2].get_str()));
+    CAmount relAmount =  AmountFromValue(UniValue(UniValue::VNUM, params[3].get_str()));
+
+    if (baseAmount <= 0 || relAmount <= 0)
+        throw JSONRPCError(RPC_LUXGATE_ERROR, "Invalid amount");
+    
+
+    //LOCK(cs_vNodes);
+    for (CNode *pnode : vNodes) {
+        auto order = std::make_shared<COrder>(base, rel, baseAmount, relAmount);
+        CAddress addr;
+        if (GetLocal(addr, &pnode->addr))
+            order->SetSender(addr);
+            pnode->PushMessage("createorder", *order);
+    }
+
     UniValue result(UniValue::VOBJ);
+
     return result;
 }
 
@@ -81,9 +130,33 @@ UniValue listorderbook(const UniValue& params, bool fHelp) {
         auto o = entry.second;
         UniValue orderEntry(UniValue::VOBJ);
         orderEntry.push_back(Pair("base", o->Base()));
-        orderEntry.push_back(Pair("rev", o->Rev()));
+        orderEntry.push_back(Pair("rel", o->Rel()));
         orderEntry.push_back(Pair("base_amount", o->BaseAmount()));
-        orderEntry.push_back(Pair("rev_amount", o->RevAmount()));
+        orderEntry.push_back(Pair("rel_amount", o->RelAmount()));
+        orderEntry.push_back(Pair("sender", o->Sender().ToStringIPPort()));
+        orders.push_back(orders);
+    }
+    result.push_back(Pair("orders", orders));
+
+    return result;
+}
+
+UniValue listactiveorders(const UniValue& params, bool fHelp) {
+    if (fHelp || params.size() > 0 ) {
+         throw std::runtime_error(
+             "listactiveorders\n"
+             "List active orders\n");
+    }
+
+    UniValue result(UniValue::VOBJ);
+    UniValue orders(UniValue::VARR);
+    for (auto const &entry : activeOrders) {
+        auto o = entry.second;
+        UniValue orderEntry(UniValue::VOBJ);
+        orderEntry.push_back(Pair("base", o->Base()));
+        orderEntry.push_back(Pair("rel", o->Rel()));
+        orderEntry.push_back(Pair("base_amount", o->BaseAmount()));
+        orderEntry.push_back(Pair("rel_amount", o->RelAmount()));
         orderEntry.push_back(Pair("sender", o->Sender().ToStringIPPort()));
         orders.push_back(orders);
     }
@@ -145,3 +218,5 @@ UniValue createswaptransaction(const UniValue& params, bool fHelp) {
 
     return result;
 }
+
+
