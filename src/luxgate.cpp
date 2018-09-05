@@ -36,6 +36,10 @@ void ProcessMessageLuxgate(CNode *pfrom, const std::string &strCommand, CDataStr
     }
 }
 
+bool IsLuxGateServiceSupported(const CNode* pfrom) {
+    return pfrom->nServices & NODE_LUXGATE;
+}
+
 OrderId COrder::ComputeId() const
 {
     return Hash(BEGIN(base), END(base),

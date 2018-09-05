@@ -19,6 +19,12 @@ extern std::map<OrderId, std::shared_ptr<COrder>> orderbook;
 
 void ProcessMessageLuxgate(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv, bool& isLuxgate);
 
+/**
+ * @brief Check for LuxGate service bit
+ * @param pfrom Node to check for LuxGate support
+ * @return LuxGate support flag
+ */
+bool IsLuxGateServiceSupported(const CNode* pfrom);
 
 class COrder 
 {
