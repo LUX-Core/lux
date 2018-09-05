@@ -1,11 +1,15 @@
+// Copyright (c) 2018 The Luxcore developers
+// Distributed under the MIT software license, see the accompanying
+// file COPYING or http://www.opensource.org/licenses/mit-license.php.
+
 #ifndef LUXGATE_H
 #define LUXGATE_H
 
-#include "main.h"
-#include "uint256.h"
-#include "util.h"
-#include "blockchainclient.h"
-#include "serialize.h"
+#include <blockchainclient.h>
+#include <main.h>
+#include <serialize.h>
+#include <uint256.h>
+#include <util.h>
 
 typedef uint256 OrderId; 
 

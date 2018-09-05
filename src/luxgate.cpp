@@ -1,9 +1,13 @@
+// Copyright (c) 2018 The Luxcore developers
+// Distributed under the MIT software license, see the accompanying
+// file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "luxgate.h"
-#include "hash.h"
-#include "utilstrencodings.h"
-#include "util.h"
-#include "net.h"
+#include <luxgate.h>
+
+#include <hash.h>
+#include <net.h>
+#include <utilstrencodings.h>
+#include <util.h>
 
 std::map<OrderId, std::shared_ptr<COrder>> orderbook;
 
