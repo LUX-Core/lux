@@ -75,7 +75,7 @@ struct ListenSocket {
 }
 
 /** Services this node implementation cares about */
-ServiceFlags nRelevantServices = NODE_NETWORK;
+ServiceFlags nRelevantServices = ServiceFlags(NODE_NETWORK | NODE_LUXGATE);
 
 //
 // Global state variables
@@ -83,7 +83,7 @@ ServiceFlags nRelevantServices = NODE_NETWORK;
 bool fDiscover = true;
 bool fListen = true;
 bool fNetworkActive = true;
-ServiceFlags nLocalServices = NODE_NETWORK;
+ServiceFlags nLocalServices = ServiceFlags(NODE_NETWORK | NODE_LUXGATE);
 CCriticalSection cs_mapLocalHost;
 map<CNetAddr, LocalServiceInfo> mapLocalHost;
 static bool vfReachable[NET_MAX] = {};
