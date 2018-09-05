@@ -363,8 +363,8 @@ static const CRPCCommand vRPCCommands[] =
         /* Luxgate features */
         {"luxgate", "createorder", &createorder, true, true, false},
         {"luxgate", "getactivecoins", &getactivecoins, true, true, false},
-        {"luxgate", "createredeemscript", &createredeemscript, true, true, false},
         {"luxgate", "listorderbook", &listorderbook, true, true, false},
+        {"luxgate", "createswaptransaction", &createswaptransaction, true, true, true},
 
 #ifdef ENABLE_WALLET
         //{"lux", "darksend", &darksend, false, false, true}, /* not threadSafe because of SendMoney */
