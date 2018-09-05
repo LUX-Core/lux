@@ -386,7 +386,10 @@ std::string HelpMessage(HelpMessageMode mode)
     strUsage += HelpMessageOpt("-checkblocks=<n>", strprintf(_("How many blocks to check at startup (default: %u, 0 = all)"), 500));
     strUsage += HelpMessageOpt("-checklevel=<n>", strprintf(_("How thorough the block verification of -checkblocks is (0-4, default: %u)"), 3));
     strUsage += HelpMessageOpt("-conf=<file>", strprintf(_("Specify configuration file (default: %s)"), "lux.conf"));
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// Luxgate
     strUsage += HelpMessageOpt("-luxgateconf=<file>", strprintf(_("Specify LuxGate configuration file (default: %s)"), "luxgate.json"));
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
     if (mode == HMM_BITCOIND) {
 #if !defined(WIN32)
         strUsage += HelpMessageOpt("-daemon", _("Run in the background as a daemon and accept commands"));
@@ -1135,6 +1138,7 @@ bool AppInit2()
     dev::g_logPost(std::string("\n\n\n\n\n\n\n\n\n\n"), NULL);
     //////////////////////////////////////////////////////////////////////
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////// Luxgate
     if (!fLogTimestamps)
         LogPrintf("Startup time: %s\n", DateTimeStrFormat("%Y-%m-%d %H:%M:%S", GetTime()));
     LogPrintf("Default data directory %s\n", GetDefaultDataDir().string());
@@ -1145,6 +1149,7 @@ bool AppInit2()
     std::ostringstream strErrors;
 
     InitSignatureCache();
+
     // Read LuxGate config
     std::vector<BlockchainConfig> config = ReadLuxGateConfigFile();
     for (BlockchainConfig conf : config) {
@@ -1154,7 +1159,7 @@ bool AppInit2()
         LogPrintf("%s swap support - %s\n", client->ticker, swapIsSupported ? "yes" : "no");
         blockchainClientPool.insert(std::make_pair(client->ticker, client));
     }
-
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     LogPrintf("Using %u threads for script verification\n", nScriptCheckThreads);
     if (nScriptCheckThreads) {
         for (int i = 0; i < nScriptCheckThreads - 1; i++)

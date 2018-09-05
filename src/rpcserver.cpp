@@ -366,12 +366,14 @@ static const CRPCCommand vRPCCommands[] =
         //{"lux", "mnsync", &mnsync, true, true, false},
         {"lux", "spork", &spork, true, true, false},
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////// Luxgate
         /* Luxgate features */
         {"luxgate", "createorder", &createorder, true, true, false},
         {"luxgate", "getactivecoins", &getactivecoins, true, true, false},
         {"luxgate", "listorderbook", &listorderbook, true, true, false},
         {"luxgate", "listactiveorders", &listactiveorders, true, true, false},
         {"luxgate", "createswaptransaction", &createswaptransaction, true, true, true},
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #ifdef ENABLE_WALLET
         //{"lux", "darksend", &darksend, false, false, true}, /* not threadSafe because of SendMoney */
