@@ -35,6 +35,7 @@ public:
     COrder() {}
     COrder(Ticker base, Ticker rel, CAmount baseAmount, CAmount relAmount) : 
                     base(base), rel(rel), baseAmount(baseAmount), relAmount(relAmount) {}
+    COrder(const COrder&) = default;
 
     OrderId ComputeId() const;
     CAddress Sender() const { return sender; }

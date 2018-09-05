@@ -69,14 +69,15 @@ UniValue createorder(const UniValue& params, bool fHelp)
     if (baseAmount <= 0 || relAmount <= 0)
         throw JSONRPCError(RPC_LUXGATE_ERROR, "Invalid amount");
     
-
+    auto order = std::make_shared<COrder>(base, rel, baseAmount, relAmount);
+    orderbook.insert(std::make_pair(order->ComputeId(), order));
     //LOCK(cs_vNodes);
     for (CNode *pnode : vNodes) {
-        auto order = std::make_shared<COrder>(base, rel, baseAmount, relAmount);
+        auto orderToPeer = std::make_shared<COrder>(*order);
         CAddress addr;
         if (GetLocal(addr, &pnode->addr))
-            order->SetSender(addr);
-            pnode->PushMessage("createorder", *order);
+            orderToPeer->SetSender(addr);
+            pnode->PushMessage("createorder", *orderToPeer);
     }
 
     UniValue result(UniValue::VOBJ);
