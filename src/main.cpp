@@ -6652,7 +6652,9 @@ static bool ProcessMessage(CNode* pfrom, const string &strCommand, CDataStream& 
         if (!processed) ProcessMasternodeConnections();
         if (!processed) ProcessInstantX(pfrom, strCommand, vRecv, processed);
         if (!processed) ProcessSpork(pfrom, strCommand, vRecv, processed);
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////  Luxgate
         if (!processed) ProcessMessageLuxgate(pfrom, strCommand, vRecv, processed);
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #       endif
     }
 

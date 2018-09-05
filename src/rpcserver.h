@@ -440,11 +440,13 @@ extern UniValue gettransactionreceipt(const UniValue& params, bool fHelp);
 extern UniValue searchlogs(const UniValue& params, bool fHelp);
 extern UniValue pruneblockchain(const UniValue& params, bool fHelp);
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////// Luxgate
 extern UniValue createorder(const UniValue& params, bool fHelp); 
 extern UniValue getactivecoins(const UniValue& params, bool fHelp);
 extern UniValue listorderbook(const UniValue& params, bool fHelp);
 extern UniValue listactiveorders(const UniValue& params, bool fHelp);
 extern UniValue createswaptransaction(const UniValue& params, bool fHelp); //TODO: for testing, remove later
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // in rest.cpp
 extern bool HTTPReq_REST(AcceptedConnection* conn,

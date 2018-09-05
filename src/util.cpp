@@ -571,7 +571,7 @@ boost::filesystem::path GetConfigFile()
 
     return pathConfigFile;
 }
-
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////// Luxgate
 boost::filesystem::path GetLuxGateConfigFile() {
     boost::filesystem::path pathConfigFile(GetArg("-luxgateconf", "luxgate.json"));
     if (!pathConfigFile.is_complete())
@@ -663,7 +663,7 @@ std::vector<BlockchainConfig> ReadLuxGateConfigFile() {
 
     return configs;
 }
-
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 boost::filesystem::path GetMasternodeConfigFile()
 {
     boost::filesystem::path pathConfigFile(GetArg("-mnconf", "masternode.conf"));

@@ -347,7 +347,10 @@ std::string HelpMessage(HelpMessageMode mode)
     strUsage += "  -checkblocks=<n>       " + strprintf(_("How many blocks to check at startup (default: %u, 0 = all)"), 500) + "\n";
     strUsage += "  -checklevel=<n>        " + strprintf(_("How thorough the block verification of -checkblocks is (0-4, default: %u)"), 3) + "\n";
     strUsage += "  -conf=<file>           " + strprintf(_("Specify configuration file (default: %s)"), "lux.conf") + "\n";
-    strUsage += "  -luxgateconf=<file>           " + strprintf(_("Specify LuxGate configuration file (default: %s)"), "luxgate.json") + "\n";
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// Luxgate
+    strUsage += "  -luxgateconf=<file>    " + strprintf(_("Specify LuxGate configuration file (default: %s)"), "luxgate.json") + "\n";
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
     if (mode == HMM_BITCOIND) {
 #if !defined(WIN32)
         strUsage += "  -daemon                " + _("Run in the background as a daemon and accept commands") + "\n";
@@ -1035,6 +1038,7 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
     dev::g_logPost(std::string("\n\n\n\n\n\n\n\n\n\n"), NULL);
     //////////////////////////////////////////////////////////////////////
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////// Luxgate
     if (!fLogTimestamps)
         LogPrintf("Startup time: %s\n", DateTimeStrFormat("%Y-%m-%d %H:%M:%S", GetTime()));
     LogPrintf("Default data directory %s\n", GetDefaultDataDir().string());
@@ -1043,7 +1047,7 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
     LogPrintf("Using LuxGate config file %s\n", GetLuxGateConfigFile().string());
     LogPrintf("Using at most %i connections (%i file descriptors available)\n", nMaxConnections, nFD);
     std::ostringstream strErrors;
-
+1
     // Read LuxGate config
     std::vector<BlockchainConfig> config = ReadLuxGateConfigFile();
     for (BlockchainConfig conf : config) {
@@ -1053,7 +1057,7 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
         LogPrintf("%s swap support - %s\n", client->ticker, swapIsSupported ? "yes" : "no");
         blockchainClientPool.insert(std::make_pair(client->ticker, client));
     }
-
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     LogPrintf("Using %u threads for script verification\n", nScriptCheckThreads);
     if (nScriptCheckThreads) {
         for (int i = 0; i < nScriptCheckThreads - 1; i++)
