@@ -4,6 +4,7 @@
 
 #include <blockchainclient.h>
 
+#include <core_io.h>
 #include <rpcprotocol.h>
 #include <utilstrencodings.h>
 
@@ -28,16 +29,11 @@ bool CBitcoinClient::CanConnect() {
 
 bool CBitcoinClient::IsSwapSupported() {
     try {
-        UniValue response = CallRPC("getnetworkinfo", NullUniValue);
-        UniValue networkInfo = find_value(response, "result");
-        if (networkInfo.isNull() || networkInfo.empty())
-            return false;
+        int version = GetClientVersion();
 
-        int version = find_value(networkInfo, "version").get_int();
-
-        response = CallRPC("getmininginfo", NullUniValue);
+        UniValue response = CallRPC("getmininginfo", NullUniValue);
         UniValue miningInfo = find_value(response, "result");
-        if (networkInfo.isNull() || networkInfo.empty())
+        if (miningInfo.isNull() || miningInfo.empty())
             return version >= nCLTVSupportedFrom;
 
         UniValue testnet = find_value(miningInfo, "testnet"); //TODO: only testnet for now
@@ -111,11 +107,124 @@ UniValue CBitcoinClient::CallRPC(const std::string& strMethod, const UniValue& p
         throw std::runtime_error("couldn't parse reply from server");
     }
 
-    const UniValue& reply = valReply.get_obj();
-    if (reply.empty()) {
-        errors.push_back("expected reply to have result, error and id properties");
+    try {
+        const UniValue& reply = valReply.get_obj();
+        if (reply.empty()) {
+            errors.push_back("expected reply to have result, error and id properties");
+            throw std::runtime_error("expected reply to have result, error and id properties");
+        }
+
+        return reply;
+    } catch (std::runtime_error) {
         throw std::runtime_error("expected reply to have result, error and id properties");
     }
-
-    return reply;
 }
+
+int CBitcoinClient::GetClientVersion() {
+    nCurrentClientVersion = 0;
+    try {
+        UniValue response = CallRPC("getnetworkinfo", NullUniValue);
+        UniValue networkInfo = find_value(response, "result");
+        if (networkInfo.isNull() || networkInfo.empty())
+            return nCurrentClientVersion;
+
+        nCurrentClientVersion = find_value(networkInfo, "version").get_int();
+        return nCurrentClientVersion;
+    } catch (std::runtime_error) {
+        return nCurrentClientVersion;
+    }
+}
+
+int CBitcoinClient::GetBlockCount() {
+    try {
+        UniValue response = CallRPC("getblockcount", NullUniValue);
+        return response.get_int();
+    } catch (const std::runtime_error& e) {
+        return -1;
+    }
+}
+
+std::string CBitcoinClient::CreateRawTransaction(const CreateTransactionParams& params) {
+    UniValue rpcParams(UniValue::VARR);
+    UniValue transactions(UniValue::VARR);
+    for (auto transaction : params.transactions) {
+        UniValue tr(UniValue::VOBJ);
+        tr.push_back(Pair("txid", transaction.txid));
+        tr.push_back(Pair("vout", transaction.vout));
+        transactions.push_back(tr);
+    }
+    rpcParams.push_back(transactions);
+
+    UniValue sendTo(UniValue::VOBJ);
+    for (auto sendPair : params.addresses) {
+        sendTo.push_back(Pair(sendPair.first, ValueFromAmount(sendPair.second)));
+    }
+
+    rpcParams.push_back(sendTo);
+
+    try {
+        UniValue response = CallRPC("createrawtransaction", rpcParams);
+        return response.get_str();
+    } catch (const std::runtime_error& e) {
+        return "";
+    }
+}
+
+std::string CBitcoinClient::SignRawTransaction(std::string txHex) {
+    UniValue param(UniValue::VSTR);
+    param.setStr(txHex);
+
+    try {
+        UniValue response = CallRPC("signrawtransaction", param);
+        return response.get_str();
+    } catch (const std::runtime_error& e) {
+        return "";
+    }
+}
+
+std::string CBitcoinClient::SendRawTransaction(std::string txHex) {
+    UniValue param(UniValue::VSTR);
+    param.setStr(txHex);
+
+    try {
+        UniValue response = CallRPC("sendrawtransaction", param);
+        return response.get_str();
+    } catch (const std::runtime_error& e) {
+        return "";
+    }
+};
+
+std::string CBitcoinClient::SendToAddress(std::string addr, CAmount nAmount) {
+    UniValue params(UniValue::VARR);
+    params.push_back(addr);
+    params.push_back(ValueFromAmount(nAmount));
+
+    try {
+        UniValue response = CallRPC("sendtoaddress", params);
+        return response.get_str();
+    } catch (const std::runtime_error& e) {
+        return "";
+    }
+}
+
+std::string CBitcoinClient::GetNewAddress() {
+    try {
+        int version = 0;
+        if (nCurrentClientVersion == 0)
+            version = GetClientVersion();
+
+        UniValue params(UniValue::VARR);
+        params.push_back(""); //default account
+        // From btc 0.16 getnewaddress has an optional address type parameter, but it defaults to p2sh-segwit
+        if (version >= 160000) {
+            // Force use legacy
+            params.push_back("legacy"); //address type
+        }
+
+        UniValue response = CallRPC("getnewaddress", params);
+        return response.get_str();
+    } catch (const std::runtime_error& e) {
+        return "";
+    }
+}
+
