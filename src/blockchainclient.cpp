@@ -6,6 +6,7 @@
 
 #include <core_io.h>
 #include <rpcprotocol.h>
+#include <rpcserver.h>
 #include <utilstrencodings.h>
 
 #include <boost/algorithm/string.hpp>
@@ -228,10 +229,81 @@ std::string CBitcoinClient::GetNewAddress() {
     }
 }
 
-std::string CBitcoinClient::IsValidAddress(std::string addr) {
+bool CBitcoinClient::IsValidAddress(std::string addr) {
     UniValue params(UniValue::VARR);
     params.push_back(addr);
 
     UniValue response = CallRPC("validateaddress", params);
+    return find_value(response, "isvalid").get_bool();
+}
+
+int CLuxClient::GetBlockCount() {
+    UniValue response = getblockcount(NullUniValue, false);
+    return response.get_int();
+}
+
+std::string CLuxClient::CreateRawTransaction(const CreateTransactionParams& params) {
+    UniValue rpcParams(UniValue::VARR);
+    UniValue transactions(UniValue::VARR);
+    for (auto transaction : params.transactions) {
+        UniValue tr(UniValue::VOBJ);
+        tr.push_back(Pair("txid", transaction.txid));
+        tr.push_back(Pair("vout", transaction.vout));
+        transactions.push_back(tr);
+    }
+    rpcParams.push_back(transactions);
+
+    UniValue sendTo(UniValue::VOBJ);
+    for (auto sendPair : params.addresses) {
+        sendTo.push_back(Pair(sendPair.first, ValueFromAmount(sendPair.second)));
+    }
+
+    rpcParams.push_back(sendTo);
+
+    UniValue response = createrawtransaction(rpcParams, false);
+    return response.get_str();
+}
+
+std::string CLuxClient::SignRawTransaction(std::string txHex) {
+    UniValue params(UniValue::VARR);
+    params.push_back(txHex);
+
+    // Direct RPC handler call
+    UniValue response = signrawtransaction(params, false);
+    return find_value(response, "hex").get_str();
+}
+
+std::string CLuxClient::SendRawTransaction(std::string txHex) {
+    UniValue param(UniValue::VSTR);
+    param.push_back(txHex);
+
+    UniValue response = sendrawtransaction(param, false);
+    return response.get_str();
+};
+
+std::string CLuxClient::SendToAddress(std::string addr, CAmount nAmount) {
+    UniValue params(UniValue::VARR);
+    params.push_back(addr);
+    params.push_back(ValueFromAmount(nAmount));
+
+    UniValue response = sendtoaddress(params, false);
+    return response.get_str();
+}
+
+std::string CLuxClient::GetNewAddress() {
+    UniValue params(UniValue::VARR);
+    params.push_back("");
+    params.push_back("legacy");
+
+    UniValue response = getnewaddress(params, false);
+    return response.get_str();
+}
+
+bool CLuxClient::IsValidAddress(std::string addr) {
+    UniValue params(UniValue::VARR);
+    params.push_back(addr);
+
+    // we can use IsValidDestination here, but let's keep it consistent
+    UniValue response = validateaddress(params, false);
     return find_value(response, "isvalid").get_bool();
 }
