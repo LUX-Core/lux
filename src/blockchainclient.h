@@ -35,6 +35,7 @@ public:
 
 /**
  * @brief Represents transactions parameter in createrawtransaction RPC call
+ * This is like COutPoint, but with a string as a tx id instead of uin256 for more compatibility
  */
 struct TransactionInputs {
     /** Hash of the input transaction */
@@ -213,10 +214,6 @@ public:
 
     virtual int GetClientVersion() override;
 
-    /**
-     * @brief Returns current block count
-     * @return Current block count or -1 in case of error
-     */
     virtual int GetBlockCount() override;
 
     virtual std::string CreateRawTransaction(const CreateTransactionParams& params) override;
@@ -227,11 +224,6 @@ public:
 
     virtual std::string SendToAddress(std::string addr, CAmount nAmount) override;
 
-    /**
-     * @copydoc CAbstractBlockchainClient::IsValidAddress()
-     * @throws CClientConnectionError from the CallRPC
-     * @throws runtime_error from the CallRPC
-     */
     virtual bool IsValidAddress(std::string addr) override;
 
     /**
@@ -256,6 +248,55 @@ private:
      * 1       * CLIENT_VERSION_BUILD
      */
     const int nCLTVSupportedFrom = 100400;
+};
+
+/**
+ * @class CLuxClient
+ * @brief Lux client implementation
+ *
+ * This class provides CAbstractBlockchainClient interface, but uses core function calls instead of RPC calls.
+ */
+class CLuxClient : public CAbstractBlockchainClient {
+public:
+    CLuxClient(const BlockchainConfig& conf) : CAbstractBlockchainClient(conf) {};
+    virtual ~CLuxClient() {};
+
+    /**
+     * @brief Checks if it is possible to connect to local Lux node
+     * @return true
+     */
+    virtual bool CanConnect() override { return true; }
+
+    /**
+     * @brief checks if locally running bitcoin node supports atomic swaps
+     * @return true
+     */
+    virtual bool IsSwapSupported() override { return true; }
+
+    virtual UniValue CallRPC(const std::string& strMethod, const UniValue& params) override { return NullUniValue; }
+
+    virtual int GetClientVersion() override { return CLIENT_VERSION; }
+
+    virtual int GetBlockCount() override;
+
+    virtual std::string CreateRawTransaction(const CreateTransactionParams& params) override;
+
+    virtual std::string SignRawTransaction(std::string txHex) override;
+
+    virtual std::string SendRawTransaction(std::string txHex) override;
+
+    virtual std::string SendToAddress(std::string addr, CAmount nAmount) override;
+
+    /**
+     * @brief Generates new address
+     * The generated address is always legacy (after segwit) or default (before segwit)
+     * @return newly generated address
+     */
+    virtual std::string GetNewAddress() override;
+
+    virtual bool IsValidAddress(std::string addr) override;
+
+    const Ticker ticker = "LUX";
 };
 
 #endif //LUX_BLOCKCHAINCLIENT_H

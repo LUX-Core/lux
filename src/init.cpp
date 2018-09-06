@@ -1046,6 +1046,9 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
 
     // Read LuxGate config
     std::vector<BlockchainConfig> config = ReadLuxGateConfigFile();
+    BlockchainConfig luxConfig{"LUX", "", 0, "", ""}; // Empty config because we don't need to actually connect to RPC
+    std::shared_ptr<CLuxClient> luxClient = std::make_shared<CLuxClient>(luxConfig);
+    blockchainClientPool.insert(std::make_pair(luxClient->ticker, luxClient));
     for (BlockchainConfig conf : config) {
         LogPrintf("BlockchainConfig: %s\n", conf.ToString().c_str());
         auto client = std::make_shared<CBitcoinClient>(conf);
