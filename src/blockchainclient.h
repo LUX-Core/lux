@@ -6,6 +6,7 @@
 #define LUX_BLOCKCHAINCLIENT_H
 
 #include <amount.h>
+#include <clientversion.h>
 #include <util.h>
 #include <univalue/univalue.h>
 
@@ -203,10 +204,6 @@ public:
      */
     virtual UniValue CallRPC(const std::string& strMethod, const UniValue& params) override;
 
-    /**
-     * @brief Retrieves blockchain client version as int
-     * @return Blockchain client version
-     */
     virtual int GetClientVersion() override;
 
     /**
@@ -215,33 +212,12 @@ public:
      */
     virtual int GetBlockCount() override;
 
-    /**
-     * @brief createrawtransaction RPC call wrapper
-     * @param params Parameters for the RPC call
-     * @return Hex encoded raw transaction or empty string in case of error
-     */
     virtual std::string CreateRawTransaction(const CreateTransactionParams& params) override;
 
-    /**
-     * @brief Sign raw transaction
-     * @param txHex Hex encoded raw transaction
-     * @return Hex encoded signed raw transaction
-     */
     virtual std::string SignRawTransaction(std::string txHex) override;
 
-    /**
-     * @brief Send signed raw transaction
-     * @param txHex Hex encoded signed raw transaction
-     * @return Hash of the created transaction
-     */
     virtual std::string SendRawTransaction(std::string txHex) override;
 
-    /**
-     * @brief Send coins to the address
-     * @param addr Blockchain address where to send coins
-     * @param nAmount Amount of coins to send
-     * @return Hash of the created transaction
-     */
     virtual std::string SendToAddress(std::string addr, CAmount nAmount) override;
 
     /**
