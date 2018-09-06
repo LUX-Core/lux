@@ -230,3 +230,10 @@ std::string CBitcoinClient::GetNewAddress() {
     }
 }
 
+std::string CBitcoinClient::IsValidAddress(std::string addr) {
+    UniValue params(UniValue::VARR);
+    params.push_back(addr);
+
+    UniValue response = CallRPC("validateaddress", params);
+    return find_value(response, "isvalid").get_bool();
+}

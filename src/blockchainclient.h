@@ -145,6 +145,13 @@ public:
      */
     virtual std::string GetNewAddress() = 0;
 
+    /**
+     * @brief Validates blockchain address by performing validateaddress RPC call
+     * @param addr Address to validate
+     * @return Is address valid for this blockchain or not
+     */
+    virtual bool IsValidAddress(std::string addr) = 0;
+
     const Ticker ticker;
     const BlockchainConfig config;
 
@@ -219,6 +226,13 @@ public:
     virtual std::string SendRawTransaction(std::string txHex) override;
 
     virtual std::string SendToAddress(std::string addr, CAmount nAmount) override;
+
+    /**
+     * @copydoc CAbstractBlockchainClient::IsValidAddress()
+     * @throws CClientConnectionError from the CallRPC
+     * @throws runtime_error from the CallRPC
+     */
+    virtual bool IsValidAddress(std::string addr) override;
 
     /**
      * @brief Generates new address
