@@ -46,7 +46,7 @@ class ExampleTest(LuxTestFramework):
 
         self.setup_clean_chain = True
         self.num_nodes = 2
-        self.extra_args = [[], []]
+        self.extra_args = [["-connect=0"], ["-connect=0"]]
 
     def setup_chain(self):
         super().setup_chain()
@@ -58,6 +58,7 @@ class ExampleTest(LuxTestFramework):
         with open(os.path.join(self.options.tmpdir+"/node" + str(node_index), "lux.conf"), 'w', encoding='utf8') as f:
             f.write("rpcuser=rpcuser\n")
             f.write("testnet=1\n")
+            f.write("bind=127.0.0.1\n")
             f.write("port=%s\n" % p2p_port(node_index))
             f.write("rpcport=%s\n" % (rpc_port(node_index)))
             f.write("rpcpassword=rpcpassword\n")
@@ -88,14 +89,20 @@ class ExampleTest(LuxTestFramework):
         assert_equal(0, len(node0.rpc.listorderbook()['orders']))
         assert_equal(0, len(node1.rpc.listorderbook()['orders']))
 
-        connect_nodes_bi(self.nodes, 0, 1)
+        connect_nodes(node1, 0)
 
         node1.rpc.createorder('LUX', 'BTC', '2', '1')
         assert_equal(1, len(node1.rpc.listorderbook()['orders']))
 
-        node0.rpc.createorder('BTC', 'LUX', '1', '2') # failed
-        #time.sleep(0.5)
-        #assert_equal(1, len(node1.rpc.listactiveorders()['orders']))
+        node0.rpc.createorder('BTC', 'LUX', '1', '2')
+        time.sleep(1.0) # wait for p2p exchange
+        
+        assert_equal(0, len(node0.rpc.listorderbook()['orders']))
+        assert_equal(1, len(node0.rpc.listactiveorders()['orders']))
+
+        assert_equal(0, len(node1.rpc.listorderbook()['orders']))
+        assert_equal(1, len(node1.rpc.listactiveorders()['orders']))
+
 
 
 
