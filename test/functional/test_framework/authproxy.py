@@ -150,7 +150,7 @@ class AuthServiceProxy(object):
                                'params': (args or list(argsn.values())), # transform dict of named args ("{}") to []
                                'id': AuthServiceProxy.__id_count}, default=EncodeDecimal, ensure_ascii=self.ensure_ascii)
         body = postdata.encode('utf-8')
-        print(body)
+        print(str(AuthServiceProxy.__id_count) + '>' + postdata)
         response = self._request('POST', self.__url.path, body)
         if response['error'] is not None:
             raise JSONRPCException(response['error'])
@@ -158,6 +158,7 @@ class AuthServiceProxy(object):
             raise JSONRPCException({
                 'code': -343, 'message': 'missing JSON-RPC result'})
         else:
+            print(str(AuthServiceProxy.__id_count) + '<' + str(response['result']))
             return response['result']
 
     def _batch(self, rpc_call_list):

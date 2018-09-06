@@ -15,9 +15,10 @@ class COrder;
 
 typedef uint256 OrderId; 
 typedef std::pair<OrderId, std::shared_ptr<COrder>> OrderEntry;
+typedef std::map<OrderId, std::shared_ptr<COrder>> OrderMap;
 
-extern std::map<OrderId, std::shared_ptr<COrder>> orderbook;
-extern std::map<OrderId, std::shared_ptr<COrder>> activeOrders;
+extern OrderMap orderbook;
+extern OrderMap activeOrders;
 
 void ProcessMessageLuxgate(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv, bool& isLuxgate);
 
@@ -40,13 +41,15 @@ public:
     OrderId ComputeId() const;
     CAddress Sender() const { return sender; }
     void SetSender(CAddress addr) { sender = addr; }
+    bool SenderIsValid() const;
     Ticker Base() const { return base; }
     Ticker Rel() const { return rel; }
     CAmount BaseAmount() const { return baseAmount; }
     CAmount RelAmount() const { return relAmount; }
 
-    bool Matches(COrder& order) const;
+    bool Matches(const COrder& order) const;
 
+    std::string ToString() const;
 
     ADD_SERIALIZE_METHODS;
 

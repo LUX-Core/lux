@@ -135,7 +135,7 @@ UniValue listorderbook(const UniValue& params, bool fHelp) {
         orderEntry.push_back(Pair("base_amount", o->BaseAmount()));
         orderEntry.push_back(Pair("rel_amount", o->RelAmount()));
         orderEntry.push_back(Pair("sender", o->Sender().ToStringIPPort()));
-        orders.push_back(orders);
+        orders.push_back(orderEntry);
     }
     result.push_back(Pair("orders", orders));
 
@@ -159,7 +159,7 @@ UniValue listactiveorders(const UniValue& params, bool fHelp) {
         orderEntry.push_back(Pair("base_amount", o->BaseAmount()));
         orderEntry.push_back(Pair("rel_amount", o->RelAmount()));
         orderEntry.push_back(Pair("sender", o->Sender().ToStringIPPort()));
-        orders.push_back(orders);
+        orders.push_back(orderEntry);
     }
     result.push_back(Pair("orders", orders));
 
