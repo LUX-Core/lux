@@ -170,6 +170,9 @@ public:
  *
  * This class provides functions for calling Bitcoin RPC methods and
  * checking atomic swap support on a locally running node
+ *
+ * @note Every function except for CanConnect and IsSwapSupported may throw std::runtime_exception or CClientConnectionError.
+ * See CallRPC() for more information.
  */
 class CBitcoinClient : public CAbstractBlockchainClient {
 public:
@@ -255,6 +258,8 @@ private:
  * @brief Lux client implementation
  *
  * This class provides CAbstractBlockchainClient interface, but uses core function calls instead of RPC calls.
+ * @note Every function except for CanConnect and IsSwapSupported may throw std::runtime_exception or CClientConnectionError from
+ * RPC call handler.
  */
 class CLuxClient : public CAbstractBlockchainClient {
 public:

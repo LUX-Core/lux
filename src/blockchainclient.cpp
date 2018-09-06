@@ -123,26 +123,18 @@ UniValue CBitcoinClient::CallRPC(const std::string& strMethod, const UniValue& p
 
 int CBitcoinClient::GetClientVersion() {
     nCurrentClientVersion = 0;
-    try {
-        UniValue response = CallRPC("getnetworkinfo", NullUniValue);
-        UniValue networkInfo = find_value(response, "result");
-        if (networkInfo.isNull() || networkInfo.empty())
-            return nCurrentClientVersion;
+    UniValue response = CallRPC("getnetworkinfo", NullUniValue);
+    UniValue networkInfo = find_value(response, "result");
+    if (networkInfo.isNull() || networkInfo.empty())
+        return nCurrentClientVersion;
 
-        nCurrentClientVersion = find_value(networkInfo, "version").get_int();
-        return nCurrentClientVersion;
-    } catch (std::runtime_error) {
-        return nCurrentClientVersion;
-    }
+    nCurrentClientVersion = find_value(networkInfo, "version").get_int();
+    return nCurrentClientVersion;
 }
 
 int CBitcoinClient::GetBlockCount() {
-    try {
-        UniValue response = CallRPC("getblockcount", NullUniValue);
-        return response.get_int();
-    } catch (const std::runtime_error& e) {
-        return -1;
-    }
+    UniValue response = CallRPC("getblockcount", NullUniValue);
+    return response.get_int();
 }
 
 std::string CBitcoinClient::CreateRawTransaction(const CreateTransactionParams& params) {
@@ -163,36 +155,24 @@ std::string CBitcoinClient::CreateRawTransaction(const CreateTransactionParams& 
 
     rpcParams.push_back(sendTo);
 
-    try {
-        UniValue response = CallRPC("createrawtransaction", rpcParams);
-        return response.get_str();
-    } catch (const std::runtime_error& e) {
-        return "";
-    }
+    UniValue response = CallRPC("createrawtransaction", rpcParams);
+    return response.get_str();
 }
 
 std::string CBitcoinClient::SignRawTransaction(std::string txHex) {
     UniValue param(UniValue::VSTR);
-    param.setStr(txHex);
+    param.push_back(txHex);
 
-    try {
-        UniValue response = CallRPC("signrawtransaction", param);
-        return response.get_str();
-    } catch (const std::runtime_error& e) {
-        return "";
-    }
+    UniValue response = CallRPC("signrawtransaction", param);
+    return find_value(response, "hex").get_str();
 }
 
 std::string CBitcoinClient::SendRawTransaction(std::string txHex) {
     UniValue param(UniValue::VSTR);
     param.setStr(txHex);
 
-    try {
-        UniValue response = CallRPC("sendrawtransaction", param);
-        return response.get_str();
-    } catch (const std::runtime_error& e) {
-        return "";
-    }
+    UniValue response = CallRPC("sendrawtransaction", param);
+    return response.get_str();
 };
 
 std::string CBitcoinClient::SendToAddress(std::string addr, CAmount nAmount) {
@@ -200,33 +180,25 @@ std::string CBitcoinClient::SendToAddress(std::string addr, CAmount nAmount) {
     params.push_back(addr);
     params.push_back(ValueFromAmount(nAmount));
 
-    try {
-        UniValue response = CallRPC("sendtoaddress", params);
-        return response.get_str();
-    } catch (const std::runtime_error& e) {
-        return "";
-    }
+    UniValue response = CallRPC("sendtoaddress", params);
+    return response.get_str();
 }
 
 std::string CBitcoinClient::GetNewAddress() {
-    try {
-        int version = 0;
-        if (nCurrentClientVersion == 0)
-            version = GetClientVersion();
+    int version = 0;
+    if (nCurrentClientVersion == 0)
+        version = GetClientVersion();
 
-        UniValue params(UniValue::VARR);
-        params.push_back(""); //default account
-        // From btc 0.16 getnewaddress has an optional address type parameter, but it defaults to p2sh-segwit
-        if (version >= 160000) {
-            // Force use legacy
-            params.push_back("legacy"); //address type
-        }
-
-        UniValue response = CallRPC("getnewaddress", params);
-        return response.get_str();
-    } catch (const std::runtime_error& e) {
-        return "";
+    UniValue params(UniValue::VARR);
+    params.push_back(""); //default account
+    // From btc 0.16 getnewaddress has an optional address type parameter, but it defaults to p2sh-segwit
+    if (version >= 160000) {
+        // Force use legacy
+        params.push_back("legacy"); //address type
     }
+
+    UniValue response = CallRPC("getnewaddress", params);
+    return response.get_str();
 }
 
 bool CBitcoinClient::IsValidAddress(std::string addr) {
