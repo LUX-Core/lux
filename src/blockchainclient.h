@@ -174,7 +174,7 @@ public:
      *
      * It checks connectivity by trying to call help RPC method on a node
      *
-     * @note All possible exceptions CallRPC may throw are hanlded
+     * @note All possible exceptions CallRPC may throw are handled
      */
     virtual bool CanConnect() override;
 
@@ -186,7 +186,7 @@ public:
      * CLTV was introduced in bitcoin 0.10.4, so this method checks if locally running
      * bitcoin node is running equal or higher version
      *
-     * @note All possible exceptions CallRPC may throw are hanlded
+     * @note All possible exceptions CallRPC may throw are handled
      */
     virtual bool IsSwapSupported() override;
 
