@@ -200,7 +200,7 @@ std::string CBitcoinClient::GetNewAddress() {
     }
 
     UniValue response = CallRPC("getnewaddress", params);
-    return response.get_str();
+    return find_value(response, "result").get_str();
 }
 
 bool CBitcoinClient::IsValidAddress(std::string addr) {
@@ -208,7 +208,8 @@ bool CBitcoinClient::IsValidAddress(std::string addr) {
     params.push_back(addr);
 
     UniValue response = CallRPC("validateaddress", params);
-    return find_value(response, "isvalid").get_bool();
+    UniValue result = find_value(response, "result");
+    return find_value(result, "isvalid").get_bool();
 }
 
 int CLuxClient::GetBlockCount() {
