@@ -39,6 +39,26 @@ bool FindMatching(const OrderMap &orders, const COrder &match, COrder &result)
 }
 
 
+bool FindClient(const Ticker ticker, ClientPtr &foundClient) 
+{
+    auto foundEntry = blockchainClientPool.find(ticker);
+    if (foundEntry != blockchainClientPool.end()) {
+        foundClient = foundEntry->second;
+        return true;
+    }
+
+    return false;
+}
+
+bool EnsureClient(const Ticker ticker, ClientPtr &foundClient) {
+    if (FindClient(ticker, foundClient)) {
+        return true;
+    } else {
+        LogPrintf("Cant find blockchain client for %s\n", ticker);
+        return false;
+    }
+}
+
 void ProcessMessageLuxgate(CNode *pfrom, const std::string &strCommand, CDataStream &vRecv, bool &isLuxgate)
 {
 
@@ -104,11 +124,11 @@ void ProcessMessageLuxgate(CNode *pfrom, const std::string &strCommand, CDataStr
 
         if (isMatching) {
             ActivateOrder(activatingOrder);
-            auto foundEntry = blockchainClientPool.find(activatingOrder.second->Rel());
-            // Stub for
-            // foundEntry->second->GetNewAddress();
-            std::string addressString =  "2Msx2aNs6h5nEm6R4LZvaPE7NaWtkvsBUXK"; // BTC testnet addr
-            pfrom->PushMessage("requestswap", *activatingOrder.second, addressString);
+            ClientPtr revClient;
+            if (EnsureClient(activatingOrder.second->Rel(), revClient)) {
+                auto addressString = revClient->GetNewAddress();
+                pfrom->PushMessage("requestswap", *activatingOrder.second, addressString);
+            }
         }
     }
 
@@ -121,13 +141,20 @@ void ProcessMessageLuxgate(CNode *pfrom, const std::string &strCommand, CDataStr
         COrder localOrder;
         if (FindMatching(activeOrders, order, localOrder)) {
             LogPrintf("Received %s address: %s\n", order.Rel(), baseAddr);
-            // TODO Verify address
-            LogPrintf("Creating address for %s\n", localOrder.Rel());
-            auto foundEntry = blockchainClientPool.find(localOrder.Rel());
-            // TODO stub for luxclient
-            // foundEntry->second->GetNewAddress()
-            std::string addressString =  "LUc1gizb2kijhs4GuwZteuKBVaMPTkRzfD"; // LUX testnet addr
-            pfrom->PushMessage("requestswapack", localOrder, addressString);
+            ClientPtr baseClient;
+            if (EnsureClient(order.Rel(), baseClient)) {
+                if (baseClient->IsValidAddress(baseAddr)) {
+                    LogPrintf("%s address is valid: %s\n", order.Rel(), baseAddr);
+                    ClientPtr relClient;
+                    if (EnsureClient(localOrder.Rel(), relClient)) {
+                        auto addressString = relClient->GetNewAddress();
+                        LogPrintf("Created address for %s\n", addressString);
+                        pfrom->PushMessage("requestswapack", localOrder, addressString);
+                    }
+                } else {
+                    LogPrintf("requestswap: %s address is invalid: %s\n", order.Rel(), baseAddr);
+                }
+            }
         } else {
             LogPrintf("requestswap: Cannot find matching order %s\n", order.ToString());
         }
@@ -140,8 +167,15 @@ void ProcessMessageLuxgate(CNode *pfrom, const std::string &strCommand, CDataStr
         
         COrder localOrder;
         if (FindMatching(activeOrders, order, localOrder)) {
-            // TODO Verify address
-            LogPrintf("requestswapack: verifying %s address %s\n", localOrder.Base(), baseAddr);
+            LogPrintf("requestswapack: verifying %s address %s\n", order.Rel(), baseAddr);
+            ClientPtr relClient;
+            if (EnsureClient(order.Rel(), relClient)) {
+                if (relClient->IsValidAddress(baseAddr)) {
+                    LogPrintf("requestswapack: %s address is valid: %s\n", order.Rel(), baseAddr);
+                } else {
+                    LogPrintf("requestswapack: %s address is invalid: %s\n", order.Rel(), baseAddr);
+                }
+            }
         } else {
             LogPrintf("requestswapack: Cannot find matching order %s\n", order.ToString());
         }

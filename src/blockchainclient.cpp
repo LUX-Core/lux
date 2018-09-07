@@ -13,7 +13,7 @@
 
 // This blockchainclient used for luxgate, and its important.
 // Do not adjust if you don't understand the consequences.
-std::map<std::string, std::shared_ptr<CAbstractBlockchainClient>> blockchainClientPool;
+std::map<std::string, ClientPtr> blockchainClientPool;
 
 bool CBitcoinClient::CanConnect() {
     try {

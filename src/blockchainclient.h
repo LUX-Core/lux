@@ -12,16 +12,18 @@
 
 #include <string>
 
-typedef std::string Ticker;
-
 class CClientConnectionError;
 class CAbstractBlockchainClient;
 class CBitcoinClient;
 
+typedef std::string Ticker;
+typedef std::shared_ptr<CAbstractBlockchainClient> ClientPtr;
+
+
 /**
  * Map of blockchain clients, where key is a ticker
  */
-extern std::map<Ticker, std::shared_ptr<CAbstractBlockchainClient>> blockchainClientPool;
+extern std::map<Ticker, ClientPtr> blockchainClientPool;
 
 /**
  * @class CClientConnectionError
