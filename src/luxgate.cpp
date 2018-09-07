@@ -127,12 +127,12 @@ void ProcessMessageLuxgate(CNode *pfrom, const std::string &strCommand, CDataStr
             ClientPtr revClient;
             if (EnsureClient(activatingOrder.second->Rel(), revClient)) {
                 auto addressString = revClient->GetNewAddress();
-                pfrom->PushMessage("requestswap", *activatingOrder.second, addressString);
+                pfrom->PushMessage("reqswap", *activatingOrder.second, addressString);
             }
         }
     }
 
-    else if (strCommand == "requestswap") {
+    else if (strCommand == "reqswap") {
 
         COrder order;
         std::string baseAddr;
@@ -148,36 +148,36 @@ void ProcessMessageLuxgate(CNode *pfrom, const std::string &strCommand, CDataStr
                     ClientPtr relClient;
                     if (EnsureClient(localOrder.Rel(), relClient)) {
                         auto addressString = relClient->GetNewAddress();
-                        LogPrintf("Created address for %s\n", addressString);
-                        pfrom->PushMessage("requestswapack", localOrder, addressString);
+                        LogPrintf("Created address for %s: %s\n", localOrder.Rel(), addressString);
+                        pfrom->PushMessage("reqswapack", localOrder, addressString);
                     }
                 } else {
-                    LogPrintf("requestswap: %s address is invalid: %s\n", order.Rel(), baseAddr);
+                    LogPrintf("reqswap: %s address is invalid: %s\n", order.Rel(), baseAddr);
                 }
             }
         } else {
-            LogPrintf("requestswap: Cannot find matching order %s\n", order.ToString());
+            LogPrintf("reqswap: Cannot find matching order %s\n", order.ToString());
         }
     }
 
-    else if (strCommand == "requestswapack") {
+    else if (strCommand == "reqswapack") {
         COrder order;
         std::string baseAddr;
         vRecv >> order >> baseAddr;
         
         COrder localOrder;
         if (FindMatching(activeOrders, order, localOrder)) {
-            LogPrintf("requestswapack: verifying %s address %s\n", order.Rel(), baseAddr);
+            LogPrintf("reqswapack: verifying %s address %s\n", order.Rel(), baseAddr);
             ClientPtr relClient;
             if (EnsureClient(order.Rel(), relClient)) {
                 if (relClient->IsValidAddress(baseAddr)) {
-                    LogPrintf("requestswapack: %s address is valid: %s\n", order.Rel(), baseAddr);
+                    LogPrintf("reqswapack: %s address is valid: %s\n", order.Rel(), baseAddr);
                 } else {
-                    LogPrintf("requestswapack: %s address is invalid: %s\n", order.Rel(), baseAddr);
+                    LogPrintf("reqswapack: %s address is invalid: %s\n", order.Rel(), baseAddr);
                 }
             }
         } else {
-            LogPrintf("requestswapack: Cannot find matching order %s\n", order.ToString());
+            LogPrintf("reqswapack: Cannot find matching order %s\n", order.ToString());
         }
     }
 }
