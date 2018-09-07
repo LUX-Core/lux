@@ -77,6 +77,8 @@ BITCOIN_CORE_H = \
   allocators.h \
   amount.h \
   base58.h \
+  bip39.h \
+  bip39_english.h \
   bech32.h \
   bip38.h \
   bloom.h \
@@ -102,6 +104,7 @@ BITCOIN_CORE_H = \
   darksend.h \
   db.h \
   hash.h \
+  hdchain.h \
   indirectmap.h \
   init.h \
   instantx.h \
@@ -389,6 +392,7 @@ libbitcoin_common_a_SOURCES = \
   allocators.cpp \
   amount.cpp \
   base58.cpp \
+  bip39.cpp \
   bech32.cpp \
   bip38.cpp \
   chainparams.cpp \
@@ -399,6 +403,7 @@ libbitcoin_common_a_SOURCES = \
   core_read.cpp \
   core_write.cpp \
   hash.cpp \
+  hdchain.cpp \
   key.cpp \
   keystore.cpp \
   netbase.cpp \

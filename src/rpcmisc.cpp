@@ -347,6 +347,9 @@ UniValue validateaddress(const UniValue& params, bool fHelp)
             "  \"iscompressed\" : true|false,    (boolean) If the address is compressed\n"
             "  \"account\" : \"account\"         (string) The account associated with the address, \"\" is the default account\n"
             "  \"timestamp\" : timestamp,      (number, optional) The creation time of the key if available in seconds since epoch (Jan 1 1970 GMT)\n"
+            "  \"hdkeypath\" : \"keypath\"       (string, optional) The HD keypath if the key is HD and available\n"
+            "  \"hdchainid\" : \"<hash>\"        (string, optional) The ID of the HD chain\n"
+            "  \"hdmasterkeyid\" : \"<hash160>\" (string, optional) The Hash160 of the HD master pubkey\n"
             "}\n"
             "\nExamples:\n" +
             HelpExampleCli("validateaddress", "\"1PSSGeFHDnKNxiEyFrD1wcEaHr9hrQDDWc\"") + HelpExampleRpc("validateaddress", "\"1PSSGeFHDnKNxiEyFrD1wcEaHr9hrQDDWc\""));
@@ -374,7 +377,8 @@ UniValue validateaddress(const UniValue& params, bool fHelp)
         ret.pushKVs(detail);
         if (pwalletMain && pwalletMain->mapAddressBook.count(dest))
             ret.push_back(Pair("account", pwalletMain->mapAddressBook[dest].name));
-        if (pwalletMain) {
+        CKeyID keyID;
+            if (pwalletMain) {
             const CKeyMetadata* meta = nullptr;
             CKeyID key_id = GetKeyForDestination(*pwalletMain, dest);
             if (key_id != uint160(0)) {
@@ -383,8 +387,24 @@ UniValue validateaddress(const UniValue& params, bool fHelp)
                     meta = &it->second;
                 }
             }
+            if (!meta) {
+                auto it = pwalletMain->m_script_metadata.find(CScriptID(scriptPubKey));
+                if (it != pwalletMain->m_script_metadata.end()) {
+                    meta = &it->second;
+                }
+            }
             if (meta) {
                 ret.push_back(Pair("timestamp", meta->nCreateTime));
+                if (!meta->hdKeypath.empty()) {
+                    ret.push_back(Pair("hdkeypath", meta->hdKeypath));
+                    ret.push_back(Pair("hdmasterkeyid", meta->hdMasterKeyID.GetHex()));
+                    }
+            }
+
+            CHDChain hdChainCurrent;
+            if (!keyID.IsNull() && pwalletMain->mapHdPubKeys.count(keyID) && pwalletMain->GetHDChain(hdChainCurrent)) {
+                ret.push_back(Pair("hdkeypath", pwalletMain->mapHdPubKeys[keyID].GetKeyPath()));
+                ret.push_back(Pair("hdchainid", hdChainCurrent.GetID().GetHex()));
             }
         }
 #endif

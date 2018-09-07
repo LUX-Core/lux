@@ -29,6 +29,15 @@
 #include <boost/filesystem/path.hpp>
 #include <boost/thread/exceptions.hpp>
 
+// Debugging macros
+
+//#define ENABLE_LUX_DEBUG
+#ifdef ENABLE_LUX_DEBUG
+#define DEBUG( x ) x
+#else
+#define DEBUG( x )
+#endif
+
 //LUX only features
 extern std::atomic<bool> hideLogMessage;
 

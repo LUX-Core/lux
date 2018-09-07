@@ -8,6 +8,7 @@
 
 #include "amount.h"
 #include "db.h"
+#include "hdchain.h"
 #include "key.h"
 #include "keystore.h"
 
@@ -45,9 +46,13 @@ enum DBErrors {
 class CKeyMetadata
 {
 public:
-    static const int CURRENT_VERSION = 1;
+    static const int VERSION_BASIC=1;
+    static const int VERSION_WITH_HDDATA=10;
+    static const int CURRENT_VERSION=VERSION_WITH_HDDATA;
     int nVersion;
     int64_t nCreateTime; // 0 means unknown
+    CKeyID hdMasterKeyID; //id of the hd masterkey used to derive this key
+    std::string hdKeypath; //optional HD/bip32 keypath
 
     CKeyMetadata()
     {
@@ -55,7 +60,7 @@ public:
     }
     CKeyMetadata(int64_t nCreateTime_)
     {
-        nVersion = CKeyMetadata::CURRENT_VERSION;
+        SetNull();
         nCreateTime = nCreateTime_;
     }
 
@@ -67,12 +72,19 @@ public:
         READWRITE(this->nVersion);
         nVersion = this->nVersion;
         READWRITE(nCreateTime);
+        if (this->nVersion >= VERSION_WITH_HDDATA)
+        {
+            READWRITE(hdKeypath);
+            READWRITE(hdMasterKeyID);
+        }
     }
 
     void SetNull()
     {
         nVersion = CKeyMetadata::CURRENT_VERSION;
         nCreateTime = 0;
+        hdKeypath.clear();
+
     }
 };
 
@@ -100,7 +112,7 @@ public:
         READWRITE(sAlias);
         READWRITE(sAddress);
         READWRITE(sCollateralAddress);
-	READWRITE(sMasternodePrivKey);
+	    READWRITE(sMasternodePrivKey);
     }
 };
 
@@ -187,6 +199,12 @@ public:
     static bool Recover(CDBEnv& dbenv, std::string filename, bool fOnlyKeys);
     static bool Recover(CDBEnv& dbenv, std::string filename);
     static unsigned int GetUpdateCounter();
+
+    //! write the hdchain model (external chain child index counter)
+    bool WriteHDChain(const CHDChain& chain);
+    bool WriteCryptedHDChain(const CHDChain& chain);
+    bool WriteHDPubKey(const CHDPubKey& hdPubKey, const CKeyMetadata& keyMeta);
+
 private:
     CWalletDB(const CWalletDB&);
     void operator=(const CWalletDB&);
