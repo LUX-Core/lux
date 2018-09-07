@@ -325,6 +325,8 @@ RES_ICONS = \
   qt/res/icons/connect2_16.png \
   qt/res/icons/connect3_16.png \
   qt/res/icons/connect4_16.png \
+  qt/res/icons/hd_disabled.png \
+  qt/res/icons/hd_enabled.png \
   qt/res/icons/debugwindow.png \
   qt/res/icons/edit.png \
   qt/res/icons/editcopy.png \
