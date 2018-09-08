@@ -26,6 +26,7 @@
 #include <QDateTime>
 #include <QDebug>
 #include <QTimer>
+
 class CBlockIndex;
 
 static const int64_t nClientStartupTime = GetTime();
@@ -64,16 +65,10 @@ ClientModel::~ClientModel()
 
 int ClientModel::getNumConnections(unsigned int flags) const
 {
-   NumConnections connections = CONNECTIONS_NONE;
-
-    if(flags == CONNECTIONS_IN)
-        connections = CONNECTIONS_IN;
-    else if (flags == CONNECTIONS_OUT)
-        connections = CONNECTIONS_OUT;
-    else if (flags == CONNECTIONS_ALL)
-        connections = CONNECTIONS_ALL;
-
     vector<CNode*> vNodesCopy = vNodes;
+
+    if (flags == CONNECTIONS_ALL) // Shortcut if we want total
+        return vNodesCopy.size();
 
     int nNum = 0;
     for (CNode* pnode : vNodesCopy)
@@ -89,13 +84,21 @@ int ClientModel::getNumBlocks() const
     return chainActive.Height();
 }
 
+int ClientModel::getHeaderHeight() const
+{
+    LOCK(cs_main);
+    if (!pindexBestHeader)
+        return 0;
+    return pindexBestHeader->nHeight;
+}
+
 int ClientModel::getNumBlocksAtStartup()
 {
     if (numBlocksAtStartup == -1) numBlocksAtStartup = getNumBlocks();
     return numBlocksAtStartup;
 }
 
-int ClientModel::getHeaderTipHeight() const
+int ClientModel::getHeaderTipHeight()
 {
     if (cachedBestHeaderHeight == -1) {
         // make sure we initially populate the cache via a cs_main lock
@@ -103,18 +106,16 @@ int ClientModel::getHeaderTipHeight() const
         LOCK(cs_main);
         if (pindexBestHeader) {
             cachedBestHeaderHeight = pindexBestHeader->nHeight;
-            cachedBestHeaderTime = pindexBestHeader->GetBlockTime();
         }
     }
     return cachedBestHeaderHeight;
 }
 
-int64_t ClientModel::getHeaderTipTime() const
+int64_t ClientModel::getHeaderTipTime()
 {
     if (cachedBestHeaderTime == -1) {
         LOCK(cs_main);
         if (pindexBestHeader) {
-            cachedBestHeaderHeight = pindexBestHeader->nHeight;
             cachedBestHeaderTime = pindexBestHeader->GetBlockTime();
         }
     }
@@ -346,6 +347,7 @@ static void BlockTipChanged(ClientModel *clientmodel, bool initialSync, const CB
         clientmodel->cachedBestHeaderHeight = pIndex->nHeight;
         clientmodel->cachedBestHeaderTime = pIndex->GetBlockTime();
     }
+
     // if we are in-sync, update the UI regardless of last update time
     if (!initialSync || now - nLastUpdateNotification > MODEL_UPDATE_DELAY) {
         //pass a async signal to the UI thread

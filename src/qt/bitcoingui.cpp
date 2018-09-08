@@ -52,7 +52,6 @@
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QMimeData>
-#include <QProgressBar>
 #include <QProgressDialog>
 #include <QSettings>
 #include <QShortcut>
@@ -88,6 +87,7 @@ const QString BitcoinGUI::DEFAULT_WALLET = "~Default";
 
 
 BitcoinGUI::BitcoinGUI(const NetworkStyle* networkStyle, QWidget* parent) : QMainWindow(parent),
+                                                                            enableWallet(false),
                                                                             clientModel(0),
                                                                             walletFrame(0),
                                                                             unitDisplayControl(0),
@@ -223,7 +223,7 @@ BitcoinGUI::BitcoinGUI(const NetworkStyle* networkStyle, QWidget* parent) : QMai
     labelConnectionsIcon->setFlat(true); // Make the button look like a label, but clickable
     labelConnectionsIcon->setStyleSheet(".QPushButton { background-color: rgba(255, 255, 255, 0);}");
     labelConnectionsIcon->setMaximumSize(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE);
-    labelBlocksIcon = new QLabel();
+    labelBlocksIcon = new GUIUtil::ClickableLabel();
 
     if (enableWallet) {
         frameBlocksLayout->addStretch();
@@ -297,6 +297,16 @@ BitcoinGUI::BitcoinGUI(const NetworkStyle* networkStyle, QWidget* parent) : QMai
     connect(timerStakingIcon, SIGNAL(timeout()), this, SLOT(setStakingStatus()));
     timerStakingIcon->start(10000);
     setStakingStatus();
+
+    modalOverlay = new ModalOverlay(this->centralWidget());
+#ifdef ENABLE_WALLET
+    if(enableWallet) {
+        connect(walletFrame, SIGNAL(requestedSyncWarningInfo()), this, SLOT(showModalOverlay()));
+        connect(labelBlocksIcon, SIGNAL(clicked(QPoint)), this, SLOT(showModalOverlay()));
+        connect(progressBar, SIGNAL(clicked(QPoint)), this, SLOT(showModalOverlay()));
+    }
+#endif
+
 }
 
 BitcoinGUI::~BitcoinGUI() {
@@ -640,6 +650,7 @@ void BitcoinGUI::setClientModel(ClientModel* clientModel) {
         connect(clientModel, SIGNAL(numConnectionsChanged(int)), this, SLOT(setNumConnections(int)));
         connect(clientModel, SIGNAL(networkActiveChanged(bool)), this, SLOT(setNetworkActive(bool)));
 
+        modalOverlay->setKnownBestHeight(clientModel->getHeaderTipHeight(), QDateTime::fromTime_t(clientModel->getHeaderTipTime()));
         setNumBlocks(clientModel->getNumBlocks(), clientModel->getLastBlockDate(), clientModel->getVerificationProgress(NULL), false);
         connect(clientModel, SIGNAL(numBlocksChanged(int,QDateTime,double,bool)), this, SLOT(setNumBlocks(int,QDateTime,double,bool)));
 
@@ -964,14 +975,22 @@ void BitcoinGUI::updateHeadersSyncProgressLabel()
     int64_t headersTipTime = clientModel->getHeaderTipTime();
     int headersTipHeight = clientModel->getHeaderTipHeight();
     int estHeadersLeft = (GetTime() - headersTipTime) / Params().GetConsensus().nPowTargetSpacing;
-    if (estHeadersLeft > HEADER_HEIGHT_DELTA_SYNC)
+#if 1
+    if (estHeadersLeft > HEADER_HEIGHT_SYNC)
         progressBarLabel->setText(tr("Syncing Headers (%1%)...").arg(QString::number(100.0 / (headersTipHeight+estHeadersLeft)*headersTipHeight, 'f', 1)));
+#endif
 }
 
-void BitcoinGUI::setNumBlocks(int count, const QDateTime& lastBlockDate, double nVerificationProgress, bool header)
+void BitcoinGUI::setNumBlocks(int count, const QDateTime& blockDate, double nVerificationProgress, bool header)
 {
-   modalOverlay->tipUpdate(count, lastBlockDate, nVerificationProgress);
-    if(!clientModel)
+    if (modalOverlay) {
+        if (header)
+            modalOverlay->setKnownBestHeight(clientModel->getHeaderTipHeight(), QDateTime::fromTime_t(clientModel->getHeaderTipTime()));
+        else {
+            modalOverlay->tipUpdate(count, blockDate, nVerificationProgress);
+        }
+    }
+    if (!clientModel)
         return;
 
     // Prevent orphan statusbar messages (e.g. hover Quit in main menu, wait until chain-sync starts -> garbelled text)
@@ -1012,21 +1031,21 @@ void BitcoinGUI::setNumBlocks(int count, const QDateTime& lastBlockDate, double 
     int secs = lastBlockDate.secsTo(currentDate);
 
     tooltip = tr("Processed %n blocks of transaction history.", "", count);
-    if(secs < 90*60){
-#ifdef ENABLE_WALLET
-        if (walletFrame) {
+    if(secs < 90*60) {
         tooltip = tr("Up to date") + QString(".<br>") + tooltip;
         labelBlocksIcon->setPixmap(QIcon(":/icons/synced").pixmap(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE));
+#ifdef ENABLE_WALLET
+        if(walletFrame)
+        {
+            walletFrame->showOutOfSyncWarning(false);
             modalOverlay->showHide(true, true);
-            modalOverlay->hideForever();
-        } else {
-            modalOverlay->showHide();
         }
-
 #endif // ENABLE_WALLET
+        progressBarLabel->setVisible(false);
+        progressBar->setVisible(false);
     } else {
+        QString timeBehindText = GUIUtil::formatNiceTimeOffset(secs);
         // Represent time from last generated block in human readable text
-        QString timeBehindText;
         const int HOUR_IN_SECONDS = 60 * 60;
         const int DAY_IN_SECONDS = 24 * 60 * 60;
         const int WEEK_IN_SECONDS = 7 * 24 * 60 * 60;
@@ -1050,19 +1069,19 @@ void BitcoinGUI::setNumBlocks(int count, const QDateTime& lastBlockDate, double 
         progressBar->setVisible(true);
 
         tooltip = tr("Catching up...") + QString("<br>") + tooltip;
+
         if (count != prevBlocks) {
-            labelBlocksIcon->setPixmap(QIcon(QString(
-                                                 ":/movies/spinner-%1")
-                                                 .arg(spinnerFrame, 3, 10, QChar('0')))
-                                           .pixmap(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE));
+            labelBlocksIcon->setPixmap(QIcon(QString(":/movies/spinner-%1").arg(spinnerFrame, 3, 10, QChar('0'))).pixmap(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE));
             spinnerFrame = (spinnerFrame + 1) % SPINNER_FRAMES;
         }
+
         prevBlocks = count;
 
 #ifdef ENABLE_WALLET
-        if (walletFrame) {
+        if(walletFrame) {
             walletFrame->showOutOfSyncWarning(true);
-            }
+            modalOverlay->showHide();
+        }
 #endif // ENABLE_WALLET
 
         tooltip += QString("<br>");
@@ -1345,12 +1364,10 @@ void BitcoinGUI::setTrayIconVisible(bool fHideTrayIcon)
     }
 }
 
-void BitcoinGUI::showModalOverlay()
-{
+void BitcoinGUI::showModalOverlay() {
     if (modalOverlay && (progressBar->isVisible() || modalOverlay->isLayerVisible()))
         modalOverlay->toggleVisibility();
 }
-
 
 static bool ThreadSafeMessageBox(BitcoinGUI* gui, const std::string& message, const std::string& caption, unsigned int style) {
     bool modal = (style & CClientUIInterface::MODAL);

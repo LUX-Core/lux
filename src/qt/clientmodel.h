@@ -56,9 +56,11 @@ public:
     //! Return number of connections, default is in- and outbound (total)
     int getNumConnections(unsigned int flags = CONNECTIONS_ALL) const;
     int getNumBlocks() const;
-    int getHeaderTipHeight() const;
-    int64_t getHeaderTipTime() const;
+    int getHeaderTipHeight();
     int getNumBlocksAtStartup();
+    int getHeaderHeight() const;
+
+    int64_t getHeaderTipTime();
 
     quint64 getTotalBytesRecv() const;
     quint64 getTotalBytesSent() const;
@@ -87,8 +89,8 @@ public:
     QString dataDir() const;
 
     // caches for the best header
-    mutable std::atomic<int> cachedBestHeaderHeight;
-    mutable std::atomic<int64_t> cachedBestHeaderTime;
+    std::atomic<int> cachedBestHeaderHeight;
+    std::atomic<int64_t> cachedBestHeaderTime;
 
 private:
     OptionsModel* optionsModel;
@@ -110,7 +112,7 @@ private:
 
 signals:
     void numConnectionsChanged(int count);
-    void numBlocksChanged(int count, const QDateTime& lastBlockDate, double nVerificationProgress, bool header);
+    void numBlocksChanged(int count, const QDateTime& blockDate, double nVerificationProgress, bool header);
     void additionalDataSyncProgressChanged(double nSyncProgress);
     void mempoolSizeChanged(long count, size_t mempoolSizeInBytes);
     void networkActiveChanged(bool networkActive);

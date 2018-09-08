@@ -1843,6 +1843,7 @@ CAmount CWallet::GetImmatureWatchOnlyBalance() const
     return nTotal;
 }
 
+
 /**
  * populate vCoins with vector of available COutputs.
  */

@@ -40,7 +40,6 @@ class MasternodeList;
 class HexAddressConverter;
 class CBlockIndex;
 
-
 class CWallet;
 
 QT_BEGIN_NAMESPACE
@@ -48,8 +47,6 @@ class QAction;
 class QProgressBar;
 class QProgressDialog;
 class QDockWidget;
-class ModalOverlay;
-
 QT_END_NAMESPACE
 
 /**
@@ -152,9 +149,9 @@ private:
     QMenu* trayIconMenu;
     Notificator* notificator;
     RPCConsole* rpcConsole;
-    ModalOverlay* modalOverlay;
     BlockExplorer* explorerWindow;
     HexAddressConverter* hexAddressWindow;
+    ModalOverlay* modalOverlay;
 
     /** Keep track of previous number of blocks, to detect progress */
     int prevBlocks;

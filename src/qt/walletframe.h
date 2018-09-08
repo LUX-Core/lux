@@ -40,8 +40,8 @@ public:
 
     void showOutOfSyncWarning(bool fShow);
     Q_SIGNALS:
-            /** Notify that the user has requested more information about the out-of-sync warning */
-            void requestedSyncWarningInfo();
+    /** Notify that the user has requested more information about the out-of-sync warning */
+    void requestedSyncWarningInfo();
 private:
     QStackedWidget* walletStack;
     BitcoinGUI* gui;
