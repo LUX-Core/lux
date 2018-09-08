@@ -65,6 +65,7 @@ static const bool DEFAULT_SPEND_ZEROCONF_CHANGE = true;
 static const bool DEFAULT_ZERO_BALANCE_ADDRESS_TOKEN = true;
 
 static const bool DEFAULT_NOT_USE_CHANGE_ADDRESS = false;
+extern const char * DEFAULT_WALLET_DAT;
 
 class CAccountingEntry;
 class CCoinControl;
@@ -144,6 +145,13 @@ public:
     }
 };
 
+struct CRecipient
+{
+    CScript scriptPubKey;
+    CAmount nAmount;
+    bool fSubtractFeeFromAmount;
+};
+
 /** Address book data */
 class CAddressBookData {
 public:
@@ -156,11 +164,14 @@ public:
     StringMap destdata;
 };
 
-typedef std::map <std::string, std::string> mapValue_t;
+
+typedef std::map<std::string, std::string> mapValue_t;
 
 
-static void __attribute__((unused)) ReadOrderPos(int64_t &nOrderPos, mapValue_t &mapValue) {
-    if (!mapValue.count("n")) {
+static void ReadOrderPos(int64_t& nOrderPos, mapValue_t& mapValue)
+{
+    if (!mapValue.count("n"))
+    {
         nOrderPos = -1; // TODO: calculate elsewhere
         return;
     }
@@ -168,14 +179,15 @@ static void __attribute__((unused)) ReadOrderPos(int64_t &nOrderPos, mapValue_t 
 }
 
 
-static void __attribute__((unused)) WriteOrderPos(const int64_t& nOrderPos, mapValue_t& mapValue)
+static void WriteOrderPos(const int64_t& nOrderPos, mapValue_t& mapValue)
 {
     if (nOrderPos == -1)
         return;
     mapValue["n"] = i64tostr(nOrderPos);
 }
 
-struct COutputEntry {
+struct COutputEntry
+{
     CTxDestination destination;
     CAmount amount;
     int vout;
@@ -295,6 +307,9 @@ class CWallet : public CCryptoKeyStore, public CValidationInterface
     void AddToSpends(const uint256& wtxid);
     void MarkConflicted(const uint256& hashBlock, const uint256& hashTx);
 
+    /* Mark a transaction (and its in-wallet descendants) as conflicting with a particular block. */
+    void MarkConflicted(const uint256& hashBlock, const uint256& hashTx);
+
     void SyncMetaData(std::pair<TxSpends::iterator, TxSpends::iterator>);
 
 public:
@@ -356,7 +371,7 @@ public:
         SetNull();
     }
 
-    CWallet(std::string strWalletFileIn)
+    CWallet(const std::string& strWalletFileIn)
     {
         SetNull();
 
@@ -408,6 +423,10 @@ public:
     }
 
     std::map<uint256, CWalletTx> mapWallet;
+    std::list<CAccountingEntry> laccentries;
+    typedef std::pair<CWalletTx*, CAccountingEntry*> TxPair;
+    typedef std::multimap<int64_t, TxPair > TxItems;
+    TxItems wtxOrdered;
 
     int64_t nOrderPosNext;
     std::map<uint256, int> mapRequestCount;
@@ -425,6 +444,8 @@ public:
     std::map<uint256, CTokenInfo> mapToken;
 
     std::map<uint256, CTokenTx> mapTokenTx;
+
+    int64_t nKeysLeftSinceAutoBackup;
 
     const CWalletTx* GetWalletTx(const uint256& hash) const;
 
@@ -522,18 +543,8 @@ public:
     int64_t IncOrderPosNext(CWalletDB* pwalletdb = NULL);
     bool GetAccountDestination(CTxDestination &dest, std::string strAccount, bool bForceNew = false);
 
-    typedef std::pair<CWalletTx*, CAccountingEntry*> TxPair;
-    typedef std::multimap<int64_t, TxPair> TxItems;
-
-    /**
-     * Get the wallet's activity log
-     * @return multimap of ordered transactions and accounting entries
-     * @warning Returned pointers are *only* valid within the scope of passed acentries
-     */
-    TxItems OrderedTxItems(std::list<CAccountingEntry>& acentries, std::string strAccount = "");
-
     void MarkDirty();
-    bool AddToWallet(const CWalletTx& wtxIn, bool fFromLoadWallet = false, bool fFlushOnClose=true);
+    bool AddToWallet(const CWalletTx& wtxIn, bool fFromLoadWallet, CWalletDB* pwalletdb);
     void SyncTransaction(const CTransaction& tx, const CBlock* pblock);
     bool AddToWalletIfInvolvingMe(const CTransaction& tx, const CBlock* pblock, bool fUpdate);
     void EraseFromWallet(const uint256& hash);
@@ -564,6 +575,7 @@ public:
                            CAmount nFeePay = 0, CAmount nGasFee=0);
     bool CreateTransaction(CScript scriptPubKey, const CAmount& nValue, CWalletTx& wtxNew, CReserveKey& reservekey, CAmount& nFeeRet, std::string& strFailReason, const CCoinControl* coinControl = NULL, AvailableCoinsType coin_type = ALL_COINS, bool useIX = false, CAmount nFeePay = 0);
     bool CommitTransaction(CWalletTx& wtxNew, CReserveKey& reservekey, std::string strCommand = "tx");
+    bool AddAccountingEntry(const CAccountingEntry&, CWalletDB & pwalletdb);
     std::string PrepareDarksendDenominate(int minRounds, int maxRounds);
     bool CreateCollateralTransaction(CMutableTransaction& txCollateral, std::string& strReason);
     bool ConvertList(std::vector<CTxIn> vCoins, std::vector<int64_t>& vecAmounts);
@@ -720,6 +732,9 @@ public:
 
     //! Get wallet transactions that conflict with given transaction (spend same outputs)
     std::set<uint256> GetConflicts(const uint256& txid) const;
+
+    //! Verify the wallet database and perform salvage if required
+    static bool Verify();
 
     /**
      * Address book entry changed.

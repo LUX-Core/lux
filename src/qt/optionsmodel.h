@@ -27,33 +27,34 @@ public:
     explicit OptionsModel(QObject* parent = 0);
 
     enum OptionID {
-        StartAtStartup,      // bool
-        MinimizeToTray,      // bool
-        MapPortUPnP,         // bool
-        MinimizeOnClose,     // bool
-        ProxyUse,            // bool
-        ProxyIP,             // QString
-        ProxyPort,           // int
-        DisplayUnit,         // BitcoinUnits::Unit
-        ThirdPartyTxUrls,    // QString
-        Digits,              // QString
-        Theme,               // QString
-        Language,            // QString
-        CoinControlFeatures, // bool
-        showMasternodesTab, // bool
-        parallelMasterNode, // bool
-        ThreadsScriptVerif,  // int
-        DatabaseCache,       // int
-        LogFileCount,       // int
-        LogEvents,           // bool
-        ZeroBalanceAddressToken,// bool
-        SpendZeroConfChange, // bool
-        DarksendRounds,      // int
-        AnonymizeLuxAmount,  //int
-        ShowMasternodesTab,  // bool
-        NotUseChangeAddress,  // bool
-        WalletBackups,     // int
-        Listen,              // bool
+        StartAtStartup,          // bool
+        MinimizeToTray,          // bool
+        MapPortUPnP,             // bool
+        MinimizeOnClose,         // bool
+        ProxyUse,                // bool
+        ProxyIP,                 // QString
+        ProxyPort,               // int
+        DisplayUnit,             // BitcoinUnits::Unit
+        ThirdPartyTxUrls,        // QString
+        Digits,                  // QString
+        Theme,                   // QString
+        Language,                // QString
+        CoinControlFeatures,     // bool
+        showMasternodesTab,      // bool
+        parallelMasterNode,      // bool
+        ThreadsScriptVerif,      // int
+        DatabaseCache,           // int
+        LogFileCount,            // int
+        LogEvents,               // bool
+        ZeroBalanceAddressToken, // bool
+        SpendZeroConfChange,     // bool
+        ShowAdvancedUI,          //bool
+        DarkSendRounds,          // int
+        AnonymizeLuxAmount,      //int
+        ShowMasternodesTab,      // bool
+        NotUseChangeAddress,     // bool
+        WalletBackups,           // int
+        Listen,                  // bool
         OptionIDRowCount,
     };
 
@@ -73,6 +74,7 @@ public:
     QString getThirdPartyTxUrls() { return strThirdPartyTxUrls; }
     bool getProxySettings(QNetworkProxy& proxy) const;
     bool getCoinControlFeatures() { return fCoinControlFeatures; }
+    bool getShowAdvancedUI() { return fShowAdvancedUI; }
     bool getshowMasternodesTab() { return fshowMasternodesTab; }
     bool getparallelMasterNode() { return fparallelMasterNode; }
     const QString& getOverriddenByCommandLine() { return strOverriddenByCommandLine; }
@@ -90,6 +92,7 @@ private:
     int nDisplayUnit;
     QString strThirdPartyTxUrls;
     bool fCoinControlFeatures;
+    bool fShowAdvancedUI;
     bool fshowMasternodesTab;
     bool fparallelMasterNode;
     /* settings that were overriden by command-line */
@@ -101,6 +104,8 @@ private:
 signals:
     void displayUnitChanged(int unit);
     void darksendRoundsChanged(int);
+    void darkSentAmountChanged();
+    void advancedUIChanged(bool);
     void anonymizeLuxAmountChanged(int);
     void coinControlFeaturesChanged(bool);
     void showMasternodesTabChanged(bool);

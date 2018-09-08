@@ -1030,7 +1030,7 @@ QWidget .QFrame#frameDarksend .QLabel#label_2 { /* Darksend Header */
 
 /**************************** DARKSEND ***********************************************/
 
-QWidget .QFrame#frameDarksend .QLabel#labelDarksendSyncStatus { /* Darksend Sync Status */
+QWidget .QFrame#frameDarksend .QLabel#labelDarksendSyncStatus- { /* Darksend Sync Status */
     qproperty-alignment: 'AlignVCenter | AlignLeft';
     margin-left:2px;
 }

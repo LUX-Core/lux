@@ -192,7 +192,7 @@ OverviewPage::OverviewPage(QWidget* parent) : QWidget(parent),
                                               currentWatchOnlyBalance(-1),
                                               currentWatchUnconfBalance(-1),
                                               currentWatchImmatureBalance(-1),
-                                          txdelegate(new TxViewDelegate()),
+                                              txdelegate(new TxViewDelegate()),
                                               tkndelegate(new TknViewDelegate(this)),
                                               filter(0)
 {
@@ -222,19 +222,20 @@ OverviewPage::OverviewPage(QWidget* parent) : QWidget(parent),
     }
 #else
        {
-        if (fMasterNode) {
-            ui->toggleDarksend->setText("(" + tr("Disabled") + ")");
-            ui->darksendAuto->setText("(" + tr("Disabled") + ")");
-            ui->darksendReset->setText("(" + tr("Disabled") + ")");
-            ui->frameDarksend->setEnabled(false);
+        if(fMasterNode || nWalletBackups <= 0){
+           // DisableDarksend();
+            if (nWalletBackups <= 0) {
+                ui->darksendEnabled->setToolTip(tr("Automatic backups are disabled, no mixing available!"));
+               }
         } else {
             if (!fEnableDarksend) {
                 ui->toggleDarksend->setText(tr("Start Luxsend"));
             } else {
                 ui->toggleDarksend->setText(tr("Stop Luxsend"));
             }
+            darkSendPool.fCreateAutoBackups = false;
             timer = new QTimer(this);
-            connect(timer, SIGNAL(timeout()), this, SLOT(darksendStatus()));
+            connect(timer, SIGNAL(timeout()), this, SLOT(darkSendStatus()));
             timer->start(1000);
         }
     }
@@ -288,7 +289,7 @@ void OverviewPage::setBalance(const CAmount& balance, const CAmount& unconfirmed
     ui->labelImmatureText->setVisible(showImmature || showWatchOnlyImmature);
     ui->labelWatchImmature->setVisible(showWatchOnlyImmature); // show watch-only immature balance
 
-    updateDarksendProgress();
+    updateDarkSendProgress();
 
     static int cachedTxLocks = 0;
 
@@ -350,6 +351,9 @@ void OverviewPage::setWalletModel(WalletModel* model)
         connect(model, SIGNAL(balanceChanged(CAmount, CAmount, CAmount, CAmount, CAmount, CAmount, CAmount)), this, SLOT(setBalance(CAmount, CAmount, CAmount, CAmount, CAmount, CAmount, CAmount)));
 
         connect(model->getOptionsModel(), SIGNAL(displayUnitChanged(int)), this, SLOT(updateDisplayUnit()));
+        connect(model->getOptionsModel(), SIGNAL(darksendRoundsChanged()), this, SLOT(updateDarkSendProgress()));
+        connect(model->getOptionsModel(), SIGNAL(advancedUIChanged(bool)), this, SLOT(updateAdvancedUI(bool)));
+        updateAdvancedUI(model->getOptionsModel()->getShowAdvancedUI());
 
         connect(ui->darksendAuto, SIGNAL(clicked()), this, SLOT(darksendAuto()));
         connect(ui->darksendReset, SIGNAL(clicked()), this, SLOT(darksendReset()));
@@ -407,7 +411,7 @@ void OverviewPage::on_buttonAddToken_clicked()
     Q_EMIT addTokenClicked(true);
 }
 
-void OverviewPage::updateDarksendProgress()
+void OverviewPage::updateDarkSendProgress()
 {
     if (!pwalletMain) return;
 
@@ -517,7 +521,18 @@ void OverviewPage::updateDarksendProgress()
     ui->darksendProgress->setToolTip(strToolPip);
 }
 
-void OverviewPage::darksendStatus()
+void OverviewPage::updateAdvancedUI(bool fShowAdvancedPSUI) {
+    //ui->labelCompletitionText->setVisible(fShowAdvancedPSUI);
+    ui->darksendProgress->setVisible(fShowAdvancedPSUI);
+    //ui->labelSubmittedDenomText->setVisible(fShowAdvancedPSUI);
+    ui->labelSubmittedDenom->setVisible(fShowAdvancedPSUI);
+    ui->darksendAuto->setVisible(fShowAdvancedPSUI);
+    ui->darksendReset->setVisible(fShowAdvancedPSUI);
+   // ui->labelDarkSendLastMessage->setVisible(fShowAdvancedPSUI);
+}
+
+
+void OverviewPage::darkSendStatus()
 {
     static int64_t nLastDSProgressBlockTime = 0;
 
@@ -530,10 +545,10 @@ void OverviewPage::darksendStatus()
     if (!fEnableDarksend) {
         if (nBestHeight != darkSendPool.cachedNumBlocks) {
             darkSendPool.cachedNumBlocks = nBestHeight;
-            updateDarksendProgress();
+            updateDarkSendProgress();
 
             ui->darksendEnabled->setText(tr("Disabled"));
-            ui->darksendStatus->setText("");
+          //  ui->labelDarkSendLastMessage->setText("");
             ui->toggleDarksend->setText(tr("Start Luxsend"));
         }
 
@@ -544,7 +559,7 @@ void OverviewPage::darksendStatus()
     if (nBestHeight != darkSendPool.cachedNumBlocks) {
         // Balance and number of transactions might have changed
         darkSendPool.cachedNumBlocks = nBestHeight;
-        updateDarksendProgress();
+        updateDarkSendProgress();
 
         ui->darksendEnabled->setText(tr("Enabled"));
     }
@@ -553,10 +568,10 @@ void OverviewPage::darksendStatus()
 
     QString s = tr("Last Darksend message:\n") + strStatus;
 
-    if (s != ui->darksendStatus->text())
-        LogPrintf("Last Darksend message: %s\n", strStatus.toStdString());
+    //if (s != ui->labelDarkSendLastMessage->text())
+     //   LogPrintf("Last Darksend message: %s\n", strStatus.toStdString());
 
-    ui->darksendStatus->setText(s);
+    //ui->labelDarkSendLastMessage->setText(s);
 
     if (darkSendPool.sessionDenom == 0) {
         ui->labelSubmittedDenom->setText(tr("N/A"));
