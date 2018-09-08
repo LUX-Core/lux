@@ -99,6 +99,8 @@ std::string to_internal(const std::string&);
 
 using namespace std;
 
+regex hexData("^([0-9a-fA-f]{2,}$)");
+
 //LUX only features
 int nLogFile = 1;
 bool fMasterNode = false;

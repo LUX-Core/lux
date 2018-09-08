@@ -9,22 +9,24 @@
 
 #include "tinyformat.h"
 #include "utiltime.h"
-
+#include <atomic>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/thread.hpp>
 
-static int64_t nMockTime = 0; //! For unit testing
+using namespace std;
+
+static std::atomic<int64_t> nMockTime(0); //! For unit testing
 
 int64_t GetTime()
 {
-    if (nMockTime) return nMockTime;
-
+    int64_t mocktime = nMockTime.load(std::memory_order_relaxed);
+    if (mocktime) return mocktime;
     return time(NULL);
 }
 
 void SetMockTime(int64_t nMockTimeIn)
 {
-    nMockTime = nMockTimeIn;
+    nMockTime.store(nMockTimeIn, std::memory_order_relaxed);
 }
 
 int64_t GetTimeMillis()
@@ -66,9 +68,8 @@ void MilliSleep(int64_t n)
 
 std::string DateTimeStrFormat(const char* pszFormat, int64_t nTime)
 {
-    static std::locale classic(std::locale::classic());
     // std::locale takes ownership of the pointer
-    std::locale loc(classic, new boost::posix_time::time_facet(pszFormat));
+    std::locale loc(std::locale::classic(), new boost::posix_time::time_facet(pszFormat));
     std::stringstream ss;
     ss.imbue(loc);
     ss << boost::posix_time::from_time_t(nTime);

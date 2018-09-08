@@ -30,6 +30,7 @@ static const int STATUSBAR_ICONSIZE = 16;
 #define COLOR_TX_STATUS_OFFLINE QColor(192, 192, 192)
 /* Transaction list -- TX status decoration - default color */
 #define COLOR_BLACK QColor(51, 51, 51)
+#define COLOR_TX_STATUS_DANGER QColor(200, 100, 100)
 
 #define CONFIRM_ICONS 5
 

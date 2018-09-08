@@ -18,6 +18,7 @@
 
 class QMenu;
 class ClientModel;
+class PlatformStyle;
 
 namespace Ui
 {
@@ -34,7 +35,7 @@ class RPCConsole : public QDialog
     Q_OBJECT
 
 public:
-    explicit RPCConsole(QWidget* parent);
+    explicit RPCConsole(const PlatformStyle *platformStyle, QWidget* parent);
     ~RPCConsole();
 
     static bool RPCParseCommandLine(std::string &strResult, const std::string &strCommand, bool fExecute, std::string * const pstrFilteredOut = NULL);
@@ -55,7 +56,7 @@ public:
 protected:
     virtual bool eventFilter(QObject* obj, QEvent* event);
 
-private slots:
+private Q_SLOTS:
     void on_lineEdit_returnPressed();
     void on_tabWidget_currentChanged(int index);
     /** Switch network activity */
@@ -78,7 +79,7 @@ private slots:
     /** clear the selected node */
     void clearSelectedNode();
 
-public slots:
+public Q_SLOTS:
     void clear();
     void fontBigger();
     void fontSmaller();
@@ -96,10 +97,10 @@ public slots:
     void message(int category, const QString& message, bool html = false);
     /** Set number of connections shown in the UI */
     void setNumConnections(int count);
+    /** Set number of blocks and last block date shown in the UI */
+    void setNumBlocks(int count, const QDateTime& lastBlockDate, double nVerificationProgress, bool headers);
     /** Set network state shown in the UI */
     void setNetworkActive(bool networkActive);
-    /** Set number of blocks shown in the UI */
-    void setNumBlocks(int count);
     /** Set number of masternodes shown in the UI */
     void setMasternodeCount(const QString& strMasternodes);
     /** Go forward or back in history */
@@ -133,7 +134,7 @@ public slots:
     /** Show folder with wallet backups in default browser */
     void showBackups();
 
-signals:
+Q_SIGNALS:
     // For RPC command executor
     void stopExecutor();
     void cmdRequest(const QString& command);
@@ -166,10 +167,11 @@ private:
     int historyPtr;
     NodeId cachedNodeid;
     int consoleFontSize;
-    QCompleter *autoCompleter;
+    QCompleter* autoCompleter;
     QThread thread;
-    QMenu *peersTableContextMenu;
-    QMenu *banTableContextMenu;
+    QMenu* peersTableContextMenu;
+    QMenu* banTableContextMenu;
+    const PlatformStyle* platformStyle;
 
 };
 

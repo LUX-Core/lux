@@ -10,6 +10,7 @@
 #include <QDialog>
 #include <QImage>
 #include <QLabel>
+#include <QPainter>
 
 class OptionsModel;
 
@@ -33,7 +34,7 @@ public:
     explicit QRImageWidget(QWidget* parent = 0);
     QImage exportImage();
 
-public slots:
+public Q_SLOTS:
     void saveImage();
     void copyImage();
 
@@ -57,7 +58,7 @@ public:
     void setInfo(const SendCoinsRecipient& info);
     static bool createQRCode(QLabel * label, SendCoinsRecipient info);
 
-private slots:
+private Q_SLOTS:
     void on_btnCopyURI_clicked();
     void on_btnCopyAddress_clicked();
 

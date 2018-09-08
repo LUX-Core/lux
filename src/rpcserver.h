@@ -32,6 +32,15 @@ namespace RPCServer
 class CBlockIndex;
 class CNetAddr;
 
+/** Wrapper for UniValue::VType, which includes typeAny:
+ * Used to denote don't care type. Only used by RPCTypeCheckObj */
+struct UniValueType {
+    UniValueType(UniValue::VType _type) : typeAny(false), type(_type) {}
+    UniValueType() : typeAny(true) {}
+    bool typeAny;
+    UniValue::VType type;
+};
+
 class JSONRequest
 {
 public:
@@ -170,6 +179,29 @@ void RPCTypeCheckObj(const UniValue& o,
     const std::map<std::string, UniValue::VType>& typesExpected,
     bool fAllowNull = false);
 
+/**
+ * Run func nSeconds from now. Uses boost deadline timers.
+ * Overrides previous timer <name> (if any).
+ */
+void RPCRunLater(const std::string& name, boost::function<void(void)> func, int64_t nSeconds);
+
+//! Convert boost::asio address to CNetAddr
+extern CNetAddr BoostAsioToCNetAddr(boost::asio::ip::address address);
+
+typedef UniValue (*rpcfn_type)(const UniValue& params, bool fHelp);
+
+void RPCRunLater(const std::string& name, boost::function<void(void)> func, int64_t nSeconds);
+
+class CRPCCommand
+{
+public:
+    std::string category;
+    std::string name;
+    rpcfn_type actor;
+    bool okSafeMode;
+    bool threadSafe;
+    bool reqWallet;
+};
 
 /** Opaque base class for timers returned by NewTimerFunc.
  * This provides no methods at the moment, but makes sure that delete

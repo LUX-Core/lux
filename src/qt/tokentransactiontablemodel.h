@@ -6,7 +6,7 @@
 #include <QAbstractTableModel>
 #include <QStringList>
 
-//class PlatformStyle;
+class PlatformStyle;
 class TokenTransactionRecord;
 class TokenTransactionTablePriv;
 class WalletModel;
@@ -20,7 +20,7 @@ class TokenTransactionTableModel : public QAbstractTableModel
     Q_OBJECT
 
 public:
-    explicit TokenTransactionTableModel(CWallet* wallet, WalletModel *parent = 0);
+    explicit TokenTransactionTableModel(const PlatformStyle *platformStyle, CWallet* wallet, WalletModel *parent = 0);
     ~TokenTransactionTableModel();
 
     enum ColumnIndex {
@@ -81,7 +81,7 @@ private:
     QStringList columns;
     TokenTransactionTablePriv *priv;
     bool fProcessingQueuedTransactions;
-    //const PlatformStyle *platformStyle;
+    const PlatformStyle *platformStyle;
 
     void subscribeToCoreSignals();
     void unsubscribeFromCoreSignals();

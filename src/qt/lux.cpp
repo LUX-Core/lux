@@ -20,6 +20,7 @@
 #include "splashscreen.h"
 #include "utilitydialog.h"
 #include "winshutdownmonitor.h"
+#include "platformstyle.h"
 
 #ifdef ENABLE_WALLET
 #include "paymentserver.h"
@@ -178,12 +179,12 @@ class BitcoinCore : public QObject
 public:
     explicit BitcoinCore();
 
-public slots:
+public Q_SLOTS:
     void initialize();
     void shutdown();
     void restart(QStringList args);
 
-signals:
+Q_SIGNALS:
     void initializeResult(int retval);
     void shutdownResult(int retval);
     void runawayException(const QString& message);
@@ -231,13 +232,13 @@ public:
 
     void restoreWallet();
 
-public slots:
+public Q_SLOTS:
     void initializeResult(int retval);
     void shutdownResult(int retval);
     /// Handle runaway exceptions. Shows a message box with the problem and quits the program.
     void handleRunawayException(const QString& message);
 
-signals:
+Q_SIGNALS:
     void requestedInitialize();
     void requestedRestart(QStringList args);
     void requestedShutdown();
@@ -255,6 +256,7 @@ private:
     WalletModel* walletModel;
 #endif
     int returnValue;
+    const PlatformStyle* platformStyle;
 
     void startThread();
 
@@ -272,7 +274,7 @@ BitcoinCore::BitcoinCore() : QObject()
 void BitcoinCore::handleRunawayException(std::exception* e)
 {
     PrintExceptionContinue(e, "Runaway exception");
-    emit runawayException(QString::fromStdString(strMiscWarning));
+    Q_EMIT runawayException(QString::fromStdString(strMiscWarning));
 }
 
 void BitcoinCore::initialize()
@@ -282,7 +284,13 @@ void BitcoinCore::initialize()
     try {
         qDebug() << __func__ << ": Running AppInit2 in thread";
         int rv = AppInit2(threadGroup, scheduler);
-        emit initializeResult(rv);
+        if (rv) {
+            /* Start a dummy RPC thread if no RPC thread is active yet
+             * to handle timeouts.
+             */
+            StartDummyRPCThread();
+        }
+        Q_EMIT initializeResult(rv);
     } catch (std::exception& e) {
         handleRunawayException(&e);
     } catch (...) {
@@ -300,7 +308,7 @@ void BitcoinCore::restart(QStringList args)
             threadGroup.join_all();
             PrepareShutdown();
             qDebug() << __func__ << ": Shutdown finished";
-            emit shutdownResult(1);
+            Q_EMIT shutdownResult(1);
             CExplicitNetCleanup::callCleanup();
             QProcess::startDetached(QApplication::applicationFilePath(), args);
             qDebug() << __func__ << ": Restart initiated...";
@@ -321,7 +329,7 @@ void BitcoinCore::shutdown()
         threadGroup.join_all();
         Shutdown();
         qDebug() << __func__ << ": Shutdown finished";
-        emit shutdownResult(1);
+        Q_EMIT shutdownResult(1);
     } catch (std::exception& e) {
         handleRunawayException(&e);
     } catch (...) {
@@ -342,13 +350,28 @@ BitcoinApplication::BitcoinApplication(int& argc, char** argv) : QApplication(ar
                                                                  returnValue(0)
 {
     setQuitOnLastWindowClosed(false);
+    // UI per-platform customization
+    // This must be done inside the BitcoinApplication constructor, or after it, because
+    // PlatformStyle::instantiate requires a QApplication
+#if defined(Q_OS_MAC)
+    std::string platformName = "macosx";
+#elif defined(Q_OS_WIN)
+    std::string platformName = "windows";
+#else
+    std::string platformName = "other";
+#endif
+    platformName = GetArg("-uiplatform", platformName);
+    platformStyle = PlatformStyle::instantiate(QString::fromStdString(platformName));
+    if (!platformStyle) // Fall back to "other" if specified name not found
+        platformStyle = PlatformStyle::instantiate("other");
+    assert(platformStyle);
 }
 
 BitcoinApplication::~BitcoinApplication()
 {
     if (coreThread) {
         qDebug() << __func__ << ": Stopping thread";
-        emit stopThread();
+        Q_EMIT stopThread();
         coreThread->wait();
         qDebug() << __func__ << ": Stopped thread";
         delete coreThread;
@@ -375,6 +398,8 @@ BitcoinApplication::~BitcoinApplication()
         }
         delete optionsModel;
         optionsModel = 0;
+        delete platformStyle;
+        platformStyle = 0;
     }
 
 }
@@ -393,7 +418,7 @@ void BitcoinApplication::createOptionsModel()
 
 void BitcoinApplication::createWindow(const NetworkStyle* networkStyle)
 {
-    window = new BitcoinGUI(networkStyle, 0);
+    window = new BitcoinGUI(platformStyle, networkStyle, 0);
 
     pollShutdownTimer = new QTimer(window);
     connect(pollShutdownTimer, SIGNAL(timeout()), window, SLOT(detectShutdown()));
@@ -435,7 +460,7 @@ void BitcoinApplication::requestInitialize()
 {
     qDebug() << __func__ << ": Requesting initialize";
     startThread();
-    emit requestedInitialize();
+    Q_EMIT requestedInitialize();
 }
 
 void BitcoinApplication::requestShutdown()
@@ -464,7 +489,7 @@ void BitcoinApplication::requestShutdown()
     clientModel = 0;
 
     // Request shutdown from core thread
-    emit requestedShutdown();
+    Q_EMIT requestedShutdown();
 }
 
 void BitcoinApplication::initializeResult(int retval)
@@ -473,6 +498,7 @@ void BitcoinApplication::initializeResult(int retval)
     // Set exit result: 0 if successful, 1 if failure
     returnValue = retval ? 0 : 1;
     if (retval) {
+        qWarning() << "Platform customization:" << platformStyle->getName();
 #ifdef ENABLE_WALLET
         PaymentServer::LoadRootCAs();
         paymentServer->setOptionsModel(optionsModel);
@@ -483,7 +509,7 @@ void BitcoinApplication::initializeResult(int retval)
 
 #ifdef ENABLE_WALLET
         if (pwalletMain) {
-            walletModel = new WalletModel(pwalletMain, optionsModel);
+            walletModel = new WalletModel(platformStyle, pwalletMain, optionsModel);
 
             window->addWallet(BitcoinGUI::DEFAULT_WALLET, walletModel);
             window->setCurrentWallet(BitcoinGUI::DEFAULT_WALLET);
@@ -499,7 +525,7 @@ void BitcoinApplication::initializeResult(int retval)
         } else {
             window->show();
         }
-        emit splashFinished(window);
+        Q_EMIT splashFinished(window);
 
 #ifdef ENABLE_WALLET
         // Now that initialization/startup is done, process any command-line
@@ -514,7 +540,7 @@ void BitcoinApplication::initializeResult(int retval)
 #endif
         pollShutdownTimer->start(150);
     } else {
-        emit splashFinished(window);
+        Q_EMIT splashFinished(window);
         quit(); // Exit main loop
     }
 }

@@ -4,6 +4,7 @@
 #include "init.h"
 #include "ui_multisenddialog.h"
 #include "walletmodel.h"
+#include "platformstyle.h"
 #include <QLineEdit>
 #include <QMessageBox>
 #include <QStyle>
@@ -12,9 +13,10 @@
 using namespace std;
 using namespace boost;
 
-MultiSendDialog::MultiSendDialog(QWidget* parent) : QDialog(parent),
+MultiSendDialog::MultiSendDialog(const PlatformStyle *platformStyle,QWidget* parent) : QDialog(parent),
                                                     ui(new Ui::MultiSendDialog),
-                                                    model(0)
+                                                    model(0),
+                                                    platformStyle(platformStyle)
 {
     ui->setupUi(this);
     updateCheckBoxes();
@@ -50,7 +52,7 @@ void MultiSendDialog::updateCheckBoxes()
 void MultiSendDialog::on_addressBookButton_clicked()
 {
     if (model && model->getAddressTableModel()) {
-        AddressBookPage dlg(AddressBookPage::ForSelection, AddressBookPage::SendingTab, this);
+        AddressBookPage dlg(platformStyle, AddressBookPage::ForSelection, AddressBookPage::SendingTab, this);
         dlg.setModel(model->getAddressTableModel());
         if (dlg.exec())
             setAddress(dlg.getReturnValue(), ui->multiSendAddressEdit);
