@@ -34,8 +34,11 @@ class SendCoinsRecipient;
 class UnitDisplayStatusBarControl;
 class WalletFrame;
 class WalletModel;
+class HelpMessageDialog;
+class ModalOverlay;
 class MasternodeList;
 class HexAddressConverter;
+class CBlockIndex;
 
 
 class CWallet;
@@ -45,6 +48,8 @@ class QAction;
 class QProgressBar;
 class QProgressDialog;
 class QDockWidget;
+class ModalOverlay;
+
 QT_END_NAMESPACE
 
 /**
@@ -57,6 +62,7 @@ class BitcoinGUI : public QMainWindow
 
 public:
     static const QString DEFAULT_WALLET;
+    static const std::string DEFAULT_UIPLATFORM;
 
     explicit BitcoinGUI(const NetworkStyle* networkStyle, QWidget* parent = 0);
     ~BitcoinGUI();
@@ -146,6 +152,7 @@ private:
     QMenu* trayIconMenu;
     Notificator* notificator;
     RPCConsole* rpcConsole;
+    ModalOverlay* modalOverlay;
     BlockExplorer* explorerWindow;
     HexAddressConverter* hexAddressWindow;
 
@@ -175,6 +182,7 @@ private:
     /** Disconnect core signals from GUI client */
     void unsubscribeFromCoreSignals();
 
+    void updateHeadersSyncProgressLabel();
 signals:
     /** Signal raised when a URI was entered or dragged to the GUI */
     void receivedURI(const QString& uri);
@@ -186,10 +194,12 @@ public slots:
     void setNumConnections(int count);
     /** Set network state shown in the UI */
     void setNetworkActive(bool networkActive);
-    /** Set number of blocks shown in the UI */
-    void setNumBlocks(int count);
     /** Get restart command-line parameters and request restart */
     void handleRestart(QStringList args);
+    /** Set number of blocks and last block date shown in the UI */
+    void setNumBlocks(int count, const QDateTime& lastBlockDate, double nVerificationProgress, bool headers);
+    /** Set additional data sync status shown in the UI */
+    //void setAdditionalDataSyncProgress(double nSyncProgress);
 
     /** Notify the user of an event from the core network or transaction handling code.
        @param[in] title     the message box / notification title
@@ -281,6 +291,11 @@ private slots:
 
     /** Show progress dialog e.g. for verifychain */
     void showProgress(const QString& title, int nProgress);
+
+    /** When hideTrayIcon setting is changed in OptionsModel hide or show the icon accordingly. */
+    void setTrayIconVisible(bool);
+
+    void showModalOverlay();
 };
 
 class UnitDisplayStatusBarControl : public QLabel

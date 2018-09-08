@@ -51,9 +51,14 @@ void OptionsModel::Init()
     // These are Qt-only settings:
 
     // Window
+    if (!settings.contains("fHideTrayIcon"))
+        settings.setValue("fHideTrayIcon", false);
+    fHideTrayIcon = settings.value("fHideTrayIcon").toBool();
+    Q_EMIT hideTrayIconChanged(fHideTrayIcon);
+
     if (!settings.contains("fMinimizeToTray"))
         settings.setValue("fMinimizeToTray", false);
-    fMinimizeToTray = settings.value("fMinimizeToTray").toBool();
+    fMinimizeToTray = settings.value("fMinimizeToTray").toBool() && !fHideTrayIcon;
 
     if (!settings.contains("fMinimizeOnClose"))
         settings.setValue("fMinimizeOnClose", false);
@@ -206,6 +211,8 @@ QVariant OptionsModel::data(const QModelIndex& index, int role) const
         switch (index.row()) {
         case StartAtStartup:
             return GUIUtil::GetStartOnSystemStartup();
+        case HideTrayIcon:
+            return fHideTrayIcon;
         case MinimizeToTray:
             return fMinimizeToTray;
         case MapPortUPnP:
@@ -291,6 +298,11 @@ bool OptionsModel::setData(const QModelIndex& index, const QVariant& value, int 
         switch (index.row()) {
         case StartAtStartup:
             successful = GUIUtil::SetStartOnSystemStartup(value.toBool());
+            break;
+        case HideTrayIcon:
+            fHideTrayIcon = value.toBool();
+            settings.setValue("fHideTrayIcon", fHideTrayIcon);
+            emit hideTrayIconChanged(fHideTrayIcon);
             break;
         case MinimizeToTray:
             fMinimizeToTray = value.toBool();

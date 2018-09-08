@@ -237,6 +237,9 @@ public:
     bool saveReceiveRequest(const std::string& sAddress, const int64_t nId, const std::string& sRequest);
     CWallet* getCurrentWallet() { return wallet; }
 
+    bool transactionCanBeAbandoned(uint256 hash) const;
+    bool abandonTransaction(uint256 hash) const;
+
     QString getRestorePath();
     QString getRestoreParam();
 

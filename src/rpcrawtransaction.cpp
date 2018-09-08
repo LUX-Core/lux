@@ -239,6 +239,8 @@ UniValue listunspent(const UniValue& params, bool fHelp)
             "    \"scriptPubKey\" : \"key\", (string) the script key\n"
             "    \"amount\" : x.xxx,         (numeric) the transaction amount in btc\n"
             "    \"confirmations\" : n       (numeric) The number of confirmations\n"
+            "    \"ds_rounds\" : n           (numeric) The number of ds round\n"
+            "    \"spendable\" : xxx,        (bool) Whether we have the private keys to spend this output\n"
             "    \"redeemScript\" : n        (string) The redeemScript if scriptPubKey is P2SH\n"
             "  }\n"
             "  ,...\n"
@@ -302,15 +304,13 @@ UniValue listunspent(const UniValue& params, bool fHelp)
             if (scriptPubKey.IsPayToScriptHash()) {
                 const CScriptID& hash = boost::get<CScriptID>(address);
                 CScript redeemScript;
-                if (pwalletMain->GetCScript(hash, redeemScript)) {
+                if (pwalletMain->GetCScript(hash, redeemScript))
                     entry.push_back(Pair("redeemScript", HexStr(redeemScript.begin(), redeemScript.end())));
-                }
             }
         }
-
-        entry.push_back(Pair("scriptPubKey", HexStr(scriptPubKey.begin(), scriptPubKey.end())));
         entry.push_back(Pair("amount", ValueFromAmount(out.tx->vout[out.i].nValue)));
         entry.push_back(Pair("confirmations", out.nDepth));
+        entry.push_back(Pair("ds_rounds", pwalletMain->GetInputDarkSendRounds(CTxIn(out.tx->GetHash(), out.i))));
         entry.push_back(Pair("spendable", out.fSpendable));
         results.push_back(entry);
     }

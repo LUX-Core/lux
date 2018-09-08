@@ -3441,6 +3441,28 @@ static bool ActivateBestChainStep(CValidationState& state, const CChainParams& c
     return true;
 }
 
+static void NotifyHeaderTip() {
+    bool fNotify = false;
+    bool fInitialBlockDownload = false;
+    static CBlockIndex* pindexHeaderOld = NULL;
+    CBlockIndex* pindexHeader = NULL;
+    {
+        LOCK(cs_main);
+        if (!setBlockIndexCandidates.empty()) {
+            pindexHeader = *setBlockIndexCandidates.rbegin();
+        }
+        if (pindexHeader != pindexHeaderOld) {
+            fNotify = true;
+            fInitialBlockDownload = IsInitialBlockDownload();
+            pindexHeaderOld = pindexHeader;
+        }
+    }
+    // Send block tip changed notifications without cs_main
+    if (fNotify) {
+        uiInterface.NotifyHeaderTip(fInitialBlockDownload, pindexHeader);
+    }
+}
+
 /**
  * Make the best chain active, in multiple steps. The result is either failure
  * or an activated best chain. pblock is either NULL or a pointer to a block
@@ -3487,21 +3509,22 @@ bool ActivateBestChain(CValidationState& state, const CChainParams& chainparams,
             // Relay inventory, but don't relay old inventory during initial block download.
             int nBlockEstimate = Checkpoints::GetTotalBlocksEstimate(chainparams.Checkpoints());
             if (nLocalServices & NODE_NETWORK) {
-                vector<CNode*> vNodesCopy;
+                vector < CNode * > vNodesCopy;
                 {
                     LOCK(cs_vNodes);
                     vNodesCopy = vNodes;
                 }
 
-                for (CNode* pnode : vNodesCopy)
-                    if (pnode && chainActive.Height() > (pnode->nStartingHeight != -1 ? pnode->nStartingHeight - 2000 : nBlockEstimate))
+                for (CNode *pnode : vNodesCopy)
+                    if (pnode && chainActive.Height() >
+                                 (pnode->nStartingHeight != -1 ? pnode->nStartingHeight - 2000 : nBlockEstimate))
                         pnode->PushInventory(CInv(MSG_BLOCK, hashNewTip));
             }
-            // Notify external listeners about the new tip.
-            uiInterface.NotifyBlockTip(hashNewTip);
         }
-    } while (pindexMostWork != chainActive.Tip());
+        // Notify external listeners about the new tip.
+        uiInterface.NotifyBlockTip(fInitialDownload, pindexNewTip);
 
+    } while (pindexMostWork != chainActive.Tip());
     CheckBlockIndex(chainparams.GetConsensus());
 
     // Write changes periodically to disk, after relay.
@@ -5315,6 +5338,7 @@ bool LoadExternalBlockFile(const CChainParams& chainparams, FILE* fileIn, CDiskB
                     LogPrintf("Block Import: already had block %s at height %d\n", hash.ToString(), mapBlockIndex[hash]->nHeight);
                 }
 
+                NotifyHeaderTip();
                 // Recursively process earlier encountered successors of this block
                 deque<uint256> queue;
                 queue.push_back(hash);
@@ -5329,8 +5353,9 @@ bool LoadExternalBlockFile(const CChainParams& chainparams, FILE* fileIn, CDiskB
                         hash = block.GetHash(usePhi2);
                         int nHeight = mapBlockIndex[hash] ? mapBlockIndex[hash]->nHeight : pindexPrev->nHeight;
                         if (ReadBlockFromDisk(block, it->second, nHeight, chainparams.GetConsensus())) {
-                            LogPrintf("%s: Processing out of order child %s of %s\n", __func__, block.GetHash(usePhi2).ToString(),
-                                head.ToString());
+                            LogPrintf("%s: Processing out of order child %s of %s\n", __func__,
+                                      block.GetHash(usePhi2).ToString(),
+                                      head.ToString());
                             CValidationState dummy;
                             if (ProcessNewBlock(dummy, chainparams, NULL, &block, &it->second)) {
                                 nLoaded++;
@@ -5340,6 +5365,7 @@ bool LoadExternalBlockFile(const CChainParams& chainparams, FILE* fileIn, CDiskB
                         range.first++;
                         mapBlocksUnknownParent.erase(it);
                     }
+                      NotifyHeaderTip();
                 }
             } catch (std::exception& e) {
                 LogPrintf("%s : Deserialize or I/O error - %s", __func__, e.what());
@@ -6373,6 +6399,7 @@ static bool ProcessMessage(CNode* pfrom, const string &strCommand, CDataStream& 
         }
 
         CheckBlockIndex(chainparams.GetConsensus());
+        NotifyHeaderTip();
     }
 
 
@@ -7096,7 +7123,7 @@ public:
 
 
 /////////////////////////////////////////////////////////////////////// lux
-bool CheckSenderScript(const CCoinsViewCache& view, const CTransaction& tx){
+bool CheckSenderScript(const CCoinsViewCache& view, const CTransaction& tx) {
     CScript script = view.AccessCoins(tx.vin[0].prevout.hash)->vout[tx.vin[0].prevout.n].scriptPubKey;
     if(!script.IsPayToPubkeyHash() && !script.IsPayToPubkey()){
         return false;

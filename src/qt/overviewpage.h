@@ -44,6 +44,7 @@ public slots:
 signals:
     void transactionClicked(const QModelIndex& index);
     void addTokenClicked(bool toAddTokenPage);
+    void outOfSyncWarningClicked();
 
 private:
     QTimer* timer;
@@ -76,6 +77,8 @@ private slots:
     void updateAlerts(const QString& warnings);
     void updateWatchOnlyLabels(bool showWatchOnly);
     void on_buttonAddToken_clicked();
+    void handleOutOfSyncWarningClicks();
+
 };
 
 #endif // BITCOIN_QT_OVERVIEWPAGE_H

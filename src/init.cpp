@@ -539,11 +539,13 @@ std::string LicenseInfo()
            "\n";
 }
 
-static void BlockNotifyCallback(const uint256& hashNewTip)
+static void BlockNotifyCallback(bool initialSync, const CBlockIndex *pBlockIndex)
 {
+    if (initialSync || !pBlockIndex)
+        return;
     std::string strCmd = GetArg("-blocknotify", "");
 
-    boost::replace_all(strCmd, "%s", hashNewTip.GetHex());
+    boost::replace_all(strCmd, "%s", pBlockIndex->GetBlockHash().GetHex());
     boost::thread t(runCommand, strCmd); // thread runs free
 }
 
@@ -1398,8 +1400,9 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
         if (!fLoaded && !fRequestShutdown) {
             // first suggest a reindex
             if (!fReset) {
-                bool fRet = uiInterface.ThreadSafeMessageBox(
+                bool fRet = uiInterface.ThreadSafeQuestion(
                     strLoadError + ".\n\n" + _("Do you want to rebuild the block database now?"),
+                    strLoadError + ".\nPlease restart with -reindex or -reindex-chainstate to recover.",
                     "", CClientUIInterface::MSG_ERROR | CClientUIInterface::BTN_ABORT);
                 if (fRet) {
                     fReindex = true;

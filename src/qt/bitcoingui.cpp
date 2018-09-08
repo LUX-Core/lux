@@ -10,6 +10,7 @@
 #include "clientmodel.h"
 #include "guiconstants.h"
 #include "guiutil.h"
+#include "modaloverlay.h"
 #include "miner.h"
 #include "networkstyle.h"
 #include "notificator.h"
@@ -72,6 +73,16 @@
 #include <QUrlQuery>
 #endif
 
+const std::string BitcoinGUI::DEFAULT_UIPLATFORM =
+#if defined(Q_OS_MAC)
+        "macosx"
+#elif defined(Q_OS_WIN)
+        "windows"
+#else
+        "other"
+#endif
+        ;
+
 const QString BitcoinGUI::DEFAULT_WALLET = "~Default";
 
 
@@ -121,6 +132,7 @@ BitcoinGUI::BitcoinGUI(const NetworkStyle* networkStyle, QWidget* parent) : QMai
                                                                             rpcConsole(0),
                                                                             explorerWindow(0),
                                                                             hexAddressWindow(0),
+                                                                            modalOverlay(0),
                                                                             prevBlocks(0),
                                                                             spinnerFrame(0)
 {
@@ -628,8 +640,10 @@ void BitcoinGUI::setClientModel(ClientModel* clientModel) {
         connect(clientModel, SIGNAL(numConnectionsChanged(int)), this, SLOT(setNumConnections(int)));
         connect(clientModel, SIGNAL(networkActiveChanged(bool)), this, SLOT(setNetworkActive(bool)));
 
-        setNumBlocks(clientModel->getNumBlocks());
-        connect(clientModel, SIGNAL(numBlocksChanged(int)), this, SLOT(setNumBlocks(int)));
+        setNumBlocks(clientModel->getNumBlocks(), clientModel->getLastBlockDate(), clientModel->getVerificationProgress(NULL), false);
+        connect(clientModel, SIGNAL(numBlocksChanged(int,QDateTime,double,bool)), this, SLOT(setNumBlocks(int,QDateTime,double,bool)));
+
+        //connect(clientModel, SIGNAL(additionalDataSyncProgressChanged(double)), this, SLOT(setAdditionalDataSyncProgress(double)));
 
         // Receive and report messages from client model
         connect(clientModel, SIGNAL(message(QString, QString, unsigned int)), this, SLOT(message(QString, QString, unsigned int)));
@@ -645,15 +659,20 @@ void BitcoinGUI::setClientModel(ClientModel* clientModel) {
 #endif // ENABLE_WALLET
         unitDisplayControl->setOptionsModel(clientModel->getOptionsModel());
 
-        //Show trayIcon
-        if (trayIcon)
+        OptionsModel* optionsModel = clientModel->getOptionsModel();
+        if(optionsModel)
         {
-          trayIcon->show();
+            // be aware of the tray icon disable state change reported by the OptionsModel object.
+            connect(optionsModel,SIGNAL(hideTrayIconChanged(bool)),this,SLOT(setTrayIconVisible(bool)));
+
+            // initialize the disable state of the tray icon with the current value in the model.
+            setTrayIconVisible(optionsModel->getHideTrayIcon());
         }
     } else {
         // Disable possibility to show main window via action
         toggleHideAction->setEnabled(false);
-        if (trayIconMenu) {
+        if(trayIconMenu)
+        {
             // Disable context menu on tray icon
             trayIconMenu->clear();
         }
@@ -666,6 +685,14 @@ void BitcoinGUI::setClientModel(ClientModel* clientModel) {
         }
 #endif // ENABLE_WALLET
         unitDisplayControl->setOptionsModel(nullptr);
+
+#ifdef Q_OS_MAC
+        if(dockIconMenu)
+        {
+            // Disable context menu on dock icon
+            dockIconMenu->clear();
+        }
+#endif
     }
 }
 
@@ -932,8 +959,19 @@ void BitcoinGUI::setNumConnections(int count) {
     updateNetworkState();
 }
 
-void BitcoinGUI::setNumBlocks(int count) {
-    if (!clientModel)
+void BitcoinGUI::updateHeadersSyncProgressLabel()
+{
+    int64_t headersTipTime = clientModel->getHeaderTipTime();
+    int headersTipHeight = clientModel->getHeaderTipHeight();
+    int estHeadersLeft = (GetTime() - headersTipTime) / Params().GetConsensus().nPowTargetSpacing;
+    if (estHeadersLeft > HEADER_HEIGHT_DELTA_SYNC)
+        progressBarLabel->setText(tr("Syncing Headers (%1%)...").arg(QString::number(100.0 / (headersTipHeight+estHeadersLeft)*headersTipHeight, 'f', 1)));
+}
+
+void BitcoinGUI::setNumBlocks(int count, const QDateTime& lastBlockDate, double nVerificationProgress, bool header)
+{
+   modalOverlay->tipUpdate(count, lastBlockDate, nVerificationProgress);
+    if(!clientModel)
         return;
 
     // Prevent orphan statusbar messages (e.g. hover Quit in main menu, wait until chain-sync starts -> garbelled text)
@@ -942,20 +980,29 @@ void BitcoinGUI::setNumBlocks(int count) {
     // Acquire current block source
     enum BlockSource blockSource = clientModel->getBlockSource();
     switch (blockSource) {
-    case BLOCK_SOURCE_NETWORK:
-        hideLogMessage = true;
-        progressBarLabel->setText(tr("Synchronizing with network..."));
-        break;
-    case BLOCK_SOURCE_DISK:
-        progressBarLabel->setText(tr("Importing blocks from disk..."));
-        break;
-    case BLOCK_SOURCE_REINDEX:
-        progressBarLabel->setText(tr("Reindexing blocks on disk..."));
-        break;
-    case BLOCK_SOURCE_NONE:
-        // Case: not Importing, not Reindexing and no network connection
-        progressBarLabel->setText(tr("No block source available..."));
-        break;
+        case BLOCK_SOURCE_NETWORK:
+            if (header) {
+                return;
+            }
+            progressBarLabel->setText(tr("Synchronizing with network..."));
+            break;
+        case BLOCK_SOURCE_DISK:
+            if (header) {
+                progressBarLabel->setText(tr("Indexing blocks on disk..."));
+            } else {
+                progressBarLabel->setText(tr("Processing blocks on disk..."));
+            }
+            break;
+        case BLOCK_SOURCE_REINDEX:
+            progressBarLabel->setText(tr("Reindexing blocks on disk..."));
+            break;
+        case BLOCK_SOURCE_NONE:
+            if (header) {
+                return;
+            }
+            // Case: not Importing, not Reindexing and no network connection
+            progressBarLabel->setText(tr("No block source available..."));
+            break;
     }
 
     QString tooltip;
@@ -965,17 +1012,17 @@ void BitcoinGUI::setNumBlocks(int count) {
     int secs = lastBlockDate.secsTo(currentDate);
 
     tooltip = tr("Processed %n blocks of transaction history.", "", count);
-
-    // Set icon state: spinning if catching up, tick otherwise
-    if (secs < 90*60) { // 90*60 for bitcoin but we are 4x times faster
-        hideLogMessage = false;
+    if(secs < 90*60){
 #ifdef ENABLE_WALLET
+        if (walletFrame) {
         tooltip = tr("Up to date") + QString(".<br>") + tooltip;
         labelBlocksIcon->setPixmap(QIcon(":/icons/synced").pixmap(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE));
-        if (walletFrame)
-            walletFrame->showOutOfSyncWarning(false);
-        progressBarLabel->setVisible(false);
-        progressBar->setVisible(false);
+            modalOverlay->showHide(true, true);
+            modalOverlay->hideForever();
+        } else {
+            modalOverlay->showHide();
+        }
+
 #endif // ENABLE_WALLET
     } else {
         // Represent time from last generated block in human readable text
@@ -999,7 +1046,7 @@ void BitcoinGUI::setNumBlocks(int count) {
         progressBarLabel->setVisible(true);
         progressBar->setFormat(tr("%1 behind").arg(timeBehindText));
         progressBar->setMaximum(1000000000);
-        progressBar->setValue(clientModel->getVerificationProgress() * 1000000000.0 + 0.5);
+        progressBar->setValue(clientModel->getVerificationProgress(NULL) * 1000000000.0 + 0.5);
         progressBar->setVisible(true);
 
         tooltip = tr("Catching up...") + QString("<br>") + tooltip;
@@ -1013,8 +1060,9 @@ void BitcoinGUI::setNumBlocks(int count) {
         prevBlocks = count;
 
 #ifdef ENABLE_WALLET
-        if (walletFrame)
+        if (walletFrame) {
             walletFrame->showOutOfSyncWarning(true);
+            }
 #endif // ENABLE_WALLET
 
         tooltip += QString("<br>");
@@ -1289,6 +1337,21 @@ void BitcoinGUI::showProgress(const QString& title, int nProgress) {
         progressDialog->setValue(nProgress);
 }
 
+void BitcoinGUI::setTrayIconVisible(bool fHideTrayIcon)
+{
+    if (trayIcon)
+    {
+        trayIcon->setVisible(!fHideTrayIcon);
+    }
+}
+
+void BitcoinGUI::showModalOverlay()
+{
+    if (modalOverlay && (progressBar->isVisible() || modalOverlay->isLayerVisible()))
+        modalOverlay->toggleVisibility();
+}
+
+
 static bool ThreadSafeMessageBox(BitcoinGUI* gui, const std::string& message, const std::string& caption, unsigned int style) {
     bool modal = (style & CClientUIInterface::MODAL);
     // The SECURE flag has no effect in the Qt GUI.
@@ -1308,11 +1371,13 @@ static bool ThreadSafeMessageBox(BitcoinGUI* gui, const std::string& message, co
 void BitcoinGUI::subscribeToCoreSignals() {
     // Connect signals to client
     uiInterface.ThreadSafeMessageBox.connect(boost::bind(ThreadSafeMessageBox, this, _1, _2, _3));
+    uiInterface.ThreadSafeQuestion.connect(boost::bind(ThreadSafeMessageBox, this, _1, _3, _4));
 }
 
 void BitcoinGUI::unsubscribeFromCoreSignals() {
     // Disconnect signals from client
     uiInterface.ThreadSafeMessageBox.disconnect(boost::bind(ThreadSafeMessageBox, this, _1, _2, _3));
+    uiInterface.ThreadSafeQuestion.disconnect(boost::bind(ThreadSafeMessageBox, this, _1, _3, _4));
 }
 
 /** Get restart command-line parameters and request restart */
@@ -1378,4 +1443,3 @@ void UnitDisplayStatusBarControl::onMenuSelection(QAction* action) {
         optionsModel->setDisplayUnit(action->data());
     }
 }
-

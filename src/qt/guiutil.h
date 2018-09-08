@@ -194,7 +194,8 @@ private:
 
 bool GetStartOnSystemStartup();
 bool SetStartOnSystemStartup(bool fAutoStart);
-
+/** Modify Qt network specific settings on migration */
+void migrateQtSettings();
 /** Save window size and position */
 void saveWindowGeometry(const QString& strSetting, QWidget* parent);
 /** Restore window size and position */
@@ -205,7 +206,8 @@ QString loadStyleSheet();
 
 /** Check whether a theme is not build-in */
 bool isExternal(QString theme);
-
+/** Return name of current CSS theme */
+QString getThemeName();
 /* Convert QString to OS specific boost path through UTF-8 */
 boost::filesystem::path qstringToBoostPath(const QString& path);
 
@@ -218,8 +220,13 @@ QString formatDurationStr(int secs);
 /* Format CNodeStats.nServices bitmask into a user-readable string */
 QString formatServicesStr(quint64 mask);
 
-/* Format a CNodeCombinedStats.dPingTime into a user-readable string or display N/A, if 0*/
+/* Format a CNodeCombinedStats.dPingTime into a u
+ * ser-readable string or display N/A, if 0*/
 QString formatPingTime(double dPingTime);
+/* Format a CNodeCombinedStats.nTimeOffset into a user-readable string. */
+QString formatTimeOffset(int64_t nTimeOffset);
+
+QString formatNiceTimeOffset(qint64 secs);
 
 #if defined(Q_OS_MAC) && QT_VERSION >= 0x050000
 // workaround for Qt OSX Bug:

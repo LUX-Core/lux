@@ -101,6 +101,7 @@ WalletView::WalletView(QWidget* parent) : QStackedWidget(parent),
 
     // Clicking on a transaction on the overview pre-selects the transaction on the transaction history page
     connect(overviewPage, SIGNAL(transactionClicked(QModelIndex)), transactionView, SLOT(focusTransaction(QModelIndex)));
+    connect(overviewPage, SIGNAL(outOfSyncWarningClicked()), this, SLOT(requestedSyncWarningInfo()));
 
     // Double-clicking on a transaction on the transaction history page shows details
     connect(transactionView, SIGNAL(doubleClicked(QModelIndex)), transactionView, SLOT(showDetails()));
@@ -452,6 +453,11 @@ void WalletView::showProgress(const QString& title, int nProgress)
             progressDialog->setValue(nProgress);
         }
     }
+}
+
+void WalletView::requestedSyncWarningInfo()
+{
+    Q_EMIT outOfSyncWarningClicked();
 }
 
 /** Update wallet with the sum of the selected transactions */
