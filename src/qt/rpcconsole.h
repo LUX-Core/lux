@@ -96,10 +96,10 @@ public slots:
     void message(int category, const QString& message, bool html = false);
     /** Set number of connections shown in the UI */
     void setNumConnections(int count);
+    /** Set number of blocks and last block date shown in the UI */
+    void setNumBlocks(int count, const QDateTime& lastBlockDate, double nVerificationProgress, bool headers);
     /** Set network state shown in the UI */
     void setNetworkActive(bool networkActive);
-    /** Set number of blocks shown in the UI */
-    void setNumBlocks(int count);
     /** Set number of masternodes shown in the UI */
     void setMasternodeCount(const QString& strMasternodes);
     /** Go forward or back in history */

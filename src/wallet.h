@@ -475,6 +475,8 @@ public:
     void ListLockedCoins(std::vector<COutPoint>& vOutpts);
     int64_t GetTotalValue(std::vector<CTxIn> vCoins);
 
+    bool transactionCanBeAbandoned(uint256 hash) const;
+    bool abandonTransaction(uint256 hash) const;
      /*
      * Rescan abort properties
      */

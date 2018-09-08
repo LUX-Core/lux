@@ -39,7 +39,9 @@ public:
     bool handlePaymentRequest(const SendCoinsRecipient& recipient);
 
     void showOutOfSyncWarning(bool fShow);
-
+    Q_SIGNALS:
+            /** Notify that the user has requested more information about the out-of-sync warning */
+            void requestedSyncWarningInfo();
 private:
     QStackedWidget* walletStack;
     BitcoinGUI* gui;
@@ -96,6 +98,8 @@ public slots:
     void usedSendingAddresses();
     /** Show used receiving addresses */
     void usedReceivingAddresses();
+    /** Pass on signal over requested out-of-sync-warning information */
+    void outOfSyncWarningClicked();
 };
 
 #endif // BITCOIN_QT_WALLETFRAME_H

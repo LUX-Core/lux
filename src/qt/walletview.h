@@ -151,6 +151,9 @@ public slots:
     /** Show progress dialog e.g. for rescan */
     void showProgress(const QString& title, int nProgress);
 
+    /** User has requested more information about the out of sync state */
+    void requestedSyncWarningInfo();
+
     /** Update selected LUX amount from transactionview */
     void trxAmount(QString amount);
 

@@ -251,6 +251,11 @@ void OverviewPage::handleTransactionClicked(const QModelIndex& index)
         emit transactionClicked(filter->mapToSource(index));
 }
 
+void OverviewPage::handleOutOfSyncWarningClicks()
+{
+    Q_EMIT outOfSyncWarningClicked();
+}
+
 OverviewPage::~OverviewPage()
 {
 
