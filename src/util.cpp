@@ -99,6 +99,8 @@ std::string to_internal(const std::string&);
 
 using namespace std;
 
+regex hexData("^([0-9a-fA-f]{2,}$)");
+
 //LUX only features
 int nLogFile = 1;
 bool fMasterNode = false;
@@ -462,6 +464,12 @@ bool SoftSetBoolArg(const std::string& strArg, bool fValue)
         return SoftSetArg(strArg, std::string("1"));
     else
         return SoftSetArg(strArg, std::string("0"));
+}
+
+void ForceSetArg(const std::string& strArg, const std::string& strValue)
+{
+    //LOCK(cs_args);
+    mapArgs[strArg] = strValue;
 }
 
 static std::string FormatException(std::exception* pex, const char* pszThread)

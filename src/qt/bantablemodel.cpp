@@ -166,9 +166,9 @@ QModelIndex BanTableModel::index(int row, int column, const QModelIndex &parent)
 
 void BanTableModel::refresh()
 {
-    emit layoutAboutToBeChanged();
+    Q_EMIT layoutAboutToBeChanged();
     priv->refreshBanlist();
-    emit layoutChanged();
+    Q_EMIT layoutChanged();
 }
 
 void BanTableModel::sort(int column, Qt::SortOrder order)

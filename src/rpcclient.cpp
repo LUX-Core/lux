@@ -220,6 +220,15 @@ UniValue RPCConvertValues(const std::string &strMethod, const std::vector<std::s
         // insert string value directly
         if (!rpcCvtTable.convert(strMethod, idx)) {
             params.push_back(strVal);
+        } else if (strMethod.substr(0, 10) == "getaddress") {
+            UniValue p;
+            try {
+                p = ParseNonRFCJSONValue(strVal);
+            } catch (...) {
+                // allow getaddressbalance "LYmrT81UoxqfskSNt28ZKZ3XXskSFENEtg" for convenience
+                p = strVal;
+            }
+            params.push_back(p);
         } else {
             // parse string as JSON, insert bool/number/object/etc. value
             params.push_back(ParseNonRFCJSONValue(strVal));

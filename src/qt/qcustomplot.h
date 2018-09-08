@@ -722,7 +722,7 @@ public:
   // non-property methods:
   bool realVisibility() const;
   
-signals:
+Q_SIGNALS:
   void layerChanged(QCPLayer *newLayer);
   
 protected:
@@ -1112,7 +1112,7 @@ public:
   // non-property methods:
   Q_SLOT void cancel();
   
-signals:
+Q_SIGNALS:
   void started(QMouseEvent *event);
   void changed(const QRect &rect, QMouseEvent *event);
   void canceled(const QRect &rect, QInputEvent *event);
@@ -2115,7 +2115,7 @@ public:
   static Qt::Orientation orientation(AxisType type) { return type==atBottom||type==atTop ? Qt::Horizontal : Qt::Vertical; }
   static AxisType opposite(AxisType type);
   
-signals:
+Q_SIGNALS:
   void rangeChanged(const QCPRange &newRange);
   void rangeChanged(const QCPRange &newRange, const QCPRange &oldRange);
   void scaleTypeChanged(QCPAxis::ScaleType scaleType);
@@ -3347,7 +3347,7 @@ public:
   bool removeFromLegend(QCPLegend *legend) const;
   bool removeFromLegend() const;
   
-signals:
+Q_SIGNALS:
   void selectionChanged(bool selected);
   void selectionChanged(const QCPDataSelection &selection);
   void selectableChanged(QCP::SelectionType selectable);
@@ -3537,7 +3537,7 @@ public:
   QCPItemAnchor *anchor(const QString &name) const;
   bool hasAnchor(const QString &name) const;
   
-signals:
+Q_SIGNALS:
   void selectionChanged(bool selected);
   void selectableChanged(bool selectable);
   
@@ -3731,7 +3731,7 @@ public:
   QCPAxis *xAxis, *yAxis, *xAxis2, *yAxis2;
   QCPLegend *legend;
   
-signals:
+Q_SIGNALS:
   void mouseDoubleClick(QMouseEvent *event);
   void mousePress(QMouseEvent *event);
   void mouseMove(QMouseEvent *event);
@@ -4740,7 +4740,7 @@ public:
   // reimplemented virtual methods:
   virtual double selectTest(const QPointF &pos, bool onlySelectable, QVariant *details=0) const Q_DECL_OVERRIDE;
   
-signals:
+Q_SIGNALS:
   void selectionChanged(bool selected);
   void selectableChanged(bool selectable);
   
@@ -4877,7 +4877,7 @@ public:
   void clearItems();
   QList<QCPAbstractLegendItem*> selectedItems() const;
   
-signals:
+Q_SIGNALS:
   void selectionChanged(QCPLegend::SelectableParts parts);
   void selectableChanged(QCPLegend::SelectableParts parts);
   
@@ -4968,7 +4968,7 @@ public:
   virtual void mouseReleaseEvent(QMouseEvent *event, const QPointF &startPos) Q_DECL_OVERRIDE;
   virtual void mouseDoubleClickEvent(QMouseEvent *event, const QVariant &details) Q_DECL_OVERRIDE;
   
-signals:
+Q_SIGNALS:
   void selectionChanged(bool selected);
   void selectableChanged(bool selectable);
   void clicked(QMouseEvent *event);
@@ -5080,7 +5080,7 @@ public:
   // reimplemented virtual methods:
   virtual void update(UpdatePhase phase) Q_DECL_OVERRIDE;
   
-signals:
+Q_SIGNALS:
   void dataRangeChanged(const QCPRange &newRange);
   void dataScaleTypeChanged(QCPAxis::ScaleType scaleType);
   void gradientChanged(const QCPColorGradient &newGradient);
@@ -5776,7 +5776,7 @@ public:
   virtual QCPRange getKeyRange(bool &foundRange, QCP::SignDomain inSignDomain=QCP::sdBoth) const Q_DECL_OVERRIDE;
   virtual QCPRange getValueRange(bool &foundRange, QCP::SignDomain inSignDomain=QCP::sdBoth, const QCPRange &inKeyRange=QCPRange()) const Q_DECL_OVERRIDE;
   
-signals:
+Q_SIGNALS:
   void dataRangeChanged(const QCPRange &newRange);
   void dataScaleTypeChanged(QCPAxis::ScaleType scaleType);
   void gradientChanged(const QCPColorGradient &newGradient);

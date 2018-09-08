@@ -103,7 +103,7 @@ void CallContractPage::setClientModel(ClientModel *_clientModel)
 
     if (m_clientModel)
     {
-        connect(m_clientModel, SIGNAL(numBlocksChanged(int)), this, SLOT(on_numBlocksChanged()));
+        connect(m_clientModel, SIGNAL(numBlocksChanged()), this, SLOT(on_numBlocksChanged()));
         on_numBlocksChanged();
     }
 }

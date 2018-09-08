@@ -38,7 +38,7 @@
 
 #include <boost/filesystem.hpp>
 
-WalletModel::WalletModel(CWallet* wallet, OptionsModel* optionsModel, QObject* parent) : QObject(parent), wallet(wallet), optionsModel(optionsModel), addressTableModel(0),
+WalletModel::WalletModel(const PlatformStyle *platformStyle, CWallet* wallet, OptionsModel* optionsModel, QObject* parent) : QObject(parent), wallet(wallet), optionsModel(optionsModel), addressTableModel(0),
                                                                                          contractTableModel(0),
                                                                                          transactionTableModel(0),
                                                                                          recentRequestsTableModel(0),
@@ -52,10 +52,10 @@ WalletModel::WalletModel(CWallet* wallet, OptionsModel* optionsModel, QObject* p
     fForceCheckBalanceChanged = false;
     addressTableModel = new AddressTableModel(wallet, this);
     contractTableModel = new ContractTableModel(wallet, this);
-    transactionTableModel = new TransactionTableModel(wallet, this);
+    transactionTableModel = new TransactionTableModel(platformStyle, wallet, this);
     recentRequestsTableModel = new RecentRequestsTableModel(wallet, this);
     tokenItemModel = new TokenItemModel(wallet, this);
-    tokenTransactionTableModel = new TokenTransactionTableModel(wallet, this);
+    tokenTransactionTableModel = new TokenTransactionTableModel(platformStyle, wallet, this);
 
     // This timer will be fired repeatedly to update the balance
     pollTimer = new QTimer(this);
@@ -127,7 +127,7 @@ void WalletModel::updateStatus()
     EncryptionStatus newEncryptionStatus = getEncryptionStatus();
 
     if (cachedEncryptionStatus != newEncryptionStatus)
-        emit encryptionStatusChanged(newEncryptionStatus);
+        Q_EMIT encryptionStatusChanged(newEncryptionStatus);
 }
 
 void WalletModel::pollBalanceChanged()
@@ -198,7 +198,7 @@ void WalletModel::checkBalanceChanged()
         cachedWatchOnlyBalance = newWatchOnlyBalance;
         cachedWatchUnconfBalance = newWatchUnconfBalance;
         cachedWatchImmatureBalance = newWatchImmatureBalance;
-        emit balanceChanged(newBalance, newUnconfirmedBalance, newImmatureBalance, newAnonymizedBalance,
+        Q_EMIT balanceChanged(newBalance, newUnconfirmedBalance, newImmatureBalance, newAnonymizedBalance,
             newWatchOnlyBalance, newWatchUnconfBalance, newWatchImmatureBalance);
     }
 }
@@ -226,7 +226,7 @@ void WalletModel::updateAddressBook(const QString& address, const QString& label
 void WalletModel::updateWatchOnlyFlag(bool fHaveWatchonly)
 {
     fHaveWatchOnly = fHaveWatchonly;
-    emit notifyWatchonlyChanged(fHaveWatchonly);
+    Q_EMIT notifyWatchonlyChanged(fHaveWatchonly);
 }
 
 bool WalletModel::validateAddress(const QString& address)
@@ -253,7 +253,7 @@ WalletModel::SendCoinsReturn WalletModel::prepareTransaction(WalletModelTransact
     int nAddresses = 0;
 
     // Pre-check input data for validity
-    foreach (const SendCoinsRecipient& rcp, recipients) {
+    Q_FOREACH (const SendCoinsRecipient& rcp, recipients) {
         if (rcp.paymentRequest.IsInitialized()) { // PaymentRequest...
             CAmount subtotal = 0;
             const payments::PaymentDetails& details = rcp.paymentRequest.getDetails();
@@ -307,7 +307,7 @@ WalletModel::SendCoinsReturn WalletModel::prepareTransaction(WalletModelTransact
 
 
         if (recipients[0].useInstanTX && total > GetSporkValue(SPORK_2_MAX_VALUE) * COIN) {
-            emit message(tr("Send Coins"), tr("InstanTX doesn't support sending values that high yet. Transactions are currently limited to %1 LUX.").arg(GetSporkValue(SPORK_2_MAX_VALUE)),
+            Q_EMIT message(tr("Send Coins"), tr("InstanTX doesn't support sending values that high yet. Transactions are currently limited to %1 LUX.").arg(GetSporkValue(SPORK_2_MAX_VALUE)),
                 CClientUIInterface::MSG_ERROR);
             return TransactionCreationFailed;
         }
@@ -316,7 +316,7 @@ WalletModel::SendCoinsReturn WalletModel::prepareTransaction(WalletModelTransact
         transaction.setTransactionFee(nFeeRequired);
 
         if (recipients[0].useInstanTX && newTx->GetValueOut() > GetSporkValue(SPORK_2_MAX_VALUE) * COIN) {
-            emit message(tr("Send Coins"), tr("InstanTX doesn't support sending values that high yet. Transactions are currently limited to %1 LUX.").arg(GetSporkValue(SPORK_2_MAX_VALUE)),
+            Q_EMIT message(tr("Send Coins"), tr("InstanTX doesn't support sending values that high yet. Transactions are currently limited to %1 LUX.").arg(GetSporkValue(SPORK_2_MAX_VALUE)),
                 CClientUIInterface::MSG_ERROR);
             return TransactionCreationFailed;
         }
@@ -325,7 +325,7 @@ WalletModel::SendCoinsReturn WalletModel::prepareTransaction(WalletModelTransact
             if ((total + nFeeRequired) > nBalance) {
                 return SendCoinsReturn(AmountWithFeeExceedsBalance);
             }
-            emit message(tr("Send Coins"), QString::fromStdString(strFailReason),
+            Q_EMIT message(tr("Send Coins"), QString::fromStdString(strFailReason),
                 CClientUIInterface::MSG_ERROR);
             return TransactionCreationFailed;
         }
@@ -352,7 +352,7 @@ WalletModel::SendCoinsReturn WalletModel::sendCoins(WalletModelTransaction& tran
         QList<SendCoinsRecipient> recipients = transaction.getRecipients();
 
         // Store PaymentRequests in wtx.vOrderForm in wallet.
-        foreach (const SendCoinsRecipient& rcp, recipients) {
+        Q_FOREACH (const SendCoinsRecipient& rcp, recipients) {
             if (rcp.paymentRequest.IsInitialized()) {
                 std::string key("PaymentRequest");
                 std::string value;
@@ -379,7 +379,7 @@ WalletModel::SendCoinsReturn WalletModel::sendCoins(WalletModelTransaction& tran
 
     // Add addresses / update labels that we've sent to to the address book,
     // and emit coinsSent signal for each recipient
-    foreach (const SendCoinsRecipient& rcp, transaction.getRecipients()) {
+    Q_FOREACH (const SendCoinsRecipient& rcp, transaction.getRecipients()) {
         // Don't touch the address book when we have a payment request
         if (!rcp.paymentRequest.IsInitialized()) {
             std::string strAddress = rcp.address.toStdString();
@@ -398,7 +398,7 @@ WalletModel::SendCoinsReturn WalletModel::sendCoins(WalletModelTransaction& tran
                 }
             }
         }
-        emit coinsSent(wallet, rcp, transaction_array);
+        Q_EMIT coinsSent(wallet, rcp, transaction_array);
     }
     checkBalanceChanged(); // update balance immediately, otherwise there could be a short noticeable delay until pollBalanceChanged hits
 
@@ -619,7 +619,7 @@ WalletModel::UnlockContext WalletModel::requestUnlock(bool relock)
 
     if (was_locked) {
         // Request UI to unlock wallet
-        emit requireUnlock();
+        Q_EMIT requireUnlock();
     }
     // If wallet is still locked, unlock was failed or cancelled, mark context as invalid
     bool valid = getEncryptionStatus() != Locked;
@@ -880,3 +880,27 @@ bool WalletModel::isMineAddress(const std::string &Address)
     return true;
 }
 
+bool WalletModel::transactionCanBeAbandoned(uint256 hash) const
+{
+    LOCK2(cs_main, wallet->cs_wallet);
+    const CWalletTx *wtx = wallet->GetWalletTx(hash);
+    if (!wtx || wtx->isAbandoned() || wtx->GetDepthInMainChain() > 0 || wtx->InMempool())
+        return false;
+    return true;
+}
+
+bool WalletModel::abandonTransaction(uint256 hash) const
+{
+    LOCK2(cs_main, wallet->cs_wallet);
+    return wallet->AbandonTransaction(hash);
+}
+
+bool WalletModel::isWalletEnabled()
+{
+    return !GetBoolArg("-disablewallet", false);
+}
+
+int WalletModel::getDefaultConfirmTarget() const
+{
+    return nTxConfirmTarget;
+}

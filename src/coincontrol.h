@@ -23,7 +23,8 @@ public:
     bool fAllowWatchOnly;
     //! Minimum absolute fee (not per kilobyte)
     CAmount nMinimumTotalFee;
-
+    //! Override the default confirmation target, 0 = use default
+    int nConfirmTarget;
     CCoinControl()
     {
         SetNull();
@@ -40,6 +41,7 @@ public:
         nMinimumTotalFee = 0;
         fSplitBlock = false;
         nSplitBlock = 1;
+        nConfirmTarget = 0;
     }
 
     bool HasSelected() const

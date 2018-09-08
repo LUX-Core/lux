@@ -284,12 +284,29 @@
            </widget>
           </item>
           <item>
+           <widget class="QCheckBox" name="showAdvancedUI">
+            <property name="toolTip">
+             <string>Show additional information and buttons for Luxsend on overview screen.</string>
+            </property>
+            <property name="text">
+             <string>Enable advanced Luxsend interface</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QCheckBox" name="spendZeroConfChange">
             <property name="toolTip">
              <string>If you disable the spending of unconfirmed change, the change from a transaction&lt;br/&gt;cannot be used until that transaction has at least one confirmation.&lt;br/&gt;This also affects how your balance is computed.</string>
             </property>
             <property name="text">
              <string>&amp;Spend unconfirmed change</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="checkUpdates">
+            <property name="text">
+             <string>Check for &amp;updates</string>
             </property>
            </widget>
           </item>
@@ -498,6 +515,16 @@
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_Window">
        <item>
+        <widget class="QCheckBox" name="hideTrayIcon">
+         <property name="toolTip">
+          <string>&amp;Hide the icon from the system tray.</string>
+         </property>
+         <property name="text">
+          <string>Hide tray icon</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QCheckBox" name="minimizeToTray">
          <property name="toolTip">
           <string>Show only a tray icon after minimizing the window.</string>
@@ -577,7 +604,7 @@
          </property>
          <property name="text">
           <string>Language missing or translation incomplete? Help contributing translations here:
-https://www.transifex.com/lux-project/lux-project-translations</string>
+https://www.transifex.com/luxcore/luxcore</string>
          </property>
          <property name="wordWrap">
           <bool>true</bool>

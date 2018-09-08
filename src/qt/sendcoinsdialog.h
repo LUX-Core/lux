@@ -18,6 +18,7 @@ class ClientModel;
 class OptionsModel;
 class SendCoinsEntry;
 class SendCoinsRecipient;
+class PlatformStyle;
 
 namespace Ui
 {
@@ -34,7 +35,7 @@ class SendCoinsDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit SendCoinsDialog(QWidget* parent = 0);
+    explicit SendCoinsDialog(const PlatformStyle *platformStyle, QWidget* parent = 0);
     ~SendCoinsDialog();
 
     void setClientModel(ClientModel* clientModel);
@@ -49,7 +50,7 @@ public:
     bool handlePaymentRequest(const SendCoinsRecipient& recipient);
     bool fSplitBlock;
 
-public slots:
+public Q_SLOTS:
     void clear();
     void reject();
     void accept();
@@ -64,6 +65,7 @@ private:
     bool fNewRecipientAllowed;
     void send(QList<SendCoinsRecipient> recipients, QString strFee, QStringList formatted);
     bool fFeeMinimized;
+    const PlatformStyle* platformStyle;
 
     // Process WalletModel::SendCoinsReturn and generate a pair consisting
     // of a message and message flags for use in emit message().
@@ -72,7 +74,7 @@ private:
     void minimizeFeeSection(bool fMinimize);
     void updateFeeMinimizedLabel();
 
-private slots:
+private Q_SLOTS:
     void on_sendButton_clicked();
     void on_buttonChooseFee_clicked();
     void on_buttonMinimizeFee_clicked();
@@ -100,7 +102,7 @@ private slots:
     void updateSmartFeeLabel();
     void updateGlobalFeeVariables();
 
-signals:
+Q_SIGNALS:
     // Fired when a message should be reported to the user
     void message(const QString& title, const QString& message, unsigned int style);
 };

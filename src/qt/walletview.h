@@ -16,7 +16,7 @@
 class BitcoinGUI;
 class ClientModel;
 class OverviewPage;
-//class PlatformStyle;
+class PlatformStyle;
 class ReceiveCoinsDialog;
 class SendCoinsDialog;
 class SendCoinsRecipient;
@@ -46,7 +46,7 @@ class WalletView : public QStackedWidget
     Q_OBJECT
 
 public:
-    explicit WalletView(QWidget *parent);
+    explicit WalletView(const PlatformStyle *platformStyle, QWidget *parent);
     ~WalletView();
 
     void setBitcoinGUI(BitcoinGUI* gui);
@@ -83,9 +83,9 @@ private:
 
     QProgressDialog* progressDialog;
     QLabel* transactionSum;
-    //const PlatformStyle *platformStyle;
+    const PlatformStyle* platformStyle;
 
-public slots:
+public Q_SLOTS:
     /** Switch to overview (home) page */
     void gotoOverviewPage();
     /** Switch to history (transactions) page */
@@ -150,6 +150,9 @@ public slots:
 
     /** Show progress dialog e.g. for rescan */
     void showProgress(const QString& title, int nProgress);
+
+    /** User has requested more information about the out of sync state */
+    void requestedSyncWarningInfo();
 
     /** Update selected LUX amount from transactionview */
     void trxAmount(QString amount);

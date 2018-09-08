@@ -52,6 +52,7 @@ extern bool bZeroBalanceAddressToken;
 extern bool fSendFreeTransactions;
 extern bool fPayAtLeastCustomFee;
 extern bool fNotUseChangeAddress;
+extern bool fWalletProcessingMode;
 //! -paytxfee default
 static const CAmount DEFAULT_TRANSACTION_FEE = 1000;
 //! -paytxfee will warn if called with a higher fee than this amount (in satoshis) per KB
@@ -484,6 +485,8 @@ public:
     void ListLockedCoins(std::vector<COutPoint>& vOutpts);
     int64_t GetTotalValue(std::vector<CTxIn> vCoins);
 
+    bool transactionCanBeAbandoned(uint256 hash) const;
+    bool abandonTransaction(uint256 hash) const;
      /*
      * Rescan abort properties
      */
