@@ -35,7 +35,7 @@
 #include <QUrl>
 #include <QVBoxLayout>
 
-TransactionView::TransactionView(QWidget* parent) : QWidget(parent), model(0), transactionProxyModel(0), abandonAction(0), transactionView(0), columnResizingFixer(0)
+TransactionView::TransactionView(QWidget* parent) : QWidget(parent), model(0), transactionProxyModel(0), transactionView(0), abandonAction(0), columnResizingFixer(0)
 {
     QSettings settings;
     // Build filter row

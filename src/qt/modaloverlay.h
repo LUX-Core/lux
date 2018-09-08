@@ -8,8 +8,7 @@
 #include <QDateTime>
 #include <QWidget>
 
-//! The required delta of headers to the estimated number of available headers until we show the IBD progress
-static constexpr int HEADER_HEIGHT_DELTA_SYNC = 24;
+static constexpr int HEADER_HEIGHT_SYNC = 24;
 
 namespace Ui {
     class ModalOverlay;
@@ -25,16 +24,14 @@ public:
     ~ModalOverlay();
 
 public Q_SLOTS:
-    void tipUpdate(int count, const QDateTime& lastBlockDate, double nVerificationProgress);
+    void tipUpdate(int count, const QDateTime& blockDate, double nVerificationProgress);
+    void setKnownBestHeight(int count, const QDateTime& blockDate);
 
-#if 0
-    void setKnownBestHeight(int count, const QDateTime& lastBlockDate);
-#endif
-    void toggleVisibility();
     // will show or hide the modal layer
     void showHide(bool hide = false, bool userRequested = false);
     void closeClicked();
-    void hideForever();
+    // show overlay
+    void toggleVisibility();
     bool isLayerVisible() { return layerIsVisible; }
 
 protected:
@@ -48,7 +45,6 @@ private:
     QVector<QPair<qint64, double> > blockProcessTime;
     bool layerIsVisible;
     bool userClosed;
-    bool foreverHidden;
 };
 
 #endif // BITCOIN_QT_MODALOVERLAY_H

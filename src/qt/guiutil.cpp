@@ -993,28 +993,17 @@ QString formatNiceTimeOffset(qint64 secs)
     const int DAY_IN_SECONDS = 24*60*60;
     const int WEEK_IN_SECONDS = 7*24*60*60;
     const int YEAR_IN_SECONDS = 31556952; // Average length of year in Gregorian calendar
-    if(secs < 60)
-    {
+    if(secs < 60) {
         timeBehindText = QObject::tr("%n second(s)","",secs);
-    }
-    else if(secs < 2*HOUR_IN_SECONDS)
-    {
+    } else if(secs < 2*HOUR_IN_SECONDS) {
         timeBehindText = QObject::tr("%n minute(s)","",secs/60);
-    }
-    else if(secs < 2*DAY_IN_SECONDS)
-    {
+    } else if(secs < 2*DAY_IN_SECONDS) {
         timeBehindText = QObject::tr("%n hour(s)","",secs/HOUR_IN_SECONDS);
-    }
-    else if(secs < 2*WEEK_IN_SECONDS)
-    {
+    } else if(secs < 2*WEEK_IN_SECONDS) {
         timeBehindText = QObject::tr("%n day(s)","",secs/DAY_IN_SECONDS);
-    }
-    else if(secs < YEAR_IN_SECONDS)
-    {
+    } else if(secs < YEAR_IN_SECONDS) {
         timeBehindText = QObject::tr("%n week(s)","",secs/WEEK_IN_SECONDS);
-    }
-    else
-    {
+    } else {
         qint64 years = secs / YEAR_IN_SECONDS;
         qint64 remainder = secs % YEAR_IN_SECONDS;
         timeBehindText = QObject::tr("%1 and %2").arg(QObject::tr("%n year(s)", "", years)).arg(QObject::tr("%n week(s)","", remainder/WEEK_IN_SECONDS));
@@ -1022,16 +1011,24 @@ QString formatNiceTimeOffset(qint64 secs)
     return timeBehindText;
 }
 
-    void formatToolButtons(QToolButton *btn1, QToolButton *btn2, QToolButton *btn3)
-    {
-        QList<QToolButton *> btnList;
-        if(btn1) btnList.append(btn1);
-        if(btn2) btnList.append(btn2);
-        if(btn3) btnList.append(btn3);
-        for(int i = 0; i < btnList.count(); i++)
-        {
-            QToolButton* btn = btnList[i];
-            btn->setIconSize(QSize(16, 16));
-        }
+void ClickableLabel::mouseReleaseEvent(QMouseEvent *event) {
+    Q_EMIT clicked(event->pos());
+}
+
+void ClickableProgressBar::mouseReleaseEvent(QMouseEvent *event) {
+    Q_EMIT clicked(event->pos());
+}
+
+void formatToolButtons(QToolButton *btn1, QToolButton *btn2, QToolButton *btn3)
+{
+    QList<QToolButton *> btnList;
+    if(btn1) btnList.append(btn1);
+    if(btn2) btnList.append(btn2);
+    if(btn3) btnList.append(btn3);
+    for(int i = 0; i < btnList.count(); i++) {
+        QToolButton* btn = btnList[i];
+        btn->setIconSize(QSize(16, 16));
     }
+}
+
 }// namespace GUIUtil

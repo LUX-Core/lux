@@ -15,6 +15,7 @@
 #include <QString>
 #include <QTableView>
 #include <QTableWidget>
+#include <QLabel>
 
 #include <boost/filesystem.hpp>
 
@@ -228,11 +229,35 @@ QString formatTimeOffset(int64_t nTimeOffset);
 
 QString formatNiceTimeOffset(qint64 secs);
 
+class ClickableLabel : public QLabel {
+    Q_OBJECT
+
+    Q_SIGNALS:
+   /** Emitted when the label is clicked. The relative mouse coordinates of the click are
+    * passed to the signal.
+    */
+    void clicked(const QPoint& point);
+protected:
+    void mouseReleaseEvent(QMouseEvent *event);
+};
+
+class ClickableProgressBar : public QProgressBar {
+    Q_OBJECT
+
+    Q_SIGNALS:
+    /** Emitted when the progressbar is clicked. The relative mouse coordinates of the click are
+     * passed to the signal.
+     */
+    void clicked(const QPoint& point);
+protected:
+    void mouseReleaseEvent(QMouseEvent *event);
+};
+
 #if defined(Q_OS_MAC) && QT_VERSION >= 0x050000
 // workaround for Qt OSX Bug:
 // https://bugreports.qt-project.org/browse/QTBUG-15631
 // QProgressBar uses around 10% CPU even when app is in background
-class ProgressBar : public QProgressBar
+class ProgressBar : public ClickableProgressBar
 {
     bool event(QEvent* e)
     {
@@ -240,7 +265,7 @@ class ProgressBar : public QProgressBar
     }
 };
 #else
-typedef QProgressBar ProgressBar;
+typedef ClickableProgressBar ProgressBar;
 #endif
 
     void formatToolButtons(QToolButton* btn1, QToolButton* btn2 = 0, QToolButton* btn3 = 0);
