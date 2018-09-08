@@ -84,6 +84,10 @@ void OptionsModel::Init()
     if (!settings.contains("fShowMasternodesTab"))
         settings.setValue("fShowMasternodesTab", masternodeConfig.getCount());
 
+    if (!settings.contains("fShowAdvancedUI"))
+        settings.setValue("fShowAdvancedUI", false);
+    fShowAdvancedUI = settings.value("fShowAdvancedUI", false).toBool();
+
     if (!settings.contains("fparallelMasterNode"))
         settings.setValue("fparallelMasterNode", false);
     fparallelMasterNode = settings.value("fparallelMasterNode", false).toBool();
@@ -230,6 +234,8 @@ QVariant OptionsModel::data(const QModelIndex& index, int role) const
 #ifdef ENABLE_WALLET
         case SpendZeroConfChange:
             return settings.value("bSpendZeroConfChange");
+        case ShowAdvancedUI:
+            return fShowAdvancedUI;
         case ShowMasternodesTab:
             return settings.value("fShowMasternodesTab");
 #endif
@@ -263,7 +269,7 @@ QVariant OptionsModel::data(const QModelIndex& index, int role) const
             return settings.value("fLogEvents");
         case ThreadsScriptVerif:
             return settings.value("nThreadsScriptVerif");
-        case DarksendRounds:
+        case DarkSendRounds:
             return QVariant(nDarksendRounds);
         case AnonymizeLuxAmount:
             return QVariant(nAnonymizeLuxAmount);
@@ -335,6 +341,11 @@ bool OptionsModel::setData(const QModelIndex& index, const QVariant& value, int 
                 setRestartRequired(true);
             }
             break;
+        case ShowAdvancedUI:
+            fShowAdvancedUI = value.toBool();
+            settings.setValue("fShowAdvancedUI", fShowAdvancedUI);
+            Q_EMIT advancedUIChanged(fShowAdvancedUI);
+            break;
         case ShowMasternodesTab:
             if (settings.value("fShowMasternodesTab") != value) {
                 settings.setValue("fShowMasternodesTab", value);
@@ -375,7 +386,7 @@ bool OptionsModel::setData(const QModelIndex& index, const QVariant& value, int 
                 setRestartRequired(true);
             }
             break;
-        case DarksendRounds:
+        case DarkSendRounds:
             nDarksendRounds = value.toInt();
             settings.setValue("nDarksendRounds", nDarksendRounds);
             emit darksendRoundsChanged(nDarksendRounds);
