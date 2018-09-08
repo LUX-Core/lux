@@ -76,12 +76,10 @@ void ModalOverlay::tipUpdate(int count, const QDateTime& blockDate, double nVeri
     QDateTime currentDate = QDateTime::currentDateTime();
 
     // keep a vector of samples of verification progress at height
-    blockProcessTime.push_front(qMakePair(currentDate.currentMSecsSinceEpoch(), nVerificationProgress));
+    blockProcessTime.push_front(qMakePair(currentDate.toMSecsSinceEpoch(), nVerificationProgress));
 
     // show progress speed if we have more then one sample
     if (blockProcessTime.size() >= 2) {
-        // try to get the window from the last 500 seconds or at least 10 samples
-        double progressStart = blockProcessTime[0].second;
         double progressDelta = 0;
         double progressPerHour = 0;
         qint64 timeDelta = 0;
@@ -91,12 +89,11 @@ void ModalOverlay::tipUpdate(int count, const QDateTime& blockDate, double nVeri
             QPair<qint64, double> sample = blockProcessTime[i];
 
             // take first sample after 500 seconds or last available one
-            if (sample.first < (currentDate.currentMSecsSinceEpoch() - 500 * 1000) ||
-                i == blockProcessTime.size() - 1) {
-                progressDelta = progressStart - sample.second;
+            if (sample.first < (currentDate.toMSecsSinceEpoch() - 500 * 1000) || i == blockProcessTime.size() - 1) {
+                progressDelta = blockProcessTime[0].second - sample.second;
                 timeDelta = blockProcessTime[0].first - sample.first;
                 progressPerHour = progressDelta / (double) timeDelta * 1000 * 3600;
-                remainingMSecs = remainingProgress / progressDelta * timeDelta;
+                remainingMSecs = (progressDelta > 0) ? remainingProgress / progressDelta * timeDelta : -1;
                 break;
             }
         }
@@ -104,12 +101,17 @@ void ModalOverlay::tipUpdate(int count, const QDateTime& blockDate, double nVeri
         ui->progressIncreasePerH->setText(QString::number(progressPerHour * 100, 'f', 2) + "%");
 
         // show expected remaining time
-        ui->expectedTimeLeft->setText(GUIUtil::formatNiceTimeOffset(remainingMSecs / 1000.0));
+        if(remainingMSecs >= 0) {
+            ui->expectedTimeLeft->setText(GUIUtil::formatNiceTimeOffset(remainingMSecs / 1000.0));
+        } else {
+            ui->expectedTimeLeft->setText(QObject::tr("unknown"));
+        }
 
         // keep maximal 5000 samples
         static const int MAX_SAMPLES = 5000;
-        if (blockProcessTime.count() > MAX_SAMPLES)
+        if (blockProcessTime.count() > MAX_SAMPLES) {
             blockProcessTime.remove(MAX_SAMPLES, blockProcessTime.count() - MAX_SAMPLES);
+        }
     }
 
     // show the last block date
@@ -132,8 +134,8 @@ void ModalOverlay::tipUpdate(int count, const QDateTime& blockDate, double nVeri
     if (estimateNumHeadersLeft < HEADER_HEIGHT_SYNC && hasBestHeader) {
         ui->numberOfBlocksLeft->setText(QString::number(bestHeaderHeight - count));
     } else {
-        ui->numberOfBlocksLeft->setText("~" + QString::number(bestHeaderHeight + estimateNumHeadersLeft - count));
-        ui->expectedTimeLeft->setText(tr("Unknown. Syncing Headers..."));
+        ui->numberOfBlocksLeft->setText(tr("Unknown. Syncing Headers (%1)...").arg(bestHeaderHeight));
+        ui->expectedTimeLeft->setText(tr("Unknown..."));
     }
 }
 
