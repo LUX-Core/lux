@@ -72,8 +72,6 @@ void ProcessMessageLuxgate(CNode *pfrom, const std::string &strCommand, CDataStr
 
         LogPrintf("createorder: %s\n", order->ToString());
 
-         if (!order->SenderIsValid())
-             order->SetSender(pfrom->addr);
 
         bool relay = true;
 
