@@ -38,6 +38,15 @@ bool FindMatching(const OrderMap &orders, const COrder &match, COrder &result)
     return false;
 }
 
+bool RemoveOrder(OrderMap &orders, COrder &match)
+{
+    for (auto it = orders.begin(); it != orders.end();) {
+        if (match == *it->second)
+            it = orders.erase(it);
+        else
+            ++it;
+    }
+}
 
 bool FindClient(const Ticker ticker, ClientPtr &foundClient) 
 {
@@ -172,12 +181,77 @@ void ProcessMessageLuxgate(CNode *pfrom, const std::string &strCommand, CDataStr
             if (EnsureClient(order.Rel(), relClient)) {
                 if (relClient->IsValidAddress(baseAddr)) {
                     LogPrintf("reqswapack: %s address is valid: %s\n", order.Rel(), baseAddr);
+                    // TODO stub for create contract tx
+                    std:string txid = "6763b1c1b3df2e4978669299b609c5dae53b6b0e8443651c3a03ae0be511f87f";
+                    pfrom->PushMessage("swccreated", localOrder, txid);
+
+                    // TODO start async timer for redeeming
+
                 } else {
                     LogPrintf("reqswapack: %s address is invalid: %s\n", order.Rel(), baseAddr);
                 }
             }
         } else {
             LogPrintf("reqswapack: Cannot find matching order %s\n", order.ToString());
+        }
+    }
+
+    // Swap contract created
+    else if (strCommand == "swccreated") {
+        COrder order;
+        std::string txid;
+        vRecv >> order >> txid;
+
+        COrder localOrder;
+        if (FindMatching(activeOrders, order, localOrder)) {
+            // TODO verify tx
+            bool isValidTx = true;
+            if (isValidTx) {
+                // TODO create contract tx using extracted hash
+                std::vector<unsigned char> secretHash = { 
+                    0x00, 0x01, 0x02, 0x03,
+                    0x04, 0x05, 0x06, 0x07,
+                    0x08, 0x09, 0x0A, 0x0B,
+                    0x0C, 0x0D, 0x0E, 0x0F
+                };
+                // TODO stub for create contract tx
+                std::string rtxid = "f7901138cbe4eb42eca7b05ccf8de1d82a35e4b53f2a4f44905edb77362b1459";
+                pfrom->PushMessage("swcack", localOrder, rtxid);
+                LogPrintf("swccreated: Spending UTXO's: %s\n", txid);
+                // TODO Poll async for inputs with secret, spend UTXO's and remove from activeOrders
+                // Detach from current thread
+                // Also start async timer for redeeming
+
+                RemoveOrder(activeOrders, localOrder);
+
+                // TODO stom redeeming timer
+
+            } else {
+                LogPrintf("swccreated: Bad tx %s\n", txid);
+            }
+        }
+    }
+
+    // Swap contract acknowledgement
+    else if (strCommand == "swcack") {
+        COrder order;
+        std::string txid;
+        vRecv >> order >> txid;
+
+        COrder localOrder;
+        if (FindMatching(activeOrders, order, localOrder)) {
+            // TODO Verify tx
+            bool isValidTx = true;
+            if (isValidTx) {
+                // TODO spend UTXO and remove from activeOrders
+                LogPrintf("swcack: Spending UTXO: %s\n", txid);
+
+                RemoveOrder(activeOrders, localOrder);
+
+                // TODO stop redeeming timer
+            } else {
+                LogPrintf("swcack: Bad tx %s\n", txid);
+            }
         }
     }
 }
