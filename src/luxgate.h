@@ -62,6 +62,11 @@ public:
         READWRITE(sender);
     }
 
+    bool operator==(const COrder &o) const 
+    {
+        return base == o.base && rel == o.rel && baseAmount == o.baseAmount && relAmount == o.relAmount;
+    }
+
 protected:
 
     Ticker base;
