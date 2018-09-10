@@ -92,16 +92,14 @@ class ExampleTest(LuxTestFramework):
         connect_nodes(node1, 0)
 
         node1.rpc.createorder('LUX', 'BTC', '2', '1')
-        assert_equal(1, len(node1.rpc.listorderbook()['orders']))
+        assert_equal(1, len([x for x in node1.rpc.listorderbook()['orders'] if x['status'] == 'new']))
 
         node0.rpc.createorder('BTC', 'LUX', '1', '2')
-        time.sleep(2.0) # wait for p2p exchange
-        
-        assert_equal(0, len(node0.rpc.listorderbook()['orders']))
-        assert_equal(0, len(node0.rpc.listactiveorders()['orders']))
 
+        time.sleep(2.0) # wait for p2p exchange
+
+        assert_equal(0, len(node0.rpc.listorderbook()['orders']))
         assert_equal(0, len(node1.rpc.listorderbook()['orders']))
-        assert_equal(0, len(node1.rpc.listactiveorders()['orders']))
 
 
 
