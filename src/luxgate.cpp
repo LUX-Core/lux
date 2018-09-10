@@ -11,17 +11,12 @@
 
 
 std::map<OrderId, std::shared_ptr<COrder>> orderbook;
-std::map<OrderId, std::shared_ptr<COrder>> activeOrders;
 
 
 bool IsLuxGateServiceSupported(const CNode* pfrom) {
     return pfrom->nServices & NODE_LUXGATE;
 }
 
-void ActivateOrder(OrderEntry order) {
-    orderbook.erase(order.first);
-    activeOrders.insert(order);
-}
 /**
  * @param [out] result Found order
  * @return Any entry was found
@@ -89,6 +84,7 @@ void ProcessMessageLuxgate(CNode *pfrom, const std::string &strCommand, CDataStr
                 LogPrintf("Received order %s matches to local order %s\n", order->ToString(), localOrder->ToString());
                 CNode* sender = ConnectNode(order->Sender());
                 sender->PushMessage("ordermatch", *localOrder);
+                localOrder->SetState(COrder::State::MATCH_FOUND);
                 matchingEntry = e;
                 relay = false;
                 break;
@@ -104,8 +100,6 @@ void ProcessMessageLuxgate(CNode *pfrom, const std::string &strCommand, CDataStr
                     pnode->PushMessage("createorder", *order);
                 }
             }
-        } else {
-            ActivateOrder(matchingEntry);
         }
     }
 
@@ -132,11 +126,11 @@ void ProcessMessageLuxgate(CNode *pfrom, const std::string &strCommand, CDataStr
         }
 
         if (isMatching) {
-            ActivateOrder(activatingOrder);
             ClientPtr revClient;
             if (EnsureClient(activatingOrder.second->Rel(), revClient)) {
                 auto addressString = revClient->GetNewAddress();
                 pfrom->PushMessage("reqswap", *activatingOrder.second, addressString);
+                activatingOrder.second->SetState(COrder::State::SWAP_REQUESTED);
             }
         }
     }
@@ -148,7 +142,7 @@ void ProcessMessageLuxgate(CNode *pfrom, const std::string &strCommand, CDataStr
         vRecv >> order >> baseAddr;
         
         COrder localOrder;
-        if (FindMatching(activeOrders, order, localOrder)) {
+        if (FindMatching(orderbook, order, localOrder)) {
             LogPrintf("Received %s address: %s\n", order.Rel(), baseAddr);
             ClientPtr baseClient;
             if (EnsureClient(order.Rel(), baseClient)) {
@@ -159,6 +153,7 @@ void ProcessMessageLuxgate(CNode *pfrom, const std::string &strCommand, CDataStr
                         auto addressString = relClient->GetNewAddress();
                         LogPrintf("Created address for %s: %s\n", localOrder.Rel(), addressString);
                         pfrom->PushMessage("reqswapack", localOrder, addressString);
+                        localOrder.SetState(COrder::State::SWAP_ACK);
                     }
                 } else {
                     LogPrintf("reqswap: %s address is invalid: %s\n", order.Rel(), baseAddr);
@@ -175,16 +170,16 @@ void ProcessMessageLuxgate(CNode *pfrom, const std::string &strCommand, CDataStr
         vRecv >> order >> baseAddr;
         
         COrder localOrder;
-        if (FindMatching(activeOrders, order, localOrder)) {
+        if (FindMatching(orderbook, order, localOrder)) {
             LogPrintf("reqswapack: verifying %s address %s\n", order.Rel(), baseAddr);
             ClientPtr relClient;
             if (EnsureClient(order.Rel(), relClient)) {
                 if (relClient->IsValidAddress(baseAddr)) {
                     LogPrintf("reqswapack: %s address is valid: %s\n", order.Rel(), baseAddr);
                     // TODO stub for create contract tx
-                    std:string txid = "6763b1c1b3df2e4978669299b609c5dae53b6b0e8443651c3a03ae0be511f87f";
+                    std::string txid = "6763b1c1b3df2e4978669299b609c5dae53b6b0e8443651c3a03ae0be511f87f";
                     pfrom->PushMessage("swccreated", localOrder, txid);
-
+                    localOrder.SetState(COrder::State::CONTRACT_CREATED);
                     // TODO start async timer for redeeming
 
                 } else {
@@ -203,12 +198,12 @@ void ProcessMessageLuxgate(CNode *pfrom, const std::string &strCommand, CDataStr
         vRecv >> order >> txid;
 
         COrder localOrder;
-        if (FindMatching(activeOrders, order, localOrder)) {
+        if (FindMatching(orderbook, order, localOrder)) {
             // TODO verify tx
             bool isValidTx = true;
             if (isValidTx) {
                 // TODO create contract tx using extracted hash
-                std::vector<unsigned char> secretHash = { 
+                std::vector<unsigned char> secretHash = {
                     0x00, 0x01, 0x02, 0x03,
                     0x04, 0x05, 0x06, 0x07,
                     0x08, 0x09, 0x0A, 0x0B,
@@ -217,12 +212,13 @@ void ProcessMessageLuxgate(CNode *pfrom, const std::string &strCommand, CDataStr
                 // TODO stub for create contract tx
                 std::string rtxid = "f7901138cbe4eb42eca7b05ccf8de1d82a35e4b53f2a4f44905edb77362b1459";
                 pfrom->PushMessage("swcack", localOrder, rtxid);
+                localOrder.SetState(COrder::State::CONTRACT_ACK);
                 LogPrintf("swccreated: Spending UTXO's: %s\n", txid);
-                // TODO Poll async for inputs with secret, spend UTXO's and remove from activeOrders
+                // TODO Poll async for inputs with secret, spend UTXO's and remove from orderbook
                 // Detach from current thread
                 // Also start async timer for redeeming
 
-                RemoveOrder(activeOrders, localOrder);
+                RemoveOrder(orderbook, localOrder);
 
                 // TODO stom redeeming timer
 
@@ -239,14 +235,14 @@ void ProcessMessageLuxgate(CNode *pfrom, const std::string &strCommand, CDataStr
         vRecv >> order >> txid;
 
         COrder localOrder;
-        if (FindMatching(activeOrders, order, localOrder)) {
+        if (FindMatching(orderbook, order, localOrder)) {
             // TODO Verify tx
             bool isValidTx = true;
             if (isValidTx) {
-                // TODO spend UTXO and remove from activeOrders
+                // TODO spend UTXO and remove from orderbook
                 LogPrintf("swcack: Spending UTXO: %s\n", txid);
 
-                RemoveOrder(activeOrders, localOrder);
+                RemoveOrder(orderbook, localOrder);
 
                 // TODO stop redeeming timer
             } else {

@@ -33,20 +33,37 @@ class COrder
 {
 
 public:
+
+    enum State 
+    {
+        NEW = 10,
+        MATCH_FOUND = 20,
+        SWAP_REQUESTED = 30,
+        SWAP_ACK = 40,
+        CONTRACT_CREATED = 50,
+        CONTRACT_ACK = 60
+    };
+
     COrder() {}
-    COrder(Ticker base, Ticker rel, CAmount baseAmount, CAmount relAmount) : 
-                    base(base), rel(rel), baseAmount(baseAmount), relAmount(relAmount) {}
+    COrder(Ticker base, Ticker rel, CAmount baseAmount, CAmount relAmount, COrder::State state) : 
+                    base(base), rel(rel), baseAmount(baseAmount), relAmount(relAmount), state(state) {}
     COrder(const COrder&) = default;
 
     OrderId ComputeId() const;
+
     CAddress Sender() const { return sender; }
     void SetSender(CAddress addr) { sender = addr; }
     bool SenderIsValid() const;
+
     Ticker Base() const { return base; }
     Ticker Rel() const { return rel; }
+
     CAmount BaseAmount() const { return baseAmount; }
     CAmount RelAmount() const { return relAmount; }
 
+    void SetState(COrder::State state) { this->state = state; }
+    COrder::State GetState() { return state; }
+    
     bool Matches(const COrder& order) const;
 
     std::string ToString() const;
@@ -68,7 +85,7 @@ public:
     }
 
 protected:
-
+    State state;
     Ticker base;
     Ticker rel;
     CAmount baseAmount;

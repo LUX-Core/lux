@@ -69,7 +69,7 @@ UniValue createorder(const UniValue& params, bool fHelp)
     if (baseAmount <= 0 || relAmount <= 0)
         throw JSONRPCError(RPC_LUXGATE_ERROR, "Invalid amount");
     
-    auto order = std::make_shared<COrder>(base, rel, baseAmount, relAmount);
+    auto order = std::make_shared<COrder>(base, rel, baseAmount, relAmount, COrder::State::NEW);
     orderbook.insert(std::make_pair(order->ComputeId(), order));
     //LOCK(cs_vNodes);
     for (CNode *pnode : vNodes) {
@@ -135,30 +135,14 @@ UniValue listorderbook(const UniValue& params, bool fHelp) {
         orderEntry.push_back(Pair("base_amount", o->BaseAmount()));
         orderEntry.push_back(Pair("rel_amount", o->RelAmount()));
         orderEntry.push_back(Pair("sender", o->Sender().ToStringIPPort()));
-        orders.push_back(orderEntry);
-    }
-    result.push_back(Pair("orders", orders));
-
-    return result;
-}
-
-UniValue listactiveorders(const UniValue& params, bool fHelp) {
-    if (fHelp || params.size() > 0 ) {
-         throw std::runtime_error(
-             "listactiveorders\n"
-             "List active orders\n");
-    }
-
-    UniValue result(UniValue::VOBJ);
-    UniValue orders(UniValue::VARR);
-    for (auto const &entry : activeOrders) {
-        auto o = entry.second;
-        UniValue orderEntry(UniValue::VOBJ);
-        orderEntry.push_back(Pair("base", o->Base()));
-        orderEntry.push_back(Pair("rel", o->Rel()));
-        orderEntry.push_back(Pair("base_amount", o->BaseAmount()));
-        orderEntry.push_back(Pair("rel_amount", o->RelAmount()));
-        orderEntry.push_back(Pair("sender", o->Sender().ToStringIPPort()));
+        switch (o->GetState()) {
+            case COrder::State::NEW: orderEntry.push_back(Pair("status", "new")); break;
+            case COrder::State::MATCH_FOUND: orderEntry.push_back(Pair("status", "match_found")); break;
+            case COrder::State::SWAP_REQUESTED: orderEntry.push_back(Pair("status", "swap_requested")); break;
+            case COrder::State::SWAP_ACK: orderEntry.push_back(Pair("status", "swap_ack")); break;
+            case COrder::State::CONTRACT_CREATED: orderEntry.push_back(Pair("status", "contract_created")); break;
+            case COrder::State::CONTRACT_ACK: orderEntry.push_back(Pair("status", "contract_ack")); break;
+        };
         orders.push_back(orderEntry);
     }
     result.push_back(Pair("orders", orders));
