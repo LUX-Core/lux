@@ -4,7 +4,9 @@
 
 #include <blockchainclient.h>
 
+#include <base58.h>
 #include <core_io.h>
+#include <pubkey.h>
 #include <rpcprotocol.h>
 #include <rpcserver.h>
 #include <utilstrencodings.h>
@@ -123,10 +125,14 @@ UniValue CBitcoinClient::CallRPC(const std::string& strMethod, const UniValue& p
     }
 }
 
+UniValue CallAndParseRPC(CAbstractBlockchainClient* client, std::string method, UniValue params) {
+    UniValue response = client->CallRPC(method, params);
+    return find_value(response, "result");
+}
+
 int CBitcoinClient::GetClientVersion() {
     nCurrentClientVersion = 0;
-    UniValue response = CallRPC("getnetworkinfo", NullUniValue);
-    UniValue networkInfo = find_value(response, "result");
+    UniValue networkInfo = CallAndParseRPC(this, "getnetworkinfo", NullUniValue);
     if (networkInfo.isNull() || networkInfo.empty())
         return nCurrentClientVersion;
 
@@ -134,9 +140,14 @@ int CBitcoinClient::GetClientVersion() {
     return nCurrentClientVersion;
 }
 
+int CBitcoinClient::GetProtocolVersion() {
+    UniValue networkInfo = CallAndParseRPC(this, "getnetworkinfo", NullUniValue);
+
+    return find_value(networkInfo, "protocolversion").get_int();
+}
+
 int CBitcoinClient::GetBlockCount() {
-    UniValue response = CallRPC("getblockcount", NullUniValue);
-    return response.get_int();
+    return CallAndParseRPC(this, "getblockcount", NullUniValue).get_int();
 }
 
 std::string CBitcoinClient::CreateRawTransaction(const CreateTransactionParams& params) {
@@ -157,24 +168,22 @@ std::string CBitcoinClient::CreateRawTransaction(const CreateTransactionParams& 
 
     rpcParams.push_back(sendTo);
 
-    UniValue response = CallRPC("createrawtransaction", rpcParams);
-    return response.get_str();
+    return CallAndParseRPC(this, "createrawtransaction", rpcParams).get_str();
 }
 
 std::string CBitcoinClient::SignRawTransaction(std::string txHex) {
     UniValue param(UniValue::VSTR);
     param.push_back(txHex);
 
-    UniValue response = CallRPC("signrawtransaction", param);
-    return find_value(response, "hex").get_str();
+    UniValue result = CallAndParseRPC(this, "signrawtransaction", param);
+    return find_value(result, "hex").get_str();
 }
 
 std::string CBitcoinClient::SendRawTransaction(std::string txHex) {
     UniValue param(UniValue::VSTR);
     param.setStr(txHex);
 
-    UniValue response = CallRPC("sendrawtransaction", param);
-    return response.get_str();
+    return CallAndParseRPC(this, "sendrawtransaction", param).get_str();
 };
 
 std::string CBitcoinClient::SendToAddress(std::string addr, CAmount nAmount) {
@@ -182,8 +191,15 @@ std::string CBitcoinClient::SendToAddress(std::string addr, CAmount nAmount) {
     params.push_back(addr);
     params.push_back(ValueFromAmount(nAmount));
 
-    UniValue response = CallRPC("sendtoaddress", params);
-    return response.get_str();
+    return CallAndParseRPC(this, "sendtoaddress", params).get_str();
+}
+
+UniValue CBitcoinClient::DecodeRawTransaction(std::string txHex) {
+    UniValue params(UniValue::VARR);
+    params.push_back(txHex);
+
+    UniValue response = CallRPC("decoderawtransaction", params);
+    return find_value(response, "result");
 }
 
 std::string CBitcoinClient::GetNewAddress() {
@@ -199,17 +215,24 @@ std::string CBitcoinClient::GetNewAddress() {
         params.push_back("legacy"); //address type
     }
 
-    UniValue response = CallRPC("getnewaddress", params);
-    return find_value(response, "result").get_str();
+    return CallAndParseRPC(this, "getnewaddress", params).get_str();
 }
 
 bool CBitcoinClient::IsValidAddress(std::string addr) {
     UniValue params(UniValue::VARR);
     params.push_back(addr);
 
-    UniValue response = CallRPC("validateaddress", params);
-    UniValue result = find_value(response, "result");
+    UniValue result = CallAndParseRPC(this, "validateaddress", params);
     return find_value(result, "isvalid").get_bool();
+}
+
+CPubKey CBitcoinClient::GetPubKeyForAddress(std::string addr) {
+    UniValue params(UniValue::VARR);
+    params.push_back(addr);
+
+    UniValue result = CallAndParseRPC(this, "validateaddress", params);
+    std::string pubKey = find_value(result, "pubkey").get_str();
+    return CPubKey(pubKey.begin(), pubKey.end());
 }
 
 int CLuxClient::GetBlockCount() {
@@ -256,6 +279,14 @@ std::string CLuxClient::SendRawTransaction(std::string txHex) {
     return response.get_str();
 };
 
+UniValue CLuxClient::DecodeRawTransaction(std::string txHex) {
+    UniValue params(UniValue::VARR);
+    params.push_back(txHex);
+
+    UniValue response = decoderawtransaction(params, false);
+    return find_value(response, "result");
+}
+
 std::string CLuxClient::SendToAddress(std::string addr, CAmount nAmount) {
     UniValue params(UniValue::VARR);
     params.push_back(addr);
@@ -281,4 +312,13 @@ bool CLuxClient::IsValidAddress(std::string addr) {
     // we can use IsValidDestination here, but let's keep it consistent
     UniValue response = validateaddress(params, false);
     return find_value(response, "isvalid").get_bool();
+}
+
+CPubKey CLuxClient::GetPubKeyForAddress(std::string addr) {
+    UniValue params(UniValue::VARR);
+    params.push_back(addr);
+
+    UniValue response = validateaddress(params, false);
+    std::string pubkey = find_value(response, "pubkey").get_str();
+    return CPubKey(pubkey.begin(), pubkey.end());
 }

@@ -9,12 +9,14 @@
 #include <clientversion.h>
 #include <util.h>
 #include <univalue/univalue.h>
+#include <version.h>
 
 #include <string>
 
 class CClientConnectionError;
 class CAbstractBlockchainClient;
 class CBitcoinClient;
+class CPubKey;
 
 typedef std::string Ticker;
 typedef std::shared_ptr<CAbstractBlockchainClient> ClientPtr;
@@ -108,6 +110,12 @@ public:
     virtual int GetClientVersion() = 0;
 
     /**
+     * @brief Retrieves blockchain protocol version
+     * @return Blockchain protocol version
+     */
+    virtual int GetProtocolVersion() = 0;
+
+    /**
      * @brief Returns current block count
      * @return Current block count
      */
@@ -135,6 +143,13 @@ public:
     virtual std::string SendRawTransaction(std::string txHex) = 0;
 
     /**
+     * @brief Decodes raw
+     * @param txHex Hex encoded transaction
+     * @return Decoded transaction in the UniValue format
+     */
+    virtual UniValue DecodeRawTransaction(std::string txHex) = 0;
+
+    /**
      * @brief Send coins to the address
      * @param addr Blockchain address where to send coins
      * @param nAmount Amount of coins to send
@@ -154,6 +169,13 @@ public:
      * @return Is address valid for this blockchain or not
      */
     virtual bool IsValidAddress(std::string addr) = 0;
+
+    /**
+     * @brief Get hash of the address's public key
+     * @param addr address to get pubkeyhash from
+     * @return
+     */
+    virtual CPubKey GetPubKeyForAddress(std::string addr) = 0;
 
     const Ticker ticker;
     const BlockchainConfig config;
@@ -219,6 +241,8 @@ public:
 
     virtual int GetClientVersion() override;
 
+    virtual int GetProtocolVersion() override;
+
     virtual int GetBlockCount() override;
 
     virtual std::string CreateRawTransaction(const CreateTransactionParams& params) override;
@@ -226,6 +250,8 @@ public:
     virtual std::string SignRawTransaction(std::string txHex) override;
 
     virtual std::string SendRawTransaction(std::string txHex) override;
+
+    virtual UniValue DecodeRawTransaction(std::string txHex) override;
 
     virtual std::string SendToAddress(std::string addr, CAmount nAmount) override;
 
@@ -237,6 +263,8 @@ public:
      * @return newly generated address
      */
     virtual std::string GetNewAddress() override;
+
+    virtual CPubKey GetPubKeyForAddress(std::string addr) override;
 
     const Ticker ticker = "BTC";
 
@@ -284,6 +312,8 @@ public:
 
     virtual int GetClientVersion() override { return CLIENT_VERSION; }
 
+    virtual int GetProtocolVersion() override { return PROTOCOL_VERSION; }
+
     virtual int GetBlockCount() override;
 
     virtual std::string CreateRawTransaction(const CreateTransactionParams& params) override;
@@ -291,6 +321,8 @@ public:
     virtual std::string SignRawTransaction(std::string txHex) override;
 
     virtual std::string SendRawTransaction(std::string txHex) override;
+
+    virtual UniValue DecodeRawTransaction(std::string txHex) override;
 
     virtual std::string SendToAddress(std::string addr, CAmount nAmount) override;
 
@@ -302,6 +334,8 @@ public:
     virtual std::string GetNewAddress() override;
 
     virtual bool IsValidAddress(std::string addr) override;
+
+    virtual CPubKey GetPubKeyForAddress(std::string addr) override;
 
     const Ticker ticker = "LUX";
 };
