@@ -73,11 +73,10 @@ UniValue createorder(const UniValue& params, bool fHelp)
     orderbook.insert(std::make_pair(order->ComputeId(), order));
     //LOCK(cs_vNodes);
     for (CNode *pnode : vNodes) {
+        CAddress addr = GetLocalAddress(&pnode->addr);
         auto orderToPeer = std::make_shared<COrder>(*order);
-        CAddress addr;
-        if (GetLocal(addr, &pnode->addr))
-            orderToPeer->SetSender(addr);
-            pnode->PushMessage("createorder", *orderToPeer);
+        orderToPeer->SetSender(addr);
+        pnode->PushMessage("createorder", *orderToPeer);
     }
 
     UniValue result(UniValue::VOBJ);
