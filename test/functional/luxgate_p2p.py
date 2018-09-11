@@ -12,24 +12,9 @@ from collections import defaultdict
 
 # Avoid wildcard * imports if possible
 from test_framework.blocktools import (create_block, create_coinbase)
-from test_framework.mininode import (
-    CInv,
-    NetworkThread,
-    NodeConn,
-    NodeConnCB,
-    mininode_lock,
-    msg_block,
-    msg_getdata,
-)
+from test_framework.mininode import *
 from test_framework.test_framework import LuxTestFramework
-from test_framework.util import (
-    assert_equal,
-    connect_nodes,
-    connect_nodes_bi,
-    p2p_port,
-    rpc_port,
-    wait_until,
-)
+from test_framework.util import *
 import os
 import json
 import decimal
@@ -45,6 +30,13 @@ class LuxgateNode(NodeConnCB):
     def on_createorder(self, conn, message):
         self.received_orders.append(message.order)
 
+    def on_reqswap(self, conn, message): pass
+    def on_reqswapack(self, conn, message): pass
+    def on_swccreated(self, conn, message): pass
+    def on_swcack(self, conn, message): pass
+
+    def on_reject(self, conn, message):
+        raise AssertionError("Message rejected: %s" % repr(message))
 
 def EncodeDecimal(o):
     if isinstance(o, decimal.Decimal):
@@ -113,6 +105,20 @@ class LuxgateTest(LuxTestFramework):
 
         assert_equal(b'LUX', node0.received_orders[0].base)
         assert_equal(b'BTC', node0.received_orders[0].rel)
+        assert_equal(200000000, node0.received_orders[0].base_amount)
+        assert_equal(100000000, node0.received_orders[0].rel_amount)
+
+        assert_equal('new', node1.rpc.listorderbook()['orders'][0]['status'])
+
+        node0.send_message(
+            msg_ordermatch(
+                LGOrder(
+                    base=b'BTC', rel=b'LUX', 
+                    base_amount=100000000, rel_amount=200000000, 
+                    sender=node0.received_orders[0].sender)))
+        node0.wait_for_reqswap()
+
+        assert_equal('swap_requested', node1.rpc.listorderbook()['orders'][0]['status'])
 
 
 if __name__ == '__main__':

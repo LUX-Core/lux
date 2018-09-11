@@ -10,6 +10,8 @@
 #include <util.h>
 #include <timedata.h>
 
+typedef std::shared_ptr<COrder> OrderPtr;
+
 std::map<OrderId, std::shared_ptr<COrder>> orderbook;
 boost::asio::io_service luxgateIOService;
 
@@ -22,22 +24,22 @@ bool IsLuxGateServiceSupported(const CNode* pfrom) {
  * @param [out] result Found order
  * @return Any entry was found
  */
-bool FindMatching(const OrderMap &orders, const COrder &match, COrder &result)
+bool FindMatching(const OrderMap &orders, const COrder &match, OrderPtr &result)
 {
     for (auto const &e : orders) {
         auto localOrder = e.second;
         if (localOrder->Matches(match)) {
-            result = *localOrder;
+            result = localOrder;
             return true;
         }
     }
     return false;
 }
 
-bool RemoveOrder(OrderMap &orders, COrder &match)
+bool RemoveOrder(OrderMap &orders, OrderPtr match)
 {
     for (auto it = orders.begin(); it != orders.end();) {
-        if (match == *it->second) {
+        if (match == it->second) {
             it = orders.erase(it);
             return true;
         }
@@ -113,28 +115,17 @@ void ProcessMessageLuxgate(CNode *pfrom, const std::string &strCommand, CDataStr
         COrder order;
         vRecv >> order;
 
-        if (!order.SenderIsValid())
-             order.SetSender(pfrom->addr);
-
-        OrderEntry activatingOrder;
-        bool isMatching = false;
-        for (auto const &e : orderbook) {
-            auto localOrder = e.second;
-            if (localOrder->Matches(order)) {
-                LogPrintf("Confirm matching order %s (local:%s)\n", order.ToString(), localOrder->ToString());
-                activatingOrder = e;
-                isMatching = true;
-                break;
-            }
-        }
-
-        if (isMatching) {
+        OrderPtr localOrder;
+        if (FindMatching(orderbook, order, localOrder)) {
+            LogPrintf("Confirm matching order %s (local:%s)\n", order.ToString(), localOrder->ToString());
             ClientPtr relClient;
-            if (EnsureClient(activatingOrder.second->Rel(), relClient)) {
+            if (EnsureClient(localOrder->Rel(), relClient)) {
                 auto addressString = relClient->GetNewAddress();
-                pfrom->PushMessage("reqswap", *activatingOrder.second, addressString);
-                activatingOrder.second->SetState(COrder::State::SWAP_REQUESTED);
+                pfrom->PushMessage("reqswap", *localOrder, addressString);
+                localOrder->SetState(COrder::State::SWAP_REQUESTED);
             }
+        } else {
+            LogPrintf("ordermatch: Cannot find matching order for %s\n", order.ToString());
         }
     }
 
@@ -144,7 +135,7 @@ void ProcessMessageLuxgate(CNode *pfrom, const std::string &strCommand, CDataStr
         std::string baseAddr;
         vRecv >> order >> baseAddr;
         
-        COrder localOrder;
+        OrderPtr localOrder;
         if (FindMatching(orderbook, order, localOrder)) {
             LogPrintf("Received %s address: %s\n", order.Rel(), baseAddr);
             ClientPtr baseClient;
@@ -152,11 +143,11 @@ void ProcessMessageLuxgate(CNode *pfrom, const std::string &strCommand, CDataStr
                 if (baseClient->IsValidAddress(baseAddr)) {
                     LogPrintf("%s address is valid: %s\n", order.Rel(), baseAddr);
                     ClientPtr relClient;
-                    if (EnsureClient(localOrder.Rel(), relClient)) {
+                    if (EnsureClient(localOrder->Rel(), relClient)) {
                         auto addressString = relClient->GetNewAddress();
-                        LogPrintf("Created address for %s: %s\n", localOrder.Rel(), addressString);
-                        pfrom->PushMessage("reqswapack", localOrder, addressString);
-                        localOrder.SetState(COrder::State::SWAP_ACK);
+                        LogPrintf("Created address for %s: %s\n", localOrder->Rel(), addressString);
+                        pfrom->PushMessage("reqswapack", *localOrder, addressString);
+                        localOrder->SetState(COrder::State::SWAP_ACK);
                     }
                 } else {
                     LogPrintf("reqswap: %s address is invalid: %s\n", order.Rel(), baseAddr);
@@ -172,7 +163,7 @@ void ProcessMessageLuxgate(CNode *pfrom, const std::string &strCommand, CDataStr
         std::string baseAddr;
         vRecv >> order >> baseAddr;
         
-        COrder localOrder;
+        OrderPtr localOrder;
         if (FindMatching(orderbook, order, localOrder)) {
             LogPrintf("reqswapack: verifying %s address %s\n", order.Rel(), baseAddr);
             ClientPtr relClient;
@@ -181,8 +172,8 @@ void ProcessMessageLuxgate(CNode *pfrom, const std::string &strCommand, CDataStr
                     LogPrintf("reqswapack: %s address is valid: %s\n", order.Rel(), baseAddr);
                     // TODO stub for create contract tx
                     std::string txid = "6763b1c1b3df2e4978669299b609c5dae53b6b0e8443651c3a03ae0be511f87f";
-                    pfrom->PushMessage("swccreated", localOrder, txid);
-                    localOrder.SetState(COrder::State::CONTRACT_CREATED);
+                    pfrom->PushMessage("swccreated", *localOrder, txid);
+                    localOrder->SetState(COrder::State::CONTRACT_CREATED);
                     
                     // start async timer for refunding
                     boost::asio::deadline_timer refundTimer(luxgateIOService);
@@ -192,8 +183,8 @@ void ProcessMessageLuxgate(CNode *pfrom, const std::string &strCommand, CDataStr
                     //std::string rtimeStr = boost::posix_time::to_simple_string(refundTime);
                     //LogPrintf("Contract will be refunded at %s\n", rtimeStr);
                     refundTimer.async_wait([&] (const boost::system::error_code&) {
-                        localOrder.SetState(COrder::State::REFUNDING);
-                        LogPrintf("Swap contract lock time expired. Refunding %s\n", localOrder.ToString());
+                        localOrder->SetState(COrder::State::REFUNDING);
+                        LogPrintf("Swap contract lock time expired. Refunding %s\n", localOrder->ToString());
                     });
 
                 } else {
@@ -211,7 +202,7 @@ void ProcessMessageLuxgate(CNode *pfrom, const std::string &strCommand, CDataStr
         std::string txid;
         vRecv >> order >> txid;
 
-        COrder localOrder;
+        OrderPtr localOrder;
         if (FindMatching(orderbook, order, localOrder)) {
             // TODO verify tx
             bool isValidTx = true;
@@ -225,8 +216,8 @@ void ProcessMessageLuxgate(CNode *pfrom, const std::string &strCommand, CDataStr
                 };
                 // TODO stub for create contract tx
                 std::string rtxid = "f7901138cbe4eb42eca7b05ccf8de1d82a35e4b53f2a4f44905edb77362b1459";
-                pfrom->PushMessage("swcack", localOrder, rtxid);
-                localOrder.SetState(COrder::State::CONTRACT_ACK);
+                pfrom->PushMessage("swcack", *localOrder, rtxid);
+                localOrder->SetState(COrder::State::CONTRACT_ACK);
                 LogPrintf("swccreated: Spending UTXO's: %s\n", txid);
                 // TODO Poll async for inputs with secret, spend UTXO's and remove from orderbook
                 // Detach from current thread
@@ -248,7 +239,7 @@ void ProcessMessageLuxgate(CNode *pfrom, const std::string &strCommand, CDataStr
         std::string txid;
         vRecv >> order >> txid;
 
-        COrder localOrder;
+        OrderPtr localOrder;
         if (FindMatching(orderbook, order, localOrder)) {
             // TODO Verify tx
             bool isValidTx = true;
