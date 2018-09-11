@@ -11,19 +11,20 @@
 #include "checkpoints.h"
 #include "coincontrol.h"
 #include "consensus/validation.h"
-#include "stake.h"
-#include "net.h"
+#include "instantx.h"
 #include "main.h"
+#include "net.h"
+#include "script/interpreter.h"
 #include "script/script.h"
 #include "script/sign.h"
 #include "spork.h"
-#include "instantx.h"
+#include "stake.h"
 #include "timedata.h"
+#include "txdb.h"
 #include "txmempool.h"
 #include "util.h"
 #include "ui_interface.h"
 #include "utilmoneystr.h"
-#include "script/interpreter.h"
 
 #include <assert.h>
 
@@ -4368,8 +4369,8 @@ bool CWallet::GetStakeWeight(uint64_t& nWeight)
         if (pblocktree->ReadTxIndex(pcoin.first->GetHash(), txpos))
             continue;
         // Stake kernel
-        int64_t nTimeWeight = GetWeight((int64_t)pcoin.first->tx->nTime, nCurrentTime);
-        uint256 bnWeight = uint256(pcoin.first->tx->vout[pcoin.second].nValue) * nTimeWeight / COIN / (24 * 60 * 60);
+        int64_t nTimeWeight = GetWeight((int64_t)pcoin.first->nTime, nCurrentTime);
+        uint256 bnWeight = uint256(pcoin.first->vout[pcoin.second].nValue) * nTimeWeight / COIN / (24 * 60 * 60);
         if (nTimeWeight > 0) {
             nWeight += bnWeight.GetCompact();
         }
