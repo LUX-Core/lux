@@ -1515,6 +1515,54 @@ class msg_witness_blocktxn(msg_blocktxn):
         r += self.block_transactions.serialize(with_witness=True)
         return r
 
+
+class LGOrder(object):
+
+    def __init__(self, base=None, rel=None, base_amount=None, rel_amount=None, sender=None):
+        self.base = base
+        self.rel = rel
+        self.base_amount = base_amount
+        self.rel_amount = rel_amount
+        self.sender = sender
+
+    def deserialize(self ,f):
+        self.base = deser_string(f)
+        self.rel = deser_string(f)
+        self.base_amount = struct.unpack("<q", f.read(8))[0]
+        self.rel_amount = struct.unpack("<q", f.read(8))[0]
+        self.sender = CAddress()
+        self.sender.deserialize(f)
+
+    def serialize(self):
+        r = b""
+        r += ser_string(self.base)
+        r += ser_string(self.rel)
+        r += struct.pack("<q", self.base_amount)
+        r += struct.pack("<q", self.rel_amount)
+        r += self.sender.serialize()
+        return r
+
+    def __repr__(self):
+        return "LGOrder(base=%s, rel=%s, base_amount=%s, rel_amount=%s, sender=%s)" % (self.base, self.rel, self.base_amount, self.rel_amount, repr(self.sender))
+
+class msg_createorder(object):
+    command = b'createorder'
+
+    def __init__(self):
+        self.order = LGOrder()
+
+    def deserialize(self, f):
+        self.order.deserialize(f)
+
+    def serialize(self):
+        r = b""
+        r += self.order.serialize()
+        return r
+
+    def __repr__(self):
+        return "msg_createorder(order=%s)" % (repr(self.order))
+
+
 class NodeConnCB(object):
     """Callback and helper functions for P2P connection to a luxd node.
 
@@ -1665,6 +1713,10 @@ class NodeConnCB(object):
         test_function = lambda: self.message_count["verack"]
         wait_until(test_function, timeout=timeout, lock=mininode_lock)
 
+    def wait_for_createorder(self, timeout=60):
+        test_function = lambda: self.last_message.get("createorder")
+        wait_until(test_function, timeout=timeout, lock=mininode_lock)
+        
     # Message sending helper functions
 
     def send_message(self, message):
@@ -1709,12 +1761,15 @@ class NodeConn(asyncore.dispatcher):
         b"sendcmpct": msg_sendcmpct,
         b"cmpctblock": msg_cmpctblock,
         b"getblocktxn": msg_getblocktxn,
-        b"blocktxn": msg_blocktxn
+        b"blocktxn": msg_blocktxn,
+
+        # Luxgate
+        b"createorder": msg_createorder
     }
     MAGIC_BYTES = {
-        "mainnet": b"\xf1\xcf\xa6\xd3",   # mainnet
-        "testnet3": b"\x0d\x22\x15\x06",  # testnet3
-        "regtest": b"\xfd\xdd\xc6\xe1",   # regtest
+        "mainnet":  b"\x6a\xb3\xc8\xa9",   # mainnet
+        "testnet4": b"\x54\x67\x51\xab",   # testnet4
+        "regtest":  b"\xa1\xcf\x7e\xac",   # regtest
     }
 
     def __init__(self, dstaddr, dstport, rpc, callback, net="regtest", services=NODE_NETWORK, send_version=True):

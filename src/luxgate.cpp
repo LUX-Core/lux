@@ -8,9 +8,10 @@
 #include <net.h>
 #include <utilstrencodings.h>
 #include <util.h>
-
+#include <timedata.h>
 
 std::map<OrderId, std::shared_ptr<COrder>> orderbook;
+boost::asio::io_service luxgateIOService;
 
 
 bool IsLuxGateServiceSupported(const CNode* pfrom) {
@@ -178,7 +179,18 @@ void ProcessMessageLuxgate(CNode *pfrom, const std::string &strCommand, CDataStr
                     std::string txid = "6763b1c1b3df2e4978669299b609c5dae53b6b0e8443651c3a03ae0be511f87f";
                     pfrom->PushMessage("swccreated", localOrder, txid);
                     localOrder.SetState(COrder::State::CONTRACT_CREATED);
-                    // TODO start async timer for redeeming
+                    
+                    // start async timer for redeeming
+                    boost::asio::deadline_timer redeemTimer(luxgateIOService);
+                    boost::system::error_code ec;
+                    auto redeemTime  = boost::posix_time::from_time_t(GetAdjustedTime() + 10);
+                    redeemTimer.expires_at(redeemTime, ec);
+                    //std::string rtimeStr = boost::posix_time::to_simple_string(redeemTime);
+                    //LogPrintf("Contract will be redeemed at %s\n", rtimeStr);
+                    redeemTimer.async_wait([&] (const boost::system::error_code&) {
+                        localOrder.SetState(COrder::State::REDEEMING);
+                        LogPrintf("Swap contract lock time expired. Redeeming %s\n", localOrder.ToString());
+                    });
 
                 } else {
                     LogPrintf("reqswapack: %s address is invalid: %s\n", order.Rel(), baseAddr);
