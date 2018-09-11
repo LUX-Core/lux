@@ -22,6 +22,10 @@ class CWalletTx;
 
 struct CMutableTransaction;
 
+bool CheckCoinStakeTimestamp(uint32_t nTimeBlock);
+
+static const int STAKE_TIMESTAMP_MASK = 15;
+
 namespace boost { class thread_group; }
 
 // Reject all splitted stake blocks under 200 LUX

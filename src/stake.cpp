@@ -38,7 +38,7 @@ using namespace std;
 static const unsigned int MODIFIER_INTERVAL = 10 * 60;
 static const unsigned int MODIFIER_INTERVAL_TESTNET = 60;
 
-static const int STAKE_TIMESTAMP_MASK = 15;
+bool CheckCoinStakeTimestamp(uint32_t nTimeBlock) { return (nTimeBlock & STAKE_TIMESTAMP_MASK) == 0; }
 
 // MODIFIER_INTERVAL_RATIO:
 // ratio of group interval length between the last group and the first group
@@ -702,7 +702,7 @@ double GetBlockDifficulty(unsigned int nBits) {
     double dDiff = (double)0x0000ffff / (double)(nBits & 0x00ffffff);
     while (nShift < 29) { dDiff *= 256.0;nShift++; }
     while (nShift > 29) { dDiff /= 256.0;nShift--; }
-    retunr dDiff;
+    return dDiff;
 }
 
 bool Stake::CreateCoinStake(CWallet* wallet, const CKeyStore& keystore, unsigned int nBits, int64_t nSearchInterval, CMutableTransaction& txNew, unsigned int& nTxNewTime) {
@@ -772,7 +772,7 @@ bool Stake::CreateCoinStake(CWallet* wallet, const CKeyStore& keystore, unsigned
         COutPoint prevoutStake = COutPoint(pcoin.first->GetHash(), pcoin.second);
         nTxNewTime = GetAdjustedTime();
 
-        nCoinWeight = pcoin.first->tx->vout[pcoin.second].nValue;
+        nCoinWeight = pcoin.first->vout[pcoin.second].nValue;
         unsigned int nStakeTarget = nBits;
         nStakeTarget *= nCoinWeight;
         nStakeWeightSum += nCoinWeight;
@@ -782,7 +782,7 @@ bool Stake::CreateCoinStake(CWallet* wallet, const CKeyStore& keystore, unsigned
         dStakeDiffSum += dStakeKernelDiff;
         dStakeDiffMax = std::max(dStakeDiffMax, dStakeKernelDiff);
         uint64_t coinAge = 0;
-        if (GetCoinAge(*pcoin.first->tx, pcoin.first->tx->nTime, coinAge)) {
+        if (GetCoinAge(*pcoin.first, pcoin.first->nTime, coinAge)) {
             nStakeCoinAgeSum += coinAge;
         }
 
