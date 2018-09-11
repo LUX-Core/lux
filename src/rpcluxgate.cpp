@@ -183,10 +183,10 @@ UniValue createswaptransaction(const UniValue& params, bool fHelp) {
     {
         LOCK2(cs_main, pwalletMain->cs_wallet);
 
-        if (!CreateSwapTransaction(pwalletMain, dest, nAmount, locktime, wtx, contractRedeemScript, nFeeRequired, secret, secretHash, strError))
+        if (!LuxSwap::CreateSwapTransaction(pwalletMain, dest, nAmount, locktime, wtx, contractRedeemScript, nFeeRequired, secret, secretHash, strError))
             throw JSONRPCError(RPC_WALLET_ERROR, strError);
 
-        if (!CreateRefundTransaction(pwalletMain, contractRedeemScript, wtx, refundTx, nRefundFeeRequired, strError))
+        if (!LuxSwap::CreateRefundTransaction(pwalletMain, contractRedeemScript, wtx, refundTx, nRefundFeeRequired, strError))
             throw JSONRPCError(RPC_WALLET_ERROR, strError);
     }
 
