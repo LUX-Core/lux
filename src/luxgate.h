@@ -10,6 +10,7 @@
 #include <serialize.h>
 #include <uint256.h>
 #include <util.h>
+#include <boost/asio.hpp>
 
 class COrder;
 
@@ -18,7 +19,7 @@ typedef std::pair<OrderId, std::shared_ptr<COrder>> OrderEntry;
 typedef std::map<OrderId, std::shared_ptr<COrder>> OrderMap;
 
 extern OrderMap orderbook;
-extern OrderMap activeOrders;
+extern boost::asio::io_service luxgateIOService;
 
 void ProcessMessageLuxgate(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv, bool& isLuxgate);
 
@@ -41,7 +42,8 @@ public:
         SWAP_REQUESTED = 30,
         SWAP_ACK = 40,
         CONTRACT_CREATED = 50,
-        CONTRACT_ACK = 60
+        CONTRACT_ACK = 60,
+        REDEEMING = 200
     };
 
     COrder() {}
@@ -85,11 +87,11 @@ public:
     }
 
 protected:
-    State state;
     Ticker base;
     Ticker rel;
     CAmount baseAmount;
     CAmount relAmount;
+    State state;
     CAddress sender;
 };
 
