@@ -131,9 +131,10 @@ public:
     /**
      * @brief Sign raw transaction
      * @param txHex Hex encoded raw transaction
-     * @return Hex encoded signed raw transaction
+     * @param result Either hex encoded transaction if signed successfully or sigscript if signed only partially
+     * @return Is signature complete or not
      */
-    virtual std::string SignRawTransaction(std::string txHex) = 0;
+    virtual bool SignRawTransaction(std::string txHex, std::string& result) = 0;
 
     /**
      * @brief Send signed raw transaction
@@ -247,7 +248,7 @@ public:
 
     virtual std::string CreateRawTransaction(const CreateTransactionParams& params) override;
 
-    virtual std::string SignRawTransaction(std::string txHex) override;
+    virtual bool SignRawTransaction(std::string txHex, std::string& result) override;
 
     virtual std::string SendRawTransaction(std::string txHex) override;
 
@@ -318,7 +319,7 @@ public:
 
     virtual std::string CreateRawTransaction(const CreateTransactionParams& params) override;
 
-    virtual std::string SignRawTransaction(std::string txHex) override;
+    virtual bool SignRawTransaction(std::string txHex, std::string& result) override;
 
     virtual std::string SendRawTransaction(std::string txHex) override;
 

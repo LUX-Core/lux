@@ -35,22 +35,14 @@ int CalcInputSize(int scriptSigSize)
     return 32 + 4 + ::GetSerializeSize(VARINT(scriptSigSize), 0, 0) + scriptSigSize + 4;
 }
 
-int EstimateRefundTxSerializeSize(const CScript& contractRedeemscript, std::vector<CTxOut> txOuts)
-{
-    int outputsSerializeSize = 0;
-    for (const CTxOut& txout : txOuts) {
-        outputsSerializeSize += ::GetSerializeSize(txout, 0, 0);
-    }
-    return 4 + 4 + 4 + ::GetSerializeSize(VARINT(1), 0, 0) + ::GetSerializeSize(VARINT(txOuts.size()), 0, 0) + CalcInputSize(refundAtomicSwapSigScriptSize + contractRedeemscript.size()) + outputsSerializeSize;
-}
+void GenerateSecret(std::vector<unsigned char>& secret, std::vector<unsigned char>& secretHash) {
+    secret.assign(ATOMIC_SECRET_SIZE, 0);
+    secretHash.assign(CSHA256::OUTPUT_SIZE, 0);
 
-int EstimateRedeemTxSerializeSize(const CScript& contractRedeemscript, std::vector<CTxOut> txOuts)
-{
-    int outputsSerializeSize = 0;
-    for (const CTxOut& txout : txOuts) {
-        outputsSerializeSize += ::GetSerializeSize(txout, 0, 0);
-    }
-    return 4 + 4 + 4 + ::GetSerializeSize(VARINT(1), 0, 0) + ::GetSerializeSize(VARINT(txOuts.size()), 0, 0) + CalcInputSize(redeemAtomicSwapSigScriptSize + contractRedeemscript.size()) + outputsSerializeSize;
+    GetRandBytes(secret.data(), secret.size());
+    CSHA256 sha;
+    sha.Write(secret.data(), secret.size());
+    sha.Finalize(secretHash.data());
 }
 
 bool TryDecodeAtomicSwapScript(const CScript& swapRedeemScript,
@@ -104,9 +96,30 @@ CScript CreateAtomicSwapRedeemScript(CKeyID initiator, CKeyID redeemer, int64_t 
     return script;
 }
 
-bool CreateAtomicSwapRedeemSigScript(CWallet* pwallet, const CMutableTransaction& redeemTx, CAmount amount,
-                                     const CKeyID& address, const CScript& swapRedeemScript, const std::vector<unsigned char>& secret,
-                                     const CScript redeemContractPubKey, CScript& redeemScriptSig) {
+namespace LuxSwap {
+
+int EstimateRefundTxSerializeSize(const CScript &contractRedeemscript, std::vector <CTxOut> txOuts) {
+    int outputsSerializeSize = 0;
+    for (const CTxOut &txout : txOuts) {
+        outputsSerializeSize += ::GetSerializeSize(txout, 0, 0);
+    }
+    return 4 + 4 + 4 + ::GetSerializeSize(VARINT(1), 0, 0) + ::GetSerializeSize(VARINT(txOuts.size()), 0, 0) +
+           CalcInputSize(refundAtomicSwapSigScriptSize + contractRedeemscript.size()) + outputsSerializeSize;
+}
+
+int EstimateRedeemTxSerializeSize(const CScript &contractRedeemscript, std::vector <CTxOut> txOuts) {
+    int outputsSerializeSize = 0;
+    for (const CTxOut &txout : txOuts) {
+        outputsSerializeSize += ::GetSerializeSize(txout, 0, 0);
+    }
+    return 4 + 4 + 4 + ::GetSerializeSize(VARINT(1), 0, 0) + ::GetSerializeSize(VARINT(txOuts.size()), 0, 0) +
+           CalcInputSize(redeemAtomicSwapSigScriptSize + contractRedeemscript.size()) + outputsSerializeSize;
+}
+
+bool CreateAtomicSwapRedeemSigScript(CWallet *pwallet, const CMutableTransaction &redeemTx, CAmount amount,
+                                     const CKeyID &address, const CScript &swapRedeemScript,
+                                     const std::vector<unsigned char> &secret,
+                                     const CScript redeemContractPubKey, CScript &redeemScriptSig) {
     MutableTransactionSignatureCreator creator(pwallet, &redeemTx, 0, amount, SIGHASH_ALL);
     std::vector<unsigned char> vch;
     CPubKey pubKey;
@@ -115,12 +128,15 @@ bool CreateAtomicSwapRedeemSigScript(CWallet* pwallet, const CMutableTransaction
         return false;
     }
 
-    redeemScriptSig = CScript() << vch << ToByteVector(pubKey) << secret << int64_t(1) << std::vector<unsigned char>(swapRedeemScript.begin(), swapRedeemScript.end());
-    return VerifyScript(redeemScriptSig, redeemContractPubKey, nullptr, STANDARD_SCRIPT_VERIFY_FLAGS, creator.Checker());
+    redeemScriptSig = CScript() << vch << ToByteVector(pubKey) << secret << int64_t(1)
+                                << std::vector<unsigned char>(swapRedeemScript.begin(), swapRedeemScript.end());
+    return VerifyScript(redeemScriptSig, redeemContractPubKey, nullptr, STANDARD_SCRIPT_VERIFY_FLAGS,
+                        creator.Checker());
 }
 
-bool CreateAtomicSwapRefundSigScript(CWallet* pwallet, const CMutableTransaction& redeemTx, CAmount amount,
-                                     const CKeyID& address, const CScript& swapRedeemScript, const CScript redeemContractPubKey, CScript& refundScriptSig) {
+bool CreateAtomicSwapRefundSigScript(CWallet *pwallet, const CMutableTransaction &redeemTx, CAmount amount,
+                                     const CKeyID &address, const CScript &swapRedeemScript,
+                                     const CScript redeemContractPubKey, CScript &refundScriptSig) {
     MutableTransactionSignatureCreator creator(pwallet, &redeemTx, 0, amount, SIGHASH_ALL);
     std::vector<unsigned char> vch;
     CPubKey pubKey;
@@ -129,21 +145,13 @@ bool CreateAtomicSwapRefundSigScript(CWallet* pwallet, const CMutableTransaction
         return false;
     }
 
-    refundScriptSig = CScript() << vch << ToByteVector(pubKey) << int64_t(0) << std::vector<unsigned char>(swapRedeemScript.begin(), swapRedeemScript.end());
-    return VerifyScript(refundScriptSig, redeemContractPubKey, nullptr, STANDARD_SCRIPT_VERIFY_FLAGS, creator.Checker());
+    refundScriptSig = CScript() << vch << ToByteVector(pubKey) << int64_t(0)
+                                << std::vector<unsigned char>(swapRedeemScript.begin(), swapRedeemScript.end());
+    return VerifyScript(refundScriptSig, redeemContractPubKey, nullptr, STANDARD_SCRIPT_VERIFY_FLAGS,
+                        creator.Checker());
 }
 
-void GenerateSecret(std::vector<unsigned char>& secret, std::vector<unsigned char>& secretHash) {
-    secret.assign(ATOMIC_SECRET_SIZE, 0);
-    secretHash.assign(CSHA256::OUTPUT_SIZE, 0);
-
-    GetRandBytes(secret.data(), secret.size());
-    CSHA256 sha;
-    sha.Write(secret.data(), secret.size());
-    sha.Finalize(secretHash.data());
-}
-
-CTxDestination GetRawChangeAddress(CWallet* pwallet, OutputType outputType) {
+CTxDestination GetRawChangeAddress(CWallet *pwallet, OutputType outputType) {
     CReserveKey reservekey(pwallet);
     CPubKey vchPubKey;
     if (!reservekey.GetReservedKey(vchPubKey, true))
@@ -155,8 +163,10 @@ CTxDestination GetRawChangeAddress(CWallet* pwallet, OutputType outputType) {
     return GetDestinationForKey(vchPubKey, outputType);
 }
 
-bool CreateSwapTransaction(CWallet* pwallet, const CKeyID& redeemer, CAmount nAmount, uint64_t lockTime, CWalletTx& redeemTx,
-                           CScript& redeemScript, CAmount& nFeeRequired, std::vector<unsigned char>& secret, std::vector<unsigned char>& secretHash, std::string& strError) {
+bool CreateSwapTransaction(CWallet *pwallet, const CKeyID &redeemer, CAmount nAmount, uint64_t lockTime,
+                           CWalletTx &redeemTx,
+                           CScript &redeemScript, CAmount &nFeeRequired, std::vector<unsigned char> &secret,
+                           std::vector<unsigned char> &secretHash, std::string &strError) {
 
     AssertLockHeld(cs_main);
     AssertLockHeld(pwallet->cs_wallet);
@@ -179,7 +189,8 @@ bool CreateSwapTransaction(CWallet* pwallet, const CKeyID& redeemer, CAmount nAm
     return pwallet->CreateTransaction(vecSend, redeemTx, reservekey, nFeeRequired, strError, &coinControl);
 }
 
-bool CreateRefundTransaction(CWallet* pwallet, const CScript& redeemScript, const CMutableTransaction& contractTx, CMutableTransaction& refundTx, CAmount& refundFee, std::string& strError) {
+bool CreateRefundTransaction(CWallet *pwallet, const CScript &redeemScript, const CMutableTransaction &contractTx,
+                             CMutableTransaction &refundTx, CAmount &refundFee, std::string &strError) {
     AssertLockHeld(cs_main);
     AssertLockHeld(pwallet->cs_wallet);
 
@@ -241,3 +252,71 @@ bool CreateRefundTransaction(CWallet* pwallet, const CScript& redeemScript, cons
     refundTx.vin[0].scriptSig = refundSigScript;
     return true;
 }
+
+} //namespace LuxSwap
+
+
+namespace BitcoinSwap {
+
+CMutableTransaction::CMutableTransaction() : nVersion(CTransaction::CURRENT_VERSION), nLockTime(0) {}
+CMutableTransaction::CMutableTransaction(const CTransaction& tx) : vin(tx.vin), vout(tx.vout), nVersion(tx.nVersion), nLockTime(tx.nLockTime) {}
+
+CTransaction::CTransaction() : vin(), vout(), nVersion(CTransaction::CURRENT_VERSION), nLockTime(0) {}
+CTransaction::CTransaction(const CMutableTransaction &tx) : vin(tx.vin), vout(tx.vout), nVersion(tx.nVersion), nLockTime(tx.nLockTime) {}
+CTransaction::CTransaction(CMutableTransaction &&tx) : vin(std::move(tx.vin)), vout(std::move(tx.vout)), nVersion(tx.nVersion), nLockTime(tx.nLockTime) {}
+
+std::string CreateAtomicSwapRedeemSigScript(std::shared_ptr<CBitcoinClient> client, const std::string redeemTx, const CScript &swapRedeemScript,
+                                     const std::vector<unsigned char> &secret, CScript &redeemScriptSig) {
+
+    std::string result;
+    // Try to sign the redeemTx transaction. The signing is expected to fail, but it will return generated signature and pubkey.
+    // Those should be fully valid, but because we haven't provided secret and 1 for OP_IF branching to the redemption, script verification will fail.
+    // So we take generated scriptSig and write it to the input's scriptSig, then append secret and 1 to it, which makes
+    // verification to be able to evaluate scriptSig to true. Then we hex encode this signed transaction and return it.
+    if (!client->SignRawTransaction(redeemTx, result)) {
+        int protocolVersion = client->GetProtocolVersion();
+        std::vector<unsigned char> txData(ParseHex(redeemTx));
+
+        CDataStream ssData(txData, SER_NETWORK, protocolVersion | SERIALIZE_TRANSACTION_NO_WITNESS);
+        BitcoinSwap::CMutableTransaction mtx;
+        ssData >> mtx;
+        // Result is took from vin.hex, so it already has both <sig> and <pubkey>
+
+        redeemScriptSig = CScript() << ToByteVector(result) << secret << int64_t(1) << std::vector<unsigned char>(swapRedeemScript.begin(), swapRedeemScript.end());
+        mtx.vin[0].scriptSig = redeemScriptSig;
+
+        CDataStream ssTx(SER_NETWORK, protocolVersion);
+        ssTx << mtx;
+        return HexStr(ssTx.begin(), ssTx.end());
+    } else
+        return result;
+
+}
+
+std::string CreateAtomicSwapRefundSigScript(std::shared_ptr<CBitcoinClient> client, const std::string refundTx,
+                                     const CScript& swapRedeemScript, CScript& refundScriptSig) {
+    std::string result;
+    // Try to sign the refundTx transaction. The signing is expected to fail, but it will return generated signature and pubkey.
+    // Those should be fully valid, but because we haven't provided 0 for OP_IF branching to the refund, script verification will fail.
+    // So we take generated scriptSig and write it to the input's scriptSig, then append  0 to it, which makes
+    // verification to be able to evaluate scriptSig to true. Then we hex encode this signed transaction and return it.
+    if (!client->SignRawTransaction(refundTx, result)) {
+        int protocolVersion = client->GetProtocolVersion();
+        std::vector<unsigned char> txData(ParseHex(refundTx));
+
+        CDataStream ssData(txData, SER_NETWORK, protocolVersion | SERIALIZE_TRANSACTION_NO_WITNESS);
+        BitcoinSwap::CMutableTransaction mtx;
+        ssData >> mtx;
+        // Result is took from vin.hex, so it already has both <sig> and <pubkey>
+        refundScriptSig = CScript() << ToByteVector(result) << int64_t(0) << std::vector<unsigned char>(swapRedeemScript.begin(), swapRedeemScript.end());
+        mtx.vin[0].scriptSig = refundScriptSig;
+
+        CDataStream ssTx(SER_NETWORK, protocolVersion);
+        ssTx << mtx;
+        return HexStr(ssTx.begin(), ssTx.end());
+    } else
+        return result;
+
+}
+
+} //namespace BitcoinSwap

@@ -171,12 +171,21 @@ std::string CBitcoinClient::CreateRawTransaction(const CreateTransactionParams& 
     return CallAndParseRPC(this, "createrawtransaction", rpcParams).get_str();
 }
 
-std::string CBitcoinClient::SignRawTransaction(std::string txHex) {
+bool CBitcoinClient::SignRawTransaction(std::string txHex, std::string& result) {
     UniValue param(UniValue::VSTR);
     param.push_back(txHex);
 
-    UniValue result = CallAndParseRPC(this, "signrawtransaction", param);
-    return find_value(result, "hex").get_str();
+    UniValue response = CallAndParseRPC(this, "signrawtransaction", param);
+
+    // signrawtransaction reports partial sign and we are ready for it
+    if (!find_value(response, "complete").get_bool()) {
+        UniValue errors = find_value(response, "errors");
+        result = find_value(errors, "scriptSig").get_str();
+        return false;
+    } else {
+        result = find_value(response, "hex").get_str();
+        return true;
+    }
 }
 
 std::string CBitcoinClient::SendRawTransaction(std::string txHex) {
@@ -262,13 +271,20 @@ std::string CLuxClient::CreateRawTransaction(const CreateTransactionParams& para
     return response.get_str();
 }
 
-std::string CLuxClient::SignRawTransaction(std::string txHex) {
+bool CLuxClient::SignRawTransaction(std::string txHex, std::string& result) {
     UniValue params(UniValue::VARR);
     params.push_back(txHex);
 
     // Direct RPC handler call
     UniValue response = signrawtransaction(params, false);
-    return find_value(response, "hex").get_str();
+    UniValue hex = find_value(response, "hex");
+    if (hex.empty() || hex.isNull()) {
+        result = "";
+        return false;
+    }
+
+    result = hex.get_str();
+    return true;
 }
 
 std::string CLuxClient::SendRawTransaction(std::string txHex) {
