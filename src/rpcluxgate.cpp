@@ -141,6 +141,7 @@ UniValue listorderbook(const UniValue& params, bool fHelp) {
             case COrder::State::SWAP_ACK: orderEntry.push_back(Pair("status", "swap_ack")); break;
             case COrder::State::CONTRACT_CREATED: orderEntry.push_back(Pair("status", "contract_created")); break;
             case COrder::State::CONTRACT_ACK: orderEntry.push_back(Pair("status", "contract_ack")); break;
+            case COrder::State::REFUNDING: orderEntry.push_back(Pair("status", "refunding")); break;
         };
         orders.push_back(orderEntry);
     }
