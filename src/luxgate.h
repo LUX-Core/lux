@@ -43,7 +43,7 @@ public:
         SWAP_ACK = 40,
         CONTRACT_CREATED = 50,
         CONTRACT_ACK = 60,
-        REDEEMING = 200
+        REFUNDING = 200
     };
 
     COrder() {}

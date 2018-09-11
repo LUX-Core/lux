@@ -37,11 +37,15 @@ bool FindMatching(const OrderMap &orders, const COrder &match, COrder &result)
 bool RemoveOrder(OrderMap &orders, COrder &match)
 {
     for (auto it = orders.begin(); it != orders.end();) {
-        if (match == *it->second)
+        if (match == *it->second) {
             it = orders.erase(it);
-        else
+            return true;
+        }
+        else {
             ++it;
+        }
     }
+    return false;
 }
 
 bool FindClient(const Ticker ticker, ClientPtr &foundClient) 
@@ -125,9 +129,9 @@ void ProcessMessageLuxgate(CNode *pfrom, const std::string &strCommand, CDataStr
         }
 
         if (isMatching) {
-            ClientPtr revClient;
-            if (EnsureClient(activatingOrder.second->Rel(), revClient)) {
-                auto addressString = revClient->GetNewAddress();
+            ClientPtr relClient;
+            if (EnsureClient(activatingOrder.second->Rel(), relClient)) {
+                auto addressString = relClient->GetNewAddress();
                 pfrom->PushMessage("reqswap", *activatingOrder.second, addressString);
                 activatingOrder.second->SetState(COrder::State::SWAP_REQUESTED);
             }
@@ -180,16 +184,16 @@ void ProcessMessageLuxgate(CNode *pfrom, const std::string &strCommand, CDataStr
                     pfrom->PushMessage("swccreated", localOrder, txid);
                     localOrder.SetState(COrder::State::CONTRACT_CREATED);
                     
-                    // start async timer for redeeming
-                    boost::asio::deadline_timer redeemTimer(luxgateIOService);
+                    // start async timer for refunding
+                    boost::asio::deadline_timer refundTimer(luxgateIOService);
                     boost::system::error_code ec;
-                    auto redeemTime  = boost::posix_time::from_time_t(GetAdjustedTime() + 10);
-                    redeemTimer.expires_at(redeemTime, ec);
-                    //std::string rtimeStr = boost::posix_time::to_simple_string(redeemTime);
-                    //LogPrintf("Contract will be redeemed at %s\n", rtimeStr);
-                    redeemTimer.async_wait([&] (const boost::system::error_code&) {
-                        localOrder.SetState(COrder::State::REDEEMING);
-                        LogPrintf("Swap contract lock time expired. Redeeming %s\n", localOrder.ToString());
+                    auto refundTime  = boost::posix_time::from_time_t(GetAdjustedTime() + 10);
+                    refundTimer.expires_at(refundTime, ec);
+                    //std::string rtimeStr = boost::posix_time::to_simple_string(refundTime);
+                    //LogPrintf("Contract will be refunded at %s\n", rtimeStr);
+                    refundTimer.async_wait([&] (const boost::system::error_code&) {
+                        localOrder.SetState(COrder::State::REFUNDING);
+                        LogPrintf("Swap contract lock time expired. Refunding %s\n", localOrder.ToString());
                     });
 
                 } else {
@@ -226,11 +230,11 @@ void ProcessMessageLuxgate(CNode *pfrom, const std::string &strCommand, CDataStr
                 LogPrintf("swccreated: Spending UTXO's: %s\n", txid);
                 // TODO Poll async for inputs with secret, spend UTXO's and remove from orderbook
                 // Detach from current thread
-                // Also start async timer for redeeming
+                // Also start async timer for refunding
 
                 RemoveOrder(orderbook, localOrder);
 
-                // TODO stom redeeming timer
+                // TODO stop refunding timer
 
             } else {
                 LogPrintf("swccreated: Bad tx %s\n", txid);
@@ -254,7 +258,7 @@ void ProcessMessageLuxgate(CNode *pfrom, const std::string &strCommand, CDataStr
 
                 RemoveOrder(orderbook, localOrder);
 
-                // TODO stop redeeming timer
+                // TODO stop refunding timer
             } else {
                 LogPrintf("swcack: Bad tx %s\n", txid);
             }
