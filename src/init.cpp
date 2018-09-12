@@ -398,9 +398,9 @@ std::string HelpMessage(HelpMessageMode mode)
 
 #ifdef ENABLE_WALLET
     strUsage += "\n" + _("Wallet options:") + "\n";
-    strUsage += "  -createwalletbackups=<n> " + strprintf(_("Use UPnP to map the listening port (default: %u)"), nWalletBackups) + "\n";
-    strUsage += "  -disablewallet           " + _("Specify full path to directory for automatic wallet backups (must exist)") + "\n";
-    strUsage += "  -walletbackupsdir=<dir>  " + _("Do not load the wallet and disable wallet RPC calls") + "\n";
+    strUsage += "  -disablewallet           " + _("Do not load the wallet and disable wallet RPC calls") + "\n";
+    strUsage += "  -createwalletbackups=<n> " + _("Number of automatic wallet backups (default: 10)") + "\n";
+    strUsage += "  -walletbackupsdir=<dir>  " + _("Specify full path to directory for automatic wallet backups (must exist)") + "\n";
     strUsage += "  -keypool=<n>             " + strprintf(_("Set key pool size to <n> (default: %u)"), 100) + "\n";
     if (GetBoolArg("-help-debug", false))
         strUsage += "  -mintxfee=<amt>          " + strprintf(_("Fees (in LUX/Kb) smaller than this are considered zero fee for transaction creation (default: %s)"), FormatMoney(CWallet::minTxFee.GetFeePerK())) + "\n";
