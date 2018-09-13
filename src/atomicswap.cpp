@@ -3,7 +3,7 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include <atomicswap.h>
-
+#include <base58.h>
 #include <coincontrol.h>
 #include <core_io.h>
 #include <crypto/sha256.h>
@@ -14,6 +14,7 @@
 #include <script/interpreter.h>
 #include <script/script.h>
 #include <script/sign.h>
+#include <timedata.h>
 #include <wallet.h>
 
 #define ATOMIC_SECRET_SIZE 32
@@ -97,6 +98,35 @@ CScript CreateAtomicSwapRedeemScript(CKeyID initiator, CKeyID redeemer, int64_t 
 }
 
 namespace LuxSwap {
+
+
+CKeyID DecodeAddress(const std::string luxaddress)
+{
+    CTxDestination dest = DecodeDestination(luxaddress);
+    return *boost::get<CKeyID>(&dest);
+}
+
+bool CreateSwapTx(const std::string redeemerLuxAddress, const CAmount amount, std::string &txid)
+{
+    CWalletTx redeemTx;
+    CScript redeemScript;
+    CAmount feeRequired;
+    dev::bytes secret;
+    dev::bytes secretHash;
+    std::string error;
+    if (CreateSwapTransaction(pwalletMain, 
+                              DecodeAddress(redeemerLuxAddress), 
+                              amount, 
+                              GetAdjustedTime() + 48 * 60 * 60, 
+                              redeemTx, redeemScript, feeRequired, secret, secretHash, error)) {
+        RelayTransaction(redeemTx);
+        txid = redeemTx.GetHash().ToString();
+        return true;
+    } else {
+        LogPrintf("Error while creating swap transaction: %s\n", error);
+        return false;
+    }
+}
 
 int EstimateRefundTxSerializeSize(const CScript &contractRedeemscript, std::vector <CTxOut> txOuts) {
     int outputsSerializeSize = 0;

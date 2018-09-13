@@ -10,6 +10,8 @@
 #include <util.h>
 #include <timedata.h>
 
+#include <atomicswap.h>
+
 typedef std::shared_ptr<COrder> OrderPtr;
 
 std::map<OrderId, std::shared_ptr<COrder>> orderbook;

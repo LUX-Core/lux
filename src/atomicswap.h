@@ -72,6 +72,15 @@ CScript CreateAtomicSwapRedeemScript(CKeyID initiator, CKeyID redeemer, int64_t 
 namespace LuxSwap {
 
 /**
+ * @brief Create swap tx
+ * @param redeemerLuxAddress address to put in tx
+ * @param amount Value of lux in tx 
+ * @param [out] txid String containing created tx hash 
+ * @return Is tx created successfully
+ */
+bool CreateSwapTx(const std::string redeemerLuxAddress, const CAmount amount, std::string &txid);
+
+/**
  * @brief Creates unlocking script for swap redemption and checks it's validity
  * @param pwallet Wallet to use for creating signature
  * @param redeemTx Transaction to sign
