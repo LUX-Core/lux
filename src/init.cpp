@@ -1047,7 +1047,7 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
     LogPrintf("Using LuxGate config file %s\n", GetLuxGateConfigFile().string());
     LogPrintf("Using at most %i connections (%i file descriptors available)\n", nMaxConnections, nFD);
     std::ostringstream strErrors;
-1
+
     // Read LuxGate config
     std::vector<BlockchainConfig> config = ReadLuxGateConfigFile();
     for (BlockchainConfig conf : config) {
