@@ -2180,7 +2180,7 @@ enum DisconnectResult
     DISCONNECT_FAILED   // Something else went wrong.
 };
 
-static int ApplyTxInUndo(const CTxInUndo& undo, CCoinsViewCache& view, const COutPoint& out) {
+static DisconnectResult ApplyTxInUndo(const CTxInUndo& undo, CCoinsViewCache& view, const COutPoint& out) {
     bool fClean = true;
 
     CCoinsModifier coins = view.ModifyCoins(out.hash);
@@ -2212,9 +2212,6 @@ static int ApplyTxInUndo(const CTxInUndo& undo, CCoinsViewCache& view, const COu
     return fClean ? DISCONNECT_OK : DISCONNECT_UNCLEAN;
 }
 
-bool UndoWriteToDisk(const CBlockUndo& blockundo, CDiskBlockPos& pos, const uint256& hashBlock);
-bool UndoReadFromDisk(CBlockUndo& blockundo, const CDiskBlockPos& pos, const uint256& hashBlock);
-
 static DisconnectResult DisconnectBlock(CBlock& block, CValidationState& state, CBlockIndex* pindex, CCoinsViewCache& view, bool* pfClean)
 {
     assert(pindex->GetBlockHash() == view.GetBestBlock());
@@ -2230,7 +2227,7 @@ static DisconnectResult DisconnectBlock(CBlock& block, CValidationState& state, 
         error("DisconnectBlock() : no undo data available");
         return DISCONNECT_FAILED;
     }
-    if (!UndoReadFromDisk(blockUndo, pos, pindex->pprev->GetBlockHash())) {
+    if (!blockUndo.ReadFromDisk(pos, pindex->pprev->GetBlockHash())) {
         error("DisconnectBlock() : failure reading undo data");
         return DISCONNECT_FAILED;
     }
@@ -2239,10 +2236,6 @@ static DisconnectResult DisconnectBlock(CBlock& block, CValidationState& state, 
         error("DisconnectBlock() : block and undo data inconsistent");
         return DISCONNECT_FAILED;
     }
-
-    std::vector<std::pair<CAddressIndexKey, CAmount> > addressIndex;
-    std::vector<std::pair<CAddressUnspentKey, CAddressUnspentValue> > addressUnspentIndex;
-    std::vector<std::pair<CSpentIndexKey, CSpentIndexValue> > spentIndex;
 
     std::vector<std::pair<CAddressIndexKey, CAmount> > addressIndex;
     std::vector<std::pair<CAddressUnspentKey, CAddressUnspentValue> > addressUnspentIndex;
@@ -2325,7 +2318,7 @@ static DisconnectResult DisconnectBlock(CBlock& block, CValidationState& state, 
                 LogPrintf("DisconnectBlock() : transaction and undo data inconsistent - txundo.vprevout.siz=%d tx.vin.siz=%d", txundo.vprevout.size(), tx.vin.size());
                 return DISCONNECT_FAILED;
             }
-            for (size_t j = tx.vin.size(); j-- > 0;) {
+            for (unsigned int j = tx.vin.size(); j-- > 0;) {
                 const COutPoint& out = tx.vin[j].prevout;
                 int res = ApplyTxInUndo(std::move(txundo.vprevout[j]), view, out);
                 if (res == DISCONNECT_FAILED)
@@ -5388,7 +5381,7 @@ bool CVerifyDB::VerifyDB(const CChainParams& chainparams, CCoinsView* coinsview,
             bool fClean = true;
             DisconnectResult res = DisconnectBlock(block, state, pindex, coins, &fClean);
             if (res == DISCONNECT_FAILED) {
-                return error("VerifyDB: *** irrecoverable inconsistency in block data at %d, hash=%s",
+                return error("VerifyDB() : *** irrecoverable inconsistency in block data at %d, hash=%s",
                              pindex->nHeight, pindex->GetBlockHash().ToString());
             }
             if (res == DISCONNECT_UNCLEAN) {
