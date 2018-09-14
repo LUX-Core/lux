@@ -633,34 +633,38 @@ UniValue setmocktime(const UniValue& params, bool fHelp)
     return NullUniValue;
 }
 
-static bool getAddressFromIndex(const uint16_t type, const uint160 &hash, std::string &address)
+bool getAddressFromIndex(const int &type, const uint160 &hash, std::string &address)
 {
-    switch (type) {
-        case 1: // keyhash
-            address = EncodeDestination(CKeyID(uint160(hash)));
-            break;
-        case 2: // segwit
-            address = EncodeDestination(CScriptID(uint160(hash)));
-            break;
-        case 4: // bech32
-            address = EncodeDestination(WitnessV0KeyHash(uint160(hash)));
-            break;
-        default:
-            return false;
+    if (type == 2) {
+        //address = CBitcoinAddress(CScriptID(hash)).ToString();
+        address = EncodeDestination(CScriptID(uint160(hash)));
+    } else if (type == 1) {
+        //address = CBitcoinAddress(CKeyID(hash)).ToString();
+        address = EncodeDestination(CKeyID(uint160(hash)));
+    } else {
+        return false;
     }
     return true;
 }
 
-static bool getAddressesFromParams(const UniValue& params, AddressTypeVector &addresses)
+bool getAddressesFromParams(const UniValue& params, std::vector<std::pair<uint160, int> > &addresses)
 {
     if (params[0].isStr()) {
-
-        CTxDestination dest = DecodeDestination(params[0].get_str());
-        uint160 hashBytes = GetHashForDestination(dest);
-        uint16_t hashType = dest.which();
-        if (hashType == 0)
+        CTxDestination address = DecodeDestination(params[0].get_str());
+        uint160 hashBytes;
+        int type = 0;
+        const CKeyID* keyID = boost::get<CKeyID>(&address);
+        const CScriptID* scriptID = boost::get<CScriptID>(&address);
+        if (keyID && IsValidDestination(*keyID)) {
+            type = 1;
+            hashBytes = *keyID;
+        } else if (scriptID && IsValidDestination(*scriptID)) {
+            type = 2;
+            hashBytes = *scriptID;
+        } else {
             throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid address");
-        addresses.push_back(std::make_pair(hashBytes, hashType));
+        }
+        addresses.push_back(std::make_pair(hashBytes, type));
 
     } else if (params[0].isObject()) {
 
@@ -670,13 +674,23 @@ static bool getAddressesFromParams(const UniValue& params, AddressTypeVector &ad
         }
 
         std::vector<UniValue> values = addressValues.getValues();
+
         for (std::vector<UniValue>::iterator it = values.begin(); it != values.end(); ++it) {
-            CTxDestination dest = DecodeDestination(it->get_str());
-            uint160 hashBytes = GetHashForDestination(dest);
-            uint16_t hashType = dest.which();
-            if (hashType == 0)
+            CTxDestination address = DecodeDestination(it->get_str());
+            uint160 hashBytes;
+            int type = 0;
+            const CKeyID* keyID = boost::get<CKeyID>(&address);
+            const CScriptID* scriptID = boost::get<CScriptID>(&address);
+            if (keyID && IsValidDestination(*keyID)) {
+                type = 1;
+                hashBytes = *keyID;
+            } else if (scriptID && IsValidDestination(*scriptID)) {
+                type = 2;
+                hashBytes = *scriptID;
+            } else {
                 throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid address");
-            addresses.push_back(std::make_pair(hashBytes, hashType));
+            }
+            addresses.push_back(std::make_pair(hashBytes, type));
         }
     } else {
         throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid address");
@@ -685,9 +699,13 @@ static bool getAddressesFromParams(const UniValue& params, AddressTypeVector &ad
     return true;
 }
 
+bool heightSort(std::pair<CAddressUnspentKey, CAddressUnspentValue> a,
+                std::pair<CAddressUnspentKey, CAddressUnspentValue> b) {
+    return a.second.blockHeight < b.second.blockHeight;
+}
 
-static bool timestampSort(std::pair<CMempoolAddressDeltaKey, CMempoolAddressDelta> a,
-                          std::pair<CMempoolAddressDeltaKey, CMempoolAddressDelta> b) {
+bool timestampSort(std::pair<CMempoolAddressDeltaKey, CMempoolAddressDelta> a,
+                   std::pair<CMempoolAddressDeltaKey, CMempoolAddressDelta> b) {
     return a.second.time < b.second.time;
 }
 
@@ -696,23 +714,26 @@ UniValue getaddressmempool(const UniValue& params, bool fHelp)
     if (fHelp || params.size() != 1)
         throw runtime_error(
             "getaddressmempool\n"
-            "\nReturns all mempool deltas for an address (-addressindex required).\n"
-            "\nArguments: {\n"
-            "  \"addresses: [\"\n"
-            "    \"address\"     (string) The base58 address\n"
-            "    ,...\n"
-            "  ]\n"
+            "\nReturns all mempool deltas for an address (requires addressindex to be enabled).\n"
+            "\nArguments:\n"
+            "{\n"
+            "  \"addresses\"\n"
+            "    [\n"
+            "      \"address\"  (string) The base58check encoded address\n"
+            "      ,...\n"
+            "    ]\n"
             "}\n"
-            "\nResult: [\n"
+            "\nResult:\n"
+            "[\n"
             "  {\n"
-            "    \"address\",   (string) The base58check encoded address\n"
-            "    \"txid\",      (string) The related transaction\n"
-            "    \"index\",     (number) The related input or output index\n"
-            "    \"satoshis\",  (number) The delta amount\n"
-            "    \"timestamp\", (number) The time the transaction entered the mempool (seconds)\n"
-            "    \"prevtx\",    (string) The previous tx hash (if spending)\n"
-            "    \"prevout\"    (string) The previous transaction output index (if spending)\n"
-            "  },...\n"
+            "    \"address\"  (string) The base58check encoded address\n"
+            "    \"txid\"  (string) The related txid\n"
+            "    \"index\"  (number) The related input or output index\n"
+            "    \"satoshis\"  (number) The difference of duffs\n"
+            "    \"timestamp\"  (number) The time the transaction entered the mempool (seconds)\n"
+            "    \"prevtxid\"  (string) The previous txid (if spending)\n"
+            "    \"prevout\"  (string) The previous transaction output index (if spending)\n"
+            "  }\n"
             "]\n"
             "\nExamples:\n"
             + HelpExampleCli("getaddressmempool", "\"LYmrT81UoxqfskSNt28ZKZ3XXskSFENEtg\"")
@@ -720,12 +741,14 @@ UniValue getaddressmempool(const UniValue& params, bool fHelp)
             + HelpExampleRpc("getaddressmempool", "{\"addresses\": [\"LYmrT81UoxqfskSNt28ZKZ3XXskSFENEtg\"]}")
         );
 
-    AddressTypeVector addresses;
+    std::vector<std::pair<uint160, int> > addresses;
+
     if (!getAddressesFromParams(params, addresses)) {
         throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid address");
     }
 
-    MempoolAddrDeltaVector indexes;
+    std::vector<std::pair<CMempoolAddressDeltaKey, CMempoolAddressDelta> > indexes;
+
     if (!mempool.getAddressIndex(addresses, indexes)) {
         throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "No information available for address");
     }
@@ -734,21 +757,22 @@ UniValue getaddressmempool(const UniValue& params, bool fHelp)
 
     UniValue result(UniValue::VARR);
 
-    for (MempoolAddrDeltaVector::iterator it = indexes.begin(); it != indexes.end(); it++) {
+    for (std::vector<std::pair<CMempoolAddressDeltaKey, CMempoolAddressDelta> >::iterator it = indexes.begin();
+         it != indexes.end(); it++) {
 
         std::string address;
-        if (!getAddressFromIndex(it->first.hashType, it->first.hashBytes, address)) {
+        if (!getAddressFromIndex(it->first.type, it->first.addressBytes, address)) {
             throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Unknown address type");
         }
 
         UniValue delta(UniValue::VOBJ);
         delta.push_back(Pair("address", address));
-        delta.push_back(Pair("txid", it->first.txHash.GetHex()));
-        delta.push_back(Pair("index", (int)it->first.indexInOut));
+        delta.push_back(Pair("txid", it->first.txhash.GetHex()));
+        delta.push_back(Pair("index", (int)it->first.index));
         delta.push_back(Pair("satoshis", it->second.amount));
         delta.push_back(Pair("timestamp", it->second.time));
         if (it->second.amount < 0) {
-            delta.push_back(Pair("prevtx", it->second.prevhash.GetHex()));
+            delta.push_back(Pair("prevtxid", it->second.prevhash.GetHex()));
             delta.push_back(Pair("prevout", (int)it->second.prevout));
         }
         result.push_back(delta);
@@ -757,33 +781,30 @@ UniValue getaddressmempool(const UniValue& params, bool fHelp)
     return result;
 }
 
-
-static bool heightSort(std::pair<CAddressUnspentKey, CAddressUnspentValue> a,
-                       std::pair<CAddressUnspentKey, CAddressUnspentValue> b) {
-    return a.second.blockHeight < b.second.blockHeight;
-}
-
 UniValue getaddressutxos(const UniValue& params, bool fHelp)
 {
     if (fHelp || params.size() != 1)
         throw runtime_error(
             "getaddressutxos\n"
-            "\nReturns all unspent outputs for an address (-addressindex required).\n"
-            "\nArguments: {\n"
-            "  \"addresses: [\"\n"
-            "    \"address\"  (string) The base58 address\n"
-            "    ,...\n"
-            "  ]\n"
+            "\nReturns all unspent outputs for an address (requires addressindex to be enabled).\n"
+            "\nArguments:\n"
+            "{\n"
+            "  \"addresses\"\n"
+            "    [\n"
+            "      \"address\"  (string) The base58check encoded address\n"
+            "      ,...\n"
+            "    ]\n"
             "}\n"
-            "\nResult: [\n"
+            "\nResult:\n"
+            "[\n"
             "  {\n"
-            "    \"address\",  (string) The base58 address\n"
-            "    \"txid\",     (string) The transaction id\n"
-            "    \"index\",    (number) The tx output index\n"
-          //"    \"script\",   (string) The script hex encoded\n"
-            "    \"satoshis\", (number) The amount of the output\n"
-            "    \"height\"    (number) The block height\n"
-            "  },...\n"
+            "    \"address\"  (string) The address base58check encoded\n"
+            "    \"txid\"  (string) The output txid\n"
+            "    \"outputIndex\"  (number) The output index\n"
+            "    \"script\"  (string) The script hex encoded\n"
+            "    \"satoshis\"  (number) The number of duffs of the output\n"
+            "    \"height\"  (number) The block height\n"
+            "  }\n"
             "]\n"
             "\nExamples:\n"
             + HelpExampleCli("getaddressutxos", "\"LYmrT81UoxqfskSNt28ZKZ3XXskSFENEtg\"")
@@ -791,14 +812,16 @@ UniValue getaddressutxos(const UniValue& params, bool fHelp)
             + HelpExampleRpc("getaddressutxos", "{\"addresses\": [\"LYmrT81UoxqfskSNt28ZKZ3XXskSFENEtg\"]}")
         );
 
-    AddressTypeVector addresses;
+    std::vector<std::pair<uint160, int> > addresses;
+
     if (!getAddressesFromParams(params, addresses)) {
         throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid address");
     }
 
-    AddressUnspentVector unspentOutputs;
-    for (AddressTypeVector::iterator it = addresses.begin(); it != addresses.end(); it++) {
-        if (!GetAddressUnspent(it->first, it->second, unspentOutputs)) {
+    std::vector<std::pair<CAddressUnspentKey, CAddressUnspentValue> > unspentOutputs;
+
+    for (std::vector<std::pair<uint160, int> >::iterator it = addresses.begin(); it != addresses.end(); it++) {
+        if (!GetAddressUnspent((*it).first, (*it).second, unspentOutputs)) {
             throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "No information available for address");
         }
     }
@@ -807,17 +830,17 @@ UniValue getaddressutxos(const UniValue& params, bool fHelp)
 
     UniValue result(UniValue::VARR);
 
-    for (AddressUnspentVector::const_iterator it=unspentOutputs.begin(); it!=unspentOutputs.end(); it++) {
+    for (std::vector<std::pair<CAddressUnspentKey, CAddressUnspentValue> >::const_iterator it=unspentOutputs.begin(); it!=unspentOutputs.end(); it++) {
         UniValue output(UniValue::VOBJ);
         std::string address;
-        if (!getAddressFromIndex(it->first.hashType, it->first.hashBytes, address)) {
+        if (!getAddressFromIndex(it->first.type, it->first.hashBytes, address)) {
             throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Unknown address type");
         }
 
         output.push_back(Pair("address", address));
-        output.push_back(Pair("txid", it->first.txHash.GetHex()));
-        output.push_back(Pair("index", (int)it->first.outputIndex));
-      //output.push_back(Pair("script", HexStr(it->second.script.begin(), it->second.script.end())));
+        output.push_back(Pair("txid", it->first.txhash.GetHex()));
+        output.push_back(Pair("outputIndex", (int)it->first.index));
+        output.push_back(Pair("script", HexStr(it->second.script.begin(), it->second.script.end())));
         output.push_back(Pair("satoshis", it->second.satoshis));
         output.push_back(Pair("height", it->second.blockHeight));
         result.push_back(output);
@@ -831,28 +854,30 @@ UniValue getaddressdeltas(const UniValue& params, bool fHelp)
     if (fHelp || params.size() < 1)
         throw runtime_error(
             "getaddressdeltas\n"
-            "\nReturns all changes for an address (-addressindex required).\n"
-            "\nArguments: {\n"
-            "  \"addresses: [\"\n"
-            "    \"address\" (string) The base58 encoded address\n"
-            "    ,...\n"
-            "  ],\n"
-            "  \"start\",    (number) The start block height (optional)\n"
-            "  \"end\"       (number) The end block height (optional)\n"
+            "\nReturns all changes for an address (requires addressindex to be enabled).\n"
+            "\nArguments:\n"
+            "{\n"
+            "  \"addresses\"\n"
+            "    [\n"
+            "      \"address\"  (string) The base58check encoded address\n"
+            "      ,...\n"
+            "    ],\n"
+            "  \"start\" (number) The start block height (optional)\n"
+            "  \"end\" (number) The end block height (optional)\n"
             "}\n"
-            "\nResult: [\n"
+            "\nResult:\n"
+            "[\n"
             "  {\n"
-            "    \"satoshis\",   (number) The operation amount\n"
-            "    \"height\",     (number) The block height\n"
-            "    \"blockindex\", (number) The tx block index\n"
-            "    \"txid\",       (string) The related transaction id\n"
-            "    \"index\",      (number) The related input or output index\n"
-            "    \"address\",    (string) The base58 encoded address\n"
-            "    \"flags\"       (number) The type of movement\n"
-            "  },...\n"
+            "    \"satoshis\"  (number) The difference of duffs\n"
+            "    \"txid\"  (string) The related txid\n"
+            "    \"index\"  (number) The related input or output index\n"
+            "    \"blockindex\"  (number) The related block index\n"
+            "    \"height\"  (number) The block height\n"
+            "    \"address\"  (string) The base58check encoded address\n"
+            "  }\n"
             "]\n"
             "\nExamples:\n"
-            + HelpExampleCli("getaddressdeltas", "\"LYmrT81UoxqfskSNt28ZKZ3XXskSFENEtg\" 0 10000")
+            + HelpExampleCli("getaddressdeltas", "\"LYmrT81UoxqfskSNt28ZKZ3XXskSFENEtg\"")
             + HelpExampleCli("getaddressdeltas", "'{\"addresses\": [\"LYmrT81UoxqfskSNt28ZKZ3XXskSFENEtg\"], \"start\": 0, \"end\": 35000}'")
             + HelpExampleRpc("getaddressdeltas", "{\"addresses\": [\"LYmrT81UoxqfskSNt28ZKZ3XXskSFENEtg\"], \"start\": 0, \"end\": 35000}")
         );
@@ -865,47 +890,48 @@ UniValue getaddressdeltas(const UniValue& params, bool fHelp)
             start = startValue.get_int();
             end = endValue.get_int();
         }
-    } else if (params.size() == 3) {
-        // debug console compat.
-        if (params[1].isNum() && params[2].isNum()) {
-            start = params[1].get_int();
-            end = params[2].get_int();
-        }
     }
 
-    if (end == 0)
+    if (start > 0 && end == 0)
         end = chainActive.Height();
     if (end < start)
         throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "End value is expected to be greater than start");
 
-    AddressTypeVector addresses;
+    std::vector<std::pair<uint160, int> > addresses;
+
     if (!getAddressesFromParams(params, addresses)) {
         throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid address");
     }
 
-    AddressIndexVector addressIndex;
-    for (AddressTypeVector::iterator it = addresses.begin(); it != addresses.end(); it++) {
-        if (!GetAddressIndex(it->first, it->second, addressIndex, start, end)) {
-            throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "No information available for address");
+    std::vector<std::pair<CAddressIndexKey, CAmount> > addressIndex;
+
+    for (std::vector<std::pair<uint160, int> >::iterator it = addresses.begin(); it != addresses.end(); it++) {
+        if (start >= 0 && end > 0) {
+            if (!GetAddressIndex((*it).first, (*it).second, addressIndex, start, end)) {
+                throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "No information available for address");
+            }
+        } else {
+            if (!GetAddressIndex((*it).first, (*it).second, addressIndex)) {
+                throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "No information available for address");
+            }
         }
     }
 
     UniValue result(UniValue::VARR);
 
-    for (AddressIndexVector::const_iterator it=addressIndex.begin(); it!=addressIndex.end(); it++) {
+    for (std::vector<std::pair<CAddressIndexKey, CAmount> >::const_iterator it=addressIndex.begin(); it!=addressIndex.end(); it++) {
         std::string address;
-        if (!getAddressFromIndex(it->first.hashType, it->first.hashBytes, address)) {
+        if (!getAddressFromIndex(it->first.type, it->first.hashBytes, address)) {
             throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Unknown address type");
         }
 
         UniValue delta(UniValue::VOBJ);
         delta.push_back(Pair("satoshis", it->second));
-        delta.push_back(Pair("height", it->first.blockHeight));
-        delta.push_back(Pair("blockindex", (int32_t)(it->first.blockIndex)));
         delta.push_back(Pair("txid", it->first.txhash.GetHex()));
-        delta.push_back(Pair("index", (int32_t)(it->first.indexInOut)));
+        delta.push_back(Pair("index", (int)it->first.index));
+        delta.push_back(Pair("blockindex", (int)it->first.txindex));
+        delta.push_back(Pair("height", it->first.blockHeight));
         delta.push_back(Pair("address", address));
-        delta.push_back(Pair("flags", (int32_t)(it->first.spentFlags)));
         result.push_back(delta);
     }
 
@@ -917,20 +943,19 @@ UniValue getaddressbalance(const UniValue& params, bool fHelp)
     if (fHelp || params.size() != 1)
         throw runtime_error(
             "getaddressbalance\n"
-            "\nReturns the balance for an address (-addressindex required).\n"
-            "\nArguments: {\n"
-            "  \"addresses\": [\n"
-            "     \"address\" (string) The base58 address to query\n"
-            "     ,...\n"
-            "  ]\n"
+            "\nReturns the balance for an address(es) (requires addressindex to be enabled).\n"
+            "\nArguments:\n"
+            "{\n"
+            "  \"addresses\"\n"
+            "    [\n"
+            "      \"address\"  (string) The base58check encoded address\n"
+            "      ,...\n"
+            "    ]\n"
             "}\n"
-            "\nResult: {\n"
-            "  \"balance\",  (number) The current balance (in LUX satoshis)\n"
-            "  \"received\", (number) The total amount received (all outputs, including stake)\n"
-            "  \"spent\",    (number) The total amount spent (excluding stakes)\n"
-            "  \"sent\",     (number) The total amount sent (excl. stakes and amounts sent to same addr.)\n"
-            "  \"staked\",   (number) The total amount of Proof of Stake incomes\n"
-            "  \"deltas\"    (number) The total amount of movements indexed\n"
+            "\nResult:\n"
+            "{\n"
+            "  \"balance\"  (string) The current balance in duffs\n"
+            "  \"received\"  (string) The total number of duffs received (including change)\n"
             "}\n"
             "\nExamples:\n"
             + HelpExampleCli("getaddressbalance", "\"LYmrT81UoxqfskSNt28ZKZ3XXskSFENEtg\"")
@@ -938,14 +963,15 @@ UniValue getaddressbalance(const UniValue& params, bool fHelp)
             + HelpExampleRpc("getaddressbalance", "{\"addresses\": [\"LYmrT81UoxqfskSNt28ZKZ3XXskSFENEtg\"]}")
         );
 
-    AddressTypeVector addresses;
+    std::vector<std::pair<uint160, int> > addresses;
+
     if (!getAddressesFromParams(params, addresses)) {
         throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid address");
     }
 
-    AddressIndexVector addressIndex;
+    std::vector<std::pair<CAddressIndexKey, CAmount> > addressIndex;
 
-    for (AddressTypeVector::iterator it = addresses.begin(); it != addresses.end(); it++) {
+    for (std::vector<std::pair<uint160, int> >::iterator it = addresses.begin(); it != addresses.end(); it++) {
         if (!GetAddressIndex((*it).first, (*it).second, addressIndex)) {
             throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "No information available for address");
         }
@@ -953,73 +979,51 @@ UniValue getaddressbalance(const UniValue& params, bool fHelp)
 
     CAmount balance = 0;
     CAmount received = 0;
-    CAmount spent = 0, sent = 0;
-    CAmount staked = 0;
-    uint256 lastStakeHash = uint256(-1);
-    uint256 lastSpentHash = uint256(-1);
 
-    for (AddressIndexVector::const_iterator it=addressIndex.begin(); it!=addressIndex.end(); it++)
-    {
-        balance += it->second;
-
+    for (std::vector<std::pair<CAddressIndexKey, CAmount> >::const_iterator it=addressIndex.begin(); it!=addressIndex.end(); it++) {
         if (it->second > 0) {
-            // outputs
             received += it->second;
-            if (it->first.txhash == lastStakeHash) {
-                staked += it->second;
-            } else if (it->first.txhash == lastSpentHash) {
-                // sent to same address
-                sent += it->second;
-            }
-        } else {
-            // inputs
-            if (it->first.spentFlags & ANDX_IS_STAKE) {
-                staked += it->second;
-                lastStakeHash = it->first.txhash;
-            } else {
-                sent += it->second;
-                spent += it->second;
-                lastSpentHash = it->first.txhash;
-            }
         }
+        balance += it->second;
     }
 
     UniValue result(UniValue::VOBJ);
     result.push_back(Pair("balance", balance));
     result.push_back(Pair("received", received));
-    result.push_back(Pair("sent", (0 - sent)));
-    result.push_back(Pair("spent", (0 - spent)));
-    result.push_back(Pair("staked", staked));
-    result.push_back(Pair("deltas", (int64_t)addressIndex.size()));
 
     return result;
+
 }
 
 UniValue getaddresstxids(const UniValue& params, bool fHelp)
 {
-    if (fHelp || params.size() < 1)
+    if (fHelp || params.size() != 1)
         throw runtime_error(
             "getaddresstxids\n"
-            "\nReturns the txids for an address(es) (-addressindex required).\n"
-            "\nArguments: {\n"
-            " \"addresses\": [\n"
-            "   \"address\" (string) The base58 encoded address\n"
-            "   ,...\n"
-            "  ],\n"
-            "  \"start\", (number) The start block height (optional)\n"
-            "  \"end\"    (number) The end block height (optional)\n"
+            "\nReturns the txids for an address(es) (requires addressindex to be enabled).\n"
+            "\nArguments:\n"
+            "{\n"
+            "  \"addresses\"\n"
+            "    [\n"
+            "      \"address\"  (string) The base58check encoded address\n"
+            "      ,...\n"
+            "    ]\n"
+            "  \"start\" (number) The start block height\n"
+            "  \"end\" (number) The end block height\n"
             "}\n"
-            "\nResult: [\n"
-            "  \"txid\"   (string) The transaction hash\n"
+            "\nResult:\n"
+            "[\n"
+            "  \"transactionid\"  (string) The transaction id\n"
             "  ,...\n"
             "]\n"
             "\nExamples:\n"
-            + HelpExampleCli("getaddresstxids", "\"LYmrT81UoxqfskSNt28ZKZ3XXskSFENEtg\" 0 100000")
+            + HelpExampleCli("getaddresstxids", "\"LYmrT81UoxqfskSNt28ZKZ3XXskSFENEtg\"")
             + HelpExampleCli("getaddresstxids", "'{\"addresses\": [\"LYmrT81UoxqfskSNt28ZKZ3XXskSFENEtg\"]}'")
             + HelpExampleRpc("getaddresstxids", "{\"addresses\": [\"LYmrT81UoxqfskSNt28ZKZ3XXskSFENEtg\"]}")
         );
 
-    AddressTypeVector addresses;
+    std::vector<std::pair<uint160, int> > addresses;
+
     if (!getAddressesFromParams(params, addresses)) {
         throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid address");
     }
@@ -1033,98 +1037,81 @@ UniValue getaddresstxids(const UniValue& params, bool fHelp)
             start = startValue.get_int();
             end = endValue.get_int();
         }
-    } else if (params.size() == 3) {
-        // debug console compat.
-        if (params[1].isNum() && params[2].isNum()) {
-            start = params[1].get_int();
-            end = params[2].get_int();
+    }
+
+    std::vector<std::pair<CAddressIndexKey, CAmount> > addressIndex;
+
+    for (std::vector<std::pair<uint160, int> >::iterator it = addresses.begin(); it != addresses.end(); it++) {
+        if (start > 0 && end > 0) {
+            if (!GetAddressIndex((*it).first, (*it).second, addressIndex, start, end)) {
+                throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "No information available for address");
+            }
+        } else {
+            if (!GetAddressIndex((*it).first, (*it).second, addressIndex)) {
+                throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "No information available for address");
+            }
         }
     }
 
-    if (end == 0)
-        end = chainActive.Height();
-    if (end < start)
-        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "End value is expected to be greater than start");
-
-    AddressIndexVector addressIndex;
-    for (AddressTypeVector::iterator it = addresses.begin(); it != addresses.end(); it++) {
-        if (!GetAddressIndex(it->first, it->second, addressIndex, start, end)) {
-            throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "No information available for address");
-        }
-    }
-
-    std::set<std::pair<int, std::string> > txhashes;
+    std::set<std::pair<int, std::string> > txids;
     UniValue result(UniValue::VARR);
 
-    for (AddressIndexVector::const_iterator it=addressIndex.begin(); it!=addressIndex.end(); it++) {
+    for (std::vector<std::pair<CAddressIndexKey, CAmount> >::const_iterator it=addressIndex.begin(); it!=addressIndex.end(); it++) {
         int height = it->first.blockHeight;
-        std::string txhash = it->first.txhash.GetHex();
+        std::string txid = it->first.txhash.GetHex();
 
         if (addresses.size() > 1) {
-            txhashes.insert(std::make_pair(height, txhash));
+            txids.insert(std::make_pair(height, txid));
         } else {
-            if (txhashes.insert(std::make_pair(height, txhash)).second) {
-                result.push_back(txhash);
+            if (txids.insert(std::make_pair(height, txid)).second) {
+                result.push_back(txid);
             }
         }
     }
 
     if (addresses.size() > 1) {
-        for (std::set<std::pair<int, std::string> >::const_iterator it=txhashes.begin(); it!=txhashes.end(); it++) {
+        for (std::set<std::pair<int, std::string> >::const_iterator it=txids.begin(); it!=txids.end(); it++) {
             result.push_back(it->second);
         }
     }
 
     return result;
+
 }
 
 UniValue getspentinfo(const UniValue& params, bool fHelp)
 {
-    if (fHelp || params.size() < 1) {
+    if (fHelp || params.size() != 1 || !params[0].isObject())
         throw runtime_error(
             "getspentinfo\n"
-            "\nReturns the transaction where an output is spent. (-spentindex required)\n"
-            "\nArguments: {\n"
-            "  \"txid\": \"...\",   (string) The hash of the transaction\n"
-            "  \"index\": 1       (number) The transaction output index to check\n"
+            "\nReturns the txid and index where an output is spent.\n"
+            "\nArguments:\n"
+            "{\n"
+            "  \"txid\" (string) The hex string of the txid\n"
+            "  \"index\" (number) The start block height\n"
             "}\n"
-            "\nResult: {\n"
-            "  \"txid\",   (string) The spent transaction hash\n"
-            "  \"index\",  (number) The transaction input index\n"
-            "  \"height\"  (number) The block height\n"
+            "\nResult:\n"
+            "{\n"
+            "  \"txid\"  (string) The transaction id\n"
+            "  \"index\"  (number) The spending input index\n"
+            "  ,...\n"
             "}\n"
             "\nExamples:\n"
-            + HelpExampleCli("getspentinfo", "\"9e941e62e07c41e78dad34deab979fb49b4ef9f9c11113f0758b504f313d40a2\" 2")
-            + HelpExampleCli("getspentinfo",
-                "'{\"txhash\": \"9e941e62e07c41e78dad34deab979fb49b4ef9f9c11113f0758b504f313d40a2\", \"index\": 2}'")
-            + HelpExampleRpc("getspentinfo",
-                "{\"txhash\": \"9e941e62e07c41e78dad34deab979fb49b4ef9f9c11113f0758b504f313d40a2\", \"index\": 2}")
+            + HelpExampleCli("getspentinfo", "'{\"txid\": \"0437cd7f8525ceed2324359c2d0ba26006d92d856a9c20fa0241106ee5a597c9\", \"index\": 0}'")
+            + HelpExampleRpc("getspentinfo", "{\"txid\": \"0437cd7f8525ceed2324359c2d0ba26006d92d856a9c20fa0241106ee5a597c9\", \"index\": 0}")
         );
+
+    UniValue txidValue = find_value(params[0].get_obj(), "txid");
+    UniValue indexValue = find_value(params[0].get_obj(), "index");
+
+    if (!txidValue.isStr() || !indexValue.isNum()) {
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid txid or index");
     }
 
-    uint256 txhash;
-    int outputIndex = 0;
-    if (params[0].isObject()) {
-        // json rpc
-        UniValue txhValue = find_value(params[0].get_obj(), "txid");
-        UniValue indexValue = find_value(params[0].get_obj(), "index");
-        if (!txhValue.isStr())
-            throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid tx");
-        txhash = ParseHashV(txhValue, "txid");
-        outputIndex = indexValue.isNum() ? indexValue.get_int() : 0;
-    } else {
-        // debug console compatible
-        UniValue txhValue = params[0];
-        if (!txhValue.isStr())
-            throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid tx");
-        txhash = ParseHashV(txhValue, "txid");
-        if (params.size() > 1) {
-            UniValue indexValue = params[1];
-            outputIndex = indexValue.isNum() ? indexValue.get_int() : 0;
-        }
-    }
+    uint256 txid = ParseHashV(txidValue, "txid");
+    int outputIndex = indexValue.get_int();
 
-    CSpentIndexKey key(txhash, outputIndex);
+    CSpentIndexKey key(txid, outputIndex);
     CSpentIndexValue value;
 
     if (!GetSpentIndex(key, value)) {
@@ -1132,74 +1119,9 @@ UniValue getspentinfo(const UniValue& params, bool fHelp)
     }
 
     UniValue obj(UniValue::VOBJ);
-    obj.push_back(Pair("txid", value.txhash.GetHex()));
+    obj.push_back(Pair("txid", value.txid.GetHex()));
     obj.push_back(Pair("index", (int)value.inputIndex));
     obj.push_back(Pair("height", value.blockHeight));
-
-    return obj;
-}
-
-UniValue purgetxindex(const UniValue& params, bool fHelp)
-{
-    if (fHelp || params.size() < 1) {
-        throw runtime_error(
-            "purgetxindex\n"
-            "\nPurges an orphaned tx from the disk indexes.\n"
-            "\nArgument:\n"
-            "  \"txid\": \"...\" (string) The id of the transaction\n"
-            "\nResult: {\n"
-            "  \"txindex\": n, (number) The number of records purged from txindex\n"
-            "  \"address\": n, (number) The number of records purged from addressindex\n"
-            "  \"unspent\": n  (number) The number of records purged from unspentindex\n"
-            "}\n"
-            "\nExamples:\n"
-            + HelpExampleCli("purgetxindex", "\"6108f40537ae12df35d5c59b23de27f713efb11ff13b97607cde99d3a12257ce\"")
-        );
-    }
-    uint256 txid;
-    UniValue hex;
-    if (params[0].isObject()) {
-        hex = find_value(params[0].get_obj(), "txid");
-    } else {
-        hex = params[0];
-    }
-    if (!hex.isStr())
-        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid txid");
-    txid = ParseHashV(hex, "txid");
-
-    CTransaction tx;
-    uint256 hashBlock = uint256();
-    if (GetTransaction(txid, tx, Params().GetConsensus(), hashBlock, true)) {
-        if (hashBlock != uint256()) {
-            CBlockIndex* pindex = LookupBlockIndex(hashBlock);
-            if (pindex && chainActive.Contains(pindex))
-                throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "This tx is not orphaned!");
-        }
-    }
-
-    int txs=0, addr=0, unspent=0;
-    if (fTxIndex) {
-        if (pblocktree->EraseTxIndex(txid)) txs++;
-    }
-    if (fAddressIndex) {
-        AddressIndexVector addressIndex;
-        if (pblocktree->FindTxEntriesInAddressIndex(txid, addressIndex)) {
-            addr = (int) addressIndex.size();
-            LogPrintf("addressindex: %zu records found for tx %s, deleting...\n", addressIndex.size(), txid.GetHex());
-            pblocktree->EraseAddressIndex(addressIndex);
-        }
-        AddressUnspentVector addressUnspent;
-        if (pblocktree->FindTxEntriesInUnspentIndex(txid, addressUnspent)) {
-            unspent += (int) addressUnspent.size();
-            LogPrintf("addressindex: %zu unspent keys found for tx %s, deleting...\n", addressUnspent.size(), txid.GetHex());
-            pblocktree->EraseAddressUnspentIndex(addressUnspent);
-        }
-    }
-
-    UniValue obj(UniValue::VOBJ);
-    obj.push_back(Pair("txindex", txs));
-    obj.push_back(Pair("address", addr));
-    obj.push_back(Pair("unspent", unspent));
 
     return obj;
 }

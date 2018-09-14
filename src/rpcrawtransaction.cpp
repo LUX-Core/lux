@@ -87,12 +87,10 @@ void TxToJSON(const CTransaction& tx, const uint256 hashBlock, UniValue& entry)
         if (GetSpentIndex(spentKey, spentInfo)) {
            in.push_back(Pair("value", ValueFromAmount(spentInfo.satoshis)));
            in.push_back(Pair("valueSat", spentInfo.satoshis));
-           if (spentInfo.hashType == 1) {
-               in.push_back(Pair("address", EncodeDestination(CKeyID(spentInfo.hashBytes))));
-           } else if (spentInfo.hashType == 2) {
-               in.push_back(Pair("address", EncodeDestination(CScriptID(spentInfo.hashBytes))));
-           } else if (spentInfo.hashType == 4) {
-               in.push_back(Pair("address", EncodeDestination(WitnessV0KeyHash(spentInfo.hashBytes))));
+           if (spentInfo.addressType == 1) {
+               in.push_back(Pair("address", EncodeDestination(CKeyID(spentInfo.addressHash))));
+           } else if (spentInfo.addressType == 2)  {
+               in.push_back(Pair("address", EncodeDestination(CScriptID(spentInfo.addressHash))));
            }
         }
         if (!tx.wit.IsNull()) {
@@ -120,11 +118,11 @@ void TxToJSON(const CTransaction& tx, const uint256 hashBlock, UniValue& entry)
         ScriptPubKeyToJSON(txout.scriptPubKey, o, true);
         out.push_back(Pair("scriptPubKey", o));
         vout.push_back(out);
-        // Add spent information if spentindex is enabled (DASH style)
+        // Add spent information if spentindex is enabled
         CSpentIndexValue spentInfo;
         CSpentIndexKey spentKey(txid, i);
         if (GetSpentIndex(spentKey, spentInfo)) {
-            out.push_back(Pair("spentTxId", spentInfo.txhash.GetHex()));
+            out.push_back(Pair("spentTxId", spentInfo.txid.GetHex()));
             out.push_back(Pair("spentIndex", (int)spentInfo.inputIndex));
             out.push_back(Pair("spentHeight", spentInfo.blockHeight));
         }

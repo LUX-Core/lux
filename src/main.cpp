@@ -1313,24 +1313,26 @@ bool GetSpentIndex(CSpentIndexKey &key, CSpentIndexValue &value)
     return true;
 }
 
-bool GetAddressIndex(uint160 addrHash, uint16_t addrType, AddressIndexVector &addressIndex, int start, int end)
+bool GetAddressIndex(uint160 addressHash, int type,
+                     std::vector<std::pair<CAddressIndexKey, CAmount> > &addressIndex, int start, int end)
 {
     if (!fAddressIndex)
-        return error("-addressindex not enabled");
+        return error("address index not enabled");
 
-    if (!pblocktree->ReadAddressIndex(addrHash, addrType, addressIndex, start, end))
-        return error("unable to get txs for address");
+    if (!pblocktree->ReadAddressIndex(addressHash, type, addressIndex, start, end))
+        return error("unable to get txids for address");
 
     return true;
 }
 
-bool GetAddressUnspent(uint160 addrHash, uint16_t addrType, AddressUnspentVector &unspentOutputs)
+bool GetAddressUnspent(uint160 addressHash, int type,
+                       std::vector<std::pair<CAddressUnspentKey, CAddressUnspentValue> > &unspentOutputs)
 {
     if (!fAddressIndex)
-        return error("-addressindex not enabled");
+        return error("address index not enabled");
 
-    if (!pblocktree->ReadAddressUnspentIndex(addrHash, addrType, unspentOutputs))
-        return error("unable to get utxos for address");
+    if (!pblocktree->ReadAddressUnspentIndex(addressHash, type, unspentOutputs))
+        return error("unable to get txids for address");
 
     return true;
 }
@@ -2178,7 +2180,7 @@ enum DisconnectResult
     DISCONNECT_FAILED   // Something else went wrong.
 };
 
-static DisconnectResult ApplyTxInUndo(const CTxInUndo& undo, CCoinsViewCache& view, const COutPoint& out) {
+static int ApplyTxInUndo(const CTxInUndo& undo, CCoinsViewCache& view, const COutPoint& out) {
     bool fClean = true;
 
     CCoinsModifier coins = view.ModifyCoins(out.hash);
@@ -2242,6 +2244,10 @@ static DisconnectResult DisconnectBlock(CBlock& block, CValidationState& state, 
     std::vector<std::pair<CAddressUnspentKey, CAddressUnspentValue> > addressUnspentIndex;
     std::vector<std::pair<CSpentIndexKey, CSpentIndexValue> > spentIndex;
 
+    std::vector<std::pair<CAddressIndexKey, CAmount> > addressIndex;
+    std::vector<std::pair<CAddressUnspentKey, CAddressUnspentValue> > addressUnspentIndex;
+    std::vector<std::pair<CSpentIndexKey, CSpentIndexValue> > spentIndex;
+
     // undo transactions in reverse order
     for (int i = block.vtx.size() - 1; i >= 0; i--) {
         const CTransaction& tx = block.vtx[i];
@@ -2270,25 +2276,39 @@ static DisconnectResult DisconnectBlock(CBlock& block, CValidationState& state, 
 
         if (fAddressIndex)
         {
-            for (size_t k = tx.vout.size(); k-- > 0;)
+            for (unsigned int k = tx.vout.size(); k-- > 0;)
             {
                 CTxDestination dest; uint160 hashDest;
                 txnouttype txType = TX_NONSTANDARD;
-                uint16_t addressType = 0;
+                unsigned int addressType = 0;
                 const CTxOut &out = tx.vout[k];
-                if (out.nValue && ExtractDestination(out.scriptPubKey, dest, &txType)) {
+                if (ExtractDestination(out.scriptPubKey, dest, &txType)) {
                     addressType = dest.which();
                     hashDest = GetHashForDestination(dest);
+                }
+
+                if (txType == TX_PUBKEYHASH || out.scriptPubKey.IsPayToPubkeyHash()) {
+                    std::vector<unsigned char> hashBytes(out.scriptPubKey.begin()+3, out.scriptPubKey.begin()+23);
+                    hashDest = uint160(hashBytes);
+                } else if (txType == TX_SCRIPTHASH || out.scriptPubKey.IsPayToScriptHash()) {
+                    std::vector<unsigned char> hashBytes(out.scriptPubKey.begin()+2, out.scriptPubKey.begin()+22);
+                    hashDest = uint160(hashBytes);
+                } else if (txType == TX_PUBKEY || out.scriptPubKey.IsPayToPubkey()) {
+                    hashDest = Hash160(out.scriptPubKey.begin()+1, out.scriptPubKey.end()-1);
+                } else if (txType == TX_WITNESS_V0_KEYHASH || out.scriptPubKey.IsPayToWitnessPubkeyHash()) {
+                    std::vector<unsigned char> hashBytes(out.scriptPubKey.begin()+2, out.scriptPubKey.end());
+                    hashDest = uint160(hashBytes);
+                } else if (txType == TX_WITNESS_V0_SCRIPTHASH || out.scriptPubKey.IsPayToWitnessScriptHash()) {
+                    std::vector<unsigned char> hashBytes(out.scriptPubKey.begin()+2, out.scriptPubKey.end());
+                    hashDest = Hash160(hashBytes);
                 } else {
                     continue;
                 }
 
-                // undo receive, decrement balance
-                uint8_t spentFlags = 0;
-                if (tx.IsCoinStake()) spentFlags |= ANDX_IS_STAKE;
+                // undo receiving activity
                 addressIndex.push_back(std::make_pair(
-                    CAddressIndexKey(addressType, hashDest, pindex->nHeight, i, hash, k, spentFlags),
-                    out.nValue // unused to delete
+                    CAddressIndexKey(addressType, hashDest, pindex->nHeight, i, hash, k, false),
+                    out.nValue
                 ));
                 // undo unspent index
                 addressUnspentIndex.push_back(std::make_pair(
@@ -2337,20 +2357,34 @@ static DisconnectResult DisconnectBlock(CBlock& block, CValidationState& state, 
 #endif
                     CTxDestination dest; uint160 hashDest;
                     txnouttype txType = TX_NONSTANDARD;
-                    uint16_t addressType = 0;
-                    if (prevout.nValue && ExtractDestination(prevout.scriptPubKey, dest, &txType)) {
+                    unsigned int addressType = 0;
+                    if (ExtractDestination(prevout.scriptPubKey, dest, &txType)) {
                         addressType = dest.which();
                         hashDest = GetHashForDestination(dest);
+                    }
+
+                    if (txType == TX_PUBKEYHASH || prevout.scriptPubKey.IsPayToPubkeyHash()) {
+                        std::vector<unsigned char> hashBytes(prevout.scriptPubKey.begin()+3, prevout.scriptPubKey.begin()+23);
+                        hashDest = uint160(hashBytes);
+                    } else if (txType == TX_SCRIPTHASH || prevout.scriptPubKey.IsPayToScriptHash()) {
+                        std::vector<unsigned char> hashBytes(prevout.scriptPubKey.begin()+2, prevout.scriptPubKey.begin()+22);
+                        hashDest = uint160(hashBytes);
+                    } else if (txType == TX_PUBKEY || prevout.scriptPubKey.IsPayToPubkey()) {
+                        hashDest = Hash160(prevout.scriptPubKey.begin()+1, prevout.scriptPubKey.end()-1);
+                    } else if (txType == TX_WITNESS_V0_KEYHASH || prevout.scriptPubKey.IsPayToWitnessPubkeyHash()) {
+                        std::vector<unsigned char> hashBytes(prevout.scriptPubKey.begin()+2, prevout.scriptPubKey.end());
+                        hashDest = uint160(hashBytes);
+                    } else if (txType == TX_WITNESS_V0_SCRIPTHASH || prevout.scriptPubKey.IsPayToWitnessScriptHash()) {
+                        std::vector<unsigned char> hashBytes(prevout.scriptPubKey.begin()+2, prevout.scriptPubKey.end());
+                        hashDest = Hash160(hashBytes);
                     } else {
                         continue;
                     }
 
-                    // undo spending activity, increment balance
-                    uint8_t spentFlags = ANDX_IS_SPENT;
-                    if (tx.IsCoinStake()) spentFlags |= ANDX_IS_STAKE;
+                    // undo spending activity
                     addressIndex.push_back(std::make_pair(
-                        CAddressIndexKey(addressType, hashDest, pindex->nHeight, i, hash, j, spentFlags),
-                        prevout.nValue
+                        CAddressIndexKey(addressType, hashDest, pindex->nHeight, i, hash, j, true),
+                        prevout.nValue * -1
                     ));
                     // restore unspent index
                     addressUnspentIndex.push_back(std::make_pair(
@@ -2371,15 +2405,6 @@ static DisconnectResult DisconnectBlock(CBlock& block, CValidationState& state, 
         setGlobalStateUTXO(uintToh256(pindex->pprev->hashUTXORoot));
     }
 
-    if (fClean == false && fLogEvents) {
-        pstorageresult->deleteResults(block.vtx);
-        pblocktree->EraseHeightIndex(pindex->nHeight);
-    }
-
-    if (pfClean) {
-        *pfClean = fClean;
-        return true;
-    }
     if (fClean == false && fLogEvents) {
         pstorageresult->deleteResults(block.vtx);
         pblocktree->EraseHeightIndex(pindex->nHeight);
@@ -2691,22 +2716,35 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
 #endif
                     CTxDestination dest; uint160 hashDest;
                     txnouttype txType = TX_NONSTANDARD;
-                    uint16_t addressType = 0;
-
+                    unsigned int addressType = 0;
                     if (ExtractDestination(out.scriptPubKey, dest, &txType)) {
                         addressType = dest.which();
                         hashDest = GetHashForDestination(dest);
+                    }
+
+                    if (txType == TX_PUBKEYHASH || out.scriptPubKey.IsPayToPubkeyHash()) {
+                        hashDest = uint160(std::vector<unsigned char>(out.scriptPubKey.begin()+3, out.scriptPubKey.begin()+23));
+                        addressType = 1;
+                    } else if (txType == TX_SCRIPTHASH || out.scriptPubKey.IsPayToScriptHash()) {
+                        hashDest = uint160(std::vector<unsigned char>(out.scriptPubKey.begin()+2, out.scriptPubKey.begin()+22));
+                        addressType = 2;
+                    } else if (txType == TX_PUBKEY || out.scriptPubKey.IsPayToPubkey()) {
+                        hashDest = Hash160(out.scriptPubKey.begin()+1, out.scriptPubKey.end()-1);
+                        addressType = 1;
+                    } else if (txType == TX_WITNESS_V0_KEYHASH || out.scriptPubKey.IsPayToWitnessPubkeyHash()) {
+                        std::vector<unsigned char> hashBytes(out.scriptPubKey.begin()+2, out.scriptPubKey.end());
+                        hashDest = uint160(hashBytes);
+                    } else if (txType == TX_WITNESS_V0_SCRIPTHASH || out.scriptPubKey.IsPayToWitnessScriptHash()) {
+                        std::vector<unsigned char> hashBytes(out.scriptPubKey.begin()+2, out.scriptPubKey.end());
+                        hashDest = Hash160(hashBytes);
                     } else {
-                        LogPrintf("%s(ndx:in %d) error %s tx %s\n", __func__, j, out.ToString(), txhash.GetHex());
-                        continue;
+                        hashDest.SetNull();
                     }
 
                     if (fAddressIndex && addressType > 0) {
-                        uint8_t spentFlags = ANDX_IS_SPENT;
-                        if (tx.IsCoinStake()) spentFlags |= ANDX_IS_STAKE;
                         // record spending activity
                         addressIndex.push_back(std::make_pair(
-                            CAddressIndexKey(addressType, hashDest, pindex->nHeight, i, txhash, j, spentFlags),
+                            CAddressIndexKey(addressType, hashDest, pindex->nHeight, i, txhash, j, true),
                             out.nValue * -1
                         ));
                         // remove address from unspent index
@@ -2753,44 +2791,37 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
 
 
         if (fAddressIndex) { // OUTPUTS
-            for (size_t k = 0; k < tx.vout.size(); k++) {
+            for (unsigned int k = 0; k < tx.vout.size(); k++) {
                 const CTxOut &out = tx.vout[k];
-                if (out.nValue == 0) continue; // PoS first tx
                 CTxDestination dest; uint160 hashDest;
                 txnouttype txType = TX_NONSTANDARD;
-                uint16_t addressType = 0;
-
+                unsigned int addressType = 0;
                 if (ExtractDestination(out.scriptPubKey, dest, &txType)) {
                     addressType = dest.which();
                     hashDest = GetHashForDestination(dest);
+                }
+
+                if (txType == TX_PUBKEYHASH || out.scriptPubKey.IsPayToPubkeyHash()) {
+                    std::vector<unsigned char> hashBytes(out.scriptPubKey.begin()+3, out.scriptPubKey.begin()+23);
+                    hashDest = uint160(hashBytes);
+                } else if (txType == TX_SCRIPTHASH || out.scriptPubKey.IsPayToScriptHash()) {
+                    std::vector<unsigned char> hashBytes(out.scriptPubKey.begin()+2, out.scriptPubKey.begin()+22);
+                    hashDest = uint160(hashBytes);
+                } else if (txType == TX_PUBKEY || out.scriptPubKey.IsPayToPubkey()) {
+                    hashDest = Hash160(out.scriptPubKey.begin()+1, out.scriptPubKey.end()-1);
+                } else if (txType == TX_WITNESS_V0_KEYHASH || out.scriptPubKey.IsPayToWitnessPubkeyHash()) {
+                    std::vector<unsigned char> hashBytes(out.scriptPubKey.begin()+2, out.scriptPubKey.end());
+                    hashDest = uint160(hashBytes);
+                } else if (txType == TX_WITNESS_V0_SCRIPTHASH || out.scriptPubKey.IsPayToWitnessScriptHash()) {
+                    std::vector<unsigned char> hashBytes(out.scriptPubKey.begin()+2, out.scriptPubKey.end());
+                    hashDest = Hash160(hashBytes);
                 } else {
-                    // outputs like OP_RETURN custom data, some LUX v3 vouts had 1 satoshi in nValue
-                    //LogPrintf("%s(ndx:out %d) error %s tx %s\n", __func__, k, out.ToString(), txhash.GetHex());
                     continue;
                 }
 
-                // record receive
-                uint8_t spentFlags = 0;
-                if (tx.IsCoinStake()) spentFlags |= ANDX_IS_STAKE;
-
-                size_t ndxKeys = addressIndex.size();
-                if (tx.vout.size() == 1 && ndxKeys > 0) {
-                    // if sent to same address, utxo split to do...
-                    // TODO: may need a function to compute tx "full delta" at 0 or txfee cost
-                    CAddressIndexKey* lastIn = &(addressIndex.back().first);
-                    if (lastIn->hashBytes == hashDest) {
-                        size_t key = 2; // flag all inputs with same address
-                        while (lastIn->hashBytes == hashDest && lastIn->txhash == txhash && key < ndxKeys) {
-                            lastIn->spentFlags |= ANDX_TO_SAME;
-                            lastIn = &(addressIndex.at(ndxKeys-key).first);
-                            key++;
-                        }
-                        spentFlags |= ANDX_TO_SAME;
-                    }
-                }
-
+                // record receiving activity
                 addressIndex.push_back(std::make_pair(
-                    CAddressIndexKey(addressType, hashDest, pindex->nHeight, i, txhash, k, spentFlags),
+                    CAddressIndexKey(addressType, hashDest, pindex->nHeight, i, txhash, k, false),
                     out.nValue
                 ));
                 // record unspent output

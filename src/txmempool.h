@@ -15,6 +15,7 @@
 
 #include "amount.h"
 #include "addressindex.h"
+#include "spentindex.h"
 #include "coins.h"
 #include "indirectmap.h"
 #include "policy/fees.h"
@@ -622,7 +623,7 @@ public:
     bool addUnchecked(const uint256& hash, const CTxMemPoolEntry &entry, setEntries &setAncestors, bool validFeeEstimate = true);
 
     void addAddressIndex(const CTxMemPoolEntry &entry, const CCoinsViewCache &view);
-    bool getAddressIndex(AddressTypeVector &addresses, MempoolAddrDeltaVector &results);
+    bool getAddressIndex(std::vector<std::pair<uint160, int> > &addresses, std::vector<std::pair<CMempoolAddressDeltaKey, CMempoolAddressDelta> > &results);
     bool removeAddressIndex(const uint256 txhash);
 
     void addSpentIndex(const CTxMemPoolEntry &entry, const CCoinsViewCache &view);
