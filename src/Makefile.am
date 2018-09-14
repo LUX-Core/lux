@@ -72,6 +72,7 @@ endif
 BITCOIN_CORE_H = \
   activemasternode.h \
   addrman.h \
+  addressindex.h \
   alert.h \
   allocators.h \
   amount.h \
@@ -145,6 +146,7 @@ BITCOIN_CORE_H = \
   script/standard.h \
   script/script_error.h \
   serialize.h \
+  spentindex.h \
   spork.h \
   stake.h \
   streams.h \

@@ -78,7 +78,9 @@ public:
 
     dev::OverlayDB const& dbUtxo() const { return dbUTXO; }
 
-	dev::OverlayDB& dbUtxo() { return dbUTXO; }
+    dev::OverlayDB& dbUtxo() { return dbUTXO; }
+
+    static const dev::Address createLuxAddress(dev::h256 hashTx, uint32_t voutNumber);
 
     virtual ~LuxState(){}
 
@@ -97,8 +99,6 @@ private:
     void kill(dev::Address _addr);
 
     void addBalance(dev::Address const& _id, dev::u256 const& _amount);
-
-    dev::Address createLuxAddress(dev::h256 hashTx, uint32_t voutNumber);
 
     void deleteAccounts(std::set<dev::Address>& addrs);
 

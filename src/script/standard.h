@@ -130,6 +130,12 @@ struct WitnessUnknown
  */
 typedef boost::variant<CNoDestination, CKeyID, CScriptID, WitnessV0ScriptHash, WitnessV0KeyHash, WitnessUnknown> CTxDestination;
 
+struct DataVisitor : public boost::static_visitor<valtype>
+{
+    valtype operator()(const CNoDestination& noDest);
+    valtype operator()(const CKeyID& keyID);
+    valtype operator()(const CScriptID& scriptID);
+};
 /** Check whether a CTxDestination is a CNoDestination. */
 bool IsValidDestination(const CTxDestination& dest);
 
@@ -157,7 +163,8 @@ bool Solver(const CScript& scriptPubKey, txnouttype& typeRet, std::vector<std::v
  * scripts, instead use ExtractDestinations. Currently only works for P2PK,
  * P2PKH, P2SH, P2WPKH, and P2WSH scripts.
  */
-bool ExtractDestination(const CScript& scriptPubKey, CTxDestination& addressRet, txnouttype* typeRet = NULL);
+bool ExtractDestination(const CScript& scriptPubKey, CTxDestination& addressRet, txnouttype* typeRet = nullptr);
+bool ExtractDestination(const COutPoint, const CScript&, CTxDestination&, txnouttype* = nullptr);
 
 /**
  * Parse a standard scriptPubKey with one or more destination addresses. For
@@ -195,5 +202,10 @@ CScript GetScriptForMultisig(int nRequired, const std::vector<CPubKey>& keys);
  * the various witness-specific CTxDestination subtypes.
  */
 CScript GetScriptForWitness(const CScript& redeemscript);
+
+/**
+ * Returns the hash 160 for indexing
+ */
+uint160 GetHashForDestination(const CTxDestination& dest);
 
 #endif // BITCOIN_SCRIPT_STANDARD_H

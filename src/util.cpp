@@ -464,6 +464,12 @@ bool SoftSetBoolArg(const std::string& strArg, bool fValue)
         return SoftSetArg(strArg, std::string("0"));
 }
 
+void ForceSetArg(const std::string& strArg, const std::string& strValue)
+{
+    //LOCK(cs_args);
+    mapArgs[strArg] = strValue;
+}
+
 static std::string FormatException(std::exception* pex, const char* pszThread)
 {
 #ifdef WIN32

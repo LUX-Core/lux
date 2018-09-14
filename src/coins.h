@@ -346,7 +346,6 @@ struct CCoinsStats {
     CCoinsStats() : nHeight(0), hashBlock(0), nTransactions(0), nTransactionOutputs(0), nSerializedSize(0), hashSerialized(0), nTotalAmount(0) {}
 };
 
-
 /** Abstract view on the open txout dataset. */
 class CCoinsView
 {

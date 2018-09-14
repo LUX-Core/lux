@@ -59,6 +59,7 @@ void ScriptPubKeyToJSON(const CScript& scriptPubKey, UniValue& out, bool fInclud
 
 void TxToJSON(const CTransaction& tx, const uint256 hashBlock, UniValue& entry)
 {
+    uint256 txid = tx.GetHash();
     entry.push_back(Pair("txid", tx.GetHash().GetHex()));
     entry.push_back(Pair("hash", tx.GetWitnessHash().GetHex()));
     entry.push_back(Pair("size", (int)::GetSerializeSize(tx, SER_NETWORK, PROTOCOL_VERSION)));
@@ -78,6 +79,18 @@ void TxToJSON(const CTransaction& tx, const uint256 hashBlock, UniValue& entry)
             o.push_back(Pair("asm", txin.scriptSig.ToString()));
             o.push_back(Pair("hex", HexStr(txin.scriptSig.begin(), txin.scriptSig.end())));
             in.push_back(Pair("scriptSig", o));
+        }
+        // Add address and value info if spentindex enabled
+        CSpentIndexValue spentInfo;
+        CSpentIndexKey spentKey(txin.prevout.hash, txin.prevout.n);
+        if (GetSpentIndex(spentKey, spentInfo)) {
+           in.push_back(Pair("value", ValueFromAmount(spentInfo.satoshis)));
+           in.push_back(Pair("valueSat", spentInfo.satoshis));
+           if (spentInfo.addressType == 1) {
+               in.push_back(Pair("address", EncodeDestination(CKeyID(spentInfo.addressHash))));
+           } else if (spentInfo.addressType == 2)  {
+               in.push_back(Pair("address", EncodeDestination(CScriptID(spentInfo.addressHash))));
+           }
         }
         if (!tx.wit.IsNull()) {
             if (!tx.wit.vtxinwit[i].IsNull()) {
@@ -104,6 +117,14 @@ void TxToJSON(const CTransaction& tx, const uint256 hashBlock, UniValue& entry)
         ScriptPubKeyToJSON(txout.scriptPubKey, o, true);
         out.push_back(Pair("scriptPubKey", o));
         vout.push_back(out);
+        // Add spent information if spentindex is enabled
+        CSpentIndexValue spentInfo;
+        CSpentIndexKey spentKey(txid, i);
+        if (GetSpentIndex(spentKey, spentInfo)) {
+            out.push_back(Pair("spentTxId", spentInfo.txid.GetHex()));
+            out.push_back(Pair("spentIndex", (int)spentInfo.inputIndex));
+            out.push_back(Pair("spentHeight", spentInfo.blockHeight));
+        }
     }
     entry.push_back(Pair("vout", vout));
 

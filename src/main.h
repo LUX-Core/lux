@@ -24,6 +24,7 @@
 #include "script/script.h"
 #include "script/sigcache.h"
 #include "script/standard.h"
+#include "spentindex.h"
 #include "sync.h"
 #include "tinyformat.h"
 #include "txmempool.h"
@@ -151,6 +152,8 @@ static const unsigned int RELAY_INVENTORY_INTERVAL = 5;
 static const unsigned int RELAY_BROADCAST_MAX = 7 * RELAY_INVENTORY_INTERVAL;
 
 static const unsigned int DEFAULT_BYTES_PER_SIGOP = 20;
+static const bool DEFAULT_ADDRESSINDEX = false;
+static const bool DEFAULT_SPENTINDEX = false;
 
 static const int64_t STATIC_POS_REWARD = 1 * COIN; //Constant reward 8%
 
@@ -249,6 +252,8 @@ extern bool fPruneMode;
 extern uint64_t nPruneTarget;
 /** Block files containing a block-height within MIN_BLOCKS_TO_KEEP of chainActive.Tip() will not be pruned. */
 static const signed int MIN_BLOCKS_TO_KEEP = 288;
+/** Default checklevel if not using spentindex, addressindex etc */
+static const unsigned int DEFAULT_CHECKLEVEL = 3;
 
 // Require that user allocate at least 550MB for block & undo files (blk???.dat and rev???.dat)
 // At 1MB per block, 288 blocks = 288MB.
@@ -676,6 +681,13 @@ public:
     ScriptError GetScriptError() const { return error; }
 };
 
+/** Address and Spent Indexes **/
+bool GetAddressIndex(uint160 addressHash, int type,
+                     std::vector<std::pair<CAddressIndexKey, CAmount> > &addressIndex,
+                     int start = 0, int end = 0);
+bool GetAddressUnspent(uint160 addressHash, int type,
+                       std::vector<std::pair<CAddressUnspentKey, CAddressUnspentValue> > &unspentOutputs);
+bool GetSpentIndex(CSpentIndexKey &key, CSpentIndexValue &value);
 
 /** Functions for disk access for blocks */
 bool WriteBlockToDisk(const CBlock& block, CDiskBlockPos& pos);
@@ -689,7 +701,7 @@ bool ReadBlockFromDisk(CBlock& block, const CBlockIndex* pindex, const Consensus
  *  In case pfClean is provided, operation will try to be tolerant about errors, and *pfClean
  *  will be true if no problems were found. Otherwise, the return value will be false in case
  *  of problems. Note that in any case, coins may be modified. */
-bool DisconnectBlock(CBlock& block, CValidationState& state, CBlockIndex* pindex, CCoinsViewCache& coins, bool* pfClean = NULL);
+//int DisconnectBlock(CBlock& block, CValidationState& state, CBlockIndex* pindex, CCoinsViewCache& coins, bool* pfClean = NULL);
 
 /** Reprocess a number of blocks to try and get on the correct chain again **/
 bool DisconnectBlocksAndReprocess(int blocks);

@@ -371,9 +371,9 @@ std::string HelpMessage(HelpMessageMode mode)
     strUsage += "  -sysperms              " + _("Create new files with system default permissions, instead of umask 077 (only effective with disabled wallet functionality)") + "\n";
 #endif
     strUsage += "  -txindex               " + strprintf(_("Maintain a full transaction index, used by the getrawtransaction rpc call (default: %u)"), 0) + "\n";
-
+    strUsage += "  -addressindex          " + strprintf(_("Maintain a full address index, used to query for the balance, txids and unspent outputs for addresses (default: %u)"), DEFAULT_ADDRESSINDEX) + "\n";
+    strUsage += "  -spentindex            " + strprintf(_("Maintain a full spent index, used to query the spending txid and input index for an outpoint (default: %u)"), DEFAULT_SPENTINDEX) + "\n";
     strUsage += "  -logevents             " + strprintf(_("Maintain a full EVM log index, used by searchlogs and gettransactionreceipt rpc calls (default: %u)"), false) + "\n";
-
     strUsage += "\n" + _("Connection options:") + "\n";
     strUsage += "  -addnode=<ip>          " + _("Add a node to connect to and attempt to keep the connection open") + "\n";
     strUsage += "  -banscore=<n>          " + strprintf(_("Threshold for disconnecting misbehaving peers (default: %u)"), 100) + "\n";
@@ -836,6 +836,17 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
             InitError(_("Invalid amount for -reservebalance=<amount>"));
             return false;
         }
+    }
+
+    // Make sure additional indexes are recalculated correctly in VerifyDB
+    // (we must reconnect blocks whenever we disconnect them for these indexes to work)
+    bool fAdditionalIndexes =
+        GetBoolArg("-addressindex", DEFAULT_ADDRESSINDEX) ||
+        GetBoolArg("-spentindex", DEFAULT_SPENTINDEX);
+
+    if (fAdditionalIndexes && GetArg("-checklevel", DEFAULT_CHECKLEVEL) < 4) {
+        ForceSetArg("-checklevel", "4");
+        LogPrintf("%s: parameter interaction: additional indexes -> setting -checklevel=4\n", __func__);
     }
 
     // Make sure enough file descriptors are available
