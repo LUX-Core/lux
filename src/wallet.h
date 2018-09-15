@@ -260,6 +260,7 @@ public:
 */
 class CWallet : public CCryptoKeyStore, public CValidationInterface
 {
+private:
     std::atomic<bool> fAbortRescan{false};
 
     static std::atomic<bool> fFlushScheduled;
@@ -760,6 +761,8 @@ public:
     /** Set whether this wallet broadcasts transactions. */
     void SetBroadcastTransactions(bool broadcast) { fBroadcastTransactions = broadcast; }
 
+    static CWallet* InitLoadWallet(bool fDisableWallet, const std::string& strWalletFile, std::string& warningString, std::string& errorString);
+
     /**
      * Explicitly make the wallet learn the related scripts for outputs to the
      * given key. This is purely to make the wallet file compatible with older
@@ -779,6 +782,13 @@ public:
      * This function will automatically add the necessary scripts to the wallet.
      */
     CTxDestination AddAndGetDestinationForScript(const CScript& script, OutputType);
+
+    void Flush(bool shutdown=false);
+
+    static bool Verify();
+
+    /* Initializes the wallet, returns a new CWallet instance or a null pointer in case of an error */
+    static bool InitLoadWallet();
 };
 
 /** A key allocated from the key pool. */

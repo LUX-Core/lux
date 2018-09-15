@@ -1127,7 +1127,7 @@ bool ProcessBlockFound(CBlock* pblock, CWallet& wallet, CReserveKey& reservekey)
     // Process this block the same as if we had received it from another node
     const CChainParams& chainparams = Params();
     CValidationState state;
-    if (!ProcessNewBlock(state, chainparams, NULL, pblock)) {
+    if (!ProcessNewBlock(state, chainparams, NULL, pblock, true, nullptr)) {
         return error("LUXMiner : ProcessNewBlock, block not accepted");
     }
 

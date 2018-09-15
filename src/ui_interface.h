@@ -16,6 +16,7 @@ class CLuxNodeConfig;
 class CBasicKeyStore;
 class CWallet;
 class uint256;
+class CBlockIndex;
 
 /** General change type (added, updated, removed). */
 enum ChangeType {
@@ -106,7 +107,10 @@ public:
     boost::signals2::signal<void(const std::string& title, int nProgress)> ShowProgress;
 
     /** New block has been accepted */
-    boost::signals2::signal<void(const uint256& hash)> NotifyBlockTip;
+    boost::signals2::signal<void (bool, const CBlockIndex *)> NotifyBlockTip;
+
+    /** Best header has changed */
+    boost::signals2::signal<void (bool, const CBlockIndex *)> NotifyHeaderTip;
 
     /** Banlist did change. */
     boost::signals2::signal<void (void)> BannedListChanged;

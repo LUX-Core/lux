@@ -921,7 +921,7 @@ UniValue getwork(const UniValue& params, bool fHelp) {
         pblock->hashMerkleRoot = pblock->BuildMerkleTree();
 
         CValidationState state;
-        return ProcessNewBlock(state, Params(), NULL, pblock);
+        return ProcessNewBlock(state, Params(), nullptr, pblock, true, nullptr);
     }
 }
 
@@ -990,7 +990,7 @@ UniValue submitblock(const UniValue& params, bool fHelp)
     CValidationState state;
     submitblock_StateCatcher sc(block.GetHash(usePhi2), usePhi2);
     RegisterValidationInterface(&sc);
-    bool fAccepted = ProcessNewBlock(state, Params(), NULL, &block);
+    bool fAccepted = ProcessNewBlock(state, Params(), NULL, &block, true, nullptr);
     UnregisterValidationInterface(&sc);
     if (fBlockPresent) {
         if (fAccepted && !sc.found)

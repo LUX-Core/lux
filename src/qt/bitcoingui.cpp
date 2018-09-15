@@ -628,8 +628,8 @@ void BitcoinGUI::setClientModel(ClientModel* clientModel) {
         connect(clientModel, SIGNAL(numConnectionsChanged(int)), this, SLOT(setNumConnections(int)));
         connect(clientModel, SIGNAL(networkActiveChanged(bool)), this, SLOT(setNetworkActive(bool)));
 
-        setNumBlocks(clientModel->getNumBlocks());
-        connect(clientModel, SIGNAL(numBlocksChanged(int)), this, SLOT(setNumBlocks(int)));
+        setNumBlocks(clientModel->getNumBlocks(), clientModel->getLastBlockDate(), clientModel->getVerificationProgress(NULL), false);
+        connect(clientModel, SIGNAL(numBlocksChanged(int,QDateTime,double,bool)), this, SLOT(setNumBlocks(int,QDateTime,double,bool)));
 
         // Receive and report messages from client model
         connect(clientModel, SIGNAL(message(QString, QString, unsigned int)), this, SLOT(message(QString, QString, unsigned int)));
@@ -932,7 +932,8 @@ void BitcoinGUI::setNumConnections(int count) {
     updateNetworkState();
 }
 
-void BitcoinGUI::setNumBlocks(int count) {
+void BitcoinGUI::setNumBlocks(int count, const QDateTime& blockDate, double nVerificationProgress, bool header)
+{
     if (!clientModel)
         return;
 
@@ -943,16 +944,21 @@ void BitcoinGUI::setNumBlocks(int count) {
     enum BlockSource blockSource = clientModel->getBlockSource();
     switch (blockSource) {
     case BLOCK_SOURCE_NETWORK:
+        if (header) { return; }
         hideLogMessage = true;
         progressBarLabel->setText(tr("Synchronizing with network..."));
         break;
     case BLOCK_SOURCE_DISK:
-        progressBarLabel->setText(tr("Importing blocks from disk..."));
-        break;
+        if (header) {
+            progressBarLabel->setText(tr("Indexing blocks on disk..."));
+        } else {
+            progressBarLabel->setText(tr("Processing blocks on disk..."));
+        }        break;
     case BLOCK_SOURCE_REINDEX:
         progressBarLabel->setText(tr("Reindexing blocks on disk..."));
         break;
     case BLOCK_SOURCE_NONE:
+        if (header) { return; }
         // Case: not Importing, not Reindexing and no network connection
         progressBarLabel->setText(tr("No block source available..."));
         break;
@@ -960,9 +966,8 @@ void BitcoinGUI::setNumBlocks(int count) {
 
     QString tooltip;
 
-    QDateTime lastBlockDate = clientModel->getLastBlockDate();
     QDateTime currentDate = QDateTime::currentDateTime();
-    int secs = lastBlockDate.secsTo(currentDate);
+    qint64 secs = blockDate.secsTo(currentDate);
 
     tooltip = tr("Processed %n blocks of transaction history.", "", count);
 
@@ -999,7 +1004,7 @@ void BitcoinGUI::setNumBlocks(int count) {
         progressBarLabel->setVisible(true);
         progressBar->setFormat(tr("%1 behind").arg(timeBehindText));
         progressBar->setMaximum(1000000000);
-        progressBar->setValue(clientModel->getVerificationProgress() * 1000000000.0 + 0.5);
+        progressBar->setValue(nVerificationProgress * 1000000000.0 + 0.5);
         progressBar->setVisible(true);
 
         tooltip = tr("Catching up...") + QString("<br>") + tooltip;
