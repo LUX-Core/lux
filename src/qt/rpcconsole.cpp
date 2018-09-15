@@ -766,7 +766,9 @@ void RPCConsole::clear()
 
     message(CMD_REPLY, (tr("Welcome to the LUX RPC console.") + "<br>" +
                            tr("Use up and down arrows to navigate history, and <b>Ctrl-L</b> to clear screen.") + "<br>" +
-                           tr("Type <b>help</b> for an overview of available commands.")),
+                           tr("Type <b>help</b> for an overview of available commands.") + "<br>" + "<br>" +
+                           tr("<b>WARNING: Scammers have been active, telling users to type commands here, stealing their ") +
+                           tr("wallet contents. Do not use this console without fully understanding the command's ramification.</b>")),
         true);
 }
 
