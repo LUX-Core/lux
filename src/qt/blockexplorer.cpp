@@ -1,5 +1,4 @@
 #include "blockexplorer.h"
-#include "bitcoinunits.h"
 #include "chainparams.h"
 #include "clientmodel.h"
 #include "core_io.h"
@@ -8,9 +7,10 @@
 #include "txdb.h"
 #include "ui_blockexplorer.h"
 #include "ui_interface.h"
-#include "util.h"
+#include "utilmoneystr.h"
 #include "utilstrencodings.h"
 #include "script/standard.h"
+#include "spentindex.h"
 #include <QDateTime>
 #include <QKeyEvent>
 #include <QMessageBox>
@@ -39,18 +39,24 @@ static int64_t getTxIn(const CTransaction& tx)
     return Sum;
 }
 
-static std::string ValueToString(int64_t nValue, bool AllowNegative = false)
+static std::string ValueToString(CAmount nValue, bool AllowNegative = false, bool units = true)
 {
     if (nValue < 0 && !AllowNegative)
-        return "<span>" + _("unknown") + "</span>";
+        return _("unknown");
 
-    QString Str = BitcoinUnits::formatWithUnit(BitcoinUnits::LUX, nValue);
+    std::string Str = FormatMoney(nValue);
+    if (units) Str += "&nbsp;" + CURRENCY_UNIT;
     if (AllowNegative && nValue > 0)
         Str = '+' + Str;
-    return std::string("<span>") + Str.toUtf8().data() + "</span>";
+    return Str;
 }
 
-static std::string ScriptToString(const CScript& Script, bool Long = false, bool Highlight = false)
+static std::string ValueToStringShort(CAmount nValue)
+{
+    return ValueToString(nValue, false, false);
+}
+
+static std::string ScriptToString(const CScript& Script, bool Long = false, bool Highlight = false, std::string hlClass = "hl")
 {
     if (Script.empty())
         return "unknown";
@@ -58,7 +64,7 @@ static std::string ScriptToString(const CScript& Script, bool Long = false, bool
     CTxDestination Dest;
     if (ExtractDestination(Script, Dest)) {
         if (Highlight)
-            return "<span class=\"addr\">" + EncodeDestination(Dest) + "</span>";
+            return "<span class=\"" + hlClass + "\">" + EncodeDestination(Dest) + "</span>";
         else
             return makeHRef(EncodeDestination(Dest));
     } else
@@ -84,7 +90,7 @@ static std::string makeHTMLTableRow(const std::string* pCells, int n)
     return Result;
 }
 
-static const char* table = "<table>";
+static const std::string table = "<table>";
 
 static std::string makeHTMLTable(const std::string* pCells, int nRows, int nColumns)
 {
@@ -95,40 +101,56 @@ static std::string makeHTMLTable(const std::string* pCells, int nRows, int nColu
     return Table;
 }
 
-static std::string TxToRow(const CTransaction& tx, const CScript& Highlight = CScript(), const std::string& Prepend = std::string(), int64_t* pSum = NULL)
+static std::string TxToRow(const CTransaction& tx, const CTxDestination& Highlight = CTxDestination(), const std::string& Prepend = std::string(), CAmount* pSum = NULL)
 {
     std::string InAmounts, InAddresses, OutAmounts, OutAddresses;
-    int64_t Delta = 0;
+    CAmount Delta = 0;
     for (unsigned int j = 0; j < tx.vin.size(); j++) {
         if (tx.IsCoinBase()) {
-            InAmounts += ValueToString(tx.GetValueOut());
+            InAmounts += ValueToStringShort(tx.GetValueOut());
             InAddresses += "coinbase";
         } else {
             CTxOut PrevOut = getPrevOut(tx.vin[j].prevout);
-            InAmounts += ValueToString(PrevOut.nValue);
-            InAddresses += ScriptToString(PrevOut.scriptPubKey, false, PrevOut.scriptPubKey == Highlight).c_str();
-            if (PrevOut.scriptPubKey == Highlight)
+            CTxDestination inAddr;
+            ExtractDestination(PrevOut.scriptPubKey, inAddr);
+            if (tx.vin.size() > 100 && inAddr != Highlight) continue;
+            InAddresses += ScriptToString(PrevOut.scriptPubKey, false, inAddr == Highlight);
+            if (inAddr == Highlight) {
                 Delta -= PrevOut.nValue;
+                InAmounts += "<span class=\"hli\">" + ValueToStringShort(PrevOut.nValue) + "</span>";
+            } else {
+                InAmounts += ValueToStringShort(PrevOut.nValue);
+            }
         }
         if (j + 1 != tx.vin.size()) {
             InAmounts += "<br/>";
             InAddresses += "<br/>";
         }
     }
+
     for (unsigned int j = 0; j < tx.vout.size(); j++) {
         CTxOut Out = tx.vout[j];
-        OutAmounts += ValueToString(Out.nValue);
-        OutAddresses += ScriptToString(Out.scriptPubKey, false, Out.scriptPubKey == Highlight);
-        if (Out.scriptPubKey == Highlight)
+        if (Out.nValue == 0 && tx.IsCoinStake()) continue;
+        CTxDestination outAddr;
+        ExtractDestination(Out.scriptPubKey, outAddr);
+        if (tx.vout.size() > 50 && outAddr != Highlight) continue; // for pools payouts
+        OutAddresses += ScriptToString(Out.scriptPubKey, false, outAddr == Highlight);
+        if (outAddr == Highlight) {
             Delta += Out.nValue;
+            OutAmounts += "<span class=\"hlo\">" + ValueToStringShort(Out.nValue) + "</span>";
+        } else {
+            OutAmounts += ValueToStringShort(Out.nValue);
+        }
         if (j + 1 != tx.vout.size()) {
             OutAmounts += "<br/>";
             OutAddresses += "<br/>";
         }
     }
+    if (OutAddresses == "") {
+        OutAddresses = itostr(tx.vout.size()) + " outputs (see tx)";
+    }
 
-    std::string List[8] =
-        {
+    std::string List[8] = {
             Prepend,
             makeHRef(tx.GetHash().GetHex()),
             InAddresses,
@@ -140,7 +162,7 @@ static std::string TxToRow(const CTransaction& tx, const CScript& Highlight = CS
 
     int n = sizeof(List) / sizeof(std::string) - 2;
 
-    if (!Highlight.empty()) {
+    if (pSum) {
         List[n++] = std::string("<font color=\"") + ((Delta > 0) ? "green" : "red") + "\">" + ValueToString(Delta, true) + "</font>";
         *pSum += Delta;
         List[n++] = ValueToString(*pSum);
@@ -201,8 +223,8 @@ std::string BlockToString(CBlockIndex* pBlock)
     int64_t Reward = 0;
 
     std::string TxLabels[] = {_("Hash"), _("From"), _("Amount"), _("To"), _("Amount")};
+    std::string TxContent = table + "<thead>" + makeHTMLTableRow(TxLabels, sizeof(TxLabels) / sizeof(std::string)) + "</thead>";
 
-    std::string TxContent = table + makeHTMLTableRow(TxLabels, sizeof(TxLabels) / sizeof(std::string));
     for (unsigned int i = 0; i < block.vtx.size(); i++) {
         const CTransaction& tx = block.vtx[i];
         TxContent += TxToRow(tx);
@@ -297,12 +319,12 @@ std::string TxToString(uint256 BlockHash, const CTransaction& tx)
     std::string OutputsContent = makeHTMLTableRow(OutputsContentCells, sizeof(OutputsContentCells) / sizeof(std::string));
 
     if (tx.IsCoinBase()) {
-        std::string InputsContentCells[] =
-            {
+        std::string InputsContentCells[] = {
                 "0",
                 "coinbase",
                 "-",
-                ValueToString(Output)};
+                ValueToString(Output)
+        };
         InputsContent += makeHTMLTableRow(InputsContentCells, sizeof(InputsContentCells) / sizeof(std::string));
     } else
         for (unsigned int i = 0; i < tx.vin.size(); i++) {
@@ -312,12 +334,12 @@ std::string TxToString(uint256 BlockHash, const CTransaction& tx)
                 Input = -MAX_MONEY;
             else
                 Input += PrevOut.nValue;
-            std::string InputsContentCells[] =
-                {
+            std::string InputsContentCells[] = {
                     itostr(i),
                     "<span>" + makeHRef(Out.hash.GetHex()) + ":" + itostr(Out.n) + "</span>",
                     ScriptToString(PrevOut.scriptPubKey, true),
-                    ValueToString(PrevOut.nValue)};
+                    ValueToString(PrevOut.nValue)
+            };
             InputsContent += makeHTMLTableRow(InputsContentCells, sizeof(InputsContentCells) / sizeof(std::string));
         }
 
@@ -328,12 +350,12 @@ std::string TxToString(uint256 BlockHash, const CTransaction& tx)
         unsigned int nNext = 0;
         bool fAddrIndex = false;
         getNextIn(COutPoint(TxHash, i), HashNext, nNext);
-        std::string OutputsContentCells[] =
-            {
+        std::string OutputsContentCells[] = {
                 itostr(i),
                 (HashNext == uint256S("0")) ? (fAddrIndex ? _("no") : _("unknown")) : "<span>" + makeHRef(HashNext.GetHex()) + ":" + itostr(nNext) + "</span>",
                 ScriptToString(Out.scriptPubKey, true),
-                ValueToString(Out.nValue)};
+                ValueToString(Out.nValue)
+        };
         OutputsContent += makeHTMLTableRow(OutputsContentCells, sizeof(OutputsContentCells) / sizeof(std::string));
     }
 
@@ -342,8 +364,7 @@ std::string TxToString(uint256 BlockHash, const CTransaction& tx)
 
     std::string Hash = TxHash.GetHex();
 
-    std::string Labels[] =
-        {
+    std::string Labels[] = {
             _("In Block"), "",
             _("Size"), itostr(GetSerializeSize(tx, SER_NETWORK, PROTOCOL_VERSION)),
             _("Input"), tx.IsCoinBase() ? "-" : ValueToString(Input),
@@ -351,7 +372,7 @@ std::string TxToString(uint256 BlockHash, const CTransaction& tx)
             _("Fees"), tx.IsCoinBase() ? "-" : ValueToString(Input - Output),
             _("Timestamp"), "",
             _("Hash"), "<pre>" + Hash + "</pre>",
-        };
+    };
 
     CBlockIndex* pindex = LookupBlockIndex(BlockHash);
     if (pindex) {
@@ -374,54 +395,96 @@ std::string TxToString(uint256 BlockHash, const CTransaction& tx)
 
 std::string AddressToString(const CTxDestination& Address)
 {
-    std::string TxLabels[] =
-        {
+    std::string TxLabels[] = {
             _("Date"),
-            _("Hash"),
+            _("Tx Hash"),
             _("From"),
             _("Amount"),
             _("To"),
             _("Amount"),
             _("Delta"),
-            _("Balance")};
-    std::string TxContent = table + makeHTMLTableRow(TxLabels, sizeof(TxLabels) / sizeof(std::string));
+            _("Balance")
+    };
 
-    std::set<COutPoint> PrevOuts;
-    /*
-    CScript AddressScript;
-    AddressScript.SetDestination(Address.Get());
+    std::string TxContent = table + "<thead>";
+    TxContent += makeHTMLTableRow(TxLabels, sizeof(TxLabels) / sizeof(std::string)) + "</thead>";
+    TxContent += "<tbody>";
 
-    int64_t Sum = 0;
-    bool fAddrIndex = false;
+    CAmount Sum = 0;
+    typedef std::vector<std::pair<CAddressIndexKey, CAmount> > aIndexVector;
+    aIndexVector aIndex;
+    uint160 hash160 = GetHashForDestination(Address);
 
-    if (!fAddrIndex)
-        return ""; // it will take too long to find transactions by address
-    else
+    std::string TxRows;
+    std::string TdFull = std::string("<tr><td colspan=\"8\">");
+    std::string TdEnd = std::string("</td></tr>");
+
+    const size_t nMaxEntries = 500;
+
+    if (hash160 == uint160())
+        TxContent += TdFull + _("unhandled or invalid address") + TdEnd;
+    else if (GetAddressIndex(hash160, Address.which(), aIndex))
     {
-        std::vector<CDiskTxPos> Txs;
-        paddressmap->GetTxs(Txs, AddressScript.GetID());
-        for (const CDiskTxPos& pos : Txs)
+        size_t nEntries = aIndex.size();
+        size_t nEntry = 0;
+        int nTxSummed = 0;
+        uint256 lastTxHash = 0;
+        for (aIndexVector::const_iterator it=aIndex.begin(); it!=aIndex.end(); it++, nEntry++)
         {
             CTransaction tx;
-            CBlock block;
-            uint256 bhash = block.GetHash();
-            GetTransaction(pos.nTxOffset, tx, bhash);
-            std::map<uint256, CBlockIndex*>::iterator mi = mapBlockIndex.find(block.GetHash());
-            if (mi == mapBlockIndex.end())
+            uint256 hashBlock = 0;
+            // we need to limit max displayed (last) rows due to html perf limits of Qt
+            bool displayRow = (nEntries < nMaxEntries || nEntry > nEntries - nMaxEntries);
+
+            if (!displayRow) {
+                // old history is hidden
+                Sum += it->second;
                 continue;
-            CBlockIndex* pindex = (*mi).second;
-            if (!pindex || !chainActive.Contains(pindex))
+            } else if (!nTxSummed && nEntry > 1) {
+                // avoid partial deltas + TxToRow sum
+                for (aIndexVector::const_iterator rit(&aIndex.at(nEntry-1)); rit!=aIndex.begin(); rit--) {
+                    if (rit->first.txhash != it->first.txhash) break;
+                    Sum -= rit->second;
+                }
+            } else if (lastTxHash == it->first.txhash) {
+                // addressindex can have multiple times the same tx (PoS/Split etc)
+                // TxToRow() already sums the multiple vouts deltas
                 continue;
-            std::string Prepend = "<a href=\"" + itostr(pindex->nHeight) + "\">" + TimeToString(pindex->nTime) + "</a>";
-            TxContent += TxToRow(tx, AddressScript, Prepend, &Sum);
+            }
+
+            if (!GetTransaction(it->first.txhash, tx, Params().GetConsensus(), hashBlock, true))
+                continue;
+
+            time_t txTime = tx.nTime;
+            if (!txTime) {
+                CBlockIndex* pindex = LookupBlockIndex(hashBlock);
+                if (!pindex || !chainActive.Contains(pindex))
+                    continue;
+                txTime = pindex->nTime;
+            }
+
+            std::string Prepend = "<a href=\"" + itostr(it->first.blockHeight) + "\">" + TimeToString(txTime) + "</a>";
+            std::string TxRow = TxToRow(tx, Address, Prepend, &Sum);
+            nTxSummed++;
+            // show latest ones first to avoid scrolling requierement for the current balance
+            TxRows = TxRow + TxRows;
+
+            lastTxHash = it->first.txhash;
         }
+        TxContent += TxRows;
+        if (nEntries > nMaxEntries)
+            TxContent += TdFull + strprintf("%zu/%zu ", nMaxEntries, nEntries) + _("movements displayed.") + TdEnd;
+        TxRows.clear();
+    } else {
+        TxContent += TdFull + _("-addressindex parameter is required to show address history") + TdEnd;
     }
-    */
-    TxContent += "</table>";
+
+    TxContent += "</tbody></table>";
 
     std::string Content;
-    Content += "<h1>" + _("Transactions to/from") + "&nbsp;<span>" + EncodeDestination(Address) + "</span></h1>";
+    Content += "<h2>" + _("Transactions to/from") + "&nbsp;<span>" + EncodeDestination(Address) + "</span></h2>";
     Content += TxContent;
+    TxContent.clear();
     return Content;
 }
 
@@ -545,7 +608,18 @@ void BlockExplorer::setBlock(CBlockIndex* pBlock)
 
 void BlockExplorer::setContent(const std::string& Content)
 {
-    QString CSS = "body {font-size:12px; background-color: #C8E5E2; color:#444;}\n a, span { font-family: monospace; }\n span.addr {color:#13BE5D; font-weight: bold;}\n table tr td {padding: 3px; border: none; background-color: #A1CDC8;}\n td.d0 {font-weight: bold; color:#f8f8f8;}\n h2, h3 { white-space:nowrap; color:#1B7884;}\n a { text-decoration:none; }\n a.nav {color:green;}\n";
+    QString CSS = "body { font-size:12px; background-color: white; color: #444444; margin: 0; }\n"
+    "span.hl  { color: #061532; }\n"
+    "span.hli { color: red; }\n"
+    "span.hlo { color: green; }\n"
+    "table tr td { padding: 3px; border: none; background-color: #ffffff; color: #061532}\n"
+    "tbody td.d3, tbody td.d5, tbody td.d6, tbody td.d7 { text-align: right; }\n"
+    "thead tr td { padding: 3px; border: none; background-color: #061532; color: #e0e0e0; font-weight: bold; text-align: center; }\n"
+    "thead tr td.d0 { text-align: left }\n"
+    "h2, h3 { white-space: nowrap; color: #061532; }\n"
+    "a { text-decoration: none; color: #34A9FF; }\n"
+    "a.nav { color: #061532; }\n";
+
     QString FullContent = "<html><head><style type=\"text/css\">" + CSS + "</style></head>" + "<body>" + Content.c_str() + "</body></html>";
     // printf(FullContent.toUtf8());
     ui->content->setText(FullContent);
