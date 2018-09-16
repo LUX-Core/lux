@@ -453,19 +453,32 @@ uint160 GetHashForDestination(const CTxDestination& dest)
     txnouttype txType = TX_NONSTANDARD;
     CTxDestination dummyDest;
     if(ExtractDestination(script, dummyDest, &txType)) {
-        // TODO: TX_CREATE might be handled if we check only dest.type()
-        if ((txType == TX_PUBKEYHASH || txType == TX_PUBKEY) && dest.type() == typeid(CKeyID)){
+        if ((txType == TX_PUBKEYHASH || txType == TX_PUBKEY) && dest.type() == typeid(CKeyID)) {
             CKeyID addressKey(boost::get<CKeyID>(dest));
             std::vector<unsigned char> addrBytes(addressKey.begin(), addressKey.end());
             hashDest = uint160(addrBytes);
         }
-        if (txType == TX_SCRIPTHASH && dest.type() == typeid(CScriptID)){
+        else if (txType == TX_SCRIPTHASH && dest.type() == typeid(CScriptID)){
             CScriptID scriptKey(boost::get<CScriptID>(dest));
-            //hashDest = uint160(std::vector<unsigned char>(scriptPubKey.begin()+2, scriptPubKey.begin()+22));
             std::vector<unsigned char> hashBytes(scriptKey.begin(), scriptKey.end());
             hashDest = uint160(hashBytes);
         }
-        // TODO: Witness TX_WITNESS_V0_KEYHASH & TX_WITNESS_V0_SCRIPTHASH ?
+        else if (txType == TX_WITNESS_V0_KEYHASH && script.IsPayToWitnessPubkeyHash()) {
+            CKeyID addressKey(boost::get<CKeyID>(dest));
+            std::vector<unsigned char> addrBytes(addressKey.begin(), addressKey.end());
+            hashDest = uint160(addrBytes);
+        }
+        else if (txType == TX_WITNESS_V0_SCRIPTHASH && script.IsPayToWitnessScriptHash()) {
+            CScriptID scriptKey(boost::get<CScriptID>(dest));
+            std::vector<unsigned char> hashBytes(scriptKey.begin(), scriptKey.end());
+            hashDest = Hash160(hashBytes);
+        }
+        else if ((txType == TX_CALL || txType == TX_CREATE) && dest.type() == typeid(CKeyID)) {
+            CKeyID addressKey(boost::get<CKeyID>(dest));
+            std::vector<unsigned char> addrBytes(addressKey.begin(), addressKey.end());
+            hashDest = uint160(addrBytes);
+        }
+        // TODO: TX_COLDSTAKE if/when merged
     }
     return hashDest;
 }

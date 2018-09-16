@@ -2257,22 +2257,6 @@ static DisconnectResult DisconnectBlock(CBlock& block, CValidationState& state, 
                 if (ExtractDestination(out.scriptPubKey, dest, &txType)) {
                     addressType = dest.which();
                     hashDest = GetHashForDestination(dest);
-                }
-
-                if (txType == TX_PUBKEYHASH || out.scriptPubKey.IsPayToPubkeyHash()) {
-                    std::vector<unsigned char> hashBytes(out.scriptPubKey.begin()+3, out.scriptPubKey.begin()+23);
-                    hashDest = uint160(hashBytes);
-                } else if (txType == TX_SCRIPTHASH || out.scriptPubKey.IsPayToScriptHash()) {
-                    std::vector<unsigned char> hashBytes(out.scriptPubKey.begin()+2, out.scriptPubKey.begin()+22);
-                    hashDest = uint160(hashBytes);
-                } else if (txType == TX_PUBKEY || out.scriptPubKey.IsPayToPubkey()) {
-                    hashDest = Hash160(out.scriptPubKey.begin()+1, out.scriptPubKey.end()-1);
-                } else if (txType == TX_WITNESS_V0_KEYHASH || out.scriptPubKey.IsPayToWitnessPubkeyHash()) {
-                    std::vector<unsigned char> hashBytes(out.scriptPubKey.begin()+2, out.scriptPubKey.end());
-                    hashDest = uint160(hashBytes);
-                } else if (txType == TX_WITNESS_V0_SCRIPTHASH || out.scriptPubKey.IsPayToWitnessScriptHash()) {
-                    std::vector<unsigned char> hashBytes(out.scriptPubKey.begin()+2, out.scriptPubKey.end());
-                    hashDest = Hash160(hashBytes);
                 } else {
                     continue;
                 }
@@ -2333,22 +2317,6 @@ static DisconnectResult DisconnectBlock(CBlock& block, CValidationState& state, 
                     if (ExtractDestination(prevout.scriptPubKey, dest, &txType)) {
                         addressType = dest.which();
                         hashDest = GetHashForDestination(dest);
-                    }
-
-                    if (txType == TX_PUBKEYHASH || prevout.scriptPubKey.IsPayToPubkeyHash()) {
-                        std::vector<unsigned char> hashBytes(prevout.scriptPubKey.begin()+3, prevout.scriptPubKey.begin()+23);
-                        hashDest = uint160(hashBytes);
-                    } else if (txType == TX_SCRIPTHASH || prevout.scriptPubKey.IsPayToScriptHash()) {
-                        std::vector<unsigned char> hashBytes(prevout.scriptPubKey.begin()+2, prevout.scriptPubKey.begin()+22);
-                        hashDest = uint160(hashBytes);
-                    } else if (txType == TX_PUBKEY || prevout.scriptPubKey.IsPayToPubkey()) {
-                        hashDest = Hash160(prevout.scriptPubKey.begin()+1, prevout.scriptPubKey.end()-1);
-                    } else if (txType == TX_WITNESS_V0_KEYHASH || prevout.scriptPubKey.IsPayToWitnessPubkeyHash()) {
-                        std::vector<unsigned char> hashBytes(prevout.scriptPubKey.begin()+2, prevout.scriptPubKey.end());
-                        hashDest = uint160(hashBytes);
-                    } else if (txType == TX_WITNESS_V0_SCRIPTHASH || prevout.scriptPubKey.IsPayToWitnessScriptHash()) {
-                        std::vector<unsigned char> hashBytes(prevout.scriptPubKey.begin()+2, prevout.scriptPubKey.end());
-                        hashDest = Hash160(hashBytes);
                     } else {
                         continue;
                     }
@@ -2686,28 +2654,13 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
                     CTxDestination dest; uint160 hashDest;
                     txnouttype txType = TX_NONSTANDARD;
                     unsigned int addressType = 0;
+
                     if (ExtractDestination(out.scriptPubKey, dest, &txType)) {
                         addressType = dest.which();
                         hashDest = GetHashForDestination(dest);
-                    }
-
-                    if (txType == TX_PUBKEYHASH || out.scriptPubKey.IsPayToPubkeyHash()) {
-                        hashDest = uint160(std::vector<unsigned char>(out.scriptPubKey.begin()+3, out.scriptPubKey.begin()+23));
-                        addressType = 1;
-                    } else if (txType == TX_SCRIPTHASH || out.scriptPubKey.IsPayToScriptHash()) {
-                        hashDest = uint160(std::vector<unsigned char>(out.scriptPubKey.begin()+2, out.scriptPubKey.begin()+22));
-                        addressType = 2;
-                    } else if (txType == TX_PUBKEY || out.scriptPubKey.IsPayToPubkey()) {
-                        hashDest = Hash160(out.scriptPubKey.begin()+1, out.scriptPubKey.end()-1);
-                        addressType = 1;
-                    } else if (txType == TX_WITNESS_V0_KEYHASH || out.scriptPubKey.IsPayToWitnessPubkeyHash()) {
-                        std::vector<unsigned char> hashBytes(out.scriptPubKey.begin()+2, out.scriptPubKey.end());
-                        hashDest = uint160(hashBytes);
-                    } else if (txType == TX_WITNESS_V0_SCRIPTHASH || out.scriptPubKey.IsPayToWitnessScriptHash()) {
-                        std::vector<unsigned char> hashBytes(out.scriptPubKey.begin()+2, out.scriptPubKey.end());
-                        hashDest = Hash160(hashBytes);
                     } else {
-                        hashDest.SetNull();
+                        LogPrintf("%s(ndx:in %d) error %s tx %s\n", __func__, j, out.ToString(), txhash.GetHex());
+                        continue;
                     }
 
                     if (fAddressIndex && addressType > 0) {
@@ -2762,29 +2715,16 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
         if (fAddressIndex) { // OUTPUTS
             for (unsigned int k = 0; k < tx.vout.size(); k++) {
                 const CTxOut &out = tx.vout[k];
+                if (out.nValue == 0) continue; // PoS first tx
                 CTxDestination dest; uint160 hashDest;
                 txnouttype txType = TX_NONSTANDARD;
                 unsigned int addressType = 0;
+
                 if (ExtractDestination(out.scriptPubKey, dest, &txType)) {
                     addressType = dest.which();
                     hashDest = GetHashForDestination(dest);
-                }
-
-                if (txType == TX_PUBKEYHASH || out.scriptPubKey.IsPayToPubkeyHash()) {
-                    std::vector<unsigned char> hashBytes(out.scriptPubKey.begin()+3, out.scriptPubKey.begin()+23);
-                    hashDest = uint160(hashBytes);
-                } else if (txType == TX_SCRIPTHASH || out.scriptPubKey.IsPayToScriptHash()) {
-                    std::vector<unsigned char> hashBytes(out.scriptPubKey.begin()+2, out.scriptPubKey.begin()+22);
-                    hashDest = uint160(hashBytes);
-                } else if (txType == TX_PUBKEY || out.scriptPubKey.IsPayToPubkey()) {
-                    hashDest = Hash160(out.scriptPubKey.begin()+1, out.scriptPubKey.end()-1);
-                } else if (txType == TX_WITNESS_V0_KEYHASH || out.scriptPubKey.IsPayToWitnessPubkeyHash()) {
-                    std::vector<unsigned char> hashBytes(out.scriptPubKey.begin()+2, out.scriptPubKey.end());
-                    hashDest = uint160(hashBytes);
-                } else if (txType == TX_WITNESS_V0_SCRIPTHASH || out.scriptPubKey.IsPayToWitnessScriptHash()) {
-                    std::vector<unsigned char> hashBytes(out.scriptPubKey.begin()+2, out.scriptPubKey.end());
-                    hashDest = Hash160(hashBytes);
                 } else {
+                    LogPrintf("%s(ndx:out %d) error %s tx %s\n", __func__, k, out.ToString(), txhash.GetHex());
                     continue;
                 }
 

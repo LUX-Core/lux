@@ -1122,9 +1122,11 @@ void CTxMemPool::addSpentIndex(const CTxMemPoolEntry &entry, const CCoinsViewCac
         unsigned int addressType = 0;
         if (ExtractDestination(prevout.scriptPubKey, dest, &txType)) {
             addressType = dest.which();
-            //TODO: addressHash = GetHashForDestination(dest);
+            addressHash = GetHashForDestination(dest);
+        } else {
+            continue;
         }
-
+#if 0
         if (txType == TX_PUBKEYHASH || prevout.scriptPubKey.IsPayToPubkeyHash()) {
             addressHash = uint160(std::vector<unsigned char> (prevout.scriptPubKey.begin()+3, prevout.scriptPubKey.begin()+23));
             addressType = 1;
@@ -1146,7 +1148,7 @@ void CTxMemPool::addSpentIndex(const CTxMemPoolEntry &entry, const CCoinsViewCac
         } else {
             addressHash.SetNull();
         }
-
+#endif
         CSpentIndexKey key = CSpentIndexKey(input.prevout.hash, input.prevout.n);
         CSpentIndexValue value = CSpentIndexValue(txhash, j, -1, prevout.nValue, addressType, addressHash);
 
