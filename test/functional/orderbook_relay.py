@@ -45,14 +45,15 @@ class ExampleTest(LuxTestFramework):
     def set_test_params(self):
 
         self.setup_clean_chain = True
-        self.num_nodes = 2
-        self.extra_args = [["-connect=0"], ["-connect=0"]]
+        self.num_nodes = 3
+        self.extra_args = [["-connect=0"], ["-connect=0"], ["-connect=0"]]
 
     def setup_chain(self):
         super().setup_chain()
 
         self.setup_configs(0)
         self.setup_configs(1)
+        self.setup_configs(2)
 
     def setup_configs(self, node_index):
         with open(os.path.join(self.options.tmpdir+"/node" + str(node_index), "lux.conf"), 'w', encoding='utf8') as f:
@@ -81,25 +82,44 @@ class ExampleTest(LuxTestFramework):
         self.setup_nodes()
 
 
+    #                    direct exchange
+    #         +------------------------------------+
+    #         |                                    |
+    #   +-----------+     +-----------+     +-----------+
+    #   | node0     +-----+ node1     +-----+ node2     |
+    #   +-----------+     +-----------+     +-----------+
+    #                         relay
+
     def run_test(self):
 
         node0 = self.nodes[0]
         node1 = self.nodes[1]
+        node2 = self.nodes[2]
 
         assert_equal(0, len(node0.rpc.listorderbook()['orders']))
         assert_equal(0, len(node1.rpc.listorderbook()['orders']))
+        assert_equal(0, len(node2.rpc.listorderbook()['orders']))
 
         connect_nodes(node1, 0)
+        connect_nodes(node2, 1)
 
-        node1.rpc.createorder('LUX', 'BTC', '2', '1')
-        assert_equal(1, len([x for x in node1.rpc.listorderbook()['orders'] if x['status'] == 'new']))
+        node0.rpc.createorder('LUX', 'BTC', '2', '1')
+        assert_equal(1, len([x for x in node0.rpc.listorderbook()['orders'] if x['status'] == 'new']))
 
-        node0.rpc.createorder('BTC', 'LUX', '1', '2')
+        # other node haven't mathching order
+        assert_equal(0, len(node1.rpc.listorderbook()['orders']))
+        assert_equal(0, len(node2.rpc.listorderbook()['orders']))
+
+        node2.rpc.createorder('BTC', 'LUX', '1', '2')
+
+        # # node1 must simply relay the order
+        assert_equal(0, len(node1.rpc.listorderbook()['orders']))
 
         time.sleep(2.0) # wait for p2p exchange
 
         assert_equal(0, len(node0.rpc.listorderbook()['orders']))
         assert_equal(0, len(node1.rpc.listorderbook()['orders']))
+        assert_equal(0, len(node2.rpc.listorderbook()['orders']))
 
 
 

@@ -12,6 +12,7 @@ import json
 import logging
 import os
 import random
+import itertools
 import re
 from subprocess import CalledProcessError
 import time
@@ -348,8 +349,15 @@ def connect_nodes(from_connection, node_num):
     from_connection.addnode(ip_port, "onetry")
     # poll until version handshake complete to avoid race conditions
     # with transaction relaying
-    while any(peer['version'] == 0 for peer in from_connection.getpeerinfo()):
+    for _ in itertools.repeat(None, 20):
         time.sleep(0.1)
+        pi = from_connection.getpeerinfo()
+        if len(pi) > 0:
+            for peer in pi:
+                if peer['addr'] == ip_port:
+                    return
+    raise AssertionError('timed out waiting for peer connect')
+   
 
 def connect_nodes_bi(nodes, a, b):
     connect_nodes(nodes[a], b)

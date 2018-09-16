@@ -365,7 +365,6 @@ static const CRPCCommand vRPCCommands[] =
         {"luxgate", "createorder", &createorder, true, true, false},
         {"luxgate", "getactivecoins", &getactivecoins, true, true, false},
         {"luxgate", "listorderbook", &listorderbook, true, true, false},
-        {"luxgate", "listactiveorders", &listactiveorders, true, true, false},
         {"luxgate", "createswaptransaction", &createswaptransaction, true, true, true},
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

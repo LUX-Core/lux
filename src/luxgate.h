@@ -10,14 +10,16 @@
 #include <serialize.h>
 #include <uint256.h>
 #include <util.h>
+#include <boost/asio.hpp>
 
 class COrder;
 
 typedef uint256 OrderId; 
 typedef std::pair<OrderId, std::shared_ptr<COrder>> OrderEntry;
+typedef std::map<OrderId, std::shared_ptr<COrder>> OrderMap;
 
-extern std::map<OrderId, std::shared_ptr<COrder>> orderbook;
-extern std::map<OrderId, std::shared_ptr<COrder>> activeOrders;
+extern OrderMap orderbook;
+extern boost::asio::io_service luxgateIOService;
 
 void ProcessMessageLuxgate(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv, bool& isLuxgate);
 
@@ -32,21 +34,41 @@ class COrder
 {
 
 public:
+
+    enum State 
+    {
+        NEW = 10,
+        MATCH_FOUND = 20,
+        SWAP_REQUESTED = 30,
+        SWAP_ACK = 40,
+        CONTRACT_CREATED = 50,
+        CONTRACT_ACK = 60,
+        REFUNDING = 200
+    };
+
     COrder() {}
-    COrder(Ticker base, Ticker rel, CAmount baseAmount, CAmount relAmount) : 
-                    base(base), rel(rel), baseAmount(baseAmount), relAmount(relAmount) {}
+    COrder(Ticker base, Ticker rel, CAmount baseAmount, CAmount relAmount, COrder::State state) : 
+                    base(base), rel(rel), baseAmount(baseAmount), relAmount(relAmount), state(state) {}
     COrder(const COrder&) = default;
 
     OrderId ComputeId() const;
+
     CAddress Sender() const { return sender; }
     void SetSender(CAddress addr) { sender = addr; }
+    bool SenderIsValid() const;
+
     Ticker Base() const { return base; }
     Ticker Rel() const { return rel; }
+
     CAmount BaseAmount() const { return baseAmount; }
     CAmount RelAmount() const { return relAmount; }
 
-    bool Matches(COrder& order) const;
+    void SetState(COrder::State state) { this->state = state; }
+    COrder::State GetState() { return state; }
+    
+    bool Matches(const COrder& order) const;
 
+    std::string ToString() const;
 
     ADD_SERIALIZE_METHODS;
 
@@ -59,12 +81,17 @@ public:
         READWRITE(sender);
     }
 
-protected:
+    bool operator==(const COrder &o) const 
+    {
+        return base == o.base && rel == o.rel && baseAmount == o.baseAmount && relAmount == o.relAmount;
+    }
 
+protected:
     Ticker base;
     Ticker rel;
     CAmount baseAmount;
     CAmount relAmount;
+    State state;
     CAddress sender;
 };
 

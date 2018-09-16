@@ -2,7 +2,7 @@
 # Copyright (c) 2018 LUX Core developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
-"""Luxgate test
+"""Luxgate P2P exchanging test
 
 The test needs running bitcoind(testnet) instance with opts specified in luxgate.json
 """
@@ -12,47 +12,48 @@ from collections import defaultdict
 
 # Avoid wildcard * imports if possible
 from test_framework.blocktools import (create_block, create_coinbase)
-from test_framework.mininode import (
-    CInv,
-    NetworkThread,
-    NodeConn,
-    NodeConnCB,
-    mininode_lock,
-    msg_block,
-    msg_getdata,
-)
+from test_framework.mininode import *
 from test_framework.test_framework import LuxTestFramework
-from test_framework.util import (
-    assert_equal,
-    connect_nodes,
-    connect_nodes_bi,
-    p2p_port,
-    rpc_port,
-    wait_until,
-)
+from test_framework.util import *
 import os
 import json
 import decimal
 import time
+
+
+class LuxgateNode(NodeConnCB):
+
+    def __init__(self):
+        super().__init__()
+        self.received_orders = []
+    
+    def on_createorder(self, conn, message):
+        self.received_orders.append(message.order)
+
+    def on_reqswap(self, conn, message): pass
+    def on_reqswapack(self, conn, message): pass
+    def on_swccreated(self, conn, message): pass
+    def on_swcack(self, conn, message): pass
+
+    def on_reject(self, conn, message):
+        raise AssertionError("Message rejected: %s" % repr(message))
 
 def EncodeDecimal(o):
     if isinstance(o, decimal.Decimal):
             return str(o)
     raise TypeError(repr(o) + " is not JSON serializable")
 
-class ExampleTest(LuxTestFramework):
+class LuxgateTest(LuxTestFramework):
 
     def set_test_params(self):
 
         self.setup_clean_chain = True
-        self.num_nodes = 2
-        self.extra_args = [["-connect=0"], ["-connect=0"]]
+        self.num_nodes = 1
+        self.extra_args = [["-connect=0"]]
 
     def setup_chain(self):
         super().setup_chain()
-
         self.setup_configs(0)
-        self.setup_configs(1)
 
     def setup_configs(self, node_index):
         with open(os.path.join(self.options.tmpdir+"/node" + str(node_index), "lux.conf"), 'w', encoding='utf8') as f:
@@ -82,27 +83,43 @@ class ExampleTest(LuxTestFramework):
 
 
     def run_test(self):
+        '''
+        Start 1 node and send testing messages to it
+        '''
 
-        node0 = self.nodes[0]
-        node1 = self.nodes[1]
+        node1 = self.nodes[0]
 
-        assert_equal(0, len(node0.rpc.listorderbook()['orders']))
-        assert_equal(0, len(node1.rpc.listorderbook()['orders']))
+        # Create connecting with  the mininode
 
-        connect_nodes(node1, 0)
+        node0 = LuxgateNode()
+        connections = []
+        connections.append(NodeConn(dstaddr='127.0.0.1', dstport=p2p_port(0), rpc=node1, callback=node0, net='testnet4'))
+        node0.add_connection(connections[0])
+        NetworkThread().start()
+        node0.wait_for_verack()
+
+        # Veifying that rpc for creating order works
 
         node1.rpc.createorder('LUX', 'BTC', '2', '1')
-        assert_equal(1, len([x for x in node1.rpc.listorderbook()['orders'] if x['status'] == 'new']))
+        node0.wait_for_createorder()
 
-        node0.rpc.createorder('BTC', 'LUX', '1', '2')
+        assert_equal(b'LUX', node0.received_orders[0].base)
+        assert_equal(b'BTC', node0.received_orders[0].rel)
+        assert_equal(200000000, node0.received_orders[0].base_amount)
+        assert_equal(100000000, node0.received_orders[0].rel_amount)
 
-        time.sleep(2.0) # wait for p2p exchange
+        assert_equal('new', node1.rpc.listorderbook()['orders'][0]['status'])
 
-        assert_equal(0, len(node0.rpc.listorderbook()['orders']))
-        assert_equal(0, len(node1.rpc.listorderbook()['orders']))
+        node0.send_message(
+            msg_ordermatch(
+                LGOrder(
+                    base=b'BTC', rel=b'LUX', 
+                    base_amount=100000000, rel_amount=200000000, 
+                    sender=node0.received_orders[0].sender)))
+        node0.wait_for_reqswap()
 
-
+        assert_equal('swap_requested', node1.rpc.listorderbook()['orders'][0]['status'])
 
 
 if __name__ == '__main__':
-    ExampleTest().main()
+    LuxgateTest().main()

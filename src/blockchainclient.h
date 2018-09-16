@@ -6,21 +6,26 @@
 #define LUX_BLOCKCHAINCLIENT_H
 
 #include <amount.h>
+#include <clientversion.h>
 #include <util.h>
 #include <univalue/univalue.h>
+#include <version.h>
 
 #include <string>
-
-typedef std::string Ticker;
 
 class CClientConnectionError;
 class CAbstractBlockchainClient;
 class CBitcoinClient;
+class CPubKey;
+
+typedef std::string Ticker;
+typedef std::shared_ptr<CAbstractBlockchainClient> ClientPtr;
+
 
 /**
  * Map of blockchain clients, where key is a ticker
  */
-extern std::map<Ticker, std::shared_ptr<CAbstractBlockchainClient>> blockchainClientPool;
+extern std::map<Ticker, ClientPtr> blockchainClientPool;
 
 /**
  * @class CClientConnectionError
@@ -34,6 +39,7 @@ public:
 
 /**
  * @brief Represents transactions parameter in createrawtransaction RPC call
+ * This is like COutPoint, but with a string as a tx id instead of uin256 for more compatibility
  */
 struct TransactionInputs {
     /** Hash of the input transaction */
@@ -104,6 +110,12 @@ public:
     virtual int GetClientVersion() = 0;
 
     /**
+     * @brief Retrieves blockchain protocol version
+     * @return Blockchain protocol version
+     */
+    virtual int GetProtocolVersion() = 0;
+
+    /**
      * @brief Returns current block count
      * @return Current block count
      */
@@ -119,9 +131,10 @@ public:
     /**
      * @brief Sign raw transaction
      * @param txHex Hex encoded raw transaction
-     * @return Hex encoded signed raw transaction
+     * @param result Either hex encoded transaction if signed successfully or sigscript if signed only partially
+     * @return Is signature complete or not
      */
-    virtual std::string SignRawTransaction(std::string txHex) = 0;
+    virtual bool SignRawTransaction(std::string txHex, std::string& result) = 0;
 
     /**
      * @brief Send signed raw transaction
@@ -129,6 +142,13 @@ public:
      * @return Hash of the created transaction
      */
     virtual std::string SendRawTransaction(std::string txHex) = 0;
+
+    /**
+     * @brief Decodes raw
+     * @param txHex Hex encoded transaction
+     * @return Decoded transaction in the UniValue format
+     */
+    virtual UniValue DecodeRawTransaction(std::string txHex) = 0;
 
     /**
      * @brief Send coins to the address
@@ -143,6 +163,20 @@ public:
      * @return newly generated address
      */
     virtual std::string GetNewAddress() = 0;
+
+    /**
+     * @brief Validates blockchain address by performing validateaddress RPC call
+     * @param addr Address to validate
+     * @return Is address valid for this blockchain or not
+     */
+    virtual bool IsValidAddress(std::string addr) = 0;
+
+    /**
+     * @brief Get hash of the address's public key
+     * @param addr address to get pubkeyhash from
+     * @return
+     */
+    virtual CPubKey GetPubKeyForAddress(std::string addr) = 0;
 
     const Ticker ticker;
     const BlockchainConfig config;
@@ -161,6 +195,9 @@ public:
  *
  * This class provides functions for calling Bitcoin RPC methods and
  * checking atomic swap support on a locally running node
+ *
+ * @note Every function except for CanConnect and IsSwapSupported may throw std::runtime_exception or CClientConnectionError.
+ * See CallRPC() for more information.
  */
 class CBitcoinClient : public CAbstractBlockchainClient {
 public:
@@ -173,7 +210,7 @@ public:
      *
      * It checks connectivity by trying to call help RPC method on a node
      *
-     * @note All possible exceptions CallRPC may throw are hanlded
+     * @note All possible exceptions CallRPC may throw are handled
      */
     virtual bool CanConnect() override;
 
@@ -185,7 +222,7 @@ public:
      * CLTV was introduced in bitcoin 0.10.4, so this method checks if locally running
      * bitcoin node is running equal or higher version
      *
-     * @note All possible exceptions CallRPC may throw are hanlded
+     * @note All possible exceptions CallRPC may throw are handled
      */
     virtual bool IsSwapSupported() override;
 
@@ -203,46 +240,23 @@ public:
      */
     virtual UniValue CallRPC(const std::string& strMethod, const UniValue& params) override;
 
-    /**
-     * @brief Retrieves blockchain client version as int
-     * @return Blockchain client version
-     */
     virtual int GetClientVersion() override;
 
-    /**
-     * @brief Returns current block count
-     * @return Current block count or -1 in case of error
-     */
+    virtual int GetProtocolVersion() override;
+
     virtual int GetBlockCount() override;
 
-    /**
-     * @brief createrawtransaction RPC call wrapper
-     * @param params Parameters for the RPC call
-     * @return Hex encoded raw transaction or empty string in case of error
-     */
     virtual std::string CreateRawTransaction(const CreateTransactionParams& params) override;
 
-    /**
-     * @brief Sign raw transaction
-     * @param txHex Hex encoded raw transaction
-     * @return Hex encoded signed raw transaction
-     */
-    virtual std::string SignRawTransaction(std::string txHex) override;
+    virtual bool SignRawTransaction(std::string txHex, std::string& result) override;
 
-    /**
-     * @brief Send signed raw transaction
-     * @param txHex Hex encoded signed raw transaction
-     * @return Hash of the created transaction
-     */
     virtual std::string SendRawTransaction(std::string txHex) override;
 
-    /**
-     * @brief Send coins to the address
-     * @param addr Blockchain address where to send coins
-     * @param nAmount Amount of coins to send
-     * @return Hash of the created transaction
-     */
+    virtual UniValue DecodeRawTransaction(std::string txHex) override;
+
     virtual std::string SendToAddress(std::string addr, CAmount nAmount) override;
+
+    virtual bool IsValidAddress(std::string addr) override;
 
     /**
      * @brief Generates new address
@@ -250,6 +264,8 @@ public:
      * @return newly generated address
      */
     virtual std::string GetNewAddress() override;
+
+    virtual CPubKey GetPubKeyForAddress(std::string addr) override;
 
     const Ticker ticker = "BTC";
 
@@ -266,6 +282,63 @@ private:
      * 1       * CLIENT_VERSION_BUILD
      */
     const int nCLTVSupportedFrom = 100400;
+};
+
+/**
+ * @class CLuxClient
+ * @brief Lux client implementation
+ *
+ * This class provides CAbstractBlockchainClient interface, but uses core function calls instead of RPC calls.
+ * @note Every function except for CanConnect and IsSwapSupported may throw std::runtime_exception or CClientConnectionError from
+ * RPC call handler.
+ */
+class CLuxClient : public CAbstractBlockchainClient {
+public:
+    CLuxClient(const BlockchainConfig& conf) : CAbstractBlockchainClient(conf) {};
+    virtual ~CLuxClient() {};
+
+    /**
+     * @brief Checks if it is possible to connect to local Lux node
+     * @return true
+     */
+    virtual bool CanConnect() override { return true; }
+
+    /**
+     * @brief checks if locally running bitcoin node supports atomic swaps
+     * @return true
+     */
+    virtual bool IsSwapSupported() override { return true; }
+
+    virtual UniValue CallRPC(const std::string& strMethod, const UniValue& params) override { return NullUniValue; }
+
+    virtual int GetClientVersion() override { return CLIENT_VERSION; }
+
+    virtual int GetProtocolVersion() override { return PROTOCOL_VERSION; }
+
+    virtual int GetBlockCount() override;
+
+    virtual std::string CreateRawTransaction(const CreateTransactionParams& params) override;
+
+    virtual bool SignRawTransaction(std::string txHex, std::string& result) override;
+
+    virtual std::string SendRawTransaction(std::string txHex) override;
+
+    virtual UniValue DecodeRawTransaction(std::string txHex) override;
+
+    virtual std::string SendToAddress(std::string addr, CAmount nAmount) override;
+
+    /**
+     * @brief Generates new address
+     * The generated address is always legacy (after segwit) or default (before segwit)
+     * @return newly generated address
+     */
+    virtual std::string GetNewAddress() override;
+
+    virtual bool IsValidAddress(std::string addr) override;
+
+    virtual CPubKey GetPubKeyForAddress(std::string addr) override;
+
+    const Ticker ticker = "LUX";
 };
 
 #endif //LUX_BLOCKCHAINCLIENT_H
