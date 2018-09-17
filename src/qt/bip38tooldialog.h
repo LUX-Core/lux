@@ -36,7 +36,7 @@ private:
     Ui::Bip38ToolDialog* ui;
     WalletModel* model;
 
-private slots:
+private Q_SLOTS:
     /* encrypt key */
     void on_addressBookButton_ENC_clicked();
     void on_pasteButton_ENC_clicked();

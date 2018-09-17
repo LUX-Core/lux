@@ -58,7 +58,7 @@ public:
 
     CAmount minimum() const;
     void setMinimum(const CAmount& min);
-signals:
+Q_SIGNALS:
     void valueChanged();
 
 protected:
@@ -69,7 +69,7 @@ private:
     AmountSpinBox* amount;
     QValueComboBox* unit;
 
-private slots:
+private Q_SLOTS:
     void unitChanged(int idx);
 };
 

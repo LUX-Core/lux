@@ -663,7 +663,7 @@ void BitcoinGUI::setClientModel(ClientModel* clientModel) {
 
         modalOverlay->setKnownBestHeight(clientModel->getHeaderTipHeight(), QDateTime::fromTime_t(clientModel->getHeaderTipTime()));
         setNumBlocks(clientModel->getNumBlocks(), clientModel->getLastBlockDate(), clientModel->getVerificationProgress(NULL), false);
-        connect(clientModel, SIGNAL(numBlocksChanged(int,QDateTime,double,bool)), this, SLOT(setNumBlocks(int,QDateTime,double,bool)));
+        connect(_clientModel, SIGNAL(numBlocksChanged(int,QDateTime,double,bool)), this, SLOT(setNumBlocks(int,QDateTime,double,bool)));
 
         //connect(clientModel, SIGNAL(additionalDataSyncProgressChanged(double)), this, SLOT(setAdditionalDataSyncProgress(double)));
 
@@ -873,7 +873,7 @@ void BitcoinGUI::openClicked()
 {
     OpenURIDialog dlg(this);
     if (dlg.exec()) {
-        emit receivedURI(dlg.getURI());
+        Q_EMIT receivedURI(dlg.getURI());
     }
 }
 
@@ -1230,8 +1230,8 @@ void BitcoinGUI::dragEnterEvent(QDragEnterEvent* event) {
 
 void BitcoinGUI::dropEvent(QDropEvent* event) {
     if (event->mimeData()->hasUrls()) {
-        foreach (const QUrl& uri, event->mimeData()->urls()) {
-            emit receivedURI(uri.toString());
+        Q_FOREACH (const QUrl& uri, event->mimeData()->urls()) {
+            Q_EMIT receivedURI(uri.toString());
         }
     }
     event->acceptProposedAction();
@@ -1410,7 +1410,7 @@ void BitcoinGUI::unsubscribeFromCoreSignals() {
 /** Get restart command-line parameters and request restart */
 void BitcoinGUI::handleRestart(QStringList args) {
     if (!ShutdownRequested())
-        emit requestedRestart(args);
+        Q_EMIT requestedRestart(args);
 }
 
 UnitDisplayStatusBarControl::UnitDisplayStatusBarControl() : optionsModel(0),
@@ -1428,7 +1428,7 @@ void UnitDisplayStatusBarControl::mousePressEvent(QMouseEvent* event) {
 /** Creates context menu, its actions, and wires up all the relevant signals for mouse events. */
 void UnitDisplayStatusBarControl::createContextMenu() {
     menu = new QMenu();
-    foreach (BitcoinUnits::Unit u, BitcoinUnits::availableUnits()) {
+    Q_FOREACH (BitcoinUnits::Unit u, BitcoinUnits::availableUnits()) {
         QAction* menuAction = new QAction(QString(BitcoinUnits::name(u)), this);
         menuAction->setData(QVariant(u));
         menu->addAction(menuAction);

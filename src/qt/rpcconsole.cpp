@@ -90,10 +90,10 @@ class RPCExecutor : public QObject
 {
     Q_OBJECT
 
-public slots:
+public Q_SLOTS:
     void request(const QString& command);
 
-signals:
+Q_SIGNALS:
     void reply(int category, const QString& command);
 };
 
@@ -615,7 +615,7 @@ void RPCConsole::setClientModel(ClientModel* model)
     if (!model) {
         // Client model is being set to 0, this means shutdown() is about to be called.
         // Make sure we clean up the executor thread
-        emit stopExecutor();
+        Q_EMIT stopExecutor();
         thread.wait();
     }
 }
@@ -727,7 +727,7 @@ void RPCConsole::buildParameterlist(QString arg)
     args.append(arg);
 
     // Send command-line arguments to BitcoinGUI::handleRestart()
-    emit handleRestart(args);
+    Q_EMIT handleRestart(args);
 }
 
 void RPCConsole::clear()
