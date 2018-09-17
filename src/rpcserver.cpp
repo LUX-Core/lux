@@ -32,6 +32,8 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/thread.hpp>
 #include <boost/signals2/signal.hpp>
+#include <boost/algorithm/string/case_conv.hpp> // for to_upper()
+#include <memory> // for unique_ptr
 
 using namespace boost;
 using namespace boost::asio;
@@ -421,7 +423,7 @@ CRPCTable::CRPCTable()
     }
 }
 
-const CRPCCommand* CRPCTable::operator[](string name) const
+const CRPCCommand* CRPCTable::operator[](const string &name) const
 {
     map<string, const CRPCCommand*>::const_iterator it = mapCommands.find(name);
     if (it == mapCommands.end())
@@ -1058,14 +1060,13 @@ UniValue CRPCTable::execute(const std::string& strMethod, const UniValue& params
     g_rpcSignals.PostCommand(*pcmd);
 }
 
-std::vector<std::string> CRPCTable::listCommands() const
+vector<string> CRPCTable::listCommands() const
 {
-    std::vector<std::string> commandList;
-#if 0
-    std::transform( mapCommands.begin(), mapCommands.end(),
-                   std::back_inserter(commandList),
-                   boost::bind(&commandMap::UniValue::VType::first,_1) );
-#endif
+    vector<string> commandList;
+    typedef map<string, const CRPCCommand*> commandMap;
+    transform( mapCommands.begin(), mapCommands.end(),
+                   back_inserter(commandList),
+                    boost::bind(&commandMap::value_type::first,_1) );
     return commandList;
 }
 

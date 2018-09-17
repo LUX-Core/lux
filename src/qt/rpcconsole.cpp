@@ -29,6 +29,7 @@
 
 #include <QDir>
 #include <QKeyEvent>
+#include <QMessageBox>
 #include <QMenu>
 #include <QScrollBar>
 #include <QSignalMapper>
@@ -266,11 +267,10 @@ bool RPCConsole::RPCParseCommandLine(std::string &strResult, const std::string &
                     }
                     if ((ch == ')' || ch == '\n') && stack.size() > 0)
                     {
-                        if (fExecute) {
-                            // Convert argument list to JSON objects in method-dependent way,
-                            // and pass it along with the method name to the dispatcher.
-                            lastResult = tableRPC.execute(stack.back()[0], RPCConvertValues(stack.back()[0], std::vector<std::string>(stack.back().begin() + 1, stack.back().end())));
-                        }
+                        std::string strPrint;
+                        // Convert argument list to JSON objects in method-dependent way,
+                        // and pass it along with the method name to the dispatcher.
+                        lastResult = tableRPC.execute(stack.back()[0], RPCConvertValues(stack.back()[0], std::vector<std::string>(stack.back().begin() + 1, stack.back().end())));
 
                         state = STATE_COMMAND_EXECUTED;
                         curarg.clear();
@@ -471,6 +471,7 @@ bool RPCConsole::eventFilter(QObject* obj, QEvent* event)
             case Qt::Key_Enter:
                 // forward these events to lineEdit
                 if(obj == autoCompleter->popup()) {
+                    autoCompleter->popup()->hide();
                     QApplication::postEvent(ui->lineEdit, new QKeyEvent(*keyevt));
                     return true;
                 }
