@@ -211,6 +211,9 @@ BitcoinGUI::BitcoinGUI(const PlatformStyle *platformStyle, const NetworkStyle* n
     // Create status bar
     statusBar();
 
+    // Disable size grip because it looks ugly and nobody needs it
+    statusBar()->setSizeGripEnabled(false);
+
     // Status bar notification icons
     QFrame* frameBlocks = new QFrame();
     frameBlocks->setContentsMargins(0, 0, 0, 0);
@@ -621,6 +624,8 @@ void BitcoinGUI::createMenuBar() {
 void BitcoinGUI::createToolBars() {
     if (walletFrame) {
         QToolBar* toolbar = new QToolBar(tr("Tabs toolbar"));
+        toolbar->setContextMenuPolicy(Qt::PreventContextMenu);
+        toolbar->setMovable(false);
         toolbar->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
         toolbar->addAction(overviewAction);
         toolbar->addAction(sendCoinsAction);
@@ -1179,15 +1184,27 @@ void BitcoinGUI::changeEvent(QEvent* e) {
 #endif
 }
 
-void BitcoinGUI::closeEvent(QCloseEvent* event) {
+void BitcoinGUI::closeEvent(QCloseEvent* event)
+{
 #ifndef Q_OS_MAC // Ignored on Mac
-    if (clientModel && clientModel->getOptionsModel()) {
-        if (!clientModel->getOptionsModel()->getMinimizeOnClose()) {
+    if(clientModel && clientModel->getOptionsModel())
+    {
+        if(!clientModel->getOptionsModel()->getMinimizeOnClose())
+        {
+            // close rpcConsole in case it was open to make some space for the shutdown window
+            rpcConsole->close();
+
             QApplication::quit();
         }
+        else
+        {
+            QMainWindow::showMinimized();
+            event->ignore();
+        }
     }
-#endif
+#else
     QMainWindow::closeEvent(event);
+#endif
 }
 
 #ifdef ENABLE_WALLET
