@@ -104,6 +104,9 @@ private:
     /// Add option to list of GUI options overridden through command line/config file
     void addOverriddenOption(const std::string& option);
 
+    // Check version & upgrade default values if required
+    void checkAndMigrate();
+
 Q_SIGNALS:
     void displayUnitChanged(int unit);
     void darksendRoundsChanged(int);
