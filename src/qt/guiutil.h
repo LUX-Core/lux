@@ -36,6 +36,9 @@ QT_END_NAMESPACE
  */
 namespace GUIUtil
 {
+// Return a monospace font
+QFont fixedPitchFont();
+
 // Create human-readable string from date
 QString dateTimeStr(const QDateTime& datetime);
 QString dateTimeStr(qint64 nTime);

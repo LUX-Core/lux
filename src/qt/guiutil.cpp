@@ -67,6 +67,10 @@
 #include <QUrlQuery>
 #endif
 
+#if QT_VERSION >= 0x50200
+#include <QFontDatabase>
+#endif
+
 #if BOOST_FILESYSTEM_VERSION >= 3
 static boost::filesystem::detail::utf8_codecvt_facet utf8;
 #endif
@@ -93,6 +97,21 @@ QString dateTimeStr(const QDateTime& date)
 QString dateTimeStr(qint64 nTime)
 {
     return dateTimeStr(QDateTime::fromTime_t((qint32)nTime));
+}
+
+QFont fixedPitchFont()
+{
+#if QT_VERSION >= 0x50200
+    return QFontDatabase::systemFont(QFontDatabase::FixedFont);
+#else
+   QFont font("Monospace");
+#if QT_VERSION >= 0x040800
+   font.setStyleHint(QFont::Monospace);
+#else
+   font.setStyleHint(QFont::TypeWriter);
+#endif
+  return font;
+#endif
 }
 
 QFont bitcoinAddressFont()
