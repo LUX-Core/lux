@@ -564,6 +564,7 @@ void BitcoinGUI::createMenuBar() {
         file->addAction(openAction);
         file->addAction(backupWalletAction);
         file->addAction(restoreWalletAction);
+        file->addSeparator();
         file->addAction(signMessageAction);
         file->addAction(verifyMessageAction);
         file->addSeparator();
@@ -579,8 +580,9 @@ void BitcoinGUI::createMenuBar() {
         settings->addAction(changePassphraseAction);
         settings->addAction(unlockWalletAction);
         settings->addAction(lockWalletAction);
-        settings->addAction(bip38ToolAction);
-        settings->addAction(multiSendAction);
+        settings->addSeparator();
+        settings->addAction(openConfEditorAction);
+        settings->addAction(openMNConfEditorAction);
         settings->addSeparator();
     }
 
@@ -588,25 +590,30 @@ void BitcoinGUI::createMenuBar() {
 
     if (walletFrame) {
         QMenu* tools = appMenuBar->addMenu(tr("&Tools"));
-        tools->addAction(openInfoAction);
         tools->addAction(openRPCConsoleAction);
+        tools->addSeparator();
         tools->addAction(openNetworkAction);
         tools->addAction(openPeersAction);
-        tools->addAction(openRepairAction);
         tools->addSeparator();
-        tools->addAction(openConfEditorAction);
-        tools->addAction(openMNConfEditorAction);
+        tools->addAction(openRepairAction);
         tools->addAction(showBackupsAction);
+        tools->addAction(bip38ToolAction);
+        tools->addAction(multiSendAction);
+        tools->addSeparator();
         tools->addAction(openHexAddressAction);
         tools->addAction(openBlockExplorerAction);
+        tools->addSeparator();
         tools->addAction(checkForUpdateAction);
+        tools->addSeparator();
     }
 
     QMenu* help = appMenuBar->addMenu(tr("&Help"));
+    help->addAction(openInfoAction);
     help->addAction(showHelpMessageAction);
     help->addSeparator();
     help->addAction(aboutAction);
     help->addAction(aboutQtAction);
+    help->addSeparator();
 }
 
 void BitcoinGUI::createToolBars() {
