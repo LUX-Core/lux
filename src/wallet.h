@@ -64,6 +64,8 @@ static const bool DEFAULT_SPEND_ZEROCONF_CHANGE = true;
 //! Default for -zerobalanceaddresstoken
 static const bool DEFAULT_ZERO_BALANCE_ADDRESS_TOKEN = true;
 
+static const bool DEFAULT_DISABLE_WALLET = false;
+
 static const bool DEFAULT_NOT_USE_CHANGE_ADDRESS = false;
 extern const char * DEFAULT_WALLET_DAT;
 

@@ -70,6 +70,8 @@ public:
     // Empty if no authentication or invalid signature/cert/etc.
     QString authenticatedMerchant;
 
+    bool fSubtractFeeFromAmount; // memory only
+
     static const int CURRENT_VERSION = 1;
     int nVersion;
 
@@ -170,9 +172,15 @@ public:
     bool validateAddress(const QString& address);
 
     // Return status record for SendCoins, contains error id + information
-    struct SendCoinsReturn {
-        SendCoinsReturn(StatusCode status = OK) : status(status) {}
+    struct SendCoinsReturn
+    {
+        SendCoinsReturn(StatusCode _status = OK, QString _reasonCommitFailed = "")
+                : status(_status),
+                  reasonCommitFailed(_reasonCommitFailed)
+        {
+        }
         StatusCode status;
+        QString reasonCommitFailed;
     };
 
     // prepare transaction for getting txfee before sending coins
@@ -249,6 +257,10 @@ public:
     std::vector<CTokenInfo> getInvalidTokens();
 
     bool isMineAddress(const std::string &Address);
+
+    static bool isWalletEnabled();
+
+    int getDefaultConfirmTarget() const;
 
 private:
     CWallet* wallet;
