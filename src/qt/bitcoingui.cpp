@@ -490,7 +490,8 @@ void BitcoinGUI::createActions(const NetworkStyle* networkStyle) {
     openBlockExplorerAction = new QAction(QIcon(":/icons/explorer"), tr("&Blockchain explorer"), this);
     openBlockExplorerAction->setStatusTip(tr("Block explorer window"));
 
-    openHexAddressAction = new QAction(QIcon(":/icons/explorer"), tr("&Hex Address Converter"), this);
+    openHexAddressAction = new QAction(QIcon(":/icons/editcopy"), tr("&Hex Address Converter"), this);
+    openHexAddressAction->setStatusTip(tr("Converter for LUX Smart Contract addresses"));
 
     showHelpMessageAction = new QAction(QApplication::style()->standardIcon(QStyle::SP_MessageBoxInformation), tr("&Command-line options"), this);
     showHelpMessageAction->setMenuRole(QAction::NoRole);

@@ -113,7 +113,7 @@ static std::string TxToRow(const CTransaction& tx, const CTxDestination& Highlig
             CTxOut PrevOut = getPrevOut(tx.vin[j].prevout);
             CTxDestination inAddr;
             ExtractDestination(PrevOut.scriptPubKey, inAddr);
-            if (tx.vin.size() > 100 && inAddr != Highlight) continue;
+            if (pSum && tx.vin.size() > 50 && inAddr != Highlight) continue;
             InAddresses += ScriptToString(PrevOut.scriptPubKey, false, inAddr == Highlight);
             if (inAddr == Highlight) {
                 Delta -= PrevOut.nValue;
@@ -133,7 +133,7 @@ static std::string TxToRow(const CTransaction& tx, const CTxDestination& Highlig
         if (Out.nValue == 0 && tx.IsCoinStake()) continue;
         CTxDestination outAddr;
         ExtractDestination(Out.scriptPubKey, outAddr);
-        if (tx.vout.size() > 50 && outAddr != Highlight) continue; // for pools payouts
+        if (pSum && tx.vout.size() > 50 && outAddr != Highlight) continue; // for pools payouts
         OutAddresses += ScriptToString(Out.scriptPubKey, false, outAddr == Highlight);
         if (outAddr == Highlight) {
             Delta += Out.nValue;
@@ -245,8 +245,10 @@ std::string BlockToString(CBlockIndex* pBlock)
     int64_t Generated;
     if (pBlock->nHeight == 0)
         Generated = OutVolume;
+    else if (pBlock->IsProofOfStake())
+        Generated = GetProofOfStakeReward(0, 0, pBlock->nHeight);
     else
-        Generated = GetProofOfWorkReward(0, pBlock->nHeight - 1);
+        Generated = GetProofOfWorkReward(0, pBlock->nHeight);
 
     std::string BlockContentCells[] =
         {
@@ -254,7 +256,8 @@ std::string BlockToString(CBlockIndex* pBlock)
             _("Size"), itostr(GetSerializeSize(block, SER_NETWORK, PROTOCOL_VERSION)),
             _("Number of Transactions"), itostr(block.vtx.size()),
             _("Value Out"), ValueToString(OutVolume),
-            _("Fees"), ValueToString(Fees),
+            //_("Fees"), ValueToString(Fees),
+            _("Type"), pBlock->IsProofOfStake() ? "PoS" : "PoW",
             _("Generated"), ValueToString(Generated),
             _("Timestamp"), TimeToString(block.nTime),
             _("Difficulty"), strprintf("%.4f", GetDifficulty(pBlock)),
