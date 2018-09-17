@@ -86,7 +86,7 @@ static const CRPCConvertParam vRPCConvertParams[] =
     { "getblockhashes", 0, "high"},
     { "getblockhashes", 1, "low"},
     { "getblockhashes", 2, "options"},
-    { "getspentinfo", 0, "argument"},
+    { "getspentinfo", 1, "index"},
     { "searchlogs", 0, "fromBlock"},
     { "searchlogs", 1, "toBlock"},
     { "searchlogs", 2, "address"},
