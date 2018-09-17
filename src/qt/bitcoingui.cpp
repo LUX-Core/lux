@@ -17,7 +17,7 @@
 #include "openuridialog.h"
 #include "optionsdialog.h"
 #include "optionsmodel.h"
-//#include "platformstyle.h"
+#include "platformstyle.h"
 #include "rpcconsole.h"
 #include "utilitydialog.h"
 #include "stake.h"
@@ -86,7 +86,7 @@ const QString BitcoinGUI::DEFAULT_WALLET = "~Default";
 
 
 
-BitcoinGUI::BitcoinGUI(const NetworkStyle* networkStyle, QWidget* parent) : QMainWindow(parent),
+BitcoinGUI::BitcoinGUI(const PlatformStyle *platformStyle, const NetworkStyle* networkStyle, QWidget* parent) : QMainWindow(parent),
                                                                             enableWallet(false),
                                                                             clientModel(0),
                                                                             walletFrame(0),
@@ -134,7 +134,9 @@ BitcoinGUI::BitcoinGUI(const NetworkStyle* networkStyle, QWidget* parent) : QMai
                                                                             hexAddressWindow(0),
                                                                             modalOverlay(0),
                                                                             prevBlocks(0),
-                                                                            spinnerFrame(0)
+                                                                            spinnerFrame(0),
+                                                                            platformStyle(platformStyle)
+
 {
     /* Open CSS when configured */
     this->setStyleSheet(GUIUtil::loadStyleSheet());
@@ -174,12 +176,12 @@ BitcoinGUI::BitcoinGUI(const NetworkStyle* networkStyle, QWidget* parent) : QMai
     setUnifiedTitleAndToolBarOnMac(true);
 #endif
 
-    rpcConsole = new RPCConsole(enableWallet ? this : 0);
+    rpcConsole = new RPCConsole(platformStyle, enableWallet ? this : 0);
     hexAddressWindow = new HexAddressConverter(this);
 #ifdef ENABLE_WALLET
     if (enableWallet) {
         /** Create wallet frame*/
-        walletFrame = new WalletFrame(this);
+        walletFrame = new WalletFrame(platformStyle, this);
         explorerWindow = new BlockExplorer(this);
     } else
 #endif // ENABLE_WALLET
@@ -216,7 +218,7 @@ BitcoinGUI::BitcoinGUI(const NetworkStyle* networkStyle, QWidget* parent) : QMai
     QHBoxLayout* frameBlocksLayout = new QHBoxLayout(frameBlocks);
     frameBlocksLayout->setContentsMargins(6, 0, 6, 0);
     frameBlocksLayout->setSpacing(6);
-    unitDisplayControl = new UnitDisplayStatusBarControl();
+    unitDisplayControl = new UnitDisplayStatusBarControl(platformStyle);
     labelStakingIcon = new QLabel();
     labelEncryptionIcon = new QLabel();
     labelConnectionsIcon = new QPushButton();
@@ -663,7 +665,7 @@ void BitcoinGUI::setClientModel(ClientModel* clientModel) {
 
         modalOverlay->setKnownBestHeight(clientModel->getHeaderTipHeight(), QDateTime::fromTime_t(clientModel->getHeaderTipTime()));
         setNumBlocks(clientModel->getNumBlocks(), clientModel->getLastBlockDate(), clientModel->getVerificationProgress(NULL), false);
-        connect(_clientModel, SIGNAL(numBlocksChanged(int,QDateTime,double,bool)), this, SLOT(setNumBlocks(int,QDateTime,double,bool)));
+        connect(clientModel, SIGNAL(numBlocksChanged(int,QDateTime,double,bool)), this, SLOT(setNumBlocks(int,QDateTime,double,bool)));
 
         //connect(clientModel, SIGNAL(additionalDataSyncProgressChanged(double)), this, SLOT(setAdditionalDataSyncProgress(double)));
 
@@ -1413,7 +1415,7 @@ void BitcoinGUI::handleRestart(QStringList args) {
         Q_EMIT requestedRestart(args);
 }
 
-UnitDisplayStatusBarControl::UnitDisplayStatusBarControl() : optionsModel(0),
+UnitDisplayStatusBarControl::UnitDisplayStatusBarControl(const PlatformStyle *platformStyle) : optionsModel(0),
                                                              menu(0)
 {
     createContextMenu();

@@ -28,7 +28,7 @@ class NetworkStyle;
 class Notificator;
 class OptionsModel;
 class BlockExplorer;
-//class PlatformStyle;
+class PlatformStyle;
 class RPCConsole;
 class SendCoinsRecipient;
 class UnitDisplayStatusBarControl;
@@ -61,7 +61,7 @@ public:
     static const QString DEFAULT_WALLET;
     static const std::string DEFAULT_UIPLATFORM;
 
-    explicit BitcoinGUI(const NetworkStyle* networkStyle, QWidget* parent = 0);
+    explicit BitcoinGUI(const PlatformStyle *platformStyle, const NetworkStyle* networkStyle, QWidget* parent = 0);
     ~BitcoinGUI();
 
     /** Set the client model.
@@ -156,6 +156,7 @@ private:
     /** Keep track of previous number of blocks, to detect progress */
     int prevBlocks;
     int spinnerFrame;
+    const PlatformStyle* platformStyle;
 
     /** Create the main UI actions. */
     void createActions(const NetworkStyle* networkStyle);
@@ -300,7 +301,7 @@ class UnitDisplayStatusBarControl : public QLabel
     Q_OBJECT
 
 public:
-    explicit UnitDisplayStatusBarControl();
+    explicit UnitDisplayStatusBarControl(const PlatformStyle* platformStyle);
     /** Lets the control know about the Options Model (and its signals) */
     void setOptionsModel(OptionsModel* optionsModel);
 

@@ -16,6 +16,7 @@
 #include "optionsmodel.h"
 #include "sendcoinsentry.h"
 #include "walletmodel.h"
+#include "platformstyle.h"
 
 #include "base58.h"
 #include "coincontrol.h"
@@ -32,20 +33,26 @@
 
 #define SEND_CONFIRM_DELAY 3
 
-SendCoinsDialog::SendCoinsDialog(QWidget* parent) : QDialog(parent),
+SendCoinsDialog::SendCoinsDialog(const PlatformStyle *platformStyle, QWidget* parent) : QDialog(parent),
                                                     ui(new Ui::SendCoinsDialog),
                                                     clientModel(0),
                                                     model(0),
                                                     fNewRecipientAllowed(true),
-                                                    fFeeMinimized(true)
+                                                    fFeeMinimized(true),
+                                                    platformStyle(platformStyle)
+
 {
     ui->setupUi(this);
 
-#ifdef Q_OS_MAC // Icons on push buttons are very uncommon on Mac
-    ui->addButton->setIcon(QIcon());
-    ui->clearButton->setIcon(QIcon());
-    ui->sendButton->setIcon(QIcon());
-#endif
+    if (!platformStyle->getImagesOnButtons()) {
+        ui->addButton->setIcon(QIcon());
+        ui->clearButton->setIcon(QIcon());
+        ui->sendButton->setIcon(QIcon());
+    } else {
+        ui->addButton->setIcon(platformStyle->SingleColorIcon(":/icons/add"));
+        ui->clearButton->setIcon(platformStyle->SingleColorIcon(":/icons/remove"));
+        ui->sendButton->setIcon(platformStyle->SingleColorIcon(":/icons/send"));
+    }
 
     GUIUtil::setupAddressWidget(ui->lineEditCoinControlChange, this);
 
@@ -468,7 +475,7 @@ void SendCoinsDialog::accept()
 
 SendCoinsEntry* SendCoinsDialog::addEntry()
 {
-    SendCoinsEntry* entry = new SendCoinsEntry(this);
+    SendCoinsEntry* entry = new SendCoinsEntry(platformStyle, this);
     entry->setModel(model);
     ui->entries->addWidget(entry);
     connect(entry, SIGNAL(removeEntry(SendCoinsEntry*)), this, SLOT(removeEntry(SendCoinsEntry*)));
@@ -879,7 +886,7 @@ void SendCoinsDialog::coinControlFeatureChanged(bool checked)
 // Coin Control: button inputs -> show actual coin control dialog
 void SendCoinsDialog::coinControlButtonClicked()
 {
-    CoinControlDialog dlg;
+    CoinControlDialog dlg(platformStyle);
     dlg.setModel(model);
     dlg.setClientModel(clientModel);
     dlg.exec();

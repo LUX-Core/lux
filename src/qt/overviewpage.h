@@ -15,6 +15,7 @@ class TransactionFilterProxy;
 class TxViewDelegate;
 class TknViewDelegate;
 class WalletModel;
+class PlatformStyle;
 
 namespace Ui {
 class OverviewPage;
@@ -30,7 +31,7 @@ class OverviewPage : public QWidget
     Q_OBJECT
 
 public:
-    explicit OverviewPage(QWidget* parent = 0);
+    explicit OverviewPage(const PlatformStyle *platformStyle, QWidget* parent = 0);
     ~OverviewPage();
 
     void setClientModel(ClientModel* clientModel);

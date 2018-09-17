@@ -19,6 +19,7 @@
 
 class WalletModel;
 class ClientModel;
+class PlatformStyle;
 
 class CCoinControl;
 class CTxMemPool;
@@ -33,7 +34,7 @@ class CoinControlDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit CoinControlDialog(QWidget* parent = 0);
+    explicit CoinControlDialog(const PlatformStyle *platformStyle, QWidget* parent = 0);
     ~CoinControlDialog();
     void CheckDialogLablesUpdated();
     void setModel(WalletModel* model);
@@ -59,7 +60,7 @@ private:
     QAction* copyTransactionHashAction;
     QAction* lockAction;
     QAction* unlockAction;
-
+    const PlatformStyle* platformStyle;
     QStringList toogleLockList;
     QString strPad(QString, int, QString);
     void sortView(int, Qt::SortOrder);

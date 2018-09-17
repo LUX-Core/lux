@@ -10,7 +10,7 @@
 
 class BitcoinGUI;
 class ClientModel;
-//class PlatformStyle;
+class PlatformStyle;
 class SendCoinsRecipient;
 class WalletModel;
 class WalletView;
@@ -26,7 +26,7 @@ class WalletFrame : public QFrame
     Q_OBJECT
 
 public:
-    explicit WalletFrame(BitcoinGUI *_gui = 0);
+    explicit WalletFrame(const PlatformStyle *platformStyle, BitcoinGUI *_gui = 0);
     ~WalletFrame();
 
     void setClientModel(ClientModel *clientModel);
@@ -49,6 +49,8 @@ private:
     QMap<QString, WalletView*> mapWalletViews;
 
     bool bOutOfSync;
+
+    const PlatformStyle* platformStyle;
 
     WalletView* currentWalletView();
 

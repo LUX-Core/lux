@@ -14,6 +14,7 @@
 #include "recentrequeststablemodel.h"
 #include "../wallet.h"
 #include "walletmodel.h"
+#include "platformstyle.h"
 
 #include <QAction>
 #include <QCursor>
@@ -22,19 +23,27 @@
 #include <QScrollBar>
 #include <QTextDocument>
 
-ReceiveCoinsDialog::ReceiveCoinsDialog(QWidget* parent) : QDialog(parent),
+ReceiveCoinsDialog::ReceiveCoinsDialog(const PlatformStyle *platformStyle, QWidget* parent) : QDialog(parent),
                                                           ui(new Ui::ReceiveCoinsDialog),
                                                           columnResizingFixer(0),
-                                                          model(0)
+                                                          model(0),
+                                                          platformStyle(platformStyle)
+
 {
     ui->setupUi(this);
 
-#ifdef Q_OS_MAC // Icons on push buttons are very uncommon on Mac
-    ui->clearButton->setIcon(QIcon());
-    ui->receiveButton->setIcon(QIcon());
-    ui->showRequestButton->setIcon(QIcon());
-    ui->removeRequestButton->setIcon(QIcon());
-#endif
+    if (!platformStyle->getImagesOnButtons()) {
+        ui->clearButton->setIcon(QIcon());
+        ui->receiveButton->setIcon(QIcon());
+        ui->showRequestButton->setIcon(QIcon());
+        ui->removeRequestButton->setIcon(QIcon());
+    } else {
+        ui->clearButton->setIcon(platformStyle->SingleColorIcon(":/icons/remove"));
+        ui->receiveButton->setIcon(platformStyle->SingleColorIcon(":/icons/receiving_addresses"));
+        ui->showRequestButton->setIcon(platformStyle->SingleColorIcon(":/icons/edit"));
+        ui->removeRequestButton->setIcon(platformStyle->SingleColorIcon(":/icons/remove"));
+    }
+
 
     if (model->getDefaultAddressType() == OUTPUT_TYPE_BECH32) {
         ui->useBech32->setCheckState(Qt::Checked);

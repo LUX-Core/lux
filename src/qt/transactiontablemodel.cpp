@@ -11,6 +11,7 @@
 #include "transactiondesc.h"
 #include "transactionrecord.h"
 #include "walletmodel.h"
+#include "platformstyle.h"
 
 #include "main.h"
 #include "sync.h"
@@ -216,11 +217,12 @@ public:
     }
 };
 
-TransactionTableModel::TransactionTableModel(CWallet* wallet, WalletModel* parent) : QAbstractTableModel(parent),
+TransactionTableModel::TransactionTableModel(const PlatformStyle *platformStyle, CWallet* wallet, WalletModel* parent) : QAbstractTableModel(parent),
                                                                                      wallet(wallet),
                                                                                      walletModel(parent),
                                                                                      priv(new TransactionTablePriv(wallet, this)),
-                                                                                     fProcessingQueuedTransactions(false)
+                                                                                     fProcessingQueuedTransactions(false),
+                                                                                     platformStyle(platformStyle)
 {
     columns << QString() << QString() << tr("Date") << tr("Type") << tr("Address") << BitcoinUnits::getAmountColumnTitle(walletModel->getOptionsModel()->getDisplayUnit());
     priv->refreshWallet();
