@@ -18,6 +18,7 @@
 
 class QMenu;
 class ClientModel;
+class PlatformStyle;
 
 namespace Ui
 {
@@ -34,7 +35,7 @@ class RPCConsole : public QDialog
     Q_OBJECT
 
 public:
-    explicit RPCConsole(QWidget* parent);
+    explicit RPCConsole(const PlatformStyle *platformStyle, QWidget* parent);
     ~RPCConsole();
 
     static bool RPCParseCommandLine(std::string &strResult, const std::string &strCommand, bool fExecute, std::string * const pstrFilteredOut = NULL);
@@ -166,10 +167,11 @@ private:
     int historyPtr;
     NodeId cachedNodeid;
     int consoleFontSize;
-    QCompleter *autoCompleter;
+    QCompleter* autoCompleter;
     QThread thread;
-    QMenu *peersTableContextMenu;
-    QMenu *banTableContextMenu;
+    QMenu* peersTableContextMenu;
+    QMenu* banTableContextMenu;
+    const PlatformStyle* platformStyle;
 
 };
 

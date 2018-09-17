@@ -19,6 +19,7 @@
 #include "transactiontablemodel.h"
 #include "walletmodel.h"
 #include "tokenitemmodel.h"
+#include "platformstyle.h"
 
 #include <QAbstractItemDelegate>
 #include <QPainter>
@@ -39,8 +40,9 @@ class TxViewDelegate : public QAbstractItemDelegate
 {
     Q_OBJECT
 public:
-    TxViewDelegate() : QAbstractItemDelegate(), unit(BitcoinUnits::LUX)
-    {
+    TxViewDelegate(const PlatformStyle *platformStyle):
+            QAbstractItemDelegate(), unit(BitcoinUnits::LUX),
+            platformStyle(platformStyle)    {
     }
 
     inline void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const
@@ -56,6 +58,7 @@ public:
         int halfheight = (mainRect.height() - 2 * ypad) / 2;
         QRect amountRect(mainRect.left() + xspace, mainRect.top() + ypad, mainRect.width() - xspace - ICON_OFFSET, halfheight);
         QRect addressRect(mainRect.left() + xspace, mainRect.top() + ypad + halfheight, mainRect.width() - xspace, halfheight);
+        icon = platformStyle->SingleColorIcon(icon);
         icon.paint(painter, decorationRect);
 
         QDateTime date = index.data(TransactionTableModel::DateRole).toDateTime();
@@ -105,6 +108,7 @@ public:
     }
 
     int unit;
+    const PlatformStyle* platformStyle;
 };
 
 class TknViewDelegate : public QAbstractItemDelegate
@@ -182,7 +186,7 @@ public:
 
 #include "overviewpage.moc"
 
-OverviewPage::OverviewPage(QWidget* parent) : QWidget(parent),
+OverviewPage::OverviewPage(const PlatformStyle *platformStyle, QWidget* parent) : QWidget(parent),
                                               ui(new Ui::OverviewPage),
                                               clientModel(0),
                                               walletModel(0),
@@ -192,7 +196,7 @@ OverviewPage::OverviewPage(QWidget* parent) : QWidget(parent),
                                               currentWatchOnlyBalance(-1),
                                               currentWatchUnconfBalance(-1),
                                               currentWatchImmatureBalance(-1),
-                                              txdelegate(new TxViewDelegate()),
+                                              txdelegate(new TxViewDelegate(platformStyle)),
                                               tkndelegate(new TknViewDelegate(this)),
                                               filter(0)
 {

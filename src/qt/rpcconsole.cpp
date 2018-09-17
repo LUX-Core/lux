@@ -11,6 +11,7 @@
 #include "guiutil.h"
 #include "peertablemodel.h"
 #include "bantablemodel.h"
+#include "platformstyle.h"
 
 #include "chainparams.h"
 #include "main.h"
@@ -375,20 +376,23 @@ void RPCExecutor::request(const QString &command)
     }
 }
 
-RPCConsole::RPCConsole(QWidget* parent) : QDialog(parent),
+RPCConsole::RPCConsole(const PlatformStyle *platformStyle, QWidget* parent) : QDialog(parent),
                                           ui(new Ui::RPCConsole),
                                           clientModel(0),
                                           historyPtr(0),
                                           cachedNodeid(-1),
                                           peersTableContextMenu(0),
-                                          banTableContextMenu(0)
+                                          banTableContextMenu(0),
+                                          platformStyle(platformStyle)
 {
     ui->setupUi(this);
     GUIUtil::restoreWindowGeometry("nRPCConsoleWindow", this->size(), this);
 
-#ifndef Q_OS_MAC
-    ui->openDebugLogfileButton->setIcon(QIcon(":/icons/export"));
-#endif
+    if (platformStyle->getImagesOnButtons()) {
+        ui->openDebugLogfileButton->setIcon(platformStyle->SingleColorIcon(":/icons/export"));
+    }
+    ui->clearButton->setIcon(platformStyle->SingleColorIcon(":/icons/remove"));
+
 
     // Install event filter for up and down arrow
     ui->lineEdit->installEventFilter(this);
@@ -744,7 +748,7 @@ void RPCConsole::clear()
         ui->messagesWidget->document()->addResource(
             QTextDocument::ImageResource,
             QUrl(ICON_MAPPING[i].url),
-            QImage(ICON_MAPPING[i].source).scaled(ICON_SIZE, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
+            platformStyle->SingleColorImage(ICON_MAPPING[i].source).scaled(ICON_SIZE, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
     }
 
     // Set default style sheet

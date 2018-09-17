@@ -7,7 +7,7 @@ namespace Ui
 {
 class MultiSendDialog;
 }
-
+class PlatformStyle;
 class WalletModel;
 class QLineEdit;
 class MultiSendDialog : public QDialog
@@ -16,7 +16,7 @@ class MultiSendDialog : public QDialog
     void updateCheckBoxes();
 
 public:
-    explicit MultiSendDialog(QWidget* parent = 0);
+    explicit MultiSendDialog(const PlatformStyle* platformStyle, QWidget* parent = 0);
     ~MultiSendDialog();
     void setModel(WalletModel* model);
     void setAddress(const QString& address);
@@ -32,6 +32,7 @@ private Q_SLOTS:
 private:
     Ui::MultiSendDialog* ui;
     WalletModel* model;
+    const PlatformStyle* platformStyle;
 };
 
 #endif // MULTISENDDIALOG_H

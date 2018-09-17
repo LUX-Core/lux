@@ -17,6 +17,7 @@
 
 class OptionsModel;
 class WalletModel;
+class PlatformStyle;
 
 namespace Ui
 {
@@ -40,7 +41,7 @@ public:
         MINIMUM_COLUMN_WIDTH = 130
     };
 
-    explicit ReceiveCoinsDialog(QWidget* parent = 0);
+    explicit ReceiveCoinsDialog(const PlatformStyle *platformStyle, QWidget* parent = 0);
     ~ReceiveCoinsDialog();
 
     void setModel(WalletModel* model);
@@ -59,6 +60,7 @@ private:
     WalletModel* model;
     QMenu* contextMenu;
     QModelIndex selectedRow();
+    const PlatformStyle* platformStyle;
     void copyColumnToClipboard(int column);
     virtual void resizeEvent(QResizeEvent* event);
 

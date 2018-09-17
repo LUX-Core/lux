@@ -15,6 +15,7 @@
 #include "transactionrecord.h"
 #include "transactiontablemodel.h"
 #include "walletmodel.h"
+#include "platformstyle.h"
 
 #include "ui_interface.h"
 
@@ -35,7 +36,7 @@
 #include <QUrl>
 #include <QVBoxLayout>
 
-TransactionView::TransactionView(QWidget* parent) : QWidget(parent), model(0), transactionProxyModel(0), transactionView(0), abandonAction(0), columnResizingFixer(0)
+TransactionView::TransactionView(const PlatformStyle *platformStyle, QWidget* parent) : QWidget(parent), model(0), transactionProxyModel(0), transactionView(0), abandonAction(0), columnResizingFixer(0)
 {
     QSettings settings;
     // Build filter row
@@ -43,27 +44,28 @@ TransactionView::TransactionView(QWidget* parent) : QWidget(parent), model(0), t
 
     QHBoxLayout* hlayout = new QHBoxLayout();
     hlayout->setContentsMargins(0, 0, 0, 0);
-#ifdef Q_OS_MAC
-    hlayout->setSpacing(5);
-    hlayout->addSpacing(26);
-#else
-    hlayout->setSpacing(0);
-    hlayout->addSpacing(23);
-#endif
+
+    if (platformStyle->getUseExtraSpacing()) {
+        hlayout->setSpacing(5);
+        hlayout->addSpacing(26);
+    } else {
+        hlayout->setSpacing(0);
+        hlayout->addSpacing(23);
+    }
 
     watchOnlyWidget = new QComboBox(this);
     watchOnlyWidget->setFixedWidth(24);
     watchOnlyWidget->addItem("", TransactionFilterProxy::WatchOnlyFilter_All);
-    watchOnlyWidget->addItem(QIcon(":/icons/eye_plus"), "", TransactionFilterProxy::WatchOnlyFilter_Yes);
-    watchOnlyWidget->addItem(QIcon(":/icons/eye_minus"), "", TransactionFilterProxy::WatchOnlyFilter_No);
+    watchOnlyWidget->addItem(platformStyle->SingleColorIcon(":/icons/eye_plus"), "", TransactionFilterProxy::WatchOnlyFilter_Yes);
+    watchOnlyWidget->addItem(platformStyle->SingleColorIcon(":/icons/eye_minus"), "", TransactionFilterProxy::WatchOnlyFilter_No);
     hlayout->addWidget(watchOnlyWidget);
 
     dateWidget = new QComboBox(this);
-#ifdef Q_OS_MAC
-    dateWidget->setFixedWidth(121);
-#else
-    dateWidget->setFixedWidth(120);
-#endif
+    if (platformStyle->getUseExtraSpacing()) {
+        dateWidget->setFixedWidth(121);
+    } else {
+        dateWidget->setFixedWidth(120);
+    }
     dateWidget->addItem(tr("All"), All);
     dateWidget->addItem(tr("Today"), Today);
     dateWidget->addItem(tr("This week"), ThisWeek);
@@ -75,11 +77,11 @@ TransactionView::TransactionView(QWidget* parent) : QWidget(parent), model(0), t
     hlayout->addWidget(dateWidget);
 
     typeWidget = new QComboBox(this);
-#ifdef Q_OS_MAC
-    typeWidget->setFixedWidth(TYPE_COLUMN_WIDTH + 1);
-#else
-    typeWidget->setFixedWidth(TYPE_COLUMN_WIDTH);
-#endif
+    if (platformStyle->getUseExtraSpacing()) {
+        typeWidget->setFixedWidth(121);
+    } else {
+        typeWidget->setFixedWidth(120);
+    }
 
     typeWidget->addItem(tr("All"), TransactionFilterProxy::ALL_TYPES);
     typeWidget->addItem(tr("Most Common"), TransactionFilterProxy::COMMON_TYPES);
@@ -109,11 +111,11 @@ TransactionView::TransactionView(QWidget* parent) : QWidget(parent), model(0), t
 #if QT_VERSION >= 0x040700
     amountWidget->setPlaceholderText(tr("Min amount"));
 #endif
-#ifdef Q_OS_MAC
-    amountWidget->setFixedWidth(97);
-#else
-    amountWidget->setFixedWidth(100);
-#endif
+    if (platformStyle->getUseExtraSpacing()) {
+        amountWidget->setFixedWidth(97);
+    } else {
+        amountWidget->setFixedWidth(100);
+    }
     amountWidget->setValidator(new QDoubleValidator(0, 1e20, 8, this));
     hlayout->addWidget(amountWidget);
 
@@ -127,12 +129,12 @@ TransactionView::TransactionView(QWidget* parent) : QWidget(parent), model(0), t
     vlayout->addWidget(view);
     vlayout->setSpacing(0);
     int width = view->verticalScrollBar()->sizeHint().width();
-// Cover scroll bar width with spacing
-#ifdef Q_OS_MAC
-    hlayout->addSpacing(width + 2);
-#else
-    hlayout->addSpacing(width);
-#endif
+    // Cover scroll bar width with spacing
+    if (platformStyle->getUseExtraSpacing()) {
+        hlayout->addSpacing(width+2);
+    } else {
+        hlayout->addSpacing(width);
+    }
     // Always show scroll bar
     view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
     view->setTabKeyNavigation(false);

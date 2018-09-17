@@ -14,6 +14,7 @@
 #include "optionsmodel.h"
 #include "walletmodel.h"
 #include "clientmodel.h"
+#include "platformstyle.h"
 
 #include "coincontrol.h"
 #include "main.h"
@@ -39,10 +40,11 @@ QList<CAmount> CoinControlDialog::payAmounts;
 int CoinControlDialog::nSplitBlockDummy;
 CCoinControl* CoinControlDialog::coinControl = new CCoinControl();
 
-CoinControlDialog::CoinControlDialog(QWidget* parent) : QDialog(parent),
+CoinControlDialog::CoinControlDialog(const PlatformStyle *platformStyle, QWidget* parent) : QDialog(parent),
                                                         ui(new Ui::CoinControlDialog),
                                                         model(0),
-                                                        clientModel(0)
+                                                        clientModel(0),
+                                                        platformStyle(platformStyle)
 {
     ui->setupUi(this);
 

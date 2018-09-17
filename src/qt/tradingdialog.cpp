@@ -1411,7 +1411,7 @@ void tradingDialog::on_SaveKeys_clicked()
     }
     if (fSuccess) {
         bool Save = true;
-        on_UpdateKeys_clicked(Save, Load);
+        on_UpdateKeys_clicked(Save);
     }
 
 }

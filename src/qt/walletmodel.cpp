@@ -38,7 +38,7 @@
 
 #include <boost/filesystem.hpp>
 
-WalletModel::WalletModel(CWallet* wallet, OptionsModel* optionsModel, QObject* parent) : QObject(parent), wallet(wallet), optionsModel(optionsModel), addressTableModel(0),
+WalletModel::WalletModel(const PlatformStyle *platformStyle, CWallet* wallet, OptionsModel* optionsModel, QObject* parent) : QObject(parent), wallet(wallet), optionsModel(optionsModel), addressTableModel(0),
                                                                                          contractTableModel(0),
                                                                                          transactionTableModel(0),
                                                                                          recentRequestsTableModel(0),
@@ -52,10 +52,10 @@ WalletModel::WalletModel(CWallet* wallet, OptionsModel* optionsModel, QObject* p
     fForceCheckBalanceChanged = false;
     addressTableModel = new AddressTableModel(wallet, this);
     contractTableModel = new ContractTableModel(wallet, this);
-    transactionTableModel = new TransactionTableModel(wallet, this);
+    transactionTableModel = new TransactionTableModel(platformStyle, wallet, this);
     recentRequestsTableModel = new RecentRequestsTableModel(wallet, this);
     tokenItemModel = new TokenItemModel(wallet, this);
-    tokenTransactionTableModel = new TokenTransactionTableModel(wallet, this);
+    tokenTransactionTableModel = new TokenTransactionTableModel(platformStyle, wallet, this);
 
     // This timer will be fired repeatedly to update the balance
     pollTimer = new QTimer(this);
