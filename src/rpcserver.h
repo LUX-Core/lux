@@ -176,7 +176,7 @@ void RPCTypeCheck(const UniValue& params,
  * Use like: RPCTypeCheck(object, boost::assign::map_list_of("name", str_type)("value", int_type));
  */
 void RPCTypeCheckObj(const UniValue& o,
-    const std::map<std::string, UniValue::VType>& typesExpected,
+    const std::map<std::string, UniValueType>& typesExpected,
     bool fAllowNull = false);
 
 
