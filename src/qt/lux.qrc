@@ -7,6 +7,16 @@
         <file alias="update">res/icons/update.ico</file>
         <file alias="luxupdate-loader">res/icons/luxupdate-loader.gif</file>
         <file alias="send">res/icons/send.png</file>
+        <file alias="conf">res/icons/conf.png</file>
+        <file alias="auto_backup">res/icons/auto_backup.png</file>
+        <file alias="backup">res/icons/backup.png</file>
+        <file alias="restore">res/icons/restore.png</file>
+        <file alias="wallet_repair">res/icons/wallet_repair.png</file>
+        <file alias="hex">res/icons/hex.png</file>
+        <file alias="explorer">res/icons/explorer.png</file>
+        <file alias="peer">res/icons/peer.png</file>
+        <file alias="verified">res/icons/verified.png</file>
+        <file alias="sign">res/icons/sign.png</file>
         <file alias="connect_0">res/icons/connect0_16.png</file>
         <file alias="connect_1">res/icons/connect1_16.png</file>
         <file alias="connect_2">res/icons/connect2_16.png</file>
@@ -23,7 +33,7 @@
         <file alias="eye">res/icons/eye.png</file>
         <file alias="eye_minus">res/icons/eye_minus.png</file>
         <file alias="eye_plus">res/icons/eye_plus.png</file>
-        <file alias="options">res/icons/configure.png</file>
+        <file alias="options">res/icons/options.png</file>
         <file alias="receiving_addresses">res/icons/receive.png</file>
         <file alias="editpaste">res/icons/editpaste.png</file>
         <file alias="editcopy">res/icons/editcopy.png</file>
