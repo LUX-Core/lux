@@ -248,7 +248,7 @@ OverviewPage::OverviewPage(QWidget* parent) : QWidget(parent),
 void OverviewPage::handleTransactionClicked(const QModelIndex& index)
 {
     if (filter)
-        emit transactionClicked(filter->mapToSource(index));
+        Q_EMIT transactionClicked(filter->mapToSource(index));
 }
 
 void OverviewPage::handleOutOfSyncWarningClicks()

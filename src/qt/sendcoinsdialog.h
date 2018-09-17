@@ -49,7 +49,7 @@ public:
     bool handlePaymentRequest(const SendCoinsRecipient& recipient);
     bool fSplitBlock;
 
-public slots:
+public Q_SLOTS:
     void clear();
     void reject();
     void accept();
@@ -72,7 +72,7 @@ private:
     void minimizeFeeSection(bool fMinimize);
     void updateFeeMinimizedLabel();
 
-private slots:
+private Q_SLOTS:
     void on_sendButton_clicked();
     void on_buttonChooseFee_clicked();
     void on_buttonMinimizeFee_clicked();
@@ -100,7 +100,7 @@ private slots:
     void updateSmartFeeLabel();
     void updateGlobalFeeVariables();
 
-signals:
+Q_SIGNALS:
     // Fired when a message should be reported to the user
     void message(const QString& title, const QString& message, unsigned int style);
 };

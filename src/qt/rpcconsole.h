@@ -55,7 +55,7 @@ public:
 protected:
     virtual bool eventFilter(QObject* obj, QEvent* event);
 
-private slots:
+private Q_SLOTS:
     void on_lineEdit_returnPressed();
     void on_tabWidget_currentChanged(int index);
     /** Switch network activity */
@@ -78,7 +78,7 @@ private slots:
     /** clear the selected node */
     void clearSelectedNode();
 
-public slots:
+public Q_SLOTS:
     void clear();
     void fontBigger();
     void fontSmaller();
@@ -133,7 +133,7 @@ public slots:
     /** Show folder with wallet backups in default browser */
     void showBackups();
 
-signals:
+Q_SIGNALS:
     // For RPC command executor
     void stopExecutor();
     void cmdRequest(const QString& command);

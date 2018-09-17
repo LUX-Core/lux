@@ -98,7 +98,7 @@ private slots:
     void updateWatchOnlyColumn(bool fHaveWatchOnly);
     void abandonTx();
 
-signals:
+Q_SIGNALS:
     void doubleClicked(const QModelIndex&);
 
     /**  Fired when a message should be reported to the user */

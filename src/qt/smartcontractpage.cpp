@@ -157,7 +157,7 @@ SmartContractPage::SmartContractPage(QWidget* parent) : QWidget(parent),
 void SmartContractPage::handleTransactionClicked(const QModelIndex& index)
 {
     if (filter)
-        emit transactionClicked(filter->mapToSource(index));
+        Q_EMIT transactionClicked(filter->mapToSource(index));
 }
 
 SmartContractPage::~SmartContractPage()

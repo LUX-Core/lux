@@ -406,7 +406,7 @@ void tradingDialog::ParseAndPopulateOpenOrdersTable(QString Response){
 
     ui->OpenOrdersTable->setRowCount(0);
 
-    foreach (const QJsonValue & value, jsonArray)
+    Q_FOREACH (const QJsonValue & value, jsonArray)
     {
         QString str = "";
         obj = value.toObject();
@@ -491,7 +491,7 @@ void tradingDialog::ParseAndPopulateAccountHistoryTable(QString Response){
 
     ui->TradeHistoryTable->setRowCount(0);
 
-    foreach (const QJsonValue & value, jsonArray)
+    Q_FOREACH (const QJsonValue & value, jsonArray)
     {
         QString str = "";
         obj = value.toObject();
@@ -531,7 +531,7 @@ void tradingDialog::ParseAndPopulateOrderBookTables(QString OrderBook){
 
     ui->AsksTable->setRowCount(0);
 
-    foreach (const QJsonValue & value, SellArray)
+    Q_FOREACH (const QJsonValue & value, SellArray)
     {
         obj = value.toObject();
 
@@ -553,7 +553,7 @@ void tradingDialog::ParseAndPopulateOrderBookTables(QString OrderBook){
 
     ui->BidsTable->setRowCount(0);
 
-    foreach (const QJsonValue & value, BuyArray)
+    Q_FOREACH (const QJsonValue & value, BuyArray)
     {
         obj = value.toObject();
 
@@ -592,7 +592,7 @@ void tradingDialog::ParseAndPopulateMarketHistoryTable(QString Response){
 
     ui->MarketHistoryTable->setRowCount(0);
 
-    foreach (const QJsonValue & value, jsonArray)
+    Q_FOREACH (const QJsonValue & value, jsonArray)
     {
         QString str = "";
         obj = value.toObject();
@@ -620,7 +620,7 @@ void tradingDialog::ParseAndPopulatePriceChart(QString Response){
 
     QVector<double> time(jsonArray.size()), price(jsonArray.size());
 
-    foreach (const QJsonValue & value, jsonArray)
+    Q_FOREACH (const QJsonValue & value, jsonArray)
     {
         QString str = "";
         obj = value.toObject();
@@ -1272,7 +1272,7 @@ void tradingDialog::CalculateCSReceiveLabel(){
     QJsonArray  BuyArray  = BuyObject.value("Buy").toArray();                //get buy/sell object from result object
 
     // For each buy order
-    foreach (const QJsonValue & value, BuyArray)
+    Q_FOREACH (const QJsonValue & value, BuyArray)
     {
         obj = value.toObject();
 
@@ -1411,7 +1411,7 @@ void tradingDialog::on_SaveKeys_clicked()
     }
     if (fSuccess) {
         bool Save = true;
-        on_UpdateKeys_clicked(Save);
+        on_UpdateKeys_clicked(Save, Load);
     }
 
 }
@@ -1515,7 +1515,7 @@ void tradingDialog::on_CS_Max_Amount_clicked()
 
 
     // For each buy order
-    foreach (const QJsonValue & value, BuyArray)
+    Q_FOREACH (const QJsonValue & value, BuyArray)
     {
         obj = value.toObject();
 
@@ -1574,7 +1574,7 @@ QJsonObject tradingDialog::GetResultObjectFromJSONArray(QString response){
     QJsonArray    jsonArraya    = jsonObjecta["Data"].toArray();
     QJsonObject   obj;
 
-    foreach (const QJsonValue & value, jsonArraya)
+    Q_FOREACH (const QJsonValue & value, jsonArraya)
     {
         obj = value.toObject();
     }
@@ -1765,7 +1765,7 @@ void tradingDialog::on_CSUnitsBtn_clicked()
     QJsonArray  BuyArray  = BuyObject.value("Buy").toArray();                //get buy/sell object from result object
 
     // For each buy order
-    foreach (const QJsonValue & value, BuyArray)
+    Q_FOREACH (const QJsonValue & value, BuyArray)
     {
         obj = value.toObject();
 

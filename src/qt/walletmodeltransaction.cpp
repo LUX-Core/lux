@@ -49,7 +49,7 @@ void WalletModelTransaction::setTransactionFee(const CAmount& newFee)
 CAmount WalletModelTransaction::getTotalTransactionAmount()
 {
     CAmount totalTransactionAmount = 0;
-    foreach (const SendCoinsRecipient& rcp, recipients) {
+    Q_FOREACH (const SendCoinsRecipient& rcp, recipients) {
         totalTransactionAmount += rcp.amount;
     }
     return totalTransactionAmount;

@@ -85,7 +85,7 @@ private:
     QLabel* transactionSum;
     //const PlatformStyle *platformStyle;
 
-public slots:
+public Q_SLOTS:
     /** Switch to overview (home) page */
     void gotoOverviewPage();
     /** Switch to history (transactions) page */
