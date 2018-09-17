@@ -364,6 +364,12 @@ UniValue fundrawtransaction(const UniValue& params, bool fHelp)
             "     \"changePosition\"         (numeric, optional, default random) The index of the change output\n"
             "     \"includeWatching\"        (boolean, optional, default false) Also select inputs which are watch only\n"
             "     \"lockUnspents\"           (boolean, optional, default false) Lock selected unspent outputs\n"
+            "     \"subtractFeeFromOutputs\" (array, optional) A json array of integers.\n"
+            "                              The fee will be equally deducted from the amount of each specified output.\n"
+            "                              The outputs are specified by their zero-based index, before any change output is added.\n"
+            "                              Those recipients will receive less lux than you enter in their corresponding amount field.\n"
+            "                              If no outputs are specified here, the sender pays the fee.\n"
+            "                                  [vout_index,...]\n"
             "   }\n"
             "                         for backward compatibility: passing in a true instead of an object will result in {\"includeWatching\":true}\n"
             "3. iswitness               (boolean, optional) Whether the transaction hex is a serialized witness transaction \n"
@@ -394,6 +400,8 @@ UniValue fundrawtransaction(const UniValue& params, bool fHelp)
     CCoinControl coinControl;
     int changePosition = -1;
     bool lockUnspents = false;
+    UniValue subtractFeeFromOutputs;
+    set<int> setSubtractFeeFromOutputs;
 
     if (!params[1].isNull()) {
         if (params[1].type() == UniValue::VBOOL) {
@@ -411,6 +419,7 @@ UniValue fundrawtransaction(const UniValue& params, bool fHelp)
                     {"includeWatching", UniValue::VBOOL},
                     {"lockUnspents", UniValue::VBOOL},
                     {"reserveChangeKey", UniValue::VBOOL}, // DEPRECATED (and ignored), should be removed in 0.16 or so.
+                    {"subtractFeeFromOutputs", (UniValue::VARR)},
                 },
                 true);
 
@@ -433,6 +442,8 @@ UniValue fundrawtransaction(const UniValue& params, bool fHelp)
             if (options.exists("lockUnspents"))
                 lockUnspents = options["lockUnspents"].get_bool();
 
+            if (options.exists("subtractFeeFromOutputs"))
+            subtractFeeFromOutputs = options["subtractFeeFromOutputs"].get_array();
         }
     }
 
@@ -451,10 +462,21 @@ UniValue fundrawtransaction(const UniValue& params, bool fHelp)
     if (changePosition != -1 && (changePosition < 0 || (unsigned int)changePosition > tx.vout.size()))
         throw JSONRPCError(RPC_INVALID_PARAMETER, "changePosition out of bounds");
 
+    for (unsigned int idx = 0; idx < subtractFeeFromOutputs.size(); idx++) {
+        int pos = subtractFeeFromOutputs[idx].get_int();
+        if (setSubtractFeeFromOutputs.count(pos))
+            throw JSONRPCError(RPC_INVALID_PARAMETER, strprintf("Invalid parameter, duplicated position: %d", pos));
+        if (pos < 0)
+            throw JSONRPCError(RPC_INVALID_PARAMETER, strprintf("Invalid parameter, negative position: %d", pos));
+        if (pos >= int(tx.vout.size()))
+            throw JSONRPCError(RPC_INVALID_PARAMETER, strprintf("Invalid parameter, position too large: %d", pos));
+        setSubtractFeeFromOutputs.insert(pos);
+    }
+
     CAmount nFeeOut;
     std::string strFailReason;
 
-    if (!pwalletMain->FundTransaction(tx, nFeeOut, changePosition, strFailReason, lockUnspents, &coinControl)) {
+    if (!pwalletMain->FundTransaction(tx, nFeeOut, changePosition, strFailReason, lockUnspents, setSubtractFeeFromOutputs, &coinControl)) {
         throw JSONRPCError(RPC_WALLET_ERROR, strFailReason);
     }
 
