@@ -365,6 +365,7 @@ UniValue fundrawtransaction(const UniValue& params, bool fHelp)
             "     \"changePosition\"         (numeric, optional, default random) The index of the change output\n"
             "     \"includeWatching\"        (boolean, optional, default false) Also select inputs which are watch only\n"
             "     \"lockUnspents\"           (boolean, optional, default false) Lock selected unspent outputs\n"
+            "     \"feeRate\"           (numeric, optional, default not set: makes wallet determine the fee) Set a specific feerate (" + CURRENCY_UNIT + " per KB)\n"
             "     \"subtractFeeFromOutputs\" (array, optional) A json array of integers.\n"
             "                              The fee will be equally deducted from the amount of each specified output.\n"
             "                              The outputs are specified by their zero-based index, before any change output is added.\n"
@@ -405,6 +406,8 @@ UniValue fundrawtransaction(const UniValue& params, bool fHelp)
     bool lockUnspents = false;
     UniValue subtractFeeFromOutputs;
     set<int> setSubtractFeeFromOutputs;
+    bool overrideEstimatedFeerate = false;
+    CFeeRate feeRate = CFeeRate(0);
 
     if (!params[1].isNull()) {
         if (params[1].type() == UniValue::VBOOL) {
@@ -421,6 +424,7 @@ UniValue fundrawtransaction(const UniValue& params, bool fHelp)
                     {"changePosition", UniValue::VNUM},
                     {"includeWatching", UniValue::VBOOL},
                     {"lockUnspents", UniValue::VBOOL},
+                    {"feeRate", UniValueType()},
                     {"reserveChangeKey", UniValue::VBOOL}, // DEPRECATED (and ignored), should be removed in 0.16 or so.
                     {"subtractFeeFromOutputs", (UniValue::VARR)},
                 },
@@ -444,6 +448,11 @@ UniValue fundrawtransaction(const UniValue& params, bool fHelp)
 
             if (options.exists("lockUnspents"))
                 lockUnspents = options["lockUnspents"].get_bool();
+
+            if (options.exists("feeRate")) {
+            feeRate = CFeeRate(AmountFromValue(options["feeRate"]));
+            overrideEstimatedFeerate = true;
+             }
 
             if (options.exists("subtractFeeFromOutputs"))
             subtractFeeFromOutputs = options["subtractFeeFromOutputs"].get_array();
@@ -479,7 +488,7 @@ UniValue fundrawtransaction(const UniValue& params, bool fHelp)
     CAmount nFeeOut;
     std::string strFailReason;
 
-    if (!pwalletMain->FundTransaction(tx, nFeeOut, changePosition, strFailReason, lockUnspents, setSubtractFeeFromOutputs, &coinControl)) {
+    if (!pwalletMain->FundTransaction(tx, nFeeOut, overrideEstimatedFeerate, changePosition, strFailReason, lockUnspents, setSubtractFeeFromOutputs, &coinControl)) {
         throw JSONRPCError(RPC_WALLET_ERROR, strFailReason);
     }
 
@@ -908,7 +917,7 @@ UniValue signrawtransaction(const UniValue& params, bool fHelp)
 
             UniValue prevOut = p.get_obj();
 
-            RPCTypeCheckObj(prevOut, map_list_of("txid", UniValue::VSTR)("vout", UniValue::VNUM)("scriptPubKey", UniValue::VSTR));
+            RPCTypeCheckObj(prevOut, { {"txid", UniValueType(UniValue::VSTR)}, {"vout", UniValueType(UniValue::VNUM)}, {"scriptPubKey", UniValueType(UniValue::VSTR)}, });
 
             uint256 txid = ParseHashO(prevOut, "txid");
 
@@ -939,7 +948,7 @@ UniValue signrawtransaction(const UniValue& params, bool fHelp)
             // if redeemScript given and not using the local wallet (private keys
             // given), add redeemScript to the tempKeystore so it can be signed:
             if (fGivenKeys && (scriptPubKey.IsPayToScriptHash() || scriptPubKey.IsPayToWitnessScriptHash())) {
-                RPCTypeCheckObj(prevOut, map_list_of("txid", UniValue::VSTR)("vout", UniValue::VNUM)("scriptPubKey", UniValue::VSTR)("redeemScript", UniValue::VSTR));
+                RPCTypeCheckObj(prevOut, { {"txid", UniValueType(UniValue::VSTR)}, {"vout", UniValueType(UniValue::VNUM)}, {"scriptPubKey", UniValueType(UniValue::VSTR)}, {"redeemScript", UniValueType(UniValue::VSTR)},});
                 UniValue v = find_value(prevOut, "redeemScript");
                 if (!(v.isNull())) {
                     vector<unsigned char> rsData(ParseHexV(v, "redeemScript"));
