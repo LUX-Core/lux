@@ -23,9 +23,12 @@ inline std::string utostr(unsigned int n)
     return strprintf("%u", n);
 }
 
-static std::string makeHRef(const std::string& Str)
+static std::string makeHRef(const std::string& Str, const size_t maxChars = 0)
 {
-    return "<a href=\"" + Str + "\">" + Str + "</a>";
+    std::string displayed = Str;
+    if (maxChars && Str.size() > maxChars)
+        displayed = Str.substr(0, maxChars) + "&hellip;";
+    return "<a href=\"" + Str + "\">" + displayed + "</a>";
 }
 
 static int64_t getTxIn(const CTransaction& tx)
@@ -152,13 +155,14 @@ static std::string TxToRow(const CTransaction& tx, const CTxDestination& Highlig
 
     std::string List[8] = {
             Prepend,
-            makeHRef(tx.GetHash().GetHex()),
+            "<tt>" + makeHRef(tx.GetHash().GetHex(), pSum?24:0) + "</tt>",
             InAddresses,
             InAmounts,
             OutAddresses,
             OutAmounts,
             "",
-            ""};
+            ""
+    };
 
     int n = sizeof(List) / sizeof(std::string) - 2;
 
@@ -197,7 +201,7 @@ const CBlockIndex* getexplorerBlockIndex(int64_t height)
 
 std::string getexplorerBlockHash(int64_t Height)
 {
-    std::string genesisblockhash = "0000041e482b9b9691d98eefb48473405c0b8ec31b76df3797c74a78680ef818";
+    std::string genesisblockhash = "0000037a438b746437529ddecad8f992b9e5536368686f6de24cfac13ff8acd2";
     CBlockIndex* pindexBest = mapBlockIndex[chainActive.Tip()->GetBlockHash()];
     if ((Height < 0) || (Height > pindexBest->nHeight)) {
         return genesisblockhash;
@@ -207,7 +211,7 @@ std::string getexplorerBlockHash(int64_t Height)
     CBlockIndex* pblockindex = mapBlockIndex[chainActive.Tip()->GetBlockHash()];
     while (pblockindex->nHeight > Height)
         pblockindex = pblockindex->pprev;
-    return pblockindex->GetBlockHash().GetHex(); // pblockindex->phashBlock->GetHex();
+    return pblockindex->GetBlockHash().GetHex();
 }
 
 std::string BlockToString(CBlockIndex* pBlock)
@@ -218,19 +222,20 @@ std::string BlockToString(CBlockIndex* pBlock)
     CBlock block;
     ReadBlockFromDisk(block, pBlock, Params().GetConsensus());
 
-    int64_t Fees = 0;
-    int64_t OutVolume = 0;
-    int64_t Reward = 0;
+    CAmount Fees = 0;
+    CAmount OutVolume = 0;
+    CAmount Reward = 0;
 
     std::string TxLabels[] = {_("Hash"), _("From"), _("Amount"), _("To"), _("Amount")};
     std::string TxContent = table + "<thead>" + makeHTMLTableRow(TxLabels, sizeof(TxLabels) / sizeof(std::string)) + "</thead>";
+    TxContent += "<tbody class=\"b\">";
 
     for (unsigned int i = 0; i < block.vtx.size(); i++) {
         const CTransaction& tx = block.vtx[i];
         TxContent += TxToRow(tx);
 
-        int64_t In = getTxIn(tx);
-        int64_t Out = tx.GetValueOut();
+        CAmount In = getTxIn(tx);
+        CAmount Out = tx.GetValueOut();
         if (tx.IsCoinBase())
             Reward += Out;
         else if (In < 0)
@@ -240,7 +245,7 @@ std::string BlockToString(CBlockIndex* pBlock)
             OutVolume += Out;
         }
     }
-    TxContent += "</table>";
+    TxContent += "</tbody></table>";
 
     int64_t Generated;
     if (pBlock->nHeight == 0)
@@ -261,13 +266,13 @@ std::string BlockToString(CBlockIndex* pBlock)
             _("Generated"), ValueToString(Generated),
             _("Timestamp"), TimeToString(block.nTime),
             _("Difficulty"), strprintf("%.4f", GetDifficulty(pBlock)),
-            _("Bits"), utostr(block.nBits),
-            _("Nonce"), utostr(block.nNonce),
-            _("Version"), itostr(block.nVersion),
-            _("Hash"), "<pre>" + block.GetHash(pBlock->nHeight >= Params().SwitchPhi2Block()).GetHex() + "</pre>",
-            _("Merkle Root"), "<pre>" + block.hashMerkleRoot.GetHex() + "</pre>",
-            _("State Root"), "<pre>" + block.hashStateRoot.GetHex() + "</pre>",
-            _("UTXO Root"), "<pre>" + block.hashUTXORoot.GetHex() + "</pre>",
+            _("Bits"), "<tt>" + strprintf("%08x", block.nBits) + "</tt>",
+            _("Nonce"), "<tt>" + strprintf("%08x", block.nNonce) + "</tt>",
+            _("Version"), "<tt>" + strprintf("%08x", block.nVersion) + "</tt>",
+            _("Hash"), "<tt>" + block.GetHash(pBlock->nHeight >= Params().SwitchPhi2Block()).GetHex() + "</tt>",
+            _("Merkle Root"), "<tt>" + block.hashMerkleRoot.GetHex() + "</tt>",
+            _("State Root"), "<tt>" + block.hashStateRoot.GetHex() + "</tt>",
+            _("UTXO Root"), "<tt>" + block.hashUTXORoot.GetHex() + "</tt>",
             // _("Hash Whole Block"), "<pre>" + block.hashWholeBlock.GetHex() + "</pre>"
             // _("Miner Signature"), "<pre>" + block.MinerSignature.ToString() + "</pre>"
         };
@@ -313,14 +318,15 @@ std::string BlockToString(CBlockIndex* pBlock)
 
 std::string TxToString(uint256 BlockHash, const CTransaction& tx)
 {
-    int64_t Input = 0;
-    int64_t Output = tx.GetValueOut();
+    CAmount Input = 0;
+    CAmount Output = tx.GetValueOut();
 
     std::string InputsContentCells[] = {_("#"), _("Taken from"), _("Address"), _("Amount")};
-    std::string InputsContent = makeHTMLTableRow(InputsContentCells, sizeof(InputsContentCells) / sizeof(std::string));
+    std::string InputsContent = "<thead>"+makeHTMLTableRow(InputsContentCells, sizeof(InputsContentCells) / sizeof(std::string))+"</thead>";
     std::string OutputsContentCells[] = {_("#"), _("Redeemed in"), _("Address"), _("Amount")};
-    std::string OutputsContent = makeHTMLTableRow(OutputsContentCells, sizeof(OutputsContentCells) / sizeof(std::string));
+    std::string OutputsContent = "<thead>"+makeHTMLTableRow(OutputsContentCells, sizeof(OutputsContentCells) / sizeof(std::string))+"</thead>";
 
+    InputsContent += "<tbody class=\"tx\">";
     if (tx.IsCoinBase()) {
         std::string InputsContentCells[] = {
                 "0",
@@ -339,28 +345,39 @@ std::string TxToString(uint256 BlockHash, const CTransaction& tx)
                 Input += PrevOut.nValue;
             std::string InputsContentCells[] = {
                     itostr(i),
-                    "<span>" + makeHRef(Out.hash.GetHex()) + ":" + itostr(Out.n) + "</span>",
+                    "<tt>" + makeHRef(Out.hash.GetHex()) + ":" + itostr(Out.n) + "</tt>",
                     ScriptToString(PrevOut.scriptPubKey, true),
                     ValueToString(PrevOut.nValue)
             };
             InputsContent += makeHTMLTableRow(InputsContentCells, sizeof(InputsContentCells) / sizeof(std::string));
         }
+    InputsContent += "</tbody>";
 
     uint256 TxHash = tx.GetHash();
+    OutputsContent += "<tbody class=\"tx\">";
     for (unsigned int i = 0; i < tx.vout.size(); i++) {
         const CTxOut& Out = tx.vout[i];
-        uint256 HashNext = uint256S("0");
+        if (Out.nValue == 0 && tx.IsCoinStake()) continue;
+        uint256 HashNext = uint256();
         unsigned int nNext = 0;
-        bool fAddrIndex = false;
-        getNextIn(COutPoint(TxHash, i), HashNext, nNext);
+        CSpentIndexKey key(TxHash, i);
+        CSpentIndexValue value;
+        bool isSpent = GetSpentIndex(key, value);
+        if (isSpent) {
+            HashNext = value.txid;
+            nNext = value.inputIndex;
+        } else if (!fSpentIndex) {
+            getNextIn(COutPoint(TxHash, i), HashNext, nNext);
+        }
         std::string OutputsContentCells[] = {
                 itostr(i),
-                (HashNext == uint256S("0")) ? (fAddrIndex ? _("no") : _("unknown")) : "<span>" + makeHRef(HashNext.GetHex()) + ":" + itostr(nNext) + "</span>",
+                (HashNext == uint256()) ? (fSpentIndex ? _("no") : _("unknown")) : "<tt>" + makeHRef(HashNext.GetHex()) + ":" + itostr(nNext) + "</tt>",
                 ScriptToString(Out.scriptPubKey, true),
                 ValueToString(Out.nValue)
         };
         OutputsContent += makeHTMLTableRow(OutputsContentCells, sizeof(OutputsContentCells) / sizeof(std::string));
     }
+    OutputsContent += "</tbody>";
 
     InputsContent = table + InputsContent + "</table>";
     OutputsContent = table + OutputsContent + "</table>";
@@ -372,7 +389,7 @@ std::string TxToString(uint256 BlockHash, const CTransaction& tx)
             _("Size"), itostr(GetSerializeSize(tx, SER_NETWORK, PROTOCOL_VERSION)),
             _("Input"), tx.IsCoinBase() ? "-" : ValueToString(Input),
             _("Output"), ValueToString(Output),
-            _("Fees"), tx.IsCoinBase() ? "-" : ValueToString(Input - Output),
+            _("Fees"), tx.IsCoinGenerated() ? "-" : ValueToString(Input - Output),
             _("Timestamp"), "",
             _("Hash"), "<pre>" + Hash + "</pre>",
     };
@@ -411,7 +428,7 @@ std::string AddressToString(const CTxDestination& Address)
 
     std::string TxContent = table + "<thead>";
     TxContent += makeHTMLTableRow(TxLabels, sizeof(TxLabels) / sizeof(std::string)) + "</thead>";
-    TxContent += "<tbody>";
+    TxContent += "<tbody class=\"h\">";
 
     CAmount Sum = 0;
     typedef std::vector<std::pair<CAddressIndexKey, CAmount> > aIndexVector;
@@ -615,10 +632,13 @@ void BlockExplorer::setContent(const std::string& Content)
     "span.hl  { color: #061532; }\n"
     "span.hli { color: red; }\n"
     "span.hlo { color: green; }\n"
-    "table tr td { padding: 3px; border: none; background-color: #ffffff; color: #061532}\n"
-    "tbody td.d3, tbody td.d5, tbody td.d6, tbody td.d7 { text-align: right; }\n"
+    "table tr td { padding: 3px; border: none; background-color: #ffffff; color: #061532; }\n"
+    //"tbody.tx a { font-family: monospace; white-space: pre; }\n"
+    "tbody.tx tr td.d3 { text-align: right; }\n"
+    "tbody.h td.d3, tbody.h td.d5, tbody.h td.d6, tbody.h td.d7 { text-align: right; }\n"
+    "tbody.b td.d2, tbody.b td.d4 { text-align: right; }\n"
     "thead tr td { padding: 3px; border: none; background-color: #061532; color: #e0e0e0; font-weight: bold; text-align: center; }\n"
-    "thead tr td.d0 { text-align: left }\n"
+    "thead tr td.d0 { text-align: left; }\n"
     "h2, h3 { white-space: nowrap; color: #061532; }\n"
     "a { text-decoration: none; color: #34A9FF; }\n"
     "a.nav { color: #061532; }\n";
