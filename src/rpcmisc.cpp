@@ -1097,8 +1097,11 @@ UniValue getspentinfo(const UniValue& params, bool fHelp)
             "  ,...\n"
             "}\n"
             "\nExamples:\n"
-            + HelpExampleCli("getspentinfo", "'{\"txid\": \"0437cd7f8525ceed2324359c2d0ba26006d92d856a9c20fa0241106ee5a597c9\", \"index\": 0}'")
-            + HelpExampleRpc("getspentinfo", "{\"txid\": \"0437cd7f8525ceed2324359c2d0ba26006d92d856a9c20fa0241106ee5a597c9\", \"index\": 0}")
+            + HelpExampleCli("getspentinfo", "\"9e941e62e07c41e78dad34deab979fb49b4ef9f9c11113f0758b504f313d40a2\" 2")
+            + HelpExampleCli("getspentinfo",
+                "'{\"txid\": \"9e941e62e07c41e78dad34deab979fb49b4ef9f9c11113f0758b504f313d40a2\", \"index\": 2}'")
+            + HelpExampleRpc("getspentinfo",
+                "{\"txid\": \"9e941e62e07c41e78dad34deab979fb49b4ef9f9c11113f0758b504f313d40a2\", \"index\": 2}")
         );
 
     UniValue txidValue = find_value(params[0].get_obj(), "txid");
