@@ -691,7 +691,7 @@ UniValue getaddressmempool(const UniValue& params, bool fHelp)
     if (fHelp || params.size() != 1)
         throw runtime_error(
             "getaddressmempool\n"
-            "\nReturns all mempool deltas for an address (requires addressindex to be enabled).\n"
+            "\nReturns all mempool deltas for an address (-addressindex required).\n"
             "\nArguments:\n"
             "{\n"
             "  \"addresses\"\n"
@@ -763,7 +763,7 @@ UniValue getaddressutxos(const UniValue& params, bool fHelp)
     if (fHelp || params.size() != 1)
         throw runtime_error(
             "getaddressutxos\n"
-            "\nReturns all unspent outputs for an address (requires addressindex to be enabled).\n"
+            "\nReturns all unspent outputs for an address (-addressindex required).\n"
             "\nArguments:\n"
             "{\n"
             "  \"addresses\"\n"
@@ -831,7 +831,7 @@ UniValue getaddressdeltas(const UniValue& params, bool fHelp)
     if (fHelp || params.size() < 1)
         throw runtime_error(
             "getaddressdeltas\n"
-            "\nReturns all changes for an address (requires addressindex to be enabled).\n"
+            "\nReturns all changes for an address (-addressindex required).\n"
             "\nArguments:\n"
             "{\n"
             "  \"addresses\"\n"
@@ -920,19 +920,20 @@ UniValue getaddressbalance(const UniValue& params, bool fHelp)
     if (fHelp || params.size() != 1)
         throw runtime_error(
             "getaddressbalance\n"
-            "\nReturns the balance for an address(es) (requires addressindex to be enabled).\n"
-            "\nArguments:\n"
-            "{\n"
-            "  \"addresses\"\n"
-            "    [\n"
-            "      \"address\"  (string) The base58check encoded address\n"
+            "\nReturns the balance for an address (-addressindex required).\n"
+            "\nArguments: {\n"
+            "  \"addresses\": [\n"
+            "      \"address\"  (string) The base58 address to query\n"
             "      ,...\n"
             "    ]\n"
             "}\n"
             "\nResult:\n"
             "{\n"
-            "  \"balance\"  (string) The current balance in duffs\n"
-            "  \"received\"  (string) The total number of duffs received (including change)\n"
+            "  \"balance\",  (numeric) The current balance (in LUX satoshis)\n"
+            "  \"received\", (numeric) The total amount received (all outputs, including stake)\n"
+            "  \"spent\",    (numeric) The total amount spent (excluding stakes)\n"
+            "  \"sent\",     (numeric) The total amount sent (excluding stakes and amounts sent to same addr.)\n"
+            "  \"staked\"    (numeric) The total amount of Proof of Stake incomes\n"
             "}\n"
             "\nExamples:\n"
             + HelpExampleCli("getaddressbalance", "\"LYmrT81UoxqfskSNt28ZKZ3XXskSFENEtg\"")
@@ -956,20 +957,49 @@ UniValue getaddressbalance(const UniValue& params, bool fHelp)
 
     CAmount balance = 0;
     CAmount received = 0;
+    CAmount spent = 0, sent = 0;
+    CAmount staked = 0;
+    uint256 lastStakeHash;
+    uint256 lastSpentHash;
 
-    for (std::vector<std::pair<CAddressIndexKey, CAmount> >::const_iterator it=addressIndex.begin(); it!=addressIndex.end(); it++) {
-        if (it->second > 0) {
-            received += it->second;
-        }
+    for (std::vector<std::pair<CAddressIndexKey, CAmount> >::const_iterator it=addressIndex.begin(); it!=addressIndex.end(); it++)
+    {
         balance += it->second;
+
+        if (it->second > 0) {
+            // outputs
+            received += it->second;
+            if (it->first.txhash == lastStakeHash) {
+                staked += it->second;
+            } else if (it->first.txhash == lastSpentHash) {
+                // sent to same address
+                sent += it->second;
+            }
+        } else {
+            // inputs
+            CTransaction tx;
+            uint256 hashBlock = 0;
+            if (GetTransaction(it->first.txhash, tx, Params().GetConsensus(), hashBlock, true)) {
+                if (tx.IsCoinStake()) {
+                    staked += it->second;
+                    lastStakeHash = it->first.txhash;
+                } else {
+                    sent += it->second;
+                    spent += it->second;
+                    lastSpentHash = it->first.txhash;
+                }
+            }
+        }
     }
 
     UniValue result(UniValue::VOBJ);
     result.push_back(Pair("balance", balance));
     result.push_back(Pair("received", received));
+    result.push_back(Pair("sent", (0 - sent)));
+    result.push_back(Pair("spent", (0 - spent)));
+    result.push_back(Pair("staked", staked));
 
     return result;
-
 }
 
 UniValue getaddresstxids(const UniValue& params, bool fHelp)
@@ -977,7 +1007,7 @@ UniValue getaddresstxids(const UniValue& params, bool fHelp)
     if (fHelp || params.size() != 1)
         throw runtime_error(
             "getaddresstxids\n"
-            "\nReturns the txids for an address(es) (requires addressindex to be enabled).\n"
+            "\nReturns the txids for an address(es) (-addressindex required).\n"
             "\nArguments:\n"
             "{\n"
             "  \"addresses\"\n"
@@ -1058,35 +1088,47 @@ UniValue getaddresstxids(const UniValue& params, bool fHelp)
 
 UniValue getspentinfo(const UniValue& params, bool fHelp)
 {
-    if (fHelp || params.size() != 1 || !params[0].isObject())
+    if (fHelp || params.size() < 1) {
         throw runtime_error(
             "getspentinfo\n"
-            "\nReturns the txid and index where an output is spent.\n"
-            "\nArguments:\n"
-            "{\n"
-            "  \"txid\" (string) The hex string of the txid\n"
-            "  \"index\" (number) The start block height\n"
+            "\nReturns the txid and index where an output is spent. (-spentindex required)\n"
+            "\nArguments: {\n"
+            "  \"txid\", (string) The hex string of the txid\n"
+            "  \"index\" (numeric) The transaction index to check\n"
             "}\n"
-            "\nResult:\n"
-            "{\n"
-            "  \"txid\"  (string) The transaction id\n"
-            "  \"index\"  (number) The spending input index\n"
-            "  ,...\n"
+            "\nResult: {\n"
+            "  \"txid\",  (string) The transaction id\n"
+            "  \"index\", (numeric) The transaction input index\n"
+            "  \"height\" (numeric) The block height\n"
             "}\n"
             "\nExamples:\n"
-            + HelpExampleCli("getspentinfo", "'{\"txid\": \"0437cd7f8525ceed2324359c2d0ba26006d92d856a9c20fa0241106ee5a597c9\", \"index\": 0}'")
-            + HelpExampleRpc("getspentinfo", "{\"txid\": \"0437cd7f8525ceed2324359c2d0ba26006d92d856a9c20fa0241106ee5a597c9\", \"index\": 0}")
+            + HelpExampleCli("getspentinfo", "\"9e941e62e07c41e78dad34deab979fb49b4ef9f9c11113f0758b504f313d40a2\" 2")
+            + HelpExampleCli("getspentinfo", "'{\"txid\": \"9e941e62e07c41e78dad34deab979fb49b4ef9f9c11113f0758b504f313d40a2\", \"index\": 0}'")
+            + HelpExampleRpc("getspentinfo", "{\"txid\": \"9e941e62e07c41e78dad34deab979fb49b4ef9f9c11113f0758b504f313d40a2\", \"index\": 0}")
         );
-
-    UniValue txidValue = find_value(params[0].get_obj(), "txid");
-    UniValue indexValue = find_value(params[0].get_obj(), "index");
-
-    if (!txidValue.isStr() || !indexValue.isNum()) {
-        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid txid or index");
     }
 
-    uint256 txid = ParseHashV(txidValue, "txid");
-    int outputIndex = indexValue.get_int();
+    uint256 txid;
+    int outputIndex = 0;
+    if (params[0].isObject()) {
+        // json rpc
+        UniValue txidValue = find_value(params[0].get_obj(), "txid");
+        UniValue indexValue = find_value(params[0].get_obj(), "index");
+        if (!txidValue.isStr())
+            throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid txid");
+        txid = ParseHashV(txidValue, "txid");
+        outputIndex = indexValue.isNum() ? indexValue.get_int() : 0;
+    } else {
+        // debug console compatible
+        UniValue txidValue = params[0];
+        if (!txidValue.isStr())
+            throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid txid");
+        txid = ParseHashV(txidValue, "txid");
+        if (params.size() > 1) {
+            UniValue indexValue = params[1];
+            outputIndex = indexValue.isNum() ? indexValue.get_int() : 0;
+        }
+    }
 
     CSpentIndexKey key(txid, outputIndex);
     CSpentIndexValue value;
