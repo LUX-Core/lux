@@ -2874,7 +2874,7 @@ bool CWallet::CommitTransaction(CWalletTx& wtxNew, CReserveKey& reservekey, std:
     return true;
 }
 
-bool CWallet::FundTransaction(CMutableTransaction& tx, CAmount& nFeeRet, int& nChangePosInOut, std::string& strFailReason,
+bool CWallet::FundTransaction(CMutableTransaction& tx, CAmount& nFeeRet, bool overrideEstimatedFeeRate, int& nChangePosInOut, std::string& strFailReason,
                               bool lockUnspents, const std::set<int>& setSubtractFeeFromOutputs, CCoinControl* coinControl)
 {
     assert(coinControl != nullptr);
@@ -2887,6 +2887,7 @@ bool CWallet::FundTransaction(CMutableTransaction& tx, CAmount& nFeeRet, int& nC
     }
 
     coinControl->fAllowOtherInputs = true;
+    coinControl->fOverrideFeeRate = overrideEstimatedFeeRate;
 
     for (const CTxIn& txin : tx.vin) {
         coinControl->Select(txin.prevout);
