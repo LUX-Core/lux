@@ -889,3 +889,13 @@ bool WalletModel::abandonTransaction(uint256 hash) const
     LOCK2(cs_main, wallet->cs_wallet);
     return wallet->AbandonTransaction(hash);
 }
+
+bool WalletModel::isWalletEnabled()
+{
+    return !GetBoolArg("-disablewallet", DEFAULT_DISABLE_WALLET);
+}
+
+int WalletModel::getDefaultConfirmTarget() const
+{
+    return nTxConfirmTarget;
+}
