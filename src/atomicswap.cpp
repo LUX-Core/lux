@@ -215,8 +215,9 @@ bool CreateSwapTransaction(CWallet *pwallet, const CKeyID &redeemer, CAmount nAm
     vecSend.push_back(std::make_pair(contractPubKeyScript, nAmount));
     CCoinControl coinControl;
     coinControl.destChange = refundDest;
+    int nChangePos;
 
-    return pwallet->CreateTransaction(vecSend, redeemTx, reservekey, nFeeRequired, strError, &coinControl);
+    return pwallet->CreateTransaction(vecSend, redeemTx, reservekey, nFeeRequired, nChangePos, strError, &coinControl);
 }
 
 bool CreateRefundTransaction(CWallet *pwallet, const CScript &redeemScript, const CMutableTransaction &contractTx,

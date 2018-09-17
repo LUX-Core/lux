@@ -291,18 +291,6 @@ static BOOL WINAPI consoleCtrlHandler(DWORD dwCtrlType)
 }
 #endif
 
-bool static InitError(const std::string& str)
-{
-    uiInterface.ThreadSafeMessageBox(str, "", CClientUIInterface::MSG_ERROR);
-    return false;
-}
-
-bool static InitWarning(const std::string& str)
-{
-    uiInterface.ThreadSafeMessageBox(str, "", CClientUIInterface::MSG_WARNING);
-    return true;
-}
-
 bool static Bind(const CService& addr, unsigned int flags)
 {
     if (!(flags & BF_EXPLICIT) && IsLimited(addr))
@@ -415,8 +403,9 @@ std::string HelpMessage(HelpMessageMode mode)
 
 #ifdef ENABLE_WALLET
     strUsage += "\n" + _("Wallet options:") + "\n";
-    strUsage += "  -createwalletbackups=<n> " + _("Number of automatic wallet backups (default: 10)") + "\n";
     strUsage += "  -disablewallet           " + _("Do not load the wallet and disable wallet RPC calls") + "\n";
+    strUsage += "  -createwalletbackups=<n> " + _("Number of automatic wallet backups (default: 10)") + "\n";
+    strUsage += "  -walletbackupsdir=<dir>  " + _("Specify full path to directory for automatic wallet backups (must exist)") + "\n";
     strUsage += "  -keypool=<n>             " + strprintf(_("Set key pool size to <n> (default: %u)"), 100) + "\n";
     if (GetBoolArg("-help-debug", false))
         strUsage += "  -mintxfee=<amt>          " + strprintf(_("Fees (in LUX/Kb) smaller than this are considered zero fee for transaction creation (default: %s)"), FormatMoney(CWallet::minTxFee.GetFeePerK())) + "\n";
@@ -429,7 +418,7 @@ std::string HelpMessage(HelpMessageMode mode)
     strUsage += "  -txconfirmtarget=<n>     " + strprintf(_("If paytxfee is not set, include enough fee so transactions begin confirmation on average within n blocks (default: %u)"), 1) + "\n";
     strUsage += "  -maxtxfee=<amt>          " + strprintf(_("Maximum total fees to use in a single wallet transaction, setting too low may abort large transactions (default: %s)"), FormatMoney(maxTxFee)) + "\n";
     strUsage += "  -upgradewallet           " + _("Upgrade wallet to latest format") + " " + _("on startup") + "\n";
-    strUsage += "  -wallet=<file>           " + _("Specify wallet file (within data directory)") + " " + strprintf(_("(default: %s)"), "wallet.dat") + "\n";
+    strUsage += "  -wallet=<file>           " + _("Specify wallet file (within data directory)") + " " + strprintf(_("(default: %s)"), DEFAULT_WALLET_DAT) + "\n";
     strUsage += "  -walletbroadcast         " + _("Make the wallet broadcast transactions") + " " + strprintf(_("(default: %u)"), true) + "\n";
     strUsage += "  -walletnotify=<cmd>      " + _("Execute command when a wallet transaction changes (%s in cmd is replaced by TxID)") + "\n";
     if (mode == HMM_BITCOIN_QT)
@@ -555,11 +544,13 @@ std::string LicenseInfo()
            "\n";
 }
 
-static void BlockNotifyCallback(const uint256& hashNewTip)
+static void BlockNotifyCallback(bool initialSync, const CBlockIndex *pBlockIndex)
 {
+    if (initialSync || !pBlockIndex)
+        return;
     std::string strCmd = GetArg("-blocknotify", "");
 
-    boost::replace_all(strCmd, "%s", hashNewTip.GetHex());
+    boost::replace_all(strCmd, "%s", pBlockIndex->GetBlockHash().GetHex());
     boost::thread t(runCommand, strCmd); // thread runs free
 }
 
@@ -982,7 +973,7 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
         return InitError(strprintf(_("Unknown change type '%s'"), GetArg("-changetype", "")));
     }
 
-    std::string strWalletFile = GetArg("-wallet", "wallet.dat");
+    std::string strWalletFile = GetArg("-wallet", DEFAULT_WALLET_DAT);
 #endif // ENABLE_WALLET
 
     fIsBareMultisigStd = GetArg("-permitbaremultisig", true) != 0;
@@ -1106,136 +1097,25 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
 
 #ifdef ENABLE_WALLET
     if (!fDisableWallet) {
-
-        LogPrintf("Using wallet %s\n", strWalletFile);
-        uiInterface.InitMessage(_("Verifying wallet..."));
-
-        if (!bitdb.Open(GetDataDir())) {
-            // try moving the database env out of the way
-            boost::filesystem::path pathDatabase = GetDataDir() / "database";
-            boost::filesystem::path pathDatabaseBak = GetDataDir() / strprintf("database.%d.bak", GetTime());
-            try {
-                boost::filesystem::rename(pathDatabase, pathDatabaseBak);
-                LogPrintf("Moved old %s to %s. Retrying.\n", pathDatabase.string(), pathDatabaseBak.string());
-            } catch (boost::filesystem::filesystem_error& error) {
-                // failure is ok (well, not really, but it's not worse than what we started with)
-            }
-
-            int max_tries = 10;
-            bool isSuccess = false;
-            // try again
-            while (max_tries > 0)
-            {
-                if (bitdb.Open(GetDataDir())) {
-                    isSuccess = true;
-                    break;
-                }
-
-                max_tries--;
-                MilliSleep(300);
-            }
-
-            if (!isSuccess)
-            {
-                // if it still fails, it probably means we can't even create the database env
-                string msg = strprintf(_("Error initializing wallet database environment %s!"), strDataDir);
-                return InitError(msg);
-            }
-        }
-
-        if (GetBoolArg("-salvagewallet", false)) {
-            // Recover readable keypairs:
-            if (!CWalletDB::Recover(bitdb, strWalletFile, true))
-                return false;
-        }
-
-        if (filesystem::exists(GetDataDir() / strWalletFile)) {
-            CDBEnv::VerifyResult r = bitdb.Verify(strWalletFile, CWalletDB::Recover);
-            if (r == CDBEnv::RECOVER_OK) {
-                string msg = strprintf(_("Warning: wallet.dat corrupt, data salvaged!"
-                                         " Original wallet.dat saved as wallet.{timestamp}.bak in %s; if"
-                                         " your balance or transactions are incorrect you should"
-                                         " restore from a backup."),
-                    strDataDir);
-                InitWarning(msg);
-            }
-            if (r == CDBEnv::RECOVER_FAIL)
-                return InitError(_("wallet.dat corrupt, salvage failed"));
-        }
-
-        filesystem::path backupDir = GetDataDir() / "backups";
-        if (!filesystem::exists(backupDir)) {
-            // Always create backup folder to not confuse the operating system's file browser
-            filesystem::create_directories(backupDir);
-        }
+        std::string strWarning;
+        std::string strError;
 
         nWalletBackups = GetArg("-createwalletbackups", 10);
         nWalletBackups = std::max(0, std::min(10, nWalletBackups));
 
-        if (nWalletBackups > 0 && filesystem::exists(backupDir)) {
-            // Keep only the last 10 backups, including the new one of course
-            typedef std::multimap<std::time_t, boost::filesystem::path> folder_set_t;
-            folder_set_t folder_set;
-            boost::filesystem::directory_iterator end_iter;
-            boost::filesystem::path backupFolder = backupDir.string();
-            backupFolder.make_preferred();
-            // Build map of backup files for current(!) wallet sorted by last write time
-            boost::filesystem::path currentFile;
-            for (boost::filesystem::directory_iterator dir_iter(backupFolder); dir_iter != end_iter; ++dir_iter) {
-                // Only check regular files
-                if (boost::filesystem::is_regular_file(dir_iter->status())) {
-                    currentFile = dir_iter->path().filename();
-                    // Only add the backups for the current wallet, e.g. wallet.dat.*
-                    if (dir_iter->path().stem().string() == strWalletFile) {
-                        folder_set.insert(folder_set_t::value_type(boost::filesystem::last_write_time(dir_iter->path()), *dir_iter));
-                    }
-                }
-            }
-            // Loop backward through backup files and keep the N newest ones (1 <= N <= 10)
-            int counter = 0;
-            for (PAIRTYPE(const std::time_t, boost::filesystem::path) file : reverse_iterate(folder_set)) {
-                counter++;
-                if (counter >= nWalletBackups) {
-                    // More than nWalletBackups backups: delete oldest one(s)
-                    try {
-                        boost::filesystem::remove(file.second);
-                        LogPrintf("Old backup deleted: %s\n", file.second);
-                    } catch (boost::filesystem::filesystem_error& error) {
-                        LogPrintf("Failed to delete backup %s\n", error.what());
-                    }
-                }
-            }
+        std::string strWalletFile = GetArg("-wallet", DEFAULT_WALLET_DAT);
 
-            // Create backup of the wallet
-            std::string dateTimeStr = DateTimeStrFormat(".%Y%m%d", GetTime());
-            std::string backupPathStr = backupDir.string();
-            backupPathStr += "/" + strWalletFile;
-            std::string sourcePathStr = GetDataDir().string();
-            sourcePathStr += "/" + strWalletFile;
-            boost::filesystem::path sourceFile = sourcePathStr;
-            boost::filesystem::path backupFile = backupPathStr + dateTimeStr;
-            sourceFile.make_preferred();
-            backupFile.make_preferred();
-            if(boost::filesystem::space(backupDir.string()).available > 1000000) {
-                if (boost::filesystem::exists(sourceFile)) {
-#if BOOST_VERSION >= 158000
-                    try {
-                        boost::filesystem::copy_file(sourceFile, backupFile);
-                        LogPrintf("Creating backup of %s -> %s\n", sourceFile, backupFile);
-                    } catch (boost::filesystem::filesystem_error& error) {
-                        LogPrintf("Failed to create backup %s\n", error.what());
-                    }
-#else
-                    std::ifstream src(sourceFile.string(), std::ios::binary);
-                    std::ofstream dst(backupFile.string(), std::ios::binary);
-                    dst << src.rdbuf();
-#endif
-                }
-            } else {
-                cwarn << "Not enough available space found for backup wallet on hard drive.";
-            }
+        if(!AutoBackupWallet(NULL, strWalletFile, strWarning, strError)) {
+            if (!strWarning.empty())
+                InitWarning(strWarning);
+            if (!strError.empty())
+                return InitError(strError);
         }
-    }  // (!fDisableWallet)
+
+        if (!CWallet::Verify())
+            return false;
+
+    } // (!fDisableWallet)
 #endif // ENABLE_WALLET
     // ********************************************************* Step 6: network initialization
 
@@ -1540,8 +1420,9 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
         if (!fLoaded && !fRequestShutdown) {
             // first suggest a reindex
             if (!fReset) {
-                bool fRet = uiInterface.ThreadSafeMessageBox(
+                bool fRet = uiInterface.ThreadSafeQuestion(
                     strLoadError + ".\n\n" + _("Do you want to rebuild the block database now?"),
+                    strLoadError + ".\nPlease restart with -reindex or -reindex-chainstate to recover.",
                     "", CClientUIInterface::MSG_ERROR | CClientUIInterface::BTN_ABORT);
                 if (fRet) {
                     fReindex = true;
@@ -1644,6 +1525,14 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
             }
 
             pwalletMain->SetBestChain(chainActive.GetLocator());
+            std::string warningString;
+            std::string errorString;
+            if(!AutoBackupWallet(pwalletMain, "", warningString, errorString)) {
+                if (!warningString.empty())
+                    InitWarning(warningString);
+                if (!errorString.empty())
+                    return InitError(errorString);
+            }
         }
 
         LogPrintf("%s", strErrors.str());
@@ -1673,6 +1562,7 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
 
             // Restore wallet transaction metadata after -zapwallettxes=1
             if (GetBoolArg("-zapwallettxes", false) && GetArg("-zapwallettxes", "1") != "2") {
+                CWalletDB walletdb(strWalletFile);
                 for (const CWalletTx& wtxOld : vWtx) {
                     uint256 hash = wtxOld.GetHash();
                     std::map<uint256, CWalletTx>::iterator mi = pwalletMain->mapWallet.find(hash);
@@ -1686,7 +1576,7 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
                         copyTo->fFromMe = copyFrom->fFromMe;
                         copyTo->strFromAccount = copyFrom->strFromAccount;
                         copyTo->nOrderPos = copyFrom->nOrderPos;
-                        copyTo->WriteToDisk();
+                        copyTo->WriteToDisk(&walletdb);
                     }
                 }
             }

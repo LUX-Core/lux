@@ -14,6 +14,7 @@
 #include "optionsmodel.h"
 #include "walletmodel.h"
 #include "clientmodel.h"
+#include "platformstyle.h"
 
 #include "coincontrol.h"
 #include "main.h"
@@ -38,11 +39,13 @@ using namespace std;
 QList<CAmount> CoinControlDialog::payAmounts;
 int CoinControlDialog::nSplitBlockDummy;
 CCoinControl* CoinControlDialog::coinControl = new CCoinControl();
+bool CoinControlDialog::fSubtractFeeFromAmount = false;
 
-CoinControlDialog::CoinControlDialog(QWidget* parent) : QDialog(parent),
+CoinControlDialog::CoinControlDialog(const PlatformStyle *platformStyle, QWidget* parent) : QDialog(parent),
                                                         ui(new Ui::CoinControlDialog),
                                                         model(0),
-                                                        clientModel(0)
+                                                        clientModel(0),
+                                                        platformStyle(platformStyle)
 {
     ui->setupUi(this);
 
@@ -136,7 +139,7 @@ CoinControlDialog::CoinControlDialog(QWidget* parent) : QDialog(parent),
     ui->treeWidget->setColumnWidth(COLUMN_AMOUNT, 100);
     ui->treeWidget->setColumnWidth(COLUMN_LABEL, 170);
     ui->treeWidget->setColumnWidth(COLUMN_ADDRESS, 190);
-    //ui->treeWidget->setColumnWidth(COLUMN_DARKSEND_ROUNDS, 88);
+    ui->treeWidget->setColumnWidth(COLUMN_DARKSEND_ROUNDS, 88);
     ui->treeWidget->setColumnWidth(COLUMN_DATE, 80);
     ui->treeWidget->setColumnWidth(COLUMN_CONFIRMATIONS, 100);
     ui->treeWidget->setColumnWidth(COLUMN_PRIORITY, 100);
@@ -574,7 +577,7 @@ void CoinControlDialog::updateLabels(WalletModel* model, QDialog* dialog)
     CAmount nPayAmount = 0;
     bool fDust = false;
     CMutableTransaction txDummy;
-    foreach (const CAmount& amount, CoinControlDialog::payAmounts) {
+    Q_FOREACH (const CAmount& amount, CoinControlDialog::payAmounts) {
         nPayAmount += amount;
 
         if (amount > 0) {
@@ -658,6 +661,11 @@ void CoinControlDialog::updateLabels(WalletModel* model, QDialog* dialog)
             nBytes += nQuantity; // account for the witness byte that holds the number of stack items for each input.
         }
 
+        // in the subtract fee from amount case, we can tell if zero change already and subtract the bytes, so that fee calculation afterwards is accurate
+        if (CoinControlDialog::fSubtractFeeFromAmount)
+            if (nAmount - nPayAmount == 0)
+                nBytes -= 34;
+
         // Priority
         double mempoolEstimatePriority = mempool.estimatePriority(nTxConfirmTarget);
         dPriority = dPriorityInputs / (nBytes - nBytesInputs + (nQuantityUncompressed * 29)); // 29 = 180 - 151 (uncompressed public keys are over the limit. max 151 bytes of the input are ignored for priority)
@@ -679,24 +687,30 @@ void CoinControlDialog::updateLabels(WalletModel* model, QDialog* dialog)
                 nPayFee = 0;
 
         if (nPayAmount > 0) {
-            nChange = nAmount - nPayFee - nPayAmount;
-/*
+            if (!CoinControlDialog::fSubtractFeeFromAmount)
+                nChange -= nPayFee;
+
             // DS Fee = overpay
             if (coinControl->useDarksend && nChange > 0) {
                 nPayFee += nChange;
                 nChange = 0;
             }
-*/
+
             // Never create dust outputs; if we would, just add the dust to the fee.
             if (nChange > 0 && nChange < CENT) {
                 CTxOut txout(nChange, (CScript)vector<unsigned char>(24, 0));
-                if (txout.IsDust(::minRelayTxFee)) {
-                    nPayFee += nChange;
-                    nChange = 0;
+                {
+                    if (CoinControlDialog::fSubtractFeeFromAmount) // dust-change will be raised until no dust
+                        nChange = txout.GetDustThreshold(dustRelayFee);
+                    else
+                    {
+                        nPayFee += nChange;
+                        nChange = 0;
+                    }
                 }
             }
 
-            if (nChange == 0)
+            if (nChange == 0 && !CoinControlDialog::fSubtractFeeFromAmount)
                 nBytes -= 34;
         }
 
@@ -930,6 +944,15 @@ void CoinControlDialog::updateView()
             else
                 itemOutput->setText(COLUMN_DARKSEND_ROUNDS, strPad(QString(tr("n/a")), 11, " "));
 */
+
+            CTxIn vin = CTxIn(out.tx->GetHash(), out.i);
+            int nRounds = pwalletMain->GetInputDarkSendRounds(vin);
+
+            if (nRounds >= 0 || fDebug) itemOutput->setText(COLUMN_DARKSEND_ROUNDS, strPad(QString::number(nRounds), 11, " "));
+            else itemOutput->setText(COLUMN_DARKSEND_ROUNDS, strPad(QString(tr("n/a")), 11, " "));
+
+            // confirmations
+            itemOutput->setText(COLUMN_CONFIRMATIONS, strPad(QString::number(out.nDepth), 8, " "));
 
             // confirmations
             itemOutput->setText(COLUMN_CONFIRMATIONS, strPad(QString::number(out.nDepth), 8, " "));

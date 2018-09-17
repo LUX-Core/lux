@@ -44,6 +44,7 @@ void OptionsModel::Init()
 {
     resetSettings = false;
     QSettings settings;
+    checkAndMigrate();
 
     // Ensure restart flag is unset on client startup
     setRestartRequired(false);
@@ -51,9 +52,14 @@ void OptionsModel::Init()
     // These are Qt-only settings:
 
     // Window
+    if (!settings.contains("fHideTrayIcon"))
+        settings.setValue("fHideTrayIcon", false);
+    fHideTrayIcon = settings.value("fHideTrayIcon").toBool();
+    Q_EMIT hideTrayIconChanged(fHideTrayIcon);
+
     if (!settings.contains("fMinimizeToTray"))
         settings.setValue("fMinimizeToTray", false);
-    fMinimizeToTray = settings.value("fMinimizeToTray").toBool();
+    fMinimizeToTray = settings.value("fMinimizeToTray").toBool() && !fHideTrayIcon;
 
     if (!settings.contains("fMinimizeOnClose"))
         settings.setValue("fMinimizeOnClose", false);
@@ -84,9 +90,17 @@ void OptionsModel::Init()
     if (!settings.contains("fShowMasternodesTab"))
         settings.setValue("fShowMasternodesTab", masternodeConfig.getCount());
 
+    if (!settings.contains("fShowAdvancedUI"))
+        settings.setValue("fShowAdvancedUI", false);
+    fShowAdvancedUI = settings.value("fShowAdvancedUI", false).toBool();
+
     if (!settings.contains("fparallelMasterNode"))
         settings.setValue("fparallelMasterNode", false);
     fparallelMasterNode = settings.value("fparallelMasterNode", false).toBool();
+
+    if (!settings.contains("fNotUseChangeAddress"))
+        settings.setValue("fNotUseChangeAddress", DEFAULT_NOT_USE_CHANGE_ADDRESS);
+    fNotUseChangeAddress = settings.value("fNotUseChangeAddress", DEFAULT_NOT_USE_CHANGE_ADDRESS).toBool();
 
     // These are shared with the core or have a command-line parameter
     // and we want command-line parameters to overwrite the GUI settings.
@@ -198,6 +212,8 @@ QVariant OptionsModel::data(const QModelIndex& index, int role) const
         switch (index.row()) {
         case StartAtStartup:
             return GUIUtil::GetStartOnSystemStartup();
+        case HideTrayIcon:
+            return fHideTrayIcon;
         case MinimizeToTray:
             return fMinimizeToTray;
         case MapPortUPnP:
@@ -226,6 +242,8 @@ QVariant OptionsModel::data(const QModelIndex& index, int role) const
 #ifdef ENABLE_WALLET
         case SpendZeroConfChange:
             return settings.value("bSpendZeroConfChange");
+        case ShowAdvancedUI:
+            return fShowAdvancedUI;
         case ShowMasternodesTab:
             return settings.value("fShowMasternodesTab");
 #endif
@@ -245,8 +263,10 @@ QVariant OptionsModel::data(const QModelIndex& index, int role) const
             return fCoinControlFeatures;
         case showMasternodesTab:
              return fshowMasternodesTab;
-         case parallelMasterNode:
+        case parallelMasterNode:
               return fparallelMasterNode;
+        case NotUseChangeAddress:
+              return settings.value("fNotUseChangeAddress");
         case WalletBackups:
             return QVariant(nWalletBackups);
         case DatabaseCache:
@@ -257,7 +277,7 @@ QVariant OptionsModel::data(const QModelIndex& index, int role) const
             return settings.value("fLogEvents");
         case ThreadsScriptVerif:
             return settings.value("nThreadsScriptVerif");
-        case DarksendRounds:
+        case DarkSendRounds:
             return QVariant(nDarksendRounds);
         case AnonymizeLuxAmount:
             return QVariant(nAnonymizeLuxAmount);
@@ -279,6 +299,11 @@ bool OptionsModel::setData(const QModelIndex& index, const QVariant& value, int 
         switch (index.row()) {
         case StartAtStartup:
             successful = GUIUtil::SetStartOnSystemStartup(value.toBool());
+            break;
+        case HideTrayIcon:
+            fHideTrayIcon = value.toBool();
+            settings.setValue("fHideTrayIcon", fHideTrayIcon);
+            Q_EMIT hideTrayIconChanged(fHideTrayIcon);
             break;
         case MinimizeToTray:
             fMinimizeToTray = value.toBool();
@@ -329,6 +354,11 @@ bool OptionsModel::setData(const QModelIndex& index, const QVariant& value, int 
                 setRestartRequired(true);
             }
             break;
+        case ShowAdvancedUI:
+            fShowAdvancedUI = value.toBool();
+            settings.setValue("fShowAdvancedUI", fShowAdvancedUI);
+            Q_EMIT advancedUIChanged(fShowAdvancedUI);
+            break;
         case ShowMasternodesTab:
             if (settings.value("fShowMasternodesTab") != value) {
                 settings.setValue("fShowMasternodesTab", value);
@@ -369,36 +399,42 @@ bool OptionsModel::setData(const QModelIndex& index, const QVariant& value, int 
                 setRestartRequired(true);
             }
             break;
-        case DarksendRounds:
+        case DarkSendRounds:
             nDarksendRounds = value.toInt();
             settings.setValue("nDarksendRounds", nDarksendRounds);
-            emit darksendRoundsChanged(nDarksendRounds);
+            Q_EMIT darksendRoundsChanged(nDarksendRounds);
             break;
         case AnonymizeLuxAmount:
             nAnonymizeLuxAmount = value.toInt();
             settings.setValue("nAnonymizeLuxAmount", nAnonymizeLuxAmount);
-            emit anonymizeLuxAmountChanged(nAnonymizeLuxAmount);
+            Q_EMIT anonymizeLuxAmountChanged(nAnonymizeLuxAmount);
             break;
         case CoinControlFeatures:
             fCoinControlFeatures = value.toBool();
             settings.setValue("fCoinControlFeatures", fCoinControlFeatures);
-            emit coinControlFeaturesChanged(fCoinControlFeatures);
+            Q_EMIT coinControlFeaturesChanged(fCoinControlFeatures);
             break;
         case showMasternodesTab:
             fshowMasternodesTab = value.toBool();
             settings.setValue("fshowMasternodesTab", fshowMasternodesTab);
-            emit showMasternodesTabChanged(fshowMasternodesTab);
+            Q_EMIT showMasternodesTabChanged(fshowMasternodesTab);
              break;
-         case parallelMasterNode:
+        case parallelMasterNode:
              fparallelMasterNode = value.toBool();
              settings.setValue("fparallelMasterNode", fparallelMasterNode);
-             emit parallelMasterNodeChanged(fparallelMasterNode);
+             Q_EMIT parallelMasterNodeChanged(fparallelMasterNode);
+             break;
+        case NotUseChangeAddress:
+             if (settings.value("fNotUseChangeAddress") != value) {
+                settings.setValue("fNotUseChangeAddress", value);
+                fNotUseChangeAddress = value.toBool();
+             }
              break;
         case WalletBackups:
             nWalletBackups = value.toInt();
             settings.setValue("nWalletBackups", nWalletBackups);
             WriteConfigToFile("createwalletbackups", std::to_string(nWalletBackups));
-            emit walletBackupsChanged(nWalletBackups);
+            Q_EMIT walletBackupsChanged(nWalletBackups);
             break;
         case DatabaseCache:
             if (settings.value("nDatabaseCache") != value) {
@@ -454,7 +490,7 @@ bool OptionsModel::setData(const QModelIndex& index, const QVariant& value, int 
         }
     }
 
-    emit dataChanged(index, index);
+    Q_EMIT dataChanged(index, index);
 
     return successful;
 }
@@ -466,7 +502,7 @@ void OptionsModel::setDisplayUnit(const QVariant& value)
         QSettings settings;
         nDisplayUnit = value.toInt();
         settings.setValue("nDisplayUnit", nDisplayUnit);
-        emit displayUnitChanged(nDisplayUnit);
+        Q_EMIT displayUnitChanged(nDisplayUnit);
     }
 }
 
@@ -497,4 +533,20 @@ bool OptionsModel::isRestartRequired()
 {
     QSettings settings;
     return settings.value("fRestartRequired", false).toBool();
+}
+
+
+void OptionsModel::checkAndMigrate() {
+    // Migration of default values
+    // Check if the QSettings container was already loaded with this client version
+    QSettings settings;
+    static const char strSettingsVersionKey[] = "nSettingsVersion";
+    int settingsVersion = settings.contains(strSettingsVersionKey) ? settings.value(strSettingsVersionKey).toInt() : 0;
+    if (settingsVersion < CLIENT_VERSION) {
+        // force people to upgrade to the new value if they are using 100MB
+        if (settingsVersion < 130000 && settings.contains("nDatabaseCache") && settings.value("nDatabaseCache").toLongLong() == 100)
+            settings.setValue("nDatabaseCache", (qint64)nDefaultDbCache);
+
+        settings.setValue(strSettingsVersionKey, CLIENT_VERSION);
+    }
 }

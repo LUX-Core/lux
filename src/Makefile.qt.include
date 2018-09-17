@@ -44,6 +44,7 @@ QT_FORMS_UI = \
   qt/forms/editcontractinfodialog.ui \
   qt/forms/helpmessagedialog.ui \
   qt/forms/intro.ui \
+  qt/forms/modaloverlay.ui \
   qt/forms/eula.ui \
   qt/forms/masternodemanager.ui \
   qt/forms/addeditluxnode.ui \
@@ -87,6 +88,7 @@ QT_MOC_CPP = \
   qt/moc_addresstablemodel.cpp \
   qt/moc_addtokenpage.cpp \
   qt/moc_askpassphrasedialog.cpp \
+  qt/moc_bantablemodel.cpp \
   qt/moc_bip38tooldialog.cpp \
   qt/moc_bitcoinaddressvalidator.cpp \
   qt/moc_bitcoinamountfield.cpp \
@@ -110,6 +112,7 @@ QT_MOC_CPP = \
   qt/moc_eula.cpp \
   qt/moc_macdockiconhandler.cpp \
   qt/moc_macnotificationhandler.cpp \
+  qt/moc_modaloverlay.cpp \
   qt/moc_masternodemanager.cpp \
   qt/moc_addeditluxnode.cpp \
   qt/moc_luxnodeconfigdialog.cpp \
@@ -207,6 +210,7 @@ BITCOIN_QT_H = \
   qt/addresstablemodel.h \
   qt/addtokenpage.h \
   qt/askpassphrasedialog.h \
+  qt/bantablemodel.h \
   qt/bip38tooldialog.h \
   qt/bitcoinaddressvalidator.h \
   qt/bitcoinamountfield.h \
@@ -235,6 +239,7 @@ BITCOIN_QT_H = \
   qt/eula.h \
   qt/macdockiconhandler.h \
   qt/macnotificationhandler.h \
+  qt/modaloverlay.h \
   qt/masternodemanager.h \
   qt/addeditluxnode.h \
   qt/luxnodeconfigdialog.h \
@@ -312,6 +317,7 @@ RES_ICONS = \
   qt/res/icons/bitcoin_testnet.png \
   qt/res/icons/browse.png \
   qt/res/icons/chevron.png \
+  qt/res/icons/warning.png \
   qt/res/icons/clock1.png \
   qt/res/icons/clock2.png \
   qt/res/icons/clock3.png \
@@ -370,6 +376,7 @@ RES_ICONS = \
   qt/res/icons/unit_tulux.png
 
 BITCOIN_QT_CPP = \
+  qt/bantablemodel.cpp \
   qt/bitcoinaddressvalidator.cpp \
   qt/bitcoinamountfield.cpp \
   qt/bitcoingui.cpp \
@@ -379,6 +386,7 @@ BITCOIN_QT_CPP = \
   qt/csvmodelwriter.cpp \
   qt/guiutil.cpp \
   qt/intro.cpp \
+  qt/modaloverlay.cpp \
   qt/eula.cpp \
   qt/masternodemanager.cpp \
   qt/addeditluxnode.cpp \

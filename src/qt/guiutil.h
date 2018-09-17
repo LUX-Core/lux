@@ -15,6 +15,7 @@
 #include <QString>
 #include <QTableView>
 #include <QTableWidget>
+#include <QLabel>
 
 #include <boost/filesystem.hpp>
 
@@ -35,6 +36,9 @@ QT_END_NAMESPACE
  */
 namespace GUIUtil
 {
+// Return a monospace font
+QFont fixedPitchFont();
+
 // Create human-readable string from date
 QString dateTimeStr(const QDateTime& datetime);
 QString dateTimeStr(qint64 nTime);
@@ -194,7 +198,8 @@ private:
 
 bool GetStartOnSystemStartup();
 bool SetStartOnSystemStartup(bool fAutoStart);
-
+/** Modify Qt network specific settings on migration */
+void migrateQtSettings();
 /** Save window size and position */
 void saveWindowGeometry(const QString& strSetting, QWidget* parent);
 /** Restore window size and position */
@@ -205,7 +210,8 @@ QString loadStyleSheet();
 
 /** Check whether a theme is not build-in */
 bool isExternal(QString theme);
-
+/** Return name of current CSS theme */
+QString getThemeName();
 /* Convert QString to OS specific boost path through UTF-8 */
 boost::filesystem::path qstringToBoostPath(const QString& path);
 
@@ -218,14 +224,43 @@ QString formatDurationStr(int secs);
 /* Format CNodeStats.nServices bitmask into a user-readable string */
 QString formatServicesStr(quint64 mask);
 
-/* Format a CNodeCombinedStats.dPingTime into a user-readable string or display N/A, if 0*/
+/* Format a CNodeCombinedStats.dPingTime into a u
+ * ser-readable string or display N/A, if 0*/
 QString formatPingTime(double dPingTime);
+/* Format a CNodeCombinedStats.nTimeOffset into a user-readable string. */
+QString formatTimeOffset(int64_t nTimeOffset);
+
+QString formatNiceTimeOffset(qint64 secs);
+
+class ClickableLabel : public QLabel {
+    Q_OBJECT
+
+    Q_SIGNALS:
+   /** Emitted when the label is clicked. The relative mouse coordinates of the click are
+    * passed to the signal.
+    */
+    void clicked(const QPoint& point);
+protected:
+    void mouseReleaseEvent(QMouseEvent *event);
+};
+
+class ClickableProgressBar : public QProgressBar {
+    Q_OBJECT
+
+    Q_SIGNALS:
+    /** Emitted when the progressbar is clicked. The relative mouse coordinates of the click are
+     * passed to the signal.
+     */
+    void clicked(const QPoint& point);
+protected:
+    void mouseReleaseEvent(QMouseEvent *event);
+};
 
 #if defined(Q_OS_MAC) && QT_VERSION >= 0x050000
 // workaround for Qt OSX Bug:
 // https://bugreports.qt-project.org/browse/QTBUG-15631
 // QProgressBar uses around 10% CPU even when app is in background
-class ProgressBar : public QProgressBar
+class ProgressBar : public ClickableProgressBar
 {
     bool event(QEvent* e)
     {
@@ -233,7 +268,7 @@ class ProgressBar : public QProgressBar
     }
 };
 #else
-typedef QProgressBar ProgressBar;
+typedef ClickableProgressBar ProgressBar;
 #endif
 
     void formatToolButtons(QToolButton* btn1, QToolButton* btn2 = 0, QToolButton* btn3 = 0);

@@ -32,6 +32,15 @@ namespace RPCServer
 class CBlockIndex;
 class CNetAddr;
 
+/** Wrapper for UniValue::VType, which includes typeAny:
+ * Used to denote don't care type. Only used by RPCTypeCheckObj */
+struct UniValueType {
+    UniValueType(UniValue::VType _type) : typeAny(false), type(_type) {}
+    UniValueType() : typeAny(true) {}
+    bool typeAny;
+    UniValue::VType type;
+};
+
 class JSONRequest
 {
 public:
@@ -192,7 +201,7 @@ void RPCTypeCheck(const UniValue& params,
  * Use like: RPCTypeCheck(object, boost::assign::map_list_of("name", str_type)("value", int_type));
  */
 void RPCTypeCheckObj(const UniValue& o,
-    const std::map<std::string, UniValue::VType>& typesExpected,
+    const std::map<std::string, UniValueType>& typesExpected,
     bool fAllowNull = false);
 
 /**
@@ -205,6 +214,8 @@ void RPCRunLater(const std::string& name, boost::function<void(void)> func, int6
 extern CNetAddr BoostAsioToCNetAddr(boost::asio::ip::address address);
 
 typedef UniValue (*rpcfn_type)(const UniValue& params, bool fHelp);
+
+void RPCRunLater(const std::string& name, boost::function<void(void)> func, int64_t nSeconds);
 
 class CRPCCommand
 {
@@ -260,7 +271,7 @@ private:
 
 public:
     CRPCTable();
-    const CRPCCommand* operator[](std::string name) const;
+    const CRPCCommand* operator[](const std::string& name) const;
     std::string help(std::string name) const;
 
     /**
@@ -399,6 +410,7 @@ extern UniValue listunspent(const UniValue& params, bool fHelp);
 extern UniValue lockunspent(const UniValue& params, bool fHelp);
 extern UniValue listlockunspent(const UniValue& params, bool fHelp);
 extern UniValue createrawtransaction(const UniValue& params, bool fHelp);
+extern UniValue fundrawtransaction(const UniValue& params, bool fHelp);
 extern UniValue decoderawtransaction(const UniValue& params, bool fHelp);
 extern UniValue decodescript(const UniValue& params, bool fHelp);
 extern UniValue signrawtransaction(const UniValue& params, bool fHelp);

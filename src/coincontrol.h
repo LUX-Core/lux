@@ -23,6 +23,12 @@ public:
     bool fAllowWatchOnly;
     //! Minimum absolute fee (not per kilobyte)
     CAmount nMinimumTotalFee;
+    //! Override the default confirmation target, 0 = use default
+    int nConfirmTarget;
+    //! Override estimated feerate
+    bool fOverrideFeeRate;
+    //! Feerate to use if overrideFeeRate is true
+    CFeeRate nFeeRate;
 
     CCoinControl()
     {
@@ -40,6 +46,9 @@ public:
         nMinimumTotalFee = 0;
         fSplitBlock = false;
         nSplitBlock = 1;
+        nConfirmTarget = 0;
+        nFeeRate = CFeeRate(0);
+        fOverrideFeeRate = false;
     }
 
     bool HasSelected() const

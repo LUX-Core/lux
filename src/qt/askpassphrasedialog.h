@@ -42,8 +42,9 @@ private:
     WalletModel* model;
     bool fCapsLock;
 
-private slots:
+private Q_SLOTS:
     void textChanged();
+    void secureClearPassFields();
 
 protected:
     bool event(QEvent* event);

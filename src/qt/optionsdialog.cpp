@@ -99,7 +99,7 @@ OptionsDialog::OptionsDialog(QWidget* parent, bool enableWallet) : QDialog(paren
     /* Language selector */
     QDir translations(":translations");
     ui->lang->addItem(QString("(") + tr("default") + QString(")"), QVariant(""));
-    foreach (const QString& langStr, translations.entryList()) {
+    Q_FOREACH (const QString& langStr, translations.entryList()) {
         QLocale locale(langStr);
 
         /** check if the locale name consists of 2 parts (language_country) */
@@ -183,7 +183,8 @@ void OptionsDialog::setModel(OptionsModel* model)
 
 void OptionsDialog::setMapper()
 {
-    /* Main */
+    /* Main */     uiInterface.InitMessage(_("Done loading"));
+
     mapper->addMapping(ui->bitcoinAtStartup, OptionsModel::StartAtStartup);
     mapper->addMapping(ui->threadsScriptVerif, OptionsModel::ThreadsScriptVerif);
     mapper->addMapping(ui->databaseCache, OptionsModel::DatabaseCache);
@@ -194,7 +195,10 @@ void OptionsDialog::setMapper()
     mapper->addMapping(ui->spendZeroConfChange, OptionsModel::SpendZeroConfChange);
     mapper->addMapping(ui->coinControlFeatures, OptionsModel::CoinControlFeatures);
     mapper->addMapping(ui->showMasternodesTab, OptionsModel::showMasternodesTab);
+    mapper->addMapping(ui->showAdvancedUI, OptionsModel::ShowAdvancedUI);
     mapper->addMapping(ui->parallelMasterNode, OptionsModel::parallelMasterNode);
+    mapper->addMapping(ui->darksendRounds, OptionsModel::DarkSendRounds);
+    mapper->addMapping(ui->anonymizeLux, OptionsModel::AnonymizeLuxAmount);
     mapper->addMapping(ui->notUseChangeAddress, OptionsModel::NotUseChangeAddress);
     mapper->addMapping(ui->walletBackups, OptionsModel::WalletBackups);
     mapper->addMapping(ui->zeroBalanceAddressToken, OptionsModel::ZeroBalanceAddressToken);
@@ -209,6 +213,7 @@ void OptionsDialog::setMapper()
 
 /* Window */
 #ifndef Q_OS_MAC
+    mapper->addMapping(ui->hideTrayIcon, OptionsModel::HideTrayIcon);
     mapper->addMapping(ui->minimizeToTray, OptionsModel::MinimizeToTray);
     mapper->addMapping(ui->minimizeOnClose, OptionsModel::MinimizeOnClose);
 #endif
@@ -223,7 +228,7 @@ void OptionsDialog::setMapper()
 
 
     /* DarkSend Rounds */
-    mapper->addMapping(ui->darksendRounds, OptionsModel::DarksendRounds);
+    mapper->addMapping(ui->darksendRounds, OptionsModel::DarkSendRounds);
     mapper->addMapping(ui->anonymizeLux, OptionsModel::AnonymizeLuxAmount);
     mapper->addMapping(ui->showMasternodesTab, OptionsModel::ShowMasternodesTab);
 }
@@ -276,6 +281,15 @@ void OptionsDialog::on_cancelButton_clicked()
     reject();
 }
 
+void OptionsDialog::on_hideTrayIcon_stateChanged(int fState) {
+    if(fState) {
+        ui->minimizeToTray->setChecked(false);
+        ui->minimizeToTray->setEnabled(false);
+    } else {
+        ui->minimizeToTray->setEnabled(true);
+    }
+}
+
 void OptionsDialog::showRestartWarning(bool fPersistent)
 {
     ui->statusLabel->setStyleSheet("QLabel { color: red; }");
@@ -293,6 +307,9 @@ void OptionsDialog::showRestartWarning(bool fPersistent)
 void OptionsDialog::clearStatusLabel()
 {
     ui->statusLabel->clear();
+    if (model && model->isRestartRequired()) {
+        showRestartWarning(true);
+    }
 }
 
 void OptionsDialog::doProxyIpChecks(QValidatedLineEdit* pUiProxyIp, int nProxyPort)
@@ -310,7 +327,7 @@ void OptionsDialog::doProxyIpChecks(QValidatedLineEdit* pUiProxyIp, int nProxyPo
         ui->statusLabel->setText(tr("The supplied proxy address is invalid."));
     } else {
         enableOkButton();
-        ui->statusLabel->clear();
+        clearStatusLabel();
     }
 }
 
@@ -318,7 +335,7 @@ bool OptionsDialog::eventFilter(QObject* object, QEvent* event)
 {
     if (event->type() == QEvent::FocusOut) {
         if (object == ui->proxyIp) {
-            emit proxyIpChecks(ui->proxyIp, ui->proxyPort->text().toInt());
+            Q_EMIT proxyIpChecks(ui->proxyIp, ui->proxyPort->text().toInt());
         }
     }
     return QDialog::eventFilter(object, event);

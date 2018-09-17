@@ -34,6 +34,9 @@
      <property name="margin">
       <number>3</number>
      </property>
+     <property name="textInteractionFlags">
+      <set>Qt::TextSelectableByMouse</set>
+     </property>
     </widget>
    </item>
    <item>
