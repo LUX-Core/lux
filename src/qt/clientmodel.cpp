@@ -20,6 +20,7 @@
 #include "txmempool.h"
 #include "ui_interface.h"
 #include "util.h"
+#include "masternode.h"
 
 #include <stdint.h>
 
@@ -76,6 +77,11 @@ int ClientModel::getNumConnections(unsigned int flags) const
             nNum++;
 
     return nNum;
+}
+
+QString ClientModel::getMasternodeCountString() const
+{
+    return QString::number((int)vecMasternodes.size()) + " / " + QString::number((int)vecMasternodes.size());
 }
 
 int ClientModel::getNumBlocks() const
@@ -159,7 +165,7 @@ void ClientModel::updateTimer()
 
 void ClientModel::updateMnTimer()
 {
-#if 0
+#if 1
     // Get required lock upfront. This avoids the GUI from getting stuck on
     // periodical polls if the core is holding the locks for a longer time -
     // for example, during a wallet rescan.
