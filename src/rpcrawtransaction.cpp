@@ -6,6 +6,7 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "base58.h"
+#include "coincontrol.h"
 #include "consensus/validation.h"
 #include "core_io.h"
 #include "init.h"
@@ -317,6 +318,133 @@ UniValue listunspent(const UniValue& params, bool fHelp)
 
     return results;
 }
+
+UniValue fundrawtransaction(const UniValue& params, bool fHelp)
+{
+    if (fHelp || params.size() < 1 || params.size() > 3)
+        throw std::runtime_error(
+            "fundrawtransaction \"hexstring\" ( options iswitness )\n"
+            "\nAdd inputs to a transaction until it has enough in value to meet its out value.\n"
+            "This will not modify existing inputs, and will add at most one change output to the outputs.\n"
+            "No existing outputs will be modified.\n"
+            "Note that inputs which were signed may need to be resigned after completion since in/outputs have been added.\n"
+            "The inputs added will not be signed, use signrawtransaction for that.\n"
+            "Note that all existing inputs must have their previous output transaction be in the wallet.\n"
+            "Note that all inputs selected must be of standard form and P2SH scripts must be\n"
+            "in the wallet using importaddress or addmultisigaddress (to calculate fees).\n"
+            "You can see whether this is the case by checking the \"solvable\" field in the listunspent output.\n"
+            "Only pay-to-pubkey, multisig, and P2SH versions thereof are currently supported for watch-only\n"
+            "\nArguments:\n"
+            "1. \"hexstring\"           (string, required) The hex string of the raw transaction\n"
+            "2. options                 (object, optional)\n"
+            "   {\n"
+            "     \"changeAddress\"          (string, optional, default pool address) The lux address to receive the change\n"
+            "     \"changePosition\"         (numeric, optional, default random) The index of the change output\n"
+            "     \"includeWatching\"        (boolean, optional, default false) Also select inputs which are watch only\n"
+            "     \"lockUnspents\"           (boolean, optional, default false) Lock selected unspent outputs\n"
+            "   }\n"
+            "                         for backward compatibility: passing in a true instead of an object will result in {\"includeWatching\":true}\n"
+            "3. iswitness               (boolean, optional) Whether the transaction hex is a serialized witness transaction \n"
+            "                              If iswitness is not present, heuristic tests will be used in decoding\n"
+
+            "\nResult:\n"
+            "{\n"
+            "  \"hex\":       \"value\", (string)  The resulting raw transaction (hex-encoded string)\n"
+            "  \"fee\":       n,         (numeric) Fee in " + CURRENCY_UNIT + " the resulting transaction pays\n"
+            "  \"changepos\": n          (numeric) The position of the added change output, or -1\n"
+            "}\n"
+            "\nExamples:\n"
+            "\nCreate a transaction with no inputs\n"
+            + HelpExampleCli("createrawtransaction", "\"[]\" \"{\\\"myaddress\\\":0.01}\"") +
+            "\nAdd sufficient unsigned inputs to meet the output value\n"
+            + HelpExampleCli("fundrawtransaction", "\"rawtransactionhex\"") +
+            "\nSign the transaction\n"
+            + HelpExampleCli("signrawtransaction", "\"fundedtransactionhex\"") +
+            "\nSend the transaction\n"
+            + HelpExampleCli("sendrawtransaction", "\"signedtransactionhex\"")
+            );
+
+    RPCTypeCheck(params, {UniValue::VSTR});
+
+    assert(pwalletMain != nullptr);
+    LOCK2(cs_main, pwalletMain->cs_wallet);
+
+    CCoinControl coinControl;
+    int changePosition = -1;
+    bool lockUnspents = false;
+
+    if (!params[1].isNull()) {
+        if (params[1].type() == UniValue::VBOOL) {
+            // backward compatibility bool only fallback
+            coinControl.fAllowWatchOnly = params[1].get_bool();
+        } else {
+            RPCTypeCheck(params, {UniValue::VSTR, UniValue::VOBJ, UniValue::VBOOL});
+
+            UniValue options = params[1];
+
+            RPCTypeCheckObj(options,
+                {
+                    {"changeAddress", UniValue::VSTR},
+                    {"changePosition", UniValue::VNUM},
+                    {"includeWatching", UniValue::VBOOL},
+                    {"lockUnspents", UniValue::VBOOL},
+                    {"reserveChangeKey", UniValue::VBOOL}, // DEPRECATED (and ignored), should be removed in 0.16 or so.
+                },
+                true);
+
+            if (options.exists("changeAddress")) {
+                CTxDestination dest = DecodeDestination(options["changeAddress"].get_str());
+
+                if (!IsValidDestination(dest)) {
+                    throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "changeAddress must be a valid lux address");
+                }
+
+                coinControl.destChange = dest;
+            }
+
+            if (options.exists("changePosition"))
+                changePosition = options["changePosition"].get_int();
+
+            if (options.exists("includeWatching"))
+                coinControl.fAllowWatchOnly = options["includeWatching"].get_bool();
+
+            if (options.exists("lockUnspents"))
+                lockUnspents = options["lockUnspents"].get_bool();
+
+        }
+    }
+
+    // parse hex string from parameter
+    CTransaction ctx;
+    bool try_no_witness = params[2].isNull() ? true : !params[2].get_bool();
+    if (!DecodeHexTx(ctx, params[0].get_str(), try_no_witness)) {
+        throw JSONRPCError(RPC_DESERIALIZATION_ERROR, "TX decode failed");
+    }
+
+    CMutableTransaction tx(ctx);
+
+    if (tx.vout.size() == 0)
+        throw JSONRPCError(RPC_INVALID_PARAMETER, "TX must have at least one output");
+
+    if (changePosition != -1 && (changePosition < 0 || (unsigned int)changePosition > tx.vout.size()))
+        throw JSONRPCError(RPC_INVALID_PARAMETER, "changePosition out of bounds");
+
+    CAmount nFeeOut;
+    std::string strFailReason;
+
+    if (!pwalletMain->FundTransaction(tx, nFeeOut, changePosition, strFailReason, lockUnspents, &coinControl)) {
+        throw JSONRPCError(RPC_WALLET_ERROR, strFailReason);
+    }
+
+    UniValue result(UniValue::VOBJ);
+    result.push_back(Pair("hex", EncodeHexTx(tx)));
+    result.push_back(Pair("changepos", changePosition));
+    result.push_back(Pair("fee", ValueFromAmount(nFeeOut)));
+
+    return result;
+}
+
+
 #endif
 
 UniValue createrawtransaction(const UniValue& params, bool fHelp)
