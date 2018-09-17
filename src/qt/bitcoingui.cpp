@@ -599,13 +599,13 @@ void BitcoinGUI::createMenuBar() {
         tools->addAction(showBackupsAction);
         tools->addAction(openHexAddressAction);
         tools->addAction(openBlockExplorerAction);
+        tools->addAction(checkForUpdateAction);
     }
 
     QMenu* help = appMenuBar->addMenu(tr("&Help"));
     help->addAction(showHelpMessageAction);
     help->addSeparator();
     help->addAction(aboutAction);
-    help->addAction(checkForUpdateAction);
     help->addAction(aboutQtAction);
 }
 
