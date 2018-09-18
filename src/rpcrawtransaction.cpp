@@ -394,6 +394,8 @@ UniValue fundrawtransaction(const UniValue& params, bool fHelp)
 
     RPCTypeCheck(params, {UniValue::VSTR});
 
+    EnsureWalletIsUnlocked();
+
     assert(pwalletMain != nullptr);
     LOCK2(cs_main, pwalletMain->cs_wallet);
 
