@@ -488,8 +488,6 @@ SendCoinsEntry* SendCoinsDialog::addEntry()
     connect(entry, SIGNAL(removeEntry(SendCoinsEntry*)), this, SLOT(removeEntry(SendCoinsEntry*)));
     connect(entry, SIGNAL(payAmountChanged()), this, SLOT(coinControlUpdateLabels()));
 
-    updateTabsAndLabels();
-
     // Focus the field, so that entry can start immediately
     entry->clear();
     entry->setFocus();
@@ -498,6 +496,7 @@ SendCoinsEntry* SendCoinsDialog::addEntry()
     QScrollBar* bar = ui->scrollArea->verticalScrollBar();
     if (bar)
         bar->setSliderPosition(bar->maximum());
+    updateTabsAndLabels();
     return entry;
 }
 
@@ -731,7 +730,7 @@ void SendCoinsDialog::updateFeeSectionControls()
     ui->checkBoxMinimumFee->setEnabled(ui->radioCustomFee->isChecked());
     ui->labelMinFeeWarning->setEnabled(ui->radioCustomFee->isChecked());
     ui->radioCustomPerKilobyte->setEnabled(ui->radioCustomFee->isChecked() && !ui->checkBoxMinimumFee->isChecked());
-    ui->radioCustomAtLeast->setEnabled(ui->radioCustomFee->isChecked() && !ui->checkBoxMinimumFee->isChecked());
+    ui->radioCustomAtLeast->setEnabled(ui->radioCustomFee->isChecked() && !ui->checkBoxMinimumFee->isChecked() && CoinControlDialog::coinControl->HasSelected());
     ui->customFee->setEnabled(ui->radioCustomFee->isChecked() && !ui->checkBoxMinimumFee->isChecked());
 }
 
@@ -743,7 +742,7 @@ void SendCoinsDialog::updateGlobalFeeVariables()
     } else {
         nTxConfirmTarget = 25;
         payTxFee = CFeeRate(ui->customFee->value());
-        fPayAtLeastCustomFee = ui->radioCustomAtLeast->isChecked();
+        CoinControlDialog::coinControl->nMinimumTotalFee = ui->radioCustomAtLeast->isChecked() ? ui->customFee->value() : 0;
     }
 
  //   fSendFreeTransactions = ui->checkBoxFreeTx->isChecked();
@@ -886,7 +885,6 @@ void SendCoinsDialog::coinControlFeatureChanged(bool checked)
     if (!checked && model) // coin control features disabled
         CoinControlDialog::coinControl->SetNull();
 
-    if (checked)
         coinControlUpdateLabels();
 }
 
@@ -967,14 +965,26 @@ void SendCoinsDialog::coinControlChangeEdited(const QString& text)
 // Coin Control: update labels
 void SendCoinsDialog::coinControlUpdateLabels()
 {
-    if (!model || !model->getOptionsModel() || !model->getOptionsModel()->getCoinControlFeatures())
+    if (!model || !model->getOptionsModel())
         return;
+
+    if (model->getOptionsModel()->getCoinControlFeatures()) {
+        // enable minium absolute fee UI controls
+        ui->radioCustomAtLeast->setVisible(true);
+
+        // only enable the feature if inputs are selected
+        ui->radioCustomAtLeast->setEnabled(CoinControlDialog::coinControl->HasSelected());
+    } else {
+        // in case coin control is disabled (=default), hide minimum absolute fee UI controls
+        ui->radioCustomAtLeast->setVisible(false);
+        return;
+    }
 
     // set pay amounts
     CoinControlDialog::payAmounts.clear();
     for (int i = 0; i < ui->entries->count(); ++i) {
         SendCoinsEntry* entry = qobject_cast<SendCoinsEntry*>(ui->entries->itemAt(i)->widget());
-        if (entry)
+        if(entry && !entry->isHidden())
             CoinControlDialog::payAmounts.append(entry->getValue().amount);
     }
 
