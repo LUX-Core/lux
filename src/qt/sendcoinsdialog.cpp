@@ -751,7 +751,7 @@ void SendCoinsDialog::updateFeeSectionControls()
     ui->checkBoxMinimumFee->setEnabled(ui->radioCustomFee->isChecked());
     ui->labelMinFeeWarning->setEnabled(ui->radioCustomFee->isChecked());
     ui->radioCustomPerKilobyte->setEnabled(ui->radioCustomFee->isChecked() && !ui->checkBoxMinimumFee->isChecked());
-    ui->radioCustomAtLeast->setEnabled(ui->radioCustomFee->isChecked() && !ui->checkBoxMinimumFee->isChecked());
+    ui->radioCustomAtLeast->setEnabled(ui->radioCustomFee->isChecked() && !ui->checkBoxMinimumFee->isChecked() && CoinControlDialog::coinControl->HasSelected());
     ui->customFee->setEnabled(ui->radioCustomFee->isChecked() && !ui->checkBoxMinimumFee->isChecked());
 }
 
