@@ -194,17 +194,28 @@ enum jtokentype getJsonToken(string& tokenVal, unsigned int& consumed,
                 case 'r':  writer.push_back('\r'); break;
                 case 't':  writer.push_back('\t'); break;
 
-                case 'u': {
-                    unsigned int codepoint;
-                    if (hatoui(raw + 1, raw + 1 + 4, codepoint) !=
-                               raw + 1 + 4)
-                        return JTOK_ERR;
-                    writer.push_back_u(codepoint);
-                    raw += 4;
-                    break;
+                    case 'u': {
+                        unsigned int codepoint;
+                        if (hatoui(raw + 1, raw + 1 + 4, codepoint) !=
+                            raw + 1 + 4)
+                            return JTOK_ERR;
+
+                        if (codepoint <= 0x7f)
+                            valStr.push_back((char)codepoint);
+                        else if (codepoint <= 0x7FF) {
+                            valStr.push_back((char)(0xC0 | (codepoint >> 6)));
+                            valStr.push_back((char)(0x80 | (codepoint & 0x3F)));
+                        } else if (codepoint <= 0xFFFF) {
+                            valStr.push_back((char)(0xE0 | (codepoint >> 12)));
+                            valStr.push_back((char)(0x80 | ((codepoint >> 6) & 0x3F)));
+                            valStr.push_back((char)(0x80 | (codepoint & 0x3F)));
+                        }
+
+                        raw += 4;
+                        break;
                     }
-                default:
-                    return JTOK_ERR;
+                    default:
+                        return JTOK_ERR;
 
                 }
 
@@ -217,20 +228,18 @@ enum jtokentype getJsonToken(string& tokenVal, unsigned int& consumed,
             }
 
             else {
-                writer.push_back(*raw);
+                valStr += *raw;
                 raw++;
             }
         }
 
-        if (!writer.finalize())
-            return JTOK_ERR;
         tokenVal = valStr;
         consumed = (raw - rawStart);
         return JTOK_STRING;
-        }
+    }
 
-    default:
-        return JTOK_ERR;
+        default:
+            return JTOK_ERR;
     }
 }
 
