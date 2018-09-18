@@ -775,6 +775,7 @@ void SendCoinsDialog::updateGlobalFeeVariables() {
         ui->confirmationTargetLabel->setText(GUIUtil::formatDurationStr(nConfirmTarget*600)+" / "+tr("%n block(s)", "", nConfirmTarget));
     } else {
         payTxFee = CFeeRate(ui->customFee->value());
+    }
 
         // if user has selected to set a minimum absolute fee, pass the value to coincontrol
         // set nMinimumTotalFee to 0 in case of user has selected that the fee is per KB
