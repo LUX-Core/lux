@@ -1604,7 +1604,7 @@ class msg_reqswap(object):
 class msg_reqswapack(object):
     command = b'reqswapack'
 
-    def __init__(self, order=LGOrder(), address=""):
+    def __init__(self, order=LGOrder(), address=b""):
         self.order = order
         self.address = address
     

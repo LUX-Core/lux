@@ -26,13 +26,20 @@ class LuxgateNode(NodeConnCB):
     def __init__(self):
         super().__init__()
         self.received_orders = []
+        self.his_address = None
+        self.his_tx = None
     
     def on_createorder(self, conn, message):
         self.received_orders.append(message.order)
 
-    def on_reqswap(self, conn, message): pass
+    def on_reqswap(self, conn, message):
+        self.his_address = message.address
+
     def on_reqswapack(self, conn, message): pass
-    def on_swccreated(self, conn, message): pass
+
+    def on_swccreated(self, conn, message):
+        self.his_tx = message.txid
+
     def on_swcack(self, conn, message): pass
 
     def on_reject(self, conn, message):
@@ -110,15 +117,29 @@ class LuxgateTest(LuxTestFramework):
 
         assert_equal('new', node1.rpc.listorderbook()['orders'][0]['status'])
 
-        node0.send_message(
-            msg_ordermatch(
-                LGOrder(
-                    base=b'BTC', rel=b'LUX', 
-                    base_amount=100000000, rel_amount=200000000, 
-                    sender=node0.received_orders[0].sender)))
+        # create matching order
+        my_order = LGOrder(
+                base=b'BTC', rel=b'LUX', 
+                base_amount=100000000, rel_amount=200000000, 
+                sender=node0.received_orders[0].sender)
+
+        node0.send_message(msg_ordermatch(my_order))
         node0.wait_for_reqswap()
 
         assert_equal('swap_requested', node1.rpc.listorderbook()['orders'][0]['status'])
+
+        print('Received address : %s' % node0.his_address)
+
+        node0.send_message(msg_reqswapack(my_order, b'LMERZFhojC4MruhonFYZpXsanyRbgynn7r')) # lux testnet
+        node0.wait_for_swccreated()
+
+        assert_equal('contract_created', node1.rpc.listorderbook()['orders'][0]['status'])
+        print('Received tx : %s' % node0.his_tx)
+
+        # after 10 sec the order must be refunded and removed from orders list
+        # period 10 sec is for testing purposes only
+        time.sleep(12)
+        assert_equal(0, len(node1.rpc.listorderbook()['orders']))
 
 
 if __name__ == '__main__':
