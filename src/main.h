@@ -218,6 +218,7 @@ extern std::atomic_bool fReindex;
 extern int nScriptCheckThreads;
 extern bool fTxIndex;
 extern bool fLogEvents;
+extern bool fAddressIndex;
 extern bool fSpentIndex;
 extern bool fIsBareMultisigStd;
 extern bool fRequireStandard;

@@ -86,10 +86,10 @@ void TxToJSON(const CTransaction& tx, const uint256 hashBlock, UniValue& entry)
         if (GetSpentIndex(spentKey, spentInfo)) {
            in.push_back(Pair("value", ValueFromAmount(spentInfo.satoshis)));
            in.push_back(Pair("valueSat", spentInfo.satoshis));
-           if (spentInfo.addressType == 1) {
-               in.push_back(Pair("address", EncodeDestination(CKeyID(spentInfo.addressHash))));
-           } else if (spentInfo.addressType == 2)  {
-               in.push_back(Pair("address", EncodeDestination(CScriptID(spentInfo.addressHash))));
+           if (spentInfo.hashType == 1) {
+               in.push_back(Pair("address", EncodeDestination(CKeyID(spentInfo.hashBytes))));
+           } else if (spentInfo.hashType == 2)  {
+               in.push_back(Pair("address", EncodeDestination(CScriptID(spentInfo.hashBytes))));
            }
         }
         if (!tx.wit.IsNull()) {
@@ -121,7 +121,7 @@ void TxToJSON(const CTransaction& tx, const uint256 hashBlock, UniValue& entry)
         CSpentIndexValue spentInfo;
         CSpentIndexKey spentKey(txid, i);
         if (GetSpentIndex(spentKey, spentInfo)) {
-            out.push_back(Pair("spentTxId", spentInfo.txid.GetHex()));
+            out.push_back(Pair("spentTxHash", spentInfo.txhash.GetHex()));
             out.push_back(Pair("spentIndex", (int)spentInfo.inputIndex));
             out.push_back(Pair("spentHeight", spentInfo.blockHeight));
         }
