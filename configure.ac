@@ -136,6 +136,12 @@ AC_ARG_ENABLE([updater],
   [enable_updater=$enableval],
   [enable_updater=no])
 
+#enable luxgate
+AC_ARG_ENABLE([luxgate],
+[AS_HELP_STRING([--enable-luxgate],
+  [enable luxgate (default is no)])],
+  [enable_luxgate=$enableval],
+  [enable_luxgate=no])
 
 AC_ARG_WITH([miniupnpc],
   [AS_HELP_STRING([--with-miniupnpc],
@@ -1091,6 +1097,14 @@ else
   AC_MSG_RESULT(no)
 fi
 
+dnl enable luxgate integration
+AC_MSG_CHECKING([if luxgate integration should be enabled])
+if test x$enable_luxgate != xno; then
+  AC_MSG_RESULT(yes)
+  AC_DEFINE_UNQUOTED([ENABLE_LUXGATE],[1],[Define to 1 to enable luxgate integration])
+else
+  AC_MSG_RESULT(no)
+fi
 
 dnl enable upnp support
 AC_MSG_CHECKING([whether to build with support for UPnP])
@@ -1185,6 +1199,7 @@ AM_CONDITIONAL([BUILD_DARWIN], [test x$BUILD_OS = xdarwin])
 AM_CONDITIONAL([TARGET_WINDOWS], [test x$TARGET_OS = xwindows])
 AM_CONDITIONAL([ENABLE_WALLET],[test x$enable_wallet = xyes])
 AM_CONDITIONAL([ENABLE_UPDATER],[test x$enable_updater = xyes])
+AM_CONDITIONAL([ENABLE_LUXGATE],[test x$enable_luxgate = xyes])
 AM_CONDITIONAL([ENABLE_TESTS],[test x$use_tests = xyes])
 AM_CONDITIONAL([ENABLE_QT],[test x$bitcoin_enable_qt = xyes])
 AM_CONDITIONAL([HAVE_QT5], [test x$bitcoin_qt_got_major_vers = x5])
@@ -1298,6 +1313,7 @@ echo
 echo "Options used to compile and link:"
 echo "  with wallet          = $enable_wallet"
 echo "  with auto-update     = $enable_updater"
+echo "  with luxgate         = $enable_luxgate"
 echo "  with gui / qt        = $bitcoin_enable_qt"
 if test x$bitcoin_enable_qt != xno; then
 echo "  qt version           = $bitcoin_qt_got_major_vers"
