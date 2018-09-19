@@ -1633,6 +1633,26 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
             pwalletMain->SetMaxVersion(nMaxVersion);
         }
 
+    // Upgrade to HD if explicit upgrade
+    if (GetBoolArg("-upgradewallet", false)) {
+        LOCK(pwalletMain->cs_wallet);
+        bool hd_upgrade = false;
+        if (pwalletMain->CanSupportFeature(FEATURE_HD) && !pwalletMain->IsHDEnabled()) {
+            LogPrintf("Upgrading wallet to HD\n");
+            pwalletMain->SetMinVersion(FEATURE_HD);
+            // generate a new master key
+            pwalletMain->GenerateNewHDChain();
+            hd_upgrade = true;
+        }
+
+        // Regenerate the keypool if upgraded to HD
+        if (hd_upgrade) {
+            if (!pwalletMain->NewKeyPool()) {
+                return InitError(_("Unable to generate keys") += "\n");
+            }
+        }
+    }
+
         if (fFirstRun) {
             // Create new keyUser and set as default key
             RandAddSeedPerfmon();
