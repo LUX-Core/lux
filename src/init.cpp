@@ -14,7 +14,6 @@
 #include "activemasternode.h"
 #include "addrman.h"
 #include "amount.h"
-#include <blockchainclient.h>
 #include "chain.h"
 #include "chainparams.h"
 #include "checkpoints.h"
@@ -44,6 +43,12 @@
 #include "wallet.h"
 #include "walletdb.h"
 #include "miner.h"
+#endif
+
+#ifdef ENABLE_LUXGATE
+#include <luxgate/lgconfig.h>
+#include <luxgate/blockchainclient.h>
+#include <luxgate/luxgate.h>
 #endif
 
 #include <fstream>
@@ -188,6 +193,12 @@ void PrepareShutdown()
         bitdb.Flush(false);
 //    GenerateBitcoins(NULL, 0);
 #endif
+
+#ifdef ENABLE_LUXGATE
+    StopLuxGateRefundService();
+    orderbook.Write();
+#endif
+
     StopNode();
     UnregisterNodeSignals(GetNodeSignals());
 
@@ -335,9 +346,9 @@ std::string HelpMessage(HelpMessageMode mode)
     strUsage += "  -checkblocks=<n>       " + strprintf(_("How many blocks to check at startup (default: %u, 0 = all)"), 500) + "\n";
     strUsage += "  -checklevel=<n>        " + strprintf(_("How thorough the block verification of -checkblocks is (0-4, default: %u)"), 3) + "\n";
     strUsage += "  -conf=<file>           " + strprintf(_("Specify configuration file (default: %s)"), "lux.conf") + "\n";
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// Luxgate
+#ifdef ENABLE_LUXGATE
     strUsage += "  -luxgateconf=<file>    " + strprintf(_("Specify LuxGate configuration file (default: %s)"), "luxgate.json") + "\n";
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#endif
 
     if (mode == HMM_BITCOIND) {
 #if !defined(WIN32)
@@ -1029,15 +1040,16 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
     dev::g_logPost(std::string("\n\n\n\n\n\n\n\n\n\n"), NULL);
     //////////////////////////////////////////////////////////////////////
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////// Luxgate
     if (!fLogTimestamps)
         LogPrintf("Startup time: %s\n", DateTimeStrFormat("%Y-%m-%d %H:%M:%S", GetTime()));
     LogPrintf("Default data directory %s\n", GetDefaultDataDir().string());
     LogPrintf("Using data directory %s\n", strDataDir);
     LogPrintf("Using config file %s\n", GetConfigFile().string());
-    LogPrintf("Using LuxGate config file %s\n", GetLuxGateConfigFile().string());
     LogPrintf("Using at most %i connections (%i file descriptors available)\n", nMaxConnections, nFD);
     std::ostringstream strErrors;
+
+#ifdef ENABLE_LUXGATE
+    LogPrintf("Using LuxGate config file %s\n", GetLuxGateConfigFile().string());
 
     // Read LuxGate config
     std::vector<BlockchainConfig> config = ReadLuxGateConfigFile();
@@ -1051,7 +1063,10 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
         LogPrintf("%s swap support - %s\n", client->ticker, swapIsSupported ? "yes" : "no");
         blockchainClientPool.insert(std::make_pair(client->ticker, client));
     }
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    orderbook.Read();
+    StartLuxGateRefundService();
+#endif // ENABLE_LUXGATE
+
     LogPrintf("Using %u threads for script verification\n", nScriptCheckThreads);
     if (nScriptCheckThreads) {
         for (int i = 0; i < nScriptCheckThreads - 1; i++)
