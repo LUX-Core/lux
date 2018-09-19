@@ -8,6 +8,7 @@
 
 #include "uint256.h"
 #include "amount.h"
+#include "spentindex.h"
 
 struct CMempoolAddressDelta
 {

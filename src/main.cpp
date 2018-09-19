@@ -1331,10 +1331,10 @@ bool GetAddressIndex(uint160 addressHash, int type,
                      std::vector<std::pair<CAddressIndexKey, CAmount> > &addressIndex, int start, int end)
 {
     if (!fAddressIndex)
-        return error("address index not enabled");
+        return error("-addressindex not enabled");
 
     if (!pblocktree->ReadAddressIndex(addressHash, type, addressIndex, start, end))
-        return error("unable to get txids for address");
+        return error("unable to get txs for address");
 
     return true;
 }
@@ -1343,10 +1343,10 @@ bool GetAddressUnspent(uint160 addressHash, int type,
                        std::vector<std::pair<CAddressUnspentKey, CAddressUnspentValue> > &unspentOutputs)
 {
     if (!fAddressIndex)
-        return error("address index not enabled");
+        return error("-addressindex not enabled");
 
     if (!pblocktree->ReadAddressUnspentIndex(addressHash, type, unspentOutputs))
-        return error("unable to get txids for address");
+        return error("unable to get txs for address");
 
     return true;
 }
@@ -2266,7 +2266,7 @@ static DisconnectResult DisconnectBlock(CBlock& block, CValidationState& state, 
 
         if (fAddressIndex)
         {
-            for (unsigned int k = tx.vout.size(); k-- > 0;)
+            for (size_t k = tx.vout.size(); k-- > 0;)
             {
                 CTxDestination dest; uint160 hashDest;
                 txnouttype txType = TX_NONSTANDARD;
@@ -2279,10 +2279,12 @@ static DisconnectResult DisconnectBlock(CBlock& block, CValidationState& state, 
                     continue;
                 }
 
-                // undo receiving activity
+                // undo receive, decrement balance
+                uint8_t spentFlags = ANDX_IS_SPENT | ANDX_ORPHANED;
+                if (tx.IsCoinStake()) spentFlags |= ANDX_IS_STAKE;
                 addressIndex.push_back(std::make_pair(
-                    CAddressIndexKey(addressType, hashDest, pindex->nHeight, i, hash, k, false),
-                    out.nValue
+                    CAddressIndexKey(addressType, hashDest, pindex->nHeight, i, hash, k, spentFlags),
+                    out.nValue * -1
                 ));
                 // undo unspent index
                 addressUnspentIndex.push_back(std::make_pair(
@@ -2299,7 +2301,7 @@ static DisconnectResult DisconnectBlock(CBlock& block, CValidationState& state, 
                 LogPrintf("DisconnectBlock() : transaction and undo data inconsistent - txundo.vprevout.siz=%d tx.vin.siz=%d", txundo.vprevout.size(), tx.vin.size());
                 return DISCONNECT_FAILED;
             }
-            for (unsigned int j = tx.vin.size(); j-- > 0;) {
+            for (size_t j = tx.vin.size(); j-- > 0;) {
                 const COutPoint& out = tx.vin[j].prevout;
                 int res = ApplyTxInUndo(std::move(txundo.vprevout[j]), view, out);
                 if (res == DISCONNECT_FAILED)
@@ -2339,10 +2341,12 @@ static DisconnectResult DisconnectBlock(CBlock& block, CValidationState& state, 
                         continue;
                     }
 
-                    // undo spending activity
+                    // undo spending activity, increment balance
+                    uint8_t spentFlags = ANDX_ORPHANED;
+                    if (tx.IsCoinStake()) spentFlags |= ANDX_IS_STAKE;
                     addressIndex.push_back(std::make_pair(
-                        CAddressIndexKey(addressType, hashDest, pindex->nHeight, i, hash, j, true),
-                        prevout.nValue * -1
+                        CAddressIndexKey(addressType, hashDest, pindex->nHeight, i, hash, j, spentFlags),
+                        prevout.nValue
                     ));
                     // restore unspent index
                     addressUnspentIndex.push_back(std::make_pair(
@@ -2685,9 +2689,11 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
                     }
 
                     if (fAddressIndex && addressType > 0) {
+                        uint8_t spentFlags = ANDX_IS_SPENT;
+                        if (tx.IsCoinStake()) spentFlags |= ANDX_IS_STAKE;
                         // record spending activity
                         addressIndex.push_back(std::make_pair(
-                            CAddressIndexKey(addressType, hashDest, pindex->nHeight, i, txhash, j, true),
+                            CAddressIndexKey(addressType, hashDest, pindex->nHeight, i, txhash, j, spentFlags),
                             out.nValue * -1
                         ));
                         // remove address from unspent index
@@ -2734,7 +2740,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
 
 
         if (fAddressIndex) { // OUTPUTS
-            for (unsigned int k = 0; k < tx.vout.size(); k++) {
+            for (size_t k = 0; k < tx.vout.size(); k++) {
                 const CTxOut &out = tx.vout[k];
                 if (out.nValue == 0) continue; // PoS first tx
                 CTxDestination dest; uint160 hashDest;
@@ -2745,13 +2751,33 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
                     addressType = dest.which();
                     hashDest = GetHashForDestination(dest);
                 } else {
-                    LogPrintf("%s(ndx:out %d) error %s tx %s\n", __func__, k, out.ToString(), txhash.GetHex());
+                    // outputs like OP_RETURN custom data, some LUX v3 vouts had 1 satoshi in nValue
+                    //LogPrintf("%s(ndx:out %d) error %s tx %s\n", __func__, k, out.ToString(), txhash.GetHex());
                     continue;
                 }
 
-                // record receiving activity
+                // record receive
+                uint8_t spentFlags = 0;
+                if (tx.IsCoinStake()) spentFlags |= ANDX_IS_STAKE;
+
+                size_t ndxKeys = addressIndex.size();
+                if (tx.vout.size() == 1 && ndxKeys > 0) {
+                    // if sent to same address, utxo split to do...
+                    // TODO: may need a function to compute tx "full delta" at 0 or txfee cost
+                    CAddressIndexKey* lastIn = &(addressIndex.back().first);
+                    if (lastIn->hashBytes == hashDest) {
+                        size_t key = 2; // flag all inputs with same address
+                        while (lastIn->hashBytes == hashDest && lastIn->txhash == txhash && key < ndxKeys) {
+                            lastIn->spentFlags |= ANDX_TO_SAME;
+                            lastIn = &(addressIndex.at(ndxKeys-key).first);
+                            key++;
+                        }
+                        spentFlags |= ANDX_TO_SAME;
+                    }
+                }
+
                 addressIndex.push_back(std::make_pair(
-                    CAddressIndexKey(addressType, hashDest, pindex->nHeight, i, txhash, k, false),
+                    CAddressIndexKey(addressType, hashDest, pindex->nHeight, i, txhash, k, spentFlags),
                     out.nValue
                 ));
                 // record unspent output

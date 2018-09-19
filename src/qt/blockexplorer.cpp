@@ -364,7 +364,7 @@ std::string TxToString(uint256 BlockHash, const CTransaction& tx)
         CSpentIndexValue value;
         bool isSpent = GetSpentIndex(key, value);
         if (isSpent) {
-            HashNext = value.txid;
+            HashNext = value.txhash;
             nNext = value.inputIndex;
         } else if (!fSpentIndex) {
             getNextIn(COutPoint(TxHash, i), HashNext, nNext);
