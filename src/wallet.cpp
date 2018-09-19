@@ -744,7 +744,7 @@ bool CWallet::EncryptWallet(const SecureString& strWalletPassphrase)
         }
 
         if (!hdChainCurrent.IsNull()) {
-            //assert(EncryptHDChain(vMasterKey));
+            assert(EncryptHDChain(_vMasterKey));
 
             CHDChain hdChainCrypted;
             assert(GetHDChain(hdChainCrypted));
