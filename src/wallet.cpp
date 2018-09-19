@@ -3630,11 +3630,11 @@ set<CTxDestination> CWallet::GetAccountAddresses(const std::string &strAccount) 
     return result;
 }
 
-bool CReserveKey::GetReservedKey(CPubKey& pubkey, bool internalIn)
+bool CReserveKey::GetReservedKey(CPubKey& pubkey, bool internal)
 {
     if (nIndex == -1) {
         CKeyPool keypool;
-        pwallet->ReserveKeyFromKeyPool(nIndex, keypool, internalIn);
+        pwallet->ReserveKeyFromKeyPool(nIndex, keypool, internal);
             if (nIndex != -1) {
                 vchPubKey = keypool.vchPubKey;
             } else {
