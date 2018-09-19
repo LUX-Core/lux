@@ -146,9 +146,6 @@ void locking_callback(int mode, int i, const char* file, int line)
     }
 }
 
-std::string BlockchainConfig::ToString() {
-    return strprintf("ticker=%s, host=%s, port=%d, rpcuser=%s, rpcpassword=%s", ticker, host, port, rpcuser, rpcpassword);
-}
 
 // Init
 class CInit
@@ -593,99 +590,6 @@ boost::filesystem::path GetConfigFile()
 
     return pathConfigFile;
 }
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////// Luxgate
-boost::filesystem::path GetLuxGateConfigFile() {
-    boost::filesystem::path pathConfigFile(GetArg("-luxgateconf", "luxgate.json"));
-    if (!pathConfigFile.is_complete())
-        pathConfigFile = GetDataDir(false) / pathConfigFile;
-    return boost::filesystem::absolute(pathConfigFile);
-}
-
-bool isValidBlockchainConfig(const BlockchainConfig& config) {
-    // ticker must be set, port must be 1000-65535, rpcuser must be set,
-    // host should be set, rpcpassword must be set
-    return config.ticker != "" &&
-           config.host != "" &&
-           config.port >= 1000 && config.port < 65535 &&
-           config.rpcuser != "" && config.rpcpassword != "";
-}
-
-std::vector<BlockchainConfig> ReadLuxGateConfigFile() {
-    std::vector<BlockchainConfig> configs;
-    boost::filesystem::path configPath = GetLuxGateConfigFile();
-    boost::filesystem::ifstream streamConfig(configPath);
-    if (!streamConfig.good()) {
-        // Create empty luxgate config file if it does not exist
-        std::ofstream configFile(configPath.string(), ios_base::app);
-        if (configFile.is_open()) {
-            //write config template
-            configFile << "{" << std::endl
-               << "\t\"coins\": [" << std::endl
-               << "\t\t{" << std::endl
-               << "\t\t\t\"ticker\": \"\"," << std::endl
-               << "\t\t\t\"host\": \"127.0.0.1\"," << std::endl
-               << "\t\t\t\"port\": 0," << std::endl
-               << "\t\t\t\"rpcuser\": \"\"," << std::endl
-               << "\t\t\t\"rpcpassword\": \"\"" << std::endl
-               << "\t\t}" << std::endl
-               << "\t]" << std::endl
-               << "}"  << std::endl;
-            configFile.flush();
-            configFile.close();
-        }
-        return configs; // Nothing to read, so just return empty list
-    }
-
-    json_spirit::Value jsonContent;
-    if (!json_spirit::read(streamConfig, jsonContent)) {
-        LogPrintf("Failed to read luxgate config file: %s\n", configPath.string());
-        return configs;
-    }
-
-    try {
-        auto root = jsonContent.get_obj();
-        if (root.size() == 0) {
-            LogPrintf("luxgate config file has an empty root element: %s\n", configPath.string());
-            return configs;
-        }
-
-        for (auto section : root) {
-            if (section.name_ == "coins") {
-                 for (auto blockchain : section.value_.get_array()) {
-                    auto bcinfo = blockchain.get_obj();
-                    BlockchainConfig bcConfig;
-                    for (auto kv : bcinfo) {
-                        if (kv.name_ == "ticker")
-                            bcConfig.ticker = kv.value_.get_str();
-                        else if (kv.name_ == "host")
-                            bcConfig.host = kv.value_.get_str();
-                        else if (kv.name_ == "port")
-                            bcConfig.port = kv.value_.get_int();
-                        else if (kv.name_ == "rpcuser")
-                            bcConfig.rpcuser = kv.value_.get_str();
-                        else if (kv.name_ == "rpcpassword")
-                            bcConfig.rpcpassword = kv.value_.get_str();
-                        else
-                            LogPrintf("ReadLuxGateConfigFile(): ignored key in luxgate.json: %s\n", kv.name_);
-                    }
-
-                    if (isValidBlockchainConfig(bcConfig))
-                        configs.push_back(bcConfig);
-                    else
-                        LogPrintf("Invalid config entry in %s\n", configPath.string());
-                }
-            } else {
-                LogPrintf("Ignoring unknown section \"%s\"\n", section.name_);
-            }
-        }
-    } catch (std::runtime_error& e) {
-        LogPrintf("Failed to parse JSON from %s: %s\n", configPath.string(), e.what());
-        return configs;
-    }
-
-    return configs;
-}
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 boost::filesystem::path GetMasternodeConfigFile()
 {
     boost::filesystem::path pathConfigFile(GetArg("-mnconf", "masternode.conf"));

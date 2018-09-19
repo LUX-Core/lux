@@ -73,7 +73,6 @@ BITCOIN_CORE_H = \
   activemasternode.h \
   addrman.h \
   addressindex.h \
-  atomicswap.h \
   alert.h \
   allocators.h \
   amount.h \
@@ -82,8 +81,6 @@ BITCOIN_CORE_H = \
   bip39_english.h \
   bech32.h \
   bip38.h \
-  blockchainclient.h \
-  luxgate.h \
   bloom.h \
   chain.h \
   chainparams.h \
@@ -188,6 +185,14 @@ BITCOIN_CORE_H = \
   lux/luxDGP.h \
   lux/storageresults.h
 
+if ENABLE_LUXGATE
+BITCOIN_CORE_H += \
+  luxgate/atomicswap.h \
+  luxgate/lgconfig.h \
+  luxgate/blockchainclient.h \
+  luxgate/luxgate.h
+endif
+
 obj/build.h: FORCE
 	@$(MKDIR_P) $(builddir)/obj
 	@$(top_srcdir)/share/genbuild.sh $(abs_top_builddir)/src/obj/build.h \
@@ -200,8 +205,6 @@ libbitcoin_server_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 libbitcoin_server_a_SOURCES = \
   addrman.cpp \
   alert.cpp \
-  atomicswap.cpp \
-  blockchainclient.cpp \
   bloom.cpp \
   chain.cpp \
   checkpoints.cpp \
@@ -219,7 +222,6 @@ libbitcoin_server_a_SOURCES = \
   rest.cpp \
   rpcblockchain.cpp \
   rpcdarksend.cpp \
-  rpcluxgate.cpp \
   rpcmining.cpp \
   rpcmisc.cpp \
   rpcnet.cpp \
@@ -227,7 +229,6 @@ libbitcoin_server_a_SOURCES = \
   httprpc.cpp \
   httpserver.cpp \
   luxcontrol.cpp \
-  luxgate.cpp \
   rpcserver.cpp \
   script/sigcache.cpp \
   timedata.cpp \
@@ -239,6 +240,15 @@ libbitcoin_server_a_SOURCES = \
   lux/luxDGP.cpp \
   lux/storageresults.cpp \
   $(BITCOIN_CORE_H)
+
+if ENABLE_LUXGATE
+libbitcoin_server_a_SOURCES += \
+  luxgate/lgconfig.cpp \
+  luxgate/atomicswap.cpp \
+  luxgate/blockchainclient.cpp \
+  luxgate/rpcluxgate.cpp \
+  luxgate/luxgate.cpp
+endif
 
 if ENABLE_ZMQ
 libbitcoin_zmq_a_CPPFLAGS = $(BITCOIN_INCLUDES) $(ZMQ_CFLAGS)
