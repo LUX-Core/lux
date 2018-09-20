@@ -6566,11 +6566,14 @@ static bool ProcessMessage(CNode* pfrom, const string &strCommand, CDataStream& 
     else if (!(nLocalServices & NODE_BLOOM) &&
              (strCommand == "filterload" ||
               strCommand == "filteradd" ||
-              strCommand == "filterclear")) {
-        LogPrintf("bloom message=%s\n", strCommand);
-        Misbehaving(pfrom->GetId(), 100);
+              strCommand == "filterclear") &&
+        //TODO: We dont need this after the entire network is upgraded
+             pfrom->nVersion >= NO_BLOOM_VERSION)
+    {
+        if (pfrom->nVersion >= NO_BLOOM_VERSION)
+            Misbehaving(pfrom->GetId(), 100);
+             LogPrintf("bloom message=%s\n", strCommand);
     }
-
 
     else if (strCommand == "filterload") {
         CBloomFilter filter;
