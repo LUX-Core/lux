@@ -1063,8 +1063,9 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
         LogPrintf("%s swap support - %s\n", client->ticker, swapIsSupported ? "yes" : "no");
         blockchainClientPool.insert(std::make_pair(client->ticker, client));
     }
-    orderbook.Read();
-    StartLuxGateRefundService();
+   if (!InitOrderbook()) {
+       LogPrintf("Failed to load orderbook\n");
+   }
 #endif // ENABLE_LUXGATE
 
     LogPrintf("Using %u threads for script verification\n", nScriptCheckThreads);
