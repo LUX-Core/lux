@@ -136,10 +136,31 @@ class LuxgateTest(LuxTestFramework):
         assert_equal('contract_created', node1.rpc.listorderbook()['orders'][0]['status'])
         print('Received tx : %s' % node0.his_tx)
 
-        # after 10 sec the order must be refunded and removed from orders list
-        # period 10 sec is for testing purposes only
-        time.sleep(12)
-        assert_equal(0, len(node1.rpc.listorderbook()['orders']))
+        # After 10 sec the order must be refunded and removed from orders list
+        # Period 10 sec is for testing purposes only
+        # Expecting that testing node will have time to restart and refund in 20 sec. 
+        start = time.time()
+        connections[0].disconnect_node()
+        
+        # The timer must be active after node restart
+        self.stop_nodes()
+        time.sleep(1)
+        self.start_nodes()
+
+        # Establish connection again
+        node0.add_connection(connections[0])
+        node0.wait_for_verack()
+
+        # Check that the order is loaded. Assume that the timeout for refund does not has come
+        assert_equal(1, len(node1.rpc.listorderbook()['orders']))
+        
+        while len(node1.rpc.listorderbook()['orders']) != 0 and time.time() - start < 20:
+            time.sleep(0.5)
+
+        if time.time() - start > 20: 
+            raise AssertionError("Timeout waiting refund event")
+        raise AssertionError("Timeout waiting refund event")
+
 
 
 if __name__ == '__main__':
