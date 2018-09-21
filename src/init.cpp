@@ -195,8 +195,7 @@ void PrepareShutdown()
 #endif
 
 #ifdef ENABLE_LUXGATE
-    StopLuxGateRefundService();
-    orderbook.Write();
+    ShutdownLuxGate();
 #endif
 
     StopNode();
@@ -1063,8 +1062,8 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
         LogPrintf("%s swap support - %s\n", client->ticker, swapIsSupported ? "yes" : "no");
         blockchainClientPool.insert(std::make_pair(client->ticker, client));
     }
-   if (!InitOrderbook()) {
-       LogPrintf("Failed to load orderbook\n");
+   if (!InitializeLuxGate()) {
+       LogPrintf("Failed to initialize LuxGate\n");
    }
 #endif // ENABLE_LUXGATE
 
