@@ -1655,7 +1655,7 @@ bool CDarkSendPool::SendRandomPaymentToSelf() {
     vecSend.push_back(make_pair(scriptChange, nPayment));
 
     CCoinControl* coinControl = NULL;
-    int nChangePos;
+    int nChangePos = -1;
     //int32_t nChangePos;
     //bool success = pwalletMain->CreateTransaction(vecSend, wtx, reservekey, nFeeRet, nChangePos, strFail, coinControl, ONLY_DENOMINATED);
     bool success = pwalletMain->CreateTransaction(vecSend, wtx, reservekey, nFeeRet, nChangePos, strFail, coinControl, ONLY_DENOMINATED);
@@ -1690,7 +1690,7 @@ bool CDarkSendPool::MakeCollateralAmounts() {
     vecSend.push_back(make_pair(scriptChange, (DARKSEND_COLLATERAL * 2) + DARKSEND_FEE));
 
     CCoinControl* coinControl = NULL;
-    int nChangePos;
+    int nChangePos = -1;
     //int32_t nChangePos;
     // try to use non-denominated and not mn-like funds
     //bool success = pwalletMain->CreateTransaction(vecSend, wtx, reservekey, nFeeRet, nChangePos, strFail, coinControl, ONLY_NONDENOMINATED_NOTMN);
@@ -1767,7 +1767,7 @@ bool CDarkSendPool::CreateDenominated(int64_t nTotalValue) {
     // if we have anything left over, it will be automatically send back as change - there is no need to send it manually
 
     CCoinControl* coinControl = NULL;
-    int nChangePos;
+    int nChangePos = -1;
     //bool success = pwalletMain->CreateTransaction(vecSend, wtx, reservekey, nFeeRet, nChangePos, strFail, coinControl, ONLY_NONDENOMINATED_NOTMN);
     bool success = pwalletMain->CreateTransaction(vecSend, wtx, reservekey, nFeeRet, nChangePos, strFail, coinControl, ONLY_NONDENOMINATED_NOTMN);
     if (!success) {

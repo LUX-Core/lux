@@ -3682,7 +3682,7 @@ void CWallet::AutoCombineDust()
 #if 1
         //get the fee amount
         CWalletTx wtxdummy;
-        int nChangePos;
+        int nChangePos = -1;
         CreateTransaction(vecSend, wtxdummy, keyChange, nFeeRet, nChangePos, strErr, coinControl, ALL_COINS, false, CAmount(0));
 
         vecSend[0].second = nTotalRewardsValue - nFeeRet - 500;
@@ -3788,7 +3788,7 @@ bool CWallet::MultiSend()
         //get the fee amount
         CWalletTx wtxdummy;
         string strErr;
-        int nChangePos;
+        int nChangePos = -1;
         CreateTransaction(vecSend, wtxdummy, keyChange, nFeeRet, nChangePos, strErr, cControl, ALL_COINS, false, CAmount(0));
         CAmount nLastSendAmount = vecSend[vecSend.size() - 1].second;
         if (nLastSendAmount < nFeeRet + 500) {
