@@ -312,7 +312,7 @@ WalletModel::SendCoinsReturn WalletModel::prepareTransaction(WalletModelTransact
             return TransactionCreationFailed;
         }
 
-        int nChangePos;
+        int nChangePos = -1;
         bool fCreated = wallet->CreateTransaction(vecSend, *newTx, *keyChange, nFeeRequired, nChangePos, strFailReason, coinControl, recipients[0].inputType, recipients[0].useInstanTX);
         transaction.setTransactionFee(nFeeRequired);
 
