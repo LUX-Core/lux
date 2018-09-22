@@ -20,6 +20,7 @@
 #include "stake.h"
 #include "masternode.h"
 #include "merkleblock.h"
+#include "metrics.h"
 #include "net.h"
 #include "policy/fees.h"
 #include "policy/policy.h"
@@ -861,6 +862,12 @@ int64_t GetTransactionSigOpCost(const CTransaction& tx, const CCoinsViewCache& i
 
 bool CheckTransaction(const CTransaction& tx, CValidationState& state)
 {
+    // Don't count coinbase transactions
+    if (!tx.IsCoinBase()) {
+        transactionsValidated.increment();
+    }
+
+
     // Basic checks that don't depend on any context
     if (tx.vin.empty())
         return state.DoS(10, error("CheckTransaction() : vin empty"),

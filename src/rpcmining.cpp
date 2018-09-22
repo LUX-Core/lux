@@ -13,6 +13,7 @@
 #include "init.h"
 #include "main.h"
 #include "miner.h"
+#include "metrics.h"
 #include "net.h"
 #include "pow.h"
 #include "masternode.h"

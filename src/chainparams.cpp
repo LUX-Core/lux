@@ -183,6 +183,7 @@ public:
         nDefaultPort = 26969;
         nMaxReorganizationDepth = 100;
         nMinerThreads = 0;
+        nStakeThreads =0;
         nMaturity = 79;
         nMasternodeCountDrift = 20;
         nModifierUpdateBlock = 615800;
@@ -306,6 +307,7 @@ public:
         vAlertPubKey = ParseHex("000010e83b2703ccf322f7dbd62dd5855ac7c10bd055814ce121ba32607d573b8810c02c0582aed05b4deb9c4b77b26d92428c61256cd42774babea0a073b2ed0c9");
         nDefaultPort = 28333;
         nMinerThreads = 0;
+        nStakeThreads = 0;
         nMaturity = 10;
         nModifierUpdateBlock = 51197; //approx Mon, 17 Apr 2017 04:00:00 GMT
 
@@ -432,6 +434,7 @@ public:
         pchMessageStart[2] = 0x7e;
         pchMessageStart[3] = 0xac;
         nMinerThreads = 1;
+        nStakeThreads = 1;
         nMaturity = 2;
         genesis.nTime = 1454124731;
         genesis.nBits = 0x207fffff;
@@ -537,6 +540,7 @@ public:
         nDefaultPort = 25666;
         nMaxReorganizationDepth = 100;
         nMinerThreads = 0;
+        nStakeThreads = 0;
         nMaturity = 5;
         nMasternodeCountDrift = 20;
         nModifierUpdateBlock = 615800;

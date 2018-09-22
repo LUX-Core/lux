@@ -21,6 +21,7 @@
 #include "consensus/validation.h"
 #include "key.h"
 #include "main.h"
+#include "metrics.h"
 #include "stake.h"
 #include "masternodeconfig.h"
 #include "masternode.h"
@@ -1056,6 +1057,11 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
     // Start the lightweight task scheduler thread
     CScheduler::Function serviceLoop = boost::bind(&CScheduler::serviceQueue, &scheduler);
     threadGroup.create_thread(boost::bind(&TraceThread<CScheduler::Function>, "scheduler", serviceLoop));
+
+    if (GetBoolArg("-showmetrics", true) && !fPrintToConsole && !GetBoolArg("-daemon", false)) {
+        // Start the persistent metrics interface
+        threadGroup.create_thread(&ThreadShowMetricsScreen);
+    }
 
     /* Start the RPC server already.  It will be started in "warmup" mode
      * and not really process calls already (but it will signify connections

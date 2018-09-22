@@ -58,6 +58,8 @@ public:
 
     /** Used if GenerateBitcoins is called with a negative number of threads */
     int DefaultMinerThreads() const { return nMinerThreads; }
+    /** Used if GenerateBitcoins is called with a negative number of threads */
+    int DefaultStakeThreads() const { return nStakeThreads; }
     const CBlock& GenesisBlock() const { return genesis; }
     /** Make miner wait to have peers to avoid wasting work */
     bool MiningRequiresPeers() const { return fMiningRequiresPeers; }
@@ -116,6 +118,7 @@ protected:
     int nMaturity;
     int nModifierUpdateBlock;
     int nMinerThreads;
+    int nStakeThreads;
     std::vector<CDNSSeedData> vSeeds;
     std::vector<unsigned char> base58Prefixes[MAX_BASE58_TYPES];
     std::string bech32_hrp;

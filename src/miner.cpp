@@ -13,6 +13,7 @@
 #include "consensus/merkle.h"
 #include "consensus/validation.h"
 #include "hash.h"
+#include "metrics.h"
 //#include "validation.h"
 #include "net.h"
 #include "policy/policy.h"
@@ -275,8 +276,10 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
     pblock->nVersion = ComputeBlockVersion(pindexPrev, chainparams.GetConsensus());
     // -regtest only: allow overriding block.nVersion with
     // -blockversion=N to test forking scenarios
-    if (chainparams.MineBlocksOnDemand())
+    if (chainparams.MineBlocksOnDemand()) {
+        PhiRuns.increment();
         pblock->nVersion = GetArg("-blockversion", pblock->nVersion);
+    }
 
     if(txProofTime == 0) {
         txProofTime = GetAdjustedTime();
@@ -1130,6 +1133,8 @@ bool ProcessBlockFound(CBlock* pblock, CWallet& wallet, CReserveKey& reservekey)
     if (!ProcessNewBlock(state, chainparams, NULL, pblock)) {
         return error("LUXMiner : ProcessNewBlock, block not accepted");
     }
+
+    minedBlocks.increment();
 
     return true;
 }
