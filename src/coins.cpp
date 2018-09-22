@@ -153,10 +153,17 @@ CCoinsModifier CCoinsViewCache::ModifyCoins(const uint256& txid)
         if (!base->GetCoins(txid, ret.first->second.coins)) {
             // The parent view does not have this entry; mark it as fresh.
             ret.first->second.coins.Clear();
-            ret.first->second.flags = CCoinsCacheEntry::FRESH;
-        } else if (ret.first->second.coins.IsPruned()) {
-            // The parent view only has a pruned entry for this; mark it as fresh.
-            ret.first->second.flags = CCoinsCacheEntry::FRESH;
+            // New coins must not already exist.
+            if (!ret.first->second.coins.IsPruned())
+                throw std::logic_error("ModifyCoins should not find pre-existing coins on a non-coinbase unless they are pruned!");
+
+            if (!(ret.first->second.flags & CCoinsCacheEntry::FRESH)) {
+                // If the coin is known to be pruned (have no unspent outputs) in
+                // the current view and the cache entry is not dirty, we know the
+                // coin also must be pruned in the parent view as well, so it is safe
+                // to mark this fresh.
+                ret.first->second.flags |= CCoinsCacheEntry::FRESH;
+            }
         }
     } else {
         cachedCoinUsage = ret.first->second.coins.DynamicMemoryUsage();

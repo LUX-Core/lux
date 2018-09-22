@@ -2171,6 +2171,7 @@ static DisconnectResult ApplyTxInUndo(const CTxInUndo& undo, CCoinsViewCache& vi
         }
         coins->Clear();
         coins->fCoinBase = undo.fCoinBase;
+        coins->fCoinStake = undo.fCoinStake;
         coins->nHeight = undo.nHeight;
         coins->nVersion = undo.nVersion;
     } else {
