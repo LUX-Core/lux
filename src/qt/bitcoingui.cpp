@@ -1070,6 +1070,12 @@ void BitcoinGUI::setNumBlocks(int count, const QDateTime& blockDate, double nVer
 #endif // ENABLE_WALLET
         progressBarLabel->setVisible(false);
         progressBar->setVisible(false);
+
+        // notify tip changed when the sync is finished
+        if(fWalletProcessingMode) {
+            fWalletProcessingMode = false;
+            QMetaObject::invokeMethod(clientModel, "numBlocksChanged", Qt::QueuedConnection);
+        }
     } else {
         QString timeBehindText = GUIUtil::formatNiceTimeOffset(secs);
         // Represent time from last generated block in human readable text

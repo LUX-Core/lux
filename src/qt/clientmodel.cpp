@@ -21,6 +21,7 @@
 #include "ui_interface.h"
 #include "util.h"
 #include "masternode.h"
+#include "wallet.h"
 
 #include <stdint.h>
 
@@ -339,6 +340,18 @@ static void BannedListChanged(ClientModel *clientmodel)
 
 static void BlockTipChanged(ClientModel *clientmodel, bool initialSync, const CBlockIndex *pIndex, bool fHeader)
 {
+    // Wallet mode checks
+    if(pIndex) {
+        int64_t secs = GetTime() - pIndex->GetBlockTime();
+        bool walletMode = secs >= 90*60 ? true : false;
+        if(walletMode) {
+            initialSync |= walletMode;
+            if(!fWalletProcessingMode) {
+                fWalletProcessingMode = true;
+            }
+        }
+    }
+
     // lock free async UI updates in case we have a new block tip
     // during initial sync, only update the UI if the last update
     // was > 250ms (MODEL_UPDATE_DELAY) ago
@@ -362,6 +375,9 @@ static void BlockTipChanged(ClientModel *clientmodel, bool initialSync, const CB
                                   Q_ARG(QDateTime, QDateTime::fromTime_t(pIndex->GetBlockTime())),
                                   Q_ARG(double, clientmodel->getVerificationProgress(pIndex)),
                                   Q_ARG(bool, fHeader));
+        if(!fHeader && !fWalletProcessingMode) {
+            QMetaObject::invokeMethod(clientmodel, "numBlocksChanged", Qt::QueuedConnection);
+        }
         nLastUpdateNotification = now;
     }
 }
