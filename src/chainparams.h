@@ -85,10 +85,12 @@ public:
     /** Return the BIP70 network string (main, test or regtest) */
     std::string NetworkIDString() const { return strNetworkID; }
     const std::vector<CDNSSeedData>& DNSSeeds() const { return vSeeds; }
+    const vector<CDNSSeedData>& i2pDNSSeeds() const { return i2pvSeeds; }
     const std::vector<unsigned char>& Base58Prefix(Base58Type type) const { return base58Prefixes[type]; }
     int ExtCoinType() const { return nExtCoinType; }
     const std::string& Bech32HRP() const { return bech32_hrp; }
     const std::vector<CAddress>& FixedSeeds() const { return vFixedSeeds; }
+    const vector<CAddress>& FixedI2PSeeds() const { return vFixedI2PSeeds; };
     virtual const Checkpoints::CCheckpointData& Checkpoints() const = 0;
     int PoolMaxTransactions() const { return nPoolMaxTransactions; }
     std::string SporkKey() const { return strSporkKey; }
@@ -117,6 +119,7 @@ protected:
     int nModifierUpdateBlock;
     int nMinerThreads;
     std::vector<CDNSSeedData> vSeeds;
+    std::vector<CDNSSeedData> i2pvSeeds;
     std::vector<unsigned char> base58Prefixes[MAX_BASE58_TYPES];
     int nExtCoinType;
     std::string bech32_hrp;
@@ -124,6 +127,7 @@ protected:
     std::string strNetworkID;
     CBlock genesis;
     std::vector<CAddress> vFixedSeeds;
+    std::vector<CAddress> vFixedI2PSeeds;
     bool fMiningRequiresPeers;
 
     bool fDefaultConsistencyChecks;

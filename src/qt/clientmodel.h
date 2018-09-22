@@ -34,7 +34,10 @@ enum NumConnections {
     CONNECTIONS_NONE = 0,
     CONNECTIONS_IN = (1U << 0),
     CONNECTIONS_OUT = (1U << 1),
-    CONNECTIONS_ALL = (CONNECTIONS_IN | CONNECTIONS_OUT),
+    CONNECTIONS_I2P_IN  = (1U << 2),
+    CONNECTIONS_I2P_OUT = (1U << 3),
+    CONNECTIONS_I2P_ALL = (CONNECTIONS_I2P_OUT | CONNECTIONS_I2P_IN),
+    CONNECTIONS_ALL  = (CONNECTIONS_IN | CONNECTIONS_OUT),
 };
 
 /** Model for LUX network client. */
@@ -79,6 +82,19 @@ public:
     bool isReleaseVersion() const;
     QString clientName() const;
     QString formatClientStartupTime() const;
+/*
+ * Public functions needed for handling the I2P Config and operational settings
+ */
+    QString formatI2PNativeFullVersion() const;
+    QString getPublicI2PKey() const;
+    QString getPrivateI2PKey() const;
+    bool isI2PAddressGenerated() const;
+    bool isI2POnly() const;
+    bool isTorOnly() const;
+    bool isDarknetOnly() const;
+    bool isBehindDarknet() const;
+    QString getB32Address(const QString& destination) const;
+    void generateI2PDestination(QString& pub, QString& priv) const;
 
 private:
     OptionsModel* optionsModel;

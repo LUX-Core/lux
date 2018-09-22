@@ -951,6 +951,9 @@ QString formatServicesStr(quint64 mask)
             case NODE_WITNESS:
                 strList.append(QObject::tr("WITNESS"));
                 break;
+            case NODE_I2P:
+                strList.append(QObject::tr("I2P"));
+                break;
             default:
                 strList.append(QString("%1[%2]").arg(QObject::tr("UNKNOWN")).arg(check));
             }

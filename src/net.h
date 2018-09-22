@@ -75,6 +75,7 @@ unsigned int SendBufferSize();
 void SetNetworkActive(bool active);
 void AddOneShot(std::string strDest);
 bool RecvLine(SOCKET hSocket, std::string& strLine);
+bool GetMyExternalIP(CNetAddr& ipRet);
 void AddressCurrentlyConnected(const CService& addr);
 CNode* FindNode(const CNetAddr& ip);
 CNode* FindNode(const CSubNet& subNet);
@@ -85,9 +86,12 @@ bool OpenNetworkConnection(const CAddress& addrConnect, bool fCountFailure, CSem
 void MapPort(bool fUseUPnP);
 unsigned short GetListenPort();
 bool BindListenPort(const CService& bindAddr, std::string& strError, bool fWhitelisted = false);
+bool BindListenNativeI2P();
+bool BindListenNativeI2P(SOCKET& hSocket);
 void StartNode(boost::thread_group& threadGroup, CScheduler& scheduler);
 bool StopNode();
 void SocketSendData(CNode* pnode);
+void AdvertizeLocal();
 
 typedef int NodeId;
 
@@ -106,9 +110,11 @@ CNodeSignals& GetNodeSignals();
 
 enum {
     LOCAL_NONE,   // unknown
+    LOCAL_PEER,   // address was discovered from a peer
     LOCAL_IF,     // address a local interface listens on
     LOCAL_BIND,   // address explicit bound to
     LOCAL_UPNP,   // address reported by UPnP
+    LOCAL_HTTP,   // address reported by whatismyip.com and similar
     LOCAL_MANUAL, // address explicitly specified (-externalip=)
 
     LOCAL_MAX
@@ -396,6 +402,13 @@ public:
     ~CNode();
 
 private:
+    // A bug exists in older software, where the stream types are defined as integers, and they should be 'unsigned', this causes the
+    // code used to treat ~SER_TYPENAME values to be treated as negative numbers and produce the 'wrong' results when setting the
+    // stream type values.  Another bug.
+    unsigned int nStreamType;        // Our stream type need only be one value.  After everyone upgrades to 70009, we can eliminate the other two.
+    // We'll keep the separate Send/Recv Types for now, in the future we will always switch both together at the same time, so no need for 2
+    unsigned int nSendStreamType;
+    unsigned int nRecvStreamType;
     // Network usage totals
     static CCriticalSection cs_totalBytesRecv;
     static CCriticalSection cs_totalBytesSent;
@@ -406,9 +419,37 @@ private:
     void operator=(const CNode&);
 
 public:
-    NodeId GetId() const
+    void SetSendStreamType(int nType) {
+        nSendStreamType = nType;
+        ssSend.SetType(nSendStreamType);
+    }
+
+    void SetRecvStreamType(int nType) {
+        nRecvStreamType = nType;
+        for (std::deque<CNetMessage>::iterator it = vRecvMsg.begin(), end = vRecvMsg.end(); it != end; ++it) {
+            it->hdrbuf.SetType(nRecvStreamType);
+            it->vRecv.SetType(nRecvStreamType);
+        }
+    }
+
+    void SetStreamType( const int nType )
     {
-        return id;
+        nStreamType = nType;
+        SetSendStreamType( nStreamType );
+        SetRecvStreamType( nStreamType );
+    }
+
+    void SetStreamTypeBasedOnServices()
+    {
+        SetStreamType( SER_NETWORK | (nServices & NODE_I2P) ? 0 : SER_IPADDRONLY );
+    }
+
+    unsigned int GetStreamType() const { return nStreamType; }
+    int GetSendStreamType() const { return nSendStreamType; }
+    int GetRecvStreamType() const { return nRecvStreamType; }
+
+    NodeId GetId() const {
+      return id;
     }
 
     int GetRefCount()

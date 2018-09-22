@@ -43,6 +43,7 @@ QT_FORMS_UI = \
   qt/forms/editaddressdialog.ui \
   qt/forms/editcontractinfodialog.ui \
   qt/forms/helpmessagedialog.ui \
+  qt/forms/i2pshowaddresses.ui \
   qt/forms/intro.ui \
   qt/forms/eula.ui \
   qt/forms/masternodemanager.ui \
@@ -107,6 +108,7 @@ QT_MOC_CPP = \
   qt/moc_editaddressdialog.cpp \
   qt/moc_editcontractinfodialog.cpp \
   qt/moc_guiutil.cpp \
+  qt/moc_i2pshowaddresses.cpp \
   qt/moc_intro.cpp \
   qt/moc_eula.cpp \
   qt/moc_macdockiconhandler.cpp \
@@ -233,6 +235,7 @@ BITCOIN_QT_H = \
   qt/eventlog.h \
   qt/guiconstants.h \
   qt/guiutil.h \
+  qt/i2pshowaddresses.h \
   qt/intro.h \
   qt/eula.h \
   qt/macdockiconhandler.h \
@@ -340,6 +343,11 @@ RES_ICONS = \
   qt/res/icons/fontbigger.png \
   qt/res/icons/fontsmaller.png \
   qt/res/icons/history.png \
+  qt/res/icons/i2plogo_wbw_0_16.png \
+  qt/res/icons/i2plogo_wbw_1_16.png \
+  qt/res/icons/i2plogo_wbw_2_16.png \
+  qt/res/icons/i2plogo_wbw_3_16.png \
+  qt/res/icons/i2plogo_wbw_4_16.png \
   qt/res/icons/key.png \
   qt/res/icons/lock_closed.png \
   qt/res/icons/update.ico \
@@ -383,6 +391,7 @@ BITCOIN_QT_CPP = \
   qt/clientmodel.cpp \
   qt/csvmodelwriter.cpp \
   qt/guiutil.cpp \
+  qt/i2pshowaddresses.cpp \
   qt/intro.cpp \
   qt/eula.cpp \
   qt/masternodemanager.cpp \
@@ -562,7 +571,7 @@ endif
 if ENABLE_ZMQ
 qt_lux_qt_LDADD += $(LIBBITCOIN_ZMQ) $(ZMQ_LIBS)
 endif
-qt_lux_qt_LDADD += $(LIBBITCOIN_CLI) $(LIBBITCOIN_COMMON) $(LIBBITCOIN_CONSENSUS) $(LIBBITCOIN_UTIL) $(LIBBITCOIN_CRYPTO) $(LIBBITCOIN_UNIVALUE) $(LIBLEVELDB) $(LIBMEMENV) \
+qt_lux_qt_LDADD += $(LIBBITCOIN_CLI) $(LIBBITCOIN_COMMON) $(LIBBITCOIN_CONSENSUS) $(LIBBITCOIN_UTIL) $(LIBBITCOIN_CRYPTO) $(LIBBITCOIN_I2PNET) $(LIBBITCOIN_UNIVALUE) $(LIBLEVELDB) $(LIBMEMENV) \
   $(BOOST_LIBS) $(QT_LIBS) $(QT_DBUS_LIBS) $(QR_LIBS) $(PROTOBUF_LIBS) $(BDB_LIBS) $(SSL_LIBS) $(CRYPTO_LIBS) $(MINIUPNPC_LIBS) $(LIBSECP256K1) \
   $(LIBCRYPTOPP) $(EVENT_PTHREADS_LIBS) $(EVENT_LIBS)
 

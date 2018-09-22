@@ -67,6 +67,7 @@ extern bool fServer;
 extern std::string strMiscWarning;
 extern bool fLogTimestamps;
 extern bool fLogIPs;
+extern bool fLogI2Ps;
 extern volatile bool fReopenDebugLog;
 
 void SetupEnvironment();
@@ -223,6 +224,24 @@ bool SoftSetArg(const std::string& strArg, const std::string& strValue);
  * @return true if argument gets set, false if it already had a value
  */
 bool SoftSetBoolArg(const std::string& strArg, bool fValue);
+
+/** \brief
+ *
+ * \param strArg const std::string&
+ * \param strValue const std::string&
+ * \return void
+ *
+ */
+void HardSetArg(const std::string& strArg, const std::string& strValue);
+
+/** \brief HardSet functions will guarantee that the parameter name exists and is the value required
+ *
+ * \param strArg const std::string& the parameter string, should always start with a '-'something
+ * \param fValue bool the new value this parameter flag is to be set to.
+ * \return none
+ *
+ */
+void HardSetBoolArg(const std::string& strArg, bool fValue);
 
 void SetThreadPriority(int nPriority);
 void RenameThread(const char* name);

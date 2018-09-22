@@ -86,6 +86,8 @@ enum ServiceFlags : uint64_t {
     // collisions and other cases where nodes may be advertising a service they
     // do not actually support. Other service bits should be allocated via the
     // BIP process.
+
+    NODE_I2P = (1 << 7),
 };
 
 /** A CService with information about it as peer */
@@ -93,7 +95,7 @@ class CAddress : public CService
 {
 public:
     CAddress();
-    explicit CAddress(CService ipIn, ServiceFlags nServicesIn);
+    explicit CAddress(CService ipIn, ServiceFlags nServicesIn = NODE_NETWORK);
 
     void Init();
 

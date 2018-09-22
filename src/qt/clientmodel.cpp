@@ -19,6 +19,8 @@
 #include "ui_interface.h"
 #include "util.h"
 
+#include "i2pwrapper.h"            // Include for i2p interface
+
 #include <stdint.h>
 
 #include <QDateTime>
@@ -65,10 +67,18 @@ int ClientModel::getNumConnections(unsigned int flags) const
         return vNodesCopy.size();
 
     int nNum = 0;
-    for (CNode* pnode : vNodesCopy)
-        if ( pnode && (flags & (pnode->fInbound ? CONNECTIONS_IN : CONNECTIONS_OUT)))
+    bool fI2pSum = flags & CONNECTIONS_I2P_ALL;
+    // Set this flags outside the loop, its faster than recomputing them every iteration
+    bool fMatchI2pInbound = flags & CONNECTIONS_I2P_IN;
+    bool fMatchI2pOutbound = flags & CONNECTIONS_I2P_OUT;
+    for (CNode* pnode : vNodesCopy) {
+        if( fI2pSum && pnode->addr.IsI2P() ) {
+            if( pnode->fInbound ) {
+                if( fMatchI2pInbound ) nNum++;
+            } else if( fMatchI2pOutbound ) nNum++;
+        } else if(flags & (pnode->fInbound ? CONNECTIONS_IN : CONNECTIONS_OUT))
             nNum++;
-
+    }
     return nNum;
 }
 
@@ -265,6 +275,63 @@ void ClientModel::updateBanlist()
 {
     banTableModel->refresh();
     emit banListChanged();
+}
+
+/**********************************************************************
+ *          These I2P functions handle values for the view
+ */
+QString ClientModel::formatI2PNativeFullVersion() const
+{
+    return QString::fromStdString(FormatI2PNativeFullVersion());
+}
+
+QString ClientModel::getPublicI2PKey() const
+{
+    return IsI2PEnabled() ? QString::fromStdString(I2PSession::Instance().getMyDestination().pub) : QString( "Not Available" );
+}
+
+QString ClientModel::getPrivateI2PKey() const
+{
+    return IsI2PEnabled() ? QString::fromStdString(I2PSession::Instance().getMyDestination().priv) : QString( "Not Available" );
+}
+
+bool ClientModel::isI2PAddressGenerated() const
+{
+    return IsI2PEnabled() ? I2PSession::Instance().getMyDestination().isGenerated : false;
+}
+
+bool ClientModel::isI2POnly() const
+{
+    return IsI2POnly();
+}
+
+bool ClientModel::isTorOnly() const
+{
+    return IsTorOnly();
+}
+
+bool ClientModel::isDarknetOnly() const
+{
+    return IsDarknetOnly();
+}
+
+bool ClientModel::isBehindDarknet() const
+{
+    return IsBehindDarknet();
+}
+
+QString ClientModel::getB32Address(const QString& destination) const
+{
+    return  IsI2PEnabled() ? QString::fromStdString(I2PSession::GenerateB32AddressFromDestination(destination.toStdString())) : QString( "Not Available" );
+}
+
+void ClientModel::generateI2PDestination(QString& pub, QString& priv) const
+{
+    SAM::FullDestination generatedDest( "Not Available", "Not Available", false );
+    if( IsI2PEnabled() )
+        generatedDest = I2PSession::Instance().destGenerate();
+    pub = QString::fromStdString(generatedDest.pub);
+    priv = QString::fromStdString(generatedDest.priv);
 }
 
 // Handlers for core signals

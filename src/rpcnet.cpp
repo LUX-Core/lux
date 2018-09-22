@@ -5,8 +5,9 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "rpcserver.h"
-#include "core_io.h"
+#include "addrman.h"
 #include "clientversion.h"
+#include "core_io.h"
 #include "main.h"
 #include "net.h"
 #include "netbase.h"
@@ -57,6 +58,149 @@ UniValue ping(const UniValue& params, bool fHelp)
     return NullUniValue;
 }
 
+UniValue destination(const UniValue& params, bool fHelp)
+{
+    if (fHelp || params.size() > 2)
+        throw runtime_error(
+                "destination [\"match|good|attempt|connect\"] [\"b32.i2p|base64|ip:port\"]\n"
+                "\n Returns I2P destination details stored in your b32.i2p address manager lookup system.\n"
+                "\nArguments:\n"
+                "  If no arguments are provided, the command returns all the b32.i2p addresses. NOTE: Results will not include base64\n"
+                "  1st argument = \"match\" then a 2nd argument is also required.\n"
+                "  2nd argument = Any string. If a match is found in any of the address, source or base64 fields, that result will be returned.\n"
+                "  1st argument = \"good\" destinations that has been tried, connected and found to be good will be returned.\n"
+                "  1st argument = \"attempt\" destinations that have been attempted, will be returned.\n"
+                "  1st argument = \"connect\" destinations that have been connected to in the past, will be returned.\n"
+                "\nResults are returned as a json array of object(s).\n"
+                "  The 1st result pair is the total size of the address hash map.\n"
+                "  The 2nd result pair is the number of objects which follow, as matching this query.  It can be zero, if no match was found.\n"
+                "\nResult:\n"
+                "[\n"
+                "  {\n"
+                "    \"tablesize\": nnn,             (numeric) The total number of destinations in the i2p address book\n"
+                "    \"matchsize\": nnn,             (numeric) The number of results returned, which matched your query\n"
+                "  }\n"
+                "  {\n"
+                "    \"address\":\"b32.i2p\",          (string)  Base32 hash of a i2p destination, a possible peer\n"
+                "    \"good\": true|false,           (boolean) Has this address been tried & found to be good\n"
+                "    \"attempt\": nnn,               (numeric) The number of times it has been attempted\n"
+                "    \"lasttry\": ttt,               (numeric) The time of a last attempted connection (memory only)\n"
+                "    \"connect\": ttt,               (numeric) The time of a last successful connection\n"
+                "    \"source\":\"b32.i2p|ip:port\",   (string)  The source of information about this address\n"
+                "    \"base64\":\"destination\",       (string)  The full Base64 Public Key of this peers b32.i2p address\n"
+                "  }\n"
+                "  ,...\n"
+                "]\n"
+                "\nNOTE: The results obtained are only a snapshot, while you are connected to the network.\n"
+                "      Peers are updating addresses & destinations all the time.\n"
+                "\nExamples: Return all I2P destinations currently known about on the system.\n"
+                + HelpExampleCli("destination", "")
+                + HelpExampleRpc("destination", "") +
+                "\nExamples: Return the I2P destinations marked as 'good', happens if they have been tried and a successful version handshake made.\n"
+                + HelpExampleCli("destination", "good") +
+                "\nExample: Return I2P destinations marked as having made an attempt to connect\n"
+                + HelpExampleRpc("destination", "attempt") +
+                "\nExample: Return I2P destinations which are marked as having been connected to.\n"
+                + HelpExampleCli("destination", "connect") +
+                "\nExamples: Return I2P destination entries which came from the 'source' IP address 215.49.103.xxx\n"
+                + HelpExampleRpc("destination", "match 215.49.103") +
+                "\nExamples: Return all I2P b32.i2p destinations which match the patter, these could be found in the 'source' or the 'address' fields.\n"
+                + HelpExampleCli("destination", "match vatzduwjheyou3ybknfgm7cl43efbhovtrpfduz55uilxahxwt7a.b32.i2p")
+                + HelpExampleRpc("destination", "match vatzduwjheyou3ybknfgm7cl43efbhovtrpfduz55uilxahxwt7a.b32.i2p")
+        );
+    //! We must not have node or main processing as Addrman needs to
+    //! be considered static for the time required to process this.
+    LOCK2(cs_main, cs_vNodes);
+
+    bool fSelectedMatch = false;
+    bool fMatchStr = false;
+    bool fMatchTried = false;
+    bool fMatchAttempt = false;
+    bool fMatchConnect = false;
+    bool fUnknownCmd = false;
+    string sMatchStr;
+
+    if( params.size() > 0 ) {                                   // Lookup the address and return the one object if found
+        string sCmdStr = params[0].get_str();
+        if( sCmdStr == "match" ) {
+            if( params.size() > 1 ) {
+                sMatchStr = params[1].get_str();
+                fMatchStr = true;
+            } else
+                fUnknownCmd = true;
+        } else if( sCmdStr == "good" )
+            fMatchTried = true;
+        else if( sCmdStr == "attempt" )
+            fMatchAttempt = true;
+        else if( sCmdStr == "connect")
+            fMatchConnect = true;
+        else
+            fUnknownCmd = true;
+        fSelectedMatch = true;
+    }
+
+    UniValue ret(UniValue::VARR);;
+    // Load the vector with all the objects we have and return with
+    // the total number of addresses we have on file
+    vector<CDestinationStats> vecStats;
+    int nTableSize = addrman.CopyDestinationStats(vecStats);
+    if( !fUnknownCmd ) {       // If set, throw runtime error
+        for( int i = 0; i < 2; i++ ) {      // Loop through the data twice
+            bool fMatchFound = false;       // Assume no match
+            int nMatchSize = 0;             // the match counter
+            for (const CDestinationStats& stats : vecStats) {
+                if( fSelectedMatch ) {
+                    if( fMatchStr ) {
+                        if( stats.sAddress.find(sMatchStr) != string::npos ||
+                            stats.sSource.find(sMatchStr) != string::npos ||
+                            stats.sBase64.find(sMatchStr) != string::npos )
+                            fMatchFound = true;
+                    } else if( fMatchTried ) {
+                        if( stats.fInTried ) fMatchFound = true;
+                    }
+                    else if( fMatchAttempt ) {
+                        if( stats.nAttempts > 0 ) fMatchFound = true;
+                    }
+                    else if( fMatchConnect ) {
+                        if( stats.nSuccessTime > 0 ) fMatchFound = true;
+                    }
+                } else          // Match everything
+                    fMatchFound = true;
+
+                if( i == 1 && fMatchFound ) {
+                    UniValue obj(UniValue::VOBJ);;
+                    obj.push_back(Pair("address", stats.sAddress));
+                    obj.push_back(Pair("good", stats.fInTried));
+                    obj.push_back(Pair("attempt", stats.nAttempts));
+                    obj.push_back(Pair("lasttry", stats.nLastTry));
+                    obj.push_back(Pair("connect", stats.nSuccessTime));
+                    obj.push_back(Pair("source", stats.sSource));
+                    //! Do to an RPC buffer limit of 65535 with stream output, we can not send these and ever get a result
+                    //! This should be considered a short term fix ToDo:  Allocate bigger iostream buffer for the output
+                    if( fSelectedMatch )
+                        obj.push_back(Pair("base64", stats.sBase64));
+                    ret.push_back(obj);
+                }
+                if( fMatchFound ) {
+                    nMatchSize++;
+                    fMatchFound = false;
+                }
+            }
+            // The 1st time we get a count of the matches, so we can list that first in the results,
+            // then we finally build the output objects, on the 2nd pass...and don't put this in there twice
+            if( i == 0 ) {
+                UniValue objSizes(UniValue::VOBJ);;
+                objSizes.push_back(Pair("tablesize", nTableSize));
+                objSizes.push_back(Pair("matchsize", nMatchSize));
+                ret.push_back(objSizes);                            // This is the 1st object put on the Array
+            }
+        }
+    } else
+        throw JSONRPCError(RPC_INVALID_PARAMS, "Unknown subcommand or argument missing");
+
+    return ret;
+}
+
 static void CopyNodeStats(std::vector<CNodeStats>& vstats)
 {
     vstats.clear();
@@ -81,8 +225,8 @@ UniValue getpeerinfo(const UniValue& params, bool fHelp)
             "[\n"
             "  {\n"
             "    \"id\": n,                   (numeric) Peer index\n"
-            "    \"addr\":\"host:port\",      (string) The ip address and port of the peer\n"
-            "    \"addrlocal\":\"ip:port\",   (string) local address\n"
+            "    \"addr\":\"host:port|b32.i2p\",      (string) The ip:port address or i2p b32.i2p destinationS of the peer\n"
+            "    \"addrlocal\":\"ip:port|b32.i2p\",   (string) local address\n"
             "    \"services\":\"xxxxxxxxxxxxxxxx\",   (string) The services offered\n"
             "    \"lastsend\": ttt,           (numeric) The time in seconds since epoch (Jan 1 1970 GMT) of the last send\n"
             "    \"lastrecv\": ttt,           (numeric) The time in seconds since epoch (Jan 1 1970 GMT) of the last receive\n"
@@ -165,15 +309,17 @@ UniValue addnode(const UniValue& params, bool fHelp)
     if (fHelp || params.size() != 2 ||
         (strCommand != "onetry" && strCommand != "add" && strCommand != "remove"))
         throw runtime_error(
-            "addnode \"node\" \"add|remove|onetry\"\n"
+            "addnode \"b32.i2p|base64|ip:port|ipv6\" \"add|remove|onetry\"\n"
             "\nAttempts add or remove a node from the addnode list.\n"
             "Or try a connection to a node once.\n"
             "\nArguments:\n"
             "1. \"node\"     (string, required) The node (see getpeerinfo for nodes)\n"
             "2. \"command\"  (string, required) 'add' to add a node to the list, 'remove' to remove a node from the list, 'onetry' to try a connection to the node once\n"
-            "\nExamples:\n" +
-            HelpExampleCli("addnode", "\"192.168.0.6:51472\" \"onetry\"") + HelpExampleRpc("addnode", "\"192.168.0.6:51472\", \"onetry\""));
-
+            "\nExamples:\n"
+             + HelpExampleCli("addnode", "\"192.168.0.6:26969\" \"onetry\"")
+             + HelpExampleRpc("addnode", "\"192.168.0.6:26969\", \"add\"")
+             + HelpExampleCli("addnode", "ibtfn3cnherivbkfbytay5tx35saajauxlg2aohna2rwyci2pecq.b32.i2p remove")
+             + HelpExampleRpc("addnode", "\"ibtfn3cnherivbkfbytay5tx35saajauxlg2aohna2rwyci2pecq.b32.i2p\", \"onetry\""));
     string strNode = params[0].get_str();
 
     if (strCommand == "onetry") {
@@ -242,15 +388,17 @@ UniValue getaddednodeinfo(const UniValue& params, bool fHelp)
             "    \"connected\" : true|false,          (boolean) If connected\n"
             "    \"addresses\" : [\n"
             "       {\n"
-            "         \"address\" : \"192.168.0.201:51472\",  (string) The lux server host and port\n"
+            "         \"address\" : \"192.168.0.201:26969\",  (string) The lux server host and port\n"
             "         \"connected\" : \"outbound\"           (string) connection, inbound or outbound\n"
             "       }\n"
             "     ]\n"
             "  }\n"
             "  ,...\n"
             "]\n"
-            "\nExamples:\n" +
-            HelpExampleCli("getaddednodeinfo", "true") + HelpExampleCli("getaddednodeinfo", "true \"192.168.0.201\"") + HelpExampleRpc("getaddednodeinfo", "true, \"192.168.0.201\""));
+            "\nExamples:\n"
+            + HelpExampleCli("getaddednodeinfo", "true")
+            + HelpExampleCli("getaddednodeinfo", "true \"192.168.0.201\"")
+            + HelpExampleRpc("getaddednodeinfo", "true, \"192.168.0.201\""));
 
     std::vector<AddedNodeInfo> vInfo = GetAddedNodeInfo();
 
