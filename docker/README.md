@@ -9,6 +9,14 @@ Push docker image:
 
     docker/push.sh
 
+Pull luxcore/lux:latest from docker hub  at [lux-dockerhub](https://hub.docker.com/r/luxcore/lux/)
+
+    sudo docker pull luxcore/lux
+    
+Run docker image
+
+    sudo docker run luxcore/lux
+
 Build docker for luxd
 ----------
 A Docker configuration with luxd node by default.
