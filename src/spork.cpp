@@ -96,7 +96,7 @@ bool IsSporkActive(int nSporkID) {
 }
 
 // grab the value of the spork on the network, or the default
-int GetSporkValue(int nSporkID) {
+long GetSporkValue(int nSporkID) {
     int r = 0;
     if (mapSporksActive.count(nSporkID)) {
         r = mapSporksActive[nSporkID].nValue;

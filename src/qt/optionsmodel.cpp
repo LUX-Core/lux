@@ -144,6 +144,10 @@ void OptionsModel::Init()
     if (!SoftSetBoolArg("-zerobalanceaddresstoken", settings.value("bZeroBalanceAddressToken").toBool()))
         addOverriddenOption("-zerobalanceaddresstoken");
 
+    if (!settings.contains("fCheckUpdates"))
+        settings.setValue("fCheckUpdates", CHECKUPDATES);
+    fCheckUpdates = settings.value("fCheckUpdates").toBool();
+
     // Network
     if (!settings.contains("fUseUPnP"))
         settings.setValue("fUseUPnP", DEFAULT_UPNP);
@@ -282,6 +286,8 @@ QVariant OptionsModel::data(const QModelIndex& index, int role) const
             return QVariant(nAnonymizeLuxAmount);
         case Listen:
             return settings.value("fListen");
+        case CheckUpdates:
+            return settings.value("fCheckUpdates");
         default:
             return QVariant();
         }
@@ -323,6 +329,12 @@ bool OptionsModel::setData(const QModelIndex& index, const QVariant& value, int 
                 settings.setValue("fUseProxy", value.toBool());
                 setRestartRequired(true);
             }
+            break;
+        case CheckUpdates:
+            if (settings.value("fCheckUpdates") != value) {
+                settings.setValue("fCheckUpdates", value);
+                fCheckUpdates = value.toBool();
+                }
             break;
         case ProxyIP: {
             // contains current IP at index 0 and current port at index 1

@@ -49,6 +49,8 @@ extern bool bZeroBalanceAddressToken;
 extern bool fSendFreeTransactions;
 extern bool fPayAtLeastCustomFee;
 extern bool fNotUseChangeAddress;
+extern bool fCheckUpdates;
+static const bool CHECKUPDATES = true;
 //! -paytxfee default
 static const CAmount DEFAULT_TRANSACTION_FEE = 1000;
 //! -paytxfee will warn if called with a higher fee than this amount (in satoshis) per KB

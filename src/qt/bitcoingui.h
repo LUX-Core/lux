@@ -39,6 +39,7 @@ class ModalOverlay;
 class MasternodeList;
 class HexAddressConverter;
 class CBlockIndex;
+class UpdateDialog;
 
 class CWallet;
 
@@ -152,6 +153,7 @@ private:
     BlockExplorer* explorerWindow;
     HexAddressConverter* hexAddressWindow;
     ModalOverlay* modalOverlay;
+    UpdateDialog* updateDialog;
 
     /** Keep track of previous number of blocks, to detect progress */
     int prevBlocks;

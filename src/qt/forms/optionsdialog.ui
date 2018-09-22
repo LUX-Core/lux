@@ -304,6 +304,13 @@
            </widget>
           </item>
           <item>
+           <widget class="QCheckBox" name="checkUpdates">
+            <property name="text">
+             <string>Check for &amp;updates</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QCheckBox" name="parallelMasterNode">
             <property name="toolTip">
              <string>Coming soon</string>
