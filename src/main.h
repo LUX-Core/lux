@@ -151,6 +151,8 @@ static const unsigned int DEFAULT_BYTES_PER_SIGOP = 20;
 static const int64_t STATIC_POS_REWARD = 1 * COIN; //Constant reward 8%
 
 static const bool DEFAULT_LOGEVENTS = false;
+/** Default for -mempoolexpiry */
+static const unsigned int DEFAULT_MEMPOOL_EXPIRY = 72;
 
 ////////////////////////////////////////////////////// lux
 static const uint64_t DEFAULT_GAS_LIMIT_OP_CREATE=2500000;
