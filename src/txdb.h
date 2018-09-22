@@ -22,11 +22,17 @@ class CCoins;
 class uint256;
 
 //! -dbcache default (MiB)
-static const int64_t nDefaultDbCache = 256;
+static const int64_t nDefaultDbCache = 300;
 //! max. -dbcache in (MiB)
-static const int64_t nMaxDbCache = sizeof(void*) > 4 ? 4096 : 1024;
+static const int64_t nMaxDbCache = sizeof(void*) > 4 ? 16384 : 1024;
 //! min. -dbcache in (MiB)
 static const int64_t nMinDbCache = 4;
+//! Max memory allocated to block tree DB specific cache, if no -txindex (MiB)
+static const int64_t nMaxBlockDBCache = 2;
+//! Max memory allocated to block tree DB specific cache, if -txindex (MiB)
+static const int64_t nMaxBlockDBAndTxIndexCache = 1024;
+//! Max memory allocated to coin DB specific cache (MiB)
+static const int64_t nMaxCoinsDBCache = 8;
 
 /** CCoinsView backed by the LevelDB coin database (chainstate/) */
 class CCoinsViewDB : public CCoinsView

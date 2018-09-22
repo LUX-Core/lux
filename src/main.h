@@ -223,7 +223,7 @@ extern bool fIsBareMultisigStd;
 extern bool fRequireStandard;
 extern unsigned int nBytesPerSigOp;
 extern bool fCheckBlockIndex;
-extern size_t nCoinCacheUsage;
+extern size_t nCoinCacheSize;
 extern CFeeRate minRelayTxFee;
 extern bool fAlerts;
 

@@ -138,7 +138,7 @@ bool fSpentIndex = false;
 bool fIsBareMultisigStd = true;
 bool fRequireStandard = true;
 bool fCheckBlockIndex = false;
-size_t nCoinCacheUsage = 5000 * 300;
+size_t nCoinCacheSize = 5000 * 300;
 unsigned int nBytesPerSigOp = DEFAULT_BYTES_PER_SIGOP;
 bool fAlerts = DEFAULT_ALERTS;
 
