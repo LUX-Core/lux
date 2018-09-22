@@ -39,6 +39,7 @@
 #include "masternodemanager.h"
 #include "ui_interface.h"
 #include "util.h"
+#include "updatedialog.h"
 
 #include <iostream>
 
@@ -135,6 +136,7 @@ BitcoinGUI::BitcoinGUI(const PlatformStyle *platformStyle, const NetworkStyle* n
                                                                             explorerWindow(0),
                                                                             hexAddressWindow(0),
                                                                             modalOverlay(0),
+                                                                            updateDialog(0),
                                                                             prevBlocks(0),
                                                                             spinnerFrame(0),
                                                                             platformStyle(platformStyle)
@@ -304,6 +306,16 @@ BitcoinGUI::BitcoinGUI(const PlatformStyle *platformStyle, const NetworkStyle* n
     timerStakingIcon->start(10000);
     setStakingStatus();
     modalOverlay = new ModalOverlay(this->centralWidget());
+
+    updateDialog = new UpdateDialog(this);
+
+    if(fCheckUpdates && updateDialog->newUpdateAvailable())
+    {
+        QString url = "https://github.com/LUX-Core/lux/releases";
+        QString link = QString("<a href=\\\"\"+ url +\"\\\">\"+ url +\"</a>").arg(NEW_RELEASES, NEW_RELEASES);
+        QString message(tr("New lux-qt version available: <br /> %1. <br />").arg(link));
+        QMessageBox::information(this, tr("Check for updates"), message);
+    }
 
 #ifdef ENABLE_WALLET
     if(enableWallet) {

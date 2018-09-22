@@ -202,6 +202,7 @@ void OptionsDialog::setMapper()
     mapper->addMapping(ui->notUseChangeAddress, OptionsModel::NotUseChangeAddress);
     mapper->addMapping(ui->walletBackups, OptionsModel::WalletBackups);
     mapper->addMapping(ui->zeroBalanceAddressToken, OptionsModel::ZeroBalanceAddressToken);
+    mapper->addMapping(ui->checkUpdates, OptionsModel::CheckUpdates);
 
     /* Network */
     mapper->addMapping(ui->mapPortUpnp, OptionsModel::MapPortUPnP);
