@@ -56,6 +56,7 @@ public:
         NotUseChangeAddress,     // bool
         WalletBackups,           // int
         Listen,                  // bool
+        CheckUpdates,            // bool
         OptionIDRowCount,
     };
 
