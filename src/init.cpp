@@ -1238,18 +1238,16 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
     }
 
     // cache size calculations
-    size_t nTotalCache = (GetArg("-dbcache", nDefaultDbCache) << 20);
-    if (nTotalCache < (nMinDbCache << 20))
-        nTotalCache = (nMinDbCache << 20); // total cache cannot be less than nMinDbCache
-    else if (nTotalCache > (nMaxDbCache << 20))
-        nTotalCache = (nMaxDbCache << 20); // total cache cannot be greater than nMaxDbCache
-    size_t nBlockTreeDBCache = nTotalCache / 8;
-    if (nBlockTreeDBCache > (1 << 21) && !GetBoolArg("-txindex", true))
-        nBlockTreeDBCache = (1 << 21); // block tree db cache shouldn't be larger than 2 MiB
+    int64_t nTotalCache = (GetArg("-dbcache", nDefaultDbCache) << 20);
+    nTotalCache = max(nTotalCache, nMinDbCache << 20); // total cache cannot be less than nMinDbCache
+    nTotalCache = min(nTotalCache, nMaxDbCache << 20); // total cache cannot be greater than nMaxDbCache
+    int64_t nBlockTreeDBCache = nTotalCache / 8;
+    nBlockTreeDBCache = min(nBlockTreeDBCache, (GetBoolArg("-txindex", true) ? nMaxBlockDBAndTxIndexCache : nMaxBlockDBCache) << 20);
     nTotalCache -= nBlockTreeDBCache;
-    size_t nCoinDBCache = nTotalCache / 2; // use half of the remaining cache for coindb cache
+    int64_t nCoinDBCache = std::min(nTotalCache / 2, (nTotalCache / 4) + (1 << 23)); // use 50% the remaining cache for coindb cache
+    nCoinDBCache = min(nCoinDBCache, nMaxCoinsDBCache << 20); // cap total coins db cache
     nTotalCache -= nCoinDBCache;
-    nCoinCacheSize = nTotalCache / 300; // coins in memory require around 300 bytes
+    nCoinCacheSize = nTotalCache; // the rest goes to in-memory cache (300bytes)
 
     bool fLoaded = false;
     while (!fLoaded && !fRequestShutdown) {

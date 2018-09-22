@@ -136,7 +136,7 @@ bool fTxIndex = true;
 bool fIsBareMultisigStd = true;
 bool fRequireStandard = true;
 bool fCheckBlockIndex = false;
-unsigned int nCoinCacheSize = 5000;
+size_t nCoinCacheSize = 5000 * 300;
 unsigned int nBytesPerSigOp = DEFAULT_BYTES_PER_SIGOP;
 bool fAlerts = DEFAULT_ALERTS;
 
