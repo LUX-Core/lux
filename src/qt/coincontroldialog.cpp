@@ -213,7 +213,7 @@ void CoinControlDialog::setModel(WalletModel* model)
 
 void CoinControlDialog::setClientModel(ClientModel* clientModel) {
     this->clientModel = clientModel;
-    connect(clientModel, SIGNAL(numBlocksChanged(int)), this, SLOT(updateInfoInDialog()));
+    connect(clientModel, SIGNAL(numBlocksChanged()), this, SLOT(updateInfoInDialog()));
 }
 
 void CoinControlDialog::updateInfoInDialog() {
