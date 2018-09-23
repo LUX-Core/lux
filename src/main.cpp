@@ -4269,7 +4269,7 @@ bool CheckBlock(const CBlock& block, CValidationState& state, const Consensus::P
             return error("%s: smart contracts are not supported yet in PoS blocks", __func__);
         }
 
-        if (!CheckTransaction(tx, state, false)) {
+        if (!CheckTransaction(tx, state, true)) {
             return state.Invalid(false, state.GetRejectCode(), state.GetRejectReason(),
                     strprintf("Transaction check failed (tx hash %s) %s", tx.GetHash().ToString(), state.GetDebugMessage()));
 
