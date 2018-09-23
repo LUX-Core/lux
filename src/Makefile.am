@@ -663,7 +663,7 @@ lux_cli_SOURCES = lux-cli.cpp
 lux_cli_CPPFLAGS = $(BITCOIN_INCLUDES) $(EVENT_CFLAGS)
 
 if TARGET_WINDOWS
-lux_cli_SOURCES += lux-cli-res.rc
+lux_cli_SOURCES += lux-cli-res.rc config/lux-config.h
 endif
 
 lux_cli_LDADD = \
