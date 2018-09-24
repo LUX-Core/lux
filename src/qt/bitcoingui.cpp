@@ -40,6 +40,7 @@
 #include "ui_interface.h"
 #include "util.h"
 #include "updatedialog.h"
+#include "wallet.h"
 
 #include <iostream>
 

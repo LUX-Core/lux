@@ -48,10 +48,11 @@ unsigned int nTxConfirmTarget = 1;
 bool bSpendZeroConfChange = true;
 bool fSendFreeTransactions = false;
 bool fPayAtLeastCustomFee = true;
+bool fWalletProcessingMode = false;
 OutputType g_address_type = OUTPUT_TYPE_NONE;
 OutputType g_change_type = OUTPUT_TYPE_NONE;
 const char * DEFAULT_WALLET_DAT = "wallet.dat";
-
+bool fCheckUpdates = CHECKUPDATES;
 bool bZeroBalanceAddressToken = DEFAULT_ZERO_BALANCE_ADDRESS_TOKEN;
 bool fNotUseChangeAddress = DEFAULT_NOT_USE_CHANGE_ADDRESS;
 /**
@@ -868,6 +869,7 @@ bool CWallet::AddToWallet(const CWalletTx& wtxIn, bool fFromLoadWallet, CWalletD
         LogPrintf("AddToWallet %s  %s%s\n", wtxIn.GetHash().ToString(), (fInsertedNew ? "new" : ""), (fUpdated ? "update" : ""));
 
         // Write to disk
+        CWalletDB walletdb(pwalletMain->strWalletFile);
         if (fInsertedNew || fUpdated)
             if (!wtx.WriteToDisk(&walletdb))
                 return false;
