@@ -258,6 +258,8 @@ public:
     int GetBlocksToMaturity() const;
     bool AcceptToMemoryPool(bool fLimitFree = true, bool fRejectInsaneFee = true, bool ignoreFees = false);
     bool isAbandoned() const { return (hashBlock == ABANDON_HASH); }
+    bool hashUnset() const { return (hashBlock.IsNull() || hashBlock == ABANDON_HASH); }
+    void setAbandoned() { hashBlock = ABANDON_HASH; }
     int GetTransactionLockSignatures() const;
     bool IsTransactionLockTimedOut() const;
 };
@@ -299,6 +301,7 @@ class CWallet : public CCryptoKeyStore, public CValidationInterface
     TxSpends mapTxSpends;
     void AddToSpends(const COutPoint& outpoint, const uint256& wtxid);
     void AddToSpends(const uint256& wtxid);
+    void MarkConflicted(const uint256& hashBlock, const uint256& hashTx);
 
     void SyncMetaData(std::pair<TxSpends::iterator, TxSpends::iterator>);
 
@@ -820,19 +823,8 @@ public:
      */
     CTxDestination AddAndGetDestinationForScript(const CScript& script, OutputType);
 
-    /**
- * HD Wallet Functions
- */
-
-    /* Returns true if HD is enabled */
-    bool IsHDEnabled();
-    /* Generates a new HD chain */
-    void GenerateNewHDChain();
-    /* Set the HD chain model (chain child index counters) */
-    bool SetHDChain(const CHDChain& chain, bool memonly);
-    bool SetCryptedHDChain(const CHDChain& chain, bool memonly);
-    bool GetDecryptedHDChain(CHDChain& hdChainRet);
-    CPubKey GenerateNewHDMasterKey();
+    /* Mark a transaction (and it in-wallet descendants) as abandoned so its inputs may be respent. */
+    bool AbandonTransaction(const uint256& hashTx);
 };
 
 /** A key allocated from the key pool. */
@@ -1373,7 +1365,13 @@ public:
             return false;
         if (!bSpendZeroConfChange || !IsFromMe(ISMINE_ALL)) // using wtx's cached debit
             return false;
-
+        // Don't trust unconfirmed transactions from us unless they are in the mempool.
+        {
+            LOCK(mempool.cs);
+            if (!mempool.exists(GetHash())) {
+                return false;
+            }
+        }
         // Trusted if all inputs are from us and are in the mempool:
         for (const CTxIn& txin : vin) {
             // Transactions not sent by us: not trusted
@@ -1388,7 +1386,7 @@ public:
         return true;
     }
 
-    bool WriteToDisk();
+    bool WriteToDisk(CWalletDB *pwalletdb);
 
     int64_t GetTxTime() const;
     int GetRequestCount() const;
