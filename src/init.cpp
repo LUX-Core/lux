@@ -1051,11 +1051,12 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
     LogPrintf("Using LuxGate config file %s\n", GetLuxGateConfigFile().string());
 
     // Read LuxGate config
-    std::vector<BlockchainConfig> config = ReadLuxGateConfigFile();
+    std::map<std::string, BlockchainConfig> config = ReadLuxGateConfigFile();
     BlockchainConfig luxConfig{"LUX", "", 0, "", ""}; // Empty config because we don't need to actually connect to RPC
     ClientPtr luxClient = std::make_shared<CLuxClient>(luxConfig);
     blockchainClientPool.insert(std::make_pair(luxClient->ticker, luxClient));
-    for (BlockchainConfig conf : config) {
+    for (auto it : config) {
+        BlockchainConfig conf = it.second;
         LogPrintf("BlockchainConfig: %s\n", conf.ToString().c_str());
         ClientPtr client = std::make_shared<CBitcoinClient>(conf);
         bool swapIsSupported = client->IsSwapSupported();
@@ -1064,6 +1065,10 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
     }
    if (!InitializeLuxGate()) {
        LogPrintf("Failed to initialize LuxGate\n");
+   }
+   // Set LUXGATE service bit only if we have more than 2 blockchain clients
+   if (blockchainClientPool.size() > 2) {
+       nLocalServices = ServiceFlags(nLocalServices | NODE_LUXGATE);
    }
 #endif // ENABLE_LUXGATE
 
