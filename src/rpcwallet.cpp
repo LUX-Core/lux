@@ -1513,6 +1513,7 @@ void ListTransactions(const CWalletTx& wtx, const string& strAccount, int nMinDe
                 continue;
             if (fLong)
                 WalletTxToJSON(wtx, entry);
+            entry.push_back(Pair("abandoned", wtx.isAbandoned()));
             ret.push_back(entry);
         }
     }
