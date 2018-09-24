@@ -378,8 +378,10 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
 
     addPriorityTxs(minGasPrice);
     addPackageTxs(minGasPrice);
-    pblock->hashStateRoot = uint256(h256Touint(oldHashStateRoot));
-    pblock->hashUTXORoot = uint256(h256Touint(oldHashUTXORoot));
+    pblock->hashStateRoot = h256Touint(getGlobalStateRoot(pindexState));
+    pblock->hashUTXORoot = h256Touint(getGlobalStateUTXO(pindexState));
+
+    // restore old roots state after txs/scs are processed
     setGlobalStateRoot(oldHashStateRoot);
     setGlobalStateUTXO(oldHashUTXORoot);
 
