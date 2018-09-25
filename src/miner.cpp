@@ -378,12 +378,15 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
 
     addPriorityTxs(minGasPrice);
     addPackageTxs(minGasPrice);
-    pblock->hashStateRoot = h256Touint(getGlobalStateRoot(pindexState));
-    pblock->hashUTXORoot = h256Touint(getGlobalStateUTXO(pindexState));
 
-    // restore old roots state after txs/scs are processed
-    setGlobalStateRoot(oldHashStateRoot);
-    setGlobalStateUTXO(oldHashUTXORoot);
+    if (chainActive.Height() >= chainparams.FirstSCBlock()) {
+        pblock->hashStateRoot = h256Touint(getGlobalStateRoot(pindexState));
+        pblock->hashUTXORoot = h256Touint(getGlobalStateUTXO(pindexState));
+
+        // restore old roots state after txs/scs are processed
+        setGlobalStateRoot(oldHashStateRoot);
+        setGlobalStateUTXO(oldHashUTXORoot);
+    }
 
     //this should already be populated by AddBlock in case of contracts, but if no contracts
     //then it won't get populated

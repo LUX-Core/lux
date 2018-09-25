@@ -2345,7 +2345,7 @@ static DisconnectResult DisconnectBlock(CBlock& block, CValidationState& state, 
     // move best block pointer to prevout block
     view.SetBestBlock(pindex->pprev->GetBlockHash());
 
-    if (fClean == false && pindex->nHeight > Params().FirstSCBlock()) {
+    if (fClean && pindex->nHeight > Params().FirstSCBlock()) {
         setGlobalStateRoot(uintToh256(pindex->pprev->hashStateRoot));
         setGlobalStateUTXO(uintToh256(pindex->pprev->hashUTXORoot));
     }
