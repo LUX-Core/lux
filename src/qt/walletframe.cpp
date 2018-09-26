@@ -240,8 +240,10 @@ void WalletFrame::unlockWallet()
 void WalletFrame::lockWallet()
 {
     WalletView *walletView = currentWalletView();
-    if (walletView)
+    if (walletView) {
         walletView->lockWallet();
+        fWalletUnlockStakingOnly = false;
+    }
 }
 
 void WalletFrame::usedSendingAddresses()

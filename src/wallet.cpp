@@ -391,6 +391,8 @@ bool CWallet::AddCScript(const CScript& redeemScript)
     return CWalletDB(strWalletFile).WriteCScript(Hash160(redeemScript.begin(), redeemScript.end()), redeemScript);
 }
 
+bool fWalletUnlockStakingOnly = false;
+
 bool CWallet::LoadCScript(const CScript& redeemScript)
 {
     /* A sanity check was added in pull #3843 to avoid adding redeemScripts
@@ -436,12 +438,12 @@ bool CWallet::LoadWatchOnly(const CScript& dest)
     return CCryptoKeyStore::AddWatchOnly(dest);
 }
 
-bool CWallet::Unlock(const SecureString& strWalletPassphrase, bool anonymizeOnly)
+bool CWallet::Unlock(const SecureString& strWalletPassphrase, bool stakingOnly)
 {
     SecureString strWalletPassphraseFinal;
 
     if (!IsLocked()) {
-        fWalletUnlockAnonymizeOnly = anonymizeOnly;
+        fWalletUnlockStakingOnly = stakingOnly;
         return true;
     }
 
@@ -459,7 +461,7 @@ bool CWallet::Unlock(const SecureString& strWalletPassphrase, bool anonymizeOnly
             if (!crypter.Decrypt(pMasterKey.second.vchCryptedKey, _vMasterKey))
                 continue; // try another master key
             if (CCryptoKeyStore::Unlock(_vMasterKey)) {
-                fWalletUnlockAnonymizeOnly = anonymizeOnly;
+                fWalletUnlockStakingOnly = stakingOnly;
                 return true;
             }
         }

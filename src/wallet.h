@@ -55,6 +55,9 @@ extern bool fNotUseChangeAddress;
 extern bool fWalletProcessingMode;
 extern bool fCheckUpdates;
 static const bool CHECKUPDATES = true;
+extern bool fWalletProcessingMode;
+extern bool fWalletUnlockStakingOnly;
+
 //! -paytxfee default
 static const CAmount DEFAULT_TRANSACTION_FEE = 1000;
 //! -paytxfee will warn if called with a higher fee than this amount (in satoshis) per KB
@@ -335,7 +338,7 @@ public:
     mutable CCriticalSection cs_wallet;
 
     bool fFileBacked;
-    bool fWalletUnlockAnonymizeOnly;
+    bool fWalletUnlockStakingOnly;
     std::string strWalletFile;
 
     void LoadKeyPool(int nIndex, const CKeyPool &keypool)
@@ -411,7 +414,7 @@ public:
         nNextResend = 0;
         nLastResend = 0;
         nTimeFirstKey = 0;
-        fWalletUnlockAnonymizeOnly = false;
+        fWalletUnlockStakingOnly = false;
 
         //MultiSend
         vMultiSend.clear();
