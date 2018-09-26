@@ -9,6 +9,7 @@
 
 #include "guiconstants.h"
 #include "walletmodel.h"
+#include "wallet.h"
 
 #include "allocators.h"
 
@@ -36,7 +37,8 @@ AskPassphraseDialog::AskPassphraseDialog(Mode mode, QWidget* parent, WalletModel
     ui->passEdit1->installEventFilter(this);
     ui->passEdit2->installEventFilter(this);
     ui->passEdit3->installEventFilter(this);
-
+    ui->stakingCheckBox->setChecked(fWalletUnlockStakingOnly);
+    ui->stakingCheckBox->hide();
     this->model = model;
 
     switch (mode) {
@@ -47,8 +49,8 @@ AskPassphraseDialog::AskPassphraseDialog(Mode mode, QWidget* parent, WalletModel
         setWindowTitle(tr("Encrypt wallet"));
         break;
     case UnlockAnonymize:
-        ui->anonymizationCheckBox->setChecked(true);
-        ui->anonymizationCheckBox->show();
+        ui->stakingCheckBox->setChecked(true);
+        ui->stakingCheckBox->show();
     case Unlock: // Ask passphrase
         ui->warningLabel->setText(tr("This operation needs your wallet passphrase to unlock the wallet."));
         ui->passLabel2->hide();
@@ -71,7 +73,7 @@ AskPassphraseDialog::AskPassphraseDialog(Mode mode, QWidget* parent, WalletModel
         break;
     }
 
-    ui->anonymizationCheckBox->setChecked(model->isAnonymizeOnlyUnlocked());
+    ui->stakingCheckBox->setChecked(model->isUnlockStakingOnly());
 
     textChanged();
     connect(ui->passEdit1, SIGNAL(textChanged(QString)), this, SLOT(textChanged()));
@@ -147,10 +149,11 @@ void AskPassphraseDialog::accept()
     } break;
     case UnlockAnonymize:
     case Unlock:
-        if (!model->setWalletLocked(false, oldpass, ui->anonymizationCheckBox->isChecked())) {
+        if (!model->setWalletLocked(false, oldpass, ui->stakingCheckBox->isChecked())) {
             QMessageBox::critical(this, tr("Wallet unlock failed"),
                 tr("The passphrase entered for the wallet decryption was incorrect."));
         } else {
+            fWalletUnlockStakingOnly = ui->stakingCheckBox->isChecked();
             QDialog::accept(); // Success
         }
         break;

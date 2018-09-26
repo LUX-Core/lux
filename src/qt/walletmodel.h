@@ -127,7 +127,7 @@ public:
         DuplicateAddress,
         TransactionCreationFailed, // Error returned when wallet is still locked
         TransactionCommitFailed,
-        AnonymizeOnlyUnlocked,
+        StakingOnlyUnlocked,
         InsaneFee
     };
 
@@ -135,7 +135,7 @@ public:
         Unencrypted,                 // !wallet->IsCrypted()
         Locked,                      // wallet->IsCrypted() && wallet->IsLocked()
         Unlocked,                    // wallet->IsCrypted() && !wallet->IsLocked()
-        UnlockedForAnonymizationOnly // wallet->IsCrypted() && !wallet->IsLocked() && wallet->fWalletUnlockAnonymizeOnly
+        UnlockedForStakingOnly            // wallet->IsCrypted() && !wallet->IsLocked() && wallet->fWalletUnlockStakingOnly
     };
 
     OptionsModel* getOptionsModel();
@@ -192,10 +192,10 @@ public:
     // Wallet encryption
     bool setWalletEncrypted(bool encrypted, const SecureString& passphrase);
     // Passphrase only needed when unlocking
-    bool setWalletLocked(bool locked, const SecureString& passPhrase = SecureString(), bool anonymizeOnly = false);
+    bool setWalletLocked(bool locked, const SecureString& passPhrase = SecureString(), bool stakingOnly = false);
     bool changePassphrase(const SecureString& oldPass, const SecureString& newPass);
     // Is wallet unlocked for anonymization only?
-    bool isAnonymizeOnlyUnlocked();
+    bool isUnlockStakingOnly();
     // Wallet backup
     bool backupWallet(const QString &filename);
     // Restore backup
@@ -223,6 +223,7 @@ public:
         bool valid;
         mutable bool relock; // mutable, as it can be set to false by copying
         void CopyFrom(const UnlockContext& rhs);
+        bool stakingOnly;
     };
 
     UnlockContext requestUnlock(bool relock = false);

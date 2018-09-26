@@ -28,7 +28,9 @@
 
 #include <boost/filesystem/path.hpp>
 #include <boost/thread/exceptions.hpp>
+#include <regex>
 
+extern std::regex hexData;
 //LUX only features
 extern std::atomic<bool> hideLogMessage;
 
