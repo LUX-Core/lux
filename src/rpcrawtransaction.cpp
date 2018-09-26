@@ -6,7 +6,6 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "base58.h"
-#include "coincontrol.h"
 #include "consensus/validation.h"
 #include "core_io.h"
 #include "init.h"
@@ -240,8 +239,6 @@ UniValue listunspent(const UniValue& params, bool fHelp)
             "    \"scriptPubKey\" : \"key\", (string) the script key\n"
             "    \"amount\" : x.xxx,         (numeric) the transaction amount in btc\n"
             "    \"confirmations\" : n       (numeric) The number of confirmations\n"
-            "    \"ds_rounds\" : n           (numeric) The number of ds round\n"
-            "    \"spendable\" : xxx,        (bool) Whether we have the private keys to spend this output\n"
             "    \"redeemScript\" : n        (string) The redeemScript if scriptPubKey is P2SH\n"
             "  }\n"
             "  ,...\n"
@@ -305,177 +302,21 @@ UniValue listunspent(const UniValue& params, bool fHelp)
             if (scriptPubKey.IsPayToScriptHash()) {
                 const CScriptID& hash = boost::get<CScriptID>(address);
                 CScript redeemScript;
-                if (pwalletMain->GetCScript(hash, redeemScript))
+                if (pwalletMain->GetCScript(hash, redeemScript)) {
                     entry.push_back(Pair("redeemScript", HexStr(redeemScript.begin(), redeemScript.end())));
+                }
             }
         }
+
+        entry.push_back(Pair("scriptPubKey", HexStr(scriptPubKey.begin(), scriptPubKey.end())));
         entry.push_back(Pair("amount", ValueFromAmount(out.tx->vout[out.i].nValue)));
         entry.push_back(Pair("confirmations", out.nDepth));
-        entry.push_back(Pair("ds_rounds", pwalletMain->GetInputDarkSendRounds(CTxIn(out.tx->GetHash(), out.i))));
         entry.push_back(Pair("spendable", out.fSpendable));
         results.push_back(entry);
     }
 
     return results;
 }
-
-UniValue fundrawtransaction(const UniValue& params, bool fHelp)
-{
-    if (fHelp || params.size() < 1 || params.size() > 3)
-        throw std::runtime_error(
-            "fundrawtransaction \"hexstring\" ( options iswitness )\n"
-            "\nAdd inputs to a transaction until it has enough in value to meet its out value.\n"
-            "This will not modify existing inputs, and will add at most one change output to the outputs.\n"
-            "No existing outputs will be modified.\n"
-            "Note that inputs which were signed may need to be resigned after completion since in/outputs have been added.\n"
-            "The inputs added will not be signed, use signrawtransaction for that.\n"
-            "Note that all existing inputs must have their previous output transaction be in the wallet.\n"
-            "Note that all inputs selected must be of standard form and P2SH scripts must be\n"
-            "in the wallet using importaddress or addmultisigaddress (to calculate fees).\n"
-            "You can see whether this is the case by checking the \"solvable\" field in the listunspent output.\n"
-            "Only pay-to-pubkey, multisig, and P2SH versions thereof are currently supported for watch-only\n"
-            "\nArguments:\n"
-            "1. \"hexstring\"           (string, required) The hex string of the raw transaction\n"
-            "2. options                 (object, optional)\n"
-            "   {\n"
-            "     \"changeAddress\"          (string, optional, default pool address) The lux address to receive the change\n"
-            "     \"changePosition\"         (numeric, optional, default random) The index of the change output\n"
-            "     \"includeWatching\"        (boolean, optional, default false) Also select inputs which are watch only\n"
-            "     \"lockUnspents\"           (boolean, optional, default false) Lock selected unspent outputs\n"
-            "     \"feeRate\"           (numeric, optional, default not set: makes wallet determine the fee) Set a specific feerate (" + CURRENCY_UNIT + " per KB)\n"
-            "     \"subtractFeeFromOutputs\" (array, optional) A json array of integers.\n"
-            "                              The fee will be equally deducted from the amount of each specified output.\n"
-            "                              The outputs are specified by their zero-based index, before any change output is added.\n"
-            "                              Those recipients will receive less lux than you enter in their corresponding amount field.\n"
-            "                              If no outputs are specified here, the sender pays the fee.\n"
-            "                                  [vout_index,...]\n"
-            "   }\n"
-            "                         for backward compatibility: passing in a true instead of an object will result in {\"includeWatching\":true}\n"
-            "3. iswitness               (boolean, optional) Whether the transaction hex is a serialized witness transaction \n"
-            "                              If iswitness is not present, heuristic tests will be used in decoding\n"
-
-            "\nResult:\n"
-            "{\n"
-            "  \"hex\":       \"value\", (string)  The resulting raw transaction (hex-encoded string)\n"
-            "  \"fee\":       n,         (numeric) Fee in " + CURRENCY_UNIT + " the resulting transaction pays\n"
-            "  \"changepos\": n          (numeric) The position of the added change output, or -1\n"
-            "}\n"
-            "\nExamples:\n"
-            "\nCreate a transaction with no inputs\n"
-            + HelpExampleCli("createrawtransaction", "\"[]\" \"{\\\"myaddress\\\":0.01}\"") +
-            "\nAdd sufficient unsigned inputs to meet the output value\n"
-            + HelpExampleCli("fundrawtransaction", "\"rawtransactionhex\"") +
-            "\nSign the transaction\n"
-            + HelpExampleCli("signrawtransaction", "\"fundedtransactionhex\"") +
-            "\nSend the transaction\n"
-            + HelpExampleCli("sendrawtransaction", "\"signedtransactionhex\"")
-            );
-
-    RPCTypeCheck(params, {UniValue::VSTR});
-
-    assert(pwalletMain != nullptr);
-    LOCK2(cs_main, pwalletMain->cs_wallet);
-
-    CCoinControl coinControl;
-    int changePosition = -1;
-    bool lockUnspents = false;
-    UniValue subtractFeeFromOutputs;
-    set<int> setSubtractFeeFromOutputs;
-    bool overrideEstimatedFeerate = false;
-    CFeeRate feeRate = CFeeRate(0);
-
-    if (!params[1].isNull()) {
-        if (params[1].type() == UniValue::VBOOL) {
-            // backward compatibility bool only fallback
-            coinControl.fAllowWatchOnly = params[1].get_bool();
-        } else {
-            RPCTypeCheck(params, {UniValue::VSTR, UniValue::VOBJ, UniValue::VBOOL});
-
-            UniValue options = params[1];
-
-            RPCTypeCheckObj(options,
-                {
-                    {"changeAddress", UniValue::VSTR},
-                    {"changePosition", UniValue::VNUM},
-                    {"includeWatching", UniValue::VBOOL},
-                    {"lockUnspents", UniValue::VBOOL},
-                    {"feeRate", UniValueType()},
-                    {"reserveChangeKey", UniValue::VBOOL}, // DEPRECATED (and ignored), should be removed in 0.16 or so.
-                    {"subtractFeeFromOutputs", (UniValue::VARR)},
-                },
-                true);
-
-            if (options.exists("changeAddress")) {
-                CTxDestination dest = DecodeDestination(options["changeAddress"].get_str());
-
-                if (!IsValidDestination(dest)) {
-                    throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "changeAddress must be a valid lux address");
-                }
-
-                coinControl.destChange = dest;
-            }
-
-            if (options.exists("changePosition"))
-                changePosition = options["changePosition"].get_int();
-
-            if (options.exists("includeWatching"))
-                coinControl.fAllowWatchOnly = options["includeWatching"].get_bool();
-
-            if (options.exists("lockUnspents"))
-                lockUnspents = options["lockUnspents"].get_bool();
-
-            if (options.exists("feeRate")) {
-            feeRate = CFeeRate(AmountFromValue(options["feeRate"]));
-            overrideEstimatedFeerate = true;
-             }
-
-            if (options.exists("subtractFeeFromOutputs"))
-            subtractFeeFromOutputs = options["subtractFeeFromOutputs"].get_array();
-        }
-    }
-
-    // parse hex string from parameter
-    CTransaction ctx;
-    bool try_no_witness = params[2].isNull() ? true : !params[2].get_bool();
-    if (!DecodeHexTx(ctx, params[0].get_str(), try_no_witness)) {
-        throw JSONRPCError(RPC_DESERIALIZATION_ERROR, "TX decode failed");
-    }
-
-    CMutableTransaction tx(ctx);
-
-    if (tx.vout.size() == 0)
-        throw JSONRPCError(RPC_INVALID_PARAMETER, "TX must have at least one output");
-
-    if (changePosition != -1 && (changePosition < 0 || (unsigned int)changePosition > tx.vout.size()))
-        throw JSONRPCError(RPC_INVALID_PARAMETER, "changePosition out of bounds");
-
-    for (unsigned int idx = 0; idx < subtractFeeFromOutputs.size(); idx++) {
-        int pos = subtractFeeFromOutputs[idx].get_int();
-        if (setSubtractFeeFromOutputs.count(pos))
-            throw JSONRPCError(RPC_INVALID_PARAMETER, strprintf("Invalid parameter, duplicated position: %d", pos));
-        if (pos < 0)
-            throw JSONRPCError(RPC_INVALID_PARAMETER, strprintf("Invalid parameter, negative position: %d", pos));
-        if (pos >= int(tx.vout.size()))
-            throw JSONRPCError(RPC_INVALID_PARAMETER, strprintf("Invalid parameter, position too large: %d", pos));
-        setSubtractFeeFromOutputs.insert(pos);
-    }
-
-    CAmount nFeeOut;
-    std::string strFailReason;
-
-    if (!pwalletMain->FundTransaction(tx, nFeeOut, overrideEstimatedFeerate, changePosition, strFailReason, lockUnspents, setSubtractFeeFromOutputs, &coinControl)) {
-        throw JSONRPCError(RPC_WALLET_ERROR, strFailReason);
-    }
-
-    UniValue result(UniValue::VOBJ);
-    result.push_back(Pair("hex", EncodeHexTx(tx)));
-    result.push_back(Pair("changepos", changePosition));
-    result.push_back(Pair("fee", ValueFromAmount(nFeeOut)));
-
-    return result;
-}
-
-
 #endif
 
 UniValue createrawtransaction(const UniValue& params, bool fHelp)
@@ -805,7 +646,7 @@ UniValue signrawtransaction(const UniValue& params, bool fHelp)
 
             UniValue prevOut = p.get_obj();
 
-            RPCTypeCheckObj(prevOut, { {"txid", UniValueType(UniValue::VSTR)}, {"vout", UniValueType(UniValue::VNUM)}, {"scriptPubKey", UniValueType(UniValue::VSTR)}, });
+            RPCTypeCheckObj(prevOut, map_list_of("txid", UniValue::VSTR)("vout", UniValue::VNUM)("scriptPubKey", UniValue::VSTR));
 
             uint256 txid = ParseHashO(prevOut, "txid");
 
@@ -836,7 +677,7 @@ UniValue signrawtransaction(const UniValue& params, bool fHelp)
             // if redeemScript given and not using the local wallet (private keys
             // given), add redeemScript to the tempKeystore so it can be signed:
             if (fGivenKeys && (scriptPubKey.IsPayToScriptHash() || scriptPubKey.IsPayToWitnessScriptHash())) {
-                RPCTypeCheckObj(prevOut, { {"txid", UniValueType(UniValue::VSTR)}, {"vout", UniValueType(UniValue::VNUM)}, {"scriptPubKey", UniValueType(UniValue::VSTR)}, {"redeemScript", UniValueType(UniValue::VSTR)},});
+                RPCTypeCheckObj(prevOut, map_list_of("txid", UniValue::VSTR)("vout", UniValue::VNUM)("scriptPubKey", UniValue::VSTR)("redeemScript", UniValue::VSTR));
                 UniValue v = find_value(prevOut, "redeemScript");
                 if (!(v.isNull())) {
                     vector<unsigned char> rsData(ParseHexV(v, "redeemScript"));

@@ -32,7 +32,7 @@ private:
     const QValidator* checkValidator;
     bool emptyIsValid;
 
-public Q_SLOTS:
+public slots:
     void setValid(bool valid);
     void setEnabled(bool enabled);
     void checkValidity();
@@ -40,7 +40,7 @@ public Q_SLOTS:
 Q_SIGNALS:
     void validationDidChange(QValidatedLineEdit *validatedLineEdit);
 
-private Q_SLOTS:
+private slots:
     void markValid();
 };
 

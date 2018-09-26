@@ -39,7 +39,7 @@ public slots:
     void updateNodeList();
     void updateLuxNode(QString alias, QString addr, QString privkey, QString collateral);
     
-Q_SIGNALS:
+signals:
 
 private:
     QTimer *timer;

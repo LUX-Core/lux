@@ -6,7 +6,6 @@
 #include "main.h"
 #include "primitives/transaction.h"
 #include "db.h"
-#include "darksend.h"
 #include "init.h"
 #include "masternode.h"
 #include "activemasternode.h"
@@ -23,48 +22,82 @@
 
 #include <fstream>
 
+void SendMoney(const CTxDestination& address, CAmount nValue, CWalletTx& wtxNew, AvailableCoinsType coin_type) {
+    // Check amount
+    if (nValue <= 0)
+        throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid amount");
+
+    if (nValue > pwalletMain->GetBalance())
+        throw JSONRPCError(RPC_WALLET_INSUFFICIENT_FUNDS, "Insufficient funds");
+
+    string strError;
+    if (pwalletMain->IsLocked()) {
+        strError = "Error: Wallet locked, unable to create transaction!";
+        LogPrintf("SendMoney() : %s", strError);
+        throw JSONRPCError(RPC_WALLET_ERROR, strError);
+    }
+
+    // Parse Lux address
+    CScript scriptPubKey = GetScriptForDestination(address);
+
+    // Create and send the transaction
+    CReserveKey reservekey(pwalletMain);
+    CAmount nFeeRequired;
+    if (!pwalletMain->CreateTransaction(scriptPubKey, nValue, wtxNew, reservekey, nFeeRequired, strError, NULL, coin_type)) {
+        if (nValue + nFeeRequired > pwalletMain->GetBalance())
+            strError = strprintf("Error: This transaction requires a transaction fee of at least %s because of its amount, complexity, or use of recently received funds!", FormatMoney(nFeeRequired));
+        LogPrintf("SendMoney() : %s\n", strError);
+        throw JSONRPCError(RPC_WALLET_ERROR, strError);
+    }
+    if (!pwalletMain->CommitTransaction(wtxNew, reservekey))
+        throw JSONRPCError(RPC_WALLET_ERROR,
+                           "Error: The transaction was rejected! This might happen if some of the coins in your wallet were already spent, such as if you used a copy of wallet.dat and coins were spent in the copy but not marked as spent here.");
+}
+
 UniValue darksend(const UniValue& params, bool fHelp) {
-    if (fHelp || params.size() != 1)
+    if (fHelp || params.size() == 0)
         throw runtime_error(
-                "darksend \"command\"\n"
-                "\nArguments:\n"
-                "1. \"command\"        (string or set of strings, required) The command to execute\n"
-                "\nAvailable commands:\n"
-                "  start       - Start mixing\n"
-                "  stop        - Stop mixing\n"
-                "  reset       - Reset mixing\n"
-                "  status      - Print mixing status\n"
+            "darksend <Luxaddress> <amount>\n"
+            "Luxaddress, reset, or auto (AutoDenominate)"
+            "<amount> is a real and is rounded to the nearest 0.00000001"
             + HelpRequiringPassphrase());
 
-    if(params[0].get_str() == "start"){
-        if (pwalletMain->IsLocked())
-            throw JSONRPCError(RPC_WALLET_UNLOCK_NEEDED, "Error: Please enter the wallet passphrase with walletpassphrase first.");
+    if (pwalletMain->IsLocked())
+        throw JSONRPCError(RPC_WALLET_UNLOCK_NEEDED, "Error: Please enter the wallet passphrase with walletpassphrase first.");
 
-        if(fMasterNode)
-            return "Mixing is not supported from masternodes";
+    if (params[0].get_str() == "auto") {
+        if (fMasterNode)
+            return "DarkSend is not supported from masternodes";
 
         darkSendPool.DoAutomaticDenominating();
         return "DoAutomaticDenominating";
     }
 
-    if(params[0].get_str() == "stop"){
-        fEnableDarksend = false;
-        return "Mixing was stopped";
+    if (params[0].get_str() == "reset") {
+        darkSendPool.SetNull(true);
+        darkSendPool.UnlockCoins();
+        return "successfully reset darksend";
     }
 
-    if(params[0].get_str() == "reset"){
-        darkSendPool.Reset();
-        return "Mixing was reset";
-    }
+    if (params.size() != 2)
+        throw runtime_error(
+            "darksend <Luxaddress> <amount>\n"
+            "Luxaddress, denominate, or auto (AutoDenominate)"
+            "<amount> is a real and is rounded to the nearest 0.00000001"
+            + HelpRequiringPassphrase());
 
-    if(params[0].get_str() == "status"){
-        UniValue obj(UniValue::VOBJ);
-        obj.push_back(Pair("keys_left", pwalletMain->nKeysLeftSinceAutoBackup));
-        obj.push_back(Pair("warnings", (pwalletMain->nKeysLeftSinceAutoBackup < KEYS_THRESHOLD_WARNING ? "WARNING: keypool is almost depleted!" : "")));
-        return obj;
-    }
+    CTxDestination dest = DecodeDestination(params[0].get_str());
+    if (!IsValidDestination(dest))
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid Lux address");
 
-    return "Unknown command, please see \"help darksend\"";
+    // Amount
+    int64_t nAmount = AmountFromValue(params[1]);
+
+    // Wallet comments
+    CWalletTx wtx;
+    SendMoney(dest, nAmount, wtx, ONLY_DENOMINATED);
+
+    return wtx.GetHash().GetHex();
 }
 
 

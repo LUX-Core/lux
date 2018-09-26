@@ -692,28 +692,10 @@ UniValue gettransactionreceipt(const UniValue& params, bool fHelp)
 {
     if (fHelp || params.size() < 1)
         throw std::runtime_error(
-            "gettransactionreceipt \"txid\"\n"
-            "\nNOTE: This function requires -logevents enabled.\n"
-
-            "\nReturns an array of objects with smart contract transaction execution results.\n"
-
-            "\nArgument:\n"
-            "1. \"txid\"      (string, required) The transaction id\n"
-
-            "\nResult:\n"
-            "[{\n"
-            "  \"blockHash\": \"data\",      (string)  The block hash containing the 'txid'\n"
-            "  \"blockNumber\": n,         (numeric) The block height\n"
-            "  \"transactionHash\": \"id\",  (string)  The transaction id (same as provided)\n"
-            "  \"transactionIndex\": n,    (numeric) The transaction index in block\n"
-            "  \"from\": \"address\",        (string)  The hexadecimal address from\n"
-            "  \"to\": \"address\",          (string)  The hexadecimal address to\n"
-            "  \"cumulativeGasUsed\": n,   (numeric) The gas used during execution\n"
-            "  \"gasUsed\": n,             (numeric) The gas used during execution\n"
-            "  \"contractAddress\": \"hex\", (string)  The hexadecimal contract address\n"
-            "  \"excepted\": \"None\",       (string)\n"
-            "  \"log\": []                 (array)\n"
-            "}]\n"
+                "gettransactionreceipt \"hash\"\n"
+                "requires -logevents to be enabled"
+                "\nArgument:\n"
+                "1. \"hash\"          (string, required) The transaction hash\n"
         );
 
     if(!fLogEvents)
@@ -728,11 +710,10 @@ UniValue gettransactionreceipt(const UniValue& params, bool fHelp)
 
     uint256 hash(uint256S(hashTemp));
 
-    if (pstorageresult == nullptr) {
-        return NullUniValue;
-    }
+    boost::filesystem::path stateDir = GetDataDir() / "stateLux";
+    StorageResults storageRes(stateDir.string());
 
-    std::vector<TransactionReceiptInfo> transactionReceiptInfo = pstorageresult->getResult(uintToh256(hash));
+    std::vector<TransactionReceiptInfo> transactionReceiptInfo = storageRes.getResult(uintToh256(hash));
 
     UniValue result(UniValue::VARR);
     for(TransactionReceiptInfo& t : transactionReceiptInfo){

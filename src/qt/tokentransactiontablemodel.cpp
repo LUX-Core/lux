@@ -4,7 +4,7 @@
 #include "guiconstants.h"
 #include "guiutil.h"
 #include "optionsmodel.h"
-#include "platformstyle.h"
+//#include "platformstyle.h"
 #include "tokentransactiondesc.h"
 #include "tokentransactionrecord.h"
 #include "walletmodel.h"
@@ -261,13 +261,12 @@ public:
     }
 };
 
-TokenTransactionTableModel::TokenTransactionTableModel(const PlatformStyle* platformStyle, CWallet* wallet, WalletModel *parent):
+TokenTransactionTableModel::TokenTransactionTableModel(CWallet* _wallet, WalletModel *parent):
         QAbstractTableModel(parent),
-        wallet(wallet),
+        wallet(_wallet),
         walletModel(parent),
-        priv(new TokenTransactionTablePriv(wallet, this)),
-        fProcessingQueuedTransactions(false),
-        platformStyle(platformStyle)
+        priv(new TokenTransactionTablePriv(_wallet, this)),
+        fProcessingQueuedTransactions(false)
 
 {
     columns << QString() << tr("Date") << tr("Type") << tr("Label") << tr("Name") << tr("Amount");

@@ -36,7 +36,7 @@ public:
 
     void setModel(WalletModel *model);
 
-private Q_SLOTS:
+private slots:
 
     void InitTrading();
     void on_TradingTabWidget_tabBarClicked(int index);
@@ -126,7 +126,7 @@ private Q_SLOTS:
     QJsonObject GetResultObjectFromJSONArray(QString response);
     QJsonArray  GetResultArrayFromJSONObject(QString response);
 
-public Q_SLOTS:
+public slots:
 
 
 private:

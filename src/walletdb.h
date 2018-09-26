@@ -108,7 +108,7 @@ public:
 class CWalletDB : public CDB
 {
 public:
-    CWalletDB(const std::string& strFilename, const char* pszMode = "r+", bool fFlushOnClose = true) : CDB(strFilename, pszMode, fFlushOnClose)
+    CWalletDB(const std::string& strFilename, const char* pszMode = "r+", bool _fFlushOnClose = true) : CDB(strFilename, pszMode, _fFlushOnClose)
     {
     }
 
@@ -176,7 +176,7 @@ public:
     bool EraseContractData(const std::string &address, const std::string &key);
 
 
-    bool WriteAccountingEntry_Backend(const CAccountingEntry& acentry);
+    bool WriteAccountingEntry(const CAccountingEntry& acentry);
     CAmount GetAccountCreditDebit(const std::string& strAccount);
     void ListAccountCreditDebit(const std::string& strAccount, std::list<CAccountingEntry>& acentries);
 
@@ -187,7 +187,6 @@ public:
     static bool Recover(CDBEnv& dbenv, std::string filename, bool fOnlyKeys);
     static bool Recover(CDBEnv& dbenv, std::string filename);
     static unsigned int GetUpdateCounter();
-
 private:
     CWalletDB(const CWalletDB&);
     void operator=(const CWalletDB&);
@@ -200,7 +199,5 @@ bool BackupWallet(const CWallet& wallet, const std::string& strDest);
 void MaybeFlushWalletDB();
 
 void ThreadFlushWalletDB(const std::string& strFile);
-
-bool AutoBackupWallet(CWallet* wallet, std::string strWalletFile, std::string& strBackupWarning, std::string& strBackupError);
 
 #endif // BITCOIN_WALLETDB_H

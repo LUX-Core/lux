@@ -31,7 +31,7 @@
 
 QRImageWidget::QRImageWidget(QWidget* parent) : QLabel(parent), contextMenu(0)
 {
-    contextMenu = new QMenu(this);
+    contextMenu = new QMenu();
     QAction* saveImageAction = new QAction(tr("&Save Image..."), this);
     connect(saveImageAction, SIGNAL(triggered()), this, SLOT(saveImage()));
     contextMenu->addAction(saveImageAction);
@@ -44,7 +44,7 @@ QImage QRImageWidget::exportImage()
 {
     if (!pixmap())
         return QImage();
-    return pixmap()->toImage();
+    return pixmap()->toImage().scaled(EXPORT_IMAGE_SIZE, EXPORT_IMAGE_SIZE);
 }
 
 void QRImageWidget::mousePressEvent(QMouseEvent* event)
@@ -152,23 +152,23 @@ bool ReceiveRequestDialog::createQRCode(QLabel *label, SendCoinsRecipient _info)
                     p++;
                 }
             }
-
+            /*
             QRcode_free(code);
 
-            QImage qrAddrImage = QImage(EXPORT_IMAGE_SIZE, EXPORT_IMAGE_SIZE+20, QImage::Format_RGB32);
+            QImage qrAddrImage = QImage(QR_IMAGE_SIZE, QR_IMAGE_SIZE+20, QImage::Format_RGB32);
             qrAddrImage.fill(0xffffff);
             QPainter painter(&qrAddrImage);
-            painter.drawImage(0, 0, qrImage.scaled(EXPORT_IMAGE_SIZE, EXPORT_IMAGE_SIZE));
+            painter.drawImage(0, 0, qrImage.scaled(QR_IMAGE_SIZE, QR_IMAGE_SIZE));
             QFont font = GUIUtil::fixedPitchFont();
             font.setPixelSize(12);
             painter.setFont(font);
             QRect paddedRect = qrAddrImage.rect();
-            paddedRect.setHeight(EXPORT_IMAGE_SIZE+12);
+            paddedRect.setHeight(QR_IMAGE_SIZE+12);
             painter.drawText(paddedRect, Qt::AlignBottom|Qt::AlignCenter, _info.address);
             painter.end();
 
             label->setPixmap(QPixmap::fromImage(qrAddrImage));
-            return true;
+            return true;*/
         }
     }
 #else
@@ -215,30 +215,18 @@ void ReceiveRequestDialog::update()
                 ui->lblQRCode->setText(tr("Error encoding URI into QR Code."));
                 return;
             }
-            QImage qrImage = QImage(code->width + 8, code->width + 8, QImage::Format_RGB32);
-            qrImage.fill(0xffffff);
+            QImage myImage = QImage(code->width + 8, code->width + 8, QImage::Format_RGB32);
+            myImage.fill(0xffffff);
             unsigned char* p = code->data;
             for (int y = 0; y < code->width; y++) {
                 for (int x = 0; x < code->width; x++) {
-                    qrImage.setPixel(x + 4, y + 4, ((*p & 1) ? 0x0 : 0xffffff));
+                    myImage.setPixel(x + 4, y + 4, ((*p & 1) ? 0x0 : 0xffffff));
                     p++;
                 }
             }
             QRcode_free(code);
 
-            QImage qrAddrImage = QImage(EXPORT_IMAGE_SIZE, EXPORT_IMAGE_SIZE+20, QImage::Format_RGB32);
-            qrAddrImage.fill(0xffffff);
-            QPainter painter(&qrAddrImage);
-            painter.drawImage(0, 0, qrImage.scaled(EXPORT_IMAGE_SIZE, EXPORT_IMAGE_SIZE));
-            QFont font = GUIUtil::fixedPitchFont();
-            font.setPixelSize(12);
-            painter.setFont(font);
-            QRect paddedRect = qrAddrImage.rect();
-            paddedRect.setHeight(EXPORT_IMAGE_SIZE+12);
-            painter.drawText(paddedRect, Qt::AlignBottom|Qt::AlignCenter, info.address);
-            painter.end();
-
-            ui->lblQRCode->setPixmap(QPixmap::fromImage(qrAddrImage));
+            ui->lblQRCode->setPixmap(QPixmap::fromImage(myImage).scaled(300, 300));
             ui->btnSaveAs->setEnabled(true);
         }
     }

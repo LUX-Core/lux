@@ -8,7 +8,6 @@
 #include <QDialog>
 
 class WalletModel;
-class PlatformStyle;
 
 namespace Ui
 {
@@ -20,7 +19,7 @@ class Bip38ToolDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit Bip38ToolDialog(const PlatformStyle* platformStyle, QWidget* parent);
+    explicit Bip38ToolDialog(QWidget* parent);
     ~Bip38ToolDialog();
 
     void setModel(WalletModel* model);
@@ -36,9 +35,8 @@ protected:
 private:
     Ui::Bip38ToolDialog* ui;
     WalletModel* model;
-    const PlatformStyle* platformStyle;
 
-private Q_SLOTS:
+private slots:
     /* encrypt key */
     void on_addressBookButton_ENC_clicked();
     void on_pasteButton_ENC_clicked();

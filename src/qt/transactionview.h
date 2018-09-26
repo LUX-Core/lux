@@ -12,7 +12,6 @@
 
 class TransactionFilterProxy;
 class WalletModel;
-class PlatformStyle;
 
 QT_BEGIN_NAMESPACE
 class QComboBox;
@@ -34,7 +33,7 @@ class TransactionView : public QWidget
     Q_OBJECT
 
 public:
-    explicit TransactionView(const PlatformStyle *platformStyle, QWidget* parent = 0);
+    explicit TransactionView(QWidget* parent = 0);
 
     void setModel(WalletModel* model);
 
@@ -74,7 +73,6 @@ private:
     QFrame* dateRangeWidget;
     QDateTimeEdit* dateFrom;
     QDateTimeEdit* dateTo;
-    QAction* abandonAction;
 
     QWidget* createDateRangeWidget();
 
@@ -93,13 +91,10 @@ private slots:
     void copyLabel();
     void copyAmount();
     void copyTxID();
-    void copyTxHex();
-    void copyTxPlainText();
     void openThirdPartyTxUrl(QString url);
     void updateWatchOnlyColumn(bool fHaveWatchOnly);
-    void abandonTx();
 
-Q_SIGNALS:
+signals:
     void doubleClicked(const QModelIndex&);
 
     /**  Fired when a message should be reported to the user */

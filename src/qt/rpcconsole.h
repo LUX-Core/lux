@@ -18,7 +18,6 @@
 
 class QMenu;
 class ClientModel;
-class PlatformStyle;
 
 namespace Ui
 {
@@ -35,7 +34,7 @@ class RPCConsole : public QDialog
     Q_OBJECT
 
 public:
-    explicit RPCConsole(const PlatformStyle *platformStyle, QWidget* parent);
+    explicit RPCConsole(QWidget* parent);
     ~RPCConsole();
 
     static bool RPCParseCommandLine(std::string &strResult, const std::string &strCommand, bool fExecute, std::string * const pstrFilteredOut = NULL);
@@ -56,7 +55,7 @@ public:
 protected:
     virtual bool eventFilter(QObject* obj, QEvent* event);
 
-private Q_SLOTS:
+private slots:
     void on_lineEdit_returnPressed();
     void on_tabWidget_currentChanged(int index);
     /** Switch network activity */
@@ -71,15 +70,9 @@ private Q_SLOTS:
     void showEvent(QShowEvent* event);
     void hideEvent(QHideEvent* event);
     /** Show custom context menu on Peers tab */
-    void showPeersTableContextMenu(const QPoint& point);
-    /** Show custom context menu on Bans tab */
-    void showBanTableContextMenu(const QPoint& point);
-    /** Hides ban table if no bans are present */
-    void showOrHideBanTableIfRequired();
-    /** clear the selected node */
-    void clearSelectedNode();
+    void showMenu(const QPoint& point);
 
-public Q_SLOTS:
+public slots:
     void clear();
     void fontBigger();
     void fontSmaller();
@@ -97,10 +90,10 @@ public Q_SLOTS:
     void message(int category, const QString& message, bool html = false);
     /** Set number of connections shown in the UI */
     void setNumConnections(int count);
-    /** Set number of blocks and last block date shown in the UI */
-    void setNumBlocks(int count, const QDateTime& lastBlockDate, double nVerificationProgress, bool headers);
     /** Set network state shown in the UI */
     void setNetworkActive(bool networkActive);
+    /** Set number of blocks shown in the UI */
+    void setNumBlocks(int count);
     /** Set number of masternodes shown in the UI */
     void setMasternodeCount(const QString& strMasternodes);
     /** Go forward or back in history */
@@ -127,14 +120,10 @@ public Q_SLOTS:
     void peerLayoutChanged();
     /** Disconnect a selected node on the Peers tab */
     void disconnectSelectedNode();
-    /** Ban a selected node on the Peers tab */
-    void banSelectedNode(int bantime);
-    /** Unban a selected node on the Bans tab */
-    void unbanSelectedNode();
     /** Show folder with wallet backups in default browser */
     void showBackups();
 
-Q_SIGNALS:
+signals:
     // For RPC command executor
     void stopExecutor();
     void cmdRequest(const QString& command);
@@ -151,13 +140,11 @@ private:
     void buildParameterlist(QString arg);
     /** show detailed information on ui about selected node */
     void updateNodeDetail(const CNodeCombinedStats* stats);
-
+    void clearSelectedNode();
     enum ColumnWidths {
         ADDRESS_COLUMN_WIDTH = 170,
         SUBVERSION_COLUMN_WIDTH = 140,
-        PING_COLUMN_WIDTH = 80,
-        BANSUBNET_COLUMN_WIDTH = 300,
-        BANTIME_COLUMN_WIDTH = 150
+        PING_COLUMN_WIDTH = 80
     };
 
     Ui::RPCConsole* ui;
@@ -167,11 +154,9 @@ private:
     int historyPtr;
     NodeId cachedNodeid;
     int consoleFontSize;
-    QCompleter* autoCompleter;
+    QMenu *contextMenu;
+    QCompleter *autoCompleter;
     QThread thread;
-    QMenu* peersTableContextMenu;
-    QMenu* banTableContextMenu;
-    const PlatformStyle* platformStyle;
 
 };
 

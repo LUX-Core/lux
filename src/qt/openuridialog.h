@@ -22,7 +22,7 @@ public:
 
     QString getURI();
 
-protected Q_SLOTS:
+protected slots:
     void accept();
 
 private slots:

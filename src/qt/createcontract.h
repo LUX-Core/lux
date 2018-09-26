@@ -28,14 +28,14 @@ public:
     bool isValidInterfaceABI();
     bool isDataValid();
 
-public Q_SLOTS:
+public slots:
             void on_clearAllClicked();
     void on_createContractClicked();
     void on_numBlocksChanged();
     void on_updateCreateButton();
     void on_newContractABI();
 
-private Q_SLOTS:
+private slots:
 
 private:
     QString toDataHex(int func, QString& errorMessage);

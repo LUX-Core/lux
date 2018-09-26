@@ -227,9 +227,9 @@ public:
 
 typedef enum BanReason
 {
-    BanReasonUnknown          = 0,
-    BanReasonNodeMisbehaving  = 1,
-    BanReasonManuallyAdded    = 2
+    BanReasonUnknown     = 0,
+    BanMisbehaving       = 1,
+    BanReasonManually    = 2
 } BanReason;
 
 class CBanEntry
@@ -274,10 +274,10 @@ public:
     std::string banReasonToString()
     {
         switch (banReason) {
-            case BanReasonNodeMisbehaving:
-                return "node misbehabing";
-            case BanReasonManuallyAdded:
-                return "manually added";
+            case BanMisbehaving:
+                return "lux node misbehabing";
+            case BanReasonManually:
+                return "manually";
             default:
                 return "unknown";
         }
@@ -413,10 +413,7 @@ public:
 
     int GetRefCount()
     {
-        if (nRefCount <= 0) {
-            nRefCount = 0;
-            return 0;
-        }
+        assert(nRefCount >= 0);
         return nRefCount;
     }
 
@@ -448,12 +445,8 @@ public:
 
     void Release()
     {
-        if (nRefCount <= 0) {
-            nRefCount = 0;
-            return;
-        }
-
         nRefCount--;
+        assert(nRefCount >= 0);
     }
 
 
@@ -784,12 +777,12 @@ public:
 };
 
 /** Access to the banlist database (banlist.dat) */
-class CBanDB
+class CBanListDB
 {
 private:
     boost::filesystem::path pathBanlist;
 public:
-    CBanDB();
+    CBanListDB();
     bool Write(const banmap_t& banSet);
     bool Read(banmap_t& banSet);
 };

@@ -22,7 +22,7 @@ public:
     bool isEulaRemembered();
     static void showDialog();
     
-private Q_SLOTS:
+private slots:
     void on_cancel_clicked();
     void on_next_clicked();
 

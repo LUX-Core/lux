@@ -285,7 +285,7 @@ bool CWalletDB::WriteAccountingEntry(const uint64_t nAccEntryNum, const CAccount
     return Write(std::make_pair(std::string("acentry"), std::make_pair(acentry.strAccount, nAccEntryNum)), acentry);
 }
 
-bool CWalletDB::WriteAccountingEntry_Backend(const CAccountingEntry& acentry)
+bool CWalletDB::WriteAccountingEntry(const CAccountingEntry& acentry)
 {
     return WriteAccountingEntry(++nAccountingEntryNumber, acentry);
 }
@@ -494,7 +494,7 @@ bool ReadKeyValue(CWallet* pwallet, CDataStream& ssKey, CDataStream& ssValue, CW
             if (wtx.nOrderPos == -1)
                 wss.fAnyUnordered = true;
 
-            pwallet->AddToWallet(wtx, true, nullptr);
+            pwallet->AddToWallet(wtx, true);
         } else if (strType == "acentry") {
             string strAccount;
             ssKey >> strAccount;
@@ -552,8 +552,7 @@ bool ReadKeyValue(CWallet* pwallet, CDataStream& ssKey, CDataStream& ssValue, CW
 
             bool fSkipCheck = false;
 
-            if (!hash.IsNull())
-            {
+            if (hash != 0) {
                 // hash pubkey/privkey to accelerate wallet load
                 std::vector<unsigned char> vchKey;
                 vchKey.reserve(vchPubKey.size() + pkey.size());
@@ -591,11 +590,6 @@ bool ReadKeyValue(CWallet* pwallet, CDataStream& ssKey, CDataStream& ssValue, CW
         } else if (strType == "ckey") {
             CPubKey vchPubKey;
             ssKey >> vchPubKey;
-            if (!vchPubKey.IsValid())
-            {
-                strErr = "Error reading wallet database: CPubKey corrupt";
-                return false;
-            }
             vector<unsigned char> vchPrivKey;
             ssValue >> vchPrivKey;
             wss.nCKeys++;
@@ -626,15 +620,8 @@ bool ReadKeyValue(CWallet* pwallet, CDataStream& ssKey, CDataStream& ssValue, CW
             CKeyPool keypool;
             ssValue >> keypool;
 
-            // If no metadata exists yet, create a default with the pool key's
-            // creation time. Note that this may be overwritten by actually
-            // stored metadata for that key later, which is fine.
-            CKeyID keyid = keypool.vchPubKey.GetID();
-            if (pwallet->mapKeyMetadata.count(keyid) == 0)
-                pwallet->mapKeyMetadata[keyid] = CKeyMetadata(keypool.nTime);
-        }
-        else if (strType == "version")
-        {
+            pwallet->LoadKeyPool(nIndex, keypool);
+        } else if (strType == "version") {
             ssValue >> wss.nFileVersion;
             if (wss.nFileVersion == 10300)
                 wss.nFileVersion = 300;
@@ -789,15 +776,9 @@ DBErrors CWalletDB::LoadWallet(CWallet* pwallet)
                 LogPrintf("%s\n", strErr);
         }
         pcursor->close();
-
-        // Store initial pool size
-        pwallet->nKeysLeftSinceAutoBackup = pwallet->GetKeyPoolSize();
-        LogPrintf("nKeysLeftSinceAutoBackup: %d\n", pwallet->nKeysLeftSinceAutoBackup);
-    }
-    catch (const boost::thread_interrupted&) {
+    } catch (boost::thread_interrupted) {
         throw;
-    }
-    catch (...) {
+    } catch (...) {
         result = DB_CORRUPT;
     }
 
@@ -812,14 +793,14 @@ DBErrors CWalletDB::LoadWallet(CWallet* pwallet)
     LogPrintf("nFileVersion = %d\n", wss.nFileVersion);
 
     LogPrintf("Keys: %u plaintext, %u encrypted, %u w/ metadata, %u total\n",
-              wss.nKeys, wss.nCKeys, wss.nKeyMeta, wss.nKeys + wss.nCKeys);
+        wss.nKeys, wss.nCKeys, wss.nKeyMeta, wss.nKeys + wss.nCKeys);
 
     // nTimeFirstKey is only reliable if all keys have metadata
     if ((wss.nKeys + wss.nCKeys) != wss.nKeyMeta)
         pwallet->nTimeFirstKey = 1; // 0 would be considered 'no value'
 
     for (uint256 hash : wss.vWalletUpgrade)
-    WriteTx(hash, pwallet->mapWallet[hash]);
+        WriteTx(hash, pwallet->mapWallet[hash]);
 
     // Rewrite encrypted wallets of versions 0.4.0 and 0.5.0rc:
     if (wss.fIsEncrypted && (wss.nFileVersion == 40000 || wss.nFileVersion == 50000))
@@ -830,12 +811,6 @@ DBErrors CWalletDB::LoadWallet(CWallet* pwallet)
 
     if (wss.fAnyUnordered)
         result = ReorderTransactions(pwallet);
-
-    pwallet->laccentries.clear();
-    ListAccountCreditDebit("*", pwallet->laccentries);
-    for (CAccountingEntry& entry : pwallet->laccentries) {
-        pwallet->wtxOrdered.insert(make_pair(entry.nOrderPos, CWallet::TxPair((CWalletTx*)0, &entry)));
-    }
 
     return result;
 }
@@ -986,20 +961,22 @@ bool BackupWallet(const CWallet& wallet, const string& strDest)
                 bitdb.mapFileUseCount.erase(wallet.strWalletFile);
 
                 // Copy wallet.dat
-                boost::filesystem::path pathSrc = GetDataDir() / wallet.strWalletFile;
-                boost::filesystem::path pathDest(strDest);
-                if (boost::filesystem::is_directory(pathDest))
+                filesystem::path pathSrc = GetDataDir() / wallet.strWalletFile;
+                filesystem::path pathDest(strDest);
+                if (filesystem::is_directory(pathDest))
                     pathDest /= wallet.strWalletFile;
 
                 try {
 #if BOOST_VERSION >= 158000
-                    boost::filesystem::copy_file(pathSrc, pathDest, boost::filesystem::copy_option::overwrite_if_exists);
+                    filesystem::copy_file(pathSrc, pathDest, filesystem::copy_option::overwrite_if_exists);
 #else
-                    boost::filesystem::copy_file(pathSrc, pathDest);
+                    std::ifstream src(pathSrc.string(), std::ios::binary);
+                    std::ofstream dst(pathDest.string(), std::ios::binary);
+                    dst << src.rdbuf();
 #endif
                     LogPrintf("copied wallet.dat to %s\n", pathDest.string());
                     return true;
-                } catch (const boost::filesystem::filesystem_error& e) {
+                } catch (const filesystem::filesystem_error& e) {
                     LogPrintf("error copying wallet.dat to %s - %s\n", pathDest.string(), e.what());
                     return false;
                 }
@@ -1007,125 +984,6 @@ bool BackupWallet(const CWallet& wallet, const string& strDest)
         }
         MilliSleep(100);
     }
-    return false;
-}
-
-// This should be called carefully:
-// either supply "wallet" (if already loaded) or "strWalletFile" (if wallet wasn't loaded yet)
-bool AutoBackupWallet (CWallet* wallet, std::string strWalletFile, std::string& strBackupWarning, std::string& strBackupError)
-{
-    namespace fs = boost::filesystem;
-
-    strBackupWarning = strBackupError = "";
-
-    if(nWalletBackups > 0)
-    {
-        fs::path backupsDir = GetBackupsDir();
-
-        if (!fs::exists(backupsDir))
-        {
-            // Always create backup folder to not confuse the operating system's file browser
-            LogPrintf("Creating backup folder %s\n", backupsDir.string());
-            if(!fs::create_directories(backupsDir)) {
-                // smth is wrong, we shouldn't continue until it's resolved
-                strBackupError = strprintf(_("Wasn't able to create wallet backup folder %s!"), backupsDir.string());
-                LogPrintf("%s\n", strBackupError);
-                nWalletBackups = -1;
-                return false;
-            }
-        }
-
-        // Create backup of the ...
-        std::string dateTimeStr = DateTimeStrFormat(".%Y-%m-%d-%H-%M", GetTime());
-        if (wallet)
-        {
-            // ... opened wallet
-            LOCK2(cs_main, wallet->cs_wallet);
-            strWalletFile = wallet->strWalletFile;
-            fs::path backupFile = backupsDir / (strWalletFile + dateTimeStr);
-            if(!BackupWallet(*wallet, backupFile.string())) {
-                strBackupWarning = strprintf(_("Failed to create backup %s!"), backupFile.string());
-                LogPrintf("%s\n", strBackupWarning);
-                nWalletBackups = -1;
-                return false;
-            }
-            // Update nKeysLeftSinceAutoBackup using current pool size
-            wallet->nKeysLeftSinceAutoBackup = wallet->GetKeyPoolSize();
-            LogPrintf("nKeysLeftSinceAutoBackup: %d\n", wallet->nKeysLeftSinceAutoBackup);
-            if(wallet->IsLocked()) {
-                strBackupWarning = _("Wallet is locked, can't replenish keypool! Automatic backups and mixing are disabled, please unlock your wallet to replenish keypool.");
-                LogPrintf("%s\n", strBackupWarning);
-                nWalletBackups = -2;
-                return false;
-            }
-        } else {
-            // ... strWalletFile file
-            fs::path sourceFile = GetDataDir() / strWalletFile;
-            fs::path backupFile = backupsDir / (strWalletFile + dateTimeStr);
-            sourceFile.make_preferred();
-            backupFile.make_preferred();
-            if (fs::exists(backupFile))
-            {
-                strBackupWarning = _("Failed to create backup, file already exists! This could happen if you restarted wallet in less than 60 seconds. You can continue if you are ok with this.");
-                LogPrintf("%s\n", strBackupWarning);
-                return false;
-            }
-            if(fs::exists(sourceFile)) {
-                try {
-                    fs::copy_file(sourceFile, backupFile);
-                    LogPrintf("Creating backup of %s -> %s\n", sourceFile.string(), backupFile.string());
-                } catch(fs::filesystem_error &error) {
-                    strBackupWarning = strprintf(_("Failed to create backup, error: %s"), error.what());
-                    LogPrintf("%s\n", strBackupWarning);
-                    nWalletBackups = -1;
-                    return false;
-                }
-            }
-        }
-
-        // Keep only the last 10 backups, including the new one of course
-        typedef std::multimap<std::time_t, fs::path> folder_set_t;
-        folder_set_t folder_set;
-        fs::directory_iterator end_iter;
-        backupsDir.make_preferred();
-        // Build map of backup files for current(!) wallet sorted by last write time
-        fs::path currentFile;
-        for (fs::directory_iterator dir_iter(backupsDir); dir_iter != end_iter; ++dir_iter)
-        {
-            // Only check regular files
-            if ( fs::is_regular_file(dir_iter->status()))
-            {
-                currentFile = dir_iter->path().filename();
-                // Only add the backups for the current wallet, e.g. wallet.dat.*
-                if(dir_iter->path().stem().string() == strWalletFile)
-                {
-                    folder_set.insert(folder_set_t::value_type(fs::last_write_time(dir_iter->path()), *dir_iter));
-                }
-            }
-        }
-
-        // Loop backward through backup files and keep the N newest ones (1 <= N <= 10)
-        int counter = 0;
-        for (PAIRTYPE(const std::time_t, fs::path) file : folder_set)
-        {
-            counter++;
-            if (counter > nWalletBackups)
-            {
-                // More than nWalletBackups backups: delete oldest one(s)
-                try {
-                    fs::remove(file.second);
-                    LogPrintf("Old backup deleted: %s\n", file.second);
-                } catch(fs::filesystem_error &error) {
-                    strBackupWarning = strprintf(_("Failed to delete backup, error: %s"), error.what());
-                    LogPrintf("%s\n", strBackupWarning);
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
-    LogPrintf("Automatic wallet backups are disabled!\n");
     return false;
 }
 

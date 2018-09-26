@@ -19,7 +19,6 @@
 
 class WalletModel;
 class ClientModel;
-class PlatformStyle;
 
 class CCoinControl;
 class CTxMemPool;
@@ -29,22 +28,12 @@ namespace Ui
 class CoinControlDialog;
 }
 
-class CCoinControlWidgetItem : public QTreeWidgetItem
-{
-public:
-    CCoinControlWidgetItem(QTreeWidget *parent, int type = Type) : QTreeWidgetItem(parent, type) {}
-    CCoinControlWidgetItem(int type = Type) : QTreeWidgetItem(type) {}
-    CCoinControlWidgetItem(QTreeWidgetItem *parent, int type = Type) : QTreeWidgetItem(parent, type) {}
-
-    bool operator<(const QTreeWidgetItem &other) const;
-};
-
 class CoinControlDialog : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit CoinControlDialog(const PlatformStyle *platformStyle, QWidget* parent = 0);
+    explicit CoinControlDialog(QWidget* parent = 0);
     ~CoinControlDialog();
     void CheckDialogLablesUpdated();
     void setModel(WalletModel* model);
@@ -57,7 +46,6 @@ public:
     static QList<CAmount> payAmounts;
     static CCoinControl* coinControl;
     static int nSplitBlockDummy;
-    static bool fSubtractFeeFromAmount;
 
 private:
     Ui::CoinControlDialog* ui;
@@ -71,14 +59,14 @@ private:
     QAction* copyTransactionHashAction;
     QAction* lockAction;
     QAction* unlockAction;
-    const PlatformStyle* platformStyle;
+
     QStringList toogleLockList;
     QString strPad(QString, int, QString);
     void sortView(int, Qt::SortOrder);
     void updateView();
 
     enum {
-        COLUMN_CHECKBOX = 0,
+        COLUMN_CHECKBOX,
         COLUMN_AMOUNT,
         COLUMN_LABEL,
         COLUMN_ADDRESS,
@@ -89,7 +77,6 @@ private:
         COLUMN_VOUT_INDEX,
         COLUMN_AMOUNT_INT64,
         COLUMN_PRIORITY_INT64,
-        COLUMN_DARKSEND_ROUNDS,
         COLUMN_DATE_INT64
     };
 
@@ -115,7 +102,7 @@ private:
         return column;
     }
 
-private Q_SLOTS:
+private slots:
     void showMenu(const QPoint&);
     void copyAmount();
     void copyLabel();
@@ -140,7 +127,7 @@ private Q_SLOTS:
     void buttonToggleLockClicked();
     void updateLabelLocked();
 
-public Q_SLOTS:
+public slots:
     void updateInfoInDialog();
 };
 

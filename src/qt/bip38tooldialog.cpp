@@ -10,7 +10,6 @@
 #include "addressbookpage.h"
 #include "guiutil.h"
 #include "walletmodel.h"
-#include "platformstyle.h"
 
 #include "base58.h"
 #include "bip38.h"
@@ -23,10 +22,9 @@
 
 #include <QClipboard>
 
-Bip38ToolDialog::Bip38ToolDialog(const PlatformStyle *platformStyle, QWidget* parent) : QDialog(parent),
+Bip38ToolDialog::Bip38ToolDialog(QWidget* parent) : QDialog(parent),
                                                     ui(new Ui::Bip38ToolDialog),
-                                                    model(0),
-                                                    platformStyle(platformStyle)
+                                                    model(0)
 {
     ui->setupUi(this);
 
@@ -82,7 +80,7 @@ void Bip38ToolDialog::showTab_DEC(bool fShow)
 void Bip38ToolDialog::on_addressBookButton_ENC_clicked()
 {
     if (model && model->getAddressTableModel()) {
-        AddressBookPage dlg(platformStyle, AddressBookPage::ForSelection, AddressBookPage::ReceivingTab, this);
+        AddressBookPage dlg(AddressBookPage::ForSelection, AddressBookPage::ReceivingTab, this);
         dlg.setModel(model->getAddressTableModel());
         if (dlg.exec()) {
             setAddress_ENC(dlg.getReturnValue());

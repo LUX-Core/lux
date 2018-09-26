@@ -226,5 +226,3 @@ int64_t GetVirtualTransactionSize(const CTransaction& tx, int64_t nSigOpCost)
 }
 
 CFeeRate incrementalRelayFee = CFeeRate(DEFAULT_INCREMENTAL_RELAY_FEE);
-
-CFeeRate dustRelayFee = CFeeRate(DUST_RELAY_TX_FEE);

@@ -1735,9 +1735,9 @@ Please check the address and try again.</translation>
     </message>
     <message>
         <source>Language missing or translation incomplete? Help contributing translations here:
-https://www.transifex.com/luxcore/luxcore</source>
+https://www.transifex.com/lux-project/lux-project-translations</source>
         <translation>Language missing or translation incomplete? Help contributing translations here:
-https://www.transifex.com/luxcore/luxcore</translation>
+https://www.transifex.com/lux-project/lux-project-translations</translation>
     </message>
     <message>
         <source>Map port using &amp;UPnP</source>

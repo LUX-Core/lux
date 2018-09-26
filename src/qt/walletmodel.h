@@ -17,14 +17,11 @@
 #include <vector>
 
 #include <QObject>
-#include <QTimer>
-#include <QMessageBox>
 
 enum OutputType : int;
 
 class AddressTableModel;
 class OptionsModel;
-class PlatformStyle;
 class RecentRequestsTableModel;
 class TransactionTableModel;
 class WalletModelTransaction;
@@ -70,8 +67,6 @@ public:
     // Empty if no authentication or invalid signature/cert/etc.
     QString authenticatedMerchant;
 
-    bool fSubtractFeeFromAmount; // memory only
-
     static const int CURRENT_VERSION = 1;
     int nVersion;
 
@@ -114,7 +109,7 @@ class WalletModel : public QObject
     Q_OBJECT
 
 public:
-    explicit WalletModel(const PlatformStyle *platformStyle, CWallet* wallet, OptionsModel* optionsModel, QObject* parent = 0);
+    explicit WalletModel(CWallet* wallet, OptionsModel* optionsModel, QObject* parent = 0);
     ~WalletModel();
 
     enum StatusCode // Returned by sendCoins
@@ -172,15 +167,9 @@ public:
     bool validateAddress(const QString& address);
 
     // Return status record for SendCoins, contains error id + information
-    struct SendCoinsReturn
-    {
-        SendCoinsReturn(StatusCode _status = OK, QString _reasonCommitFailed = "")
-                : status(_status),
-                  reasonCommitFailed(_reasonCommitFailed)
-        {
-        }
+    struct SendCoinsReturn {
+        SendCoinsReturn(StatusCode status = OK) : status(status) {}
         StatusCode status;
-        QString reasonCommitFailed;
     };
 
     // prepare transaction for getting txfee before sending coins
@@ -229,8 +218,6 @@ public:
 
     bool getPubKey(const CKeyID& address, CPubKey& vchPubKeyOut) const;
     bool isMine(CTxDestination address);
-    bool havePrivKey(const CKeyID &address) const;
-    bool getPrivKey(const CKeyID &address, CKey& vchPrivKeyOut) const;
     void getOutputs(const std::vector<COutPoint>& vOutpoints, std::vector<COutput>& vOutputs);
     bool isSpent(const COutPoint& outpoint) const;
     bool isUnspentAddress(const std::string& address) const;
@@ -246,9 +233,6 @@ public:
     bool saveReceiveRequest(const std::string& sAddress, const int64_t nId, const std::string& sRequest);
     CWallet* getCurrentWallet() { return wallet; }
 
-    bool transactionCanBeAbandoned(uint256 hash) const;
-    bool abandonTransaction(uint256 hash) const;
-
     QString getRestorePath();
     QString getRestoreParam();
 
@@ -257,10 +241,6 @@ public:
     std::vector<CTokenInfo> getInvalidTokens();
 
     bool isMineAddress(const std::string &Address);
-
-    static bool isWalletEnabled();
-
-    int getDefaultConfirmTarget() const;
 
 private:
     CWallet* wallet;
@@ -301,7 +281,7 @@ private:
     void checkBalanceChanged();
     void checkTokenBalanceChanged();
 
-Q_SIGNALS:
+signals:
     // Signal that balance in wallet changed
     void balanceChanged(const CAmount& balance, const CAmount& unconfirmedBalance, const CAmount& immatureBalance, const CAmount& anonymizedBalance, const CAmount& watchOnlyBalance, const CAmount& watchUnconfBalance, const CAmount& watchImmatureBalance);
 
@@ -327,7 +307,7 @@ Q_SIGNALS:
 
     void AddTokenTxEntry(bool fHaveWatchonly);
 
-public Q_SLOTS:
+public slots:
     /* Wallet status might have changed */
     void updateStatus();
     /* New transaction, or transaction changed status */

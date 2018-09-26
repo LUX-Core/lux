@@ -27,35 +27,33 @@ public:
     explicit OptionsModel(QObject* parent = 0);
 
     enum OptionID {
-        StartAtStartup,          // bool
-        HideTrayIcon,            // bool
-        MinimizeToTray,          // bool
-        MapPortUPnP,             // bool
-        MinimizeOnClose,         // bool
-        ProxyUse,                // bool
-        ProxyIP,                 // QString
-        ProxyPort,               // int
-        DisplayUnit,             // BitcoinUnits::Unit
-        ThirdPartyTxUrls,        // QString
-        Digits,                  // QString
-        Theme,                   // QString
-        Language,                // QString
-        CoinControlFeatures,     // bool
-        showMasternodesTab,      // bool
-        parallelMasterNode,      // bool
-        ThreadsScriptVerif,      // int
-        DatabaseCache,           // int
-        LogFileCount,            // int
-        LogEvents,               // bool
-        ZeroBalanceAddressToken, // bool
-        SpendZeroConfChange,     // bool
-        ShowAdvancedUI,          //bool
-        DarkSendRounds,          // int
-        AnonymizeLuxAmount,      //int
-        ShowMasternodesTab,      // bool
-        NotUseChangeAddress,     // bool
-        WalletBackups,           // int
-        Listen,                  // bool
+        StartAtStartup,      // bool
+        MinimizeToTray,      // bool
+        MapPortUPnP,         // bool
+        MinimizeOnClose,     // bool
+        ProxyUse,            // bool
+        ProxyIP,             // QString
+        ProxyPort,           // int
+        DisplayUnit,         // BitcoinUnits::Unit
+        ThirdPartyTxUrls,    // QString
+        Digits,              // QString
+        Theme,               // QString
+        Language,            // QString
+        CoinControlFeatures, // bool
+        showMasternodesTab, // bool
+        parallelMasterNode, // bool
+        ThreadsScriptVerif,  // int
+        DatabaseCache,       // int
+        LogFileCount,       // int
+        LogEvents,           // bool
+        ZeroBalanceAddressToken,// bool
+        SpendZeroConfChange, // bool
+        DarksendRounds,      // int
+        AnonymizeLuxAmount,  //int
+        ShowMasternodesTab,  // bool
+        NotUseChangeAddress,  // bool
+        WalletBackups,     // int
+        Listen,              // bool
         OptionIDRowCount,
     };
 
@@ -69,14 +67,12 @@ public:
     void setDisplayUnit(const QVariant& value);
 
     /* Explicit getters */
-    bool getHideTrayIcon() { return fHideTrayIcon; }
     bool getMinimizeToTray() { return fMinimizeToTray; }
     bool getMinimizeOnClose() { return fMinimizeOnClose; }
     int getDisplayUnit() { return nDisplayUnit; }
     QString getThirdPartyTxUrls() { return strThirdPartyTxUrls; }
     bool getProxySettings(QNetworkProxy& proxy) const;
     bool getCoinControlFeatures() { return fCoinControlFeatures; }
-    bool getShowAdvancedUI() { return fShowAdvancedUI; }
     bool getshowMasternodesTab() { return fshowMasternodesTab; }
     bool getparallelMasterNode() { return fparallelMasterNode; }
     const QString& getOverriddenByCommandLine() { return strOverriddenByCommandLine; }
@@ -88,14 +84,12 @@ public:
 
 private:
     /* Qt-only settings */
-    bool fHideTrayIcon;
     bool fMinimizeToTray;
     bool fMinimizeOnClose;
     QString language;
     int nDisplayUnit;
     QString strThirdPartyTxUrls;
     bool fCoinControlFeatures;
-    bool fShowAdvancedUI;
     bool fshowMasternodesTab;
     bool fparallelMasterNode;
     /* settings that were overriden by command-line */
@@ -104,21 +98,15 @@ private:
     /// Add option to list of GUI options overridden through command line/config file
     void addOverriddenOption(const std::string& option);
 
-    // Check version & upgrade default values if required
-    void checkAndMigrate();
-
-Q_SIGNALS:
+signals:
     void displayUnitChanged(int unit);
     void darksendRoundsChanged(int);
-    void darkSentAmountChanged();
-    void advancedUIChanged(bool);
     void anonymizeLuxAmountChanged(int);
     void coinControlFeaturesChanged(bool);
     void showMasternodesTabChanged(bool);
     void parallelMasterNodeChanged(bool);
     void zeroBalanceAddressTokenChanged(bool);
     void walletBackupsChanged(int);
-    void hideTrayIconChanged(bool);
 };
 
 #endif // BITCOIN_QT_OPTIONSMODEL_H

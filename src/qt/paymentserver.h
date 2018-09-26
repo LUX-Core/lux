@@ -91,7 +91,7 @@ public:
     // This is now public, because we use it in paymentservertests.cpp
     static bool readPaymentRequestFromFile(const QString& filename, PaymentRequestPlus& request);
 
-Q_SIGNALS:
+signals:
     // Fired when a valid payment request is received
     void receivedPaymentRequest(SendCoinsRecipient);
 
@@ -101,7 +101,7 @@ Q_SIGNALS:
     // Fired when a message should be reported to the user
     void message(const QString& title, const QString& message, unsigned int style);
 
-public Q_SLOTS:
+public slots:
     // Signal this when the main window's UI is ready
     // to display payment requests to the user
     void uiReady();
@@ -112,7 +112,7 @@ public Q_SLOTS:
     // Handle an incoming URI, URI with local file scheduler or file
     void handleURIOrFile(const QString& s);
 
-private Q_SLOTS:
+private slots:
     void handleURIConnection();
     void netRequestFinished(QNetworkReply*);
     void reportSslErrors(QNetworkReply*, const QList<QSslError>&);
