@@ -419,7 +419,7 @@ UniValue getstorage(const UniValue& params, bool fHelp)
     LOCK(cs_main);
 
     std::string strAddr = params[0].get_str();
-    if(strAddr.size() != 40 || !CheckHex(strAddr))
+    if(strAddr.size() != 40 || !regex_match(strAddr, hexData))
         throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Incorrect address"); 
 
     TemporaryState ts(globalState);
@@ -539,7 +539,7 @@ bool getContractAddressesFromParams(const UniValue& params, std::vector<dev::h16
 
         for (std::vector<UniValue>::iterator it = values.begin(); it != values.end(); ++it) {
             auto addrStr(it->get_str());
-            if (addrStr.length() != 40)
+            if (addrStr.length() != 40 || !std::regex_match(addrStr, hexData))
                 throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid address");
             addresses.push_back(dev::h160(addrStr));
         }
@@ -565,7 +565,7 @@ bool getTopicsFromParams(const UniValue& params, std::vector<std::pair<unsigned,
             auto topicStr(values[i].get_str());
             if (topicStr == "null")
                 continue;
-            if (topicStr.length() != 64)
+            if (topicStr.length() != 64 || !regex_match(topicStr, hexData))
                 throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid topic");
             topics.push_back({i, dev::h256(topicStr)});
         }
@@ -818,7 +818,7 @@ UniValue getaccountinfo(const UniValue& params, bool fHelp)
     LOCK(cs_main);
 
     std::string strAddr = params[0].get_str();
-    if(strAddr.size() != 40 || !CheckHex(strAddr))
+    if(strAddr.size() != 40 || !regex_match(strAddr, hexData))
         throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Incorrect address");
 
     dev::Address addrAccount(strAddr);
