@@ -41,13 +41,8 @@ unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHead
         return bnTargetLimit.GetCompact(); // second block
 
     int64_t nActualSpacing = pindexPrev->GetBlockTime() - pindexPrevPrev->GetBlockTime();
-    if (nActualSpacing < 0) {
-        LogPrintf(">> nActualSpacing = %lld.\n", nActualSpacing);
+    if (nActualSpacing < 0)
         nActualSpacing = nTargetSpacing;
-    } else if (nActualSpacing > nTargetTimespan) {
-        LogPrintf(">> nActualSpacing = %lld =  nTargetTimespan.\n", nActualSpacing);
-        nActualSpacing = nTargetTimespan;
-    }
 
     // ppcoin: target change every block
     // ppcoin: retarget with exponential moving toward target spacing
@@ -58,7 +53,7 @@ unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHead
     bnNew *= ((nInterval - 1) * nTargetSpacing + nActualSpacing + nActualSpacing);
     bnNew /= ((nInterval + 1) * nTargetSpacing);
 
-    if (bnNew > bnTargetLimit)
+    if (bnNew <= 0 || bnNew > bnTargetLimit)
         bnNew = bnTargetLimit;
 
     return bnNew.GetCompact();
