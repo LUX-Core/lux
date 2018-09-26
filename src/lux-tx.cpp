@@ -75,6 +75,7 @@ static bool AppInitRawTx(int argc, char* argv[])
         strUsage += "  in=TXID:VOUT           " + _("Add input to TX") + "\n";
         strUsage += "  locktime=N             " + _("Set TX lock time to N") + "\n";
         strUsage += "  nversion=N             " + _("Set TX version to N") + "\n";
+        strUsage += "  rbfoptin(=N)           " + _("Set RBF opt-in sequence number for input N (if not provided, opt-in all available inputs)") + "\n";
         strUsage += "  outaddr=VALUE:ADDRESS  " + _("Add address-based output to TX") + "\n";
         strUsage += "  outscript=VALUE:SCRIPT " + _("Add raw script output to TX") + "\n";
         strUsage += "  sign=SIGHASH-FLAGS     " + _("Add zero or more signatures to transaction") + "\n";
@@ -178,6 +179,23 @@ static void MutateTxLocktime(CMutableTransaction& tx, const string& cmdVal)
         throw runtime_error("Invalid TX locktime requested");
 
     tx.nLockTime = (unsigned int)newLocktime;
+}
+
+static void MutateTxRBFOptIn(CMutableTransaction& tx, const std::string& strInIdx)
+{
+    // parse requested index
+    int inIdx = atoi(strInIdx);
+    if (inIdx < 0 || inIdx >= (int)tx.vin.size()) {
+        throw std::runtime_error("Invalid TX input index '" + strInIdx + "'");
+    }
+    // set the nSequence to MAX_INT - 2 (= RBF opt in flag)
+    int cnt = 0;
+    for (CTxIn& txin : tx.vin) {
+        if (strInIdx == "" || cnt == inIdx) {
+            txin.nSequence = std::numeric_limits<unsigned int>::max() - 2;
+        }
+        ++cnt;
+    }
 }
 
 static void MutateTxAddInput(CMutableTransaction& tx, const string& strInput)

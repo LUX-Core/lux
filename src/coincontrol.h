@@ -7,6 +7,7 @@
 
 #include "primitives/transaction.h"
 #include "script/standard.h"
+#include "wallet.h"
 
 /** Coin Control Features. */
 class CCoinControl
@@ -25,6 +26,8 @@ public:
     CAmount nMinimumTotalFee;
     //! Override the default confirmation target, 0 = use default
     int nConfirmTarget;
+    //! Signal BIP-125 replace by fee.
+    bool signalRbf;
 
     CCoinControl()
     {
@@ -43,6 +46,7 @@ public:
         fSplitBlock = false;
         nSplitBlock = 1;
         nConfirmTarget = 0;
+        signalRbf = fWalletRbf;
     }
 
     bool HasSelected() const

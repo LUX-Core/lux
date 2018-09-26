@@ -52,6 +52,8 @@ extern bool fNotUseChangeAddress;
 extern bool fCheckUpdates;
 static const bool CHECKUPDATES = true;
 extern bool fWalletProcessingMode;
+extern bool fWalletRbf;
+
 //! -paytxfee default
 static const CAmount DEFAULT_TRANSACTION_FEE = 1000;
 //! -paytxfee will warn if called with a higher fee than this amount (in satoshis) per KB
@@ -66,6 +68,10 @@ static const unsigned int MAX_FREE_TRANSACTION_CREATE_SIZE = 1000;
 static const bool DEFAULT_SPEND_ZEROCONF_CHANGE = true;
 //! Default for -zerobalanceaddresstoken
 static const bool DEFAULT_ZERO_BALANCE_ADDRESS_TOKEN = true;
+//! Default for -sendfreetransactions
+static const bool DEFAULT_SEND_FREE_TRANSACTIONS = false;
+//! -walletrbf default
+static const bool DEFAULT_WALLET_RBF = false;
 
 static const bool DEFAULT_DISABLE_WALLET = false;
 
