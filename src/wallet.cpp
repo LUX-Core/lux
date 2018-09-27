@@ -4560,3 +4560,14 @@ bool CWallet::RemoveTokenEntry(const uint256 &tokenHash, bool fFlushOnClose)
 
     return true;
 }
+
+void CWallet::GetScriptForMining(std::shared_ptr<CReserveScript> &script)
+{
+    std::shared_ptr<CReserveKey> rKey = std::make_shared<CReserveKey>(this);
+    CPubKey pubkey;
+    if (!rKey->GetReservedKey(pubkey))
+        return;
+
+    script = std::make_shared<CReserveScript>();
+    script->reserveScript = CScript() << ToByteVector(pubkey) << OP_CHECKSIG;
+}

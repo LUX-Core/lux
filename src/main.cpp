@@ -1776,6 +1776,10 @@ CAmount GetProofOfWorkReward(int64_t nFees, int nHeight)
         if (nHeight < 200) return 250000 * COIN;
     }
 
+    if (Params().NetworkID() == CBaseChainParams::REGTEST) {
+        return COIN + nFees;
+    }
+
     CAmount nSubsidy = 1 * COIN;
     if (nHeight < 1) {
         nSubsidy = 1 * COIN;

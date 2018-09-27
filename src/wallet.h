@@ -816,6 +816,8 @@ public:
 
     /* Mark a transaction (and it in-wallet descendants) as abandoned so its inputs may be respent. */
     bool AbandonTransaction(const uint256& hashTx);
+
+    void GetScriptForMining(std::shared_ptr<CReserveScript> &script);
 };
 
 /** A key allocated from the key pool. */
