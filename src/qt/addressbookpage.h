@@ -9,6 +9,7 @@
 
 class AddressTableModel;
 class OptionsModel;
+class PlatformStyle;
 
 namespace Ui
 {
@@ -40,13 +41,13 @@ public:
         ForEditing    /**< Open address book for editing */
     };
 
-    explicit AddressBookPage(Mode mode, Tabs tab, QWidget* parent);
+    explicit AddressBookPage(const PlatformStyle *platformStyle, Mode mode, Tabs tab, QWidget* parent);
     ~AddressBookPage();
 
     void setModel(AddressTableModel* model);
     const QString& getReturnValue() const { return returnValue; }
 
-public slots:
+public Q_SLOTS:
     void done(int retval);
 
 private:
@@ -59,8 +60,9 @@ private:
     QMenu* contextMenu;
     QAction* deleteAction; // to be able to explicitly disable it
     QString newAddressToSelect;
+    const PlatformStyle* platformStyle;
 
-private slots:
+private Q_SLOTS:
     /** Delete currently selected address entry */
     void on_deleteAddress_clicked();
     /** Create a new address for receiving coins and / or add a new address book entry */
@@ -81,7 +83,7 @@ private slots:
     /** New entry/entries were added to address table */
     void selectNewAddress(const QModelIndex& parent, int begin, int /*end*/);
 
-signals:
+Q_SIGNALS:
     void sendCoins(QString addr);
 };
 

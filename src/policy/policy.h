@@ -43,6 +43,9 @@ static const unsigned int DEFAULT_BLOCK_MIN_TX_FEE = 400000;
 static const unsigned int MAX_STANDARD_TX_WEIGHT = 400000;
 
 static const unsigned int DEFAULT_INCREMENTAL_RELAY_FEE = 10000;
+
+static const unsigned int DUST_RELAY_TX_FEE = 1000;
+
 /**
  * Standard script verification flags that standard transactions will comply
  * with. However scripts violating these flags may still be present in valid
@@ -98,5 +101,7 @@ int64_t GetVirtualTransactionSize(int64_t nWeight, int64_t nSigOpCost);
 int64_t GetVirtualTransactionSize(const CTransaction& tx, int64_t nSigOpCost);
 
 extern CFeeRate incrementalRelayFee;
+
+extern CFeeRate dustRelayFee;
 
 #endif // BITCOIN_POLICY_POLICY_H

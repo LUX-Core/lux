@@ -12,9 +12,10 @@
 #include <QHBoxLayout>
 #include <QLabel>
 
-WalletFrame::WalletFrame(BitcoinGUI *_gui) :
+WalletFrame::WalletFrame(const PlatformStyle *platformStyle, BitcoinGUI *_gui) :
     QFrame(_gui),
-    gui(_gui)
+    gui(_gui),
+    platformStyle(platformStyle)
 {
     // Leave HBox hook for adding a list view later
     QHBoxLayout* walletFrameLayout = new QHBoxLayout(this);
@@ -44,7 +45,7 @@ bool WalletFrame::addWallet(const QString& name, WalletModel* walletModel)
     if (!gui || !clientModel || !walletModel || mapWalletViews.count(name) > 0)
         return false;
 
-    WalletView *walletView = new WalletView(this);
+    WalletView *walletView = new WalletView(platformStyle, this);
     walletView->setBitcoinGUI(gui);
     walletView->setClientModel(clientModel);
     walletView->setWalletModel(walletModel);
@@ -57,6 +58,7 @@ bool WalletFrame::addWallet(const QString& name, WalletModel* walletModel)
 
     // Ensure a walletView is able to show the main window
     connect(walletView, SIGNAL(showNormalIfMinimized()), gui, SLOT(showNormalIfMinimized()));
+    connect(walletView, SIGNAL(outOfSyncWarningClicked()), this, SLOT(outOfSyncWarningClicked()));
 
     return true;
 }
@@ -238,8 +240,10 @@ void WalletFrame::unlockWallet()
 void WalletFrame::lockWallet()
 {
     WalletView *walletView = currentWalletView();
-    if (walletView)
+    if (walletView) {
         walletView->lockWallet();
+        fWalletUnlockStakingOnly = false;
+    }
 }
 
 void WalletFrame::usedSendingAddresses()
@@ -259,4 +263,9 @@ void WalletFrame::usedReceivingAddresses()
 WalletView *WalletFrame::currentWalletView()
 {
     return qobject_cast<WalletView*>(walletStack->currentWidget());
+}
+
+void WalletFrame::outOfSyncWarningClicked()
+{
+    Q_EMIT requestedSyncWarningInfo();
 }

@@ -101,6 +101,8 @@ std::string to_internal(const std::string&);
 
 using namespace std;
 
+regex hexData("^([0-9a-fA-f]{2,}$)");
+
 //LUX only features
 int nLogFile = 1;
 bool fMasterNode = false;
@@ -552,6 +554,32 @@ const boost::filesystem::path& GetDataDir(bool fNetSpecific)
     fs::create_directories(path);
 
     return path;
+}
+
+static boost::filesystem::path backupsDirCached;
+static CCriticalSection csBackupsDirCached;
+
+const boost::filesystem::path &GetBackupsDir()
+{
+    namespace fs = boost::filesystem;
+
+    LOCK(csBackupsDirCached);
+
+    fs::path &backupsDir = backupsDirCached;
+
+    if (!backupsDir.empty())
+        return backupsDir;
+
+    if (mapArgs.count("-walletbackupsdir")) {
+        backupsDir = fs::absolute(mapArgs["-walletbackupsdir"]);
+        // Path must exist
+        if (fs::is_directory(backupsDir)) return backupsDir;
+        LogPrintf("%s: Warning: incorrect parameter -walletbackupsdir, path must exist! Using default path.\n", __func__);
+    }
+    // Default path
+    backupsDir = GetDataDir() / "backups";
+
+    return backupsDir;
 }
 
 void ClearDatadirCache()

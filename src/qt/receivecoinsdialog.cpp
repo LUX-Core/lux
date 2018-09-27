@@ -14,6 +14,7 @@
 #include "recentrequeststablemodel.h"
 #include "../wallet.h"
 #include "walletmodel.h"
+#include "platformstyle.h"
 
 #include <QAction>
 #include <QCursor>
@@ -22,18 +23,27 @@
 #include <QScrollBar>
 #include <QTextDocument>
 
-ReceiveCoinsDialog::ReceiveCoinsDialog(QWidget* parent) : QDialog(parent),
+ReceiveCoinsDialog::ReceiveCoinsDialog(const PlatformStyle *platformStyle, QWidget* parent) : QDialog(parent),
                                                           ui(new Ui::ReceiveCoinsDialog),
-                                                          model(0)
+                                                          columnResizingFixer(0),
+                                                          model(0),
+                                                          platformStyle(platformStyle)
+
 {
     ui->setupUi(this);
 
-#ifdef Q_OS_MAC // Icons on push buttons are very uncommon on Mac
-    ui->clearButton->setIcon(QIcon());
-    ui->receiveButton->setIcon(QIcon());
-    ui->showRequestButton->setIcon(QIcon());
-    ui->removeRequestButton->setIcon(QIcon());
-#endif
+    if (!platformStyle->getImagesOnButtons()) {
+        ui->clearButton->setIcon(QIcon());
+        ui->receiveButton->setIcon(QIcon());
+        ui->showRequestButton->setIcon(QIcon());
+        ui->removeRequestButton->setIcon(QIcon());
+    } else {
+        ui->clearButton->setIcon(platformStyle->SingleColorIcon(":/icons/remove"));
+        ui->receiveButton->setIcon(platformStyle->SingleColorIcon(":/icons/receiving_addresses"));
+        ui->showRequestButton->setIcon(platformStyle->SingleColorIcon(":/icons/edit"));
+        ui->removeRequestButton->setIcon(platformStyle->SingleColorIcon(":/icons/remove"));
+    }
+
 
     if (model->getDefaultAddressType() == OUTPUT_TYPE_BECH32) {
         ui->useBech32->setCheckState(Qt::Checked);
@@ -42,18 +52,21 @@ ReceiveCoinsDialog::ReceiveCoinsDialog(QWidget* parent) : QDialog(parent),
     }
 
     // context menu actions
+    QAction *copyURIAction = new QAction(tr("Copy URI"), this);
     QAction* copyLabelAction = new QAction(tr("Copy label"), this);
     QAction* copyMessageAction = new QAction(tr("Copy message"), this);
     QAction* copyAmountAction = new QAction(tr("Copy amount"), this);
 
     // context menu
-    contextMenu = new QMenu();
+    contextMenu = new QMenu(this);
+    contextMenu->addAction(copyURIAction);
     contextMenu->addAction(copyLabelAction);
     contextMenu->addAction(copyMessageAction);
     contextMenu->addAction(copyAmountAction);
 
     // context menu signals
     connect(ui->recentRequestsView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(showMenu(QPoint)));
+    connect(copyURIAction, SIGNAL(triggered()), this, SLOT(copyURI()));
     connect(copyLabelAction, SIGNAL(triggered()), this, SLOT(copyLabel()));
     connect(copyMessageAction, SIGNAL(triggered()), this, SLOT(copyMessage()));
     connect(copyAmountAction, SIGNAL(triggered()), this, SLOT(copyAmount()));
@@ -85,7 +98,7 @@ void ReceiveCoinsDialog::setModel(WalletModel* model)
             SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this,
             SLOT(recentRequestsView_selectionChanged(QItemSelection, QItemSelection)));
         // Last 2 columns are set by the columnResizingFixer, when the table geometry is ready.
-        columnResizingFixer = new GUIUtil::TableViewLastColumnResizingFixer(tableView, AMOUNT_MINIMUM_COLUMN_WIDTH, DATE_COLUMN_WIDTH, this, 2);
+        columnResizingFixer = new GUIUtil::TableViewLastColumnResizingFixer(tableView, AMOUNT_MINIMUM_COLUMN_WIDTH, DATE_COLUMN_WIDTH, this);
     }
 }
 
@@ -174,7 +187,7 @@ void ReceiveCoinsDialog::on_showRequestButton_clicked()
         return;
     QModelIndexList selection = ui->recentRequestsView->selectionModel()->selectedRows();
 
-    foreach (QModelIndex index, selection) {
+    Q_FOREACH (QModelIndex index, selection) {
         on_recentRequestsView_doubleClicked(index);
     }
 }
@@ -213,28 +226,48 @@ void ReceiveCoinsDialog::keyPressEvent(QKeyEvent* event)
     this->QDialog::keyPressEvent(event);
 }
 
+QModelIndex ReceiveCoinsDialog::selectedRow()
+{
+    if(!model || !model->getRecentRequestsTableModel() || !ui->recentRequestsView->selectionModel())
+        return QModelIndex();
+    QModelIndexList selection = ui->recentRequestsView->selectionModel()->selectedRows();
+    if(selection.empty())
+        return QModelIndex();
+    // correct for selection mode ContiguousSelection
+    QModelIndex firstIndex = selection.at(0);
+    return firstIndex;
+}
+
 // copy column of selected row to clipboard
 void ReceiveCoinsDialog::copyColumnToClipboard(int column)
 {
-    if (!model || !model->getRecentRequestsTableModel() || !ui->recentRequestsView->selectionModel())
+    QModelIndex firstIndex = selectedRow();
+    if (!firstIndex.isValid()) {
         return;
-    QModelIndexList selection = ui->recentRequestsView->selectionModel()->selectedRows();
-    if (selection.empty())
-        return;
-    // correct for selection mode ContiguousSelection
-    QModelIndex firstIndex = selection.at(0);
+    }
     GUIUtil::setClipboard(model->getRecentRequestsTableModel()->data(firstIndex.child(firstIndex.row(), column), Qt::EditRole).toString());
 }
 
 // context menu
-void ReceiveCoinsDialog::showMenu(const QPoint& point)
+void ReceiveCoinsDialog::showMenu(const QPoint &point)
 {
-    if (!model || !model->getRecentRequestsTableModel() || !ui->recentRequestsView->selectionModel())
+    if (!selectedRow().isValid()) {
         return;
-    QModelIndexList selection = ui->recentRequestsView->selectionModel()->selectedRows();
-    if (selection.empty())
-        return;
+    }
     contextMenu->exec(QCursor::pos());
+}
+
+// context menu action: copy URI
+void ReceiveCoinsDialog::copyURI()
+{
+    QModelIndex sel = selectedRow();
+    if (!sel.isValid()) {
+        return;
+    }
+
+    const RecentRequestsTableModel * const submodel = model->getRecentRequestsTableModel();
+    const QString uri = GUIUtil::formatBitcoinURI(submodel->entry(sel.row()).recipient);
+    GUIUtil::setClipboard(uri);
 }
 
 // context menu action: copy label

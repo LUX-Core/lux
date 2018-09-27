@@ -49,6 +49,12 @@ extern bool bZeroBalanceAddressToken;
 extern bool fSendFreeTransactions;
 extern bool fPayAtLeastCustomFee;
 extern bool fNotUseChangeAddress;
+extern bool fCheckUpdates;
+static const bool CHECKUPDATES = true;
+extern bool fWalletProcessingMode;
+extern bool fWalletRbf;
+extern bool fWalletUnlockStakingOnly;
+
 //! -paytxfee default
 static const CAmount DEFAULT_TRANSACTION_FEE = 1000;
 //! -paytxfee will warn if called with a higher fee than this amount (in satoshis) per KB
@@ -63,8 +69,15 @@ static const unsigned int MAX_FREE_TRANSACTION_CREATE_SIZE = 1000;
 static const bool DEFAULT_SPEND_ZEROCONF_CHANGE = true;
 //! Default for -zerobalanceaddresstoken
 static const bool DEFAULT_ZERO_BALANCE_ADDRESS_TOKEN = true;
+//! Default for -sendfreetransactions
+static const bool DEFAULT_SEND_FREE_TRANSACTIONS = false;
+//! -walletrbf default
+static const bool DEFAULT_WALLET_RBF = false;
+
+static const bool DEFAULT_DISABLE_WALLET = false;
 
 static const bool DEFAULT_NOT_USE_CHANGE_ADDRESS = false;
+extern const char * DEFAULT_WALLET_DAT;
 
 class CAccountingEntry;
 class CCoinControl;
@@ -144,6 +157,13 @@ public:
     }
 };
 
+struct CRecipient
+{
+    CScript scriptPubKey;
+    CAmount nAmount;
+    bool fSubtractFeeFromAmount;
+};
+
 /** Address book data */
 class CAddressBookData {
 public:
@@ -156,11 +176,14 @@ public:
     StringMap destdata;
 };
 
-typedef std::map <std::string, std::string> mapValue_t;
+
+typedef std::map<std::string, std::string> mapValue_t;
 
 
-static void __attribute__((unused)) ReadOrderPos(int64_t &nOrderPos, mapValue_t &mapValue) {
-    if (!mapValue.count("n")) {
+static void ReadOrderPos(int64_t& nOrderPos, mapValue_t& mapValue)
+{
+    if (!mapValue.count("n"))
+    {
         nOrderPos = -1; // TODO: calculate elsewhere
         return;
     }
@@ -168,14 +191,15 @@ static void __attribute__((unused)) ReadOrderPos(int64_t &nOrderPos, mapValue_t 
 }
 
 
-static void __attribute__((unused)) WriteOrderPos(const int64_t& nOrderPos, mapValue_t& mapValue)
+static void WriteOrderPos(const int64_t& nOrderPos, mapValue_t& mapValue)
 {
     if (nOrderPos == -1)
         return;
     mapValue["n"] = i64tostr(nOrderPos);
 }
 
-struct COutputEntry {
+struct COutputEntry
+{
     CTxDestination destination;
     CAmount amount;
     int vout;
@@ -250,6 +274,8 @@ public:
     int GetBlocksToMaturity() const;
     bool AcceptToMemoryPool(bool fLimitFree = true, bool fRejectInsaneFee = true, bool ignoreFees = false);
     bool isAbandoned() const { return (hashBlock == ABANDON_HASH); }
+    bool hashUnset() const { return (hashBlock.IsNull() || hashBlock == ABANDON_HASH); }
+    void setAbandoned() { hashBlock = ABANDON_HASH; }
     int GetTransactionLockSignatures() const;
     bool IsTransactionLockTimedOut() const;
 };
@@ -292,6 +318,9 @@ class CWallet : public CCryptoKeyStore, public CValidationInterface
     void AddToSpends(const COutPoint& outpoint, const uint256& wtxid);
     void AddToSpends(const uint256& wtxid);
 
+    /* Mark a transaction (and its in-wallet descendants) as conflicting with a particular block. */
+    void MarkConflicted(const uint256& hashBlock, const uint256& hashTx);
+
     void SyncMetaData(std::pair<TxSpends::iterator, TxSpends::iterator>);
 
 public:
@@ -318,7 +347,7 @@ public:
     mutable CCriticalSection cs_wallet;
 
     bool fFileBacked;
-    bool fWalletUnlockAnonymizeOnly;
+    bool fWalletUnlockStakingOnly;
     std::string strWalletFile;
 
     //std::set<int64_t> setKeyPool;
@@ -353,7 +382,7 @@ public:
         SetNull();
     }
 
-    CWallet(std::string strWalletFileIn)
+    CWallet(const std::string& strWalletFileIn)
     {
         SetNull();
 
@@ -377,7 +406,7 @@ public:
         nNextResend = 0;
         nLastResend = 0;
         nTimeFirstKey = 0;
-        fWalletUnlockAnonymizeOnly = false;
+        fWalletUnlockStakingOnly = false;
 
         //MultiSend
         vMultiSend.clear();
@@ -405,6 +434,10 @@ public:
     }
 
     std::map<uint256, CWalletTx> mapWallet;
+    std::list<CAccountingEntry> laccentries;
+    typedef std::pair<CWalletTx*, CAccountingEntry*> TxPair;
+    typedef std::multimap<int64_t, TxPair > TxItems;
+    TxItems wtxOrdered;
 
     int64_t nOrderPosNext;
     std::map<uint256, int> mapRequestCount;
@@ -422,6 +455,8 @@ public:
     std::map<uint256, CTokenInfo> mapToken;
 
     std::map<uint256, CTokenTx> mapTokenTx;
+
+    int64_t nKeysLeftSinceAutoBackup;
 
     const CWalletTx* GetWalletTx(const uint256& hash) const;
 
@@ -451,6 +486,8 @@ public:
     void ListLockedCoins(std::vector<COutPoint>& vOutpts);
     int64_t GetTotalValue(std::vector<CTxIn> vCoins);
 
+    bool transactionCanBeAbandoned(uint256 hash) const;
+    bool abandonTransaction(uint256 hash) const;
      /*
      * Rescan abort properties
      */
@@ -519,18 +556,8 @@ public:
     int64_t IncOrderPosNext(CWalletDB* pwalletdb = NULL);
     bool GetAccountDestination(CTxDestination &dest, std::string strAccount, bool bForceNew = false);
 
-    typedef std::pair<CWalletTx*, CAccountingEntry*> TxPair;
-    typedef std::multimap<int64_t, TxPair> TxItems;
-
-    /**
-     * Get the wallet's activity log
-     * @return multimap of ordered transactions and accounting entries
-     * @warning Returned pointers are *only* valid within the scope of passed acentries
-     */
-    TxItems OrderedTxItems(std::list<CAccountingEntry>& acentries, std::string strAccount = "");
-
     void MarkDirty();
-    bool AddToWallet(const CWalletTx& wtxIn, bool fFromLoadWallet = false, bool fFlushOnClose=true);
+    bool AddToWallet(const CWalletTx& wtxIn, bool fFromLoadWallet, CWalletDB* pwalletdb);
     void SyncTransaction(const CTransaction& tx, const CBlock* pblock);
     bool AddToWalletIfInvolvingMe(const CTransaction& tx, const CBlock* pblock, bool fUpdate);
     void EraseFromWallet(const uint256& hash);
@@ -561,6 +588,7 @@ public:
                            CAmount nFeePay = 0, CAmount nGasFee=0);
     bool CreateTransaction(CScript scriptPubKey, const CAmount& nValue, CWalletTx& wtxNew, CReserveKey& reservekey, CAmount& nFeeRet, std::string& strFailReason, const CCoinControl* coinControl = NULL, AvailableCoinsType coin_type = ALL_COINS, bool useIX = false, CAmount nFeePay = 0);
     bool CommitTransaction(CWalletTx& wtxNew, CReserveKey& reservekey, std::string strCommand = "tx");
+    bool AddAccountingEntry(const CAccountingEntry&, CWalletDB & pwalletdb);
     std::string PrepareDarksendDenominate(int minRounds, int maxRounds);
     bool CreateCollateralTransaction(CMutableTransaction& txCollateral, std::string& strReason);
     bool ConvertList(std::vector<CTxIn> vCoins, std::vector<int64_t>& vecAmounts);
@@ -718,6 +746,9 @@ public:
     //! Get wallet transactions that conflict with given transaction (spend same outputs)
     std::set<uint256> GetConflicts(const uint256& txid) const;
 
+    //! Verify the wallet database and perform salvage if required
+    static bool Verify();
+
     /**
      * Address book entry changed.
      * @note called with lock cs_wallet held.
@@ -779,6 +810,9 @@ public:
      * This function will automatically add the necessary scripts to the wallet.
      */
     CTxDestination AddAndGetDestinationForScript(const CScript& script, OutputType);
+
+    /* Mark a transaction (and it in-wallet descendants) as abandoned so its inputs may be respent. */
+    bool AbandonTransaction(const uint256& hashTx);
 };
 
 /** A key allocated from the key pool. */
@@ -1285,7 +1319,6 @@ public:
     }
 
     bool InMempool() const;
-
     bool IsTrusted() const
     {
         // Quick answer in most cases
@@ -1297,6 +1330,10 @@ public:
         if (nDepth < 0)
             return false;
         if (!bSpendZeroConfChange || !IsFromMe(ISMINE_ALL)) // using wtx's cached debit
+            return false;
+
+        // Don't trust unconfirmed transactions from us unless they are in the mempool.
+        if (!InMempool())
             return false;
 
         // Trusted if all inputs are from us and are in the mempool:
@@ -1313,7 +1350,7 @@ public:
         return true;
     }
 
-    bool WriteToDisk();
+    bool WriteToDisk(CWalletDB *pwalletdb);
 
     int64_t GetTxTime() const;
     int GetRequestCount() const;

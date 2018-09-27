@@ -51,9 +51,14 @@ void OptionsModel::Init()
     // These are Qt-only settings:
 
     // Window
+    if (!settings.contains("fHideTrayIcon"))
+        settings.setValue("fHideTrayIcon", false);
+    fHideTrayIcon = settings.value("fHideTrayIcon").toBool();
+    Q_EMIT hideTrayIconChanged(fHideTrayIcon);
+
     if (!settings.contains("fMinimizeToTray"))
         settings.setValue("fMinimizeToTray", false);
-    fMinimizeToTray = settings.value("fMinimizeToTray").toBool();
+    fMinimizeToTray = settings.value("fMinimizeToTray").toBool() && !fHideTrayIcon;
 
     if (!settings.contains("fMinimizeOnClose"))
         settings.setValue("fMinimizeOnClose", false);
@@ -83,6 +88,10 @@ void OptionsModel::Init()
 
     if (!settings.contains("fShowMasternodesTab"))
         settings.setValue("fShowMasternodesTab", masternodeConfig.getCount());
+
+    if (!settings.contains("fShowAdvancedUI"))
+        settings.setValue("fShowAdvancedUI", false);
+    fShowAdvancedUI = settings.value("fShowAdvancedUI", false).toBool();
 
     if (!settings.contains("fparallelMasterNode"))
         settings.setValue("fparallelMasterNode", false);
@@ -130,6 +139,10 @@ void OptionsModel::Init()
         settings.setValue("bZeroBalanceAddressToken", true);
     if (!SoftSetBoolArg("-zerobalanceaddresstoken", settings.value("bZeroBalanceAddressToken").toBool()))
         addOverriddenOption("-zerobalanceaddresstoken");
+
+    if (!settings.contains("fCheckUpdates"))
+        settings.setValue("fCheckUpdates", CHECKUPDATES);
+    fCheckUpdates = settings.value("fCheckUpdates").toBool();
 
     // Network
     if (!settings.contains("fUseUPnP"))
@@ -198,6 +211,8 @@ QVariant OptionsModel::data(const QModelIndex& index, int role) const
         switch (index.row()) {
         case StartAtStartup:
             return GUIUtil::GetStartOnSystemStartup();
+        case HideTrayIcon:
+            return fHideTrayIcon;
         case MinimizeToTray:
             return fMinimizeToTray;
         case MapPortUPnP:
@@ -226,6 +241,8 @@ QVariant OptionsModel::data(const QModelIndex& index, int role) const
 #ifdef ENABLE_WALLET
         case SpendZeroConfChange:
             return settings.value("bSpendZeroConfChange");
+        case ShowAdvancedUI:
+            return fShowAdvancedUI;
         case ShowMasternodesTab:
             return settings.value("fShowMasternodesTab");
 #endif
@@ -257,12 +274,14 @@ QVariant OptionsModel::data(const QModelIndex& index, int role) const
             return settings.value("fLogEvents");
         case ThreadsScriptVerif:
             return settings.value("nThreadsScriptVerif");
-        case DarksendRounds:
+        case DarkSendRounds:
             return QVariant(nDarksendRounds);
         case AnonymizeLuxAmount:
             return QVariant(nAnonymizeLuxAmount);
         case Listen:
             return settings.value("fListen");
+        case CheckUpdates:
+            return settings.value("fCheckUpdates");
         default:
             return QVariant();
         }
@@ -279,6 +298,11 @@ bool OptionsModel::setData(const QModelIndex& index, const QVariant& value, int 
         switch (index.row()) {
         case StartAtStartup:
             successful = GUIUtil::SetStartOnSystemStartup(value.toBool());
+            break;
+        case HideTrayIcon:
+            fHideTrayIcon = value.toBool();
+            settings.setValue("fHideTrayIcon", fHideTrayIcon);
+            Q_EMIT hideTrayIconChanged(fHideTrayIcon);
             break;
         case MinimizeToTray:
             fMinimizeToTray = value.toBool();
@@ -299,6 +323,12 @@ bool OptionsModel::setData(const QModelIndex& index, const QVariant& value, int 
                 settings.setValue("fUseProxy", value.toBool());
                 setRestartRequired(true);
             }
+            break;
+        case CheckUpdates:
+            if (settings.value("fCheckUpdates") != value) {
+                settings.setValue("fCheckUpdates", value);
+                fCheckUpdates = value.toBool();
+                }
             break;
         case ProxyIP: {
             // contains current IP at index 0 and current port at index 1
@@ -328,6 +358,11 @@ bool OptionsModel::setData(const QModelIndex& index, const QVariant& value, int 
                 settings.setValue("bSpendZeroConfChange", value);
                 setRestartRequired(true);
             }
+            break;
+        case ShowAdvancedUI:
+            fShowAdvancedUI = value.toBool();
+            settings.setValue("fShowAdvancedUI", fShowAdvancedUI);
+            Q_EMIT advancedUIChanged(fShowAdvancedUI);
             break;
         case ShowMasternodesTab:
             if (settings.value("fShowMasternodesTab") != value) {
@@ -369,36 +404,36 @@ bool OptionsModel::setData(const QModelIndex& index, const QVariant& value, int 
                 setRestartRequired(true);
             }
             break;
-        case DarksendRounds:
+        case DarkSendRounds:
             nDarksendRounds = value.toInt();
             settings.setValue("nDarksendRounds", nDarksendRounds);
-            emit darksendRoundsChanged(nDarksendRounds);
+            Q_EMIT darksendRoundsChanged(nDarksendRounds);
             break;
         case AnonymizeLuxAmount:
             nAnonymizeLuxAmount = value.toInt();
             settings.setValue("nAnonymizeLuxAmount", nAnonymizeLuxAmount);
-            emit anonymizeLuxAmountChanged(nAnonymizeLuxAmount);
+            Q_EMIT anonymizeLuxAmountChanged(nAnonymizeLuxAmount);
             break;
         case CoinControlFeatures:
             fCoinControlFeatures = value.toBool();
             settings.setValue("fCoinControlFeatures", fCoinControlFeatures);
-            emit coinControlFeaturesChanged(fCoinControlFeatures);
+            Q_EMIT coinControlFeaturesChanged(fCoinControlFeatures);
             break;
         case showMasternodesTab:
             fshowMasternodesTab = value.toBool();
             settings.setValue("fshowMasternodesTab", fshowMasternodesTab);
-            emit showMasternodesTabChanged(fshowMasternodesTab);
+            Q_EMIT showMasternodesTabChanged(fshowMasternodesTab);
              break;
          case parallelMasterNode:
              fparallelMasterNode = value.toBool();
              settings.setValue("fparallelMasterNode", fparallelMasterNode);
-             emit parallelMasterNodeChanged(fparallelMasterNode);
+             Q_EMIT parallelMasterNodeChanged(fparallelMasterNode);
              break;
         case WalletBackups:
             nWalletBackups = value.toInt();
             settings.setValue("nWalletBackups", nWalletBackups);
             WriteConfigToFile("createwalletbackups", std::to_string(nWalletBackups));
-            emit walletBackupsChanged(nWalletBackups);
+            Q_EMIT walletBackupsChanged(nWalletBackups);
             break;
         case DatabaseCache:
             if (settings.value("nDatabaseCache") != value) {
@@ -454,7 +489,7 @@ bool OptionsModel::setData(const QModelIndex& index, const QVariant& value, int 
         }
     }
 
-    emit dataChanged(index, index);
+    Q_EMIT dataChanged(index, index);
 
     return successful;
 }
@@ -466,7 +501,7 @@ void OptionsModel::setDisplayUnit(const QVariant& value)
         QSettings settings;
         nDisplayUnit = value.toInt();
         settings.setValue("nDisplayUnit", nDisplayUnit);
-        emit displayUnitChanged(nDisplayUnit);
+        Q_EMIT displayUnitChanged(nDisplayUnit);
     }
 }
 

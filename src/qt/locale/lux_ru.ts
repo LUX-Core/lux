@@ -1555,9 +1555,9 @@ Please check the address and try again.</source>
     </message>
     <message>
         <source>Language missing or translation incomplete? Help contributing translations here:
-https://www.transifex.com/lux-project/lux-project-translations</source>
+https://www.transifex.com/luxcore/luxcore</source>
         <translation>Отсутствует ваш язык или заметили незавершенный перевод? Вы можете помочь нам стать лучше:
-https://www.transifex.com/lux-project/lux-project-translations</translation>
+https://www.transifex.com/luxcore/luxcore</translation>
     </message>
     <message>
         <source>Map port using &amp;UPnP</source>

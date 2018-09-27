@@ -271,6 +271,8 @@ void TransactionRecord::updateStatus(const CWalletTx& wtx)
             status.status = TransactionStatus::Offline;
         } else if (status.depth == 0) {
             status.status = TransactionStatus::Unconfirmed;
+            if (wtx.isAbandoned())
+                status.status = TransactionStatus::Abandoned;
         } else if (status.depth < RecommendedNumConfirmations) {
             status.status = TransactionStatus::Confirming;
         } else {

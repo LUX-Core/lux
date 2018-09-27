@@ -32,6 +32,15 @@ namespace RPCServer
 class CBlockIndex;
 class CNetAddr;
 
+/** Wrapper for UniValue::VType, which includes typeAny:
+ * Used to denote don't care type. Only used by RPCTypeCheckObj */
+struct UniValueType {
+    UniValueType(UniValue::VType _type) : typeAny(false), type(_type) {}
+    UniValueType() : typeAny(true) {}
+    bool typeAny;
+    UniValue::VType type;
+};
+
 class JSONRequest
 {
 public:
@@ -206,6 +215,8 @@ extern CNetAddr BoostAsioToCNetAddr(boost::asio::ip::address address);
 
 typedef UniValue (*rpcfn_type)(const UniValue& params, bool fHelp);
 
+void RPCRunLater(const std::string& name, boost::function<void(void)> func, int64_t nSeconds);
+
 class CRPCCommand
 {
 public:
@@ -260,7 +271,7 @@ private:
 
 public:
     CRPCTable();
-    const CRPCCommand* operator[](std::string name) const;
+    const CRPCCommand* operator[](const std::string& name) const;
     std::string help(std::string name) const;
 
     /**
@@ -373,6 +384,7 @@ extern UniValue listaddressgroupings(const UniValue& params, bool fHelp);
 extern UniValue listaccounts(const UniValue& params, bool fHelp);
 extern UniValue listsinceblock(const UniValue& params, bool fHelp);
 extern UniValue gettransaction(const UniValue& params, bool fHelp);
+extern UniValue abandontransaction(const UniValue& params, bool fHelp);
 extern UniValue backupwallet(const UniValue& params, bool fHelp);
 extern UniValue keypoolrefill(const UniValue& params, bool fHelp);
 extern UniValue walletpassphrase(const UniValue& params, bool fHelp);

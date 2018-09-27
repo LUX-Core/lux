@@ -10,6 +10,8 @@
 #include "clientmodel.h"
 #include "guiutil.h"
 #include "peertablemodel.h"
+#include "bantablemodel.h"
+#include "platformstyle.h"
 
 #include "chainparams.h"
 #include "main.h"
@@ -27,11 +29,13 @@
 
 #include <QDir>
 #include <QKeyEvent>
+#include <QMessageBox>
 #include <QMenu>
 #include <QScrollBar>
 #include <QSignalMapper>
 #include <QThread>
 #include <QTime>
+#include <QTimer>
 #include <QStringList>
 #include <QSettings>
 
@@ -88,10 +92,10 @@ class RPCExecutor : public QObject
 {
     Q_OBJECT
 
-public slots:
+public Q_SLOTS:
     void request(const QString& command);
 
-signals:
+Q_SIGNALS:
     void reply(int category, const QString& command);
 };
 
@@ -264,9 +268,9 @@ bool RPCConsole::RPCParseCommandLine(std::string &strResult, const std::string &
                     if ((ch == ')' || ch == '\n') && stack.size() > 0)
                     {
                         if (fExecute) {
-                            // Convert argument list to JSON objects in method-dependent way,
-                            // and pass it along with the method name to the dispatcher.
-                            lastResult = tableRPC.execute(stack.back()[0], RPCConvertValues(stack.back()[0], std::vector<std::string>(stack.back().begin() + 1, stack.back().end())));
+                        // Convert argument list to JSON objects in method-dependent way,
+                        // and pass it along with the method name to the dispatcher.
+                        lastResult = tableRPC.execute(stack.back()[0], RPCConvertValues(stack.back()[0], std::vector<std::string>(stack.back().begin() + 1, stack.back().end())));
                         }
 
                         state = STATE_COMMAND_EXECUTED;
@@ -373,19 +377,23 @@ void RPCExecutor::request(const QString &command)
     }
 }
 
-RPCConsole::RPCConsole(QWidget* parent) : QDialog(parent),
+RPCConsole::RPCConsole(const PlatformStyle *platformStyle, QWidget* parent) : QDialog(parent),
                                           ui(new Ui::RPCConsole),
                                           clientModel(0),
                                           historyPtr(0),
                                           cachedNodeid(-1),
-                                          contextMenu(0)
+                                          peersTableContextMenu(0),
+                                          banTableContextMenu(0),
+                                          platformStyle(platformStyle)
 {
     ui->setupUi(this);
     GUIUtil::restoreWindowGeometry("nRPCConsoleWindow", this->size(), this);
 
-#ifndef Q_OS_MAC
-    ui->openDebugLogfileButton->setIcon(QIcon(":/icons/export"));
-#endif
+    if (platformStyle->getImagesOnButtons()) {
+        ui->openDebugLogfileButton->setIcon(platformStyle->SingleColorIcon(":/icons/export"));
+    }
+    ui->clearButton->setIcon(platformStyle->SingleColorIcon(":/icons/remove"));
+
 
     // Install event filter for up and down arrow
     ui->lineEdit->installEventFilter(this);
@@ -464,6 +472,7 @@ bool RPCConsole::eventFilter(QObject* obj, QEvent* event)
             case Qt::Key_Enter:
                 // forward these events to lineEdit
                 if(obj == autoCompleter->popup()) {
+                    autoCompleter->popup()->hide();
                     QApplication::postEvent(ui->lineEdit, new QKeyEvent(*keyevt));
                     return true;
                 }
@@ -487,17 +496,17 @@ void RPCConsole::setClientModel(ClientModel* model)
 {
     clientModel = model;
     ui->trafficGraph->setClientModel(model);
-    if (model) {
+    if (model && clientModel->getPeerTableModel() && clientModel->getBanTableModel()) {
         // Keep up to date with client
         setNumConnections(model->getNumConnections());
         connect(model, SIGNAL(numConnectionsChanged(int)), this, SLOT(setNumConnections(int)));
 
-        setNumBlocks(model->getNumBlocks());
-        connect(model, SIGNAL(numBlocksChanged(int)), this, SLOT(setNumBlocks(int)));
+        setNumBlocks(model->getNumBlocks(), model->getLastBlockDate(), model->getVerificationProgress(NULL), false);
+        connect(model, SIGNAL(numBlocksChanged(int,QDateTime,double,bool)), this, SLOT(setNumBlocks(int,QDateTime,double,bool)));
 
         updateNetworkState();
         connect(model, SIGNAL(networkActiveChanged(bool)), this, SLOT(setNetworkActive(bool)));
-#if 0
+#if 1
         setMasternodeCount(model->getMasternodeCountString());
         connect(model, SIGNAL(strMasternodesChanged(QString)), this, SLOT(setMasternodeCount(QString)));
 #endif
@@ -515,30 +524,85 @@ void RPCConsole::setClientModel(ClientModel* model)
         ui->peerWidget->setColumnWidth(PeerTableModel::Address, ADDRESS_COLUMN_WIDTH);
         ui->peerWidget->setColumnWidth(PeerTableModel::Subversion, SUBVERSION_COLUMN_WIDTH);
         ui->peerWidget->setColumnWidth(PeerTableModel::Ping, PING_COLUMN_WIDTH);
+        ui->peerWidget->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
+
 
         // create context menu actions
-        QAction* disconnectAction = new QAction(tr("&Disconnect Node"), this);
+        QAction* disconnectAction   = new QAction(tr("&Disconnect Node"), this);
+        QAction* banAction1h        = new QAction(tr("&Ban Node for") + " " + tr("&1 hour"), this);
+        QAction* banAction24h       = new QAction(tr("&Ban Node for") + " " + tr("&24 hours"), this);
+        QAction* banAction7d        = new QAction(tr("&Ban Node for") + " " + tr("&7 days"), this);
+        QAction* banAction365d      = new QAction(tr("&Ban Node for") + " " + tr("&1 year"), this);
+
 
         // create context menu
-        contextMenu = new QMenu();
-        contextMenu->addAction(disconnectAction);
+        peersTableContextMenu = new QMenu(this);
+        peersTableContextMenu->addAction(disconnectAction);
+        peersTableContextMenu->addAction(banAction1h);
+        peersTableContextMenu->addAction(banAction24h);
+        peersTableContextMenu->addAction(banAction7d);
+        peersTableContextMenu->addAction(banAction365d);
 
-        // context menu signals
-        connect(ui->peerWidget, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(showMenu(const QPoint&)));
+
+        //add a signal mapping, use int instead of int64_t for bantime because signalmapper only supports int or objects
+        //int is sufficient for our case
+        QSignalMapper* signalMapper = new QSignalMapper(this);
+        signalMapper->setMapping(banAction1h, 60*60);
+        signalMapper->setMapping(banAction24h, 60*60*24);
+        signalMapper->setMapping(banAction7d, 60*60*24*7);
+        signalMapper->setMapping(banAction365d, 60*60*24*365);
+        connect(banAction1h, SIGNAL(triggered()), signalMapper, SLOT(map()));
+        connect(banAction24h, SIGNAL(triggered()), signalMapper, SLOT(map()));
+        connect(banAction7d, SIGNAL(triggered()), signalMapper, SLOT(map()));
+        connect(banAction365d, SIGNAL(triggered()), signalMapper, SLOT(map()));
+        connect(signalMapper, SIGNAL(mapped(int)), this, SLOT(banSelectedNode(int))) ;
+
+        // peer table context menu signals
+        connect(ui->peerWidget, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(showPeersTableContextMenu(const QPoint&)));
         connect(disconnectAction, SIGNAL(triggered()), this, SLOT(disconnectSelectedNode()));
 
         // connect the peerWidget selection model to our peerSelected() handler
-        connect(ui->peerWidget->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),
-            this, SLOT(peerSelected(const QItemSelection&, const QItemSelection&)));
+        connect(ui->peerWidget->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)),
+        this, SLOT(peerSelected(const QItemSelection &, const QItemSelection &)));
         connect(model->getPeerTableModel(), SIGNAL(layoutChanged()), this, SLOT(peerLayoutChanged()));
+
+        // set up ban table
+        ui->banlistWidget->setModel(model->getBanTableModel());
+        ui->banlistWidget->verticalHeader()->hide();
+        ui->banlistWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
+        ui->banlistWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
+        ui->banlistWidget->setSelectionMode(QAbstractItemView::SingleSelection);
+        ui->banlistWidget->setContextMenuPolicy(Qt::CustomContextMenu);
+        ui->banlistWidget->setColumnWidth(BanTableModel::Address, BANSUBNET_COLUMN_WIDTH);
+        ui->banlistWidget->setColumnWidth(BanTableModel::Bantime, BANTIME_COLUMN_WIDTH);
+        ui->banlistWidget->horizontalHeader()->setStretchLastSection(true);
+
+        // create ban table context menu action
+        QAction* unbanAction = new QAction(tr("&Unban Node"), this);
+
+        // create ban table context menu
+        banTableContextMenu = new QMenu(this);
+        banTableContextMenu->addAction(unbanAction);
+
+        // context menu signals
+        connect(ui->banlistWidget, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(showBanTableContextMenu(const QPoint&)));
+        connect(unbanAction, SIGNAL(triggered()), this, SLOT(unbanSelectedNode()));
+
+        // ban table signal handling - clear peer details when clicking a peer in the ban table
+        connect(ui->banlistWidget, SIGNAL(clicked(const QModelIndex&)), this, SLOT(clearSelectedNode()));
+        // ban table signal handling - ensure ban table is shown or hidden (if empty)
+        connect(model->getBanTableModel(), SIGNAL(layoutChanged()), this, SLOT(showOrHideBanTableIfRequired()));
+        showOrHideBanTableIfRequired();
 
         // Provide initial values
         ui->clientVersion->setText(model->formatFullVersion());
         ui->clientName->setText(model->clientName());
-        ui->buildDate->setText(model->formatBuildDate());
+        ui->dataDir->setText(model->dataDir());
         ui->startupTime->setText(model->formatClientStartupTime());
-
         ui->networkName->setText(QString::fromStdString(Params().NetworkIDString()));
+
+        connect(model, SIGNAL(banListChanged()), this, SLOT(showOrHideBanTableIfRequired()));
+        showOrHideBanTableIfRequired();
 
         //Setup autocomplete and attach it
         QStringList wordList;
@@ -557,7 +621,7 @@ void RPCConsole::setClientModel(ClientModel* model)
     if (!model) {
         // Client model is being set to 0, this means shutdown() is about to be called.
         // Make sure we clean up the executor thread
-        emit stopExecutor();
+        Q_EMIT stopExecutor();
         thread.wait();
     }
 }
@@ -669,7 +733,7 @@ void RPCConsole::buildParameterlist(QString arg)
     args.append(arg);
 
     // Send command-line arguments to BitcoinGUI::handleRestart()
-    emit handleRestart(args);
+    Q_EMIT handleRestart(args);
 }
 
 void RPCConsole::clear()
@@ -686,7 +750,7 @@ void RPCConsole::clear()
         ui->messagesWidget->document()->addResource(
             QTextDocument::ImageResource,
             QUrl(ICON_MAPPING[i].url),
-            QImage(ICON_MAPPING[i].source).scaled(ICON_SIZE, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
+            platformStyle->SingleColorImage(ICON_MAPPING[i].source).scaled(ICON_SIZE, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
     }
 
     // Set default style sheet
@@ -703,7 +767,9 @@ void RPCConsole::clear()
 
     message(CMD_REPLY, (tr("Welcome to the LUX RPC console.") + "<br>" +
                            tr("Use up and down arrows to navigate history, and <b>Ctrl-L</b> to clear screen.") + "<br>" +
-                           tr("Type <b>help</b> for an overview of available commands.")),
+                           tr("Type <b>help</b> for an overview of available commands.") + "<br>" + "<br>" +
+                           tr("<b>WARNING: Scammers have been active, telling users to type commands here, stealing their ") +
+                           tr("wallet contents. Do not use this console without fully understanding the command's ramification.</b>")),
         true);
 }
 
@@ -756,13 +822,13 @@ void RPCConsole::setNetworkActive(bool networkActive)
     updateNetworkState();
 }
 
-void RPCConsole::setNumBlocks(int count)
+void RPCConsole::setNumBlocks(int count, const QDateTime& lastBlockDate, double nVerificationProgress, bool headers)
 {
-    ui->numberOfBlocks->setText(QString::number(count));
-    if (clientModel)
-        ui->lastBlockTime->setText(clientModel->getLastBlockDate().toString());
+    if (!headers) {
+        ui->numberOfBlocks->setText(QString::number(count));
+        ui->lastBlockTime->setText(lastBlockDate.toString());
+    }
 }
-
 void RPCConsole::setMasternodeCount(const QString& strMasternodes)
 {
     ui->masternodeCount->setText(strMasternodes);
@@ -943,7 +1009,7 @@ void RPCConsole::peerSelected(const QItemSelection& selected, const QItemSelecti
 {
     Q_UNUSED(deselected);
 
-    if (!clientModel || selected.indexes().isEmpty())
+    if (!clientModel || !clientModel->getPeerTableModel() || selected.indexes().isEmpty())
         return;
 
     const CNodeCombinedStats* stats = clientModel->getPeerTableModel()->getNodeStats(selected.indexes().first().row());
@@ -953,7 +1019,7 @@ void RPCConsole::peerSelected(const QItemSelection& selected, const QItemSelecti
 
 void RPCConsole::peerLayoutChanged()
 {
-    if (!clientModel)
+    if (!clientModel || !clientModel->getPeerTableModel())
         return;
 
     const CNodeCombinedStats* stats = NULL;
@@ -1058,7 +1124,7 @@ void RPCConsole::showEvent(QShowEvent* event)
 {
     QWidget::showEvent(event);
 
-    if (!clientModel)
+    if (!clientModel || !clientModel->getPeerTableModel())
         return;
 
     // start PeerTableModel auto refresh
@@ -1069,18 +1135,25 @@ void RPCConsole::hideEvent(QHideEvent* event)
 {
     QWidget::hideEvent(event);
 
-    if (!clientModel)
+    if (!clientModel || !clientModel->getPeerTableModel())
         return;
 
     // stop PeerTableModel auto refresh
     clientModel->getPeerTableModel()->stopAutoRefresh();
 }
 
-void RPCConsole::showMenu(const QPoint& point)
+void RPCConsole::showPeersTableContextMenu(const QPoint& point)
 {
     QModelIndex index = ui->peerWidget->indexAt(point);
     if (index.isValid())
-        contextMenu->exec(QCursor::pos());
+        peersTableContextMenu->exec(QCursor::pos());
+}
+
+void RPCConsole::showBanTableContextMenu(const QPoint& point)
+{
+    QModelIndex index = ui->banlistWidget->indexAt(point);
+    if (index.isValid())
+        banTableContextMenu->exec(QCursor::pos());
 }
 
 void RPCConsole::disconnectSelectedNode()
@@ -1104,10 +1177,58 @@ void RPCConsole::on_switchNetworkActiveButton_clicked()
     clientModel->setNetworkActive(!clientModel->getNetworkActive());
 }
 
+void RPCConsole::banSelectedNode(int bantime)
+{
+    if (!clientModel)
+        return;
+
+    // Get currently selected peer address
+    QString strNode = GUIUtil::getEntryData(ui->peerWidget, 0, PeerTableModel::Address);
+    // Find possible nodes, ban it and clear the selected node
+    if (CNode *bannedNode = FindNode(strNode.toStdString())) {
+        std::string nStr = strNode.toStdString();
+        std::string addr;
+        int port = 0;
+        SplitHostPort(nStr, port, addr);
+
+        CNode::Ban(CNetAddr(addr), BanReasonManuallyAdded, bantime);
+        bannedNode->fDisconnect = true;
+
+        clearSelectedNode();
+        clientModel->getBanTableModel()->refresh();
+    }
+}
+
+void RPCConsole::unbanSelectedNode()
+{
+    // Get currently selected ban address
+    QString strNode = GUIUtil::getEntryData(ui->banlistWidget, 0, BanTableModel::Address);
+    CSubNet possibleSubnet(strNode.toStdString());
+
+    if (possibleSubnet.IsValid())
+    {
+        CNode::Unban(possibleSubnet);
+        clientModel->updateBanlist();
+        showOrHideBanTableIfRequired();
+    }
+}
+
+
 void RPCConsole::clearSelectedNode()
 {
     ui->peerWidget->selectionModel()->clearSelection();
     cachedNodeid = -1;
     ui->detailWidget->hide();
     ui->peerHeading->setText(tr("Select a peer to view detailed information."));
+}
+
+
+void RPCConsole::showOrHideBanTableIfRequired()
+{
+    if (!clientModel)
+        return;
+
+    bool visible = clientModel->getBanTableModel()->shouldShow();
+    ui->banlistWidget->setVisible(visible);
+    ui->banHeading->setVisible(visible);
 }
