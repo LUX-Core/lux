@@ -75,7 +75,7 @@ static const CRPCConvertParam vRPCConvertParams[] =
     { "listsinceblock", 2, "include_watchonly" },
     { "sendmany", 1, "fromaccount" },
     { "sendmany", 2, "amounts" },
-    { "sendmany", 2, "minconf" },
+    { "sendmany", 3, "minconf" },
     { "sendmany", 4, "comment" },
     { "sendmany", 5, "use_ix" },
     { "sendmany", 6, "use_ds" },
