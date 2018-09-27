@@ -1880,9 +1880,11 @@ void StartNode(boost::thread_group& threadGroup, CScheduler& scheduler) {
 bool StopNode() {
     LogPrintf("StopNode()\n");
     MapPort(false);
-    if (semOutbound)
-        for (int i = 0; i < MAX_OUTBOUND_CONNECTIONS; i++)
+    if (semOutbound) {
+        for (int i = 0; i < MAX_OUTBOUND_CONNECTIONS; i++) {
             semOutbound->post();
+        }
+    }
 
     if (fAddressesInitialized) {
         DumpData();
