@@ -1164,7 +1164,7 @@ bool AppInit2()
 
     // Read LuxGate config
     std::map<std::string, BlockchainConfig> config = ReadLuxGateConfigFile();
-    BlockchainConfig luxConfig{"LUX", "", 0, "", ""}; // Empty config because we don't need to actually connect to RPC
+    BlockchainConfig luxConfig{"LUX", "", 0, "", "", ""}; // Empty config because we don't need to actually connect to RPC
     ClientPtr luxClient = std::make_shared<CLuxClient>(luxConfig);
     blockchainClientPool.insert(std::make_pair(luxClient->ticker, luxClient));
     for (auto it : config) {

@@ -449,6 +449,8 @@ extern UniValue listorderbook(const UniValue& params, bool fHelp);
 //extern UniValue createswaptransaction(const UniValue& params, bool fHelp); //TODO: for testing, remove later
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+extern UniValue generate(const UniValue& params, bool fHelp);
+
 // in rest.cpp
 extern bool HTTPReq_REST(AcceptedConnection* conn,
     std::string& strURI,
