@@ -386,7 +386,7 @@ void ProcessMessageDarksend(CNode* pfrom, const std::string& strCommand, CDataSt
         vector<CTxIn> sigs;
         vRecv >> sigs;
 
-        bool success = false;
+        std::atomic<bool> success{false};
         int count = 0;
 
         LogPrintf(" -- sigs count %d %d\n", (int) sigs.size(), count);
@@ -2110,7 +2110,7 @@ void ThreadCheckDarkSendPool() {
         darkSendPool.CheckTimeout();
 
         if (c % 60 == 0) {
-            LOCK(cs_main);
+//            LOCK(cs_main);
             /*
                 cs_main is required for doing masternode.Check because something
                 is modifying the coins view without a mempool lock. It causes
