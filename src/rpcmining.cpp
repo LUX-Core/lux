@@ -947,7 +947,7 @@ protected:
 
 UniValue submitblock(const UniValue& params, bool fHelp)
 {
-    if (fHelp || params.size() < 1 || params.size() > 2)
+    if (fHelp || params.size() < 1 || params.size() > 2) {
         throw runtime_error(
             "submitblock \"hexdata\" ( \"jsonparametersobject\" )\n"
             "\nAttempts to submit new block to network.\n"
@@ -963,10 +963,12 @@ UniValue submitblock(const UniValue& params, bool fHelp)
             "\nResult:\n"
             "\nExamples:\n" +
             HelpExampleCli("submitblock", "\"mydata\"") + HelpExampleRpc("submitblock", "\"mydata\""));
+    }
 
     CBlock block;
-    if (!DecodeHexBlk(block, params[0].get_str()))
+    if (!DecodeHexBlk(block, params[0].get_str())) {
         throw JSONRPCError(RPC_DESERIALIZATION_ERROR, "Block decode failed");
+    }
 
     bool usePhi2, fBlockPresent = false;
     {
@@ -978,10 +980,12 @@ UniValue submitblock(const UniValue& params, bool fHelp)
         uint256 hash = block.GetHash(usePhi2);
         CBlockIndex* pindex = LookupBlockIndex(hash);
         if (pindex) {
-            if (pindex->IsValid(BLOCK_VALID_SCRIPTS))
+            if (pindex->IsValid(BLOCK_VALID_SCRIPTS)) {
                 return "duplicate";
-            if (pindex->nStatus & BLOCK_FAILED_MASK)
+            }
+            if (pindex->nStatus & BLOCK_FAILED_MASK) {
                 return "duplicate-invalid";
+            }
             // Otherwise, we might only have the header - process the block before returning
             fBlockPresent = true;
         }
@@ -993,13 +997,15 @@ UniValue submitblock(const UniValue& params, bool fHelp)
     bool fAccepted = ProcessNewBlock(state, Params(), NULL, &block);
     UnregisterValidationInterface(&sc);
     if (fBlockPresent) {
-        if (fAccepted && !sc.found)
+        if (fAccepted && !sc.found) {
             return "duplicate-inconclusive";
+        }
         return "duplicate";
     }
     if (fAccepted) {
-        if (!sc.found)
+        if (!sc.found) {
             return "inconclusive";
+            }
         state = sc.state;
     }
     return BIP22ValidationResult(state);
