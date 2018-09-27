@@ -58,7 +58,7 @@ class ExampleTest(LuxTestFramework):
     def setup_configs(self, node_index):
         with open(os.path.join(self.options.tmpdir+"/node" + str(node_index), "lux.conf"), 'w', encoding='utf8') as f:
             f.write("rpcuser=rpcuser\n")
-            f.write("testnet=1\n")
+            f.write("regtest=1\n")
             f.write("bind=127.0.0.1\n")
             f.write("port=%s\n" % p2p_port(node_index))
             f.write("rpcport=%s\n" % (rpc_port(node_index)))
@@ -72,7 +72,8 @@ class ExampleTest(LuxTestFramework):
                         "host": "127.0.0.1",
                         "port": 8332, 
                         "rpcuser": "rpcuser",
-                        "rpcpassword": "rpcpassword"
+                        "rpcpassword": "rpcpassword",
+                        "zmq_pub_raw_tx_endpoint": "127.0.0.1:5000"
                     },
                 ]},
                 default=EncodeDecimal, ensure_ascii=True)

@@ -54,7 +54,7 @@ class ExampleTest(LuxTestFramework):
 
         with open(os.path.join(self.options.tmpdir+"/node0", "lux.conf"), 'w', encoding='utf8') as f:
             f.write("rpcuser=rpcuser\n")
-            f.write("testnet=1\n")
+            f.write("regtest=1\n")
             f.write("port=%s\n" % p2p_port(0))
             f.write("rpcport=%s\n" % (rpc_port(0)))
             f.write("rpcpassword=rpcpassword\n")
@@ -67,7 +67,8 @@ class ExampleTest(LuxTestFramework):
                         "host": "127.0.0.1",
                         "port": 8332, # testnet port
                         "rpcuser": "rpcuser",
-                        "rpcpassword": "rpcpassword"
+                        "rpcpassword": "rpcpassword",
+                        "zmq_pub_raw_tx_endpoint": "127.0.0.1:5000"
                     },
                 ]},
                 default=EncodeDecimal, ensure_ascii=True)
@@ -75,7 +76,7 @@ class ExampleTest(LuxTestFramework):
 
         with open(os.path.join(self.options.tmpdir+"/node1", "lux.conf"), 'w', encoding='utf8') as f:
             f.write("rpcuser=rpcuser\n")
-            f.write("testnet=1\n")
+            f.write("regtest=1\n")
             f.write("port=%s\n" % p2p_port(1))
             f.write("rpcport=%s\n" % (rpc_port(1)))
             f.write("rpcpassword=rpcpassword\n")
@@ -88,7 +89,8 @@ class ExampleTest(LuxTestFramework):
                         "host": "127.0.0.1",
                         "port": 8339, # wrong port
                         "rpcuser": "rpcuser",
-                        "rpcpassword": "rpcpassword"
+                        "rpcpassword": "rpcpassword",
+                        "zmq_pub_raw_tx_endpoint": "127.0.0.1:5000"
                     },
                 ]},
                 default=EncodeDecimal, ensure_ascii=True)
@@ -110,7 +112,7 @@ class ExampleTest(LuxTestFramework):
         node0 = self.nodes[0]
 
         get_coins_rs = node0.rpc.getactivecoins()
-        btc = get_coins_rs['coins'][0]
+        btc = [ x for x in get_coins_rs['coins'] if x['ticker'] == 'BTC'][0]
         assert_equal(btc['ticker'], 'BTC')
         assert_equal(btc['rpchost'], '127.0.0.1')
         assert_equal(btc['rpcport'], 8332)
@@ -124,7 +126,7 @@ class ExampleTest(LuxTestFramework):
 
         node1 = self.nodes[1]
         get_coins_rs = node1.rpc.getactivecoins()
-        btc = get_coins_rs['coins'][0]
+        btc = [ x for x in get_coins_rs['coins'] if x['ticker'] == 'BTC'][0]
         assert_equal(btc['ticker'], 'BTC')
         assert_equal(btc['rpchost'], '127.0.0.1')
         assert_equal(btc['rpcport'], 8339)
