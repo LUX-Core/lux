@@ -4849,3 +4849,14 @@ bool CWallet::GetStakeWeight(uint64_t& nWeight)
     }
     return true;
 }
+
+void CWallet::GetScriptForMining(std::shared_ptr<CReserveScript> &script)
+{
+    std::shared_ptr<CReserveKey> rKey = std::make_shared<CReserveKey>(this);
+    CPubKey pubkey;
+    if (!rKey->GetReservedKey(pubkey, true))
+        return;
+
+    script = std::make_shared<CReserveScript>();
+    script->reserveScript = CScript() << ToByteVector(pubkey) << OP_CHECKSIG;
+}

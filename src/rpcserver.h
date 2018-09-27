@@ -447,7 +447,7 @@ extern UniValue getaccountinfo(const UniValue& params, bool fHelp);
 //extern UniValue mnfinalbudget(const UniValue& params, bool fHelp);
 //extern UniValue mnsync(const UniValue& params, bool fHelp);
 
-
+extern UniValue generate(const UniValue& params, bool fHelp);
 extern UniValue getstorage(const UniValue& params, bool fHelp);
 extern UniValue listcontracts(const UniValue& params, bool fHelp);
 extern UniValue gettransactionreceipt(const UniValue& params, bool fHelp);
