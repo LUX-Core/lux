@@ -403,7 +403,7 @@ dev::h256 getGlobalStateRoot(CBlockIndex* pIndex){
     }
     if (!isset) {
         root = dev::sha3(dev::rlp(""));
-        if (pIndex && pIndex->pprev->hashStateRoot != uint256()) {
+        if (pIndex && pIndex->pprev->hashStateRoot != uint256() && pIndex->pprev->hashUTXORoot != uint256()) {
             root = uintToh256(pIndex->pprev->hashStateRoot);
         }
     }
