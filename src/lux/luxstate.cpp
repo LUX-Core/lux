@@ -385,42 +385,36 @@ bool CondensingTX::checkDeleteAddress(dev::Address addr){
  * Read globalState root/utxo hashes, with a fallback to prev block one
  */
 dev::h256 getGlobalStateRoot(CBlockIndex* pIndex){
-    dev::h256 root;
-    bool isset = false;
+    dev::h256 root = dev::sha3(dev::rlp(""));
+
     try {
         if (globalState != nullptr) {
             root = dev::h256(globalState->rootHash());
-            isset = true;
         }
     } catch (std::exception& e) {
         // When root node is empty, it will throw exception. We must re-initialize value
-    }
-    if (!isset) {
-        root = dev::sha3(dev::rlp(""));
-        if (pIndex && pIndex->pprev->hashStateRoot != uint256()) {
+        if (pIndex && pIndex->pprev->hashStateRoot != uint256() && pIndex->pprev->hashUTXORoot != uint256()) {
             root = uintToh256(pIndex->pprev->hashStateRoot);
         }
     }
+
     return root;
 }
 
 dev::h256 getGlobalStateUTXO(CBlockIndex* pIndex){
-    dev::h256 root;
-    bool isset = false;
+    dev::h256 root = dev::sha3(dev::rlp(""));
+
     try {
         if (globalState != nullptr) {
             root = dev::h256(globalState->rootHashUTXO());
-            isset = true;
         }
     } catch (std::exception& e) {
         // When root node is empty, it will throw exception. We must re-initialize value
-    }
-    if (!isset) {
-        root = dev::sha3(dev::rlp(""));
-        if (pIndex && pIndex->pprev->hashUTXORoot != uint256()) {
+        if (pIndex && pIndex->pprev->hashStateRoot != uint256() && pIndex->pprev->hashUTXORoot != uint256()) {
             root = uintToh256(pIndex->pprev->hashUTXORoot);
         }
     }
+
     return root;
 }
 
