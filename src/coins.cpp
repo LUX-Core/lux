@@ -33,29 +33,13 @@ void CCoins::CalcMaskSize(unsigned int& nBytes, unsigned int& nNonzeroBytes) con
     nBytes += nLastUsedByte;
 }
 
-bool CCoins::Spend(const COutPoint& out, CTxInUndo& undo)
+bool CCoins::Spend(uint32_t nPos)
 {
-    if (out.n >= vout.size())
+    if (nPos >= vout.size() || vout[nPos].IsNull())
         return false;
-    if (vout[out.n].IsNull())
-        return false;
-    undo = CTxInUndo(vout[out.n]);
-    vout[out.n].SetNull();
+    vout[nPos].SetNull();
     Cleanup();
-    if (vout.size() == 0) {
-        undo.nHeight = nHeight;
-        undo.fCoinBase = fCoinBase;
-        undo.fCoinStake = fCoinStake;
-        undo.nVersion = this->nVersion;
-    }
     return true;
-}
-
-bool CCoins::Spend(int nPos)
-{
-    CTxInUndo undo;
-    COutPoint out(0, nPos);
-    return Spend(out, undo);
 }
 
 
@@ -77,6 +61,11 @@ bool CCoinsViewBacked::HaveCoins(const uint256& txid) const
 {
     if (!base) return false;
     return base->HaveCoins(txid);
+}
+
+bool CCoinsViewCache::HaveCoinsInCache(const uint256 &txid) const {
+    CCoinsMap::const_iterator it = cacheCoins.find(txid);
+    return it != cacheCoins.end();
 }
 
 uint256 CCoinsViewBacked::GetBestBlock() const
@@ -173,6 +162,27 @@ CCoinsModifier CCoinsViewCache::ModifyCoins(const uint256& txid)
     return CCoinsModifier(*this, ret.first, cachedCoinUsage);
 }
 
+CCoinsModifier CCoinsViewCache::ModifyNewCoins(const uint256 &txid, bool coinbase) {
+    assert(!hasModifier);
+    std::pair<CCoinsMap::iterator, bool> ret = cacheCoins.insert(std::make_pair(txid, CCoinsCacheEntry()));
+    if (!coinbase) {
+        // New coins must not already exist.
+        if (!ret.first->second.coins.IsPruned())
+            throw std::logic_error("ModifyNewCoins should not find pre-existing coins on a non-coinbase unless they are pruned!");
+
+        if (!(ret.first->second.flags & CCoinsCacheEntry::DIRTY)) {
+            // If the coin is known to be pruned (have no unspent outputs) in
+            // the current view and the cache entry is not dirty, we know the
+            // coin also must be pruned in the parent view as well, so it is safe
+            // to mark this fresh.
+            ret.first->second.flags |= CCoinsCacheEntry::FRESH;
+        }
+    }
+    ret.first->second.coins.Clear();
+    ret.first->second.flags |= CCoinsCacheEntry::DIRTY;
+    return CCoinsModifier(*this, ret.first, 0);
+}
+
 const CCoins* CCoinsViewCache::AccessCoins(const uint256& txid) const
 {
     CCoinsMap::const_iterator it = FetchCoins(txid);
@@ -252,6 +262,15 @@ bool CCoinsViewCache::Flush()
     cacheCoins.clear();
     cachedCoinsUsage = 0;
     return fOk;
+}
+
+void CCoinsViewCache::Uncache(const uint256& hash)
+{
+    CCoinsMap::iterator it = cacheCoins.find(hash);
+    if (it != cacheCoins.end() && it->second.flags == 0) {
+        cachedCoinsUsage -= it->second.coins.DynamicMemoryUsage();
+        cacheCoins.erase(it);
+    }
 }
 
 unsigned int CCoinsViewCache::GetCacheSize() const
