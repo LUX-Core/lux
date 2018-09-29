@@ -4,8 +4,8 @@
 
 #include "coins.h"
 #include "memusage.h"
-
 #include "random.h"
+#include "util.h"
 
 #include <assert.h>
 
@@ -259,10 +259,19 @@ unsigned int CCoinsViewCache::GetCacheSize() const
     return cacheCoins.size();
 }
 
+static const CTxOut INVALID_TXOUT = CTxOut();
+
 const CTxOut& CCoinsViewCache::GetOutputFor(const CTxIn& input) const
 {
     const CCoins* coins = AccessCoins(input.prevout.hash);
-    assert(coins && coins->IsAvailable(input.prevout.n));
+    if (!coins) {
+        LogPrintf("GetOutputFor %s:%u not accessible!\n", input.prevout.hash.GetHex(), input.prevout.n);
+        return INVALID_TXOUT;
+    }
+    if (!coins->IsAvailable(input.prevout.n)) {
+        LogPrintf("GetOutputFor %s:%u not available!\n", input.prevout.hash.GetHex(), input.prevout.n);
+        return INVALID_TXOUT;
+    }
     return coins->vout[input.prevout.n];
 }
 
