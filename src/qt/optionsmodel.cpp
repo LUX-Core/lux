@@ -102,6 +102,10 @@ void OptionsModel::Init()
         settings.setValue("fNotUseChangeAddress", DEFAULT_NOT_USE_CHANGE_ADDRESS);
     fNotUseChangeAddress = settings.value("fNotUseChangeAddress", DEFAULT_NOT_USE_CHANGE_ADDRESS).toBool();
 
+    if (!settings.contains("fNotUseChangeAddress"))
+        settings.setValue("fNotUseChangeAddress", DEFAULT_NOT_USE_CHANGE_ADDRESS);
+    fNotUseChangeAddress = settings.value("fNotUseChangeAddress", DEFAULT_NOT_USE_CHANGE_ADDRESS).toBool();
+
     // These are shared with the core or have a command-line parameter
     // and we want command-line parameters to overwrite the GUI settings.
     //
