@@ -2045,6 +2045,11 @@ void UpdateCoins(const CTransaction& tx, CValidationState& state, CCoinsViewCach
     inputs.ModifyNewCoins(tx.GetHash(), tx.IsCoinBase())->FromTx(tx,nHeight);
 }
 
+void UpdateCoins(const CTransaction& tx, CValidationState &state, CCoinsViewCache &inputs, int nHeight)
+{
+    CTxUndo txundo;
+    UpdateCoins(tx, state, inputs, txundo, nHeight);
+}
 
 bool CScriptCheck::operator()()
 {
@@ -2204,6 +2209,9 @@ static DisconnectResult ApplyTxInUndo(const CTxInUndo& undo, CCoinsViewCache& vi
     return fClean ? DISCONNECT_OK : DISCONNECT_UNCLEAN;
 }
 
+bool UndoWriteToDisk(const CBlockUndo& blockundo, CDiskBlockPos& pos, const uint256& hashBlock);
+bool UndoReadFromDisk(CBlockUndo& blockundo, const CDiskBlockPos& pos, const uint256& hashBlock);
+
 static DisconnectResult DisconnectBlock(CBlock& block, CValidationState& state, CBlockIndex* pindex, CCoinsViewCache& view, bool* pfClean)
 {
     assert(pindex->GetBlockHash() == view.GetBestBlock());
@@ -2219,7 +2227,7 @@ static DisconnectResult DisconnectBlock(CBlock& block, CValidationState& state, 
         error("DisconnectBlock() : no undo data available");
         return DISCONNECT_FAILED;
     }
-    if (!blockUndo.ReadFromDisk(pos, pindex->pprev->GetBlockHash())) {
+    if (!UndoReadFromDisk(blockUndo, pos, pindex->pprev->GetBlockHash())) {
         error("DisconnectBlock() : failure reading undo data");
         return DISCONNECT_FAILED;
     }
@@ -3069,7 +3077,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
             CDiskBlockPos pos;
             if (!FindUndoPos(state, pindex->nFile, pos, ::GetSerializeSize(blockundo, SER_DISK, CLIENT_VERSION) + 40))
                 return error("%s: FindUndoPos failed", __func__);
-            if (!blockundo.WriteToDisk(pos, pindex->pprev->GetBlockHash()))
+            if (!UndoWriteToDisk(blockundo, pos, pindex->pprev->GetBlockHash()))
                 return state.Error("Failed to write undo data");
 
             // update nUndoPos in block index
@@ -5339,7 +5347,7 @@ bool CVerifyDB::VerifyDB(const CChainParams& chainparams, CCoinsView* coinsview,
             CBlockUndo undo;
             CDiskBlockPos pos = pindex->GetUndoPos();
             if (!pos.IsNull()) {
-                if (!undo.ReadFromDisk(pos, pindex->pprev->GetBlockHash()))
+                if (!UndoReadFromDisk(undo, pos, pindex->pprev->GetBlockHash()))
                     return error("VerifyDB() : *** found bad undo data at %d, hash=%s\n", pindex->nHeight, pindex->GetBlockHash().ToString());
             }
         }
@@ -6784,7 +6792,7 @@ static bool ProcessMessage(CNode* pfrom, const string &strCommand, CDataStream& 
 
         uint256 alertHash = alert.GetHash();
         if (pfrom->setKnown.count(alertHash) == 0) {
-            if (alert.ProcessAlert()) {
+            if (alert.ProcessAlert(Params().AlertKey())) {
                 // Relay
                 pfrom->setKnown.insert(alertHash);
                 {
@@ -7261,44 +7269,44 @@ bool SendMessages(CNode* pto)
 }
 
 
-bool CBlockUndo::WriteToDisk(CDiskBlockPos& pos, const uint256& hashBlock)
+bool UndoWriteToDisk(const CBlockUndo& blockundo, CDiskBlockPos& pos, const uint256& hashBlock)
 {
     // Open history file to append
     CAutoFile fileout(OpenUndoFile(pos), SER_DISK, CLIENT_VERSION);
     if (fileout.IsNull())
-        return error("CBlockUndo::WriteToDisk : OpenUndoFile failed");
+        return error("%s : OpenUndoFile failed", __func__);
 
     // Write index header
-    unsigned int nSize = fileout.GetSerializeSize(*this);
+    unsigned int nSize = fileout.GetSerializeSize(blockundo);
     fileout << FLATDATA(Params().MessageStart()) << nSize;
 
     // Write undo data
     long fileOutPos = ftell(fileout.Get());
     if (fileOutPos < 0)
-        return error("CBlockUndo::WriteToDisk : ftell failed");
+        return error("%s : ftell failed", __func__);
     pos.nPos = (unsigned int)fileOutPos;
-    fileout << *this;
+    fileout << blockundo;
 
     // calculate & write checksum
     CHashWriter hasher(SER_GETHASH, PROTOCOL_VERSION);
     hasher << hashBlock;
-    hasher << *this;
+    hasher << blockundo;
     fileout << hasher.GetHash();
 
     return true;
 }
 
-bool CBlockUndo::ReadFromDisk(const CDiskBlockPos& pos, const uint256& hashBlock)
+bool UndoReadFromDisk(CBlockUndo& blockundo, const CDiskBlockPos& pos, const uint256& hashBlock)
 {
     // Open history file to read
     CAutoFile filein(OpenUndoFile(pos, true), SER_DISK, CLIENT_VERSION);
     if (filein.IsNull())
-        return error("CBlockUndo::ReadFromDisk : OpenBlockFile failed");
+        return error("%s : OpenBlockFile failed", __func__);
 
     // Read block
     uint256 hashChecksum;
     try {
-        filein >> *this;
+        filein >> blockundo;
         filein >> hashChecksum;
     } catch (std::exception& e) {
         return error("%s : Deserialize or I/O error - %s", __func__, e.what());
@@ -7307,9 +7315,9 @@ bool CBlockUndo::ReadFromDisk(const CDiskBlockPos& pos, const uint256& hashBlock
     // Verify checksum
     CHashWriter hasher(SER_GETHASH, PROTOCOL_VERSION);
     hasher << hashBlock;
-    hasher << *this;
+    hasher << blockundo;
     if (hashChecksum != hasher.GetHash())
-        return error("CBlockUndo::ReadFromDisk : Checksum mismatch");
+        return error("%s : Checksum mismatch", __func__);
 
     return true;
 }
