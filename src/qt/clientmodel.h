@@ -8,10 +8,12 @@
 #define BITCOIN_QT_CLIENTMODEL_H
 
 #include <QObject>
+#include <QDateTime>
 
 #include <atomic>
 
 class AddressTableModel;
+class BanTableModel;
 class OptionsModel;
 class PeerTableModel;
 class TransactionTableModel;
@@ -49,6 +51,7 @@ public:
 
     OptionsModel* getOptionsModel();
     PeerTableModel* getPeerTableModel();
+    BanTableModel* getBanTableModel();
 
     //! Return number of connections, default is in- and outbound (total)
     int getNumConnections(unsigned int flags = CONNECTIONS_ALL) const;
@@ -93,6 +96,7 @@ public:
 private:
     OptionsModel* optionsModel;
     PeerTableModel* peerTableModel;
+    BanTableModel *banTableModel;
 
     int cachedNumBlocks;
     QString cachedMasternodeCountString;
@@ -117,6 +121,7 @@ Q_SIGNALS:
     void strMasternodesChanged(const QString& strMasternodes);
     void alertsChanged(const QString& warnings);
     void bytesChanged(quint64 totalBytesIn, quint64 totalBytesOut);
+    void banListChanged();
 
     //! Fired when a message should be reported to the user
     void message(const QString& title, const QString& message, unsigned int style);
@@ -130,6 +135,8 @@ public slots:
     void updateNumConnections(int numConnections);
     void updateNetworkActive(bool networkActive);
     void updateAlert(const QString& hash, int status);
+    void updateBanlist();
+
 };
 
 #endif // BITCOIN_QT_CLIENTMODEL_H

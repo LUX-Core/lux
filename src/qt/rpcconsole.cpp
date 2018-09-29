@@ -1191,7 +1191,7 @@ void RPCConsole::banSelectedNode(int bantime)
         int port = 0;
         SplitHostPort(nStr, port, addr);
 
-        CNode::Ban(CNetAddr(addr), BanReasonManuallyAdded, bantime);
+        CNode::Ban(CNetAddr(addr), BanReasonManually, bantime);
         bannedNode->fDisconnect = true;
 
         clearSelectedNode();

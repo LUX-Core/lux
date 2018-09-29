@@ -29,6 +29,9 @@
 #include <QScrollBar>
 #include <QSettings>
 #include <QTextDocument>
+#include <QTimer>
+
+#define SEND_CONFIRM_DELAY 3
 
 SendCoinsDialog::SendCoinsDialog(const PlatformStyle *platformStyle, QWidget* parent) : QDialog(parent),
                                                     ui(new Ui::SendCoinsDialog),
@@ -279,8 +282,22 @@ void SendCoinsDialog::on_sendButton_clicked()
         return;
     }
 
-    if (CoinControlDialog::coinControl->fSplitBlock)
+    if (CoinControlDialog::coinControl->fSplitBlock) {
+        if (ui->splitBlockLineEdit->text().isEmpty()) {
+            QMessageBox::warning(this, tr("Send Coins"),
+                tr("The number of output is empty. Try again."),
+                QMessageBox::Ok, QMessageBox::Ok);
+            return;
+        }
+
         CoinControlDialog::coinControl->nSplitBlock = int(ui->splitBlockLineEdit->text().toInt());
+        if (CoinControlDialog::coinControl->nSplitBlock == 0) {
+            QMessageBox::warning(this, tr("Send Coins"),
+                tr("The number of output must be a number and greater than 0. Try again."),
+                QMessageBox::Ok, QMessageBox::Ok);
+            return;
+        }
+    }
 
     QString strFunds = tr("using") + " <b>" + tr("anonymous funds") + "</b>";
     QString strFee = "";
@@ -438,10 +455,10 @@ void SendCoinsDialog::send(QList<SendCoinsRecipient> recipients, QString strFee,
     questionString.append(tr("<b>(%1 of %2 entries displayed)</b>").arg(displayedEntries).arg(messageEntries));
 
     // Display message box
-    QMessageBox::StandardButton retval = QMessageBox::question(this, tr("Confirm send coins"),
-        questionString.arg(formatted.join("<br />")),
-        QMessageBox::Yes | QMessageBox::Cancel,
-        QMessageBox::Cancel);
+    SendConfirmationDialog confirmationDialog(tr("Confirm send coins"), questionString.arg(formatted.join("<br />")), SEND_CONFIRM_DELAY, this);
+    confirmationDialog.exec();
+    QMessageBox::StandardButton retval = (QMessageBox::StandardButton)confirmationDialog.result();
+
 
     if (retval != QMessageBox::Yes) {
         fNewRecipientAllowed = true;

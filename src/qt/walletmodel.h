@@ -17,6 +17,8 @@
 #include <vector>
 
 #include <QObject>
+#include <QTimer>
+#include <QMessageBox>
 
 enum OutputType : int;
 
@@ -228,6 +230,8 @@ public:
 
     bool getPubKey(const CKeyID& address, CPubKey& vchPubKeyOut) const;
     bool isMine(CTxDestination address);
+    bool havePrivKey(const CKeyID &address) const;
+    bool getPrivKey(const CKeyID &address, CKey& vchPrivKeyOut) const;
     void getOutputs(const std::vector<COutPoint>& vOutpoints, std::vector<COutput>& vOutputs);
     bool isSpent(const COutPoint& outpoint) const;
     bool isUnspentAddress(const std::string& address) const;
