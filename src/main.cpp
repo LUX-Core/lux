@@ -2213,6 +2213,9 @@ static DisconnectResult ApplyTxInUndo(const CTxInUndo& undo, CCoinsViewCache& vi
     return fClean ? DISCONNECT_OK : DISCONNECT_UNCLEAN;
 }
 
+bool UndoWriteToDisk(const CBlockUndo& blockundo, CDiskBlockPos& pos, const uint256& hashBlock);
+bool UndoReadFromDisk(CBlockUndo& blockundo, const CDiskBlockPos& pos, const uint256& hashBlock);
+
 static DisconnectResult DisconnectBlock(CBlock& block, CValidationState& state, CBlockIndex* pindex, CCoinsViewCache& view, bool* pfClean)
 {
     assert(pindex->GetBlockHash() == view.GetBestBlock());
@@ -2228,7 +2231,7 @@ static DisconnectResult DisconnectBlock(CBlock& block, CValidationState& state, 
         error("DisconnectBlock() : no undo data available");
         return DISCONNECT_FAILED;
     }
-    if (!blockUndo.ReadFromDisk(pos, pindex->pprev->GetBlockHash())) {
+    if (!UndoReadFromDisk(blockUndo, pos, pindex->pprev->GetBlockHash())) {
         error("DisconnectBlock() : failure reading undo data");
         return DISCONNECT_FAILED;
     }
@@ -5374,7 +5377,7 @@ bool CVerifyDB::VerifyDB(const CChainParams& chainparams, CCoinsView* coinsview,
             CDiskBlockPos pos = pindex->GetUndoPos();
             if (!pos.IsNull()) {
                 if (!UndoReadFromDisk(undo, pos, pindex->pprev->GetBlockHash()))
-                    return error("VerifyDB: *** found bad undo data at %d, hash=%s\n", pindex->nHeight, pindex->GetBlockHash().GetHex());
+                    return error("VerifyDB() : *** found bad undo data at %d, hash=%s\n", pindex->nHeight, pindex->GetBlockHash().ToString());
             }
         }
         // check level 3: check for inconsistencies during memory-only disconnect of tip blocks
