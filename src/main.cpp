@@ -1314,26 +1314,24 @@ bool GetSpentIndex(CSpentIndexKey &key, CSpentIndexValue &value)
     return true;
 }
 
-bool GetAddressIndex(uint160 addressHash, int type,
-                     std::vector<std::pair<CAddressIndexKey, CAmount> > &addressIndex, int start, int end)
+bool GetAddressIndex(uint160 addrHash, uint16_t addrType, AddressIndexVector &addressIndex, int start, int end)
 {
     if (!fAddressIndex)
         return error("-addressindex not enabled");
 
-    if (!pblocktree->ReadAddressIndex(addressHash, type, addressIndex, start, end))
+    if (!pblocktree->ReadAddressIndex(addrHash, addrType, addressIndex, start, end))
         return error("unable to get txs for address");
 
     return true;
 }
 
-bool GetAddressUnspent(uint160 addressHash, int type,
-                       std::vector<std::pair<CAddressUnspentKey, CAddressUnspentValue> > &unspentOutputs)
+bool GetAddressUnspent(uint160 addrHash, uint16_t addrType, AddressUnspentVector &unspentOutputs)
 {
     if (!fAddressIndex)
         return error("-addressindex not enabled");
 
-    if (!pblocktree->ReadAddressUnspentIndex(addressHash, type, unspentOutputs))
-        return error("unable to get txs for address");
+    if (!pblocktree->ReadAddressUnspentIndex(addrHash, addrType, unspentOutputs))
+        return error("unable to get utxos for address");
 
     return true;
 }
@@ -2273,7 +2271,7 @@ static DisconnectResult DisconnectBlock(CBlock& block, CValidationState& state, 
             {
                 CTxDestination dest; uint160 hashDest;
                 txnouttype txType = TX_NONSTANDARD;
-                unsigned int addressType = 0;
+                uint16_t addressType = 0;
                 const CTxOut &out = tx.vout[k];
                 if (ExtractDestination(out.scriptPubKey, dest, &txType)) {
                     addressType = dest.which();
@@ -2336,7 +2334,7 @@ static DisconnectResult DisconnectBlock(CBlock& block, CValidationState& state, 
 #endif
                     CTxDestination dest; uint160 hashDest;
                     txnouttype txType = TX_NONSTANDARD;
-                    unsigned int addressType = 0;
+                    uint16_t addressType = 0;
                     if (ExtractDestination(prevout.scriptPubKey, dest, &txType)) {
                         addressType = dest.which();
                         hashDest = GetHashForDestination(dest);
@@ -2680,7 +2678,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
 #endif
                     CTxDestination dest; uint160 hashDest;
                     txnouttype txType = TX_NONSTANDARD;
-                    unsigned int addressType = 0;
+                    uint16_t addressType = 0;
 
                     if (ExtractDestination(out.scriptPubKey, dest, &txType)) {
                         addressType = dest.which();
@@ -2747,7 +2745,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
                 if (out.nValue == 0) continue; // PoS first tx
                 CTxDestination dest; uint160 hashDest;
                 txnouttype txType = TX_NONSTANDARD;
-                unsigned int addressType = 0;
+                uint16_t addressType = 0;
 
                 if (ExtractDestination(out.scriptPubKey, dest, &txType)) {
                     addressType = dest.which();

@@ -77,6 +77,9 @@ struct CMempoolAddressDeltaKeyCompare
 
 // Type helpers to avoid code lines of 200 chars
 typedef std::vector<std::pair<uint160, uint16_t> > AddressTypeVector;
+typedef std::vector<std::pair<CAddressIndexKey, CAmount> > AddressIndexVector;
+typedef std::vector<std::pair<CAddressUnspentKey, CAddressUnspentValue> > AddressUnspentVector;
+
 typedef std::vector<std::pair<CMempoolAddressDeltaKey, CMempoolAddressDelta> > MempoolAddrDeltaVector;
 
 #endif // BITCOIN_ADDRESSINDEX_H

@@ -53,6 +53,8 @@ template<typename Stream> static inline void ser_writedata32be(Stream &s, uint32
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+// part of -spentindex
+
 struct CSpentIndexKey {
     uint256 txhash;
     uint32_t outputIndex;
@@ -141,36 +143,38 @@ struct CSpentIndexKeyCompare
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+// part of -addressindex
+
 struct CAddressUnspentKey {
-    uint256 txhash;
     uint160 hashBytes;
-    uint16_t hashType;
-    uint16_t indexout;
+    uint8_t hashType;
+    uint16_t outputIndex;
+    uint256 txHash;
 
     size_t GetSerializeSize(int nType, int nVersion) const {
-        return 56;
+        return 55;
     }
 
     template<typename Stream>
     void Serialize(Stream& s, int nType, int nVersion) const {
-        ser_writedata16(s, hashType);
+        ser_writedata8(s, hashType);
         hashBytes.Serialize(s, nType, nVersion);
-        txhash.Serialize(s, nType, nVersion);
-        ser_writedata16(s, indexout);
+        txHash.Serialize(s, nType, nVersion);
+        ser_writedata16(s, outputIndex);
     }
     template<typename Stream>
     void Unserialize(Stream& s, int nType, int nVersion) {
-        hashType = ser_readdata16(s);
+        hashType = ser_readdata8(s);
         hashBytes.Unserialize(s, nType, nVersion);
-        txhash.Unserialize(s, nType, nVersion);
-        indexout = ser_readdata16(s);
+        txHash.Unserialize(s, nType, nVersion);
+        outputIndex = ser_readdata16(s);
     }
 
-    CAddressUnspentKey(unsigned addrType, uint160 addrHash, uint256 txh, size_t indexValue) {
-        hashType = (uint16_t) addrType;
+    CAddressUnspentKey(uint16_t addrType, uint160 addrHash, uint256 txh, size_t nOutput) {
+        hashType = (uint8_t) addrType;
         hashBytes = addrHash;
-        txhash = txh;
-        indexout = (uint16_t) indexValue;
+        txHash = txh;
+        outputIndex = (uint16_t) nOutput;
     }
 
     CAddressUnspentKey() {
@@ -180,8 +184,8 @@ struct CAddressUnspentKey {
     void SetNull() {
         hashType = 0;
         hashBytes.SetNull();
-        txhash.SetNull();
-        indexout = 0;
+        txHash.SetNull();
+        outputIndex = 0;
     }
 };
 
@@ -221,6 +225,8 @@ struct CAddressUnspentValue {
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+
+// part of -addressindex
 
 #define ANDX_IS_SPENT 1
 #define ANDX_IS_STAKE 2
@@ -293,7 +299,7 @@ struct CAddressIndexKey {
     }
 };
 
-// for DB_ADDRESSINDEX and DB_ADDRESSUNSPENTINDEX
+// common for DB_ADDRESSINDEX and DB_ADDRESSUNSPENTINDEX
 struct CAddressIndexIteratorKey {
     uint160 hashBytes;
     uint8_t hashType;
@@ -312,7 +318,7 @@ struct CAddressIndexIteratorKey {
         hashBytes.Unserialize(s, nType, nVersion);
     }
 
-    CAddressIndexIteratorKey(unsigned int addressType, uint160 addressHash) {
+    CAddressIndexIteratorKey(uint16_t addressType, uint160 addressHash) {
         hashBytes = addressHash;
         hashType = (uint8_t) addressType;
     }
