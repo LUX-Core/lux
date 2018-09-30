@@ -55,6 +55,27 @@ public:
         WalletBackups,     // int
         Listen,              // bool
         OptionIDRowCount,
+
+        eI2PUseI2POnly,              // bool
+        eI2PSAMHost,                 // QString
+        eI2PSAMPort,                 // int
+        eI2PSessionName,             // QString
+
+        I2PInboundQuantity,         // int
+        I2PInboundLength,           // int
+        I2PInboundLengthVariance,   // int
+        I2PInboundBackupQuantity,   // int
+        I2PInboundAllowZeroHop,     // bool
+        I2PInboundIPRestriction,    // int
+
+        I2POutboundQuantity,        // int
+        I2POutboundLength,          // int
+        I2POutboundLengthVariance,  // int
+        I2POutboundBackupQuantity,  // int
+        I2POutboundAllowZeroHop,    // bool
+        I2POutboundIPRestriction,   // int
+        I2POutboundPriority,        // int
+
     };
 
     void Init();

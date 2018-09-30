@@ -12,6 +12,7 @@
 
 #include "bitcoinunits.h"
 #include "guiutil.h"
+#include "i2psam/i2psam.h"
 
 #include "amount.h"
 #include "init.h"
@@ -24,7 +25,9 @@
 #include "wallet.h"
 #include "walletdb.h"
 #endif
-
+//#ifdef ENABLE_I2PSAM
+#include "i2pwrapper.h"
+//#endif
 #include <QNetworkProxy>
 #include <QSettings>
 #include <QStringList>
@@ -170,6 +173,27 @@ void OptionsModel::Init()
         SoftSetArg("-anonymizeluxamount", settings.value("nAnonymizeLuxAmount").toString().toStdString());
 
     language = settings.value("language").toString();
+
+/*#ifdef ENABLE_I2PSAM
+    eI2PUseI2POnly = IsI2POnly();
+    eI2PSAMHost = QString::fromStdString( GetArg( "-i2p.options.samhost", SAM_DEFAULT_ADDRESS ) );
+    eI2PSAMPort = (int)GetArg( "-i2p.options.samport", SAM_DEFAULT_PORT );
+    eI2PSessionName = QString::fromStdString( GetArg( "-i2p.options.sessionname", I2P_SESSION_NAME_DEFAULT ) );
+
+    I2PInboundQuantity        = (int)GetArg( "-i2p.options.inbound.quantity"        , SAM_DEFAULT_INBOUND_QUANTITY );
+    I2PInboundLength          = (int)GetArg( "-i2p.options.inbound.length"          , SAM_DEFAULT_INBOUND_LENGTH );
+    I2PInboundLengthVariance  = (int)GetArg( "-i2p.options.inbound.lengthvariance"  , SAM_DEFAULT_INBOUND_LENGTHVARIANCE );
+    I2PInboundBackupQuantity  = (int)GetArg( "-i2p.options.inbound.backupquantity"  , SAM_DEFAULT_INBOUND_BACKUPQUANTITY );
+    I2PInboundAllowZeroHop    = GetBoolArg(  "-i2p.options.inbound.allowzerohop"     , SAM_DEFAULT_INBOUND_ALLOWZEROHOP );
+    I2PInboundIPRestriction   = (int)GetArg( "-i2p.options.inbound.iprestriction"   , SAM_DEFAULT_INBOUND_IPRESTRICTION );
+    I2POutboundQuantity       = (int)GetArg( "-i2p.options.outbound.quantity"       , SAM_DEFAULT_OUTBOUND_QUANTITY );
+    I2POutboundLength         = (int)GetArg( "-i2p.options.outbound.length"         , SAM_DEFAULT_OUTBOUND_LENGTH );
+    I2POutboundLengthVariance = (int)GetArg( "-i2p.options.outbound.lengthvariance" , SAM_DEFAULT_OUTBOUND_LENGTHVARIANCE );
+    I2POutboundBackupQuantity = (int)GetArg( "-i2p.options.outbound.backupquantity" , SAM_DEFAULT_OUTBOUND_BACKUPQUANTITY );
+    I2POutboundAllowZeroHop   = GetBoolArg(  "-i2p.options.outbound.allowzerohop"    , SAM_DEFAULT_OUTBOUND_ALLOWZEROHOP );
+    I2POutboundIPRestriction  = (int)GetArg( "-i2p.options.outbound.iprestriction"  , SAM_DEFAULT_OUTBOUND_IPRESTRICTION );
+    I2POutboundPriority       = (int)GetArg( "-i2p.options.outbound.priority"       , SAM_DEFAULT_OUTBOUND_PRIORITY );
+#endif*/
 }
 
 void OptionsModel::Reset()

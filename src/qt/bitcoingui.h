@@ -194,6 +194,8 @@ signals:
 public slots:
     /** Set number of connections shown in the UI */
     void setNumConnections(int count);
+    /** Set number of i2p connections shown in the UI */
+    void setNumI2PConnections(int count);
     /** Set network state shown in the UI */
     void setNetworkActive(bool networkActive);
     /** Set number of blocks shown in the UI */

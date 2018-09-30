@@ -38,6 +38,7 @@
 #include "masternodemanager.h"
 #include "ui_interface.h"
 #include "util.h"
+#include "i2pshowaddresses.h"
 
 #include <iostream>
 
@@ -121,6 +122,7 @@ BitcoinGUI::BitcoinGUI(const NetworkStyle* networkStyle, QWidget* parent) : QMai
                                                                             rpcConsole(0),
                                                                             explorerWindow(0),
                                                                             hexAddressWindow(0),
+                                                                            i2pAddress(0),
                                                                             prevBlocks(0),
                                                                             spinnerFrame(0)
 {
@@ -644,10 +646,13 @@ void BitcoinGUI::setClientModel(ClientModel* clientModel) {
         createTrayIconMenu();
 
         // Keep up to date with client
-        updateNetworkState();
+        //updateNetworkState();
+        setNumConnections(clientModel->getNumConnections());
         connect(clientModel, SIGNAL(numConnectionsChanged(int)), this, SLOT(setNumConnections(int)));
         connect(clientModel, SIGNAL(networkActiveChanged(bool)), this, SLOT(setNetworkActive(bool)));
 
+        setNumI2PConnections(clientModel->getNumConnections());
+        connect(clientModel, SIGNAL(numConnectionsChanged()), this, SLOT(setNumI2PConnections(int)));
 
         if (clientModel->isI2POnly()) {
             labelI2POnly->setText("I2P");
@@ -807,6 +812,7 @@ void BitcoinGUI::createTrayIconMenu() {
     trayIconMenu->addSeparator();
     trayIconMenu->addAction(openInfoAction);
     trayIconMenu->addAction(openRPCConsoleAction);
+    trayIconMenu->addAction(openI2pAddressAction);
     trayIconMenu->addAction(openNetworkAction);
     trayIconMenu->addAction(openPeersAction);
     trayIconMenu->addAction(openRepairAction);
@@ -951,10 +957,11 @@ void BitcoinGUI::gotoBlockExplorerPage()
 
 #endif // ENABLE_WALLET
 
-void BitcoinGUI::updateNetworkState() {
-    int count = clientModel->getNumConnections();
+void BitcoinGUI::setNumConnections(int count) {
     QString icon;
-    switch (count) {
+    int realcount = clientModel ? count - clientModel->getNumConnections(CONNECTIONS_I2P_ALL) : count;
+    switch(realcount)
+    {
     case 0: icon = ":/icons/connect_0"; break;
     case 1: case 2: case 3: icon = ":/icons/connect_1"; break;
     case 4: case 5: case 6: icon = ":/icons/connect_2"; break;
@@ -964,10 +971,12 @@ void BitcoinGUI::updateNetworkState() {
     QIcon connectionItem = QIcon(icon).pixmap(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE);
     labelConnectionsIcon->setIcon(connectionItem);
     if (clientModel->getNetworkActive())
-        labelConnectionsIcon->setToolTip(tr("%n active connection(s) to Luxcore network", "", count));
+        labelConnectionsIcon->setToolTip(tr("%n active connection(s) to Luxcore network", "", realcount));
     else
         labelConnectionsIcon->setToolTip(tr("Network activity disabled"));
-
+}
+void BitcoinGUI::setNumI2PConnections(int count)
+{
     QString i2pIcon;
 
     // We never run this until we have the clientModel, so the check shouldn't be necessary.
@@ -988,11 +997,7 @@ void BitcoinGUI::updateNetworkState() {
 }
 
 void BitcoinGUI::setNetworkActive(bool networkActive) {
-    updateNetworkState();
-}
-
-void BitcoinGUI::setNumConnections(int count) {
-    updateNetworkState();
+ //   updateNetworkState();
 }
 
 void BitcoinGUI::setNumBlocks(int count) {

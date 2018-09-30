@@ -44,6 +44,7 @@ QT_FORMS_UI = \
   qt/forms/editcontractinfodialog.ui \
   qt/forms/helpmessagedialog.ui \
   qt/forms/i2pshowaddresses.ui \
+  qt/forms/i2poptions.ui \
   qt/forms/intro.ui \
   qt/forms/eula.ui \
   qt/forms/masternodemanager.ui \
@@ -108,10 +109,12 @@ QT_MOC_CPP = \
   qt/moc_editcontractinfodialog.cpp \
   qt/moc_guiutil.cpp \
   qt/moc_i2pshowaddresses.cpp \
+  qt/moc_i2poptions.cpp \
   qt/moc_intro.cpp \
   qt/moc_eula.cpp \
   qt/moc_macdockiconhandler.cpp \
   qt/moc_macnotificationhandler.cpp \
+  qt/moc_monitoreddatamapper.cpp \
   qt/moc_masternodemanager.cpp \
   qt/moc_addeditluxnode.cpp \
   qt/moc_luxnodeconfigdialog.cpp \
@@ -234,10 +237,12 @@ BITCOIN_QT_H = \
   qt/guiconstants.h \
   qt/guiutil.h \
   qt/i2pshowaddresses.h \
+  qt/i2poptions.h \
   qt/intro.h \
   qt/eula.h \
   qt/macdockiconhandler.h \
   qt/macnotificationhandler.h \
+  qt/monitoreddatamapper.h \
   qt/masternodemanager.h \
   qt/addeditluxnode.h \
   qt/luxnodeconfigdialog.h \
@@ -387,8 +392,10 @@ BITCOIN_QT_CPP = \
   qt/csvmodelwriter.cpp \
   qt/guiutil.cpp \
   qt/i2pshowaddresses.cpp \
+  qt/i2poptions.cpp \
   qt/intro.cpp \
   qt/eula.cpp \
+  qt/monitoreddatamapper.cpp \
   qt/masternodemanager.cpp \
   qt/addeditluxnode.cpp \
   qt/luxnodeconfigdialog.cpp \
