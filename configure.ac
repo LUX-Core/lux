@@ -134,6 +134,12 @@ AC_ARG_ENABLE([updater],
   [enable_updater=$enableval],
   [enable_updater=no])
 
+# Enable i2pd
+AC_ARG_ENABLE([i2pd],
+  [AS_HELP_STRING([--enable-i2pd],
+  [enable i2pd (default is yes)])],
+  [enable_i2pd=$enableval],
+  [enable_i2pd=yes])
 
 AC_ARG_WITH([miniupnpc],
   [AS_HELP_STRING([--with-miniupnpc],
@@ -1030,6 +1036,14 @@ else
   AC_MSG_RESULT(no)
 fi
 
+dnl enable i2pd
+AC_MSG_CHECKING([if i2pd module should be included])
+if test x$enable_i2pd != xno; then
+  AC_MSG_RESULT(yes)
+  AC_DEFINE_UNQUOTED([ENABLE_I2PSAM],[1],[Define to 1 to enable I2PD interface functions])
+else
+  AC_MSG_RESULT(no)
+fi
 
 dnl enable upnp support
 AC_MSG_CHECKING([whether to build with support for UPnP])
@@ -1123,6 +1137,7 @@ AM_CONDITIONAL([TARGET_DARWIN], [test x$TARGET_OS = xdarwin])
 AM_CONDITIONAL([BUILD_DARWIN], [test x$BUILD_OS = xdarwin])
 AM_CONDITIONAL([TARGET_WINDOWS], [test x$TARGET_OS = xwindows])
 AM_CONDITIONAL([ENABLE_WALLET],[test x$enable_wallet = xyes])
+AM_CONDITIONAL([ENABLE_I2PSAM],[test x$enable_i2pd = xyes])
 AM_CONDITIONAL([ENABLE_UPDATER],[test x$enable_updater = xyes])
 AM_CONDITIONAL([ENABLE_TESTS],[test x$use_tests = xyes])
 AM_CONDITIONAL([ENABLE_QT],[test x$bitcoin_enable_qt = xyes])
