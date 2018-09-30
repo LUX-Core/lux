@@ -35,50 +35,54 @@ struct CMempoolAddressDelta
 
 struct CMempoolAddressDeltaKey
 {
-    int type;
-    uint160 addressBytes;
-    uint256 txhash;
-    unsigned int index;
-    int spending;
+    uint160 hashBytes;
+    uint16_t hashType;
+    uint16_t spendFlags;
+    uint256 txHash;
+    uint32_t indexInOut;
 
-    CMempoolAddressDeltaKey(int addressType, uint160 addressHash, uint256 hash, unsigned int i, int s) {
-        type = addressType;
-        addressBytes = addressHash;
-        txhash = hash;
-        index = i;
-        spending = s;
+    CMempoolAddressDeltaKey(uint16_t addrType, uint160 addrHash, uint256 txh, unsigned int i, uint16_t sf) {
+        hashType = addrType;
+        hashBytes = addrHash;
+        txHash = txh;
+        indexInOut = i;
+        spendFlags = sf;
     }
 
-    CMempoolAddressDeltaKey(int addressType, uint160 addressHash) {
-        type = addressType;
-        addressBytes = addressHash;
-        txhash.SetNull();
-        index = 0;
-        spending = 0;
+    CMempoolAddressDeltaKey(uint16_t addressType, uint160 addressHash) {
+        hashType = addressType;
+        hashBytes = addressHash;
+        txHash.SetNull();
+        indexInOut = 0;
+        spendFlags = 0;
     }
 };
 
 struct CMempoolAddressDeltaKeyCompare
 {
     bool operator()(const CMempoolAddressDeltaKey& a, const CMempoolAddressDeltaKey& b) const {
-        if (a.type == b.type) {
-            if (a.addressBytes == b.addressBytes) {
-                if (a.txhash == b.txhash) {
-                    if (a.index == b.index) {
-                        return a.spending < b.spending;
+        if (a.hashType == b.hashType) {
+            if (a.hashBytes == b.hashBytes) {
+                if (a.txHash == b.txHash) {
+                    if (a.indexInOut == b.indexInOut) {
+                        return a.spendFlags < b.spendFlags;
                     } else {
-                        return a.index < b.index;
+                        return a.indexInOut < b.indexInOut;
                     }
                 } else {
-                    return a.txhash < b.txhash;
+                    return a.txHash < b.txHash;
                 }
             } else {
-                return a.addressBytes < b.addressBytes;
+                return a.hashBytes < b.hashBytes;
             }
         } else {
-            return a.type < b.type;
+            return a.hashType < b.hashType;
         }
     }
 };
+
+// Type helpers to avoid code lines of 200 chars
+typedef std::vector<std::pair<uint160, uint16_t> > AddressTypeVector;
+typedef std::vector<std::pair<CMempoolAddressDeltaKey, CMempoolAddressDelta> > MempoolAddrDeltaVector;
 
 #endif // BITCOIN_ADDRESSINDEX_H

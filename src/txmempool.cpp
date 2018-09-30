@@ -1050,11 +1050,13 @@ void CTxMemPool::addAddressIndex(const CTxMemPoolEntry &entry, const CCoinsViewC
 
         CTxDestination dest;
         if (ExtractDestination(prevout.scriptPubKey, dest)) {
-            short type(dest.which());
+            uint16_t addressType = dest.which();
+            uint160 addressHash = GetHashForDestination(dest);
 
-            CMempoolAddressDeltaKey key(type, uint160(), txhash, j, 1);
+            CMempoolAddressDeltaKey key(addressType, addressHash, txhash, j, 1);
             CMempoolAddressDelta delta(entry.GetTime(), prevout.nValue * -1, input.prevout.hash, input.prevout.n);
             mapAddress.insert(std::make_pair(key, delta));
+            inserted.push_back(key);
         }
     }
 
@@ -1063,9 +1065,10 @@ void CTxMemPool::addAddressIndex(const CTxMemPoolEntry &entry, const CCoinsViewC
 
         CTxDestination dest;
         if (ExtractDestination(out.scriptPubKey, dest)) {
-            short type(dest.which());
+            uint16_t addressType = dest.which();
+            uint160 addressHash = GetHashForDestination(dest);
 
-            CMempoolAddressDeltaKey key(type, uint160(), txhash, k, 0);
+            CMempoolAddressDeltaKey key(addressType, addressHash, txhash, k, 0);
             mapAddress.insert(std::make_pair(key, CMempoolAddressDelta(entry.GetTime(), out.nValue)));
             inserted.push_back(key);
         }
@@ -1074,13 +1077,12 @@ void CTxMemPool::addAddressIndex(const CTxMemPoolEntry &entry, const CCoinsViewC
     mapAddressInserted.insert(std::make_pair(txhash, inserted));
 }
 
-bool CTxMemPool::getAddressIndex(std::vector<std::pair<uint160, int> > &addresses,
-                                 std::vector<std::pair<CMempoolAddressDeltaKey, CMempoolAddressDelta> > &results)
+bool CTxMemPool::getAddressIndex(AddressTypeVector &addresses, MempoolAddrDeltaVector &results)
 {
     LOCK(cs);
-    for (std::vector<std::pair<uint160, int> >::iterator it = addresses.begin(); it != addresses.end(); it++) {
-        addressDeltaMap::iterator ait = mapAddress.lower_bound(CMempoolAddressDeltaKey((*it).second, (*it).first));
-        while (ait != mapAddress.end() && (*ait).first.addressBytes == (*it).first && (*ait).first.type == (*it).second) {
+    for (AddressTypeVector::iterator it = addresses.begin(); it != addresses.end(); it++) {
+        addressDeltaMap::iterator ait = mapAddress.lower_bound(CMempoolAddressDeltaKey(it->second, it->first));
+        while (ait != mapAddress.end() && ait->first.hashBytes == it->first && ait->first.hashType == it->second) {
             results.push_back(*ait);
             ait++;
         }
@@ -1092,15 +1094,14 @@ bool CTxMemPool::removeAddressIndex(const uint256 txhash)
 {
     LOCK(cs);
     addressDeltaMapInserted::iterator it = mapAddressInserted.find(txhash);
-
     if (it != mapAddressInserted.end()) {
-        std::vector<CMempoolAddressDeltaKey> keys = (*it).second;
+        std::vector<CMempoolAddressDeltaKey> keys = it->second;
         for (std::vector<CMempoolAddressDeltaKey>::iterator mit = keys.begin(); mit != keys.end(); mit++) {
             mapAddress.erase(*mit);
         }
+        keys.clear();
         mapAddressInserted.erase(it);
     }
-
     return true;
 }
 

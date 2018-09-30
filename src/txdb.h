@@ -8,7 +8,6 @@
 
 #include "leveldbwrapper.h"
 #include "main.h"
-#include "spentindex.h"
 
 #include <map>
 #include <string>
