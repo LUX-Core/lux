@@ -86,11 +86,11 @@ public:
     /** Return the BIP70 network string (main, test or regtest) */
     std::string NetworkIDString() const { return strNetworkID; }
     const std::vector<CDNSSeedData>& DNSSeeds() const { return vSeeds; }
-    const vector<CDNSSeedData>& i2pDNSSeeds() const { return i2pvSeeds; }
+    const std::vector<CDNSSeedData>& i2pDNSSeeds() const { return i2pvSeeds; }
     const std::vector<unsigned char>& Base58Prefix(Base58Type type) const { return base58Prefixes[type]; }
     const std::string& Bech32HRP() const { return bech32_hrp; }
     const std::vector<CAddress>& FixedSeeds() const { return vFixedSeeds; }
-    const vector<CAddress>& FixedI2PSeeds() const { return vFixedI2PSeeds; };
+    const std::vector<CAddress>& FixedI2PSeeds() const { return vFixedI2PSeeds; };
     virtual const Checkpoints::CCheckpointData& Checkpoints() const = 0;
     int PoolMaxTransactions() const { return nPoolMaxTransactions; }
     std::string SporkKey() const { return strSporkKey; }

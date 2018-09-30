@@ -26,6 +26,14 @@
 using namespace std;
 using namespace boost::assign;
 
+static const string I2pDestinationSeeds[] = {
+"",
+"",
+"",
+"",
+""
+};
+
 struct SeedSpec6 {
     uint8_t addr[16];
     uint16_t port;
@@ -219,6 +227,17 @@ public:
         vSeeds.push_back(CDNSSeedData("45.32.86.162", "45.32.86.162"));           // DNSSeed
         vSeeds.push_back(CDNSSeedData("45.77.127.10", "45.77.127.10"));           // DNSSeed
         vSeeds.push_back(CDNSSeedData("45.32.146.237", "45.32.146.237"));         // DNSSeed
+        ////////////////////////////////////////////////////////////////////////////////////////////////
+        i2pvSeeds.push_back(CDNSSeedData("", ""));          // I2p seeds
+        i2pvSeeds.push_back(CDNSSeedData("", ""));          // I2p seeds
+        ////////////////////////////////////////////////////////////////////////////////////////////////
+
+        for (unsigned int i = 0; i < ARRAYLEN( I2pDestinationSeeds ); i++ ) {
+            const int64_t nOneWeek = 7*24*60*60;
+            CAddress addr( CService( CNetAddr( I2pDestinationSeeds[i] ), 0 ), NODE_I2P );
+            addr.nTime = GetTime() - GetRand(nOneWeek) - nOneWeek;
+            vFixedI2PSeeds.push_back(addr);
+        }
 
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,48); // LUX address start with 'L'
         base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1,63); // LUX script addresses start with 'S'

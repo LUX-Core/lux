@@ -19,9 +19,9 @@
 #include <utility>
 
 #define SAM_DEFAULT_ADDRESS         "127.0.0.1"
-#define SAM_DEFAULT_PORT            7656
-#define SAM_DEFAULT_MIN_VER         "3.0"
-#define SAM_DEFAULT_MAX_VER         "3.0"
+#define SAM_DEFAULT_PORT            6969
+#define SAM_DEFAULT_MIN_VER         "1.0"
+#define SAM_DEFAULT_MAX_VER         "1.0"
 #define SAM_GENERATE_MY_DESTINATION "TRANSIENT"
 #define SAM_MY_NAME                 "ME"
 #define SAM_DEFAULT_I2P_OPTIONS     ""

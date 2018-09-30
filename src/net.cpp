@@ -285,8 +285,11 @@ bool AddLocal(const CService& addr, int nScore)
     if (!addr.IsRoutable())
         return false;
 
-    if( !addr.IsI2P() && !fDiscover && nScore < LOCAL_MANUAL )
+    if( !addr.IsI2P() && !fDiscover && nScore < LOCAL_MANUAL ) {
         return false;
+    } else if (fDiscover && nScore < LOCAL_MANUAL) {
+        return false;
+    }
 
     if (IsLimited(addr))
         return false;
@@ -1596,7 +1599,9 @@ void ThreadDNSAddressSeed()
         // if its already on file.
         addrman.Add( vAdd, CNetAddr("127.0.0.1") );
     }
-
+    if( IsDarknetOnly() )
+        LogPrintf("Mainnet DNS seeds disabled, parallel network disabled, running i2p network only.\n");
+    else
     BOOST_FOREACH (const CDNSSeedData& seed, vSeeds) {
         if (HaveNameProxy()) {
             AddOneShot(seed.host);
@@ -1780,7 +1785,7 @@ void ThreadOpenConnections() {
                 continue;
 
             // only consider very recently tried nodes after 30 failed attempts
-            if (nANow - addr.nLastTry < 600 && nTries < 30)
+            if (nANow - addr.nLastTry < 300 && nTries < 30)
                 continue;
 
             // only consider nodes missing relevant services after 40 failed attemps
@@ -1788,7 +1793,7 @@ void ThreadOpenConnections() {
                 continue;
 
             // do not allow non-default ports, unless after 50 invalid addresses selected already
-            if (addr.GetPort() != Params().GetDefaultPort() && nTries < 50)
+            if (!addr.IsI2P() && addr.GetPort() != Params().GetDefaultPort() && nTries < 50)
                 continue;
 
             addrConnect = addr;
