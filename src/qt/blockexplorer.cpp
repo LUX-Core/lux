@@ -431,8 +431,7 @@ std::string AddressToString(const CTxDestination& Address)
     TxContent += "<tbody class=\"h\">";
 
     CAmount Sum = 0;
-    typedef std::vector<std::pair<CAddressIndexKey, CAmount> > aIndexVector;
-    aIndexVector aIndex;
+    AddressIndexVector aIndex;
     uint160 hash160 = GetHashForDestination(Address);
 
     std::string TxRows;
@@ -449,7 +448,7 @@ std::string AddressToString(const CTxDestination& Address)
         size_t nEntry = 0;
         int nTxSummed = 0;
         uint256 lastTxHash = 0;
-        for (aIndexVector::const_iterator it=aIndex.begin(); it!=aIndex.end(); it++, nEntry++)
+        for (AddressIndexVector::const_iterator it=aIndex.begin(); it!=aIndex.end(); it++, nEntry++)
         {
             CTransaction tx;
             uint256 hashBlock = 0;
@@ -462,7 +461,7 @@ std::string AddressToString(const CTxDestination& Address)
                 continue;
             } else if (!nTxSummed && nEntry > 1) {
                 // avoid partial deltas + TxToRow sum
-                for (aIndexVector::const_iterator rit(&aIndex.at(nEntry-1)); rit!=aIndex.begin(); rit--) {
+                for (AddressIndexVector::const_iterator rit(&aIndex.at(nEntry-1)); rit!=aIndex.begin(); rit--) {
                     if (rit->first.txhash != it->first.txhash) break;
                     Sum -= rit->second;
                 }

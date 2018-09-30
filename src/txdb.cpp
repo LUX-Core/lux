@@ -254,9 +254,9 @@ bool CBlockTreeDB::UpdateSpentIndex(const std::vector<std::pair<CSpentIndexKey, 
     return WriteBatch(batch);
 }
 
-bool CBlockTreeDB::UpdateAddressUnspentIndex(const std::vector<std::pair<CAddressUnspentKey, CAddressUnspentValue > >&vect) {
+bool CBlockTreeDB::UpdateAddressUnspentIndex(const AddressUnspentVector &vect) {
     CLevelDBBatch batch;
-    for (std::vector<std::pair<CAddressUnspentKey, CAddressUnspentValue> >::const_iterator it=vect.begin(); it!=vect.end(); it++) {
+    for (AddressUnspentVector::const_iterator it=vect.begin(); it!=vect.end(); it++) {
         if (it->second.IsNull()) {
             batch.Erase(std::make_pair(DB_ADDRESSUNSPENTINDEX, it->first));
         } else {
@@ -266,13 +266,12 @@ bool CBlockTreeDB::UpdateAddressUnspentIndex(const std::vector<std::pair<CAddres
     return WriteBatch(batch);
 }
 
-bool CBlockTreeDB::ReadAddressUnspentIndex(uint160 addressHash, int type,
-                                           std::vector<std::pair<CAddressUnspentKey, CAddressUnspentValue> > &unspentOutputs) {
+bool CBlockTreeDB::ReadAddressUnspentIndex(uint160 addrHash, uint16_t addrType, AddressUnspentVector &unspentOutputs) {
 
     boost::scoped_ptr<leveldb::Iterator> pcursor(NewIterator());
 
     CDataStream ssKeySet(SER_DISK, CLIENT_VERSION);
-    ssKeySet << make_pair(DB_ADDRESSUNSPENTINDEX, CAddressIndexIteratorKey(type, addressHash));
+    ssKeySet << make_pair(DB_ADDRESSUNSPENTINDEX, CAddressIndexIteratorKey(addrType, addrHash));
     pcursor->Seek(ssKeySet.str());
 
     while (pcursor->Valid()) {
@@ -284,7 +283,7 @@ bool CBlockTreeDB::ReadAddressUnspentIndex(uint160 addressHash, int type,
             CAddressUnspentKey indexKey;
             ssKey >> chType;
             ssKey >> indexKey;
-            if (chType == DB_ADDRESSUNSPENTINDEX && indexKey.hashBytes == addressHash) {
+            if (chType == DB_ADDRESSUNSPENTINDEX && indexKey.hashType == addrType && indexKey.hashBytes == addrHash) {
                 try {
                     leveldb::Slice slValue = pcursor->value();
                     CDataStream ssValue(slValue.data(), slValue.data()+slValue.size(), SER_DISK, CLIENT_VERSION);
@@ -299,38 +298,36 @@ bool CBlockTreeDB::ReadAddressUnspentIndex(uint160 addressHash, int type,
                 break;
             }
         } catch (const std::exception& e) {
+            LogPrintf("%s: exception %s\n", __func__, e.what());
             break;
         }
     }
-
     return true;
 }
 
-bool CBlockTreeDB::WriteAddressIndex(const std::vector<std::pair<CAddressIndexKey, CAmount > >&vect) {
+bool CBlockTreeDB::WriteAddressIndex(const AddressIndexVector &vect) {
     CLevelDBBatch batch;
-    for (std::vector<std::pair<CAddressIndexKey, CAmount> >::const_iterator it=vect.begin(); it!=vect.end(); it++)
+    for (AddressIndexVector::const_iterator it=vect.begin(); it!=vect.end(); it++)
         batch.Write(std::make_pair(DB_ADDRESSINDEX, it->first), it->second);
     return WriteBatch(batch);
 }
 
-bool CBlockTreeDB::EraseAddressIndex(const std::vector<std::pair<CAddressIndexKey, CAmount > >&vect) {
+bool CBlockTreeDB::EraseAddressIndex(const AddressIndexVector &vect) {
     CLevelDBBatch batch;
-    for (std::vector<std::pair<CAddressIndexKey, CAmount> >::const_iterator it=vect.begin(); it!=vect.end(); it++)
+    for (AddressIndexVector::const_iterator it=vect.begin(); it!=vect.end(); it++)
         batch.Erase(std::make_pair(DB_ADDRESSINDEX, it->first));
     return WriteBatch(batch);
 }
 
-bool CBlockTreeDB::ReadAddressIndex(uint160 addressHash, int type,
-                                    std::vector<std::pair<CAddressIndexKey, CAmount> > &addressIndex,
-                                    int start, int end) {
-
+bool CBlockTreeDB::ReadAddressIndex(uint160 addrHash, uint16_t addrType, AddressIndexVector &addressIndex, int start, int end)
+{
     boost::scoped_ptr<leveldb::Iterator> pcursor(NewIterator());
 
     CDataStream ssKeySet(SER_DISK, CLIENT_VERSION);
-    if (start > 0 && end > 0) {
-        ssKeySet << make_pair(DB_ADDRESSINDEX, CAddressIndexIteratorHeightKey(type, addressHash, start));
+    if (start > 0) {
+        ssKeySet << make_pair(DB_ADDRESSINDEX, CAddressIndexIteratorHeightKey(addrType, addrHash, start));
     } else {
-        ssKeySet << make_pair(DB_ADDRESSINDEX, CAddressIndexIteratorKey(type, addressHash));
+        ssKeySet << make_pair(DB_ADDRESSINDEX, CAddressIndexIteratorKey(addrType, addrHash));
     }
     pcursor->Seek(ssKeySet.str());
 
@@ -343,7 +340,7 @@ bool CBlockTreeDB::ReadAddressIndex(uint160 addressHash, int type,
             CAddressIndexKey indexKey;
             ssKey >> chType;
             ssKey >> indexKey;
-            if (chType == DB_ADDRESSINDEX && indexKey.hashBytes == addressHash) {
+            if (chType == DB_ADDRESSINDEX && indexKey.hashType == addrType && indexKey.hashBytes == addrHash) {
                 if (end > 0 && indexKey.blockHeight > end) {
                     break;
                 }
