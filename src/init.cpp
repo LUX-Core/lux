@@ -201,7 +201,9 @@ void PrepareShutdown()
             LogPrintf("%s: Failed to write fee estimates to %s\n", __func__, est_path.string());
         fFeeEstimatesInitialized = false;
     }
-
+#ifdef ENABLE_I2PSAM
+    if( IsI2PEnabled() ) I2PSession::Instance().stopForwardingAll();
+#endif
     {
         LOCK(cs_main);
         if (pcoinsTip != NULL) {
@@ -987,6 +989,9 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
 
     fIsBareMultisigStd = GetArg("-permitbaremultisig", true) != 0;
     nMaxDatacarrierBytes = GetArg("-datacarriersize", nMaxDatacarrierBytes);
+
+    if( !GetBoolArg("-i2pd", false) && !IsBehindDarknet() )
+        InitWarning( _("Luxcore I2p network is running in parallel with Mainnet!") );
 
     fAlerts = GetBoolArg("-alerts", DEFAULT_ALERTS);
 
