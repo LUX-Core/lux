@@ -61,23 +61,18 @@ struct CMempoolAddressDeltaKey
 struct CMempoolAddressDeltaKeyCompare
 {
     bool operator()(const CMempoolAddressDeltaKey& a, const CMempoolAddressDeltaKey& b) const {
-        if (a.hashType == b.hashType) {
-            if (a.hashBytes == b.hashBytes) {
-                if (a.txHash == b.txHash) {
-                    if (a.indexInOut == b.indexInOut) {
-                        return a.spendFlags < b.spendFlags;
-                    } else {
-                        return a.indexInOut < b.indexInOut;
-                    }
-                } else {
-                    return a.txHash < b.txHash;
-                }
-            } else {
-                return a.hashBytes < b.hashBytes;
-            }
-        } else {
+
+        if (a.hashType != b.hashType)
             return a.hashType < b.hashType;
-        }
+        if (a.hashBytes != b.hashBytes)
+            return a.hashBytes < b.hashBytes;
+        if (a.txHash != b.txHash)
+            return a.txHash < b.txHash;
+        if (a.spendFlags != b.spendFlags)
+            // keep inputs before outputs
+            return a.spendFlags > b.spendFlags;
+        else
+            return a.indexInOut < b.indexInOut;
     }
 };
 
