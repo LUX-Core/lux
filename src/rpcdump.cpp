@@ -398,20 +398,20 @@ UniValue dumphdinfo(const UniValue& params, bool fHelp)
     if (!pwalletMain->GetHDChain(hdChainCurrent))
         throw JSONRPCError(RPC_WALLET_ERROR, "This wallet is not an HD wallet.");
 
-        if (!pwalletMain->GetDecryptedHDChain(hdChainCurrent))
-            throw JSONRPCError(RPC_INTERNAL_ERROR, "Cannot decrypt HD seed");
+    if (!pwalletMain->GetDecryptedHDChain(hdChainCurrent))
+        throw JSONRPCError(RPC_INTERNAL_ERROR, "Cannot decrypt HD seed");
 
-        SecureString ssMnemonic;
-        SecureString ssMnemonicPassphrase;
-        hdChainCurrent.GetMnemonic(ssMnemonic, ssMnemonicPassphrase);
+    SecureString ssMnemonic;
+    SecureString ssMnemonicPassphrase;
+    hdChainCurrent.GetMnemonic(ssMnemonic, ssMnemonicPassphrase);
 
-        UniValue obj(UniValue::VOBJ);
-        obj.push_back(Pair("hdseed", HexStr(hdChainCurrent.GetSeed())));
-        obj.push_back(Pair("mnemonic", ssMnemonic.c_str()));
-        obj.push_back(Pair("mnemonicpassphrase", ssMnemonicPassphrase.c_str()));
+    UniValue obj(UniValue::VOBJ);
+    obj.push_back(Pair("hdseed", HexStr(hdChainCurrent.GetSeed())));
+    obj.push_back(Pair("mnemonic", ssMnemonic.c_str()));
+    obj.push_back(Pair("mnemonicpassphrase", ssMnemonicPassphrase.c_str()));
 
-        return obj;
-    }
+    return obj;
+}
 
 
 UniValue dumpwallet(const UniValue& params, bool fHelp)
