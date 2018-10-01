@@ -391,8 +391,9 @@ UniValue dumphdinfo(const UniValue& params, bool fHelp)
 
     // add the base58check encoded extended master if the wallet uses HD
     CHDChain hdChainCurrent;
-    if (pwalletMain->GetHDChain(hdChainCurrent))
-    {
+    if (!pwalletMain->GetHDChain(hdChainCurrent))
+        throw JSONRPCError(RPC_WALLET_ERROR, "This wallet is not an HD wallet.");
+
         if (!pwalletMain->GetDecryptedHDChain(hdChainCurrent))
             throw JSONRPCError(RPC_INTERNAL_ERROR, "Cannot decrypt HD seed");
 
@@ -408,8 +409,6 @@ UniValue dumphdinfo(const UniValue& params, bool fHelp)
         return obj;
     }
 
-    return NullUniValue;
-}
 
 UniValue dumpwallet(const UniValue& params, bool fHelp)
 {
