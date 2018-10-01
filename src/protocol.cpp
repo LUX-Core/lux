@@ -122,7 +122,7 @@ CInv::CInv(const std::string& strType, const uint256& hashIn)
         }
     }
     if (i == ARRAYLEN(ppszTypeName))
-        LogPrint("net", "CInv::CInv(string, uint256) : unknown type '%s'", strType);
+        throw std::out_of_range(strprintf("CInv::CInv(string, uint256): unknown type '%s'", strType));
     hash = hashIn;
 }
 
@@ -138,11 +138,8 @@ bool CInv::IsKnownType() const
 
 const char* CInv::GetCommand() const
 {
-    if (!IsKnownType()) {
-        LogPrint("net", "CInv::GetCommand() : type=%d unknown type", type);
-        return ppszTypeName[0]; // ERROR
-    }
-
+    if (!IsKnownType())
+        throw std::out_of_range(strprintf("CInv::GetCommand(): type=%d unknown type", type));
     return ppszTypeName[type];
 }
 
