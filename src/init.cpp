@@ -1197,7 +1197,7 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
             }
 
             // Create backup of the wallet
-            std::string dateTimeStr = DateTimeStrFormat(".%Y%m%d", GetTime());
+            std::string dateTimeStr = DateTimeStrFormat(".%Y-%m-%d-%H-%M", GetTime());
             std::string backupPathStr = backupDir.string();
             backupPathStr += "/" + strWalletFile;
             std::string sourcePathStr = GetDataDir().string();
