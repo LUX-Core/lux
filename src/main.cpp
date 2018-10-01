@@ -5922,12 +5922,17 @@ void static ProcessGetData(CNode* pfrom, const Consensus::Params& consensusParam
                 // Send stream from relay memory
                 bool pushed = false;
                 {
+                    CDataStream ss(SER_NETWORK, PROTOCOL_VERSION);
+                    {
                     LOCK(cs_mapRelay);
                     map<CInv, CDataStream>::iterator mi = mapRelay.find(inv);
                     if (mi != mapRelay.end()) {
-                        pfrom->PushMessage(inv.GetCommand(), (*mi).second); //TODO: push message with flags
+                        ss += (*mi).second;
                         pushed = true;
+                        }
                     }
+                    if(pushed)
+                        pfrom->PushMessage(inv.GetCommand(), ss);
                 }
 
                 if (!pushed && inv.type == MSG_TX) { //TODO: probably should check for MSG_TX_WITNESS too
@@ -6287,6 +6292,11 @@ static bool ProcessMessage(CNode* pfrom, const string &strCommand, CDataStream& 
 
         for (unsigned int nInv = 0; nInv < vInv.size(); nInv++) {
             const CInv& inv = vInv[nInv];
+
+            if(!inv.IsKnownType()) {
+                LogPrint("net", "got inv of unknown type %d: %s peer=%d\n", inv.type, inv.hash.ToString(), pfrom->id);
+                continue;
+            }
 
             boost::this_thread::interruption_point();
             pfrom->AddInventoryKnown(inv);
