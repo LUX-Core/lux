@@ -2259,7 +2259,7 @@ static DisconnectResult DisconnectBlock(CBlock& block, CValidationState& state, 
             if (outsBlock.nVersion < 0)
                 outs->nVersion = outsBlock.nVersion;
             if (*outs != outsBlock)
-                fClean = fClean && error("DisconnectBlock() : added transaction mismatch? database corrupted");
+                fClean = false;
 
             // remove outputs
             outs->Clear();
@@ -3681,8 +3681,9 @@ static bool ActivateBestChainStep(CValidationState& state, const CChainParams& c
             if (!ConnectTip(state, chainparams, pindexConnect, pindexConnect == pindexMostWork ? pblock : NULL)) {
                 if (state.IsInvalid()) {
                     // The block violates a consensus rule.
-                    if (!state.CorruptionPossible())
+                    if (!state.CorruptionPossible()) {
                         InvalidChainFound(vpindexToConnect.back());
+                    }
                     state = CValidationState();
                     fInvalidFound = true;
                     fContinue = false;
