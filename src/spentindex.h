@@ -301,6 +301,7 @@ struct CAddressIndexKey {
 };
 
 // common for DB_ADDRESSINDEX and DB_ADDRESSUNSPENTINDEX
+// Serialize order should match the start of CAddressIndexKey
 struct CAddressIndexIteratorKey {
     uint160 hashBytes;
     uint8_t hashType;
@@ -312,11 +313,6 @@ struct CAddressIndexIteratorKey {
     void Serialize(Stream& s, int nType, int nVersion) const {
         ser_writedata8(s, hashType);
         hashBytes.Serialize(s, nType, nVersion);
-    }
-    template<typename Stream>
-    void Unserialize(Stream& s, int nType, int nVersion) {
-        hashType = ser_readdata8(s);
-        hashBytes.Unserialize(s, nType, nVersion);
     }
 
     CAddressIndexIteratorKey(uint16_t addressType, uint160 addressHash) {
@@ -334,6 +330,8 @@ struct CAddressIndexIteratorKey {
     }
 };
 
+// used for getaddressdeltas with block height range
+// Serialize order should match the start of CAddressIndexKey
 struct CAddressIndexIteratorHeightKey {
     int32_t blockHeight;
     uint160 hashBytes;
@@ -344,15 +342,9 @@ struct CAddressIndexIteratorHeightKey {
     }
     template<typename Stream>
     void Serialize(Stream& s, int nType, int nVersion) const {
-        ser_writedata32be(s, blockHeight);
         ser_writedata8(s, hashType);
         hashBytes.Serialize(s, nType, nVersion);
-    }
-    template<typename Stream>
-    void Unserialize(Stream& s, int nType, int nVersion) {
-        blockHeight = ser_readdata32be(s);
-        hashType = ser_readdata8(s);
-        hashBytes.Unserialize(s, nType, nVersion);
+        ser_writedata32be(s, blockHeight);
     }
 
     CAddressIndexIteratorHeightKey(unsigned int addrType, uint160 addrHash, int height) {

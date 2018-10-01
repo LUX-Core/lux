@@ -884,7 +884,7 @@ UniValue getaddressdeltas(const UniValue& params, bool fHelp)
         }
     }
 
-    if (start > 0 && end == 0)
+    if (end == 0)
         end = chainActive.Height();
     if (end < start)
         throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "End value is expected to be greater than start");
@@ -896,14 +896,8 @@ UniValue getaddressdeltas(const UniValue& params, bool fHelp)
 
     AddressIndexVector addressIndex;
     for (AddressTypeVector::iterator it = addresses.begin(); it != addresses.end(); it++) {
-        if (start >= 0 && end > 0) {
-            if (!GetAddressIndex((*it).first, (*it).second, addressIndex, start, end)) {
-                throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "No information available for address");
-            }
-        } else {
-            if (!GetAddressIndex((*it).first, (*it).second, addressIndex)) {
-                throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "No information available for address");
-            }
+        if (!GetAddressIndex(it->first, it->second, addressIndex, start, end)) {
+            throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "No information available for address");
         }
     }
 
@@ -1014,7 +1008,7 @@ UniValue getaddressbalance(const UniValue& params, bool fHelp)
 
 UniValue getaddresstxids(const UniValue& params, bool fHelp)
 {
-    if (fHelp || params.size() != 1)
+    if (fHelp || params.size() < 1)
         throw runtime_error(
             "getaddresstxids\n"
             "\nReturns the txids for an address(es) (-addressindex required).\n"
@@ -1058,16 +1052,15 @@ UniValue getaddresstxids(const UniValue& params, bool fHelp)
         }
     }
 
+    if (end == 0)
+        end = chainActive.Height();
+    if (end < start)
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "End value is expected to be greater than start");
+
     AddressIndexVector addressIndex;
     for (AddressTypeVector::iterator it = addresses.begin(); it != addresses.end(); it++) {
-        if (start >= 0 && end > 0) {
-            if (!GetAddressIndex((*it).first, (*it).second, addressIndex, start, end)) {
-                throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "No information available for address");
-            }
-        } else {
-            if (!GetAddressIndex((*it).first, (*it).second, addressIndex)) {
-                throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "No information available for address");
-            }
+        if (!GetAddressIndex(it->first, it->second, addressIndex, start, end)) {
+            throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "No information available for address");
         }
     }
 
@@ -1094,7 +1087,6 @@ UniValue getaddresstxids(const UniValue& params, bool fHelp)
     }
 
     return result;
-
 }
 
 UniValue getspentinfo(const UniValue& params, bool fHelp)
