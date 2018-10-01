@@ -53,6 +53,7 @@ WalletView::WalletView(const PlatformStyle* platformStyle, QWidget* parent) : QS
     smartContractPage = new SmartContract(this);
     LSRTokenPage = new LSRToken(this);
     tradingPage = new tradingDialog(this);
+    luxgatePage = new LuxgateDialog(this);
     QVBoxLayout* vbox = new QVBoxLayout();
     QHBoxLayout* hbox_buttons = new QHBoxLayout();
     transactionView = new TransactionView(platformStyle, this);
@@ -88,6 +89,7 @@ WalletView::WalletView(const PlatformStyle* platformStyle, QWidget* parent) : QS
     addWidget(transactionsPage);
 
     addWidget(tradingPage);
+    addWidget(luxgatePage);
     addWidget(receiveCoinsPage);
     addWidget(sendCoinsPage);
     addWidget(explorerWindow);
@@ -256,6 +258,11 @@ void WalletView::gotoHistoryPage()
 void WalletView::gotoTradingPage()
 {
     setCurrentWidget(tradingPage);
+}
+
+void WalletView::gotoLuxgatePage()
+{
+    setCurrentWidget(luxgatePage);
 }
 
 void WalletView::gotoBlockExplorerPage()

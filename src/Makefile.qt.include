@@ -55,6 +55,7 @@ QT_FORMS_UI = \
   qt/forms/optionsdialog.ui \
   qt/forms/overviewpage.ui \
   qt/forms/tradingdialog.ui \
+  qt/forms/luxgatedialog.ui \
   qt/forms/receivecoinsdialog.ui \
   qt/forms/receivetokenpage.ui \
   qt/forms/receiverequestdialog.ui \
@@ -123,6 +124,7 @@ QT_MOC_CPP = \
   qt/moc_optionsmodel.cpp \
   qt/moc_overviewpage.cpp \
   qt/moc_tradingdialog.cpp \
+  qt/moc_luxgatedialog.cpp \
   qt/moc_tokenamountfield.cpp \
   qt/moc_qcustomplot.cpp \
   qt/moc_peertablemodel.cpp \
@@ -252,6 +254,7 @@ BITCOIN_QT_H = \
   qt/optionsmodel.h \
   qt/overviewpage.h \
   qt/tradingdialog.h \
+  qt/luxgatedialog.h \
   qt/paymentrequestplus.h \
   qt/paymentserver.h \
   qt/peertablemodel.h \
@@ -452,6 +455,7 @@ BITCOIN_QT_CPP += \
   qt/overviewpage.cpp \
   qt/qcustomplot.cpp \
   qt/tradingdialog.cpp \
+  qt/luxgatedialog.cpp \
   qt/paymentrequestplus.cpp \
   qt/paymentserver.cpp \
   qt/lsrtoken.cpp \
