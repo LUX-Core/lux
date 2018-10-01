@@ -211,7 +211,7 @@ UniValue getrawmempool(const UniValue& params, bool fHelp)
 
     if (fVerbose) {
         LOCK(mempool.cs);
-        UniValue o(UniValue::VOBJ);
+        UniValue o(UniValue::VARR);
         for (const CTxMemPoolEntry& e : mempool.mapTx) {
             const uint256& hash = e.GetTx().GetHash();
             UniValue info(UniValue::VOBJ);
