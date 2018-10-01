@@ -71,10 +71,7 @@ static const CRPCConvertParam vRPCConvertParams[] =
     { "listsinceblock", 2, "include_watchonly" },
     { "sendmany", 1, "amounts" },
     { "sendmany", 2, "minconf" },
-    { "sendmany", 4, "subtractfeefrom" },
-    { "sendmanywithdupes", 1, "amounts" },
-    { "sendmanywithdupes", 2, "minconf" },
-    { "sendmanywithdupes", 4, "subtractfeefrom" },
+    { "sendmany", 3, "comment" },
     { "addmultisigaddress", 0, "nrequired" },
     { "addmultisigaddress", 1, "keys" },
     ////////////////////////////////////////////////// // lux
