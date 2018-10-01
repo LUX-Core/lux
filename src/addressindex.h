@@ -15,13 +15,13 @@ struct CMempoolAddressDelta
     int64_t time;
     CAmount amount;
     uint256 prevhash;
-    unsigned int prevout;
+    uint32_t prevout;
 
     CMempoolAddressDelta(int64_t t, CAmount a, uint256 hash, unsigned int out) {
         time = t;
         amount = a;
         prevhash = hash;
-        prevout = out;
+        prevout = (uint32_t) out;
     }
 
     CMempoolAddressDelta(int64_t t, CAmount a) {
@@ -44,7 +44,7 @@ struct CMempoolAddressDeltaKey
         hashType = addrType;
         hashBytes = addrHash;
         txHash = txh;
-        indexInOut = i;
+        indexInOut = (uint32_t) i;
         spendFlags = sf;
     }
 
