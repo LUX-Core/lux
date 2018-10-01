@@ -852,7 +852,7 @@ UniValue getwork(const UniValue& params, bool fHelp) {
             CReserveKey reservekey(pwalletMain);
 
             CPubKey pubkey;
-            reservekey.GetReservedKey(pubkey);
+            reservekey.GetReservedKey(pubkey, true);
 
             pblocktemplate = BlockAssembler(Params()).CreateNewBlockWithKey(reservekey, false);
 

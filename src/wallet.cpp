@@ -2563,7 +2563,8 @@ bool CWallet::CreateCollateralTransaction(CMutableTransaction& txCollateral, std
     // make our change address
     CScript scriptChange;
     CPubKey vchPubKey;
-    assert(reservekey.GetReservedKey(vchPubKey, true)); // should never fail, as we just unlocked
+    bool success = reservekey.GetReservedKey(vchPubKey, true);
+    assert(success); // should never fail, as we just unlocked
     scriptChange = GetScriptForDestination(vchPubKey.GetID());
     reservekey.KeepKey();
 
@@ -3090,7 +3091,8 @@ std::string CWallet::PrepareDarksendDenominate(int minRounds, int maxRounds)
                         CScript scriptChange;
                         CPubKey vchPubKey;
                         // use a unique change address
-                        assert(reservekey.GetReservedKey(vchPubKey)); // should never fail, as we just unlocked
+                        bool success = reservekey.GetReservedKey(vchPubKey, true);
+                        assert(success); // should never fail, as we just unlocked
                         scriptChange = GetScriptForDestination(vchPubKey.GetID());
                         reservekey.KeepKey();
 
@@ -3638,7 +3640,7 @@ bool CReserveKey::GetReservedKey(CPubKey& pubkey, bool internal)
             } else {
                 return false;
             }
-        vchPubKey = keypool.vchPubKey;
+        //vchPubKey = keypool.vchPubKey;
         internal = keypool.internal;
     }
 
