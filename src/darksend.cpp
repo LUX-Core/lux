@@ -1643,7 +1643,7 @@ bool CDarkSendPool::SendRandomPaymentToSelf() {
 
     CScript scriptDenom;
     CPubKey vchPubKey;
-    assert(reservekey.GetReservedKey(vchPubKey)); // should never fail, as we just unlocked
+    assert(reservekey.GetReservedKey(vchPubKey, false)); // should never fail, as we just unlocked
     scriptDenom = GetScriptForDestination(vchPubKey.GetID());
 
     CWalletTx wtx;

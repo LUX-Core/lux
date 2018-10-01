@@ -850,7 +850,7 @@ public:
     }
 
     void ReturnKey();
-    bool GetReservedKey(CPubKey &pubkey, bool internalIn = false);
+    bool GetReservedKey(CPubKey &pubkey, bool internalIn/* = false*/);
     void KeepKey();
 };
 
