@@ -5924,11 +5924,11 @@ void static ProcessGetData(CNode* pfrom, const Consensus::Params& consensusParam
                 {
                     CDataStream ss(SER_NETWORK, PROTOCOL_VERSION);
                     {
-                    LOCK(cs_mapRelay);
-                    map<CInv, CDataStream>::iterator mi = mapRelay.find(inv);
-                    if (mi != mapRelay.end()) {
-                        ss += (*mi).second;
-                        pushed = true;
+                        LOCK(cs_mapRelay);
+                        map<CInv, CDataStream>::iterator mi = mapRelay.find(inv);
+                        if (mi != mapRelay.end()) {
+                            ss += (*mi).second;
+                            pushed = true;
                         }
                     }
                     if(pushed)
