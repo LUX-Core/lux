@@ -31,6 +31,7 @@
 using namespace std;
 
 void EnsureWalletIsUnlocked();
+bool EnsureWalletIsAvailable(bool avoidException);
 
 std::string static EncodeDumpTime(int64_t nTime)
 {
@@ -370,6 +371,9 @@ UniValue dumpprivkey(const UniValue& params, bool fHelp)
 
 UniValue dumphdinfo(const UniValue& params, bool fHelp)
 {
+    if (!EnsureWalletIsAvailable(fHelp))
+        return NullUniValue;
+
     if (fHelp || params.size() != 0)
         throw runtime_error(
                 "dumphdinfo\n"
