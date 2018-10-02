@@ -777,6 +777,8 @@ public:
      */
     void LearnAllRelatedScripts(const CPubKey& key);
 
+    bool GetStakeWeight(uint64_t& nWeight);
+
     /**
      * Get a destination of the requested type (if possible) to the specified script.
      * This function will automatically add the necessary scripts to the wallet.
