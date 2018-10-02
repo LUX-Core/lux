@@ -5,6 +5,7 @@
 #define BITCOIN_STAKING_H__DUZY
 
 #include "uint256.h"
+#include "sync.h"
 #include "amount.h"
 #include <map>
 #include <set>
@@ -32,6 +33,22 @@ struct StakeKernel
 {
 protected:
     StakeKernel();
+};
+
+struct StakeStatus {
+    CCriticalSection lock;
+    double dValueSum;
+    double dKernelDiffMax;
+    double dKernelDiffSum;
+    int64_t nLastCoinStakeSearchInterval;
+    uint64_t nWeightSum, nWeightMin, nWeightMax;
+    uint64_t nCoinAgeSum;
+    uint64_t nBlocksCreated;
+    uint64_t nBlocksAccepted;
+    uint64_t nKernelsFound;
+
+    void Clear();
+    StakeStatus();
 };
 
 //!<DuzyDoc>: Stake - singleton class encapsulating PoS feature for Lux.
@@ -63,7 +80,6 @@ class Stake : StakeKernel
 
 private:
 
-    bool SelectStakeCoins(CWallet *wallet, std::set<std::pair<const CWalletTx*, unsigned int> >& stakecoins, const int64_t targetAmount);
     bool CreateCoinStake(CWallet *wallet, const CKeyStore& keystore, unsigned int nBits, int64_t nSearchInterval, CMutableTransaction& txNew, unsigned int& nTxNewTime);
 
     bool GenBlockStake(CWallet *wallet, const CReserveKey &key, unsigned int &extra);
@@ -78,7 +94,9 @@ public:
         return 100;
     }
 
-    bool isForbidden(const CScript& scriptPubKey);
+    StakeStatus stakeMiner;
+
+    bool SelectStakeCoins(CWallet *wallet, std::set<std::pair<const CWalletTx*, unsigned int> >& stakecoins, const int64_t targetAmount);
 
     //!<DuzyDoc>: Stake::ComputeNextModifier - compute the hash modifier for proof-of-stake
     bool ComputeNextModifier(const CBlockIndex* pindexPrev, uint64_t& nStakeModifier, bool& fGeneratedStakeModifier);
@@ -133,5 +151,8 @@ public:
 
 //!<DuzyDoc>: stake - global staking pointer for convenient access of staking kernel.
 extern Stake * const stake;
+
+// Get time
+int64_t GetWeight(int64_t nIntervalBeginning, int64_t nIntervalEnd);
 
 #endif // BITCOIN_STAKING_H__DUZY

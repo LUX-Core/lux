@@ -4697,3 +4697,36 @@ bool CWallet::RemoveTokenEntry(const uint256 &tokenHash, bool fFlushOnClose)
 
     return true;
 }
+
+bool CWallet::GetStakeWeight(uint64_t& nWeight)
+{
+    int64_t nBalance = GetBalance();
+    CAmount nReserveBalance = stake->GetReservedBalance();
+    if (nBalance <= nReserveBalance)
+        return false;
+
+    std::vector<const CWalletTx*> vwtxPrev;
+    std::set<std::pair<const CWalletTx*,unsigned int> > setCoins;
+
+    if (!stake->SelectStakeCoins(this, setCoins, nBalance - nReserveBalance))
+        return false;
+
+    if (setCoins.empty())
+        return false;
+
+    nWeight = 0;
+    int64_t nCurrentTime = GetAdjustedTime();
+    LOCK(cs_main);
+    for (auto const& pcoin : setCoins) {
+        CDiskTxPos txpos;
+        if (pblocktree->ReadTxIndex(pcoin.first->GetHash(), txpos))
+            continue;
+        // Stake kernel
+        int64_t nTimeWeight = GetWeight((int64_t)pcoin.first->tx->nTime, nCurrentTime);
+        uint256 bnWeight = uint256(pcoin.first->tx->vout[pcoin.second].nValue) * nTimeWeight / COIN / (24 * 60 * 60);
+        if (nTimeWeight > 0) {
+            nWeight += bnWeight.GetCompact();
+        }
+    }
+    return true;
+}
