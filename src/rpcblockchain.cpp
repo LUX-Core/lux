@@ -8,7 +8,7 @@
 #include "core_io.h"
 #include "checkpoints.h"
 #include "consensus/validation.h"
-//#include "main.h"
+#include "main.h"
 #include "primitives/transaction.h"
 #include "rpcserver.h"
 #include "rpcwallet.cpp"
@@ -19,7 +19,8 @@
 #include <stdint.h>
 
 #include "univalue/univalue.h"
-
+#include <mutex>
+#include <condition_variable>
 using namespace std;
 
 extern void TxToJSON(const CTransaction& tx, const uint256 hashBlock, UniValue& entry);
@@ -154,6 +155,16 @@ UniValue getbestblockhash(const UniValue& params, bool fHelp)
 
     LOCK(cs_main);
     return chainActive.Tip()->GetBlockHash().GetHex();
+}
+
+void RPCNotifyBlockChange(bool ibd, const CBlockIndex* pindex)
+{
+    if(pindex) {
+        std::lock_guard<std::mutex> lock(cs_blockchange);
+        latestblock.hash = pindex->GetBlockHash();
+        latestblock.height = pindex->nHeight;
+    }
+    cond_blockchange.notify_all();
 }
 
 UniValue getdifficulty(const UniValue& params, bool fHelp)

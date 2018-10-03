@@ -179,7 +179,7 @@ static void MutateTxLocktime(CMutableTransaction& tx, const string& cmdVal)
 
     tx.nLockTime = (unsigned int)newLocktime;
 }
-
+#if 1
 static void MutateTxAddInput(CMutableTransaction& tx, const string& strInput)
 {
     // separate TXID:VOUT in string
@@ -208,7 +208,7 @@ static void MutateTxAddInput(CMutableTransaction& tx, const string& strInput)
     CTxIn txin(txid, vout);
     tx.vin.push_back(txin);
 }
-
+#endif
 static void MutateTxAddOutAddr(CMutableTransaction& tx, const string& strInput)
 {
     // separate VALUE:ADDRESS in string
