@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1024</width>
-    <height>842</height>
+    <width>960</width>
+    <height>617</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -195,6 +195,12 @@
      <layout class="QHBoxLayout" name="centerLayout">
       <item>
        <widget class="QTabWidget" name="tabWidget">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>600</height>
+         </size>
+        </property>
         <property name="accessibleName">
          <string>DETACH_TAB</string>
         </property>
