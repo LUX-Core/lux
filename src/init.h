@@ -23,6 +23,8 @@ bool ShutdownRequested();
 void Shutdown();
 void PrepareShutdown();
 bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler);
+/** Interrupt threads */
+void Interrupt(boost::thread_group& threadGroup);
 
 /** The help message mode determines what help message to show */
 enum HelpMessageMode {

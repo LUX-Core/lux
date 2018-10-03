@@ -13,12 +13,16 @@
 #include "utilstrencodings.h"
 #include "univalue/univalue.h"
 #include <boost/filesystem/operations.hpp>
+#include <stdio.h>
+
+#include <event2/event.h>
+#include <event2/http.h>
+#include <event2/buffer.h>
+#include <event2/keyvalq_struct.h>
 
 #define _(x) std::string(x) /* Keep the _() around in case gettext or such will be used later to translate non-UI */
 
 using namespace std;
-using namespace boost;
-using namespace boost::asio;
 
 std::string HelpMessageCli()
 {
@@ -37,9 +41,6 @@ std::string HelpMessageCli()
     strUsage += "  -rpcwait               " + _("Wait for RPC server to start") + "\n";
     strUsage += "  -rpcuser=<user>        " + _("Username for JSON-RPC connections") + "\n";
     strUsage += "  -rpcpassword=<pw>      " + _("Password for JSON-RPC connections") + "\n";
-
-    strUsage += "\n" + _("SSL options: (see the Bitcoin Wiki for SSL setup instructions)") + "\n";
-    strUsage += "  -rpcssl                " + _("Use OpenSSL (https) for JSON-RPC connections") + "\n";
 
     return strUsage;
 }
@@ -96,63 +97,118 @@ static bool AppInitRPC(int argc, char* argv[])
         fprintf(stderr, "Error: Invalid combination of -regtest and -testnet.\n");
         return false;
     }
+        if (GetBoolArg("-rpcssl", false))
+        {
+            fprintf(stderr, "Error: SSL mode for RPC (-rpcssl) is no longer supported.\n");
+            return false;
+    }
     return true;
+}
+
+
+/** Reply structure for request_done to fill in */
+struct HTTPReply
+{
+    int status;
+    std::string body;
+};
+
+static void http_request_done(struct evhttp_request *req, void *ctx)
+{
+    HTTPReply *reply = static_cast<HTTPReply*>(ctx);
+
+    if (req == NULL) {
+        /* If req is NULL, it means an error occurred while connecting, but
+         * I'm not sure how to find out which one. We also don't really care.
+         */
+        reply->status = 0;
+        return;
+    }
+
+    reply->status = evhttp_request_get_response_code(req);
+
+    struct evbuffer *buf = evhttp_request_get_input_buffer(req);
+    if (buf)
+    {
+        size_t size = evbuffer_get_length(buf);
+        const char *data = (const char*)evbuffer_pullup(buf, size);
+        if (data)
+            reply->body = std::string(data, size);
+        evbuffer_drain(buf, size);
+    }
 }
 
 UniValue CallRPC(const string& strMethod, const UniValue& params)
 {
-    // Connect to localhost
-    bool fUseSSL = GetBoolArg("-rpcssl", false);
-    asio::io_service io_service;
-    ssl::context context(io_service, ssl::context::sslv23);
-    context.set_options(ssl::context::no_sslv2 | ssl::context::no_sslv3);
-    asio::ssl::stream<asio::ip::tcp::socket> sslStream(io_service, context);
-    SSLIOStreamDevice<asio::ip::tcp> d(sslStream, fUseSSL);
-    iostreams::stream<SSLIOStreamDevice<asio::ip::tcp> > stream(d);
+    std::string host = GetArg("-rpcconnect", "127.0.0.1");
+    int port = GetArg("-rpcport", BaseParams().RPCPort());
 
-    const bool fConnected = d.connect(GetArg("-rpcconnect", "127.0.0.1"), GetArg("-rpcport", itostr(BaseParams().RPCPort())));
-    if (!fConnected)
-        throw CConnectionFailed("couldn't connect to server");
+    // Create event base
+    struct event_base *base = event_base_new(); // TODO RAII
+    if (!base)
+        throw runtime_error("cannot create event_base");
+
+    // Synchronously look up hostname
+    struct evhttp_connection *evcon = evhttp_connection_base_new(base, NULL, host.c_str(), port); // TODO RAII
+    if (evcon == NULL)
+        throw runtime_error("create connection failed");
+    evhttp_connection_set_timeout(evcon, GetArg("-rpctimeout", 30));
+
+    HTTPReply response;
+    struct evhttp_request *req = evhttp_request_new(http_request_done, (void*)&response); // TODO RAII
+    if (req == NULL)
+        throw runtime_error("create http request failed");
 
     // Find credentials to use
     std::string strRPCUserColonPass;
     if (mapArgs["-rpcpassword"] == "") {
         // Try fall back to cookie-based authentication if no password is provided
         if (!GetAuthCookie(&strRPCUserColonPass)) {
-            throw runtime_error(strprintf(_("You must set rpcpassword=<password> in the configuration file:\n%s\n" "If the file does not exist, create it with owner-readable-only file permissions."), GetConfigFile().string().c_str()));
+            throw runtime_error(strprintf(_("Could not locate RPC credentials. No authentication cookie could be found, and no rpcpassword is set in the configuration file (%s)"),
+                     GetConfigFile().string().c_str()));
         }
     } else {
         strRPCUserColonPass = mapArgs["-rpcuser"] + ":" + mapArgs["-rpcpassword"];
     }
 
     // HTTP basic authentication
-    map<string, string> mapRequestHeaders;
-    mapRequestHeaders["Authorization"] = string("Basic ") + EncodeBase64(strRPCUserColonPass);
+    struct evkeyvalq *output_headers = evhttp_request_get_output_headers(req);
+    assert(output_headers);
+    evhttp_add_header(output_headers, "Host", host.c_str());
+    evhttp_add_header(output_headers, "Connection", "close");
+    evhttp_add_header(output_headers, "Authorization", (std::string("Basic ") + EncodeBase64(strRPCUserColonPass)).c_str());
 
     // Send request
-    string strRequest = JSONRPCRequest(strMethod, params, 1);
-    string strPost = HTTPPost(strRequest, mapRequestHeaders);
-    stream << strPost << std::flush;
+    std::string strRequest = JSONRPCRequest(strMethod, params, 1);
+    struct evbuffer * output_buffer = evhttp_request_get_output_buffer(req);
+    assert(output_buffer);
+    evbuffer_add(output_buffer, strRequest.data(), strRequest.size());
 
     // Receive HTTP reply status
-    int nProto = 0;
-    int nStatus = ReadHTTPStatus(stream, nProto);
+    int r = evhttp_make_request(evcon, req, EVHTTP_REQ_POST, "/");
+    if (r != 0) {
+        evhttp_connection_free(evcon);
+        event_base_free(base);
+        throw CConnectionFailed("send http request failed");
+    }
 
     // Receive HTTP reply message headers and body
-    map<string, string> mapHeaders;
-    string strReply;
-    ReadHTTPMessage(stream, mapHeaders, strReply, nProto, std::numeric_limits<size_t>::max());
+    event_base_dispatch(base);
+    evhttp_connection_free(evcon);
+    event_base_free(base);
 
-    if (nStatus == HTTP_UNAUTHORIZED)
+    if (response.status == 0)
+        throw CConnectionFailed("couldn't connect to server");
+    else if (response.status == HTTP_UNAUTHORIZED)
         throw runtime_error("incorrect rpcuser or rpcpassword (authorization failed)");
-    else if (nStatus >= 400 && nStatus != HTTP_BAD_REQUEST && nStatus != HTTP_NOT_FOUND && nStatus != HTTP_INTERNAL_SERVER_ERROR)
-        throw runtime_error(strprintf("server returned HTTP error %d", nStatus));
-    else if (strReply.empty())
+    else if (response.status >= 400 && response.status != HTTP_BAD_REQUEST && response.status != HTTP_NOT_FOUND && response.status != HTTP_INTERNAL_SERVER_ERROR)
+        throw runtime_error(strprintf("server returned HTTP error %d", response.status));
+    else if (response.body.empty())
         throw runtime_error("no response from server");
 
     // Parse reply
     UniValue valReply(UniValue::VSTR);
-    if (!valReply.read(strReply))
+    if (!valReply.read(response.body))
         throw runtime_error("couldn't parse reply from server");
     const UniValue& reply = valReply.get_obj();
     if (reply.empty())
@@ -198,6 +254,15 @@ int CommandLineRPC(int argc, char* argv[])
                         throw CConnectionFailed("server in warmup");
                     strPrint = "error: " + error.write();
                     nRet = abs(code);
+                    if (error.isObject())
+                    {
+                        UniValue errCode = find_value(error, "code");
+                        UniValue errMsg  = find_value(error, "message");
+                        strPrint = errCode.isNull() ? "" : "error code: "+errCode.getValStr()+"\n";
+
+                        if (errMsg.isStr())
+                            strPrint += "error message:\n"+errMsg.get_str();
+                    }
                 } else {
                     // Result
                     if (result.isNull())
