@@ -41,6 +41,7 @@
         <file alias="bitcoin_testnet">res/icons/bitcoin_testnet.png</file>
         <file alias="edit">res/icons/edit.png</file>
         <file alias="history">res/icons/history.png</file>
+        <file alias="luxgate">res/icons/luxgate.png</file>
         <file alias="stake">res/icons/stake.png</file>
         <file alias="overview">res/icons/overview.png</file>
         <file alias="smartcontract">res/icons/smartcontract.png</file>
