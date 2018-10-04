@@ -611,7 +611,7 @@ int32_t ComputeBlockVersion(const CBlockIndex* pindexPrev, const Consensus::Para
 void UpdateCoins(const CTransaction& tx, CValidationState& state, CCoinsViewCache& inputs, int nHeight);
 
 /** Context-independent validity checks */
-bool CheckTransaction(const CTransaction& tx, CValidationState& state, bool fCheckDuplicateInputs=true);
+bool CheckTransaction(const CTransaction& tx, CValidationState& state);
 
 /**
  * Check if transaction will be final in the next block to be created.

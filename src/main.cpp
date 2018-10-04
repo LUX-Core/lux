@@ -861,7 +861,7 @@ int64_t GetTransactionSigOpCost(const CTransaction& tx, const CCoinsViewCache& i
     return nSigOps;
 }
 
-bool CheckTransaction(const CTransaction& tx, CValidationState &state, bool fCheckDuplicateInputs)
+bool CheckTransaction(const CTransaction& tx, CValidationState &state)
 {
     // Basic checks that don't depend on any context
     if (tx.vin.empty())
@@ -900,12 +900,12 @@ bool CheckTransaction(const CTransaction& tx, CValidationState &state, bool fChe
 
 
     // Check for duplicate inputs
-    if (fCheckDuplicateInputs) {
-        std::set<COutPoint> vInOutPoints;
-        for (const auto& txin : tx.vin) {
-            if (!vInOutPoints.insert(txin.prevout).second)
-                return state.DoS(100, false, REJECT_INVALID, "bad-txns-inputs-duplicate");
-        }
+    std::set<COutPoint> vInOutPoints;
+    for (const CTxIn& txin : tx.vin) {
+        if (vInOutPoints.count(txin.prevout))
+            return state.DoS(100, error("CheckTransaction() : duplicate inputs"),
+                REJECT_INVALID, "bad-txns-inputs-duplicate");
+        vInOutPoints.insert(txin.prevout);
     }
 
     if (tx.IsCoinBase()) {
@@ -4287,7 +4287,7 @@ bool CheckBlock(const CBlock& block, CValidationState& state, const Consensus::P
             return error("%s: smart contracts are not supported yet in PoS blocks", __func__);
         }
 
-        if (!CheckTransaction(tx, state, true)) {
+        if (!CheckTransaction(tx, state)) {
             return state.Invalid(false, state.GetRejectCode(), state.GetRejectReason(),
                     strprintf("Transaction check failed (tx hash %s) %s", tx.GetHash().ToString(), state.GetDebugMessage()));
 
