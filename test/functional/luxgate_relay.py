@@ -101,8 +101,8 @@ class ExampleTest(LuxTestFramework):
         assert_equal(0, len(node1.rpc.listorderbook()['orders']))
         assert_equal(0, len(node2.rpc.listorderbook()['orders']))
 
-        connect_nodes(node1, 0)
-        connect_nodes(node2, 1)
+        connect_nodes(node1, 0, True)
+        connect_nodes(node2, 1, True)
 
         node0.rpc.createorder('LUX', 'BTC', '2', '1')
         assert_equal(1, len([x for x in node0.rpc.listorderbook()['orders'] if x['status'] == 'new']))

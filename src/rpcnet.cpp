@@ -93,6 +93,9 @@ UniValue getpeerinfo(const UniValue& params, bool fHelp)
             "    \"pingwait\": n,             (numeric) ping wait (if non-zero)\n"
             "    \"version\": v,              (numeric) The peer version, such as 7001\n"
             "    \"subver\": \"/Luxcore:x.x.x.x/\",  (string) The string version\n"
+            #ifdef ENABLE_LUXGATE
+            "    \"luxgateversion\": v,       (numeric) The peer's LuxGate protocol version\n"
+            #endif
             "    \"inbound\": true|false,     (boolean) Inbound (true) or Outbound (false)\n"
             "    \"startingheight\": n,       (numeric) The starting height (block) of the peer\n"
             "    \"banscore\": n,             (numeric) The ban score\n"
@@ -137,6 +140,9 @@ UniValue getpeerinfo(const UniValue& params, bool fHelp)
         // corrupting or modifiying the JSON output by putting special characters in
         // their ver message.
         obj.push_back(Pair("subver", stats.cleanSubVer));
+#ifdef ENABLE_LUXGATE
+        obj.push_back(Pair("luxgateversion", stats.nLuxGateVersion));
+#endif
         obj.push_back(Pair("inbound", stats.fInbound));
         obj.push_back(Pair("startingheight", stats.nStartingHeight));
         if (fStateStats) {

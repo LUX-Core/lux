@@ -24,6 +24,10 @@
 #include "miner.h"
 #include "stake.h"
 
+#ifdef ENABLE_LUXGATE
+#include "luxgate/luxgate.h"
+#endif
+
 #ifdef WIN32
 #include <string.h>
 #else
@@ -516,6 +520,9 @@ void CNode::PushVersion()
         LogPrint("net", "send version message: version %d, blocks=%d, us=%s, peer=%d\n", PROTOCOL_VERSION, nBestHeight, addrMe.ToString(), id);
     PushMessage("version", PROTOCOL_VERSION, (uint64_t) nLocalServices, nTime, addrYou, addrMe,
         nLocalHostNonce, FormatSubVersion(CLIENT_NAME, CLIENT_VERSION, std::vector<string>()), nBestHeight, true);
+#ifdef ENABLE_LUXGATE
+    PushMessage("lgversion", LUXGATE_PROTOCOL_VERSION);
+#endif
 }
 
 
@@ -679,6 +686,9 @@ void CNode::copyStats(CNodeStats& stats)
     X(addrName);
     X(nVersion);
     X(cleanSubVer);
+#ifdef ENABLE_LUXGATE
+    X(nLuxGateVersion);
+#endif
     X(fInbound);
     X(nStartingHeight);
     {

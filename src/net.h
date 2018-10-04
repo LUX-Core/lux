@@ -173,6 +173,9 @@ public:
     std::string addrName;
     int nVersion;
     std::string cleanSubVer;
+#ifdef ENABLE_LUXGATE
+    uint64_t nLuxGateVersion;
+#endif
     bool fInbound;
     int nStartingHeight;
     uint64_t nSendBytes;
@@ -320,6 +323,9 @@ public:
     // store the sanitized version in cleanSubVer. The original should be used when dealing with
     // the network or wire types and the cleaned string used when displayed or logged.
     std::string strSubVer, cleanSubVer;
+#ifdef ENABLE_LUXGATE
+    uint64_t nLuxGateVersion = 0;
+#endif
     bool fWhitelisted; // This peer can bypass DoS banning.
     bool fOneShot;
     bool fClient;
