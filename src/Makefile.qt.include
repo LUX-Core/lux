@@ -348,10 +348,14 @@ RES_ICONS = \
   qt/res/icons/history.png \
   qt/res/icons/key.png \
   qt/res/icons/lock_closed.png \
+  qt/res/icons/lock_closed_black.png \
+  qt/res/icons/luxcoin_black.png \
   qt/res/icons/update.ico \
+  qt/res/icons/update_black.png \
   qt/res/icons/luxupdate-loader.gif \
   qt/res/icons/lock_open.png \
   qt/res/icons/masternodes.png \
+  qt/res/icons/network_monitor.png \
   qt/res/icons/overview.png \
   qt/res/icons/smartcontract.png \
   qt/res/icons/qrcode.png \
