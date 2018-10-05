@@ -213,23 +213,37 @@ public:
         assert(genesis.hashMerkleRoot == uint256("0xe08ae0cfc35a1d70e6764f347fdc54355206adeb382446dd54c32cd0201000d3"));
 
         ////////////////////////////////////////////////////////////////////////////////////////////////
-        vSeeds.push_back(CDNSSeedData("140.82.21.110", "140.82.21.110"));        // Luxgate seed
-        vSeeds.push_back(CDNSSeedData("149.28.163.40", "149.28.163.40"));        // Main seed
-        vSeeds.push_back(CDNSSeedData("207.148.83.62", "207.148.83.62"));        // Chain state seed
-        vSeeds.push_back(CDNSSeedData("207.148.81.88", "207.148.81.88"));        // Global state seed
-        vSeeds.push_back(CDNSSeedData("149.28.172.147", "149.28.172.147"));      // Main seed
+        vSeeds.push_back(CDNSSeedData("149.28.183.115 ", "149.28.183.115 "));     // Luxgate seed
+        vSeeds.push_back(CDNSSeedData("149.28.163.40", "149.28.163.40"));         // Main seed
+        vSeeds.push_back(CDNSSeedData("45.32.246.142", "45.32.246.142"));         // Chain state seed
+        vSeeds.push_back(CDNSSeedData("207.148.81.88", "207.148.81.88"));         // Global state seed
+        vSeeds.push_back(CDNSSeedData("45.32.240.8", "45.32.240.8"));             // Main seed
         ////////////////////////////////////////////////////////////////////////////////////////////////
-        vSeeds.push_back(CDNSSeedData("45.32.86.162", "45.32.86.162"));           // DNSSeed
+        vSeeds.push_back(CDNSSeedData("45.77.237.16", "45.77.237.16"));           // DNSSeed
         vSeeds.push_back(CDNSSeedData("45.77.127.10", "45.77.127.10"));           // DNSSeed
         vSeeds.push_back(CDNSSeedData("45.32.146.237", "45.32.146.237"));         // DNSSeed
         ////////////////////////////////////////////////////////////////////////////////////////////////
         vSeeds.push_back(CDNSSeedData("89.3.178.185", "89.3.178.185"));           // DNSSeed
-        vSeeds.push_back(CDNSSeedData("104.238.189.30", "104.238.189.30"));           // DNSSeed
-        vSeeds.push_back(CDNSSeedData("51.15.39.62", "51.15.39.62"));         // DNSSeed
-        vSeeds.push_back(CDNSSeedData("108.61.176.178", "108.61.176.178"));           // DNSSeed
+        vSeeds.push_back(CDNSSeedData("104.238.189.30", "104.238.189.30"));       // DNSSeed
+        vSeeds.push_back(CDNSSeedData("51.15.39.62", "51.15.39.62"));             // DNSSeed
+        vSeeds.push_back(CDNSSeedData("108.61.176.178", "108.61.176.178"));       // DNSSeed
         vSeeds.push_back(CDNSSeedData("45.77.224.63", "45.77.224.63"));           // DNSSeed
         vSeeds.push_back(CDNSSeedData("45.77.227.235", "45.77.227.235"));         // DNSSeed
         vSeeds.push_back(CDNSSeedData("45.32.187.166", "45.32.187.166"));         // DNSSeed
+        ////////////////////////////////////////////////////////////////////////////////////////////////
+        vSeeds.push_back(CDNSSeedData("149.28.145.20", "149.28.145.20"));         // DNSSeed Asia
+        vSeeds.push_back(CDNSSeedData("149.28.150.184", "149.28.150.184"));       // DNSSeed Asia
+        vSeeds.push_back(CDNSSeedData("45.32.115.110", "45.32.115.110"));         // DNSSeed Asia
+        vSeeds.push_back(CDNSSeedData("66.42.51.223", "66.42.51.223"));           // DNSSeed Asia
+        vSeeds.push_back(CDNSSeedData("45.76.159.236", "45.76.159.236"));         // DNSSeed Asia
+        ////////////////////////////////////////////////////////////////////////////////////////////////
+        vSeeds.push_back(CDNSSeedData("149.28.167.57", "149.28.167.57"));         // DNSSeed AUS
+        ////////////////////////////////////////////////////////////////////////////////////////////////
+        vSeeds.push_back(CDNSSeedData("95.179.136.100", "95.179.136.100"));       // DNSSeed Europe
+        vSeeds.push_back(CDNSSeedData("199.247.28.100", "199.247.28.100"));       // DNSSeed Europe
+        vSeeds.push_back(CDNSSeedData("45.63.40.109", "45.63.40.109"));           // DNSSeed Europe
+        vSeeds.push_back(CDNSSeedData("95.179.179.146", "95.179.179.146"));       // DNSSeed Europe
+        vSeeds.push_back(CDNSSeedData("45.76.36.166", "45.76.36.166"));           // DNSSeed Europe
         ////////////////////////////////////////////////////////////////////////////////////////////////
 
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,48); // LUX address start with 'L'
