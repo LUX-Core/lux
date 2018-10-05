@@ -17,11 +17,11 @@ cache:
   - $HOME/.ccache
 env:
   global:
-    - MAKEJOBS=-j4
+    - MAKEJOBS=-j5
     - RUN_TESTS=false
     - CHECK_DOC=0
     - BOOST_TEST_RANDOM=1$TRAVIS_BUILD_ID
-    - CCACHE_SIZE=100M
+    - CCACHE_SIZE=400M
     - CCACHE_TEMPDIR=/tmp/.ccache-temp
     - CCACHE_COMPRESS=1
     - BASE_OUTDIR=$TRAVIS_BUILD_DIR/out
