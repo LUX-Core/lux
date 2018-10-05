@@ -357,7 +357,7 @@ std::string HelpMessage(HelpMessageMode mode)
     strUsage += "  -nlogfile=<n>           " + _("Set number of debug log files") + "\n";
     strUsage += "  -loadblock=<file>      " + _("Imports blocks from external blk000??.dat file") + " " + _("on startup") + "\n";
     strUsage += "  -maxorphantx=<n>       " + strprintf(_("Keep at most <n> unconnectable transactions in memory (default: %u)"), DEFAULT_MAX_ORPHAN_TRANSACTIONS) + "\n";
-    strUsage += "  -mempoolexpiry=<n>     " + strprintf(_("Do not keep transactions in the mempool longer than <n> hours (default: %u)"), DEFAULT_MEMPOOL_EXPIRY) + "\n";
+//    strUsage += "  -mempoolexpiry=<n>     " + strprintf(_("Do not keep transactions in the mempool longer than <n> hours (default: %u)"), DEFAULT_MEMPOOL_EXPIRY) + "\n";
     strUsage += "  -par=<n>               " + strprintf(_("Set the number of script verification threads (%u to %d, 0 = auto, <0 = leave that many cores free, default: %d)"), -(int)boost::thread::hardware_concurrency(), MAX_SCRIPTCHECK_THREADS, DEFAULT_SCRIPTCHECK_THREADS) + "\n";
 #ifndef WIN32
     strUsage += "  -pid=<file>            " + strprintf(_("Specify pid file (default: %s)"), "luxd.pid") + "\n";
@@ -1677,12 +1677,12 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
                 return InitError(strprintf(_("Error loading %s: You can't enable HD on a already existing non-HD wallet"), strWalletFile));
                  }
         }
-
+#if 0
         // Warn user every time he starts non-encrypted HD wallet
         if (GetBoolArg("-usehd", DEFAULT_USE_HD_WALLET) && !pwalletMain->IsLocked()) {
             InitWarning(_("Make sure to encrypt your wallet and delete all non-encrypted backups after you verified that wallet works!"));
         }
-
+#endif
         LogPrintf("%s", strErrors.str());
         LogPrintf(" wallet      %15dms\n", GetTimeMillis() - nStart);
 
