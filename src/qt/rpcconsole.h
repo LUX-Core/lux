@@ -19,6 +19,7 @@
 class QMenu;
 class ClientModel;
 class PlatformStyle;
+class RPCTimerInterface;
 
 namespace Ui
 {
@@ -172,6 +173,7 @@ private:
     QMenu* peersTableContextMenu;
     QMenu* banTableContextMenu;
     const PlatformStyle* platformStyle;
+    RPCTimerInterface* rpcTimerInterface;
 
 };
 

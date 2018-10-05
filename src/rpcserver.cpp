@@ -43,10 +43,10 @@ static bool fRPCInWarmup = true;
 static std::string rpcWarmupStatus("RPC server started");
 static CCriticalSection cs_rpcWarmup;
 
-static std::vector<RPCTimerInterface*> timerInterfaces;
+static RPCTimerInterface* timerInterface = NULL;
 /* Map of name to timer.
  * @note Can be changed to std::unique_ptr when C++11 */
-static std::map<std::string, boost::shared_ptr<RPCTimerBase> > deadlineTimers;
+static std::map<std::string, std::unique_ptr<RPCTimerBase> > deadlineTimers;
 
 static struct CRPCSignals
 {
@@ -517,16 +517,21 @@ void JSONRequest::PollReply(const UniValue& result) {
     req->ChunkEnd();
 }
 
-void RPCRegisterTimerInterface(RPCTimerInterface *iface)
+void RPCSetTimerInterfaceIfUnset(RPCTimerInterface *iface)
 {
-    timerInterfaces.push_back(iface);
+    if (!timerInterface)
+        timerInterface = iface;
 }
 
-void RPCUnregisterTimerInterface(RPCTimerInterface *iface)
+void RPCSetTimerInterface(RPCTimerInterface *iface)
 {
-    std::vector<RPCTimerInterface*>::iterator i = std::find(timerInterfaces.begin(), timerInterfaces.end(), iface);
-    assert(i != timerInterfaces.end());
-    timerInterfaces.erase(i);
+    timerInterface = iface;
+}
+
+void RPCUnsetTimerInterface(RPCTimerInterface *iface)
+{
+    if (timerInterface == iface)
+        timerInterface = NULL;
 }
 
 void JSONRequest::parse(const UniValue& valRequest)
@@ -638,12 +643,11 @@ std::string HelpExampleRpc(string methodname, string args)
 
 void RPCRunLater(const std::string& name, boost::function<void(void)> func, int64_t nSeconds)
 {
-    if (timerInterfaces.empty())
+    if (!timerInterface)
         throw JSONRPCError(RPC_INTERNAL_ERROR, "No timer handler registered for RPC");
     deadlineTimers.erase(name);
-    RPCTimerInterface* timerInterface = timerInterfaces[0];
     LogPrint("rpc", "queue run of timer %s in %i seconds (using %s)\n", name, nSeconds, timerInterface->Name());
-    deadlineTimers.insert(std::make_pair(name, timerInterface->NewTimer(func, nSeconds)));
+    deadlineTimers.emplace(name, std::unique_ptr<RPCTimerBase>(timerInterface->NewTimer(func, nSeconds*1000)));
 }
 
 const CRPCTable tableRPC;
