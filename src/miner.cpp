@@ -1131,5 +1131,10 @@ bool ProcessBlockFound(CBlock* pblock, CWallet& wallet, CReserveKey& reservekey)
         return error("LUXMiner : ProcessNewBlock, block not accepted");
     }
 
+    {
+        LOCK(stake->stakeMiner.lock);
+        stake->stakeMiner.nBlocksAccepted++;
+    }
+
     return true;
 }
