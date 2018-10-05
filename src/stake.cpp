@@ -781,10 +781,10 @@ bool Stake::CreateCoinStake(CWallet* wallet, const CKeyStore& keystore, unsigned
         double dStakeKernelDiff = GetBlockDifficulty(nBits);
         dStakeDiffSum += dStakeKernelDiff;
         dStakeDiffMax = std::max(dStakeDiffMax, dStakeKernelDiff);
-        uint64_t coinAge = 0;
-        if (GetCoinAge(*pcoin.first, pcoin.first->nTime, coinAge)) {
-            nStakeCoinAgeSum += coinAge;
-        }
+//        uint64_t coinAge = 0;
+//        if (GetCoinAge(*pcoin.first, pcoin.first->nTime, coinAge)) {
+//            nStakeCoinAgeSum += coinAge;
+//        }
 
         //iterates each utxo inside of CheckStakeKernelHash()
         if (CheckHash(pindex->pprev, nStakeTarget, block, *pcoin.first, prevoutStake, nTxNewTime, hashProofOfStake)) {
