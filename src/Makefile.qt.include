@@ -262,12 +262,14 @@ BITCOIN_QT_H = \
   qt/qvaluecombobox.h \
   qt/receivecoinsdialog.h \
   qt/receiverequestdialog.h \
+  qt/receivetokenpage.h \
   qt/recentrequeststablemodel.h \
   qt/restoredialog.h \
   qt/rpcconsole.h \
   qt/sendcoinsdialog.h \
   qt/sendcoinsentry.h \
   qt/sendtocontract.h \
+  qt/sendtokenpage.h \
   qt/signverifymessagedialog.h \
   qt/smartcontract.h \
   qt/splashscreen.h \
@@ -325,6 +327,7 @@ RES_ICONS = \
   qt/res/icons/clock3.png \
   qt/res/icons/clock4.png \
   qt/res/icons/clock5.png \
+  qt/res/icons/conf.png \
   qt/res/icons/configure.png \
   qt/res/icons/connect0_16.png \
   qt/res/icons/connect1_16.png \

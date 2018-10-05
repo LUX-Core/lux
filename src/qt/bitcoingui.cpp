@@ -729,10 +729,10 @@ void BitcoinGUI::setClientModel(ClientModel* clientModel) {
         unitDisplayControl->setOptionsModel(nullptr);
 
 #ifdef Q_OS_MAC
-        if(dockIconMenu)
+        if(trayIconMenu)
         {
             // Disable context menu on dock icon
-            dockIconMenu->clear();
+            trayIconMenu->clear();
         }
 #endif
     }
