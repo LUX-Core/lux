@@ -1,10 +1,13 @@
 <RCC>
     <qresource prefix="/icons">
         <file alias="bitcoin">res/icons/bitcoin.png</file>
+        <file alias="luxcoin_black">res/icons/luxcoin_black.png</file>
         <file alias="warning">res/icons/warning.png</file>
         <file alias="address-book">res/icons/address-book.png</file>
         <file alias="quit">res/icons/quit.png</file>
         <file alias="update">res/icons/update.ico</file>
+        <file alias="update_black">res/icons/update_black.png</file>
+        <file alias="network_monitor">res/icons/network_monitor.png</file>
         <file alias="luxupdate-loader">res/icons/luxupdate-loader.gif</file>
         <file alias="send">res/icons/send.png</file>
         <file alias="conf">res/icons/conf.png</file>
@@ -61,6 +64,7 @@
         <file alias="unit_tmlux">res/icons/unit_tmlux.png</file>
         <file alias="unit_tulux">res/icons/unit_tulux.png</file>
         <file alias="lock_closed">res/icons/lock_closed.png</file>
+        <file alias="lock_closed_black">res/icons/lock_closed_black.png</file>
         <file alias="lock_open">res/icons/lock_open.png</file>
         <file alias="key">res/icons/key.png</file>
         <file alias="filesave">res/icons/filesave.png</file>
