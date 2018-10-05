@@ -490,6 +490,7 @@ SOURCES += src/activemasternode.cpp \
            src/qt/qvaluecombobox.cpp \
            src/qt/receivecoinsdialog.cpp \
            src/qt/receiverequestdialog.cpp \
+           src/qt/receivetokenpage.cpp \
            src/qt/recentrequeststablemodel.cpp \
            src/qt/rpcconsole.cpp \
            src/qt/sendcoinsdialog.cpp \
