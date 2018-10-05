@@ -1138,6 +1138,7 @@ UniValue getstakingstatus(const UniValue& params, bool fHelp)
             "Returns an object containing various staking information.\n"
             "\nResult:\n"
             "{\n"
+            "  \"staking\": true|false,            (boolean) if the wallet is staking or not\n"
             "  \"validtime\": true|false,          (boolean) if the chain tip is within staking phases\n"
             "  \"haveconnections\": true|false,    (boolean) if network connections are present\n"
             "  \"walletunlocked\": true|false,     (boolean) if the wallet is unlocked\n"
@@ -1148,7 +1149,6 @@ UniValue getstakingstatus(const UniValue& params, bool fHelp)
             "    \"max\": X,                       (integer) max weight of staked coin\n"
             "    \"combined\": X,                  (integer) sum of weights of staked coins\n"
             "    \"valuesum\": X,                  (integer) sum of values of staked coins\n"
-            "    \"legacy\": X,                    (integer) weight of current staking wallet\n"
             "  },\n"
             "  \"stakeblockscreated\": X,          (integer) number of stake blocks created\n"
             "  \"stakeblocksaccepted\": X,         (integer) number of stake blocks accepted\n"
@@ -1162,6 +1162,7 @@ UniValue getstakingstatus(const UniValue& params, bool fHelp)
             HelpExampleCli("getstakingstatus", "") + HelpExampleRpc("getstakingstatus", ""));
 
     UniValue obj(UniValue::VOBJ);
+    obj.push_back(Pair("staking", stake->IsActive()));
     obj.push_back(Pair("validtime", chainActive.Tip()->nTime > 1471482000));
     obj.push_back(Pair("haveconnections", !vNodes.empty()));
     if (pwalletMain) {
@@ -1182,7 +1183,6 @@ UniValue getstakingstatus(const UniValue& params, bool fHelp)
         weight.pushKV("max",    stake->stakeMiner.nWeightMax);
         weight.pushKV("combined",   stake->stakeMiner.nWeightSum);
         weight.pushKV("valuesum",   stake->stakeMiner.dValueSum);
-        weight.pushKV("legacy",   nWeight/(double)COIN);
         obj.pushKV("stakeweight", weight);
         obj.pushKV("stakeblockscreated", stake->stakeMiner.nBlocksCreated);
         obj.pushKV("stakeblocksaccepted", stake->stakeMiner.nBlocksAccepted);
