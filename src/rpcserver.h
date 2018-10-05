@@ -93,16 +93,6 @@ public:
     HTTPRequest *req;
 };
 
-class AcceptedConnection
-{
-public:
-    virtual ~AcceptedConnection() {}
-
-    virtual std::iostream& stream() = 0;
-    virtual std::string peer_address_to_string() const = 0;
-    virtual void close() = 0;
-};
-
 class JSONRPCRequest
 {
 public:
@@ -158,23 +148,8 @@ public:
     // FIXME: make this private?
     HTTPRequest *req;
 };
-
-/** Start RPC threads */
-void StartRPCThreads();
-/**
- * Alternative to StartRPCThreads for the GUI, when no server is
- * used. The RPC thread in this case is only used to handle timeouts.
- * If real RPC threads have already been started this is a no-op.
- */
-void StartDummyRPCThread();
-/** Stop RPC threads */
-void StopRPCThreads();
 /** Query whether RPC is running */
 bool IsRPCRunning();
-
-
-
-
 
 /** 
  * Set
@@ -204,29 +179,6 @@ void RPCTypeCheckObj(const UniValue& o,
     const std::map<std::string, UniValue::VType>& typesExpected,
     bool fAllowNull = false);
 
-/**
- * Run func nSeconds from now. Uses boost deadline timers.
- * Overrides previous timer <name> (if any).
- */
-void RPCRunLater(const std::string& name, boost::function<void(void)> func, int64_t nSeconds);
-
-//! Convert boost::asio address to CNetAddr
-extern CNetAddr BoostAsioToCNetAddr(boost::asio::ip::address address);
-
-typedef UniValue (*rpcfn_type)(const UniValue& params, bool fHelp);
-
-void RPCRunLater(const std::string& name, boost::function<void(void)> func, int64_t nSeconds);
-
-class CRPCCommand
-{
-public:
-    std::string category;
-    std::string name;
-    rpcfn_type actor;
-    bool okSafeMode;
-    bool threadSafe;
-    bool reqWallet;
-};
 
 /** Opaque base class for timers returned by NewTimerFunc.
  * This provides no methods at the moment, but makes sure that delete
@@ -261,6 +213,24 @@ void RPCRegisterTimerInterface(RPCTimerInterface *iface);
 /** Unregister factory function for timers */
 void RPCUnregisterTimerInterface(RPCTimerInterface *iface);
 
+/**
+ * Run func nSeconds from now.
+ * Overrides previous timer <name> (if any).
+ */
+void RPCRunLater(const std::string& name, boost::function<void(void)> func, int64_t nSeconds);
+
+typedef UniValue(*rpcfn_type)(const UniValue& params, bool fHelp);
+
+class CRPCCommand
+{
+public:
+    std::string category;
+    std::string name;
+    rpcfn_type actor;
+    bool okSafeMode;
+    bool threadSafe;
+    bool reqWallet;
+};
 /**
  * LUX RPC command dispatcher.
  */
@@ -300,9 +270,6 @@ extern uint256 ParseHashV(const UniValue& v, std::string strName);
 extern uint256 ParseHashO(const UniValue& o, std::string strKey);
 extern std::vector<unsigned char> ParseHexV(const UniValue& v, std::string strName);
 extern std::vector<unsigned char> ParseHexO(const UniValue& o, std::string strKey);
-
-extern void InitRPCMining();
-extern void ShutdownRPCMining();
 
 extern int64_t nWalletUnlockTime;
 extern CAmount AmountFromValue(const UniValue& value);
@@ -461,11 +428,10 @@ extern UniValue gettransactionreceipt(const UniValue& params, bool fHelp);
 extern UniValue searchlogs(const UniValue& params, bool fHelp);
 extern UniValue pruneblockchain(const UniValue& params, bool fHelp);
 
-// in rest.cpp
-extern bool HTTPReq_REST(AcceptedConnection* conn,
-    std::string& strURI,
-    std::map<std::string, std::string>& mapHeaders,
-    bool fRun);
+bool StartRPC();
+void InterruptRPC();
+void StopRPC();
 std::string JSONRPCExecBatch(const UniValue& vReq);
+void RPCNotifyBlockChange(bool ibd, const CBlockIndex* pindex);
 
 #endif // BITCOIN_RPCSERVER_H
