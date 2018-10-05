@@ -138,7 +138,6 @@ bool fSpentIndex = false;
 bool fIsBareMultisigStd = true;
 bool fRequireStandard = true;
 bool fCheckBlockIndex = false;
-extern size_t nCoinCacheUsage;
 size_t nCoinCacheUsage = 5000 * 300;
 unsigned int nBytesPerSigOp = DEFAULT_BYTES_PER_SIGOP;
 bool fAlerts = DEFAULT_ALERTS;
@@ -5377,15 +5376,19 @@ bool CVerifyDB::VerifyDB(const CChainParams& chainparams, CCoinsView* coinsview,
             CDiskBlockPos pos = pindex->GetUndoPos();
             if (!pos.IsNull()) {
                 if (!UndoReadFromDisk(undo, pos, pindex->pprev->GetBlockHash()))
-                    return error("VerifyDB() : *** found bad undo data at %d, hash=%s\n", pindex->nHeight, pindex->GetBlockHash().ToString());
+                    return error("VerifyDB: *** found bad undo data at %d, hash=%s\n", pindex->nHeight, pindex->GetBlockHash().GetHex());
             }
         }
+        if ((coins.DynamicMemoryUsage() + pcoinsTip->DynamicMemoryUsage()) > nCoinCacheUsage) {
+            LogPrintf("%s: WARNING nCoinCache reached (%zu > %zu), please increase -dbcache\n", __func__,
+                    (coins.DynamicMemoryUsage() + pcoinsTip->DynamicMemoryUsage()), nCoinCacheUsage);
+        }
         // check level 3: check for inconsistencies during memory-only disconnect of tip blocks
-        if (nCheckLevel >= 3 && (coins.DynamicMemoryUsage() + pcoinsTip->DynamicMemoryUsage()) <= nCoinCacheUsage) {
+        if (nCheckLevel >= 3) {
             bool fClean = true;
             DisconnectResult res = DisconnectBlock(block, state, pindex, coins, &fClean);
             if (res == DISCONNECT_FAILED) {
-                return error("VerifyDB() : *** irrecoverable inconsistency in block data at %d, hash=%s",
+                return error("VerifyDB: *** irrecoverable inconsistency in block data at %d, hash=%s",
                              pindex->nHeight, pindex->GetBlockHash().ToString());
             }
             if (res == DISCONNECT_UNCLEAN) {
@@ -5413,8 +5416,7 @@ bool CVerifyDB::VerifyDB(const CChainParams& chainparams, CCoinsView* coinsview,
             pindex = chainActive.Next(pindex);
             CBlock block;
             if (!ReadBlockFromDisk(block, pindex, chainparams.GetConsensus()))
-                return error("VerifyDB: *** ReadBlockFromDisk failed at %d, hash=%s", pindex->nHeight, pindex->GetBlockHash().ToString());
-
+                return error("VerifyDB: *** ReadBlockFromDisk failed at %d, hash=%s", pindex->nHeight, pindex->GetBlockHash().GetHex());
             oldHashStateRoot = getGlobalStateRoot(pindex);
             oldHashUTXORoot = getGlobalStateUTXO(pindex);
             if (!ConnectBlock(block, state, pindex, coins, chainparams)) {
@@ -5424,8 +5426,7 @@ bool CVerifyDB::VerifyDB(const CChainParams& chainparams, CCoinsView* coinsview,
                     if (pstorageresult != nullptr)
                         pstorageresult->clearCacheResult();
                 }
-
-                return error("VerifyDB: *** found unconnectable block at %d, hash=%s", pindex->nHeight, pindex->GetBlockHash().ToString());
+                return error("VerifyDB: *** found unconnectable block at %d, hash=%s", pindex->nHeight, pindex->GetBlockHash().GetHex());
             }
         }
     } else if (chainActive.Height() >= chainparams.FirstSCBlock()) {
