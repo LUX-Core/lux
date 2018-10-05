@@ -64,7 +64,7 @@ public:
     void update(const_iterator itIn, const mapped_type& v)
     {
         // TODO: When we switch to C++11, use map.erase(itIn, itIn) to get the non-const iterator.
-        iterator itTarget = map.find(itIn->first);
+        iterator itTarget = map.erase(itIn, itIn);
         if (itTarget == map.end())
             return;
         std::pair<rmap_iterator, rmap_iterator> itPair = rmap.equal_range(itTarget->second);
