@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1024</width>
+    <width>960</width>
     <height>617</height>
    </rect>
   </property>
@@ -523,6 +523,9 @@
            <widget class="QTableView" name="tableHistory">
             <property name="contextMenuPolicy">
              <enum>Qt::CustomContextMenu</enum>
+            </property>
+            <property name="autoFillBackground">
+             <bool>true</bool>
             </property>
             <property name="styleSheet">
              <string notr="true">font-size:12px</string>
@@ -1615,7 +1618,7 @@
                </property>
                <property name="sizeHint" stdset="0">
                 <size>
-                 <width>40</width>
+                 <width>20</width>
                  <height>20</height>
                 </size>
                </property>
@@ -1849,7 +1852,7 @@
                </property>
                <property name="sizeHint" stdset="0">
                 <size>
-                 <width>40</width>
+                 <width>20</width>
                  <height>20</height>
                 </size>
                </property>
@@ -2029,9 +2032,12 @@
            <height>50</height>
           </size>
          </property>
+         <property name="autoFillBackground">
+          <bool>false</bool>
+         </property>
          <layout class="QVBoxLayout" name="action_panel">
           <property name="spacing">
-           <number>9</number>
+           <number>3</number>
           </property>
           <property name="leftMargin">
            <number>0</number>
@@ -2043,8 +2049,27 @@
            <number>0</number>
           </property>
           <property name="bottomMargin">
-           <number>0</number>
+           <number>9</number>
           </property>
+          <item>
+           <widget class="QLabel" name="label_9">
+            <property name="font">
+             <font>
+              <weight>75</weight>
+              <bold>true</bold>
+             </font>
+            </property>
+            <property name="text">
+             <string>STATUS</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QTableWidget" name="tableWidget"/>
+          </item>
          </layout>
         </widget>
        </item>
