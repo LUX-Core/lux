@@ -3397,7 +3397,7 @@ DBErrors CWallet::LoadWallet(bool& fFirstRunRet)
             setInternalKeyPool.clear();
             setExternalKeyPool.clear();
             nKeysLeftSinceAutoBackup = 0;
-            m_pool_key_to_index.clear();
+//            m_pool_key_to_index.clear();
             // Note: can't top-up keypool here, because wallet is locked.
             // User will be prompted to unlock wallet the next operation
             // the requires a new key.
@@ -3426,7 +3426,7 @@ DBErrors CWallet::ZapWalletTx(std::vector<CWalletTx>& vWtx)
             setInternalKeyPool.clear();
             setExternalKeyPool.clear();
             nKeysLeftSinceAutoBackup = 0;
-            m_pool_key_to_index.clear();
+//            m_pool_key_to_index.clear();
             // Note: can't top-up keypool here, because wallet is locked.
             // User will be prompted to unlock wallet the next operation
             // that requires a new key.
@@ -3511,7 +3511,7 @@ bool CWallet::NewKeyPool()
         }
         setExternalKeyPool.clear();
         nKeysLeftSinceAutoBackup = 0;
-        m_pool_key_to_index.clear();
+//        m_pool_key_to_index.clear();
 //        darkSendClient.fEnableDarkSend = false;
 
         if (!TopUpKeyPool()) {
@@ -3533,7 +3533,7 @@ size_t CWallet::KeypoolCountInternalKeys()
     AssertLockHeld(cs_wallet); // setInternalKeyPool
     return setInternalKeyPool.size();
 }
-
+/*
 void CWallet::LoadKeyPool(int64_t nIndex, const CKeyPool &keypool)
 {
     AssertLockHeld(cs_wallet);
@@ -3552,7 +3552,7 @@ void CWallet::LoadKeyPool(int64_t nIndex, const CKeyPool &keypool)
     if (mapKeyMetadata.count(keyid) == 0)
         mapKeyMetadata[keyid] = CKeyMetadata(keypool.nTime);
 }
-
+*/
 bool CWallet::TopUpKeyPool(unsigned int kpSize)
 {
     {
@@ -3594,8 +3594,8 @@ bool CWallet::TopUpKeyPool(unsigned int kpSize)
             if (!setExternalKeyPool.empty()) {
                 nEnd = std::max(nEnd, *(--setExternalKeyPool.end()) + 1);
             }
-            assert(m_max_keypool_index < std::numeric_limits<int64_t>::max()); // How in the hell did you use so many keys?
-            int64_t index = ++m_max_keypool_index;
+//            assert(m_max_keypool_index < std::numeric_limits<int64_t>::max()); // How in the hell did you use so many keys?
+//            int64_t index = ++m_max_keypool_index;
 
             if (!walletdb.WritePool(nEnd, CKeyPool(GenerateNewKey(0, internal), internal)))
                 throw runtime_error("TopUpKeyPool(): writing generated key failed");
@@ -3605,6 +3605,7 @@ bool CWallet::TopUpKeyPool(unsigned int kpSize)
             } else {
                 setExternalKeyPool.insert(nEnd);
             }
+            LogPrintf("keypool added key %d, size=%u, internal=%d\n", nEnd, setInternalKeyPool.size() + setExternalKeyPool.size(), internal);
 
             double dProgress = 100.f * nEnd / (nTargetSize + 1);
             if (dProgress < 100.1) {
@@ -3612,9 +3613,9 @@ bool CWallet::TopUpKeyPool(unsigned int kpSize)
                 uiInterface.InitMessage(strMsg);
             }
         }
-        if (missingInternal + missingExternal > 0) {
-            LogPrintf("keypool added %d keys (%d internal), size=%u (%u internal)\n", missingInternal + missingExternal, missingInternal, setInternalKeyPool.size() + setExternalKeyPool.size(), setInternalKeyPool.size());
-        }
+//        if (missingInternal + missingExternal > 0) {
+//            LogPrintf("keypool added %d keys (%d internal), size=%u (%u internal)\n", missingInternal + missingExternal, missingInternal, setInternalKeyPool.size() + setExternalKeyPool.size(), setInternalKeyPool.size());
+//        }
     }
     return true;
 }
@@ -3658,7 +3659,7 @@ void CWallet::ReserveKeyFromKeyPool(int64_t& nIndex, CKeyPool& keypool, bool int
             return;
         }
 
-        m_pool_key_to_index.erase(keypool.vchPubKey.GetID());
+//        m_pool_key_to_index.erase(keypool.vchPubKey.GetID());
         LogPrintf("keypool reserve %d\n", nIndex);
     }
 }
@@ -3669,8 +3670,9 @@ void CWallet::KeepKey(int64_t nIndex)
     if (fFileBacked) {
         CWalletDB walletdb(strWalletFile);
         walletdb.ErasePool(nIndex);
+        nKeysLeftSinceAutoBackup = nWalletBackups ? nKeysLeftSinceAutoBackup - 1 : 0;
     }
-    //LogPrintf("keypool keep %d\n", nIndex);
+    LogPrintf("keypool keep %d\n", nIndex);
 }
 
 void CWallet::ReturnKey(int64_t nIndex, bool internal, const CPubKey& pubkey)
@@ -3683,9 +3685,9 @@ void CWallet::ReturnKey(int64_t nIndex, bool internal, const CPubKey& pubkey)
         } else {
             setExternalKeyPool.insert(nIndex);
         }
-        m_pool_key_to_index[pubkey.GetID()] = nIndex;
+//        m_pool_key_to_index[pubkey.GetID()] = nIndex;
     }
-    //LogPrintf("keypool return %d\n", nIndex);
+    LogPrintf("keypool return %d\n", nIndex);
 }
 
 bool CWallet::GetKeyFromPool(CPubKey& result, bool internal)

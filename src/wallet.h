@@ -326,8 +326,6 @@ public:
 
     bool SelectCoinsCollateral(std::vector<CTxIn>& setCoinsRet, int64_t& nValueRet) const;
 
-    void LoadKeyPool(int64_t nIndex, const CKeyPool &keypool);
-
     /*
      * Main wallet lock.
      * This lock protects all the fields added by CWallet
