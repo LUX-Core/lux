@@ -1808,8 +1808,12 @@ void StartNode(boost::thread_group& threadGroup, CScheduler& scheduler) {
     // Load addresses for peers.dat
     int64_t nStart = GetTimeMillis();{
         CAddrDB adb;
-        if (!adb.Read(addrman))
+        if (adb.Read(addrman))
+            LogPrintf("Loaded %i addresses from peers.dat  %dms\n", addrman.size(), GetTimeMillis() - nStart);
+        else {
             LogPrintf("Invalid or missing peers.dat; recreating\n");
+            DumpAddresses();
+        }
     }
 
     //try to read stored banlist
@@ -1822,8 +1826,11 @@ void StartNode(boost::thread_group& threadGroup, CScheduler& scheduler) {
 
         LogPrint("net", "Loaded %d banned node ips/subnets from banlist.dat  %dms\n",
                  banmap.size(), GetTimeMillis() - nStart);
-    } else
+    } else {
         LogPrintf("Invalid or missing banlist.dat; recreating\n");
+        CNode::SetBannedSetDirty(true);
+        DumpBanlist();
+    }
 
     fAddressesInitialized = true;
 
