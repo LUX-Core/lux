@@ -3601,12 +3601,12 @@ bool CWallet::TopUpKeyPool(unsigned int kpSize)
                 throw runtime_error("TopUpKeyPool(): writing generated key failed");
 
             if (internal) {
-                setInternalKeyPool.insert(index);
+                setInternalKeyPool.insert(nEnd);
             } else {
-                setExternalKeyPool.insert(index);
+                setExternalKeyPool.insert(nEnd);
             }
 
-            double dProgress = 100.f * index / (nTargetSize + 1);
+            double dProgress = 100.f * nEnd / (nTargetSize + 1);
             if (dProgress < 100.1) {
                 std::string strMsg = strprintf(_("Loading wallet... (%3.2f %%)"), dProgress);
                 uiInterface.InitMessage(strMsg);
