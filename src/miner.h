@@ -266,9 +266,9 @@ private:
 
     // Methods for how to add transactions to a block.
     /** Add transactions based on tx "priority" */
-    void addPriorityTxs(uint64_t minGasPrice);
+    void addPriorityTxs(uint64_t minGasPrice, const bool fProofOfStake);
     /** Add transactions based on feerate including unconfirmed ancestors */
-    void addPackageTxs(uint64_t minGasPrice);
+    void addPackageTxs(uint64_t minGasPrice, const bool fProofOfStake);
 
     // helper function for addPriorityTxs
     /** Test if tx will still "fit" in the block */

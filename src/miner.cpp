@@ -180,12 +180,12 @@ void BlockAssembler::resetBlock()
     blockFinished = false;
 }
 
-void BlockAssembler::RebuildRefundTransaction(){
-    int refundtx=0; //0 for coinbase in PoW
-    CMutableTransaction contrTx(originalRewardTx);
+void BlockAssembler::RebuildRefundTransaction()
+{
     if (!pblock->IsProofOfStake()) {
-        refundtx=0;
+        int refundtx=0;  //0 for coinbase in PoW
 
+        CMutableTransaction contrTx(originalRewardTx);
         CAmount powReward = GetProofOfWorkReward(0, nHeight);
         CAmount totalReward = powReward + nFees;
         CAmount minerReward = 0;
@@ -217,21 +217,9 @@ void BlockAssembler::RebuildRefundTransaction(){
             contrTx.vout[i]=vout;
             i++;
         }
-    } else {
-        refundtx=1;
-//        contrTx.vout[refundtx].nValue -= bceResult.refundSender;
-//
-//        int i=contrTx.vout.size();
-//        contrTx.vout.resize(contrTx.vout.size()+bceResult.refundOutputs.size());
-//        for(CTxOut& vout : bceResult.refundOutputs){
-//            contrTx.vout[i]=vout;
-//            i++;
-//        }
+
+        pblock->vtx[refundtx] = std::move(CTransaction(contrTx));
     }
-
-    //note, this will need changed for MPoS
-
-    pblock->vtx[refundtx] = std::move(CTransaction(contrTx));
 }
 
 std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlockWithKey(CReserveKey& reservekey, bool fMineWitnessTx, bool fProofOfStake, int64_t* pTotalFees, int32_t txProofTime, int32_t nTimeLimit)
@@ -376,8 +364,8 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
     dev::h256 oldHashStateRoot = getGlobalStateRoot(pindexState);
     dev::h256 oldHashUTXORoot = getGlobalStateUTXO(pindexState);
 
-    addPriorityTxs(minGasPrice);
-    addPackageTxs(minGasPrice);
+    addPriorityTxs(minGasPrice, fProofOfStake);
+    addPackageTxs(minGasPrice, fProofOfStake);
 
     if (chainActive.Height() >= chainparams.FirstSCBlock()) {
         pblock->hashStateRoot = h256Touint(getGlobalStateRoot(pindexState));
@@ -393,7 +381,8 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
     RebuildRefundTransaction();
 
     if (fProofOfStake && bceResult.refundOutputs.size()) {
-        // for now, avoid processing SC in PoS blocks
+        // SC txs are not processed in PoS blocks
+        LogPrintf("%s: PoS Block generation skipped due to %zu SC refund\n", __func__, bceResult.refundOutputs.size());
         return nullptr;
     }
     ////////////////////////////////////////////////////////
@@ -782,7 +771,7 @@ void BlockAssembler::SortForBlock(const CTxMemPool::setEntries& package, CTxMemP
 // Each time through the loop, we compare the best transaction in
 // mapModifiedTxs with the next transaction in the mempool to decide what
 // transaction package to work on next.
-void BlockAssembler::addPackageTxs(uint64_t minGasPrice)
+void BlockAssembler::addPackageTxs(uint64_t minGasPrice, const bool fProofOfStake)
 {
     // mapModifiedTx will store sorted packages after they are modified
     // because some of their txs are already in the block
@@ -914,9 +903,15 @@ void BlockAssembler::addPackageTxs(uint64_t minGasPrice)
             const CTransaction& tx = sortedEntries[i]->GetTx();
             if(wasAdded) {
                 if (tx.HasCreateOrCall()) {
-                    wasAdded = AttemptToAddContractToBlock(sortedEntries[i], minGasPrice);
-                    if(!wasAdded){
-                        if(fUsingModified) {
+                    if (fProofOfStake) {
+                        wasAdded = false; // SC txs not allowed on PoS
+                        if (fUsingModified) {
+                            mapModifiedTx.get<ancestor_score_or_gas_price>().erase(modit);
+                            failedTx.insert(iter);
+                        }
+                    } else {
+                        wasAdded = AttemptToAddContractToBlock(sortedEntries[i], minGasPrice);
+                        if(!wasAdded && fUsingModified) {
                             //this only needs to be done once to mark the whole package (everything in sortedEntries) as failed
                             mapModifiedTx.get<ancestor_score_or_gas_price>().erase(modit);
                             failedTx.insert(iter);
@@ -940,7 +935,7 @@ void BlockAssembler::addPackageTxs(uint64_t minGasPrice)
     }
 }
 
-void BlockAssembler::addPriorityTxs(uint64_t minGasPrice)
+void BlockAssembler::addPriorityTxs(uint64_t minGasPrice, const bool fProofOfStake)
 {
     // How much of the block should be dedicated to high-priority transactions,
     // included regardless of the fees they pay
@@ -1008,8 +1003,9 @@ void BlockAssembler::addPriorityTxs(uint64_t minGasPrice)
             const CTransaction& tx = iter->GetTx();
             bool wasAdded=true;
             if(tx.HasCreateOrCall()) {
+                if (fProofOfStake) continue;
                 wasAdded = AttemptToAddContractToBlock(iter, minGasPrice);
-            }else {
+            } else {
                 AddToBlock(iter);
             }
 
