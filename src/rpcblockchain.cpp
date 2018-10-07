@@ -186,17 +186,18 @@ UniValue getrawmempool(const UniValue& params, bool fHelp)
             "  \"transactionid\"     (string) The transaction id\n"
             "  ,...\n"
             "]\n"
-            "\nResult: (for verbose = true):\n"
-            "{                           (json object)\n"
-            "  \"transactionid\" : {       (json object)\n"
+            "\nResult: (for verbose = true): [\n"
+            "  {                           (json object)\n"
+            "    \"txid\", \"...\",          (string)  the transaction id\n"
+            "    \"hash\", \"...\",          (string)  the transaction hash\n"
             "    \"size\" : n,             (numeric) transaction size in bytes\n"
             "    \"fee\" : n,              (numeric) transaction fee in lux\n"
-            "    \"time\" : n,             (numeric) local time transaction entered pool in seconds since 1 Jan 1970 GMT\n"
+            "    \"time\" : n,             (numeric) unix timestamp when transaction entered the mempool\n"
             "    \"height\" : n,           (numeric) block height when transaction entered pool\n"
             "    \"startingpriority\" : n, (numeric) priority when transaction entered pool\n"
             "    \"currentpriority\" : n,  (numeric) transaction priority now\n"
-            "    \"depends\" : [           (array) unconfirmed transactions used as inputs for this transaction\n"
-            "        \"transactionid\",    (string) parent transaction id\n"
+            "    \"depends\" : [           (array)   unconfirmed transactions used as inputs for the transaction\n"
+            "        \"transactionid\",    (string)  parent transaction id\n"
             "       ... ]\n"
             "  }, ...\n"
             "]\n"
@@ -213,8 +214,11 @@ UniValue getrawmempool(const UniValue& params, bool fHelp)
         LOCK(mempool.cs);
         UniValue o(UniValue::VARR);
         for (const CTxMemPoolEntry& e : mempool.mapTx) {
-            const uint256& hash = e.GetTx().GetHash();
+            const uint256& txid = e.GetTx().GetHash();
+            const uint256& hash = e.GetTx().GetWitnessHash();
             UniValue info(UniValue::VOBJ);
+            info.push_back(Pair("txid", txid.GetHex()));
+            info.push_back(Pair("hash", hash.GetHex()));
             info.push_back(Pair("size", (int)e.GetTxSize()));
             info.push_back(Pair("fee", ValueFromAmount(e.GetFee())));
             info.push_back(Pair("time", e.GetTime()));
@@ -229,13 +233,12 @@ UniValue getrawmempool(const UniValue& params, bool fHelp)
             }
             UniValue depends(UniValue::VARR);
 
-            for (const std::string& dep : setDepends)
-            {
+            for (const std::string& dep : setDepends) {
                   depends.push_back(dep);
             }
 
             info.push_back(Pair("depends", depends));
-            o.push_back(Pair(hash.ToString(), info));
+            o.push_back(info);
         }
         return o;
     } else {
