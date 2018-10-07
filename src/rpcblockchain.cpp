@@ -1066,20 +1066,24 @@ UniValue getblockchaininfo(const UniValue& params, bool fHelp)
             "Returns an object containing various state info regarding block chain processing.\n"
             "\nResult:\n"
             "{\n"
-            "  \"chain\": \"xxxx\",        (string) current network name as defined in BIP70 (main, test, regtest)\n"
+            "  \"chain\": \"xxxx\",          (string) current network name as defined in BIP70 (main, test, regtest)\n"
             "  \"blocks\": xxxxxx,         (numeric) the current number of blocks processed in the server\n"
             "  \"headers\": xxxxxx,        (numeric) the current number of headers we have validated\n"
-            "  \"bestblockhash\": \"...\", (string) the hash of the currently best block\n"
+            "  \"bestblockhash\": \"...\",   (string) the hash of the currently best block\n"
             "  \"difficulty\": xxxxxx,     (numeric) the current difficulty\n"
             "  \"mediantime\": xxxxxx,     (numeric) median time for the current best block\n"
-            "  \"verificationprogress\": xxxx, (numeric) estimate of verification progress [0..1]\n"
-            "  \"chainwork\": \"xxxx\"     (string) total amount of work in active chain, in hexadecimal\n"
-            "  \"bip9_softforks\": {          (object) status of BIP9 softforks in progress\n"
-            "     \"xxxx\" : {                (string) name of the softfork\n"
-            "        \"status\": \"xxxx\",    (string) one of \"defined\", \"started\", \"lockedin\", \"active\", \"failed\"\n"
-            "        \"bit\": xx,             (numeric) the bit, 0-28, in the block version field used to signal this soft fork\n"
-            "        \"startTime\": xx,       (numeric) the minimum median time past of a block at which the bit gains its meaning\n"
-            "        \"timeout\": xx          (numeric) the median time past of a block at which the deployment is considered failed if not yet locked in\n"
+            "  \"verificationprogress\": x, (number) estimate of verification progress [0..1]\n"
+            "  \"chainwork\": \"xxxx\",      (string) total amount of work in active chain, in hexadecimal\n"
+            "  \"logevents\": true|false,  (boolean) show the current -logevents setting\n"
+            "  \"addressindex\": false,    (boolean) show the current -addressindex setting\n"
+            "  \"spentindex\": true|false, (boolean) show the current -spentindex setting\n"
+            "  \"txindex\": true|false,    (boolean) show the current -txindex setting\n"
+            "  \"bip9_softforks\": {       (object) status of BIP9 softforks in progress\n"
+            "     \"xxxx\" : {             (string) name of the softfork\n"
+            "        \"status\": \"xxxx\",   (string) one of \"defined\", \"started\", \"lockedin\", \"active\", \"failed\"\n"
+            "        \"bit\": xx,          (numeric) the bit, 0-28, in the block version field used to signal this soft fork\n"
+            "        \"startTime\": xx,    (numeric) the minimum median time past of a block at which the bit gains its meaning\n"
+            "        \"timeout\": xx       (numeric) the median time past of a block at which the deployment is considered failed if not yet locked in\n"
             "     }\n"
             "  }\n"
             "}\n"
@@ -1099,6 +1103,10 @@ UniValue getblockchaininfo(const UniValue& params, bool fHelp)
     obj.push_back(Pair("mediantime",            (int64_t)chainActive.Tip()->GetMedianTimePast()));
     obj.push_back(Pair("verificationprogress",  Checkpoints::GuessVerificationProgress(Params().Checkpoints(), chainActive.Tip())));
     obj.push_back(Pair("chainwork",             chainActive.Tip()->nChainWork.GetHex()));
+    obj.push_back(Pair("logevents",             fLogEvents));
+    obj.push_back(Pair("addressindex",          fAddressIndex));
+    obj.push_back(Pair("spentindex",            fSpentIndex));
+    obj.push_back(Pair("txindex",               fTxIndex));
 
     const Consensus::Params& consensusParams = Params().GetConsensus();
     UniValue bip9_softforks(UniValue::VOBJ);
