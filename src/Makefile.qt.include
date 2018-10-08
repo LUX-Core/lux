@@ -356,6 +356,8 @@ RES_ICONS = \
   qt/res/icons/overview.png \
   qt/res/icons/smartcontract.png \
   qt/res/icons/luxgate.png \
+  qt/res/icons/rec_luxgate.png \
+  qt/res/icons/send_luxgate.png\
   qt/res/icons/swap.png \
   qt/res/icons/qrcode.png \
   qt/res/icons/lsrtoken.png \

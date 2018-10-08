@@ -1269,7 +1269,7 @@
                 <string/>
                </property>
                <property name="pixmap">
-                <pixmap resource="luxgate.qrc">:/images/receive.png</pixmap>
+                <pixmap resource="../lux.qrc">:/icons/rec_luxgate</pixmap>
                </property>
                <property name="scaledContents">
                 <bool>false</bool>
@@ -1356,7 +1356,7 @@
                 <string/>
                </property>
                <property name="pixmap">
-                <pixmap resource="luxgate.qrc">:/images/Swap.png</pixmap>
+                <pixmap resource="../lux.qrc">:/icons/swap</pixmap>
                </property>
                <property name="scaledContents">
                 <bool>true</bool>
@@ -1396,7 +1396,7 @@
                 <string/>
                </property>
                <property name="pixmap">
-                <pixmap resource="luxgate.qrc">:/images/send.png</pixmap>
+                <pixmap resource="../lux.qrc">:/icons/send_luxgate</pixmap>
                </property>
               </widget>
              </item>
