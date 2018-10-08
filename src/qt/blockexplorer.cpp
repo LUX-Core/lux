@@ -461,7 +461,7 @@ std::string AddressToString(const CTxDestination& Address)
                 continue;
             } else if (!nTxSummed && nEntry > 1) {
                 // avoid partial deltas + TxToRow sum
-                for (AddressIndexVector::const_iterator rit(&aIndex.at(nEntry-1)); rit!=aIndex.begin(); rit--) {
+                for (AddressIndexVector::const_iterator rit = (aIndex.begin() + (nEntry-1)); rit!=aIndex.begin(); rit--) {
                     if (rit->first.txhash != it->first.txhash) break;
                     Sum -= rit->second;
                 }
