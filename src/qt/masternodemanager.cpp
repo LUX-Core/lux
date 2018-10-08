@@ -29,7 +29,6 @@ using namespace std;
 #include <QClipboard>
 #include <QMessageBox>
 #include <QThread>
-#include <QtConcurrent/QtConcurrent>
 #include <QScrollBar>
 #include <QMessageBox>
 

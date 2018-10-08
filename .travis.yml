@@ -37,10 +37,10 @@ env:
 # ARM
     - HOST=arm-linux-gnueabihf PACKAGES="g++-arm-linux-gnueabihf libprotobuf-dev protobuf-compiler libqrencode-dev" CHECK_DOC=0 GOAL="install" BITCOIN_CONFIG="--enable-glibc-back-compat --enable-reduce-exports --disable-tests --disable-zmq --disable-updater"
 # Win32
-#   - HOST=i686-w64-mingw32 DPKG_ADD_ARCH="i386" PACKAGES="python3 nsis wine1.6 bc build-essential libtool autotools-dev automake cmake pkg-config bsdmainutils curl libevent-dev libminiupnpc-dev libzmq3-dev g++-mingw-w64-x86-64 mingw-w64-x86-64-dev g++-mingw-w64-i686 mingw-w64-i686-dev libqrencode-dev qttools5-dev-tools qttools5-dev qtbase5-dev libprotobuf-dev -y" RUN_TESTS=false BITCOIN_CONFIG="--with-gui=qt5 --disable-shared --enable-reduce-exports --disable-updater" GOAL="src/qt/lux-qt.exe"
-    - HOST=i686-w64-mingw32 DPKG_ADD_ARCH="i386" DEP_OPTS="NO_QT=0" PACKAGES="python3 nsis wine1.6 bc build-essential libtool autotools-dev automake cmake pkg-config bsdmainutils curl g++-mingw-w64-x86-64 mingw-w64-x86-64-dev g++-mingw-w64-i686 mingw-w64-i686-dev -y" RUN_TESTS=false GOAL="install" BITCOIN_CONFIG="--enable-reduce-exports --disable-zmq --without-miniupnpc --disable-updater"
+#   - HOST=i686-w64-mingw32 DPKG_ADD_ARCH="i386" PACKAGES="nsis wine1.6 cmake libevent-dev libminiupnpc-dev libzmq3-dev g++-mingw-w64-x86-64 mingw-w64-x86-64-dev g++-mingw-w64-i686 mingw-w64-i686-dev libqrencode-dev qttools5-dev-tools qttools5-dev qtbase5-dev libprotobuf-dev -y" RUN_TESTS=false BITCOIN_CONFIG="--with-gui=qt5 --disable-shared --enable-reduce-exports --disable-updater" GOAL="src/qt/lux-qt.exe"
+    - HOST=i686-w64-mingw32 DPKG_ADD_ARCH="i386" DEP_OPTS="NO_QT=0" PACKAGES="nsis wine1.6 cmake g++-mingw-w64-x86-64 mingw-w64-x86-64-dev g++-mingw-w64-i686 mingw-w64-i686-dev -y" RUN_TESTS=false BITCOIN_CONFIG="--enable-reduce-exports --disable-zmq --without-miniupnpc --disable-updater" GOAL="install"
 # Cross-Mac
-    - HOST=x86_64-apple-darwin14 PPA="ppa:bitcoin/bitcoin" PACKAGES="cmake imagemagick libcap-dev librsvg2-bin libz-dev libbz2-dev libtiff-tools python-dev python3-setuptools-git" BITCOIN_CONFIG="--enable-gui --enable-reduce-exports --disable-tests --disable-zmq --disable-updater" OSX_SDK=10.11 GOAL="all deploy"
+    - HOST=x86_64-apple-darwin14 PPA="ppa:bitcoin/bitcoin" PACKAGES="cmake imagemagick libcap-dev librsvg2-bin libz-dev libbz2-dev libtiff-tools python3-dev python3-setuptools-git" BITCOIN_CONFIG="--with-gui=qt5 --enable-reduce-exports --disable-tests --disable-zmq --disable-updater" OSX_SDK=10.11 GOAL="src/qt/lux-qt"
 #   - HOST=x86_64-apple-darwin11 PPA="ppa:bitcoin/bitcoin" DEP_OPTS="NO_QT=1" PACKAGES="cmake imagemagick libcap-dev librsvg2-bin libz-dev libbz2-dev libtiff-tools python3-dev" BITCOIN_CONFIG="--without-gui --enable-reduce-exports --disable-tests --disable-zmq --disable-updater" OSX_SDK=10.11 GOAL="src/luxd"
 
 before_install:
@@ -48,8 +48,8 @@ before_install:
 install:
     - if [ -n "$PPA" ]; then travis_retry sudo add-apt-repository "$PPA" -y; fi
     - if [ -n "$DPKG_ADD_ARCH" ]; then sudo dpkg --add-architecture "$DPKG_ADD_ARCH" ; fi
-    - if [ -n "$PACKAGES" ]; then travis_retry sudo apt-get update; fi
-    - if [ -n "$PACKAGES" ]; then travis_retry sudo apt-get install --no-install-recommends --no-upgrade --allow-unauthenticated -m -qq $PACKAGES; fi
+    - if [ -n "$PACKAGES" ]; then travis_retry sudo apt-get update --allow-unauthenticated; fi
+    - if [ -n "$PACKAGES" ]; then travis_retry sudo apt-get install --no-install-recommends --no-upgrade --allow-unauthenticated -m -q $PACKAGES; fi
 before_script:
     - unset CC; unset CXX
     - if [ "$CHECK_DOC" = 1 ]; then contrib/devtools/check-doc.py; fi
