@@ -228,7 +228,6 @@ libbitcoin_server_a_SOURCES = \
   validationinterface.cpp \
   versionbits.cpp \
   lux/luxstate.cpp \
-  lux/luxtransaction.cpp \
   lux/luxDGP.cpp \
   lux/storageresults.cpp \
   $(BITCOIN_CORE_H)
@@ -576,7 +575,6 @@ libbitcoin_common_a_SOURCES = \
   cpp-ethereum/libethash/io.h \
   cpp-ethereum/libethash/ethash.h \
   cpp-ethereum/libethash/internal.h \
-  cpp-ethereum/libethash/mmap_win32.c \
   cpp-ethereum/utils/json_spirit/JsonSpiritHeaders.h \
   cpp-ethereum/utils/json_spirit/json_spirit.h \
   cpp-ethereum/utils/json_spirit/json_spirit_error_position.h \
@@ -592,6 +590,7 @@ libbitcoin_common_a_SOURCES = \
 if TARGET_WINDOWS
     libbitcoin_common_a_SOURCES += \
       cpp-ethereum/libethash/io_win32.c \
+      cpp-ethereum/libethash/mmap_win32.c \
       cpp-ethereum/libethash/util_win32.c
 else
     libbitcoin_common_a_SOURCES += cpp-ethereum/libethash/io_posix.c
