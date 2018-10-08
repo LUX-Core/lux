@@ -290,6 +290,12 @@
     </item>
     <item>
      <widget class="QWidget" name="centerpanel" native="true">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
       <layout class="QVBoxLayout" name="verticalLayout_5">
        <property name="spacing">
         <number>0</number>
@@ -1125,7 +1131,7 @@
     <item>
      <widget class="QWidget" name="rightpanel" native="true">
       <property name="sizePolicy">
-       <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
@@ -1231,8 +1237,20 @@
           </item>
           <item>
            <widget class="QLabel" name="label">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
             <property name="text">
-             <string>COUPLED ASSET SWAP</string>
+             <string/>
+            </property>
+            <property name="pixmap">
+             <pixmap resource="../lux.qrc">:/icons/swap_header</pixmap>
+            </property>
+            <property name="scaledContents">
+             <bool>true</bool>
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>
@@ -1839,6 +1857,12 @@
           </property>
           <item>
            <widget class="QLabel" name="label_9">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
             <property name="font">
              <font>
               <weight>75</weight>
@@ -1846,7 +1870,13 @@
              </font>
             </property>
             <property name="text">
-             <string>STATUS</string>
+             <string/>
+            </property>
+            <property name="pixmap">
+             <pixmap resource="../lux.qrc">:/icons/status</pixmap>
+            </property>
+            <property name="scaledContents">
+             <bool>true</bool>
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>

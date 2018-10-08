@@ -48,6 +48,8 @@
         <file alias="send_btn">res/icons/send_btn.png</file>
         <file alias="receive_btn">res/icons/receive_btn.png</file>
         <file alias="swap_btn">res/icons/swap_btn.png</file>
+        <file alias="swap_header">res/icons/swap_header.png</file>
+        <file alias="status">res/icons/status.png</file>
         <file alias="stake">res/icons/stake.png</file>
         <file alias="overview">res/icons/overview.png</file>
         <file alias="smartcontract">res/icons/smartcontract.png</file>
