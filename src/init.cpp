@@ -1720,14 +1720,15 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
             pwalletMain->SetBestChain(chainActive.GetLocator());
         }
 
-         else if (mapArgs.count("-usehd")) {
+        else if (mapArgs.count("-usehd")) {
             bool useHD = GetBoolArg("-usehd", DEFAULT_USE_HD_WALLET);
-            if (pwalletMain->IsHDEnabled() && !useHD) {
+            bool zaptx = GetBoolArg("-zapwallettxes", false) && GetArg("-zapwallettxes", "1") == "2";
+            if (pwalletMain->IsHDEnabled() && (!useHD && !zaptx)) {
                 return InitError(strprintf(_("Error loading %s: You can't disable HD on a already existing HD wallet"), strWalletFile));
-                }
+            }
             if (!pwalletMain->IsHDEnabled() && useHD) {
-                return InitError(strprintf(_("Error loading %s: You can't enable HD on a already existing non-HD wallet"), strWalletFile));
-                 }
+                return InitError(strprintf(_("Error loading %s: You need to upgrade the wallet to enable HD on a non-HD wallet"), strWalletFile));
+            }
         }
 #if 0
         // Warn user every time he starts non-encrypted HD wallet
