@@ -232,6 +232,10 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlockWithKey(CReserveKe
     return CreateNewBlock(scriptPubKey, fMineWitnessTx, fProofOfStake, pTotalFees, txProofTime, nTimeLimit);
 }
 
+std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewStake(bool fMineWitnessTx, bool fProofOfStake, int64_t* pTotalFees, int32_t txProofTime, int32_t nTimeLimit)
+{
+    return CreateNewBlock(CScript(), fMineWitnessTx, fProofOfStake, pTotalFees, txProofTime, nTimeLimit);
+}
 
 std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& scriptPubKeyIn, bool fMineWitnessTx, bool fProofOfStake, int64_t* pTotalFees, int32_t txProofTime, int32_t nTimeLimit)
 {
@@ -1050,7 +1054,7 @@ void IncrementExtraNonce(CBlock* pblock, const CBlockIndex* pindexPrev, unsigned
     pblock->hashMerkleRoot = BlockMerkleRoot(*pblock);
 }
 
-bool ProcessBlockFound(CBlock* pblock, CWallet& wallet, CReserveKey& reservekey)
+bool ProcessBlockFound(CBlock* pblock, CWallet& wallet)
 {
     // Found a solution (stake)
     {
@@ -1068,9 +1072,6 @@ bool ProcessBlockFound(CBlock* pblock, CWallet& wallet, CReserveKey& reservekey)
     CAmount generated = GetProofOfStakeReward(0, 0, chainActive.Height()+1);
     generated -= GetMasternodePosReward(chainActive.Height()+1, generated);
     LogPrintf("generated %s\n", FormatMoney(generated));
-
-    // Remove key from key pool
-    reservekey.KeepKey();
 
     bool usePhi2;
     {

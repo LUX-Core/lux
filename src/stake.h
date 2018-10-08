@@ -83,7 +83,7 @@ private:
 
     bool CreateCoinStake(CWallet *wallet, const CKeyStore& keystore, unsigned int nBits, int64_t nSearchInterval, CMutableTransaction& txNew, unsigned int& nTxNewTime);
 
-    bool GenBlockStake(CWallet *wallet, const CReserveKey &key, unsigned int &extra);
+    bool GenBlockStake(CWallet *wallet, unsigned int &extra);
     void StakingThread(CWallet *wallet);
 
 public:

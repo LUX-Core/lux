@@ -564,9 +564,9 @@ bool Stake::IsBlockStaked(int nHeight) const {
     bool result = false;
     auto it = mapHashedBlocks.find(nHeight);
     if (it != mapHashedBlocks.end()) {
-        if (nHashInterval < Params().StakingInterval()) {
+        if (nHashInterval < (unsigned int) Params().StakingInterval()) {
             auto that = const_cast<Stake*>(this);
-            that->nHashInterval = Params().StakingInterval();
+            that->nHashInterval = (unsigned int) Params().StakingInterval();
         }
         if (GetTime() - it->second < max(nHashInterval, (unsigned int) 1)) {
             result = true;
@@ -753,8 +753,9 @@ bool Stake::CreateCoinStake(CWallet* wallet, const CKeyStore& keystore, unsigned
         nTxNewTime = GetAdjustedTime();
 
         nCoinWeight = pcoin.first->vout[pcoin.second].nValue;
-        unsigned int nStakeTarget = nBits;
-        nStakeTarget *= nCoinWeight;
+        uint256 bnStakeTarget;
+        bnStakeTarget.SetCompact(nBits);
+        bnStakeTarget *= nCoinWeight;
         nStakeWeightSum += nCoinWeight;
         nStakeWeightMin = std::min(nStakeWeightMin, nCoinWeight);
         nStakeWeightMax = std::max(nStakeWeightMax, nCoinWeight);
@@ -767,7 +768,7 @@ bool Stake::CreateCoinStake(CWallet* wallet, const CKeyStore& keystore, unsigned
 //        }
 
         //iterates each utxo inside of CheckStakeKernelHash()
-        if (CheckHash(pindex->pprev, nStakeTarget, block, *pcoin.first, prevoutStake, nTxNewTime, hashProofOfStake)) {
+        if (CheckHash(pindex->pprev, bnStakeTarget.GetCompact(), block, *pcoin.first, prevoutStake, nTxNewTime, hashProofOfStake)) {
             //Double check that this will pass time requirements
             if (nTxNewTime <= chainActive.Tip()->GetMedianTimePast()) {
                 LogPrintf("%s: stake found, but it is too far in the past \n", __func__);
@@ -960,14 +961,14 @@ bool Stake::CreateBlockStake(CWallet* wallet, CBlock* block) {
     return result;
 }
 
-bool Stake::GenBlockStake(CWallet* wallet, const CReserveKey& key, unsigned int& extra) {
+bool Stake::GenBlockStake(CWallet* wallet, unsigned int& extra) {
     CBlockIndex* tip = nullptr;
     {
         LOCK(cs_main);
         tip = chainActive.Tip();
     }
 
-    std::unique_ptr <CBlockTemplate> blocktemplate(BlockAssembler(Params()).CreateNewBlockWithKey(const_cast<CReserveKey&>(key), true, true));
+    std::unique_ptr <CBlockTemplate> blocktemplate(BlockAssembler(Params()).CreateNewStake(true, true));
     if (!blocktemplate) {
         return false; // No stake available.
     }
@@ -1011,7 +1012,7 @@ bool Stake::GenBlockStake(CWallet* wallet, const CReserveKey& key, unsigned int&
 #endif
         LogPrintf("%s: found stake %s, block %s\n%s\n", __func__,
                   proof1.GetHex(), hash.GetHex(), block->ToString());
-        ProcessBlockFound(block, *wallet, const_cast<CReserveKey&>(key));
+        ProcessBlockFound(block, *wallet);
     } else if (!GetProof(hash, proof2)) {
         SetProof(hash, proof1);
     } else if (proof1 != proof2) {
@@ -1029,14 +1030,15 @@ void Stake::StakingThread(CWallet* wallet) {
     SetThreadPriority(THREAD_PRIORITY_LOWEST);
 
     try {
-        boost::this_thread::interruption_point();
         int nHeight = 0;
         (void) nHeight;
         unsigned int extra = 0;
-        CReserveKey reserve(wallet);
         while (!nStakingInterrupped && !ShutdownRequested()) {
             std::size_t nNodes = 0;
             bool nCanStake = !IsInitialBlockDownload();
+
+            boost::this_thread::interruption_point();
+
             if (nCanStake) {
                 LOCK(cs_vNodes); // Lock nodes for security.
                 if ((nNodes = vNodes.size()) == 0) {
@@ -1056,6 +1058,7 @@ void Stake::StakingThread(CWallet* wallet) {
                         break;
                     }
                 }
+
                 if (nCanStake) {
                     LOCK(cs_main);
                     tip = chainActive.Tip();
@@ -1073,13 +1076,14 @@ void Stake::StakingThread(CWallet* wallet) {
 #if defined(DEBUG_DUMP_STAKING_THREAD) && defined(DEBUG_DUMP_STAKING_INFO)
             DEBUG_DUMP_STAKING_THREAD();
 #endif
-            if (nCanStake && GenBlockStake(wallet, reserve, extra)) {
+            boost::this_thread::interruption_point();
+
+            if (nCanStake && GenBlockStake(wallet, extra)) {
                 MilliSleep(1500);
             } else {
                 MilliSleep(1000);
             }
         }
-        boost::this_thread::interruption_point();
     } catch (std::exception& e) {
         LogPrintf("%s: exception: %s\n", __func__, e.what());
     } catch (...) {
