@@ -1208,22 +1208,23 @@ QString tradingDialog::CryptopiaIntegerTimeStampToReadable(int DateTime){
     dt.setTime_t(DateTime);
 
     //Reconstruct time and date in our own format, one that QDateTime will recognise.
-    QString DisplayDate = dt.toString("yyyy-MM-dd hh:mm:ss A");
+    QString DisplayDate = dt.toString("yyyy-MM-dd HH:mm:ss");
 
     return DisplayDate;
 }
 
 QString tradingDialog::CryptopiaTimeStampToReadable(QString DateTime){
-    //Seperate Time and date.
+    // Seperate Time and date. "2016-02-01T16:18:44.839246"
     int TPos = DateTime.indexOf("T");
     int sPos = DateTime.indexOf(".");
-    QDateTime Date = QDateTime::fromString(DateTime.left(TPos),"yyyy-MM-dd"); //format to convert from
+    //bool ok = false; int msecs = DateTime.right(sPos).toInt(&ok, 10);
+    QDateTime Date = QDateTime::fromString(DateTime.left(TPos),"yyyy-MM-dd");
     DateTime.remove(sPos,sizeof(DateTime));
     DateTime.remove(0,TPos+1);
-    QDateTime Time = QDateTime::fromString(DateTime.right(TPos),"hh:mm:ss");
+    QDateTime Time = QDateTime::fromString(DateTime.right(TPos),"HH:mm:ss");
 
     //Reconstruct time and date in our own format, one that QDateTime will recognise.
-    QString DisplayDate = Date.toString("dd/MM/yyyy") + " " + Time.toString("hh:mm:ss A"); //formats to convert to
+    QString DisplayDate = Date.toString("yyyy-MM-dd") + " " + Time.toString("HH:mm:ss");
 
     return DisplayDate;
 }
