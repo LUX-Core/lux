@@ -435,16 +435,29 @@
             <number>12</number>
            </property>
            <item row="0" column="0">
-            <widget class="QLabel" name="label_6">
+            <widget class="QLabel" name="darksendEnabledText">
              <property name="text">
               <string>Status:</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignVCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QLabel" name="darksendEnabled">
+             <property name="text">
+              <string>Enabled/Disabled</string>
              </property>
             </widget>
            </item>
            <item row="1" column="0">
-            <widget class="QLabel" name="label_7">
+            <widget class="QLabel" name="labelCompletitionText">
              <property name="text">
               <string>Completion:</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignVCenter</set>
              </property>
             </widget>
            </item>
@@ -466,6 +479,9 @@
              <property name="text">
               <string>Luxsend Balance:</string>
              </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignVCenter</set>
+             </property>
             </widget>
            </item>
            <item row="2" column="1">
@@ -482,9 +498,12 @@
             </widget>
            </item>
            <item row="3" column="0">
-            <widget class="QLabel" name="label_8">
+            <widget class="QLabel" name="labelAmountRoundsText">
              <property name="text">
               <string>Amount and Rounds:</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignVCenter</set>
              </property>
             </widget>
            </item>
@@ -496,9 +515,12 @@
             </widget>
            </item>
            <item row="4" column="0">
-            <widget class="QLabel" name="label_9">
+            <widget class="QLabel" name="labelSubmittedDenomText">
              <property name="text">
               <string>Submitted Denom:</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignVCenter</set>
              </property>
             </widget>
            </item>
@@ -509,13 +531,6 @@
              </property>
              <property name="text">
               <string>n/a</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QLabel" name="darksendEnabled">
-             <property name="text">
-              <string>Enabled/Disabled</string>
              </property>
             </widget>
            </item>
@@ -990,7 +1005,7 @@
            <enum>Qt::Horizontal</enum>
           </property>
          </widget>
-         <widget class="QLabel" name="darksendStatus">
+         <widget class="QLabel" name="darkSendStatus">
           <property name="geometry">
            <rect>
             <x>10</x>
@@ -1031,7 +1046,7 @@
            </sizepolicy>
           </property>
           <property name="toolTip">
-           <string>Try to manually submit a Darksend request.</string>
+           <string>Try to manually submit a Luxsend request.</string>
           </property>
           <property name="text">
            <string>Try Mix</string>
@@ -1053,7 +1068,7 @@
            </sizepolicy>
           </property>
           <property name="toolTip">
-           <string>Reset the current status of Darksend (can interrupt Darksend if it's in the process of Mixing, which can cost you money!)</string>
+           <string>Reset the current status of Luxsend (can interrupt Luxsend if it's in the process of Mixing, which can cost you money!)</string>
           </property>
           <property name="autoFillBackground">
            <bool>false</bool>

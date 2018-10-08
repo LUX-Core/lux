@@ -1045,7 +1045,7 @@ QWidget .QFrame#frameDarksend #formLayoutWidget > .QLabel {
     min-height:25px;
 }
 
-QWidget .QFrame#frameDarksend #formLayoutWidget .QLabel#label_6 { /* Darksend Status Label */
+QWidget .QFrame#frameDarksend #formLayoutWidget .QLabel#darksendEnabledText { /* Darksend Status Label */
     qproperty-alignment: 'AlignVCenter | AlignRight';
     min-width:160px;
     background-color:transparent;
@@ -1058,7 +1058,7 @@ QWidget .QFrame#frameDarksend #formLayoutWidget .QLabel#darksendEnabled { /* Dar
 
 }
 
-QWidget .QFrame#frameDarksend #formLayoutWidget .QLabel#label_7 { /* Darksend Completion Label */
+QWidget .QFrame#frameDarksend #formLayoutWidget .QLabel#labelCompletitionText { /* Darksend Completion Label */
     qproperty-alignment: 'AlignVCenter | AlignRight';
     min-width:160px;
     background-color:transparent;
@@ -1094,7 +1094,7 @@ QWidget .QFrame#frameDarksend #formLayoutWidget .QLabel#labelAnonymized { /* Dar
 
 }
 
-QWidget .QFrame#frameDarksend #formLayoutWidget .QLabel#label_8 { /* Darksend Amount and Rounds Label */
+QWidget .QFrame#frameDarksend #formLayoutWidget .QLabel#labelAmountRoundsText { /* Darksend Amount and Rounds Label */
     qproperty-alignment: 'AlignVCenter | AlignRight';
     min-width:160px;
     background-color:transparent;
@@ -1107,7 +1107,7 @@ QWidget .QFrame#frameDarksend #formLayoutWidget .QLabel#labelAmountRounds { /* D
 
 }
 
-QWidget .QFrame#frameDarksend #formLayoutWidget .QLabel#label_9 { /* Darksend Submitted Denom Label */
+QWidget .QFrame#frameDarksend #formLayoutWidget .QLabel#labelSubmittedDenomText { /* Darksend Submitted Denom Label */
     qproperty-alignment: 'AlignVCenter | AlignRight';
     min-width:160px;
     background-color:transparent;
@@ -1120,7 +1120,7 @@ QWidget .QFrame#frameDarksend #formLayoutWidget .QLabel#labelSubmittedDenom { /*
 
 }
 
-QWidget .QFrame#frameDarksend .QLabel#darksendStatus { /* Darksend Status Notifications */
+QWidget .QFrame#frameDarksend .QLabel#darkSendStatus { /* Darksend Status Notifications */
     qproperty-alignment: 'AlignVCenter | AlignCenter';
     qproperty-geometry: rect(70 226 395 34);
     font-size:11px;
