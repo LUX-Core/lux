@@ -20,17 +20,19 @@ cache:
   - $HOME/.ccache
 env:
   global:
-    - MAKEJOBS=-j5
+    - MAKEJOBS=-j6
     - RUN_TESTS=false
     - CHECK_DOC=0
     - BOOST_TEST_RANDOM=1$TRAVIS_BUILD_ID
     - CCACHE_SIZE=400M
     - CCACHE_TEMPDIR=/tmp/.ccache-temp
     - CCACHE_COMPRESS=1
+    - CCACHE_DIR=$HOME/.ccache
     - BASE_OUTDIR=$TRAVIS_BUILD_DIR/out
     - SDK_URL=https://bitcoincore.org/depends-sources/sdks
     - PYTHON_DEBUG=1
     - WINEDEBUG=fixme-all
+    - DEPENDS_TIMEOUT=900
   matrix:
 # ARM
     - HOST=arm-linux-gnueabihf PACKAGES="g++-arm-linux-gnueabihf libprotobuf-dev protobuf-compiler libqrencode-dev" CHECK_DOC=0 GOAL="install" BITCOIN_CONFIG="--enable-glibc-back-compat --enable-reduce-exports --disable-tests --disable-zmq --disable-updater"
@@ -38,8 +40,8 @@ env:
 #   - HOST=i686-w64-mingw32 DPKG_ADD_ARCH="i386" PACKAGES="python3 nsis wine1.6 bc build-essential libtool autotools-dev automake cmake pkg-config bsdmainutils curl libevent-dev libminiupnpc-dev libzmq3-dev g++-mingw-w64-x86-64 mingw-w64-x86-64-dev g++-mingw-w64-i686 mingw-w64-i686-dev libqrencode-dev qttools5-dev-tools qttools5-dev qtbase5-dev libprotobuf-dev -y" RUN_TESTS=false BITCOIN_CONFIG="--with-gui=qt5 --disable-shared --enable-reduce-exports --disable-updater" GOAL="src/qt/lux-qt.exe"
     - HOST=i686-w64-mingw32 DPKG_ADD_ARCH="i386" DEP_OPTS="NO_QT=0" PACKAGES="python3 nsis wine1.6 bc build-essential libtool autotools-dev automake cmake pkg-config bsdmainutils curl g++-mingw-w64-x86-64 mingw-w64-x86-64-dev g++-mingw-w64-i686 mingw-w64-i686-dev -y" RUN_TESTS=false GOAL="install" BITCOIN_CONFIG="--enable-reduce-exports --disable-zmq --without-miniupnpc --disable-updater"
 # Cross-Mac
-#   - HOST=x86_64-apple-darwin11 PPA="ppa:bitcoin/bitcoin" PACKAGES="python3 cmake imagemagick libcap-dev librsvg2-bin libz-dev libbz2-dev libtiff-tools python3-dev" BITCOIN_CONFIG="--enable-gui --enable-reduce-exports --disable-tests --disable-zmq --disable-updater" OSX_SDK=10.11 GOAL="deploy"
-    - HOST=x86_64-apple-darwin11 PPA="ppa:bitcoin/bitcoin" DEP_OPTS="NO_QT=1" PACKAGES="cmake imagemagick libcap-dev librsvg2-bin libz-dev libbz2-dev libtiff-tools python3-dev" BITCOIN_CONFIG="--without-gui --enable-reduce-exports --disable-tests --disable-zmq --disable-updater" OSX_SDK=10.11 GOAL="src/luxd"
+    - HOST=x86_64-apple-darwin14 PPA="ppa:bitcoin/bitcoin" PACKAGES="cmake imagemagick libcap-dev librsvg2-bin libz-dev libbz2-dev libtiff-tools python-dev python3-setuptools-git" BITCOIN_CONFIG="--enable-gui --enable-reduce-exports --disable-tests --disable-zmq --disable-updater" OSX_SDK=10.11 GOAL="all deploy"
+#   - HOST=x86_64-apple-darwin11 PPA="ppa:bitcoin/bitcoin" DEP_OPTS="NO_QT=1" PACKAGES="cmake imagemagick libcap-dev librsvg2-bin libz-dev libbz2-dev libtiff-tools python3-dev" BITCOIN_CONFIG="--without-gui --enable-reduce-exports --disable-tests --disable-zmq --disable-updater" OSX_SDK=10.11 GOAL="src/luxd"
 
 before_install:
     - export PATH=$(echo $PATH | tr ':' "\n" | sed '/\/opt\/python/d' | tr "\n" ":" | sed "s|::|:|g")
@@ -65,7 +67,7 @@ script:
     - export TRAVIS_COMMIT_LOG=`git log --format=fuller -1`
     - if [ -n "$USE_SHELL" ]; then export CONFIG_SHELL="$USE_SHELL"; fi
     - OUTDIR=$BASE_OUTDIR/$TRAVIS_PULL_REQUEST/$TRAVIS_JOB_NUMBER-$HOST
-    - BITCOIN_CONFIG_ALL="--prefix=$TRAVIS_BUILD_DIR/depends/$HOST --bindir=$OUTDIR/bin --libdir=$OUTDIR/lib CPPFLAGS=-DTRAVIS"
+    - BITCOIN_CONFIG_ALL="--disable-dependency-tracking --prefix=$TRAVIS_BUILD_DIR/depends/$HOST --bindir=$OUTDIR/bin --libdir=$OUTDIR/lib"
     - depends/$HOST/native/bin/ccache --max-size=$CCACHE_SIZE
     - test -n "$USE_SHELL" && eval '"$USE_SHELL" -c "./autogen.sh"' || ./autogen.sh
     - ./configure CFLAGS="-std=c99" --cache-file=config.cache $BITCOIN_CONFIG_ALL $BITCOIN_CONFIG || ( cat config.log && false)
