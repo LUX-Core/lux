@@ -116,7 +116,7 @@ public:
         isLongPolling = false;
     };
 
-    JSONRPCRequest(HTTPRequest *req);
+    JSONRPCRequest(HTTPRequest *_req);
 
     /**
      * Start long-polling

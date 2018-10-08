@@ -483,8 +483,8 @@ bool RPCIsInWarmup(std::string* outStatus)
     return fRPCInWarmup;
 }
 
-JSONRequest::JSONRequest(HTTPRequest *req): JSONRequest() {
-    req = req;
+JSONRequest::JSONRequest(HTTPRequest *_req): JSONRequest() {
+    req = _req;
 }
 
 bool JSONRequest::PollAlive() {
