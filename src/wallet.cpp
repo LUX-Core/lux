@@ -3032,9 +3032,10 @@ bool CWallet::CreateTransaction(const vector<pair<CScript, CAmount> >& vecSend, 
                     bool signSuccess;
                     const CScript& scriptPubKey = coin.first->vout[coin.second].scriptPubKey;
                     SignatureData sigdata;
-                    if (sign)
-                        signSuccess = ProduceSignature(TransactionSignatureCreator(this, &txNewConst, nIn, SIGHASH_ALL), scriptPubKey, sigdata);
-                    else
+                    if (sign) {
+                        const CAmount nValue = coin.first->vout[coin.second].nValue;
+                        signSuccess = ProduceSignature(TransactionSignatureCreator(this, &txNewConst, nIn, nValue, SIGHASH_ALL), scriptPubKey, sigdata);
+                    } else
                         signSuccess = ProduceSignature(DummySignatureCreator(this), scriptPubKey, sigdata, false);
 
                     if (!signSuccess) {
