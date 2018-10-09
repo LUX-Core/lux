@@ -1071,8 +1071,8 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
    if (!InitializeLuxGate()) {
        LogPrintf("Failed to initialize LuxGate\n");
    }
-   // Set LUXGATE service bit only if we have more than 2 blockchain clients
-   if (blockchainClientPool.size() > 2) {
+   // Set LUXGATE service bit only if we have 2 or more blockchain clients
+   if (blockchainClientPool.size() >= 2) {
        nLocalServices = ServiceFlags(nLocalServices | NODE_LUXGATE);
    }
 #endif // ENABLE_LUXGATE
