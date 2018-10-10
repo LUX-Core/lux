@@ -1140,10 +1140,8 @@ void CWallet::MarkConflicted(const uint256& hashBlock, const uint256& hashTx)
             conflictconfirms = -(chainActive.Height() - pindex->nHeight + 1);
         }
     }
-
-    // Mark tx as orphaned/conflicted
     if (conflictconfirms >= 0)
-        conflictconfirms = -1;
+        return;
 
     // Do not flush the wallet here for performance reasons
     CWalletDB walletdb(strWalletFile, "r+", false);
