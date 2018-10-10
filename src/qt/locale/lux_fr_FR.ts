@@ -911,7 +911,7 @@ Adresse : %4
     </message>
     <message>
         <source>Status</source>
-        <translation>Statuts</translation>
+        <translation>Etat</translation>
     </message>
     <message>
         <source>Active</source>
@@ -1238,7 +1238,7 @@ Veuillez vérifier l'adresse et réessayer.</translation>
     </message>
     <message>
         <source>Copy label</source>
-        <translation>Copier le montant</translation>
+        <translation>Copier l'étiquette</translation>
     </message>
     <message>
         <source>Copy message</source>
@@ -1261,7 +1261,7 @@ Veuillez vérifier l'adresse et réessayer.</translation>
     </message>
     <message>
         <source>Copy &amp;Address</source>
-        <translation>Copier l'asdresse</translation>
+        <translation>Copier l'adresse</translation>
     </message>
     <message>
         <source>&amp;Save Image...</source>
@@ -1600,25 +1600,93 @@ Veuillez vérifier l'adresse et réessayer.</translation>
 <context>
     <name>TransactionDesc</name>
     <message>
-        <source>Status</source>
-        <translation>Statuts</translation>
+        <source>Generated</source>
+        <translation>Généré</translation>
     </message>
     <message>
-        <source>Date</source>
-        <translation>Date</translation>
+        <source>conflicted</source>
+        <translation>en conflit</translation>
+    </message>
+    <message>
+        <source>%1/offline</source>
+        <translation>%1/hors ligne</translation>
+    </message>
+    <message>
+        <source>%1/unconfirmed</source>
+        <translation>%1/non confirmée</translation>
+    </message>
+    <message>
+        <source>%1 confirmations</source>
+        <translation>%1 confirmations</translation>
+    </message>
+    <message>
+        <source>Status</source>
+        <translation>Etat</translation>
+    </message>
+    <message>
+        <source>From</source>
+        <translation>De</translation>
+    </message>
+    <message>
+        <source>To</source>
+        <translation>Vers</translation>
+    </message>
+    <message>
+        <source>own address</source>
+        <translation>possédée</translation>
     </message>
     <message>
         <source>Message</source>
         <translation>Message</translation>
     </message>
     <message>
+        <source>Debit</source>
+        <translation>Débit</translation>
+    </message>
+    <message>
+        <source>Credit</source>
+        <translation>Crédit</translation>
+    </message>
+    <message>
+        <source>Total debit</source>
+        <translation>Total débit</translation>
+    </message>
+    <message>
+        <source>Total credit</source>
+        <translation>Total crédit</translation>
+    </message>
+    <message>
+        <source>Transaction fee</source>
+        <translation>Frais</translation>
+    </message>
+    <message>
+        <source>Net amount</source>
+        <translation>Montant net</translation>
+    </message>
+    <message>
         <source>Amount</source>
         <translation>Montant</translation>
+    </message>
+    <message>
+        <source>Transaction ID</source>
+        <translation>ID Transaction</translation>
+    </message>
+    <message>
+        <source>Output index</source>
+        <translation>Index sortie</translation>
     </message>
     </context>
 <context>
     <name>TransactionDescDialog</name>
-    </context>
+    <message>
+        <source>Details for %1</source>
+        <translation>Détails pour %1</translation>
+    </message>
+    <message>
+        <source>This pane shows a detailed description of the transaction</source>
+        <translation>Ce panneau affiche une description détaillée de la transaction</translation>
+    </message>
+</context>
 <context>
     <name>TransactionTableModel</name>
     <message>
@@ -1629,7 +1697,75 @@ Veuillez vérifier l'adresse et réessayer.</translation>
         <source>Address</source>
         <translation>Adresse</translation>
     </message>
-    </context>
+    <message>
+        <source>Offline</source>
+        <translation>Hors ligne</translation>
+    </message>
+    <message>
+        <source>Unconfirmed</source>
+        <translation>Non confirmée</translation>
+    </message>
+    <message>
+        <source>Conflicted</source>
+        <translation>En conflit</translation>
+    </message>
+    <message>
+        <source>Confirmed (%1 confirmations)</source>
+        <translation>Confirmé (%1 confirmations)</translation>
+    </message>
+    <message>
+        <source>Confirming (%1 of %2 recommended confirmations)</source>
+        <translation>Validation (%1/%2 confirmations recommandées)</translation>
+    </message>
+    <message>
+        <source>Immature (%1 confirmations, will be available after %2)</source>
+        <translation>Immature (%1 confirmations, disponible après %2)</translation>
+    </message>
+    <message>
+        <source>This block was not received by any other nodes and will probably not be accepted!</source>
+        <translation>Ce bloc n'a pas été reçu par les autres noeuds et ne sera probablement pas accepté !</translation>
+    </message>
+    <message>
+        <source>Received with</source>
+        <translation>Reçu avec</translation>
+    </message>
+    <message>
+        <source>Sent to</source>
+        <translation>Envoyé à</translation>
+    </message>
+    <message>
+        <source>Payment to yourself</source>
+        <translation>Paiement interne</translation>
+    </message>
+    <message>
+        <source>Minted</source>
+        <translation>Minted</translation>
+    </message>
+    <message>
+        <source>Mined</source>
+        <translation>Miné</translation>
+    </message>
+    <message>
+        <source>SC refund</source>
+        <translation>Retour SC</translation>
+    </message>
+    <message>
+        <source>Date and time that the transaction was received.</source>
+        <translation>Date et heure de la transaction.</translation>
+    </message>
+    <message>
+        <source>Type of transaction.</source>
+        <translation>Type de transaction.</translation>
+    </message>
+    <message>
+        <source>Destination address of transaction.</source>
+        <translation>Adresse de destination de la transaction.</translation>
+    </message>
+    <message>
+        <source>Amount removed from or added to balance.</source>
+        <translation>Montant ajouté ou soustrait à votre balance.</translation>
+    </message>
+</context>
 <context>
     <name>TransactionView</name>
     <message>
@@ -1638,7 +1774,7 @@ Veuillez vérifier l'adresse et réessayer.</translation>
     </message>
     <message>
         <source>Copy label</source>
-        <translation>Copier le montant</translation>
+        <translation>Copier l'étiquette</translation>
     </message>
     <message>
         <source>Copy amount</source>
@@ -1646,7 +1782,7 @@ Veuillez vérifier l'adresse et réessayer.</translation>
     </message>
     <message>
         <source>Copy transaction ID</source>
-        <translation>Copier l'ID de la transaction</translation>
+        <translation>Copier l'ID de transaction</translation>
     </message>
     <message>
         <source>Comma separated file (*.csv)</source>
@@ -1657,20 +1793,80 @@ Veuillez vérifier l'adresse et réessayer.</translation>
         <translation>Confirmé</translation>
     </message>
     <message>
-        <source>Date</source>
-        <translation>Date</translation>
-    </message>
-    <message>
         <source>Label</source>
-        <translation>Label</translation>
+        <translation>Etiquette</translation>
     </message>
     <message>
         <source>Address</source>
         <translation>Adresse</translation>
     </message>
     <message>
+        <source>All</source>
+        <translation>Toutes</translation>
+    </message>
+    <message>
+        <source>Today</source>
+        <translation>Aujourd'hui</translation>
+    </message>
+    <message>
+        <source>This week</source>
+        <translation>Cette semaine</translation>
+    </message>
+    <message>
+        <source>This month</source>
+        <translation>Ce mois-ci</translation>
+    </message>
+    <message>
+        <source>Last month</source>
+        <translation>Le mois dernier</translation>
+    </message>
+    <message>
+        <source>This year</source>
+        <translation>Cette année</translation>
+    </message>
+    <message>
+        <source>Range...</source>
+        <translation>Période...</translation>
+    </message>
+    <message>
+        <source>Most Common</source>
+        <translation>Les plus courantes</translation>
+    </message>
+    <message>
+        <source>Received with</source>
+        <translation>Reçues</translation>
+    </message>
+    <message>
+        <source>Sent to</source>
+        <translation>Envoyées</translation>
+    </message>
+    <message>
+        <source>To yourself</source>
+        <translation>Internes</translation>
+    </message>
+    <message>
+        <source>Mined</source>
+        <translation>Minées</translation>
+    </message>
+    <message>
+        <source>Minted</source>
+        <translation>Intérêts</translation>
+    </message>
+    <message>
+        <source>Other</source>
+        <translation>Autres</translation>
+    </message>
+    <message>
+        <source>Enter address or label to search</source>
+        <translation>Filtrer par adresse ou étiquette</translation>
+    </message>
+    <message>
+        <source>Min amount</source>
+        <translation>Minimum</translation>
+    </message>
+    <message>
         <source>Exporting Failed</source>
-        <translation>Exportation échouée</translation>
+        <translation>Export échoué</translation>
     </message>
     </context>
 <context>
@@ -1692,7 +1888,15 @@ Veuillez vérifier l'adresse et réessayer.</translation>
         <source>&amp;Export</source>
         <translation>&amp;Exporter</translation>
     </message>
-    </context>
+    <message>
+        <source>Export the data in the current tab to a file</source>
+        <translation>Exporte les données du tableau vers un fichier</translation>
+    </message>
+    <message>
+        <source>Selected amount:</source>
+        <translation>Montant sélection:</translation>
+    </message>
+</context>
 <context>
     <name>lux-core</name>
     <message>
