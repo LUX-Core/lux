@@ -1286,6 +1286,25 @@ public:
 
     bool InMempool() const;
 
+    bool IsSCrefund() const
+    {
+        bool ret = false;
+        if (IsCoinBase() && vout.size() > 2) {
+            CAmount credit = GetCredit(ISMINE_ALL);
+            if (credit == 0) for (const CTxOut& txout : vout)
+                credit += pwallet->GetCredit(txout, ISMINE_ALL);
+            int nDepth = GetDepthInMainChain();
+            int nHeight = chainActive.Height();
+            if (nDepth > 0) nHeight -= nDepth;
+            CAmount blockReward = GetProofOfWorkReward(0, nHeight);
+            if (nHeight >= Params().FirstSplitRewardBlock())
+                blockReward = blockReward * 0.2; // MN reward
+            if (credit < blockReward)
+                ret = true;
+        }
+        return ret;
+    }
+
     bool IsTrusted() const
     {
         // Quick answer in most cases

@@ -59,6 +59,7 @@ QString TransactionDesc::toHTML(CWallet* wallet, CWalletTx& wtx, TransactionReco
     CAmount nCredit = wtx.GetCredit(ISMINE_ALL);
     CAmount nDebit = wtx.GetDebit(ISMINE_ALL);
     CAmount nNet = nCredit - nDebit;
+    bool isSCrefund = false;
 
     strHTML += "<b>" + tr("Status") + ":</b> " + FormatTxStatus(wtx);
     int nRequests = wtx.GetRequestCount();
@@ -76,7 +77,9 @@ QString TransactionDesc::toHTML(CWallet* wallet, CWalletTx& wtx, TransactionReco
     // From
     //
     if (wtx.IsCoinBase()) {
-        strHTML += "<b>" + tr("Source") + ":</b> " + tr("Generated") + "<br>";
+        isSCrefund = wtx.IsSCrefund();
+        strHTML += "<b>" + tr("Source") + ":</b> ";
+        strHTML += (isSCrefund ? tr("Smart contract") : tr("Generated")) + "<br/>";
     } else if (wtx.mapValue.count("from") && !wtx.mapValue["from"].empty()) {
         // Online transaction
         strHTML += "<b>" + tr("From") + ":</b> " + GUIUtil::HtmlEscape(wtx.mapValue["from"]) + "<br>";
@@ -87,7 +90,6 @@ QString TransactionDesc::toHTML(CWallet* wallet, CWalletTx& wtx, TransactionReco
             CTxDestination address = DecodeDestination(rec->address);
             if (IsValidDestination(address)) {
                 if (wallet->mapAddressBook.count(address)) {
-                    strHTML += "<b>" + tr("From") + ":</b> " + tr("unknown") + "<br>";
                     strHTML += "<b>" + tr("To") + ":</b> ";
                     strHTML += GUIUtil::HtmlEscape(rec->address);
                     QString addressOwned = (::IsMine(*wallet, address) == ISMINE_SPENDABLE) ? tr("own address") : tr("watch-only");
@@ -162,7 +164,6 @@ QString TransactionDesc::toHTML(CWallet* wallet, CWalletTx& wtx, TransactionReco
                     continue;
 
                 if (!wtx.mapValue.count("to") || wtx.mapValue["to"].empty()) {
-                    // Offline transaction
                     CTxDestination address;
                     if (ExtractDestination(txout.scriptPubKey, address)) {
                         strHTML += "<b>" + tr("To") + ":</b> ";
@@ -170,10 +171,10 @@ QString TransactionDesc::toHTML(CWallet* wallet, CWalletTx& wtx, TransactionReco
                             strHTML += GUIUtil::HtmlEscape(wallet->mapAddressBook[address].name) + " ";
                         strHTML += GUIUtil::HtmlEscape(EncodeDestination(address));
                         if (toSelf == ISMINE_SPENDABLE)
-                            strHTML += " (own address)";
+                            strHTML += " (" + tr("own address") + ")";
                         else if (toSelf == ISMINE_WATCH_ONLY)
-                            strHTML += " (watch-only)";
-                        strHTML += "<br>";
+                            strHTML += " (" + tr("watch-only") + ")";
+                        strHTML += "<br/>";
                     }
                 }
 
@@ -193,16 +194,19 @@ QString TransactionDesc::toHTML(CWallet* wallet, CWalletTx& wtx, TransactionReco
             CAmount nTxFee = nDebit - wtx.GetValueOut();
             if (nTxFee > 0)
                 strHTML += "<b>" + tr("Transaction fee") + ":</b> " + BitcoinUnits::formatHtmlWithUnit(unit, -nTxFee) + "<br>";
+
         } else {
             //
             // Mixed debit transaction
             //
-            for (const CTxIn& txin : wtx.vin)
-                if (wallet->IsMine(txin))
-                    strHTML += "<b>" + tr("Debit") + ":</b> " + BitcoinUnits::formatHtmlWithUnit(unit, -wallet->GetDebit(txin, ISMINE_ALL)) + "<br>";
-            for (const CTxOut& txout : wtx.vout)
-                if (wallet->IsMine(txout))
-                    strHTML += "<b>" + tr("Credit") + ":</b> " + BitcoinUnits::formatHtmlWithUnit(unit, wallet->GetCredit(txout, ISMINE_ALL)) + "<br>";
+            for (const CTxIn& txin : wtx.vin) if (wallet->IsMine(txin)) {
+                strHTML += "<b>" + tr("Debit") + ":</b> ";
+                strHTML += BitcoinUnits::formatHtmlWithUnit(unit, -wallet->GetDebit(txin, ISMINE_ALL)) + "<br/>";
+            }
+            for (const CTxOut& txout : wtx.vout) if (wallet->IsMine(txout)) {
+                strHTML += "<b>" + tr("Credit") + ":</b> ";
+                strHTML += BitcoinUnits::formatHtmlWithUnit(unit, wallet->GetCredit(txout, ISMINE_ALL)) + "<br/>";
+            }
         }
     }
 
@@ -238,8 +242,12 @@ QString TransactionDesc::toHTML(CWallet* wallet, CWalletTx& wtx, TransactionReco
     }
 
     if (wtx.IsCoinBase()) {
-        quint32 numBlocksToMaturity = Params().COINBASE_MATURITY() + 1;
-        strHTML += "<br>" + tr("Generated coins must mature %1 blocks before they can be spent. When you generated this block, it was broadcast to the network to be added to the block chain. If it fails to get into the chain, its state will change to \"not accepted\" and it won't be spendable. This may occasionally happen if another node generates a block within a few seconds of yours.").arg(QString::number(numBlocksToMaturity)) + "<br>";
+        static const quint32 numBlocksToMaturity = Params().COINBASE_MATURITY() + 1;
+        strHTML += "<br/>";
+        if (isSCrefund)
+            strHTML += tr("This gas refund must mature %1 blocks before it can be spent. If it fails to get into the chain, its state will change to \"not accepted\" and it won't be spendable.").arg(QString::number(numBlocksToMaturity));
+        else
+            strHTML += tr("Generated coins must mature %1 blocks before they can be spent. When you generated this block, it was broadcast to the network to be added to the block chain. If it fails to get into the chain, its state will change to \"not accepted\" and it won't be spendable. This may occasionally happen if another node generates a block within a few seconds of yours.").arg(QString::number(numBlocksToMaturity));
     }
 
     //

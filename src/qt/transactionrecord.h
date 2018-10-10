@@ -86,7 +86,10 @@ public:
         DarksendCollateralPayment,
         DarksendMakeCollaterals,
         DarksendCreateDenominations,
-        Darksend
+        Darksend,
+        SCcall,
+        SCcreate,
+        SCrefund
     };
 
     /** Number of confirmation recommended for accepting a transaction */
