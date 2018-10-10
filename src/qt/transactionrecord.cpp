@@ -91,8 +91,9 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const CWallet* 
                 if (wtx.IsCoinBase()) {
                     // Generated
                     sub.type = TransactionRecord::Generated;
+                    if (wtx.IsSCrefund())
+                        sub.type = TransactionRecord::SCrefund;
                 }
-
                 parts.append(sub);
             }
         }
@@ -191,6 +192,13 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const CWallet* 
                     // Sent to IP, or other non-address transaction like OP_EVAL
                     sub.type = TransactionRecord::SendToOther;
                     sub.address = mapValue["to"];
+                }
+
+                if (txout.scriptPubKey.HasOpCreate()) {
+                    sub.type = TransactionRecord::SCcreate;
+                }
+                else if (txout.scriptPubKey.HasOpCall()) {
+                    sub.type = TransactionRecord::SCcall;
                 }
 
                 if (mapValue["DS"] == "1") {
