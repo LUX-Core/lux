@@ -426,12 +426,9 @@ QString TransactionTableModel::formatTxToAddress(const TransactionRecord* wtx, b
     case TransactionRecord::Darksend:
         return lookupAddress(wtx->address, tooltip) + watchAddress;
     case TransactionRecord::SendToOther:
-        return QString::fromStdString(wtx->address) + watchAddress;
     case TransactionRecord::SCcreate:
-    case TransactionRecord::SCcall: {
-        std::string address = "Smart contract"; // TODO: show/get contract address
-        return QString::fromStdString(address);
-    }
+    case TransactionRecord::SCcall:
+        return QString::fromStdString(wtx->address) + watchAddress;
     case TransactionRecord::SendToSelf:
     default:
         return tr("(n/a)") + watchAddress;

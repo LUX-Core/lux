@@ -157,7 +157,8 @@ QString TransactionDesc::toHTML(CWallet* wallet, CWalletTx& wtx, TransactionReco
             //
             // Debit
             //
-            for (const CTxOut& txout : wtx.vout) {
+            for (uint32_t nOut = 0; nOut < wtx.vout.size(); nOut++) {
+                const CTxOut& txout = wtx.vout[nOut];
                 // Ignore change
                 isminetype toSelf = wallet->IsMine(txout);
                 if ((toSelf == ISMINE_SPENDABLE) && (fAllFromMe == ISMINE_SPENDABLE))
@@ -175,12 +176,19 @@ QString TransactionDesc::toHTML(CWallet* wallet, CWalletTx& wtx, TransactionReco
                         else if (toSelf == ISMINE_WATCH_ONLY)
                             strHTML += " (" + tr("watch-only") + ")";
                         strHTML += "<br/>";
+                    } else if (txout.scriptPubKey.HasOpCreate()) {
+                        uint160 contract = uint160(LuxState::createLuxAddress(uintToh256(wtx.GetWitnessHash()), nOut).asBytes());
+                        strHTML += "<b>" + tr("Smart contract") + ":</b> ";
+                        strHTML += GUIUtil::HtmlEscape(EncodeDestination(CKeyID(contract))) + "<br/>";
+                        strHTML += "<b>Hash160:</b> ";
+                        strHTML += QString::fromStdString(contract.ToStringReverseEndian()) + "<br/>";
                     }
                 }
 
-                strHTML += "<b>" + tr("Debit") + ":</b> " + BitcoinUnits::formatHtmlWithUnit(unit, -txout.nValue) + "<br>";
+                if (txout.nValue)
+                    strHTML += "<b>" + tr("Debit") + ":</b> " + BitcoinUnits::formatHtmlWithUnit(unit, -txout.nValue) + "<br/>";
                 if (toSelf)
-                    strHTML += "<b>" + tr("Credit") + ":</b> " + BitcoinUnits::formatHtmlWithUnit(unit, txout.nValue) + "<br>";
+                    strHTML += "<b>" + tr("Credit") + ":</b> " + BitcoinUnits::formatHtmlWithUnit(unit, txout.nValue) + "<br/>";
             }
 
             if (fAllToMe) {
