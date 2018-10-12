@@ -1679,25 +1679,32 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
             pwalletMain->SetMaxVersion(nMaxVersion);
         }
 
-    // Upgrade to HD if explicit upgrade
-    if (GetBoolArg("-upgradewallet", false)) {
-        LOCK(pwalletMain->cs_wallet);
-        bool hd_upgrade = false;
-        if (pwalletMain->CanSupportFeature(FEATURE_HD) && !pwalletMain->IsHDEnabled()) {
-            LogPrintf("Upgrading wallet to HD\n");
-            pwalletMain->SetMinVersion(FEATURE_HD);
-            // generate a new master key
-            pwalletMain->GenerateNewHDChain();
-            hd_upgrade = true;
-        }
+        // Upgrade to HD if explicit upgrade
+        if (GetBoolArg("-upgradewallet", false)) {
+            LOCK(pwalletMain->cs_wallet);
+            bool hd_upgrade = false;
+            bool useHD = GetBoolArg("-usehd", DEFAULT_USE_HD_WALLET);
+            if (pwalletMain->CanSupportFeature(FEATURE_HD)) {
+                if (useHD && !pwalletMain->IsHDEnabled()) {
+                    LogPrintf("Upgrading wallet to HD\n");
+                    pwalletMain->SetMinVersion(FEATURE_HD);
+                    // generate a new master key
+                    pwalletMain->GenerateNewHDChain();
+                    hd_upgrade = true;
+                }
+            }
 
-        // Regenerate the keypool if upgraded to HD
-        if (hd_upgrade) {
-            if (!pwalletMain->NewKeyPool()) {
-                return InitError(_("Unable to generate keys") += "\n");
+            if (!useHD && pwalletMain->IsHDEnabled()) {
+                hd_upgrade = true; // NewKeyPool
+            }
+
+            // Regenerate the keypool if needed
+            if (hd_upgrade) {
+                if (!pwalletMain->NewKeyPool()) {
+                    return InitError(_("Unable to generate keys") += "\n");
+                }
             }
         }
-    }
 
         if (fFirstRun) {
             // Create new keyUser and set as default key
@@ -1722,8 +1729,8 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
 
         else if (mapArgs.count("-usehd")) {
             bool useHD = GetBoolArg("-usehd", DEFAULT_USE_HD_WALLET);
-            bool zaptx = GetBoolArg("-zapwallettxes", false) && GetArg("-zapwallettxes", "1") == "2";
-            if (pwalletMain->IsHDEnabled() && (!useHD && !zaptx)) {
+            bool reset = GetBoolArg("-salvagewallet", false) || GetBoolArg("-upgradewallet", false);
+            if (pwalletMain->IsHDEnabled() && (!useHD && !reset)) {
                 return InitError(strprintf(_("Error loading %s: You can't disable HD on a already existing HD wallet"), strWalletFile));
             }
             if (!pwalletMain->IsHDEnabled() && useHD) {
