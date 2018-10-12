@@ -72,7 +72,7 @@ class TransactionRecord
 {
 public:
     enum Type {
-        Other,
+        Other = 0,
         Generated,
         StakeMint,
         SendToAddress,
