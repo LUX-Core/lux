@@ -610,37 +610,32 @@ UniValue setmocktime(const UniValue& params, bool fHelp)
     return NullUniValue;
 }
 
-bool getAddressFromIndex(const uint16_t type, const uint160 &hash, std::string &address)
+static bool getAddressFromIndex(const uint16_t type, const uint160 &hash, std::string &address)
 {
-    if (type == 2) {
-        //address = CBitcoinAddress(CScriptID(hash)).ToString();
-        address = EncodeDestination(CScriptID(uint160(hash)));
-    } else if (type == 1) {
-        //address = CBitcoinAddress(CKeyID(hash)).ToString();
-        address = EncodeDestination(CKeyID(uint160(hash)));
-    } else {
-        return false;
+    switch (type) {
+        case 1:
+        case 4: // TX_WITNESS_V0_KEYHASH
+            address = EncodeDestination(CKeyID(uint160(hash)));
+            break;
+        case 2:
+            address = EncodeDestination(CScriptID(uint160(hash)));
+            break;
+        default:
+            return false;
     }
     return true;
 }
 
-bool getAddressesFromParams(const UniValue& params, AddressTypeVector &addresses)
+static bool getAddressesFromParams(const UniValue& params, AddressTypeVector &addresses)
 {
     if (params[0].isStr()) {
-        CTxDestination address = DecodeDestination(params[0].get_str());
-        uint160 hashBytes;
-        uint16_t hashType = 0;
-        const CKeyID* keyID = boost::get<CKeyID>(&address);
-        const CScriptID* scriptID = boost::get<CScriptID>(&address);
-        if (keyID && IsValidDestination(*keyID)) {
-            hashType = 1;
-            hashBytes = *keyID;
-        } else if (scriptID && IsValidDestination(*scriptID)) {
-            hashType = 2;
-            hashBytes = *scriptID;
-        } else {
+
+        CTxDestination dest = DecodeDestination(params[0].get_str());
+        uint160 hashBytes = GetHashForDestination(dest);
+        uint16_t hashType = dest.which();
+        if (hashType == 0)
             throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid address");
-        }
+        if (hashType == 4) hashType = 1; // TX_WITNESS_V0_KEYHASH
         addresses.push_back(std::make_pair(hashBytes, hashType));
 
     } else if (params[0].isObject()) {
@@ -651,22 +646,13 @@ bool getAddressesFromParams(const UniValue& params, AddressTypeVector &addresses
         }
 
         std::vector<UniValue> values = addressValues.getValues();
-
         for (std::vector<UniValue>::iterator it = values.begin(); it != values.end(); ++it) {
-            CTxDestination address = DecodeDestination(it->get_str());
-            uint160 hashBytes;
-            uint16_t hashType = 0;
-            const CKeyID* keyID = boost::get<CKeyID>(&address);
-            const CScriptID* scriptID = boost::get<CScriptID>(&address);
-            if (keyID && IsValidDestination(*keyID)) {
-                hashType = 1;
-                hashBytes = *keyID;
-            } else if (scriptID && IsValidDestination(*scriptID)) {
-                hashType = 2;
-                hashBytes = *scriptID;
-            } else {
+            CTxDestination dest = DecodeDestination(it->get_str());
+            uint160 hashBytes = GetHashForDestination(dest);
+            uint16_t hashType = dest.which();
+            if (hashType == 0)
                 throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid address");
-            }
+            if (hashType == 4) hashType = 1; // TX_WITNESS_V0_KEYHASH
             addresses.push_back(std::make_pair(hashBytes, hashType));
         }
     } else {
