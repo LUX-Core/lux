@@ -706,7 +706,7 @@ UniValue getaddressmempool(const UniValue& params, bool fHelp)
             "\nResult: [\n"
             "  {\n"
             "    \"address\",   (string) The base58check encoded address\n"
-            "    \"txhash\",    (string) The related transaction\n"
+            "    \"txid\",      (string) The related transaction\n"
             "    \"index\",     (number) The related input or output index\n"
             "    \"satoshis\",  (number) The delta amount\n"
             "    \"timestamp\", (number) The time the transaction entered the mempool (seconds)\n"
@@ -743,7 +743,7 @@ UniValue getaddressmempool(const UniValue& params, bool fHelp)
 
         UniValue delta(UniValue::VOBJ);
         delta.push_back(Pair("address", address));
-        delta.push_back(Pair("txhash", it->first.txHash.GetHex()));
+        delta.push_back(Pair("txid", it->first.txHash.GetHex()));
         delta.push_back(Pair("index", (int)it->first.indexInOut));
         delta.push_back(Pair("satoshis", it->second.amount));
         delta.push_back(Pair("timestamp", it->second.time));
@@ -778,7 +778,7 @@ UniValue getaddressutxos(const UniValue& params, bool fHelp)
             "\nResult: [\n"
             "  {\n"
             "    \"address\",  (string) The base58 address\n"
-            "    \"txhash\",   (string) The transaction hash\n"
+            "    \"txid\",     (string) The transaction id\n"
             "    \"index\",    (number) The tx output index\n"
           //"    \"script\",   (string) The script hex encoded\n"
             "    \"satoshis\", (number) The amount of the output\n"
@@ -815,7 +815,7 @@ UniValue getaddressutxos(const UniValue& params, bool fHelp)
         }
 
         output.push_back(Pair("address", address));
-        output.push_back(Pair("txhash", it->first.txHash.GetHex()));
+        output.push_back(Pair("txid", it->first.txHash.GetHex()));
         output.push_back(Pair("index", (int)it->first.outputIndex));
       //output.push_back(Pair("script", HexStr(it->second.script.begin(), it->second.script.end())));
         output.push_back(Pair("satoshis", it->second.satoshis));
@@ -845,7 +845,7 @@ UniValue getaddressdeltas(const UniValue& params, bool fHelp)
             "    \"satoshis\",   (number) The operation amount\n"
             "    \"height\",     (number) The block height\n"
             "    \"blockindex\", (number) The tx block index\n"
-            "    \"txhash\",     (string) The related tx hash\n"
+            "    \"txid\",       (string) The related transaction id\n"
             "    \"index\",      (number) The related input or output index\n"
             "    \"address\",    (string) The base58 encoded address\n"
             "    \"flags\"       (number) The type of movement\n"
@@ -902,7 +902,7 @@ UniValue getaddressdeltas(const UniValue& params, bool fHelp)
         delta.push_back(Pair("satoshis", it->second));
         delta.push_back(Pair("height", it->first.blockHeight));
         delta.push_back(Pair("blockindex", (int32_t)(it->first.blockIndex)));
-        delta.push_back(Pair("txhash", it->first.txhash.GetHex()));
+        delta.push_back(Pair("txid", it->first.txhash.GetHex()));
         delta.push_back(Pair("index", (int32_t)(it->first.indexInOut)));
         delta.push_back(Pair("address", address));
         delta.push_back(Pair("flags", (int32_t)(it->first.spentFlags)));
@@ -1010,7 +1010,7 @@ UniValue getaddresstxids(const UniValue& params, bool fHelp)
             "  \"end\"    (number) The end block height (optional)\n"
             "}\n"
             "\nResult: [\n"
-            "  \"txhash\"  (string) The transaction hash\n"
+            "  \"txid\"   (string) The transaction hash\n"
             "  ,...\n"
             "]\n"
             "\nExamples:\n"
@@ -1085,11 +1085,11 @@ UniValue getspentinfo(const UniValue& params, bool fHelp)
             "getspentinfo\n"
             "\nReturns the transaction where an output is spent. (-spentindex required)\n"
             "\nArguments: {\n"
-            "  \"txhash\": \"...\", (string) The hash of the transaction\n"
+            "  \"txid\": \"...\",   (string) The hash of the transaction\n"
             "  \"index\": 1       (number) The transaction output index to check\n"
             "}\n"
             "\nResult: {\n"
-            "  \"txhash\", (string) The spent transaction hash\n"
+            "  \"txid\",   (string) The spent transaction hash\n"
             "  \"index\",  (number) The transaction input index\n"
             "  \"height\"  (number) The block height\n"
             "}\n"
@@ -1106,18 +1106,18 @@ UniValue getspentinfo(const UniValue& params, bool fHelp)
     int outputIndex = 0;
     if (params[0].isObject()) {
         // json rpc
-        UniValue txhValue = find_value(params[0].get_obj(), "txhash");
+        UniValue txhValue = find_value(params[0].get_obj(), "txid");
         UniValue indexValue = find_value(params[0].get_obj(), "index");
         if (!txhValue.isStr())
             throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid tx");
-        txhash = ParseHashV(txhValue, "txhash");
+        txhash = ParseHashV(txhValue, "txid");
         outputIndex = indexValue.isNum() ? indexValue.get_int() : 0;
     } else {
         // debug console compatible
         UniValue txhValue = params[0];
         if (!txhValue.isStr())
             throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid tx");
-        txhash = ParseHashV(txhValue, "txhash");
+        txhash = ParseHashV(txhValue, "txid");
         if (params.size() > 1) {
             UniValue indexValue = params[1];
             outputIndex = indexValue.isNum() ? indexValue.get_int() : 0;
@@ -1132,7 +1132,7 @@ UniValue getspentinfo(const UniValue& params, bool fHelp)
     }
 
     UniValue obj(UniValue::VOBJ);
-    obj.push_back(Pair("txhash", value.txhash.GetHex()));
+    obj.push_back(Pair("txid", value.txhash.GetHex()));
     obj.push_back(Pair("index", (int)value.inputIndex));
     obj.push_back(Pair("height", value.blockHeight));
 
