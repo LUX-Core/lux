@@ -465,7 +465,26 @@ uint160 GetHashForDestination(const CTxDestination& dest)
             std::vector<unsigned char> hashBytes(scriptKey.begin(), scriptKey.end());
             hashDest = uint160(hashBytes);
         }
-        // TODO: Witness TX_WITNESS_V0_KEYHASH & TX_WITNESS_V0_SCRIPTHASH ?
+        else if (txType == TX_WITNESS_V0_KEYHASH && script.IsPayToWitnessPubkeyHash()) {
+            int witnessversion = 0;
+            std::vector<unsigned char> addrBytes;
+            if (script.IsWitnessProgram(witnessversion, addrBytes)) {
+                hashDest = addrBytes.size()==20 ? uint160(addrBytes) : Hash160(addrBytes);
+            }
+        }
+        else if (txType == TX_WITNESS_V0_SCRIPTHASH && script.IsPayToWitnessScriptHash()) {
+            int witnessversion = 0;
+            std::vector<unsigned char> addrBytes;
+            if (script.IsWitnessProgram(witnessversion, addrBytes)) {
+                hashDest = addrBytes.size()==20 ? uint160(addrBytes) : Hash160(addrBytes);
+            }
+        }
+        else if ((txType == TX_CALL || txType == TX_CREATE) && dest.type() == typeid(CKeyID)) {
+            CKeyID addressKey(boost::get<CKeyID>(dest));
+            std::vector<unsigned char> addrBytes(addressKey.begin(), addressKey.end());
+            hashDest = uint160(addrBytes);
+        }
+        // TODO: TX_COLDSTAKE if/when merged
     }
     return hashDest;
 }
