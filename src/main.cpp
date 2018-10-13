@@ -5786,7 +5786,7 @@ static bool ProcessMessage(CNode* pfrom, const string &strCommand, CDataStream& 
         pfrom->PushMessage("verack");
         pfrom->ssSend.SetVersion(min(pfrom->nVersion, PROTOCOL_VERSION));
 
-        if (!pfrom->fInbound) {
+        if (!pfrom->fInbound || IsDarknetOnly()) {
             // Advertise our address
             if (fListen && !IsInitialBlockDownload()) {
                 CAddress addr = GetLocalAddress(&pfrom->addr);
@@ -5905,7 +5905,7 @@ static bool ProcessMessage(CNode* pfrom, const string &strCommand, CDataStream& 
                 }
             }
             // Do not store addresses outside our network
-            if (fReachable)
+            if(fReachable && (!IsI2POnly() || addr.IsI2P()) )
                 vAddrOk.push_back(addr);
         }
         addrman.Add(vAddrOk, pfrom->addr, 2 * 60 * 60);
@@ -6276,12 +6276,16 @@ static bool ProcessMessage(CNode* pfrom, const string &strCommand, CDataStream& 
     // Making users (which are behind NAT and can only make outgoing connections) ignore
     // getaddr message mitigates the attack.
     else if ((strCommand == "getaddr") && (pfrom->fInbound)) {
+        LogPrintf("getaddr received from %s (startheight:%d) nVersion %d \n", pfrom->id, pfrom->nStartingHeight, pfrom->nVersion);
         pfrom->vAddrToSend.clear();
         bool fIpOnly = (pfrom->addr.nServices & NODE_I2P) != 0;
         bool fI2pOnly = pfrom->addr.IsI2P();
         vector<CAddress> vAddr = addrman.GetAddr( fIpOnly, fI2pOnly );
-        BOOST_FOREACH (const CAddress& addr, vAddr)
+        for (const CAddress& addr : vAddr) {
+            LogPrint("addrman", "addrman: getaddr received, address sent to %s \n", pfrom->id);
+            addr.print();
             pfrom->PushAddress(addr);
+        }
     }
 
 
