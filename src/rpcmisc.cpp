@@ -613,11 +613,12 @@ UniValue setmocktime(const UniValue& params, bool fHelp)
 static bool getAddressFromIndex(const uint16_t type, const uint160 &hash, std::string &address)
 {
     switch (type) {
-        case 1:
-        case 4: // TX_WITNESS_V0_KEYHASH
+        case 1: // CKeyID
+        case 4: // WitnessV0KeyHash
             address = EncodeDestination(CKeyID(uint160(hash)));
             break;
-        case 2:
+        case 2: // CScriptID
+        case 3: // WitnessV0ScriptHash
             address = EncodeDestination(CScriptID(uint160(hash)));
             break;
         default:
@@ -635,7 +636,8 @@ static bool getAddressesFromParams(const UniValue& params, AddressTypeVector &ad
         uint16_t hashType = dest.which();
         if (hashType == 0)
             throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid address");
-        if (hashType == 4) hashType = 1; // TX_WITNESS_V0_KEYHASH
+        if (hashType == 3) hashType = 2; // CScriptID
+        if (hashType == 4) hashType = 1; // CKeyID
         addresses.push_back(std::make_pair(hashBytes, hashType));
 
     } else if (params[0].isObject()) {
@@ -652,7 +654,8 @@ static bool getAddressesFromParams(const UniValue& params, AddressTypeVector &ad
             uint16_t hashType = dest.which();
             if (hashType == 0)
                 throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid address");
-            if (hashType == 4) hashType = 1; // TX_WITNESS_V0_KEYHASH
+            if (hashType == 3) hashType = 2; // CScriptID
+            if (hashType == 4) hashType = 1; // CKeyID
             addresses.push_back(std::make_pair(hashBytes, hashType));
         }
     } else {

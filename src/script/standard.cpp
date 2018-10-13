@@ -471,9 +471,11 @@ uint160 GetHashForDestination(const CTxDestination& dest)
             }
         }
         else if (txType == TX_WITNESS_V0_SCRIPTHASH && script.IsPayToWitnessScriptHash()) {
-            CScriptID scriptKey(boost::get<CScriptID>(dest));
-            std::vector<unsigned char> hashBytes(scriptKey.begin(), scriptKey.end());
-            hashDest = Hash160(hashBytes);
+            int witnessversion = 0;
+            std::vector<unsigned char> addrBytes;
+            if (script.IsWitnessProgram(witnessversion, addrBytes)) {
+                hashDest = addrBytes.size()==20 ? uint160(addrBytes) : Hash160(addrBytes);
+            }
         }
         else if ((txType == TX_CALL || txType == TX_CREATE) && dest.type() == typeid(CKeyID)) {
             CKeyID addressKey(boost::get<CKeyID>(dest));
