@@ -90,7 +90,7 @@ void OptionsModel::Init()
         settings.setValue("fShowMasternodesTab", masternodeConfig.getCount());
 
     if (!settings.contains("fShowAdvancedUI"))
-        settings.setValue("fShowAdvancedUI", false);
+        settings.setValue("fShowAdvancedUI", fEnableDarksend);
     fShowAdvancedUI = settings.value("fShowAdvancedUI", false).toBool();
 
     if (!settings.contains("fparallelMasterNode"))
