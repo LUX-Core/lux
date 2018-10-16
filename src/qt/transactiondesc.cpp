@@ -119,10 +119,8 @@ QString TransactionDesc::toHTML(CWallet* wallet, CWalletTx& wtx, TransactionReco
     //
     // Amount
     //
-    if (wtx.IsCoinBase() && nCredit == 0) {
-        //
-        // Coinbase
-        //
+    if (nCredit == 0 && wtx.IsCoinBase()) {
+        // Coinbase, Immature (PoW)
         CAmount nUnmatured = 0;
         for (const CTxOut& txout : wtx.vout)
             nUnmatured += wallet->GetCredit(txout, ISMINE_ALL);
@@ -131,12 +129,20 @@ QString TransactionDesc::toHTML(CWallet* wallet, CWalletTx& wtx, TransactionReco
             strHTML += BitcoinUnits::formatHtmlWithUnit(unit, nUnmatured) + " (" + tr("matures in %n more block(s)", "", wtx.GetBlocksToMaturity()) + ")";
         else
             strHTML += "(" + tr("not accepted") + ")";
-        strHTML += "<br>";
+        strHTML += "<br/>";
+    } else if (wtx.IsCoinStake()) {
+        // Minted (PoS)
+        strHTML += "<b>" + tr("Input") + ":</b> " + BitcoinUnits::formatHtmlWithUnit(unit, nCredit - nNet) + "<br/>";
+        strHTML += "<b>" + tr("Credit") + ":</b> " + BitcoinUnits::formatHtmlWithUnit(unit, nNet);
+        int nDepth = wtx.GetDepthInMainChain();
+        if (nDepth >= 0 && nDepth < Params().COINBASE_MATURITY())
+            strHTML += " (" + tr("Immature") + ", " + tr("matures in %n more block(s)", "", wtx.GetBlocksToMaturity()) + ")";
+        strHTML += "<br/>";
     } else if (nNet > 0) {
         //
         // Credit
         //
-        strHTML += "<b>" + tr("Credit") + ":</b> " + BitcoinUnits::formatHtmlWithUnit(unit, nNet) + "<br>";
+        strHTML += "<b>" + tr("Credit") + ":</b> " + BitcoinUnits::formatHtmlWithUnit(unit, nNet) + "<br/>";
     } else {
         isminetype fAllFromMe = ISMINE_SPENDABLE;
         for (const CTxIn& txin : wtx.vin) {
