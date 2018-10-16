@@ -1366,6 +1366,8 @@ public:
             CAmount credit = GetCredit(ISMINE_ALL);
             if (credit == 0) for (const CTxOut& txout : vout)
                 credit += pwallet->GetCredit(txout, ISMINE_ALL);
+            if (credit == 0)
+                return false; // witness tx
             int nDepth = GetDepthInMainChain();
             int nHeight = chainActive.Height();
             if (nDepth > 0) nHeight -= nDepth;
