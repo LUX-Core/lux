@@ -73,6 +73,7 @@ static bool AppInitRawTx(int argc, char* argv[])
         strUsage += "  delin=N                " + _("Delete input N from TX") + "\n";
         strUsage += "  delout=N               " + _("Delete output N from TX") + "\n";
         strUsage += "  in=TXID:VOUT           " + _("Add input to TX") + "\n";
+        strUsage += "  witness=N:HEX1         " + _("Add witness data to input N") + "\n";
         strUsage += "  locktime=N             " + _("Set TX lock time to N") + "\n";
         strUsage += "  nversion=N             " + _("Set TX version to N") + "\n";
         strUsage += "  rbfoptin(=N)           " + _("Set RBF opt-in sequence number for input N (if not provided, opt-in all available inputs)") + "\n";
@@ -181,7 +182,7 @@ static void MutateTxLocktime(CMutableTransaction& tx, const string& cmdVal)
 
     tx.nLockTime = (unsigned int)newLocktime;
 }
-
+#if 0
 static void MutateTxRBFOptIn(CMutableTransaction& tx, const std::string& strInIdx)
 {
     // parse requested index
@@ -198,7 +199,7 @@ static void MutateTxRBFOptIn(CMutableTransaction& tx, const std::string& strInId
         ++cnt;
     }
 }
-
+#endif
 static void MutateTxAddInput(CMutableTransaction& tx, const string& strInput)
 {
     // separate TXID:VOUT in string
@@ -226,6 +227,23 @@ static void MutateTxAddInput(CMutableTransaction& tx, const string& strInput)
     // append to transaction input list
     CTxIn txin(txid, vout);
     tx.vin.push_back(txin);
+}
+
+static void MutateTxAddWitness(CMutableTransaction& tx, const std::string& strInput)
+{
+    std::vector<std::string> vStrInputParts;
+    boost::split(vStrInputParts, strInput, boost::is_any_of(":"));
+
+    if (vStrInputParts.size() < 2) {
+        std::string strErr = "Bad input '" + strInput + "'";
+        throw std::runtime_error(strErr.c_str());
+    }
+
+    int inIdx = atoi(vStrInputParts[0]);
+    if (inIdx < 0 || inIdx >= (int)tx.vin.size()) {
+        std::string strErr = "Invalid TX input index '" + vStrInputParts[0] + "'";
+        throw std::runtime_error(strErr.c_str());
+    }
 }
 
 static void MutateTxAddOutAddr(CMutableTransaction& tx, const string& strInput)
@@ -540,6 +558,8 @@ static void MutateTx(CMutableTransaction& tx, const string& command, const strin
         MutateTxDelInput(tx, commandVal);
     else if (command == "in")
         MutateTxAddInput(tx, commandVal);
+    else if (command == "witness")
+        MutateTxAddWitness(tx, commandVal);
 
     else if (command == "delout")
         MutateTxDelOutput(tx, commandVal);

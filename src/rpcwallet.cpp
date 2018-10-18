@@ -21,6 +21,7 @@
 #include "stake.h"
 #include "coincontrol.h"
 #include "consensus/validation.h"
+#include "script/sign.h"
 #include "rbf.h"
 #include <stdint.h>
 #include <string>
@@ -3352,4 +3353,153 @@ UniValue generate(const UniValue& params, bool fHelp)
     }
 
     return generateBlocks(coinbase_script, num_generate, max_tries, true);
+}
+
+UniValue createsignaturewithwallet(const UniValue& params, bool fHelp)
+{
+    if (!EnsureWalletIsAvailable(fHelp))
+        return NullUniValue;
+
+    if (fHelp || params.size() < 3 || params.size() > 4)
+        throw std::runtime_error(
+                "createsignaturewithwallet \"hexstring\" \"prevtx\" \"address\" \"sighashtype\"\n"
+                "\nSign inputs for raw transaction (serialized, hex-encoded).\n"
+                + HelpRequiringPassphrase() + "\n"
+                "\nArguments:\n"
+                "1. \"hexstring\"                      (string, required) The transaction hex string\n"
+                "2. \"prevtx\"                         (json, required) The prevtx signing for\n"
+                "    {\n"
+                "     \"txid\":\"id\",                   (string, required) The transaction id\n"
+                "     \"vout\":n,                      (numeric, required) The output number\n"
+                "     \"scriptPubKey\": \"hex\",         (string, required) script key\n"
+                "     \"redeemScript\": \"hex\",         (string, required for P2SH or P2WSH) redeem script\n"
+                "     \"amount\": value                (numeric, required) The amount spent\n"
+                "   }\n"
+                "3. \"address\"                        (string, required) The address of the private key to sign with\n"
+                "4. \"sighashtype\"                    (string, optional, default=ALL) The signature hash type. Must be one of\n"
+                "       \"ALL\"\n"
+                "       \"NONE\"\n"
+                "       \"SINGLE\"\n"
+                "       \"ALL|ANYONECANPAY\"\n"
+                "       \"NONE|ANYONECANPAY\"\n"
+                "       \"SINGLE|ANYONECANPAY\"\n"
+                "\nResult:\n"
+                "The hex encoded signature.\n"
+                "\nExamples:\n"
+                + HelpExampleCli("createsignaturewithwallet", "\"myhex\" 0 \"myaddress\"") + HelpExampleRpc("createsignaturewithwallet", "\"myhex\", 0, \"myaddress\"")
+        );
+
+    EnsureWalletIsUnlocked();
+
+    RPCTypeCheck(params, {UniValue::VSTR, UniValue::VOBJ, UniValue::VSTR, UniValue::VSTR}, true);
+
+    CTransaction tx;
+    if (!DecodeHexTx(tx, params[0].get_str())) {
+        throw JSONRPCError(RPC_DESERIALIZATION_ERROR, "TX decode failed");
+    }
+
+    UniValue prevOut = params[1].get_obj();
+
+    RPCTypeCheckObj(prevOut, map_list_of("txid", UniValue::VSTR)("vout", UniValue::VNUM)("scriptPubKey", UniValue::VSTR));
+
+    uint256 txid = ParseHashO(prevOut, "txid");
+
+    int nOut = find_value(prevOut, "vout").get_int();
+    if (nOut < 0) {
+        throw JSONRPCError(RPC_DESERIALIZATION_ERROR, "vout must be positive");
+    }
+
+    COutPoint out(txid, nOut);
+    vector<unsigned char> pkData(ParseHexO(prevOut, "scriptPubKey"));
+    CScript scriptRedeem, scriptPubKey(pkData.begin(), pkData.end());
+
+    if (!prevOut.exists("amount"))
+        throw JSONRPCError(RPC_DESERIALIZATION_ERROR, "amount is required");
+
+    if (prevOut.exists("redeemScript")) {
+        vector<unsigned char> redeemData(ParseHexO(prevOut, "redeemScript"));
+        scriptRedeem = CScript(redeemData.begin(), redeemData.end());
+    } else if (scriptPubKey.IsPayToScriptHash()) {
+        if (pwalletMain) {
+            CTxDestination redeemDest;
+            if (ExtractDestination(scriptPubKey, redeemDest)) {
+                if (redeemDest.type() == typeid(CScriptID)) {
+                    const CScriptID& scriptID = boost::get<CScriptID>(redeemDest);
+                    pwalletMain->GetCScript(scriptID, scriptRedeem);
+                }
+            }
+        }
+
+        if (scriptRedeem.size() == 0) {
+            throw JSONRPCError(RPC_INVALID_PARAMETER, "\"redeemScript\" is required");
+        }
+    }
+
+    CKeyID idSign;
+    CTxDestination dest = DecodeDestination(params[2].get_str());
+    if (!IsValidDestination(dest))
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid address");
+
+    if (dest.type() == typeid(CKeyID)) {
+        idSign = boost::get<CKeyID>(dest);
+    } else {
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Unsupported destination type.");
+    }
+
+    const UniValue &hashType = params[3];
+    int nHashType = SIGHASH_ALL;
+    if (!hashType.isNull()) {
+        static map<string, int> mapSigHashValues = {
+                {string("ALL"), int(SIGHASH_ALL)},
+                {string("ALL|ANYONECANPAY"), int(SIGHASH_ALL|SIGHASH_ANYONECANPAY)},
+                {string("NONE"), int(SIGHASH_NONE)},
+                {string("NONE|ANYONECANPAY"), int(SIGHASH_NONE|SIGHASH_ANYONECANPAY)},
+                {string("SINGLE"), int(SIGHASH_SINGLE)},
+                {string("SINGLE|ANYONECANPAY"), int(SIGHASH_SINGLE|SIGHASH_ANYONECANPAY)},
+        };
+
+        string strHashType = hashType.get_str();
+        if (mapSigHashValues.count(strHashType)) {
+            nHashType = mapSigHashValues[strHashType];
+        } else {
+            throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid sighash param");
+        }
+    }
+
+    bool fHashSingle = ((nHashType & ~SIGHASH_ANYONECANPAY) == SIGHASH_SINGLE);
+
+    // Sign the transaction
+    LOCK2(cs_main, pwalletMain->cs_wallet);
+
+    vector<CMutableTransaction> txVariants;
+    vector<uint8_t> vchSig;
+    CBasicKeyStore tempKeystore;
+    const CKeyStore& keystore = tempKeystore;
+    CCoinsView viewDummy;
+    CCoinsViewCache view(&viewDummy);
+
+    // mergedTx will end up with all the signatures; it
+    // starts as a clone of the rawtx:
+    CMutableTransaction mergedTx(txVariants[0]);
+    const CTransaction txConst(mergedTx);
+    unsigned int i;
+    for (i = 0; i < mergedTx.vin.size(); i++) {
+        CTxIn& txin = mergedTx.vin[i];
+        const CCoins* coins = view.AccessCoins(txin.prevout.hash);
+        const CScript& prevPubKey = coins->vout[txin.prevout.n].scriptPubKey;
+        const CAmount& amount = coins->vout[txin.prevout.n].nValue;
+
+        txin.scriptSig.clear();
+        SignatureData sigdata;
+
+        // Only sign SIGHASH_SINGLE if there's a corresponding output:
+        if (!fHashSingle || (i < mergedTx.vout.size()))
+            ProduceSignature(MutableTransactionSignatureCreator(&keystore, &mergedTx, i, amount, nHashType), prevPubKey, sigdata);
+        sigdata = CombineSignatures(prevPubKey, TransactionSignatureChecker(&txConst, i, amount), sigdata, DataFromTransaction(mergedTx, i));
+
+        if (!VerifyScript(txin.scriptSig, prevPubKey, mergedTx.wit.vtxinwit.size() > i ? &mergedTx.wit.vtxinwit[i].scriptWitness : nullptr, STANDARD_SCRIPT_VERIFY_FLAGS, TransactionSignatureChecker(&txConst, i, amount)))
+            break;
+        }
+
+    return HexStr(vchSig);
 }
