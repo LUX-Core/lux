@@ -73,6 +73,7 @@ public:
     CScript scriptSig;
     uint32_t nSequence;
     CScript prevPubKey;
+    CScriptWitness scriptWitness; //! Only serialized through CTransaction
 
     /* Setting nSequence to this value for every input in a transaction
      * disables nLockTime. */

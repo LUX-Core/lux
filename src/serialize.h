@@ -18,6 +18,7 @@
 #include <utility>
 #include <vector>
 
+#include <span.h>
 #include "prevector.h"
 
 class CScript;
@@ -43,6 +44,12 @@ inline T* NCONST_PTR(const T* val)
 {
     return const_cast<T*>(val);
 }
+
+//! Safely convert odd char pointer types to standard ones.
+inline char* CharCast(char* c) { return c; }
+inline char* CharCast(unsigned char* c) { return (char*)c; }
+inline const char* CharCast(const char* c) { return c; }
+inline const char* CharCast(const unsigned char* c) { return (const char*)c; }
 
 /** 
  * Get begin pointer of vector (non-const version).
@@ -203,6 +210,31 @@ inline void Serialize(Stream& s, double a, int, int = 0)
     WRITEDATA(s, a);
 }
 
+template<typename Stream, int N>
+inline void Serialize(Stream& s, const char (&a)[N])
+{
+    s.write(a, N);
+}
+
+template<typename Stream, int N>
+inline void Serialize(Stream& s, const unsigned char (&a)[N])
+{
+    s.write(CharCast(a), N);
+}
+
+template<typename Stream>
+inline void Serialize(Stream& s, const Span<const unsigned char>& span)
+{
+    s.write(CharCast(span.data()), span.size());
+}
+
+template<typename Stream>
+inline void Serialize(Stream& s, const Span<unsigned char>& span)
+{
+    s.write(CharCast(span.data()), span.size());
+}
+
+
 template <typename Stream>
 inline void Unserialize(Stream& s, char& a, int, int = 0)
 {
@@ -284,6 +316,23 @@ inline void Unserialize(Stream& s, bool& a, int, int = 0)
     a = f;
 }
 
+template<typename Stream, int N>
+inline void Unserialize(Stream& s, char (&a)[N])
+{
+    s.read(a, N);
+}
+
+template<typename Stream, int N>
+inline void Unserialize(Stream& s, unsigned char (&a)[N])
+{
+    s.read(CharCast(a), N);
+}
+
+template<typename Stream>
+inline void Unserialize(Stream& s, Span<unsigned char>& span)
+{
+    s.read(CharCast(span.data()), span.size());
+}
 
 /**
  * Compact Size

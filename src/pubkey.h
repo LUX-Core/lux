@@ -103,6 +103,7 @@ public:
     const unsigned char* begin() const { return vch; }
     const unsigned char* end() const { return vch + size(); }
     const unsigned char& operator[](unsigned int pos) const { return vch[pos]; }
+    const unsigned char* data() const { return vch; }
 
     //! Comparator implementation.
     friend bool operator==(const CPubKey& a, const CPubKey& b)
