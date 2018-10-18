@@ -152,12 +152,13 @@ static void RegisterLoad(const string& strInput)
         valStr.insert(valStr.size(), buf, bread);
     }
 
-    if (ferror(f)) {
+    int error = ferror(f);
+    fclose(f);
+
+    if (error) {
         string strErr = "Error reading file " + filename;
         throw runtime_error(strErr);
     }
-
-    fclose(f);
 
     // evaluate as JSON buffer register
     RegisterSetJson(key, valStr);
@@ -211,10 +212,10 @@ static void MutateTxAddInput(CMutableTransaction& tx, const string& strInput)
     string strTxid = strInput.substr(0, pos);
     if ((strTxid.size() != 64) || !IsHex(strTxid))
         throw runtime_error("invalid TX input txid");
-    uint256 txid(strTxid);
+    uint256 txid(uint256S(strTxid));
 
     static const unsigned int minTxOutSz = 9;
-    static const unsigned int maxVout = MAX_BLOCK_BASE_SIZE / minTxOutSz;
+    static const unsigned int maxVout = MAX_BLOCK_SIZE / minTxOutSz;
 
     // extract and validate vout
     string strVout = strInput.substr(pos + 1, string::npos);
@@ -253,6 +254,35 @@ static void MutateTxAddOutAddr(CMutableTransaction& tx, const string& strInput)
 
     // construct TxOut, append to transaction output list
     CTxOut txout(value, scriptPubKey);
+    tx.vout.push_back(txout);
+}
+
+static void MutateTxAddOutData(CMutableTransaction& tx, const string& strInput)
+{
+    CAmount value = 0;
+
+    // separate [VALUE:]DATA in string
+    size_t pos = strInput.find(':');
+
+    if (pos==0)
+        throw runtime_error("TX output value not specified");
+
+    if (pos != string::npos) {
+        // extract and validate VALUE
+        string strValue = strInput.substr(0, pos);
+        if (!ParseMoney(strValue, value))
+            throw runtime_error("invalid TX output value");
+    }
+
+    // extract and validate DATA
+    string strData = strInput.substr(pos + 1, string::npos);
+
+    if (!IsHex(strData))
+        throw runtime_error("invalid TX output data");
+
+    vector<unsigned char> data = ParseHex(strData);
+
+    CTxOut txout(value, CScript() << OP_RETURN << data);
     tx.vout.push_back(txout);
 }
 
@@ -412,8 +442,8 @@ static void MutateTxSign(CMutableTransaction& tx, const string& flagStr)
                 CCoinsModifier coins = view.ModifyCoins(txid);
                 if (coins->IsAvailable(nOut) && coins->vout[nOut].scriptPubKey != scriptPubKey) {
                     string err("Previous output scriptPubKey mismatch:\n");
-                    err = err + coins->vout[nOut].scriptPubKey.ToString() + "\nvs:\n" +
-                          scriptPubKey.ToString();
+                    err = err + ScriptToAsmStr(coins->vout[nOut].scriptPubKey) + "\nvs:\n" +
+                            ScriptToAsmStr(scriptPubKey);
                     throw runtime_error(err);
                 }
                 if ((unsigned int)nOut >= coins->vout.size())
@@ -515,6 +545,8 @@ static void MutateTx(CMutableTransaction& tx, const string& command, const strin
         MutateTxDelOutput(tx, commandVal);
     else if (command == "outaddr")
         MutateTxAddOutAddr(tx, commandVal);
+    else if (command == "outdata")
+        MutateTxAddOutData(tx, commandVal);
     else if (command == "outscript")
         MutateTxAddOutScript(tx, commandVal);
 
