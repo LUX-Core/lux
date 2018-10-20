@@ -90,8 +90,10 @@ void TxToJSON(const CTransaction& tx, const uint256 hashBlock, UniValue& entry)
            in.push_back(Pair("valueSat", spentInfo.satoshis));
            if (spentInfo.hashType == 1) {
                in.push_back(Pair("address", EncodeDestination(CKeyID(spentInfo.hashBytes))));
-           } else if (spentInfo.hashType == 2)  {
+           } else if (spentInfo.hashType == 2) {
                in.push_back(Pair("address", EncodeDestination(CScriptID(spentInfo.hashBytes))));
+           } else if (spentInfo.hashType == 4) {
+               in.push_back(Pair("address", EncodeDestination(WitnessV0KeyHash(spentInfo.hashBytes))));
            }
         }
         if (!tx.wit.IsNull()) {
@@ -119,11 +121,11 @@ void TxToJSON(const CTransaction& tx, const uint256 hashBlock, UniValue& entry)
         ScriptPubKeyToJSON(txout.scriptPubKey, o, true);
         out.push_back(Pair("scriptPubKey", o));
         vout.push_back(out);
-        // Add spent information if spentindex is enabled
+        // Add spent information if spentindex is enabled (DASH style)
         CSpentIndexValue spentInfo;
         CSpentIndexKey spentKey(txid, i);
         if (GetSpentIndex(spentKey, spentInfo)) {
-            out.push_back(Pair("spentTxHash", spentInfo.txhash.GetHex()));
+            out.push_back(Pair("spentTxId", spentInfo.txhash.GetHex()));
             out.push_back(Pair("spentIndex", (int)spentInfo.inputIndex));
             out.push_back(Pair("spentHeight", spentInfo.blockHeight));
         }
@@ -138,8 +140,9 @@ void TxToJSON(const CTransaction& tx, const uint256 hashBlock, UniValue& entry)
                 entry.push_back(Pair("confirmations", 1 + chainActive.Height() - pindex->nHeight));
                 entry.push_back(Pair("time", pindex->GetBlockTime()));
                 entry.push_back(Pair("blocktime", pindex->GetBlockTime()));
-            } else
-                entry.push_back(Pair("confirmations", 0));
+            } else {
+                entry.push_back(Pair("confirmations", -1));
+            }
         }
     }
 }

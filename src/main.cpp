@@ -2276,7 +2276,7 @@ static DisconnectResult DisconnectBlock(CBlock& block, CValidationState& state, 
                 txnouttype txType = TX_NONSTANDARD;
                 uint16_t addressType = 0;
                 const CTxOut &out = tx.vout[k];
-                if (ExtractDestination(out.scriptPubKey, dest, &txType)) {
+                if (out.nValue && ExtractDestination(out.scriptPubKey, dest, &txType)) {
                     addressType = dest.which();
                     hashDest = GetHashForDestination(dest);
                 } else {
@@ -2338,7 +2338,7 @@ static DisconnectResult DisconnectBlock(CBlock& block, CValidationState& state, 
                     CTxDestination dest; uint160 hashDest;
                     txnouttype txType = TX_NONSTANDARD;
                     uint16_t addressType = 0;
-                    if (ExtractDestination(prevout.scriptPubKey, dest, &txType)) {
+                    if (prevout.nValue && ExtractDestination(prevout.scriptPubKey, dest, &txType)) {
                         addressType = dest.which();
                         hashDest = GetHashForDestination(dest);
                     } else {

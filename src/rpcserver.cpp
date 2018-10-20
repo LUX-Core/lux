@@ -297,6 +297,7 @@ static const CRPCCommand vRPCCommands[] =
         {"addressindex", "getaddresstxids", &getaddresstxids, false, false, false},
         {"addressindex", "getaddressbalance", &getaddressbalance, false, false, false},
         {"addressindex", "getspentinfo", &getspentinfo, false, false, false},
+        {"addressindex", "purgetxindex", &purgetxindex, false, false, false},
 
         /*Smart Contract*/
         {"blockchain", "getaccountinfo", &getaccountinfo,true, true, false },

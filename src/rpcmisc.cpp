@@ -17,6 +17,7 @@
 #include "script/standard.h"
 #include "spork.h"
 #include "timedata.h"
+#include "txdb.h"
 #include "util.h"
 #ifdef ENABLE_WALLET
 #include "wallet.h"
@@ -1132,6 +1133,71 @@ UniValue getspentinfo(const UniValue& params, bool fHelp)
     obj.push_back(Pair("txid", value.txhash.GetHex()));
     obj.push_back(Pair("index", (int)value.inputIndex));
     obj.push_back(Pair("height", value.blockHeight));
+
+    return obj;
+}
+
+UniValue purgetxindex(const UniValue& params, bool fHelp)
+{
+    if (fHelp || params.size() < 1) {
+        throw runtime_error(
+            "purgetxindex\n"
+            "\nPurges an orphaned tx from the disk indexes.\n"
+            "\nArgument:\n"
+            "  \"txid\": \"...\" (string) The id of the transaction\n"
+            "\nResult: {\n"
+            "  \"txindex\": n, (number) The number of records purged from txindex\n"
+            "  \"address\": n, (number) The number of records purged from addressindex\n"
+            "  \"unspent\": n  (number) The number of records purged from unspentindex\n"
+            "}\n"
+            "\nExamples:\n"
+            + HelpExampleCli("purgetxindex", "\"6108f40537ae12df35d5c59b23de27f713efb11ff13b97607cde99d3a12257ce\"")
+        );
+    }
+    uint256 txid;
+    UniValue hex;
+    if (params[0].isObject()) {
+        hex = find_value(params[0].get_obj(), "txid");
+    } else {
+        hex = params[0];
+    }
+    if (!hex.isStr())
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid txid");
+    txid = ParseHashV(hex, "txid");
+
+    CTransaction tx;
+    uint256 hashBlock = uint256();
+    if (GetTransaction(txid, tx, Params().GetConsensus(), hashBlock, true)) {
+        if (hashBlock != uint256()) {
+            CBlockIndex* pindex = LookupBlockIndex(hashBlock);
+            if (pindex && chainActive.Contains(pindex))
+                throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "This tx is not orphaned!");
+        }
+    }
+
+    int txs=0, addr=0, unspent=0;
+    if (fTxIndex) {
+        if (pblocktree->EraseTxIndex(txid)) txs++;
+    }
+    if (fAddressIndex) {
+        AddressIndexVector addressIndex;
+        if (pblocktree->FindTxEntriesInAddressIndex(txid, addressIndex)) {
+            addr = (int) addressIndex.size();
+            LogPrintf("addressindex: %zu records found for tx %s, deleting...\n", addressIndex.size(), txid.GetHex());
+            pblocktree->EraseAddressIndex(addressIndex);
+        }
+        AddressUnspentVector addressUnspent;
+        if (pblocktree->FindTxEntriesInUnspentIndex(txid, addressUnspent)) {
+            unspent += (int) addressUnspent.size();
+            LogPrintf("addressindex: %zu unspent keys found for tx %s, deleting...\n", addressUnspent.size(), txid.GetHex());
+            pblocktree->EraseAddressUnspentIndex(addressUnspent);
+        }
+    }
+
+    UniValue obj(UniValue::VOBJ);
+    obj.push_back(Pair("txindex", txs));
+    obj.push_back(Pair("address", addr));
+    obj.push_back(Pair("unspent", unspent));
 
     return obj;
 }
