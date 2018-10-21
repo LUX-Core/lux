@@ -2284,11 +2284,11 @@ static DisconnectResult DisconnectBlock(CBlock& block, CValidationState& state, 
                 }
 
                 // undo receive, decrement balance
-                uint8_t spentFlags = ANDX_IS_SPENT | ANDX_ORPHANED;
+                uint8_t spentFlags = 0;
                 if (tx.IsCoinStake()) spentFlags |= ANDX_IS_STAKE;
                 addressIndex.push_back(std::make_pair(
                     CAddressIndexKey(addressType, hashDest, pindex->nHeight, i, hash, k, spentFlags),
-                    out.nValue * -1
+                    out.nValue // unused to delete
                 ));
                 // undo unspent index
                 addressUnspentIndex.push_back(std::make_pair(
@@ -2346,7 +2346,7 @@ static DisconnectResult DisconnectBlock(CBlock& block, CValidationState& state, 
                     }
 
                     // undo spending activity, increment balance
-                    uint8_t spentFlags = ANDX_ORPHANED;
+                    uint8_t spentFlags = ANDX_IS_SPENT;
                     if (tx.IsCoinStake()) spentFlags |= ANDX_IS_STAKE;
                     addressIndex.push_back(std::make_pair(
                         CAddressIndexKey(addressType, hashDest, pindex->nHeight, i, hash, j, spentFlags),
