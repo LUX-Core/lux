@@ -107,7 +107,7 @@ void RPCTypeCheckObj(const UniValue& o,
     const map<string, UniValue::VType>& typesExpected,
     bool fAllowNull)
 {
-    for (const PAIRTYPE(string, UniValue::VType) & t : typesExpected) {
+    for (const std::pair<string, UniValue::VType> & t : typesExpected) {
         const UniValue& v = find_value(o, t.first);
         if (!fAllowNull && v.isNull())
             throw JSONRPCError(RPC_TYPE_ERROR, strprintf("Missing %s", t.first));
@@ -177,7 +177,7 @@ string CRPCTable::help(string strCommand) const
         vCommands.push_back(make_pair(mi->second->category + mi->first, mi->second));
     sort(vCommands.begin(), vCommands.end());
 
-    for (const PAIRTYPE(string, const CRPCCommand*) & command : vCommands) {
+    for (const std::pair<string, const CRPCCommand*> & command : vCommands) {
         const CRPCCommand* pcmd = command.second;
         string strMethod = pcmd->name;
         // We already filter duplicates, but these deprecated screw up the sort order
@@ -771,7 +771,7 @@ void StopRPCThreads()
             LogPrintf("%s: Warning: %s when cancelling acceptor", __func__, ec.message());
     }
     rpc_acceptors.clear();
-    for (const PAIRTYPE(std::string, boost::shared_ptr<deadline_timer>) & timer : deadlineTimers) {
+    for (const std::pair<std::string, boost::shared_ptr<deadline_timer>> & timer : deadlineTimers) {
         timer.second->cancel(ec);
         if (ec)
             LogPrintf("%s: Warning: %s when cancelling timer", __func__, ec.message());

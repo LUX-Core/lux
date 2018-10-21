@@ -472,7 +472,7 @@ int GetMasternodeByRank(int findRank, int64_t nBlockHeight, int minProtocol) {
     sort(vecMasternodeScores.rbegin(), vecMasternodeScores.rend(), CompareValueOnly2());
 
     int rank = 0;
-    for (PAIRTYPE(unsigned int, int) &s : vecMasternodeScores) {
+    for (std::pair<unsigned int, int> &s : vecMasternodeScores) {
         rank++;
         if (rank == findRank) return s.second;
     }
@@ -502,7 +502,7 @@ int GetMasternodeRank(CTxIn& vin, int64_t nBlockHeight, int minProtocol) {
     sort(vecMasternodeScores.rbegin(), vecMasternodeScores.rend(), CompareValueOnly());
 
     unsigned int rank = 0;
-    for (PAIRTYPE(unsigned int, CTxIn) &s : vecMasternodeScores) {
+    for (std::pair<unsigned int, CTxIn> &s : vecMasternodeScores) {
         rank++;
         if (s.second == vin) {
             return rank;

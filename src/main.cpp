@@ -5791,7 +5791,7 @@ string GetWarnings(string strFor)
     // Alerts
     {
         LOCK(cs_mapAlerts);
-        for (PAIRTYPE(const uint256, CAlert) & item : mapAlerts) {
+        for (std::pair<const uint256, CAlert> & item : mapAlerts) {
             const CAlert& alert = item.second;
             if (alert.AppliesToMe() && alert.nPriority > nPriority) {
                 nPriority = alert.nPriority;
@@ -6176,7 +6176,7 @@ static bool ProcessMessage(CNode* pfrom, const string &strCommand, CDataStream& 
         // Relay alerts
         {
             LOCK(cs_mapAlerts);
-            for (PAIRTYPE(const uint256, CAlert) & item : mapAlerts)
+            for (std::pair<const uint256, CAlert> & item : mapAlerts)
                 item.second.RelayTo(pfrom);
         }
 
