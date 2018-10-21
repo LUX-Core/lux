@@ -650,7 +650,7 @@ AC_LINK_IFELSE([AC_LANG_SOURCE([
       use_reduce_exports=no
   ]
 )
-
+# Check thread_local
 TEMP_LDFLAGS="$LDFLAGS"
 LDFLAGS="$TEMP_LDFLAGS $PTHREAD_CFLAGS"
 AC_MSG_CHECKING([for thread_local support])
