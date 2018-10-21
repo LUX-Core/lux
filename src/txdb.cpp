@@ -335,19 +335,22 @@ bool CBlockTreeDB::FindTxEntriesInUnspentIndex(uint256 txid, AddressUnspentVecto
             ssKey >> chType;
             if (chType != DB_ADDRESSUNSPENTINDEX) break;
             ssKey >> indexKey;
-            try {
-                if (indexKey.txHash == txid) {
+            if (indexKey.txHash == txid) {
+                try {
                     leveldb::Slice slValue = pcursor->value();
                     CDataStream ssValue(slValue.data(), slValue.data()+slValue.size(), SER_DISK, CLIENT_VERSION);
-                    CAddressUnspentValue nData;
-                    ssValue >> nData;
-                    addressUnspent.push_back(make_pair(indexKey, nData));
+                    CAddressUnspentValue stData;
+                    ssValue >> stData;
+                    addressUnspent.push_back(make_pair(indexKey, stData));
+                } catch (const std::exception& e) {
+                    LogPrintf("%s: Deserialize I/O error - %s", __func__, e.what());
+                    CAddressUnspentValue stDummy;
+                    addressUnspent.push_back(make_pair(indexKey, stDummy));
                 }
-                pcursor->Next();
-            } catch (...) {
-                return false;
             }
-        } catch (...) {
+            pcursor->Next();
+        } catch (const std::exception& e) {
+            LogPrintf("%s: Seek or I/O error - %s", __func__, e.what());
             break;
         }
     }
@@ -440,19 +443,21 @@ bool CBlockTreeDB::FindTxEntriesInAddressIndex(uint256 txid, AddressIndexVector 
             ssKey >> chType;
             if (chType != DB_ADDRESSINDEX) break;
             ssKey >> indexKey;
-            try {
-                if (indexKey.txhash == txid) {
+            if (indexKey.txhash == txid) {
+                try {
                     leveldb::Slice slValue = pcursor->value();
                     CDataStream ssValue(slValue.data(), slValue.data()+slValue.size(), SER_DISK, CLIENT_VERSION);
                     CAmount nValue;
                     ssValue >> nValue;
                     addressIndex.push_back(make_pair(indexKey, nValue));
+                } catch (const std::exception& e) {
+                    LogPrintf("%s: Deserialize I/O error - %s", __func__, e.what());
+                    addressIndex.push_back(make_pair(indexKey, 0));
                 }
-                pcursor->Next();
-            } catch (...) {
-                return false;
             }
-        } catch (...) {
+            pcursor->Next();
+        } catch (const std::exception& e) {
+            LogPrintf("%s: Seek or I/O error - %s", __func__, e.what());
             break;
         }
     }
