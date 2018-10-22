@@ -3,7 +3,7 @@
     <name>AddressBookPage</name>
     <message>
         <source>Right-click to edit address or label</source>
-        <translation>Clique droit pour modifier l'adresse ou le label</translation>
+        <translation>Clic droit pour modifier l&apos;adresse ou som nom</translation>
     </message>
     <message>
         <source>Create a new address</source>
@@ -11,47 +11,47 @@
     </message>
     <message>
         <source>&amp;New</source>
-        <translation>Nouveau</translation>
+        <translation>&amp;Nouveau</translation>
     </message>
     <message>
         <source>Copy the currently selected address to the system clipboard</source>
-        <translation>Copier l'adresse actuelle dans le presse-papier</translation>
+        <translation>Copier l&apos;adresse sélectionnée dans le presse-papier</translation>
     </message>
     <message>
         <source>&amp;Copy</source>
-        <translation>Copier</translation>
+        <translation>&amp;Copier</translation>
     </message>
     <message>
         <source>Delete the currently selected address from the list</source>
-        <translation>Supprimer l'adresse actuellement séléctionnée de la liste</translation>
+        <translation>Supprimer l&apos;adresse sélectionnée de la liste</translation>
     </message>
     <message>
         <source>&amp;Delete</source>
-        <translation>Supprimer</translation>
+        <translation>&amp;Supprimer</translation>
     </message>
     <message>
         <source>&amp;Export</source>
-        <translation>Exporter</translation>
+        <translation>&amp;Exporter</translation>
     </message>
     <message>
         <source>C&amp;lose</source>
-        <translation>Fermer</translation>
+        <translation>&amp;Fermer</translation>
     </message>
     <message>
         <source>Choose the address to send coins to</source>
-        <translation>Choisir l'adresse à laquelle envoyer des pièces</translation>
+        <translation>Sélection du destinataire</translation>
     </message>
     <message>
         <source>Choose the address to receive coins with</source>
-        <translation>Choisir l'adresse avec laquelle recevoir des pièces</translation>
+        <translation>Sélection de l&apos;adresse de réception</translation>
     </message>
     <message>
         <source>C&amp;hoose</source>
-        <translation>Choisir</translation>
+        <translation>C&amp;hoisir</translation>
     </message>
     <message>
         <source>Sending addresses</source>
-        <translation>Adresses d'envoi</translation>
+        <translation>Adresses enregistrées</translation>
     </message>
     <message>
         <source>Receiving addresses</source>
@@ -59,15 +59,15 @@
     </message>
     <message>
         <source>&amp;Copy Address</source>
-        <translation>Copier l'adresse</translation>
+        <translation>&amp;Copier l&apos;adresse</translation>
     </message>
     <message>
         <source>Copy &amp;Label</source>
-        <translation>Copier le label</translation>
+        <translation>Copier &amp;le nom</translation>
     </message>
     <message>
         <source>&amp;Edit</source>
-        <translation>Modifier</translation>
+        <translation>Modifi&amp;er</translation>
     </message>
     <message>
         <source>Export Address List</source>
@@ -75,7 +75,7 @@
     </message>
     <message>
         <source>Comma separated file (*.csv)</source>
-        <translation>Fichier avec séparation par des virgules (*.csv)</translation>
+        <translation>Fichier CSV séparé par virgules (*.csv)</translation>
     </message>
     <message>
         <source>Exporting Failed</source>
@@ -83,14 +83,26 @@
     </message>
     <message>
         <source>There was an error trying to save the address list to %1. Please try again.</source>
-        <translation>Un erreur s'est produite en essayant d'enregistrer la liste d'adresses dans %1. Veuillez réessayer.</translation>
+        <translation>Une erreur s'est produite en essayant d&apos;exporter la liste d&apos;adresses dans %1.</translation>
+    </message>
+    <message>
+        <source>Export the data in the current tab to a file</source>
+        <translation>Exporte les données du tableau dans un fichier</translation>
+    </message>
+    <message>
+        <source>These are your LUX addresses for sending payments. Always check the amount and the receiving address before sending coins.</source>
+        <translation>Adresses de destinataires enregistrées. Vérifiez bien le montant et l&apos;adresse du destinataire avant d&apos;envoyer.</translation>
+    </message>
+    <message>
+        <source>These are your LUX addresses for receiving payments. It is recommended to use a new receiving address for each transaction.</source>
+        <translation>Voici vos adresses pour recevoir des LUX. Il est recommandé d&apos;en utiliser une nouvelle pour chaque transaction.</translation>
     </message>
 </context>
 <context>
     <name>AddressTableModel</name>
     <message>
         <source>Label</source>
-        <translation>Label</translation>
+        <translation>Nom</translation>
     </message>
     <message>
         <source>Address</source>
@@ -98,7 +110,7 @@
     </message>
     <message>
         <source>(no label)</source>
-        <translation>(pas de label)</translation>
+        <translation>(sans nom)</translation>
     </message>
 </context>
 <context>
@@ -354,32 +366,56 @@
         <translation>Portefeuille</translation>
     </message>
     <message>
+        <source>&amp;Overview</source>
+        <translation>Aperç&amp;u</translation>
+    </message>
+    <message>
+        <source>Show general overview of wallet</source>
+        <translation>Affiche un aperçu général du portefeuille</translation>
+    </message>
+    <message>
         <source>&amp;Send</source>
         <translation>Envoyer</translation>
     </message>
     <message>
         <source>&amp;Receive</source>
-        <translation>Recevoir</translation>
+        <translation>&amp;Recevoir</translation>
+    </message>
+    <message>
+        <source>Request payments (generates QR codes and lux: URIs)</source>
+        <translation>Demande de paiement (génération de QR-codes et URLs lux)</translation>
     </message>
     <message>
         <source>&amp;Transactions</source>
-        <translation>Transactions</translation>
+        <translation>&amp;Transactions</translation>
     </message>
     <message>
         <source>Browse transaction history</source>
-        <translation>Afficher l'historique de transaction</translation>
+        <translation>Afficher l&apos;historique de transactions</translation>
+    </message>
+    <message>
+        <source>&amp;LSR Token</source>
+        <translation>&amp;Jetons LSR</translation>
+    </message>
+    <message>
+        <source>LSR Token (send, receive or add Token in list)</source>
+        <translation>Envoi et réception de jetons (LSR Tokens)</translation>
+    </message>
+    <message>
+        <source>Open &amp;URI...</source>
+        <translation>Ouvrir l&apos;&amp;URL...</translation>
     </message>
     <message>
         <source>E&amp;xit</source>
-        <translation>Quitter</translation>
+        <translation>&amp;Quitter</translation>
     </message>
     <message>
         <source>Quit application</source>
-        <translation>Quitter l'application</translation>
+        <translation>Quitter l&apos;application</translation>
     </message>
     <message>
         <source>About &amp;Qt</source>
-        <translation>A propos de Qt</translation>
+        <translation>A propos de &amp;Qt</translation>
     </message>
     <message>
         <source>Show information about Qt</source>
@@ -387,11 +423,11 @@
     </message>
     <message>
         <source>&amp;Options...</source>
-        <translation>Options...</translation>
+        <translation>&amp;Options...</translation>
     </message>
     <message>
         <source>&amp;Show / Hide</source>
-        <translation>Afficher / Cacher</translation>
+        <translation>Afficher / Cac&amp;her</translation>
     </message>
     <message>
         <source>Show or hide the main Window</source>
@@ -399,7 +435,7 @@
     </message>
     <message>
         <source>&amp;Encrypt Wallet...</source>
-        <translation>Crypter le portefeuille...</translation>
+        <translation>Crypt&amp;er le portefeuille...</translation>
     </message>
     <message>
         <source>Encrypt the private keys that belong to your wallet</source>
@@ -407,7 +443,7 @@
     </message>
     <message>
         <source>&amp;Change Passphrase...</source>
-        <translation>Changer la phrase de sécurité...</translation>
+        <translation>&amp;Changer la phrase de sécurité...</translation>
     </message>
     <message>
         <source>Change the passphrase used for wallet encryption</source>
@@ -415,7 +451,7 @@
     </message>
     <message>
         <source>&amp;Unlock Wallet...</source>
-        <translation>Déverrouiller le portefeuille</translation>
+        <translation>Déverro&amp;uiller le portefeuille</translation>
     </message>
     <message>
         <source>Unlock wallet</source>
@@ -423,15 +459,31 @@
     </message>
     <message>
         <source>&amp;Lock Wallet</source>
-        <translation>Verrouiller le portefeuille</translation>
+        <translation>Verroui&amp;ller le portefeuille</translation>
+    </message>
+    <message>
+        <source>&amp;Backup Wallet...</source>
+        <translation>Sauve&amp;garde portefeuille</translation>
+    </message>
+    <message>
+        <source>&amp;Restore Wallet...</source>
+        <translation>&amp;Import de portefeuille</translation>
     </message>
     <message>
         <source>Sign &amp;message...</source>
-        <translation>Signer le message...</translation>
+        <translation>Signer le &amp;message...</translation>
     </message>
     <message>
         <source>&amp;Verify message...</source>
-        <translation>Vérifier le message...</translation>
+        <translation>&amp;Vérifier le message...</translation>
+    </message>
+    <message>
+        <source>&amp;Sending addresses...</source>
+        <translation>Annuaire d&apos;adre&amp;sses</translation>
+    </message>
+    <message>
+        <source>&amp;Receiving addresses...</source>
+        <translation>Adresses de &amp;réception</translation>
     </message>
     <message>
         <source>&amp;Information</source>
@@ -443,15 +495,23 @@
     </message>
     <message>
         <source>&amp;Debug console</source>
-        <translation>Console de déboggage</translation>
+        <translation>Console de &amp;débogage</translation>
     </message>
     <message>
         <source>Open debugging console</source>
-        <translation>Ouvrir la console de déboggage</translation>
+        <translation>Ouvrir la console de débogage</translation>
+    </message>
+    <message>
+        <source>&amp;Network Monitor</source>
+        <translation>&amp;Observateur réseau</translation>
+    </message>
+    <message>
+        <source>Show network monitor</source>
+        <translation>Affiche l&apos;activité réseau</translation>
     </message>
     <message>
         <source>&amp;Peers list</source>
-        <translation>Liste des pairs</translation>
+        <translation>Liste des &amp;pairs</translation>
     </message>
     <message>
         <source>Show peers info</source>
@@ -459,31 +519,51 @@
     </message>
     <message>
         <source>Wallet &amp;Repair</source>
-        <translation>Réparation du portefeuille</translation>
+        <translation>&amp;Réparation du portefeuille</translation>
     </message>
     <message>
         <source>Show wallet repair options</source>
         <translation>Montrer les options de réparation du portefeuille </translation>
     </message>
     <message>
+        <source>Open Wallet &amp;Configuration File</source>
+        <translation>Fichier de &amp;configuration Luxcore</translation>
+    </message>
+    <message>
         <source>Open configuration file</source>
-        <translation>Ouvrir le fichier de configuration</translation>
+        <translation>Ouvre le fichier de configuration</translation>
+    </message>
+    <message>
+        <source>Open &amp;Masternode Configuration File</source>
+        <translation>Fichier de configuration &amp;Masternode</translation>
+    </message>
+    <message>
+        <source>Show Automatic &amp;Backups</source>
+        <translation>E&amp;xplorer sauvegardes auto.</translation>
     </message>
     <message>
         <source>Show automatically created wallet backups</source>
         <translation>Montrer les sauvegardes de portefeuille créées automatiquement</translation>
     </message>
     <message>
-        <source>&amp;Sending addresses...</source>
-        <translation>Adresses d'envoi</translation>
+        <source>&amp;Hex Address Converter</source>
+        <translation>Conversion d&apos;adresse &amp;Hex</translation>
     </message>
     <message>
-        <source>&amp;Receiving addresses...</source>
-        <translation>Adresses de réception</translation>
+        <source>&amp;Blockchain explorer</source>
+        <translation>Explorateur &amp;Blockchain</translation>
     </message>
     <message>
-        <source>Open &amp;URI...</source>
-        <translation>Ouvir URI...</translation>
+        <source>&amp;Command-line options</source>
+        <translation>Options ligne de &amp;commande</translation>
+    </message>
+    <message>
+        <source>&amp;About Luxcore</source>
+        <translation>A propos de &amp;Luxcore</translation>
+    </message>
+    <message>
+        <source>Check for &amp;Update</source>
+        <translation>Vérifier &amp;mise à jour</translation>
     </message>
     <message>
         <source>Synchronizing additional data: %p%</source>
@@ -495,7 +575,7 @@
     </message>
     <message>
         <source>&amp;Settings</source>
-        <translation>&amp;Réglages</translation>
+        <translation>&amp;Paramètres</translation>
     </message>
     <message>
         <source>&amp;Tools</source>
@@ -511,7 +591,7 @@
     </message>
     <message>
         <source>&amp;Masternodes</source>
-        <translation>Masternodes</translation>
+        <translation>&amp;Masternodes</translation>
     </message>
     <message>
         <source>Browse masternodes</source>
@@ -519,7 +599,7 @@
     </message>
     <message>
         <source>Modify configuration options for LUX</source>
-        <translation>Modifier les options de configuration pour LUX</translation>
+        <translation>Modifier les options de configuration pour Luxcore</translation>
     </message>
     <message>
         <source>Sign messages with your LUX addresses to prove you own them</source>
@@ -531,15 +611,16 @@
     </message>
     <message>
         <source>&amp;BIP38 tool</source>
-        <translation>Outil BIP38</translation>
+        <translation>Outil &amp;BIP38</translation>
     </message>
     <message>
         <source>Encrypt and decrypt private keys using a passphrase</source>
         <translation>Crypter et décrypter les clés privées en utilisant une phrase secrète</translation>
     </message>
     <message numerus="yes">
-        <source>%n active connection(s) to LUX network</source>
-        <translation><numerusform>%n connexion au réseau LUX</numerusform><numerusform>%n connexions au réseau LUX</numerusform></translation>
+        <source>%n active connection(s) to Luxcore network</source>
+        <translation><numerusform>%n connexion au réseau Luxcore</numerusform>
+        <numerusform>%n connexions au réseau Luxcore</numerusform></translation>
     </message>
     <message>
         <source>Synchronizing with network...</source>
@@ -559,7 +640,7 @@
     </message>
     <message numerus="yes">
         <source>%n hour(s)</source>
-        <translation><numerusform>%n heure</numerusform><numerusform>%n heures </numerusform></translation>
+        <translation><numerusform>%n heure</numerusform><numerusform>%n heures</numerusform></translation>
     </message>
     <message numerus="yes">
         <source>%n day(s)</source>
@@ -587,11 +668,11 @@
     </message>
     <message>
         <source>Transactions after this will not yet be visible.</source>
-        <translation>Les transactions après cela ne seront pas encore visibles.</translation>
+        <translation>Les transactions plus récentes ne sont pas encore visibles.</translation>
     </message>
     <message>
         <source>Error</source>
-        <translation>Erreur </translation>
+        <translation>Erreur</translation>
     </message>
     <message>
         <source>Warning</source>
@@ -603,7 +684,7 @@
     </message>
     <message>
         <source>Sent transaction</source>
-        <translation>Transaction sortie</translation>
+        <translation>Transaction envoyée</translation>
     </message>
     <message>
         <source>Incoming transaction</source>
@@ -616,10 +697,16 @@ Type: %3
 Address: %4
 </source>
         <translation>Date : %1
-montan t: %2
+Montant: %2
 Type : %3
 Adresse : %4
 </translation>
+    </message>
+    <message>
+        <source>Staking is not active
+ MultiSend: %1</source>
+        <translation>PoS inactif
+ MultiSend: %1</translation>
     </message>
     <message>
         <source>Active</source>
@@ -800,7 +887,7 @@ Adresse : %4
     </message>
     <message>
         <source>This means a fee of at least %1 per kB is required.</source>
-        <translation>Cela signifie qu'une commission d'au moins %1 par kb est obligatoire.</translation>
+        <translation>Cela signifie que des frais d&apos;au moins %1 par ko est obligatoire.</translation>
     </message>
     <message>
         <source>Transactions with higher priority are more likely to get included into a block.</source>
@@ -808,54 +895,66 @@ Adresse : %4
     </message>
     <message>
         <source>(no label)</source>
-        <translation>(pas de label)</translation>
+        <translation>(sans nom)</translation>
     </message>
     <message>
         <source>(change)</source>
-        <translation>(changer)</translation>
+        <translation>(retour)</translation>
     </message>
 </context>
 <context>
     <name>EditAddressDialog</name>
     <message>
         <source>Edit Address</source>
-        <translation>Modifier l'adresse</translation>
+        <translation>&amp;Modifier l&apos;adresse</translation>
     </message>
     <message>
         <source>&amp;Address</source>
-        <translation>Adresse</translation>
+        <translation>&amp;Adresse</translation>
     </message>
     <message>
         <source>New receiving address</source>
-        <translation>Nouvelle adresse de reception</translation>
+        <translation>Nouvelle adresse de réception</translation>
     </message>
     <message>
         <source>New sending address</source>
-        <translation>Nouvelle adresse d'envoi</translation>
+        <translation>Nouvelle adresse de destinataire</translation>
     </message>
     <message>
         <source>Edit receiving address</source>
-        <translation>Modifier l'adresse de reception</translation>
+        <translation>Renommer l&apos;adresse de réception</translation>
     </message>
     <message>
         <source>Edit sending address</source>
-        <translation>Modifier l'adresse d'envoi</translation>
+        <translation>Modifier l&apos;adresse du destinataire</translation>
     </message>
     <message>
         <source>The entered address "%1" is not a valid LUX address.</source>
-        <translation>L'adresse entrée "%1" n'est pas une adresse LUX valide</translation>
+        <translation>L&apos;adresse saisie "%1" n&apos;est pas une adresse LUX valide.</translation>
     </message>
     <message>
         <source>The entered address "%1" is already in the address book.</source>
-        <translation>L'adresse entrée "%1" est déjà dans la liste d'adresse</translation>
+        <translation>L&apos;adresse saisie "%1" est déjà dans la liste.</translation>
     </message>
     <message>
         <source>Could not unlock wallet.</source>
-        <translation>N'a pas pu déverrouiller le portefeuille</translation>
+        <translation>Impossible de déverrouiller le portefeuille</translation>
     </message>
     <message>
         <source>New key generation failed.</source>
-        <translation>La création de la nouvelle clé à échoué</translation>
+        <translation>La création de nouvelle clé a échoué</translation>
+    </message>
+    <message>
+        <source>&amp;Label</source>
+        <translation>&amp;Nom</translation>
+    </message>
+    <message>
+        <source>The label associated with this address list entry</source>
+        <translation>Le nom associé à cette adresse</translation>
+    </message>
+    <message>
+        <source>The address associated with this address list entry. This can only be modified for sending addresses.</source>
+        <translation>L&apos;adresse associée. Peut seulement être modifiée pour les destinataires.</translation>
     </message>
 </context>
 <context>
@@ -1080,8 +1179,24 @@ Veuillez vérifier l'adresse et réessayer.</translation>
         <translation>Options</translation>
     </message>
     <message>
+        <source>&amp;Main</source>
+        <translation>&amp;Général</translation>
+    </message>
+    <message>
         <source>W&amp;allet</source>
-        <translation>Portefeuille</translation>
+        <translation>&amp;Portefeuille</translation>
+    </message>
+    <message>
+        <source>&amp;Network</source>
+        <translation>&amp;Réseau</translation>
+    </message>
+    <message>
+        <source>&amp;Window</source>
+        <translation>&amp;Fenêtre</translation>
+    </message>
+    <message>
+        <source>&amp;Display</source>
+        <translation>&amp;Affichage</translation>
     </message>
     <message>
         <source>Accept connections from outside</source>
@@ -1094,7 +1209,111 @@ Veuillez vérifier l'adresse et réessayer.</translation>
     </context>
 <context>
     <name>OverviewPage</name>
-    </context>
+    <message>
+        <source>Immature:</source>
+        <translation>Immature :</translation>
+    </message>
+    <message>
+        <source>Staked or masternode rewards that has not yet matured</source>
+        <translation>Généré ou intérêts pas encore matures</translation>
+    </message>
+    <message>
+        <source>Watch-only:</source>
+        <translation>Watch-only :</translation>
+    </message>
+    <message>
+        <source>Current total balance in watch-only addresses</source>
+        <translation>Solde total des adresses watch-only</translation>
+    </message>
+    <message>
+        <source>Available:</source>
+        <translation>Disponible :</translation>
+    </message>
+    <message>
+        <source>Your current balance in watch-only addresses</source>
+        <translation>Votre solde watch-only</translation>
+    </message>
+    <message>
+        <source>Unconfirmed transactions to watch-only addresses</source>
+        <translation>Non confirmé vers les adresses watch-only</translation>
+    </message>
+    <message>
+        <source>Pending:</source>
+        <translation>En attente :</translation>
+    </message>
+    <message>
+        <source>Total of transactions that have yet to be confirmed, and do not yet count toward the spendable balance</source>
+        <translation>Total pas encore confirmé, bientôt dans le solde disponible</translation>
+    </message>
+    <message>
+        <source>Spendable:</source>
+        <translation>Disponible :</translation>
+    </message>
+    <message>
+        <source>Your current spendable balance</source>
+        <translation>Votre solde disponible</translation>
+    </message>
+    <message>
+        <source>Total:</source>
+        <translation>Total :</translation>
+    </message>
+    <message>
+        <source>Your current total balance</source>
+        <translation>Votre solde total</translation>
+    </message>
+    <message>
+        <source>Status:</source>
+        <translation>Etat :</translation>
+    </message>
+    <message>
+        <source>Disabled</source>
+        <translation>Désactivé</translation>
+    </message>
+    <message>
+        <source>Enabled</source>
+        <translation>Activé</translation>
+    </message>
+    <message>
+        <source>Completion:</source>
+        <translation>Progression :</translation>
+    </message>
+    <message>
+        <source>Luxsend Balance:</source>
+        <translation>Balance Luxsend :</translation>
+    </message>
+    <message>
+        <source>Amount and Rounds:</source>
+        <translation>Montant et Rounds :</translation>
+    </message>
+    <message>
+        <source>Submitted Denom:</source>
+        <translation>Denom transmis :</translation>
+    </message>
+    <message>
+        <source>Start Luxsend</source>
+        <translation>Démarrer Luxsend</translation>
+    </message>
+    <message>
+        <source>Stop Luxsend</source>
+        <translation>Arrêter Luxsend</translation>
+    </message>
+    <message>
+        <source>Recent transactions</source>
+        <translation>Transactions récentes</translation>
+    </message>
+    <message>
+        <source>LSR Tokens</source>
+        <translation>Jetons LSR</translation>
+    </message>
+    <message>
+        <source>Go to token page</source>
+        <translation>Aller à la page des jetons</translation>
+    </message>
+    <message>
+        <source>Add Token</source>
+        <translation>Ajout de Jeton</translation>
+    </message>
+</context>
 <context>
     <name>PaymentServer</name>
     </context>
@@ -1111,12 +1330,16 @@ Veuillez vérifier l'adresse et réessayer.</translation>
         <source>Amount</source>
         <translation>Montant</translation>
     </message>
-    </context>
+    <message>
+        <source>Enter a Lux address (e.g. %1)</source>
+        <translation>Entrer une adresse LUX %1</translation>
+    </message>
+</context>
 <context>
     <name>QRImageWidget</name>
     <message>
         <source>&amp;Save Image...</source>
-        <translation>Enregistrer l'image</translation>
+        <translation>Enregi&amp;strer l'image</translation>
     </message>
     <message>
         <source>Save QR Code</source>
@@ -1334,8 +1557,16 @@ Veuillez vérifier l'adresse et réessayer.</translation>
         <translation>Envoyer des pièces</translation>
     </message>
     <message>
+        <source>Coin Control Features</source>
+        <translation>Contrôle de pièces</translation>
+    </message>
+    <message>
+        <source>automatically selected</source>
+        <translation>automatique</translation>
+    </message>
+    <message>
         <source>Inputs...</source>
-        <translation>Pièces...</translation>
+        <translation>En&amp;trées...</translation>
     </message>
     <message>
         <source>Insufficient funds!</source>
@@ -1343,7 +1574,7 @@ Veuillez vérifier l'adresse et réessayer.</translation>
     </message>
     <message>
         <source>Quantity:</source>
-        <translation>Quantité</translation>
+        <translation>Quantité :</translation>
     </message>
     <message>
         <source>Amount:</source>
@@ -1359,7 +1590,7 @@ Veuillez vérifier l'adresse et réessayer.</translation>
     </message>
     <message>
         <source>Fee:</source>
-        <translation>Commission :</translation>
+        <translation>Frais :</translation>
     </message>
     <message>
         <source>no</source>
@@ -1367,7 +1598,7 @@ Veuillez vérifier l'adresse et réessayer.</translation>
     </message>
     <message>
         <source>After Fee:</source>
-        <translation>Après commission</translation>
+        <translation>Après commission :</translation>
     </message>
     <message>
         <source>0 LUX</source>
@@ -1375,19 +1606,35 @@ Veuillez vérifier l'adresse et réessayer.</translation>
     </message>
     <message>
         <source>Transaction Fee:</source>
-        <translation>Commission de transaction</translation>
+        <translation>Frais transaction :</translation>
     </message>
     <message>
         <source>Choose...</source>
-        <translation>Choisir...</translation>
+        <translation>Modi&amp;fier...</translation>
     </message>
     <message>
         <source>Minimize</source>
-        <translation>Minimiser</translation>
+        <translation>Réduire</translation>
+    </message>
+    <message>
+        <source>Recommended</source>
+        <translation>Recommandé</translation>
     </message>
     <message>
         <source>Custom:</source>
-        <translation>Personnalisé:</translation>
+        <translation>Personnalisé :</translation>
+    </message>
+    <message>
+        <source>per kilobyte</source>
+        <translation>par kilo-octet</translation>
+    </message>
+    <message>
+        <source>total at least</source>
+        <translation>total minimum</translation>
+    </message>
+    <message>
+        <source>Confirmation time:</source>
+        <translation>Délai confirmation :</translation>
     </message>
     <message>
         <source>normal</source>
@@ -1397,13 +1644,35 @@ Veuillez vérifier l'adresse et réessayer.</translation>
         <source>fast</source>
         <translation>rapide</translation>
     </message>
-    <message>
-        <source>S&amp;end</source>
-        <translation>Envoyer</translation>
+    <message numerus="yes">
+        <source>%n block(s)</source>
+        <translation>
+            <numerusform>%n bloc</numerusform>
+            <numerusform>%n blocs</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Estimated to begin confirmation within %n block(s).</source>
+        <translation>
+            <numerusform>Estimé à être confirmé dans %n bloc</numerusform>
+            <numerusform>Estimé à être confirmé dans %n blocs</numerusform>
+        </translation>
     </message>
     <message>
-        <source>Clear &amp;All</source>
-        <translation>Tout effacer</translation>
+        <source>Pay only the minimum fee of %1</source>
+        <translation>Payer les frais mini. de %1</translation>
+    </message>
+    <message>
+        <source>(Smart fee not initialized yet. This usually takes a few blocks...)</source>
+        <translation>(Smart fee pas encore prêt. Cela peut prendre plusieurs blocs...)</translation>
+    </message>
+    <message>
+        <source>Send as zero-fee transaction if possible</source>
+        <translation>Envoyer sans frais si possible</translation>
+    </message>
+    <message>
+        <source>(confirmation may take longer)</source>
+        <translation>(la confirmation peut être plus longue)</translation>
     </message>
     <message>
         <source>Balance:</source>
@@ -1419,11 +1688,11 @@ Veuillez vérifier l'adresse et réessayer.</translation>
     </message>
     <message>
         <source>Copy fee</source>
-        <translation>Copier la comission</translation>
+        <translation>Copier les frais</translation>
     </message>
     <message>
         <source>Copy after fee</source>
-        <translation>Copier après la commission</translation>
+        <translation>Copier avec frais</translation>
     </message>
     <message>
         <source>Copy priority</source>
@@ -1434,12 +1703,44 @@ Veuillez vérifier l'adresse et réessayer.</translation>
         <translation>fonds anonymes</translation>
     </message>
     <message>
-        <source>Are you sure you want to send?</source>
-        <translation>Êtes vous sûr de vouloir envoyer?</translation>
+        <source>Confirm send coins</source>
+        <translation>Confirmer l&apos;envoi</translation>
     </message>
     <message>
-        <source>Confirm send coins</source>
-        <translation>Confirmer l'envoi des pièces</translation>
+        <source>Are you sure you want to send?</source>
+        <translation>Êtes-vous sûr de vouloir envoyer ?</translation>
+    </message>
+    <message>
+        <source>(darksend requires this amount to be rounded up to the nearest %1).</source>
+        <translation>(luxsend nécessite d&apos;arrondir au plus proche %1).</translation>
+    </message>
+    <message>
+        <source>using</source>
+        <translation>depuis</translation>
+    </message>
+    <message>
+        <source>any available funds (not recommended)</source>
+        <translation>les fonds disponibles (non recommandé)</translation>
+    </message>
+    <message>
+        <source>and InstanTX</source>
+        <translation>et InstanTX</translation>
+    </message>
+    <message>
+        <source> split into %1 outputs using the UTXO splitter.</source>
+        <translation> découpé en %1 sortie(s).</translation>
+    </message>
+    <message>
+        <source>are added as transaction fee</source>
+        <translation>ajouté en frais de transaction</translation>
+    </message>
+    <message>
+        <source>Total Amount = &lt;b&gt;%1&lt;/b&gt;&lt;br /&gt;= %2</source>
+        <translation>Montant total = &lt;b&gt;%1&lt;/b&gt;&lt;br /&gt;= %2</translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;(%1 of %2 entries displayed)&lt;/b&gt;</source>
+        <translation>&lt;b&gt;(%1 de %2 entrées)&lt;/b&gt;</translation>
     </message>
     <message>
         <source>Transaction creation failed!</source>
@@ -1451,22 +1752,66 @@ Veuillez vérifier l'adresse et réessayer.</translation>
     </message>
     <message>
         <source>(no label)</source>
-        <translation>(pas de label)</translation>
+        <translation>(sans nom)</translation>
+    </message>
+    <message>
+        <source>Bytes:</source>
+        <translation>Octets :</translation>
+    </message>
+    <message>
+        <source>Custom change address</source>
+        <translation>Adresse de retour</translation>
+    </message>
+    <message>
+        <source>Split UTXO</source>
+        <translation>Découpe UTXO</translation>
+    </message>
+    <message>
+        <source># of outputs</source>
+        <translation>nb de sorties</translation>
+    </message>
+    <message>
+        <source>UTXO Size:</source>
+        <translation>Taille par UTXO :</translation>
+    </message>
+    <message>
+        <source>S&amp;end</source>
+        <translation>&amp;Envoyer</translation>
+    </message>
+    <message>
+        <source>Confirm the send action</source>
+        <translation>Confirmer l&apos;envoi</translation>
+    </message>
+    <message>
+        <source>Clear &amp;All</source>
+        <translation>Tout effa&amp;cer</translation>
+    </message>
+    <message>
+        <source>Clear all fields of the form.</source>
+        <translation>Remettre à zéro tous les champs.</translation>
+    </message>
+    <message>
+        <source>Add &amp;Recipient</source>
+        <translation>Ajouter &amp;Dest.</translation>
+    </message>
+    <message>
+        <source>Send to multiple recipients at once</source>
+        <translation>Envoyer à plusieurs destinataires</translation>
     </message>
 </context>
 <context>
     <name>SendCoinsEntry</name>
     <message>
         <source>Pay &amp;To:</source>
-        <translation>Payer à :</translation>
+        <translation>Pa&amp;yer à :</translation>
     </message>
     <message>
         <source>The LUX address to send the payment to</source>
-        <translation>L'adresse LUX à laquelle envoyer le paiement</translation>
+        <translation>L&apos;adresse LUX à laquelle envoyer le paiement</translation>
     </message>
     <message>
         <source>Choose previously used address</source>
-        <translation>Choisir l'adresse précédemment utilisée</translation>
+        <translation>Choisir une adresse précédemment utilisée</translation>
     </message>
     <message>
         <source>Alt+A</source>
@@ -1474,7 +1819,7 @@ Veuillez vérifier l'adresse et réessayer.</translation>
     </message>
     <message>
         <source>Paste address from clipboard</source>
-        <translation>Copié l'adresse depuis le presse-papier</translation>
+        <translation>Coller l'adresse depuis le presse-papier</translation>
     </message>
     <message>
         <source>Alt+P</source>
@@ -1482,21 +1827,64 @@ Veuillez vérifier l'adresse et réessayer.</translation>
     </message>
     <message>
         <source>Remove this entry</source>
-        <translation>Supprimer cette entré</translation>
+        <translation>Supprimer cette entrée</translation>
     </message>
     <message>
         <source>Message:</source>
         <translation>Message :</translation>
     </message>
     <message>
-        <source>Pay To:</source>
-        <translation>Payer à :</translation>
-    </message>
-    <message>
         <source>This is a verified payment request.</source>
         <translation>Ceci est une requête de paiement vérifiée.</translation>
     </message>
-    </context>
+    <message>
+        <source>This is a normal payment.</source>
+        <translation>Ceci est un paiement classique.</translation>
+    </message>
+    <message>
+        <source>&amp;Label:</source>
+        <translation>&amp;Nom :</translation>
+    </message>
+    <message>
+        <source>Enter a label for this address to add it to the list of used addresses</source>
+        <translation>Entrer un nom pour ajouter cette adresse à la liste des adresses utilisées</translation>
+    </message>
+    <message>
+        <source>A&amp;mount:</source>
+        <translation>&amp;Montant :</translation>
+    </message>
+    <message>
+        <source>The fee will be deducted from the amount being sent. The recipient will receive less luxcoins than you enter in the amount field. If multiple recipients are selected, the fee is split equally.</source>
+        <translation>Les frais seront déduits du montant à envoyer. Le destinataire recevra moins que le montant saisi. En cas de dest. multiples, les frais seront répartis entre eux.</translation>
+    </message>
+    <message>
+        <source>S&amp;ubtract fee from amount</source>
+        <translation>So&amp;ustraire des frais du montant</translation>
+    </message>
+    <message>
+        <source>A message that was attached to the LUX: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the LUX network.</source>
+        <translation>Un message attaché à l&apos;URL de la transaction pour référence. Note: Il ne sera pas enregistré dans la blockchain partagée.</translation>
+    </message>
+    <message>
+        <source>This is an unverified payment request.</source>
+        <translation>Ceci est une demande de paiement non vérifiée.</translation>
+    </message>
+    <message>
+        <source>Memo:</source>
+        <translation>Mémo :</translation>
+    </message>
+    <message>
+        <source>Enter a label for this address to add it to your address book</source>
+        <translation>Entrer un nom pour ajouter l&apos;adresse à l&apos;annuaire</translation>
+    </message>
+</context>
+<context>
+    <name>SendConfirmationDialog</name>
+    <message>
+        <source>Yes</source>
+        <translation>Oui</translation>
+    </message>
+</context>
 <context>
     <name>ShutdownWindow</name>
     </context>
