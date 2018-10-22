@@ -13,12 +13,27 @@
   <property name="windowTitle">
    <string>BIP 38 Tool</string>
   </property>
+  <property name="sizeGripEnabled">
+   <bool>false</bool>
+  </property>
   <property name="modal">
    <bool>true</bool>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QTabWidget" name="tabWidget">
+     <property name="minimumSize">
+      <size>
+       <width>150</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="tabPosition">
+      <enum>QTabWidget::North</enum>
+     </property>
+     <property name="tabShape">
+      <enum>QTabWidget::Rounded</enum>
+     </property>
      <property name="currentIndex">
       <number>1</number>
      </property>
@@ -27,6 +42,22 @@
        <string>&amp;BIP 38 Encrypt</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_SM">
+       <item>
+        <spacer name="verticalSpacer_4">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Fixed</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>10</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
        <item>
         <widget class="QLabel" name="infoLabel_ENC">
          <property name="text">
@@ -41,12 +72,31 @@
         </widget>
        </item>
        <item>
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
         <layout class="QHBoxLayout" name="horizontalLayout_1_ENC">
          <property name="spacing">
-          <number>0</number>
+          <number>10</number>
          </property>
          <item>
           <widget class="QLabel" name="label_5">
+           <property name="minimumSize">
+            <size>
+             <width>150</width>
+             <height>0</height>
+            </size>
+           </property>
            <property name="text">
             <string>Address:</string>
            </property>
@@ -60,7 +110,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="addressBookButton_ENC">
+          <widget class="QToolButton" name="addressBookButton_ENC">
            <property name="toolTip">
             <string>Choose previously used address</string>
            </property>
@@ -74,13 +124,10 @@
            <property name="shortcut">
             <string>Alt+A</string>
            </property>
-           <property name="autoDefault">
-            <bool>false</bool>
-           </property>
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="pasteButton_ENC">
+          <widget class="QToolButton" name="pasteButton_ENC">
            <property name="toolTip">
             <string>Paste address from clipboard</string>
            </property>
@@ -94,17 +141,23 @@
            <property name="shortcut">
             <string>Alt+P</string>
            </property>
-           <property name="autoDefault">
-            <bool>false</bool>
-           </property>
           </widget>
          </item>
         </layout>
        </item>
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_5">
+         <property name="spacing">
+          <number>10</number>
+         </property>
          <item>
           <widget class="QLabel" name="label_6">
+           <property name="minimumSize">
+            <size>
+             <width>150</width>
+             <height>0</height>
+            </size>
+           </property>
            <property name="text">
             <string>Passphrase: </string>
            </property>
@@ -122,10 +175,16 @@
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_2_ENC">
          <property name="spacing">
-          <number>0</number>
+          <number>10</number>
          </property>
          <item>
           <widget class="QLabel" name="encryptedKeyLabel_ENC">
+           <property name="minimumSize">
+            <size>
+             <width>150</width>
+             <height>0</height>
+            </size>
+           </property>
            <property name="text">
             <string>Encrypted Key:</string>
            </property>
@@ -147,7 +206,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="copyKeyButton_ENC">
+          <widget class="QToolButton" name="copyKeyButton_ENC">
            <property name="toolTip">
             <string>Copy the current signature to the system clipboard</string>
            </property>
@@ -158,49 +217,15 @@
             <iconset resource="../lux.qrc">
              <normaloff>:/icons/editcopy</normaloff>:/icons/editcopy</iconset>
            </property>
-           <property name="autoDefault">
-            <bool>false</bool>
-           </property>
           </widget>
          </item>
         </layout>
        </item>
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_3_ENC">
-         <item>
-          <widget class="QPushButton" name="encryptKeyButton_ENC">
-           <property name="toolTip">
-            <string>Sign the message to prove you own this LUX address</string>
-           </property>
-           <property name="text">
-            <string>Encrypt &amp;Key</string>
-           </property>
-           <property name="icon">
-            <iconset resource="../lux.qrc">
-             <normaloff>:/icons/edit</normaloff>:/icons/edit</iconset>
-           </property>
-           <property name="autoDefault">
-            <bool>false</bool>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="clearButton_ENC">
-           <property name="toolTip">
-            <string>Reset all sign message fields</string>
-           </property>
-           <property name="text">
-            <string>Clear &amp;All</string>
-           </property>
-           <property name="icon">
-            <iconset resource="../lux.qrc">
-             <normaloff>:/icons/remove</normaloff>:/icons/remove</iconset>
-           </property>
-           <property name="autoDefault">
-            <bool>false</bool>
-           </property>
-          </widget>
-         </item>
+         <property name="spacing">
+          <number>20</number>
+         </property>
          <item>
           <spacer name="horizontalSpacer_1_ENC">
            <property name="orientation">
@@ -243,6 +268,40 @@
            </property>
           </spacer>
          </item>
+         <item>
+          <widget class="QPushButton" name="clearButton_ENC">
+           <property name="toolTip">
+            <string>Reset all sign message fields</string>
+           </property>
+           <property name="text">
+            <string>Clear &amp;All</string>
+           </property>
+           <property name="icon">
+            <iconset resource="../lux.qrc">
+             <normaloff>:/icons/remove</normaloff>:/icons/remove</iconset>
+           </property>
+           <property name="autoDefault">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="encryptKeyButton_ENC">
+           <property name="toolTip">
+            <string>Sign the message to prove you own this LUX address</string>
+           </property>
+           <property name="text">
+            <string>Encrypt &amp;Key</string>
+           </property>
+           <property name="icon">
+            <iconset resource="../lux.qrc">
+             <normaloff>:/icons/edit</normaloff>:/icons/edit</iconset>
+           </property>
+           <property name="autoDefault">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
         </layout>
        </item>
       </layout>
@@ -252,6 +311,22 @@
        <string>&amp;BIP 38 Decrypt</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_VM">
+       <item>
+        <spacer name="verticalSpacer_3">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Fixed</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>10</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
        <item>
         <widget class="QLabel" name="infoLabel_DEC">
          <property name="text">
@@ -269,9 +344,31 @@
         </widget>
        </item>
        <item>
+        <spacer name="verticalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
         <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <property name="spacing">
+          <number>10</number>
+         </property>
          <item>
           <widget class="QLabel" name="label_2">
+           <property name="minimumSize">
+            <size>
+             <width>150</width>
+             <height>0</height>
+            </size>
+           </property>
            <property name="text">
             <string>Encrypted Key:</string>
            </property>
@@ -288,8 +385,17 @@
        </item>
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout">
+         <property name="spacing">
+          <number>10</number>
+         </property>
          <item>
           <widget class="QLabel" name="label">
+           <property name="minimumSize">
+            <size>
+             <width>150</width>
+             <height>0</height>
+            </size>
+           </property>
            <property name="text">
             <string>Passphrase: </string>
            </property>
@@ -306,40 +412,9 @@
        </item>
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_2_DEC">
-         <item>
-          <widget class="QPushButton" name="decryptKeyButton_DEC">
-           <property name="toolTip">
-            <string>Verify the message to ensure it was signed with the specified LUX address</string>
-           </property>
-           <property name="text">
-            <string>Decrypt &amp;Key</string>
-           </property>
-           <property name="icon">
-            <iconset resource="../lux.qrc">
-             <normaloff>:/icons/transaction_0</normaloff>:/icons/transaction_0</iconset>
-           </property>
-           <property name="autoDefault">
-            <bool>false</bool>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="clearButton_DEC">
-           <property name="toolTip">
-            <string>Reset all verify message fields</string>
-           </property>
-           <property name="text">
-            <string>Clear &amp;All</string>
-           </property>
-           <property name="icon">
-            <iconset resource="../lux.qrc">
-             <normaloff>:/icons/remove</normaloff>:/icons/remove</iconset>
-           </property>
-           <property name="autoDefault">
-            <bool>false</bool>
-           </property>
-          </widget>
-         </item>
+         <property name="spacing">
+          <number>20</number>
+         </property>
          <item>
           <spacer name="horizontalSpacer_1_DEC">
            <property name="orientation">
@@ -382,12 +457,55 @@
            </property>
           </spacer>
          </item>
+         <item>
+          <widget class="QPushButton" name="clearButton_DEC">
+           <property name="toolTip">
+            <string>Reset all verify message fields</string>
+           </property>
+           <property name="text">
+            <string>Clear &amp;All</string>
+           </property>
+           <property name="icon">
+            <iconset resource="../lux.qrc">
+             <normaloff>:/icons/remove</normaloff>:/icons/remove</iconset>
+           </property>
+           <property name="autoDefault">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="decryptKeyButton_DEC">
+           <property name="toolTip">
+            <string>Verify the message to ensure it was signed with the specified LUX address</string>
+           </property>
+           <property name="text">
+            <string>Decrypt &amp;Key</string>
+           </property>
+           <property name="icon">
+            <iconset resource="../lux.qrc">
+             <normaloff>:/icons/transaction_0</normaloff>:/icons/transaction_0</iconset>
+           </property>
+           <property name="autoDefault">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
         </layout>
        </item>
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <property name="spacing">
+          <number>10</number>
+         </property>
          <item>
           <widget class="QLabel" name="label_3">
+           <property name="minimumSize">
+            <size>
+             <width>150</width>
+             <height>0</height>
+            </size>
+           </property>
            <property name="text">
             <string>Decrypted Key:</string>
            </property>
@@ -400,15 +518,17 @@
        </item>
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_4">
-         <item>
-          <widget class="QPushButton" name="importAddressButton_DEC">
-           <property name="text">
-            <string>Import Address</string>
-           </property>
-          </widget>
-         </item>
+         <property name="spacing">
+          <number>10</number>
+         </property>
          <item>
           <widget class="QLabel" name="label_4">
+           <property name="minimumSize">
+            <size>
+             <width>150</width>
+             <height>0</height>
+            </size>
+           </property>
            <property name="text">
             <string>Address:</string>
            </property>
@@ -416,6 +536,29 @@
          </item>
          <item>
           <widget class="QLineEdit" name="addressOut_DEC"/>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeType">
+            <enum>QSizePolicy::Fixed</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>10</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="importAddressButton_DEC">
+           <property name="text">
+            <string>Import Address</string>
+           </property>
+          </widget>
          </item>
         </layout>
        </item>
