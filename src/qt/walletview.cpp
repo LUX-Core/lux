@@ -335,7 +335,7 @@ void WalletView::gotoBip38Tool()
 
 void WalletView::gotoMultiSendDialog()
 {
-    MultiSendDialog* multiSendDialog = new MultiSendDialog(platformStyle);
+    MultiSendDialog* multiSendDialog = new MultiSendDialog(platformStyle, this);
     multiSendDialog->setModel(walletModel);
     multiSendDialog->show();
 }
