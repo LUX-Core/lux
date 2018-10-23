@@ -212,15 +212,16 @@
     <name>Bip38ToolDialog</name>
     <message>
         <source>BIP 38 Tool</source>
-        <translation>BIP 38 outils</translation>
+        <translation>Outil BIP 38</translation>
     </message>
     <message>
         <source>&amp;BIP 38 Encrypt</source>
-        <translation>BIP 38 crypter</translation>
+        <translation>&amp;Encryptage BIP 38</translation>
     </message>
     <message>
         <source>Enter a Lux Address that you would like to encrypt using BIP 38. Enter a passphrase in the middle box. Press encrypt to compute the encrypted private key.</source>
-        <translation>Entrez une adresse Lux que vous voulez crypter en utilisant BIP 38. Entrez une phrase secrète dans le champ du milieu. Cliquez sur crypter pour calculer la clé de cryptage privée.</translation>
+        <translation>Saisir l&apos;adresse Lux à encrypter en utilisant BIP 38 puis une phrase secrète dans le champ suivant.
+Cliquer sur "Crypter la clé" pour signer et encrypter la clé privée.</translation>
     </message>
     <message>
         <source>Address:</source>
@@ -228,11 +229,11 @@
     </message>
     <message>
         <source>The LUX address to sign the message with</source>
-        <translation>L'adresse LUX avec laquelle signer le message</translation>
+        <translation>L&apos;adresse LUX avec laquelle signer le message</translation>
     </message>
     <message>
         <source>Choose previously used address</source>
-        <translation>Choisir l'adresse précédemment utilisée</translation>
+        <translation>Choisir une adresse de l&apos;annuaire</translation>
     </message>
     <message>
         <source>Alt+A</source>
@@ -240,7 +241,7 @@
     </message>
     <message>
         <source>Paste address from clipboard</source>
-        <translation>Copier l'adresse depuis le presse-papier</translation>
+        <translation>Coller l&apos;adresse depuis le presse-papier</translation>
     </message>
     <message>
         <source>Alt+P</source>
@@ -252,7 +253,7 @@
     </message>
     <message>
         <source>Encrypted Key:</source>
-        <translation>Clé de cryptage :</translation>
+        <translation>Clé encryptée :</translation>
     </message>
     <message>
         <source>Copy the current signature to the system clipboard</source>
@@ -264,19 +265,19 @@
     </message>
     <message>
         <source>Encrypt &amp;Key</source>
-        <translation>Clé de cryptage</translation>
+        <translation>&amp;Crypter la clé</translation>
     </message>
     <message>
         <source>Reset all sign message fields</source>
-        <translation>Réinitialiser tous les champs de messages signés</translation>
+        <translation>Réinitialiser tous les champs de signature</translation>
     </message>
     <message>
         <source>Clear &amp;All</source>
-        <translation>Tout effacer</translation>
+        <translation>Tout eff&amp;acer</translation>
     </message>
     <message>
         <source>&amp;BIP 38 Decrypt</source>
-        <translation>BIP 38 Décrypter</translation>
+        <translation>&amp;Décryptage BIP 38</translation>
     </message>
     <message>
         <source>The LUX address the message was signed with</source>
@@ -288,23 +289,23 @@
     </message>
     <message>
         <source>Decrypt &amp;Key</source>
-        <translation>Décrypter la clé</translation>
+        <translation>Décrypter la &amp;clé</translation>
     </message>
     <message>
         <source>Decrypted Key:</source>
-        <translation>Clé de décryptage :</translation>
+        <translation>Clé décryptée :</translation>
     </message>
     <message>
         <source>Import Address</source>
-        <translation>Importer l'adresse</translation>
+        <translation>&amp;Importer l&apos;adresse</translation>
     </message>
     <message>
         <source>Click "Decrypt Key" to compute key</source>
-        <translation>Cliquez sur "Décrypter la clé" pour calculer la clé</translation>
+        <translation>Cliquez sur "Décrypter la clé" pour décoder la clé</translation>
     </message>
     <message>
         <source>The entered passphrase is invalid. </source>
-        <translation>La phrase secrète entrée est incorrect.</translation>
+        <translation>La phrase secrète saisie est incorrecte.</translation>
     </message>
     <message>
         <source>Allowed: 0-9,a-z,A-Z,</source>
@@ -312,15 +313,15 @@
     </message>
     <message>
         <source>The entered address is invalid.</source>
-        <translation>L'adresse entrée est incorrect.</translation>
+        <translation>L&apos;adresse entrée est incorrecte.</translation>
     </message>
     <message>
         <source>Please check the address and try again.</source>
-        <translation>Veuillez vérifier l'adresse et réessayer.</translation>
+        <translation>Veuillez vérifier l&apos;adresse et réessayer.</translation>
     </message>
     <message>
         <source>The entered address does not refer to a key.</source>
-        <translation>L'adresse renseignée ne correspond à aucune à une clé.</translation>
+        <translation>L&apos;adresse renseignée ne correspond à aucune clé.</translation>
     </message>
     <message>
         <source>Wallet unlock was cancelled.</source>
@@ -328,7 +329,7 @@
     </message>
     <message>
         <source>Private key for the entered address is not available.</source>
-        <translation>La clé privé pour l'adresse entrée n'est pas valide.</translation>
+        <translation>La clé privée pour l&apos;adresse entrée n&apos;est pas valide.</translation>
     </message>
     <message>
         <source>Failed to decrypt.</source>
@@ -340,7 +341,7 @@
     </message>
     <message>
         <source>Data Not Valid.</source>
-        <translation>Les donnés ne sont pas valides.</translation>
+        <translation>Données non valides.</translation>
     </message>
     <message>
         <source>Please try again.</source>
@@ -357,6 +358,18 @@
     <message>
         <source>Successfully Added Private Key To Wallet</source>
         <translation>La clé privée a été ajoutée avec succès au portefeuille</translation>
+    </message>
+    <message>
+        <source>Enter the BIP 38 encrypted private key. Enter the passphrase in the middle box. Click Decrypt Key to compute the private key. After the key is decrypted, clicking &apos;Import Address&apos; will add this private key to the wallet.</source>
+        <translation>Saisir la clé encryptée BIP 38 et la phrase secrète. Cliquer ensuite sur "Décrypter la clé" pour décoder la clé privée. Lorsque la clé est décryptée, cliquer sur "Importer l&apos;adresse" pour ajouter la clé privée au portefeuille.</translation>
+    </message>
+    <message>
+        <source>Reset all verify message fields</source>
+        <translation>Effacer tous les messages de vérification</translation>
+    </message>
+    <message>
+        <source>Key Already Held By Wallet</source>
+        <translation>Clé déjà incluse dans le portefeuille</translation>
     </message>
 </context>
 <context>

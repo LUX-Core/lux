@@ -1745,9 +1745,7 @@ QDialog#Bip38ToolDialog .QPushButton#clearButton_ENC:pressed {
     border:1px solid #9e9e9e;
 }
 
-
-
-QDialog#MultiSendDialog  .QToolButton { 
+QDialog#MultiSendDialog .QToolButton {
     background-color:transparent;
     border: 0;
     outline: 0;
