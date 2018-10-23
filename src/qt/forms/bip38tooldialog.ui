@@ -484,7 +484,7 @@
            </property>
            <property name="icon">
             <iconset resource="../lux.qrc">
-             <normaloff>:/icons/transaction_0</normaloff>:/icons/transaction_0</iconset>
+             <normaloff>:/icons/key</normaloff>:/icons/key</iconset>
            </property>
            <property name="autoDefault">
             <bool>false</bool>
