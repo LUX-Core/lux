@@ -17,7 +17,6 @@ MultiSendDialog::MultiSendDialog(QWidget* parent) : QDialog(parent),
                                                     model(0)
 {
     ui->setupUi(this);
-
     updateCheckBoxes();
 }
 
@@ -78,6 +77,7 @@ void MultiSendDialog::on_viewButton_clicked()
         strMultiSendPrint += "% \n";
     }
     ui->message->setProperty("status", "ok");
+    ui->message->style()->unpolish(ui->message);
     ui->message->style()->polish(ui->message);
     ui->message->setText(QString(strMultiSendPrint.c_str()));
     return;
@@ -89,6 +89,7 @@ void MultiSendDialog::on_addButton_clicked()
     std::string strAddress = ui->multiSendAddressEdit->text().toStdString();
     if (!IsValidDestination(DecodeDestination(strAddress))) {
         ui->message->setProperty("status", "error");
+        ui->message->style()->unpolish(ui->message);
         ui->message->style()->polish(ui->message);
         ui->message->setText(tr("The entered address:\n") + ui->multiSendAddressEdit->text() + tr(" is invalid.\nPlease check the address and try again."));
         ui->multiSendAddressEdit->setFocus();
@@ -100,6 +101,7 @@ void MultiSendDialog::on_addButton_clicked()
         nSumMultiSend += pwalletMain->vMultiSend[i].second;
     if (nSumMultiSend + nMultiSendPercent > 100) {
         ui->message->setProperty("status", "error");
+        ui->message->style()->unpolish(ui->message);
         ui->message->style()->polish(ui->message);
         ui->message->setText(tr("The total amount of your MultiSend vector is over 100% of your stake reward\n"));
         ui->multiSendAddressEdit->setFocus();
@@ -107,6 +109,7 @@ void MultiSendDialog::on_addButton_clicked()
     }
     if (!fValidConversion || nMultiSendPercent > 100 || nMultiSendPercent <= 0) {
         ui->message->setProperty("status", "error");
+        ui->message->style()->unpolish(ui->message);
         ui->message->style()->polish(ui->message);
         ui->message->setText(tr("Please Enter 1 - 100 for percent."));
         ui->multiSendPercentEdit->setFocus();
@@ -117,6 +120,7 @@ void MultiSendDialog::on_addButton_clicked()
     pMultiSend.second = nMultiSendPercent;
     pwalletMain->vMultiSend.push_back(pMultiSend);
     ui->message->setProperty("status", "ok");
+    ui->message->style()->unpolish(ui->message);
     ui->message->style()->polish(ui->message);
     std::string strMultiSendPrint = "";
     for (int i = 0; i < (int)pwalletMain->vMultiSend.size(); i++) {
@@ -178,6 +182,7 @@ void MultiSendDialog::on_activateButton_clicked()
     } else
         strRet = "First Address Not Valid";
     ui->message->setProperty("status", "ok");
+    ui->message->style()->unpolish(ui->message);
     ui->message->style()->polish(ui->message);
     ui->message->setText(tr(strRet.c_str()));
     return;
@@ -189,10 +194,16 @@ void MultiSendDialog::on_disableButton_clicked()
     pwalletMain->setMultiSendDisabled();
     CWalletDB walletdb(pwalletMain->strWalletFile);
     if (!walletdb.WriteMSettings(false, false, pwalletMain->nLastMultiSendHeight))
+    {
         strRet = "MultiSend deactivated but writing settings to DB failed";
+        ui->message->setProperty("status", "error");
+    }
     else
+    {
         strRet = "MultiSend deactivated";
-    ui->message->setProperty("status", "");
+        ui->message->setProperty("status", "ok");
+    }
+    ui->message->style()->unpolish(ui->message);
     ui->message->style()->polish(ui->message);
     ui->message->setText(tr(strRet.c_str()));
     return;
