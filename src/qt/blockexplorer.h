@@ -39,7 +39,7 @@ private Q_SLOTS:
     void goTo(const QString& query);
     void back();
     void forward();
-
+    void home();
 private:
     Ui::BlockExplorer* ui;
     bool m_NeverShown;
