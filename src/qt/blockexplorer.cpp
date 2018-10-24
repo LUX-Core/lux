@@ -175,12 +175,43 @@ static std::string TxToRow(const CTransaction& tx, CBlock * const ptrBlock= null
         CTxDestination outAddr;
         ExtractDestination(Out.scriptPubKey, outAddr);
         if (pSum && tx.vout.size() > 50 && outAddr != Highlight) continue; // for pools payouts
-        OutAddresses += ScriptToString(Out.scriptPubKey, false, outAddr == Highlight);
-        if (outAddr == Highlight) {
-            Delta += Out.nValue;
-            OutAmounts += "<span class=\"hlo\">" + ValueToStringShort(Out.nValue) + "</span>";
-        } else {
-            OutAmounts += ValueToStringShort(Out.nValue);
+        auto strAddress = ScriptToString(Out.scriptPubKey, false, outAddr == Highlight);
+        bCalcOutAddr = true;
+        bool bSC_Amount = false;
+        if(bHasOpCall && strAddress == "")
+        {
+            strAddress = "Call SC";
+            bSC_Amount = true;
+        }
+        if(bHasOpCreate && strAddress == "")
+        {
+            strAddress = "Create SC";
+            bSC_Amount = true;
+        }
+        if(bSC_Amount)
+        {
+            CAmount nAmount;
+            //calc nAmount
+            {
+                CAmount sumIn = 0;
+                for (unsigned int j = 0; j < tx.vin.size(); j++)
+                {
+                    CTxOut PrevOut = getPrevOut(tx.vin[j].prevout);
+                    if (PrevOut.nValue < 0)
+                        sumIn = -MAX_MONEY;
+                    else
+                        sumIn += PrevOut.nValue;
+                }
+                CAmount sumOut = tx.GetValueOut();
+                nAmount = sumIn - sumOut;
+            }
+            if (outAddr == Highlight)
+            {
+                Delta += nAmount;
+                OutAmounts += "<span class=\"hlo\">" + ValueToStringShort(nAmount) + "</span>";
+            } else {
+                OutAmounts += ValueToStringShort(nAmount);
+            }
         }
         else if(strAddress != "")
         {
