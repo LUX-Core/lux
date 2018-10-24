@@ -62,7 +62,7 @@ static std::string ValueToStringShort(CAmount nValue)
 static std::string ScriptToString(const CScript& Script, bool Long = false, bool Highlight = false, std::string hlClass = "hl")
 {
     if (Script.empty())
-        return "unknown";
+        return "";
 
     CTxDestination Dest;
     if (ExtractDestination(Script, Dest)) {
@@ -71,7 +71,7 @@ static std::string ScriptToString(const CScript& Script, bool Long = false, bool
         else
             return makeHRef(EncodeDestination(Dest));
     } else
-        return Long ? "<pre>" + FormatScript(Script) + "</pre>" : _("Non-standard script");
+        return Long ? "<pre>" + FormatScript(Script) + "</pre>" : "";
 }
 
 static std::string TimeToString(uint64_t Time)
@@ -104,14 +104,51 @@ static std::string makeHTMLTable(const std::string* pCells, int nRows, int nColu
     return Table;
 }
 
-static std::string TxToRow(const CTransaction& tx, const CTxDestination& Highlight = CTxDestination(), const std::string& Prepend = std::string(), CAmount* pSum = NULL)
+static std::string TxToRow(const CTransaction& tx, CBlock * const ptrBlock= nullptr,
+                           const CTxDestination& Highlight = CTxDestination(),
+                           const std::string& Prepend = std::string(), CAmount* pSum = NULL)
 {
     std::string InAmounts, InAddresses, OutAmounts, OutAddresses;
     CAmount Delta = 0;
+
+    bool bHasOpCall = false;
+    bool bHasOpCreate = false;
+    //calc bHasOpCall and bHasOpCreate
+    if(ptrBlock != nullptr)
+    {
+        for (unsigned int i = 0; i < ptrBlock->vtx.size(); i++)
+        {
+            const CTransaction& tx_ = ptrBlock->vtx[i];
+            for (const auto& txout : tx_.vout)
+            {
+                if (txout.scriptPubKey.HasOpCall())
+                {
+                    bHasOpCall = true;
+                    break;
+                }
+                if (txout.scriptPubKey.HasOpCreate())
+                {
+                    bHasOpCreate = true;
+                    break;
+                }
+            }
+            if(bHasOpCall || bHasOpCreate)
+                break;
+        }
+    }
+
     for (unsigned int j = 0; j < tx.vin.size(); j++) {
         if (tx.IsCoinBase()) {
             InAmounts += ValueToStringShort(tx.GetValueOut());
-            InAddresses += "coinbase";
+            std::string strAddr = "coinbase";
+            if(tx.HasWitness())
+                strAddr = "coinbase(segwit)";
+            else if (ptrBlock != nullptr)
+            {
+                if (ptrBlock->IsProofOfStake())
+                    strAddr = "stake";
+            }
+            InAddresses += strAddr;
         } else {
             CTxOut PrevOut = getPrevOut(tx.vin[j].prevout);
             CTxDestination inAddr;
@@ -131,26 +168,71 @@ static std::string TxToRow(const CTransaction& tx, const CTxDestination& Highlig
         }
     }
 
+    bool bCalcOutAddr = false;
     for (unsigned int j = 0; j < tx.vout.size(); j++) {
         CTxOut Out = tx.vout[j];
         if (Out.nValue == 0 && tx.IsCoinStake()) continue;
         CTxDestination outAddr;
         ExtractDestination(Out.scriptPubKey, outAddr);
         if (pSum && tx.vout.size() > 50 && outAddr != Highlight) continue; // for pools payouts
-        OutAddresses += ScriptToString(Out.scriptPubKey, false, outAddr == Highlight);
-        if (outAddr == Highlight) {
-            Delta += Out.nValue;
-            OutAmounts += "<span class=\"hlo\">" + ValueToStringShort(Out.nValue) + "</span>";
-        } else {
-            OutAmounts += ValueToStringShort(Out.nValue);
+        auto strAddress = ScriptToString(Out.scriptPubKey, false, outAddr == Highlight);
+        bCalcOutAddr = true;
+        bool bSC_Amount = false;
+        if(bHasOpCall && strAddress == "")
+        {
+            strAddress = "Call SC";
+            bSC_Amount = true;
         }
+        if(bHasOpCreate && strAddress == "")
+        {
+            strAddress = "Create SC";
+            bSC_Amount = true;
+        }
+        if(bSC_Amount)
+        {
+            CAmount nAmount;
+            //calc nAmount
+            {
+                CAmount sumIn = 0;
+                for (unsigned int j = 0; j < tx.vin.size(); j++)
+                {
+                    CTxOut PrevOut = getPrevOut(tx.vin[j].prevout);
+                    if (PrevOut.nValue < 0)
+                        sumIn = -MAX_MONEY;
+                    else
+                        sumIn += PrevOut.nValue;
+                }
+                CAmount sumOut = tx.GetValueOut();
+                nAmount = sumIn - sumOut;
+            }
+            if (outAddr == Highlight)
+            {
+                Delta += nAmount;
+                OutAmounts += "<span class=\"hlo\">" + ValueToStringShort(nAmount) + "</span>";
+            } else {
+                OutAmounts += ValueToStringShort(nAmount);
+            }
+        }
+        else if(strAddress != "")
+        {
+            if (outAddr == Highlight) {
+                Delta += Out.nValue;
+                OutAmounts += "<span class=\"hlo\">" + ValueToStringShort(Out.nValue) + "</span>";
+            } else {
+                OutAmounts += ValueToStringShort(Out.nValue);
+            }
+        }
+        OutAddresses += strAddress;
         if (j + 1 != tx.vout.size()) {
             OutAmounts += "<br/>";
             OutAddresses += "<br/>";
         }
     }
-    if (OutAddresses == "") {
-        OutAddresses = itostr(tx.vout.size()) + " outputs (see tx)";
+    if(!bCalcOutAddr)
+    {
+        if (OutAddresses == "") {
+            OutAddresses = itostr(tx.vout.size()) + " outputs (see tx)";
+        }
     }
 
     std::string List[8] = {
@@ -232,7 +314,7 @@ std::string BlockToString(CBlockIndex* pBlock)
 
     for (unsigned int i = 0; i < block.vtx.size(); i++) {
         const CTransaction& tx = block.vtx[i];
-        TxContent += TxToRow(tx);
+        TxContent += TxToRow(tx, &block);
 
         CAmount In = getTxIn(tx);
         CAmount Out = tx.GetValueOut();
@@ -483,7 +565,7 @@ std::string AddressToString(const CTxDestination& Address)
             }
 
             std::string Prepend = "<a href=\"" + itostr(it->first.blockHeight) + "\">" + TimeToString(txTime) + "</a>";
-            std::string TxRow = TxToRow(tx, Address, Prepend, &Sum);
+            std::string TxRow = TxToRow(tx, nullptr, Address, Prepend, &Sum);
             nTxSummed++;
             // show latest ones first to avoid scrolling requierement for the current balance
             TxRows = TxRow + TxRows;
@@ -517,6 +599,7 @@ BlockExplorer::BlockExplorer(QWidget* parent) : QMainWindow(parent),
     connect(ui->pushSearch, SIGNAL(released()), this, SLOT(onSearch()));
     connect(ui->content, SIGNAL(linkActivated(const QString&)), this, SLOT(goTo(const QString&)));
     connect(ui->back, SIGNAL(released()), this, SLOT(back()));
+    connect(ui->pushButtonHome, SIGNAL(released()), this, SLOT(home()));
     connect(ui->forward, SIGNAL(released()), this, SLOT(forward()));
 }
 
@@ -538,24 +621,31 @@ void BlockExplorer::keyPressEvent(QKeyEvent* event)
     }
 }
 
-void BlockExplorer::showEvent(QShowEvent*)
+void BlockExplorer::showEvent(QShowEvent* ev)
 {
     if (m_NeverShown) {
         m_NeverShown = false;
-
-        CBlockIndex* pindexBest = mapBlockIndex[chainActive.Tip()->GetBlockHash()];
-
-        setBlock(pindexBest);
-        QString text = QString("%1").arg(pindexBest->nHeight);
-        ui->searchBox->setText(text);
-        m_History.push_back(text);
-        updateNavButtons();
-
+        home();
         if (!GetBoolArg("-txindex", false)) {
             QString Warning = tr("Not all transactions will be shown. To view all transactions you need to set txindex=1 in the configuration file (lux.conf).");
             QMessageBox::warning(this, "Luxcore Blockchain Explorer", Warning, QMessageBox::Ok);
         }
     }
+    QMainWindow::showEvent(ev);
+}
+
+void BlockExplorer::home()
+{
+    CBlockIndex* pindexBest = mapBlockIndex[chainActive.Tip()->GetBlockHash()];
+
+    setBlock(pindexBest);
+    QString text = QString("%1").arg(pindexBest->nHeight);
+    ui->searchBox->setText(text);
+    while (m_History.size() > m_HistoryIndex + 1)
+        m_History.pop_back();
+    m_History.push_back(text);
+    m_HistoryIndex = m_History.size() - 1;
+    updateNavButtons();
 }
 
 bool BlockExplorer::switchTo(const QString& query)
