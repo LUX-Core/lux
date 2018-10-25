@@ -30,8 +30,8 @@ contract StandardToken is Token {
             Transfer(msg.sender, _to, _value);
             return true;
         } else {
-        return false;
-         }
+            return false;
+        }
     }
 
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
@@ -43,7 +43,7 @@ contract StandardToken is Token {
             Transfer(_from, _to, _value);
             return true;
         } else {
-        return false;
+            return false;
         }
     }
 
@@ -58,7 +58,7 @@ contract StandardToken is Token {
     }
 
     function allowance(address _owner, address _spender) constant returns (uint256 remaining) {
-      return allowed[_owner][_spender];
+        return allowed[_owner][_spender];
     }
 
     mapping (address => uint256) balances;
@@ -69,7 +69,7 @@ contract LSRStandardToken is StandardToken {
 
     //if ether is sent to this address, send it back.
     function () {
-		return;
+        return;
     }
 
     //LSRToken 0.1 standard.
@@ -86,30 +86,31 @@ contract LSRStandardToken is StandardToken {
 
     function LSRStandardToken(uint256 initialSupply, string tokenName, uint8 decimalUnits, string tokenSymbol) {
 
-    // Give the creator all initial tokens
-    balances[msg.sender] = initialSupply;
+        // Give the creator all initial tokens
+        balances[msg.sender] = initialSupply;
 
-    // Update total supply
-    totalSupply = initialSupply;
+        // Update total supply
+        totalSupply = initialSupply;
 
-    // Set the name for display purposes
-    name = tokenName;
+        // Set the name for display purposes
+        name = tokenName;
 
-    // Amount of decimals for display purposes
-    decimals = decimalUnits;
+        // Amount of decimals for display purposes
+        decimals = decimalUnits;
 
-    // Set the symbol for display purposes
-    symbol = tokenSymbol;
+        // Set the symbol for display purposes
+        symbol = tokenSymbol;
     }
 
     //Approves and then calls contract
     function approveAndCall(address _spender, uint256 _value, bytes _extraData) returns (bool success) {
+
         allowed[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
 
         if(!_spender.call(bytes4(bytes32(sha3("receiveApproval(address,uint256,address,bytes)"))), msg.sender, _value, this, _extraData)) {
-        		return false;
-        	 }
+            return false;
+        }
         return true;
     }
 }
