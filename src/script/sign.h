@@ -76,10 +76,13 @@ struct SignatureData {
     CScript witness_script;                  ///< The witnessScript (if any) for the input. witnessScripts are used in P2WSH outputs.
     CScriptWitness scriptWitness;            ///< The scriptWitness of an input. Contains complete signatures or the traditional partial signatures format. scriptWitness is part of a transaction input per BIP 144.
     std::map<CKeyID, SigPair> signatures;    ///< BIP 174 style partial signatures for the input. May contain all signatures necessary for producing a final scriptSig or scriptWitness.
+    bool witness = false;                    ///< Stores whether the input this SigData corresponds to is a witness input
+    std::map<CKeyID, CPubKey> misc_pubkeys;
 
 
     SignatureData() {}
     explicit SignatureData(const CScript& script) : scriptSig(script) {}
+    void MergeSignatureData(SignatureData sigdata);
 };
 
 /** Produce a script signature using a generic signature creator. */
@@ -210,6 +213,10 @@ struct PSBTInput
     int sighash_type = 0;
 
     bool IsNull() const;
+    void FillSignatureData(SignatureData& sigdata) const;
+    void FromSignatureData(const SignatureData& sigdata);
+    void Merge(const PSBTInput& input);
+    bool IsSane() const;
     PSBTInput() {}
 
     template <typename Stream>
@@ -399,6 +406,10 @@ struct PSBTOutput
     std::map<std::vector<unsigned char>, std::vector<unsigned char>> unknown;
 
     bool IsNull() const;
+    void FillSignatureData(SignatureData& sigdata) const;
+    void FromSignatureData(const SignatureData& sigdata);
+    void Merge(const PSBTOutput& output);
+    bool IsSane() const;
     PSBTOutput() {}
 
     template <typename Stream>
@@ -497,6 +508,8 @@ struct PartiallySignedTransaction
     std::map<std::vector<unsigned char>, std::vector<unsigned char>> unknown;
 
     bool IsNull() const;
+    void Merge(const PartiallySignedTransaction& psbt);
+    bool IsSane() const;
     PartiallySignedTransaction() {}
     PartiallySignedTransaction(const PartiallySignedTransaction& psbt_in) : tx(psbt_in.tx), inputs(psbt_in.inputs), outputs(psbt_in.outputs), unknown(psbt_in.unknown) {}
 
@@ -629,6 +642,10 @@ struct PartiallySignedTransaction
         // Make sure that the number of outputs matches the number of outputs in the transaction
         if (outputs.size() != tx->vout.size()) {
             throw std::ios_base::failure("Outputs provided does not match the number of outputs in transaction.");
+        }
+        // Sanity check
+        if (!IsSane()) {
+            throw std::ios_base::failure("PSBT is not sane.");
         }
     }
 #if 0
