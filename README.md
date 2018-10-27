@@ -151,11 +151,11 @@ Then install [Homebrew](https://brew.sh)
 
 #### Dependencies
 
-    brew install cmake automake berkeley-db4 leveldb libtool boost@1.60 --c++11 --without-single --without-static miniupnpc openssl pkg-config protobuf qt5 libevent imagemagick --with-librsvg
+    brew install cmake automake berkeley-db4 leveldb libtool boost@1.64 --c++11 --without-single --without-static miniupnpc openssl pkg-config protobuf qt5 libevent imagemagick --with-librsvg
 
-Link boost 1.60
+Link boost 1.64
 
-    brew link boost@1.60 --force
+    brew link boost@1.64 --force
 
 #### Build Luxcore
 
