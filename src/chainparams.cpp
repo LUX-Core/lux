@@ -93,14 +93,16 @@ static Checkpoints::MapCheckpoints mapCheckpoints =
                 ( 299500,   uint256("0x94c34653c7b107662f1f44d085be5817d03f8d3f0b3c29b970ce25eb44e03743") )
                 ( 303112,   uint256("0x0000000000026621b448ad1288a7f9762e78a0ef5ab87fcbc016cddc3ded4356") )
                 ( 350095,   uint256("0x000000000007726c464bbdb9bcffc3baf044333f88b79882aa0aefcbe6f0f881") )
+                ( 410000,   uint256("0x000000000008d3f413fdad9d3bf3403d4ea78a7ba94eaf442593ffc4535d4f3d") )
+                ( 460000,   uint256("0x00000000001267a73897a2e01f2fb376e3cb9ddc75c70b31f12d7fd2625879a0") )
 ;
 
 static const Checkpoints::CCheckpointData data = {
         &mapCheckpoints,
-        1533497346, // * UNIX timestamp of last checkpoint block
-        723458,     // * total number of transactions between genesis and last checkpoint
-        //   (the tx=... number in UpdateTip debug.log lines)
-        350058        // * estimated number of transactions per day after checkpoint
+        1540537646, // * UNIX timestamp of last checkpoint block
+        928170,     // * total number of transactions between genesis and last checkpoint
+        //               (the tx=... number in UpdateTip debug.log lines)
+        2438.911721 // * estimated number of transactions per day after checkpoint
 };
 
 static Checkpoints::MapCheckpoints mapCheckpointsTestnet =
