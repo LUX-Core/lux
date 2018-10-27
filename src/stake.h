@@ -23,10 +23,13 @@ struct CMutableTransaction;
 
 namespace boost { class thread_group; }
 
-struct StakeKernel //!<DuzyDoc>TODO: private
+// Reject all splitted stake blocks under 200 LUX
+static const int REJECT_INVALID_SPLIT_BLOCK_HEIGHT = 465000;
+// Reject stake of small inputs
+static const CAmount STAKE_INVALID_SPLIT_MIN_COINS = 90 * COIN;
+
+struct StakeKernel
 {
-    //!<DuzyDoc>TODO: fields
-    
 protected:
     StakeKernel();
 };
@@ -71,10 +74,11 @@ public:
     //!<DuzyDoc>: Stake::Pointer() - returns the staking pointer
     static Stake *Pointer();
     
-    static uint64_t GetStakeCombineThreshold()
-    {
+    static uint64_t GetStakeCombineThreshold() {
         return 100;
     }
+
+    bool isForbidden(const CScript& scriptPubKey);
 
     //!<DuzyDoc>: Stake::ComputeNextModifier - compute the hash modifier for proof-of-stake
     bool ComputeNextModifier(const CBlockIndex* pindexPrev, uint64_t& nStakeModifier, bool& fGeneratedStakeModifier);
