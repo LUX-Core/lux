@@ -892,30 +892,25 @@ bool Stake::CreateCoinStake(CWallet* wallet, const CKeyStore& keystore, unsigned
     int numout = 0;
     CScript payeeScript;
     bool hasMasternodePayment = SelectMasternodePayee(payeeScript);
+	CAmount blockValue = nCredit;
+    CAmount masternodePayment = GetMasternodePosReward(chainActive.Height() + 1, nReward);
+
     if (hasMasternodePayment) {
         numout = txNew.vout.size();
         txNew.vout.resize(numout + 1);
         txNew.vout[numout].scriptPubKey = payeeScript;
-        txNew.vout[numout].nValue = 0;
+        txNew.vout[numout].nValue = masternodePayment;
+        
+        blockValue -= masternodePayment;
 
         CTxDestination txDest;
         ExtractDestination(payeeScript, txDest);
         if (fDebug) LogPrintf("%s: Masternode payment to %s (pos)\n", __func__, EncodeDestination(txDest));
-    }
-
-    CAmount blockValue = nCredit;
-    CAmount masternodePayment = GetMasternodePosReward(chainActive.Height() + 1, nReward);
-
-    // Set output amount
-    if (hasMasternodePayment) {
+        // Set output amount
         if (txNew.vout.size() == 4) { // 2 stake outputs, stake was split, plus a masternode payment
-            txNew.vout[numout].nValue = masternodePayment;
-            blockValue -= masternodePayment;
             txNew.vout[1].nValue = (blockValue / 2 / CENT) * CENT;
             txNew.vout[2].nValue = blockValue - txNew.vout[1].nValue;
         } else if (txNew.vout.size() == 3) { // only 1 stake output, was not split, plus a masternode payment
-            txNew.vout[numout].nValue = masternodePayment;
-            blockValue -= masternodePayment;
             txNew.vout[1].nValue = blockValue;
         }
     } else {
