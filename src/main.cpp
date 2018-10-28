@@ -88,7 +88,7 @@ bool fRecordLogOpcodes = false;
 bool fIsVMlogFile = false;
 bool fGettingValuesDGP = false;
 
-std::string SCVersion ("/Luxcore:5.2.1/");
+std::string SCVersion ("/Luxcore:5.2.5/");
 
 
 /** The maximum allowed size for a serialized block, in bytes (only for buffer size limits) */
@@ -4358,16 +4358,6 @@ bool CheckWork(const CBlock &block, CBlockIndex* const pindexPrev)
 
     unsigned int nBitsRequired = GetNextWorkRequired(pindexPrev, &block, consensusParams, block.IsProofOfStake());
 
-//    if (block.IsProofOfWork() && (pindexPrev->nHeight + 1 <= 68589)) {
-//        double n1 = ConvertBitsToDouble(block.nBits);
-//        double n2 = ConvertBitsToDouble(nBitsRequired);
-//
-//        if (abs(n1 - n2) > n1 * 0.5)
-//            return error("%s : incorrect proof of work (DGW pre-fork) - %f %f %f at %d", __func__, abs(n1 - n2), n1, n2, pindexPrev->nHeight + 1);
-//
-//        return true;
-//    }
-
     if (block.IsProofOfWork() && pindexPrev->nHeight + 1 > chainParams.LAST_POW_BLOCK())
         return error("%s: reject proof-of-work at height %d", __func__, pindexPrev->nHeight + 1);
 
@@ -4378,11 +4368,11 @@ bool CheckWork(const CBlock &block, CBlockIndex* const pindexPrev)
         uint256 hashProofOfStake, proof;
         uint256 hash = block.GetHash(pindexPrev->nHeight + 1 >= chainParams.SwitchPhi2Block());
         if (!stake->CheckProof(pindexPrev, block, hashProofOfStake)) {
-            return error("%s: invalid proof-of-stake (block %s)\n", __func__, hash.GetHex());
+            return error("%s: invalid proof-of-stake (block %s)", __func__, hash.GetHex());
         }
         if (stake->GetProof(hash, proof)) {
             if (proof != hashProofOfStake)
-                return error("%s: diverged stake %s, %s (block %s)\n", __func__,
+                return error("%s: diverged stake %s, %s (block %s)", __func__,
                              hashProofOfStake.GetHex(), proof.GetHex(), hash.GetHex());
         } else {
             stake->SetProof(hash, hashProofOfStake);
@@ -7412,29 +7402,32 @@ bool CheckRefund(const CBlock& block, const std::vector<CTxOut>& vouts){
     size_t offset = block.IsProofOfStake() ? 1 : 0;
     std::vector<CTxOut> vTempVouts=block.vtx[offset].vout;
     std::vector<CTxOut>::iterator it;
+    bool allValid = true;
     for(size_t i = 0; i < vouts.size(); i++){
         it=std::find(vTempVouts.begin(), vTempVouts.end(), vouts[i]);
         if (it==vTempVouts.end()) {
-            bool refundValid=false;
-            const int nPrecision = 1000000;
+            bool refundValid = false;
+            const int nPrecision = 10000000;
             LogPrintf("%s: warning, unable to find exact %s\n", __func__, vouts[i].ToString().c_str());
             for(it=vTempVouts.begin(); it!=vTempVouts.end(); it++) {
                 if (vouts[i].scriptPubKey == it->scriptPubKey && it->nValue/nPrecision == vouts[i].nValue/nPrecision) {
                     LogPrintf("%s: found vout %s (%s)\n", __func__, it->ToString().c_str(), FormatMoney(it->nValue));
                     refundValid = true;
+                    break;
                 }
             }
             if (!refundValid) {
                 LogPrintf("%s: Unable to find vout %s\n", __func__, vouts[i].ToString().c_str());
                 LogPrintf("%s: first block %s\n", __func__, vTempVouts.at(0).ToString().c_str());
-                return false;
+                allValid = false;
+                break;
             }
         } else {
             vTempVouts.erase(it);
         }
     }
     vTempVouts.clear();
-    return true;
+    return allValid;
 }
 
 valtype GetSenderAddress(const CTransaction& tx, const CCoinsViewCache* coinsView, const std::vector<CTransaction>* blockTxs){

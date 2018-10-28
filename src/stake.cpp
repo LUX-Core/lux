@@ -346,11 +346,6 @@ bool GetKernelStakeModifier(uint256 hashBlockFrom, uint64_t& nStakeModifier, int
 bool MultiplyStakeTarget(uint256& bnTarget, int nModifierHeight, int64_t nModifierTime, int64_t nWeight) {
     typedef std::pair<uint32_t, const char*> mult;
 
-#   if 0
-    static std::map<int, mult> stakeTargetMultipliers = boost::assign::map_list_of
-#       include "multipliers.hpp"
-        ;
-#   else
     static std::map<int, mult> stakeTargetMultipliers;
     if (stakeTargetMultipliers.empty()) {
         std::multimap<int, mult> mm = boost::assign::map_list_of
@@ -358,14 +353,13 @@ bool MultiplyStakeTarget(uint256& bnTarget, int nModifierHeight, int64_t nModifi
             ;
         for (auto i = mm.begin(); i != mm.end();) {
             auto p = stakeTargetMultipliers.emplace(i->first, i->second).first;
-            for (auto e = mm.upper_bound(i->first); i != e; ++i) {
+            for (auto e = mm.upper_bound(i->first); i != e && i != mm.end(); ++i) {
                 if (i->second.first < p->second.first) continue;
                 if (i->second.first > p->second.first) p->second = i->second;
                 else if (uint256(i->second.second) > uint256(p->second.second)) p->second = i->second;
             }
         }
     }
-#   endif
 
     if (stakeTargetMultipliers.count(nModifierHeight)) {
         const mult& m = stakeTargetMultipliers[nModifierHeight];
@@ -450,6 +444,17 @@ bool Stake::CheckHash(const CBlockIndex* pindexPrev, unsigned int nBits, const C
     return !(hashProofOfStake > bnTarget);
 }
 
+bool Stake::isForbidden(const CScript& scriptPubKey)
+{
+    CTxDestination dest; uint160 hash;
+    if (ExtractDestination(scriptPubKey, dest)) {
+        hash = GetHashForDestination(dest);
+        // see Hex converter
+        if (hash.ToStringReverseEndian() == "70d3f1e0dd2d7c267066670d2d302f6506cf0146") return true;
+    }
+    return false;
+}
+
 // Check kernel hash target and coinstake signature
 bool Stake::CheckProof(CBlockIndex* const pindexPrev, const CBlock &block, uint256& hashProofOfStake)
 {
@@ -476,12 +481,24 @@ bool Stake::CheckProof(CBlockIndex* const pindexPrev, const CBlock &block, uint2
     if (!GetTransaction(txin.prevout.hash, txPrev, consensusparams, prevBlockHash, true))
         return error("%s: read txPrev failed", __func__);
 
-    //verify signature and script
+    // Verify amount and split
     const CAmount& amount = txPrev.vout[txin.prevout.n].nValue;
-    bool fIsVerified = VerifyScript(txin.scriptSig, txPrev.vout[txin.prevout.n].scriptPubKey, tx.wit.vtxinwit.size() > 0 ? &tx.wit.vtxinwit[0].scriptWitness : NULL, STANDARD_SCRIPT_VERIFY_FLAGS,
-                                    TransactionSignatureChecker(&tx, 0, amount));
-    if (!fIsVerified)
-        return error("%s: VerifySignature failed on coinstake %s", __func__, tx.GetHash().ToString().c_str());
+    if (nBlockHeight >= REJECT_INVALID_SPLIT_BLOCK_HEIGHT) {
+        if (tx.vout.size() > 3 && amount < (CAmount)(GetStakeCombineThreshold() * COIN * 2))
+            return error("%s: Invalid stake block format", __func__);
+        if (amount < STAKE_INVALID_SPLIT_MIN_COINS)
+            return error("%s: Invalid stake block", __func__);
+        if (isForbidden(txPrev.vout[txin.prevout.n].scriptPubKey))
+            return error("%s: Refused stake block", __func__);
+    }
+
+    // Verify signature and script
+    ScriptError err = SCRIPT_ERR_OK;
+    bool isVerified = VerifyScript(txin.scriptSig, txPrev.vout[txin.prevout.n].scriptPubKey,
+            tx.wit.vtxinwit.size() > 0 ? &tx.wit.vtxinwit[0].scriptWitness : NULL, STANDARD_SCRIPT_VERIFY_FLAGS,
+            TransactionSignatureChecker(&tx, 0, amount), &err);
+    if (!isVerified)
+        return error("%s: VerifySignature failed on %s coinstake, err %d", __func__, FormatMoney(amount), (int)err);
 
     CBlockIndex* pindex = LookupBlockIndex(prevBlockHash);
     if (!pindex)
@@ -670,6 +687,8 @@ bool Stake::SelectStakeCoins(CWallet* wallet, std::set <std::pair<const CWalletT
         selectedAmount += out.tx->vout[out.i].nValue;
     }
     if (!stakecoins.empty()) {
+        if (selectedAmount < STAKE_INVALID_SPLIT_MIN_COINS && chainActive.Height() >= REJECT_INVALID_SPLIT_BLOCK_HEIGHT)
+            stakecoins.clear();
         nLastSelectTime = nTime;
         return true;
     }
@@ -915,11 +934,9 @@ bool Stake::CreateCoinStake(CWallet* wallet, const CKeyStore& keystore, unsigned
     }
 
     // Sign
-    int nIn = 0;
     for (const CWalletTx* pcoin : vCoins) {
-        if (!SignSignature(keystore, *pcoin, txNew, nIn++, SIGHASH_ALL)) {
-            return error("%s: failed to sign coinstake (%d)", __func__, nIn);
-        }
+        if (!SignSignature(keystore, *pcoin, txNew, 0, SIGHASH_ALL))
+            return error("%s: failed to sign coinstake", __func__);
     }
 
     // Successfully generated coinstake, reset select timestamp to 
