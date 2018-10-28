@@ -397,24 +397,18 @@ bool Stake::CheckHash(const CBlockIndex* pindexPrev, unsigned int nBits, const C
     uint256 bnTarget;
     bnTarget.SetCompact(nBits);
 
-    std::cout << "bnTarget: " << bnTarget.GetHex() << std::endl;
-
     // Weighted target
     int64_t nValueIn = txPrev.vout[prevout.n].nValue;
-    int64_t nTimeWeight = min((int64_t)nTimeTx - txPrev.nTime, Params().StakingMinAge()) - (int64_t)0;
-
-    uint256 bnWeight = uint256(nValueIn) * nTimeWeight / COIN / (24 * 60 * 60);
+    uint256 bnWeight = uint256(nValueIn);
+    int64_t nTimeWeight = min((int64_t)nTimeTx - txPrev.nTime, Params().StakingMinAge());
+    if(nTimeWeight){
+        bnWeight = uint256(nValueIn) * nTimeWeight / COIN / (24 * 60 * 60);
+    }
     bnTarget *= bnWeight; // comment out this will cause 'ERROR: CheckWork: invalid proof-of-stake at block 1144'
-
-    std::cout << "targetProofOfStake: " << bnTarget.GetHex() << std::endl;
 
     uint64_t nStakeModifier = pindexPrev->nStakeModifier;
     int nStakeModifierHeight = pindexPrev->nHeight;
     int64_t nStakeModifierTime = pindexPrev->nTime;
-
-    std::cout << "nStakeModifier: " << nStakeModifier << std::endl;
-    std::cout << "nStakeModifierHeight: " << nStakeModifierHeight << std::endl;
-    std::cout << "nStakeModifierTime: " << nStakeModifierTime << std::endl;
 
     // Calculate hash
     CDataStream ss(SER_GETHASH, 0);
@@ -424,8 +418,6 @@ bool Stake::CheckHash(const CBlockIndex* pindexPrev, unsigned int nBits, const C
            << bnWeight << nStakeModifierTime;
     }
     hashProofOfStake = Hash(ss.begin(), ss.end());
-
-    std::cout << "hashProofOfStake: " << hashProofOfStake.GetHex() << std::endl;
 
     if (fDebug) {
 #       if 0
