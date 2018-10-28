@@ -4408,7 +4408,7 @@ bool CheckWork(const CBlock &block, CBlockIndex* const pindexPrev)
         }
         if (stake->GetProof(hash, proof)) {
             if (proof != hashProofOfStake)
-                return error("%s: diverged stake %s, %s (block %s)\n", __func__,
+                return error("%s: diverged stake %s, %s (block %s)", __func__,
                              hashProofOfStake.GetHex(), proof.GetHex(), hash.GetHex());
         } else {
             stake->SetProof(hash, hashProofOfStake);

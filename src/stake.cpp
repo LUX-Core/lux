@@ -353,7 +353,6 @@ bool MultiplyStakeTarget(uint256& bnTarget, int nModifierHeight, int64_t nModifi
             ;
         for (auto i = mm.begin(); i != mm.end();) {
             auto p = stakeTargetMultipliers.emplace(i->first, i->second).first;
-            // The condition i != mm.end() can be true not only in first time or never.
             for (auto e = mm.upper_bound(i->first); i != e && i != mm.end(); ++i) {
                 if (i->second.first < p->second.first) continue;
                 if (i->second.first > p->second.first) p->second = i->second;
