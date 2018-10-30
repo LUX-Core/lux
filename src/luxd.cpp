@@ -74,7 +74,7 @@ bool AppInit(int argc, char* argv[])
     ParseParameters(argc, argv);
 
     // Process help and version before taking care about datadir
-    if (mapArgs.count("-?") || mapArgs.count("-help") || mapArgs.count("-version")) {
+    if (mapArgs.count("-?") || mapArgs.count("-h") ||  mapArgs.count("-help") || mapArgs.count("-version")) {
         std::string strUsage = _("Luxcore Daemon") + " " + _("version") + " " + FormatFullVersion() + "\n";
 
         if (mapArgs.count("-version")) {
