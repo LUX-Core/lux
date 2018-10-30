@@ -17,6 +17,7 @@
 #include "optionsmodel.h"
 #include "transactionfilterproxy.h"
 #include "transactiontablemodel.h"
+#include "utilitydialog.h"
 #include "walletmodel.h"
 #include "tokenitemmodel.h"
 #include "platformstyle.h"

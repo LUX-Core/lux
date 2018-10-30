@@ -16,6 +16,8 @@ static const int MAX_PASSPHRASE_SIZE = 1024;
 /* Lux GUI -- Size of icons in status bar */
 static const int STATUSBAR_ICONSIZE = 16;
 
+static const bool DEFAULT_SPLASHSCREEN = true;
+
 /* Invalid field background style */
 #define STYLE_INVALID "background:#FF8080"
 /* Transaction list -- unconfirmed transaction */
