@@ -40,6 +40,7 @@ class MasternodeList;
 class HexAddressConverter;
 class CBlockIndex;
 class UpdateDialog;
+class HelpMessageDialog;
 
 
 class CWallet;
@@ -152,6 +153,7 @@ private:
     QMenu* trayIconMenu;
     Notificator* notificator;
     RPCConsole* rpcConsole;
+    HelpMessageDialog* helpMessageDialog;
     BlockExplorer* explorerWindow;
     HexAddressConverter* hexAddressWindow;
     ModalOverlay* modalOverlay;

@@ -133,6 +133,7 @@ BitcoinGUI::BitcoinGUI(const PlatformStyle *platformStyle, const NetworkStyle* n
                                                                             trayIconMenu(0),
                                                                             notificator(0),
                                                                             rpcConsole(0),
+                                                                            helpMessageDialog(0),
                                                                             explorerWindow(0),
                                                                             hexAddressWindow(0),
                                                                             modalOverlay(0),
@@ -178,6 +179,7 @@ BitcoinGUI::BitcoinGUI(const PlatformStyle *platformStyle, const NetworkStyle* n
 #endif
 
     rpcConsole = new RPCConsole(platformStyle, enableWallet ? this : 0);
+    helpMessageDialog = new HelpMessageDialog(this, HelpMessageDialog::cmdline);
     hexAddressWindow = new HexAddressConverter(this);
 #ifdef ENABLE_WALLET
     if (enableWallet) {
@@ -867,7 +869,7 @@ void BitcoinGUI::aboutClicked() {
     if (!clientModel)
         return;
 
-    HelpMessageDialog dlg(this, true);
+    HelpMessageDialog dlg(this, HelpMessageDialog::about);
     dlg.exec();
 }
 
@@ -883,9 +885,7 @@ void BitcoinGUI::updaterClicked() {
 }
 
 void BitcoinGUI::showHelpMessageClicked() {
-    HelpMessageDialog* help = new HelpMessageDialog(this, false);
-    help->setAttribute(Qt::WA_DeleteOnClose);
-    help->show();
+    helpMessageDialog->show();
 }
 
 #ifdef ENABLE_WALLET
