@@ -1,4 +1,107 @@
-<TS language="en_US" version="2.1">
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="en_US">
+<context>
+    <name>ABIFunctionField</name>
+    <message>
+        <source>Function</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ABIParam</name>
+    <message>
+        <source>%1 %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>AddEditLuxNode</name>
+    <message>
+        <source>Add/Edit LuxNodes Node</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enter an Alias (friendly name) for your LuxNodes Node and its address (either clearnet IP and port or Tor onion address and port).  The address should be in the format 123.456.789.123:9999 or akjdsafxjkhasdf.onion:9999.  A masternode private key and a collateral address will both be automatically generated for you.  You must send exactly 16120 LUX to the collateral address.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Alias</source>
+        <translation type="unfinished">Alias</translation>
+    </message>
+    <message>
+        <source>Address</source>
+        <translation type="unfinished">Address</translation>
+    </message>
+    <message>
+        <source>&amp;OK</source>
+        <translation type="unfinished">&amp;OK</translation>
+    </message>
+    <message>
+        <source>&amp;Cancel</source>
+        <translation type="unfinished">&amp;Cancel</translation>
+    </message>
+</context>
+<context>
+    <name>AddTokenPage</name>
+    <message>
+        <source>Form</source>
+        <translation type="unfinished">Form</translation>
+    </message>
+    <message>
+        <source>Token Symbol</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Contract Address</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Token Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Decimals</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Address</source>
+        <translation type="unfinished">Address</translation>
+    </message>
+    <message>
+        <source>Confirm</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clear</source>
+        <translation type="unfinished">Clear</translation>
+    </message>
+    <message>
+        <source>The %1 address &quot;%2&quot; 
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid token address</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Token exist</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The token already exist with the specified contract and sender addresses.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Log events</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable log events from the option menu in order to receive token transactions.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
 <context>
     <name>AddressBookPage</name>
     <message>
@@ -177,7 +280,7 @@
     </message>
     <message>
         <source>LUX will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your LUXs from being stolen by malware infecting your computer.</source>
-        <translation>LUX will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your LUXs from being stolen by malware infecting your computer.</translation>
+        <translation type="vanished">LUX will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your LUXs from being stolen by malware infecting your computer.</translation>
     </message>
     <message>
         <source>Are you sure you wish to encrypt your wallet?</source>
@@ -226,6 +329,29 @@
     <message>
         <source>Warning: The Caps Lock key is on!</source>
         <translation>Warning: The Caps Lock key is on!</translation>
+    </message>
+    <message>
+        <source>%1 will close now to finish the encryption process.Remember that encrypting your wallet cannot fully protect your LUXs from being stolen by malware infecting your computer.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>IMPORTANT: Any previous backups you have made of your wallet file should be replaced with the newly generated, encrypted wallet file. Previous backups of the unencrypted wallet file contain the same HD seed andstill have full access to all your funds just like the new, encrypted wallet.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your funds from being stolen by malware infecting your computer.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>BanTableModel</name>
+    <message>
+        <source>IP/Netmask</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Banned Until</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -299,8 +425,8 @@
         <translation>&amp;BIP 38 Decrypt</translation>
     </message>
     <message>
-        <source>Enter the BIP 38 encrypted private key. Enter the passphrase in the middle box. Click Decrypt Key to compute the private key. After the key is decrypted, clicking 'Import Address' will add this private key to the wallet.</source>
-        <translation>Enter the BIP 38 encrypted private key. Enter the passphrase in the middle box. Click Decrypt Key to compute the private key. After the key is decrypted, clicking 'Import Address' will add this private key to the wallet.</translation>
+        <source>Enter the BIP 38 encrypted private key. Enter the passphrase in the middle box. Click Decrypt Key to compute the private key. After the key is decrypted, clicking &apos;Import Address&apos; will add this private key to the wallet.</source>
+        <translation>Enter the BIP 38 encrypted private key. Enter the passphrase in the middle box. Click Decrypt Key to compute the private key. After the key is decrypted, clicking &apos;Import Address&apos; will add this private key to the wallet.</translation>
     </message>
     <message>
         <source>The LUX address the message was signed with</source>
@@ -327,8 +453,8 @@
         <translation>Import Address</translation>
     </message>
     <message>
-        <source>Click "Decrypt Key" to compute key</source>
-        <translation>Click "Decrypt Key" to compute key</translation>
+        <source>Click &quot;Decrypt Key&quot; to compute key</source>
+        <translation>Click &quot;Decrypt Key&quot; to compute key</translation>
     </message>
     <message>
         <source>The entered passphrase is invalid. </source>
@@ -567,7 +693,7 @@
     </message>
     <message>
         <source>Open &amp;URI...</source>
-        <translation>Open &amp;URI...</translation>
+        <translation type="vanished">Open &amp;URI...</translation>
     </message>
     <message>
         <source>&amp;Command-line options</source>
@@ -575,11 +701,14 @@
     </message>
     <message numerus="yes">
         <source>Processed %n blocks of transaction history.</source>
-        <translation><numerusform>Processed %n block of transaction history.</numerusform><numerusform>Processed %n blocks of transaction history.</numerusform></translation>
+        <translation>
+            <numerusform>Processed %n block of transaction history.</numerusform>
+            <numerusform>Processed %n blocks of transaction history.</numerusform>
+        </translation>
     </message>
     <message>
         <source>Synchronizing additional data: %p%</source>
-        <translation>Synchronizing additional data: %p%</translation>
+        <translation type="vanished">Synchronizing additional data: %p%</translation>
     </message>
     <message>
         <source>&amp;File</source>
@@ -691,7 +820,10 @@
     </message>
     <message numerus="yes">
         <source>%n active connection(s) to LUX network</source>
-        <translation><numerusform>%n active connection(s) to LUX network</numerusform><numerusform>%n active connection(s) to LUX network</numerusform></translation>
+        <translation type="vanished">
+            <numerusform>%n active connection(s) to LUX network</numerusform>
+            <numerusform>%n active connection(s) to LUX network</numerusform>
+        </translation>
     </message>
     <message>
         <source>Synchronizing with network...</source>
@@ -699,7 +831,7 @@
     </message>
     <message>
         <source>Importing blocks from disk...</source>
-        <translation>Importing blocks from disk...</translation>
+        <translation type="vanished">Importing blocks from disk...</translation>
     </message>
     <message>
         <source>Reindexing blocks on disk...</source>
@@ -715,15 +847,24 @@
     </message>
     <message numerus="yes">
         <source>%n hour(s)</source>
-        <translation><numerusform>%n hour</numerusform><numerusform>%n hours</numerusform></translation>
+        <translation>
+            <numerusform>%n hour</numerusform>
+            <numerusform>%n hours</numerusform>
+        </translation>
     </message>
     <message numerus="yes">
         <source>%n day(s)</source>
-        <translation><numerusform>%n day</numerusform><numerusform>%n days</numerusform></translation>
+        <translation>
+            <numerusform>%n day</numerusform>
+            <numerusform>%n days</numerusform>
+        </translation>
     </message>
     <message numerus="yes">
         <source>%n week(s)</source>
-        <translation><numerusform>%n week</numerusform><numerusform>%n weeks</numerusform></translation>
+        <translation>
+            <numerusform>%n week</numerusform>
+            <numerusform>%n weeks</numerusform>
+        </translation>
     </message>
     <message>
         <source>%1 and %2</source>
@@ -731,7 +872,10 @@
     </message>
     <message numerus="yes">
         <source>%n year(s)</source>
-        <translation><numerusform>%n year</numerusform><numerusform>%n years</numerusform></translation>
+        <translation>
+            <numerusform>%n year</numerusform>
+            <numerusform>%n years</numerusform>
+        </translation>
     </message>
     <message>
         <source>%1 behind</source>
@@ -779,7 +923,7 @@ Amount: %2
 Type: %3
 Address: %4
 </source>
-        <translation>Date: %1
+        <translation type="vanished">Date: %1
 Amount: %2
 Type: %3
 Address: %4
@@ -817,6 +961,134 @@ Address: %4
         <source>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;locked&lt;/b&gt;</source>
         <translation>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;locked&lt;/b&gt;</translation>
     </message>
+    <message>
+        <source>New lux-qt version available: &lt;br /&gt; %1. &lt;br /&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Check for updates</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Trading</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Trading on Cryptopia</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;LSR Token</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LSR Token (send, receive or add Token in list)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Smart Contracts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Smart Contracts Actions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Check for &amp;Update</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Check whether there is an updated wallet from Luxcore</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Restore Wallet...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Restore wallet from another location</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit &amp;Configuration File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit configuration file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open payment request | &amp;URI...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Hex Address Converter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Converter for LUX Smart Contract addresses</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n active connection(s) to Luxcore network</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Network activity disabled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Syncing Headers (%1%)...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Indexing blocks on disk...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Processing blocks on disk...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Date: %1
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Amount: %1
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Type: %1
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Label: %1
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Address: %1
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>HD key generation is &lt;b&gt;enabled&lt;/b&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>HD key generation is &lt;b&gt;disabled&lt;/b&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A fatal error occurred. LUX can no longer continue safely and will quit.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>BlockExplorer</name>
@@ -840,12 +1112,83 @@ Address: %4
         <source>Not all transactions will be shown. To view all transactions you need to set txindex=1 in the configuration file (lux.conf).</source>
         <translation>Not all transactions will be shown. To view all transactions you need to set txindex=1 in the configuration file (lux.conf).</translation>
     </message>
+    <message>
+        <source>&lt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>CallContractPage</name>
+    <message>
+        <source>Form</source>
+        <translation type="unfinished">Form</translation>
+    </message>
+    <message>
+        <source>Call Smart Contract</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Contract Address</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose from contract book page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Paste contract address from clipboard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save contract info</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Interface (ABI)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Function</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Optional</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sender Address</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clear All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Call Contract</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The account address.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The sender address hex string.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Call contract</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ClientModel</name>
     <message>
         <source>Total: %1 (OBF compatible: %2 / Enabled: %3)</source>
-        <translation>Total: %1 (OBF compatible: %2 / Enabled: %3)</translation>
+        <translation type="vanished">Total: %1 (OBF compatible: %2 / Enabled: %3)</translation>
     </message>
     <message>
         <source>Network Alert</source>
@@ -924,7 +1267,7 @@ Address: %4
     </message>
     <message>
         <source>DS Rounds</source>
-        <translation>DS Rounds</translation>
+        <translation type="vanished">DS Rounds</translation>
     </message>
     <message>
         <source>Date</source>
@@ -995,12 +1338,12 @@ Address: %4
         <translation>Copy change</translation>
     </message>
     <message>
-        <source>Please switch to "List mode" to use this function.</source>
-        <translation>Please switch to "List mode" to use this function.</translation>
+        <source>Please switch to &quot;List mode&quot; to use this function.</source>
+        <translation>Please switch to &quot;List mode&quot; to use this function.</translation>
     </message>
     <message>
         <source>Non-anonymized input selected. &lt;b&gt;Darksend will be disabled.&lt;/b&gt;&lt;br&gt;&lt;br&gt;If you still want to use Darksend, please deselect all non-nonymized inputs first and then check Darksend checkbox again.</source>
-        <translation>Non-anonymized input selected. &lt;b&gt;Darksend will be disabled.&lt;/b&gt;&lt;br&gt;&lt;br&gt;If you still want to use Darksend, please deselect all non-nonymized inputs first and then check Darksend checkbox again.</translation>
+        <translation type="vanished">Non-anonymized input selected. &lt;b&gt;Darksend will be disabled.&lt;/b&gt;&lt;br&gt;&lt;br&gt;If you still want to use Darksend, please deselect all non-nonymized inputs first and then check Darksend checkbox again.</translation>
     </message>
     <message>
         <source>highest</source>
@@ -1079,8 +1422,8 @@ Address: %4
         <translation>Transactions with higher priority are more likely to get included into a block.</translation>
     </message>
     <message>
-        <source>This label turns red, if the priority is smaller than "medium".</source>
-        <translation>This label turns red, if the priority is smaller than "medium".</translation>
+        <source>This label turns red, if the priority is smaller than &quot;medium&quot;.</source>
+        <translation>This label turns red, if the priority is smaller than &quot;medium&quot;.</translation>
     </message>
     <message>
         <source>This label turns red, if any recipient receives an amount smaller than %1.</source>
@@ -1097,6 +1440,353 @@ Address: %4
     <message>
         <source>(change)</source>
         <translation>(change)</translation>
+    </message>
+    <message>
+        <source>Luxsend Rounds</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Non-anonymized input selected. &lt;b&gt;Luxsend will be disabled.&lt;/b&gt;&lt;br&gt;&lt;br&gt;If you still want to use Luxsend, please deselect all non-nonymized inputs first and then check Luxsend checkbox again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ContractBookPage</name>
+    <message>
+        <source>Form</source>
+        <translation type="unfinished">Form</translation>
+    </message>
+    <message>
+        <source>Create a new contract info</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copy the currently selected contract address to the system clipboard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete the currently selected contract info from the list</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation type="unfinished">Delete</translation>
+    </message>
+    <message>
+        <source>Export the data to a file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose the contract for send/call</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>These are your saved contracts. Always check the contract address and the ABI before sending/calling.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copy &amp;Address</source>
+        <translation type="unfinished">Copy &amp;Address</translation>
+    </message>
+    <message>
+        <source>Copy &amp;Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copy &amp;Interface</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Edit</source>
+        <translation type="unfinished">&amp;Edit</translation>
+    </message>
+    <message>
+        <source>&amp;Delete</source>
+        <translation type="unfinished">&amp;Delete</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to delete the address &quot;%1&quot; from your contract address list?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete contact address</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export Contract List</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Comma separated file (*.csv)</source>
+        <translation type="unfinished">Comma separated file (*.csv)</translation>
+    </message>
+    <message>
+        <source>Exporting Failed</source>
+        <translation type="unfinished">Exporting Failed</translation>
+    </message>
+    <message>
+        <source>There was an error trying to save the address list to %1. Please try again.</source>
+        <translation type="unfinished">There was an error trying to save the address list to %1. Please try again.</translation>
+    </message>
+</context>
+<context>
+    <name>ContractResult</name>
+    <message>
+        <source>StackedWidget</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Contract Summary</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ContractAddress</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hash160</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SenderAddress</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Transaction ID</source>
+        <translation type="unfinished">Transaction ID</translation>
+    </message>
+    <message>
+        <source>Contract Book</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save contract to Contract Book</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Contract label</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set contract label</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Contract Address</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Function</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sender Address</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Result</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Create contract</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ContractTableModel</name>
+    <message>
+        <source>Label</source>
+        <translation type="unfinished">Label</translation>
+    </message>
+    <message>
+        <source>Contract Address</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Interface (ABI)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(no label)</source>
+        <translation type="unfinished">(no label)</translation>
+    </message>
+</context>
+<context>
+    <name>CreateContract</name>
+    <message>
+        <source>Form</source>
+        <translation type="unfinished">Form</translation>
+    </message>
+    <message>
+        <source>Create Smart Contract</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Solidity</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Token</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bytecode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Interface (ABI)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Constructor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Optional</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sender Address</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Gas Price</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Gas Limit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clear All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Create Contract</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The bytecode of the contract</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The quantum address that will be used to create the contract.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The Gas Price is too high, are you sure you want to possibly spend a max of %1 for this transaction?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>High Gas price</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Are you sure you want to create contract? &lt;br /&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Confirm contract creation.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Create contract</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Gas limit. Default = %1, Max = %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Gas price: LUX price per gas unit. Default = %1, Min = %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>DarksendConfig</name>
+    <message>
+        <source>Configure Darksend</source>
+        <translation>Configure Darksend</translation>
+    </message>
+    <message>
+        <source>Basic Privacy</source>
+        <translation>Basic Privacy</translation>
+    </message>
+    <message>
+        <source>High Privacy</source>
+        <translation>High Privacy</translation>
+    </message>
+    <message>
+        <source>Maximum Privacy</source>
+        <translation>Maximum Privacy</translation>
+    </message>
+    <message>
+        <source>Please select a privacy level.</source>
+        <translation>Please select a privacy level.</translation>
+    </message>
+    <message>
+        <source>Use 2 separate masternodes to mix funds up to 10000 LUX</source>
+        <translation>Use 2 separate masternodes to mix funds up to 10000 LUX</translation>
+    </message>
+    <message>
+        <source>Use 8 separate masternodes to mix funds up to 10000 LUX</source>
+        <translation>Use 8 separate masternodes to mix funds up to 10000 LUX</translation>
+    </message>
+    <message>
+        <source>Use 16 separate masternodes</source>
+        <translation>Use 16 separate masternodes</translation>
+    </message>
+    <message>
+        <source>This option is the quickest and will cost about ~0.025 LUX to anonymize 10000 LUX</source>
+        <translation>This option is the quickest and will cost about ~0.025 LUX to anonymize 10000 LUX</translation>
+    </message>
+    <message>
+        <source>This option is moderately fast and will cost about 0.05 LUX to anonymize 10000 LUX</source>
+        <translation>This option is moderately fast and will cost about 0.05 LUX to anonymize 10000 LUX</translation>
+    </message>
+    <message>
+        <source>This is the slowest and most secure option. Using maximum anonymity will cost</source>
+        <translation>This is the slowest and most secure option. Using maximum anonymity will cost</translation>
+    </message>
+    <message>
+        <source>0.1 LUX per 10000 LUX you anonymize.</source>
+        <translation>0.1 LUX per 10000 LUX you anonymize.</translation>
+    </message>
+    <message>
+        <source>Darksend Configuration</source>
+        <translation>Darksend Configuration</translation>
+    </message>
+    <message>
+        <source>Darksend was successfully set to basic (%1 and 2 rounds). You can change this at any time by opening LUX&apos;s configuration screen.</source>
+        <translation>Darksend was successfully set to basic (%1 and 2 rounds). You can change this at any time by opening LUX&apos;s configuration screen.</translation>
+    </message>
+    <message>
+        <source>Darksend was successfully set to high (%1 and 8 rounds). You can change this at any time by opening LUX&apos;s configuration screen.</source>
+        <translation>Darksend was successfully set to high (%1 and 8 rounds). You can change this at any time by opening LUX&apos;s configuration screen.</translation>
+    </message>
+    <message>
+        <source>Darksend was successfully set to maximum (%1 and 16 rounds). You can change this at any time by opening LUX&apos;s configuration screen.</source>
+        <translation>Darksend was successfully set to maximum (%1 and 16 rounds). You can change this at any time by opening LUX&apos;s configuration screen.</translation>
     </message>
 </context>
 <context>
@@ -1138,12 +1828,12 @@ Address: %4
         <translation>Edit sending address</translation>
     </message>
     <message>
-        <source>The entered address "%1" is not a valid LUX address.</source>
-        <translation>The entered address "%1" is not a valid LUX address.</translation>
+        <source>The entered address &quot;%1&quot; is not a valid LUX address.</source>
+        <translation>The entered address &quot;%1&quot; is not a valid LUX address.</translation>
     </message>
     <message>
-        <source>The entered address "%1" is already in the address book.</source>
-        <translation>The entered address "%1" is already in the address book.</translation>
+        <source>The entered address &quot;%1&quot; is already in the address book.</source>
+        <translation>The entered address &quot;%1&quot; is already in the address book.</translation>
     </message>
     <message>
         <source>Could not unlock wallet.</source>
@@ -1152,6 +1842,325 @@ Address: %4
     <message>
         <source>New key generation failed.</source>
         <translation>New key generation failed.</translation>
+    </message>
+</context>
+<context>
+    <name>EditContractInfoDialog</name>
+    <message>
+        <source>Dialog</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Label</source>
+        <translation type="unfinished">Label</translation>
+    </message>
+    <message>
+        <source>Contract Address</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Interface (ABI)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New contract info</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit contract info</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The entered address &quot;%1&quot; is already in the contract book.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>Eula</name>
+    <message>
+        <source>End User Software License Agreement</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please read the following license agreement. You must accept the terms contained in this agreement before continuing with the application.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Next</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;p style=&quot;line-height:140&quot;&gt;&lt;span&gt;&lt;br&gt;Please read the following license agreement. You must accept the terms contained in this agreement before continuing with the application.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I have read and agree to the terms contained in the license agreements.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I do not accept the terms and conditions of above licence agreements.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Don&apos;t show this dialog again</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;p style=&quot;line-height:10&quot;&gt;&lt;b&gt;GENERAL&lt;/b&gt;&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;p style=&quot;line-height:10&quot;&gt;---------------------&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;p style=&quot;line-height:30&quot;&gt;&lt;br&gt;&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;p style=&quot;line-height:130&quot;&gt;PLEASE READ THIS CONTRACT                    CAREFULLY. BY USING ALL OR ANY PORTION OF THE SOFTWARE YOU ACCEPT ALL THE                    TERMS AND CONDITIONS OF THIS AGREEMENT, INCLUDING, IN PARTICULAR THE                    LIMITATIONS ON: USE CONTAINED IN SECTION 2; TRANSFERABILITY IN SECTION                    4; WARRANTY IN SECTION 6 AND 7; AND LIABILITY IN SECTION 8. YOU AGREE                    THAT THIS AGREEMENT IS ENFORCEABLE LIKE ANY WRITTEN NEGOTIATED AGREEMENT                    SIGNED BY YOU. IF YOU DO NOT AGREE, DO NOT USE THIS SOFTWARE. IF YOU ACQUIRED                    THE SOFTWARE ON TANGIBLE MEDIA (e.g. CD) WITHOUT AN OPPORTUNITY TO REVIEW THIS                    LICENSE AND YOU DO NOT ACCEPT THIS AGREEMENT, YOU MAY OBTAIN A REFUND OF THE                    AMOUNT YOU ORIGINALLY PAID IF YOU: (A) DO NOT USE THE SOFTWARE AND (B) RETURN IT,                    WITH PROOF OF PAYMENT, TO THE LOCATION FROM WHICH IT WAS OBTAINED WITHIN THIRTY                    (30) DAYS OF THE PURCHASE DATE.&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;p style=&quot;line-height:130&quot;&gt;&lt;br&gt;&lt;b&gt;1.	Definitions&lt;/b&gt;&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;p style=&quot;line-height:30&quot;&gt;&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;p style=&quot;line-height:130&quot;&gt;When used in this Agreement, the following terms                    shall have the respective meanings indicated, such meanings to be applicable to                    both the singular and plural forms of the terms defined: &lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;p style=&quot;line-height:130&quot;&gt;&lt;b&gt;&quot;Licensor&quot;&lt;/b&gt; means Luxcore, with its main address                    located at Suite 3 Level 27, Governor Macquarie Tower, 1 Farrer Place, Sydney, NSW, 2000.&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;p style=&quot;line-height:130&quot;&gt;&lt;b&gt;&quot;Software&quot;&lt;/b&gt; means (a) all of the contents of the files,                    disk(s), CD-ROM(s) or other media with which this Agreement is provided, including but not                    limited to (i) Luxcore or third party computer information or software; (ii) digital images,                    stock photographs, clip art, sounds or other artistic works (&quot;Stock Files&quot;); (iii) related                    explanatory written materials or files (&quot;Documentation&quot;); and (iv) fonts; and (b) upgrades,                    modified versions, updates, additions, and copies of the Software, if any, licensed to you by                    Luxcore (collectively, &quot;Updates&quot;). &lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;p style=&quot;line-height:130&quot;&gt;&lt;b&gt;&quot;Use&quot;&lt;/b&gt; or &lt;b&gt;&quot;Using&quot;&lt;/b&gt; means to access, install, download,                    copy or otherwise benefit from using the functionality of the Software in accordance with the                    Documentation. &lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;p style=&quot;line-height:130&quot;&gt;&lt;b&gt;&quot;Licensee&quot;&lt;/b&gt; means You or Your Company, unless otherwise indicated.&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;p style=&quot;line-height:130&quot;&gt;&lt;b&gt;&quot;Permitted Number&quot;&lt;/b&gt; means one (1) unless otherwise indicated under                    a valid license (e.g. volume license) granted by Luxcore.&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;p style=&quot;line-height:130&quot;&gt;&lt;b&gt;&quot;Computer&quot;&lt;/b&gt; means an electronic device that accepts information in                    digital or similar form and manipulates it for a specific result based on a sequence of instructions.&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;p style=&quot;line-height:130&quot;&gt;&lt;br&gt;&lt;b&gt;2.	Software License&lt;/b&gt;&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;p style=&quot;line-height:130&quot;&gt;As long as you comply with the terms of this End User License Agreement (the                    &quot;Agreement&quot;), Luxcore grants to you a non-exclusive license to Use the Software for the purposes described                     in the Documentation. Some third party materials included in the Software may be subject to other terms and                     conditions, which are typically found in a &quot;Read Me&quot; file located near such materials.&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;p style=&quot;line-height:130&quot;&gt;&lt;br&gt;&lt;b&gt;2.1	General Use&lt;/b&gt;&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;p style=&quot;line-height:130&quot;&gt;You may install and Use a copy of the Software on your compatible computer,                    up to the Permitted Number of computers; or&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;p style=&quot;line-height:130&quot;&gt;&lt;br&gt;&lt;b&gt;2.2	Server Use&lt;/b&gt;&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;p style=&quot;line-height:130&quot;&gt;You may install one copy of the Software on your computer file server for the                    purpose of downloading and installing the Software onto other computers within your internal network up to                    the Permitted Number or you may install one copy of the Software on a computer file server within your internal                    network for the sole and exclusive purpose of using the Software through commands, data or instructions (e.g.                    scripts) from an unlimited number of computers on your internal network. No other network use is permitted,                    including but not limited to, using the Software either directly or through commands, data or instructions from                    or to a computer not part of your internal network, for internet or web hosting services or by any user not licensed                    to use this copy of the Software through a valid license from Luxcore; and&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;p style=&quot;line-height:130&quot;&gt;&lt;br&gt;&lt;b&gt;2.3	Backup Copy&lt;/b&gt;&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;p style=&quot;line-height:130&quot;&gt;You may make one backup copy of the Software, provided your backup copy is not installed                     or used on any computer. You may not transfer the rights to a backup copy unless you transfer all rights in the Software                     as provided under Section 6.&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;p style=&quot;line-height:130&quot;&gt;&lt;br&gt;&lt;b&gt;2.4	Home Use &lt;/b&gt;&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;p style=&quot;line-height:130&quot;&gt;You, as the primary user of the computer on which the Software is installed, may also install                    the Software on one of your home computers. However, the Software may not be used on your home computer at the same time the                    Software on the primary computer is being used.&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;p style=&quot;line-height:130&quot;&gt;&lt;br&gt;&lt;b&gt;2.5	Stock Files&lt;/b&gt;&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;p style=&quot;line-height:130&quot;&gt;Unless stated otherwise in the &quot;Read-Me&quot; files associated with the Stock Files, which may                    include specific rights and restrictions with respect to such materials, you may display, modify, reproduce and distribute                    any of the Stock Files included with the Software. However, you may not distribute the Stock Files on a stand-alone basis,                    i.e., in circumstances in which the Stock Files constitute the primary value of the product being distributed. Stock Files                    may not be used in the production of libelous, defamatory, fraudulent, lewd, obscene or pornographic material or any material                    that infringes upon any third party intellectual property rights or in any otherwise illegal manner. You may not claim any                    trademark rights in the Stock Files or derivative works thereof.&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;p style=&quot;line-height:130&quot;&gt;&lt;br&gt;&lt;b&gt;2.6	Limitations&lt;/b&gt;&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;p style=&quot;line-height:130&quot;&gt;To the extent that the Software includes Luxcore Luxgate software, (i) you may customize the                    installer for such software in accordance with the restrictions found at &lt;a href=&quot;https://luxcore.io&quot;&gt;https://luxcore.io&lt;/a&gt;                    (e.g., installation of additional plug-in and help files); however, you may not otherwise alter or modify the installer program                    or create a new installer for any of such software, (ii) such software is licensed and distributed by Luxcore, and (iii) you are                    not authorized to use any plug-in or enhancement that permits you to save modifications to a any format file with such software;                    however, such use is authorized with Luxcore, Luxcore Luxgate, and other current and future Luxcore products. For information on                    how to distribute Luxgate please refer to the sections entitled &quot;How to Distribute Luxgate&quot; at                    &lt;a href=&quot;https://luxcore.io&quot;&gt;https://luxcore.io&lt;/a&gt;.&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;p style=&quot;line-height:130&quot;&gt;&lt;br&gt;&lt;b&gt;3.	Intellectual Property Rights&lt;/b&gt;&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;p style=&quot;line-height:130&quot;&gt;The Software and any copies that you are authorized by Luxcore to make are the intellectual property                     of and are owned by Luxcore and its suppliers. The structure, organization and code of the Software are the valuable trade secrets                     and confidential information of Luxcore and its suppliers. The Software is protected by copyright, including without limitation by                     Australia Copyright Law, international treaty provisions and applicable laws in the country in which it is being used. You may not                     copy the Software, except as set forth in Section 2 (&quot;Software License&quot;).&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;p style=&quot;line-height:130&quot;&gt;Any copies that you are permitted to make pursuant to this Agreement must contain the same copyright                    and other proprietary notices that appear on or in the Software. You also agree not to reverse engineer, decompile, disassemble or                    otherwise attempt to discover the source code of the Software except to the extent you may be expressly permitted to decompile under                    applicable law, it is essential to do so in order to achieve operability of the Software with another software program, and you have                    first requested Luxcore to provide the information necessary to achieve such operability and Luxcore has not made such information                    available.&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;p style=&quot;line-height:130&quot;&gt;Luxcore has the right to impose reasonable conditions and to request a reasonable fee before providing                     such information. Any information supplied by Luxcore or obtained by you, as permitted hereunder, may only be used by you for the                     purpose described herein and may not be disclosed to any third party or used to create any software which is substantially similar                     to the expression of the Software. Requests for information should be directed to the Luxcore Customer Support Department. Trademarks                     shall be used in accordance with accepted trademark practice, including identification of trademarks owners&apos; names. Trademarks can only                     be used to identify printed output produced by the Software and such use of any trademark does not give you any rights of ownership in                     that trademark. Except as expressly stated above, this Agreement does not grant you any intellectual property rights in the Software.&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;p style=&quot;line-height:130&quot;&gt;&lt;br&gt;&lt;b&gt;4.	Transfer&lt;/b&gt;&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;p style=&quot;line-height:130&quot;&gt;You may not, rent, lease, sublicense or authorize all or any portion of the Software to be copied onto                     another users computer except as may be expressly permitted herein. You may, however, transfer all your rights to Use the Software                     to another person or legal entity provided that: (a) you also transfer each this Agreement, the Software and all other software or                     hardware bundled or pre-installed with the Software, including all copies, Updates and prior versions, and all copies of font software                     converted into other formats, to such person or entity; (b) you retain no copies, including backups and copies stored on a computer;                     and (c) the receiving party accepts the terms and conditions of this Agreement and any other terms and conditions upon which you legally                     purchased a license to the Software. Notwithstanding the foregoing, you may not transfer education, pre-release, or not for resale copies                     of the Software.&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;p style=&quot;line-height:130&quot;&gt;&lt;br&gt;&lt;b&gt;5.	Multiple Environment Software / Multiple Language Software / Dual Media Software / Multiple                     Copies/ Bundles / Updates&lt;/b&gt;&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;p style=&quot;line-height:130&quot;&gt;If the Software supports multiple platforms or languages, if you receive the Software on multiple media, if                     you otherwise receive multiple copies of the Software, or if you received the Software bundled with other software, the total number of                     your computers on which all versions of the Software are installed may not exceed the Permitted Number. You may not, rent, lease, sublicense,                     lend or transfer any versions or copies of such Software you do not Use. If the Software is an Update to a previous version of the Software,                     you must possess a valid license to such previous version in order to Use the Update. You may continue to Use the previous version of the Software                     on your computer after you receive the Update to assist you in the transition to the Update, provided that: the Update and the previous version                     are installed on the same computer; the previous version or copies thereof are not transferred to another party or computer unless all copies of                     the Update are also transferred to such party or computer; and you acknowledge that any obligation Luxcore may have to support the previous version                     of the Software may be ended upon availability of the Update.&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;p style=&quot;line-height:130&quot;&gt;&lt;br&gt;&lt;b&gt;6.	NO WARRANTY&lt;/b&gt;&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;p style=&quot;line-height:130&quot;&gt;The Software is being delivered to you &quot;AS IS&quot; and Luxcore makes no warranty as to its use or performance. Luxcore AND                     ITS SUPPLIERS DO NOT AND CANNOT WARRANT THE PERFORMANCE OR RESULTS YOU MAY OBTAIN BY USING THE SOFTWARE. EXCEPT FOR ANY WARRANTY, CONDITION,                     REPRESENTATION OR TERM TO THE EXTENT TO WHICH THE SAME CANNOT OR MAY NOT BE EXCLUDED OR LIMITED BY LAW APPLICABLE TO YOU IN YOUR JURISDICTION, Luxcore                     AND ITS SUPPLIERS MAKE NO WARRANTIES CONDITIONS, REPRESENTATIONS, OR TERMS (EXPRESS OR IMPLIED WHETHER BY STATUTE, COMMON LAW, CUSTOM, USAGE OR OTHERWISE)                     AS TO ANY MATTER INCLUDING WITHOUT LIMITATION NONINFRINGEMENT OF THIRD PARTY RIGHTS, MERCHANTABILITY, INTEGRATION, SATISFACTORY QUALITY, OR FITNESS FOR ANY                     PARTICULAR PURPOSE.&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;p style=&quot;line-height:130&quot;&gt;&lt;br&gt;&lt;b&gt;7.	Pre-release Product Additional Terms&lt;/b&gt;&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;p style=&quot;line-height:130&quot;&gt;If the product you have received with this license is pre-commercial release or beta Software (&quot;Pre-release Software&quot;), then                     the following Section applies. To the extent that any provision in this Section is in conflict with any other term or condition in this Agreement, this                     Section shall supercede such other term(s) and condition(s) with respect to the Pre-release Software, but only to the extent necessary to resolve the conflict.                     You acknowledge that the Software is a pre-release version, does not represent final product from Luxcore, and may contain bugs, errors and other problems that                     could cause system or other failures and data loss. Consequently, the Pre-release Software is provided to you &quot;AS-IS&quot;, and Luxcore disclaims any warranty or                     liability obligations to you of any kind. WHERE LEGALLY LIABILITY CANNOT BE EXCLUDED FOR PRE-RELEASE SOFTWARE, BUT IT MAY BE LIMITED, LUXCORE&apos;S LIABILITY AND                     THAT OF ITS SUPPLIERS SHALL BE LIMITED TO THE SUM OF FIFTY DOLLARS (U.S. $50) IN TOTAL. You acknowledge that Luxcore has not promised or guaranteed to you that                     Pre-release Software will be announced or made available to anyone in the future, that Luxcore has no express or implied obligation to you to announce or                     introduce the Pre-release Software and that Luxcore may not introduce a product similar to or compatible with the Pre-release Software. Accordingly, you                     acknowledge that any research or development that you perform regarding the Pre-release Software or any product associated with the Pre-release Software is                     done entirely at your own risk. During the term of this Agreement, if requested by Luxcore, you will provide feedback to Luxcore regarding testing and use of                     the Pre-release Software, including error or bug reports. If you have been provided the Pre-release Software pursuant to a separate written agreement, such as                     the Luxcore Serial Agreement for Unreleased Products, your use of the Software is also governed by such agreement. You agree that you may not and certify that                     you will not sublicense, lease, loan, rent, or transfer the Pre-release Software. Upon receipt of a later unreleased version of the Pre-release Software or                     release by Luxcore of a publicly released commercial version of the Software, whether as a stand-alone product or as part of a larger product, you agree to                     return or destroy all earlier Pre-release Software received from Luxcore and to abide by the terms of the End User License Agreement for any such later versions                     of the Pre-release Software. Notwithstanding anything in this Section to the contrary, if you are located outside the United States of America or Canada, you agree                     that you will return or destroy all unreleased versions of the Pre-release Software within thirty (30) days of the completion of your testing of the Software                     when such date is earlier than the date for Luxcore&apos;s first commercial shipment of the publicly released (commercial) Software.&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;p style=&quot;line-height:130&quot;&gt;&lt;br&gt;&lt;b&gt;8.	LIMITATION OF LIABILITY&lt;/b&gt;&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;p style=&quot;line-height:130&quot;&gt;IN NO EVENT WILL LUXCORE OR ITS SUPPLIERS BE LIABLE TO YOU FOR ANY DAMAGES, CLAIMS OR COSTS WHATSOEVER OR ANY CONSEQUENTIAL, INDIRECT,                    INCIDENTAL DAMAGES, OR ANY LOST PROFITS OR LOST SAVINGS, EVEN IF AN LUXCORE REPRESENTATIVE HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH LOSS, DAMAGES, CLAIMS OR                    COSTS OR FOR ANY CLAIM BY ANY THIRD PARTY. THE FOREGOING LIMITATIONS AND EXCLUSIONS APPLY TO THE EXTENT PERMITTED BY APPLICABLE LAW IN YOUR JURISDICTION. LUXCORE&apos;S                    AGGREGATE LIABILITY AND THAT OF ITS SUPPLIERS UNDER OR IN CONNECTION WITH THIS AGREEMENT SHALL BE LIMITED TO THE AMOUNT PAID FOR THE SOFTWARE, IF ANY. Nothing                    contained in this Agreement limits Luxcore&apos;s liability to you in the event of death or personal injury resulting from Luxcore&apos;s negligence or for the tort of                    deceit (fraud). Luxcore is acting on behalf of its suppliers for the purpose of disclaiming, excluding and/or limiting obligations, warranties and liability as                    provided in this Agreement, but in no other respects and for no other purpose. For further information, please see the jurisdiction specific information at the                    end of this Agreement, if any, or contact Luxcore&apos;s Customer Support Department.&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;p style=&quot;line-height:130&quot;&gt;&lt;br&gt;&lt;b&gt;9.	Export Rules (OPTIONAL - FOR AMERICAN COMPANIES)&lt;/b&gt;&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;p style=&quot;line-height:130&quot;&gt;You agree that the Software will not be shipped, transferred or exported into any country or used in any manner prohibited by the                    United States Export Administration Act or any other export laws, restrictions or regulations (collectively the &quot;Export Laws&quot;). In addition, if the Software is                    identified as export controlled items under the Export Laws, you represent and warrant that you are not a citizen, or otherwise located within, an embargoed nation                    (including without limitation Iran, Iraq, Syria, Sudan, Libya, Cuba, North Korea, and Serbia) and that you are not otherwise prohibited under the Export Laws from                    receiving the Software. All rights to Use the Software are granted on condition that such rights are forfeited if you fail to comply with the terms of this                    Agreement.&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;p style=&quot;line-height:130&quot;&gt;&lt;br&gt;&lt;b&gt;10.	Governing Law&lt;/b&gt;&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;p style=&quot;line-height:130&quot;&gt;This Agreement shall be governed by and interpreted in accordance with the laws of the Melbourne, Victoria, Australia.&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;p style=&quot;line-height:130&quot;&gt;&lt;br&gt;&lt;b&gt;11.	General Provisions&lt;/b&gt;&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;p style=&quot;line-height:130&quot;&gt;If any part of this Agreement is found void and unenforceable, it will not affect the validity of the balance of the Agreement,                    which shall remain valid and enforceable according to its terms. This Agreement shall not prejudice the statutory rights of any party dealing as a consumer.                    This Agreement may only be modified by a writing signed by an authorized officer of Luxcore. Updates may be licensed to you by Luxcore with additional or                    different terms. This is the entire agreement between Luxcore and you relating to the Software and it supersedes any prior representations, discussions,                    undertakings, communications or advertising relating to the Software.&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;p style=&quot;line-height:130&quot;&gt;&lt;br&gt;&lt;b&gt;12.	Notice to U.S. Government End Users&lt;/b&gt;&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;p style=&quot;line-height:130&quot;&gt;The Software and Documentation are &quot;Commercial Items,&quot; as that term is defined at 48 C.F.R. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>2.101, consisting of &quot;Commercial Computer Software&quot; and &quot;Commercial Computer Software Documentation,&quot; as such terms are used in 48 C.F.R. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>12.212 or 48 C.F.R. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>227.7202, as applicable. Consistent with 48 C.F.R. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>227.7202-1 through 227.7202-4, as applicable, the                 Commercial Computer Software and Commercial Computer Software Documentation are being licensed to U.S. Government end users (a) only as Commercial Items and                 (b) with only those rights as are granted to all other end users pursuant to the terms and conditions herein. Unpublished-rights reserved under the copyright                 laws of the United States. For U.S. Government End Users, Luxcore agrees to comply with all applicable equal opportunity laws including, if appropriate, the                 provisions of Executive Order 11246, as amended, Section 402 of the Vietnam Era Veterans Readjustment Assistance Act of 1974 (38 USC 4212), and Section 503                 of the Rehabilitation Act of 1973, as amended, and the regulations at 41 CFR Parts 60-1 through 60-60, 60-250, and 60-741. The affirmative action clause and                 regulations contained in the preceding sentence shall be incorporated by reference in this Agreement.&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;p style=&quot;line-height:130&quot;&gt;&lt;br&gt;&lt;b&gt;13.	Compliance with Licenses&lt;/b&gt;&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;p style=&quot;line-height:130&quot;&gt;If you are a business or organization, you agree that upon request from Luxcore or Luxcore &apos;s authorized representative, you will                    within thirty (30) days fully document and certify that use of any and all Luxcore Software at the time of the request is in conformity with your valid licenses                    from Luxcore.&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;p style=&quot;line-height:130&quot;&gt;If you have any questions regarding this Agreement or if you wish to request any information from Luxcore please use the address                     and contact information included with this product to contact the Luxcore office serving your jurisdiction.&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;p style=&quot;line-height:130&quot;&gt;Luxcore, Luxgate, and all other Luxcore&apos;s products are either registered trademarks or trademarks of Luxcore in the United States,                     Europe and/or other countries.&lt;/p&gt;&lt;br&gt;&lt;br&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>lux_</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>luxVersion</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ExecRPCCommand</name>
+    <message>
+        <source>Mandatory fields are not present:
+%1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Optional fields are not present:
+%1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Parse error: unbalanced &apos; or &quot;</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1209,15 +2218,15 @@ Address: %4
     </message>
     <message>
         <source>UI options</source>
-        <translation>UI options</translation>
+        <translation type="vanished">UI options</translation>
     </message>
     <message>
         <source>Choose data directory on startup (default: 0)</source>
-        <translation>Choose data directory on startup (default: 0)</translation>
+        <translation type="vanished">Choose data directory on startup (default: 0)</translation>
     </message>
     <message>
-        <source>Set language, for example "de_DE" (default: system locale)</source>
-        <translation>Set language, for example "de_DE" (default: system locale)</translation>
+        <source>Set language, for example &quot;de_DE&quot; (default: system locale)</source>
+        <translation>Set language, for example &quot;de_DE&quot; (default: system locale)</translation>
     </message>
     <message>
         <source>Start minimized</source>
@@ -1229,7 +2238,38 @@ Address: %4
     </message>
     <message>
         <source>Show splash screen on startup (default: 1)</source>
-        <translation>Show splash screen on startup (default: 1)</translation>
+        <translation type="vanished">Show splash screen on startup (default: 1)</translation>
+    </message>
+    <message>
+        <source>UI Options:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose data directory on startup (default: %u)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show splash screen on startup (default: %u)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reset all settings changed in the GUI</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>HexAddressConverter</name>
+    <message>
+        <source>Hex Address Converter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Address</source>
+        <translation type="unfinished">Address</translation>
+    </message>
+    <message>
+        <source>Result</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1263,8 +2303,8 @@ Address: %4
         <translation>Luxcore</translation>
     </message>
     <message>
-        <source>Error: Specified data directory "%1" cannot be created.</source>
-        <translation>Error: Specified data directory "%1" cannot be created.</translation>
+        <source>Error: Specified data directory &quot;%1&quot; cannot be created.</source>
+        <translation>Error: Specified data directory &quot;%1&quot; cannot be created.</translation>
     </message>
     <message>
         <source>Error</source>
@@ -1280,122 +2320,338 @@ Address: %4
     </message>
 </context>
 <context>
+    <name>LSRToken</name>
+    <message>
+        <source>Form</source>
+        <translation type="unfinished">Form</translation>
+    </message>
+    <message>
+        <source>Send</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Receive</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>AddToken</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copy token address</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copy token balance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copy token name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copy sender address</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove token</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Confirm token remove</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The selected token will be removed from the list. Are you sure?</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>LuxNodeConfigDialog</name>
+    <message>
+        <source>LuxNodes Node Configuration Template</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This pane shows an example lux.conf template with the necessary masternode settings.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>MasternodeList</name>
     <message>
         <source>Form</source>
-        <translation>Form</translation>
+        <translation type="vanished">Form</translation>
     </message>
     <message>
         <source>My Masternodes</source>
-        <translation>My Masternodes</translation>
+        <translation type="vanished">My Masternodes</translation>
     </message>
     <message>
-        <source>Note: Status of your masternodes in local wallet can potentially be slightly incorrect.&lt;br /&gt;Always wait for wallet to sync additional data and then double check from another node&lt;br /&gt;if your node should be running but you still see "MISSING" in "Status" field.</source>
-        <translation>Note: Status of your masternodes in local wallet can potentially be slightly incorrect.&lt;br /&gt;Always wait for wallet to sync additional data and then double check from another node&lt;br /&gt;if your node should be running but you still see "MISSING" in "Status" field.</translation>
+        <source>Note: Status of your masternodes in local wallet can potentially be slightly incorrect.&lt;br /&gt;Always wait for wallet to sync additional data and then double check from another node&lt;br /&gt;if your node should be running but you still see &quot;MISSING&quot; in &quot;Status&quot; field.</source>
+        <translation type="vanished">Note: Status of your masternodes in local wallet can potentially be slightly incorrect.&lt;br /&gt;Always wait for wallet to sync additional data and then double check from another node&lt;br /&gt;if your node should be running but you still see &quot;MISSING&quot; in &quot;Status&quot; field.</translation>
     </message>
     <message>
         <source>Alias</source>
-        <translation>Alias</translation>
+        <translation type="vanished">Alias</translation>
     </message>
     <message>
         <source>Address</source>
-        <translation>Address</translation>
+        <translation type="vanished">Address</translation>
     </message>
     <message>
         <source>Protocol</source>
-        <translation>Protocol</translation>
+        <translation type="vanished">Protocol</translation>
     </message>
     <message>
         <source>Status</source>
-        <translation>Status</translation>
+        <translation type="vanished">Status</translation>
     </message>
     <message>
         <source>Active</source>
-        <translation>Active</translation>
+        <translation type="vanished">Active</translation>
     </message>
     <message>
         <source>Last Seen (UTC)</source>
-        <translation>Last Seen (UTC)</translation>
+        <translation type="vanished">Last Seen (UTC)</translation>
     </message>
     <message>
         <source>Pubkey</source>
-        <translation>Pubkey</translation>
+        <translation type="vanished">Pubkey</translation>
     </message>
     <message>
         <source>S&amp;tart alias</source>
-        <translation>S&amp;tart alias</translation>
+        <translation type="vanished">S&amp;tart alias</translation>
     </message>
     <message>
         <source>Start &amp;all</source>
-        <translation>Start &amp;all</translation>
+        <translation type="vanished">Start &amp;all</translation>
     </message>
     <message>
         <source>Start &amp;MISSING</source>
-        <translation>Start &amp;MISSING</translation>
+        <translation type="vanished">Start &amp;MISSING</translation>
     </message>
     <message>
         <source>&amp;Update status</source>
-        <translation>&amp;Update status</translation>
+        <translation type="vanished">&amp;Update status</translation>
     </message>
     <message>
         <source>Status will be updated automatically in (sec):</source>
-        <translation>Status will be updated automatically in (sec):</translation>
+        <translation type="vanished">Status will be updated automatically in (sec):</translation>
     </message>
     <message>
         <source>0</source>
-        <translation>0</translation>
+        <translation type="vanished">0</translation>
     </message>
     <message>
         <source>All Masternodes</source>
-        <translation>All Masternodes</translation>
+        <translation type="vanished">All Masternodes</translation>
     </message>
     <message>
         <source>Filter List:</source>
-        <translation>Filter List:</translation>
+        <translation type="vanished">Filter List:</translation>
     </message>
     <message>
         <source>Filter masternode list</source>
-        <translation>Filter masternode list</translation>
+        <translation type="vanished">Filter masternode list</translation>
     </message>
     <message>
         <source>Node Count:</source>
-        <translation>Node Count:</translation>
+        <translation type="vanished">Node Count:</translation>
     </message>
     <message>
         <source>Start alias</source>
-        <translation>Start alias</translation>
+        <translation type="vanished">Start alias</translation>
     </message>
     <message>
         <source>Confirm masternode start</source>
-        <translation>Confirm masternode start</translation>
+        <translation type="vanished">Confirm masternode start</translation>
     </message>
     <message>
         <source>Are you sure you want to start masternode %1?</source>
-        <translation>Are you sure you want to start masternode %1?</translation>
+        <translation type="vanished">Are you sure you want to start masternode %1?</translation>
     </message>
     <message>
         <source>Confirm all masternodes start</source>
-        <translation>Confirm all masternodes start</translation>
+        <translation type="vanished">Confirm all masternodes start</translation>
     </message>
     <message>
         <source>Are you sure you want to start ALL masternodes?</source>
-        <translation>Are you sure you want to start ALL masternodes?</translation>
+        <translation type="vanished">Are you sure you want to start ALL masternodes?</translation>
     </message>
     <message>
         <source>Command is not available right now</source>
-        <translation>Command is not available right now</translation>
+        <translation type="vanished">Command is not available right now</translation>
     </message>
     <message>
-        <source>You can't use this command until masternode list is synced</source>
-        <translation>You can't use this command until masternode list is synced</translation>
+        <source>You can&apos;t use this command until masternode list is synced</source>
+        <translation type="vanished">You can&apos;t use this command until masternode list is synced</translation>
     </message>
     <message>
         <source>Confirm missing masternodes start</source>
-        <translation>Confirm missing masternodes start</translation>
+        <translation type="vanished">Confirm missing masternodes start</translation>
     </message>
     <message>
         <source>Are you sure you want to start MISSING masternodes?</source>
-        <translation>Are you sure you want to start MISSING masternodes?</translation>
+        <translation type="vanished">Are you sure you want to start MISSING masternodes?</translation>
+    </message>
+</context>
+<context>
+    <name>MasternodeManager</name>
+    <message>
+        <source>Form</source>
+        <translation type="unfinished">Form</translation>
+    </message>
+    <message>
+        <source>Masternodes Network</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Address</source>
+        <translation type="unfinished">Address</translation>
+    </message>
+    <message>
+        <source>Rank</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Active</source>
+        <translation type="unfinished">Active</translation>
+    </message>
+    <message>
+        <source>Active (secs)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Last Seen</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pubkey</source>
+        <translation type="unfinished">Pubkey</translation>
+    </message>
+    <message>
+        <source>Masternodes Activated:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>0</source>
+        <translation type="unfinished">0</translation>
+    </message>
+    <message>
+        <source>Parallel Masternodes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Masternode Configuration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Alias</source>
+        <translation type="unfinished">Alias</translation>
+    </message>
+    <message>
+        <source>IP/Onion</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Status</source>
+        <translation type="unfinished">Status</translation>
+    </message>
+    <message>
+        <source>Collateral Address</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Create...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Edit</source>
+        <translation type="unfinished">&amp;Edit</translation>
+    </message>
+    <message>
+        <source>&amp;Get Config</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Remove</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Start</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Start All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Stop</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Stop All</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ModalOverlay</name>
+    <message>
+        <source>Form</source>
+        <translation type="unfinished">Form</translation>
+    </message>
+    <message>
+        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the Luxcore network after a connection is established. Recent transactions may not yet be visible, and therefore your wallet&apos;s balance might be incorrect. This information will be correct once your wallet has finished synchronizing with the Luxcore network, as detailed below.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This means that recent transactions will not be visible, and the balance will not be up-to-date until this process has completed. Attempting to spend LUX during this time will not be accepted by the network!!!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Number of blocks left</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>unknown...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Last block time</source>
+        <translation type="unfinished">Last block time</translation>
+    </message>
+    <message>
+        <source>Progress</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>~</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Progress increase per hour</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>calculating...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Estimated time left until synced</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hide</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown. Syncing Headers (%1)...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1421,7 +2677,7 @@ Address: %4
 To Add: enter percentage to give and LUX address to add to the MultiSend vector.
 To Delete: Enter address to delete and press delete.
 MultiSend will not be activated unless you have clicked Activate</source>
-        <translation>MultiSend allows you to automatically send up to 100% of your stake or masternode reward to a list of other LUX addresses after it matures.
+        <translation type="vanished">MultiSend allows you to automatically send up to 100% of your stake or masternode reward to a list of other LUX addresses after it matures.
 To Add: enter percentage to give and LUX address to add to the MultiSend vector.
 To Delete: Enter address to delete and press delete.
 MultiSend will not be activated unless you have clicked Activate</translation>
@@ -1536,72 +2792,25 @@ Please check the address and try again.</translation>
         <translation>Could not locate address
 </translation>
     </message>
-</context>
-<context>
-    <name>DarksendConfig</name>
     <message>
-        <source>Configure Darksend</source>
-        <translation>Configure Darksend</translation>
+        <source>MultiSend allows you to automatically send up to 100% of your stake or masternode reward to a list of other LUX addresses after it matures.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Basic Privacy</source>
-        <translation>Basic Privacy</translation>
+        <source>Add to the MultiSend vector</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>High Privacy</source>
-        <translation>High Privacy</translation>
+        <source>Delete from  MultiSend vector</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Maximum Privacy</source>
-        <translation>Maximum Privacy</translation>
+        <source>Activate multisend</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Please select a privacy level.</source>
-        <translation>Please select a privacy level.</translation>
-    </message>
-    <message>
-        <source>Use 2 separate masternodes to mix funds up to 10000 LUX</source>
-        <translation>Use 2 separate masternodes to mix funds up to 10000 LUX</translation>
-    </message>
-    <message>
-        <source>Use 8 separate masternodes to mix funds up to 10000 LUX</source>
-        <translation>Use 8 separate masternodes to mix funds up to 10000 LUX</translation>
-    </message>
-    <message>
-        <source>Use 16 separate masternodes</source>
-        <translation>Use 16 separate masternodes</translation>
-    </message>
-    <message>
-        <source>This option is the quickest and will cost about ~0.025 LUX to anonymize 10000 LUX</source>
-        <translation>This option is the quickest and will cost about ~0.025 LUX to anonymize 10000 LUX</translation>
-    </message>
-    <message>
-        <source>This option is moderately fast and will cost about 0.05 LUX to anonymize 10000 LUX</source>
-        <translation>This option is moderately fast and will cost about 0.05 LUX to anonymize 10000 LUX</translation>
-    </message>
-    <message>
-        <source>This is the slowest and most secure option. Using maximum anonymity will cost</source>
-        <translation>This is the slowest and most secure option. Using maximum anonymity will cost</translation>
-    </message>
-    <message>
-        <source>0.1 LUX per 10000 LUX you anonymize.</source>
-        <translation>0.1 LUX per 10000 LUX you anonymize.</translation>
-    </message>
-    <message>
-        <source>Darksend Configuration</source>
-        <translation>Darksend Configuration</translation>
-    </message>
-    <message>
-        <source>Darksend was successfully set to basic (%1 and 2 rounds). You can change this at any time by opening LUX's configuration screen.</source>
-        <translation>Darksend was successfully set to basic (%1 and 2 rounds). You can change this at any time by opening LUX's configuration screen.</translation>
-    </message>
-    <message>
-        <source>Darksend was successfully set to high (%1 and 8 rounds). You can change this at any time by opening LUX's configuration screen.</source>
-        <translation>Darksend was successfully set to high (%1 and 8 rounds). You can change this at any time by opening LUX's configuration screen.</translation>
-    </message>
-    <message>
-        <source>Darksend was successfully set to maximum (%1 and 16 rounds). You can change this at any time by opening LUX's configuration screen.</source>
-        <translation>Darksend was successfully set to maximum (%1 and 16 rounds). You can change this at any time by opening LUX's configuration screen.</translation>
+        <source>Deactivate multisend</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1698,8 +2907,8 @@ Please check the address and try again.</translation>
         <translation>Darksend rounds to use</translation>
     </message>
     <message>
-        <source>This amount acts as a threshold to turn off Darksend once it's reached.</source>
-        <translation>This amount acts as a threshold to turn off Darksend once it's reached.</translation>
+        <source>This amount acts as a threshold to turn off Darksend once it&apos;s reached.</source>
+        <translation>This amount acts as a threshold to turn off Darksend once it&apos;s reached.</translation>
     </message>
     <message>
         <source>Amount of LUX to keep anonymized</source>
@@ -1736,7 +2945,7 @@ Please check the address and try again.</translation>
     <message>
         <source>Language missing or translation incomplete? Help contributing translations here:
 https://www.transifex.com/lux-project/lux-project-translations</source>
-        <translation>Language missing or translation incomplete? Help contributing translations here:
+        <translation type="vanished">Language missing or translation incomplete? Help contributing translations here:
 https://www.transifex.com/lux-project/lux-project-translations</translation>
     </message>
     <message>
@@ -1863,6 +3072,59 @@ https://www.transifex.com/lux-project/lux-project-translations</translation>
         <source>The supplied proxy address is invalid.</source>
         <translation>The supplied proxy address is invalid.</translation>
     </message>
+    <message>
+        <source>Enable  log &amp;events</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Number of debug log files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show additional information and buttons for Luxsend on overview screen.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable advanced Luxsend interface</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Check for &amp;updates</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Coming soon</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Activate Parallel Masternode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable &amp;zero balance for receiver token address</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Don&apos;t use change &amp;address</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Number of automatic wallet backups</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Hide the icon from the system tray.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hide tray icon</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Language missing or translation incomplete? Help contributing translations here:
+https://www.transifex.com/luxcore/luxcore</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>OverviewPage</name>
@@ -1940,7 +3202,7 @@ https://www.transifex.com/lux-project/lux-project-translations</translation>
     </message>
     <message>
         <source>Darksend Balance:</source>
-        <translation>Darksend Balance:</translation>
+        <translation type="vanished">Darksend Balance:</translation>
     </message>
     <message>
         <source>0 LUX / 0 Rounds</source>
@@ -1952,11 +3214,11 @@ https://www.transifex.com/lux-project/lux-project-translations</translation>
     </message>
     <message>
         <source>Try to manually submit a Darksend request.</source>
-        <translation>Try to manually submit a Darksend request.</translation>
+        <translation type="vanished">Try to manually submit a Darksend request.</translation>
     </message>
     <message>
-        <source>Reset the current status of Darksend (can interrupt Darksend if it's in the process of Mixing, which can cost you money!)</source>
-        <translation>Reset the current status of Darksend (can interrupt Darksend if it's in the process of Mixing, which can cost you money!)</translation>
+        <source>Reset the current status of Darksend (can interrupt Darksend if it&apos;s in the process of Mixing, which can cost you money!)</source>
+        <translation type="vanished">Reset the current status of Darksend (can interrupt Darksend if it&apos;s in the process of Mixing, which can cost you money!)</translation>
     </message>
     <message>
         <source>Darksend</source>
@@ -2016,11 +3278,14 @@ https://www.transifex.com/lux-project/lux-project-translations</translation>
     </message>
     <message numerus="yes">
         <source>%n Rounds</source>
-        <translation><numerusform>%n Round</numerusform><numerusform>%n Rounds</numerusform></translation>
+        <translation>
+            <numerusform>%n Round</numerusform>
+            <numerusform>%n Rounds</numerusform>
+        </translation>
     </message>
     <message>
-        <source>Not enough compatible inputs to anonymize &lt;span style='color:red;'&gt;%1&lt;/span&gt;,&lt;br&gt;will anonymize &lt;span style='color:red;'&gt;%2&lt;/span&gt; instead</source>
-        <translation>Not enough compatible inputs to anonymize &lt;span style='color:red;'&gt;%1&lt;/span&gt;,&lt;br&gt;will anonymize &lt;span style='color:red;'&gt;%2&lt;/span&gt; instead</translation>
+        <source>Not enough compatible inputs to anonymize &lt;span style=&apos;color:red;&apos;&gt;%1&lt;/span&gt;,&lt;br&gt;will anonymize &lt;span style=&apos;color:red;&apos;&gt;%2&lt;/span&gt; instead</source>
+        <translation>Not enough compatible inputs to anonymize &lt;span style=&apos;color:red;&apos;&gt;%1&lt;/span&gt;,&lt;br&gt;will anonymize &lt;span style=&apos;color:red;&apos;&gt;%2&lt;/span&gt; instead</translation>
     </message>
     <message>
         <source>Overall progress</source>
@@ -2036,12 +3301,15 @@ https://www.transifex.com/lux-project/lux-project-translations</translation>
     </message>
     <message numerus="yes">
         <source>Denominated inputs have %5 of %n rounds on average</source>
-        <translation><numerusform>Denominated inputs have %5 of %n rounds on average</numerusform><numerusform>Denominated inputs have %5 of %n rounds on average</numerusform></translation>
+        <translation>
+            <numerusform>Denominated inputs have %5 of %n rounds on average</numerusform>
+            <numerusform>Denominated inputs have %5 of %n rounds on average</numerusform>
+        </translation>
     </message>
     <message>
         <source>Last Darksend message:
 </source>
-        <translation>Last Darksend message:
+        <translation type="vanished">Last Darksend message:
 </translation>
     </message>
     <message>
@@ -2049,8 +3317,8 @@ https://www.transifex.com/lux-project/lux-project-translations</translation>
         <translation>Darksend was successfully reset.</translation>
     </message>
     <message>
-        <source>If you don't want to see internal Darksend fees/transactions select "Most Common" as Type on the "Transactions" tab.</source>
-        <translation>If you don't want to see internal Darksend fees/transactions select "Most Common" as Type on the "Transactions" tab.</translation>
+        <source>If you don&apos;t want to see internal Darksend fees/transactions select &quot;Most Common&quot; as Type on the &quot;Transactions&quot; tab.</source>
+        <translation>If you don&apos;t want to see internal Darksend fees/transactions select &quot;Most Common&quot; as Type on the &quot;Transactions&quot; tab.</translation>
     </message>
     <message>
         <source>Darksend requires at least %1 to use.</source>
@@ -2084,6 +3352,66 @@ https://www.transifex.com/lux-project/lux-project-translations</translation>
         <source>N/A</source>
         <translation>N/A</translation>
     </message>
+    <message>
+        <source>Luxsend Balance:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Try to manually submit a Luxsend request.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reset the current status of Luxsend (can interrupt Luxsend if it&apos;s in the process of Mixing, which can cost you money!)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Luxsend</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LSR Tokens</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Go to token page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add Token</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Waiting for update</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Waiting in a queue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Accepting entries</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Master node broadcast</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Signing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Transmitting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Errored</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Success</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>PaymentServer</name>
@@ -2113,7 +3441,7 @@ https://www.transifex.com/lux-project/lux-project-translations</translation>
     </message>
     <message>
         <source>URI cannot be parsed! This can be caused by an invalid LUX address or malformed URI parameters.</source>
-        <translation>URI cannot be parsed! This can be caused by an invalid LUX address or malformed URI parameters.</translation>
+        <translation type="vanished">URI cannot be parsed! This can be caused by an invalid LUX address or malformed URI parameters.</translation>
     </message>
     <message>
         <source>Payment request file cannot be read! This can be caused by an invalid payment request file.</source>
@@ -2124,8 +3452,8 @@ https://www.transifex.com/lux-project/lux-project-translations</translation>
         <translation>Payment request rejected</translation>
     </message>
     <message>
-        <source>Payment request network doesn't match client network.</source>
-        <translation>Payment request network doesn't match client network.</translation>
+        <source>Payment request network doesn&apos;t match client network.</source>
+        <translation>Payment request network doesn&apos;t match client network.</translation>
     </message>
     <message>
         <source>Payment request has expired.</source>
@@ -2175,6 +3503,10 @@ https://www.transifex.com/lux-project/lux-project-translations</translation>
         <source>Payment acknowledged</source>
         <translation>Payment acknowledged</translation>
     </message>
+    <message>
+        <source>URI cannot be parsed! This can be caused by an invalid lux address or malformed URI parameters.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>PeerTableModel</name>
@@ -2199,7 +3531,7 @@ https://www.transifex.com/lux-project/lux-project-translations</translation>
     </message>
     <message>
         <source>Enter a LUX address (e.g. %1)</source>
-        <translation>Enter a LUX address (e.g. %1)</translation>
+        <translation type="vanished">Enter a LUX address (e.g. %1)</translation>
     </message>
     <message>
         <source>%1 d</source>
@@ -2236,6 +3568,131 @@ https://www.transifex.com/lux-project/lux-project-translations</translation>
     <message>
         <source>%1 ms</source>
         <translation>%1 ms</translation>
+    </message>
+    <message>
+        <source>ABI parsing error:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unsupported type %1 %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error encoding parameter %1 %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error decoding parameter %1 %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter a Lux address (e.g. %1)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>WITNESS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n second(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n minute(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n hour(s)</source>
+        <translation type="unfinished">
+            <numerusform>%n hour</numerusform>
+            <numerusform>%n hours</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n day(s)</source>
+        <translation type="unfinished">
+            <numerusform>%n day</numerusform>
+            <numerusform>%n days</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n week(s)</source>
+        <translation type="unfinished">
+            <numerusform>%n week</numerusform>
+            <numerusform>%n weeks</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>%1 and %2</source>
+        <translation type="unfinished">%1 and %2</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n year(s)</source>
+        <translation type="unfinished">
+            <numerusform>%n year</numerusform>
+            <numerusform>%n years</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Luxcore</source>
+        <translation type="unfinished">Luxcore</translation>
+    </message>
+    <message>
+        <source>Error: Specified data directory &quot;%1&quot; does not exist.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error: Cannot parse configuration file: %1. Only use key=value syntax.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error: Invalid combination of -regtest and -testnet.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error reading masternode configuration file: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Luxcore didn&apos;t yet exit safely...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>unknown</source>
+        <translation type="unfinished">unknown</translation>
+    </message>
+</context>
+<context>
+    <name>QPlatformTheme</name>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Apply</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Yes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;No</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2313,7 +3770,7 @@ https://www.transifex.com/lux-project/lux-project-translations</translation>
     </message>
     <message>
         <source>Build date</source>
-        <translation>Build date</translation>
+        <translation type="vanished">Build date</translation>
     </message>
     <message>
         <source>Current number of blocks</source>
@@ -2553,18 +4010,110 @@ https://www.transifex.com/lux-project/lux-project-translations</translation>
     </message>
     <message>
         <source>Fetching...</source>
-        <translation>Fetching...</translation>
+        <translation type="vanished">Fetching...</translation>
+    </message>
+    <message>
+        <source>DataDir</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Temporarily switch network activity ON/OFF</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Switch Network Activity</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Decrease font size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Increase font size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Banned peers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Whitelisted</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Synced Blocks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The duration of a currently outstanding ping.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ping Wait</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Disconnect Node</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Ban Node for</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;1 hour</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;24 hours</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;7 days</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;1 year</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Unban Node</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;WARNING: Scammers have been active, telling users to type commands here, stealing their </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>wallet contents. Do not use this console without fully understanding the command&apos;s ramification.&lt;/b&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Network activity disabled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(node id: %1)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>ReceiveCoinsDialog</name>
     <message>
         <source>Reuse one of the previously used receiving addresses.&lt;br&gt;Reusing addresses has security and privacy issues.&lt;br&gt;Do not use this unless re-generating a payment request made before.</source>
-        <translation>Reuse one of the previously used receiving addresses.&lt;br&gt;Reusing addresses has security and privacy issues.&lt;br&gt;Do not use this unless re-generating a payment request made before.</translation>
+        <translation type="vanished">Reuse one of the previously used receiving addresses.&lt;br&gt;Reusing addresses has security and privacy issues.&lt;br&gt;Do not use this unless re-generating a payment request made before.</translation>
     </message>
     <message>
         <source>R&amp;euse an existing receiving address (not recommended)</source>
-        <translation>R&amp;euse an existing receiving address (not recommended)</translation>
+        <translation type="vanished">R&amp;euse an existing receiving address (not recommended)</translation>
     </message>
     <message>
         <source>&amp;Message:</source>
@@ -2576,11 +4125,11 @@ https://www.transifex.com/lux-project/lux-project-translations</translation>
     </message>
     <message>
         <source>An optional message to attach to the payment request, which will be displayed when the request is opened. Note: The message will not be sent with the payment over the LUX network.</source>
-        <translation>An optional message to attach to the payment request, which will be displayed when the request is opened. Note: The message will not be sent with the payment over the LUX network.</translation>
+        <translation type="vanished">An optional message to attach to the payment request, which will be displayed when the request is opened. Note: The message will not be sent with the payment over the LUX network.</translation>
     </message>
     <message>
         <source>An optional message to attach to the payment request, which will be displayed when the request is opened.&lt;br&gt;Note: The message will not be sent with the payment over the LUX network.</source>
-        <translation>An optional message to attach to the payment request, which will be displayed when the request is opened.&lt;br&gt;Note: The message will not be sent with the payment over the LUX network.</translation>
+        <translation type="vanished">An optional message to attach to the payment request, which will be displayed when the request is opened.&lt;br&gt;Note: The message will not be sent with the payment over the LUX network.</translation>
     </message>
     <message>
         <source>Use this form to request payments. All fields are &lt;b&gt;optional&lt;/b&gt;.</source>
@@ -2642,6 +4191,22 @@ https://www.transifex.com/lux-project/lux-project-translations</translation>
         <source>Copy amount</source>
         <translation>Copy amount</translation>
     </message>
+    <message>
+        <source>An optional message to attach to the payment request, which will be displayed when the request is opened. Note: The message will not be sent with the payment over the Bitcoin network.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Native segwit addresses (aka Bech32 or BIP-173) reduce your transaction fees later on and offer better protection against typos, but old wallets don&apos;t support them. When unchecked, an address compatible with older wallets will be created instead.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Generate native segwit (Bech32) address</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copy URI</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ReceiveRequestDialog</name>
@@ -2699,6 +4264,17 @@ https://www.transifex.com/lux-project/lux-project-translations</translation>
     </message>
 </context>
 <context>
+    <name>ReceiveTokenPage</name>
+    <message>
+        <source>Form</source>
+        <translation type="unfinished">Form</translation>
+    </message>
+    <message>
+        <source>Copy Address</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>RecentRequestsTableModel</name>
     <message>
         <source>Date</source>
@@ -2727,6 +4303,61 @@ https://www.transifex.com/lux-project/lux-project-translations</translation>
     <message>
         <source>(no amount)</source>
         <translation>(no amount)</translation>
+    </message>
+</context>
+<context>
+    <name>RestoreDialog</name>
+    <message>
+        <source>Dialog</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select wallet file to restore from</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose wallet restore option</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reindex</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Salvage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The wallet.dat will be restored from the selected location and the Qt Wallet will be restarted with the -reindex or -salvagewallet option.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Reset</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Confirm wallet restoration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning: The wallet will be restored from location &lt;b&gt;%1&lt;/b&gt; and restarted with parameter &lt;b&gt;%2&lt;/b&gt;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;br&gt;&lt;br&gt;Are you sure you wish to restore your wallet?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Restore Wallet</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Wallet (*.dat)</source>
+        <translation type="unfinished">Wallet (*.dat)</translation>
     </message>
 </context>
 <context>
@@ -2857,15 +4488,15 @@ https://www.transifex.com/lux-project/lux-project-translations</translation>
     </message>
     <message>
         <source>Confirmation time:</source>
-        <translation>Confirmation time:</translation>
+        <translation type="vanished">Confirmation time:</translation>
     </message>
     <message>
-        <source>If the custom fee is set to 1000 uLUXs and the transaction is only 250 bytes, then "per kilobyte" only pays 250 uLUXs in fee,&lt;br /&gt;while "at least" pays 1000 uLUXs. For transactions bigger than a kilobyte both pay by kilobyte.</source>
-        <translation>If the custom fee is set to 1000 uLUXs and the transaction is only 250 bytes, then "per kilobyte" only pays 250 uLUXs in fee,&lt;br /&gt;while "at least" pays 1000 uLUXs. For transactions bigger than a kilobyte both pay by kilobyte.</translation>
+        <source>If the custom fee is set to 1000 uLUXs and the transaction is only 250 bytes, then &quot;per kilobyte&quot; only pays 250 uLUXs in fee,&lt;br /&gt;while &quot;at least&quot; pays 1000 uLUXs. For transactions bigger than a kilobyte both pay by kilobyte.</source>
+        <translation>If the custom fee is set to 1000 uLUXs and the transaction is only 250 bytes, then &quot;per kilobyte&quot; only pays 250 uLUXs in fee,&lt;br /&gt;while &quot;at least&quot; pays 1000 uLUXs. For transactions bigger than a kilobyte both pay by kilobyte.</translation>
     </message>
     <message>
-        <source>If the custom fee is set to 1000 uLUXs and the transaction is only 250 bytes, then "per kilobyte" only pays 250 uLUXs in fee,&lt;br /&gt;while "total at least" pays 1000 uLUXs. For transactions bigger than a kilobyte both pay by kilobyte.</source>
-        <translation>If the custom fee is set to 1000 uLUXs and the transaction is only 250 bytes, then "per kilobyte" only pays 250 uLUXs in fee,&lt;br /&gt;while "total at least" pays 1000 uLUXs. For transactions bigger than a kilobyte both pay by kilobyte.</translation>
+        <source>If the custom fee is set to 1000 uLUXs and the transaction is only 250 bytes, then &quot;per kilobyte&quot; only pays 250 uLUXs in fee,&lt;br /&gt;while &quot;total at least&quot; pays 1000 uLUXs. For transactions bigger than a kilobyte both pay by kilobyte.</source>
+        <translation>If the custom fee is set to 1000 uLUXs and the transaction is only 250 bytes, then &quot;per kilobyte&quot; only pays 250 uLUXs in fee,&lt;br /&gt;while &quot;total at least&quot; pays 1000 uLUXs. For transactions bigger than a kilobyte both pay by kilobyte.</translation>
     </message>
     <message>
         <source>Paying only the minimum fee is just fine as long as there is less transaction volume than space in the blocks.&lt;br /&gt;But be aware that this can end up in a never confirming transaction once there is more demand for LUX transactions than the network can process.</source>
@@ -3009,7 +4640,10 @@ https://www.transifex.com/lux-project/lux-project-translations</translation>
     </message>
     <message numerus="yes">
         <source>Estimated to begin confirmation within %n block(s).</source>
-        <translation><numerusform>Estimated to begin confirmation within %n block.</numerusform><numerusform>Estimated to begin confirmation within %n blocks.</numerusform></translation>
+        <translation>
+            <numerusform>Estimated to begin confirmation within %n block.</numerusform>
+            <numerusform>Estimated to begin confirmation within %n blocks.</numerusform>
+        </translation>
     </message>
     <message>
         <source>The recipient address is not valid, please recheck.</source>
@@ -3049,11 +4683,11 @@ https://www.transifex.com/lux-project/lux-project-translations</translation>
     </message>
     <message>
         <source>The transaction was rejected! This might happen if some of the coins in your wallet were already spent, such as if you used a copy of wallet.dat and coins were spent in the copy but not marked as spent here.</source>
-        <translation>The transaction was rejected! This might happen if some of the coins in your wallet were already spent, such as if you used a copy of wallet.dat and coins were spent in the copy but not marked as spent here.</translation>
+        <translation type="vanished">The transaction was rejected! This might happen if some of the coins in your wallet were already spent, such as if you used a copy of wallet.dat and coins were spent in the copy but not marked as spent here.</translation>
     </message>
     <message>
         <source>Error: The wallet was unlocked only to anonymize coins.</source>
-        <translation>Error: The wallet was unlocked only to anonymize coins.</translation>
+        <translation type="vanished">Error: The wallet was unlocked only to anonymize coins.</translation>
     </message>
     <message>
         <source>Pay only the minimum fee of %1</source>
@@ -3066,6 +4700,49 @@ https://www.transifex.com/lux-project/lux-project-translations</translation>
     <message>
         <source>(no label)</source>
         <translation>(no label)</translation>
+    </message>
+    <message>
+        <source>Confirmation time target:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(count)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The number of output is empty. Try again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The number of output must be a number and greater than 0. Try again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The transaction was rejected with the following reason: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error: The wallet was unlocked only to anonymize and stake coins.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error: The wallet was unlocked only to anonymize coins. Unlock canceled.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n block(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Confirm custom change address</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The address you selected for change is not part of this wallet. Any or all funds in your wallet may be sent to this address. Are you sure?</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3141,6 +4818,207 @@ https://www.transifex.com/lux-project/lux-project-translations</translation>
     <message>
         <source>Enter a label for this address to add it to your address book</source>
         <translation>Enter a label for this address to add it to your address book</translation>
+    </message>
+    <message>
+        <source>The fee will be deducted from the amount being sent. The recipient will receive less luxcoins than you enter in the amount field. If multiple recipients are selected, the fee is split equally.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>S&amp;ubtract fee from amount</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SendConfirmationDialog</name>
+    <message>
+        <source>Yes</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SendToContract</name>
+    <message>
+        <source>Form</source>
+        <translation type="unfinished">Form</translation>
+    </message>
+    <message>
+        <source>Send to Smart Contract</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Choose from contract book page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Paste contract address from clipboard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save contract info</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Contract Address</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Interface (ABI)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Function</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Optional</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Gas Limit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Gas Price</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Amount</source>
+        <translation type="unfinished">Amount</translation>
+    </message>
+    <message>
+        <source>Sender Address</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clear All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Send To Contract</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The contract address that will receive the funds and data.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The amount in Lux to send. Default = 0.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The quantum address that will be used as sender.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The Gas Price is too high, are you sure you want to possibly spend a max of %1 for this transaction?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>High Gas price</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Are you sure you want to send to the contract: &lt;br /&gt;&lt;br /&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;%1&lt;/b&gt;?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Confirm sending to contract.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Send to contract</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Gas limit: Default = %1, Max = %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Gas price: LUX price per gas unit. Default = %1, Min = %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SendTokenPage</name>
+    <message>
+        <source>Form</source>
+        <translation type="unfinished">Form</translation>
+    </message>
+    <message>
+        <source>PayTo</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Amount</source>
+        <translation type="unfinished">Amount</translation>
+    </message>
+    <message>
+        <source>GasLimit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>GasPrice</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Description</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Confirm</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clear</source>
+        <translation type="unfinished">Clear</translation>
+    </message>
+    <message>
+        <source>The address that will receive the tokens.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The amount in LSR Token to send.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Optional description for transaction.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Gas limit: Default = %1, Max = %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Gas price: LUX/gas unit. Default = %1, Min = %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Are you sure you want to send? &lt;br /&gt;&lt;br /&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;%1 %2 &lt;/b&gt; to </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;br /&gt;%3 &lt;br /&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Confirm send token.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>To send %1 you need LUX in address &lt;br /&gt; %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Send token</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3241,8 +5119,8 @@ https://www.transifex.com/lux-project/lux-project-translations</translation>
         <translation>Reset all verify message fields</translation>
     </message>
     <message>
-        <source>Click "Sign Message" to generate signature</source>
-        <translation>Click "Sign Message" to generate signature</translation>
+        <source>Click &quot;Sign Message&quot; to generate signature</source>
+        <translation>Click &quot;Sign Message&quot; to generate signature</translation>
     </message>
     <message>
         <source>The entered address is invalid.</source>
@@ -3294,6 +5172,255 @@ https://www.transifex.com/lux-project/lux-project-translations</translation>
     </message>
 </context>
 <context>
+    <name>SmartContract</name>
+    <message>
+        <source>Dialog</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SmartContractPage</name>
+    <message>
+        <source>out of sync</source>
+        <translation type="unfinished">out of sync</translation>
+    </message>
+    <message>
+        <source>Disabled</source>
+        <translation type="unfinished">Disabled</translation>
+    </message>
+    <message>
+        <source>Start Luxsend</source>
+        <translation type="unfinished">Start Luxsend</translation>
+    </message>
+    <message>
+        <source>Stop Luxsend</source>
+        <translation type="unfinished">Stop Luxsend</translation>
+    </message>
+    <message>
+        <source>No inputs detected</source>
+        <translation type="unfinished">No inputs detected</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n Rounds</source>
+        <translation type="unfinished">
+            <numerusform>%n Round</numerusform>
+            <numerusform>%n Rounds</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Found enough compatible inputs to anonymize %1</source>
+        <translation type="unfinished">Found enough compatible inputs to anonymize %1</translation>
+    </message>
+    <message>
+        <source>Not enough compatible inputs to anonymize &lt;span style=&apos;color:red;&apos;&gt;%1&lt;/span&gt;,&lt;br&gt;will anonymize &lt;span style=&apos;color:red;&apos;&gt;%2&lt;/span&gt; instead</source>
+        <translation type="unfinished">Not enough compatible inputs to anonymize &lt;span style=&apos;color:red;&apos;&gt;%1&lt;/span&gt;,&lt;br&gt;will anonymize &lt;span style=&apos;color:red;&apos;&gt;%2&lt;/span&gt; instead</translation>
+    </message>
+    <message>
+        <source>Overall progress</source>
+        <translation type="unfinished">Overall progress</translation>
+    </message>
+    <message>
+        <source>Denominated</source>
+        <translation type="unfinished">Denominated</translation>
+    </message>
+    <message>
+        <source>Mixed</source>
+        <translation type="unfinished">Mixed</translation>
+    </message>
+    <message>
+        <source>Anonymized</source>
+        <translation type="unfinished">Anonymized</translation>
+    </message>
+    <message numerus="yes">
+        <source>Denominated inputs have %5 of %n rounds on average</source>
+        <translation type="unfinished">
+            <numerusform>Denominated inputs have %5 of %n rounds on average</numerusform>
+            <numerusform>Denominated inputs have %5 of %n rounds on average</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Start Darksend</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enabled</source>
+        <translation type="unfinished">Enabled</translation>
+    </message>
+    <message>
+        <source>Last Darksend message:
+</source>
+        <translation type="unfinished">Last Darksend message:
+</translation>
+    </message>
+    <message>
+        <source>N/A</source>
+        <translation type="unfinished">N/A</translation>
+    </message>
+    <message>
+        <source>Darksend</source>
+        <translation type="unfinished">Darksend</translation>
+    </message>
+    <message>
+        <source>Darksend was successfully reset.</source>
+        <translation type="unfinished">Darksend was successfully reset.</translation>
+    </message>
+    <message>
+        <source>If you don&apos;t want to see internal Darksend fees/transactions select &quot;Most Common&quot; as Type on the &quot;Transactions&quot; tab.</source>
+        <translation type="unfinished">If you don&apos;t want to see internal Darksend fees/transactions select &quot;Most Common&quot; as Type on the &quot;Transactions&quot; tab.</translation>
+    </message>
+    <message>
+        <source>Darksend requires at least %1 to use.</source>
+        <translation type="unfinished">Darksend requires at least %1 to use.</translation>
+    </message>
+    <message>
+        <source>Wallet is locked and user declined to unlock. Disabling Darksend.</source>
+        <translation type="unfinished">Wallet is locked and user declined to unlock. Disabling Darksend.</translation>
+    </message>
+    <message>
+        <source>Stop Darksend</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SmartTokenConfig</name>
+    <message>
+        <source>Form</source>
+        <translation type="unfinished">Form</translation>
+    </message>
+    <message>
+        <source>Balances</source>
+        <translation type="unfinished">Balances</translation>
+    </message>
+    <message>
+        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the LUX network after a connection is established, but this process has not completed yet.</source>
+        <translation type="unfinished">The displayed information may be out of date. Your wallet automatically synchronizes with the LUX network after a connection is established, but this process has not completed yet.</translation>
+    </message>
+    <message>
+        <source>Unconfirmed transactions to watch-only addresses</source>
+        <translation type="unfinished">Unconfirmed transactions to watch-only addresses</translation>
+    </message>
+    <message>
+        <source>Total of transactions that have yet to be confirmed, and do not yet count toward the spendable balance</source>
+        <translation type="unfinished">Total of transactions that have yet to be confirmed, and do not yet count toward the spendable balance</translation>
+    </message>
+    <message>
+        <source>Staked or masternode rewards in watch-only addresses that has not yet matured</source>
+        <translation type="unfinished">Staked or masternode rewards in watch-only addresses that has not yet matured</translation>
+    </message>
+    <message>
+        <source>Total:</source>
+        <translation type="unfinished">Total:</translation>
+    </message>
+    <message>
+        <source>Staked or masternode rewards that has not yet matured</source>
+        <translation type="unfinished">Staked or masternode rewards that has not yet matured</translation>
+    </message>
+    <message>
+        <source>Immature:</source>
+        <translation type="unfinished">Immature:</translation>
+    </message>
+    <message>
+        <source>Your current total balance</source>
+        <translation type="unfinished">Your current total balance</translation>
+    </message>
+    <message>
+        <source>Current total balance in watch-only addresses</source>
+        <translation type="unfinished">Current total balance in watch-only addresses</translation>
+    </message>
+    <message>
+        <source>Watch-only:</source>
+        <translation type="unfinished">Watch-only:</translation>
+    </message>
+    <message>
+        <source>Available:</source>
+        <translation type="unfinished">Available:</translation>
+    </message>
+    <message>
+        <source>Your current spendable balance</source>
+        <translation type="unfinished">Your current spendable balance</translation>
+    </message>
+    <message>
+        <source>Your current balance in watch-only addresses</source>
+        <translation type="unfinished">Your current balance in watch-only addresses</translation>
+    </message>
+    <message>
+        <source>Pending:</source>
+        <translation type="unfinished">Pending:</translation>
+    </message>
+    <message>
+        <source>Spendable:</source>
+        <translation type="unfinished">Spendable:</translation>
+    </message>
+    <message>
+        <source>Status:</source>
+        <translation type="unfinished">Status:</translation>
+    </message>
+    <message>
+        <source>Completion:</source>
+        <translation type="unfinished">Completion:</translation>
+    </message>
+    <message>
+        <source>Luxsend Balance:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Amount and Rounds:</source>
+        <translation type="unfinished">Amount and Rounds:</translation>
+    </message>
+    <message>
+        <source>0 LUX / 0 Rounds</source>
+        <translation type="unfinished">0 LUX / 0 Rounds</translation>
+    </message>
+    <message>
+        <source>Submitted Denom:</source>
+        <translation type="unfinished">Submitted Denom:</translation>
+    </message>
+    <message>
+        <source>The denominations you submitted to the Masternode.&lt;br&gt;To mix, other users must submit the exact same denominations.</source>
+        <translation type="unfinished">The denominations you submitted to the Masternode.&lt;br&gt;To mix, other users must submit the exact same denominations.</translation>
+    </message>
+    <message>
+        <source>n/a</source>
+        <translation type="unfinished">n/a</translation>
+    </message>
+    <message>
+        <source>Enabled/Disabled</source>
+        <translation type="unfinished">Enabled/Disabled</translation>
+    </message>
+    <message>
+        <source>Start/Stop Mixing</source>
+        <translation type="unfinished">Start/Stop Mixing</translation>
+    </message>
+    <message>
+        <source>(Last Message)</source>
+        <translation type="unfinished">(Last Message)</translation>
+    </message>
+    <message>
+        <source>Try to manually submit a Luxsend request.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Try Mix</source>
+        <translation type="unfinished">Try Mix</translation>
+    </message>
+    <message>
+        <source>Reset the current status of Luxsend (can interrupt Luxsend if it&apos;s in the process of Mixing, which can cost you money!)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reset</source>
+        <translation type="unfinished">Reset</translation>
+    </message>
+    <message>
+        <source>Luxsend</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recent transactions</source>
+        <translation type="unfinished">Recent transactions</translation>
+    </message>
+</context>
+<context>
     <name>SplashScreen</name>
     <message>
         <source>Luxcore</source>
@@ -3321,6 +5448,261 @@ https://www.transifex.com/lux-project/lux-project-translations</translation>
     </message>
 </context>
 <context>
+    <name>TokenDescDialog</name>
+    <message>
+        <source>Dialog</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Details for %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>TokenItemModel</name>
+    <message>
+        <source>Token Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Token Symbol</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Balance</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>TokenTransactionDesc</name>
+    <message>
+        <source>conflicted with a transaction with %1 confirmations</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1/offline</source>
+        <translation type="unfinished">%1/offline</translation>
+    </message>
+    <message>
+        <source>0/unconfirmed, in memory pool</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>0/unconfirmed, not in memory pool</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1/unconfirmed</source>
+        <translation type="unfinished">%1/unconfirmed</translation>
+    </message>
+    <message>
+        <source>%1 confirmations</source>
+        <translation type="unfinished">%1 confirmations</translation>
+    </message>
+    <message>
+        <source>Status</source>
+        <translation type="unfinished">Status</translation>
+    </message>
+    <message>
+        <source>Date</source>
+        <translation type="unfinished">Date</translation>
+    </message>
+    <message>
+        <source>Transaction ID</source>
+        <translation type="unfinished">Transaction ID</translation>
+    </message>
+    <message>
+        <source>Token Address</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>From</source>
+        <translation type="unfinished">From</translation>
+    </message>
+    <message>
+        <source>To</source>
+        <translation type="unfinished">To</translation>
+    </message>
+    <message>
+        <source>Credit</source>
+        <translation type="unfinished">Credit</translation>
+    </message>
+    <message>
+        <source>Debit</source>
+        <translation type="unfinished">Debit</translation>
+    </message>
+    <message>
+        <source>Net Amount</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>TokenTransactionTableModel</name>
+    <message>
+        <source>Date</source>
+        <translation type="unfinished">Date</translation>
+    </message>
+    <message>
+        <source>Type</source>
+        <translation type="unfinished">Type</translation>
+    </message>
+    <message>
+        <source>Label</source>
+        <translation type="unfinished">Label</translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation type="unfinished">Name</translation>
+    </message>
+    <message>
+        <source>Amount</source>
+        <translation type="unfinished">Amount</translation>
+    </message>
+    <message>
+        <source>Offline</source>
+        <translation type="unfinished">Offline</translation>
+    </message>
+    <message>
+        <source>Unconfirmed</source>
+        <translation type="unfinished">Unconfirmed</translation>
+    </message>
+    <message>
+        <source>Confirming (%1 of %2 recommended confirmations)</source>
+        <translation type="unfinished">Confirming (%1 of %2 recommended confirmations)</translation>
+    </message>
+    <message>
+        <source>Confirmed (%1 confirmations)</source>
+        <translation type="unfinished">Confirmed (%1 confirmations)</translation>
+    </message>
+    <message>
+        <source>Received with</source>
+        <translation type="unfinished">Received with</translation>
+    </message>
+    <message>
+        <source>Received from</source>
+        <translation type="unfinished">Received from</translation>
+    </message>
+    <message>
+        <source>Sent to</source>
+        <translation type="unfinished">Sent to</translation>
+    </message>
+    <message>
+        <source>Payment to yourself</source>
+        <translation type="unfinished">Payment to yourself</translation>
+    </message>
+    <message>
+        <source>(n/a)</source>
+        <translation type="unfinished">(n/a)</translation>
+    </message>
+    <message>
+        <source>(no label)</source>
+        <translation type="unfinished">(no label)</translation>
+    </message>
+    <message>
+        <source>Transaction status. Hover over this field to show number of confirmations.</source>
+        <translation type="unfinished">Transaction status. Hover over this field to show number of confirmations.</translation>
+    </message>
+    <message>
+        <source>Date and time that the transaction was received.</source>
+        <translation type="unfinished">Date and time that the transaction was received.</translation>
+    </message>
+    <message>
+        <source>Type of transaction.</source>
+        <translation type="unfinished">Type of transaction.</translation>
+    </message>
+    <message>
+        <source>User-defined intent/purpose of the transaction.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Token name.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Amount removed from or added to balance.</source>
+        <translation type="unfinished">Amount removed from or added to balance.</translation>
+    </message>
+</context>
+<context>
+    <name>TokenTransactionView</name>
+    <message>
+        <source>All</source>
+        <translation type="unfinished">All</translation>
+    </message>
+    <message>
+        <source>Today</source>
+        <translation type="unfinished">Today</translation>
+    </message>
+    <message>
+        <source>This week</source>
+        <translation type="unfinished">This week</translation>
+    </message>
+    <message>
+        <source>This month</source>
+        <translation type="unfinished">This month</translation>
+    </message>
+    <message>
+        <source>Last month</source>
+        <translation type="unfinished">Last month</translation>
+    </message>
+    <message>
+        <source>This year</source>
+        <translation type="unfinished">This year</translation>
+    </message>
+    <message>
+        <source>Range...</source>
+        <translation type="unfinished">Range...</translation>
+    </message>
+    <message>
+        <source>Received</source>
+        <translation type="unfinished">Received</translation>
+    </message>
+    <message>
+        <source>Sent</source>
+        <translation type="unfinished">Sent</translation>
+    </message>
+    <message>
+        <source>To yourself</source>
+        <translation type="unfinished">To yourself</translation>
+    </message>
+    <message>
+        <source>Enter address to search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Min amount</source>
+        <translation type="unfinished">Min amount</translation>
+    </message>
+    <message>
+        <source>Copy address</source>
+        <translation type="unfinished">Copy address</translation>
+    </message>
+    <message>
+        <source>Copy amount</source>
+        <translation type="unfinished">Copy amount</translation>
+    </message>
+    <message>
+        <source>Copy transaction ID</source>
+        <translation type="unfinished">Copy transaction ID</translation>
+    </message>
+    <message>
+        <source>Copy full transaction details</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show transaction details</source>
+        <translation type="unfinished">Show transaction details</translation>
+    </message>
+    <message>
+        <source>Range:</source>
+        <translation type="unfinished">Range:</translation>
+    </message>
+    <message>
+        <source>to</source>
+        <translation type="unfinished">to</translation>
+    </message>
+</context>
+<context>
     <name>TrafficGraphWidget</name>
     <message>
         <source>KB/s</source>
@@ -3331,7 +5713,10 @@ https://www.transifex.com/lux-project/lux-project-translations</translation>
     <name>TransactionDesc</name>
     <message numerus="yes">
         <source>Open for %n more block(s)</source>
-        <translation><numerusform>Open for %n more block</numerusform><numerusform>Open for %n more blocks</numerusform></translation>
+        <translation>
+            <numerusform>Open for %n more block</numerusform>
+            <numerusform>Open for %n more blocks</numerusform>
+        </translation>
     </message>
     <message>
         <source>Open until %1</source>
@@ -3339,23 +5724,23 @@ https://www.transifex.com/lux-project/lux-project-translations</translation>
     </message>
     <message>
         <source>conflicted</source>
-        <translation>conflicted</translation>
+        <translation type="vanished">conflicted</translation>
     </message>
     <message>
         <source>%1/offline (verified via instantx)</source>
-        <translation>%1/offline (verified via instantx)</translation>
+        <translation type="vanished">%1/offline (verified via instantx)</translation>
     </message>
     <message>
         <source>%1/confirmed (verified via instantx)</source>
-        <translation>%1/confirmed (verified via instantx)</translation>
+        <translation type="vanished">%1/confirmed (verified via instantx)</translation>
     </message>
     <message>
         <source>%1 confirmations (verified via instantx)</source>
-        <translation>%1 confirmations (verified via instantx)</translation>
+        <translation type="vanished">%1 confirmations (verified via instantx)</translation>
     </message>
     <message>
         <source>%1/offline</source>
-        <translation>%1/offline</translation>
+        <translation type="vanished">%1/offline</translation>
     </message>
     <message>
         <source>%1/unconfirmed</source>
@@ -3367,23 +5752,23 @@ https://www.transifex.com/lux-project/lux-project-translations</translation>
     </message>
     <message>
         <source>%1/offline (InstanTX verification in progress - %2 of %3 signatures)</source>
-        <translation>%1/offline (InstanTX verification in progress - %2 of %3 signatures)</translation>
+        <translation type="vanished">%1/offline (InstanTX verification in progress - %2 of %3 signatures)</translation>
     </message>
     <message>
         <source>%1/confirmed (InstanTX verification in progress - %2 of %3 signatures )</source>
-        <translation>%1/confirmed (InstanTX verification in progress - %2 of %3 signatures )</translation>
+        <translation type="vanished">%1/confirmed (InstanTX verification in progress - %2 of %3 signatures )</translation>
     </message>
     <message>
         <source>%1 confirmations (InstanTX verification in progress - %2 of %3 signatures)</source>
-        <translation>%1 confirmations (InstanTX verification in progress - %2 of %3 signatures)</translation>
+        <translation type="vanished">%1 confirmations (InstanTX verification in progress - %2 of %3 signatures)</translation>
     </message>
     <message>
         <source>%1/offline (InstanTX verification failed)</source>
-        <translation>%1/offline (InstanTX verification failed)</translation>
+        <translation type="vanished">%1/offline (InstanTX verification failed)</translation>
     </message>
     <message>
         <source>%1/confirmed (InstanTX verification failed)</source>
-        <translation>%1/confirmed (InstanTX verification failed)</translation>
+        <translation type="vanished">%1/confirmed (InstanTX verification failed)</translation>
     </message>
     <message>
         <source>Status</source>
@@ -3395,7 +5780,10 @@ https://www.transifex.com/lux-project/lux-project-translations</translation>
     </message>
     <message numerus="yes">
         <source>, broadcast through %n node(s)</source>
-        <translation><numerusform>, broadcast through %n node</numerusform><numerusform>, broadcast through %n nodes</numerusform></translation>
+        <translation>
+            <numerusform>, broadcast through %n node</numerusform>
+            <numerusform>, broadcast through %n nodes</numerusform>
+        </translation>
     </message>
     <message>
         <source>Date</source>
@@ -3415,7 +5803,7 @@ https://www.transifex.com/lux-project/lux-project-translations</translation>
     </message>
     <message>
         <source>unknown</source>
-        <translation>unknown</translation>
+        <translation type="vanished">unknown</translation>
     </message>
     <message>
         <source>To</source>
@@ -3439,7 +5827,10 @@ https://www.transifex.com/lux-project/lux-project-translations</translation>
     </message>
     <message numerus="yes">
         <source>matures in %n more block(s)</source>
-        <translation><numerusform>matures in %n more block</numerusform><numerusform>matures in %n more blocks</numerusform></translation>
+        <translation>
+            <numerusform>matures in %n more block</numerusform>
+            <numerusform>matures in %n more blocks</numerusform>
+        </translation>
     </message>
     <message>
         <source>not accepted</source>
@@ -3486,8 +5877,8 @@ https://www.transifex.com/lux-project/lux-project-translations</translation>
         <translation>Merchant</translation>
     </message>
     <message>
-        <source>Generated coins must mature %1 blocks before they can be spent. When you generated this block, it was broadcast to the network to be added to the block chain. If it fails to get into the chain, its state will change to "not accepted" and it won't be spendable. This may occasionally happen if another node generates a block within a few seconds of yours.</source>
-        <translation>Generated coins must mature %1 blocks before they can be spent. When you generated this block, it was broadcast to the network to be added to the block chain. If it fails to get into the chain, its state will change to "not accepted" and it won't be spendable. This may occasionally happen if another node generates a block within a few seconds of yours.</translation>
+        <source>Generated coins must mature %1 blocks before they can be spent. When you generated this block, it was broadcast to the network to be added to the block chain. If it fails to get into the chain, its state will change to &quot;not accepted&quot; and it won&apos;t be spendable. This may occasionally happen if another node generates a block within a few seconds of yours.</source>
+        <translation>Generated coins must mature %1 blocks before they can be spent. When you generated this block, it was broadcast to the network to be added to the block chain. If it fails to get into the chain, its state will change to &quot;not accepted&quot; and it won&apos;t be spendable. This may occasionally happen if another node generates a block within a few seconds of yours.</translation>
     </message>
     <message>
         <source>Debug information</source>
@@ -3513,16 +5904,52 @@ https://www.transifex.com/lux-project/lux-project-translations</translation>
         <source>false</source>
         <translation>false</translation>
     </message>
+    <message>
+        <source>conflicted with a transaction with %1 confirmations</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>0/unconfirmed, %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>in memory pool</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>not in memory pool</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Smart contract</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Immature</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This gas refund must mature %1 blocks before it can be spent. If it fails to get into the chain, its state will change to &quot;not accepted&quot; and it won&apos;t be spendable.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>TransactionDescDialog</name>
     <message>
         <source>Transaction details</source>
-        <translation>Transaction details</translation>
+        <translation type="vanished">Transaction details</translation>
     </message>
     <message>
         <source>This pane shows a detailed description of the transaction</source>
         <translation>This pane shows a detailed description of the transaction</translation>
+    </message>
+    <message>
+        <source>Details for %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3541,7 +5968,10 @@ https://www.transifex.com/lux-project/lux-project-translations</translation>
     </message>
     <message numerus="yes">
         <source>Open for %n more block(s)</source>
-        <translation><numerusform>Open for %n more block</numerusform><numerusform>Open for %n more blocks</numerusform></translation>
+        <translation>
+            <numerusform>Open for %n more block</numerusform>
+            <numerusform>Open for %n more blocks</numerusform>
+        </translation>
     </message>
     <message>
         <source>Open until %1</source>
@@ -3662,6 +6092,22 @@ https://www.transifex.com/lux-project/lux-project-translations</translation>
     <message>
         <source>Amount removed from or added to balance.</source>
         <translation>Amount removed from or added to balance.</translation>
+    </message>
+    <message>
+        <source>Abandoned</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Smart contract</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SC refund</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(no label)</source>
+        <translation type="unfinished">(no label)</translation>
     </message>
 </context>
 <context>
@@ -3838,6 +6284,22 @@ https://www.transifex.com/lux-project/lux-project-translations</translation>
         <source>to</source>
         <translation>to</translation>
     </message>
+    <message>
+        <source>Smart contract</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Abandon transaction</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copy raw transaction</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copy full transaction details</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>UnitDisplayStatusBarControl</name>
@@ -3860,8 +6322,8 @@ https://www.transifex.com/lux-project/lux-project-translations</translation>
         <translation>Send Coins</translation>
     </message>
     <message>
-        <source>InstanTX doesn't support sending values that high yet. Transactions are currently limited to %1 LUX.</source>
-        <translation>InstanTX doesn't support sending values that high yet. Transactions are currently limited to %1 LUX.</translation>
+        <source>InstanTX doesn&apos;t support sending values that high yet. Transactions are currently limited to %1 LUX.</source>
+        <translation>InstanTX doesn&apos;t support sending values that high yet. Transactions are currently limited to %1 LUX.</translation>
     </message>
 </context>
 <context>
@@ -3902,6 +6364,10 @@ https://www.transifex.com/lux-project/lux-project-translations</translation>
         <source>The wallet data was successfully saved to %1.</source>
         <translation>The wallet data was successfully saved to %1.</translation>
     </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>lux-core</name>
@@ -3915,7 +6381,7 @@ https://www.transifex.com/lux-project/lux-project-translations</translation>
     </message>
     <message>
         <source>An error occurred while setting up the RPC address %s port %u for listening: %s</source>
-        <translation>An error occurred while setting up the RPC address %s port %u for listening: %s</translation>
+        <translation type="vanished">An error occurred while setting up the RPC address %s port %u for listening: %s</translation>
     </message>
     <message>
         <source>Bind to given address and always listen on it. Use [host]:port notation for IPv6</source>
@@ -3951,7 +6417,7 @@ https://www.transifex.com/lux-project/lux-project-translations</translation>
     </message>
     <message>
         <source>Disable all LUX specific functionality (Masternodes, Darksend, InstanTX, Budgeting) (0-1, default: %u)</source>
-        <translation>Disable all LUX specific functionality (Masternodes, Darksend, InstanTX, Budgeting) (0-1, default: %u)</translation>
+        <translation type="vanished">Disable all LUX specific functionality (Masternodes, Darksend, InstanTX, Budgeting) (0-1, default: %u)</translation>
     </message>
     <message>
         <source>Distributed under the MIT software license, see the accompanying file COPYING or &lt;http://www.opensource.org/licenses/mit-license.php&gt;.</source>
@@ -3974,8 +6440,8 @@ https://www.transifex.com/lux-project/lux-project-translations</translation>
         <translation>Error: Listening for incoming connections failed (listen returned error %s)</translation>
     </message>
     <message>
-        <source>Error: Unsupported argument -socks found. Setting SOCKS version isn't possible anymore, only SOCKS5 proxies are supported.</source>
-        <translation>Error: Unsupported argument -socks found. Setting SOCKS version isn't possible anymore, only SOCKS5 proxies are supported.</translation>
+        <source>Error: Unsupported argument -socks found. Setting SOCKS version isn&apos;t possible anymore, only SOCKS5 proxies are supported.</source>
+        <translation>Error: Unsupported argument -socks found. Setting SOCKS version isn&apos;t possible anymore, only SOCKS5 proxies are supported.</translation>
     </message>
     <message>
         <source>Execute command when a relevant alert is received or we see a really long fork (%s in cmd is replaced by message)</source>
@@ -4018,8 +6484,8 @@ https://www.transifex.com/lux-project/lux-project-translations</translation>
         <translation>In this mode -genproclimit controls how many blocks are generated immediately.</translation>
     </message>
     <message>
-        <source>Invalid amount for -maxtxfee=&lt;amount&gt;: '%s' (must be at least the minrelay fee of %s to prevent stuck transactions)</source>
-        <translation>Invalid amount for -maxtxfee=&lt;amount&gt;: '%s' (must be at least the minrelay fee of %s to prevent stuck transactions)</translation>
+        <source>Invalid amount for -maxtxfee=&lt;amount&gt;: &apos;%s&apos; (must be at least the minrelay fee of %s to prevent stuck transactions)</source>
+        <translation>Invalid amount for -maxtxfee=&lt;amount&gt;: &apos;%s&apos; (must be at least the minrelay fee of %s to prevent stuck transactions)</translation>
     </message>
     <message>
         <source>Log transaction priority and fee per kB when mining blocks (default: %u)</source>
@@ -4043,7 +6509,7 @@ https://www.transifex.com/lux-project/lux-project-translations</translation>
     </message>
     <message>
         <source>Darksend uses exact denominated amounts to send funds, you might simply need to anonymize some more coins.</source>
-        <translation>Darksend uses exact denominated amounts to send funds, you might simply need to anonymize some more coins.</translation>
+        <translation type="vanished">Darksend uses exact denominated amounts to send funds, you might simply need to anonymize some more coins.</translation>
     </message>
     <message>
         <source>Output debugging information (default: %u, supplying &lt;category&gt; is optional)</source>
@@ -4071,7 +6537,7 @@ https://www.transifex.com/lux-project/lux-project-translations</translation>
     </message>
     <message>
         <source>Set the number of script verification threads (%u to %d, 0 = auto, &lt;0 = leave that many cores free, default: %d)</source>
-        <translation>Set the number of script verification threads (%u to %d, 0 = auto, &lt;0 = leave that many cores free, default: %d)</translation>
+        <translation type="vanished">Set the number of script verification threads (%u to %d, 0 = auto, &lt;0 = leave that many cores free, default: %d)</translation>
     </message>
     <message>
         <source>Set the number of threads for coin generation if enabled (-1 = all cores, default: %d)</source>
@@ -4083,7 +6549,7 @@ https://www.transifex.com/lux-project/lux-project-translations</translation>
     </message>
     <message>
         <source>InstanTX requires inputs with at least 6 confirmations, you might need to wait a few minutes and try again.</source>
-        <translation>InstanTX requires inputs with at least 6 confirmations, you might need to wait a few minutes and try again.</translation>
+        <translation type="vanished">InstanTX requires inputs with at least 6 confirmations, you might need to wait a few minutes and try again.</translation>
     </message>
     <message>
         <source>This is a pre-release test build - use at your own risk - do not use for mining or merchant applications</source>
@@ -4103,9 +6569,9 @@ rpcpassword=%s
 The username and password MUST NOT be the same.
 If the file does not exist, create it with owner-readable-only file permissions.
 It is also recommended to set alertnotify so you are notified of problems;
-for example: alertnotify=echo %%s | mail -s "LUX Alert" admin@foo.com
+for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
 </source>
-        <translation>To use luxd, or the -server option to lux-qt, you must set an rpcpassword in the configuration file:
+        <translation type="vanished">To use luxd, or the -server option to lux-qt, you must set an rpcpassword in the configuration file:
 %s
 It is recommended you use the following random password:
 rpcuser=luxrpc
@@ -4114,7 +6580,7 @@ rpcpassword=%s
 The username and password MUST NOT be the same.
 If the file does not exist, create it with owner-readable-only file permissions.
 It is also recommended to set alertnotify so you are notified of problems;
-for example: alertnotify=echo %%s | mail -s "LUX Alert" admin@foo.com
+for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
 </translation>
     </message>
     <message>
@@ -4123,11 +6589,11 @@ for example: alertnotify=echo %%s | mail -s "LUX Alert" admin@foo.com
     </message>
     <message>
         <source>Unable to locate enough Darksend denominated funds for this transaction.</source>
-        <translation>Unable to locate enough Darksend denominated funds for this transaction.</translation>
+        <translation type="vanished">Unable to locate enough Darksend denominated funds for this transaction.</translation>
     </message>
     <message>
         <source>Unable to locate enough Darksend non-denominated funds for this transaction that are not equal 10000 LUX.</source>
-        <translation>Unable to locate enough Darksend non-denominated funds for this transaction that are not equal 10000 LUX.</translation>
+        <translation type="vanished">Unable to locate enough Darksend non-denominated funds for this transaction that are not equal 10000 LUX.</translation>
     </message>
     <message>
         <source>Unable to locate enough funds for this transaction that are not equal 10000 LUX.</source>
@@ -4146,8 +6612,8 @@ for example: alertnotify=echo %%s | mail -s "LUX Alert" admin@foo.com
         <translation>Warning: -paytxfee is set very high! This is the transaction fee you will pay if you send a transaction.</translation>
     </message>
     <message>
-        <source>Warning: Please check that your computer's date and time are correct! If your clock is wrong Luxcore will not work properly.</source>
-        <translation>Warning: Please check that your computer's date and time are correct! If your clock is wrong Luxcore will not work properly.</translation>
+        <source>Warning: Please check that your computer&apos;s date and time are correct! If your clock is wrong Luxcore will not work properly.</source>
+        <translation>Warning: Please check that your computer&apos;s date and time are correct! If your clock is wrong Luxcore will not work properly.</translation>
     </message>
     <message>
         <source>Warning: The network does not appear to fully agree! Some miners appear to be experiencing issues.</source>
@@ -4179,7 +6645,7 @@ for example: alertnotify=echo %%s | mail -s "LUX Alert" admin@foo.com
     </message>
     <message>
         <source>(51472 could be used only on mainnet)</source>
-        <translation>(51472 could be used only on mainnet)</translation>
+        <translation type="vanished">(51472 could be used only on mainnet)</translation>
     </message>
     <message>
         <source>(default: %s)</source>
@@ -4191,12 +6657,12 @@ for example: alertnotify=echo %%s | mail -s "LUX Alert" admin@foo.com
     </message>
     <message>
         <source>(must be 51472 for mainnet)</source>
-        <translation>(must be 51472 for mainnet)</translation>
+        <translation type="vanished">(must be 51472 for mainnet)</translation>
     </message>
     <message>
         <source>&lt;category&gt; can be:
 </source>
-        <translation>&lt;category&gt; can be:
+        <translation type="vanished">&lt;category&gt; can be:
 </translation>
     </message>
     <message>
@@ -4240,32 +6706,32 @@ for example: alertnotify=echo %%s | mail -s "LUX Alert" admin@foo.com
         <translation>Block creation options:</translation>
     </message>
     <message>
-        <source>Can't denominate: no compatible inputs left.</source>
-        <translation>Can't denominate: no compatible inputs left.</translation>
+        <source>Can&apos;t denominate: no compatible inputs left.</source>
+        <translation>Can&apos;t denominate: no compatible inputs left.</translation>
     </message>
     <message>
-        <source>Can't find random Masternode.</source>
-        <translation>Can't find random Masternode.</translation>
+        <source>Can&apos;t find random Masternode.</source>
+        <translation type="vanished">Can&apos;t find random Masternode.</translation>
     </message>
     <message>
-        <source>Can't mix while sync in progress.</source>
-        <translation>Can't mix while sync in progress.</translation>
+        <source>Can&apos;t mix while sync in progress.</source>
+        <translation type="vanished">Can&apos;t mix while sync in progress.</translation>
     </message>
     <message>
         <source>Cannot downgrade wallet</source>
         <translation>Cannot downgrade wallet</translation>
     </message>
     <message>
-        <source>Cannot resolve -bind address: '%s'</source>
-        <translation>Cannot resolve -bind address: '%s'</translation>
+        <source>Cannot resolve -bind address: &apos;%s&apos;</source>
+        <translation>Cannot resolve -bind address: &apos;%s&apos;</translation>
     </message>
     <message>
-        <source>Cannot resolve -externalip address: '%s'</source>
-        <translation>Cannot resolve -externalip address: '%s'</translation>
+        <source>Cannot resolve -externalip address: &apos;%s&apos;</source>
+        <translation>Cannot resolve -externalip address: &apos;%s&apos;</translation>
     </message>
     <message>
-        <source>Cannot resolve -whitebind address: '%s'</source>
-        <translation>Cannot resolve -whitebind address: '%s'</translation>
+        <source>Cannot resolve -whitebind address: &apos;%s&apos;</source>
+        <translation>Cannot resolve -whitebind address: &apos;%s&apos;</translation>
     </message>
     <message>
         <source>Cannot write default address</source>
@@ -4301,7 +6767,7 @@ for example: alertnotify=echo %%s | mail -s "LUX Alert" admin@foo.com
     </message>
     <message>
         <source>Copyright (C) 2015-%i The Luxcore Developers</source>
-        <translation>Copyright (C) 2015-%i The Luxcore Developers</translation>
+        <translation type="vanished">Copyright (C) 2015-%i The Luxcore Developers</translation>
     </message>
     <message>
         <source>Corrupted block database detected</source>
@@ -4309,11 +6775,11 @@ for example: alertnotify=echo %%s | mail -s "LUX Alert" admin@foo.com
     </message>
     <message>
         <source>Could not parse -rpcbind value %s as network address</source>
-        <translation>Could not parse -rpcbind value %s as network address</translation>
+        <translation type="vanished">Could not parse -rpcbind value %s as network address</translation>
     </message>
     <message>
         <source>Could not parse masternode.conf</source>
-        <translation>Could not parse masternode.conf</translation>
+        <translation type="vanished">Could not parse masternode.conf</translation>
     </message>
     <message>
         <source>Debugging/Testing options:</source>
@@ -4349,7 +6815,7 @@ for example: alertnotify=echo %%s | mail -s "LUX Alert" admin@foo.com
     </message>
     <message>
         <source>Error connecting to Masternode.</source>
-        <translation>Error connecting to Masternode.</translation>
+        <translation type="vanished">Error connecting to Masternode.</translation>
     </message>
     <message>
         <source>Error initializing block database</source>
@@ -4396,8 +6862,8 @@ for example: alertnotify=echo %%s | mail -s "LUX Alert" admin@foo.com
         <translation>Error: A fatal internal error occured, see debug.log for details</translation>
     </message>
     <message>
-        <source>Error: Can't select current denominated inputs</source>
-        <translation>Error: Can't select current denominated inputs</translation>
+        <source>Error: Can&apos;t select current denominated inputs</source>
+        <translation type="vanished">Error: Can&apos;t select current denominated inputs</translation>
     </message>
     <message>
         <source>Error: Disk space is low!</source>
@@ -4421,7 +6887,7 @@ for example: alertnotify=echo %%s | mail -s "LUX Alert" admin@foo.com
     </message>
     <message>
         <source>Failed to read block</source>
-        <translation>Failed to read block</translation>
+        <translation type="vanished">Failed to read block</translation>
     </message>
     <message>
         <source>Fee (in LUX/kB) to add to transactions you send (default: %s)</source>
@@ -4429,7 +6895,7 @@ for example: alertnotify=echo %%s | mail -s "LUX Alert" admin@foo.com
     </message>
     <message>
         <source>Finalizing transaction.</source>
-        <translation>Finalizing transaction.</translation>
+        <translation type="vanished">Finalizing transaction.</translation>
     </message>
     <message>
         <source>Force safe mode (default: %u)</source>
@@ -4437,11 +6903,11 @@ for example: alertnotify=echo %%s | mail -s "LUX Alert" admin@foo.com
     </message>
     <message>
         <source>Found enough users, signing ( waiting %s )</source>
-        <translation>Found enough users, signing ( waiting %s )</translation>
+        <translation type="vanished">Found enough users, signing ( waiting %s )</translation>
     </message>
     <message>
         <source>Found enough users, signing ...</source>
-        <translation>Found enough users, signing ...</translation>
+        <translation type="vanished">Found enough users, signing ...</translation>
     </message>
     <message>
         <source>Generate coins (default: %u)</source>
@@ -4496,32 +6962,32 @@ for example: alertnotify=echo %%s | mail -s "LUX Alert" admin@foo.com
         <translation>Insufficient funds.</translation>
     </message>
     <message>
-        <source>Invalid -onion address: '%s'</source>
-        <translation>Invalid -onion address: '%s'</translation>
+        <source>Invalid -onion address: &apos;%s&apos;</source>
+        <translation>Invalid -onion address: &apos;%s&apos;</translation>
     </message>
     <message>
-        <source>Invalid -proxy address: '%s'</source>
-        <translation>Invalid -proxy address: '%s'</translation>
+        <source>Invalid -proxy address: &apos;%s&apos;</source>
+        <translation>Invalid -proxy address: &apos;%s&apos;</translation>
     </message>
     <message>
-        <source>Invalid amount for -maxtxfee=&lt;amount&gt;: '%s'</source>
-        <translation>Invalid amount for -maxtxfee=&lt;amount&gt;: '%s'</translation>
+        <source>Invalid amount for -maxtxfee=&lt;amount&gt;: &apos;%s&apos;</source>
+        <translation>Invalid amount for -maxtxfee=&lt;amount&gt;: &apos;%s&apos;</translation>
     </message>
     <message>
-        <source>Invalid amount for -minrelaytxfee=&lt;amount&gt;: '%s'</source>
-        <translation>Invalid amount for -minrelaytxfee=&lt;amount&gt;: '%s'</translation>
+        <source>Invalid amount for -minrelaytxfee=&lt;amount&gt;: &apos;%s&apos;</source>
+        <translation>Invalid amount for -minrelaytxfee=&lt;amount&gt;: &apos;%s&apos;</translation>
     </message>
     <message>
-        <source>Invalid amount for -mintxfee=&lt;amount&gt;: '%s'</source>
-        <translation>Invalid amount for -mintxfee=&lt;amount&gt;: '%s'</translation>
+        <source>Invalid amount for -mintxfee=&lt;amount&gt;: &apos;%s&apos;</source>
+        <translation>Invalid amount for -mintxfee=&lt;amount&gt;: &apos;%s&apos;</translation>
     </message>
     <message>
-        <source>Invalid amount for -paytxfee=&lt;amount&gt;: '%s' (must be at least %s)</source>
-        <translation>Invalid amount for -paytxfee=&lt;amount&gt;: '%s' (must be at least %s)</translation>
+        <source>Invalid amount for -paytxfee=&lt;amount&gt;: &apos;%s&apos; (must be at least %s)</source>
+        <translation>Invalid amount for -paytxfee=&lt;amount&gt;: &apos;%s&apos; (must be at least %s)</translation>
     </message>
     <message>
-        <source>Invalid amount for -paytxfee=&lt;amount&gt;: '%s'</source>
-        <translation>Invalid amount for -paytxfee=&lt;amount&gt;: '%s'</translation>
+        <source>Invalid amount for -paytxfee=&lt;amount&gt;: &apos;%s&apos;</source>
+        <translation>Invalid amount for -paytxfee=&lt;amount&gt;: &apos;%s&apos;</translation>
     </message>
     <message>
         <source>Invalid amount for -reservebalance=&lt;amount&gt;</source>
@@ -4532,12 +6998,12 @@ for example: alertnotify=echo %%s | mail -s "LUX Alert" admin@foo.com
         <translation>Invalid masternodeprivkey. Please see documenation.</translation>
     </message>
     <message>
-        <source>Invalid netmask specified in -whitelist: '%s'</source>
-        <translation>Invalid netmask specified in -whitelist: '%s'</translation>
+        <source>Invalid netmask specified in -whitelist: &apos;%s&apos;</source>
+        <translation>Invalid netmask specified in -whitelist: &apos;%s&apos;</translation>
     </message>
     <message>
         <source>Invalid port detected in masternode.conf</source>
-        <translation>Invalid port detected in masternode.conf</translation>
+        <translation type="vanished">Invalid port detected in masternode.conf</translation>
     </message>
     <message>
         <source>Invalid private key.</source>
@@ -4561,7 +7027,7 @@ for example: alertnotify=echo %%s | mail -s "LUX Alert" admin@foo.com
     </message>
     <message>
         <source>Last successful Darksend action was too recent.</source>
-        <translation>Last successful Darksend action was too recent.</translation>
+        <translation type="vanished">Last successful Darksend action was too recent.</translation>
     </message>
     <message>
         <source>Limit size of signature cache to &lt;n&gt; entries (default: %u)</source>
@@ -4569,7 +7035,7 @@ for example: alertnotify=echo %%s | mail -s "LUX Alert" admin@foo.com
     </message>
     <message>
         <source>Line: %d</source>
-        <translation>Line: %d</translation>
+        <translation type="vanished">Line: %d</translation>
     </message>
     <message>
         <source>Listen for JSON-RPC connections on &lt;port&gt; (default: %u or testnet: %u)</source>
@@ -4589,15 +7055,15 @@ for example: alertnotify=echo %%s | mail -s "LUX Alert" admin@foo.com
     </message>
     <message>
         <source>Loading budget cache...</source>
-        <translation>Loading budget cache...</translation>
+        <translation type="vanished">Loading budget cache...</translation>
     </message>
     <message>
         <source>Loading masternode cache...</source>
-        <translation>Loading masternode cache...</translation>
+        <translation type="vanished">Loading masternode cache...</translation>
     </message>
     <message>
         <source>Loading masternode payment cache...</source>
-        <translation>Loading masternode payment cache...</translation>
+        <translation type="vanished">Loading masternode payment cache...</translation>
     </message>
     <message>
         <source>Loading wallet... (%3.2f %%)</source>
@@ -4609,7 +7075,7 @@ for example: alertnotify=echo %%s | mail -s "LUX Alert" admin@foo.com
     </message>
     <message>
         <source>Lock is already in place.</source>
-        <translation>Lock is already in place.</translation>
+        <translation type="vanished">Lock is already in place.</translation>
     </message>
     <message>
         <source>Lock masternodes from masternode configuration file (default: %u)</source>
@@ -4645,19 +7111,19 @@ for example: alertnotify=echo %%s | mail -s "LUX Alert" admin@foo.com
     </message>
     <message>
         <source>Mixing in progress...</source>
-        <translation>Mixing in progress...</translation>
+        <translation type="vanished">Mixing in progress...</translation>
     </message>
     <message>
-        <source>Need to specify a port with -whitebind: '%s'</source>
-        <translation>Need to specify a port with -whitebind: '%s'</translation>
+        <source>Need to specify a port with -whitebind: &apos;%s&apos;</source>
+        <translation>Need to specify a port with -whitebind: &apos;%s&apos;</translation>
     </message>
     <message>
         <source>No Masternodes detected.</source>
-        <translation>No Masternodes detected.</translation>
+        <translation type="vanished">No Masternodes detected.</translation>
     </message>
     <message>
         <source>No compatible Masternode found.</source>
-        <translation>No compatible Masternode found.</translation>
+        <translation type="vanished">No compatible Masternode found.</translation>
     </message>
     <message>
         <source>No funds detected in need of denominating.</source>
@@ -4685,7 +7151,7 @@ for example: alertnotify=echo %%s | mail -s "LUX Alert" admin@foo.com
     </message>
     <message>
         <source>Not in the Masternode list.</source>
-        <translation>Not in the Masternode list.</translation>
+        <translation type="vanished">Not in the Masternode list.</translation>
     </message>
     <message>
         <source>Number of automatic wallet backups (default: 10)</source>
@@ -4693,7 +7159,7 @@ for example: alertnotify=echo %%s | mail -s "LUX Alert" admin@foo.com
     </message>
     <message>
         <source>Darksend is idle.</source>
-        <translation>Darksend is idle.</translation>
+        <translation type="vanished">Darksend is idle.</translation>
     </message>
     <message>
         <source>Darksend options:</source>
@@ -4701,11 +7167,11 @@ for example: alertnotify=echo %%s | mail -s "LUX Alert" admin@foo.com
     </message>
     <message>
         <source>Darksend request complete:</source>
-        <translation>Darksend request complete:</translation>
+        <translation type="vanished">Darksend request complete:</translation>
     </message>
     <message>
         <source>Darksend request incomplete:</source>
-        <translation>Darksend request incomplete:</translation>
+        <translation type="vanished">Darksend request incomplete:</translation>
     </message>
     <message>
         <source>Only accept block chain matching built-in checkpoints (default: %u)</source>
@@ -4797,7 +7263,7 @@ for example: alertnotify=echo %%s | mail -s "LUX Alert" admin@foo.com
     </message>
     <message>
         <source>Session timed out.</source>
-        <translation>Session timed out.</translation>
+        <translation type="vanished">Session timed out.</translation>
     </message>
     <message>
         <source>Set database cache size in megabytes (%d to %d, default: %d)</source>
@@ -4845,7 +7311,7 @@ for example: alertnotify=echo %%s | mail -s "LUX Alert" admin@foo.com
     </message>
     <message>
         <source>Signing timed out.</source>
-        <translation>Signing timed out.</translation>
+        <translation type="vanished">Signing timed out.</translation>
     </message>
     <message>
         <source>Signing transaction failed</source>
@@ -4889,15 +7355,15 @@ for example: alertnotify=echo %%s | mail -s "LUX Alert" admin@foo.com
     </message>
     <message>
         <source>Submitted following entries to masternode: %u / %d</source>
-        <translation>Submitted following entries to masternode: %u / %d</translation>
+        <translation type="vanished">Submitted following entries to masternode: %u / %d</translation>
     </message>
     <message>
         <source>Submitted to masternode, waiting for more entries ( %u / %d ) %s</source>
-        <translation>Submitted to masternode, waiting for more entries ( %u / %d ) %s</translation>
+        <translation type="vanished">Submitted to masternode, waiting for more entries ( %u / %d ) %s</translation>
     </message>
     <message>
         <source>Submitted to masternode, waiting in queue %s</source>
-        <translation>Submitted to masternode, waiting in queue %s</translation>
+        <translation type="vanished">Submitted to masternode, waiting in queue %s</translation>
     </message>
     <message>
         <source>InstanTX options:</source>
@@ -4905,31 +7371,31 @@ for example: alertnotify=echo %%s | mail -s "LUX Alert" admin@foo.com
     </message>
     <message>
         <source>Synchronization failed</source>
-        <translation>Synchronization failed</translation>
+        <translation type="vanished">Synchronization failed</translation>
     </message>
     <message>
         <source>Synchronization finished</source>
-        <translation>Synchronization finished</translation>
+        <translation type="vanished">Synchronization finished</translation>
     </message>
     <message>
         <source>Synchronization pending...</source>
-        <translation>Synchronization pending...</translation>
+        <translation type="vanished">Synchronization pending...</translation>
     </message>
     <message>
         <source>Synchronizing budgets...</source>
-        <translation>Synchronizing budgets...</translation>
+        <translation type="vanished">Synchronizing budgets...</translation>
     </message>
     <message>
         <source>Synchronizing masternode winners...</source>
-        <translation>Synchronizing masternode winners...</translation>
+        <translation type="vanished">Synchronizing masternode winners...</translation>
     </message>
     <message>
         <source>Synchronizing masternodes...</source>
-        <translation>Synchronizing masternodes...</translation>
+        <translation type="vanished">Synchronizing masternodes...</translation>
     </message>
     <message>
         <source>Synchronizing sporks...</source>
-        <translation>Synchronizing sporks...</translation>
+        <translation type="vanished">Synchronizing sporks...</translation>
     </message>
     <message>
         <source>This help message</source>
@@ -4945,7 +7411,7 @@ for example: alertnotify=echo %%s | mail -s "LUX Alert" admin@foo.com
     </message>
     <message>
         <source>This is not a Masternode.</source>
-        <translation>This is not a Masternode.</translation>
+        <translation type="vanished">This is not a Masternode.</translation>
     </message>
     <message>
         <source>Threshold for disconnecting misbehaving peers (default: %u)</source>
@@ -4973,15 +7439,15 @@ for example: alertnotify=echo %%s | mail -s "LUX Alert" admin@foo.com
     </message>
     <message>
         <source>Transaction too large for fee policy</source>
-        <translation>Transaction too large for fee policy</translation>
+        <translation type="vanished">Transaction too large for fee policy</translation>
     </message>
     <message>
         <source>Transaction too large</source>
-        <translation>Transaction too large</translation>
+        <translation type="vanished">Transaction too large</translation>
     </message>
     <message>
         <source>Transmitting final transaction.</source>
-        <translation>Transmitting final transaction.</translation>
+        <translation type="vanished">Transmitting final transaction.</translation>
     </message>
     <message>
         <source>Unable to bind to %s on this computer (bind returned error %s)</source>
@@ -4992,12 +7458,12 @@ for example: alertnotify=echo %%s | mail -s "LUX Alert" admin@foo.com
         <translation>Unable to sign spork message, wrong key?</translation>
     </message>
     <message>
-        <source>Unknown network specified in -onlynet: '%s'</source>
-        <translation>Unknown network specified in -onlynet: '%s'</translation>
+        <source>Unknown network specified in -onlynet: &apos;%s&apos;</source>
+        <translation>Unknown network specified in -onlynet: &apos;%s&apos;</translation>
     </message>
     <message>
         <source>Unknown state: id = %u</source>
-        <translation>Unknown state: id = %u</translation>
+        <translation type="vanished">Unknown state: id = %u</translation>
     </message>
     <message>
         <source>Upgrade wallet to latest format</source>
@@ -5077,7 +7543,7 @@ for example: alertnotify=echo %%s | mail -s "LUX Alert" admin@foo.com
     </message>
     <message>
         <source>Will retry...</source>
-        <translation>Will retry...</translation>
+        <translation type="vanished">Will retry...</translation>
     </message>
     <message>
         <source>You need to rebuild the database using -reindex to change -txindex</source>
@@ -5085,11 +7551,11 @@ for example: alertnotify=echo %%s | mail -s "LUX Alert" admin@foo.com
     </message>
     <message>
         <source>Your entries added successfully.</source>
-        <translation>Your entries added successfully.</translation>
+        <translation type="vanished">Your entries added successfully.</translation>
     </message>
     <message>
         <source>Your transaction was accepted into the pool!</source>
-        <translation>Your transaction was accepted into the pool!</translation>
+        <translation type="vanished">Your transaction was accepted into the pool!</translation>
     </message>
     <message>
         <source>Zapping all transactions from wallet...</source>
@@ -5102,6 +7568,513 @@ for example: alertnotify=echo %%s | mail -s "LUX Alert" admin@foo.com
     <message>
         <source>wallet.dat corrupt, salvage failed</source>
         <translation>wallet.dat corrupt, salvage failed</translation>
+    </message>
+    <message>
+        <source> or address book entries might be missing or incorrect</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&apos;importprivkey&apos; finished successfully. Please restart Luxcore wallet with &apos;-rescan&apos; option. Otherwise, transaction data</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&apos;importprivkey&apos; with &apos;Rescan&apos; option finished successfully. Please restart your Luxcore wallet. Otherwise, transaction data</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot obtain a lock on data directory %s. %s is probably already running.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DarkSend uses exact denominated amounts to send funds, you might simply need to anonymize some more coins.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error loading %s: You need to upgrade the wallet to enable HD on a non-HD wallet</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>InstantX requires inputs with at least 6 confirmations, you might need to wait a few minutes and try again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maintain a full EVM log index, used by searchlogs and gettransactionreceipt rpc calls (default: %u)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maintain a full address index, used to query for the balance, txids and unspent outputs for addresses (default: %u)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maintain a full spent index, used to query the spending txid and input index for an outpoint (default: %u)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Make sure to encrypt your wallet and delete all non-encrypted backups after you verified that wallet works!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Prune configured below the minimum of %d MB.  Please use a higher number.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reduce storage requirements by pruning (deleting) old blocks. This mode disables wallet support and is incompatible with -txindex.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rescan aborted by user. Please restart your Luxcore wallet with &apos;-rescan&apos; option. Otherwise, transaction data</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set the number of script verification threads (1 to %d, 0 = auto, &lt;0 = leave that many cores free, default: %d)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The block database contains a block which appears to be from the future. This may be due to your computer&apos;s date and time being set incorrectly. Only rebuild the block database if you are sure that your computer&apos;s date and time are correct</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to locate enough DarkSend denominated funds for this transaction.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to locate enough DarkSend non-denominated funds for this transaction that are not equal 10000 LUX.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use hierarchical deterministic key generation (HD) after bip32. Only has effect during wallet creation/first start</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>User defined memonic passphrase for HD wallet (bip39). Only has effect during wallet creation/first start (default: randomly generated)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>User defined mnemonic for HD wallet (bip39). Only has effect during wallet creation/first start (default: randomly generated)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>User defined seed for HD wallet (should be in hex). Only has effect during wallet creation/first start (default: randomly generated)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning: Reverting this setting requires re-downloading the entire blockchain.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You need to rebuild the database using -reindex to go back to unpruned mode.  This will redownload the entire blockchain</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You need to rebuild the database using -reindex-chainstate to enable -logevents</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(default: %u)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(default: 0 = disable pruning blocks,</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;category&gt; can be:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&gt;%u = target size in MiB to use for block files)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change index out of range</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Collateral is not valid.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copyright (C) 2017-%i The LUX-Core Developers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Darksend is disabled.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable publish hash block in &lt;address&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable publish hash transaction (locked via InstanTX) in &lt;address&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable publish hash transaction in &lt;address&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable publish raw block in &lt;address&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable publish raw transaction (locked via InstanTX) in &lt;address&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable publish raw transaction in &lt;address&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error connecting to masternode.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error loading %s: You can&apos;t disable HD on a already existing HD wallet</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error: A fatal internal error occurred, see debug.log for details</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error: can&apos;t select current denominated inputs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keypool ran out, please call keypoolrefill first</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Last successful darksend action was too recent.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Logs all EVM LOG opcode operations to the file vmExecLogs.json</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Make the wallet broadcast transactions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mnemonic passphrase is too long, must be at most 256 characters</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No compatible masternode found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No masternodes detected.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not in the masternode list.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Prune cannot be configured with a negative value.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Prune mode is incompatible with -txindex.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pruning blockstore...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rebuild chain state from the currently indexed blocks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Session timed out (30 seconds), please resubmit.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set number of debug log files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Signing timed out, please resubmit.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stake your coins to support network and gain reward (default: %s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This is not a masternode.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to generate keys</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to sign masternode payment winner, wrong key?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to start HTTP server. See debug log for details.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown address type &apos;%s&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown change type &apos;%s&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use the SegWit test network</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning: unknown new rules activated (versionbit %i)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Wrong state.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ZeroMQ notification options:</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>tradingDialog</name>
+    <message>
+        <source>Dialog</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>0.00000000</source>
+        <translation type="unfinished">0.00000000</translation>
+    </message>
+    <message>
+        <source>0.000000000</source>
+        <translation type="unfinished">0.000000000</translation>
+    </message>
+    <message>
+        <source>Trade</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bid</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>BTC</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Total w/ 0.25% Fee </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> 0.00000000</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> BTC</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Buy LUX</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>0.00000000 BTC</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bids: 0000</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Supply: 0.00000000 LUX</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sell LUX</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Demand: 0.00000000 LUX</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LUX</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Max</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Asks: 0000</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Units</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>BTC Available:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LUX Available:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> 0.00000000 </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> LUX</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Send</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lowest price:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Amount in LUX:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Total w/ Fees :</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:9pt; font-weight:600;&quot;&gt;Warning:&lt;/span&gt;&lt;span style=&quot; font-size:9pt;&quot;&gt; This feature is in &lt;/span&gt;&lt;span style=&quot; font-size:9pt; font-weight:600;&quot;&gt;ALPHA ! USE AT OWN RISK !&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-weight:600; text-decoration: underline;&quot;&gt;Instructions:&lt;/span&gt;&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;To use the cross sending feature you need to have &lt;/p&gt;&lt;p align=&quot;center&quot;&gt;LUX available to spend on Cryptopia. If you don&apos;t have any &lt;/p&gt;&lt;p align=&quot;center&quot;&gt;you can find your deposit address on the &amp;quot;Balance&amp;quot; tab.&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;1. Enter the amount you want to receive in Bitcoin.&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;2. Enter the Bitcoin address you are sending to.&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;3. Check that the Total with fee&apos;s is correct.&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;4. Press send and watch the magic happen.&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-weight:600; text-decoration: underline;&quot;&gt;Notes.&lt;/span&gt;&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:7pt;&quot;&gt;Total w/ fees: N/A means you dont have enough LUX to sell !&lt;/span&gt;&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:7pt;&quot;&gt;All trades are done through Cryptopia using your own balance and API keys.&lt;/span&gt;&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:7pt;&quot;&gt;Encrypt and backup your wallet when using this feature.&lt;/span&gt;&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:7pt;&quot;&gt;If you don&apos;t have a password you Cryptopia account will be accessible 24/7&lt;/span&gt;&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:7pt;&quot;&gt;Withdrawal fee of 0.002 and 0.25% taken by Cryptopia.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Amount:</source>
+        <translation type="unfinished">Amount:</translation>
+    </message>
+    <message>
+        <source>Address:</source>
+        <translation type="unfinished">Address:</translation>
+    </message>
+    <message>
+        <source>LUX Balance:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>BTC Balance:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Paste from clipboard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Alt+P</source>
+        <translation type="unfinished">Alt+P</translation>
+    </message>
+    <message>
+        <source>Cross-Send</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Market History</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Orders</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Trade history</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Balance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LUX Pending:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>BTC Pending:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Generate LUX Coin Deposit Address</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Deposit Address:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copy to clipboard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Withdraw LUX:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Withdraw</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>API Key</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Secret Key</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Password</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Load API Keys</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Update API Keys</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save API Keys</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Loading keys:&lt;/p&gt;&lt;p&gt;1) Enter Password&lt;/p&gt;&lt;p&gt;2) Load API Keys&lt;/p&gt;&lt;p&gt;3) Start trading on Cryptopia&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Saving keys:&lt;/p&gt;&lt;p&gt;1) Enter in API Keys found at &lt;a href=&quot;https://Cryptopia.co.nz/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Cryptopia&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;2) Enter Password&lt;/p&gt;&lt;p&gt;3) Save API Keys&lt;/p&gt;&lt;p&gt;4) Start trading on Cryptopia&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel Order</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>
