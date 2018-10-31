@@ -15,8 +15,6 @@
 #include "utilmoneystr.h"
 #include "utilstrencodings.h"
 
-#include <boost/assign/list_of.hpp>
-
 using namespace std;
 
 UniValue ValueFromAmount(const CAmount& amount)
@@ -65,13 +63,14 @@ string FormatScript(const CScript& script)
     return ret.substr(0, ret.size() - 1);
 }
 
-const map<unsigned char, string> mapSigHashTypes = boost::assign::map_list_of
-                (static_cast<unsigned char>(SIGHASH_ALL), string("ALL"))
-                (static_cast<unsigned char>(SIGHASH_ALL|SIGHASH_ANYONECANPAY), string("ALL|ANYONECANPAY"))
-                (static_cast<unsigned char>(SIGHASH_NONE), string("NONE"))
-                (static_cast<unsigned char>(SIGHASH_NONE|SIGHASH_ANYONECANPAY), string("NONE|ANYONECANPAY"))
-                (static_cast<unsigned char>(SIGHASH_SINGLE), string("SINGLE"))
-                (static_cast<unsigned char>(SIGHASH_SINGLE|SIGHASH_ANYONECANPAY), string("SINGLE|ANYONECANPAY"));
+const map<unsigned char, string> mapSigHashTypes = {
+        {static_cast<unsigned char>(SIGHASH_ALL), string("ALL")},
+        {static_cast<unsigned char>(SIGHASH_ALL|SIGHASH_ANYONECANPAY), string("ALL|ANYONECANPAY")},
+        {static_cast<unsigned char>(SIGHASH_NONE), string("NONE")},
+        {static_cast<unsigned char>(SIGHASH_NONE|SIGHASH_ANYONECANPAY), string("NONE|ANYONECANPAY")},
+        {static_cast<unsigned char>(SIGHASH_SINGLE), string("SINGLE")},
+        {static_cast<unsigned char>(SIGHASH_SINGLE|SIGHASH_ANYONECANPAY), string("SINGLE|ANYONECANPAY")},
+};
 
 /**
  * Create the assembly string representation of a CScript object.

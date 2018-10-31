@@ -25,12 +25,10 @@
 
 #include <stdint.h>
 
-#include <boost/assign/list_of.hpp>
 #include "univalue/univalue.h"
 #include "rpcutil.h"
 
 using namespace boost;
-using namespace boost::assign;
 using namespace std;
 
 /**
@@ -604,7 +602,7 @@ UniValue setmocktime(const UniValue& params, bool fHelp)
 
     LOCK(cs_main);
 
-    RPCTypeCheck(params, boost::assign::list_of(UniValue::VNUM));
+    RPCTypeCheck(params, {UniValue::VNUM});
     SetMockTime(params[0].get_int64());
 
     return NullUniValue;

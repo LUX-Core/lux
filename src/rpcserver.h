@@ -21,6 +21,15 @@
 
 class CRPCCommand;
 
+/** Wrapper for UniValue::VType, which includes typeAny:
+ * Used to denote don't care type. Only used by RPCTypeCheckObj */
+struct UniValueType {
+    UniValueType(UniValue::VType _type) : typeAny(false), type(_type) {}
+    UniValueType() : typeAny(true) {}
+    bool typeAny;
+    UniValue::VType type;
+};
+
 namespace RPCServer
 {
     void OnStarted(boost::function<void ()> slot);
@@ -192,8 +201,9 @@ void RPCTypeCheck(const UniValue& params,
  * Use like: RPCTypeCheck(object, boost::assign::map_list_of("name", str_type)("value", int_type));
  */
 void RPCTypeCheckObj(const UniValue& o,
-    const std::map<std::string, UniValue::VType>& typesExpected,
-    bool fAllowNull = false);
+    const std::map<std::string, UniValueType>& typesExpected,
+    bool fAllowNull = false,
+    bool fStrict = false);
 
 /**
  * Run func nSeconds from now. Uses boost deadline timers.

@@ -29,11 +29,9 @@
 
 #include "univalue/univalue.h"
 #include "rpcutil.h"
-#include <boost/assign/list_of.hpp>
 
 using namespace std;
 using namespace boost;
-using namespace boost::assign;
 struct CUpdatedBlock
 {
     uint256 hash;
@@ -2214,9 +2212,9 @@ UniValue lockunspent(const UniValue& params, bool fHelp)
     LOCK2(cs_main, pwalletMain->cs_wallet);
 
     if (params.size() == 1)
-        RPCTypeCheck(params, boost::assign::list_of(UniValue::VBOOL));
+        RPCTypeCheck(params, {UniValue::VBOOL});
     else
-        RPCTypeCheck(params, boost::assign::list_of(UniValue::VBOOL)(UniValue::VARR));
+        RPCTypeCheck(params, {UniValue::VBOOL, UniValue::VARR});
 
     bool fUnlock = params[0].get_bool();
 
@@ -2233,7 +2231,7 @@ UniValue lockunspent(const UniValue& params, bool fHelp)
             throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter, expected object");
         const UniValue& o = output.get_obj();
 
-        RPCTypeCheckObj(o, boost::assign::map_list_of("txid", UniValue::VSTR)("vout", UniValue::VNUM));
+        RPCTypeCheckObj(o, {{"txid", UniValueType(UniValue::VSTR)}, {"vout", UniValueType(UniValue::VNUM)},});
 
         string txid = find_value(o, "txid").get_str();
         if (!IsHex(txid))

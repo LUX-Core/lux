@@ -104,18 +104,30 @@ void RPCTypeCheck(const UniValue& params,
 }
 
 void RPCTypeCheckObj(const UniValue& o,
-    const map<string, UniValue::VType>& typesExpected,
-    bool fAllowNull)
+    const map<string, UniValueType>& typesExpected,
+    bool fAllowNull,
+    bool fStrict)
 {
-    for (const PAIRTYPE(string, UniValue::VType) & t : typesExpected) {
+    for (const auto& t : typesExpected) {
         const UniValue& v = find_value(o, t.first);
         if (!fAllowNull && v.isNull())
             throw JSONRPCError(RPC_TYPE_ERROR, strprintf("Missing %s", t.first));
 
-        if (!((v.type() == t.second) || (fAllowNull && (v.isNull())))) {
+        if (!(t.second.typeAny || v.type() == t.second.type || (fAllowNull && v.isNull()))) {
             string err = strprintf("Expected type %s for %s, got %s",
-                uvTypeName(t.second), t.first, uvTypeName(v.type()));
+                uvTypeName(t.second.type), t.first, uvTypeName(v.type()));
             throw JSONRPCError(RPC_TYPE_ERROR, err);
+        }
+    }
+    if (fStrict)
+    {
+        for (const string& k : o.getKeys())
+        {
+            if (typesExpected.count(k) == 0)
+            {
+                string err = strprintf("Unexpected key %s", k);
+                throw JSONRPCError(RPC_TYPE_ERROR, err);
+            }
         }
     }
 }

@@ -30,8 +30,6 @@
 
 #include <stdint.h>
 
-#include <boost/assign/list_of.hpp>
-
 #include "univalue/univalue.h"
 
 using namespace std;
@@ -1023,7 +1021,7 @@ UniValue estimatefee(const UniValue& params, bool fHelp)
             "\nExample:\n" +
             HelpExampleCli("estimatefee", "6"));
 
-    RPCTypeCheck(params, boost::assign::list_of(UniValue::VNUM));
+    RPCTypeCheck(params, {UniValue::VNUM});
 
     int nBlocks = params[0].get_int();
     if (nBlocks < 1)
@@ -1054,7 +1052,7 @@ UniValue estimatepriority(const UniValue& params, bool fHelp)
             "\nExample:\n" +
             HelpExampleCli("estimatepriority", "6"));
 
-    RPCTypeCheck(params, boost::assign::list_of(UniValue::VNUM));
+    RPCTypeCheck(params, {UniValue::VNUM});
 
     int nBlocks = params[0].get_int();
     if (nBlocks < 1)
@@ -1087,7 +1085,7 @@ UniValue estimatesmartfee(const UniValue& params, bool fHelp)
             + HelpExampleCli("estimatesmartfee", "6")
             );
 
-    RPCTypeCheck(params, boost::assign::list_of(UniValue::VNUM));
+    RPCTypeCheck(params, {UniValue::VNUM});
 
     int nBlocks = params[0].get_int();
 
@@ -1123,7 +1121,7 @@ UniValue estimatesmartpriority(const UniValue& params, bool fHelp)
             + HelpExampleCli("estimatesmartpriority", "6")
             );
 
-    RPCTypeCheck(params, boost::assign::list_of(UniValue::VNUM));
+    RPCTypeCheck(params, {UniValue::VNUM});
 
     int nBlocks = params[0].get_int();
 

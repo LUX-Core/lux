@@ -15,8 +15,6 @@
 
 #include <assert.h>
 
-#include <boost/assign/list_of.hpp>
-
 ///////////////////////////////////////////// // lux
 #include <libdevcore/SHA3.h>
 #include <libdevcore/RLP.h>
@@ -24,7 +22,6 @@
 /////////////////////////////////////////////
 
 using namespace std;
-using namespace boost::assign;
 
 struct SeedSpec6 {
     uint8_t addr[16];
@@ -79,21 +76,20 @@ static void convertSeed6(std::vector<CAddress>& vSeedsOut, const SeedSpec6* data
 //   (no blocks before with a timestamp after, none after with
 //    timestamp before)
 // + Contains no strange transactions
-static Checkpoints::MapCheckpoints mapCheckpoints =
-        boost::assign::map_list_of
-                ( 0,   uint256("0x00000759bb3da130d7c9aedae170da8335f5a0d01a9007e4c8d3ccd08ace6a42") )
-                ( 175,   uint256("0x000000000002611e8e3c2e460e7fcd0a39ee210b9915fc76a5573a0704bb2b33") )
-                ( 2241,   uint256("0x69e2e47fb84085c4b82b6090f701c7ac03a4e510bd1f41cc072c33061cf83a0d") )
-                ( 6901,   uint256("0x0000000000034bab666179e364e0cce7c19eaa255f1e4afd2170356acfa1a3ac") )
-                ( 25318,   uint256("0x092a04ee669d2d2241aba0ec9dcecb548c9cea9ff114b0ee52cdc7ddac98a1f4") )
-                ( 97176,   uint256("0x000000000004e4aac7926e7dbd778f21b15b62f0e4c1d424ac9e5a9889c1724a") )
-                ( 122237,   uint256("0x10f6d17326a0c439f61a21c44a172885469bb60668a0d77be82eead7209183b0") )
-                ( 203690,   uint256("0x00000000000180e78502c3c952f00bf8bba2bc9ffef60e7188c8763582f26ef4") )
-                ( 293220,   uint256("0xe90c89ff18e00b49be312aff64bcc18cba753ff36dde5c7fc216029d7bc2b457") )
-                ( 299500,   uint256("0x94c34653c7b107662f1f44d085be5817d03f8d3f0b3c29b970ce25eb44e03743") )
-                ( 303112,   uint256("0x0000000000026621b448ad1288a7f9762e78a0ef5ab87fcbc016cddc3ded4356") )
-                ( 350095,   uint256("0x000000000007726c464bbdb9bcffc3baf044333f88b79882aa0aefcbe6f0f881") )
-;
+static Checkpoints::MapCheckpoints mapCheckpoints = {
+        {0, uint256("0x00000759bb3da130d7c9aedae170da8335f5a0d01a9007e4c8d3ccd08ace6a42")},
+                {175, uint256("0x000000000002611e8e3c2e460e7fcd0a39ee210b9915fc76a5573a0704bb2b33")},
+                {2241, uint256("0x69e2e47fb84085c4b82b6090f701c7ac03a4e510bd1f41cc072c33061cf83a0d")},
+                {6901, uint256("0x0000000000034bab666179e364e0cce7c19eaa255f1e4afd2170356acfa1a3ac")},
+                {25318, uint256("0x092a04ee669d2d2241aba0ec9dcecb548c9cea9ff114b0ee52cdc7ddac98a1f4")},
+                {97176, uint256("0x000000000004e4aac7926e7dbd778f21b15b62f0e4c1d424ac9e5a9889c1724a")},
+                {122237, uint256("0x10f6d17326a0c439f61a21c44a172885469bb60668a0d77be82eead7209183b0")},
+                {203690, uint256("0x00000000000180e78502c3c952f00bf8bba2bc9ffef60e7188c8763582f26ef4")},
+                {293220, uint256("0xe90c89ff18e00b49be312aff64bcc18cba753ff36dde5c7fc216029d7bc2b457")},
+                {299500, uint256("0x94c34653c7b107662f1f44d085be5817d03f8d3f0b3c29b970ce25eb44e03743")},
+                {303112, uint256("0x0000000000026621b448ad1288a7f9762e78a0ef5ab87fcbc016cddc3ded4356")},
+                {350095, uint256("0x000000000007726c464bbdb9bcffc3baf044333f88b79882aa0aefcbe6f0f881")},
+};
 
 static const Checkpoints::CCheckpointData data = {
         &mapCheckpoints,
@@ -103,8 +99,8 @@ static const Checkpoints::CCheckpointData data = {
         350058        // * estimated number of transactions per day after checkpoint
 };
 
-static Checkpoints::MapCheckpoints mapCheckpointsTestnet =
-    boost::assign::map_list_of(0, uint256("0"));
+static Checkpoints::MapCheckpoints mapCheckpointsTestnet = {
+    {0, uint256("0")},};
 static const Checkpoints::CCheckpointData dataTestnet = {
     &mapCheckpointsTestnet,
     0,
@@ -112,8 +108,8 @@ static const Checkpoints::CCheckpointData dataTestnet = {
     0
 };
 
-static Checkpoints::MapCheckpoints mapCheckpointsRegtest =
-    boost::assign::map_list_of(0, uint256("0"));
+static Checkpoints::MapCheckpoints mapCheckpointsRegtest = {
+    {0, uint256("0")},};
 static const Checkpoints::CCheckpointData dataRegtest = {
     &mapCheckpointsRegtest,
     0,
@@ -121,8 +117,8 @@ static const Checkpoints::CCheckpointData dataRegtest = {
     0
 };
 
-static Checkpoints::MapCheckpoints mapCheckpointsSegWittest =
-        boost::assign::map_list_of(0, uint256("0"));
+static Checkpoints::MapCheckpoints mapCheckpointsSegWittest = {
+        {0, uint256("0")},};
 static const Checkpoints::CCheckpointData dataSegwittest = {
         &mapCheckpointsSegWittest,
         0,
@@ -235,8 +231,8 @@ public:
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,48); // LUX address start with 'L'
         base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1,63); // LUX script addresses start with 'S'
         base58Prefixes[SECRET_KEY]     = std::vector<unsigned char>(1,155);
-        base58Prefixes[EXT_PUBLIC_KEY] = boost::assign::list_of(0x07)(0x28)(0xA2)(0x4E).convert_to_container<std::vector<unsigned char> >();
-        base58Prefixes[EXT_SECRET_KEY] = boost::assign::list_of(0x03)(0xD8)(0xA1)(0xE5).convert_to_container<std::vector<unsigned char> >();
+        base58Prefixes[EXT_PUBLIC_KEY] = {0x07, 0x28, 0xA2, 0x4E};
+        base58Prefixes[EXT_SECRET_KEY] = {0x03, 0xD8, 0xA1, 0xE5};
 
         bech32_hrp = "bc";
 
@@ -359,11 +355,11 @@ public:
         base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1, 63);  // Testnet lux script addresses start with 'S'
         base58Prefixes[SECRET_KEY] = std::vector<unsigned char>(1, 155);     // Testnet private keys start with '9' or 'c' (Bitcoin defaults)
         // Testnet lux BIP32 pubkeys start with 'DRKV'
-        base58Prefixes[EXT_PUBLIC_KEY] = boost::assign::list_of(0x3a)(0x80)(0x61)(0xa0).convert_to_container<std::vector<unsigned char> >();
+        base58Prefixes[EXT_PUBLIC_KEY] = {0x3a, 0x80, 0x61, 0xa0};
         // Testnet lux BIP32 prvkeys start with 'DRKP'
-        base58Prefixes[EXT_SECRET_KEY] = boost::assign::list_of(0x3a)(0x80)(0x58)(0x37).convert_to_container<std::vector<unsigned char> >();
+        base58Prefixes[EXT_SECRET_KEY] = {0x3a, 0x80, 0x58, 0x37};
         // Testnet lux BIP44 coin type is '1' (All coin's testnet default)
-        base58Prefixes[EXT_COIN_TYPE] = boost::assign::list_of(0x01)(0x00)(0x00)(0x80).convert_to_container<std::vector<unsigned char> >();
+        base58Prefixes[EXT_COIN_TYPE] = {0x01, 0x00, 0x00, 0x80};
 
         bech32_hrp = "tb";
 
@@ -578,8 +574,8 @@ public:
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,48); // LUX Start letter L
         base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1,64);
         base58Prefixes[SECRET_KEY]     = std::vector<unsigned char>(1,155);
-        base58Prefixes[EXT_PUBLIC_KEY] = boost::assign::list_of(0x07)(0x28)(0xA2)(0x4E).convert_to_container<std::vector<unsigned char> >();
-        base58Prefixes[EXT_SECRET_KEY] = boost::assign::list_of(0x03)(0xD8)(0xA1)(0xE5).convert_to_container<std::vector<unsigned char> >();
+        base58Prefixes[EXT_PUBLIC_KEY] = {0x07, 0x28, 0xA2, 0x4E};
+        base58Prefixes[EXT_SECRET_KEY] = {0x03, 0xD8, 0xA1, 0xE5};
 
         fMiningRequiresPeers = true;
         fDefaultConsistencyChecks = false;
