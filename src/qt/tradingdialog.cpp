@@ -47,6 +47,7 @@
 #include <algorithm>
 #include <functional>
 
+#include <QMessageBox>
 using namespace std;
 
 tradingDialog::tradingDialog(QWidget *parent) :
@@ -58,6 +59,16 @@ tradingDialog::tradingDialog(QWidget *parent) :
     ui->setupUi(this);
     timerid = 0;
     qDebug() <<  "Expected this";
+
+    //chartTest
+    {
+        auto wgts = ui->BuyTab->findChildren<QWidget *>();
+        foreach(auto wgt, wgts)
+            wgt->hide();
+        foreach(auto wgt, wgts)
+            wgt->hide();
+        ui->priceChart->show();
+    }
 
 
     QVBoxLayout* plotLay = new QVBoxLayout();
@@ -81,7 +92,8 @@ tradingDialog::tradingDialog(QWidget *parent) :
     ui->CSReceiveLabel->setTextFormat(Qt::RichText);
 
     //Set tabs to inactive
-    ui->TradingTabWidget->setTabEnabled(0,false);
+    //chartTest
+    //ui->TradingTabWidget->setTabEnabled(0,false);
     ui->TradingTabWidget->setTabEnabled(1,false);
     ui->TradingTabWidget->setTabEnabled(3,false);
     ui->TradingTabWidget->setTabEnabled(4,false);
@@ -610,63 +622,66 @@ void tradingDialog::ParseAndPopulateMarketHistoryTable(QString Response){
     obj.empty();
 }
 
+void tradingDialog::ParseAndPopulatePriceChart(QString Response)
+{
+    QJsonArray allCandles = QJsonDocument::fromJson(Response.toUtf8()).
+            object()["Candle"].toArray();
 
-void tradingDialog::ParseAndPopulatePriceChart(QString Response){
+    if(allCandles.isEmpty())
+        return;
 
-    int itteration = 0;
-    QJsonArray    jsonArray    = GetResultArrayFromJSONObject(Response);
-    QJsonObject   obj;
-    double binSize = 60*15;
+    QCPFinancialDataContainer financialData;
+    double min_time = allCandles.first().toArray()[0].toDouble()/1000;
+    double max_time= allCandles.last().toArray()[0].toDouble()/1000;
 
-    QVector<double> time(jsonArray.size()), price(jsonArray.size());
+    for(int i=0; i<allCandles.size(); i++)
+        financialData.add(QCPFinancialData(
+                allCandles[i].toArray()[0].toDouble()/1000,
+                allCandles[i].toArray()[1].toDouble(),
+                allCandles[i].toArray()[2].toDouble(),
+                allCandles[i].toArray()[3].toDouble(),
+                allCandles[i].toArray()[4].toDouble()));
 
-    Q_FOREACH (const QJsonValue & value, jsonArray)
-    {
-        QString str = "";
-        obj = value.toObject();
-
-
-        time[itteration] = obj["Timestamp"].toDouble();
-        price[itteration] = obj["Price"].toDouble();
-
-        itteration++;
-    }
-    obj.empty();
-
-
-    std::reverse(price.begin(), price.end());
-    std::reverse(time.begin(), time.end());
-
-    double min_time = *std::min_element(time.constBegin(), time.constEnd());
-    double max_time = *std::max_element(time.constBegin(), time.constEnd());
-
-    double min_price = *std::min_element(price.constBegin(), price.constEnd());
-    double max_price = *std::max_element(price.constBegin(), price.constEnd());
-    double diff_price = max_price - min_price;
-
-    ohlc->data()->set(QCPFinancial::timeSeriesToOhlc(time, price, binSize/3.0, min_time)); // divide binSize by 3 just to make the ohlc bars a bit denser
+    //TODO: add comboBox with dataGroup
+    // and variable, which will be used here
+    double binSize = 15*60;
+    ohlc->data()->set(financialData);
     ohlc->setWidth(binSize*0.2);
     ohlc->setTwoColored(true);
 
     derPlot->xAxis->setLabel("Time (GMT)");
     derPlot->yAxis->setLabel("LUX Price in BTC");
 
-    QCPAxisRect *volumeAxisRect = new QCPAxisRect(derPlot);
+    //QCPAxisRect *volumeAxisRect = new QCPAxisRect(derPlot);
     QSharedPointer<QCPAxisTickerDateTime> dateTimeTicker(new QCPAxisTickerDateTime);
     dateTimeTicker->setDateTimeSpec(Qt::UTC);
     dateTimeTicker->setDateTimeFormat("dd.MM.yy(hh:mm)");
-    volumeAxisRect->axis(QCPAxis::atBottom)->setTicker(dateTimeTicker);
-    volumeAxisRect->axis(QCPAxis::atBottom)->setTickLabelRotation(15);
+//    volumeAxisRect->axis(QCPAxis::atBottom)->setTicker(dateTimeTicker);
+//    volumeAxisRect->axis(QCPAxis::atBottom)->setTickLabelRotation(15);
     derPlot->xAxis->setBasePen(Qt::NoPen);
     derPlot->xAxis->setTicker(dateTimeTicker);
     derPlot->rescaleAxes();
-    derPlot->xAxis->setRange(min_time, max_time+5);
+    derPlot->xAxis->setRange(max_time - 24*60*60, max_time+5);
+
+    //TODO: find function in customPlot to setRange to yAxis (if function exist)
+    double max_price = (*(financialData.end()- 1)).high;
+    double min_price = (*(financialData.end() - 1)).low;
+    for (auto it = financialData.end() - 1;
+         it != financialData.begin(); it--)
+    {
+        if((*it).key < max_time - 24*60*60)
+            break;
+        if((*it).high > max_price)
+            max_price = (*it).high;
+        if((*it).low < min_price)
+            min_price = (*it).low;
+    }
     derPlot->xAxis->scaleRange(1.025, derPlot->xAxis->range().center());
-    derPlot->yAxis->setRange(min_price-0.2*diff_price, max_price+0.2*diff_price);
+    auto diff_price = max_price - min_price;
+    derPlot->yAxis->setRange(min_price - 0.2*diff_price,
+                             max_price + 0.2*diff_price);
 
     derPlot->replot();
-
-
 }
 
 void tradingDialog::ActionsOnSwitch(int index = -1){
@@ -693,8 +708,14 @@ void tradingDialog::ActionsOnSwitch(int index = -1){
             f = std::bind(&tradingDialog::showOrderBookOnTradingTab, this);
             sendRequest1("https://www.cryptopia.co.nz/api/GetMarketOrders/LUX_BTC", f);
 
+//            f = std::bind(&tradingDialog::showMarketHistoryOnTradingTab, this);
+//            sendRequest1(QString("https://www.cryptopia.co.nz/api/GetMarketHistory/LUX_BTC"), f);
+
+            //TODO: Is tradePairId==const? If no 1)https://www.cryptopia.co.nz/api/GetMarket/LUX_BTC
+            //2) this request
             f = std::bind(&tradingDialog::showMarketHistoryOnTradingTab, this);
-            sendRequest1(QString("https://www.cryptopia.co.nz/api/GetMarketHistory/LUX_BTC"), f);
+            sendRequest1(QString("https://www.cryptopia.co.nz/Exchange/"
+                                 "GetTradePairChart?tradePairId=5643&dataRange=2&dataGroup=15"), f);
 
             break;
 
@@ -1009,6 +1030,7 @@ void tradingDialog::showOrderBookOnTradingTab() {
         ParseAndPopulateOrderBookTables(Response);
     }
 }
+
 
 void tradingDialog::showMarketHistoryOnTradingTab() {
     QNetworkReply *reply = qobject_cast<QNetworkReply *>(sender());
