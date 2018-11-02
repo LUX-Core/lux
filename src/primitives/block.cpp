@@ -146,17 +146,16 @@ void CBlock::print() const
     LogPrintf("%s", ToString());
 }
 
+typedef std::vector<unsigned char> valtype;
 // ppcoin: sign block
 bool CBlock::SignBlock(const CKeyStore& keystore)
 {
     std::vector<valtype> vSolutions;
     txnouttype whichType;
 
-    if (IsProofOfStake()) {
+    if(!IsProofOfStake()) {
         // if we are trying to sign
         //    a complete proof-of-stake block
-        return vtx[0].vout[0].IsEmpty() && vtx.size() > 1 && vtx[1].IsCoinStake();
-    } else {
         for (unsigned int i = 0; i < vtx[0].vout.size(); i++) {
             const CTxOut& txout = vtx[0].vout[i];
 
@@ -178,22 +177,50 @@ bool CBlock::SignBlock(const CKeyStore& keystore)
                 return true;
             }
         }
-    }
+    } else {
+        for (unsigned int j = 1; j < vtx[1].vout.size(); j++) {
+            const CTxOut &txout = vtx[1].vout[j];
 
+            if (!Solver(txout.scriptPubKey, whichType, vSolutions))
+                continue;
+
+            if (whichType != TX_PUBKEY && whichType != TX_PUBKEYHASH) {
+                break;
+            } else if (whichType == TX_PUBKEYHASH) {
+                // Sign
+                CKeyID keyID;
+                keyID = CKeyID(uint160(vSolutions[0]));
+
+                CKey key;
+                if (!keystore.GetKey(keyID, key))
+                    return false;
+
+                if (!key.Sign(GetHash(), vchBlockSig))
+                    return false;
+
+                return true;
+            } else if (whichType == TX_PUBKEY) {
+                // Sign
+                const valtype& vchPubKey = vSolutions[0];
+                CKey key;
+                CPubKey pubKey(vchPubKey);
+                if (!keystore.GetKey(pubKey.GetID(), key))
+                    return false;
+                if (key.GetPubKey() != pubKey)
+                    return false;
+                return key.Sign(GetHash(), vchBlockSig, 0);
+            }
+            return false;
+            }
+        }
     LogPrintf("Sign failed\n");
     return false;
 }
 
 bool CBlock::CheckBlockSignature() const
 {
-    if (IsProofOfWork())
+    if (GetHash() == Params().GetConsensus().hashGenesisBlock || !IsProofOfStake())
         return vchBlockSig.empty();
-
-    if (IsProofOfStake()) {
-        // if we are trying to sign
-        //    a complete proof-of-stake block
-        return vtx[0].vout[0].IsEmpty();
-    }
 
     std::vector<valtype> vSolutions;
     txnouttype whichType;
