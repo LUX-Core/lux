@@ -469,14 +469,14 @@ static void MutateTxSign(CMutableTransaction& tx, const string& flagStr)
             return;
         }
         const CAmount& amount = txPrev.vout[txin.prevout.n].nValue;
-        SignatureData sigdata;
+        SignatureData sigdata = DataFromTransaction(mergedTx, i, coins->vout[txin.prevout.n]);
         // Only sign SIGHASH_SINGLE if there's a corresponding output:
         if (!fHashSingle || (i < mergedTx.vout.size()))
             ProduceSignature(MutableTransactionSignatureCreator(&keystore, &mergedTx, i, amount, nHashType), prevPubKey, sigdata);
 
         // ... and merge in other signatures:
         for (const CTransaction& txv : txVariants) {
-            sigdata = CombineSignatures(prevPubKey, MutableTransactionSignatureChecker(&mergedTx, i, amount), sigdata, DataFromTransaction(txv, i));
+            sigdata = CombineSignatures(prevPubKey, MutableTransactionSignatureChecker(&mergedTx, i, amount), sigdata, DataFromTransaction(txv, i, coins->vout[txin.prevout.n]));
         }
 
         UpdateTransaction(mergedTx, i, sigdata);

@@ -96,7 +96,7 @@ bool SignSignature(const CKeyStore& keystore, const CTransaction& txFrom, CMutab
 SignatureData CombineSignatures(const CScript& scriptPubKey, const BaseSignatureChecker& checker, const SignatureData& scriptSig1, const SignatureData& scriptSig2);
 
 /** Extract signature data from a transaction, and insert it. */
-SignatureData DataFromTransaction(const CMutableTransaction& tx, unsigned int nIn);
+SignatureData DataFromTransaction(const CMutableTransaction& tx, unsigned int nIn, const CTxOut& txout);
 void UpdateTransaction(CMutableTransaction& tx, unsigned int nIn, const SignatureData& data);
 
 /* Check whether we know how to sign for an output like this, assuming we

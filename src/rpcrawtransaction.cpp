@@ -720,11 +720,11 @@ UniValue signrawtransaction(const UniValue& params, bool fHelp)
         const CAmount& amount = coins->vout[txin.prevout.n].nValue;
 
         txin.scriptSig.clear();
-        SignatureData sigdata;
+        SignatureData sigdata = DataFromTransaction(mergedTx, i, coins->vout[txin.prevout.n]);
         // Only sign SIGHASH_SINGLE if there's a corresponding output:
         if (!fHashSingle || (i < mergedTx.vout.size()))
             ProduceSignature(MutableTransactionSignatureCreator(&keystore, &mergedTx, i, amount, nHashType), prevPubKey, sigdata);
-        sigdata = CombineSignatures(prevPubKey, TransactionSignatureChecker(&txConst, i, amount), sigdata, DataFromTransaction(mergedTx, i));
+        sigdata = CombineSignatures(prevPubKey, TransactionSignatureChecker(&txConst, i, amount), sigdata, DataFromTransaction(mergedTx, i, coins->vout[txin.prevout.n]));
 
         UpdateTransaction(mergedTx, i, sigdata);
 
