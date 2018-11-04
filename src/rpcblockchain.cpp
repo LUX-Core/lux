@@ -618,8 +618,8 @@ UniValue searchlogs(const UniValue& params, bool fHelp)
                 "4. \"topics\"           (string, optional) An array of values from which at least one must appear in the log entries. The order is important, if you want to leave topics out use null, e.g. [\"null\", \"0x00...\"]. \n"
                 "5. \"minconf\"          (uint, optional, default=0) Minimal number of confirmations before a log is returned\n"
                 "\nExamples:\n"
-                + HelpExampleCli("searchlogs", "0 100 '{\"addresses\": [\"12ae42729af478ca92c8c66773a3e32115717be4\"]}' '{\"topics\": [\"null\",\"b436c2bf863ccd7b8f63171201efd4792066b4ce8e543dde9c3e9e9ab98e216c\"]}'")
-                + HelpExampleRpc("searchlogs", "0 100 {\"addresses\": [\"12ae42729af478ca92c8c66773a3e32115717be4\"]} {\"topics\": [\"null\",\"b436c2bf863ccd7b8f63171201efd4792066b4ce8e543dde9c3e9e9ab98e216c\"]}")
+                + HelpExampleCli("searchlogs", "0 472000 '{\"addresses\": [\"04159f89d938b5d2de4b67bdbf482f788a97946a\"]}' '{\"topics\": [\"null\",\"ddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef\"]}'")
+                + HelpExampleRpc("searchlogs", "0 472000 {\"addresses\": [\"04159f89d938b5d2de4b67bdbf482f788a97946a\"]} {\"topics\": [\"null\",\"ddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef\"]}")
         );
 
     if(!fLogEvents)
@@ -687,6 +687,170 @@ UniValue searchlogs(const UniValue& params, bool fHelp)
             }
         }
     }
+
+    return result;
+}
+
+class WaitForLogsParams {
+public:
+    int fromBlock;
+    int toBlock;
+
+    size_t minconf;
+
+    std::set<dev::h160> addresses;
+    std::vector<boost::optional<dev::h256>> topics;
+
+    // bool wait;
+
+    WaitForLogsParams(const UniValue& params) {
+        std::unique_lock<std::mutex> lock(cs_blockchange);
+
+        fromBlock = parseBlockHeight(params[0], latestblock.height + 1);
+        toBlock = parseBlockHeight(params[1], -1);
+
+        parseFilter(params[2]);
+        minconf = parseUInt(params[3], 6);
+    }
+
+private:
+    void parseFilter(const UniValue& val) {
+        if (val.isNull()) {
+            return;
+        }
+
+        parseParam(val["addresses"], addresses);
+        parseParam(val["topics"], topics);
+    }
+};
+
+UniValue waitforlogs(const UniValue& params, bool fHelp) {
+    if (fHelp) {
+        throw std::runtime_error(
+                "waitforlogs (fromBlock) (toBlock) (filter) (minconf)\n"
+                "requires -logevents to be enabled\n"
+                "\nWaits for a new logs and return matching log entries. When the call returns, it also specifies the next block number to start waiting for new logs.\n"
+                "By calling waitforlogs repeatedly using the returned nextBlock number, a client can receive a stream of the current log entires.\n"
+                "\nThis call is different from the similarly named waitforlogs. This call returns individual matching log entries, `searchlogs` returns a transaction receipt if one of the log entries of that transaction matches the filter conditions.\n"
+                "\nArguments:\n"
+                "1. fromBlock (int | \"latest\", optional, default=null) The block number to start looking for logs. ()\n"
+                "2. toBlock   (int | \"latest\", optional, default=null) The block number to stop looking for logs. If null, will wait indefinitely into the future.\n"
+                "3. filter    ({ addresses?: Hex160String[], topics?: Hex256String[] }, optional default={}) Filter conditions for logs. Addresses and topics are specified as array of hexadecimal strings\n"
+                "4. minconf   (uint, optional, default=6) Minimal number of confirmations before a log is returned\n"
+                "\nResult:\n"
+                "An object with the following properties:\n"
+                "1. logs (LogEntry[]) Array of matchiing log entries. This may be empty if `filter` removed all entries."
+                "2. count (int) How many log entries are returned."
+                "3. nextBlock (int) To wait for new log entries haven't seen before, use this number as `fromBlock`"
+                "\nUsage:\n"
+                "`waitforlogs` waits for new logs, starting from the tip of the chain.\n"
+                "`waitforlogs 600` waits for new logs, but starting from block 600. If there are logs available, this call will return immediately.\n"
+                "`waitforlogs 600 700` waits for new logs, but only up to 700th block\n"
+                "`waitforlogs null null` this is equivalent to `waitforlogs`, using default parameter values\n"
+                "`waitforlogs null null` { \"addresses\": [ \"ff0011...\" ], \"topics\": [ \"c0fefe\"] }` waits for logs in the future matching the specified conditions\n"
+                "\nSample Output:\n"
+                "{\n\"entries\": [\n {\n\"blockHash\": \"000000000013ca244452d2af443a3de40d9084fa1b12755e421178faaa329bdf\",\n\"blockNumber\": 352754,\n\"transactionHash\": \"23dbfa9bcb0ce1b0247e04563de558edbbd6cdf3b08f13a5643994476f3d9d3a\",\n"
+        );
+    }
+
+    if (!fLogEvents)
+        throw JSONRPCError(RPC_INTERNAL_ERROR, "Events indexing disabled");
+
+    WaitForLogsParams logsParams(params);
+
+    std::vector<std::vector<uint256>> hashesToBlock;
+
+    int curheight = 0;
+
+    auto& addresses = logsParams.addresses;
+    auto& filterTopics = logsParams.topics;
+
+    while (curheight == 0) {
+        {
+            LOCK(cs_main);
+            curheight = pblocktree->ReadHeightIndex(logsParams.fromBlock, logsParams.toBlock, logsParams.minconf,
+                                                    hashesToBlock, addresses);
+        }
+
+        if (curheight > 0) {
+            break;
+        }
+
+        if (curheight == -1) {
+            throw JSONRPCError(RPC_INVALID_PARAMETER, "Incorrect params");
+        }
+
+        // wait for a new block to arrive
+        {
+            while (true) {
+                std::unique_lock<std::mutex> lock(cs_blockchange);
+                auto blockHeight = latestblock.height;
+
+                cond_blockchange.wait_for(lock, std::chrono::milliseconds(1000));
+                if (latestblock.height > blockHeight) {
+                    break;
+                }
+
+                if (!IsRPCRunning()) {
+                    LogPrintf("waitforlogs client disconnected\n");
+                    return NullUniValue;
+                }
+            }
+        }
+    }
+
+    LOCK(cs_main);
+
+    UniValue jsonLogs(UniValue::VARR);
+
+    for (const auto& txHashes : hashesToBlock) {
+        for (const auto& txHash : txHashes) {
+            std::vector<TransactionReceiptInfo> receipts = pstorageresult->getResult(
+                    uintToh256(txHash));
+
+            for (const auto& receipt : receipts) {
+                for (const auto& log : receipt.logs) {
+
+                    bool includeLog = true;
+
+                    if (!filterTopics.empty()) {
+                        for (size_t i = 0; i < filterTopics.size(); i++) {
+                            auto filterTopic = filterTopics[i];
+
+                            if (!filterTopic) {
+                                continue;
+                            }
+
+                            auto filterTopicContent = filterTopic.get();
+                            auto topicContent = log.topics[i];
+
+                            if (topicContent != filterTopicContent) {
+                                includeLog = false;
+                                break;
+                            }
+                        }
+                    }
+
+
+                    if (!includeLog) {
+                        continue;
+                    }
+
+                    UniValue jsonLog(UniValue::VOBJ);
+
+                    assignJSON(jsonLog, receipt);
+                    assignJSON(jsonLog, log, false);
+
+                    jsonLogs.push_back(jsonLog);
+                }
+            }
+        }
+    }
+
+    UniValue result(UniValue::VOBJ);
+    result.push_back(Pair("entries", jsonLogs));
+    result.push_back(Pair("count", (int) jsonLogs.size()));
+    result.push_back(Pair("nextblock", curheight + 1));
 
     return result;
 }
