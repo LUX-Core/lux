@@ -157,6 +157,9 @@ void assignJSON(UniValue& entry, const TransactionReceiptInfo& resExec) {
             Pair("cumulativeGasUsed", CAmount(resExec.cumulativeGasUsed)));
     entry.push_back(Pair("gasUsed", CAmount(resExec.gasUsed)));
     entry.push_back(Pair("contractAddress", resExec.contractAddress.hex()));
+    std::stringstream ss;
+    ss << resExec.excepted;
+    entry.push_back(Pair("excepted",ss.str()));
 }
 
 void assignJSON(UniValue& logEntry, const dev::eth::LogEntry& log,
@@ -303,39 +306,6 @@ void parseParam(const UniValue& val, std::vector<boost::optional<dev::h256>> &h2
         return boost::optional<dev::h256>(dev::h256(addrStr));
     });
 }
-
-class WaitForLogsParams {
-public:
-    size_t fromBlock;
-    size_t toBlock;
-
-    size_t minconf;
-
-    std::set<dev::h160> addresses;
-    std::vector<boost::optional<dev::h256>> topics;
-
-    // bool wait;
-
-    WaitForLogsParams(const UniValue& params) {
-        std::unique_lock<std::mutex> lock(cs_blockchange);
-
-        fromBlock = parseBlockHeight(params[0], latestblock.height + 1);
-        toBlock = parseBlockHeight(params[1], 0);
-
-        parseFilter(params[2]);
-        minconf = parseUInt(params[3], 6);
-    }
-
-private:
-    void parseFilter(const UniValue& val) {
-        if (val.isNull()) {
-            return;
-        }
-
-        parseParam(val["addresses"], addresses);
-        parseParam(val["topics"], topics);
-    }
-};
 
 ////////////////////////////////////////////////////////////////////////////
 
