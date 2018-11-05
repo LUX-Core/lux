@@ -400,10 +400,6 @@ bool Stake::CheckHash(const CBlockIndex* pindexPrev, unsigned int nBits, const C
     // Weighted target
     int64_t nValueIn = txPrev.vout[prevout.n].nValue;
     uint256 bnWeight = uint256(nValueIn);
-    int64_t nTimeWeight = min((int64_t)nTimeTx - txPrev.nTime, Params().StakingMinAge());
-    if(nTimeWeight){
-        bnWeight = uint256(nValueIn) * nTimeWeight / COIN / (24 * 60 * 60);
-    }
     bnTarget *= bnWeight; // comment out this will cause 'ERROR: CheckWork: invalid proof-of-stake at block 1144'
 
     uint64_t nStakeModifier = pindexPrev->nStakeModifier;
@@ -445,7 +441,7 @@ bool Stake::CheckHash(const CBlockIndex* pindexPrev, unsigned int nBits, const C
     }
 
     // Now check if proof-of-stake hash meets target protocol
-    return !(hashProofOfStake > bnWeight * bnTarget);
+    return !(hashProofOfStake > bnTarget);
 }
 
 bool Stake::isForbidden(const CScript& scriptPubKey)
