@@ -178,7 +178,7 @@ bool CBlock::SignBlock(const CKeyStore& keystore)
             }
         }
     } else {
-        for (unsigned int j = 1; j < vtx[1].vout.size(); j++) {
+        for (unsigned int j = 0; j < vtx[1].vout.size(); j++) {
             const CTxOut &txout = vtx[1].vout[j];
 
             if (!Solver(txout.scriptPubKey, whichType, vSolutions))
