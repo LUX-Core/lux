@@ -4735,7 +4735,7 @@ bool ProcessNewBlock(CValidationState& state, const CChainParams& chainparams, C
 
     // Check proof-of-stake block signature
     if (!pblock->CheckBlockSignature())
-        return error("%s: bad block signature", __func__);
+        return state.DoS(100, false, REJECT_INVALID, "bad-blk-sign", false, "bad block signature");
 
     // Limited duplicity on stake: prevents block flood attack
     // Duplicate stake allowed only when there is orphan child block
