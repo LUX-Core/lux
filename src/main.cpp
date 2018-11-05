@@ -2215,8 +2215,6 @@ bool UndoReadFromDisk(CBlockUndo& blockundo, const CDiskBlockPos& pos, const uin
 
 static DisconnectResult DisconnectBlock(CBlock& block, CValidationState& state, CBlockIndex* pindex, CCoinsViewCache& view, bool* pfClean)
 {
-    assert(pindex->GetBlockHash() == view.GetBestBlock());
-
     if (pfClean)
         *pfClean = false;
 
@@ -3686,7 +3684,7 @@ static bool ActivateBestChainStep(CValidationState& state, const CChainParams& c
                 if (state.IsInvalid()) {
                     // The block violates a consensus rule.
                     if (!state.CorruptionPossible()) {
-                        InvalidChainFound(vpindexToConnect.back());
+                        InvalidChainFound(vpindexToConnect.front());
                     }
                     state = CValidationState();
                     fInvalidFound = true;
