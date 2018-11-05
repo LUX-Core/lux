@@ -306,6 +306,7 @@ static const CRPCCommand vRPCCommands[] =
         {"blockchain", "listcontracts", &listcontracts,true, true, false },
         {"blockchain", "gettransactionreceipt", &gettransactionreceipt,true, true, false },
         {"blockchain", "searchlogs", &searchlogs,true, true, false },
+        {"blockchain", "waitforlogs", &waitforlogs,true, true, false },
         {"blockchain", "createcontract", &createcontract,true, true, false },
         {"blockchain", "sendtocontract", &sendtocontract,true, true, false },
         {"blockchain", "pruneblockchain", &pruneblockchain,true, true, false },
@@ -613,15 +614,16 @@ UniValue CRPCTable::execute(const std::string& strMethod, const UniValue& params
     const CRPCCommand* pcmd = tableRPC[strMethod];
     if (!pcmd)
         throw JSONRPCError(RPC_METHOD_NOT_FOUND, "Method not found");
+
     g_rpcSignals.PreCommand(*pcmd);
 
     try {
         // Execute
         return pcmd->actor(params, false);
-
-    } catch (std::exception& e) {
+    } catch (const std::exception& e) {
         throw JSONRPCError(RPC_MISC_ERROR, e.what());
     }
+
     g_rpcSignals.PostCommand(*pcmd);
 }
 

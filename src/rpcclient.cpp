@@ -92,6 +92,10 @@ static const CRPCConvertParam vRPCConvertParams[] =
     { "searchlogs", 1, "toBlock"},
     { "searchlogs", 2, "address"},
     { "searchlogs", 3, "topics"},
+    { "waitforlogs", 0, "fromBlock"},
+    { "waitforlogs", 1, "txlimit"},
+    { "waitforlogs", 2, "address"},
+    { "waitforlogs", 3, "topics"},
     //////////////////////////////////////////////////
     { "createmultisig", 0, "nrequired" },
     { "createmultisig", 1, "keys" },
