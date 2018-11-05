@@ -8,13 +8,13 @@ Note: Your Windows file system is located at /mnt/c in the Bash shell environmen
     
     https://www.microsoft.com/en-us/p/ubuntu/9nblggh4msv6
     
-2.Run Ubuntu. Note: upon the first lunch of Ubuntu the system may prompt you to enable the Windows optional feature. In this case, you need to pen Windows Power Shell as Administrator and run the following: 
-
+2.Run Ubuntu. Note: upon the first lunch of Ubuntu the system may prompt you to enable the Windows optional feature. In this case, you need to pen Windows Power Shell as Administrator and run the following:
+    
     Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux
     
 Restart your computer.
 
-3.Create a new user and specify your user name and password. 
+3.Create a new user and specify your user name and password.
 
 4.Set up WSL Ubuntu environment (or you can use depends/install-dependencies.sh)
     

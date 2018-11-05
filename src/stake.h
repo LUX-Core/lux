@@ -28,7 +28,7 @@ static const int STAKE_TIMESTAMP_MASK = 15;
 
 namespace boost { class thread_group; }
 
-// Reject all splitted stake blocks under 200 LUX
+// Reject all splited stake blocks under 200 LUX
 static const int REJECT_INVALID_SPLIT_BLOCK_HEIGHT = 465000;
 // Reject stake of small inputs
 static const CAmount STAKE_INVALID_SPLIT_MIN_COINS = 90 * COIN;
