@@ -750,7 +750,7 @@ bool Stake::CreateCoinStake(CWallet* wallet, const CKeyStore& keystore, unsigned
         MilliSleep(10000);
 
     const CBlockIndex* pIndex0 = chainActive.Tip();
-    for (PAIRTYPE(const CWalletTx*, unsigned int) pcoin : stakeCoins) {
+    for (std::pair<const CWalletTx*, unsigned int> pcoin : stakeCoins) {
         //make sure that enough time has elapsed between
         CBlockIndex* pindex = LookupBlockIndex(pcoin.first->hashBlock);
         if (!pindex) {
@@ -896,7 +896,7 @@ bool Stake::CreateCoinStake(CWallet* wallet, const CKeyStore& keystore, unsigned
         txNew.vout.resize(numout + 1);
         txNew.vout[numout].scriptPubKey = payeeScript;
         txNew.vout[numout].nValue = masternodePayment;
-        
+
         blockValue -= masternodePayment;
 
         CTxDestination txDest;
@@ -928,11 +928,24 @@ bool Stake::CreateCoinStake(CWallet* wallet, const CKeyStore& keystore, unsigned
         i += 1;
     }
 
+#if 1
     // Sign
     for (const CWalletTx* pcoin : vCoins) {
         if (!SignSignature(keystore, *pcoin, txNew, 0, SIGHASH_ALL))
             return error("%s: failed to sign coinstake", __func__);
     }
+#else
+    const CScript& pubKey = txNew.vout[1].scriptPubKey;
+    SignatureData sigdata;
+    bool isSigned = ProduceSignature(
+            MutableTransactionSignatureCreator(&keystore, &txNew, 0, nCredit - nReward, SIGHASH_SINGLE),
+            pubKey, sigdata);
+    if (!isSigned)
+        return error("%s: failed to sign %s stake", __func__, FormatMoney(nCredit - nReward));
+    UpdateTransaction(txNew, 0, sigdata);
+    //const CTxIn& txin = txNew.vin[0];
+    //LogPrintf("%s: sign %s %s\n", __func__, FormatMoney(nCredit - nReward), txin.ToString());
+#endif
 
     // Successfully generated coinstake, reset select timestamp to 
     // start next round as soon as possible.

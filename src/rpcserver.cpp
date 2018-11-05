@@ -99,8 +99,8 @@ void RPCTypeCheck(const UniValue& params,
 }
 
 void RPCTypeCheckObj(const UniValue& o,
-    const map<string, UniValueType>& typesExpected,
-    bool fAllowNull)
+                     const map<string, UniValueType>& typesExpected,
+                     bool fAllowNull)
 {
     for (const auto& t : typesExpected) {
         const UniValue& v = find_value(o, t.first);
@@ -109,7 +109,7 @@ void RPCTypeCheckObj(const UniValue& o,
 
         if (!(t.second.typeAny || v.type() == t.second.type || (fAllowNull && v.isNull()))) {
             string err = strprintf("Expected type %s for %s, got %s",
-            uvTypeName(t.second.type), t.first, uvTypeName(v.type()));
+                                   uvTypeName(t.second.type), t.first, uvTypeName(v.type()));
             throw JSONRPCError(RPC_TYPE_ERROR, err);
         }
     }
@@ -172,7 +172,7 @@ string CRPCTable::help(string strCommand) const
         vCommands.push_back(make_pair(mi->second->category + mi->first, mi->second));
     sort(vCommands.begin(), vCommands.end());
 
-    for (const PAIRTYPE(string, const CRPCCommand*) & command : vCommands) {
+    for (const std::pair<string, const CRPCCommand*> & command : vCommands) {
         const CRPCCommand* pcmd = command.second;
         string strMethod = pcmd->name;
         // We already filter duplicates, but these deprecated screw up the sort order

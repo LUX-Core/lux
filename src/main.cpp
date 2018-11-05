@@ -861,7 +861,7 @@ int64_t GetTransactionSigOpCost(const CTransaction& tx, const CCoinsViewCache& i
     return nSigOps;
 }
 
-bool CheckTransaction(const CTransaction& tx, CValidationState& state)
+bool CheckTransaction(const CTransaction& tx, CValidationState &state)
 {
     // Basic checks that don't depend on any context
     if (tx.vin.empty())
@@ -900,7 +900,7 @@ bool CheckTransaction(const CTransaction& tx, CValidationState& state)
 
 
     // Check for duplicate inputs
-    set<COutPoint> vInOutPoints;
+    std::set<COutPoint> vInOutPoints;
     for (const CTxIn& txin : tx.vin) {
         if (vInOutPoints.count(txin.prevout))
             return state.DoS(100, error("CheckTransaction() : duplicate inputs"),
@@ -4316,8 +4316,8 @@ bool CheckBlock(const CBlock& block, CValidationState& state, const Consensus::P
         }
 
         if (!CheckTransaction(tx, state)) {
-            LogPrint("debug", "%s: invalid transaction %s", __func__, tx.ToString());
-            return error("%s: CheckTransaction failed (nTx=%d, reason: %s)", __func__, nTx, state.GetRejectReason());
+            return state.Invalid(false, state.GetRejectCode(), state.GetRejectReason(),
+                    strprintf("Transaction check failed (tx hash %s) %s", tx.GetHash().ToString(), state.GetDebugMessage()));
 
             // OP_SPEND can only exist immediately after a contract tx in a block.
             // So, fail it if the previous tx was not a contract tx
@@ -5360,6 +5360,9 @@ bool CVerifyDB::VerifyDB(const CChainParams& chainparams, CCoinsView* coinsview,
                 pindexFailure = pindex;
             } else
                 nGoodTransactions += block.vtx.size();
+            if ((coins.DynamicMemoryUsage() + pcoinsTip->DynamicMemoryUsage()) > nCoinCacheUsage)
+                LogPrint("debug", "%s: WARNING nCoinCacheUsage reached (%zu+%zu > %zu)\n", __func__,
+                      coins.DynamicMemoryUsage(), pcoinsTip->DynamicMemoryUsage(), (size_t)nCoinCacheUsage);
         }
         if (ShutdownRequested())
             return true;
@@ -5384,9 +5387,9 @@ bool CVerifyDB::VerifyDB(const CChainParams& chainparams, CCoinsView* coinsview,
                 if (chainActive.Height() >= chainparams.FirstSCBlock()) {
                     setGlobalStateRoot(oldHashStateRoot);
                     setGlobalStateUTXO(oldHashUTXORoot);
-                    if (pstorageresult != nullptr)
-                        pstorageresult->clearCacheResult();
                 }
+                if (fLogEvents && pstorageresult != nullptr)
+                    pstorageresult->clearCacheResult();
                 return error("VerifyDB: *** found unconnectable block at %d, hash=%s", pindex->nHeight, pindex->GetBlockHash().GetHex());
             }
         }
@@ -5809,7 +5812,7 @@ string GetWarnings(string strFor)
     // Alerts
     {
         LOCK(cs_mapAlerts);
-        for (PAIRTYPE(const uint256, CAlert) & item : mapAlerts) {
+        for (std::pair<const uint256, CAlert> & item : mapAlerts) {
             const CAlert& alert = item.second;
             if (alert.AppliesToMe() && alert.nPriority > nPriority) {
                 nPriority = alert.nPriority;
@@ -6199,7 +6202,7 @@ static bool ProcessMessage(CNode* pfrom, const string &strCommand, CDataStream& 
         // Relay alerts
         {
             LOCK(cs_mapAlerts);
-            for (PAIRTYPE(const uint256, CAlert) & item : mapAlerts)
+            for (std::pair<const uint256, CAlert> & item : mapAlerts)
                 item.second.RelayTo(pfrom);
         }
 
