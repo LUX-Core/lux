@@ -219,8 +219,14 @@ bool CBlock::SignBlock(const CKeyStore& keystore)
 
 bool CBlock::CheckBlockSignature() const
 {
-    if (GetHash() == Params().GetConsensus().hashGenesisBlock || !IsProofOfStake())
+    if (IsProofOfWork())
         return vchBlockSig.empty();
+
+    if (IsProofOfStake()) {
+        // if we are trying to sign
+        //    a complete proof-of-stake block
+        return vtx[0].vout[0].IsEmpty();
+    } else {
 
     std::vector<valtype> vSolutions;
     txnouttype whichType;
@@ -257,6 +263,7 @@ bool CBlock::CheckBlockSignature() const
 
         return pubkey.Verify(GetHash(), vchBlockSig);
 
+        }
     }
 
     return false;
