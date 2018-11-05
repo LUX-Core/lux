@@ -19,27 +19,27 @@
     <name>AddEditLuxNode</name>
     <message>
         <source>Add/Edit LuxNodes Node</source>
-        <translation type="unfinished"></translation>
+        <translation>Ajouter/modifier un noeud</translation>
     </message>
     <message>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enter an Alias (friendly name) for your LuxNodes Node and its address (either clearnet IP and port or Tor onion address and port).  The address should be in the format 123.456.789.123:9999 or akjdsafxjkhasdf.onion:9999.  A masternode private key and a collateral address will both be automatically generated for you.  You must send exactly 16120 LUX to the collateral address.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Entrer un Alias (un nom) à votre noeud et son adresse (soit une IP classique + port ou une adresse Tor/Onion + port). L&apos;adresse doit être au format 123.456.789.123:9999 ou akjdsafxjkhasdf.onion:9999. Une clé privée de masternode et une adresse collatérale seront automatiquement generés pour vous. Vous devez posséder exactement 16120 LUX (en une seule entrée) sur l&apos;adresse collatérale.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <source>Alias</source>
-        <translation type="unfinished"></translation>
+        <translation>Alias</translation>
     </message>
     <message>
         <source>Address</source>
-        <translation type="unfinished">Adresse</translation>
+        <translation>Adresse</translation>
     </message>
     <message>
         <source>&amp;OK</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Ok</translation>
     </message>
     <message>
         <source>&amp;Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Annuler</translation>
     </message>
 </context>
 <context>
@@ -50,56 +50,57 @@
     </message>
     <message>
         <source>Token Symbol</source>
-        <translation type="unfinished"></translation>
+        <translation>Symbole</translation>
     </message>
     <message>
         <source>Contract Address</source>
-        <translation type="unfinished"></translation>
+        <translation>Adresse Contrat</translation>
     </message>
     <message>
         <source>Token Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Nom du Jeton</translation>
     </message>
     <message>
         <source>Decimals</source>
-        <translation type="unfinished"></translation>
+        <translation>Décimales</translation>
     </message>
     <message>
         <source>Address</source>
-        <translation type="unfinished">Adresse</translation>
+        <translation>Adresse</translation>
     </message>
     <message>
         <source>Confirm</source>
-        <translation type="unfinished"></translation>
+        <translation>Confirmer</translation>
     </message>
     <message>
         <source>Clear</source>
-        <translation type="unfinished">Effacer</translation>
+        <translation>Effacer</translation>
     </message>
     <message>
         <source>The %1 address &quot;%2&quot; 
 </source>
-        <translation type="unfinished"></translation>
+        <translation>L&apos;adresse %1 &quot;%2&quot; 
+</translation>
     </message>
     <message>
         <source>Invalid token address</source>
-        <translation type="unfinished"></translation>
+        <translation>Adresse de jeton invalide</translation>
     </message>
     <message>
         <source>Token exist</source>
-        <translation type="unfinished"></translation>
+        <translation>Le jeton existe</translation>
     </message>
     <message>
         <source>The token already exist with the specified contract and sender addresses.</source>
-        <translation type="unfinished"></translation>
+        <translation>Le jeton existe déjà avec ces adresses de contrat et d&apos;expéditeur.</translation>
     </message>
     <message>
         <source>Log events</source>
-        <translation type="unfinished"></translation>
+        <translation>Log events</translation>
     </message>
     <message>
         <source>Enable log events from the option menu in order to receive token transactions.</source>
-        <translation type="unfinished"></translation>
+        <translation>Activez "Log events" dans les options pour recevoir des transactions de jetons.</translation>
     </message>
 </context>
 <context>
@@ -228,7 +229,7 @@
     </message>
     <message>
         <source>Repeat new passphrase</source>
-        <translation>Confirmer la nouvelle phrase secrète</translation>
+        <translation>Confirmer nouvelle phrase</translation>
     </message>
     <message>
         <source>Encrypt wallet</source>
@@ -261,10 +262,6 @@
     <message>
         <source>Confirm wallet encryption</source>
         <translation>Confirmer le cryptage du portefeuille</translation>
-    </message>
-    <message>
-        <source>LUX will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your LUXs from being stolen by malware infecting your computer.</source>
-        <translation type="vanished">LUX va maintenant se fermer pour finir le processus cryptage. Notez que le cryptage de votre portefeuille ne peut pas complètement protéger vos LUXs d&apos;un vol par un malware ayant infecté votre ordinateur. </translation>
     </message>
     <message>
         <source>Are you sure you wish to encrypt your wallet?</source>
@@ -312,46 +309,46 @@
     </message>
     <message>
         <source>Passphrase Dialog</source>
-        <translation type="unfinished"></translation>
+        <translation>Phrase secrète</translation>
     </message>
     <message>
         <source>Serves to disable the trivial sendmoney when OS account compromised. Provides no real security.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sert à interdire les envois si votre OS est compromis. Ne fournit pas une réelle sécurité.</translation>
     </message>
     <message>
         <source>For anonymization and staking only</source>
-        <translation type="unfinished"></translation>
+        <translation>Pour l&apos;anonymisation et le PoS uniquement</translation>
     </message>
     <message>
         <source>Enter the new passphrase to the wallet.&lt;br/&gt;Please use a passphrase of &lt;b&gt;ten or more random characters&lt;/b&gt;, or &lt;b&gt;eight or more words&lt;/b&gt;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Saisir la nouvelle phrase secrète.&lt;br/&gt;Veiller à utiliser une phrase de &lt;b&gt;10 caractères ou plus&lt;/b&gt;, ou de &lt;b&gt;huit mots&lt;/b&gt; minimum.</translation>
     </message>
     <message>
         <source>%1 will close now to finish the encryption process.Remember that encrypting your wallet cannot fully protect your LUXs from being stolen by malware infecting your computer.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 va maintenant se fermer pour finir le processus de cryptage. Notez que le cryptage de votre portefeuille ne peut pas complètement protéger vos LUX d&apos;un vol par un malware ayant infecté votre ordinateur.</translation>
     </message>
     <message>
         <source>IMPORTANT: Any previous backups you have made of your wallet file should be replaced with the newly generated, encrypted wallet file. Previous backups of the unencrypted wallet file contain the same HD seed andstill have full access to all your funds just like the new, encrypted wallet.</source>
-        <translation type="unfinished"></translation>
+        <translation>IMPORTANT: Les sauvegardes préalables doivent être remplacées par une sauvegarde encryptée car les précédentes, non cryptées, contiennent la meme clé HD et permettent toujours de disposer de votre portefeuille.</translation>
     </message>
     <message>
         <source>%1 will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your funds from being stolen by malware infecting your computer.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 va maintenant se fermer pour finir le processus de cryptage. Notez que le cryptage de votre portefeuille ne peut pas complètement protéger vos LUX d&apos;un vol par un malware ayant infecté votre ordinateur.</translation>
     </message>
     <message>
         <source>IMPORTANT: Any previous backups you have made of your wallet file should be replaced with the newly generated, encrypted wallet file. For security reasons, previous backups of the unencrypted wallet file will become useless as soon as you start using the new, encrypted wallet.</source>
-        <translation type="unfinished"></translation>
+        <translation>IMPORTANT: Les sauvegardes préalables doivent être remplacées par une sauvegarde encryptée car les précédentes, non cryptées, contiennent la meme clé HD et permettent toujours de disposer de votre portefeuille.</translation>
     </message>
 </context>
 <context>
     <name>BanTableModel</name>
     <message>
         <source>IP/Netmask</source>
-        <translation type="unfinished"></translation>
+        <translation>IP/Masque</translation>
     </message>
     <message>
         <source>Banned Until</source>
-        <translation type="unfinished"></translation>
+        <translation>Banni jusque</translation>
     </message>
 </context>
 <context>
@@ -864,30 +861,18 @@ Cliquer sur &quot;Crypter la clé&quot; pour signer et encrypter la clé privée
         <translation>Transaction entrante</translation>
     </message>
     <message>
-        <source>Date: %1
-Amount: %2
-Type: %3
-Address: %4
-</source>
-        <translation type="vanished">Date : %1
-Montant: %2
-Type : %3
-Adresse : %4
-</translation>
-    </message>
-    <message>
         <source>Staking is not active
  MultiSend: %1</source>
-        <translation>PoS inactif
- MultiSend: %1</translation>
+        <translation>PoS désactivé
+MultiSend: %1</translation>
     </message>
     <message>
         <source>Active</source>
-        <translation>Actif</translation>
+        <translation>activé</translation>
     </message>
     <message>
         <source>Not Active</source>
-        <translation>Pas actif</translation>
+        <translation>désactivé</translation>
     </message>
     <message>
         <source>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;unlocked&lt;/b&gt;</source>
@@ -899,188 +884,194 @@ Adresse : %4
     </message>
     <message>
         <source>Luxcore</source>
-        <translation type="unfinished"></translation>
+        <translation>Luxcore</translation>
     </message>
     <message>
         <source>Node</source>
-        <translation type="unfinished"></translation>
+        <translation>Noeud</translation>
     </message>
     <message>
         <source>New lux-qt version available: &lt;br /&gt; %1. &lt;br /&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Nouvelle version lux-qt disponible: &lt;br /&gt; %1. &lt;br /&gt;</translation>
     </message>
     <message>
         <source>Check for updates</source>
-        <translation type="unfinished"></translation>
+        <translation>Rechercher mise à jour</translation>
     </message>
     <message>
         <source>&amp;Trading</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Trading</translation>
     </message>
     <message>
         <source>Trading on Cryptopia</source>
-        <translation type="unfinished"></translation>
+        <translation>Trading sur Cryptopia</translation>
     </message>
     <message>
         <source>&amp;Smart Contracts</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Smart Contrats</translation>
     </message>
     <message>
         <source>Smart Contracts Actions</source>
-        <translation type="unfinished"></translation>
+        <translation>Gérer les Smart-Contrats</translation>
     </message>
     <message>
         <source>Show information about Luxcore</source>
-        <translation type="unfinished"></translation>
+        <translation>Affiche les informations à propos de LUxcore</translation>
     </message>
     <message>
         <source>Check whether there is an updated wallet from Luxcore</source>
-        <translation type="unfinished"></translation>
+        <translation>Vérifier s&apos;il existe une version plus récente du portefeuille Luxcore</translation>
     </message>
     <message>
         <source>Backup wallet to another location</source>
-        <translation type="unfinished"></translation>
+        <translation>Sauvegarder votre portefeuille vers un disque</translation>
     </message>
     <message>
         <source>Restore wallet from another location</source>
-        <translation type="unfinished"></translation>
+        <translation>Restaurer le portefeuille depuis un disque</translation>
     </message>
     <message>
         <source>&amp;MultiSend</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;MultiSend</translation>
     </message>
     <message>
         <source>MultiSend Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Paramètres MultiSend</translation>
     </message>
     <message>
         <source>Open Masternode configuration file</source>
-        <translation type="unfinished"></translation>
+        <translation>Ouvrir le fichier de configuration Masternode</translation>
     </message>
     <message>
         <source>Edit &amp;Configuration File</source>
-        <translation type="unfinished"></translation>
+        <translation>Fichier de &amp;configuration Luxcore</translation>
     </message>
     <message>
         <source>Edit configuration file</source>
-        <translation type="unfinished"></translation>
+        <translation>Modifier le fichier de configuration</translation>
     </message>
     <message>
         <source>Show the list of used sending addresses and labels</source>
-        <translation type="unfinished"></translation>
+        <translation>Affiche la liste des adresses dèjà utilisées</translation>
     </message>
     <message>
         <source>Show the list of used receiving addresses and labels</source>
-        <translation type="unfinished"></translation>
+        <translation>Affiche la liste de vos adresses de réception</translation>
     </message>
     <message>
         <source>Open payment request | &amp;URI...</source>
-        <translation type="unfinished"></translation>
+        <translation>Requête de paiement | &amp;URL...</translation>
     </message>
     <message>
         <source>Open a LUX: URI or payment request</source>
-        <translation type="unfinished"></translation>
+        <translation>Ouvrir une URL LUX:// ou une requête de paiement</translation>
     </message>
     <message>
         <source>Block explorer window</source>
-        <translation type="unfinished"></translation>
+        <translation>Explorateur de blocs</translation>
     </message>
     <message>
         <source>Converter for LUX Smart Contract addresses</source>
-        <translation type="unfinished"></translation>
+        <translation>Convertisseur pour les adresses LUX des Smart-Contrats</translation>
     </message>
     <message>
         <source>Show the Luxcore help message to get a list with possible LUX command-line options</source>
-        <translation type="unfinished"></translation>
+        <translation>Affiche la description des paramètres de ligne de commande</translation>
     </message>
     <message>
         <source>Tabs toolbar</source>
-        <translation type="unfinished"></translation>
+        <translation>Onglets</translation>
     </message>
     <message>
         <source>Luxcore client</source>
-        <translation type="unfinished"></translation>
+        <translation>Client Luxcore</translation>
     </message>
     <message>
         <source>Network activity disabled</source>
-        <translation type="unfinished"></translation>
+        <translation>Activité réseau désactivée</translation>
     </message>
     <message>
         <source>Syncing Headers (%1%)...</source>
-        <translation type="unfinished"></translation>
+        <translation>Synchronisation des entêtes (%1%)...</translation>
     </message>
     <message>
         <source>Indexing blocks on disk...</source>
-        <translation type="unfinished"></translation>
+        <translation>Indexation des blocs sur le disque...</translation>
     </message>
     <message>
         <source>Processing blocks on disk...</source>
-        <translation type="unfinished"></translation>
+        <translation>Traitement des blocs sur le disque...</translation>
     </message>
     <message>
         <source>No block source available...</source>
-        <translation type="unfinished"></translation>
+        <translation>Aucune source de blocs disponible...</translation>
     </message>
     <message numerus="yes">
         <source>Processed %n blocks of transaction history.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n bloc traité.</numerusform>
+            <numerusform>%n blocs traités.</numerusform>
         </translation>
     </message>
     <message>
         <source>Catching up...</source>
-        <translation type="unfinished"></translation>
+        <translation>Synchronisation...</translation>
     </message>
     <message>
         <source>Date: %1
 </source>
-        <translation type="unfinished"></translation>
+        <translation>Date: %1
+</translation>
     </message>
     <message>
         <source>Amount: %1
 </source>
-        <translation type="unfinished"></translation>
+        <translation>Montant: %1
+</translation>
     </message>
     <message>
         <source>Type: %1
 </source>
-        <translation type="unfinished"></translation>
+        <translation>Type: %1
+</translation>
     </message>
     <message>
         <source>Label: %1
 </source>
-        <translation type="unfinished"></translation>
+        <translation>Nom: %1
+</translation>
     </message>
     <message>
         <source>Address: %1
 </source>
-        <translation type="unfinished"></translation>
+        <translation>Adresse: %1
+</translation>
     </message>
     <message>
         <source>Sent MultiSend transaction</source>
-        <translation type="unfinished"></translation>
+        <translation>Transaction MultiSend envoyée</translation>
     </message>
     <message>
         <source>Staking is active
  MultiSend: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>PoS activé
+MultiSend: %1</translation>
     </message>
     <message>
         <source>HD key generation is &lt;b&gt;enabled&lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Génération de clé HD &lt;b&gt;activée&lt;b&gt;</translation>
     </message>
     <message>
         <source>HD key generation is &lt;b&gt;disabled&lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Génération de clé HD &lt;b&gt;désactivée&lt;b&gt;</translation>
     </message>
     <message>
         <source>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;unlocked&lt;/b&gt; for anonymization and staking only</source>
-        <translation type="unfinished"></translation>
+        <translation>Le portefeuille est &lt;b&gt;encrypté&lt;/b&gt; et &lt;b&gt;dévérouillé&lt;/b&gt; pour l&apos;anonymisation et le PoS</translation>
     </message>
     <message>
         <source>A fatal error occurred. LUX can no longer continue safely and will quit.</source>
-        <translation type="unfinished"></translation>
+        <translation>Erreur fatale. Luxcore ne peut plus fonctionner correctement et va se fermer.</translation>
     </message>
 </context>
 <context>
@@ -1095,19 +1086,19 @@ Adresse : %4
     </message>
     <message>
         <source>Blockchain Explorer</source>
-        <translation type="unfinished"></translation>
+        <translation>Explorateur de blocs</translation>
     </message>
     <message>
         <source>&lt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;</translation>
     </message>
     <message>
         <source>&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&gt;</translation>
     </message>
     <message>
         <source>Address / Block / Transaction</source>
-        <translation type="unfinished"></translation>
+        <translation>Adresse / Bloc / Transaction</translation>
     </message>
     <message>
         <source>TextLabel</source>
@@ -1122,47 +1113,47 @@ Adresse : %4
     </message>
     <message>
         <source>Call Smart Contract</source>
-        <translation type="unfinished"></translation>
+        <translation>Appel Smart Contrat</translation>
     </message>
     <message>
         <source>Contract Address</source>
-        <translation type="unfinished"></translation>
+        <translation>Adresse Contrat</translation>
     </message>
     <message>
         <source>Choose from contract book page</source>
-        <translation type="unfinished"></translation>
+        <translation>Sélectionner depuis annuaire de contrats</translation>
     </message>
     <message>
         <source>Paste contract address from clipboard</source>
-        <translation type="unfinished"></translation>
+        <translation>Coller adresse contrat depuis le presse-papier</translation>
     </message>
     <message>
         <source>Save contract info</source>
-        <translation type="unfinished"></translation>
+        <translation>Enregistrer infos contrat</translation>
     </message>
     <message>
         <source>Interface (ABI)</source>
-        <translation type="unfinished"></translation>
+        <translation>Interface (ABI)</translation>
     </message>
     <message>
         <source>Function</source>
-        <translation type="unfinished"></translation>
+        <translation>Fonction</translation>
     </message>
     <message>
         <source>Optional</source>
-        <translation type="unfinished"></translation>
+        <translation>Options</translation>
     </message>
     <message>
         <source>Sender Address</source>
-        <translation type="unfinished"></translation>
+        <translation>Expéditeur</translation>
     </message>
     <message>
         <source>Clear All</source>
-        <translation type="unfinished"></translation>
+        <translation>Effacer tout</translation>
     </message>
     <message>
         <source>Call Contract</source>
-        <translation type="unfinished"></translation>
+        <translation>Appel Contrat</translation>
     </message>
     <message>
         <source>The account address.</source>
@@ -1170,11 +1161,11 @@ Adresse : %4
     </message>
     <message>
         <source>The sender address hex string.</source>
-        <translation type="unfinished"></translation>
+        <translation>L&apos;adresse Hex.</translation>
     </message>
     <message>
         <source>Call contract</source>
-        <translation type="unfinished"></translation>
+        <translation>Appel contrat</translation>
     </message>
 </context>
 <context>
@@ -1204,7 +1195,19 @@ Adresse : %4
     </message>
     <message>
         <source>After Fee:</source>
-        <translation>Après commission</translation>
+        <translation>Après commission :</translation>
+    </message>
+    <message>
+        <source>Bytes:</source>
+        <translation>Octets :</translation>
+    </message>
+    <message>
+        <source>Dust:</source>
+        <translation>Poussière :</translation>
+    </message>
+    <message>
+        <source>Change:</source>
+        <translation>Monnaie :</translation>
     </message>
     <message>
         <source>(un)select all</source>
@@ -1344,31 +1347,19 @@ Adresse : %4
     </message>
     <message>
         <source>Coin Selection</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Bytes:</source>
-        <translation type="unfinished">Octets :</translation>
-    </message>
-    <message>
-        <source>Dust:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Change:</source>
-        <translation type="unfinished"></translation>
+        <translation>Sélection d&apos;entrées</translation>
     </message>
     <message>
         <source>toggle lock state</source>
-        <translation type="unfinished"></translation>
+        <translation>(Dé)vérouiller</translation>
     </message>
     <message>
         <source>(1 locked)</source>
-        <translation type="unfinished"></translation>
+        <translation>(1 vérouillé)</translation>
     </message>
     <message>
         <source>Received with label</source>
-        <translation type="unfinished"></translation>
+        <translation>Reçu avec</translation>
     </message>
     <message>
         <source>Luxsend Rounds</source>
@@ -1376,27 +1367,27 @@ Adresse : %4
     </message>
     <message>
         <source>Copy label</source>
-        <translation type="unfinished">Copier l&apos;étiquette</translation>
+        <translation>Copier le nom</translation>
     </message>
     <message>
         <source>Lock unspent</source>
-        <translation type="unfinished"></translation>
+        <translation>Vérouiller entrée</translation>
     </message>
     <message>
         <source>Unlock unspent</source>
-        <translation type="unfinished"></translation>
+        <translation>Dévérouiller entrée</translation>
     </message>
     <message>
         <source>Copy bytes</source>
-        <translation type="unfinished"></translation>
+        <translation>Copier octets</translation>
     </message>
     <message>
         <source>Copy dust</source>
-        <translation type="unfinished"></translation>
+        <translation>Copier poussière</translation>
     </message>
     <message>
         <source>Copy change</source>
-        <translation type="unfinished"></translation>
+        <translation>Copier monnaie</translation>
     </message>
     <message>
         <source>Non-anonymized input selected. &lt;b&gt;Luxsend will be disabled.&lt;/b&gt;&lt;br&gt;&lt;br&gt;If you still want to use Luxsend, please deselect all non-nonymized inputs first and then check Luxsend checkbox again.</source>
@@ -1404,31 +1395,31 @@ Adresse : %4
     </message>
     <message>
         <source>This label turns red, if the transaction size is greater than 1000 bytes.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ce label passe au rouge si la taille de transaction est supérieure à 1000 octets.</translation>
     </message>
     <message>
         <source>Can vary +/- 1 byte per input.</source>
-        <translation type="unfinished"></translation>
+        <translation>Peut varier de +/- 1 octet par entrée.</translation>
     </message>
     <message>
         <source>This label turns red, if the priority is smaller than &quot;medium&quot;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ce label passe au rouge si la priorité est inférieure à &quot;moyenne&quot;.</translation>
     </message>
     <message>
         <source>This label turns red, if any recipient receives an amount smaller than %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ce label passe au rouge si le destinataire recoit un montant inférieur à %1.</translation>
     </message>
     <message>
         <source>Can vary +/- %1 duff(s) per input.</source>
-        <translation type="unfinished"></translation>
+        <translation>Peut varier de +/- %1 satoshi(s) par entrée.</translation>
     </message>
     <message>
         <source>change from %1 (%2)</source>
-        <translation type="unfinished"></translation>
+        <translation>monnaie de %1 (%2)</translation>
     </message>
     <message>
         <source>n/a</source>
-        <translation type="unfinished"></translation>
+        <translation>n/a</translation>
     </message>
 </context>
 <context>
@@ -1439,91 +1430,91 @@ Adresse : %4
     </message>
     <message>
         <source>Create a new contract info</source>
-        <translation type="unfinished"></translation>
+        <translation>Ajouter des infos de contrat</translation>
     </message>
     <message>
         <source>New</source>
-        <translation type="unfinished"></translation>
+        <translation>Nouveau</translation>
     </message>
     <message>
         <source>Copy the currently selected contract address to the system clipboard</source>
-        <translation type="unfinished"></translation>
+        <translation>Copier l&apos;adresse du contrat sélectionné vers le presse-papier</translation>
     </message>
     <message>
         <source>Copy</source>
-        <translation type="unfinished"></translation>
+        <translation>Copier</translation>
     </message>
     <message>
         <source>Delete the currently selected contract info from the list</source>
-        <translation type="unfinished"></translation>
+        <translation>Supprime les infos du contrat sélectionné de la liste</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished">Supprimer</translation>
+        <translation>Supprimer</translation>
     </message>
     <message>
         <source>Export the data to a file</source>
-        <translation type="unfinished"></translation>
+        <translation>Exporter les données vers un fichier</translation>
     </message>
     <message>
         <source>Export</source>
-        <translation type="unfinished"></translation>
+        <translation>Exporter</translation>
     </message>
     <message>
         <source>Choose</source>
-        <translation type="unfinished"></translation>
+        <translation>Choisir</translation>
     </message>
     <message>
         <source>Choose the contract for send/call</source>
-        <translation type="unfinished"></translation>
+        <translation>Sélectionner le contrat pour envoi/appel</translation>
     </message>
     <message>
         <source>These are your saved contracts. Always check the contract address and the ABI before sending/calling.</source>
-        <translation type="unfinished"></translation>
+        <translation>Voici vos contrats sauvegardés. Vérifiez l&apos;adresse du contrat et l&apos;ABI avant de soumettre la requête.</translation>
     </message>
     <message>
         <source>Copy &amp;Address</source>
-        <translation type="unfinished">Copier l&apos;adresse</translation>
+        <translation>Copier l&apos;adresse</translation>
     </message>
     <message>
         <source>Copy &amp;Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Copier le &amp;nom</translation>
     </message>
     <message>
         <source>Copy &amp;Interface</source>
-        <translation type="unfinished"></translation>
+        <translation>Copier l&apos;&amp;interface</translation>
     </message>
     <message>
         <source>&amp;Edit</source>
-        <translation type="unfinished">Modifi&amp;er</translation>
+        <translation>Modifi&amp;er</translation>
     </message>
     <message>
         <source>&amp;Delete</source>
-        <translation type="unfinished">&amp;Supprimer</translation>
+        <translation>&amp;Supprimer</translation>
     </message>
     <message>
         <source>Are you sure you want to delete the address &quot;%1&quot; from your contract address list?</source>
-        <translation type="unfinished"></translation>
+        <translation>Etes-vous sûr de vouloir supprimer l&apos;adresse &quot;%1&quot; de votre liste de contrats ?</translation>
     </message>
     <message>
         <source>Delete contact address</source>
-        <translation type="unfinished"></translation>
+        <translation>Supprimer adresse de contrat</translation>
     </message>
     <message>
         <source>Export Contract List</source>
-        <translation type="unfinished"></translation>
+        <translation>Export liste des contrats</translation>
     </message>
     <message>
         <source>Comma separated file (*.csv)</source>
-        <translation type="unfinished"></translation>
+        <translation>Fichier séparé par virgules (*.csv)</translation>
     </message>
     <message>
         <source>Exporting Failed</source>
-        <translation type="unfinished"></translation>
+        <translation>Exportation échouée</translation>
     </message>
     <message>
         <source>There was an error trying to save the address list to %1. Please try again.</source>
-        <translation type="unfinished">Une erreur s&apos;est produite en essayant d&apos;exporter la liste d&apos;adresses dans %1.</translation>
+        <translation>Une erreur s&apos;est produite en essayant d&apos;exporter la liste d&apos;adresses dans %1.</translation>
     </message>
 </context>
 <context>
@@ -1534,82 +1525,82 @@ Adresse : %4
     </message>
     <message>
         <source>Contract Summary</source>
-        <translation type="unfinished"></translation>
+        <translation>Résumé du contrat</translation>
     </message>
     <message>
         <source>ContractAddress</source>
-        <translation type="unfinished"></translation>
+        <translation>Adresse Contrat</translation>
     </message>
     <message>
         <source>Hash160</source>
-        <translation type="unfinished"></translation>
+        <translation>Hash160</translation>
     </message>
     <message>
         <source>SenderAddress</source>
-        <translation type="unfinished"></translation>
+        <translation>Adresse expéditeur</translation>
     </message>
     <message>
         <source>Transaction ID</source>
-        <translation type="unfinished">ID Transaction</translation>
+        <translation>ID Transaction</translation>
     </message>
     <message>
         <source>Contract Book</source>
-        <translation type="unfinished"></translation>
+        <translation>Annuaire de Contrats</translation>
     </message>
     <message>
         <source>Save contract to Contract Book</source>
-        <translation type="unfinished"></translation>
+        <translation>Ajouter dans l&apos;annuaire de contrats</translation>
     </message>
     <message>
         <source>Contract label</source>
-        <translation type="unfinished"></translation>
+        <translation>Nom du contrat</translation>
     </message>
     <message>
         <source>Set contract label</source>
-        <translation type="unfinished"></translation>
+        <translation>Définir le nom du contrat</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished"></translation>
+        <translation>Ok</translation>
     </message>
     <message>
         <source>Contract Address</source>
-        <translation type="unfinished"></translation>
+        <translation>Adresse du contrat</translation>
     </message>
     <message>
         <source>Function</source>
-        <translation type="unfinished"></translation>
+        <translation>Fonction</translation>
     </message>
     <message>
         <source>Sender Address</source>
-        <translation type="unfinished"></translation>
+        <translation>Adresse expéditeur</translation>
     </message>
     <message>
         <source>Result</source>
-        <translation type="unfinished"></translation>
+        <translation>Résultat</translation>
     </message>
     <message>
         <source>Create contract</source>
-        <translation type="unfinished"></translation>
+        <translation>Créer contrat</translation>
     </message>
 </context>
 <context>
     <name>ContractTableModel</name>
     <message>
         <source>Label</source>
-        <translation type="unfinished"></translation>
+        <translation>Nom</translation>
     </message>
     <message>
         <source>Contract Address</source>
-        <translation type="unfinished"></translation>
+        <translation>Adresse contrat</translation>
     </message>
     <message>
         <source>Interface (ABI)</source>
-        <translation type="unfinished"></translation>
+        <translation>Interface (ABI)</translation>
     </message>
     <message>
         <source>(no label)</source>
-        <translation type="unfinished"></translation>
+        <translation>(sans nom)</translation>
     </message>
 </context>
 <context>
@@ -1620,7 +1611,7 @@ Adresse : %4
     </message>
     <message>
         <source>Create Smart Contract</source>
-        <translation type="unfinished"></translation>
+        <translation>Création Smart Contrat</translation>
     </message>
     <message>
         <source>Solidity</source>
@@ -1628,7 +1619,7 @@ Adresse : %4
     </message>
     <message>
         <source>Token</source>
-        <translation type="unfinished"></translation>
+        <translation>Jeton</translation>
     </message>
     <message>
         <source>Bytecode</source>
@@ -1644,35 +1635,35 @@ Adresse : %4
     </message>
     <message>
         <source>Optional</source>
-        <translation type="unfinished"></translation>
+        <translation>Options</translation>
     </message>
     <message>
         <source>Sender Address</source>
-        <translation type="unfinished"></translation>
+        <translation>Expéditeur</translation>
     </message>
     <message>
         <source>Gas Price</source>
-        <translation type="unfinished"></translation>
+        <translation>Prix du Gas</translation>
     </message>
     <message>
         <source>Gas Limit</source>
-        <translation type="unfinished"></translation>
+        <translation>Limite de Gas</translation>
     </message>
     <message>
         <source>Clear All</source>
-        <translation type="unfinished"></translation>
+        <translation>Effacer tout</translation>
     </message>
     <message>
         <source>Create Contract</source>
-        <translation type="unfinished"></translation>
+        <translation>Créer contrat</translation>
     </message>
     <message>
         <source>The bytecode of the contract</source>
-        <translation type="unfinished"></translation>
+        <translation>Le bytecode du contrat</translation>
     </message>
     <message>
         <source>The quantum address that will be used to create the contract.</source>
-        <translation type="unfinished"></translation>
+        <translation>L&apos;addresse LUX qui sera utilisée pour créer le contrat.</translation>
     </message>
     <message>
         <source>The Gas Price is too high, are you sure you want to possibly spend a max of %1 for this transaction?</source>
@@ -1684,19 +1675,19 @@ Adresse : %4
     </message>
     <message>
         <source>Are you sure you want to create contract? &lt;br /&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Etes-vous sûr de vouloir créer ce contrat ?&lt;br /&gt;</translation>
     </message>
     <message>
         <source>Confirm contract creation.</source>
-        <translation type="unfinished"></translation>
+        <translation>Confirmation création</translation>
     </message>
     <message>
         <source>Create contract</source>
-        <translation type="unfinished"></translation>
+        <translation>Créer contrat</translation>
     </message>
     <message>
         <source>Gas limit. Default = %1, Max = %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Limite de Gas Défault = %1, Max = %2</translation>
     </message>
     <message>
         <source>Gas price: LUX price per gas unit. Default = %1, Min = %2</source>
@@ -1751,11 +1742,11 @@ Adresse : %4
     </message>
     <message>
         <source>Configure Darksend</source>
-        <translation type="unfinished"></translation>
+        <translation>Configurer Luxsend</translation>
     </message>
     <message>
         <source>Darksend Configuration</source>
-        <translation type="unfinished"></translation>
+        <translation>Configuration Luxsend</translation>
     </message>
     <message>
         <source>Darksend was successfully set to basic (%1 and 2 rounds). You can change this at any time by opening LUX&apos;s configuration screen.</source>
@@ -1833,27 +1824,27 @@ Adresse : %4
     </message>
     <message>
         <source>Label</source>
-        <translation type="unfinished"></translation>
+        <translation>Nom</translation>
     </message>
     <message>
         <source>Contract Address</source>
-        <translation type="unfinished"></translation>
+        <translation>Adresse du contrat</translation>
     </message>
     <message>
         <source>Interface (ABI)</source>
-        <translation type="unfinished"></translation>
+        <translation>Interface (ABI)</translation>
     </message>
     <message>
         <source>New contract info</source>
-        <translation type="unfinished"></translation>
+        <translation>Nouveau contrat</translation>
     </message>
     <message>
         <source>Edit contract info</source>
-        <translation type="unfinished"></translation>
+        <translation>Modifier contrat</translation>
     </message>
     <message>
         <source>The entered address &quot;%1&quot; is already in the contract book.</source>
-        <translation type="unfinished"></translation>
+        <translation>L&apos;adresse &quot;%1&quot; est déjà dans l&apos;annuaire de contrats.</translation>
     </message>
 </context>
 <context>
@@ -1868,11 +1859,11 @@ Adresse : %4
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Annuler</translation>
     </message>
     <message>
         <source>Next</source>
-        <translation type="unfinished"></translation>
+        <translation>Suivant</translation>
     </message>
     <message>
         <source>&lt;p style=&quot;line-height:140&quot;&gt;&lt;span&gt;&lt;br&gt;Please read the following license agreement. You must accept the terms contained in this agreement before continuing with the application.</source>
@@ -2132,7 +2123,8 @@ Adresse : %4
     <message>
         <source>Mandatory fields are not present:
 %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Champs obligatoires non présents:
+%1</translation>
     </message>
     <message>
         <source>Optional fields are not present:
@@ -2183,62 +2175,62 @@ Adresse : %4
     </message>
     <message>
         <source>Luxcore</source>
-        <translation type="unfinished"></translation>
+        <translation>Luxcore</translation>
     </message>
     <message>
         <source>About Luxcore</source>
-        <translation type="unfinished"></translation>
+        <translation>A propos de Luxcore</translation>
     </message>
     <message>
         <source>Command-line options</source>
-        <translation type="unfinished"></translation>
+        <translation>Options ligne de commande</translation>
     </message>
     <message>
         <source>command-line options</source>
-        <translation type="unfinished"></translation>
+        <translation>options ligne de commande</translation>
     </message>
     <message>
         <source>UI Options:</source>
-        <translation type="unfinished"></translation>
+        <translation>Options UI :</translation>
     </message>
     <message>
         <source>Choose data directory on startup (default: %u)</source>
-        <translation type="unfinished"></translation>
+        <translation>Choisir le dossier de données au démarrage (défaut: %u)</translation>
     </message>
     <message>
         <source>Set language, for example &quot;de_DE&quot; (default: system locale)</source>
-        <translation type="unfinished"></translation>
+        <translation>Définir la langue, par exemple &quot;fr_FR&quot; (défaut: langue du système)</translation>
     </message>
     <message>
         <source>Start minimized</source>
-        <translation type="unfinished"></translation>
+        <translation>Démarrer minimisé</translation>
     </message>
     <message>
         <source>Set SSL root certificates for payment request (default: -system-)</source>
-        <translation type="unfinished"></translation>
+        <translation>Définir les certificats racines SSL pour les demandes de paiement (défaut: -système-)</translation>
     </message>
     <message>
         <source>Show splash screen on startup (default: %u)</source>
-        <translation type="unfinished"></translation>
+        <translation>Afficher le splash screen au démarrage (défaut: %u)</translation>
     </message>
     <message>
         <source>Reset all settings changed in the GUI</source>
-        <translation type="unfinished"></translation>
+        <translation>Réinitialiser tous les paramètres modifiés par l&apos;utilisateur</translation>
     </message>
 </context>
 <context>
     <name>HexAddressConverter</name>
     <message>
         <source>Hex Address Converter</source>
-        <translation type="unfinished"></translation>
+        <translation>Conversion d&apos;adresse Hex</translation>
     </message>
     <message>
         <source>Address</source>
-        <translation type="unfinished">Adresse</translation>
+        <translation>Adresse</translation>
     </message>
     <message>
         <source>Result</source>
-        <translation type="unfinished"></translation>
+        <translation>Résultat</translation>
     </message>
 </context>
 <context>
@@ -2261,27 +2253,27 @@ Adresse : %4
     </message>
     <message>
         <source>Welcome to Luxcore.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bienvenue dans Luxcore.</translation>
     </message>
     <message>
         <source>As this is the first time the program is launched, you can choose where Luxcore will store its data.</source>
-        <translation type="unfinished"></translation>
+        <translation>Lors de ce premier lancement, vous pouvez choisir où stocker les données Luxcore.</translation>
     </message>
     <message>
         <source>Luxcore will download and store a copy of the LUX block chain. At least %1GB of data will be stored in this directory, and it will grow over time. The wallet will also be stored in this directory.</source>
-        <translation type="unfinished"></translation>
+        <translation>Luxcore va télécharger et stocker une copie de la blockchain LUX. Au moins %1Go de données sera utilisé dans ce dossier qui va grossir avec le temps. Votre portefeuille sera aussi enregistré dans ce dossier.</translation>
     </message>
     <message>
         <source>Use the default data directory</source>
-        <translation type="unfinished"></translation>
+        <translation>Utiliser répertoire de données par défaut</translation>
     </message>
     <message>
         <source>Use a custom data directory:</source>
-        <translation type="unfinished"></translation>
+        <translation>Utiliser un autre répertoire :</translation>
     </message>
     <message>
         <source>Luxcore</source>
-        <translation type="unfinished"></translation>
+        <translation>Luxcore</translation>
     </message>
     <message>
         <source>Error: Specified data directory &quot;%1&quot; cannot be created.</source>
@@ -2296,43 +2288,43 @@ Adresse : %4
     </message>
     <message>
         <source>Send</source>
-        <translation type="unfinished"></translation>
+        <translation>Envoyer</translation>
     </message>
     <message>
         <source>Receive</source>
-        <translation type="unfinished"></translation>
+        <translation>Recevoir</translation>
     </message>
     <message>
         <source>AddToken</source>
-        <translation type="unfinished"></translation>
+        <translation>Ajout de Jeton</translation>
     </message>
     <message>
         <source>Copy token address</source>
-        <translation type="unfinished"></translation>
+        <translation>Copier l&apos;adresse du jeton</translation>
     </message>
     <message>
         <source>Copy token balance</source>
-        <translation type="unfinished"></translation>
+        <translation>Copier la balance</translation>
     </message>
     <message>
         <source>Copy token name</source>
-        <translation type="unfinished"></translation>
+        <translation>Copier le nom du jeton</translation>
     </message>
     <message>
         <source>Copy sender address</source>
-        <translation type="unfinished"></translation>
+        <translation>Copier l&apos;addresse de l&apos;expéditeur</translation>
     </message>
     <message>
         <source>Remove token</source>
-        <translation type="unfinished"></translation>
+        <translation>Retirer le jeton</translation>
     </message>
     <message>
         <source>Confirm token remove</source>
-        <translation type="unfinished"></translation>
+        <translation>Confirmation du retrait</translation>
     </message>
     <message>
         <source>The selected token will be removed from the list. Are you sure?</source>
-        <translation type="unfinished"></translation>
+        <translation>Le jeton sélectionné sera retiré de la liste. Etes-vous sûr ?</translation>
     </message>
 </context>
 <context>
@@ -2343,62 +2335,7 @@ Adresse : %4
     </message>
     <message>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This pane shows an example lux.conf template with the necessary masternode settings.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>MasternodeList</name>
-    <message>
-        <source>Address</source>
-        <translation type="vanished">Adresse</translation>
-    </message>
-    <message>
-        <source>Protocol</source>
-        <translation type="vanished">Protocole</translation>
-    </message>
-    <message>
-        <source>Status</source>
-        <translation type="vanished">Etat</translation>
-    </message>
-    <message>
-        <source>Active</source>
-        <translation type="vanished">Actif</translation>
-    </message>
-    <message>
-        <source>0</source>
-        <translation type="vanished">0</translation>
-    </message>
-    <message>
-        <source>All Masternodes</source>
-        <translation type="vanished">Toutes les masternodes</translation>
-    </message>
-    <message>
-        <source>Filter List:</source>
-        <translation type="vanished">Liste de filtres :</translation>
-    </message>
-    <message>
-        <source>Filter masternode list</source>
-        <translation type="vanished">Filtrer la liste des masternodes</translation>
-    </message>
-    <message>
-        <source>Confirm masternode start</source>
-        <translation type="vanished">Confirmer le lancement de la masternode</translation>
-    </message>
-    <message>
-        <source>Are you sure you want to start masternode %1?</source>
-        <translation type="vanished">Êtes-vous sûr de vouloir lancer la masternode %1?</translation>
-    </message>
-    <message>
-        <source>Are you sure you want to start ALL masternodes?</source>
-        <translation type="vanished">Êtes-vous sûr de vouloir lancer TOUTES les masternodes?</translation>
-    </message>
-    <message>
-        <source>Command is not available right now</source>
-        <translation type="vanished">La commande n&apos;est pas disponible actuellement</translation>
-    </message>
-    <message>
-        <source>You can&apos;t use this command until masternode list is synced</source>
-        <translation type="vanished">Vous ne pouvez pas utiliser cette commande tant que la liste de masternodes n&apos;est pas synchronisée</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Voici un exemple de ficheir lux.conf avec les paramètres nécessaires pour une masternode.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
@@ -2409,23 +2346,23 @@ Adresse : %4
     </message>
     <message>
         <source>Masternodes Network</source>
-        <translation type="unfinished"></translation>
+        <translation>Réseau Masternodes</translation>
     </message>
     <message>
         <source>Address</source>
-        <translation type="unfinished">Adresse</translation>
+        <translation>Adresse</translation>
     </message>
     <message>
         <source>Rank</source>
-        <translation type="unfinished"></translation>
+        <translation>Rang</translation>
     </message>
     <message>
         <source>Active</source>
-        <translation type="unfinished">Actif</translation>
+        <translation>Active</translation>
     </message>
     <message>
         <source>Active (secs)</source>
-        <translation type="unfinished"></translation>
+        <translation>Activée (secs)</translation>
     </message>
     <message>
         <source>Last Seen</source>
@@ -2433,47 +2370,47 @@ Adresse : %4
     </message>
     <message>
         <source>Pubkey</source>
-        <translation type="unfinished"></translation>
+        <translation>Pubkey</translation>
     </message>
     <message>
         <source>Masternodes Activated:</source>
-        <translation type="unfinished"></translation>
+        <translation>Masternodes activées :</translation>
     </message>
     <message>
         <source>0</source>
-        <translation type="unfinished">0</translation>
+        <translation>0</translation>
     </message>
     <message>
         <source>Parallel Masternodes</source>
-        <translation type="unfinished"></translation>
+        <translation>Masternodes parallèles</translation>
     </message>
     <message>
         <source>Masternode Configuration</source>
-        <translation type="unfinished"></translation>
+        <translation>Configuration Masternode</translation>
     </message>
     <message>
         <source>Alias</source>
-        <translation type="unfinished"></translation>
+        <translation>Alias</translation>
     </message>
     <message>
         <source>IP/Onion</source>
-        <translation type="unfinished"></translation>
+        <translation>IP/Onion</translation>
     </message>
     <message>
         <source>Status</source>
-        <translation type="unfinished">Etat</translation>
+        <translation>Etat</translation>
     </message>
     <message>
         <source>Collateral Address</source>
-        <translation type="unfinished"></translation>
+        <translation>Adresse collatérale</translation>
     </message>
     <message>
         <source>&amp;Create...</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Créer...</translation>
     </message>
     <message>
         <source>&amp;Edit</source>
-        <translation type="unfinished">Modifi&amp;er</translation>
+        <translation>Modifi&amp;er</translation>
     </message>
     <message>
         <source>&amp;Get Config</source>
@@ -2481,23 +2418,23 @@ Adresse : %4
     </message>
     <message>
         <source>&amp;Remove</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Retirer</translation>
     </message>
     <message>
         <source>&amp;Start</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Démarrer</translation>
     </message>
     <message>
         <source>&amp;Start All</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Tout démarrer</translation>
     </message>
     <message>
         <source>&amp;Stop</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Arrêter</translation>
     </message>
     <message>
         <source>&amp;Stop All</source>
-        <translation type="unfinished"></translation>
+        <translation>Arrêter t&amp;out</translation>
     </message>
 </context>
 <context>
@@ -2516,47 +2453,43 @@ Adresse : %4
     </message>
     <message>
         <source>Number of blocks left</source>
-        <translation type="unfinished"></translation>
+        <translation>Nombre de blocs restant</translation>
     </message>
     <message>
         <source>unknown...</source>
-        <translation type="unfinished"></translation>
+        <translation>inconnu...</translation>
     </message>
     <message>
         <source>Last block time</source>
-        <translation type="unfinished"></translation>
+        <translation>Date du dernier bloc</translation>
     </message>
     <message>
         <source>Progress</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>~</source>
-        <translation type="unfinished"></translation>
+        <translation>Progression</translation>
     </message>
     <message>
         <source>Progress increase per hour</source>
-        <translation type="unfinished"></translation>
+        <translation>Progression par heure</translation>
     </message>
     <message>
         <source>calculating...</source>
-        <translation type="unfinished"></translation>
+        <translation>calcul...</translation>
     </message>
     <message>
         <source>Estimated time left until synced</source>
-        <translation type="unfinished"></translation>
+        <translation>Temps estimé pour la synchronisation</translation>
     </message>
     <message>
         <source>Hide</source>
-        <translation type="unfinished"></translation>
+        <translation>Cacher</translation>
     </message>
     <message>
         <source>Unknown. Syncing Headers (%1)...</source>
-        <translation type="unfinished"></translation>
+        <translation>Inconnu. Synchronisation entêtes (%1)...</translation>
     </message>
     <message>
         <source>Unknown...</source>
-        <translation type="unfinished"></translation>
+        <translation>Inconnu...</translation>
     </message>
 </context>
 <context>
@@ -2625,85 +2558,87 @@ Veuillez vérifier l&apos;adresse et réessayer.</translation>
     </message>
     <message>
         <source>MultiSend</source>
-        <translation type="unfinished"></translation>
+        <translation>MultiSend</translation>
     </message>
     <message>
         <source>MultiSend allows you to automatically send up to 100% of your stake or masternode reward to a list of other LUX addresses after it matures.</source>
-        <translation type="unfinished"></translation>
+        <translation>MultiSend permet d&apos;envoyer automatiquement jusqu&apos;à 100% de vos intérêts et revenus masternode vers une autre adresse LUX, après maturation.</translation>
     </message>
     <message>
         <source>Send For Masternode Rewards</source>
-        <translation type="unfinished"></translation>
+        <translation>Envoyer revenus Masternode</translation>
     </message>
     <message>
         <source>Send For Stakes</source>
-        <translation type="unfinished"></translation>
+        <translation>Envoyer PoS</translation>
     </message>
     <message>
         <source>Percentage of stake to send</source>
-        <translation type="unfinished"></translation>
+        <translation>Pourcentage du PoS à envoyer</translation>
     </message>
     <message>
         <source>Enter % to Give (1-100)</source>
-        <translation type="unfinished"></translation>
+        <translation>% envoyé (1-100)</translation>
     </message>
     <message>
         <source>Address to send portion of stake to</source>
-        <translation type="unfinished"></translation>
+        <translation>Adresse où envoyer les revenus</translation>
     </message>
     <message>
         <source>Add to the MultiSend vector</source>
-        <translation type="unfinished"></translation>
+        <translation>Ajouter au vecteur MultiSend</translation>
     </message>
     <message>
         <source>Add to MultiSend Vector</source>
-        <translation type="unfinished"></translation>
+        <translation>Ajout au vecteur MultiSend</translation>
     </message>
     <message>
         <source>Delete from  MultiSend vector</source>
-        <translation type="unfinished"></translation>
+        <translation>Supprimer du vecteur MultiSend</translation>
     </message>
     <message>
         <source>Delete Address From MultiSend Vector</source>
-        <translation type="unfinished"></translation>
+        <translation>Supprimer l&apos;adresse du vecteur MultiSend</translation>
     </message>
     <message>
         <source>Activate multisend</source>
-        <translation type="unfinished"></translation>
+        <translation>Activer MultiSend</translation>
     </message>
     <message>
         <source>Activate MultiSend</source>
-        <translation type="unfinished"></translation>
+        <translation>Activer MultiSend</translation>
     </message>
     <message>
         <source>Deactivate multisend</source>
-        <translation type="unfinished"></translation>
+        <translation>Désactiver MultiSend</translation>
     </message>
     <message>
         <source>Deactivate MultiSend</source>
-        <translation type="unfinished"></translation>
+        <translation>Désactiver MultiSend</translation>
     </message>
     <message>
         <source>View MultiSend Vector</source>
-        <translation type="unfinished"></translation>
+        <translation>Afficher vecteur MultiSend</translation>
     </message>
     <message>
         <source>View MultiSend</source>
-        <translation type="unfinished"></translation>
+        <translation>Afficher MultiSend</translation>
     </message>
     <message>
         <source>The total amount of your MultiSend vector is over 100% of your stake reward
 </source>
-        <translation type="unfinished"></translation>
+        <translation>Le montant total du vecteur est supérieur à 100% des revenus
+</translation>
     </message>
     <message>
         <source>MultiSend Vector
 </source>
-        <translation type="unfinished"></translation>
+        <translation>Vecteur MultiSend
+</translation>
     </message>
     <message>
         <source>Removed </source>
-        <translation type="unfinished"></translation>
+        <translation>Supprimé </translation>
     </message>
 </context>
 <context>
@@ -2765,27 +2700,27 @@ Veuillez vérifier l&apos;adresse et réessayer.</translation>
     </message>
     <message>
         <source>Automatically start LUX after logging in to the system.</source>
-        <translation type="unfinished"></translation>
+        <translation>Lance automatiquement Luxcore après le login dans le système.</translation>
     </message>
     <message>
         <source>&amp;Start LUX on system login</source>
-        <translation type="unfinished"></translation>
+        <translation>Démarrer Luxcore avec le &amp;système</translation>
     </message>
     <message>
         <source>Enable  log &amp;events</source>
-        <translation type="unfinished"></translation>
+        <translation>Activer log &amp;events</translation>
     </message>
     <message>
         <source>Size of &amp;database cache</source>
-        <translation type="unfinished"></translation>
+        <translation>Taille du cache base de &amp;données (-dbcache)</translation>
     </message>
     <message>
         <source>MB</source>
-        <translation type="unfinished"></translation>
+        <translation>Mo</translation>
     </message>
     <message>
         <source>Number of script &amp;verification threads</source>
-        <translation type="unfinished"></translation>
+        <translation>Threads pour la &amp;vérification des scripts</translation>
     </message>
     <message>
         <source>(0 = auto, &lt;0 = leave that many cores free)</source>
@@ -2793,7 +2728,7 @@ Veuillez vérifier l&apos;adresse et réessayer.</translation>
     </message>
     <message>
         <source>Number of debug log files</source>
-        <translation type="unfinished"></translation>
+        <translation>Nombre de fichiers debug.log</translation>
     </message>
     <message>
         <source>This setting determines the amount of individual masternodes that an input will be anonymized through.&lt;br/&gt;More rounds of anonymization gives a higher degree of privacy, but also costs more in fees.</source>
@@ -2801,27 +2736,27 @@ Veuillez vérifier l&apos;adresse et réessayer.</translation>
     </message>
     <message>
         <source>Darksend rounds to use</source>
-        <translation type="unfinished"></translation>
+        <translation>Rounds Luxsend</translation>
     </message>
     <message>
         <source>This amount acts as a threshold to turn off Darksend once it&apos;s reached.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ce montant est un seuil pour désactiver Luxsend.</translation>
     </message>
     <message>
         <source>Amount of LUX to keep anonymized</source>
-        <translation type="unfinished"></translation>
+        <translation>Montant en LUX pour anonymiser</translation>
     </message>
     <message>
         <source>Expert</source>
-        <translation type="unfinished"></translation>
+        <translation>Expert</translation>
     </message>
     <message>
         <source>Whether to show coin control features or not.</source>
-        <translation type="unfinished"></translation>
+        <translation>Afficher ou cacher les contrôles de selection d&apos;entrées et de découpe.</translation>
     </message>
     <message>
         <source>Enable coin &amp;control features</source>
-        <translation type="unfinished"></translation>
+        <translation>Activer le &amp;contrôle des pièces</translation>
     </message>
     <message>
         <source>Show additional tab listing all your masternodes in first sub-tab&lt;br/&gt;and all masternodes on the network in second sub-tab.</source>
@@ -2829,15 +2764,15 @@ Veuillez vérifier l&apos;adresse et réessayer.</translation>
     </message>
     <message>
         <source>Show Masternodes Tab</source>
-        <translation type="unfinished"></translation>
+        <translation>Afficher l&apos;onglet Masternodes</translation>
     </message>
     <message>
         <source>Show additional information and buttons for Luxsend on overview screen.</source>
-        <translation type="unfinished"></translation>
+        <translation>Affiche des informations détaillées pour Luxsend sur l&apos;écran d&apos;accueil</translation>
     </message>
     <message>
         <source>Enable advanced Luxsend interface</source>
-        <translation type="unfinished"></translation>
+        <translation>Afficher l&apos;interface Luxsend avancée</translation>
     </message>
     <message>
         <source>If you disable the spending of unconfirmed change, the change from a transaction&lt;br/&gt;cannot be used until that transaction has at least one confirmation.&lt;br/&gt;This also affects how your balance is computed.</source>
@@ -2845,11 +2780,11 @@ Veuillez vérifier l&apos;adresse et réessayer.</translation>
     </message>
     <message>
         <source>&amp;Spend unconfirmed change</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Utiliser les retours de monnaie non confirmés</translation>
     </message>
     <message>
         <source>Check for &amp;updates</source>
-        <translation type="unfinished"></translation>
+        <translation>Vérifier si mise à jour</translation>
     </message>
     <message>
         <source>Coming soon</source>
@@ -2857,19 +2792,19 @@ Veuillez vérifier l&apos;adresse et réessayer.</translation>
     </message>
     <message>
         <source>&amp;Activate Parallel Masternode</source>
-        <translation type="unfinished"></translation>
+        <translation>Activer Masternodes parallèles</translation>
     </message>
     <message>
         <source>Enable &amp;zero balance for receiver token address</source>
-        <translation type="unfinished"></translation>
+        <translation>Activer les balances à &amp;zéro pour recevoir des jetons</translation>
     </message>
     <message>
         <source>Don&apos;t use change &amp;address</source>
-        <translation type="unfinished"></translation>
+        <translation>Ne pas générer d&apos;adresses de retour</translation>
     </message>
     <message>
         <source>Number of automatic wallet backups</source>
-        <translation type="unfinished"></translation>
+        <translation>Nombre de sauvegardes auto. portefeuille</translation>
     </message>
     <message>
         <source>Automatically open the LUX client port on the router. This only works when your router supports UPnP and it is enabled.</source>
@@ -2877,67 +2812,67 @@ Veuillez vérifier l&apos;adresse et réessayer.</translation>
     </message>
     <message>
         <source>Map port using &amp;UPnP</source>
-        <translation type="unfinished"></translation>
+        <translation>Ouvrir un port du routeur avec &amp;UPnP</translation>
     </message>
     <message>
         <source>Allow incoming connections</source>
-        <translation type="unfinished"></translation>
+        <translation>Autoriser connexions entrantes</translation>
     </message>
     <message>
         <source>Connect to the LUX network through a SOCKS5 proxy.</source>
-        <translation type="unfinished"></translation>
+        <translation>Se connecter au réseau LUX via un proxy SOCKS5.</translation>
     </message>
     <message>
         <source>&amp;Connect through SOCKS5 proxy (default proxy):</source>
-        <translation type="unfinished"></translation>
+        <translation>Se &amp;connecter via proxy SOCKS5 (proxy par défaut) :</translation>
     </message>
     <message>
         <source>Proxy &amp;IP:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;IP du Proxy :</translation>
     </message>
     <message>
         <source>IP address of the proxy (e.g. IPv4: 127.0.0.1 / IPv6: ::1)</source>
-        <translation type="unfinished"></translation>
+        <translation>Adresse IP du proxy (IPv4: 127.0.0.1 / IPv6: ::1)</translation>
     </message>
     <message>
         <source>&amp;Port:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Port :</translation>
     </message>
     <message>
         <source>Port of the proxy (e.g. 9050)</source>
-        <translation type="unfinished"></translation>
+        <translation>Port du proxy (ex: 9050)</translation>
     </message>
     <message>
         <source>&amp;Hide the icon from the system tray.</source>
-        <translation type="unfinished"></translation>
+        <translation>Cacher l&apos;icône de la barre de notifications système.</translation>
     </message>
     <message>
         <source>Hide tray icon</source>
-        <translation type="unfinished"></translation>
+        <translation>Cac&amp;her icône de notification</translation>
     </message>
     <message>
         <source>Show only a tray icon after minimizing the window.</source>
-        <translation type="unfinished"></translation>
+        <translation>Affiche uniquement une icône lors de la réduction du portefeuille</translation>
     </message>
     <message>
         <source>&amp;Minimize to the tray instead of the taskbar</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Réduire dans les icônes de notification</translation>
     </message>
     <message>
         <source>Minimize instead of exit the application when the window is closed. When this option is enabled, the application will be closed only after selecting Quit in the menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>Réduire plutôt que de fermer l&apos;application lorsque la fenêtre est fermée. Si activé, l&apos;application peut être fermée par un clic droit sur l&apos;icône.</translation>
     </message>
     <message>
         <source>M&amp;inimize on close</source>
-        <translation type="unfinished"></translation>
+        <translation>Réduire à la fermeture</translation>
     </message>
     <message>
         <source>User Interface &amp;language:</source>
-        <translation type="unfinished"></translation>
+        <translation>Langue de l&apos;interface :</translation>
     </message>
     <message>
         <source>The user interface language can be set here. This setting will take effect after restarting LUX.</source>
-        <translation type="unfinished"></translation>
+        <translation>La langue de l&apos;interface peut être définie ici. Requiert un redémarrage de Luxcore.</translation>
     </message>
     <message>
         <source>Language missing or translation incomplete? Help contributing translations here:
@@ -2946,19 +2881,19 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>User Interface Theme:</source>
-        <translation type="unfinished"></translation>
+        <translation>Thème de l&apos;interface :</translation>
     </message>
     <message>
         <source>&amp;Unit to show amounts in:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Unité utilisée pour les montants :</translation>
     </message>
     <message>
         <source>Choose the default subdivision unit to show in the interface and when sending coins.</source>
-        <translation type="unfinished"></translation>
+        <translation>Préférence de sub-division d&apos;unité à utiliser dans l&apos;interface et pour l&apos;envoi.</translation>
     </message>
     <message>
         <source>Decimal digits</source>
-        <translation type="unfinished"></translation>
+        <translation>Nombre de décimales</translation>
     </message>
     <message>
         <source>Third party URLs (e.g. a block explorer) that appear in the transactions tab as context menu items. %s in the URL is replaced by transaction hash. Multiple URLs are separated by vertical bar |.</source>
@@ -2966,51 +2901,51 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Third party transaction URLs</source>
-        <translation type="unfinished"></translation>
+        <translation>URLs de traductions tierces</translation>
     </message>
     <message>
         <source>Active command-line options that override above options:</source>
-        <translation type="unfinished"></translation>
+        <translation>Options de ligne de commande qui modifient ces paramètres :</translation>
     </message>
     <message>
         <source>Reset all client options to default.</source>
-        <translation type="unfinished"></translation>
+        <translation>Réinitialiser toutes les options par défaut.</translation>
     </message>
     <message>
         <source>&amp;Reset Options</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Reset Options</translation>
     </message>
     <message>
         <source>&amp;OK</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Ok</translation>
     </message>
     <message>
         <source>&amp;Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Annuler</translation>
     </message>
     <message>
         <source>default</source>
-        <translation type="unfinished"></translation>
+        <translation>par défaut</translation>
     </message>
     <message>
         <source>Confirm options reset</source>
-        <translation type="unfinished"></translation>
+        <translation>Confirmer reset des options</translation>
     </message>
     <message>
         <source>Client restart required to activate changes.</source>
-        <translation type="unfinished"></translation>
+        <translation>Le client doit être relancé pour activer les modifications.</translation>
     </message>
     <message>
         <source>Client will be shutdown, do you want to proceed?</source>
-        <translation type="unfinished"></translation>
+        <translation>Le client sera fermé, souhaitez-vous continuer ?</translation>
     </message>
     <message>
         <source>This change would require a client restart.</source>
-        <translation type="unfinished"></translation>
+        <translation>Cette modification nécessite un rédémarrage.</translation>
     </message>
     <message>
         <source>The supplied proxy address is invalid.</source>
-        <translation type="unfinished"></translation>
+        <translation>L&apos;adresse du proxy est invalide.</translation>
     </message>
 </context>
 <context>
@@ -3125,7 +3060,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Balances</source>
-        <translation type="unfinished"></translation>
+        <translation>Balances</translation>
     </message>
     <message>
         <source>The displayed information may be out of date. Your wallet automatically synchronizes with the LUX network after a connection is established, but this process has not completed yet.</source>
@@ -3137,11 +3072,11 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Enabled/Disabled</source>
-        <translation type="unfinished"></translation>
+        <translation>Activé/désactivé</translation>
     </message>
     <message>
         <source>0 LUX / 0 Rounds</source>
-        <translation type="unfinished"></translation>
+        <translation>0 LUX / 0 Round</translation>
     </message>
     <message>
         <source>The denominations you submitted to the Masternode.&lt;br&gt;To mix, other users must submit the exact same denominations.</source>
@@ -3149,15 +3084,15 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>n/a</source>
-        <translation type="unfinished"></translation>
+        <translation>n/a</translation>
     </message>
     <message>
         <source>Start/Stop Mixing</source>
-        <translation type="unfinished"></translation>
+        <translation>Démarrer/Arrêter le Mixage</translation>
     </message>
     <message>
         <source>(Last Message)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Dernier message)</translation>
     </message>
     <message>
         <source>Try to manually submit a Luxsend request.</source>
@@ -3165,19 +3100,19 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Try Mix</source>
-        <translation type="unfinished"></translation>
+        <translation>Essai Mix</translation>
     </message>
     <message>
         <source>Reset the current status of Luxsend (can interrupt Luxsend if it&apos;s in the process of Mixing, which can cost you money!)</source>
-        <translation type="unfinished"></translation>
+        <translation>Réinitialise l&apos;état de Luxsend (peut interrompre Luxsend si un Mix est en cours, ce qui peut vous coûter de l&apos;argent)</translation>
     </message>
     <message>
         <source>Reset</source>
-        <translation type="unfinished"></translation>
+        <translation>Reset</translation>
     </message>
     <message>
         <source>Luxsend</source>
-        <translation type="unfinished"></translation>
+        <translation>Luxsend</translation>
     </message>
     <message>
         <source>out of sync</source>
@@ -3185,7 +3120,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>No inputs detected</source>
-        <translation type="unfinished"></translation>
+        <translation>Pas d&apos;entrées détectées</translation>
     </message>
     <message numerus="yes">
         <source>%n Rounds</source>
@@ -3196,7 +3131,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Found enough compatible inputs to anonymize %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Assez d&apos;entrées compatibles pour anonymiser %1</translation>
     </message>
     <message>
         <source>Not enough compatible inputs to anonymize &lt;span style=&apos;color:red;&apos;&gt;%1&lt;/span&gt;,&lt;br&gt;will anonymize &lt;span style=&apos;color:red;&apos;&gt;%2&lt;/span&gt; instead</source>
@@ -3204,19 +3139,19 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Overall progress</source>
-        <translation type="unfinished"></translation>
+        <translation>Progression</translation>
     </message>
     <message>
         <source>Denominated</source>
-        <translation type="unfinished"></translation>
+        <translation>Dénommé</translation>
     </message>
     <message>
         <source>Mixed</source>
-        <translation type="unfinished"></translation>
+        <translation>Mixé</translation>
     </message>
     <message>
         <source>Anonymized</source>
-        <translation type="unfinished"></translation>
+        <translation>Anonymisé</translation>
     </message>
     <message numerus="yes">
         <source>Denominated inputs have %5 of %n rounds on average</source>
@@ -3227,59 +3162,59 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Waiting for update</source>
-        <translation type="unfinished"></translation>
+        <translation>Attente de mise à jour</translation>
     </message>
     <message>
         <source>Waiting in a queue</source>
-        <translation type="unfinished"></translation>
+        <translation>Dans file d&apos;attente</translation>
     </message>
     <message>
         <source>Accepting entries</source>
-        <translation type="unfinished"></translation>
+        <translation>Accepte les entrées</translation>
     </message>
     <message>
         <source>Master node broadcast</source>
-        <translation type="unfinished"></translation>
+        <translation>Diffusion Masternode</translation>
     </message>
     <message>
         <source>Signing</source>
-        <translation type="unfinished"></translation>
+        <translation>Signature</translation>
     </message>
     <message>
         <source>Transmitting</source>
-        <translation type="unfinished"></translation>
+        <translation>Transmission</translation>
     </message>
     <message>
         <source>Errored</source>
-        <translation type="unfinished"></translation>
+        <translation>Erroné</translation>
     </message>
     <message>
         <source>Success</source>
-        <translation type="unfinished"></translation>
+        <translation>Succès</translation>
     </message>
     <message>
         <source>N/A</source>
-        <translation type="unfinished"></translation>
+        <translation>N/A</translation>
     </message>
     <message>
         <source>Darksend</source>
-        <translation type="unfinished"></translation>
+        <translation>Luxsend</translation>
     </message>
     <message>
         <source>Darksend was successfully reset.</source>
-        <translation type="unfinished"></translation>
+        <translation>Luxsend a été reinitialisé.</translation>
     </message>
     <message>
         <source>If you don&apos;t want to see internal Darksend fees/transactions select &quot;Most Common&quot; as Type on the &quot;Transactions&quot; tab.</source>
-        <translation type="unfinished"></translation>
+        <translation>Si vous de voulez pas voir les transactions/frais internes à Luxsend, sélectionner &quot;Les plus courantes&quot; en filtre dans la liste des transactions.</translation>
     </message>
     <message>
         <source>Darksend requires at least %1 to use.</source>
-        <translation type="unfinished"></translation>
+        <translation>Luxsend nécessite au moins %1 pour être utilisé.</translation>
     </message>
     <message>
         <source>Wallet is locked and user declined to unlock. Disabling Darksend.</source>
-        <translation type="unfinished"></translation>
+        <translation>Le portefeuille est toujours vérouillé. Désactivation de Luxsend.</translation>
     </message>
 </context>
 <context>
@@ -3381,11 +3316,11 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Address/Hostname</source>
-        <translation type="unfinished"></translation>
+        <translation>Adresse/Hôte</translation>
     </message>
     <message>
         <source>Ping Time</source>
-        <translation type="unfinished"></translation>
+        <translation>Ping</translation>
     </message>
 </context>
 <context>
@@ -3416,23 +3351,23 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>%1 d</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 j</translation>
     </message>
     <message>
         <source>%1 h</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 h</translation>
     </message>
     <message>
         <source>%1 m</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 min</translation>
     </message>
     <message>
         <source>%1 s</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 sec</translation>
     </message>
     <message>
         <source>NETWORK</source>
-        <translation type="unfinished"></translation>
+        <translation>RESEAU</translation>
     </message>
     <message>
         <source>WITNESS</source>
@@ -3440,69 +3375,69 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>UNKNOWN</source>
-        <translation type="unfinished"></translation>
+        <translation>INCONNU</translation>
     </message>
     <message>
         <source>None</source>
-        <translation type="unfinished"></translation>
+        <translation>Aucun</translation>
     </message>
     <message>
         <source>N/A</source>
-        <translation type="unfinished"></translation>
+        <translation>N/A</translation>
     </message>
     <message>
         <source>%1 ms</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 ms</translation>
     </message>
     <message numerus="yes">
         <source>%n second(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n seconde</numerusform>
+            <numerusform>%n secondes</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n minute(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n minute</numerusform>
+            <numerusform>%n minutes</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n hour(s)</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>%n heure</numerusform>
             <numerusform>%n heures</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n day(s)</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>%n jours</numerusform>
             <numerusform>%n jours</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n week(s)</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>%n semaine</numerusform>
             <numerusform>%n semaines</numerusform>
         </translation>
     </message>
     <message>
         <source>%1 and %2</source>
-        <translation type="unfinished">%1 et %2</translation>
+        <translation>%1 et %2</translation>
     </message>
     <message numerus="yes">
         <source>%n year(s)</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>%n an</numerusform>
             <numerusform>%n ans</numerusform>
         </translation>
     </message>
     <message>
         <source>Luxcore</source>
-        <translation type="unfinished"></translation>
+        <translation>Luxcore</translation>
     </message>
     <message>
         <source>Error: Specified data directory &quot;%1&quot; does not exist.</source>
@@ -3526,34 +3461,34 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>inconnu</translation>
     </message>
 </context>
 <context>
     <name>QPlatformTheme</name>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Annuler</translation>
     </message>
     <message>
         <source>Close</source>
-        <translation type="unfinished"></translation>
+        <translation>Fermer</translation>
     </message>
     <message>
         <source>Apply</source>
-        <translation type="unfinished"></translation>
+        <translation>Appliquer</translation>
     </message>
     <message>
         <source>&amp;Yes</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Oui</translation>
     </message>
     <message>
         <source>&amp;No</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Non</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished"></translation>
+        <translation>Ok</translation>
     </message>
 </context>
 <context>
@@ -3572,7 +3507,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>&amp;Copy Image</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Copier Image</translation>
     </message>
 </context>
 <context>
@@ -3667,35 +3602,35 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Tools window</source>
-        <translation type="unfinished"></translation>
+        <translation>Fenêtre outils</translation>
     </message>
     <message>
         <source>Using BerkeleyDB version</source>
-        <translation type="unfinished"></translation>
+        <translation>Version BerkeleyDB</translation>
     </message>
     <message>
         <source>N/A</source>
-        <translation type="unfinished"></translation>
+        <translation>N/A</translation>
     </message>
     <message>
         <source>Startup time</source>
-        <translation type="unfinished"></translation>
+        <translation>Démarré depuis le</translation>
     </message>
     <message>
         <source>Block chain</source>
-        <translation type="unfinished"></translation>
+        <translation>Block chain</translation>
     </message>
     <message>
         <source>DataDir</source>
-        <translation type="unfinished"></translation>
+        <translation>Répertoire données</translation>
     </message>
     <message>
         <source>Using OpenSSL version</source>
-        <translation type="unfinished"></translation>
+        <translation>Version OpenSSL</translation>
     </message>
     <message>
         <source>Last block time</source>
-        <translation type="unfinished"></translation>
+        <translation>Heure du dernier bloc</translation>
     </message>
     <message>
         <source>Temporarily switch network activity ON/OFF</source>
@@ -3703,11 +3638,11 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>&amp;Switch Network Activity</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Switch activité réseau</translation>
     </message>
     <message>
         <source>Debug log file</source>
-        <translation type="unfinished"></translation>
+        <translation>Fichier debug.log</translation>
     </message>
     <message>
         <source>Open the LUX debug log file from the current data directory. This can take a few seconds for large log files.</source>
@@ -3715,71 +3650,71 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>&amp;Open</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Ouvrir</translation>
     </message>
     <message>
         <source>&amp;Console</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Console</translation>
     </message>
     <message>
         <source>Decrease font size</source>
-        <translation type="unfinished"></translation>
+        <translation>Réduire la police</translation>
     </message>
     <message>
         <source>Increase font size</source>
-        <translation type="unfinished"></translation>
+        <translation>Agrandir la police</translation>
     </message>
     <message>
         <source>&amp;Clear</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Vider</translation>
     </message>
     <message>
         <source>&amp;Peers</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Pairs</translation>
     </message>
     <message>
         <source>Banned peers</source>
-        <translation type="unfinished"></translation>
+        <translation>Pairs bannis</translation>
     </message>
     <message>
         <source>Select a peer to view detailed information.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sélectionner un pair pour afficher les infos détaillées.</translation>
     </message>
     <message>
         <source>Whitelisted</source>
-        <translation type="unfinished"></translation>
+        <translation>Liste blanche</translation>
     </message>
     <message>
         <source>Starting Height</source>
-        <translation type="unfinished"></translation>
+        <translation>Démarré au bloc</translation>
     </message>
     <message>
         <source>Sync Height</source>
-        <translation type="unfinished"></translation>
+        <translation>Synch. au bloc</translation>
     </message>
     <message>
         <source>Synced Blocks</source>
-        <translation type="unfinished"></translation>
+        <translation>Blocs synchro.</translation>
     </message>
     <message>
         <source>Ban Score</source>
-        <translation type="unfinished"></translation>
+        <translation>Score Ban</translation>
     </message>
     <message>
         <source>Connection Time</source>
-        <translation type="unfinished"></translation>
+        <translation>Connecté depuis</translation>
     </message>
     <message>
         <source>Bytes Sent</source>
-        <translation type="unfinished"></translation>
+        <translation>Octets envoyés</translation>
     </message>
     <message>
         <source>Bytes Received</source>
-        <translation type="unfinished"></translation>
+        <translation>Octets reçus</translation>
     </message>
     <message>
         <source>Ping Time</source>
-        <translation type="unfinished"></translation>
+        <translation>Ping</translation>
     </message>
     <message>
         <source>The duration of a currently outstanding ping.</source>
@@ -3791,7 +3726,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>&amp;Wallet Repair</source>
-        <translation type="unfinished"></translation>
+        <translation>Réparation porte&amp;feuille</translation>
     </message>
     <message>
         <source>Salvage wallet</source>
@@ -3799,103 +3734,103 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Rescan blockchain files</source>
-        <translation type="unfinished"></translation>
+        <translation>Rescanner fichiers de blocs</translation>
     </message>
     <message>
         <source>Recover transactions 1</source>
-        <translation type="unfinished"></translation>
+        <translation>Récupération transactions 1</translation>
     </message>
     <message>
         <source>Recover transactions 2</source>
-        <translation type="unfinished"></translation>
+        <translation>Récupération transactions 2</translation>
     </message>
     <message>
         <source>Upgrade wallet format</source>
-        <translation type="unfinished"></translation>
+        <translation>Upgrade format portefeuille</translation>
     </message>
     <message>
         <source>The buttons below will restart the wallet with command-line options to repair the wallet, fix issues with corrupt blockhain files or missing/obsolete transactions.</source>
-        <translation type="unfinished"></translation>
+        <translation>Les boutons ci-dessous redémarrent Luxcore avec une option de réparation du portefeuille afin de corriger des problèmes de stockage ou de transactions obsolètes/manquantes.</translation>
     </message>
     <message>
         <source>-salvagewallet: Attempt to recover private keys from a corrupt wallet.dat.</source>
-        <translation type="unfinished"></translation>
+        <translation>-salvagewallet: Tente de récupérer les clés privées d&apos;un fichier wallet.dat corrompu.</translation>
     </message>
     <message>
         <source>-rescan: Rescan the block chain for missing wallet transactions.</source>
-        <translation type="unfinished"></translation>
+        <translation>-rescan: Rescanne la base de données pour chercher des transactions manquantes.</translation>
     </message>
     <message>
         <source>-zapwallettxes=1: Recover transactions from blockchain (keep meta-data, e.g. account owner).</source>
-        <translation type="unfinished"></translation>
+        <translation>-zapwallettxes=1: Réconstruit vos transactions depuis la base de données (conserve les méta-data, ex. accounts).</translation>
     </message>
     <message>
         <source>-zapwallettxes=2: Recover transactions from blockchain (drop meta-data).</source>
-        <translation type="unfinished"></translation>
+        <translation>-zapwallettxes=2: Réconstruit vos transactions depuis la base de données (retire les méta-data).</translation>
     </message>
     <message>
         <source>-upgradewallet: Upgrade wallet to latest format on startup. (Note: this is NOT an update of the wallet itself!)</source>
-        <translation type="unfinished"></translation>
+        <translation>-upgradewallet: Met à jour le format d&apos;un vieux portefeuille. (Pour migration vers clé HD, etc..)</translation>
     </message>
     <message>
         <source>Wallet repair options.</source>
-        <translation type="unfinished"></translation>
+        <translation>Options de récupération de portefeuille.</translation>
     </message>
     <message>
         <source>Rebuild index</source>
-        <translation type="unfinished"></translation>
+        <translation>Reconstruire index</translation>
     </message>
     <message>
         <source>-reindex: Rebuild block chain index from current blk000??.dat files.</source>
-        <translation type="unfinished"></translation>
+        <translation>-reindex: Reconstruit les fichiers d&apos;index à partir des fichiers blk000??.dat</translation>
     </message>
     <message>
         <source>Wallet Path</source>
-        <translation type="unfinished"></translation>
+        <translation>Chemin portefeuille</translation>
     </message>
     <message>
         <source>Wallet in use: </source>
-        <translation type="unfinished"></translation>
+        <translation>Portefeuille en cours : </translation>
     </message>
     <message>
         <source>&amp;Disconnect Node</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Déconnecter Noeud</translation>
     </message>
     <message>
         <source>&amp;Ban Node for</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Banni le Noeud pour</translation>
     </message>
     <message>
         <source>&amp;1 hour</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;1 heure</translation>
     </message>
     <message>
         <source>&amp;24 hours</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;24 heures</translation>
     </message>
     <message>
         <source>&amp;7 days</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;7 jours</translation>
     </message>
     <message>
         <source>&amp;1 year</source>
-        <translation type="unfinished"></translation>
+        <translation>1 &amp;an</translation>
     </message>
     <message>
         <source>&amp;Unban Node</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Débannir Noeud</translation>
     </message>
     <message>
         <source>Welcome to the LUX RPC console.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bienvenue dans la console RPC de Luxcore.</translation>
     </message>
     <message>
         <source>Use up and down arrows to navigate history, and &lt;b&gt;Ctrl-L&lt;/b&gt; to clear screen.</source>
-        <translation type="unfinished"></translation>
+        <translation>Utilisez les flêches haut et bas pour naviguer dans l&apos;historique, Ctrl-L pour vider la console.</translation>
     </message>
     <message>
         <source>Type &lt;b&gt;help&lt;/b&gt; for an overview of available commands.</source>
-        <translation type="unfinished"></translation>
+        <translation>Taper &lt;b&gt;help&lt;/b&gt; pour obtenir la liste des commandes.</translation>
     </message>
     <message>
         <source>&lt;b&gt;WARNING: Scammers have been active, telling users to type commands here, stealing their </source>
@@ -3907,7 +3842,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Network activity disabled</source>
-        <translation type="unfinished"></translation>
+        <translation>Activité réseau désactivée</translation>
     </message>
     <message>
         <source>In:</source>
@@ -3919,43 +3854,43 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>%1 B</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 octets</translation>
     </message>
     <message>
         <source>%1 KB</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 ko</translation>
     </message>
     <message>
         <source>%1 MB</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 Mo</translation>
     </message>
     <message>
         <source>%1 GB</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 Go</translation>
     </message>
     <message>
         <source>(node id: %1)</source>
-        <translation type="unfinished"></translation>
+        <translation>(id: %1)</translation>
     </message>
     <message>
         <source>via %1</source>
-        <translation type="unfinished"></translation>
+        <translation>via %1</translation>
     </message>
     <message>
         <source>Inbound</source>
-        <translation type="unfinished"></translation>
+        <translation>Entrante</translation>
     </message>
     <message>
         <source>Outbound</source>
-        <translation type="unfinished"></translation>
+        <translation>Sortante</translation>
     </message>
     <message>
         <source>Yes</source>
-        <translation type="unfinished">Oui</translation>
+        <translation>Oui</translation>
     </message>
     <message>
         <source>No</source>
-        <translation type="unfinished"></translation>
+        <translation>Non</translation>
     </message>
 </context>
 <context>
@@ -3990,59 +3925,59 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>An optional amount to request. Leave this empty or zero to not request a specific amount.</source>
-        <translation type="unfinished"></translation>
+        <translation>Le montant demandé. Laisser vide ou à zéro pour ne pas demander un montant spécifiquement.</translation>
     </message>
     <message>
         <source>An optional message to attach to the payment request, which will be displayed when the request is opened. Note: The message will not be sent with the payment over the Bitcoin network.</source>
-        <translation type="unfinished"></translation>
+        <translation>Un message facultatif à attacher à la demande de paiement et qui sera affiché à l'ouverture de la requête. Note: Ce message n&apos;est pas transmis sur le réseau.</translation>
     </message>
     <message>
         <source>&amp;Message:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Message :</translation>
     </message>
     <message>
         <source>An optional label to associate with the new receiving address.</source>
-        <translation type="unfinished"></translation>
+        <translation>Un nom pour retrouver cette adresse de réception.</translation>
     </message>
     <message>
         <source>Use this form to request payments. All fields are &lt;b&gt;optional&lt;/b&gt;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Utiliser ce formulaire pour demander des paiements. Tous les champs sont &lt;b&gt;facultatifs&lt;/b&gt;.</translation>
     </message>
     <message>
         <source>&amp;Label:</source>
-        <translation type="unfinished">&amp;Nom :</translation>
+        <translation>&amp;Nom :</translation>
     </message>
     <message>
         <source>&amp;Request payment</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Requête de paiement</translation>
     </message>
     <message>
         <source>Clear all fields of the form.</source>
-        <translation type="unfinished">Remettre à zéro tous les champs.</translation>
+        <translation>Remettre à zéro tous les champs.</translation>
     </message>
     <message>
         <source>Native segwit addresses (aka Bech32 or BIP-173) reduce your transaction fees later on and offer better protection against typos, but old wallets don&apos;t support them. When unchecked, an address compatible with older wallets will be created instead.</source>
-        <translation type="unfinished"></translation>
+        <translation>Les adresses natives segwit (Bech32 ou BIP-173) réduisent les frais de transaction et offrent une meilleur protection contre les fautes de frappe. Si décoché, une adresse compatible avec les anciens outils sera créée.</translation>
     </message>
     <message>
         <source>Generate native segwit (Bech32) address</source>
-        <translation type="unfinished"></translation>
+        <translation>Générer une adresse segwit native (Bech32)</translation>
     </message>
     <message>
         <source>Requested payments history</source>
-        <translation type="unfinished"></translation>
+        <translation>Historique des requêtes</translation>
     </message>
     <message>
         <source>Show the selected request (does the same as double clicking an entry)</source>
-        <translation type="unfinished"></translation>
+        <translation>Affiche la requête sélectionnée (comme pour le double clic)</translation>
     </message>
     <message>
         <source>Remove the selected entries from the list</source>
-        <translation type="unfinished"></translation>
+        <translation>Supprmier l&apos;entrée de la liste</translation>
     </message>
     <message>
         <source>Copy URI</source>
-        <translation type="unfinished"></translation>
+        <translation>Copier URL</translation>
     </message>
 </context>
 <context>
@@ -4093,11 +4028,11 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Resulting URI too long, try to reduce the text for label / message.</source>
-        <translation type="unfinished"></translation>
+        <translation>L&apos;URL générée est trop longue, essayer de reduire le nom et/ou le message.</translation>
     </message>
     <message>
         <source>Error encoding URI into QR Code.</source>
-        <translation type="unfinished"></translation>
+        <translation>Erreur pour encoder l&apos;URL dans le QR-Code</translation>
     </message>
 </context>
 <context>
@@ -4108,7 +4043,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Copy Address</source>
-        <translation type="unfinished"></translation>
+        <translation>Copier l&apos;adresse</translation>
     </message>
 </context>
 <context>
@@ -4119,7 +4054,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Label</source>
-        <translation>Label</translation>
+        <translation>Nom</translation>
     </message>
     <message>
         <source>Message</source>
@@ -4131,7 +4066,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>(no label)</source>
-        <translation>(pas de label)</translation>
+        <translation>(pas de nom)</translation>
     </message>
     <message>
         <source>(no message)</source>
@@ -4146,23 +4081,23 @@ https://www.transifex.com/luxcore/luxcore</source>
     <name>RestoreDialog</name>
     <message>
         <source>Dialog</source>
-        <translation type="unfinished"></translation>
+        <translation>Import</translation>
     </message>
     <message>
         <source>Select wallet file to restore from</source>
-        <translation type="unfinished"></translation>
+        <translation>Sélectionner le fichier à restaurer</translation>
     </message>
     <message>
         <source>...</source>
-        <translation type="unfinished"></translation>
+        <translation>...</translation>
     </message>
     <message>
         <source>Choose wallet restore option</source>
-        <translation type="unfinished"></translation>
+        <translation>Sélectionner l&apos;option de restauration</translation>
     </message>
     <message>
         <source>Reindex</source>
-        <translation type="unfinished"></translation>
+        <translation>Réindexer</translation>
     </message>
     <message>
         <source>Salvage</source>
@@ -4170,31 +4105,31 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>The wallet.dat will be restored from the selected location and the Qt Wallet will be restarted with the -reindex or -salvagewallet option.</source>
-        <translation type="unfinished"></translation>
+        <translation>Le fichier wallet.dat sera restauré depuis la location spécifiée. Luxcore sera redémarré avec les options -reindex ou -salvagewallet.</translation>
     </message>
     <message>
         <source>&amp;Reset</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Reset</translation>
     </message>
     <message>
         <source>Confirm wallet restoration</source>
-        <translation type="unfinished"></translation>
+        <translation>Confirmer la restauration</translation>
     </message>
     <message>
         <source>Warning: The wallet will be restored from location &lt;b&gt;%1&lt;/b&gt; and restarted with parameter &lt;b&gt;%2&lt;/b&gt;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Attention: Ce portefeuille sera restauré depuis &lt;b&gt;%1&lt;/b&gt; et redémarré avec le paramètre &lt;b&gt;%2&lt;/b&gt;.</translation>
     </message>
     <message>
         <source>&lt;br&gt;&lt;br&gt;Are you sure you wish to restore your wallet?</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;br&gt;&lt;br&gt;Etes-vous sûr de vouloir restaurer votre portefeuille ?</translation>
     </message>
     <message>
         <source>Restore Wallet</source>
-        <translation type="unfinished"></translation>
+        <translation>Restaurer</translation>
     </message>
     <message>
         <source>Wallet (*.dat)</source>
-        <translation type="unfinished"></translation>
+        <translation>>Wallet (*.dat)</translation>
     </message>
 </context>
 <context>
@@ -4253,7 +4188,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Transaction Fee:</source>
-        <translation>Frais transaction :</translation>
+        <translation>Frais de transaction :</translation>
     </message>
     <message>
         <source>Choose...</source>
@@ -4278,10 +4213,6 @@ https://www.transifex.com/luxcore/luxcore</source>
     <message>
         <source>total at least</source>
         <translation>total minimum</translation>
-    </message>
-    <message>
-        <source>Confirmation time:</source>
-        <translation type="vanished">Délai confirmation :</translation>
     </message>
     <message>
         <source>normal</source>
@@ -4394,10 +4325,6 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation>La création de la transaction a échoué</translation>
     </message>
     <message>
-        <source>Error: The wallet was unlocked only to anonymize coins.</source>
-        <translation type="vanished">Erreur : Le portefeuille n&apos;a été déverrouillé que pour anonymiser les pièces.</translation>
-    </message>
-    <message>
         <source>(no label)</source>
         <translation>(sans nom)</translation>
     </message>
@@ -4447,19 +4374,19 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Dust:</source>
-        <translation type="unfinished"></translation>
+        <translation>Poussière :</translation>
     </message>
     <message>
         <source>Change:</source>
-        <translation type="unfinished"></translation>
+        <translation>Monnaie :</translation>
     </message>
     <message>
         <source>If this is activated, but the change address is empty or invalid, change will be sent to a newly generated address.</source>
-        <translation type="unfinished"></translation>
+        <translation>Si ce paramètre est activé avec l&apos;adresse de retour vide ou invalide, la monnaie sera réçue sur une nouvelle adresse générée.</translation>
     </message>
     <message>
         <source>collapse fee-settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Compacter les paramètres de frais</translation>
     </message>
     <message>
         <source>If the custom fee is set to 1000 uLUXs and the transaction is only 250 bytes, then &quot;per kilobyte&quot; only pays 250 uLUXs in fee,&lt;br /&gt;while &quot;at least&quot; pays 1000 uLUXs. For transactions bigger than a kilobyte both pay by kilobyte.</source>
@@ -4479,103 +4406,103 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Confirmation time target:</source>
-        <translation type="unfinished"></translation>
+        <translation>Cible </translation>
     </message>
     <message>
         <source>(count)</source>
-        <translation type="unfinished"></translation>
+        <translation>(nombre)</translation>
     </message>
     <message>
         <source>Darksend</source>
-        <translation type="unfinished"></translation>
+        <translation>Luxsend</translation>
     </message>
     <message>
         <source>InstanTX</source>
-        <translation type="unfinished"></translation>
+        <translation>InstanTX</translation>
     </message>
     <message>
         <source>Copy bytes</source>
-        <translation type="unfinished"></translation>
+        <translation>Copier taille</translation>
     </message>
     <message>
         <source>Copy dust</source>
-        <translation type="unfinished"></translation>
+        <translation>Copier poussière</translation>
     </message>
     <message>
         <source>Copy change</source>
-        <translation type="unfinished"></translation>
+        <translation>Copier monnaie</translation>
     </message>
     <message>
         <source>The split block tool does not work when sending to outside addresses. Try again.</source>
-        <translation type="unfinished"></translation>
+        <translation>L&apos;outil de découpe ne peut pas fonctionner pour l&apos;envoi vers des adresses externes.</translation>
     </message>
     <message>
         <source>The split block tool does not work with multiple addresses. Try again.</source>
-        <translation type="unfinished"></translation>
+        <translation>L&apos;outil de découpe ne peut pas fonctionner avec des destinataires multiples.</translation>
     </message>
     <message>
         <source>The number of output is empty. Try again.</source>
-        <translation type="unfinished"></translation>
+        <translation>Le nombre de sorties est vide !</translation>
     </message>
     <message>
         <source>The number of output must be a number and greater than 0. Try again.</source>
-        <translation type="unfinished"></translation>
+        <translation>Le nombre de sorties doit être un nombre supérieur à 0.</translation>
     </message>
     <message>
         <source>%1 to %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 à %2</translation>
     </message>
     <message>
         <source>The recipient address is not valid, please recheck.</source>
-        <translation type="unfinished"></translation>
+        <translation>L&apos;adresse du destinataire n&apos;est pas valide.</translation>
     </message>
     <message>
         <source>The amount to pay must be larger than 0.</source>
-        <translation type="unfinished"></translation>
+        <translation>Le montant à envoyer doit être supérieur à 0.</translation>
     </message>
     <message>
         <source>The amount exceeds your balance.</source>
-        <translation type="unfinished"></translation>
+        <translation>Le montant est plus grand que votre balance disponible.</translation>
     </message>
     <message>
         <source>The total exceeds your balance when the %1 transaction fee is included.</source>
-        <translation type="unfinished"></translation>
+        <translation>Le montant total dépasse votre balance disponible lorsque les %1 de frais sont inclus.</translation>
     </message>
     <message>
         <source>Duplicate address found, can only send to each address once per send operation.</source>
-        <translation type="unfinished"></translation>
+        <translation>Adresse dupliquée, ne peut être présente plus d'une fois par transaction.</translation>
     </message>
     <message>
         <source>The transaction was rejected with the following reason: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>La transaction a été rejetée pour cette raison : %1</translation>
     </message>
     <message>
         <source>Error: The wallet was unlocked only to anonymize and stake coins.</source>
-        <translation type="unfinished"></translation>
+        <translation>Erreur: Le portefeuille n&apos;est dévérouillé que pour l&apos;anonymisation et le PoS.</translation>
     </message>
     <message>
         <source>A fee %1 times higher than %2 per kB is considered an insanely high fee.</source>
-        <translation type="unfinished"></translation>
+        <translation>Des frais %1 fois supérieurs à %2/ko sont considérés comme absurde.</translation>
     </message>
     <message>
         <source>Error: The wallet was unlocked only to anonymize coins. Unlock canceled.</source>
-        <translation type="unfinished"></translation>
+        <translation>Erreur: Le portefeuille n&apos;est dévérouillé que pour l&apos;anonymisation. Dévérouillage annulé.</translation>
     </message>
     <message>
         <source>Warning: Invalid LUX address</source>
-        <translation type="unfinished"></translation>
+        <translation>Attention : Adresse LUX invalide</translation>
     </message>
     <message>
         <source>Warning: Unknown change address</source>
-        <translation type="unfinished"></translation>
+        <translation>Attention: adresse de retour inconnue</translation>
     </message>
     <message>
         <source>Confirm custom change address</source>
-        <translation type="unfinished"></translation>
+        <translation>Confirmer l&apos;adresse de retour de monnaie</translation>
     </message>
     <message>
         <source>The address you selected for change is not part of this wallet. Any or all funds in your wallet may be sent to this address. Are you sure?</source>
-        <translation type="unfinished"></translation>
+        <translation>L&apos;adresse choisie pour le retour de monnaie n&apos;appartient pas à ce portefeuille. Etes-vous sûr de vouloir envoyer à cette addresse ?</translation>
     </message>
 </context>
 <context>
@@ -4658,7 +4585,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Pay To:</source>
-        <translation type="unfinished"></translation>
+        <translation>Payer à :</translation>
     </message>
 </context>
 <context>
@@ -4676,59 +4603,59 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Send to Smart Contract</source>
-        <translation type="unfinished"></translation>
+        <translation>Envoi vers Smart Contrat</translation>
     </message>
     <message>
         <source>Choose from contract book page</source>
-        <translation type="unfinished"></translation>
+        <translation>Sélection depuis annuaire de contrats</translation>
     </message>
     <message>
         <source>Paste contract address from clipboard</source>
-        <translation type="unfinished"></translation>
+        <translation>Coller adresse contrat depuis le presse-papier</translation>
     </message>
     <message>
         <source>Save contract info</source>
-        <translation type="unfinished"></translation>
+        <translation>Enregistrer infos du contrat</translation>
     </message>
     <message>
         <source>Contract Address</source>
-        <translation type="unfinished"></translation>
+        <translation>Adresse Contrat</translation>
     </message>
     <message>
         <source>Interface (ABI)</source>
-        <translation type="unfinished"></translation>
+        <translation>Interface (ABI)</translation>
     </message>
     <message>
         <source>Function</source>
-        <translation type="unfinished"></translation>
+        <translation>Fonction</translation>
     </message>
     <message>
         <source>Optional</source>
-        <translation type="unfinished"></translation>
+        <translation>Options</translation>
     </message>
     <message>
         <source>Gas Limit</source>
-        <translation type="unfinished"></translation>
+        <translation>Limite de Gas</translation>
     </message>
     <message>
         <source>Gas Price</source>
-        <translation type="unfinished"></translation>
+        <translation>Prix du Gas</translation>
     </message>
     <message>
         <source>Amount</source>
-        <translation type="unfinished">Montant</translation>
+        <translation>Montant</translation>
     </message>
     <message>
         <source>Sender Address</source>
-        <translation type="unfinished"></translation>
+        <translation>Expéditeur</translation>
     </message>
     <message>
         <source>Clear All</source>
-        <translation type="unfinished"></translation>
+        <translation>Effacer tout</translation>
     </message>
     <message>
         <source>Send To Contract</source>
-        <translation type="unfinished"></translation>
+        <translation>Envoi vers Contrat</translation>
     </message>
     <message>
         <source>The contract address that will receive the funds and data.</source>
@@ -4764,7 +4691,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Send to contract</source>
-        <translation type="unfinished"></translation>
+        <translation>Envoi vers contrat</translation>
     </message>
     <message>
         <source>Gas limit: Default = %1, Max = %2.</source>
@@ -4787,7 +4714,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Amount</source>
-        <translation type="unfinished">Montant</translation>
+        <translation>Montant</translation>
     </message>
     <message>
         <source>GasLimit</source>
@@ -4799,15 +4726,15 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Description</source>
-        <translation type="unfinished"></translation>
+        <translation>Description</translation>
     </message>
     <message>
         <source>Confirm</source>
-        <translation type="unfinished"></translation>
+        <translation>Confirmer</translation>
     </message>
     <message>
         <source>Clear</source>
-        <translation type="unfinished">Effacer</translation>
+        <translation>Effacer</translation>
     </message>
     <message>
         <source>The address that will receive the tokens.</source>
@@ -4858,11 +4785,11 @@ https://www.transifex.com/luxcore/luxcore</source>
     <name>ShutdownWindow</name>
     <message>
         <source>Luxcore is shutting down...</source>
-        <translation type="unfinished"></translation>
+        <translation>Fermeture de Luxcore...</translation>
     </message>
     <message>
         <source>Do not shut down the computer until this window disappears.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ne pas éteindre la machine avant que ce message disparaisse.</translation>
     </message>
 </context>
 <context>
@@ -4957,7 +4884,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Signatures - Sign / Verify a Message</source>
-        <translation type="unfinished"></translation>
+        <translation>Signatures - Signer / Vérifier un message</translation>
     </message>
     <message>
         <source>You can sign messages with your addresses to prove you own them. Be careful not to sign anything vague, as phishing attacks may try to trick you into signing your identity over to them. Only sign fully-detailed statements you agree to.</source>
@@ -4965,7 +4892,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Enter the message you want to sign here</source>
-        <translation type="unfinished"></translation>
+        <translation>Entrer le message à signer ici</translation>
     </message>
     <message>
         <source>Enter the signing address, message (ensure you copy line breaks, spaces, tabs, etc. exactly) and signature below to verify the message. Be careful not to read more into the signature than what is in the signed message itself, to avoid being tricked by a man-in-the-middle attack.</source>
@@ -4981,11 +4908,11 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Message signed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Message signé.</translation>
     </message>
     <message>
         <source>The signature could not be decoded.</source>
-        <translation type="unfinished"></translation>
+        <translation>La signature ne peut être décodée.</translation>
     </message>
     <message>
         <source>Please check the signature and try again.</source>
@@ -5001,7 +4928,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Message verified.</source>
-        <translation type="unfinished"></translation>
+        <translation>Message vérifié.</translation>
     </message>
 </context>
 <context>
@@ -5019,19 +4946,19 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Disabled</source>
-        <translation type="unfinished">Désactivé</translation>
+        <translation>Désactivé</translation>
     </message>
     <message>
         <source>Start Luxsend</source>
-        <translation type="unfinished">Démarrer Luxsend</translation>
+        <translation>Démarrer Luxsend</translation>
     </message>
     <message>
         <source>Stop Luxsend</source>
-        <translation type="unfinished">Arrêter Luxsend</translation>
+        <translation>Arrêter Luxsend</translation>
     </message>
     <message>
         <source>No inputs detected</source>
-        <translation type="unfinished"></translation>
+        <translation>Pas d&apos;entrées detectées</translation>
     </message>
     <message numerus="yes">
         <source>%n Rounds</source>
@@ -5050,19 +4977,19 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Overall progress</source>
-        <translation type="unfinished"></translation>
+        <translation>Progression</translation>
     </message>
     <message>
         <source>Denominated</source>
-        <translation type="unfinished"></translation>
+        <translation>Dénommé</translation>
     </message>
     <message>
         <source>Mixed</source>
-        <translation type="unfinished"></translation>
+        <translation>Mixé</translation>
     </message>
     <message>
         <source>Anonymized</source>
-        <translation type="unfinished"></translation>
+        <translation>Anonymisé</translation>
     </message>
     <message numerus="yes">
         <source>Denominated inputs have %5 of %n rounds on average</source>
@@ -5073,28 +5000,29 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Start Darksend</source>
-        <translation type="unfinished"></translation>
+        <translation>Démarrer Luxsend</translation>
     </message>
     <message>
         <source>Enabled</source>
-        <translation type="unfinished">Activé</translation>
+        <translation>Activé</translation>
     </message>
     <message>
         <source>Last Darksend message:
 </source>
-        <translation type="unfinished"></translation>
+        <translation>Dernier message Luxsend :
+</translation>
     </message>
     <message>
         <source>N/A</source>
-        <translation type="unfinished"></translation>
+        <translation>N/A</translation>
     </message>
     <message>
         <source>Darksend</source>
-        <translation type="unfinished"></translation>
+        <translation>Luxsend</translation>
     </message>
     <message>
         <source>Darksend was successfully reset.</source>
-        <translation type="unfinished"></translation>
+        <translation>Luxsend a été réinitialisé.</translation>
     </message>
     <message>
         <source>If you don&apos;t want to see internal Darksend fees/transactions select &quot;Most Common&quot; as Type on the &quot;Transactions&quot; tab.</source>
@@ -5102,15 +5030,15 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Darksend requires at least %1 to use.</source>
-        <translation type="unfinished"></translation>
+        <translation>Luxsend demande au moins %1 pour être utilisé.</translation>
     </message>
     <message>
         <source>Wallet is locked and user declined to unlock. Disabling Darksend.</source>
-        <translation type="unfinished"></translation>
+        <translation>Le portefeuille est toujours vérouillé. Luxsend désactivé.</translation>
     </message>
     <message>
         <source>Stop Darksend</source>
-        <translation type="unfinished"></translation>
+        <translation>Arrêter Luxsend</translation>
     </message>
 </context>
 <context>
@@ -5121,7 +5049,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Balances</source>
-        <translation type="unfinished"></translation>
+        <translation>Balances</translation>
     </message>
     <message>
         <source>The displayed information may be out of date. Your wallet automatically synchronizes with the LUX network after a connection is established, but this process has not completed yet.</source>
@@ -5129,11 +5057,11 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Unconfirmed transactions to watch-only addresses</source>
-        <translation type="unfinished">Non confirmé vers les adresses watch-only</translation>
+        <translation>Non confirmé vers les adresses watch-only</translation>
     </message>
     <message>
         <source>Total of transactions that have yet to be confirmed, and do not yet count toward the spendable balance</source>
-        <translation type="unfinished">Total pas encore confirmé, bientôt dans le solde disponible</translation>
+        <translation>Total pas encore confirmé, bientôt dans le solde disponible</translation>
     </message>
     <message>
         <source>Staked or masternode rewards in watch-only addresses that has not yet matured</source>
@@ -5141,71 +5069,71 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Total:</source>
-        <translation type="unfinished">Total :</translation>
+        <translation>Total :</translation>
     </message>
     <message>
         <source>Staked or masternode rewards that has not yet matured</source>
-        <translation type="unfinished">Généré ou intérêts pas encore matures</translation>
+        <translation>Généré ou intérêts pas encore matures</translation>
     </message>
     <message>
         <source>Immature:</source>
-        <translation type="unfinished">Immature :</translation>
+        <translation>Immature :</translation>
     </message>
     <message>
         <source>Your current total balance</source>
-        <translation type="unfinished">Votre solde total</translation>
+        <translation>Votre solde total</translation>
     </message>
     <message>
         <source>Current total balance in watch-only addresses</source>
-        <translation type="unfinished">Solde total des adresses watch-only</translation>
+        <translation>Solde total des adresses watch-only</translation>
     </message>
     <message>
         <source>Watch-only:</source>
-        <translation type="unfinished">Watch-only :</translation>
+        <translation>Watch-only :</translation>
     </message>
     <message>
         <source>Available:</source>
-        <translation type="unfinished">Disponible :</translation>
+        <translation>Disponible :</translation>
     </message>
     <message>
         <source>Your current spendable balance</source>
-        <translation type="unfinished">Votre solde disponible</translation>
+        <translation>Votre solde disponible</translation>
     </message>
     <message>
         <source>Your current balance in watch-only addresses</source>
-        <translation type="unfinished">Votre solde watch-only</translation>
+        <translation>Votre solde watch-only</translation>
     </message>
     <message>
         <source>Pending:</source>
-        <translation type="unfinished">En attente :</translation>
+        <translation>En attente :</translation>
     </message>
     <message>
         <source>Spendable:</source>
-        <translation type="unfinished">Disponible :</translation>
+        <translation>Disponible :</translation>
     </message>
     <message>
         <source>Status:</source>
-        <translation type="unfinished">Etat :</translation>
+        <translation>Etat :</translation>
     </message>
     <message>
         <source>Completion:</source>
-        <translation type="unfinished">Progression :</translation>
+        <translation>Progression :</translation>
     </message>
     <message>
         <source>Luxsend Balance:</source>
-        <translation type="unfinished">Balance Luxsend :</translation>
+        <translation>Balance Luxsend :</translation>
     </message>
     <message>
         <source>Amount and Rounds:</source>
-        <translation type="unfinished">Montant et Rounds :</translation>
+        <translation>Montant et Rounds :</translation>
     </message>
     <message>
         <source>0 LUX / 0 Rounds</source>
-        <translation type="unfinished"></translation>
+        <translation>0 LUX / 0 Round</translation>
     </message>
     <message>
         <source>Submitted Denom:</source>
-        <translation type="unfinished">Denom transmis :</translation>
+        <translation>Denom transmis :</translation>
     </message>
     <message>
         <source>The denominations you submitted to the Masternode.&lt;br&gt;To mix, other users must submit the exact same denominations.</source>
@@ -5213,27 +5141,27 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>n/a</source>
-        <translation type="unfinished"></translation>
+        <translation>n/a</translation>
     </message>
     <message>
         <source>Enabled/Disabled</source>
-        <translation type="unfinished"></translation>
+        <translation>Activé/Désactivé</translation>
     </message>
     <message>
         <source>Start/Stop Mixing</source>
-        <translation type="unfinished"></translation>
+        <translation>Démarrer/Arrêter Mixage</translation>
     </message>
     <message>
         <source>(Last Message)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Dernier message)</translation>
     </message>
     <message>
         <source>Try to manually submit a Luxsend request.</source>
-        <translation type="unfinished"></translation>
+        <translation>Essayer de soumettre manuellement une requête Luxsend.</translation>
     </message>
     <message>
         <source>Try Mix</source>
-        <translation type="unfinished"></translation>
+        <translation>Essai Mix</translation>
     </message>
     <message>
         <source>Reset the current status of Luxsend (can interrupt Luxsend if it&apos;s in the process of Mixing, which can cost you money!)</source>
@@ -5241,30 +5169,30 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Reset</source>
-        <translation type="unfinished"></translation>
+        <translation>Reset</translation>
     </message>
     <message>
         <source>Luxsend</source>
-        <translation type="unfinished"></translation>
+        <translation>Luxsend</translation>
     </message>
     <message>
         <source>Recent transactions</source>
-        <translation type="unfinished">Transactions récentes</translation>
+        <translation>Transactions récentes</translation>
     </message>
 </context>
 <context>
     <name>SplashScreen</name>
     <message>
         <source>[testnet]</source>
-        <translation type="unfinished"></translation>
+        <translation>[testnet]</translation>
     </message>
     <message>
         <source>Luxcore</source>
-        <translation type="unfinished"></translation>
+        <translation>Luxcore</translation>
     </message>
     <message>
         <source>Version %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Version %1</translation>
     </message>
     <message>
         <source>The Bitcoin Core developers</source>
@@ -5287,22 +5215,22 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Details for %1</source>
-        <translation type="unfinished">Détails pour %1</translation>
+        <translation>Détails pour %1</translation>
     </message>
 </context>
 <context>
     <name>TokenItemModel</name>
     <message>
         <source>Token Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Nom du Jeton</translation>
     </message>
     <message>
         <source>Token Symbol</source>
-        <translation type="unfinished"></translation>
+        <translation>Symbole</translation>
     </message>
     <message>
         <source>Balance</source>
-        <translation type="unfinished"></translation>
+        <translation>Balance</translation>
     </message>
 </context>
 <context>
@@ -5313,7 +5241,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>%1/offline</source>
-        <translation type="unfinished">%1/hors ligne</translation>
+        <translation>%1/hors ligne</translation>
     </message>
     <message>
         <source>0/unconfirmed, in memory pool</source>
@@ -5325,110 +5253,110 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>%1/unconfirmed</source>
-        <translation type="unfinished">%1/non confirmée</translation>
+        <translation>%1/non confirmée</translation>
     </message>
     <message>
         <source>%1 confirmations</source>
-        <translation type="unfinished">%1 confirmations</translation>
+        <translation>%1 confirmations</translation>
     </message>
     <message>
         <source>Status</source>
-        <translation type="unfinished">Etat</translation>
+        <translation>Etat</translation>
     </message>
     <message>
         <source>Date</source>
-        <translation type="unfinished">Date</translation>
+        <translation>Date</translation>
     </message>
     <message>
         <source>Transaction ID</source>
-        <translation type="unfinished">ID Transaction</translation>
+        <translation>ID Transaction</translation>
     </message>
     <message>
         <source>Token Address</source>
-        <translation type="unfinished"></translation>
+        <translation>Adresse Jeton</translation>
     </message>
     <message>
         <source>From</source>
-        <translation type="unfinished">De</translation>
+        <translation>De</translation>
     </message>
     <message>
         <source>To</source>
-        <translation type="unfinished">Vers</translation>
+        <translation>Vers</translation>
     </message>
     <message>
         <source>Credit</source>
-        <translation type="unfinished">Crédit</translation>
+        <translation>Crédit</translation>
     </message>
     <message>
         <source>Debit</source>
-        <translation type="unfinished">Débit</translation>
+        <translation>Débit</translation>
     </message>
     <message>
         <source>Net Amount</source>
-        <translation type="unfinished"></translation>
+        <translation>Montant net</translation>
     </message>
 </context>
 <context>
     <name>TokenTransactionTableModel</name>
     <message>
         <source>Date</source>
-        <translation type="unfinished">Date</translation>
+        <translation>Date</translation>
     </message>
     <message>
         <source>Type</source>
-        <translation type="unfinished"></translation>
+        <translation>Type</translation>
     </message>
     <message>
         <source>Label</source>
-        <translation type="unfinished"></translation>
+        <translation>Nom</translation>
     </message>
     <message>
         <source>Name</source>
-        <translation type="unfinished">Nom</translation>
+        <translation>Nom</translation>
     </message>
     <message>
         <source>Amount</source>
-        <translation type="unfinished">Montant</translation>
+        <translation>Montant</translation>
     </message>
     <message>
         <source>Offline</source>
-        <translation type="unfinished">Hors ligne</translation>
+        <translation>Hors ligne</translation>
     </message>
     <message>
         <source>Unconfirmed</source>
-        <translation type="unfinished">Non confirmée</translation>
+        <translation>Non confirmée</translation>
     </message>
     <message>
         <source>Confirming (%1 of %2 recommended confirmations)</source>
-        <translation type="unfinished">Validation (%1/%2 confirmations recommandées)</translation>
+        <translation>Validation (%1/%2 confirmations recommandées)</translation>
     </message>
     <message>
         <source>Confirmed (%1 confirmations)</source>
-        <translation type="unfinished">Confirmé (%1 confirmations)</translation>
+        <translation>Confirmé (%1 confirmations)</translation>
     </message>
     <message>
         <source>Received with</source>
-        <translation type="unfinished"></translation>
+        <translation>Reçu avec</translation>
     </message>
     <message>
         <source>Received from</source>
-        <translation type="unfinished"></translation>
+        <translation>Reçu de</translation>
     </message>
     <message>
         <source>Sent to</source>
-        <translation type="unfinished"></translation>
+        <translation>Envoyé à</translation>
     </message>
     <message>
         <source>Payment to yourself</source>
-        <translation type="unfinished">Paiement interne</translation>
+        <translation>Paiement interne</translation>
     </message>
     <message>
         <source>(n/a)</source>
-        <translation type="unfinished"></translation>
+        <translation>(n/a)</translation>
     </message>
     <message>
         <source>(no label)</source>
-        <translation type="unfinished"></translation>
+        <translation>(sans nom)</translation>
     </message>
     <message>
         <source>Transaction status. Hover over this field to show number of confirmations.</source>
@@ -5436,11 +5364,11 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Date and time that the transaction was received.</source>
-        <translation type="unfinished">Date et heure de la transaction.</translation>
+        <translation>Date et heure de la transaction.</translation>
     </message>
     <message>
         <source>Type of transaction.</source>
-        <translation type="unfinished">Type de transaction.</translation>
+        <translation>Type de transaction.</translation>
     </message>
     <message>
         <source>User-defined intent/purpose of the transaction.</source>
@@ -5452,93 +5380,93 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Amount removed from or added to balance.</source>
-        <translation type="unfinished">Montant ajouté ou soustrait à votre balance.</translation>
+        <translation>Montant ajouté ou soustrait à votre balance.</translation>
     </message>
 </context>
 <context>
     <name>TokenTransactionView</name>
     <message>
         <source>All</source>
-        <translation type="unfinished">Toutes</translation>
+        <translation>Toutes</translation>
     </message>
     <message>
         <source>Today</source>
-        <translation type="unfinished">Aujourd&apos;hui</translation>
+        <translation>Aujourd&apos;hui</translation>
     </message>
     <message>
         <source>This week</source>
-        <translation type="unfinished">Cette semaine</translation>
+        <translation>Cette semaine</translation>
     </message>
     <message>
         <source>This month</source>
-        <translation type="unfinished">Ce mois-ci</translation>
+        <translation>Ce mois-ci</translation>
     </message>
     <message>
         <source>Last month</source>
-        <translation type="unfinished">Le mois dernier</translation>
+        <translation>Le mois dernier</translation>
     </message>
     <message>
         <source>This year</source>
-        <translation type="unfinished">Cette année</translation>
+        <translation>Cette année</translation>
     </message>
     <message>
         <source>Range...</source>
-        <translation type="unfinished">Période...</translation>
+        <translation>Période...</translation>
     </message>
     <message>
         <source>Received</source>
-        <translation type="unfinished">Reçu</translation>
+        <translation>Reçu</translation>
     </message>
     <message>
         <source>Sent</source>
-        <translation type="unfinished">Envoyé</translation>
+        <translation>Envoyé</translation>
     </message>
     <message>
         <source>To yourself</source>
-        <translation type="unfinished">Internes</translation>
+        <translation>Internes</translation>
     </message>
     <message>
         <source>Enter address to search</source>
-        <translation type="unfinished"></translation>
+        <translation>Rechercher une adresse</translation>
     </message>
     <message>
         <source>Min amount</source>
-        <translation type="unfinished">Minimum</translation>
+        <translation>Minimum</translation>
     </message>
     <message>
         <source>Copy address</source>
-        <translation type="unfinished">Copier l&apos;adresse</translation>
+        <translation>Copier l&apos;adresse</translation>
     </message>
     <message>
         <source>Copy amount</source>
-        <translation type="unfinished">Copier le montant</translation>
+        <translation>Copier le montant</translation>
     </message>
     <message>
         <source>Copy transaction ID</source>
-        <translation type="unfinished"></translation>
+        <translation>Copier ID de transaction</translation>
     </message>
     <message>
         <source>Copy full transaction details</source>
-        <translation type="unfinished"></translation>
+        <translation>Copier tous les détails</translation>
     </message>
     <message>
         <source>Show transaction details</source>
-        <translation type="unfinished"></translation>
+        <translation>Afficher détails transaction</translation>
     </message>
     <message>
         <source>Range:</source>
-        <translation type="unfinished"></translation>
+        <translation>Période :</translation>
     </message>
     <message>
         <source>to</source>
-        <translation type="unfinished"></translation>
+        <translation>à</translation>
     </message>
 </context>
 <context>
     <name>TrafficGraphWidget</name>
     <message>
         <source>KB/s</source>
-        <translation type="unfinished"></translation>
+        <translation>ko/s</translation>
     </message>
 </context>
 <context>
@@ -5546,14 +5474,6 @@ https://www.transifex.com/luxcore/luxcore</source>
     <message>
         <source>Generated</source>
         <translation>Généré</translation>
-    </message>
-    <message>
-        <source>conflicted</source>
-        <translation type="vanished">en conflit</translation>
-    </message>
-    <message>
-        <source>%1/offline</source>
-        <translation type="vanished">%1/hors ligne</translation>
     </message>
     <message>
         <source>%1/unconfirmed</source>
@@ -5636,7 +5556,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>0/unconfirmed, %1</source>
-        <translation type="unfinished"></translation>
+        <translation>0/non confirmée, %1</translation>
     </message>
     <message>
         <source>in memory pool</source>
@@ -5659,19 +5579,19 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Date</source>
-        <translation type="unfinished">Date</translation>
+        <translation>Date</translation>
     </message>
     <message>
         <source>Source</source>
-        <translation type="unfinished"></translation>
+        <translation>Source</translation>
     </message>
     <message>
         <source>Smart contract</source>
-        <translation type="unfinished"></translation>
+        <translation>Smart contrat</translation>
     </message>
     <message>
         <source>watch-only</source>
-        <translation type="unfinished"></translation>
+        <translation>watch-only</translation>
     </message>
     <message>
         <source>label</source>
@@ -5679,30 +5599,30 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message numerus="yes">
         <source>matures in %n more block(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>mature dans %n bloc</numerusform>
+            <numerusform>mature dans %n blocs</numerusform>
         </translation>
     </message>
     <message>
         <source>not accepted</source>
-        <translation type="unfinished"></translation>
+        <translation>non accepté</translation>
     </message>
     <message>
         <source>Input</source>
-        <translation type="unfinished"></translation>
+        <translation>Entrée</translation>
     </message>
     <message>
         <source>Immature</source>
-        <translation type="unfinished"></translation>
+        <translation>Immature</translation>
     </message>
     <message>
         <source>Comment</source>
-        <translation type="unfinished"></translation>
+        <translation>Commentaire</translation>
     </message>
     <message>
         <source>Merchant</source>
-        <translation type="unfinished"></translation>
+        <translation>Marchand</translation>
     </message>
     <message>
         <source>This gas refund must mature %1 blocks before it can be spent. If it fails to get into the chain, its state will change to &quot;not accepted&quot; and it won&apos;t be spendable.</source>
@@ -5714,15 +5634,15 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Debug information</source>
-        <translation type="unfinished"></translation>
+        <translation>Informations debug</translation>
     </message>
     <message>
         <source>Transaction</source>
-        <translation type="unfinished"></translation>
+        <translation>Transaction</translation>
     </message>
     <message>
         <source>Inputs</source>
-        <translation type="unfinished"></translation>
+        <translation>Entrées</translation>
     </message>
     <message>
         <source>true</source>
@@ -5839,7 +5759,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Abandoned</source>
-        <translation type="unfinished"></translation>
+        <translation>Abandonné</translation>
     </message>
     <message>
         <source>Orphan Block - Generated but not accepted. This does not impact your holdings.</source>
@@ -5851,7 +5771,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Received from</source>
-        <translation type="unfinished"></translation>
+        <translation>Reçu de</translation>
     </message>
     <message>
         <source>Received via Darksend</source>
@@ -5875,11 +5795,11 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Darksend</source>
-        <translation type="unfinished"></translation>
+        <translation>Luxsend</translation>
     </message>
     <message>
         <source>Smart contract</source>
-        <translation type="unfinished"></translation>
+        <translation>Smart contrat</translation>
     </message>
     <message>
         <source>watch-only</source>
@@ -5887,11 +5807,11 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>(n/a)</source>
-        <translation type="unfinished"></translation>
+        <translation>(n/a)</translation>
     </message>
     <message>
         <source>(no label)</source>
-        <translation type="unfinished"></translation>
+        <translation>(sans nom)</translation>
     </message>
     <message>
         <source>Transaction status. Hover over this field to show number of confirmations.</source>
@@ -5910,7 +5830,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Copy label</source>
-        <translation>Copier l&apos;étiquette</translation>
+        <translation>Copier le nom</translation>
     </message>
     <message>
         <source>Copy amount</source>
@@ -5930,7 +5850,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Label</source>
-        <translation>Etiquette</translation>
+        <translation>Nom</translation>
     </message>
     <message>
         <source>Address</source>
@@ -6026,85 +5946,85 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Masternode Reward</source>
-        <translation type="unfinished"></translation>
+        <translation>Revenu Masternode</translation>
     </message>
     <message>
         <source>Smart contract</source>
-        <translation type="unfinished"></translation>
+        <translation>Smart contrat</translation>
     </message>
     <message>
         <source>Abandon transaction</source>
-        <translation type="unfinished"></translation>
+        <translation>Abandonner transaction</translation>
     </message>
     <message>
         <source>Copy raw transaction</source>
-        <translation type="unfinished"></translation>
+        <translation>Copier transaction (raw)</translation>
     </message>
     <message>
         <source>Copy full transaction details</source>
-        <translation type="unfinished"></translation>
+        <translation>Copier détails transaction</translation>
     </message>
     <message>
         <source>Edit label</source>
-        <translation type="unfinished"></translation>
+        <translation>Modifier le nom</translation>
     </message>
     <message>
         <source>Show transaction details</source>
-        <translation type="unfinished"></translation>
+        <translation>Affiche les détails de la transaction</translation>
     </message>
     <message>
         <source>Export Transaction History</source>
-        <translation type="unfinished"></translation>
+        <translation>Exporte l&apos;historique de transaction</translation>
     </message>
     <message>
         <source>Watch-only</source>
-        <translation type="unfinished"></translation>
+        <translation>Lecture-seule</translation>
     </message>
     <message>
         <source>Date</source>
-        <translation type="unfinished">Date</translation>
+        <translation>Date</translation>
     </message>
     <message>
         <source>Type</source>
-        <translation type="unfinished"></translation>
+        <translation>Type</translation>
     </message>
     <message>
         <source>ID</source>
-        <translation type="unfinished"></translation>
+        <translation>ID</translation>
     </message>
     <message>
         <source>There was an error trying to save the transaction history to %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Il y a eu une erreur pour enregistrer l&apos;historique vers %1</translation>
     </message>
     <message>
         <source>Exporting Successful</source>
-        <translation type="unfinished"></translation>
+        <translation>Exporté avec succès</translation>
     </message>
     <message>
         <source>The transaction history was successfully saved to %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>L&apos;historique a été enregistré avec succès dans %1</translation>
     </message>
     <message>
         <source>Range:</source>
-        <translation type="unfinished"></translation>
+        <translation>Période :</translation>
     </message>
     <message>
         <source>to</source>
-        <translation type="unfinished"></translation>
+        <translation>à</translation>
     </message>
 </context>
 <context>
     <name>UnitDisplayStatusBarControl</name>
     <message>
         <source>Unit to show amounts in. Click to select another unit.</source>
-        <translation type="unfinished"></translation>
+        <translation>Unité des montants. Cliquer pour en sélectionner une autre.</translation>
     </message>
 </context>
 <context>
     <name>WalletFrame</name>
     <message>
         <source>No wallet has been loaded.</source>
-        <translation type="unfinished"></translation>
+        <translation>Aucun portefeuille n&apos;a été chargé.</translation>
     </message>
 </context>
 <context>
@@ -6134,31 +6054,31 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Backup Wallet</source>
-        <translation type="unfinished"></translation>
+        <translation>Sauvegarde portefeuille</translation>
     </message>
     <message>
         <source>Wallet (*.dat)</source>
-        <translation type="unfinished"></translation>
+        <translation>Wallet (*.dat)</translation>
     </message>
     <message>
         <source>Backup Failed</source>
-        <translation type="unfinished"></translation>
+        <translation>Sauvegarde échouée</translation>
     </message>
     <message>
         <source>There was an error trying to save the wallet data to %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Erreur lors de l&apos;enregistrement du portefeuille vers %1.</translation>
     </message>
     <message>
         <source>Backup Successful</source>
-        <translation type="unfinished"></translation>
+        <translation>Sauvegarde effectuée</translation>
     </message>
     <message>
         <source>The wallet data was successfully saved to %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Le portefeuille a été sauvegardé avec succès vers %1.</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Annuler</translation>
     </message>
 </context>
 <context>
@@ -6657,7 +6577,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Done loading</source>
-        <translation type="unfinished"></translation>
+        <translation>Chargement terminé</translation>
     </message>
     <message>
         <source>Enable publish hash block in &lt;address&gt;</source>
@@ -6909,19 +6829,19 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Loading addresses...</source>
-        <translation type="unfinished"></translation>
+        <translation>Chargement adresses...</translation>
     </message>
     <message>
         <source>Loading block index...</source>
-        <translation type="unfinished"></translation>
+        <translation>Chargement index des blocs...</translation>
     </message>
     <message>
         <source>Loading wallet... (%3.2f %%)</source>
-        <translation type="unfinished"></translation>
+        <translation>Chargement portefeuille... (%3.2f %%)</translation>
     </message>
     <message>
         <source>Loading wallet...</source>
-        <translation type="unfinished"></translation>
+        <translation>Chargement portefeuille...</translation>
     </message>
     <message>
         <source>Lock masternodes from masternode configuration file (default: %u)</source>
@@ -7325,11 +7245,11 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Verifying blocks...</source>
-        <translation type="unfinished"></translation>
+        <translation>Vérification des blocs...</translation>
     </message>
     <message>
         <source>Verifying wallet...</source>
-        <translation type="unfinished"></translation>
+        <translation>Vérification portefeuille...</translation>
     </message>
     <message>
         <source>Wallet %s resides outside data directory %s</source>
@@ -7416,7 +7336,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>BTC</source>
-        <translation type="unfinished"></translation>
+        <translation>BTC</translation>
     </message>
     <message>
         <source>Total w/ 0.25% Fee </source>
@@ -7424,10 +7344,6 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source> 0.00000000</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source> BTC</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7456,11 +7372,11 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>LUX</source>
-        <translation type="unfinished"></translation>
+        <translation>LUX</translation>
     </message>
     <message>
         <source>Max</source>
-        <translation type="unfinished"></translation>
+        <translation>Max</translation>
     </message>
     <message>
         <source>Asks: 0000</source>
@@ -7472,19 +7388,11 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>BTC Available:</source>
-        <translation type="unfinished"></translation>
+        <translation>BTC Disponible :</translation>
     </message>
     <message>
         <source>LUX Available:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source> 0.00000000 </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source> LUX</source>
-        <translation type="unfinished"></translation>
+        <translation>LUX Disponible :</translation>
     </message>
     <message>
         <source>Send</source>
@@ -7512,23 +7420,23 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Amount:</source>
-        <translation type="unfinished">Montant :</translation>
+        <translation>Montant :</translation>
     </message>
     <message>
         <source>Address:</source>
-        <translation type="unfinished">Adresse :</translation>
+        <translation>Adresse :</translation>
     </message>
     <message>
         <source>LUX Balance:</source>
-        <translation type="unfinished"></translation>
+        <translation>Balance LUX :</translation>
     </message>
     <message>
         <source>BTC Balance:</source>
-        <translation type="unfinished"></translation>
+        <translation>Balance BTC :</translation>
     </message>
     <message>
         <source>Paste from clipboard</source>
-        <translation type="unfinished"></translation>
+        <translation>Coller depuis presse-papier</translation>
     </message>
     <message>
         <source>Alt+P</source>
@@ -7552,7 +7460,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Balance</source>
-        <translation type="unfinished"></translation>
+        <translation>Balance</translation>
     </message>
     <message>
         <source>LUX Pending:</source>
@@ -7572,7 +7480,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Copy to clipboard</source>
-        <translation type="unfinished"></translation>
+        <translation>Copier vers presse-papier</translation>
     </message>
     <message>
         <source>Withdraw LUX:</source>
@@ -7584,7 +7492,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Paramètres</translation>
     </message>
     <message>
         <source>API Key</source>
@@ -7596,7 +7504,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Password</source>
-        <translation type="unfinished"></translation>
+        <translation>Mot de passe</translation>
     </message>
     <message>
         <source>Load API Keys</source>
@@ -7620,7 +7528,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Cancel Order</source>
-        <translation type="unfinished"></translation>
+        <translation>Annuler Ordre</translation>
     </message>
 </context>
 </TS>
