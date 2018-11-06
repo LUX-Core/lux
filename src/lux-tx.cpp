@@ -482,8 +482,7 @@ static void MutateTxSign(CMutableTransaction& tx, const string& flagStr)
         UpdateTransaction(mergedTx, i, sigdata);
 
         //If transaction contains witness, then witness script should be verified
-        const CScriptWitness *witness = (i < mergedTx.wit.vtxinwit.size()) ? &mergedTx.wit.vtxinwit[i].scriptWitness : nullptr;
-        if (!VerifyScript(txin.scriptSig, prevPubKey, witness, STANDARD_SCRIPT_VERIFY_FLAGS, MutableTransactionSignatureChecker(&mergedTx, i, amount)))
+        if (!VerifyScript(txin.scriptSig, prevPubKey, &txin.scriptWitness, STANDARD_SCRIPT_VERIFY_FLAGS, MutableTransactionSignatureChecker(&mergedTx, i, amount)))
             fComplete = false;
     }
 
