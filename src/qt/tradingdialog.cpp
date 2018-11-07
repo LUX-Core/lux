@@ -11,7 +11,6 @@
 #include <rpcserver.h>
 #include "crypto/rfc6979_hmac_sha256.h"
 #include "utilstrencodings.h"
-#include "qcustomplot.h"
 
 #include <QClipboard>
 #include <QDebug>
@@ -48,6 +47,10 @@
 #include <functional>
 
 #include <QMessageBox>
+#include <QPen>
+#include <QBrush>
+#include <algorithm>
+#include <QDateTime>
 using namespace std;
 
 tradingDialog::tradingDialog(QWidget *parent) :
@@ -60,27 +63,6 @@ tradingDialog::tradingDialog(QWidget *parent) :
     timerid = 0;
     qDebug() <<  "Expected this";
 
-    //chartTest
-    {
-        auto wgts = ui->BuyTab->findChildren<QWidget *>();
-        foreach(auto wgt, wgts)
-            wgt->hide();
-        foreach(auto wgt, wgts)
-            wgt->hide();
-        ui->priceChart->show();
-    }
-
-
-    QVBoxLayout* plotLay = new QVBoxLayout();
-    ui->priceChart->setLayout(plotLay);
-
-    derPlot = new QCustomPlot();
-    plotLay->addWidget(derPlot);
-
-    ohlc = new QCPFinancial(derPlot->xAxis, derPlot->yAxis);
-    ohlc->setName("OHLC");
-    ohlc->setChartStyle(QCPFinancial::csOhlc);
-
     ui->BtcAvailableLabel->setTextFormat(Qt::RichText);
     ui->LUXAvailableLabel->setTextFormat(Qt::RichText);
     ui->BuyCostLabel->setTextFormat(Qt::RichText);
@@ -92,8 +74,7 @@ tradingDialog::tradingDialog(QWidget *parent) :
     ui->CSReceiveLabel->setTextFormat(Qt::RichText);
 
     //Set tabs to inactive
-    //chartTest
-    //ui->TradingTabWidget->setTabEnabled(0,false);
+    ui->TradingTabWidget->setTabEnabled(0,false);
     ui->TradingTabWidget->setTabEnabled(1,false);
     ui->TradingTabWidget->setTabEnabled(3,false);
     ui->TradingTabWidget->setTabEnabled(4,false);
@@ -196,7 +177,7 @@ void tradingDialog::UpdaterFunction(){
     int Retval = SetExchangeInfoTextLabels();
 
     if (Retval == 0){
-        ActionsOnSwitch(-1);
+        ActionsOnSwitch(nullptr);
     }
 }
 
@@ -622,145 +603,70 @@ void tradingDialog::ParseAndPopulateMarketHistoryTable(QString Response){
     obj.empty();
 }
 
-void tradingDialog::ParseAndPopulatePriceChart(QString Response)
-{
-    QJsonArray allCandles = QJsonDocument::fromJson(Response.toUtf8()).
-            object()["Candle"].toArray();
+void tradingDialog::ActionsOnSwitch(QWidget *tab){
 
-    if(allCandles.isEmpty())
-        return;
-
-    QCPFinancialDataContainer financialData;
-    double min_time = allCandles.first().toArray()[0].toDouble()/1000;
-    double max_time= allCandles.last().toArray()[0].toDouble()/1000;
-
-    for(int i=0; i<allCandles.size(); i++)
-        financialData.add(QCPFinancialData(
-                allCandles[i].toArray()[0].toDouble()/1000,
-                allCandles[i].toArray()[1].toDouble(),
-                allCandles[i].toArray()[2].toDouble(),
-                allCandles[i].toArray()[3].toDouble(),
-                allCandles[i].toArray()[4].toDouble()));
-
-    //TODO: add comboBox with dataGroup
-    // and variable, which will be used here
-    double binSize = 15*60;
-    ohlc->data()->set(financialData);
-    ohlc->setWidth(binSize*0.2);
-    ohlc->setTwoColored(true);
-
-    derPlot->xAxis->setLabel("Time (GMT)");
-    derPlot->yAxis->setLabel("LUX Price in BTC");
-
-    //QCPAxisRect *volumeAxisRect = new QCPAxisRect(derPlot);
-    QSharedPointer<QCPAxisTickerDateTime> dateTimeTicker(new QCPAxisTickerDateTime);
-    dateTimeTicker->setDateTimeSpec(Qt::UTC);
-    dateTimeTicker->setDateTimeFormat("dd.MM.yy(hh:mm)");
-//    volumeAxisRect->axis(QCPAxis::atBottom)->setTicker(dateTimeTicker);
-//    volumeAxisRect->axis(QCPAxis::atBottom)->setTickLabelRotation(15);
-    derPlot->xAxis->setBasePen(Qt::NoPen);
-    derPlot->xAxis->setTicker(dateTimeTicker);
-    derPlot->rescaleAxes();
-    derPlot->xAxis->setRange(max_time - 24*60*60, max_time+5);
-
-    //TODO: find function in customPlot to setRange to yAxis (if function exist)
-    double max_price = (*(financialData.end()- 1)).high;
-    double min_price = (*(financialData.end() - 1)).low;
-    for (auto it = financialData.end() - 1;
-         it != financialData.begin(); it--)
-    {
-        if((*it).key < max_time - 24*60*60)
-            break;
-        if((*it).high > max_price)
-            max_price = (*it).high;
-        if((*it).low < min_price)
-            min_price = (*it).low;
-    }
-    derPlot->xAxis->scaleRange(1.025, derPlot->xAxis->range().center());
-    auto diff_price = max_price - min_price;
-    derPlot->yAxis->setRange(min_price - 0.2*diff_price,
-                             max_price + 0.2*diff_price);
-
-    derPlot->replot();
-}
-
-void tradingDialog::ActionsOnSwitch(int index = -1){
-
-    QString Response = "";
-    QString Response2 = "";
-    QString Response3 = "";
-    QString Response4 = "";
-
-    if(index == -1){
-        index = ui->TradingTabWidget->currentIndex();
+    if(tab == nullptr){
+        tab = ui->TradingTabWidget->currentWidget();
     }
     std::function<void(void)> f;
 
-    switch (index){
-        case 0:    //buy tab is active
+    //buy tab is active
+    if(ui->BuyTab==tab)
+    {
+        f = std::bind(&tradingDialog::showBalanceOfLUXOnTradingTab, this);
+        sendRequest1(QString("https://www.cryptopia.co.nz/api/GetBalance"), f, "POST", QString("{\"Currency\":\"") + "LUX" + QString("\"}"));
 
-            f = std::bind(&tradingDialog::showBalanceOfLUXOnTradingTab, this);
-            sendRequest1(QString("https://www.cryptopia.co.nz/api/GetBalance"), f, "POST", QString("{\"Currency\":\"") + "LUX" + QString("\"}"));
+        f = std::bind(&tradingDialog::showBalanceOfBTCOnTradingTab, this);
+        sendRequest1(QString("https://www.cryptopia.co.nz/api/GetBalance"), f, "POST", QString("{\"Currency\":\"") + "BTC" + QString("\"}"));
 
-            f = std::bind(&tradingDialog::showBalanceOfBTCOnTradingTab, this);
-            sendRequest1(QString("https://www.cryptopia.co.nz/api/GetBalance"), f, "POST", QString("{\"Currency\":\"") + "BTC" + QString("\"}"));
+        f = std::bind(&tradingDialog::showOrderBookOnTradingTab, this);
+        sendRequest1("https://www.cryptopia.co.nz/api/GetMarketOrders/LUX_BTC", f);
+    }
 
-            f = std::bind(&tradingDialog::showOrderBookOnTradingTab, this);
-            sendRequest1("https://www.cryptopia.co.nz/api/GetMarketOrders/LUX_BTC", f);
+    //Cross send tab active
+    if(ui->CrossSendTab==tab)
+    {
+        f = std::bind(&tradingDialog::showBalanceOfLUXOnSendTab, this);
+        sendRequest1(QString("https://www.cryptopia.co.nz/api/GetBalance"), f, "POST", QString("{\"Currency\":\"") + "LUX" + QString("\"}"));
 
-//            f = std::bind(&tradingDialog::showMarketHistoryOnTradingTab, this);
-//            sendRequest1(QString("https://www.cryptopia.co.nz/api/GetMarketHistory/LUX_BTC"), f);
+        f = std::bind(&tradingDialog::showBalanceOfBTCOnSendTab, this);
+        sendRequest1(QString("https://www.cryptopia.co.nz/api/GetBalance"), f, "POST", QString("{\"Currency\":\"") + "BTC" + QString("\"}"));
+    }
 
-            //TODO: Is tradePairId==const? If no 1)https://www.cryptopia.co.nz/api/GetMarket/LUX_BTC
-            //2) this request
-            f = std::bind(&tradingDialog::showMarketHistoryOnTradingTab, this);
-            sendRequest1(QString("https://www.cryptopia.co.nz/Exchange/"
-                                 "GetTradePairChart?tradePairId=5643&dataRange=2&dataGroup=15"), f);
+    //market history tab
+    if(ui->MarketHistory==tab)
+    {
+        GetMarketHistory();
+    }
 
-            break;
+    //open orders tab
+    if(ui->OpenOrders==tab)
+    {
+        f = std::bind(&tradingDialog::showOpenOrders, this);
+        sendRequest1("https://www.cryptopia.co.nz/api/GetOpenOrders", f, "POST");
+    }
 
-        case 1: //Cross send tab active
+    //account history tab
+    if(ui->TradeHistory==tab)
+    {
+        f = std::bind(&tradingDialog::showAccountHistory, this);
+        sendRequest1("https://www.cryptopia.co.nz/api/GetTradeHistory", f, "POST");
+    }
 
-            f = std::bind(&tradingDialog::showBalanceOfLUXOnSendTab, this);
-            sendRequest1(QString("https://www.cryptopia.co.nz/api/GetBalance"), f, "POST", QString("{\"Currency\":\"") + "LUX" + QString("\"}"));
+    //show balance tab
+    if(ui->BalanceTab==tab)
+    {
+        f = std::bind(&tradingDialog::showBalanceOfLUXOnBalanceTab, this);
+        sendRequest1(QString("https://www.cryptopia.co.nz/api/GetBalance"), f, "POST", QString("{\"Currency\":\"") + "LUX" + QString("\"}"));
 
-            f = std::bind(&tradingDialog::showBalanceOfBTCOnSendTab, this);
-            sendRequest1(QString("https://www.cryptopia.co.nz/api/GetBalance"), f, "POST", QString("{\"Currency\":\"") + "BTC" + QString("\"}"));
+        f = std::bind(&tradingDialog::showBalanceOfBTCOnBalanceTab, this);
+        sendRequest1(QString("https://www.cryptopia.co.nz/api/GetBalance"), f, "POST", QString("{\"Currency\":\"") + "BTC" + QString("\"}"));
+    }
 
-            break;
-
-        case 2://market history tab
-            GetMarketHistory();
-            break;
-
-        case 3: //open orders tab
-
-            f = std::bind(&tradingDialog::showOpenOrders, this);
-            sendRequest1("https://www.cryptopia.co.nz/api/GetOpenOrders", f, "POST");
-
-            break;
-
-        case 4://account history tab
-
-            f = std::bind(&tradingDialog::showAccountHistory, this);
-            sendRequest1("https://www.cryptopia.co.nz/api/GetTradeHistory", f, "POST");
-
-            break;
-
-        case 5://show balance tab
-
-            f = std::bind(&tradingDialog::showBalanceOfLUXOnBalanceTab, this);
-            sendRequest1(QString("https://www.cryptopia.co.nz/api/GetBalance"), f, "POST", QString("{\"Currency\":\"") + "LUX" + QString("\"}"));
-
-            f = std::bind(&tradingDialog::showBalanceOfBTCOnBalanceTab, this);
-            sendRequest1(QString("https://www.cryptopia.co.nz/api/GetBalance"), f, "POST", QString("{\"Currency\":\"") + "BTC" + QString("\"}"));
-
-            break;
-
-        case 6:
-
-            break;
-
+    //trade plot
+    if(ui->ChartTab==tab)
+    {
+        ui->ChartTab->updateChartData();
     }
 
 }
@@ -771,7 +677,7 @@ void tradingDialog::on_TradingTabWidget_tabBarClicked(int index)
 
     this->timer->stop();
 
-    ActionsOnSwitch(index);
+    ActionsOnSwitch(ui->TradingTabWidget->widget(index));
 
     this->timer->start();
 }
@@ -1028,27 +934,6 @@ void tradingDialog::showOrderBookOnTradingTab() {
     reply->deleteLater();
     if(Response.size() > 0 && Response != "Error"){
         ParseAndPopulateOrderBookTables(Response);
-    }
-}
-
-
-void tradingDialog::showMarketHistoryOnTradingTab() {
-    QNetworkReply *reply = qobject_cast<QNetworkReply *>(sender());
-    QString Response = "";
-    if (reply->error() == QNetworkReply::NoError) {
-        //success
-        Response = reply->readAll();
-
-    }
-    else{
-        //failure
-        qDebug() << "Failure" << reply->errorString();
-        Response = "Error";
-    }
-
-    reply->deleteLater();
-    if(Response.size() > 0 && Response != "Error"){
-        ParseAndPopulatePriceChart(Response);
     }
 }
 

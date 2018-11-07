@@ -168,6 +168,35 @@
        <string>Trade</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_6">
+       <item row="7" column="4">
+        <widget class="QLabel" name="label_5">
+         <property name="text">
+          <string>BTC</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="1">
+        <widget class="QLabel" name="label_3">
+         <property name="font">
+          <font>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="layoutDirection">
+          <enum>Qt::LeftToRight</enum>
+         </property>
+         <property name="autoFillBackground">
+          <bool>false</bool>
+         </property>
+         <property name="text">
+          <string>Units</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+         </property>
+        </widget>
+       </item>
        <item row="7" column="1">
         <widget class="QLabel" name="label_6">
          <property name="font">
@@ -198,13 +227,6 @@
            <weight>75</weight>
            <bold>true</bold>
           </font>
-         </property>
-        </widget>
-       </item>
-       <item row="7" column="4">
-        <widget class="QLabel" name="label_5">
-         <property name="text">
-          <string>BTC</string>
          </property>
         </widget>
        </item>
@@ -1209,15 +1231,15 @@
          </property>
         </widget>
        </item>
+       <item row="4" column="0">
+        <widget class="QWidget" name="widget" native="true"/>
+       </item>
        <item row="6" column="4">
         <widget class="QLabel" name="label_4">
          <property name="text">
           <string>LUX</string>
          </property>
         </widget>
-       </item>
-       <item row="4" column="0">
-        <widget class="QWidget" name="widget" native="true"/>
        </item>
        <item row="6" column="8">
         <widget class="QPushButton" name="Sell_Max_Amount">
@@ -1376,28 +1398,6 @@
          </property>
          <property name="selectionMode">
           <enum>QAbstractItemView::NoSelection</enum>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="1">
-        <widget class="QLabel" name="label_3">
-         <property name="font">
-          <font>
-           <weight>75</weight>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="layoutDirection">
-          <enum>Qt::LeftToRight</enum>
-         </property>
-         <property name="autoFillBackground">
-          <bool>false</bool>
-         </property>
-         <property name="text">
-          <string>Units</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
          </property>
         </widget>
        </item>
@@ -2335,25 +2335,9 @@
          </property>
         </widget>
        </item>
-       <item row="0" column="0" colspan="12">
-        <widget class="QWidget" name="priceChart" native="true">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="sizeIncrement">
-          <size>
-           <width>0</width>
-           <height>1</height>
-          </size>
-         </property>
-        </widget>
-       </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tab">
+     <widget class="QWidget" name="CrossSendTab">
       <attribute name="title">
        <string>Send</string>
       </attribute>
@@ -4826,7 +4810,7 @@
           <string/>
          </property>
          <property name="icon">
-          <iconset>
+          <iconset resource="../lux.qrc">
            <normaloff>:/icons/editpaste</normaloff>:/icons/editpaste</iconset>
          </property>
          <property name="shortcut">
@@ -5224,7 +5208,7 @@
           <string/>
          </property>
          <property name="icon">
-          <iconset>
+          <iconset resource="../lux.qrc">
            <normaloff>:/icons/editcopy</normaloff>:/icons/editcopy</iconset>
          </property>
          <property name="shortcut">
@@ -5320,7 +5304,7 @@
           <string/>
          </property>
          <property name="icon">
-          <iconset>
+          <iconset resource="../lux.qrc">
            <normaloff>:/icons/editpaste</normaloff>:/icons/editpaste</iconset>
          </property>
          <property name="shortcut">
@@ -5413,7 +5397,7 @@
           <string/>
          </property>
          <property name="icon">
-          <iconset>
+          <iconset resource="../lux.qrc">
            <normaloff>:/icons/editpaste</normaloff>:/icons/editpaste</iconset>
          </property>
          <property name="shortcut">
@@ -5459,7 +5443,7 @@
           <string/>
          </property>
          <property name="icon">
-          <iconset>
+          <iconset resource="../lux.qrc">
            <normaloff>:/icons/editpaste</normaloff>:/icons/editpaste</iconset>
          </property>
          <property name="shortcut">
@@ -5585,10 +5569,23 @@
       <zorder>KeyPasteButton</zorder>
       <zorder>SecretPasteButton</zorder>
      </widget>
+     <widget class="TradingPlot" name="ChartTab">
+      <attribute name="title">
+       <string>Trade Chart</string>
+      </attribute>
+     </widget>
     </widget>
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>TradingPlot</class>
+   <extends>QWidget</extends>
+   <header>tradingplot.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="../lux.qrc"/>
  </resources>

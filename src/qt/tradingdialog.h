@@ -15,7 +15,6 @@
 
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
-#include "qcustomplot.h"
 
 #include <QJsonObject>
 #include <QJsonArray>
@@ -36,12 +35,11 @@ public:
 
     void setModel(WalletModel *model);
 
-private Q_SLOTS:
+private slots:
 
     void InitTrading();
     void on_TradingTabWidget_tabBarClicked(int index);
     void ParseAndPopulateOrderBookTables(QString Response);
-    void ParseAndPopulatePriceChart(QString Response);
     void ParseAndPopulateMarketHistoryTable(QString Response);
     void ParseAndPopulateAccountHistoryTable(QString Response);
     void ParseAndPopulateOpenOrdersTable(QString Response);
@@ -50,7 +48,7 @@ private Q_SLOTS:
     void DisplayBalance(QLabel &BalanceLabel,QLabel &Available, QLabel &Pending, QString Currency,QString Response);
     void DisplayBalance(QLabel &BalanceLabel, QLabel &BalanceLabel2, QString Response, QString Response2);
     void DisplayBalance(QLabel &BalanceLabel, QString Response);
-    void ActionsOnSwitch(int index);
+    void ActionsOnSwitch(QWidget *tab = nullptr);
     void CancelOrderSlot(int row, int col);
     void BidInfoInsertSlot(int row, int col);
     void AskInfoInsertSlot(int row, int col);
@@ -62,7 +60,6 @@ private Q_SLOTS:
     void showBalanceOfLUXOnTradingTab();
     void showBalanceOfBTCOnTradingTab();
     void showOrderBookOnTradingTab();
-    void showMarketHistoryOnTradingTab();
     void showBalanceOfBTCOnSendTab();
     void showBalanceOfLUXOnSendTab();
     void showBalanceOfLUXOnBalanceTab();
@@ -128,8 +125,7 @@ private Q_SLOTS:
     QJsonObject GetResultObjectFromJSONObject(QString response);
     QJsonObject GetResultObjectFromJSONArray(QString response);
     QJsonArray  GetResultArrayFromJSONObject(QString response);
-
-public Q_SLOTS:
+public slots:
 
 
 private:
@@ -140,12 +136,10 @@ private:
     QString ApiKey;
     QString SecretKey;
     WalletModel *model;
-    QCustomPlot* derPlot;
     QCPFinancial *ohlc;
     QNetworkAccessManager *qmanager;
     bool Save=false;
     bool Load=false;
-
 };
 
 #endif //LUX_TRADINGDIALOG_H
