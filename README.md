@@ -22,6 +22,8 @@ Features
 * New PHI2 PoW/PoS hybrid algorithm
 * Luxgate
 * Parallel masternode
+  * [Banking layer](#)
+  * [Proof of file storage (Decentralised distributed file storage)](doc/Technical-description-of-the-implementation-of-a-distributed-file-storage.md)
 * ~~PHI1612 PoW/PoS hybrid algorithm~~
 
 The Luxcore Project is a decentralized peer-to-peer banking financial platform, created under an open source license, featuring a built-in cryptocurrency, end-to-end encrypted messaging and decentralized marketplace. The decentralized network aims to provide anonymity and privacy for everyone through a simple user-friendly interface by taking care of all the advanced cryptography in the background.
