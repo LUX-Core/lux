@@ -6277,7 +6277,6 @@ static bool ProcessMessage(CNode* pfrom, const string &strCommand, CDataStream& 
                         // Probably non-standard or insufficient fee/priority
                         LogPrint("mempool", "   removed orphan tx %s\n", orphanHash.ToString());
                         vEraseQueue.push_back(orphanHash);
-
                     }
                     mempool.check(pcoinsTip);
                 }
@@ -6294,7 +6293,6 @@ static bool ProcessMessage(CNode* pfrom, const string &strCommand, CDataStream& 
             if (nEvicted > 0)
                 LogPrint("mempool", "mapOrphan overflow, removed %u tx\n", nEvicted);
         } else {
-
             if (pfrom->fWhitelisted && GetBoolArg("-whitelistalwaysrelay", DEFAULT_WHITELISTALWAYSRELAY)) {
                 int nDoS = 0;
                 if (!state.IsInvalid(nDoS) || nDoS == 0) {
