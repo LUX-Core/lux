@@ -20,7 +20,7 @@ class TradingPlot : public QWidget
 public:
     explicit TradingPlot(QWidget *parent = nullptr);
     ~TradingPlot() override;
-    void updateChartData(bool bInit);
+    void updateChartData(bool bInit=false);
 protected:
     bool eventFilter(QObject *watched, QEvent *event) override;
 

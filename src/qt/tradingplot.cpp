@@ -295,7 +295,8 @@ void TradingPlot::updateChartData(bool bInit)
              this, &TradingPlot::slotReplyFinished);
     loadText->position->setCoords(ui->priceChart->xAxis->range().center(),
                                   ui->priceChart->yAxis->range().center());
-    loadText->setVisible(true);
+    if(bInit)
+        loadText->setVisible(true);
     ui->priceChart->replot();
 }
 
