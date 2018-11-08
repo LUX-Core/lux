@@ -36,9 +36,9 @@ extern std::regex hexData;
 
 //#define ENABLE_LUX_DEBUG
 #ifdef ENABLE_LUX_DEBUG
-#define DEBUG( x ) x
+#define DEBUG_SECTION( x ) x
 #else
-#define DEBUG( x )
+#define DEBUG_SECTION( x )
 #endif
 
 //LUX only features
