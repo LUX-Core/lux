@@ -26,14 +26,6 @@
 
 using namespace std;
 
-typedef vector<unsigned char> valtype;
-
-string ToStringReverseEndian(const CTxDestination& address) {
-    CTxDestination EncodeDestination(address);
-    const CKeyID *keyID = boost::get<CKeyID>(&address);
-    return HexStr(valtype(keyID->begin(),keyID->end()));
-}
-
 QString TransactionDesc::FormatTxStatus(const CWalletTx& wtx)
 {
     AssertLockHeld(cs_main);
@@ -191,9 +183,7 @@ QString TransactionDesc::toHTML(CWallet* wallet, CWalletTx& wtx, TransactionReco
                             strHTML += " (" + tr("watch-only") + ")";
                         strHTML += "<br/>";
                     } else if (txout.scriptPubKey.HasOpCreate()) {
-                        uint160 contract = uint160(LuxState::createLuxAddress(uintToh256(wtx.GetWitnessHash()), nOut).asBytes());
-                        strHTML += "<b>" + tr("Lux Address") + ":</b> ";
-                        strHTML += GUIUtil::HtmlEscape(EncodeDestination(CKeyID(contract))) + "<br/>";
+                        uint160 contract = uint160(LuxState::createLuxAddress(uintToh256(wtx.GetHash()), nOut).asBytes());
                         strHTML += "<b>" + tr("SC Address (Hash160)") + ":</b> ";
                         strHTML += QString::fromStdString(contract.ToStringReverseEndian()) + "<br/>";
                     }
