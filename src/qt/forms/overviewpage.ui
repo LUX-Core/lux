@@ -1232,9 +1232,21 @@
            </layout>
           </item>
           <item>
-           <widget class="CustomList" name="listTransactions" native="true">
+           <widget class="CustomList" name="listTransactions">
             <property name="styleSheet">
              <string notr="true">QListView { background: transparent; }</string>
+            </property>
+            <property name="frameShape">
+             <enum>QFrame::NoFrame</enum>
+            </property>
+            <property name="verticalScrollBarPolicy">
+             <enum>Qt::ScrollBarAlwaysOff</enum>
+            </property>
+            <property name="horizontalScrollBarPolicy">
+             <enum>Qt::ScrollBarAlwaysOff</enum>
+            </property>
+            <property name="selectionMode">
+             <enum>QAbstractItemView::NoSelection</enum>
             </property>
            </widget>
           </item>
