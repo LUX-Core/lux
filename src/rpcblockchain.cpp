@@ -1254,6 +1254,8 @@ UniValue getblockchaininfo(const UniValue& params, bool fHelp)
             "  \"mediantime\": xxxxxx,     (numeric) median time for the current best block\n"
             "  \"verificationprogress\": x, (number) estimate of verification progress [0..1]\n"
             "  \"chainwork\": \"xxxx\",      (string) total amount of work in active chain, in hexadecimal\n"
+            "  \"pruned\": xx,             (boolean) if the blocks are subject to pruning\n"
+            "  \"pruneheight\": xxxxxx,    (numeric) lowest-height complete block stored\n"
             "  \"logevents\": true|false,  (boolean) show the current -logevents setting\n"
             "  \"addressindex\": false,    (boolean) show the current -addressindex setting\n"
             "  \"spentindex\": true|false, (boolean) show the current -spentindex setting\n"
@@ -1274,15 +1276,24 @@ UniValue getblockchaininfo(const UniValue& params, bool fHelp)
 
     LOCK(cs_main);
     CBlockIndex* powTip = GetLastBlockOfType(0);
+    CBlockIndex* posTip = GetLastBlockOfType(1);
     UniValue obj(UniValue::VOBJ);
+    UniValue diff(UniValue::VOBJ);
     obj.push_back(Pair("chain",                 Params().NetworkIDString()));
     obj.push_back(Pair("blocks",                chainActive.Height()));
     obj.push_back(Pair("headers",               pindexBestHeader ? pindexBestHeader->nHeight : -1));
     obj.push_back(Pair("bestblockhash",         chainActive.Tip()->GetBlockHash().GetHex()));
-    obj.push_back(Pair("difficulty",            (double)GetDifficulty(powTip)));
+    diff.push_back(Pair("proof-of-work",        (double)GetDifficulty(powTip)));
+    diff.push_back(Pair("proof-of-stake",       (double)GetDifficulty(posTip)));
+    obj.push_back(Pair("difficulty",            diff));
     obj.push_back(Pair("mediantime",            (int64_t)chainActive.Tip()->GetMedianTimePast()));
     obj.push_back(Pair("verificationprogress",  Checkpoints::GuessVerificationProgress(Params().Checkpoints(), chainActive.Tip())));
     obj.push_back(Pair("chainwork",             chainActive.Tip()->nChainWork.GetHex()));
+    obj.push_back(Pair("pruned",                fPruneMode));
+    if (fPruneMode) {
+        CBlockIndex *block = chainActive.Tip(); while (block && block->pprev && (block->pprev->nStatus & BLOCK_HAVE_DATA))block = block->pprev;
+        obj.push_back(Pair("pruneheight",       block->nHeight));
+    }
     obj.push_back(Pair("logevents",             fLogEvents));
     obj.push_back(Pair("addressindex",          fAddressIndex));
     obj.push_back(Pair("spentindex",            fSpentIndex));
