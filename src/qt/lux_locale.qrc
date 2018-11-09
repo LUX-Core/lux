@@ -6,7 +6,7 @@
         <file alias="en">locale/lux_en.qm</file>
         <file alias="en_US">locale/lux_en_US.qm</file>
         <file alias="es">locale/lux_es.qm</file>
-        <file alias="fr_FR">locale/lux_fr_FR.qm</file>
+        <file alias="fr">locale/lux_fr.qm</file>
         <file alias="it">locale/lux_it.qm</file>
         <file alias="ja">locale/lux_ja.qm</file>
         <file alias="pt">locale/lux_pt.qm</file>

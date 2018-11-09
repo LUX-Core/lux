@@ -148,6 +148,9 @@ QT_TRANSLATE_NOOP("lux-core", ""
 QT_TRANSLATE_NOOP("lux-core", ""
 "Prune configured below the minimum of %d MB.  Please use a higher number."),
 QT_TRANSLATE_NOOP("lux-core", ""
+"Prune: last wallet synchronisation goes beyond pruned data. You need to -"
+"reindex (download the whole blockchain again in case of pruned node)"),
+QT_TRANSLATE_NOOP("lux-core", ""
 "Query for peer addresses via DNS lookup, if low on addresses (default: 1 "
 "unless -connect)"),
 QT_TRANSLATE_NOOP("lux-core", ""
