@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="fr_FR">
+<TS version="2.1" language="fr">
 <context>
     <name>ABIFunctionField</name>
     <message>
@@ -683,7 +683,7 @@ Cliquer sur &quot;Crypter la clé&quot; pour signer et encrypter la clé privée
     </message>
     <message>
         <source>Open Wallet &amp;Configuration File</source>
-        <translation>Fichier de &amp;configuration Luxcore</translation>
+        <translation>Fichier de configuration &amp;Luxcore</translation>
     </message>
     <message>
         <source>Open configuration file</source>
@@ -707,7 +707,7 @@ Cliquer sur &quot;Crypter la clé&quot; pour signer et encrypter la clé privée
     </message>
     <message>
         <source>&amp;Blockchain explorer</source>
-        <translation>Explorateur &amp;Blockchain</translation>
+        <translation>&amp;Explorateur Blockchain</translation>
     </message>
     <message>
         <source>&amp;Command-line options</source>
@@ -719,7 +719,7 @@ Cliquer sur &quot;Crypter la clé&quot; pour signer et encrypter la clé privée
     </message>
     <message>
         <source>Check for &amp;Update</source>
-        <translation>Vérifier &amp;mise à jour</translation>
+        <translation>&amp;Vérifier mise à jour</translation>
     </message>
     <message>
         <source>Synchronizing additional data: %p%</source>
@@ -1851,11 +1851,11 @@ MultiSend: %1</translation>
     <name>Eula</name>
     <message>
         <source>End User Software License Agreement</source>
-        <translation type="unfinished"></translation>
+        <translation>Licence pour utilisateur final</translation>
     </message>
     <message>
         <source>Please read the following license agreement. You must accept the terms contained in this agreement before continuing with the application.</source>
-        <translation type="unfinished"></translation>
+        <translation>Veuillez lire les conditions d&apos;utilisation de la licence suivante. Vous devez accepter ces termes avant de pouvoir utiliser cette application.</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -1867,19 +1867,19 @@ MultiSend: %1</translation>
     </message>
     <message>
         <source>&lt;p style=&quot;line-height:140&quot;&gt;&lt;span&gt;&lt;br&gt;Please read the following license agreement. You must accept the terms contained in this agreement before continuing with the application.</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;p style=&quot;line-height:140&quot;&gt;&lt;span&gt;&lt;br&gt;Veuillez lire les conditions d&apos;utilisation de la licence suivante. Vous devez accepter ces termes avant de pouvoir utiliser cette application.</translation>
     </message>
     <message>
         <source>I have read and agree to the terms contained in the license agreements.</source>
-        <translation type="unfinished"></translation>
+        <translation>J&apos;ai lu et j&apos;accepte les termes de cette licence.</translation>
     </message>
     <message>
         <source>I do not accept the terms and conditions of above licence agreements.</source>
-        <translation type="unfinished"></translation>
+        <translation>Je n&apos;accepte pas les termes et conditions de cette licence.</translation>
     </message>
     <message>
         <source>Don&apos;t show this dialog again</source>
-        <translation type="unfinished"></translation>
+        <translation>Ne plus afficher cette fenêtre</translation>
     </message>
     <message>
         <source>&lt;p style=&quot;line-height:10&quot;&gt;&lt;b&gt;GENERAL&lt;/b&gt;&lt;/p&gt;</source>
@@ -2144,7 +2144,7 @@ MultiSend: %1</translation>
     </message>
     <message>
         <source>A new data directory will be created.</source>
-        <translation type="unfinished"></translation>
+        <translation>Un nouveau dossier de données va être créé.</translation>
     </message>
     <message>
         <source>Directory already exists. Add %1 if you intend to create a new directory here.</source>
@@ -2156,7 +2156,7 @@ MultiSend: %1</translation>
     </message>
     <message>
         <source>Cannot create data directory here.</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible de créer un dossier ici.</translation>
     </message>
 </context>
 <context>
@@ -2199,7 +2199,7 @@ MultiSend: %1</translation>
     </message>
     <message>
         <source>Set language, for example &quot;de_DE&quot; (default: system locale)</source>
-        <translation>Définir la langue, par exemple &quot;fr_FR&quot; (défaut: langue du système)</translation>
+        <translation>Définir la langue, par exemple &quot;fr&quot; (défaut: langue du système)</translation>
     </message>
     <message>
         <source>Start minimized</source>
@@ -3206,7 +3206,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>If you don&apos;t want to see internal Darksend fees/transactions select &quot;Most Common&quot; as Type on the &quot;Transactions&quot; tab.</source>
-        <translation>Si vous de voulez pas voir les transactions/frais internes à Luxsend, sélectionner &quot;Les plus courantes&quot; en filtre dans la liste des transactions.</translation>
+        <translation>Si vous ne voulez pas voir les transactions/frais internes à Luxsend, sélectionner &quot;Les plus courantes&quot; en filtre dans la liste des transactions.</translation>
     </message>
     <message>
         <source>Darksend requires at least %1 to use.</source>
@@ -3237,7 +3237,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Invalid payment address %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Adresse de paiement invalide %1</translation>
     </message>
     <message>
         <source>URI cannot be parsed! This can be caused by an invalid lux address or malformed URI parameters.</source>
@@ -3253,7 +3253,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Payment request rejected</source>
-        <translation type="unfinished"></translation>
+        <translation>Requête de paiement rejetée</translation>
     </message>
     <message>
         <source>Payment request network doesn&apos;t match client network.</source>
@@ -3261,11 +3261,11 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Payment request has expired.</source>
-        <translation type="unfinished"></translation>
+        <translation>La requête de paiement a expiré.</translation>
     </message>
     <message>
         <source>Payment request is not initialized.</source>
-        <translation type="unfinished"></translation>
+        <translation>La requête de paiement n&apos;est pas initialisée.</translation>
     </message>
     <message>
         <source>Unverified payment requests to custom payment scripts are unsupported.</source>
@@ -3554,7 +3554,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>&amp;Network Traffic</source>
-        <translation>Traffic du réseau</translation>
+        <translation>Traffic réseau</translation>
     </message>
     <message>
         <source>Totals</source>
@@ -4565,7 +4565,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>S&amp;ubtract fee from amount</source>
-        <translation>So&amp;ustraire des frais du montant</translation>
+        <translation>So&amp;ustraire les frais du montant</translation>
     </message>
     <message>
         <source>A message that was attached to the LUX: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the LUX network.</source>
@@ -5237,7 +5237,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     <name>TokenTransactionDesc</name>
     <message>
         <source>conflicted with a transaction with %1 confirmations</source>
-        <translation type="unfinished"></translation>
+        <translation>En conflit avec transaction confirmée (%1 conf.)</translation>
     </message>
     <message>
         <source>%1/offline</source>
@@ -5245,11 +5245,11 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>0/unconfirmed, in memory pool</source>
-        <translation type="unfinished"></translation>
+        <translation>0/non confirmée, dans mempool</translation>
     </message>
     <message>
         <source>0/unconfirmed, not in memory pool</source>
-        <translation type="unfinished"></translation>
+        <translation>0/non confirmée, hors mempool</translation>
     </message>
     <message>
         <source>%1/unconfirmed</source>
@@ -5294,6 +5294,10 @@ https://www.transifex.com/luxcore/luxcore</source>
     <message>
         <source>Net Amount</source>
         <translation>Montant net</translation>
+    </message>
+     <message>
+        <source>SC Address (Hash160)</source>
+        <translation>Adresse SC</translation>
     </message>
 </context>
 <context>
@@ -5716,7 +5720,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Minted</source>
-        <translation>Minted</translation>
+        <translation>Intérêts</translation>
     </message>
     <message>
         <source>Mined</source>
@@ -5926,31 +5930,31 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Darksend</source>
-        <translation type="unfinished"></translation>
+        <translation>Luxsend</translation>
     </message>
     <message>
         <source>Darksend Make Collateral Inputs</source>
-        <translation type="unfinished"></translation>
+        <translation>Luxsend - Entrées collatérales</translation>
     </message>
     <message>
         <source>Darksend Create Denominations</source>
-        <translation type="unfinished"></translation>
+        <translation>Luxsend - Création dénominations</translation>
     </message>
     <message>
         <source>Darksend Denominate</source>
-        <translation type="unfinished"></translation>
+        <translation>Luxsend - Dénomination</translation>
     </message>
     <message>
         <source>Darksend Collateral Payment</source>
-        <translation type="unfinished"></translation>
+        <translation>Luxsend - Paiement collatéral</translation>
     </message>
     <message>
         <source>Masternode Reward</source>
-        <translation>Revenu Masternode</translation>
+        <translation>Revenus Masternode</translation>
     </message>
     <message>
         <source>Smart contract</source>
-        <translation>Smart contrat</translation>
+        <translation>Smart contrats</translation>
     </message>
     <message>
         <source>Abandon transaction</source>
@@ -6011,6 +6015,18 @@ https://www.transifex.com/luxcore/luxcore</source>
     <message>
         <source>to</source>
         <translation>à</translation>
+    </message>
+    <message>
+        <source>SC created</source>
+        <translation>Création SC</translation>
+    </message>
+    <message>
+        <source>SC sent</source>
+        <translation>Envoi SC</translation>
+    </message>
+    <message>
+        <source>SC refunded</source>
+        <translation>Monnaie SC</translation>
     </message>
 </context>
 <context>
@@ -6833,7 +6849,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Loading block index...</source>
-        <translation>Chargement index des blocs...</translation>
+        <translation>Chargement index de blocs...</translation>
     </message>
     <message>
         <source>Loading wallet... (%3.2f %%)</source>

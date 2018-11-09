@@ -299,11 +299,14 @@ extern UniValue clearbanned(const UniValue& params, bool fHelp);
 extern UniValue dumpprivkey(const UniValue& params, bool fHelp); // in rpcdump.cpp
 extern UniValue importprivkey(const UniValue& params, bool fHelp);
 extern UniValue importaddress(const UniValue& params, bool fHelp);
+extern UniValue importpubkey(const UniValue& params, bool fHelp);
 extern UniValue dumphdinfo(const UniValue& params, bool fHelp);
 extern UniValue dumpwallet(const UniValue& params, bool fHelp);
 extern UniValue importwallet(const UniValue& params, bool fHelp);
 extern UniValue bip38encrypt(const UniValue& params, bool fHelp);
 extern UniValue bip38decrypt(const UniValue& params, bool fHelp);
+extern UniValue importprunedfunds(const UniValue& params, bool fHelp);
+extern UniValue removeprunedfunds(const UniValue& params, bool fHelp);
 
 extern UniValue dumpprivkey(const UniValue& params, bool fHelp); // in rpcdump.cpp
 extern UniValue importprivkey(const UniValue& params, bool fHelp);
@@ -412,6 +415,7 @@ extern UniValue gettxoutsetinfo(const UniValue& params, bool fHelp);
 extern UniValue gettxout(const UniValue& params, bool fHelp);
 extern UniValue verifychain(const UniValue& params, bool fHelp);
 extern UniValue getchaintips(const UniValue& params, bool fHelp);
+extern UniValue getchaintxstats(const UniValue& params, bool fHelp);
 extern UniValue switchnetwork(const UniValue& params, bool fHelp);
 extern UniValue invalidateblock(const UniValue& params, bool fHelp);
 extern UniValue reconsiderblock(const UniValue& params, bool fHelp);

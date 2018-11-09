@@ -12,6 +12,7 @@
 #include "init.h"
 #include "keystore.h"
 #include "main.h"
+#include "merkleblock.h"
 #include "net.h"
 #include "primitives/transaction.h"
 #include "rpcserver.h"

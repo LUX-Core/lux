@@ -19,7 +19,7 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="topLayout">
+  <layout class="QVBoxLayout" name="verticalLayout_6">
    <item>
     <widget class="QLabel" name="labelAlerts">
      <property name="visible">
@@ -440,7 +440,7 @@
               <string>Status:</string>
              </property>
              <property name="alignment">
-              <set>Qt::AlignRight|Qt::AlignVCenter</set>
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
              </property>
             </widget>
            </item>
@@ -457,7 +457,7 @@
               <string>Completion:</string>
              </property>
              <property name="alignment">
-              <set>Qt::AlignRight|Qt::AlignVCenter</set>
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
              </property>
             </widget>
            </item>
@@ -480,7 +480,7 @@
               <string>Luxsend Balance:</string>
              </property>
              <property name="alignment">
-              <set>Qt::AlignRight|Qt::AlignVCenter</set>
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
              </property>
             </widget>
            </item>
@@ -503,7 +503,7 @@
               <string>Amount and Rounds:</string>
              </property>
              <property name="alignment">
-              <set>Qt::AlignRight|Qt::AlignVCenter</set>
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
              </property>
             </widget>
            </item>
@@ -520,7 +520,7 @@
               <string>Submitted Denom:</string>
              </property>
              <property name="alignment">
-              <set>Qt::AlignRight|Qt::AlignVCenter</set>
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
              </property>
             </widget>
            </item>
@@ -1279,7 +1279,7 @@
            <property name="text">
             <string>LSR Tokens</string>
            </property>
-           <property name="leftMargin">
+           <property name="leftMargin" stdset="0">
             <number>80</number>
            </property>
           </widget>
@@ -1303,14 +1303,17 @@
         <layout class="QVBoxLayout" name="horizontalLayout_31">
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout_41">
+           <property name="spacing">
+            <number>0</number>
+           </property>
            <property name="leftMargin">
-            <number>10</number>
+            <number>0</number>
            </property>
            <property name="rightMargin">
-            <number>10</number>
+            <number>0</number>
            </property>
-           <item alignment="Qt::AlignVCenter">
-            <widget class="QListView" name="listTokens">
+           <item>
+            <widget class="tokensListView" name="listTokens">
              <property name="enabled">
               <bool>true</bool>
              </property>
@@ -1331,22 +1334,48 @@
              </property>
             </widget>
            </item>
-          </layout>
-         </item>
-         <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_51">
-           <property name="spacing">
-            <number>6</number>
-           </property>
-           <item alignment="Qt::AlignHCenter|Qt::AlignVCenter">
-            <widget class="QPushButton" name="buttonAddToken">
-             <property name="toolTip">
-              <string>Go to token page</string>
+           <item>
+            <layout class="QVBoxLayout" name="verticalLayout_5">
+             <item>
+              <spacer name="verticalSpacer_5">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>40</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QPushButton" name="buttonAddToken">
+               <property name="toolTip">
+                <string>Go to token page</string>
+               </property>
+               <property name="text">
+                <string>Add Token</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_5">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
              </property>
-             <property name="text">
-              <string>Add Token</string>
+             <property name="sizeType">
+              <enum>QSizePolicy::Fixed</enum>
              </property>
-            </widget>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>120</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
            </item>
           </layout>
          </item>
@@ -1374,6 +1403,18 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>CustomList</class>
+   <extends>QWidget</extends>
+   <header>customlist.h</header>
+  </customwidget>
+  <customwidget>
+   <class>tokensListView</class>
+   <extends>QListView</extends>
+   <header>tokenslistview.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

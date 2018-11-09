@@ -281,6 +281,7 @@ static const CRPCCommand vRPCCommands[] =
         {"blockchain", "getblockhashes", &getblockhashes, true, false, false},
         {"blockchain", "getblockheader", &getblockheader, false, false, false},
         {"blockchain", "getchaintips", &getchaintips, true, false, false},
+        {"blockchain", "getchaintxstats", &getchaintxstats, true, false, false},
         {"blockchain", "getdifficulty", &getdifficulty, true, false, false},
         {"blockchain", "getmempoolinfo", &getmempoolinfo, true, true, false},
         {"blockchain", "getrawmempool", &getrawmempool, true, false, false},
@@ -393,6 +394,8 @@ static const CRPCCommand vRPCCommands[] =
         {"wallet", "importprivkey", &importprivkey, true, false, true},
         {"wallet", "importwallet", &importwallet, true, false, true},
         {"wallet", "importaddress", &importaddress, true, false, true},
+        {"wallet", "importprunedfunds", &importprunedfunds, true, false, true},
+        {"wallet", "importpubkey", &importpubkey, true, false, true},
         {"wallet", "keypoolrefill", &keypoolrefill, true, false, true},
         {"wallet", "listaccounts", &listaccounts, false, false, true},
         {"wallet", "listaddressgroupings", &listaddressgroupings, false, false, true},
@@ -415,6 +418,8 @@ static const CRPCCommand vRPCCommands[] =
         {"wallet", "walletlock", &walletlock, true, false, true},
         {"wallet", "walletpassphrasechange", &walletpassphrasechange, true, false, true},
         {"wallet", "walletpassphrase", &walletpassphrase, true, false, true},
+        {"wallet", "removeprunedfunds", &removeprunedfunds, true, false, true},
+
 #endif // ENABLE_WALLET
 };
 

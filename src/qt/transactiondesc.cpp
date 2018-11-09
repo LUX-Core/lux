@@ -183,10 +183,8 @@ QString TransactionDesc::toHTML(CWallet* wallet, CWalletTx& wtx, TransactionReco
                             strHTML += " (" + tr("watch-only") + ")";
                         strHTML += "<br/>";
                     } else if (txout.scriptPubKey.HasOpCreate()) {
-                        uint160 contract = uint160(LuxState::createLuxAddress(uintToh256(wtx.GetWitnessHash()), nOut).asBytes());
-                        strHTML += "<b>" + tr("Smart contract") + ":</b> ";
-                        strHTML += GUIUtil::HtmlEscape(EncodeDestination(CKeyID(contract))) + "<br/>";
-                        strHTML += "<b>Hash160:</b> ";
+                        uint160 contract = uint160(LuxState::createLuxAddress(uintToh256(wtx.GetHash()), nOut).asBytes());
+                        strHTML += "<b>" + tr("SC Address (Hash160)") + ":</b> ";
                         strHTML += QString::fromStdString(contract.ToStringReverseEndian()) + "<br/>";
                     }
                 }
