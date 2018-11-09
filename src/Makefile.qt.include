@@ -299,8 +299,8 @@ BITCOIN_QT_H = \
   qt/walletview.h \
   qt/winshutdownmonitor.h \
   qt/qcustomplot.h \
-  qt/hexaddressconverter.h
-
+  qt/hexaddressconverter.h \
+  qt/tokenslistview.h
 if ENABLE_UPDATER
   BITCOIN_QT_H += lux-installer/src/luxupdater/luxupdater.h \
                   lux-installer/src/luxupdater/simplescheduler_p.h \
@@ -432,7 +432,8 @@ BITCOIN_QT_CPP = \
   qt/utilitydialog.cpp \
   qt/updatedialog.cpp \
   qt/winshutdownmonitor.cpp \
-  qt/hexaddressconverter.cpp
+  qt/hexaddressconverter.cpp \
+  qt/tokenslistview.cpp
 
 if ENABLE_WALLET
 BITCOIN_QT_CPP += \

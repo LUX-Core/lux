@@ -102,6 +102,10 @@ WalletView::WalletView(const PlatformStyle* platformStyle, QWidget* parent) : QS
 
     // Clicking on a transaction on the overview pre-selects the transaction on the transaction history page
     connect(overviewPage, SIGNAL(transactionClicked(QModelIndex)), transactionView, SLOT(focusTransaction(QModelIndex)));
+
+    // Clicking on a token on the overview pre-selects the token on the LSR Token page
+    connect(overviewPage, &OverviewPage::tokenClicked, LSRTokenPage, &LSRToken::focusToken);
+
     connect(overviewPage, SIGNAL(outOfSyncWarningClicked()), this, SLOT(requestedSyncWarningInfo()));
 
     // Double-clicking on a transaction on the transaction history page shows details
@@ -128,7 +132,12 @@ void WalletView::setBitcoinGUI(BitcoinGUI* gui)
 {
     if (gui) {
         // Clicking on a transaction on the overview page simply sends you to transaction history page
-        connect(overviewPage, SIGNAL(transactionClicked(QModelIndex)), gui, SLOT(gotoHistoryPage()));
+        connect(overviewPage, SIGNAL(transactionClicked(QModelIndex)),
+                gui, SLOT(gotoHistoryPage()));
+
+        // Clicking on a token on the overview page simply sends you to LSR Token page
+        connect(overviewPage,SIGNAL(tokenClicked(QModelIndex)),
+                gui, SLOT(gotoLSRTokenPage()));
 
         // Receive and report messages
         connect(this, SIGNAL(message(QString, QString, unsigned int)), gui, SLOT(message(QString, QString, unsigned int)));
