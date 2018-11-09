@@ -1219,7 +1219,6 @@ UniValue getstakingstatus(const UniValue& params, bool fHelp)
             "  \"walletunlocked\": true|false,     (boolean) if the wallet is unlocked\n"
             "  \"mintablecoins\": true|false,      (boolean) if the wallet has mintable coins\n"
             "  \"enoughcoins\": true|false,        (boolean) if available coins are greater than reserve balance\n"
-            "  \"difficulty\": X,                  (integer) Returns the proof-of-stake difficulty as a multiple of the minimum difficulty. \n"
             "  \"stakeweight\": {\n"
             "    \"min\": X,                       (integer) min weight of staked coin\n"
             "    \"max\": X,                       (integer) max weight of staked coin\n"
@@ -1260,7 +1259,6 @@ UniValue getstakingstatus(const UniValue& params, bool fHelp)
         weight.pushKV("max",    stake->stakeMiner.nWeightMax);
         weight.pushKV("combined",   stake->stakeMiner.nWeightSum);
         weight.pushKV("valuesum",   stake->stakeMiner.dValueSum);
-        obj.push_back(Pair("difficulty", GetDifficulty(GetLastBlockIndex(pindexBestHeader, true))));
         obj.pushKV("stakeweight", weight);
         obj.pushKV("stakeblockscreated", stake->stakeMiner.nBlocksCreated);
         obj.pushKV("stakeblocksaccepted", stake->stakeMiner.nBlocksAccepted);
