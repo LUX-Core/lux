@@ -1133,6 +1133,7 @@ UniValue getstakingstatus(const UniValue& params, bool fHelp)
             "  \"walletunlocked\": true|false,     (boolean) if the wallet is unlocked\n"
             "  \"mintablecoins\": true|false,      (boolean) if the wallet has mintable coins\n"
             "  \"enoughcoins\": true|false,        (boolean) if available coins are greater than reserve balance\n"
+            "  \"difficulty\": X,                  (integer) Returns the proof-of-stake difficulty as a multiple of the minimum difficulty. \n"
             "  \"stakeweight\": {\n"
             "    \"min\": X,                       (integer) min weight of staked coin\n"
             "    \"max\": X,                       (integer) max weight of staked coin\n"
@@ -1142,8 +1143,9 @@ UniValue getstakingstatus(const UniValue& params, bool fHelp)
             "  \"stakeblockscreated\": X,          (integer) number of stake blocks created\n"
             "  \"stakeblocksaccepted\": X,         (integer) number of stake blocks accepted\n"
             "  \"foundstake\": X,                  (integer) number of stake kernels found\n"
+            "  \"difficulty\": X,                  (integer) Returns the proof-of-stake difficulty as a multiple of the minimum difficulty. \n"
             "  \"beststakediff\": X.X,             (double) best diff of staked coins\n"
-            "  \"posdiff\": X.X,                   (double) sum of diff of staked coins\n"
+            "  \"sumdiff\": X.X,                   (double) sum of diff of staked coins\n"
             "  \"netstakeweight\": X,              (integer) estimated network weight\n"
             "  \"expectedtime\": X                 (integer) expected time to stake in seconds\n"
             "}\n"
@@ -1172,12 +1174,14 @@ UniValue getstakingstatus(const UniValue& params, bool fHelp)
         weight.pushKV("max",    stake->stakeMiner.nWeightMax);
         weight.pushKV("combined",   stake->stakeMiner.nWeightSum);
         weight.pushKV("valuesum",   stake->stakeMiner.dValueSum);
+        obj.push_back(Pair("difficulty", GetDifficulty(GetLastBlockIndex(pindexBestHeader, true))));
         obj.pushKV("stakeweight", weight);
         obj.pushKV("stakeblockscreated", stake->stakeMiner.nBlocksCreated);
         obj.pushKV("stakeblocksaccepted", stake->stakeMiner.nBlocksAccepted);
         obj.pushKV("foundstake", stake->stakeMiner.nKernelsFound);
+        obj.push_back(Pair("difficulty", GetDifficulty(GetLastBlockIndex(pindexBestHeader, true))));
         obj.pushKV("beststakediff", stake->stakeMiner.dKernelDiffMax);
-        obj.pushKV("posdiff", stake->stakeMiner.dKernelDiffSum);
+        obj.pushKV("sumdiff", stake->stakeMiner.dKernelDiffSum);
         obj.push_back(Pair("netstakeweight", (uint64_t)nNetworkWeight));
         obj.push_back(Pair("expectedtime", nExpectedTime));
     }
