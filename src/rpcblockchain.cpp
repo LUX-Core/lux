@@ -173,15 +173,17 @@ UniValue getdifficulty(const UniValue& params, bool fHelp)
         throw runtime_error(
             "getdifficulty\n"
             "\nReturns the proof-of-work difficulty as a multiple of the minimum difficulty.\n"
+            "\nReturns the proof-of-stake difficulty as a multiple of the minimum difficulty.\n"
             "\nResult:\n"
             "n.nnn       (numeric) the proof-of-work difficulty as a multiple of the minimum difficulty.\n"
             "\nExamples:\n" +
             HelpExampleCli("getdifficulty", "") + HelpExampleRpc("getdifficulty", ""));
 
     LOCK(cs_main);
-
-    CBlockIndex* powTip = GetLastBlockOfType(0);
-    return GetDifficulty(powTip);
+    UniValue obj(UniValue::VOBJ);
+    obj.push_back(Pair("proof-of-work", GetDifficulty(GetLastBlockIndex(pindexBestHeader, false))));
+    obj.push_back(Pair("proof-of-stake", GetDifficulty(GetLastBlockIndex(pindexBestHeader, true))));
+    return obj;
 }
 
 UniValue getrawmempool(const UniValue& params, bool fHelp)
