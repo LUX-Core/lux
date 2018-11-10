@@ -934,8 +934,8 @@ bool CDarkSendPool::SignatureValid(const CScript& newSig, const CTxIn& newVin) {
         CScriptWitness* witness;
         int flags = SCRIPT_VERIFY_P2SH | SCRIPT_VERIFY_STRICTENC;
         //If transaction contains witness, then witness script should be verified
-        if (n < (int) txNew.wit.vtxinwit.size()) {
-            witness = &txNew.wit.vtxinwit[n].scriptWitness;
+        if (n < (int) txNew.vin.size()) {
+            witness = &txNew.vin[n].scriptWitness;
             flags |= SCRIPT_VERIFY_WITNESS;
         } else {
             witness = nullptr;

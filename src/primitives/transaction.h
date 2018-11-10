@@ -443,16 +443,6 @@ public:
     }
 
     bool GetCoinAge(uint64_t& nCoinAge) const;  // ppcoin: get transaction coin age
-
-    bool HasWitness() const
-    {
-        for (size_t i = 0; i < wit.vtxinwit.size(); i++) {
-            if (!wit.vtxinwit[i].scriptWitness.IsNull()) {
-                return true;
-            }
-        }
-        return false;
-    }
 };
 
 /** A mutable version of CTransaction. */
@@ -503,22 +493,6 @@ struct CMutableTransaction
         }
         return false;
     }
-
-    friend bool operator==(const CMutableTransaction& a, const CMutableTransaction& b)
-    {
-        return a.GetHash() == b.GetHash();
-    }
-
-    bool HasWitness() const
-    {
-        for (size_t i = 0; i < wit.vtxinwit.size(); i++) {
-            if (!wit.vtxinwit[i].scriptWitness.IsNull()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
 };
 
 /** Compute the cost of a transaction, as defined by BIP 141 */

@@ -462,7 +462,7 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
             if (block.hashPrevBlock != pindexPrev->GetBlockHash())
                 return "inconclusive-not-best-prevblk";
 
-            if (block.vtx[0]->wit.vtxinwit.size() < 1) {
+            if (block.vtx[0]->vin.size() < 1) {
                 UpdateUncommittedBlockStructures(block, pindexPrev, Params().GetConsensus());
             }
 

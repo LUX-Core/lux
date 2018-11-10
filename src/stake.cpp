@@ -456,7 +456,7 @@ bool Stake::CheckProof(CBlockIndex* const pindexPrev, const CBlock &block, uint2
 
     //verify signature and script
     const CAmount& amount = txPrev->vout[txin.prevout.n].nValue;
-    bool fIsVerified = VerifyScript(txin.scriptSig, txPrev->vout[txin.prevout.n].scriptPubKey, tx.wit.vtxinwit.size() > 0 ? &tx.wit.vtxinwit[0].scriptWitness : NULL, STANDARD_SCRIPT_VERIFY_FLAGS,
+    bool fIsVerified = VerifyScript(txin.scriptSig, txPrev->vout[txin.prevout.n].scriptPubKey, tx.vin.size() > 0 ? &tx.vin[0].scriptWitness : NULL, STANDARD_SCRIPT_VERIFY_FLAGS,
                                     TransactionSignatureChecker(&tx, 0, amount));
     if (!fIsVerified)
         return error("%s: VerifySignature failed on coinstake %s", __func__, tx.GetHash().ToString().c_str());

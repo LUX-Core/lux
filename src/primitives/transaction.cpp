@@ -82,7 +82,7 @@ std::string CTxOut::ToString() const
 }
 
 CMutableTransaction::CMutableTransaction() : nVersion(CTransaction::CURRENT_VERSION), nTime(0), nLockTime(0) {}
-CMutableTransaction::CMutableTransaction(const CTransaction& tx) : vin(tx.vin), vout(tx.vout), wit(tx.wit), nVersion(tx.nVersion), nTime(tx.nTime), nLockTime(tx.nLockTime) {}
+CMutableTransaction::CMutableTransaction(const CTransaction& tx) : vin(tx.vin), vout(tx.vout), nVersion(tx.nVersion), nTime(tx.nTime), nLockTime(tx.nLockTime) {}
 
 uint256 CMutableTransaction::GetHash() const
 {
@@ -117,11 +117,11 @@ uint256 CTransaction::GetWitnessHash() const
     return SerializeHash(*this, SER_GETHASH, 0);
 }
 
-CTransaction::CTransaction() : hash(0), wit(CTxWitness()), vin(), vout(), nVersion(CTransaction::CURRENT_VERSION), nTime(0), nLockTime(0) { }
-CTransaction::CTransaction(const CMutableTransaction &tx) : wit(tx.wit), vin(tx.vin), vout(tx.vout), nVersion(tx.nVersion), nTime(tx.nTime), nLockTime(tx.nLockTime) {
+CTransaction::CTransaction() : hash(0), vin(), vout(), nVersion(CTransaction::CURRENT_VERSION), nTime(0), nLockTime(0) { }
+CTransaction::CTransaction(const CMutableTransaction &tx) : vin(tx.vin), vout(tx.vout), nVersion(tx.nVersion), nTime(tx.nTime), nLockTime(tx.nLockTime) {
     UpdateHash();
 }
-CTransaction::CTransaction(CMutableTransaction &&tx) : wit(std::move(tx.wit)), vin(std::move(tx.vin)), vout(std::move(tx.vout)), nVersion(tx.nVersion), nTime(tx.nTime), nLockTime(tx.nLockTime) {
+CTransaction::CTransaction(CMutableTransaction &&tx) : vin(std::move(tx.vin)), vout(std::move(tx.vout)), nVersion(tx.nVersion), nTime(tx.nTime), nLockTime(tx.nLockTime) {
     UpdateHash();
 }
 
@@ -132,7 +132,6 @@ CTransaction& CTransaction::operator=(const CTransaction &tx) {
     *const_cast<std::vector<CTxOut>*>(&vout) = tx.vout;
     *const_cast<unsigned int*>(&nLockTime) = tx.nLockTime;
     *const_cast<uint256*>(&hash) = tx.hash;
-    *const_cast<CTxWitness*>(&wit) = tx.wit;
     return *this;
 }
 
