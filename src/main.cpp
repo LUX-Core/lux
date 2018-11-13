@@ -4240,14 +4240,19 @@ bool CheckBlock(const CBlock& block, CValidationState& state, const Consensus::P
             REJECT_INVALID, "bad-header", true);
 
     // 3 minute future drift for PoS
-    auto const nBlockTimeLimit = GetAdjustedTime() + (block.IsProofOfStake() ? 180 : 7200);
+    auto const nBlockTimeLimit = GetAdjustedTime() + (block.IsProofOfStake() ? MaxPosClockDrift : MaxPowClockDrift);
 
     LogPrint("debug", "%s: block=%s (%s %d %d)\n", __func__, block.GetHash().GetHex(), s,
              block.GetBlockTime(), nBlockTimeLimit);
 
     // Check block time, reject far future blocks.
-    if (block.GetBlockTime() > nBlockTimeLimit)
-        return state.Invalid(false, REJECT_INVALID, "time-too-new", "block timestamp too far in the future");
+    if (stake->CheckTimestamp(block.GetBlockTime(), (int64_t)block.vtx[1].nTime) > nBlockTimeLimit)
+        return state.DoS(100, error("CheckBlock() : coinbase timestamp violation nTimeBlock=% nTimeTx=%u", block.GetBlockTime()));
+
+    // Check proof-of-stake block signature
+    if (fCheckSig && !block.CheckBlockSignature()) {
+        return error("CheckBlock() : bad PoS block signature");
+    }
 
     // Check the merkle root.
     if (fCheckMerkleRoot) {
@@ -4281,6 +4286,12 @@ bool CheckBlock(const CBlock& block, CValidationState& state, const Consensus::P
         if (block.vtx[i].IsCoinBase())
             return state.DoS(100, false, REJECT_INVALID, "bad-cb-multiple", false, "more than one coinbase");
 
+#if 0
+    // Check coinbase timestamp
+    if (block.IsProofOfWork() && block.GetBlockTime() > (int64_t)block.vtx[0].nTime + MaxPowClockDrift)
+        return state.DoS(50, error("CheckBlock() : coinbase timestamp violation nTimeBlock=% nTimeTx=%u", block.GetBlockTime(), block.vtx[0].nTime));
+#endif
+
     if (block.IsProofOfStake()) {
         // Coinbase output should be empty if proof-of-stake block
         int commitpos = GetWitnessCommitmentIndex(block);
@@ -4293,7 +4304,11 @@ bool CheckBlock(const CBlock& block, CValidationState& state, const Consensus::P
         for (unsigned int i = 2; i < block.vtx.size(); i++)
             if (block.vtx[i].IsCoinStake())
                 return state.DoS(100, error("%s: more than one coinstake", __func__));
-
+#if 0
+        // Check coinstake timestamp
+        if (!stake->CheckTimestamp(block.GetBlockTime(), (int64_t)block.vtx[1].nTime))
+            return state.DoS(50, error("CheckBlock() : coinstake timestamp violation nTimeBlock=% nTimeTx=%u", block.GetBlockTime(), block.vtx[1].nTime));
+#endif
         //Don't allow contract opcodes in coinstake for safety
         if(block.vtx[1].HasOpSpend() || block.vtx[1].HasCreateOrCall()){
             return state.DoS(100, false, REJECT_INVALID, "bad-cs-contract", false, "coinstake must not contain OP_SPEND, OP_CALL, or OP_CREATE");
