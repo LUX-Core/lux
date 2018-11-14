@@ -4251,7 +4251,7 @@ bool CheckBlock(const CBlock& block, CValidationState& state, const Consensus::P
 
     // Check proof-of-stake block signature
     if (fCheckSig && !block.CheckBlockSignature()) {
-        return error("CheckBlock() : bad PoS block signature");
+        return state.DoS(100, false, REJECT_INVALID, "bad-PoS-block-signature", false, "bad PoS block signature");
     }
 
     // Check the merkle root.
@@ -4747,11 +4747,11 @@ bool ProcessNewBlock(CValidationState& state, const CChainParams& chainparams, C
     // Preliminary checks
     if (!CheckBlock(*pblock, state, chainparams.GetConsensus()))
         return error("%s: block not passing checks", __func__);
-
+#if 0
     // Check proof-of-stake block signature
     if (!pblock->CheckBlockSignature())
         return state.DoS(100, false, REJECT_INVALID, "bad-blk-sign", false, "bad block signature");
-
+#endif
     // Limited duplicity on stake: prevents block flood attack
     // Duplicate stake allowed only when there is orphan child block
     if (pblock->IsProofOfStake() && stake->IsBlockStaked(pblock) && !mapBlockIndex.count(pblock->hashPrevBlock))
