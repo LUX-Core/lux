@@ -400,10 +400,14 @@ bool Stake::CheckHash(const CBlockIndex* pindexPrev, unsigned int nBits, const C
     // Weighted target
     int64_t nValueIn = txPrev.vout[prevout.n].nValue;
     uint256 bnWeight = uint256(nValueIn);
-#if 0
-    int64_t nTimeWeight = min((int64_t)nTimeTx - txPrev.nTime, Params().StakingMinAge());
-    if(nTimeWeight){
-        bnWeight = uint256(nValueIn) * nTimeWeight / COIN / (24 * 60 * 60);
+
+    int nBlockHeight = pindexPrev->nHeight + 1;
+
+    if (nBlockHeight > POS_REWARD_CHANGED_BLOCK_V2) {
+        int64_t nTimeWeight = min((int64_t)nTimeTx - txPrev.nTime, Params().StakingMinAge());
+        if(nTimeWeight){
+            bnWeight = uint256(nValueIn) * nTimeWeight / COIN / (24 * 60 * 60);
+        }
     }
 #endif
     bnTarget *= bnWeight; // comment out this will cause 'ERROR: CheckWork: invalid proof-of-stake at block 1144'
@@ -447,11 +451,10 @@ bool Stake::CheckHash(const CBlockIndex* pindexPrev, unsigned int nBits, const C
     }
 
     // Now check if proof-of-stake hash meets target protocol
-#if 0
-    return !(hashProofOfStake > bnWeight * bnTarget);
-#else
+    if (nBlockHeight > POS_REWARD_CHANGED_BLOCK_V2) {
+        return !(hashProofOfStake > bnWeight * bnTarget);
+    }
     return !(hashProofOfStake > bnTarget);
-#endif
 }
 
 // Check whether the coinstake timestamp meets protocol

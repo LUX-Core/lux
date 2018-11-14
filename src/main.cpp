@@ -4286,11 +4286,21 @@ bool CheckBlock(const CBlock& block, CValidationState& state, const Consensus::P
         if (block.vtx[i].IsCoinBase())
             return state.DoS(100, false, REJECT_INVALID, "bad-cb-multiple", false, "more than one coinbase");
 
-#if 0
-    // Check coinbase timestamp
-    if (block.IsProofOfWork() && block.GetBlockTime() > (int64_t)block.vtx[0].nTime + MaxPowClockDrift)
-        return state.DoS(50, error("CheckBlock() : coinbase timestamp violation nTimeBlock=% nTimeTx=%u", block.GetBlockTime(), block.vtx[0].nTime));
-#endif
+    CBlockIndex* pindexPrev = LookupBlockIndex(block.hashPrevBlock);
+    if (pindexPrev) {
+        int nBlockHeight = pindexPrev->nHeight + 1;
+
+        if (nBlockHeight > POS_REWARD_CHANGED_BLOCK_V2)
+        {
+            // Check coinbase timestamp
+            if (block.IsProofOfWork() && (block.GetBlockTime() > ((int64_t)block.vtx[0].nTime + MaxPowClockDrift)))
+                return state.DoS(50, error("CheckBlock() : coinbase timestamp violation nTimeBlock=%ld nTimeTx=%u", block.GetBlockTime(), block.vtx[0].nTime));
+
+            // Check coinstake timestamp
+            if (block.IsProofOfStake() && !stake->CheckTimestamp(block.GetBlockTime(), (int64_t)block.vtx[1].nTime))
+                return state.DoS(50, error("CheckBlock() : coinstake timestamp violation nTimeBlock=%ld nTimeTx=%u", block.GetBlockTime(), block.vtx[1].nTime));
+        }
+    }
 
     if (block.IsProofOfStake()) {
         // Coinbase output should be empty if proof-of-stake block
@@ -4304,11 +4314,7 @@ bool CheckBlock(const CBlock& block, CValidationState& state, const Consensus::P
         for (unsigned int i = 2; i < block.vtx.size(); i++)
             if (block.vtx[i].IsCoinStake())
                 return state.DoS(100, error("%s: more than one coinstake", __func__));
-#if 0
-        // Check coinstake timestamp
-        if (!stake->CheckTimestamp(block.GetBlockTime(), (int64_t)block.vtx[1].nTime))
-            return state.DoS(50, error("CheckBlock() : coinstake timestamp violation nTimeBlock=% nTimeTx=%u", block.GetBlockTime(), block.vtx[1].nTime));
-#endif
+
         //Don't allow contract opcodes in coinstake for safety
         if(block.vtx[1].HasOpSpend() || block.vtx[1].HasCreateOrCall()){
             return state.DoS(100, false, REJECT_INVALID, "bad-cs-contract", false, "coinstake must not contain OP_SPEND, OP_CALL, or OP_CREATE");
