@@ -349,6 +349,7 @@ std::string HelpMessage(HelpMessageMode mode)
     strUsage += "  -conf=<file>           " + strprintf(_("Specify configuration file (default: %s)"), "lux.conf") + "\n";
 #ifdef ENABLE_LUXGATE
     strUsage += "  -luxgateconf=<file>    " + strprintf(_("Specify LuxGate configuration file (default: %s)"), "luxgate.json") + "\n";
+    strUsage += "  -enablegob             " + _("Enable global orderbook (may increase disk, RAM and CPU usage) (default: disabled). It provides other node's trade orders and basic statistics") + "\n";
 #endif
 
     if (mode == HMM_BITCOIND) {
@@ -1068,13 +1069,16 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
         LogPrintf("%s swap support - %s\n", client->ticker, swapIsSupported ? "yes" : "no");
         blockchainClientPool.insert(std::make_pair(client->ticker, client));
     }
-   if (!InitializeLuxGate()) {
-       LogPrintf("Failed to initialize LuxGate\n");
-   }
-   // Set LUXGATE service bit only if we have 2 or more blockchain clients
-   if (blockchainClientPool.size() >= 2) {
-       nLocalServices = ServiceFlags(nLocalServices | NODE_LUXGATE);
-   }
+    if (!InitializeLuxGate()) {
+        LogPrintf("Failed to initialize LuxGate\n");
+    }
+    // Set LUXGATE service bit only if we have 2 or more blockchain clients
+    if (blockchainClientPool.size() >= 2) {
+        nLocalServices = ServiceFlags(nLocalServices | NODE_LUXGATE);
+    }
+    if (GetBoolArg("-enablegob", false)) {
+        orderbook.EnableFeature(ORDERBOOK_GLOBAL);
+    }
 #endif // ENABLE_LUXGATE
 
     InitSignatureCache();
