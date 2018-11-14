@@ -31,11 +31,12 @@
 #include <QSortFilterProxyModel>
 
 #include <QMessageBox>
+#include <QPixmap>
 
 #define DECORATION_SIZE 48
 #define ICON_OFFSET 16
 #define NUM_ITEMS 5
-#define TOKEN_NUM_ITEMS 2
+#define TOKEN_NUM_ITEMS 3
 #define TOKEN_SIZE 35
 #define MARGIN 4
 #define NAME_WIDTH 250 /* to align with txs history amounts */
@@ -125,7 +126,7 @@ public:
     void paint(QPainter *painter, const QStyleOptionViewItem &option,
                const QModelIndex &index) const
     {
-        if(index.row() >=2)
+        if(index.row() >=TOKEN_NUM_ITEMS)
             return;
         painter->save();
 
@@ -209,6 +210,11 @@ OverviewPage::OverviewPage(const PlatformStyle *platformStyle, QWidget* parent) 
 {
     nDisplayUnit = 0; // just make sure it's not unitialized
     ui->setupUi(this);
+
+    //set Logo
+    ui->labelLogo->setPixmap(QPixmap(":/images/lux_logo_horizontal")
+                             .scaled(410,80,Qt::KeepAspectRatio,
+                                     Qt::SmoothTransformation));
 
     // Recent transactions
     ui->listTransactions->setItemDelegate(txdelegate);
