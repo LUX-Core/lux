@@ -326,7 +326,7 @@ BitcoinGUI::BitcoinGUI(const PlatformStyle *platformStyle, const NetworkStyle* n
         connect(progressBar, SIGNAL(clicked(QPoint)), this, SLOT(showModalOverlay()));
     }
 #endif
-
+    setMinimumHeight(height());
 }
 
 BitcoinGUI::~BitcoinGUI() {

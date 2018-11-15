@@ -210,7 +210,6 @@ OverviewPage::OverviewPage(const PlatformStyle *platformStyle, QWidget* parent) 
 {
     nDisplayUnit = 0; // just make sure it's not unitialized
     ui->setupUi(this);
-
     //set Logo
     ui->labelLogo->setPixmap(QPixmap(":/images/lux_logo_horizontal")
                              .scaled(410,80,Qt::KeepAspectRatio,
