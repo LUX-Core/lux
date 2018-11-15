@@ -158,9 +158,9 @@ static bool FindModifierBlockFromCandidates(vector <pair<int64_t, uint256>>& vSo
         if (mSelectedBlocks.count(pindex->GetBlockHash()) > 0) continue;
 
         // compute the selection hash by hashing an input that is unique to that block
+        uint256 hashPoS = pindex->IsProofOfStake() ? pindex->hashProofOfStake : pindex->GetBlockHash();
         CDataStream ss(SER_GETHASH, 0);
-        ss << uint256(pindex->IsProofOfStake() ? pindex->hashProofOfStake : pindex->GetBlockHash())
-           << nStakeModifierPrev;
+        ss << hashPoS << nStakeModifierPrev;
 
         uint256 hashSelection(Hash(ss.begin(), ss.end()));
 
@@ -401,15 +401,14 @@ bool Stake::CheckHash(const CBlockIndex* pindexPrev, unsigned int nBits, const C
     int64_t nValueIn = txPrev.vout[prevout.n].nValue;
     uint256 bnWeight = uint256(nValueIn);
 
-    int nBlockHeight = pindexPrev->nHeight + 1;
-
-    if (nBlockHeight > POS_REWARD_CHANGED_BLOCK_V2) {
+    int nBlockHeight = pindexPrev ? pindexPrev->nHeight + 1 : chainActive.Height() + 1;
+    if (nBlockHeight >= POS_REWARD_CHANGED_BLOCK_V2) {
         int64_t nTimeWeight = min((int64_t)nTimeTx - txPrev.nTime, Params().StakingMinAge());
         if(nTimeWeight){
             bnWeight = uint256(nValueIn) * nTimeWeight / COIN / (24 * 60 * 60);
         }
     }
-#endif
+
     bnTarget *= bnWeight; // comment out this will cause 'ERROR: CheckWork: invalid proof-of-stake at block 1144'
 
     uint64_t nStakeModifier = pindexPrev->nStakeModifier;
@@ -451,7 +450,7 @@ bool Stake::CheckHash(const CBlockIndex* pindexPrev, unsigned int nBits, const C
     }
 
     // Now check if proof-of-stake hash meets target protocol
-    if (nBlockHeight > POS_REWARD_CHANGED_BLOCK_V2) {
+    if (nBlockHeight >= POS_REWARD_CHANGED_BLOCK_V2) {
         return !(hashProofOfStake > bnWeight * bnTarget);
     }
     return !(hashProofOfStake > bnTarget);

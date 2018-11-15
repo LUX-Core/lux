@@ -4245,14 +4245,17 @@ bool CheckBlock(const CBlock& block, CValidationState& state, const Consensus::P
     LogPrint("debug", "%s: block=%s (%s %d %d)\n", __func__, block.GetHash().GetHex(), s,
              block.GetBlockTime(), nBlockTimeLimit);
 
-    // Check block time, reject far future blocks.
-    if (stake->CheckTimestamp(block.GetBlockTime(), (int64_t)block.vtx[1].nTime) > nBlockTimeLimit)
-        return state.DoS(100, error("CheckBlock() : coinbase timestamp violation nTimeBlock=% nTimeTx=%u", block.GetBlockTime()));
-
-    // Check proof-of-stake block signature
-    if (fCheckSig && !block.CheckBlockSignature()) {
-        return state.DoS(100, false, REJECT_INVALID, "bad-PoS-block-signature", false, "bad PoS block signature");
-    }
+    CBlockIndex* pindexPrev = LookupBlockIndex(block.hashPrevBlock);
+    int nBlockHeight = pindexPrev ? pindexPrev->nHeight + 1 : chainActive.Height() + 1;
+    if (nBlockHeight >= POS_REWARD_CHANGED_BLOCK_V2) {
+            // Check block time, reject far future blocks.
+            if (stake->CheckTimestamp(block.GetBlockTime(), (int64_t)block.vtx[1].nTime) > nBlockTimeLimit)
+                return state.DoS(100, error("CheckBlock() : coinbase timestamp violation nTimeBlock=% nTimeTx=%u", block.GetBlockTime(), (int64_t)block.vtx[1].nTime));
+            // Check proof-of-stake block signature
+            if (fCheckSig && !block.CheckBlockSignature()) {
+                return state.DoS(100, false, REJECT_INVALID, "bad-PoS-block-signature", false, "bad PoS block signature");
+            }
+        }
 
     // Check the merkle root.
     if (fCheckMerkleRoot) {
@@ -4285,22 +4288,6 @@ bool CheckBlock(const CBlock& block, CValidationState& state, const Consensus::P
     for (unsigned int i = 1; i < block.vtx.size(); i++)
         if (block.vtx[i].IsCoinBase())
             return state.DoS(100, false, REJECT_INVALID, "bad-cb-multiple", false, "more than one coinbase");
-
-    CBlockIndex* pindexPrev = LookupBlockIndex(block.hashPrevBlock);
-    if (pindexPrev) {
-        int nBlockHeight = pindexPrev->nHeight + 1;
-
-        if (nBlockHeight > POS_REWARD_CHANGED_BLOCK_V2)
-        {
-            // Check coinbase timestamp
-            if (block.IsProofOfWork() && (block.GetBlockTime() > ((int64_t)block.vtx[0].nTime + MaxPowClockDrift)))
-                return state.DoS(50, error("CheckBlock() : coinbase timestamp violation nTimeBlock=%ld nTimeTx=%u", block.GetBlockTime(), block.vtx[0].nTime));
-
-            // Check coinstake timestamp
-            if (block.IsProofOfStake() && !stake->CheckTimestamp(block.GetBlockTime(), (int64_t)block.vtx[1].nTime))
-                return state.DoS(50, error("CheckBlock() : coinstake timestamp violation nTimeBlock=%ld nTimeTx=%u", block.GetBlockTime(), block.vtx[1].nTime));
-        }
-    }
 
     if (block.IsProofOfStake()) {
         // Coinbase output should be empty if proof-of-stake block
