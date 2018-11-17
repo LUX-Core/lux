@@ -12,6 +12,7 @@ static const char UNUSED *lux_strings[] = {
 QT_TRANSLATE_NOOP("QPlatformTheme", "Cancel"),
 QT_TRANSLATE_NOOP("QPlatformTheme", "Close"),
 QT_TRANSLATE_NOOP("QPlatformTheme", "Apply"),
+QT_TRANSLATE_NOOP("QPlatformTheme", "&Save"),
 QT_TRANSLATE_NOOP("QPlatformTheme", "&Yes"),
 QT_TRANSLATE_NOOP("QPlatformTheme", "&No"),
 QT_TRANSLATE_NOOP("QPlatformTheme", "OK"),
