@@ -75,6 +75,8 @@ static const CRPCConvertParam vRPCConvertParams[] =
     { "addmultisigaddress", 0, "nrequired" },
     { "addmultisigaddress", 1, "keys" },
     ////////////////////////////////////////////////// // lux
+    { "autocombinerewards", 0, "enable"},
+    { "autocombinerewards", 1, "threshold"},
     { "getaddresstxids", 0, "addresses"},
     { "getaddresstxids", 1, "start"},
     { "getaddresstxids", 2, "end"},
