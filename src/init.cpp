@@ -208,11 +208,9 @@ void PrepareShutdown()
 #ifdef ENABLE_WALLET
     if (pwalletMain)
         bitdb.Flush(false);
-//    GenerateBitcoins(NULL, 0);
 #endif
     StopNode();
     UnregisterNodeSignals(GetNodeSignals());
-
     if (fFeeEstimatesInitialized) {
         boost::filesystem::path est_path = GetDataDir() / FEE_ESTIMATES_FILENAME;
         CAutoFile est_fileout(fopen(est_path.string().c_str(), "wb"), SER_DISK, CLIENT_VERSION);
@@ -224,7 +222,6 @@ void PrepareShutdown()
     }
 
     {
-        LOCK(cs_main);
         if (pcoinsTip != NULL) {
             FlushStateToDisk();
 
@@ -250,7 +247,6 @@ void PrepareShutdown()
     if (pwalletMain)
         bitdb.Flush(true);
 #endif
-
 #if ENABLE_ZMQ
     if (pzmqNotificationInterface) {
         UnregisterValidationInterface(pzmqNotificationInterface);
@@ -258,7 +254,6 @@ void PrepareShutdown()
         pzmqNotificationInterface = NULL;
     }
 #endif
-
 #ifndef WIN32
     boost::filesystem::remove(GetPidFile());
 #endif
@@ -1482,6 +1477,11 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
                 // Note that it also sets fReindex based on the disk flag!
                 // From here on out fReindex and fReset mean something different!
                 if (!LoadBlockIndex()) {
+                    if (fRequestShutdown)
+                    {
+                        LogPrintf("Shutdown requested. Exiting.\n");
+                        return false;
+                    }
                     strLoadError = _("Error loading block database");
                     break;
                 }
