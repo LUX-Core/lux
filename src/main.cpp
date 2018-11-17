@@ -82,6 +82,8 @@ static const int POS_REWARD_CHANGED_BLOCK = 300000;
 #include <bitset>
 #include "pubkey.h"
 
+extern std::atomic<bool> fRequestShutdown;
+
 std::unique_ptr<LuxState> globalState = nullptr;
 std::shared_ptr<dev::eth::SealEngineFace> globalSealEngine = nullptr;
 bool fRecordLogOpcodes = false;
@@ -3158,7 +3160,7 @@ static void FindFilesToPruneManual(std::set<int>& setFilesToPrune, int nManualPr
  */
 static bool FlushStateToDisk(CValidationState& state, FlushStateMode mode, int nManualPruneHeight)
 {
-    LOCK2(cs_main, cs_LastBlockFile);
+    //LOCK2(cs_main, cs_LastBlockFile);
     static int64_t nLastWrite = 0;
     static int64_t nLastFlush = 0;
     static int64_t nLastSetChain = 0;
@@ -5098,11 +5100,13 @@ bool static LoadBlockIndexDB()
     vector<pair<int, CBlockIndex*> > vSortedByHeight;
     vSortedByHeight.reserve(mapBlockIndex.size());
     for (auto const &item : mapBlockIndex) {
+        if (fRequestShutdown) return false;
         CBlockIndex* pindex = item.second;
         vSortedByHeight.push_back(make_pair(pindex->nHeight, pindex));
     }
     sort(vSortedByHeight.begin(), vSortedByHeight.end());
     for (auto const &item : vSortedByHeight) {
+        if (fRequestShutdown) return false;
         CBlockIndex* pindex = item.second;
         pindex->nChainWork = (pindex->pprev ? pindex->pprev->nChainWork : 0) + GetBlockProof(*pindex);
         pindex->nTimeMax = (pindex->pprev ? std::max(pindex->pprev->nTimeMax, pindex->nTime) : pindex->nTime);
@@ -5136,10 +5140,12 @@ bool static LoadBlockIndexDB()
     vinfoBlockFile.resize(nLastBlockFile + 1);
     LogPrintf("%s: last block file = %i\n", __func__, nLastBlockFile);
     for (int nFile = 0; nFile <= nLastBlockFile; nFile++) {
+        if (fRequestShutdown) return false;
         pblocktree->ReadBlockFileInfo(nFile, vinfoBlockFile[nFile]);
     }
     LogPrintf("%s: last block file info: %s\n", __func__, vinfoBlockFile[nLastBlockFile].ToString());
     for (int nFile = nLastBlockFile + 1; true; nFile++) {
+        if (fRequestShutdown) return false;
         CBlockFileInfo info;
         if (pblocktree->ReadBlockFileInfo(nFile, info)) {
             vinfoBlockFile.push_back(info);
@@ -5152,12 +5158,14 @@ bool static LoadBlockIndexDB()
     LogPrintf("Checking all blk files are present...\n");
     set<int> setBlkDataFiles;
     for (auto const &item : mapBlockIndex) {
+        if (fRequestShutdown) return false;
         CBlockIndex* pindex = item.second;
         if (pindex->nStatus & BLOCK_HAVE_DATA) {
             setBlkDataFiles.insert(pindex->nFile);
         }
     }
     for (std::set<int>::iterator it = setBlkDataFiles.begin(); it != setBlkDataFiles.end(); it++) {
+        if (fRequestShutdown) return false;
         CDiskBlockPos pos(*it, 0);
         if (CAutoFile(OpenBlockFile(pos, true), SER_DISK, CLIENT_VERSION).IsNull()) {
             return false;
@@ -5239,6 +5247,7 @@ bool static LoadBlockIndexDB()
         vinfoBlockFile.resize(nLastBlockFile + 1);
         LogPrintf("%s: last block file = %i\n", __func__, nLastBlockFile);
         for (int nFile = 0; nFile <= nLastBlockFile; nFile++) {
+            if (fRequestShutdown) return false;
             pblocktree->ReadBlockFileInfo(nFile, vinfoBlockFile[nFile]);
         }
         LogPrintf("%s: last block file info: %s\n", __func__, vinfoBlockFile[nLastBlockFile].ToString());
