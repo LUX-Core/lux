@@ -12,7 +12,7 @@
 bool CScriptCompressor::IsToKeyID(CKeyID& hash) const
 {
     if (script.size() == 25 && script[0] == OP_DUP && script[1] == OP_HASH160 && script[2] == 20 && script[23] == OP_EQUALVERIFY && script[24] == OP_CHECKSIG) {
-        memcpy(&hash, &script[3], 20);
+        memcpy((void *)&hash, (void *)&script[3], 20);
         return true;
     }
     return false;
@@ -21,7 +21,7 @@ bool CScriptCompressor::IsToKeyID(CKeyID& hash) const
 bool CScriptCompressor::IsToScriptID(CScriptID& hash) const
 {
     if (script.size() == 23 && script[0] == OP_HASH160 && script[1] == 20 && script[22] == OP_EQUAL) {
-        memcpy(&hash, &script[2], 20);
+        memcpy((void *)&hash, (void *)&script[2], 20);
         return true;
     }
     return false;
