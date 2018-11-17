@@ -146,13 +146,6 @@ public:
         running = false;
         cond.notify_all();
     }
-    /** Wait for worker threads to exit */
-    void WaitExit()
-    {
-        std::unique_lock<std::mutex> lock(cs);
-        while (numThreads > 0)
-            cond.wait(lock);
-    }
 
     /** Return current depth of queue */
     size_t Depth()
@@ -490,10 +483,10 @@ void InterruptHTTPServer()
 
 void StopHTTPServer()
 {
+    InterruptHTTPServer();
     LogPrint("http", "Stopping HTTP server\n");
     if (workQueue) {
         LogPrint("http", "Waiting for HTTP worker threads to exit\n");
-        workQueue->WaitExit();
         for (auto& thread: g_thread_http_workers) {
             thread.join();
         }
