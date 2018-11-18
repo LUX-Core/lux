@@ -53,7 +53,8 @@ void FormatHashBuffers(CBlock* pblock, char* pmidstate, char* pdata)
         } block;
     } tmp;
 
-    memset(&tmp, 0, sizeof(tmp));
+    // Check all field below
+    //memset(&tmp, 0, sizeof(tmp));
 
     tmp.block.nVersion       = pblock->nVersion;
     tmp.block.hashPrevBlock  = pblock->hashPrevBlock;
