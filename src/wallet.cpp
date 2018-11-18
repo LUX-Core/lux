@@ -3040,7 +3040,7 @@ bool CWallet::CreateTransaction(const vector<pair<CScript, CAmount> >& vecSend, 
                         const CAmount nValue = coin.first->vout[coin.second].nValue;
                         signSuccess = ProduceSignature(TransactionSignatureCreator(this, &txNewConst, nIn, nValue, SIGHASH_ALL), scriptPubKey, sigdata);
                     } else
-                        signSuccess = ProduceSignature(DummySignatureCreator(this), scriptPubKey, sigdata, false);
+                        signSuccess = ProduceSignature(DummySignatureCreator(this), scriptPubKey, sigdata);
 
                     if (!signSuccess) {
                         strFailReason = _("Signing transaction failed");
