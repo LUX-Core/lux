@@ -1078,8 +1078,7 @@ bool CWallet::AbandonTransaction(const uint256& hashTx)
     // Do not flush the wallet here for performance reasons
     CWalletDB walletdb(strWalletFile, "r+", false);
 
-    std::set<uint256> todo;
-    std::set<uint256> done;
+    set<uint256> todo, done;
 
     // Can't mark abandoned if confirmed or in mempool
     assert(mapWallet.count(hashTx));
@@ -1146,17 +1145,18 @@ void CWallet::MarkConflicted(const uint256& hashBlock, const uint256& hashTx)
     // Do not flush the wallet here for performance reasons
     CWalletDB walletdb(strWalletFile, "r+", false);
 
-    std::set<uint256> todo;
-    std::set<uint256> done;
+    set<uint256> todo, done;
 
     todo.insert(hashTx);
+    map<uint256, CWalletTx>::iterator it;
+    size_t nRecords = 0;
 
     while (!todo.empty()) {
         uint256 now = *todo.begin();
         todo.erase(now);
         done.insert(now);
-        assert(mapWallet.count(now));
-        CWalletTx& wtx = mapWallet[now];
+        if ((it = mapWallet.find(now)) != mapWallet.end()) {
+        CWalletTx& wtx = it->second;
         int currentconfirm = wtx.GetDepthInMainChain();
         if (conflictconfirms < currentconfirm) {
             // Block is 'more conflicted' than current confirm; update.
@@ -1172,9 +1172,23 @@ void CWallet::MarkConflicted(const uint256& hashBlock, const uint256& hashTx)
                     todo.insert(iter->second);
                 }
                 iter++;
+                }
+                // If a transaction changes 'conflicted' state, that changes the balance
+                // available of the outputs it spends. So force those to be recomputed
+                for (const CTxIn &txin : wtx.vin) {
+                    if (mapWallet.count(txin.prevout.hash))
+                        mapWallet[txin.prevout.hash].MarkDirty();
+                }
             }
+            nRecords++;
+            continue;
         }
+        LogPrintf("%s: txn %s not recorded in wallet\n", __func__);
     }
+    if (nRecords > 0) {
+        MarkDirty();
+    }
+    return;
 }
 
 void CWallet::SyncTransaction(const CTransaction& tx, const CBlock* pblock)
