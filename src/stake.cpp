@@ -50,9 +50,7 @@ static const bool ENABLE_ADVANCED_STAKING = true;
 
 static const int ADVANCED_STAKING_HEIGHT = 225000;
 
-static const unsigned int nLuxProtocolSwitchHeight = 520000;
-
-static const unsigned int nLuxProtocolTestSwitchHeight = 500000;
+static const int POS_REWARD_CHANGED_BLOCK_V2_TESTNET = 500000;
 
 static std::atomic<bool> nStakingInterrupped;
 
@@ -81,8 +79,8 @@ Stake::Stake()
 
 Stake::~Stake() {}
 
-static bool IsLuxProtocol(unsigned int nTimeBlock) {
-    return (nTimeBlock >= (IsTestNet() ? nLuxProtocolTestSwitchHeight : nLuxProtocolSwitchHeight));
+static bool IsLuxProtocolV2(int blockHeight) {
+    return (blockHeight >= (IsTestNet() ? POS_REWARD_CHANGED_BLOCK_V2_TESTNET : POS_REWARD_CHANGED_BLOCK_V2));
 }
 
 StakeStatus::StakeStatus() {
@@ -242,7 +240,7 @@ bool Stake::ComputeNextModifier(const CBlockIndex* pindexPrev, uint64_t& nStakeM
 
     // Lux Protocol: We use current nTime different with GetInterval
     if (nModifierTime / GetInterval()  >= pindexPrev->GetBlockTime() / GetInterval()) {
-        if (IsLuxProtocol(pindexPrev->nTime)) {
+        if (IsLuxProtocolV2(pindexPrev->nHeight + 1)) {
             if (fDebug) {
                 LogPrintf("ComputeNextStakeModifier: Lux Protocol: pindexPrev nHeight=%d nTime=%u\n", __func__, pindexPrev->nHeight, (unsigned int)pindexPrev->GetBlockTime());
             }
@@ -423,9 +421,8 @@ bool Stake::CheckHash(const CBlockIndex* pindexPrev, unsigned int nBits, const C
     // Weighted target
     int64_t nValueIn = txPrev.vout[prevout.n].nValue;
     uint256 bnWeight = uint256(nValueIn);
-
-    int nBlockHeight = pindexPrev ? pindexPrev->nHeight + 1 : chainActive.Height() + 1;
-    if (nBlockHeight >= POS_REWARD_CHANGED_BLOCK_V2) {
+    int nBlockHeight = pindexPrev->nHeight + 1;
+    if (IsLuxProtocolV2(nBlockHeight)) {
         int64_t nTimeWeight = min((int64_t)nTimeTx - txPrev.nTime, Params().StakingMinAge());
         if(nTimeWeight){
             bnWeight = uint256(nValueIn) * nTimeWeight / COIN / (24 * 60 * 60);
@@ -440,23 +437,23 @@ bool Stake::CheckHash(const CBlockIndex* pindexPrev, unsigned int nBits, const C
 
     // Calculate hash
     CDataStream ss(SER_GETHASH, 0);
-        // Switch to our new protocol
-        if (IsLuxProtocol(nTimeTx)) {
-            if (!GetKernelStakeModifier(nTimeBlockFrom, nStakeModifier, nStakeModifierHeight, nStakeModifierTime, true))
-                return false;
-            ss << nStakeModifier;
-        } else {
+
+    // Switch to our new protocol
+    if (IsLuxProtocolV2(nBlockHeight)) {
+        if (!GetKernelStakeModifier(nTimeBlockFrom, nStakeModifier, nStakeModifierHeight, nStakeModifierTime, true))
+            return false;
+    }
+
+    ss << nStakeModifier << nTimeBlockFrom << txPrev.nTime << prevout.hash << prevout.n << nTimeTx;
     if (ENABLE_ADVANCED_STAKING && (GetBoolArg("-regtest", false) || nStakeModifierHeight >= ADVANCED_STAKING_HEIGHT)) {
         ss << nHashInterval << nSelectionPeriod << nStakeMinAge << nStakeSplitThreshold
-           << bnWeight << nStakeModifierTime;
-        }
+                        << bnWeight << nStakeModifierTime;
     }
-    ss << nTimeBlockFrom << txPrev.nTime << prevout.hash << prevout.n << nTimeTx;
     hashProofOfStake = Hash(ss.begin(), ss.end());
 
     if (fDebug) {
 #       if 0
-        if (IsLuxProtocol(nTimeTx)) {
+        if (IsLuxProtocolV2(nBlockHeight)) {
         LogPrintf("%s: using modifier 0x%016x at height=%d timestamp=%s for block from height=%d timestamp=%s\n", __func__,
                   nStakeModifier, nStakeModifierHeight,
                   DateTimeStrFormat("%Y-%m-%d %H:%M:%S", nStakeModifierTime).c_str(),
@@ -482,16 +479,16 @@ bool Stake::CheckHash(const CBlockIndex* pindexPrev, unsigned int nBits, const C
     }
 
     // Now check if proof-of-stake hash meets target protocol
-    if (nBlockHeight >= POS_REWARD_CHANGED_BLOCK_V2) {
+    if (IsLuxProtocolV2(nBlockHeight)) {
         return !(hashProofOfStake > bnWeight * bnTarget);
     }
     return !(hashProofOfStake > bnTarget);
 }
 
 // Check whether the coinstake timestamp meets protocol
-bool Stake::CheckTimestamp(int64_t nTimeBlock, int64_t nTimeTx)
+bool Stake::CheckTimestamp(int blockHeight, int64_t nTimeBlock, int64_t nTimeTx)
 {
-    if (IsLuxProtocol(nTimeBlock))
+    if (IsLuxProtocolV2(blockHeight))
         return (nTimeBlock == nTimeTx);
     else
         return ((nTimeTx <= nTimeBlock) && (nTimeBlock <= nTimeTx + MaxPosClockDrift));

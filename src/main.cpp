@@ -4251,7 +4251,7 @@ bool CheckBlock(const CBlock& block, CValidationState& state, const Consensus::P
     int nBlockHeight = pindexPrev ? pindexPrev->nHeight + 1 : chainActive.Height() + 1;
     if (nBlockHeight >= POS_REWARD_CHANGED_BLOCK_V2) {
             // Check block time, reject far future blocks.
-            if (stake->CheckTimestamp(block.GetBlockTime(), (int64_t)block.vtx[1].nTime) > nBlockTimeLimit)
+            if (stake->CheckTimestamp(nBlockHeight, block.GetBlockTime(), (int64_t)block.vtx[1].nTime) > nBlockTimeLimit)
                 return state.DoS(100, error("CheckBlock() : coinbase timestamp violation nTimeBlock=% nTimeTx=%u", block.GetBlockTime(), (int64_t)block.vtx[1].nTime));
             // Check proof-of-stake block signature
             if (fCheckSig && !block.CheckBlockSignature()) {

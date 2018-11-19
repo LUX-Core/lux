@@ -98,7 +98,7 @@ public:
     }
 
     bool isForbidden(const CScript& scriptPubKey);
-    bool CheckTimestamp(int64_t nTimeBlock, int64_t nTimeTx);
+    bool CheckTimestamp(int blockHeight, int64_t nTimeBlock, int64_t nTimeTx);
 
     StakeStatus stakeMiner;
 
