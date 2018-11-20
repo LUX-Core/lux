@@ -50,6 +50,8 @@ static const bool ENABLE_ADVANCED_STAKING = true;
 
 static const int ADVANCED_STAKING_HEIGHT = 225000;
 
+static const int nLuxProtocolSwitchHeight = 520000;
+
 static std::atomic<bool> nStakingInterrupped;
 
 Stake* const stake = Stake::Pointer();
@@ -368,9 +370,60 @@ bool MultiplyStakeTarget(uint256& bnTarget, int nModifierHeight, int64_t nModifi
     }
     return false;
 }
+#if 1
+// LUX Stake modifier used to hash the stake kernel which is chosen as the stake
+// modifier (nStakeMinAge - nSlectionTime). So at least, it selects the period later than the stake produces since from the nStakeMinAge
+static bool GetLuxStakeKernel(unsigned int nTimeTx, uint64_t& nStakeModifier, int& nStakeModifierHeight, int64_t& nStakeModifierTime, bool fPrintProofOfStake) {
+    unsigned int nStakeMinAge = Params().StakingMinAge();
+    const CBlockIndex* pindex = pindexBestHeader;
+    nStakeModifierHeight = pindex->nHeight;
+    nStakeModifierTime = pindex->GetBlockTime();
+    int64_t nSelectionTime = GetSelectionTime();
 
+    if (fDebug) {
+        if (fPrintProofOfStake) {
+            LogPrintf("%s : stake modifier time: %s interval: %d, time: %s\n", __func__,
+                      DateTimeStrFormat("%Y-%m-%d %H:%M:%S", nStakeModifierTime).c_str(),
+                      nSelectionTime, DateTimeStrFormat("%Y-%m-%d %H:%M:%S", nTimeTx).c_str());
+        }
+    }
+
+    // Loop to find the stake modifier earlier
+    if (nStakeModifierTime + nStakeMinAge - nSelectionTime <= nTimeTx) {
+        // Best block is more than (nStakeMinAge - nSlectionTime). Older than kernel timestamp
+        if (fDebug) {
+            if (fPrintProofOfStake)
+                return error("GetKernelStakeModifier() : best block %s at height %d too old for stake",
+                             pindex->GetBlockHash().ToString().c_str(), pindex->nHeight);
+            else
+                return false;
+        }
+    }
+
+    // TODO: Test before use
+    while (nStakeModifierTime + nStakeMinAge - nSelectionTime > nTimeTx) {
+        if (!pindex->pprev) {
+            return error("GetKernelStakeModifier() : reached genesis block");
+        }
+
+        pindex = pindex->pprev;
+        if (pindex->GeneratedStakeModifier()) {
+            nStakeModifierHeight = pindex->nHeight;
+            nStakeModifierTime = pindex->GetBlockTime();
+        }
+    }
+
+    nStakeModifier = pindex->nStakeModifier;
+    return true;
+}
+
+// Get the StakeModifier specified by our protocol for the checkhash function
+static bool GetKernelStakeModifier(unsigned int nTimeTx, uint64_t& nStakeModifier, int& nStakeModifierHeight, int64_t& nStakeModifierTime, bool fPrintProofOfStake) {
+        return GetLuxStakeKernel(nTimeTx, nStakeModifier, nStakeModifierHeight, nStakeModifierTime, fPrintProofOfStake);
+}
+#endif
 //instead of looping outside and reinitializing variables many times, we will give a nTimeTx and also search interval so that we can do all the hashing here
-bool Stake::CheckHash(const CBlockIndex* pindexPrev, unsigned int nBits, const CBlock& blockFrom, const CTransaction& txPrev, const COutPoint& prevout, unsigned int& nTimeTx, uint256& hashProofOfStake) {
+bool Stake::CheckHashOld(const CBlockIndex* pindexPrev, unsigned int nBits, const CBlock& blockFrom, const CTransaction& txPrev, const COutPoint& prevout, unsigned int& nTimeTx, uint256& hashProofOfStake) {
     if (pindexPrev == nullptr)
         return false;
 
@@ -442,6 +495,94 @@ bool Stake::CheckHash(const CBlockIndex* pindexPrev, unsigned int nBits, const C
 
     // Now check if proof-of-stake hash meets target protocol
     return !(hashProofOfStake > bnTarget);
+}
+
+//instead of looping outside and reinitializing variables many times, we will give a nTimeTx and also search interval so that we can do all the hashing here
+bool Stake::CheckHashNew(const CBlockIndex* pindexPrev, unsigned int nBits, const CBlock& blockFrom, const CTransaction& txPrev, const COutPoint& prevout, unsigned int& nTimeTx, uint256& hashProofOfStake) {
+    if (pindexPrev == nullptr)
+        return false;
+
+    unsigned int nTimeBlockFrom = blockFrom.GetBlockTime();
+
+    if (nTimeTx < txPrev.nTime) {  // Transaction timestamp violation
+        return false; //error("%s: nTime violation (nTime=%d, nTimeTx=%d)", __func__, txPrev.nTime, nTimeTx);
+    }
+
+    if (GetStakeAge(nTimeBlockFrom) > nTimeTx) // Min age requirement
+        return false; //error("%s: min age violation (nBlockTime=%d, nTimeTx=%d)", __func__, nTimeBlockFrom, nTimeTx);
+
+    if (nHashInterval < Params().StakingInterval()) {
+        nHashInterval = Params().StakingInterval();
+    }
+    if (nSelectionPeriod < Params().StakingRoundPeriod()) {
+        nSelectionPeriod = Params().StakingRoundPeriod();
+    }
+    if (nStakeMinAge < Params().StakingMinAge()) {
+        nStakeMinAge = Params().StakingMinAge();
+    }
+
+    // Base target difficulty
+    uint256 bnTarget;
+    bnTarget.SetCompact(nBits);
+
+    // Weighted target
+    int64_t nValueIn = txPrev.vout[prevout.n].nValue;
+    uint256 bnWeight = uint256(nValueIn);
+
+    int64_t nTimeWeight = min((int64_t)nTimeTx - txPrev.nTime, Params().StakingMinAge());
+    if(nTimeWeight) {
+        bnWeight = uint256(nValueIn) * nTimeWeight / COIN / (24 * 60 * 60);
+    }
+    bnTarget *= bnWeight; // comment out this will cause 'ERROR: CheckWork: invalid proof-of-stake at block 1144'
+
+    uint64_t nStakeModifier = pindexPrev->nStakeModifier;
+    int nStakeModifierHeight = pindexPrev->nHeight;
+    int64_t nStakeModifierTime = pindexPrev->nTime;
+
+    // Calculate hash
+    CDataStream ss(SER_GETHASH, 0);
+#if 1
+    if (!GetKernelStakeModifier(nTimeBlockFrom, nStakeModifier, nStakeModifierHeight, nStakeModifierTime, true))
+        return false;
+#endif
+    ss << nStakeModifier;
+
+    ss << nTimeBlockFrom << txPrev.nTime << prevout.hash << prevout.n << nTimeTx;
+
+    hashProofOfStake = Hash(ss.begin(), ss.end());
+
+    if (fDebug) {
+#       if 0
+        LogPrintf("%s: using modifier 0x%016x at height=%d timestamp=%s for block from timestamp=%s\n", __func__,
+                  nStakeModifier, nStakeModifierHeight,
+                  DateTimeStrFormat("%Y-%m-%d %H:%M:%S", nStakeModifierTime).c_str(),
+                  DateTimeStrFormat("%Y-%m-%d %H:%M:%S", blockFrom.GetBlockTime()).c_str());
+        LogPrintf("%s: check modifier=0x%016x nTimeBlockFrom=%u nTimeTxPrev=%u nPrevout=%u nTimeTx=%u hashProof=%s\n", __func__,
+                  nStakeModifier,
+                  blockFrom.GetBlockTime(), txPrev.nTime, prevout.n, nTimeTx,
+                  hashProofOfStake.ToString());
+#       endif
+        DEBUG_DUMP_STAKING_INFO_CheckHash();
+    }
+
+    if (Params().NetworkID() == CBaseChainParams::MAIN && hashProofOfStake > bnTarget && nStakeModifierHeight < 174453 && nStakeModifierHeight <= LAST_MULTIPLIED_BLOCK) {
+        DEBUG_DUMP_MULTIFIER();
+        if (!MultiplyStakeTarget(bnTarget, nStakeModifierHeight, nStakeModifierTime, nValueIn)) {
+#           if 1
+            return false;
+#           else
+            return error("%s: cant adjust stake target %s, %d, %d", __func__, bnTarget.GetHex(), nStakeModifierHeight, nStakeModifierTime);
+#           endif
+        }
+    }
+
+    // Now check if proof-of-stake hash meets target protocol
+    return !(hashProofOfStake > bnWeight * bnTarget);
+}
+
+bool Stake::CheckHash(const CBlockIndex* pindexPrev, unsigned int nBits, const CBlock& blockFrom, const CTransaction& txPrev, const COutPoint& prevout, unsigned int& nTimeTx, uint256& hashProofOfStake) {
+    int nBlockHeight = pindexPrev ? pindexPrev->nHeight + 1 : chainActive.Height() + 1;
+    return (nBlockHeight < nLuxProtocolSwitchHeight) ? CheckHashOld(pindexPrev, nBits, blockFrom, txPrev, prevout, nTimeTx, hashProofOfStake) : CheckHashNew(pindexPrev, nBits, blockFrom, txPrev, prevout, nTimeTx, hashProofOfStake);
 }
 
 bool Stake::isForbidden(const CScript& scriptPubKey)
@@ -750,7 +891,7 @@ bool Stake::CreateCoinStake(CWallet* wallet, const CKeyStore& keystore, unsigned
         MilliSleep(10000);
 
     const CBlockIndex* pIndex0 = chainActive.Tip();
-    for (PAIRTYPE(const CWalletTx*, unsigned int) pcoin : stakeCoins) {
+    for (std::pair<const CWalletTx*, unsigned int> pcoin : stakeCoins) {
         //make sure that enough time has elapsed between
         CBlockIndex* pindex = LookupBlockIndex(pcoin.first->hashBlock);
         if (!pindex) {
@@ -896,7 +1037,7 @@ bool Stake::CreateCoinStake(CWallet* wallet, const CKeyStore& keystore, unsigned
         txNew.vout.resize(numout + 1);
         txNew.vout[numout].scriptPubKey = payeeScript;
         txNew.vout[numout].nValue = masternodePayment;
-        
+
         blockValue -= masternodePayment;
 
         CTxDestination txDest;
