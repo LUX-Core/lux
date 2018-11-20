@@ -1400,7 +1400,6 @@ public:
         return true;
     }
 
-    bool WriteToDisk(CWalletDB *pwalletdb);
 
     int64_t GetTxTime() const;
     int GetRequestCount() const;
