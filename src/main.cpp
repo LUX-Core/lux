@@ -4725,6 +4725,7 @@ bool ProcessNewBlock(CValidationState& state, const CChainParams& chainparams, C
 {
     int nHeight = chainActive.Height() + 1;
     bool usePhi2 = false;
+    bool alreadyAccepted = false;
 
     // Reject the block from older version
     if (pfrom && pfrom->strSubVer.compare(SCVersion) < 0)
@@ -4752,6 +4753,7 @@ bool ProcessNewBlock(CValidationState& state, const CChainParams& chainparams, C
         } else {
             nHeight = pindexPrev->nHeight + 1;
             usePhi2 = nHeight >= Params().SwitchPhi2Block();
+            alreadyAccepted = (LookupBlockIndex(pblock->GetHash(usePhi2)) != nullptr);
         }
     }
 
@@ -4806,7 +4808,7 @@ bool ProcessNewBlock(CValidationState& state, const CChainParams& chainparams, C
     const char * const s = pindex->IsProofOfStake() ? "pos" : "pow";
     if (fDebug) {
         LogPrintf("%s: ACCEPTED %d %s (%s)\n%s\n", __func__, pindex->nHeight, hash.GetHex(), s, pblock->ToString());
-    } else if (!hideLogMessage) {
+    } else if (!hideLogMessage && !alreadyAccepted) {
         LogPrintf("%s: ACCEPTED %d %s (%s)\n", __func__, pindex->nHeight, hash.GetHex(), s);
     }
 
