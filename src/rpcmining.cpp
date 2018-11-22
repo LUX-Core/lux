@@ -970,6 +970,7 @@ UniValue submitblock(const UniValue& params, bool fHelp)
         throw JSONRPCError(RPC_DESERIALIZATION_ERROR, "Block decode failed");
     }
 
+    CValidationState state;
     bool usePhi2, fBlockPresent = false;
     {
         LOCK(cs_main);
@@ -989,9 +990,15 @@ UniValue submitblock(const UniValue& params, bool fHelp)
             // Otherwise, we might only have the header - process the block before returning
             fBlockPresent = true;
         }
+        bool fValid = TestBlockValidity(state, Params(), block, pindexPrev, false, true);
+        if (!state.IsValid()) {
+            LogPrintf("%s: block state is not valid!\n", __func__);
+        }
+        if (!fValid) {
+            LogPrintf("%s: block is not valid!\n", __func__);
+        }
     }
 
-    CValidationState state;
     submitblock_StateCatcher sc(block.GetHash(usePhi2), usePhi2);
     RegisterValidationInterface(&sc);
     bool fAccepted = ProcessNewBlock(state, Params(), NULL, &block);
@@ -1007,6 +1014,9 @@ UniValue submitblock(const UniValue& params, bool fHelp)
             return "inconclusive";
             }
         state = sc.state;
+    } else if (state.IsValid()) {
+        LogPrintf("%s: block not accepted but state is valid!\n", __func__);
+        return "rejected";
     }
     return BIP22ValidationResult(state);
 }
