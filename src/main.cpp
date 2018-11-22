@@ -3049,6 +3049,8 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
             }
             if (checkBlock.hashStateRoot != block.hashStateRoot) {
                 LogPrintf("Actual block data does not match hashStateRoot expected by AAL block\n");
+                LogPrintf("  %s vs %s\n", checkBlock.hashStateRoot.GetHex(), block.hashStateRoot.GetHex());
+                LogPrintf("  global=%s\n", h256Touint(getGlobalStateRoot(pindex)).GetHex());
             }
 
             return state.DoS(100,
@@ -3058,7 +3060,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
     }
 
     if (fJustCheck) {
-        if (pindex->nHeight > Params().FirstSCBlock()) {
+        if (pindex->nHeight >= Params().FirstSCBlock()) {
             dev::h256 prevHashStateRoot(dev::sha3(dev::rlp("")));
             dev::h256 prevHashUTXORoot(dev::sha3(dev::rlp("")));
             if (pindex->pprev->hashStateRoot != uint256() && pindex->pprev->hashUTXORoot != uint256()) {

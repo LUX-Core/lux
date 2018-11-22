@@ -7,19 +7,20 @@ using namespace std;
 using namespace dev;
 using namespace dev::eth;
 
-LuxState::LuxState(u256 const& _accountStartNonce, OverlayDB const& _db, const string& _path, BaseState _bs) :
-        State(_accountStartNonce, _db, _bs) {
-            dbUTXO = LuxState::openDB(_path + "/luxDB", sha3(rlp("")), WithExisting::Trust);
-	        stateUTXO = SecureTrieDB<Address, OverlayDB>(&dbUTXO);
+LuxState::LuxState(u256 const& _accountStartNonce, OverlayDB const& _db, const string& _path, BaseState _bs) : State(_accountStartNonce, _db, _bs)
+{
+    dbUTXO = LuxState::openDB(_path + "/luxDB", sha3(rlp("")), WithExisting::Trust);
+    stateUTXO = SecureTrieDB<Address, OverlayDB>(&dbUTXO);
 }
 
-LuxState::LuxState() : dev::eth::State(dev::Invalid256, dev::OverlayDB(), dev::eth::BaseState::PreExisting) {
+LuxState::LuxState() : dev::eth::State(dev::Invalid256, dev::OverlayDB(), dev::eth::BaseState::PreExisting)
+{
     dbUTXO = OverlayDB();
     stateUTXO = SecureTrieDB<Address, OverlayDB>(&dbUTXO);
 }
 
-ResultExecute LuxState::execute(EnvInfo const& _envInfo, SealEngineFace const& _sealEngine, LuxTransaction const& _t, Permanence _p, OnOpFunc const& _onOp){
-
+ResultExecute LuxState::execute(EnvInfo const& _envInfo, SealEngineFace const& _sealEngine, LuxTransaction const& _t, Permanence _p, OnOpFunc const& _onOp)
+{
     assert(_t.getVersion().toRaw() == VersionVM::GetEVMDefault().toRaw());
 
     addBalance(_t.sender(), _t.value() + (_t.gas() * _t.gasPrice()));
@@ -30,16 +31,16 @@ ResultExecute LuxState::execute(EnvInfo const& _envInfo, SealEngineFace const& _
     h256 oldStateRoot = rootHash();
     bool voutLimit = false;
 
-	auto onOp = _onOp;
+    auto onOp = _onOp;
 #if ETH_VMTRACE
-	if (isChannelVisible<VMTraceChannel>())
-		onOp = Executive::simpleTrace(); // override tracer
+    if (isChannelVisible<VMTraceChannel>())
+        onOp = Executive::simpleTrace(); // override tracer
 #endif
-	// Create and initialize the executive. This will throw fairly cheaply and quickly if the
-	// transaction is bad in any way.
-	Executive e(*this, _envInfo, _sealEngine);
-	ExecutionResult res;
-	e.setResultRecipient(res);
+    // Create and initialize the executive. This will throw fairly cheaply and quickly if the
+    // transaction is bad in any way.
+    Executive e(*this, _envInfo, _sealEngine);
+    ExecutionResult res;
+    e.setResultRecipient(res);
 
     CTransactionRef tx;
     u256 startGasUsed;
@@ -53,7 +54,7 @@ ResultExecute LuxState::execute(EnvInfo const& _envInfo, SealEngineFace const& _
         if (!e.execute()){
             e.go(onOp);
         } else {
-
+            LogPrintf("%s: contract execute failed!\n", __func__);
             e.revert();
             throw Exception();
         }
@@ -86,6 +87,7 @@ ResultExecute LuxState::execute(EnvInfo const& _envInfo, SealEngineFace const& _
     }
     catch(Exception const& _e){
 
+        LogPrintf("%s: contract execute exception %s\n", __func__, _e.what());
         printfErrorLog(dev::eth::toTransactionException(_e));
         res.excepted = dev::eth::toTransactionException(_e);
         res.gasUsed = _t.gas();
@@ -399,6 +401,7 @@ dev::h256 getGlobalStateRoot(CBlockIndex* pIndex){
             root = dev::sha3(dev::rlp(""));
         }
     } catch (std::exception& e) {
+        LogPrintf("%s: exception at block %d: %s\n", __func__, pIndex->nHeight, e.what());
         // When root node is empty, it will throw exception. We must re-initialize value
         if (pIndex && pIndex->pprev->hashStateRoot != uint256() && pIndex->pprev->hashUTXORoot != uint256()) {
             root = uintToh256(pIndex->pprev->hashStateRoot);
