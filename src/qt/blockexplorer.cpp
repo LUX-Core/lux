@@ -16,8 +16,28 @@
 #include <QMessageBox>
 #include <set>
 
-// tr() requires to be in QObject or QWidget sub functions
+// tr() requires to be in QObject or QWidget methods
+// This function allow the lupdate parser to detect our std::string without QString requirement.
 #define _(x) BlockExplorer::tr(x).toStdString()
+
+void BlockExplorer::Translations()
+{
+    QString toTranslate[] = {
+        tr("unknown"), tr("Height"), tr("Size"), tr("Timestamp"),
+        tr("Number of Transactions"), tr("Difficulty"),
+        tr("Value Out"), tr("Fees"), tr("Type"), tr("Generated"),
+        tr("Bits"), tr("Nonce"), tr("Version"), tr("Hash"),
+        tr("Merkle Root"), tr("State Root"), tr("UTXO Root"),
+        tr("Block"), tr("Transaction"), tr("Call SC"), tr("Create SC"),
+        tr("Input"), tr("Output"), tr("Inputs"), tr("Outputs"),
+        tr("Tx Hash"), tr("Amount"), tr("From"), tr("To"), tr("Redeemed in"),
+        tr("Balance"), tr("Delta"), tr("In Block"), tr("Taken from"),
+        tr("outputs (see tx)"), tr("unhandled or invalid address"),
+        tr("movements displayed."), tr("Transactions to/from"),
+        tr("-addressindex parameter is required to show address history")
+    };
+    Q_UNUSED(toTranslate)
+}
 
 extern double GetDifficulty(const CBlockIndex* blockindex = NULL);
 
@@ -299,7 +319,7 @@ std::string getexplorerBlockHash(int64_t Height)
     return pblockindex->GetBlockHash().GetHex();
 }
 
-std::string BlockToString(CBlockIndex* pBlock)
+static std::string BlockToString(CBlockIndex* pBlock)
 {
     if (!pBlock)
         return "";
@@ -401,7 +421,7 @@ std::string BlockToString(CBlockIndex* pBlock)
     return Content;
 }
 
-std::string TxToString(uint256 BlockHash, const CTransaction& tx)
+static std::string TxToString(uint256 BlockHash, const CTransaction& tx)
 {
     CAmount Input = 0;
     CAmount Output = tx.GetValueOut();
@@ -498,7 +518,7 @@ std::string TxToString(uint256 BlockHash, const CTransaction& tx)
     return Content;
 }
 
-std::string AddressToString(const CTxDestination& Address)
+static std::string AddressToString(const CTxDestination& Address)
 {
     std::string TxLabels[] = {
             _("Date"),
