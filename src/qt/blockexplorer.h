@@ -50,6 +50,8 @@ private:
     bool switchTo(const QString& query);
     void setContent(const std::string& content);
     void updateNavButtons();
+
+    void Translations();
 };
 
 #endif // BLOCKEXPLORER_H
