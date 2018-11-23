@@ -16,6 +16,9 @@
 #include <QMessageBox>
 #include <set>
 
+// tr() requires to be in QObject or QWidget sub functions
+#define _(x) BlockExplorer::tr(x).toStdString()
+
 extern double GetDifficulty(const CBlockIndex* blockindex = NULL);
 
 inline std::string utostr(unsigned int n)
@@ -180,12 +183,12 @@ static std::string TxToRow(const CTransaction& tx, CBlock * const ptrBlock= null
         bool bSC_Amount = false;
         if(bHasOpCall && strAddress == "")
         {
-            strAddress = "Call SC";
+            strAddress = _("Call SC");
             bSC_Amount = true;
         }
         if(bHasOpCreate && strAddress == "")
         {
-            strAddress = "Create SC";
+            strAddress = _("Create SC");
             bSC_Amount = true;
         }
         if(bSC_Amount)
@@ -231,7 +234,7 @@ static std::string TxToRow(const CTransaction& tx, CBlock * const ptrBlock= null
     if(!bCalcOutAddr)
     {
         if (OutAddresses == "") {
-            OutAddresses = itostr(tx.vout.size()) + " outputs (see tx)";
+            OutAddresses = itostr(tx.vout.size()) + " " + _("outputs (see tx)");
         }
     }
 
@@ -628,7 +631,7 @@ void BlockExplorer::showEvent(QShowEvent* ev)
         home();
         if (!GetBoolArg("-txindex", false)) {
             QString Warning = tr("Not all transactions will be shown. To view all transactions you need to set txindex=1 in the configuration file (lux.conf).");
-            QMessageBox::warning(this, "Luxcore Blockchain Explorer", Warning, QMessageBox::Ok);
+            QMessageBox::warning(this, tr("Luxcore Blockchain Explorer"), Warning, QMessageBox::Ok);
         }
     }
     QMainWindow::showEvent(ev);
