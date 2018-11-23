@@ -197,7 +197,7 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const CWallet* 
 
                 if (txout.scriptPubKey.HasOpCreate()) {
                     sub.type = TransactionRecord::SCcreate;
-                    address = CKeyID(uint160(LuxState::createLuxAddress(uintToh256(wtx.GetWitnessHash()), nOut).asBytes()));
+                    address = CKeyID(uint160(LuxState::createLuxAddress(uintToh256(wtx.GetHash()), nOut).asBytes()));
                     sub.address = EncodeDestination(address);
                 } else if (txout.scriptPubKey.HasOpCall()) {
                     sub.type = TransactionRecord::SCsent;
