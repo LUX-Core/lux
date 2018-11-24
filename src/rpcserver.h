@@ -323,6 +323,7 @@ extern UniValue getnetworkhashps(const UniValue& params, bool fHelp);
 extern UniValue gethashespersec(const UniValue& params, bool fHelp);
 extern UniValue getmininginfo(const UniValue& params, bool fHelp);
 extern UniValue prioritisetransaction(const UniValue& params, bool fHelp);
+extern UniValue purgetxmempool(const UniValue& params, bool fHelp);
 extern UniValue getblocktemplate(const UniValue& params, bool fHelp);
 extern UniValue getwork(const UniValue& params, bool fHelp);
 
