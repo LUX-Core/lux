@@ -1190,7 +1190,7 @@ void CWallet::MarkConflicted(const uint256& hashBlock, const uint256& hashTx)
 
 void CWallet::SyncTransaction(const CTransaction& tx, const CBlock* pblock)
 {
-    LOCK2(cs_main, cs_wallet);
+    //LOCK2(cs_main, cs_wallet);
     if (!AddToWalletIfInvolvingMe(tx, pblock, true))
         return; // Not one of ours
 
@@ -1689,7 +1689,7 @@ int CWallet::ScanForWalletTransactions(CBlockIndex* pindexStart, bool fUpdate)
             CBlock block;
             ReadBlockFromDisk(block, pindex, Params().GetConsensus());
             {
-                LOCK(cs_wallet);
+                //LOCK(cs_wallet);
                 for (CTransaction& tx : block.vtx) {
                     if (AddToWalletIfInvolvingMe(tx, &block, fUpdate))
                         ret++;
