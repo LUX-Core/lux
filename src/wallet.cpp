@@ -1675,7 +1675,7 @@ int CWallet::ScanForWalletTransactions(CBlockIndex* pindexStart, bool fUpdate)
             CBlock block;
             ReadBlockFromDisk(block, pindex, Params().GetConsensus());
             {
-                LOCK(cs_wallet);
+                //LOCK(cs_wallet);
                 for (CTransaction& tx : block.vtx) {
                     if (AddToWalletIfInvolvingMe(tx, &block, fUpdate))
                         ret++;
