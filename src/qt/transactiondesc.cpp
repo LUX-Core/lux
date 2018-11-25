@@ -173,14 +173,25 @@ QString TransactionDesc::toHTML(CWallet* wallet, CWalletTx& wtx, TransactionReco
                 if (!wtx.mapValue.count("to") || wtx.mapValue["to"].empty()) {
                     CTxDestination address;
                     if (ExtractDestination(txout.scriptPubKey, address)) {
-                        strHTML += "<b>" + tr("To") + ":</b> ";
-                        if (wallet->mapAddressBook.count(address) && !wallet->mapAddressBook[address].name.empty())
-                            strHTML += GUIUtil::HtmlEscape(wallet->mapAddressBook[address].name) + " ";
-                        strHTML += GUIUtil::HtmlEscape(EncodeDestination(address));
-                        if (toSelf == ISMINE_SPENDABLE)
-                            strHTML += " (" + tr("own address") + ")";
-                        else if (toSelf == ISMINE_WATCH_ONLY)
-                            strHTML += " (" + tr("watch-only") + ")";
+                        if (txout.scriptPubKey.HasOpCall()) {
+                            // Sent to SC
+                            CKeyID *keyid = boost::get<CKeyID>(&address);
+                            if (keyid) {
+                                std::string contract = HexStr(valtype(keyid->begin(),keyid->end()));
+                                strHTML += "<b>" + tr("To") + " " + tr("SC Address (Hash160)") + ":</b> ";
+                                strHTML += QString::fromStdString(contract);
+                            }
+                        } else {
+                            // Sent to Address
+                            strHTML += "<b>" + tr("To") + ":</b> ";
+                            if (wallet->mapAddressBook.count(address) && !wallet->mapAddressBook[address].name.empty())
+                                strHTML += GUIUtil::HtmlEscape(wallet->mapAddressBook[address].name) + " ";
+                            strHTML += GUIUtil::HtmlEscape(EncodeDestination(address));
+                            if (toSelf == ISMINE_SPENDABLE)
+                                strHTML += " (" + tr("own address") + ")";
+                            else if (toSelf == ISMINE_WATCH_ONLY)
+                                strHTML += " (" + tr("watch-only") + ")";
+                        }
                         strHTML += "<br/>";
                     } else if (txout.scriptPubKey.HasOpCreate()) {
                         uint160 contract = uint160(LuxState::createLuxAddress(uintToh256(wtx.GetHash()), nOut).asBytes());

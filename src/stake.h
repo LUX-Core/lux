@@ -110,6 +110,8 @@ public:
     //Stake::CheckHash - check whether stake kernel meets hash target
     //      Sets hashProofOfStake on success return
     bool CheckHash(const CBlockIndex* pindexPrev, unsigned int nBits, const CBlock &blockFrom, const CTransaction &txPrev, const COutPoint &prevout, unsigned int& nTimeTx, uint256& hashProofOfStake);
+    bool CheckHashOld(const CBlockIndex* pindexPrev, unsigned int nBits, const CBlock &blockFrom, const CTransaction &txPrev, const COutPoint &prevout, unsigned int& nTimeTx, uint256& hashProofOfStake);
+    bool CheckHashNew(const CBlockIndex* pindexPrev, unsigned int nBits, const CBlock &blockFrom, const CTransaction &txPrev, const COutPoint &prevout, unsigned int& nTimeTx, uint256& hashProofOfStake);
 
     //Stake::CheckProof - check kernel hash target and coinstake signature
     //      Sets hashProofOfStake on success return

@@ -2103,7 +2103,8 @@ bool CheckInputs(const CTransaction& tx, CValidationState& state, const CCoinsVi
             // If prev is coinbase, check that it's matured
             if (coins->IsCoinGenerated()) {
                 if (nSpendHeight - coins->nHeight < Params().COINBASE_MATURITY())
-                    return state.Invalid(false, REJECT_INVALID, "bad-txns-premature-spend-of-coinbase", strprintf("tried to spend coinbase at depth %d", nSpendHeight - coins->nHeight, coins->IsCoinStake()));
+                    return state.Invalid(false, REJECT_INVALID, "bad-txns-premature-spend-of-coinbase",
+                                strprintf("tried to spend coinbase at depth %d", nSpendHeight - coins->nHeight));
             }
 
             // Check for negative or overflow input values
@@ -2302,7 +2303,7 @@ static DisconnectResult DisconnectBlock(CBlock& block, CValidationState& state, 
         if (i > 0) { // not coinbases
             const CTxUndo& txundo = blockUndo.vtxundo[i - 1];
             if (txundo.vprevout.size() != tx.vin.size()) {
-                LogPrintf("DisconnectBlock() : transaction and undo data inconsistent - txundo.vprevout.siz=%d tx.vin.siz=%d", txundo.vprevout.size(), tx.vin.size());
+                LogPrintf("DisconnectBlock() : transaction and undo data inconsistent - txundo.vprevout.siz=%zu tx.vin.siz=%zu", txundo.vprevout.size(), tx.vin.size());
                 return DISCONNECT_FAILED;
             }
             for (size_t j = tx.vin.size(); j-- > 0;) {
@@ -2543,7 +2544,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
         hashPrevBlock = pindex->pprev->GetBlockHash();
     }
     if (hashPrevBlock != view.GetBestBlock()) {
-        LogPrintf("%s: block=%s,%d prev=%s best=%s\n", __func__, pindex->GetBlockHash().GetHex(), pindex->nHeight, view.GetBestBlock().GetHex(), hashPrevBlock.GetHex());
+        LogPrintf("%s: block=%s,%d prev=%s best=%s\n", __func__, pindex->GetBlockHash().GetHex(), pindex->nHeight, hashPrevBlock.GetHex(), view.GetBestBlock().GetHex());
         return error("%s: previous block not best", __func__);
     }
 
@@ -3005,14 +3006,14 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
             if (checkBlock.hashMerkleRoot != block.hashMerkleRoot) {
                 //there is a mismatched tx, so go through and determine which txs
                 if (block.vtx.size() > checkBlock.vtx.size()) {
-                    LogPrintf("Unexpected AAL transactions in block. Actual txs: %i, expected txs: %i\n",
+                    LogPrintf("Unexpected AAL transactions in block. Actual txs: %zu, expected txs: %zu\n",
                               block.vtx.size(), checkBlock.vtx.size());
                     for (size_t i = 0; i < block.vtx.size(); i++) {
                         if (i > checkBlock.vtx.size()) {
                             LogPrintf("Unexpected transaction: %s\n", block.vtx[i].ToString());
                         } else {
                             if (block.vtx[i].GetHash() != block.vtx[i].GetHash()) {
-                                LogPrintf("Mismatched transaction at entry %i\n", i);
+                                LogPrintf("Mismatched transaction at entry %zu\n", i);
                                 LogPrintf("Actual: %s\n", block.vtx[i].ToString());
                                 LogPrintf("Expected: %s\n", checkBlock.vtx[i].ToString());
                             }
@@ -3026,7 +3027,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
                             LogPrintf("Missing transaction: %s\n", checkBlock.vtx[i].ToString());
                         } else {
                             if (block.vtx[i].GetHash() != block.vtx[i].GetHash()) {
-                                LogPrintf("Mismatched transaction at entry %i\n", i);
+                                LogPrintf("Mismatched transaction at entry %zu\n", i);
                                 LogPrintf("Actual: %s\n", block.vtx[i].ToString());
                                 LogPrintf("Expected: %s\n", checkBlock.vtx[i].ToString());
                             }
@@ -3036,7 +3037,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
                     //count is correct, but a tx is wrong
                     for (size_t i = 0; i < checkBlock.vtx.size(); i++) {
                         if (block.vtx[i].GetHash() != block.vtx[i].GetHash()) {
-                            LogPrintf("Mismatched transaction at entry %i\n", i);
+                            LogPrintf("Mismatched transaction at entry %zu\n", i);
                             LogPrintf("Actual: %s\n", block.vtx[i].ToString());
                             LogPrintf("Expected: %s\n", checkBlock.vtx[i].ToString());
                         }
@@ -4017,7 +4018,7 @@ bool FindBlockPos(CValidationState& state, CDiskBlockPos& pos, unsigned int nAdd
 
     if (!fKnown) {
         while (vinfoBlockFile[nFile].nSize + nAddSize >= MAX_BLOCKFILE_SIZE) {
-            LogPrintf("Leaving block file %i: %s\n", nFile, vinfoBlockFile[nFile].ToString());
+            LogPrintf("Leaving block file %u: %s\n", nFile, vinfoBlockFile[nFile].ToString());
             FlushBlockFile(true);
             nFile++;
             if (vinfoBlockFile.size() <= nFile) {
@@ -4166,7 +4167,7 @@ bool CheckForMasternodePayment(const CTransaction& tx, const CBlockHeader& heade
         }
     }
 
-    if (fDebugMnSecurity) LogPrintf("%s: totalReward = %ld \n",__func__, totalReward);
+    if (fDebugMnSecurity) LogPrintf("%s: totalReward = %lld\n", __func__, (long long) totalReward);
 
     // New block
     bool hasMasternodePayment = false;
@@ -4184,7 +4185,7 @@ bool CheckForMasternodePayment(const CTransaction& tx, const CBlockHeader& heade
             if (it != vmnScripts.end()) {
                 hasMasternodePayment = true;
                 masternodePayment = txout.nValue;
-                if (fDebugMnSecurity) LogPrintf("%s: masternodePayment = %ld \n",__func__, masternodePayment);
+                if (fDebugMnSecurity) LogPrintf("%s: masternodePayment = %lld\n", __func__, (long long) masternodePayment);
                 break;
             }
         }
@@ -4211,7 +4212,7 @@ bool CheckForMasternodePayment(const CTransaction& tx, const CBlockHeader& heade
         for (const CTxOut& txout : tx.vout) {
             roundMnPayment = (CAmount) (txout.nValue / nPrecision);
             if (roundMnAward == roundMnPayment)  return true;
-            if (fDebugMnSecurity) LogPrintf("%s: roundMnAward = %ld roundMnPayment = %ld \n",__func__, roundMnAward, roundMnPayment);
+            if (fDebugMnSecurity) LogPrintf("%s: roundMnAward = %lld roundMnPayment = %lld\n", __func__, (long long) roundMnAward, (long long) roundMnPayment);
         }
     }
 
@@ -4219,7 +4220,7 @@ bool CheckForMasternodePayment(const CTransaction& tx, const CBlockHeader& heade
 
     if (fDebugMnSecurity) {
         LogPrintf("%s: hasMasternodePayment (%s) \n",__func__, hasMasternodePayment ? "NOT NULL": "NULL");
-        LogPrintf("%s: roundMnAward (%ld) masternodePayment (%ld)\n",__func__, roundMnAward, masternodePayment);
+        LogPrintf("%s: roundMnAward (%lld) masternodePayment (%lld)\n", __func__, (long long) roundMnAward, (long long) masternodePayment);
     }
 
     // no masternode payment is found or payment amount is null
@@ -4343,7 +4344,7 @@ bool CheckBlock(const CBlock& block, CValidationState& state, const Consensus::P
 
         if (fCheckPOW && !CheckForMasternodePayment(tx, block)) {
             LogPrint("debug", "%s: invalid masternode payment in %s", __func__, tx.ToString());
-            return error("%s: CheckForMasternodePayment failed (nTx=%d)", __func__, nTx);
+            return error("%s: CheckForMasternodePayment failed (nTx=%u)", __func__, nTx);
         }
         ++nTx;
     }
@@ -4734,6 +4735,7 @@ bool ProcessNewBlock(CValidationState& state, const CChainParams& chainparams, C
 {
     int nHeight = chainActive.Height() + 1;
     bool usePhi2 = false;
+    bool alreadyAccepted = false;
 
     // Reject the block from older version
     if (pfrom && pfrom->strSubVer.compare(SCVersion) < 0)
@@ -4761,6 +4763,7 @@ bool ProcessNewBlock(CValidationState& state, const CChainParams& chainparams, C
         } else {
             nHeight = pindexPrev->nHeight + 1;
             usePhi2 = nHeight >= Params().SwitchPhi2Block();
+            alreadyAccepted = (LookupBlockIndex(pblock->GetHash(usePhi2)) != nullptr);
         }
     }
 
@@ -4815,7 +4818,7 @@ bool ProcessNewBlock(CValidationState& state, const CChainParams& chainparams, C
     const char * const s = pindex->IsProofOfStake() ? "pos" : "pow";
     if (fDebug) {
         LogPrintf("%s: ACCEPTED %d %s (%s)\n%s\n", __func__, pindex->nHeight, hash.GetHex(), s, pblock->ToString());
-    } else if (!hideLogMessage) {
+    } else if (!hideLogMessage && !alreadyAccepted) {
         LogPrintf("%s: ACCEPTED %d %s (%s)\n", __func__, pindex->nHeight, hash.GetHex(), s);
     }
 
@@ -6092,7 +6095,6 @@ int GetMajorVersionFromVersion(const string& cleanVersion) {
 
 static bool ProcessMessage(CNode* pfrom, const string &strCommand, CDataStream& vRecv, int64_t nTimeReceived, const CChainParams& chainparams)
 {
-    RandAddSeedPerfmon();
     if (fDebug) {
         LogPrintf("received: %s (%u bytes) peer=%d\n", SanitizeString(strCommand), vRecv.size(), pfrom->id);
     }
@@ -6785,12 +6787,9 @@ static bool ProcessMessage(CNode* pfrom, const string &strCommand, CDataStream& 
         }
 
         if (!(sProblem.empty())) {
-            LogPrint("net", "pong peer=%d %s: %s, %x expected, %x received, %u bytes\n",
-                pfrom->id,
-                sProblem,
-                pfrom->nPingNonceSent,
-                nonce,
-                nAvail);
+            LogPrint("net", "pong peer=%d %s: %s, %x expected, %x received, %zu bytes\n",
+                pfrom->id, (fLogIPs ? pfrom->addr.ToString().c_str() : ""), sProblem,
+                pfrom->nPingNonceSent, nonce, nAvail);
         }
         if (bPingFinished) {
             pfrom->nPingNonceSent = 0;

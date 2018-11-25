@@ -978,18 +978,18 @@ UniValue getaccountinfo(const UniValue& params, bool fHelp)
         throw std::runtime_error(
                 "getaccountinfo \"address\"\n"
                 "\nArgument:\n"
-                "1. \"address\"          (string, required) The account address\n"
+                "1. \"address\" (string, required) The contract/account hash160\n"
         );
 
     LOCK(cs_main);
 
     std::string strAddr = params[0].get_str();
     if(strAddr.size() != 40 || !regex_match(strAddr, hexData))
-        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Incorrect address");
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid contract address");
 
     dev::Address addrAccount(strAddr);
     if(!globalState->addressInUse(addrAccount))
-        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Address does not exist");
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Contract does not exist");
 
     UniValue result(UniValue::VOBJ);
 

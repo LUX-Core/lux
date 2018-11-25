@@ -16,6 +16,29 @@
 #include <QMessageBox>
 #include <set>
 
+// tr() requires to be in QObject or QWidget methods
+// This function allow the lupdate parser to detect our std::string without QString requirement.
+#define _(x) BlockExplorer::tr(x).toStdString()
+
+void BlockExplorer::Translations()
+{
+    QString toTranslate[] = {
+        tr("unknown"), tr("Height"), tr("Size"), tr("Timestamp"),
+        tr("Number of Transactions"), tr("Difficulty"),
+        tr("Value Out"), tr("Fees"), tr("Type"), tr("Generated"),
+        tr("Bits"), tr("Nonce"), tr("Version"), tr("Hash"),
+        tr("Merkle Root"), tr("State Root"), tr("UTXO Root"),
+        tr("Block"), tr("Transaction"), tr("Call SC"), tr("Create SC"),
+        tr("Input"), tr("Output"), tr("Inputs"), tr("Outputs"),
+        tr("Tx Hash"), tr("Amount"), tr("From"), tr("To"), tr("Redeemed in"),
+        tr("Balance"), tr("Delta"), tr("In Block"), tr("Taken from"),
+        tr("outputs (see tx)"), tr("unhandled or invalid address"),
+        tr("movements displayed."), tr("Transactions to/from"),
+        tr("-addressindex parameter is required to show address history")
+    };
+    Q_UNUSED(toTranslate)
+}
+
 extern double GetDifficulty(const CBlockIndex* blockindex = NULL);
 
 inline std::string utostr(unsigned int n)
@@ -180,12 +203,12 @@ static std::string TxToRow(const CTransaction& tx, CBlock * const ptrBlock= null
         bool bSC_Amount = false;
         if(bHasOpCall && strAddress == "")
         {
-            strAddress = "Call SC";
+            strAddress = _("Call SC");
             bSC_Amount = true;
         }
         if(bHasOpCreate && strAddress == "")
         {
-            strAddress = "Create SC";
+            strAddress = _("Create SC");
             bSC_Amount = true;
         }
         if(bSC_Amount)
@@ -231,7 +254,7 @@ static std::string TxToRow(const CTransaction& tx, CBlock * const ptrBlock= null
     if(!bCalcOutAddr)
     {
         if (OutAddresses == "") {
-            OutAddresses = itostr(tx.vout.size()) + " outputs (see tx)";
+            OutAddresses = itostr(tx.vout.size()) + " " + _("outputs (see tx)");
         }
     }
 
@@ -296,7 +319,7 @@ std::string getexplorerBlockHash(int64_t Height)
     return pblockindex->GetBlockHash().GetHex();
 }
 
-std::string BlockToString(CBlockIndex* pBlock)
+static std::string BlockToString(CBlockIndex* pBlock)
 {
     if (!pBlock)
         return "";
@@ -398,7 +421,7 @@ std::string BlockToString(CBlockIndex* pBlock)
     return Content;
 }
 
-std::string TxToString(uint256 BlockHash, const CTransaction& tx)
+static std::string TxToString(uint256 BlockHash, const CTransaction& tx)
 {
     CAmount Input = 0;
     CAmount Output = tx.GetValueOut();
@@ -495,7 +518,7 @@ std::string TxToString(uint256 BlockHash, const CTransaction& tx)
     return Content;
 }
 
-std::string AddressToString(const CTxDestination& Address)
+static std::string AddressToString(const CTxDestination& Address)
 {
     std::string TxLabels[] = {
             _("Date"),
@@ -628,7 +651,7 @@ void BlockExplorer::showEvent(QShowEvent* ev)
         home();
         if (!GetBoolArg("-txindex", false)) {
             QString Warning = tr("Not all transactions will be shown. To view all transactions you need to set txindex=1 in the configuration file (lux.conf).");
-            QMessageBox::warning(this, "Luxcore Blockchain Explorer", Warning, QMessageBox::Ok);
+            QMessageBox::warning(this, tr("Luxcore Blockchain Explorer"), Warning, QMessageBox::Ok);
         }
     }
     QMainWindow::showEvent(ev);

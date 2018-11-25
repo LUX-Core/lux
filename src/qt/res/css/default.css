@@ -1202,17 +1202,11 @@ QWidget .QFrame#frame_2 { /* Transactions Widget */
     margin-right:20px;
     margin-left:0;
     margin-top:0;
-    background-image: url(':/images/lux_logo_horizontal');
-    background-repeat:none;
 }
 
 QWidget .QFrame#frame_2 .QLabel#label_4 { /* Recent Transactions Label */
-    min-width:180px;
+    /*min-width:180px;*/
     color:#061532;
-    margin-left:67px;
-    margin-top:83px;
-    margin-right:5px;
-    padding-right:5px;
     font-weight:bold;
     font-size:15px;
     min-height:24px;
@@ -1221,10 +1215,15 @@ QWidget .QFrame#frame_2 .QLabel#label_4 { /* Recent Transactions Label */
 QWidget .QFrame#frame_2 .QLabel#labelTransactionsStatus { /* Recent Transactions Sync Status */
     qproperty-alignment: 'AlignBottom | AlignRight';
     min-width:93px;
-    margin-top:83px;
-    margin-left:16px;
-    margin-right:5px;
     min-height:16px;
+}
+
+QWidget#OverviewPage .QLabel#labelTokens { /* Recent Tokens Label */
+    min-width:180px;
+    color:#061532;
+    font-weight:bold;
+    font-size:15px;
+    min-height:24px;
 }
 
 QWidget .QFrame#frame_2 QListView { /* Transaction List */
