@@ -486,12 +486,14 @@ void StopHTTPServer()
     InterruptHTTPServer();
     LogPrint("http", "Stopping HTTP server\n");
     if (workQueue) {
+        workQueue->Interrupt();
         LogPrint("http", "Waiting for HTTP worker threads to exit\n");
         for (auto& thread: g_thread_http_workers) {
             thread.join();
         }
         g_thread_http_workers.clear();
         delete workQueue;
+        workQueue = 0;
     }
     if (eventBase) {
         LogPrint("http", "Waiting for HTTP event thread to exit\n");

@@ -97,7 +97,6 @@ static const int64_t DARKSEND_POOL_MAX = (1999999.99*COIN);
 
 static const int64_t MaxPosClockDrift = 3 * 60;
 static const int64_t MaxPowClockDrift = 2 * 60 * 60;
-static const int POS_REWARD_CHANGED_BLOCK_V2 = 520000;
 
 /** The maximum size for mined blocks */
 static const unsigned int MAX_BLOCK_SIZE_GEN = MAX_BLOCK_BASE_SIZE/2;
