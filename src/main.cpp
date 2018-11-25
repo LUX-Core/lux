@@ -4250,13 +4250,16 @@ bool CheckBlock(const CBlock& block, CValidationState& state, const Consensus::P
     LogPrint("debug", "%s: block=%s (%s %d %d)\n", __func__, block.GetHash().GetHex(), s,
              block.GetBlockTime(), nBlockTimeLimit);
 
-    // Check block time, reject far future blocks.
-    if (block.GetBlockTime() > nBlockTimeLimit)
-        return state.Invalid(false, REJECT_INVALID, "time-too-new", "block timestamp too far in the future");
-
-    // Check proof-of-stake block signature
-    if (fCheckSig && !block.CheckBlockSignature()) {
-        return state.DoS(100, false, REJECT_INVALID, "bad-PoS-block-signature", false, "bad PoS block signature");
+    CBlockIndex* pindexPrev = LookupBlockIndex(block.hashPrevBlock);
+    int nBlockHeight = pindexPrev ? pindexPrev->nHeight + 1 : chainActive.Height() + 1;
+    if (nBlockHeight >= nLuxProtocolSwitchHeight) {
+        // Check block time, reject far future blocks.
+        if (stake->CheckTimestamp(block.GetBlockTime(), (int64_t)block.vtx[1].nTime) > nBlockTimeLimit)
+            return state.DoS(100, error("CheckBlock() : coinbase timestamp violation nTimeBlock=% nTimeTx=%u", block.GetBlockTime(), (int64_t)block.vtx[1].nTime));
+        // Check proof-of-stake block signature
+        if (fCheckSig && !block.CheckBlockSignature()) {
+            return state.DoS(100, false, REJECT_INVALID, "bad-PoS-block-signature", false, "bad PoS block signature");
+        }
     }
 
     // Check the merkle root.

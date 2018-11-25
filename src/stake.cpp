@@ -50,10 +50,6 @@ static const bool ENABLE_ADVANCED_STAKING = true;
 
 static const int ADVANCED_STAKING_HEIGHT = 225000;
 
-static const int nLuxProtocolSwitchHeight = 520000;
-
-static const int nLuxProtocolSwitchHeightTestnet = 95000; // nHeight = 89032 (1:54 am Tuesday, 20 November 2018)
-
 static std::atomic<bool> nStakingInterrupped;
 
 Stake* const stake = Stake::Pointer();
@@ -162,9 +158,9 @@ static bool FindModifierBlockFromCandidates(vector <pair<int64_t, uint256>>& vSo
         if (mSelectedBlocks.count(pindex->GetBlockHash()) > 0) continue;
 
         // compute the selection hash by hashing an input that is unique to that block
+        uint256 hashPoS = pindex->IsProofOfStake() ? pindex->hashProofOfStake : pindex->GetBlockHash();
         CDataStream ss(SER_GETHASH, 0);
-        ss << uint256(pindex->IsProofOfStake() ? pindex->hashProofOfStake : pindex->GetBlockHash())
-           << nStakeModifierPrev;
+        ss << hashPoS << nStakeModifierPrev;
 
         uint256 hashSelection(Hash(ss.begin(), ss.end()));
 
@@ -470,9 +466,9 @@ bool Stake::CheckHashOld(const CBlockIndex* pindexPrev, unsigned int nBits, cons
            << bnWeight << nStakeModifierTime;
     }
     hashProofOfStake = Hash(ss.begin(), ss.end());
-
-    if (fDebug) {
 #       if 0
+    if (fDebug) {
+
         LogPrintf("%s: using modifier 0x%016x at height=%d timestamp=%s for block from timestamp=%s\n", __func__,
                   nStakeModifier, nStakeModifierHeight,
                   DateTimeStrFormat("%Y-%m-%d %H:%M:%S", nStakeModifierTime).c_str(),
@@ -481,18 +477,15 @@ bool Stake::CheckHashOld(const CBlockIndex* pindexPrev, unsigned int nBits, cons
                   nStakeModifier,
                   blockFrom.GetBlockTime(), txPrev.nTime, prevout.n, nTimeTx,
                   hashProofOfStake.ToString());
-#       endif
+
         DEBUG_DUMP_STAKING_INFO_CheckHash();
     }
-
+#       endif
     if (Params().NetworkID() == CBaseChainParams::MAIN && hashProofOfStake > bnTarget && nStakeModifierHeight < 174453 && nStakeModifierHeight <= LAST_MULTIPLIED_BLOCK) {
         DEBUG_DUMP_MULTIFIER();
         if (!MultiplyStakeTarget(bnTarget, nStakeModifierHeight, nStakeModifierTime, nValueIn)) {
-#           if 1
             return false;
-#           else
-            return error("%s: cant adjust stake target %s, %d, %d", __func__, bnTarget.GetHex(), nStakeModifierHeight, nStakeModifierTime);
-#           endif
+
         }
     }
 
@@ -555,7 +548,7 @@ bool Stake::CheckHashNew(const CBlockIndex* pindexPrev, unsigned int nBits, cons
     ss << nTimeBlockFrom << txPrev.nTime << prevout.hash << prevout.n << nTimeTx;
 
     hashProofOfStake = Hash(ss.begin(), ss.end());
-
+#if 0
     if (fDebug) {
         LogPrintf("%s: using modifier 0x%016x at height=%d timestamp=%s for block from timestamp=%s\n", __func__,
                   nStakeModifier, nStakeModifierHeight,
@@ -567,7 +560,7 @@ bool Stake::CheckHashNew(const CBlockIndex* pindexPrev, unsigned int nBits, cons
                   hashProofOfStake.ToString());
         DEBUG_DUMP_STAKING_INFO_CheckHash();
     }
-
+#endif
     if (Params().NetworkID() == CBaseChainParams::MAIN && hashProofOfStake > bnTarget && nStakeModifierHeight < 174453 && nStakeModifierHeight <= LAST_MULTIPLIED_BLOCK) {
         DEBUG_DUMP_MULTIFIER();
         if (!MultiplyStakeTarget(bnTarget, nStakeModifierHeight, nStakeModifierTime, nValueIn)) {
@@ -583,11 +576,13 @@ bool Stake::CheckHashNew(const CBlockIndex* pindexPrev, unsigned int nBits, cons
 bool Stake::CheckHash(const CBlockIndex* pindexPrev, unsigned int nBits, const CBlock& blockFrom, const CTransaction& txPrev, const COutPoint& prevout, unsigned int& nTimeTx, uint256& hashProofOfStake) {
 
     int nBlockHeight = pindexPrev ? pindexPrev->nHeight + 1 : chainActive.Height() + 1;
-    if (IsTestNet()) {
-        return (nBlockHeight < nLuxProtocolSwitchHeightTestnet) ? CheckHashOld(pindexPrev, nBits, blockFrom, txPrev, prevout, nTimeTx, hashProofOfStake) : CheckHashNew(pindexPrev, nBits, blockFrom, txPrev, prevout, nTimeTx, hashProofOfStake);
-    }
-
     return (nBlockHeight < nLuxProtocolSwitchHeight) ? CheckHashOld(pindexPrev, nBits, blockFrom, txPrev, prevout, nTimeTx, hashProofOfStake) : CheckHashNew(pindexPrev, nBits, blockFrom, txPrev, prevout, nTimeTx, hashProofOfStake);
+}
+
+// Check whether the coinstake timestamp meets protocol
+bool Stake::CheckTimestamp(int64_t nTimeBlock, int64_t nTimeTx)
+{
+    return ((nTimeTx <= nTimeBlock) && (nTimeBlock <= nTimeTx + MaxPosClockDrift));
 }
 
 bool Stake::isForbidden(const CScript& scriptPubKey)
