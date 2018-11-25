@@ -30,6 +30,8 @@
 #include <boost/thread/exceptions.hpp>
 #include <regex>
 
+#define END_IGNORE_EXCEPTION "END_IGNORE_EXCEPTION"
+
 extern std::regex hexData;
 
 // Debugging macros
@@ -263,6 +265,25 @@ inline uint32_t ByteReverse(uint32_t value)
     return (value<<16) | (value>>16);
 }
 
+static bool IsExceptionIgnored (const char* name)
+{
+    const char* IgnoredThread [] = {
+        "net",
+        "Runaway exception",
+        "msghand",
+        END_IGNORE_EXCEPTION
+    };
+
+    int i = 0;
+    while (strcmp(IgnoredThread[i], END_IGNORE_EXCEPTION))
+    {
+        if (!strcmp(IgnoredThread[i], name))
+            return true;
+        i++;
+    }
+    return false;
+}
+
 /**
  * .. and a wrapper that just calls func once
  */
@@ -277,16 +298,16 @@ void TraceThread(const char* name, Callable func)
         LogPrintf("%s thread exit\n", name);
     } catch (boost::thread_interrupted) {
         LogPrintf("%s thread interrupt\n", name);
-        // rethrow exception if current thread is not the "net" thread
-        if (strcmp(name, "net")) throw;
+        // rethrow exception if current thread is not in the ignore list
+        if (!IsExceptionIgnored(name)) throw;
     } catch (std::exception& e) {
         PrintExceptionContinue(&e, name);
-        // rethrow exception if current thread is not the "net" thread
-        if (strcmp(name, "net")) throw;
+        // rethrow exception if current thread is not in the ignore list
+        if (!IsExceptionIgnored(name)) throw;
     } catch (...) {
         PrintExceptionContinue(NULL, name);
-        // rethrow exception if current thread is not the "net" thread
-        if (strcmp(name, "net")) throw;
+        // rethrow exception if current thread is not in the ignore list
+        if (!IsExceptionIgnored(name)) throw;
     }
 }
 
