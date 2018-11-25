@@ -580,7 +580,7 @@ UniValue createrawtransaction(const UniValue& params, bool fHelp)
 
         if (name_ == "data") {
             vector<unsigned char> data = ParseHexV(sendTo[name_].getValStr(),"Data");
-
+            //TODO: this OP_RETURN would avoid network stalled when create contract block
             CTxOut out(0, CScript() << OP_RETURN << data);
             rawTx.vout.push_back(out);
         } else if (name_ == "contract") {
