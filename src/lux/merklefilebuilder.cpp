@@ -1,7 +1,7 @@
 #include <openssl/sha.h>
 #include <cmath>
 
-#include "MerkleBlock.h"
+#include "merklefilebuilder.h"
 
 /** Compute the 256-bit hash of a void pointer */
 inline void Hash(void* in, unsigned int len, unsigned char* out)
@@ -41,14 +41,34 @@ void ConstructMerkleTree(std::ifstream &firstLayer, size_t size, std::ofstream &
     }
 }
 
+size_t GetMerkleSize(size_t blocksSize)
+{
+    size_t size = 0;
+    size_t layerSize = blocksSize;
+    for (; layerSize > 1; layerSize = (layerSize >> 1) + (layerSize & 1)) {
+        size += layerSize;
+    }
+    return size + layerSize;
+}
 
-uint256 ConstructMerklePath(std::vector<uint256> path, size_t blocksSize, size_t branchSize, size_t pos,
-                            bool readOnly, size_t &hashIdx, int depth)
+size_t GetLayerSize(size_t blocksSize, size_t depth)
+{
+    size_t layerSize = blocksSize;
+    const size_t maxDepth = ceil(log2(blocksSize)) + 1;
+    const size_t height = maxDepth - depth;
+    for (size_t i = 0; layerSize > 1 && i <= height; ++i) {
+        layerSize = (layerSize >> 1) + (layerSize & 1);
+    }
+    return layerSize;
+}
+
+uint256 ConstructMerklePath(std::ifstream &firstLayer, std::vector<uint256> path, size_t blocksSize, size_t branchSize, size_t pos,
+                            bool readOnly, size_t &hashIdx, unsigned int depth)
 {
     if (hashIdx >= path.size()) {
         return {};
     }
-    size_t maxDepth = blocksSize / 2 + blocksSize % 2;
+    const size_t maxDepth = ceil(log2(blocksSize)) + 1;
     if (readOnly || depth == maxDepth) {
         return path[hashIdx++]; // ?
     }

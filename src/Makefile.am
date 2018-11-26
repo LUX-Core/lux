@@ -17,8 +17,6 @@ BITCOIN_INCLUDES += -I$(srcdir)/secp256k1/include
 
 BITCOIN_INCLUDES += -I$(srcdir)/cpp-ethereum
 
-BITCOIN_INCLUDES += -I$(srcdir)/lux-lib-crypto
-
 LIBBITCOIN_SERVER=libbitcoin_server.a
 LIBBITCOIN_COMMON=libbitcoin_common.a
 LIBBITCOIN_CONSENSUS=libbitcoin_consensus.a
@@ -229,6 +227,12 @@ libbitcoin_server_a_SOURCES = \
   lux/luxtransaction.cpp \
   lux/luxDGP.cpp \
   lux/storageresults.cpp \
+  lux/replicabuilder.h \
+  lux/replicabuilder.cpp \
+  lux/storageheap.h \
+  lux/storageheap.cpp \
+  lux/merklefilebuilder.h \
+  lux/merklefilebuilder.cpp \
   $(BITCOIN_CORE_H)
 
 if ENABLE_ZMQ
@@ -583,12 +587,6 @@ libbitcoin_common_a_SOURCES = \
   cpp-ethereum/utils/json_spirit/json_spirit_value.h \
   cpp-ethereum/utils/json_spirit/json_spirit_writer.h \
   cpp-ethereum/utils/json_spirit/json_spirit_writer_template.h \
-  lux-lib-crypto/CryptoSplitter.h \
-  lux-lib-crypto/CryptoSplitter.cpp \
-  lux-lib-crypto/StorageHeap.h \
-  lux-lib-crypto/StorageHeap.cpp \
-  lux-lib-crypto/MerkleBlock.h \
-  lux-lib-crypto/MerkleBlock.cpp \
   $(BITCOIN_CORE_H)
 
 if TARGET_WINDOWS
