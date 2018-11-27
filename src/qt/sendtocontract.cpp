@@ -70,7 +70,7 @@ SendToContract::SendToContract(QWidget *parent) :
     ui->labelSenderAddress->setToolTip(tr("The quantum address that will be used as sender."));
 
     m_tabInfo = new TabBarInfo(ui->stackedWidget);
-    m_tabInfo->addTab(0, tr("Send To Contract"));
+    m_tabInfo->addTab(0, tr("Write Contract"));
 
     // Set defaults
     ui->lineEditGasPrice->setValue(DEFAULT_GAS_PRICE);
@@ -238,7 +238,7 @@ void SendToContract::on_sendToContractClicked()
                 widgetResult->setResultData(result, FunctionABI(), m_ABIFunctionField->getParamsValues(), ContractResult::SendToResult);
                 widgetResult->show();
             } else {
-                QMessageBox::warning(this, tr("Send to contract"), errorMessage);
+                QMessageBox::warning(this, tr("Write contract"), errorMessage);
             }
         }
     }
