@@ -62,26 +62,20 @@ size_t GetLayerSize(size_t blocksSize, size_t depth)
     return layerSize;
 }
 
-void ConstructMerklePath(std::ifstream *replica, std::ifstream *merkleTree, size_t height,
+void ConstructMerklePath(std::ifstream *merkleTree, size_t height,
                          std::list<uint256> &path, MPBContext &context)
 {
     size_t currentPos;
-    size_t currentOffset;
-    std::ifstream *stream;
     if (height > 1) {
-        ConstructMerklePath(replica, merkleTree, height - 1, path, context);
+        ConstructMerklePath(merkleTree, height - 1, path, context);
         currentPos = (context.position % 2) ? (context.position - 1) : (context.position + 1);
-        currentOffset = context.offsetLayer + currentPos * SHA256_DIGEST_LENGTH;
-        stream = merkleTree;
     } else {
         currentPos = context.position;
-        currentOffset = currentPos * context.fileBlockSize;
-        stream = replica;
     }
     if (currentPos < context.layerSize) {
         unsigned char hash[SHA256_DIGEST_LENGTH];
-        stream->seekg(currentOffset, stream->beg);
-        stream->read((char *) hash, SHA256_DIGEST_LENGTH);
+        merkleTree->seekg(context.offsetLayer + currentPos * SHA256_DIGEST_LENGTH, merkleTree->beg);
+        merkleTree->read((char *) hash, SHA256_DIGEST_LENGTH);
         std::vector<unsigned char> vch(hash, hash + sizeof(hash) / sizeof(*hash));
         if (context.position % 2) {
             path.push_front(uint256(vch));
