@@ -22,7 +22,7 @@ void ConstructMerkleTreeLayer(std::ifstream &prevLayer, size_t size, std::ofstre
     }
     unsigned char data[2 * SHA256_DIGEST_LENGTH];
     unsigned char hash[SHA256_DIGEST_LENGTH];
-    for (uint64_t i = 1; i < size; i+=2) {
+    for (uint64_t i = 1; i < size; i += 2) {
         prevLayer.read((char *)data, 2 * SHA256_DIGEST_LENGTH);
         Hash(data, 2 * SHA256_DIGEST_LENGTH, hash);
         outputLayer.write((char *)hash, SHA256_DIGEST_LENGTH);
@@ -45,7 +45,7 @@ size_t GetMerkleSize(size_t blocksSize)
 {
     size_t size = 0;
     size_t layerSize = blocksSize;
-    for (; layerSize > 1; layerSize = (layerSize >> 1) + (layerSize & 1)) {
+    for (; layerSize > 1; layerSize = (layerSize / 2) + (layerSize % 2)) {
         size += layerSize;
     }
     return size + layerSize;
@@ -57,36 +57,40 @@ size_t GetLayerSize(size_t blocksSize, size_t depth)
     const size_t maxDepth = ceil(log2(blocksSize)) + 1;
     const size_t height = maxDepth - depth;
     for (size_t i = 0; layerSize > 1 && i <= height; ++i) {
-        layerSize = (layerSize >> 1) + (layerSize & 1);
+        layerSize = (layerSize / 2) + (layerSize % 2);
     }
     return layerSize;
 }
 
-uint256 ConstructMerklePath(std::ifstream &firstLayer, std::vector<uint256> path, size_t blocksSize, size_t branchSize, size_t pos,
-                            bool readOnly, size_t &hashIdx, unsigned int depth)
+uint256 GetHashFromMerkleLayer(std::ifstream &merkleTree, uint64_t offsetToLayer, size_t layerSize, size_t pos)
 {
-    if (hashIdx >= path.size()) {
-        return {};
+    size_t startPos = (pos >> 1) << 1;
+    if (startPos == (layerSize - 1)) {
+        unsigned char hash[SHA256_DIGEST_LENGTH];
+        merkleTree.seekg(offsetToLayer + startPos * SHA256_DIGEST_LENGTH, merkleTree.beg);
+        merkleTree.read((char *)hash, SHA256_DIGEST_LENGTH);
+        std::vector<unsigned char> vch(hash, hash + sizeof(hash)/sizeof(*hash));
+        return uint256(vch);
     }
-    const size_t maxDepth = ceil(log2(blocksSize)) + 1;
-    if (readOnly || depth == maxDepth) {
-        return path[hashIdx++]; // ?
+
+    unsigned char data[2 * SHA256_DIGEST_LENGTH];
+    unsigned char hash[SHA256_DIGEST_LENGTH];
+    merkleTree.seekg(offsetToLayer + startPos * SHA256_DIGEST_LENGTH, merkleTree.beg);
+    merkleTree.read((char *)data, 2 * SHA256_DIGEST_LENGTH);
+    Hash(data, 2 * SHA256_DIGEST_LENGTH, hash);
+    std::vector<unsigned char> vch(hash, hash + sizeof(hash)/sizeof(*hash));
+    return uint256(vch);
+}
+
+void ConstructMerklePath(std::ifstream &merkleTree, size_t blocksSize, size_t pos, std::vector<uint256> path)
+{
+    size_t offset = 0;
+    size_t currentPos = pos;
+    size_t layerSize = blocksSize;
+    while (layerSize > 1) {
+        uint256 md = GetHashFromMerkleLayer(merkleTree, offset, layerSize, currentPos);
+        offset += layerSize;
+        currentPos = (currentPos / 2) + (currentPos % 2);
+        layerSize = (layerSize / 2) + (layerSize % 2);
     }
-    uint256 md;
-//    uint256 hashes[2];
-//    const size_t leftBranchSize = maxDepth - depth - 1;
-//    const size_t rightBranchSize = branchSize - leftBranchSize;
-//    const bool leftReadOnly = pos >= leftBranchSize;
-//    const bool rightReadOnly = !leftBranchSize;
-//    hashes[0] = ConstructMerklePath(path, blocksSize, leftBranchSize, pos, leftReadOnly, hashIdx, depth + 1);
-//    hashes[1] = ConstructMerklePath(path, blocksSize, rightBranchSize, pos, rightReadOnly, hashIdx, depth + 1);
-//    if (hashes[0] != uint256{} && hashes[0] != hashes[1]) {
-//        if (hashes[1] == uint256{}) {
-//            hashes[1] = hashes[0];
-//        }
-//        Hash(hashes, sizeof(hashes), md);
-//    } else {
-//        hashIdx = SIZE_MAX;
-//    }
-    return md;
 }
