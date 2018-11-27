@@ -1293,7 +1293,7 @@ Adresse: %4</translation>
         <translation type="unfinished">Formular</translation>
     </message>
     <message>
-        <source>Call Smart Contract</source>
+        <source>Read Smart Contract</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1333,7 +1333,7 @@ Adresse: %4</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Call Contract</source>
+        <source>Read Contract</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1345,7 +1345,7 @@ Adresse: %4</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Call contract</source>
+        <source>Read contract</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5178,7 +5178,7 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation type="unfinished">Formular</translation>
     </message>
     <message>
-        <source>Send to Smart Contract</source>
+        <source>Write Smart Contract</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5230,7 +5230,7 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Send To Contract</source>
+        <source>Write Contract</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5266,7 +5266,7 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Send to contract</source>
+        <source>Write contract</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
