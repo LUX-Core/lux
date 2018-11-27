@@ -2,13 +2,21 @@
 #define LUX_LIB_CRYPTO_MERKLEBLOCK_H
 
 #include <fstream>
-#include <vector>
-#include "../uint256.h"
+#include <list>
+#include "uint256.h"
+
+struct MPBContext { // MerklePathBuilderContext
+    size_t layerSize;
+    size_t offsetLayer;
+    size_t position;
+    size_t fileBlockSize;
+};
 
 void ConstructMerkleTreeLayer(std::ifstream &prevLayer, size_t size, std::ofstream &outputLayer);
 void ConstructMerkleTree(std::ifstream &firstLayer, size_t size, std::ofstream &outputStream);
 size_t GetMerkleSize(size_t blocksSize);
 size_t GetLayerSize(size_t blocksSize, size_t depth);
-void ConstructMerklePath(std::ifstream &merkleTree, size_t blocksSize, size_t pos, std::vector<uint256> path);
+void ConstructMerklePath(std::ifstream &replica, std::ifstream &merkleTree, size_t height,
+                         std::list<uint256> &path, MPBContext &context);
 
 #endif //LUX_LIB_CRYPTO_MERKLEBLOCK_H
