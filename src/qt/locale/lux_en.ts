@@ -1464,7 +1464,7 @@ Address: %4
     <message>
         <location line="+31"/>
         <location filename="../forms/ui_callcontract.h" line="+1"/>
-        <source>Call Smart Contract</source>
+        <source>Read Smart Contract</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1525,7 +1525,7 @@ Address: %4
         <location line="+23"/>
         <location filename="../callcontract.cpp" line="+61"/>
         <location filename="../forms/ui_callcontract.h" line="+1"/>
-        <source>Call Contract</source>
+        <source>Read Contract</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1540,7 +1540,7 @@ Address: %4
     </message>
     <message>
         <location line="+125"/>
-        <source>Call contract</source>
+        <source>Read contract</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6522,7 +6522,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     <message>
         <location line="+31"/>
         <location filename="../forms/ui_sendtocontract.h" line="+1"/>
-        <source>Send to Smart Contract</source>
+        <source>Write Smart Contract</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6601,7 +6601,7 @@ https://www.transifex.com/luxcore/luxcore</source>
         <location line="+23"/>
         <location filename="../forms/ui_sendtocontract.h" line="+1"/>
         <location filename="../sendtocontract.cpp" line="+73"/>
-        <source>Send To Contract</source>
+        <source>Write Contract</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6646,7 +6646,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <location line="+11"/>
-        <source>Send to contract</source>
+        <source>Write contract</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
