@@ -190,8 +190,6 @@ Q_SIGNALS:
     void runawayException(const QString& message);
 
 private:
-    boost::thread_group threadGroup;
-    CScheduler scheduler;
 
     /// Pass fatal exception message to UI thread
     void handleRunawayException(std::exception* e);
@@ -279,7 +277,7 @@ void BitcoinCore::initialize()
 {
     try {
         qDebug() << __func__ << ": Running AppInit2 in thread";
-        int rv = AppInit2(threadGroup, scheduler);
+        int rv = AppInit2();
         Q_EMIT initializeResult(rv);
     } catch (std::exception& e) {
         handleRunawayException(&e);
@@ -296,8 +294,7 @@ void BitcoinCore::restart(QStringList args)
         executing_restart = true;
         try {
             qDebug() << __func__ << ": Running Restart in thread";
-            Interrupt(threadGroup);
-            threadGroup.join_all();
+            Interrupt();
             StartRestart();
             PrepareShutdown();
             qDebug() << __func__ << ": Shutdown finished";
@@ -318,8 +315,7 @@ void BitcoinCore::shutdown()
 {
     try {
         qDebug() << __func__ << ": Running Shutdown in thread";
-        threadGroup.interrupt_all();
-        threadGroup.join_all();
+        Interrupt();
         Shutdown();
         qDebug() << __func__ << ": Shutdown finished";
         Q_EMIT shutdownResult(1);
