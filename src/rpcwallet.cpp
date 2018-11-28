@@ -1345,6 +1345,10 @@ UniValue ListReceived(const UniValue& params, bool fByAccounts)
         if (it == mapTally.end() && !fIncludeEmpty)
             continue;
 
+        isminefilter mine = IsMine(*pwalletMain, dest);
+        if(!(mine & filter))
+            continue;
+
         CAmount nAmount = 0;
         int nConf = std::numeric_limits<int>::max();
         int nBCConf = std::numeric_limits<int>::max();
