@@ -193,9 +193,6 @@ private:
     boost::thread_group threadGroup;
     CScheduler scheduler;
 
-    /// Flag indicating a restart
-    bool execute_restart;
-
     /// Pass fatal exception message to UI thread
     void handleRunawayException(std::exception* e);
 };
@@ -257,6 +254,7 @@ private:
 #endif
     int returnValue;
     const PlatformStyle* platformStyle;
+    std::unique_ptr<QWidget> shutdownWindow;
 
     void startThread();
 
@@ -279,8 +277,6 @@ void BitcoinCore::handleRunawayException(std::exception* e)
 
 void BitcoinCore::initialize()
 {
-    execute_restart = true;
-
     try {
         qDebug() << __func__ << ": Running AppInit2 in thread";
         int rv = AppInit2(threadGroup, scheduler);
@@ -300,12 +296,15 @@ void BitcoinCore::initialize()
 
 void BitcoinCore::restart(QStringList args)
 {
-    if (execute_restart) { // Only restart 1x, no matter how often a user clicks on a restart-button
-        execute_restart = false;
+    static bool executing_restart{false};
+
+    if(!executing_restart) { // Only restart 1x, no matter how often a user clicks on a restart-button
+        executing_restart = true;
         try {
             qDebug() << __func__ << ": Running Restart in thread";
             Interrupt(threadGroup);
             threadGroup.join_all();
+            StartRestart();
             PrepareShutdown();
             qDebug() << __func__ << ": Shutdown finished";
             Q_EMIT shutdownResult(1);
@@ -429,7 +428,7 @@ void BitcoinApplication::createSplashScreen(const NetworkStyle* networkStyle)
     SplashScreen* splash = new SplashScreen(0, networkStyle);
     // We don't hold a direct pointer to the splash screen after creation, so use
     // Qt::WA_DeleteOnClose to make sure that the window will be deleted eventually.
-    splash->setAttribute(Qt::WA_DeleteOnClose);
+//    splash->setAttribute(Qt::WA_DeleteOnClose);
     splash->show();
     connect(this, SIGNAL(splashFinished(QWidget*)), splash, SLOT(slotFinish(QWidget*)));
 }
@@ -465,7 +464,7 @@ void BitcoinApplication::requestInitialize()
 
 void BitcoinApplication::requestShutdown()
 {
-    ShutdownWindow::showShutdownWindow(window);
+    shutdownWindow.reset(ShutdownWindow::showShutdownWindow(window));
     qDebug() << __func__ << ": Requesting shutdown";
     startThread();
     window->hide();
@@ -488,6 +487,7 @@ void BitcoinApplication::requestShutdown()
     }
     clientModel = 0;
 
+    StartShutdown();
     // Request shutdown from core thread
     Q_EMIT requestedShutdown();
 }
