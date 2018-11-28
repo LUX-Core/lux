@@ -19,6 +19,7 @@ class thread_group;
 extern CWallet* pwalletMain;
 
 void StartShutdown();
+void StartRestart();
 bool ShutdownRequested();
 void Shutdown();
 void PrepareShutdown();
