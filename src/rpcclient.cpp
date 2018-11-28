@@ -42,6 +42,7 @@ static const CRPCConvertParam vRPCConvertParams[] =
     { "getsubsidy", 0, "height" },
     { "getreceivedbyaddress", 1, "minconf" },
     { "getreceivedbyaccount", 1, "minconf" },
+    { "listaddressbalances", 0, "minamount" },
     { "listreceivedbyaddress", 0, "minconf" },
     { "listreceivedbyaddress", 1, "include_empty" },
     { "listreceivedbyaddress", 2, "include_watchonly" },

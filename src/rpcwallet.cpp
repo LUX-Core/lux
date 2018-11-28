@@ -727,6 +727,44 @@ UniValue listaddressgroupings(const UniValue& params, bool fHelp)
     return jsonGroupings;
 }
 
+UniValue listaddressbalances(const UniValue& params, bool fHelp)
+{
+    if (!EnsureWalletIsAvailable(fHelp))
+        return NullUniValue;
+
+    if (fHelp || params.size() > 1)
+        throw std::runtime_error(
+            "listaddressbalances ( minamount )\n"
+            "\nLists addresses of this wallet and their balances\n"
+            "\nArguments:\n"
+            "1. minamount  (numeric, optional, default=0) Minimum balance in " + CURRENCY_UNIT + " an address should have to be shown in the list\n"
+            "\nResult:\n"
+            "{\n"
+            "  \"address\": amount, (string) Lux address and the amount in " + CURRENCY_UNIT + "\n"
+            "  ,...\n"
+            "}\n"
+            "\nExamples:\n"
+            + HelpExampleCli("listaddressbalances", "") + HelpExampleCli("listaddressbalances", "10") + HelpExampleRpc("listaddressbalances", "") + HelpExampleRpc("listaddressbalances", "10")
+        );
+
+    LOCK2(cs_main, pwalletMain->cs_wallet);
+
+    CAmount nMinAmount = 0;
+    if (params.size() > 0)
+        nMinAmount = AmountFromValue(params[0]);
+
+    if (nMinAmount < 0)
+        throw JSONRPCError(RPC_TYPE_ERROR, "Invalid amount");
+
+    UniValue jsonBalances(UniValue::VOBJ);
+    std::map<CTxDestination, CAmount> balances = pwalletMain->GetAddressBalances();
+    for (auto& balance : balances)
+        if (balance.second >= nMinAmount)
+            jsonBalances.push_back(Pair(EncodeDestination(balance.first), ValueFromAmount(balance.second)));
+
+    return jsonBalances;
+}
+
 UniValue signmessage(const UniValue& params, bool fHelp)
 {
     if (fHelp || params.size() != 2)
