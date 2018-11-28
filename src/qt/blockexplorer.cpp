@@ -15,6 +15,8 @@
 #include <QKeyEvent>
 #include <QMessageBox>
 #include <set>
+#include "pubkey.h"
+#include "utilstrencodings.h"
 
 // tr() requires to be in QObject or QWidget methods
 // This function allow the lupdate parser to detect our std::string without QString requirement.
@@ -201,14 +203,17 @@ static std::string TxToRow(const CTransaction& tx, CBlock * const ptrBlock= null
         auto strAddress = ScriptToString(Out.scriptPubKey, false, outAddr == Highlight);
         bCalcOutAddr = true;
         bool bSC_Amount = false;
-        if(bHasOpCall && strAddress == "")
+        if(bHasOpCall && Out.nValue== 0)
         {
+            CKeyID *keyid = boost::get<CKeyID>(&outAddr);
             strAddress = _("Call SC");
+            if (keyid) strAddress += " " + HexStr(valtype(keyid->begin(),keyid->end()));
             bSC_Amount = true;
         }
-        if(bHasOpCreate && strAddress == "")
+        if(bHasOpCreate && Out.nValue== 0)
         {
-            strAddress = _("Create SC");
+            uint160 contract = uint160(LuxState::createLuxAddress(uintToh256(tx.GetHash()), j).asBytes());
+            strAddress = _("Create SC") + " " + contract.ToStringReverseEndian();
             bSC_Amount = true;
         }
         if(bSC_Amount)
