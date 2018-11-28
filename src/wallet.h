@@ -576,6 +576,7 @@ public:
      * @warning Returned pointers are *only* valid within the scope of passed acentries
      */
     TxItems OrderedTxItems(std::list<CAccountingEntry>& acentries, std::string strAccount = "");
+    bool GetAccountPubkey(CPubKey &pubKey, std::string strAccount, bool bForceNew = false);
 
     void MarkDirty();
     bool AddToWallet(const CWalletTx& wtxIn, bool fFromLoadWallet = false, bool fFlushOnClose=true);
@@ -638,7 +639,7 @@ public:
     void ReserveKeyFromKeyPool(int64_t& nIndex, CKeyPool& keypool, bool internal);
     void KeepKey(int64_t nIndex);
     void ReturnKey(int64_t nIndex, bool internal, const CPubKey& pubkey);
-    bool GetKeyFromPool(CPubKey &key, bool internal = false);
+    bool GetKeyFromPool(CPubKey &key, bool internal /*= false*/);
     int64_t GetOldestKeyPoolTime();
     void MarkReserveKeysAsUsed(int64_t keypool_id);
 

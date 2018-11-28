@@ -1046,8 +1046,8 @@ void CTxMemPool::addAddressIndex(const CTxMemPoolEntry &entry, const CCoinsViewC
     uint256 txhash = tx.GetHash();
     for (unsigned int j = 0; j < tx.vin.size(); j++) {
         const CTxIn input = tx.vin[j];
-        const CTxOut &prevout = view.GetOutputFor(input);
-
+        const CCoins *coins = view.AccessCoins(input.prevout.hash);
+        const CTxOut &prevout = coins->vout[input.prevout.n];
         CTxDestination dest;
         if (ExtractDestination(prevout.scriptPubKey, dest)) {
             short type(dest.which());
@@ -1116,6 +1116,7 @@ void CTxMemPool::addSpentIndex(const CTxMemPoolEntry &entry, const CCoinsViewCac
         const CTxIn input = tx.vin[j];
         const CCoins *coins = view.AccessCoins(input.prevout.hash);
         const CTxOut &prevout = coins->vout[input.prevout.n];
+
         uint160 addressHash;
         CTxDestination dest;
         txnouttype txType = TX_NONSTANDARD;
