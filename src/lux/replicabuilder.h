@@ -1,5 +1,5 @@
-#ifndef LUX_LIB_CRYPTO_CRYPTOSPLITTER_H
-#define LUX_LIB_CRYPTO_CRYPTOSPLITTER_H
+#ifndef LUX_LIB_CRYPTO_REPLICABUILDER_H
+#define LUX_LIB_CRYPTO_REPLICABUILDER_H
 
 #include <string>
 #include <vector>
@@ -20,4 +20,4 @@ void EncryptData(const byte *src, uint64_t offset, size_t srcSize, byte *cipherT
 void DecryptData(const byte *src, uint64_t offset, size_t srcSize, byte *plainText,
                  const AESKey &aesKey, RSA *rsa);
 
-#endif //LUX_LIB_CRYPTO_CRYPTOSPLITTER_H
+#endif //LUX_LIB_CRYPTO_REPLICABUILDER_H

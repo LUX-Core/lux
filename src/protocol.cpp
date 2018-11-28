@@ -30,7 +30,13 @@ static const char* ppszTypeName[] = {
         "mn quorum",
         "mn announce",
         "mn ping",
-        "dstx"
+        "dstx",
+        "pmn storage order announce",           // 17
+        "pmn storage order proposal",           // 18
+        "pmn storage order accept"              // 19
+//        "pmn replica transfer",               // 20
+//        "pmn replica transfer sanity check"   // 21
+//        "pmn sign storage order"              // 22 Isn’t implemented
 };
 
 CMessageHeader::CMessageHeader()

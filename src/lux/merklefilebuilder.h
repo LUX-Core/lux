@@ -1,5 +1,5 @@
-#ifndef LUX_LIB_CRYPTO_MERKLEBLOCK_H
-#define LUX_LIB_CRYPTO_MERKLEBLOCK_H
+#ifndef LUX_LIB_CRYPTO_MERKLEFILEBUILDER_H
+#define LUX_LIB_CRYPTO_MERKLEFILEBUILDER_H
 
 #include <fstream>
 #include <list>
@@ -18,4 +18,4 @@ size_t GetLayerSize(size_t blocksSize, size_t depth);
 void ConstructMerklePath(std::ifstream &merkleTree, size_t height,
                          std::list<uint256> &path, MPBContext &context);
 
-#endif //LUX_LIB_CRYPTO_MERKLEBLOCK_H
+#endif //LUX_LIB_CRYPTO_MERKLEFILEBUILDER_H
