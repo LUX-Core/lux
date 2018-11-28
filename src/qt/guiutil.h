@@ -16,6 +16,7 @@
 #include <QTableView>
 #include <QTableWidget>
 #include <QLabel>
+#include <QMouseEvent>
 
 #include <boost/filesystem.hpp>
 

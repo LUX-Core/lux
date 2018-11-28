@@ -22,6 +22,7 @@
 #include "httpserver.h"
 #include "httprpc.h"
 #include "key.h"
+#include "luxcontrol.h"
 #include "main.h"
 #include "stake.h"
 #include "masternodeconfig.h"
@@ -139,14 +140,19 @@ CClientUIInterface uiInterface;
 //
 
 std::atomic<bool> fRequestShutdown(false);
+std::atomic<bool> fRequestRestart(false);
 
 void StartShutdown()
 {
     fRequestShutdown = true;
 }
+void StartRestart()
+{
+    fRequestShutdown = fRequestRestart = true;
+}
 bool ShutdownRequested()
 {
-    return fRequestShutdown || fRestartRequested;
+    return fRequestShutdown;
 }
 
 class CCoinsViewErrorCatcher : public CCoinsViewBacked
@@ -186,8 +192,6 @@ void Interrupt(boost::thread_group& threadGroup)
 /** Preparing steps before shutting down or restarting the wallet */
 void PrepareShutdown()
 {
-    fRequestShutdown = true;  // Needed when we shutdown the wallet
-    fRestartRequested = true; // Needed when we restart the wallet
     LogPrintf("%s: In progress...\n", __func__);
     static CCriticalSection cs_Shutdown;
     TRY_LOCK(cs_Shutdown, lockShutdown);
@@ -260,7 +264,11 @@ void PrepareShutdown()
 #endif
 
 #ifndef WIN32
-    boost::filesystem::remove(GetPidFile());
+    try {
+        boost::filesystem::remove(GetPidFile());
+    } catch (const boost::filesystem::filesystem_error& e) {
+        LogPrintf("%s: Unable to remove pidfile: %s\n", __func__, e.what());
+    }
 #endif
     UnregisterAllValidationInterfaces();
 }
@@ -277,11 +285,12 @@ void PrepareShutdown()
 void Shutdown()
 {
     // Shutdown part 1: prepare shutdown
-    if (!fRestartRequested) {
+    if(!fRequestRestart) {
         PrepareShutdown();
     }
 
 // Shutdown part 2: delete wallet instance
+    StopLuxControl();
 #ifdef ENABLE_WALLET
     delete pwalletMain;
     pwalletMain = NULL;
@@ -673,7 +682,7 @@ void ThreadImport(std::vector<boost::filesystem::path> vImportFiles)
     }
 }
 
-static bool LockDataDirectory(bool probeOnly, bool try_lock = true)
+static bool LockDataDirectory(bool probeOnly)
 {
     std::string strDataDir = GetDataDir().string();
 
@@ -684,12 +693,8 @@ static bool LockDataDirectory(bool probeOnly, bool try_lock = true)
 
     try {
         static boost::interprocess::file_lock lock(pathLockFile.string().c_str());
-        if (try_lock && !lock.try_lock()) {
+        if (!lock.try_lock())
             return InitError(strprintf(_("Cannot obtain a lock on data directory %s. %s is probably already running."), strDataDir, _(PACKAGE_NAME)));
-        }
-        if (probeOnly) {
-            lock.unlock();
-        }
     } catch(const boost::interprocess::interprocess_exception& e) {
         return InitError(strprintf(_("Cannot obtain a lock on data directory %s. %s is probably already running.") + " %s.", strDataDir, _(PACKAGE_NAME), e.what()));
     }
@@ -1983,5 +1988,5 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
 void UnlockDataDirectory()
 {
     // Try lock and unlock
-    LockDataDirectory(true, false);
+    LockDataDirectory(true);
 }
