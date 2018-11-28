@@ -4836,10 +4836,16 @@ bool TestBlockValidity(CValidationState& state, const CChainParams& chainparams,
 {
     AssertLockHeld(cs_main);
 
-    // In some case, chainActive.Tip() will return null. This will hit the assertion. So, we will
-    // checking the assertion only when chainActive.Tip() return "not null"
+    // In some cases, chainActive.Tip() may return nullptr
     CBlockIndex *pIndex = chainActive.Tip();
-    if (pIndex) assert(pindexPrev == pIndex);
+    if (pIndex == nullptr) {
+        LogPrintf("%s: Invalid chain tip!\n", __func__);
+        return false;
+    }
+    else if (pindexPrev != pIndex) {
+        LogPrintf("%s: Invalid prevblock!\n", __func__);
+        return false;
+    }
 
     CCoinsViewCache viewNew(pcoinsTip);
     CBlockIndex index(block);
@@ -4868,7 +4874,9 @@ bool TestBlockValidity(CValidationState& state, const CChainParams& chainparams,
         return false;
     }
 
-    assert(state.IsValid());
+    if (!state.IsValid()) {
+        return false;
+    }
 
     return true;
 }
