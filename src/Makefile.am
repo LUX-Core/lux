@@ -156,6 +156,7 @@ BITCOIN_CORE_H = \
   streams.h \
   support/allocators/zeroafterfree.h \
   support/cleanse.h \
+  support/events.h \
   sync.h \
   threadsafety.h \
   timedata.h \
