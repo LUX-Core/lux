@@ -526,11 +526,12 @@ bool Stake::CheckHashNew(const CBlockIndex* pindexPrev, unsigned int nBits, cons
     // Weighted target
     int64_t nValueIn = txPrev.vout[prevout.n].nValue;
     uint256 bnWeight = uint256(nValueIn);
-
+#if 0
     int64_t nTimeWeight = min((int64_t)nTimeTx - txPrev.nTime, Params().StakingMinAge());
     if(nTimeWeight) {
         bnWeight = uint256(nValueIn) * nTimeWeight / COIN / (24 * 60 * 60);
     }
+#endif
     bnTarget *= bnWeight;
 
     uint64_t nStakeModifier = pindexPrev->nStakeModifier;
@@ -540,15 +541,16 @@ bool Stake::CheckHashNew(const CBlockIndex* pindexPrev, unsigned int nBits, cons
     // Calculate hash
     CDataStream ss(SER_GETHASH, 0);
 
-    if (!GetKernelStakeModifier(nTimeBlockFrom, nStakeModifier, nStakeModifierHeight, nStakeModifierTime, true))
+    if (!GetKernelStakeModifier(nTimeBlockFrom, nStakeModifier, nStakeModifierHeight, nStakeModifierTime, true)) {
         return false;
+    }
 
     ss << nStakeModifier;
 
     ss << nTimeBlockFrom << txPrev.nTime << prevout.hash << prevout.n << nTimeTx;
 
     hashProofOfStake = Hash(ss.begin(), ss.end());
-#if 0
+#if 1
     if (fDebug) {
         LogPrintf("%s: using modifier 0x%016x at height=%d timestamp=%s for block from timestamp=%s\n", __func__,
                   nStakeModifier, nStakeModifierHeight,
@@ -566,6 +568,11 @@ bool Stake::CheckHashNew(const CBlockIndex* pindexPrev, unsigned int nBits, cons
         if (!MultiplyStakeTarget(bnTarget, nStakeModifierHeight, nStakeModifierTime, nValueIn)) {
             return false;
         }
+    } else if (IsTestNet() && hashProofOfStake > (bnWeight * bnTarget) && nStakeModifierHeight) {
+        if (!MultiplyStakeTarget(bnTarget, nStakeModifierHeight, nStakeModifierTime, nValueIn)) {
+            return error("%s: cant adjust stake target %s, %d, %d", __func__, bnTarget.GetHex(), nStakeModifierHeight,
+                         nStakeModifierTime);
+        }
     }
 
     // Now check if proof-of-stake hash meets target protocol
@@ -576,6 +583,9 @@ bool Stake::CheckHashNew(const CBlockIndex* pindexPrev, unsigned int nBits, cons
 bool Stake::CheckHash(const CBlockIndex* pindexPrev, unsigned int nBits, const CBlock& blockFrom, const CTransaction& txPrev, const COutPoint& prevout, unsigned int& nTimeTx, uint256& hashProofOfStake) {
 
     int nBlockHeight = pindexPrev ? pindexPrev->nHeight + 1 : chainActive.Height() + 1;
+    if (IsTestNet()) {
+        return (nBlockHeight < nLuxProtocolSwitchHeightTestnet) ? CheckHashOld(pindexPrev, nBits, blockFrom, txPrev, prevout, nTimeTx, hashProofOfStake) : CheckHashNew(pindexPrev, nBits, blockFrom, txPrev, prevout, nTimeTx, hashProofOfStake);
+    }
     return (nBlockHeight < nLuxProtocolSwitchHeight) ? CheckHashOld(pindexPrev, nBits, blockFrom, txPrev, prevout, nTimeTx, hashProofOfStake) : CheckHashNew(pindexPrev, nBits, blockFrom, txPrev, prevout, nTimeTx, hashProofOfStake);
 }
 
