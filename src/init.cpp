@@ -22,6 +22,7 @@
 #include "httpserver.h"
 #include "httprpc.h"
 #include "key.h"
+#include "luxcontrol.h"
 #include "main.h"
 #include "stake.h"
 #include "masternodeconfig.h"
@@ -139,14 +140,19 @@ CClientUIInterface uiInterface;
 //
 
 std::atomic<bool> fRequestShutdown(false);
+std::atomic<bool> fRequestRestart(false);
 
 void StartShutdown()
 {
     fRequestShutdown = true;
 }
+void StartRestart()
+{
+    fRequestShutdown = fRequestRestart = true;
+}
 bool ShutdownRequested()
 {
-    return fRequestShutdown || fRestartRequested;
+    return fRequestShutdown;
 }
 
 class CCoinsViewErrorCatcher : public CCoinsViewBacked
@@ -173,21 +179,20 @@ public:
 static CCoinsViewDB* pcoinsdbview = NULL;
 static CCoinsViewErrorCatcher* pcoinscatcher = NULL;
 static boost::scoped_ptr<ECCVerifyHandle> globalVerifyHandle;
+static boost::thread_group threadGroup;
+static CScheduler scheduler;
 
-void Interrupt(boost::thread_group& threadGroup)
+void Interrupt()
 {
     InterruptHTTPServer();
     InterruptHTTPRPC();
     InterruptRPC();
     InterruptREST();
-    threadGroup.interrupt_all();
 }
 
 /** Preparing steps before shutting down or restarting the wallet */
 void PrepareShutdown()
 {
-    fRequestShutdown = true;  // Needed when we shutdown the wallet
-    fRestartRequested = true; // Needed when we restart the wallet
     LogPrintf("%s: In progress...\n", __func__);
     static CCriticalSection cs_Shutdown;
     TRY_LOCK(cs_Shutdown, lockShutdown);
@@ -208,9 +213,16 @@ void PrepareShutdown()
 #ifdef ENABLE_WALLET
     if (pwalletMain)
         bitdb.Flush(false);
+//    GenerateBitcoins(NULL, 0);
 #endif
     StopNode();
     UnregisterNodeSignals(GetNodeSignals());
+
+    // After everything has been shut down, but before things get flushed, stop the
+    // CScheduler/checkqueue threadGroup
+    threadGroup.interrupt_all();
+    threadGroup.join_all();
+
     if (fFeeEstimatesInitialized) {
         boost::filesystem::path est_path = GetDataDir() / FEE_ESTIMATES_FILENAME;
         CAutoFile est_fileout(fopen(est_path.string().c_str(), "wb"), SER_DISK, CLIENT_VERSION);
@@ -222,6 +234,7 @@ void PrepareShutdown()
     }
 
     {
+        LOCK(cs_main);
         if (pcoinsTip != NULL) {
             FlushStateToDisk();
 
@@ -255,7 +268,11 @@ void PrepareShutdown()
     }
 #endif
 #ifndef WIN32
-    boost::filesystem::remove(GetPidFile());
+    try {
+        boost::filesystem::remove(GetPidFile());
+    } catch (const boost::filesystem::filesystem_error& e) {
+        LogPrintf("%s: Unable to remove pidfile: %s\n", __func__, e.what());
+    }
 #endif
     UnregisterAllValidationInterfaces();
 }
@@ -272,11 +289,12 @@ void PrepareShutdown()
 void Shutdown()
 {
     // Shutdown part 1: prepare shutdown
-    if (!fRestartRequested) {
+    if(!fRequestRestart) {
         PrepareShutdown();
     }
 
 // Shutdown part 2: delete wallet instance
+    StopLuxControl();
 #ifdef ENABLE_WALLET
     delete pwalletMain;
     pwalletMain = NULL;
@@ -521,6 +539,8 @@ std::string HelpMessage(HelpMessageMode mode)
     strUsage += HelpMessageOpt("-instantxdepth=<n>", strprintf(_("Show N confirmations for a successfully locked transaction (0-9999, default: %u)"), nInstanTXDepth));
 
     strUsage += HelpMessageGroup(_("Node relay options:"));
+    if (GetBoolArg("-help-debug", false))
+        strUsage += HelpMessageOpt("-acceptnonstandardtxn", strprintf("Relay and mine \"non-standard\" transactions (%sdefault: %u)", "testnet/regtest only; ", !Params(CBaseChainParams::TESTNET).RequireStandard()));
     strUsage += HelpMessageOpt("-datacarrier", strprintf(_("Relay and mine data carrier transactions (default: %u)"), 1));
     strUsage += HelpMessageOpt("-datacarriersize", strprintf(_("Maximum size of data in data carrier transactions we relay and mine (default: %u)"), MAX_OP_RETURN_RELAY));
 
@@ -668,7 +688,7 @@ void ThreadImport(std::vector<boost::filesystem::path> vImportFiles)
     }
 }
 
-static bool LockDataDirectory(bool probeOnly, bool try_lock = true)
+static bool LockDataDirectory(bool probeOnly)
 {
     std::string strDataDir = GetDataDir().string();
 
@@ -679,12 +699,8 @@ static bool LockDataDirectory(bool probeOnly, bool try_lock = true)
 
     try {
         static boost::interprocess::file_lock lock(pathLockFile.string().c_str());
-        if (try_lock && !lock.try_lock()) {
+        if (!lock.try_lock())
             return InitError(strprintf(_("Cannot obtain a lock on data directory %s. %s is probably already running."), strDataDir, _(PACKAGE_NAME)));
-        }
-        if (probeOnly) {
-            lock.unlock();
-        }
     } catch(const boost::interprocess::interprocess_exception& e) {
         return InitError(strprintf(_("Cannot obtain a lock on data directory %s. %s is probably already running.") + " %s.", strDataDir, _(PACKAGE_NAME), e.what()));
     }
@@ -708,7 +724,7 @@ bool InitSanityCheck(void)
     return true;
 }
 
-bool AppInitServers(boost::thread_group& threadGroup)
+bool AppInitServers()
 {
     RPCServer::OnStopped(&OnRPCStopped);
     RPCServer::OnPreCommand(&OnRPCPreCommand);
@@ -728,7 +744,7 @@ bool AppInitServers(boost::thread_group& threadGroup)
 /** Initialize lux.
  *  @pre Parameters should be parsed and config file should be read.
  */
-bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
+bool AppInit2()
 {
 // ********************************************************* Step 1: setup
 #ifdef WIN32
@@ -979,6 +995,11 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
             return InitError(strprintf(_("Invalid amount for -minrelaytxfee=<amount>: '%s'"), mapArgs["-minrelaytxfee"]));
     }
 
+    fRequireStandard = !GetBoolArg("-acceptnonstandardtxn", !Params().RequireStandard());
+    if (Params().RequireStandard() && !fRequireStandard)
+        return InitError(strprintf("acceptnonstandardtxn is not currently supported for %s chain", chainparams.NetworkIDString()));
+
+
 #ifdef ENABLE_WALLET
     if (mapArgs.count("-mintxfee")) {
         CAmount n = 0;
@@ -1116,7 +1137,7 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
      */
     if (fServer) {
         uiInterface.InitMessage.connect(SetRPCWarmupStatus);
-        if (!AppInitServers(threadGroup))
+        if (!AppInitServers())
             return InitError(_("Unable to start HTTP server. See debug log for details."));
     }
 
@@ -1983,5 +2004,5 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
 void UnlockDataDirectory()
 {
     // Try lock and unlock
-    LockDataDirectory(true, false);
+    LockDataDirectory(true);
 }

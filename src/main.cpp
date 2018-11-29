@@ -1014,6 +1014,9 @@ bool AcceptToMemoryPool(CTxMemPool& pool, CValidationState& state, const CTransa
             error("AcceptToMemoryPool : nonstandard transaction: %s", reason),
             REJECT_NONSTANDARD, reason);
 
+    if (!IsFinalTx(tx, chainActive.Height() + 1))
+        return state.DoS(0, error("AcceptToMemoryPool: non-final"), REJECT_NONSTANDARD, "non-final");
+
     // is it already in the memory pool?
     if (pool.exists(hash))
         return false;
@@ -3726,9 +3729,8 @@ static void NotifyHeaderTip() {
     CBlockIndex* pindexHeader = NULL;
     {
         LOCK(cs_main);
-        if (!setBlockIndexCandidates.empty()) {
-            pindexHeader = *setBlockIndexCandidates.rbegin();
-        }
+        pindexHeader = pindexBestHeader;
+
         if (pindexHeader != pindexHeaderOld) {
             fNotify = true;
             fInitialBlockDownload = IsInitialBlockDownload();

@@ -4,6 +4,7 @@
 
 #include "modaloverlay.h"
 #include "ui_modaloverlay.h"
+#include "chainparams.h"
 
 #include "guiutil.h"
 
