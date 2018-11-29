@@ -10,5 +10,17 @@ add_custom_target(build-lux ALL
         COMMAND $(MAKE) WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
         COMMAND $(MAKE))
 
+add_custom_target(build-luxgate-node ALL
+        COMMAND ./autogen.sh
+        COMMAND ./configure --disable-tests --without-gui --enable-luxgate --enable-luxgate-tests
+        COMMAND $(MAKE) WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+        COMMAND $(MAKE))
+
+add_custom_target(build-luxgate ALL
+        COMMAND ./autogen.sh
+        COMMAND ./configure --disable-tests --enable-luxgate --enable-luxgate-tests
+        COMMAND $(MAKE) WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+        COMMAND $(MAKE))
+
 add_custom_target(debug-luxd ALL)
 add_custom_target(debug-lux-qt ALL)

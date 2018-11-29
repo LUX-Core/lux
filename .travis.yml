@@ -55,10 +55,11 @@ before_script:
     - cd src/lux-installer/src
     - touch luxupdater/simplescheduler.cpp luxupdater/luxupdater_p.cpp luxupdater/luxupdater.cpp luxupdater/atomfeeder.cpp luxupdater/downloadmanager.cpp dialogmaster.cpp adminauthorization_x11.cpp adminauthorization_win.cpp progressdialog.cpp updatecontroller.cpp updateinfodialog.cpp luxupdater/luxupdater.h luxupdater/simplescheduler_p.h luxupdater/atomfeeder.h luxupdater/downloadmanager.h progressdialog_p.h updatecontroller.h updateinfodialog_p.h forms/updateinfodialog.ui forms/progressdialog.ui
     - cd -
-    - mkdir -p src/luxgate
+    - mkdir -p src/luxgate/test
     - cd src/luxgate
-    - touch atomicswap.h atomicswap.cpp luxgate.h luxgate.cpp lgconfig.h lgconfig.cpp rpcluxgate.cpp blockchainclient.h blockchainclient.cpp zmqsub.h zmqsub.cpp
+    - touch atomicswap.h atomicswap.cpp luxgate.h luxgate.cpp lgconfig.h version.h lgconfig.cpp rpcluxgate.cpp blockchainclient.h blockchainclient.cpp zmqsub.h zmqsub.cpp
     - cd -
+    - touch src/luxgate/test/test_luxgate.cpp
   
 script:
     - export TRAVIS_COMMIT_LOG=`git log --format=fuller -1`

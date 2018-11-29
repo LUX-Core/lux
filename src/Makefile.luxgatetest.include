@@ -1,0 +1,42 @@
+# -*- makefile-gmake -*-
+
+TESTS += luxgate/test/test_luxgate
+bin_PROGRAMS += luxgate/test/test_luxgate
+LUXGATETEST_BINARY = luxgate/test/test_luxgate$(EXEEXT)
+
+LUXGATE_TESTS = \
+  luxgate/test/test_luxgate.cpp
+
+AM_CXXFLAGS += -std=c++11
+
+luxgate_test_test_luxgate_SOURCES = $(LUXGATE_TESTS)
+luxgate_test_test_luxgate_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES) -I$(builddir)/luxgate/ $(TESTDEFS)
+luxgate_test_test_luxgate_CXXFLAGS = $(AM_CXXFLAGS)
+luxgate_test_test_luxgate_LDADD = $(LIBBITCOIN_SERVER) $(LIBBITCOIN_COMMON) $(LIBBITCOIN_UTIL) $(LIBBITCOIN_CRYPTO) $(LIBBITCOIN_UNIVALUE) $(LIBLEVELDB) $(LIBMEMENV) \
+  $(BOOST_LIBS) $(BOOST_UNIT_TEST_FRAMEWORK_LIB) $(LIBSECP256K1)
+if ENABLE_WALLET
+luxgate_test_test_luxgate_LDADD += $(LIBBITCOIN_WALLET)
+endif
+
+luxgate_test_test_luxgate_LDADD += $(LIBBITCOIN_CONSENSUS) $(BDB_LIBS) $(SSL_LIBS) $(CRYPTO_LIBS) $(MINIUPNPC_LIBS)
+luxgate_test_test_luxgate_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS) -static
+
+CLEAN_LUXGATE_TEST = luxgate/test/*.gcda src/luxgate/test/*.gcno
+
+CLEANFILES += $(CLEAN_LUXGATE_TEST)
+
+luxgate_test: $(LUXGATETEST_BINARY)
+
+luxgate_test_check: $(LUXGATETEST_BINARY) FORCE
+	$(MAKE) check-TESTS TESTS=$^
+
+luxgate_test_clean : FORCE
+	rm -f $(CLEAN_LUXGATE_TEST) $(luxgate_test_test_luxgate_OBJECTS) $(LUXGATETEST_BINARY)
+
+check-local:
+	$(AM_V_at)$(MAKE) $(AM_MAKEFLAGS) -C secp256k1 check
+
+debug-flags: $(LUXGATETEST_BINARY)
+	@echo $(luxgate_test_test_luxgate_CXXFLAGS)
+	@echo $(luxgate_test_test_luxgate_CPPFLAGS)
+

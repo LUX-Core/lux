@@ -8,8 +8,6 @@ if !TARGET_WINDOWS
 PIE_FLAGS = -fPIC
 endif
 
-EXTRA_LIBRARIES =
-
 BITCOIN_CONFIG_INCLUDES=-I$(builddir)/config
 BITCOIN_INCLUDES=-I$(builddir) -I$(builddir)/obj $(BDB_CPPFLAGS) $(BOOST_CPPFLAGS) $(LEVELDB_CPPFLAGS) $(CRYPTO_CFLAGS) $(SSL_CFLAGS) -I$(srcdir)/cpp-ethereum/utils
 
@@ -182,10 +180,11 @@ BITCOIN_CORE_H = \
 if ENABLE_LUXGATE
 BITCOIN_CORE_H += \
   luxgate/atomicswap.h \
-  luxgate/lgconfig.h \
-  luxgate/zmqsub.h \
   luxgate/blockchainclient.h \
-  luxgate/luxgate.h
+  luxgate/lgconfig.h \
+  luxgate/luxgate.h \
+  luxgate/version.h \
+  luxgate/zmqsub.h
 endif
 
 obj/build.h: FORCE
@@ -683,7 +682,6 @@ luxd_LDADD = \
 
 luxd_LDADD += $(BOOST_LIBS) $(BDB_LIBS) $(SSL_LIBS) $(CRYPTO_LIBS) $(MINIUPNPC_LIBS) $(ZMQ_LIBS) $(EVENT_PTHREADS_LIBS) $(EVENT_LIBS)
 
-
 # lux-cli binary #
 lux_cli_SOURCES = lux-cli.cpp
 lux_cli_CPPFLAGS = $(BITCOIN_INCLUDES) $(EVENT_CFLAGS)
@@ -751,6 +749,7 @@ CLEANFILES += *.a *.la crypto/*.a cryptopp/*.a qt/*.a
 CLEANFILES += *.gcda *.gcno
 CLEANFILES += compat/*.gcda compat/*.gcno
 CLEANFILES += crypto/*.gcda crypto/*.gcno
+CLEANFILES += luxgate/*.gcda luxgate/*.gcno
 CLEANFILES += primitives/*.gcda primitives/*.gcno
 CLEANFILES += script/*.gcda script/*.gcno
 CLEANFILES += univalue/*.gcda univalue/*.gcno
@@ -795,4 +794,8 @@ endif
 
 if ENABLE_QT
 include Makefile.qt.include
+endif
+
+if ENABLE_LUXGATE_TESTS
+include Makefile.luxgatetest.include
 endif

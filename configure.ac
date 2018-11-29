@@ -143,6 +143,13 @@ AC_ARG_ENABLE([luxgate],
   [enable_luxgate=$enableval],
   [enable_luxgate=no])
 
+#enable luxgate tests
+AC_ARG_ENABLE([luxgate-tests],
+[AS_HELP_STRING([--enable-luxgate-tests],
+  [enable luxgate tests (default is no)])],
+  [enable_luxgate_tests=$enableval],
+  [enable_luxgate_tests=no])
+
 AC_ARG_WITH([miniupnpc],
   [AS_HELP_STRING([--with-miniupnpc],
   [enable UPNP (default is yes if libminiupnpc is found)])],
@@ -807,7 +814,7 @@ if test x$use_reduce_exports != xno; then
     AX_CHECK_LINK_FLAG([[-Wl,--exclude-libs,ALL]], [RELDFLAGS="-Wl,--exclude-libs,ALL"])
 fi
 
-if test x$use_tests = xyes; then
+if test x$use_tests = xyes || test x$enable_luxgate$enable_luxgate_tests = xyesyes; then
 
   if test x$HEXDUMP = x; then
     AC_MSG_ERROR(hexdump is required for tests)
@@ -1182,6 +1189,15 @@ else
   AC_MSG_RESULT([no])
 fi
 
+dnl enable luxgate tests (works only with LuxGate enabled)
+AC_MSG_CHECKING([whether to build test_luxgate])
+if test x$enable_luxgate$enable_luxgate_tests = xyesyes; then
+  AC_MSG_RESULT([yes])
+  BUILD_TEST_LUXGATE="luxgate"
+else
+  AC_MSG_RESULT([no])
+fi
+
 AC_MSG_CHECKING([whether to reduce exports])
 if test x$use_reduce_exports != xno; then
   AC_MSG_RESULT([yes])
@@ -1199,6 +1215,7 @@ AM_CONDITIONAL([TARGET_WINDOWS], [test x$TARGET_OS = xwindows])
 AM_CONDITIONAL([ENABLE_WALLET],[test x$enable_wallet = xyes])
 AM_CONDITIONAL([ENABLE_UPDATER],[test x$enable_updater = xyes])
 AM_CONDITIONAL([ENABLE_LUXGATE],[test x$enable_luxgate = xyes])
+AM_CONDITIONAL([ENABLE_LUXGATE_TESTS],[test x$enable_luxgate$enable_luxgate_tests = xyesyes])
 AM_CONDITIONAL([ENABLE_TESTS],[test x$use_tests = xyes])
 AM_CONDITIONAL([ENABLE_QT],[test x$bitcoin_enable_qt = xyes])
 AM_CONDITIONAL([HAVE_QT5], [test x$bitcoin_qt_got_major_vers = x5])
@@ -1249,6 +1266,7 @@ AC_SUBST(BUILD_QT)
 AC_SUBST(EVENT_LIBS)
 AC_SUBST(EVENT_PTHREADS_LIBS)
 AC_SUBST(BUILD_TEST_QT)
+AC_SUBST(BUILD_TEST_LUXGATE)
 AC_SUBST(MINIUPNPC_CPPFLAGS)
 AC_SUBST(MINIUPNPC_LIBS)
 AC_SUBST(LEVELDB_ATOMIC_CPPFLAGS)
@@ -1310,6 +1328,9 @@ echo "Options used to compile and link:"
 echo "  with wallet          = $enable_wallet"
 echo "  with auto-update     = $enable_updater"
 echo "  with luxgate         = $enable_luxgate"
+if test x$enable_luxgate = xyes; then
+echo "  with luxgate tests   = $enable_luxgate_tests"
+fi
 echo "  with gui / qt        = $bitcoin_enable_qt"
 if test x$bitcoin_enable_qt != xno; then
 echo "  qt version           = $bitcoin_qt_got_major_vers"
