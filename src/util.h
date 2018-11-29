@@ -265,7 +265,7 @@ inline uint32_t ByteReverse(uint32_t value)
     return (value<<16) | (value>>16);
 }
 
-static bool IsExceptionIgnored (const char* name)
+inline static bool IsExceptionIgnored (const char* name)
 {
     const char* IgnoredThread [] = {
         "net",
