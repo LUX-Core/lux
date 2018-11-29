@@ -99,7 +99,7 @@ static const int64_t MaxPosClockDrift = 3 * 60;
 static const int64_t MaxPowClockDrift = 2 * 60 * 60;
 
 static const int nLuxProtocolSwitchHeight = 520000;
-static const int nLuxProtocolSwitchHeightTestnet = 96000;
+static const int nLuxProtocolSwitchHeightTestnet = 95150;
 
 /** The maximum size for mined blocks */
 static const unsigned int MAX_BLOCK_SIZE_GEN = MAX_BLOCK_BASE_SIZE/2;
