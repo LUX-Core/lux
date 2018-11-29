@@ -40,7 +40,7 @@
 #include "validationinterface.h"
 #include "versionbits.h"
 #include "script/interpreter.h"
-#include "lux/dfsnet.h"
+#include "lux/storagecontroller.h"
 
 #include "univalue/univalue.h"
 #include <atomic>
@@ -5830,7 +5830,7 @@ bool static AlreadyHave(const CInv& inv)
     case MSG_MASTERNODE_WINNER:
         return mapSeenMasternodeVotes.count(inv.hash);
     case MSG_STORAGE_ORDER_ANNOUNCE:
-        return mapDFSAnnouncements.count(inv.hash);
+        return storageController.mapAnnouncements.count(inv.hash);
 //    case MSG_STORAGE_ORDER_PROPOSAL:
 //        return ;
 //    case MSG_STORAGE_ORDER_ACCEPT:
@@ -5991,23 +5991,14 @@ void static ProcessGetData(CNode* pfrom, const Consensus::Params& consensusParam
                     }
                 }
                 if (!pushed && inv.type == MSG_STORAGE_ORDER_ANNOUNCE) {
-                    if (mapDFSAnnouncements.count(inv.hash)) {
+                    if (storageController.mapAnnouncements.count(inv.hash)) {
                         CDataStream ss(SER_NETWORK, PROTOCOL_VERSION);
-                        int a = 0;
                         ss.reserve(1000);
-                        ss << mapDFSAnnouncements[inv.hash] << a;
-                     //   pfrom->PushMessage("", ss); // !!! [WIP] !!!
+                        ss << storageController.mapAnnouncements[inv.hash];
+                        pfrom->PushMessage("dfsannounce", ss);
                         pushed = true;
                     }
                 }
-//                if (!pushed && inv.type == MSG_STORAGE_ORDER_PROPOSAL) {
-//                }
-//                if (!pushed && inv.type == MSG_STORAGE_ORDER_ACCEPT) {
-//                }
-//                if (!pushed && inv.type == MSG_REPLICA_TRANSFER) {
-//                }
-//                if (!pushed && inv.type == MSG_REPLICA_TRANSFER_SANTIFY_CHECK) {
-//                }
 
                 if (!pushed) {
                     vNotFound.push_back(inv);

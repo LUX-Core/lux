@@ -233,8 +233,8 @@ libbitcoin_server_a_SOURCES = \
   lux/storageheap.cpp \
   lux/merklefilebuilder.h \
   lux/merklefilebuilder.cpp \
-  lux/dfsnet.h \
-  lux/dfsnet.cpp \
+  lux/storagecontroller.h \
+  lux/storagecontroller.cpp \
   $(BITCOIN_CORE_H)
 
 if ENABLE_ZMQ
