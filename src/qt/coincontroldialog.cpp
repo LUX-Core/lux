@@ -694,8 +694,9 @@ void CoinControlDialog::updateLabels(WalletModel* model, QDialog* dialog)
                 nPayFee = 0;
 
         if (nPayAmount > 0) {
-            if (!CoinControlDialog::fSubtractFeeFromAmount)
-                nChange -= nPayFee;
+            if (!CoinControlDialog::fSubtractFeeFromAmount) {
+                nChange = nAmount - nPayFee - nPayAmount;
+             }
 
             // DS Fee = overpay
             if (coinControl->useDarksend && nChange > 0) {
