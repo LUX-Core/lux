@@ -42,7 +42,7 @@
           </font>
          </property>
          <property name="text">
-          <string>Read Smart Contract</string>
+          <string>Read Smart Contract (This is not a tx)</string>
          </property>
         </widget>
        </item>
