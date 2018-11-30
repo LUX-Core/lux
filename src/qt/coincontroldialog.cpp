@@ -694,8 +694,10 @@ void CoinControlDialog::updateLabels(WalletModel* model, QDialog* dialog)
                 nPayFee = 0;
 
         if (nPayAmount > 0) {
-            if (!CoinControlDialog::fSubtractFeeFromAmount)
+            nChange = nAmount - nPayAmount;
+            if (!CoinControlDialog::fSubtractFeeFromAmount) {
                 nChange -= nPayFee;
+             }
 
             // DS Fee = overpay
             if (coinControl->useDarksend && nChange > 0) {
@@ -722,9 +724,7 @@ void CoinControlDialog::updateLabels(WalletModel* model, QDialog* dialog)
         }
 
         // after fee
-        nAfterFee = nAmount - nPayFee;
-        if (nAfterFee < 0)
-            nAfterFee = 0;
+        nAfterFee = std::max<CAmount>(nAmount - nPayFee, 0);
 
         // if use Split UTXO
         if (CoinControlDialog::nSplitBlockDummy > 1 && CoinControlDialog::coinControl->fSplitBlock) {
