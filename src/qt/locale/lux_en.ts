@@ -290,6 +290,19 @@
     </message>
 </context>
 <context>
+    <name>AdminAuthorization</name>
+    <message>
+        <location filename="../../lux-installer/src/adminauthorization_x11.cpp" line="+197"/>
+        <source>Enter Password</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Enter your root password to run the maintenancetool:</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>AskPassphraseDialog</name>
     <message>
         <location filename="../forms/askpassphrasedialog.ui" line="+26"/>
@@ -480,13 +493,13 @@
     </message>
     <message>
         <location line="+28"/>
-        <location filename="../forms/ui_bip38tooldialog.h" line="+31"/>
+        <location filename="../forms/ui_bip38tooldialog.h" line="+35"/>
         <source>&amp;BIP 38 Encrypt</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+22"/>
-        <location filename="../forms/ui_bip38tooldialog.h" line="-30"/>
+        <location filename="../forms/ui_bip38tooldialog.h" line="-34"/>
         <source>Enter a Lux Address that you would like to encrypt using BIP 38. Enter a passphrase in the middle box. Press encrypt to compute the encrypted private key.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -494,13 +507,13 @@
         <location line="+37"/>
         <location line="+432"/>
         <location filename="../forms/ui_bip38tooldialog.h" line="+1"/>
-        <location line="+46"/>
+        <location line="+50"/>
         <source>Address:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-425"/>
-        <location filename="../forms/ui_bip38tooldialog.h" line="-44"/>
+        <location filename="../forms/ui_bip38tooldialog.h" line="-48"/>
         <source>The LUX address to sign the message with</source>
         <translation type="unfinished"></translation>
     </message>
@@ -512,26 +525,26 @@
     </message>
     <message>
         <location line="+10"/>
-        <location filename="../forms/ui_bip38tooldialog.h" line="+3"/>
+        <location filename="../forms/ui_bip38tooldialog.h" line="+4"/>
         <source>Alt+A</source>
         <translation type="unfinished">Alt+A</translation>
     </message>
     <message>
         <location line="+7"/>
-        <location filename="../forms/ui_bip38tooldialog.h" line="+2"/>
+        <location filename="../forms/ui_bip38tooldialog.h" line="+3"/>
         <source>Paste address from clipboard</source>
         <translation type="unfinished">Paste address from clipboard</translation>
     </message>
     <message>
         <location line="+10"/>
-        <location filename="../forms/ui_bip38tooldialog.h" line="+3"/>
+        <location filename="../forms/ui_bip38tooldialog.h" line="+4"/>
         <source>Alt+P</source>
         <translation type="unfinished">Alt+P</translation>
     </message>
     <message>
         <location line="+20"/>
         <location line="+238"/>
-        <location filename="../forms/ui_bip38tooldialog.h" line="+1"/>
+        <location filename="../forms/ui_bip38tooldialog.h" line="+2"/>
         <location line="+21"/>
         <source>Passphrase: </source>
         <translation type="unfinished"></translation>
@@ -710,7 +723,7 @@
 <context>
     <name>BitcoinGUI</name>
     <message>
-        <location filename="../bitcoingui.cpp" line="+160"/>
+        <location filename="../bitcoingui.cpp" line="+161"/>
         <source>Wallet</source>
         <translation>Wallet</translation>
     </message>
@@ -996,10 +1009,6 @@
         <translation>Show the list of used receiving addresses and labels</translation>
     </message>
     <message>
-        <source>Open &amp;URI...</source>
-        <translation type="vanished">Open &amp;URI...</translation>
-    </message>
-    <message>
         <location line="+10"/>
         <source>&amp;Command-line options</source>
         <translation>&amp;Command-line options</translation>
@@ -1023,7 +1032,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+29"/>
+        <location line="+31"/>
         <source>Indexing blocks on disk...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1032,8 +1041,13 @@
         <source>Processing blocks on disk...</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location line="+11"/>
+        <source>Connecting to peers...</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message numerus="yes">
-        <location line="+21"/>
+        <location line="+10"/>
         <source>Processed %n blocks of transaction history.</source>
         <translation>
             <numerusform>Processed %n block of transaction history.</numerusform>
@@ -1041,11 +1055,7 @@
         </translation>
     </message>
     <message>
-        <source>Synchronizing additional data: %p%</source>
-        <translation type="vanished">Synchronizing additional data: %p%</translation>
-    </message>
-    <message>
-        <location line="-481"/>
+        <location line="-483"/>
         <source>&amp;File</source>
         <translation>&amp;File</translation>
     </message>
@@ -1071,12 +1081,12 @@
     </message>
     <message>
         <location line="-492"/>
-        <location line="+989"/>
+        <location line="+991"/>
         <source>Luxcore</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-779"/>
+        <location line="-781"/>
         <source>Send coins to a LUX address</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1196,26 +1206,17 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+242"/>
+        <location line="+243"/>
         <source>Synchronizing with network...</source>
         <translation>Synchronizing with network...</translation>
     </message>
     <message>
-        <source>Importing blocks from disk...</source>
-        <translation type="vanished">Importing blocks from disk...</translation>
-    </message>
-    <message>
-        <location line="+10"/>
+        <location line="+11"/>
         <source>Reindexing blocks on disk...</source>
         <translation>Reindexing blocks on disk...</translation>
     </message>
     <message>
-        <location line="+7"/>
-        <source>No block source available...</source>
-        <translation>No block source available...</translation>
-    </message>
-    <message>
-        <location line="+12"/>
+        <location line="+19"/>
         <source>Up to date</source>
         <translation>Up to date</translation>
     </message>
@@ -1343,18 +1344,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Date: %1
-Amount: %2
-Type: %3
-Address: %4
-</source>
-        <translation type="vanished">Date: %1
-Amount: %2
-Type: %3
-Address: %4
-</translation>
-    </message>
-    <message>
         <location line="+54"/>
         <source>Staking is active
  MultiSend: %1</source>
@@ -1404,7 +1393,7 @@ Address: %4
         <translation>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;locked&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="../lux.cpp" line="+550"/>
+        <location filename="../lux.cpp" line="+546"/>
         <source>A fatal error occurred. LUX can no longer continue safely and will quit.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1448,8 +1437,208 @@ Address: %4
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../blockexplorer.cpp" line="+630"/>
+        <location filename="../blockexplorer.cpp" line="+28"/>
+        <source>unknown</source>
+        <translation type="unfinished">unknown</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Timestamp</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Value In</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Number of Transactions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Difficulty</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Address</source>
+        <translation type="unfinished">Address</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Value Out</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Fees</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Type</source>
+        <translation type="unfinished">Type</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Generated</source>
+        <translation type="unfinished">Generated</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Bits</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Nonce</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Version</source>
+        <translation type="unfinished">Version</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Hash</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Merkle Root</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>State Root</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>UTXO Root</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Block</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Transaction</source>
+        <translation type="unfinished">Transaction</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Call SC</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Create SC</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Inputs</source>
+        <translation type="unfinished">Inputs</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Outputs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Smart Contract</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Tx Hash</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Amount</source>
+        <translation type="unfinished">Amount</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>From</source>
+        <translation type="unfinished">From</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>To</source>
+        <translation type="unfinished">To</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Redeemed in</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Balance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Delta</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>In Block</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Taken from</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>outputs (see tx)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>unhandled or invalid address</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>movements displayed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Transactions to/from</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>-addressindex parameter is required to show address history</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+603"/>
         <source>Not all transactions will be shown. To view all transactions you need to set txindex=1 in the configuration file (lux.conf).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Luxcore Blockchain Explorer</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1546,10 +1735,6 @@ Address: %4
 </context>
 <context>
     <name>ClientModel</name>
-    <message>
-        <source>Total: %1 (OBF compatible: %2 / Enabled: %3)</source>
-        <translation type="vanished">Total: %1 (OBF compatible: %2 / Enabled: %3)</translation>
-    </message>
     <message>
         <location filename="../clientmodel.cpp" line="+204"/>
         <source>Network Alert</source>
@@ -2387,6 +2572,69 @@ Address: %4
     </message>
 </context>
 <context>
+    <name>DialogMaster</name>
+    <message>
+        <location filename="../../lux-installer/src/dialogmaster.cpp" line="+140"/>
+        <source>Information</source>
+        <translation type="unfinished">Information</translation>
+    </message>
+    <message>
+        <location line="+35"/>
+        <source>Question</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+35"/>
+        <source>Warning</source>
+        <translation type="unfinished">Warning</translation>
+    </message>
+    <message>
+        <location line="+35"/>
+        <source>Error</source>
+        <translation type="unfinished">Error</translation>
+    </message>
+    <message>
+        <location line="+14"/>
+        <source>About</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>%1 — Version %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+19"/>
+        <source>Qt-Version: &lt;a href=&quot;https://www.qt.io/&quot;&gt;%2&lt;/a&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Developed by: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Project Website: &lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>License: &lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>License: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <source>About Qt</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>EditAddressDialog</name>
     <message>
         <location filename="../forms/editaddressdialog.ui" line="+14"/>
@@ -3000,14 +3248,6 @@ Address: %4
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>UI options</source>
-        <translation type="vanished">UI options</translation>
-    </message>
-    <message>
-        <source>Choose data directory on startup (default: 0)</source>
-        <translation type="vanished">Choose data directory on startup (default: 0)</translation>
-    </message>
-    <message>
         <location line="-4"/>
         <source>Set language, for example &quot;de_DE&quot; (default: system locale)</source>
         <translation>Set language, for example &quot;de_DE&quot; (default: system locale)</translation>
@@ -3021,10 +3261,6 @@ Address: %4
         <location line="+1"/>
         <source>Set SSL root certificates for payment request (default: -system-)</source>
         <translation>Set SSL root certificates for payment request (default: -system-)</translation>
-    </message>
-    <message>
-        <source>Show splash screen on startup (default: 1)</source>
-        <translation type="vanished">Show splash screen on startup (default: 1)</translation>
     </message>
 </context>
 <context>
@@ -3190,21 +3426,6 @@ Address: %4
         <location filename="../forms/ui_luxnodeconfigdialog.h" line="+2"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This pane shows an example lux.conf template with the necessary masternode settings.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>MasternodeList</name>
-    <message>
-        <source>Form</source>
-        <translation type="obsolete">Form</translation>
-    </message>
-    <message>
-        <source>Address</source>
-        <translation type="obsolete">Address</translation>
-    </message>
-    <message>
-        <source>Status</source>
-        <translation type="obsolete">Status</translation>
     </message>
 </context>
 <context>
@@ -3445,7 +3666,7 @@ Address: %4
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../modaloverlay.cpp" line="+137"/>
+        <location filename="../modaloverlay.cpp" line="+138"/>
         <source>Unknown. Syncing Headers (%1)...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3483,7 +3704,7 @@ Address: %4
     </message>
     <message>
         <location line="+79"/>
-        <location filename="../forms/ui_multisenddialog.h" line="+11"/>
+        <location filename="../forms/ui_multisenddialog.h" line="+13"/>
         <source>Add to MultiSend Vector</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3507,19 +3728,19 @@ Address: %4
     </message>
     <message>
         <location line="-122"/>
-        <location filename="../forms/ui_multisenddialog.h" line="-32"/>
+        <location filename="../forms/ui_multisenddialog.h" line="-34"/>
         <source>Choose an address from the address book</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+10"/>
-        <location filename="../forms/ui_multisenddialog.h" line="+3"/>
+        <location filename="../forms/ui_multisenddialog.h" line="+4"/>
         <source>Alt+A</source>
         <translation type="unfinished">Alt+A</translation>
     </message>
     <message>
         <location line="-60"/>
-        <location filename="../forms/ui_multisenddialog.h" line="-19"/>
+        <location filename="../forms/ui_multisenddialog.h" line="-20"/>
         <source>Percentage of stake to send</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3549,7 +3770,7 @@ Address: %4
     </message>
     <message>
         <location line="+86"/>
-        <location filename="../forms/ui_multisenddialog.h" line="+12"/>
+        <location filename="../forms/ui_multisenddialog.h" line="+14"/>
         <source>Add to the MultiSend vector</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3609,7 +3830,7 @@ Address: %4
     </message>
     <message>
         <location line="-202"/>
-        <location filename="../forms/ui_multisenddialog.h" line="-57"/>
+        <location filename="../forms/ui_multisenddialog.h" line="-59"/>
         <source>Send For Stakes</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3620,7 +3841,22 @@ Address: %4
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../multisenddialog.cpp" line="+96"/>
+        <location filename="../multisenddialog.cpp" line="+68"/>
+        <source>MultiSend enabled for Stakes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>MultiSend enabled for Masternode Rewards</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>MultiSend is not active</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+24"/>
         <source>The entered address:
 </source>
         <translation type="unfinished"></translation>
@@ -3657,6 +3893,41 @@ Please check the address and try again.</source>
         <location line="+2"/>
         <source>Could not locate address
 </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <source>Unable to activate MultiSend, check MultiSend vector</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Need to select to send on stake and/or masternode rewards</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>MultiSend activated but writing settings to DB failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>MultiSend activated</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>First address is not valid</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+15"/>
+        <source>MultiSend disabled but writing settings to DB failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>MultiSend disabled</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4115,13 +4386,13 @@ https://www.transifex.com/luxcore/luxcore</source>
 <context>
     <name>OverviewPage</name>
     <message>
-        <location filename="../forms/overviewpage.ui" line="+20"/>
-        <location filename="../forms/ui_overviewpage.h" line="+643"/>
+        <location filename="../forms/overviewpage.ui" line="+26"/>
+        <location filename="../forms/ui_overviewpage.h" line="+669"/>
         <source>Form</source>
         <translation>Form</translation>
     </message>
     <message>
-        <location line="+305"/>
+        <location line="+286"/>
         <location filename="../forms/ui_overviewpage.h" line="+26"/>
         <source>Available:</source>
         <translation>Available:</translation>
@@ -4165,16 +4436,16 @@ https://www.transifex.com/luxcore/luxcore</source>
     <message>
         <location line="+10"/>
         <location line="+1030"/>
-        <location line="+100"/>
+        <location line="+146"/>
         <location filename="../forms/ui_overviewpage.h" line="+2"/>
         <location line="+56"/>
-        <location line="+4"/>
+        <location line="+5"/>
         <source>The displayed information may be out of date. Your wallet automatically synchronizes with the LUX network after a connection is established, but this process has not completed yet.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-1085"/>
-        <location filename="../forms/ui_overviewpage.h" line="-57"/>
+        <location line="-1131"/>
+        <location filename="../forms/ui_overviewpage.h" line="-58"/>
         <source>Unconfirmed transactions to watch-only addresses</source>
         <translation>Unconfirmed transactions to watch-only addresses</translation>
     </message>
@@ -4227,13 +4498,13 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation>Status:</translation>
     </message>
     <message>
-        <location line="+840"/>
-        <location filename="../forms/ui_overviewpage.h" line="+30"/>
+        <location line="+886"/>
+        <location filename="../forms/ui_overviewpage.h" line="+31"/>
         <source>LSR Tokens</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+64"/>
+        <location line="+78"/>
         <location filename="../forms/ui_overviewpage.h" line="+2"/>
         <source>Go to token page</source>
         <translation type="unfinished"></translation>
@@ -4245,8 +4516,8 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-834"/>
-        <location filename="../forms/ui_overviewpage.h" line="-29"/>
+        <location line="-894"/>
+        <location filename="../forms/ui_overviewpage.h" line="-30"/>
         <source>0 LUX / 0 Rounds</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4257,7 +4528,7 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation>Enabled/Disabled</translation>
     </message>
     <message>
-        <location filename="../overviewpage.cpp" line="+645"/>
+        <location filename="../overviewpage.cpp" line="+663"/>
         <location line="+13"/>
         <location line="+10"/>
         <location line="+12"/>
@@ -4313,14 +4584,14 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+97"/>
-        <location filename="../forms/ui_overviewpage.h" line="+4"/>
+        <location line="+143"/>
+        <location filename="../forms/ui_overviewpage.h" line="+5"/>
         <source>Recent transactions</source>
         <translation>Recent transactions</translation>
     </message>
     <message>
-        <location line="-204"/>
-        <location filename="../forms/ui_overviewpage.h" line="-14"/>
+        <location line="-250"/>
+        <location filename="../forms/ui_overviewpage.h" line="-15"/>
         <source>Start/Stop Mixing</source>
         <translation>Start/Stop Mixing</translation>
     </message>
@@ -4349,7 +4620,7 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation>Reset</translation>
     </message>
     <message>
-        <location filename="../overviewpage.cpp" line="-459"/>
+        <location filename="../overviewpage.cpp" line="-465"/>
         <location line="+1"/>
         <location line="+1"/>
         <source>out of sync</source>
@@ -4360,7 +4631,7 @@ https://www.transifex.com/luxcore/luxcore</source>
         <location line="+1"/>
         <location line="+1"/>
         <location line="+4"/>
-        <location line="+330"/>
+        <location line="+336"/>
         <source>Disabled</source>
         <translation>Disabled</translation>
     </message>
@@ -4434,15 +4705,15 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation>Found enough compatible inputs to anonymize %1</translation>
     </message>
     <message>
-        <location line="-235"/>
-        <location line="+331"/>
+        <location line="-241"/>
+        <location line="+337"/>
         <location line="+126"/>
         <source>Start Luxsend</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-454"/>
-        <location line="+457"/>
+        <location line="-460"/>
+        <location line="+463"/>
         <source>Stop Luxsend</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4452,8 +4723,8 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation>Mixed</translation>
     </message>
     <message>
-        <location line="-287"/>
-        <location line="+341"/>
+        <location line="-293"/>
+        <location line="+347"/>
         <source>Enabled</source>
         <translation>Enabled</translation>
     </message>
@@ -4644,6 +4915,21 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
 </context>
 <context>
+    <name>ProgressDialog</name>
+    <message>
+        <location filename="../../lux-installer/src/forms/progressdialog.ui" line="+17"/>
+        <location filename="../../lux-installer/src/forms/ui_progressdialog.h" line="+71"/>
+        <source>Check for Updates</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+9"/>
+        <location filename="../../lux-installer/src/forms/ui_progressdialog.h" line="+1"/>
+        <source>Checking for updates…</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QObject</name>
     <message>
         <location filename="../bitcoinunits.cpp" line="+360"/>
@@ -4781,6 +5067,11 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../modaloverlay.cpp" line="-31"/>
+        <source>unknown</source>
+        <translation type="unfinished">unknown</translation>
+    </message>
+    <message>
         <location filename="../lux.cpp" line="+114"/>
         <location line="+7"/>
         <location line="+13"/>
@@ -4813,11 +5104,6 @@ https://www.transifex.com/luxcore/luxcore</source>
         <source>Luxcore didn&apos;t yet exit safely...</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <location filename="../modaloverlay.cpp" line="-31"/>
-        <source>unknown</source>
-        <translation type="unfinished">unknown</translation>
-    </message>
 </context>
 <context>
     <name>QPlatformTheme</name>
@@ -4834,6 +5120,11 @@ https://www.transifex.com/luxcore/luxcore</source>
     <message>
         <location line="+1"/>
         <source>Apply</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>&amp;Save</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4873,6 +5164,163 @@ https://www.transifex.com/luxcore/luxcore</source>
         <location line="+0"/>
         <source>PNG Image (*.png)</source>
         <translation>PNG Image (*.png)</translation>
+    </message>
+</context>
+<context>
+    <name>QtLuxUpdater::AtomFeeder</name>
+    <message>
+        <location filename="../../lux-installer/src/luxupdater/atomfeeder.cpp" line="+57"/>
+        <source>Check for Updates</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Cannot connect to server. Please check your network connection!</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QtLuxUpdater::ProgressDialog</name>
+    <message>
+        <location filename="../../lux-installer/src/progressdialog.cpp" line="+39"/>
+        <source>Canceling update check…</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QtLuxUpdater::UpdateController</name>
+    <message>
+        <location filename="../../lux-installer/src/updatecontroller.cpp" line="+46"/>
+        <location line="+93"/>
+        <location line="+12"/>
+        <location line="+12"/>
+        <location line="+76"/>
+        <location line="+53"/>
+        <location line="+4"/>
+        <source>Check for Updates</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-247"/>
+        <source>Checks if new updates are available. You will be prompted before updates are installed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+91"/>
+        <location line="+24"/>
+        <source>The program is already checking for updates!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-12"/>
+        <source>Do you want to check for updates now?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+88"/>
+        <source>Checking for updates was canceled!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+35"/>
+        <source>Install Updates</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>New updates are available. The maintenance tool will be started to install those as soon as you close the application!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+17"/>
+        <source>No new updates available!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>The update process failed!</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QtLuxUpdater::UpdateInfoDialog</name>
+    <message>
+        <location filename="../../lux-installer/src/updateinfodialog.cpp" line="+33"/>
+        <location line="+21"/>
+        <source>Updates for %1 are available!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-2"/>
+        <source>Check for Updates</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>There are new updates available! You can install them now or later.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>%1 v%2 — %3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <source>Run with &amp;elevated rights</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Install Now</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <location line="+53"/>
+        <source>Install On Exit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-52"/>
+        <source>Install later</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+23"/>
+        <location line="+48"/>
+        <source>%L1 Bytes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-29"/>
+        <source>Install Now?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Close the application and install updates?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>Updates will be installed on exit. The maintenance tool will be started as soon as you close the application!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+20"/>
+        <source>%L1 KiB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>%L1 MiB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>%L1 GiB</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5008,10 +5456,6 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation>Using OpenSSL version</translation>
     </message>
     <message>
-        <source>Build date</source>
-        <translation type="vanished">Build date</translation>
-    </message>
-    <message>
         <location line="+140"/>
         <location filename="../forms/ui_rpcconsole.h" line="+11"/>
         <source>Current number of blocks</source>
@@ -5134,9 +5578,8 @@ https://www.transifex.com/luxcore/luxcore</source>
     <message>
         <location line="+65"/>
         <location filename="../forms/ui_rpcconsole.h" line="+1"/>
-        <location filename="../rpcconsole.cpp" line="+468"/>
-        <location line="+619"/>
-        <location line="+175"/>
+        <location filename="../rpcconsole.cpp" line="+467"/>
+        <location line="+816"/>
         <source>Select a peer to view detailed information.</source>
         <translation>Select a peer to view detailed information.</translation>
     </message>
@@ -5339,7 +5782,7 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../rpcconsole.cpp" line="-409"/>
+        <location filename="../rpcconsole.cpp" line="-425"/>
         <source>In:</source>
         <translation>In:</translation>
     </message>
@@ -5354,7 +5797,7 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-353"/>
+        <location line="-359"/>
         <source>Wallet in use: </source>
         <translation type="unfinished"></translation>
     </message>
@@ -5392,12 +5835,12 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+46"/>
+        <location line="+48"/>
         <source>&amp;Unban Node</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+188"/>
+        <location line="+192"/>
         <source>Use up and down arrows to navigate history, and &lt;b&gt;Ctrl-L&lt;/b&gt; to clear screen.</source>
         <translation>Use up and down arrows to navigate history, and &lt;b&gt;Ctrl-L&lt;/b&gt; to clear screen.</translation>
     </message>
@@ -5442,7 +5885,7 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation>%1 GB</translation>
     </message>
     <message>
-        <location line="+125"/>
+        <location line="+141"/>
         <source>(node id: %1)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5483,21 +5926,9 @@ https://www.transifex.com/luxcore/luxcore</source>
         <source>Unknown</source>
         <translation>Unknown</translation>
     </message>
-    <message>
-        <source>Fetching...</source>
-        <translation type="vanished">Fetching...</translation>
-    </message>
 </context>
 <context>
     <name>ReceiveCoinsDialog</name>
-    <message>
-        <source>Reuse one of the previously used receiving addresses.&lt;br&gt;Reusing addresses has security and privacy issues.&lt;br&gt;Do not use this unless re-generating a payment request made before.</source>
-        <translation type="vanished">Reuse one of the previously used receiving addresses.&lt;br&gt;Reusing addresses has security and privacy issues.&lt;br&gt;Do not use this unless re-generating a payment request made before.</translation>
-    </message>
-    <message>
-        <source>R&amp;euse an existing receiving address (not recommended)</source>
-        <translation type="vanished">R&amp;euse an existing receiving address (not recommended)</translation>
-    </message>
     <message>
         <location filename="../forms/receivecoinsdialog.ui" line="+53"/>
         <location filename="../forms/ui_receivecoinsdialog.h" line="+278"/>
@@ -5705,15 +6136,20 @@ https://www.transifex.com/luxcore/luxcore</source>
     <name>ReceiveTokenPage</name>
     <message>
         <location filename="../forms/receivetokenpage.ui" line="+17"/>
-        <location filename="../forms/ui_receivetokenpage.h" line="+100"/>
+        <location filename="../forms/ui_receivetokenpage.h" line="+135"/>
         <source>Form</source>
         <translation type="unfinished">Form</translation>
     </message>
     <message>
-        <location line="+85"/>
-        <location filename="../forms/ui_receivetokenpage.h" line="+2"/>
+        <location line="+137"/>
+        <location filename="../forms/ui_receivetokenpage.h" line="+3"/>
         <source>Copy Address</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../receivetokenpage.cpp" line="+28"/>
+        <source>Address</source>
+        <translation type="unfinished">Address</translation>
     </message>
 </context>
 <context>
@@ -6036,10 +6472,6 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation>(Smart fee not initialized yet. This usually takes a few blocks...)</translation>
     </message>
     <message>
-        <source>Confirmation time:</source>
-        <translation type="vanished">Confirmation time:</translation>
-    </message>
-    <message>
         <location line="-340"/>
         <location filename="../forms/ui_sendcoinsdialog.h" line="-25"/>
         <source>If the custom fee is set to 1000 uLUXs and the transaction is only 250 bytes, then &quot;per kilobyte&quot; only pays 250 uLUXs in fee,&lt;br /&gt;while &quot;at least&quot; pays 1000 uLUXs. For transactions bigger than a kilobyte both pay by kilobyte.</source>
@@ -6333,14 +6765,6 @@ https://www.transifex.com/luxcore/luxcore</source>
         <location line="+3"/>
         <source>Transaction creation failed!</source>
         <translation>Transaction creation failed!</translation>
-    </message>
-    <message>
-        <source>The transaction was rejected! This might happen if some of the coins in your wallet were already spent, such as if you used a copy of wallet.dat and coins were spent in the copy but not marked as spent here.</source>
-        <translation type="vanished">The transaction was rejected! This might happen if some of the coins in your wallet were already spent, such as if you used a copy of wallet.dat and coins were spent in the copy but not marked as spent here.</translation>
-    </message>
-    <message>
-        <source>Error: The wallet was unlocked only to anonymize coins.</source>
-        <translation type="vanished">Error: The wallet was unlocked only to anonymize coins.</translation>
     </message>
     <message>
         <location line="+118"/>
@@ -6789,13 +7213,13 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <location line="+13"/>
-        <location filename="../forms/ui_signverifymessagedialog.h" line="+32"/>
+        <location filename="../forms/ui_signverifymessagedialog.h" line="+36"/>
         <source>&amp;Sign Message</source>
         <translation>&amp;Sign Message</translation>
     </message>
     <message>
         <location line="+6"/>
-        <location filename="../forms/ui_signverifymessagedialog.h" line="-31"/>
+        <location filename="../forms/ui_signverifymessagedialog.h" line="-35"/>
         <source>You can sign messages with your addresses to prove you own them. Be careful not to sign anything vague, as phishing attacks may try to trick you into signing your identity over to them. Only sign fully-detailed statements you agree to.</source>
         <translation>You can sign messages with your addresses to prove you own them. Be careful not to sign anything vague, as phishing attacks may try to trick you into signing your identity over to them. Only sign fully-detailed statements you agree to.</translation>
     </message>
@@ -6809,33 +7233,33 @@ https://www.transifex.com/luxcore/luxcore</source>
         <location line="+7"/>
         <location line="+210"/>
         <location filename="../forms/ui_signverifymessagedialog.h" line="+3"/>
-        <location line="+32"/>
+        <location line="+36"/>
         <source>Choose previously used address</source>
         <translation>Choose previously used address</translation>
     </message>
     <message>
         <location line="-200"/>
         <location line="+210"/>
-        <location filename="../forms/ui_signverifymessagedialog.h" line="-29"/>
-        <location line="+32"/>
+        <location filename="../forms/ui_signverifymessagedialog.h" line="-32"/>
+        <location line="+36"/>
         <source>Alt+A</source>
         <translation>Alt+A</translation>
     </message>
     <message>
         <location line="-200"/>
-        <location filename="../forms/ui_signverifymessagedialog.h" line="-30"/>
+        <location filename="../forms/ui_signverifymessagedialog.h" line="-33"/>
         <source>Paste address from clipboard</source>
         <translation>Paste address from clipboard</translation>
     </message>
     <message>
         <location line="+10"/>
-        <location filename="../forms/ui_signverifymessagedialog.h" line="+3"/>
+        <location filename="../forms/ui_signverifymessagedialog.h" line="+4"/>
         <source>Alt+P</source>
         <translation>Alt+P</translation>
     </message>
     <message>
         <location line="+12"/>
-        <location filename="../forms/ui_signverifymessagedialog.h" line="+2"/>
+        <location filename="../forms/ui_signverifymessagedialog.h" line="+3"/>
         <source>Enter the message you want to sign here</source>
         <translation>Enter the message you want to sign here</translation>
     </message>
@@ -6865,13 +7289,13 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <location line="+37"/>
-        <location filename="../forms/ui_signverifymessagedialog.h" line="+8"/>
+        <location filename="../forms/ui_signverifymessagedialog.h" line="+10"/>
         <source>Verify the message to ensure it was signed with the specified LUX address</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-140"/>
-        <location filename="../forms/ui_signverifymessagedialog.h" line="-17"/>
+        <location filename="../forms/ui_signverifymessagedialog.h" line="-19"/>
         <source>Sign &amp;Message</source>
         <translation>Sign &amp;Message</translation>
     </message>
@@ -6885,7 +7309,7 @@ https://www.transifex.com/luxcore/luxcore</source>
         <location line="+3"/>
         <location line="+143"/>
         <location filename="../forms/ui_signverifymessagedialog.h" line="+2"/>
-        <location line="+19"/>
+        <location line="+21"/>
         <source>Clear &amp;All</source>
         <translation>Clear &amp;All</translation>
     </message>
@@ -6897,13 +7321,13 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <location line="+6"/>
-        <location filename="../forms/ui_signverifymessagedialog.h" line="-18"/>
+        <location filename="../forms/ui_signverifymessagedialog.h" line="-20"/>
         <source>Enter the signing address, message (ensure you copy line breaks, spaces, tabs, etc. exactly) and signature below to verify the message. Be careful not to read more into the signature than what is in the signed message itself, to avoid being tricked by a man-in-the-middle attack.</source>
         <translation>Enter the signing address, message (ensure you copy line breaks, spaces, tabs, etc. exactly) and signature below to verify the message. Be careful not to read more into the signature than what is in the signed message itself, to avoid being tricked by a man-in-the-middle attack.</translation>
     </message>
     <message>
         <location line="+61"/>
-        <location filename="../forms/ui_signverifymessagedialog.h" line="+12"/>
+        <location filename="../forms/ui_signverifymessagedialog.h" line="+14"/>
         <source>Verify &amp;Message</source>
         <translation>Verify &amp;Message</translation>
     </message>
@@ -6997,7 +7421,7 @@ https://www.transifex.com/luxcore/luxcore</source>
 <context>
     <name>SmartContractPage</name>
     <message>
-        <location filename="../smartcontractpage.cpp" line="+129"/>
+        <location filename="../smartcontractpage.cpp" line="+126"/>
         <location line="+1"/>
         <location line="+1"/>
         <source>out of sync</source>
@@ -7681,26 +8105,6 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation>Open until %1</translation>
     </message>
     <message>
-        <source>conflicted</source>
-        <translation type="vanished">conflicted</translation>
-    </message>
-    <message>
-        <source>%1/offline (verified via instantx)</source>
-        <translation type="vanished">%1/offline (verified via instantx)</translation>
-    </message>
-    <message>
-        <source>%1/confirmed (verified via instantx)</source>
-        <translation type="vanished">%1/confirmed (verified via instantx)</translation>
-    </message>
-    <message>
-        <source>%1 confirmations (verified via instantx)</source>
-        <translation type="vanished">%1 confirmations (verified via instantx)</translation>
-    </message>
-    <message>
-        <source>%1/offline</source>
-        <translation type="vanished">%1/offline</translation>
-    </message>
-    <message>
         <location line="+8"/>
         <source>%1/unconfirmed</source>
         <translation>%1/unconfirmed</translation>
@@ -7709,26 +8113,6 @@ https://www.transifex.com/luxcore/luxcore</source>
         <location line="+2"/>
         <source>%1 confirmations</source>
         <translation>%1 confirmations</translation>
-    </message>
-    <message>
-        <source>%1/offline (InstanTX verification in progress - %2 of %3 signatures)</source>
-        <translation type="vanished">%1/offline (InstanTX verification in progress - %2 of %3 signatures)</translation>
-    </message>
-    <message>
-        <source>%1/confirmed (InstanTX verification in progress - %2 of %3 signatures )</source>
-        <translation type="vanished">%1/confirmed (InstanTX verification in progress - %2 of %3 signatures )</translation>
-    </message>
-    <message>
-        <source>%1 confirmations (InstanTX verification in progress - %2 of %3 signatures)</source>
-        <translation type="vanished">%1 confirmations (InstanTX verification in progress - %2 of %3 signatures)</translation>
-    </message>
-    <message>
-        <source>%1/offline (InstanTX verification failed)</source>
-        <translation type="vanished">%1/offline (InstanTX verification failed)</translation>
-    </message>
-    <message>
-        <source>%1/confirmed (InstanTX verification failed)</source>
-        <translation type="vanished">%1/confirmed (InstanTX verification failed)</translation>
     </message>
     <message>
         <location line="+18"/>
@@ -7770,10 +8154,6 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation>From</translation>
     </message>
     <message>
-        <source>unknown</source>
-        <translation type="vanished">unknown</translation>
-    </message>
-    <message>
         <location line="-121"/>
         <source>conflicted with a transaction with %1 confirmations</source>
         <translation type="unfinished"></translation>
@@ -7795,32 +8175,32 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <location line="+40"/>
-        <location line="+105"/>
         <source>Smart contract</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-94"/>
+        <location line="+11"/>
         <location line="+19"/>
-        <location line="+64"/>
+        <location line="+69"/>
+        <location line="+5"/>
         <source>To</source>
         <translation>To</translation>
     </message>
     <message>
-        <location line="-81"/>
-        <location line="+86"/>
+        <location line="-91"/>
+        <location line="+96"/>
         <source>own address</source>
         <translation>own address</translation>
     </message>
     <message>
-        <location line="-86"/>
+        <location line="-96"/>
         <location line="+66"/>
-        <location line="+22"/>
+        <location line="+32"/>
         <source>watch-only</source>
         <translation>watch-only</translation>
     </message>
     <message>
-        <location line="-86"/>
+        <location line="-96"/>
         <source>label</source>
         <translation>label</translation>
     </message>
@@ -7828,14 +8208,14 @@ https://www.transifex.com/luxcore/luxcore</source>
         <location line="+30"/>
         <location line="+9"/>
         <location line="+9"/>
-        <location line="+52"/>
+        <location line="+61"/>
         <location line="+24"/>
         <location line="+56"/>
         <source>Credit</source>
         <translation>Credit</translation>
     </message>
     <message numerus="yes">
-        <location line="-148"/>
+        <location line="-157"/>
         <location line="+10"/>
         <source>matures in %n more block(s)</source>
         <translation>
@@ -7859,7 +8239,13 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+56"/>
+        <location line="+42"/>
+        <location line="+17"/>
+        <source>SC Address (Hash160)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+6"/>
         <location line="+22"/>
         <location line="+57"/>
         <source>Debit</source>
@@ -7956,10 +8342,6 @@ https://www.transifex.com/luxcore/luxcore</source>
 </context>
 <context>
     <name>TransactionDescDialog</name>
-    <message>
-        <source>Transaction details</source>
-        <translation type="vanished">Transaction details</translation>
-    </message>
     <message>
         <location filename="../forms/transactiondescdialog.ui" line="+20"/>
         <location filename="../forms/ui_transactiondescdialog.h" line="+63"/>
@@ -8083,7 +8465,22 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-14"/>
+        <location line="+4"/>
+        <source>SC created</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>SC sent</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>SC refunded</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-24"/>
         <source>Sent to</source>
         <translation>Sent to</translation>
     </message>
@@ -8113,17 +8510,7 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation>Darksend</translation>
     </message>
     <message>
-        <location line="+3"/>
-        <source>Smart contract</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>SC refund</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+33"/>
+        <location line="+42"/>
         <source>watch-only</source>
         <translation>watch-only</translation>
     </message>
@@ -8410,9 +8797,96 @@ https://www.transifex.com/luxcore/luxcore</source>
 <context>
     <name>UnitDisplayStatusBarControl</name>
     <message>
-        <location filename="../bitcoingui.cpp" line="+111"/>
+        <location filename="../bitcoingui.cpp" line="+118"/>
         <source>Unit to show amounts in. Click to select another unit.</source>
         <translation>Unit to show amounts in. Click to select another unit.</translation>
+    </message>
+</context>
+<context>
+    <name>UpdateInfoDialog</name>
+    <message>
+        <location filename="../../lux-installer/src/forms/updateinfodialog.ui" line="+17"/>
+        <location filename="../../lux-installer/src/forms/ui_updateinfodialog.h" line="+176"/>
+        <source>Check for Updates</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+35"/>
+        <location filename="../../lux-installer/src/forms/ui_updateinfodialog.h" line="+1"/>
+        <source>There are new updates available! You can install them now or automatically, when you exit the application. If you don&apos;t want to install updates right know, you can install them later.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+16"/>
+        <location filename="../../lux-installer/src/forms/ui_updateinfodialog.h" line="+1"/>
+        <source>Updates:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+34"/>
+        <location filename="../../lux-installer/src/forms/ui_updateinfodialog.h" line="+4"/>
+        <source>Component Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <location filename="../../lux-installer/src/forms/ui_updateinfodialog.h" line="-1"/>
+        <source>Version</source>
+        <translation type="unfinished">Version</translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <location filename="../../lux-installer/src/forms/ui_updateinfodialog.h" line="-1"/>
+        <source>Update Size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+15"/>
+        <location filename="../../lux-installer/src/forms/ui_updateinfodialog.h" line="+3"/>
+        <source>https://github.com/LUX-Core/lux/releases</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+23"/>
+        <location filename="../../lux-installer/src/forms/ui_updateinfodialog.h" line="+1"/>
+        <source>Run with &amp;elevated rights</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <location filename="../../lux-installer/src/forms/ui_updateinfodialog.h" line="+2"/>
+        <source>Close and do nothing. You can install updates later.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <location filename="../../lux-installer/src/forms/ui_updateinfodialog.h" line="+2"/>
+        <source>Install later</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+23"/>
+        <location filename="../../lux-installer/src/forms/ui_updateinfodialog.h" line="+2"/>
+        <source>You proceed using the application, and as soon as you close it, the updater will start automatically to install the updates.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <location filename="../../lux-installer/src/forms/ui_updateinfodialog.h" line="+2"/>
+        <source>Install On Exit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <location filename="../../lux-installer/src/forms/ui_updateinfodialog.h" line="+2"/>
+        <source>Closes the application and opens the installer to update the app.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <location filename="../../lux-installer/src/forms/ui_updateinfodialog.h" line="+2"/>
+        <source>Install Now</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8457,7 +8931,7 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation>Selected amount:</translation>
     </message>
     <message>
-        <location line="+302"/>
+        <location line="+311"/>
         <source>Backup Wallet</source>
         <translation>Backup Wallet</translation>
     </message>
@@ -8503,10 +8977,6 @@ https://www.transifex.com/luxcore/luxcore</source>
         <location line="+3"/>
         <source>Allow JSON-RPC connections from specified source. Valid for &lt;ip&gt; are a single IP (e.g. 1.2.3.4), a network/netmask (e.g. 1.2.3.4/255.255.255.0) or a network/CIDR (e.g. 1.2.3.4/24). This option can be specified multiple times</source>
         <translation type="unfinished">Allow JSON-RPC connections from specified source. Valid for &lt;ip&gt; are a single IP (e.g. 1.2.3.4), a network/netmask (e.g. 1.2.3.4/255.255.255.0) or a network/CIDR (e.g. 1.2.3.4/24). This option can be specified multiple times</translation>
-    </message>
-    <message>
-        <source>An error occurred while setting up the RPC address %s port %u for listening: %s</source>
-        <translation type="obsolete">An error occurred while setting up the RPC address %s port %u for listening: %s</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -8669,7 +9139,7 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+9"/>
         <source>Query for peer addresses via DNS lookup, if low on addresses (default: 1 unless -connect)</source>
         <translation type="unfinished">Query for peer addresses via DNS lookup, if low on addresses (default: 1 unless -connect)</translation>
     </message>
@@ -8689,10 +9159,6 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation type="unfinished">Set maximum size of high-priority/low-fee transactions in bytes (default: %d)</translation>
     </message>
     <message>
-        <source>Set the number of script verification threads (%u to %d, 0 = auto, &lt;0 = leave that many cores free, default: %d)</source>
-        <translation type="obsolete">Set the number of script verification threads (%u to %d, 0 = auto, &lt;0 = leave that many cores free, default: %d)</translation>
-    </message>
-    <message>
         <location line="+5"/>
         <source>Set the number of threads for coin generation if enabled (-1 = all cores, default: %d)</source>
         <translation type="unfinished">Set the number of threads for coin generation if enabled (-1 = all cores, default: %d)</translation>
@@ -8701,10 +9167,6 @@ https://www.transifex.com/luxcore/luxcore</source>
         <location line="+3"/>
         <source>Show N confirmations for a successfully locked transaction (0-9999, default: %u)</source>
         <translation type="unfinished">Show N confirmations for a successfully locked transaction (0-9999, default: %u)</translation>
-    </message>
-    <message>
-        <source>InstanTX requires inputs with at least 6 confirmations, you might need to wait a few minutes and try again.</source>
-        <translation type="obsolete">InstanTX requires inputs with at least 6 confirmations, you might need to wait a few minutes and try again.</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -8782,10 +9244,6 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation type="unfinished">You must specify a masternodeprivkey in the configuration. Please see documentation for help.</translation>
     </message>
     <message>
-        <source>(51472 could be used only on mainnet)</source>
-        <translation type="obsolete">(51472 could be used only on mainnet)</translation>
-    </message>
-    <message>
         <location line="+9"/>
         <source>(default: %s)</source>
         <translation type="unfinished">(default: %s)</translation>
@@ -8794,12 +9252,6 @@ https://www.transifex.com/luxcore/luxcore</source>
         <location line="+3"/>
         <source>(default: 1)</source>
         <translation type="unfinished">(default: 1)</translation>
-    </message>
-    <message>
-        <source>&lt;category&gt; can be:
-</source>
-        <translation type="obsolete">&lt;category&gt; can be:
-</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -8855,14 +9307,6 @@ https://www.transifex.com/luxcore/luxcore</source>
         <location line="+1"/>
         <source>Can&apos;t denominate: no compatible inputs left.</source>
         <translation type="unfinished">Can&apos;t denominate: no compatible inputs left.</translation>
-    </message>
-    <message>
-        <source>Can&apos;t find random Masternode.</source>
-        <translation type="obsolete">Can&apos;t find random Masternode.</translation>
-    </message>
-    <message>
-        <source>Can&apos;t mix while sync in progress.</source>
-        <translation type="obsolete">Can&apos;t mix while sync in progress.</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -8930,14 +9374,6 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation type="unfinished">Corrupted block database detected</translation>
     </message>
     <message>
-        <source>Could not parse -rpcbind value %s as network address</source>
-        <translation type="obsolete">Could not parse -rpcbind value %s as network address</translation>
-    </message>
-    <message>
-        <source>Could not parse masternode.conf</source>
-        <translation type="obsolete">Could not parse masternode.conf</translation>
-    </message>
-    <message>
         <location line="+3"/>
         <source>Debugging/Testing options:</source>
         <translation type="unfinished">Debugging/Testing options:</translation>
@@ -8976,10 +9412,6 @@ https://www.transifex.com/luxcore/luxcore</source>
         <location line="+1"/>
         <source>Entries are full.</source>
         <translation type="unfinished">Entries are full.</translation>
-    </message>
-    <message>
-        <source>Error connecting to Masternode.</source>
-        <translation type="obsolete">Error connecting to Masternode.</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -9037,10 +9469,6 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation type="unfinished">Error: A fatal internal error occured, see debug.log for details</translation>
     </message>
     <message>
-        <source>Error: Can&apos;t select current denominated inputs</source>
-        <translation type="obsolete">Error: Can&apos;t select current denominated inputs</translation>
-    </message>
-    <message>
         <location line="+2"/>
         <source>Error: Disk space is low!</source>
         <translation type="unfinished">Error: Disk space is low!</translation>
@@ -9066,17 +9494,9 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation type="unfinished">Failed to listen on any port. Use -listen=0 if you want this.</translation>
     </message>
     <message>
-        <source>Failed to read block</source>
-        <translation type="obsolete">Failed to read block</translation>
-    </message>
-    <message>
         <location line="+1"/>
         <source>Fee (in LUX/kB) to add to transactions you send (default: %s)</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Finalizing transaction.</source>
-        <translation type="obsolete">Finalizing transaction.</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -9084,15 +9504,7 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation type="unfinished">Force safe mode (default: %u)</translation>
     </message>
     <message>
-        <source>Found enough users, signing ( waiting %s )</source>
-        <translation type="obsolete">Found enough users, signing ( waiting %s )</translation>
-    </message>
-    <message>
-        <source>Found enough users, signing ...</source>
-        <translation type="obsolete">Found enough users, signing ...</translation>
-    </message>
-    <message>
-        <location line="-303"/>
+        <location line="-306"/>
         <source> or address book entries might be missing or incorrect</source>
         <translation type="unfinished"></translation>
     </message>
@@ -9152,7 +9564,12 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+2"/>
+        <source>Prune: last wallet synchronisation goes beyond pruned data. You need to -reindex (download the whole blockchain again in case of pruned node)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+6"/>
         <source>Reduce storage requirements by pruning (deleting) old blocks. This mode disables wallet support and is incompatible with -txindex.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -9467,10 +9884,6 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Invalid port detected in masternode.conf</source>
-        <translation type="obsolete">Invalid port detected in masternode.conf</translation>
-    </message>
-    <message>
         <location line="-126"/>
         <source>Invalid private key.</source>
         <translation type="unfinished">Invalid private key.</translation>
@@ -9506,10 +9919,6 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation type="unfinished">Limit size of signature cache to &lt;n&gt; entries (default: %u)</translation>
     </message>
     <message>
-        <source>Line: %d</source>
-        <translation type="obsolete">Line: %d</translation>
-    </message>
-    <message>
         <location line="+1"/>
         <source>Listen for JSON-RPC connections on &lt;port&gt; (default: %u or testnet: %u)</source>
         <translation type="unfinished">Listen for JSON-RPC connections on &lt;port&gt; (default: %u or testnet: %u)</translation>
@@ -9530,18 +9939,6 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation type="unfinished">Loading block index...</translation>
     </message>
     <message>
-        <source>Loading budget cache...</source>
-        <translation type="obsolete">Loading budget cache...</translation>
-    </message>
-    <message>
-        <source>Loading masternode cache...</source>
-        <translation type="obsolete">Loading masternode cache...</translation>
-    </message>
-    <message>
-        <source>Loading masternode payment cache...</source>
-        <translation type="obsolete">Loading masternode payment cache...</translation>
-    </message>
-    <message>
         <location line="+1"/>
         <source>Loading wallet... (%3.2f %%)</source>
         <translation type="unfinished">Loading wallet... (%3.2f %%)</translation>
@@ -9550,10 +9947,6 @@ https://www.transifex.com/luxcore/luxcore</source>
         <location line="+1"/>
         <source>Loading wallet...</source>
         <translation type="unfinished">Loading wallet...</translation>
-    </message>
-    <message>
-        <source>Lock is already in place.</source>
-        <translation type="obsolete">Lock is already in place.</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -9606,21 +9999,9 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation type="unfinished">Missing input transaction information.</translation>
     </message>
     <message>
-        <source>Mixing in progress...</source>
-        <translation type="obsolete">Mixing in progress...</translation>
-    </message>
-    <message>
         <location line="+2"/>
         <source>Need to specify a port with -whitebind: &apos;%s&apos;</source>
         <translation type="unfinished">Need to specify a port with -whitebind: &apos;%s&apos;</translation>
-    </message>
-    <message>
-        <source>No Masternodes detected.</source>
-        <translation type="obsolete">No Masternodes detected.</translation>
-    </message>
-    <message>
-        <source>No compatible Masternode found.</source>
-        <translation type="obsolete">No compatible Masternode found.</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -9656,10 +10037,6 @@ https://www.transifex.com/luxcore/luxcore</source>
         <location line="+1"/>
         <source>Not enough file descriptors available.</source>
         <translation type="unfinished">Not enough file descriptors available.</translation>
-    </message>
-    <message>
-        <source>Not in the Masternode list.</source>
-        <translation type="obsolete">Not in the Masternode list.</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -9802,10 +10179,6 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation type="unfinished">Session not complete!</translation>
     </message>
     <message>
-        <source>Session timed out.</source>
-        <translation type="obsolete">Session timed out.</translation>
-    </message>
-    <message>
         <location line="+2"/>
         <source>Set database cache size in megabytes (%d to %d, default: %d)</source>
         <translation type="unfinished">Set database cache size in megabytes (%d to %d, default: %d)</translation>
@@ -9866,10 +10239,6 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation type="unfinished">Signing failed.</translation>
     </message>
     <message>
-        <source>Signing timed out.</source>
-        <translation type="obsolete">Signing timed out.</translation>
-    </message>
-    <message>
         <location line="+2"/>
         <source>Signing transaction failed</source>
         <translation type="unfinished">Signing transaction failed</translation>
@@ -9925,49 +10294,9 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation type="unfinished">Stop running after importing blocks from disk (default: %u)</translation>
     </message>
     <message>
-        <source>Submitted following entries to masternode: %u / %d</source>
-        <translation type="obsolete">Submitted following entries to masternode: %u / %d</translation>
-    </message>
-    <message>
-        <source>Submitted to masternode, waiting for more entries ( %u / %d ) %s</source>
-        <translation type="obsolete">Submitted to masternode, waiting for more entries ( %u / %d ) %s</translation>
-    </message>
-    <message>
-        <source>Submitted to masternode, waiting in queue %s</source>
-        <translation type="obsolete">Submitted to masternode, waiting in queue %s</translation>
-    </message>
-    <message>
         <location line="-98"/>
         <source>InstanTX options:</source>
         <translation type="unfinished">InstanTX options:</translation>
-    </message>
-    <message>
-        <source>Synchronization failed</source>
-        <translation type="obsolete">Synchronization failed</translation>
-    </message>
-    <message>
-        <source>Synchronization finished</source>
-        <translation type="obsolete">Synchronization finished</translation>
-    </message>
-    <message>
-        <source>Synchronization pending...</source>
-        <translation type="obsolete">Synchronization pending...</translation>
-    </message>
-    <message>
-        <source>Synchronizing budgets...</source>
-        <translation type="obsolete">Synchronizing budgets...</translation>
-    </message>
-    <message>
-        <source>Synchronizing masternode winners...</source>
-        <translation type="obsolete">Synchronizing masternode winners...</translation>
-    </message>
-    <message>
-        <source>Synchronizing masternodes...</source>
-        <translation type="obsolete">Synchronizing masternodes...</translation>
-    </message>
-    <message>
-        <source>Synchronizing sporks...</source>
-        <translation type="obsolete">Synchronizing sporks...</translation>
     </message>
     <message>
         <location line="+99"/>
@@ -9983,10 +10312,6 @@ https://www.transifex.com/luxcore/luxcore</source>
         <location line="+1"/>
         <source>This is intended for regression testing tools and app development.</source>
         <translation type="unfinished">This is intended for regression testing tools and app development.</translation>
-    </message>
-    <message>
-        <source>This is not a Masternode.</source>
-        <translation type="obsolete">This is not a Masternode.</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -10017,18 +10342,6 @@ https://www.transifex.com/luxcore/luxcore</source>
         <location line="+1"/>
         <source>Transaction not valid.</source>
         <translation type="unfinished">Transaction not valid.</translation>
-    </message>
-    <message>
-        <source>Transaction too large for fee policy</source>
-        <translation type="obsolete">Transaction too large for fee policy</translation>
-    </message>
-    <message>
-        <source>Transaction too large</source>
-        <translation type="obsolete">Transaction too large</translation>
-    </message>
-    <message>
-        <source>Transmitting final transaction.</source>
-        <translation type="obsolete">Transmitting final transaction.</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -10069,10 +10382,6 @@ https://www.transifex.com/luxcore/luxcore</source>
         <location line="+1"/>
         <source>Unknown network specified in -onlynet: &apos;%s&apos;</source>
         <translation type="unfinished">Unknown network specified in -onlynet: &apos;%s&apos;</translation>
-    </message>
-    <message>
-        <source>Unknown state: id = %u</source>
-        <translation type="obsolete">Unknown state: id = %u</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -10175,21 +10484,9 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation type="unfinished">Warning: Unsupported argument -debugnet ignored, use -debug=net.</translation>
     </message>
     <message>
-        <source>Will retry...</source>
-        <translation type="obsolete">Will retry...</translation>
-    </message>
-    <message>
         <location line="+3"/>
         <source>You need to rebuild the database using -reindex to change -txindex</source>
         <translation type="unfinished">You need to rebuild the database using -reindex to change -txindex</translation>
-    </message>
-    <message>
-        <source>Your entries added successfully.</source>
-        <translation type="obsolete">Your entries added successfully.</translation>
-    </message>
-    <message>
-        <source>Your transaction was accepted into the pool!</source>
-        <translation type="obsolete">Your transaction was accepted into the pool!</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -10235,7 +10532,7 @@ https://www.transifex.com/luxcore/luxcore</source>
         <location line="+2"/>
         <location line="+1"/>
         <location line="+23"/>
-        <location line="+41"/>
+        <location line="+43"/>
         <location line="+2"/>
         <location line="+2"/>
         <location line="+2"/>
@@ -10246,7 +10543,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <location line="-5007"/>
-        <location filename="../forms/ui_tradingdialog.h" line="-76"/>
+        <location filename="../forms/ui_tradingdialog.h" line="-78"/>
         <source>0.000000000</source>
         <translation type="unfinished"></translation>
     </message>
@@ -10370,13 +10667,13 @@ https://www.transifex.com/luxcore/luxcore</source>
         <location filename="../forms/ui_tradingdialog.h" line="-30"/>
         <location line="+10"/>
         <location line="+24"/>
-        <location line="+34"/>
+        <location line="+38"/>
         <source>Max</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-4031"/>
-        <location filename="../forms/ui_tradingdialog.h" line="-67"/>
+        <location filename="../forms/ui_tradingdialog.h" line="-71"/>
         <source>Asks: 0000</source>
         <translation type="unfinished"></translation>
     </message>
@@ -10390,21 +10687,21 @@ https://www.transifex.com/luxcore/luxcore</source>
         <location line="+18"/>
         <location line="+3610"/>
         <location filename="../forms/ui_tradingdialog.h" line="+1"/>
-        <location line="+47"/>
+        <location line="+49"/>
         <source>BTC Available:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-3149"/>
         <location line="+3120"/>
-        <location filename="../forms/ui_tradingdialog.h" line="-44"/>
-        <location line="+42"/>
+        <location filename="../forms/ui_tradingdialog.h" line="-46"/>
+        <location line="+44"/>
         <source>LUX Available:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-2692"/>
-        <location filename="../forms/ui_tradingdialog.h" line="-41"/>
+        <location filename="../forms/ui_tradingdialog.h" line="-43"/>
         <source> 0.00000000 </source>
         <translation type="unfinished"></translation>
     </message>
@@ -10418,13 +10715,13 @@ https://www.transifex.com/luxcore/luxcore</source>
         <location line="+38"/>
         <location line="+1407"/>
         <location filename="../forms/ui_tradingdialog.h" line="+12"/>
-        <location line="+20"/>
+        <location line="+22"/>
         <source>Send</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-1392"/>
-        <location filename="../forms/ui_tradingdialog.h" line="-29"/>
+        <location filename="../forms/ui_tradingdialog.h" line="-31"/>
         <source>Lowest price:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -10456,31 +10753,31 @@ https://www.transifex.com/luxcore/luxcore</source>
         <location line="+14"/>
         <location line="+1438"/>
         <location filename="../forms/ui_tradingdialog.h" line="+2"/>
-        <location line="+40"/>
+        <location line="+44"/>
         <source>Amount:</source>
         <translation type="unfinished">Amount:</translation>
     </message>
     <message>
         <location line="-1400"/>
         <location line="+1440"/>
-        <location filename="../forms/ui_tradingdialog.h" line="-39"/>
-        <location line="+42"/>
+        <location filename="../forms/ui_tradingdialog.h" line="-43"/>
+        <location line="+46"/>
         <source>Address:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-1424"/>
         <location line="+1050"/>
-        <location filename="../forms/ui_tradingdialog.h" line="-41"/>
-        <location line="+17"/>
+        <location filename="../forms/ui_tradingdialog.h" line="-45"/>
+        <location line="+19"/>
         <source>LUX Balance:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-583"/>
         <location line="+612"/>
-        <location filename="../forms/ui_tradingdialog.h" line="-14"/>
-        <location line="+16"/>
+        <location filename="../forms/ui_tradingdialog.h" line="-16"/>
+        <location line="+18"/>
         <source>BTC Balance:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -10489,10 +10786,10 @@ https://www.transifex.com/luxcore/luxcore</source>
         <location line="+494"/>
         <location line="+93"/>
         <location line="+46"/>
-        <location filename="../forms/ui_tradingdialog.h" line="-11"/>
-        <location line="+35"/>
-        <location line="+9"/>
-        <location line="+6"/>
+        <location filename="../forms/ui_tradingdialog.h" line="-13"/>
+        <location line="+39"/>
+        <location line="+11"/>
+        <location line="+8"/>
         <source>Paste from clipboard</source>
         <translation type="unfinished"></translation>
     </message>
@@ -10502,17 +10799,17 @@ https://www.transifex.com/luxcore/luxcore</source>
         <location line="+96"/>
         <location line="+93"/>
         <location line="+46"/>
-        <location filename="../forms/ui_tradingdialog.h" line="-47"/>
-        <location line="+25"/>
-        <location line="+10"/>
-        <location line="+9"/>
-        <location line="+6"/>
+        <location filename="../forms/ui_tradingdialog.h" line="-54"/>
+        <location line="+27"/>
+        <location line="+12"/>
+        <location line="+11"/>
+        <location line="+8"/>
         <source>Alt+P</source>
         <translation type="unfinished">Alt+P</translation>
     </message>
     <message>
         <location line="-619"/>
-        <location filename="../forms/ui_tradingdialog.h" line="-49"/>
+        <location filename="../forms/ui_tradingdialog.h" line="-56"/>
         <source>Cross-Send</source>
         <translation type="unfinished"></translation>
     </message>
@@ -10536,13 +10833,13 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <location line="+10"/>
-        <location filename="../forms/ui_tradingdialog.h" line="+32"/>
+        <location filename="../forms/ui_tradingdialog.h" line="+36"/>
         <source>Balance</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+142"/>
-        <location filename="../forms/ui_tradingdialog.h" line="-23"/>
+        <location filename="../forms/ui_tradingdialog.h" line="-27"/>
         <source>LUX Pending:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -10572,37 +10869,37 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <location line="+24"/>
-        <location filename="../forms/ui_tradingdialog.h" line="+4"/>
+        <location filename="../forms/ui_tradingdialog.h" line="+6"/>
         <source>Withdraw LUX:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+94"/>
-        <location filename="../forms/ui_tradingdialog.h" line="+10"/>
+        <location filename="../forms/ui_tradingdialog.h" line="+12"/>
         <source>Withdraw</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+45"/>
-        <location filename="../forms/ui_tradingdialog.h" line="+21"/>
+        <location filename="../forms/ui_tradingdialog.h" line="+25"/>
         <source>Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+12"/>
-        <location filename="../forms/ui_tradingdialog.h" line="-19"/>
+        <location filename="../forms/ui_tradingdialog.h" line="-23"/>
         <source>API Key</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+50"/>
-        <location filename="../forms/ui_tradingdialog.h" line="+7"/>
+        <location filename="../forms/ui_tradingdialog.h" line="+9"/>
         <source>Secret Key</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+33"/>
-        <location filename="../forms/ui_tradingdialog.h" line="+6"/>
+        <location filename="../forms/ui_tradingdialog.h" line="+8"/>
         <source>Password</source>
         <translation type="unfinished"></translation>
     </message>
@@ -10637,8 +10934,202 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../tradingdialog.cpp" line="+425"/>
+        <location filename="../tradingdialog.cpp" line="+96"/>
+        <location line="+1"/>
+        <source>SUM(BTC)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-1"/>
+        <location line="+1"/>
+        <source>TOTAL(BTC)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-1"/>
+        <location line="+1"/>
+        <source>LUX(SIZE)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-1"/>
+        <source>BID(BTC)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>ASK(BTC)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+9"/>
+        <source>DATE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>BUY/SELL</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>BID/ASK</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>TOTAL UNITS(LUX)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>TOTAL COST(BTC)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+17"/>
+        <location line="+21"/>
+        <source>Date Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-21"/>
+        <location line="+21"/>
+        <source>Exchange</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-21"/>
+        <location line="+21"/>
+        <source>OrderType</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-21"/>
+        <location line="+21"/>
+        <source>QTY</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-21"/>
+        <location line="+22"/>
+        <source>Price</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-22"/>
+        <location line="+22"/>
+        <source>PricePerUnit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-1"/>
+        <source>OrderId</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>QTY_Rem</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <location line="+284"/>
         <source>Cancel Order</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-101"/>
+        <source>Ask:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Bid:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>LUX Volume:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>BTC Volume:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+246"/>
+        <source>Supply:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Ask&apos;s:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Demand:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Bid&apos;s:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+69"/>
+        <source>Time (GMT)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>LUX Price in BTC</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+682"/>
+        <source>API Configuration Failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Api configuration was unsuccesful.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <location line="+11"/>
+        <location line="+11"/>
+        <source>API Configuration Complete</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-22"/>
+        <source>Your API keys have been loaded and the connection has been successfully configured and tested.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <source>Your API keys have been saved and the connection has been successfully configured and tested.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <source>Api connection has been successfully configured and tested.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+37"/>
+        <location line="+37"/>
+        <source>Error</source>
+        <translation type="unfinished">Error</translation>
+    </message>
+    <message>
+        <location line="-37"/>
+        <location line="+37"/>
+        <source>Your password is too short!</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -93,8 +93,8 @@ tradingDialog::tradingDialog(QWidget *parent) :
     connect(ui->PasswordInput, SIGNAL(returnPressed()),ui->LoadKeys,SIGNAL(clicked()));
 
     /*OrderBook Table Init*/
-    CreateOrderBookTables(*ui->BidsTable,QStringList() << "SUM(BTC)" << "TOTAL(BTC)" << "LUX(SIZE)" << "BID(BTC)");
-    CreateOrderBookTables(*ui->AsksTable,QStringList() << "ASK(BTC)" << "LUX(SIZE)" << "TOTAL(BTC)" << "SUM(BTC)");
+    CreateOrderBookTables(*ui->BidsTable,QStringList() << tr("SUM(BTC)") << tr("TOTAL(BTC)") << tr("LUX(SIZE)") << tr("BID(BTC)"));
+    CreateOrderBookTables(*ui->AsksTable,QStringList() << tr("ASK(BTC)") << tr("LUX(SIZE)") << tr("TOTAL(BTC)") << tr("SUM(BTC)"));
     connect (ui->BidsTable, SIGNAL(cellClicked(int,int)), this, SLOT(BidInfoInsertSlot(int, int)));
     connect (ui->AsksTable, SIGNAL(cellClicked(int,int)), this, SLOT(AskInfoInsertSlot(int, int)));
     /*OrderBook Table Init*/
@@ -102,7 +102,8 @@ tradingDialog::tradingDialog(QWidget *parent) :
     /*Market History Table Init*/
     ui->MarketHistoryTable->setColumnCount(5);
     ui->MarketHistoryTable->verticalHeader()->setVisible(false);
-    ui->MarketHistoryTable->setHorizontalHeaderLabels(QStringList()<<"DATE"<<"BUY/SELL"<<"BID/ASK"<<"TOTAL UNITS(LUX)"<<"TOTAL COST(BTC)");
+    ui->MarketHistoryTable->setHorizontalHeaderLabels(QStringList()
+        << tr("DATE") << tr("BUY/SELL") << tr("BID/ASK") << tr("TOTAL UNITS(LUX)") << tr("TOTAL COST(BTC)"));
     ui->MarketHistoryTable->setRowCount(0);
     int Cellwidth =  ui->MarketHistoryTable->width() / 5;
     ui->MarketHistoryTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
@@ -118,7 +119,8 @@ tradingDialog::tradingDialog(QWidget *parent) :
     /*Account History Table Init*/
     ui->TradeHistoryTable->setColumnCount(6);
     ui->TradeHistoryTable->verticalHeader()->setVisible(false);
-    ui->TradeHistoryTable->setHorizontalHeaderLabels(QStringList() << "Date Time" << "Exchange" << "OrderType" << "QTY" << "Price" << "PricePerUnit" );
+    ui->TradeHistoryTable->setHorizontalHeaderLabels(QStringList()
+        << tr("Date Time") << tr("Exchange") << tr("OrderType") << tr("QTY") << tr("Price") << tr("PricePerUnit"));
     ui->TradeHistoryTable->setRowCount(0);
     Cellwidth =  ui->TradeHistoryTable->width() / 6;
     ui->TradeHistoryTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
@@ -138,7 +140,9 @@ tradingDialog::tradingDialog(QWidget *parent) :
     /*Open Orders Table*/
     ui->OpenOrdersTable->setColumnCount(9);
     ui->OpenOrdersTable->verticalHeader()->setVisible(false);
-    ui->OpenOrdersTable->setHorizontalHeaderLabels(QStringList() << "OrderId" << "Date Time" << "Exchange" << "OrderType" << "QTY" << "QTY_Rem" << "Price" << "PricePerUnit" << "Cancel Order");
+    ui->OpenOrdersTable->setHorizontalHeaderLabels(QStringList()
+        << tr("OrderId") << tr("Date Time") << tr("Exchange") << tr("OrderType") << tr("QTY") << tr("QTY_Rem")
+        << tr("Price") << tr("PricePerUnit") << tr("Cancel Order"));
     ui->OpenOrdersTable->setRowCount(0);
     Cellwidth =  ui->OpenOrdersTable->width() / 8;
     ui->OpenOrdersTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
@@ -321,13 +325,13 @@ int tradingDialog::SetExchangeInfoTextLabels(){
     ui->volumet->setTextFormat(Qt::RichText);
     ui->volumebtc->setTextFormat(Qt::RichText);
 
-    ui->Ask->setText("<b>Ask:</b> <span style='font-weight:bold; font-size:12px; color:Red'>" + str.number(obj["AskPrice"].toDouble(),'i',8) + "</span> BTC");
+    ui->Ask->setText("<b>"+tr("Ask:")+"</b> <span style='font-weight:bold; font-size:12px; color:Red'>" + str.number(obj["AskPrice"].toDouble(),'i',8) + "</span> BTC");
 
-    ui->Bid->setText("<b>Bid:</b> <span style='font-weight:bold; font-size:12px; color:Green;'>" + str.number(obj["BidPrice"].toDouble(),'i',8) + "</span> BTC");
+    ui->Bid->setText("<b>"+tr("Bid:")+"</b> <span style='font-weight:bold; font-size:12px; color:Green;'>" + str.number(obj["BidPrice"].toDouble(),'i',8) + "</span> BTC");
 
-    ui->volumet->setText("<b>LUX Volume:</b> <span style='font-weight:bold; font-size:12px; color:blue;'>" + str.number(obj["Volume"].toDouble(),'i',8) + "</span> LUX");
+    ui->volumet->setText("<b>"+tr("LUX Volume:")+"</b> <span style='font-weight:bold; font-size:12px; color:blue;'>" + str.number(obj["Volume"].toDouble(),'i',8) + "</span> LUX");
 
-    ui->volumebtc->setText("<b>BTC Volume:</b> <span style='font-weight:bold; font-size:12px; color:blue;'>" + str.number(obj["BaseVolume"].toDouble(),'i',8) + "</span> BTC");
+    ui->volumebtc->setText("<b>"+tr("BTC Volume:")+"</b> <span style='font-weight:bold; font-size:12px; color:blue;'>" + str.number(obj["BaseVolume"].toDouble(),'i',8) + "</span> BTC");
 
     obj.empty();
 
@@ -573,13 +577,13 @@ void tradingDialog::ParseAndPopulateOrderBookTables(QString OrderBook){
         BuyItteration++;
     }
 
-    ui->LUXSupply->setText("<b>Supply:</b> <span style='font-weight:bold; font-size:12px; color:blue'>" + str.number(LUXSupply,'i',8) + "</span><b> LUX</b>");
+    ui->LUXSupply->setText("<b>"+tr("Supply:")+"</b> <span style='font-weight:bold; font-size:12px; color:blue'>" + str.number(LUXSupply,'i',8) + "</span><b> LUX</b>");
     ui->BtcSupply->setText("<span style='font-weight:bold; font-size:12px; color:blue'>" + str.number(BtcSupply,'i',8) + "</span><b> BTC</b>");
-    ui->AsksCount->setText("<b>Ask's :</b> <span style='font-weight:bold; font-size:12px; color:blue'>" + str.number(ui->AsksTable->rowCount()) + "</span>");
+    ui->AsksCount->setText("<b>"+tr("Ask's:")+"</b> <span style='font-weight:bold; font-size:12px; color:blue'>" + str.number(ui->AsksTable->rowCount()) + "</span>");
 
-    ui->LUXDemand->setText("<b>Demand:</b> <span style='font-weight:bold; font-size:12px; color:blue'>" + str.number(LUXDemand,'i',8) + "</span><b> LUX</b>");
+    ui->LUXDemand->setText("<b>"+tr("Demand:")+"</b> <span style='font-weight:bold; font-size:12px; color:blue'>" + str.number(LUXDemand,'i',8) + "</span><b> LUX</b>");
     ui->BtcDemand->setText("<span style='font-weight:bold; font-size:12px; color:blue'>" + str.number(BtcDemand,'i',8) + "</span><b> BTC</b>");
-    ui->BidsCount->setText("<b>Bid's :</b> <span style='font-weight:bold; font-size:12px; color:blue'>" + str.number(ui->BidsTable->rowCount()) + "</span>");
+    ui->BidsCount->setText("<b>"+tr("Bid's:")+"</b> <span style='font-weight:bold; font-size:12px; color:blue'>" + str.number(ui->BidsTable->rowCount()) + "</span>");
     obj.empty();
 }
 
@@ -648,8 +652,8 @@ void tradingDialog::ParseAndPopulatePriceChart(QString Response){
     ohlc->setWidth(binSize*0.2);
     ohlc->setTwoColored(true);
 
-    derPlot->xAxis->setLabel("Time (GMT)");
-    derPlot->yAxis->setLabel("LUX Price in BTC");
+    derPlot->xAxis->setLabel(tr("Time (GMT)"));
+    derPlot->yAxis->setLabel(tr("LUX Price in BTC"));
 
     QCPAxisRect *volumeAxisRect = new QCPAxisRect(derPlot);
     QSharedPointer<QCPAxisTickerDateTime> dateTimeTicker(new QCPAxisTickerDateTime);
@@ -1331,10 +1335,10 @@ void tradingDialog::on_UpdateKeys_clicked()
     QJsonObject ResponseObject = jsonResponse.object();                                 //get json obj
 
     if ( ResponseObject.value("Success").toBool() == false){
-        QMessageBox::information(this,"API Configuration Failed","Api configuration was unsuccesful.");
+        QMessageBox::information(this,tr("API Configuration Failed"),tr("Api configuration was unsuccesful."));
 
     }else if ( ResponseObject.value("Success").toBool() == true && Load){
-        QMessageBox::information(this,"API Configuration Complete","Your API keys have been loaded and the connection has been successfully configured and tested.");
+        QMessageBox::information(this,tr("API Configuration Complete"),tr("Your API keys have been loaded and the connection has been successfully configured and tested."));
         ui->ApiKeyInput->setEchoMode(QLineEdit::Password);
         ui->SecretKeyInput->setEchoMode(QLineEdit::Password);
         ui->PasswordInput->setText("");
@@ -1345,7 +1349,7 @@ void tradingDialog::on_UpdateKeys_clicked()
         ui->TradingTabWidget->setTabEnabled(5,true);
         Load = false;
     }else if ( ResponseObject.value("Success").toBool() == true && Save){
-        QMessageBox::information(this,"API Configuration Complete","Your API keys have been saved and the connection has been successfully configured and tested.");
+        QMessageBox::information(this,tr("API Configuration Complete"),tr("Your API keys have been saved and the connection has been successfully configured and tested."));
         ui->ApiKeyInput->setEchoMode(QLineEdit::Password);
         ui->SecretKeyInput->setEchoMode(QLineEdit::Password);
         ui->PasswordInput->setText("");
@@ -1356,7 +1360,7 @@ void tradingDialog::on_UpdateKeys_clicked()
         ui->TradingTabWidget->setTabEnabled(5,true);
         Save = false;
     }else{
-        QMessageBox::information(this,"API Configuration Complete","Api connection has been successfully configured and tested.");
+        QMessageBox::information(this,tr("API Configuration Complete"),tr("Api connection has been successfully configured and tested."));
         ui->ApiKeyInput->setEchoMode(QLineEdit::Password);
         ui->SecretKeyInput->setEchoMode(QLineEdit::Password);
         ui->PasswordInput->setText("");
@@ -1393,7 +1397,7 @@ void tradingDialog::on_SaveKeys_clicked()
     string password = ui->PasswordInput->text().toStdString();
 
     if (password.length() <= 6){
-        QMessageBox::information(this,"Error !","Your password is too short !");
+        QMessageBox::information(this,tr("Error"),tr("Your password is too short!"));
         fSuccess = false;
         stream.close();
     }
@@ -1430,7 +1434,7 @@ void tradingDialog::on_LoadKeys_clicked()
     string password = ui->PasswordInput->text().toUtf8().constData();
 
     if (password.length() <= 6){
-        QMessageBox::information(this,"Error !","Your password is too short !");
+        QMessageBox::information(this,tr("Error"),tr("Your password is too short!"));
         fSuccess = false;
         stream.close();
     }
