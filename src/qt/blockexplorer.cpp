@@ -26,7 +26,7 @@ void BlockExplorer::Translations()
 {
     QString toTranslate[] = {
         tr("unknown"), tr("Height"), tr("Size"), tr("Timestamp"),
-        tr("Number of Transactions"), tr("Difficulty"),
+        tr("Number of Transactions"), tr("Difficulty"), tr("Address"),
         tr("Value Out"), tr("Fees"), tr("Type"), tr("Generated"),
         tr("Bits"), tr("Nonce"), tr("Version"), tr("Hash"),
         tr("Merkle Root"), tr("State Root"), tr("UTXO Root"),
