@@ -1104,16 +1104,16 @@ MultiSend: %1</translation>
         <translation>Bloc</translation>
     </message>
     <message>
-        <source>Height</source>
-        <translation>Numéro de bloc</translation>
-    </message>
-    <message>
         <source>Size</source>
         <translation>Taille</translation>
     </message>
     <message>
         <source>Number of Transactions</source>
         <translation>Nombre de Transactions</translation>
+    </message>
+    <message>
+        <source>Value In</source>
+        <translation>Valeur entrées</translation>
     </message>
     <message>
         <source>Value Out</source>

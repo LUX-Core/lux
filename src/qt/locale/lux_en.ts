@@ -1443,17 +1443,17 @@
     </message>
     <message>
         <location line="+0"/>
-        <source>Height</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+0"/>
         <source>Size</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Timestamp</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Value In</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1637,7 +1637,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+619"/>
+        <location line="+611"/>
         <source>Not all transactions will be shown. To view all transactions you need to set txindex=1 in the configuration file (lux.conf).</source>
         <translation type="unfinished"></translation>
     </message>
