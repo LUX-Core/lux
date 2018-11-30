@@ -217,6 +217,17 @@
     </message>
 </context>
 <context>
+    <name>AdminAuthorization</name>
+    <message>
+        <source>Enter Password</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter your root password to run the maintenancetool:</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>AskPassphraseDialog</name>
     <message>
         <source>Passphrase Dialog</source>
@@ -839,7 +850,7 @@
     </message>
     <message>
         <source>No block source available...</source>
-        <translation>Fuente de bloques no disponible...</translation>
+        <translation type="vanished">Fuente de bloques no disponible...</translation>
     </message>
     <message>
         <source>Up to date</source>
@@ -1089,6 +1100,10 @@ MultiEnvío: %1</translation>
         <source>A fatal error occurred. LUX can no longer continue safely and will quit.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Connecting to peers...</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>BlockExplorer</name>
@@ -1119,6 +1134,170 @@ MultiEnvío: %1</translation>
     <message>
         <source>&gt;</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>unknown</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Height</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Timestamp</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Number of Transactions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Difficulty</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Value Out</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fees</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Generated</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bits</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Nonce</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Version</source>
+        <translation type="unfinished">Versión</translation>
+    </message>
+    <message>
+        <source>Hash</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Merkle Root</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>State Root</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>UTXO Root</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Block</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Transaction</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Call SC</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Create SC</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Output</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Inputs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Outputs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tx Hash</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Amount</source>
+        <translation type="unfinished">Cantidad</translation>
+    </message>
+    <message>
+        <source>From</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>To</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Redeemed in</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Balance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delta</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>In Block</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Taken from</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>outputs (see tx)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>unhandled or invalid address</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>movements displayed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Transactions to/from</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>-addressindex parameter is required to show address history</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Luxcore Blockchain Explorer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Address</source>
+        <translation type="unfinished">Dirección</translation>
     </message>
 </context>
 <context>
@@ -1787,6 +1966,57 @@ MultiEnvío: %1</translation>
     <message>
         <source>Darksend was successfully set to maximum (%1 and 16 rounds). You can change this at any time by opening LUX&apos;s configuration screen.</source>
         <translation>La Ofuscación se activó correctamente en su grado máximo (%1 y 16 rondas). Usted puede cambiar ésto en cualquier momento en la ventana de configuración de LUX.</translation>
+    </message>
+</context>
+<context>
+    <name>DialogMaster</name>
+    <message>
+        <source>Information</source>
+        <translation type="unfinished">Información</translation>
+    </message>
+    <message>
+        <source>Question</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning</source>
+        <translation type="unfinished">Advertencia</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation type="unfinished">Error</translation>
+    </message>
+    <message>
+        <source>About</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 — Version %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Qt-Version: &lt;a href=&quot;https://www.qt.io/&quot;&gt;%2&lt;/a&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Developed by: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Project Website: &lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>License: &lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>License: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>About Qt</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2812,6 +3042,46 @@ Por favor compruebe la dirección e inténtelo de nuevo.</translation>
         <source>Deactivate multisend</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>MultiSend enabled for Stakes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MultiSend enabled for Masternode Rewards</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MultiSend is not active</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to activate MultiSend, check MultiSend vector</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Need to select to send on stake and/or masternode rewards</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MultiSend activated but writing settings to DB failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MultiSend activated</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>First address is not valid</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MultiSend disabled but writing settings to DB failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MultiSend disabled</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>OpenURIDialog</name>
@@ -3525,6 +3795,17 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
 </context>
 <context>
+    <name>ProgressDialog</name>
+    <message>
+        <source>Check for Updates</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Checking for updates…</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QObject</name>
     <message>
         <source>Amount</source>
@@ -3695,6 +3976,10 @@ https://www.transifex.com/luxcore/luxcore</source>
         <source>OK</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>&amp;Save</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QRImageWidget</name>
@@ -3713,6 +3998,126 @@ https://www.transifex.com/luxcore/luxcore</source>
     <message>
         <source>PNG Image (*.png)</source>
         <translation>Imagen PNG (*.png)</translation>
+    </message>
+</context>
+<context>
+    <name>QtLuxUpdater::AtomFeeder</name>
+    <message>
+        <source>Check for Updates</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot connect to server. Please check your network connection!</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QtLuxUpdater::ProgressDialog</name>
+    <message>
+        <source>Canceling update check…</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QtLuxUpdater::UpdateController</name>
+    <message>
+        <source>Check for Updates</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Checks if new updates are available. You will be prompted before updates are installed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The program is already checking for updates!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Do you want to check for updates now?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Checking for updates was canceled!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Install Updates</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New updates are available. The maintenance tool will be started to install those as soon as you close the application!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No new updates available!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The update process failed!</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QtLuxUpdater::UpdateInfoDialog</name>
+    <message>
+        <source>Updates for %1 are available!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Check for Updates</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>There are new updates available! You can install them now or later.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 v%2 — %3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Run with &amp;elevated rights</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Install Now</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Install On Exit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Install later</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%L1 Bytes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Install Now?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Close the application and install updates?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Updates will be installed on exit. The maintenance tool will be started as soon as you close the application!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%L1 KiB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%L1 MiB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%L1 GiB</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4273,6 +4678,10 @@ https://www.transifex.com/luxcore/luxcore</source>
     <message>
         <source>Copy Address</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Address</source>
+        <translation type="unfinished">Dirección</translation>
     </message>
 </context>
 <context>
@@ -5886,6 +6295,10 @@ https://www.transifex.com/luxcore/luxcore</source>
         <source>false</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>SC Address (Hash160)</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>TransactionDescDialog</name>
@@ -6012,14 +6425,6 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation type="unfinished">Ofuscación</translation>
     </message>
     <message>
-        <source>Smart contract</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>SC refund</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>watch-only</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6053,6 +6458,18 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Amount removed from or added to balance.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SC created</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SC sent</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SC refunded</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6251,6 +6668,65 @@ https://www.transifex.com/luxcore/luxcore</source>
     <name>UnitDisplayStatusBarControl</name>
     <message>
         <source>Unit to show amounts in. Click to select another unit.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>UpdateInfoDialog</name>
+    <message>
+        <source>Check for Updates</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>There are new updates available! You can install them now or automatically, when you exit the application. If you don&apos;t want to install updates right know, you can install them later.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Updates:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Component Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Version</source>
+        <translation type="unfinished">Versión</translation>
+    </message>
+    <message>
+        <source>Update Size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>https://github.com/LUX-Core/lux/releases</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Run with &amp;elevated rights</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Close and do nothing. You can install updates later.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Install later</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You proceed using the application, and as soon as you close it, the updater will start automatically to install the updates.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Install On Exit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Closes the application and opens the installer to update the app.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Install Now</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7545,6 +8021,10 @@ https://www.transifex.com/luxcore/luxcore</source>
         <source>wallet.dat corrupt, salvage failed</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Prune: last wallet synchronisation goes beyond pruned data. You need to -reindex (download the whole blockchain again in case of pruned node)</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>tradingDialog</name>
@@ -7774,6 +8254,150 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Cancel Order</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Supply:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ask&apos;s:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Demand:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bid&apos;s:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SUM(BTC)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>TOTAL(BTC)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LUX(SIZE)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>BID(BTC)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ASK(BTC)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DATE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>BUY/SELL</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>BID/ASK</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>TOTAL UNITS(LUX)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>TOTAL COST(BTC)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Date Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exchange</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OrderType</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>QTY</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Price</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PricePerUnit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OrderId</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>QTY_Rem</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ask:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bid:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LUX Volume:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>BTC Volume:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Time (GMT)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LUX Price in BTC</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>API Configuration Failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Api configuration was unsuccesful.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>API Configuration Complete</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Your API keys have been loaded and the connection has been successfully configured and tested.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Your API keys have been saved and the connection has been successfully configured and tested.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Api connection has been successfully configured and tested.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation type="unfinished">Error</translation>
+    </message>
+    <message>
+        <source>Your password is too short!</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
