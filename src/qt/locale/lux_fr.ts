@@ -1112,7 +1112,7 @@ MultiSend: %1</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Read Smart Contract</source>
+        <source>Read Smart Contract (This is not a tx)</source>
         <translation>Appel Smart Contrat</translation>
     </message>
     <message>
@@ -4654,7 +4654,7 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation>Effacer tout</translation>
     </message>
     <message>
-        <source>Write Contract</source>
+        <source>Write to Contract</source>
         <translation>Envoi vers Contrat</translation>
     </message>
     <message>
@@ -4690,7 +4690,7 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Write contract</source>
+        <source>Write to contract</source>
         <translation>Envoi vers contrat</translation>
     </message>
     <message>

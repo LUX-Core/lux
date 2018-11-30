@@ -1464,7 +1464,7 @@ Address: %4
     <message>
         <location line="+31"/>
         <location filename="../forms/ui_callcontract.h" line="+1"/>
-        <source>Read Smart Contract</source>
+        <source>Read Smart Contract (This is not a tx)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6601,7 +6601,7 @@ https://www.transifex.com/luxcore/luxcore</source>
         <location line="+23"/>
         <location filename="../forms/ui_sendtocontract.h" line="+1"/>
         <location filename="../sendtocontract.cpp" line="+73"/>
-        <source>Write Contract</source>
+        <source>Write to Contract</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6646,7 +6646,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <location line="+11"/>
-        <source>Write contract</source>
+        <source>Write to contract</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
