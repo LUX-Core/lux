@@ -25,7 +25,7 @@
 void BlockExplorer::Translations()
 {
     QString toTranslate[] = {
-        tr("unknown"), tr("Height"), tr("Size"), tr("Timestamp"),
+        tr("unknown"), tr("Size"), tr("Timestamp"), tr("Value In"),
         tr("Number of Transactions"), tr("Difficulty"), tr("Address"),
         tr("Value Out"), tr("Fees"), tr("Type"), tr("Generated"),
         tr("Bits"), tr("Nonce"), tr("Version"), tr("Hash"),
@@ -56,14 +56,16 @@ static std::string makeHRef(const std::string& Str, const size_t maxChars = 0)
     return "<a href=\"" + Str + "\">" + displayed + "</a>";
 }
 
-static int64_t getTxIn(const CTransaction& tx)
+static CAmount getTxIn(const CTransaction& tx)
 {
     if (tx.IsCoinBase())
         return 0;
 
-    int64_t Sum = 0;
-    for (unsigned int i = 0; i < tx.vin.size(); i++)
-        Sum += getPrevOut(tx.vin[i].prevout).nValue;
+    CAmount Sum = 0;
+    for(size_t i = 0; i < tx.vin.size(); i++) {
+        CTxOut PrevOut = getPrevOut(tx.vin[i].prevout);
+        Sum += (PrevOut.nValue > 0 ? PrevOut.nValue : 0);
+    }
     return Sum;
 }
 
@@ -146,13 +148,11 @@ static std::string TxToRow(const CTransaction& tx, CBlock * const ptrBlock= null
             const CTransaction& tx_ = ptrBlock->vtx[i];
             for (const auto& txout : tx_.vout)
             {
-                if (txout.scriptPubKey.HasOpCall())
-                {
+                if (txout.scriptPubKey.HasOpCall()) {
                     bHasOpCall = true;
                     break;
                 }
-                if (txout.scriptPubKey.HasOpCreate())
-                {
+                if (txout.scriptPubKey.HasOpCreate()) {
                     bHasOpCreate = true;
                     break;
                 }
@@ -203,14 +203,14 @@ static std::string TxToRow(const CTransaction& tx, CBlock * const ptrBlock= null
         auto strAddress = ScriptToString(Out.scriptPubKey, false, outAddr == Highlight);
         bCalcOutAddr = true;
         bool bSC_Amount = false;
-        if(bHasOpCall && Out.nValue== 0)
+        if(bHasOpCall && Out.nValue == 0)
         {
             CKeyID *keyid = boost::get<CKeyID>(&outAddr);
             strAddress = _("Call SC");
             if (keyid) strAddress += " " + HexStr(valtype(keyid->begin(),keyid->end()));
             bSC_Amount = true;
         }
-        if(bHasOpCreate && Out.nValue== 0)
+        if(bHasOpCreate && Out.nValue == 0)
         {
             uint160 contract = uint160(LuxState::createLuxAddress(uintToh256(tx.GetHash()), j).asBytes());
             strAddress = _("Create SC") + " " + contract.ToStringReverseEndian();
@@ -332,32 +332,25 @@ static std::string BlockToString(CBlockIndex* pBlock)
     CBlock block;
     ReadBlockFromDisk(block, pBlock, Params().GetConsensus());
 
-    CAmount Fees = 0;
-    CAmount OutVolume = 0;
-    CAmount Reward = 0;
-
     std::string TxLabels[] = {_("Hash"), _("From"), _("Amount"), _("To"), _("Amount")};
     std::string TxContent = table + "<thead>" + makeHTMLTableRow(TxLabels, sizeof(TxLabels) / sizeof(std::string)) + "</thead>";
     TxContent += "<tbody class=\"b\">";
 
-    for (unsigned int i = 0; i < block.vtx.size(); i++) {
+    CAmount InVolume = 0, OutVolume = 0;
+    for (size_t i = 0; i < block.vtx.size(); i++) {
         const CTransaction& tx = block.vtx[i];
-        TxContent += TxToRow(tx, &block);
-
-        CAmount In = getTxIn(tx);
-        CAmount Out = tx.GetValueOut();
-        if (tx.IsCoinBase())
-            Reward += Out;
-        else if (In < 0)
-            Fees = -MAX_MONEY;
-        else {
-            Fees += In - Out;
+        if (!tx.IsCoinBase()) {
+            CAmount Out = tx.GetValueOut();
+            CAmount In = getTxIn(tx);
             OutVolume += Out;
+            InVolume += (In < 0 ? 0 : In);
         }
+        TxContent += TxToRow(tx, &block);
     }
     TxContent += "</tbody></table>";
 
-    int64_t Generated;
+    CAmount Fees = InVolume - OutVolume;
+    CAmount Generated;
     if (pBlock->nHeight == 0)
         Generated = OutVolume;
     else if (pBlock->IsProofOfStake())
@@ -365,27 +358,25 @@ static std::string BlockToString(CBlockIndex* pBlock)
     else
         Generated = GetProofOfWorkReward(0, pBlock->nHeight);
 
-    std::string BlockContentCells[] =
-        {
-            _("Height"), itostr(pBlock->nHeight),
-            _("Size"), itostr(GetSerializeSize(block, SER_NETWORK, PROTOCOL_VERSION)),
-            _("Number of Transactions"), itostr(block.vtx.size()),
-            _("Value Out"), ValueToString(OutVolume),
-            //_("Fees"), ValueToString(Fees),
-            _("Type"), pBlock->IsProofOfStake() ? "PoS" : "PoW",
-            _("Generated"), ValueToString(Generated),
-            _("Timestamp"), TimeToString(block.nTime),
-            _("Difficulty"), strprintf("%.4f", GetDifficulty(pBlock)),
-            _("Bits"), "<tt>" + strprintf("%08x", block.nBits) + "</tt>",
-            _("Nonce"), "<tt>" + strprintf("%08x", block.nNonce) + "</tt>",
-            _("Version"), "<tt>" + strprintf("%08x", block.nVersion) + "</tt>",
-            _("Hash"), "<tt>" + block.GetHash(pBlock->nHeight >= Params().SwitchPhi2Block()).GetHex() + "</tt>",
-            _("Merkle Root"), "<tt>" + block.hashMerkleRoot.GetHex() + "</tt>",
-            _("State Root"), "<tt>" + block.hashStateRoot.GetHex() + "</tt>",
-            _("UTXO Root"), "<tt>" + block.hashUTXORoot.GetHex() + "</tt>",
-            // _("Hash Whole Block"), "<pre>" + block.hashWholeBlock.GetHex() + "</pre>"
-            // _("Miner Signature"), "<pre>" + block.MinerSignature.ToString() + "</pre>"
-        };
+    std::string BlockContentCells[] = {
+        _("Type"), pBlock->IsProofOfStake() ? "PoS" : "PoW",
+        _("Timestamp"), TimeToString(block.nTime),
+        _("Generated"), ValueToString(Generated),
+        _("Value Out"), ValueToString(OutVolume),
+        //_("Value In"), ValueToString(InVolume),
+        _("Fees"), Fees > 0 ? ValueToString(Fees) : "-",
+        _("Size"), itostr(GetSerializeSize(block, SER_NETWORK, PROTOCOL_VERSION)),
+        _("Difficulty"), strprintf("%.4f", GetDifficulty(pBlock)),
+        _("Bits"), "<tt>" + strprintf("%08x", block.nBits) + "</tt>",
+        _("Nonce"), "<tt>" + strprintf("%08x", block.nNonce) + "</tt>",
+        _("Version"), "<tt>" + strprintf("%08x", block.nVersion) + "</tt>",
+        _("Hash"), "<tt>" + block.GetHash(pBlock->nHeight >= Params().SwitchPhi2Block()).GetHex() + "</tt>",
+        _("Merkle Root"), "<tt>" + block.hashMerkleRoot.GetHex() + "</tt>",
+        _("State Root"), "<tt>" + block.hashStateRoot.GetHex() + "</tt>",
+        _("UTXO Root"), "<tt>" + block.hashUTXORoot.GetHex() + "</tt>",
+        _("Number of Transactions"), itostr(block.vtx.size())
+        //_("Miner Signature"), "<tt>" + block.MinerSignature.ToString() + "</tt>"
+    };
 
     std::string BlockContent = makeHTMLTable(BlockContentCells, sizeof(BlockContentCells) / (2 * sizeof(std::string)), 2);
 
