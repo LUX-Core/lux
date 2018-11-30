@@ -1256,7 +1256,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Read Smart Contract</source>
+        <source>Read Smart Contract (This is not a tx)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5036,7 +5036,7 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Write Contract</source>
+        <source>Write to Contract</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5072,7 +5072,7 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Write contract</source>
+        <source>Write to contract</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
