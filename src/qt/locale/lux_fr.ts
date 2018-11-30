@@ -1188,14 +1188,6 @@ MultiSend: %1</translation>
         <translation>SC</translation>
     </message>
     <message>
-        <source>Input</source>
-        <translation>Entrée</translation>
-    </message>
-    <message>
-        <source>Output</source>
-        <translation>Sortie</translation>
-    </message>
-    <message>
         <source>Inputs</source>
         <translation>Entrées</translation>
     </message>
@@ -1266,6 +1258,10 @@ MultiSend: %1</translation>
     <message>
         <source>Luxcore Blockchain Explorer</source>
         <translation>Explorateur Blockchain Luxcore</translation>
+    </message>
+    <message>
+        <source>Smart Contract</source>
+        <translation>Smart Contrat</translation>
     </message>
 </context>
 <context>

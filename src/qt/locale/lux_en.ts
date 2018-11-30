@@ -1548,22 +1548,17 @@
     </message>
     <message>
         <location line="+1"/>
-        <source>Input</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+0"/>
-        <source>Output</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+0"/>
         <source>Inputs</source>
         <translation type="unfinished">Inputs</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Outputs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Smart Contract</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1637,7 +1632,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+611"/>
+        <location line="+603"/>
         <source>Not all transactions will be shown. To view all transactions you need to set txindex=1 in the configuration file (lux.conf).</source>
         <translation type="unfinished"></translation>
     </message>
