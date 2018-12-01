@@ -1,6 +1,6 @@
 #include "blockexplorer.h"
+
 #include "chainparams.h"
-#include "clientmodel.h"
 #include "core_io.h"
 #include "main.h"
 #include "net.h"
@@ -601,10 +601,10 @@ static std::string AddressToString(const CTxDestination& Address)
     return Content;
 }
 
-BlockExplorer::BlockExplorer(QWidget* parent) : QMainWindow(parent),
-                                                ui(new Ui::BlockExplorer),
-                                                m_NeverShown(true),
-                                                m_HistoryIndex(0)
+BlockExplorer::BlockExplorer(const PlatformStyle* platformStyle, QWidget* parent) :
+    QMainWindow(parent), ui(new Ui::BlockExplorer),
+    m_NeverShown(true), m_HistoryIndex(0),
+    model(0), unitDisplayControl(0)
 {
     ui->setupUi(this);
 
@@ -613,11 +613,39 @@ BlockExplorer::BlockExplorer(QWidget* parent) : QMainWindow(parent),
     connect(ui->back, SIGNAL(released()), this, SLOT(back()));
     connect(ui->pushButtonHome, SIGNAL(released()), this, SLOT(home()));
     connect(ui->forward, SIGNAL(released()), this, SLOT(forward()));
+
+    // Create status bar
+    statusBar();
+
+    QFrame* frameBlocks = new QFrame();
+    frameBlocks->setContentsMargins(0, 0, 0, 0);
+    frameBlocks->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
+
+    QHBoxLayout* frameBlocksLayout = new QHBoxLayout(frameBlocks);
+    frameBlocksLayout->setContentsMargins(6, 0, 6, 0);
+    frameBlocksLayout->setSpacing(6);
+
+    unitDisplayControl = new NetworkDisplayStatusBarControl(platformStyle);
+    unitDisplayControl->setOptionsModel(model ? model->getOptionsModel() : NULL);
+
+    frameBlocksLayout->addStretch();
+    frameBlocksLayout->addWidget(unitDisplayControl);
+    frameBlocksLayout->addStretch();
+
+    statusBar()->addPermanentWidget(frameBlocks);
 }
 
 BlockExplorer::~BlockExplorer()
 {
+    delete unitDisplayControl;
     delete ui;
+}
+
+void BlockExplorer::setClientModel(ClientModel *clientModel)
+{
+    model = clientModel;
+    if (unitDisplayControl)
+        unitDisplayControl->setOptionsModel(model ? model->getOptionsModel() : NULL);
 }
 
 void BlockExplorer::keyPressEvent(QKeyEvent* event)
@@ -776,3 +804,29 @@ void BlockExplorer::updateNavButtons()
     ui->back->setEnabled(m_HistoryIndex - 1 >= 0);
     ui->forward->setEnabled(m_HistoryIndex + 1 < m_History.size());
 }
+
+/** Status Bar LUX or tLUX icon */
+NetworkDisplayStatusBarControl::NetworkDisplayStatusBarControl(const PlatformStyle *platformStyle) : optionsModel(0)
+{
+    setToolTip(tr("Current network"));
+}
+
+/** Lets the control know about the Options Model (and its signals) */
+void NetworkDisplayStatusBarControl::setOptionsModel(OptionsModel* optionsModel) {
+    if (optionsModel) {
+        this->optionsModel = optionsModel;
+
+        // initialize the display units label with the current value in the model.
+        updateDisplayUnit(optionsModel->getDisplayUnit());
+    }
+}
+
+/** When Display Units are changed on OptionsModel it will refresh the display text of the control on the status bar */
+void NetworkDisplayStatusBarControl::updateDisplayUnit(int newUnits) {
+    if (Params().NetworkID() == CBaseChainParams::MAIN) {
+        setPixmap(QIcon(":/icons/unit_" + BitcoinUnits::id(newUnits)).pixmap(39, STATUSBAR_ICONSIZE));
+    } else {
+        setPixmap(QIcon(":/icons/unit_t" + BitcoinUnits::id(newUnits)).pixmap(39, STATUSBAR_ICONSIZE));
+    }
+}
+

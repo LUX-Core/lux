@@ -151,7 +151,7 @@ BitcoinGUI::BitcoinGUI(const PlatformStyle *platformStyle, const NetworkStyle* n
     QString windowTitle = tr("Luxcore") + " - ";
 
 #ifdef ENABLE_UPDATER
-    controller = new QtLuxUpdater::UpdateController(QStringLiteral("v5.2.0"), this);
+    controller = new QtLuxUpdater::UpdateController(QStringLiteral("v5.3.0"), this);
     controller->setDetailedUpdateInfo(true);
 #endif
 
@@ -187,7 +187,7 @@ BitcoinGUI::BitcoinGUI(const PlatformStyle *platformStyle, const NetworkStyle* n
     if (enableWallet) {
         /** Create wallet frame*/
         walletFrame = new WalletFrame(platformStyle, this);
-        explorerWindow = new BlockExplorer(this);
+        explorerWindow = new BlockExplorer(platformStyle, this);
     } else
 #endif // ENABLE_WALLET
     {
@@ -769,6 +769,10 @@ void BitcoinGUI::setClientModel(ClientModel* clientModel) {
             // initialize the disable state of the tray icon with the current value in the model.
             setTrayIconVisible(optionsModel->getHideTrayIcon());
         }
+
+        if (explorerWindow)
+            explorerWindow->setClientModel(clientModel);
+
     } else {
         // Disable possibility to show main window via action
         toggleHideAction->setEnabled(false);
