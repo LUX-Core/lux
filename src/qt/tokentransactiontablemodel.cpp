@@ -465,8 +465,6 @@ QVariant TokenTransactionTableModel::txStatusDecoration(const TokenTransactionRe
 {
     switch(wtx->status.status)
     {
-    case TokenTransactionStatus::Offline:
-        return COLOR_TX_STATUS_OFFLINE;
     case TokenTransactionStatus::Unconfirmed:
         return QIcon(":/icons/transaction_0");
     case TokenTransactionStatus::Confirming: {
