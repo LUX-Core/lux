@@ -1074,13 +1074,6 @@ bool ProcessBlockFound(CBlock* pblock, CWallet& wallet)
     generated -= GetMasternodePosReward(chainActive.Height()+1, generated);
     LogPrintf("generated %s\n", FormatMoney(generated));
 
-    bool usePhi2;
-    {
-        LOCK(cs_main);
-        CBlockIndex* pindexPrev = LookupBlockIndex(pblock->hashPrevBlock);
-        usePhi2 = pindexPrev ? pindexPrev->nHeight + 1 >= Params().SwitchPhi2Block() : false;
-    }
-
     // Process this block the same as if we had received it from another node
     const CChainParams& chainparams = Params();
     CValidationState state;
