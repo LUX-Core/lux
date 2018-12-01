@@ -89,7 +89,6 @@ public:
         DarksendMakeCollaterals,
         DarksendCreateDenominations,
         Darksend,
-        //SCcall,
         SCsent,
         SCcreate,
         SCrefund
