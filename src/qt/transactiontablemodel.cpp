@@ -373,8 +373,6 @@ QString TransactionTableModel::formatTxType(const TransactionRecord* wtx) const
         return tr("Darksend");
     case TransactionRecord::SCcreate:
         return tr("SC created");
-    /*case TransactionRecord::SCcall:
-        return tr("SC call");*/
     case TransactionRecord::SCsent:
         return tr("SC sent");
     case TransactionRecord::SCrefund:
@@ -433,6 +431,7 @@ QString TransactionTableModel::formatTxToAddress(const TransactionRecord* wtx, b
     case TransactionRecord::SCsent:
         return QString::fromStdString(wtx->address) + watchAddress;
     case TransactionRecord::SendToSelf:
+        if (wtx->address != "") return lookupAddress(wtx->address, tooltip) + watchAddress;
     default:
         return tr("(n/a)") + watchAddress;
     }
