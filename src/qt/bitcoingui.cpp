@@ -67,6 +67,7 @@
 #include <QToolButton>
 #include <QDockWidget>
 #include <QSizeGrip>
+#include <QDesktopServices>
 
 #if QT_VERSION < 0x050000
 #include <QTextDocument>
@@ -233,8 +234,9 @@ BitcoinGUI::BitcoinGUI(const PlatformStyle *platformStyle, const NetworkStyle* n
     labelConnectionsIcon->setFlat(true); // Make the button look like a label, but clickable
     labelConnectionsIcon->setStyleSheet(".QPushButton { background-color: rgba(255, 255, 255, 0);}");
     labelConnectionsIcon->setMaximumSize(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE);
-    labelBlocksIcon = new GUIUtil::ClickableLabel();
 
+
+    labelBlocksIcon = new GUIUtil::ClickableLabel();
     if (enableWallet) {
         frameBlocksLayout->addStretch();
         frameBlocksLayout->addWidget(unitDisplayControl);
@@ -249,6 +251,52 @@ BitcoinGUI::BitcoinGUI(const PlatformStyle *platformStyle, const NetworkStyle* n
     frameBlocksLayout->addStretch();
     frameBlocksLayout->addWidget(labelBlocksIcon);
     frameBlocksLayout->addStretch();
+
+    //status bar social media icons
+    QFrame* frameSocMedia = new QFrame();
+
+    //fill in frameSocMedia
+    {
+        frameSocMedia->setContentsMargins(0, 0, 0, 0);
+        frameSocMedia->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
+        QHBoxLayout* frameLayout = new QHBoxLayout(frameSocMedia);
+        frameLayout->setContentsMargins(6, 0, 6, 0);
+        frameLayout->setSpacing(10);
+
+        pushButtonTelegram = new QPushButton(frameSocMedia);
+        connect(pushButtonTelegram, &QPushButton::clicked,
+                this, [](){QDesktopServices::openUrl(QUrl("https://t.me/LUXcoreOfficial"));});
+        pushButtonTelegram->setIcon(QIcon(QPixmap(":/icons/res/icons/telegram.png").scaledToHeight(STATUSBAR_ICONSIZE,Qt::SmoothTransformation)));
+
+        pushButtonDiscord = new QPushButton(frameSocMedia);
+        connect(pushButtonDiscord, &QPushButton::clicked,
+                this, [](){QDesktopServices::openUrl(QUrl("https://discord.gg/27xFP5Y"));});
+        pushButtonDiscord->setIcon(QIcon(":/icons/res/icons/discord.png").pixmap(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE));
+
+        pushButtonTwitter = new QPushButton(frameSocMedia);
+        connect(pushButtonTwitter, &QPushButton::clicked,
+                this, [](){QDesktopServices::openUrl(QUrl("https://twitter.com/LUX_Coin"));});
+        pushButtonTwitter->setIcon(QIcon(":/icons/res/icons/twitter.png").pixmap(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE));
+
+        pushButtonGithub = new QPushButton(frameSocMedia);
+        connect(pushButtonGithub, &QPushButton::clicked,
+                this, [](){QDesktopServices::openUrl(QUrl("https://github.com/lux-core"));});
+        pushButtonGithub->setIcon(QIcon(":/icons/res/icons/github.png").pixmap(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE));
+
+        auto buttons = frameSocMedia->findChildren<QPushButton* >();
+        QString styleSheet = ".QPushButton { background-color: transparent;"
+                                        "border: none;"
+                                        "qproperty-text: \"\" }";
+        foreach(auto but, buttons)
+        {
+            frameLayout->addWidget(but);
+            but->setMinimumSize(30, STATUSBAR_ICONSIZE);
+            but->setMaximumSize(30, STATUSBAR_ICONSIZE);
+            but->setIconSize(QSize(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE));
+            but->setCursor(Qt::PointingHandCursor);
+            but->setStyleSheet(styleSheet);
+        }
+    }
 
     // Progress bar and label for blocks download
     progressBarLabel = new QLabel();
@@ -269,6 +317,7 @@ BitcoinGUI::BitcoinGUI(const PlatformStyle *platformStyle, const NetworkStyle* n
 
     statusBar()->addWidget(progressBarLabel);
     statusBar()->addWidget(progressBar);
+    statusBar()->addPermanentWidget(frameSocMedia);
     statusBar()->addPermanentWidget(frameBlocks);
 
     // Jump directly to tabs in RPC-console
