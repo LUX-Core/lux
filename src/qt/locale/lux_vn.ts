@@ -377,7 +377,15 @@
     </message>
     <message>
         <source>IMPORTANT: Any previous backups you have made of your wallet file should be replaced with the newly generated, encrypted wallet file. Previous backups of the unencrypted wallet file contain the same HD seed andstill have full access to all your funds just like the new, encrypted wallet.</source>
-        <translation type="unfinished"></translation>
+        <translation>LƯU Ý: Bất kỳ bản sao lưu trước nào bạn đã tạo trong tệp ví của bạn sẽ được thay thế bằng tệp ví tiền được mã hóa mới được tạo. Các bản sao lưu trước đó của tệp ví tiền không được mã hóa chứa cùng một hạt giống HD và sẽ có toàn quyền truy cập vào tất cả số tiền của bạn giống như ví tiền mới được mã hóa.</translation>
+    </message>
+    <message>
+        <source>%1 will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your funds from being stolen by malware infecting your computer.</source>
+        <translation> % 1 sẽ đóng ngay bây giờ để hoàn tất quá trình mã hóa. Hãy nhớ rằng mã hóa ví của bạn không thể bảo vệ hoàn toàn tiền của bạn khỏi bị phần mềm độc hại lây nhiễm vào máy tính của bạn.</translation>
+    </message>
+    <message>
+        <source>IMPORTANT: Any previous backups you have made of your wallet file should be replaced with the newly generated, encrypted wallet file. For security reasons, previous backups of the unencrypted wallet file will become useless as soon as you start using the new, encrypted wallet.</source>
+        <translation>LƯU Ý: Bất kỳ bản sao lưu trước nào bạn đã tạo trong tệp ví của bạn sẽ được thay thế bằng tệp ví tiền được mã hóa mới được tạo. Vì lý do bảo mật, các bản sao lưu trước đó của tệp ví tiền không được mã hóa sẽ trở nên vô dụng ngay sau khi bạn bắt đầu sử dụng ví tiền mới được mã hóa.</translation>
     </message>
 </context>
 <context>
@@ -2229,7 +2237,7 @@
     </message>
     <message>
         <source>Please read the following license agreement. You must accept the terms contained in this agreement before continuing with the application.</source>
-        <translation>Vui lòng đọc thỏa thuận cấp phép sau. Bạn phải chấp nhận các điều khoản có trong thỏa thuận này trước khi tiếp tục với đơn đăng ký.</translation>
+        <translation>Vui lòng đọc kỹ thỏa thuận, điều khoản và điều kiện sử dụng giấy phép bản quyền phần mềm trước khi cài đặt và sử dụng phần mềm và dịch vụ của công ty Luxcore.</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -2257,7 +2265,7 @@
     </message>
     <message>
         <source>&lt;p style=&quot;line-height:10&quot;&gt;&lt;b&gt;GENERAL&lt;/b&gt;&lt;/p&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Thỏa thuận và điều khoản sử dụng phần mềm</translation>
     </message>
     <message>
         <source>&lt;p style=&quot;line-height:10&quot;&gt;---------------------&lt;/p&gt;</source>
