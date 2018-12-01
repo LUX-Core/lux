@@ -289,12 +289,13 @@ void TransactionRecord::updateStatus(const CWalletTx& wtx)
             status.status = TransactionStatus::Confirmed;
         }
     }
+    status.Updating = false;
 }
 
 bool TransactionRecord::statusUpdateNeeded()
 {
     AssertLockHeld(cs_main);
-    return status.cur_num_blocks != chainActive.Height() /*|| status.cur_num_ix_locks != nCompleteTXLocks*/;
+    return status.cur_num_blocks != chainActive.Height() || status.Updating;
 }
 
 QString TransactionRecord::getTxID() const
