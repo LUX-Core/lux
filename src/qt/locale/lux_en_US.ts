@@ -1140,10 +1140,6 @@ Address: %4
         <translation type="unfinished">unknown</translation>
     </message>
     <message>
-        <source>Height</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Size</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1220,14 +1216,6 @@ Address: %4
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Input</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Output</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Inputs</source>
         <translation type="unfinished">Inputs</translation>
     </message>
@@ -1298,6 +1286,14 @@ Address: %4
     <message>
         <source>Address</source>
         <translation type="unfinished">Address</translation>
+    </message>
+    <message>
+        <source>Value In</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Smart Contract</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3950,37 +3946,6 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
 </context>
 <context>
-    <name>QPlatformTheme</name>
-    <message>
-        <source>Cancel</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Close</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Apply</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&amp;Yes</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&amp;No</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>OK</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&amp;Save</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>QRImageWidget</name>
     <message>
         <source>&amp;Save Image...</source>
@@ -4507,6 +4472,18 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>No</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Memory usage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Current number of transactions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Memory Pool</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5890,7 +5867,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>%1/offline</source>
-        <translation type="unfinished">%1/offline</translation>
+        <translation type="obsolete">%1/offline</translation>
     </message>
     <message>
         <source>0/unconfirmed, in memory pool</source>
@@ -6185,11 +6162,11 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>, has not been successfully broadcast yet</source>
-        <translation>, has not been successfully broadcast yet</translation>
+        <translation type="vanished">, has not been successfully broadcast yet</translation>
     </message>
     <message numerus="yes">
         <source>, broadcast through %n node(s)</source>
-        <translation>
+        <translation type="vanished">
             <numerusform>, broadcast through %n node</numerusform>
             <numerusform>, broadcast through %n nodes</numerusform>
         </translation>
@@ -6392,7 +6369,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Offline</source>
-        <translation>Offline</translation>
+        <translation type="vanished">Offline</translation>
     </message>
     <message>
         <source>Unconfirmed</source>
@@ -6416,7 +6393,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>This block was not received by any other nodes and will probably not be accepted!</source>
-        <translation>This block was not received by any other nodes and will probably not be accepted!</translation>
+        <translation type="vanished">This block was not received by any other nodes and will probably not be accepted!</translation>
     </message>
     <message>
         <source>Received with</source>
@@ -6873,15 +6850,15 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Cannot obtain a lock on data directory %s. Luxcore is probably already running.</source>
-        <translation>Cannot obtain a lock on data directory %s. Luxcore is probably already running.</translation>
+        <translation type="vanished">Cannot obtain a lock on data directory %s. Luxcore is probably already running.</translation>
     </message>
     <message>
         <source>Change automatic finalized budget voting behavior. mode=auto: Vote for only exact finalized budget match to my generated budget. (string, default: auto)</source>
-        <translation>Change automatic finalized budget voting behavior. mode=auto: Vote for only exact finalized budget match to my generated budget. (string, default: auto)</translation>
+        <translation type="vanished">Change automatic finalized budget voting behavior. mode=auto: Vote for only exact finalized budget match to my generated budget. (string, default: auto)</translation>
     </message>
     <message>
         <source>Continuously rate-limit free transactions to &lt;n&gt;*1000 bytes per minute (default:%u)</source>
-        <translation>Continuously rate-limit free transactions to &lt;n&gt;*1000 bytes per minute (default:%u)</translation>
+        <translation type="vanished">Continuously rate-limit free transactions to &lt;n&gt;*1000 bytes per minute (default:%u)</translation>
     </message>
     <message>
         <source>Create new files with system default permissions, instead of umask 077 (only effective with disabled wallet functionality)</source>
@@ -6897,19 +6874,19 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Distributed under the MIT software license, see the accompanying file COPYING or &lt;http://www.opensource.org/licenses/mit-license.php&gt;.</source>
-        <translation>Distributed under the MIT software license, see the accompanying file COPYING or &lt;http://www.opensource.org/licenses/mit-license.php&gt;.</translation>
+        <translation type="vanished">Distributed under the MIT software license, see the accompanying file COPYING or &lt;http://www.opensource.org/licenses/mit-license.php&gt;.</translation>
     </message>
     <message>
         <source>Enable instantx, show confirmations for locked transactions (bool, default: %s)</source>
-        <translation>Enable instantx, show confirmations for locked transactions (bool, default: %s)</translation>
+        <translation type="vanished">Enable instantx, show confirmations for locked transactions (bool, default: %s)</translation>
     </message>
     <message>
         <source>Enable use of automated darksend for funds stored in this wallet (0-1, default: %u)</source>
-        <translation>Enable use of automated darksend for funds stored in this wallet (0-1, default: %u)</translation>
+        <translation type="vanished">Enable use of automated darksend for funds stored in this wallet (0-1, default: %u)</translation>
     </message>
     <message>
         <source>Enter regression test mode, which uses a special chain in which blocks can be solved instantly.</source>
-        <translation>Enter regression test mode, which uses a special chain in which blocks can be solved instantly.</translation>
+        <translation type="vanished">Enter regression test mode, which uses a special chain in which blocks can be solved instantly.</translation>
     </message>
     <message>
         <source>Error: Listening for incoming connections failed (listen returned error %s)</source>
@@ -6917,7 +6894,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Error: Unsupported argument -socks found. Setting SOCKS version isn&apos;t possible anymore, only SOCKS5 proxies are supported.</source>
-        <translation>Error: Unsupported argument -socks found. Setting SOCKS version isn&apos;t possible anymore, only SOCKS5 proxies are supported.</translation>
+        <translation type="vanished">Error: Unsupported argument -socks found. Setting SOCKS version isn&apos;t possible anymore, only SOCKS5 proxies are supported.</translation>
     </message>
     <message>
         <source>Execute command when a relevant alert is received or we see a really long fork (%s in cmd is replaced by message)</source>
@@ -6933,15 +6910,15 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Fees (in LUX/Kb) smaller than this are considered zero fee for relaying (default: %s)</source>
-        <translation>Fees (in LUX/Kb) smaller than this are considered zero fee for relaying (default: %s)</translation>
+        <translation type="vanished">Fees (in LUX/Kb) smaller than this are considered zero fee for relaying (default: %s)</translation>
     </message>
     <message>
         <source>Fees (in LUX/Kb) smaller than this are considered zero fee for transaction creation (default: %s)</source>
-        <translation>Fees (in LUX/Kb) smaller than this are considered zero fee for transaction creation (default: %s)</translation>
+        <translation type="vanished">Fees (in LUX/Kb) smaller than this are considered zero fee for transaction creation (default: %s)</translation>
     </message>
     <message>
         <source>Flush database activity from memory pool to disk log every &lt;n&gt; megabytes (default: %u)</source>
-        <translation>Flush database activity from memory pool to disk log every &lt;n&gt; megabytes (default: %u)</translation>
+        <translation type="vanished">Flush database activity from memory pool to disk log every &lt;n&gt; megabytes (default: %u)</translation>
     </message>
     <message>
         <source>Found unconfirmed denominated outputs, will wait till they confirm to continue.</source>
@@ -6957,7 +6934,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>In this mode -genproclimit controls how many blocks are generated immediately.</source>
-        <translation>In this mode -genproclimit controls how many blocks are generated immediately.</translation>
+        <translation type="vanished">In this mode -genproclimit controls how many blocks are generated immediately.</translation>
     </message>
     <message>
         <source>Invalid amount for -maxtxfee=&lt;amount&gt;: &apos;%s&apos; (must be at least the minrelay fee of %s to prevent stuck transactions)</source>
@@ -6965,7 +6942,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Log transaction priority and fee per kB when mining blocks (default: %u)</source>
-        <translation>Log transaction priority and fee per kB when mining blocks (default: %u)</translation>
+        <translation type="vanished">Log transaction priority and fee per kB when mining blocks (default: %u)</translation>
     </message>
     <message>
         <source>Maintain a full transaction index, used by the getrawtransaction rpc call (default: %u)</source>
@@ -6993,19 +6970,19 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Provide liquidity to Darksend by infrequently mixing coins on a continual basis (0-100, default: %u, 1=very frequent, high fees, 100=very infrequent, low fees)</source>
-        <translation>Provide liquidity to Darksend by infrequently mixing coins on a continual basis (0-100, default: %u, 1=very frequent, high fees, 100=very infrequent, low fees)</translation>
+        <translation type="vanished">Provide liquidity to Darksend by infrequently mixing coins on a continual basis (0-100, default: %u, 1=very frequent, high fees, 100=very infrequent, low fees)</translation>
     </message>
     <message>
         <source>Query for peer addresses via DNS lookup, if low on addresses (default: 1 unless -connect)</source>
-        <translation>Query for peer addresses via DNS lookup, if low on addresses (default: 1 unless -connect)</translation>
+        <translation type="vanished">Query for peer addresses via DNS lookup, if low on addresses (default: 1 unless -connect)</translation>
     </message>
     <message>
         <source>Require high priority for relaying free or low-fee transactions (default:%u)</source>
-        <translation>Require high priority for relaying free or low-fee transactions (default:%u)</translation>
+        <translation type="vanished">Require high priority for relaying free or low-fee transactions (default:%u)</translation>
     </message>
     <message>
         <source>Send trace/debug info to console instead of debug.log file (default: %u)</source>
-        <translation>Send trace/debug info to console instead of debug.log file (default: %u)</translation>
+        <translation type="vanished">Send trace/debug info to console instead of debug.log file (default: %u)</translation>
     </message>
     <message>
         <source>Set maximum size of high-priority/low-fee transactions in bytes (default: %d)</source>
@@ -7013,15 +6990,15 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Set the number of script verification threads (%u to %d, 0 = auto, &lt;0 = leave that many cores free, default: %d)</source>
-        <translation type="vanished">Set the number of script verification threads (%u to %d, 0 = auto, &lt;0 = leave that many cores free, default: %d)</translation>
+        <translation>Set the number of script verification threads (%u to %d, 0 = auto, &lt;0 = leave that many cores free, default: %d)</translation>
     </message>
     <message>
         <source>Set the number of threads for coin generation if enabled (-1 = all cores, default: %d)</source>
-        <translation>Set the number of threads for coin generation if enabled (-1 = all cores, default: %d)</translation>
+        <translation type="vanished">Set the number of threads for coin generation if enabled (-1 = all cores, default: %d)</translation>
     </message>
     <message>
         <source>Show N confirmations for a successfully locked transaction (0-9999, default: %u)</source>
-        <translation>Show N confirmations for a successfully locked transaction (0-9999, default: %u)</translation>
+        <translation type="vanished">Show N confirmations for a successfully locked transaction (0-9999, default: %u)</translation>
     </message>
     <message>
         <source>InstanTX requires inputs with at least 6 confirmations, you might need to wait a few minutes and try again.</source>
@@ -7033,7 +7010,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>This product includes software developed by the OpenSSL Project for use in the OpenSSL Toolkit &lt;https://www.openssl.org/&gt; and cryptographic software written by Eric Young and UPnP software written by Thomas Bernard.</source>
-        <translation>This product includes software developed by the OpenSSL Project for use in the OpenSSL Toolkit &lt;https://www.openssl.org/&gt; and cryptographic software written by Eric Young and UPnP software written by Thomas Bernard.</translation>
+        <translation type="vanished">This product includes software developed by the OpenSSL Project for use in the OpenSSL Toolkit &lt;https://www.openssl.org/&gt; and cryptographic software written by Eric Young and UPnP software written by Thomas Bernard.</translation>
     </message>
     <message>
         <source>To use luxd, or the -server option to lux-qt, you must set an rpcpassword in the configuration file:
@@ -7061,7 +7038,7 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <source>Unable to bind to %s on this computer. Luxcore is probably already running.</source>
-        <translation>Unable to bind to %s on this computer. Luxcore is probably already running.</translation>
+        <translation type="vanished">Unable to bind to %s on this computer. Luxcore is probably already running.</translation>
     </message>
     <message>
         <source>Unable to locate enough Darksend denominated funds for this transaction.</source>
@@ -7073,7 +7050,7 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <source>Unable to locate enough funds for this transaction that are not equal 10000 LUX.</source>
-        <translation>Unable to locate enough funds for this transaction that are not equal 10000 LUX.</translation>
+        <translation type="vanished">Unable to locate enough funds for this transaction that are not equal 10000 LUX.</translation>
     </message>
     <message>
         <source>Use separate SOCKS5 proxy to reach peers via Tor hidden services (default: %s)</source>
@@ -7081,15 +7058,15 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <source>Warning: -maxtxfee is set very high! Fees this large could be paid on a single transaction.</source>
-        <translation>Warning: -maxtxfee is set very high! Fees this large could be paid on a single transaction.</translation>
+        <translation type="vanished">Warning: -maxtxfee is set very high! Fees this large could be paid on a single transaction.</translation>
     </message>
     <message>
         <source>Warning: -paytxfee is set very high! This is the transaction fee you will pay if you send a transaction.</source>
-        <translation>Warning: -paytxfee is set very high! This is the transaction fee you will pay if you send a transaction.</translation>
+        <translation type="vanished">Warning: -paytxfee is set very high! This is the transaction fee you will pay if you send a transaction.</translation>
     </message>
     <message>
         <source>Warning: Please check that your computer&apos;s date and time are correct! If your clock is wrong Luxcore will not work properly.</source>
-        <translation>Warning: Please check that your computer&apos;s date and time are correct! If your clock is wrong Luxcore will not work properly.</translation>
+        <translation type="vanished">Warning: Please check that your computer&apos;s date and time are correct! If your clock is wrong Luxcore will not work properly.</translation>
     </message>
     <message>
         <source>Warning: The network does not appear to fully agree! Some miners appear to be experiencing issues.</source>
@@ -7101,15 +7078,15 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <source>Warning: error reading wallet.dat! All keys read correctly, but transaction data or address book entries might be missing or incorrect.</source>
-        <translation>Warning: error reading wallet.dat! All keys read correctly, but transaction data or address book entries might be missing or incorrect.</translation>
+        <translation type="vanished">Warning: error reading wallet.dat! All keys read correctly, but transaction data or address book entries might be missing or incorrect.</translation>
     </message>
     <message>
         <source>Warning: wallet.dat corrupt, data salvaged! Original wallet.dat saved as wallet.{timestamp}.bak in %s; if your balance or transactions are incorrect you should restore from a backup.</source>
-        <translation>Warning: wallet.dat corrupt, data salvaged! Original wallet.dat saved as wallet.{timestamp}.bak in %s; if your balance or transactions are incorrect you should restore from a backup.</translation>
+        <translation type="vanished">Warning: wallet.dat corrupt, data salvaged! Original wallet.dat saved as wallet.{timestamp}.bak in %s; if your balance or transactions are incorrect you should restore from a backup.</translation>
     </message>
     <message>
         <source>Whitelist peers connecting from the given netmask or IP address. Can be specified multiple times.</source>
-        <translation>Whitelist peers connecting from the given netmask or IP address. Can be specified multiple times.</translation>
+        <translation type="vanished">Whitelist peers connecting from the given netmask or IP address. Can be specified multiple times.</translation>
     </message>
     <message>
         <source>Whitelisted peers cannot be DoS banned and their transactions are always relayed, even if they are already in the mempool, useful e.g. for a gateway</source>
@@ -7129,7 +7106,7 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <source>(default: 1)</source>
-        <translation>(default: 1)</translation>
+        <translation type="vanished">(default: 1)</translation>
     </message>
     <message>
         <source>(must be 51472 for mainnet)</source>
@@ -7147,7 +7124,7 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <source>Accept connections from outside (default: 1 if no -proxy or -connect)</source>
-        <translation>Accept connections from outside (default: 1 if no -proxy or -connect)</translation>
+        <translation type="vanished">Accept connections from outside (default: 1 if no -proxy or -connect)</translation>
     </message>
     <message>
         <source>Accept public REST requests (default: %u)</source>
@@ -7155,7 +7132,7 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <source>Acceptable ciphers (default: %s)</source>
-        <translation>Acceptable ciphers (default: %s)</translation>
+        <translation type="vanished">Acceptable ciphers (default: %s)</translation>
     </message>
     <message>
         <source>Add a node to connect to and attempt to keep the connection open</source>
@@ -7175,7 +7152,7 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <source>Attempt to recover private keys from a corrupt wallet.dat</source>
-        <translation>Attempt to recover private keys from a corrupt wallet.dat</translation>
+        <translation type="vanished">Attempt to recover private keys from a corrupt wallet.dat</translation>
     </message>
     <message>
         <source>Block creation options:</source>
@@ -7183,15 +7160,15 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <source>Can&apos;t denominate: no compatible inputs left.</source>
-        <translation>Can&apos;t denominate: no compatible inputs left.</translation>
+        <translation type="vanished">Can&apos;t denominate: no compatible inputs left.</translation>
     </message>
     <message>
         <source>Can&apos;t find random Masternode.</source>
-        <translation type="vanished">Can&apos;t find random Masternode.</translation>
+        <translation>Can&apos;t find random Masternode.</translation>
     </message>
     <message>
         <source>Can&apos;t mix while sync in progress.</source>
-        <translation type="vanished">Can&apos;t mix while sync in progress.</translation>
+        <translation>Can&apos;t mix while sync in progress.</translation>
     </message>
     <message>
         <source>Cannot downgrade wallet</source>
@@ -7199,15 +7176,15 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <source>Cannot resolve -bind address: &apos;%s&apos;</source>
-        <translation>Cannot resolve -bind address: &apos;%s&apos;</translation>
+        <translation type="vanished">Cannot resolve -bind address: &apos;%s&apos;</translation>
     </message>
     <message>
         <source>Cannot resolve -externalip address: &apos;%s&apos;</source>
-        <translation>Cannot resolve -externalip address: &apos;%s&apos;</translation>
+        <translation type="vanished">Cannot resolve -externalip address: &apos;%s&apos;</translation>
     </message>
     <message>
         <source>Cannot resolve -whitebind address: &apos;%s&apos;</source>
-        <translation>Cannot resolve -whitebind address: &apos;%s&apos;</translation>
+        <translation type="vanished">Cannot resolve -whitebind address: &apos;%s&apos;</translation>
     </message>
     <message>
         <source>Cannot write default address</source>
@@ -7219,7 +7196,7 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <source>Connect only to the specified node(s)</source>
-        <translation>Connect only to the specified node(s)</translation>
+        <translation type="vanished">Connect only to the specified node(s)</translation>
     </message>
     <message>
         <source>Connect through SOCKS5 proxy</source>
@@ -7235,11 +7212,11 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <source>Copyright (C) 2009-%i The Bitcoin Core Developers</source>
-        <translation>Copyright (C) 2009-%i The Bitcoin Core Developers</translation>
+        <translation type="vanished">Copyright (C) 2009-%i The Bitcoin Core Developers</translation>
     </message>
     <message>
         <source>Copyright (C) 2014-%i The Dash Core Developers</source>
-        <translation>Copyright (C) 2014-%i The Dash Core Developers</translation>
+        <translation type="vanished">Copyright (C) 2014-%i The Dash Core Developers</translation>
     </message>
     <message>
         <source>Copyright (C) 2015-%i The Luxcore Developers</source>
@@ -7255,7 +7232,7 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <source>Could not parse masternode.conf</source>
-        <translation type="vanished">Could not parse masternode.conf</translation>
+        <translation>Could not parse masternode.conf</translation>
     </message>
     <message>
         <source>Debugging/Testing options:</source>
@@ -7263,11 +7240,11 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <source>Disable safemode, override a real safe mode event (default: %u)</source>
-        <translation>Disable safemode, override a real safe mode event (default: %u)</translation>
+        <translation type="vanished">Disable safemode, override a real safe mode event (default: %u)</translation>
     </message>
     <message>
         <source>Discover own IP address (default: 1 when listening and no -externalip)</source>
-        <translation>Discover own IP address (default: 1 when listening and no -externalip)</translation>
+        <translation type="vanished">Discover own IP address (default: 1 when listening and no -externalip)</translation>
     </message>
     <message>
         <source>Do not load the wallet and disable wallet RPC calls</source>
@@ -7307,15 +7284,15 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <source>Error loading wallet.dat</source>
-        <translation>Error loading wallet.dat</translation>
+        <translation type="vanished">Error loading wallet.dat</translation>
     </message>
     <message>
         <source>Error loading wallet.dat: Wallet corrupted</source>
-        <translation>Error loading wallet.dat: Wallet corrupted</translation>
+        <translation type="vanished">Error loading wallet.dat: Wallet corrupted</translation>
     </message>
     <message>
         <source>Error loading wallet.dat: Wallet requires newer version of Luxcore</source>
-        <translation>Error loading wallet.dat: Wallet requires newer version of Luxcore</translation>
+        <translation type="vanished">Error loading wallet.dat: Wallet requires newer version of Luxcore</translation>
     </message>
     <message>
         <source>Error opening block database</source>
@@ -7327,7 +7304,7 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <source>Error recovering public key.</source>
-        <translation>Error recovering public key.</translation>
+        <translation type="vanished">Error recovering public key.</translation>
     </message>
     <message>
         <source>Error</source>
@@ -7335,7 +7312,7 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <source>Error: A fatal internal error occured, see debug.log for details</source>
-        <translation>Error: A fatal internal error occured, see debug.log for details</translation>
+        <translation type="vanished">Error: A fatal internal error occured, see debug.log for details</translation>
     </message>
     <message>
         <source>Error: Can&apos;t select current denominated inputs</source>
@@ -7347,15 +7324,15 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <source>Error: Unsupported argument -tor found, use -onion.</source>
-        <translation>Error: Unsupported argument -tor found, use -onion.</translation>
+        <translation type="vanished">Error: Unsupported argument -tor found, use -onion.</translation>
     </message>
     <message>
         <source>Error: Wallet locked, unable to create transaction!</source>
-        <translation>Error: Wallet locked, unable to create transaction!</translation>
+        <translation type="vanished">Error: Wallet locked, unable to create transaction!</translation>
     </message>
     <message>
         <source>Error: You already have pending entries in the Darksend pool</source>
-        <translation>Error: You already have pending entries in the Darksend pool</translation>
+        <translation type="vanished">Error: You already have pending entries in the Darksend pool</translation>
     </message>
     <message>
         <source>Failed to listen on any port. Use -listen=0 if you want this.</source>
@@ -7367,7 +7344,7 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <source>Fee (in LUX/kB) to add to transactions you send (default: %s)</source>
-        <translation>Fee (in LUX/kB) to add to transactions you send (default: %s)</translation>
+        <translation type="vanished">Fee (in LUX/kB) to add to transactions you send (default: %s)</translation>
     </message>
     <message>
         <source>Finalizing transaction.</source>
@@ -7375,19 +7352,19 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <source>Force safe mode (default: %u)</source>
-        <translation>Force safe mode (default: %u)</translation>
+        <translation type="vanished">Force safe mode (default: %u)</translation>
     </message>
     <message>
         <source>Found enough users, signing ( waiting %s )</source>
-        <translation type="vanished">Found enough users, signing ( waiting %s )</translation>
+        <translation>Found enough users, signing ( waiting %s )</translation>
     </message>
     <message>
         <source>Found enough users, signing ...</source>
-        <translation type="vanished">Found enough users, signing ...</translation>
+        <translation>Found enough users, signing ...</translation>
     </message>
     <message>
         <source>Generate coins (default: %u)</source>
-        <translation>Generate coins (default: %u)</translation>
+        <translation type="vanished">Generate coins (default: %u)</translation>
     </message>
     <message>
         <source>How many blocks to check at startup (default: %u, 0 = all)</source>
@@ -7395,7 +7372,7 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <source>If &lt;category&gt; is not supplied, output all debugging information.</source>
-        <translation>If &lt;category&gt; is not supplied, output all debugging information.</translation>
+        <translation type="vanished">If &lt;category&gt; is not supplied, output all debugging information.</translation>
     </message>
     <message>
         <source>Importing...</source>
@@ -7403,7 +7380,7 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <source>Imports blocks from external blk000??.dat file</source>
-        <translation>Imports blocks from external blk000??.dat file</translation>
+        <translation type="vanished">Imports blocks from external blk000??.dat file</translation>
     </message>
     <message>
         <source>Include IP addresses in debug output (default: %u)</source>
@@ -7427,7 +7404,7 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <source>Initialization sanity check failed. Luxcore is shutting down.</source>
-        <translation>Initialization sanity check failed. Luxcore is shutting down.</translation>
+        <translation type="vanished">Initialization sanity check failed. Luxcore is shutting down.</translation>
     </message>
     <message>
         <source>Input is not valid.</source>
@@ -7447,15 +7424,15 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <source>Invalid amount for -maxtxfee=&lt;amount&gt;: &apos;%s&apos;</source>
-        <translation>Invalid amount for -maxtxfee=&lt;amount&gt;: &apos;%s&apos;</translation>
+        <translation type="vanished">Invalid amount for -maxtxfee=&lt;amount&gt;: &apos;%s&apos;</translation>
     </message>
     <message>
         <source>Invalid amount for -minrelaytxfee=&lt;amount&gt;: &apos;%s&apos;</source>
-        <translation>Invalid amount for -minrelaytxfee=&lt;amount&gt;: &apos;%s&apos;</translation>
+        <translation type="vanished">Invalid amount for -minrelaytxfee=&lt;amount&gt;: &apos;%s&apos;</translation>
     </message>
     <message>
         <source>Invalid amount for -mintxfee=&lt;amount&gt;: &apos;%s&apos;</source>
-        <translation>Invalid amount for -mintxfee=&lt;amount&gt;: &apos;%s&apos;</translation>
+        <translation type="vanished">Invalid amount for -mintxfee=&lt;amount&gt;: &apos;%s&apos;</translation>
     </message>
     <message>
         <source>Invalid amount for -paytxfee=&lt;amount&gt;: &apos;%s&apos; (must be at least %s)</source>
@@ -7463,11 +7440,11 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <source>Invalid amount for -paytxfee=&lt;amount&gt;: &apos;%s&apos;</source>
-        <translation>Invalid amount for -paytxfee=&lt;amount&gt;: &apos;%s&apos;</translation>
+        <translation type="vanished">Invalid amount for -paytxfee=&lt;amount&gt;: &apos;%s&apos;</translation>
     </message>
     <message>
         <source>Invalid amount for -reservebalance=&lt;amount&gt;</source>
-        <translation>Invalid amount for -reservebalance=&lt;amount&gt;</translation>
+        <translation type="vanished">Invalid amount for -reservebalance=&lt;amount&gt;</translation>
     </message>
     <message>
         <source>Invalid masternodeprivkey. Please see documenation.</source>
@@ -7479,11 +7456,11 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <source>Invalid port detected in masternode.conf</source>
-        <translation type="vanished">Invalid port detected in masternode.conf</translation>
+        <translation>Invalid port detected in masternode.conf</translation>
     </message>
     <message>
         <source>Invalid private key.</source>
-        <translation>Invalid private key.</translation>
+        <translation type="vanished">Invalid private key.</translation>
     </message>
     <message>
         <source>Invalid script detected.</source>
@@ -7491,7 +7468,7 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <source>Keep N LUX anonymized (default: %u)</source>
-        <translation>Keep N LUX anonymized (default: %u)</translation>
+        <translation type="vanished">Keep N LUX anonymized (default: %u)</translation>
     </message>
     <message>
         <source>Keep at most &lt;n&gt; unconnectable transactions in memory (default: %u)</source>
@@ -7499,7 +7476,7 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <source>Last Darksend was too recent.</source>
-        <translation>Last Darksend was too recent.</translation>
+        <translation type="vanished">Last Darksend was too recent.</translation>
     </message>
     <message>
         <source>Last successful Darksend action was too recent.</source>
@@ -7507,11 +7484,11 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <source>Limit size of signature cache to &lt;n&gt; entries (default: %u)</source>
-        <translation>Limit size of signature cache to &lt;n&gt; entries (default: %u)</translation>
+        <translation type="vanished">Limit size of signature cache to &lt;n&gt; entries (default: %u)</translation>
     </message>
     <message>
         <source>Line: %d</source>
-        <translation type="vanished">Line: %d</translation>
+        <translation>Line: %d</translation>
     </message>
     <message>
         <source>Listen for JSON-RPC connections on &lt;port&gt; (default: %u or testnet: %u)</source>
@@ -7535,11 +7512,11 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <source>Loading masternode cache...</source>
-        <translation type="vanished">Loading masternode cache...</translation>
+        <translation>Loading masternode cache...</translation>
     </message>
     <message>
         <source>Loading masternode payment cache...</source>
-        <translation type="vanished">Loading masternode payment cache...</translation>
+        <translation>Loading masternode payment cache...</translation>
     </message>
     <message>
         <source>Loading wallet... (%3.2f %%)</source>
@@ -7551,7 +7528,7 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <source>Lock is already in place.</source>
-        <translation type="vanished">Lock is already in place.</translation>
+        <translation>Lock is already in place.</translation>
     </message>
     <message>
         <source>Lock masternodes from masternode configuration file (default: %u)</source>
@@ -7559,7 +7536,7 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <source>Maintain at most &lt;n&gt; connections to peers (default: %u)</source>
-        <translation>Maintain at most &lt;n&gt; connections to peers (default: %u)</translation>
+        <translation type="vanished">Maintain at most &lt;n&gt; connections to peers (default: %u)</translation>
     </message>
     <message>
         <source>Masternode options:</source>
@@ -7587,7 +7564,7 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <source>Mixing in progress...</source>
-        <translation type="vanished">Mixing in progress...</translation>
+        <translation>Mixing in progress...</translation>
     </message>
     <message>
         <source>Need to specify a port with -whitebind: &apos;%s&apos;</source>
@@ -7595,15 +7572,15 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <source>No Masternodes detected.</source>
-        <translation type="vanished">No Masternodes detected.</translation>
+        <translation>No Masternodes detected.</translation>
     </message>
     <message>
         <source>No compatible Masternode found.</source>
-        <translation type="vanished">No compatible Masternode found.</translation>
+        <translation>No compatible Masternode found.</translation>
     </message>
     <message>
         <source>No funds detected in need of denominating.</source>
-        <translation>No funds detected in need of denominating.</translation>
+        <translation type="vanished">No funds detected in need of denominating.</translation>
     </message>
     <message>
         <source>No matching denominations found for mixing.</source>
@@ -7627,11 +7604,11 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <source>Not in the Masternode list.</source>
-        <translation type="vanished">Not in the Masternode list.</translation>
+        <translation>Not in the Masternode list.</translation>
     </message>
     <message>
         <source>Number of automatic wallet backups (default: 10)</source>
-        <translation>Number of automatic wallet backups (default: 10)</translation>
+        <translation type="vanished">Number of automatic wallet backups (default: 10)</translation>
     </message>
     <message>
         <source>Darksend is idle.</source>
@@ -7639,7 +7616,7 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <source>Darksend options:</source>
-        <translation>Darksend options:</translation>
+        <translation type="vanished">Darksend options:</translation>
     </message>
     <message>
         <source>Darksend request complete:</source>
@@ -7651,7 +7628,7 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <source>Only accept block chain matching built-in checkpoints (default: %u)</source>
-        <translation>Only accept block chain matching built-in checkpoints (default: %u)</translation>
+        <translation type="vanished">Only accept block chain matching built-in checkpoints (default: %u)</translation>
     </message>
     <message>
         <source>Only connect to nodes in network &lt;net&gt; (ipv4, ipv6 or onion)</source>
@@ -7671,7 +7648,7 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <source>RPC SSL options: (see the Bitcoin Wiki for SSL setup instructions)</source>
-        <translation>RPC SSL options: (see the Bitcoin Wiki for SSL setup instructions)</translation>
+        <translation type="vanished">RPC SSL options: (see the Bitcoin Wiki for SSL setup instructions)</translation>
     </message>
     <message>
         <source>RPC server options:</source>
@@ -7679,19 +7656,19 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <source>RPC support for HTTP persistent connections (default: %d)</source>
-        <translation>RPC support for HTTP persistent connections (default: %d)</translation>
+        <translation type="vanished">RPC support for HTTP persistent connections (default: %d)</translation>
     </message>
     <message>
         <source>Randomly drop 1 of every &lt;n&gt; network messages</source>
-        <translation>Randomly drop 1 of every &lt;n&gt; network messages</translation>
+        <translation type="vanished">Randomly drop 1 of every &lt;n&gt; network messages</translation>
     </message>
     <message>
         <source>Randomly fuzz 1 of every &lt;n&gt; network messages</source>
-        <translation>Randomly fuzz 1 of every &lt;n&gt; network messages</translation>
+        <translation type="vanished">Randomly fuzz 1 of every &lt;n&gt; network messages</translation>
     </message>
     <message>
         <source>Rebuild block chain index from current blk000??.dat files</source>
-        <translation>Rebuild block chain index from current blk000??.dat files</translation>
+        <translation type="vanished">Rebuild block chain index from current blk000??.dat files</translation>
     </message>
     <message>
         <source>Receive and display P2P network alerts (default: %u)</source>
@@ -7707,7 +7684,7 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <source>Rescan the block chain for missing wallet transactions</source>
-        <translation>Rescan the block chain for missing wallet transactions</translation>
+        <translation type="vanished">Rescan the block chain for missing wallet transactions</translation>
     </message>
     <message>
         <source>Rescanning...</source>
@@ -7715,7 +7692,7 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <source>Run a thread to flush wallet periodically (default: %u)</source>
-        <translation>Run a thread to flush wallet periodically (default: %u)</translation>
+        <translation type="vanished">Run a thread to flush wallet periodically (default: %u)</translation>
     </message>
     <message>
         <source>Run in the background as a daemon and accept commands</source>
@@ -7727,11 +7704,11 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <source>Server certificate file (default: %s)</source>
-        <translation>Server certificate file (default: %s)</translation>
+        <translation type="vanished">Server certificate file (default: %s)</translation>
     </message>
     <message>
         <source>Server private key (default: %s)</source>
-        <translation>Server private key (default: %s)</translation>
+        <translation type="vanished">Server private key (default: %s)</translation>
     </message>
     <message>
         <source>Session not complete!</source>
@@ -7739,7 +7716,7 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <source>Session timed out.</source>
-        <translation type="vanished">Session timed out.</translation>
+        <translation>Session timed out.</translation>
     </message>
     <message>
         <source>Set database cache size in megabytes (%d to %d, default: %d)</source>
@@ -7747,7 +7724,7 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <source>Set external address:port to get to this masternode (example: %s)</source>
-        <translation>Set external address:port to get to this masternode (example: %s)</translation>
+        <translation type="vanished">Set external address:port to get to this masternode (example: %s)</translation>
     </message>
     <message>
         <source>Set key pool size to &lt;n&gt; (default: %u)</source>
@@ -7759,7 +7736,7 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <source>Set minimum block size in bytes (default: %u)</source>
-        <translation>Set minimum block size in bytes (default: %u)</translation>
+        <translation type="vanished">Set minimum block size in bytes (default: %u)</translation>
     </message>
     <message>
         <source>Set the masternode private key</source>
@@ -7771,7 +7748,7 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <source>Sets the DB_PRIVATE flag in the wallet db environment (default: %u)</source>
-        <translation>Sets the DB_PRIVATE flag in the wallet db environment (default: %u)</translation>
+        <translation type="vanished">Sets the DB_PRIVATE flag in the wallet db environment (default: %u)</translation>
     </message>
     <message>
         <source>Show all debugging options (usage: --help -help-debug)</source>
@@ -7783,7 +7760,7 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <source>Signing failed.</source>
-        <translation>Signing failed.</translation>
+        <translation type="vanished">Signing failed.</translation>
     </message>
     <message>
         <source>Signing timed out.</source>
@@ -7827,35 +7804,35 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <source>Stop running after importing blocks from disk (default: %u)</source>
-        <translation>Stop running after importing blocks from disk (default: %u)</translation>
+        <translation type="vanished">Stop running after importing blocks from disk (default: %u)</translation>
     </message>
     <message>
         <source>Submitted following entries to masternode: %u / %d</source>
-        <translation type="vanished">Submitted following entries to masternode: %u / %d</translation>
+        <translation>Submitted following entries to masternode: %u / %d</translation>
     </message>
     <message>
         <source>Submitted to masternode, waiting for more entries ( %u / %d ) %s</source>
-        <translation type="vanished">Submitted to masternode, waiting for more entries ( %u / %d ) %s</translation>
+        <translation>Submitted to masternode, waiting for more entries ( %u / %d ) %s</translation>
     </message>
     <message>
         <source>Submitted to masternode, waiting in queue %s</source>
-        <translation type="vanished">Submitted to masternode, waiting in queue %s</translation>
+        <translation>Submitted to masternode, waiting in queue %s</translation>
     </message>
     <message>
         <source>InstanTX options:</source>
-        <translation>InstanTX options:</translation>
+        <translation type="vanished">InstanTX options:</translation>
     </message>
     <message>
         <source>Synchronization failed</source>
-        <translation type="vanished">Synchronization failed</translation>
+        <translation>Synchronization failed</translation>
     </message>
     <message>
         <source>Synchronization finished</source>
-        <translation type="vanished">Synchronization finished</translation>
+        <translation>Synchronization finished</translation>
     </message>
     <message>
         <source>Synchronization pending...</source>
-        <translation type="vanished">Synchronization pending...</translation>
+        <translation>Synchronization pending...</translation>
     </message>
     <message>
         <source>Synchronizing budgets...</source>
@@ -7867,7 +7844,7 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <source>Synchronizing masternodes...</source>
-        <translation type="vanished">Synchronizing masternodes...</translation>
+        <translation>Synchronizing masternodes...</translation>
     </message>
     <message>
         <source>Synchronizing sporks...</source>
@@ -7875,7 +7852,7 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <source>This help message</source>
-        <translation>This help message</translation>
+        <translation type="vanished">This help message</translation>
     </message>
     <message>
         <source>This is experimental software.</source>
@@ -7883,11 +7860,11 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <source>This is intended for regression testing tools and app development.</source>
-        <translation>This is intended for regression testing tools and app development.</translation>
+        <translation type="vanished">This is intended for regression testing tools and app development.</translation>
     </message>
     <message>
         <source>This is not a Masternode.</source>
-        <translation type="vanished">This is not a Masternode.</translation>
+        <translation>This is not a Masternode.</translation>
     </message>
     <message>
         <source>Threshold for disconnecting misbehaving peers (default: %u)</source>
@@ -7899,7 +7876,7 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <source>Transaction amounts must be positive</source>
-        <translation>Transaction amounts must be positive</translation>
+        <translation type="vanished">Transaction amounts must be positive</translation>
     </message>
     <message>
         <source>Transaction created successfully.</source>
@@ -7915,7 +7892,7 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <source>Transaction too large for fee policy</source>
-        <translation type="vanished">Transaction too large for fee policy</translation>
+        <translation>Transaction too large for fee policy</translation>
     </message>
     <message>
         <source>Transaction too large</source>
@@ -7939,19 +7916,19 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <source>Unknown state: id = %u</source>
-        <translation type="vanished">Unknown state: id = %u</translation>
+        <translation>Unknown state: id = %u</translation>
     </message>
     <message>
         <source>Upgrade wallet to latest format</source>
-        <translation>Upgrade wallet to latest format</translation>
+        <translation type="vanished">Upgrade wallet to latest format</translation>
     </message>
     <message>
         <source>Use N separate masternodes to anonymize funds  (2-8, default: %u)</source>
-        <translation>Use N separate masternodes to anonymize funds  (2-8, default: %u)</translation>
+        <translation type="vanished">Use N separate masternodes to anonymize funds  (2-8, default: %u)</translation>
     </message>
     <message>
         <source>Use OpenSSL (https) for JSON-RPC connections</source>
-        <translation>Use OpenSSL (https) for JSON-RPC connections</translation>
+        <translation type="vanished">Use OpenSSL (https) for JSON-RPC connections</translation>
     </message>
     <message>
         <source>Use UPnP to map the listening port (default: %u)</source>
@@ -7959,11 +7936,11 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <source>Use UPnP to map the listening port (default: 1 when listening)</source>
-        <translation>Use UPnP to map the listening port (default: 1 when listening)</translation>
+        <translation type="vanished">Use UPnP to map the listening port (default: 1 when listening)</translation>
     </message>
     <message>
         <source>Use the test network</source>
-        <translation>Use the test network</translation>
+        <translation type="vanished">Use the test network</translation>
     </message>
     <message>
         <source>Username for JSON-RPC connections</source>
@@ -7971,7 +7948,7 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <source>Value more than Darksend pool maximum allows.</source>
-        <translation>Value more than Darksend pool maximum allows.</translation>
+        <translation type="vanished">Value more than Darksend pool maximum allows.</translation>
     </message>
     <message>
         <source>Verifying blocks...</source>
@@ -7991,7 +7968,7 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <source>Wallet needed to be rewritten: restart Luxcore to complete</source>
-        <translation>Wallet needed to be rewritten: restart Luxcore to complete</translation>
+        <translation type="vanished">Wallet needed to be rewritten: restart Luxcore to complete</translation>
     </message>
     <message>
         <source>Wallet options:</source>
@@ -8007,31 +7984,31 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <source>Warning: This version is obsolete, upgrade required!</source>
-        <translation>Warning: This version is obsolete, upgrade required!</translation>
+        <translation type="vanished">Warning: This version is obsolete, upgrade required!</translation>
     </message>
     <message>
         <source>Warning: Unsupported argument -benchmark ignored, use -debug=bench.</source>
-        <translation>Warning: Unsupported argument -benchmark ignored, use -debug=bench.</translation>
+        <translation type="vanished">Warning: Unsupported argument -benchmark ignored, use -debug=bench.</translation>
     </message>
     <message>
         <source>Warning: Unsupported argument -debugnet ignored, use -debug=net.</source>
-        <translation>Warning: Unsupported argument -debugnet ignored, use -debug=net.</translation>
+        <translation type="vanished">Warning: Unsupported argument -debugnet ignored, use -debug=net.</translation>
     </message>
     <message>
         <source>Will retry...</source>
-        <translation type="vanished">Will retry...</translation>
+        <translation>Will retry...</translation>
     </message>
     <message>
         <source>You need to rebuild the database using -reindex to change -txindex</source>
-        <translation>You need to rebuild the database using -reindex to change -txindex</translation>
+        <translation type="vanished">You need to rebuild the database using -reindex to change -txindex</translation>
     </message>
     <message>
         <source>Your entries added successfully.</source>
-        <translation type="vanished">Your entries added successfully.</translation>
+        <translation>Your entries added successfully.</translation>
     </message>
     <message>
         <source>Your transaction was accepted into the pool!</source>
-        <translation type="vanished">Your transaction was accepted into the pool!</translation>
+        <translation>Your transaction was accepted into the pool!</translation>
     </message>
     <message>
         <source>Zapping all transactions from wallet...</source>
@@ -8039,23 +8016,11 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <source>on startup</source>
-        <translation>on startup</translation>
+        <translation type="vanished">on startup</translation>
     </message>
     <message>
         <source>wallet.dat corrupt, salvage failed</source>
-        <translation>wallet.dat corrupt, salvage failed</translation>
-    </message>
-    <message>
-        <source> or address book entries might be missing or incorrect</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&apos;importprivkey&apos; finished successfully. Please restart Luxcore wallet with &apos;-rescan&apos; option. Otherwise, transaction data</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&apos;importprivkey&apos; with &apos;Rescan&apos; option finished successfully. Please restart your Luxcore wallet. Otherwise, transaction data</source>
-        <translation type="unfinished"></translation>
+        <translation type="vanished">wallet.dat corrupt, salvage failed</translation>
     </message>
     <message>
         <source>Cannot obtain a lock on data directory %s. %s is probably already running.</source>
@@ -8063,18 +8028,6 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <source>DarkSend uses exact denominated amounts to send funds, you might simply need to anonymize some more coins.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Error loading %s: You need to upgrade the wallet to enable HD on a non-HD wallet</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>InstantX requires inputs with at least 6 confirmations, you might need to wait a few minutes and try again.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Maintain a full EVM log index, used by searchlogs and gettransactionreceipt rpc calls (default: %u)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -8094,35 +8047,11 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Reduce storage requirements by pruning (deleting) old blocks. This mode disables wallet support and is incompatible with -txindex.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Rescan aborted by user. Please restart your Luxcore wallet with &apos;-rescan&apos; option. Otherwise, transaction data</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Set the number of script verification threads (1 to %d, 0 = auto, &lt;0 = leave that many cores free, default: %d)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>The block database contains a block which appears to be from the future. This may be due to your computer&apos;s date and time being set incorrectly. Only rebuild the block database if you are sure that your computer&apos;s date and time are correct</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Unable to locate enough DarkSend denominated funds for this transaction.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Unable to locate enough DarkSend non-denominated funds for this transaction that are not equal 10000 LUX.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Use hierarchical deterministic key generation (HD) after bip32. Only has effect during wallet creation/first start</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>User defined memonic passphrase for HD wallet (bip39). Only has effect during wallet creation/first start (default: randomly generated)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -8134,15 +8063,7 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Warning: Reverting this setting requires re-downloading the entire blockchain.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>You need to rebuild the database using -reindex to go back to unpruned mode.  This will redownload the entire blockchain</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>You need to rebuild the database using -reindex-chainstate to enable -logevents</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -8150,15 +8071,7 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>(default: 0 = disable pruning blocks,</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>&lt;category&gt; can be:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&gt;%u = target size in MiB to use for block files)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -8166,23 +8079,7 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Collateral is not valid.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Copyright (C) 2017-%i The LUX-Core Developers</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Darksend is disabled.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Enable publish hash block in &lt;address&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Enable publish hash transaction (locked via InstanTX) in &lt;address&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -8194,15 +8091,7 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Enable publish raw transaction (locked via InstanTX) in &lt;address&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Enable publish raw transaction in &lt;address&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Error connecting to masternode.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -8214,19 +8103,7 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Error: can&apos;t select current denominated inputs</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Keypool ran out, please call keypoolrefill first</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Last successful darksend action was too recent.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Logs all EVM LOG opcode operations to the file vmExecLogs.json</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -8235,18 +8112,6 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <source>Mnemonic passphrase is too long, must be at most 256 characters</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>No compatible masternode found.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>No masternodes detected.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Not in the masternode list.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -8266,55 +8131,11 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Session timed out (30 seconds), please resubmit.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Set number of debug log files</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Signing timed out, please resubmit.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Stake your coins to support network and gain reward (default: %s)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This is not a masternode.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Unable to generate keys</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Unable to sign masternode payment winner, wrong key?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Unable to start HTTP server. See debug log for details.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Unknown address type &apos;%s&apos;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Unknown change type &apos;%s&apos;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Use the SegWit test network</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Warning: unknown new rules activated (versionbit %i)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Wrong state.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -8323,6 +8144,686 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <source>Prune: last wallet synchronisation goes beyond pruned data. You need to -reindex (download the whole blockchain again in case of pruned node)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>lux Core</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The %s developers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>-maxtxfee is set very high! Fees this large could be paid on a single transaction.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A fee rate (in %s/kB) that will be used when fee estimation has insufficient data (default: %s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Accept connections from outside (default: 1 if no -proxy or -connect/-noconnect)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Accept relayed transactions received from whitelisted peers even when not relaying transactions (default: %d)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connect only to the specified node(s); -noconnect or -connect=0 alone to disable automatic connections</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Disable all lux specific functionality (Masternodes, DarkSend, InstantSend, Governance) (0-1, default: %u)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Discover own IP addresses (default: 1 when listening and no -externalip or -proxy)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Distributed under the MIT software license, see the accompanying file %s or %s</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Do not keep transactions in the mempool longer than &lt;n&gt; hours (default: %u)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable InstantSend, show confirmations for locked transactions (0-1, default: %u)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable multiple DarkSend mixing sessions per block, experimental (0-1, default: %u)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable use of automated DarkSend for funds stored in this wallet (0-1, default: %u)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error loading %s: You can&apos;t enable HD on a already existing non-HD wallet</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error reading %s! All keys read correctly, but transaction data or address book entries might be missing or incorrect.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Execute command when a wallet InstantSend transaction is successfully locked (%s in cmd is replaced by TxID)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to create backup, file already exists! This could happen if you restarted wallet in less than 60 seconds. You can continue if you are ok with this.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fees (in %s/kB) smaller than this are considered zero fee for relaying, mining and transaction creation (default: %s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fees (in %s/kB) smaller than this are considered zero fee for transaction creation (default: %s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Force relay of transactions from whitelisted peers even if they violate local relay policy (default: %d)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If &lt;category&gt; is not supplied or if &lt;category&gt; = 1, output all debugging information.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If this block is in the chain assume that it and its ancestors are valid and potentially skip their script verification (0 to verify all, default: %s, testnet: %s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Incorrect or no devnet genesis block found. Wrong datadir for devnet specified?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>InstantSend doesn&apos;t support sending values that high yet. Transactions are currently limited to %1 lux.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>InstantSend requires inputs with at least %d confirmations, you might need to wait a few minutes and try again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maintain a timestamp index for block hashes, used to query blocks hashes by a range of timestamps (default: %u)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maintain at most &lt;n&gt; connections to peers (temporary service connections excluded) (default: %u)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maximum allowed median peer time offset adjustment. Local perspective of time may be influenced by peers forward or backward by this amount. (default: %u seconds)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Override spork address. Only useful for regtest and devnet. Using this on mainnet or testnet will ban you.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please check that your computer&apos;s date and time are correct! If your clock is wrong, %s will not work properly.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please contribute if you find %s useful. Visit %s for further information about the software.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Provide liquidity to DarkSend by infrequently mixing coins on a continual basis (%u-%u, default: %u, 1=very frequent, high fees, %u=very infrequent, low fees)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Query for peer addresses via DNS lookup, if low on addresses (default: 1 unless -connect/-noconnect)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Randomize credentials for every proxy connection. This enables Tor stream isolation (default: %u)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reduce storage requirements by enabling pruning (deleting) of old blocks. This allows the pruneblockchain RPC to be called to delete specific blocks, and enables automatic pruning of old blocks if a target size in MiB is provided. This mode is incompatible with -txindex and -rescan. Warning: Reverting this setting requires re-downloading the entire blockchain. (default: 0 = disable pruning blocks, 1 = allow manual pruning via RPC, &gt;%u = automatically prune block files to stay under the specified target size in MiB)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rescans are not possible in pruned mode. You will need to use -reindex which will download the whole blockchain again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set lowest fee rate (in %s/kB) for transactions to be included in block creation. (default: %s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show N confirmations for a successfully locked transaction (%u-%u, default: %u)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Specify full path to directory for automatic wallet backups (must exist)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Support filtering of blocks and transaction with bloom filters (default: %u)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The transaction amount is too small to send after the fee has been deducted</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This is the transaction fee you may pay when fee estimates are not available.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This product includes software developed by the OpenSSL Project for use in the OpenSSL Toolkit %s and cryptographic software written by Eric Young and UPnP software written by Thomas Bernard.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Total length of network version string (%i) exceeds maximum length (%i). Reduce the number or size of uacomments.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tries to keep outbound traffic under the given target (in MiB per 24h), 0 = no limit (default: %d)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to locate enough DarkSend non-denominated funds for this transaction.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unsupported argument -socks found. Setting SOCKS version isn&apos;t possible anymore, only SOCKS5 proxies are supported.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unsupported argument -whitelistalwaysrelay ignored, use -whitelistrelay and/or -whitelistforcerelay.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use N separate masternodes for each denominated input to mix funds (%u-%u, default: %u)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use UPnP to map the listening port (default: 1 when listening and no -proxy)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use hierarchical deterministic key generation (HD) after BIP39/BIP44. Only has effect during wallet creation/first start</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>User defined mnemonic passphrase for HD wallet (BIP39). Only has effect during wallet creation/first start (default: empty string)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Username and hashed password for JSON-RPC connections. The field &lt;userpw&gt; comes in the format: &lt;USERNAME&gt;:&lt;SALT&gt;$&lt;HASH&gt;. A canonical python script is included in share/rpcuser. The client then connects normally using the rpcuser=&lt;USERNAME&gt;/rpcpassword=&lt;PASSWORD&gt; pair of arguments. This option can be specified multiple times</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>WARNING! Failed to replenish keypool, please unlock your wallet to do so.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Wallet is locked, can&apos;t replenish keypool! Automatic backups and mixing are disabled, please unlock your wallet to replenish keypool.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Wallet will not create transactions that violate mempool chain limits (default: %u)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning: At least %d of %d masternodes are running on a newer software version. Please check latest releases, you might need to update too.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning: Every masternode (out of %d known ones) is running on a newer software version. Please check latest releases, it&apos;s very likely that you missed a major/critical update.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning: Unknown block versions being mined! It&apos;s possible unknown rules are in effect</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning: Wallet file corrupt, data salvaged! Original %s saved as %s in %s; if your balance or transactions are incorrect you should restore from a backup.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Whitelist peers connecting from the given IP address (e.g. 1.2.3.4) or CIDR notated network (e.g. 1.2.3.0/24). Can be specified multiple times.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You need to rebuild the database using -reindex-chainstate to change -txindex</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%s corrupt, salvage failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%s is not a valid backup folder!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%s is set very high!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(%d could be used only on mainnet)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(must be %d for mainnet)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(press q to shutdown and continue later)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>-devnet can only be specified once</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>-maxmempool must be at least %d MB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>-port must be specified when -devnet and -listen are specified</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>-rpcport must be specified when -devnet and -server are specified</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allow RFC1918 addresses to be relayed and connected to (default: %u)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Append comment to the user agent string</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Attempt to recover private keys from a corrupt wallet on startup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatic backups disabled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatically create Tor hidden service (default: %d)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Can&apos;t mix: no compatible inputs found!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot resolve -%s address: &apos;%s&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Chain selection options:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connect to KeePassHttp on port &lt;port&gt; (default: %u)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copyright (C)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ERROR! Failed to create automatic backup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable publish hash transaction (locked via InstantSend) in &lt;address&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable publish raw transaction (locked via InstantSend) in &lt;address&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable transaction replacement in the memory pool (default: %u)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Entry exceeds maximum size.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error loading %s</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error loading %s: Wallet corrupted</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error loading %s: Wallet requires newer version of %s</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error upgrading chainstate database</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to create backup %s!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to create backup, error: %s</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to delete backup, error: %s</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to find mixing queue to join</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to load fulfilled requests cache from</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to load governance cache from</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to load masternode cache from</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to load masternode payments cache from</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to parse host:port string</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to start a new mixing queue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fee (in %s/kB) to add to transactions you send (default: %s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Imports blocks from external blk000??.dat file on startup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Initialization sanity check failed. %s is shutting down.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>InstantSend options:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid amount for -%s=&lt;amount&gt;: &apos;%s&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid amount for -fallbackfee=&lt;amount&gt;: &apos;%s&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid spork address specified with -sporkaddr</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>KeePassHttp id for the established association</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>KeePassHttp key for AES encrypted communication with KeePass</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keep N lux anonymized (%u-%u, default: %u)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keep the transaction memory pool below &lt;n&gt; megabytes (default: %u)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Last DarkSend was too recent.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Last successful DarkSend action was too recent.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Loading banlist...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Loading fulfilled requests cache...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Loading governance cache...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Location of the auth cookie (default: data dir)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Masternode cache is empty, skipping payments and governance cache...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Minimum bytes per sigop in transactions we relay and mine (default: %u)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No errors detected.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not enough funds to anonymize.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Number of automatic wallet backups (default: %u)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Port: %d</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Print this help message and exit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Print version and exit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DarkSend is idle.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DarkSend options:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DarkSend request complete:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DarkSend request incomplete:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rebuild chain state and block index from the blk*.dat files on disk</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reducing -maxconnections from %d to %d, because of system limitations.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rescan the block chain for missing wallet transactions on startup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Send trace/debug info to console instead of debug.log file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Send trace/debug info to debug.log file (default: %u)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Starting network threads...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Synchroning blockchain...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Synchronizing governance objects...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Synchronizing masternode payments...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The source code is available from %s.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The transaction amount is too small to pay the fee</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The wallet will avoid paying less than the minimum relay fee.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This is the minimum transaction fee you pay on every transaction.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This is the transaction fee you will pay if you send a transaction.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Too many %f denominations, removing.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tor control port password (default: empty)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tor control port to use if onion listening enabled (default: %s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Transaction amounts must not be negative</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Transaction has too long of a mempool chain</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Transaction must have at least one recipient</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Trying to connect...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to bind to %s on this computer. %s is probably already running.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown response.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unsupported argument -benchmark ignored, use -debug=bench.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unsupported argument -debugnet ignored, use -debug=net.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unsupported argument -tor found, use -onion.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Upgrade wallet to latest format on startup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Upgrading UTXO database</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use KeePass 2 integration using KeePassHttp plugin (default: %u)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use devnet chain with provided name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use the test chain</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>User Agent comment (%s) contains unsafe characters.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Very low number of keys left: %d</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Wallet debugging/testing options:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Wallet needed to be rewritten: restart %s to complete</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Wasn&apos;t able to create wallet backup folder %s!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Whether to operate in a blocks only mode (default: %u)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>no mixing available.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>see debug.log for details.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
