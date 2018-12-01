@@ -1358,6 +1358,14 @@ MultiEnvío: %1</translation>
         <source>Call contract</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Read Smart Contract (This is not a tx)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Read Contract</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ClientModel</name>
@@ -3947,6 +3955,37 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
 </context>
 <context>
+    <name>QPlatformTheme</name>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Apply</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Save</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Yes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;No</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QRImageWidget</name>
     <message>
         <source>&amp;Save Image...</source>
@@ -5318,6 +5357,14 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Gas price: LUX price per gas unit. Default = %1, Min = %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Write to Smart Contract</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Write to Contract</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7424,799 +7471,559 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>lux Core</source>
+        <source> or address book entries might be missing or incorrect</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>The %s developers</source>
+        <source>&apos;importprivkey&apos; finished successfully. Please restart Luxcore wallet with &apos;-rescan&apos; option. Otherwise, transaction data</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>-maxtxfee is set very high! Fees this large could be paid on a single transaction.</source>
+        <source>&apos;importprivkey&apos; with &apos;Rescan&apos; option finished successfully. Please restart your Luxcore wallet. Otherwise, transaction data</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>A fee rate (in %s/kB) that will be used when fee estimation has insufficient data (default: %s)</source>
+        <source>Cannot obtain a lock on data directory %s. Luxcore is probably already running.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Accept connections from outside (default: 1 if no -proxy or -connect/-noconnect)</source>
+        <source>Change automatic finalized budget voting behavior. mode=auto: Vote for only exact finalized budget match to my generated budget. (string, default: auto)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Accept relayed transactions received from whitelisted peers even when not relaying transactions (default: %d)</source>
+        <source>Continuously rate-limit free transactions to &lt;n&gt;*1000 bytes per minute (default:%u)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Connect only to the specified node(s); -noconnect or -connect=0 alone to disable automatic connections</source>
+        <source>Distributed under the MIT software license, see the accompanying file COPYING or &lt;http://www.opensource.org/licenses/mit-license.php&gt;.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Disable all lux specific functionality (Masternodes, DarkSend, InstantSend, Governance) (0-1, default: %u)</source>
+        <source>Enable instantx, show confirmations for locked transactions (bool, default: %s)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Discover own IP addresses (default: 1 when listening and no -externalip or -proxy)</source>
+        <source>Enable use of automated darksend for funds stored in this wallet (0-1, default: %u)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Distributed under the MIT software license, see the accompanying file %s or %s</source>
+        <source>Enter regression test mode, which uses a special chain in which blocks can be solved instantly.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Do not keep transactions in the mempool longer than &lt;n&gt; hours (default: %u)</source>
+        <source>Error loading %s: You need to upgrade the wallet to enable HD on a non-HD wallet</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Enable InstantSend, show confirmations for locked transactions (0-1, default: %u)</source>
+        <source>Error: Unsupported argument -socks found. Setting SOCKS version isn&apos;t possible anymore, only SOCKS5 proxies are supported.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Enable multiple DarkSend mixing sessions per block, experimental (0-1, default: %u)</source>
+        <source>Fees (in LUX/Kb) smaller than this are considered zero fee for relaying (default: %s)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Enable use of automated DarkSend for funds stored in this wallet (0-1, default: %u)</source>
+        <source>Fees (in LUX/Kb) smaller than this are considered zero fee for transaction creation (default: %s)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Error loading %s: You can&apos;t enable HD on a already existing non-HD wallet</source>
+        <source>Flush database activity from memory pool to disk log every &lt;n&gt; megabytes (default: %u)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Error reading %s! All keys read correctly, but transaction data or address book entries might be missing or incorrect.</source>
+        <source>In this mode -genproclimit controls how many blocks are generated immediately.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Execute command when a wallet InstantSend transaction is successfully locked (%s in cmd is replaced by TxID)</source>
+        <source>InstantX requires inputs with at least 6 confirmations, you might need to wait a few minutes and try again.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Failed to create backup, file already exists! This could happen if you restarted wallet in less than 60 seconds. You can continue if you are ok with this.</source>
+        <source>Log transaction priority and fee per kB when mining blocks (default: %u)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Fees (in %s/kB) smaller than this are considered zero fee for relaying, mining and transaction creation (default: %s)</source>
+        <source>Maintain a full EVM log index, used by searchlogs and gettransactionreceipt rpc calls (default: %u)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Fees (in %s/kB) smaller than this are considered zero fee for transaction creation (default: %s)</source>
+        <source>Provide liquidity to Darksend by infrequently mixing coins on a continual basis (0-100, default: %u, 1=very frequent, high fees, 100=very infrequent, low fees)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Force relay of transactions from whitelisted peers even if they violate local relay policy (default: %d)</source>
+        <source>Query for peer addresses via DNS lookup, if low on addresses (default: 1 unless -connect)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>If &lt;category&gt; is not supplied or if &lt;category&gt; = 1, output all debugging information.</source>
+        <source>Reduce storage requirements by pruning (deleting) old blocks. This mode disables wallet support and is incompatible with -txindex.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>If this block is in the chain assume that it and its ancestors are valid and potentially skip their script verification (0 to verify all, default: %s, testnet: %s)</source>
+        <source>Require high priority for relaying free or low-fee transactions (default:%u)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Incorrect or no devnet genesis block found. Wrong datadir for devnet specified?</source>
+        <source>Rescan aborted by user. Please restart your Luxcore wallet with &apos;-rescan&apos; option. Otherwise, transaction data</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>InstantSend doesn&apos;t support sending values that high yet. Transactions are currently limited to %1 lux.</source>
+        <source>Send trace/debug info to console instead of debug.log file (default: %u)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>InstantSend requires inputs with at least %d confirmations, you might need to wait a few minutes and try again.</source>
+        <source>Set the number of script verification threads (1 to %d, 0 = auto, &lt;0 = leave that many cores free, default: %d)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Maintain a timestamp index for block hashes, used to query blocks hashes by a range of timestamps (default: %u)</source>
+        <source>Set the number of threads for coin generation if enabled (-1 = all cores, default: %d)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Maintain at most &lt;n&gt; connections to peers (temporary service connections excluded) (default: %u)</source>
+        <source>Show N confirmations for a successfully locked transaction (0-9999, default: %u)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Maximum allowed median peer time offset adjustment. Local perspective of time may be influenced by peers forward or backward by this amount. (default: %u seconds)</source>
+        <source>This product includes software developed by the OpenSSL Project for use in the OpenSSL Toolkit &lt;https://www.openssl.org/&gt; and cryptographic software written by Eric Young and UPnP software written by Thomas Bernard.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Override spork address. Only useful for regtest and devnet. Using this on mainnet or testnet will ban you.</source>
+        <source>Unable to bind to %s on this computer. Luxcore is probably already running.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Please check that your computer&apos;s date and time are correct! If your clock is wrong, %s will not work properly.</source>
+        <source>Unable to locate enough DarkSend non-denominated funds for this transaction that are not equal 10000 LUX.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Please contribute if you find %s useful. Visit %s for further information about the software.</source>
+        <source>Unable to locate enough funds for this transaction that are not equal 10000 LUX.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Provide liquidity to DarkSend by infrequently mixing coins on a continual basis (%u-%u, default: %u, 1=very frequent, high fees, %u=very infrequent, low fees)</source>
+        <source>Use hierarchical deterministic key generation (HD) after bip32. Only has effect during wallet creation/first start</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Query for peer addresses via DNS lookup, if low on addresses (default: 1 unless -connect/-noconnect)</source>
+        <source>User defined memonic passphrase for HD wallet (bip39). Only has effect during wallet creation/first start (default: randomly generated)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Randomize credentials for every proxy connection. This enables Tor stream isolation (default: %u)</source>
+        <source>Warning: -maxtxfee is set very high! Fees this large could be paid on a single transaction.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Reduce storage requirements by enabling pruning (deleting) of old blocks. This allows the pruneblockchain RPC to be called to delete specific blocks, and enables automatic pruning of old blocks if a target size in MiB is provided. This mode is incompatible with -txindex and -rescan. Warning: Reverting this setting requires re-downloading the entire blockchain. (default: 0 = disable pruning blocks, 1 = allow manual pruning via RPC, &gt;%u = automatically prune block files to stay under the specified target size in MiB)</source>
+        <source>Warning: -paytxfee is set very high! This is the transaction fee you will pay if you send a transaction.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Rescans are not possible in pruned mode. You will need to use -reindex which will download the whole blockchain again.</source>
+        <source>Warning: Please check that your computer&apos;s date and time are correct! If your clock is wrong Luxcore will not work properly.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Set lowest fee rate (in %s/kB) for transactions to be included in block creation. (default: %s)</source>
+        <source>Warning: Reverting this setting requires re-downloading the entire blockchain.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Set the number of script verification threads (%u to %d, 0 = auto, &lt;0 = leave that many cores free, default: %d)</source>
+        <source>Warning: error reading wallet.dat! All keys read correctly, but transaction data or address book entries might be missing or incorrect.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Show N confirmations for a successfully locked transaction (%u-%u, default: %u)</source>
+        <source>Warning: wallet.dat corrupt, data salvaged! Original wallet.dat saved as wallet.{timestamp}.bak in %s; if your balance or transactions are incorrect you should restore from a backup.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Specify full path to directory for automatic wallet backups (must exist)</source>
+        <source>Whitelist peers connecting from the given netmask or IP address. Can be specified multiple times.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Support filtering of blocks and transaction with bloom filters (default: %u)</source>
+        <source>You need to rebuild the database using -reindex-chainstate to enable -logevents</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>The transaction amount is too small to send after the fee has been deducted</source>
+        <source>(default: 0 = disable pruning blocks,</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>This is the transaction fee you may pay when fee estimates are not available.</source>
+        <source>(default: 1)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>This product includes software developed by the OpenSSL Project for use in the OpenSSL Toolkit %s and cryptographic software written by Eric Young and UPnP software written by Thomas Bernard.</source>
+        <source>&gt;%u = target size in MiB to use for block files)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Total length of network version string (%i) exceeds maximum length (%i). Reduce the number or size of uacomments.</source>
+        <source>Accept connections from outside (default: 1 if no -proxy or -connect)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Tries to keep outbound traffic under the given target (in MiB per 24h), 0 = no limit (default: %d)</source>
+        <source>Acceptable ciphers (default: %s)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Unable to locate enough DarkSend non-denominated funds for this transaction.</source>
+        <source>Attempt to recover private keys from a corrupt wallet.dat</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Unsupported argument -socks found. Setting SOCKS version isn&apos;t possible anymore, only SOCKS5 proxies are supported.</source>
+        <source>Can&apos;t denominate: no compatible inputs left.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Unsupported argument -whitelistalwaysrelay ignored, use -whitelistrelay and/or -whitelistforcerelay.</source>
+        <source>Cannot resolve -bind address: &apos;%s&apos;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Use N separate masternodes for each denominated input to mix funds (%u-%u, default: %u)</source>
+        <source>Cannot resolve -externalip address: &apos;%s&apos;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Use UPnP to map the listening port (default: 1 when listening and no -proxy)</source>
+        <source>Cannot resolve -whitebind address: &apos;%s&apos;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Use hierarchical deterministic key generation (HD) after BIP39/BIP44. Only has effect during wallet creation/first start</source>
+        <source>Collateral is not valid.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>User defined mnemonic passphrase for HD wallet (BIP39). Only has effect during wallet creation/first start (default: empty string)</source>
+        <source>Connect only to the specified node(s)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Username and hashed password for JSON-RPC connections. The field &lt;userpw&gt; comes in the format: &lt;USERNAME&gt;:&lt;SALT&gt;$&lt;HASH&gt;. A canonical python script is included in share/rpcuser. The client then connects normally using the rpcuser=&lt;USERNAME&gt;/rpcpassword=&lt;PASSWORD&gt; pair of arguments. This option can be specified multiple times</source>
+        <source>Copyright (C) 2009-%i The Bitcoin Core Developers</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>WARNING! Failed to replenish keypool, please unlock your wallet to do so.</source>
+        <source>Copyright (C) 2014-%i The Dash Core Developers</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Wallet is locked, can&apos;t replenish keypool! Automatic backups and mixing are disabled, please unlock your wallet to replenish keypool.</source>
+        <source>Copyright (C) 2017-%i The LUX-Core Developers</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Wallet will not create transactions that violate mempool chain limits (default: %u)</source>
+        <source>Darksend is disabled.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Warning: At least %d of %d masternodes are running on a newer software version. Please check latest releases, you might need to update too.</source>
+        <source>Darksend options:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Warning: Every masternode (out of %d known ones) is running on a newer software version. Please check latest releases, it&apos;s very likely that you missed a major/critical update.</source>
+        <source>Disable safemode, override a real safe mode event (default: %u)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Warning: Unknown block versions being mined! It&apos;s possible unknown rules are in effect</source>
+        <source>Discover own IP address (default: 1 when listening and no -externalip)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Warning: Wallet file corrupt, data salvaged! Original %s saved as %s in %s; if your balance or transactions are incorrect you should restore from a backup.</source>
+        <source>Enable publish hash transaction (locked via InstanTX) in &lt;address&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Whitelist peers connecting from the given IP address (e.g. 1.2.3.4) or CIDR notated network (e.g. 1.2.3.0/24). Can be specified multiple times.</source>
+        <source>Enable publish raw transaction (locked via InstanTX) in &lt;address&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>You need to rebuild the database using -reindex-chainstate to change -txindex</source>
+        <source>Error connecting to masternode.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>%s corrupt, salvage failed</source>
+        <source>Error loading wallet.dat</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>%s is not a valid backup folder!</source>
+        <source>Error loading wallet.dat: Wallet corrupted</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>%s is set very high!</source>
+        <source>Error loading wallet.dat: Wallet requires newer version of Luxcore</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>(%d could be used only on mainnet)</source>
+        <source>Error recovering public key.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>(must be %d for mainnet)</source>
+        <source>Error: A fatal internal error occured, see debug.log for details</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>(press q to shutdown and continue later)</source>
+        <source>Error: Unsupported argument -tor found, use -onion.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>-devnet can only be specified once</source>
+        <source>Error: Wallet locked, unable to create transaction!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>-maxmempool must be at least %d MB</source>
+        <source>Error: You already have pending entries in the Darksend pool</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>-port must be specified when -devnet and -listen are specified</source>
+        <source>Error: can&apos;t select current denominated inputs</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>-rpcport must be specified when -devnet and -server are specified</source>
+        <source>Fee (in LUX/kB) to add to transactions you send (default: %s)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Allow RFC1918 addresses to be relayed and connected to (default: %u)</source>
+        <source>Force safe mode (default: %u)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Append comment to the user agent string</source>
+        <source>Generate coins (default: %u)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Attempt to recover private keys from a corrupt wallet on startup</source>
+        <source>If &lt;category&gt; is not supplied, output all debugging information.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Automatic backups disabled</source>
+        <source>Imports blocks from external blk000??.dat file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Automatically create Tor hidden service (default: %d)</source>
+        <source>Initialization sanity check failed. Luxcore is shutting down.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Can&apos;t find random Masternode.</source>
+        <source>InstanTX options:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Can&apos;t mix while sync in progress.</source>
+        <source>Invalid amount for -maxtxfee=&lt;amount&gt;: &apos;%s&apos;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Can&apos;t mix: no compatible inputs found!</source>
+        <source>Invalid amount for -minrelaytxfee=&lt;amount&gt;: &apos;%s&apos;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Cannot resolve -%s address: &apos;%s&apos;</source>
+        <source>Invalid amount for -mintxfee=&lt;amount&gt;: &apos;%s&apos;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Chain selection options:</source>
+        <source>Invalid amount for -paytxfee=&lt;amount&gt;: &apos;%s&apos;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Connect to KeePassHttp on port &lt;port&gt; (default: %u)</source>
+        <source>Invalid amount for -reservebalance=&lt;amount&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Copyright (C)</source>
+        <source>Invalid private key.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Could not parse masternode.conf</source>
+        <source>Keep N LUX anonymized (default: %u)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>ERROR! Failed to create automatic backup</source>
+        <source>Last Darksend was too recent.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Enable publish hash transaction (locked via InstantSend) in &lt;address&gt;</source>
+        <source>Last successful darksend action was too recent.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Enable publish raw transaction (locked via InstantSend) in &lt;address&gt;</source>
+        <source>Limit size of signature cache to &lt;n&gt; entries (default: %u)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Enable transaction replacement in the memory pool (default: %u)</source>
+        <source>Logs all EVM LOG opcode operations to the file vmExecLogs.json</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Entry exceeds maximum size.</source>
+        <source>Maintain at most &lt;n&gt; connections to peers (default: %u)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Error loading %s</source>
+        <source>No compatible masternode found.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Error loading %s: Wallet corrupted</source>
+        <source>No funds detected in need of denominating.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Error loading %s: Wallet requires newer version of %s</source>
+        <source>No masternodes detected.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Error upgrading chainstate database</source>
+        <source>Not in the masternode list.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Failed to create backup %s!</source>
+        <source>Number of automatic wallet backups (default: 10)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Failed to create backup, error: %s</source>
+        <source>Only accept block chain matching built-in checkpoints (default: %u)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Failed to delete backup, error: %s</source>
+        <source>RPC SSL options: (see the Bitcoin Wiki for SSL setup instructions)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Failed to find mixing queue to join</source>
+        <source>RPC support for HTTP persistent connections (default: %d)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Failed to load fulfilled requests cache from</source>
+        <source>Randomly drop 1 of every &lt;n&gt; network messages</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Failed to load governance cache from</source>
+        <source>Randomly fuzz 1 of every &lt;n&gt; network messages</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Failed to load masternode cache from</source>
+        <source>Rebuild block chain index from current blk000??.dat files</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Failed to load masternode payments cache from</source>
+        <source>Rescan the block chain for missing wallet transactions</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Failed to parse host:port string</source>
+        <source>Run a thread to flush wallet periodically (default: %u)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Failed to start a new mixing queue</source>
+        <source>Server certificate file (default: %s)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Fee (in %s/kB) to add to transactions you send (default: %s)</source>
+        <source>Server private key (default: %s)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Found enough users, signing ( waiting %s )</source>
+        <source>Session timed out (30 seconds), please resubmit.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Found enough users, signing ...</source>
+        <source>Set external address:port to get to this masternode (example: %s)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Imports blocks from external blk000??.dat file on startup</source>
+        <source>Set minimum block size in bytes (default: %u)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Initialization sanity check failed. %s is shutting down.</source>
+        <source>Set number of debug log files</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>InstantSend options:</source>
+        <source>Sets the DB_PRIVATE flag in the wallet db environment (default: %u)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Invalid amount for -%s=&lt;amount&gt;: &apos;%s&apos;</source>
+        <source>Signing failed.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Invalid amount for -fallbackfee=&lt;amount&gt;: &apos;%s&apos;</source>
+        <source>Signing timed out, please resubmit.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Invalid port detected in masternode.conf</source>
+        <source>Stake your coins to support network and gain reward (default: %s)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Invalid spork address specified with -sporkaddr</source>
+        <source>Stop running after importing blocks from disk (default: %u)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>KeePassHttp id for the established association</source>
+        <source>This help message</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>KeePassHttp key for AES encrypted communication with KeePass</source>
+        <source>This is intended for regression testing tools and app development.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Keep N lux anonymized (%u-%u, default: %u)</source>
+        <source>This is not a masternode.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Keep the transaction memory pool below &lt;n&gt; megabytes (default: %u)</source>
+        <source>Transaction amounts must be positive</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Last DarkSend was too recent.</source>
+        <source>Unable to generate keys</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Last successful DarkSend action was too recent.</source>
+        <source>Unable to sign masternode payment winner, wrong key?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Line: %d</source>
+        <source>Unknown address type &apos;%s&apos;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Loading banlist...</source>
+        <source>Unknown change type &apos;%s&apos;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Loading fulfilled requests cache...</source>
+        <source>Upgrade wallet to latest format</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Loading governance cache...</source>
+        <source>Use N separate masternodes to anonymize funds  (2-8, default: %u)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Loading masternode cache...</source>
+        <source>Use OpenSSL (https) for JSON-RPC connections</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Loading masternode payment cache...</source>
+        <source>Use UPnP to map the listening port (default: 1 when listening)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Location of the auth cookie (default: data dir)</source>
+        <source>Use the SegWit test network</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Lock is already in place.</source>
+        <source>Use the test network</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Masternode cache is empty, skipping payments and governance cache...</source>
+        <source>Value more than Darksend pool maximum allows.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Minimum bytes per sigop in transactions we relay and mine (default: %u)</source>
+        <source>Wallet needed to be rewritten: restart Luxcore to complete</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Mixing in progress...</source>
+        <source>Warning: This version is obsolete, upgrade required!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>No Masternodes detected.</source>
+        <source>Warning: Unsupported argument -benchmark ignored, use -debug=bench.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>No compatible Masternode found.</source>
+        <source>Warning: Unsupported argument -debugnet ignored, use -debug=net.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>No errors detected.</source>
+        <source>Wrong state.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Not enough funds to anonymize.</source>
+        <source>You need to rebuild the database using -reindex to change -txindex</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Not in the Masternode list.</source>
+        <source>on startup</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Number of automatic wallet backups (default: %u)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Port: %d</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Print this help message and exit</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Print version and exit</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>DarkSend is idle.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>DarkSend options:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>DarkSend request complete:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>DarkSend request incomplete:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Rebuild chain state and block index from the blk*.dat files on disk</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Reducing -maxconnections from %d to %d, because of system limitations.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Rescan the block chain for missing wallet transactions on startup</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Send trace/debug info to console instead of debug.log file</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Send trace/debug info to debug.log file (default: %u)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Session timed out.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Starting network threads...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Submitted following entries to masternode: %u / %d</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Submitted to masternode, waiting for more entries ( %u / %d ) %s</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Submitted to masternode, waiting in queue %s</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Synchroning blockchain...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Synchronization failed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Synchronization finished</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Synchronization pending...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Synchronizing governance objects...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Synchronizing masternode payments...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Synchronizing masternodes...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>The source code is available from %s.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>The transaction amount is too small to pay the fee</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>The wallet will avoid paying less than the minimum relay fee.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This is not a Masternode.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This is the minimum transaction fee you pay on every transaction.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This is the transaction fee you will pay if you send a transaction.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Too many %f denominations, removing.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Tor control port password (default: empty)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Tor control port to use if onion listening enabled (default: %s)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Transaction amounts must not be negative</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Transaction has too long of a mempool chain</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Transaction must have at least one recipient</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Transaction too large for fee policy</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Trying to connect...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Unable to bind to %s on this computer. %s is probably already running.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Unknown response.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Unknown state: id = %u</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Unsupported argument -benchmark ignored, use -debug=bench.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Unsupported argument -debugnet ignored, use -debug=net.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Unsupported argument -tor found, use -onion.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Upgrade wallet to latest format on startup</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Upgrading UTXO database</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Use KeePass 2 integration using KeePassHttp plugin (default: %u)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Use devnet chain with provided name</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Use the test chain</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>User Agent comment (%s) contains unsafe characters.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Very low number of keys left: %d</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Wallet debugging/testing options:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Wallet needed to be rewritten: restart %s to complete</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Wasn&apos;t able to create wallet backup folder %s!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Whether to operate in a blocks only mode (default: %u)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Will retry...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Your entries added successfully.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Your transaction was accepted into the pool!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>no mixing available.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>see debug.log for details.</source>
+        <source>wallet.dat corrupt, salvage failed</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
