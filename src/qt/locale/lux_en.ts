@@ -1711,13 +1711,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+23"/>
-        <location filename="../callcontract.cpp" line="+61"/>
-        <location filename="../forms/ui_callcontract.h" line="+1"/>
-        <source>Read Contract</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../callcontract.cpp" line="-6"/>
         <source>The account address.</source>
         <translation type="unfinished"></translation>
@@ -1730,11 +1723,6 @@
     <message>
         <location line="+125"/>
         <source>Read contract</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../forms/ui_callcontract.h" line="-18"/>
-        <source>Read Smart Contract (This is not a tx)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6973,7 +6961,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     <message>
         <location line="+31"/>
         <location filename="../forms/ui_sendtocontract.h" line="+1"/>
-        <source>Write Smart Contract</source>
+        <source>Write to Smart Contract</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7049,12 +7037,6 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+23"/>
-        <location filename="../sendtocontract.cpp" line="+73"/>
-        <source>Write to Contract</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../sendtocontract.cpp" line="-5"/>
         <source>The contract address that will receive the funds and data.</source>
         <translation type="unfinished"></translation>
@@ -7107,11 +7089,6 @@ https://www.transifex.com/luxcore/luxcore</source>
     <message>
         <location line="+1"/>
         <source>Gas price: LUX price per gas unit. Default = %1, Min = %2.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../forms/ui_sendtocontract.h" line="-21"/>
-        <source>Write to Smart Contract</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

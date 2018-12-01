@@ -207,10 +207,6 @@
         <translation>Đã xảy ra lỗi khi cố gắng lưu danh sách địa chỉ vào% 1. Vui lòng thử lại.</translation>
     </message>
     <message>
-        <source>Export the data in the current tab to a file</source>
-        <translation>Xuất dữ liệu trong tab hiện tại sang tệp</translation>
-    </message>
-    <message>
         <source>These are your LUX addresses for sending payments. Always check the amount and the receiving address before sending coins.</source>
         <translation>Đây là địa chỉ LUX của bạn để gửi thanh toán. Luôn kiểm tra số tiền và địa chỉ nhận trước khi gửi tiền.</translation>
     </message>
@@ -320,14 +316,6 @@
         <translation>%1 sẽ được đóng bây giờ để hoàn thành tiến trình mã hoá. Hãy nhớ rằng mã hoá ví không thể hoàn toàn bảo vệ tiền của bạn khỏi bị ăn trộm bởi những mã độc đã thâm nhập máy tính của bạn.</translation>
     </message>
     <message>
-        <source>IMPORTANT: Any previous backups you have made of your wallet file should be replaced with the newly generated, encrypted wallet file. Previous backups of the unencrypted wallet file contain the same HD seed and still have full access to all your funds just like the new, encrypted wallet.</source>
-        <translation type="vanished">QUAN TRỌNG: Bất cứ sao lưu nào bạn đã làm trước đó với ví của bạn thì nên thay thế bằng phiên bản sao lưu mới nhất đã được mã hoá. Những bản sao lưu trước mà không mã hoá mà chứa HD Seed thì vẫn có toàn quyền truy cập đến tiền trong ví của bạn giống y như phiên bản ví mới đã được mã hoá.</translation>
-    </message>
-    <message>
-        <source>IMPORTANT: Any previous backups you have made of your wallet file should be replaced with the newly generated, encrypted wallet file. For security reasons, previous backups of the unencrypted wallet file will become useless as soon as you start using the new, encrypted wallet.</source>
-        <translation>QUAN TRỌNG: Bất kỳ sao lưu nào mà bạn đã thực hiện trước với ví của bạn sẽ nên được thay thế bởi tệp Ví mới, được mã hoá. Vì lý do an ninh, những tệp sao lưu trước của ví không mã hoá sẽ trở nên vô nghĩa khi bạn bắt đầu sử dụng ví mới, có mã hoá.</translation>
-    </message>
-    <message>
         <source>Wallet encryption failed</source>
         <translation>Mã hoá ví không thành công</translation>
     </message>
@@ -370,18 +358,6 @@
     <message>
         <source>Enter the old and new passphrase to the wallet.</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>%1 will close now to finish the encryption process.Remember that encrypting your wallet cannot fully protect your LUXs from being stolen by malware infecting your computer.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>IMPORTANT: Any previous backups you have made of your wallet file should be replaced with the newly generated, encrypted wallet file. Previous backups of the unencrypted wallet file contain the same HD seed andstill have full access to all your funds just like the new, encrypted wallet.</source>
-        <translation>LƯU Ý: Bất kỳ bản sao lưu trước nào bạn đã tạo trong tệp ví của bạn sẽ được thay thế bằng tệp ví tiền được mã hóa mới được tạo. Các bản sao lưu trước đó của tệp ví tiền không được mã hóa chứa cùng một hạt giống HD và sẽ có toàn quyền truy cập vào tất cả số tiền của bạn giống như ví tiền mới được mã hóa.</translation>
-    </message>
-    <message>
-        <source>%1 will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your funds from being stolen by malware infecting your computer.</source>
-        <translation> % 1 sẽ đóng ngay bây giờ để hoàn tất quá trình mã hóa. Hãy nhớ rằng mã hóa ví của bạn không thể bảo vệ hoàn toàn tiền của bạn khỏi bị phần mềm độc hại lây nhiễm vào máy tính của bạn.</translation>
     </message>
     <message>
         <source>IMPORTANT: Any previous backups you have made of your wallet file should be replaced with the newly generated, encrypted wallet file. For security reasons, previous backups of the unencrypted wallet file will become useless as soon as you start using the new, encrypted wallet.</source>

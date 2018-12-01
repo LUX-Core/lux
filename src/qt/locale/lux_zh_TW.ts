@@ -1296,10 +1296,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Read Contract</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>The account address.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1309,10 +1305,6 @@
     </message>
     <message>
         <source>Read contract</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Read Smart Contract (This is not a tx)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4984,7 +4976,7 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Write Smart Contract</source>
+        <source>Write to Smart Contract</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5036,10 +5028,6 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Write to Contract</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>The contract address that will receive the funds and data.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5081,10 +5069,6 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Gas price: LUX price per gas unit. Default = %1, Min = %2.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Write to Smart Contract</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
