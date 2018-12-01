@@ -1311,10 +1311,6 @@ MultiSend: %1</translation>
         <translation>Effacer tout</translation>
     </message>
     <message>
-        <source>Read Contract</source>
-        <translation>Appel Contrat</translation>
-    </message>
-    <message>
         <source>The account address.</source>
         <translation>L&apos;adresse du contrat.</translation>
     </message>
@@ -1325,10 +1321,6 @@ MultiSend: %1</translation>
     <message>
         <source>Read contract</source>
         <translation>Appel contrat</translation>
-    </message>
-    <message>
-        <source>Read Smart Contract (This is not a tx)</source>
-        <translation>Requête Smart Contrat (sans tx)</translation>
     </message>
     <message>
         <source>Read Contract</source>
@@ -5015,7 +5007,7 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation type="unfinished">Form</translation>
     </message>
     <message>
-        <source>Write Smart Contract</source>
+        <source>Write to Smart Contract</source>
         <translation>Envoi vers Smart Contrat</translation>
     </message>
     <message>
@@ -5067,10 +5059,6 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation>Effacer tout</translation>
     </message>
     <message>
-        <source>Write to Contract</source>
-        <translation>Envoi vers Contrat</translation>
-    </message>
-    <message>
         <source>The contract address that will receive the funds and data.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5113,10 +5101,6 @@ https://www.transifex.com/luxcore/luxcore</source>
     <message>
         <source>Gas price: LUX price per gas unit. Default = %1, Min = %2.</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Write to Smart Contract</source>
-        <translation>Envoi vers Smart contrat (via tx)</translation>
     </message>
     <message>
         <source>Write to Contract</source>
