@@ -104,6 +104,10 @@ private:
     QLabel* labelWalletEncryptionIcon;
     QLabel* labelWalletHDStatusIcon;
     QPushButton* labelConnectionsIcon;
+    QPushButton * pushButtonTelegram;
+    QPushButton * pushButtonTwitter;
+    QPushButton * pushButtonGithub;
+    QPushButton * pushButtonDiscord;
     QLabel* labelBlocksIcon;
     QLabel* progressBarLabel;
     QProgressBar* progressBar;
