@@ -43,10 +43,10 @@
 #include <unistd.h>
 #include <fcntl.h>
 
+#include <sys/ioctl.h>
 #include <sys/types.h>
 
 #ifdef Q_OS_LINUX
-#include <sys/ioctl.h>
 #include <sys/resource.h>
 #include <sys/wait.h>
 #include <linux/limits.h>
