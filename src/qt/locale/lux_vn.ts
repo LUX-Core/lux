@@ -204,15 +204,19 @@
     </message>
     <message>
         <source>There was an error trying to save the address list to %1. Please try again.</source>
-        <translation>Có lỗi xảy ra khi lưu các địa chỉ vào %1. Hãy thử lại.</translation>
+        <translation>Đã xảy ra lỗi khi cố gắng lưu danh sách địa chỉ vào% 1. Vui lòng thử lại.</translation>
+    </message>
+    <message>
+        <source>Export the data in the current tab to a file</source>
+        <translation>Xuất dữ liệu trong tab hiện tại sang tệp</translation>
     </message>
     <message>
         <source>These are your LUX addresses for sending payments. Always check the amount and the receiving address before sending coins.</source>
-        <translation type="unfinished"></translation>
+        <translation>Đây là địa chỉ LUX của bạn để gửi thanh toán. Luôn kiểm tra số tiền và địa chỉ nhận trước khi gửi tiền.</translation>
     </message>
     <message>
         <source>These are your LUX addresses for receiving payments. It is recommended to use a new receiving address for each transaction.</source>
-        <translation type="unfinished"></translation>
+        <translation>Đây là địa chỉ LUX của bạn để nhận thanh toán. Bạn nên sử dụng địa chỉ nhận mới cho mỗi giao dịch.</translation>
     </message>
 </context>
 <context>
@@ -391,47 +395,47 @@
     <name>Bip38ToolDialog</name>
     <message>
         <source>BIP 38 Tool</source>
-        <translation type="unfinished"></translation>
+        <translation>Dụng cụ BIP 38</translation>
     </message>
     <message>
         <source>&amp;BIP 38 Encrypt</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Mã hóa BIP 38</translation>
     </message>
     <message>
         <source>Enter a Lux Address that you would like to encrypt using BIP 38. Enter a passphrase in the middle box. Press encrypt to compute the encrypted private key.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nhập địa chỉ Lux mà bạn muốn mã hóa bằng BIP 38 Nhập cụm mật khẩu vào hộp ở giữa. Nhấn mã hóa để tính toán khóa cá nhân được mã hóa.</translation>
     </message>
     <message>
         <source>Address:</source>
-        <translation type="unfinished"></translation>
+        <translation>Địa chỉ :</translation>
     </message>
     <message>
         <source>The LUX address to sign the message with</source>
-        <translation type="unfinished"></translation>
+        <translation>Địa chỉ LUX để ký thư với</translation>
     </message>
     <message>
         <source>Choose previously used address</source>
-        <translation type="unfinished"></translation>
+        <translation>Chọn địa chỉ đã sử dụng trước đó</translation>
     </message>
     <message>
         <source>Alt+A</source>
-        <translation type="unfinished">Alt+A</translation>
+        <translation>Alt+A</translation>
     </message>
     <message>
         <source>Paste address from clipboard</source>
-        <translation type="unfinished">Dán địa chỉ từ clipboard</translation>
+        <translation>Dán địa chỉ từ khay nhớ tạm</translation>
     </message>
     <message>
         <source>Alt+P</source>
-        <translation type="unfinished">Alt+P</translation>
+        <translation>Alt+P</translation>
     </message>
     <message>
         <source>Passphrase: </source>
-        <translation type="unfinished"></translation>
+        <translation>Mật khẩu :</translation>
     </message>
     <message>
         <source>Encrypted Key:</source>
-        <translation type="unfinished"></translation>
+        <translation>Mã hóa :</translation>
     </message>
     <message>
         <source>Copy the current signature to the system clipboard</source>
@@ -2221,35 +2225,35 @@
     <name>Eula</name>
     <message>
         <source>End User Software License Agreement</source>
-        <translation type="unfinished"></translation>
+        <translation>Bản quyền phần mềm</translation>
     </message>
     <message>
         <source>Please read the following license agreement. You must accept the terms contained in this agreement before continuing with the application.</source>
-        <translation type="unfinished"></translation>
+        <translation>Vui lòng đọc thỏa thuận cấp phép sau. Bạn phải chấp nhận các điều khoản có trong thỏa thuận này trước khi tiếp tục với đơn đăng ký.</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Hủy bỏ</translation>
     </message>
     <message>
         <source>Next</source>
-        <translation type="unfinished"></translation>
+        <translation>Tiếp tục</translation>
     </message>
     <message>
         <source>&lt;p style=&quot;line-height:140&quot;&gt;&lt;span&gt;&lt;br&gt;Please read the following license agreement. You must accept the terms contained in this agreement before continuing with the application.</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;p style=&quot;line-height:140&quot;&gt;&lt;span&gt;&lt;br&gt;Vui lòng đọc thỏa thuận cấp phép sau.;Bạn phải chấp nhận các điều khoản có trong thỏa thuận này trước khi tiếp tục với đơn đăng ký.</translation>
     </message>
     <message>
         <source>I have read and agree to the terms contained in the license agreements.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tôi đã đọc và đồng ý với các điều khoản trong thỏa thuận cấp phép bản quyền phần mềm.</translation>
     </message>
     <message>
         <source>I do not accept the terms and conditions of above licence agreements.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tôi không chấp nhận các điều khoản và điều kiện của thỏa thuận cấp phép bản quyền phần mềm trên.</translation>
     </message>
     <message>
         <source>Don&apos;t show this dialog again</source>
-        <translation type="unfinished"></translation>
+        <translation>Hiển thị lại hộp thoại này</translation>
     </message>
     <message>
         <source>&lt;p style=&quot;line-height:10&quot;&gt;&lt;b&gt;GENERAL&lt;/b&gt;&lt;/p&gt;</source>
@@ -2265,11 +2269,11 @@
     </message>
     <message>
         <source>&lt;p style=&quot;line-height:130&quot;&gt;PLEASE READ THIS CONTRACT                    CAREFULLY. BY USING ALL OR ANY PORTION OF THE SOFTWARE YOU ACCEPT ALL THE                    TERMS AND CONDITIONS OF THIS AGREEMENT, INCLUDING, IN PARTICULAR THE                    LIMITATIONS ON: USE CONTAINED IN SECTION 2; TRANSFERABILITY IN SECTION                    4; WARRANTY IN SECTION 6 AND 7; AND LIABILITY IN SECTION 8. YOU AGREE                    THAT THIS AGREEMENT IS ENFORCEABLE LIKE ANY WRITTEN NEGOTIATED AGREEMENT                    SIGNED BY YOU. IF YOU DO NOT AGREE, DO NOT USE THIS SOFTWARE. IF YOU ACQUIRED                    THE SOFTWARE ON TANGIBLE MEDIA (e.g. CD) WITHOUT AN OPPORTUNITY TO REVIEW THIS                    LICENSE AND YOU DO NOT ACCEPT THIS AGREEMENT, YOU MAY OBTAIN A REFUND OF THE                    AMOUNT YOU ORIGINALLY PAID IF YOU: (A) DO NOT USE THE SOFTWARE AND (B) RETURN IT,                    WITH PROOF OF PAYMENT, TO THE LOCATION FROM WHICH IT WAS OBTAINED WITHIN THIRTY                    (30) DAYS OF THE PURCHASE DATE.&lt;/p&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;p style=&quot;line-height:130&quot;&gt;VUI LÒNG ĐỌC KỸ HỢP ĐỒNG NÀY. SỬ DỤNG TẤT CẢ HOẶC BẤT K PORT PHẦN MỀM CỦA BẠN PHẦN MỀM BẠN CHẤP NHẬN TẤT CẢ CÁC ĐIỀU KHOẢN VÀ ĐIỀU KIỆN CỦA HỢP ĐỒNG NÀY, BAO GỒM, TRONG CÁC GIỚI HẠN MỘT PHẦN MỞ RỘNG: SỬ DỤNG ĐỐI VỚI PHẦN 2; CHUYỂN GIAO TRONG PHẦN 4; BẢO HÀNH TRONG PHẦN 6 VÀ 7; TRÁCH NHIỆM VÀ TRÁCH NHIỆM TRONG PHẦN 8. BẠN ĐỒNG Ý R AGNG HỢP ĐỒNG NÀY CÓ THỂ THỰC HIỆN BẤT CỨ BẤT K WR B AGNG HỢP ĐỒNG BỊ HỢP ĐỒNG NÀO ĐƯỢC KÝ K BY CỦA BẠN. NẾU BẠN KHÔNG ĐỒNG Ý, KHÔNG SỬ DỤNG PHẦN MỀM NÀY. NẾU BẠN CẦN PHẦN MỀM TRÊN TƯƠNG LAI MEDIA (ví dụ CD) KHÔNG CÓ CƠ HỘI ĐỂ XEM BÀI VIẾT NÀY VÀ BẠN KHÔNG CHẤP NHẬN THỎA THUẬN NÀY, BẠN CÓ THỂ TRẢ LẠI HOÀN TOÀN MỘT SỐ BẠN ĐÃ BỊ CỨU NẾU BẠN: (A) KHÔNG SỬ DỤNG PHẦN MỀM VÀ (B) TRẢ TIỀN R, RÀNG, VỚI CHỨNG KHOẢN THANH TOÁN, ĐẾN VỊ TRÍ TỪ KHI ĐÃ NÀO ĐƯỢC NÀO TRONG THỜI GIAN (30) NGÀY MUA NGÀY.&lt;/p&gt;</translation>
     </message>
     <message>
         <source>&lt;p style=&quot;line-height:130&quot;&gt;&lt;br&gt;&lt;b&gt;1.	Definitions&lt;/b&gt;&lt;/p&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;p style=&quot;line-height:130&quot;&gt;&lt;br&gt;&lt;b&gt;1.	Định nghĩa&lt;/b&gt;&lt;/p&gt;</translation>
     </message>
     <message>
         <source>&lt;p style=&quot;line-height:30&quot;&gt;&lt;/p&gt;</source>
@@ -2277,7 +2281,7 @@
     </message>
     <message>
         <source>&lt;p style=&quot;line-height:130&quot;&gt;When used in this Agreement, the following terms                    shall have the respective meanings indicated, such meanings to be applicable to                    both the singular and plural forms of the terms defined: &lt;/p&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;p style=&quot;line-height:130&quot;&gt;Khi được sử dụng trong Thỏa thuận này, các điều khoản sau đây sẽ có ý nghĩa tương ứng được chỉ ra, nghĩa như vậy sẽ được áp dụng cho cả dạng số ít và số nhiều của các thuật ngữ được xác định: &lt;/p&gt;</translation>
     </message>
     <message>
         <source>&lt;p style=&quot;line-height:130&quot;&gt;&lt;b&gt;&quot;Licensor&quot;&lt;/b&gt; means Luxcore, with its main address                    located at Suite 3 Level 27, Governor Macquarie Tower, 1 Farrer Place, Sydney, NSW, 2000.&lt;/p&gt;</source>
