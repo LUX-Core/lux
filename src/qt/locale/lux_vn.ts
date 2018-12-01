@@ -1418,6 +1418,14 @@
         <source>Call contract</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Read Smart Contract (This is not a tx)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Read Contract</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ClientModel</name>
@@ -4318,6 +4326,37 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
 </context>
 <context>
+    <name>QPlatformTheme</name>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Apply</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Save</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Yes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;No</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QRDialog</name>
     <message>
         <source>QR-Code Title</source>
@@ -5893,6 +5932,14 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Gas price: LUX price per gas unit. Default = %1, Min = %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Write to Smart Contract</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Write to Contract</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7491,7 +7538,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Set the number of script verification threads (%u to %d, 0 = auto, &lt;0 = leave that many cores free, default: %d)</source>
-        <translation>Thiết lập số luồng của kịch bản kiểm tra (%u to %d, 0 = tự động, &lt;0 = để nhiều lõi miễn phí, ngầm định: %d)</translation>
+        <translation type="vanished">Thiết lập số luồng của kịch bản kiểm tra (%u to %d, 0 = tự động, &lt;0 = để nhiều lõi miễn phí, ngầm định: %d)</translation>
     </message>
     <message>
         <source>This is a pre-release test build - use at your own risk - do not use for mining or merchant applications</source>
@@ -7611,15 +7658,15 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>-maxtxfee is set very high! Fees this large could be paid on a single transaction.</source>
-        <translation>-maxtxfee được thiết lập rất cao! Mức phí cao này có thể được trả chỉ cho một giao dịch.</translation>
+        <translation type="vanished">-maxtxfee được thiết lập rất cao! Mức phí cao này có thể được trả chỉ cho một giao dịch.</translation>
     </message>
     <message>
         <source>A fee rate (in %s/kB) that will be used when fee estimation has insufficient data (default: %s)</source>
-        <translation>Một tỷ lệ phí (theo %s/kB) sẽ được sử dụng khi việc tính phí không có đủ dữ liệu (ngầm định: %s)</translation>
+        <translation type="vanished">Một tỷ lệ phí (theo %s/kB) sẽ được sử dụng khi việc tính phí không có đủ dữ liệu (ngầm định: %s)</translation>
     </message>
     <message>
         <source>Accept relayed transactions received from whitelisted peers even when not relaying transactions (default: %d)</source>
-        <translation>Chấp nhận các giao dịch chuyển tiếp nhận được từ các nút ngang hàng trong danh sách trắng thậm chí đó không phải giao dịch chuyển tiếp (ngầm định: %d)</translation>
+        <translation type="vanished">Chấp nhận các giao dịch chuyển tiếp nhận được từ các nút ngang hàng trong danh sách trắng thậm chí đó không phải giao dịch chuyển tiếp (ngầm định: %d)</translation>
     </message>
     <message>
         <source>Allow JSON-RPC connections from specified source. Valid for &lt;ip&gt; are a single IP (e.g. 1.2.3.4), a network/netmask (e.g. 1.2.3.4/255.255.255.0) or a network/CIDR (e.g. 1.2.3.4/24). This option can be specified multiple times</source>
@@ -7643,7 +7690,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Error loading %s: You can&apos;t enable HD on a already existing non-HD wallet</source>
-        <translation>Lỗi tải %s: Bạn không thể mở HD trên ví mà không phải là HD</translation>
+        <translation type="vanished">Lỗi tải %s: Bạn không thể mở HD trên ví mà không phải là HD</translation>
     </message>
     <message>
         <source>Found unconfirmed denominated outputs, will wait till they confirm to continue.</source>
@@ -7659,7 +7706,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>If this block is in the chain assume that it and its ancestors are valid and potentially skip their script verification (0 to verify all, default: %s, testnet: %s)</source>
-        <translation>Nếu khối này nằm trong chuỗi giả định rằng nó và các khối trước nó là hợp lệ và có khả năng bỏ qua kịch bản kiểm tra (0 để kiểm tra tất cả, ngầm định: %s, testnet: %s)</translation>
+        <translation type="vanished">Nếu khối này nằm trong chuỗi giả định rằng nó và các khối trước nó là hợp lệ và có khả năng bỏ qua kịch bản kiểm tra (0 để kiểm tra tất cả, ngầm định: %s, testnet: %s)</translation>
     </message>
     <message>
         <source>Invalid amount for -maxtxfee=&lt;amount&gt;: &apos;%s&apos; (must be at least the minrelay fee of %s to prevent stuck transactions)</source>
@@ -7703,7 +7750,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>You need to rebuild the database using -reindex-chainstate to change -txindex</source>
-        <translation>Bạn cần tái tạo lại cơ sở dữ liệu sử dụng tham số -reindex-chainstate để thay cho -txindex</translation>
+        <translation type="vanished">Bạn cần tái tạo lại cơ sở dữ liệu sử dụng tham số -reindex-chainstate để thay cho -txindex</translation>
     </message>
     <message>
         <source>(default: %s)</source>
@@ -7719,11 +7766,11 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Can&apos;t mix: no compatible inputs found!</source>
-        <translation>Không thể trộn: không thấy đầu vào tương thích!</translation>
+        <translation type="vanished">Không thể trộn: không thấy đầu vào tương thích!</translation>
     </message>
     <message>
         <source>Chain selection options:</source>
-        <translation>Các tuỳ chọn lựa chọn chuỗi:</translation>
+        <translation type="vanished">Các tuỳ chọn lựa chọn chuỗi:</translation>
     </message>
     <message>
         <source>Connect through SOCKS5 proxy</source>
@@ -7731,7 +7778,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Connect to KeePassHttp on port &lt;port&gt; (default: %u)</source>
-        <translation>Kết nối tới KeePassHttp trên cổng &lt;port&gt; (ngầm định: %u)</translation>
+        <translation type="vanished">Kết nối tới KeePassHttp trên cổng &lt;port&gt; (ngầm định: %u)</translation>
     </message>
     <message>
         <source>Enable the client to act as a masternode (0-1, default: %u)</source>
@@ -7739,7 +7786,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Entry exceeds maximum size.</source>
-        <translation>Đầu vào vượt ngưỡng tối đa. </translation>
+        <translation type="vanished">Đầu vào vượt ngưỡng tối đa. </translation>
     </message>
     <message>
         <source>Error loading %s: You can&apos;t disable HD on a already existing HD wallet</source>
@@ -7747,27 +7794,27 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Failed to load fulfilled requests cache from</source>
-        <translation>Không thể tải cache yêu cầu đã được thực hiện từ</translation>
+        <translation type="vanished">Không thể tải cache yêu cầu đã được thực hiện từ</translation>
     </message>
     <message>
         <source>Failed to load governance cache from</source>
-        <translation>Không thể cache tải dữ liệu governance từ</translation>
+        <translation type="vanished">Không thể cache tải dữ liệu governance từ</translation>
     </message>
     <message>
         <source>Failed to load masternode cache from</source>
-        <translation>Không thể tải cache dữ liệu về masternode từ</translation>
+        <translation type="vanished">Không thể tải cache dữ liệu về masternode từ</translation>
     </message>
     <message>
         <source>Failed to load masternode payments cache from</source>
-        <translation>Không thể tải được cache dữ liệu về các giao dịch từ</translation>
+        <translation type="vanished">Không thể tải được cache dữ liệu về các giao dịch từ</translation>
     </message>
     <message>
         <source>Found enough users, signing ( waiting %s )</source>
-        <translation>Đã tìm đủ người dùng, đang ký (vui lòng đợi %s)</translation>
+        <translation type="vanished">Đã tìm đủ người dùng, đang ký (vui lòng đợi %s)</translation>
     </message>
     <message>
         <source>Found enough users, signing ...</source>
-        <translation>Đã kiếm đủ người dùng, đang ký ...</translation>
+        <translation type="vanished">Đã kiếm đủ người dùng, đang ký ...</translation>
     </message>
     <message>
         <source>How many blocks to check at startup (default: %u, 0 = all)</source>
@@ -7831,23 +7878,23 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Loading banlist...</source>
-        <translation>Đang tải danh sách từ chối...</translation>
+        <translation type="vanished">Đang tải danh sách từ chối...</translation>
     </message>
     <message>
         <source>Loading fulfilled requests cache...</source>
-        <translation>Đang tải cache dữ liệu thực hiện...</translation>
+        <translation type="vanished">Đang tải cache dữ liệu thực hiện...</translation>
     </message>
     <message>
         <source>Loading masternode cache...</source>
-        <translation>Đang tải cache cho masternode...</translation>
+        <translation type="vanished">Đang tải cache cho masternode...</translation>
     </message>
     <message>
         <source>Loading masternode payment cache...</source>
-        <translation>Đang tải bộ đệm thanh toán cho masternode...</translation>
+        <translation type="vanished">Đang tải bộ đệm thanh toán cho masternode...</translation>
     </message>
     <message>
         <source>Lock is already in place.</source>
-        <translation>Khoá đã sẵn sàng.</translation>
+        <translation type="vanished">Khoá đã sẵn sàng.</translation>
     </message>
     <message>
         <source>Lock masternodes from masternode configuration file (default: %u)</source>
@@ -7863,7 +7910,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Mixing in progress...</source>
-        <translation>Đang trong quá trình trộn...</translation>
+        <translation type="vanished">Đang trong quá trình trộn...</translation>
     </message>
     <message>
         <source>Mnemonic passphrase is too long, must be at most 256 characters</source>
@@ -7875,15 +7922,15 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>No Masternodes detected.</source>
-        <translation>Không tìm thấy các Master node.</translation>
+        <translation type="vanished">Không tìm thấy các Master node.</translation>
     </message>
     <message>
         <source>No compatible Masternode found.</source>
-        <translation>Không tìm thấy Masternode tương thích.</translation>
+        <translation type="vanished">Không tìm thấy Masternode tương thích.</translation>
     </message>
     <message>
         <source>Not in the Masternode list.</source>
-        <translation>Không có trong danh sách Masternode.</translation>
+        <translation type="vanished">Không có trong danh sách Masternode.</translation>
     </message>
     <message>
         <source>Only connect to nodes in network &lt;net&gt; (ipv4, ipv6 or onion)</source>
@@ -7891,7 +7938,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Port: %d</source>
-        <translation>Cổng: %d</translation>
+        <translation type="vanished">Cổng: %d</translation>
     </message>
     <message>
         <source>Prepend debug output with timestamp (default: %u)</source>
@@ -7899,7 +7946,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Rebuild chain state and block index from the blk*.dat files on disk</source>
-        <translation>Tái tạo chuỗi trạng thái và chỉ mục khối từ các file blk*.dat trên đĩa</translation>
+        <translation type="vanished">Tái tạo chuỗi trạng thái và chỉ mục khối từ các file blk*.dat trên đĩa</translation>
     </message>
     <message>
         <source>Rebuild chain state from the currently indexed blocks</source>
@@ -7907,7 +7954,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Send trace/debug info to debug.log file (default: %u)</source>
-        <translation>Gửi thông tin trace/debug vào file debug.log (ngầm định: %u)</translation>
+        <translation type="vanished">Gửi thông tin trace/debug vào file debug.log (ngầm định: %u)</translation>
     </message>
     <message>
         <source>Send transactions as zero-fee transactions if possible (default: %u)</source>
@@ -7943,35 +7990,35 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Submitted following entries to masternode: %u / %d</source>
-        <translation>Đã gửi các những thành phần sau tới masternode: %u / %d</translation>
+        <translation type="vanished">Đã gửi các những thành phần sau tới masternode: %u / %d</translation>
     </message>
     <message>
         <source>Submitted to masternode, waiting for more entries ( %u / %d ) %s</source>
-        <translation>Đã gửi đến masternode, đang đợi các đầu vào khác nữa (%u / %d) %s</translation>
+        <translation type="vanished">Đã gửi đến masternode, đang đợi các đầu vào khác nữa (%u / %d) %s</translation>
     </message>
     <message>
         <source>Submitted to masternode, waiting in queue %s</source>
-        <translation>Đã được gửi cho masternode, đang đợi trong hàng đợi %s</translation>
+        <translation type="vanished">Đã được gửi cho masternode, đang đợi trong hàng đợi %s</translation>
     </message>
     <message>
         <source>Synchroning blockchain...</source>
-        <translation>Đang đồng bộ chuỗi khối...</translation>
+        <translation type="vanished">Đang đồng bộ chuỗi khối...</translation>
     </message>
     <message>
         <source>Synchronization failed</source>
-        <translation>Đồng bộ thất bại</translation>
+        <translation type="vanished">Đồng bộ thất bại</translation>
     </message>
     <message>
         <source>Synchronization finished</source>
-        <translation>Đồng bộ đã hoàn thành</translation>
+        <translation type="vanished">Đồng bộ đã hoàn thành</translation>
     </message>
     <message>
         <source>Synchronizing masternodes...</source>
-        <translation>Đang đồng bộ các masternode...</translation>
+        <translation type="vanished">Đang đồng bộ các masternode...</translation>
     </message>
     <message>
         <source>This is not a Masternode.</source>
-        <translation>Đây không phải là một Masternode.</translation>
+        <translation type="vanished">Đây không phải là một Masternode.</translation>
     </message>
     <message>
         <source>Threshold for disconnecting misbehaving peers (default: %u)</source>
@@ -7979,15 +8026,15 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Too many %f denominations, removing.</source>
-        <translation>Có quá nhiều %f mệnh giá, đang xoá.</translation>
+        <translation type="vanished">Có quá nhiều %f mệnh giá, đang xoá.</translation>
     </message>
     <message>
         <source>Tor control port password (default: empty)</source>
-        <translation>Mật khẩu kiểm soát cổng Tor (ngầm định: bỏ trống)</translation>
+        <translation type="vanished">Mật khẩu kiểm soát cổng Tor (ngầm định: bỏ trống)</translation>
     </message>
     <message>
         <source>Tor control port to use if onion listening enabled (default: %s)</source>
-        <translation>Bật cơ chế lắng nghe onion để có thể sử dụng cổng điều khiển Tor (ngầm định: %s)</translation>
+        <translation type="vanished">Bật cơ chế lắng nghe onion để có thể sử dụng cổng điều khiển Tor (ngầm định: %s)</translation>
     </message>
     <message>
         <source>Unable to start HTTP server. See debug log for details.</source>
@@ -7995,27 +8042,27 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Unknown response.</source>
-        <translation>Trả lời không xác định.</translation>
+        <translation type="vanished">Trả lời không xác định.</translation>
     </message>
     <message>
         <source>Unsupported argument -benchmark ignored, use -debug=bench.</source>
-        <translation>Tuỳ chọn không được hỗ trợ -benchmark, sử dụng -debug=bench.</translation>
+        <translation type="vanished">Tuỳ chọn không được hỗ trợ -benchmark, sử dụng -debug=bench.</translation>
     </message>
     <message>
         <source>Unsupported argument -debugnet ignored, use -debug=net.</source>
-        <translation>Tuỳ chọn không được hỗ trợ -debugnet, sử dụng -debug=net.</translation>
+        <translation type="vanished">Tuỳ chọn không được hỗ trợ -debugnet, sử dụng -debug=net.</translation>
     </message>
     <message>
         <source>Unsupported argument -tor found, use -onion.</source>
-        <translation>Tuỳ chọn không được hỗ trợ -tor, hãy sử dụng -onion.</translation>
+        <translation type="vanished">Tuỳ chọn không được hỗ trợ -tor, hãy sử dụng -onion.</translation>
     </message>
     <message>
         <source>Upgrade wallet to latest format on startup</source>
-        <translation>Nâng cấp ví lên định dạng mới nhất khi khởi động</translation>
+        <translation type="vanished">Nâng cấp ví lên định dạng mới nhất khi khởi động</translation>
     </message>
     <message>
         <source>Use KeePass 2 integration using KeePassHttp plugin (default: %u)</source>
-        <translation>Sử dụng tích hợp KeePass 2 dùng KeePassHttp plugin (ngầm định: %u)</translation>
+        <translation type="vanished">Sử dụng tích hợp KeePass 2 dùng KeePassHttp plugin (ngầm định: %u)</translation>
     </message>
     <message>
         <source>Use UPnP to map the listening port (default: %u)</source>
@@ -8023,15 +8070,15 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Use the test chain</source>
-        <translation>Sử dụng chuỗi thử</translation>
+        <translation type="vanished">Sử dụng chuỗi thử</translation>
     </message>
     <message>
         <source>User Agent comment (%s) contains unsafe characters.</source>
-        <translation>Bình luận User Agent (%s) có chứa những ký tự không an toàn.</translation>
+        <translation type="vanished">Bình luận User Agent (%s) có chứa những ký tự không an toàn.</translation>
     </message>
     <message>
         <source>Will retry...</source>
-        <translation>Sẽ thử lại...</translation>
+        <translation type="vanished">Sẽ thử lại...</translation>
     </message>
     <message>
         <source>Invalid masternodeprivkey. Please see documenation.</source>
@@ -8039,15 +8086,15 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Can&apos;t find random Masternode.</source>
-        <translation>Không tìm thấy Masternode ngẫu nhiên.</translation>
+        <translation type="vanished">Không tìm thấy Masternode ngẫu nhiên.</translation>
     </message>
     <message>
         <source>Can&apos;t mix while sync in progress.</source>
-        <translation>Không thể trộn trong quá trình đồng bộ.</translation>
+        <translation type="vanished">Không thể trộn trong quá trình đồng bộ.</translation>
     </message>
     <message>
         <source>Could not parse masternode.conf</source>
-        <translation>Không hiểu được tệp masternode.conf</translation>
+        <translation type="vanished">Không hiểu được tệp masternode.conf</translation>
     </message>
     <message>
         <source>Invalid netmask specified in -whitelist: &apos;%s&apos;</source>
@@ -8055,7 +8102,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Invalid port detected in masternode.conf</source>
-        <translation>Phát hiện thấy cổng không hợp lệ trong tệp masternode.conf</translation>
+        <translation type="vanished">Phát hiện thấy cổng không hợp lệ trong tệp masternode.conf</translation>
     </message>
     <message>
         <source>Invalid script detected.</source>
@@ -8063,11 +8110,11 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>KeePassHttp id for the established association</source>
-        <translation>KeePassHttp id cho thiết lập sự kết hợp</translation>
+        <translation type="vanished">KeePassHttp id cho thiết lập sự kết hợp</translation>
     </message>
     <message>
         <source>KeePassHttp key for AES encrypted communication with KeePass</source>
-        <translation>Khoá KeePassHttp cho liên lạc mã hoá AES với KeePass</translation>
+        <translation type="vanished">Khoá KeePassHttp cho liên lạc mã hoá AES với KeePass</translation>
     </message>
     <message>
         <source>Keep at most &lt;n&gt; unconnectable transactions in memory (default: %u)</source>
@@ -8079,15 +8126,15 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Discover own IP addresses (default: 1 when listening and no -externalip or -proxy)</source>
-        <translation>Tự phát hiện địa chỉ IP (ngầm định: 1 khi nghe và không dùng -externalip hoặc -proxy)</translation>
+        <translation type="vanished">Tự phát hiện địa chỉ IP (ngầm định: 1 khi nghe và không dùng -externalip hoặc -proxy)</translation>
     </message>
     <message>
         <source>Do not keep transactions in the mempool longer than &lt;n&gt; hours (default: %u)</source>
-        <translation>Không giữ các giao dịch trong mempool lâu hơn &lt;n&gt; giờ (ngầm định: %u)</translation>
+        <translation type="vanished">Không giữ các giao dịch trong mempool lâu hơn &lt;n&gt; giờ (ngầm định: %u)</translation>
     </message>
     <message>
         <source>Enable InstantSend, show confirmations for locked transactions (0-1, default: %u)</source>
-        <translation>Bật InstantSend, hiển thị các xác thực cho các giao dịch bị khoá (0-1, ngầm định: %u)</translation>
+        <translation type="vanished">Bật InstantSend, hiển thị các xác thực cho các giao dịch bị khoá (0-1, ngầm định: %u)</translation>
     </message>
     <message>
         <source>Enable multiple PrivateSend mixing sessions per block, experimental (0-1, default: %u)</source>
@@ -8099,23 +8146,23 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Execute command when a wallet InstantSend transaction is successfully locked (%s in cmd is replaced by TxID)</source>
-        <translation>Thực hiện lên khi một giao dịch InstantSend được khoá thành công (%s trong cmd được thay thế bằng TxID)</translation>
+        <translation type="vanished">Thực hiện lên khi một giao dịch InstantSend được khoá thành công (%s trong cmd được thay thế bằng TxID)</translation>
     </message>
     <message>
         <source>Failed to create backup, file already exists! This could happen if you restarted wallet in less than 60 seconds. You can continue if you are ok with this.</source>
-        <translation>Không tạo được file dự phòng, file đã tồn tại rồi! Điều này có thể xảy ra nếu bạn khởi động lại ví trong ít hơn 60 giây. Bạn có thể tiếp tục nếu bạn đồng ý với việc đó.</translation>
+        <translation type="vanished">Không tạo được file dự phòng, file đã tồn tại rồi! Điều này có thể xảy ra nếu bạn khởi động lại ví trong ít hơn 60 giây. Bạn có thể tiếp tục nếu bạn đồng ý với việc đó.</translation>
     </message>
     <message>
         <source>Fees (in %s/kB) smaller than this are considered zero fee for relaying, mining and transaction creation (default: %s)</source>
-        <translation>Phí (theo %s/kB) nhỏ hơn giá trị này được xem là không phí cho việc chuyển tiếp, đào và tạo giao dịch (ngầm định: %s)</translation>
+        <translation type="vanished">Phí (theo %s/kB) nhỏ hơn giá trị này được xem là không phí cho việc chuyển tiếp, đào và tạo giao dịch (ngầm định: %s)</translation>
     </message>
     <message>
         <source>Fees (in %s/kB) smaller than this are considered zero fee for transaction creation (default: %s)</source>
-        <translation>Phí (theo %s/kB) nhỏ hơn giá trị này được xem là không phí cho việc tạo giao dịch (ngầm định: %s)</translation>
+        <translation type="vanished">Phí (theo %s/kB) nhỏ hơn giá trị này được xem là không phí cho việc tạo giao dịch (ngầm định: %s)</translation>
     </message>
     <message>
         <source>If &lt;category&gt; is not supplied or if &lt;category&gt; = 1, output all debugging information.</source>
-        <translation>Nếu &lt;category&gt; không được cung cấp hoặc nếu &lt;category&gt; = 1, xuất tất cả các thông tin gỡ lỗi.</translation>
+        <translation type="vanished">Nếu &lt;category&gt; không được cung cấp hoặc nếu &lt;category&gt; = 1, xuất tất cả các thông tin gỡ lỗi.</translation>
     </message>
     <message>
         <source>InstantSend doesn&apos;t support sending values that high yet. Transactions are currently limited to %1 LUX.</source>
@@ -8123,7 +8170,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>InstantSend requires inputs with at least %d confirmations, you might need to wait a few minutes and try again.</source>
-        <translation>InstantSend cần các đầu vào ít nhất %d xác thực, bạn cần đợi thêm vài phút nữa và thử lại.</translation>
+        <translation type="vanished">InstantSend cần các đầu vào ít nhất %d xác thực, bạn cần đợi thêm vài phút nữa và thử lại.</translation>
     </message>
     <message>
         <source>Maintain a full address index, used to query for the balance, txids and unspent outputs for addresses (default: %u)</source>
@@ -8135,11 +8182,11 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Maintain a timestamp index for block hashes, used to query blocks hashes by a range of timestamps (default: %u)</source>
-        <translation>Duy trì một chỉ mục đầy đủ các đánh dấu thời gian cho các giá trị băm của khối, được dùng để tra cứu số các giá trị băm trong một khoảng thời gian xác định (ngầm định: %u)</translation>
+        <translation type="vanished">Duy trì một chỉ mục đầy đủ các đánh dấu thời gian cho các giá trị băm của khối, được dùng để tra cứu số các giá trị băm trong một khoảng thời gian xác định (ngầm định: %u)</translation>
     </message>
     <message>
         <source>Maintain at most &lt;n&gt; connections to peers (temporary service connections excluded) (default: %u)</source>
-        <translation>Duy trì nhiều nhất &lt;n&gt; kết nối đến các nút ngang hàng (các kết nối dịch vụ tạm thời không được tính) (ngầm định: %u)</translation>
+        <translation type="vanished">Duy trì nhiều nhất &lt;n&gt; kết nối đến các nút ngang hàng (các kết nối dịch vụ tạm thời không được tính) (ngầm định: %u)</translation>
     </message>
     <message>
         <source>PrivateSend uses exact denominated amounts to send funds, you might simply need to anonymize some more coins.</source>
@@ -8155,19 +8202,19 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Randomize credentials for every proxy connection. This enables Tor stream isolation (default: %u)</source>
-        <translation>Ngẫu nhiên hoá các chứng thư cho mỗi kết nối qua proxy. Nó bật Tor stream isolation (ngầm định: %u)</translation>
+        <translation type="vanished">Ngẫu nhiên hoá các chứng thư cho mỗi kết nối qua proxy. Nó bật Tor stream isolation (ngầm định: %u)</translation>
     </message>
     <message>
         <source>Rescans are not possible in pruned mode. You will need to use -reindex which will download the whole blockchain again.</source>
-        <translation>Rescans là không thể trong chế độ xén tỉa. Bạn cần sử dụng -reindex mà nó sẽ tải xuống toàn bộ blockchain lại.</translation>
+        <translation type="vanished">Rescans là không thể trong chế độ xén tỉa. Bạn cần sử dụng -reindex mà nó sẽ tải xuống toàn bộ blockchain lại.</translation>
     </message>
     <message>
         <source>Specify full path to directory for automatic wallet backups (must exist)</source>
-        <translation>Hãy chỉ đường dẫn đầy đủ đến thư mục dành cho việc tự động backup ví (thư mục phải được tạo sẵn)</translation>
+        <translation type="vanished">Hãy chỉ đường dẫn đầy đủ đến thư mục dành cho việc tự động backup ví (thư mục phải được tạo sẵn)</translation>
     </message>
     <message>
         <source>Support filtering of blocks and transaction with bloom filters (default: %u)</source>
-        <translation>Hỗ trợ việc lọc các khối và giao dịch với bộ lọc bloom (ngầm định: %u)</translation>
+        <translation type="vanished">Hỗ trợ việc lọc các khối và giao dịch với bộ lọc bloom (ngầm định: %u)</translation>
     </message>
     <message>
         <source>The block database contains a block which appears to be from the future. This may be due to your computer&apos;s date and time being set incorrectly. Only rebuild the block database if you are sure that your computer&apos;s date and time are correct</source>
@@ -8175,15 +8222,15 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>The transaction amount is too small to send after the fee has been deducted</source>
-        <translation>Giá trị giao dịch quá nhỏ để gửi sau khi đã trừ đi mức phí giao dịch</translation>
+        <translation type="vanished">Giá trị giao dịch quá nhỏ để gửi sau khi đã trừ đi mức phí giao dịch</translation>
     </message>
     <message>
         <source>Total length of network version string (%i) exceeds maximum length (%i). Reduce the number or size of uacomments.</source>
-        <translation>Tổng độ dài của chuỗi phiên bản mạng (%i) vượt qua độ dài tối đa (%i). Hãy giảm số hoặc kích thước của uacomments.</translation>
+        <translation type="vanished">Tổng độ dài của chuỗi phiên bản mạng (%i) vượt qua độ dài tối đa (%i). Hãy giảm số hoặc kích thước của uacomments.</translation>
     </message>
     <message>
         <source>Tries to keep outbound traffic under the given target (in MiB per 24h), 0 = no limit (default: %d)</source>
-        <translation>Thử giữ cho thông lượng mạng truyền ra dưới ngưỡng (theo MiB mỗi 24 giờ), 0 = không giới hạn (ngầm định: %d)</translation>
+        <translation type="vanished">Thử giữ cho thông lượng mạng truyền ra dưới ngưỡng (theo MiB mỗi 24 giờ), 0 = không giới hạn (ngầm định: %d)</translation>
     </message>
     <message>
         <source>Unable to locate enough PrivateSend denominated funds for this transaction.</source>
@@ -8191,27 +8238,27 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Unsupported argument -socks found. Setting SOCKS version isn&apos;t possible anymore, only SOCKS5 proxies are supported.</source>
-        <translation>Tìm thấy tham số không được hỗ trợ -socks. Thiết lập phiên bản SOCKS không còn hiệu lực nữa, chỉ có proxy SOCKS5 mới được hỗ trợ.</translation>
+        <translation type="vanished">Tìm thấy tham số không được hỗ trợ -socks. Thiết lập phiên bản SOCKS không còn hiệu lực nữa, chỉ có proxy SOCKS5 mới được hỗ trợ.</translation>
     </message>
     <message>
         <source>Unsupported argument -whitelistalwaysrelay ignored, use -whitelistrelay and/or -whitelistforcerelay.</source>
-        <translation>Tham số không được hỗ trợ -whitelistalwaysrelay đã bị bỏ qua, hãy sử dụng -whitelistrelay và/hoặc -whitelistforcerelay.</translation>
+        <translation type="vanished">Tham số không được hỗ trợ -whitelistalwaysrelay đã bị bỏ qua, hãy sử dụng -whitelistrelay và/hoặc -whitelistforcerelay.</translation>
     </message>
     <message>
         <source>Use UPnP to map the listening port (default: 1 when listening and no -proxy)</source>
-        <translation>Sử dụng UPnP để ánh xạ các cổng lắng nghe (ngầm định: 1 khi nghe và không -proxy)</translation>
+        <translation type="vanished">Sử dụng UPnP để ánh xạ các cổng lắng nghe (ngầm định: 1 khi nghe và không -proxy)</translation>
     </message>
     <message>
         <source>WARNING! Failed to replenish keypool, please unlock your wallet to do so.</source>
-        <translation>CẢNH BÁO: Bổ sung keypool không thành công, hãy mở khoá ví của bạn để làm điều đó.</translation>
+        <translation type="vanished">CẢNH BÁO: Bổ sung keypool không thành công, hãy mở khoá ví của bạn để làm điều đó.</translation>
     </message>
     <message>
         <source>Wallet is locked, can&apos;t replenish keypool! Automatic backups and mixing are disabled, please unlock your wallet to replenish keypool.</source>
-        <translation>Ví đã được khoá, không thể bổ sung keypool! Tự động backups và trộn đã bị tắt, hãy mở khoá ví của bạn để bổ sung keypool.</translation>
+        <translation type="vanished">Ví đã được khoá, không thể bổ sung keypool! Tự động backups và trộn đã bị tắt, hãy mở khoá ví của bạn để bổ sung keypool.</translation>
     </message>
     <message>
         <source>Warning: Unknown block versions being mined! It&apos;s possible unknown rules are in effect</source>
-        <translation>Cảnh báo: Không xác định được phiên bản khối được đào! Có thể những luật chưa được biết đang có tác động</translation>
+        <translation type="vanished">Cảnh báo: Không xác định được phiên bản khối được đào! Có thể những luật chưa được biết đang có tác động</translation>
     </message>
     <message>
         <source>You need to rebuild the database using -reindex to go back to unpruned mode.  This will redownload the entire blockchain</source>
@@ -8219,7 +8266,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>(%d could be used only on mainnet)</source>
-        <translation>(%d chỉ có thể sử dụng ở trên mạng chính thức)</translation>
+        <translation type="vanished">(%d chỉ có thể sử dụng ở trên mạng chính thức)</translation>
     </message>
     <message>
         <source>(default: %u)</source>
@@ -8227,11 +8274,11 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>(must be %d for mainnet)</source>
-        <translation>(phải là %d cho mạng chính)</translation>
+        <translation type="vanished">(phải là %d cho mạng chính)</translation>
     </message>
     <message>
         <source>-maxmempool must be at least %d MB</source>
-        <translation>-maxmempool phải ít nhất %d MB</translation>
+        <translation type="vanished">-maxmempool phải ít nhất %d MB</translation>
     </message>
     <message>
         <source>&lt;category&gt; can be:</source>
@@ -8239,19 +8286,19 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Append comment to the user agent string</source>
-        <translation>Thêm bình luận vào thông tin user agent</translation>
+        <translation type="vanished">Thêm bình luận vào thông tin user agent</translation>
     </message>
     <message>
         <source>Automatic backups disabled</source>
-        <translation>Tự động backup đã bị tắt</translation>
+        <translation type="vanished">Tự động backup đã bị tắt</translation>
     </message>
     <message>
         <source>Automatically create Tor hidden service (default: %d)</source>
-        <translation>Tự động tạo dịch vụ ẩn Tor (ngầm định: %d)</translation>
+        <translation type="vanished">Tự động tạo dịch vụ ẩn Tor (ngầm định: %d)</translation>
     </message>
     <message>
         <source>ERROR! Failed to create automatic backup</source>
-        <translation>LỖI: Thất bại trong việc backup tự động</translation>
+        <translation type="vanished">LỖI: Thất bại trong việc backup tự động</translation>
     </message>
     <message>
         <source>Enable publish hash block in &lt;address&gt;</source>
@@ -8259,7 +8306,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Enable publish hash transaction (locked via InstantSend) in &lt;address&gt;</source>
-        <translation>Cho phép công bố hash transaction (khoá thông qua InstantSend) trong &lt;address&gt;</translation>
+        <translation type="vanished">Cho phép công bố hash transaction (khoá thông qua InstantSend) trong &lt;address&gt;</translation>
     </message>
     <message>
         <source>Enable publish hash transaction in &lt;address&gt;</source>
@@ -8271,7 +8318,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Enable publish raw transaction (locked via InstantSend) in &lt;address&gt;</source>
-        <translation>Cho phép công bố các giao dịch raw (được khoá qua InstantSend) trong &lt;address&gt;</translation>
+        <translation type="vanished">Cho phép công bố các giao dịch raw (được khoá qua InstantSend) trong &lt;address&gt;</translation>
     </message>
     <message>
         <source>Enable publish raw transaction in &lt;address&gt;</source>
@@ -8279,7 +8326,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Enable transaction replacement in the memory pool (default: %u)</source>
-        <translation>Cho phép thay thế giao dịch trong bể nhớ (ngầm định: %u)</translation>
+        <translation type="vanished">Cho phép thay thế giao dịch trong bể nhớ (ngầm định: %u)</translation>
     </message>
     <message>
         <source>Error: A fatal internal error occurred, see debug.log for details</source>
@@ -8287,39 +8334,39 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Failed to create backup %s!</source>
-        <translation>Không tạo được backup %s!</translation>
+        <translation type="vanished">Không tạo được backup %s!</translation>
     </message>
     <message>
         <source>Failed to create backup, error: %s</source>
-        <translation>Không tạo được backup, lỗi: %s</translation>
+        <translation type="vanished">Không tạo được backup, lỗi: %s</translation>
     </message>
     <message>
         <source>Failed to delete backup, error: %s</source>
-        <translation>Không xoá được backup, lỗi: %s</translation>
+        <translation type="vanished">Không xoá được backup, lỗi: %s</translation>
     </message>
     <message>
         <source>Failed to parse host:port string</source>
-        <translation>Không diễn dịch được thông tin địa chỉ máy:cổng</translation>
+        <translation type="vanished">Không diễn dịch được thông tin địa chỉ máy:cổng</translation>
     </message>
     <message>
         <source>Fee (in %s/kB) to add to transactions you send (default: %s)</source>
-        <translation>Phí (theo %s/kB) để thêm vào giao dịch mà bạn gửi (ngầm định: %s)</translation>
+        <translation type="vanished">Phí (theo %s/kB) để thêm vào giao dịch mà bạn gửi (ngầm định: %s)</translation>
     </message>
     <message>
         <source>Imports blocks from external blk000??.dat file on startup</source>
-        <translation>Nhập các khối từ các file ngoài blk000??.dat khi khởi động</translation>
+        <translation type="vanished">Nhập các khối từ các file ngoài blk000??.dat khi khởi động</translation>
     </message>
     <message>
         <source>InstantSend options:</source>
-        <translation>Các tuỳ chọn InstantSend:</translation>
+        <translation type="vanished">Các tuỳ chọn InstantSend:</translation>
     </message>
     <message>
         <source>Invalid amount for -fallbackfee=&lt;amount&gt;: &apos;%s&apos;</source>
-        <translation>Số lượng không hợp lệ cho -fallbackfee=&lt;amount&gt;: &apos;%s&apos;</translation>
+        <translation type="vanished">Số lượng không hợp lệ cho -fallbackfee=&lt;amount&gt;: &apos;%s&apos;</translation>
     </message>
     <message>
         <source>Keep the transaction memory pool below &lt;n&gt; megabytes (default: %u)</source>
-        <translation>Giữ cho bể nhớ giao dịch dưới &lt;n&gt; megabytes (ngầm định: %u)</translation>
+        <translation type="vanished">Giữ cho bể nhớ giao dịch dưới &lt;n&gt; megabytes (ngầm định: %u)</translation>
     </message>
     <message>
         <source>Last PrivateSend was too recent.</source>
@@ -8331,7 +8378,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Line: %d</source>
-        <translation>Dòng: %d</translation>
+        <translation type="vanished">Dòng: %d</translation>
     </message>
     <message>
         <source>Loading addresses...</source>
@@ -8343,7 +8390,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Loading governance cache...</source>
-        <translation>Đang tải bộ đệm quản trị...</translation>
+        <translation type="vanished">Đang tải bộ đệm quản trị...</translation>
     </message>
     <message>
         <source>Loading wallet... (%3.2f %%)</source>
@@ -8355,7 +8402,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Location of the auth cookie (default: data dir)</source>
-        <translation>Vị trí của auth cookie (ngầm định: thư mục dữ liệu)</translation>
+        <translation type="vanished">Vị trí của auth cookie (ngầm định: thư mục dữ liệu)</translation>
     </message>
     <message>
         <source>Make the wallet broadcast transactions</source>
@@ -8363,7 +8410,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Masternode cache is empty, skipping payments and governance cache...</source>
-        <translation>Bộ đệm Masternode đang trống, bỏ qua các bộ đệm thanh toán và bộ đệm quản trị...</translation>
+        <translation type="vanished">Bộ đệm Masternode đang trống, bỏ qua các bộ đệm thanh toán và bộ đệm quản trị...</translation>
     </message>
     <message>
         <source>Masternode options:</source>
@@ -8379,7 +8426,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Minimum bytes per sigop in transactions we relay and mine (default: %u)</source>
-        <translation>Số bytes tối thiểu mỗi sigop trong các giao dịch chúng ta chuyển tiếp và đào (ngầm định: %u)</translation>
+        <translation type="vanished">Số bytes tối thiểu mỗi sigop trong các giao dịch chúng ta chuyển tiếp và đào (ngầm định: %u)</translation>
     </message>
     <message>
         <source>Missing input transaction information.</source>
@@ -8387,7 +8434,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>No errors detected.</source>
-        <translation>Không phát hiện ra các lỗi.</translation>
+        <translation type="vanished">Không phát hiện ra các lỗi.</translation>
     </message>
     <message>
         <source>No matching denominations found for mixing.</source>
@@ -8411,11 +8458,11 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Not enough funds to anonymize.</source>
-        <translation>Không đủ tiền để ẩn danh.</translation>
+        <translation type="vanished">Không đủ tiền để ẩn danh.</translation>
     </message>
     <message>
         <source>Number of automatic wallet backups (default: %u)</source>
-        <translation>Số lượng ví tự động backup (ngầm định: %u)</translation>
+        <translation type="vanished">Số lượng ví tự động backup (ngầm định: %u)</translation>
     </message>
     <message>
         <source>Options:</source>
@@ -8427,7 +8474,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Print version and exit</source>
-        <translation>In ra phiên bản và thoát</translation>
+        <translation type="vanished">In ra phiên bản và thoát</translation>
     </message>
     <message>
         <source>PrivateSend is idle.</source>
@@ -8459,55 +8506,55 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Rescan the block chain for missing wallet transactions on startup</source>
-        <translation>Quét lại block chain để tìm ra những giao dịch mà ví còn thiếu khi khởi động</translation>
+        <translation type="vanished">Quét lại block chain để tìm ra những giao dịch mà ví còn thiếu khi khởi động</translation>
     </message>
     <message>
         <source>The wallet will avoid paying less than the minimum relay fee.</source>
-        <translation>Wallet sẽ hủy thanh toán nhỏ hơn phí relay.</translation>
+        <translation type="vanished">Wallet sẽ hủy thanh toán nhỏ hơn phí relay.</translation>
     </message>
     <message>
         <source>This is the minimum transaction fee you pay on every transaction.</source>
-        <translation>Đây là minimum transaction fee bạn pay cho mỗi transaction.</translation>
+        <translation type="vanished">Đây là minimum transaction fee bạn pay cho mỗi transaction.</translation>
     </message>
     <message>
         <source>This is the transaction fee you will pay if you send a transaction.</source>
-        <translation>Đây là transaction fee bạn sẽ pay nếu gửi transaction.</translation>
+        <translation type="vanished">Đây là transaction fee bạn sẽ pay nếu gửi transaction.</translation>
     </message>
     <message>
         <source>Transaction amounts must not be negative</source>
-        <translation>Transaction amounts phải không âm</translation>
+        <translation type="vanished">Transaction amounts phải không âm</translation>
     </message>
     <message>
         <source>Transaction has too long of a mempool chain</source>
-        <translation>Transaction có chuỗi mempool chain quá dài</translation>
+        <translation type="vanished">Transaction có chuỗi mempool chain quá dài</translation>
     </message>
     <message>
         <source>Transaction must have at least one recipient</source>
-        <translation>Transaction phải có ít nhất một người nhận</translation>
+        <translation type="vanished">Transaction phải có ít nhất một người nhận</translation>
     </message>
     <message>
         <source>Trying to connect...</source>
-        <translation>Đang thử kết nối...</translation>
+        <translation type="vanished">Đang thử kết nối...</translation>
     </message>
     <message>
         <source>Unable to bind to %s on this computer. %s is probably already running.</source>
-        <translation>Unable to bind to %s on this computer. %s is probably already running.</translation>
+        <translation type="vanished">Unable to bind to %s on this computer. %s is probably already running.</translation>
     </message>
     <message>
         <source>Upgrading UTXO database</source>
-        <translation>Upgrading UTXO database</translation>
+        <translation type="vanished">Upgrading UTXO database</translation>
     </message>
     <message>
         <source>Use devnet chain with provided name</source>
-        <translation>Sử dụng mạng phát triển có tên được cung cấp</translation>
+        <translation type="vanished">Sử dụng mạng phát triển có tên được cung cấp</translation>
     </message>
     <message>
         <source>Wallet debugging/testing options:</source>
-        <translation>Wallet debugging/testing options:</translation>
+        <translation type="vanished">Wallet debugging/testing options:</translation>
     </message>
     <message>
         <source>Wallet needed to be rewritten: restart %s to complete</source>
-        <translation>Wallet needed to be rewritten: restart %s to complete</translation>
+        <translation type="vanished">Wallet needed to be rewritten: restart %s to complete</translation>
     </message>
     <message>
         <source>Warning: unknown new rules activated (versionbit %i)</source>
@@ -8515,11 +8562,11 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Wasn&apos;t able to create wallet backup folder %s!</source>
-        <translation>Không thể tạo được thư mục backup ví %s!</translation>
+        <translation type="vanished">Không thể tạo được thư mục backup ví %s!</translation>
     </message>
     <message>
         <source>Whether to operate in a blocks only mode (default: %u)</source>
-        <translation>Cho dù hoạt động trong chế độ chỉ có các khối (ngầm định: %u)</translation>
+        <translation type="vanished">Cho dù hoạt động trong chế độ chỉ có các khối (ngầm định: %u)</translation>
     </message>
     <message>
         <source>ZeroMQ notification options:</source>
@@ -8527,11 +8574,11 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>no mixing available.</source>
-        <translation>không có phiên trộn nào sẵn sàng.</translation>
+        <translation type="vanished">không có phiên trộn nào sẵn sàng.</translation>
     </message>
     <message>
         <source>see debug.log for details.</source>
-        <translation>xem debug.log để biết thêm chi tiết.</translation>
+        <translation type="vanished">xem debug.log để biết thêm chi tiết.</translation>
     </message>
     <message>
         <source>RPC server options:</source>
@@ -8543,11 +8590,11 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>The %s developers</source>
-        <translation>The %s developers</translation>
+        <translation type="vanished">The %s developers</translation>
     </message>
     <message>
         <source>Accept connections from outside (default: 1 if no -proxy or -connect/-noconnect)</source>
-        <translation>Chấp nhận kết nối từ bên ngoài (ngầm định: 1 nếu không có -proxy hoặc -connect/-noconnect)</translation>
+        <translation type="vanished">Chấp nhận kết nối từ bên ngoài (ngầm định: 1 nếu không có -proxy hoặc -connect/-noconnect)</translation>
     </message>
     <message>
         <source>Cannot obtain a lock on data directory %s. %s is probably already running.</source>
@@ -8555,27 +8602,27 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Connect only to the specified node(s); -noconnect or -connect=0 alone to disable automatic connections</source>
-        <translation>Chỉ kết nối đến (các) nút được cung cấp: -noconnect hoặc chỉ dùng -connect=0  để tắt chức năng tự kết nối</translation>
+        <translation type="vanished">Chỉ kết nối đến (các) nút được cung cấp: -noconnect hoặc chỉ dùng -connect=0  để tắt chức năng tự kết nối</translation>
     </message>
     <message>
         <source>Distributed under the MIT software license, see the accompanying file %s or %s</source>
-        <translation>Distributed under the MIT software license, see the accompanying file %s or %s</translation>
+        <translation type="vanished">Distributed under the MIT software license, see the accompanying file %s or %s</translation>
     </message>
     <message>
         <source>Error reading %s! All keys read correctly, but transaction data or address book entries might be missing or incorrect.</source>
-        <translation>Error reading %s! All keys read correctly, but transaction data or address book entries might be missing or incorrect.</translation>
+        <translation type="vanished">Error reading %s! All keys read correctly, but transaction data or address book entries might be missing or incorrect.</translation>
     </message>
     <message>
         <source>Force relay of transactions from whitelisted peers even if they violate local relay policy (default: %d)</source>
-        <translation>Force relay of transactions from whitelisted peers even if they violate local relay policy (default: %d)</translation>
+        <translation type="vanished">Force relay of transactions from whitelisted peers even if they violate local relay policy (default: %d)</translation>
     </message>
     <message>
         <source>Incorrect or no devnet genesis block found. Wrong datadir for devnet specified?</source>
-        <translation>Không chính xác hoặc không tìm thấy khối ban đầu của devnet. Thư mục dữ liệu devnet được cung cấp không chính xác?</translation>
+        <translation type="vanished">Không chính xác hoặc không tìm thấy khối ban đầu của devnet. Thư mục dữ liệu devnet được cung cấp không chính xác?</translation>
     </message>
     <message>
         <source>Maximum allowed median peer time offset adjustment. Local perspective of time may be influenced by peers forward or backward by this amount. (default: %u seconds)</source>
-        <translation>Maximum allowed median peer time offset adjustment. Local perspective of time may be influenced by peers forward or backward by this amount. (default: %u seconds)</translation>
+        <translation type="vanished">Maximum allowed median peer time offset adjustment. Local perspective of time may be influenced by peers forward or backward by this amount. (default: %u seconds)</translation>
     </message>
     <message>
         <source>Maximum total fees (in %s) to use in a single wallet transaction or raw transaction; setting this too low may abort large transactions (default: %s)</source>
@@ -8583,15 +8630,15 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Override spork address. Only useful for regtest and devnet. Using this on mainnet or testnet will ban you.</source>
-        <translation>Ghi đè địa chỉ spork. Chỉ hữu ích với regtest và devnet. Sử dụng nó với mainnet và testnet sẽ cấm bạn.</translation>
+        <translation type="vanished">Ghi đè địa chỉ spork. Chỉ hữu ích với regtest và devnet. Sử dụng nó với mainnet và testnet sẽ cấm bạn.</translation>
     </message>
     <message>
         <source>Please check that your computer&apos;s date and time are correct! If your clock is wrong, %s will not work properly.</source>
-        <translation>Please check that your computer&apos;s date and time are correct! If your clock is wrong, %s will not work properly.</translation>
+        <translation type="vanished">Please check that your computer&apos;s date and time are correct! If your clock is wrong, %s will not work properly.</translation>
     </message>
     <message>
         <source>Please contribute if you find %s useful. Visit %s for further information about the software.</source>
-        <translation>Please contribute if you find %s useful. Visit %s for further information about the software.</translation>
+        <translation type="vanished">Please contribute if you find %s useful. Visit %s for further information about the software.</translation>
     </message>
     <message>
         <source>Provide liquidity to PrivateSend by infrequently mixing coins on a continual basis (%u-%u, default: %u, 1=very frequent, high fees, %u=very infrequent, low fees)</source>
@@ -8599,27 +8646,27 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Query for peer addresses via DNS lookup, if low on addresses (default: 1 unless -connect/-noconnect)</source>
-        <translation>Truy vấn các địa chỉ ngang hàng thông qua cơ chế tìm kiếm DNS, nếu địa chỉ thấp (ngầm định: 1 trừ khi -connect/-noconnect)</translation>
+        <translation type="vanished">Truy vấn các địa chỉ ngang hàng thông qua cơ chế tìm kiếm DNS, nếu địa chỉ thấp (ngầm định: 1 trừ khi -connect/-noconnect)</translation>
     </message>
     <message>
         <source>Reduce storage requirements by enabling pruning (deleting) of old blocks. This allows the pruneblockchain RPC to be called to delete specific blocks, and enables automatic pruning of old blocks if a target size in MiB is provided. This mode is incompatible with -txindex and -rescan. Warning: Reverting this setting requires re-downloading the entire blockchain. (default: 0 = disable pruning blocks, 1 = allow manual pruning via RPC, &gt;%u = automatically prune block files to stay under the specified target size in MiB)</source>
-        <translation>Reduce storage requirements by enabling pruning (deleting) of old blocks. This allows the pruneblockchain RPC to be called to delete specific blocks, and enables automatic pruning of old blocks if a target size in MiB is provided. This mode is incompatible with -txindex and -rescan. Warning: Reverting this setting requires re-downloading the entire blockchain. (default: 0 = disable pruning blocks, 1 = allow manual pruning via RPC, &gt;%u = automatically prune block files to stay under the specified target size in MiB)</translation>
+        <translation type="vanished">Reduce storage requirements by enabling pruning (deleting) of old blocks. This allows the pruneblockchain RPC to be called to delete specific blocks, and enables automatic pruning of old blocks if a target size in MiB is provided. This mode is incompatible with -txindex and -rescan. Warning: Reverting this setting requires re-downloading the entire blockchain. (default: 0 = disable pruning blocks, 1 = allow manual pruning via RPC, &gt;%u = automatically prune block files to stay under the specified target size in MiB)</translation>
     </message>
     <message>
         <source>Set lowest fee rate (in %s/kB) for transactions to be included in block creation. (default: %s)</source>
-        <translation>Set lowest fee rate (in %s/kB) for transactions to be included in block creation. (default: %s)</translation>
+        <translation type="vanished">Set lowest fee rate (in %s/kB) for transactions to be included in block creation. (default: %s)</translation>
     </message>
     <message>
         <source>Show N confirmations for a successfully locked transaction (%u-%u, default: %u)</source>
-        <translation>Hiển thị N xác thực cho một giao dịch được khoá thành công (%u-%u, ngầm định: %u)</translation>
+        <translation type="vanished">Hiển thị N xác thực cho một giao dịch được khoá thành công (%u-%u, ngầm định: %u)</translation>
     </message>
     <message>
         <source>This is the transaction fee you may pay when fee estimates are not available.</source>
-        <translation>This is the transaction fee you may pay when fee estimates are not available.</translation>
+        <translation type="vanished">This is the transaction fee you may pay when fee estimates are not available.</translation>
     </message>
     <message>
         <source>This product includes software developed by the OpenSSL Project for use in the OpenSSL Toolkit %s and cryptographic software written by Eric Young and UPnP software written by Thomas Bernard.</source>
-        <translation>This product includes software developed by the OpenSSL Project for use in the OpenSSL Toolkit %s and cryptographic software written by Eric Young and UPnP software written by Thomas Bernard.</translation>
+        <translation type="vanished">This product includes software developed by the OpenSSL Project for use in the OpenSSL Toolkit %s and cryptographic software written by Eric Young and UPnP software written by Thomas Bernard.</translation>
     </message>
     <message>
         <source>Unable to locate enough PrivateSend non-denominated funds for this transaction.</source>
@@ -8627,79 +8674,79 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Use N separate masternodes for each denominated input to mix funds (%u-%u, default: %u)</source>
-        <translation>Sử dụng N masternode riêng biệt cho mỗi mệnh giá đầu vào để trộn ngân quỹ (%u-%u, ngầm định: %u)</translation>
+        <translation type="vanished">Sử dụng N masternode riêng biệt cho mỗi mệnh giá đầu vào để trộn ngân quỹ (%u-%u, ngầm định: %u)</translation>
     </message>
     <message>
         <source>Use hierarchical deterministic key generation (HD) after BIP39/BIP44. Only has effect during wallet creation/first start</source>
-        <translation>Sử dụng cơ chế sinh khoá theo xác định phân cấp (HD) sau BIP39/BIP44. Chỉ có tác dụng trong quá trình tạo ví/lần khởi động lần đầu tiên</translation>
+        <translation type="vanished">Sử dụng cơ chế sinh khoá theo xác định phân cấp (HD) sau BIP39/BIP44. Chỉ có tác dụng trong quá trình tạo ví/lần khởi động lần đầu tiên</translation>
     </message>
     <message>
         <source>User defined mnemonic passphrase for HD wallet (BIP39). Only has effect during wallet creation/first start (default: empty string)</source>
-        <translation>Sử dụng mã gợi nhớ xác định trước cho ví HD (BIP39). Chỉ có tác dụng trong quá trình tạo ví/khởi động lần đầu (ngầm định: không có gì)</translation>
+        <translation type="vanished">Sử dụng mã gợi nhớ xác định trước cho ví HD (BIP39). Chỉ có tác dụng trong quá trình tạo ví/khởi động lần đầu (ngầm định: không có gì)</translation>
     </message>
     <message>
         <source>Username and hashed password for JSON-RPC connections. The field &lt;userpw&gt; comes in the format: &lt;USERNAME&gt;:&lt;SALT&gt;$&lt;HASH&gt;. A canonical python script is included in share/rpcuser. The client then connects normally using the rpcuser=&lt;USERNAME&gt;/rpcpassword=&lt;PASSWORD&gt; pair of arguments. This option can be specified multiple times</source>
-        <translation>Username and hashed password for JSON-RPC connections. The field &lt;userpw&gt; comes in the format: &lt;USERNAME&gt;:&lt;SALT&gt;$&lt;HASH&gt;. A canonical python script is included in share/rpcuser. The client then connects normally using the rpcuser=&lt;USERNAME&gt;/rpcpassword=&lt;PASSWORD&gt; pair of arguments. This option can be specified multiple times</translation>
+        <translation type="vanished">Username and hashed password for JSON-RPC connections. The field &lt;userpw&gt; comes in the format: &lt;USERNAME&gt;:&lt;SALT&gt;$&lt;HASH&gt;. A canonical python script is included in share/rpcuser. The client then connects normally using the rpcuser=&lt;USERNAME&gt;/rpcpassword=&lt;PASSWORD&gt; pair of arguments. This option can be specified multiple times</translation>
     </message>
     <message>
         <source>Wallet will not create transactions that violate mempool chain limits (default: %u)</source>
-        <translation>Wallet will not create transactions that violate mempool chain limits (default: %u)</translation>
+        <translation type="vanished">Wallet will not create transactions that violate mempool chain limits (default: %u)</translation>
     </message>
     <message>
         <source>Warning: At least %d of %d masternodes are running on a newer software version. Please check latest releases, you might need to update too.</source>
-        <translation>Cảnh báo: Có ít nhất %d của %d các masternode đang chạy trên phiên bản phần mềm mới hơn. Hãy kiểm tra lại phiên bản mới ra nhất, bạn có thể cũng cần phải update.</translation>
+        <translation type="vanished">Cảnh báo: Có ít nhất %d của %d các masternode đang chạy trên phiên bản phần mềm mới hơn. Hãy kiểm tra lại phiên bản mới ra nhất, bạn có thể cũng cần phải update.</translation>
     </message>
     <message>
         <source>Warning: Every masternode (out of %d known ones) is running on a newer software version. Please check latest releases, it&apos;s very likely that you missed a major/critical update.</source>
-        <translation>Cảnh báo: Mỗi một masternode (trong số %d được biết) đang chạy trên phiên bản phần mềm mới hơn. Hãy kiểm tra lại phiên bản phần mềm mới nhất, có vẻ như bạn đã bỏ sót một đợt nâng cấp chính/nâng cấp quan trọng.</translation>
+        <translation type="vanished">Cảnh báo: Mỗi một masternode (trong số %d được biết) đang chạy trên phiên bản phần mềm mới hơn. Hãy kiểm tra lại phiên bản phần mềm mới nhất, có vẻ như bạn đã bỏ sót một đợt nâng cấp chính/nâng cấp quan trọng.</translation>
     </message>
     <message>
         <source>Warning: Wallet file corrupt, data salvaged! Original %s saved as %s in %s; if your balance or transactions are incorrect you should restore from a backup.</source>
-        <translation>Warning: Wallet file corrupt, data salvaged! Original %s saved as %s in %s; if your balance or transactions are incorrect you should restore from a backup.</translation>
+        <translation type="vanished">Warning: Wallet file corrupt, data salvaged! Original %s saved as %s in %s; if your balance or transactions are incorrect you should restore from a backup.</translation>
     </message>
     <message>
         <source>Whitelist peers connecting from the given IP address (e.g. 1.2.3.4) or CIDR notated network (e.g. 1.2.3.0/24). Can be specified multiple times.</source>
-        <translation>Whitelist peers connecting from the given IP address (e.g. 1.2.3.4) or CIDR notated network (e.g. 1.2.3.0/24). Can be specified multiple times.</translation>
+        <translation type="vanished">Whitelist peers connecting from the given IP address (e.g. 1.2.3.4) or CIDR notated network (e.g. 1.2.3.0/24). Can be specified multiple times.</translation>
     </message>
     <message>
         <source>%s corrupt, salvage failed</source>
-        <translation>%s corrupt, salvage failed</translation>
+        <translation type="vanished">%s corrupt, salvage failed</translation>
     </message>
     <message>
         <source>%s is not a valid backup folder!</source>
-        <translation>%s không phải là thư mục sao lưu dự phòng hợp lệ!</translation>
+        <translation type="vanished">%s không phải là thư mục sao lưu dự phòng hợp lệ!</translation>
     </message>
     <message>
         <source>%s is set very high!</source>
-        <translation>%s is set very high!</translation>
+        <translation type="vanished">%s is set very high!</translation>
     </message>
     <message>
         <source>(press q to shutdown and continue later)</source>
-        <translation>(bấm q để tắt và tiếp tục sau)</translation>
+        <translation type="vanished">(bấm q để tắt và tiếp tục sau)</translation>
     </message>
     <message>
         <source>-devnet can only be specified once</source>
-        <translation>-devnet chỉ có thể chỉ ra một lần duy nhất</translation>
+        <translation type="vanished">-devnet chỉ có thể chỉ ra một lần duy nhất</translation>
     </message>
     <message>
         <source>-port must be specified when -devnet and -listen are specified</source>
-        <translation>-port phải được chỉ rõ khi -devnet và -listen được sử dụng</translation>
+        <translation type="vanished">-port phải được chỉ rõ khi -devnet và -listen được sử dụng</translation>
     </message>
     <message>
         <source>-rpcport must be specified when -devnet and -server are specified</source>
-        <translation>-rpcport phải được chỉ rõ khi -devnet và -server được sử dụng</translation>
+        <translation type="vanished">-rpcport phải được chỉ rõ khi -devnet và -server được sử dụng</translation>
     </message>
     <message>
         <source>Allow RFC1918 addresses to be relayed and connected to (default: %u)</source>
-        <translation>Cho phép địa chỉ RFC1918 để chuyển tiếp và kết nối đến (ngầm định: %u)</translation>
+        <translation type="vanished">Cho phép địa chỉ RFC1918 để chuyển tiếp và kết nối đến (ngầm định: %u)</translation>
     </message>
     <message>
         <source>Attempt to recover private keys from a corrupt wallet on startup</source>
-        <translation>Attempt to recover private keys from a corrupt wallet on startup</translation>
+        <translation type="vanished">Attempt to recover private keys from a corrupt wallet on startup</translation>
     </message>
     <message>
         <source>Cannot resolve -%s address: &apos;%s&apos;</source>
-        <translation>Cannot resolve -%s address: &apos;%s&apos;</translation>
+        <translation type="vanished">Cannot resolve -%s address: &apos;%s&apos;</translation>
     </message>
     <message>
         <source>Change index out of range</source>
@@ -8707,43 +8754,43 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Copyright (C)</source>
-        <translation>Bản quyền (C)</translation>
+        <translation type="vanished">Bản quyền (C)</translation>
     </message>
     <message>
         <source>Error loading %s</source>
-        <translation>Error loading %s</translation>
+        <translation type="vanished">Error loading %s</translation>
     </message>
     <message>
         <source>Error loading %s: Wallet corrupted</source>
-        <translation>Error loading %s: Wallet corrupted</translation>
+        <translation type="vanished">Error loading %s: Wallet corrupted</translation>
     </message>
     <message>
         <source>Error loading %s: Wallet requires newer version of %s</source>
-        <translation>Error loading %s: Wallet requires newer version of %s</translation>
+        <translation type="vanished">Error loading %s: Wallet requires newer version of %s</translation>
     </message>
     <message>
         <source>Error upgrading chainstate database</source>
-        <translation>Error upgrading chainstate database</translation>
+        <translation type="vanished">Error upgrading chainstate database</translation>
     </message>
     <message>
         <source>Failed to find mixing queue to join</source>
-        <translation>Không tìm thấy hàng đợi trộn để tham gia</translation>
+        <translation type="vanished">Không tìm thấy hàng đợi trộn để tham gia</translation>
     </message>
     <message>
         <source>Failed to start a new mixing queue</source>
-        <translation>Không thể khởi động được một hàng đợi trộn mới</translation>
+        <translation type="vanished">Không thể khởi động được một hàng đợi trộn mới</translation>
     </message>
     <message>
         <source>Initialization sanity check failed. %s is shutting down.</source>
-        <translation>Initialization sanity check failed. %s is shutting down.</translation>
+        <translation type="vanished">Initialization sanity check failed. %s is shutting down.</translation>
     </message>
     <message>
         <source>Invalid amount for -%s=&lt;amount&gt;: &apos;%s&apos;</source>
-        <translation>Invalid amount for -%s=&lt;amount&gt;: &apos;%s&apos;</translation>
+        <translation type="vanished">Invalid amount for -%s=&lt;amount&gt;: &apos;%s&apos;</translation>
     </message>
     <message>
         <source>Invalid spork address specified with -sporkaddr</source>
-        <translation>Địa chỉ spork được chỉ ra không hợp lệ với -sporkaddr</translation>
+        <translation type="vanished">Địa chỉ spork được chỉ ra không hợp lệ với -sporkaddr</translation>
     </message>
     <message>
         <source>Keep N LUX anonymized (%u-%u, default: %u)</source>
@@ -8751,7 +8798,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Print this help message and exit</source>
-        <translation>Print this help message and exit</translation>
+        <translation type="vanished">Print this help message and exit</translation>
     </message>
     <message>
         <source>Receive and display P2P network alerts (default: %u)</source>
@@ -8759,7 +8806,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Reducing -maxconnections from %d to %d, because of system limitations.</source>
-        <translation>Giảm -maxconnections từ %d đến %d, bởi vì những giới hạn của hệ thống.</translation>
+        <translation type="vanished">Giảm -maxconnections từ %d đến %d, bởi vì những giới hạn của hệ thống.</translation>
     </message>
     <message>
         <source>Relay and mine data carrier transactions (default: %u)</source>
@@ -8779,7 +8826,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Send trace/debug info to console instead of debug.log file</source>
-        <translation>Gửi thông tin về trace/debug ra màn hình thay vì vào file debug.log.</translation>
+        <translation type="vanished">Gửi thông tin về trace/debug ra màn hình thay vì vào file debug.log.</translation>
     </message>
     <message>
         <source>Session not complete!</source>
@@ -8787,7 +8834,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Session timed out.</source>
-        <translation>Hết thời gian cho phiên làm việc.</translation>
+        <translation type="vanished">Hết thời gian cho phiên làm việc.</translation>
     </message>
     <message>
         <source>Set database cache size in megabytes (%d to %d, default: %d)</source>
@@ -8827,27 +8874,27 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Starting network threads...</source>
-        <translation>Starting network threads...</translation>
+        <translation type="vanished">Starting network threads...</translation>
     </message>
     <message>
         <source>Synchronization pending...</source>
-        <translation>Đang chuẩn bị đồng bộ...</translation>
+        <translation type="vanished">Đang chuẩn bị đồng bộ...</translation>
     </message>
     <message>
         <source>Synchronizing governance objects...</source>
-        <translation>Đang đồng bộ các đối tượng quản trị...</translation>
+        <translation type="vanished">Đang đồng bộ các đối tượng quản trị...</translation>
     </message>
     <message>
         <source>Synchronizing masternode payments...</source>
-        <translation>Đang đồng bộ các giao dịch masternode...</translation>
+        <translation type="vanished">Đang đồng bộ các giao dịch masternode...</translation>
     </message>
     <message>
         <source>The source code is available from %s.</source>
-        <translation>The source code is available from %s.</translation>
+        <translation type="vanished">The source code is available from %s.</translation>
     </message>
     <message>
         <source>The transaction amount is too small to pay the fee</source>
-        <translation>Giá trị giao dịch quá nhỏ để trả phí</translation>
+        <translation type="vanished">Giá trị giao dịch quá nhỏ để trả phí</translation>
     </message>
     <message>
         <source>This is experimental software.</source>
@@ -8871,7 +8918,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Transaction too large for fee policy</source>
-        <translation>Giao dịch quá lớn cho chính sách miễn phí</translation>
+        <translation type="vanished">Giao dịch quá lớn cho chính sách miễn phí</translation>
     </message>
     <message>
         <source>Unable to bind to %s on this computer (bind returned error %s)</source>
@@ -8887,7 +8934,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Unknown state: id = %u</source>
-        <translation>Trạng thái không xác định: id = %u</translation>
+        <translation type="vanished">Trạng thái không xác định: id = %u</translation>
     </message>
     <message>
         <source>Username for JSON-RPC connections</source>
@@ -8903,7 +8950,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Very low number of keys left: %d</source>
-        <translation>Còn lại số lượg rất ít các khoá: %d</translation>
+        <translation type="vanished">Còn lại số lượg rất ít các khoá: %d</translation>
     </message>
     <message>
         <source>Wallet %s resides outside data directory %s</source>
@@ -8927,35 +8974,15 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Your entries added successfully.</source>
-        <translation>Các đầu vào của bạn đã được thêm vào một cách thành công.</translation>
+        <translation type="vanished">Các đầu vào của bạn đã được thêm vào một cách thành công.</translation>
     </message>
     <message>
         <source>Your transaction was accepted into the pool!</source>
-        <translation>Giao dịch của bạn đã được chấp nhận vào bể!</translation>
+        <translation type="vanished">Giao dịch của bạn đã được chấp nhận vào bể!</translation>
     </message>
     <message>
         <source>Zapping all transactions from wallet...</source>
         <translation>Dọn sạch tất cả các giao dịch khỏi ví...</translation>
-    </message>
-    <message>
-        <source>lux Core</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Disable all lux specific functionality (Masternodes, DarkSend, InstantSend, Governance) (0-1, default: %u)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Enable multiple DarkSend mixing sessions per block, experimental (0-1, default: %u)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Enable use of automated DarkSend for funds stored in this wallet (0-1, default: %u)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>InstantSend doesn&apos;t support sending values that high yet. Transactions are currently limited to %1 lux.</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Maximum total fees to use in a single wallet transaction, setting too low may abort large transactions (default: %s)</source>
@@ -8963,10 +8990,6 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>DarkSend uses exact denominated amounts to send funds, you might simply need to anonymize some more coins.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Provide liquidity to DarkSend by infrequently mixing coins on a continual basis (%u-%u, default: %u, 1=very frequent, high fees, %u=very infrequent, low fees)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -8978,35 +9001,559 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Unable to locate enough DarkSend non-denominated funds for this transaction.</source>
+        <source> or address book entries might be missing or incorrect</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Keep N lux anonymized (%u-%u, default: %u)</source>
+        <source>&apos;importprivkey&apos; finished successfully. Please restart Luxcore wallet with &apos;-rescan&apos; option. Otherwise, transaction data</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Last DarkSend was too recent.</source>
+        <source>&apos;importprivkey&apos; with &apos;Rescan&apos; option finished successfully. Please restart your Luxcore wallet. Otherwise, transaction data</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Last successful DarkSend action was too recent.</source>
+        <source>Cannot obtain a lock on data directory %s. Luxcore is probably already running.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>DarkSend is idle.</source>
+        <source>Change automatic finalized budget voting behavior. mode=auto: Vote for only exact finalized budget match to my generated budget. (string, default: auto)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>DarkSend options:</source>
+        <source>Continuously rate-limit free transactions to &lt;n&gt;*1000 bytes per minute (default:%u)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>DarkSend request complete:</source>
+        <source>Distributed under the MIT software license, see the accompanying file COPYING or &lt;http://www.opensource.org/licenses/mit-license.php&gt;.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>DarkSend request incomplete:</source>
+        <source>Enable instantx, show confirmations for locked transactions (bool, default: %s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable use of automated darksend for funds stored in this wallet (0-1, default: %u)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter regression test mode, which uses a special chain in which blocks can be solved instantly.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error loading %s: You need to upgrade the wallet to enable HD on a non-HD wallet</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error: Unsupported argument -socks found. Setting SOCKS version isn&apos;t possible anymore, only SOCKS5 proxies are supported.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fees (in LUX/Kb) smaller than this are considered zero fee for relaying (default: %s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fees (in LUX/Kb) smaller than this are considered zero fee for transaction creation (default: %s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Flush database activity from memory pool to disk log every &lt;n&gt; megabytes (default: %u)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>In this mode -genproclimit controls how many blocks are generated immediately.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>InstantX requires inputs with at least 6 confirmations, you might need to wait a few minutes and try again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Log transaction priority and fee per kB when mining blocks (default: %u)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maintain a full EVM log index, used by searchlogs and gettransactionreceipt rpc calls (default: %u)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Provide liquidity to Darksend by infrequently mixing coins on a continual basis (0-100, default: %u, 1=very frequent, high fees, 100=very infrequent, low fees)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Query for peer addresses via DNS lookup, if low on addresses (default: 1 unless -connect)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reduce storage requirements by pruning (deleting) old blocks. This mode disables wallet support and is incompatible with -txindex.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Require high priority for relaying free or low-fee transactions (default:%u)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rescan aborted by user. Please restart your Luxcore wallet with &apos;-rescan&apos; option. Otherwise, transaction data</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Send trace/debug info to console instead of debug.log file (default: %u)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set the number of script verification threads (1 to %d, 0 = auto, &lt;0 = leave that many cores free, default: %d)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set the number of threads for coin generation if enabled (-1 = all cores, default: %d)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show N confirmations for a successfully locked transaction (0-9999, default: %u)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This product includes software developed by the OpenSSL Project for use in the OpenSSL Toolkit &lt;https://www.openssl.org/&gt; and cryptographic software written by Eric Young and UPnP software written by Thomas Bernard.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to bind to %s on this computer. Luxcore is probably already running.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to locate enough DarkSend non-denominated funds for this transaction that are not equal 10000 LUX.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to locate enough funds for this transaction that are not equal 10000 LUX.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use hierarchical deterministic key generation (HD) after bip32. Only has effect during wallet creation/first start</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>User defined memonic passphrase for HD wallet (bip39). Only has effect during wallet creation/first start (default: randomly generated)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning: -maxtxfee is set very high! Fees this large could be paid on a single transaction.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning: -paytxfee is set very high! This is the transaction fee you will pay if you send a transaction.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning: Please check that your computer&apos;s date and time are correct! If your clock is wrong Luxcore will not work properly.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning: Reverting this setting requires re-downloading the entire blockchain.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning: error reading wallet.dat! All keys read correctly, but transaction data or address book entries might be missing or incorrect.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning: wallet.dat corrupt, data salvaged! Original wallet.dat saved as wallet.{timestamp}.bak in %s; if your balance or transactions are incorrect you should restore from a backup.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Whitelist peers connecting from the given netmask or IP address. Can be specified multiple times.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You need to rebuild the database using -reindex-chainstate to enable -logevents</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(default: 0 = disable pruning blocks,</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(default: 1)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&gt;%u = target size in MiB to use for block files)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Accept connections from outside (default: 1 if no -proxy or -connect)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Acceptable ciphers (default: %s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Attempt to recover private keys from a corrupt wallet.dat</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Can&apos;t denominate: no compatible inputs left.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot resolve -bind address: &apos;%s&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot resolve -externalip address: &apos;%s&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot resolve -whitebind address: &apos;%s&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Collateral is not valid.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connect only to the specified node(s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copyright (C) 2009-%i The Bitcoin Core Developers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copyright (C) 2014-%i The Dash Core Developers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copyright (C) 2017-%i The LUX-Core Developers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Darksend is disabled.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Darksend options:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Disable safemode, override a real safe mode event (default: %u)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Discover own IP address (default: 1 when listening and no -externalip)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable publish hash transaction (locked via InstanTX) in &lt;address&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable publish raw transaction (locked via InstanTX) in &lt;address&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error connecting to masternode.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error loading wallet.dat</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error loading wallet.dat: Wallet corrupted</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error loading wallet.dat: Wallet requires newer version of Luxcore</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error recovering public key.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error: A fatal internal error occured, see debug.log for details</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error: Unsupported argument -tor found, use -onion.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error: Wallet locked, unable to create transaction!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error: You already have pending entries in the Darksend pool</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error: can&apos;t select current denominated inputs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fee (in LUX/kB) to add to transactions you send (default: %s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Force safe mode (default: %u)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Generate coins (default: %u)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If &lt;category&gt; is not supplied, output all debugging information.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Imports blocks from external blk000??.dat file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Initialization sanity check failed. Luxcore is shutting down.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>InstanTX options:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid amount for -maxtxfee=&lt;amount&gt;: &apos;%s&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid amount for -minrelaytxfee=&lt;amount&gt;: &apos;%s&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid amount for -mintxfee=&lt;amount&gt;: &apos;%s&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid amount for -paytxfee=&lt;amount&gt;: &apos;%s&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid amount for -reservebalance=&lt;amount&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid private key.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keep N LUX anonymized (default: %u)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Last Darksend was too recent.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Last successful darksend action was too recent.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Limit size of signature cache to &lt;n&gt; entries (default: %u)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Logs all EVM LOG opcode operations to the file vmExecLogs.json</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maintain at most &lt;n&gt; connections to peers (default: %u)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No compatible masternode found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No funds detected in need of denominating.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No masternodes detected.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not in the masternode list.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Number of automatic wallet backups (default: 10)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Only accept block chain matching built-in checkpoints (default: %u)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>RPC SSL options: (see the Bitcoin Wiki for SSL setup instructions)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>RPC support for HTTP persistent connections (default: %d)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Randomly drop 1 of every &lt;n&gt; network messages</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Randomly fuzz 1 of every &lt;n&gt; network messages</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rebuild block chain index from current blk000??.dat files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rescan the block chain for missing wallet transactions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Run a thread to flush wallet periodically (default: %u)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server certificate file (default: %s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server private key (default: %s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Session timed out (30 seconds), please resubmit.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set external address:port to get to this masternode (example: %s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set minimum block size in bytes (default: %u)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set number of debug log files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sets the DB_PRIVATE flag in the wallet db environment (default: %u)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Signing failed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Signing timed out, please resubmit.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stake your coins to support network and gain reward (default: %s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop running after importing blocks from disk (default: %u)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This help message</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This is intended for regression testing tools and app development.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This is not a masternode.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Transaction amounts must be positive</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to generate keys</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to sign masternode payment winner, wrong key?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown address type &apos;%s&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown change type &apos;%s&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Upgrade wallet to latest format</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use N separate masternodes to anonymize funds  (2-8, default: %u)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use OpenSSL (https) for JSON-RPC connections</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use UPnP to map the listening port (default: 1 when listening)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use the SegWit test network</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use the test network</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Value more than Darksend pool maximum allows.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Wallet needed to be rewritten: restart Luxcore to complete</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning: This version is obsolete, upgrade required!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning: Unsupported argument -benchmark ignored, use -debug=bench.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning: Unsupported argument -debugnet ignored, use -debug=net.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Wrong state.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You need to rebuild the database using -reindex to change -txindex</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>on startup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>wallet.dat corrupt, salvage failed</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
