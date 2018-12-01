@@ -61,6 +61,11 @@ public:
     int getNumBlocksAtStartup();
     int getHeaderHeight() const;
 
+    //! Return number of transactions in the mempool
+    long getMempoolSize() const;
+    //! Return the dynamic memory usage of the mempool
+    size_t getMempoolDynamicUsage() const;
+
     int64_t getHeaderTipTime();
 
     quint64 getTotalBytesRecv() const;

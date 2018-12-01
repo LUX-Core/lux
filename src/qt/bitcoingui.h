@@ -287,6 +287,12 @@ private Q_SLOTS:
     /** Show help message dialog */
     void showHelpMessageClicked();
 
+    /** Show debug window */
+    void showDebugWindow();
+
+    /** Show debug window and set focus to the console */
+    void showDebugWindowActivateConsole();
+
 #ifndef Q_OS_MAC
     /** Handle tray icon clicked */
     void trayIconActivated(QSystemTrayIcon::ActivationReason reason);
