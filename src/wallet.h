@@ -442,7 +442,6 @@ public:
     std::map<uint256, CWalletTx> mapWallet;
 
     int64_t nOrderPosNext;
-    std::map<uint256, int> mapRequestCount;
 
     std::map<CTxDestination, CAddressBookData> mapAddressBook;
 
@@ -740,13 +739,6 @@ public:
     bool DelContractBook(const std::string& strAddress);
 
     bool UpdatedTransaction(const uint256& hashTx);
-
-    void Inventory(const uint256& hash)
-    {
-        LOCK(cs_wallet);
-        std::map<uint256, int>::iterator mi = mapRequestCount.find(hash);
-        if (mi != mapRequestCount.end()) (*mi).second++;
-    }
 
     unsigned int GetKeyPoolSize()
     {
@@ -1403,7 +1395,6 @@ public:
 
 
     int64_t GetTxTime() const;
-    int GetRequestCount() const;
 
     void RelayWalletTransaction(std::string strCommand = "tx");
 
