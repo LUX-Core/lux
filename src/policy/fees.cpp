@@ -564,6 +564,7 @@ double CBlockPolicyEstimator::estimateSmartPriority(int confTarget, int *answerF
         return -1;
 
     // If mempool is limiting txs, no priority txs are allowed
+    // CBanana
     CAmount minPoolFee = pool.GetMinFee(GetArg("-maxmempool", DEFAULT_MAX_MEMPOOL_SIZE) * 1000000).GetFeePerK();
     if (minPoolFee > 0)
         return INF_PRIORITY;

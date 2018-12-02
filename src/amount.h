@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include <string>
 
+// CBanana
 typedef int64_t CAmount;
 
 static const CAmount COIN = 100000000;

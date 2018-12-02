@@ -3204,7 +3204,7 @@ static bool FlushStateToDisk(CValidationState& state, FlushStateMode mode, int n
             if (nLastSetChain == 0) {
                 nLastSetChain = nNow;
             }
-            CAmount maxMempoolSize = GetArg("-maxmempool", DEFAULT_MAX_MEMPOOL_SIZE) * 1000000;
+            int64_t maxMempoolSize = GetArg("-maxmempool", DEFAULT_MAX_MEMPOOL_SIZE) * 1000000;
             int64_t nMempoolUsage = mempool.DynamicMemoryUsage();
             int64_t cacheSize = pcoinsTip->DynamicMemoryUsage() * 2; // coincache mempool memory peak
             int64_t nTotalSpace = nCoinCacheUsage + max<int64_t>(maxMempoolSize - nMempoolUsage, 0);
