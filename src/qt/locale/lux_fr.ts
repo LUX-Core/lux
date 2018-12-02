@@ -9,13 +9,6 @@
     </message>
 </context>
 <context>
-    <name>ABIParam</name>
-    <message>
-        <source>%1 %2</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>AddEditLuxNode</name>
     <message>
         <source>Add/Edit LuxNodes Node</source>
@@ -1072,6 +1065,10 @@ MultiSend: %1</translation>
         <source>Connecting to peers...</source>
         <translation>Connexion aux pairs...</translation>
     </message>
+    <message>
+        <source>Go to</source>
+        <translation>Visiter</translation>
+    </message>
 </context>
 <context>
     <name>BlockExplorer</name>
@@ -1522,7 +1519,7 @@ MultiSend: %1</translation>
     </message>
     <message>
         <source>Luxsend Rounds</source>
-        <translation type="unfinished"></translation>
+        <translation>Rounds Luxsend</translation>
     </message>
     <message>
         <source>Copy label</source>
@@ -1585,7 +1582,7 @@ MultiSend: %1</translation>
     <name>ContractBookPage</name>
     <message>
         <source>Form</source>
-        <translation type="unfinished">Form</translation>
+        <translation>Form</translation>
     </message>
     <message>
         <source>Create a new contract info</source>
@@ -1680,7 +1677,7 @@ MultiSend: %1</translation>
     <name>ContractResult</name>
     <message>
         <source>StackedWidget</source>
-        <translation type="unfinished"></translation>
+        <translation>StackedWidget</translation>
     </message>
     <message>
         <source>Contract Summary</source>
@@ -1766,7 +1763,7 @@ MultiSend: %1</translation>
     <name>CreateContract</name>
     <message>
         <source>Form</source>
-        <translation type="unfinished">Form</translation>
+        <translation>Form</translation>
     </message>
     <message>
         <source>Create Smart Contract</source>
@@ -1774,7 +1771,7 @@ MultiSend: %1</translation>
     </message>
     <message>
         <source>Solidity</source>
-        <translation type="unfinished"></translation>
+        <translation>Solidity</translation>
     </message>
     <message>
         <source>Token</source>
@@ -1782,15 +1779,15 @@ MultiSend: %1</translation>
     </message>
     <message>
         <source>Bytecode</source>
-        <translation type="unfinished"></translation>
+        <translation>Bytecode</translation>
     </message>
     <message>
         <source>Interface (ABI)</source>
-        <translation type="unfinished">Interface (ABI)</translation>
+        <translation>Interface (ABI)</translation>
     </message>
     <message>
         <source>Constructor</source>
-        <translation type="unfinished"></translation>
+        <translation>Constructeur</translation>
     </message>
     <message>
         <source>Optional</source>
@@ -1924,19 +1921,19 @@ MultiSend: %1</translation>
     <name>DialogMaster</name>
     <message>
         <source>Information</source>
-        <translation type="unfinished">Information</translation>
+        <translation>Information</translation>
     </message>
     <message>
         <source>Question</source>
-        <translation type="unfinished"></translation>
+        <translation>Question</translation>
     </message>
     <message>
         <source>Warning</source>
-        <translation type="unfinished">Attention</translation>
+        <translation>Attention</translation>
     </message>
     <message>
         <source>Error</source>
-        <translation type="unfinished"></translation>
+        <translation>Erreur</translation>
     </message>
     <message>
         <source>About</source>
@@ -1952,23 +1949,23 @@ MultiSend: %1</translation>
     </message>
     <message>
         <source>Developed by: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Développé par: %1</translation>
     </message>
     <message>
         <source>Project Website: &lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Site web du projet: &lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;</translation>
     </message>
     <message>
         <source>License: &lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Licence: &lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;</translation>
     </message>
     <message>
         <source>License: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Licence: %1</translation>
     </message>
     <message>
         <source>About Qt</source>
-        <translation type="unfinished"></translation>
+        <translation>A propos de Qt</translation>
     </message>
 </context>
 <context>
@@ -2030,7 +2027,7 @@ MultiSend: %1</translation>
     <name>EditContractInfoDialog</name>
     <message>
         <source>Dialog</source>
-        <translation type="unfinished">Import</translation>
+        <translation>Dialog</translation>
     </message>
     <message>
         <source>Label</source>
@@ -2319,14 +2316,6 @@ MultiSend: %1</translation>
         <source>&lt;p style=&quot;line-height:130&quot;&gt;Luxcore, Luxgate, and all other Luxcore&apos;s products are either registered trademarks or trademarks of Luxcore in the United States,                     Europe and/or other countries.&lt;/p&gt;&lt;br&gt;&lt;br&gt;</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>lux_</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>luxVersion</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>ExecRPCCommand</name>
@@ -2494,7 +2483,7 @@ MultiSend: %1</translation>
     <name>LSRToken</name>
     <message>
         <source>Form</source>
-        <translation type="unfinished">Form</translation>
+        <translation>Form</translation>
     </message>
     <message>
         <source>Send</source>
@@ -2552,7 +2541,7 @@ MultiSend: %1</translation>
     <name>MasternodeManager</name>
     <message>
         <source>Form</source>
-        <translation type="unfinished">Form</translation>
+        <translation>Form</translation>
     </message>
     <message>
         <source>Masternodes Network</source>
@@ -2651,7 +2640,7 @@ MultiSend: %1</translation>
     <name>ModalOverlay</name>
     <message>
         <source>Form</source>
-        <translation type="unfinished">Form</translation>
+        <translation>Form</translation>
     </message>
     <message>
         <source>The displayed information may be out of date. Your wallet automatically synchronizes with the Luxcore network after a connection is established. Recent transactions may not yet be visible, and therefore your wallet&apos;s balance might be incorrect. This information will be correct once your wallet has finished synchronizing with the Luxcore network, as detailed below.</source>
@@ -2896,14 +2885,21 @@ Veuillez vérifier l&apos;adresse et réessayer.</translation>
     </message>
 </context>
 <context>
+    <name>NetworkDisplayStatusBarControl</name>
+    <message>
+        <source>Current network</source>
+        <translation>Chaine en cours</translation>
+    </message>
+</context>
+<context>
     <name>OpenURIDialog</name>
     <message>
         <source>URI:</source>
-        <translation>URI:</translation>
+        <translation>URL:</translation>
     </message>
     <message>
         <source>Open URI</source>
-        <translation type="unfinished"></translation>
+        <translation>Ouvrir URL</translation>
     </message>
     <message>
         <source>Open payment request from URI or file</source>
@@ -3042,7 +3038,7 @@ Veuillez vérifier l&apos;adresse et réessayer.</translation>
     </message>
     <message>
         <source>Coming soon</source>
-        <translation type="unfinished"></translation>
+        <translation>Bientôt disponible</translation>
     </message>
     <message>
         <source>&amp;Activate Parallel Masternode</source>
@@ -3310,7 +3306,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Form</source>
-        <translation type="unfinished">Form</translation>
+        <translation>Form</translation>
     </message>
     <message>
         <source>Balances</source>
@@ -5004,7 +5000,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     <name>SendToContract</name>
     <message>
         <source>Form</source>
-        <translation type="unfinished">Form</translation>
+        <translation>Form</translation>
     </message>
     <message>
         <source>Write to Smart Contract</source>
@@ -5091,10 +5087,6 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Write to contract</source>
-        <translation>Envoi vers contrat</translation>
-    </message>
-    <message>
         <source>Gas limit: Default = %1, Max = %2.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5111,7 +5103,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     <name>SendTokenPage</name>
     <message>
         <source>Form</source>
-        <translation type="unfinished">Form</translation>
+        <translation>Form</translation>
     </message>
     <message>
         <source>PayTo</source>
@@ -5143,15 +5135,15 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>The address that will receive the tokens.</source>
-        <translation type="unfinished"></translation>
+        <translation>L&apos;adresse qui va recevoir les tokens.</translation>
     </message>
     <message>
         <source>The amount in LSR Token to send.</source>
-        <translation type="unfinished"></translation>
+        <translation>Le montant de jetons LSR à envoyer.</translation>
     </message>
     <message>
         <source>Optional description for transaction.</source>
-        <translation type="unfinished"></translation>
+        <translation>Description optionnelle</translation>
     </message>
     <message>
         <source>Gas limit: Default = %1, Max = %2.</source>
@@ -5163,11 +5155,11 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Are you sure you want to send? &lt;br /&gt;&lt;br /&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Confirmer l&apos;envoi ? &lt;br /&gt;&lt;br /&gt;</translation>
     </message>
     <message>
         <source>&lt;b&gt;%1 %2 &lt;/b&gt; to </source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;%1 %2 &lt;/b&gt; vers </translation>
     </message>
     <message>
         <source>&lt;br /&gt;%3 &lt;br /&gt;</source>
@@ -5179,7 +5171,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>To send %1 you need LUX in address &lt;br /&gt; %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>Pour envoyer %1 il faut des LUX sur l&apos;adresse &lt;br /&gt; %2.</translation>
     </message>
     <message>
         <source>Send token</source>
@@ -5341,6 +5333,18 @@ https://www.transifex.com/luxcore/luxcore</source>
     <message>
         <source>Dialog</source>
         <translation>Dialog</translation>
+    </message>
+    <message>
+        <source>Create Smart Contract</source>
+        <translation>Création Smart Contrat</translation>
+    </message>
+    <message>
+        <source>Read Smart Contract</source>
+        <translation>Info Smart Contrat</translation>
+    </message>
+    <message>
+        <source>Write to Smart Contract</source>
+        <translation>Envoi vers Smart Contrat</translation>
     </message>
 </context>
 <context>
@@ -5645,10 +5649,6 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation>En conflit avec transaction confirmée (%1 conf.)</translation>
     </message>
     <message>
-        <source>%1/offline</source>
-        <translation type="vanished">%1/hors ligne</translation>
-    </message>
-    <message>
         <source>0/unconfirmed, in memory pool</source>
         <translation>0/non confirmée, dans mempool</translation>
     </message>
@@ -5699,10 +5699,6 @@ https://www.transifex.com/luxcore/luxcore</source>
     <message>
         <source>Net Amount</source>
         <translation>Montant net</translation>
-    </message>
-    <message>
-        <source>SC Address (Hash160)</source>
-        <translation type="vanished">Adresse SC</translation>
     </message>
 </context>
 <context>
@@ -5976,17 +5972,6 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation>pas dans la mempool</translation>
     </message>
     <message>
-        <source>, has not been successfully broadcast yet</source>
-        <translation type="vanished">, n&apos;a pas encore été transmis</translation>
-    </message>
-    <message numerus="yes">
-        <source>, broadcast through %n node(s)</source>
-        <translation type="vanished">
-            <numerusform>, transmis à %n node</numerusform>
-            <numerusform>, transmis à %n nodes</numerusform>
-        </translation>
-    </message>
-    <message>
         <source>Date</source>
         <translation>Date</translation>
     </message>
@@ -6088,10 +6073,6 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation>Adresse</translation>
     </message>
     <message>
-        <source>Offline</source>
-        <translation type="vanished">Hors ligne</translation>
-    </message>
-    <message>
         <source>Unconfirmed</source>
         <translation>Non confirmée</translation>
     </message>
@@ -6110,10 +6091,6 @@ https://www.transifex.com/luxcore/luxcore</source>
     <message>
         <source>Immature (%1 confirmations, will be available after %2)</source>
         <translation>Immature (%1 confirmations, disponible après %2)</translation>
-    </message>
-    <message>
-        <source>This block was not received by any other nodes and will probably not be accepted!</source>
-        <translation type="vanished">Ce bloc n&apos;a pas été reçu par les autres noeuds et ne sera probablement pas accepté !</translation>
     </message>
     <message>
         <source>Received with</source>
