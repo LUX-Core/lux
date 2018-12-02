@@ -470,8 +470,8 @@ void OverviewPage::updateDarkSendProgress()
     double nAverageAnonymizedRounds;
 
     {
-        TRY_LOCK(cs_main, lockMain);
-        if (!lockMain) return;
+        //TRY_LOCK(cs_main, lockMain);
+        //if (!lockMain) return;
 
         nDenominatedConfirmedBalance = pwalletMain->GetDenominatedBalance(false);
         nDenominatedUnconfirmedBalance = pwalletMain->GetDenominatedBalance(true, false);

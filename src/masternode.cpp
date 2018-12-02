@@ -514,6 +514,9 @@ int GetMasternodeRank(CTxIn& vin, int64_t nBlockHeight, int minProtocol) {
 
 //Get the last hash that matches the modulus given. Processed in reverse order
 bool GetBlockHash(uint256& hash, int nBlockHeight) {
+
+    LOCK(cs_main);
+
     if (chainActive.Tip() == NULL) return false;
 
     if (nBlockHeight == 0)
@@ -558,7 +561,11 @@ bool GetBlockHash(uint256& hash, int nBlockHeight) {
 // and get paid this block
 //
 uint256 CMasterNode::CalculateScore(int mod, int64_t nBlockHeight) {
-    if (chainActive.Tip() == NULL) return 0;
+
+    {
+        LOCK(cs_main);
+        if (chainActive.Tip() == NULL) return 0;
+    }
 
     uint256 hash = 0;
     uint256 aux = vin.prevout.hash + vin.prevout.n;

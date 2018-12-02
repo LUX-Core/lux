@@ -2429,18 +2429,20 @@ void ThreadScriptCheck()
     scriptcheckqueue.Thread();
 }
 
-static bool IsBlockValueValid(const CBlock& block, int64_t nExpectedValue)
-{
-    CBlockIndex* pindexPrev = chainActive.Tip();
-    if (!pindexPrev) return true;
-
+static bool IsBlockValueValid(const CBlock& block, int64_t nExpectedValue) {
     int nHeight = 0;
-    if (pindexPrev->GetBlockHash() == block.hashPrevBlock) {
-        nHeight = pindexPrev->nHeight + 1;
-    } else { //out of order
-        pindexPrev = LookupBlockIndex(block.hashPrevBlock);
-        if (pindexPrev)
-            nHeight = pindexPrev->nHeight + 1;
+    {
+        LOCK(cs_main);
+
+        if (!chainActive.Tip()) return true;
+
+        if (chainActive.Tip()->GetBlockHash() == block.hashPrevBlock) {
+            nHeight = chainActive.Tip()->nHeight + 1;
+        } else {
+            BlockMap::iterator mi = mapBlockIndex.find(block.hashPrevBlock);
+            if (mi != mapBlockIndex.end() && (*mi).second)
+                nHeight = (*mi).second->nHeight + 1;
+        }
     }
 
     if (nHeight == 0) {

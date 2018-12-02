@@ -234,7 +234,14 @@ int64_t CreateNewLock(CTransaction tx) {
         This prevents attackers from using transaction mallibility to predict which masternodes
         they'll use.
     */
-    int nBlockHeight = (chainActive.Height() - nTxAge) + 4;
+    int nBlockHeight = 0;
+    {
+        LOCK(cs_main);
+        if (chainActive.Tip())
+            nBlockHeight = chainActive.Tip()->nHeight - nTxAge + 4;
+        else
+            return 0;
+    }
 
     if (!mapTxLocks.count(tx.GetHash())) {
         LogPrintf("CreateNewLock - New Transaction Lock %s !\n", tx.GetHash().ToString().c_str());
@@ -431,7 +438,7 @@ int64_t GetAverageVoteTime() {
 }
 
 void CleanTransactionLocksList() {
-    if (chainActive.Tip() == NULL) return;
+ //   if (chainActive.Tip() == NULL) return;
 
     std::map<uint256, CTransactionLock>::iterator it = mapTxLocks.begin();
 
