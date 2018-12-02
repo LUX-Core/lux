@@ -67,6 +67,7 @@ private:
 public:
     bool WriteBatchSync(const std::vector<std::pair<int, const CBlockFileInfo*> >& fileInfo, int nLastFile, const std::vector<const CBlockIndex*>& blockinfo);
     bool WriteBlockIndex(const CDiskBlockIndex& blockindex);
+    bool EraseBlockIndex(uint256 hash);
     bool ReadBlockFileInfo(int nFile, CBlockFileInfo& fileinfo);
     bool WriteBlockFileInfo(int nFile, const CBlockFileInfo& fileinfo);
     bool ReadLastBlockFile(int& nFile);

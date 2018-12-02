@@ -5214,14 +5214,30 @@ bool static LoadBlockIndexDB()
 
         //fix Assertion `hashPrevBlock == view.GetBestBlock()' failed. By adjusting height to the last recorded by coinsview
         CBlockIndex* pindexCoinsView = mapBlockIndex[pcoinsTip->GetBestBlock()];
-        if (pindexCoinsView)
+        if (pindexCoinsView && vSortedByHeight.size())
         {
-            for (unsigned int i = vinfoBlockFile[nLastBlockFile].nHeightLast + 1; i < vSortedByHeight.size(); i++)
+            CBlockIndex* pindexLastGood = pindexCoinsView;
+            for (size_t i = vSortedByHeight.size()-1; i > vinfoBlockFile[nLastBlockFile].nHeightLast; i--)
             {
                 pindexLastMeta = vSortedByHeight[i].second;
-                if(pindexLastMeta->nHeight > pindexCoinsView->nHeight)
+                LogPrintf("%s: Last meta %d %s\n", __func__, pindexLastMeta->nHeight, pindexLastMeta->GetBlockHash().GetHex());
+                if(pindexLastMeta->nHeight == pindexCoinsView->nHeight) {
+                    pindexLastGood = pindexLastMeta;
                     break;
+                }
+                if(pindexLastMeta->nHeight > pindexCoinsView->nHeight) {
+                    uint256 hashToClean = pindexLastMeta->GetBlockHash();
+                    LogPrintf("%s: Erasing block index %d\n", __func__, pindexLastMeta->nHeight);
+                    if (pblocktree->EraseBlockIndex(hashToClean)) {
+                        BlockMap::const_iterator it = mapBlockIndex.find(hashToClean);
+                        if (it != mapBlockIndex.end()) mapBlockIndex.erase(it);
+                        vSortedByHeight.erase(vSortedByHeight.begin() + i);
+                    }
+                } else {
+                    pindexLastGood = pindexLastMeta;
+                }
             }
+            pindexLastMeta = pindexLastGood;
         }
 
         LogPrintf("%s: Last block properly recorded: #%d %s\n", __func__, pindexLastMeta->nHeight, pindexLastMeta->GetBlockHash().GetHex());
@@ -5241,14 +5257,18 @@ bool static LoadBlockIndexDB()
         ProcessNewBlock(state, chainparams, NULL, &lastMetaBlock, &blockPos);
 
         //ensure that everything is as it should be
-        if (pcoinsTip->GetBestBlock() != vSortedByHeight[vSortedByHeight.size() - 1].second->GetBlockHash()) {
+        int lastVSortedHeight = (int) (vSortedByHeight.size() - 1);
+        if (pcoinsTip->GetBestBlock() != vSortedByHeight[lastVSortedHeight].second->GetBlockHash()) {
             isFixed = false;
             strError = "pcoinsTip best block is not correct";
+            LogPrintf("%s: Last vsorted height @ %d : %d -> %s\n", __func__, lastVSortedHeight,
+                    vSortedByHeight[lastVSortedHeight].second->nHeight,
+                    vSortedByHeight[lastVSortedHeight].second->GetBlockHash().GetHex());
         }
 
         //properly account for all of the blocks that were not in the meta data. If this is not done the file
         //positioning will be wrong and blocks will be overwritten and later cause serialization errors
-        CBlockIndex *pindexLast = vSortedByHeight[vSortedByHeight.size() - 1].second;
+        CBlockIndex *pindexLast = vSortedByHeight[lastVSortedHeight].second;
         CBlock lastBlock;
         if (!ReadBlockFromDisk(lastBlock, pindexLast, chainparams.GetConsensus())) {
             isFixed = false;
