@@ -24,3 +24,4 @@ add_custom_target(build-luxgate ALL
 
 add_custom_target(debug-luxd ALL)
 add_custom_target(debug-lux-qt ALL)
+add_custom_target(debug-luxgate-tests ALL)

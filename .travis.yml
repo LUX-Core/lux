@@ -57,9 +57,11 @@ before_script:
     - cd -
     - mkdir -p src/luxgate/test
     - cd src/luxgate
-    - touch atomicswap.h atomicswap.cpp luxgate.h luxgate.cpp lgconfig.h version.h lgconfig.cpp rpcluxgate.cpp blockchainclient.h blockchainclient.cpp zmqsub.h zmqsub.cpp
+    - touch archive.h archive.cpp atomicswap.h atomicswap.cpp luxgate.h luxgate.cpp lgconfig.h version.h lgconfig.cpp rpcluxgate.cpp blockchainclient.h blockchainclient.cpp zmqsub.h zmqsub.cpp
     - cd -
-    - touch src/luxgate/test/test_luxgate.cpp
+    - cd src/luxgate/test
+    - touch test_luxgate.cpp archive_test.cpp
+    - cd -
   
 script:
     - export TRAVIS_COMMIT_LOG=`git log --format=fuller -1`

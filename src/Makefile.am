@@ -179,6 +179,7 @@ BITCOIN_CORE_H = \
 
 if ENABLE_LUXGATE
 BITCOIN_CORE_H += \
+  luxgate/archive.h \
   luxgate/atomicswap.h \
   luxgate/blockchainclient.h \
   luxgate/lgconfig.h \
@@ -238,12 +239,13 @@ libbitcoin_server_a_SOURCES = \
 
 if ENABLE_LUXGATE
 libbitcoin_server_a_SOURCES += \
-  luxgate/lgconfig.cpp \
+  luxgate/archive.cpp \
   luxgate/atomicswap.cpp \
-  luxgate/zmqsub.cpp \
   luxgate/blockchainclient.cpp \
+  luxgate/lgconfig.cpp \
+  luxgate/luxgate.cpp \
   luxgate/rpcluxgate.cpp \
-  luxgate/luxgate.cpp
+  luxgate/zmqsub.cpp
 endif
 
 if ENABLE_ZMQ
