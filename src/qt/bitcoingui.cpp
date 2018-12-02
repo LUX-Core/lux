@@ -264,25 +264,25 @@ BitcoinGUI::BitcoinGUI(const PlatformStyle *platformStyle, const NetworkStyle* n
         frameLayout->setSpacing(10);
 
         pushButtonTelegram = new QPushButton(frameSocMedia);
-        pushButtonTelegram->setToolTip("Go to Telegram");
+        pushButtonTelegram->setToolTip(tr("Go to")+" Telegram");
         connect(pushButtonTelegram, &QPushButton::clicked,
                 this, [](){QDesktopServices::openUrl(QUrl("https://t.me/LUXcoreOfficial"));});
         pushButtonTelegram->setIcon(QIcon(QPixmap(":/icons/res/icons/telegram.png").scaledToHeight(STATUSBAR_ICONSIZE,Qt::SmoothTransformation)));
 
         pushButtonDiscord = new QPushButton(frameSocMedia);
-        pushButtonDiscord->setToolTip("Go to Discord");
+        pushButtonDiscord->setToolTip(tr("Go to")+" Discord");
         connect(pushButtonDiscord, &QPushButton::clicked,
                 this, [](){QDesktopServices::openUrl(QUrl("https://discord.gg/27xFP5Y"));});
         pushButtonDiscord->setIcon(QIcon(":/icons/res/icons/discord.png").pixmap(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE));
 
         pushButtonTwitter = new QPushButton(frameSocMedia);
-        pushButtonTwitter->setToolTip("Go to Twitter");
+        pushButtonTwitter->setToolTip(tr("Go to")+" Twitter");
         connect(pushButtonTwitter, &QPushButton::clicked,
                 this, [](){QDesktopServices::openUrl(QUrl("https://twitter.com/LUX_Coin"));});
         pushButtonTwitter->setIcon(QIcon(":/icons/res/icons/twitter.png").pixmap(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE));
 
         pushButtonGithub = new QPushButton(frameSocMedia);
-        pushButtonGithub->setToolTip("Go to GitHub");
+        pushButtonGithub->setToolTip(tr("Go to")+" GitHub");
         connect(pushButtonGithub, &QPushButton::clicked,
                 this, [](){QDesktopServices::openUrl(QUrl("https://github.com/lux-core"));});
         pushButtonGithub->setIcon(QIcon(":/icons/res/icons/github.png").pixmap(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE));

@@ -313,16 +313,16 @@ void Eula::showDialog()
     bool isDialogHiding = false;
     QSettings settings;
 
-    QString currentVersion = tr("lux_") + QString::fromStdString(strprintf("%d%d%d%d",
+    QString currentVersion = QString("lux_") + QString::fromStdString(strprintf("%d%d%d%d",
                              CLIENT_VERSION_MAJOR,
                              CLIENT_VERSION_MINOR,
                              CLIENT_VERSION_REVISION,
                              CLIENT_VERSION_BUILD
                              ));
 
-    if (settings.contains(tr("luxVersion")))
+    if (settings.contains(QString("luxVersion")))
     {
-        QString storeVersion = settings.value(tr("luxVersion")).toString();
+        QString storeVersion = settings.value(QString("luxVersion")).toString();
         if (QString::compare(storeVersion, currentVersion, Qt::CaseInsensitive) == 0)
         {
             isDialogHiding = settings.value(storeVersion).toBool();
@@ -330,12 +330,12 @@ void Eula::showDialog()
         else
         {
             settings.remove(storeVersion);
-            settings.setValue(tr("luxVersion"), currentVersion);
+            settings.setValue(QString("luxVersion"), currentVersion);
         }
     }
     else
     {
-        settings.setValue(tr("luxVersion"), currentVersion);
+        settings.setValue(QString("luxVersion"), currentVersion);
     }
 	
     if(isDialogHiding)
