@@ -1577,6 +1577,14 @@ MultiSend: %1</translation>
         <source>n/a</source>
         <translation>n/a</translation>
     </message>
+    <message>
+        <source>Tx Hash</source>
+        <translation>Tx Hash</translation>
+    </message>
+    <message>
+        <source>Output index</source>
+        <translation>Index sortie</translation>
+    </message>
 </context>
 <context>
     <name>ContractBookPage</name>
@@ -2961,6 +2969,14 @@ Veuillez vérifier l&apos;adresse et réessayer.</translation>
         <translation>Activer log &amp;events</translation>
     </message>
     <message>
+        <source>Enable &amp;transaction indexes</source>
+        <translation>Activer les indexes de &amp;transactions</translation>
+    </message>
+    <message>
+        <source>Enable &amp;address indexes</source>
+        <translation>Activer les indexes d&apos;&amp;adresses</translation>
+    </message>
+    <message>
         <source>Size of &amp;database cache</source>
         <translation>Taille du cache base de &amp;données (-dbcache)</translation>
     </message>
@@ -3196,6 +3212,26 @@ https://www.transifex.com/luxcore/luxcore</source>
     <message>
         <source>The supplied proxy address is invalid.</source>
         <translation>L&apos;adresse du proxy est invalide.</translation>
+    </message>
+    <message>
+        <source>Maintain a full EVM log index, used by searchlogs and gettransactionreceipt rpc calls (default: %u)</source>
+        <translation>Maintient un log EVM complet, utilisé pour searchlogs et gettransactionreceipt (défaut: %u)</translation>
+    </message>
+    <message>
+        <source>false</source>
+        <translation>non</translation>
+    </message>
+    <message>
+        <source>Maintain a full transaction index, used by the getrawtransaction rpc call (default: %u)</source>
+        <translation>Maintient un index complet des transactions, utilisé pour getrawtransaction (défaut: %u)</translation>
+    </message>
+    <message>
+        <source>Maintain a full address index, used to query for the balance, txids and unspent outputs for addresses (default: %u)</source>
+        <translation>Maintient un index complet des adresses, utilisé pour obtenir les balances et l&apos;historique des adresses (défaut: %u)</translation>
+    </message>
+    <message>
+        <source>true</source>
+        <translation>oui</translation>
     </message>
 </context>
 <context>
@@ -6618,15 +6654,15 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Maintain a full address index, used to query for the balance, txids and unspent outputs for addresses (default: %u)</source>
-        <translation type="unfinished"></translation>
+        <translation>Maintient un index complet des adresses, utilisé pour obtenir les balances et l&apos;historique des adresses (défaut: %u)</translation>
     </message>
     <message>
         <source>Maintain a full spent index, used to query the spending txid and input index for an outpoint (default: %u)</source>
-        <translation type="unfinished"></translation>
+        <translation>Maintient un index complet des dépenses, utilisé pour connaître le statut des sorties (défaut: %u)</translation>
     </message>
     <message>
         <source>Maintain a full transaction index, used by the getrawtransaction rpc call (default: %u)</source>
-        <translation type="unfinished"></translation>
+        <translation>Maintient un index complet des transactions, utilisé pour getrawtransaction (défaut: %u)</translation>
     </message>
     <message>
         <source>Make sure to encrypt your wallet and delete all non-encrypted backups after you verified that wallet works!</source>
@@ -7306,7 +7342,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Maintain a full EVM log index, used by searchlogs and gettransactionreceipt rpc calls (default: %u)</source>
-        <translation type="unfinished"></translation>
+        <translation>Maintient un log EVM complet, utilisé pour searchlogs et gettransactionreceipt (défaut: %u)</translation>
     </message>
     <message>
         <source>Provide liquidity to Darksend by infrequently mixing coins on a continual basis (0-100, default: %u, 1=very frequent, high fees, 100=very infrequent, low fees)</source>

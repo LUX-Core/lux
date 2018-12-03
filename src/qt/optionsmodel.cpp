@@ -125,6 +125,11 @@ void OptionsModel::Init()
     if (!SoftSetBoolArg("-logevents", settings.value("fLogEvents").toBool()))
         addOverriddenOption("-logevents");
 
+    if (!settings.contains("fTxIndex"))
+        settings.setValue("fTxIndex", fTxIndex);
+    if (!SoftSetBoolArg("-txindex", settings.value("fTxIndex").toBool()))
+        addOverriddenOption("-txindex");
+
     if (!settings.contains("fAddressIndex"))
         settings.setValue("fAddressIndex", fAddressIndex);
     if (!SoftSetBoolArg("-addressindex", settings.value("fAddressIndex").toBool()))
@@ -293,6 +298,8 @@ QVariant OptionsModel::data(const QModelIndex& index, int role) const
             return settings.value("fListen");
         case CheckUpdates:
             return settings.value("fCheckUpdates");
+        case TxIndex:
+            return settings.value("fTxIndex");
         case AddressIndex:
             return settings.value("fAddressIndex");
         default:
@@ -488,6 +495,12 @@ bool OptionsModel::setData(const QModelIndex& index, const QVariant& value, int 
         case LogEvents:
             if (settings.value("fLogEvents") != value) {
                settings.setValue("fLogEvents", value);
+               setRestartRequired(true);
+            }
+            break;
+        case TxIndex:
+            if (settings.value("fTxIndex") != value) {
+               settings.setValue("fTxIndex", value);
                setRestartRequired(true);
             }
             break;

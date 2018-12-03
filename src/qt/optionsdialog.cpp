@@ -168,6 +168,7 @@ void OptionsDialog::setModel(OptionsModel* model)
     connect(ui->databaseCache, SIGNAL(valueChanged(int)), this, SLOT(showRestartWarning()));
     //connect(ui->logFileCount, SIGNAL(valueChanged(int)), this, SLOT(showRestartWarning()));
     connect(ui->logEvents, SIGNAL(clicked(bool)), this, SLOT(showRestartWarning()));
+    connect(ui->txIndex, SIGNAL(clicked(bool)), this, SLOT(showRestartWarning()));
     connect(ui->addressIndex, SIGNAL(clicked(bool)), this, SLOT(showRestartWarning()));
     connect(ui->threadsScriptVerif, SIGNAL(valueChanged(int)), this, SLOT(showRestartWarning()));
 
@@ -175,15 +176,28 @@ void OptionsDialog::setModel(OptionsModel* model)
     if (!SoftSetBoolArg("-logevents", fLogEvents)) {
         QSettings settings;
         settings.setValue("fLogEvents", fLogEvents);
-        ui->logEvents->setChecked(GetBoolArg("-logevents", fLogEvents));
+        ui->logEvents->setChecked(fLogEvents);
         ui->logEvents->setEnabled(false);
+    }
+    if (!SoftSetBoolArg("-txindex", fTxIndex)) {
+        QSettings settings;
+        settings.setValue("fTxIndex", fTxIndex);
+        ui->txIndex->setChecked(fTxIndex);
+        ui->txIndex->setEnabled(false);
     }
     if (!SoftSetBoolArg("-addressindex", fAddressIndex)) {
         QSettings settings;
         settings.setValue("fAddressIndex", fAddressIndex);
-        ui->addressIndex->setChecked(GetBoolArg("-addressindex", fAddressIndex));
+        ui->addressIndex->setChecked(fAddressIndex);
         ui->addressIndex->setEnabled(false);
     }
+
+    // option tooltips, strings taken from -help
+    ui->logEvents->setToolTip(tr("Maintain a full EVM log index, used by searchlogs and gettransactionreceipt rpc calls (default: %u)")
+            .replace(QString("%u"),tr("false")));
+    ui->txIndex->setToolTip(tr("Maintain a full transaction index, used by the getrawtransaction rpc call (default: %u)")
+            .replace(QString("%u"),tr("false")));
+    ui->addressIndex->setToolTip(tr("Maintain a full address index, used to query for the balance, txids and unspent outputs for addresses (default: %u)").replace(QString("%u"), DEFAULT_ADDRESSINDEX ? tr("true") : tr("false")));
 
     /* Wallet */
     connect(ui->spendZeroConfChange, SIGNAL(clicked(bool)), this, SLOT(showRestartWarning()));
@@ -207,6 +221,7 @@ void OptionsDialog::setMapper()
     mapper->addMapping(ui->databaseCache, OptionsModel::DatabaseCache);
     mapper->addMapping(ui->logFileCount, OptionsModel::LogFileCount);
     mapper->addMapping(ui->logEvents, OptionsModel::LogEvents);
+    mapper->addMapping(ui->txIndex, OptionsModel::TxIndex);
     mapper->addMapping(ui->addressIndex, OptionsModel::AddressIndex);
 
     /* Wallet */
