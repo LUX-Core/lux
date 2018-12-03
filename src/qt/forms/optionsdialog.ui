@@ -45,6 +45,13 @@
         </widget>
        </item>
        <item>
+        <widget class="QCheckBox" name="txIndex">
+         <property name="text">
+          <string>Enable &amp;transaction indexes</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QCheckBox" name="addressIndex">
          <property name="text">
           <string>Enable &amp;address indexes</string>

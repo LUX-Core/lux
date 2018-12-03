@@ -57,6 +57,7 @@ public:
         WalletBackups,           // int
         Listen,                  // bool
         CheckUpdates,            // bool
+        TxIndex,                 // bool
         AddressIndex,            // bool
         OptionIDRowCount,
     };
