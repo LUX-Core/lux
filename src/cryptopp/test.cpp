@@ -15,8 +15,6 @@
 #include "randpool.h"
 #include "ida.h"
 #include "base64.h"
-#include "socketft.h"
-#include "wait.h"
 #include "factory.h"
 #include "whrlpool.h"
 #include "tiger.h"
@@ -39,11 +37,6 @@
 #include <windows.h>
 #endif
 
-#if defined(USE_BERKELEY_STYLE_SOCKETS) && !defined(macintosh)
-#include <netinet/in.h>
-#include <netinet/tcp.h>
-#endif
-
 #if (_MSC_VER >= 1000)
 #include <crtdbg.h>		// for the debug heap
 #endif
@@ -58,7 +51,6 @@
 
 #ifdef __BORLANDC__
 #pragma comment(lib, "cryptlib_bds.lib")
-#pragma comment(lib, "ws2_32.lib")
 #endif
 
 // Aggressive stack checking with VS2005 SP1 and above.
@@ -109,9 +101,6 @@ void Base64Decode(const char *infile, const char *outfile);
 void HexEncode(const char *infile, const char *outfile);
 void HexDecode(const char *infile, const char *outfile);
 
-void ForwardTcpPort(const char *sourcePort, const char *destinationHost, const char *destinationPort);
-
-void FIPS140_SampleApplication();
 void FIPS140_GenerateRandomFiles();
 
 bool Validate(int, bool, const char *);
@@ -375,8 +364,6 @@ int CRYPTOPP_API main(int argc, char *argv[])
 			FIPS140_SampleApplication();
 		else if (command == "fips-rand")
 			FIPS140_GenerateRandomFiles();
-		else if (command == "ft")
-			ForwardTcpPort(argv[2], argv[3], argv[4]);
 		else if (command == "a")
 		{
 			if (AdhocTest)
@@ -808,77 +795,6 @@ void HexEncode(const char *in, const char *out)
 void HexDecode(const char *in, const char *out)
 {
 	FileSource(in, true, new HexDecoder(new FileSink(out)));
-}
-
-void ForwardTcpPort(const char *sourcePortName, const char *destinationHost, const char *destinationPortName)
-{
-	// Quiet warnings for Windows Phone and Windows Store builds
-	CRYPTOPP_UNUSED(sourcePortName), CRYPTOPP_UNUSED(destinationHost), CRYPTOPP_UNUSED(destinationPortName);
-
-#ifdef SOCKETS_AVAILABLE
-	SocketsInitializer sockInit;
-
-	Socket sockListen, sockSource, sockDestination;
-
-	int sourcePort = Socket::PortNameToNumber(sourcePortName);
-	int destinationPort = Socket::PortNameToNumber(destinationPortName);
-
-	sockListen.Create();
-	sockListen.Bind(sourcePort);
-
-	const int flag = 1;
-	int err = setsockopt(sockListen, IPPROTO_TCP, TCP_NODELAY, (char*)&flag, sizeof(int));
-	CRYPTOPP_ASSERT(err == 0);
-	if(err != 0)
-		throw Socket::Err(sockListen, "setsockopt", sockListen.GetLastError());
-
-	cout << "Listing on port " << sourcePort << ".\n";
-	sockListen.Listen();
-
-	sockListen.Accept(sockSource);
-	cout << "Connection accepted on port " << sourcePort << ".\n";
-	sockListen.CloseSocket();
-
-	cout << "Making connection to " << destinationHost << ", port " << destinationPort << ".\n";
-	sockDestination.Create();
-	sockDestination.Connect(destinationHost, destinationPort);
-
-	cout << "Connection made to " << destinationHost << ", starting to forward.\n";
-
-	SocketSource out(sockSource, false, new SocketSink(sockDestination));
-	SocketSource in(sockDestination, false, new SocketSink(sockSource));
-
-	WaitObjectContainer waitObjects;
-
-	while (!(in.SourceExhausted() && out.SourceExhausted()))
-	{
-		waitObjects.Clear();
-
-		out.GetWaitObjects(waitObjects, CallStack("ForwardTcpPort - out", NULL));
-		in.GetWaitObjects(waitObjects, CallStack("ForwardTcpPort - in", NULL));
-
-		waitObjects.Wait(INFINITE_TIME);
-
-		if (!out.SourceExhausted())
-		{
-			cout << "o" << flush;
-			out.PumpAll2(false);
-			if (out.SourceExhausted())
-				cout << "EOF received on source socket.\n";
-		}
-
-		if (!in.SourceExhausted())
-		{
-			cout << "i" << flush;
-			in.PumpAll2(false);
-			if (in.SourceExhausted())
-				cout << "EOF received on destination socket.\n";
-		}
-	}
-#else
-	cout << "Socket support was not enabled at compile time.\n";
-	exit(-1);
-#endif
 }
 
 bool Validate(int alg, bool thorough, const char *seedInput)

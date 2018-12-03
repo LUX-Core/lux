@@ -58,7 +58,6 @@ cryptopp_libcryptopp_a_SOURCES += cryptopp/rijndael.cpp
 cryptopp_libcryptopp_a_SOURCES += cryptopp/rng.cpp
 cryptopp_libcryptopp_a_SOURCES += cryptopp/sha.cpp
 cryptopp_libcryptopp_a_SOURCES += cryptopp/strciphr.cpp
-cryptopp_libcryptopp_a_SOURCES += cryptopp/winpipes.cpp
 cryptopp_libcryptopp_a_SOURCES += cryptopp/sha3.cpp
 
 cryptopp_libcryptopp_a_SOURCES += cryptopp/cryptlib.h
@@ -99,7 +98,6 @@ cryptopp_libcryptopp_a_SOURCES += cryptopp/rijndael.h
 cryptopp_libcryptopp_a_SOURCES += cryptopp/rng.h
 cryptopp_libcryptopp_a_SOURCES += cryptopp/sha.h
 cryptopp_libcryptopp_a_SOURCES += cryptopp/strciphr.h
-cryptopp_libcryptopp_a_SOURCES += cryptopp/winpipes.h
 cryptopp_libcryptopp_a_SOURCES += cryptopp/sha3.h
 cryptopp_libcryptopp_a_SOURCES += cryptopp/aes.h
 cryptopp_libcryptopp_a_SOURCES += cryptopp/factory.h
@@ -135,7 +133,6 @@ cryptopp_libcryptopp_a_SOURCES += cryptopp/oids.h
 cryptopp_libcryptopp_a_SOURCES += cryptopp/ossig.h
 cryptopp_libcryptopp_a_SOURCES += cryptopp/pch.h
 cryptopp_libcryptopp_a_SOURCES += cryptopp/cbcmac.h
-cryptopp_libcryptopp_a_SOURCES += cryptopp/trdlocal.h
 cryptopp_libcryptopp_a_SOURCES += cryptopp/ccm.h
 cryptopp_libcryptopp_a_SOURCES += cryptopp/*.h
 

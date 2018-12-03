@@ -41,15 +41,15 @@ Square, TEA, \ref ThreeWay "3-Way", Twofish, XTEA
 <dt>Compression<dd>
 	Deflator, Inflator, Gzip, Gunzip, ZlibCompressor, ZlibDecompressor
 <dt>Input Source Classes<dd>
-	StringSource, ArraySource, FileSource, SocketSource, WindowsPipeSource, RandomNumberSource
+	StringSource, ArraySource, FileSource, RandomNumberSource
 <dt>Output Sink Classes<dd>
-	StringSinkTemplate, StringSink, ArraySink, FileSink, SocketSink, WindowsPipeSink, RandomNumberSink
+	StringSinkTemplate, StringSink, ArraySink, FileSink, RandomNumberSink
 <dt>Filter Wrappers<dd>
 	StreamTransformationFilter, AuthenticatedEncryptionFilter, AuthenticatedDecryptionFilter, HashFilter, HashVerificationFilter, SignerFilter, SignatureVerificationFilter
 <dt>Binary to Text Encoders and Decoders<dd>
 	HexEncoder, HexDecoder, Base64Encoder, Base64Decoder, Base64URLEncoder, Base64URLDecoder, Base32Encoder, Base32Decoder
 <dt>Wrappers for OS features<dd>
-	Timer, Socket, WindowsHandle, ThreadLocalStorage, ThreadUserTimer
+	Timer, ThreadUserTimer
 <dt>FIPS 140 validated cryptography<dd>
 	fips140.h
 </dl>

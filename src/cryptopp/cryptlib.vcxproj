@@ -473,7 +473,6 @@
     <ClInclude Include="wait.h" />
     <ClInclude Include="wake.h" />
     <ClInclude Include="whrlpool.h" />
-    <ClInclude Include="winpipes.h" />
     <ClInclude Include="words.h" />
     <ClInclude Include="xtr.h" />
     <ClInclude Include="xtrcrypt.h" />

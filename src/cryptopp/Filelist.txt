@@ -294,8 +294,6 @@ wake.cpp
 wake.h
 whrlpool.cpp
 whrlpool.h
-winpipes.cpp
-winpipes.h
 words.h
 x64dll.asm
 x64masm.asm

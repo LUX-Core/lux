@@ -810,9 +810,6 @@
     <ClInclude Include="whrlpool.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="winpipes.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="words.h">
       <Filter>Header Files</Filter>
     </ClInclude>

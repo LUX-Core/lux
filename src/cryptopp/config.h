@@ -103,14 +103,7 @@
 // of 'b', 'o', 'h' or '.' (the last for decimal).
 // #define CRYPTOPP_USE_STD_SHOWBASE
 
-// choose which style of sockets to wrap (mostly useful for MinGW which has both)
-#if !defined(NO_BERKELEY_STYLE_SOCKETS) && !defined(PREFER_BERKELEY_STYLE_SOCKETS)
-# define PREFER_BERKELEY_STYLE_SOCKETS
-#endif
 
-// #if !defined(NO_WINDOWS_STYLE_SOCKETS) && !defined(PREFER_WINDOWS_STYLE_SOCKETS)
-// # define PREFER_WINDOWS_STYLE_SOCKETS
-// #endif
 
 // set the name of Rijndael cipher, was "Rijndael" before version 5.3
 #define CRYPTOPP_RIJNDAEL_NAME "AES"
@@ -217,10 +210,6 @@ namespace CryptoPP { }
 #	else
 #		define TYPE_OF_SOCKLEN_T ::socklen_t
 #	endif
-#endif
-
-#if defined(__CYGWIN__) && defined(PREFER_WINDOWS_STYLE_SOCKETS)
-#	define __USE_W32_SOCKETS
 #endif
 
 typedef unsigned char byte;		// put in global namespace to avoid ambiguity with other byte typedefs
@@ -619,57 +608,23 @@ NAMESPACE_END
 # endif
 #endif
 
-#ifdef CRYPTOPP_UNIX_AVAILABLE
-#	define HAS_BERKELEY_STYLE_SOCKETS
-#	define SOCKETS_AVAILABLE
-#endif
-
-// Sockets are only available under Windows Runtime desktop partition apps (despite the MSDN literature)
-#ifdef CRYPTOPP_WIN32_AVAILABLE
-# define HAS_WINDOWS_STYLE_SOCKETS
-# if !defined(WINAPI_FAMILY)
-#	define SOCKETS_AVAILABLE
-# elif defined(WINAPI_FAMILY)
-#   if (WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP))
-#	  define SOCKETS_AVAILABLE
-#   endif
-# endif
-#endif
-
-#if defined(HAS_WINDOWS_STYLE_SOCKETS) && (!defined(HAS_BERKELEY_STYLE_SOCKETS) || defined(PREFER_WINDOWS_STYLE_SOCKETS))
-#	define USE_WINDOWS_STYLE_SOCKETS
-#else
-#	define USE_BERKELEY_STYLE_SOCKETS
-#endif
-
-#if defined(CRYPTOPP_WIN32_AVAILABLE) && defined(SOCKETS_AVAILABLE) && !defined(USE_BERKELEY_STYLE_SOCKETS)
-#	define WINDOWS_PIPES_AVAILABLE
-#endif
-
 #if defined(CRYPTOPP_UNIX_AVAILABLE) || defined(CRYPTOPP_DOXYGEN_PROCESSING)
 #	define NONBLOCKING_RNG_AVAILABLE
 #	define BLOCKING_RNG_AVAILABLE
 #	define OS_RNG_AVAILABLE
-#	define HAS_PTHREADS
-#	define THREADS_AVAILABLE
 #endif
 
-// Newlib on Cygwin is a problem. __NEWLIB__ is not defined yet; use __CYGWIN__ as a proxy
-//   Also see https://github.com/weidai11/cryptopp/issues/315
-#if defined(CRYPTOPP_UNIX_AVAILABLE) && !defined(__CYGWIN__)
+// Cygwin/Newlib requires _XOPEN_SOURCE=600
+#if defined(CRYPTOPP_UNIX_AVAILABLE)
 # define UNIX_SIGNALS_AVAILABLE 1
 #endif
 
 #ifdef CRYPTOPP_WIN32_AVAILABLE
 # if !defined(WINAPI_FAMILY)
-#	define HAS_WINTHREADS
-#	define THREADS_AVAILABLE
 #	define NONBLOCKING_RNG_AVAILABLE
 #	define OS_RNG_AVAILABLE
 # elif defined(WINAPI_FAMILY)
 #   if (WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP))
-#	  define HAS_WINTHREADS
-#	  define THREADS_AVAILABLE
 #	  define NONBLOCKING_RNG_AVAILABLE
 #	  define OS_RNG_AVAILABLE
 #   elif !(WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP))
