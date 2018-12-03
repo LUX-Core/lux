@@ -5831,14 +5831,6 @@ bool static AlreadyHave(const CInv& inv)
         return mapSeenMasternodeVotes.count(inv.hash);
     case MSG_STORAGE_ORDER_ANNOUNCE:
         return storageController.mapAnnouncements.count(inv.hash);
-//    case MSG_STORAGE_ORDER_PROPOSAL:
-//        return ;
-//    case MSG_STORAGE_ORDER_ACCEPT:
-//        return ;
-//    case MSG_REPLICA_TRANSFER:
-//        return ;
-//    case MSG_REPLICA_TRANSFER_SANTIFY_CHECK:
-//        return ;
     }
     // Don't know what it is, just say we already got one
     return true;

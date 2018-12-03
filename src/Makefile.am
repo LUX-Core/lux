@@ -235,6 +235,9 @@ libbitcoin_server_a_SOURCES = \
   lux/merklefilebuilder.cpp \
   lux/storagecontroller.h \
   lux/storagecontroller.cpp \
+  lux/proposalsagent.h \
+  lux/proposalsagent.cpp \
+  lux/storageorder.h \
   $(BITCOIN_CORE_H)
 
 if ENABLE_ZMQ
