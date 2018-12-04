@@ -102,7 +102,7 @@ private:
     UnitDisplayStatusBarControl* unitDisplayControl;
     QLabel* labelStakingIcon;
     QLabel* labelWalletEncryptionIcon;
-    QLabel* labelWalletHDStatusIcon;
+    QPushButton* pushButtonWalletHDStatusIcon;
     QPushButton* labelConnectionsIcon;
     QPushButton * pushButtonTelegram;
     QPushButton * pushButtonTwitter;
