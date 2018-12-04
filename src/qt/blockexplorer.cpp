@@ -666,7 +666,7 @@ void BlockExplorer::showEvent(QShowEvent* ev)
     if (m_NeverShown) {
         m_NeverShown = false;
         home();
-        if (!GetBoolArg("-txindex", false)) {
+        if (!GetBoolArg("-txindex", DEFAULT_TXINDEX)) {
             QString Warning = tr("Not all transactions will be shown. To view all transactions you need to set txindex=1 in the configuration file (lux.conf).");
             QMessageBox::warning(this, tr("Luxcore Blockchain Explorer"), Warning, QMessageBox::Ok);
         }
