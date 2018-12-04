@@ -22,7 +22,7 @@ Eula::Eula(QWidget* parent) : QDialog(parent),
     // Remove minimize button
     this->setWindowFlags(Qt::Dialog);
 
-    QCoreApplication::setApplicationName(tr("End User Software License Agreement"));
+    QApplication::setApplicationName(tr("End User Software License Agreement"));
 
     QString headerInfo = tr("<p style=\"line-height:140\"><span><br>Please read the following license agreement. You must accept the terms contained in this agreement before continuing with the application.");
     ui->header->setTextFormat(Qt::RichText);
