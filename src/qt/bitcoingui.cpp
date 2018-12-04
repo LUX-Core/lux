@@ -68,6 +68,7 @@
 #include <QDockWidget>
 #include <QSizeGrip>
 #include <QDesktopServices>
+#include <QProcess>
 
 #if QT_VERSION < 0x050000
 #include <QTextDocument>
@@ -97,7 +98,7 @@ BitcoinGUI::BitcoinGUI(const PlatformStyle *platformStyle, const NetworkStyle* n
                                                                             unitDisplayControl(0),
                                                                             labelStakingIcon(0),
                                                                             labelWalletEncryptionIcon(0),
-                                                                            labelWalletHDStatusIcon(0),
+                                                                            pushButtonWalletHDStatusIcon(0),
                                                                             labelConnectionsIcon(0),
                                                                             labelBlocksIcon(0),
                                                                             progressBarLabel(0),
@@ -227,9 +228,38 @@ BitcoinGUI::BitcoinGUI(const PlatformStyle *platformStyle, const NetworkStyle* n
     frameBlocksLayout->setContentsMargins(6, 0, 6, 0);
     frameBlocksLayout->setSpacing(6);
     unitDisplayControl = new UnitDisplayStatusBarControl(platformStyle);
+    unitDisplayControl->setCursor(Qt::PointingHandCursor);
     labelStakingIcon = new QLabel();
     labelWalletEncryptionIcon = new QLabel();
-    labelWalletHDStatusIcon = new QLabel();
+
+    pushButtonWalletHDStatusIcon = new QPushButton();
+    QString styleSheet = ".QPushButton { background-color: transparent;"
+                         "border: none;"
+                         "qproperty-text: \"\" }";
+    pushButtonWalletHDStatusIcon->setMinimumSize(30, STATUSBAR_ICONSIZE);
+    pushButtonWalletHDStatusIcon->setMaximumSize(30, STATUSBAR_ICONSIZE);
+    pushButtonWalletHDStatusIcon->setIconSize(QSize(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE));
+    pushButtonWalletHDStatusIcon->setCursor(Qt::PointingHandCursor);
+    pushButtonWalletHDStatusIcon->setStyleSheet(styleSheet);
+    connect(pushButtonWalletHDStatusIcon, &QPushButton::clicked,
+            this, [this]()
+            {
+                int hdEnabled = this->pushButtonWalletHDStatusIcon->property("hdEnabled").toInt();
+                if( hdEnabled == 0)
+                {
+                    auto button = QMessageBox::warning(this, "hdWallet",
+                                                       tr("Do you really want enable hdWallet? You can not disable it again. Also if you will select \"Yes\" application will restart"),
+                                                       QMessageBox::Yes | QMessageBox::No);
+
+                    if (QMessageBox::Yes == button) {
+                        QStringList args;
+                        if (0 == hdEnabled)
+                            args << "-usehd" << "-upgradewallet";
+                        emit requestedRestart(args);
+                    }
+                }
+            });
+
     labelConnectionsIcon = new QPushButton();
     labelConnectionsIcon->setFlat(true); // Make the button look like a label, but clickable
     labelConnectionsIcon->setStyleSheet(".QPushButton { background-color: rgba(255, 255, 255, 0);}");
@@ -242,7 +272,7 @@ BitcoinGUI::BitcoinGUI(const PlatformStyle *platformStyle, const NetworkStyle* n
         frameBlocksLayout->addWidget(unitDisplayControl);
         frameBlocksLayout->addStretch();
         frameBlocksLayout->addWidget(labelWalletEncryptionIcon);
-        frameBlocksLayout->addWidget(labelWalletHDStatusIcon);
+        frameBlocksLayout->addWidget(pushButtonWalletHDStatusIcon);
     }
     frameBlocksLayout->addStretch();
     frameBlocksLayout->addWidget(labelStakingIcon);
@@ -1392,11 +1422,12 @@ bool BitcoinGUI::handlePaymentRequest(const SendCoinsRecipient& recipient)
 void BitcoinGUI::setHDStatus(int hdEnabled)
 {
 
-    labelWalletHDStatusIcon->setPixmap(QIcon(hdEnabled ? ":/icons/hd_enabled" : ":/icons/hd_disabled").pixmap(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE));
-    labelWalletHDStatusIcon->setToolTip(hdEnabled ? tr("HD key generation is <b>enabled</b>") : tr("HD key generation is <b>disabled</b>"));
+    pushButtonWalletHDStatusIcon->setProperty("hdEnabled", hdEnabled);
+    pushButtonWalletHDStatusIcon->setIcon(QIcon(hdEnabled ? ":/icons/hd_enabled" : ":/icons/hd_disabled").pixmap(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE));
+    pushButtonWalletHDStatusIcon->setToolTip(hdEnabled ? tr("HD key generation is <b>enabled</b>") : tr("HD key generation is <b>disabled</b>"));
 
     // eventually disable the QLabel to set its opacity to 50%
-    labelWalletHDStatusIcon->setEnabled(hdEnabled);
+    //pushButtonWalletHDStatusIcon->setEnabled(hdEnabled);
 }
 
 void BitcoinGUI::setEncryptionStatus(int status)
