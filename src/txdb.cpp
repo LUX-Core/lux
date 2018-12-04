@@ -36,6 +36,7 @@ static const char DB_REINDEX_FLAG = 'R';
 static const char DB_LAST_BLOCK = 'l';
 
 extern map<uint256, uint256> mapProofOfStake;
+extern std::atomic<bool> fRequestShutdown;
 
 using namespace std;
 
@@ -404,6 +405,7 @@ bool CBlockTreeDB::LoadBlockIndexGuts()
 
     // Load mapBlockIndex
     while (pcursor->Valid()) {
+        if (fRequestShutdown) return false;
         boost::this_thread::interruption_point();
         try {
             leveldb::Slice slKey = pcursor->key();
