@@ -326,6 +326,8 @@ crypto_libbitcoin_crypto_a_SOURCES = \
 if USE_ASM
 crypto/crypto_libbitcoin_crypto_a-sha256.$(OBJEXT) : CXXFLAGS += -DUSE_ASM
 crypto/crypto_libbitcoin_crypto_a-sha256_sse4.$(OBJEXT) : CXXFLAGS += $(SSE42_CXXFLAGS) -DUSE_ASM
+crypto/libbitcoin_crypto_a-sha256.$(OBJEXT) : CXXFLAGS += -DUSE_ASM
+crypto/libbitcoin_crypto_a-sha256_sse4.$(OBJEXT) : CXXFLAGS += $(SSE42_CXXFLAGS) -DUSE_ASM
 crypto_libbitcoin_crypto_a_SOURCES += crypto/sha256_sse4.cpp
 endif
 
