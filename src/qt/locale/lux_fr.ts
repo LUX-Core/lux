@@ -3218,7 +3218,7 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation>Maintient un log EVM complet, utilisé pour searchlogs et gettransactionreceipt (défaut: %u)</translation>
     </message>
     <message>
-        <source>false</source>
+        <source>no</source>
         <translation>non</translation>
     </message>
     <message>
@@ -3230,7 +3230,7 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation>Maintient un index complet des adresses, utilisé pour obtenir les balances et l&apos;historique des adresses (défaut: %u)</translation>
     </message>
     <message>
-        <source>true</source>
+        <source>yes</source>
         <translation>oui</translation>
     </message>
 </context>

@@ -154,6 +154,7 @@ static const unsigned int RELAY_BROADCAST_MAX = 7 * RELAY_INVENTORY_INTERVAL;
 static const unsigned int DEFAULT_BYTES_PER_SIGOP = 20;
 static const bool DEFAULT_ADDRESSINDEX = false;
 static const bool DEFAULT_SPENTINDEX = false;
+static const bool DEFAULT_TXINDEX = true;
 
 static const int64_t STATIC_POS_REWARD = 1 * COIN; //Constant reward 8%
 

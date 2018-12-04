@@ -177,7 +177,7 @@ void OptionsDialog::setModel(OptionsModel* model)
         QSettings settings;
         settings.setValue("fLogEvents", fLogEvents);
         ui->logEvents->setChecked(fLogEvents);
-        ui->logEvents->setEnabled(false);
+        //ui->logEvents->setEnabled(false);
     }
     if (!SoftSetBoolArg("-txindex", fTxIndex)) {
         QSettings settings;
@@ -194,10 +194,10 @@ void OptionsDialog::setModel(OptionsModel* model)
 
     // option tooltips, strings taken from -help
     ui->logEvents->setToolTip(tr("Maintain a full EVM log index, used by searchlogs and gettransactionreceipt rpc calls (default: %u)")
-            .replace(QString("%u"),tr("false")));
+            .replace(QString("%u"),tr("no")));
     ui->txIndex->setToolTip(tr("Maintain a full transaction index, used by the getrawtransaction rpc call (default: %u)")
-            .replace(QString("%u"),tr("false")));
-    ui->addressIndex->setToolTip(tr("Maintain a full address index, used to query for the balance, txids and unspent outputs for addresses (default: %u)").replace(QString("%u"), DEFAULT_ADDRESSINDEX ? tr("true") : tr("false")));
+            .replace(QString("%u"),tr("yes")));
+    ui->addressIndex->setToolTip(tr("Maintain a full address index, used to query for the balance, txids and unspent outputs for addresses (default: %u)").replace(QString("%u"), DEFAULT_ADDRESSINDEX ? tr("yes") : tr("no")));
 
     /* Wallet */
     connect(ui->spendZeroConfChange, SIGNAL(clicked(bool)), this, SLOT(showRestartWarning()));
