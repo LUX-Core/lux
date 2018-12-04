@@ -1506,6 +1506,11 @@ bool AppInit2()
                 // Note that it also sets fReindex based on the disk flag!
                 // From here on out fReindex and fReset mean something different!
                 if (!LoadBlockIndex()) {
+                    if (fRequestShutdown)
+                    {
+                        LogPrintf("Shutdown requested. Exiting.\n");
+                        return false;
+                    }
                     strLoadError = _("Error loading block database");
                     break;
                 }
