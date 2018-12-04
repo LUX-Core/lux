@@ -818,18 +818,14 @@ bool Stake::SelectStakeCoins(CWallet* wallet, std::set <std::pair<const CWalletT
     stakecoins.clear();
     for (auto const& out : coins) {
         CAmount nValue = out.tx->vout[out.i].nValue;
-        bool addToSet = true;
+
         // make sure not to outrun target amount
-        if (selectedAmount >= targetAmount)
-            break;
+        if (selectedAmount + nValue > targetAmount)
+            continue;
 
         // do not add small inputs to stake set
         if (hasMinInputSize && nValue < STAKE_INVALID_SPLIT_MIN_COINS)
-            addToSet = false;
-
-        // do not add locked coins to stake set
-        if (wallet->IsLockedCoin(out.tx->GetHash(), out.i))
-            addToSet = false;
+            continue;
 
         // check for min age
         auto const nAge = stake->GetStakeAge(out.tx->GetTxTime());
@@ -840,13 +836,10 @@ bool Stake::SelectStakeCoins(CWallet* wallet, std::set <std::pair<const CWalletT
             continue;
 
         // add to our stake set
-        if (addToSet)
-            stakecoins.insert(make_pair(out.tx, out.i));
+        stakecoins.insert(make_pair(out.tx, out.i));
         selectedAmount += nValue;
     }
     if (!stakecoins.empty()) {
-        if (hasMinInputSize && selectedAmount < STAKE_INVALID_SPLIT_MIN_COINS)
-            stakecoins.clear();
         nLastSelectTime = nTime;
         return true;
     }
