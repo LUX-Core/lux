@@ -812,28 +812,40 @@ bool Stake::SelectStakeCoins(CWallet* wallet, std::set <std::pair<const CWalletT
     }
 
     int64_t selectedAmount = 0;
+    bool hasMinInputSize = chainActive.Height() >= REJECT_INVALID_SPLIT_BLOCK_HEIGHT;
     vector<COutput> coins;
     wallet->AvailableCoins(coins, true);
     stakecoins.clear();
     for (auto const& out : coins) {
-        //make sure not to outrun target amount
-        if (selectedAmount + out.tx->vout[out.i].nValue > targetAmount)
-            continue;
+        CAmount nValue = out.tx->vout[out.i].nValue;
+        bool addToSet = true;
+        // make sure not to outrun target amount
+        if (selectedAmount >= targetAmount)
+            break;
 
-        //check for min age
+        // do not add small inputs to stake set
+        if (hasMinInputSize && nValue < STAKE_INVALID_SPLIT_MIN_COINS)
+            addToSet = false;
+
+        // do not add locked coins to stake set
+        if (wallet->IsLockedCoin(out.tx->GetHash(), out.i))
+            addToSet = false;
+
+        // check for min age
         auto const nAge = stake->GetStakeAge(out.tx->GetTxTime());
         if (nTime < nAge) continue;
 
-        //check that it is matured
+        // check that it is matured
         if (out.nDepth < (out.tx->IsCoinStake() ? Params().COINBASE_MATURITY() : 10))
             continue;
 
-        //add to our stake set
-        stakecoins.insert(make_pair(out.tx, out.i));
-        selectedAmount += out.tx->vout[out.i].nValue;
+        // add to our stake set
+        if (addToSet)
+            stakecoins.insert(make_pair(out.tx, out.i));
+        selectedAmount += nValue;
     }
     if (!stakecoins.empty()) {
-        if (selectedAmount < STAKE_INVALID_SPLIT_MIN_COINS && chainActive.Height() >= REJECT_INVALID_SPLIT_BLOCK_HEIGHT)
+        if (hasMinInputSize && selectedAmount < STAKE_INVALID_SPLIT_MIN_COINS)
             stakecoins.clear();
         nLastSelectTime = nTime;
         return true;
