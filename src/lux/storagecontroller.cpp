@@ -1,14 +1,14 @@
 #include "storagecontroller.h"
 #include "protocol.h"
 #include "net.h"
+#include "main.h"
 
 StorageController storageController;
 
-void AnnounceOrder(const StorageOrder &order, const std::string &path)
+void StorageController::AnnounceOrder(StorageOrder order, const std::string &path)
 {
     uint256 hash = order.GetHash();
-    mapAnnouncements[hash] = order;
-    mapLocalFiles[hash] = path;
+    proposalsAgent.AddOrder(order, path);
 
     CInv inv(MSG_STORAGE_ORDER_ANNOUNCE, hash);
     vector <CInv> vInv;
@@ -25,7 +25,7 @@ void AnnounceOrder(const StorageOrder &order, const std::string &path)
         }
         if (pnode->nVersion >= ActiveProtocol()) {
             LOCK(pnode->cs_filter);
-            if (pnode->pfilter==nullptr) {
+            if (pnode->pfilter == nullptr) {
                 pnode->PushMessage("inv", vInv);
             }
         }

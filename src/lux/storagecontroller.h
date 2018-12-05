@@ -17,8 +17,8 @@ private:
     StorageHeap tempStorageHeap;
     ProposalsAgent proposalsAgent;
 public:
-    void AnnounceOrder(const StorageOrder &order, const std::string &path);
-    std::vector<StorageOrder> GetAnnounces();
+    void AnnounceOrder(StorageOrder order, const std::string &path);
+    //std::vector<StorageOrder> GetAnnounces();
 
 };
 
