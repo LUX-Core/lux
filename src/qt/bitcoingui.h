@@ -40,6 +40,8 @@ class MasternodeList;
 class HexAddressConverter;
 class CBlockIndex;
 class UpdateDialog;
+class HelpMessageDialog;
+
 
 class CWallet;
 
@@ -99,7 +101,8 @@ private:
 
     UnitDisplayStatusBarControl* unitDisplayControl;
     QLabel* labelStakingIcon;
-    QLabel* labelEncryptionIcon;
+    QLabel* labelWalletEncryptionIcon;
+    QLabel* labelWalletHDStatusIcon;
     QPushButton* labelConnectionsIcon;
     QLabel* labelBlocksIcon;
     QLabel* progressBarLabel;
@@ -150,6 +153,7 @@ private:
     QMenu* trayIconMenu;
     Notificator* notificator;
     RPCConsole* rpcConsole;
+    HelpMessageDialog* helpMessageDialog;
     BlockExplorer* explorerWindow;
     HexAddressConverter* hexAddressWindow;
     ModalOverlay* modalOverlay;
@@ -213,6 +217,13 @@ public Q_SLOTS:
     void setStakingStatus();
 
 #ifdef ENABLE_WALLET
+
+    /** Set the hd-enabled status as shown in the UI.
+     @param[in] status            current hd enabled status
+     @see WalletModel::EncryptionStatus
+     */
+    void setHDStatus(int hdEnabled);
+
     /** Set the encryption status as shown in the UI.
        @param[in] status            current encryption status
        @see WalletModel::EncryptionStatus
@@ -294,6 +305,9 @@ private Q_SLOTS:
 
     /** When hideTrayIcon setting is changed in OptionsModel hide or show the icon accordingly. */
     void setTrayIconVisible(bool);
+
+    /** Toggle networking */
+    void toggleNetworkActive();
 
     void showModalOverlay();
 };

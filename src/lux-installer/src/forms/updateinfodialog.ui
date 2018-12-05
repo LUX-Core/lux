@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>UpdateInfoDialog</class>
+ <widget class="QDialog" name="UpdateInfoDialog">
+  <property name="windowModality">
+   <enum>Qt::WindowModal</enum>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>612</width>
+    <height>380</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Check for Updates</string>
+  </property>
+  <property name="sizeGripEnabled">
+   <bool>true</bool>
+  </property>
+  <property name="modal">
+   <bool>true</bool>
+  </property>
+  <layout class="QHBoxLayout" name="rootLayout">
+   <item>
+    <widget class="QLabel" name="imageLabel">
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QVBoxLayout" name="verticalLayout_3">
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <property name="spacing">
+        <number>12</number>
+       </property>
+       <item>
+        <widget class="QLabel" name="headerLabel">
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+          </font>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="stateLabel">
+         <property name="text">
+          <string>There are new updates available! You can install them now or automatically, when you exit the application. If you don't want to install updates right know, you can install them later.</string>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_2">
+         <property name="font">
+          <font>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>Updates:</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <widget class="QTreeWidget" name="updateListTreeWidget">
+       <property name="editTriggers">
+        <set>QAbstractItemView::NoEditTriggers</set>
+       </property>
+       <property name="tabKeyNavigation">
+        <bool>true</bool>
+       </property>
+       <property name="showDropIndicator" stdset="0">
+        <bool>false</bool>
+       </property>
+       <property name="alternatingRowColors">
+        <bool>true</bool>
+       </property>
+       <property name="selectionMode">
+        <enum>QAbstractItemView::NoSelection</enum>
+       </property>
+       <property name="rootIsDecorated">
+        <bool>false</bool>
+       </property>
+       <property name="itemsExpandable">
+        <bool>false</bool>
+       </property>
+       <property name="expandsOnDoubleClick">
+        <bool>false</bool>
+       </property>
+       <column>
+        <property name="text">
+         <string>Component Name</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>Version</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>Update Size</string>
+        </property>
+       </column>
+      </widget>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_2">
+       <item>
+        <widget class="QLabel" name="urlReleaseLabel">
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>https://github.com/LUX-Core/lux/releases</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="runAdminCheckBox">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="text">
+          <string>Run with &amp;elevated rights</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <widget class="QPushButton" name="skipButton">
+         <property name="toolTip">
+          <string>Close and do nothing. You can install updates later.</string>
+         </property>
+         <property name="text">
+          <string>Install later</string>
+         </property>
+         <property name="autoDefault">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QPushButton" name="delayButton">
+         <property name="toolTip">
+          <string>You proceed using the application, and as soon as you close it, the updater will start automatically to install the updates.</string>
+         </property>
+         <property name="text">
+          <string>Install On Exit</string>
+         </property>
+         <property name="autoDefault">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="acceptButton">
+         <property name="toolTip">
+          <string>Closes the application and opens the installer to update the app.</string>
+         </property>
+         <property name="text">
+          <string>Install Now</string>
+         </property>
+         <property name="autoDefault">
+          <bool>false</bool>
+         </property>
+         <property name="default">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <tabstops>
+  <tabstop>updateListTreeWidget</tabstop>
+  <tabstop>runAdminCheckBox</tabstop>
+  <tabstop>acceptButton</tabstop>
+  <tabstop>delayButton</tabstop>
+  <tabstop>skipButton</tabstop>
+ </tabstops>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>skipButton</sender>
+   <signal>clicked()</signal>
+   <receiver>UpdateInfoDialog</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>96</x>
+     <y>368</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>199</x>
+     <y>351</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

@@ -54,7 +54,7 @@ private Q_SLOTS:
     void CancelOrderSlot(int row, int col);
     void BidInfoInsertSlot(int row, int col);
     void AskInfoInsertSlot(int row, int col);
-    void on_UpdateKeys_clicked(bool Save=true, bool Load=true);
+    void on_UpdateKeys_clicked();
     void on_LoadKeys_clicked();
     void on_SaveKeys_clicked();
     void on_GenDepositBTN_clicked();
@@ -74,14 +74,17 @@ private Q_SLOTS:
 
     void CalculateBuyCostLabel();
     void on_Buy_Max_Amount_clicked();
+
+#if 0
     void on_BuyBidcomboBox_currentIndexChanged(const QString &arg1);
+    void on_SellBidcomboBox_currentIndexChanged(const QString &arg1);
+#endif
     void on_UnitsInput_textChanged(const QString &arg1);
     void on_BuyBidPriceEdit_textChanged(const QString &arg1);
     void on_BuyLUX_clicked();
 
     void CalculateSellCostLabel();
     void on_Sell_Max_Amount_clicked();
-    void on_SellBidcomboBox_currentIndexChanged(const QString &arg1);
     void on_UnitsInputLUX_textChanged(const QString &arg1);
     void on_SellBidPriceEdit_textChanged(const QString &arg1);
     void on_SellLUXBTN_clicked();
@@ -140,6 +143,8 @@ private:
     QCustomPlot* derPlot;
     QCPFinancial *ohlc;
     QNetworkAccessManager *qmanager;
+    bool Save=false;
+    bool Load=false;
 
 };
 

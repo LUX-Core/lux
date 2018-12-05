@@ -171,8 +171,8 @@ void WalletModel::updateContractBook(const QString &address, const QString &labe
 
 void WalletModel::checkBalanceChanged()
 {
-    TRY_LOCK(cs_main, lockMain);
-    if (!lockMain) return;
+    //TRY_LOCK(cs_main, lockMain);
+    //if (!lockMain) return;
 
     CAmount newBalance = getBalance();
     CAmount newUnconfirmedBalance = getUnconfirmedBalance();
@@ -296,7 +296,7 @@ WalletModel::SendCoinsReturn WalletModel::prepareTransaction(WalletModelTransact
     }
 
     {
-        LOCK2(cs_main, wallet->cs_wallet);
+        //LOCK2(cs_main, wallet->cs_wallet);
 
         transaction.newPossibleKeyChange(wallet);
         CAmount nFeeRequired = 0;
@@ -778,8 +778,8 @@ void WalletModel::listLockedCoins(std::vector<COutPoint>& vOutpts)
 void WalletModel::loadReceiveRequests(std::vector<std::string>& vReceiveRequests)
 {
     LOCK(wallet->cs_wallet);
-    for (const PAIRTYPE(CTxDestination, CAddressBookData) & item : wallet->mapAddressBook)
-        for (const PAIRTYPE(std::string, std::string) & item2 : item.second.destdata)
+    for (const std::pair<CTxDestination, CAddressBookData> & item : wallet->mapAddressBook)
+        for (const std::pair<std::string, std::string> & item2 : item.second.destdata)
             if (item2.first.size() > 2 && item2.first.substr(0, 2) == "rr") // receive request
                 vReceiveRequests.push_back(item2.second);
 }
@@ -797,6 +797,11 @@ bool WalletModel::saveReceiveRequest(const std::string& sAddress, const int64_t 
         return wallet->EraseDestData(dest, key);
     else
         return wallet->AddDestData(dest, key, sRequest);
+}
+
+bool WalletModel::hdEnabled() const
+{
+    return wallet->IsHDEnabled();
 }
 
 bool WalletModel::isMine(CTxDestination address)
@@ -895,7 +900,7 @@ bool WalletModel::abandonTransaction(uint256 hash) const
 
 bool WalletModel::isWalletEnabled()
 {
-    return !GetBoolArg("-disablewallet", DEFAULT_DISABLE_WALLET);
+    return !GetBoolArg("-disablewallet", false);
 }
 
 int WalletModel::getDefaultConfirmTarget() const

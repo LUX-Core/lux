@@ -82,8 +82,8 @@ public:
 };
 
 BanTableModel::BanTableModel(ClientModel *parent) :
-        QAbstractTableModel(parent),
-        clientModel(parent)
+    QAbstractTableModel(parent),
+    clientModel(parent)
 {
     columns << tr("IP/Netmask") << tr("Banned Until");
     priv.reset(new BanTablePriv());
@@ -121,12 +121,12 @@ QVariant BanTableModel::data(const QModelIndex &index, int role) const
     if (role == Qt::DisplayRole) {
         switch(index.column())
         {
-            case Address:
-                return QString::fromStdString(rec->subnet.ToString());
-            case Bantime:
-                QDateTime date = QDateTime::fromMSecsSinceEpoch(0);
-                date = date.addSecs(rec->banEntry.nBanUntil);
-                return date.toString(Qt::SystemLocaleLongDate);
+        case Address:
+            return QString::fromStdString(rec->subnet.ToString());
+        case Bantime:
+            QDateTime date = QDateTime::fromMSecsSinceEpoch(0);
+            date = date.addSecs(rec->banEntry.nBanUntil);
+            return date.toString(Qt::SystemLocaleLongDate);
         }
     }
 

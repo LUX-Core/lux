@@ -237,6 +237,7 @@ template bool base_uint<160>::EqualTo(uint64_t) const;
 template double base_uint<160>::getdouble() const;
 template std::string base_uint<160>::GetHex() const;
 template std::string base_uint<160>::ToString() const;
+template std::string base_uint<160>::ToStringReverseEndian() const;
 template void base_uint<160>::SetHex(const char*);
 template void base_uint<160>::SetHex(const std::string&);
 template unsigned int base_uint<160>::bits() const;

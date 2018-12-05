@@ -624,8 +624,8 @@ void SendCoinsDialog::setBalance(const CAmount& balance, const CAmount& unconfir
 
 void SendCoinsDialog::updateDisplayUnit()
 {
-    TRY_LOCK(cs_main, lockMain);
-    if (!lockMain) return;
+    //TRY_LOCK(cs_main, lockMain);
+    //if (!lockMain) return;
 
     setBalance(model->getBalance(), model->getUnconfirmedBalance(), model->getImmatureBalance(), model->getAnonymizedBalance(),
         model->getWatchBalance(), model->getWatchUnconfirmedBalance(), model->getWatchImmatureBalance());
@@ -751,7 +751,7 @@ void SendCoinsDialog::updateFeeSectionControls()
     ui->checkBoxMinimumFee->setEnabled(ui->radioCustomFee->isChecked());
     ui->labelMinFeeWarning->setEnabled(ui->radioCustomFee->isChecked());
     ui->radioCustomPerKilobyte->setEnabled(ui->radioCustomFee->isChecked() && !ui->checkBoxMinimumFee->isChecked());
-    ui->radioCustomAtLeast->setEnabled(ui->radioCustomFee->isChecked() && !ui->checkBoxMinimumFee->isChecked());
+    ui->radioCustomAtLeast->setEnabled(ui->radioCustomFee->isChecked() && !ui->checkBoxMinimumFee->isChecked() && CoinControlDialog::coinControl->HasSelected());
     ui->customFee->setEnabled(ui->radioCustomFee->isChecked() && !ui->checkBoxMinimumFee->isChecked());
 }
 
@@ -995,8 +995,20 @@ void SendCoinsDialog::coinControlChangeEdited(const QString& text)
 // Coin Control: update labels
 void SendCoinsDialog::coinControlUpdateLabels()
 {
-    if (!model || !model->getOptionsModel() || !model->getOptionsModel()->getCoinControlFeatures())
+    if (!model || !model->getOptionsModel())
         return;
+
+    if (model->getOptionsModel()->getCoinControlFeatures()) {
+        // enable minium absolute fee UI controls
+        ui->radioCustomAtLeast->setVisible(true);
+
+        // only enable the feature if inputs are selected
+        ui->radioCustomAtLeast->setEnabled(CoinControlDialog::coinControl->HasSelected());
+    } else {
+        // in case coin control is disabled (=default), hide minimum absolute fee UI controls
+        ui->radioCustomAtLeast->setVisible(false);
+        return;
+    }
 
     // set pay amounts
     CoinControlDialog::payAmounts.clear();
@@ -1012,7 +1024,6 @@ void SendCoinsDialog::coinControlUpdateLabels()
                 CoinControlDialog::fSubtractFeeFromAmount = true;
         }
     }
-
 
     ui->checkUseDarksend->setChecked(CoinControlDialog::coinControl->useDarksend);
 

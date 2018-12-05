@@ -17,6 +17,7 @@
 #include "optionsmodel.h"
 #include "transactionfilterproxy.h"
 #include "transactiontablemodel.h"
+#include "utilitydialog.h"
 #include "walletmodel.h"
 #include "tokenitemmodel.h"
 #include "platformstyle.h"
@@ -29,10 +30,14 @@
 #include <QStandardItemModel>
 #include <QSortFilterProxyModel>
 
+#include <QMessageBox>
+#include <QPixmap>
+
 #define DECORATION_SIZE 48
 #define ICON_OFFSET 16
 #define NUM_ITEMS 5
-#define TOKEN_SIZE 24
+#define TOKEN_NUM_ITEMS 3
+#define TOKEN_SIZE 35
 #define MARGIN 4
 #define NAME_WIDTH 250 /* to align with txs history amounts */
 
@@ -121,6 +126,8 @@ public:
     void paint(QPainter *painter, const QStyleOptionViewItem &option,
                const QModelIndex &index) const
     {
+        if(index.row() >=TOKEN_NUM_ITEMS)
+            return;
         painter->save();
 
         QIcon tokenIcon/*(":/icons/token")*/;
@@ -163,7 +170,8 @@ public:
         //addressFont.setPixelSize(addressFont.pixelSize() * 0.9);
         painter->setFont(addressFont);
         painter->setPen(COLOR_UNCONFIRMED);
-        QRect receiveAddressRect(decorationRect.right() + MARGIN, decorationSize, mainRect.width() - decorationSize, decorationSize * 2);
+        QRect receiveAddressRect(decorationRect.right() + MARGIN, decorationSize +mainRect.top()
+                                 , mainRect.width() - decorationSize, decorationSize * 2);
         painter->drawText(receiveAddressRect, Qt::AlignLeft|Qt::AlignBottom, receiveAddress);
 
         painter->restore();
@@ -202,6 +210,10 @@ OverviewPage::OverviewPage(const PlatformStyle *platformStyle, QWidget* parent) 
 {
     nDisplayUnit = 0; // just make sure it's not unitialized
     ui->setupUi(this);
+    //set Logo
+    ui->labelLogo->setPixmap(QPixmap(":/images/lux_logo_horizontal")
+                             .scaled(410,80,Qt::KeepAspectRatio,
+                                     Qt::SmoothTransformation));
 
     // Recent transactions
     ui->listTransactions->setItemDelegate(txdelegate);
@@ -213,8 +225,9 @@ OverviewPage::OverviewPage(const PlatformStyle *platformStyle, QWidget* parent) 
 
     ui->listTokens->setItemDelegate(tkndelegate);
     ui->listTokens->setIconSize(QSize(DECORATION_SIZE, DECORATION_SIZE));
-    //ui->listTokens->setMinimumHeight(NUM_ITEMS * (DECORATION_SIZE + 2));
+    ui->listTokens->setMinimumHeight(TOKEN_NUM_ITEMS * (DECORATION_SIZE + 2));
     ui->listTokens->setAttribute(Qt::WA_MacShowFocusRect, false);
+    connect(ui->listTokens, SIGNAL(clicked(QModelIndex)), this, SLOT(handleTokenClicked(QModelIndex)));
 
     // init "out of sync" warning labels
     ui->labelWalletStatus->setText("(" + tr("out of sync") + ")");
@@ -226,24 +239,28 @@ OverviewPage::OverviewPage(const PlatformStyle *platformStyle, QWidget* parent) 
     }
 #else
        {
-        if(fMasterNode || nWalletBackups <= 0){
-           // DisableDarksend();
-            if (nWalletBackups <= 0) {
-                ui->darksendEnabled->setToolTip(tr("Automatic backups are disabled, no mixing available!"));
-               }
+        if (fMasterNode) {
+            ui->toggleDarksend->setText("(" + tr("Disabled") + ")");
+            ui->darksendAuto->setText("(" + tr("Disabled") + ")");
+            ui->darksendReset->setText("(" + tr("Disabled") + ")");
+            ui->frameDarksend->setEnabled(false);
         } else {
             if (!fEnableDarksend) {
+                ui->darksendEnabled->setText(tr("Disabled"));
                 ui->toggleDarksend->setText(tr("Start Luxsend"));
             } else {
+                ui->darksendEnabled->setText(tr("Enabled"));
                 ui->toggleDarksend->setText(tr("Stop Luxsend"));
             }
-            darkSendPool.fCreateAutoBackups = false;
             timer = new QTimer(this);
             connect(timer, SIGNAL(timeout()), this, SLOT(darkSendStatus()));
             timer->start(1000);
         }
     }
 #endif
+
+    if (this->walletModel)
+        updateAdvancedUI(this->walletModel->getOptionsModel()->getShowAdvancedUI());
 
     // start with displaying the "out of sync" warnings
     showOutOfSyncWarning(true);
@@ -253,6 +270,12 @@ void OverviewPage::handleTransactionClicked(const QModelIndex& index)
 {
     if (filter)
         Q_EMIT transactionClicked(filter->mapToSource(index));
+}
+
+void OverviewPage::handleTokenClicked(const QModelIndex& index)
+{
+    if (tokenProxyModel)
+        emit tokenClicked(tokenProxyModel->mapToSource(index));
 }
 
 void OverviewPage::handleOutOfSyncWarningClicks()
@@ -374,13 +397,13 @@ void OverviewPage::setWalletModel(WalletModel* model)
     if(model && model->getTokenItemModel())
     {
         // Sort tokens by name
-        QSortFilterProxyModel *proxyModel = new QSortFilterProxyModel(this);
+        tokenProxyModel = new QSortFilterProxyModel(this);
         TokenItemModel* tokenModel = model->getTokenItemModel();
-        proxyModel->setSourceModel(tokenModel);
-        proxyModel->sort(0, Qt::AscendingOrder);
+        tokenProxyModel->setSourceModel(tokenModel);
+        tokenProxyModel->sort(0, Qt::AscendingOrder);
 
         // Set tokens model
-        ui->listTokens->setModel(proxyModel);
+        ui->listTokens->setModel(tokenProxyModel);
     }
 
     // update the display unit, to not use the default ("LUX")
@@ -447,8 +470,8 @@ void OverviewPage::updateDarkSendProgress()
     double nAverageAnonymizedRounds;
 
     {
-        TRY_LOCK(cs_main, lockMain);
-        if (!lockMain) return;
+        //TRY_LOCK(cs_main, lockMain);
+        //if (!lockMain) return;
 
         nDenominatedConfirmedBalance = pwalletMain->GetDenominatedBalance(false);
         nDenominatedUnconfirmedBalance = pwalletMain->GetDenominatedBalance(true, false);
@@ -531,15 +554,18 @@ void OverviewPage::updateDarkSendProgress()
 }
 
 void OverviewPage::updateAdvancedUI(bool fShowAdvancedPSUI) {
-    //ui->labelCompletitionText->setVisible(fShowAdvancedPSUI);
+    ui->labelCompletitionText->setVisible(fShowAdvancedPSUI);
     ui->darksendProgress->setVisible(fShowAdvancedPSUI);
-    //ui->labelSubmittedDenomText->setVisible(fShowAdvancedPSUI);
+    ui->labelAnonymizedText->setVisible(fShowAdvancedPSUI);
+    ui->labelAnonymized->setVisible(fShowAdvancedPSUI);
+    ui->labelAmountRoundsText->setVisible(fShowAdvancedPSUI);
+    ui->labelAmountRounds->setVisible(fShowAdvancedPSUI);
+    ui->labelSubmittedDenomText->setVisible(fShowAdvancedPSUI);
     ui->labelSubmittedDenom->setVisible(fShowAdvancedPSUI);
+    ui->darkSendStatus->setVisible(fShowAdvancedPSUI);
     ui->darksendAuto->setVisible(fShowAdvancedPSUI);
     ui->darksendReset->setVisible(fShowAdvancedPSUI);
-   // ui->labelDarkSendLastMessage->setVisible(fShowAdvancedPSUI);
 }
-
 
 void OverviewPage::darkSendStatus()
 {
@@ -557,7 +583,7 @@ void OverviewPage::darkSendStatus()
             updateDarkSendProgress();
 
             ui->darksendEnabled->setText(tr("Disabled"));
-          //  ui->labelDarkSendLastMessage->setText("");
+            ui->darkSendStatus->setText("");
             ui->toggleDarksend->setText(tr("Start Luxsend"));
         }
 
@@ -573,14 +599,37 @@ void OverviewPage::darkSendStatus()
         ui->darksendEnabled->setText(tr("Enabled"));
     }
 
-    QString strStatus = QString(darkSendPool.GetState());
-
-    QString s = tr("Last Darksend message:\n") + strStatus;
-
-    //if (s != ui->labelDarkSendLastMessage->text())
-     //   LogPrintf("Last Darksend message: %s\n", strStatus.toStdString());
-
-    //ui->labelDarkSendLastMessage->setText(s);
+    QString strStatus;
+    int poolStatus = darkSendPool.GetState();
+    switch (poolStatus) {
+        case POOL_STATUS_UNKNOWN:
+        case POOL_STATUS_IDLE:
+            strStatus = tr("Waiting for update");
+            break;
+        case POOL_STATUS_QUEUE:
+            strStatus = tr("Waiting in a queue");
+            break;
+        case POOL_STATUS_ACCEPTING_ENTRIES:
+            strStatus = tr("Accepting entries");
+            break;
+        case POOL_STATUS_FINALIZE_TRANSACTION:
+            strStatus = tr("Master node broadcast");
+            break;
+        case POOL_STATUS_SIGNING:
+            strStatus = tr("Signing");
+            break;
+        case POOL_STATUS_TRANSMISSION:
+            strStatus = tr("Transmitting");
+            break;
+        case POOL_STATUS_ERROR:
+            strStatus = tr("Errored");
+            break;
+        case POOL_STATUS_SUCCESS:
+            strStatus = tr("Success");
+            break;
+        default:
+            strStatus = QString("");
+    }
 
     if (darkSendPool.sessionDenom == 0) {
         ui->labelSubmittedDenom->setText(tr("N/A"));
@@ -591,6 +640,12 @@ void OverviewPage::darkSendStatus()
         ui->labelSubmittedDenom->setText(s2);
     }
 
+    if (strStatus != ui->darkSendStatus->text() && !strStatus.isEmpty()) {
+        LogPrintf("Last Luxsend message: %s\n", strStatus.toStdString().c_str());
+        ui->darkSendStatus->setText(strStatus);
+    } else {
+        ui->darkSendStatus->setText("");
+    }
 }
 
 void OverviewPage::darksendAuto()
@@ -651,6 +706,8 @@ void OverviewPage::toggleDarksend()
 
     fEnableDarksend = !fEnableDarksend;
     darkSendPool.cachedNumBlocks = std::numeric_limits<int>::max();
+
+    updateAdvancedUI(this->walletModel->getOptionsModel()->getShowAdvancedUI());
 
     if (!fEnableDarksend) {
         ui->toggleDarksend->setText(tr("Start Luxsend"));

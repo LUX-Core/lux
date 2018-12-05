@@ -190,11 +190,6 @@ Q_SIGNALS:
     void runawayException(const QString& message);
 
 private:
-    boost::thread_group threadGroup;
-    CScheduler scheduler;
-
-    /// Flag indicating a restart
-    bool execute_restart;
 
     /// Pass fatal exception message to UI thread
     void handleRunawayException(std::exception* e);
@@ -257,6 +252,7 @@ private:
 #endif
     int returnValue;
     const PlatformStyle* platformStyle;
+    std::unique_ptr<QWidget> shutdownWindow;
 
     void startThread();
 
@@ -279,17 +275,9 @@ void BitcoinCore::handleRunawayException(std::exception* e)
 
 void BitcoinCore::initialize()
 {
-    execute_restart = true;
-
     try {
         qDebug() << __func__ << ": Running AppInit2 in thread";
-        int rv = AppInit2(threadGroup, scheduler);
-        if (rv) {
-            /* Start a dummy RPC thread if no RPC thread is active yet
-             * to handle timeouts.
-             */
-            StartDummyRPCThread();
-        }
+        int rv = AppInit2();
         Q_EMIT initializeResult(rv);
     } catch (std::exception& e) {
         handleRunawayException(&e);
@@ -300,12 +288,14 @@ void BitcoinCore::initialize()
 
 void BitcoinCore::restart(QStringList args)
 {
-    if (execute_restart) { // Only restart 1x, no matter how often a user clicks on a restart-button
-        execute_restart = false;
+    static bool executing_restart{false};
+
+    if(!executing_restart) { // Only restart 1x, no matter how often a user clicks on a restart-button
+        executing_restart = true;
         try {
             qDebug() << __func__ << ": Running Restart in thread";
-            threadGroup.interrupt_all();
-            threadGroup.join_all();
+            Interrupt();
+            StartRestart();
             PrepareShutdown();
             qDebug() << __func__ << ": Shutdown finished";
             Q_EMIT shutdownResult(1);
@@ -325,8 +315,7 @@ void BitcoinCore::shutdown()
 {
     try {
         qDebug() << __func__ << ": Running Shutdown in thread";
-        threadGroup.interrupt_all();
-        threadGroup.join_all();
+        Interrupt();
         Shutdown();
         qDebug() << __func__ << ": Shutdown finished";
         Q_EMIT shutdownResult(1);
@@ -429,7 +418,7 @@ void BitcoinApplication::createSplashScreen(const NetworkStyle* networkStyle)
     SplashScreen* splash = new SplashScreen(0, networkStyle);
     // We don't hold a direct pointer to the splash screen after creation, so use
     // Qt::WA_DeleteOnClose to make sure that the window will be deleted eventually.
-    splash->setAttribute(Qt::WA_DeleteOnClose);
+//    splash->setAttribute(Qt::WA_DeleteOnClose);
     splash->show();
     connect(this, SIGNAL(splashFinished(QWidget*)), splash, SLOT(slotFinish(QWidget*)));
 }
@@ -465,7 +454,7 @@ void BitcoinApplication::requestInitialize()
 
 void BitcoinApplication::requestShutdown()
 {
-    ShutdownWindow::showShutdownWindow(window);
+    shutdownWindow.reset(ShutdownWindow::showShutdownWindow(window));
     qDebug() << __func__ << ": Requesting shutdown";
     startThread();
     window->hide();
@@ -488,6 +477,7 @@ void BitcoinApplication::requestShutdown()
     }
     clientModel = 0;
 
+    StartShutdown();
     // Request shutdown from core thread
     Q_EMIT requestedShutdown();
 }
@@ -650,8 +640,8 @@ int main(int argc, char* argv[])
 
     // Show help message immediately after parsing command-line options (for "-lang") and setting locale,
     // but before showing splash screen.
-    if (mapArgs.count("-?") || mapArgs.count("-help") || mapArgs.count("-version")) {
-        HelpMessageDialog help(NULL, mapArgs.count("-version"));
+    if (mapArgs.count("-?") || mapArgs.count("-h") || mapArgs.count("-help") || mapArgs.count("-version")) {
+        HelpMessageDialog help(NULL, mapArgs.count("-version") ? HelpMessageDialog::about : HelpMessageDialog::cmdline);
         help.showOrPrint();
         return 1;
     }

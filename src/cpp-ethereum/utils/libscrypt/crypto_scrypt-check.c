@@ -1,17 +1,17 @@
+#ifdef _WIN32
+#define strtok_r strtok_s
+#else
+#define _POSIX_C_SOURCE 200112L /* for strtok_r decl with c99 */
+#endif
+
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdio.h>
 #include <math.h>
 
 #include "b64.h"
 #include "slowequals.h"
 #include "libscrypt.h"
-
-#if defined(_WIN32)
-/* On windows, strtok uses a thread-local static variable in strtok to
- * make strtok thread-safe.  It also neglects to provide a strtok_r. */
-#define strtok_r(str, val, saveptr) strtok((str), (val))
-#endif
 
 int libscrypt_check(char *mcf, const char *password)
 {
@@ -21,9 +21,7 @@ int libscrypt_check(char *mcf, const char *password)
 	* >0 correct password
 	*/
 
-#ifndef _WIN32
 	char *saveptr = NULL;
-#endif
 	uint32_t params;
 	uint64_t N;
 	uint8_t r, p;

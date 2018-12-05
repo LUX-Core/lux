@@ -28,7 +28,6 @@
 #include <QDateTime>
 #include <QDebug>
 #include <QTimer>
-
 class CBlockIndex;
 
 static const int64_t nClientStartupTime = GetTime();

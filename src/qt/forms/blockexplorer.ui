@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>600</height>
+    <width>1280</width>
+    <height>800</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -22,12 +22,20 @@
       </property>
       <item>
        <widget class="QPushButton" name="back">
-        <property name="text">
-         <string/>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
         </property>
-        <property name="icon">
-         <iconset resource="../lux.qrc">
-          <normaloff>:/icons/back</normaloff>:/icons/back</iconset>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>30</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>&lt;</string>
         </property>
         <property name="flat">
          <bool>false</bool>
@@ -35,13 +43,44 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="forward">
+       <widget class="QPushButton" name="pushButtonHome">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>30</height>
+         </size>
+        </property>
         <property name="text">
          <string/>
         </property>
         <property name="icon">
          <iconset resource="../lux.qrc">
-          <normaloff>:/icons/forward</normaloff>:/icons/forward</iconset>
+          <normaloff>:/icons/res/icons/home.png</normaloff>:/icons/res/icons/home.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>14</width>
+          <height>14</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="forward">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>30</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>&gt;</string>
         </property>
        </widget>
       </item>
@@ -56,7 +95,7 @@
         <property name="minimumSize">
          <size>
           <width>0</width>
-          <height>0</height>
+          <height>30</height>
          </size>
         </property>
         <property name="inputMask">
@@ -81,7 +120,7 @@
         <property name="minimumSize">
          <size>
           <width>0</width>
-          <height>0</height>
+          <height>30</height>
          </size>
         </property>
         <property name="maximumSize">
@@ -116,8 +155,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>780</width>
-         <height>498</height>
+         <width>1580</width>
+         <height>720</height>
         </rect>
        </property>
        <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -148,16 +187,6 @@
      </widget>
     </item>
    </layout>
-  </widget>
-  <widget class="QMenuBar" name="menubar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>800</width>
-     <height>25</height>
-    </rect>
-   </property>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>

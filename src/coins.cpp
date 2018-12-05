@@ -3,8 +3,9 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "coins.h"
-
+#include "memusage.h"
 #include "random.h"
+#include "util.h"
 
 #include <assert.h>
 
@@ -32,29 +33,13 @@ void CCoins::CalcMaskSize(unsigned int& nBytes, unsigned int& nNonzeroBytes) con
     nBytes += nLastUsedByte;
 }
 
-bool CCoins::Spend(const COutPoint& out, CTxInUndo& undo)
+bool CCoins::Spend(uint32_t nPos)
 {
-    if (out.n >= vout.size())
+    if (nPos >= vout.size() || vout[nPos].IsNull())
         return false;
-    if (vout[out.n].IsNull())
-        return false;
-    undo = CTxInUndo(vout[out.n]);
-    vout[out.n].SetNull();
+    vout[nPos].SetNull();
     Cleanup();
-    if (vout.size() == 0) {
-        undo.nHeight = nHeight;
-        undo.fCoinBase = fCoinBase;
-        undo.fCoinStake = fCoinStake;
-        undo.nVersion = this->nVersion;
-    }
     return true;
-}
-
-bool CCoins::Spend(int nPos)
-{
-    CTxInUndo undo;
-    COutPoint out(0, nPos);
-    return Spend(out, undo);
 }
 
 
@@ -76,6 +61,11 @@ bool CCoinsViewBacked::HaveCoins(const uint256& txid) const
 {
     if (!base) return false;
     return base->HaveCoins(txid);
+}
+
+bool CCoinsViewCache::HaveCoinsInCache(const uint256 &txid) const {
+    CCoinsMap::const_iterator it = cacheCoins.find(txid);
+    return it != cacheCoins.end();
 }
 
 uint256 CCoinsViewBacked::GetBestBlock() const
@@ -103,11 +93,15 @@ bool CCoinsViewBacked::GetStats(CCoinsStats& stats) const
 
 CCoinsKeyHasher::CCoinsKeyHasher() : salt(GetRandHash()) {}
 
-CCoinsViewCache::CCoinsViewCache(CCoinsView* baseIn) : CCoinsViewBacked(baseIn), hasModifier(false), hashBlock(0) {}
+CCoinsViewCache::CCoinsViewCache(CCoinsView* baseIn) : CCoinsViewBacked(baseIn), hasModifier(false), hashBlock(0), cachedCoinsUsage(0) {}
 
 CCoinsViewCache::~CCoinsViewCache()
 {
     assert(!hasModifier);
+}
+
+size_t CCoinsViewCache::DynamicMemoryUsage() const {
+    return memusage::DynamicUsage(cacheCoins) + cachedCoinsUsage;
 }
 
 CCoinsMap::const_iterator CCoinsViewCache::FetchCoins(const uint256& txid) const
@@ -125,6 +119,7 @@ CCoinsMap::const_iterator CCoinsViewCache::FetchCoins(const uint256& txid) const
         // version as fresh.
         ret->second.flags = CCoinsCacheEntry::FRESH;
     }
+    cachedCoinsUsage += ret->second.coins.DynamicMemoryUsage();
     return ret;
 }
 
@@ -142,19 +137,50 @@ CCoinsModifier CCoinsViewCache::ModifyCoins(const uint256& txid)
 {
     assert(!hasModifier);
     std::pair<CCoinsMap::iterator, bool> ret = cacheCoins.insert(std::make_pair(txid, CCoinsCacheEntry()));
+    size_t cachedCoinUsage = 0;
     if (ret.second) {
         if (!base->GetCoins(txid, ret.first->second.coins)) {
             // The parent view does not have this entry; mark it as fresh.
             ret.first->second.coins.Clear();
-            ret.first->second.flags = CCoinsCacheEntry::FRESH;
-        } else if (ret.first->second.coins.IsPruned()) {
-            // The parent view only has a pruned entry for this; mark it as fresh.
-            ret.first->second.flags = CCoinsCacheEntry::FRESH;
+            // New coins must not already exist.
+            if (!ret.first->second.coins.IsPruned())
+                throw std::logic_error("ModifyCoins should not find pre-existing coins on a non-coinbase unless they are pruned!");
+
+            if (!(ret.first->second.flags & CCoinsCacheEntry::FRESH)) {
+                // If the coin is known to be pruned (have no unspent outputs) in
+                // the current view and the cache entry is not dirty, we know the
+                // coin also must be pruned in the parent view as well, so it is safe
+                // to mark this fresh.
+                ret.first->second.flags |= CCoinsCacheEntry::FRESH;
+            }
         }
+    } else {
+        cachedCoinUsage = ret.first->second.coins.DynamicMemoryUsage();
     }
     // Assume that whenever ModifyCoins is called, the entry will be modified.
     ret.first->second.flags |= CCoinsCacheEntry::DIRTY;
-    return CCoinsModifier(*this, ret.first);
+    return CCoinsModifier(*this, ret.first, cachedCoinUsage);
+}
+
+CCoinsModifier CCoinsViewCache::ModifyNewCoins(const uint256 &txid, bool coinbase) {
+    assert(!hasModifier);
+    std::pair<CCoinsMap::iterator, bool> ret = cacheCoins.insert(std::make_pair(txid, CCoinsCacheEntry()));
+    if (!coinbase) {
+        // New coins must not already exist.
+        if (!ret.first->second.coins.IsPruned())
+            throw std::logic_error("ModifyNewCoins should not find pre-existing coins on a non-coinbase unless they are pruned!");
+
+        if (!(ret.first->second.flags & CCoinsCacheEntry::DIRTY)) {
+            // If the coin is known to be pruned (have no unspent outputs) in
+            // the current view and the cache entry is not dirty, we know the
+            // coin also must be pruned in the parent view as well, so it is safe
+            // to mark this fresh.
+            ret.first->second.flags |= CCoinsCacheEntry::FRESH;
+        }
+    }
+    ret.first->second.coins.Clear();
+    ret.first->second.flags |= CCoinsCacheEntry::DIRTY;
+    return CCoinsModifier(*this, ret.first, 0);
 }
 
 const CCoins* CCoinsViewCache::AccessCoins(const uint256& txid) const
@@ -192,35 +218,44 @@ void CCoinsViewCache::SetBestBlock(const uint256& hashBlockIn)
 bool CCoinsViewCache::BatchWrite(CCoinsMap& mapCoins, const uint256& hashBlockIn)
 {
     assert(!hasModifier);
-    for (CCoinsMap::iterator it = mapCoins.begin(); it != mapCoins.end();) {
-        if (it->second.flags & CCoinsCacheEntry::DIRTY) { // Ignore non-dirty entries (optimization).
-            CCoinsMap::iterator itUs = cacheCoins.find(it->first);
-            if (itUs == cacheCoins.end()) {
-                if (!it->second.coins.IsPruned()) {
-                    // The parent cache does not have an entry, while the child
-                    // cache does have (a non-pruned) one. Move the data up, and
-                    // mark it as fresh (if the grandparent did have it, we
-                    // would have pulled it in at first GetCoins).
-                    assert(it->second.flags & CCoinsCacheEntry::FRESH);
-                    CCoinsCacheEntry& entry = cacheCoins[it->first];
-                    entry.coins.swap(it->second.coins);
-                    entry.flags = CCoinsCacheEntry::DIRTY | CCoinsCacheEntry::FRESH;
-                }
-            } else {
-                if ((itUs->second.flags & CCoinsCacheEntry::FRESH) && it->second.coins.IsPruned()) {
-                    // The grandparent does not have an entry, and the child is
-                    // modified and being pruned. This means we can just delete
-                    // it from the parent.
-                    cacheCoins.erase(itUs);
-                } else {
-                    // A normal modification.
-                    itUs->second.coins.swap(it->second.coins);
-                    itUs->second.flags |= CCoinsCacheEntry::DIRTY;
+    for (CCoinsMap::iterator it = mapCoins.begin(); it != mapCoins.end(); it = mapCoins.erase(it)) {
+
+        if (!(it->second.flags & CCoinsCacheEntry::DIRTY))
+            continue; // Ignore non-dirty entries
+
+        CCoinsMap::iterator itUs = cacheCoins.find(it->first);
+        if (itUs == cacheCoins.end()) {
+            if (!((it->second.flags & CCoinsCacheEntry::FRESH) && it->second.coins.IsPruned())) {
+                // The parent cache does not have an entry, while the child
+                // cache does have (a non-pruned) one. Move the data up, and
+                // mark it as fresh (if the grandparent did have it, we
+                // would have pulled it in at first GetCoins).
+                CCoinsCacheEntry& entry = cacheCoins[it->first];
+                entry.coins.swap(it->second.coins);
+                cachedCoinsUsage += entry.coins.DynamicMemoryUsage();
+                entry.flags = CCoinsCacheEntry::DIRTY;
+                if (it->second.flags & CCoinsCacheEntry::FRESH) {
+                    entry.flags |= CCoinsCacheEntry::FRESH;
                 }
             }
+        } else {
+            if ((it->second.flags & CCoinsCacheEntry::FRESH) && !itUs->second.coins.IsPruned()) {
+                throw std::logic_error("FRESH flag misapplied to cache entry for base transaction with spendable outputs");
+            }
+            if ((itUs->second.flags & CCoinsCacheEntry::FRESH) && it->second.coins.IsPruned()) {
+                // The grandparent does not have an entry, and the child is
+                // modified and being pruned. This means we can just delete
+                // it from the parent.
+                cachedCoinsUsage -= itUs->second.coins.DynamicMemoryUsage();
+                cacheCoins.erase(itUs);
+            } else {
+                // A normal modification.
+                cachedCoinsUsage -= itUs->second.coins.DynamicMemoryUsage();
+                itUs->second.coins.swap(it->second.coins);
+                cachedCoinsUsage += itUs->second.coins.DynamicMemoryUsage();
+                itUs->second.flags |= CCoinsCacheEntry::DIRTY;
+            }
         }
-        CCoinsMap::iterator itOld = it++;
-        mapCoins.erase(itOld);
     }
     hashBlock = hashBlockIn;
     return true;
@@ -230,7 +265,17 @@ bool CCoinsViewCache::Flush()
 {
     bool fOk = base->BatchWrite(cacheCoins, hashBlock);
     cacheCoins.clear();
+    cachedCoinsUsage = 0;
     return fOk;
+}
+
+void CCoinsViewCache::Uncache(const uint256& hash)
+{
+    CCoinsMap::iterator it = cacheCoins.find(hash);
+    if (it != cacheCoins.end() && it->second.flags == 0) {
+        cachedCoinsUsage -= it->second.coins.DynamicMemoryUsage();
+        cacheCoins.erase(it);
+    }
 }
 
 unsigned int CCoinsViewCache::GetCacheSize() const
@@ -238,10 +283,19 @@ unsigned int CCoinsViewCache::GetCacheSize() const
     return cacheCoins.size();
 }
 
+static const CTxOut INVALID_TXOUT = CTxOut();
+
 const CTxOut& CCoinsViewCache::GetOutputFor(const CTxIn& input) const
 {
     const CCoins* coins = AccessCoins(input.prevout.hash);
-    assert(coins && coins->IsAvailable(input.prevout.n));
+    if (!coins) {
+        LogPrintf("GetOutputFor %s:%u not accessible!\n", input.prevout.hash.GetHex(), input.prevout.n);
+        return INVALID_TXOUT;
+    }
+    if (!coins->IsAvailable(input.prevout.n)) {
+        LogPrintf("GetOutputFor %s:%u not available!\n", input.prevout.hash.GetHex(), input.prevout.n);
+        return INVALID_TXOUT;
+    }
     return coins->vout[input.prevout.n];
 }
 
@@ -289,7 +343,7 @@ double CCoinsViewCache::GetPriority(const CTransaction& tx, int nHeight, CAmount
     return tx.ComputePriority(dResult);
 }
 
-CCoinsModifier::CCoinsModifier(CCoinsViewCache& cache_, CCoinsMap::iterator it_) : cache(cache_), it(it_)
+CCoinsModifier::CCoinsModifier(CCoinsViewCache& cache_, CCoinsMap::iterator it_, size_t usage) : cache(cache_), it(it_), cachedCoinUsage(usage)
 {
     assert(!cache.hasModifier);
     cache.hasModifier = true;
@@ -300,7 +354,11 @@ CCoinsModifier::~CCoinsModifier()
     assert(cache.hasModifier);
     cache.hasModifier = false;
     it->second.coins.Cleanup();
+    cache.cachedCoinsUsage -= cachedCoinUsage; // Subtract the old usage
     if ((it->second.flags & CCoinsCacheEntry::FRESH) && it->second.coins.IsPruned()) {
         cache.cacheCoins.erase(it);
+    } else {
+        // If the coin still exists after the modification, add the new usage
+        cache.cachedCoinsUsage += it->second.coins.DynamicMemoryUsage();
     }
 }

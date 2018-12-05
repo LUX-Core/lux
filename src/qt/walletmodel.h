@@ -246,6 +246,7 @@ public:
     void loadReceiveRequests(std::vector<std::string>& vReceiveRequests);
     bool saveReceiveRequest(const std::string& sAddress, const int64_t nId, const std::string& sRequest);
     CWallet* getCurrentWallet() { return wallet; }
+    bool hdEnabled() const;
 
     bool transactionCanBeAbandoned(uint256 hash) const;
     bool abandonTransaction(uint256 hash) const;

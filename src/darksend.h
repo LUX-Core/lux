@@ -44,11 +44,6 @@ extern std::string strMasterNodePrivKey;
 extern map<uint256, CDarksendBroadcastTx> mapDarksendBroadcastTxes;
 extern CActiveMasternode activeMasternode;
 
-// Warn user if mixing in gui or try to create backup if mixing in daemon mode
-static const int KEYS_THRESHOLD_WARNING = 100;
-// Stop mixing completely, it's too dangerous to continue when we have only this many keys left
-static const int KEYS_THRESHOLD_STOP = 50;
-
 //specific messages for the Darksend protocol
 void ProcessMessageDarksend(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv, bool &isDarksend);
 
@@ -266,7 +261,6 @@ public:
 
     int cachedLastSuccess;
     int cachedNumBlocks; //used for the overview screen
-    bool fCreateAutoBackups; //builtin support for automatic backups
     int minBlockSpacing; //required blocks between mixes
     CMutableTransaction txCollateral;
 
@@ -290,7 +284,6 @@ public:
         minBlockSpacing = 1;
         nDsqCount = 0;
         lastNewBlock = 0;
-        fCreateAutoBackups = true;
 
         SetNull();
     }
@@ -320,8 +313,6 @@ public:
     {
         return state;
     }
-
-    std::string GetStatus();
 
     int GetEntriesCount() const
     {

@@ -19,6 +19,7 @@
 class QMenu;
 class ClientModel;
 class PlatformStyle;
+class RPCTimerInterface;
 
 namespace Ui
 {
@@ -26,6 +27,7 @@ class RPCConsole;
 }
 
 QT_BEGIN_NAMESPACE
+class QMenu;
 class QItemSelection;
 QT_END_NAMESPACE
 
@@ -80,7 +82,7 @@ private Q_SLOTS:
     void clearSelectedNode();
 
 public Q_SLOTS:
-    void clear();
+    void clear(bool clearHistory = true);
     void fontBigger();
     void fontSmaller();
     void setFontSize(int newSize);
@@ -122,7 +124,9 @@ public Q_SLOTS:
     /** Open external (default) editor with masternode.conf */
     void showMNConfEditor();
     /** Handle selection of peer in peers list */
-    void peerSelected(const QItemSelection& selected, const QItemSelection& deselected);
+    void peerSelected(const QItemSelection& selected, const QItemSelection &deselected);
+    /** Handle selection caching before update */
+    void peerLayoutAboutToChange();
     /** Handle updated peer information */
     void peerLayoutChanged();
     /** Disconnect a selected node on the Peers tab */
@@ -162,6 +166,7 @@ private:
 
     Ui::RPCConsole* ui;
     ClientModel* clientModel;
+    QList<NodeId> cachedNodeids;
     QString cmdBeforeBrowsing;
     QStringList history;
     int historyPtr;
@@ -172,6 +177,7 @@ private:
     QMenu* peersTableContextMenu;
     QMenu* banTableContextMenu;
     const PlatformStyle* platformStyle;
+    RPCTimerInterface* rpcTimerInterface;
 
 };
 
