@@ -840,9 +840,10 @@ bool Stake::SelectStakeCoins(CWallet* wallet, std::set <std::pair<const CWalletT
             continue;
 
         // add to our stake set
-        if (addToSet)
+        if (addToSet) {
             stakecoins.insert(make_pair(out.tx, out.i));
-        selectedAmount += nValue;
+            selectedAmount += nValue;
+        }
     }
     if (!stakecoins.empty()) {
         if (hasMinInputSize && selectedAmount < STAKE_INVALID_SPLIT_MIN_COINS)
