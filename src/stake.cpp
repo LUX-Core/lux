@@ -52,7 +52,7 @@ static const int ADVANCED_STAKING_HEIGHT = 225000;
 
 static const int nLuxProtocolSwitchHeight = 520000;
 
-static const int nLuxProtocolSwitchHeightTestnet = 95000; // nHeight = 89032 (1:54 am Tuesday, 20 November 2018)
+static const int nLuxProtocolSwitchHeightTestnet = 95150; // 2018-11-29 02:54:56 (1543460096)
 
 static std::atomic<bool> nStakingInterrupped;
 
