@@ -486,6 +486,14 @@ void SendCoinsDialog::clear()
     }
     addEntry();
 
+    // Reset UTXO split if set
+    if (ui->splitBlockCheckBox->isChecked()) {
+        ui->splitBlockLineEdit->setText("");
+        splitBlockLineEditChanged("");
+        ui->splitBlockCheckBox->setChecked(false);
+        splitBlockChecked(Qt::Unchecked);
+    }
+
     updateTabsAndLabels();
 }
 
