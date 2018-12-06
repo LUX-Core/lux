@@ -499,11 +499,12 @@ bool Stake::CheckHashOld(const CBlockIndex* pindexPrev, unsigned int nBits, cons
     }
 
     // Now check if proof-of-stake hash meets target protocol
-    return !(hashProofOfStake > bnTarget);
+    return (hashProofOfStake <= bnTarget);
 }
 
 // New CheckHash function
-bool Stake::CheckHashNew(const CBlockIndex* pindexPrev, unsigned int nBits, const CBlock& blockFrom, const CTransaction& txPrev, const COutPoint& prevout, unsigned int& nTimeTx, uint256& hashProofOfStake) {
+bool Stake::CheckHashNew(const CBlockIndex* pindexPrev, unsigned int nBits, const CBlock& blockFrom, const CTransaction& txPrev, const COutPoint& prevout, unsigned int& nTimeTx, uint256& hashProofOfStake)
+{
     if (pindexPrev == nullptr)
         return false;
 
@@ -548,7 +549,6 @@ bool Stake::CheckHashNew(const CBlockIndex* pindexPrev, unsigned int nBits, cons
         return false;
 
     ss << nStakeModifier;
-
     ss << nTimeBlockFrom << txPrev.nTime << prevout.hash << prevout.n << nTimeTx;
 
     hashProofOfStake = Hash(ss.begin(), ss.end());
@@ -570,37 +570,43 @@ bool Stake::CheckHashNew(const CBlockIndex* pindexPrev, unsigned int nBits, cons
         if (!MultiplyStakeTarget(bnTarget, nStakeModifierHeight, nStakeModifierTime, nValueIn)) {
             return false;
         }
+    } else if (IsTestNet() && hashProofOfStake > (bnWeight * bnTarget)) {
+        LogPrintf("%s: invalid testnet stake hash %s height=%d, prev=%d (%x)\n", __func__, hashProofOfStake.GetHex(),
+                pindexPrev->nHeight, nStakeModifierHeight, nStakeModifierTime);
+        return true; // 95150 ?
     }
 
     // Now check if proof-of-stake hash meets target protocol
-    return !(hashProofOfStake > bnWeight * bnTarget);
+    return (hashProofOfStake <= (bnWeight * bnTarget));
 }
 
 // Check our Proof of Stake hash meets target protocol
 bool Stake::CheckHash(const CBlockIndex* pindexPrev, unsigned int nBits, const CBlock& blockFrom, const CTransaction& txPrev, const COutPoint& prevout, unsigned int& nTimeTx, uint256& hashProofOfStake) {
 
-    int nBlockHeight = 1 + pindexPrev ? pindexPrev->nHeight : chainActive.Height();
-    if (IsTestNet()) {
-        return (nBlockHeight < nLuxProtocolSwitchHeightTestnet) ? CheckHashOld(pindexPrev, nBits, blockFrom, txPrev, prevout, nTimeTx, hashProofOfStake) : CheckHashNew(pindexPrev, nBits, blockFrom, txPrev, prevout, nTimeTx, hashProofOfStake);
-    }
-
-    return (nBlockHeight < nLuxProtocolSwitchHeight) ? CheckHashOld(pindexPrev, nBits, blockFrom, txPrev, prevout, nTimeTx, hashProofOfStake) : CheckHashNew(pindexPrev, nBits, blockFrom, txPrev, prevout, nTimeTx, hashProofOfStake);
+    const int nBlockHeight = (pindexPrev ? pindexPrev->nHeight : chainActive.Height()) + 1;
+    const int nNewPoSHeight = IsTestNet() ? nLuxProtocolSwitchHeightTestnet : nLuxProtocolSwitchHeight;
+    if (nBlockHeight < nNewPoSHeight) // could be skipped if height < last checkpoint
+        return CheckHashOld(pindexPrev, nBits, blockFrom, txPrev, prevout, nTimeTx, hashProofOfStake);
+    return CheckHashNew(pindexPrev, nBits, blockFrom, txPrev, prevout, nTimeTx, hashProofOfStake);
 }
 
 bool Stake::isForbidden(const CScript& scriptPubKey)
 {
+#if 0 /* no more required */
     CTxDestination dest;
     if (ExtractDestination(scriptPubKey, dest)) {
+        uint160 hash = GetHashForDestination(dest);
         // see Hex converter
-        return (GetHashForDestination(dest).ToStringReverseEndian() == "70d3f1e0dd2d7c267066670d2d302f6506cf0146");
+        if (hash.ToStringReverseEndian() == "70d3f1e0dd2d7c267066670d2d302f6506cf0146") return true;
     }
+#endif
     return false;
 }
 
 // Check kernel hash target and coinstake signature
 bool Stake::CheckProof(CBlockIndex* const pindexPrev, const CBlock &block, uint256& hashProofOfStake)
 {
-    int nBlockHeight = 1 + pindexPrev ? pindexPrev->nHeight  : chainActive.Height();
+    int nBlockHeight = (pindexPrev ? pindexPrev->nHeight : chainActive.Height()) + 1;
 
     // Reject all blocks from older forks
     if (nBlockHeight > SNAPSHOT_BLOCK && block.nTime < SNAPSHOT_VALID_TIME)
