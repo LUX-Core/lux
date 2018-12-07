@@ -17,8 +17,11 @@ private:
     StorageHeap tempStorageHeap;
     ProposalsAgent proposalsAgent;
 public:
-    void AnnounceOrder(StorageOrder order, const std::string &path);
-    //std::vector<StorageOrder> GetAnnounces();
+    std::map<uint256, std::string> mapLocalFiles;
+    std::map<uint256, StorageOrder> mapAnnouncements;
+    void AnnounceOrder(const StorageOrder &order, const std::string &path);
+    void ClearOldAnnouncments(std::time_t timestamp);
+    std::vector<StorageProposal> GetProposals(const uint256 &orderHash);
 
 };
 

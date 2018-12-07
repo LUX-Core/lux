@@ -5,10 +5,11 @@
 
 StorageController storageController;
 
-void StorageController::AnnounceOrder(StorageOrder order, const std::string &path)
+void StorageController::AnnounceOrder(const StorageOrder &order, const std::string &path)
 {
     uint256 hash = order.GetHash();
-    proposalsAgent.AddOrder(order, path);
+    mapAnnouncements[hash] = order;
+    mapLocalFiles[hash] = path;
 
     CInv inv(MSG_STORAGE_ORDER_ANNOUNCE, hash);
     vector <CInv> vInv;
@@ -30,4 +31,20 @@ void StorageController::AnnounceOrder(StorageOrder order, const std::string &pat
             }
         }
     }
+}
+
+void StorageController::ClearOldAnnouncments(std::time_t timestamp)
+{
+    for (auto it = mapAnnouncements.begin(); it != mapAnnouncements.end(); ) {
+        if (it->second.time < timestamp) {
+            mapLocalFiles.erase(it->first);
+            mapAnnouncements.erase(it++);
+        } else {
+            ++it;
+        }
+    }
+}
+
+std::vector<StorageProposal> StorageController::GetProposals(const uint256 &orderHash){
+    return proposalsAgent.GetProposals(orderHash);
 }

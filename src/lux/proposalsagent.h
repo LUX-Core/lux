@@ -6,17 +6,14 @@
 class ProposalsAgent
 {
 private:
-    std::vector<StorageProposal> vProposals;
-    std::map<uint256, StorageOrder> mapAnnouncements;
-    std::map<uint256, std::string> mapLocalFiles;
+    std::map<uint256, std::vector<StorageProposal>> vProposals;
+    std::map<uint256, std::pair<bool, std::time_t>> vListenProposals;
 
 public:
-    void AddOrder(StorageOrder order, const std::string &path);
     void ListenProposal(const uint256 &orderHash);
     void StopListenProposal(const uint256 &orderHash);
-    void ClearOldAnnouncments(size_t timestamp);
-    void AddProposal(StorageProposal proposal);
-    std::vector<StorageProposal> GetProposals(const uint256 &orderHash) const;
+    void AddProposal(const StorageProposal &proposal);
+    std::vector<StorageProposal> GetProposals(const uint256 &orderHash);
 };
 
 #endif //LUX_PROPOSALSAGENT_H

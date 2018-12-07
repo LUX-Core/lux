@@ -5829,8 +5829,8 @@ bool static AlreadyHave(const CInv& inv)
         return mapSporks.count(inv.hash);
     case MSG_MASTERNODE_WINNER:
         return mapSeenMasternodeVotes.count(inv.hash);
-//    case MSG_STORAGE_ORDER_ANNOUNCE:
-//        return storageController.mapAnnouncements.count(inv.hash);
+    case MSG_STORAGE_ORDER_ANNOUNCE:
+        return storageController.mapAnnouncements.count(inv.hash);
     }
     // Don't know what it is, just say we already got one
     return true;
@@ -5982,15 +5982,15 @@ void static ProcessGetData(CNode* pfrom, const Consensus::Params& consensusParam
                         pushed = true;
                     }
                 }
-//                if (!pushed && inv.type == MSG_STORAGE_ORDER_ANNOUNCE) {
-//                    if (storageController.mapAnnouncements.count(inv.hash)) {
-//                        CDataStream ss(SER_NETWORK, PROTOCOL_VERSION);
-//                        ss.reserve(1000);
-//                        ss << storageController.mapAnnouncements[inv.hash];
-//                        pfrom->PushMessage("dfsannounce", ss);
-//                        pushed = true;
-//                    }
-//                }
+                if (!pushed && inv.type == MSG_STORAGE_ORDER_ANNOUNCE) {
+                    if (storageController.mapAnnouncements.count(inv.hash)) {
+                        CDataStream ss(SER_NETWORK, PROTOCOL_VERSION);
+                        ss.reserve(1000);
+                        ss << storageController.mapAnnouncements[inv.hash];
+                        pfrom->PushMessage("dfsannounce", ss);
+                        pushed = true;
+                    }
+                }
 
                 if (!pushed) {
                     vNotFound.push_back(inv);

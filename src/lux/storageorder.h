@@ -11,16 +11,15 @@
 class StorageOrder
 {
 public:
-    size_t time;            // current timestamp
-    size_t storageUntil;    // timestamp
+    std::time_t time;           // current timestamp
+    std::time_t storageUntil;   // timestamp
     uint64_t fileSize;
     uint256 fileURI;
-    bool listen;
-    CAmount maxRate;        // Lux * COIN / (sec * byte)
-    uint maxGap;            // max number of blocks, which can be mined between proofs
-    CAddress address;       // [!!!] global-wide sender address
+    CAmount maxRate;            // Lux * COIN / (sec * byte)
+    uint maxGap;                // max number of blocks, which can be mined between proofs
+    CAddress address;           // [!!!] global-wide sender address
 
-    uint256 GetHash(){
+    uint256 GetHash() const{
         uint256 n = Hash(BEGIN(time), END(maxGap));
         return n;
     }
@@ -33,7 +32,6 @@ public:
         READWRITE(storageUntil);
         READWRITE(fileSize);
         READWRITE(fileURI);
-        READWRITE(listen);
         READWRITE(maxRate);
         READWRITE(maxGap);
         READWRITE(address);
@@ -43,12 +41,12 @@ public:
 class StorageProposal
 {
 public:
-    size_t time;            // current timestamp
+    std::time_t time;       // current timestamp
     uint256 orderHash;
     CAmount rate;           // Lux * COIN / (sec * byte)
     CAddress address;       // [!!!] global-wide sender address
 
-    uint256 GetHash(){
+    uint256 GetHash() const{
         uint256 n = Hash(BEGIN(time), END(rate));
         return n;
     }
