@@ -1069,6 +1069,10 @@ MultiSend: %1</translation>
         <source>Go to</source>
         <translation>Visiter</translation>
     </message>
+    <message>
+        <source>Do you really want to enable hd-wallet? You will no more be able to disable it. If you select &quot;Yes&quot; the application will restart to upgrade the wallet...</source>
+        <translation>Souhaitez-vous migrer le portefeuille vers des clés HD ? Il n&apos;y a pas de retour en arrière possible. Si &quot;Oui&quot; l&apos;application redémarrera pour mettre à jour le format du portefeuille.</translation>
+    </message>
 </context>
 <context>
     <name>BlockExplorer</name>
@@ -1831,11 +1835,11 @@ MultiSend: %1</translation>
     </message>
     <message>
         <source>The Gas Price is too high, are you sure you want to possibly spend a max of %1 for this transaction?</source>
-        <translation type="unfinished"></translation>
+        <translation>Le prix du gas est trop haut, êtes-cous sur de vouloir dépenser %1 (max) pour cette transaction ?</translation>
     </message>
     <message>
         <source>High Gas price</source>
-        <translation type="unfinished"></translation>
+        <translation>Prix du Gas élevé</translation>
     </message>
     <message>
         <source>Are you sure you want to create contract? &lt;br /&gt;</source>
@@ -1855,7 +1859,7 @@ MultiSend: %1</translation>
     </message>
     <message>
         <source>Gas price: LUX price per gas unit. Default = %1, Min = %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Prix du Gas en LUX par unité de gas. Défaut = %1, Min = %2</translation>
     </message>
 </context>
 <context>
@@ -1949,7 +1953,7 @@ MultiSend: %1</translation>
     </message>
     <message>
         <source>%1 — Version %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 — Version %2</translation>
     </message>
     <message>
         <source>Qt-Version: &lt;a href=&quot;https://www.qt.io/&quot;&gt;%2&lt;/a&gt;</source>
@@ -2484,7 +2488,7 @@ MultiSend: %1</translation>
     </message>
     <message>
         <source>Error: Specified data directory &quot;%1&quot; cannot be created.</source>
-        <translation type="unfinished"></translation>
+        <translation>Erreur: Le répertoire &quot;%1&quot; ne peut pas être créé.</translation>
     </message>
 </context>
 <context>
@@ -2621,7 +2625,7 @@ MultiSend: %1</translation>
     </message>
     <message>
         <source>&amp;Get Config</source>
-        <translation type="unfinished"></translation>
+        <translation>A&amp;fficher Config</translation>
     </message>
     <message>
         <source>&amp;Remove</source>
@@ -2700,7 +2704,7 @@ MultiSend: %1</translation>
     </message>
     <message>
         <source>~</source>
-        <translation type="unfinished"></translation>
+        <translation>~</translation>
     </message>
 </context>
 <context>
@@ -3402,7 +3406,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>out of sync</source>
-        <translation type="unfinished">obsolète</translation>
+        <translation>obsolète</translation>
     </message>
     <message>
         <source>No inputs detected</source>
@@ -3410,7 +3414,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message numerus="yes">
         <source>%n Rounds</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>%n Round</numerusform>
             <numerusform>%n Rounds</numerusform>
         </translation>
@@ -3883,10 +3887,6 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation>Des composants sont disponibles ! Vous pouvez mettre à jour maintenant ou plus tard.</translation>
     </message>
     <message>
-        <source>%1 v%2 — %3</source>
-        <translation>%1 v%2 — %3</translation>
-    </message>
-    <message>
         <source>Run with &amp;elevated rights</source>
         <translation>Demander élévation &amp;Administrateur</translation>
     </message>
@@ -4315,11 +4315,11 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Memory usage</source>
-        <translation type="unfinished"></translation>
+        <translation>Mémoire utilisée</translation>
     </message>
     <message>
         <source>Current number of transactions</source>
-        <translation type="unfinished"></translation>
+        <translation>Nombre de transactions</translation>
     </message>
     <message>
         <source>Memory Pool</source>
@@ -4839,7 +4839,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>(read the tooltip)</source>
-        <translation type="unfinished"></translation>
+        <translation>(voir tooltip)</translation>
     </message>
     <message>
         <source>Confirmation time target:</source>
@@ -5096,19 +5096,19 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>The amount in Lux to send. Default = 0.</source>
-        <translation type="unfinished"></translation>
+        <translation>Le montant en Lux à envoyer. Défaut = 0.</translation>
     </message>
     <message>
         <source>The quantum address that will be used as sender.</source>
-        <translation type="unfinished"></translation>
+        <translation>L&apos;adresse LUX qui sera utilisée comme expéditeur.</translation>
     </message>
     <message>
         <source>The Gas Price is too high, are you sure you want to possibly spend a max of %1 for this transaction?</source>
-        <translation type="unfinished"></translation>
+        <translation>Le prix du gas est trop haut, êtes-cous sur de vouloir dépenser %1 (max) pour cette transaction ?</translation>
     </message>
     <message>
         <source>High Gas price</source>
-        <translation type="unfinished"></translation>
+        <translation>Prix du Gas élevé</translation>
     </message>
     <message>
         <source>Are you sure you want to send to the contract: &lt;br /&gt;&lt;br /&gt;</source>
@@ -5120,15 +5120,15 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Confirm sending to contract.</source>
-        <translation type="unfinished"></translation>
+        <translation>Confirmer l&apos;envoi vers le contrat.</translation>
     </message>
     <message>
         <source>Gas limit: Default = %1, Max = %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>Limite de Gas: Défaut = %1, Max = %2.</translation>
     </message>
     <message>
         <source>Gas price: LUX price per gas unit. Default = %1, Min = %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>Prix du Gas en LUX par unité de gas. Défaut = %1, Min = %2. {1,?}</translation>
     </message>
     <message>
         <source>Write to Contract</source>
@@ -5183,11 +5183,11 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Gas limit: Default = %1, Max = %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>Limite de Gas: Défaut = %1, Max = %2.</translation>
     </message>
     <message>
         <source>Gas price: LUX/gas unit. Default = %1, Min = %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>Prix du Gas par unité: Défaut = %1, Min = %2.</translation>
     </message>
     <message>
         <source>Are you sure you want to send? &lt;br /&gt;&lt;br /&gt;</source>
@@ -5337,7 +5337,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Click &quot;Sign Message&quot; to generate signature</source>
-        <translation type="unfinished"></translation>
+        <translation>Cliquer sur &quot;Signer le message&quot; pour générer la signature</translation>
     </message>
     <message>
         <source>Message signed.</source>
@@ -5801,7 +5801,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Transaction status. Hover over this field to show number of confirmations.</source>
-        <translation type="unfinished"></translation>
+        <translation>Etat de la transaction. Placer la souris sur ce champ pour afficher les confirmations.</translation>
     </message>
     <message>
         <source>Date and time that the transaction was received.</source>
@@ -5813,7 +5813,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>User-defined intent/purpose of the transaction.</source>
-        <translation type="unfinished"></translation>
+        <translation>Propos de la transaction défini par l&apos;utilisateur.</translation>
     </message>
     <message>
         <source>Token name.</source>
@@ -6233,7 +6233,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Transaction status. Hover over this field to show number of confirmations.</source>
-        <translation type="unfinished"></translation>
+        <translation>Etat de la transaction. Placer la souris sur ce champ pour afficher les confirmations.</translation>
     </message>
     <message>
         <source>Whether or not a watch-only address is involved in this transaction.</source>
@@ -8013,11 +8013,11 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Loading keys:&lt;/p&gt;&lt;p&gt;1) Enter Password&lt;/p&gt;&lt;p&gt;2) Load API Keys&lt;/p&gt;&lt;p&gt;3) Start trading on Cryptopia&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Loading keys:&lt;/p&gt;&lt;p&gt;1) Entrer le mot de passe &lt;/p&gt;&lt;p&gt;2) Charger les clés API&lt;/p&gt;&lt;p&gt;3) Echanger sur Cryptopia&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Chargement des clés:&lt;/p&gt;&lt;p&gt;1) Entrer le mot de passe &lt;/p&gt;&lt;p&gt;2) Charger les clés API&lt;/p&gt;&lt;p&gt;3) Echanger sur Cryptopia&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Saving keys:&lt;/p&gt;&lt;p&gt;1) Enter in API Keys found at &lt;a href=&quot;https://Cryptopia.co.nz/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Cryptopia&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;2) Enter Password&lt;/p&gt;&lt;p&gt;3) Save API Keys&lt;/p&gt;&lt;p&gt;4) Start trading on Cryptopia&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Saving keys:&lt;/p&gt;&lt;p&gt;1) Saisir les clés API fournies par &lt;a href=&quot;https://Cryptopia.co.nz/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Cryptopia&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;2) Entrer un mot de passe&lt;/p&gt;&lt;p&gt;3) Enregistrer les clés API&lt;/p&gt;&lt;p&gt;4) Echanger sur Cryptopia&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enregistrement des clés:&lt;/p&gt;&lt;p&gt;1) Saisir les clés API fournies par &lt;a href=&quot;https://Cryptopia.co.nz/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Cryptopia&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;2) Entrer un mot de passe&lt;/p&gt;&lt;p&gt;3) Enregistrer les clés API&lt;/p&gt;&lt;p&gt;4) Echanger sur Cryptopia&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <source>Cancel Order</source>
