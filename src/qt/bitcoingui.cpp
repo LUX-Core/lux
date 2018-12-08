@@ -241,24 +241,21 @@ BitcoinGUI::BitcoinGUI(const PlatformStyle *platformStyle, const NetworkStyle* n
     pushButtonWalletHDStatusIcon->setIconSize(QSize(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE));
     pushButtonWalletHDStatusIcon->setCursor(Qt::PointingHandCursor);
     pushButtonWalletHDStatusIcon->setStyleSheet(styleSheet);
-    connect(pushButtonWalletHDStatusIcon, &QPushButton::clicked,
-            this, [this]()
-            {
-                int hdEnabled = this->pushButtonWalletHDStatusIcon->property("hdEnabled").toInt();
-                if( hdEnabled == 0)
-                {
-                    auto button = QMessageBox::warning(this, "hdWallet",
-                                                       tr("Do you really want enable hdWallet? You can not disable it again. Also if you will select \"Yes\" application will restart"),
-                                                       QMessageBox::Yes | QMessageBox::No);
+    connect(pushButtonWalletHDStatusIcon, &QPushButton::clicked, this, [this]() {
+        int hdEnabled = this->pushButtonWalletHDStatusIcon->property("hdEnabled").toInt();
+        if(!hdEnabled) {
+            auto button = QMessageBox::warning(this, "hdWallet",
+                    tr("Do you really want to enable hd-wallet? You will no more be able to disable it. "
+                       "If you select \"Yes\" the application will restart to upgrade the wallet..."),
+                    QMessageBox::Yes | QMessageBox::No);
 
-                    if (QMessageBox::Yes == button) {
-                        QStringList args;
-                        if (0 == hdEnabled)
-                            args << "-usehd" << "-upgradewallet";
-                        emit requestedRestart(args);
-                    }
-                }
-            });
+            if (QMessageBox::Yes == button) {
+                QStringList args;
+                args << "-usehd" << "-upgradewallet";
+                emit requestedRestart(args);
+            }
+        }
+    });
 
     labelConnectionsIcon = new QPushButton();
     labelConnectionsIcon->setFlat(true); // Make the button look like a label, but clickable
