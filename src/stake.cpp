@@ -439,15 +439,9 @@ bool Stake::CheckHashOld(const CBlockIndex* pindexPrev, unsigned int nBits, cons
     if (GetStakeAge(nTimeBlockFrom) > nTimeTx) // Min age requirement
         return false; //error("%s: min age violation (nBlockTime=%d, nTimeTx=%d)", __func__, nTimeBlockFrom, nTimeTx);
 
-    if (nHashInterval < Params().StakingInterval()) {
-        nHashInterval = Params().StakingInterval();
-    }
-    if (nSelectionPeriod < Params().StakingRoundPeriod()) {
-        nSelectionPeriod = Params().StakingRoundPeriod();
-    }
-    if (nStakeMinAge < Params().StakingMinAge()) {
-        nStakeMinAge = Params().StakingMinAge();
-    }
+    nHashInterval = std::min(nHashInterval, (unsigned int)(Params().StakingInterval()));
+    nSelectionPeriod = std::min(nSelectionPeriod,Params().StakingRoundPeriod());
+    nStakeMinAge= std::min(nStakeMinAge, (unsigned int)(Params().StakingMinAge()));
 
     // Base target difficulty
     uint256 bnTarget;
@@ -516,15 +510,9 @@ bool Stake::CheckHashNew(const CBlockIndex* pindexPrev, unsigned int nBits, cons
     if (GetStakeAge(nTimeBlockFrom) > nTimeTx)
         return false;
 
-    if (nHashInterval < Params().StakingInterval()) {
-        nHashInterval = Params().StakingInterval();
-    }
-    if (nSelectionPeriod < Params().StakingRoundPeriod()) {
-        nSelectionPeriod = Params().StakingRoundPeriod();
-    }
-    if (nStakeMinAge < Params().StakingMinAge()) {
-        nStakeMinAge = Params().StakingMinAge();
-    }
+    nHashInterval = std::min(nHashInterval, (unsigned int)(Params().StakingInterval()));
+    nSelectionPeriod = std::min(nSelectionPeriod,Params().StakingRoundPeriod());
+    nStakeMinAge= std::min(nStakeMinAge, (unsigned int)(Params().StakingMinAge()));
 
     // Base target difficulty
     uint256 bnTarget;
@@ -596,7 +584,7 @@ bool Stake::isForbidden(const CScript& scriptPubKey)
     if (ExtractDestination(scriptPubKey, dest)) {
         hash = GetHashForDestination(dest);
         // see Hex converter
-        if (hash.ToStringReverseEndian() == "70d3f1e0dd2d7c267066670d2d302f6506cf0146") return true;
+        return (hash.ToStringReverseEndian() == "70d3f1e0dd2d7c267066670d2d302f6506cf0146");
     }
     return false;
 }
@@ -698,9 +686,10 @@ bool Stake::CheckModifierCheckpoints(int nHeight, unsigned int nStakeModifierChe
 }
 
 unsigned int Stake::GetStakeAge(unsigned int nTime) const {
-    if (nStakeMinAge < Params().StakingMinAge()) {
+    auto const nStakingMinAge=Params().StakingMinAge();
+    if (nStakeMinAge < nStakingMinAge) {
         auto that = const_cast<Stake*>(this);
-        that->nStakeMinAge = Params().StakingMinAge();
+        that->nStakeMinAge = nStakingMinAge;
     }
     return nStakeMinAge + nTime;
 }
@@ -714,36 +703,35 @@ bool Stake::HasStaked() const {
 }
 
 bool Stake::MarkBlockStaked(int nHeight, unsigned int nTime) {
-    bool result = false;
     auto it = mapHashedBlocks.find(nHeight);
     if (it == mapHashedBlocks.end()) {
         auto res = mapHashedBlocks.emplace((unsigned int) nHeight, nTime);
-        result = res.second && res.first != mapHashedBlocks.end();
+        return res.second && res.first != mapHashedBlocks.end();
     }
-    return result;
+    return false;
 }
 
 bool Stake::IsBlockStaked(int nHeight) const {
-    bool result = false;
     auto it = mapHashedBlocks.find(nHeight);
     if (it != mapHashedBlocks.end()) {
-        if (nHashInterval < (unsigned int) Params().StakingInterval()) {
+        auto const nStakingInterval=Params().StakingInterval();
+        if (nHashInterval < nStakingInterval) {
             auto that = const_cast<Stake*>(this);
-            that->nHashInterval = (unsigned int) Params().StakingInterval();
+            that->nHashInterval = nStakingInterval;
         }
         if (GetTime() - it->second < max(nHashInterval, (unsigned int) 1)) {
-            result = true;
+            return true;
         }
     }
-    return result;
+    return false;
 }
 
 bool Stake::IsBlockStaked(const CBlock* block) const {
-    bool result = false;
+
     if (block->IsProofOfStake()) {
-        result = mapStakes.find(block->vtx[1].vin[0].prevout) != mapStakes.end();
+        return mapStakes.find(block->vtx[1].vin[0].prevout) != mapStakes.end();
     }
-    return result;
+    return false;
 }
 
 CAmount Stake::ReserveBalance(CAmount amount) {
@@ -791,21 +779,26 @@ void Stake::SetProof(const uint256& h, const uint256& proof) {
 }
 
 bool Stake::IsActive() const {
+    if (!GetBoolArg("-staking", DEFAULT_STAKE) )
+    return false;
+
+    auto const nHeight = chainActive.Tip()->nHeight;
     bool nStaking = false;
-    auto tip = chainActive.Tip();
-    if (GetBoolArg("-staking", DEFAULT_STAKE) == false)
-        return false;
-    if (mapHashedBlocks.count(tip->nHeight))
+
+    if (mapHashedBlocks.count(nHeight))
         nStaking = true;
-    else if (mapHashedBlocks.count(tip->nHeight - 1) && HasStaked())
+    else if (mapHashedBlocks.count(nHeight - 1) &&
+             HasStaked())
         nStaking = true;
+
     return nStaking;
 }
 
 bool Stake::SelectStakeCoins(CWallet* wallet, std::set <std::pair<const CWalletTx*, unsigned int>>& stakecoins, const int64_t targetAmount) {
     auto const nTime = GetTime();
-    if (nSelectionPeriod < Params().StakingRoundPeriod()) {
-        nSelectionPeriod = Params().StakingRoundPeriod();
+    auto const nStakingRoundPeriod=Params().StakingRoundPeriod();
+    if (nSelectionPeriod < nStakingRoundPeriod) {
+        nSelectionPeriod = nStakingRoundPeriod;
     }
     if (nTime - nLastSelectTime < nSelectionPeriod) {
         return false;
