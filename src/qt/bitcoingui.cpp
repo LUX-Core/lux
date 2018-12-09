@@ -244,16 +244,26 @@ BitcoinGUI::BitcoinGUI(const PlatformStyle *platformStyle, const NetworkStyle* n
     connect(pushButtonWalletHDStatusIcon, &QPushButton::clicked, this, [this]() {
         int hdEnabled = this->pushButtonWalletHDStatusIcon->property("hdEnabled").toInt();
         if(!hdEnabled) {
-            auto button = QMessageBox::warning(this, "hdWallet",
-                    tr("Do you really want to enable hd-wallet? You will no more be able to disable it. "
-                       "If you select \"Yes\" the application will restart to upgrade the wallet..."),
-                    QMessageBox::Yes | QMessageBox::No);
+            if (!pwalletMain->IsCrypted()) 
+            {
+                auto button = QMessageBox::warning(this, "HD Wallet",
+                        tr("Do you really want to enable hd-wallet? You will no more be able to disable it. "
+                           "If you select \"Yes\" the application will restart to upgrade the wallet..."),
+                        QMessageBox::Yes | QMessageBox::No);
 
-            if (QMessageBox::Yes == button) {
-                QStringList args;
-                args << "-usehd" << "-upgradewallet";
-                emit requestedRestart(args);
-            }
+                if (QMessageBox::Yes == button) {
+                    QStringList args;
+                    args << "-usehd" << "-upgradewallet";
+                    emit requestedRestart(args);
+                }
+           }
+           else
+           {
+                QMessageBox::warning(this, "HD Wallet",
+                    tr("Your wallet cannot be upgraded because it is encrypted. "
+                     "In order to use the HD \"Hierarchical Deterministic\" feature you will need to import "
+                     "your private keys into a new/old unencrypted wallet, then attempt to upgrade."));
+           }
         }
     });
 
