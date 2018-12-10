@@ -20,6 +20,9 @@
 #include "timedata.h"
 #include <boost/thread.hpp>
 #include <atomic>
+#include <map>
+#include <set>
+#include <utility>
 
 #if defined(DEBUG_DUMP_STAKING_INFO)
 #  include "DEBUG_DUMP_STAKING_INFO.hpp"
@@ -93,6 +96,45 @@ void StakeStatus::Clear() {
     nCoinAgeSum = 0;
     dKernelDiffSum = 0;
     nLastCoinStakeSearchInterval = 0;
+}
+
+
+static map<LuxPoSKernel, set<uint256> > InvalidLuxPoSKernels;
+static map<uint256, LuxPoSKernel> InvalidLuxPoSBlocks;
+
+void InvalidLuxPoS(LuxPoSKernel const& hashProofOfStake, const uint256& blockHash)
+{
+    InvalidLuxPoSKernels[hashProofOfStake].insert(blockHash);
+    InvalidLuxPoSBlocks.insert(make_pair(blockHash, hashProofOfStake));
+}
+
+void CleanInvalidLuxPoS(LuxPoSKernel const& hashProofOfStake)
+{
+    if (!IsInvalidLuxPoS(hashProofOfStake))
+        return ;
+
+    for (const uint256& hash : InvalidLuxPoSKernels.at(hashProofOfStake))
+        InvalidLuxPoSBlocks.erase(hash);
+
+    InvalidLuxPoSKernels.erase(hashProofOfStake);
+}
+
+void CleanInvalidLuxPoS(const uint256& blockHash)
+{
+    if (!IsInvalidLuxPoS(blockHash))
+        return ;
+
+    CleanInvalidLuxPoS(InvalidLuxPoSBlocks[blockHash]);
+}
+
+bool IsInvalidLuxPoS(LuxPoSKernel const& hashProofOfStake)
+{
+    return InvalidLuxPoSKernels.count(hashProofOfStake) > 0;
+}
+
+bool IsInvalidLuxPoS(const uint256& blockHash)
+{
+    return InvalidLuxPoSBlocks.count(blockHash) > 0;
 }
 
 // Modifier interval: time to elapse before new modifier is computed
@@ -600,6 +642,10 @@ bool Stake::CheckProof(CBlockIndex* const pindexPrev, const CBlock &block, uint2
 
     if (block.vtx.size() < 2)
         return error("%s: called on non-coinstake %s", __func__, block.ToString());
+
+    // Check if PoS is Valid
+    if (IsInvalidLuxPoS(block.IsProofOfStake()))
+        return false;
 
     const CTransaction& tx = block.vtx[1];
     if (!tx.IsCoinStake())

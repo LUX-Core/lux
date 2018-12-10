@@ -20,6 +20,20 @@ class CTransaction;
 class CWallet;
 class CWalletTx;
 
+
+typedef std::pair<COutPoint, unsigned int> LuxPoSKernel;
+
+// Use blockHash to check Invalid LuxPoSKernel.
+void InvalidLuxPoS(LuxPoSKernel const& hashProofOfStake, const uint256& blockHash);
+
+// Remove a Invalid LuxPoSKernel from all its related blocks
+void CleanInvalidLuxPoS(LuxPoSKernel const& hashProofOfStake);
+void CleanInvalidLuxPoS(const uint256& blockHash);
+
+// Check if PoS block is invalid
+bool IsInvalidLuxPoS(LuxPoSKernel const& hashProofOfStake);
+bool IsInvalidLuxPoS(const uint256& blockHash);
+
 struct CMutableTransaction;
 
 bool CheckCoinStakeTimestamp(uint32_t nTimeBlock);
