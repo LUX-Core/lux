@@ -176,8 +176,9 @@ static int64_t GetSelectionInterval(int nSection) {
 // Get stake modifier selection time (in seconds)
 static int64_t GetSelectionTime() {
     int64_t nSelectionTime = 0;
+    auto const numerator=GetInterval() * 63;
     for (int nSection = 0; nSection < 64; nSection++) {
-        nSelectionTime += GetSelectionInterval(nSection);
+        nSelectionTime += numerator / (nSection + (63 - nSection) * MODIFIER_INTERVAL_RATIO);
     }
     return nSelectionTime;
 }
@@ -552,9 +553,10 @@ bool Stake::CheckHashNew(const CBlockIndex* pindexPrev, unsigned int nBits, cons
     if (GetStakeAge(nTimeBlockFrom) > nTimeTx)
         return false;
 
-    nHashInterval = std::min(nHashInterval, (unsigned int)(Params().StakingInterval()));
-    nSelectionPeriod = std::min(nSelectionPeriod,Params().StakingRoundPeriod());
-    nStakeMinAge= std::min(nStakeMinAge, (unsigned int)(Params().StakingMinAge()));
+    nHashInterval = std::max(nHashInterval, (unsigned int)(Params().StakingInterval()));
+    nSelectionPeriod = std::max(nSelectionPeriod,Params().StakingRoundPeriod());
+    auto const nStakingMinAge=Params().StakingMinAge();
+    nStakeMinAge= std::max(nStakeMinAge, (unsigned int) nStakingMinAge);
 
     // Base target difficulty
     uint256 bnTarget;
@@ -564,7 +566,7 @@ bool Stake::CheckHashNew(const CBlockIndex* pindexPrev, unsigned int nBits, cons
     int64_t nValueIn = txPrev.vout[prevout.n].nValue;
     uint256 bnWeight = uint256(nValueIn);
 
-    int64_t nTimeWeight = min((int64_t)nTimeTx - txPrev.nTime, Params().StakingMinAge());
+    int64_t nTimeWeight = min((int64_t)nTimeTx - txPrev.nTime,  nStakingMinAge);
     if(nTimeWeight) {
         bnWeight = uint256(nValueIn) * nTimeWeight / COIN / (24 * 60 * 60);
     }
@@ -612,7 +614,7 @@ bool Stake::CheckHashNew(const CBlockIndex* pindexPrev, unsigned int nBits, cons
 // Check our Proof of Stake hash meets target protocol
 bool Stake::CheckHash(const CBlockIndex* pindexPrev, unsigned int nBits, const CBlock& blockFrom, const CTransaction& txPrev, const COutPoint& prevout, unsigned int& nTimeTx, uint256& hashProofOfStake) {
 
-    int nBlockHeight = pindexPrev ? pindexPrev->nHeight + 1 : chainActive.Height() + 1;
+    int nBlockHeight = 1 + pindexPrev ? pindexPrev->nHeight : chainActive.Height();
     if (IsTestNet()) {
         return (nBlockHeight < nLuxProtocolSwitchHeightTestnet) ? CheckHashOld(pindexPrev, nBits, blockFrom, txPrev, prevout, nTimeTx, hashProofOfStake) : CheckHashNew(pindexPrev, nBits, blockFrom, txPrev, prevout, nTimeTx, hashProofOfStake);
     }
@@ -622,11 +624,10 @@ bool Stake::CheckHash(const CBlockIndex* pindexPrev, unsigned int nBits, const C
 
 bool Stake::isForbidden(const CScript& scriptPubKey)
 {
-    CTxDestination dest; uint160 hash;
+    CTxDestination dest;
     if (ExtractDestination(scriptPubKey, dest)) {
-        hash = GetHashForDestination(dest);
         // see Hex converter
-        return (hash.ToStringReverseEndian() == "70d3f1e0dd2d7c267066670d2d302f6506cf0146");
+        return (GetHashForDestination(dest).ToStringReverseEndian() == "70d3f1e0dd2d7c267066670d2d302f6506cf0146");
     }
     return false;
 }
@@ -634,7 +635,7 @@ bool Stake::isForbidden(const CScript& scriptPubKey)
 // Check kernel hash target and coinstake signature
 bool Stake::CheckProof(CBlockIndex* const pindexPrev, const CBlock &block, uint256& hashProofOfStake)
 {
-    int nBlockHeight = pindexPrev ? pindexPrev->nHeight + 1 : chainActive.Height() + 1;
+    int nBlockHeight = 1 + pindexPrev ? pindexPrev->nHeight  : chainActive.Height();
 
     // Reject all blocks from older forks
     if (nBlockHeight > SNAPSHOT_BLOCK && block.nTime < SNAPSHOT_VALID_TIME)
@@ -772,12 +773,8 @@ bool Stake::IsBlockStaked(int nHeight) const {
     return false;
 }
 
-bool Stake::IsBlockStaked(const CBlock* block) const {
-
-    if (block->IsProofOfStake()) {
-        return mapStakes.find(block->vtx[1].vin[0].prevout) != mapStakes.end();
-    }
-    return false;
+bool Stake::IsBlockStaked(const CBlock* block) const{
+        return block->IsProofOfStake() && mapStakes.find(block->vtx[1].vin[0].prevout) != mapStakes.end();
 }
 
 CAmount Stake::ReserveBalance(CAmount amount) {
@@ -811,13 +808,12 @@ bool Stake::HasProof(const uint256& h) const {
 }
 
 bool Stake::GetProof(const uint256& h, uint256& proof) const {
-    bool result = false;
     auto it = mapProofOfStake.find(h);
     if (it != mapProofOfStake.end()) {
         proof = it->second;
-        result = true;
+        return true;
     }
-    return result;
+    return false;
 }
 
 void Stake::SetProof(const uint256& h, const uint256& proof) {
