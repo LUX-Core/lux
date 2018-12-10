@@ -31,7 +31,7 @@ static const char* ppszTypeName[] = {
         "mn announce",
         "mn ping",
         "dstx",
-        "pmn storage order announce",           // 17
+        "dfsannounce",           // 17
 };
 
 CMessageHeader::CMessageHeader()

@@ -2,8 +2,16 @@
 #include "protocol.h"
 #include "net.h"
 #include "main.h"
+#include "streams.h"
 
 StorageController storageController;
+
+void ProcessStorageMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv, bool& isStorageCommand)
+{
+    if (strCommand == "dfsannounce") {
+
+    }
+}
 
 void StorageController::AnnounceOrder(const StorageOrder &order, const std::string &path)
 {
@@ -45,6 +53,22 @@ void StorageController::ClearOldAnnouncments(std::time_t timestamp)
     }
 }
 
-std::vector<StorageProposal> StorageController::GetProposals(const uint256 &orderHash){
+void StorageController::ListenProposal(const uint256 &orderHash)
+{
+    proposalsAgent.ListenProposal(orderHash);
+}
+
+void StorageController::StopListenProposal(const uint256 &orderHash)
+{
+    proposalsAgent.StopListenProposal(orderHash);
+}
+
+void StorageController::AddProposal(const StorageProposal &proposal)
+{
+    proposalsAgent.AddProposal(proposal);
+}
+
+std::vector<StorageProposal> StorageController::GetProposals(const uint256 &orderHash)
+{
     return proposalsAgent.GetProposals(orderHash);
 }
