@@ -320,6 +320,9 @@ private Q_SLOTS:
     void toggleNetworkActive();
 
     void showModalOverlay();
+
+    void slotHDEnabled();
+
 };
 
 class UnitDisplayStatusBarControl : public QLabel

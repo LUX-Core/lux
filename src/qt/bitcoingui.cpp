@@ -24,6 +24,7 @@
 #include "stake.h"
 #include "main.h"
 #include "hexaddressconverter.h"
+#include "rpcserver.h"
 
 #ifdef ENABLE_WALLET
 #include "blockexplorer.h"
@@ -69,6 +70,8 @@
 #include <QSizeGrip>
 #include <QDesktopServices>
 #include <QProcess>
+#include <QDateTime>
+#include <QFile>
 
 #if QT_VERSION < 0x050000
 #include <QTextDocument>
@@ -241,31 +244,7 @@ BitcoinGUI::BitcoinGUI(const PlatformStyle *platformStyle, const NetworkStyle* n
     pushButtonWalletHDStatusIcon->setIconSize(QSize(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE));
     pushButtonWalletHDStatusIcon->setCursor(Qt::PointingHandCursor);
     pushButtonWalletHDStatusIcon->setStyleSheet(styleSheet);
-    connect(pushButtonWalletHDStatusIcon, &QPushButton::clicked, this, [this]() {
-        int hdEnabled = this->pushButtonWalletHDStatusIcon->property("hdEnabled").toInt();
-        if(!hdEnabled) {
-            if (!pwalletMain->IsCrypted()) 
-            {
-                auto button = QMessageBox::warning(this, "HD Wallet",
-                        tr("Do you really want to enable hd-wallet? You will no more be able to disable it. "
-                           "If you select \"Yes\" the application will restart to upgrade the wallet..."),
-                        QMessageBox::Yes | QMessageBox::No);
-
-                if (QMessageBox::Yes == button) {
-                    QStringList args;
-                    args << "-usehd" << "-upgradewallet";
-                    emit requestedRestart(args);
-                }
-           }
-           else
-           {
-                QMessageBox::warning(this, "HD Wallet",
-                    tr("Your wallet cannot be upgraded because it is encrypted. "
-                     "In order to use the HD \"Hierarchical Deterministic\" feature you will need to import "
-                     "your private keys into a new/old unencrypted wallet, then attempt to upgrade."));
-           }
-        }
-    });
+    connect(pushButtonWalletHDStatusIcon, &QPushButton::clicked, this, &BitcoinGUI::slotHDEnabled);
 
     labelConnectionsIcon = new QPushButton();
     labelConnectionsIcon->setFlat(true); // Make the button look like a label, but clickable
@@ -416,6 +395,48 @@ BitcoinGUI::BitcoinGUI(const PlatformStyle *platformStyle, const NetworkStyle* n
     }
 #endif
     setMinimumHeight(height());
+}
+
+void BitcoinGUI::slotHDEnabled()
+{
+    if(pwalletMain->IsLocked())
+    {
+        return;
+    }
+    int hdEnabled = this->pushButtonWalletHDStatusIcon->property("hdEnabled").toInt();
+    if(!hdEnabled) {
+        auto button = QMessageBox::warning(this, "HD Wallet",
+                                           tr("Do you really want to enable hd-wallet? You will no more be able to disable it. "
+                                              "If you select \"Yes\" the application will restart to upgrade the wallet..."),
+                                           QMessageBox::Yes | QMessageBox::No);
+
+        if (QMessageBox::Yes == button)
+        {
+            if (pwalletMain->IsCrypted())
+            {
+                //dumpwallet
+                {
+                    std::string hd_dump = GetDataDir().string() +std::string("/HD_restart.dump");
+                    if(QFile::exists(QString::fromStdString(hd_dump)))
+                        QFile::remove(QString::fromStdString(hd_dump));
+                    UniValue params(UniValue::VARR);
+                    params.push_back(UniValue(UniValue::VSTR, hd_dump));
+                    dumpwallet(params, false);
+                }
+                //backupwallet
+                {
+                    UniValue params(UniValue::VARR);
+                    std::string datetime = QDateTime::currentDateTime().toString("yyyy-MM-dd-hh-mm").toStdString();
+                    params.push_back(UniValue(UniValue::VSTR, GetDataDir().string() +std::string("/backups/wallet.dat." + datetime)));
+                    backupwallet(params, false);
+                }
+            }
+
+            QStringList args;
+            args << "-usehd" << "-upgradewallet";
+            emit requestedRestart(args);
+        }
+    }
 }
 
 BitcoinGUI::~BitcoinGUI() {

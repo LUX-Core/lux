@@ -821,6 +821,7 @@ bool AppInit2()
     fLogTimestamps = GetBoolArg("-logtimestamps", true);
     fLogIPs = GetBoolArg("-logips", false);
 
+
     if (mapArgs.count("-bind") || mapArgs.count("-whitebind")) {
         // when specifying an explicit binding address, you want to listen on it
         // even when -connect or -proxy is specified
@@ -1715,6 +1716,19 @@ bool AppInit2()
             if (pwalletMain->CanSupportFeature(FEATURE_HD)) {
                 if (useHD && !pwalletMain->IsHDEnabled()) {
                     LogPrintf("Upgrading wallet to HD\n");
+                    //importwallet
+                    if(!pwalletMain->IsLocked())
+                    {
+                        std::string hd_dump = GetDataDir().string() +std::string("/HD_restart.dump");
+                        boost::filesystem::path p_dump (hd_dump);
+                        if(is_regular_file(p_dump))
+                        {
+                            UniValue params(UniValue::VARR);
+                            params.push_back(UniValue(UniValue::VSTR, hd_dump));
+                            importwallet(params, false);
+                            boost::filesystem::remove (p_dump);
+                        }
+                    }
                     pwalletMain->SetMinVersion(FEATURE_HD);
                     // generate a new master key
                     pwalletMain->GenerateNewHDChain();
