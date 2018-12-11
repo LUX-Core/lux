@@ -17,7 +17,7 @@ public:
     uint256 fileURI;
     CAmount maxRate;            // Lux * COIN / (sec * byte)
     uint maxGap;                // max number of blocks, which can be mined between proofs
-    CAddress address;           // [!!!] global-wide sender address
+    CService address;           // [!!!] global-wide sender address
 
     uint256 GetHash() const{
         uint256 n = Hash(BEGIN(time), END(maxGap));
@@ -44,7 +44,7 @@ public:
     std::time_t time;       // current timestamp
     uint256 orderHash;
     CAmount rate;           // Lux * COIN / (sec * byte)
-    CAddress address;       // [!!!] global-wide sender address
+    CService address;       // [!!!] global-wide sender address
 
     uint256 GetHash() const{
         uint256 n = Hash(BEGIN(time), END(rate));

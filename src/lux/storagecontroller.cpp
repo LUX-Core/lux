@@ -1,23 +1,35 @@
 #include "storagecontroller.h"
-#include "protocol.h"
-#include "net.h"
 #include "main.h"
 #include "streams.h"
 
 StorageController storageController;
 
-void ProcessStorageMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv, bool& isStorageCommand)
+void StorageController::ProcessStorageMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv, bool& isStorageCommand)
 {
     if (strCommand == "dfsannounce") {
+        isStorageCommand = true;
+        StorageOrder order;
+        vRecv >> order;
 
+        uint256 hash = order.GetHash();
+        if (storageController.mapAnnouncements.find(hash) == storageController.mapAnnouncements.end()) {
+            storageController.AnnounceOrder(order); // TODO: Is need remove "pfrom" node from announcement? (SS)
+            if (storageHeap.MaxAllocateSize() > order.fileSize) {
+                StorageProposal proposal;
+                proposal.time = std::time(0);
+                proposal.orderHash = hash;
+                proposal.rate = storageController.rate;
+                proposal.address = storageController.address;
+                storageController.proposalsAgent.AddProposal(proposal);
+            }
+        }
     }
 }
 
-void StorageController::AnnounceOrder(const StorageOrder &order, const std::string &path)
+void StorageController::AnnounceOrder(const StorageOrder &order)
 {
     uint256 hash = order.GetHash();
     mapAnnouncements[hash] = order;
-    mapLocalFiles[hash] = path;
 
     CInv inv(MSG_STORAGE_ORDER_ANNOUNCE, hash);
     vector <CInv> vInv;
@@ -41,6 +53,12 @@ void StorageController::AnnounceOrder(const StorageOrder &order, const std::stri
     }
 }
 
+void StorageController::AnnounceOrder(const StorageOrder &order, const std::string &path)
+{
+    AnnounceOrder(order);
+    mapLocalFiles[order.GetHash()] = path;
+}
+
 void StorageController::ClearOldAnnouncments(std::time_t timestamp)
 {
     for (auto it = mapAnnouncements.begin(); it != mapAnnouncements.end(); ) {
@@ -61,11 +79,6 @@ void StorageController::ListenProposal(const uint256 &orderHash)
 void StorageController::StopListenProposal(const uint256 &orderHash)
 {
     proposalsAgent.StopListenProposal(orderHash);
-}
-
-void StorageController::AddProposal(const StorageProposal &proposal)
-{
-    proposalsAgent.AddProposal(proposal);
 }
 
 std::vector<StorageProposal> StorageController::GetProposals(const uint256 &orderHash)
