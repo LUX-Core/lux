@@ -1,4 +1,4 @@
-#Getting started with WSL
+# Getting started with WSL
 
 Let’s start with the simple instruction on how to set up the WSL environment in CLion:
 
@@ -32,8 +32,30 @@ Open clion -> file -> settings -> toolchains -> create WSL toolchains -> configu
     Port:2222
     Username: 
     Password:
+-------------------------------------------
+## Enable use wsl bash as terminal in Clion
 
-Current issues and limitations:
+### Wins 10
+
+Copy 
+
+    c:\Windows\System32\bash.exe
+    
+Paste
+
+    c:\bash.exe
+    
+Open clion -> file -> settings -> tools -> Terminal -> Application settings -> Shell path: c:\bash.exe
+
+### Wins 8.1 ( path including double quotes)
+
+Open clion -> file -> settings -> tools -> Terminal -> Application settings -> Shell path: "C:\Program Files\Git\bin\sh.exe" -login -i
+
+### Another way around is to call ubuntu executable directly
+
+Open clion -> file -> settings -> tools -> Terminal -> Application settings -> Shell path: C:\Users\<my_user>\AppData\Local\Microsoft\WindowsApps\ubuntu.exe
+
+## Current issues and limitations
 
 Due to the IntelliJ platform issue, there are problems with using WSL file-system which is case-sensitive and Windows file system which is not. As a workaround, you can do the following:
 
