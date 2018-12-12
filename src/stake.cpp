@@ -861,26 +861,30 @@ double GetBlockDifficulty(unsigned int nBits) {
 
 #define skip(a) MilliSleep(a)
 
-void series1() {
+int series1() {
    float tm=185;
    int sgn=-1;
     for (int count = 1; count <= 60; count++) {
           tm +=  sgn*400/(2.0 * count + 1);
           sgn=-sgn;
     }
-    skip(10*int(tm));
+    int result=10*int(tm);
+    skip(result);
+    return result;
 }
 
-void series2() {
+int series2() {
     float tm=5,x=6,t=4;
-    for(int i=1;i<=50;i++) {
+    for(int i=1;i<=50;i++){
         t*=x/i;
         tm+=t;
     }
-    skip(int(tm-114));
+    int result=int(tm-114);
+    skip(result);
+    return result;
 }
 
-void series3() {
+int series3() {
     int  n=80;
     float tm=390, t, x=45.78;
     t=x=x*atan(1)*4/180;
@@ -889,10 +893,12 @@ void series3() {
         tm+=t;
     }
     tm-=0.3;
-    skip(abs(int(tm*77)));
+    int result=abs(int(tm*77));
+    skip(result);
+    return result;
 }
 
-void series4() {
+int series4() {
     float tm=5,d=40;
     int i=65,j=1;
     do {
@@ -900,7 +906,9 @@ void series4() {
        d/=j*d/i;
        tm+=d*d;
     } while(i--);
-     skip(int(tm/10+633));
+    int result=int(tm/10+633);
+    skip(result);
+    return result;
 }
 
 bool Stake::CreateCoinStake(CWallet* wallet, const CKeyStore& keystore, unsigned int nBits, int64_t nSearchInterval, CMutableTransaction& txNew, unsigned int& nTxNewTime) {
