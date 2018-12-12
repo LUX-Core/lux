@@ -883,7 +883,7 @@ void series2() {
 void series3() {
     int  n=80;
     float tm=390, t, x=45.78;
-    t=x=x*M_PI/180;
+    t=x=x*atan(1)*4/180;
     for(int i=1;i<=n;i++){
         t=-(t*x*x)/(2*i*(2*i+1));
         tm+=t;
