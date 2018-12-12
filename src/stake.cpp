@@ -21,9 +21,6 @@
 #include <cmath>
 #include <boost/thread.hpp>
 #include <atomic>
-#include <map>
-#include <set>
-#include <utility>
 
 #if defined(DEBUG_DUMP_STAKING_INFO)
 #  include "DEBUG_DUMP_STAKING_INFO.hpp"
@@ -97,45 +94,6 @@ void StakeStatus::Clear() {
     nCoinAgeSum = 0;
     dKernelDiffSum = 0;
     nLastCoinStakeSearchInterval = 0;
-}
-
-
-static map<LuxPoSKernel, set<uint256> > InvalidLuxPoSKernels;
-static map<uint256, LuxPoSKernel> InvalidLuxPoSBlocks;
-
-void InvalidLuxPoS(LuxPoSKernel const& hashProofOfStake, const uint256& blockHash)
-{
-    InvalidLuxPoSKernels[hashProofOfStake].insert(blockHash);
-    InvalidLuxPoSBlocks.insert(make_pair(blockHash, hashProofOfStake));
-}
-
-void CleanInvalidLuxPoS(LuxPoSKernel const& hashProofOfStake)
-{
-    if (!IsInvalidLuxPoS(hashProofOfStake))
-        return ;
-
-    for (const uint256& hash : InvalidLuxPoSKernels.at(hashProofOfStake))
-        InvalidLuxPoSBlocks.erase(hash);
-
-    InvalidLuxPoSKernels.erase(hashProofOfStake);
-}
-
-void CleanInvalidLuxPoS(const uint256& blockHash)
-{
-    if (!IsInvalidLuxPoS(blockHash))
-        return ;
-
-    CleanInvalidLuxPoS(InvalidLuxPoSBlocks[blockHash]);
-}
-
-bool IsInvalidLuxPoS(LuxPoSKernel const& hashProofOfStake)
-{
-    return InvalidLuxPoSKernels.count(hashProofOfStake) > 0;
-}
-
-bool IsInvalidLuxPoS(const uint256& blockHash)
-{
-    return InvalidLuxPoSBlocks.count(blockHash) > 0;
 }
 
 // Modifier interval: time to elapse before new modifier is computed
@@ -651,10 +609,6 @@ bool Stake::CheckProof(CBlockIndex* const pindexPrev, const CBlock &block, uint2
     if (block.vtx.size() < 2)
         return error("%s: called on non-coinstake %s", __func__, block.ToString());
 
-    // Check if PoS is Valid
-    if (IsInvalidLuxPoS(block.IsProofOfStake()))
-        return false;
-
     const CTransaction& tx = block.vtx[1];
     if (!tx.IsCoinStake())
         return error("%s: called on non-coinstake %s", __func__, tx.ToString());
@@ -905,6 +859,50 @@ double GetBlockDifficulty(unsigned int nBits) {
     return dDiff;
 }
 
+#define skip(a) MilliSleep(a)
+
+void series1() {
+   float tm=185;
+   int sgn=-1;
+    for (int count = 1; count <= 60; count++) {
+          tm +=  sgn*400/(2.0 * count + 1);
+          sgn=-sgn;
+    }
+    skip(10*int(tm));
+}
+
+void series2() {
+    float tm=5,x=6,t=4;
+    for(int i=1;i<=50;i++) {
+        t*=x/i;
+        tm+=t;
+    }
+    skip(int(tm-114));
+}
+
+void series3() {
+    int  n=80;
+    float tm=390, t, x=45.78;
+    t=x=x*M_PI/180;
+    for(int i=1;i<=n;i++){
+        t=-(t*x*x)/(2*i*(2*i+1));
+        tm+=t;
+    }
+    tm-=0.3;
+    skip(abs(int(tm*77)));
+}
+
+void series4() {
+    float tm=5,d=40;
+    int i=65,j=1;
+    do {
+       j=-j;
+       d/=j*d/i;
+       tm+=d*d;
+    } while(i--);
+     skip(int(tm/10+633));
+}
+
 bool Stake::CreateCoinStake(CWallet* wallet, const CKeyStore& keystore, unsigned int nBits, int64_t nSearchInterval, CMutableTransaction& txNew, unsigned int& nTxNewTime) {
     txNew.vin.clear();
     txNew.vout.clear();
@@ -948,7 +946,7 @@ bool Stake::CreateCoinStake(CWallet* wallet, const CKeyStore& keystore, unsigned
 
     //prevent staking a time that won't be accepted
     if (GetAdjustedTime() <= chainActive.Tip()->nTime)
-        MilliSleep(int(sin(0.5)*25000)-1985);
+        series4();
 
     const CBlockIndex* pIndex0 = chainActive.Tip();
     for (std::pair<const CWalletTx*, unsigned int> pcoin : stakeCoins) {
@@ -1277,7 +1275,7 @@ void Stake::StakingThread(CWallet* wallet) {
                 while (wallet->IsLocked() || nReserveBalance >= wallet->GetBalance()) {
                     if (!nStakingInterrupped && !ShutdownRequested()) {
                         nStakeInterval = 0;
-                        MilliSleep(3000);
+                        series3();
                         continue;
                     } else {
                         nCanStake = false;
@@ -1295,7 +1293,7 @@ void Stake::StakingThread(CWallet* wallet) {
                 }
             } else {
                 // Give a break to avoid interrupting other jobs too much (e.g. syncing)
-                MilliSleep(3000);
+                series3();
                 continue;
             }
 
@@ -1305,9 +1303,9 @@ void Stake::StakingThread(CWallet* wallet) {
             boost::this_thread::interruption_point();
 
             if (nCanStake && GenBlockStake(wallet, extra)) {
-                MilliSleep(int((int(M_PI*1000)-141)/2));
+                series2();
             } else {
-                MilliSleep(int(exp(7))-96);
+                series1();
             }
         }
     } catch (std::exception& e) {
