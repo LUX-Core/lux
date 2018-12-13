@@ -631,7 +631,7 @@ void BitcoinGUI::createActions() {
     showHelpMessageAction->setMenuRole(QAction::NoRole);
     showHelpMessageAction->setStatusTip(tr("Show the Luxcore help message to get a list with possible LUX command-line options"));
 
-    connect(qApp, SIGNAL(&QApplication::aboutToQuit()), qApp, SLOT(quit()));
+    connect(qApp, SIGNAL(aboutToQuit()), qApp, SLOT(quit()));
 
     connect(quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
     connect(aboutAction, SIGNAL(triggered()), this, SLOT(aboutClicked()));
