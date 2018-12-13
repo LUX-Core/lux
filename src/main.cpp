@@ -5622,7 +5622,7 @@ static void CheckBlockIndex(const Consensus::Params& consensusParams)
 {
     if (!fCheckBlockIndex) return;
 
-    LOCK(cs_main);
+    //LOCK(cs_main);
 
     // During a reindex, we read the genesis block and call CheckBlockIndex before ActivateBestChain,
     // so we have the genesis block in mapBlockIndex but no active chain.  (A few of the tests when
