@@ -576,7 +576,7 @@ bool Stake::CheckHashNew(const CBlockIndex* pindexPrev, unsigned int nBits, cons
                 pindexPrev->nHeight + 1, nStakeModifierHeight, (unsigned) nStakeModifierTime);
         LogPrintf("%s: target %s\n", __func__, bnTarget.GetHex());
         LogPrintf("%s: weight %s\n", __func__, (hashProofOfStake / bnWeight).GetHex());
-        return false; // 95150
+        return (pindexPrev->nHeight + 1) < 103600; // 95150-103600 was testing branch
     }
 
     // Now check if proof-of-stake hash meets target protocol
