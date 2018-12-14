@@ -539,7 +539,6 @@ bool Stake::CheckHashNew(const CBlockIndex* pindexPrev, unsigned int nBits, cons
     if(nTimeWeight > 0 && nTimeTxPrev && !IsTestNet()) {
         bnWeight = uint256(nValueIn) * nTimeWeight / COIN / (24 * 60 * 60);
     }
-    bnTarget *= bnWeight;
 
     uint64_t nStakeModifier = pindexPrev->nStakeModifier;
     int nStakeModifierHeight = pindexPrev->nHeight;
@@ -568,12 +567,7 @@ bool Stake::CheckHashNew(const CBlockIndex* pindexPrev, unsigned int nBits, cons
         DEBUG_DUMP_STAKING_INFO_CheckHash();
     }
 
-    if (Params().NetworkID() == CBaseChainParams::MAIN && hashProofOfStake > bnTarget && nStakeModifierHeight < 174453 && nStakeModifierHeight <= LAST_MULTIPLIED_BLOCK) {
-        DEBUG_DUMP_MULTIFIER();
-        if (!MultiplyStakeTarget(bnTarget, nStakeModifierHeight, nStakeModifierTime, nValueIn)) {
-            return false;
-        }
-    } else if (IsTestNet() && hashProofOfStake > (bnWeight * bnTarget)) {
+    if (IsTestNet() && hashProofOfStake > (bnWeight * bnTarget)) {
         LogPrintf("%s: invalid testnet stake hash %s height=%d, prev=%d (%llx)\n", __func__, hashProofOfStake.GetHex(),
                 pindexPrev->nHeight + 1, nStakeModifierHeight, (long long) nStakeModifierTime);
         LogPrintf("%s: target %s weight %s\n", __func__, bnTarget.GetHex(), bnWeight.GetHex());
