@@ -376,7 +376,7 @@ bool MultiplyStakeTarget(uint256& bnTarget, int nModifierHeight, int64_t nModifi
 }
 
 // LUX Stake modifier used to hash the stake kernel which is chosen as the stake
-// modifier (nStakeMinAge - nSlectionTime). So at least, it selects the period later than the stake produces since from the nStakeMinAge
+// modifier (nStakeMinAge - nSelectionTime). So at least, it selects the period later than the stake produces since from the nStakeMinAge
 static bool GetLuxStakeKernel(unsigned int nTimeTx, uint64_t& nStakeModifier, int& nStakeModifierHeight, int64_t& nStakeModifierTime, bool fPrintProofOfStake) {
     unsigned int nStakeMinAge = Params().StakingMinAge();
     const CBlockIndex* pindex = pindexBestHeader;
@@ -384,31 +384,26 @@ static bool GetLuxStakeKernel(unsigned int nTimeTx, uint64_t& nStakeModifier, in
     nStakeModifierTime = pindex->GetBlockTime();
     int64_t nSelectionTime = GetSelectionTime();
 
-    if (fDebug) {
-        if (fPrintProofOfStake) {
-            LogPrintf("%s : stake modifier time: %s interval: %d, time: %s\n", __func__,
-                      DateTimeStrFormat("%Y-%m-%d %H:%M:%S", nStakeModifierTime).c_str(),
-                      nSelectionTime, DateTimeStrFormat("%Y-%m-%d %H:%M:%S", nTimeTx).c_str());
-        }
+    if (fDebug && fPrintProofOfStake) {
+        LogPrintf("%s: stake modifier time: %s interval: %d, time: %s\n", __func__,
+                DateTimeStrFormat("%Y-%m-%d %H:%M:%S", nStakeModifierTime).c_str(),
+                nSelectionTime, DateTimeStrFormat("%Y-%m-%d %H:%M:%S", nTimeTx).c_str());
     }
 
     // Loop to find the stake modifier earlier
     if (nStakeModifierTime + nStakeMinAge - nSelectionTime <= nTimeTx) {
         // Best block is more than (nStakeMinAge - nSlectionTime). Older than kernel timestamp
-        if (fDebug) {
-            if (fPrintProofOfStake)
-                return error("GetKernelStakeModifier() : best block %s at height %d too old for stake",
-                             pindex->GetBlockHash().ToString().c_str(), pindex->nHeight);
-            else
-                return false;
+        if (fDebug && fPrintProofOfStake) {
+            LogPrintf("%s: best block %s at height %d too old for stake", __func__,
+                    pindex->GetBlockHash().ToString().c_str(), pindex->nHeight);
         }
+        if (!IsTestNet()) // nStakeMinAge = 360
+            return false;
     }
 
-    // TODO: Test before use
     while (nStakeModifierTime + nStakeMinAge - nSelectionTime > nTimeTx) {
-        if (!pindex->pprev) {
+        if (!pindex->pprev)
             return error("GetKernelStakeModifier() : reached genesis block");
-        }
 
         pindex = pindex->pprev;
         if (pindex->GeneratedStakeModifier()) {
@@ -424,7 +419,7 @@ static bool GetLuxStakeKernel(unsigned int nTimeTx, uint64_t& nStakeModifier, in
 // Get the StakeModifier specified by our protocol for the checkhash function.
 // Note: Separated GetKernelStakeModifier & GetLuxStakeKernel for convenient in case we need any other fork later on
 static bool GetKernelStakeModifier(unsigned int nTimeTx, uint64_t& nStakeModifier, int& nStakeModifierHeight, int64_t& nStakeModifierTime, bool fPrintProofOfStake) {
-        return GetLuxStakeKernel(nTimeTx, nStakeModifier, nStakeModifierHeight, nStakeModifierTime, fPrintProofOfStake);
+    return GetLuxStakeKernel(nTimeTx, nStakeModifier, nStakeModifierHeight, nStakeModifierTime, fPrintProofOfStake);
 }
 
 //instead of looping outside and reinitializing variables many times, we will give a nTimeTx and also search interval so that we can do all the hashing here
@@ -535,10 +530,10 @@ bool Stake::CheckHashNew(const CBlockIndex* pindexPrev, unsigned int nBits, cons
     int64_t nValueIn = txPrev.vout[prevout.n].nValue;
     uint256 bnWeight = uint256(nValueIn);
 
-    unsigned nTimeWeight = std::max(nTimeTx - nTimeTxPrev, (unsigned)nStakingMinAge);
+    unsigned nTimeWeight = nTimeTx - nTimeTxPrev;
     if(nTimeTxPrev && nStakingMinAge) {
-        bnWeight = ((uint256(nValueIn) * nTimeWeight * 0x100) / nStakingMinAge);
-        LogPrintf("%s: nTimeWeight=%u wr=%x w=%s\n", __func__, nTimeWeight, (nTimeWeight * 0x100) / nStakingMinAge, bnWeight.GetHex());
+        bnWeight = ((uint256(nValueIn) * nTimeWeight) / nStakingMinAge);
+        LogPrintf("%s: nTimeWeight=%u wr=%u w=%s\n", __func__, nTimeWeight, nTimeWeight / nStakingMinAge, bnWeight.GetHex());
     }
 
     // prevent divide by 0, but should never happen
@@ -576,7 +571,7 @@ bool Stake::CheckHashNew(const CBlockIndex* pindexPrev, unsigned int nBits, cons
                 pindexPrev->nHeight + 1, nStakeModifierHeight, (unsigned) nStakeModifierTime);
         LogPrintf("%s: target %s\n", __func__, bnTarget.GetHex());
         LogPrintf("%s: weight %s\n", __func__, (hashProofOfStake / bnWeight).GetHex());
-        return (pindexPrev->nHeight + 1) < 103600; // 95150-103600 was testing branch
+        return (pindexPrev->nHeight + 1) < 103700; // 95150-103600 was testing branch, < 103700 with wr ratio 0x100
     }
 
     // Now check if proof-of-stake hash meets target protocol
