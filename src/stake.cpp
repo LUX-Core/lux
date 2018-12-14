@@ -481,7 +481,7 @@ bool Stake::CheckHashOld(const CBlockIndex* pindexPrev, unsigned int nBits, cons
                   DateTimeStrFormat("%Y-%m-%d %H:%M:%S", blockFrom.GetBlockTime()).c_str());
         LogPrintf("%s: check modifier=0x%016x nTimeBlockFrom=%u nTimeTxPrev=%u nPrevout=%u nTimeTx=%u hashProof=%s\n", __func__,
                   nStakeModifier,
-                  blockFrom.GetBlockTime(), txPrev.nTime, prevout.n, nTimeTx,
+                  nTimeBlockFrom, txPrev.nTime, prevout.n, nTimeTx,
                   hashProofOfStake.ToString());
 #       endif
         DEBUG_DUMP_STAKING_INFO_CheckHash();
@@ -510,8 +510,11 @@ bool Stake::CheckHashNew(const CBlockIndex* pindexPrev, unsigned int nBits, cons
 
     unsigned int nTimeBlockFrom = blockFrom.GetBlockTime();
 
+    // Beware, txPrev.nTime seen at 0 during -reindex
+    unsigned int nTimeTxPrev = txPrev.nTime ? txPrev.nTime : nTimeBlockFrom;
+
     // Transaction timestamp violation
-    if (nTimeTx < txPrev.nTime) {
+    if (nTimeTx < nTimeTxPrev) {
         return false;
     }
 
@@ -532,8 +535,8 @@ bool Stake::CheckHashNew(const CBlockIndex* pindexPrev, unsigned int nBits, cons
     int64_t nValueIn = txPrev.vout[prevout.n].nValue;
     uint256 bnWeight = uint256(nValueIn);
 
-    int64_t nTimeWeight = min((int64_t)nTimeTx - txPrev.nTime,  nStakingMinAge);
-    if(nTimeWeight) {
+    int64_t nTimeWeight = min((int64_t)nTimeTx - nTimeTxPrev, nStakingMinAge);
+    if(nTimeWeight > 0 && nTimeTxPrev && !IsTestNet()) {
         bnWeight = uint256(nValueIn) * nTimeWeight / COIN / (24 * 60 * 60);
     }
     bnTarget *= bnWeight;
@@ -549,18 +552,18 @@ bool Stake::CheckHashNew(const CBlockIndex* pindexPrev, unsigned int nBits, cons
         return false;
 
     ss << nStakeModifier;
-    ss << nTimeBlockFrom << txPrev.nTime << prevout.hash << prevout.n << nTimeTx;
+    ss << nTimeBlockFrom << nTimeTxPrev << prevout.hash << prevout.n << nTimeTx;
 
     hashProofOfStake = Hash(ss.begin(), ss.end());
 
-    if (fDebug) {
+    if (fDebug || IsTestNet()) {
         LogPrintf("%s: using modifier 0x%016x at height=%d timestamp=%s for block from timestamp=%s\n", __func__,
                   nStakeModifier, nStakeModifierHeight,
                   DateTimeStrFormat("%Y-%m-%d %H:%M:%S", nStakeModifierTime).c_str(),
                   DateTimeStrFormat("%Y-%m-%d %H:%M:%S", blockFrom.GetBlockTime()).c_str());
         LogPrintf("%s: check modifier=0x%016x nTimeBlockFrom=%u nTimeTxPrev=%u nPrevout=%u nTimeTx=%u hashProof=%s\n", __func__,
                   nStakeModifier,
-                  blockFrom.GetBlockTime(), txPrev.nTime, prevout.n, nTimeTx,
+                  nTimeBlockFrom, nTimeTxPrev, prevout.n, nTimeTx,
                   hashProofOfStake.ToString());
         DEBUG_DUMP_STAKING_INFO_CheckHash();
     }
@@ -571,9 +574,11 @@ bool Stake::CheckHashNew(const CBlockIndex* pindexPrev, unsigned int nBits, cons
             return false;
         }
     } else if (IsTestNet() && hashProofOfStake > (bnWeight * bnTarget)) {
-        LogPrintf("%s: invalid testnet stake hash %s height=%d, prev=%d (%x)\n", __func__, hashProofOfStake.GetHex(),
-                pindexPrev->nHeight, nStakeModifierHeight, nStakeModifierTime);
-        return true; // 95150 ?
+        LogPrintf("%s: invalid testnet stake hash %s height=%d, prev=%d (%llx)\n", __func__, hashProofOfStake.GetHex(),
+                pindexPrev->nHeight + 1, nStakeModifierHeight, (long long) nStakeModifierTime);
+        LogPrintf("%s: target %s weight %s\n", __func__, bnTarget.GetHex(), bnWeight.GetHex());
+        LogPrintf("%s: multiplied target %s\n", __func__, (bnTarget * bnWeight).GetHex());
+        return true; // 95150
     }
 
     // Now check if proof-of-stake hash meets target protocol
