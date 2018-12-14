@@ -533,7 +533,8 @@ bool Stake::CheckHashNew(const CBlockIndex* pindexPrev, unsigned int nBits, cons
     unsigned nTimeWeight = nTimeTx - nTimeTxPrev;
     if(nTimeTxPrev && nStakingMinAge) {
         bnWeight = ((uint256(nValueIn) * nTimeWeight) / nStakingMinAge);
-        LogPrintf("%s: nTimeWeight=%u wr=%u w=%s\n", __func__, nTimeWeight, nTimeWeight / nStakingMinAge, bnWeight.GetHex());
+        if (fDebug)
+            LogPrintf("%s: nTimeWeight=%u wr=%u w=%s\n", __func__, nTimeWeight, nTimeWeight / nStakingMinAge, bnWeight.GetHex());
     }
 
     // prevent divide by 0, but should never happen
@@ -554,7 +555,7 @@ bool Stake::CheckHashNew(const CBlockIndex* pindexPrev, unsigned int nBits, cons
     ss << nTimeBlockFrom << nTimeTxPrev << prevout.hash << prevout.n << nTimeTx;
     hashProofOfStake = Hash(ss.begin(), ss.end());
 
-    if (fDebug || IsTestNet()) {
+    if (fDebug) {
         LogPrintf("%s: using modifier 0x%016x at height=%d timestamp=%s for block from timestamp=%s\n", __func__,
                   nStakeModifier, nStakeModifierHeight,
                   DateTimeStrFormat("%Y-%m-%d %H:%M:%S", nStakeModifierTime).c_str(),
