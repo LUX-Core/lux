@@ -6024,8 +6024,14 @@ void static ProcessGetData(CNode* pfrom, const Consensus::Params& consensusParam
                             pushed = true;
                         }
                     }
-                    if(pushed)
-                        pfrom->PushMessage(inv.GetCommand(), ss);
+                    if(pushed) {
+                       try {
+                           const char* command = inv.GetCommand();
+                           pfrom->PushMessage(command, ss);
+                       } catch (std::out_of_range& e) {
+                           LogPrintf("%s: out_of_range in inv.GetCommand()\n", __func__);
+                       }
+                    }
                 }
 
                 if (!pushed && inv.type == MSG_TX) { //TODO: probably should check for MSG_TX_WITNESS too
