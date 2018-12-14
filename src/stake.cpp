@@ -543,16 +543,13 @@ bool Stake::CheckHashNew(const CBlockIndex* pindexPrev, unsigned int nBits, cons
     uint64_t nStakeModifier = pindexPrev->nStakeModifier;
     int nStakeModifierHeight = pindexPrev->nHeight;
     int64_t nStakeModifierTime = pindexPrev->nTime;
+    if (!GetKernelStakeModifier(nTimeTxPrev, nStakeModifier, nStakeModifierHeight, nStakeModifierTime, true))
+        return false;
 
     // Calculate hash
     CDataStream ss(SER_GETHASH, 0);
-
-    if (!GetKernelStakeModifier(nTimeBlockFrom, nStakeModifier, nStakeModifierHeight, nStakeModifierTime, true))
-        return false;
-
     ss << nStakeModifier;
     ss << nTimeBlockFrom << nTimeTxPrev << prevout.hash << prevout.n << nTimeTx;
-
     hashProofOfStake = Hash(ss.begin(), ss.end());
 
     if (fDebug || IsTestNet()) {
@@ -572,7 +569,7 @@ bool Stake::CheckHashNew(const CBlockIndex* pindexPrev, unsigned int nBits, cons
                 pindexPrev->nHeight + 1, nStakeModifierHeight, (long long) nStakeModifierTime);
         LogPrintf("%s: target %s weight %s\n", __func__, bnTarget.GetHex(), bnWeight.GetHex());
         LogPrintf("%s: multiplied target %s\n", __func__, (bnTarget * bnWeight).GetHex());
-        return true; // 95150
+        return false; // 95150
     }
 
     // Now check if proof-of-stake hash meets target protocol
