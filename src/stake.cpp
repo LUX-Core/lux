@@ -45,7 +45,7 @@ bool CheckCoinStakeTimestamp(uint32_t nTimeBlock) { return (nTimeBlock & STAKE_T
 // ratio of group interval length between the last group and the first group
 static const int MODIFIER_INTERVAL_RATIO = 3;
 
-static const int LAST_MULTIPLIED_BLOCK = 180 * 1000; // 180K
+static const int LAST_MULTIPLIED_BLOCK = 180000;
 
 static const bool ENABLE_ADVANCED_STAKING = true;
 
@@ -145,8 +145,8 @@ static int64_t GetSelectionTime() {
 // Finds a block from the candidate blocks in vSortedCandidates, excluding
 // already selected blocks in vSelectedBlocks, and with timestamp up to
 // nSelectionTime.
-static bool FindModifierBlockFromCandidates(vector <pair<int64_t, uint256>>& vSortedCandidates, map<uint256, const CBlockIndex*>& mSelectedBlocks, int64_t nSelectionTime, uint64_t nStakeModifierPrev,
-                                            const CBlockIndex*& pindexSelected) {
+static bool FindModifierBlockFromCandidates(vector <pair<int64_t, uint256>>& vSortedCandidates, map<uint256, const CBlockIndex*>& mSelectedBlocks, int64_t nSelectionTime, uint64_t nStakeModifierPrev, const CBlockIndex*& pindexSelected)
+{
     uint256 hashBest = 0;
 
     pindexSelected = nullptr;
@@ -508,10 +508,10 @@ bool Stake::CheckHashNew(const CBlockIndex* pindexPrev, unsigned int nBits, cons
     if (pindexPrev == nullptr)
         return false;
 
-    unsigned int nTimeBlockFrom = blockFrom.GetBlockTime();
+    uint32_t nTimeBlockFrom = (uint32_t) blockFrom.GetBlockTime();
 
     // Beware, txPrev.nTime seen at 0 during -reindex
-    unsigned int nTimeTxPrev = txPrev.nTime ? txPrev.nTime : nTimeBlockFrom;
+    uint32_t nTimeTxPrev = txPrev.nTime ? txPrev.nTime : nTimeBlockFrom;
 
     // Transaction timestamp violation
     if (nTimeTx < nTimeTxPrev) {
@@ -522,10 +522,10 @@ bool Stake::CheckHashNew(const CBlockIndex* pindexPrev, unsigned int nBits, cons
     if (GetStakeAge(nTimeBlockFrom) > nTimeTx)
         return false;
 
-    nHashInterval = std::max(nHashInterval, (unsigned int)(Params().StakingInterval()));
+    nHashInterval = std::max(nHashInterval, (unsigned)(Params().StakingInterval()));
     nSelectionPeriod = std::max(nSelectionPeriod,Params().StakingRoundPeriod());
     auto const nStakingMinAge=Params().StakingMinAge();
-    nStakeMinAge= std::max(nStakeMinAge, (unsigned int) nStakingMinAge);
+    nStakeMinAge = std::max(nStakeMinAge, (unsigned)nStakingMinAge);
 
     // Base target difficulty
     uint256 bnTarget;
@@ -535,9 +535,16 @@ bool Stake::CheckHashNew(const CBlockIndex* pindexPrev, unsigned int nBits, cons
     int64_t nValueIn = txPrev.vout[prevout.n].nValue;
     uint256 bnWeight = uint256(nValueIn);
 
-    int64_t nTimeWeight = min((int64_t)nTimeTx - nTimeTxPrev, nStakingMinAge);
-    if(nTimeWeight > 0 && nTimeTxPrev && !IsTestNet()) {
-        bnWeight = uint256(nValueIn) * nTimeWeight / COIN / (24 * 60 * 60);
+    unsigned nTimeWeight = std::max(nTimeTx - nTimeTxPrev, (unsigned)nStakingMinAge);
+    if(nTimeTxPrev && nStakingMinAge) {
+        bnWeight = ((uint256(nValueIn) * nTimeWeight * 0x100) / nStakingMinAge);
+        LogPrintf("%s: nTimeWeight=%u wr=%x w=%s\n", __func__, nTimeWeight, (nTimeWeight * 0x100) / nStakingMinAge, bnWeight.GetHex());
+    }
+
+    // prevent divide by 0, but should never happen
+    if(bnWeight == uint256(0)) {
+        LogPrintf("%s: invalid computed weight!\n", __func__);
+        return false;
     }
 
     uint64_t nStakeModifier = pindexPrev->nStakeModifier;
@@ -564,16 +571,16 @@ bool Stake::CheckHashNew(const CBlockIndex* pindexPrev, unsigned int nBits, cons
         DEBUG_DUMP_STAKING_INFO_CheckHash();
     }
 
-    if (IsTestNet() && hashProofOfStake > (bnWeight * bnTarget)) {
-        LogPrintf("%s: invalid testnet stake hash %s height=%d, prev=%d (%llx)\n", __func__, hashProofOfStake.GetHex(),
-                pindexPrev->nHeight + 1, nStakeModifierHeight, (long long) nStakeModifierTime);
-        LogPrintf("%s: target %s weight %s\n", __func__, bnTarget.GetHex(), bnWeight.GetHex());
-        LogPrintf("%s: multiplied target %s\n", __func__, (bnTarget * bnWeight).GetHex());
+    if (IsTestNet() && (hashProofOfStake / bnWeight) > bnTarget) {
+        LogPrintf("%s: invalid stake hash %s height=%d, modifier from %d (%x)\n", __func__, hashProofOfStake.GetHex(),
+                pindexPrev->nHeight + 1, nStakeModifierHeight, (unsigned) nStakeModifierTime);
+        LogPrintf("%s: target %s\n", __func__, bnTarget.GetHex());
+        LogPrintf("%s: weight %s\n", __func__, (hashProofOfStake / bnWeight).GetHex());
         return false; // 95150
     }
 
     // Now check if proof-of-stake hash meets target protocol
-    return (hashProofOfStake <= (bnWeight * bnTarget));
+    return (hashProofOfStake / bnWeight) <= bnTarget;
 }
 
 // Check our Proof of Stake hash meets target protocol
@@ -995,8 +1002,8 @@ bool Stake::CreateCoinStake(CWallet* wallet, const CKeyStore& keystore, unsigned
 //            nStakeCoinAgeSum += coinAge;
 //        }
 
-        //iterates each utxo inside of CheckStakeKernelHash()
-        if (CheckHash(pindex->pprev, bnStakeTarget.GetCompact(), block, *pcoin.first, prevoutStake, nTxNewTime, hashProofOfStake)) {
+        // iterates each utxo inside of CheckStakeKernelHash()
+        if (CheckHash(pindex->pprev, nBits, block, *(pcoin.first), prevoutStake, nTxNewTime, hashProofOfStake)) {
             //Double check that this will pass time requirements
             if (nTxNewTime <= chainActive.Tip()->GetMedianTimePast()) {
                 LogPrintf("%s: stake found, but it is too far in the past \n", __func__);
@@ -1097,7 +1104,7 @@ bool Stake::CreateCoinStake(CWallet* wallet, const CKeyStore& keystore, unsigned
     int numout = 0;
     CScript payeeScript;
     bool hasMasternodePayment = SelectMasternodePayee(payeeScript);
-	CAmount blockValue = nCredit;
+    CAmount blockValue = nCredit;
     CAmount masternodePayment = GetMasternodePosReward(chainActive.Height() + 1, nReward);
 
     if (hasMasternodePayment) {
