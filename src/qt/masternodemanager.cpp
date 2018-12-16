@@ -45,15 +45,15 @@ MasternodeManager::MasternodeManager(QWidget *parent) :
     ui->startButton->setEnabled(false);
     ui->stopButton->setEnabled(false);
     //ui->copyAddressButton->setEnabled(false);
+    ui->tableWidgetPMN->setVisible(false);
 
     subscribeToCoreSignals();
 
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(updateNodeList()));
-        timer->start(1000);
-
-        fFilterUpdated = true;
-	nTimeFilterUpdated = GetTime();
+    timer->start(1000);
+    fFilterUpdated = true;
+    nTimeFilterUpdated = GetTime();
 }
 
 MasternodeManager::~MasternodeManager()
@@ -97,7 +97,7 @@ void MasternodeManager::on_tableWidget_2_itemSelectionChanged()
         ui->getConfigButton->setEnabled(true);
         ui->startButton->setEnabled(true);
         ui->stopButton->setEnabled(true);
-	   //ui->copyAddressButton->setEnabled(true);
+        //ui->copyAddressButton->setEnabled(true);
     }
 }
 
@@ -209,8 +209,14 @@ void MasternodeManager::setWalletModel(WalletModel *model)
     this->walletModel = model;
     if(model && model->getOptionsModel())
     {
+        ui->tableWidgetPMN->setVisible(model->getOptionsModel()->getParallelMasternodes());
+	connect(model->getOptionsModel(), SIGNAL(parallelMasternodesChanged(bool)), this, SLOT(setPMNsVisible(bool)));
     }
+}
 
+void MasternodeManager::setPMNsVisible(bool visible)
+{
+    ui->tableWidgetPMN->setVisible(visible);
 }
 
 void MasternodeManager::on_createButton_clicked()
