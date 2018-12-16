@@ -41,18 +41,17 @@ public:
         Theme,                   // QString
         Language,                // QString
         CoinControlFeatures,     // bool
-        showMasternodesTab,      // bool
-        parallelMasterNode,      // bool
+        ShowMasternodesTab,      // bool
+        ParallelMasternodes,     // bool
         ThreadsScriptVerif,      // int
         DatabaseCache,           // int
         LogFileCount,            // int
         LogEvents,               // bool
         ZeroBalanceAddressToken, // bool
         SpendZeroConfChange,     // bool
-        ShowAdvancedUI,          //bool
+        ShowAdvancedUI,          // bool
         DarkSendRounds,          // int
-        AnonymizeLuxAmount,      //int
-        ShowMasternodesTab,      // bool
+        AnonymizeLuxAmount,      // int
         NotUseChangeAddress,     // bool
         WalletBackups,           // int
         Listen,                  // bool
@@ -80,8 +79,8 @@ public:
     bool getProxySettings(QNetworkProxy& proxy) const;
     bool getCoinControlFeatures() { return fCoinControlFeatures; }
     bool getShowAdvancedUI() { return fShowAdvancedUI; }
-    bool getshowMasternodesTab() { return fshowMasternodesTab; }
-    bool getparallelMasterNode() { return fparallelMasterNode; }
+    bool getShowMasternodesTab() { return fShowMasternodesTab; }
+    bool getParallelMasternodes() { return fParallelMasternodes; }
     const QString& getOverriddenByCommandLine() { return strOverriddenByCommandLine; }
 
     /* Restart flag helper */
@@ -99,8 +98,8 @@ private:
     QString strThirdPartyTxUrls;
     bool fCoinControlFeatures;
     bool fShowAdvancedUI;
-    bool fshowMasternodesTab;
-    bool fparallelMasterNode;
+    bool fShowMasternodesTab;
+    bool fParallelMasternodes;
     /* settings that were overriden by command-line */
     QString strOverriddenByCommandLine;
 
@@ -115,7 +114,7 @@ Q_SIGNALS:
     void anonymizeLuxAmountChanged(int);
     void coinControlFeaturesChanged(bool);
     void showMasternodesTabChanged(bool);
-    void parallelMasterNodeChanged(bool);
+    void parallelMasternodesChanged(bool);
     void zeroBalanceAddressTokenChanged(bool);
     void walletBackupsChanged(int);
     void hideTrayIconChanged(bool);

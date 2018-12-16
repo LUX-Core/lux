@@ -394,7 +394,7 @@ static bool GetLuxStakeKernel(unsigned int nTimeTx, uint64_t& nStakeModifier, in
     if (nStakeModifierTime + nStakeMinAge - nSelectionTime <= nTimeTx) {
         // Best block is more than (nStakeMinAge - nSlectionTime). Older than kernel timestamp
         if (fDebug && fPrintProofOfStake) {
-            LogPrintf("%s: best block %s at height %d too old for stake", __func__,
+            LogPrintf("%s: best block %s at height %d too old for stake\n", __func__,
                     pindex->GetBlockHash().ToString().c_str(), pindex->nHeight);
         }
         if (!IsTestNet()) // nStakeMinAge = 360

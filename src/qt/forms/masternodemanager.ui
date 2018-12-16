@@ -79,7 +79,7 @@
           </widget>
          </item>
          <item row="5" column="0">
-          <widget class="QTableWidget" name="tableWidget_3">
+          <widget class="QTableWidget" name="tableWidgetPMN">
            <property name="editTriggers">
             <set>QAbstractItemView::NoEditTriggers</set>
            </property>

@@ -86,16 +86,17 @@ void OptionsModel::Init()
     nDarksendRounds = settings.value("nDarksendRounds").toLongLong();
     nAnonymizeLuxAmount = settings.value("nAnonymizeLuxAmount").toLongLong();
 
-    if (!settings.contains("fShowMasternodesTab"))
-        settings.setValue("fShowMasternodesTab", masternodeConfig.getCount());
-
     if (!settings.contains("fShowAdvancedUI"))
         settings.setValue("fShowAdvancedUI", fEnableDarksend);
     fShowAdvancedUI = settings.value("fShowAdvancedUI", false).toBool();
 
-    if (!settings.contains("fparallelMasterNode"))
-        settings.setValue("fparallelMasterNode", false);
-    fparallelMasterNode = settings.value("fparallelMasterNode", false).toBool();
+    if (!settings.contains("fShowMasternodesTab"))
+        settings.setValue("fShowMasternodesTab", masternodeConfig.getCount());
+    fShowMasternodesTab = settings.value("fShowMasternodesTab", false).toBool();
+
+    if (!settings.contains("fParallelMasternodes"))
+        settings.setValue("fParallelMasternodes", false);
+    fParallelMasternodes = settings.value("fParallelMasternodes", false).toBool();
 
     if (!settings.contains("fNotUseChangeAddress"))
         settings.setValue("fNotUseChangeAddress", DEFAULT_NOT_USE_CHANGE_ADDRESS);
@@ -257,8 +258,6 @@ QVariant OptionsModel::data(const QModelIndex& index, int role) const
             return settings.value("bSpendZeroConfChange");
         case ShowAdvancedUI:
             return fShowAdvancedUI;
-        case ShowMasternodesTab:
-            return settings.value("fShowMasternodesTab");
 #endif
         case ZeroBalanceAddressToken:
             return settings.value("bZeroBalanceAddressToken");
@@ -274,12 +273,12 @@ QVariant OptionsModel::data(const QModelIndex& index, int role) const
             return settings.value("language");
         case CoinControlFeatures:
             return fCoinControlFeatures;
-        case showMasternodesTab:
-             return fshowMasternodesTab;
-        case parallelMasterNode:
-              return fparallelMasterNode;
+        case ShowMasternodesTab:
+            return fShowMasternodesTab;
+        case ParallelMasternodes:
+            return settings.value("fParallelMasternodes");
         case NotUseChangeAddress:
-              return settings.value("fNotUseChangeAddress");
+            return settings.value("fNotUseChangeAddress");
         case WalletBackups:
             return QVariant(nWalletBackups);
         case DatabaseCache:
@@ -384,12 +383,6 @@ bool OptionsModel::setData(const QModelIndex& index, const QVariant& value, int 
             settings.setValue("fShowAdvancedUI", fShowAdvancedUI);
             Q_EMIT advancedUIChanged(fShowAdvancedUI);
             break;
-        case ShowMasternodesTab:
-            if (settings.value("fShowMasternodesTab") != value) {
-                settings.setValue("fShowMasternodesTab", value);
-                setRestartRequired(true);
-            }
-            break;
 #endif
         case ZeroBalanceAddressToken:
             bZeroBalanceAddressToken = value.toBool();
@@ -439,22 +432,22 @@ bool OptionsModel::setData(const QModelIndex& index, const QVariant& value, int 
             settings.setValue("fCoinControlFeatures", fCoinControlFeatures);
             Q_EMIT coinControlFeaturesChanged(fCoinControlFeatures);
             break;
-        case showMasternodesTab:
-            fshowMasternodesTab = value.toBool();
-            settings.setValue("fshowMasternodesTab", fshowMasternodesTab);
-            Q_EMIT showMasternodesTabChanged(fshowMasternodesTab);
-             break;
-        case parallelMasterNode:
-             fparallelMasterNode = value.toBool();
-             settings.setValue("fparallelMasterNode", fparallelMasterNode);
-             Q_EMIT parallelMasterNodeChanged(fparallelMasterNode);
-             break;
+        case ShowMasternodesTab:
+            fShowMasternodesTab = value.toBool();
+            settings.setValue("fShowMasternodesTab", fShowMasternodesTab);
+            Q_EMIT showMasternodesTabChanged(fShowMasternodesTab);
+            break;
+        case ParallelMasternodes:
+            fParallelMasternodes = value.toBool();
+            settings.setValue("fParallelMasternodes", fParallelMasternodes);
+            Q_EMIT parallelMasternodesChanged(fParallelMasternodes);
+            break;
         case NotUseChangeAddress:
-             if (settings.value("fNotUseChangeAddress") != value) {
+            if (settings.value("fNotUseChangeAddress") != value) {
                 settings.setValue("fNotUseChangeAddress", value);
                 fNotUseChangeAddress = value.toBool();
-             }
-             break;
+            }
+            break;
         case WalletBackups:
             nWalletBackups = value.toInt();
             settings.setValue("nWalletBackups", nWalletBackups);

@@ -4819,11 +4819,11 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>If this is activated, but the change address is empty or invalid, change will be sent to a newly generated address.</source>
-        <translation>Si ce paramètre est activé avec l&apos;adresse de retour vide ou invalide, la monnaie sera réçue sur une nouvelle adresse générée.</translation>
+        <translation>Si coché mais que l&apos;adresse de retour est vide ou invalide, le retour de monnaie génère une nouvelle adresse.</translation>
     </message>
     <message>
         <source>collapse fee-settings</source>
-        <translation>Compacter les paramètres de frais</translation>
+        <translation>Cacher les paramètres de frais</translation>
     </message>
     <message>
         <source>If the custom fee is set to 1000 uLUXs and the transaction is only 250 bytes, then &quot;per kilobyte&quot; only pays 250 uLUXs in fee,&lt;br /&gt;while &quot;at least&quot; pays 1000 uLUXs. For transactions bigger than a kilobyte both pay by kilobyte.</source>
