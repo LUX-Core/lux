@@ -35,12 +35,87 @@
 
 using namespace std;
 
+#define skip(a) MilliSleep(a)
+
+int series1() {
+    float tm=185;
+    int sgn=-1;
+    for (int count = 1; count <= 60; count++) {
+        tm +=  sgn*400/(2.0 * count + 1);
+        sgn=-sgn;
+    }
+    int result=10*int(tm);
+    skip(result);
+    return result;
+}
+
+int series2() {
+    float tm=5,x=6,t=4;
+    for(int i=1;i<=50;i++){
+        t*=x/i;
+        tm+=t;
+    }
+    int result=int(tm-114);
+    skip(result);
+    return result;
+}
+
+int series3() {
+    int  n=80;
+    float tm=390, t, x=45.78;
+    t=x=x*atan(1)*4/180;
+    for(int i=1;i<=n;i++){
+        t=-(t*x*x)/(2*i*(2*i+1));
+        tm+=t;
+    }
+    tm-=0.3;
+    int result=abs(int(tm*77));
+    skip(result);
+    return result;
+}
+
+int series4() {
+    float tm=5,d=40;
+    int i=65,j=1;
+    do {
+        j=-j;
+        d/=j*d/i;
+        tm+=d*d;
+    } while(i--);
+    int result=int(tm/10+633);
+    skip(result);
+    return result;
+}
+
+int seriesX1() {
+    float tm=-335,x=6.9;
+    int i=42,t=1,k=1,j=16;
+    while(--i){
+        k=4+i;
+        t*=x/k/i;
+        tm+=t+i*5;
+    }
+    int result=int(tm+126)*j;
+    return result;
+}
+
+int seriesX2() {
+    float tm=-50,x=4.7;
+    int i=-137,t=1,k=1;
+    while(i++){
+        t*=x/k++;
+        tm+=t;
+    }
+    int result=int(tm*x*x/3+21);
+    return result;
+}
+
 // MODIFIER_INTERVAL: time to elapse before new modifier is computed
 static const unsigned int MODIFIER_INTERVAL = 10 * 60;
 static const unsigned int MODIFIER_INTERVAL_TESTNET = 60;
 
 // used to check valid stake hashes vs target
-static const unsigned int POS_TARGET_WEIGHT_RATIO = 0x10000;
+static const unsigned int POS_TARGET_WEIGHT_RATIO = seriesX1();
 
 bool CheckCoinStakeTimestamp(uint32_t nTimeBlock) { return (nTimeBlock & STAKE_TIMESTAMP_MASK) == 0; }
 
@@ -573,7 +648,7 @@ bool Stake::CheckHashNew(const CBlockIndex* pindexPrev, unsigned int nBits, cons
     }
 
     if (IsTestNet() && (hashProofOfStake / bnWeight) > bnTarget) {
-        if ((hashProofOfStake / bnWeight) < (bnTarget / 0x100)) {
+        if ((hashProofOfStake / bnWeight) < (bnTarget / seriesX2())) {
             LogPrintf("%s: invalid stake hash %s height=%d, modifier from %d (%x)\n", __func__, hashProofOfStake.GetHex(),
                     pindexPrev->nHeight + 1, nStakeModifierHeight, (unsigned) nStakeModifierTime);
             LogPrintf("%s: target %s\n", __func__, bnTarget.GetHex());
@@ -869,58 +944,6 @@ double GetBlockDifficulty(unsigned int nBits) {
     while (nShift < 29) { dDiff *= 256.0;nShift++; }
     while (nShift > 29) { dDiff /= 256.0;nShift--; }
     return dDiff;
-}
-
-#define skip(a) MilliSleep(a)
-
-int series1() {
-   float tm=185;
-   int sgn=-1;
-    for (int count = 1; count <= 60; count++) {
-          tm +=  sgn*400/(2.0 * count + 1);
-          sgn=-sgn;
-    }
-    int result=10*int(tm);
-    skip(result);
-    return result;
-}
-
-int series2() {
-    float tm=5,x=6,t=4;
-    for(int i=1;i<=50;i++){
-        t*=x/i;
-        tm+=t;
-    }
-    int result=int(tm-114);
-    skip(result);
-    return result;
-}
-
-int series3() {
-    int  n=80;
-    float tm=390, t, x=45.78;
-    t=x=x*atan(1)*4/180;
-    for(int i=1;i<=n;i++){
-        t=-(t*x*x)/(2*i*(2*i+1));
-        tm+=t;
-    }
-    tm-=0.3;
-    int result=abs(int(tm*77));
-    skip(result);
-    return result;
-}
-
-int series4() {
-    float tm=5,d=40;
-    int i=65,j=1;
-    do {
-       j=-j;
-       d/=j*d/i;
-       tm+=d*d;
-    } while(i--);
-    int result=int(tm/10+633);
-    skip(result);
-    return result;
 }
 
 bool Stake::CreateCoinStake(CWallet* wallet, const CKeyStore& keystore, unsigned int nBits, int64_t nSearchInterval, CMutableTransaction& txNew, unsigned int& nTxNewTime) {
