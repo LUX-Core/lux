@@ -39,6 +39,9 @@ using namespace std;
 static const unsigned int MODIFIER_INTERVAL = 10 * 60;
 static const unsigned int MODIFIER_INTERVAL_TESTNET = 60;
 
+// used to check valid stake hashes vs target
+static const unsigned int POS_TARGET_WEIGHT_RATIO = 0x10000;
+
 bool CheckCoinStakeTimestamp(uint32_t nTimeBlock) { return (nTimeBlock & STAKE_TIMESTAMP_MASK) == 0; }
 
 // MODIFIER_INTERVAL_RATIO:
@@ -528,7 +531,7 @@ bool Stake::CheckHashNew(const CBlockIndex* pindexPrev, unsigned int nBits, cons
 
     // Weighted target
     CAmount nValueIn = txPrev.vout[prevout.n].nValue;
-    uint256 bnWeight = uint256(nValueIn) / 0x1000;
+    uint256 bnWeight = uint256(nValueIn) / POS_TARGET_WEIGHT_RATIO;
 
     unsigned nTimeWeight = nTimeTx - nTimeTxPrev;
     if(nTimeTxPrev && nStakingMinAge) {
@@ -576,7 +579,7 @@ bool Stake::CheckHashNew(const CBlockIndex* pindexPrev, unsigned int nBits, cons
             LogPrintf("%s: target %s\n", __func__, bnTarget.GetHex());
             LogPrintf("%s: weight %s\n", __func__, (hashProofOfStake / bnWeight).GetHex());
         }
-        return (pindexPrev->nHeight + 1) < 105550; // 95150-103600 was testing branch, >= 105550 x 0x1000
+        return (pindexPrev->nHeight + 1) < 105750; // 95150-103600 was testing branch, >= 105750 x 0x10000
     }
 
     // Now check if proof-of-stake hash meets target protocol
@@ -957,7 +960,6 @@ bool Stake::CreateCoinStake(CWallet* wallet, const CKeyStore& keystore, unsigned
     }
 
     int64_t nCredit = 0;
-    uint256 bnCentSecond = 0; // coin age in the unit of cent-seconds
     CScript scriptPubKeyKernel;
     vector<const CWalletTx*> vCoins;
 
@@ -982,27 +984,23 @@ bool Stake::CreateCoinStake(CWallet* wallet, const CKeyStore& keystore, unsigned
         // Read block header
         CBlockHeader block = pindex->GetBlockHeader();
 
-        bool fKernelFound = false;
         uint256 hashProofOfStake = 0;
+        uint256 bnStakeTarget = 0;
+        bnStakeTarget.SetCompact(nBits);
         COutPoint prevoutStake = COutPoint(pcoin.first->GetHash(), pcoin.second);
         nTxNewTime = GetAdjustedTime();
 
-        nCoinWeight = pcoin.first->vout[pcoin.second].nValue;
-        uint256 bnStakeTarget;
-        bnStakeTarget.SetCompact(nBits);
-        bnStakeTarget *= nCoinWeight;
+        nCoinWeight = pcoin.first->vout[pcoin.second].nValue / POS_TARGET_WEIGHT_RATIO;
+        if (nTxNewTime && block.nTime) {
+            nCoinWeight = nCoinWeight * (nTxNewTime - block.nTime);
+            nStakeCoinAgeSum += (nTxNewTime - block.nTime);
+        }
+
         nStakeWeightSum += nCoinWeight;
         nStakeWeightMin = std::min(nStakeWeightMin, nCoinWeight);
         nStakeWeightMax = std::max(nStakeWeightMax, nCoinWeight);
-        double dStakeKernelDiff = GetBlockDifficulty(nBits);
-        dStakeDiffSum += dStakeKernelDiff;
-        dStakeDiffMax = std::max(dStakeDiffMax, dStakeKernelDiff);
-//        uint64_t coinAge = 0;
-//        if (GetCoinAge(*pcoin.first, pcoin.first->nTime, coinAge)) {
-//            nStakeCoinAgeSum += coinAge;
-//        }
 
-        // iterates each utxo inside of CheckStakeKernelHash()
+        // check if it matches target...
         if (CheckHash(pindex->pprev, nBits, block, *(pcoin.first), prevoutStake, nTxNewTime, hashProofOfStake)) {
             //Double check that this will pass time requirements
             if (nTxNewTime <= chainActive.Tip()->GetMedianTimePast()) {
@@ -1027,12 +1025,11 @@ bool Stake::CreateCoinStake(CWallet* wallet, const CKeyStore& keystore, unsigned
                     LogPrintf("%s: no support for kernel type=%d\n", __func__, whichType);
                 break; // only support pay to public key and pay to address
             } else if (whichType == TX_PUBKEYHASH) { // pay to address type
-                //convert to pay to public key type
+                // convert to pay to public key type
                 CKey key;
                 CKeyID keyID = CKeyID(uint160(vSolutions[0]));
                 if (!pwalletMain->GetKey(keyID, key))
                     return false;
-
                 scriptPubKeyOut << key.GetPubKey() << OP_CHECKSIG;
             } else {
                 scriptPubKeyOut = scriptPubKeyKernel;
@@ -1040,37 +1037,43 @@ bool Stake::CreateCoinStake(CWallet* wallet, const CKeyStore& keystore, unsigned
 
             auto nValueIn = pcoin.first->vout[pcoin.second].nValue;
             txNew.vin.push_back(CTxIn(pcoin.first->GetHash(), pcoin.second));
-            bnCentSecond += uint256(nValueIn) * (nTxNewTime - pIndex0->nTime);
             nCredit += nValueIn;
             vCoins.push_back(pcoin.first);
             txNew.vout.push_back(CTxOut(0, scriptPubKeyOut));
 
             //presstab HyperStake - calculate the total size of our new output including the stake reward so that we can use it to decide whether to split the stake outputs
             const CBlockIndex* pIndex0 = chainActive.Tip();
-            uint64_t nTotalSize = pcoin.first->vout[pcoin.second].nValue + GetProofOfStakeReward(0, 0, pIndex0->nHeight);
+            uint64_t nTotalSize = pcoin.first->vout[pcoin.second].nValue + GetProofOfStakeReward(0, pIndex0->nHeight);
 
             //presstab HyperStake - if MultiSend is set to send in coinstake we will add our outputs here (values asigned further down)
             if (nTotalSize / 2 > (uint64_t)(GetStakeCombineThreshold() * COIN))
                 txNew.vout.push_back(CTxOut(0, scriptPubKeyOut)); //split stake
 
-            fKernelFound = true;
+            if (GetBoolArg("-printcoinstake", false)) {
+                LogPrintf("%s: Target %s nbits %x\n", __func__, bnStakeTarget.GetHex().substr(0,16), nBits);
+                LogPrintf("%s: Hstake %s input %d mn\n", __func__,
+                        (hashProofOfStake/nCoinWeight).GetHex().substr(0,16), (nTxNewTime - block.nTime)/60);
+            }
+
+            double dStakeKernelDiff = GetBlockDifficulty(nBits);
+            dStakeDiffMax = std::max(dStakeDiffMax, dStakeKernelDiff);
+            dStakeDiffSum += dStakeKernelDiff;
 
             LOCK(stakeMiner.lock);
             stakeMiner.nKernelsFound++;
             stakeMiner.dKernelDiffMax = 0;
             stakeMiner.dKernelDiffSum = dStakeDiffSum;
-
             break;
         }
-        if (fKernelFound) break; // if kernel is found stop searching
     }
-    if (nCredit == 0 || nCredit > nBalance - nReserveBalance) {
+
+    if (nCredit == 0 || nCredit > (nBalance - nReserveBalance)) {
+        // no valid hash
         return false;
     }
 
     // Calculate reward
-    uint256 bnCoinDay = bnCentSecond / COIN / (24 * 60 * 60);
-    uint64_t nReward = GetProofOfStakeReward(bnCoinDay.GetCompact(), 0, pIndex0->nHeight);
+    CAmount nReward = GetProofOfStakeReward(0, pIndex0->nHeight);
     nCredit += nReward;
 
     int64_t nMinFee = 0;
