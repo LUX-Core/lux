@@ -1070,7 +1070,7 @@ bool ProcessBlockFound(CBlock* pblock, CWallet& wallet)
         }
     }
 
-    CAmount generated = GetProofOfStakeReward(0, 0, chainActive.Height()+1);
+    CAmount generated = GetProofOfStakeReward(0, chainActive.Height()+1);
     generated -= GetMasternodePosReward(chainActive.Height()+1, generated);
     LogPrintf("generated %s\n", FormatMoney(generated));
 

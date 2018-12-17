@@ -337,7 +337,7 @@ inline unsigned int GetTargetSpacing(int nHeight) { return IsProtocolV2(nHeight)
 
 bool ActivateBestChain(CValidationState& state, const CChainParams& chainparams, const CBlock* pblock = NULL);
 CAmount GetProofOfWorkReward(int64_t nFees, int nHeight);
-CAmount GetProofOfStakeReward(int64_t nCoinAge, int64_t nFees, int nHeight);
+CAmount GetProofOfStakeReward(int64_t nFees, int nHeight);
 
 /**
  * Prune block and undo files (blk???.dat and undo???.dat) so that the disk space used is less than a user-defined target.

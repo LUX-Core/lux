@@ -1844,7 +1844,7 @@ CAmount GetProofOfWorkReward(int64_t nFees, int nHeight)
     return nSubsidy + nFees;
 }
 
-CAmount GetProofOfStakeReward(int64_t nCoinAge, int64_t nFees, int nHeight)
+CAmount GetProofOfStakeReward(int64_t nFees, int nHeight)
 {
     CAmount nSubsidy = STATIC_POS_REWARD;
 
@@ -2975,12 +2975,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
     }
 
     if (block.IsProofOfStake()) {
-        uint64_t nCoinAge;
-        const CTransaction &tx = block.vtx[1];
-        if (!GetCoinAge(tx, tx.nTime, nCoinAge))
-            return error("%s: %s unable to get coin age for coinstake", __func__, tx.GetHash().GetHex());
-
-        int64_t nCalculatedStakeReward = GetProofOfStakeReward(nCoinAge, nFees, pindex->nHeight);
+        int64_t nCalculatedStakeReward = GetProofOfStakeReward(nFees, pindex->nHeight);
         if (nStakeReward > nCalculatedStakeReward)
             return error("%s: coinstake pays too much(actual=%d vs calculated=%d)", __func__, nStakeReward, nCalculatedStakeReward);
     }
@@ -4159,7 +4154,7 @@ bool CheckForMasternodePayment(const CTransaction& tx, const CBlockHeader& heade
     // Calculate total reward and find masternode payment txout
     CAmount totalReward = 0, masternodePayment = 0;
     if (tx.IsCoinStake()) {
-        totalReward = GetProofOfStakeReward(0, 0, nHeight);
+        totalReward = GetProofOfStakeReward(0, nHeight);
     } else {
         // Avoid costly checks early on first PoW blocks
         if (nHeight < chainParams.FirstSplitRewardBlock())
