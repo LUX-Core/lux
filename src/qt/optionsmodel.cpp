@@ -187,17 +187,20 @@ void OptionsModel::Init()
         settings.setValue("theme", "");
     if (!settings.contains("fCSSexternal"))
         settings.setValue("fCSSexternal", false);
+
     if (!settings.contains("language"))
         settings.setValue("language", "");
     if (!SoftSetArg("-lang", settings.value("language").toString().toStdString()))
         addOverriddenOption("-lang");
+    language = settings.value("language").toString();
 
     if (settings.contains("nDarksendRounds"))
         SoftSetArg("-darksendrounds", settings.value("nDarksendRounds").toString().toStdString());
     if (settings.contains("nAnonymizeLuxAmount"))
         SoftSetArg("-anonymizeluxamount", settings.value("nAnonymizeLuxAmount").toString().toStdString());
 
-    language = settings.value("language").toString();
+    // Old/bad keys to clean
+    settings.remove("fparallelMasterNode");
 }
 
 void OptionsModel::Reset()
