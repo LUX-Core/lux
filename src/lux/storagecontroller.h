@@ -35,6 +35,7 @@ public:
     // Proposals Agent
     void ListenProposal(const uint256 &orderHash);
     void StopListenProposal(const uint256 &orderHash);
+    bool isListen(const uint256 &proposalHash);
     std::vector<StorageProposal> GetProposals(const uint256 &orderHash);
 };
 

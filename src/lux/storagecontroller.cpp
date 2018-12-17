@@ -12,17 +12,44 @@ void StorageController::ProcessStorageMessage(CNode* pfrom, const std::string& s
         vRecv >> order;
 
         uint256 hash = order.GetHash();
-        if (storageController.mapAnnouncements.find(hash) == storageController.mapAnnouncements.end()) {
-            storageController.AnnounceOrder(order); // TODO: Is need remove "pfrom" node from announcement? (SS)
-            if (storageHeap.MaxAllocateSize() > order.fileSize) {
+        if (mapAnnouncements.find(hash) == mapAnnouncements.end()) {
+            AnnounceOrder(order); // TODO: Is need remove "pfrom" node from announcement? (SS)
+            if (storageHeap.MaxAllocateSize() > order.fileSize && tempStorageHeap.MaxAllocateSize() > order.fileSize) {
                 StorageProposal proposal;
                 proposal.time = std::time(0);
                 proposal.orderHash = hash;
-                proposal.rate = storageController.rate;
-                proposal.address = storageController.address;
-                storageController.proposalsAgent.AddProposal(proposal);
+                proposal.rate = rate;
+                proposal.address = address;
+
+                CNode* pnode = FindNode(order.address);
+                if (!pnode) {
+                    CAddress addr;
+                    OpenNetworkConnection(addr, false, NULL, order.address.ToStringIPPort().c_str());
+                    MilliSleep(500);
+                    pnode = FindNode(order.address);
+                }
+                pnode->PushMessage("dfsproposal", proposal);
             }
         }
+    } else if (strCommand == "dfsproposal") {
+        isStorageCommand = true;
+        StorageProposal proposal;
+        vRecv >> proposal;
+
+        if (mapAnnouncements.find(proposal.orderHash) != mapAnnouncements.end()) {
+            std::vector<uint256> vListenProposals = proposalsAgent.GetListenProposals();
+            if (std::find(vListenProposals.begin(), vListenProposals.end(), proposal.orderHash) != vListenProposals.end()) {
+                proposalsAgent.AddProposal(proposal);
+            }
+        } else {
+//            CNode* pnode = FindNode(proposal.address);
+//            if (pnode) {
+//                CNodeState *state = State(pnode); // CNodeState was declared in main.cpp
+//                state->nMisbehavior += 10;
+//            }
+        }
+    } else if (strCommand == "dfshandshake") {
+
     }
 }
 

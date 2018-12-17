@@ -2,27 +2,27 @@
 
 void ProposalsAgent::ListenProposal(const uint256 &orderHash)
 {
-    vListenProposals[orderHash] = std::make_pair(true, std::time(nullptr));
+    mapListenProposals[orderHash] = std::make_pair(true, std::time(nullptr));
 }
 
 void ProposalsAgent::StopListenProposal(const uint256 &orderHash)
 {
-    auto it = vListenProposals.find(orderHash);
-    if (it != vListenProposals.end()) {
-        vListenProposals.erase(it);
-        vListenProposals[orderHash] = std::make_pair(false, std::time(nullptr));
+    auto it = mapListenProposals.find(orderHash);
+    if (it != mapListenProposals.end()) {
+        mapListenProposals.erase(it);
+        mapListenProposals[orderHash] = std::make_pair(false, std::time(nullptr));
     }
 }
 
 void ProposalsAgent::AddProposal(const StorageProposal &proposal)
 {
     uint256 orderHash = proposal.orderHash;
-    auto itListenProposals = vListenProposals.find(orderHash);
-    if (itListenProposals == vListenProposals.end() || std::get<0>(*itListenProposals) == false) {
+    auto itListenProposals = mapListenProposals.find(orderHash);
+    if (itListenProposals == mapListenProposals.end() || std::get<0>(*itListenProposals) == false) {
         return;
     }
     // remove previous proposal
-    std::vector<StorageProposal> &vOrderProposal = vProposals[orderHash];
+    std::vector<StorageProposal> &vOrderProposal = mapProposals[orderHash];
     for (auto it = vOrderProposal.begin(); it != vOrderProposal.end(); ++it) {
         if (it->orderHash == proposal.orderHash &&
             it->address == proposal.address &&
@@ -37,14 +37,27 @@ void ProposalsAgent::AddProposal(const StorageProposal &proposal)
 std::vector<StorageProposal> ProposalsAgent::GetProposals(const uint256 &orderHash)
 {
     std::vector<StorageProposal> vProposalsForOrder;
-    if (vProposals.find(orderHash) == vProposals.end()) {
+    if (mapProposals.find(orderHash) == mapProposals.end()) {
         return {};
     }
-    std::vector<StorageProposal> &vOrderProposal = vProposals[orderHash];
+    std::vector<StorageProposal> &vOrderProposal = mapProposals[orderHash];
     for (auto it = vOrderProposal.begin(); it != vOrderProposal.end(); ++it) {
         if (it->orderHash == orderHash) {
             vProposalsForOrder.push_back(*it);
         }
     }
     return vProposalsForOrder;
+}
+
+
+std::vector<uint256> ProposalsAgent::GetListenProposals()
+{
+    std::vector<uint256> vListenProposals;
+    for (auto it = mapListenProposals.begin(); it != mapListenProposals.end(); ++it) {
+        if (it->second.first == true) {
+            vListenProposals.push_back(it->first);
+        }
+    }
+
+    return vListenProposals;
 }
