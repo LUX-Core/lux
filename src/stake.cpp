@@ -527,14 +527,16 @@ bool Stake::CheckHashNew(const CBlockIndex* pindexPrev, unsigned int nBits, cons
     bnTarget.SetCompact(nBits);
 
     // Weighted target
-    int64_t nValueIn = txPrev.vout[prevout.n].nValue;
-    uint256 bnWeight = uint256(nValueIn);
+    CAmount nValueIn = txPrev.vout[prevout.n].nValue;
+    uint256 bnWeight = uint256(nValueIn) / 0x1000;
 
     unsigned nTimeWeight = nTimeTx - nTimeTxPrev;
     if(nTimeTxPrev && nStakingMinAge) {
-        bnWeight = ((uint256(nValueIn) * nTimeWeight) / nStakingMinAge);
-        if (fDebug)
-            LogPrintf("%s: nTimeWeight=%u wr=%u w=%s\n", __func__, nTimeWeight, nTimeWeight / nStakingMinAge, bnWeight.GetHex());
+        bnWeight = (bnWeight * nTimeWeight) / nStakingMinAge;
+        if (fDebug) {
+            LogPrintf("%s: nTimeWeight=%u wr=%u w=%s\n", __func__, nTimeWeight,
+                        nTimeWeight / nStakingMinAge, bnWeight.GetHex());
+        }
     }
 
     // prevent divide by 0, but should never happen
@@ -568,11 +570,13 @@ bool Stake::CheckHashNew(const CBlockIndex* pindexPrev, unsigned int nBits, cons
     }
 
     if (IsTestNet() && (hashProofOfStake / bnWeight) > bnTarget) {
-        LogPrintf("%s: invalid stake hash %s height=%d, modifier from %d (%x)\n", __func__, hashProofOfStake.GetHex(),
-                pindexPrev->nHeight + 1, nStakeModifierHeight, (unsigned) nStakeModifierTime);
-        LogPrintf("%s: target %s\n", __func__, bnTarget.GetHex());
-        LogPrintf("%s: weight %s\n", __func__, (hashProofOfStake / bnWeight).GetHex());
-        return (pindexPrev->nHeight + 1) < 103700; // 95150-103600 was testing branch, < 103700 with wr ratio 0x100
+        if ((hashProofOfStake / bnWeight) < (bnTarget / 0x100)) {
+            LogPrintf("%s: invalid stake hash %s height=%d, modifier from %d (%x)\n", __func__, hashProofOfStake.GetHex(),
+                    pindexPrev->nHeight + 1, nStakeModifierHeight, (unsigned) nStakeModifierTime);
+            LogPrintf("%s: target %s\n", __func__, bnTarget.GetHex());
+            LogPrintf("%s: weight %s\n", __func__, (hashProofOfStake / bnWeight).GetHex());
+        }
+        return (pindexPrev->nHeight + 1) < 105550; // 95150-103600 was testing branch, >= 105550 x 0x1000
     }
 
     // Now check if proof-of-stake hash meets target protocol
