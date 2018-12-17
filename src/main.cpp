@@ -1647,7 +1647,7 @@ bool GetTransaction(const uint256& hash, CTransaction& txOut, const Consensus::P
 {
     CBlockIndex* pindexSlow = NULL;
 
-    LOCK(cs_main);
+    //LOCK(cs_main);
 
     CTransactionRef ptx = mempool.get(hash);
     if (ptx)
