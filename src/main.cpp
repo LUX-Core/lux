@@ -2975,6 +2975,15 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
     }
 
     if (block.IsProofOfStake()) {
+        // Although coinage is not used, but GetCoinAge() will be used for other purposes.
+        // If we remove it, we will break consensus phase 3 "Independent verification of
+        // the new blocks by every node and assembly into a chain"
+
+        uint64_t nCoinAge;
+        const CTransaction &tx = block.vtx[1];
+        if (!GetCoinAge(tx, tx.nTime, nCoinAge))
+            return error("%s: %s unable to get coin age for coinstake", __func__, tx.GetHash().GetHex());
+
         int64_t nCalculatedStakeReward = GetProofOfStakeReward(nFees, pindex->nHeight);
         if (nStakeReward > nCalculatedStakeReward)
             return error("%s: coinstake pays too much(actual=%d vs calculated=%d)", __func__, nStakeReward, nCalculatedStakeReward);
