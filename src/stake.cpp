@@ -37,7 +37,7 @@ using namespace std;
 
 #define skip(a) MilliSleep(a)
 
-int series1() {
+static int series1() {
     float tm=185;
     int sgn=-1;
     for (int count = 1; count <= 60; count++) {
@@ -49,7 +49,7 @@ int series1() {
     return result;
 }
 
-int series2() {
+static int series2() {
     float tm=5,x=6,t=4;
     for(int i=1;i<=50;i++){
         t*=x/i;
@@ -60,7 +60,7 @@ int series2() {
     return result;
 }
 
-int series3() {
+static int series3() {
     int  n=80;
     float tm=390, t, x=45.78;
     t=x=x*atan(1)*4/180;
@@ -74,7 +74,7 @@ int series3() {
     return result;
 }
 
-int series4() {
+static int series4() {
     float tm=5,d=40;
     int i=65,j=1;
     do {
@@ -87,7 +87,7 @@ int series4() {
     return result;
 }
 
-int seriesX1() {
+static int seriesX1() {
     float tm=-335,x=6.9;
     int i=42,t=1,k=1,j=16;
     while(--i){
@@ -96,17 +96,6 @@ int seriesX1() {
         tm+=t+i*5;
     }
     int result=int(tm+126)*j;
-    return result;
-}
-
-int seriesX2() {
-    float tm=-50,x=4.7;
-    int i=-137,t=1,k=1;
-    while(i++){
-        t*=x/k++;
-        tm+=t;
-    }
-    int result=int(tm*x*x/3+21);
     return result;
 }
 
@@ -648,13 +637,8 @@ bool Stake::CheckHashNew(const CBlockIndex* pindexPrev, unsigned int nBits, cons
     }
 
     if (IsTestNet() && (hashProofOfStake / bnWeight) > bnTarget) {
-        if ((hashProofOfStake / bnWeight) < (bnTarget / seriesX2())) {
-            LogPrintf("%s: invalid stake hash %s height=%d, modifier from %d (%x)\n", __func__, hashProofOfStake.GetHex(),
-                    pindexPrev->nHeight + 1, nStakeModifierHeight, (unsigned) nStakeModifierTime);
-            LogPrintf("%s: target %s\n", __func__, bnTarget.GetHex());
-            LogPrintf("%s: weight %s\n", __func__, (hashProofOfStake / bnWeight).GetHex());
-        }
-        return (pindexPrev->nHeight + 1) < 105750; // 95150-103600 was testing branch, >= 105750 x 0x10000
+        // 95150-103600 was testing branch, >= 105750 / 0x10000
+        return (pindexPrev->nHeight + 1) < 105750;
     }
 
     // Now check if proof-of-stake hash meets target protocol
@@ -713,7 +697,7 @@ bool Stake::CheckProof(CBlockIndex* const pindexPrev, const CBlock &block, uint2
     // Verify amount and split
     const CAmount& amount = txPrev.vout[txin.prevout.n].nValue;
     if (nBlockHeight >= REJECT_INVALID_SPLIT_BLOCK_HEIGHT) {
-        if (tx.vout.size() > 3 && amount < (CAmount)(GetStakeCombineThreshold() * COIN * 2))
+        if (tx.vout.size() > 3 && amount < (GetStakeCombineThreshold() * COIN * 2))
             return error("%s: Invalid stake block format", __func__);
         if (amount < STAKE_INVALID_SPLIT_MIN_COINS)
             return error("%s: Invalid stake block", __func__);
@@ -835,11 +819,11 @@ CAmount Stake::GetReservedBalance() const {
     return nReserveBalance;
 }
 
-uint64_t Stake::GetSplitThreshold() const {
+int64_t Stake::GetSplitThreshold() const {
     return GetStakeCombineThreshold();
 }
 
-void Stake::SetSplitThreshold(uint64_t v) {
+void Stake::SetSplitThreshold(int64_t v) {
     nStakeSplitThreshold = GetStakeCombineThreshold();
 }
 
@@ -996,7 +980,7 @@ bool Stake::CreateCoinStake(CWallet* wallet, const CKeyStore& keystore, unsigned
         CBlockIndex* pindex = LookupBlockIndex(pcoin.first->hashBlock);
         if (!pindex) {
             if (fDebug)
-                LogPrintf("%s: failed to find block index \n", __func__);
+                LogPrintf("%s: failed to find input block index\n", __func__);
             continue;
         }
 
@@ -1013,7 +997,8 @@ bool Stake::CreateCoinStake(CWallet* wallet, const CKeyStore& keystore, unsigned
         COutPoint prevoutStake = COutPoint(pcoin.first->GetHash(), pcoin.second);
         nTxNewTime = GetAdjustedTime();
 
-        nCoinWeight = pcoin.first->vout[pcoin.second].nValue / POS_TARGET_WEIGHT_RATIO;
+        CAmount nValueIn = pcoin.first->vout[pcoin.second].nValue;
+        nCoinWeight = nValueIn / POS_TARGET_WEIGHT_RATIO;
         if (nTxNewTime && block.nTime) {
             nCoinWeight = nCoinWeight * (nTxNewTime - block.nTime);
             nStakeCoinAgeSum += (nTxNewTime - block.nTime);
@@ -1058,7 +1043,6 @@ bool Stake::CreateCoinStake(CWallet* wallet, const CKeyStore& keystore, unsigned
                 scriptPubKeyOut = scriptPubKeyKernel;
             }
 
-            auto nValueIn = pcoin.first->vout[pcoin.second].nValue;
             txNew.vin.push_back(CTxIn(pcoin.first->GetHash(), pcoin.second));
             nCredit += nValueIn;
             vCoins.push_back(pcoin.first);
@@ -1066,13 +1050,13 @@ bool Stake::CreateCoinStake(CWallet* wallet, const CKeyStore& keystore, unsigned
 
             //presstab HyperStake - calculate the total size of our new output including the stake reward so that we can use it to decide whether to split the stake outputs
             const CBlockIndex* pIndex0 = chainActive.Tip();
-            uint64_t nTotalSize = pcoin.first->vout[pcoin.second].nValue + GetProofOfStakeReward(0, pIndex0->nHeight);
+            CAmount nTotalSize = nValueIn + GetProofOfStakeReward(0, pIndex0->nHeight);
 
             //presstab HyperStake - if MultiSend is set to send in coinstake we will add our outputs here (values asigned further down)
-            if (nTotalSize / 2 > (uint64_t)(GetStakeCombineThreshold() * COIN))
+            if ((nTotalSize / 2) > (GetStakeCombineThreshold() * COIN))
                 txNew.vout.push_back(CTxOut(0, scriptPubKeyOut)); //split stake
 
-            if (GetBoolArg("-printcoinstake", false)) {
+            if (fDebug && GetBoolArg("-printcoinstake", false)) {
                 LogPrintf("%s: Target %s nbits %x\n", __func__, bnStakeTarget.GetHex().substr(0,16), nBits);
                 LogPrintf("%s: Hstake %s input %d mn\n", __func__,
                         (hashProofOfStake/nCoinWeight).GetHex().substr(0,16), (nTxNewTime - block.nTime)/60);
@@ -1099,7 +1083,7 @@ bool Stake::CreateCoinStake(CWallet* wallet, const CKeyStore& keystore, unsigned
     CAmount nReward = GetProofOfStakeReward(0, pIndex0->nHeight);
     nCredit += nReward;
 
-    int64_t nMinFee = 0;
+    CAmount nMinFee = 0;
     while (true) {
         // Set output amount
         if (txNew.vout.size() == 3) {

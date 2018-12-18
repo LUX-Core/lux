@@ -169,7 +169,7 @@ bool CWalletDB::WriteOrderPosNext(int64_t nOrderPosNext)
 }
 
 // presstab HyperStake
-bool CWalletDB::WriteStakeSplitThreshold(uint64_t nStakeSplitThreshold)
+bool CWalletDB::WriteStakeSplitThreshold(int64_t nStakeSplitThreshold)
 {
     nWalletDBUpdateCounter++;
     return Write(std::string("stakeSplitThreshold"), nStakeSplitThreshold);
@@ -232,7 +232,7 @@ bool CWalletDB::EraseMSDisabledAddresses(std::vector<std::string> vDisabledAddre
     }
     return ret;
 }
-bool CWalletDB::WriteAutoCombineSettings(bool fEnable, CAmount nCombineThreshold)
+bool CWalletDB::WriteAutoCombineSettings(bool fEnable, int64_t nCombineThreshold)
 {
     nWalletDBUpdateCounter++;
     std::pair<bool, CAmount> pSettings;
