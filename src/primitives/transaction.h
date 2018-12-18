@@ -484,8 +484,6 @@ public:
 
     std::string ToString() const;
 
-    bool GetCoinAge(uint64_t& nCoinAge) const;  // ppcoin: get transaction coin age
-
     bool HasWitness() const
     {
         for (size_t i = 0; i < wit.vtxinwit.size(); i++) {

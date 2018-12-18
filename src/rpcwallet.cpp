@@ -2497,10 +2497,10 @@ Value setstakesplitthreshold(const Array& params, bool fHelp)
         throw runtime_error(
             "setstakesplitthreshold <1 - 999,999>\n"
             "This will set the output size of your stakes to never be below this number\n");
-    uint64_t nStakeSplitThreshold = params[0].get_int();
+    int64_t nStakeSplitThreshold = params[0].get_int();
     if (pwalletMain->IsLocked())
         throw JSONRPCError(RPC_WALLET_UNLOCK_NEEDED, "Error: Unlock wallet to use this feature");
-    if (nStakeSplitThreshold > 999999)
+    if (nStakeSplitThreshold > 999999 || nStakeSplitThreshold < 0)
         return "out of range - setting split threshold failed";
 
     CWalletDB walletdb(pwalletMain->strWalletFile);
@@ -2544,13 +2544,15 @@ UniValue autocombinerewards(const UniValue& params, bool fHelp)
 
     CWalletDB walletdb(pwalletMain->strWalletFile);
     bool fEnable = params[0].get_bool();
-    CAmount nThreshold = 0;
+    int64_t nThreshold = 0;
 
     if (fEnable) {
         if (params.size() != 2)
             throw runtime_error("Input Error: use format: autocombinerewards <true/false> threshold\n");
 
         nThreshold = params[1].get_int();
+        if (nThreshold < 0)
+            throw runtime_error("Input Error: threshold range error\n");
     }
 
     pwalletMain->fCombineDust = fEnable;

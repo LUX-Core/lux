@@ -71,7 +71,7 @@ class Stake : StakeKernel
     int64_t nLastStakeTime;
     int64_t nLastSelectTime;
     int64_t nSelectionPeriod;
-    uint64_t nStakeSplitThreshold;
+    int64_t nStakeSplitThreshold;
     unsigned int nStakeMinAge;
     unsigned int nHashInterval;
 
@@ -94,7 +94,7 @@ public:
     //!<DuzyDoc>: Stake::Pointer() - returns the staking pointer
     static Stake *Pointer();
     
-    static uint64_t GetStakeCombineThreshold() {
+    int64_t GetStakeCombineThreshold() const {
         return 100;
     }
 
@@ -136,8 +136,8 @@ public:
     CAmount ReserveBalance(CAmount amount);
     CAmount GetReservedBalance() const;
 
-    uint64_t GetSplitThreshold() const;
-    void SetSplitThreshold(uint64_t v);
+    int64_t GetSplitThreshold() const;
+    void SetSplitThreshold(int64_t); // param unused
 
     void MarkStake(const COutPoint &out, unsigned int nTime);
     bool IsStaked(const COutPoint &out) const;
