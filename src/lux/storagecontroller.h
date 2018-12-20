@@ -30,6 +30,7 @@ public:
 
     void AnnounceOrder(const StorageOrder &order);
     void AnnounceOrder(const StorageOrder &order, const std::string &path);
+    std::vector<StorageProposal> GetBestProposals(const StorageOrder &order, const int maxProposal);
     void ClearOldAnnouncments(std::time_t timestamp);
     void ProcessStorageMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv, bool& isStorageCommand);
     // Proposals Agent

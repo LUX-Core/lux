@@ -35,16 +35,19 @@ void StorageController::ProcessStorageMessage(CNode* pfrom, const std::string& s
         isStorageCommand = true;
         StorageProposal proposal;
         vRecv >> proposal;
-
-        if (mapAnnouncements.find(proposal.orderHash) != mapAnnouncements.end()) {
+        auto itAnnounce = mapAnnouncements.find(proposal.orderHash);
+        if (itAnnounce != mapAnnouncements.end()) {
             std::vector<uint256> vListenProposals = proposalsAgent.GetListenProposals();
             if (std::find(vListenProposals.begin(), vListenProposals.end(), proposal.orderHash) != vListenProposals.end()) {
-                proposalsAgent.AddProposal(proposal);
+                if (itAnnounce->second.maxRate > proposal.rate) {
+                    proposalsAgent.AddProposal(proposal);
+                }
             }
+            // need will close connect to this node (SS)
         } else {
 //            CNode* pnode = FindNode(proposal.address);
 //            if (pnode) {
-//                CNodeState *state = State(pnode); // CNodeState was declared in main.cpp
+//                CNodeState *state = State(pnode); // CNodeState was declared in main.cpp (SS)
 //                state->nMisbehavior += 10;
 //            }
         }
@@ -67,7 +70,7 @@ void StorageController::AnnounceOrder(const StorageOrder &order)
         LOCK(cs_vNodes);
         vNodesCopy = vNodes;
     }
-    for (CNode* pnode : vNodesCopy) {
+    for (auto *pnode : vNodesCopy) {
         if (!pnode) {
             continue;
         }
@@ -86,10 +89,48 @@ void StorageController::AnnounceOrder(const StorageOrder &order, const std::stri
     mapLocalFiles[order.GetHash()] = path;
 }
 
+std::vector<StorageProposal> StorageController::GetBestProposals(const StorageOrder &order, const int maxProposal)
+{
+    if (maxProposal) {
+        return ;
+    }
+
+    std::vector<StorageProposal> proposals = proposalsAgent.GetProposals(order.GetHash());
+    if (proposals.size()) {
+        return ;
+    }
+
+    std::list<StorageProposal> sortedProposals = { *(proposals.begin()) };
+    for (auto itProposal = ++(proposals.begin()); itProposal != proposals.end(); ++itProposal) {
+        for (auto it = sortedProposals.begin(); it != sortedProposals.end(); ++it) {
+            if (itProposal->rate < it->rate) { // TODO: add check last save file time, free space, etc. (SS)
+                sortedProposals.insert(it, *itProposal);
+                break;
+            }
+        }
+    }
+
+    std::list<StorageProposal>::iterator itLast;
+    if (sortedProposals.size() > maxProposal) {
+        itLast = std::next(sortedProposals.begin(), maxProposal);
+    } else {
+        itLast = sortedProposals.end();
+    }
+    std::vector<StorageProposal> bestProposals( sortedProposals.begin(), itLast);
+
+    return bestProposals;
+}
+
 void StorageController::ClearOldAnnouncments(std::time_t timestamp)
 {
-    for (auto it = mapAnnouncements.begin(); it != mapAnnouncements.end(); ) {
-        if (it->second.time < timestamp) {
+    for (auto &&it = mapAnnouncements.begin(); it != mapAnnouncements.end(); ) {
+        StorageProposal proposal = it->second;
+        if (proposal.time < timestamp) {
+            std::vector<uint256> vListenProposals = proposalsAgent.GetListenProposals();
+            if (std::find(vListenProposals.begin(), vListenProposals.end(), proposal.orderHash) != vListenProposals.end()) {
+                proposalsAgent.StopListenProposal(proposal.orderHash);
+            }
+
             mapLocalFiles.erase(it->first);
             mapAnnouncements.erase(it++);
         } else {
