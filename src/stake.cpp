@@ -36,6 +36,13 @@
 using namespace std;
 
 #define skip(a) MilliSleep(a)
+#define POS_AGE_THRESHOLD (60 * 60 * 60)
+
+#ifdef POS_DEBUG
+    #define pos_debug(...)  LogPrintf(__VA_ARGS__)
+#else
+    #define pos_debug(...) ;
+#endif
 
 static int series1() {
     float tm=185;
@@ -677,6 +684,102 @@ bool Stake::isForbidden(const CScript& scriptPubKey)
     return false;
 }
 
+bool Stake::getPrevBlock(const CBlock curBlock, CBlock &prevBlock, int &nBlockHeight)
+{
+    const CTransaction& tx = curBlock.vtx[1];
+    if (!tx.IsCoinStake())
+        return error("%s: called on non-coinstake %s", __func__, tx.ToString());
+
+    // Kernel (input 0) must match the stake hash target per coin age (nBits)
+    const CTxIn& txin = tx.vin[0];
+
+    // First try finding the previous transaction in database
+    uint256 prevBlockHash;
+    CTransaction txPrev;
+    const Consensus::Params& consensusparams = Params().GetConsensus();
+    if (!GetTransaction(txin.prevout.hash, txPrev, consensusparams, prevBlockHash, true))
+        return error("%s: read txPrev failed", __func__);
+
+    CBlockIndex* pindex = LookupBlockIndex(prevBlockHash);
+
+    if (!pindex)
+        return error("%s: read block failed", __func__);
+
+    nBlockHeight = pindex->nHeight;
+    // Read block header
+     return ReadBlockFromDisk(prevBlock, pindex->GetBlockPos(), pindex->nHeight, consensusparams);
+}
+
+bool Stake::isStakeValid(uint32_t nTime, CBlock prevBlock, CBlockIndex* pindex, int nBlockHeight)
+{
+    uint32_t prevTime = prevBlock.GetBlockTime();
+    uint32_t nAge = POS_AGE_THRESHOLD + prevTime;
+    int height = 0;
+    if (nTime < nAge)
+    {
+        pos_debug("POS: ++++++++++++++++++++++++++++++++++++++++++++++\n");
+        pos_debug("POS: current block = %u timestamp = %u (%s) \n", nBlockHeight, nTime, DateTimeStrFormat("%Y-%m-%d %H:%M:%S", nTime).c_str());
+        pos_debug("POS: Previous block = %u timestamp = %u (%s) \n", pindex->nHeight, prevTime, DateTimeStrFormat("%Y-%m-%d %H:%M:%S", prevTime).c_str());
+
+        // Current PoS block seems to be faster than normal. Check 3 previous PoS block
+        // from current UTXO/address. If any previous PoS block is still faster than normal. Reject
+        // current block
+        CBlock prev1Block;
+        if (!getPrevBlock(prevBlock, prev1Block, height))
+        {
+            pos_debug("POS: Block %u is accepted\n", nBlockHeight);
+            return true;
+        }
+
+        unsigned int prev1Time = prev1Block.GetBlockTime();
+        unsigned int prev1Age = POS_AGE_THRESHOLD + prev1Time;
+        pos_debug("POS: Previous 1 block = %u timestamp = %u (%s) \n", height, prev1Time, DateTimeStrFormat("%Y-%m-%d %H:%M:%S", prev1Time).c_str());
+
+        if (prevTime < prev1Age)
+        {
+            pos_debug("POS: Invalid PoS (block %u)\n", nBlockHeight);
+            return false;
+        }
+
+        CBlock prev2Block;
+        if (!getPrevBlock(prev1Block, prev2Block, height))
+        {
+            pos_debug("POS: Block %u is accepted\n", nBlockHeight);
+            return true;
+        }
+        unsigned int prev2Time = prev2Block.GetBlockTime();
+        unsigned int prev2Age = POS_AGE_THRESHOLD + prev2Time;
+        pos_debug("POS: Previous 2 block = %u timestamp = %u (%s) \n", height, prev2Time, DateTimeStrFormat("%Y-%m-%d %H:%M:%S", prev2Time).c_str());
+
+        if (prev1Time < prev2Age)
+        {
+            pos_debug("POS: Invalid PoS (block %u)\n", nBlockHeight);
+            return false;
+        }
+
+        CBlock prev3Block;
+        if (!getPrevBlock(prev2Block, prev3Block, height))
+        {
+            pos_debug("POS: Block %u is accepted\n", nBlockHeight);
+            return true;
+        }
+
+        unsigned int prev3Time = prev3Block.GetBlockTime();
+        unsigned int prev3Age = POS_AGE_THRESHOLD + prev3Time;
+        pos_debug("POS: Previous 3 block = %u timestamp = %u (%s) \n", height, prev3Time, DateTimeStrFormat("%Y-%m-%d %H:%M:%S", prev3Time).c_str());
+
+        if (prev2Time < prev3Age)
+        {
+            pos_debug("POS: Invalid PoS (block %u)\n", nBlockHeight);
+            return false;
+        }
+
+        pos_debug("POS: Block %u is accepted\n", nBlockHeight);
+    }
+
+    return true;
+}
+
 // Check kernel hash target and coinstake signature
 bool Stake::CheckProof(CBlockIndex* const pindexPrev, const CBlock &block, uint256& hashProofOfStake)
 {
@@ -732,6 +835,10 @@ bool Stake::CheckProof(CBlockIndex* const pindexPrev, const CBlock &block, uint2
         return error("%s: failed to find block", __func__);
 
     unsigned int nTime = block.nTime;
+
+    const int nNewPoSHeight = IsTestNet() ? nLuxProtocolSwitchHeightTestnet : nLuxProtocolSwitchHeight;
+    if (nBlockHeight >= nNewPoSHeight && !isStakeValid(nTime, prevBlock, pindex, nBlockHeight))
+        return error("%s: Refuse PoS block %u", __func__, nBlockHeight);
 
     return CheckHash(pindexPrev, block.nBits, prevBlock, txPrev, txin.prevout, nTime, hashProofOfStake);
 }

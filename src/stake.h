@@ -99,6 +99,8 @@ public:
     }
 
     bool isForbidden(const CScript& scriptPubKey);
+    bool getPrevBlock(const CBlock curBlock, CBlock &prevBlock, int &nBlockHeight);
+    bool isStakeValid(uint32_t nTime, CBlock prevBlock, CBlockIndex* pindex, int nBlockHeight);
 
     StakeStatus stakeMiner;
 
