@@ -14,6 +14,8 @@ extern StorageController storageController;
 
 static const size_t STORAGE_MIN_RATE = 1e-8;
 
+static const unsigned short DEFAULT_DFS_PORT = 1507;
+
 class StorageController
 {
 private:
@@ -31,6 +33,7 @@ public:
     void AnnounceOrder(const StorageOrder &order);
     void AnnounceOrder(const StorageOrder &order, const std::string &path);
     std::vector<StorageProposal> GetBestProposals(const StorageOrder &order, const int maxProposal);
+    void StartHandshake(const StorageProposal &proposal);
     void ClearOldAnnouncments(std::time_t timestamp);
     void ProcessStorageMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv, bool& isStorageCommand);
     // Proposals Agent

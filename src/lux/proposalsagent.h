@@ -13,6 +13,7 @@ public:
     void StopListenProposal(const uint256 &orderHash);
     void AddProposal(const StorageProposal &proposal);
     std::vector<StorageProposal> GetProposals(const uint256 &orderHash);
+    void EraseOrdersProposals(const uint256 &orderHash);
     std::vector<uint256> GetListenProposals();
 };
 

@@ -20,8 +20,7 @@ public:
     CService address;           // [!!!] global-wide sender address
 
     uint256 GetHash() const{
-        uint256 n = Hash(BEGIN(time), END(maxGap));
-        return n;
+        return Hash(BEGIN(time), END(maxGap));
     }
 
     ADD_SERIALIZE_METHODS;
@@ -47,8 +46,7 @@ public:
     CService address;       // [!!!] global-wide sender address
 
     uint256 GetHash() const{
-        uint256 n = Hash(BEGIN(time), END(rate));
-        return n;
+        return Hash(BEGIN(time), END(rate));
     }
 
     ADD_SERIALIZE_METHODS;
@@ -59,6 +57,29 @@ public:
         READWRITE(orderHash);
         READWRITE(rate);
         READWRITE(address);
+    }
+};
+
+class StorageHandshake
+{
+public:
+    std::time_t time;
+    uint256 orderHash;
+    uint256 proposalHash;
+    unsigned short port;
+
+    uint256 GetHash() const{
+        return Hash(BEGIN(time), END(port));
+    }
+
+    ADD_SERIALIZE_METHODS;
+
+    template <typename Stream, typename Operation>
+    inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion) {
+        READWRITE(time);
+        READWRITE(orderHash);
+        READWRITE(proposalHash);
+        READWRITE(port);
     }
 };
 

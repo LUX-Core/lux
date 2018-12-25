@@ -19,7 +19,7 @@ void ProposalsAgent::AddProposal(const StorageProposal &proposal)
     uint256 orderHash = proposal.orderHash;
     auto itListenProposals = mapListenProposals.find(orderHash);
     if (itListenProposals == mapListenProposals.end() || std::get<0>(*itListenProposals) == false) {
-        return;
+        return ;
     }
     // remove previous proposal
     std::vector<StorageProposal> &vOrderProposal = mapProposals[orderHash];
@@ -32,6 +32,14 @@ void ProposalsAgent::AddProposal(const StorageProposal &proposal)
         }
     }
     vOrderProposal.push_back(proposal);
+}
+
+void ProposalsAgent::EraseOrdersProposals(const uint256 &orderHash)
+{
+    if (mapProposals.find(orderHash) == mapProposals.end()) {
+        return ;
+    }
+    mapProposals.erase(orderHash);
 }
 
 std::vector<StorageProposal> ProposalsAgent::GetProposals(const uint256 &orderHash)

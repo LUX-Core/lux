@@ -21,14 +21,14 @@ void StorageController::ProcessStorageMessage(CNode* pfrom, const std::string& s
                 proposal.rate = rate;
                 proposal.address = address;
 
-                CNode* pnode = FindNode(order.address);
-                if (!pnode) {
+                CNode* pNode = FindNode(order.address);
+                if (!pNode) {
                     CAddress addr;
                     OpenNetworkConnection(addr, false, NULL, order.address.ToStringIPPort().c_str());
                     MilliSleep(500);
-                    pnode = FindNode(order.address);
+                    pNode = FindNode(order.address);
                 }
-                pnode->PushMessage("dfsproposal", proposal);
+                pNode->PushMessage("dfsproposal", proposal);
             }
         }
     } else if (strCommand == "dfsproposal") {
@@ -43,16 +43,65 @@ void StorageController::ProcessStorageMessage(CNode* pfrom, const std::string& s
                     proposalsAgent.AddProposal(proposal);
                 }
             }
-            // need will close connect to this node (SS)
+            CNode* pNode = FindNode(proposal.address);
+            if (pNode) {
+                pNode->CloseSocketDisconnect();
+            }
         } else {
-//            CNode* pnode = FindNode(proposal.address);
-//            if (pnode) {
-//                CNodeState *state = State(pnode); // CNodeState was declared in main.cpp (SS)
+            // DoS prevention
+//            CNode* pNode = FindNode(proposal.address);
+//            if (pNode) {
+//                CNodeState *state = State(pNode); // CNodeState was declared in main.cpp (SS)
 //                state->nMisbehavior += 10;
 //            }
         }
     } else if (strCommand == "dfshandshake") {
+        isStorageCommand = true;
+        StorageHandshake handshake;
+        vRecv >> handshake;
+        auto itAnnounce = mapAnnouncements.find(handshake.orderHash);
+        if (itAnnounce != mapAnnouncements.end()) {
+            StorageOrder &order = itAnnounce->second;
+            if (storageHeap.MaxAllocateSize() > order.fileSize && tempStorageHeap.MaxAllocateSize() > order.fileSize) { // Change to exist(handshake.proposalHash) (SS)
+                StorageHandshake requestReplica;
+                handshake.time = std::time(0);
+                handshake.orderHash = handshake.orderHash;
+                handshake.proposalHash = handshake.proposalHash;
+                handshake.port = DEFAULT_DFS_PORT;
 
+                CNode* pNode = FindNode(order.address);
+                if (!pNode) {
+                    LogPrint("dfs", "\"dfshandshake\" message handler have not connection to order sender");
+                }
+                pNode->PushMessage("dfsrequestreplica", requestReplica);
+            }
+        } else {
+            // DoS prevention
+//            CNode* pNode = FindNode(proposal.address);
+//            if (pNode) {
+//                CNodeState *state = State(pNode); // CNodeState was declared in main.cpp (SS)
+//                state->nMisbehavior += 10;
+//            }
+        }
+    } else if (strCommand == "dfsrequestreplica") {
+        isStorageCommand = true;
+        StorageHandshake handshake;
+        vRecv >> handshake;
+        auto itAnnounce = mapAnnouncements.find(handshake.orderHash);
+        if (itAnnounce != mapAnnouncements.end()) {
+         //   StorageOrder &order = itAnnounce->second;
+            auto it = mapLocalFiles.find(handshake.orderHash);
+            if (it != mapLocalFiles.end()) {
+                // TODO: Send file (ss)
+            } else {
+                // DoS prevention
+//            CNode* pNode = FindNode(proposal.address);
+//            if (pNode) {
+//                CNodeState *state = State(pNode); // CNodeState was declared in main.cpp (SS)
+//                state->nMisbehavior += 10;
+//            }
+            }
+        }
     }
 }
 
@@ -70,14 +119,14 @@ void StorageController::AnnounceOrder(const StorageOrder &order)
         LOCK(cs_vNodes);
         vNodesCopy = vNodes;
     }
-    for (auto *pnode : vNodesCopy) {
-        if (!pnode) {
+    for (auto *pNode : vNodesCopy) {
+        if (!pNode) {
             continue;
         }
-        if (pnode->nVersion >= ActiveProtocol()) {
-            LOCK(pnode->cs_filter);
-            if (pnode->pfilter == nullptr) {
-                pnode->PushMessage("inv", vInv);
+        if (pNode->nVersion >= ActiveProtocol()) {
+            LOCK(pNode->cs_filter);
+            if (pNode->pfilter == nullptr) {
+                pNode->PushMessage("inv", vInv);
             }
         }
     }
@@ -89,15 +138,33 @@ void StorageController::AnnounceOrder(const StorageOrder &order, const std::stri
     mapLocalFiles[order.GetHash()] = path;
 }
 
+void StorageController::StartHandshake(const StorageProposal &proposal)
+{
+    StorageHandshake handshake;
+    handshake.time = std::time(0);
+    handshake.orderHash = proposal.orderHash;
+    handshake.proposalHash = proposal.GetHash();
+    handshake.port = DEFAULT_DFS_PORT;
+
+    CNode* pNode = FindNode(proposal.address);
+    if (!pNode) {
+        CAddress addr;
+        OpenNetworkConnection(addr, false, NULL, proposal.address.ToStringIPPort().c_str());
+        MilliSleep(500);
+        pNode = FindNode(proposal.address);
+    }
+    pNode->PushMessage("dfshandshake", handshake);
+}
+
 std::vector<StorageProposal> StorageController::GetBestProposals(const StorageOrder &order, const int maxProposal)
 {
     if (maxProposal) {
-        return ;
+        return {};
     }
 
     std::vector<StorageProposal> proposals = proposalsAgent.GetProposals(order.GetHash());
     if (proposals.size()) {
-        return ;
+        return {};
     }
 
     std::list<StorageProposal> sortedProposals = { *(proposals.begin()) };
@@ -124,14 +191,18 @@ std::vector<StorageProposal> StorageController::GetBestProposals(const StorageOr
 void StorageController::ClearOldAnnouncments(std::time_t timestamp)
 {
     for (auto &&it = mapAnnouncements.begin(); it != mapAnnouncements.end(); ) {
-        StorageProposal proposal = it->second;
-        if (proposal.time < timestamp) {
+        StorageOrder order = it->second;
+        if (order.time < timestamp) {
             std::vector<uint256> vListenProposals = proposalsAgent.GetListenProposals();
-            if (std::find(vListenProposals.begin(), vListenProposals.end(), proposal.orderHash) != vListenProposals.end()) {
-                proposalsAgent.StopListenProposal(proposal.orderHash);
+            uint256 orderHash = order.GetHash();
+            if (std::find(vListenProposals.begin(), vListenProposals.end(), orderHash) != vListenProposals.end()) {
+                proposalsAgent.StopListenProposal(orderHash);
             }
-
-            mapLocalFiles.erase(it->first);
+            std::vector<StorageProposal> vProposals = proposalsAgent.GetProposals(orderHash);
+            if (vProposals.size()) {
+                proposalsAgent.EraseOrdersProposals(orderHash);
+            }
+            mapLocalFiles.erase(orderHash);
             mapAnnouncements.erase(it++);
         } else {
             ++it;
