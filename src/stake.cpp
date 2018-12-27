@@ -690,10 +690,10 @@ bool Stake::getPrevBlock(const CBlock curBlock, CBlock &prevBlock, int &nBlockHe
     if (!tx.IsCoinStake())
         return error("%s: called on non-coinstake %s", __func__, tx.ToString());
 
-    // Kernel (input 0) must match the stake hash target per coin age (nBits)
+    // Kernel (input 0) must match the stake hash target per coin age (nBits).
     const CTxIn& txin = tx.vin[0];
 
-    // First try finding the previous transaction in database
+    // First, try to find the previous transaction in database.
     uint256 prevBlockHash;
     CTransaction txPrev;
     const Consensus::Params& consensusparams = Params().GetConsensus();
@@ -706,7 +706,7 @@ bool Stake::getPrevBlock(const CBlock curBlock, CBlock &prevBlock, int &nBlockHe
         return error("%s: read block failed", __func__);
 
     nBlockHeight = pindex->nHeight;
-    // Read block header
+    // Read block header.
      return ReadBlockFromDisk(prevBlock, pindex->GetBlockPos(), pindex->nHeight, consensusparams);
 }
 
@@ -714,9 +714,9 @@ bool Stake::isBlockAccepted(CBlock prevBlock, CBlock& prev1Block, int& height, i
 
     uint32_t prevTime = prevBlock.GetBlockTime();
 
-        // Current PoS block seems to be faster than normal. Check 3 previous PoS block
-        // from current UTXO/address. If any previous PoS block is still faster than normal. Reject
-        // current block
+        // Current PoS block seems to be faster than usual.
+        // Check the last three prev block from current UTXO/address
+        // if it's still faster. Reject current block.
 
         if (!getPrevBlock(prevBlock, prev1Block, height))
         {
@@ -745,13 +745,12 @@ bool Stake::isStakeValid(uint32_t nTime, CBlock prevBlock, CBlockIndex* pindex, 
 	    if (nTime < nAge) {
 	        pos_debug("POS: ++++++++++++++++++++++++++++++++++++++++++++++\n");
             pos_debug("POS: current block = %u timestamp = %u (%s) \n", nBlockHeight, nTime, DateTimeStrFormat("%Y-%m-%d %H:%M:%S", nTime).c_str());
-        pos_debug("POS: Previous block = %u timestamp = %u (%s) \n", pindex->nHeight, prevTime, DateTimeStrFormat("%Y-%m-%d %H:%M:%S", prevTime).c_str());
+            pos_debug("POS: Previous block = %u timestamp = %u (%s) \n", pindex->nHeight, prevTime, DateTimeStrFormat("%Y-%m-%d %H:%M:%S", prevTime).c_str());
 
 
-            // Current PoS block seems to be faster than normal. Check 3 previous PoS block
-	        // from current UTXO/address. If any previous PoS block is still faster than normal. Reject
-	        // current block
-
+            // Current PoS block seems to be faster than usual.
+            // Check the last three prev block from current UTXO/address
+            // if it's still faster. Reject current block.
 	        CBlock prev1Block, prev2Block, prev3Block;
 	        if(!isBlockAccepted(prevBlock,prev1Block, height, nBlockHeight, 1))
             return false;
