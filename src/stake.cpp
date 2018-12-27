@@ -710,21 +710,14 @@ bool Stake::getPrevBlock(const CBlock curBlock, CBlock &prevBlock, int &nBlockHe
      return ReadBlockFromDisk(prevBlock, pindex->GetBlockPos(), pindex->nHeight, consensusparams);
 }
 
-bool Stake::isStakeValid(uint32_t nTime, CBlock prevBlock, CBlockIndex* pindex, int nBlockHeight)
-{
+bool Stake::isBlockAccepted(CBlock prevBlock, CBlock& prev1Block, int& height, int nBlockHeight,const unsigned ind){
+
     uint32_t prevTime = prevBlock.GetBlockTime();
-    uint32_t nAge = POS_AGE_THRESHOLD + prevTime;
-    int height = 0;
-    if (nTime < nAge)
-    {
-        pos_debug("POS: ++++++++++++++++++++++++++++++++++++++++++++++\n");
-        pos_debug("POS: current block = %u timestamp = %u (%s) \n", nBlockHeight, nTime, DateTimeStrFormat("%Y-%m-%d %H:%M:%S", nTime).c_str());
-        pos_debug("POS: Previous block = %u timestamp = %u (%s) \n", pindex->nHeight, prevTime, DateTimeStrFormat("%Y-%m-%d %H:%M:%S", prevTime).c_str());
 
         // Current PoS block seems to be faster than normal. Check 3 previous PoS block
         // from current UTXO/address. If any previous PoS block is still faster than normal. Reject
         // current block
-        CBlock prev1Block;
+
         if (!getPrevBlock(prevBlock, prev1Block, height))
         {
             pos_debug("POS: Block %u is accepted\n", nBlockHeight);
@@ -733,7 +726,7 @@ bool Stake::isStakeValid(uint32_t nTime, CBlock prevBlock, CBlockIndex* pindex, 
 
         unsigned int prev1Time = prev1Block.GetBlockTime();
         unsigned int prev1Age = POS_AGE_THRESHOLD + prev1Time;
-        pos_debug("POS: Previous 1 block = %u timestamp = %u (%s) \n", height, prev1Time, DateTimeStrFormat("%Y-%m-%d %H:%M:%S", prev1Time).c_str());
+        pos_debug("POS: Previous %u block = %u timestamp = %u (%s) \n",ind, height, prev1Time, DateTimeStrFormat("%Y-%m-%d %H:%M:%S", prev1Time).c_str());
 
         if (prevTime < prev1Age)
         {
@@ -741,38 +734,33 @@ bool Stake::isStakeValid(uint32_t nTime, CBlock prevBlock, CBlockIndex* pindex, 
             return false;
         }
 
-        CBlock prev2Block;
-        if (!getPrevBlock(prev1Block, prev2Block, height))
-        {
-            pos_debug("POS: Block %u is accepted\n", nBlockHeight);
-            return true;
-        }
-        unsigned int prev2Time = prev2Block.GetBlockTime();
-        unsigned int prev2Age = POS_AGE_THRESHOLD + prev2Time;
-        pos_debug("POS: Previous 2 block = %u timestamp = %u (%s) \n", height, prev2Time, DateTimeStrFormat("%Y-%m-%d %H:%M:%S", prev2Time).c_str());
+        return true;
 
-        if (prev1Time < prev2Age)
-        {
-            pos_debug("POS: Invalid PoS (block %u)\n", nBlockHeight);
+bool Stake::isStakeValid(uint32_t nTime, CBlock prevBlock, CBlockIndex* pindex, int nBlockHeight)
+{
+	    uint32_t prevTime = prevBlock.GetBlockTime();
+	    uint32_t nAge = POS_AGE_THRESHOLD + prevTime;
+        int height = 0;
+
+	    if (nTime < nAge) {
+	        pos_debug("POS: ++++++++++++++++++++++++++++++++++++++++++++++\n");
+            pos_debug("POS: current block = %u timestamp = %u (%s) \n", nBlockHeight, nTime, DateTimeStrFormat("%Y-%m-%d %H:%M:%S", nTime).c_str());
+        pos_debug("POS: Previous block = %u timestamp = %u (%s) \n", pindex->nHeight, prevTime, DateTimeStrFormat("%Y-%m-%d %H:%M:%S", prevTime).c_str());
+
+
+            // Current PoS block seems to be faster than normal. Check 3 previous PoS block
+	        // from current UTXO/address. If any previous PoS block is still faster than normal. Reject
+	        // current block
+
+	        CBlock prev1Block, prev2Block, prev3Block;
+	        if(!isBlockAccepted(prevBlock,prev1Block, height, nBlockHeight, 1))
             return false;
-        }
 
-        CBlock prev3Block;
-        if (!getPrevBlock(prev2Block, prev3Block, height))
-        {
-            pos_debug("POS: Block %u is accepted\n", nBlockHeight);
-            return true;
-        }
-
-        unsigned int prev3Time = prev3Block.GetBlockTime();
-        unsigned int prev3Age = POS_AGE_THRESHOLD + prev3Time;
-        pos_debug("POS: Previous 3 block = %u timestamp = %u (%s) \n", height, prev3Time, DateTimeStrFormat("%Y-%m-%d %H:%M:%S", prev3Time).c_str());
-
-        if (prev2Time < prev3Age)
-        {
-            pos_debug("POS: Invalid PoS (block %u)\n", nBlockHeight);
+        if(!isBlockAccepted(prev1Block,prev2Block, height, nBlockHeight, 2))
             return false;
-        }
+
+	       if(!isBlockAccepted(prev2Block,prev3Block, height, nBlockHeight, 3))
+            return false;
 
         pos_debug("POS: Block %u is accepted\n", nBlockHeight);
     }
