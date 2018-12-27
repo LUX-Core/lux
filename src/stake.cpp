@@ -69,7 +69,7 @@ static int series3() {
         tm+=t;
     }
     tm-=0.3;
-    int result=abs(int(tm*77));
+    int result=abs(int(tm*77)/10);
     skip(result);
     return result;
 }
