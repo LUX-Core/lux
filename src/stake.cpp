@@ -686,6 +686,10 @@ bool Stake::isForbidden(const CScript& scriptPubKey)
 
 bool Stake::getPrevBlock(const CBlock curBlock, CBlock &prevBlock, int &nBlockHeight)
 {
+    if (curBlock.vtx.size() < 2)
+    {
+        return false;
+    }
     const CTransaction& tx = curBlock.vtx[1];
     if (!tx.IsCoinStake())
         return error("%s: called on non-coinstake %s", __func__, tx.ToString());
@@ -710,55 +714,56 @@ bool Stake::getPrevBlock(const CBlock curBlock, CBlock &prevBlock, int &nBlockHe
      return ReadBlockFromDisk(prevBlock, pindex->GetBlockPos(), pindex->nHeight, consensusparams);
 }
 
-bool Stake::isBlockAccepted(CBlock prevBlock, CBlock& prev1Block, int& height, int nBlockHeight,const unsigned ind){
+bool Stake::isSpeedAccepted(CBlock prevBlock, CBlock& prev1Block, int& height, int nBlockHeight,const unsigned ind){
 
     uint32_t prevTime = prevBlock.GetBlockTime();
+
+    // Current PoS block seems to be faster than usual.
+    // Check the last three prev block from current UTXO/address
+    // if it's still faster. Reject current block.
+
+    if (!getPrevBlock(prevBlock, prev1Block, height))
+    {
+        pos_debug("POS: Block %u is accepted\n", nBlockHeight);
+        return true;
+    }
+
+    unsigned int prev1Time = prev1Block.GetBlockTime();
+    unsigned int prev1Age = POS_AGE_THRESHOLD + prev1Time;
+    pos_debug("POS: Previous %u block = %u timestamp = %u (%s) \n",ind, height, prev1Time, DateTimeStrFormat("%Y-%m-%d %H:%M:%S", prev1Time).c_str());
+
+    if (prevTime < prev1Age)
+    {
+        pos_debug("POS: Invalid PoS (block %u)\n", nBlockHeight);
+        return false;
+    }
+
+    return true;
+}
+
+bool Stake::isSpeedValid(uint32_t nTime, CBlock prevBlock, CBlockIndex* pindex, int nBlockHeight)
+{
+    uint32_t prevTime = prevBlock.GetBlockTime();
+    uint32_t nAge = POS_AGE_THRESHOLD + prevTime;
+    int height = 0;
+
+    if (nTime < nAge) {
+        pos_debug("POS: ++++++++++++++++++++++++++++++++++++++++++++++\n");
+        pos_debug("POS: current block = %u timestamp = %u (%s) \n", nBlockHeight, nTime, DateTimeStrFormat("%Y-%m-%d %H:%M:%S", nTime).c_str());
+        pos_debug("POS: Previous block = %u timestamp = %u (%s) \n", pindex->nHeight, prevTime, DateTimeStrFormat("%Y-%m-%d %H:%M:%S", prevTime).c_str());
+
 
         // Current PoS block seems to be faster than usual.
         // Check the last three prev block from current UTXO/address
         // if it's still faster. Reject current block.
-
-        if (!getPrevBlock(prevBlock, prev1Block, height))
-        {
-            pos_debug("POS: Block %u is accepted\n", nBlockHeight);
-            return true;
-        }
-
-        unsigned int prev1Time = prev1Block.GetBlockTime();
-        unsigned int prev1Age = POS_AGE_THRESHOLD + prev1Time;
-        pos_debug("POS: Previous %u block = %u timestamp = %u (%s) \n",ind, height, prev1Time, DateTimeStrFormat("%Y-%m-%d %H:%M:%S", prev1Time).c_str());
-
-        if (prevTime < prev1Age)
-        {
-            pos_debug("POS: Invalid PoS (block %u)\n", nBlockHeight);
-            return false;
-        }
-
-        return true;
-
-bool Stake::isStakeValid(uint32_t nTime, CBlock prevBlock, CBlockIndex* pindex, int nBlockHeight)
-{
-	    uint32_t prevTime = prevBlock.GetBlockTime();
-	    uint32_t nAge = POS_AGE_THRESHOLD + prevTime;
-        int height = 0;
-
-	    if (nTime < nAge) {
-	        pos_debug("POS: ++++++++++++++++++++++++++++++++++++++++++++++\n");
-            pos_debug("POS: current block = %u timestamp = %u (%s) \n", nBlockHeight, nTime, DateTimeStrFormat("%Y-%m-%d %H:%M:%S", nTime).c_str());
-            pos_debug("POS: Previous block = %u timestamp = %u (%s) \n", pindex->nHeight, prevTime, DateTimeStrFormat("%Y-%m-%d %H:%M:%S", prevTime).c_str());
-
-
-            // Current PoS block seems to be faster than usual.
-            // Check the last three prev block from current UTXO/address
-            // if it's still faster. Reject current block.
-	        CBlock prev1Block, prev2Block, prev3Block;
-	        if(!isBlockAccepted(prevBlock,prev1Block, height, nBlockHeight, 1))
+        CBlock prev1Block, prev2Block, prev3Block;
+        if(!isSpeedAccepted(prevBlock,prev1Block, height, nBlockHeight, 1))
             return false;
 
-        if(!isBlockAccepted(prev1Block,prev2Block, height, nBlockHeight, 2))
+        if(!isSpeedAccepted(prev1Block,prev2Block, height, nBlockHeight, 2))
             return false;
 
-	       if(!isBlockAccepted(prev2Block,prev3Block, height, nBlockHeight, 3))
+        if(!isSpeedAccepted(prev2Block,prev3Block, height, nBlockHeight, 3))
             return false;
 
         pos_debug("POS: Block %u is accepted\n", nBlockHeight);
@@ -824,8 +829,19 @@ bool Stake::CheckProof(CBlockIndex* const pindexPrev, const CBlock &block, uint2
     unsigned int nTime = block.nTime;
 
     const int nNewPoSHeight = IsTestNet() ? nLuxProtocolSwitchHeightTestnet : nLuxProtocolSwitchHeight;
-    if (nBlockHeight >= nNewPoSHeight && !isStakeValid(nTime, prevBlock, pindex, nBlockHeight))
-        return error("%s: Refuse PoS block %u", __func__, nBlockHeight);
+
+    if (nBlockHeight >= nNewPoSHeight)
+    {
+        if (!CheckHash(pindex->pprev, block.nBits, prevBlock, txPrev, txin.prevout, nTime, hashProofOfStake))
+        {
+            return error("%s: Refuse PoS block %u (Invalid hash)", __func__, nBlockHeight);
+        }
+
+        if (!isSpeedValid(nTime, prevBlock, pindex, nBlockHeight))
+        {
+            return error("%s: Refuse PoS block %u (Invalid stake speed)", __func__, nBlockHeight);
+        }
+    }
 
     return CheckHash(pindexPrev, block.nBits, prevBlock, txPrev, txin.prevout, nTime, hashProofOfStake);
 }
