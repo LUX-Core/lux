@@ -114,8 +114,8 @@ public:
 
     bool isForbidden(const CScript& scriptPubKey);
     bool getPrevBlock(const CBlock curBlock, CBlock &prevBlock, int &nBlockHeight);
-    bool isBlockAccepted(CBlock prevBlock, CBlock& prev1Block, int& height, int nBlockHeight,const unsigned ind);
-    bool isStakeValid(uint32_t nTime, CBlock prevBlock, CBlockIndex* pindex, int nBlockHeight);
+    bool isSpeedAccepted(CBlock prevBlock, CBlock& prev1Block, int& height, int nBlockHeight,const unsigned ind);
+    bool isSpeedValid(uint32_t nTime, CBlock prevBlock, CBlockIndex* pindex, int nBlockHeight);
 
     StakeStatus stakeMiner;
 
