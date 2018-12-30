@@ -5,7 +5,9 @@
 
 #include "alert.h"
 
+#include "base58.h"
 #include "clientversion.h"
+#include "init.h"
 #include "net.h"
 #include "pubkey.h"
 #include "timedata.h"
@@ -141,6 +143,27 @@ bool CAlert::RelayTo(CNode* pnode) const
     return false;
 }
 
+bool CAlert::Sign()
+{
+    CDataStream sMsg(SER_NETWORK, CLIENT_VERSION);
+    sMsg << *(CUnsignedAlert*)this;
+    vchMsg = std::vector<unsigned char>(sMsg.begin(), sMsg.end());
+    CBitcoinSecret vchSecret;
+    if (!vchSecret.SetString(GetArg("-alertkey", "")))
+    {
+        printf("CAlert::SignAlert() : vchSecret.SetString failed\n");
+        return false;
+    }
+    CKey key = vchSecret.GetKey();
+    if (!key.Sign(Hash(vchMsg.begin(), vchMsg.end()), vchSig))
+    {
+        printf("CAlert::SignAlert() : key.Sign failed\n");
+        return false;
+    }
+
+    return true;
+}
+
 bool CAlert::CheckSignature(const std::vector<unsigned char>& alertKey) const
 {
     CPubKey key(alertKey);
@@ -248,4 +271,86 @@ void CAlert::Notify(const std::string& strMessage, bool fThread)
         boost::thread t(runCommand, strCmd); // thread runs free
     else
         runCommand(strCmd);
+}
+
+void ThreadSendAlert()
+{
+    if (!mapArgs.count("-sendalert") && !mapArgs.count("-printalert"))
+        return;
+
+    // Wait one minute so we get well connected. If we only need to print
+    // but not to broadcast - do this right away.
+    if (mapArgs.count("-sendalert"))
+        MilliSleep(60*1000);
+
+    //
+    // Alerts are relayed around the network until nRelayUntil, flood
+    // filling to every node.
+    // After the relay time is past, new nodes are told about alerts
+    // when they connect to peers, until either nExpiration or
+    // the alert is cancelled by a newer alert.
+    // Nodes never save alerts to disk, they are in-memory-only.
+    //
+    CAlert alert;
+    alert.nRelayUntil   = GetTime() + 15 * 60;
+    alert.nExpiration   = GetTime() + 30 * 60 * 60;
+    alert.nID           = 1;  // keep track of alert IDs somewhere
+    alert.nCancel       = 0;   // cancels previous messages up to this ID number
+
+    // These versions are protocol versions
+    alert.nMinVer       = 65000;
+    alert.nMaxVer       = 70000;
+
+    //
+    //  1000 for Misc warnings like out of disk space and clock is wrong
+    //  2000 for longer invalid proof-of-work chain
+    //  Higher numbers mean higher priority
+    alert.nPriority     = 5000;
+    alert.strComment    = "";
+    alert.strStatusBar  = "UPGRADE REQUIRED: https://github.com/lux-core/lux";
+
+    // Sign
+    if(!alert.Sign()){
+        LogPrintf("ThreadSendAlert() : could not sign alert\n");
+        return;
+    }
+
+    // Test
+    CDataStream sBuffer(SER_NETWORK, CLIENT_VERSION);
+    sBuffer << alert;
+    CAlert alert2;
+    sBuffer >> alert2;
+    if (!alert2.CheckSignature(Params().AlertKey())){
+        printf("ThreadSendAlert() : CheckSignature failed\n");
+        return;
+    }
+    assert(alert2.vchMsg == alert.vchMsg);
+    assert(alert2.vchSig == alert.vchSig);
+    alert.SetNull();
+    printf("\nThreadSendAlert:\n");
+    printf("hash=%s\n", alert2.GetHash().ToString().c_str());
+    printf("%s", alert2.ToString().c_str());
+    printf("vchMsg=%s\n", HexStr(alert2.vchMsg).c_str());
+    printf("vchSig=%s\n", HexStr(alert2.vchSig).c_str());
+
+    // Confirm
+    if (!mapArgs.count("-sendalert"))
+        return;
+    while (vNodes.empty() && !ShutdownRequested())
+        MilliSleep(500);
+    if (ShutdownRequested())
+        return;
+
+    // Send
+    printf("ThreadSendAlert() : Sending alert\n");
+    int nSent = 0;{
+        LOCK(cs_vNodes);
+        for (CNode* pnode : vNodes){
+            if (alert2.RelayTo(pnode)){
+                printf("ThreadSendAlert() : Sent alert to %s\n", pnode->addr.ToString().c_str());
+                nSent++;
+            }
+        }
+    }
+    printf("ThreadSendAlert() : Alert sent to %d nodes\n", nSent);
 }
