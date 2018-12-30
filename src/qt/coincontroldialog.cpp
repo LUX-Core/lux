@@ -735,7 +735,7 @@ void CoinControlDialog::updateLabels(WalletModel* model, QDialog* dialog)
                 nBytes -= 34;
         }
 
-        // after fee
+        // after fee.
         nAfterFee = std::max<CAmount>(nAmount - nPayFee, 0);
 
         // if use Split UTXO
