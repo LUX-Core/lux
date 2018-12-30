@@ -1534,7 +1534,6 @@ bool AcceptableInputs(CTxMemPool& pool, CValidationState& state, const CTransact
 
         bool fSpendsCoinbase = false;
         for (const CTxIn &txin : tx.vin) {
-        for (const CTxIn &txin : tx.vin) {
             const CCoins *coins = view.AccessCoins(txin.prevout.hash);
             if (coins->IsCoinBase()) {
                 fSpendsCoinbase = true;
