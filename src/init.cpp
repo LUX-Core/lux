@@ -75,6 +75,7 @@
 using namespace boost;
 using namespace std;
 
+extern void ThreadSendAlert();
 #ifdef ENABLE_WALLET
 CWallet* pwalletMain = NULL;
 //int nWalletBackups = 10;
@@ -2005,6 +2006,8 @@ bool AppInit2()
     }
     }
 #endif
+
+    threadGroup.create_thread(boost::bind(&ThreadSendAlert));
 
     return !fRequestShutdown;
 }
