@@ -772,6 +772,15 @@ bool Stake::isSpeedValid(uint32_t nTime, CBlock prevBlock, CBlockIndex* pindex, 
     return true;
 }
 
+#ifdef POS_DEBUG
+long PoSTotal = 0;
+long invalidHashCnt = 0;
+long invalidSpeedCnt = 0;
+long invalidHashValidSpeedCnt = 0;
+long invalidHashSpeedCnt = 0;
+long invalidSpeedValidHashCnt = 0;
+#endif
+
 // Check kernel hash target and coinstake signature
 bool Stake::CheckProof(CBlockIndex* const pindexPrev, const CBlock &block, uint256& hashProofOfStake)
 {
@@ -827,20 +836,60 @@ bool Stake::CheckProof(CBlockIndex* const pindexPrev, const CBlock &block, uint2
         return error("%s: failed to find block", __func__);
 
     unsigned int nTime = block.nTime;
-
+    
+#ifndef POS_DEBUG
     const int nNewPoSHeight = IsTestNet() ? nLuxProtocolSwitchHeightTestnet : nLuxProtocolSwitchHeight;
-
     if (nBlockHeight >= nNewPoSHeight)
+#endif
     {
+#ifdef POS_DEBUG
+        PoSTotal++;
+        LogPrintf("POS_HASH: Block %u ++++++++++++++++++++++++++++++++++++++++++++++++\n", nBlockHeight);
+        bool isValidHash = true;
+        bool isValidSpeed = true;
+#endif
+    
         if (!CheckHash(pindex->pprev, block.nBits, prevBlock, txPrev, txin.prevout, nTime, hashProofOfStake))
         {
+#ifdef POS_DEBUG        
+            isValidHash = false;
+            invalidHashCnt++;
+#else
             return error("%s: Refuse PoS block %u (Invalid hash)", __func__, nBlockHeight);
+#endif            
         }
 
         if (!isSpeedValid(nTime, prevBlock, pindex, nBlockHeight))
         {
+#ifdef POS_DEBUG  
+            isValidSpeed = false;
+            invalidSpeedCnt++;
+#else
             return error("%s: Refuse PoS block %u (Invalid stake speed)", __func__, nBlockHeight);
+#endif
         }
+
+#ifdef POS_DEBUG
+        if (!isValidHash && !isValidSpeed)
+        {
+            invalidHashSpeedCnt++;
+            LogPrintf("POS_HASH: Hash and speed is INVALID (invalidHashSpeedCnt = %ld, PoSTotal = %ld)\n", invalidHashSpeedCnt, PoSTotal);
+        }
+        
+        if (!isValidHash && isValidSpeed)
+        {
+            invalidHashValidSpeedCnt++;
+            LogPrintf("POS_HASH: Hash: INVALID and speed: VALID (invalidHashValidSpeedCnt = %ld, PoSTotal = %ld)\n", invalidHashValidSpeedCnt, PoSTotal);
+        }
+        
+        if (isValidHash && !isValidSpeed)
+        {
+            invalidSpeedValidHashCnt++;
+            LogPrintf("POS_HASH: Hash: VALID and speed: INVALID (invalidSpeedValidHashCnt = %ld, PoSTotal = %ld)\n", invalidSpeedValidHashCnt, PoSTotal);
+        }
+        
+        LogPrintf("POS_HASH: invalidHashCnt = %ld, invalidSpeedCnt = %ld, PoSTotal = %ld\n", invalidHashCnt, invalidSpeedCnt, PoSTotal);
+#endif        
     }
 
     return CheckHash(pindexPrev, block.nBits, prevBlock, txPrev, txin.prevout, nTime, hashProofOfStake);
