@@ -179,29 +179,6 @@ void RPCTypeCheckObj(const UniValue& o,
     const std::map<std::string, UniValueType>& typesExpected,
     bool fAllowNull = false);
 
-/**
- * Run func nSeconds from now. Uses boost deadline timers.
- * Overrides previous timer <name> (if any).
- */
-void RPCRunLater(const std::string& name, boost::function<void(void)> func, int64_t nSeconds);
-
-//! Convert boost::asio address to CNetAddr
-extern CNetAddr BoostAsioToCNetAddr(boost::asio::ip::address address);
-
-typedef UniValue (*rpcfn_type)(const UniValue& params, bool fHelp);
-
-void RPCRunLater(const std::string& name, boost::function<void(void)> func, int64_t nSeconds);
-
-class CRPCCommand
-{
-public:
-    std::string category;
-    std::string name;
-    rpcfn_type actor;
-    bool okSafeMode;
-    bool threadSafe;
-    bool reqWallet;
-};
 
 /** Opaque base class for timers returned by NewTimerFunc.
  * This provides no methods at the moment, but makes sure that delete
@@ -397,6 +374,7 @@ extern UniValue getaddressdeltas(const UniValue& params, bool fHelp);
 extern UniValue getaddresstxids(const UniValue& params, bool fHelp);
 extern UniValue getaddressbalance(const UniValue& params, bool fHelp);
 extern UniValue getspentinfo(const UniValue& params, bool fHelp);
+extern UniValue purgetxindex(const UniValue& params, bool fHelp);
 extern UniValue getinfo(const UniValue& params, bool fHelp);
 extern UniValue getstateinfo(const UniValue& params, bool fHelp);
 extern UniValue getwalletinfo(const UniValue& params, bool fHelp);

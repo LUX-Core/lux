@@ -23,12 +23,14 @@
 #include "wallet.h"
 #endif
 
+#include <boost/algorithm/string.hpp>
 #include <boost/bind.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/foreach.hpp>
 #include <boost/iostreams/concepts.hpp>
 #include <boost/iostreams/stream.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/thread.hpp>
 #include <boost/signals2/signal.hpp>
 #include <boost/algorithm/string/case_conv.hpp> // for to_upper()
 #include <memory> // for unique_ptr
@@ -170,7 +172,7 @@ string CRPCTable::help(string strCommand) const
         vCommands.push_back(make_pair(mi->second->category + mi->first, mi->second));
     sort(vCommands.begin(), vCommands.end());
 
-    for (const std::pair<string, const CRPCCommand*> & command : vCommands) {
+    for (const PAIRTYPE(string, const CRPCCommand*) & command : vCommands) {
         const CRPCCommand* pcmd = command.second;
         string strMethod = pcmd->name;
         // We already filter duplicates, but these deprecated screw up the sort order
@@ -296,6 +298,7 @@ static const CRPCCommand vRPCCommands[] =
         {"addressindex", "getaddresstxids", &getaddresstxids, false, false, false},
         {"addressindex", "getaddressbalance", &getaddressbalance, false, false, false},
         {"addressindex", "getspentinfo", &getspentinfo, false, false, false},
+        {"addressindex", "purgetxindex", &purgetxindex, false, false, false},
 
         /*Smart Contract*/
         {"blockchain", "getaccountinfo", &getaccountinfo,true, true, false },

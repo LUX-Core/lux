@@ -24,7 +24,6 @@
 #include "script/script.h"
 #include "script/sigcache.h"
 #include "script/standard.h"
-#include "spentindex.h"
 #include "sync.h"
 #include "tinyformat.h"
 #include "txmempool.h"
@@ -682,11 +681,8 @@ public:
 };
 
 /** Address and Spent Indexes **/
-bool GetAddressIndex(uint160 addressHash, int type,
-                     std::vector<std::pair<CAddressIndexKey, CAmount> > &addressIndex,
-                     int start = 0, int end = 0);
-bool GetAddressUnspent(uint160 addressHash, int type,
-                       std::vector<std::pair<CAddressUnspentKey, CAddressUnspentValue> > &unspentOutputs);
+bool GetAddressIndex(uint160 addrHash, uint16_t addrType, AddressIndexVector &addressIndex, int start = 0, int end = 0);
+bool GetAddressUnspent(uint160 addrHash, uint16_t addrType, AddressUnspentVector &unspentOutputs);
 bool GetSpentIndex(CSpentIndexKey &key, CSpentIndexValue &value);
 
 /** Functions for disk access for blocks */

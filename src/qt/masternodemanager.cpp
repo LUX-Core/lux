@@ -188,7 +188,7 @@ void MasternodeManager::updateNodeList()
     if(pwalletMain)
     {
         LOCK(cs_adrenaline);
-        for (std::pair<std::string, CLuxNodeConfig> adrenaline : pwalletMain->mapMyLuxNodes)
+        for (PAIRTYPE(std::string, CLuxNodeConfig) adrenaline : pwalletMain->mapMyLuxNodes)
         {
             updateLuxNode(QString::fromStdString(adrenaline.second.sAlias), QString::fromStdString(adrenaline.second.sAddress), QString::fromStdString(adrenaline.second.sMasternodePrivKey), QString::fromStdString(adrenaline.second.sCollateralAddress));
         }
@@ -291,7 +291,7 @@ void MasternodeManager::on_removeButton_clicked()
         walletdb.EraseLuxNodeConfig(c.sAddress);
         ui->tableWidget_2->clearContents();
         ui->tableWidget_2->setRowCount(0);
-        for (std::pair<std::string, CLuxNodeConfig> adrenaline : pwalletMain->mapMyLuxNodes)
+        for (PAIRTYPE(std::string, CLuxNodeConfig) adrenaline : pwalletMain->mapMyLuxNodes)
         {
             updateLuxNode(QString::fromStdString(adrenaline.second.sAlias), QString::fromStdString(adrenaline.second.sAddress), QString::fromStdString(adrenaline.second.sMasternodePrivKey), QString::fromStdString(adrenaline.second.sCollateralAddress));
         }
@@ -353,7 +353,7 @@ void MasternodeManager::on_stopButton_clicked()
 void MasternodeManager::on_startAllButton_clicked()
 {
     std::string results;
-    for (std::pair<std::string, CLuxNodeConfig> adrenaline : pwalletMain->mapMyLuxNodes)
+    for (PAIRTYPE(std::string, CLuxNodeConfig) adrenaline : pwalletMain->mapMyLuxNodes)
     {
         CLuxNodeConfig c = adrenaline.second;
 	std::string errorMessage;
@@ -376,7 +376,7 @@ void MasternodeManager::on_startAllButton_clicked()
 void MasternodeManager::on_stopAllButton_clicked()
 {
     std::string results;
-    for (std::pair<std::string, CLuxNodeConfig> adrenaline : pwalletMain->mapMyLuxNodes)
+    for (PAIRTYPE(std::string, CLuxNodeConfig) adrenaline : pwalletMain->mapMyLuxNodes)
     {
         CLuxNodeConfig c = adrenaline.second;
 	std::string errorMessage;

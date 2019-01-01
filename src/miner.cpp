@@ -369,8 +369,8 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
     dev::h256 oldHashStateRoot = getGlobalStateRoot(pindexState);
     dev::h256 oldHashUTXORoot = getGlobalStateUTXO(pindexState);
 
-    addPriorityTxs(minGasPrice);
-    addPackageTxs(minGasPrice);
+    addPriorityTxs(minGasPrice, fProofOfStake);
+    addPackageTxs(minGasPrice, fProofOfStake);
 
     if (chainActive.Height() >= chainparams.FirstSCBlock()) {
         pblock->hashStateRoot = h256Touint(getGlobalStateRoot(pindexState));

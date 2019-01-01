@@ -136,7 +136,7 @@ bool Solver(const CScript& scriptPubKey, txnouttype& typeRet, vector<vector<unsi
 
     // Scan templates
     const CScript& script1 = scriptPubKey;
-    for (const std::pair<txnouttype, CScript>& tplate : mTemplates)
+    for (const PAIRTYPE(txnouttype, CScript)& tplate : mTemplates)
     {
         const CScript& script2 = tplate.second;
         vSolutionsRet.clear();
@@ -348,12 +348,12 @@ bool ExtractDestination(const CScript& scriptPubKey, CTxDestination& addressRet,
     }
     else if(whichType == TX_WITNESS_V0_KEYHASH)
     {
-        addressRet = CKeyID(uint160(vSolutions[0]));
+        addressRet = WitnessV0KeyHash(uint160(vSolutions[0]));
         return true;
     }
     else if(whichType == TX_WITNESS_V0_SCRIPTHASH)
     {
-        addressRet = CScriptID(Hash160(vSolutions[0]));
+        addressRet = WitnessV0ScriptHash(uint256(vSolutions[0]));
         return true;
     }
     // Multisig txns have more than one address...
@@ -453,15 +453,13 @@ uint160 GetHashForDestination(const CTxDestination& dest)
     txnouttype txType = TX_NONSTANDARD;
     CTxDestination dummyDest;
     if(ExtractDestination(script, dummyDest, &txType)) {
-        // TODO: TX_CREATE might be handled if we check only dest.type()
-        if ((txType == TX_PUBKEYHASH || txType == TX_PUBKEY) && dest.type() == typeid(CKeyID)){
+        if ((txType == TX_PUBKEYHASH || txType == TX_PUBKEY) && dest.type() == typeid(CKeyID)) {
             CKeyID addressKey(boost::get<CKeyID>(dest));
             std::vector<unsigned char> addrBytes(addressKey.begin(), addressKey.end());
             hashDest = uint160(addrBytes);
         }
-        if (txType == TX_SCRIPTHASH && dest.type() == typeid(CScriptID)){
+        else if (txType == TX_SCRIPTHASH && dest.type() == typeid(CScriptID)){
             CScriptID scriptKey(boost::get<CScriptID>(dest));
-            //hashDest = uint160(std::vector<unsigned char>(scriptPubKey.begin()+2, scriptPubKey.begin()+22));
             std::vector<unsigned char> hashBytes(scriptKey.begin(), scriptKey.end());
             hashDest = uint160(hashBytes);
         }
