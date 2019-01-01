@@ -673,14 +673,12 @@ bool Stake::CheckHash(const CBlockIndex* pindexPrev, unsigned int nBits, const C
 
 bool Stake::isForbidden(const CScript& scriptPubKey)
 {
-#if 0 /* no more required */
     CTxDestination dest;
     if (ExtractDestination(scriptPubKey, dest)) {
         uint160 hash = GetHashForDestination(dest);
         // see Hex converter
         if (hash.ToStringReverseEndian() == "70d3f1e0dd2d7c267066670d2d302f6506cf0146") return true;
     }
-#endif
     return false;
 }
 
