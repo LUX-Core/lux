@@ -135,12 +135,12 @@ void WalletModel::pollBalanceChanged()
     // Get required locks upfront. This avoids the GUI from getting stuck on
     // periodical polls if the core is holding the locks for a longer time -
     // for example, during a wallet rescan.
-    TRY_LOCK(cs_main, lockMain);
-    if (!lockMain)
-        return;
-    TRY_LOCK(wallet->cs_wallet, lockWallet);
-    if (!lockWallet)
-        return;
+    //TRY_LOCK(cs_main, lockMain);
+    //if (!lockMain)
+    //    return;
+    //TRY_LOCK(wallet->cs_wallet, lockWallet);
+    //if (!lockWallet)
+    //    return;
     bool cachedNumBlocksChanged = chainActive.Height() != cachedNumBlocks;
     if (fForceCheckBalanceChanged || chainActive.Height() != cachedNumBlocks || nDarksendRounds != cachedDarksendRounds || cachedTxLocks != nCompleteTXLocks) {
         fForceCheckBalanceChanged = false;
