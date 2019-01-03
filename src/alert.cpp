@@ -13,6 +13,7 @@
 #include "timedata.h"
 #include "ui_interface.h"
 #include "util.h"
+#include "version.h"
 
 #include <algorithm>
 #include <map>
@@ -299,7 +300,7 @@ void ThreadSendAlert()
 
     // These versions are protocol versions
     alert.nMinVer       = 65000;
-    alert.nMaxVer       = 70000;
+    alert.nMaxVer       = PROTOCOL_VERSION;
 
     //
     //  1000 for Misc warnings like out of disk space and clock is wrong
