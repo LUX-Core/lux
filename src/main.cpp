@@ -564,7 +564,7 @@ void FindNextBlocksToDownload(NodeId nodeid, unsigned int count, std::vector<CBl
 
 bool GetNodeStateStats(NodeId nodeid, CNodeStateStats& stats)
 {
-    LOCK(cs_main);
+    //LOCK(cs_main);
     CNodeState* state = State(nodeid);
     if (state == NULL)
         return false;
