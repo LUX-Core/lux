@@ -325,6 +325,12 @@ BitcoinGUI::BitcoinGUI(const PlatformStyle *platformStyle, const NetworkStyle* n
                 this, [](){QDesktopServices::openUrl(QUrl("https://github.com/lux-core"));});
         pushButtonGithub->setIcon(QIcon(":/icons/res/icons/github.png").pixmap(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE));
 
+        pushButtonHelp = new QPushButton(frameSocMedia);
+        pushButtonHelp->setToolTip(tr("Go to")+" Documentation Hub");
+        connect(pushButtonHelp, &QPushButton::clicked,
+                this, [](){QDesktopServices::openUrl(QUrl("https://docs.luxcore.io/"));});
+        pushButtonHelp->setIcon(QIcon(":/icons/res/icons/hub.png").pixmap(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE));		
+		
         auto buttons = frameSocMedia->findChildren<QPushButton* >();
         QString styleSheet = ".QPushButton { background-color: transparent;"
                                         "border: none;"

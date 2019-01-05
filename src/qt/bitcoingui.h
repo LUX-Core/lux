@@ -108,6 +108,7 @@ private:
     QPushButton * pushButtonTwitter;
     QPushButton * pushButtonGithub;
     QPushButton * pushButtonDiscord;
+	QPushButton * pushButtonHelp;
     QLabel* labelBlocksIcon;
     QLabel* progressBarLabel;
     QProgressBar* progressBar;
