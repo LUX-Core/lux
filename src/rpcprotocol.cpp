@@ -18,7 +18,6 @@
 #include <fstream>
 
 using namespace std;
-using namespace boost;
 
 /**
  * JSON-RPC protocol.  LUX speaks version 1.0 for maximum compatibility,

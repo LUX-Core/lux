@@ -156,6 +156,11 @@ public:
             case CT_UPDATED:
                 // Miscellaneous updates -- nothing to do, status update will take care of this, and is only computed for
                 // visible transactions.
+                for (int i = lowerIndex; i < upperIndex; i++) {
+                    TransactionRecord* rec = &cachedWallet[i];
+                    rec->status.Updating = true;
+                    rec->status.Updating = true;
+                }
                 break;
         }
     }
@@ -286,9 +291,6 @@ QString TransactionTableModel::formatTxStatus(const TransactionRecord* wtx) cons
     case TransactionStatus::OpenUntilDate:
         status = tr("Open until %1").arg(GUIUtil::dateTimeStr(wtx->status.open_for));
         break;
-    case TransactionStatus::Offline:
-        status = tr("Offline");
-        break;
     case TransactionStatus::Unconfirmed:
         status = tr("Unconfirmed");
         break;
@@ -306,9 +308,6 @@ QString TransactionTableModel::formatTxStatus(const TransactionRecord* wtx) cons
         break;
     case TransactionStatus::Immature:
         status = tr("Immature (%1 confirmations, will be available after %2)").arg(wtx->status.depth).arg(wtx->status.depth + wtx->status.matures_in);
-        break;
-    case TransactionStatus::MaturesWarning:
-        status = tr("This block was not received by any other nodes and will probably not be accepted!");
         break;
     case TransactionStatus::NotAccepted:
         status = tr("Orphan Block - Generated but not accepted. This does not impact your holdings.");
@@ -374,8 +373,6 @@ QString TransactionTableModel::formatTxType(const TransactionRecord* wtx) const
         return tr("Darksend");
     case TransactionRecord::SCcreate:
         return tr("SC created");
-    /*case TransactionRecord::SCcall:
-        return tr("SC call");*/
     case TransactionRecord::SCsent:
         return tr("SC sent");
     case TransactionRecord::SCrefund:
@@ -434,6 +431,7 @@ QString TransactionTableModel::formatTxToAddress(const TransactionRecord* wtx, b
     case TransactionRecord::SCsent:
         return QString::fromStdString(wtx->address) + watchAddress;
     case TransactionRecord::SendToSelf:
+        if (wtx->address != "") return lookupAddress(wtx->address, tooltip) + watchAddress;
     default:
         return tr("(n/a)") + watchAddress;
     }
@@ -480,8 +478,6 @@ QVariant TransactionTableModel::txStatusDecoration(const TransactionRecord* wtx)
     case TransactionStatus::OpenUntilBlock:
     case TransactionStatus::OpenUntilDate:
         return COLOR_TX_STATUS_OPENUNTILDATE;
-    case TransactionStatus::Offline:
-        return COLOR_TX_STATUS_OFFLINE;
     case TransactionStatus::Unconfirmed:
         return QIcon(":/icons/transaction_0");
     case TransactionStatus::Abandoned:
@@ -508,7 +504,6 @@ QVariant TransactionTableModel::txStatusDecoration(const TransactionRecord* wtx)
         int part = (wtx->status.depth * 4 / total) + 1;
         return QIcon(QString(":/icons/transaction_%1").arg(part));
     }
-    case TransactionStatus::MaturesWarning:
     case TransactionStatus::NotAccepted:
         return QIcon(":/icons/transaction_0");
     default:

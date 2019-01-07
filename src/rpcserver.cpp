@@ -99,8 +99,8 @@ void RPCTypeCheck(const UniValue& params,
 }
 
 void RPCTypeCheckObj(const UniValue& o,
-                     const map<string, UniValueType>& typesExpected,
-                     bool fAllowNull)
+    const map<string, UniValueType>& typesExpected,
+    bool fAllowNull)
 {
     for (const auto& t : typesExpected) {
         const UniValue& v = find_value(o, t.first);
@@ -109,7 +109,7 @@ void RPCTypeCheckObj(const UniValue& o,
 
         if (!(t.second.typeAny || v.type() == t.second.type || (fAllowNull && v.isNull()))) {
             string err = strprintf("Expected type %s for %s, got %s",
-                                   uvTypeName(t.second.type), t.first, uvTypeName(v.type()));
+            uvTypeName(t.second.type), t.first, uvTypeName(v.type()));
             throw JSONRPCError(RPC_TYPE_ERROR, err);
         }
     }
@@ -172,7 +172,7 @@ string CRPCTable::help(string strCommand) const
         vCommands.push_back(make_pair(mi->second->category + mi->first, mi->second));
     sort(vCommands.begin(), vCommands.end());
 
-    for (const std::pair<string, const CRPCCommand*> & command : vCommands) {
+    for (const PAIRTYPE(string, const CRPCCommand*) & command : vCommands) {
         const CRPCCommand* pcmd = command.second;
         string strMethod = pcmd->name;
         // We already filter duplicates, but these deprecated screw up the sort order
@@ -318,7 +318,6 @@ static const CRPCCommand vRPCCommands[] =
         {"mining", "getmininginfo", &getmininginfo, true, false, false},
         {"mining", "getnetworkhashps", &getnetworkhashps, true, false, false},
         {"mining", "prioritisetransaction", &prioritisetransaction, true, false, false},
-        {"mining", "purgetxmempool", &purgetxmempool, true, false, false},
         {"mining", "submitblock", &submitblock, true, true, false},
         {"mining", "reservebalance", &reservebalance, true, true, false},
 
@@ -630,16 +629,15 @@ UniValue CRPCTable::execute(const std::string& strMethod, const UniValue& params
     const CRPCCommand* pcmd = tableRPC[strMethod];
     if (!pcmd)
         throw JSONRPCError(RPC_METHOD_NOT_FOUND, "Method not found");
-
     g_rpcSignals.PreCommand(*pcmd);
 
     try {
         // Execute
         return pcmd->actor(params, false);
-    } catch (const std::exception& e) {
+
+    } catch (std::exception& e) {
         throw JSONRPCError(RPC_MISC_ERROR, e.what());
     }
-
     g_rpcSignals.PostCommand(*pcmd);
 }
 

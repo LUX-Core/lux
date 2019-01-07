@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>769</width>
-    <height>494</height>
+    <height>539</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -118,19 +118,6 @@
           <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
          </property>
         </widget>
-       </item>
-       <item row="17" column="0">
-        <spacer name="verticalSpacer_2">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
        </item>
        <item row="3" column="1">
         <widget class="QLabel" name="openSSLVersion">
@@ -348,7 +335,66 @@
          </property>
         </widget>
        </item>
-       <item row="15" column="0">
+       <item row="19" column="0">
+        <widget class="QLabel" name="labelMemoryUsage">
+         <property name="text">
+          <string>Memory usage</string>
+         </property>
+        </widget>
+       </item>
+       <item row="18" column="0">
+        <widget class="QLabel" name="labelNumberOfTransactions">
+         <property name="text">
+          <string>Current number of transactions</string>
+         </property>
+        </widget>
+       </item>
+       <item row="19" column="1">
+        <widget class="QLabel" name="mempoolSize">
+         <property name="cursor">
+          <cursorShape>IBeamCursor</cursorShape>
+         </property>
+         <property name="text">
+          <string>N/A</string>
+         </property>
+         <property name="textFormat">
+          <enum>Qt::PlainText</enum>
+         </property>
+         <property name="textInteractionFlags">
+          <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
+         </property>
+        </widget>
+       </item>
+       <item row="18" column="1">
+        <widget class="QLabel" name="mempoolNumberTxs">
+         <property name="cursor">
+          <cursorShape>IBeamCursor</cursorShape>
+         </property>
+         <property name="text">
+          <string>N/A</string>
+         </property>
+         <property name="textFormat">
+          <enum>Qt::PlainText</enum>
+         </property>
+         <property name="textInteractionFlags">
+          <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
+         </property>
+        </widget>
+       </item>
+       <item row="17" column="0">
+        <widget class="QLabel" name="labelMempoolTitle">
+         <property name="font">
+          <font>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>Memory Pool</string>
+         </property>
+        </widget>
+       </item>
+       <item row="20" column="0">
         <widget class="QLabel" name="debugLogFileHeader">
          <property name="font">
           <font>
@@ -361,7 +407,7 @@
          </property>
         </widget>
        </item>
-       <item row="16" column="0">
+       <item row="21" column="0">
         <widget class="QPushButton" name="openDebugLogfileButton">
          <property name="toolTip">
           <string>Open the LUX debug log file from the current data directory. This can take a few seconds for large log files.</string>
@@ -375,6 +421,39 @@
         </widget>
        </item>
       </layout>
+      <zorder>labelMempoolTitle</zorder>
+      <zorder>berkeleyDBVersionLabel</zorder>
+      <zorder>networkHeader</zorder>
+      <zorder>numberOfBlocks</zorder>
+      <zorder>networkNameLabel</zorder>
+      <zorder>startupTimeLabel</zorder>
+      <zorder>numberOfConnectionsLabel</zorder>
+      <zorder>berkeleyDBVersion</zorder>
+      <zorder>clientVersion</zorder>
+      <zorder>openSSLVersion</zorder>
+      <zorder>generalHeader</zorder>
+      <zorder>blockchainHeader</zorder>
+      <zorder>buildDateLabel</zorder>
+      <zorder>openSSLVersionLabel</zorder>
+      <zorder>dataDir</zorder>
+      <zorder>startupTime</zorder>
+      <zorder>clientVersionLabel</zorder>
+      <zorder>masternodeCountLabel</zorder>
+      <zorder>masternodeCount</zorder>
+      <zorder>clientName</zorder>
+      <zorder>lastBlockTime</zorder>
+      <zorder>networkName</zorder>
+      <zorder>lastBlockTimeLabel</zorder>
+      <zorder>numberOfConnections</zorder>
+      <zorder>labelNumberOfTransactions</zorder>
+      <zorder>mempoolNumberTxs</zorder>
+      <zorder>labelMemoryUsage</zorder>
+      <zorder>mempoolSize</zorder>
+      <zorder>numberOfBlocksLabel</zorder>
+      <zorder>clientNameLabel</zorder>
+      <zorder>switchNetworkActiveButton</zorder>
+      <zorder>debugLogFileHeader</zorder>
+      <zorder>openDebugLogfileButton</zorder>
      </widget>
      <widget class="QWidget" name="tab_console">
       <attribute name="title">

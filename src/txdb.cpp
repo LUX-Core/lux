@@ -138,11 +138,6 @@ bool CBlockTreeDB::WriteBlockIndex(const CDiskBlockIndex& blockindex)
     return Write(make_pair(DB_BLOCK_INDEX, hash), blockindex);
 }
 
-bool CBlockTreeDB::EraseBlockIndex(uint256 hash)
-{
-    return Erase(make_pair(DB_BLOCK_INDEX, hash));
-}
-
 bool CBlockTreeDB::WriteBlockFileInfo(int nFile, const CBlockFileInfo& info)
 {
     return Write(make_pair(DB_BLOCK_FILES, nFile), info);

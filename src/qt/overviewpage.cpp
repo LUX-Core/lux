@@ -404,6 +404,9 @@ void OverviewPage::setWalletModel(WalletModel* model)
 
         // Set tokens model
         ui->listTokens->setModel(tokenProxyModel);
+
+        // Hide button if tokens are visible (same behavior)
+        ui->buttonAddToken->setVisible(tokenProxyModel->rowCount() == 0);
     }
 
     // update the display unit, to not use the default ("LUX")

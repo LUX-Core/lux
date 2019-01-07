@@ -10,8 +10,6 @@
 #include <sstream>
 #include <vector>
 
-#include "util.h"
-
 class CCoinsViewCache;
 class CTransaction;
 class CBlockIndex;
@@ -50,7 +48,6 @@ public:
         strRejectReason = strRejectReasonIn;
         corruptionPossible = corruptionIn;
         strDebugMessage = strDebugMessageIn;
-        LogPrintf("%s(%u) %s %s\n", __func__, chRejectCode, strRejectReason.c_str(), strDebugMessage.c_str());
         if (mode == MODE_ERROR)
             return ret;
         nDoS += level;

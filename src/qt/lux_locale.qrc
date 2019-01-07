@@ -12,6 +12,7 @@
         <file alias="pt">locale/lux_pt.qm</file>
         <file alias="ro_RO">locale/lux_ro_RO.qm</file>
         <file alias="ru">locale/lux_ru.qm</file>
+        <file alias="vn">locale/lux_vn.qm</file>
         <file alias="zh_TW">locale/lux_zh_TW.qm</file>
     </qresource>
 </RCC>

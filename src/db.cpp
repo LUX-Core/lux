@@ -68,7 +68,7 @@ void CDBEnv::Close()
     EnvShutdown();
 }
 
-bool CDBEnv::Open(const boost::filesystem::path& pathIn)
+bool CDBEnv::Open(const boost::filesystem::path& pathIn, bool retry)
 {
     if (fDbEnvInit)
         return true;
@@ -110,13 +110,31 @@ bool CDBEnv::Open(const boost::filesystem::path& pathIn)
         LogPrintf("CDBEnv::Open : Error %d opening database environment: %s\n", ret, DbEnv::strerror(ret));
 
         // According to Berkeley DB specification, we must call dbenv.close() method on failure
-        int ret = dbenv->close(0);
-        if (ret != 0)
+        dbenv->close(0);
+        if (retry)
         {
-            LogPrintf("CDBEnv::Open : Error %d shutting down database environment: %s\n", ret, DbEnv::strerror(ret));
+            // try moving the database env out of the way
+            boost::filesystem::path pathDatabaseBak = pathIn / strprintf("database.%d.bak", GetTime());
+            try
+            {
+                boost::filesystem::rename(pathLogDir, pathDatabaseBak);
+                LogPrintf("Moved old %s to %s. Retrying.\n", pathLogDir.string(), pathDatabaseBak.string());
+            }
+            catch (const boost::filesystem::filesystem_error&)
+            {
+                // failure is ok (well, not really, but it's not worse than what we started with)
+            }
+            // try opening it again one more time
+            if (!Open(pathIn, false))
+            {
+                // if it still fails, it probably means we can't even create the database env
+                return error("CDBEnv::Open : Error %d opening database environment: %s\n", ret, DbEnv::strerror(ret));
+            }
         }
-
-        return error("CDBEnv::Open : Error %d opening database environment: %s\n", ret, DbEnv::strerror(ret));
+        else
+        {
+            return error("CDBEnv::Open : Error %d opening database environment: %s\n", ret, DbEnv::strerror(ret));
+        }
     }
 
     fDbEnvInit = true;

@@ -1891,7 +1891,7 @@ int CDarkSendPool::GetDenominations(const std::vector<CTxOut>& vout) {
     // look for denominations and update uses to 1
     for (CTxOut out : vout) {
         bool found = false;
-        for (std::pair<int64_t, int> &s : denomUsed) {
+        for (PAIRTYPE(int64_t, int) &s : denomUsed) {
             if (out.nValue == s.first) {
                 s.second = 1;
                 found = true;
@@ -1904,7 +1904,7 @@ int CDarkSendPool::GetDenominations(const std::vector<CTxOut>& vout) {
     int c = 0;
     // if the denomination is used, shift the bit on.
     // then move to the next
-    for (std::pair<int64_t, int> &s : denomUsed)
+    for (PAIRTYPE(int64_t, int) &s : denomUsed)
         denom |= s.second << c++;
 
     // Function returns as follows:

@@ -11,13 +11,13 @@ SmartContract::SmartContract(QWidget *parent) : QWidget(parent), ui(new Ui::Smar
     ui->setupUi(this);
 
     createContractPage = new CreateContract();
-    ui->SmartContractTabWidget->addTab(createContractPage, "Create Smart Contract");
+    ui->SmartContractTabWidget->addTab(createContractPage, tr("Create Smart Contract"));
 
     callContractPage = new CallContractPage();
-    ui->SmartContractTabWidget->addTab(callContractPage, "Read Smart Contract");
+    ui->SmartContractTabWidget->addTab(callContractPage, tr("Read Smart Contract"));
 
     sendToContractPage = new SendToContract();
-    ui->SmartContractTabWidget->addTab(sendToContractPage, "Write to Smart Contract");
+    ui->SmartContractTabWidget->addTab(sendToContractPage, tr("Write to Smart Contract"));
 }
 
 SmartContract::~SmartContract() {

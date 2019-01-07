@@ -26,6 +26,12 @@ if [ ! -f $CC ]; then
    sudo apt-get install build-essential libtool autotools-dev automake cmake pkg-config bsdmainutils curl g++-mingw-w64-x86-64 mingw-w64-x86-64-dev g++-mingw-w64-i686 mingw-w64-i686-dev -y
 fi
 
+# Ubuntu 16.04 LTS mingw 4 (gcc 5.3) doesnt include a win10 header, copy it
+if [ ! -f /usr/i686-w64-mingw32/include/uiviewsettingsinterop.h ]; then
+    cp $OLD_PATH/patches/qt/uiviewsettingsinterop.h /usr/share/mingw-w64/include/
+    ln -s ../../share/mingw-w64/include/uiviewsettingsinterop.h /usr/i686-w64-mingw32/include/uiviewsettingsinterop.h
+fi
+
 #Double check whether we have the expected toolchain
 if [ ! -f $CC ]; then
     CC=""

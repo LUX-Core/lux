@@ -51,7 +51,7 @@ public:
         cachedContractTable.clear();
         {
             LOCK(wallet->cs_wallet);
-            for (const std::pair<std::string, CContractBookData>& item : wallet->mapContractBook)
+            for (const PAIRTYPE(std::string, CContractBookData)& item : wallet->mapContractBook)
             {
                 const std::string& address = item.first;
                 const std::string& strName = item.second.name;

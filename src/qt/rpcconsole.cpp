@@ -552,6 +552,8 @@ void RPCConsole::setClientModel(ClientModel* model)
         updateTrafficStats(model->getTotalBytesRecv(), model->getTotalBytesSent());
         connect(model, SIGNAL(bytesChanged(quint64, quint64)), this, SLOT(updateTrafficStats(quint64, quint64)));
 
+        connect(model, SIGNAL(mempoolSizeChanged(long,size_t)), this, SLOT(setMempoolSize(long,size_t)));
+
         // set up peer table
         ui->peerWidget->setModel(model->getPeerTableModel());
         ui->peerWidget->verticalHeader()->hide();
@@ -876,6 +878,16 @@ void RPCConsole::setNumBlocks(int count, const QDateTime& lastBlockDate, double 
 void RPCConsole::setMasternodeCount(const QString& strMasternodes)
 {
     ui->masternodeCount->setText(strMasternodes);
+}
+
+void RPCConsole::setMempoolSize(long numberOfTxs, size_t dynUsage)
+{
+    ui->mempoolNumberTxs->setText(QString::number(numberOfTxs));
+
+    if (dynUsage < 1000000)
+        ui->mempoolSize->setText(QString::number(dynUsage/1000.0, 'f', 2) + " KB");
+    else
+        ui->mempoolSize->setText(QString::number(dynUsage/1000000.0, 'f', 2) + " MB");
 }
 
 void RPCConsole::on_lineEdit_returnPressed()
@@ -1292,4 +1304,9 @@ void RPCConsole::showOrHideBanTableIfRequired()
     bool visible = clientModel->getBanTableModel()->shouldShow();
     ui->banlistWidget->setVisible(visible);
     ui->banHeading->setVisible(visible);
+}
+
+void RPCConsole::setTabFocus(enum TabTypes tabType)
+{
+    ui->tabWidget->setCurrentIndex(tabType);
 }

@@ -271,6 +271,7 @@ void PrepareShutdown()
     if (pwalletMain)
         bitdb.Flush(true);
 #endif
+
 #if ENABLE_ZMQ
     if (pzmqNotificationInterface) {
         UnregisterValidationInterface(pzmqNotificationInterface);
@@ -278,6 +279,7 @@ void PrepareShutdown()
         pzmqNotificationInterface = NULL;
     }
 #endif
+
 #ifndef WIN32
     try {
         boost::filesystem::remove(GetPidFile());
@@ -403,6 +405,7 @@ std::string HelpMessage(HelpMessageMode mode)
     strUsage += HelpMessageOpt("-nlogfile=<n>", _("Set number of debug log files"));
     strUsage += HelpMessageOpt("-loadblock=<file>", _("Imports blocks from external blk000??.dat file") + " " + _("on startup"));
     strUsage += HelpMessageOpt("-maxorphantx=<n>", strprintf(_("Keep at most <n> unconnectable transactions in memory (default: %u)"), DEFAULT_MAX_ORPHAN_TRANSACTIONS));
+    strUsage += HelpMessageOpt("-maxmempool=<n>", strprintf(_("Keep the transaction memory pool below <n> megabytes (default: %u)"), DEFAULT_MAX_MEMPOOL_SIZE));
     strUsage += HelpMessageOpt("-par=<n>", strprintf(_("Set the number of script verification threads (1 to %d, 0 = auto, <0 = leave that many cores free, default: %d)"), (int)boost::thread::hardware_concurrency(), DEFAULT_SCRIPTCHECK_THREADS));
 #ifndef WIN32
     strUsage += HelpMessageOpt("-pid=<file>", strprintf(_("Specify pid file (default: %s)"), "luxd.pid"));
@@ -414,7 +417,7 @@ std::string HelpMessage(HelpMessageMode mode)
 #if !defined(WIN32)
     strUsage += HelpMessageOpt("-sysperms", _("Create new files with system default permissions, instead of umask 077 (only effective with disabled wallet functionality)"));
 #endif
-    strUsage += HelpMessageOpt("-txindex", strprintf(_("Maintain a full transaction index, used by the getrawtransaction rpc call (default: %u)"), 0));
+    strUsage += HelpMessageOpt("-txindex", strprintf(_("Maintain a full transaction index, used by the getrawtransaction rpc call (default: %u)"), DEFAULT_TXINDEX));
     strUsage += HelpMessageOpt("-addressindex", strprintf(_("Maintain a full address index, used to query for the balance, txids and unspent outputs for addresses (default: %u)"), DEFAULT_ADDRESSINDEX));
     strUsage += HelpMessageOpt("-spentindex", strprintf(_("Maintain a full spent index, used to query the spending txid and input index for an outpoint (default: %u)"), DEFAULT_SPENTINDEX));
     strUsage += HelpMessageOpt("-logevents", strprintf(_("Maintain a full EVM log index, used by searchlogs and gettransactionreceipt rpc calls (default: %u)"), false));
@@ -926,7 +929,7 @@ bool AppInit2()
         nMaxConnections = nFD - MIN_CORE_FILEDESCRIPTORS;
 
     if (GetArg("-prune", 0)) {
-        if (GetBoolArg("-txindex", false))
+        if (GetBoolArg("-txindex", DEFAULT_TXINDEX))
             return InitError(_("Prune mode is incompatible with -txindex."));
     }
 
@@ -958,6 +961,11 @@ bool AppInit2()
     mempool.setSanityCheck(GetBoolArg("-checkmempool", chainparams.DefaultConsistencyChecks()));
     fCheckBlockIndex = GetBoolArg("-checkblockindex", chainparams.DefaultConsistencyChecks());
     Checkpoints::fEnabled = GetBoolArg("-checkpoints", true);
+
+    // Mempool size limit
+    int64_t maxMempoolSize = GetArg("-maxmempool", DEFAULT_MAX_MEMPOOL_SIZE) * 1000000;
+    if (maxMempoolSize < 0)
+        return InitError(_("Error: -maxmempool must be at least %d MB"));
 
     // -par=0 means autodetect, but nScriptCheckThreads==0 means no concurrency
     nScriptCheckThreads = GetArg("-par", DEFAULT_SCRIPTCHECK_THREADS);
@@ -1281,7 +1289,7 @@ bool AppInit2()
             }
             // Loop backward through backup files and keep the N newest ones (1 <= N <= 10)
             int counter = 0;
-            for (std::pair<const std::time_t, boost::filesystem::path> file : reverse_iterate(folder_set)) {
+            for (PAIRTYPE(const std::time_t, boost::filesystem::path) file : reverse_iterate(folder_set)) {
                 counter++;
                 if (counter >= nWalletBackups) {
                     // More than nWalletBackups backups: delete oldest one(s)
@@ -1467,7 +1475,7 @@ bool AppInit2()
     nTotalCache = max(nTotalCache, nMinDbCache << 20); // total cache cannot be less than nMinDbCache
     nTotalCache = min(nTotalCache, nMaxDbCache << 20); // total cache cannot be greater than nMaxDbCache
     int64_t nBlockTreeDBCache = nTotalCache / 8;
-    nBlockTreeDBCache = min(nBlockTreeDBCache, (GetBoolArg("-txindex", true) ? nMaxBlockDBAndTxIndexCache : nMaxBlockDBCache) << 20);
+    nBlockTreeDBCache = min(nBlockTreeDBCache, (GetBoolArg("-txindex", DEFAULT_TXINDEX) ? nMaxBlockDBAndTxIndexCache : nMaxBlockDBCache) << 20);
     nTotalCache -= nBlockTreeDBCache;
     int64_t nCoinDBCache = std::min(nTotalCache / 2, (nTotalCache / 4) + (1 << 23)); // use 50% the remaining cache for coindb cache
     nCoinDBCache = min(nCoinDBCache, nMaxCoinsDBCache << 20); // cap total coins db cache
@@ -1579,7 +1587,7 @@ bool AppInit2()
                 }
 
                 // Check for changed -txindex state
-                if (fTxIndex != GetBoolArg("-txindex", true)) {
+                if (fTxIndex != GetBoolArg("-txindex", DEFAULT_TXINDEX)) {
                     strLoadError = _("You need to rebuild the database using -reindex to change -txindex");
                     break;
                 }
