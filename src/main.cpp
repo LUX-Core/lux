@@ -4830,6 +4830,12 @@ bool ProcessNewBlock(CValidationState& state, const CChainParams& chainparams, C
     bool usePhi2 = false;
     bool alreadyAccepted = false;
 
+    // Do not accept the peers having older versions when the fork happens
+    if (nHeight >= nLuxProtocolSwitchHeight)
+    {
+        SCVersion = WORKING_VERSION;
+    }
+
     // Reject the block from older version
     if (pfrom && pfrom->strSubVer.compare(SCVersion) < 0)
         return error("%s: Invalid block %d, wrong chain ver %s", __func__, nHeight, pfrom->strSubVer.c_str());

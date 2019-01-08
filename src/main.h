@@ -91,9 +91,15 @@ struct CNodeStateStats;
 #define SNAPSHOT_BLOCK 299500
 #endif
 
+#ifndef WORKING_VERSION
+#define WORKING_VERSION "/Luxcore:5.3.0/"
+#endif
+
 static const int64_t DARKSEND_COLLATERAL = (16120*COIN); //16120 LUX
 static const int64_t DARKSEND_FEE = (0.002*COIN); // reward masternode
 static const int64_t DARKSEND_POOL_MAX = (1999999.99*COIN);
+
+static const int nLuxProtocolSwitchHeight = 600000;
 
 /** The maximum size for mined blocks */
 static const unsigned int MAX_BLOCK_SIZE_GEN = MAX_BLOCK_BASE_SIZE/2;
