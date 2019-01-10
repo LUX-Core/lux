@@ -132,6 +132,9 @@ void WalletModel::updateStatus()
 
 void WalletModel::pollBalanceChanged()
 {
+    // let's not bother polling for balance changes if we're syncing - the user will be told they're out of sync so the number doesn't matter anyway.
+    if (IsInitialBlockDownload()) return;
+
     // Get required locks upfront. This avoids the GUI from getting stuck on
     // periodical polls if the core is holding the locks for a longer time -
     // for example, during a wallet rescan.
@@ -142,6 +145,7 @@ void WalletModel::pollBalanceChanged()
     //if (!lockWallet)
     //    return;
     bool cachedNumBlocksChanged = chainActive.Height() != cachedNumBlocks;
+
     if (fForceCheckBalanceChanged || chainActive.Height() != cachedNumBlocks || nDarksendRounds != cachedDarksendRounds || cachedTxLocks != nCompleteTXLocks) {
         fForceCheckBalanceChanged = false;
 
@@ -149,17 +153,17 @@ void WalletModel::pollBalanceChanged()
         cachedNumBlocks = chainActive.Height();
         cachedDarksendRounds = nDarksendRounds;
 
-        checkBalanceChanged();
-        if (transactionTableModel)
-            transactionTableModel->updateConfirmations();
+            checkBalanceChanged();
+            if (transactionTableModel)
+                transactionTableModel->updateConfirmations();
 
-        if(tokenTransactionTableModel)
-            tokenTransactionTableModel->updateConfirmations();
+            if(tokenTransactionTableModel)
+                tokenTransactionTableModel->updateConfirmations();
 
-        if(cachedNumBlocksChanged)
-        {
-            checkTokenBalanceChanged();
-        }
+            if(cachedNumBlocksChanged)
+            {
+                checkTokenBalanceChanged();
+            }
     }
 }
 
