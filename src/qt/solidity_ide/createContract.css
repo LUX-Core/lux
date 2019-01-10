@@ -1,0 +1,162 @@
+/**************************** Contracts Wizard*************************************************/
+QWidget#CsAllTypesWidget
+{
+    background-color: white;
+}
+
+
+QFrame#csTypeWidget
+{
+    margin: 0px;
+    border: 1px solid grey;
+    background-color: #ededed;
+}
+
+QFrame#csTypeWidget .QLabel#labelType
+{
+    font: bold 14px;
+}
+
+QFrame#csTypeWidget .QLabel#labelDescription
+{
+    font: 12px;
+}
+
+QListView#listViewSC_Types
+{
+    border: 0px;
+    background-color: transparent;
+}
+
+QLabel#labelTytleCsAllTypes
+{
+    border: 1px transparent;
+    border-radius: 7px;
+    padding: 2px;
+    color: white;
+    background-image:url(://imgs/labelChooseType.png) no-repeat center center fixed;
+    font-size: 17px
+}
+
+/**************************** Edit Contract Widget*************************************************/
+
+QWidget#EditContract
+{
+    background-color: #3D3C3A;
+}
+
+QWidget#EditContract  .QFrame#frameWidgetCurrentProject
+{
+    border: 1px solid black;
+    border-radius: 10px;
+    background-color:white;
+}
+
+QWidget#EditContract  .QFrame#frameAllOpenFiles
+{
+    border: 1px solid black;
+    border-radius: 10px;
+    background-color: white;
+}
+
+QWidget#EditContract .QFrame
+{
+    border: 1px solid black;
+    border-radius: 10px;
+}
+
+QWidget#EditContract .CodeEditor#codeEdit{
+    border: 1px solid black;
+}
+
+QWidget#EditContract  .QLabel#labelFileName
+{
+    color: #E5E4E2;
+    min-height:25;
+    max-height:25;
+}
+
+QWidget#EditContract  .QLabel#labelCurrentProjectTytle
+{
+    border: 1px solid black;
+    border-radius: 10px;
+    color: #008080;
+    background-color: #C2DFFF;
+    min-height:25;
+    max-height:25;
+}
+
+QWidget#EditContract  .QLabel#labelAllOpenFilesTytle
+{
+    border: 1px solid black;
+    border-radius: 10px;
+    color: #008080;
+    background-color: #C2DFFF;
+    min-height:25;
+    max-height:25;
+}
+
+
+QWidget#EditContract  .QFrame#toolsFrame
+{
+    min-height:40;
+    max-height:40;
+    background-color: #E5E4E2;
+}
+
+QWidget#EditContract  .QFrame#frameBuild
+{
+    background-color: #E5E4E2;
+}
+
+QWidget#EditContract  .QComboBox#comboBoxCompilerVersion
+{
+    qproperty-iconSize: 12px;
+}
+
+QWidget#EditContract  .QPushButton#pushButtonBuild
+{
+    qproperty-iconSize: 14px;
+}
+
+
+QWidget#EditContract  .QListWidget#listWidgetErrWarnings::item
+{
+    border: 2px dashed gray;
+    border-radius: 3px;
+    background-color: #FA8072;
+    color: black;
+}
+
+QWidget#EditContract  .QListWidget#listWidgetErrWarnings::item:selected
+{
+    border: 2px dashed gray;
+    border-radius: 3px;
+    background-color: #48D1CC;
+    color: black;
+}
+
+QWidget#EditContract  .QLabel#labelBuildStatus[success=true]
+{
+    color: green;
+}
+
+QWidget#EditContract  .QLabel#labelBuildStatus[success=false]
+{
+    color: red;
+}
+
+/*QWidget#EditContract  .QStackedWidget#stackedWidget  .QWidget#CsAllTypesWidget .QListView#listViewSC_Types*/
+
+
+QWidget#EditContract .QFrame#toolsFrame .QPushButton
+{
+    background-color: transparent;
+    border: none;
+    min-width:25;
+    min-height:25;
+    max-width:25;
+    max-height:25;
+    qproperty-iconSize: 25px 25px;
+    qproperty-text:""
+}

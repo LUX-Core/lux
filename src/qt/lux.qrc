@@ -84,6 +84,25 @@
         <file>res/icons/discord.png</file>
         <file>res/icons/telegram.png</file>
         <file>res/icons/twitter.png</file>
+        <file>res/icons/Check.png</file>
+        <file>res/icons/close.png</file>
+        <file>res/icons/compile.png</file>
+        <file>res/icons/contract.png</file>
+        <file>res/icons/cryptotoken.png</file>
+        <file>res/icons/download.png</file>
+        <file>res/icons/error.png</file>
+        <file>res/icons/find.png</file>
+        <file>res/icons/labelChooseType.png</file>
+        <file>res/icons/newFile.png</file>
+        <file>res/icons/openFile.png</file>
+        <file>res/icons/redo.png</file>
+        <file>res/icons/saveAllFiles.png</file>
+        <file>res/icons/saveFile.png</file>
+        <file>res/icons/saveFileAs.png</file>
+        <file>res/icons/settings.png</file>
+        <file>res/icons/undo.png</file>
+        <file>res/icons/warning_sol_ide.png</file>
+        <file>res/icons/wizard.png</file>
     </qresource>
     <qresource prefix="/css">
         <file alias="default">res/css/default.css</file>

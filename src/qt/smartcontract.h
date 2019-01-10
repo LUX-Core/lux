@@ -1,6 +1,6 @@
 #ifndef SMARTCONTRACT_H
 #define SMARTCONTRACT_H
-
+#include "solidity_ide/editcontract.h"
 #include <QWidget>
 
 class CallContractPage;
@@ -8,6 +8,7 @@ class CreateContract;
 class SendToContract;
 class WalletModel;
 class ClientModel;
+//class EditContract;
 
 namespace Ui {
 class SmartContract;
@@ -28,7 +29,7 @@ private:
     Ui::SmartContract* ui;
 
     CallContractPage* callContractPage;
-    CreateContract* createContractPage;
+    EditContract* createContractPage;
     SendToContract* sendToContractPage;
 
     WalletModel* m_model;
