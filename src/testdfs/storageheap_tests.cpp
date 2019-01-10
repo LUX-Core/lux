@@ -98,7 +98,7 @@ BOOST_AUTO_TEST_CASE(allocate_file)
     std::string strFileURI = "0xFF...some hash...FF";
     uint64_t nFileSize = 10ull * 1024 * 1024 * 1024;    // 10 Gb
     heap.AddChunk(path, size);
-    std::string filename = strFileURI + "_" + std::to_string(std::time(0)) + ".luxfs";
+    std::string filename = path + "/" + strFileURI + "_" + std::to_string(std::time(0)) + ".luxfs";
 
     heap.AllocateFile(strFileURI, nFileSize);
 
@@ -132,7 +132,7 @@ BOOST_AUTO_TEST_CASE(find_best_chunk)
     for(unsigned int i = 0; i < paths.size(); ++i) {
         heap.AddChunk(paths[i], sizes[i]);
     }
-    std::string filename = strFileURI + "_" + std::to_string(std::time(0)) + ".luxfs";
+    std::string filename = paths[0] + "/" + strFileURI + "_" + std::to_string(std::time(0)) + ".luxfs";
 
     heap.AllocateFile(strFileURI, nFileSize);
 
@@ -197,7 +197,7 @@ BOOST_AUTO_TEST_CASE(get_file)
     uint64_t nFileSize = 10ull * 1024 * 1024 * 1024;    // 10 Gb
     heap.AddChunk(path, size);
     heap.AllocateFile(strFileURI, nFileSize);
-    std::string filename = strFileURI + "_" + std::to_string(std::time(0)) + ".luxfs";
+    std::string filename = path + "/" + strFileURI + "_" + std::to_string(std::time(0)) + ".luxfs";
 
     auto file = heap.GetFile(strFileURI);
 
@@ -230,7 +230,7 @@ BOOST_AUTO_TEST_CASE(set_public_key_for_file)
     uint64_t nFileSize = 10ull * 1024 * 1024 * 1024;    // 10 Gb
     heap.AddChunk(path, size);
     heap.AllocateFile(strFileURI, nFileSize);
-    std::string filename = strFileURI + "_" + std::to_string(std::time(0)) + ".luxfs";
+    std::string filename = path + "/" + strFileURI + "_" + std::to_string(std::time(0)) + ".luxfs";
 
     heap.SetPubKey(strFileURI, strPubKey);
 

@@ -14,22 +14,23 @@ extern StorageController storageController;
 
 static const size_t STORAGE_MIN_RATE = 1;
 
+static const uint64_t DEFAULT_STORAGE_SIZE = 100ul * 1024 * 1024 * 1024; // 100 Gb
 static const unsigned short DEFAULT_DFS_PORT = 1507;
 
 class StorageController
 {
 private:
-    StorageHeap storageHeap;
-    StorageHeap tempStorageHeap;
-    ProposalsAgent proposalsAgent;
 public:
     size_t rate;
     CService address;
     std::map<uint256, boost::filesystem::path> mapLocalFiles;
     std::map<uint256, StorageOrder> mapAnnouncements;
     std::map<uint256, StorageHandshake> mapReceivedHandshakes;
+    StorageHeap storageHeap;
+    StorageHeap tempStorageHeap;
+    ProposalsAgent proposalsAgent;
 
-    StorageController() : rate(STORAGE_MIN_RATE), address(CService("127.0.0.1")) {} // TODO: Change to global-wide address (SS)
+    StorageController(); // TODO: Change to global-wide address (SS)
 
     void AnnounceOrder(const StorageOrder &order);
     void AnnounceOrder(const StorageOrder &order, const boost::filesystem::path &path);

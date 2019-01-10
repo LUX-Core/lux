@@ -1,6 +1,7 @@
 #include "storagecontroller.h"
 
 #include <fstream>
+#include <boost/filesystem.hpp>
 
 #include "main.h"
 #include "streams.h"
@@ -8,6 +9,21 @@
 #include "replicabuilder.h"
 
 StorageController storageController;
+
+StorageController::StorageController() : rate(STORAGE_MIN_RATE), address(CService("127.0.0.1")) {
+//    namespace fs = boost::filesystem;
+//
+//    fs::path defaultDfsPath = GetDataDir() / "dfs";
+//    if (!fs::exists(defaultDfsPath)) {
+//        fs::create_directories(defaultDfsPath);
+//    }
+//    storageHeap.AddChunk(defaultDfsPath.string(), DEFAULT_STORAGE_SIZE);
+//    fs::path defaultDfsTempPath = GetDataDir() / "dfstemp";
+//    if (!fs::exists(defaultDfsTempPath)) {
+//        fs::create_directories(defaultDfsTempPath);
+//    }
+//    tempStorageHeap.AddChunk(defaultDfsTempPath.string(), DEFAULT_STORAGE_SIZE);
+}
 
 void StorageController::ProcessStorageMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv, bool& isStorageCommand)
 {
@@ -256,23 +272,31 @@ void StorageController::CreateReplica(const boost::filesystem::path &filename, c
     namespace fs = boost::filesystem;
 
     std::ifstream filein;
-    filein.open(filename.string().c_str(), std::ios::binary|std::ios::in);
+    filein.open(filename.string().c_str(), std::ios::binary);
     if (!filein.is_open()) {
         LogPrint("dfs", "file %s cannot be opened", filename.string());
         return ;
     }
 
-    std::ofstream outfile;
-    outfile.open("temppdf.pdf", std::ios::binary|std::ios::out);
+    filein.seekg (0, ios::end);
+    uint64_t length = filein.tellg();
+    filein.seekg (0, ios::beg);
 
-//    int buffer[2];
-//    while(filein.read((char *)&buffer,sizeof(buffer)))
-//    {
-//        outfile.write((char *)&buffer,sizeof(buffer));
-//    }
+    int BUFFER_SIZE = 128;
+    std::shared_ptr<AllocatedFile> tempFile = tempStorageHeap.AllocateFile(order.fileURI.ToString(), length + BUFFER_SIZE); // TODO: size = (length / BUFFER_SIZE + (length % BUFFER_SIZE != 0)) * BUFFER_SIZE (SS)
+
+    std::ofstream outfile;
+    outfile.open(tempFile->filename, std::ios::binary);
+
+    char *buffer = new char[BUFFER_SIZE];
+    while(filein.read(buffer, sizeof(buffer)))
+    {
+        outfile.write(buffer, sizeof(buffer));
+    }
+    outfile.write(buffer, filein.gcount());
 
     filein.close();
     outfile.close();
 
- //   EncryptData(src, offset, srcSize, cipherText, aesKey, rsa);
+    delete[] buffer;
 }

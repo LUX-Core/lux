@@ -64,7 +64,7 @@ std::shared_ptr<AllocatedFile> StorageHeap::AllocateFile(const std::string& uri,
     }
     if (nBestChunkIndex < chunks.size()) {
         std::shared_ptr<AllocatedFile> file_ptr = std::make_shared<AllocatedFile>();
-        file_ptr->filename = uri + "_" + std::to_string(std::time(0)) + ".luxfs";
+        file_ptr->filename = chunks[nBestChunkIndex].path + "/" + uri + "_" + std::to_string(std::time(0)) + ".luxfs";
         file_ptr->size = size;
         file_ptr->uri = uri;
         // add file to heap
