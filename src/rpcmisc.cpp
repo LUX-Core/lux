@@ -23,6 +23,7 @@
 #include "wallet.h"
 #include "walletdb.h"
 #endif
+#include "lux/storagecontroller.h"
 
 #include <stdint.h>
 
@@ -1213,3 +1214,30 @@ UniValue getstakingstatus(const UniValue& params, bool fHelp)
     return obj;
 }
 #endif // ENABLE_WALLET
+
+UniValue announcefileorder(const UniValue& params, bool fHelp)
+{
+    if (fHelp || params.size() != 4)
+        throw runtime_error(
+                "announcefileorder\n"
+                "\nAnnounces a file order.\n"
+                "\nResult:\n"
+                "{\n"
+                "}\n"
+                "\nExamples:\n"
+                + HelpExampleRpc("announcefileorder", "\"localFilePath\", daysToKeep, fileCostInCoins")
+        );
+
+    StorageOrder order{};
+    boost::filesystem::path path{ params[0].get_str() };
+
+    order.time = std::time(nullptr);
+    order.storageUntil = order.time + params[1].get_int() * 24 * 60 * 60;
+    order.fileSize = boost::filesystem::file_size(path);
+    order.maxRate = params[2].get_real() * COIN / (order.fileSize * (order.storageUntil - order.time));
+
+    LOCK(cs_main);
+    storageController.AnnounceOrder(order, path);
+
+    return UniValue::VNULL;
+}

@@ -368,6 +368,7 @@ static const CRPCCommand vRPCCommands[] =
         //{"lux", "mnfinalbudget", &mnfinalbudget, true, true, false},
         //{"lux", "mnsync", &mnsync, true, true, false},
         {"lux", "spork", &spork, true, true, false},
+        {"lux", "announcefileorder", &announcefileorder, true, true, false},
 #ifdef ENABLE_WALLET
         //{"lux", "darksend", &darksend, false, false, true}, /* not threadSafe because of SendMoney */
 
