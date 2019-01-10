@@ -8,13 +8,30 @@
 #include <mutex>
 #include <boost/optional.hpp>
 
+struct DecryptionKeys
+{
+    using Bytes = std::vector<unsigned char>;
+    Bytes rsaKey;
+    Bytes aesKey;
+
+    static std::string ToString(Bytes bytes)
+    {
+        return std::string(bytes.begin(), bytes.end());
+    }
+
+    static Bytes ToBytes(std::string data)
+    {
+        return Bytes(data.begin(), data.end());
+    }
+};
+
 struct AllocatedFile
 {
     std::mutex cs;
     std::string filename;
     uint64_t size;
     std::string uri;
-    std::string pubkey;
+    DecryptionKeys keys;
 };
 
 
@@ -43,7 +60,7 @@ public:
     std::shared_ptr<AllocatedFile> AllocateFile(const std::string& uri, uint64_t size);
     void FreeFile(const std::string& uri);
     std::shared_ptr<AllocatedFile> GetFile(const std::string& uri) const;
-    void SetPubKey(const std::string& uri, const std::string& pubkey);
+    void SetDecryptionKeys(const std::string& uri, const std::vector<unsigned char>& rsaKey, const std::vector<unsigned char>& aesKey);
 };
 
 #endif //LUX_LIB_CRYPTO_STORAGE_HEAP_H

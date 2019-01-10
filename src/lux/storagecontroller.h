@@ -14,7 +14,7 @@ extern StorageController storageController;
 
 static const size_t STORAGE_MIN_RATE = 1;
 
-static const uint64_t DEFAULT_STORAGE_SIZE = 100ul * 1024 * 1024 * 1024; // 100 Gb
+static const uint64_t DEFAULT_STORAGE_SIZE = 100ull * 1024 * 1024 * 1024; // 100 Gb
 static const unsigned short DEFAULT_DFS_PORT = 1507;
 
 class StorageController
@@ -45,7 +45,7 @@ public:
     std::vector<StorageProposal> GetProposals(const uint256 &orderHash);
     // Temp
     void FindReplicaKeepers(const StorageOrder &order, const int countReplica);
-    void CreateReplica(const boost::filesystem::path &filename, const StorageOrder &order, const StorageProposal &proposal);
+    std::shared_ptr<AllocatedFile> CreateReplica(const boost::filesystem::path &filename, const StorageOrder &order, const StorageProposal &proposal);
 };
 
 #endif //LUX_STORAGECONTROLLER_H

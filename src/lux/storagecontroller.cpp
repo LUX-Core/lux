@@ -2,12 +2,15 @@
 
 #include <fstream>
 #include <boost/filesystem.hpp>
+#include <openssl/rsa.h>
+#include <openssl/pem.h>
 
 #include "main.h"
 #include "streams.h"
 #include "util.h"
 #include "replicabuilder.h"
 
+static const unsigned int REPLICA_BUFFER_SIZE = 256; // this const is never changed
 StorageController storageController;
 
 StorageController::StorageController() : rate(STORAGE_MIN_RATE), address(CService("127.0.0.1")) {
@@ -112,12 +115,9 @@ void StorageController::ProcessStorageMessage(CNode* pfrom, const std::string& s
         vRecv >> handshake;
         auto itAnnounce = mapAnnouncements.find(handshake.orderHash);
         if (itAnnounce != mapAnnouncements.end()) {
-            StorageOrder order = itAnnounce->second;
             auto it = mapLocalFiles.find(handshake.orderHash);
             if (it != mapLocalFiles.end()) {
                 mapReceivedHandshakes[handshake.orderHash] = handshake;
-                auto proposal = proposalsAgent.GetProposal(handshake.orderHash, handshake.proposalHash);
-                CreateReplica(it->second, order, proposal);
             } else {
                 // DoS prevention
 //            CNode* pNode = FindNode(proposal.address);
@@ -253,6 +253,9 @@ void StorageController::FindReplicaKeepers(const StorageOrder &order, const int 
         }
         if (it != mapReceivedHandshakes.end()) {
             ++numReplica;
+            auto itFile = mapLocalFiles.find(proposal.orderHash);
+            auto pAllocatedFile = CreateReplica(itFile->second, order, proposal);
+            // pNode->PushMessage("sendfile", nullptr); // TODO: change nullptr to bytes (SS)
             if (numReplica == countReplica) {
                 break;
             }
@@ -265,38 +268,66 @@ void StorageController::FindReplicaKeepers(const StorageOrder &order, const int 
     }
 }
 
-void StorageController::CreateReplica(const boost::filesystem::path &filename, const StorageOrder &order, const StorageProposal &proposal)
+std::shared_ptr<AllocatedFile> StorageController::CreateReplica(const boost::filesystem::path &filename, const StorageOrder &order, const StorageProposal &proposal)
 {
-//    void EncryptData(const byte *src, uint64_t offset, size_t srcSize, byte *cipherText,
-//                     const AESKey &aesKey, RSA *rsa);
     namespace fs = boost::filesystem;
 
     std::ifstream filein;
     filein.open(filename.string().c_str(), std::ios::binary);
     if (!filein.is_open()) {
         LogPrint("dfs", "file %s cannot be opened", filename.string());
-        return ;
+        return {};
     }
 
     filein.seekg (0, ios::end);
     uint64_t length = filein.tellg();
     filein.seekg (0, ios::beg);
 
-    int BUFFER_SIZE = 128;
-    std::shared_ptr<AllocatedFile> tempFile = tempStorageHeap.AllocateFile(order.fileURI.ToString(), length + BUFFER_SIZE); // TODO: size = (length / BUFFER_SIZE + (length % BUFFER_SIZE != 0)) * BUFFER_SIZE (SS)
+    size_t BUFFER_SIZE = 128;
+    size_t nBlockSizeRSA = 128;
+    std::shared_ptr<AllocatedFile> tempFile = tempStorageHeap.AllocateFile(order.fileURI.ToString(), (length / BUFFER_SIZE + (length % BUFFER_SIZE != 0)) * BUFFER_SIZE);
 
     std::ofstream outfile;
     outfile.open(tempFile->filename, std::ios::binary);
 
-    char *buffer = new char[BUFFER_SIZE];
-    while(filein.read(buffer, sizeof(buffer)))
+    RSA *rsa;
+    // search for rsa->n > 0x0000ff...126 bytes...ff
     {
-        outfile.write(buffer, sizeof(buffer));
+        rsa = RSA_generate_key(nBlockSizeRSA * 8, 3, nullptr, nullptr);
+        BIGNUM *minModulus = GetMinModulus();
+        while (BN_ucmp(minModulus, rsa->n) >= 0) {
+            RSA_free(rsa);
+            rsa = RSA_generate_key(nBlockSizeRSA * 8, 3, nullptr, nullptr);
+        }
+        BN_free(minModulus);
     }
-    outfile.write(buffer, filein.gcount());
+    const char chAESKey[] = "1234567890123456"; // TODO: generate unique 16 bytes (SS)
+    const AESKey aesKey(chAESKey, chAESKey + sizeof(chAESKey)/sizeof(*chAESKey));
 
+    byte *buffer = new byte[BUFFER_SIZE];
+    byte *replica = new byte[REPLICA_BUFFER_SIZE];
+    while(filein.read((char *)buffer, sizeof(buffer)))
+    {
+        EncryptData(buffer, 0, BUFFER_SIZE, replica, aesKey, rsa);
+        outfile.write((char *)replica, sizeof(replica));
+        // TODO: check write (SS)
+    }
+    EncryptData(buffer, 0, filein.gcount(), replica, aesKey, rsa);
+    outfile.write((char *)replica, BUFFER_SIZE);
+    // TODO: check write (SS)
+
+    BIO *pub = BIO_new(BIO_s_mem());
+    PEM_write_bio_RSAPublicKey(pub, rsa);
+    size_t publicKeyLength = BIO_pending(pub);
+    char *publicKey = new char[publicKeyLength + 1];
+    BIO_read(pub, publicKey, publicKeyLength);
+    publicKey[publicKeyLength] = '\0';
+  //  tempStorageHeap.SetDecryptionKeys(tempFile->uri, DecryptionKeys::ToBytes(std::string(publicKey)), aesKey);
     filein.close();
     outfile.close();
-
+    RSA_free(rsa);
     delete[] buffer;
+    delete[] replica;
+
+    return tempFile;
 }

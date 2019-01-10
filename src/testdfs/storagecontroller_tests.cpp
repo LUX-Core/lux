@@ -4,6 +4,7 @@
 
 #include <boost/filesystem.hpp>
 #include <boost/test/unit_test.hpp>
+#include <fstream>
 
 BOOST_AUTO_TEST_SUITE(storage_controller_tests)
 
@@ -27,7 +28,7 @@ BOOST_AUTO_TEST_CASE(createreplica)
     StorageOrder order = {
         std::time(0),
         std::time(0) + 86400,
-        100l * 1024 * 1024 * 1024, // 100 Gb
+        100ull * 1024 * 1024 * 1024, // 100 Gb
         fileUri,
         2,
         100,
@@ -40,9 +41,15 @@ BOOST_AUTO_TEST_CASE(createreplica)
         CService("127.0.0.1")
     };
 
-    controller.CreateReplica(fullFilename, order, proposal);
+    auto tempFile = controller.CreateReplica(fullFilename, order, proposal);
 
-//    BOOST_CHECK_EQUAL(,);
+    std::ifstream filein;
+    filein.open(tempFile->filename.c_str(), std::ios::binary);
+    filein.seekg (0, ios::end);
+    uint64_t length = filein.tellg();
+    filein.close();
+    BOOST_CHECK_EQUAL(length, tempFile->size);
+    fs::remove(tempFile->filename);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

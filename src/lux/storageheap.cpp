@@ -103,14 +103,15 @@ std::shared_ptr<AllocatedFile> StorageHeap::GetFile(const std::string& uri) cons
     return {};
 }
 
-void StorageHeap::SetPubKey(const std::string& uri, const std::string& pubkey)
+void StorageHeap::SetDecryptionKeys(const std::string& uri, const std::vector<unsigned char>& rsaKey, const std::vector<unsigned char>& aesKey)
 {
     std::lock_guard<std::mutex> scoped_lock(cs_dfs);
     for (auto&& chunk : chunks) {
         for (auto&& file : chunk.files) {
             if (file->uri == uri) {
-                file->pubkey = pubkey;
-                files[uri]->pubkey = pubkey;
+                DecryptionKeys decryptionKeys = {rsaKey, aesKey};
+                file->keys = decryptionKeys;
+                files[uri]->keys = decryptionKeys;
                 return;
             }
         }

@@ -109,14 +109,16 @@ BOOST_AUTO_TEST_CASE(allocate_file)
     BOOST_CHECK_EQUAL(file->uri, strFileURI);
     BOOST_CHECK_EQUAL(file->size, nFileSize);
     BOOST_CHECK_EQUAL(file->filename, filename);
-    BOOST_CHECK_EQUAL(file->pubkey, "");
+    BOOST_CHECK_EQUAL(DecryptionKeys::ToString(file->keys.rsaKey), "");
+    BOOST_CHECK_EQUAL(DecryptionKeys::ToString(file->keys.aesKey), "");
     BOOST_CHECK_EQUAL(pTestHeap->_files().size(), 1);
     auto file_it = pTestHeap->_files().find(strFileURI);
     BOOST_CHECK(file_it != pTestHeap->_files().end());
     BOOST_CHECK_EQUAL(file_it->second->uri, strFileURI);
     BOOST_CHECK_EQUAL(file_it->second->size, nFileSize);
     BOOST_CHECK_EQUAL(file_it->second->filename, filename);
-    BOOST_CHECK_EQUAL(file_it->second->pubkey, "");
+    BOOST_CHECK_EQUAL(DecryptionKeys::ToString(file_it->second->keys.rsaKey), "");
+    BOOST_CHECK_EQUAL(DecryptionKeys::ToString(file_it->second->keys.aesKey), "");
 }
 
 BOOST_AUTO_TEST_CASE(find_best_chunk)
@@ -144,7 +146,8 @@ BOOST_AUTO_TEST_CASE(find_best_chunk)
     BOOST_CHECK_EQUAL(file_it->second->uri, strFileURI);
     BOOST_CHECK_EQUAL(file_it->second->size, nFileSize);
     BOOST_CHECK_EQUAL(file_it->second->filename, filename);
-    BOOST_CHECK_EQUAL(file_it->second->pubkey, "");
+    BOOST_CHECK_EQUAL(DecryptionKeys::ToString(file_it->second->keys.rsaKey), "");
+    BOOST_CHECK_EQUAL(DecryptionKeys::ToString(file_it->second->keys.aesKey), "");
 }
 
 BOOST_AUTO_TEST_CASE(doesnt_allocate_oversize_file)
@@ -204,7 +207,8 @@ BOOST_AUTO_TEST_CASE(get_file)
     BOOST_CHECK_EQUAL(file->uri, strFileURI);
     BOOST_CHECK_EQUAL(file->size, nFileSize);
     BOOST_CHECK_EQUAL(file->filename, filename);
-    BOOST_CHECK_EQUAL(file->pubkey, "");
+    BOOST_CHECK_EQUAL(DecryptionKeys::ToString(file->keys.rsaKey), "");
+    BOOST_CHECK_EQUAL(DecryptionKeys::ToString(file->keys.aesKey), "");
 }
 
 BOOST_AUTO_TEST_CASE(file_not_found)
@@ -220,25 +224,27 @@ BOOST_AUTO_TEST_CASE(file_not_found)
     BOOST_CHECK(!file);
 }
 
-BOOST_AUTO_TEST_CASE(set_public_key_for_file)
+BOOST_AUTO_TEST_CASE(set_decryption_keys_for_file)
 {
     StorageHeap heap;
     uint64_t size = 100ull * 1024    * 1024 * 1024;     // 100 Gb
     std::string path = "/path/to/some/directory";
     std::string strFileURI = "0xFF...some hash...FF";
-    std::string strPubKey = "0xFF...some public key hash...FF";
+    std::string strRSAKey = "0xFF...some public key hash...FF";
+    std::string strAESKey = "0xFF...some public key hash...FF";
     uint64_t nFileSize = 10ull * 1024 * 1024 * 1024;    // 10 Gb
     heap.AddChunk(path, size);
     heap.AllocateFile(strFileURI, nFileSize);
     std::string filename = path + "/" + strFileURI + "_" + std::to_string(std::time(0)) + ".luxfs";
 
-    heap.SetPubKey(strFileURI, strPubKey);
+    heap.SetDecryptionKeys(strFileURI, DecryptionKeys::ToBytes(strRSAKey), DecryptionKeys::ToBytes(strAESKey));
 
     auto file = heap.GetFile(strFileURI);
     BOOST_CHECK_EQUAL(file->uri, strFileURI);
     BOOST_CHECK_EQUAL(file->size, nFileSize);
     BOOST_CHECK_EQUAL(file->filename, filename);
-    BOOST_CHECK_EQUAL(file->pubkey, strPubKey);
+    BOOST_CHECK_EQUAL(DecryptionKeys::ToString(file->keys.rsaKey), strRSAKey);
+    BOOST_CHECK_EQUAL(DecryptionKeys::ToString(file->keys.aesKey), strAESKey);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
