@@ -8,8 +8,6 @@ if !TARGET_WINDOWS
 PIE_FLAGS = -fPIC
 endif
 
-EXTRA_LIBRARIES =
-
 BITCOIN_CONFIG_INCLUDES=-I$(builddir)/config
 BITCOIN_INCLUDES=-I$(builddir) -I$(builddir)/obj $(BDB_CPPFLAGS) $(BOOST_CPPFLAGS) $(LEVELDB_CPPFLAGS) $(CRYPTO_CFLAGS) $(SSL_CFLAGS) -I$(srcdir)/cpp-ethereum/utils
 

@@ -5,7 +5,7 @@
 
 class ProposalsAgent
 {
-private:
+protected:
     std::map<uint256, std::vector<StorageProposal>> mapProposals;
     std::map<uint256, std::pair<bool, std::time_t>> mapListenProposals;
 public:
