@@ -7,15 +7,27 @@ TESTDFS_BINARY = testdfs/test_dfs$(EXEEXT)
 
 BITCOIN_TESTDFS = \
   testdfs/storageheap_tests.cpp \
+  testdfs/storagecontroller_tests.cpp \
   testdfs/replicabuilder_tests.cpp \
   testdfs/merklefilebuilder_tests.cpp
 
 testdfs_test_dfs_SOURCES = $(BITCOIN_TESTDFS)
 testdfs_test_dfs_CPPFLAGS = $(BITCOIN_INCLUDES) -I$(builddir)/testdfs/ $(TESTDEFS)
-testdfs_test_dfs_LDADD = $(LIBBITCOIN_SERVER) $(LIBBITCOIN_CLI) $(LIBBITCOIN_COMMON) $(LIBBITCOIN_UTIL) $(LIBBITCOIN_CRYPTO) $(LIBBITCOIN_UNIVALUE) $(LIBLEVELDB) $(LIBMEMENV) \
-  $(BOOST_LIBS) $(BOOST_UNIT_TEST_FRAMEWORK_LIB) $(LIBSECP256K1)
+testdfs_test_dfs_LDADD = \
+  $(LIBBITCOIN_SERVER) \
+  $(LIBBITCOIN_COMMON) \
+  $(LIBBITCOIN_UNIVALUE) \
+  $(LIBBITCOIN_UTIL) \
+  $(LIBBITCOIN_WALLET) \
+  $(LIBBITCOIN_ZMQ) \
+  $(LIBBITCOIN_CONSENSUS) \
+  $(LIBBITCOIN_CRYPTO) \
+  $(LIBLEVELDB) \
+  $(LIBMEMENV) \
+  $(LIBCRYPTOPP) \
+  $(LIBSECP256K1)
 
-testdfs_test_dfs_LDADD += $(LIBBITCOIN_CONSENSUS) $(BDB_LIBS) $(SSL_LIBS) $(CRYPTO_LIBS) $(MINIUPNPC_LIBS)
+testdfs_test_dfs_LDADD += $(BOOST_LIBS) $(BOOST_UNIT_TEST_FRAMEWORK_LIB) $(BDB_LIBS) $(SSL_LIBS) $(CRYPTO_LIBS) $(MINIUPNPC_LIBS) $(ZMQ_LIBS) $(EVENT_PTHREADS_LIBS) $(EVENT_LIBS)
 testdfs_test_dfs_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS) -static
 
 CLEAN_BITCOIN_TESTDFS = testdfs/*.gcda testdfs/*.gcno

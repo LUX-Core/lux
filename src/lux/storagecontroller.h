@@ -12,7 +12,7 @@ class StorageController;
 
 extern StorageController storageController;
 
-static const size_t STORAGE_MIN_RATE = 1e-8;
+static const size_t STORAGE_MIN_RATE = 1;
 
 static const unsigned short DEFAULT_DFS_PORT = 1507;
 
