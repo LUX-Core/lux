@@ -25,14 +25,15 @@ private:
 public:
     size_t rate;
     CService address;
-    std::map<uint256, std::string> mapLocalFiles;
+    std::map<uint256, boost::filesystem::path> mapLocalFiles;
     std::map<uint256, StorageOrder> mapAnnouncements;
+    std::map<uint256, StorageHandshake> mapReceivedHandshakes;
 
     StorageController() : rate(STORAGE_MIN_RATE), address(CService("127.0.0.1")) {} // TODO: Change to global-wide address (SS)
 
     void AnnounceOrder(const StorageOrder &order);
-    void AnnounceOrder(const StorageOrder &order, const std::string &path);
-    std::vector<StorageProposal> GetBestProposals(const StorageOrder &order, const int maxProposal);
+    void AnnounceOrder(const StorageOrder &order, const boost::filesystem::path &path);
+    std::vector<StorageProposal> SortProposals(const StorageOrder &order);
     void StartHandshake(const StorageProposal &proposal);
     void ClearOldAnnouncments(std::time_t timestamp);
     void ProcessStorageMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv, bool& isStorageCommand);
@@ -41,6 +42,9 @@ public:
     void StopListenProposal(const uint256 &orderHash);
     bool isListen(const uint256 &proposalHash);
     std::vector<StorageProposal> GetProposals(const uint256 &orderHash);
+    // Temp
+    void FindReplicaKeepers(const StorageOrder &order, const int countReplica);
+    void CreateReplica(const boost::filesystem::path &filename, const StorageOrder &order, const StorageProposal &proposal);
 };
 
 #endif //LUX_STORAGECONTROLLER_H

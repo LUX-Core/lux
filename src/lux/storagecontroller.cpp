@@ -1,6 +1,11 @@
 #include "storagecontroller.h"
+
+#include <fstream>
+
 #include "main.h"
 #include "streams.h"
+#include "util.h"
+#include "replicabuilder.h"
 
 StorageController storageController;
 
@@ -64,14 +69,16 @@ void StorageController::ProcessStorageMessage(CNode* pfrom, const std::string& s
             StorageOrder &order = itAnnounce->second;
             if (storageHeap.MaxAllocateSize() > order.fileSize && tempStorageHeap.MaxAllocateSize() > order.fileSize) { // Change to exist(handshake.proposalHash) (SS)
                 StorageHandshake requestReplica;
-                handshake.time = std::time(0);
-                handshake.orderHash = handshake.orderHash;
-                handshake.proposalHash = handshake.proposalHash;
-                handshake.port = DEFAULT_DFS_PORT;
+                requestReplica.time = std::time(0);
+                requestReplica.orderHash = handshake.orderHash;
+                requestReplica.proposalHash = handshake.proposalHash;
+                requestReplica.port = DEFAULT_DFS_PORT;
 
+                mapReceivedHandshakes[handshake.orderHash] = handshake;
                 CNode* pNode = FindNode(order.address);
                 if (!pNode) {
                     LogPrint("dfs", "\"dfshandshake\" message handler have not connection to order sender");
+                    return ;
                 }
                 pNode->PushMessage("dfsrequestreplica", requestReplica);
             }
@@ -89,10 +96,12 @@ void StorageController::ProcessStorageMessage(CNode* pfrom, const std::string& s
         vRecv >> handshake;
         auto itAnnounce = mapAnnouncements.find(handshake.orderHash);
         if (itAnnounce != mapAnnouncements.end()) {
-         //   StorageOrder &order = itAnnounce->second;
+            StorageOrder order = itAnnounce->second;
             auto it = mapLocalFiles.find(handshake.orderHash);
             if (it != mapLocalFiles.end()) {
-                // TODO: Send file (ss)
+                mapReceivedHandshakes[handshake.orderHash] = handshake;
+                auto proposal = proposalsAgent.GetProposal(handshake.orderHash, handshake.proposalHash);
+                CreateReplica(it->second, order, proposal);
             } else {
                 // DoS prevention
 //            CNode* pNode = FindNode(proposal.address);
@@ -132,7 +141,7 @@ void StorageController::AnnounceOrder(const StorageOrder &order)
     }
 }
 
-void StorageController::AnnounceOrder(const StorageOrder &order, const std::string &path)
+void StorageController::AnnounceOrder(const StorageOrder &order, const boost::filesystem::path &path)
 {
     AnnounceOrder(order);
     mapLocalFiles[order.GetHash()] = path;
@@ -156,12 +165,8 @@ void StorageController::StartHandshake(const StorageProposal &proposal)
     pNode->PushMessage("dfshandshake", handshake);
 }
 
-std::vector<StorageProposal> StorageController::GetBestProposals(const StorageOrder &order, const int maxProposal)
+std::vector<StorageProposal> StorageController::SortProposals(const StorageOrder &order)
 {
-    if (maxProposal) {
-        return {};
-    }
-
     std::vector<StorageProposal> proposals = proposalsAgent.GetProposals(order.GetHash());
     if (proposals.size()) {
         return {};
@@ -177,13 +182,7 @@ std::vector<StorageProposal> StorageController::GetBestProposals(const StorageOr
         }
     }
 
-    std::list<StorageProposal>::iterator itLast;
-    if (sortedProposals.size() > maxProposal) {
-        itLast = std::next(sortedProposals.begin(), maxProposal);
-    } else {
-        itLast = sortedProposals.end();
-    }
-    std::vector<StorageProposal> bestProposals( sortedProposals.begin(), itLast);
+    std::vector<StorageProposal> bestProposals(sortedProposals.begin(), sortedProposals.end());
 
     return bestProposals;
 }
@@ -223,4 +222,57 @@ void StorageController::StopListenProposal(const uint256 &orderHash)
 std::vector<StorageProposal> StorageController::GetProposals(const uint256 &orderHash)
 {
     return proposalsAgent.GetProposals(orderHash);
+}
+
+void StorageController::FindReplicaKeepers(const StorageOrder &order, const int countReplica)
+{
+    std::vector<StorageProposal> proposals = SortProposals(order);
+    int numReplica = 0;
+    for (auto &&proposal : proposals) {
+        StartHandshake(proposal);
+        auto it = mapReceivedHandshakes.find(proposal.orderHash);
+        for (int times = 0; times < 300 || it != mapReceivedHandshakes.end(); ++times) {
+            MilliSleep(100);
+            it = mapReceivedHandshakes.find(proposal.orderHash);
+        }
+        if (it != mapReceivedHandshakes.end()) {
+            ++numReplica;
+            if (numReplica == countReplica) {
+                break;
+            }
+        } else {
+            CNode* pNode = FindNode(proposal.address);
+            if (pNode) {
+                pNode->CloseSocketDisconnect();
+            }
+        }
+    }
+}
+
+void StorageController::CreateReplica(const boost::filesystem::path &filename, const StorageOrder &order, const StorageProposal &proposal)
+{
+//    void EncryptData(const byte *src, uint64_t offset, size_t srcSize, byte *cipherText,
+//                     const AESKey &aesKey, RSA *rsa);
+    namespace fs = boost::filesystem;
+
+    std::ifstream filein;
+    filein.open(filename.string().c_str(), std::ios::binary|std::ios::in);
+    if (!filein.is_open()) {
+        LogPrint("dfs", "file %s cannot be opened", filename.string());
+        return ;
+    }
+
+    std::ofstream outfile;
+    outfile.open("temppdf.pdf", std::ios::binary|std::ios::out);
+
+//    int buffer[2];
+//    while(filein.read((char *)&buffer,sizeof(buffer)))
+//    {
+//        outfile.write((char *)&buffer,sizeof(buffer));
+//    }
+
+    filein.close();
+    outfile.close();
+
+ //   EncryptData(src, offset, srcSize, cipherText, aesKey, rsa);
 }

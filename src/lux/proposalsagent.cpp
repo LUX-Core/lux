@@ -48,15 +48,23 @@ std::vector<StorageProposal> ProposalsAgent::GetProposals(const uint256 &orderHa
     if (mapProposals.find(orderHash) == mapProposals.end()) {
         return {};
     }
-    std::vector<StorageProposal> &vOrderProposal = mapProposals[orderHash];
-    for (auto it = vOrderProposal.begin(); it != vOrderProposal.end(); ++it) {
-        if (it->orderHash == orderHash) {
-            vProposalsForOrder.push_back(*it);
-        }
-    }
-    return vProposalsForOrder;
+    return mapProposals[orderHash];
 }
 
+StorageProposal ProposalsAgent::GetProposal(const uint256 &orderHash, const uint256 &proposalHash)
+{
+    if (mapProposals.find(orderHash) == mapProposals.end()) {
+        return {};
+    }
+    std::vector<StorageProposal> &vOrderProposal = mapProposals[orderHash];
+    for (auto it = vOrderProposal.begin(); it != vOrderProposal.end(); ++it) {
+        if (it->GetHash() == proposalHash) {
+            return *it;
+        }
+    }
+
+    return {};
+}
 
 std::vector<uint256> ProposalsAgent::GetListenProposals()
 {

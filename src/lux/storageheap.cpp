@@ -51,6 +51,9 @@ uint64_t StorageHeap::MaxAllocateSize() const
 std::shared_ptr<AllocatedFile> StorageHeap::AllocateFile(const std::string& uri, uint64_t size)
 {
     std::lock_guard<std::mutex> scoped_lock(cs_dfs);
+    if (uri.empty()) {
+        return {};
+    }
     unsigned long nBestChunkIndex = chunks.size();
     uint64_t nBestChunkFreeSize = INT64_MAX;
     for (unsigned int i = 0; i < chunks.size(); ++i) {
@@ -61,7 +64,7 @@ std::shared_ptr<AllocatedFile> StorageHeap::AllocateFile(const std::string& uri,
     }
     if (nBestChunkIndex < chunks.size()) {
         std::shared_ptr<AllocatedFile> file_ptr = std::make_shared<AllocatedFile>();
-        // file->filename = ; // TODO: generate it
+        //file_ptr->filename = uri + std::to_string(std::time(0)) + ".luxfs";
         file_ptr->size = size;
         file_ptr->uri = uri;
         // add file to heap
