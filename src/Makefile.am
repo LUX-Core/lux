@@ -774,6 +774,10 @@ if ENABLE_TESTS
 include Makefile.test.include
 endif
 
+if ENABLE_DFS_TESTS
+include Makefile.dfs.include
+endif
+
 if ENABLE_QT
 include Makefile.qt.include
 endif

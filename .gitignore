@@ -12,6 +12,7 @@ src/luxd
 src/lux-cli
 src/lux-tx
 src/test/test_lux
+src/testdfs/test_dfs
 src/qt/test/test_lux-qt
 
 # autoreconf

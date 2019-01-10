@@ -1,0 +1,34 @@
+# -*- makefile-gmake -*-
+
+TESTS += testdfs/test_dfs
+bin_PROGRAMS += testdfs/test_dfs
+TESTDFS_SRCDIR = testdfs
+TESTDFS_BINARY = testdfs/test_dfs$(EXEEXT)
+
+BITCOIN_TESTDFS = \
+  testdfs/storageheap_tests.cpp \
+  testdfs/replicabuilder_tests.cpp \
+  testdfs/merklefilebuilder_tests.cpp
+
+testdfs_test_dfs_SOURCES = $(BITCOIN_TESTDFS)
+testdfs_test_dfs_CPPFLAGS = $(BITCOIN_INCLUDES) -I$(builddir)/testdfs/ $(TESTDEFS)
+testdfs_test_dfs_LDADD = $(LIBBITCOIN_SERVER) $(LIBBITCOIN_CLI) $(LIBBITCOIN_COMMON) $(LIBBITCOIN_UTIL) $(LIBBITCOIN_CRYPTO) $(LIBBITCOIN_UNIVALUE) $(LIBLEVELDB) $(LIBMEMENV) \
+  $(BOOST_LIBS) $(BOOST_UNIT_TEST_FRAMEWORK_LIB) $(LIBSECP256K1)
+
+testdfs_test_dfs_LDADD += $(LIBBITCOIN_CONSENSUS) $(BDB_LIBS) $(SSL_LIBS) $(CRYPTO_LIBS) $(MINIUPNPC_LIBS)
+testdfs_test_dfs_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS) -static
+
+CLEAN_BITCOIN_TESTDFS = testdfs/*.gcda testdfs/*.gcno
+
+CLEANFILES += $(CLEAN_BITCOIN_TESTDFS)
+
+lux_test: $(TESTDFS_BINARY)
+
+lux_test_check: $(TESTDFS_BINARY) FORCE
+	$(MAKE) check-TESTS TESTS=$^
+
+lux_test_clean: FORCE
+	rm -f $(CLEAN_BITCOIN_TEST) $(testdfs_test_dfs_OBJECTS) $(TESTDFS_BINARY)
+
+check-local:
+	$(AM_V_at)$(MAKE) $(AM_MAKEFLAGS) -C secp256k1 check

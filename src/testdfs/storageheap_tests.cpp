@@ -1,4 +1,4 @@
-#include "storageheap.h"
+#include "../lux/storageheap.h"
 
 #define BOOST_TEST_MODULE Lux Lib Crypto Test
 

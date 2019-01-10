@@ -1,4 +1,4 @@
-#include "replicabuilder.h"
+#include "../lux/replicabuilder.h"
 
 #include <openssl/rsa.h>
 #include <openssl/pem.h>

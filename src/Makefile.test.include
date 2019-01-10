@@ -83,12 +83,7 @@ BITCOIN_TESTS += \
   test/rpc_wallet_tests.cpp
 endif
 
-LUX_TESTS = \
-  src/test/lux/storageheap.cpp \
-  src/test/lux/replicabuilder.cpp \
-  src/test/lux/merklefilebuilder.cpp
-
-test_test_lux_SOURCES = $(BITCOIN_TESTS) $(LUX_TESTS) $(JSON_TEST_FILES) $(RAW_TEST_FILES)
+test_test_lux_SOURCES = $(BITCOIN_TESTS) $(JSON_TEST_FILES) $(RAW_TEST_FILES)
 test_test_lux_CPPFLAGS = $(BITCOIN_INCLUDES) -I$(builddir)/test/ $(TESTDEFS)
 test_test_lux_LDADD = $(LIBBITCOIN_SERVER) $(LIBBITCOIN_CLI) $(LIBBITCOIN_COMMON) $(LIBBITCOIN_UTIL) $(LIBBITCOIN_CRYPTO) $(LIBBITCOIN_UNIVALUE) $(LIBLEVELDB) $(LIBMEMENV) \
   $(BOOST_LIBS) $(BOOST_UNIT_TEST_FRAMEWORK_LIB) $(LIBSECP256K1)
