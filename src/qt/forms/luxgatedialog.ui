@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>LuxgateDialog</class>
- <widget class="QWidget" name="LuxgateDialog">
+ <widget class="QMainWindow" name="LuxgateDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>960</width>
+    <width>996</width>
     <height>617</height>
    </rect>
   </property>
@@ -1247,7 +1247,7 @@
              <string/>
             </property>
             <property name="pixmap">
-             <pixmap resource="../lux.qrc">:/icons/swap_header</pixmap>
+             <pixmap>:/icons/swap_header</pixmap>
             </property>
             <property name="scaledContents">
              <bool>true</bool>
@@ -1287,7 +1287,7 @@
                 <string/>
                </property>
                <property name="pixmap">
-                <pixmap resource="../lux.qrc">:/icons/rec_luxgate</pixmap>
+                <pixmap>:/icons/rec_luxgate</pixmap>
                </property>
                <property name="scaledContents">
                 <bool>false</bool>
@@ -1374,7 +1374,7 @@
                 <string/>
                </property>
                <property name="pixmap">
-                <pixmap resource="../lux.qrc">:/icons/swap</pixmap>
+                <pixmap>:/icons/swap</pixmap>
                </property>
                <property name="scaledContents">
                 <bool>true</bool>
@@ -1414,7 +1414,7 @@
                 <string/>
                </property>
                <property name="pixmap">
-                <pixmap resource="../lux.qrc">:/icons/send_luxgate</pixmap>
+                <pixmap>:/icons/send_luxgate</pixmap>
                </property>
               </widget>
              </item>
@@ -1560,7 +1560,7 @@
                    <string/>
                   </property>
                   <property name="pixmap">
-                   <pixmap resource="../lux.qrc">:/icons/swap_btn</pixmap>
+                   <pixmap>:/icons/swap_btn</pixmap>
                   </property>
                  </widget>
                 </item>
@@ -1696,7 +1696,7 @@
                 <string/>
                </property>
                <property name="pixmap">
-                <pixmap resource="../lux.qrc">:/icons/send_btn</pixmap>
+                <pixmap>:/icons/send_btn</pixmap>
                </property>
               </widget>
              </item>
@@ -1712,7 +1712,7 @@
                 <string/>
                </property>
                <property name="pixmap">
-                <pixmap resource="../lux.qrc">:/icons/receive_btn</pixmap>
+                <pixmap>:/icons/receive_btn</pixmap>
                </property>
               </widget>
              </item>
@@ -1790,7 +1790,7 @@
                 <string/>
                </property>
                <property name="pixmap">
-                <pixmap resource="../lux.qrc">:/icons/send_btn</pixmap>
+                <pixmap>:/icons/send_btn</pixmap>
                </property>
               </widget>
              </item>
@@ -1812,7 +1812,7 @@
                 <string/>
                </property>
                <property name="pixmap">
-                <pixmap resource="../lux.qrc">:/icons/receive_btn</pixmap>
+                <pixmap>:/icons/receive_btn</pixmap>
                </property>
               </widget>
              </item>
@@ -1873,7 +1873,7 @@
              <string/>
             </property>
             <property name="pixmap">
-             <pixmap resource="../lux.qrc">:/icons/status</pixmap>
+             <pixmap>:/icons/status</pixmap>
             </property>
             <property name="scaledContents">
              <bool>true</bool>
@@ -1896,6 +1896,8 @@
   </widget>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources/>
+ <resources>
+  <include location="../lux.qrc"/>
+ </resources>
  <connections/>
 </ui>

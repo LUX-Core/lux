@@ -16,13 +16,17 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QNetworkReply>
+#include <QMainWindow>
+
 
 namespace Ui {
     class LuxgateDialog;
 }
 class WalletModel;
+class QDockWidget;
 
-class LuxgateDialog : public QWidget
+
+class LuxgateDialog : public QMainWindow
 {
     Q_OBJECT
 
@@ -36,7 +40,8 @@ public:
 private:
     Ui::LuxgateDialog *ui;
     WalletModel *model;
-
+    void moveWidgetsToDocks();
+    QDockWidget* createDock(QWidget* widget, const QString& title);
 };
 
 #endif //__LUXGATE_DIALOG_H__
