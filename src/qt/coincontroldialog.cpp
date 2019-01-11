@@ -760,7 +760,8 @@ void CoinControlDialog::updateLabels(WalletModel* model, QDialog* dialog)
                 CoinControlDialog::coinControl->nSplitBlock = CoinControlDialog::nSplitBlockDummy;
 
                 WalletModelTransaction currentTransaction(recipients);
-                model->prepareTransaction(currentTransaction, CoinControlDialog::coinControl);
+                model->prepareTransaction(currentTransaction, CoinControlDialog::coinControl, false); // let's not sign this preparation as the wallet may be locked
+
                 CAmount nFee = currentTransaction.getTransactionFee() + 10;
                 if (nPayFee < nFee) {
                     nPayFee = nFee;
