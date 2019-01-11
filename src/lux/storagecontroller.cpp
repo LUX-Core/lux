@@ -53,8 +53,7 @@ static void RSA_get0_key(const RSA *r, const BIGNUM **n, const BIGNUM **e, const
 #endif
 
 StorageController::StorageController() : background(boost::bind(&StorageController::BackgroundJob, this)),
-                                         rate(STORAGE_MIN_RATE),
-                                         address(CService("127.0.0.1"))
+                                         rate(STORAGE_MIN_RATE)
 {
 //    namespace fs = boost::filesystem;
 //
@@ -180,15 +179,37 @@ void StorageController::ProcessStorageMessage(CNode* pfrom, const std::string& s
             return ;
         }
         vRecv >> fileStream;
+    } else if (strCommand == "dfsping") {
+        isStorageCommand = true;
+        pfrom->PushMessage("dfspong", pfrom->addr);
+    } else if (strCommand == "dfspong") {
+        isStorageCommand = true;
+        vRecv >> address;
     }
 }
 
 void StorageController::BackgroundJob()
 {
+    auto lastCheckIp = std::time(nullptr);
+
     while (1) {
         boost::this_thread::interruption_point();
         boost::this_thread::sleep(boost::posix_time::seconds(1));
         boost::lock_guard<boost::mutex> lock(mutex);
+
+        std::vector<CNode*> vNodesCopy;
+        {
+            LOCK(cs_vNodes);
+            vNodesCopy = vNodes;
+        }
+
+        if (!address.IsValid() || (std::time(nullptr) - lastCheckIp > 3600))
+        {
+            for (const auto &node : vNodesCopy) {
+                node->PushMessage("dfsping");
+            }
+        }
+        LogPrintf("%s: %d, %s\n", __func__, address.IsValid(), address.ToString());
 
         for(auto &&orderHash : proposalsAgent.GetListenProposals()) {
             auto orderIt = mapAnnouncements.find(orderHash);
@@ -199,7 +220,6 @@ void StorageController::BackgroundJob()
                 }
             }
         }
-
     }
 }
 

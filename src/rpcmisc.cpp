@@ -1229,19 +1229,22 @@ UniValue announcefileorder(const UniValue& params, bool fHelp)
                 + HelpExampleRpc("announcefileorder", "\"localFilePath\", daysToKeep, fileCostInCoins")
         );
 
-    StorageOrder order{};
-    boost::filesystem::path path{ params[0].get_str() };
+    if (storageController.address.IsTor() || !storageController.address.IsValid()) {
+        LogPrintf("%s: ERROR - unknown local IP address");
+    } else {
+        StorageOrder order{};
+        boost::filesystem::path path{ params[0].get_str() };
 
-    order.fileURI = SerializeHash(path.string(), SER_GETHASH, 0);
-    order.time = std::time(nullptr);
-    order.storageUntil = order.time + params[1].get_int() * 24 * 60 * 60;
-    order.fileSize = boost::filesystem::file_size(path);
-    order.maxRate = params[2].get_real() * COIN / (order.fileSize * (order.storageUntil - order.time));
-    order.address = storageController.address;
+        order.fileURI = SerializeHash(path.string(), SER_GETHASH, 0);
+        order.time = std::time(nullptr);
+        order.storageUntil = order.time + params[1].get_int() * 24 * 60 * 60;
+        order.fileSize = boost::filesystem::file_size(path);
+        order.maxRate = params[2].get_real() * COIN / (order.fileSize * (order.storageUntil - order.time));
+        order.address = storageController.address;
 
-    LOCK(cs_main);
-    storageController.AnnounceOrder(order, path);
-    storageController.proposalsAgent.ListenProposal(order.GetHash());
+        storageController.AnnounceOrder(order, path);
+        storageController.proposalsAgent.ListenProposal(order.GetHash());
+    }
 
     return UniValue::VNULL;
 }
