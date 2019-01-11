@@ -1588,7 +1588,7 @@ bool AppInit2()
                 }
 
                 {
-                    LOCK(cs_main);
+                    //LOCK(cs_main);
                     CBlockIndex* tip = chainActive.Tip();
                     RPCNotifyBlockChange(true, tip);
                     if (tip && tip->nTime > GetAdjustedTime() + 2 * 60 * 60) {
