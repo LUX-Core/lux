@@ -37,8 +37,25 @@ struct FileStream
     }
 };
 
-StorageController::StorageController() : rate(STORAGE_MIN_RATE), address(CService("127.0.0.1")),
-                                         background(boost::bind(&StorageController::BackgroundJob, this)) {
+
+#if OPENSSL_VERSION_NUMBER < 0x10100005L
+static void RSA_get0_key(const RSA *r, const BIGNUM **n, const BIGNUM **e, const BIGNUM **d)
+{
+    if(n != NULL)
+        *n = r->n;
+
+    if(e != NULL)
+        *e = r->e;
+
+    if(d != NULL)
+        *d = r->d;
+}
+#endif
+
+StorageController::StorageController() : background(boost::bind(&StorageController::BackgroundJob, this)),
+                                         rate(STORAGE_MIN_RATE),
+                                         address(CService("127.0.0.1"))
+{
 //    namespace fs = boost::filesystem;
 //
 //    fs::path defaultDfsPath = GetDataDir() / "dfs";
@@ -348,11 +365,13 @@ std::shared_ptr<AllocatedFile> StorageController::CreateReplica(const boost::fil
     outfile.open(tempFile->filename, std::ios::binary);
 
     RSA *rsa;
+    const BIGNUM *rsa_n;
     // search for rsa->n > 0x0000ff...126 bytes...ff
     {
         rsa = RSA_generate_key(nBlockSizeRSA * 8, 3, nullptr, nullptr);
         BIGNUM *minModulus = GetMinModulus();
-        while (BN_ucmp(minModulus, rsa->n) >= 0) {
+        RSA_get0_key(rsa, &rsa_n, nullptr, nullptr);
+        while (BN_ucmp(minModulus, rsa_n) >= 0) {
             RSA_free(rsa);
             rsa = RSA_generate_key(nBlockSizeRSA * 8, 3, nullptr, nullptr);
         }
