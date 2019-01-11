@@ -9,11 +9,36 @@
 #include "streams.h"
 #include "util.h"
 #include "replicabuilder.h"
+#include "serialize.h"
 
-static const unsigned int REPLICA_BUFFER_SIZE = 256; // this const is never changed
 StorageController storageController;
 
-StorageController::StorageController() : rate(STORAGE_MIN_RATE), address(CService("127.0.0.1")) {
+struct FileStream
+{
+    std::fstream filestream;
+
+    ADD_SERIALIZE_METHODS;
+    template <typename Stream, typename Operation>
+    inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion) {
+        std::vector<char> buf(256);
+
+        if (!ser_action.ForRead()) {
+            while (filestream.eof()) {
+                buf.resize(filestream.readsome(&buf[0], buf.size()));
+                if (buf.empty()) {
+                    break;
+                }
+                READWRITE(buf);
+            }
+        } else {
+            READWRITE(buf);
+            filestream.write(&buf[0], buf.size());
+        }
+    }
+};
+
+StorageController::StorageController() : rate(STORAGE_MIN_RATE), address(CService("127.0.0.1")),
+                                         background(boost::bind(&StorageController::BackgroundJob, this)) {
 //    namespace fs = boost::filesystem;
 //
 //    fs::path defaultDfsPath = GetDataDir() / "dfs";
@@ -125,6 +150,33 @@ void StorageController::ProcessStorageMessage(CNode* pfrom, const std::string& s
 //                CNodeState *state = State(pNode); // CNodeState was declared in main.cpp (SS)
 //                state->nMisbehavior += 10;
 //            }
+            }
+        }
+    } else if (strCommand == "dfssendfile") {
+        isStorageCommand = true;
+        FileStream fileStream;
+        boost::filesystem::path fullFilename = GetDefaultDataDir() / (std::to_string(std::time(nullptr)) + ".luxfs");
+        fileStream.filestream.open(fullFilename.string(), std::ios::binary|std::ios::out);
+        if (!fileStream.filestream.is_open()) {
+            LogPrint("dfs", "file %s cannot be opened", fullFilename);
+            return ;
+        }
+        vRecv >> fileStream;
+    }
+}
+
+void StorageController::BackgroundJob()
+{
+    while (1) {
+        boost::this_thread::interruption_point();
+        boost::lock_guard<boost::mutex> lock(mutex);
+        for(auto &&orderHash : proposalsAgent.GetListenProposals()) {
+            auto orderIt = mapAnnouncements.find(orderHash);
+            if (orderIt != mapAnnouncements.end()) {
+                auto order = orderIt->second;
+                if(std::time(nullptr) > order.time + 60) {
+                    FindReplicaKeepers(order, 1);
+                }
             }
         }
     }
@@ -254,8 +306,17 @@ void StorageController::FindReplicaKeepers(const StorageOrder &order, const int 
         if (it != mapReceivedHandshakes.end()) {
             ++numReplica;
             auto itFile = mapLocalFiles.find(proposal.orderHash);
-            auto pAllocatedFile = CreateReplica(itFile->second, order, proposal);
-            // pNode->PushMessage("sendfile", nullptr); // TODO: change nullptr to bytes (SS)
+            auto pAllocatedFile = CreateReplica(itFile->second, order);
+            CNode* pNode = FindNode(proposal.address);
+            if (pNode) {
+                FileStream fileStream;
+                fileStream.filestream.open(pAllocatedFile->filename, std::ios::binary|std::ios::in);
+                if (!fileStream.filestream.is_open()) {
+                    LogPrint("dfs", "file %s cannot be opened", pAllocatedFile->filename);
+                    return ;
+                }
+                pNode->PushMessage("dfssendfile", fileStream);
+            }
             if (numReplica == countReplica) {
                 break;
             }
@@ -268,7 +329,7 @@ void StorageController::FindReplicaKeepers(const StorageOrder &order, const int 
     }
 }
 
-std::shared_ptr<AllocatedFile> StorageController::CreateReplica(const boost::filesystem::path &filename, const StorageOrder &order, const StorageProposal &proposal)
+std::shared_ptr<AllocatedFile> StorageController::CreateReplica(const boost::filesystem::path &filename, const StorageOrder &order)
 {
     namespace fs = boost::filesystem;
 
@@ -279,13 +340,9 @@ std::shared_ptr<AllocatedFile> StorageController::CreateReplica(const boost::fil
         return {};
     }
 
-    filein.seekg (0, ios::end);
-    uint64_t length = filein.tellg();
-    filein.seekg (0, ios::beg);
+    auto length = fs::file_size(filename);
 
-    size_t BUFFER_SIZE = 128;
-    size_t nBlockSizeRSA = 128;
-    std::shared_ptr<AllocatedFile> tempFile = tempStorageHeap.AllocateFile(order.fileURI.ToString(), (length / BUFFER_SIZE + (length % BUFFER_SIZE != 0)) * BUFFER_SIZE);
+    std::shared_ptr<AllocatedFile> tempFile = tempStorageHeap.AllocateFile(order.fileURI.ToString(), GetCryptoReplicaSize(length));
 
     std::ofstream outfile;
     outfile.open(tempFile->filename, std::ios::binary);
@@ -304,25 +361,26 @@ std::shared_ptr<AllocatedFile> StorageController::CreateReplica(const boost::fil
     const char chAESKey[] = "1234567890123456"; // TODO: generate unique 16 bytes (SS)
     const AESKey aesKey(chAESKey, chAESKey + sizeof(chAESKey)/sizeof(*chAESKey));
 
-    byte *buffer = new byte[BUFFER_SIZE];
-    byte *replica = new byte[REPLICA_BUFFER_SIZE];
-    while(filein.read((char *)buffer, sizeof(buffer)))
+    size_t sizeBuffer = nBlockSizeRSA - 2;
+    byte *buffer = new byte[sizeBuffer];
+    byte *replica = new byte[nBlockSizeRSA];
+    while(!filein.eof())
     {
-        EncryptData(buffer, 0, BUFFER_SIZE, replica, aesKey, rsa);
-        outfile.write((char *)replica, sizeof(replica));
+        auto n = filein.readsome((char *)buffer, sizeBuffer);
+        if (n <= 0) {
+            break;
+        }
+        EncryptData(buffer, 0, n, replica, aesKey, rsa);
+        outfile.write((char *) replica, nBlockSizeRSA);
         // TODO: check write (SS)
     }
-    EncryptData(buffer, 0, filein.gcount(), replica, aesKey, rsa);
-    outfile.write((char *)replica, BUFFER_SIZE);
-    // TODO: check write (SS)
-
     BIO *pub = BIO_new(BIO_s_mem());
     PEM_write_bio_RSAPublicKey(pub, rsa);
     size_t publicKeyLength = BIO_pending(pub);
     char *publicKey = new char[publicKeyLength + 1];
     BIO_read(pub, publicKey, publicKeyLength);
     publicKey[publicKeyLength] = '\0';
-  //  tempStorageHeap.SetDecryptionKeys(tempFile->uri, DecryptionKeys::ToBytes(std::string(publicKey)), aesKey);
+    tempStorageHeap.SetDecryptionKeys(tempFile->uri, DecryptionKeys::ToBytes(std::string(publicKey)), aesKey);
     filein.close();
     outfile.close();
     RSA_free(rsa);

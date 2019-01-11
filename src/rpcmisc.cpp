@@ -30,6 +30,7 @@
 #include <boost/assign/list_of.hpp>
 #include "univalue/univalue.h"
 #include "rpcutil.h"
+#include "util.h"
 
 using namespace boost;
 using namespace boost::assign;
@@ -1231,13 +1232,16 @@ UniValue announcefileorder(const UniValue& params, bool fHelp)
     StorageOrder order{};
     boost::filesystem::path path{ params[0].get_str() };
 
+    order.fileURI = SerializeHash(path.string(), SER_GETHASH, 0);
     order.time = std::time(nullptr);
     order.storageUntil = order.time + params[1].get_int() * 24 * 60 * 60;
     order.fileSize = boost::filesystem::file_size(path);
     order.maxRate = params[2].get_real() * COIN / (order.fileSize * (order.storageUntil - order.time));
+    order.address = storageController.address;
 
     LOCK(cs_main);
     storageController.AnnounceOrder(order, path);
+    storageController.proposalsAgent.ListenProposal(order.GetHash());
 
     return UniValue::VNULL;
 }

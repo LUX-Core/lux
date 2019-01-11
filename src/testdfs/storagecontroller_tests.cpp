@@ -34,20 +34,10 @@ BOOST_AUTO_TEST_CASE(createreplica)
         100,
         CService("127.0.0.1")
     };
-    StorageProposal proposal = {
-        std::time(0) + 10,
-        order.GetHash(),
-        1,
-        CService("127.0.0.1")
-    };
 
-    auto tempFile = controller.CreateReplica(fullFilename, order, proposal);
+    auto tempFile = controller.CreateReplica(fullFilename, order);
 
-    std::ifstream filein;
-    filein.open(tempFile->filename.c_str(), std::ios::binary);
-    filein.seekg (0, ios::end);
-    uint64_t length = filein.tellg();
-    filein.close();
+    auto length = fs::file_size(tempFile->filename);
     BOOST_CHECK_EQUAL(length, tempFile->size);
     fs::remove(tempFile->filename);
 }

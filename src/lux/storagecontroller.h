@@ -8,6 +8,8 @@
 #include "storageorder.h"
 #include "proposalsagent.h"
 
+#include <boost/thread.hpp>
+
 class StorageController;
 
 extern StorageController storageController;
@@ -20,6 +22,10 @@ static const unsigned short DEFAULT_DFS_PORT = 1507;
 class StorageController
 {
 private:
+    boost::mutex mutex;
+    boost::thread background;
+    void BackgroundJob();
+
 public:
     size_t rate;
     CService address;
@@ -45,7 +51,7 @@ public:
     std::vector<StorageProposal> GetProposals(const uint256 &orderHash);
     // Temp
     void FindReplicaKeepers(const StorageOrder &order, const int countReplica);
-    std::shared_ptr<AllocatedFile> CreateReplica(const boost::filesystem::path &filename, const StorageOrder &order, const StorageProposal &proposal);
+    std::shared_ptr<AllocatedFile> CreateReplica(const boost::filesystem::path &filename, const StorageOrder &order);
 };
 
 #endif //LUX_STORAGECONTROLLER_H
