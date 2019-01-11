@@ -43,7 +43,7 @@ struct FileStream
                 const auto fileSize = GetCryptoReplicaSize(order.fileSize);
                 const auto tailSize = fileSize % BUFFER_SIZE;
 
-                for (auto i = 0; i < fileSize; i += BUFFER_SIZE) {
+                for (auto i = 0u; i < fileSize; i += BUFFER_SIZE) {
                     READWRITE(buf);
                     filestream.write(&buf[0], buf.size());
                 }
