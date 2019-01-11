@@ -1151,6 +1151,7 @@ void BitcoinGUI::setNumBlocks(int count, const QDateTime& blockDate, double nVer
     enum BlockSource blockSource = clientModel->getBlockSource();
     switch (blockSource) {
         case BLOCK_SOURCE_NETWORK:
+            hideLogMessage = true;
             if (header) {
                 updateHeadersSyncProgressLabel();
                 return;
@@ -1185,6 +1186,7 @@ void BitcoinGUI::setNumBlocks(int count, const QDateTime& blockDate, double nVer
 
     tooltip = tr("Processed %n blocks of transaction history.", "", count);
     if(secs < 90*60) {
+        hideLogMessage = false;
         tooltip = tr("Up to date") + QString(".<br>") + tooltip;
         labelBlocksIcon->setPixmap(QIcon(":/icons/synced").pixmap(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE));
 #ifdef ENABLE_WALLET
