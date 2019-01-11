@@ -15,7 +15,7 @@ boost::scoped_ptr<StorageController> storageController;
 
 struct FileStream
 {
-    const std::size_t BUFFER_SIZE = 777;
+    const std::size_t BUFFER_SIZE = 4 * 1024;
     std::fstream filestream;
     uint256 currenOrderHash;
 
@@ -232,13 +232,12 @@ void StorageController::BackgroundJob()
                 node->PushMessage("dfsping");
             }
         }
-        LogPrintf("%s: %d, %s\n", __func__, address.IsValid(), address.ToString());
 
         for(auto &&orderHash : proposalsAgent.GetListenProposals()) {
             auto orderIt = mapAnnouncements.find(orderHash);
             if (orderIt != mapAnnouncements.end()) {
                 auto order = orderIt->second;
-                if(std::time(nullptr) > order.time + 10) {
+                if(std::time(nullptr) > order.time + 60) {
                     if (FindReplicaKeepers(order, 1)) {
                         proposalsAgent.StopListenProposal(orderHash);
                     }
