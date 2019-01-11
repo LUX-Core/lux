@@ -15,16 +15,19 @@ boost::scoped_ptr<StorageController> storageController;
 
 struct FileStream
 {
+    const std::size_t BUFFER_SIZE = 777;
     std::fstream filestream;
 
     ADD_SERIALIZE_METHODS;
     template <typename Stream, typename Operation>
     inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion) {
-        std::vector<char> buf(256);
+        std::vector<char> buf(BUFFER_SIZE);
 
         if (!ser_action.ForRead()) {
-            while (filestream.eof()) {
+            while (!filestream.eof()) {
+                buf.resize(BUFFER_SIZE);
                 buf.resize(filestream.readsome(&buf[0], buf.size()));
+
                 if (buf.empty()) {
                     break;
                 }
@@ -32,6 +35,7 @@ struct FileStream
             }
         } else {
             READWRITE(buf);
+            s.write(&buf[0], buf.size());
             filestream.write(&buf[0], buf.size());
         }
     }
