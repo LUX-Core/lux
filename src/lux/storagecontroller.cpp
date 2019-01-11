@@ -103,6 +103,7 @@ void StorageController::ProcessStorageMessage(CNode* pfrom, const std::string& s
         vRecv >> proposal;
         auto itAnnounce = mapAnnouncements.find(proposal.orderHash);
         if (itAnnounce != mapAnnouncements.end()) {
+            boost::lock_guard<boost::mutex> lock(mutex);
             std::vector<uint256> vListenProposals = proposalsAgent.GetListenProposals();
             if (std::find(vListenProposals.begin(), vListenProposals.end(), proposal.orderHash) != vListenProposals.end()) {
                 if (itAnnounce->second.maxRate > proposal.rate) {
@@ -186,7 +187,9 @@ void StorageController::BackgroundJob()
 {
     while (1) {
         boost::this_thread::interruption_point();
+        boost::this_thread::sleep(boost::posix_time::seconds(1));
         boost::lock_guard<boost::mutex> lock(mutex);
+
         for(auto &&orderHash : proposalsAgent.GetListenProposals()) {
             auto orderIt = mapAnnouncements.find(orderHash);
             if (orderIt != mapAnnouncements.end()) {
@@ -196,6 +199,7 @@ void StorageController::BackgroundJob()
                 }
             }
         }
+
     }
 }
 
@@ -252,6 +256,7 @@ void StorageController::StartHandshake(const StorageProposal &proposal)
 
 std::vector<StorageProposal> StorageController::SortProposals(const StorageOrder &order)
 {
+    boost::lock_guard<boost::mutex> lock(mutex);
     std::vector<StorageProposal> proposals = proposalsAgent.GetProposals(order.GetHash());
     if (proposals.size()) {
         return {};
@@ -277,6 +282,7 @@ void StorageController::ClearOldAnnouncments(std::time_t timestamp)
     for (auto &&it = mapAnnouncements.begin(); it != mapAnnouncements.end(); ) {
         StorageOrder order = it->second;
         if (order.time < timestamp) {
+            boost::lock_guard<boost::mutex> lock(mutex);
             std::vector<uint256> vListenProposals = proposalsAgent.GetListenProposals();
             uint256 orderHash = order.GetHash();
             if (std::find(vListenProposals.begin(), vListenProposals.end(), orderHash) != vListenProposals.end()) {
@@ -296,16 +302,19 @@ void StorageController::ClearOldAnnouncments(std::time_t timestamp)
 
 void StorageController::ListenProposal(const uint256 &orderHash)
 {
+    boost::lock_guard<boost::mutex> lock(mutex);
     proposalsAgent.ListenProposal(orderHash);
 }
 
 void StorageController::StopListenProposal(const uint256 &orderHash)
 {
+    boost::lock_guard<boost::mutex> lock(mutex);
     proposalsAgent.StopListenProposal(orderHash);
 }
 
 std::vector<StorageProposal> StorageController::GetProposals(const uint256 &orderHash)
 {
+    boost::lock_guard<boost::mutex> lock(mutex);
     return proposalsAgent.GetProposals(orderHash);
 }
 
