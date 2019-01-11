@@ -1229,7 +1229,7 @@ UniValue announcefileorder(const UniValue& params, bool fHelp)
                 + HelpExampleRpc("announcefileorder", "\"localFilePath\", daysToKeep, fileCostInCoins")
         );
 
-    if (storageController.address.IsTor() || !storageController.address.IsValid()) {
+    if (storageController->address.IsTor() || !storageController->address.IsValid()) {
         LogPrintf("%s: ERROR - unknown local IP address");
     } else {
         StorageOrder order{};
@@ -1240,10 +1240,10 @@ UniValue announcefileorder(const UniValue& params, bool fHelp)
         order.storageUntil = order.time + params[1].get_int() * 24 * 60 * 60;
         order.fileSize = boost::filesystem::file_size(path);
         order.maxRate = params[2].get_real() * COIN / (order.fileSize * (order.storageUntil - order.time));
-        order.address = storageController.address;
+        order.address = storageController->address;
 
-        storageController.AnnounceOrder(order, path);
-        storageController.proposalsAgent.ListenProposal(order.GetHash());
+        storageController->AnnounceOrder(order, path);
+        storageController->proposalsAgent.ListenProposal(order.GetHash());
     }
 
     return UniValue::VNULL;

@@ -11,7 +11,7 @@
 #include "replicabuilder.h"
 #include "serialize.h"
 
-StorageController storageController;
+boost::scoped_ptr<StorageController> storageController;
 
 struct FileStream
 {
@@ -55,18 +55,18 @@ static void RSA_get0_key(const RSA *r, const BIGNUM **n, const BIGNUM **e, const
 StorageController::StorageController() : background(boost::bind(&StorageController::BackgroundJob, this)),
                                          rate(STORAGE_MIN_RATE)
 {
-//    namespace fs = boost::filesystem;
-//
-//    fs::path defaultDfsPath = GetDataDir() / "dfs";
-//    if (!fs::exists(defaultDfsPath)) {
-//        fs::create_directories(defaultDfsPath);
-//    }
-//    storageHeap.AddChunk(defaultDfsPath.string(), DEFAULT_STORAGE_SIZE);
-//    fs::path defaultDfsTempPath = GetDataDir() / "dfstemp";
-//    if (!fs::exists(defaultDfsTempPath)) {
-//        fs::create_directories(defaultDfsTempPath);
-//    }
-//    tempStorageHeap.AddChunk(defaultDfsTempPath.string(), DEFAULT_STORAGE_SIZE);
+    namespace fs = boost::filesystem;
+
+    fs::path defaultDfsPath = GetDataDir() / "dfs";
+    if (!fs::exists(defaultDfsPath)) {
+        fs::create_directories(defaultDfsPath);
+    }
+    storageHeap.AddChunk(defaultDfsPath.string(), DEFAULT_STORAGE_SIZE);
+    fs::path defaultDfsTempPath = GetDataDir() / "dfstemp";
+    if (!fs::exists(defaultDfsTempPath)) {
+        fs::create_directories(defaultDfsTempPath);
+    }
+    tempStorageHeap.AddChunk(defaultDfsTempPath.string(), DEFAULT_STORAGE_SIZE);
 }
 
 void StorageController::ProcessStorageMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv, bool& isStorageCommand)

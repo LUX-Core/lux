@@ -5830,7 +5830,7 @@ bool static AlreadyHave(const CInv& inv)
     case MSG_MASTERNODE_WINNER:
         return mapSeenMasternodeVotes.count(inv.hash);
     case MSG_STORAGE_ORDER_ANNOUNCE:
-        return storageController.mapAnnouncements.count(inv.hash);
+        return storageController->mapAnnouncements.count(inv.hash);
     }
     // Don't know what it is, just say we already got one
     return true;
@@ -5983,10 +5983,10 @@ void static ProcessGetData(CNode* pfrom, const Consensus::Params& consensusParam
                     }
                 }
                 if (!pushed && inv.type == MSG_STORAGE_ORDER_ANNOUNCE) {
-                    if (storageController.mapAnnouncements.count(inv.hash)) {
+                    if (storageController->mapAnnouncements.count(inv.hash)) {
                         CDataStream ss(SER_NETWORK, PROTOCOL_VERSION);
                         ss.reserve(1000);
-                        ss << storageController.mapAnnouncements[inv.hash];
+                        ss << storageController->mapAnnouncements[inv.hash];
                         pfrom->PushMessage("dfsannounce", ss);
                         pushed = true;
                     }
@@ -6879,7 +6879,7 @@ static bool ProcessMessage(CNode* pfrom, const string &strCommand, CDataStream& 
         if (!processed) ProcessMasternodeConnections();
         if (!processed) ProcessInstantX(pfrom, strCommand, vRecv, processed);
         if (!processed) ProcessSpork(pfrom, strCommand, vRecv, processed);
-        if (!processed) storageController.ProcessStorageMessage(pfrom, strCommand, vRecv, processed);
+        if (!processed) storageController->ProcessStorageMessage(pfrom, strCommand, vRecv, processed);
 #       endif
     }
 

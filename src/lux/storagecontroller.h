@@ -12,7 +12,7 @@
 
 class StorageController;
 
-extern StorageController storageController;
+extern boost::scoped_ptr<StorageController> storageController;
 
 static const size_t STORAGE_MIN_RATE = 1;
 
@@ -28,7 +28,7 @@ private:
 
 public:
     size_t rate;
-    CService address;
+    CAddress address;
     std::map<uint256, boost::filesystem::path> mapLocalFiles;
     std::map<uint256, StorageOrder> mapAnnouncements;
     std::map<uint256, StorageHandshake> mapReceivedHandshakes;
