@@ -1218,14 +1218,14 @@ UniValue getstakingstatus(const UniValue& params, bool fHelp)
 
 UniValue announcefileorder(const UniValue& params, bool fHelp)
 {
-    if (fHelp || params.size() != 4)
+    if (fHelp || params.size() != 3)
         throw runtime_error(
                 "announcefileorder\n"
                 "\nAnnounces a file order.\n"
                 "\nResult:\n"
-                "{\n"
-                "}\n"
+                "null\n"
                 "\nExamples:\n"
+                + HelpExampleCli("announcefileorder", "\"localFilePath\", daysToKeep, fileCostInCoins")
                 + HelpExampleRpc("announcefileorder", "\"localFilePath\", daysToKeep, fileCostInCoins")
         );
 

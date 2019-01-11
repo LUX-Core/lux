@@ -16,7 +16,7 @@ public:
     uint64_t fileSize;
     uint256 fileURI;
     CAmount maxRate;            // Lux * COIN / (sec * byte)
-    uint maxGap;                // max number of blocks, which can be mined between proofs
+    unsigned int maxGap;        // max number of blocks, which can be mined between proofs
     CService address;           // [!!!] global-wide sender address
 
     uint256 GetHash() const{
