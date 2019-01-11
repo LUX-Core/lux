@@ -1220,31 +1220,35 @@ UniValue announcefileorder(const UniValue& params, bool fHelp)
 {
     if (fHelp || params.size() != 3)
         throw runtime_error(
-                "announcefileorder\n"
+                "announcefileorder \"localFilePath\", daysToKeep, fileCostInCoins\n"
                 "\nAnnounces a file order.\n"
+                "\nArgument:\n"
+                "1. \"localFilePath\"          (string, required) The local file path of file\n"
+                "2. daysToKeep                (numeric, required) The days to keep\n"
+                "3. fileCostInCoins           (numeric, required) The file cost in coins\n"
                 "\nResult:\n"
                 "null\n"
                 "\nExamples:\n"
-                + HelpExampleCli("announcefileorder", "\"localFilePath\", daysToKeep, fileCostInCoins")
-                + HelpExampleRpc("announcefileorder", "\"localFilePath\", daysToKeep, fileCostInCoins")
+                + HelpExampleCli("announcefileorder", "\"/tmp/123.jpg\" 1 0.3")
+                + HelpExampleRpc("announcefileorder", "\"/tmp/123.jpg\", 1, 0.3")
         );
 
     if (storageController->address.IsTor() || !storageController->address.IsValid()) {
-        LogPrintf("%s: ERROR - unknown local IP address");
-    } else {
-        StorageOrder order{};
-        boost::filesystem::path path{ params[0].get_str() };
-
-        order.fileURI = SerializeHash(path.string(), SER_GETHASH, 0);
-        order.time = std::time(nullptr);
-        order.storageUntil = order.time + params[1].get_int() * 24 * 60 * 60;
-        order.fileSize = boost::filesystem::file_size(path);
-        order.maxRate = params[2].get_real() * COIN / (order.fileSize * (order.storageUntil - order.time));
-        order.address = storageController->address;
-
-        storageController->AnnounceOrder(order, path);
-        storageController->proposalsAgent.ListenProposal(order.GetHash());
+        throw JSONRPCError(RPC_INTERNAL_ERROR, "Unknown local IP address");
     }
+
+    StorageOrder order{};
+    boost::filesystem::path path{params[0].get_str()};
+
+    order.fileURI = SerializeHash(path.string(), SER_GETHASH, 0);
+    order.time = std::time(nullptr);
+    order.storageUntil = order.time + std::stoi(params[1].get_str()) * 24 * 60 * 60;
+    order.fileSize = boost::filesystem::file_size(path);
+    order.maxRate = std::stod(params[2].get_str()) * COIN / (order.fileSize * (order.storageUntil - order.time));
+    order.address = storageController->address;
+
+    storageController->AnnounceOrder(order, path);
+    storageController->proposalsAgent.ListenProposal(order.GetHash());
 
     return UniValue::VNULL;
 }
