@@ -54,6 +54,7 @@ LuxgateDialog::LuxgateDialog(QWidget *parent) :
 {
     ui->setupUi(this);
     setWindowFlags(Qt::Widget);
+    setContentsMargins(10,10,10,10);
     moveWidgetsToDocks();
 }
 
@@ -72,6 +73,7 @@ void LuxgateDialog::moveWidgetsToDocks()
     tabifyDockWidget(dockChart, dockOrderBook);
     tabifyDockWidget(dockChart, dockOpenOrders);
     tabifyDockWidget(dockChart, dockBalances);
+    setTabPosition(Qt::LeftDockWidgetArea, QTabWidget::North);
 
     //Right
     auto dockActionPanel = createDock(ui->action_panel_3, "action_panel_3");
@@ -90,7 +92,7 @@ void LuxgateDialog::moveWidgetsToDocks()
 QDockWidget* LuxgateDialog::createDock(QWidget* widget, const QString& title)
 {
     QDockWidget* dock = new QDockWidget(this);
-
+    widget->setProperty("IsDockable", true);
     if(widget->layout())
     {
         QMargins widgetMargins = widget->layout()->contentsMargins();

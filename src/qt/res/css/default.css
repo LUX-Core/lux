@@ -4,7 +4,7 @@
 
 
 WalletFrame {
-	background: #ffffff url(':/images/walletFrame_bg') no-repeat top right cover; 
+	background: #ffffff url(':/images/walletFrame_bg') no-repeat top right cover;
     border-top: 0px solid #000;
     margin:0;
     padding:0;
@@ -1701,4 +1701,41 @@ QCalendarWidget QAbstractItemView:enabled { /* Calendar widget weekdays in month
 
 QCalendarWidget QAbstractItemView:disabled { /* Calendar widget days not in month */
     color:#818181;
+}
+
+/**************************** LUXGATE DIALOG ********************************/
+
+QMainWindow#LuxgateDialog .QLabel#labelCoupledAssetSwap {
+    background-color:#061431;
+		color: white;
+}
+
+QMainWindow#LuxgateDialog .QLabel#labelStatus {
+	background-color:#061431;
+	color: white;
+}
+
+*[IsDockable] {
+	background: rgba(255,255,255,40);
+	border: 1px solid gray;
+  border-radius: 3px;
+	margin-top:2px
+}
+
+QDockWidget::title {
+	background: rgba(255,255,255,100);
+	border: 1px solid gray;
+	border-radius: 2px;
+	padding:3px;
+	text-align: left center;
+}
+
+QDockWidget::close-button {
+	top:2px;
+	right:3px
+}
+
+QDockWidget::float-button {
+	top:2px;
+	right:18px
 }

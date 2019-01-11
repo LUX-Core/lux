@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>996</width>
-    <height>617</height>
+    <height>620</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -326,8 +326,11 @@
          <property name="styleSheet">
           <string notr="true"/>
          </property>
+         <property name="tabPosition">
+          <enum>QTabWidget::North</enum>
+         </property>
          <property name="currentIndex">
-          <number>3</number>
+          <number>0</number>
          </property>
          <property name="iconSize">
           <size>
@@ -1236,21 +1239,27 @@
            </widget>
           </item>
           <item>
-           <widget class="QLabel" name="label">
+           <widget class="QLabel" name="labelCoupledAssetSwap">
             <property name="sizePolicy">
              <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
-            <property name="text">
-             <string/>
+            <property name="font">
+             <font>
+              <weight>75</weight>
+              <bold>true</bold>
+             </font>
             </property>
-            <property name="pixmap">
-             <pixmap>:/icons/swap_header</pixmap>
+            <property name="styleSheet">
+             <string notr="true"/>
+            </property>
+            <property name="text">
+             <string>COUPLED ASSET SWAP</string>
             </property>
             <property name="scaledContents">
-             <bool>true</bool>
+             <bool>false</bool>
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>
@@ -1287,7 +1296,7 @@
                 <string/>
                </property>
                <property name="pixmap">
-                <pixmap>:/icons/rec_luxgate</pixmap>
+                <pixmap resource="../lux.qrc">:/icons/rec_luxgate</pixmap>
                </property>
                <property name="scaledContents">
                 <bool>false</bool>
@@ -1344,6 +1353,9 @@
              <property name="spacing">
               <number>0</number>
              </property>
+             <property name="sizeConstraint">
+              <enum>QLayout::SetMaximumSize</enum>
+             </property>
              <property name="leftMargin">
               <number>0</number>
              </property>
@@ -1357,29 +1369,64 @@
               <number>0</number>
              </property>
              <item>
+              <spacer name="horizontalSpacer_13">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
               <widget class="QLabel" name="label_3">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                 <horstretch>10</horstretch>
-                 <verstretch>10</verstretch>
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
                 </sizepolicy>
                </property>
                <property name="minimumSize">
                 <size>
-                 <width>0</width>
-                 <height>0</height>
+                 <width>30</width>
+                 <height>30</height>
                 </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>30</width>
+                 <height>30</height>
+                </size>
+               </property>
+               <property name="frameShape">
+                <enum>QFrame::NoFrame</enum>
                </property>
                <property name="text">
                 <string/>
                </property>
                <property name="pixmap">
-                <pixmap>:/icons/swap</pixmap>
+                <pixmap resource="../lux.qrc">:/icons/swap</pixmap>
                </property>
                <property name="scaledContents">
                 <bool>true</bool>
                </property>
               </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_14">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
              </item>
             </layout>
            </widget>
@@ -1414,7 +1461,7 @@
                 <string/>
                </property>
                <property name="pixmap">
-                <pixmap>:/icons/send_luxgate</pixmap>
+                <pixmap resource="../lux.qrc">:/icons/send_luxgate</pixmap>
                </property>
               </widget>
              </item>
@@ -1560,7 +1607,7 @@
                    <string/>
                   </property>
                   <property name="pixmap">
-                   <pixmap>:/icons/swap_btn</pixmap>
+                   <pixmap resource="../lux.qrc">:/icons/swap_btn</pixmap>
                   </property>
                  </widget>
                 </item>
@@ -1696,7 +1743,7 @@
                 <string/>
                </property>
                <property name="pixmap">
-                <pixmap>:/icons/send_btn</pixmap>
+                <pixmap resource="../lux.qrc">:/icons/send_btn</pixmap>
                </property>
               </widget>
              </item>
@@ -1712,7 +1759,7 @@
                 <string/>
                </property>
                <property name="pixmap">
-                <pixmap>:/icons/receive_btn</pixmap>
+                <pixmap resource="../lux.qrc">:/icons/receive_btn</pixmap>
                </property>
               </widget>
              </item>
@@ -1790,7 +1837,7 @@
                 <string/>
                </property>
                <property name="pixmap">
-                <pixmap>:/icons/send_btn</pixmap>
+                <pixmap resource="../lux.qrc">:/icons/send_btn</pixmap>
                </property>
               </widget>
              </item>
@@ -1812,7 +1859,7 @@
                 <string/>
                </property>
                <property name="pixmap">
-                <pixmap>:/icons/receive_btn</pixmap>
+                <pixmap resource="../lux.qrc">:/icons/receive_btn</pixmap>
                </property>
               </widget>
              </item>
@@ -1856,7 +1903,7 @@
            <number>9</number>
           </property>
           <item>
-           <widget class="QLabel" name="label_9">
+           <widget class="QLabel" name="labelStatus">
             <property name="sizePolicy">
              <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
               <horstretch>0</horstretch>
@@ -1870,10 +1917,7 @@
              </font>
             </property>
             <property name="text">
-             <string/>
-            </property>
-            <property name="pixmap">
-             <pixmap>:/icons/status</pixmap>
+             <string>STATUS</string>
             </property>
             <property name="scaledContents">
              <bool>true</bool>
