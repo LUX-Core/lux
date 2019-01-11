@@ -45,12 +45,12 @@ public:
     void ClearOldAnnouncments(std::time_t timestamp);
     void ProcessStorageMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv, bool& isStorageCommand);
     // Proposals Agent
-    void ListenProposal(const uint256 &orderHash);
-    void StopListenProposal(const uint256 &orderHash);
-    bool isListen(const uint256 &proposalHash);
-    std::vector<StorageProposal> GetProposals(const uint256 &orderHash);
+    //void ListenProposal(const uint256 &orderHash);
+    //void StopListenProposal(const uint256 &orderHash);
+    //bool isListen(const uint256 &proposalHash);
+    //std::vector<StorageProposal> GetProposals(const uint256 &orderHash);
     // Temp
-    void FindReplicaKeepers(const StorageOrder &order, const int countReplica);
+    bool FindReplicaKeepers(const StorageOrder &order, const int countReplica);
     std::shared_ptr<AllocatedFile> CreateReplica(const boost::filesystem::path &filename, const StorageOrder &order);
 };
 

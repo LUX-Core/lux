@@ -141,7 +141,7 @@ void StorageController::ProcessStorageMessage(CNode* pfrom, const std::string& s
                     LogPrint("dfs", "\"dfshandshake\" message handler have not connection to order sender");
                     return ;
                 }
-                pNode->PushMessage("dfsrequestreplica", requestReplica);
+                pNode->PushMessage("dfsrr", requestReplica);
             }
         } else {
             // DoS prevention
@@ -151,7 +151,7 @@ void StorageController::ProcessStorageMessage(CNode* pfrom, const std::string& s
 //                state->nMisbehavior += 10;
 //            }
         }
-    } else if (strCommand == "dfsrequestreplica") {
+    } else if (strCommand == "dfsrr") {
         isStorageCommand = true;
         StorageHandshake handshake;
         vRecv >> handshake;
@@ -216,8 +216,10 @@ void StorageController::BackgroundJob()
             auto orderIt = mapAnnouncements.find(orderHash);
             if (orderIt != mapAnnouncements.end()) {
                 auto order = orderIt->second;
-                if(std::time(nullptr) > order.time + 60) {
-                    FindReplicaKeepers(order, 1);
+                if(std::time(nullptr) > order.time + 10) {
+                    if (FindReplicaKeepers(order, 1)) {
+                        proposalsAgent.StopListenProposal(orderHash);
+                    }
                 }
             }
         }
@@ -263,19 +265,22 @@ void StorageController::StartHandshake(const StorageProposal &proposal)
     handshake.port = DEFAULT_DFS_PORT;
 
     CNode* pNode = FindNode(proposal.address);
-    if (!pNode) {
-        for (int64_t nLoop = 0; nLoop < 100; nLoop++) {
+    if (pNode == nullptr) {
+        for (int64_t nLoop = 0; nLoop < 100 && pNode == nullptr; nLoop++) {
          //   ProcessOneShot();
             CAddress addr;
             OpenNetworkConnection(addr, false, NULL, proposal.address.ToStringIPPort().c_str());
             for (int i = 0; i < 10 && i < nLoop; i++) {
                 MilliSleep(500);
             }
+            pNode = FindNode(proposal.address);
             MilliSleep(500);
         }
-        pNode = FindNode(proposal.address);
     }
-    pNode->PushMessage("dfshandshake", handshake);
+
+    if (pNode != nullptr) {
+        pNode->PushMessage("dfshandshake", handshake);
+    }
 }
 
 std::vector<StorageProposal> StorageController::SortProposals(const StorageOrder &order)
@@ -305,7 +310,6 @@ void StorageController::ClearOldAnnouncments(std::time_t timestamp)
     for (auto &&it = mapAnnouncements.begin(); it != mapAnnouncements.end(); ) {
         StorageOrder order = it->second;
         if (order.time < timestamp) {
-            boost::lock_guard<boost::mutex> lock(mutex);
             std::vector<uint256> vListenProposals = proposalsAgent.GetListenProposals();
             uint256 orderHash = order.GetHash();
             if (std::find(vListenProposals.begin(), vListenProposals.end(), orderHash) != vListenProposals.end()) {
@@ -323,25 +327,24 @@ void StorageController::ClearOldAnnouncments(std::time_t timestamp)
     }
 }
 
-void StorageController::ListenProposal(const uint256 &orderHash)
-{
-    boost::lock_guard<boost::mutex> lock(mutex);
-    proposalsAgent.ListenProposal(orderHash);
-}
+//void StorageController::ListenProposal(const uint256 &orderHash)
+//{
+//    boost::lock_guard<boost::mutex> lock(mutex);
+//    proposalsAgent.ListenProposal(orderHash);
+//}
+//
+//void StorageController::StopListenProposal(const uint256 &orderHash)
+//{
+//    proposalsAgent.StopListenProposal(orderHash);
+//}
+//
+//std::vector<StorageProposal> StorageController::GetProposals(const uint256 &orderHash)
+//{
+//    boost::lock_guard<boost::mutex> lock(mutex);
+//    return proposalsAgent.GetProposals(orderHash);
+//}
 
-void StorageController::StopListenProposal(const uint256 &orderHash)
-{
-    boost::lock_guard<boost::mutex> lock(mutex);
-    proposalsAgent.StopListenProposal(orderHash);
-}
-
-std::vector<StorageProposal> StorageController::GetProposals(const uint256 &orderHash)
-{
-    boost::lock_guard<boost::mutex> lock(mutex);
-    return proposalsAgent.GetProposals(orderHash);
-}
-
-void StorageController::FindReplicaKeepers(const StorageOrder &order, const int countReplica)
+bool StorageController::FindReplicaKeepers(const StorageOrder &order, const int countReplica)
 {
     std::vector<StorageProposal> proposals = SortProposals(order);
     int numReplica = 0;
@@ -362,12 +365,12 @@ void StorageController::FindReplicaKeepers(const StorageOrder &order, const int 
                 fileStream.filestream.open(pAllocatedFile->filename, std::ios::binary|std::ios::in);
                 if (!fileStream.filestream.is_open()) {
                     LogPrint("dfs", "file %s cannot be opened", pAllocatedFile->filename);
-                    return ;
+                    return false;
                 }
                 pNode->PushMessage("dfssendfile", fileStream);
             }
             if (numReplica == countReplica) {
-                break;
+                return true;
             }
         } else {
             CNode* pNode = FindNode(proposal.address);
@@ -376,6 +379,7 @@ void StorageController::FindReplicaKeepers(const StorageOrder &order, const int 
             }
         }
     }
+    return false;
 }
 
 std::shared_ptr<AllocatedFile> StorageController::CreateReplica(const boost::filesystem::path &filename, const StorageOrder &order)
