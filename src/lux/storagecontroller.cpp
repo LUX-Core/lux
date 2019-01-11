@@ -17,6 +17,7 @@ struct FileStream
 {
     const std::size_t BUFFER_SIZE = 777;
     std::fstream filestream;
+    uint256 currenOrderHash;
 
     ADD_SERIALIZE_METHODS;
     template <typename Stream, typename Operation>
@@ -24,6 +25,7 @@ struct FileStream
         std::vector<char> buf(BUFFER_SIZE);
 
         if (!ser_action.ForRead()) {
+            READWRITE(currenOrderHash);
             while (!filestream.eof()) {
                 buf.resize(BUFFER_SIZE);
                 buf.resize(filestream.readsome(&buf[0], buf.size()));
@@ -34,9 +36,24 @@ struct FileStream
                 READWRITE(buf);
             }
         } else {
-            READWRITE(buf);
-            s.write(&buf[0], buf.size());
-            filestream.write(&buf[0], buf.size());
+            READWRITE(currenOrderHash);
+
+            if (storageController->mapAnnouncements.count(currenOrderHash) != 0) {
+                const auto order = storageController->mapAnnouncements[currenOrderHash];
+                const auto fileSize = GetCryptoReplicaSize(order.fileSize);
+                const auto tailSize = fileSize % BUFFER_SIZE;
+
+                for (auto i = 0; i < fileSize; i += BUFFER_SIZE) {
+                    READWRITE(buf);
+                    filestream.write(&buf[0], buf.size());
+                }
+
+                if (tailSize > 0) {
+                    buf.resize(tailSize);
+                    READWRITE(buf);
+                    filestream.write(&buf[0], buf.size());
+                }
+            }
         }
     }
 };
@@ -176,7 +193,8 @@ void StorageController::ProcessStorageMessage(CNode* pfrom, const std::string& s
     } else if (strCommand == "dfssendfile") {
         isStorageCommand = true;
         FileStream fileStream;
-        boost::filesystem::path fullFilename = GetDefaultDataDir() / (std::to_string(std::time(nullptr)) + ".luxfs");
+        boost::filesystem::path fullFilename = storageHeap.GetChunks()[0].path;
+        fullFilename /= (std::to_string(std::time(nullptr)) + ".luxfs");
         fileStream.filestream.open(fullFilename.string(), std::ios::binary|std::ios::out);
         if (!fileStream.filestream.is_open()) {
             LogPrint("dfs", "file %s cannot be opened", fullFilename);
@@ -366,6 +384,7 @@ bool StorageController::FindReplicaKeepers(const StorageOrder &order, const int 
             CNode* pNode = FindNode(proposal.address);
             if (pNode) {
                 FileStream fileStream;
+                fileStream.currenOrderHash = order.GetHash();
                 fileStream.filestream.open(pAllocatedFile->filename, std::ios::binary|std::ios::in);
                 if (!fileStream.filestream.is_open()) {
                     LogPrint("dfs", "file %s cannot be opened", pAllocatedFile->filename);
