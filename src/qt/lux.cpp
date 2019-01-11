@@ -528,7 +528,7 @@ void BitcoinApplication::initializeResult(int retval)
             window, SLOT(message(QString, QString, unsigned int)));
         QTimer::singleShot(100, paymentServer, SLOT(uiReady()));
 #endif
-        pollShutdownTimer->start(150);
+        pollShutdownTimer->start(300);
     } else {
         Q_EMIT splashFinished(window);
         quit(); // Exit main loop
