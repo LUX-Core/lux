@@ -351,7 +351,7 @@ bool StorageController::FindReplicaKeepers(const StorageOrder &order, const int 
     for (auto &&proposal : proposals) {
         StartHandshake(proposal);
         auto it = mapReceivedHandshakes.find(proposal.orderHash);
-        for (int times = 0; times < 300 || it != mapReceivedHandshakes.end(); ++times) {
+        for (int times = 0; times < 300 && it == mapReceivedHandshakes.end(); ++times) {
             MilliSleep(100);
             it = mapReceivedHandshakes.find(proposal.orderHash);
         }

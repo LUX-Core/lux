@@ -1244,7 +1244,7 @@ UniValue announcefileorder(const UniValue& params, bool fHelp)
     order.time = std::time(nullptr);
     order.storageUntil = order.time + std::stoi(params[1].get_str()) * 24 * 60 * 60;
     order.fileSize = boost::filesystem::file_size(path);
-    order.maxRate = std::stod(params[2].get_str()) * COIN / (order.fileSize * (order.storageUntil - order.time));
+    order.maxRate = std::stoi(params[2].get_str());
     order.address = storageController->address;
 
     storageController->AnnounceOrder(order, path);
