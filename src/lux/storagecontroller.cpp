@@ -185,6 +185,7 @@ void StorageController::ProcessStorageMessage(CNode* pfrom, const std::string& s
     } else if (strCommand == "dfspong") {
         isStorageCommand = true;
         vRecv >> address;
+        address.SetPort(GetListenPort());
     }
 }
 
@@ -242,10 +243,7 @@ void StorageController::AnnounceOrder(const StorageOrder &order)
             continue;
         }
         if (pNode->nVersion >= ActiveProtocol()) {
-            LOCK(pNode->cs_filter);
-            if (pNode->pfilter == nullptr) {
-                pNode->PushMessage("inv", vInv);
-            }
+            pNode->PushMessage("inv", vInv);
         }
     }
 }
@@ -266,9 +264,15 @@ void StorageController::StartHandshake(const StorageProposal &proposal)
 
     CNode* pNode = FindNode(proposal.address);
     if (!pNode) {
-        CAddress addr;
-        OpenNetworkConnection(addr, false, NULL, proposal.address.ToStringIPPort().c_str());
-        MilliSleep(500);
+        for (int64_t nLoop = 0; nLoop < 100; nLoop++) {
+         //   ProcessOneShot();
+            CAddress addr;
+            OpenNetworkConnection(addr, false, NULL, proposal.address.ToStringIPPort().c_str());
+            for (int i = 0; i < 10 && i < nLoop; i++) {
+                MilliSleep(500);
+            }
+            MilliSleep(500);
+        }
         pNode = FindNode(proposal.address);
     }
     pNode->PushMessage("dfshandshake", handshake);
@@ -276,9 +280,8 @@ void StorageController::StartHandshake(const StorageProposal &proposal)
 
 std::vector<StorageProposal> StorageController::SortProposals(const StorageOrder &order)
 {
-    boost::lock_guard<boost::mutex> lock(mutex);
     std::vector<StorageProposal> proposals = proposalsAgent.GetProposals(order.GetHash());
-    if (proposals.size()) {
+    if (!proposals.size()) {
         return {};
     }
 
