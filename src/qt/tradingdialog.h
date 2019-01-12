@@ -59,6 +59,7 @@ private Q_SLOTS:
     void on_SaveKeys_clicked();
     void on_GenDepositBTN_clicked();
     void showMarketHistoryWhenReplyFinished();
+    void SetExchangeInfoTextLabels();
     void showBalanceOfLUXOnTradingTab();
     void showBalanceOfBTCOnTradingTab();
     void showOrderBookOnTradingTab();
@@ -103,7 +104,7 @@ private Q_SLOTS:
     void on_WithdrawPasteButton_clicked();
     void on_DepositCopyButton_clicked();
 
-    int SetExchangeInfoTextLabels();
+
 
     QString CryptopiaTimeStampToReadable(QString DateTime);
     QString CryptopiaIntegerTimeStampToReadable(int DateTime);
