@@ -723,7 +723,7 @@ static void NotifyTokenTransactionChanged(TokenTransactionTableModel *ttm, CWall
 
 static void ShowProgress(TokenTransactionTableModel *ttm, const std::string &title, int nProgress)
 {
-    if (nProgress == 0)
+    if (nProgress < 100)
         fQueueNotifications = true;
 
     if (nProgress == 100)
