@@ -42,6 +42,9 @@ private:
     WalletModel *model;
     void moveWidgetsToDocks();
     QDockWidget* createDock(QWidget* widget, const QString& title);
+
+private slots:
+    void slotClickResetConfiguration();
 };
 
 #endif //__LUXGATE_DIALOG_H__

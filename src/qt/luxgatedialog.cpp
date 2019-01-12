@@ -1,5 +1,6 @@
 
 #include "luxgatedialog.h"
+#include "luxgateconfigmodel.h"
 #include "ui_luxgatedialog.h"
 #include "clientmodel.h"
 #include "walletmodel.h"
@@ -31,6 +32,8 @@
 #include <openssl/hmac.h>
 #include <stdlib.h>
 #include "util.h"
+#include "luxgateconfigmodel.h"
+#include "../luxgate/lgconfig.h"
 #include <openssl/x509.h>
 
 
@@ -56,6 +59,14 @@ LuxgateDialog::LuxgateDialog(QWidget *parent) :
     setWindowFlags(Qt::Widget);
     setContentsMargins(10,10,10,10);
     moveWidgetsToDocks();
+
+    //init configuration
+    {
+        ui->tableViewConfiguration->setModel(new LuxgateConfigModel(this));
+        connect(ui->pushButtonResetConfig, &QPushButton::clicked,
+                this, &LuxgateDialog::slotClickResetConfiguration);
+        slotClickResetConfiguration();
+    }
 }
 
 void LuxgateDialog::moveWidgetsToDocks()
@@ -63,6 +74,7 @@ void LuxgateDialog::moveWidgetsToDocks()
     //Left
     auto dockBidPanel = createDock(ui->bidpanel, "bidpanel");
     auto dockAskPanel = createDock(ui->askpanel_2, "askpanel_2");
+    auto dockConfigPanel = createDock(ui->configpanel, "Configuration");
     auto dockChart = createDock(ui->tabCharts, "tabCharts");
     auto dockOrderBook = createDock(ui->tabOrderBook, "tabOrderBook");
     auto dockOpenOrders = createDock(ui->tabOpenOrders, "tabOpenOrders");
@@ -70,6 +82,7 @@ void LuxgateDialog::moveWidgetsToDocks()
     addDockWidget(Qt::LeftDockWidgetArea, dockBidPanel);
     splitDockWidget(dockBidPanel, dockChart, Qt::Horizontal);
     splitDockWidget(dockBidPanel, dockAskPanel, Qt::Vertical);
+    splitDockWidget(dockAskPanel, dockConfigPanel, Qt::Vertical);
     tabifyDockWidget(dockChart, dockOrderBook);
     tabifyDockWidget(dockChart, dockOpenOrders);
     tabifyDockWidget(dockChart, dockBalances);
@@ -108,6 +121,23 @@ QDockWidget* LuxgateDialog::createDock(QWidget* widget, const QString& title)
 void LuxgateDialog::setModel(WalletModel *model)
 {
     this->model = model;
+}
+
+void LuxgateDialog::slotClickResetConfiguration()
+{
+    auto model = qobject_cast<LuxgateConfigModel*>(ui->tableViewConfiguration->model());
+    model->removeRows(0, model->rowCount());
+    // Read LuxGate config
+    std::map<std::string, BlockchainConfig> config = ReadLuxGateConfigFile();
+    for (auto it : config)
+    {
+        BlockchainConfig conf = it.second;
+        model->insertRows(model->rowCount(), 1);
+        model->setData(model->rowCount(),
+                LuxgateConfigModel::TickerColumn,
+                QVariant::fromValue(conf),
+                LuxgateConfigModel::AllDataRole);
+    }
 }
 
 LuxgateDialog::~LuxgateDialog()

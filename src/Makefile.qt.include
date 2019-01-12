@@ -73,7 +73,7 @@ QT_FORMS_UI = \
 
 if ENABLE_UPDATER
  QT_FORMS_UI += lux-installer/src/forms/updateinfodialog.ui \
-                lux-installer/src/forms/progressdialog.ui 
+                lux-installer/src/forms/progressdialog.ui
 endif
 
 QT_MOC_CPP = \
@@ -165,7 +165,8 @@ QT_MOC_CPP = \
   qt/moc_walletframe.cpp \
   qt/moc_walletmodel.cpp \
   qt/moc_walletview.cpp \
-  qt/moc_hexaddressconverter.cpp
+  qt/moc_hexaddressconverter.cpp \
+  qt/moc_luxgateconfigmodel.cpp 
 
 if ENABLE_UPDATER
   QT_MOC_CPP += lux-installer/src/luxupdater/moc_luxupdater.cpp \
@@ -300,7 +301,8 @@ BITCOIN_QT_H = \
   qt/walletview.h \
   qt/winshutdownmonitor.h \
   qt/qcustomplot.h \
-  qt/hexaddressconverter.h
+  qt/hexaddressconverter.h \
+  qt/luxgateconfigmodel.h
 
 if ENABLE_UPDATER
   BITCOIN_QT_H += lux-installer/src/luxupdater/luxupdater.h \
@@ -489,7 +491,8 @@ BITCOIN_QT_CPP += \
   qt/walletframe.cpp \
   qt/walletmodel.cpp \
   qt/walletmodeltransaction.cpp \
-  qt/walletview.cpp
+  qt/walletview.cpp \
+  qt/luxgateconfigmodel.cpp
 
 if ENABLE_UPDATER
   BITCOIN_QT_CPP += lux-installer/src/luxupdater/simplescheduler.cpp \
