@@ -301,13 +301,20 @@ void SmartContractPage::showOutOfSyncWarning(bool fShow)
 void SmartContractPage::updateDarkSendProgress()
 {
     if (!pwalletMain) return;
+    if (IsInitialBlockDownload()) {
+        float progress = 0.0;
+        ui->darksendProgress->setValue(progress);
+        QString strToolPip = ("<b>" + tr("Currently syncing") + "</b>");
+        ui->darksendProgress->setToolTip(strToolPip);
+        return; // don't update the darksend progress while syncing - there's no point!
+    }
 
     QString strAmountAndRounds;
     QString strAnonymizeLuxAmount = BitcoinUnits::formatHtmlWithUnit(nDisplayUnit, nAnonymizeLuxAmount * COIN, false, BitcoinUnits::separatorAlways);
 
     if (currentBalance == 0) {
-        ui->darksendProgress>setValue(0);
-        ui->darksendProgress>setToolTip(tr("No inputs detected"));
+        ui->darksendProgress->setValue(0);
+        ui->darksendProgress->setToolTip(tr("No inputs detected"));
 
         // when balance is zero just show info from settings
         strAnonymizeLuxAmount = strAnonymizeLuxAmount.remove(strAnonymizeLuxAmount.indexOf("."), BitcoinUnits::decimals(nDisplayUnit) + 1);
@@ -405,7 +412,7 @@ void SmartContractPage::updateDarkSendProgress()
                              .arg(anonNormPart)
                              .arg(anonFullPart)
                              .arg(nAverageAnonymizedRounds);
-    ui->darksendProgress>setToolTip(strToolPip);
+    ui->darksendProgress->setToolTip(strToolPip);
 }
 
 void SmartContractPage::darkSendStatus()
