@@ -133,18 +133,15 @@ void WalletModel::updateStatus()
 
 void WalletModel::pollBalanceChanged()
 {
-    // let's not bother polling for balance changes if we're syncing - the user will be told they're out of sync so the number doesn't matter anyway.
-    //if (IsInitialBlockDownload()) return;
-
     // Get required locks upfront. This avoids the GUI from getting stuck on
     // periodical polls if the core is holding the locks for a longer time -
     // for example, during a wallet rescan.
-    //TRY_LOCK(cs_main, lockMain);
-    //if (!lockMain)
-    //    return;
-    //TRY_LOCK(wallet->cs_wallet, lockWallet);
-    //if (!lockWallet)
-    //    return;
+    TRY_LOCK(cs_main, lockMain);
+    if (!lockMain)
+        return;
+    TRY_LOCK(wallet->cs_wallet, lockWallet);
+    if (!lockWallet)
+        return;
     bool cachedNumBlocksChanged = chainActive.Height() != cachedNumBlocks;
 
     if (fForceCheckBalanceChanged || chainActive.Height() != cachedNumBlocks || nDarksendRounds != cachedDarksendRounds || cachedTxLocks != nCompleteTXLocks) {
@@ -154,12 +151,12 @@ void WalletModel::pollBalanceChanged()
         cachedNumBlocks = chainActive.Height();
         cachedDarksendRounds = nDarksendRounds;
 
-            checkBalanceChanged();
+        checkBalanceChanged();
 
-            if(cachedNumBlocksChanged)
-            {
-                checkTokenBalanceChanged();
-            }
+        if(cachedNumBlocksChanged)
+        {
+            checkTokenBalanceChanged();
+        }
     }
 }
 
@@ -171,8 +168,8 @@ void WalletModel::updateContractBook(const QString &address, const QString &labe
 
 void WalletModel::checkBalanceChanged()
 {
-    TRY_LOCK(cs_main, lockMain);
-    if (!lockMain) return;
+    //TRY_LOCK(cs_main, lockMain);
+    //if (!lockMain) return;
 
     CAmount newBalance = getBalance();
     CAmount newUnconfirmedBalance = getUnconfirmedBalance();
