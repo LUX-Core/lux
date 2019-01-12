@@ -184,12 +184,9 @@ void tradingDialog::InitTrading()
 void tradingDialog::UpdaterFunction(){
     //LUXst get the main exchange info in order to populate qLabels in maindialog. then get data
     //required for the current tab.
+    std::function<void(void)> f = std::bind(&tradingDialog::SetExchangeInfoTextLabels, this);
+    sendRequest1(QString("https://www.cryptopia.co.nz/api/GetMarket/LUX_BTC"), f);
 
-    int Retval = SetExchangeInfoTextLabels();
-
-    if (Retval == 0){
-        ActionsOnSwitch(-1);
-    }
 }
 
 QString tradingDialog::GetMarketSummary(){
@@ -311,31 +308,46 @@ QString tradingDialog::GetAccountHistory(){
     return Response;
 }
 
-int tradingDialog::SetExchangeInfoTextLabels(){
-    //Get the current exchange information + information for the current open tab if required.
-    QString str = "";
-    QString Response = GetMarketSummary();
+void tradingDialog::SetExchangeInfoTextLabels() {
+    QNetworkReply *reply = qobject_cast<QNetworkReply *>(sender());
+    QString Response = "";
+    if (reply->error() == QNetworkReply::NoError) {
+        //success
+        Response = reply->readAll();
+    }
+    else{
+        //failure
+        qDebug() << "Failure" << reply->errorString();
+        Response = "Error";
+    }
 
-    //Set the labels, parse the json result to get values.
-    QJsonObject obj = GetResultObjectFromJSONObject(Response);
+    reply->deleteLater();
+    if(Response.size() > 0 && Response != "Error"){
 
-    //set labels to richtext to use css.
-    ui->Bid->setTextFormat(Qt::RichText);
-    ui->Ask->setTextFormat(Qt::RichText);
-    ui->volumet->setTextFormat(Qt::RichText);
-    ui->volumebtc->setTextFormat(Qt::RichText);
+        //Get the current exchange information + information for the current open tab if required.
+        QString str = "";
 
-    ui->Ask->setText("<b>"+tr("Ask:")+"</b> <span style='font-weight:bold; font-size:12px; color:Red'>" + str.number(obj["AskPrice"].toDouble(),'i',8) + "</span> BTC");
+        //Set the labels, parse the json result to get values.
+        QJsonObject obj = GetResultObjectFromJSONObject(Response);
 
-    ui->Bid->setText("<b>"+tr("Bid:")+"</b> <span style='font-weight:bold; font-size:12px; color:Green;'>" + str.number(obj["BidPrice"].toDouble(),'i',8) + "</span> BTC");
+        //set labels to richtext to use css.
+        ui->Bid->setTextFormat(Qt::RichText);
+        ui->Ask->setTextFormat(Qt::RichText);
+        ui->volumet->setTextFormat(Qt::RichText);
+        ui->volumebtc->setTextFormat(Qt::RichText);
 
-    ui->volumet->setText("<b>"+tr("LUX Volume:")+"</b> <span style='font-weight:bold; font-size:12px; color:blue;'>" + str.number(obj["Volume"].toDouble(),'i',8) + "</span> LUX");
+        ui->Ask->setText("<b>"+tr("Ask:")+"</b> <span style='font-weight:bold; font-size:12px; color:Red'>" + str.number(obj["AskPrice"].toDouble(),'i',8) + "</span> BTC");
 
-    ui->volumebtc->setText("<b>"+tr("BTC Volume:")+"</b> <span style='font-weight:bold; font-size:12px; color:blue;'>" + str.number(obj["BaseVolume"].toDouble(),'i',8) + "</span> BTC");
+        ui->Bid->setText("<b>"+tr("Bid:")+"</b> <span style='font-weight:bold; font-size:12px; color:Green;'>" + str.number(obj["BidPrice"].toDouble(),'i',8) + "</span> BTC");
 
-    obj.empty();
+        ui->volumet->setText("<b>"+tr("LUX Volume:")+"</b> <span style='font-weight:bold; font-size:12px; color:blue;'>" + str.number(obj["Volume"].toDouble(),'i',8) + "</span> LUX");
 
-    return 0;
+        ui->volumebtc->setText("<b>"+tr("BTC Volume:")+"</b> <span style='font-weight:bold; font-size:12px; color:blue;'>" + str.number(obj["BaseVolume"].toDouble(),'i',8) + "</span> BTC");
+
+        obj.empty();
+
+    }
+    return;
 }
 
 void tradingDialog::CreateOrderBookTables(QTableWidget& Table,QStringList TableHeader){
