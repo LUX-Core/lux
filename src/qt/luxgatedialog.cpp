@@ -1,6 +1,7 @@
 
 #include "luxgatedialog.h"
 #include "luxgateconfigmodel.h"
+#include "luxgate/luxgate.h"
 #include "ui_luxgatedialog.h"
 #include "clientmodel.h"
 #include "walletmodel.h"

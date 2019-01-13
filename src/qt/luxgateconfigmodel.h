@@ -29,6 +29,7 @@ public:
     bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
 
     bool setData(int iRow,int iColumn,  const QVariant &value, int role = Qt::EditRole);
+    QVariant data(int iRow,int iColumn,  int role = Qt::DisplayRole);
 private:
     QList<BlockchainConfig> items;
 };

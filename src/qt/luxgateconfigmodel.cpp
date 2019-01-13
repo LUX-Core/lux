@@ -12,6 +12,11 @@ int LuxgateConfigModel::rowCount(const QModelIndex &parent) const
     return items.size();
 }
 
+QVariant LuxgateConfigModel::data(int iRow, int iColumn, int role)
+{
+    return data(index(iRow, iColumn), role);
+}
+
 QVariant LuxgateConfigModel::data(const QModelIndex &index, int role) const
 {
     QVariant res;
