@@ -9,7 +9,7 @@
 #include <boost/lexical_cast.hpp>
 //tt
 
-int CMasterNode::minProtoVersion = MIN_MN_PROTO_VERSION;
+int CMasterNode::minProtoVersion = MIN_PROTO_VERSION;
 
 CCriticalSection cs_masternodes;
 
@@ -81,7 +81,7 @@ void ProcessMasternode(CNode* pfrom, const std::string& strCommand, CDataStream&
 
         strMessage = addr.ToString() + boost::lexical_cast<std::string>(sigTime) + vchPubKey + vchPubKey2 + boost::lexical_cast<std::string>(protocolVersion);
 
-        if (protocolVersion < MIN_MN_PROTO_VERSION) {
+        if (protocolVersion < MIN_PROTO_VERSION) {
             LogPrintf("dsee - ignoring outdated masternode %s protocol version %d\n", vin.ToString().c_str(), protocolVersion);
             return;
         }

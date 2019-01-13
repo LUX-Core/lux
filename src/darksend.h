@@ -9,6 +9,7 @@
 #include "main.h"
 #include "masternode.h"
 #include "activemasternode.h"
+#include "version.h"
 
 class CTxIn;
 class CDarkSendPool;
@@ -223,7 +224,7 @@ class CDarksendSession
 class CDarkSendPool
 {
 public:
-    static const int MIN_PEER_PROTO_VERSION = 69600;
+    static const int MIN_PEER_PROTO_VERSION = MIN_PROTO_VERSION;
 
     // clients entries
     std::vector<CDarkSendEntry> myEntries;
