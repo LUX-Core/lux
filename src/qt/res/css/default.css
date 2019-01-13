@@ -1045,7 +1045,7 @@ QWidget .QFrame#frameDarksend #formLayoutWidget > .QLabel {
     min-height:25px;
 }
 
-QWidget .QFrame#frameDarksend #formLayoutWidget .QLabel#label_6 { /* Darksend Status Label */
+QWidget .QFrame#frameDarksend #formLayoutWidget .QLabel#darksendEnabledText { /* Darksend Status Label */
     qproperty-alignment: 'AlignVCenter | AlignRight';
     min-width:160px;
     background-color:transparent;
@@ -1058,7 +1058,7 @@ QWidget .QFrame#frameDarksend #formLayoutWidget .QLabel#darksendEnabled { /* Dar
 
 }
 
-QWidget .QFrame#frameDarksend #formLayoutWidget .QLabel#label_7 { /* Darksend Completion Label */
+QWidget .QFrame#frameDarksend #formLayoutWidget .QLabel#labelCompletitionText { /* Darksend Completion Label */
     qproperty-alignment: 'AlignVCenter | AlignRight';
     min-width:160px;
     background-color:transparent;
@@ -1094,7 +1094,7 @@ QWidget .QFrame#frameDarksend #formLayoutWidget .QLabel#labelAnonymized { /* Dar
 
 }
 
-QWidget .QFrame#frameDarksend #formLayoutWidget .QLabel#label_8 { /* Darksend Amount and Rounds Label */
+QWidget .QFrame#frameDarksend #formLayoutWidget .QLabel#labelAmountRoundsText { /* Darksend Amount and Rounds Label */
     qproperty-alignment: 'AlignVCenter | AlignRight';
     min-width:160px;
     background-color:transparent;
@@ -1107,7 +1107,7 @@ QWidget .QFrame#frameDarksend #formLayoutWidget .QLabel#labelAmountRounds { /* D
 
 }
 
-QWidget .QFrame#frameDarksend #formLayoutWidget .QLabel#label_9 { /* Darksend Submitted Denom Label */
+QWidget .QFrame#frameDarksend #formLayoutWidget .QLabel#labelSubmittedDenomText { /* Darksend Submitted Denom Label */
     qproperty-alignment: 'AlignVCenter | AlignRight';
     min-width:160px;
     background-color:transparent;
@@ -1120,7 +1120,7 @@ QWidget .QFrame#frameDarksend #formLayoutWidget .QLabel#labelSubmittedDenom { /*
 
 }
 
-QWidget .QFrame#frameDarksend .QLabel#darksendStatus { /* Darksend Status Notifications */
+QWidget .QFrame#frameDarksend .QLabel#darkSendStatus { /* Darksend Status Notifications */
     qproperty-alignment: 'AlignVCenter | AlignCenter';
     qproperty-geometry: rect(70 226 395 34);
     font-size:11px;
@@ -1202,17 +1202,11 @@ QWidget .QFrame#frame_2 { /* Transactions Widget */
     margin-right:20px;
     margin-left:0;
     margin-top:0;
-    background-image: url(':/images/lux_logo_horizontal');
-    background-repeat:none;
 }
 
 QWidget .QFrame#frame_2 .QLabel#label_4 { /* Recent Transactions Label */
-    min-width:180px;
+    /*min-width:180px;*/
     color:#061532;
-    margin-left:67px;
-    margin-top:83px;
-    margin-right:5px;
-    padding-right:5px;
     font-weight:bold;
     font-size:15px;
     min-height:24px;
@@ -1221,10 +1215,15 @@ QWidget .QFrame#frame_2 .QLabel#label_4 { /* Recent Transactions Label */
 QWidget .QFrame#frame_2 .QLabel#labelTransactionsStatus { /* Recent Transactions Sync Status */
     qproperty-alignment: 'AlignBottom | AlignRight';
     min-width:93px;
-    margin-top:83px;
-    margin-left:16px;
-    margin-right:5px;
     min-height:16px;
+}
+
+QWidget#OverviewPage .QLabel#labelTokens { /* Recent Tokens Label */
+    min-width:180px;
+    color:#061532;
+    font-weight:bold;
+    font-size:15px;
+    min-height:24px;
 }
 
 QWidget .QFrame#frame_2 QListView { /* Transaction List */
@@ -1738,4 +1737,96 @@ QDockWidget::close-button {
 QDockWidget::float-button {
 	top:2px;
 	right:18px
+}
+
+QDialog#Bip38ToolDialog  .QToolButton {
+    background-color:transparent;
+    border: 0;
+    outline: 0;
+}
+
+QDialog#Bip38ToolDialog .QPushButton {
+   margin-right: 0px;
+}
+
+QDialog#Bip38ToolDialog .QPushButton#clearButton_DEC { /* Clear Button */
+    background-color:qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: .01 #f6f6f6, stop: .1 rgba(250, 250, 250, 128), stop: .95 rgba(250, 250, 250, 255), stop: 1 #ebebeb);
+    border:1px solid #d2d2d2;
+    color:#616161;
+    margin-right: 0px;
+}
+
+QDialog#Bip38ToolDialog .QPushButton#clearButton_DEC:hover {
+    background-color:qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: .01 #f6f6f6, stop: .1 rgba(240, 240, 240, 255), stop: .95 rgba(240, 240, 240, 255), stop: 1 #ebebeb);
+    color:#333;
+}
+
+QDialog#Bip38ToolDialog .QPushButton#clearButton_DEC:pressed {
+    border:1px solid #9e9e9e;
+}
+
+QDialog#Bip38ToolDialog .QPushButton#clearButton_ENC { /* Clear Button */
+    background-color:qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: .01 #f6f6f6, stop: .1 rgba(250, 250, 250, 128), stop: .95 rgba(250, 250, 250, 255), stop: 1 #ebebeb);
+    border:1px solid #d2d2d2;
+    color:#616161;
+    margin-right: 0px;
+}
+
+QDialog#Bip38ToolDialog .QPushButton#clearButton_ENC:hover {
+    background-color:qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: .01 #f6f6f6, stop: .1 rgba(240, 240, 240, 255), stop: .95 rgba(240, 240, 240, 255), stop: 1 #ebebeb);
+    color:#333;
+}
+
+QDialog#Bip38ToolDialog .QPushButton#clearButton_ENC:pressed {
+    border:1px solid #9e9e9e;
+}
+
+QDialog#MultiSendDialog .QToolButton {
+    background-color:transparent;
+    border: 0;
+    outline: 0;
+}
+
+QDialog#MultiSendDialog .QLabel#message[status="ok"]{
+   color: green;
+}
+
+QDialog#MultiSendDialog .QLabel#message[status="error"]{
+   color: red;
+}
+
+QDialog#MultiSendDialog .QPushButton {
+   margin-right: 0px;
+}
+
+QDialog#MultiSendDialog .QPushButton#addButton { /* Clear Button */
+    background-color:qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: .01 #f6f6f6, stop: .1 rgba(250, 250, 250, 128), stop: .95 rgba(250, 250, 250, 255), stop: 1 #ebebeb);
+    border:1px solid #d2d2d2;
+    color:#616161;
+    margin-right: 0px;
+}
+
+QDialog#MultiSendDialog .QPushButton#addButton:hover {
+    background-color:qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: .01 #f6f6f6, stop: .1 rgba(240, 240, 240, 255), stop: .95 rgba(240, 240, 240, 255), stop: 1 #ebebeb);
+    color:#333;
+}
+
+QDialog#MultiSendDialog .QPushButton#addButton:pressed {
+    border:1px solid #9e9e9e;
+}
+
+QDialog#MultiSendDialog .QPushButton#deleteButton { /* Clear Button */
+    background-color:qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: .01 #f6f6f6, stop: .1 rgba(250, 250, 250, 128), stop: .95 rgba(250, 250, 250, 255), stop: 1 #ebebeb);
+    border:1px solid #d2d2d2;
+    color:#616161;
+    margin-right: 0px;
+}
+
+QDialog#MultiSendDialog .QPushButton#deleteButton:hover {
+    background-color:qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: .01 #f6f6f6, stop: .1 rgba(240, 240, 240, 255), stop: .95 rgba(240, 240, 240, 255), stop: 1 #ebebeb);
+    color:#333;
+}
+
+QDialog#MultiSendDialog .QPushButton#deleteButton:pressed {
+    border:1px solid #9e9e9e;
 }

@@ -39,7 +39,7 @@ private Q_SLOTS:
     void goTo(const QString& query);
     void back();
     void forward();
-
+    void home();
 private:
     Ui::BlockExplorer* ui;
     bool m_NeverShown;
@@ -50,6 +50,8 @@ private:
     bool switchTo(const QString& query);
     void setContent(const std::string& content);
     void updateNavButtons();
+
+    void Translations();
 };
 
 #endif // BLOCKEXPLORER_H

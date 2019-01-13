@@ -104,6 +104,7 @@ void SplashScreen::slotFinish(QWidget* mainWin)
 {
     Q_UNUSED(mainWin);
     hide();
+    deleteLater();
 }
 
 static void InitMessage(SplashScreen* splash, const std::string& message)

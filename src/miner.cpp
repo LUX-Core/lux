@@ -53,7 +53,8 @@ void FormatHashBuffers(CBlock* pblock, char* pmidstate, char* pdata)
         } block;
     } tmp;
 
-    memset(&tmp, 0, sizeof(tmp));
+    // Check all field below
+    //memset(&tmp, 0, sizeof(tmp));
 
     tmp.block.nVersion       = pblock->nVersion;
     tmp.block.hashPrevBlock  = pblock->hashPrevBlock;
@@ -180,12 +181,12 @@ void BlockAssembler::resetBlock()
     blockFinished = false;
 }
 
-void BlockAssembler::RebuildRefundTransaction(){
-    int refundtx=0; //0 for coinbase in PoW
-    CMutableTransaction contrTx(originalRewardTx);
+void BlockAssembler::RebuildRefundTransaction()
+{
     if (!pblock->IsProofOfStake()) {
-        refundtx=0;
+        int refundtx=0;  //0 for coinbase in PoW
 
+        CMutableTransaction contrTx(originalRewardTx);
         CAmount powReward = GetProofOfWorkReward(0, nHeight);
         CAmount totalReward = powReward + nFees;
         CAmount minerReward = 0;
@@ -217,33 +218,25 @@ void BlockAssembler::RebuildRefundTransaction(){
             contrTx.vout[i]=vout;
             i++;
         }
-    } else {
-        refundtx=1;
-//        contrTx.vout[refundtx].nValue -= bceResult.refundSender;
-//
-//        int i=contrTx.vout.size();
-//        contrTx.vout.resize(contrTx.vout.size()+bceResult.refundOutputs.size());
-//        for(CTxOut& vout : bceResult.refundOutputs){
-//            contrTx.vout[i]=vout;
-//            i++;
-//        }
+
+        pblock->vtx[refundtx] = std::move(CTransaction(contrTx));
     }
-
-    //note, this will need changed for MPoS
-
-    pblock->vtx[refundtx] = std::move(CTransaction(contrTx));
 }
 
 std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlockWithKey(CReserveKey& reservekey, bool fMineWitnessTx, bool fProofOfStake, int64_t* pTotalFees, int32_t txProofTime, int32_t nTimeLimit)
 {
     CPubKey pubkey;
-    if (!reservekey.GetReservedKey(pubkey))
+    if (!reservekey.GetReservedKey(pubkey, true))
         return NULL;
 
     CScript scriptPubKey = CScript() << ToByteVector(pubkey) << OP_CHECKSIG;
     return CreateNewBlock(scriptPubKey, fMineWitnessTx, fProofOfStake, pTotalFees, txProofTime, nTimeLimit);
 }
 
+std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewStake(bool fMineWitnessTx, bool fProofOfStake, int64_t* pTotalFees, int32_t txProofTime, int32_t nTimeLimit)
+{
+    return CreateNewBlock(CScript(), fMineWitnessTx, fProofOfStake, pTotalFees, txProofTime, nTimeLimit);
+}
 
 std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& scriptPubKeyIn, bool fMineWitnessTx, bool fProofOfStake, int64_t* pTotalFees, int32_t txProofTime, int32_t nTimeLimit)
 {
@@ -265,7 +258,8 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
     pblocktemplate->vTxFees.push_back(-1); // updated at end
     pblocktemplate->vTxSigOpsCost.push_back(-1); // updated at end
 
-    LOCK2(cs_main, mempool.cs);
+    //LOCK2(cs_main, mempool.cs);
+    LOCK(cs_main);
     CBlockIndex* pindexPrev = chainActive.Tip();
     if (!pindexPrev) return nullptr;
 
@@ -375,8 +369,8 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
     dev::h256 oldHashStateRoot = getGlobalStateRoot(pindexState);
     dev::h256 oldHashUTXORoot = getGlobalStateUTXO(pindexState);
 
-    addPriorityTxs(minGasPrice);
-    addPackageTxs(minGasPrice);
+    addPriorityTxs(minGasPrice, fProofOfStake);
+    addPackageTxs(minGasPrice, fProofOfStake);
 
     if (chainActive.Height() >= chainparams.FirstSCBlock()) {
         pblock->hashStateRoot = h256Touint(getGlobalStateRoot(pindexState));
@@ -392,7 +386,8 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
     RebuildRefundTransaction();
 
     if (fProofOfStake && bceResult.refundOutputs.size()) {
-        // for now, avoid processing SC in PoS blocks
+        // SC txs are not processed in PoS blocks
+        LogPrintf("%s: PoS Block generation skipped due to %zu SC refund\n", __func__, bceResult.refundOutputs.size());
         return nullptr;
     }
     ////////////////////////////////////////////////////////
@@ -781,7 +776,7 @@ void BlockAssembler::SortForBlock(const CTxMemPool::setEntries& package, CTxMemP
 // Each time through the loop, we compare the best transaction in
 // mapModifiedTxs with the next transaction in the mempool to decide what
 // transaction package to work on next.
-void BlockAssembler::addPackageTxs(uint64_t minGasPrice)
+void BlockAssembler::addPackageTxs(uint64_t minGasPrice, const bool fProofOfStake)
 {
     // mapModifiedTx will store sorted packages after they are modified
     // because some of their txs are already in the block
@@ -913,9 +908,15 @@ void BlockAssembler::addPackageTxs(uint64_t minGasPrice)
             const CTransaction& tx = sortedEntries[i]->GetTx();
             if(wasAdded) {
                 if (tx.HasCreateOrCall()) {
-                    wasAdded = AttemptToAddContractToBlock(sortedEntries[i], minGasPrice);
-                    if(!wasAdded){
-                        if(fUsingModified) {
+                    if (fProofOfStake) {
+                        wasAdded = false; // SC txs not allowed on PoS
+                        if (fUsingModified) {
+                            mapModifiedTx.get<ancestor_score_or_gas_price>().erase(modit);
+                            failedTx.insert(iter);
+                        }
+                    } else {
+                        wasAdded = AttemptToAddContractToBlock(sortedEntries[i], minGasPrice);
+                        if(!wasAdded && fUsingModified) {
                             //this only needs to be done once to mark the whole package (everything in sortedEntries) as failed
                             mapModifiedTx.get<ancestor_score_or_gas_price>().erase(modit);
                             failedTx.insert(iter);
@@ -939,7 +940,7 @@ void BlockAssembler::addPackageTxs(uint64_t minGasPrice)
     }
 }
 
-void BlockAssembler::addPriorityTxs(uint64_t minGasPrice)
+void BlockAssembler::addPriorityTxs(uint64_t minGasPrice, const bool fProofOfStake)
 {
     // How much of the block should be dedicated to high-priority transactions,
     // included regardless of the fees they pay
@@ -1007,8 +1008,9 @@ void BlockAssembler::addPriorityTxs(uint64_t minGasPrice)
             const CTransaction& tx = iter->GetTx();
             bool wasAdded=true;
             if(tx.HasCreateOrCall()) {
+                if (fProofOfStake) continue;
                 wasAdded = AttemptToAddContractToBlock(iter, minGasPrice);
-            }else {
+            } else {
                 AddToBlock(iter);
             }
 
@@ -1053,7 +1055,7 @@ void IncrementExtraNonce(CBlock* pblock, const CBlockIndex* pindexPrev, unsigned
     pblock->hashMerkleRoot = BlockMerkleRoot(*pblock);
 }
 
-bool ProcessBlockFound(CBlock* pblock, CWallet& wallet, CReserveKey& reservekey)
+bool ProcessBlockFound(CBlock* pblock, CWallet& wallet)
 {
     // Found a solution (stake)
     {
@@ -1071,9 +1073,6 @@ bool ProcessBlockFound(CBlock* pblock, CWallet& wallet, CReserveKey& reservekey)
     CAmount generated = GetProofOfStakeReward(0, 0, chainActive.Height()+1);
     generated -= GetMasternodePosReward(chainActive.Height()+1, generated);
     LogPrintf("generated %s\n", FormatMoney(generated));
-
-    // Remove key from key pool
-    reservekey.KeepKey();
 
     bool usePhi2;
     {
@@ -1093,6 +1092,11 @@ bool ProcessBlockFound(CBlock* pblock, CWallet& wallet, CReserveKey& reservekey)
     CValidationState state;
     if (!ProcessNewBlock(state, chainparams, NULL, pblock)) {
         return error("LUXMiner : ProcessNewBlock, block not accepted");
+    }
+
+    {
+        LOCK(stake->stakeMiner.lock);
+        stake->stakeMiner.nBlocksAccepted++;
     }
 
     return true;

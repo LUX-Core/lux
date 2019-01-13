@@ -73,7 +73,7 @@ class TransactionRecord
 {
 public:
     enum Type {
-        Other,
+        Other = 0,
         Generated,
         StakeMint,
         SendToAddress,
@@ -87,7 +87,11 @@ public:
         DarksendCollateralPayment,
         DarksendMakeCollaterals,
         DarksendCreateDenominations,
-        Darksend
+        Darksend,
+        //SCcall,
+        SCsent,
+        SCcreate,
+        SCrefund
     };
 
     /** Number of confirmation recommended for accepting a transaction */

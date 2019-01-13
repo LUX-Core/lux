@@ -20,12 +20,22 @@
 
 using namespace std;
 
-typedef vector<unsigned char> valtype;
+typedef std::vector<unsigned char> valtype;
 
 bool fAcceptDatacarrier = DEFAULT_ACCEPT_DATACARRIER;
 unsigned nMaxDatacarrierBytes = MAX_OP_RETURN_RELAY;
 
 CScriptID::CScriptID(const CScript& in) : uint160(Hash160(in.begin(), in.end())) {}
+
+valtype DataVisitor::operator()(const CNoDestination& noDest) {
+    return valtype();
+}
+valtype DataVisitor::operator()(const CKeyID& keyID) {
+    return valtype(keyID.begin(), keyID.end());
+}
+valtype DataVisitor::operator()(const CScriptID& scriptID) {
+    return valtype(scriptID.begin(), scriptID.end());
+}
 
 const char* GetTxnOutputType(txnouttype t)
 {
@@ -126,7 +136,7 @@ bool Solver(const CScript& scriptPubKey, txnouttype& typeRet, vector<vector<unsi
 
     // Scan templates
     const CScript& script1 = scriptPubKey;
-    for (const PAIRTYPE(txnouttype, CScript)& tplate : mTemplates)
+    for (const std::pair<txnouttype, CScript>& tplate : mTemplates)
     {
         const CScript& script2 = tplate.second;
         vSolutionsRet.clear();
@@ -284,6 +294,24 @@ bool Solver(const CScript& scriptPubKey, txnouttype& typeRet, vector<vector<unsi
     return false;
 }
 
+#include "base58.h"
+
+
+bool ExtractDestination(const COutPoint out, const CScript& script, CTxDestination& addressRet, txnouttype* typeRet) {
+    if (!typeRet) {
+        txnouttype type;
+        typeRet = &type;
+    }
+    if (ExtractDestination(script, addressRet, typeRet))
+        return true;
+    if (*typeRet == TX_CREATE) {
+        addressRet = CKeyID(uint160(LuxState::createLuxAddress(uintToh256(out.hash), out.n).asBytes()));
+        // std::cout << CBitcoinAddress(addressRet).ToString()<< " " << out.hash.GetHex() << " " << out.n << std::endl;
+        return true;
+    }
+    return false;
+}
+
 bool ExtractDestination(const CScript& scriptPubKey, CTxDestination& addressRet, txnouttype *typeRet)
 {
     vector<valtype> vSolutions;
@@ -313,22 +341,19 @@ bool ExtractDestination(const CScript& scriptPubKey, CTxDestination& addressRet,
     {
         addressRet = CScriptID(uint160(vSolutions[0]));
         return true;
-    } else if (whichType == TX_WITNESS_V0_KEYHASH) {
-        WitnessV0KeyHash hash;
-        std::copy(vSolutions[0].begin(), vSolutions[0].end(), hash.begin());
-        addressRet = hash;
+    }
+    else if(whichType == TX_CALL){
+        addressRet = CKeyID(uint160(vSolutions[0]));
         return true;
-    } else if (whichType == TX_WITNESS_V0_SCRIPTHASH) {
-        WitnessV0ScriptHash hash;
-        std::copy(vSolutions[0].begin(), vSolutions[0].end(), hash.begin());
-        addressRet = hash;
+    }
+    else if(whichType == TX_WITNESS_V0_KEYHASH)
+    {
+        addressRet = WitnessV0KeyHash(uint160(vSolutions[0]));
         return true;
-    } else if (whichType == TX_WITNESS_UNKNOWN) {
-        WitnessUnknown unk;
-        unk.version = vSolutions[0][0];
-        std::copy(vSolutions[1].begin(), vSolutions[1].end(), unk.program);
-        unk.length = vSolutions[1].size();
-        addressRet = unk;
+    }
+    else if(whichType == TX_WITNESS_V0_SCRIPTHASH)
+    {
+        addressRet = WitnessV0ScriptHash(uint256(vSolutions[0]));
         return true;
     }
     // Multisig txns have more than one address...
@@ -418,6 +443,48 @@ public:
         return true;
     }
 };
+}
+
+uint160 GetHashForDestination(const CTxDestination& dest)
+{
+    uint160 hashDest = uint160();
+    CScript script;
+    boost::apply_visitor(CScriptVisitor(&script), dest);
+    txnouttype txType = TX_NONSTANDARD;
+    CTxDestination dummyDest;
+    if(ExtractDestination(script, dummyDest, &txType)) {
+        if ((txType == TX_PUBKEYHASH || txType == TX_PUBKEY) && dest.type() == typeid(CKeyID)) {
+            CKeyID addressKey(boost::get<CKeyID>(dest));
+            std::vector<unsigned char> addrBytes(addressKey.begin(), addressKey.end());
+            hashDest = uint160(addrBytes);
+        }
+        else if (txType == TX_SCRIPTHASH && dest.type() == typeid(CScriptID)){
+            CScriptID scriptKey(boost::get<CScriptID>(dest));
+            std::vector<unsigned char> hashBytes(scriptKey.begin(), scriptKey.end());
+            hashDest = uint160(hashBytes);
+        }
+        else if (txType == TX_WITNESS_V0_KEYHASH && script.IsPayToWitnessPubkeyHash()) {
+            int witnessversion = 0;
+            std::vector<unsigned char> addrBytes;
+            if (script.IsWitnessProgram(witnessversion, addrBytes)) {
+                hashDest = addrBytes.size()==20 ? uint160(addrBytes) : Hash160(addrBytes);
+            }
+        }
+        else if (txType == TX_WITNESS_V0_SCRIPTHASH && script.IsPayToWitnessScriptHash()) {
+            int witnessversion = 0;
+            std::vector<unsigned char> addrBytes;
+            if (script.IsWitnessProgram(witnessversion, addrBytes)) {
+                hashDest = addrBytes.size()==20 ? uint160(addrBytes) : Hash160(addrBytes);
+            }
+        }
+        else if ((txType == TX_CALL || txType == TX_CREATE) && dest.type() == typeid(CKeyID)) {
+            CKeyID addressKey(boost::get<CKeyID>(dest));
+            std::vector<unsigned char> addrBytes(addressKey.begin(), addressKey.end());
+            hashDest = uint160(addrBytes);
+        }
+        // TODO: TX_COLDSTAKE if/when merged
+    }
+    return hashDest;
 }
 
 CScript GetScriptForDestination(const CTxDestination& dest)

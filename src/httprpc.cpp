@@ -39,7 +39,7 @@ private:
 class HTTPRPCTimerInterface : public RPCTimerInterface
 {
 public:
-    HTTPRPCTimerInterface(struct event_base* base) : base(base)
+    HTTPRPCTimerInterface(struct event_base* _base) : base(_base)
     {
     }
     const char* Name()
@@ -188,7 +188,7 @@ bool StartHTTPRPC()
 
     assert(EventBase());
     httpRPCTimerInterface = new HTTPRPCTimerInterface(EventBase());
-    RPCRegisterTimerInterface(httpRPCTimerInterface);
+    RPCSetTimerInterface(httpRPCTimerInterface);
     return true;
 }
 
@@ -201,8 +201,11 @@ void StopHTTPRPC()
 {
     LogPrint("rpc", "Stopping HTTP RPC server\n");
     UnregisterHTTPHandler("/", true);
+#ifdef ENABLE_WALLET
+    UnregisterHTTPHandler("/wallet/", false);
+#endif
     if (httpRPCTimerInterface) {
-        RPCUnregisterTimerInterface(httpRPCTimerInterface);
+        RPCUnsetTimerInterface(httpRPCTimerInterface);
         delete httpRPCTimerInterface;
         httpRPCTimerInterface = 0;
     }

@@ -93,14 +93,16 @@ static Checkpoints::MapCheckpoints mapCheckpoints =
                 ( 299500,   uint256("0x94c34653c7b107662f1f44d085be5817d03f8d3f0b3c29b970ce25eb44e03743") )
                 ( 303112,   uint256("0x0000000000026621b448ad1288a7f9762e78a0ef5ab87fcbc016cddc3ded4356") )
                 ( 350095,   uint256("0x000000000007726c464bbdb9bcffc3baf044333f88b79882aa0aefcbe6f0f881") )
+                ( 410000,   uint256("0x000000000008d3f413fdad9d3bf3403d4ea78a7ba94eaf442593ffc4535d4f3d") )
+                ( 460000,   uint256("0x00000000001267a73897a2e01f2fb376e3cb9ddc75c70b31f12d7fd2625879a0") )
 ;
 
 static const Checkpoints::CCheckpointData data = {
         &mapCheckpoints,
-        1533497346, // * UNIX timestamp of last checkpoint block
-        723458,     // * total number of transactions between genesis and last checkpoint
-        //   (the tx=... number in UpdateTip debug.log lines)
-        350058        // * estimated number of transactions per day after checkpoint
+        1540537646, // * UNIX timestamp of last checkpoint block
+        928170,     // * total number of transactions between genesis and last checkpoint
+        //               (the tx=... number in UpdateTip debug.log lines)
+        2438.911721 // * estimated number of transactions per day after checkpoint
 };
 
 static Checkpoints::MapCheckpoints mapCheckpointsTestnet =
@@ -213,23 +215,47 @@ public:
         assert(genesis.hashMerkleRoot == uint256("0xe08ae0cfc35a1d70e6764f347fdc54355206adeb382446dd54c32cd0201000d3"));
 
         ////////////////////////////////////////////////////////////////////////////////////////////////
-        vSeeds.push_back(CDNSSeedData("140.82.21.110", "140.82.21.110"));        // Luxgate seed
-        vSeeds.push_back(CDNSSeedData("149.28.163.40", "149.28.163.40"));        // Main seed
-        vSeeds.push_back(CDNSSeedData("207.148.83.62", "207.148.83.62"));        // Chain state seed
-        vSeeds.push_back(CDNSSeedData("207.148.81.88", "207.148.81.88"));        // Global state seed
-        vSeeds.push_back(CDNSSeedData("149.28.172.147", "149.28.172.147"));      // Main seed
+        vSeeds.push_back(CDNSSeedData("149.28.183.115", "149.28.183.115"));       // Luxgate seed
+        vSeeds.push_back(CDNSSeedData("149.28.163.40", "149.28.163.40"));         // Main seed
+        vSeeds.push_back(CDNSSeedData("45.32.246.142", "45.32.246.142"));         // Chain state seed
+        vSeeds.push_back(CDNSSeedData("207.148.81.88", "207.148.81.88"));         // Global state seed
+        vSeeds.push_back(CDNSSeedData("45.32.240.8", "45.32.240.8"));             // Main seed
         ////////////////////////////////////////////////////////////////////////////////////////////////
-        vSeeds.push_back(CDNSSeedData("45.32.86.162", "45.32.86.162"));           // DNSSeed
+        vSeeds.push_back(CDNSSeedData("45.77.237.16", "45.77.237.16"));           // DNSSeed
         vSeeds.push_back(CDNSSeedData("45.77.127.10", "45.77.127.10"));           // DNSSeed
         vSeeds.push_back(CDNSSeedData("45.32.146.237", "45.32.146.237"));         // DNSSeed
         ////////////////////////////////////////////////////////////////////////////////////////////////
         vSeeds.push_back(CDNSSeedData("89.3.178.185", "89.3.178.185"));           // DNSSeed
-        vSeeds.push_back(CDNSSeedData("104.238.189.30", "104.238.189.30"));           // DNSSeed
-        vSeeds.push_back(CDNSSeedData("51.15.39.62", "51.15.39.62"));         // DNSSeed
-        vSeeds.push_back(CDNSSeedData("108.61.176.178", "108.61.176.178"));           // DNSSeed
+        vSeeds.push_back(CDNSSeedData("104.238.189.30", "104.238.189.30"));       // DNSSeed
+        vSeeds.push_back(CDNSSeedData("51.15.39.62", "51.15.39.62"));             // DNSSeed
+        vSeeds.push_back(CDNSSeedData("108.61.176.178", "108.61.176.178"));       // DNSSeed
         vSeeds.push_back(CDNSSeedData("45.77.224.63", "45.77.224.63"));           // DNSSeed
         vSeeds.push_back(CDNSSeedData("45.77.227.235", "45.77.227.235"));         // DNSSeed
         vSeeds.push_back(CDNSSeedData("45.32.187.166", "45.32.187.166"));         // DNSSeed
+        ////////////////////////////////////////////////////////////////////////////////////////////////
+        vSeeds.push_back(CDNSSeedData("51.15.39.62", "51.15.39.62"));             // DNSSeed
+        vSeeds.push_back(CDNSSeedData("66.42.68.169", "66.42.68.169"));           // DNSSeed
+        vSeeds.push_back(CDNSSeedData("107.191.62.96", "107.191.62.96"));         // DNSSeed
+        vSeeds.push_back(CDNSSeedData("149.28.229.80", "149.28.229.80"));         // DNSSeed
+        vSeeds.push_back(CDNSSeedData("208.167.255.8", "208.167.255.8"));         // DNSSeed
+        vSeeds.push_back(CDNSSeedData("207.246.100.179", "207.246.100.179"));     // DNSSeed
+        vSeeds.push_back(CDNSSeedData("209.250.250.164", "209.250.250.164"));     // DNSSeed
+        vSeeds.push_back(CDNSSeedData("108.61.172.159", "108.61.172.159"));       // DNSSeed
+        vSeeds.push_back(CDNSSeedData("163.172.49.27", "163.172.49.27"));         // DNSSeed
+        ////////////////////////////////////////////////////////////////////////////////////////////////
+        vSeeds.push_back(CDNSSeedData("149.28.145.20", "149.28.145.20"));         // DNSSeed Asia
+        vSeeds.push_back(CDNSSeedData("149.28.150.184", "149.28.150.184"));       // DNSSeed Asia
+        vSeeds.push_back(CDNSSeedData("45.32.115.110", "45.32.115.110"));         // DNSSeed Asia
+        vSeeds.push_back(CDNSSeedData("66.42.51.223", "66.42.51.223"));           // DNSSeed Asia
+        vSeeds.push_back(CDNSSeedData("45.76.159.236", "45.76.159.236"));         // DNSSeed Asia
+        ////////////////////////////////////////////////////////////////////////////////////////////////
+        vSeeds.push_back(CDNSSeedData("149.28.167.57", "149.28.167.57"));         // DNSSeed AUS
+        ////////////////////////////////////////////////////////////////////////////////////////////////
+        vSeeds.push_back(CDNSSeedData("95.179.136.100", "95.179.136.100"));       // DNSSeed Europe
+        vSeeds.push_back(CDNSSeedData("199.247.28.100", "199.247.28.100"));       // DNSSeed Europe
+        vSeeds.push_back(CDNSSeedData("45.63.40.109", "45.63.40.109"));           // DNSSeed Europe
+        vSeeds.push_back(CDNSSeedData("95.179.179.146", "95.179.179.146"));       // DNSSeed Europe
+        vSeeds.push_back(CDNSSeedData("45.76.36.166", "45.76.36.166"));           // DNSSeed Europe
         ////////////////////////////////////////////////////////////////////////////////////////////////
 
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,48); // LUX address start with 'L'
@@ -237,6 +263,9 @@ public:
         base58Prefixes[SECRET_KEY]     = std::vector<unsigned char>(1,155);
         base58Prefixes[EXT_PUBLIC_KEY] = boost::assign::list_of(0x07)(0x28)(0xA2)(0x4E).convert_to_container<std::vector<unsigned char> >();
         base58Prefixes[EXT_SECRET_KEY] = boost::assign::list_of(0x03)(0xD8)(0xA1)(0xE5).convert_to_container<std::vector<unsigned char> >();
+
+        // LUX BIP44 coin type is '1'
+        nExtCoinType = 1;
 
         bech32_hrp = "bc";
 
@@ -363,8 +392,8 @@ public:
         // Testnet lux BIP32 prvkeys start with 'DRKP'
         base58Prefixes[EXT_SECRET_KEY] = boost::assign::list_of(0x3a)(0x80)(0x58)(0x37).convert_to_container<std::vector<unsigned char> >();
         // Testnet lux BIP44 coin type is '1' (All coin's testnet default)
-        base58Prefixes[EXT_COIN_TYPE] = boost::assign::list_of(0x01)(0x00)(0x00)(0x80).convert_to_container<std::vector<unsigned char> >();
-
+        // LUX BIP44 coin type is '1'
+        nExtCoinType = 1;
         bech32_hrp = "tb";
 
         convertSeed6(vFixedSeeds, pnSeed6_test, ARRAYLEN(pnSeed6_test));
@@ -580,7 +609,8 @@ public:
         base58Prefixes[SECRET_KEY]     = std::vector<unsigned char>(1,155);
         base58Prefixes[EXT_PUBLIC_KEY] = boost::assign::list_of(0x07)(0x28)(0xA2)(0x4E).convert_to_container<std::vector<unsigned char> >();
         base58Prefixes[EXT_SECRET_KEY] = boost::assign::list_of(0x03)(0xD8)(0xA1)(0xE5).convert_to_container<std::vector<unsigned char> >();
-
+        // LUX BIP44 coin type is '1'
+        nExtCoinType = 1;
         fMiningRequiresPeers = true;
         fDefaultConsistencyChecks = false;
         fRequireStandard = true;

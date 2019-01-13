@@ -71,12 +71,13 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const CWallet* 
         //
         // Credit
         //
-        for (const CTxOut& txout : wtx.vout) {
+        for (unsigned int i = 0; i < wtx.vout.size(); i++) {
+            const CTxOut& txout = wtx.vout[i];
             isminetype mine = wallet->IsMine(txout);
             if (mine) {
                 TransactionRecord sub(hash, nTime);
                 CTxDestination address;
-                sub.idx = parts.size(); // sequence number
+                sub.idx = i; // sequence number
                 sub.credit = txout.nValue;
                 sub.involvesWatchAddress = mine & ISMINE_WATCH_ONLY;
                 if (ExtractDestination(txout.scriptPubKey, address) && IsMine(*wallet, address)) {
@@ -91,8 +92,9 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const CWallet* 
                 if (wtx.IsCoinBase()) {
                     // Generated
                     sub.type = TransactionRecord::Generated;
+                    if (wtx.IsSCrefund())
+                        sub.type = TransactionRecord::SCrefund;
                 }
-
                 parts.append(sub);
             }
         }
@@ -173,7 +175,7 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const CWallet* 
             for (unsigned int nOut = 0; nOut < wtx.vout.size(); nOut++) {
                 const CTxOut& txout = wtx.vout[nOut];
                 TransactionRecord sub(hash, nTime);
-                sub.idx = parts.size();
+                sub.idx = nOut;
                 sub.involvesWatchAddress = involvesWatchAddress;
 
                 if (wallet->IsMine(txout)) {
@@ -191,6 +193,14 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const CWallet* 
                     // Sent to IP, or other non-address transaction like OP_EVAL
                     sub.type = TransactionRecord::SendToOther;
                     sub.address = mapValue["to"];
+                }
+
+                if (txout.scriptPubKey.HasOpCreate()) {
+                    sub.type = TransactionRecord::SCcreate;
+                    address = CKeyID(uint160(LuxState::createLuxAddress(uintToh256(wtx.GetHash()), nOut).asBytes()));
+                    sub.address = EncodeDestination(address);
+                } else if (txout.scriptPubKey.HasOpCall()) {
+                    sub.type = TransactionRecord::SCsent;
                 }
 
                 if (mapValue["DS"] == "1") {

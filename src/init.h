@@ -16,14 +16,16 @@ namespace boost
 class thread_group;
 } // namespace boost
 
-extern std::string strWalletFile;
 extern CWallet* pwalletMain;
 
 void StartShutdown();
+void StartRestart();
 bool ShutdownRequested();
 void Shutdown();
 void PrepareShutdown();
-bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler);
+bool AppInit2();
+/** Interrupt threads */
+void Interrupt();
 
 /** The help message mode determines what help message to show */
 enum HelpMessageMode {

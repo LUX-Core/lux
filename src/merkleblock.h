@@ -78,7 +78,7 @@ protected:
      * recursive function that traverses tree nodes, consuming the bits and hashes produced by TraverseAndBuild.
      * it returns the hash of the respective node.
      */
-    uint256 TraverseAndExtract(int height, unsigned int pos, unsigned int& nBitsUsed, unsigned int& nHashUsed, std::vector<uint256>& vMatch);
+    uint256 TraverseAndExtract(int height, unsigned int pos, unsigned int& nBitsUsed, unsigned int& nHashUsed, std::vector<uint256>& vMatch, std::vector<unsigned int> &vnIndex);
 
 public:
     /** serialization implementation */
@@ -114,7 +114,7 @@ public:
      * extract the matching txid's represented by this partial merkle tree.
      * returns the merkle root, or 0 in case of failure
      */
-    uint256 ExtractMatches(std::vector<uint256>& vMatch);
+    uint256 ExtractMatches(std::vector<uint256>& vMatch, std::vector<unsigned int> &vnIndex);
 };
 
 
@@ -139,6 +139,11 @@ public:
      * thus the filter will likely be modified.
      */
     CMerkleBlock(const CBlock& block, CBloomFilter& filter);
+
+    // Create from a CBlock, matching the txids in the set
+    CMerkleBlock(const CBlock& block, const std::set<uint256>& txids);
+
+    CMerkleBlock() {}
 
     ADD_SERIALIZE_METHODS;
 

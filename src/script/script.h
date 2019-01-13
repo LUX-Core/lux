@@ -684,6 +684,7 @@ public:
     ///////////////////////////////////////////////// // lux
     bool IsPayToPubkey() const;
     bool IsPayToPubkeyHash() const;
+    bool IsPayToWitnessPubkeyHash() const;
     /////////////////////////////////////////////////
 
     /** Called by IsStandardTx and P2SH/BIP62 VerifyScript (which makes it consensus-critical). */

@@ -341,3 +341,14 @@ void LSRToken::removeToken()
         m_model->removeTokenEntry(sHash);
     }
 }
+
+
+void LSRToken::focusToken(const QModelIndex& idx)
+{
+    if (!m_tokenModel)
+        return;
+    QModelIndex targetIdx = m_tokenModel->mapFromSource(idx);
+    ui->tokensList->scrollTo(targetIdx);
+    ui->tokensList->setCurrentIndex(targetIdx);
+    ui->tokensList->setFocus();
+}

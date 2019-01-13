@@ -5,7 +5,7 @@
 Luxcore is GNU AGPLv3 licensed.
 
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2F216k155%2Flux.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2F216k155%2Flux?ref=badge_shield) [![Build Status](https://travis-ci.org/LUX-Core/lux.svg?branch=master)](https://travis-ci.org/LUX-Core/lux) [![GitHub version](https://badge.fury.io/gh/LUX-Core%2Flux.png)](https://badge.fury.io/gh/LUX-Core%2Flux.png) [![HitCount](http://hits.dwyl.io/216k155/lux.svg)](http://hits.dwyl.io/216k155/lux)
-<a href="https://discord.gg/27xFP5Y"><img src="https://discordapp.com/api/guilds/364500397999652866/embed.png" alt="Discord server" /></a> <a href="https://twitter.com/intent/follow?screen_name=LUX_COIN"><img src="https://img.shields.io/twitter/follow/LUX_COIN.svg?style=social&logo=twitter" alt="follow on Twitter"></a>
+<a href="https://discord.gg/A6YW6uh"><img src="https://discordapp.com/api/guilds/364500397999652866/embed.png" alt="Discord server" /></a> <a href="https://twitter.com/intent/follow?screen_name=LUX_COIN"><img src="https://img.shields.io/twitter/follow/LUX_COIN.svg?style=social&logo=twitter" alt="follow on Twitter"></a>
                                                                                                                                                      
 [![Build history](https://buildstats.info/travisci/chart/LUX-Core/lux?branch=master)](https://travis-ci.org/LUX-Core/lux?branch=master)
 
@@ -22,6 +22,8 @@ Features
 * New PHI2 PoW/PoS hybrid algorithm
 * Luxgate
 * Parallel masternode
+  * [Banking layer](#)
+  * [Proof of file storage (Decentralised distributed file storage)](doc/Technical-description-of-the-implementation-of-a-distributed-file-storage.md)
 * ~~PHI1612 PoW/PoS hybrid algorithm~~
 
 The Luxcore Project is a decentralized peer-to-peer banking financial platform, created under an open source license, featuring a built-in cryptocurrency, end-to-end encrypted messaging and decentralized marketplace. The decentralized network aims to provide anonymity and privacy for everyone through a simple user-friendly interface by taking care of all the advanced cryptography in the background.
@@ -139,17 +141,21 @@ Install the OS X command line tools:
 
 When the popup appears, click `Install`.
 
+If you're running macOS Mojave 10.14/Xcode 10.0 or later, and want to use the depends system, you'll also need to use the following script to install the macOS system headers into /usr/include.
+
+    open /Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_10.14.pkg
+
 Then install [Homebrew](https://brew.sh)
 
     /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 
 #### Dependencies
 
-    brew install cmake automake berkeley-db4 leveldb libtool boost@1.66 --c++11 --without-single --without-static miniupnpc openssl pkg-config protobuf qt5 libevent imagemagick --with-librsvg
+    brew install cmake automake berkeley-db4 leveldb libtool boost@1.64 --c++11 --without-single --without-static miniupnpc openssl pkg-config protobuf qt5 libevent imagemagick --with-librsvg
 
-Link boost 1.66
+Link boost 1.64
 
-    brew link boost@1.66 --force
+    brew link boost@1.64 --force
 
 #### Build Luxcore
 

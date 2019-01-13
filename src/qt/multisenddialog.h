@@ -7,9 +7,11 @@ namespace Ui
 {
 class MultiSendDialog;
 }
+
 class PlatformStyle;
 class WalletModel;
 class QLineEdit;
+
 class MultiSendDialog : public QDialog
 {
     Q_OBJECT

@@ -45,6 +45,7 @@ private:
 
 private slots:
     void slotClickResetConfiguration();
+    void slotClickChangeConfig();
 };
 
 #endif //__LUXGATE_DIALOG_H__

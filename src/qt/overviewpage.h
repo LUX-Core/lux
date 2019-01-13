@@ -16,6 +16,7 @@ class TxViewDelegate;
 class TknViewDelegate;
 class WalletModel;
 class PlatformStyle;
+class QSortFilterProxyModel;
 
 namespace Ui {
 class OverviewPage;
@@ -46,6 +47,7 @@ Q_SIGNALS:
     void transactionClicked(const QModelIndex& index);
     void addTokenClicked(bool toAddTokenPage);
     void outOfSyncWarningClicked();
+    void tokenClicked(const QModelIndex& index);
 
 private:
     QTimer* timer;
@@ -65,6 +67,7 @@ private:
     TxViewDelegate* txdelegate;
     TknViewDelegate *tkndelegate;
     TransactionFilterProxy* filter;
+    QSortFilterProxyModel *tokenProxyModel;
     void DisableDarksend();
 
 private slots:
@@ -75,6 +78,7 @@ private slots:
     void updateDarkSendProgress();
     void updateAdvancedUI(bool fShowAdvancedUI);
     void handleTransactionClicked(const QModelIndex& index);
+    void handleTokenClicked(const QModelIndex& index);
     void updateAlerts(const QString& warnings);
     void updateWatchOnlyLabels(bool showWatchOnly);
     void on_buttonAddToken_clicked();

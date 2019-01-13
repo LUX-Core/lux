@@ -72,7 +72,7 @@ CoinControlDialog::CoinControlDialog(const PlatformStyle *platformStyle, QWidget
     unlockAction = new QAction(tr("Unlock unspent"), this);                   // we need to enable/disable this
 
     // context menu
-    contextMenu = new QMenu();
+    contextMenu = new QMenu(this);
     contextMenu->addAction(copyAddressAction);
     contextMenu->addAction(copyLabelAction);
     contextMenu->addAction(copyAmountAction);
@@ -678,6 +678,8 @@ void CoinControlDialog::updateLabels(WalletModel* model, QDialog* dialog)
 
         // Fee
         nPayFee = CWallet::GetMinimumFee(nBytes, nTxConfirmTarget, mempool);
+        if (nPayFee > 0 && coinControl->nMinimumTotalFee > nPayFee)
+            nPayFee = coinControl->nMinimumTotalFee;
 
         // IX Fee
         if (coinControl->useInstanTX) nPayFee = max(nPayFee, CENT);
@@ -692,8 +694,10 @@ void CoinControlDialog::updateLabels(WalletModel* model, QDialog* dialog)
                 nPayFee = 0;
 
         if (nPayAmount > 0) {
-            if (!CoinControlDialog::fSubtractFeeFromAmount)
+            nChange = nAmount - nPayAmount;
+            if (!CoinControlDialog::fSubtractFeeFromAmount) {
                 nChange -= nPayFee;
+             }
 
             // DS Fee = overpay
             if (coinControl->useDarksend && nChange > 0) {
@@ -720,9 +724,7 @@ void CoinControlDialog::updateLabels(WalletModel* model, QDialog* dialog)
         }
 
         // after fee
-        nAfterFee = nAmount - nPayFee;
-        if (nAfterFee < 0)
-            nAfterFee = 0;
+        nAfterFee = std::max<CAmount>(nAmount - nPayFee, 0);
 
         // if use Split UTXO
         if (CoinControlDialog::nSplitBlockDummy > 1 && CoinControlDialog::coinControl->fSplitBlock) {
@@ -857,8 +859,8 @@ void CoinControlDialog::updateView()
     map<QString, vector<COutput> > mapCoins;
     model->listCoins(mapCoins);
 
-    for (PAIRTYPE(QString, vector<COutput>) coins : mapCoins) {
-        CCoinControlWidgetItem *itemWalletAddress = new CCoinControlWidgetItem();
+    for (std::pair<QString, vector<COutput>> coins : mapCoins) {
+        QTreeWidgetItem* itemWalletAddress = new QTreeWidgetItem();
         itemWalletAddress->setCheckState(COLUMN_CHECKBOX, Qt::Unchecked);
         QString sWalletAddress = coins.first;
         QString sWalletLabel = model->getAddressTableModel()->labelForAddress(sWalletAddress);

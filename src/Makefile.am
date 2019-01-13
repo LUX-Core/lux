@@ -72,10 +72,13 @@ endif
 BITCOIN_CORE_H = \
   activemasternode.h \
   addrman.h \
+  addressindex.h \
   alert.h \
   allocators.h \
   amount.h \
   base58.h \
+  bip39.h \
+  bip39_english.h \
   bech32.h \
   bip38.h \
   bloom.h \
@@ -102,6 +105,7 @@ BITCOIN_CORE_H = \
   darksend.h \
   db.h \
   hash.h \
+  hdchain.h \
   indirectmap.h \
   init.h \
   instantx.h \
@@ -146,11 +150,13 @@ BITCOIN_CORE_H = \
   script/standard.h \
   script/script_error.h \
   serialize.h \
+  spentindex.h \
   spork.h \
   stake.h \
   streams.h \
   support/allocators/zeroafterfree.h \
   support/cleanse.h \
+  support/events.h \
   sync.h \
   threadsafety.h \
   timedata.h \
@@ -183,6 +189,7 @@ if ENABLE_LUXGATE
 BITCOIN_CORE_H += \
   luxgate/atomicswap.h \
   luxgate/lgconfig.h \
+  luxgate/http.h \
   luxgate/zmqsub.h \
   luxgate/blockchainclient.h \
   luxgate/luxgate.h
@@ -232,7 +239,6 @@ libbitcoin_server_a_SOURCES = \
   validationinterface.cpp \
   versionbits.cpp \
   lux/luxstate.cpp \
-  lux/luxtransaction.cpp \
   lux/luxDGP.cpp \
   lux/storageresults.cpp \
   $(BITCOIN_CORE_H)
@@ -242,6 +248,7 @@ libbitcoin_server_a_SOURCES += \
   luxgate/lgconfig.cpp \
   luxgate/atomicswap.cpp \
   luxgate/zmqsub.cpp \
+  luxgate/http.cpp \
   luxgate/blockchainclient.cpp \
   luxgate/rpcluxgate.cpp \
   luxgate/luxgate.cpp
@@ -412,6 +419,7 @@ libbitcoin_common_a_SOURCES = \
   allocators.cpp \
   amount.cpp \
   base58.cpp \
+  bip39.cpp \
   bech32.cpp \
   bip38.cpp \
   chainparams.cpp \
@@ -422,6 +430,7 @@ libbitcoin_common_a_SOURCES = \
   core_read.cpp \
   core_write.cpp \
   hash.cpp \
+  hdchain.cpp \
   key.cpp \
   keystore.cpp \
   netbase.cpp \
@@ -434,7 +443,6 @@ libbitcoin_common_a_SOURCES = \
   script/standard.cpp \
   script/script_error.cpp \
   spork.cpp \
-  ui_interface.cpp \
   cpp-ethereum/libdevcore/Base64.cpp \
   cpp-ethereum/libdevcore/Base64.h \
   cpp-ethereum/libdevcore/Common.cpp \
@@ -594,7 +602,6 @@ libbitcoin_common_a_SOURCES = \
   cpp-ethereum/libethash/io.h \
   cpp-ethereum/libethash/ethash.h \
   cpp-ethereum/libethash/internal.h \
-  cpp-ethereum/libethash/mmap_win32.c \
   cpp-ethereum/utils/json_spirit/JsonSpiritHeaders.h \
   cpp-ethereum/utils/json_spirit/json_spirit.h \
   cpp-ethereum/utils/json_spirit/json_spirit_error_position.h \
@@ -610,6 +617,7 @@ libbitcoin_common_a_SOURCES = \
 if TARGET_WINDOWS
     libbitcoin_common_a_SOURCES += \
       cpp-ethereum/libethash/io_win32.c \
+      cpp-ethereum/libethash/mmap_win32.c \
       cpp-ethereum/libethash/util_win32.c
 else
     libbitcoin_common_a_SOURCES += cpp-ethereum/libethash/io_posix.c

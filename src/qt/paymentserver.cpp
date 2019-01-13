@@ -543,7 +543,7 @@ bool PaymentServer::processPaymentRequest(PaymentRequestPlus& request, SendCoins
     QList<std::pair<CScript, CAmount> > sendingTos = request.getPayTo();
     QStringList addresses;
 
-    Q_FOREACH (const PAIRTYPE(CScript, CAmount) & sendingTo, sendingTos) {
+    for (const std::pair<CScript, CAmount>& sendingTo : sendingTos) {
         // Extract and check destination addresses
         CTxDestination dest;
         if (ExtractDestination(sendingTo.first, dest)) {
@@ -619,7 +619,7 @@ void PaymentServer::fetchPaymentACK(CWallet* wallet, SendCoinsRecipient recipien
         refund_to->set_script(&s[0], s.size());
     } else {
         CPubKey newKey;
-        if (wallet->GetKeyFromPool(newKey)) {
+        if (wallet->GetKeyFromPool(newKey, false)) {
             CKeyID keyID = newKey.GetID();
             wallet->SetAddressBook(keyID, strAccount, "refund");
 

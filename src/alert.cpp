@@ -5,7 +5,6 @@
 
 #include "alert.h"
 
-#include "chainparams.h"
 #include "clientversion.h"
 #include "net.h"
 #include "pubkey.h"
@@ -142,9 +141,9 @@ bool CAlert::RelayTo(CNode* pnode) const
     return false;
 }
 
-bool CAlert::CheckSignature() const
+bool CAlert::CheckSignature(const std::vector<unsigned char>& alertKey) const
 {
-    CPubKey key(Params().AlertKey());
+    CPubKey key(alertKey);
     if (!key.Verify(Hash(vchMsg.begin(), vchMsg.end()), vchSig))
         return error("CAlert::CheckSignature() : verify signature failed");
 
@@ -166,9 +165,9 @@ CAlert CAlert::getAlertByHash(const uint256& hash)
     return retval;
 }
 
-bool CAlert::ProcessAlert(bool fThread)
+bool CAlert::ProcessAlert(const std::vector<unsigned char>& alertKey, bool fThread)
 {
-    if (!CheckSignature())
+    if (!CheckSignature(alertKey))
         return false;
     if (!IsInEffect())
         return false;
@@ -211,7 +210,7 @@ bool CAlert::ProcessAlert(bool fThread)
         }
 
         // Check if this alert has been cancelled
-        for (PAIRTYPE(const uint256, CAlert) & item : mapAlerts) {
+        for (std::pair<const uint256, CAlert> & item : mapAlerts) {
             const CAlert& alert = item.second;
             if (alert.Cancels(*this)) {
                 LogPrint("alert", "alert already cancelled by %d\n", alert.nID);

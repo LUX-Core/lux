@@ -8,6 +8,7 @@
 
 #include "amount.h"
 #include "db.h"
+#include "hdchain.h"
 #include "key.h"
 #include "keystore.h"
 
@@ -45,9 +46,13 @@ enum DBErrors {
 class CKeyMetadata
 {
 public:
-    static const int CURRENT_VERSION = 1;
+    static const int VERSION_BASIC=1;
+    static const int VERSION_WITH_HDDATA=10;
+    static const int CURRENT_VERSION=VERSION_WITH_HDDATA;
     int nVersion;
     int64_t nCreateTime; // 0 means unknown
+    CKeyID hdMasterKeyID; //id of the hd masterkey used to derive this key
+    std::string hdKeypath; //optional HD/bip32 keypath
 
     CKeyMetadata()
     {
@@ -55,7 +60,7 @@ public:
     }
     CKeyMetadata(int64_t nCreateTime_)
     {
-        nVersion = CKeyMetadata::CURRENT_VERSION;
+        SetNull();
         nCreateTime = nCreateTime_;
     }
 
@@ -67,12 +72,19 @@ public:
         READWRITE(this->nVersion);
         nVersion = this->nVersion;
         READWRITE(nCreateTime);
+        if (this->nVersion >= VERSION_WITH_HDDATA)
+        {
+            READWRITE(hdKeypath);
+            READWRITE(hdMasterKeyID);
+        }
     }
 
     void SetNull()
     {
         nVersion = CKeyMetadata::CURRENT_VERSION;
         nCreateTime = 0;
+        hdKeypath.clear();
+
     }
 };
 
@@ -100,7 +112,7 @@ public:
         READWRITE(sAlias);
         READWRITE(sAddress);
         READWRITE(sCollateralAddress);
-	READWRITE(sMasternodePrivKey);
+	    READWRITE(sMasternodePrivKey);
     }
 };
 
@@ -108,7 +120,7 @@ public:
 class CWalletDB : public CDB
 {
 public:
-    CWalletDB(const std::string& strFilename, const char* pszMode = "r+", bool fFlushOnClose = true) : CDB(strFilename, pszMode, fFlushOnClose)
+    CWalletDB(const std::string& strFilename, const char* pszMode = "r+", bool _fFlushOnClose = true) : CDB(strFilename, pszMode, _fFlushOnClose)
     {
     }
 
@@ -118,7 +130,7 @@ public:
     bool WritePurpose(const std::string& strAddress, const std::string& purpose);
     bool ErasePurpose(const std::string& strAddress);
 
-    bool WriteTx(uint256 hash, const CWalletTx& wtx);
+    bool WriteTx(const CWalletTx& wtx);
     bool EraseTx(uint256 hash);
 
     bool WriteToken(const CTokenInfo& wtoken);
@@ -176,7 +188,7 @@ public:
     bool EraseContractData(const std::string &address, const std::string &key);
 
 
-    bool WriteAccountingEntry_Backend(const CAccountingEntry& acentry);
+    bool WriteAccountingEntry(const CAccountingEntry& acentry);
     CAmount GetAccountCreditDebit(const std::string& strAccount);
     void ListAccountCreditDebit(const std::string& strAccount, std::list<CAccountingEntry>& acentries);
 
@@ -184,10 +196,17 @@ public:
     DBErrors LoadWallet(CWallet* pwallet);
     DBErrors FindWalletTx(CWallet* pwallet, std::vector<uint256>& vTxHash, std::vector<CWalletTx>& vWtx);
     DBErrors ZapWalletTx(CWallet* pwallet, std::vector<CWalletTx>& vWtx);
+    DBErrors ZapSelectTx(CWallet* pwallet, std::vector<uint256>& vHashIn, std::vector<uint256>& vHashOut);
     static bool Recover(CDBEnv& dbenv, std::string filename, bool fOnlyKeys);
     static bool Recover(CDBEnv& dbenv, std::string filename);
     static unsigned int GetUpdateCounter();
 
+    //! write the hdchain model (external chain child index counter)
+    bool WriteHDChain(const CHDChain& chain);
+    bool WriteCryptedHDChain(const CHDChain& chain);
+    bool WriteHDPubKey(const CHDPubKey& hdPubKey, const CKeyMetadata& keyMeta);
+
+    static void IncrementUpdateCounter();
 private:
     CWalletDB(const CWalletDB&);
     void operator=(const CWalletDB&);
@@ -200,7 +219,5 @@ bool BackupWallet(const CWallet& wallet, const std::string& strDest);
 void MaybeFlushWalletDB();
 
 void ThreadFlushWalletDB(const std::string& strFile);
-
-bool AutoBackupWallet(CWallet* wallet, std::string strWalletFile, std::string& strBackupWarning, std::string& strBackupError);
 
 #endif // BITCOIN_WALLETDB_H

@@ -19,8 +19,6 @@
 #include "utilstrencodings.h"
 #include "utiltime.h"
 
-#include <json/json_spirit_reader.h>
-
 #include <stdarg.h>
 
 #include <boost/date_time/posix_time/posix_time.hpp>
@@ -146,7 +144,6 @@ void locking_callback(int mode, int i, const char* file, int line)
         LEAVE_CRITICAL_SECTION(*ppmutexOpenSSL[i]);
     }
 }
-
 
 // Init
 class CInit
@@ -403,7 +400,7 @@ void ParseParameters(int argc, const char* const argv[])
     }
 
     // New 0.6 features:
-    for (const PAIRTYPE(string, string) & entry : mapArgs) {
+    for (const std::pair<string, string> & entry : mapArgs) {
         // interpret -nofoo as -foo=0 (and -nofoo=0 as -foo=1) as long as -foo not set
         InterpretNegativeSetting(entry.first, mapArgs);
     }
@@ -467,6 +464,27 @@ bool SoftSetBoolArg(const std::string& strArg, bool fValue)
         return SoftSetArg(strArg, std::string("1"));
     else
         return SoftSetArg(strArg, std::string("0"));
+}
+
+void ForceSetArg(const std::string& strArg, const std::string& strValue)
+{
+    //LOCK(cs_args);
+    mapArgs[strArg] = strValue;
+}
+
+static const int screenWidth = 79;
+static const int optIndent = 2;
+static const int msgIndent = 7;
+
+std::string HelpMessageGroup(const std::string &message) {
+    return std::string(message) + std::string("\n\n");
+}
+
+std::string HelpMessageOpt(const std::string &option, const std::string &message) {
+    return std::string(optIndent,' ') + std::string(option) +
+           std::string("\n") + std::string(msgIndent,' ') +
+           FormatParagraph(message, screenWidth - msgIndent, msgIndent) +
+           std::string("\n\n");
 }
 
 static std::string FormatException(std::exception* pex, const char* pszThread)
@@ -556,32 +574,6 @@ const boost::filesystem::path& GetDataDir(bool fNetSpecific)
     return path;
 }
 
-static boost::filesystem::path backupsDirCached;
-static CCriticalSection csBackupsDirCached;
-
-const boost::filesystem::path &GetBackupsDir()
-{
-    namespace fs = boost::filesystem;
-
-    LOCK(csBackupsDirCached);
-
-    fs::path &backupsDir = backupsDirCached;
-
-    if (!backupsDir.empty())
-        return backupsDir;
-
-    if (mapArgs.count("-walletbackupsdir")) {
-        backupsDir = fs::absolute(mapArgs["-walletbackupsdir"]);
-        // Path must exist
-        if (fs::is_directory(backupsDir)) return backupsDir;
-        LogPrintf("%s: Warning: incorrect parameter -walletbackupsdir, path must exist! Using default path.\n", __func__);
-    }
-    // Default path
-    backupsDir = GetDataDir() / "backups";
-
-    return backupsDir;
-}
-
 void ClearDatadirCache()
 {
     pathCached = boost::filesystem::path();
@@ -596,6 +588,7 @@ boost::filesystem::path GetConfigFile()
 
     return pathConfigFile;
 }
+
 boost::filesystem::path GetMasternodeConfigFile()
 {
     boost::filesystem::path pathConfigFile(GetArg("-mnconf", "masternode.conf"));
@@ -687,7 +680,7 @@ bool TryCreateDirectory(const boost::filesystem::path& p)
 {
     try {
         return boost::filesystem::create_directory(p);
-    } catch (boost::filesystem::filesystem_error) {
+    } catch (boost::filesystem::filesystem_error& e) {
         if (!boost::filesystem::exists(p) || !boost::filesystem::is_directory(p))
             throw;
     }

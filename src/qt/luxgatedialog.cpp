@@ -65,6 +65,8 @@ LuxgateDialog::LuxgateDialog(QWidget *parent) :
         ui->tableViewConfiguration->setModel(new LuxgateConfigModel(this));
         connect(ui->pushButtonResetConfig, &QPushButton::clicked,
                 this, &LuxgateDialog::slotClickResetConfiguration);
+        connect(ui->pushButtonChangeConfig, &QPushButton::clicked,
+                this, &LuxgateDialog::slotClickChangeConfig);
         slotClickResetConfiguration();
     }
 }
@@ -133,11 +135,25 @@ void LuxgateDialog::slotClickResetConfiguration()
     {
         BlockchainConfig conf = it.second;
         model->insertRows(model->rowCount(), 1);
-        model->setData(model->rowCount(),
-                LuxgateConfigModel::TickerColumn,
+        model->setData(model->rowCount(), 0,
                 QVariant::fromValue(conf),
                 LuxgateConfigModel::AllDataRole);
     }
+}
+
+void LuxgateDialog::slotClickChangeConfig()
+{
+    std::map<std::string, BlockchainConfig> configs;
+    //fill in configs
+    {
+        auto model = qobject_cast<LuxgateConfigModel *>(ui->tableViewConfiguration->model());
+        for(int iR=0; iR<model->rowCount(); iR++)
+        {
+            BlockchainConfig conf = qvariant_cast<BlockchainConfig>(model->data(iR, 0, LuxgateConfigModel::AllDataRole));
+            configs[conf.ticker] = conf;
+        }
+    }
+    ChangeLuxGateConfiguration(configs);
 }
 
 LuxgateDialog::~LuxgateDialog()

@@ -1,8 +1,8 @@
 dnl require autoconf 2.60 (AS_ECHO/AS_ECHO_N)
 AC_PREREQ([2.60])
 define(_CLIENT_VERSION_MAJOR, 5)
-define(_CLIENT_VERSION_MINOR, 2)
-define(_CLIENT_VERSION_REVISION, 3)
+define(_CLIENT_VERSION_MINOR, 3)
+define(_CLIENT_VERSION_REVISION, 0)
 define(_CLIENT_VERSION_BUILD, 0)
 define(_CLIENT_VERSION_IS_RELEASE, true)
 define(_COPYRIGHT_YEAR, 2018)
@@ -658,7 +658,7 @@ AC_LINK_IFELSE([AC_LANG_SOURCE([
       use_reduce_exports=no
   ]
 )
-
+# Check thread_local
 TEMP_LDFLAGS="$LDFLAGS"
 LDFLAGS="$TEMP_LDFLAGS $PTHREAD_CFLAGS"
 AC_MSG_CHECKING([for thread_local support])
@@ -1282,7 +1282,10 @@ PKGCONFIG_LIBDIR_TEMP="$PKG_CONFIG_LIBDIR"
 unset PKG_CONFIG_LIBDIR
 PKG_CONFIG_LIBDIR="$PKGCONFIG_LIBDIR_TEMP"
 
-ac_configure_args="${ac_configure_args} --disable-shared --with-pic --with-bignum=no --enable-module-recovery --enable-module-ecdh --enable-experimental --disable-jni"
+ac_configure_args="${ac_configure_args} --disable-shared --with-bignum=no --enable-module-recovery --enable-module-ecdh --enable-experimental --disable-jni"
+if test "$TARGET_OS" = "windows"; then
+ac_configure_args="$ac_configure_args --with-asm=no --with-field=32bit --with-scalar=32bit"
+fi
 AC_CONFIG_SUBDIRS([src/secp256k1])
 
 AC_OUTPUT

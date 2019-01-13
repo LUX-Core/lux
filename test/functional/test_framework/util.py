@@ -344,7 +344,7 @@ def disconnect_nodes(from_connection, node_num):
     else:
         raise AssertionError("timed out waiting for disconnect")
 
-def connect_nodes(from_connection, node_num):
+def connect_nodes(from_connection, node_num, expect_luxgate=False):
     ip_port = "127.0.0.1:" + str(p2p_port(node_num))
     from_connection.addnode(ip_port, "onetry")
     # poll until version handshake complete to avoid race conditions
@@ -355,7 +355,11 @@ def connect_nodes(from_connection, node_num):
         if len(pi) > 0:
             for peer in pi:
                 if peer['addr'] == ip_port:
-                    return
+                    if expect_luxgate:
+                        if peer['luxgateversion'] != 0:
+                            return
+                    else:
+                        return
     raise AssertionError('timed out waiting for peer connect')
    
 

@@ -1,11 +1,11 @@
 ---
 name: "lux-win-signer"
 suites:
-- "trusty"
+- "bionic"
 architectures:
 - "amd64"
 packages:
-- "libssl-dev"
+- "libssl1.0-dev"
 - "autoconf"
 remotes:
 - "url": "https://github.com/216k155/detached-sigs.git"
