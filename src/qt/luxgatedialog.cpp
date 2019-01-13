@@ -83,6 +83,8 @@ LuxgateDialog::LuxgateDialog(QWidget *parent) :
                 this, &LuxgateDialog::slotClickChangeConfig);
         connect(configModel, &LuxgateConfigModel::dataChanged,
                 this, &LuxgateDialog::slotConfigDataChanged);
+        connect(ui->pushButtonAddConfiguration, &QPushButton::clicked,
+                this, &LuxgateDialog::slotClickAddConfiguration);
     }
 }
 
@@ -153,15 +155,15 @@ void LuxgateDialog::setModel(WalletModel *model)
 
 void LuxgateDialog::slotClickResetConfiguration()
 {
-    auto model = qobject_cast<LuxgateConfigModel*>(ui->tableViewConfiguration->model());
-    model->removeRows(0, model->rowCount());
+    auto modelConfig = qobject_cast<LuxgateConfigModel*>(ui->tableViewConfiguration->model());
+    modelConfig->removeRows(0, modelConfig->rowCount());
     // Read LuxGate config
     std::map<std::string, BlockchainConfig> config = ReadLuxGateConfigFile();
     for (auto it : config)
     {
         BlockchainConfigQt conf(it.second);
-        model->insertRows(model->rowCount(), 1);
-        model->setData(model->rowCount()-1, 0,
+        modelConfig->insertRows(modelConfig->rowCount(), 1);
+        modelConfig->setData(modelConfig->rowCount()-1, 0,
                 QVariant::fromValue(conf),
                 LuxgateConfigModel::AllDataRole);
     }
@@ -181,6 +183,15 @@ void LuxgateDialog::slotClickChangeConfig()
             configs[conf.ticker] = conf;
         }
     }
+    //check Valid configs
+    for (auto it : configs)
+    {
+        if(!isValidBlockchainConfig(it.second))
+        {
+            QMessageBox::critical(this, tr("Luxgate"), tr("Configuration is not valid!"));
+            return;
+        }
+    }
     bool bChange = ChangeLuxGateConfiguration(configs);
     if(bChange)
     {
@@ -191,6 +202,14 @@ void LuxgateDialog::slotClickChangeConfig()
     {
         QMessageBox::critical(this, tr("Luxgate"), tr("Error while changing configuration"));
     }
+}
+
+void LuxgateDialog::slotClickAddConfiguration()
+{
+    auto modelConfig = qobject_cast<LuxgateConfigModel*>(ui->tableViewConfiguration->model());
+    modelConfig->insertRows(modelConfig->rowCount(), 1);
+    ui->pushButtonResetConfig->setEnabled(true);
+    ui->pushButtonChangeConfig->setEnabled(true);
 }
 
 LuxgateDialog::~LuxgateDialog()

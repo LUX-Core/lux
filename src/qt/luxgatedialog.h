@@ -44,6 +44,7 @@ private:
     QDockWidget* createDock(QWidget* widget, const QString& title);
 
 private slots:
+    void slotClickAddConfiguration();
     void slotClickResetConfiguration();
     void slotClickChangeConfig();
     void slotConfigDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles);
