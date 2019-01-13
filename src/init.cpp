@@ -1159,7 +1159,7 @@ bool AppInit2()
     }
 
     //ignore masternodes below protocol version
-    CMasterNode::minProtoVersion = GetArg("-masternodeminprotocol", MIN_MN_PROTO_VERSION);
+    CMasterNode::minProtoVersion = GetArg("-masternodeminprotocol", MIN_PROTO_VERSION);
 
     int64_t nStart = 0;
 
