@@ -411,6 +411,7 @@ int randomizeList(int i) { return std::rand() % i; }
 // Recursively determine the rounds of a given input (How deep is the darksend chain for a given input)
 int GetInputDarksendRounds(CTxIn in, int rounds) {
     if (rounds >= 17) return rounds;
+    if (rounds > nDarksendRounds || nDarksendRounds <= 0 || !fEnableDarksend) return rounds; // once we hit the max rounds setting, there's no point going further back (this func is only used for selecting qualifying txs)
 
     std::string padding = "";
     padding.insert(0, ((rounds + 1) * 5) + 3, ' ');

@@ -748,7 +748,7 @@ static void NotifyTransactionChanged(TransactionTableModel* ttm, CWallet* wallet
 
 static void ShowProgress(TransactionTableModel* ttm, const std::string& title, int nProgress)
 {
-    if (nProgress == 0)
+    if (nProgress < 100)
         fQueueNotifications = true;
 
     if (nProgress == 100) {

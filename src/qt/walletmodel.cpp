@@ -89,6 +89,7 @@ CAmount WalletModel::getBalance(const CCoinControl* coinControl) const
 
 CAmount WalletModel::getAnonymizedBalance() const
 {
+    if (!fEnableDarksend) return 0; // if we have disabled darksend, don't bother calculating anonymized funds in the balances
     return wallet->GetAnonymizedBalance();
 }
 
@@ -132,18 +133,15 @@ void WalletModel::updateStatus()
 
 void WalletModel::pollBalanceChanged()
 {
-    // let's not bother polling for balance changes if we're syncing - the user will be told they're out of sync so the number doesn't matter anyway.
-    if (IsInitialBlockDownload()) return;
-
     // Get required locks upfront. This avoids the GUI from getting stuck on
     // periodical polls if the core is holding the locks for a longer time -
     // for example, during a wallet rescan.
-    //TRY_LOCK(cs_main, lockMain);
-    //if (!lockMain)
-    //    return;
-    //TRY_LOCK(wallet->cs_wallet, lockWallet);
-    //if (!lockWallet)
-    //    return;
+    TRY_LOCK(cs_main, lockMain);
+    if (!lockMain)
+        return;
+    TRY_LOCK(wallet->cs_wallet, lockWallet);
+    if (!lockWallet)
+        return;
     bool cachedNumBlocksChanged = chainActive.Height() != cachedNumBlocks;
 
     if (fForceCheckBalanceChanged || chainActive.Height() != cachedNumBlocks || nDarksendRounds != cachedDarksendRounds || cachedTxLocks != nCompleteTXLocks) {
@@ -153,17 +151,12 @@ void WalletModel::pollBalanceChanged()
         cachedNumBlocks = chainActive.Height();
         cachedDarksendRounds = nDarksendRounds;
 
-            checkBalanceChanged();
-            if (transactionTableModel)
-                transactionTableModel->updateConfirmations();
+        checkBalanceChanged();
 
-            if(tokenTransactionTableModel)
-                tokenTransactionTableModel->updateConfirmations();
-
-            if(cachedNumBlocksChanged)
-            {
-                checkTokenBalanceChanged();
-            }
+        if(cachedNumBlocksChanged)
+        {
+            checkTokenBalanceChanged();
+        }
     }
 }
 
