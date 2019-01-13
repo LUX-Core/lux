@@ -46,6 +46,7 @@ private:
 private slots:
     void slotClickResetConfiguration();
     void slotClickChangeConfig();
+    void slotConfigDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles);
 };
 
 #endif //__LUXGATE_DIALOG_H__

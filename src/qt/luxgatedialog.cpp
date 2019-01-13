@@ -29,6 +29,10 @@
 #include <QTime>
 #include <QVBoxLayout>
 #include <QDockWidget>
+#include <QStringList>
+#include <QHeaderView>
+#include <QVector>
+#include <QMessageBox>
 
 #include <openssl/hmac.h>
 #include <stdlib.h>
@@ -63,12 +67,33 @@ LuxgateDialog::LuxgateDialog(QWidget *parent) :
 
     //init configuration
     {
-        ui->tableViewConfiguration->setModel(new LuxgateConfigModel(this));
+        auto configModel = new LuxgateConfigModel(this);
+        ui->tableViewConfiguration->setModel(configModel);
+
+        QHeaderView * HeaderView = ui->tableViewConfiguration->horizontalHeader();
+        HeaderView->setSectionResizeMode(QHeaderView::Stretch);
+
+        slotClickResetConfiguration();
+        ui->pushButtonResetConfig->setEnabled(false);
+        ui->pushButtonChangeConfig->setEnabled(false);
+
         connect(ui->pushButtonResetConfig, &QPushButton::clicked,
                 this, &LuxgateDialog::slotClickResetConfiguration);
         connect(ui->pushButtonChangeConfig, &QPushButton::clicked,
                 this, &LuxgateDialog::slotClickChangeConfig);
-        slotClickResetConfiguration();
+        connect(configModel, &LuxgateConfigModel::dataChanged,
+                this, &LuxgateDialog::slotConfigDataChanged);
+    }
+}
+
+void LuxgateDialog::slotConfigDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)
+{
+    if(roles.contains(Qt::EditRole)
+        ||
+       roles.contains(Qt::DisplayRole))
+    {
+        ui->pushButtonResetConfig->setEnabled(true);
+        ui->pushButtonChangeConfig->setEnabled(true);
     }
 }
 
@@ -134,12 +159,14 @@ void LuxgateDialog::slotClickResetConfiguration()
     std::map<std::string, BlockchainConfig> config = ReadLuxGateConfigFile();
     for (auto it : config)
     {
-        BlockchainConfig conf = it.second;
+        BlockchainConfigQt conf(it.second);
         model->insertRows(model->rowCount(), 1);
-        model->setData(model->rowCount(), 0,
+        model->setData(model->rowCount()-1, 0,
                 QVariant::fromValue(conf),
                 LuxgateConfigModel::AllDataRole);
     }
+    ui->pushButtonResetConfig->setEnabled(false);
+    ui->pushButtonChangeConfig->setEnabled(false);
 }
 
 void LuxgateDialog::slotClickChangeConfig()
@@ -150,11 +177,20 @@ void LuxgateDialog::slotClickChangeConfig()
         auto model = qobject_cast<LuxgateConfigModel *>(ui->tableViewConfiguration->model());
         for(int iR=0; iR<model->rowCount(); iR++)
         {
-            BlockchainConfig conf = qvariant_cast<BlockchainConfig>(model->data(iR, 0, LuxgateConfigModel::AllDataRole));
+            BlockchainConfig conf = qvariant_cast<BlockchainConfigQt>(model->data(iR, 0, LuxgateConfigModel::AllDataRole)).toBlockchainConfig();
             configs[conf.ticker] = conf;
         }
     }
-    ChangeLuxGateConfiguration(configs);
+    bool bChange = ChangeLuxGateConfiguration(configs);
+    if(bChange)
+    {
+        ui->pushButtonResetConfig->setEnabled(false);
+        ui->pushButtonChangeConfig->setEnabled(false);
+    }
+    else
+    {
+        QMessageBox::critical(this, tr("Luxgate"), tr("Error while changing configuration"));
+    }
 }
 
 LuxgateDialog::~LuxgateDialog()

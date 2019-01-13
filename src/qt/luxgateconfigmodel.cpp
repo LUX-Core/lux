@@ -17,6 +17,38 @@ QVariant LuxgateConfigModel::data(int iRow, int iColumn, int role)
     return data(index(iRow, iColumn), role);
 }
 
+QVariant LuxgateConfigModel::headerData(int section, Qt::Orientation orientation, int role) const
+{
+    QVariant res;
+    if (Qt::Horizontal == orientation
+            &&
+        Qt::DisplayRole == role)
+    {
+        switch(section)
+        {
+            case TickerColumn:
+                res = "Ticker";
+                break;
+            case HostColumn:
+                res = "Host";
+                break;
+            case PortColumn:
+                res = "Port";
+                break;
+            case RpcuserColumn:
+                res = "Rpc User";
+                break;
+            case RpcpasswordColumn:
+                res = "Rpc Password";
+                break;
+            case Zmq_pub_raw_tx_endpointColumn:
+                res = "Zmq Endpoint";
+                break;
+        }
+    }
+    return res;
+}
+
 QVariant LuxgateConfigModel::data(const QModelIndex &index, int role) const
 {
     QVariant res;
@@ -25,22 +57,22 @@ QVariant LuxgateConfigModel::data(const QModelIndex &index, int role) const
         switch (index.column())
         {
             case TickerColumn:
-                res = QString::fromStdString(items[index.row()].ticker);
+                res = items[index.row()].ticker;
             break;
             case HostColumn:
-                res = QString::fromStdString(items[index.row()].host);
+                res = items[index.row()].host;
             break;
             case PortColumn:
                 res = items[index.row()].port;
             break;
             case RpcuserColumn:
-                res = QString::fromStdString(items[index.row()].rpcuser);
+                res = items[index.row()].rpcuser;
             break;
             case RpcpasswordColumn:
-                res = QString::fromStdString(items[index.row()].rpcpassword);
+                res = items[index.row()].rpcpassword;
             break;
             case Zmq_pub_raw_tx_endpointColumn:
-                res = QString::fromStdString(items[index.row()].zmq_pub_raw_tx_endpoint);
+                res = items[index.row()].zmq_pub_raw_tx_endpoint;
             break;
         }
     }
@@ -87,6 +119,11 @@ int LuxgateConfigModel::columnCount(const QModelIndex &parent) const
     return NColumns;
 }
 
+Qt::ItemFlags LuxgateConfigModel::flags(const QModelIndex &index) const
+{
+    return  Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled;
+}
+
 bool LuxgateConfigModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
     if(index.row() >= items.size() || index.row() < 0)
@@ -97,24 +134,35 @@ bool LuxgateConfigModel::setData(const QModelIndex &index, const QVariant &value
         switch (index.column())
         {
             case TickerColumn:
-                items[index.row()].ticker = value.toString().toStdString();
+                items[index.row()].ticker = value.toString();
+            break;
             case HostColumn:
-                items[index.row()].host = value.toString().toStdString();
+                items[index.row()].host = value.toString();
+            break;
             case PortColumn:
                 items[index.row()].port = value.toInt();
+            break;
             case RpcuserColumn:
-                items[index.row()].rpcuser = value.toString().toStdString();
+                items[index.row()].rpcuser = value.toString();
+            break;
             case RpcpasswordColumn:
-                items[index.row()].rpcpassword = value.toString().toStdString();
+                items[index.row()].rpcpassword = value.toString();
+            break;
             case Zmq_pub_raw_tx_endpointColumn:
-                items[index.row()].zmq_pub_raw_tx_endpoint = value.toString().toStdString();
+                items[index.row()].zmq_pub_raw_tx_endpoint = value.toString();
+            break;
         }
+        emit dataChanged(index, index, {role});
     }
     else if(role == AllDataRole)
-        items[index.row()] = qvariant_cast<BlockchainConfig>(value);
+    {
+        items[index.row()] = qvariant_cast<BlockchainConfigQt>(value);
+        emit dataChanged(  this->index(index.row(), 0),
+                           this->index(index.row(), NColumns-1),
+                            {Qt::EditRole, Qt::DisplayRole, AllDataRole});
+    }
     else
         return QAbstractTableModel::setData(index,value,role);
 
-    emit dataChanged(index, index, {role});
     return true;
 }
