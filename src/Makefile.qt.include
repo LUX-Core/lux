@@ -69,11 +69,17 @@ QT_FORMS_UI = \
   qt/forms/smartcontract.ui \
   qt/forms/tokendescdialog.ui \
   qt/forms/transactiondescdialog.ui \
-  qt/forms/hexaddressconverter.ui
+  qt/forms/hexaddressconverter.ui \
+  qt/forms/editcontract.ui \
+  qt/forms/findwidget.ui \
+  qt/forms/scalltypeswidget.ui \
+  qt/forms/sctypewidget.ui \
+  qt/forms/scwizardwgt.ui \
+  qt/forms/searchwgt.ui
 
 if ENABLE_UPDATER
  QT_FORMS_UI += lux-installer/src/forms/updateinfodialog.ui \
-                lux-installer/src/forms/progressdialog.ui 
+                lux-installer/src/forms/progressdialog.ui
 endif
 
 QT_MOC_CPP = \
@@ -164,7 +170,20 @@ QT_MOC_CPP = \
   qt/moc_walletframe.cpp \
   qt/moc_walletmodel.cpp \
   qt/moc_walletview.cpp \
-  qt/moc_hexaddressconverter.cpp
+  qt/moc_hexaddressconverter.cpp \
+  qt/solidity_ide/moc_allopenfilesmodel.cpp \
+  qt/solidity_ide/moc_codeeditor.cpp \
+  qt/solidity_ide/moc_editcontract.cpp \
+  qt/solidity_ide/moc_highlighter.cpp \
+  qt/solidity_ide/moc_scalltypeswidget.cpp \
+  qt/solidity_ide/moc_sctypesdelegate.cpp \
+  qt/solidity_ide/moc_sctypesmodel.cpp \
+  qt/solidity_ide/moc_scwizardwgt.cpp \
+  qt/solidity_ide/moc_searchwgt.cpp \
+  qt/solidity_ide/find/moc_findwidget.cpp \
+  qt/solidity_ide/quazip/moc_quagzipfile.cpp\
+  qt/solidity_ide/quazip/moc_quaziodevice.cpp\
+  qt/solidity_ide/quazip/moc_quazipfile.cpp
 
 if ENABLE_UPDATER
   QT_MOC_CPP += lux-installer/src/luxupdater/moc_luxupdater.cpp \
@@ -301,7 +320,40 @@ BITCOIN_QT_H = \
   qt/winshutdownmonitor.h \
   qt/qcustomplot.h \
   qt/hexaddressconverter.h \
-  qt/tokenslistview.h
+  qt/tokenslistview.h \
+  qt/solidity_ide/allopenfilesmodel.h \
+  qt/solidity_ide/codeeditor.h \
+  qt/solidity_ide/editcontract.h \
+  qt/solidity_ide/global.h \
+  qt/solidity_ide/highlighter.h \
+  qt/solidity_ide/scalltypeswidget.h \
+  qt/solidity_ide/sctypesdelegate.h \
+  qt/solidity_ide/sctypesmodel.h \
+  qt/solidity_ide/sctypewidget.h \
+  qt/solidity_ide/scwizardwgt.h \
+  qt/solidity_ide/searchwgt.h \
+  qt/solidity_ide/find/findwidget.h \
+  qt/solidity_ide/find/globalsearch.h \
+  qt/solidity_ide/find/searchresulttreeitemdelegate.h \
+  qt/solidity_ide/find/treewidgetfindresults.h \
+  qt/solidity_ide/quazip/ioapi.h \
+  qt/solidity_ide/quazip/JlCompress.h \
+  qt/solidity_ide/quazip/minizip_crypt.h \
+  qt/solidity_ide/quazip/quaadler32.h \
+  qt/solidity_ide/quazip/quachecksum32.h \
+  qt/solidity_ide/quazip/quacrc32.h \
+  qt/solidity_ide/quazip/quagzipfile.h \
+  qt/solidity_ide/quazip/quaziodevice.h \
+  qt/solidity_ide/quazip/quazip.h \
+  qt/solidity_ide/quazip/quazipdir.h \
+  qt/solidity_ide/quazip/quazipfile.h \
+  qt/solidity_ide/quazip/quazipfileinfo.h \
+  qt/solidity_ide/quazip/quazip_global.h \
+  qt/solidity_ide/quazip/quazipnewinfo.h \
+  qt/solidity_ide/quazip/unzip.h \
+  qt/solidity_ide/quazip/zip.h
+
+
 if ENABLE_UPDATER
   BITCOIN_QT_H += lux-installer/src/luxupdater/luxupdater.h \
                   lux-installer/src/luxupdater/simplescheduler_p.h \
@@ -395,7 +447,26 @@ RES_ICONS = \
   qt/res/icons/update_black.png \
   qt/res/icons/verified.png \
   qt/res/icons/wallet_repair.png \
-  qt/res/icons/warning.png
+  qt/res/icons/warning.png \
+  qt/res/icons/Check.png \
+  qt/res/icons/close.png \
+  qt/res/icons/compile.png \
+  qt/res/icons/contract.png \
+  qt/res/icons/cryptotoken.png \
+  qt/res/icons/download.png \
+  qt/res/icons/error.png \
+  qt/res/icons/find.png \
+  qt/res/icons/labelChooseType.png \
+  qt/res/icons/newFile.png \
+  qt/res/icons/openFile.png \
+  qt/res/icons/redo.png \
+  qt/res/icons/saveAllFiles.png \
+  qt/res/icons/saveFile.png \
+  qt/res/icons/saveFileAs.png \
+  qt/res/icons/settings.png \
+  qt/res/icons/undo.png \
+  qt/res/icons/warning_sol_ide.png \
+  qt/res/icons/wizard.png
 
 BITCOIN_QT_CPP = \
   qt/bantablemodel.cpp \
@@ -502,7 +573,32 @@ BITCOIN_QT_CPP += \
   qt/walletframe.cpp \
   qt/walletmodel.cpp \
   qt/walletmodeltransaction.cpp \
-  qt/walletview.cpp
+  qt/walletview.cpp \
+  qt/solidity_ide/allopenfilesmodel.cpp \
+  qt/solidity_ide/codeeditor.cpp \
+  qt/solidity_ide/editcontract.cpp \
+  qt/solidity_ide/highlighter.cpp \
+  qt/solidity_ide/scalltypeswidget.cpp \
+  qt/solidity_ide/sctypesdelegate.cpp \
+  qt/solidity_ide/sctypesmodel.cpp \
+  qt/solidity_ide/sctypewidget.cpp \
+  qt/solidity_ide/scwizardwgt.cpp \
+  qt/solidity_ide/searchwgt.cpp \
+  qt/solidity_ide/find/findwidget.cpp \
+  qt/solidity_ide/find/searchresulttreeitemdelegate.cpp \
+  qt/solidity_ide/find/treewidgetfindresults.cpp \
+  qt/solidity_ide/quazip/JlCompress.cpp \
+  qt/solidity_ide/quazip/quaadler32.cpp \
+  qt/solidity_ide/quazip/quacrc32.cpp \
+  qt/solidity_ide/quazip/quagzipfile.cpp \
+  qt/solidity_ide/quazip/quaziodevice.cpp \
+  qt/solidity_ide/quazip/quazip.cpp \
+  qt/solidity_ide/quazip/quazipdir.cpp \
+  qt/solidity_ide/quazip/quazipfile.cpp \
+  qt/solidity_ide/quazip/quazipfileinfo.cpp \
+  qt/solidity_ide/quazip/quazipnewinfo.cpp \
+  qt/solidity_ide/quazip/unzip.c \
+  qt/solidity_ide/quazip/zip.c
 
 if ENABLE_UPDATER
   BITCOIN_QT_CPP += lux-installer/src/luxupdater/simplescheduler.cpp \
@@ -549,7 +645,9 @@ BITCOIN_RC = qt/res/lux-qt-res.rc
 endif
 
 BITCOIN_QT_INCLUDES = -I$(builddir)/qt -I$(srcdir)/qt -I$(srcdir)/qt/forms \
-  -I$(builddir)/qt/forms
+  -I$(builddir)/qt/forms -I$(builddir)/qt/solidity_ide -I$(srcdir)/qt/solidity_ide \
+  -I$(builddir)/qt/solidity_ide/find -I$(srcdir)/qt/solidity_ide/find \
+  -I$(builddir)/qt/solidity_ide/quazip -I$(srcdir)/qt/solidity_ide/quazip
 
 qt_libbitcoinqt_a_CPPFLAGS = $(BITCOIN_INCLUDES) $(BITCOIN_QT_INCLUDES) \
   $(QT_INCLUDES) $(QT_DBUS_INCLUDES) $(PROTOBUF_CFLAGS) $(QR_CFLAGS)
