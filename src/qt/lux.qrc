@@ -89,6 +89,10 @@
         <file alias="hd_disabled">res/icons/hd_disabled.png</file>
         <file alias="transaction_abandoned">res/icons/transaction_abandoned.png</file>
         <file>res/icons/home.png</file>
+        <file>res/icons/github.png</file>
+        <file>res/icons/discord.png</file>
+        <file>res/icons/telegram.png</file>
+        <file>res/icons/twitter.png</file>
     </qresource>
     <qresource prefix="/css">
         <file alias="default">res/css/default.css</file>

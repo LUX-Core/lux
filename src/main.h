@@ -95,12 +95,6 @@ static const int64_t DARKSEND_COLLATERAL = (16120*COIN); //16120 LUX
 static const int64_t DARKSEND_FEE = (0.002*COIN); // reward masternode
 static const int64_t DARKSEND_POOL_MAX = (1999999.99*COIN);
 
-static const int64_t MaxPosClockDrift = 3 * 60;
-static const int64_t MaxPowClockDrift = 2 * 60 * 60;
-
-static const int nLuxProtocolSwitchHeight = 520000;
-static const int nLuxProtocolSwitchHeightTestnet = 95150;
-
 /** The maximum size for mined blocks */
 static const unsigned int MAX_BLOCK_SIZE_GEN = MAX_BLOCK_BASE_SIZE/2;
 /** Default for accepting alerts from the P2P network. */
@@ -159,6 +153,7 @@ static const unsigned int RELAY_BROADCAST_MAX = 7 * RELAY_INVENTORY_INTERVAL;
 static const unsigned int DEFAULT_BYTES_PER_SIGOP = 20;
 static const bool DEFAULT_ADDRESSINDEX = false;
 static const bool DEFAULT_SPENTINDEX = false;
+static const bool DEFAULT_TXINDEX = true;
 
 static const int64_t STATIC_POS_REWARD = 1 * COIN; //Constant reward 8%
 

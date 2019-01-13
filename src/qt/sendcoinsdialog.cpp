@@ -486,6 +486,14 @@ void SendCoinsDialog::clear()
     }
     addEntry();
 
+    // Reset UTXO split if set
+    if (ui->splitBlockCheckBox->isChecked()) {
+        ui->splitBlockLineEdit->setText("");
+        splitBlockLineEditChanged("");
+        ui->splitBlockCheckBox->setChecked(false);
+        splitBlockChecked(Qt::Unchecked);
+    }
+
     updateTabsAndLabels();
 }
 
@@ -624,8 +632,8 @@ void SendCoinsDialog::setBalance(const CAmount& balance, const CAmount& unconfir
 
 void SendCoinsDialog::updateDisplayUnit()
 {
-    //TRY_LOCK(cs_main, lockMain);
-    //if (!lockMain) return;
+    TRY_LOCK(cs_main, lockMain);
+    if (!lockMain) return;
 
     setBalance(model->getBalance(), model->getUnconfirmedBalance(), model->getImmatureBalance(), model->getAnonymizedBalance(),
         model->getWatchBalance(), model->getWatchUnconfirmedBalance(), model->getWatchImmatureBalance());

@@ -148,14 +148,16 @@ CoinControlDialog::CoinControlDialog(const PlatformStyle *platformStyle, QWidget
 
     ui->treeWidget->setColumnWidth(COLUMN_CHECKBOX, 84);
     ui->treeWidget->setColumnWidth(COLUMN_AMOUNT, 100);
-    ui->treeWidget->setColumnWidth(COLUMN_LABEL, 170);
-    ui->treeWidget->setColumnWidth(COLUMN_ADDRESS, 190);
-    ui->treeWidget->setColumnWidth(COLUMN_DARKSEND_ROUNDS, 88);
-    ui->treeWidget->setColumnWidth(COLUMN_DATE, 80);
-    ui->treeWidget->setColumnWidth(COLUMN_CONFIRMATIONS, 100);
+    ui->treeWidget->setColumnWidth(COLUMN_LABEL, 160);
+    ui->treeWidget->setColumnWidth(COLUMN_ADDRESS, 210);
+    ui->treeWidget->setColumnWidth(COLUMN_DATE, 100);
+    ui->treeWidget->setColumnWidth(COLUMN_CONFIRMATIONS, 80);
     ui->treeWidget->setColumnWidth(COLUMN_PRIORITY, 100);
+    ui->treeWidget->setColumnWidth(COLUMN_DARKSEND_ROUNDS, 80);
+
     ui->treeWidget->setColumnHidden(COLUMN_TXHASH, true);         // store transacton hash in this column, but dont show it
     ui->treeWidget->setColumnHidden(COLUMN_VOUT_INDEX, true);     // store vout index in this column, but dont show it
+    ui->treeWidget->setColumnHidden(COLUMN_PRIORITY_INT64, true);
     ui->treeWidget->setColumnHidden(COLUMN_DATE_INT64, true);     // store date int64 in this column, but dont show it
 
     // default view is sorted by amount desc
@@ -260,24 +262,34 @@ void CoinControlDialog::buttonSelectAllClicked()
 // Toggle lock state
 void CoinControlDialog::buttonToggleLockClicked()
 {
-    QTreeWidgetItem* item;
     // Works in list-mode only
     if (ui->radioListMode->isChecked()) {
+        bool doLock = false;
         ui->treeWidget->setEnabled(false);
+
+        // count selected (checked) inputs to lock, if none action will be to unlock all
         for (int i = 0; i < ui->treeWidget->topLevelItemCount(); i++) {
-            item = ui->treeWidget->topLevelItem(i);
+            if (ui->treeWidget->topLevelItem(i)->checkState(COLUMN_CHECKBOX) == Qt::Checked) {
+                doLock = true;
+                break;
+            }
+        }
+
+        for (int i = 0; i < ui->treeWidget->topLevelItemCount(); i++) {
+            QTreeWidgetItem* item = ui->treeWidget->topLevelItem(i);
             COutPoint outpt(uint256(item->text(COLUMN_TXHASH).toStdString()), item->text(COLUMN_VOUT_INDEX).toUInt());
-            if (model->isLockedCoin(uint256(item->text(COLUMN_TXHASH).toStdString()), item->text(COLUMN_VOUT_INDEX).toUInt())) {
+            if (doLock == false && item->isDisabled()) {
                 model->unlockCoin(outpt);
                 item->setDisabled(false);
                 item->setIcon(COLUMN_CHECKBOX, QIcon());
-            } else {
+            } else if (doLock && item->checkState(COLUMN_CHECKBOX) == Qt::Checked) {
                 model->lockCoin(outpt);
                 item->setDisabled(true);
                 item->setIcon(COLUMN_CHECKBOX, QIcon(":/icons/lock_closed"));
             }
             updateLabelLocked();
         }
+
         ui->treeWidget->setEnabled(true);
         CoinControlDialog::updateLabels(model, this);
         CheckDialogLablesUpdated();
@@ -732,7 +744,7 @@ void CoinControlDialog::updateLabels(WalletModel* model, QDialog* dialog)
             model->listCoins(mapCoins);
 
             if(mapCoins.size() > 0) {
-               map<QString, vector<COutput>>::iterator it = mapCoins.begin();
+                map<QString, vector<COutput>>::iterator it = mapCoins.begin();
 
                 SendCoinsRecipient defRecipient;
                 defRecipient.address = (*it).first;
@@ -746,13 +758,10 @@ void CoinControlDialog::updateLabels(WalletModel* model, QDialog* dialog)
                 recipients.append(defRecipient);
 
                 CoinControlDialog::coinControl->nSplitBlock = CoinControlDialog::nSplitBlockDummy;
-                
+
                 WalletModelTransaction currentTransaction(recipients);
-                
                 model->prepareTransaction(currentTransaction, CoinControlDialog::coinControl);
-                
                 CAmount nFee = currentTransaction.getTransactionFee() + 10;
-    
                 if (nPayFee < nFee) {
                     nPayFee = nFee;
                     nAfterFee = nAmount - nFee;
@@ -859,8 +868,8 @@ void CoinControlDialog::updateView()
     map<QString, vector<COutput> > mapCoins;
     model->listCoins(mapCoins);
 
-    for (std::pair<QString, vector<COutput>> coins : mapCoins) {
-        QTreeWidgetItem* itemWalletAddress = new QTreeWidgetItem();
+    for (PAIRTYPE(QString, vector<COutput>) coins : mapCoins) {
+        CCoinControlWidgetItem *itemWalletAddress = new CCoinControlWidgetItem();
         itemWalletAddress->setCheckState(COLUMN_CHECKBOX, Qt::Unchecked);
         QString sWalletAddress = coins.first;
         QString sWalletLabel = model->getAddressTableModel()->labelForAddress(sWalletAddress);

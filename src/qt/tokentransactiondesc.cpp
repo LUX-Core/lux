@@ -25,8 +25,6 @@ QString TokenTransactionDesc::FormatTxStatus(CWallet *wallet, const CTokenTx& wt
     auto mi = wallet->mapWallet.find(wtx.transactionHash);
     if (nDepth < 0)
         return tr("conflicted with a transaction with %1 confirmations").arg(-nDepth);
-    else if (mi != wallet->mapWallet.end() && (GetAdjustedTime() - mi->second.nTimeReceived > 2 * 60) && mi->second.GetRequestCount() == 0)
-        return tr("%1/offline").arg(nDepth);
     else if (nDepth == 0)
     {
         if(mi != wallet->mapWallet.end() && mi->second.InMempool())

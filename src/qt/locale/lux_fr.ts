@@ -9,13 +9,6 @@
     </message>
 </context>
 <context>
-    <name>ABIParam</name>
-    <message>
-        <source>%1 %2</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>AddEditLuxNode</name>
     <message>
         <source>Add/Edit LuxNodes Node</source>
@@ -1072,6 +1065,14 @@ MultiSend: %1</translation>
         <source>Connecting to peers...</source>
         <translation>Connexion aux pairs...</translation>
     </message>
+    <message>
+        <source>Go to</source>
+        <translation>Visiter</translation>
+    </message>
+    <message>
+        <source>Do you really want to enable hd-wallet? You will no more be able to disable it. If you select &quot;Yes&quot; the application will restart to upgrade the wallet...</source>
+        <translation>Souhaitez-vous migrer le portefeuille vers des clés HD ? Il n&apos;y a pas de retour en arrière possible. Si &quot;Oui&quot; l&apos;application redémarrera pour mettre à jour le format du portefeuille.</translation>
+    </message>
 </context>
 <context>
     <name>BlockExplorer</name>
@@ -1311,10 +1312,6 @@ MultiSend: %1</translation>
         <translation>Effacer tout</translation>
     </message>
     <message>
-        <source>Read Contract</source>
-        <translation>Appel Contrat</translation>
-    </message>
-    <message>
         <source>The account address.</source>
         <translation>L&apos;adresse du contrat.</translation>
     </message>
@@ -1325,6 +1322,10 @@ MultiSend: %1</translation>
     <message>
         <source>Read contract</source>
         <translation>Appel contrat</translation>
+    </message>
+    <message>
+        <source>Read Contract</source>
+        <translation>Lecture Contrat</translation>
     </message>
 </context>
 <context>
@@ -1522,7 +1523,7 @@ MultiSend: %1</translation>
     </message>
     <message>
         <source>Luxsend Rounds</source>
-        <translation type="unfinished"></translation>
+        <translation>Rounds Luxsend</translation>
     </message>
     <message>
         <source>Copy label</source>
@@ -1580,12 +1581,20 @@ MultiSend: %1</translation>
         <source>n/a</source>
         <translation>n/a</translation>
     </message>
+    <message>
+        <source>Tx Hash</source>
+        <translation>Tx Hash</translation>
+    </message>
+    <message>
+        <source>Output index</source>
+        <translation>Index sortie</translation>
+    </message>
 </context>
 <context>
     <name>ContractBookPage</name>
     <message>
         <source>Form</source>
-        <translation type="unfinished">Form</translation>
+        <translation>Form</translation>
     </message>
     <message>
         <source>Create a new contract info</source>
@@ -1680,7 +1689,7 @@ MultiSend: %1</translation>
     <name>ContractResult</name>
     <message>
         <source>StackedWidget</source>
-        <translation type="unfinished"></translation>
+        <translation>StackedWidget</translation>
     </message>
     <message>
         <source>Contract Summary</source>
@@ -1766,7 +1775,7 @@ MultiSend: %1</translation>
     <name>CreateContract</name>
     <message>
         <source>Form</source>
-        <translation type="unfinished">Form</translation>
+        <translation>Form</translation>
     </message>
     <message>
         <source>Create Smart Contract</source>
@@ -1774,7 +1783,7 @@ MultiSend: %1</translation>
     </message>
     <message>
         <source>Solidity</source>
-        <translation type="unfinished"></translation>
+        <translation>Solidity</translation>
     </message>
     <message>
         <source>Token</source>
@@ -1782,15 +1791,15 @@ MultiSend: %1</translation>
     </message>
     <message>
         <source>Bytecode</source>
-        <translation type="unfinished"></translation>
+        <translation>Bytecode</translation>
     </message>
     <message>
         <source>Interface (ABI)</source>
-        <translation type="unfinished">Interface (ABI)</translation>
+        <translation>Interface (ABI)</translation>
     </message>
     <message>
         <source>Constructor</source>
-        <translation type="unfinished"></translation>
+        <translation>Constructeur</translation>
     </message>
     <message>
         <source>Optional</source>
@@ -1826,11 +1835,11 @@ MultiSend: %1</translation>
     </message>
     <message>
         <source>The Gas Price is too high, are you sure you want to possibly spend a max of %1 for this transaction?</source>
-        <translation type="unfinished"></translation>
+        <translation>Le prix du gas est trop haut, êtes-cous sur de vouloir dépenser %1 (max) pour cette transaction ?</translation>
     </message>
     <message>
         <source>High Gas price</source>
-        <translation type="unfinished"></translation>
+        <translation>Prix du Gas élevé</translation>
     </message>
     <message>
         <source>Are you sure you want to create contract? &lt;br /&gt;</source>
@@ -1850,7 +1859,7 @@ MultiSend: %1</translation>
     </message>
     <message>
         <source>Gas price: LUX price per gas unit. Default = %1, Min = %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Prix du Gas en LUX par unité de gas. Défaut = %1, Min = %2</translation>
     </message>
 </context>
 <context>
@@ -1924,19 +1933,19 @@ MultiSend: %1</translation>
     <name>DialogMaster</name>
     <message>
         <source>Information</source>
-        <translation type="unfinished">Information</translation>
+        <translation>Information</translation>
     </message>
     <message>
         <source>Question</source>
-        <translation type="unfinished"></translation>
+        <translation>Question</translation>
     </message>
     <message>
         <source>Warning</source>
-        <translation type="unfinished">Attention</translation>
+        <translation>Attention</translation>
     </message>
     <message>
         <source>Error</source>
-        <translation type="unfinished"></translation>
+        <translation>Erreur</translation>
     </message>
     <message>
         <source>About</source>
@@ -1944,7 +1953,7 @@ MultiSend: %1</translation>
     </message>
     <message>
         <source>%1 — Version %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 — Version %2</translation>
     </message>
     <message>
         <source>Qt-Version: &lt;a href=&quot;https://www.qt.io/&quot;&gt;%2&lt;/a&gt;</source>
@@ -1952,23 +1961,23 @@ MultiSend: %1</translation>
     </message>
     <message>
         <source>Developed by: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Développé par: %1</translation>
     </message>
     <message>
         <source>Project Website: &lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Site web du projet: &lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;</translation>
     </message>
     <message>
         <source>License: &lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Licence: &lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;</translation>
     </message>
     <message>
         <source>License: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Licence: %1</translation>
     </message>
     <message>
         <source>About Qt</source>
-        <translation type="unfinished"></translation>
+        <translation>A propos de Qt</translation>
     </message>
 </context>
 <context>
@@ -2030,7 +2039,7 @@ MultiSend: %1</translation>
     <name>EditContractInfoDialog</name>
     <message>
         <source>Dialog</source>
-        <translation type="unfinished">Import</translation>
+        <translation>Dialog</translation>
     </message>
     <message>
         <source>Label</source>
@@ -2319,14 +2328,6 @@ MultiSend: %1</translation>
         <source>&lt;p style=&quot;line-height:130&quot;&gt;Luxcore, Luxgate, and all other Luxcore&apos;s products are either registered trademarks or trademarks of Luxcore in the United States,                     Europe and/or other countries.&lt;/p&gt;&lt;br&gt;&lt;br&gt;</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>lux_</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>luxVersion</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>ExecRPCCommand</name>
@@ -2487,14 +2488,14 @@ MultiSend: %1</translation>
     </message>
     <message>
         <source>Error: Specified data directory &quot;%1&quot; cannot be created.</source>
-        <translation type="unfinished"></translation>
+        <translation>Erreur: Le répertoire &quot;%1&quot; ne peut pas être créé.</translation>
     </message>
 </context>
 <context>
     <name>LSRToken</name>
     <message>
         <source>Form</source>
-        <translation type="unfinished">Form</translation>
+        <translation>Form</translation>
     </message>
     <message>
         <source>Send</source>
@@ -2552,7 +2553,7 @@ MultiSend: %1</translation>
     <name>MasternodeManager</name>
     <message>
         <source>Form</source>
-        <translation type="unfinished">Form</translation>
+        <translation>Form</translation>
     </message>
     <message>
         <source>Masternodes Network</source>
@@ -2624,7 +2625,7 @@ MultiSend: %1</translation>
     </message>
     <message>
         <source>&amp;Get Config</source>
-        <translation type="unfinished"></translation>
+        <translation>A&amp;fficher Config</translation>
     </message>
     <message>
         <source>&amp;Remove</source>
@@ -2651,7 +2652,7 @@ MultiSend: %1</translation>
     <name>ModalOverlay</name>
     <message>
         <source>Form</source>
-        <translation type="unfinished">Form</translation>
+        <translation>Form</translation>
     </message>
     <message>
         <source>The displayed information may be out of date. Your wallet automatically synchronizes with the Luxcore network after a connection is established. Recent transactions may not yet be visible, and therefore your wallet&apos;s balance might be incorrect. This information will be correct once your wallet has finished synchronizing with the Luxcore network, as detailed below.</source>
@@ -2703,7 +2704,7 @@ MultiSend: %1</translation>
     </message>
     <message>
         <source>~</source>
-        <translation type="unfinished"></translation>
+        <translation>~</translation>
     </message>
 </context>
 <context>
@@ -2896,14 +2897,21 @@ Veuillez vérifier l&apos;adresse et réessayer.</translation>
     </message>
 </context>
 <context>
+    <name>NetworkDisplayStatusBarControl</name>
+    <message>
+        <source>Current network</source>
+        <translation>Chaine en cours</translation>
+    </message>
+</context>
+<context>
     <name>OpenURIDialog</name>
     <message>
         <source>URI:</source>
-        <translation>URI:</translation>
+        <translation>URL:</translation>
     </message>
     <message>
         <source>Open URI</source>
-        <translation type="unfinished"></translation>
+        <translation>Ouvrir URL</translation>
     </message>
     <message>
         <source>Open payment request from URI or file</source>
@@ -2963,6 +2971,14 @@ Veuillez vérifier l&apos;adresse et réessayer.</translation>
     <message>
         <source>Enable  log &amp;events</source>
         <translation>Activer log &amp;events</translation>
+    </message>
+    <message>
+        <source>Enable &amp;transaction indexes</source>
+        <translation>Activer les indexes de &amp;transactions</translation>
+    </message>
+    <message>
+        <source>Enable &amp;address indexes</source>
+        <translation>Activer les indexes d&apos;&amp;adresses</translation>
     </message>
     <message>
         <source>Size of &amp;database cache</source>
@@ -3042,7 +3058,7 @@ Veuillez vérifier l&apos;adresse et réessayer.</translation>
     </message>
     <message>
         <source>Coming soon</source>
-        <translation type="unfinished"></translation>
+        <translation>Bientôt disponible</translation>
     </message>
     <message>
         <source>&amp;Activate Parallel Masternode</source>
@@ -3201,6 +3217,26 @@ https://www.transifex.com/luxcore/luxcore</source>
         <source>The supplied proxy address is invalid.</source>
         <translation>L&apos;adresse du proxy est invalide.</translation>
     </message>
+    <message>
+        <source>Maintain a full EVM log index, used by searchlogs and gettransactionreceipt rpc calls (default: %u)</source>
+        <translation>Maintient un log EVM complet, utilisé pour searchlogs et gettransactionreceipt (défaut: %u)</translation>
+    </message>
+    <message>
+        <source>no</source>
+        <translation>non</translation>
+    </message>
+    <message>
+        <source>Maintain a full transaction index, used by the getrawtransaction rpc call (default: %u)</source>
+        <translation>Maintient un index complet des transactions, utilisé pour getrawtransaction (défaut: %u)</translation>
+    </message>
+    <message>
+        <source>Maintain a full address index, used to query for the balance, txids and unspent outputs for addresses (default: %u)</source>
+        <translation>Maintient un index complet des adresses, utilisé pour obtenir les balances et l&apos;historique des adresses (défaut: %u)</translation>
+    </message>
+    <message>
+        <source>yes</source>
+        <translation>oui</translation>
+    </message>
 </context>
 <context>
     <name>OverviewPage</name>
@@ -3310,7 +3346,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Form</source>
-        <translation type="unfinished">Form</translation>
+        <translation>Form</translation>
     </message>
     <message>
         <source>Balances</source>
@@ -3370,7 +3406,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>out of sync</source>
-        <translation type="unfinished">obsolète</translation>
+        <translation>obsolète</translation>
     </message>
     <message>
         <source>No inputs detected</source>
@@ -3378,7 +3414,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message numerus="yes">
         <source>%n Rounds</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>%n Round</numerusform>
             <numerusform>%n Rounds</numerusform>
         </translation>
@@ -3851,10 +3887,6 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation>Des composants sont disponibles ! Vous pouvez mettre à jour maintenant ou plus tard.</translation>
     </message>
     <message>
-        <source>%1 v%2 — %3</source>
-        <translation>%1 v%2 — %3</translation>
-    </message>
-    <message>
         <source>Run with &amp;elevated rights</source>
         <translation>Demander élévation &amp;Administrateur</translation>
     </message>
@@ -4280,6 +4312,18 @@ https://www.transifex.com/luxcore/luxcore</source>
     <message>
         <source>No</source>
         <translation>Non</translation>
+    </message>
+    <message>
+        <source>Memory usage</source>
+        <translation>Mémoire utilisée</translation>
+    </message>
+    <message>
+        <source>Current number of transactions</source>
+        <translation>Nombre de transactions</translation>
+    </message>
+    <message>
+        <source>Memory Pool</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4795,7 +4839,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>(read the tooltip)</source>
-        <translation type="unfinished"></translation>
+        <translation>(voir tooltip)</translation>
     </message>
     <message>
         <source>Confirmation time target:</source>
@@ -4992,10 +5036,10 @@ https://www.transifex.com/luxcore/luxcore</source>
     <name>SendToContract</name>
     <message>
         <source>Form</source>
-        <translation type="unfinished">Form</translation>
+        <translation>Form</translation>
     </message>
     <message>
-        <source>Write Smart Contract</source>
+        <source>Write to Smart Contract</source>
         <translation>Envoi vers Smart Contrat</translation>
     </message>
     <message>
@@ -5047,28 +5091,24 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation>Effacer tout</translation>
     </message>
     <message>
-        <source>Write to Contract</source>
-        <translation>Envoi vers Contrat</translation>
-    </message>
-    <message>
         <source>The contract address that will receive the funds and data.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>The amount in Lux to send. Default = 0.</source>
-        <translation type="unfinished"></translation>
+        <translation>Le montant en Lux à envoyer. Défaut = 0.</translation>
     </message>
     <message>
         <source>The quantum address that will be used as sender.</source>
-        <translation type="unfinished"></translation>
+        <translation>L&apos;adresse LUX qui sera utilisée comme expéditeur.</translation>
     </message>
     <message>
         <source>The Gas Price is too high, are you sure you want to possibly spend a max of %1 for this transaction?</source>
-        <translation type="unfinished"></translation>
+        <translation>Le prix du gas est trop haut, êtes-cous sur de vouloir dépenser %1 (max) pour cette transaction ?</translation>
     </message>
     <message>
         <source>High Gas price</source>
-        <translation type="unfinished"></translation>
+        <translation>Prix du Gas élevé</translation>
     </message>
     <message>
         <source>Are you sure you want to send to the contract: &lt;br /&gt;&lt;br /&gt;</source>
@@ -5080,26 +5120,26 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Confirm sending to contract.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Write to contract</source>
-        <translation>Envoi vers contrat</translation>
+        <translation>Confirmer l&apos;envoi vers le contrat.</translation>
     </message>
     <message>
         <source>Gas limit: Default = %1, Max = %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>Limite de Gas: Défaut = %1, Max = %2.</translation>
     </message>
     <message>
         <source>Gas price: LUX price per gas unit. Default = %1, Min = %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>Prix du Gas en LUX par unité de gas. Défaut = %1, Min = %2. {1,?}</translation>
+    </message>
+    <message>
+        <source>Write to Contract</source>
+        <translation>Ecriture Contrat</translation>
     </message>
 </context>
 <context>
     <name>SendTokenPage</name>
     <message>
         <source>Form</source>
-        <translation type="unfinished">Form</translation>
+        <translation>Form</translation>
     </message>
     <message>
         <source>PayTo</source>
@@ -5131,31 +5171,31 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>The address that will receive the tokens.</source>
-        <translation type="unfinished"></translation>
+        <translation>L&apos;adresse qui va recevoir les tokens.</translation>
     </message>
     <message>
         <source>The amount in LSR Token to send.</source>
-        <translation type="unfinished"></translation>
+        <translation>Le montant de jetons LSR à envoyer.</translation>
     </message>
     <message>
         <source>Optional description for transaction.</source>
-        <translation type="unfinished"></translation>
+        <translation>Description optionnelle</translation>
     </message>
     <message>
         <source>Gas limit: Default = %1, Max = %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>Limite de Gas: Défaut = %1, Max = %2.</translation>
     </message>
     <message>
         <source>Gas price: LUX/gas unit. Default = %1, Min = %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>Prix du Gas par unité: Défaut = %1, Min = %2.</translation>
     </message>
     <message>
         <source>Are you sure you want to send? &lt;br /&gt;&lt;br /&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Confirmer l&apos;envoi ? &lt;br /&gt;&lt;br /&gt;</translation>
     </message>
     <message>
         <source>&lt;b&gt;%1 %2 &lt;/b&gt; to </source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;%1 %2 &lt;/b&gt; vers </translation>
     </message>
     <message>
         <source>&lt;br /&gt;%3 &lt;br /&gt;</source>
@@ -5167,7 +5207,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>To send %1 you need LUX in address &lt;br /&gt; %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>Pour envoyer %1 il faut des LUX sur l&apos;adresse &lt;br /&gt; %2.</translation>
     </message>
     <message>
         <source>Send token</source>
@@ -5297,7 +5337,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Click &quot;Sign Message&quot; to generate signature</source>
-        <translation type="unfinished"></translation>
+        <translation>Cliquer sur &quot;Signer le message&quot; pour générer la signature</translation>
     </message>
     <message>
         <source>Message signed.</source>
@@ -5329,6 +5369,18 @@ https://www.transifex.com/luxcore/luxcore</source>
     <message>
         <source>Dialog</source>
         <translation>Dialog</translation>
+    </message>
+    <message>
+        <source>Create Smart Contract</source>
+        <translation>Création Smart Contrat</translation>
+    </message>
+    <message>
+        <source>Read Smart Contract</source>
+        <translation>Info Smart Contrat</translation>
+    </message>
+    <message>
+        <source>Write to Smart Contract</source>
+        <translation>Envoi vers Smart Contrat</translation>
     </message>
 </context>
 <context>
@@ -5633,10 +5685,6 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation>En conflit avec transaction confirmée (%1 conf.)</translation>
     </message>
     <message>
-        <source>%1/offline</source>
-        <translation>%1/hors ligne</translation>
-    </message>
-    <message>
         <source>0/unconfirmed, in memory pool</source>
         <translation>0/non confirmée, dans mempool</translation>
     </message>
@@ -5687,10 +5735,6 @@ https://www.transifex.com/luxcore/luxcore</source>
     <message>
         <source>Net Amount</source>
         <translation>Montant net</translation>
-    </message>
-    <message>
-        <source>SC Address (Hash160)</source>
-        <translation type="vanished">Adresse SC</translation>
     </message>
 </context>
 <context>
@@ -5757,7 +5801,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Transaction status. Hover over this field to show number of confirmations.</source>
-        <translation type="unfinished"></translation>
+        <translation>Etat de la transaction. Placer la souris sur ce champ pour afficher les confirmations.</translation>
     </message>
     <message>
         <source>Date and time that the transaction was received.</source>
@@ -5769,7 +5813,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>User-defined intent/purpose of the transaction.</source>
-        <translation type="unfinished"></translation>
+        <translation>Propos de la transaction défini par l&apos;utilisateur.</translation>
     </message>
     <message>
         <source>Token name.</source>
@@ -5938,14 +5982,14 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message numerus="yes">
         <source>Open for %n more block(s)</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>Ouvert pendant %n bloc</numerusform>
             <numerusform>Ouvert pendant %n blocs</numerusform>
         </translation>
     </message>
     <message>
         <source>Open until %1</source>
-        <translation type="unfinished">Ouvert pendant %1</translation>
+        <translation>Ouvert pendant %1</translation>
     </message>
     <message>
         <source>conflicted with a transaction with %1 confirmations</source>
@@ -5962,17 +6006,6 @@ https://www.transifex.com/luxcore/luxcore</source>
     <message>
         <source>not in memory pool</source>
         <translation>pas dans la mempool</translation>
-    </message>
-    <message>
-        <source>, has not been successfully broadcast yet</source>
-        <translation>, n&apos;a pas encore été transmis</translation>
-    </message>
-    <message numerus="yes">
-        <source>, broadcast through %n node(s)</source>
-        <translation>
-            <numerusform>, transmis à %n node</numerusform>
-            <numerusform>, transmis à %n nodes</numerusform>
-        </translation>
     </message>
     <message>
         <source>Date</source>
@@ -6076,10 +6109,6 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation>Adresse</translation>
     </message>
     <message>
-        <source>Offline</source>
-        <translation>Hors ligne</translation>
-    </message>
-    <message>
         <source>Unconfirmed</source>
         <translation>Non confirmée</translation>
     </message>
@@ -6098,10 +6127,6 @@ https://www.transifex.com/luxcore/luxcore</source>
     <message>
         <source>Immature (%1 confirmations, will be available after %2)</source>
         <translation>Immature (%1 confirmations, disponible après %2)</translation>
-    </message>
-    <message>
-        <source>This block was not received by any other nodes and will probably not be accepted!</source>
-        <translation>Ce bloc n&apos;a pas été reçu par les autres noeuds et ne sera probablement pas accepté !</translation>
     </message>
     <message>
         <source>Received with</source>
@@ -6208,7 +6233,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Transaction status. Hover over this field to show number of confirmations.</source>
-        <translation type="unfinished"></translation>
+        <translation>Etat de la transaction. Placer la souris sur ce champ pour afficher les confirmations.</translation>
     </message>
     <message>
         <source>Whether or not a watch-only address is involved in this transaction.</source>
@@ -6560,18 +6585,6 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation>Attention</translation>
     </message>
     <message>
-        <source> or address book entries might be missing or incorrect</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&apos;importprivkey&apos; finished successfully. Please restart Luxcore wallet with &apos;-rescan&apos; option. Otherwise, transaction data</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&apos;importprivkey&apos; with &apos;Rescan&apos; option finished successfully. Please restart your Luxcore wallet. Otherwise, transaction data</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>(1 = keep tx meta data e.g. account owner and payment request information, 2 = drop tx meta data)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6596,18 +6609,6 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Cannot obtain a lock on data directory %s. Luxcore is probably already running.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Change automatic finalized budget voting behavior. mode=auto: Vote for only exact finalized budget match to my generated budget. (string, default: auto)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Continuously rate-limit free transactions to &lt;n&gt;*1000 bytes per minute (default:%u)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Create new files with system default permissions, instead of umask 077 (only effective with disabled wallet functionality)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6620,31 +6621,7 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Distributed under the MIT software license, see the accompanying file COPYING or &lt;http://www.opensource.org/licenses/mit-license.php&gt;.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Enable instantx, show confirmations for locked transactions (bool, default: %s)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Enable use of automated darksend for funds stored in this wallet (0-1, default: %u)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Enter regression test mode, which uses a special chain in which blocks can be solved instantly.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Error loading %s: You need to upgrade the wallet to enable HD on a non-HD wallet</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Error: Listening for incoming connections failed (listen returned error %s)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Error: Unsupported argument -socks found. Setting SOCKS version isn&apos;t possible anymore, only SOCKS5 proxies are supported.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6660,18 +6637,6 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Fees (in LUX/Kb) smaller than this are considered zero fee for relaying (default: %s)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Fees (in LUX/Kb) smaller than this are considered zero fee for transaction creation (default: %s)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Flush database activity from memory pool to disk log every &lt;n&gt; megabytes (default: %u)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Found unconfirmed denominated outputs, will wait till they confirm to continue.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6684,36 +6649,20 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>In this mode -genproclimit controls how many blocks are generated immediately.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>InstantX requires inputs with at least 6 confirmations, you might need to wait a few minutes and try again.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Invalid amount for -maxtxfee=&lt;amount&gt;: &apos;%s&apos; (must be at least the minrelay fee of %s to prevent stuck transactions)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Log transaction priority and fee per kB when mining blocks (default: %u)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Maintain a full EVM log index, used by searchlogs and gettransactionreceipt rpc calls (default: %u)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Maintain a full address index, used to query for the balance, txids and unspent outputs for addresses (default: %u)</source>
-        <translation type="unfinished"></translation>
+        <translation>Maintient un index complet des adresses, utilisé pour obtenir les balances et l&apos;historique des adresses (défaut: %u)</translation>
     </message>
     <message>
         <source>Maintain a full spent index, used to query the spending txid and input index for an outpoint (default: %u)</source>
-        <translation type="unfinished"></translation>
+        <translation>Maintient un index complet des dépenses, utilisé pour connaître le statut des sorties (défaut: %u)</translation>
     </message>
     <message>
         <source>Maintain a full transaction index, used by the getrawtransaction rpc call (default: %u)</source>
-        <translation type="unfinished"></translation>
+        <translation>Maintient un index complet des transactions, utilisé pour getrawtransaction (défaut: %u)</translation>
     </message>
     <message>
         <source>Make sure to encrypt your wallet and delete all non-encrypted backups after you verified that wallet works!</source>
@@ -6736,47 +6685,11 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Provide liquidity to Darksend by infrequently mixing coins on a continual basis (0-100, default: %u, 1=very frequent, high fees, 100=very infrequent, low fees)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Prune configured below the minimum of %d MB.  Please use a higher number.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Query for peer addresses via DNS lookup, if low on addresses (default: 1 unless -connect)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Reduce storage requirements by pruning (deleting) old blocks. This mode disables wallet support and is incompatible with -txindex.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Require high priority for relaying free or low-fee transactions (default:%u)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Rescan aborted by user. Please restart your Luxcore wallet with &apos;-rescan&apos; option. Otherwise, transaction data</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Send trace/debug info to console instead of debug.log file (default: %u)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Set maximum size of high-priority/low-fee transactions in bytes (default: %d)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Set the number of script verification threads (1 to %d, 0 = auto, &lt;0 = leave that many cores free, default: %d)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Set the number of threads for coin generation if enabled (-1 = all cores, default: %d)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Show N confirmations for a successfully locked transaction (0-9999, default: %u)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6788,35 +6701,11 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>This product includes software developed by the OpenSSL Project for use in the OpenSSL Toolkit &lt;https://www.openssl.org/&gt; and cryptographic software written by Eric Young and UPnP software written by Thomas Bernard.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Unable to bind to %s on this computer. Luxcore is probably already running.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Unable to locate enough DarkSend denominated funds for this transaction.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Unable to locate enough DarkSend non-denominated funds for this transaction that are not equal 10000 LUX.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Unable to locate enough funds for this transaction that are not equal 10000 LUX.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Use hierarchical deterministic key generation (HD) after bip32. Only has effect during wallet creation/first start</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Use separate SOCKS5 proxy to reach peers via Tor hidden services (default: %s)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>User defined memonic passphrase for HD wallet (bip39). Only has effect during wallet creation/first start (default: randomly generated)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6828,39 +6717,11 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Warning: -maxtxfee is set very high! Fees this large could be paid on a single transaction.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Warning: -paytxfee is set very high! This is the transaction fee you will pay if you send a transaction.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Warning: Please check that your computer&apos;s date and time are correct! If your clock is wrong Luxcore will not work properly.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Warning: Reverting this setting requires re-downloading the entire blockchain.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Warning: The network does not appear to fully agree! Some miners appear to be experiencing issues.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Warning: We do not appear to fully agree with our peers! You may need to upgrade, or other nodes may need to upgrade.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Warning: error reading wallet.dat! All keys read correctly, but transaction data or address book entries might be missing or incorrect.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Warning: wallet.dat corrupt, data salvaged! Original wallet.dat saved as wallet.{timestamp}.bak in %s; if your balance or transactions are incorrect you should restore from a backup.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Whitelist peers connecting from the given netmask or IP address. Can be specified multiple times.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6873,10 +6734,6 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>You need to rebuild the database using -reindex to go back to unpruned mode.  This will redownload the entire blockchain</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>You need to rebuild the database using -reindex-chainstate to enable -logevents</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6900,23 +6757,11 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&gt;%u = target size in MiB to use for block files)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Accept command line and JSON-RPC commands</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Accept connections from outside (default: 1 if no -proxy or -connect)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Accept public REST requests (default: %u)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Acceptable ciphers (default: %s)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6936,31 +6781,11 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Attempt to recover private keys from a corrupt wallet.dat</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Block creation options:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Can&apos;t denominate: no compatible inputs left.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Cannot downgrade wallet</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cannot resolve -bind address: &apos;%s&apos;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cannot resolve -externalip address: &apos;%s&apos;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cannot resolve -whitebind address: &apos;%s&apos;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6972,15 +6797,7 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Collateral is not valid.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Collateral not valid.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Connect only to the specified node(s)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6993,18 +6810,6 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Connection options:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Copyright (C) 2009-%i The Bitcoin Core Developers</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Copyright (C) 2014-%i The Dash Core Developers</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Copyright (C) 2017-%i The LUX-Core Developers</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7024,14 +6829,6 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Disable safemode, override a real safe mode event (default: %u)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Discover own IP address (default: 1 when listening and no -externalip)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Do not load the wallet and disable wallet RPC calls</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7048,19 +6845,11 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Enable publish hash transaction (locked via InstanTX) in &lt;address&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Enable publish hash transaction in &lt;address&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Enable publish raw block in &lt;address&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Enable publish raw transaction (locked via InstanTX) in &lt;address&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7073,10 +6862,6 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Entries are full.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Error connecting to masternode.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7096,31 +6881,11 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Error loading wallet.dat</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Error loading wallet.dat: Wallet corrupted</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Error loading wallet.dat: Wallet requires newer version of Luxcore</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Error opening block database</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Error reading from database, shutting down.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Error recovering public key.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Error: A fatal internal error occured, see debug.log for details</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7132,35 +6897,7 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Error: Unsupported argument -tor found, use -onion.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Error: Wallet locked, unable to create transaction!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Error: You already have pending entries in the Darksend pool</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Error: can&apos;t select current denominated inputs</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Failed to listen on any port. Use -listen=0 if you want this.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Fee (in LUX/kB) to add to transactions you send (default: %s)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Force safe mode (default: %u)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Generate coins (default: %u)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7168,16 +6905,8 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>If &lt;category&gt; is not supplied, output all debugging information.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Importing...</source>
         <translation>Import...</translation>
-    </message>
-    <message>
-        <source>Imports blocks from external blk000??.dat file</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Include IP addresses in debug output (default: %u)</source>
@@ -7196,15 +6925,7 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Initialization sanity check failed. Luxcore is shutting down.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Input is not valid.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>InstanTX options:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7220,27 +6941,7 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Invalid amount for -maxtxfee=&lt;amount&gt;: &apos;%s&apos;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Invalid amount for -minrelaytxfee=&lt;amount&gt;: &apos;%s&apos;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Invalid amount for -mintxfee=&lt;amount&gt;: &apos;%s&apos;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Invalid amount for -paytxfee=&lt;amount&gt;: &apos;%s&apos; (must be at least %s)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Invalid amount for -paytxfee=&lt;amount&gt;: &apos;%s&apos;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Invalid amount for -reservebalance=&lt;amount&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7252,15 +6953,7 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Invalid private key.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Invalid script detected.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Keep N LUX anonymized (default: %u)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7269,18 +6962,6 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Keypool ran out, please call keypoolrefill first</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Last Darksend was too recent.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Last successful darksend action was too recent.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Limit size of signature cache to &lt;n&gt; entries (default: %u)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7309,14 +6990,6 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Lock masternodes from masternode configuration file (default: %u)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Logs all EVM LOG opcode operations to the file vmExecLogs.json</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Maintain at most &lt;n&gt; connections to peers (default: %u)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7356,18 +7029,6 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>No compatible masternode found.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>No funds detected in need of denominating.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>No masternodes detected.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>No matching denominations found for mixing.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7385,18 +7046,6 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Not enough file descriptors available.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Not in the masternode list.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Number of automatic wallet backups (default: 10)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Only accept block chain matching built-in checkpoints (default: %u)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7428,27 +7077,7 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>RPC SSL options: (see the Bitcoin Wiki for SSL setup instructions)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>RPC server options:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>RPC support for HTTP persistent connections (default: %d)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Randomly drop 1 of every &lt;n&gt; network messages</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Randomly fuzz 1 of every &lt;n&gt; network messages</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Rebuild block chain index from current blk000??.dat files</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7468,15 +7097,7 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Rescan the block chain for missing wallet transactions</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Rescanning...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Run a thread to flush wallet periodically (default: %u)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7488,27 +7109,11 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Server certificate file (default: %s)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Server private key (default: %s)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Session not complete!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Session timed out (30 seconds), please resubmit.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Set database cache size in megabytes (%d to %d, default: %d)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Set external address:port to get to this masternode (example: %s)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7520,14 +7125,6 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Set minimum block size in bytes (default: %u)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Set number of debug log files</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Set the masternode private key</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7536,23 +7133,11 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Sets the DB_PRIVATE flag in the wallet db environment (default: %u)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Show all debugging options (usage: --help -help-debug)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Shrink debug.log file on client startup (default: 1 when no -debug)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Signing failed.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Signing timed out, please resubmit.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7592,27 +7177,7 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Stake your coins to support network and gain reward (default: %s)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Stop running after importing blocks from disk (default: %u)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This help message</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>This is experimental software.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This is intended for regression testing tools and app development.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This is not a masternode.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7621,10 +7186,6 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Transaction amount too small</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Transaction amounts must be positive</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7644,14 +7205,6 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Unable to generate keys</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Unable to sign masternode payment winner, wrong key?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Unable to sign spork message, wrong key?</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7660,27 +7213,7 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Unknown address type &apos;%s&apos;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Unknown change type &apos;%s&apos;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Unknown network specified in -onlynet: &apos;%s&apos;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Upgrade wallet to latest format</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Use N separate masternodes to anonymize funds  (2-8, default: %u)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Use OpenSSL (https) for JSON-RPC connections</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7688,23 +7221,7 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Use UPnP to map the listening port (default: 1 when listening)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Use the SegWit test network</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Use the test network</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Username for JSON-RPC connections</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Value more than Darksend pool maximum allows.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7724,10 +7241,6 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Wallet needed to be rewritten: restart Luxcore to complete</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Wallet options:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7736,27 +7249,7 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Warning: This version is obsolete, upgrade required!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Warning: Unsupported argument -benchmark ignored, use -debug=bench.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Warning: Unsupported argument -debugnet ignored, use -debug=net.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Warning: unknown new rules activated (versionbit %i)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Wrong state.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>You need to rebuild the database using -reindex to change -txindex</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7772,11 +7265,543 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation>au démarrage</translation>
     </message>
     <message>
-        <source>wallet.dat corrupt, salvage failed</source>
+        <source>Prune: last wallet synchronisation goes beyond pruned data. You need to -reindex (download the whole blockchain again in case of pruned node)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Prune: last wallet synchronisation goes beyond pruned data. You need to -reindex (download the whole blockchain again in case of pruned node)</source>
+        <source> or address book entries might be missing or incorrect</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&apos;importprivkey&apos; finished successfully. Please restart Luxcore wallet with &apos;-rescan&apos; option. Otherwise, transaction data</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&apos;importprivkey&apos; with &apos;Rescan&apos; option finished successfully. Please restart your Luxcore wallet. Otherwise, transaction data</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot obtain a lock on data directory %s. Luxcore is probably already running.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change automatic finalized budget voting behavior. mode=auto: Vote for only exact finalized budget match to my generated budget. (string, default: auto)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Continuously rate-limit free transactions to &lt;n&gt;*1000 bytes per minute (default:%u)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Distributed under the MIT software license, see the accompanying file COPYING or &lt;http://www.opensource.org/licenses/mit-license.php&gt;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable instantx, show confirmations for locked transactions (bool, default: %s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable use of automated darksend for funds stored in this wallet (0-1, default: %u)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter regression test mode, which uses a special chain in which blocks can be solved instantly.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error loading %s: You need to upgrade the wallet to enable HD on a non-HD wallet</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error: Unsupported argument -socks found. Setting SOCKS version isn&apos;t possible anymore, only SOCKS5 proxies are supported.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fees (in LUX/Kb) smaller than this are considered zero fee for relaying (default: %s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fees (in LUX/Kb) smaller than this are considered zero fee for transaction creation (default: %s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Flush database activity from memory pool to disk log every &lt;n&gt; megabytes (default: %u)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>In this mode -genproclimit controls how many blocks are generated immediately.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>InstantX requires inputs with at least 6 confirmations, you might need to wait a few minutes and try again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Log transaction priority and fee per kB when mining blocks (default: %u)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maintain a full EVM log index, used by searchlogs and gettransactionreceipt rpc calls (default: %u)</source>
+        <translation>Maintient un log EVM complet, utilisé pour searchlogs et gettransactionreceipt (défaut: %u)</translation>
+    </message>
+    <message>
+        <source>Provide liquidity to Darksend by infrequently mixing coins on a continual basis (0-100, default: %u, 1=very frequent, high fees, 100=very infrequent, low fees)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Query for peer addresses via DNS lookup, if low on addresses (default: 1 unless -connect)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reduce storage requirements by pruning (deleting) old blocks. This mode disables wallet support and is incompatible with -txindex.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Require high priority for relaying free or low-fee transactions (default:%u)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rescan aborted by user. Please restart your Luxcore wallet with &apos;-rescan&apos; option. Otherwise, transaction data</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Send trace/debug info to console instead of debug.log file (default: %u)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set the number of script verification threads (1 to %d, 0 = auto, &lt;0 = leave that many cores free, default: %d)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set the number of threads for coin generation if enabled (-1 = all cores, default: %d)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show N confirmations for a successfully locked transaction (0-9999, default: %u)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This product includes software developed by the OpenSSL Project for use in the OpenSSL Toolkit &lt;https://www.openssl.org/&gt; and cryptographic software written by Eric Young and UPnP software written by Thomas Bernard.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to bind to %s on this computer. Luxcore is probably already running.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to locate enough DarkSend non-denominated funds for this transaction that are not equal 10000 LUX.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to locate enough funds for this transaction that are not equal 10000 LUX.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use hierarchical deterministic key generation (HD) after bip32. Only has effect during wallet creation/first start</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>User defined memonic passphrase for HD wallet (bip39). Only has effect during wallet creation/first start (default: randomly generated)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning: -maxtxfee is set very high! Fees this large could be paid on a single transaction.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning: -paytxfee is set very high! This is the transaction fee you will pay if you send a transaction.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning: Please check that your computer&apos;s date and time are correct! If your clock is wrong Luxcore will not work properly.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning: Reverting this setting requires re-downloading the entire blockchain.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning: error reading wallet.dat! All keys read correctly, but transaction data or address book entries might be missing or incorrect.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning: wallet.dat corrupt, data salvaged! Original wallet.dat saved as wallet.{timestamp}.bak in %s; if your balance or transactions are incorrect you should restore from a backup.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Whitelist peers connecting from the given netmask or IP address. Can be specified multiple times.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You need to rebuild the database using -reindex-chainstate to enable -logevents</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&gt;%u = target size in MiB to use for block files)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Accept connections from outside (default: 1 if no -proxy or -connect)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Acceptable ciphers (default: %s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Attempt to recover private keys from a corrupt wallet.dat</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Can&apos;t denominate: no compatible inputs left.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot resolve -bind address: &apos;%s&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot resolve -externalip address: &apos;%s&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot resolve -whitebind address: &apos;%s&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Collateral is not valid.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connect only to the specified node(s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copyright (C) 2009-%i The Bitcoin Core Developers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copyright (C) 2014-%i The Dash Core Developers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copyright (C) 2017-%i The LUX-Core Developers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Disable safemode, override a real safe mode event (default: %u)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Discover own IP address (default: 1 when listening and no -externalip)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable publish hash transaction (locked via InstanTX) in &lt;address&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable publish raw transaction (locked via InstanTX) in &lt;address&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error connecting to masternode.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error loading wallet.dat</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error loading wallet.dat: Wallet corrupted</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error loading wallet.dat: Wallet requires newer version of Luxcore</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error recovering public key.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error: A fatal internal error occured, see debug.log for details</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error: Unsupported argument -tor found, use -onion.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error: Wallet locked, unable to create transaction!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error: You already have pending entries in the Darksend pool</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error: can&apos;t select current denominated inputs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fee (in LUX/kB) to add to transactions you send (default: %s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Force safe mode (default: %u)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Generate coins (default: %u)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If &lt;category&gt; is not supplied, output all debugging information.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Imports blocks from external blk000??.dat file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Initialization sanity check failed. Luxcore is shutting down.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>InstanTX options:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid amount for -maxtxfee=&lt;amount&gt;: &apos;%s&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid amount for -minrelaytxfee=&lt;amount&gt;: &apos;%s&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid amount for -mintxfee=&lt;amount&gt;: &apos;%s&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid amount for -paytxfee=&lt;amount&gt;: &apos;%s&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid amount for -reservebalance=&lt;amount&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid private key.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keep N LUX anonymized (default: %u)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Last Darksend was too recent.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Last successful darksend action was too recent.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Limit size of signature cache to &lt;n&gt; entries (default: %u)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Logs all EVM LOG opcode operations to the file vmExecLogs.json</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maintain at most &lt;n&gt; connections to peers (default: %u)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No compatible masternode found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No funds detected in need of denominating.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No masternodes detected.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not in the masternode list.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Number of automatic wallet backups (default: 10)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Only accept block chain matching built-in checkpoints (default: %u)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>RPC SSL options: (see the Bitcoin Wiki for SSL setup instructions)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>RPC support for HTTP persistent connections (default: %d)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Randomly drop 1 of every &lt;n&gt; network messages</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Randomly fuzz 1 of every &lt;n&gt; network messages</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rebuild block chain index from current blk000??.dat files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rescan the block chain for missing wallet transactions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Run a thread to flush wallet periodically (default: %u)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server certificate file (default: %s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server private key (default: %s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Session timed out (30 seconds), please resubmit.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set external address:port to get to this masternode (example: %s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set minimum block size in bytes (default: %u)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set number of debug log files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sets the DB_PRIVATE flag in the wallet db environment (default: %u)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Signing failed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Signing timed out, please resubmit.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stake your coins to support network and gain reward (default: %s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop running after importing blocks from disk (default: %u)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This help message</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This is intended for regression testing tools and app development.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This is not a masternode.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Transaction amounts must be positive</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to generate keys</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to sign masternode payment winner, wrong key?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown address type &apos;%s&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown change type &apos;%s&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Upgrade wallet to latest format</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use N separate masternodes to anonymize funds  (2-8, default: %u)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use OpenSSL (https) for JSON-RPC connections</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use UPnP to map the listening port (default: 1 when listening)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use the SegWit test network</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use the test network</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Value more than Darksend pool maximum allows.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Wallet needed to be rewritten: restart Luxcore to complete</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning: This version is obsolete, upgrade required!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning: Unsupported argument -benchmark ignored, use -debug=bench.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning: Unsupported argument -debugnet ignored, use -debug=net.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Wrong state.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You need to rebuild the database using -reindex to change -txindex</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>wallet.dat corrupt, salvage failed</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7988,11 +8013,11 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Loading keys:&lt;/p&gt;&lt;p&gt;1) Enter Password&lt;/p&gt;&lt;p&gt;2) Load API Keys&lt;/p&gt;&lt;p&gt;3) Start trading on Cryptopia&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Loading keys:&lt;/p&gt;&lt;p&gt;1) Entrer le mot de passe &lt;/p&gt;&lt;p&gt;2) Charger les clés API&lt;/p&gt;&lt;p&gt;3) Echanger sur Cryptopia&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Chargement des clés:&lt;/p&gt;&lt;p&gt;1) Entrer le mot de passe &lt;/p&gt;&lt;p&gt;2) Charger les clés API&lt;/p&gt;&lt;p&gt;3) Echanger sur Cryptopia&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Saving keys:&lt;/p&gt;&lt;p&gt;1) Enter in API Keys found at &lt;a href=&quot;https://Cryptopia.co.nz/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Cryptopia&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;2) Enter Password&lt;/p&gt;&lt;p&gt;3) Save API Keys&lt;/p&gt;&lt;p&gt;4) Start trading on Cryptopia&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Saving keys:&lt;/p&gt;&lt;p&gt;1) Saisir les clés API fournies par &lt;a href=&quot;https://Cryptopia.co.nz/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Cryptopia&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;2) Entrer un mot de passe&lt;/p&gt;&lt;p&gt;3) Enregistrer les clés API&lt;/p&gt;&lt;p&gt;4) Echanger sur Cryptopia&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enregistrement des clés:&lt;/p&gt;&lt;p&gt;1) Saisir les clés API fournies par &lt;a href=&quot;https://Cryptopia.co.nz/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Cryptopia&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;2) Entrer un mot de passe&lt;/p&gt;&lt;p&gt;3) Enregistrer les clés API&lt;/p&gt;&lt;p&gt;4) Echanger sur Cryptopia&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <source>Cancel Order</source>

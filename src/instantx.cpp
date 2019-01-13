@@ -234,14 +234,7 @@ int64_t CreateNewLock(CTransaction tx) {
         This prevents attackers from using transaction mallibility to predict which masternodes
         they'll use.
     */
-    int nBlockHeight = 0;
-    {
-        LOCK(cs_main);
-        if (chainActive.Tip())
-            nBlockHeight = chainActive.Tip()->nHeight - nTxAge + 4;
-        else
-            return 0;
-    }
+    int nBlockHeight = (chainActive.Height() - nTxAge) + 4;
 
     if (!mapTxLocks.count(tx.GetHash())) {
         LogPrintf("CreateNewLock - New Transaction Lock %s !\n", tx.GetHash().ToString().c_str());
@@ -352,14 +345,6 @@ bool ProcessConsensusVote(CConsensusVote& ctx) {
     if (i != mapTxLocks.end()) {
         (*i).second.AddSignature(ctx);
 
-#ifdef ENABLE_WALLET
-        if(pwalletMain){
-            //when we get back signatures, we'll count them as requests. Otherwise the client will think it didn't propagate.
-            if(pwalletMain->mapRequestCount.count(ctx.txHash))
-                pwalletMain->mapRequestCount[ctx.txHash]++;
-        }
-#endif
-
         if (fDebug) LogPrintf("InstantX::ProcessConsensusVote - Transaction Lock Votes %d - %s !\n", (*i).second.CountSignatures(), ctx.GetHash().ToString().c_str());
 
         if ((*i).second.CountSignatures() >= INSTANTX_SIGNATURES_REQUIRED) {
@@ -438,7 +423,7 @@ int64_t GetAverageVoteTime() {
 }
 
 void CleanTransactionLocksList() {
- //   if (chainActive.Tip() == NULL) return;
+    if (chainActive.Tip() == NULL) return;
 
     std::map<uint256, CTransactionLock>::iterator it = mapTxLocks.begin();
 

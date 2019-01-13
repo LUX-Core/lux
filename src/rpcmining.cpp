@@ -1021,39 +1021,6 @@ UniValue submitblock(const UniValue& params, bool fHelp)
     return BIP22ValidationResult(state);
 }
 
-UniValue purgetxmempool(const UniValue& params, bool fHelp)
-{
-    if (fHelp || params.size() != 1)
-        throw runtime_error(
-            "purgetxmempool txid\n"
-            "\nRemoves a transaction from mempool\n"
-            "\nArguments:\n"
-            "\"txid\"     (string) the txid to remove\n"
-            "\nResult:\n"
-            "true|false (boolean) true if removed\n"
-            "\nExample:\n" +
-            HelpExampleCli("purgetxmempool", "7e00f209a0e80b7e17913c777ed98968025ef74d985e28968812c68244b2ac77")
-        );
-
-    string txid = params[0].get_str();
-    if (!IsHex(txid) || txid.size() != 64)
-        throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter, expected hex txid");
-
-    UniValue result(UniValue::VBOOL);
-
-    uint256 hash;
-    hash.SetHex(txid);
-    if (mempool.exists(hash)) {
-        CTransactionRef ref = mempool.get(hash);
-        if (ref) {
-            mempool.removeRecursive(*ref, MemPoolRemovalReason::EXPIRY);
-            LogPrintf("%s: removed tx %s from mempool\n", __func__, txid);
-            result = true;
-        }
-    }
-    return result;
-}
-
 UniValue estimatefee(const UniValue& params, bool fHelp)
 {
     if (fHelp || params.size() != 1)

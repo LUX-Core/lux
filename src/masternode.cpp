@@ -472,7 +472,7 @@ int GetMasternodeByRank(int findRank, int64_t nBlockHeight, int minProtocol) {
     sort(vecMasternodeScores.rbegin(), vecMasternodeScores.rend(), CompareValueOnly2());
 
     int rank = 0;
-    for (std::pair<unsigned int, int> &s : vecMasternodeScores) {
+    for (PAIRTYPE(unsigned int, int) &s : vecMasternodeScores) {
         rank++;
         if (rank == findRank) return s.second;
     }
@@ -502,7 +502,7 @@ int GetMasternodeRank(CTxIn& vin, int64_t nBlockHeight, int minProtocol) {
     sort(vecMasternodeScores.rbegin(), vecMasternodeScores.rend(), CompareValueOnly());
 
     unsigned int rank = 0;
-    for (std::pair<unsigned int, CTxIn> &s : vecMasternodeScores) {
+    for (PAIRTYPE(unsigned int, CTxIn) &s : vecMasternodeScores) {
         rank++;
         if (s.second == vin) {
             return rank;
@@ -514,9 +514,6 @@ int GetMasternodeRank(CTxIn& vin, int64_t nBlockHeight, int minProtocol) {
 
 //Get the last hash that matches the modulus given. Processed in reverse order
 bool GetBlockHash(uint256& hash, int nBlockHeight) {
-
-    LOCK(cs_main);
-
     if (chainActive.Tip() == NULL) return false;
 
     if (nBlockHeight == 0)
@@ -561,11 +558,7 @@ bool GetBlockHash(uint256& hash, int nBlockHeight) {
 // and get paid this block
 //
 uint256 CMasterNode::CalculateScore(int mod, int64_t nBlockHeight) {
-
-    {
-        LOCK(cs_main);
-        if (chainActive.Tip() == NULL) return 0;
-    }
+    if (chainActive.Tip() == NULL) return 0;
 
     uint256 hash = 0;
     uint256 aux = vin.prevout.hash + vin.prevout.n;

@@ -1140,10 +1140,6 @@ Address: %4
         <translation type="unfinished">unknown</translation>
     </message>
     <message>
-        <source>Height</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Size</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1220,14 +1216,6 @@ Address: %4
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Input</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Output</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Inputs</source>
         <translation type="unfinished">Inputs</translation>
     </message>
@@ -1299,6 +1287,14 @@ Address: %4
         <source>Address</source>
         <translation type="unfinished">Address</translation>
     </message>
+    <message>
+        <source>Value In</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Smart Contract</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>CallContractPage</name>
@@ -1347,10 +1343,6 @@ Address: %4
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Read Contract</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>The account address.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1360,6 +1352,10 @@ Address: %4
     </message>
     <message>
         <source>Read contract</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Read Contract</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3964,6 +3960,10 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>&amp;Save</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>&amp;Yes</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3973,10 +3973,6 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&amp;Save</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4507,6 +4503,18 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>No</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Memory usage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Current number of transactions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Memory Pool</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5251,7 +5259,7 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation type="unfinished">Form</translation>
     </message>
     <message>
-        <source>Write Smart Contract</source>
+        <source>Write to Smart Contract</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5303,10 +5311,6 @@ https://www.transifex.com/luxcore/luxcore</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Write to Contract</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>The contract address that will receive the funds and data.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5348,6 +5352,10 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Gas price: LUX price per gas unit. Default = %1, Min = %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Write to Contract</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5890,7 +5898,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>%1/offline</source>
-        <translation type="unfinished">%1/offline</translation>
+        <translation type="obsolete">%1/offline</translation>
     </message>
     <message>
         <source>0/unconfirmed, in memory pool</source>
@@ -6185,11 +6193,11 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>, has not been successfully broadcast yet</source>
-        <translation>, has not been successfully broadcast yet</translation>
+        <translation type="vanished">, has not been successfully broadcast yet</translation>
     </message>
     <message numerus="yes">
         <source>, broadcast through %n node(s)</source>
-        <translation>
+        <translation type="vanished">
             <numerusform>, broadcast through %n node</numerusform>
             <numerusform>, broadcast through %n nodes</numerusform>
         </translation>
@@ -6392,7 +6400,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Offline</source>
-        <translation>Offline</translation>
+        <translation type="vanished">Offline</translation>
     </message>
     <message>
         <source>Unconfirmed</source>
@@ -6416,7 +6424,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>This block was not received by any other nodes and will probably not be accepted!</source>
-        <translation>This block was not received by any other nodes and will probably not be accepted!</translation>
+        <translation type="vanished">This block was not received by any other nodes and will probably not be accepted!</translation>
     </message>
     <message>
         <source>Received with</source>
@@ -8046,35 +8054,11 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
         <translation>wallet.dat corrupt, salvage failed</translation>
     </message>
     <message>
-        <source> or address book entries might be missing or incorrect</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&apos;importprivkey&apos; finished successfully. Please restart Luxcore wallet with &apos;-rescan&apos; option. Otherwise, transaction data</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&apos;importprivkey&apos; with &apos;Rescan&apos; option finished successfully. Please restart your Luxcore wallet. Otherwise, transaction data</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Cannot obtain a lock on data directory %s. %s is probably already running.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>DarkSend uses exact denominated amounts to send funds, you might simply need to anonymize some more coins.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Error loading %s: You need to upgrade the wallet to enable HD on a non-HD wallet</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>InstantX requires inputs with at least 6 confirmations, you might need to wait a few minutes and try again.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Maintain a full EVM log index, used by searchlogs and gettransactionreceipt rpc calls (default: %u)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -8094,35 +8078,11 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Reduce storage requirements by pruning (deleting) old blocks. This mode disables wallet support and is incompatible with -txindex.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Rescan aborted by user. Please restart your Luxcore wallet with &apos;-rescan&apos; option. Otherwise, transaction data</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Set the number of script verification threads (1 to %d, 0 = auto, &lt;0 = leave that many cores free, default: %d)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>The block database contains a block which appears to be from the future. This may be due to your computer&apos;s date and time being set incorrectly. Only rebuild the block database if you are sure that your computer&apos;s date and time are correct</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Unable to locate enough DarkSend denominated funds for this transaction.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Unable to locate enough DarkSend non-denominated funds for this transaction that are not equal 10000 LUX.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Use hierarchical deterministic key generation (HD) after bip32. Only has effect during wallet creation/first start</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>User defined memonic passphrase for HD wallet (bip39). Only has effect during wallet creation/first start (default: randomly generated)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -8134,15 +8094,7 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Warning: Reverting this setting requires re-downloading the entire blockchain.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>You need to rebuild the database using -reindex to go back to unpruned mode.  This will redownload the entire blockchain</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>You need to rebuild the database using -reindex-chainstate to enable -logevents</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -8150,15 +8102,7 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>(default: 0 = disable pruning blocks,</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>&lt;category&gt; can be:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&gt;%u = target size in MiB to use for block files)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -8166,23 +8110,7 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Collateral is not valid.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Copyright (C) 2017-%i The LUX-Core Developers</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Darksend is disabled.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Enable publish hash block in &lt;address&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Enable publish hash transaction (locked via InstanTX) in &lt;address&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -8194,15 +8122,7 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Enable publish raw transaction (locked via InstanTX) in &lt;address&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Enable publish raw transaction in &lt;address&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Error connecting to masternode.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -8214,19 +8134,7 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Error: can&apos;t select current denominated inputs</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Keypool ran out, please call keypoolrefill first</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Last successful darksend action was too recent.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Logs all EVM LOG opcode operations to the file vmExecLogs.json</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -8235,18 +8143,6 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <source>Mnemonic passphrase is too long, must be at most 256 characters</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>No compatible masternode found.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>No masternodes detected.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Not in the masternode list.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -8263,6 +8159,134 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
     </message>
     <message>
         <source>Rebuild chain state from the currently indexed blocks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to start HTTP server. See debug log for details.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning: unknown new rules activated (versionbit %i)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ZeroMQ notification options:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Prune: last wallet synchronisation goes beyond pruned data. You need to -reindex (download the whole blockchain again in case of pruned node)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> or address book entries might be missing or incorrect</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&apos;importprivkey&apos; finished successfully. Please restart Luxcore wallet with &apos;-rescan&apos; option. Otherwise, transaction data</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&apos;importprivkey&apos; with &apos;Rescan&apos; option finished successfully. Please restart your Luxcore wallet. Otherwise, transaction data</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error loading %s: You need to upgrade the wallet to enable HD on a non-HD wallet</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>InstantX requires inputs with at least 6 confirmations, you might need to wait a few minutes and try again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maintain a full EVM log index, used by searchlogs and gettransactionreceipt rpc calls (default: %u)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reduce storage requirements by pruning (deleting) old blocks. This mode disables wallet support and is incompatible with -txindex.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rescan aborted by user. Please restart your Luxcore wallet with &apos;-rescan&apos; option. Otherwise, transaction data</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set the number of script verification threads (1 to %d, 0 = auto, &lt;0 = leave that many cores free, default: %d)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to locate enough DarkSend non-denominated funds for this transaction that are not equal 10000 LUX.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use hierarchical deterministic key generation (HD) after bip32. Only has effect during wallet creation/first start</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>User defined memonic passphrase for HD wallet (bip39). Only has effect during wallet creation/first start (default: randomly generated)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning: Reverting this setting requires re-downloading the entire blockchain.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You need to rebuild the database using -reindex-chainstate to enable -logevents</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(default: 0 = disable pruning blocks,</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&gt;%u = target size in MiB to use for block files)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Collateral is not valid.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copyright (C) 2017-%i The LUX-Core Developers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Darksend is disabled.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable publish hash transaction (locked via InstanTX) in &lt;address&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable publish raw transaction (locked via InstanTX) in &lt;address&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error connecting to masternode.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error: can&apos;t select current denominated inputs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Last successful darksend action was too recent.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Logs all EVM LOG opcode operations to the file vmExecLogs.json</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No compatible masternode found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No masternodes detected.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not in the masternode list.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -8294,10 +8318,6 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Unable to start HTTP server. See debug log for details.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Unknown address type &apos;%s&apos;</source>
         <translation type="unfinished"></translation>
     </message>
@@ -8310,19 +8330,7 @@ for example: alertnotify=echo %%s | mail -s &quot;LUX Alert&quot; admin@foo.com
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Warning: unknown new rules activated (versionbit %i)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Wrong state.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>ZeroMQ notification options:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Prune: last wallet synchronisation goes beyond pruned data. You need to -reindex (download the whole blockchain again in case of pruned node)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -56,7 +56,7 @@ UpdateInfoDialog::DialogResult UpdateInfoDialog::showUpdateInfo(QList<LuxUpdater
 		boxInfo.text = tr("There are new updates available! You can install them now or later.");
 		QStringList details;
 		for(auto info : updates) {
-			details << tr("%1 v%2 — %3")
+			details << QString("%1 v%2 — %3")
 					   .arg(info.name)
 					   .arg(info.version.toUtf8().constData())
 					   .arg(getByteText(info.size));

@@ -26,6 +26,7 @@ QT_TS = \
   qt/locale/lux_pt.ts \
   qt/locale/lux_ro_RO.ts \
   qt/locale/lux_ru.ts \
+  qt/locale/lux_vn.ts \
   qt/locale/lux_zh_TW.ts
 
 QT_FORMS_UI = \

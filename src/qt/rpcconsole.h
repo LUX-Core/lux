@@ -55,6 +55,13 @@ public:
         CMD_ERROR
     };
 
+    enum TabTypes {
+        TAB_INFO = 0,
+        TAB_CONSOLE = 1,
+        TAB_GRAPH = 2,
+        TAB_PEERS = 3
+    };
+
 protected:
     virtual bool eventFilter(QObject* obj, QEvent* event);
 
@@ -137,6 +144,10 @@ public Q_SLOTS:
     void unbanSelectedNode();
     /** Show folder with wallet backups in default browser */
     void showBackups();
+    /** Set size (number of transactions and memory usage) of the mempool in the UI */
+    void setMempoolSize(long numberOfTxs, size_t dynUsage);
+    /** set which tab has the focus (is visible) */
+    void setTabFocus(enum TabTypes tabType);
 
 Q_SIGNALS:
     // For RPC command executor

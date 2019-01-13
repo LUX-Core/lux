@@ -48,7 +48,7 @@ WalletView::WalletView(const PlatformStyle* platformStyle, QWidget* parent) : QS
 {
     // Create tabs
     overviewPage = new OverviewPage(platformStyle, this);
-    explorerWindow = new BlockExplorer(this);
+    explorerWindow = new BlockExplorer(platformStyle, this);
     transactionsPage = new QWidget(this);
     smartContractPage = new SmartContract(this);
     LSRTokenPage = new LSRToken(this);

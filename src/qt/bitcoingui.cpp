@@ -67,6 +67,8 @@
 #include <QToolButton>
 #include <QDockWidget>
 #include <QSizeGrip>
+#include <QDesktopServices>
+#include <QProcess>
 
 #if QT_VERSION < 0x050000
 #include <QTextDocument>
@@ -96,7 +98,7 @@ BitcoinGUI::BitcoinGUI(const PlatformStyle *platformStyle, const NetworkStyle* n
                                                                             unitDisplayControl(0),
                                                                             labelStakingIcon(0),
                                                                             labelWalletEncryptionIcon(0),
-                                                                            labelWalletHDStatusIcon(0),
+                                                                            pushButtonWalletHDStatusIcon(0),
                                                                             labelConnectionsIcon(0),
                                                                             labelBlocksIcon(0),
                                                                             progressBarLabel(0),
@@ -151,7 +153,7 @@ BitcoinGUI::BitcoinGUI(const PlatformStyle *platformStyle, const NetworkStyle* n
     QString windowTitle = tr("Luxcore") + " - ";
 
 #ifdef ENABLE_UPDATER
-    controller = new QtLuxUpdater::UpdateController(QStringLiteral("v5.2.0"), this);
+    controller = new QtLuxUpdater::UpdateController(QStringLiteral("v5.3.0"), this);
     controller->setDetailedUpdateInfo(true);
 #endif
 
@@ -187,7 +189,7 @@ BitcoinGUI::BitcoinGUI(const PlatformStyle *platformStyle, const NetworkStyle* n
     if (enableWallet) {
         /** Create wallet frame*/
         walletFrame = new WalletFrame(platformStyle, this);
-        explorerWindow = new BlockExplorer(this);
+        explorerWindow = new BlockExplorer(platformStyle, this);
     } else
 #endif // ENABLE_WALLET
     {
@@ -227,21 +229,58 @@ BitcoinGUI::BitcoinGUI(const PlatformStyle *platformStyle, const NetworkStyle* n
     frameBlocksLayout->setContentsMargins(6, 0, 6, 0);
     frameBlocksLayout->setSpacing(6);
     unitDisplayControl = new UnitDisplayStatusBarControl(platformStyle);
+    unitDisplayControl->setCursor(Qt::PointingHandCursor);
     labelStakingIcon = new QLabel();
     labelWalletEncryptionIcon = new QLabel();
-    labelWalletHDStatusIcon = new QLabel();
+
+    pushButtonWalletHDStatusIcon = new QPushButton();
+    QString styleSheet = ".QPushButton { background-color: transparent;"
+                         "border: none;"
+                         "qproperty-text: \"\" }";
+    pushButtonWalletHDStatusIcon->setMinimumSize(30, STATUSBAR_ICONSIZE);
+    pushButtonWalletHDStatusIcon->setMaximumSize(30, STATUSBAR_ICONSIZE);
+    pushButtonWalletHDStatusIcon->setIconSize(QSize(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE));
+    pushButtonWalletHDStatusIcon->setCursor(Qt::PointingHandCursor);
+    pushButtonWalletHDStatusIcon->setStyleSheet(styleSheet);
+    connect(pushButtonWalletHDStatusIcon, &QPushButton::clicked, this, [this]() {
+        int hdEnabled = this->pushButtonWalletHDStatusIcon->property("hdEnabled").toInt();
+        if(!hdEnabled) {
+            if (!pwalletMain->IsCrypted()) 
+            {
+                auto button = QMessageBox::warning(this, "HD Wallet",
+                        tr("Do you really want to enable hd-wallet? You will no more be able to disable it. "
+                           "If you select \"Yes\" the application will restart to upgrade the wallet..."),
+                        QMessageBox::Yes | QMessageBox::No);
+
+                if (QMessageBox::Yes == button) {
+                    QStringList args;
+                    args << "-usehd" << "-upgradewallet";
+                    emit requestedRestart(args);
+                }
+           }
+           else
+           {
+                QMessageBox::warning(this, "HD Wallet",
+                    tr("Your wallet cannot be upgraded because it is encrypted. "
+                     "In order to use the HD \"Hierarchical Deterministic\" feature you will need to import "
+                     "your private keys into a new/old unencrypted wallet, then attempt to upgrade."));
+           }
+        }
+    });
+
     labelConnectionsIcon = new QPushButton();
     labelConnectionsIcon->setFlat(true); // Make the button look like a label, but clickable
     labelConnectionsIcon->setStyleSheet(".QPushButton { background-color: rgba(255, 255, 255, 0);}");
     labelConnectionsIcon->setMaximumSize(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE);
-    labelBlocksIcon = new GUIUtil::ClickableLabel();
 
+
+    labelBlocksIcon = new GUIUtil::ClickableLabel();
     if (enableWallet) {
         frameBlocksLayout->addStretch();
         frameBlocksLayout->addWidget(unitDisplayControl);
         frameBlocksLayout->addStretch();
         frameBlocksLayout->addWidget(labelWalletEncryptionIcon);
-        frameBlocksLayout->addWidget(labelWalletHDStatusIcon);
+        frameBlocksLayout->addWidget(pushButtonWalletHDStatusIcon);
     }
     frameBlocksLayout->addStretch();
     frameBlocksLayout->addWidget(labelStakingIcon);
@@ -250,6 +289,56 @@ BitcoinGUI::BitcoinGUI(const PlatformStyle *platformStyle, const NetworkStyle* n
     frameBlocksLayout->addStretch();
     frameBlocksLayout->addWidget(labelBlocksIcon);
     frameBlocksLayout->addStretch();
+
+    //status bar social media icons
+    QFrame* frameSocMedia = new QFrame();
+
+    //fill in frameSocMedia
+    {
+        frameSocMedia->setContentsMargins(0, 0, 0, 0);
+        frameSocMedia->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
+        QHBoxLayout* frameLayout = new QHBoxLayout(frameSocMedia);
+        frameLayout->setContentsMargins(6, 0, 6, 0);
+        frameLayout->setSpacing(10);
+
+        pushButtonTelegram = new QPushButton(frameSocMedia);
+        pushButtonTelegram->setToolTip(tr("Go to")+" Telegram");
+        connect(pushButtonTelegram, &QPushButton::clicked,
+                this, [](){QDesktopServices::openUrl(QUrl("https://t.me/LUXcoreOfficial"));});
+        pushButtonTelegram->setIcon(QIcon(QPixmap(":/icons/res/icons/telegram.png").scaledToHeight(STATUSBAR_ICONSIZE,Qt::SmoothTransformation)));
+
+        pushButtonDiscord = new QPushButton(frameSocMedia);
+        pushButtonDiscord->setToolTip(tr("Go to")+" Discord");
+        connect(pushButtonDiscord, &QPushButton::clicked,
+                this, [](){QDesktopServices::openUrl(QUrl("https://discord.gg/27xFP5Y"));});
+        pushButtonDiscord->setIcon(QIcon(":/icons/res/icons/discord.png").pixmap(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE));
+
+        pushButtonTwitter = new QPushButton(frameSocMedia);
+        pushButtonTwitter->setToolTip(tr("Go to")+" Twitter");
+        connect(pushButtonTwitter, &QPushButton::clicked,
+                this, [](){QDesktopServices::openUrl(QUrl("https://twitter.com/LUX_Coin"));});
+        pushButtonTwitter->setIcon(QIcon(":/icons/res/icons/twitter.png").pixmap(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE));
+
+        pushButtonGithub = new QPushButton(frameSocMedia);
+        pushButtonGithub->setToolTip(tr("Go to")+" GitHub");
+        connect(pushButtonGithub, &QPushButton::clicked,
+                this, [](){QDesktopServices::openUrl(QUrl("https://github.com/lux-core"));});
+        pushButtonGithub->setIcon(QIcon(":/icons/res/icons/github.png").pixmap(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE));
+
+        auto buttons = frameSocMedia->findChildren<QPushButton* >();
+        QString styleSheet = ".QPushButton { background-color: transparent;"
+                                        "border: none;"
+                                        "qproperty-text: \"\" }";
+        foreach(auto but, buttons)
+        {
+            frameLayout->addWidget(but);
+            but->setMinimumSize(30, STATUSBAR_ICONSIZE);
+            but->setMaximumSize(30, STATUSBAR_ICONSIZE);
+            but->setIconSize(QSize(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE));
+            but->setCursor(Qt::PointingHandCursor);
+            but->setStyleSheet(styleSheet);
+        }
+    }
 
     // Progress bar and label for blocks download
     progressBarLabel = new QLabel();
@@ -270,6 +359,7 @@ BitcoinGUI::BitcoinGUI(const PlatformStyle *platformStyle, const NetworkStyle* n
 
     statusBar()->addWidget(progressBarLabel);
     statusBar()->addWidget(progressBar);
+    statusBar()->addPermanentWidget(frameSocMedia);
     statusBar()->addPermanentWidget(frameBlocks);
 
     // Jump directly to tabs in RPC-console
@@ -286,8 +376,6 @@ BitcoinGUI::BitcoinGUI(const PlatformStyle *platformStyle, const NetworkStyle* n
     // Get restart command-line parameters and handle restart
     connect(rpcConsole, SIGNAL(handleRestart(QStringList)), this, SLOT(handleRestart(QStringList)));
 
-    // prevents an open debug window from becoming stuck/unusable on client shutdown
-    connect(quitAction, SIGNAL(triggered()), rpcConsole, SLOT(hide()));
 
     connect(openBlockExplorerAction, SIGNAL(triggered()), explorerWindow, SLOT(show()));
 
@@ -557,6 +645,8 @@ void BitcoinGUI::createActions() {
     showHelpMessageAction->setMenuRole(QAction::NoRole);
     showHelpMessageAction->setStatusTip(tr("Show the Luxcore help message to get a list with possible LUX command-line options"));
 
+    connect(qApp, SIGNAL(aboutToQuit()), qApp, SLOT(quit()));
+
     connect(quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
     connect(aboutAction, SIGNAL(triggered()), this, SLOT(aboutClicked()));
     connect(checkForUpdateAction, SIGNAL(triggered()), this, SLOT(updaterClicked()));
@@ -564,6 +654,9 @@ void BitcoinGUI::createActions() {
     connect(optionsAction, SIGNAL(triggered()), this, SLOT(optionsClicked()));
     connect(toggleHideAction, SIGNAL(triggered()), this, SLOT(toggleHidden()));
     connect(showHelpMessageAction, SIGNAL(triggered()), this, SLOT(showHelpMessageClicked()));
+    connect(openRPCConsoleAction, SIGNAL(triggered()), this, SLOT(showDebugWindow()));
+    // prevents an open debug window from becoming stuck/unusable on client shutdown
+    connect(quitAction, SIGNAL(triggered()), rpcConsole, SLOT(hide()));
 
 #ifdef ENABLE_WALLET
     if (walletFrame) {
@@ -582,6 +675,8 @@ void BitcoinGUI::createActions() {
         connect(multiSendAction, SIGNAL(triggered()), this, SLOT(gotoMultiSendDialog()));
     }
 #endif // ENABLE_WALLET
+    new QShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_C), this, SLOT(showDebugWindowActivateConsole()));
+    new QShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_D), this, SLOT(showDebugWindow()));
 }
 
 void BitcoinGUI::createMenuBar() {
@@ -728,6 +823,10 @@ void BitcoinGUI::setClientModel(ClientModel* clientModel) {
             // initialize the disable state of the tray icon with the current value in the model.
             setTrayIconVisible(optionsModel->getHideTrayIcon());
         }
+
+        if (explorerWindow)
+            explorerWindow->setClientModel(clientModel);
+
     } else {
         // Disable possibility to show main window via action
         toggleHideAction->setEnabled(false);
@@ -899,6 +998,20 @@ void BitcoinGUI::updaterClicked() {
     uiInterface.ThreadSafeMessageBox("This feature is only available on official builds!",
              "Warning", CClientUIInterface::MSG_WARNING);
 #endif
+}
+
+void BitcoinGUI::showDebugWindow()
+{
+    rpcConsole->showNormal();
+    rpcConsole->show();
+    rpcConsole->raise();
+    rpcConsole->activateWindow();
+}
+
+void BitcoinGUI::showDebugWindowActivateConsole()
+{
+    rpcConsole->setTabFocus(RPCConsole::TAB_CONSOLE);
+    showDebugWindow();
 }
 
 void BitcoinGUI::showHelpMessageClicked() {
@@ -1340,11 +1453,12 @@ bool BitcoinGUI::handlePaymentRequest(const SendCoinsRecipient& recipient)
 void BitcoinGUI::setHDStatus(int hdEnabled)
 {
 
-    labelWalletHDStatusIcon->setPixmap(QIcon(hdEnabled ? ":/icons/hd_enabled" : ":/icons/hd_disabled").pixmap(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE));
-    labelWalletHDStatusIcon->setToolTip(hdEnabled ? tr("HD key generation is <b>enabled</b>") : tr("HD key generation is <b>disabled</b>"));
+    pushButtonWalletHDStatusIcon->setProperty("hdEnabled", hdEnabled);
+    pushButtonWalletHDStatusIcon->setIcon(QIcon(hdEnabled ? ":/icons/hd_enabled" : ":/icons/hd_disabled").pixmap(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE));
+    pushButtonWalletHDStatusIcon->setToolTip(hdEnabled ? tr("HD key generation is <b>enabled</b>") : tr("HD key generation is <b>disabled</b>"));
 
     // eventually disable the QLabel to set its opacity to 50%
-    labelWalletHDStatusIcon->setEnabled(hdEnabled);
+    //pushButtonWalletHDStatusIcon->setEnabled(hdEnabled);
 }
 
 void BitcoinGUI::setEncryptionStatus(int status)

@@ -143,8 +143,6 @@ public:
 
     int GetMasternodeInputAge()
     {
-        LOCK(cs_main);
-
         if(chainActive.Tip() == NULL) return 0;
 
         if(cacheInputAge == 0){

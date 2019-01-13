@@ -102,8 +102,12 @@ private:
     UnitDisplayStatusBarControl* unitDisplayControl;
     QLabel* labelStakingIcon;
     QLabel* labelWalletEncryptionIcon;
-    QLabel* labelWalletHDStatusIcon;
+    QPushButton* pushButtonWalletHDStatusIcon;
     QPushButton* labelConnectionsIcon;
+    QPushButton * pushButtonTelegram;
+    QPushButton * pushButtonTwitter;
+    QPushButton * pushButtonGithub;
+    QPushButton * pushButtonDiscord;
     QLabel* labelBlocksIcon;
     QLabel* progressBarLabel;
     QProgressBar* progressBar;
@@ -289,6 +293,12 @@ private Q_SLOTS:
 
     /** Show help message dialog */
     void showHelpMessageClicked();
+
+    /** Show debug window */
+    void showDebugWindow();
+
+    /** Show debug window and set focus to the console */
+    void showDebugWindowActivateConsole();
 
 #ifndef Q_OS_MAC
     /** Handle tray icon clicked */

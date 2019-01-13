@@ -27,7 +27,7 @@ ABIParam::ABIParam( int ID, const ParameterABI &param, QWidget *parent) :
     m_paramItemsLayout->setSpacing(3);
     m_paramItemsLayout->setContentsMargins(0,0,0,0);
 
-    m_paramName->setToolTip(tr("%1 %2").arg(QString::fromStdString(param.type)).arg(QString::fromStdString(param.name)));
+    m_paramName->setToolTip(QString("%1 %2").arg(QString::fromStdString(param.type)).arg(QString::fromStdString(param.name)));
     m_paramName->setFixedWidth(160);
     m_paramName->setFixedHeight(27);
 
