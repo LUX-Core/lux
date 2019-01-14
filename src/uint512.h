@@ -1,4 +1,9 @@
-// -*- c++ -*-
+// Copyright (c) 2012-2014 The Bitcoin developers
+// Copyright (c) 2014-2015 The Dash developers
+// Copyright (c) 2015-2018 The Luxcore developers
+// Distributed under the MIT software license, see the accompanying
+// file COPYING or http://www.opensource.org/licenses/mit-license.php.
+
 #pragma once
 #include "arith_uint256.h"
 #include "uint256.h"
