@@ -1200,7 +1200,7 @@ void BitcoinGUI::setNumBlocks(int count, const QDateTime& blockDate, double nVer
         // notify tip changed when the sync is finished
         if(fWalletProcessingMode) {
             fWalletProcessingMode = false;
-            QMetaObject::invokeMethod(clientModel, "numBlocksChanged", Qt::QueuedConnection);
+            QMetaObject::invokeMethod(clientModel, "numBlocksChanged", Qt::QueuedConnection, Q_ARG(int, count));
         }
     } else {
         QString timeBehindText = GUIUtil::formatNiceTimeOffset(secs);

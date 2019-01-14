@@ -103,8 +103,8 @@ void CallContractPage::setClientModel(ClientModel *_clientModel)
 
     if (m_clientModel)
     {
-        connect(m_clientModel, SIGNAL(numBlocksChanged()), this, SLOT(on_numBlocksChanged()));
-        on_numBlocksChanged();
+        connect(m_clientModel, SIGNAL(numBlocksChanged(int)), this, SLOT(on_numBlocksChanged(int)));
+        on_numBlocksChanged(1);
     }
 }
 
@@ -183,11 +183,14 @@ void CallContractPage::on_callContractClicked()
     }
 }
 
-void CallContractPage::on_numBlocksChanged()
+void CallContractPage::on_numBlocksChanged(int newHeight)
 {
     if(m_clientModel)
     {
-        ui->lineEditSenderAddress->on_refresh();
+        if (lastUpdatedHeight < newHeight) {
+            ui->lineEditSenderAddress->on_refresh();
+            lastUpdatedHeight = newHeight;
+        }
     }
 }
 

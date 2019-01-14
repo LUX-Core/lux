@@ -31,7 +31,7 @@ public:
 public Q_SLOTS:
             void on_clearAllClicked();
     void on_createContractClicked();
-    void on_numBlocksChanged();
+    void on_numBlocksChanged(int newHeight);
     void on_updateCreateButton();
     void on_newContractABI();
 
@@ -50,6 +50,7 @@ private:
     ContractABI* m_contractABI;
     TabBarInfo* m_tabInfo;
     int m_results;
+    int lastUpdatedHeight;
 };
 
 #endif // CREATECONTRACT_H
