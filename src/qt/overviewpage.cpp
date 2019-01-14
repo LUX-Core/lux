@@ -460,6 +460,19 @@ void OverviewPage::updateDarkSendProgress()
     QString strAmountAndRounds;
     QString strAnonymizeLuxAmount = BitcoinUnits::formatHtmlWithUnit(nDisplayUnit, nAnonymizeLuxAmount * COIN, false, BitcoinUnits::separatorAlways);
 
+    if (!fEnableDarksend) {
+        ui->darksendProgress->setValue(0);
+        ui->darksendProgress->setToolTip(tr("Darksend disabled"));
+
+        // when balance is zero just show info from settings
+        strAnonymizeLuxAmount = strAnonymizeLuxAmount.remove(strAnonymizeLuxAmount.indexOf("."), BitcoinUnits::decimals(nDisplayUnit) + 1);
+        strAmountAndRounds = strAnonymizeLuxAmount + " / " + tr("%n Rounds", "", nDarksendRounds);
+
+        ui->labelAmountRounds->setToolTip(tr("Darksend disabled"));
+        ui->labelAmountRounds->setText(tr("Disabled"));
+        return;
+    }
+
     if (currentBalance == 0) {
         ui->darksendProgress->setValue(0);
         ui->darksendProgress->setToolTip(tr("No inputs detected"));
