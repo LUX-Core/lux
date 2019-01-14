@@ -573,7 +573,9 @@ uint256 CMasterNode::CalculateScore(int mod, int64_t nBlockHeight) {
     return r;
 }
 
-void CMasterNode::Check() {
+void CMasterNode::Check(bool forceCheck) {
+    if(!forceCheck && (GetTime() - lastTimeChecked < MASTERNODE_CHECK_SECONDS)) return;
+    lastTimeChecked = GetTime();
     //once spent, stop doing the checks
     if (enabled == 3) return;
 
