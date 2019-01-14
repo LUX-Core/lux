@@ -715,7 +715,7 @@ static void NotifyTokenTransactionChanged(TokenTransactionTableModel *ttm, CWall
 
     if (fQueueNotifications)
     {
-        vQueueNotifications.push_back(notification);
+        // vQueueNotifications.push_back(notification);
         return;
     }
     notification.invoke(ttm);
@@ -736,7 +736,7 @@ static void ShowProgress(TokenTransactionTableModel *ttm, const std::string &tit
             if (vQueueNotifications.size() - i <= 10)
                 QMetaObject::invokeMethod(ttm, "setProcessingQueuedTransactions", Qt::QueuedConnection, Q_ARG(bool, false));
 
-            vQueueNotifications[i].invoke(ttm);
+            // vQueueNotifications[i].invoke(ttm);
         }
         std::vector<TokenTransactionNotification >().swap(vQueueNotifications); // clear
     }

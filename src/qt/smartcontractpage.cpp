@@ -312,6 +312,14 @@ void SmartContractPage::updateDarkSendProgress()
     QString strAmountAndRounds;
     QString strAnonymizeLuxAmount = BitcoinUnits::formatHtmlWithUnit(nDisplayUnit, nAnonymizeLuxAmount * COIN, false, BitcoinUnits::separatorAlways);
 
+    if (!fEnableDarksend) {
+        ui->darksendProgress->setValue(0);
+        ui->darksendProgress->setToolTip(tr("Darksend disabled"));
+        ui->labelAmountRounds->setToolTip(tr("Darksend disabled"));
+        ui->labelAmountRounds->setText(tr("Disabled"));
+        return;
+    }
+
     if (currentBalance == 0) {
         ui->darksendProgress->setValue(0);
         ui->darksendProgress->setToolTip(tr("No inputs detected"));
