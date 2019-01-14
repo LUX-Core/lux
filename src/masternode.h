@@ -37,6 +37,7 @@ class uint256;
 #define MASTERNODE_PING_WAIT_SECONDS           (5*60)
 #define MASTERNODE_EXPIRATION_SECONDS          (65*60) //Old 65*60
 #define MASTERNODE_REMOVAL_SECONDS             (70*60) //Old 70*60
+#define MASTERNODE_CHECK_SECONDS               60
 
 using namespace std;
 
@@ -76,6 +77,7 @@ public:
     std::vector<unsigned char> sig;
     int64_t now; //dsee message times
     int64_t lastDseep;
+    int64_t lastTimeChecked;
     int cacheInputAge;
     int cacheInputAgeBlock;
     int enabled;
@@ -102,6 +104,7 @@ public:
         lastDseep = 0;
         allowFreeTx = true;
         protocolVersion = protocolVersionIn;
+        lastTimeChecked = GetTime() + GetRand(60); // set random check time
     }
 
     uint256 CalculateScore(int mod=1, int64_t nBlockHeight=0);
@@ -122,7 +125,7 @@ public:
         return n;
     }
 
-    void Check();
+    void Check(bool forceCheck = false);
 
     bool UpdatedWithin(int seconds)
     {
