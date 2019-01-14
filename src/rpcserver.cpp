@@ -368,7 +368,17 @@ static const CRPCCommand vRPCCommands[] =
         //{"lux", "mnfinalbudget", &mnfinalbudget, true, true, false},
         //{"lux", "mnsync", &mnsync, true, true, false},
         {"lux", "spork", &spork, true, true, false},
-        {"lux", "announcefileorder", &announcefileorder, true, true, false},
+        {"lux", "dfsannounce", &dfsannounce, true, true, false},
+        {"lux", "dfscancelorder", &dfscancelorder, true, true, false},
+        {"lux", "dfsgetinfo", &dfsgetinfo, true, true, false},
+        {"lux", "dfsorderslist", &dfsorderslist, true, true, false},
+        {"lux", "dfsproposalslist", &dfsproposalslist, true, true, false},
+        {"lux", "dfsacceptproposal", &dfsacceptproposal, true, true, false},
+        {"lux", "dfssetparams", &dfssetparams, true, true, false},
+        {"lux", "dfssetfolder", &dfssetfolder, true, true, false},
+        {"lux", "dfssettempfolder", &dfssettempfolder, true, true, false},
+        {"lux", "dfsremoveoldorders", &dfsremoveoldorders, true, true, false},
+        {"lux", "dfssetmyip", &dfssetmyip, true, true, false},
 #ifdef ENABLE_WALLET
         //{"lux", "darksend", &darksend, false, false, true}, /* not threadSafe because of SendMoney */
 

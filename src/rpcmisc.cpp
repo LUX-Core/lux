@@ -1216,21 +1216,21 @@ UniValue getstakingstatus(const UniValue& params, bool fHelp)
 }
 #endif // ENABLE_WALLET
 
-UniValue announcefileorder(const UniValue& params, bool fHelp)
+UniValue dfsannounce(const UniValue& params, bool fHelp)
 {
     if (fHelp || params.size() != 3)
         throw runtime_error(
-                "announcefileorder \"localFilePath\", daysToKeep, fileCostInCoins\n"
+                "dfsannounce \"localFilePath\", daysToKeep, fileCostInCoins\n"
                 "\nAnnounces a file order.\n"
                 "\nArgument:\n"
-                "1. \"localFilePath\"          (string, required) The local file path of file\n"
+                "1. \"localFilePath\"         (string, required) The local file path of file\n"
                 "2. daysToKeep                (numeric, required) The days to keep\n"
                 "3. fileCostInCoins           (numeric, required) The file cost in coins\n"
                 "\nResult:\n"
                 "null\n"
                 "\nExamples:\n"
-                + HelpExampleCli("announcefileorder", "\"/tmp/123.jpg\" 1 0.3")
-                + HelpExampleRpc("announcefileorder", "\"/tmp/123.jpg\", 1, 0.3")
+                + HelpExampleCli("dfsannounce", "\"/tmp/123.jpg\" 1 0.3")
+                + HelpExampleRpc("dfsannounce", "\"/tmp/123.jpg\", 1, 0.3")
         );
 
     if (storageController->address.IsTor() || !storageController->address.IsValid()) {
@@ -1250,5 +1250,192 @@ UniValue announcefileorder(const UniValue& params, bool fHelp)
     storageController->AnnounceOrder(order, path);
     storageController->proposalsAgent.ListenProposal(order.GetHash());
 
+    return UniValue::VNULL;
+}
+
+UniValue dfscancelorder(const UniValue& params, bool fHelp)
+{
+    if (fHelp || params.size() != 1)
+        throw runtime_error(
+                "dfscancelorder \"order's hash\"\n"
+                        "\nCancel announces order.\n"
+                        "\nArgument:\n"
+                        "    \"hash order\"         (string, required) The hash of announces order\n"
+                        "\nResult:\n"
+                        "null\n"
+                        "\nExamples:\n"
+                + HelpExampleCli("dfscancelorder", "\"..TODO..\"")
+                + HelpExampleRpc("dfscancelorder", "\"..TODO..\"")
+        );
+    return UniValue::VNULL;
+}
+
+UniValue dfsgetinfo(const UniValue& params, bool fHelp)
+{
+    if (fHelp || params.size())
+        throw runtime_error(
+                        "dfsgetinfo\n"
+                        "Returns ..TODO..\n"
+                        "\nResult:\n"
+                        "{\n"
+                        "  \"enabled\": true|false,      (boolean) ..TODO..\n"
+                        "  \"my ip\": \"...\",           (string) ..TODO..\n"
+                        "  \"dfs folder\": \"...\",      (string) path to data folder\n"
+                        "  \"dfs temp folder\": \"...\", (string) path to temp folder\n"
+                        "  \"min rate\": xxxxxxxx,       (numeric) ..TODO..\n"
+                        "  \"max blocks gap\": xxxxxx,   (numeric) ..TODO..\n"
+                        "}\n"
+                        "\nExamples:\n" +
+                + HelpExampleCli("dfsgetinfo", "") + HelpExampleRpc("dfsgetinfo", ""));
+    return UniValue::VNULL;
+}
+
+UniValue dfsorderslist(const UniValue& params, bool fHelp)
+{
+    if (fHelp || params.size())
+        throw runtime_error(
+                "dfsorderslist\n"
+                        "\nReturns array of orders\n"
+                        "\nResult\n"
+                        "[                   (array of json object)\n"
+                        "  {\n"
+                        "    \"order hash\" : \"hash\",  (string) the order hash \n"
+                        "    \"time\" : timestamp,       (numeric) the create order time\n"
+                        "    \"address\" : \"address\",  (string) the ip address node which create order\n"
+                        "    \"until time\" : timestamp, (numeric) ..TODO..\n"
+                        "    \"file name\" : \"...\",    (string) ..TODO..\n"
+                        "    \"file size\" : n,          (numeric) ..TODO..\n"
+                        "    \"rate\" : n                (numeric) ..TODO..\n"
+                        "    \"block gap\" : n           (numeric) ..TODO..\n"
+                        "  }\n"
+                        "  ,...\n"
+                        "]\n"
+                        "\nExamples\n"
+                + HelpExampleCli("dfsorderslist", "")
+                + HelpExampleRpc("dfsorderslist", ""));
+
+    return UniValue::VNULL;
+}
+
+UniValue dfsproposalslist(const UniValue& params, bool fHelp)
+{
+    if (fHelp || params.size() != 1)
+        throw runtime_error(
+                "dfsproposalslist\n"
+                        "\nReturns array of proposals for order\n"
+                        "\nArguments:\n"
+                        "    \"orders hash\"             (string, required) The hash of announces order\n"
+                        "\nResult\n"
+                        "[                   (array of json object)\n"
+                        "  {\n"
+                        "    \"order hash\" : \"hash\",  (string) the order hash \n"
+                        "    \"time\" : timestamp,       (numeric) the create proposal time\n"
+                        "    \"address\" : \"address\",  (string) the ip address node which create proposal\n"
+                        "    \"rate\" : n                (numeric) ..TODO..\n"
+                        "  }\n"
+                        "  ,...\n"
+                        "]\n"
+                        "\nExamples\n"
+                + HelpExampleCli("dfsproposalslist", "..TODO..")
+                + HelpExampleRpc("dfsproposalslist", "..TODO.."));
+    return UniValue::VNULL;
+}
+
+UniValue dfsacceptproposal(const UniValue& params, bool fHelp)
+{
+    if (fHelp || params.size() != 2)
+        throw runtime_error(
+                "dfsacceptproposal\n"
+                        "\n..TODO..\n"
+                        "\nArguments:\n"
+                        "  \"min rate\": xxxxxxxx,       (numeric, required) ..TODO..\n"
+                        "  \"max blocks gap\": xxxxxx,   (numeric, required) ..TODO..\n"
+                        "\nResult:\n"
+                        "null\n"
+                        "\nExamples\n"
+                + HelpExampleCli("dfsacceptproposal", "1 20")
+                + HelpExampleRpc("dfsacceptproposal", "1 20"));
+    return UniValue::VNULL;
+}
+
+UniValue dfssetparams(const UniValue& params, bool fHelp)
+{
+    if (fHelp || params.size() != 2)
+        throw runtime_error(
+                "dfssetparams\n"
+                        "\n..TODO..\n"
+                        "\nArguments:\n"
+                        "    \"orders hash\"             (string, required) The hash of announces order\n"
+                        "    \"proposals hash\"          (string, required) The hash of proposal\n"
+                        "\nResult:\n"
+                        "null\n"
+                        "\nExamples\n"
+                + HelpExampleCli("dfssetparams", "..TODO..")
+                + HelpExampleRpc("dfssetparams", "..TODO.."));
+    return UniValue::VNULL;
+}
+
+UniValue dfssetfolder(const UniValue& params, bool fHelp)
+{
+    if (fHelp || params.size() != 1)
+        throw runtime_error(
+                "dfssetfolder\n"
+                        "\nSet path to dfs data folder\n"
+                        "\nArguments:\n"
+                        "  \"dfs folder\": \"...\",      (string) path to dfs data folder\n"
+                        "\nResult:\n"
+                        "null\n"
+                        "\nExamples\n"
+                + HelpExampleCli("dfssetfolder", "/home/user/dfs")
+                + HelpExampleRpc("dfssetfolder", "/home/user/dfs"));
+    return UniValue::VNULL;
+}
+
+UniValue dfssettempfolder(const UniValue& params, bool fHelp)
+{
+    if (fHelp || params.size() != 1)
+        throw runtime_error(
+                "dfssettempfolder\n"
+                        "\nSet path to dfs temp folder\n"
+                        "\nArguments:\n"
+                        "  \"dfs folder\": \"...\",      (string) path to dfs temp folder\n"
+                        "\nResult:\n"
+                        "null\n"
+                        "\nExamples\n"
+                + HelpExampleCli("dfssettempfolder", "/home/user/temp")
+                + HelpExampleRpc("dfssettempfolder", "/home/user/temp"));
+    return UniValue::VNULL;
+}
+
+UniValue dfsremoveoldorders(const UniValue& params, bool fHelp)
+{
+    if (fHelp || params.size() > 1)
+        throw runtime_error(
+                "dfsremoveoldorders\n"
+                        "\n..TODO..\n"
+                        "\nArguments:\n"
+                        "  \"time\": xxxxxxxx,       (numeric, optional) ..TODO..\n"
+                        "\nResult:\n"
+                        "null\n"
+                        "\nExamples\n"
+                + HelpExampleCli("dfsremoveoldorders", "1546300800")
+                + HelpExampleRpc("dfsremoveoldorders", "1546300800"));
+    return UniValue::VNULL;
+}
+
+UniValue dfssetmyip(const UniValue& params, bool fHelp)
+{
+    if (fHelp || !params.size() || params.size() > 2)
+        throw runtime_error(
+                "dfssetmyip\n"
+                        "\n..TODO..\n"
+                        "\nArguments:\n"
+                        "  \"address\": address,       (string, required) ..TODO..\n"
+                        "  \"port\": address,          (string, optional) ..TODO..\n"
+                        "\nResult:\n"
+                        "null\n"
+                        "\nExamples\n"
+                + HelpExampleCli("dfssetmyip", "192.168.0.0.1")
+                + HelpExampleRpc("dfssetmyip", "192.168.0.0.1"));
     return UniValue::VNULL;
 }

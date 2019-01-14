@@ -167,7 +167,7 @@ bool IsRPCRunning();
 
 
 
-/** 
+/**
  * Set
  * the RPC warmup status.  When this is done, all RPC calls will error out
  * immediately with RPC_IN_WARMUP.
@@ -432,7 +432,6 @@ extern UniValue invalidateblock(const UniValue& params, bool fHelp);
 extern UniValue reconsiderblock(const UniValue& params, bool fHelp);
 extern UniValue darksend(const UniValue& params, bool fHelp);
 extern UniValue spork(const UniValue& params, bool fHelp);
-extern UniValue announcefileorder(const UniValue& params, bool fHelp);
 extern UniValue masternode(const UniValue& params, bool fHelp);
 extern UniValue getaccountinfo(const UniValue& params, bool fHelp);
 //extern UniValue masternodelist(const UniValue& params, bool fHelp);
@@ -440,6 +439,19 @@ extern UniValue getaccountinfo(const UniValue& params, bool fHelp);
 //extern UniValue mnbudgetvoteraw(const UniValue& params, bool fHelp);
 //extern UniValue mnfinalbudget(const UniValue& params, bool fHelp);
 //extern UniValue mnsync(const UniValue& params, bool fHelp);
+
+// parallels master nodes
+extern UniValue dfsannounce(const UniValue& params, bool fHelp);
+extern UniValue dfscancelorder(const UniValue& params, bool fHelp);
+extern UniValue dfsgetinfo(const UniValue& params, bool fHelp);
+extern UniValue dfsorderslist(const UniValue& params, bool fHelp);
+extern UniValue dfsproposalslist(const UniValue& params, bool fHelp);
+extern UniValue dfsacceptproposal(const UniValue& params, bool fHelp);
+extern UniValue dfssetparams(const UniValue& params, bool fHelp);
+extern UniValue dfssetfolder(const UniValue& params, bool fHelp);
+extern UniValue dfssettempfolder(const UniValue& params, bool fHelp);
+extern UniValue dfsremoveoldorders(const UniValue& params, bool fHelp);
+extern UniValue dfssetmyip(const UniValue& params, bool fHelp);
 
 
 extern UniValue getstorage(const UniValue& params, bool fHelp);
