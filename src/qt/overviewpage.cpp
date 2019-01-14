@@ -592,7 +592,7 @@ void OverviewPage::updateAdvancedUI(bool fShowAdvancedPSUI) {
 
 void OverviewPage::darkSendStatus()
 {
-    bool fIsInitialBlockDownload = IsInitialBlockDownload();
+    //bool fIsInitialBlockDownload = IsInitialBlockDownload();
     static int64_t nLastDSProgressBlockTime = 0;
 
     int nBestHeight = chainActive.Height();
