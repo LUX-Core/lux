@@ -561,10 +561,13 @@ void BitcoinGUI::createActions() {
     aboutAction->setStatusTip(tr("Show information about Luxcore"));
     aboutAction->setMenuRole(QAction::AboutRole);
 
+#ifdef ENABLE_UPDATER
     // Check for update menu item
     checkForUpdateAction = new QAction(QIcon(":/icons/update_black"), tr("Check for &Update"), this);
     checkForUpdateAction->setStatusTip(tr("Check whether there is an updated wallet from Luxcore"));
     checkForUpdateAction->setMenuRole(QAction::NoRole);
+    checkForUpdateAction->setVisible(false);
+#endif
 
 #if QT_VERSION < 0x050000
     aboutQtAction = new QAction(QIcon(":/trolltech/qmessagebox/images/qtlogo-64.png"), tr("About &Qt"), this);
@@ -642,7 +645,9 @@ void BitcoinGUI::createActions() {
 
     connect(quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
     connect(aboutAction, SIGNAL(triggered()), this, SLOT(aboutClicked()));
+#ifdef ENABLE_UPDATER
     connect(checkForUpdateAction, SIGNAL(triggered()), this, SLOT(updaterClicked()));
+#endif
     connect(aboutQtAction, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
     connect(optionsAction, SIGNAL(triggered()), this, SLOT(optionsClicked()));
     connect(toggleHideAction, SIGNAL(triggered()), this, SLOT(toggleHidden()));
@@ -725,9 +730,11 @@ void BitcoinGUI::createMenuBar() {
         tools->addSeparator();
         tools->addAction(openHexAddressAction);
         tools->addAction(openBlockExplorerAction);
+#ifdef ENABLE_UPDATER
         tools->addSeparator();
         tools->addAction(checkForUpdateAction);
         tools->addSeparator();
+#endif
     }
 
     QMenu* help = appMenuBar->addMenu(tr("&Help"));
