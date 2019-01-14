@@ -1855,6 +1855,7 @@ CAmount CWallet::GetAnonymizableBalance() const
 
 CAmount CWallet::GetAnonymizedBalance() const
 {
+    if (!fEnableDarksend) return 0; // if we have disabled darksend, don't bother calculating anonymized funds in the balances
     int64_t nTotal = 0;
     {
         LOCK(cs_wallet);
@@ -1893,6 +1894,8 @@ CAmount CWallet::GetAnonymizedBalance() const
 // that's ok as long as we use it for informational purposes only
 double CWallet::GetAverageAnonymizedRounds() const
 {
+    if (!fEnableDarksend) return 0; // if we have disabled darksend, don't bother calculating anonymized funds in the balances
+
     double fTotal = 0;
     double fCount = 0;
 
@@ -1934,6 +1937,7 @@ double CWallet::GetAverageAnonymizedRounds() const
 // that's ok as long as we use it for informational purposes only
 CAmount CWallet::GetNormalizedAnonymizedBalance() const
 {
+    if (!fEnableDarksend) return 0; // if we have disabled darksend, don't bother calculating anonymized funds in the balances
     CAmount nTotal = 0;
 
     {
@@ -1960,6 +1964,7 @@ CAmount CWallet::GetNormalizedAnonymizedBalance() const
 
 CAmount CWallet::GetDenominatedBalance(bool unconfirmed) const
 {
+    if (!fEnableDarksend) return 0; // if we have disabled darksend, don't bother calculating anonymized funds in the balances
     CAmount nTotal = 0;
     {
         LOCK2(cs_main, cs_wallet);
@@ -1975,6 +1980,7 @@ CAmount CWallet::GetDenominatedBalance(bool unconfirmed) const
 
 CAmount CWallet::GetDenominatedBalance(bool onlyDenom, bool onlyUnconfirmed) const
 {
+    if (!fEnableDarksend) return 0; // if we have disabled darksend, don't bother calculating anonymized funds in the balances
     int64_t nTotal = 0;
     {
         LOCK(cs_wallet);
