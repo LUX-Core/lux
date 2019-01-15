@@ -108,7 +108,9 @@ BitcoinGUI::BitcoinGUI(const PlatformStyle *platformStyle, const NetworkStyle* n
                                                                             overviewAction(0),
                                                                             historyAction(0),
                                                                             tradingAction(0),
+#ifdef ENABLE_LUXGATE
                                                                             luxgateAction(0),
+#endif
                                                                             masternodeAction(0),
                                                                             quitAction(0),
                                                                             sendCoinsAction(0),
@@ -529,7 +531,7 @@ void BitcoinGUI::createActions() {
     #else
         smartContractAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_8));
     #endif
-    
+#ifdef ENABLE_LUXGATE
     luxgateAction = new QAction(QIcon(":/icons/luxgate"), tr("Luxgate"), this);
     luxgateAction->setStatusTip(tr("Trading on Luxgate"));
     luxgateAction->setToolTip(luxgateAction->statusTip());
@@ -540,6 +542,7 @@ void BitcoinGUI::createActions() {
     luxgateAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_9));
 #endif
     tabGroup->addAction(luxgateAction);
+#endif  //ENABLE_LUXGATE
 
     // These showNormalIfMinimized are needed because Send Coins and Receive Coins
     // can be triggered from the tray menu, and need to show the GUI to be useful.
@@ -556,8 +559,10 @@ void BitcoinGUI::createActions() {
     connect(historyAction, SIGNAL(triggered()), this, SLOT(gotoHistoryPage()));
     connect(tradingAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
     connect(tradingAction, SIGNAL(triggered()), this, SLOT(gotoTradingPage()));
+#ifdef ENABLE_LUXGATE
     connect(luxgateAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
     connect(luxgateAction, SIGNAL(triggered()), this, SLOT(gotoLuxgatePage()));
+#endif // ENABLE_LUXGATE
 #endif // ENABLE_WALLET
 
     quitAction = new QAction(QIcon(":/icons/quit"), tr("E&xit"), this);
@@ -763,7 +768,9 @@ void BitcoinGUI::createToolBars() {
             toolbar->addAction(masternodeAction);
         }
         toolbar->addAction(smartContractAction);
+#ifdef ENABLE_LUXGATE
         toolbar->addAction(luxgateAction);
+#endif
         toolbar->setMovable(false); // remove unused icon in upper left corner
         overviewAction->setChecked(true);
 
@@ -886,7 +893,9 @@ void BitcoinGUI::setWalletActionsEnabled(bool enabled) {
     receiveCoinsAction->setEnabled(enabled);
     historyAction->setEnabled(enabled);
     tradingAction->setEnabled(enabled);
+#ifdef ENABLE_LUXGATE
     luxgateAction->setEnabled(enabled);
+#endif
     QSettings settings;
     if (settings.value("fShowMasternodesTab").toBool()) {
         masternodeAction->setEnabled(enabled);
@@ -1049,12 +1058,13 @@ void BitcoinGUI::gotoTradingPage()
     tradingAction->setChecked(true);
     if (walletFrame) walletFrame->gotoTradingPage();
 }
-
+#ifdef ENABLE_LUXGATE
 void BitcoinGUI::gotoLuxgatePage()
 {
     luxgateAction->setChecked(true);
     if (walletFrame) walletFrame->gotoLuxgatePage();
 }
+#endif
 
 void BitcoinGUI::gotoMasternodePage()
 {

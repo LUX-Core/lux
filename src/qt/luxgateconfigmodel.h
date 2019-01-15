@@ -1,7 +1,6 @@
 #ifndef CsTypesMODEL_H
 #define CsTypesMODEL_H
 #include "luxgate/lgconfig.h"
-#include "../luxgate/lgconfig.h"
 #include <QList>
 #include <QAbstractTableModel>
 #include <QString>

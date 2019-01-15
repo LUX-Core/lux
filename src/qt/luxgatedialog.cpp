@@ -2,6 +2,7 @@
 #include "luxgatedialog.h"
 #include "luxgateconfigmodel.h"
 #include "luxgate/luxgate.h"
+#include "luxgate/lgconfig.h"
 #include "ui_luxgatedialog.h"
 #include "clientmodel.h"
 #include "walletmodel.h"
@@ -37,8 +38,6 @@
 #include <openssl/hmac.h>
 #include <stdlib.h>
 #include "util.h"
-#include "luxgateconfigmodel.h"
-#include "../luxgate/lgconfig.h"
 #include <openssl/x509.h>
 
 
@@ -85,7 +84,22 @@ LuxgateDialog::LuxgateDialog(QWidget *parent) :
                 this, &LuxgateDialog::slotConfigDataChanged);
         connect(ui->pushButtonAddConfiguration, &QPushButton::clicked,
                 this, &LuxgateDialog::slotClickAddConfiguration);
+        connect(ui->pushButtonRemoveConfiguration, &QPushButton::clicked,
+                this, &LuxgateDialog::slotClickRemoveConfiguration);
     }
+}
+
+void LuxgateDialog::slotClickRemoveConfiguration()
+{
+    auto modelConfig = qobject_cast<LuxgateConfigModel *>(ui->tableViewConfiguration->model());
+    auto selectRows = ui->tableViewConfiguration->selectionModel()->selectedRows();
+    if(selectRows.isEmpty())
+    {
+        QMessageBox::critical(this, tr("Luxgate"),
+                tr("Not one row selected!"));
+        return;
+    }
+    modelConfig->removeRows(selectRows.first().row(), 1);
 }
 
 void LuxgateDialog::slotConfigDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)
@@ -186,7 +200,7 @@ void LuxgateDialog::slotClickChangeConfig()
     //check Valid configs
     for (auto it : configs)
     {
-        if(!isValidBlockchainConfig(it.second))
+        if(!isValidBlockchainConfig(it.second).bValid)
         {
             QMessageBox::critical(this, tr("Luxgate"), tr("Configuration is not valid!"));
             return;

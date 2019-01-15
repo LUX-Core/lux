@@ -45,6 +45,7 @@ private:
 
 private slots:
     void slotClickAddConfiguration();
+    void slotClickRemoveConfiguration();
     void slotClickResetConfiguration();
     void slotClickChangeConfig();
     void slotConfigDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles);

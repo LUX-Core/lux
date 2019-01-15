@@ -136,12 +136,14 @@ void WalletFrame::gotoTradingPage()
         i.value()->gotoTradingPage();
 }
 
+#ifdef ENABLE_LUXGATE
 void WalletFrame::gotoLuxgatePage()
 {
     QMap<QString, WalletView*>::const_iterator i;
     for (i = mapWalletViews.constBegin(); i != mapWalletViews.constEnd(); ++i)
         i.value()->gotoLuxgatePage();
 }
+#endif
 
 void WalletFrame::gotoMasternodePage() // Masternode list
 {

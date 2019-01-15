@@ -61,8 +61,10 @@ public Q_SLOTS:
     void gotoHistoryPage();
     /** Switch to trading page */
     void gotoTradingPage();
+#ifdef ENABLE_LUXGATE
     /** Switch to luxgate page */
     void gotoLuxgatePage();
+#endif
     /** Switch to masternode page */
     void gotoMasternodePage();
     /** Switch to smart contract page */

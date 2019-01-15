@@ -286,7 +286,17 @@
            <widget class="QWidget" name="configpanel" native="true">
             <layout class="QVBoxLayout" name="verticalLayout_4">
              <item>
-              <widget class="QTableView" name="tableViewConfiguration"/>
+              <widget class="QTableView" name="tableViewConfiguration">
+               <property name="editTriggers">
+                <set>QAbstractItemView::AnyKeyPressed|QAbstractItemView::DoubleClicked</set>
+               </property>
+               <property name="selectionMode">
+                <enum>QAbstractItemView::SingleSelection</enum>
+               </property>
+               <property name="selectionBehavior">
+                <enum>QAbstractItemView::SelectRows</enum>
+               </property>
+              </widget>
              </item>
              <item>
               <layout class="QHBoxLayout" name="horizontalLayout_6">
@@ -304,6 +314,17 @@
                 </spacer>
                </item>
                <item>
+                <widget class="QPushButton" name="pushButtonRemoveConfiguration">
+                 <property name="text">
+                  <string/>
+                 </property>
+                 <property name="icon">
+                  <iconset resource="../lux.qrc">
+                   <normaloff>:/icons/remove</normaloff>:/icons/remove</iconset>
+                 </property>
+                </widget>
+               </item>
+               <item>
                 <widget class="QPushButton" name="pushButtonAddConfiguration">
                  <property name="text">
                   <string/>
@@ -319,23 +340,30 @@
              <item>
               <layout class="QHBoxLayout" name="horizontalLayout_7">
                <item>
-                <widget class="QPushButton" name="pushButtonDefaultConfig">
+                <widget class="QPushButton" name="pushButtonImportConfig">
                  <property name="text">
-                  <string>Default config</string>
+                  <string>Import</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="pushButtonExportConfig">
+                 <property name="text">
+                  <string>Export</string>
                  </property>
                 </widget>
                </item>
                <item>
                 <widget class="QPushButton" name="pushButtonResetConfig">
                  <property name="text">
-                  <string>Reset Config</string>
+                  <string>Reset</string>
                  </property>
                 </widget>
                </item>
                <item>
                 <widget class="QPushButton" name="pushButtonChangeConfig">
                  <property name="text">
-                  <string>Change Config</string>
+                  <string>Change</string>
                  </property>
                 </widget>
                </item>
