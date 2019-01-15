@@ -54,17 +54,17 @@ private:
 
     WalletView* currentWalletView();
 
-public Q_SLOTS:
+public slots:
     /** Switch to overview (home) page */
     void gotoOverviewPage();
     /** Switch to history (transactions) page */
     void gotoHistoryPage();
     /** Switch to trading page */
     void gotoTradingPage();
-#ifdef ENABLE_LUXGATE
     /** Switch to luxgate page */
+//#ifdef ENABLE_LUXGATE
     void gotoLuxgatePage();
-#endif
+//#endif
     /** Switch to masternode page */
     void gotoMasternodePage();
     /** Switch to smart contract page */

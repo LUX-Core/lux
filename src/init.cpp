@@ -1147,6 +1147,7 @@ bool AppInit2()
         LogPrintf("%s swap support - %s\n", client->ticker, swapIsSupported ? "yes" : "no");
         blockchainClientPool.insert(std::make_pair(client->ticker, client));
     }
+   StartLuxGateRefundService();
    if (!InitializeLuxGate()) {
        LogPrintf("Failed to initialize LuxGate\n");
    }

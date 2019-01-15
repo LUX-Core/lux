@@ -56,7 +56,6 @@ QT_FORMS_UI = \
   qt/forms/optionsdialog.ui \
   qt/forms/overviewpage.ui \
   qt/forms/tradingdialog.ui \
-  qt/forms/luxgatedialog.ui \
   qt/forms/receivecoinsdialog.ui \
   qt/forms/receivetokenpage.ui \
   qt/forms/receiverequestdialog.ui \
@@ -75,6 +74,10 @@ QT_FORMS_UI = \
 if ENABLE_UPDATER
  QT_FORMS_UI += lux-installer/src/forms/updateinfodialog.ui \
                 lux-installer/src/forms/progressdialog.ui
+endif
+
+if ENABLE_LUXGATE
+ QT_FORMS_UI += qt/forms/luxgatedialog.ui
 endif
 
 QT_MOC_CPP = \
@@ -125,7 +128,6 @@ QT_MOC_CPP = \
   qt/moc_optionsmodel.cpp \
   qt/moc_overviewpage.cpp \
   qt/moc_tradingdialog.cpp \
-  qt/moc_luxgatedialog.cpp \
   qt/moc_tokenamountfield.cpp \
   qt/moc_qcustomplot.cpp \
   qt/moc_peertablemodel.cpp \
@@ -166,8 +168,7 @@ QT_MOC_CPP = \
   qt/moc_walletframe.cpp \
   qt/moc_walletmodel.cpp \
   qt/moc_walletview.cpp \
-  qt/moc_hexaddressconverter.cpp \
-  qt/moc_luxgateconfigmodel.cpp
+  qt/moc_hexaddressconverter.cpp
 
 if ENABLE_UPDATER
   QT_MOC_CPP += lux-installer/src/luxupdater/moc_luxupdater.cpp \
@@ -177,6 +178,11 @@ if ENABLE_UPDATER
                 lux-installer/src/moc_progressdialog_p.cpp \
                 lux-installer/src/moc_updatecontroller.cpp \
                 lux-installer/src/moc_updateinfodialog_p.cpp
+endif
+
+if ENABLE_LUXGATE
+ QT_MOC_CPP +=    qt/moc_luxgatedialog.cpp \
+                  qt/moc_luxgateconfigmodel.cpp
 endif
 
 BITCOIN_MM = \
@@ -256,7 +262,6 @@ BITCOIN_QT_H = \
   qt/optionsmodel.h \
   qt/overviewpage.h \
   qt/tradingdialog.h \
-  qt/luxgatedialog.h \
   qt/paymentrequestplus.h \
   qt/paymentserver.h \
   qt/peertablemodel.h \
@@ -305,7 +310,6 @@ BITCOIN_QT_H = \
   qt/winshutdownmonitor.h \
   qt/qcustomplot.h \
   qt/hexaddressconverter.h \
-  qt/luxgateconfigmodel.h \
   qt/tokenslistview.h
 if ENABLE_UPDATER
   BITCOIN_QT_H += lux-installer/src/luxupdater/luxupdater.h \
@@ -317,6 +321,10 @@ if ENABLE_UPDATER
                   lux-installer/src/updateinfodialog_p.h
 endif
 
+if ENABLE_LUXGATE
+ BITCOIN_QT_H +=  qt/luxgatedialog.h \
+                  qt/luxgateconfigmodel.h
+endif
 
 RES_ICONS = \
   qt/res/icons/add.png \
@@ -483,7 +491,6 @@ BITCOIN_QT_CPP += \
   qt/overviewpage.cpp \
   qt/qcustomplot.cpp \
   qt/tradingdialog.cpp \
-  qt/luxgatedialog.cpp \
   qt/paymentrequestplus.cpp \
   qt/paymentserver.cpp \
   qt/lsrtoken.cpp \
@@ -513,8 +520,8 @@ BITCOIN_QT_CPP += \
   qt/walletframe.cpp \
   qt/walletmodel.cpp \
   qt/walletmodeltransaction.cpp \
-  qt/walletview.cpp \
-  qt/luxgateconfigmodel.cpp
+  qt/walletview.cpp
+
 
 if ENABLE_UPDATER
   BITCOIN_QT_CPP += lux-installer/src/luxupdater/simplescheduler.cpp \
@@ -532,6 +539,11 @@ else
   BITCOIN_QT_CPP += lux-installer/src/adminauthorization_x11.cpp
 endif
 
+endif
+
+if ENABLE_LUXGATE
+ BITCOIN_QT_CPP +=  qt/luxgatedialog.cpp \
+                  qt/luxgateconfigmodel.cpp
 endif
 
 endif
