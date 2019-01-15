@@ -21,6 +21,10 @@ QT_BEGIN_NAMESPACE
 class QStackedWidget;
 QT_END_NAMESPACE
 
+#if defined(HAVE_CONFIG_H)
+#include "config/lux-config.h"
+#endif
+
 class WalletFrame : public QFrame
 {
     Q_OBJECT
@@ -61,10 +65,10 @@ public slots:
     void gotoHistoryPage();
     /** Switch to trading page */
     void gotoTradingPage();
+#ifdef ENABLE_LUXGATE
     /** Switch to luxgate page */
-//#ifdef ENABLE_LUXGATE
     void gotoLuxgatePage();
-//#endif
+#endif
     /** Switch to masternode page */
     void gotoMasternodePage();
     /** Switch to smart contract page */
