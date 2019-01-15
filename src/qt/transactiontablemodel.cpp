@@ -740,7 +740,7 @@ static void NotifyTransactionChanged(TransactionTableModel* ttm, CWallet* wallet
     TransactionNotification notification(hash, status, showTransaction);
 
     if (fQueueNotifications) {
-        // vQueueNotifications.push_back(notification);
+        vQueueNotifications.push_back(notification);
         return;
     }
     notification.invoke(ttm);
@@ -759,7 +759,7 @@ static void ShowProgress(TransactionTableModel* ttm, const std::string& title, i
             if (vQueueNotifications.size() - i <= 10)
                 QMetaObject::invokeMethod(ttm, "setProcessingQueuedTransactions", Qt::QueuedConnection, Q_ARG(bool, false));
 
-            // vQueueNotifications[i].invoke(ttm);
+            vQueueNotifications[i].invoke(ttm);
         }
         std::vector<TransactionNotification>().swap(vQueueNotifications); // clear
     }
