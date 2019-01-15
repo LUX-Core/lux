@@ -13,10 +13,11 @@ class StorageOrder
 public:
     std::time_t time;           // current timestamp
     std::time_t storageUntil;   // timestamp
+    std::string filename;
     uint64_t fileSize;
     uint256 fileURI;
     CAmount maxRate;            // Lux * COIN / (sec * byte)
-    unsigned int maxGap;        // max number of blocks, which can be mined between proofs
+    size_t maxGap;              // max number of blocks, which can be mined between proofs
     CService address;           // [!!!] global-wide sender address
 
     uint256 GetHash() const{

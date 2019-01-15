@@ -6,12 +6,24 @@
 #include <boost/test/unit_test.hpp>
 #include <fstream>
 
+class TestStorageController : public StorageController
+{
+public:
+    boost::mutex mutex;
+    boost::thread background;
+
+    void StartHandshake(const StorageProposal &proposal);
+    std::shared_ptr<AllocatedFile> CreateReplica(const boost::filesystem::path &filename, const StorageOrder &order);
+    void SendReplica(const StorageOrder &order, std::shared_ptr<AllocatedFile> pAllocatedFile, const CNode &pNode);
+    void BackgroundJob();
+};
+
 BOOST_AUTO_TEST_SUITE(storage_controller_tests)
 
 BOOST_AUTO_TEST_CASE(createreplica)
 {
     namespace fs = boost::filesystem;
-    StorageController controller;
+    TestStorageController controller{};
     fs::path fullFilename = GetDefaultDataDir() / "test.temp";
     fs::path defaultDfsPath = GetDefaultDataDir() / "dfs";
     if (!fs::exists(defaultDfsPath)) {

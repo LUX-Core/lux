@@ -11,7 +11,7 @@
 #include "replicabuilder.h"
 #include "serialize.h"
 
-boost::scoped_ptr<StorageController> storageController;
+std::unique_ptr<StorageController> storageController;
 
 struct FileStream
 {
@@ -74,7 +74,8 @@ static void RSA_get0_key(const RSA *r, const BIGNUM **n, const BIGNUM **e, const
 #endif
 
 StorageController::StorageController() : background(boost::bind(&StorageController::BackgroundJob, this)),
-                                         rate(STORAGE_MIN_RATE)
+                                         rate(STORAGE_MIN_RATE),
+                                         maxblocksgap(DEFAULT_STORAGE_MAX_BLOCK_GAP)
 {
     namespace fs = boost::filesystem;
 
@@ -100,7 +101,10 @@ void StorageController::ProcessStorageMessage(CNode* pfrom, const std::string& s
         uint256 hash = order.GetHash();
         if (mapAnnouncements.find(hash) == mapAnnouncements.end()) {
             AnnounceOrder(order); // TODO: Is need remove "pfrom" node from announcement? (SS)
-            if (storageHeap.MaxAllocateSize() > order.fileSize && tempStorageHeap.MaxAllocateSize() > order.fileSize) {
+            if (storageHeap.MaxAllocateSize() > order.fileSize &&
+                tempStorageHeap.MaxAllocateSize() > order.fileSize &&
+                order.maxRate > rate &&
+                order.maxGap > maxblocksgap) {
                 StorageProposal proposal;
                 proposal.time = std::time(0);
                 proposal.orderHash = hash;
@@ -277,6 +281,41 @@ void StorageController::AnnounceOrder(const StorageOrder &order, const boost::fi
     mapLocalFiles[order.GetHash()] = path;
 }
 
+void StorageController::CancelOrder(const std::string &orderHash)
+{
+    // TODO: implement this (SS)
+}
+
+bool StorageController::AcceptProposal( const StorageProposal &proposal)
+{
+    if (!mapAnnouncements.count(proposal.orderHash)) {
+        return false;
+    }
+
+    auto order = mapAnnouncements[proposal.orderHash];
+    StartHandshake(proposal);
+    auto it = mapReceivedHandshakes.find(proposal.orderHash);
+    for (int times = 0; times < 300 && it == mapReceivedHandshakes.end(); ++times) {
+        MilliSleep(100);
+        it = mapReceivedHandshakes.find(proposal.orderHash);
+    }
+    CNode* pNode = FindNode(proposal.address);
+    if (it != mapReceivedHandshakes.end()) {
+        auto itFile = mapLocalFiles.find(proposal.orderHash);
+        auto pAllocatedFile = CreateReplica(itFile->second, order);
+        if (pNode) {
+            if (!SendReplica(order, pAllocatedFile, pNode)) {
+                return false;
+            }
+        }
+    } else {
+        if (pNode) {
+            pNode->CloseSocketDisconnect();
+        }
+    }
+    return false;
+}
+
 void StorageController::StartHandshake(const StorageProposal &proposal)
 {
     StorageHandshake handshake;
@@ -370,34 +409,9 @@ bool StorageController::FindReplicaKeepers(const StorageOrder &order, const int 
     std::vector<StorageProposal> proposals = SortProposals(order);
     int numReplica = 0;
     for (auto &&proposal : proposals) {
-        StartHandshake(proposal);
-        auto it = mapReceivedHandshakes.find(proposal.orderHash);
-        for (int times = 0; times < 300 && it == mapReceivedHandshakes.end(); ++times) {
-            MilliSleep(100);
-            it = mapReceivedHandshakes.find(proposal.orderHash);
-        }
-        if (it != mapReceivedHandshakes.end()) {
-            ++numReplica;
-            auto itFile = mapLocalFiles.find(proposal.orderHash);
-            auto pAllocatedFile = CreateReplica(itFile->second, order);
-            CNode* pNode = FindNode(proposal.address);
-            if (pNode) {
-                FileStream fileStream;
-                fileStream.currenOrderHash = order.GetHash();
-                fileStream.filestream.open(pAllocatedFile->filename, std::ios::binary|std::ios::in);
-                if (!fileStream.filestream.is_open()) {
-                    LogPrint("dfs", "file %s cannot be opened", pAllocatedFile->filename);
-                    return false;
-                }
-                pNode->PushMessage("dfssendfile", fileStream);
-            }
-            if (numReplica == countReplica) {
+        if (AcceptProposal(proposal)) {
+            if (++numReplica == countReplica) {
                 return true;
-            }
-        } else {
-            CNode* pNode = FindNode(proposal.address);
-            if (pNode) {
-                pNode->CloseSocketDisconnect();
             }
         }
     }
@@ -465,4 +479,18 @@ std::shared_ptr<AllocatedFile> StorageController::CreateReplica(const boost::fil
     delete[] replica;
 
     return tempFile;
+}
+
+bool StorageController::SendReplica(const StorageOrder &order, std::shared_ptr<AllocatedFile> pAllocatedFile, CNode* pNode)
+{
+    FileStream fileStream;
+    fileStream.currenOrderHash = order.GetHash();
+    fileStream.filestream.open(pAllocatedFile->filename, std::ios::binary|std::ios::in);
+    if (!fileStream.filestream.is_open()) {
+        LogPrint("dfs", "file %s cannot be opened", pAllocatedFile->filename);
+        return false;
+    }
+    pNode->PushMessage("dfssendfile", fileStream);
+
+    return true;
 }

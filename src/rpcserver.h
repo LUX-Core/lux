@@ -444,14 +444,14 @@ extern UniValue getaccountinfo(const UniValue& params, bool fHelp);
 extern UniValue dfsannounce(const UniValue& params, bool fHelp);
 extern UniValue dfscancelorder(const UniValue& params, bool fHelp);
 extern UniValue dfsgetinfo(const UniValue& params, bool fHelp);
-extern UniValue dfsorderslist(const UniValue& params, bool fHelp);
-extern UniValue dfsproposalslist(const UniValue& params, bool fHelp);
+extern UniValue dfslistorders(const UniValue& params, bool fHelp);
+extern UniValue dfslistproposals(const UniValue& params, bool fHelp);
+extern UniValue dfslocalstorage(const UniValue& params, bool fHelp);
 extern UniValue dfsacceptproposal(const UniValue& params, bool fHelp);
 extern UniValue dfssetparams(const UniValue& params, bool fHelp);
 extern UniValue dfssetfolder(const UniValue& params, bool fHelp);
 extern UniValue dfssettempfolder(const UniValue& params, bool fHelp);
 extern UniValue dfsremoveoldorders(const UniValue& params, bool fHelp);
-extern UniValue dfssetmyip(const UniValue& params, bool fHelp);
 
 
 extern UniValue getstorage(const UniValue& params, bool fHelp);

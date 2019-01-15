@@ -1227,7 +1227,7 @@ UniValue dfsannounce(const UniValue& params, bool fHelp)
                 "2. daysToKeep                (numeric, required) The days to keep\n"
                 "3. fileCostInCoins           (numeric, required) The file cost in coins\n"
                 "\nResult:\n"
-                "null\n"
+                "order hash\n"
                 "\nExamples:\n"
                 + HelpExampleCli("dfsannounce", "\"/tmp/123.jpg\" 1 0.3")
                 + HelpExampleRpc("dfsannounce", "\"/tmp/123.jpg\", 1, 0.3")
@@ -1250,7 +1250,9 @@ UniValue dfsannounce(const UniValue& params, bool fHelp)
     storageController->AnnounceOrder(order, path);
     storageController->proposalsAgent.ListenProposal(order.GetHash());
 
-    return UniValue::VNULL;
+    UniValue ret(UniValue::VSTR);
+    ret = order.GetHash().ToString();
+    return ret;
 }
 
 UniValue dfscancelorder(const UniValue& params, bool fHelp)
@@ -1267,6 +1269,10 @@ UniValue dfscancelorder(const UniValue& params, bool fHelp)
                 + HelpExampleCli("dfscancelorder", "\"..TODO..\"")
                 + HelpExampleRpc("dfscancelorder", "\"..TODO..\"")
         );
+
+    std::string hash = params[0].get_str();
+    storageController->CancelOrder(hash);
+
     return UniValue::VNULL;
 }
 
@@ -1278,50 +1284,79 @@ UniValue dfsgetinfo(const UniValue& params, bool fHelp)
                         "Returns ..TODO..\n"
                         "\nResult:\n"
                         "{\n"
-                        "  \"enabled\": true|false,      (boolean) ..TODO..\n"
-                        "  \"my ip\": \"...\",           (string) ..TODO..\n"
-                        "  \"dfs folder\": \"...\",      (string) path to data folder\n"
-                        "  \"dfs temp folder\": \"...\", (string) path to temp folder\n"
-                        "  \"min rate\": xxxxxxxx,       (numeric) ..TODO..\n"
-                        "  \"max blocks gap\": xxxxxx,   (numeric) ..TODO..\n"
+                        "  \"enabled\": true|false,     (boolean) ..TODO..\n"
+                        "  \"myip\": \"...\",           (string) ..TODO..\n"
+                        "  \"dfsfolder\": \"...\",      (string) path to data folder\n"
+                        "  \"dfstempfolder\": \"...\",  (string) path to temp folder\n"
+                        "  \"rate\": xxxxxxxx,          (numeric) ..TODO..\n"
+                        "  \"maxblocksgap\": xxxxxx,    (numeric) max number of blocks, which can be mined between proofs\n"
                         "}\n"
-                        "\nExamples:\n" +
+                        "\nExamples:\n"
                 + HelpExampleCli("dfsgetinfo", "") + HelpExampleRpc("dfsgetinfo", ""));
-    return UniValue::VNULL;
+
+    std::string myip = storageController->address.ToStringIPPort();
+    bool enabled = (myip != "[::]:0");
+
+    UniValue obj(UniValue::VOBJ);
+    obj.push_back(Pair("enabled", enabled));
+    obj.push_back(Pair("myip", myip));
+    obj.push_back(Pair("dfsfolder", storageController->storageHeap.GetChunks().back().path));
+    obj.push_back(Pair("dfstempfolder", storageController->tempStorageHeap.GetChunks().back().path));
+    obj.push_back(Pair("rate", storageController->rate));
+    obj.push_back(Pair("maxblocksgap", storageController->maxblocksgap));
+
+    return obj;
 }
 
-UniValue dfsorderslist(const UniValue& params, bool fHelp)
+UniValue dfslistorders(const UniValue& params, bool fHelp)
 {
     if (fHelp || params.size())
         throw runtime_error(
-                "dfsorderslist\n"
+                "dfslistorders\n"
                         "\nReturns array of orders\n"
                         "\nResult\n"
                         "[                   (array of json object)\n"
                         "  {\n"
-                        "    \"order hash\" : \"hash\",  (string) the order hash \n"
+                        "    \"orderhash\" : \"hash\",   (string) the order hash \n"
                         "    \"time\" : timestamp,       (numeric) the create order time\n"
+                        "    \"filename\" : \"...\",     (string) ..TODO..\n"
                         "    \"address\" : \"address\",  (string) the ip address node which create order\n"
-                        "    \"until time\" : timestamp, (numeric) ..TODO..\n"
-                        "    \"file name\" : \"...\",    (string) ..TODO..\n"
-                        "    \"file size\" : n,          (numeric) ..TODO..\n"
+                        "    \"untiltime\" : timestamp,  (numeric) ..TODO..\n"
+                        "    \"filesize\" : n,           (numeric) ..TODO..\n"
                         "    \"rate\" : n                (numeric) ..TODO..\n"
-                        "    \"block gap\" : n           (numeric) ..TODO..\n"
+                        "    \"blockgap\" : n            (numeric) max number of blocks, which can be mined between proofs\n"
                         "  }\n"
                         "  ,...\n"
                         "]\n"
                         "\nExamples\n"
-                + HelpExampleCli("dfsorderslist", "")
-                + HelpExampleRpc("dfsorderslist", ""));
+                + HelpExampleCli("dfslistorders", "")
+                + HelpExampleRpc("dfslistorders", ""));
 
-    return UniValue::VNULL;
+    UniValue result(UniValue::VARR);
+
+    for (auto announcePair : storageController->mapAnnouncements){
+        StorageOrder announce = announcePair.second;
+        UniValue obj(UniValue::VOBJ);
+        obj.push_back(Pair("orderhash", announcePair.first.ToString()));
+        obj.push_back(Pair("time", announce.time));
+        obj.push_back(Pair("fileURI", announce.fileURI.ToString()));
+        obj.push_back(Pair("filename", announce.filename));
+        obj.push_back(Pair("address", announce.address.ToStringIPPort()));
+        obj.push_back(Pair("untiltime", announce.storageUntil));
+        obj.push_back(Pair("filesize", announce.fileSize));
+        obj.push_back(Pair("rate", announce.maxRate));
+        obj.push_back(Pair("blockgap", announce.maxGap));
+        result.push_back(obj);
+    }
+
+    return result;
 }
 
-UniValue dfsproposalslist(const UniValue& params, bool fHelp)
+UniValue dfslistproposals(const UniValue& params, bool fHelp)
 {
     if (fHelp || params.size() != 1)
         throw runtime_error(
-                "dfsproposalslist\n"
+                "dfslistproposals\n"
                         "\nReturns array of proposals for order\n"
                         "\nArguments:\n"
                         "    \"orders hash\"             (string, required) The hash of announces order\n"
@@ -1336,9 +1371,64 @@ UniValue dfsproposalslist(const UniValue& params, bool fHelp)
                         "  ,...\n"
                         "]\n"
                         "\nExamples\n"
-                + HelpExampleCli("dfsproposalslist", "..TODO..")
-                + HelpExampleRpc("dfsproposalslist", "..TODO.."));
-    return UniValue::VNULL;
+                + HelpExampleCli("dfslistproposals", "..TODO..")
+                + HelpExampleRpc("dfslistproposals", "..TODO.."));
+
+    UniValue result(UniValue::VARR);
+    std::vector<StorageProposal> proposals = storageController->proposalsAgent.GetProposals(uint256{params[0].get_str()});
+    for (auto proposal : proposals){
+        UniValue obj(UniValue::VOBJ);
+        obj.push_back(Pair("orderhash", proposal.orderHash.ToString()));
+        obj.push_back(Pair("time", proposal.time));
+        obj.push_back(Pair("address", proposal.address.ToStringIPPort()));
+        obj.push_back(Pair("rate", proposal.rate));
+        result.push_back(obj);
+    }
+
+    return result;
+}
+
+UniValue dfslocalstorage(const UniValue& params, bool fHelp)
+{
+    if (fHelp || params.size() != 1)
+        throw runtime_error(
+                "dfslocalstorage\n"
+                        "\nReturns array of local files visible from decentralized file storage\n"
+                        "\nResult\n"
+                        "[                   (array of json object)\n"
+                        "  {\n"
+                        "    ..TODO.. \n"
+                        "  }\n"
+                        "  ,...\n"
+                        "]\n"
+                        "\nExamples\n"
+                + HelpExampleCli("dfslocalstorage", "..TODO..")
+                + HelpExampleRpc("dfslocalstorage", "..TODO.."));
+
+    UniValue result(UniValue::VARR);
+    std::vector<StorageChunk> chunks = storageController->storageHeap.GetChunks();
+
+    size_t chunkIndex = 0;
+    for(auto &&chunk : chunks) {
+        UniValue obj(UniValue::VOBJ);
+        obj.push_back(Pair("index", chunkIndex++));
+        obj.push_back(Pair("path", chunk.path));
+        obj.push_back(Pair("totalSpace", std::to_string(chunk.totalSpace)));
+        obj.push_back(Pair("freeSpace", std::to_string(chunk.freeSpace)));
+
+        UniValue files(UniValue::VARR);
+        for(auto &&file : chunk.files) {
+            UniValue objFile(UniValue::VOBJ);
+            objFile.push_back(Pair("filename", file->filename));
+            objFile.push_back(Pair("uri", file->uri));
+            objFile.push_back(Pair("size", std::to_string(file->size)));
+            files.push_back(objFile);
+        }
+        // TODO: push files to result (SS)
+        result.push_back(obj);
+    }
+
+    return result;
 }
 
 UniValue dfsacceptproposal(const UniValue& params, bool fHelp)
@@ -1348,13 +1438,20 @@ UniValue dfsacceptproposal(const UniValue& params, bool fHelp)
                 "dfsacceptproposal\n"
                         "\n..TODO..\n"
                         "\nArguments:\n"
-                        "  \"min rate\": xxxxxxxx,       (numeric, required) ..TODO..\n"
-                        "  \"max blocks gap\": xxxxxx,   (numeric, required) ..TODO..\n"
+                        "    \"orders hash\"             (string, required) The hash of announces order\n"
+                        "    \"proposals hash\"          (string, required) The hash of proposal\n"
                         "\nResult:\n"
                         "null\n"
                         "\nExamples\n"
-                + HelpExampleCli("dfsacceptproposal", "1 20")
-                + HelpExampleRpc("dfsacceptproposal", "1 20"));
+                + HelpExampleCli("dfsacceptproposal", "..TODO..")
+                + HelpExampleRpc("dfsacceptproposal", "..TODO.."));
+
+    uint256 orderHash = uint256{params[0].get_str()};
+    StorageProposal proposal = storageController->proposalsAgent.GetProposal(orderHash, uint256{params[1].get_str()});
+    if (proposal.time != 0) {
+        storageController->AcceptProposal(proposal);
+    }
+
     return UniValue::VNULL;
 }
 
@@ -1365,13 +1462,24 @@ UniValue dfssetparams(const UniValue& params, bool fHelp)
                 "dfssetparams\n"
                         "\n..TODO..\n"
                         "\nArguments:\n"
-                        "    \"orders hash\"             (string, required) The hash of announces order\n"
-                        "    \"proposals hash\"          (string, required) The hash of proposal\n"
+                        "  \"min rate\": xxxxxxxx,       (numeric, required) ..TODO..\n"
+                        "  \"max blocks gap\": xxxxxx,   (numeric, required) ..TODO..\n"
                         "\nResult:\n"
                         "null\n"
                         "\nExamples\n"
-                + HelpExampleCli("dfssetparams", "..TODO..")
-                + HelpExampleRpc("dfssetparams", "..TODO.."));
+                + HelpExampleCli("dfssetparams", "1 20")
+                + HelpExampleRpc("dfssetparams", "1 20"));
+
+    CAmount rate = std::stoi(params[0].get_str());
+    size_t maxblocksgap = std::stoi(params[1].get_str());
+
+    if (rate > COIN && maxblocksgap > 10000) {
+        LogPrintf("Warning! %s: dfs parameters are very huge (rate: %d gap: %d)\n", __func__, rate, maxblocksgap);
+    }
+
+    storageController->rate = rate;
+    storageController->maxblocksgap = maxblocksgap;
+
     return UniValue::VNULL;
 }
 
@@ -1420,22 +1528,16 @@ UniValue dfsremoveoldorders(const UniValue& params, bool fHelp)
                         "\nExamples\n"
                 + HelpExampleCli("dfsremoveoldorders", "1546300800")
                 + HelpExampleRpc("dfsremoveoldorders", "1546300800"));
+
+    std::time_t timestamp;
+    if (params.size()) {
+        timestamp = std::stoi(params[0].get_str());
+    } else {
+        timestamp = time_t(nullptr) - 7 * 24 * 60 * 60; // one week ago
+    }
+
+    storageController->ClearOldAnnouncments(timestamp);
+
     return UniValue::VNULL;
 }
 
-UniValue dfssetmyip(const UniValue& params, bool fHelp)
-{
-    if (fHelp || !params.size() || params.size() > 2)
-        throw runtime_error(
-                "dfssetmyip\n"
-                        "\n..TODO..\n"
-                        "\nArguments:\n"
-                        "  \"address\": address,       (string, required) ..TODO..\n"
-                        "  \"port\": address,          (string, optional) ..TODO..\n"
-                        "\nResult:\n"
-                        "null\n"
-                        "\nExamples\n"
-                + HelpExampleCli("dfssetmyip", "192.168.0.0.1")
-                + HelpExampleRpc("dfssetmyip", "192.168.0.0.1"));
-    return UniValue::VNULL;
-}

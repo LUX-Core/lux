@@ -12,22 +12,28 @@
 
 class StorageController;
 
-extern boost::scoped_ptr<StorageController> storageController;
+extern std::unique_ptr<StorageController> storageController;
 
 static const size_t STORAGE_MIN_RATE = 1;
+static const size_t DEFAULT_STORAGE_MAX_BLOCK_GAP = 100;
 
 static const uint64_t DEFAULT_STORAGE_SIZE = 100ull * 1024 * 1024 * 1024; // 100 Gb
 static const unsigned short DEFAULT_DFS_PORT = 1507;
 
 class StorageController
 {
-private:
+protected:
     boost::mutex mutex;
     boost::thread background;
+
+    void StartHandshake(const StorageProposal &proposal);
+    std::shared_ptr<AllocatedFile> CreateReplica(const boost::filesystem::path &filename, const StorageOrder &order);
+    bool SendReplica(const StorageOrder &order, std::shared_ptr<AllocatedFile> pAllocatedFile, CNode* pNode);
     void BackgroundJob();
 
 public:
     size_t rate;
+    size_t maxblocksgap;
     CAddress address;
     std::map<uint256, boost::filesystem::path> mapLocalFiles;
     std::map<uint256, StorageOrder> mapAnnouncements;
@@ -36,12 +42,13 @@ public:
     StorageHeap tempStorageHeap;
     ProposalsAgent proposalsAgent;
 
-    StorageController(); // TODO: Change to global-wide address (SS)
+    StorageController();
 
     void AnnounceOrder(const StorageOrder &order);
     void AnnounceOrder(const StorageOrder &order, const boost::filesystem::path &path);
+    void CancelOrder(const std::string &orderHash);
     std::vector<StorageProposal> SortProposals(const StorageOrder &order);
-    void StartHandshake(const StorageProposal &proposal);
+    bool AcceptProposal(const StorageProposal &proposal);
     void ClearOldAnnouncments(std::time_t timestamp);
     void ProcessStorageMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv, bool& isStorageCommand);
     // Proposals Agent
@@ -51,7 +58,6 @@ public:
     //std::vector<StorageProposal> GetProposals(const uint256 &orderHash);
     // Temp
     bool FindReplicaKeepers(const StorageOrder &order, const int countReplica);
-    std::shared_ptr<AllocatedFile> CreateReplica(const boost::filesystem::path &filename, const StorageOrder &order);
 };
 
 #endif //LUX_STORAGECONTROLLER_H
