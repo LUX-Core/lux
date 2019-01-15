@@ -34,6 +34,9 @@
 #include <QHeaderView>
 #include <QVector>
 #include <QMessageBox>
+#include <QFileDialog>
+#include <QStandardPaths>
+#include <QFile>
 
 #include <openssl/hmac.h>
 #include <stdlib.h>
@@ -53,6 +56,25 @@
 #include <functional>
 
 using namespace std;
+
+boost::filesystem::path PathFromQString(const QString & filePath)
+{
+#ifdef _WIN32
+    auto * wptr = reinterpret_cast<const wchar_t*>(filePath.utf16());
+    return boost::filesystem::path(wptr, wptr + filePath.size());
+#else
+    return boost::filesystem::path(filePath.toStdString());
+#endif
+}
+
+QString QStringFromPath(const boost::filesystem::path & filePath)
+{
+#ifdef _WIN32
+    return QString::fromStdWString(filePath.generic_wstring());
+#else
+    return QString::fromStdString(filePath.native());
+#endif
+}
 
 LuxgateDialog::LuxgateDialog(QWidget *parent) :
         QMainWindow(parent),
@@ -86,6 +108,10 @@ LuxgateDialog::LuxgateDialog(QWidget *parent) :
                 this, &LuxgateDialog::slotClickAddConfiguration);
         connect(ui->pushButtonRemoveConfiguration, &QPushButton::clicked,
                 this, &LuxgateDialog::slotClickRemoveConfiguration);
+        connect(ui->pushButtonImportConfig, &QPushButton::clicked,
+                this, &LuxgateDialog::slotClickImportConfiguration);
+        connect(ui->pushButtonExportConfig, &QPushButton::clicked,
+                this, &LuxgateDialog::slotClickExportConfiguration);
     }
 }
 
@@ -167,20 +193,49 @@ void LuxgateDialog::setModel(WalletModel *model)
     this->model = model;
 }
 
-void LuxgateDialog::slotClickResetConfiguration()
+void LuxgateDialog::slotClickImportConfiguration()
+{
+    QString openFileName = QFileDialog::getOpenFileName(this, tr("Import Luxgate Configuration"),
+            QStandardPaths::writableLocation(QStandardPaths::DataLocation),
+            tr("*.json"));
+    if(!openFileName.isEmpty())
+    {
+        fillInTableWithConfig(openFileName);
+        ui->pushButtonResetConfig->setEnabled(true);
+        ui->pushButtonChangeConfig->setEnabled(true);
+    }
+}
+
+void LuxgateDialog::slotClickExportConfiguration()
+{
+    QString newFileName = QFileDialog::getSaveFileName(this, tr("Export Luxgate Configuration"),
+                                                        QStandardPaths::writableLocation(QStandardPaths::DataLocation),
+                                                        tr("*.json"));
+    QFile::remove(newFileName);
+    QFile::copy(QStringFromPath(GetLuxGateConfigFile()),
+                newFileName);
+}
+
+//strConfig - path to import config, if strConfig == "" use standard config file
+void LuxgateDialog::fillInTableWithConfig(QString strConfig)
 {
     auto modelConfig = qobject_cast<LuxgateConfigModel*>(ui->tableViewConfiguration->model());
     modelConfig->removeRows(0, modelConfig->rowCount());
     // Read LuxGate config
-    std::map<std::string, BlockchainConfig> config = ReadLuxGateConfigFile();
+    std::map<std::string, BlockchainConfig> config = ReadLuxGateConfigFile(PathFromQString(strConfig));
     for (auto it : config)
     {
         BlockchainConfigQt conf(it.second);
         modelConfig->insertRows(modelConfig->rowCount(), 1);
         modelConfig->setData(modelConfig->rowCount()-1, 0,
-                QVariant::fromValue(conf),
-                LuxgateConfigModel::AllDataRole);
+                             QVariant::fromValue(conf),
+                             LuxgateConfigModel::AllDataRole);
     }
+}
+
+void LuxgateDialog::slotClickResetConfiguration()
+{
+    fillInTableWithConfig();
     ui->pushButtonResetConfig->setEnabled(false);
     ui->pushButtonChangeConfig->setEnabled(false);
 }
