@@ -821,6 +821,7 @@ bool AppInit2()
     fPrintToConsole = GetBoolArg("-printtoconsole", false);
     fLogTimestamps = GetBoolArg("-logtimestamps", true);
     fLogIPs = GetBoolArg("-logips", false);
+    int nIndexNum;
 
     if (mapArgs.count("-bind") || mapArgs.count("-whitebind")) {
         // when specifying an explicit binding address, you want to listen on it
@@ -919,8 +920,27 @@ bool AppInit2()
         nMaxConnections = nFD - MIN_CORE_FILEDESCRIPTORS;
 
     if (GetArg("-prune", 0)) {
-        if (GetBoolArg("-txindex", DEFAULT_TXINDEX))
-            return InitError(_("Prune mode is incompatible with -txindex."));
+        std::string strLoadError;
+        if (GetBoolArg("-txindex", DEFAULT_TXINDEX)) {
+            strLoadError = _("You need to add txindex=0 to start pruning");
+            bool fRetPrune = uiInterface.ThreadSafeQuestion(
+                strLoadError + ".\n\n" + _("Do you want to add automatically add it to the configuration file and close the wallet?"),
+                strLoadError + ".\nPlease restart with txindex=0 to prune.",
+                "", CClientUIInterface::MSG_ERROR | CClientUIInterface::BTN_ABORT);
+            if (fRetPrune){
+                nIndexNum = 0;
+                WriteConfigToFile("txindex", std::to_string(nIndexNum));
+                fReindex = true;
+                fRequestRestart = true;  
+            } else {
+                LogPrintf("Aborted configuration changes. Exiting.\n");
+                return false;
+            }
+        }
+    }
+    if (fRequestRestart) {
+        LogPrintf("Restart requested. Exiting.\n");
+        return false;
     }
 
     // ********************************************************* Step 3: parameter-to-internal-flags
