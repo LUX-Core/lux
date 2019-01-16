@@ -37,6 +37,8 @@
 #include <QFileDialog>
 #include <QStandardPaths>
 #include <QFile>
+#include <QBrush>
+#include <QItemDelegate>
 
 #include <openssl/hmac.h>
 #include <stdlib.h>
@@ -76,6 +78,32 @@ QString QStringFromPath(const boost::filesystem::path & filePath)
 #endif
 }
 
+
+class HighlightDelegate : public QItemDelegate
+{
+public:
+    HighlightDelegate(QObject *parent);
+    void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const Q_DECL_OVERRIDE;
+};
+
+HighlightDelegate::HighlightDelegate(QObject *parent) :
+        QItemDelegate(parent)
+{}
+
+void HighlightDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
+{
+    QStyleOptionViewItem opt = option;
+
+    if(!index.model()->data(index, LuxgateConfigModel::ValidRole).toBool()) {
+        QColor col;
+        col.setNamedColor("#990012");
+        opt.palette.setColor(QPalette::Highlight, col);
+    }
+
+    this->QItemDelegate::paint(painter, opt, index);
+}
+
+
 LuxgateDialog::LuxgateDialog(QWidget *parent) :
         QMainWindow(parent),
         ui(new Ui::LuxgateDialog),
@@ -90,7 +118,8 @@ LuxgateDialog::LuxgateDialog(QWidget *parent) :
     {
         auto configModel = new LuxgateConfigModel(this);
         ui->tableViewConfiguration->setModel(configModel);
-
+        ui->tableViewConfiguration->setItemDelegate(new HighlightDelegate(ui->tableViewConfiguration));
+        ui->tableViewConfiguration->setStyleSheet("");
         QHeaderView * HeaderView = ui->tableViewConfiguration->horizontalHeader();
         HeaderView->setSectionResizeMode(QHeaderView::Stretch);
 
@@ -226,6 +255,8 @@ void LuxgateDialog::fillInTableWithConfig(QString strConfig)
     for (auto it : config)
     {
         BlockchainConfigQt conf(it.second);
+        if(conf.ticker == "Lux")
+            continue;
         modelConfig->insertRows(modelConfig->rowCount(), 1);
         modelConfig->setData(modelConfig->rowCount()-1, 0,
                              QVariant::fromValue(conf),
@@ -243,26 +274,67 @@ void LuxgateDialog::slotClickResetConfiguration()
 void LuxgateDialog::slotClickChangeConfig()
 {
     std::map<std::string, BlockchainConfig> configs;
-    //fill in configs
+    auto modelConfig = qobject_cast<LuxgateConfigModel *>(ui->tableViewConfiguration->model());
+    //all configs are valid
+    bool bValid = true;
+    //fill in configs and bValid
     {
-        auto model = qobject_cast<LuxgateConfigModel *>(ui->tableViewConfiguration->model());
-        for(int iR=0; iR<model->rowCount(); iR++)
+        for(int iR=0; iR<modelConfig->rowCount(); iR++)
         {
-            BlockchainConfig conf = qvariant_cast<BlockchainConfigQt>(model->data(iR, 0, LuxgateConfigModel::AllDataRole)).toBlockchainConfig();
+            BlockchainConfig conf = qvariant_cast<BlockchainConfigQt>(modelConfig->data(iR, 0, LuxgateConfigModel::AllDataRole)).toBlockchainConfig();
             configs[conf.ticker] = conf;
+
+            //check Valid configs
+            auto validItems = isValidBlockchainConfig(conf);
+            if(!validItems.bValid) {
+                int iEditingCol = modelConfig->columnCount();
+
+                if(!validItems.bTickerValid)
+                    iEditingCol = qMin(iEditingCol, static_cast<int>(LuxgateConfigModel::TickerColumn));
+                modelConfig->setData(iR, LuxgateConfigModel::TickerColumn, validItems.bTickerValid, LuxgateConfigModel::ValidRole);
+
+                if(!validItems.bHostValid)
+                    iEditingCol = qMin(iEditingCol, static_cast<int>(LuxgateConfigModel::HostColumn));
+                modelConfig->setData(iR, LuxgateConfigModel::HostColumn, validItems.bHostValid, LuxgateConfigModel::ValidRole);
+
+
+                if(!validItems.bPortValid)
+                    iEditingCol = qMin(iEditingCol, static_cast<int>(LuxgateConfigModel::PortColumn));
+                modelConfig->setData(iR, LuxgateConfigModel::PortColumn, validItems.bPortValid, LuxgateConfigModel::ValidRole);
+
+                if(!validItems.bRpcUserValid)
+                    iEditingCol = qMin(iEditingCol, static_cast<int>(LuxgateConfigModel::RpcuserColumn));
+                modelConfig->setData(iR, LuxgateConfigModel::RpcuserColumn, validItems.bRpcUserValid, LuxgateConfigModel::ValidRole);
+
+                if(!validItems.bRpcPasswordValid)
+                    iEditingCol = qMin(iEditingCol, static_cast<int>(LuxgateConfigModel::RpcpasswordColumn));
+                modelConfig->setData(iR, LuxgateConfigModel::RpcpasswordColumn, validItems.bRpcPasswordValid, LuxgateConfigModel::ValidRole);
+
+                if(!validItems.bZmqEndpointValid)
+                    iEditingCol = qMin(iEditingCol, static_cast<int>(LuxgateConfigModel::Zmq_pub_raw_tx_endpointColumn));
+
+                modelConfig->setData(iR, LuxgateConfigModel::Zmq_pub_raw_tx_endpointColumn, validItems.bZmqEndpointValid, LuxgateConfigModel::ValidRole);
+
+                if(iEditingCol != modelConfig->columnCount() && bValid) {
+                    bValid = false;
+                    ui->tableViewConfiguration->edit(modelConfig->index(iR, iEditingCol));
+                }
+            }
+            else {
+                for(int iC=0; iC<modelConfig->columnCount(); iC++){
+                    modelConfig->setData(iR, iC, true, LuxgateConfigModel::ValidRole);
+                }
+            }
         }
     }
-    //check Valid configs
-    for (auto it : configs)
+
+    if(!bValid)
     {
-        if(!isValidBlockchainConfig(it.second).bValid)
-        {
-            QMessageBox::critical(this, tr("Luxgate"), tr("Configuration is not valid!"));
-            return;
-        }
+        //QMessageBox::critical(this, tr("Luxgate"), tr("Configuration is not valid!"));
+        return;
     }
-    bool bChange = ChangeLuxGateConfiguration(configs);
-    if(bChange)
+
+    if(ChangeLuxGateConfiguration(configs))
     {
         ui->pushButtonResetConfig->setEnabled(false);
         ui->pushButtonChangeConfig->setEnabled(false);

@@ -396,12 +396,12 @@ QHeaderView::section:last {
     border:1px solid #333;
 }
 
-QTableView::item { /* Table Item */
+QTableView::item [defaultQSS=true]{ /* Table Item */
     background-color:#fcfcfc;
     font-size:12px;
 }
 
-QTableView::item:selected { /* Table Item Selected */
+QTableView::item:selected [defaultQSS=true] { /* Table Item Selected */
     background-color:#40c2dc;
     color:#fff;
 }

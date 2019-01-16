@@ -52,7 +52,8 @@ QVariant LuxgateConfigModel::headerData(int section, Qt::Orientation orientation
 QVariant LuxgateConfigModel::data(const QModelIndex &index, int role) const
 {
     QVariant res;
-    if(role == Qt::EditRole || role == Qt::DisplayRole)
+    if( Qt::EditRole == role ||
+        Qt::DisplayRole == role)
     {
         switch (index.column())
         {
@@ -76,10 +77,14 @@ QVariant LuxgateConfigModel::data(const QModelIndex &index, int role) const
             break;
         }
     }
-    else if(role == AllDataRole)
+    else if(Qt::BackgroundRole == role)
+        res = backgroundBrushs[index.row()][index.column()];
+    else if(AllDataRole == role)
         res = QVariant::fromValue(items[index.row()]);
+    else if(ValidRole == role)
+        res = validItems[index.row()][index.column()];
     else
-        return QVariant();
+        res = QVariant();
     return res;
 }
 
@@ -93,9 +98,16 @@ bool LuxgateConfigModel::insertRows(int row, int count, const QModelIndex &paren
     if(row < 0 || (row > items.size() && items.size()!= 0))
         return false;
     beginInsertRows(parent,row, row+count-1);
-    for(int i=row; i<row+count; i++)
+    for(int iR=row; iR<row+count; iR++)
     {
-        items.insert(i, BlockchainConfig());
+        items.insert(iR, BlockchainConfig());
+        for(int iC=0; iC<columnCount(); iC++)
+        {
+            QColor col;
+            col.setNamedColor("#fcfcfc");
+            backgroundBrushs[iR][iC] = QBrush(col);
+            validItems[iR][iC] =   true;
+        }
     }
     endInsertRows();
     return true;
@@ -109,6 +121,8 @@ bool LuxgateConfigModel::removeRows(int row, int count, const QModelIndex &paren
     for(int i=0; i<count; i++)
     {
         items.removeAt(row);
+        backgroundBrushs.remove(row+i);
+        validItems.remove(row+i);
     }
     endRemoveRows();
     return true;
@@ -129,7 +143,9 @@ bool LuxgateConfigModel::setData(const QModelIndex &index, const QVariant &value
     if(index.row() >= items.size() || index.row() < 0)
         return QAbstractTableModel::setData(index,value,role);
 
-    if(role == Qt::EditRole || role == Qt::DisplayRole)
+
+    if(Qt::EditRole == role
+        || Qt::DisplayRole == role)
     {
         switch (index.column())
         {
@@ -152,17 +168,39 @@ bool LuxgateConfigModel::setData(const QModelIndex &index, const QVariant &value
                 items[index.row()].zmq_pub_raw_tx_endpoint = value.toString();
             break;
         }
-        emit dataChanged(index, index, {role});
     }
-    else if(role == AllDataRole)
+    else if (Qt::BackgroundRole == role)
+    {
+        backgroundBrushs[index.row()][index.column()] =   qvariant_cast<QBrush>(value);
+    }
+    else if (ValidRole == role)
+    {
+        validItems[index.row()][index.column()] =   value.toBool();
+        if(value.toBool())
+        {
+            QColor col;
+            col.setNamedColor("#fcfcfc");
+            backgroundBrushs[index.row()][index.column()] = QBrush(col);
+        }
+        else
+            backgroundBrushs[index.row()][index.column()] = QBrush(QColor(Qt::red));
+    }
+    else if(AllDataRole == role)
     {
         items[index.row()] = qvariant_cast<BlockchainConfigQt>(value);
-        emit dataChanged(  this->index(index.row(), 0),
-                           this->index(index.row(), NColumns-1),
-                            {Qt::EditRole, Qt::DisplayRole, AllDataRole});
     }
     else
         return QAbstractTableModel::setData(index,value,role);
+
+    //emit dataChanged
+    if(AllDataRole == role)
+        emit dataChanged(  this->index(index.row(), 0),
+                           this->index(index.row(), NColumns-1),
+                           {Qt::EditRole, Qt::DisplayRole, AllDataRole});
+    else if (ValidRole == role)
+        emit dataChanged(index, index, {ValidRole, Qt::BackgroundRole});
+    else
+        emit dataChanged(index, index, {role});
 
     return true;
 }

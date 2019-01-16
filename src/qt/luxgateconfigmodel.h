@@ -4,6 +4,7 @@
 #include <QList>
 #include <QAbstractTableModel>
 #include <QString>
+#include <QBrush>
 
 struct BlockchainConfigQt
 {
@@ -45,7 +46,7 @@ class LuxgateConfigModel : public QAbstractTableModel
 public:
     LuxgateConfigModel(QObject *parent = nullptr);
 
-    enum UserRoles{AllDataRole = Qt::UserRole + 1};
+    enum UserRoles{AllDataRole = Qt::UserRole + 1, ValidRole};
 
     enum Columns{
         TickerColumn = 0, HostColumn,
@@ -67,6 +68,8 @@ public:
     QVariant data(int iRow,int iColumn,  int role = Qt::DisplayRole);
 private:
     QList<BlockchainConfigQt> items;
+    QMap<int, QMap<int, QBrush> > backgroundBrushs; //QMap<row,QMap<column, brush>>
+    QMap<int, QMap<int, bool> > validItems; //QMap<row,QMap<column, bValid>>
 };
 
 #endif // CsTypesMODEL_H
