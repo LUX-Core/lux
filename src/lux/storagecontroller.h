@@ -32,7 +32,7 @@ protected:
     void BackgroundJob();
 
 public:
-    size_t rate;
+    CAmount rate;
     size_t maxblocksgap;
     CAddress address;
     std::map<uint256, boost::filesystem::path> mapLocalFiles;

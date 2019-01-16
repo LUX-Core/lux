@@ -7,37 +7,38 @@
 #include <memory>
 #include <mutex>
 #include <boost/optional.hpp>
+#include <boost/filesystem.hpp>
 
 struct DecryptionKeys
 {
-    using Bytes = std::vector<unsigned char>;
-    Bytes rsaKey;
-    Bytes aesKey;
+    using bytes = std::vector<unsigned char>;
+    bytes rsaKey;
+    bytes aesKey;
 
-    static std::string ToString(Bytes bytes)
+    static std::string ToString(bytes data)
     {
-        return std::string(bytes.begin(), bytes.end());
+        return std::string(data.begin(), data.end());
     }
 
-    static Bytes ToBytes(std::string data)
+    static bytes ToBytes(std::string data)
     {
-        return Bytes(data.begin(), data.end());
+        return bytes(data.begin(), data.end());
     }
 };
 
 struct AllocatedFile
 {
     std::mutex cs;
-    std::string filename;
+    std::string filename; // TODO: change full path to short name, or change type to boost::filesystem::path
     uint64_t size;
-    std::string uri;
+    std::string uri; // TODO: change type to uint256
     DecryptionKeys keys;
 };
 
 
 struct StorageChunk
 {
-    std::string path;
+    std::string path; // TODO: change type to boost::filesystem::path
     std::vector<std::shared_ptr<AllocatedFile>> files;
     uint64_t totalSpace;
     uint64_t freeSpace;
@@ -48,14 +49,15 @@ class StorageHeap
 {
 protected:
     mutable std::mutex cs_dfs;
-    std::vector<StorageChunk> chunks;
+    std::vector<std::shared_ptr<StorageChunk>> chunks;
     std::map<std::string, std::shared_ptr<AllocatedFile>> files;
 
 public:
     virtual ~StorageHeap() {}
     void AddChunk(const std::string& path, uint64_t size);
+    void MoveChunk(size_t chunkIndex, const boost::filesystem::path &newpath);
+    std::vector<std::shared_ptr<StorageChunk>> GetChunks() const;
     void FreeChunk(const std::string& path);
-    std::vector<StorageChunk> GetChunks() const;
     uint64_t MaxAllocateSize() const;
     std::shared_ptr<AllocatedFile> AllocateFile(const std::string& uri, uint64_t size);
     void FreeFile(const std::string& uri);

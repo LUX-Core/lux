@@ -66,10 +66,10 @@ BOOST_AUTO_TEST_CASE(get_chunks)
 
     BOOST_CHECK_EQUAL(chunks.size(), paths.size());
     for(unsigned int i = 0; i < chunks.size(); ++i) {
-        BOOST_CHECK_EQUAL(chunks[i].path, paths[i]);
-        BOOST_CHECK_EQUAL(chunks[i].totalSpace, sizes[i]);
-        BOOST_CHECK_EQUAL(chunks[i].freeSpace, sizes[i]);
-        BOOST_CHECK_EQUAL(chunks[i].files.size(), 0);
+        BOOST_CHECK_EQUAL(chunks[i]->path, paths[i]);
+        BOOST_CHECK_EQUAL(chunks[i]->totalSpace, sizes[i]);
+        BOOST_CHECK_EQUAL(chunks[i]->freeSpace, sizes[i]);
+        BOOST_CHECK_EQUAL(chunks[i]->files.size(), 0);
     }
 }
 

@@ -1300,8 +1300,8 @@ UniValue dfsgetinfo(const UniValue& params, bool fHelp)
     UniValue obj(UniValue::VOBJ);
     obj.push_back(Pair("enabled", enabled));
     obj.push_back(Pair("myip", myip));
-    obj.push_back(Pair("dfsfolder", storageController->storageHeap.GetChunks().back().path));
-    obj.push_back(Pair("dfstempfolder", storageController->tempStorageHeap.GetChunks().back().path));
+    obj.push_back(Pair("dfsfolder", storageController->storageHeap.GetChunks().back()->path));
+    obj.push_back(Pair("dfstempfolder", storageController->tempStorageHeap.GetChunks().back()->path));
     obj.push_back(Pair("rate", storageController->rate));
     obj.push_back(Pair("maxblocksgap", storageController->maxblocksgap));
 
@@ -1413,12 +1413,12 @@ UniValue dfslocalstorage(const UniValue& params, bool fHelp)
         UniValue obj(UniValue::VOBJ);
         obj.push_back(Pair("index", chunkIndex++));
         obj.push_back(Pair("type", "storage chunk"));
-        obj.push_back(Pair("path", chunk.path));
-        obj.push_back(Pair("totalSpace", std::to_string(chunk.totalSpace)));
-        obj.push_back(Pair("freeSpace", std::to_string(chunk.freeSpace)));
+        obj.push_back(Pair("path", chunk->path));
+        obj.push_back(Pair("totalSpace", std::to_string(chunk->totalSpace)));
+        obj.push_back(Pair("freeSpace", std::to_string(chunk->freeSpace)));
 
         UniValue files(UniValue::VARR);
-        for(auto &&file : chunk.files) {
+        for(auto &&file : chunk->files) {
             UniValue objFile(UniValue::VOBJ);
             objFile.push_back(Pair("filename", file->filename));
             objFile.push_back(Pair("uri", file->uri));
@@ -1436,12 +1436,12 @@ UniValue dfslocalstorage(const UniValue& params, bool fHelp)
         UniValue obj(UniValue::VOBJ);
         obj.push_back(Pair("index", chunkIndex++));
         obj.push_back(Pair("type", "temp chunk"));
-        obj.push_back(Pair("path", chunk.path));
-        obj.push_back(Pair("totalSpace", std::to_string(chunk.totalSpace)));
-        obj.push_back(Pair("freeSpace", std::to_string(chunk.freeSpace)));
+        obj.push_back(Pair("path", chunk->path));
+        obj.push_back(Pair("totalSpace", std::to_string(chunk->totalSpace)));
+        obj.push_back(Pair("freeSpace", std::to_string(chunk->freeSpace)));
 
         UniValue files(UniValue::VARR);
-        for(auto &&file : chunk.files) {
+        for(auto &&file : chunk->files) {
             UniValue objFile(UniValue::VOBJ);
             objFile.push_back(Pair("filename", file->filename));
             objFile.push_back(Pair("uri", file->uri));
@@ -1520,7 +1520,20 @@ UniValue dfssetfolder(const UniValue& params, bool fHelp)
                         "\nExamples\n"
                 + HelpExampleCli("dfssetfolder", "/home/user/dfs")
                 + HelpExampleRpc("dfssetfolder", "/home/user/dfs"));
-    return UniValue::VNULL;
+
+    namespace fs = boost::filesystem;
+    fs::path path{params[0].get_str()};
+
+    if (!fs::is_directory(path)) {
+        UniValue obj(UniValue::VSTR, "Error! dfssetfolder: directory" + path.string() + " isn't exists");
+        return obj;
+    }
+
+    auto chunksSize = storageController->storageHeap.GetChunks().size();
+    storageController->storageHeap.MoveChunk(chunksSize - 1, path);
+
+    UniValue obj(UniValue::VSTR, "dfssetfolder: move chunk to " + path.string() + " directory");
+    return obj;
 }
 
 UniValue dfssettempfolder(const UniValue& params, bool fHelp)
@@ -1536,7 +1549,20 @@ UniValue dfssettempfolder(const UniValue& params, bool fHelp)
                         "\nExamples\n"
                 + HelpExampleCli("dfssettempfolder", "/home/user/temp")
                 + HelpExampleRpc("dfssettempfolder", "/home/user/temp"));
-    return UniValue::VNULL;
+
+    namespace fs = boost::filesystem;
+    fs::path path{params[0].get_str()};
+
+    if (!fs::is_directory(path)) {
+        UniValue obj(UniValue::VSTR, "Error! dfssettempfolder: directory" + path.string() + " isn't exists");
+        return obj;
+    }
+
+    auto chunksSize = storageController->tempStorageHeap.GetChunks().size();
+    storageController->tempStorageHeap.MoveChunk(chunksSize - 1, path);
+
+    UniValue obj(UniValue::VSTR, "dfssettempfolder: move temp chunk to " + path.string() + " directory");
+    return obj;
 }
 
 UniValue dfsremoveoldorders(const UniValue& params, bool fHelp)

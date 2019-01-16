@@ -197,7 +197,7 @@ void StorageController::ProcessStorageMessage(CNode* pfrom, const std::string& s
     } else if (strCommand == "dfssendfile") {
         isStorageCommand = true;
         FileStream fileStream;
-        boost::filesystem::path fullFilename = storageHeap.GetChunks()[0].path;
+        boost::filesystem::path fullFilename = storageHeap.GetChunks().back()->path;
         fullFilename /= (std::to_string(std::time(nullptr)) + ".luxfs");
         fileStream.filestream.open(fullFilename.string(), std::ios::binary|std::ios::out);
         if (!fileStream.filestream.is_open()) {
