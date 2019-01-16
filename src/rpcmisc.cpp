@@ -1270,7 +1270,7 @@ UniValue dfscancelorder(const UniValue& params, bool fHelp)
                 + HelpExampleRpc("dfscancelorder", "\"..TODO..\"")
         );
 
-    std::string hash = params[0].get_str();
+    uint256 hash = uint256{params[0].get_str()};
     storageController->CancelOrder(hash);
 
     return UniValue::VNULL;
@@ -1390,7 +1390,7 @@ UniValue dfslistproposals(const UniValue& params, bool fHelp)
 
 UniValue dfslocalstorage(const UniValue& params, bool fHelp)
 {
-    if (fHelp || params.size() != 1)
+    if (fHelp || params.size() > 0)
         throw runtime_error(
                 "dfslocalstorage\n"
                         "\nReturns array of local files visible from decentralized file storage\n"
@@ -1406,12 +1406,13 @@ UniValue dfslocalstorage(const UniValue& params, bool fHelp)
                 + HelpExampleRpc("dfslocalstorage", "..TODO.."));
 
     UniValue result(UniValue::VARR);
-    std::vector<StorageChunk> chunks = storageController->storageHeap.GetChunks();
+    const auto chunks = storageController->storageHeap.GetChunks();
 
     size_t chunkIndex = 0;
     for(auto &&chunk : chunks) {
         UniValue obj(UniValue::VOBJ);
         obj.push_back(Pair("index", chunkIndex++));
+        obj.push_back(Pair("type", "storage chunk"));
         obj.push_back(Pair("path", chunk.path));
         obj.push_back(Pair("totalSpace", std::to_string(chunk.totalSpace)));
         obj.push_back(Pair("freeSpace", std::to_string(chunk.freeSpace)));
@@ -1424,7 +1425,30 @@ UniValue dfslocalstorage(const UniValue& params, bool fHelp)
             objFile.push_back(Pair("size", std::to_string(file->size)));
             files.push_back(objFile);
         }
-        // TODO: push files to result (SS)
+        obj.push_back(Pair("files", files));
+        result.push_back(obj);
+    }
+
+    const auto tempChunks = storageController->tempStorageHeap.GetChunks();
+
+    chunkIndex = 0;
+    for(auto &&chunk : tempChunks) {
+        UniValue obj(UniValue::VOBJ);
+        obj.push_back(Pair("index", chunkIndex++));
+        obj.push_back(Pair("type", "temp chunk"));
+        obj.push_back(Pair("path", chunk.path));
+        obj.push_back(Pair("totalSpace", std::to_string(chunk.totalSpace)));
+        obj.push_back(Pair("freeSpace", std::to_string(chunk.freeSpace)));
+
+        UniValue files(UniValue::VARR);
+        for(auto &&file : chunk.files) {
+            UniValue objFile(UniValue::VOBJ);
+            objFile.push_back(Pair("filename", file->filename));
+            objFile.push_back(Pair("uri", file->uri));
+            objFile.push_back(Pair("size", std::to_string(file->size)));
+            files.push_back(objFile);
+        }
+        obj.push_back(Pair("files", files));
         result.push_back(obj);
     }
 

@@ -281,9 +281,17 @@ void StorageController::AnnounceOrder(const StorageOrder &order, const boost::fi
     mapLocalFiles[order.GetHash()] = path;
 }
 
-void StorageController::CancelOrder(const std::string &orderHash)
+bool StorageController::CancelOrder(const uint256 &orderHash)
 {
-    // TODO: implement this (SS)
+    if (!mapAnnouncements.count(orderHash)) {
+        return false;
+    }
+
+    proposalsAgent.StopListenProposal(orderHash);
+    proposalsAgent.EraseOrdersProposals(orderHash);
+    mapLocalFiles.erase(orderHash);
+    mapAnnouncements.erase(orderHash);
+    return true;
 }
 
 bool StorageController::AcceptProposal( const StorageProposal &proposal)

@@ -46,7 +46,7 @@ public:
 
     void AnnounceOrder(const StorageOrder &order);
     void AnnounceOrder(const StorageOrder &order, const boost::filesystem::path &path);
-    void CancelOrder(const std::string &orderHash);
+    bool CancelOrder(const uint256 &orderHash);
     std::vector<StorageProposal> SortProposals(const StorageOrder &order);
     bool AcceptProposal(const StorageProposal &proposal);
     void ClearOldAnnouncments(std::time_t timestamp);
