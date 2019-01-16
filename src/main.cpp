@@ -1904,6 +1904,10 @@ CAmount GetProofOfWorkReward(int64_t nFees, int nHeight)
         if (nHeight < 200) return 250000 * COIN;
     }
 
+    if (Params().NetworkID() == CBaseChainParams::LUXGATETEST) {
+        if (nHeight < 20) return 250000 * COIN;
+    }
+
     if (Params().NetworkID() == CBaseChainParams::REGTEST) {
         return COIN + nFees;
     }
@@ -1930,7 +1934,9 @@ CAmount GetProofOfWorkReward(int64_t nFees, int nHeight)
     }
 
     if (nHeight < LAST_HEIGHT_FEE_BLOCK) {
-        if (IsTestNet() && nHeight >= 17500)
+        if (Params().NetworkID() == CBaseChainParams::TESTNET && nHeight >= 17500)
+            return nSubsidy + nFees;
+        if (Params().NetworkID() == CBaseChainParams::LUXGATETEST && nHeight >= 20)
             return nSubsidy + nFees;
         nFees = nHeight;
     }

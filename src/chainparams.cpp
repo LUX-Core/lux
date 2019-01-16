@@ -422,6 +422,21 @@ public:
 };
 static CTestNetParams testNetParams;
 
+
+class CLuxGateTestParams : public CTestNetParams
+{
+    public:
+        CLuxGateTestParams()
+        {
+            networkID = CBaseChainParams::LUXGATETEST;
+            consensus.powLimit = ~uint256(0) >> 5; 
+            vSeeds.clear();
+            nSwitchPhi2Block = 30;
+            consensus.nPowTargetSpacing = 60; // 1 minute
+        } 
+};
+
+static CLuxGateTestParams luxGateTestParams;
 /**
  * Regression test
  */
@@ -659,6 +674,8 @@ CChainParams& Params(CBaseChainParams::Network network)
         return mainParams;
     case CBaseChainParams::TESTNET:
         return testNetParams;
+    case CBaseChainParams::LUXGATETEST:
+        return luxGateTestParams;
     case CBaseChainParams::REGTEST:
         return regTestParams;
     case CBaseChainParams::UNITTEST:
@@ -678,6 +695,8 @@ CChainParams* CreateChainParams(CBaseChainParams::Network network)
         return new CMainParams();
     case CBaseChainParams::TESTNET:
         return new CTestNetParams();
+    case CBaseChainParams::LUXGATETEST:
+        return new CLuxGateTestParams();
     case CBaseChainParams::REGTEST:
         return new CRegTestParams();
     case CBaseChainParams::SEGWITTEST:
