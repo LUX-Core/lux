@@ -819,7 +819,9 @@ bool CMasternodePayments::SetPrivKey(std::string strPrivKey) {
 
 bool MasternodePaymentsEnabled() {
     bool result = false;
-    if (Params().NetworkID() == CBaseChainParams::TESTNET || Params().NetworkID() == CBaseChainParams::REGTEST) {
+    if (Params().NetworkID() == CBaseChainParams::TESTNET
+            || Params().NetworkID() == CBaseChainParams::REGTEST
+            || Params().NetworkID() == CBaseChainParams::LUXGATETEST) {
         if (GetTime() > START_MASTERNODE_PAYMENTS_TESTNET) {
             result = true;
         }

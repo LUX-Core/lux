@@ -21,7 +21,7 @@ public:
         REGTEST,
         UNITTEST,
         SEGWITTEST,
-
+        LUXGATETEST,
         MAX_NETWORK_TYPES
     };
 
