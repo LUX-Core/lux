@@ -1386,6 +1386,7 @@ UniValue dfslistproposals(const UniValue& params, bool fHelp)
     for (auto proposal : proposals){
         UniValue obj(UniValue::VOBJ);
         obj.push_back(Pair("orderhash", proposal.orderHash.ToString()));
+        obj.push_back(Pair("proposalhash", proposal.GetHash().ToString()));
         obj.push_back(Pair("time", proposal.time));
         obj.push_back(Pair("address", proposal.address.ToStringIPPort()));
         obj.push_back(Pair("rate", proposal.rate));
