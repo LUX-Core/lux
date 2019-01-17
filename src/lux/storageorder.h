@@ -6,6 +6,7 @@
 #include "hash.h"
 #include "utilstrencodings.h"
 #include "serialize.h"
+#include "streams.h"
 #include "protocol.h"
 
 class StorageOrder
@@ -21,7 +22,9 @@ public:
     CService address;           // [!!!] global-wide sender address
 
     uint256 GetHash() const{
-        return Hash(BEGIN(time), END(maxGap));
+        CDataStream ss(SER_GETHASH, 0);
+        ss << *this;
+        return Hash(ss.begin(), ss.end());
     }
 
     ADD_SERIALIZE_METHODS;
@@ -48,7 +51,9 @@ public:
     CService address;       // [!!!] global-wide sender address
 
     uint256 GetHash() const{
-        return Hash(BEGIN(time), END(rate));
+        CDataStream ss(SER_GETHASH, 0);
+        ss << *this;
+        return Hash(ss.begin(), ss.end());
     }
 
     ADD_SERIALIZE_METHODS;
@@ -71,7 +76,9 @@ public:
     unsigned short port;
 
     uint256 GetHash() const{
-        return Hash(BEGIN(time), END(port));
+        CDataStream ss(SER_GETHASH, 0);
+        ss << *this;
+        return Hash(ss.begin(), ss.end());
     }
 
     ADD_SERIALIZE_METHODS;
