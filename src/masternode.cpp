@@ -166,8 +166,13 @@ void ProcessMasternode(CNode* pfrom, const std::string& strCommand, CDataStream&
         tx.vin.push_back(vin);
         tx.vout.push_back(vout);
         //if(AcceptableInputs(mempool, state, tx)){
-        bool pfMissingInputs;
-        if (AcceptableInputs(mempool, state, CTransaction(tx), false, &pfMissingInputs)) {
+        bool inputsAcceptable;
+        {
+            LOCK(cs_main);
+            bool pfMissingInputs;
+            inputsAcceptable = AcceptableInputs(mempool, state, CTransaction(tx), false, &pfMissingInputs);
+        }
+        if (inputsAcceptable) {
             if (fDebug) LogPrintf("dsee - Accepted masternode entry %i %i\n", count, current);
 
             if (GetInputAge(vin) < MASTERNODE_MIN_CONFIRMATIONS) {
@@ -596,6 +601,12 @@ void CMasterNode::Check(bool forceCheck) {
     }
 
     if (!unitTest) {
+        LOCK(cs_main);
+        /*
+            cs_main is required for doing masternode.Check because something
+            is modifying the coins view without a mempool lock. It causes
+            segfaults from this code without the cs_main lock.
+        */
         CValidationState state;
         CMutableTransaction tx = CMutableTransaction();
         CTxOut vout = CTxOut((GetMNCollateral(chainActive.Height()) - 1) * COIN, darkSendPool.collateralPubKey);
