@@ -1218,7 +1218,7 @@ UniValue getstakingstatus(const UniValue& params, bool fHelp)
 
 UniValue dfsannounce(const UniValue& params, bool fHelp)
 {
-    if (fHelp || params.size() != 3)
+    if (fHelp || !(params.size() == 3 || params.size() == 4))
         throw runtime_error(
                 "dfsannounce \"localFilePath\", daysToKeep, fileCostInCoins\n"
                 "\nAnnounces a file order.\n"
@@ -1226,6 +1226,7 @@ UniValue dfsannounce(const UniValue& params, bool fHelp)
                 "1. \"localFilePath\"         (string, required) The local file path of file\n"
                 "2. daysToKeep                (numeric, required) The days to keep\n"
                 "3. fileCostInCoins           (numeric, required) The file cost in coins\n"
+                "4. maxGap                    (numeric, optional) ..TODO..\n"
                 "\nResult:\n"
                 "order hash\n"
                 "\nExamples:\n"
@@ -1246,6 +1247,11 @@ UniValue dfsannounce(const UniValue& params, bool fHelp)
     order.storageUntil = order.time + std::stoi(params[1].get_str()) * 24 * 60 * 60;
     order.fileSize = boost::filesystem::file_size(path);
     order.maxRate = std::stoi(params[2].get_str());
+    if (params.size() == 4) {
+        order.maxGap = std::stoi(params[3].get_str());
+    } else {
+        order.maxGap = DEFAULT_STORAGE_MAX_BLOCK_GAP;
+    }
     order.address = storageController->address;
 
     storageController->AnnounceOrder(order, path);
