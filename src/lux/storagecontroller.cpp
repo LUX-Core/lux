@@ -103,8 +103,8 @@ void StorageController::ProcessStorageMessage(CNode* pfrom, const std::string& s
             AnnounceOrder(order); // TODO: Is need remove "pfrom" node from announcement? (SS)
             if (storageHeap.MaxAllocateSize() > order.fileSize &&
                 tempStorageHeap.MaxAllocateSize() > order.fileSize &&
-                order.maxRate > rate &&
-                order.maxGap > maxblocksgap) {
+                order.maxRate >= rate &&
+                order.maxGap >= maxblocksgap) {
                 StorageProposal proposal;
                 proposal.time = std::time(0);
                 proposal.orderHash = hash;
