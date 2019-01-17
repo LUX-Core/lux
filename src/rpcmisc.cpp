@@ -1241,6 +1241,7 @@ UniValue dfsannounce(const UniValue& params, bool fHelp)
     boost::filesystem::path path{params[0].get_str()};
 
     order.fileURI = SerializeHash(path.string(), SER_GETHASH, 0);
+    order.filename = path.filename().string();
     order.time = std::time(nullptr);
     order.storageUntil = order.time + std::stoi(params[1].get_str()) * 24 * 60 * 60;
     order.fileSize = boost::filesystem::file_size(path);
@@ -1498,7 +1499,7 @@ UniValue dfssetparams(const UniValue& params, bool fHelp)
     size_t maxblocksgap = std::stoi(params[1].get_str());
 
     if (rate > COIN && maxblocksgap > 10000) {
-        LogPrintf("Warning! %s: dfs parameters are very huge (rate: %d gap: %d)\n", __func__, rate, maxblocksgap);
+        LogPrintf("Warning! %s: dfs parameters are huge (rate: %d gap: %d)\n", __func__, rate, maxblocksgap);
     }
 
     storageController->rate = rate;

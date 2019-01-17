@@ -30,6 +30,7 @@ public:
     inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion) {
         READWRITE(time);
         READWRITE(storageUntil);
+        READWRITE(filename);
         READWRITE(fileSize);
         READWRITE(fileURI);
         READWRITE(maxRate);
