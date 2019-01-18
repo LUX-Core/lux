@@ -118,7 +118,13 @@ void StorageController::ProcessStorageMessage(CNode* pfrom, const std::string& s
                     MilliSleep(500);
                     pNode = FindNode(order.address);
                 }
-                pNode->PushMessage("dfsproposal", proposal);
+
+                if (pNode) {
+                    pNode->PushMessage("dfsproposal", proposal);
+                } else {
+                    pfrom->PushMessage("dfsproposal", proposal);
+                }
+
             }
         }
     } else if (strCommand == "dfsproposal") {
@@ -167,11 +173,13 @@ void StorageController::ProcessStorageMessage(CNode* pfrom, const std::string& s
 
                 mapReceivedHandshakes[handshake.orderHash] = handshake;
                 CNode* pNode = FindNode(order.address);
-                if (!pNode) {
+
+                if (pNode) {
+                    pNode->PushMessage("dfsrr", requestReplica);
+                } else {
                     LogPrint("dfs", "\"dfshandshake\" message handler have not connection to order sender");
-                    return ;
+                    pfrom->PushMessage("dfsrr", requestReplica);
                 }
-                pNode->PushMessage("dfsrr", requestReplica);
             }
         } else {
             // DoS prevention
@@ -433,6 +441,8 @@ bool StorageController::FindReplicaKeepers(const StorageOrder &order, const int 
     for (StorageProposal proposal : proposals) {
         if (AcceptProposal(proposal)) {
             if (++numReplica == countReplica) {
+                boost::lock_guard<boost::mutex> lock(mutex);
+                proposalsAgent.StopListenProposal(order.GetHash());
                 return true;
             }
         }
@@ -505,6 +515,10 @@ std::shared_ptr<AllocatedFile> StorageController::CreateReplica(const boost::fil
 
 bool StorageController::SendReplica(const StorageOrder &order, std::shared_ptr<AllocatedFile> pAllocatedFile, CNode* pNode)
 {
+    if (!pNode) {
+        LogPrint("dfs", "Node does not found");
+        return false;
+    }
     FileStream fileStream;
     fileStream.currenOrderHash = order.GetHash();
     fileStream.filestream.open(pAllocatedFile->filename, std::ios::binary|std::ios::in);
