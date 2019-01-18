@@ -39,6 +39,8 @@
 #include <QFile>
 #include <QBrush>
 #include <QItemDelegate>
+#include <QRegExpValidator>
+#include <QRegExp>
 
 #include <openssl/hmac.h>
 #include <stdlib.h>
@@ -83,7 +85,11 @@ class LuxgateConfigDelegate : public QItemDelegate
 {
 public:
     LuxgateConfigDelegate(QObject *parent);
-    void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const Q_DECL_OVERRIDE;
+    void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+    QWidget * createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+    void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override;
+private slots:
+    void commitAndCloseEditor();
 };
 
 LuxgateConfigDelegate::LuxgateConfigDelegate(QObject *parent) :
@@ -118,6 +124,64 @@ void LuxgateConfigDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
     }
 }
 
+QWidget * LuxgateConfigDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
+{
+    QLineEdit * editor = new QLineEdit(parent);
+    editor->setProperty("Column", index.column());
+    connect(editor, &QLineEdit::editingFinished,
+            this, &LuxgateConfigDelegate::commitAndCloseEditor);
+
+    if(LuxgateConfigModel::PortColumn == index.column())
+        editor->setValidator(new QRegExpValidator(QRegExp("^[1-9]\\d*$"), editor));
+    if(LuxgateConfigModel::HostColumn == index.column())
+        editor->setInputMask("000.000.000.000;_");
+    if(LuxgateConfigModel::Zmq_pub_raw_tx_endpointColumn == index.column())
+        editor->setInputMask("000.000.000.000:0000000000;_");
+    return editor;
+}
+
+void LuxgateConfigDelegate::commitAndCloseEditor()
+{
+    QLineEdit *editor = qobject_cast<QLineEdit *>(sender());
+
+    emit commitData(editor);
+    emit closeEditor(editor);
+}
+
+void LuxgateConfigDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
+{
+    int iColumn = index.column();
+    bool bSetModel = true;
+    QLineEdit * lineEdit = qobject_cast<QLineEdit *>(editor);
+    if(LuxgateConfigModel::Zmq_pub_raw_tx_endpointColumn == iColumn)
+    {
+        QString ipRange = "(?:[0-1]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])";
+        QRegExp ipRegex ("^" + ipRange
+                         + "\\." + ipRange
+                         + "\\." + ipRange
+                         + "\\." + ipRange + "\\:" + "[1-9]\\d*$");
+        QRegExpValidator *val = new QRegExpValidator(ipRegex, lineEdit);
+        int pos = 0;
+        QString text = lineEdit->text();
+        if(QValidator::Acceptable != val->validate(text, pos))
+            bSetModel = false;
+    }
+    if(LuxgateConfigModel::HostColumn == iColumn)
+    {
+        QString ipRange = "(?:[0-1]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])";
+        QRegExp ipRegex ("^" + ipRange
+                         + "\\." + ipRange
+                         + "\\." + ipRange
+                         + "\\." + ipRange + "$");
+        QRegExpValidator *ipValidator = new QRegExpValidator(ipRegex, lineEdit);
+        int pos = 0;
+        QString text = lineEdit->text();
+        if(QValidator::Acceptable != ipValidator->validate(text, pos))
+            bSetModel = false;
+    }
+    if(bSetModel)
+        QItemDelegate::setModelData(editor, model, index);
+}
 
 LuxgateDialog::LuxgateDialog(QWidget *parent) :
         QMainWindow(parent),
