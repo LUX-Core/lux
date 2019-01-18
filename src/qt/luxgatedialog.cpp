@@ -79,28 +79,43 @@ QString QStringFromPath(const boost::filesystem::path & filePath)
 }
 
 
-class HighlightDelegate : public QItemDelegate
+class LuxgateConfigDelegate : public QItemDelegate
 {
 public:
-    HighlightDelegate(QObject *parent);
+    LuxgateConfigDelegate(QObject *parent);
     void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const Q_DECL_OVERRIDE;
 };
 
-HighlightDelegate::HighlightDelegate(QObject *parent) :
+LuxgateConfigDelegate::LuxgateConfigDelegate(QObject *parent) :
         QItemDelegate(parent)
 {}
 
-void HighlightDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
+void LuxgateConfigDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
+    painter->setRenderHint(QPainter::Antialiasing, true);
     QStyleOptionViewItem opt = option;
-
     if(!index.model()->data(index, LuxgateConfigModel::ValidRole).toBool()) {
         QColor col;
         col.setNamedColor("#990012");
         opt.palette.setColor(QPalette::Highlight, col);
     }
+    QItemDelegate::paint(painter, opt, index);
+    if(LuxgateConfigModel::SwapSupportColumn == index.column())
+    {
+        QPen oldPen = painter->pen();
+        QBrush oldBrush =  painter->brush();
+        QColor col;
+        if(index.model()->data(index).toBool())
+            col = Qt::green;
+        else
+            col = Qt::red;
+        painter->setPen(QPen(Qt::black));
+        painter->setBrush(QBrush(col));
+        painter->drawEllipse(option.rect.center(),9,9);
+        painter->setPen(oldPen);
+        painter->setBrush(oldBrush);
 
-    this->QItemDelegate::paint(painter, opt, index);
+    }
 }
 
 
@@ -118,11 +133,19 @@ LuxgateDialog::LuxgateDialog(QWidget *parent) :
     {
         auto configModel = new LuxgateConfigModel(this);
         ui->tableViewConfiguration->setModel(configModel);
-        ui->tableViewConfiguration->setItemDelegate(new HighlightDelegate(ui->tableViewConfiguration));
+        ui->tableViewConfiguration->setItemDelegate(new LuxgateConfigDelegate(ui->tableViewConfiguration));
         ui->tableViewConfiguration->setStyleSheet("");
         QHeaderView * HeaderView = ui->tableViewConfiguration->horizontalHeader();
-        HeaderView->setSectionResizeMode(QHeaderView::Stretch);
-
+        HeaderView->setSectionsMovable(true);
+        HeaderView->setSectionResizeMode(QHeaderView::Interactive);
+        HeaderView->resizeSection(LuxgateConfigModel::TickerColumn, 50);
+        HeaderView->resizeSection(LuxgateConfigModel::HostColumn, 80);
+        HeaderView->resizeSection(LuxgateConfigModel::PortColumn, 50);
+        HeaderView->resizeSection(LuxgateConfigModel::SwapSupportColumn, 50);
+        HeaderView->resizeSection(LuxgateConfigModel::Zmq_pub_raw_tx_endpointColumn, 80);
+        int rpc_width = (HeaderView->length() - (50*3+80*2) -5) /2;
+        HeaderView->resizeSection(LuxgateConfigModel::RpcuserColumn, rpc_width);
+        HeaderView->resizeSection(LuxgateConfigModel::RpcpasswordColumn, rpc_width);
         slotClickResetConfiguration();
         ui->pushButtonResetConfig->setEnabled(false);
         ui->pushButtonChangeConfig->setEnabled(false);
@@ -151,18 +174,32 @@ void LuxgateDialog::slotClickRemoveConfiguration()
     if(selectRows.isEmpty())
     {
         QMessageBox::critical(this, tr("Luxgate"),
-                tr("Not one row selected!"));
+                tr("No rows selected!"));
         return;
     }
     modelConfig->removeRows(selectRows.first().row(), 1);
+    ui->labelConfigStatus->setProperty("status", "info");
+    ui->labelConfigStatus->style()->unpolish(ui->labelConfigStatus);
+    ui->labelConfigStatus->style()->polish(ui->labelConfigStatus);
+    ui->labelConfigStatus->setText(tr("Unsaved configuration changes"));
 }
 
 void LuxgateDialog::slotConfigDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)
 {
+    if(LuxgateConfigModel::SwapSupportColumn == topLeft.column()
+       &&
+       LuxgateConfigModel::SwapSupportColumn == bottomRight.column())
+        return;
+
     if(roles.contains(Qt::EditRole)
         ||
        roles.contains(Qt::DisplayRole))
     {
+        ui->labelConfigStatus->setProperty("status", "info");
+        ui->labelConfigStatus->style()->unpolish(ui->labelConfigStatus);
+        ui->labelConfigStatus->style()->polish(ui->labelConfigStatus);
+        ui->labelConfigStatus->setText(tr("Unsaved configuration changes"));
+
         ui->pushButtonResetConfig->setEnabled(true);
         ui->pushButtonChangeConfig->setEnabled(true);
     }
@@ -277,6 +314,8 @@ void LuxgateDialog::slotClickChangeConfig()
     auto modelConfig = qobject_cast<LuxgateConfigModel *>(ui->tableViewConfiguration->model());
     //all configs are valid
     bool bValid = true;
+    int iEditingCol = modelConfig->columnCount();
+    int iEditingRow = modelConfig->rowCount();
     //fill in configs and bValid
     {
         for(int iR=0; iR<modelConfig->rowCount(); iR++)
@@ -287,7 +326,6 @@ void LuxgateDialog::slotClickChangeConfig()
             //check Valid configs
             auto validItems = isValidBlockchainConfig(conf);
             if(!validItems.bValid) {
-                int iEditingCol = modelConfig->columnCount();
 
                 if(!validItems.bTickerValid)
                     iEditingCol = qMin(iEditingCol, static_cast<int>(LuxgateConfigModel::TickerColumn));
@@ -313,16 +351,26 @@ void LuxgateDialog::slotClickChangeConfig()
                 if(!validItems.bZmqEndpointValid)
                     iEditingCol = qMin(iEditingCol, static_cast<int>(LuxgateConfigModel::Zmq_pub_raw_tx_endpointColumn));
 
-                modelConfig->setData(iR, LuxgateConfigModel::Zmq_pub_raw_tx_endpointColumn, validItems.bZmqEndpointValid, LuxgateConfigModel::ValidRole);
+                if(iEditingCol != modelConfig->columnCount())
+                    iEditingRow = iR;
 
-                if(iEditingCol != modelConfig->columnCount() && bValid) {
-                    bValid = false;
-                    ui->tableViewConfiguration->edit(modelConfig->index(iR, iEditingCol));
-                }
+                modelConfig->setData(iR, LuxgateConfigModel::Zmq_pub_raw_tx_endpointColumn, validItems.bZmqEndpointValid, LuxgateConfigModel::ValidRole);
+                bValid = false;
             }
             else {
                 for(int iC=0; iC<modelConfig->columnCount(); iC++){
                     modelConfig->setData(iR, iC, true, LuxgateConfigModel::ValidRole);
+                }
+            }
+            //check that ticker is unical
+            auto tickerList = modelConfig->match(modelConfig->index(LuxgateConfigModel::TickerColumn,0), Qt::DisplayRole, QString::fromStdString(conf.ticker), -1);
+            if(tickerList.size() > 1 && conf.ticker != "") {
+                iEditingCol = qMin(iEditingCol, static_cast<int>(LuxgateConfigModel::TickerColumn));
+                bValid = false;
+                foreach(auto index, tickerList)
+                {
+                    modelConfig->setData(index, false, LuxgateConfigModel::ValidRole);
+                    iEditingRow = qMin(iEditingRow,index.row());
                 }
             }
         }
@@ -330,25 +378,63 @@ void LuxgateDialog::slotClickChangeConfig()
 
     if(!bValid)
     {
-        //QMessageBox::critical(this, tr("Luxgate"), tr("Configuration is not valid!"));
+        QMessageBox::critical(this, tr("Luxgate"), tr("Configuration is not valid!"));
+
+        if(iEditingCol != modelConfig->columnCount()) {
+            ui->tableViewConfiguration->edit(modelConfig->index(iEditingRow, iEditingCol));
+        }
+        ui->labelConfigStatus->setProperty("status", "error");
+        ui->labelConfigStatus->style()->unpolish(ui->labelConfigStatus);
+        ui->labelConfigStatus->style()->polish(ui->labelConfigStatus);
+        ui->labelConfigStatus->setText(tr("Configuration is not valid!"));
         return;
     }
 
     if(ChangeLuxGateConfiguration(configs))
     {
+        update();//fill in swap supported
+        for (auto it : blockchainClientPool)
+        {
+            Ticker ticker =  it.first;
+            auto client =  it.second;
+            auto list = modelConfig->match(modelConfig->index(0,0), Qt::DisplayRole, QString::fromStdString(ticker), -1);
+            if(!list.isEmpty())
+            {
+                foreach(auto index, list)
+                {
+                    if(LuxgateConfigModel::TickerColumn == index.column())
+                    {
+                        modelConfig->setData(modelConfig->index(index.row(), LuxgateConfigModel::SwapSupportColumn),
+                                client->IsSwapSupported());
+                        break;
+                    }
+                }
+            }
+        }
         ui->pushButtonResetConfig->setEnabled(false);
         ui->pushButtonChangeConfig->setEnabled(false);
+        ui->labelConfigStatus->clear();
     }
     else
     {
         QMessageBox::critical(this, tr("Luxgate"), tr("Error while changing configuration"));
+        ui->labelConfigStatus->setProperty("status", "error");
+        ui->labelConfigStatus->style()->unpolish(ui->labelConfigStatus);
+        ui->labelConfigStatus->style()->polish(ui->labelConfigStatus);
+        ui->labelConfigStatus->setText(tr("Error while changing configuration!"));
     }
+
 }
 
 void LuxgateDialog::slotClickAddConfiguration()
 {
     auto modelConfig = qobject_cast<LuxgateConfigModel*>(ui->tableViewConfiguration->model());
     modelConfig->insertRows(modelConfig->rowCount(), 1);
+    ui->labelConfigStatus->setProperty("status", "info");
+    ui->labelConfigStatus->style()->unpolish(ui->labelConfigStatus);
+    ui->labelConfigStatus->style()->polish(ui->labelConfigStatus);
+    ui->labelConfigStatus->setText(tr("Unsaved configuration changes"));
+
     ui->pushButtonResetConfig->setEnabled(true);
     ui->pushButtonChangeConfig->setEnabled(true);
 }

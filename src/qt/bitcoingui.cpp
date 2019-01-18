@@ -151,7 +151,7 @@ BitcoinGUI::BitcoinGUI(const PlatformStyle *platformStyle, const NetworkStyle* n
 {
     /* Open CSS when configured */
     this->setStyleSheet(GUIUtil::loadStyleSheet());
-    resize(1200, 750);
+    resize(1350, 750);
     QString windowTitle = tr("Luxcore") + " - ";
 
 #ifdef ENABLE_UPDATER

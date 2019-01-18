@@ -16,7 +16,8 @@ struct BlockchainConfigQt
             port(conf.port),
             rpcuser(QString::fromStdString(conf.rpcuser)),
             rpcpassword(QString::fromStdString(conf.rpcpassword)),
-            zmq_pub_raw_tx_endpoint(QString::fromStdString(conf.zmq_pub_raw_tx_endpoint))
+            zmq_pub_raw_tx_endpoint(QString::fromStdString(conf.zmq_pub_raw_tx_endpoint)),
+            bSwapConnect(false)
     {}
     BlockchainConfig toBlockchainConfig()
     {
@@ -35,6 +36,7 @@ struct BlockchainConfigQt
     QString rpcuser;
     QString rpcpassword;
     QString zmq_pub_raw_tx_endpoint;
+    bool bSwapConnect;
 };
 Q_DECLARE_METATYPE(BlockchainConfigQt)
 
@@ -51,7 +53,7 @@ public:
     enum Columns{
         TickerColumn = 0, HostColumn,
         PortColumn, RpcuserColumn, RpcpasswordColumn,
-        Zmq_pub_raw_tx_endpointColumn, NColumns
+        Zmq_pub_raw_tx_endpointColumn, SwapSupportColumn, NColumns
     };
 
     //override functions

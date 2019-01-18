@@ -1714,6 +1714,14 @@ QMainWindow#LuxgateDialog .QLabel#labelStatus {
 	color: white;
 }
 
+QMainWindow#LuxgateDialog .QLabel#labelConfigStatus[status="error"] {
+	color: red;
+}
+
+QMainWindow#LuxgateDialog .QLabel#labelConfigStatus[status="info"] {
+	color: black;
+}
+
 *[IsDockable] {
 	background: rgba(255,255,255,40);
 	border: 1px solid gray;

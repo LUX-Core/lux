@@ -299,6 +299,22 @@
               </widget>
              </item>
              <item>
+              <widget class="QLabel" name="labelConfigStatus">
+               <property name="styleSheet">
+                <string notr="true"/>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
+               </property>
+               <property name="status" stdset="0">
+                <string>error</string>
+               </property>
+              </widget>
+             </item>
+             <item>
               <layout class="QHBoxLayout" name="horizontalLayout_6">
                <item>
                 <spacer name="horizontalSpacer_15">

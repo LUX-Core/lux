@@ -39,10 +39,13 @@ QVariant LuxgateConfigModel::headerData(int section, Qt::Orientation orientation
                 res = "Rpc User";
                 break;
             case RpcpasswordColumn:
-                res = "Rpc Password";
+                res = "Rpc Passw";
                 break;
             case Zmq_pub_raw_tx_endpointColumn:
-                res = "Zmq Endpoint";
+                res = "Zmq";
+                break;
+            case SwapSupportColumn:
+                res = "Swap";
                 break;
         }
     }
@@ -74,6 +77,9 @@ QVariant LuxgateConfigModel::data(const QModelIndex &index, int role) const
             break;
             case Zmq_pub_raw_tx_endpointColumn:
                 res = items[index.row()].zmq_pub_raw_tx_endpoint;
+            break;
+            case SwapSupportColumn:
+                res = QVariant();
             break;
         }
     }
@@ -135,7 +141,10 @@ int LuxgateConfigModel::columnCount(const QModelIndex &parent) const
 
 Qt::ItemFlags LuxgateConfigModel::flags(const QModelIndex &index) const
 {
-    return  Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled;
+    Qt::ItemFlags res = Qt::ItemIsSelectable |  Qt::ItemIsEnabled;
+    if(SwapSupportColumn != index.column())
+        res |= Qt::ItemIsEditable;
+    return  res;
 }
 
 bool LuxgateConfigModel::setData(const QModelIndex &index, const QVariant &value, int role)
@@ -166,6 +175,9 @@ bool LuxgateConfigModel::setData(const QModelIndex &index, const QVariant &value
             break;
             case Zmq_pub_raw_tx_endpointColumn:
                 items[index.row()].zmq_pub_raw_tx_endpoint = value.toString();
+            break;
+            case SwapSupportColumn:
+                items[index.row()].bSwapConnect = value.toBool();
             break;
         }
     }
