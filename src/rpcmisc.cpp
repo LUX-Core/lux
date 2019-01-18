@@ -1255,7 +1255,6 @@ UniValue dfsannounce(const UniValue& params, bool fHelp)
     order.address = storageController->address;
 
     storageController->AnnounceOrder(order, path);
-    storageController->proposalsAgent.ListenProposal(order.GetHash());
 
     UniValue ret(UniValue::VSTR);
     ret = order.GetHash().ToString();

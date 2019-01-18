@@ -127,10 +127,15 @@ void StorageController::ProcessStorageMessage(CNode* pfrom, const std::string& s
         vRecv >> proposal;
         auto itAnnounce = mapAnnouncements.find(proposal.orderHash);
         if (itAnnounce != mapAnnouncements.end()) {
-            boost::lock_guard<boost::mutex> lock(mutex);
-            std::vector<uint256> vListenProposals = proposalsAgent.GetListenProposals();
+            std::vector<uint256> vListenProposals;
+            {
+                boost::lock_guard <boost::mutex> lock(mutex);
+                vListenProposals = proposalsAgent.GetListenProposals();
+            }
+
             if (std::find(vListenProposals.begin(), vListenProposals.end(), proposal.orderHash) != vListenProposals.end()) {
                 if (itAnnounce->second.maxRate > proposal.rate) {
+                    boost::lock_guard <boost::mutex> lock(mutex);
                     proposalsAgent.AddProposal(proposal);
                 }
             }
@@ -221,8 +226,7 @@ void StorageController::BackgroundJob()
 
     while (1) {
         boost::this_thread::interruption_point();
-        boost::this_thread::sleep(boost::posix_time::seconds(1));
-        boost::lock_guard<boost::mutex> lock(mutex);
+        boost::this_thread::sleep(boost::posix_time::seconds(5));
 
         std::vector<CNode*> vNodesCopy;
         {
@@ -237,12 +241,18 @@ void StorageController::BackgroundJob()
             }
         }
 
-        for(auto &&orderHash : proposalsAgent.GetListenProposals()) {
+        std::vector<uint256> orderHashes;
+        {
+            boost::lock_guard<boost::mutex> lock(mutex);
+            orderHashes = proposalsAgent.GetListenProposals();
+        }
+        for(auto &&orderHash : orderHashes) {
             auto orderIt = mapAnnouncements.find(orderHash);
             if (orderIt != mapAnnouncements.end()) {
                 auto order = orderIt->second;
                 if(std::time(nullptr) > order.time + 60) {
                     if (FindReplicaKeepers(order, 1)) {
+                        boost::lock_guard<boost::mutex> lock(mutex);
                         proposalsAgent.StopListenProposal(orderHash);
                     }
                 }
@@ -278,7 +288,9 @@ void StorageController::AnnounceOrder(const StorageOrder &order)
 void StorageController::AnnounceOrder(const StorageOrder &order, const boost::filesystem::path &path)
 {
     AnnounceOrder(order);
+    boost::lock_guard<boost::mutex> lock(mutex);
     mapLocalFiles[order.GetHash()] = path;
+    proposalsAgent.ListenProposal(order.GetHash());
 }
 
 bool StorageController::CancelOrder(const uint256 &orderHash)
@@ -353,6 +365,7 @@ void StorageController::StartHandshake(const StorageProposal &proposal)
 
 std::vector<StorageProposal> StorageController::SortProposals(const StorageOrder &order)
 {
+    boost::lock_guard<boost::mutex> lock(mutex);
     std::vector<StorageProposal> proposals = proposalsAgent.GetProposals(order.GetHash());
     if (!proposals.size()) {
         return {};
@@ -375,6 +388,7 @@ std::vector<StorageProposal> StorageController::SortProposals(const StorageOrder
 
 void StorageController::ClearOldAnnouncments(std::time_t timestamp)
 {
+    boost::lock_guard<boost::mutex> lock(mutex);
     for (auto &&it = mapAnnouncements.begin(); it != mapAnnouncements.end(); ) {
         StorageOrder order = it->second;
         if (order.time < timestamp) {
@@ -416,7 +430,7 @@ bool StorageController::FindReplicaKeepers(const StorageOrder &order, const int 
 {
     std::vector<StorageProposal> proposals = SortProposals(order);
     int numReplica = 0;
-    for (auto &&proposal : proposals) {
+    for (StorageProposal proposal : proposals) {
         if (AcceptProposal(proposal)) {
             if (++numReplica == countReplica) {
                 return true;
