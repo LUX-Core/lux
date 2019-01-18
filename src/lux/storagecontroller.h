@@ -15,7 +15,7 @@ class StorageController;
 extern std::unique_ptr<StorageController> storageController;
 
 static const size_t STORAGE_MIN_RATE = 1;
-static const size_t DEFAULT_STORAGE_MAX_BLOCK_GAP = 100;
+static const unsigned int DEFAULT_STORAGE_MAX_BLOCK_GAP = 100;
 
 static const uint64_t DEFAULT_STORAGE_SIZE = 100ull * 1024 * 1024 * 1024; // 100 Gb
 static const unsigned short DEFAULT_DFS_PORT = 1507;
@@ -33,7 +33,7 @@ protected:
 
 public:
     CAmount rate;
-    size_t maxblocksgap;
+    unsigned int maxblocksgap;
     CAddress address;
     std::map<uint256, boost::filesystem::path> mapLocalFiles;
     std::map<uint256, StorageOrder> mapAnnouncements;

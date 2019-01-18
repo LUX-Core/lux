@@ -1344,11 +1344,11 @@ UniValue dfslistorders(const UniValue& params, bool fHelp)
         StorageOrder announce = announcePair.second;
         UniValue obj(UniValue::VOBJ);
         obj.push_back(Pair("orderhash", announcePair.first.ToString()));
-        obj.push_back(Pair("time", announce.time));
+        obj.push_back(Pair("time", to_string(announce.time)));
         obj.push_back(Pair("fileURI", announce.fileURI.ToString()));
         obj.push_back(Pair("filename", announce.filename));
         obj.push_back(Pair("address", announce.address.ToStringIPPort()));
-        obj.push_back(Pair("untiltime", announce.storageUntil));
+        obj.push_back(Pair("untiltime", to_string(announce.storageUntil)));
         obj.push_back(Pair("filesize", announce.fileSize));
         obj.push_back(Pair("rate", announce.maxRate));
         obj.push_back(Pair("blockgap", announce.maxGap));
@@ -1386,7 +1386,7 @@ UniValue dfslistproposals(const UniValue& params, bool fHelp)
         UniValue obj(UniValue::VOBJ);
         obj.push_back(Pair("orderhash", proposal.orderHash.ToString()));
         obj.push_back(Pair("proposalhash", proposal.GetHash().ToString()));
-        obj.push_back(Pair("time", proposal.time));
+        obj.push_back(Pair("time", to_string(proposal.time)));
         obj.push_back(Pair("address", proposal.address.ToStringIPPort()));
         obj.push_back(Pair("rate", proposal.rate));
         result.push_back(obj);
@@ -1415,7 +1415,7 @@ UniValue dfslocalstorage(const UniValue& params, bool fHelp)
     UniValue result(UniValue::VARR);
     const auto chunks = storageController->storageHeap.GetChunks();
 
-    size_t chunkIndex = 0;
+    unsigned int chunkIndex = 0;
     for(auto &&chunk : chunks) {
         UniValue obj(UniValue::VOBJ);
         obj.push_back(Pair("index", chunkIndex++));
@@ -1502,7 +1502,7 @@ UniValue dfssetparams(const UniValue& params, bool fHelp)
                 + HelpExampleRpc("dfssetparams", "1 20"));
 
     CAmount rate = std::stoi(params[0].get_str());
-    size_t maxblocksgap = std::stoi(params[1].get_str());
+    unsigned int maxblocksgap = std::stoi(params[1].get_str());
 
     if (rate > COIN && maxblocksgap > 10000) {
         LogPrintf("Warning! %s: dfs parameters are huge (rate: %d gap: %d)\n", __func__, rate, maxblocksgap);
