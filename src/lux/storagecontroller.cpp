@@ -135,7 +135,7 @@ void StorageController::ProcessStorageMessage(CNode* pfrom, const std::string& s
                 }
             }
             CNode* pNode = FindNode(proposal.address);
-            if (pNode) {
+            if (pNode && vNodes.size() > 5) {
                 pNode->CloseSocketDisconnect();
             }
         } else {
