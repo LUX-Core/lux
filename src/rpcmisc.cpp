@@ -1415,7 +1415,7 @@ UniValue dfslocalstorage(const UniValue& params, bool fHelp)
     UniValue result(UniValue::VARR);
     const auto chunks = storageController->storageHeap.GetChunks();
 
-    unsigned int chunkIndex = 0;
+    int chunkIndex = 0;
     for(auto &&chunk : chunks) {
         UniValue obj(UniValue::VOBJ);
         obj.push_back(Pair("index", chunkIndex++));
@@ -1502,7 +1502,7 @@ UniValue dfssetparams(const UniValue& params, bool fHelp)
                 + HelpExampleRpc("dfssetparams", "1 20"));
 
     CAmount rate = std::stoi(params[0].get_str());
-    unsigned int maxblocksgap = std::stoi(params[1].get_str());
+    int maxblocksgap = std::stoi(params[1].get_str());
 
     if (rate > COIN && maxblocksgap > 10000) {
         LogPrintf("Warning! %s: dfs parameters are huge (rate: %d gap: %d)\n", __func__, rate, maxblocksgap);
