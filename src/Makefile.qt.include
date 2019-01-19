@@ -77,7 +77,9 @@ if ENABLE_UPDATER
 endif
 
 if ENABLE_LUXGATE
- QT_FORMS_UI += qt/forms/luxgatedialog.ui
+ QT_FORMS_UI += qt/forms/luxgatedialog.ui \
+                qt/forms/luxgatebidpanel.ui \
+                qt/forms/luxgateconfigpanel.ui
 endif
 
 QT_MOC_CPP = \
@@ -182,7 +184,9 @@ endif
 
 if ENABLE_LUXGATE
  QT_MOC_CPP +=    qt/moc_luxgatedialog.cpp \
-                  qt/moc_luxgateconfigmodel.cpp
+                  qt/moc_luxgateconfigmodel.cpp \
+                  qt/moc_luxgatebidpanel.cpp \
+                  qt/moc_luxgateconfigpanel.cpp
 endif
 
 BITCOIN_MM = \
@@ -323,7 +327,9 @@ endif
 
 if ENABLE_LUXGATE
  BITCOIN_QT_H +=  qt/luxgatedialog.h \
-                  qt/luxgateconfigmodel.h
+                  qt/luxgateconfigmodel.h \
+                  qt/luxgatebidpanel.h \
+                  qt/luxgateconfigpanel.h
 endif
 
 RES_ICONS = \
@@ -543,7 +549,9 @@ endif
 
 if ENABLE_LUXGATE
  BITCOIN_QT_CPP +=  qt/luxgatedialog.cpp \
-                  qt/luxgateconfigmodel.cpp
+                    qt/luxgateconfigmodel.cpp \
+                    qt/luxgatebidpanel.cpp \
+                    qt/luxgateconfigpanel.cpp
 endif
 
 endif
