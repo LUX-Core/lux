@@ -433,7 +433,7 @@ class CLuxGateTestParams : public CTestNetParams
             consensus.powLimit = ~uint256(0) >> 5; 
             vSeeds.clear();
             nSwitchPhi2Block = 30;
-            consensus.nPowTargetSpacing = 60; // 1 minute
+            consensus.nPowTargetSpacing = 15; // 15 seconds
         } 
 };
 
