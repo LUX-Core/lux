@@ -1,0 +1,4 @@
+/media/alex/7a15ebc8-686e-4d37-aa51-198577f0f0dd/home/alex/Загрузки/CLion-2018.3/clion-2018.3/bin/cmake/linux/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" /media/alex/7a15ebc8-686e-4d37-aa51-198577f0f0dd/home/alex/Projects/lux
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /media/alex/7a15ebc8-686e-4d37-aa51-198577f0f0dd/home/alex/Projects/lux/cmake-build-debug
