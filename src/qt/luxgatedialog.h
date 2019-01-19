@@ -5,7 +5,6 @@
 #include <QObject>
 #include <QTableWidget>
 #include <stdint.h>
-#include "ui_luxgatedialog.h"
 #include "clientmodel.h"
 #include "walletmodel.h"
 
@@ -36,22 +35,11 @@ public:
 
     void setModel(WalletModel *model);
 
-
 private:
     Ui::LuxgateDialog *ui;
     WalletModel *model;
     void moveWidgetsToDocks();
-    void fillInTableWithConfig(QString strConfig = ""); //strConfig - path to import config, if strConfig == "" use standard config file
     QDockWidget* createDock(QWidget* widget, const QString& title);
-
-private slots:
-    void slotClickAddConfiguration();
-    void slotClickRemoveConfiguration();
-    void slotClickResetConfiguration();
-    void slotClickImportConfiguration();
-    void slotClickExportConfiguration();
-    void slotClickChangeConfig();
-    void slotConfigDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles);
 };
 
 #endif //__LUXGATE_DIALOG_H__

@@ -55,7 +55,7 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="QWidget" name="bidpanel" native="true">
+        <widget class="LuxgateBidPanel" name="bidpanel" native="true">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
            <horstretch>0</horstretch>
@@ -71,117 +71,10 @@
          <property name="accessibleName">
           <string>TR00018</string>
          </property>
-         <layout class="QVBoxLayout" name="verticalLayout_7">
-          <property name="spacing">
-           <number>9</number>
-          </property>
-          <property name="leftMargin">
-           <number>0</number>
-          </property>
-          <property name="topMargin">
-           <number>3</number>
-          </property>
-          <property name="rightMargin">
-           <number>0</number>
-          </property>
-          <property name="bottomMargin">
-           <number>0</number>
-          </property>
-          <item>
-           <widget class="QWidget" name="bidHeader_2" native="true">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <layout class="QHBoxLayout" name="bidHeader">
-             <property name="spacing">
-              <number>2</number>
-             </property>
-             <property name="leftMargin">
-              <number>0</number>
-             </property>
-             <property name="topMargin">
-              <number>3</number>
-             </property>
-             <property name="rightMargin">
-              <number>0</number>
-             </property>
-             <property name="bottomMargin">
-              <number>0</number>
-             </property>
-             <item>
-              <widget class="QLabel" name="bidNum">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="minimumSize">
-                <size>
-                 <width>110</width>
-                 <height>0</height>
-                </size>
-               </property>
-               <property name="text">
-                <string>0 BIDS</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-               </property>
-               <property name="buddy">
-                <cstring>btc_lux_panel</cstring>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <spacer name="horizontalSpacer_7">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="sizeType">
-                <enum>QSizePolicy::Fixed</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>10</width>
-                 <height>20</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-             <item>
-              <widget class="QLabel" name="label_11">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="minimumSize">
-                <size>
-                 <width>90</width>
-                 <height>0</height>
-                </size>
-               </property>
-               <property name="text">
-                <string>BTC=&gt;LUX</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-          </item>
-          <item>
-           <widget class="QTableView" name="bidTable"/>
-          </item>
-         </layout>
         </widget>
+       </item>
+       <item>
+        <widget class="LuxgateConfigPanel" name="configpanel" native="true"/>
        </item>
        <item>
         <widget class="QWidget" name="askpanel_2" native="true">
@@ -281,112 +174,6 @@
           </item>
           <item>
            <widget class="QTableView" name="askTable"/>
-          </item>
-          <item>
-           <widget class="QWidget" name="configpanel" native="true">
-            <layout class="QVBoxLayout" name="verticalLayout_4">
-             <item>
-              <widget class="QTableView" name="tableViewConfiguration">
-               <property name="editTriggers">
-                <set>QAbstractItemView::AnyKeyPressed|QAbstractItemView::DoubleClicked</set>
-               </property>
-               <property name="selectionMode">
-                <enum>QAbstractItemView::SingleSelection</enum>
-               </property>
-               <property name="selectionBehavior">
-                <enum>QAbstractItemView::SelectRows</enum>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLabel" name="labelConfigStatus">
-               <property name="styleSheet">
-                <string notr="true"/>
-               </property>
-               <property name="text">
-                <string/>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignCenter</set>
-               </property>
-               <property name="status" stdset="0">
-                <string>error</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <layout class="QHBoxLayout" name="horizontalLayout_6">
-               <item>
-                <spacer name="horizontalSpacer_15">
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>40</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-               <item>
-                <widget class="QPushButton" name="pushButtonRemoveConfiguration">
-                 <property name="text">
-                  <string/>
-                 </property>
-                 <property name="icon">
-                  <iconset resource="../lux.qrc">
-                   <normaloff>:/icons/remove</normaloff>:/icons/remove</iconset>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QPushButton" name="pushButtonAddConfiguration">
-                 <property name="text">
-                  <string/>
-                 </property>
-                 <property name="icon">
-                  <iconset resource="../lux.qrc">
-                   <normaloff>:/icons/add</normaloff>:/icons/add</iconset>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </item>
-             <item>
-              <layout class="QHBoxLayout" name="horizontalLayout_7">
-               <item>
-                <widget class="QPushButton" name="pushButtonImportConfig">
-                 <property name="text">
-                  <string>Import</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QPushButton" name="pushButtonExportConfig">
-                 <property name="text">
-                  <string>Export</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QPushButton" name="pushButtonResetConfig">
-                 <property name="text">
-                  <string>Reset</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QPushButton" name="pushButtonChangeConfig">
-                 <property name="text">
-                  <string>Change</string>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </item>
-            </layout>
-           </widget>
           </item>
          </layout>
         </widget>
@@ -1402,7 +1189,7 @@
                 <string/>
                </property>
                <property name="pixmap">
-                <pixmap resource="../lux.qrc">:/icons/rec_luxgate</pixmap>
+                <pixmap>:/icons/rec_luxgate</pixmap>
                </property>
                <property name="scaledContents">
                 <bool>false</bool>
@@ -1514,7 +1301,7 @@
                 <string/>
                </property>
                <property name="pixmap">
-                <pixmap resource="../lux.qrc">:/icons/swap</pixmap>
+                <pixmap>:/icons/swap</pixmap>
                </property>
                <property name="scaledContents">
                 <bool>true</bool>
@@ -1567,7 +1354,7 @@
                 <string/>
                </property>
                <property name="pixmap">
-                <pixmap resource="../lux.qrc">:/icons/send_luxgate</pixmap>
+                <pixmap>:/icons/send_luxgate</pixmap>
                </property>
               </widget>
              </item>
@@ -1713,7 +1500,7 @@
                    <string/>
                   </property>
                   <property name="pixmap">
-                   <pixmap resource="../lux.qrc">:/icons/swap_btn</pixmap>
+                   <pixmap>:/icons/swap_btn</pixmap>
                   </property>
                  </widget>
                 </item>
@@ -1849,7 +1636,7 @@
                 <string/>
                </property>
                <property name="pixmap">
-                <pixmap resource="../lux.qrc">:/icons/send_btn</pixmap>
+                <pixmap>:/icons/send_btn</pixmap>
                </property>
               </widget>
              </item>
@@ -1865,7 +1652,7 @@
                 <string/>
                </property>
                <property name="pixmap">
-                <pixmap resource="../lux.qrc">:/icons/receive_btn</pixmap>
+                <pixmap>:/icons/receive_btn</pixmap>
                </property>
               </widget>
              </item>
@@ -1943,7 +1730,7 @@
                 <string/>
                </property>
                <property name="pixmap">
-                <pixmap resource="../lux.qrc">:/icons/send_btn</pixmap>
+                <pixmap>:/icons/send_btn</pixmap>
                </property>
               </widget>
              </item>
@@ -1965,7 +1752,7 @@
                 <string/>
                </property>
                <property name="pixmap">
-                <pixmap resource="../lux.qrc">:/icons/receive_btn</pixmap>
+                <pixmap>:/icons/receive_btn</pixmap>
                </property>
               </widget>
              </item>
@@ -2046,6 +1833,20 @@
   </widget>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>LuxgateBidPanel</class>
+   <extends>QWidget</extends>
+   <header>luxgatebidpanel.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>LuxgateConfigPanel</class>
+   <extends>QWidget</extends>
+   <header>luxgateconfigpanel.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="../lux.qrc"/>
  </resources>
