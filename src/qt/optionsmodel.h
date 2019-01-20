@@ -59,7 +59,37 @@ public:
         CheckUpdates,            // bool
         TxIndex,                 // bool
         AddressIndex,            // bool
+        AsksBidsDecimalsPrice,   // int
+        AsksBidsDecimalsBase,    // int
+        AsksBidsDecimalsQuote,   // int
+        AsksShowWidget,          // bool
+        BidsShowWidget,          // bool
+        ConfigShowWidget,        // bool
         OptionIDRowCount,
+    };
+
+    struct Decimals
+    {
+        Decimals(int price, int base, int quote):   price(price),
+                                                    base(base),
+                                                    quote(quote)
+        {}
+        Decimals(const Decimals & other)
+        {
+            price = other.price;
+            base = other.base;
+            quote = other.quote;
+        }
+        Decimals& operator=(const Decimals& other)
+        {
+            price = other.price;
+            base = other.base;
+            quote = other.quote;
+            return *this;
+        }
+        int price;
+        int base;
+        int quote;
     };
 
     void Init();
@@ -81,8 +111,12 @@ public:
     bool getCoinControlFeatures() { return fCoinControlFeatures; }
     bool getShowAdvancedUI() { return fShowAdvancedUI; }
     bool getshowMasternodesTab() { return fshowMasternodesTab; }
-    bool getparallelMasterNode() { return fparallelMasterNode; }
+    bool getparallelMasterNode() { return fparallelMasterNode; } 
     const QString& getOverriddenByCommandLine() { return strOverriddenByCommandLine; }
+    Decimals getBidsAsksDecimals();
+    bool getHideAsksWidget();
+    bool getHideBidsWidget();
+    bool getHideConfigWidget();
 
     /* Restart flag helper */
     void setRestartRequired(bool fRequired);
@@ -119,6 +153,10 @@ Q_SIGNALS:
     void zeroBalanceAddressTokenChanged(bool);
     void walletBackupsChanged(int);
     void hideTrayIconChanged(bool);
+    void bidsAsksDecimalsChanged(Decimals);
+    void hideAsksWidget(bool bHide);
+    void hideBidsWidget(bool bHide);
+    void hideConfigWidget(bool bHide);
 };
 
 #endif // BITCOIN_QT_OPTIONSMODEL_H

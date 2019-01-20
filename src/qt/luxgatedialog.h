@@ -24,6 +24,15 @@ namespace Ui {
 class WalletModel;
 class QDockWidget;
 
+struct CurrencyPair
+{
+    CurrencyPair(QString baseCurrency,QString quoteCurrency):   baseCurrency(baseCurrency),
+                                                                quoteCurrency(quoteCurrency)
+    {}
+    QString baseCurrency;
+    QString quoteCurrency;
+};
+extern CurrencyPair curCurrencyPair;
 
 class LuxgateDialog : public QMainWindow
 {
@@ -38,6 +47,9 @@ public:
 private:
     Ui::LuxgateDialog *ui;
     WalletModel *model;
+    QDockWidget* dockBidPanel;
+    QDockWidget* dockAskPanel;
+    QDockWidget* dockConfigPanel;
     void moveWidgetsToDocks();
     QDockWidget* createDock(QWidget* widget, const QString& title);
 };

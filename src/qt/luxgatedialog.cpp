@@ -3,6 +3,7 @@
 #include "ui_luxgatedialog.h"
 #include "clientmodel.h"
 #include "walletmodel.h"
+#include "optionsmodel.h"
 #include <qmessagebox.h>
 #include <qtimer.h>
 #include <rpcserver.h>
@@ -48,6 +49,7 @@
 
 using namespace std;
 
+CurrencyPair curCurrencyPair ("LUX", "BTC");
 
 LuxgateDialog::LuxgateDialog(QWidget *parent) :
         QMainWindow(parent),
@@ -62,9 +64,10 @@ LuxgateDialog::LuxgateDialog(QWidget *parent) :
 
 void LuxgateDialog::moveWidgetsToDocks()
 {
-    auto dockBidPanel = createDock(ui->bidpanel, "bidpanel");
-    auto dockAskPanel = createDock(ui->askpanel_2, "askpanel_2");
-    auto dockConfigPanel = createDock(ui->configpanel, "Configuration");
+    dockBidPanel = createDock(ui->bidpanel, "Bids");
+    dockAskPanel = createDock(ui->askspanel, "Asks");
+    dockConfigPanel = createDock(ui->configpanel, "Configuration");
+
     auto dockChart = createDock(ui->tabCharts, "tabCharts");
     auto dockOrderBook = createDock(ui->tabOrderBook, "tabOrderBook");
     auto dockOpenOrders = createDock(ui->tabOpenOrders, "tabOpenOrders");
@@ -110,6 +113,21 @@ QDockWidget* LuxgateDialog::createDock(QWidget* widget, const QString& title)
 void LuxgateDialog::setModel(WalletModel *model)
 {
     this->model = model;
+    ui->askspanel->setModel(model);
+    ui->bidpanel->setModel(model);
+    OptionsModel * opt_model = model->getOptionsModel();
+
+    dockAskPanel->setHidden(opt_model->getHideAsksWidget());
+    connect(opt_model, &OptionsModel::hideAsksWidget,
+            dockAskPanel, &QDockWidget::setHidden);
+
+    dockBidPanel->setHidden(opt_model->getHideBidsWidget());
+    connect(opt_model, &OptionsModel::hideBidsWidget,
+            dockBidPanel, &QDockWidget::setHidden);
+
+    dockConfigPanel->setHidden(opt_model->getHideConfigWidget());
+    connect(opt_model, &OptionsModel::hideConfigWidget,
+            dockConfigPanel, &QDockWidget::setHidden);
 }
 
 LuxgateDialog::~LuxgateDialog()

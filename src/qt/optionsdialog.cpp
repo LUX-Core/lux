@@ -263,6 +263,16 @@ void OptionsDialog::setMapper()
     mapper->addMapping(ui->darksendRounds, OptionsModel::DarkSendRounds);
     mapper->addMapping(ui->anonymizeLux, OptionsModel::AnonymizeLuxAmount);
     mapper->addMapping(ui->showMasternodesTab, OptionsModel::ShowMasternodesTab);
+
+    /* Luxgate Decimals*/
+    mapper->addMapping(ui->spinBoxAsksBidsPrice, OptionsModel::AsksBidsDecimalsPrice);
+    mapper->addMapping(ui->spinBoxAsksBidsBase, OptionsModel::AsksBidsDecimalsBase);
+    mapper->addMapping(ui->spinBoxAsksBidsQuote, OptionsModel::AsksBidsDecimalsQuote);
+
+    /* Luxgate View*/
+    mapper->addMapping(ui->checkBoxAsks, OptionsModel::AsksShowWidget);
+    mapper->addMapping(ui->checkBoxBids, OptionsModel::BidsShowWidget);
+    mapper->addMapping(ui->checkBoxConfiguration, OptionsModel::ConfigShowWidget);
 }
 
 void OptionsDialog::enableOkButton()

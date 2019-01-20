@@ -8,7 +8,7 @@ LuxgateConfigModel::LuxgateConfigModel(QObject *parent):
 
 int LuxgateConfigModel::rowCount(const QModelIndex &parent) const
 {
-    Q_UNUSED(parent)
+    Q_UNUSED(parent);
     return items.size();
 }
 
@@ -55,42 +55,41 @@ QVariant LuxgateConfigModel::headerData(int section, Qt::Orientation orientation
 QVariant LuxgateConfigModel::data(const QModelIndex &index, int role) const
 {
     QVariant res;
-    if( Qt::EditRole == role ||
-        Qt::DisplayRole == role)
-    {
-        switch (index.column())
-        {
-            case TickerColumn:
-                res = items[index.row()].ticker;
-            break;
-            case HostColumn:
-                res = items[index.row()].host;
-            break;
-            case PortColumn:
-                res = items[index.row()].port;
-            break;
-            case RpcuserColumn:
-                res = items[index.row()].rpcuser;
-            break;
-            case RpcpasswordColumn:
-                res = items[index.row()].rpcpassword;
-            break;
-            case Zmq_pub_raw_tx_endpointColumn:
-                res = items[index.row()].zmq_pub_raw_tx_endpoint;
-            break;
-            case SwapSupportColumn:
-                res = QVariant();
-            break;
-        }
+    if (index.isValid()) {
+        if (Qt::EditRole == role ||
+            Qt::DisplayRole == role) {
+            switch (index.column()) {
+                case TickerColumn:
+                    res = items[index.row()].ticker;
+                    break;
+                case HostColumn:
+                    res = items[index.row()].host;
+                    break;
+                case PortColumn:
+                    res = items[index.row()].port;
+                    break;
+                case RpcuserColumn:
+                    res = items[index.row()].rpcuser;
+                    break;
+                case RpcpasswordColumn:
+                    res = items[index.row()].rpcpassword;
+                    break;
+                case Zmq_pub_raw_tx_endpointColumn:
+                    res = items[index.row()].zmq_pub_raw_tx_endpoint;
+                    break;
+                case SwapSupportColumn:
+                    res = QVariant();
+                    break;
+            }
+        } else if (Qt::BackgroundRole == role)
+            res = backgroundBrushs[index.row()][index.column()];
+        else if (AllDataRole == role)
+            res = QVariant::fromValue(items[index.row()]);
+        else if (ValidRole == role)
+            res = validItems[index.row()][index.column()];
+        else
+            res = QVariant();
     }
-    else if(Qt::BackgroundRole == role)
-        res = backgroundBrushs[index.row()][index.column()];
-    else if(AllDataRole == role)
-        res = QVariant::fromValue(items[index.row()]);
-    else if(ValidRole == role)
-        res = validItems[index.row()][index.column()];
-    else
-        res = QVariant();
     return res;
 }
 
@@ -136,6 +135,7 @@ bool LuxgateConfigModel::removeRows(int row, int count, const QModelIndex &paren
 
 int LuxgateConfigModel::columnCount(const QModelIndex &parent) const
 {
+    Q_UNUSED(parent);
     return NColumns;
 }
 

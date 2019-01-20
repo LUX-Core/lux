@@ -159,9 +159,10 @@ LuxgateConfigPanel::LuxgateConfigPanel(QWidget *parent) :
     HeaderView->resizeSection(LuxgateConfigModel::PortColumn, 50);
     HeaderView->resizeSection(LuxgateConfigModel::SwapSupportColumn, 50);
     HeaderView->resizeSection(LuxgateConfigModel::Zmq_pub_raw_tx_endpointColumn, 80);
-    int rpc_width = (HeaderView->length() - (50*3+80*2) -5) /2;
+    int rpc_width = (HeaderView->length() - (50*3+80*2)) /2;
     HeaderView->resizeSection(LuxgateConfigModel::RpcuserColumn, rpc_width);
     HeaderView->resizeSection(LuxgateConfigModel::RpcpasswordColumn, rpc_width);
+    HeaderView->setFixedHeight(30);
     slotClickResetConfiguration();
     ui->pushButtonResetConfig->setEnabled(false);
     ui->pushButtonChangeConfig->setEnabled(false);

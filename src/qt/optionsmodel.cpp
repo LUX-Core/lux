@@ -197,6 +197,22 @@ void OptionsModel::Init()
         SoftSetArg("-anonymizeluxamount", settings.value("nAnonymizeLuxAmount").toString().toStdString());
 
     language = settings.value("language").toString();
+
+    //Luxgate Decimals
+    if (!settings.contains("nAsksBidsDecimalsPrice"))
+        settings.setValue("nAsksBidsDecimalsPrice", 8);
+    if (!settings.contains("nAsksBidsDecimalsBase"))
+        settings.setValue("nAsksBidsDecimalsBase", 8);
+    if (!settings.contains("nAsksBidsDecimalsQuote"))
+        settings.setValue("nAsksBidsDecimalsQuote", 8);
+
+    //Luxgate Widgets
+    if (!settings.contains("bAsksShowWidget"))
+        settings.setValue("bAsksShowWidget", true);
+    if (!settings.contains("bBidsShowWidget"))
+        settings.setValue("bBidsShowWidget", true);
+    if (!settings.contains("bConfigShowWidget"))
+        settings.setValue("bConfigShowWidget", true);
 }
 
 void OptionsModel::Reset()
@@ -302,12 +318,28 @@ QVariant OptionsModel::data(const QModelIndex& index, int role) const
             return settings.value("fTxIndex");
         case AddressIndex:
             return settings.value("fAddressIndex");
+        case AsksBidsDecimalsPrice:
+            return settings.value("nAsksBidsDecimalsPrice");
+        case AsksBidsDecimalsBase:
+            return settings.value("nAsksBidsDecimalsBase");
+        case AsksBidsDecimalsQuote:
+            return settings.value("nAsksBidsDecimalsQuote");
+        case AsksShowWidget:
+            return settings.value("bAsksShowWidget");
+        case BidsShowWidget:
+            return settings.value("bBidsShowWidget");
+        case ConfigShowWidget:
+            return settings.value("bConfigShowWidget");
         default:
             return QVariant();
         }
     }
     return QVariant();
 }
+
+OptionsModel::Decimals OptionsModel::getBidsAsksDecimals() { return Decimals(QSettings().value("nAsksBidsDecimalsPrice").toInt(),
+                                                 QSettings().value("nAsksBidsDecimalsBase").toInt(),
+                                                 QSettings().value("nAsksBidsDecimalsQuote").toInt()); }
 
 // write QSettings values
 bool OptionsModel::setData(const QModelIndex& index, const QVariant& value, int role)
@@ -522,6 +554,36 @@ bool OptionsModel::setData(const QModelIndex& index, const QVariant& value, int 
                 setRestartRequired(true);
             }
             break;
+        case AsksBidsDecimalsPrice:
+            settings.setValue("nAsksBidsDecimalsPrice", value);
+            emit bidsAsksDecimalsChanged(Decimals(settings.value("nAsksBidsDecimalsPrice").toInt(),
+                                                  settings.value("nAsksBidsDecimalsBase").toInt(),
+                                                  settings.value("nAsksBidsDecimalsQuote").toInt()));
+            break;
+        case AsksBidsDecimalsBase:
+            settings.setValue("nAsksBidsDecimalsBase", value);
+            emit bidsAsksDecimalsChanged(Decimals(settings.value("nAsksBidsDecimalsPrice").toInt(),
+                                                  settings.value("nAsksBidsDecimalsBase").toInt(),
+                                                  settings.value("nAsksBidsDecimalsQuote").toInt()));
+            break;
+        case AsksBidsDecimalsQuote:
+            settings.setValue("nAsksBidsDecimalsQuote", value);
+            emit bidsAsksDecimalsChanged(Decimals(settings.value("nAsksBidsDecimalsPrice").toInt(),
+                                                  settings.value("nAsksBidsDecimalsBase").toInt(),
+                                                  settings.value("nAsksBidsDecimalsQuote").toInt()));
+            break;
+        case AsksShowWidget:
+            settings.setValue("bAsksShowWidget", value);
+            emit hideAsksWidget(!value.toBool());
+            break;
+        case BidsShowWidget:
+            settings.setValue("bBidsShowWidget", value);
+            emit hideBidsWidget(!value.toBool());
+            break;
+        case ConfigShowWidget:
+            settings.setValue("bConfigShowWidget", value);
+            emit hideConfigWidget(!value.toBool());
+            break;
         default:
             break;
         }
@@ -558,6 +620,21 @@ bool OptionsModel::getProxySettings(QNetworkProxy& proxy) const
         proxy.setType(QNetworkProxy::NoProxy);
 
     return false;
+}
+
+bool OptionsModel::getHideAsksWidget()
+{
+    return !QSettings().value("bAsksShowWidget").toBool();
+}
+
+bool OptionsModel::getHideBidsWidget()
+{
+    return !QSettings().value("bBidsShowWidget").toBool();
+}
+
+bool OptionsModel::getHideConfigWidget()
+{
+    return !QSettings().value("bConfigShowWidget").toBool();
 }
 
 void OptionsModel::setRestartRequired(bool fRequired)

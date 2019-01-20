@@ -1747,6 +1747,18 @@ QDockWidget::float-button {
 	right:18px
 }
 
+
+/**************************** LuxgateBidPanel ********************************/
+QTableView#tableViewBids .QHeaderView::section{
+		border-bottom: 3px solid #6CC417;
+}
+
+/**************************** LuxgateAskPanel ********************************/
+QTableView#tableViewAsks .QHeaderView::section{
+		border-bottom: 3px solid red;
+}
+
+/**************************** Bip38ToolDialog ********************************/
 QDialog#Bip38ToolDialog  .QToolButton {
     background-color:transparent;
     border: 0;
@@ -1789,6 +1801,7 @@ QDialog#Bip38ToolDialog .QPushButton#clearButton_ENC:pressed {
     border:1px solid #9e9e9e;
 }
 
+/**************************** MultiSendDialog ********************************/
 QDialog#MultiSendDialog .QToolButton {
     background-color:transparent;
     border: 0;

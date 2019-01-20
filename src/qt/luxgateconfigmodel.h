@@ -10,7 +10,7 @@ struct BlockchainConfigQt
 {
     BlockchainConfigQt()
     {}
-    BlockchainConfigQt(BlockchainConfig conf):
+    BlockchainConfigQt(const BlockchainConfig & conf):
             ticker(QString::fromStdString(conf.ticker)),
             host(QString::fromStdString(conf.host)),
             port(conf.port),

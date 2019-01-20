@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>LuxgateBidPanel</class>
- <widget class="QFrame" name="LuxgateBidPanel">
+ <class>LuxgateAskPanel</class>
+ <widget class="QFrame" name="LuxgateAskPanel">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -47,7 +47,7 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="QLabel" name="BidNum">
+        <widget class="QLabel" name="AskNum">
          <property name="lineWidth">
           <number>1</number>
          </property>
@@ -57,9 +57,9 @@
         </widget>
        </item>
        <item>
-        <widget class="QLabel" name="labelBidsNumBids">
+        <widget class="QLabel" name="labelAsksNumAsks">
          <property name="text">
-          <string> BIDS</string>
+          <string> ASKS</string>
          </property>
         </widget>
        </item>
@@ -109,7 +109,7 @@
        <item>
         <widget class="QLabel" name="labelTotalCurrency">
          <property name="text">
-          <string> ( BTC )</string>
+          <string> ( LUX )</string>
          </property>
         </widget>
        </item>
@@ -187,7 +187,7 @@
     </layout>
    </item>
    <item>
-    <widget class="QTableView" name="tableViewBids">
+    <widget class="QTableView" name="tableViewAsks">
      <property name="selectionMode">
       <enum>QAbstractItemView::NoSelection</enum>
      </property>
@@ -195,7 +195,7 @@
       <enum>QAbstractItemView::SelectRows</enum>
      </property>
      <attribute name="verticalHeaderVisible">
-      <bool>true</bool>
+      <bool>false</bool>
      </attribute>
     </widget>
    </item>
