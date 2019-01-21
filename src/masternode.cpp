@@ -601,7 +601,8 @@ void CMasterNode::Check(bool forceCheck) {
     }
 
     if (!unitTest) {
-        LOCK(cs_main);
+        TRY_LOCK(cs_main, lockMain);
+        if (!lockMain) return;
         /*
             cs_main is required for doing masternode.Check because something
             is modifying the coins view without a mempool lock. It causes
