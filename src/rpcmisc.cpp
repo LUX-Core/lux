@@ -1482,7 +1482,7 @@ UniValue dfsacceptproposal(const UniValue& params, bool fHelp)
     if (proposal.time != 0) {
         storageController->AcceptProposal(proposal);
     }
-
+    // TODO: AcceptProposal blocks cli (SS)
     return UniValue::VNULL;
 }
 

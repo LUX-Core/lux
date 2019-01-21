@@ -2,8 +2,6 @@
 
 #include <fstream>
 #include <boost/filesystem.hpp>
-#include <openssl/rsa.h>
-#include <openssl/pem.h>
 
 #include "main.h"
 #include "streams.h"
@@ -164,7 +162,7 @@ void StorageController::ProcessStorageMessage(CNode* pfrom, const std::string& s
         auto itAnnounce = mapAnnouncements.find(handshake.orderHash);
         if (itAnnounce != mapAnnouncements.end()) {
             StorageOrder &order = itAnnounce->second;
-            if (storageHeap.MaxAllocateSize() > order.fileSize && tempStorageHeap.MaxAllocateSize() > order.fileSize) { // Change to exist(handshake.proposalHash) (SS)
+            if (storageHeap.MaxAllocateSize() > order.fileSize && tempStorageHeap.MaxAllocateSize() > order.fileSize) { // TODO: Change to exist(handshake.proposalHash) (SS)
                 StorageHandshake requestReplica;
                 requestReplica.time = std::time(0);
                 requestReplica.orderHash = handshake.orderHash;
@@ -234,7 +232,7 @@ void StorageController::BackgroundJob()
 
     while (1) {
         boost::this_thread::interruption_point();
-        boost::this_thread::sleep(boost::posix_time::seconds(5));
+        boost::this_thread::sleep(boost::posix_time::seconds(1));
 
         std::vector<CNode*> vNodesCopy;
         {
@@ -321,7 +319,9 @@ bool StorageController::AcceptProposal( const StorageProposal &proposal)
     }
 
     auto order = mapAnnouncements[proposal.orderHash];
-    StartHandshake(proposal);
+    if (!StartHandshake(proposal)) {
+        return false;
+    }
     auto it = mapReceivedHandshakes.find(proposal.orderHash);
     for (int times = 0; times < 300 && it == mapReceivedHandshakes.end(); ++times) {
         MilliSleep(100);
@@ -344,7 +344,7 @@ bool StorageController::AcceptProposal( const StorageProposal &proposal)
     return false;
 }
 
-void StorageController::StartHandshake(const StorageProposal &proposal)
+bool StorageController::StartHandshake(const StorageProposal &proposal)
 {
     StorageHandshake handshake;
     handshake.time = std::time(0);
@@ -368,7 +368,9 @@ void StorageController::StartHandshake(const StorageProposal &proposal)
 
     if (pNode != nullptr) {
         pNode->PushMessage("dfshandshake", handshake);
+        return true;
     }
+    return false;
 }
 
 std::vector<StorageProposal> StorageController::SortProposals(const StorageOrder &order)
@@ -450,6 +452,36 @@ bool StorageController::FindReplicaKeepers(const StorageOrder &order, const int 
     return false;
 }
 
+std::pair<DecryptionKeys, RSA> StorageController::GenerateKeys()
+{
+    RSA *rsa;
+    const BIGNUM *rsa_n;
+    // search for rsa->n > 0x0000ff...126 bytes...ff
+    {
+        rsa = RSA_generate_key(nBlockSizeRSA * 8, 3, nullptr, nullptr);
+        BIGNUM *minModulus = GetMinModulus();
+        RSA_get0_key(rsa, &rsa_n, nullptr, nullptr);
+        while (BN_ucmp(minModulus, rsa_n) >= 0) {
+            RSA_free(rsa);
+            rsa = RSA_generate_key(nBlockSizeRSA * 8, 3, nullptr, nullptr);
+        }
+        BN_free(minModulus);
+    }
+    const char chAESKey[] = "1234567890123456"; // TODO: generate unique 16 bytes (SS)
+    const AESKey aesKey(chAESKey, chAESKey + sizeof(chAESKey)/sizeof(*chAESKey));
+
+    BIO *pub = BIO_new(BIO_s_mem());
+    PEM_write_bio_RSAPublicKey(pub, rsa);
+    size_t publicKeyLength = BIO_pending(pub);
+    char *rsaPubKey = new char[publicKeyLength + 1];
+    BIO_read(pub, rsaPubKey, publicKeyLength);
+    rsaPubKey[publicKeyLength] = '\0';
+
+    DecryptionKeys decryptionKeys = {DecryptionKeys::ToBytes(std::string(rsaPubKey)), aesKey};
+    std::pair<DecryptionKeys, RSA> keys = {decryptionKeys, *rsa};
+    return keys;
+}
+
 std::shared_ptr<AllocatedFile> StorageController::CreateReplica(const boost::filesystem::path &filename, const StorageOrder &order)
 {
     namespace fs = boost::filesystem;
@@ -468,22 +500,10 @@ std::shared_ptr<AllocatedFile> StorageController::CreateReplica(const boost::fil
     std::ofstream outfile;
     outfile.open(tempFile->filename, std::ios::binary);
 
-    RSA *rsa;
-    const BIGNUM *rsa_n;
-    // search for rsa->n > 0x0000ff...126 bytes...ff
-    {
-        rsa = RSA_generate_key(nBlockSizeRSA * 8, 3, nullptr, nullptr);
-        BIGNUM *minModulus = GetMinModulus();
-        RSA_get0_key(rsa, &rsa_n, nullptr, nullptr);
-        while (BN_ucmp(minModulus, rsa_n) >= 0) {
-            RSA_free(rsa);
-            rsa = RSA_generate_key(nBlockSizeRSA * 8, 3, nullptr, nullptr);
-        }
-        BN_free(minModulus);
-    }
-    const char chAESKey[] = "1234567890123456"; // TODO: generate unique 16 bytes (SS)
-    const AESKey aesKey(chAESKey, chAESKey + sizeof(chAESKey)/sizeof(*chAESKey));
-
+    std::pair<DecryptionKeys, RSA> keys = GenerateKeys();
+    RSA *rsa = &(keys.second);
+    const AESKey aesKey = keys.first.aesKey;
+    const RSAKey rsaKey = keys.first.rsaKey;
     size_t sizeBuffer = nBlockSizeRSA - 2;
     byte *buffer = new byte[sizeBuffer];
     byte *replica = new byte[nBlockSizeRSA];
@@ -497,13 +517,7 @@ std::shared_ptr<AllocatedFile> StorageController::CreateReplica(const boost::fil
         outfile.write((char *) replica, nBlockSizeRSA);
         // TODO: check write (SS)
     }
-    BIO *pub = BIO_new(BIO_s_mem());
-    PEM_write_bio_RSAPublicKey(pub, rsa);
-    size_t publicKeyLength = BIO_pending(pub);
-    char *publicKey = new char[publicKeyLength + 1];
-    BIO_read(pub, publicKey, publicKeyLength);
-    publicKey[publicKeyLength] = '\0';
-    tempStorageHeap.SetDecryptionKeys(tempFile->uri, DecryptionKeys::ToBytes(std::string(publicKey)), aesKey);
+    tempStorageHeap.SetDecryptionKeys(tempFile->uri, rsaKey, aesKey);
     filein.close();
     outfile.close();
     RSA_free(rsa);

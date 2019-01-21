@@ -8,6 +8,7 @@
 #include "serialize.h"
 #include "streams.h"
 #include "protocol.h"
+#include "decryptionkeys.h"
 
 class StorageOrder
 {
@@ -73,7 +74,8 @@ public:
     std::time_t time;
     uint256 orderHash;
     uint256 proposalHash;
-    unsigned short port;
+    unsigned short port; // TODO: does not used (SS)
+ //   DecryptionKeys keys;
 
     uint256 GetHash() const{
         CDataStream ss(SER_GETHASH, 0);
@@ -89,6 +91,7 @@ public:
         READWRITE(orderHash);
         READWRITE(proposalHash);
         READWRITE(port);
+    //    READWRITE(keys);
     }
 };
 

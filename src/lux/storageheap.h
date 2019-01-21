@@ -8,23 +8,7 @@
 #include <mutex>
 #include <boost/optional.hpp>
 #include <boost/filesystem.hpp>
-
-struct DecryptionKeys
-{
-    using bytes = std::vector<unsigned char>;
-    bytes rsaKey;
-    bytes aesKey;
-
-    static std::string ToString(bytes data)
-    {
-        return std::string(data.begin(), data.end());
-    }
-
-    static bytes ToBytes(std::string data)
-    {
-        return bytes(data.begin(), data.end());
-    }
-};
+#include "decryptionkeys.h"
 
 struct AllocatedFile
 {

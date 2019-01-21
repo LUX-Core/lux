@@ -4,11 +4,7 @@
 #include <string>
 #include <vector>
 #include <openssl/bn.h>
-
-struct AllocatedFile;
-
-typedef unsigned char byte;
-typedef std::vector<byte> AESKey;
+#include "decryptionkeys.h"
 
 static constexpr size_t nBlockSizeRSA = 128;
 static constexpr size_t nBlockSizeAES = 16;
