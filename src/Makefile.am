@@ -236,6 +236,7 @@ libbitcoin_server_a_SOURCES = \
   lux/proposalsagent.h \
   lux/proposalsagent.cpp \
   lux/storageorder.h \
+  lux/decryptionkeys.h \
   $(BITCOIN_CORE_H)
 
 if ENABLE_ZMQ

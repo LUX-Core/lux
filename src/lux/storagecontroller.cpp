@@ -319,8 +319,10 @@ bool StorageController::AcceptProposal(const StorageProposal &proposal)
     }
 
     auto order = mapAnnouncements[proposal.orderHash];
-    std::pair<DecryptionKeys, RSA> keys = GenerateKeys();
-    if (!StartHandshake(proposal, keys.first)) {
+    RSA *rsa;
+    DecryptionKeys keys = GenerateKeys(&rsa);
+    if (!StartHandshake(proposal, keys)) {
+        RSA_free(rsa);
         return false;
     }
     auto it = mapReceivedHandshakes.find(proposal.orderHash);
@@ -331,17 +333,21 @@ bool StorageController::AcceptProposal(const StorageProposal &proposal)
     CNode* pNode = FindNode(proposal.address);
     if (it != mapReceivedHandshakes.end()) {
         auto itFile = mapLocalFiles.find(proposal.orderHash);
-        auto pAllocatedFile = CreateReplica(itFile->second, order.fileURI, keys.first, &(keys.second));
+        auto pAllocatedFile = CreateReplica(itFile->second, order.fileURI, keys, rsa);
         if (pNode) {
             if (!SendReplica(order, pAllocatedFile, pNode)) {
+                RSA_free(rsa);
                 return false;
             }
+            RSA_free(rsa);
+            return true;
         }
     } else {
         if (pNode) {
             pNode->CloseSocketDisconnect();
         }
     }
+    RSA_free(rsa);
     return false;
 }
 
@@ -454,18 +460,17 @@ bool StorageController::FindReplicaKeepers(const StorageOrder &order, const int 
     return false;
 }
 
-std::pair<DecryptionKeys, RSA> StorageController::GenerateKeys()
+DecryptionKeys StorageController::GenerateKeys(RSA **rsa)
 {
-    RSA *rsa;
     const BIGNUM *rsa_n;
     // search for rsa->n > 0x0000ff...126 bytes...ff
     {
-        rsa = RSA_generate_key(nBlockSizeRSA * 8, 3, nullptr, nullptr);
+        (*rsa) = RSA_generate_key(nBlockSizeRSA * 8, 3, nullptr, nullptr);
         BIGNUM *minModulus = GetMinModulus();
-        RSA_get0_key(rsa, &rsa_n, nullptr, nullptr);
+        RSA_get0_key((*rsa), &rsa_n, nullptr, nullptr);
         while (BN_ucmp(minModulus, rsa_n) >= 0) {
-            RSA_free(rsa);
-            rsa = RSA_generate_key(nBlockSizeRSA * 8, 3, nullptr, nullptr);
+            RSA_free((*rsa));
+            (*rsa) = RSA_generate_key(nBlockSizeRSA * 8, 3, nullptr, nullptr);
         }
         BN_free(minModulus);
     }
@@ -473,15 +478,14 @@ std::pair<DecryptionKeys, RSA> StorageController::GenerateKeys()
     const AESKey aesKey(chAESKey, chAESKey + sizeof(chAESKey)/sizeof(*chAESKey));
 
     BIO *pub = BIO_new(BIO_s_mem());
-    PEM_write_bio_RSAPublicKey(pub, rsa);
+    PEM_write_bio_RSAPublicKey(pub, (*rsa));
     size_t publicKeyLength = BIO_pending(pub);
     char *rsaPubKey = new char[publicKeyLength + 1];
     BIO_read(pub, rsaPubKey, publicKeyLength);
     rsaPubKey[publicKeyLength] = '\0';
 
     DecryptionKeys decryptionKeys = {DecryptionKeys::ToBytes(std::string(rsaPubKey)), aesKey};
-    std::pair<DecryptionKeys, RSA> keys = {decryptionKeys, *rsa};
-    return keys;
+    return decryptionKeys;
 }
 
 std::shared_ptr<AllocatedFile> StorageController::CreateReplica(const boost::filesystem::path &filename,
@@ -521,7 +525,6 @@ std::shared_ptr<AllocatedFile> StorageController::CreateReplica(const boost::fil
     tempStorageHeap.SetDecryptionKeys(tempFile->uri, keys.rsaKey, keys.aesKey);
     filein.close();
     outfile.close();
-    RSA_free(rsa);
     delete[] buffer;
     delete[] replica;
 

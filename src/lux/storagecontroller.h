@@ -7,8 +7,10 @@
 #include "storageheap.h"
 #include "storageorder.h"
 #include "proposalsagent.h"
+#include "decryptionkeys.h"
 
 #include <boost/thread.hpp>
+#include <openssl/rsa.h>
 
 class StorageController;
 
@@ -27,7 +29,7 @@ protected:
     boost::thread background;
 
     bool StartHandshake(const StorageProposal &proposal, const DecryptionKeys &keys);
-    std::pair<DecryptionKeys, RSA> GenerateKeys();
+    DecryptionKeys GenerateKeys(RSA **rsa);
     std::shared_ptr<AllocatedFile> CreateReplica(const boost::filesystem::path &filename,
                                                  const uint256 &fileURI,
                                                  const DecryptionKeys &keys,
