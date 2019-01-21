@@ -312,14 +312,15 @@ bool StorageController::CancelOrder(const uint256 &orderHash)
     return true;
 }
 
-bool StorageController::AcceptProposal( const StorageProposal &proposal)
+bool StorageController::AcceptProposal(const StorageProposal &proposal)
 {
     if (!mapAnnouncements.count(proposal.orderHash)) {
         return false;
     }
 
     auto order = mapAnnouncements[proposal.orderHash];
-    if (!StartHandshake(proposal)) {
+    std::pair<DecryptionKeys, RSA> keys = GenerateKeys();
+    if (!StartHandshake(proposal, keys.first)) {
         return false;
     }
     auto it = mapReceivedHandshakes.find(proposal.orderHash);
@@ -330,7 +331,7 @@ bool StorageController::AcceptProposal( const StorageProposal &proposal)
     CNode* pNode = FindNode(proposal.address);
     if (it != mapReceivedHandshakes.end()) {
         auto itFile = mapLocalFiles.find(proposal.orderHash);
-        auto pAllocatedFile = CreateReplica(itFile->second, order);
+        auto pAllocatedFile = CreateReplica(itFile->second, order.fileURI, keys.first, &(keys.second));
         if (pNode) {
             if (!SendReplica(order, pAllocatedFile, pNode)) {
                 return false;
@@ -344,13 +345,14 @@ bool StorageController::AcceptProposal( const StorageProposal &proposal)
     return false;
 }
 
-bool StorageController::StartHandshake(const StorageProposal &proposal)
+bool StorageController::StartHandshake(const StorageProposal &proposal, const DecryptionKeys &keys)
 {
     StorageHandshake handshake;
     handshake.time = std::time(0);
     handshake.orderHash = proposal.orderHash;
     handshake.proposalHash = proposal.GetHash();
     handshake.port = DEFAULT_DFS_PORT;
+    handshake.keys = keys;
 
     CNode* pNode = FindNode(proposal.address);
     if (pNode == nullptr) {
@@ -482,7 +484,10 @@ std::pair<DecryptionKeys, RSA> StorageController::GenerateKeys()
     return keys;
 }
 
-std::shared_ptr<AllocatedFile> StorageController::CreateReplica(const boost::filesystem::path &filename, const StorageOrder &order)
+std::shared_ptr<AllocatedFile> StorageController::CreateReplica(const boost::filesystem::path &filename,
+                                                                const uint256 &fileURI,
+                                                                const DecryptionKeys &keys,
+                                                                RSA *rsa)
 {
     namespace fs = boost::filesystem;
 
@@ -495,15 +500,11 @@ std::shared_ptr<AllocatedFile> StorageController::CreateReplica(const boost::fil
 
     auto length = fs::file_size(filename);
 
-    std::shared_ptr<AllocatedFile> tempFile = tempStorageHeap.AllocateFile(order.fileURI.ToString(), GetCryptoReplicaSize(length));
+    std::shared_ptr<AllocatedFile> tempFile = tempStorageHeap.AllocateFile(fileURI.ToString(), GetCryptoReplicaSize(length));
 
     std::ofstream outfile;
     outfile.open(tempFile->filename, std::ios::binary);
 
-    std::pair<DecryptionKeys, RSA> keys = GenerateKeys();
-    RSA *rsa = &(keys.second);
-    const AESKey aesKey = keys.first.aesKey;
-    const RSAKey rsaKey = keys.first.rsaKey;
     size_t sizeBuffer = nBlockSizeRSA - 2;
     byte *buffer = new byte[sizeBuffer];
     byte *replica = new byte[nBlockSizeRSA];
@@ -513,11 +514,11 @@ std::shared_ptr<AllocatedFile> StorageController::CreateReplica(const boost::fil
         if (n <= 0) {
             break;
         }
-        EncryptData(buffer, 0, n, replica, aesKey, rsa);
+        EncryptData(buffer, 0, n, replica, keys.aesKey, rsa);
         outfile.write((char *) replica, nBlockSizeRSA);
         // TODO: check write (SS)
     }
-    tempStorageHeap.SetDecryptionKeys(tempFile->uri, rsaKey, aesKey);
+    tempStorageHeap.SetDecryptionKeys(tempFile->uri, keys.rsaKey, keys.aesKey);
     filein.close();
     outfile.close();
     RSA_free(rsa);

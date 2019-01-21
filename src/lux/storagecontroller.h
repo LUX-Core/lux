@@ -26,9 +26,12 @@ protected:
     boost::mutex mutex;
     boost::thread background;
 
-    bool StartHandshake(const StorageProposal &proposal);
+    bool StartHandshake(const StorageProposal &proposal, const DecryptionKeys &keys);
     std::pair<DecryptionKeys, RSA> GenerateKeys();
-    std::shared_ptr<AllocatedFile> CreateReplica(const boost::filesystem::path &filename, const StorageOrder &order);
+    std::shared_ptr<AllocatedFile> CreateReplica(const boost::filesystem::path &filename,
+                                                 const uint256 &fileURI,
+                                                 const DecryptionKeys &keys,
+                                                 RSA *rsa);
     bool SendReplica(const StorageOrder &order, std::shared_ptr<AllocatedFile> pAllocatedFile, CNode* pNode);
     void BackgroundJob();
 
