@@ -260,7 +260,7 @@ int CommandLineRPC(int argc, char* argv[])
                         throw CConnectionFailed("server in warmup");
                     strPrint = "error: " + error.write();
                     nRet = abs(code);
-                    if (error.isObject())
+                    if (error.isObject() && GetBoolArg("-printstringerror", false))
                     {
                         UniValue errCode = find_value(error, "code");
                         UniValue errMsg  = find_value(error, "message");
