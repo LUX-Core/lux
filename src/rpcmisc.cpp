@@ -1532,7 +1532,7 @@ UniValue dfssetfolder(const UniValue& params, bool fHelp)
     fs::path path{params[0].get_str()};
 
     if (!fs::is_directory(path)) {
-        UniValue obj(UniValue::VSTR, "Error! dfssetfolder: directory" + path.string() + " isn't exists");
+        UniValue obj(UniValue::VSTR, "Error! dfssetfolder: directory " + path.string() + " isn't exists");
         return obj;
     }
 
@@ -1561,7 +1561,7 @@ UniValue dfssettempfolder(const UniValue& params, bool fHelp)
     fs::path path{params[0].get_str()};
 
     if (!fs::is_directory(path)) {
-        UniValue obj(UniValue::VSTR, "Error! dfssettempfolder: directory" + path.string() + " isn't exists");
+        UniValue obj(UniValue::VSTR, "Error! dfssettempfolder: directory " + path.string() + " isn't exists");
         return obj;
     }
 
@@ -1598,3 +1598,25 @@ UniValue dfsremoveoldorders(const UniValue& params, bool fHelp)
     return UniValue::VNULL;
 }
 
+UniValue dfsdecrypt(const UniValue& params, bool fHelp)
+{
+    if (fHelp || params.size() != 2)
+        throw runtime_error(
+                "dfsdecrypt \"ordersHash\" \"filePath\"\n"
+                        "\n..TODO..\n"
+                        "\nArgument:\n"
+                        "\"ordersHash\"            (string, required) The hash of announces order\n"
+                        "\"localFilePath\"         (string, required) The path to new decrypted file\n"
+                        "\nResult:\n"
+                        "null\n"
+                        "\nExamples:\n"
+                + HelpExampleCli("dfsdecrypt", "\"cca72157824073c35e010893267a8d843f565cb7f7e53b4fd8f1066a30939f1b\", \"/tmp/123.jpg\"")
+                + HelpExampleRpc("dfsdecrypt", "\"cca72157824073c35e010893267a8d843f565cb7f7e53b4fd8f1066a30939f1b\", \"/tmp/123.jpg\"")
+        );
+
+    auto pathToFile = boost::filesystem::path{params[2].get_str()};
+    auto orderHash = uint256{params[1].get_str()};
+    storageController->DecryptReplica(orderHash, pathToFile);
+
+    return UniValue::VNULL;
+}

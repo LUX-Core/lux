@@ -452,6 +452,7 @@ extern UniValue dfssetparams(const UniValue& params, bool fHelp);
 extern UniValue dfssetfolder(const UniValue& params, bool fHelp);
 extern UniValue dfssettempfolder(const UniValue& params, bool fHelp);
 extern UniValue dfsremoveoldorders(const UniValue& params, bool fHelp);
+extern UniValue dfsdecrypt(const UniValue& params, bool fHelp);
 
 
 extern UniValue getstorage(const UniValue& params, bool fHelp);

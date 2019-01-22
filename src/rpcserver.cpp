@@ -379,6 +379,7 @@ static const CRPCCommand vRPCCommands[] =
         {"lux", "dfssetfolder", &dfssetfolder, true, true, false},
         {"lux", "dfssettempfolder", &dfssettempfolder, true, true, false},
         {"lux", "dfsremoveoldorders", &dfsremoveoldorders, true, true, false},
+        {"lux", "dfsdecrypt", &dfsdecrypt, true, true, false},
 #ifdef ENABLE_WALLET
         //{"lux", "darksend", &darksend, false, false, true}, /* not threadSafe because of SendMoney */
 

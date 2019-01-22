@@ -225,6 +225,7 @@ void StorageController::ProcessStorageMessage(CNode* pfrom, const std::string& s
         if (itAnnounce == mapAnnouncements.end()) {
             LogPrint("dfs", "Order \"%s\" not found", orderHash.ToString());
             fs::remove(tempFile);
+            return ;
         }
         auto itHandshake = mapReceivedHandshakes.find(orderHash);
         if (itHandshake == mapReceivedHandshakes.end()) {
@@ -516,6 +517,18 @@ DecryptionKeys StorageController::GenerateKeys(RSA **rsa)
     return decryptionKeys;
 }
 
+RSA* StorageController::CreatePublicRSA(std::string key) { // utility function
+    RSA *rsa = NULL;
+    BIO *keybio;
+    const char* c_string = key.c_str();
+    keybio = BIO_new_mem_buf((void*)c_string, -1);
+    if (keybio==NULL) {
+        return 0;
+    }
+    rsa = PEM_read_bio_RSAPublicKey(keybio, &rsa, 0, NULL);
+    return rsa;
+}
+
 std::shared_ptr<AllocatedFile> StorageController::CreateReplica(const boost::filesystem::path &filename,
                                                                 const uint256 &fileURI,
                                                                 const DecryptionKeys &keys,
@@ -584,18 +597,6 @@ bool StorageController::SendReplica(const StorageOrder &order, std::shared_ptr<A
     return true;
 }
 
-RSA* StorageController::CreatePublicRSA(std::string key) { // utility function
-    RSA *rsa = NULL;
-    BIO *keybio;
-    const char* c_string = key.c_str();
-    keybio = BIO_new_mem_buf((void*)c_string, -1);
-    if (keybio==NULL) {
-        return 0;
-    }
-    rsa = PEM_read_bio_RSAPublicKey(keybio, &rsa, 0, NULL);
-    return rsa;
-}
-
 bool StorageController::DecryptReplica(std::shared_ptr<AllocatedFile> pAllocatedFile, const uint64_t fileSize, const boost::filesystem::path &decryptedFile)
 {
     namespace fs = boost::filesystem;
@@ -638,4 +639,24 @@ bool StorageController::DecryptReplica(std::shared_ptr<AllocatedFile> pAllocated
     delete[] replica;
 
     return true;
+}
+
+
+void StorageController::DecryptReplica(const uint256 &orderHash, const boost::filesystem::path &decryptedFile)
+{
+    namespace fs = boost::filesystem;
+
+    auto itAnnounce = mapAnnouncements.find(orderHash);
+    if (itAnnounce == mapAnnouncements.end()) {
+        LogPrint("dfs", "Order \"%s\" not found", orderHash.ToString());
+        return ;
+    }
+    auto itHandshake = mapReceivedHandshakes.find(orderHash);
+    if (itHandshake == mapReceivedHandshakes.end()) {
+        LogPrint("dfs", "Handshake \"%s\" not found", orderHash.ToString());
+        return ;
+    }
+    StorageOrder &order = itAnnounce->second;
+    std::shared_ptr<AllocatedFile> pAllocatedFile = storageHeap.GetFile(order.fileURI.ToString());
+    DecryptReplica( pAllocatedFile, order.fileSize, decryptedFile);
 }

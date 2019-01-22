@@ -30,12 +30,12 @@ protected:
 
     bool StartHandshake(const StorageProposal &proposal, const DecryptionKeys &keys);
     DecryptionKeys GenerateKeys(RSA **rsa);
+    RSA* CreatePublicRSA(std::string key);
     std::shared_ptr<AllocatedFile> CreateReplica(const boost::filesystem::path &filename,
                                                  const uint256 &fileURI,
                                                  const DecryptionKeys &keys,
                                                  RSA *rsa);
     bool SendReplica(const StorageOrder &order, std::shared_ptr<AllocatedFile> pAllocatedFile, CNode* pNode);
-    RSA* CreatePublicRSA(std::string key);
     bool DecryptReplica(std::shared_ptr<AllocatedFile> pAllocatedFile, const uint64_t fileSize, const boost::filesystem::path &decryptedFile);
     void BackgroundJob();
 
@@ -59,6 +59,7 @@ public:
     bool AcceptProposal(const StorageProposal &proposal);
     void ClearOldAnnouncments(std::time_t timestamp);
     void ProcessStorageMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv, bool& isStorageCommand);
+    void DecryptReplica(const uint256 &orderHash, const boost::filesystem::path &decryptedFile);
     // Proposals Agent
     //void ListenProposal(const uint256 &orderHash);
     //void StopListenProposal(const uint256 &orderHash);
