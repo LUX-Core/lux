@@ -1,6 +1,7 @@
 #include "storagecontroller.h"
 
 #include <fstream>
+#include <iostream>
 #include <boost/filesystem.hpp>
 
 #include "main.h"
@@ -91,6 +92,8 @@ StorageController::StorageController() : background(boost::bind(&StorageControll
 
 void StorageController::ProcessStorageMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv, bool& isStorageCommand)
 {
+    namespace fs = boost::filesystem;
+
     if (strCommand == "dfsannounce") {
         isStorageCommand = true;
         StorageOrder order;
@@ -208,7 +211,7 @@ void StorageController::ProcessStorageMessage(CNode* pfrom, const std::string& s
     } else if (strCommand == "dfssendfile") {
         isStorageCommand = true;
         ReplicaStream replicaStream;
-        boost::filesystem::path tempFile = tempStorageHeap.GetChunks().back()->path; // TODO: temp usage (SS)
+        fs::path tempFile = tempStorageHeap.GetChunks().back()->path; // TODO: temp usage (SS)
         tempFile /= (std::to_string(std::time(nullptr)) + ".luxfs");
         replicaStream.filestream.open(tempFile.string(), std::ios::binary|std::ios::out);
         if (!replicaStream.filestream.is_open()) {
@@ -219,22 +222,28 @@ void StorageController::ProcessStorageMessage(CNode* pfrom, const std::string& s
         // create true filename and copy file from temp storage to dfs storage
         uint256 orderHash = replicaStream.currenOrderHash;
         auto itAnnounce = mapAnnouncements.find(orderHash);
-        if (itAnnounce != mapAnnouncements.end()) {
-            StorageOrder &order = itAnnounce->second;
-            if (boost::filesystem::file_size(tempFile) != order.fileSize) {
-                LogPrint("dfs", "Wrong file \"%s\" size. real size: %d not equal order size: %d ", order.filename, boost::filesystem::file_size(tempFile), order.fileSize);
-                boost::filesystem::remove(tempFile);
-                return ;
-            }
-            std::shared_ptr<AllocatedFile> file = storageHeap.AllocateFile(order.fileURI.ToString(), GetCryptoReplicaSize(order.fileSize));
-            boost::filesystem::path fullfilename = tempStorageHeap.GetChunks().back()->path;
-            fullfilename /= file->filename;
-            boost::filesystem::rename(tempFile, fullfilename);
-            LogPrint("dfs", "File \"%s\" was uploaded", order.filename);
-        } else {
+        if (itAnnounce == mapAnnouncements.end()) {
             LogPrint("dfs", "Order \"%s\" not found", orderHash.ToString());
-            boost::filesystem::remove(tempFile);
+            fs::remove(tempFile);
         }
+        auto itHandshake = mapReceivedHandshakes.find(orderHash);
+        if (itHandshake == mapReceivedHandshakes.end()) {
+            LogPrint("dfs", "Handshake \"%s\" not found", orderHash.ToString());
+            fs::remove(tempFile);
+            return ;
+        }
+        StorageOrder &order = itAnnounce->second;
+        if (fs::file_size(tempFile) != order.fileSize) {
+            LogPrint("dfs", "Wrong file \"%s\" size. real size: %d not equal order size: %d ", order.filename, boost::filesystem::file_size(tempFile), order.fileSize);
+            fs::remove(tempFile);
+            return ;
+        }
+        std::shared_ptr<AllocatedFile> file = storageHeap.AllocateFile(order.fileURI.ToString(), GetCryptoReplicaSize(order.fileSize));
+        storageHeap.SetDecryptionKeys(file->uri, itHandshake->second.keys.rsaKey, itHandshake->second.keys.aesKey);
+        fs::path fullfilename = tempStorageHeap.GetChunks().back()->path;
+        fullfilename /= file->filename;
+        fs::rename(tempFile, fullfilename);
+        LogPrint("dfs", "File \"%s\" was uploaded", order.filename);
     } else if (strCommand == "dfsping") {
         isStorageCommand = true;
         pfrom->PushMessage("dfspong", pfrom->addr);
@@ -552,6 +561,7 @@ std::shared_ptr<AllocatedFile> StorageController::CreateReplica(const boost::fil
 
 bool StorageController::SendReplica(const StorageOrder &order, std::shared_ptr<AllocatedFile> pAllocatedFile, CNode* pNode)
 {
+    namespace fs = boost::filesystem;
     if (!pNode) {
         LogPrint("dfs", "Node does not found");
         return false;
@@ -566,6 +576,66 @@ bool StorageController::SendReplica(const StorageOrder &order, std::shared_ptr<A
     pNode->PushMessage("dfssendfile", replicaStream);
 
     replicaStream.filestream.close();
-    boost::filesystem::remove(pAllocatedFile->filename);
+
+//    fs::path tempFile = tempStorageHeap.GetChunks().back()->path; // TODO: temp usage (SS)
+//    tempFile /= ("decrypt" + std::to_string(std::time(nullptr)) + ".luxfs");
+//    DecryptReplica(pAllocatedFile, order.fileSize, tempFile);
+    fs::remove(pAllocatedFile->filename);
+    return true;
+}
+
+RSA* StorageController::CreatePublicRSA(std::string key) { // utility function
+    RSA *rsa = NULL;
+    BIO *keybio;
+    const char* c_string = key.c_str();
+    keybio = BIO_new_mem_buf((void*)c_string, -1);
+    if (keybio==NULL) {
+        return 0;
+    }
+    rsa = PEM_read_bio_RSAPublicKey(keybio, &rsa, 0, NULL);
+    return rsa;
+}
+
+bool StorageController::DecryptReplica(std::shared_ptr<AllocatedFile> pAllocatedFile, const uint64_t fileSize, const boost::filesystem::path &decryptedFile)
+{
+    namespace fs = boost::filesystem;
+
+    RSA *rsa = CreatePublicRSA(DecryptionKeys::ToString(pAllocatedFile->keys.rsaKey));
+
+    std::ifstream filein;
+    filein.open(pAllocatedFile->filename.c_str(), std::ios::binary);
+    if (!filein.is_open()) {
+        LogPrint("dfs", "file %s cannot be opened", pAllocatedFile->filename);
+        return false;
+    }
+
+    auto length = fs::file_size(pAllocatedFile->filename);
+    auto bytesSize = fileSize;
+
+    std::ofstream outfile;
+    outfile.open(decryptedFile.string().c_str(), std::ios::binary);
+
+    size_t sizeBuffer = nBlockSizeRSA - 2;
+    byte *buffer = new byte[sizeBuffer];
+    byte *replica = new byte[nBlockSizeRSA];
+    while(!filein.eof())
+    {
+        auto n = filein.readsome((char *)replica, nBlockSizeRSA);
+        if (n <= 0) {
+            break;
+        }
+        if (n != nBlockSizeRSA) {
+            LogPrint("dfs", "file %s cannot be read", pAllocatedFile->filename);
+        }
+        DecryptData(replica, 0, sizeBuffer, buffer, pAllocatedFile->keys.aesKey, rsa);
+        outfile.write((char *) buffer, std::min(sizeBuffer, bytesSize));
+        bytesSize -= sizeBuffer;
+        // TODO: check write (SS)
+    }
+    filein.close();
+    outfile.close();
+    delete[] buffer;
+    delete[] replica;
+
     return true;
 }

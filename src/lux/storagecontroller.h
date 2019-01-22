@@ -35,6 +35,8 @@ protected:
                                                  const DecryptionKeys &keys,
                                                  RSA *rsa);
     bool SendReplica(const StorageOrder &order, std::shared_ptr<AllocatedFile> pAllocatedFile, CNode* pNode);
+    RSA* CreatePublicRSA(std::string key);
+    bool DecryptReplica(std::shared_ptr<AllocatedFile> pAllocatedFile, const uint64_t fileSize, const boost::filesystem::path &decryptedFile);
     void BackgroundJob();
 
 public:
