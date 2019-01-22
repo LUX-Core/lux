@@ -1241,8 +1241,8 @@ UniValue dfsannounce(const UniValue& params, bool fHelp)
     StorageOrder order{};
     boost::filesystem::path path{params[0].get_str()};
 
-    order.fileURI = SerializeHash(path.string(), SER_GETHASH, 0);
     order.filename = path.filename().string();
+    order.fileURI = SerializeHash(order.filename, SER_GETHASH, 0);
     order.time = std::time(nullptr);
     order.storageUntil = order.time + std::stoi(params[1].get_str()) * 24 * 60 * 60;
     order.fileSize = boost::filesystem::file_size(path);

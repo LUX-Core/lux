@@ -11,7 +11,7 @@
 
 std::unique_ptr<StorageController> storageController;
 
-struct FileStream
+struct ReplicaStream
 {
     const std::size_t BUFFER_SIZE = 4 * 1024;
     std::fstream filestream;
@@ -187,7 +187,7 @@ void StorageController::ProcessStorageMessage(CNode* pfrom, const std::string& s
 //                state->nMisbehavior += 10;
 //            }
         }
-    } else if (strCommand == "dfsrr") {
+    } else if (strCommand == "dfsrr") { // dfs request replica
         isStorageCommand = true;
         StorageHandshake handshake;
         vRecv >> handshake;
@@ -207,15 +207,34 @@ void StorageController::ProcessStorageMessage(CNode* pfrom, const std::string& s
         }
     } else if (strCommand == "dfssendfile") {
         isStorageCommand = true;
-        FileStream fileStream;
-        boost::filesystem::path fullFilename = storageHeap.GetChunks().back()->path;
-        fullFilename /= (std::to_string(std::time(nullptr)) + ".luxfs");
-        fileStream.filestream.open(fullFilename.string(), std::ios::binary|std::ios::out);
-        if (!fileStream.filestream.is_open()) {
-            LogPrint("dfs", "file %s cannot be opened", fullFilename);
+        ReplicaStream replicaStream;
+        boost::filesystem::path tempFile = tempStorageHeap.GetChunks().back()->path; // TODO: temp usage (SS)
+        tempFile /= (std::to_string(std::time(nullptr)) + ".luxfs");
+        replicaStream.filestream.open(tempFile.string(), std::ios::binary|std::ios::out);
+        if (!replicaStream.filestream.is_open()) {
+            LogPrint("dfs", "File \"%s\" cannot be opened", tempFile);
             return ;
         }
-        vRecv >> fileStream;
+        vRecv >> replicaStream;
+        // create true filename and copy file from temp storage to dfs storage
+        uint256 orderHash = replicaStream.currenOrderHash;
+        auto itAnnounce = mapAnnouncements.find(orderHash);
+        if (itAnnounce != mapAnnouncements.end()) {
+            StorageOrder &order = itAnnounce->second;
+            if (boost::filesystem::file_size(tempFile) != order.fileSize) {
+                LogPrint("dfs", "Wrong file \"%s\" size. real size: %d not equal order size: %d ", order.filename, boost::filesystem::file_size(tempFile), order.fileSize);
+                boost::filesystem::remove(tempFile);
+                return ;
+            }
+            std::shared_ptr<AllocatedFile> file = storageHeap.AllocateFile(order.fileURI.ToString(), GetCryptoReplicaSize(order.fileSize));
+            boost::filesystem::path fullfilename = tempStorageHeap.GetChunks().back()->path;
+            fullfilename /= file->filename;
+            boost::filesystem::rename(tempFile, fullfilename);
+            LogPrint("dfs", "File \"%s\" was uploaded", order.filename);
+        } else {
+            LogPrint("dfs", "Order \"%s\" not found", orderHash.ToString());
+            boost::filesystem::remove(tempFile);
+        }
     } else if (strCommand == "dfsping") {
         isStorageCommand = true;
         pfrom->PushMessage("dfspong", pfrom->addr);
@@ -465,12 +484,12 @@ DecryptionKeys StorageController::GenerateKeys(RSA **rsa)
     const BIGNUM *rsa_n;
     // search for rsa->n > 0x0000ff...126 bytes...ff
     {
-        (*rsa) = RSA_generate_key(nBlockSizeRSA * 8, 3, nullptr, nullptr);
+        *rsa = RSA_generate_key(nBlockSizeRSA * 8, 3, nullptr, nullptr);
         BIGNUM *minModulus = GetMinModulus();
-        RSA_get0_key((*rsa), &rsa_n, nullptr, nullptr);
+        RSA_get0_key(*rsa, &rsa_n, nullptr, nullptr);
         while (BN_ucmp(minModulus, rsa_n) >= 0) {
-            RSA_free((*rsa));
-            (*rsa) = RSA_generate_key(nBlockSizeRSA * 8, 3, nullptr, nullptr);
+            RSA_free(*rsa);
+            *rsa = RSA_generate_key(nBlockSizeRSA * 8, 3, nullptr, nullptr);
         }
         BN_free(minModulus);
     }
@@ -478,7 +497,7 @@ DecryptionKeys StorageController::GenerateKeys(RSA **rsa)
     const AESKey aesKey(chAESKey, chAESKey + sizeof(chAESKey)/sizeof(*chAESKey));
 
     BIO *pub = BIO_new(BIO_s_mem());
-    PEM_write_bio_RSAPublicKey(pub, (*rsa));
+    PEM_write_bio_RSAPublicKey(pub, *rsa);
     size_t publicKeyLength = BIO_pending(pub);
     char *rsaPubKey = new char[publicKeyLength + 1];
     BIO_read(pub, rsaPubKey, publicKeyLength);
@@ -537,14 +556,16 @@ bool StorageController::SendReplica(const StorageOrder &order, std::shared_ptr<A
         LogPrint("dfs", "Node does not found");
         return false;
     }
-    FileStream fileStream;
-    fileStream.currenOrderHash = order.GetHash();
-    fileStream.filestream.open(pAllocatedFile->filename, std::ios::binary|std::ios::in);
-    if (!fileStream.filestream.is_open()) {
+    ReplicaStream replicaStream;
+    replicaStream.currenOrderHash = order.GetHash();
+    replicaStream.filestream.open(pAllocatedFile->filename, std::ios::binary|std::ios::in);
+    if (!replicaStream.filestream.is_open()) {
         LogPrint("dfs", "file %s cannot be opened", pAllocatedFile->filename);
         return false;
     }
-    pNode->PushMessage("dfssendfile", fileStream);
+    pNode->PushMessage("dfssendfile", replicaStream);
 
+    replicaStream.filestream.close();
+    boost::filesystem::remove(pAllocatedFile->filename);
     return true;
 }
