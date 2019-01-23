@@ -616,7 +616,7 @@ bool StorageController::DecryptReplica(std::shared_ptr<AllocatedFile> pAllocated
     std::ofstream outfile;
     outfile.open(decryptedFile.string().c_str(), std::ios::binary);
 
-    size_t sizeBuffer = nBlockSizeRSA - 2;
+    uint64_t sizeBuffer = nBlockSizeRSA - 2;
     byte *buffer = new byte[sizeBuffer];
     byte *replica = new byte[nBlockSizeRSA];
     while(!filein.eof())
