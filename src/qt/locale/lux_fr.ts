@@ -607,7 +607,7 @@ Cliquer sur &quot;Crypter la clé&quot; pour signer et encrypter la clé privée
     </message>
     <message>
         <source>&amp;Unlock Wallet...</source>
-        <translation>Déverro&amp;uiller le portefeuille</translation>
+        <translation>&amp;Déverrouiller le portefeuille</translation>
     </message>
     <message>
         <source>Unlock wallet</source>
@@ -615,7 +615,7 @@ Cliquer sur &quot;Crypter la clé&quot; pour signer et encrypter la clé privée
     </message>
     <message>
         <source>&amp;Lock Wallet</source>
-        <translation>Verroui&amp;ller le portefeuille</translation>
+        <translation>&amp;Verrouiller le portefeuille</translation>
     </message>
     <message>
         <source>&amp;Backup Wallet...</source>
@@ -1055,7 +1055,7 @@ MultiSend: %1</translation>
     </message>
     <message>
         <source>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;unlocked&lt;/b&gt; for anonymization and staking only</source>
-        <translation>Le portefeuille est &lt;b&gt;encrypté&lt;/b&gt; et &lt;b&gt;dévérouillé&lt;/b&gt; pour l&apos;anonymisation et le PoS</translation>
+        <translation>Le portefeuille est &lt;b&gt;encrypté&lt;/b&gt; et &lt;b&gt;déverrouillé&lt;/b&gt; pour l&apos;anonymisation et le PoS</translation>
     </message>
     <message>
         <source>A fatal error occurred. LUX can no longer continue safely and will quit.</source>
@@ -1082,7 +1082,7 @@ MultiSend: %1</translation>
     </message>
     <message>
         <source>Not all transactions will be shown and block explorer is not available while running in pruned mode. To view all transactions you need to set txindex=1 in the configuration file (lux.conf).</source>
-        <translation>Toutes les transaction ne seront pas affichés. Pour voir toutes les transactions, vous devez régler txindex=1 dans le fichier de configuration (lux.conf).</translation>
+        <translation>Certaines transactions ne seront pas affichées. Pour voir toutes les transactions, vous devez définir txindex=1 dans le fichier de configuration (lux.conf).</translation>
     </message>
     <message>
         <source>Blockchain Explorer</source>
@@ -1511,11 +1511,11 @@ MultiSend: %1</translation>
     </message>
     <message>
         <source>toggle lock state</source>
-        <translation>(Dé)vérouiller</translation>
+        <translation>(Dé)verrouiller</translation>
     </message>
     <message>
         <source>(1 locked)</source>
-        <translation>(1 vérouillé)</translation>
+        <translation>(1 verrouillé)</translation>
     </message>
     <message>
         <source>Received with label</source>
@@ -1535,7 +1535,7 @@ MultiSend: %1</translation>
     </message>
     <message>
         <source>Unlock unspent</source>
-        <translation>Dévérouiller entrée</translation>
+        <translation>Déverrouiller entrée</translation>
     </message>
     <message>
         <source>Copy bytes</source>
@@ -3504,7 +3504,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Wallet is locked and user declined to unlock. Disabling Darksend.</source>
-        <translation>Le portefeuille est toujours vérouillé. Désactivation de Luxsend.</translation>
+        <translation>Le portefeuille est toujours verrouillé. Désactivation de Luxsend.</translation>
     </message>
 </context>
 <context>
@@ -4915,7 +4915,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Error: The wallet was unlocked only to anonymize and stake coins.</source>
-        <translation>Erreur: Le portefeuille n&apos;est dévérouillé que pour l&apos;anonymisation et le PoS.</translation>
+        <translation>Erreur: Le portefeuille n&apos;est déverrouillé que pour l&apos;anonymisation et le PoS.</translation>
     </message>
     <message>
         <source>A fee %1 times higher than %2 per kB is considered an insanely high fee.</source>
@@ -4923,7 +4923,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Error: The wallet was unlocked only to anonymize coins. Unlock canceled.</source>
-        <translation>Erreur: Le portefeuille n&apos;est dévérouillé que pour l&apos;anonymisation. Dévérouillage annulé.</translation>
+        <translation>Erreur: Le portefeuille n&apos;est déverrouillé que pour l&apos;anonymisation. Déverrouillage annulé.</translation>
     </message>
     <message>
         <source>Warning: Invalid LUX address</source>
