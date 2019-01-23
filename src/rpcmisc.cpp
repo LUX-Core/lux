@@ -1220,18 +1220,18 @@ UniValue dfsannounce(const UniValue& params, bool fHelp)
 {
     if (fHelp || !(params.size() == 3 || params.size() == 4))
         throw runtime_error(
-                "dfsannounce \"localFilePath\", daysToKeep, fileCostInCoins\n"
-                "\nAnnounces a file order.\n"
+                "dfsannounce\n"
+                "\nAnnounces a file order and send to node with best price.\n"
                 "\nArgument:\n"
                 "1. \"localFilePath\"         (string, required) The local file path of file\n"
                 "2. daysToKeep                (numeric, required) The days to keep\n"
                 "3. fileCostInCoins           (numeric, required) The file cost in coins\n"
-                "4. maxGap                    (numeric, optional) ..TODO..\n"
+                "4. maxGap                    (numeric, optional) Max number of blocks, which can be mined between proofs\n"
                 "\nResult:\n"
                 "order hash\n"
                 "\nExamples:\n"
                 + HelpExampleCli("dfsannounce", "\"/tmp/123.jpg\" 1 0.3")
-                + HelpExampleRpc("dfsannounce", "\"/tmp/123.jpg\", 1, 0.3")
+                + HelpExampleRpc("dfsannounce", "\"/tmp/123.jpg\" 1 0.3")
         );
 
     if (storageController->address.IsTor() || !storageController->address.IsValid()) {
@@ -1265,15 +1265,15 @@ UniValue dfscancelorder(const UniValue& params, bool fHelp)
 {
     if (fHelp || params.size() != 1)
         throw runtime_error(
-                "dfscancelorder \"order's hash\"\n"
+                "dfscancelorder\n"
                         "\nCancel announces order.\n"
                         "\nArgument:\n"
-                        "    \"hash order\"         (string, required) The hash of announces order\n"
+                        "1. \"hash order\"         (string, required) The hash of announces order\n"
                         "\nResult:\n"
                         "null\n"
                         "\nExamples:\n"
-                + HelpExampleCli("dfscancelorder", "\"..TODO..\"")
-                + HelpExampleRpc("dfscancelorder", "\"..TODO..\"")
+                + HelpExampleCli("dfscancelorder", "cca72157824073c35e010893267a8d843f565cb7f7e53b4fd8f1066a30939f1b")
+                + HelpExampleRpc("dfscancelorder", "cca72157824073c35e010893267a8d843f565cb7f7e53b4fd8f1066a30939f1b")
         );
 
     uint256 hash = uint256{params[0].get_str()};
@@ -1287,15 +1287,15 @@ UniValue dfsgetinfo(const UniValue& params, bool fHelp)
     if (fHelp || params.size())
         throw runtime_error(
                         "dfsgetinfo\n"
-                        "Returns ..TODO..\n"
+                        "Returns an object containing various state dfs info.\n"
                         "\nResult:\n"
                         "{\n"
-                        "  \"enabled\": true|false,     (boolean) ..TODO..\n"
-                        "  \"myip\": \"...\",           (string) ..TODO..\n"
-                        "  \"dfsfolder\": \"...\",      (string) path to data folder\n"
-                        "  \"dfstempfolder\": \"...\",  (string) path to temp folder\n"
-                        "  \"rate\": xxxxxxxx,          (numeric) ..TODO..\n"
-                        "  \"maxblocksgap\": xxxxxx,    (numeric) max number of blocks, which can be mined between proofs\n"
+                        "  \"enabled\": true|false,     (boolean) Use the node to save files in dfs\n"
+                        "  \"myip\": \"...\",           (string) White ip and port this node, using for dfs connection\n"
+                        "  \"dfsfolder\": \"...\",      (string) The path to dfs data folder\n"
+                        "  \"dfstempfolder\": \"...\",  (string) The path to dfs temp folder\n"
+                        "  \"rate\": n,                 (numeric) The rate for save file in this node\n"
+                        "  \"maxblocksgap\": n,         (numeric) Max number of blocks, which can be mined between proofs\n"
                         "}\n"
                         "\nExamples:\n"
                 + HelpExampleCli("dfsgetinfo", "") + HelpExampleRpc("dfsgetinfo", ""));
@@ -1319,17 +1319,18 @@ UniValue dfslistorders(const UniValue& params, bool fHelp)
     if (fHelp || params.size())
         throw runtime_error(
                 "dfslistorders\n"
-                        "\nReturns array of orders\n"
+                        "\nReturns an array of orders\n"
                         "\nResult\n"
                         "[                   (array of json object)\n"
                         "  {\n"
-                        "    \"orderhash\" : \"hash\",   (string) the order hash \n"
-                        "    \"time\" : timestamp,       (numeric) the create order time\n"
-                        "    \"filename\" : \"...\",     (string) ..TODO..\n"
+                        "    \"orderhash\" : \"hash\",   (string) The order hash \n"
+                        "    \"time\" : timestamp,       (numeric) The create order time\n"
+                        "    \"fileURI\" : \"hash\",     (string) The file id in dfs\n"
+                        "    \"filename\" : \"...\",     (string) usual file name\n"
                         "    \"address\" : \"address\",  (string) the ip address node which create order\n"
-                        "    \"untiltime\" : timestamp,  (numeric) ..TODO..\n"
-                        "    \"filesize\" : n,           (numeric) ..TODO..\n"
-                        "    \"rate\" : n                (numeric) ..TODO..\n"
+                        "    \"untiltime\" : timestamp,  (numeric) paid time for save file\n"
+                        "    \"filesize\" : n,           (numeric) size of file\n"
+                        "    \"rate\" : n                (numeric) rate for save file in this node\n"
                         "    \"blockgap\" : n            (numeric) max number of blocks, which can be mined between proofs\n"
                         "  }\n"
                         "  ,...\n"
@@ -1369,16 +1370,16 @@ UniValue dfslistproposals(const UniValue& params, bool fHelp)
                         "\nResult\n"
                         "[                   (array of json object)\n"
                         "  {\n"
-                        "    \"order hash\" : \"hash\",  (string) the order hash \n"
-                        "    \"time\" : timestamp,       (numeric) the create proposal time\n"
-                        "    \"address\" : \"address\",  (string) the ip address node which create proposal\n"
-                        "    \"rate\" : n                (numeric) ..TODO..\n"
+                        "    \"order hash\" : \"hash\",  (string) The order hash \n"
+                        "    \"time\" : timestamp,       (numeric) The create proposal time\n"
+                        "    \"address\" : \"address\",  (string) ip address node which create proposal\n"
+                        "    \"rate\" : n                (numeric) The price (1 Kb * 1 second / 1 satoshis-lux) node which create proposal\n"
                         "  }\n"
                         "  ,...\n"
                         "]\n"
                         "\nExamples\n"
-                + HelpExampleCli("dfslistproposals", "..TODO..")
-                + HelpExampleRpc("dfslistproposals", "..TODO.."));
+                + HelpExampleCli("dfslistproposals", "cca72157824073c35e010893267a8d843f565cb7f7e53b4fd8f1066a30939f1b")
+                + HelpExampleRpc("dfslistproposals", "cca72157824073c35e010893267a8d843f565cb7f7e53b4fd8f1066a30939f1b"));
 
     UniValue result(UniValue::VARR);
     std::vector<StorageProposal> proposals = storageController->proposalsAgent.GetProposals(uint256{params[0].get_str()});
@@ -1409,8 +1410,8 @@ UniValue dfslocalstorage(const UniValue& params, bool fHelp)
                         "  ,...\n"
                         "]\n"
                         "\nExamples\n"
-                + HelpExampleCli("dfslocalstorage", "..TODO..")
-                + HelpExampleRpc("dfslocalstorage", "..TODO.."));
+                + HelpExampleCli("dfslocalstorage", "")
+                + HelpExampleRpc("dfslocalstorage", ""));
 
     UniValue result(UniValue::VARR);
     const auto chunks = storageController->storageHeap.GetChunks();
@@ -1469,13 +1470,13 @@ UniValue dfsacceptproposal(const UniValue& params, bool fHelp)
                 "dfsacceptproposal\n"
                         "\n..TODO..\n"
                         "\nArguments:\n"
-                        "    \"orders hash\"             (string, required) The hash of announces order\n"
-                        "    \"proposals hash\"          (string, required) The hash of proposal\n"
+                        "1. \"orders hash\"             (string, required) The hash of announces order\n"
+                        "2. \"proposals hash\"          (string, required) The hash of proposal\n"
                         "\nResult:\n"
                         "null\n"
                         "\nExamples\n"
-                + HelpExampleCli("dfsacceptproposal", "..TODO..")
-                + HelpExampleRpc("dfsacceptproposal", "..TODO.."));
+                + HelpExampleCli("dfsacceptproposal", "cca72157824073c35e010893267a8d843f565cb7f7e53b4fd8f1066a30939f1b")
+                + HelpExampleRpc("dfsacceptproposal", "cca72157824073c35e010893267a8d843f565cb7f7e53b4fd8f1066a30939f1b cca72157824073c35e010893267a8d843f565cb7f7e53b4fd8f1066a30939f1b"));
 
     uint256 orderHash = uint256{params[0].get_str()};
     StorageProposal proposal = storageController->proposalsAgent.GetProposal(orderHash, uint256{params[1].get_str()});
@@ -1491,10 +1492,10 @@ UniValue dfssetparams(const UniValue& params, bool fHelp)
     if (fHelp || params.size() != 2)
         throw runtime_error(
                 "dfssetparams\n"
-                        "\n..TODO..\n"
+                        "\nSet parameters for storage\n"
                         "\nArguments:\n"
-                        "  \"min rate\": xxxxxxxx,       (numeric, required) ..TODO..\n"
-                        "  \"max blocks gap\": xxxxxx,   (numeric, required) ..TODO..\n"
+                        "1. \"min rate\": n,         (numeric, required) rate for save file in this node\n"
+                        "2. \"max blocks gap\": n,   (numeric, required) max number of blocks, which can be mined between proofs\n"
                         "\nResult:\n"
                         "null\n"
                         "\nExamples\n"
@@ -1577,9 +1578,9 @@ UniValue dfsremoveoldorders(const UniValue& params, bool fHelp)
     if (fHelp || params.size() > 1)
         throw runtime_error(
                 "dfsremoveoldorders\n"
-                        "\n..TODO..\n"
+                        "\nRemove orders created earlier the previous week or selected time\n"
                         "\nArguments:\n"
-                        "  \"time\": xxxxxxxx,       (numeric, optional) ..TODO..\n"
+                        "1. \"time\": xxxxxxxx,       (numeric, optional) \n"
                         "\nResult:\n"
                         "null\n"
                         "\nExamples\n"
@@ -1603,15 +1604,15 @@ UniValue dfsdecrypt(const UniValue& params, bool fHelp)
     if (fHelp || params.size() != 2)
         throw runtime_error(
                 "dfsdecrypt \"ordersHash\" \"filePath\"\n"
-                        "\n..TODO..\n"
+                        "\nDecrypt crypto-replica file\n"
                         "\nArgument:\n"
-                        "\"ordersHash\"            (string, required) The hash of announces order\n"
-                        "\"localFilePath\"         (string, required) The path to new decrypted file\n"
+                        "1. \"ordersHash\"            (string, required) The hash of announces order\n"
+                        "2. \"localFilePath\"         (string, required) The path to new decrypted file\n"
                         "\nResult:\n"
                         "null\n"
                         "\nExamples:\n"
-                + HelpExampleCli("dfsdecrypt", "\"cca72157824073c35e010893267a8d843f565cb7f7e53b4fd8f1066a30939f1b\", \"/tmp/123.jpg\"")
-                + HelpExampleRpc("dfsdecrypt", "\"cca72157824073c35e010893267a8d843f565cb7f7e53b4fd8f1066a30939f1b\", \"/tmp/123.jpg\"")
+                + HelpExampleCli("dfsdecrypt", "cca72157824073c35e010893267a8d843f565cb7f7e53b4fd8f1066a30939f1b, \"/tmp/123.jpg\"")
+                + HelpExampleRpc("dfsdecrypt", "cca72157824073c35e010893267a8d843f565cb7f7e53b4fd8f1066a30939f1b, \"/tmp/123.jpg\"")
         );
 
     auto pathToFile = boost::filesystem::path{params[2].get_str()};
