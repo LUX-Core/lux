@@ -566,7 +566,6 @@ void BitcoinGUI::createActions() {
     checkForUpdateAction = new QAction(QIcon(":/icons/update_black"), tr("Check for &Update"), this);
     checkForUpdateAction->setStatusTip(tr("Check whether there is an updated wallet from Luxcore"));
     checkForUpdateAction->setMenuRole(QAction::NoRole);
-    checkForUpdateAction->setVisible(false);
 #endif
 
 #if QT_VERSION < 0x050000
