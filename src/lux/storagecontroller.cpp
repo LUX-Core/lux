@@ -25,32 +25,28 @@ struct ReplicaStream
 
         if (!ser_action.ForRead()) {
             READWRITE(currenOrderHash);
-            while (!filestream.eof()) {
-                buf.resize(BUFFER_SIZE);
-                buf.resize(filestream.readsome(&buf[0], buf.size()));
-
+            const auto order = storageController->mapAnnouncements[currenOrderHash];
+            const auto fileSize = GetCryptoReplicaSize(order.fileSize);
+            for (auto i = 0u; i < fileSize;) {
+                size_t n = std::min(BUFFER_SIZE, fileSize - i);
+                buf.resize(n);
+                filestream.read(&buf[0], n);
                 if (buf.empty()) {
                     break;
                 }
                 READWRITE(buf);
+                i += buf.size();
             }
         } else {
             READWRITE(currenOrderHash);
-
             if (storageController->mapAnnouncements.count(currenOrderHash) != 0) {
                 const auto order = storageController->mapAnnouncements[currenOrderHash];
                 const auto fileSize = GetCryptoReplicaSize(order.fileSize);
-                const auto tailSize = fileSize % BUFFER_SIZE;
 
-                for (auto i = 0u; i < fileSize; i += BUFFER_SIZE) {
+                for (auto i = 0u; i < fileSize;) {
                     READWRITE(buf);
                     filestream.write(&buf[0], buf.size());
-                }
-
-                if (tailSize > 0) {
-                    buf.resize(tailSize);
-                    READWRITE(buf);
-                    filestream.write(&buf[0], buf.size());
+                    i += buf.size();
                 }
             }
         }
@@ -234,8 +230,8 @@ void StorageController::ProcessStorageMessage(CNode* pfrom, const std::string& s
             return ;
         }
         StorageOrder &order = itAnnounce->second;
-        if (fs::file_size(tempFile) != order.fileSize) {
-            LogPrint("dfs", "Wrong file \"%s\" size. real size: %d not equal order size: %d ", order.filename, boost::filesystem::file_size(tempFile), order.fileSize);
+        if (fs::file_size(tempFile) != GetCryptoReplicaSize(order.fileSize)) {
+            LogPrint("dfs", "Wrong file \"%s\" size. real size: %d not equal order size: %d ", order.filename, fs::file_size(tempFile),  GetCryptoReplicaSize(order.fileSize));
             fs::remove(tempFile);
             return ;
         }
@@ -362,7 +358,7 @@ bool StorageController::AcceptProposal(const StorageProposal &proposal)
     CNode* pNode = FindNode(proposal.address);
     if (it != mapReceivedHandshakes.end()) {
         auto itFile = mapLocalFiles.find(proposal.orderHash);
-        auto pAllocatedFile = CreateReplica(itFile->second, order.fileURI, keys, rsa);
+        auto pAllocatedFile = CreateReplica(itFile->second, order, keys, rsa);
         if (pNode) {
             if (!SendReplica(order, pAllocatedFile, pNode)) {
                 RSA_free(rsa);
@@ -530,7 +526,7 @@ RSA* StorageController::CreatePublicRSA(std::string key) { // utility function
 }
 
 std::shared_ptr<AllocatedFile> StorageController::CreateReplica(const boost::filesystem::path &filename,
-                                                                const uint256 &fileURI,
+                                                                const StorageOrder &order,
                                                                 const DecryptionKeys &keys,
                                                                 RSA *rsa)
 {
@@ -545,7 +541,7 @@ std::shared_ptr<AllocatedFile> StorageController::CreateReplica(const boost::fil
 
     auto length = fs::file_size(filename);
 
-    std::shared_ptr<AllocatedFile> tempFile = tempStorageHeap.AllocateFile(fileURI.ToString(), GetCryptoReplicaSize(length));
+    std::shared_ptr<AllocatedFile> tempFile = tempStorageHeap.AllocateFile(order.fileURI.ToString(), GetCryptoReplicaSize(length));
 
     std::ofstream outfile;
     outfile.open(tempFile->filename, std::ios::binary);
@@ -553,12 +549,14 @@ std::shared_ptr<AllocatedFile> StorageController::CreateReplica(const boost::fil
     size_t sizeBuffer = nBlockSizeRSA - 2;
     byte *buffer = new byte[sizeBuffer];
     byte *replica = new byte[nBlockSizeRSA];
-    while(!filein.eof())
+    for (auto i = 0; i < order.fileSize; i+= sizeBuffer)
     {
-        auto n = filein.readsome((char *)buffer, sizeBuffer);
-        if (n <= 0) {
-            break;
-        }
+        size_t n = std::min(sizeBuffer, order.fileSize - i);
+
+        filein.read((char *)buffer, n);
+//        if (n < sizeBuffer) {
+//            std::cout << "tail " << n << std::endl;
+//        }
         EncryptData(buffer, 0, n, replica, keys.aesKey, rsa);
         outfile.write((char *) replica, nBlockSizeRSA);
         // TODO: check write (SS)
@@ -566,6 +564,7 @@ std::shared_ptr<AllocatedFile> StorageController::CreateReplica(const boost::fil
     tempStorageHeap.SetDecryptionKeys(tempFile->uri, keys.rsaKey, keys.aesKey);
     filein.close();
     outfile.close();
+    std::cout << "replica size: " << fs::file_size(tempFile->filename) << std::endl;
     delete[] buffer;
     delete[] replica;
 

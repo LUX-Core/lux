@@ -32,7 +32,7 @@ protected:
     DecryptionKeys GenerateKeys(RSA **rsa);
     RSA* CreatePublicRSA(std::string key);
     std::shared_ptr<AllocatedFile> CreateReplica(const boost::filesystem::path &filename,
-                                                 const uint256 &fileURI,
+                                                 const StorageOrder &order,
                                                  const DecryptionKeys &keys,
                                                  RSA *rsa);
     bool SendReplica(const StorageOrder &order, std::shared_ptr<AllocatedFile> pAllocatedFile, CNode* pNode);
