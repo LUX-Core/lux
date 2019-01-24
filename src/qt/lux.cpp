@@ -154,7 +154,12 @@ static void initTranslations(QTranslator& qtTranslatorBase, QTranslator& qtTrans
         QApplication::installTranslator(&translator);
 }
 
-/* qDebug() message handler --> debug.log */
+/*  qDebug() message handler --> debug.log 
+
+    Also includes a very basic warning suppressor, we want to use it to remove useless clutter from the debug log. It currently 
+    suppresses warnings from broken QT functionality (QFont's setPixelSize unwarranted "warnings")
+
+*/
 #if QT_VERSION < 0x050000
 void DebugMessageHandler(QtMsgType type, const char* msg)
 {
@@ -169,7 +174,7 @@ void DebugMessageHandler(QtMsgType type, const QMessageLogContext& context, cons
 {
     Q_UNUSED(context);
     const char* category = (type == QtDebugMsg) ? "qt" : NULL;
-    if (msg == "QFont::setPixelSize: Pixel size <= 0 (0)" || msg == "PaymentServer::LoadRootCAs : Loaded  134  root certificates") {
+    if (msg == "QFont::setPixelSize: Pixel size <= 0 (0)") {
         return; 
     }
     else LogPrint(category, "GUI: %s\n", msg.toStdString());
