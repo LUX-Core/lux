@@ -30,7 +30,7 @@ struct ReplicaStream
             for (auto i = 0u; i < fileSize;) {
                 size_t n = std::min(BUFFER_SIZE, fileSize - i);
                 buf.resize(n);
-                filestream.read(&buf[0], n);
+`                filestream.read(&buf[0], n);  // TODO: change to loop of readsome
                 if (buf.empty()) {
                     break;
                 }
@@ -215,6 +215,8 @@ void StorageController::ProcessStorageMessage(CNode* pfrom, const std::string& s
             return ;
         }
         vRecv >> replicaStream;
+
+        replicaStream.filestream.close();
         // create true filename and copy file from temp storage to dfs storage
         uint256 orderHash = replicaStream.currenOrderHash;
         auto itAnnounce = mapAnnouncements.find(orderHash);
@@ -237,9 +239,7 @@ void StorageController::ProcessStorageMessage(CNode* pfrom, const std::string& s
         }
         std::shared_ptr<AllocatedFile> file = storageHeap.AllocateFile(order.fileURI.ToString(), GetCryptoReplicaSize(order.fileSize));
         storageHeap.SetDecryptionKeys(file->uri, itHandshake->second.keys.rsaKey, itHandshake->second.keys.aesKey);
-        fs::path fullfilename = tempStorageHeap.GetChunks().back()->path;
-        fullfilename /= file->filename;
-        fs::rename(tempFile, fullfilename);
+        fs::rename(tempFile, file->filename);
         LogPrint("dfs", "File \"%s\" was uploaded", order.filename);
     } else if (strCommand == "dfsping") {
         isStorageCommand = true;
@@ -553,7 +553,7 @@ std::shared_ptr<AllocatedFile> StorageController::CreateReplica(const boost::fil
     {
         size_t n = std::min(sizeBuffer, order.fileSize - i);
 
-        filein.read((char *)buffer, n);
+        filein.read((char *)buffer, n); // TODO: change to loop of readsome
 //        if (n < sizeBuffer) {
 //            std::cout << "tail " << n << std::endl;
 //        }
@@ -592,6 +592,7 @@ bool StorageController::SendReplica(const StorageOrder &order, std::shared_ptr<A
 //    fs::path tempFile = tempStorageHeap.GetChunks().back()->path; // TODO: temp usage (SS)
 //    tempFile /= ("decrypt" + std::to_string(std::time(nullptr)) + ".luxfs");
 //    DecryptReplica(pAllocatedFile, order.fileSize, tempFile);
+    tempStorageHeap.FreeFile(pAllocatedFile->uri);
     fs::remove(pAllocatedFile->filename);
     return true;
 }
@@ -618,15 +619,10 @@ bool StorageController::DecryptReplica(std::shared_ptr<AllocatedFile> pAllocated
     uint64_t sizeBuffer = nBlockSizeRSA - 2;
     byte *buffer = new byte[sizeBuffer];
     byte *replica = new byte[nBlockSizeRSA];
-    while(!filein.eof())
+    for (auto i = 0; i < length; i+= nBlockSizeRSA)
     {
-        auto n = filein.readsome((char *)replica, nBlockSizeRSA);
-        if (n <= 0) {
-            break;
-        }
-        if (n != nBlockSizeRSA) {
-            LogPrint("dfs", "file %s cannot be read", pAllocatedFile->filename);
-        }
+        filein.read((char *)replica, nBlockSizeRSA); // TODO: change to loop of readsome
+
         DecryptData(replica, 0, sizeBuffer, buffer, pAllocatedFile->keys.aesKey, rsa);
         outfile.write((char *) buffer, std::min(sizeBuffer, bytesSize));
         bytesSize -= sizeBuffer;
