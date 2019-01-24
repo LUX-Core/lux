@@ -15,7 +15,6 @@ class PlatformStyle;
 class SendCoinsRecipient;
 class WalletModel;
 class WalletView;
-class TradingDialog;
 class BlockExplorer;
 
 QT_BEGIN_NAMESPACE
@@ -60,8 +59,6 @@ public Q_SLOTS:
     void gotoOverviewPage();
     /** Switch to history (transactions) page */
     void gotoHistoryPage();
-    /** Switch to trading page */
-    void gotoTradingPage();
     /** Switch to masternode page */
     void gotoMasternodePage();
     /** Switch to smart contract page */
