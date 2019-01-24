@@ -159,14 +159,20 @@ static void initTranslations(QTranslator& qtTranslatorBase, QTranslator& qtTrans
 void DebugMessageHandler(QtMsgType type, const char* msg)
 {
     const char* category = (type == QtDebugMsg) ? "qt" : NULL;
-    LogPrint(category, "GUI: %s\n", msg);
+    if (msg == "QFont::setPixelSize: Pixel size <= 0 (0)") {
+        return;
+    }
+    else LogPrint(category, "GUI: %s\n", msg);
 }
 #else
 void DebugMessageHandler(QtMsgType type, const QMessageLogContext& context, const QString& msg)
 {
     Q_UNUSED(context);
     const char* category = (type == QtDebugMsg) ? "qt" : NULL;
-    LogPrint(category, "GUI: %s\n", msg.toStdString());
+    if (msg == "QFont::setPixelSize: Pixel size <= 0 (0)" || msg == "PaymentServer::LoadRootCAs : Loaded  134  root certificates") {
+        return; 
+    }
+    else LogPrint(category, "GUI: %s\n", msg.toStdString());
 }
 #endif
 

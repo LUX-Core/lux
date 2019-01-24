@@ -55,7 +55,6 @@ QT_FORMS_UI = \
   qt/forms/openuridialog.ui \
   qt/forms/optionsdialog.ui \
   qt/forms/overviewpage.ui \
-  qt/forms/tradingdialog.ui \
   qt/forms/receivecoinsdialog.ui \
   qt/forms/receivetokenpage.ui \
   qt/forms/receiverequestdialog.ui \
@@ -123,7 +122,6 @@ QT_MOC_CPP = \
   qt/moc_optionsdialog.cpp \
   qt/moc_optionsmodel.cpp \
   qt/moc_overviewpage.cpp \
-  qt/moc_tradingdialog.cpp \
   qt/moc_tokenamountfield.cpp \
   qt/moc_qcustomplot.cpp \
   qt/moc_peertablemodel.cpp \
@@ -252,7 +250,6 @@ BITCOIN_QT_H = \
   qt/optionsdialog.h \
   qt/optionsmodel.h \
   qt/overviewpage.h \
-  qt/tradingdialog.h \
   qt/paymentrequestplus.h \
   qt/paymentserver.h \
   qt/peertablemodel.h \
@@ -376,7 +373,6 @@ RES_ICONS = \
   qt/res/icons/staking_inactive.png \
   qt/res/icons/synced.png \
   qt/res/icons/stake.png \
-  qt/res/icons/trade.png \
   qt/res/icons/transaction0.png \
   qt/res/icons/transaction2.png \
   qt/res/icons/transaction_abandoned.png \
@@ -472,7 +468,6 @@ BITCOIN_QT_CPP += \
   qt/openuridialog.cpp \
   qt/overviewpage.cpp \
   qt/qcustomplot.cpp \
-  qt/tradingdialog.cpp \
   qt/paymentrequestplus.cpp \
   qt/paymentserver.cpp \
   qt/lsrtoken.cpp \
