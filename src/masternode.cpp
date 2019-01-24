@@ -601,23 +601,23 @@ void CMasterNode::Check(bool forceCheck) {
     }
 
     if (!unitTest) {
-        TRY_LOCK(cs_main, lockMain);
-        if (!lockMain) return;
-        /*
-            cs_main is required for doing masternode.Check because something
-            is modifying the coins view without a mempool lock. It causes
-            segfaults from this code without the cs_main lock.
-        */
         CValidationState state;
         CMutableTransaction tx = CMutableTransaction();
         CTxOut vout = CTxOut((GetMNCollateral(chainActive.Height()) - 1) * COIN, darkSendPool.collateralPubKey);
         tx.vin.push_back(vin);
         tx.vout.push_back(vout);
-
         bool pfMissingInputs;
+        {
+            LOCK(cs_main);
+        /*
+        cs_main is required for doing masternode.Check because something
+        is modifying the coins view without a mempool lock. It causes
+        segfaults from this code without the cs_main lock.
+        */
         if (!AcceptableInputs(mempool, state, CTransaction(tx), false, &pfMissingInputs)) {
             enabled = 3;
             return;
+            }
         }
     }
 
