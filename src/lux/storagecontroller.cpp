@@ -30,7 +30,7 @@ struct ReplicaStream
             for (auto i = 0u; i < fileSize;) {
                 size_t n = std::min(BUFFER_SIZE, fileSize - i);
                 buf.resize(n);
-`                filestream.read(&buf[0], n);  // TODO: change to loop of readsome
+                filestream.read(&buf[0], n);  // TODO: change to loop of readsome
                 if (buf.empty()) {
                     break;
                 }
@@ -564,7 +564,6 @@ std::shared_ptr<AllocatedFile> StorageController::CreateReplica(const boost::fil
     tempStorageHeap.SetDecryptionKeys(tempFile->uri, keys.rsaKey, keys.aesKey);
     filein.close();
     outfile.close();
-    std::cout << "replica size: " << fs::file_size(tempFile->filename) << std::endl;
     delete[] buffer;
     delete[] replica;
 

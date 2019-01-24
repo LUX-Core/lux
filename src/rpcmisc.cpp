@@ -1615,8 +1615,8 @@ UniValue dfsdecrypt(const UniValue& params, bool fHelp)
                 + HelpExampleRpc("dfsdecrypt", "cca72157824073c35e010893267a8d843f565cb7f7e53b4fd8f1066a30939f1b, \"/tmp/123.jpg\"")
         );
 
-    auto pathToFile = boost::filesystem::path{params[2].get_str()};
-    auto orderHash = uint256{params[1].get_str()};
+    auto pathToFile = boost::filesystem::path{params[1].get_str()};
+    auto orderHash = uint256{params[0].get_str()};
     storageController->DecryptReplica(orderHash, pathToFile);
 
     return UniValue::VNULL;
