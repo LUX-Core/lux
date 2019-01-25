@@ -521,7 +521,10 @@ void CNode::PushVersion()
     PushMessage("version", PROTOCOL_VERSION, (uint64_t) nLocalServices, nTime, addrYou, addrMe,
         nLocalHostNonce, FormatSubVersion(CLIENT_NAME, CLIENT_VERSION, std::vector<string>()), nBestHeight, true);
 #ifdef ENABLE_LUXGATE
-    PushMessage("lgversion", LUXGATE_PROTOCOL_VERSION);
+    if (nServices & NODE_LUXGATE) {
+        LogPrint("net", "send LuxGate version message: version %d, us=%s, peer=%d\n", LUXGATE_PROTOCOL_VERSION, addrMe.ToString());
+        PushMessage("lgversion", LUXGATE_PROTOCOL_VERSION);
+    }
 #endif
 }
 
