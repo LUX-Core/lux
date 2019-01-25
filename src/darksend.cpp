@@ -386,7 +386,7 @@ void ProcessMessageDarksend(CNode* pfrom, const std::string& strCommand, CDataSt
         vector<CTxIn> sigs;
         vRecv >> sigs;
 
-        bool success = false;
+        std::atomic<bool> success{false};
         int count = 0;
 
         LogPrintf(" -- sigs count %d %d\n", (int) sigs.size(), count);
@@ -1370,68 +1370,9 @@ bool CDarkSendPool::DoAutomaticDenominating(bool fDryRun, bool ready) {
     LOCK(cs_darksend);
 
     if (IsInitialBlockDownload()) return false;
-    if(!pwalletMain || pwalletMain->IsLocked()) return false;
 
     if (fMasterNode) return false;
     if (state == POOL_STATUS_ERROR || state == POOL_STATUS_SUCCESS) return false;
-    if (nWalletBackups == 0) {
-        LogPrint("darksend", "CDarksendPool::DoAutomaticDenominating - Automatic backups disabled, no mixing available.\n");
-        strAutoDenomResult = _("Automatic backups disabled") + ", " + _("no mixing available.");
-        fEnableDarksend = false; // stop mixing
-        pwalletMain->nKeysLeftSinceAutoBackup = 0; // no backup, no "keys since last backup"
-        return false;
-    } else if (nWalletBackups == -1) {
-        // Automatic backup failed, nothing else we can do until user fixes the issue manually.
-        // There is no way to bring user attention in daemon mode so we just update status and
-        // keep spaming if debug is on.
-        LogPrint("darksend", "CDarksendPool::DoAutomaticDenominating - ERROR! Failed to create automatic backup.\n");
-        strAutoDenomResult = _("ERROR! Failed to create automatic backup") + ", " + _("see debug.log for details.");
-        return false;
-    } else if (nWalletBackups == -2) {
-        // We were able to create automatic backup but keypool was not replenished because wallet is locked.
-        // There is no way to bring user attention in daemon mode so we just update status and
-        // keep spaming if debug is on.
-        LogPrint("darksendsend", "CDarksendPool::DoAutomaticDenominating - WARNING! Failed to create replenish keypool, please unlock your wallet to do so.\n");
-        strAutoDenomResult = _("WARNING! Failed to replenish keypool, please unlock your wallet to do so.") + ", " + _("see debug.log for details.");
-        return false;
-    }
-
-    if (pwalletMain->nKeysLeftSinceAutoBackup < KEYS_THRESHOLD_STOP) {
-        // We should never get here via mixing itself but probably smth else is still actively using keypool
-        LogPrint("darksend", "CDarksendPool::DoAutomaticDenominating - Very low number of keys left: %d, no mixing available.\n", pwalletMain->nKeysLeftSinceAutoBackup);
-        strAutoDenomResult = strprintf(_("Very low number of keys left: %d") + ", " + _("no mixing available."), pwalletMain->nKeysLeftSinceAutoBackup);
-        // It's getting really dangerous, stop mixing
-        fEnableDarksend = false;
-        return false;
-    } else if (pwalletMain->nKeysLeftSinceAutoBackup < KEYS_THRESHOLD_WARNING) {
-        // Low number of keys left but it's still more or less safe to continue
-        LogPrint("darksend", "CDarksendPool::DoAutomaticDenominating - Very low number of keys left: %d\n", pwalletMain->nKeysLeftSinceAutoBackup);
-        strAutoDenomResult = strprintf(_("Very low number of keys left: %d"), pwalletMain->nKeysLeftSinceAutoBackup);
-
-        if (fCreateAutoBackups) {
-            LogPrint("darksend", "CDarksendPool::DoAutomaticDenominating - Trying to create new backup.\n");
-            std::string warningString;
-            std::string errorString;
-
-            if(!AutoBackupWallet(pwalletMain, "", warningString, errorString)) {
-                if (!warningString.empty()) {
-                    // There were some issues saving backup but yet more or less safe to continue
-                    LogPrintf("CDarksendPool::DoAutomaticDenominating - WARNING! Something went wrong on automatic backup: %s\n", warningString);
-                }
-                if (!errorString.empty()) {
-                    // Things are really broken
-                    LogPrintf("CDarksendPool::DoAutomaticDenominating - ERROR! Failed to create automatic backup: %s\n", errorString);
-                    strAutoDenomResult = strprintf(_("ERROR! Failed to create automatic backup") + ": %s", errorString);
-                    return false;
-                }
-            }
-        } else {
-            // Wait for someone else (e.g. GUI action) to create automatic backup for us
-            return false;
-        }
-    }
-
-    LogPrint("darksend", "CDarksendPool::DoAutomaticDenominating - Keys left since latest backup: %d\n", pwalletMain->nKeysLeftSinceAutoBackup);
 
     if (chainActive.Height() - cachedLastSuccess < minBlockSpacing) {
         LogPrintf("CDarkSendPool::DoAutomaticDenominating - Last successful darksend action was too recent\n");
@@ -1700,10 +1641,10 @@ bool CDarkSendPool::SendRandomPaymentToSelf() {
     // make our change address
     CReserveKey reservekey(pwalletMain);
 
-    CScript scriptChange;
+    CScript scriptDenom;
     CPubKey vchPubKey;
-    assert(reservekey.GetReservedKey(vchPubKey)); // should never fail, as we just unlocked
-    scriptChange = GetScriptForDestination(vchPubKey.GetID());
+    assert(reservekey.GetReservedKey(vchPubKey, false)); // should never fail, as we just unlocked
+    scriptDenom = GetScriptForDestination(vchPubKey.GetID());
 
     CWalletTx wtx;
     int64_t nFeeRet = 0;
@@ -1711,7 +1652,7 @@ bool CDarkSendPool::SendRandomPaymentToSelf() {
     vector< pair<CScript, int64_t> > vecSend;
 
     // ****** Add fees ************ /
-    vecSend.push_back(make_pair(scriptChange, nPayment));
+    vecSend.push_back(make_pair(scriptDenom, nPayment));
 
     CCoinControl* coinControl = NULL;
     int nChangePos = -1;
@@ -1737,7 +1678,7 @@ bool CDarkSendPool::MakeCollateralAmounts() {
 
     CScript scriptChange;
     CPubKey vchPubKey;
-    assert(reservekey.GetReservedKey(vchPubKey)); // should never fail, as we just unlocked
+    assert(reservekey.GetReservedKey(vchPubKey, false)); // should never fail, as we just unlocked
     scriptChange = GetScriptForDestination(vchPubKey.GetID());
 
     CWalletTx wtx;
@@ -1781,7 +1722,7 @@ bool CDarkSendPool::CreateDenominated(int64_t nTotalValue) {
 
     CScript scriptChange;
     CPubKey vchPubKey;
-    assert(reservekey.GetReservedKey(vchPubKey)); // should never fail, as we just unlocked
+    assert(reservekey.GetReservedKey(vchPubKey, false)); // should never fail, as we just unlocked
     scriptChange = GetScriptForDestination(vchPubKey.GetID());
 
     CWalletTx wtx;
@@ -1807,7 +1748,7 @@ bool CDarkSendPool::CreateDenominated(int64_t nTotalValue) {
             CScript scriptChange;
             CPubKey vchPubKey;
             //use a unique change address
-            assert(reservekey.GetReservedKey(vchPubKey)); // should never fail, as we just unlocked
+            assert(reservekey.GetReservedKey(vchPubKey, false)); // should never fail, as we just unlocked
             scriptChange = GetScriptForDestination(vchPubKey.GetID());
             reservekey.KeepKey();
 
@@ -2171,7 +2112,7 @@ void ThreadCheckDarkSendPool() {
         darkSendPool.CheckTimeout();
 
         if (c % 60 == 0) {
-            LOCK(cs_main);
+//            LOCK(cs_main);
             /*
                 cs_main is required for doing masternode.Check because something
                 is modifying the coins view without a mempool lock. It causes

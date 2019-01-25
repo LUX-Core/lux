@@ -16,6 +16,8 @@ static const int MAX_PASSPHRASE_SIZE = 1024;
 /* Lux GUI -- Size of icons in status bar */
 static const int STATUSBAR_ICONSIZE = 16;
 
+static const bool DEFAULT_SPLASHSCREEN = true;
+
 /* Invalid field background style */
 #define STYLE_INVALID "background:#FF8080"
 /* Transaction list -- unconfirmed transaction */
@@ -26,8 +28,6 @@ static const int STATUSBAR_ICONSIZE = 16;
 #define COLOR_BAREADDRESS QColor(140, 140, 140)
 /* Transaction list -- TX status decoration - open until date */
 #define COLOR_TX_STATUS_OPENUNTILDATE QColor(64, 64, 255)
-/* Transaction list -- TX status decoration - offline */
-#define COLOR_TX_STATUS_OFFLINE QColor(192, 192, 192)
 /* Transaction list -- TX status decoration - default color */
 #define COLOR_BLACK QColor(51, 51, 51)
 #define COLOR_TX_STATUS_DANGER QColor(200, 100, 100)

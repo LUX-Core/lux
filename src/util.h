@@ -30,7 +30,19 @@
 #include <boost/thread/exceptions.hpp>
 #include <regex>
 
+#define END_IGNORE_EXCEPTION "END_IGNORE_EXCEPTION"
+
 extern std::regex hexData;
+
+// Debugging macros
+
+//#define ENABLE_LUX_DEBUG
+#ifdef ENABLE_LUX_DEBUG
+#define DEBUG_SECTION( x ) x
+#else
+#define DEBUG_SECTION( x )
+#endif
+
 //LUX only features
 extern std::atomic<bool> hideLogMessage;
 
@@ -49,7 +61,7 @@ extern int keysLoaded;
 extern bool fSucessfullyLoaded;
 extern std::vector<int64_t> darkSendDenominations;
 extern std::string strBudgetMode;
-extern int nWalletBackups;
+
 extern std::map<std::string, std::string> mapArgs;
 extern std::map<std::string, std::vector<std::string> > mapMultiArgs;
 extern bool fDebug;
@@ -122,7 +134,6 @@ static inline bool error(const char* format)
     return false;
 }
 
-
 void PrintExceptionContinue(std::exception* pex, const char* pszThread);
 void ParseParameters(int argc, const char* const argv[]);
 void FileCommit(FILE* fileout);
@@ -132,7 +143,6 @@ void AllocateFileRange(FILE* file, unsigned int offset, unsigned int length);
 bool RenameOver(boost::filesystem::path src, boost::filesystem::path dest);
 bool TryCreateDirectory(const boost::filesystem::path& p);
 boost::filesystem::path GetDefaultDataDir();
-const boost::filesystem::path &GetBackupsDir();
 const boost::filesystem::path& GetDataDir(bool fNetSpecific = true);
 boost::filesystem::path GetConfigFile();
 boost::filesystem::path GetMasternodeConfigFile();
@@ -219,6 +229,9 @@ bool SoftSetArg(const std::string& strArg, const std::string& strValue);
  */
 bool SoftSetBoolArg(const std::string& strArg, bool fValue);
 
+// Forces a arg setting
+void ForceSetArg(const std::string& strArg, const std::string& strValue);
+
 /**
  * Format a string to be used as group of options in help messages
  *
@@ -252,6 +265,25 @@ inline uint32_t ByteReverse(uint32_t value)
     return (value<<16) | (value>>16);
 }
 
+inline static bool IsExceptionIgnored (const char* name)
+{
+    const char* IgnoredThread [] = {
+        "net",
+        "Runaway exception",
+        "msghand",
+        END_IGNORE_EXCEPTION
+    };
+
+    int i = 0;
+    while (strcmp(IgnoredThread[i], END_IGNORE_EXCEPTION))
+    {
+        if (!strcmp(IgnoredThread[i], name))
+            return true;
+        i++;
+    }
+    return false;
+}
+
 /**
  * .. and a wrapper that just calls func once
  */
@@ -266,13 +298,16 @@ void TraceThread(const char* name, Callable func)
         LogPrintf("%s thread exit\n", name);
     } catch (boost::thread_interrupted) {
         LogPrintf("%s thread interrupt\n", name);
-        throw;
+        // rethrow exception if current thread is not in the ignore list
+        if (!IsExceptionIgnored(name)) throw;
     } catch (std::exception& e) {
         PrintExceptionContinue(&e, name);
-        throw;
+        // rethrow exception if current thread is not in the ignore list
+        if (!IsExceptionIgnored(name)) throw;
     } catch (...) {
         PrintExceptionContinue(NULL, name);
-        throw;
+        // rethrow exception if current thread is not in the ignore list
+        if (!IsExceptionIgnored(name)) throw;
     }
 }
 

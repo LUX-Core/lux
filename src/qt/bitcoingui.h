@@ -40,6 +40,8 @@ class MasternodeList;
 class HexAddressConverter;
 class CBlockIndex;
 class UpdateDialog;
+class HelpMessageDialog;
+
 
 class CWallet;
 
@@ -99,8 +101,13 @@ private:
 
     UnitDisplayStatusBarControl* unitDisplayControl;
     QLabel* labelStakingIcon;
-    QLabel* labelEncryptionIcon;
+    QLabel* labelWalletEncryptionIcon;
+    QPushButton* pushButtonWalletHDStatusIcon;
     QPushButton* labelConnectionsIcon;
+    QPushButton * pushButtonTelegram;
+    QPushButton * pushButtonTwitter;
+    QPushButton * pushButtonGithub;
+    QPushButton * pushButtonDiscord;
     QLabel* labelBlocksIcon;
     QLabel* progressBarLabel;
     QProgressBar* progressBar;
@@ -150,6 +157,7 @@ private:
     QMenu* trayIconMenu;
     Notificator* notificator;
     RPCConsole* rpcConsole;
+    HelpMessageDialog* helpMessageDialog;
     BlockExplorer* explorerWindow;
     HexAddressConverter* hexAddressWindow;
     ModalOverlay* modalOverlay;
@@ -213,6 +221,13 @@ public Q_SLOTS:
     void setStakingStatus();
 
 #ifdef ENABLE_WALLET
+
+    /** Set the hd-enabled status as shown in the UI.
+     @param[in] status            current hd enabled status
+     @see WalletModel::EncryptionStatus
+     */
+    void setHDStatus(int hdEnabled);
+
     /** Set the encryption status as shown in the UI.
        @param[in] status            current encryption status
        @see WalletModel::EncryptionStatus
@@ -276,6 +291,12 @@ private Q_SLOTS:
     /** Show help message dialog */
     void showHelpMessageClicked();
 
+    /** Show debug window */
+    void showDebugWindow();
+
+    /** Show debug window and set focus to the console */
+    void showDebugWindowActivateConsole();
+
 #ifndef Q_OS_MAC
     /** Handle tray icon clicked */
     void trayIconActivated(QSystemTrayIcon::ActivationReason reason);
@@ -294,6 +315,9 @@ private Q_SLOTS:
 
     /** When hideTrayIcon setting is changed in OptionsModel hide or show the icon accordingly. */
     void setTrayIconVisible(bool);
+
+    /** Toggle networking */
+    void toggleNetworkActive();
 
     void showModalOverlay();
 };

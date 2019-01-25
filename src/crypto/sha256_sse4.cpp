@@ -11,11 +11,9 @@
 #include <stdlib.h>
 
 #if defined(__x86_64__) || defined(__amd64__)
-
 #ifndef __SSE4_1__
 #error "SSE4.1 not enabled, please compile with -msse4.1 C++ flag"
 #endif
-
 namespace sha256_sse4
 {
 void Transform(uint32_t* s, const unsigned char* chunk, size_t blocks)

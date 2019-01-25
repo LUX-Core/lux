@@ -15,8 +15,11 @@
 TransactionDescDialog::TransactionDescDialog(const QModelIndex& idx, QWidget* parent) : QDialog(parent),
                                                                                         ui(new Ui::TransactionDescDialog)
 {
+    Qt::WindowFlags flags;
     ui->setupUi(this);
-
+    flags = this->windowFlags() ^ Qt::WindowContextHelpButtonHint;
+    this->setWindowFlags(flags);
+    this->setModal(true);
     /* Open CSS when configured */
     this->setStyleSheet(GUIUtil::loadStyleSheet());
     setWindowTitle(tr("Details for %1").arg(idx.data(TransactionTableModel::TxIDRole).toString()));

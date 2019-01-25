@@ -296,7 +296,7 @@ WalletModel::SendCoinsReturn WalletModel::prepareTransaction(WalletModelTransact
     }
 
     {
-        LOCK2(cs_main, wallet->cs_wallet);
+        //LOCK2(cs_main, wallet->cs_wallet);
 
         transaction.newPossibleKeyChange(wallet);
         CAmount nFeeRequired = 0;
@@ -799,6 +799,11 @@ bool WalletModel::saveReceiveRequest(const std::string& sAddress, const int64_t 
         return wallet->AddDestData(dest, key, sRequest);
 }
 
+bool WalletModel::hdEnabled() const
+{
+    return wallet->IsHDEnabled();
+}
+
 bool WalletModel::isMine(CTxDestination address)
 {
     return IsMine(*wallet, address);
@@ -895,7 +900,7 @@ bool WalletModel::abandonTransaction(uint256 hash) const
 
 bool WalletModel::isWalletEnabled()
 {
-    return !GetBoolArg("-disablewallet", DEFAULT_DISABLE_WALLET);
+    return !GetBoolArg("-disablewallet", false);
 }
 
 int WalletModel::getDefaultConfirmTarget() const

@@ -163,13 +163,7 @@ public:
     ~CCheckQueue()
     {
     }
-#if 0
-    bool IsIdle()
-    {
-        boost::unique_lock<boost::mutex> lock(mutex);
-        return (nTotal == nIdle && nTodo == 0 && fAllOk == true);
-    }
-#endif
+
 };
 
 /** 

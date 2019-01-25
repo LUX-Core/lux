@@ -1,5 +1,6 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2014 The Bitcoin developers
+// Copyright (c) 2015-2018 The LUX developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -25,11 +26,17 @@ static const char DB_HEIGHTINDEX = 'h';
 
 static const char DB_BEST_BLOCK = 'B';
 static const char DB_HEAD_BLOCKS = 'H';
+
+static const char DB_ADDRESSINDEX = 'a';
+static const char DB_ADDRESSUNSPENTINDEX = 'u';
+static const char DB_SPENTINDEX = 's';
+
 static const char DB_FLAG = 'F';
 static const char DB_REINDEX_FLAG = 'R';
 static const char DB_LAST_BLOCK = 'l';
 
 extern map<uint256, uint256> mapProofOfStake;
+extern std::atomic<bool> fRequestShutdown;
 
 using namespace std;
 
@@ -91,6 +98,18 @@ bool CCoinsViewDB::BatchWrite(CCoinsMap& mapCoins, const uint256& hashBlock)
 
 CBlockTreeDB::CBlockTreeDB(size_t nCacheSize, bool fMemory, bool fWipe) : CLevelDBWrapper(GetDataDir() / "blocks" / "index", nCacheSize, fMemory, fWipe)
 {
+}
+
+bool CBlockTreeDB::WriteBatchSync(const std::vector<std::pair<int, const CBlockFileInfo*> >& fileInfo, int nLastFile, const std::vector<const CBlockIndex*>& blockinfo) {
+    CLevelDBBatch batch;
+    for (std::vector<std::pair<int, const CBlockFileInfo*> >::const_iterator it=fileInfo.begin(); it != fileInfo.end(); it++) {
+        batch.Write(make_pair(DB_BLOCK_FILES, it->first), *it->second);
+    }
+    batch.Write(DB_LAST_BLOCK, nLastFile);
+    for (std::vector<const CBlockIndex*>::const_iterator it=blockinfo.begin(); it != blockinfo.end(); it++) {
+        batch.Write(make_pair(DB_BLOCK_INDEX, (*it)->GetBlockHash()), CDiskBlockIndex(*it));
+    }
+    return WriteBatch(batch, true);
 }
 
 bool CBlockTreeDB::WriteBlockIndex(const CDiskBlockIndex& blockindex)
@@ -158,7 +177,7 @@ bool CCoinsViewDB::GetStats(CCoinsStats& stats) const
     /* It seems that there are no "const iterators" for LevelDB.  Since we
        only need read operations on it, use a const-cast to get around
        that restriction.  */
-    boost::scoped_ptr<leveldb::Iterator> pcursor(const_cast<CLevelDBWrapper*>(&db)->NewIterator());
+    boost::scoped_ptr<leveldb::Iterator> pcursor(const_cast<CLevelDBWrapper&>(db).NewIterator());
     pcursor->SeekToFirst();
 
     CHashWriter ss(SER_GETHASH, PROTOCOL_VERSION);
@@ -212,12 +231,239 @@ bool CBlockTreeDB::ReadTxIndex(const uint256& txid, CDiskTxPos& pos)
     return Read(make_pair(DB_TXINDEX, txid), pos);
 }
 
+bool CBlockTreeDB::EraseTxIndex(const uint256& txid)
+{
+    return Erase(std::make_pair(DB_TXINDEX, txid));
+}
+
 bool CBlockTreeDB::WriteTxIndex(const std::vector<std::pair<uint256, CDiskTxPos> >& vect)
 {
     CLevelDBBatch batch;
     for (std::vector<std::pair<uint256, CDiskTxPos> >::const_iterator it = vect.begin(); it != vect.end(); it++)
         batch.Write(make_pair(DB_TXINDEX, it->first), it->second);
     return WriteBatch(batch);
+}
+
+bool CBlockTreeDB::ReadSpentIndex(CSpentIndexKey &key, CSpentIndexValue &value) {
+    return Read(std::make_pair(DB_SPENTINDEX, key), value);
+}
+
+bool CBlockTreeDB::UpdateSpentIndex(const std::vector<std::pair<CSpentIndexKey, CSpentIndexValue> >&vect) {
+    CLevelDBBatch batch;
+    for (std::vector<std::pair<CSpentIndexKey,CSpentIndexValue> >::const_iterator it=vect.begin(); it!=vect.end(); it++) {
+        if (it->second.IsNull()) {
+            batch.Erase(std::make_pair(DB_SPENTINDEX, it->first));
+        } else {
+            batch.Write(std::make_pair(DB_SPENTINDEX, it->first), it->second);
+        }
+    }
+    return WriteBatch(batch);
+}
+
+bool CBlockTreeDB::UpdateAddressUnspentIndex(const AddressUnspentVector &vect) {
+    CLevelDBBatch batch;
+    for (AddressUnspentVector::const_iterator it=vect.begin(); it!=vect.end(); it++) {
+        if (it->second.IsNull()) {
+            batch.Erase(std::make_pair(DB_ADDRESSUNSPENTINDEX, it->first));
+        } else {
+            batch.Write(std::make_pair(DB_ADDRESSUNSPENTINDEX, it->first), it->second);
+        }
+    }
+    return WriteBatch(batch);
+}
+
+bool CBlockTreeDB::ReadAddressUnspentIndex(uint160 addrHash, uint16_t addrType, AddressUnspentVector &unspentOutputs) {
+
+    boost::scoped_ptr<leveldb::Iterator> pcursor(NewIterator());
+
+    CDataStream ssKeySet(SER_DISK, CLIENT_VERSION);
+    ssKeySet << make_pair(DB_ADDRESSUNSPENTINDEX, CAddressIndexIteratorKey(addrType, addrHash));
+    pcursor->Seek(ssKeySet.str());
+
+    while (pcursor->Valid()) {
+        boost::this_thread::interruption_point();
+        try {
+            leveldb::Slice slKey = pcursor->key();
+            CDataStream ssKey(slKey.data(), slKey.data()+slKey.size(), SER_DISK, CLIENT_VERSION);
+            char chType;
+            CAddressUnspentKey indexKey;
+            ssKey >> chType;
+            ssKey >> indexKey;
+            if (chType == DB_ADDRESSUNSPENTINDEX && indexKey.hashType == addrType && indexKey.hashBytes == addrHash) {
+                try {
+                    leveldb::Slice slValue = pcursor->value();
+                    CDataStream ssValue(slValue.data(), slValue.data()+slValue.size(), SER_DISK, CLIENT_VERSION);
+                    CAddressUnspentValue nValue;
+                    ssValue >> nValue;
+                    unspentOutputs.push_back(make_pair(indexKey, nValue));
+                    pcursor->Next();
+                } catch (const std::exception& e) {
+                    return error("failed to get address unspent value");
+                }
+            } else {
+                break;
+            }
+        } catch (const std::exception& e) {
+            LogPrintf("%s: exception %s\n", __func__, e.what());
+            break;
+        }
+    }
+    return true;
+}
+
+bool CBlockTreeDB::EraseAddressUnspentIndex(const AddressUnspentVector &vect) {
+    CLevelDBBatch batch;
+    for (AddressUnspentVector::const_iterator it=vect.begin(); it!=vect.end(); it++)
+        batch.Erase(std::make_pair(DB_ADDRESSUNSPENTINDEX, it->first));
+    return WriteBatch(batch);
+}
+
+// Parse all addressindex unspent entries matching a txid (slow, not using address keys)
+bool CBlockTreeDB::FindTxEntriesInUnspentIndex(uint256 txid, AddressUnspentVector &addressUnspent)
+{
+    boost::scoped_ptr<leveldb::Iterator> pcursor(NewIterator());
+
+    CDataStream ssKeySet(SER_DISK, CLIENT_VERSION);
+    ssKeySet << make_pair(DB_ADDRESSUNSPENTINDEX, NULL);
+    pcursor->Seek(ssKeySet.str());
+    while (pcursor->Valid()) {
+        boost::this_thread::interruption_point();
+        try {
+            leveldb::Slice slKey = pcursor->key();
+            CDataStream ssKey(slKey.data(), slKey.data()+slKey.size(), SER_DISK, CLIENT_VERSION);
+            CAddressUnspentKey indexKey;
+            char chType;
+            ssKey >> chType;
+            if (chType != DB_ADDRESSUNSPENTINDEX) break;
+            ssKey >> indexKey;
+            if (indexKey.txHash == txid) {
+                try {
+                    leveldb::Slice slValue = pcursor->value();
+                    CDataStream ssValue(slValue.data(), slValue.data()+slValue.size(), SER_DISK, CLIENT_VERSION);
+                    CAddressUnspentValue stData;
+                    ssValue >> stData;
+                    addressUnspent.push_back(make_pair(indexKey, stData));
+                } catch (const std::exception& e) {
+                    LogPrintf("%s: Deserialize I/O error - %s", __func__, e.what());
+                    CAddressUnspentValue stDummy;
+                    addressUnspent.push_back(make_pair(indexKey, stDummy));
+                }
+            }
+            pcursor->Next();
+        } catch (const std::exception& e) {
+            LogPrintf("%s: Seek or I/O error - %s", __func__, e.what());
+            break;
+        }
+    }
+
+    return (addressUnspent.size() > 0);
+}
+
+
+bool CBlockTreeDB::WriteAddressIndex(const AddressIndexVector &vect) {
+    CLevelDBBatch batch;
+    for (AddressIndexVector::const_iterator it=vect.begin(); it!=vect.end(); it++)
+        batch.Write(std::make_pair(DB_ADDRESSINDEX, it->first), it->second);
+    return WriteBatch(batch);
+}
+
+bool CBlockTreeDB::EraseAddressIndex(const AddressIndexVector &vect) {
+    CLevelDBBatch batch;
+    for (AddressIndexVector::const_iterator it=vect.begin(); it!=vect.end(); it++)
+        batch.Erase(std::make_pair(DB_ADDRESSINDEX, it->first));
+    return WriteBatch(batch);
+}
+
+bool CBlockTreeDB::ReadAddressIndex(uint160 addrHash, uint16_t addrType, AddressIndexVector &addressIndex, int start, int end)
+{
+    boost::scoped_ptr<leveldb::Iterator> pcursor(NewIterator());
+
+    CDataStream ssKeySet(SER_DISK, CLIENT_VERSION);
+    if (start > 0) {
+        ssKeySet << make_pair(DB_ADDRESSINDEX, CAddressIndexIteratorHeightKey(addrType, addrHash, start));
+    } else {
+        ssKeySet << make_pair(DB_ADDRESSINDEX, CAddressIndexIteratorKey(addrType, addrHash));
+    }
+    pcursor->Seek(ssKeySet.str());
+
+    CAddressIndexKey prevKey;
+    while (pcursor->Valid()) {
+        boost::this_thread::interruption_point();
+        try {
+            leveldb::Slice slKey = pcursor->key();
+            CDataStream ssKey(slKey.data(), slKey.data()+slKey.size(), SER_DISK, CLIENT_VERSION);
+            char chType;
+            CAddressIndexKey indexKey;
+            ssKey >> chType;
+            ssKey >> indexKey;
+            if (chType == DB_ADDRESSINDEX && indexKey.hashType == addrType && indexKey.hashBytes == addrHash) {
+                if (end > 0 && indexKey.blockHeight > end) {
+                    break;
+                }
+                try {
+                    leveldb::Slice slValue = pcursor->value();
+                    CDataStream ssValue(slValue.data(), slValue.data()+slValue.size(), SER_DISK, CLIENT_VERSION);
+                    CAmount nValue;
+                    ssValue >> nValue;
+                    if (memcmp(&indexKey, &prevKey, sizeof(CAddressIndexKey))) {
+                        addressIndex.push_back(make_pair(indexKey, nValue));
+                        prevKey = indexKey;
+                    } else {
+                        LogPrintf("%s: skipping duplicated entry in the database\n", __func__);
+                    }
+                    pcursor->Next();
+                } catch (const std::exception& e) {
+                    return error("failed to get address index value");
+                }
+            } else {
+                break;
+            }
+        } catch (const std::exception& e) {
+            break;
+        }
+    }
+
+    return true;
+}
+
+// Parse all addressindex entries matching a txid (slow, not using address keys)
+bool CBlockTreeDB::FindTxEntriesInAddressIndex(uint256 txid, AddressIndexVector &addressIndex)
+{
+    boost::scoped_ptr<leveldb::Iterator> pcursor(NewIterator());
+
+    CDataStream ssKeySet(SER_DISK, CLIENT_VERSION);
+    ssKeySet << make_pair(DB_ADDRESSINDEX, NULL);
+    pcursor->Seek(ssKeySet.str());
+    while (pcursor->Valid()) {
+        boost::this_thread::interruption_point();
+        try {
+            leveldb::Slice slKey = pcursor->key();
+            CDataStream ssKey(slKey.data(), slKey.data()+slKey.size(), SER_DISK, CLIENT_VERSION);
+            CAddressIndexKey indexKey;
+            char chType;
+            ssKey >> chType;
+            if (chType != DB_ADDRESSINDEX) break;
+            ssKey >> indexKey;
+            if (indexKey.txhash == txid) {
+                try {
+                    leveldb::Slice slValue = pcursor->value();
+                    CDataStream ssValue(slValue.data(), slValue.data()+slValue.size(), SER_DISK, CLIENT_VERSION);
+                    CAmount nValue;
+                    ssValue >> nValue;
+                    addressIndex.push_back(make_pair(indexKey, nValue));
+                } catch (const std::exception& e) {
+                    LogPrintf("%s: Deserialize I/O error - %s", __func__, e.what());
+                    addressIndex.push_back(make_pair(indexKey, 0));
+                }
+            }
+            pcursor->Next();
+        } catch (const std::exception& e) {
+            LogPrintf("%s: Seek or I/O error - %s", __func__, e.what());
+            break;
+        }
+    }
+
+    return (addressIndex.size() > 0);
 }
 
 bool CBlockTreeDB::WriteFlag(const std::string& name, bool fValue)
@@ -250,6 +496,7 @@ bool CBlockTreeDB::LoadBlockIndexGuts()
 
     // Load mapBlockIndex
     while (pcursor->Valid()) {
+        if (fRequestShutdown) return false;
         boost::this_thread::interruption_point();
         try {
             leveldb::Slice slKey = pcursor->key();

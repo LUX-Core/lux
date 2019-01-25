@@ -20,12 +20,13 @@ QT_TS = \
   qt/locale/lux_en.ts \
   qt/locale/lux_en_US.ts \
   qt/locale/lux_es.ts \
-  qt/locale/lux_fr_FR.ts \
+  qt/locale/lux_fr.ts \
   qt/locale/lux_it.ts \
   qt/locale/lux_ja.ts \
   qt/locale/lux_pt.ts \
   qt/locale/lux_ro_RO.ts \
   qt/locale/lux_ru.ts \
+  qt/locale/lux_vn.ts \
   qt/locale/lux_zh_TW.ts
 
 QT_FORMS_UI = \
@@ -262,12 +263,14 @@ BITCOIN_QT_H = \
   qt/qvaluecombobox.h \
   qt/receivecoinsdialog.h \
   qt/receiverequestdialog.h \
+  qt/receivetokenpage.h \
   qt/recentrequeststablemodel.h \
   qt/restoredialog.h \
   qt/rpcconsole.h \
   qt/sendcoinsdialog.h \
   qt/sendcoinsentry.h \
   qt/sendtocontract.h \
+  qt/sendtokenpage.h \
   qt/signverifymessagedialog.h \
   qt/smartcontract.h \
   qt/splashscreen.h \
@@ -297,8 +300,8 @@ BITCOIN_QT_H = \
   qt/walletview.h \
   qt/winshutdownmonitor.h \
   qt/qcustomplot.h \
-  qt/hexaddressconverter.h
-
+  qt/hexaddressconverter.h \
+  qt/tokenslistview.h
 if ENABLE_UPDATER
   BITCOIN_QT_H += lux-installer/src/luxupdater/luxupdater.h \
                   lux-installer/src/luxupdater/simplescheduler_p.h \
@@ -313,18 +316,20 @@ endif
 RES_ICONS = \
   qt/res/icons/add.png \
   qt/res/icons/address-book.png \
+  qt/res/icons/auto_backup.png \
+  qt/res/icons/backup.png \
   qt/res/icons/bitcoin.ico \
   qt/res/icons/bitcoin.png \
   qt/res/icons/bitcoin_testnet.ico \
   qt/res/icons/bitcoin_testnet.png \
   qt/res/icons/browse.png \
   qt/res/icons/chevron.png \
-  qt/res/icons/warning.png \
   qt/res/icons/clock1.png \
   qt/res/icons/clock2.png \
   qt/res/icons/clock3.png \
   qt/res/icons/clock4.png \
   qt/res/icons/clock5.png \
+  qt/res/icons/conf.png \
   qt/res/icons/configure.png \
   qt/res/icons/connect0_16.png \
   qt/res/icons/connect1_16.png \
@@ -343,21 +348,30 @@ RES_ICONS = \
   qt/res/icons/filesave.png \
   qt/res/icons/fontbigger.png \
   qt/res/icons/fontsmaller.png \
+  qt/res/icons/hd_disabled.png \
+  qt/res/icons/hd_enabled.png \
+  qt/res/icons/hex.png \
   qt/res/icons/history.png \
   qt/res/icons/key.png \
   qt/res/icons/lock_closed.png \
-  qt/res/icons/update.ico \
-  qt/res/icons/luxupdate-loader.gif \
-  qt/res/icons/lock_open.png \
-  qt/res/icons/masternodes.png \
-  qt/res/icons/overview.png \
-  qt/res/icons/smartcontract.png \
-  qt/res/icons/qrcode.png \
+  qt/res/icons/lock_closed_black.png \
+  qt/res/icons/luxcoin_black.png \
   qt/res/icons/lsrtoken.png \
+  qt/res/icons/lock_open.png \
+  qt/res/icons/luxupdate-loader.gif \
+  qt/res/icons/masternodes.png \
+  qt/res/icons/network_monitor.png \
+  qt/res/icons/options.png \
+  qt/res/icons/overview.png \
+  qt/res/icons/peer.png \
+  qt/res/icons/qrcode.png \
   qt/res/icons/quit.png \
   qt/res/icons/receive.png \
   qt/res/icons/remove.png \
+  qt/res/icons/restore.png \
   qt/res/icons/send.png \
+  qt/res/icons/sign.png \
+  qt/res/icons/smartcontract.png \
   qt/res/icons/staking_active.png \
   qt/res/icons/staking_inactive.png \
   qt/res/icons/synced.png \
@@ -365,6 +379,7 @@ RES_ICONS = \
   qt/res/icons/trade.png \
   qt/res/icons/transaction0.png \
   qt/res/icons/transaction2.png \
+  qt/res/icons/transaction_abandoned.png \
   qt/res/icons/transaction_conflicted.png \
   qt/res/icons/tx_inout.png \
   qt/res/icons/tx_input.png \
@@ -375,7 +390,12 @@ RES_ICONS = \
   qt/res/icons/unit_ulux.png \
   qt/res/icons/unit_tlux.png \
   qt/res/icons/unit_tmlux.png \
-  qt/res/icons/unit_tulux.png
+  qt/res/icons/unit_tulux.png \
+  qt/res/icons/update.ico \
+  qt/res/icons/update_black.png \
+  qt/res/icons/verified.png \
+  qt/res/icons/wallet_repair.png \
+  qt/res/icons/warning.png
 
 BITCOIN_QT_CPP = \
   qt/bantablemodel.cpp \
@@ -413,7 +433,8 @@ BITCOIN_QT_CPP = \
   qt/utilitydialog.cpp \
   qt/updatedialog.cpp \
   qt/winshutdownmonitor.cpp \
-  qt/hexaddressconverter.cpp
+  qt/hexaddressconverter.cpp \
+  qt/tokenslistview.cpp
 
 if ENABLE_WALLET
 BITCOIN_QT_CPP += \

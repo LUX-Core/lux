@@ -90,7 +90,7 @@ void OptionsModel::Init()
         settings.setValue("fShowMasternodesTab", masternodeConfig.getCount());
 
     if (!settings.contains("fShowAdvancedUI"))
-        settings.setValue("fShowAdvancedUI", false);
+        settings.setValue("fShowAdvancedUI", fEnableDarksend);
     fShowAdvancedUI = settings.value("fShowAdvancedUI", false).toBool();
 
     if (!settings.contains("fparallelMasterNode"))
@@ -124,6 +124,16 @@ void OptionsModel::Init()
         settings.setValue("fLogEvents", fLogEvents);
     if (!SoftSetBoolArg("-logevents", settings.value("fLogEvents").toBool()))
         addOverriddenOption("-logevents");
+
+    if (!settings.contains("fTxIndex"))
+        settings.setValue("fTxIndex", fTxIndex);
+    if (!SoftSetBoolArg("-txindex", settings.value("fTxIndex").toBool()))
+        addOverriddenOption("-txindex");
+
+    if (!settings.contains("fAddressIndex"))
+        settings.setValue("fAddressIndex", fAddressIndex);
+    if (!SoftSetBoolArg("-addressindex", settings.value("fAddressIndex").toBool()))
+        addOverriddenOption("-addressindex");
 
     if (!settings.contains("nThreadsScriptVerif"))
         settings.setValue("nThreadsScriptVerif", DEFAULT_SCRIPTCHECK_THREADS);
@@ -288,6 +298,10 @@ QVariant OptionsModel::data(const QModelIndex& index, int role) const
             return settings.value("fListen");
         case CheckUpdates:
             return settings.value("fCheckUpdates");
+        case TxIndex:
+            return settings.value("fTxIndex");
+        case AddressIndex:
+            return settings.value("fAddressIndex");
         default:
             return QVariant();
         }
@@ -483,7 +497,19 @@ bool OptionsModel::setData(const QModelIndex& index, const QVariant& value, int 
                settings.setValue("fLogEvents", value);
                setRestartRequired(true);
             }
-           break;
+            break;
+        case TxIndex:
+            if (settings.value("fTxIndex") != value) {
+               settings.setValue("fTxIndex", value);
+               setRestartRequired(true);
+            }
+            break;
+        case AddressIndex:
+            if (settings.value("fAddressIndex") != value) {
+               settings.setValue("fAddressIndex", value);
+               setRestartRequired(true);
+            }
+            break;
         case ThreadsScriptVerif:
             if (settings.value("nThreadsScriptVerif") != value) {
                 settings.setValue("nThreadsScriptVerif", value);

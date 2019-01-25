@@ -54,8 +54,10 @@ private:
     void unsubscribeFromCoreSignals();
    
 private slots:
+#if 0
     void on_copyAddressButton_clicked();
-    void on_createButton_clicked();
+#endif
+	void on_createButton_clicked();
     void on_editButton_clicked();
     void on_getConfigButton_clicked();
     void on_startButton_clicked();

@@ -131,7 +131,7 @@ AccountMap dev::eth::jsonToAccountMap(std::string const& _json, u256 const& _def
 				unsigned word = toUnsigned(l["word"]);
 				o_precompiled->insert(make_pair(a, PrecompiledContract(base, word, PrecompiledRegistrar::executor(n), startingBlock)));
 			}
-			catch (ExecutorNotFound)
+			catch (ExecutorNotFound& e)
 			{
 				// Oh dear - missing a plugin?
 				cwarn << "Couldn't create a precompiled contract account. Missing an executor called:" << n;

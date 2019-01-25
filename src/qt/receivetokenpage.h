@@ -17,6 +17,7 @@ public:
 
 
 void setAddress(QString address);
+void setSymbol(QString symbol);
 
 private Q_SLOTS:
 

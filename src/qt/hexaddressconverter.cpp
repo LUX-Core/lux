@@ -6,6 +6,7 @@
 
 #include <iostream>
 #include <QClipboard>
+#include <QRegularExpressionValidator>
 
 #define paternAddress "^[a-fA-F0-9]{40,40}$"
 
@@ -48,7 +49,6 @@ void HexAddressConverter::addressChanged(const QString& address) {
             ui->label->setText("Address (Lux)");
             ui->label_2->setText("Result (hex)");
             CKeyID *keyid = boost::get<CKeyID>(&addr);
-
             if (keyid) {
                 ui->resultLabel->setText(QString::fromStdString(HexStr(valtype(keyid->begin(),keyid->end()))));
             }

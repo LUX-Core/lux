@@ -23,6 +23,11 @@ void ReceiveTokenPage::setAddress(QString address)
     createQRCode();
 }
 
+void ReceiveTokenPage::setSymbol(QString symbol)
+{
+    QString addressText = symbol.isEmpty() ? "" : (QString("%1 ").arg(symbol) + tr("Address"));
+}
+
 void ReceiveTokenPage::on_copyAddressClicked()
 {
     if(!m_address.isEmpty())
@@ -37,11 +42,20 @@ void ReceiveTokenPage::createQRCode()
         info.address = m_address;
         if(ReceiveRequestDialog::createQRCode(ui->lblQRCode, info))
         {
+            ui->lblQRCode->setVisible(true);
             ui->lblQRCode->setScaledContents(true);
         }
+        else
+        {
+            ui->lblQRCode->setVisible(false);
+        }
+        ui->labelTokenAddress->setText(m_address);
+        ui->copyAddressButton->setVisible(true);
     }
     else
     {
         ui->lblQRCode->clear();
+        ui->labelTokenAddress->setText("");
+        ui->copyAddressButton->setVisible(false);
     }
 }

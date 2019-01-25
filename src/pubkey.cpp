@@ -3,15 +3,15 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "pubkey.h"
+#include "util.h"
 
 #include <secp256k1.h>
 #include <secp256k1_recovery.h>
 
-namespace
-{
+namespace {
 /* Global secp256k1_context object used for verification. */
-secp256k1_context* secp256k1_context_verify = nullptr;
-} // namespace
+static secp256k1_context* secp256k1_context_verify = nullptr;
+}
 
 static int ecdsa_signature_parse_der_lax(const secp256k1_context* ctx, secp256k1_ecdsa_signature* sig, const unsigned char *input, size_t inputlen) {
     size_t rpos, rlen, spos, slen;
@@ -177,14 +177,23 @@ bool CPubKey::RecoverCompact(const uint256& hash, const std::vector<unsigned cha
 {
     if (vchSig.size() != COMPACT_SIGNATURE_SIZE)
         return false;
+
+    unsigned char hashMsg[64];
+    memcpy(&hashMsg[0], hash.begin(), 32);
+    memset(&hashMsg[32], 0, 32);
+
     int recid = (vchSig[0] - 27) & 3;
     bool fComp = ((vchSig[0] - 27) & 4) != 0;
     secp256k1_pubkey pubkey;
     secp256k1_ecdsa_recoverable_signature sig;
+    if (secp256k1_context_verify == nullptr) {
+        LogPrintf("%s: bad context for secp256k1_ecdsa_recover()\n", __func__);
+        return false;
+    }
     if (!secp256k1_ecdsa_recoverable_signature_parse_compact(secp256k1_context_verify, &sig, &vchSig[1], recid)) {
         return false;
     }
-    if (!secp256k1_ecdsa_recover(secp256k1_context_verify, &pubkey, &sig, hash.begin())) {
+    if (!secp256k1_ecdsa_recover(secp256k1_context_verify, &pubkey, &sig, hashMsg)) {
         return false;
     }
     unsigned char pub[PUBLIC_KEY_SIZE];
@@ -281,9 +290,9 @@ int ECCVerifyHandle::refcount = 0;
 ECCVerifyHandle::ECCVerifyHandle()
 {
     if (refcount == 0) {
-        assert(secp256k1_context_verify == NULL);
+        assert(secp256k1_context_verify == nullptr);
         secp256k1_context_verify = secp256k1_context_create(SECP256K1_CONTEXT_VERIFY);
-        assert(secp256k1_context_verify != NULL);
+        assert(secp256k1_context_verify != nullptr);
     }
     refcount++;
 }
@@ -292,8 +301,8 @@ ECCVerifyHandle::~ECCVerifyHandle()
 {
     refcount--;
     if (refcount == 0) {
-        assert(secp256k1_context_verify != NULL);
+        assert(secp256k1_context_verify != nullptr);
         secp256k1_context_destroy(secp256k1_context_verify);
-        secp256k1_context_verify = NULL;
+        secp256k1_context_verify = nullptr;
     }
 }

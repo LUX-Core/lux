@@ -852,7 +852,7 @@ UniValue getwork(const UniValue& params, bool fHelp) {
             CReserveKey reservekey(pwalletMain);
 
             CPubKey pubkey;
-            reservekey.GetReservedKey(pubkey);
+            reservekey.GetReservedKey(pubkey, true);
 
             pblocktemplate = BlockAssembler(Params()).CreateNewBlockWithKey(reservekey, false);
 
@@ -947,7 +947,7 @@ protected:
 
 UniValue submitblock(const UniValue& params, bool fHelp)
 {
-    if (fHelp || params.size() < 1 || params.size() > 2)
+    if (fHelp || params.size() < 1 || params.size() > 2) {
         throw runtime_error(
             "submitblock \"hexdata\" ( \"jsonparametersobject\" )\n"
             "\nAttempts to submit new block to network.\n"
@@ -963,11 +963,14 @@ UniValue submitblock(const UniValue& params, bool fHelp)
             "\nResult:\n"
             "\nExamples:\n" +
             HelpExampleCli("submitblock", "\"mydata\"") + HelpExampleRpc("submitblock", "\"mydata\""));
+    }
 
     CBlock block;
-    if (!DecodeHexBlk(block, params[0].get_str()))
+    if (!DecodeHexBlk(block, params[0].get_str())) {
         throw JSONRPCError(RPC_DESERIALIZATION_ERROR, "Block decode failed");
+    }
 
+    CValidationState state;
     bool usePhi2, fBlockPresent = false;
     {
         LOCK(cs_main);
@@ -978,29 +981,42 @@ UniValue submitblock(const UniValue& params, bool fHelp)
         uint256 hash = block.GetHash(usePhi2);
         CBlockIndex* pindex = LookupBlockIndex(hash);
         if (pindex) {
-            if (pindex->IsValid(BLOCK_VALID_SCRIPTS))
+            if (pindex->IsValid(BLOCK_VALID_SCRIPTS)) {
                 return "duplicate";
-            if (pindex->nStatus & BLOCK_FAILED_MASK)
+            }
+            if (pindex->nStatus & BLOCK_FAILED_MASK) {
                 return "duplicate-invalid";
+            }
             // Otherwise, we might only have the header - process the block before returning
             fBlockPresent = true;
         }
+        bool fValid = TestBlockValidity(state, Params(), block, pindexPrev, false, true);
+        if (!state.IsValid()) {
+            LogPrintf("%s: block state is not valid!\n", __func__);
+        }
+        if (!fValid) {
+            LogPrintf("%s: block is not valid!\n", __func__);
+        }
     }
 
-    CValidationState state;
     submitblock_StateCatcher sc(block.GetHash(usePhi2), usePhi2);
     RegisterValidationInterface(&sc);
     bool fAccepted = ProcessNewBlock(state, Params(), NULL, &block);
     UnregisterValidationInterface(&sc);
     if (fBlockPresent) {
-        if (fAccepted && !sc.found)
+        if (fAccepted && !sc.found) {
             return "duplicate-inconclusive";
+        }
         return "duplicate";
     }
     if (fAccepted) {
-        if (!sc.found)
+        if (!sc.found) {
             return "inconclusive";
+            }
         state = sc.state;
+    } else if (state.IsValid()) {
+        LogPrintf("%s: block not accepted but state is valid!\n", __func__);
+        return "rejected";
     }
     return BIP22ValidationResult(state);
 }

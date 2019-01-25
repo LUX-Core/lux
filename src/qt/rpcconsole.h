@@ -19,6 +19,7 @@
 class QMenu;
 class ClientModel;
 class PlatformStyle;
+class RPCTimerInterface;
 
 namespace Ui
 {
@@ -26,6 +27,7 @@ class RPCConsole;
 }
 
 QT_BEGIN_NAMESPACE
+class QMenu;
 class QItemSelection;
 QT_END_NAMESPACE
 
@@ -51,6 +53,13 @@ public:
         CMD_REQUEST,
         CMD_REPLY,
         CMD_ERROR
+    };
+
+    enum TabTypes {
+        TAB_INFO = 0,
+        TAB_CONSOLE = 1,
+        TAB_GRAPH = 2,
+        TAB_PEERS = 3
     };
 
 protected:
@@ -80,7 +89,7 @@ private Q_SLOTS:
     void clearSelectedNode();
 
 public Q_SLOTS:
-    void clear();
+    void clear(bool clearHistory = true);
     void fontBigger();
     void fontSmaller();
     void setFontSize(int newSize);
@@ -122,7 +131,9 @@ public Q_SLOTS:
     /** Open external (default) editor with masternode.conf */
     void showMNConfEditor();
     /** Handle selection of peer in peers list */
-    void peerSelected(const QItemSelection& selected, const QItemSelection& deselected);
+    void peerSelected(const QItemSelection& selected, const QItemSelection &deselected);
+    /** Handle selection caching before update */
+    void peerLayoutAboutToChange();
     /** Handle updated peer information */
     void peerLayoutChanged();
     /** Disconnect a selected node on the Peers tab */
@@ -133,6 +144,10 @@ public Q_SLOTS:
     void unbanSelectedNode();
     /** Show folder with wallet backups in default browser */
     void showBackups();
+    /** Set size (number of transactions and memory usage) of the mempool in the UI */
+    void setMempoolSize(long numberOfTxs, size_t dynUsage);
+    /** set which tab has the focus (is visible) */
+    void setTabFocus(enum TabTypes tabType);
 
 Q_SIGNALS:
     // For RPC command executor
@@ -162,6 +177,7 @@ private:
 
     Ui::RPCConsole* ui;
     ClientModel* clientModel;
+    QList<NodeId> cachedNodeids;
     QString cmdBeforeBrowsing;
     QStringList history;
     int historyPtr;
@@ -172,6 +188,7 @@ private:
     QMenu* peersTableContextMenu;
     QMenu* banTableContextMenu;
     const PlatformStyle* platformStyle;
+    RPCTimerInterface* rpcTimerInterface;
 
 };
 

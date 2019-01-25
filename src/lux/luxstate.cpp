@@ -89,8 +89,14 @@ ResultExecute LuxState::execute(EnvInfo const& _envInfo, SealEngineFace const& _
         printfErrorLog(dev::eth::toTransactionException(_e));
         res.excepted = dev::eth::toTransactionException(_e);
         res.gasUsed = _t.gas();
-        m_cache.clear();
-        cacheUTXO.clear();
+
+        if (_p != Permanence::Reverted) {
+            deleteAccounts(_sealEngine.deleteAddresses);
+            commit(CommitBehaviour::RemoveEmptyAccounts);
+        } else {
+            m_cache.clear();
+            cacheUTXO.clear();
+        }
     }
 
     if(!_t.isCreation())
@@ -219,7 +225,7 @@ void LuxState::addBalance(dev::Address const& _id, dev::u256 const& _amount)
         m_changeLog.emplace_back(dev::eth::detail::Change::Balance, _id, _amount);
 }
 
-dev::Address LuxState::createLuxAddress(dev::h256 hashTx, uint32_t voutNumber){
+const dev::Address LuxState::createLuxAddress(dev::h256 hashTx, uint32_t voutNumber){
     uint256 hashTXid(h256Touint(hashTx));
 	std::vector<unsigned char> txIdAndVout(hashTXid.begin(), hashTXid.end());
 	std::vector<unsigned char> voutNumberChrs;
@@ -386,19 +392,18 @@ bool CondensingTX::checkDeleteAddress(dev::Address addr){
  */
 dev::h256 getGlobalStateRoot(CBlockIndex* pIndex){
     dev::h256 root;
-    bool isset = false;
     try {
         if (globalState != nullptr) {
             root = dev::h256(globalState->rootHash());
-            isset = true;
+        } else {
+            root = dev::sha3(dev::rlp(""));
         }
     } catch (std::exception& e) {
         // When root node is empty, it will throw exception. We must re-initialize value
-    }
-    if (!isset) {
-        root = dev::sha3(dev::rlp(""));
-        if (pIndex && pIndex->pprev->hashStateRoot != uint256()) {
+        if (pIndex && pIndex->pprev->hashStateRoot != uint256() && pIndex->pprev->hashUTXORoot != uint256()) {
             root = uintToh256(pIndex->pprev->hashStateRoot);
+        } else {
+            root = dev::sha3(dev::rlp(""));
         }
     }
     return root;
@@ -406,19 +411,18 @@ dev::h256 getGlobalStateRoot(CBlockIndex* pIndex){
 
 dev::h256 getGlobalStateUTXO(CBlockIndex* pIndex){
     dev::h256 root;
-    bool isset = false;
     try {
         if (globalState != nullptr) {
             root = dev::h256(globalState->rootHashUTXO());
-            isset = true;
+        } else {
+            root = dev::sha3(dev::rlp(""));
         }
     } catch (std::exception& e) {
         // When root node is empty, it will throw exception. We must re-initialize value
-    }
-    if (!isset) {
-        root = dev::sha3(dev::rlp(""));
-        if (pIndex && pIndex->pprev->hashUTXORoot != uint256()) {
+        if (pIndex && pIndex->pprev->hashStateRoot != uint256() && pIndex->pprev->hashUTXORoot != uint256()) {
             root = uintToh256(pIndex->pprev->hashUTXORoot);
+        } else {
+            root = dev::sha3(dev::rlp(""));
         }
     }
     return root;

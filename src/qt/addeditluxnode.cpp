@@ -74,7 +74,7 @@ void AddEditLuxNode::on_okButton_clicked()
         // Generate a new key
         if (!account.vchPubKey.IsValid() || bForceNew || bKeyUsed)
         {
-            if (!pwalletMain->GetKeyFromPool(account.vchPubKey))
+            if (!pwalletMain->GetKeyFromPool(account.vchPubKey, false))
             {
 		QMessageBox msg;
                 msg.setText("Keypool ran out, please call keypoolrefill first.");

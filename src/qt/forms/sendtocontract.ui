@@ -42,7 +42,7 @@
           </font>
          </property>
          <property name="text">
-          <string>Send to Smart Contract</string>
+          <string>Write to Smart Contract</string>
          </property>
         </widget>
        </item>
@@ -434,7 +434,7 @@
      <item>
       <widget class="QPushButton" name="pushButtonSendToContract">
        <property name="text">
-        <string>Send To Contract</string>
+        <string>Write to Contract</string>
        </property>
       </widget>
      </item>

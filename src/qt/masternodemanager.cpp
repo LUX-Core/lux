@@ -29,7 +29,6 @@ using namespace std;
 #include <QClipboard>
 #include <QMessageBox>
 #include <QThread>
-#include <QtConcurrent/QtConcurrent>
 #include <QScrollBar>
 #include <QMessageBox>
 
@@ -219,7 +218,7 @@ void MasternodeManager::on_createButton_clicked()
     AddEditLuxNode* aenode = new AddEditLuxNode();
     aenode->exec();
 }
-
+#if 0
 void MasternodeManager::on_copyAddressButton_clicked()
 {
     QItemSelectionModel* selectionModel = ui->tableWidget_2->selectionModel();
@@ -233,7 +232,7 @@ void MasternodeManager::on_copyAddressButton_clicked()
 
     QApplication::clipboard()->setText(QString::fromStdString(sCollateralAddress));
 }
-
+#endif
 void MasternodeManager::on_editButton_clicked()
 {
     QItemSelectionModel* selectionModel = ui->tableWidget_2->selectionModel();

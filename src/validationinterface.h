@@ -51,8 +51,6 @@ protected:
 
     virtual bool UpdatedTransaction(const uint256 &hash) { return false; }
 
-    virtual void Inventory(const uint256 &hash) {}
-
 // XX42    virtual void ResendWalletTransactions(int64_t nBestBlockTime) {}
     virtual void ResendWalletTransactions() {}
 
@@ -80,8 +78,6 @@ struct CMainSignals {
     boost::signals2::signal<bool(const uint256 &)> UpdatedTransaction;
     /** Notifies listeners of a new active block chain. */
     boost::signals2::signal<void(const CBlockLocator &)> SetBestChain;
-    /** Notifies listeners about an inventory item being seen on the network. */
-    boost::signals2::signal<void(const uint256 &)> Inventory;
     /** Tells listeners to broadcast their data. */
     boost::signals2::signal<void(int64_t nBestBlockTime)> Broadcast;
     /** Notifies listeners of a block validation result */

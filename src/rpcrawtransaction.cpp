@@ -12,10 +12,10 @@
 #include "init.h"
 #include "keystore.h"
 #include "main.h"
+#include "merkleblock.h"
 #include "net.h"
 #include "primitives/transaction.h"
 #include "rpcserver.h"
-#include "rbf.h"
 #include "script/script.h"
 #include "script/sign.h"
 #include "script/standard.h"
@@ -42,7 +42,7 @@ void ScriptPubKeyToJSON(const CScript& scriptPubKey, UniValue& out, bool fInclud
     vector<CTxDestination> addresses;
     int nRequired;
 
-    out.push_back(Pair("asm", ScriptToAsmStr(scriptPubKey)));
+    out.push_back(Pair("asm", scriptPubKey.ToString()));
     if (fIncludeHex)
         out.push_back(Pair("hex", HexStr(scriptPubKey.begin(), scriptPubKey.end())));
 
@@ -62,6 +62,7 @@ void ScriptPubKeyToJSON(const CScript& scriptPubKey, UniValue& out, bool fInclud
 
 void TxToJSON(const CTransaction& tx, const uint256 hashBlock, UniValue& entry)
 {
+    uint256 txid = tx.GetHash();
     entry.push_back(Pair("txid", tx.GetHash().GetHex()));
     entry.push_back(Pair("hash", tx.GetWitnessHash().GetHex()));
     entry.push_back(Pair("size", (int)::GetSerializeSize(tx, SER_NETWORK, PROTOCOL_VERSION)));
@@ -78,9 +79,23 @@ void TxToJSON(const CTransaction& tx, const uint256 hashBlock, UniValue& entry)
             in.push_back(Pair("txid", txin.prevout.hash.GetHex()));
             in.push_back(Pair("vout", (int64_t)txin.prevout.n));
             UniValue o(UniValue::VOBJ);
-            o.push_back(Pair("asm", ScriptToAsmStr(txin.scriptSig, true)));
+            o.push_back(Pair("asm", txin.scriptSig.ToString()));
             o.push_back(Pair("hex", HexStr(txin.scriptSig.begin(), txin.scriptSig.end())));
             in.push_back(Pair("scriptSig", o));
+        }
+        // Add address and value info if spentindex enabled
+        CSpentIndexValue spentInfo;
+        CSpentIndexKey spentKey(txin.prevout.hash, txin.prevout.n);
+        if (GetSpentIndex(spentKey, spentInfo)) {
+           in.push_back(Pair("value", ValueFromAmount(spentInfo.satoshis)));
+           in.push_back(Pair("valueSat", spentInfo.satoshis));
+           if (spentInfo.hashType == 1) {
+               in.push_back(Pair("address", EncodeDestination(CKeyID(spentInfo.hashBytes))));
+           } else if (spentInfo.hashType == 2) {
+               in.push_back(Pair("address", EncodeDestination(CScriptID(spentInfo.hashBytes))));
+           } else if (spentInfo.hashType == 4) {
+               in.push_back(Pair("address", EncodeDestination(WitnessV0KeyHash(spentInfo.hashBytes))));
+           }
         }
         if (!tx.wit.IsNull()) {
             if (!tx.wit.vtxinwit[i].IsNull()) {
@@ -107,6 +122,14 @@ void TxToJSON(const CTransaction& tx, const uint256 hashBlock, UniValue& entry)
         ScriptPubKeyToJSON(txout.scriptPubKey, o, true);
         out.push_back(Pair("scriptPubKey", o));
         vout.push_back(out);
+        // Add spent information if spentindex is enabled (DASH style)
+        CSpentIndexValue spentInfo;
+        CSpentIndexKey spentKey(txid, i);
+        if (GetSpentIndex(spentKey, spentInfo)) {
+            out.push_back(Pair("spentTxId", spentInfo.txhash.GetHex()));
+            out.push_back(Pair("spentIndex", (int)spentInfo.inputIndex));
+            out.push_back(Pair("spentHeight", spentInfo.blockHeight));
+        }
     }
     entry.push_back(Pair("vout", vout));
 
@@ -118,8 +141,9 @@ void TxToJSON(const CTransaction& tx, const uint256 hashBlock, UniValue& entry)
                 entry.push_back(Pair("confirmations", 1 + chainActive.Height() - pindex->nHeight));
                 entry.push_back(Pair("time", pindex->GetBlockTime()));
                 entry.push_back(Pair("blocktime", pindex->GetBlockTime()));
-            } else
-                entry.push_back(Pair("confirmations", 0));
+            } else {
+                entry.push_back(Pair("confirmations", -1));
+            }
         }
     }
 }
@@ -344,6 +368,7 @@ UniValue fundrawtransaction(const UniValue& params, bool fHelp)
             "     \"changePosition\"         (numeric, optional, default random) The index of the change output\n"
             "     \"includeWatching\"        (boolean, optional, default false) Also select inputs which are watch only\n"
             "     \"lockUnspents\"           (boolean, optional, default false) Lock selected unspent outputs\n"
+            "     \"feeRate\"           (numeric, optional, default not set: makes wallet determine the fee) Set a specific feerate (" + CURRENCY_UNIT + " per KB)\n"
             "     \"subtractFeeFromOutputs\" (array, optional) A json array of integers.\n"
             "                              The fee will be equally deducted from the amount of each specified output.\n"
             "                              The outputs are specified by their zero-based index, before any change output is added.\n"
@@ -384,6 +409,8 @@ UniValue fundrawtransaction(const UniValue& params, bool fHelp)
     bool lockUnspents = false;
     UniValue subtractFeeFromOutputs;
     set<int> setSubtractFeeFromOutputs;
+    bool overrideEstimatedFeerate = false;
+    CFeeRate feeRate = CFeeRate(0);
 
     if (!params[1].isNull()) {
         if (params[1].type() == UniValue::VBOOL) {
@@ -400,6 +427,7 @@ UniValue fundrawtransaction(const UniValue& params, bool fHelp)
                     {"changePosition", UniValue::VNUM},
                     {"includeWatching", UniValue::VBOOL},
                     {"lockUnspents", UniValue::VBOOL},
+                    {"feeRate", UniValueType()},
                     {"reserveChangeKey", UniValue::VBOOL}, // DEPRECATED (and ignored), should be removed in 0.16 or so.
                     {"subtractFeeFromOutputs", (UniValue::VARR)},
                 },
@@ -423,6 +451,11 @@ UniValue fundrawtransaction(const UniValue& params, bool fHelp)
 
             if (options.exists("lockUnspents"))
                 lockUnspents = options["lockUnspents"].get_bool();
+
+            if (options.exists("feeRate")) {
+            feeRate = CFeeRate(AmountFromValue(options["feeRate"]));
+            overrideEstimatedFeerate = true;
+             }
 
             if (options.exists("subtractFeeFromOutputs"))
             subtractFeeFromOutputs = options["subtractFeeFromOutputs"].get_array();
@@ -458,7 +491,7 @@ UniValue fundrawtransaction(const UniValue& params, bool fHelp)
     CAmount nFeeOut;
     std::string strFailReason;
 
-    if (!pwalletMain->FundTransaction(tx, nFeeOut, changePosition, strFailReason, lockUnspents, setSubtractFeeFromOutputs, &coinControl)) {
+    if (!pwalletMain->FundTransaction(tx, nFeeOut, overrideEstimatedFeerate, changePosition, strFailReason, lockUnspents, setSubtractFeeFromOutputs, &coinControl)) {
         throw JSONRPCError(RPC_WALLET_ERROR, strFailReason);
     }
 
@@ -507,9 +540,7 @@ UniValue createrawtransaction(const UniValue& params, bool fHelp)
             "       } \n"
             "      ,...\n"
             "    }\n"
-            "3. locktime                  (numeric, optional, default=0) Raw locktime. Non-0 value also locktime-activates inputs\n"
-            "4. replaceable               (boolean, optional, default=false) Marks this transaction as BIP125 replaceable.\n"
-            "                             Allows this transaction to be replaced by a transaction with higher fees. If provided, it is an error if explicit sequence numbers are incompatible.\n"
+
             "\nResult:\n"
             "\"transaction\"            (string) hex string of the transaction\n"
             "\nExamples\n" +
@@ -524,17 +555,10 @@ UniValue createrawtransaction(const UniValue& params, bool fHelp)
 
     CMutableTransaction rawTx;
 
-    if (!params[2].isNull()) {
-        int64_t nLockTime = params[2].get_int64();
-        if (nLockTime < 0 || nLockTime > numeric_limits<uint32_t>::max())
-            throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter, locktime out of range");
-        rawTx.nLockTime = nLockTime;
-    }
 
-    bool rbfOptIn = params[3].isTrue();
+    for (unsigned int i = 0; i < inputs.size(); i++) {
+         UniValue input = inputs[i];
 
-    for (unsigned int idx = 0; idx < inputs.size(); idx++) {
-        const UniValue& input = inputs[idx];
         const UniValue& o = input.get_obj();
 
         uint256 txid = ParseHashO(o, "txid");
@@ -546,32 +570,11 @@ UniValue createrawtransaction(const UniValue& params, bool fHelp)
         if (nOutput < 0)
             throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter, vout must be positive");
 
-        uint32_t nSequence;
-        if (rbfOptIn) {
-            nSequence = MAX_BIP125_RBF_SEQUENCE;
-        } else if (rawTx.nLockTime) {
-            nSequence = numeric_limits<uint32_t>::max() - 1;
-        } else {
-            nSequence = numeric_limits<uint32_t>::max();
-        }
-
-        // set the sequence number if passed in the parameters object
-        const UniValue& sequenceObj = find_value(o, "sequence");
-        if (sequenceObj.isNum()) {
-            int64_t seqNr64 = sequenceObj.get_int64();
-            if (seqNr64 < 0 || seqNr64 > numeric_limits<uint32_t>::max()) {
-                throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter, sequence number is out of range");
-            } else {
-                nSequence = (uint32_t)seqNr64;
-            }
-        }
-
-        CTxIn in(COutPoint(txid, nOutput), CScript(), nSequence);
-
+        CTxIn in(COutPoint(txid, nOutput));
         rawTx.vin.push_back(in);
     }
 
-    set<CTxDestination> destinations;
+    set<CTxDestination > destinations;
     vector<string> addrList = sendTo.getKeys();
     for (const string& name_ : addrList) {
 
@@ -667,9 +670,6 @@ UniValue createrawtransaction(const UniValue& params, bool fHelp)
         }
     }
 
-    if (!params[3].isNull() && rbfOptIn != SignalsOptInRBF(rawTx)) {
-        throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter combination: Sequence number(s) contradict replaceable option");
-    }
     return EncodeHexTx(rawTx);
 }
 
@@ -920,7 +920,7 @@ UniValue signrawtransaction(const UniValue& params, bool fHelp)
 
             UniValue prevOut = p.get_obj();
 
-            RPCTypeCheckObj(prevOut, map_list_of("txid", UniValue::VSTR)("vout", UniValue::VNUM)("scriptPubKey", UniValue::VSTR));
+            RPCTypeCheckObj(prevOut, { {"txid", UniValueType(UniValue::VSTR)}, {"vout", UniValueType(UniValue::VNUM)}, {"scriptPubKey", UniValueType(UniValue::VSTR)}, });
 
             uint256 txid = ParseHashO(prevOut, "txid");
 
@@ -935,8 +935,8 @@ UniValue signrawtransaction(const UniValue& params, bool fHelp)
                 CCoinsModifier coins = view.ModifyCoins(txid);
                 if (coins->IsAvailable(nOut) && coins->vout[nOut].scriptPubKey != scriptPubKey) {
                     string err("Previous output scriptPubKey mismatch:\n");
-                    err = err + ScriptToAsmStr(coins->vout[nOut].scriptPubKey) + "\nvs:\n" +
-                            ScriptToAsmStr(scriptPubKey);
+                    err = err + coins->vout[nOut].scriptPubKey.ToString() + "\nvs:\n" +
+                          scriptPubKey.ToString();
                     throw JSONRPCError(RPC_DESERIALIZATION_ERROR, err);
                 }
                 if ((unsigned int)nOut >= coins->vout.size())
@@ -951,7 +951,7 @@ UniValue signrawtransaction(const UniValue& params, bool fHelp)
             // if redeemScript given and not using the local wallet (private keys
             // given), add redeemScript to the tempKeystore so it can be signed:
             if (fGivenKeys && (scriptPubKey.IsPayToScriptHash() || scriptPubKey.IsPayToWitnessScriptHash())) {
-                RPCTypeCheckObj(prevOut, map_list_of("txid", UniValue::VSTR)("vout", UniValue::VNUM)("scriptPubKey", UniValue::VSTR)("redeemScript", UniValue::VSTR));
+                RPCTypeCheckObj(prevOut, { {"txid", UniValueType(UniValue::VSTR)}, {"vout", UniValueType(UniValue::VNUM)}, {"scriptPubKey", UniValueType(UniValue::VSTR)}, {"redeemScript", UniValueType(UniValue::VSTR)},});
                 UniValue v = find_value(prevOut, "redeemScript");
                 if (!(v.isNull())) {
                     vector<unsigned char> rsData(ParseHexV(v, "redeemScript"));

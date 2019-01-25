@@ -8,17 +8,21 @@
 
 #include "leveldbwrapper.h"
 #include "main.h"
+#include "addressindex.h"
 
 #include <map>
 #include <string>
 #include <utility>
 #include <vector>
 
+class CBlockFileInfo;
+class CBlockIndex;
+struct CDiskTxPos;
 class CCoins;
 class uint256;
 
 //! -dbcache default (MiB)
-static const int64_t nDefaultDbCache = 300;
+static const int64_t nDefaultDbCache = 450;
 //! max. -dbcache in (MiB)
 static const int64_t nMaxDbCache = sizeof(void*) > 4 ? 16384 : 1024;
 //! min. -dbcache in (MiB)
@@ -44,6 +48,10 @@ public:
     uint256 GetBestBlock() const;
     bool BatchWrite(CCoinsMap& mapCoins, const uint256& hashBlock);
     bool GetStats(CCoinsStats& stats) const;
+
+    //! Attempt to update from an older database format. Returns whether an error occurred.
+    bool Upgrade();
+    size_t EstimateSize() const;
 };
 
 /** Access to the block database (blocks/index/) */
@@ -57,6 +65,7 @@ private:
     void operator=(const CBlockTreeDB&);
 
 public:
+    bool WriteBatchSync(const std::vector<std::pair<int, const CBlockFileInfo*> >& fileInfo, int nLastFile, const std::vector<const CBlockIndex*>& blockinfo);
     bool WriteBlockIndex(const CDiskBlockIndex& blockindex);
     bool ReadBlockFileInfo(int nFile, CBlockFileInfo& fileinfo);
     bool WriteBlockFileInfo(int nFile, const CBlockFileInfo& fileinfo);
@@ -64,8 +73,19 @@ public:
     bool WriteLastBlockFile(int nFile);
     bool WriteReindexing(bool fReindex);
     bool ReadReindexing(bool& fReindex);
+    bool EraseTxIndex(const uint256& txid);
     bool ReadTxIndex(const uint256& txid, CDiskTxPos& pos);
     bool WriteTxIndex(const std::vector<std::pair<uint256, CDiskTxPos> >& list);
+    bool ReadSpentIndex(CSpentIndexKey &key, CSpentIndexValue &value);
+    bool UpdateSpentIndex(const std::vector<std::pair<CSpentIndexKey, CSpentIndexValue> >&vect);
+    bool UpdateAddressUnspentIndex(const AddressUnspentVector &vect);
+    bool ReadAddressUnspentIndex(uint160 addrHash, uint16_t addrType, AddressUnspentVector &vect);
+    bool EraseAddressUnspentIndex(const AddressUnspentVector &vect);
+    bool FindTxEntriesInUnspentIndex(uint256 txid, AddressUnspentVector &addressUnspent);
+    bool WriteAddressIndex(const AddressIndexVector &vect);
+    bool EraseAddressIndex(const AddressIndexVector &vect);
+    bool FindTxEntriesInAddressIndex(uint256 txid, AddressIndexVector &addressIndex);
+    bool ReadAddressIndex(uint160 addrHash, uint16_t addrType, AddressIndexVector &addressIndex, int start = 0, int end = 0);
     bool WriteFlag(const std::string& name, bool fValue);
     bool ReadFlag(const std::string& name, bool& fValue);
     bool LoadBlockIndexGuts();

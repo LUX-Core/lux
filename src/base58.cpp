@@ -136,28 +136,6 @@ std::string EncodeBase58Check(const std::vector<unsigned char>& vchIn)
     return EncodeBase58(vch);
 }
 
-bool DecodeBase58Check(const char* psz, std::vector<unsigned char>& vchRet)
-{
-    if (!DecodeBase58(psz, vchRet) ||
-        (vchRet.size() < 4)) {
-        vchRet.clear();
-        return false;
-    }
-    // re-calculate the checksum, insure it matches the included 4-byte checksum
-    uint256 hash = Hash(vchRet.begin(), vchRet.end() - 4);
-    if (memcmp(&hash, &vchRet.end()[-4], 4) != 0) {
-        vchRet.clear();
-        return false;
-    }
-    vchRet.resize(vchRet.size() - 4);
-    return true;
-}
-
-bool DecodeBase58Check(const std::string& str, std::vector<unsigned char>& vchRet)
-{
-    return DecodeBase58Check(str.c_str(), vchRet);
-}
-
 CBase58Data::CBase58Data()
 {
     vchVersion.clear();

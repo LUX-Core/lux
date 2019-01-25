@@ -75,6 +75,14 @@ f.write("""
 #endif
 """)
 f.write('static const char UNUSED *lux_strings[] = {\n')
+# force add some qt base common entries (dialogs butttons for cross-builds)
+f.write('QT_TRANSLATE_NOOP("QPlatformTheme", "Cancel"),\n')
+f.write('QT_TRANSLATE_NOOP("QPlatformTheme", "Close"),\n')
+f.write('QT_TRANSLATE_NOOP("QPlatformTheme", "Apply"),\n')
+f.write('QT_TRANSLATE_NOOP("QPlatformTheme", "&Save"),\n')
+f.write('QT_TRANSLATE_NOOP("QPlatformTheme", "&Yes"),\n')
+f.write('QT_TRANSLATE_NOOP("QPlatformTheme", "&No"),\n')
+f.write('QT_TRANSLATE_NOOP("QPlatformTheme", "OK"),\n')
 messages.sort(key=operator.itemgetter(0))
 for (msgid, msgstr) in messages:
     if msgid != EMPTY:

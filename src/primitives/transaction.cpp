@@ -49,7 +49,7 @@ std::string CTxIn::ToString() const
     if (prevout.IsNull())
         str += strprintf(", coinbase %s", HexStr(scriptSig));
     else
-        str += strprintf(", scriptSig=%s", HexStr(scriptSig).substr(0,24));
+        str += strprintf(", scriptSig=%s", scriptSig.ToString().substr(0,24));
     if (nSequence != SEQUENCE_FINAL)
         str += strprintf(", nSequence=%u", nSequence);
     str += ")";
@@ -78,7 +78,7 @@ uint256 CTxOut::GetHash() const
 
 std::string CTxOut::ToString() const
 {
-    return strprintf("CTxOut(nValue=%d.%08d, scriptPubKey=%s)", nValue / COIN, nValue % COIN, HexStr(scriptPubKey).substr(0, 30));
+    return strprintf("CTxOut(nValue=%d.%08d, scriptPubKey=%s)", nValue / COIN, nValue % COIN, scriptPubKey.ToString().substr(0,30));
 }
 
 CMutableTransaction::CMutableTransaction() : nVersion(CTransaction::CURRENT_VERSION), nTime(0), nLockTime(0) {}
@@ -132,6 +132,17 @@ CTransaction& CTransaction::operator=(const CTransaction &tx) {
     *const_cast<uint256*>(&hash) = tx.hash;
     *const_cast<CTxWitness*>(&wit) = tx.wit;
     return *this;
+}
+
+bool CTransaction::IsEquivalent(const CTransaction& tx) const {
+    if (nVersion != tx.nVersion || nLockTime != tx.nLockTime || vin.size() != tx.vin.size() || vout != tx.vout)
+        return false;
+    for (unsigned int i = 0; i < vin.size(); i++) {
+        if (vin[i].nSequence != tx.vin[i].nSequence ||
+            vin[i].prevout   != tx.vin[i].prevout)
+            return false;
+    }
+    return true;
 }
 
 CAmount CTransaction::GetValueOut() const

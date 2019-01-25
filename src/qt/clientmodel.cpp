@@ -28,7 +28,6 @@
 #include <QDateTime>
 #include <QDebug>
 #include <QTimer>
-
 class CBlockIndex;
 
 static const int64_t nClientStartupTime = GetTime();
@@ -148,6 +147,16 @@ QDateTime ClientModel::getLastBlockDate() const
         return QDateTime::fromTime_t(Params().GenesisBlock().GetBlockTime()); // Genesis block's time of current network
 }
 
+long ClientModel::getMempoolSize() const
+{
+    return mempool.size();
+}
+
+size_t ClientModel::getMempoolDynamicUsage() const
+{
+    return mempool.DynamicMemoryUsage();
+}
+
 double ClientModel::getVerificationProgress(const CBlockIndex *tipIn) const
 {
     CBlockIndex *tip = const_cast<CBlockIndex *>(tipIn);
@@ -161,19 +170,14 @@ double ClientModel::getVerificationProgress(const CBlockIndex *tipIn) const
 
 void ClientModel::updateTimer()
 {
+    // no locking required at this point
+    // the following calls will acquire the required lock
+    Q_EMIT mempoolSizeChanged(getMempoolSize(), getMempoolDynamicUsage());
     Q_EMIT bytesChanged(getTotalBytesRecv(), getTotalBytesSent());
 }
 
 void ClientModel::updateMnTimer()
 {
-#if 1
-    // Get required lock upfront. This avoids the GUI from getting stuck on
-    // periodical polls if the core is holding the locks for a longer time -
-    // for example, during a wallet rescan.
-    TRY_LOCK(cs_main, lockMain);
-    if (!lockMain)
-        return;
-
     QString newMasternodeCountString = getMasternodeCountString();
 
     if (cachedMasternodeCountString != newMasternodeCountString) {
@@ -181,7 +185,6 @@ void ClientModel::updateMnTimer()
 
         Q_EMIT strMasternodesChanged(cachedMasternodeCountString);
     }
-#endif
 }
 
 void ClientModel::updateNumConnections(int numConnections)
