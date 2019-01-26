@@ -27,6 +27,7 @@ void LuxgateOrderBookPanel::setModel(WalletModel *model)
     wal_model = model;
     ui->frameAsks->setData(false, model);
     ui->frameBids->setData(true, model);
+    slotReplaceBidsAsks();
 }
 
 void LuxgateOrderBookPanel::slotReplaceBidsAsks()
