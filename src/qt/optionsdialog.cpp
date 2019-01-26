@@ -265,14 +265,15 @@ void OptionsDialog::setMapper()
     mapper->addMapping(ui->showMasternodesTab, OptionsModel::ShowMasternodesTab);
 
     /* Luxgate Decimals*/
-    mapper->addMapping(ui->spinBoxAsksBidsPrice, OptionsModel::AsksBidsDecimalsPrice);
-    mapper->addMapping(ui->spinBoxAsksBidsBase, OptionsModel::AsksBidsDecimalsBase);
-    mapper->addMapping(ui->spinBoxAsksBidsQuote, OptionsModel::AsksBidsDecimalsQuote);
+    mapper->addMapping(ui->spinBoxPrice, OptionsModel::DecimalsPrice);
+    mapper->addMapping(ui->spinBoxBase, OptionsModel::DecimalsBase);
+    mapper->addMapping(ui->spinBoxQuote, OptionsModel::DecimalsQuote);
 
     /* Luxgate View*/
     mapper->addMapping(ui->checkBoxAsks, OptionsModel::AsksShowWidget);
     mapper->addMapping(ui->checkBoxBids, OptionsModel::BidsShowWidget);
     mapper->addMapping(ui->checkBoxConfiguration, OptionsModel::ConfigShowWidget);
+    mapper->addMapping(ui->checkBoxOpenOrders, OptionsModel::OpenOrdersShowWidget);
 }
 
 void OptionsDialog::enableOkButton()

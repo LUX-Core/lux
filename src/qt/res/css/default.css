@@ -1722,6 +1722,14 @@ QMainWindow#LuxgateDialog .QLabel#labelConfigStatus[status="info"] {
 	color: black;
 }
 
+QMainWindow#LuxgateDialog .QLabel[OrderColor="BIDS"]{
+	color: #267E00;
+}
+
+QMainWindow#LuxgateDialog .QLabel[OrderColor="ASKS"]{
+	color: red;
+}
+
 *[IsDockable] {
 	background: rgba(255,255,255,40);
 	border: 1px solid gray;
@@ -1737,6 +1745,14 @@ QDockWidget::title {
 	text-align: left center;
 }
 
+QDockWidget#LuxgateBidDockWidget::title {
+  text-align: center center;
+}
+
+QDockWidget#LuxgateAskDockWidget::title {
+  text-align: center center;
+}
+
 QDockWidget::close-button {
 	top:2px;
 	right:3px
@@ -1747,15 +1763,50 @@ QDockWidget::float-button {
 	right:18px
 }
 
+/**************************** LuxgateBidAskPanel ********************************/
 
-/**************************** LuxgateBidPanel ********************************/
-QTableView#tableViewBids .QHeaderView::section{
+*[class~="LuxgateBidAskPanel"] .QTableView#tableViewBidsAsks[OrderColor="BIDS"] .QHeaderView::section{
 		border-bottom: 3px solid #6CC417;
 }
 
-/**************************** LuxgateAskPanel ********************************/
-QTableView#tableViewAsks .QHeaderView::section{
+*[class~="LuxgateBidAskPanel"] .QTableView#tableViewBidsAsks[OrderColor="ASKS"] .QHeaderView::section{
 		border-bottom: 3px solid red;
+}
+
+*[class~="LuxgateBidAskPanel"] .QLabel#labelTotal {
+	color: blue;
+}
+
+*[class~="LuxgateBidAskPanel"] .QLabel#labelAveragePrice {
+	color: blue;
+}
+
+/**************************** LuxgateOpenOrdersPanel ********************************/
+QMainWindow#LuxgateDialog .QPushButton[OpenOrdersCancel=true]{
+    background-color: gray;
+		margin-right: 0px;
+}
+
+QMainWindow#LuxgateDialog .QPushButton[OpenOrdersCancel=true] {
+    background-color:qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: .01 #f6f6f6, stop: .1 rgba(250, 250, 250, 128), stop: .95 rgba(250, 250, 250, 255), stop: 1 #ebebeb);
+    border:1px solid #d2d2d2;
+    color:#616161;
+    padding-left:10px;
+    padding-right:10px;
+}
+
+QMainWindow#LuxgateDialog .QPushButton[OpenOrdersCancel=true]:hover {
+    background-color:qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: .01 #f6f6f6, stop: .1 rgba(240, 240, 240, 255), stop: .95 rgba(240, 240, 240, 255), stop: 1 #ebebeb);
+    color:#333;
+}
+
+QMainWindow#LuxgateDialog .QPushButton[OpenOrdersCancel=true]:pressed {
+    border:1px solid #9e9e9e;
+}
+
+/**************************** LuxgateOrderBookPanel ********************************/
+*[class~="LuxgateOrderBookPanel"] .QPushButton#pushButtonReplaceBidsAsks {
+	margin-right: 0px;
 }
 
 /**************************** Bip38ToolDialog ********************************/

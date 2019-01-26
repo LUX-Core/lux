@@ -21,18 +21,17 @@
 namespace Ui {
     class LuxgateDialog;
 }
+
+
 class WalletModel;
 class QDockWidget;
 
-struct CurrencyPair
-{
-    CurrencyPair(QString baseCurrency,QString quoteCurrency):   baseCurrency(baseCurrency),
-                                                                quoteCurrency(quoteCurrency)
-    {}
-    QString baseCurrency;
-    QString quoteCurrency;
-};
-extern CurrencyPair curCurrencyPair;
+class LuxgateOpenOrdersPanel;
+class LuxgateBidPanel;
+class LuxgateBidAskPanel;
+class LuxgateConfigPanel;
+class LuxgateOrderBookPanel;
+
 
 class LuxgateDialog : public QMainWindow
 {
@@ -47,10 +46,23 @@ public:
 private:
     Ui::LuxgateDialog *ui;
     WalletModel *model;
+
+    LuxgateBidPanel * bidsPanel;
     QDockWidget* dockBidPanel;
+
+    LuxgateBidAskPanel * asksPanel;
     QDockWidget* dockAskPanel;
+
+    LuxgateConfigPanel * confPanel;
     QDockWidget* dockConfigPanel;
-    void moveWidgetsToDocks();
+
+    LuxgateOpenOrdersPanel * openOrders;
+    QDockWidget* dockOpenOrdersPanel;
+
+    LuxgateOrderBookPanel * orderBookPanel;
+    QDockWidget* dockOrderBookPanel;
+
+    void createWidgetsAndDocks();
     QDockWidget* createDock(QWidget* widget, const QString& title);
 };
 

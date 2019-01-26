@@ -4,18 +4,20 @@
 #include <QAbstractTableModel>
 #include "optionsmodel.h"
 
-class LuxgateAsksModel : public QAbstractTableModel
+class LuxgateBidsAsksModel : public QAbstractTableModel
 {
     Q_OBJECT
 
 public:
-    explicit LuxgateAsksModel(const OptionsModel::Decimals & decimals, QObject *parent = nullptr);
+    explicit LuxgateBidsAsksModel(bool bBids, const OptionsModel::Decimals & decimals, QObject *parent = nullptr);
 
     enum Columns{
         PriceColumn = 0, BaseColumn,
         QuoteColumn, NColumns
     };
 
+    //convert value from Columns to columnNum
+    int columnNum(Columns col) const;
     // Header:
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
 
@@ -23,20 +25,18 @@ public:
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     int columnCount(const QModelIndex &parent = QModelIndex()) const override;
 
+    Qt::ItemFlags flags(const QModelIndex &index) const override;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
 
-    // Add data:
-    bool insertRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
-
-    // Remove data:
-    bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
+    void setOrientation(bool bLeft);
 
 public slots:
     void slotSetDecimals(const OptionsModel::Decimals & decimals_);
 
 private:
     OptionsModel::Decimals decimals;
-
+    bool bLeft;             //true - in left side, false - right
+    const bool bBids;       //true - Bids, false - Asks
 };
 
 #endif // LUXGATEBIDSMODEL_H

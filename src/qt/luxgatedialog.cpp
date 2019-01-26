@@ -1,5 +1,6 @@
 
 #include "luxgatedialog.h"
+#include "luxgategui_global.h"
 #include "ui_luxgatedialog.h"
 #include "clientmodel.h"
 #include "walletmodel.h"
@@ -10,7 +11,10 @@
 #include "crypto/rfc6979_hmac_sha256.h"
 #include "utilstrencodings.h"
 #include "qcustomplot.h"
-#include "luxgatebidpanel.h"
+#include "luxgateconfigpanel.h"
+#include "luxgatebidaskpanel.h"
+#include "luxgateopenorderspanel.h"
+#include "luxgateorderbookpanel.h"
 
 #include <QClipboard>
 #include <QDebug>
@@ -59,32 +63,41 @@ LuxgateDialog::LuxgateDialog(QWidget *parent) :
     ui->setupUi(this);
     setWindowFlags(Qt::Widget);
     setContentsMargins(10,10,10,10);
-    moveWidgetsToDocks();
+    createWidgetsAndDocks();
 }
 
-void LuxgateDialog::moveWidgetsToDocks()
+void LuxgateDialog::createWidgetsAndDocks()
 {
-    dockBidPanel = createDock(ui->bidpanel, "Bids");
-    dockAskPanel = createDock(ui->askspanel, "Asks");
-    dockConfigPanel = createDock(ui->configpanel, "Configuration");
+/*    bidsPanel = new LuxgateBidPanel(this);
+    dockBidPanel = createDock(bidsPanel, "Bids  ( " + curCurrencyPair.quoteCurrency + " => " + curCurrencyPair.baseCurrency + " )");
 
-    auto dockChart = createDock(ui->tabCharts, "tabCharts");
-    auto dockOrderBook = createDock(ui->tabOrderBook, "tabOrderBook");
-    auto dockOpenOrders = createDock(ui->tabOpenOrders, "tabOpenOrders");
-    auto dockBalances= createDock(ui->tabBalances, "tabBalances");
-    addDockWidget(Qt::LeftDockWidgetArea, dockBidPanel);
-    splitDockWidget(dockBidPanel, dockChart, Qt::Horizontal);
-    splitDockWidget(dockBidPanel, dockAskPanel, Qt::Vertical);
-    splitDockWidget(dockAskPanel, dockConfigPanel, Qt::Vertical);
-    tabifyDockWidget(dockChart, dockOrderBook);
-    tabifyDockWidget(dockChart, dockOpenOrders);
+    asksPanel = new LuxgateBidAskPanel(this);
+    dockAskPanel = createDock(asksPanel, "Asks  ( "  + curCurrencyPair.baseCurrency + " => " + curCurrencyPair.quoteCurrency + " )");*/
+
+    confPanel = new LuxgateConfigPanel(this);
+    dockConfigPanel = createDock(confPanel, "Configuration");
+
+    auto dockChart = createDock(ui->tabCharts, "Charts");
+
+    openOrders = new LuxgateOpenOrdersPanel(this);
+    dockOpenOrdersPanel = createDock(openOrders, "Your Open Orders");
+    orderBookPanel = new LuxgateOrderBookPanel(this);
+    dockOrderBookPanel = createDock(orderBookPanel, "Order Book");
+    auto dockBalances= createDock(ui->tabBalances, "Balances");
+    addDockWidget(Qt::LeftDockWidgetArea, dockConfigPanel);
+    //splitDockWidget(dockBidPanel, dockChart, Qt::Horizontal);
+    //splitDockWidget(dockBidPanel, dockAskPanel, Qt::Vertical);
+    //splitDockWidget(dockAskPanel, dockConfigPanel, Qt::Vertical);
+    tabifyDockWidget(dockConfigPanel, dockChart);
+    tabifyDockWidget(dockChart, dockOrderBookPanel);
+    tabifyDockWidget(dockChart, dockOpenOrdersPanel);
     tabifyDockWidget(dockChart, dockBalances);
     setTabPosition(Qt::LeftDockWidgetArea, QTabWidget::North);
 
     //Right
-    auto dockActionPanel = createDock(ui->action_panel_3, "action_panel_3");
-    auto dockStatusPanel = createDock(ui->status_panel, "status_panel");
-    auto dockSwapPanel = createDock(ui->swap_panel, "swap_panel");
+    auto dockActionPanel = createDock(ui->action_panel_3, "Action");
+    auto dockStatusPanel = createDock(ui->status_panel, "Status");
+    auto dockSwapPanel = createDock(ui->swap_panel, "Swap");
     addDockWidget(Qt::RightDockWidgetArea, dockActionPanel);
     addDockWidget(Qt::RightDockWidgetArea, dockStatusPanel);
     addDockWidget(Qt::RightDockWidgetArea, dockSwapPanel);
@@ -113,21 +126,27 @@ QDockWidget* LuxgateDialog::createDock(QWidget* widget, const QString& title)
 void LuxgateDialog::setModel(WalletModel *model)
 {
     this->model = model;
-    ui->askspanel->setModel(model);
-    ui->bidpanel->setModel(model);
+    /*asksPanel->setData(model);
+    bidsPanel->setModel(model);*/
+    orderBookPanel->setModel(model);
+    openOrders->setModel(model);
     OptionsModel * opt_model = model->getOptionsModel();
 
-    dockAskPanel->setHidden(opt_model->getHideAsksWidget());
+    /*dockAskPanel->setHidden(opt_model->getHideAsksWidget());
     connect(opt_model, &OptionsModel::hideAsksWidget,
             dockAskPanel, &QDockWidget::setHidden);
 
     dockBidPanel->setHidden(opt_model->getHideBidsWidget());
     connect(opt_model, &OptionsModel::hideBidsWidget,
-            dockBidPanel, &QDockWidget::setHidden);
+            dockBidPanel, &QDockWidget::setHidden);*/
 
     dockConfigPanel->setHidden(opt_model->getHideConfigWidget());
     connect(opt_model, &OptionsModel::hideConfigWidget,
             dockConfigPanel, &QDockWidget::setHidden);
+
+    dockOpenOrdersPanel->setHidden(opt_model->getHideOpenOrdersWidget());
+    connect(opt_model, &OptionsModel::hideOpenOrdersWidget,
+            dockOpenOrdersPanel, &QDockWidget::setHidden);
 }
 
 LuxgateDialog::~LuxgateDialog()

@@ -213,6 +213,8 @@ void OptionsModel::Init()
         settings.setValue("bBidsShowWidget", true);
     if (!settings.contains("bConfigShowWidget"))
         settings.setValue("bConfigShowWidget", true);
+    if (!settings.contains("bOpenOrdersShowWidget"))
+        settings.setValue("bOpenOrdersShowWidget", true);
 }
 
 void OptionsModel::Reset()
@@ -318,11 +320,11 @@ QVariant OptionsModel::data(const QModelIndex& index, int role) const
             return settings.value("fTxIndex");
         case AddressIndex:
             return settings.value("fAddressIndex");
-        case AsksBidsDecimalsPrice:
+        case DecimalsPrice:
             return settings.value("nAsksBidsDecimalsPrice");
-        case AsksBidsDecimalsBase:
+        case DecimalsBase:
             return settings.value("nAsksBidsDecimalsBase");
-        case AsksBidsDecimalsQuote:
+        case DecimalsQuote:
             return settings.value("nAsksBidsDecimalsQuote");
         case AsksShowWidget:
             return settings.value("bAsksShowWidget");
@@ -330,6 +332,8 @@ QVariant OptionsModel::data(const QModelIndex& index, int role) const
             return settings.value("bBidsShowWidget");
         case ConfigShowWidget:
             return settings.value("bConfigShowWidget");
+        case OpenOrdersShowWidget:
+            return settings.value("bOpenOrdersShowWidget");
         default:
             return QVariant();
         }
@@ -554,21 +558,21 @@ bool OptionsModel::setData(const QModelIndex& index, const QVariant& value, int 
                 setRestartRequired(true);
             }
             break;
-        case AsksBidsDecimalsPrice:
+        case DecimalsPrice:
             settings.setValue("nAsksBidsDecimalsPrice", value);
-            emit bidsAsksDecimalsChanged(Decimals(settings.value("nAsksBidsDecimalsPrice").toInt(),
+            emit luxgateDecimalsChanged(Decimals(settings.value("nAsksBidsDecimalsPrice").toInt(),
                                                   settings.value("nAsksBidsDecimalsBase").toInt(),
                                                   settings.value("nAsksBidsDecimalsQuote").toInt()));
             break;
-        case AsksBidsDecimalsBase:
+        case DecimalsBase:
             settings.setValue("nAsksBidsDecimalsBase", value);
-            emit bidsAsksDecimalsChanged(Decimals(settings.value("nAsksBidsDecimalsPrice").toInt(),
+            emit luxgateDecimalsChanged(Decimals(settings.value("nAsksBidsDecimalsPrice").toInt(),
                                                   settings.value("nAsksBidsDecimalsBase").toInt(),
                                                   settings.value("nAsksBidsDecimalsQuote").toInt()));
             break;
-        case AsksBidsDecimalsQuote:
+        case DecimalsQuote:
             settings.setValue("nAsksBidsDecimalsQuote", value);
-            emit bidsAsksDecimalsChanged(Decimals(settings.value("nAsksBidsDecimalsPrice").toInt(),
+            emit luxgateDecimalsChanged(Decimals(settings.value("nAsksBidsDecimalsPrice").toInt(),
                                                   settings.value("nAsksBidsDecimalsBase").toInt(),
                                                   settings.value("nAsksBidsDecimalsQuote").toInt()));
             break;
@@ -583,6 +587,10 @@ bool OptionsModel::setData(const QModelIndex& index, const QVariant& value, int 
         case ConfigShowWidget:
             settings.setValue("bConfigShowWidget", value);
             emit hideConfigWidget(!value.toBool());
+            break;
+        case OpenOrdersShowWidget:
+            settings.setValue("bOpenOrdersShowWidget", value);
+            emit hideOpenOrdersWidget(!value.toBool());
             break;
         default:
             break;
@@ -635,6 +643,11 @@ bool OptionsModel::getHideBidsWidget()
 bool OptionsModel::getHideConfigWidget()
 {
     return !QSettings().value("bConfigShowWidget").toBool();
+}
+
+bool OptionsModel::getHideOpenOrdersWidget()
+{
+    return !QSettings().value("bOpenOrdersShowWidget").toBool();
 }
 
 void OptionsModel::setRestartRequired(bool fRequired)

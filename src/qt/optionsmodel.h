@@ -59,12 +59,13 @@ public:
         CheckUpdates,            // bool
         TxIndex,                 // bool
         AddressIndex,            // bool
-        AsksBidsDecimalsPrice,   // int
-        AsksBidsDecimalsBase,    // int
-        AsksBidsDecimalsQuote,   // int
+        DecimalsPrice,   // int
+        DecimalsBase,    // int
+        DecimalsQuote,   // int
         AsksShowWidget,          // bool
         BidsShowWidget,          // bool
         ConfigShowWidget,        // bool
+        OpenOrdersShowWidget,    // bool
         OptionIDRowCount,
     };
 
@@ -117,6 +118,7 @@ public:
     bool getHideAsksWidget();
     bool getHideBidsWidget();
     bool getHideConfigWidget();
+    bool getHideOpenOrdersWidget();
 
     /* Restart flag helper */
     void setRestartRequired(bool fRequired);
@@ -153,10 +155,11 @@ Q_SIGNALS:
     void zeroBalanceAddressTokenChanged(bool);
     void walletBackupsChanged(int);
     void hideTrayIconChanged(bool);
-    void bidsAsksDecimalsChanged(Decimals);
+    void luxgateDecimalsChanged(Decimals);
     void hideAsksWidget(bool bHide);
     void hideBidsWidget(bool bHide);
     void hideConfigWidget(bool bHide);
+    void hideOpenOrdersWidget(bool bHide);
 };
 
 #endif // BITCOIN_QT_OPTIONSMODEL_H

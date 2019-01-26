@@ -93,6 +93,9 @@
         <file>res/icons/discord.png</file>
         <file>res/icons/telegram.png</file>
         <file>res/icons/twitter.png</file>
+        <file>res/icons/currencies/BTC.png</file>
+        <file>res/icons/currencies/LUX.png</file>
+        <file>res/icons/replace.png</file>
     </qresource>
     <qresource prefix="/css">
         <file alias="default">res/css/default.css</file>

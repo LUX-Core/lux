@@ -89,6 +89,12 @@ extern double NSAppKitVersionNumber;
 
 namespace GUIUtil
 {
+
+QString currencyIcon(QString ticker)
+{
+    return ":/icons/res/icons/currencies/" + ticker.toUpper() +".png";
+}
+
 QString dateTimeStr(const QDateTime& date)
 {
     return date.date().toString(Qt::SystemLocaleShortDate) + QString(" ") + date.toString("hh:mm");
