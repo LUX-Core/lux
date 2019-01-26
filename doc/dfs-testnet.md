@@ -49,7 +49,7 @@ Both servers are equivalent and can act as "Alice" and "Bob" when requested to s
 
          --datadir =" / root / luxtestnet / "
 
-* To execute any rpc command on these servers you should specify the `testnet` and `rpcpassword = 123456` keys.
+To execute any rpc command on these servers you should specify the `testnet` and `rpcpassword = 123456` keys.
 
 Example: 
 
