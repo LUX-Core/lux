@@ -109,11 +109,11 @@ static int seriesX1() {
 
 static int seriesX2(){
     float tm=5,d=40;
-    int i=65,t=20,j=1;
-    int x=(sin(0.5)*25000)-1985;
+    int i=65,j=1;
+    int x=int(exp(7))-96;
     do{j=-j;d/=j*d/i;tm+=d*d;}
     while(i--);
-    int result=int(tm/10+633)/x*t;
+    int result=int(tm/10+633)/x;
     return result;
 }
 
