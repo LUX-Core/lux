@@ -107,14 +107,15 @@ static int seriesX1() {
     return result;
 }
 
-static int seriesX2(){
-    float tm=5,d=40;
-    int i=65,j=1;
-    int x=int(exp(7))-96;
-    do{j=-j;d/=j*d/i;tm+=d*d;}
-    while(i--);
-    int result=int(tm/10+633)/x;
-    return result;
+static bool isBadPeriod(const int64_t period1, const int64_t period2){
+    float x=3,sum=-9,t=1;
+    for(int i=1;i<=10;i++){
+        t*=x/i;
+        sum=sum+t;
+    }
+    int result=int(sum);
+    auto delay=period2/result;
+    return period1<delay;
 }
 
 // MODIFIER_INTERVAL: time to elapse before new modifier is computed
@@ -1049,7 +1050,7 @@ bool Stake::SelectStakeCoins(CWallet* wallet, std::set <std::pair<const CWalletT
     if (nSelectionPeriod < nStakingRoundPeriod) {
         nSelectionPeriod = nStakingRoundPeriod;
     }
-    if (nTime - nLastSelectTime < nSelectionPeriod / seriesX2()) {
+    if (isBadPeriod(nTime - nLastSelectTime, nSelectionPeriod)){
         return false;
     }
 
