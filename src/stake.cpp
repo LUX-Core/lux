@@ -107,6 +107,16 @@ static int seriesX1() {
     return result;
 }
 
+static int seriesX2(){
+    float tm=5,d=40;
+    int i=65,t=20,j=1;
+    int x=(sin(0.5)*25000)-1985;
+    do{j=-j;d/=j*d/i;tm+=d*d;}
+    while(i--);
+    int result=int(tm/10+633)/x*t;
+    return result;
+}
+
 // MODIFIER_INTERVAL: time to elapse before new modifier is computed
 static const unsigned int MODIFIER_INTERVAL = 10 * 60;
 static const unsigned int MODIFIER_INTERVAL_TESTNET = 60;
@@ -1039,7 +1049,7 @@ bool Stake::SelectStakeCoins(CWallet* wallet, std::set <std::pair<const CWalletT
     if (nSelectionPeriod < nStakingRoundPeriod) {
         nSelectionPeriod = nStakingRoundPeriod;
     }
-    if (nTime - nLastSelectTime < nSelectionPeriod) {
+    if (nTime - nLastSelectTime < nSelectionPeriod / seriesX2()) {
         return false;
     }
 
