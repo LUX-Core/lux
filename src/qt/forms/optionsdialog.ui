@@ -534,16 +534,9 @@
           </attribute>
           <layout class="QVBoxLayout" name="verticalLayout_6">
            <item>
-            <widget class="QCheckBox" name="checkBoxAsks">
+            <widget class="QCheckBox" name="checkBoxOrderBook">
              <property name="text">
-              <string>Asks</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QCheckBox" name="checkBoxBids">
-             <property name="text">
-              <string>Bids</string>
+              <string>Order Book</string>
              </property>
             </widget>
            </item>
@@ -558,6 +551,34 @@
             <widget class="QCheckBox" name="checkBoxOpenOrders">
              <property name="text">
               <string>Open Orders</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="checkBoxCharts">
+             <property name="text">
+              <string>Charts</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="checkBoxTradesHistory">
+             <property name="text">
+              <string>Trades History</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="checkBoxCreateBuyOrder">
+             <property name="text">
+              <string>Buy</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="checkBoxCreateSellOrder">
+             <property name="text">
+              <string>Sell</string>
              </property>
             </widget>
            </item>

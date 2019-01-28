@@ -62,10 +62,13 @@ public:
         DecimalsPrice,   // int
         DecimalsBase,    // int
         DecimalsQuote,   // int
-        AsksShowWidget,          // bool
-        BidsShowWidget,          // bool
+        OrderBookShowWidget,     // bool
         ConfigShowWidget,        // bool
         OpenOrdersShowWidget,    // bool
+        ChartsShowWidget,        // bool
+        TradesHistoryShowWidget, // bool
+        BuyShowWidget, // bool
+        SellShowWidget, // bool
         OptionIDRowCount,
     };
 
@@ -115,10 +118,13 @@ public:
     bool getparallelMasterNode() { return fparallelMasterNode; } 
     const QString& getOverriddenByCommandLine() { return strOverriddenByCommandLine; }
     Decimals getBidsAsksDecimals();
-    bool getHideAsksWidget();
-    bool getHideBidsWidget();
     bool getHideConfigWidget();
     bool getHideOpenOrdersWidget();
+    bool getHideOrderBookWidget();
+    bool getHideChartsWidget();
+    bool getHideTradesHistoryWidget();
+    bool getHideBuyWidget();
+    bool getHideSellWidget();
 
     /* Restart flag helper */
     void setRestartRequired(bool fRequired);
@@ -156,10 +162,13 @@ Q_SIGNALS:
     void walletBackupsChanged(int);
     void hideTrayIconChanged(bool);
     void luxgateDecimalsChanged(Decimals);
-    void hideAsksWidget(bool bHide);
-    void hideBidsWidget(bool bHide);
+    void hideOrderBookWidget(bool bHide);
     void hideConfigWidget(bool bHide);
     void hideOpenOrdersWidget(bool bHide);
+    void hideChartsWidget(bool bHide);
+    void hideTradesHistoryWidget(bool bHide);
+    void hideBuyWidget(bool bHide);
+    void hideSellWidget(bool bHide);
 };
 
 #endif // BITCOIN_QT_OPTIONSMODEL_H

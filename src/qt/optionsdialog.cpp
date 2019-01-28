@@ -270,10 +270,13 @@ void OptionsDialog::setMapper()
     mapper->addMapping(ui->spinBoxQuote, OptionsModel::DecimalsQuote);
 
     /* Luxgate View*/
-    mapper->addMapping(ui->checkBoxAsks, OptionsModel::AsksShowWidget);
-    mapper->addMapping(ui->checkBoxBids, OptionsModel::BidsShowWidget);
+    mapper->addMapping(ui->checkBoxOrderBook, OptionsModel::OrderBookShowWidget);
     mapper->addMapping(ui->checkBoxConfiguration, OptionsModel::ConfigShowWidget);
     mapper->addMapping(ui->checkBoxOpenOrders, OptionsModel::OpenOrdersShowWidget);
+    mapper->addMapping(ui->checkBoxCharts, OptionsModel::ChartsShowWidget);
+    mapper->addMapping(ui->checkBoxTradesHistory, OptionsModel::TradesHistoryShowWidget);
+    mapper->addMapping(ui->checkBoxCreateBuyOrder, OptionsModel::BuyShowWidget);
+    mapper->addMapping(ui->checkBoxCreateSellOrder, OptionsModel::SellShowWidget);
 }
 
 void OptionsDialog::enableOkButton()

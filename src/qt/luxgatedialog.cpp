@@ -15,6 +15,9 @@
 #include "luxgatebidaskpanel.h"
 #include "luxgateopenorderspanel.h"
 #include "luxgateorderbookpanel.h"
+#include "luxgatehistorypanel.h"
+#include "tradingplot.h"
+#include "luxgatecreateorderpanel.h"
 
 #include <QClipboard>
 #include <QDebug>
@@ -68,40 +71,45 @@ LuxgateDialog::LuxgateDialog(QWidget *parent) :
 
 void LuxgateDialog::createWidgetsAndDocks()
 {
-/*    bidsPanel = new LuxgateBidPanel(this);
-    dockBidPanel = createDock(bidsPanel, "Bids  ( " + curCurrencyPair.quoteCurrency + " => " + curCurrencyPair.baseCurrency + " )");
-
-    asksPanel = new LuxgateBidAskPanel(this);
-    dockAskPanel = createDock(asksPanel, "Asks  ( "  + curCurrencyPair.baseCurrency + " => " + curCurrencyPair.quoteCurrency + " )");*/
-
     confPanel = new LuxgateConfigPanel(this);
     dockConfigPanel = createDock(confPanel, "Configuration");
 
-    auto dockChart = createDock(ui->tabCharts, "Charts");
+    chartsPanel = new TradingPlot(this);
+    dockChart = createDock(chartsPanel, "Charts");
 
     openOrders = new LuxgateOpenOrdersPanel(this);
     dockOpenOrdersPanel = createDock(openOrders, "Your Open Orders");
+
     orderBookPanel = new LuxgateOrderBookPanel(this);
     dockOrderBookPanel = createDock(orderBookPanel, "Order Book");
-    auto dockBalances= createDock(ui->tabBalances, "Balances");
+
+    historyPanel = new LuxgateHistoryPanel(this);
+    dockHistoryPanel = createDock(historyPanel, "Trades History");
+
     addDockWidget(Qt::LeftDockWidgetArea, dockConfigPanel);
-    //splitDockWidget(dockBidPanel, dockChart, Qt::Horizontal);
-    //splitDockWidget(dockBidPanel, dockAskPanel, Qt::Vertical);
-    //splitDockWidget(dockAskPanel, dockConfigPanel, Qt::Vertical);
+
     tabifyDockWidget(dockConfigPanel, dockChart);
     tabifyDockWidget(dockChart, dockOrderBookPanel);
     tabifyDockWidget(dockChart, dockOpenOrdersPanel);
-    tabifyDockWidget(dockChart, dockBalances);
+    tabifyDockWidget(dockChart, dockHistoryPanel);
     setTabPosition(Qt::LeftDockWidgetArea, QTabWidget::North);
 
     //Right
-    auto dockActionPanel = createDock(ui->action_panel_3, "Action");
+    createBuyOrderPanel = new LuxgateCreateOrderPanel(this);
+    dockBuyOrderPanel = createDock(createBuyOrderPanel, "Buy " + curCurrencyPair.baseCurrency);
+
+    createSellOrderPanel = new LuxgateCreateOrderPanel(this);
+    dockSellOrderPanel = createDock(createSellOrderPanel, "Sell " + curCurrencyPair.baseCurrency);
+
+    addDockWidget(Qt::RightDockWidgetArea, dockBuyOrderPanel);
+    addDockWidget(Qt::RightDockWidgetArea, dockSellOrderPanel);
+/*    auto dockActionPanel = createDock(ui->action_panel_3, "Action");
     auto dockStatusPanel = createDock(ui->status_panel, "Status");
     auto dockSwapPanel = createDock(ui->swap_panel, "Swap");
     addDockWidget(Qt::RightDockWidgetArea, dockActionPanel);
     addDockWidget(Qt::RightDockWidgetArea, dockStatusPanel);
     addDockWidget(Qt::RightDockWidgetArea, dockSwapPanel);
-
+*/
     //remove Central
     QDockWidget* centralDockNULL = new QDockWidget(this);
     centralDockNULL->setFixedWidth(0);
@@ -126,19 +134,9 @@ QDockWidget* LuxgateDialog::createDock(QWidget* widget, const QString& title)
 void LuxgateDialog::setModel(WalletModel *model)
 {
     this->model = model;
-    /*asksPanel->setData(model);
-    bidsPanel->setModel(model);*/
     orderBookPanel->setModel(model);
     openOrders->setModel(model);
     OptionsModel * opt_model = model->getOptionsModel();
-
-    /*dockAskPanel->setHidden(opt_model->getHideAsksWidget());
-    connect(opt_model, &OptionsModel::hideAsksWidget,
-            dockAskPanel, &QDockWidget::setHidden);
-
-    dockBidPanel->setHidden(opt_model->getHideBidsWidget());
-    connect(opt_model, &OptionsModel::hideBidsWidget,
-            dockBidPanel, &QDockWidget::setHidden);*/
 
     dockConfigPanel->setHidden(opt_model->getHideConfigWidget());
     connect(opt_model, &OptionsModel::hideConfigWidget,
@@ -147,6 +145,26 @@ void LuxgateDialog::setModel(WalletModel *model)
     dockOpenOrdersPanel->setHidden(opt_model->getHideOpenOrdersWidget());
     connect(opt_model, &OptionsModel::hideOpenOrdersWidget,
             dockOpenOrdersPanel, &QDockWidget::setHidden);
+
+    dockOrderBookPanel->setHidden(opt_model->getHideOrderBookWidget());
+    connect(opt_model, &OptionsModel::hideOrderBookWidget,
+            dockOrderBookPanel, &QDockWidget::setHidden);
+
+    dockHistoryPanel->setHidden(opt_model->getHideTradesHistoryWidget());
+    connect(opt_model, &OptionsModel::hideTradesHistoryWidget,
+            dockHistoryPanel, &QDockWidget::setHidden);
+
+    dockBuyOrderPanel->setHidden(opt_model->getHideBuyWidget());
+    connect(opt_model, &OptionsModel::hideBuyWidget,
+            dockBuyOrderPanel, &QDockWidget::setHidden);
+
+    dockSellOrderPanel->setHidden(opt_model->getHideSellWidget());
+    connect(opt_model, &OptionsModel::hideSellWidget,
+            dockSellOrderPanel, &QDockWidget::setHidden);
+
+    dockChart->setHidden(opt_model->getHideChartsWidget());
+    connect(opt_model, &OptionsModel::hideChartsWidget,
+            dockChart, &QDockWidget::setHidden);
 }
 
 LuxgateDialog::~LuxgateDialog()

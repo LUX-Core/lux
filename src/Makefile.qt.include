@@ -81,7 +81,10 @@ if ENABLE_LUXGATE
                 qt/forms/luxgateconfigpanel.ui \
                 qt/forms/luxgatebidaskpanel.ui \
                 qt/forms/luxgateopenorderspanel.ui \
-                qt/forms/luxgateorderbookpanel.ui
+                qt/forms/luxgateorderbookpanel.ui \
+                qt/forms/tradingplot.ui \
+                qt/forms/luxgatehistorypanel.ui \
+                qt/forms/luxgatecreateorderpanel.ui
 endif
 
 QT_MOC_CPP = \
@@ -192,7 +195,11 @@ if ENABLE_LUXGATE
                   qt/moc_luxgatebidaskpanel.cpp \
                   qt/moc_luxgateopenorderspanel.cpp \
                   qt/moc_luxgateopenordersmodel.cpp \
-                  qt/moc_luxgateorderbookpanel.cpp
+                  qt/moc_luxgateorderbookpanel.cpp \
+                  qt/moc_tradingplot.cpp \
+                  qt/moc_luxgatehistorypanel.cpp \
+                  qt/moc_luxgatehistorymodel.cpp \
+                  qt/moc_luxgatecreateorderpanel.cpp
 endif
 
 BITCOIN_MM = \
@@ -340,7 +347,11 @@ if ENABLE_LUXGATE
                   qt/luxgateopenorderspanel.h \
                   qt/luxgateopenordersmodel.h \
                   qt/luxgateorderbookpanel.h \
-                  qt/luxgategui_global.h
+                  qt/luxgategui_global.h \
+                  qt/tradingplot.h \
+                  qt/luxgatehistorypanel.h \
+                  qt/luxgatehistorymodel.h \
+                  qt/luxgatecreateorderpanel.h
 endif
 
 RES_ICONS = \
@@ -566,7 +577,11 @@ if ENABLE_LUXGATE
                     qt/luxgatebidsasksmodel.cpp \
                     qt/luxgateopenorderspanel.cpp \
                     qt/luxgateopenordersmodel.cpp \
-                    qt/luxgateorderbookpanel.cpp
+                    qt/luxgateorderbookpanel.cpp \
+                    qt/tradingplot.cpp \
+                    qt/luxgatehistorypanel.cpp \
+                    qt/luxgatehistorymodel.cpp \
+                    qt/luxgatecreateorderpanel.cpp
 endif
 
 endif

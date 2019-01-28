@@ -26,11 +26,12 @@ namespace Ui {
 class WalletModel;
 class QDockWidget;
 
-class LuxgateOpenOrdersPanel;
-class LuxgateBidPanel;
-class LuxgateBidAskPanel;
+class LuxgateOpenOrdersPanel;;
 class LuxgateConfigPanel;
 class LuxgateOrderBookPanel;
+class TradingPlot;
+class LuxgateHistoryPanel;
+class LuxgateCreateOrderPanel;
 
 
 class LuxgateDialog : public QMainWindow
@@ -47,12 +48,6 @@ private:
     Ui::LuxgateDialog *ui;
     WalletModel *model;
 
-    LuxgateBidPanel * bidsPanel;
-    QDockWidget* dockBidPanel;
-
-    LuxgateBidAskPanel * asksPanel;
-    QDockWidget* dockAskPanel;
-
     LuxgateConfigPanel * confPanel;
     QDockWidget* dockConfigPanel;
 
@@ -61,6 +56,18 @@ private:
 
     LuxgateOrderBookPanel * orderBookPanel;
     QDockWidget* dockOrderBookPanel;
+
+    LuxgateHistoryPanel * historyPanel;
+    QDockWidget* dockHistoryPanel;
+
+    LuxgateCreateOrderPanel * createBuyOrderPanel;
+    QDockWidget* dockBuyOrderPanel;
+
+    LuxgateCreateOrderPanel * createSellOrderPanel;
+    QDockWidget* dockSellOrderPanel;
+
+    TradingPlot * chartsPanel;
+    QDockWidget* dockChart;
 
     void createWidgetsAndDocks();
     QDockWidget* createDock(QWidget* widget, const QString& title);

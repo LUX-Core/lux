@@ -1782,9 +1782,12 @@ QDockWidget::float-button {
 }
 
 /**************************** LuxgateOpenOrdersPanel ********************************/
+*[class~="LuxgateOpenOrdersPanel"] .QPushButton {
+	margin-right: 0px;
+}
+
 QMainWindow#LuxgateDialog .QPushButton[OpenOrdersCancel=true]{
     background-color: gray;
-		margin-right: 0px;
 }
 
 QMainWindow#LuxgateDialog .QPushButton[OpenOrdersCancel=true] {
