@@ -27,7 +27,7 @@ void LuxgateOpenOrdersPanel::setModel(WalletModel *model)
     OptionsModel * opt_model = wal_model->getOptionsModel();
     //init tableview
     {
-        auto tableModel =new LuxgateOpenOrdersModel(opt_model->getBidsAsksDecimals(), this);
+        auto tableModel =new LuxgateOpenOrdersModel(opt_model->getLuxgateDecimals(), this);
         ui->tableViewOpenOrders->setModel(tableModel);
         QHeaderView * HeaderView = ui->tableViewOpenOrders->horizontalHeader();
         HeaderView->setSectionResizeMode(QHeaderView::Stretch);

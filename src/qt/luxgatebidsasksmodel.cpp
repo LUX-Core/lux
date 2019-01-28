@@ -3,7 +3,7 @@
 #include <QColor>
 #include <QBrush>
 
-LuxgateBidsAsksModel::LuxgateBidsAsksModel(bool bBids, const OptionsModel::Decimals & decimals, QObject *parent)
+LuxgateBidsAsksModel::LuxgateBidsAsksModel(bool bBids, const Luxgate::Decimals & decimals, QObject *parent)
     : QAbstractTableModel(parent),
       decimals(decimals),
       bLeft(bBids),
@@ -30,7 +30,7 @@ Qt::ItemFlags LuxgateBidsAsksModel::flags(const QModelIndex &index) const
     return Qt::ItemIsSelectable |  Qt::ItemIsEnabled;
 }
 
-void LuxgateBidsAsksModel::slotSetDecimals(const OptionsModel::Decimals & decimals_)
+void LuxgateBidsAsksModel::slotSetDecimals(const Luxgate::Decimals & decimals_)
 {
     decimals = decimals_;
     emit dataChanged(index(0,0), index(rowCount()-1,columnCount()-1), {Qt::DisplayRole});

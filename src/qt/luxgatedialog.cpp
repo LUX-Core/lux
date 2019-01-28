@@ -56,7 +56,7 @@
 
 using namespace std;
 
-CurrencyPair curCurrencyPair ("LUX", "BTC");
+Luxgate::CurrencyPair curCurrencyPair ("LUX", "BTC");
 
 LuxgateDialog::LuxgateDialog(QWidget *parent) :
         QMainWindow(parent),
@@ -136,6 +136,7 @@ void LuxgateDialog::setModel(WalletModel *model)
     this->model = model;
     orderBookPanel->setModel(model);
     openOrders->setModel(model);
+    historyPanel->setModel(model);
     OptionsModel * opt_model = model->getOptionsModel();
 
     dockConfigPanel->setHidden(opt_model->getHideConfigWidget());

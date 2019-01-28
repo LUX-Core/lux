@@ -4,7 +4,7 @@
 #include <QColor>
 #include <QBrush>
 
-LuxgateOpenOrdersModel::LuxgateOpenOrdersModel(const OptionsModel::Decimals & decimals, QObject *parent)
+LuxgateOpenOrdersModel::LuxgateOpenOrdersModel(const Luxgate::Decimals & decimals, QObject *parent)
     : QAbstractTableModel(parent),
       decimals(decimals)
 {
@@ -15,7 +15,7 @@ Qt::ItemFlags LuxgateOpenOrdersModel::flags(const QModelIndex &index) const
     return Qt::ItemIsSelectable |  Qt::ItemIsEnabled;
 }
 
-void LuxgateOpenOrdersModel::slotSetDecimals(const OptionsModel::Decimals & decimals_)
+void LuxgateOpenOrdersModel::slotSetDecimals(const Luxgate::Decimals & decimals_)
 {
     decimals = decimals_;
     emit dataChanged(index(0,0), index(rowCount()-1,columnCount()-1), {Qt::DisplayRole});
@@ -31,25 +31,25 @@ QVariant LuxgateOpenOrdersModel::headerData(int section, Qt::Orientation orienta
         switch(section)
         {
             case DateColumn:
-                res = "Date";
+                res = "DATE";
                 break;
             case TypeColumn:
-                res = "Type";
+                res = "TYPE";
                 break;
             case SideColumn:
-                res = "Side";
+                res = "SIDE";
                 break;
             case PriceColumn:
-                res = "Price";
+                res = "PRICE";
                 break;
             case BaseAmountColumn:
-                res = "Amount ( " + curCurrencyPair.baseCurrency + " )";
+                res = "AMOUNT ( " + curCurrencyPair.baseCurrency + " )";
                 break;
             case QuoteTotalColumn:
-                res = "Total ( " + curCurrencyPair.quoteCurrency + " )";
+                res = "TOTAL ( " + curCurrencyPair.quoteCurrency + " )";
                 break;
             case CancelColumn:
-                res = "Cancel";
+                res = "CANCEL";
                 break;
         }
     }

@@ -199,12 +199,12 @@ void OptionsModel::Init()
     language = settings.value("language").toString();
 
     //Luxgate Decimals
-    if (!settings.contains("nAsksBidsDecimalsPrice"))
-        settings.setValue("nAsksBidsDecimalsPrice", 8);
-    if (!settings.contains("nAsksBidsDecimalsBase"))
-        settings.setValue("nAsksBidsDecimalsBase", 8);
-    if (!settings.contains("nAsksBidsDecimalsQuote"))
-        settings.setValue("nAsksBidsDecimalsQuote", 8);
+    if (!settings.contains("nLuxgateDecimalsPrice"))
+        settings.setValue("nLuxgateDecimalsPrice", 8);
+    if (!settings.contains("nLuxgateDecimalsBase"))
+        settings.setValue("nLuxgateDecimalsBase", 8);
+    if (!settings.contains("nLuxgateDecimalsQuote"))
+        settings.setValue("nLuxgateDecimalsQuote", 8);
 
     //Luxgate Widgets
     if (!settings.contains("bOrderBookShowWidget"))
@@ -327,11 +327,11 @@ QVariant OptionsModel::data(const QModelIndex& index, int role) const
         case AddressIndex:
             return settings.value("fAddressIndex");
         case DecimalsPrice:
-            return settings.value("nAsksBidsDecimalsPrice");
+            return settings.value("nLuxgateDecimalsPrice");
         case DecimalsBase:
-            return settings.value("nAsksBidsDecimalsBase");
+            return settings.value("nLuxgateDecimalsBase");
         case DecimalsQuote:
-            return settings.value("nAsksBidsDecimalsQuote");
+            return settings.value("nLuxgateDecimalsQuote");
         case ConfigShowWidget:
             return settings.value("bConfigShowWidget");
         case OpenOrdersShowWidget:
@@ -353,9 +353,9 @@ QVariant OptionsModel::data(const QModelIndex& index, int role) const
     return QVariant();
 }
 
-OptionsModel::Decimals OptionsModel::getBidsAsksDecimals() { return Decimals(QSettings().value("nAsksBidsDecimalsPrice").toInt(),
-                                                 QSettings().value("nAsksBidsDecimalsBase").toInt(),
-                                                 QSettings().value("nAsksBidsDecimalsQuote").toInt()); }
+Luxgate::Decimals OptionsModel::getLuxgateDecimals() { return Luxgate::Decimals(QSettings().value("nLuxgateDecimalsPrice").toInt(),
+                                                 QSettings().value("nLuxgateDecimalsBase").toInt(),
+                                                 QSettings().value("nLuxgateDecimalsQuote").toInt()); }
 
 // write QSettings values
 bool OptionsModel::setData(const QModelIndex& index, const QVariant& value, int role)
@@ -571,22 +571,22 @@ bool OptionsModel::setData(const QModelIndex& index, const QVariant& value, int 
             }
             break;
         case DecimalsPrice:
-            settings.setValue("nAsksBidsDecimalsPrice", value);
-            emit luxgateDecimalsChanged(Decimals(settings.value("nAsksBidsDecimalsPrice").toInt(),
-                                                  settings.value("nAsksBidsDecimalsBase").toInt(),
-                                                  settings.value("nAsksBidsDecimalsQuote").toInt()));
+            settings.setValue("nLuxgateDecimalsPrice", value);
+            emit luxgateDecimalsChanged(Luxgate::Decimals(settings.value("nLuxgateDecimalsPrice").toInt(),
+                                                  settings.value("nLuxgateDecimalsBase").toInt(),
+                                                  settings.value("nLuxgateDecimalsQuote").toInt()));
             break;
         case DecimalsBase:
-            settings.setValue("nAsksBidsDecimalsBase", value);
-            emit luxgateDecimalsChanged(Decimals(settings.value("nAsksBidsDecimalsPrice").toInt(),
-                                                  settings.value("nAsksBidsDecimalsBase").toInt(),
-                                                  settings.value("nAsksBidsDecimalsQuote").toInt()));
+            settings.setValue("nLuxgateDecimalsBase", value);
+            emit luxgateDecimalsChanged(Luxgate::Decimals(settings.value("nLuxgateDecimalsPrice").toInt(),
+                                                  settings.value("nLuxgateDecimalsBase").toInt(),
+                                                  settings.value("nLuxgateDecimalsQuote").toInt()));
             break;
         case DecimalsQuote:
-            settings.setValue("nAsksBidsDecimalsQuote", value);
-            emit luxgateDecimalsChanged(Decimals(settings.value("nAsksBidsDecimalsPrice").toInt(),
-                                                  settings.value("nAsksBidsDecimalsBase").toInt(),
-                                                  settings.value("nAsksBidsDecimalsQuote").toInt()));
+            settings.setValue("nLuxgateDecimalsQuote", value);
+            emit luxgateDecimalsChanged(Luxgate::Decimals(settings.value("nLuxgateDecimalsPrice").toInt(),
+                                                  settings.value("nLuxgateDecimalsBase").toInt(),
+                                                  settings.value("nLuxgateDecimalsQuote").toInt()));
             break;
         case ConfigShowWidget:
             settings.setValue("bConfigShowWidget", value);

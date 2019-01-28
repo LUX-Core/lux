@@ -2,14 +2,13 @@
 #define LUXGATEBIDSMODEL_H
 
 #include <QAbstractTableModel>
-#include "optionsmodel.h"
-
+#include "luxgategui_global.h"
 class LuxgateBidsAsksModel : public QAbstractTableModel
 {
     Q_OBJECT
 
 public:
-    explicit LuxgateBidsAsksModel(bool bBids, const OptionsModel::Decimals & decimals, QObject *parent = nullptr);
+    explicit LuxgateBidsAsksModel(bool bBids, const Luxgate::Decimals & decimals, QObject *parent = nullptr);
 
     enum Columns{
         PriceColumn = 0, BaseColumn,
@@ -31,10 +30,10 @@ public:
     void setOrientation(bool bLeft);
 
 public slots:
-    void slotSetDecimals(const OptionsModel::Decimals & decimals_);
+    void slotSetDecimals(const Luxgate::Decimals & decimals_);
 
 private:
-    OptionsModel::Decimals decimals;
+    Luxgate::Decimals decimals;
     bool bLeft;             //true - in left side, false - right
     const bool bBids;       //true - Bids, false - Asks
 };

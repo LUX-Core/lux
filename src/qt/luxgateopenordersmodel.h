@@ -2,14 +2,14 @@
 #define LUXGATEOPENORDERSMODEL_H
 
 #include <QAbstractTableModel>
-#include "optionsmodel.h"
+#include "luxgategui_global.h"
 
 class LuxgateOpenOrdersModel : public QAbstractTableModel
 {
     Q_OBJECT
 
 public:
-    explicit LuxgateOpenOrdersModel(const OptionsModel::Decimals & decimals, QObject *parent = nullptr);
+    explicit LuxgateOpenOrdersModel(const Luxgate::Decimals & decimals, QObject *parent = nullptr);
 
     enum Columns{   DateColumn = 0, TypeColumn, SideColumn,
                     PriceColumn,  BaseAmountColumn,
@@ -25,10 +25,10 @@ public:
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
 
 public slots:
-            void slotSetDecimals(const OptionsModel::Decimals & decimals_);
+    void slotSetDecimals(const Luxgate::Decimals & decimals_);
 
 private:
-    OptionsModel::Decimals decimals;
+    Luxgate::Decimals decimals;
 };
 
 #endif // LUXGATEOPENORDERSMODEL_H

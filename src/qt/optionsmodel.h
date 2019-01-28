@@ -6,6 +6,7 @@
 #define BITCOIN_QT_OPTIONSMODEL_H
 
 #include "amount.h"
+#include "luxgategui_global.h"
 
 #include <QAbstractListModel>
 
@@ -72,30 +73,6 @@ public:
         OptionIDRowCount,
     };
 
-    struct Decimals
-    {
-        Decimals(int price, int base, int quote):   price(price),
-                                                    base(base),
-                                                    quote(quote)
-        {}
-        Decimals(const Decimals & other)
-        {
-            price = other.price;
-            base = other.base;
-            quote = other.quote;
-        }
-        Decimals& operator=(const Decimals& other)
-        {
-            price = other.price;
-            base = other.base;
-            quote = other.quote;
-            return *this;
-        }
-        int price;
-        int base;
-        int quote;
-    };
-
     void Init();
     void Reset();
 
@@ -117,7 +94,7 @@ public:
     bool getshowMasternodesTab() { return fshowMasternodesTab; }
     bool getparallelMasterNode() { return fparallelMasterNode; } 
     const QString& getOverriddenByCommandLine() { return strOverriddenByCommandLine; }
-    Decimals getBidsAsksDecimals();
+    Luxgate::Decimals getLuxgateDecimals();
     bool getHideConfigWidget();
     bool getHideOpenOrdersWidget();
     bool getHideOrderBookWidget();
@@ -161,7 +138,7 @@ Q_SIGNALS:
     void zeroBalanceAddressTokenChanged(bool);
     void walletBackupsChanged(int);
     void hideTrayIconChanged(bool);
-    void luxgateDecimalsChanged(Decimals);
+    void luxgateDecimalsChanged(Luxgate::Decimals);
     void hideOrderBookWidget(bool bHide);
     void hideConfigWidget(bool bHide);
     void hideOpenOrdersWidget(bool bHide);

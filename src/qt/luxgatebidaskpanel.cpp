@@ -22,7 +22,7 @@ void LuxgateBidAskPanel::setData(bool bBids_, WalletModel *model)
     OptionsModel * opt_model = wal_model->getOptionsModel();
     //init tableview
     {
-        auto tableModel =new LuxgateBidsAsksModel(bBids, opt_model->getBidsAsksDecimals(), this);
+        auto tableModel =new LuxgateBidsAsksModel(bBids, opt_model->getLuxgateDecimals(), this);
         ui->tableViewBidsAsks->setModel(tableModel);
         QHeaderView * HeaderView = ui->tableViewBidsAsks->horizontalHeader();
         HeaderView->setSectionResizeMode(QHeaderView::Stretch);

@@ -3,9 +3,12 @@
 
 #include <QFrame>
 
+
 namespace Ui {
 class LuxgateHistoryPanel;
 }
+
+class WalletModel;
 
 class LuxgateHistoryPanel : public QFrame
 {
@@ -14,8 +17,9 @@ class LuxgateHistoryPanel : public QFrame
 public:
     explicit LuxgateHistoryPanel(QWidget *parent = nullptr);
     ~LuxgateHistoryPanel();
-
+    void setModel(WalletModel *model);
 private:
+    WalletModel * wal_model;
     Ui::LuxgateHistoryPanel *ui;
 };
 
