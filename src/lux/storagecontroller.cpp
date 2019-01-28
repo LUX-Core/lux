@@ -14,7 +14,7 @@ std::unique_ptr<StorageController> storageController;
 
 struct ReplicaStream
 {
-    const std::size_t BUFFER_SIZE = 4 * 1024;
+    const uint64_t BUFFER_SIZE = 4 * 1024;
     std::fstream filestream;
     uint256 currenOrderHash;
 
@@ -28,7 +28,7 @@ struct ReplicaStream
             const auto order = storageController->mapAnnouncements[currenOrderHash];
             const auto fileSize = GetCryptoReplicaSize(order.fileSize);
             for (auto i = 0u; i < fileSize;) {
-                size_t n = std::min(BUFFER_SIZE, fileSize - i);
+                uint64_t n = std::min(BUFFER_SIZE, fileSize - i);
                 buf.resize(n);
                 filestream.read(&buf[0], n);  // TODO: change to loop of readsome
                 if (buf.empty()) {
@@ -237,9 +237,9 @@ void StorageController::ProcessStorageMessage(CNode* pfrom, const std::string& s
             fs::remove(tempFile);
             return ;
         }
-        std::shared_ptr<AllocatedFile> file = storageHeap.AllocateFile(order.fileURI.ToString(), GetCryptoReplicaSize(order.fileSize));
+        std::shared_ptr<AllocatedFile> file = storageHeap.AllocateFile(order.fileURI, GetCryptoReplicaSize(order.fileSize));
         storageHeap.SetDecryptionKeys(file->uri, itHandshake->second.keys.rsaKey, itHandshake->second.keys.aesKey);
-        fs::rename(tempFile, file->filename);
+        fs::rename(tempFile, file->fullpath);
         LogPrint("dfs", "File \"%s\" was uploaded", order.filename);
     } else if (strCommand == "dfsping") {
         isStorageCommand = true;
@@ -525,7 +525,7 @@ RSA* StorageController::CreatePublicRSA(std::string key) { // utility function
     return rsa;
 }
 
-std::shared_ptr<AllocatedFile> StorageController::CreateReplica(const boost::filesystem::path &filename,
+std::shared_ptr<AllocatedFile> StorageController::CreateReplica(const boost::filesystem::path &replicaPath,
                                                                 const StorageOrder &order,
                                                                 const DecryptionKeys &keys,
                                                                 RSA *rsa)
@@ -533,25 +533,25 @@ std::shared_ptr<AllocatedFile> StorageController::CreateReplica(const boost::fil
     namespace fs = boost::filesystem;
 
     std::ifstream filein;
-    filein.open(filename.string().c_str(), std::ios::binary);
+    filein.open(replicaPath.string().c_str(), std::ios::binary);
     if (!filein.is_open()) {
-        LogPrint("dfs", "file %s cannot be opened", filename.string());
+        LogPrint("dfs", "file %s cannot be opened", replicaPath.string());
         return {};
     }
 
-    auto length = fs::file_size(filename);
+    auto length = fs::file_size(replicaPath);
 
-    std::shared_ptr<AllocatedFile> tempFile = tempStorageHeap.AllocateFile(order.fileURI.ToString(), GetCryptoReplicaSize(length));
+    std::shared_ptr<AllocatedFile> tempFile = tempStorageHeap.AllocateFile(order.fileURI, GetCryptoReplicaSize(length));
 
     std::ofstream outfile;
-    outfile.open(tempFile->filename, std::ios::binary);
+    outfile.open(tempFile->fullpath.string(), std::ios::binary);
 
     size_t sizeBuffer = nBlockSizeRSA - 2;
     byte *buffer = new byte[sizeBuffer];
     byte *replica = new byte[nBlockSizeRSA];
-    for (auto i = 0; i < order.fileSize; i+= sizeBuffer)
+    for (auto i = 0u; i < order.fileSize; i+= sizeBuffer)
     {
-        size_t n = std::min(sizeBuffer, order.fileSize - i);
+        uint64_t n = std::min(sizeBuffer, order.fileSize - i);
 
         filein.read((char *)buffer, n); // TODO: change to loop of readsome
 //        if (n < sizeBuffer) {
@@ -579,20 +579,17 @@ bool StorageController::SendReplica(const StorageOrder &order, std::shared_ptr<A
     }
     ReplicaStream replicaStream;
     replicaStream.currenOrderHash = order.GetHash();
-    replicaStream.filestream.open(pAllocatedFile->filename, std::ios::binary|std::ios::in);
+    replicaStream.filestream.open(pAllocatedFile->fullpath.string(), std::ios::binary|std::ios::in);
     if (!replicaStream.filestream.is_open()) {
-        LogPrint("dfs", "file %s cannot be opened", pAllocatedFile->filename);
+        LogPrint("dfs", "file %s cannot be opened", pAllocatedFile->fullpath.string());
         return false;
     }
     pNode->PushMessage("dfssendfile", replicaStream);
 
     replicaStream.filestream.close();
 
-//    fs::path tempFile = tempStorageHeap.GetChunks().back()->path; // TODO: temp usage (SS)
-//    tempFile /= ("decrypt" + std::to_string(std::time(nullptr)) + ".luxfs");
-//    DecryptReplica(pAllocatedFile, order.fileSize, tempFile);
     tempStorageHeap.FreeFile(pAllocatedFile->uri);
-    fs::remove(pAllocatedFile->filename);
+    fs::remove(pAllocatedFile->fullpath);
     return true;
 }
 
@@ -603,13 +600,13 @@ bool StorageController::DecryptReplica(std::shared_ptr<AllocatedFile> pAllocated
     RSA *rsa = CreatePublicRSA(DecryptionKeys::ToString(pAllocatedFile->keys.rsaKey));
 
     std::ifstream filein;
-    filein.open(pAllocatedFile->filename.c_str(), std::ios::binary);
+    filein.open(pAllocatedFile->fullpath.string(), std::ios::binary);
     if (!filein.is_open()) {
-        LogPrint("dfs", "file %s cannot be opened", pAllocatedFile->filename);
+        LogPrint("dfs", "file %s cannot be opened", pAllocatedFile->fullpath.string());
         return false;
     }
 
-    auto length = fs::file_size(pAllocatedFile->filename);
+    auto length = fs::file_size(pAllocatedFile->fullpath);
     auto bytesSize = fileSize;
 
     std::ofstream outfile;
@@ -618,7 +615,7 @@ bool StorageController::DecryptReplica(std::shared_ptr<AllocatedFile> pAllocated
     uint64_t sizeBuffer = nBlockSizeRSA - 2;
     byte *buffer = new byte[sizeBuffer];
     byte *replica = new byte[nBlockSizeRSA];
-    for (auto i = 0; i < length; i+= nBlockSizeRSA)
+    for (auto i = 0u; i < length; i+= nBlockSizeRSA)
     {
         filein.read((char *)replica, nBlockSizeRSA); // TODO: change to loop of readsome
 
@@ -651,6 +648,6 @@ void StorageController::DecryptReplica(const uint256 &orderHash, const boost::fi
         return ;
     }
     StorageOrder &order = itAnnounce->second;
-    std::shared_ptr<AllocatedFile> pAllocatedFile = storageHeap.GetFile(order.fileURI.ToString());
-    DecryptReplica( pAllocatedFile, order.fileSize, decryptedFile);
+    std::shared_ptr<AllocatedFile> pAllocatedFile = storageHeap.GetFile(order.fileURI);
+    DecryptReplica(pAllocatedFile, order.fileSize, decryptedFile);
 }

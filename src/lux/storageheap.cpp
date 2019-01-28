@@ -1,8 +1,9 @@
 #include "storageheap.h"
+#include "uint256.h"
 
 #include <iostream>
 
-void StorageHeap::AddChunk(const std::string& path, uint64_t size)
+void StorageHeap::AddChunk(const boost::filesystem::path& path, uint64_t size)
 {
     std::lock_guard<std::mutex> scoped_lock(cs_dfs);
     std::shared_ptr<StorageChunk> chunk_ptr = std::make_shared<StorageChunk>();
@@ -19,14 +20,13 @@ void StorageHeap::MoveChunk(size_t chunkIndex, const boost::filesystem::path &ne
     }
 
     auto chunk = chunks[chunkIndex];
-    chunk->path = newpath.string();
+    chunk->path = newpath;
 
     for(auto &&file : chunk->files) {
-        boost::filesystem::path filefullpath{file->filename};
-        std::string shortname = filefullpath.filename().string();
-        file->filename = chunk->path + "/" + shortname;
-        boost::filesystem::rename(filefullpath, newpath / shortname);
-        boost::filesystem::remove(filefullpath);
+        auto shortname = file->fullpath.filename();
+        boost::filesystem::rename(file->fullpath, newpath / shortname);
+        boost::filesystem::remove(file->fullpath);
+        file->fullpath = chunk->path / shortname;
     }
 
     return ;
@@ -39,7 +39,7 @@ std::vector<std::shared_ptr<StorageChunk>> StorageHeap::GetChunks() const
 };
 
 
-void StorageHeap::FreeChunk(const std::string& path)
+void StorageHeap::FreeChunk(const boost::filesystem::path& path)
 {
     std::lock_guard<std::mutex> scoped_lock(cs_dfs);
     for (auto it = chunks.begin(); it != chunks.end(); ++it) {
@@ -71,10 +71,10 @@ uint64_t StorageHeap::MaxAllocateSize() const
     return nMaxAllocateSize;
 }
 
-std::shared_ptr<AllocatedFile> StorageHeap::AllocateFile(const std::string& uri, uint64_t size)
+std::shared_ptr<AllocatedFile> StorageHeap::AllocateFile(const uint256& uri, uint64_t size)
 {
     std::lock_guard<std::mutex> scoped_lock(cs_dfs);
-    if (uri.empty()) {
+    if (uri.size() == 0) {
         return {};
     }
     unsigned long nBestChunkIndex = chunks.size();
@@ -87,7 +87,7 @@ std::shared_ptr<AllocatedFile> StorageHeap::AllocateFile(const std::string& uri,
     }
     if (nBestChunkIndex < chunks.size()) {
         std::shared_ptr<AllocatedFile> file_ptr = std::make_shared<AllocatedFile>();
-        file_ptr->filename = chunks[nBestChunkIndex]->path + "/" + uri + "_" + std::to_string(std::time(0)) + ".luxfs";
+        file_ptr->fullpath = chunks[nBestChunkIndex]->path / (uri.ToString() + "_" + std::to_string(std::time(0)) + ".luxfs");
         file_ptr->size = size;
         file_ptr->uri = uri;
         // add file to heap
@@ -99,7 +99,7 @@ std::shared_ptr<AllocatedFile> StorageHeap::AllocateFile(const std::string& uri,
     return {};
 }
 
-void StorageHeap::FreeFile(const std::string& uri)
+void StorageHeap::FreeFile(const uint256& uri)
 {
     std::lock_guard<std::mutex> scoped_lock(cs_dfs);
     for (auto&& chunk : chunks) {
@@ -117,7 +117,7 @@ void StorageHeap::FreeFile(const std::string& uri)
     }
 }
 
-std::shared_ptr<AllocatedFile> StorageHeap::GetFile(const std::string& uri) const
+std::shared_ptr<AllocatedFile> StorageHeap::GetFile(const uint256& uri) const
 {
     std::lock_guard<std::mutex> scoped_lock(cs_dfs);
     auto file_it = files.find(uri);
@@ -126,7 +126,7 @@ std::shared_ptr<AllocatedFile> StorageHeap::GetFile(const std::string& uri) cons
     return {};
 }
 
-void StorageHeap::SetDecryptionKeys(const std::string& uri, const std::vector<unsigned char>& rsaKey, const std::vector<unsigned char>& aesKey)
+void StorageHeap::SetDecryptionKeys(const uint256& uri, const RSAKey& rsaKey, const AESKey& aesKey)
 {
     std::lock_guard<std::mutex> scoped_lock(cs_dfs);
     for (auto&& chunk : chunks) {

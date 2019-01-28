@@ -1306,8 +1306,8 @@ UniValue dfsgetinfo(const UniValue& params, bool fHelp)
     UniValue obj(UniValue::VOBJ);
     obj.push_back(Pair("enabled", enabled));
     obj.push_back(Pair("myip", myip));
-    obj.push_back(Pair("dfsfolder", storageController->storageHeap.GetChunks().back()->path));
-    obj.push_back(Pair("dfstempfolder", storageController->tempStorageHeap.GetChunks().back()->path));
+    obj.push_back(Pair("dfsfolder", storageController->storageHeap.GetChunks().back()->path.string()));
+    obj.push_back(Pair("dfstempfolder", storageController->tempStorageHeap.GetChunks().back()->path.string()));
     obj.push_back(Pair("rate", storageController->rate));
     obj.push_back(Pair("maxblocksgap", storageController->maxblocksgap));
 
@@ -1421,15 +1421,15 @@ UniValue dfslocalstorage(const UniValue& params, bool fHelp)
         UniValue obj(UniValue::VOBJ);
         obj.push_back(Pair("index", chunkIndex++));
         obj.push_back(Pair("type", "storage chunk"));
-        obj.push_back(Pair("path", chunk->path));
+        obj.push_back(Pair("path", chunk->path.string()));
         obj.push_back(Pair("totalSpace", std::to_string(chunk->totalSpace)));
         obj.push_back(Pair("freeSpace", std::to_string(chunk->freeSpace)));
 
         UniValue files(UniValue::VARR);
         for(auto &&file : chunk->files) {
             UniValue objFile(UniValue::VOBJ);
-            objFile.push_back(Pair("filename", file->filename));
-            objFile.push_back(Pair("uri", file->uri));
+            objFile.push_back(Pair("filename", file->fullpath.string()));
+            objFile.push_back(Pair("uri", file->uri.ToString()));
             objFile.push_back(Pair("size", std::to_string(file->size)));
             files.push_back(objFile);
         }
@@ -1444,15 +1444,15 @@ UniValue dfslocalstorage(const UniValue& params, bool fHelp)
         UniValue obj(UniValue::VOBJ);
         obj.push_back(Pair("index", chunkIndex++));
         obj.push_back(Pair("type", "temp chunk"));
-        obj.push_back(Pair("path", chunk->path));
+        obj.push_back(Pair("path", chunk->path.string()));
         obj.push_back(Pair("totalSpace", std::to_string(chunk->totalSpace)));
         obj.push_back(Pair("freeSpace", std::to_string(chunk->freeSpace)));
 
         UniValue files(UniValue::VARR);
         for(auto &&file : chunk->files) {
             UniValue objFile(UniValue::VOBJ);
-            objFile.push_back(Pair("filename", file->filename));
-            objFile.push_back(Pair("uri", file->uri));
+            objFile.push_back(Pair("filename", file->fullpath.string()));
+            objFile.push_back(Pair("uri", file->uri.ToString()));
             objFile.push_back(Pair("size", std::to_string(file->size)));
             files.push_back(objFile);
         }
