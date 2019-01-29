@@ -96,9 +96,13 @@ void LuxgateDialog::createWidgetsAndDocks()
 
     //Right
     createBuyOrderPanel = new LuxgateCreateOrderPanel(this);
+    createBuyOrderPanel->setBidAsk(true);
+    createBuyOrderPanel->setObjectName("createBuyOrderPanel");
     dockBuyOrderPanel = createDock(createBuyOrderPanel, "Buy " + curCurrencyPair.baseCurrency);
 
     createSellOrderPanel = new LuxgateCreateOrderPanel(this);
+    createSellOrderPanel->setBidAsk(false);
+    createSellOrderPanel->setObjectName("createSellOrderPanel");
     dockSellOrderPanel = createDock(createSellOrderPanel, "Sell " + curCurrencyPair.baseCurrency);
 
     addDockWidget(Qt::RightDockWidgetArea, dockBuyOrderPanel);

@@ -1763,6 +1763,88 @@ QDockWidget::float-button {
 	right:18px
 }
 
+/**************************** LuxgateCreateOrderPanel ********************************/
+
+/****SELL****/
+
+QMainWindow#LuxgateDialog .LuxgateCreateOrderPanel#createSellOrderPanel .QPushButton#pushButtonBuySell {
+		margin-right: 0px;
+		background-color: #E42217;
+    border:0;
+    color:#ffffff;
+    font-size:12px;
+    font-weight:bold;
+    padding-left:25px;
+    padding-right:25px;
+    padding-top:5px;
+    padding-bottom:5px;
+		text: "SELL";
+}
+
+QMainWindow#LuxgateDialog .LuxgateCreateOrderPanel#createSellOrderPanel .QPushButton#pushButtonBuySell:hover {
+    background-color: #40c2dc;
+}
+
+
+QMainWindow#LuxgateDialog .LuxgateCreateOrderPanel#createSellOrderPanel .QPushButton#pushButtonBuySell:focus {
+    border:none;
+    outline:none;
+}
+
+QMainWindow#LuxgateDialog .LuxgateCreateOrderPanel#createSellOrderPanel .QPushButton#pushButtonBuySell:pressed {
+    border:1px solid #333;
+}
+
+QMainWindow#LuxgateDialog .LuxgateCreateOrderPanel#createSellOrderPanel .QPushButton#pushButtonBuySell:disabled {
+	background-color:#DC381F;
+	color:#F5F5DC;
+}
+
+QMainWindow#LuxgateDialog .LuxgateCreateOrderPanel#createSellOrderPanel {
+		border-top: 3px solid #E42217;
+}
+
+
+/****BUY****/
+
+QMainWindow#LuxgateDialog .LuxgateCreateOrderPanel#createBuyOrderPanel .QPushButton#pushButtonBuySell {
+		margin-right: 0px;
+		background-color: #437C17;
+    border:0;
+    color:#ffffff;
+    font-size:12px;
+    font-weight:bold;
+    padding-left:25px;
+    padding-right:25px;
+    padding-top:5px;
+    padding-bottom:5px;
+		text: "SELL";
+}
+
+QMainWindow#LuxgateDialog .LuxgateCreateOrderPanel#createBuyOrderPanel .QPushButton#pushButtonBuySell:hover {
+    background-color: #40c2dc;
+}
+
+
+QMainWindow#LuxgateDialog .LuxgateCreateOrderPanel#createBuyOrderPanel .QPushButton#pushButtonBuySell:focus {
+    border:none;
+    outline:none;
+}
+
+QMainWindow#LuxgateDialog .LuxgateCreateOrderPanel#createBuyOrderPanel .QPushButton#pushButtonBuySell:pressed {
+    border:1px solid #333;
+}
+
+QMainWindow#LuxgateDialog .LuxgateCreateOrderPanel#createBuyOrderPanel .QPushButton#pushButtonBuySell:disabled {
+	background-color:#85BB65;
+	color:#F5F5DC;
+}
+
+QMainWindow#LuxgateDialog .LuxgateCreateOrderPanel#createBuyOrderPanel {
+		border-top: 3px solid #437C17;
+}
+
+
 /**************************** LuxgateBidAskPanel ********************************/
 
 *[class~="LuxgateBidAskPanel"] .QTableView#tableViewBidsAsks[OrderColor="BIDS"] .QHeaderView::section{
@@ -1784,10 +1866,6 @@ QDockWidget::float-button {
 /**************************** LuxgateOpenOrdersPanel ********************************/
 *[class~="LuxgateOpenOrdersPanel"] .QPushButton {
 	margin-right: 0px;
-}
-
-QMainWindow#LuxgateDialog .QPushButton[OpenOrdersCancel=true]{
-    background-color: gray;
 }
 
 QMainWindow#LuxgateDialog .QPushButton[OpenOrdersCancel=true] {

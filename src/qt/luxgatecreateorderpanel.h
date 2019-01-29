@@ -14,9 +14,10 @@ class LuxgateCreateOrderPanel : public QFrame
 public:
     explicit LuxgateCreateOrderPanel(QWidget *parent = nullptr);
     ~LuxgateCreateOrderPanel();
-
+    void setBidAsk(bool bBid);
 private:
     Ui::LuxgateCreateOrderPanel *ui;
+    bool bBid;
 };
 
 #endif // LUXGATECREATEORDERPANEL_H
