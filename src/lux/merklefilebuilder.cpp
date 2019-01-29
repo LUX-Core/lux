@@ -1,24 +1,38 @@
+#include "merklefilebuilder.h"
+
 #include <openssl/sha.h>
 #include <cmath>
 
-#include "merklefilebuilder.h"
+#include "util.h"
+#include "hash.h"
 
-/** Compute the 256-bit hash of a void pointer */
-inline void Hash(void* in, unsigned int len, unsigned char* out)
+size_t CalcMerkleSize(size_t firstLayerBlocksNum)
 {
-    SHA256_CTX sha256;
-    SHA256_Init(&sha256);
-    SHA256_Update(&sha256, in, len);
-    SHA256_Final(out, &sha256);
+    size_t size = 0;
+    size_t layerSize = firstLayerBlocksNum;
+    for (; layerSize > 1; layerSize = (layerSize / 2) + (layerSize % 2)) {
+        size += layerSize;
+    }
+    return size + layerSize;
 }
 
-void ConstructMerkleTreeLayer(std::ifstream &prevLayer, size_t size, std::ofstream &outputLayer)
+size_t CalcLayerSize(size_t firstLayerBlocksNum, size_t depth)
+{
+    size_t layerSize = firstLayerBlocksNum;
+    const size_t maxDepth = ceil(log2(firstLayerBlocksNum)) + 1;
+    const size_t height = maxDepth - depth;
+    for (size_t i = 0; layerSize > 1 && i <= height; ++i) {
+        layerSize = (layerSize / 2) + (layerSize % 2);
+    }
+    return layerSize;
+}
+
+bool ConstructMerkleTreeLayer(std::ifstream &prevLayer, size_t size, std::ofstream &outputLayer)
 {
     using namespace std;
 
     if (!prevLayer.good() || !outputLayer.good()){
-        // throw exception
-        return;
+        return false;
     }
     unsigned char data[2 * SHA256_DIGEST_LENGTH];
     unsigned char hash[SHA256_DIGEST_LENGTH];
@@ -32,42 +46,62 @@ void ConstructMerkleTreeLayer(std::ifstream &prevLayer, size_t size, std::ofstre
         prevLayer.read((char *)hash, SHA256_DIGEST_LENGTH);
         outputLayer.write((char *)hash, SHA256_DIGEST_LENGTH);
     }
+    return true;
 }
 
-void ConstructMerkleTree(std::ifstream &firstLayer, size_t size, std::ofstream &outputStream)
+bool ConstructMerkleTreeFirstLayer(std::ifstream &source, size_t fileSize, std::ofstream &outputFirstLayer)
 {
+    return ConstructMerkleTreeLayer(source, fileSize, outputFirstLayer);
+}
+
+bool ConstructMerkleTree(const boost::filesystem::path &source, const boost::filesystem::path &dest)
+{
+    std::ifstream sourceStream;
+    sourceStream.open(source.string(), std::ios::binary);
+    if (!sourceStream.is_open()) {
+        LogPrint("dfs", "%s file %s cannot be opened", __func__, source.string());
+        return false;
+    }
+    std::ofstream outputStream;
+    outputStream.open(dest.string(), std::ios::binary);
+    if (!outputStream.is_open()) {
+        LogPrint("dfs", "%s file %s cannot be opened", __func__, dest.string());
+        return false;
+    }
+
+    auto size = boost::filesystem::file_size(source);
+    if (!ConstructMerkleTreeFirstLayer(sourceStream, size, outputStream)) {
+        return false;
+    }
+
+    std::ifstream prevLayer;
+    prevLayer.open(dest.string(), std::ios::binary);
+    if (!prevLayer.is_open()) {
+        LogPrint("dfs", "%s file %s cannot be opened", __func__, dest.string());
+        return false;
+    }
     for (uint64_t currentSize = size; currentSize > 1; currentSize = currentSize / 2 + currentSize % 2) {
-        ConstructMerkleTreeLayer(firstLayer, currentSize, outputStream);
+        if (!ConstructMerkleTreeLayer(prevLayer, currentSize, outputStream)) {
+            sourceStream.close();
+            outputStream.close();
+            prevLayer.close();
+            return false;
+        }
     }
+    sourceStream.close();
+    outputStream.close();
+    prevLayer.close();
+    return true;
 }
 
-size_t GetMerkleSize(size_t blocksSize)
-{
-    size_t size = 0;
-    size_t layerSize = blocksSize;
-    for (; layerSize > 1; layerSize = (layerSize / 2) + (layerSize % 2)) {
-        size += layerSize;
-    }
-    return size + layerSize;
-}
-
-size_t GetLayerSize(size_t blocksSize, size_t depth)
-{
-    size_t layerSize = blocksSize;
-    const size_t maxDepth = ceil(log2(blocksSize)) + 1;
-    const size_t height = maxDepth - depth;
-    for (size_t i = 0; layerSize > 1 && i <= height; ++i) {
-        layerSize = (layerSize / 2) + (layerSize % 2);
-    }
-    return layerSize;
-}
-
-void ConstructMerklePath(std::ifstream *merkleTree, size_t height,
-                         std::list<uint256> &path, MPBContext &context)
+bool ConstructMerklePath(std::ifstream *merkleTree, size_t height,
+                         std::list<uint256> &path, MerkleBuilder::MPBContext &context)
 {
     size_t currentPos;
     if (height > 1) {
-        ConstructMerklePath(merkleTree, height - 1, path, context);
+        if (!ConstructMerklePath(merkleTree, height - 1, path, context)) {
+            return false; // never
+        }
         currentPos = (context.position % 2) ? (context.position - 1) : (context.position + 1);
     } else {
         currentPos = context.position;
@@ -86,4 +120,5 @@ void ConstructMerklePath(std::ifstream *merkleTree, size_t height,
     context.offsetLayer += context.layerSize * SHA256_DIGEST_LENGTH;
     context.position /= 2;
     context.layerSize = (context.layerSize / 2) + (context.layerSize % 2);
+    return true;
 }
