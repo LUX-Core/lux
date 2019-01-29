@@ -21,11 +21,18 @@ struct DecryptionKeys
 
     static std::string ToString(bytes data)
     {
+        if (data.size() == 0) {
+            return "";
+        }
         return std::string(data.begin(), data.end());
     }
 
     static bytes ToBytes(std::string data)
     {
+        if (data.empty())
+        {
+            return {};
+        }
         return bytes(data.begin(), data.end());
     }
 

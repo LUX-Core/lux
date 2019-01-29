@@ -72,18 +72,20 @@ StorageController::StorageController() : background(boost::bind(&StorageControll
                                          rate(STORAGE_MIN_RATE),
                                          maxblocksgap(DEFAULT_STORAGE_MAX_BLOCK_GAP)
 {
+}
+
+void StorageController::InitStorages(const boost::filesystem::path &dataDir, const boost::filesystem::path &tempDataDir)
+{
     namespace fs = boost::filesystem;
 
-    fs::path defaultDfsPath = GetDataDir() / "dfs";
-    if (!fs::exists(defaultDfsPath)) {
-        fs::create_directories(defaultDfsPath);
+    if (!fs::exists(dataDir)) {
+        fs::create_directories(dataDir);
     }
-    storageHeap.AddChunk(defaultDfsPath.string(), DEFAULT_STORAGE_SIZE);
-    fs::path defaultDfsTempPath = GetDataDir() / "dfstemp";
-    if (!fs::exists(defaultDfsTempPath)) {
-        fs::create_directories(defaultDfsTempPath);
+    storageHeap.AddChunk(dataDir, DEFAULT_STORAGE_SIZE);
+    if (!fs::exists(tempDataDir)) {
+        fs::create_directories(tempDataDir);
     }
-    tempStorageHeap.AddChunk(defaultDfsTempPath.string(), DEFAULT_STORAGE_SIZE);
+    tempStorageHeap.AddChunk(tempDataDir, DEFAULT_STORAGE_SIZE);
 }
 
 void StorageController::ProcessStorageMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv, bool& isStorageCommand)
@@ -513,7 +515,7 @@ DecryptionKeys StorageController::GenerateKeys(RSA **rsa)
     return decryptionKeys;
 }
 
-RSA* StorageController::CreatePublicRSA(std::string key) { // utility function
+RSA* StorageController::CreatePublicRSA(const std::string &key) { // utility function
     RSA *rsa = NULL;
     BIO *keybio;
     const char* c_string = key.c_str();
@@ -525,7 +527,7 @@ RSA* StorageController::CreatePublicRSA(std::string key) { // utility function
     return rsa;
 }
 
-std::shared_ptr<AllocatedFile> StorageController::CreateReplica(const boost::filesystem::path &replicaPath,
+std::shared_ptr<AllocatedFile> StorageController::CreateReplica(const boost::filesystem::path &sourcePath,
                                                                 const StorageOrder &order,
                                                                 const DecryptionKeys &keys,
                                                                 RSA *rsa)
@@ -533,13 +535,13 @@ std::shared_ptr<AllocatedFile> StorageController::CreateReplica(const boost::fil
     namespace fs = boost::filesystem;
 
     std::ifstream filein;
-    filein.open(replicaPath.string().c_str(), std::ios::binary);
+    filein.open(sourcePath.string().c_str(), std::ios::binary);
     if (!filein.is_open()) {
-        LogPrint("dfs", "file %s cannot be opened", replicaPath.string());
+        LogPrint("dfs", "file %s cannot be opened", sourcePath.string());
         return {};
     }
 
-    auto length = fs::file_size(replicaPath);
+    auto length = fs::file_size(sourcePath);
 
     std::shared_ptr<AllocatedFile> tempFile = tempStorageHeap.AllocateFile(order.fileURI, GetCryptoReplicaSize(length));
 
@@ -549,7 +551,7 @@ std::shared_ptr<AllocatedFile> StorageController::CreateReplica(const boost::fil
     size_t sizeBuffer = nBlockSizeRSA - 2;
     byte *buffer = new byte[sizeBuffer];
     byte *replica = new byte[nBlockSizeRSA];
-    for (auto i = 0u; i < order.fileSize; i+= sizeBuffer)
+    for (auto i = 0u; i < length; i+= sizeBuffer)
     {
         uint64_t n = std::min(sizeBuffer, order.fileSize - i);
 

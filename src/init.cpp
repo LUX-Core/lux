@@ -1055,6 +1055,8 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
     std::ostringstream strErrors;
 
     LogPrintf("Using %u threads for script verification\n", nScriptCheckThreads);
+
+    storageController->InitStorages(GetDataDir() / "dfs", GetDataDir() / "dfstemp"); // =========> INIT DFS CONTROLLER <=========
     if (nScriptCheckThreads) {
         for (int i = 0; i < nScriptCheckThreads - 1; i++)
             threadGroup.create_thread(&ThreadScriptCheck);

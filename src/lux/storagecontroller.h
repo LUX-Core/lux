@@ -30,7 +30,7 @@ protected:
 
     bool StartHandshake(const StorageProposal &proposal, const DecryptionKeys &keys);
     DecryptionKeys GenerateKeys(RSA **rsa);
-    RSA* CreatePublicRSA(std::string key);
+    RSA* CreatePublicRSA(const std::string &key);
     std::shared_ptr<AllocatedFile> CreateReplica(const boost::filesystem::path &filename,
                                                  const StorageOrder &order,
                                                  const DecryptionKeys &keys,
@@ -52,6 +52,7 @@ public:
 
     StorageController();
 
+    void InitStorages(const boost::filesystem::path &dataDir, const boost::filesystem::path &tempDataDir);
     void AnnounceOrder(const StorageOrder &order);
     void AnnounceOrder(const StorageOrder &order, const boost::filesystem::path &path);
     bool CancelOrder(const uint256 &orderHash);

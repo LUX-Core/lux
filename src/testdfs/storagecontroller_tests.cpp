@@ -9,13 +9,37 @@
 class TestStorageController : public StorageController
 {
 public:
-    boost::mutex mutex;
-    boost::thread background;
 
-    void StartHandshake(const StorageProposal &proposal);
-    std::shared_ptr<AllocatedFile> CreateReplica(const boost::filesystem::path &filename, const StorageOrder &order);
-    void SendReplica(const StorageOrder &order, std::shared_ptr<AllocatedFile> pAllocatedFile, const CNode &pNode);
-    void BackgroundJob();
+    TestStorageController()
+    {
+        rate = STORAGE_MIN_RATE;
+        maxblocksgap = DEFAULT_STORAGE_MAX_BLOCK_GAP;
+    }
+
+    bool StartHandshake(const StorageProposal &proposal, const DecryptionKeys &keys)
+    {
+        return StorageController::StartHandshake(proposal, keys);
+    }
+
+    DecryptionKeys GenerateKeys(RSA **rsa)
+    {
+        return StorageController::GenerateKeys(rsa);
+    }
+
+    RSA* CreatePublicRSA(const std::string &key)
+    {
+        return StorageController::CreatePublicRSA(key);
+    }
+
+    std::shared_ptr<AllocatedFile> CreateReplica(const boost::filesystem::path &filename,
+                                                 const StorageOrder &order,
+                                                 const DecryptionKeys &keys,
+                                                 RSA *rsa)
+    {
+        return StorageController::CreateReplica(filename, order, keys, rsa);
+    }
+    // bool SendReplica(const StorageOrder &order, std::shared_ptr<AllocatedFile> pAllocatedFile, CNode* pNode);
+    // bool DecryptReplica(std::shared_ptr<AllocatedFile> pAllocatedFile, const uint64_t fileSize, const boost::filesystem::path &decryptedFile);
 };
 
 BOOST_AUTO_TEST_SUITE(storage_controller_tests)
@@ -24,34 +48,36 @@ BOOST_AUTO_TEST_CASE(createreplica)
 {
     namespace fs = boost::filesystem;
     TestStorageController controller{};
-    fs::path fullFilename = GetDefaultDataDir() / "test.temp";
-    fs::path defaultDfsPath = GetDefaultDataDir() / "dfs";
-    if (!fs::exists(defaultDfsPath)) {
-        fs::create_directories(defaultDfsPath);
-    }
-    controller.storageHeap.AddChunk(defaultDfsPath.string(), DEFAULT_STORAGE_SIZE);
-    fs::path defaultDfsTempPath = GetDefaultDataDir() / "dfstemp";
-    if (!fs::exists(defaultDfsTempPath)) {
-        fs::create_directories(defaultDfsTempPath);
-    }
-    controller.tempStorageHeap.AddChunk(defaultDfsTempPath.string(), DEFAULT_STORAGE_SIZE);
-    uint256 fileUri = SerializeHash(fullFilename.string(), SER_GETHASH, 0);
-    std::string fileUriSring = "48941b144b0a86685faea4781614f9e9d6ba5587a9631e7b41515be72efff732";
+    fs::path fullFilename = boost::filesystem::current_path() / "test.test";
+    std::ofstream out(fullFilename.string());
+    out << "12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678";
+    out.close();
+    fs::path defaultDfsPath = boost::filesystem::current_path() / "dfs_test";
+    fs::path defaultDfsTempPath = boost::filesystem::current_path() / "dfstemp_test";
+    controller.InitStorages(defaultDfsPath, defaultDfsTempPath);// TODO: need test for this (SS)
+    uint256 fileUri = SerializeHash(fullFilename.filename().string(), SER_GETHASH, 0);
+    std::string fileUriString = "48941b144b0a86685faea4781614f9e9d6ba5587a9631e7b41515be72efff732";
     StorageOrder order = {
         std::time(0),
         std::time(0) + 86400,
-        100ull * 1024 * 1024 * 1024, // 100 Gb
+        fullFilename.filename().string(),
+        fs::file_size(fullFilename),
         fileUri,
         2,
         100,
         CService("127.0.0.1")
     };
+    RSA *rsa;
+    DecryptionKeys keys = controller.GenerateKeys(&rsa);// TODO: need test for this (SS)
 
-    auto tempFile = controller.CreateReplica(fullFilename, order);
+    auto tempFile = controller.CreateReplica(fullFilename, order, keys, rsa);
 
-    auto length = fs::file_size(tempFile->filename);
+    auto length = fs::file_size(tempFile->fullpath);
     BOOST_CHECK_EQUAL(length, tempFile->size);
-    fs::remove(tempFile->filename);
+    fs::remove(fullFilename);
+    fs::remove(tempFile->fullpath);
+    fs::remove_all(defaultDfsPath);
+    fs::remove_all(defaultDfsTempPath);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
