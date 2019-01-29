@@ -1,9 +1,12 @@
 #include "luxgatebidaskpanel.h"
+#include "ui_luxgatebidaskpanel.h"
+
 #include "luxgategui_global.h"
 #include "luxgatebidsasksmodel.h"
-#include "ui_luxgatebidaskpanel.h"
 #include "walletmodel.h"
 #include "optionsmodel.h"
+#include "luxgatepricedelegate.h"
+
 
 LuxgateBidAskPanel::LuxgateBidAskPanel(QWidget *parent) :
     QFrame(parent),
@@ -24,12 +27,17 @@ void LuxgateBidAskPanel::setData(bool bBids_, WalletModel *model)
     {
         auto tableModel =new LuxgateBidsAsksModel(bBids, opt_model->getLuxgateDecimals(), this);
         ui->tableViewBidsAsks->setModel(tableModel);
+
         QHeaderView * HeaderView = ui->tableViewBidsAsks->horizontalHeader();
         HeaderView->setSectionResizeMode(QHeaderView::Stretch);
         HeaderView->setSectionsMovable(true);
         HeaderView->setFixedHeight(30);
+
         connect(opt_model, &OptionsModel::luxgateDecimalsChanged,
                 tableModel, &LuxgateBidsAsksModel::slotSetDecimals);
+
+        ui->tableViewBidsAsks->setItemDelegateForColumn(tableModel->columnNum(LuxgateBidsAsksModel::PriceColumn),
+                                                        new LuxgatePriceDelegate(this));
     }
 
     //init other widgets
@@ -71,7 +79,12 @@ void LuxgateBidAskPanel::setOrientation(bool bLeft)
     newTotalLayout->setStretch(2,1);
     ui->widgetTotalData->setLayout(newTotalLayout);
 
-    qobject_cast<LuxgateBidsAsksModel *>(ui->tableViewBidsAsks->model())->setOrientation(bLeft);
+    auto tableModel = qobject_cast<LuxgateBidsAsksModel *>(ui->tableViewBidsAsks->model());
+    ui->tableViewBidsAsks->setItemDelegateForColumn(tableModel->columnNum(LuxgateBidsAsksModel::PriceColumn),
+                                                    ui->tableViewBidsAsks->itemDelegate());
+    tableModel->setOrientation(bLeft);
+    ui->tableViewBidsAsks->setItemDelegateForColumn(tableModel->columnNum(LuxgateBidsAsksModel::PriceColumn),
+                                                    new LuxgatePriceDelegate(this));
 }
 
 LuxgateBidAskPanel::~LuxgateBidAskPanel()

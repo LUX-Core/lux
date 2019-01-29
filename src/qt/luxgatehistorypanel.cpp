@@ -1,8 +1,10 @@
 #include "luxgatehistorypanel.h"
-#include "luxgatehistorymodel.h"
 #include "ui_luxgatehistorypanel.h"
+
+#include "luxgatehistorymodel.h"
 #include "walletmodel.h"
 #include "optionsmodel.h"
+#include "luxgatepricedelegate.h"
 
 LuxgateHistoryPanel::LuxgateHistoryPanel(QWidget *parent) :
     QFrame(parent),
@@ -22,8 +24,12 @@ void LuxgateHistoryPanel::setModel(WalletModel *model)
         QHeaderView * HeaderView = ui->tableViewHistory->horizontalHeader();
         HeaderView->setSectionResizeMode(QHeaderView::Stretch);
         HeaderView->setSectionsMovable(true);
+        HeaderView->setFixedHeight(30);
         connect(opt_model, &OptionsModel::luxgateDecimalsChanged,
                 tableModel, &LuxgateHistoryModel::slotSetDecimals);
+
+        ui->tableViewHistory->setItemDelegateForColumn(LuxgateHistoryModel::PriceColumn,
+                                                        new LuxgatePriceDelegate(this));
     }
 }
 

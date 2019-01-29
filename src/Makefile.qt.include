@@ -199,7 +199,8 @@ if ENABLE_LUXGATE
                   qt/moc_tradingplot.cpp \
                   qt/moc_luxgatehistorypanel.cpp \
                   qt/moc_luxgatehistorymodel.cpp \
-                  qt/moc_luxgatecreateorderpanel.cpp
+                  qt/moc_luxgatecreateorderpanel.cpp \
+                  qt/moc_luxgatepricedelegate.cpp
 endif
 
 BITCOIN_MM = \
@@ -351,7 +352,8 @@ if ENABLE_LUXGATE
                   qt/tradingplot.h \
                   qt/luxgatehistorypanel.h \
                   qt/luxgatehistorymodel.h \
-                  qt/luxgatecreateorderpanel.h
+                  qt/luxgatecreateorderpanel.h \
+                  qt/luxgatepricedelegate.h
 endif
 
 RES_ICONS = \
@@ -581,7 +583,8 @@ if ENABLE_LUXGATE
                     qt/tradingplot.cpp \
                     qt/luxgatehistorypanel.cpp \
                     qt/luxgatehistorymodel.cpp \
-                    qt/luxgatecreateorderpanel.cpp
+                    qt/luxgatecreateorderpanel.cpp \
+                    qt/luxgatepricedelegate.cpp                    
 endif
 
 endif

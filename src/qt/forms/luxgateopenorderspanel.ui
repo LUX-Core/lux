@@ -76,7 +76,11 @@
     </layout>
    </item>
    <item>
-    <widget class="QTableView" name="tableViewOpenOrders"/>
+    <widget class="QTableView" name="tableViewOpenOrders">
+     <property name="selectionMode">
+      <enum>QAbstractItemView::NoSelection</enum>
+     </property>
+    </widget>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_2">

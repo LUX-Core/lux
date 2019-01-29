@@ -77,7 +77,7 @@ QVariant LuxgateBidsAsksModel::data(const QModelIndex &index, int role) const
     QVariant res;
 
     if (index.isValid()) {
-        if (Qt::ForegroundRole == role) {
+        /*if (Qt::ForegroundRole == role) {
             if (columnNum(PriceColumn) == index.column()) {
                 QColor col;
                 if(bBids)
@@ -86,7 +86,9 @@ QVariant LuxgateBidsAsksModel::data(const QModelIndex &index, int role) const
                     col = Qt::red;
                 res = QBrush(col);
             }
-        }
+        }*/
+        if(Luxgate::BidAskRole == role)
+            return bBids;
         else if(Qt::EditRole == role ||
                 Qt::DisplayRole == role)
         {

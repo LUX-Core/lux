@@ -34,6 +34,8 @@ namespace Luxgate {
         QString baseCurrency;
         QString quoteCurrency;
     };
+
+    enum CommonRoles {BidAskRole = Qt::UserRole, IndividualRole};
 }
 extern Luxgate::CurrencyPair curCurrencyPair;
 #endif // LUXGATEGUI_GLOBAL_H

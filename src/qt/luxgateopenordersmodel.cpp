@@ -78,15 +78,11 @@ QVariant LuxgateOpenOrdersModel::data(const QModelIndex &index, int role) const
     QVariant res;
 
     if (index.isValid()) {
-        if (Qt::ForegroundRole == role) {
-            if (SideColumn == index.column()) {
-                QColor col;
-                if("Sell" == data(index).toString())
-                    col = Qt::red;
-                else
-                    col.setNamedColor("#267E00");
-                res = QBrush(col);
-            }
+        if (Luxgate::BidAskRole == role) {
+            if("Sell" == data(this->index(index.row(), SideColumn)).toString())
+                return false;
+            else
+                return true;
         }
         else if(Qt::EditRole == role ||
                 Qt::DisplayRole == role)

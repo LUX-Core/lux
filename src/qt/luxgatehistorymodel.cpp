@@ -1,4 +1,7 @@
 #include "luxgatehistorymodel.h"
+
+#include "luxgategui_global.h"
+
 #include <QColor>
 #include <QBrush>
 
@@ -62,12 +65,11 @@ QVariant LuxgateHistoryModel::data(const QModelIndex &index, int role) const
     QVariant res;
 
     if (index.isValid()) {
-        if (Qt::ForegroundRole == role) {
-            if (PriceColumn == index.column()) {
-                QColor col;
-                col.setNamedColor("#267E00");
-                res = QBrush(col);
-            }
+        if (Luxgate::BidAskRole == role) {
+            if(index.row()%2)
+                return true;
+            else
+                return false;
         }
         else if(Qt::EditRole == role ||
                 Qt::DisplayRole == role)

@@ -3,6 +3,7 @@
 
 #include "luxgategui_global.h"
 #include "luxgateopenordersmodel.h"
+#include "luxgatepricedelegate.h"
 #include "guiutil.h"
 #include "walletmodel.h"
 #include "optionsmodel.h"
@@ -36,6 +37,9 @@ void LuxgateOpenOrdersPanel::setModel(WalletModel *model)
         connect(opt_model, &OptionsModel::luxgateDecimalsChanged,
                 tableModel, &LuxgateOpenOrdersModel::slotSetDecimals);
         updateButtonsCancel();
+
+        ui->tableViewOpenOrders->setItemDelegateForColumn(LuxgateOpenOrdersModel::PriceColumn,
+                                                       new LuxgatePriceDelegate(this));
     }
 
 }

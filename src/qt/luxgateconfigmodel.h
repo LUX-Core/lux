@@ -1,6 +1,7 @@
 #ifndef CsTypesMODEL_H
 #define CsTypesMODEL_H
 #include "luxgate/lgconfig.h"
+#include "luxgategui_global.h"
 #include <QList>
 #include <QAbstractTableModel>
 #include <QString>
@@ -48,7 +49,7 @@ class LuxgateConfigModel : public QAbstractTableModel
 public:
     LuxgateConfigModel(QObject *parent = nullptr);
 
-    enum UserRoles{AllDataRole = Qt::UserRole + 1, ValidRole};
+    enum UserRoles{AllDataRole = Luxgate::IndividualRole, ValidRole};
 
     enum Columns{
         TickerColumn = 0, HostColumn,
