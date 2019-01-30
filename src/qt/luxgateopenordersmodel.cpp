@@ -1,13 +1,33 @@
 #include "luxgateopenordersmodel.h"
+
 #include "luxgategui_global.h"
+#include "luxgate/luxgate.h"
+#include "guiutil.h"
+
+#include <algorithm>
 
 #include <QColor>
 #include <QBrush>
+#include <QDateTime>
 
 LuxgateOpenOrdersModel::LuxgateOpenOrdersModel(const Luxgate::Decimals & decimals, QObject *parent)
     : QAbstractTableModel(parent),
       decimals(decimals)
 {
+    update();
+}
+
+void LuxgateOpenOrdersModel::update()
+{
+    openOrders.clear();
+    for( auto it = orderbook.Orders().begin(); it != orderbook.Orders().end(); ++it ) {
+        openOrders.push_back( it->second );
+    }
+    std::sort(openOrders.begin(), openOrders.end(),
+
+              [](std::shared_ptr<COrder> a, std::shared_ptr<COrder> b)
+              { return a->OrderCreationTime() > b->OrderCreationTime();});
+    emit dataChanged(index(0,0), index(rowCount()-1,columnCount()-1), {Luxgate::BidAskRole, Qt::DisplayRole});
 }
 
 Qt::ItemFlags LuxgateOpenOrdersModel::flags(const QModelIndex &index) const
@@ -61,8 +81,7 @@ int LuxgateOpenOrdersModel::rowCount(const QModelIndex &parent) const
     if (parent.isValid())
         return 0;
     else
-        return 2;
-    // FIXME: Implement me!
+        return openOrders.size();
 }
 
 int LuxgateOpenOrdersModel::columnCount(const QModelIndex &parent) const
@@ -78,38 +97,36 @@ QVariant LuxgateOpenOrdersModel::data(const QModelIndex &index, int role) const
     QVariant res;
 
     if (index.isValid()) {
-        if (Luxgate::BidAskRole == role) {
-            if("Sell" == data(this->index(index.row(), SideColumn)).toString())
-                return false;
-            else
-                return true;
-        }
+        auto order = openOrders[index.row()];
+
+        if (Luxgate::BidAskRole == role)
+            return order->IsBid();
         else if(Qt::EditRole == role ||
-                Qt::DisplayRole == role)
-        {
+                Qt::DisplayRole == role) {
+
             if (DateColumn == index.column()) {
-                res = QString("12-21 19:59:10");
+                auto createTime = order->OrderCreationTime();
+                res = GUIUtil::dateTimeStr(createTime);
             }
             else if (TypeColumn == index.column()) {
                 res = QString("limit");
             }
             else if (SideColumn == index.column()) {
-                if(0 == index.row())
+                if(order->IsAsk())
                     res = QString("Sell");
-                if(1 == index.row())
+                if(order->IsBid())
                     res = QString("Buy");
             }
             else if (PriceColumn == index.column()) {
-                res = QString::number(0.00001234 + 0.000001 * index.row(), 'f',decimals.price);
+                res = QString::number(order->Price(), 'f',decimals.price);
             }
             else if (BaseAmountColumn == index.column()) {
-                res = QString::number(104.2354 + 3 * index.row(), 'f',decimals.base);
+                res = QString::number(order->Amount(), 'f',decimals.base);
             }
             else if (QuoteTotalColumn == index.column()) {
-                res = QString::number(0.00024512 + 3 * index.row(), 'f',decimals.quote);
+                res = QString::number(order->Total(), 'f',decimals.quote);
             }
         }
     }
-    // FIXME: Implement me!
     return res;
 }

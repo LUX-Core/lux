@@ -11,6 +11,7 @@ LuxgateCreateOrderPanel::LuxgateCreateOrderPanel(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->pushButtonBuySell->setEnabled(false);
+    ui->pushButtonBuySell->setToolTip("Invalid Price");
     ui->labelPriceDimension->setText(curCurrencyPair.baseCurrency + "/" + curCurrencyPair.quoteCurrency);
     ui->labelQuantityDimension->setText(curCurrencyPair.baseCurrency);
     ui->labelTotalDimension->setText(curCurrencyPair.quoteCurrency);

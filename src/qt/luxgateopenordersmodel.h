@@ -3,6 +3,10 @@
 
 #include <QAbstractTableModel>
 #include "luxgategui_global.h"
+#include <vector>
+#include <memory>
+
+class COrder;
 
 class LuxgateOpenOrdersModel : public QAbstractTableModel
 {
@@ -26,9 +30,10 @@ public:
 
 public slots:
     void slotSetDecimals(const Luxgate::Decimals & decimals_);
-
+    void update();
 private:
     Luxgate::Decimals decimals;
+    std::vector<std::shared_ptr<COrder>> openOrders;
 };
 
 #endif // LUXGATEOPENORDERSMODEL_H
