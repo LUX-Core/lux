@@ -6,43 +6,11 @@
 #include <QPainter>
 #include <QModelIndex>
 #include <QTextDocument>
-#include <QRegExp>
 
 LuxgatePriceDelegate::LuxgatePriceDelegate(QObject *parent):
     QStyledItemDelegate(parent)
 {
 
-}
-
-//if bBid==true price of bid, else price of ask
-QString LuxgatePriceDelegate::formattedText(QString text, bool bBid) const
-{
-    QString color;
-    if(bBid)
-        color =  "#267E00";
-    else
-        color =  "red";
-
-    bool bDouble = true;
-    text.toDouble(&bDouble);
-
-    QRegExp rx("[1-9]");
-    int  firstNumber = text.indexOf(rx) ;
-
-    if(-1 == firstNumber||
-       !text.startsWith("0") ||
-       !bDouble)
-    {
-        return "<font color=\"" + color + "\">" + text + "</font>";
-    }
-
-    QString nullPart = "0.";
-    for(int i=1; i<firstNumber; i++)
-        nullPart +="0";
-    QString numberPart = text.mid(firstNumber);
-
-
-    return nullPart + "<font color=\"" + color + "\">" + numberPart + "</font>";
 }
 
 void LuxgatePriceDelegate::paint(QPainter* painter, const QStyleOptionViewItem & option, const QModelIndex &index) const
@@ -53,7 +21,7 @@ void LuxgatePriceDelegate::paint(QPainter* painter, const QStyleOptionViewItem &
     painter->save();
 
     bool bBid = index.data(Luxgate::BidAskRole).toBool();
-    QString formatText = formattedText(options.text, bBid);
+    QString formatText = Luxgate::priceFormattedText(options.text, bBid);
 
     QTextDocument doc;
     doc.setHtml(formatText);
@@ -74,7 +42,8 @@ QSize LuxgatePriceDelegate::sizeHint ( const QStyleOptionViewItem & option, cons
     initStyleOption(&options, index);
 
     QTextDocument doc;
-    doc.setHtml(options.text);
+    bool bBid = index.data(Luxgate::BidAskRole).toBool();
+    doc.setHtml(Luxgate::priceFormattedText(options.text, bBid));
     doc.setTextWidth(options.rect.width());
     return QSize(doc.idealWidth(), doc.size().height());
 }

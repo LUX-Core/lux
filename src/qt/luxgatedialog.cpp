@@ -58,6 +58,7 @@ using namespace std;
 
 Luxgate::CurrencyPair curCurrencyPair ("LUX", "BTC");
 
+
 LuxgateDialog::LuxgateDialog(QWidget *parent) :
         QMainWindow(parent),
         ui(new Ui::LuxgateDialog),
@@ -93,15 +94,15 @@ void LuxgateDialog::createWidgetsAndDocks()
     tabifyDockWidget(dockChart, dockOpenOrdersPanel);
     tabifyDockWidget(dockChart, dockHistoryPanel);
     setTabPosition(Qt::LeftDockWidgetArea, QTabWidget::North);
-
+    dockConfigPanel->raise();
     //Right
     createBuyOrderPanel = new LuxgateCreateOrderPanel(this);
-    createBuyOrderPanel->setBidAsk(true);
+    createBuyOrderPanel->setBuySell(true);
     createBuyOrderPanel->setObjectName("createBuyOrderPanel");
     dockBuyOrderPanel = createDock(createBuyOrderPanel, "Buy " + curCurrencyPair.baseCurrency);
 
     createSellOrderPanel = new LuxgateCreateOrderPanel(this);
-    createSellOrderPanel->setBidAsk(false);
+    createSellOrderPanel->setBuySell(false);
     createSellOrderPanel->setObjectName("createSellOrderPanel");
     dockSellOrderPanel = createDock(createSellOrderPanel, "Sell " + curCurrencyPair.baseCurrency);
 
@@ -141,6 +142,8 @@ void LuxgateDialog::setModel(WalletModel *model)
     orderBookPanel->setModel(model);
     openOrders->setModel(model);
     historyPanel->setModel(model);
+    createBuyOrderPanel->setModel(model);
+    createSellOrderPanel->setModel(model);
     OptionsModel * opt_model = model->getOptionsModel();
 
     dockConfigPanel->setHidden(opt_model->getHideConfigWidget());

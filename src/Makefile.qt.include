@@ -584,7 +584,8 @@ if ENABLE_LUXGATE
                     qt/luxgatehistorypanel.cpp \
                     qt/luxgatehistorymodel.cpp \
                     qt/luxgatecreateorderpanel.cpp \
-                    qt/luxgatepricedelegate.cpp                    
+                    qt/luxgatepricedelegate.cpp \
+                    qt/luxgategui_global.cpp                                    
 endif
 
 endif

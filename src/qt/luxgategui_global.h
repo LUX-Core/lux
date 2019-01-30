@@ -8,6 +8,9 @@ namespace Luxgate {
         Decimals(int price, int base, int quote) : price(price),
                                                    base(base),
                                                    quote(quote) {}
+        Decimals(): price(8),
+                    base(8),
+                    quote(8) {}
 
         Decimals(const Decimals &other) {
             price = other.price;
@@ -34,6 +37,8 @@ namespace Luxgate {
         QString baseCurrency;
         QString quoteCurrency;
     };
+
+    QString priceFormattedText(QString text, bool bBid); //if bBid==true price of bid, else price of ask
 
     enum CommonRoles {BidAskRole = Qt::UserRole, IndividualRole};
 }

@@ -1765,6 +1765,15 @@ QDockWidget::float-button {
 
 /**************************** LuxgateCreateOrderPanel ********************************/
 
+QMainWindow#LuxgateDialog .LuxgateCreateOrderPanel .QLineEdit#lineEditPrice[Status="Cheap"] {
+		color: #800080;
+}
+
+QMainWindow#LuxgateDialog .LuxgateCreateOrderPanel .QLineEdit#lineEditPrice[Status="Expensive"] {
+		color: #800517;
+}
+
+
 /****SELL****/
 
 QMainWindow#LuxgateDialog .LuxgateCreateOrderPanel#createSellOrderPanel .QPushButton#pushButtonBuySell {

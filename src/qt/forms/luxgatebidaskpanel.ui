@@ -77,7 +77,7 @@
             </font>
            </property>
            <property name="text">
-            <string>NUMBER: </string>
+            <string/>
            </property>
           </widget>
          </item>
