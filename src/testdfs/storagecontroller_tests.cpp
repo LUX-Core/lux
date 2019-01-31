@@ -2,8 +2,8 @@
 #include "../hash.h"
 #include "../util.h"
 
-#include <boost/filesystem.hpp>
 #include <boost/test/unit_test.hpp>
+#include <boost/filesystem.hpp>
 #include <fstream>
 
 class TestStorageController : public StorageController

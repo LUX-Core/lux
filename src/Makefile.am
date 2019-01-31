@@ -229,8 +229,8 @@ libbitcoin_server_a_SOURCES = \
   lux/replicabuilder.cpp \
   lux/storageheap.h \
   lux/storageheap.cpp \
-  lux/merklefilebuilder.h \
-  lux/merklefilebuilder.cpp \
+  lux/merkler.h \
+  lux/merkler.cpp \
   lux/storagecontroller.h \
   lux/storagecontroller.cpp \
   lux/proposalsagent.h \

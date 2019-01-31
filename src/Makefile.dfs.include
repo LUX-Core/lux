@@ -9,7 +9,7 @@ BITCOIN_TESTDFS = \
   testdfs/storageheap_tests.cpp \
   testdfs/storagecontroller_tests.cpp \
   testdfs/replicabuilder_tests.cpp \
-  testdfs/merklefilebuilder_tests.cpp \
+  testdfs/merkler_tests.cpp \
   testdfs/proposalsagent_tests.cpp
 
 testdfs_test_dfs_SOURCES = $(BITCOIN_TESTDFS)
