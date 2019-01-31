@@ -1,0 +1,3 @@
+[submodule "src/luxgate"]
+	path = src/luxgate
+	url = https://github.com/216k155/luxgate-priv
