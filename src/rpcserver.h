@@ -439,9 +439,6 @@ extern UniValue searchlogs(const UniValue& params, bool fHelp);
 extern UniValue waitforlogs(const UniValue& params, bool fHelp);
 extern UniValue pruneblockchain(const UniValue& params, bool fHelp);
 
-bool StartRPC();
-void InterruptRPC();
-void StopRPC();
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////// Luxgate
 extern UniValue createorder(const UniValue& params, bool fHelp); 
 extern UniValue getactivecoins(const UniValue& params, bool fHelp);
@@ -451,12 +448,11 @@ extern UniValue listorderbook(const UniValue& params, bool fHelp);
 
 extern UniValue generate(const UniValue& params, bool fHelp);
 
-// in rest.cpp
-extern bool HTTPReq_REST(AcceptedConnection* conn,
-    std::string& strURI,
-    std::map<std::string, std::string>& mapHeaders,
-    bool fRun);
+bool StartRPC();
+void InterruptRPC();
+void StopRPC();
 std::string JSONRPCExecBatch(const UniValue& vReq);
 void RPCNotifyBlockChange(bool ibd, const CBlockIndex* pindex);
+
 
 #endif // BITCOIN_RPCSERVER_H
