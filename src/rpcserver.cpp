@@ -369,9 +369,13 @@ static const CRPCCommand vRPCCommands[] =
 
 #ifdef ENABLE_LUXGATE
         /* Luxgate features */
+        {"luxgate", "listtradepairs", &listtradepairs, true, true, false},
         {"luxgate", "createorder", &createorder, true, true, false},
         {"luxgate", "getactivecoins", &getactivecoins, true, true, false},
         {"luxgate", "listorderbook", &listorderbook, true, true, false},
+        {"luxgate", "getlocalorder", &getlocalorder, true, true, false},
+        {"luxgate", "gettradeorder", &gettradeorder, true, true, false},
+        {"luxgate", "tradestats", &tradestats, true, true, false}, // TODO: make it thread-safe
         {"luxgate", "globalorderbook", &globalorderbook, true, false, false}, // TODO: make it thread-safe
 #endif // ENABLE_LUXGATE
 
