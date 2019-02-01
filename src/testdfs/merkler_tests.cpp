@@ -146,9 +146,59 @@ BOOST_AUTO_TEST_CASE(constructmerkletree)
         std::ofstream out(dataFile.string());
         out << "12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678"; // 128 bytes = size 1 RSA encrypt data
     }
+
     uint256 merkleRoot = Merkler::ConstructMerkleTree(dataFile, merkle_treeFile);
 
     BOOST_CHECK_EQUAL(merkleRoot.ToString(), expectedHash);
+    fs::remove(dataFile);
+    fs::remove(merkle_treeFile);
+}
+
+BOOST_AUTO_TEST_CASE(constructmerklepath)
+{
+    namespace fs = boost::filesystem;
+    std::string expectedHash{"78a0a1ccf07fb8159d391b256b057d9b0e119c3803e5c7d3d5af92922cdb73ee"};
+    fs::path dataFile = boost::filesystem::current_path() / "test.test";
+    fs::path merkle_treeFile = boost::filesystem::current_path() / "merkleForPath.tree";
+    std::vector<std::list<uint256>> expectedPaths = {
+        {
+            uint256{"3231303938373635343332313039383736353433323130393837363534333231"},
+            uint256{"3433323130393837363534333231303938373635343332313039383736353433"},
+            uint256{"6ebc21df543e9e0468960a6802d94aa82ecf9dca5e22208829ef3e613ce1e0c5"}
+        },
+        {
+            uint256{"3231303938373635343332313039383736353433323130393837363534333231"},
+            uint256{"3433323130393837363534333231303938373635343332313039383736353433"},
+            uint256{"6ebc21df543e9e0468960a6802d94aa82ecf9dca5e22208829ef3e613ce1e0c5"}
+        },
+        {
+            uint256{"55ad8512add4a0a8bc720b6b42545ca980543196ee637acb50ecd35e96916467"},
+            uint256{"3635343332313039383736353433323130393837363534333231303938373635"},
+            uint256{"3837363534333231303938373635343332313039383736353433323130393837"}
+        },
+        {
+            uint256{"55ad8512add4a0a8bc720b6b42545ca980543196ee637acb50ecd35e96916467"},
+            uint256{"3635343332313039383736353433323130393837363534333231303938373635"},
+            uint256{"3837363534333231303938373635343332313039383736353433323130393837"}
+        }
+    };
+
+    // TODO: if exists then remove files (SS)
+    {
+        std::ofstream out(dataFile.string());
+        out << "12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678"; // 128 bytes = size 1 RSA encrypt data
+    }
+    uint256 merkleRoot = Merkler::ConstructMerkleTree(dataFile, merkle_treeFile);
+
+    for (size_t i = 0; i < 4; ++i) {
+        std::list<uint256> path = Merkler::ConstructMerklePath(dataFile, merkle_treeFile, i);
+
+        auto expectedPath_it = expectedPaths[i].begin();
+        for (hash: path) {
+            BOOST_CHECK_EQUAL(hash.ToString(), expectedPath_it->ToString());
+            ++expectedPath_it;
+        }
+    }
     fs::remove(dataFile);
     fs::remove(merkle_treeFile);
 }

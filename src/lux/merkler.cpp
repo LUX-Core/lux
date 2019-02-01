@@ -6,9 +6,9 @@
 #include "util.h"
 #include "hash.h"
 
-size_t Merkler::CalcDepth(size_t fileSize)
+size_t Merkler::CalcDepth(size_t firstLayerBlocksNum)
 {
-    return (fileSize != 0) ? ceil(log2(fileSize)) : 0;
+    return (firstLayerBlocksNum != 0) ? ceil(log2(firstLayerBlocksNum)) : 0;
 }
 
 size_t Merkler::CalcMerkleSize(size_t firstLayerBlocksNum)
@@ -113,31 +113,75 @@ uint256 Merkler::ConstructMerkleTree(const boost::filesystem::path &source, cons
     return hash;
 }
 
-bool Merkler::ConstructMerklePath(std::istream &merkleTree, size_t height,
-                                  std::list<uint256> &path, Merkler::MPBContext &context)
+// Local function
+bool ConstructMerklePath(std::istream &merkleTree, size_t height, std::list<uint256> &path, Merkler::MPBContext &context)
 {
-    size_t currentPos;
     if (height > 1) {
         if (!ConstructMerklePath(merkleTree, height - 1, path, context)) {
-            return false; // never
+            return false;
         }
-        currentPos = (context.position % 2) ? (context.position - 1) : (context.position + 1);
-    } else {
-        currentPos = context.position;
     }
+    size_t currentPos = (context.position % 2) ? (context.position - 1) : (context.position + 1);
     if (currentPos < context.layerSize) {
-        unsigned char hash[SHA256_DIGEST_LENGTH];
+        std::vector<unsigned char> hash(SHA256_DIGEST_LENGTH);
         merkleTree.seekg(context.offsetLayer + currentPos * SHA256_DIGEST_LENGTH, merkleTree.beg);
-        merkleTree.read((char *) hash, SHA256_DIGEST_LENGTH);
-        std::vector<unsigned char> vch(hash, hash + sizeof(hash) / sizeof(*hash));
+        merkleTree.read((char *) hash.data(), SHA256_DIGEST_LENGTH);
         if (context.position % 2) {
-            path.push_front(uint256(vch));
+            path.push_front(uint256(hash));
         } else {
-            path.push_back(uint256(vch));
+            path.push_back(uint256(hash));
         }
+    } else {
+        return false;
     }
     context.offsetLayer += context.layerSize * SHA256_DIGEST_LENGTH;
     context.position /= 2;
     context.layerSize = context.layerSize / 2 + (context.layerSize % 2);
     return true;
+}
+
+
+std::list<uint256> Merkler::ConstructMerklePath(const boost::filesystem::path &source, const boost::filesystem::path &merkleTree, size_t position)
+{
+    namespace fs = boost::filesystem;
+
+    std::list<uint256> path = {};
+
+    // get data from source file
+    std::ifstream sourceStream(source.string(), std::ios::binary);
+
+    {
+        std::vector<unsigned char> hash(SHA256_DIGEST_LENGTH);
+        sourceStream.seekg(position * SHA256_DIGEST_LENGTH, sourceStream.beg);
+        sourceStream.read((char *) hash.data(), SHA256_DIGEST_LENGTH);
+        path.push_back(uint256(hash));
+    }
+    size_t complenentPosition = (position % 2) ? (position - 1) : (position + 1);
+    {
+        std::vector<unsigned char> hash(SHA256_DIGEST_LENGTH);
+        sourceStream.seekg(complenentPosition * SHA256_DIGEST_LENGTH, sourceStream.beg);
+        sourceStream.read((char *) hash.data(), SHA256_DIGEST_LENGTH);
+        if (position % 2) {
+            path.push_front(uint256(hash));
+        } else {
+            path.push_back(uint256(hash));
+        }
+    }
+    sourceStream.close();
+
+    // get data from merkle tree file
+    std::ifstream merkleTreeStream(merkleTree.string(), std::ios::binary);
+    size_t sourceSize = fs::file_size(source);
+    size_t firstLayerSize = Merkler::CalcFirstLayerSize(sourceSize);
+    size_t restDepth = Merkler::CalcDepth(firstLayerSize) - 1;
+    Merkler::MPBContext context{
+            Merkler::CalcLayerSize(firstLayerSize, restDepth),
+            0,
+            position / 2
+    };
+    if (!ConstructMerklePath(merkleTreeStream, restDepth, path, context)) {
+        return {};
+    }
+    merkleTreeStream.close();
+    return path;
 }
