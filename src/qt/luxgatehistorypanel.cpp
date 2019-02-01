@@ -30,6 +30,12 @@ void LuxgateHistoryPanel::setModel(WalletModel *model)
 
         ui->tableViewHistory->setItemDelegateForColumn(LuxgateHistoryModel::PriceColumn,
                                                         new LuxgatePriceDelegate(this));
+
+        ui->tableViewHistory->setCopyColumns(QMap<int, int>{
+                {LuxgateTableView::PriceColumn, LuxgateHistoryModel::PriceColumn},
+                {LuxgateTableView::BaseAmountColumn, LuxgateHistoryModel::BaseAmountColumn},
+                {LuxgateTableView::QuoteTotalColumn, LuxgateHistoryModel::QuoteTotalColumn},
+                {LuxgateTableView::DateCloseOrderColumn, LuxgateHistoryModel::DateColumn}});
     }
 }
 

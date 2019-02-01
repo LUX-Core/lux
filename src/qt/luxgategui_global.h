@@ -40,7 +40,7 @@ namespace Luxgate {
 
     QString priceFormattedText(QString text, bool bBid); //if bBid==true price of bid, else price of ask
 
-    enum CommonRoles {BidAskRole = Qt::UserRole, IndividualRole};
+    enum CommonRoles {BidAskRole = Qt::UserRole, CopyRowRole, IndividualRole};
 }
 extern Luxgate::CurrencyPair curCurrencyPair;
 #endif // LUXGATEGUI_GLOBAL_H

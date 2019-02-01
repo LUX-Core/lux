@@ -40,6 +40,12 @@ void LuxgateOpenOrdersPanel::setModel(WalletModel *model)
 
         ui->tableViewOpenOrders->setItemDelegateForColumn(LuxgateOpenOrdersModel::PriceColumn,
                                                        new LuxgatePriceDelegate(this));
+
+        ui->tableViewOpenOrders->setCopyColumns(QMap<int, int>{
+                {LuxgateTableView::PriceColumn, LuxgateOpenOrdersModel::PriceColumn},
+                {LuxgateTableView::BaseAmountColumn, LuxgateOpenOrdersModel::BaseAmountColumn},
+                {LuxgateTableView::QuoteTotalColumn, LuxgateOpenOrdersModel::QuoteTotalColumn},
+                {LuxgateTableView::DateOpenOrderColumn, LuxgateOpenOrdersModel::DateColumn}});
     }
 
 }

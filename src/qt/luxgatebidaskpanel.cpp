@@ -38,6 +38,11 @@ void LuxgateBidAskPanel::setData(bool bBids_, WalletModel *model)
 
         ui->tableViewBidsAsks->setItemDelegateForColumn(tableModel->columnNum(LuxgateBidsAsksModel::PriceColumn),
                                                         new LuxgatePriceDelegate(this));
+
+        ui->tableViewBidsAsks->setCopyColumns(QMap<int, int>{
+                {LuxgateTableView::PriceColumn, tableModel->columnNum(LuxgateBidsAsksModel::PriceColumn)},
+                {LuxgateTableView::BaseAmountColumn, tableModel->columnNum(LuxgateBidsAsksModel::BaseColumn)},
+                {LuxgateTableView::QuoteTotalColumn, tableModel->columnNum(LuxgateBidsAsksModel::QuoteColumn)}});
     }
 
     //init other widgets
@@ -55,28 +60,26 @@ void LuxgateBidAskPanel::setData(bool bBids_, WalletModel *model)
     ui->labelBidsAsksType->style()->polish(ui->labelBidsAsksType);
 }
 
-void LuxgateBidAskPanel::setOrientation(bool bLeft)
-{
+void LuxgateBidAskPanel::setOrientation(bool bLeft) {
     //change orientation in widgetTotalData
     auto totalLayout = ui->widgetTotalData->layout();
     totalLayout->removeWidget(ui->widgetAverage);
     totalLayout->removeWidget(ui->widgetNumAsks);
     totalLayout->removeWidget(ui->widgetTotal);
     delete totalLayout;
-    QHBoxLayout * newTotalLayout = new QHBoxLayout(this);
-    if(bLeft){
+    QHBoxLayout *newTotalLayout = new QHBoxLayout(this);
+    if (bLeft) {
         newTotalLayout->addWidget(ui->widgetAverage);
         newTotalLayout->addWidget(ui->widgetTotal);
         newTotalLayout->addWidget(ui->widgetNumAsks);
-    }
-    else{
+    } else {
         newTotalLayout->addWidget(ui->widgetNumAsks);
         newTotalLayout->addWidget(ui->widgetTotal);
         newTotalLayout->addWidget(ui->widgetAverage);
     }
-    newTotalLayout->setStretch(0,1);
-    newTotalLayout->setStretch(1,1);
-    newTotalLayout->setStretch(2,1);
+    newTotalLayout->setStretch(0, 1);
+    newTotalLayout->setStretch(1, 1);
+    newTotalLayout->setStretch(2, 1);
     ui->widgetTotalData->setLayout(newTotalLayout);
 
     auto tableModel = qobject_cast<LuxgateBidsAsksModel *>(ui->tableViewBidsAsks->model());
@@ -85,6 +88,11 @@ void LuxgateBidAskPanel::setOrientation(bool bLeft)
     tableModel->setOrientation(bLeft);
     ui->tableViewBidsAsks->setItemDelegateForColumn(tableModel->columnNum(LuxgateBidsAsksModel::PriceColumn),
                                                     new LuxgatePriceDelegate(this));
+
+    ui->tableViewBidsAsks->setCopyColumns(QMap < int, int > {
+            {LuxgateTableView::PriceColumn,      tableModel->columnNum(LuxgateBidsAsksModel::PriceColumn)},
+            {LuxgateTableView::BaseAmountColumn, tableModel->columnNum(LuxgateBidsAsksModel::BaseColumn)},
+            {LuxgateTableView::QuoteTotalColumn, tableModel->columnNum(LuxgateBidsAsksModel::QuoteColumn)}});
 }
 
 LuxgateBidAskPanel::~LuxgateBidAskPanel()

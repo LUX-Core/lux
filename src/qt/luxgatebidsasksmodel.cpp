@@ -88,7 +88,11 @@ QVariant LuxgateBidsAsksModel::data(const QModelIndex &index, int role) const
             }
         }*/
         if(Luxgate::BidAskRole == role)
-            return bBids;
+            res =  bBids;
+        else if(Luxgate::CopyRowRole == role)
+            res =   "Price: " + data(this->index(index.row(), columnNum(PriceColumn))).toString()
+                    + " Base: "  + data(this->index(index.row(), columnNum(BaseColumn))).toString()
+                    + " Quote: "  + data(this->index(index.row(), columnNum(QuoteColumn))).toString();
         else if(Qt::EditRole == role ||
                 Qt::DisplayRole == role)
         {

@@ -100,7 +100,12 @@ QVariant LuxgateOpenOrdersModel::data(const QModelIndex &index, int role) const
         auto order = openOrders[index.row()];
 
         if (Luxgate::BidAskRole == role)
-            return order->IsBid();
+            res = order->IsBid();
+        else if(Luxgate::CopyRowRole == role)
+            res =   "Price: " + data(this->index(index.row(), PriceColumn)).toString()
+                    + " Base: "  + data(this->index(index.row(), BaseAmountColumn)).toString()
+                    + " Quote: "  + data(this->index(index.row(), QuoteTotalColumn)).toString()
+                    + " Date: " + data(this->index(index.row(), DateColumn)).toString();
         else if(Qt::EditRole == role ||
                 Qt::DisplayRole == role) {
 
