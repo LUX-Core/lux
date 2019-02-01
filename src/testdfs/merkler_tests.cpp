@@ -105,7 +105,7 @@ BOOST_AUTO_TEST_CASE(constructmerkletreelayer)
     // TODO: if exists then remove files (SS)
     {
         std::ofstream out(dataFile.string());
-        for (auto hexHash: data) {
+        for (auto &&hexHash: data) {
             uint256 hash;
             hash.SetHex(hexHash);
             hash.Serialize(out, 0, PROTOCOL_VERSION);
@@ -160,6 +160,7 @@ BOOST_AUTO_TEST_CASE(constructmerklepath)
     std::string expectedHash{"78a0a1ccf07fb8159d391b256b057d9b0e119c3803e5c7d3d5af92922cdb73ee"};
     fs::path dataFile = boost::filesystem::current_path() / "test.test";
     fs::path merkle_treeFile = boost::filesystem::current_path() / "merkleForPath.tree";
+    // TODO: if exists then remove files (SS)
     std::vector<std::list<uint256>> expectedPaths = {
         {
             uint256{"3231303938373635343332313039383736353433323130393837363534333231"},
@@ -182,19 +183,17 @@ BOOST_AUTO_TEST_CASE(constructmerklepath)
             uint256{"3837363534333231303938373635343332313039383736353433323130393837"}
         }
     };
-
-    // TODO: if exists then remove files (SS)
     {
         std::ofstream out(dataFile.string());
         out << "12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678"; // 128 bytes = size 1 RSA encrypt data
     }
-    uint256 merkleRoot = Merkler::ConstructMerkleTree(dataFile, merkle_treeFile);
+    Merkler::ConstructMerkleTree(dataFile, merkle_treeFile);
 
     for (size_t i = 0; i < 4; ++i) {
         std::list<uint256> path = Merkler::ConstructMerklePath(dataFile, merkle_treeFile, i);
 
         auto expectedPath_it = expectedPaths[i].begin();
-        for (hash: path) {
+        for (auto &&hash: path) {
             BOOST_CHECK_EQUAL(hash.ToString(), expectedPath_it->ToString());
             ++expectedPath_it;
         }

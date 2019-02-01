@@ -9,6 +9,7 @@
 #include "util.h"
 #include "replicabuilder.h"
 #include "serialize.h"
+#include "merkler.h"
 
 std::unique_ptr<StorageController> storageController;
 
@@ -16,7 +17,8 @@ struct ReplicaStream
 {
     const uint64_t BUFFER_SIZE = 4 * 1024;
     std::fstream filestream;
-    uint256 currenOrderHash;
+    uint256 currentOrderHash;
+    uint256 merkleRootHash;
 
     ADD_SERIALIZE_METHODS;
     template <typename Stream, typename Operation>
@@ -24,8 +26,9 @@ struct ReplicaStream
         std::vector<char> buf(BUFFER_SIZE);
 
         if (!ser_action.ForRead()) {
-            READWRITE(currenOrderHash);
-            const auto order = storageController->mapAnnouncements[currenOrderHash];
+            READWRITE(currentOrderHash);
+            READWRITE(merkleRootHash);
+            const auto order = storageController->mapAnnouncements[currentOrderHash];
             const auto fileSize = GetCryptoReplicaSize(order.fileSize);
             for (auto i = 0u; i < fileSize;) {
                 uint64_t n = std::min(BUFFER_SIZE, fileSize - i);
@@ -38,9 +41,10 @@ struct ReplicaStream
                 i += buf.size();
             }
         } else {
-            READWRITE(currenOrderHash);
-            if (storageController->mapAnnouncements.count(currenOrderHash) != 0) {
-                const auto order = storageController->mapAnnouncements[currenOrderHash];
+            READWRITE(currentOrderHash);
+            READWRITE(merkleRootHash);
+            if (storageController->mapAnnouncements.count(currentOrderHash) != 0) {
+                const auto order = storageController->mapAnnouncements[currentOrderHash];
                 const auto fileSize = GetCryptoReplicaSize(order.fileSize);
 
                 for (auto i = 0u; i < fileSize;) {
@@ -220,7 +224,8 @@ void StorageController::ProcessStorageMessage(CNode* pfrom, const std::string& s
 
         replicaStream.filestream.close();
         // create true filename and copy file from temp storage to dfs storage
-        uint256 orderHash = replicaStream.currenOrderHash;
+        uint256 orderHash = replicaStream.currentOrderHash;
+        uint256 receivedMerkleRootHash = replicaStream.merkleRootHash;
         auto itAnnounce = mapAnnouncements.find(orderHash);
         if (itAnnounce == mapAnnouncements.end()) {
             LogPrint("dfs", "Order \"%s\" not found", orderHash.ToString());
@@ -238,6 +243,18 @@ void StorageController::ProcessStorageMessage(CNode* pfrom, const std::string& s
             LogPrint("dfs", "Wrong file \"%s\" size. real size: %d not equal order size: %d ", order.filename, fs::file_size(tempFile),  GetCryptoReplicaSize(order.fileSize));
             fs::remove(tempFile);
             return ;
+        }
+        { // check merkle root hash
+            size_t size = fs::file_size(tempFile);
+            auto pMerleTreeFile = tempStorageHeap.AllocateFile(uint256{}, size);
+            uint256 merkleRootHash = Merkler::ConstructMerkleTree(tempFile, pMerleTreeFile->fullpath);
+            fs::remove(pMerleTreeFile->fullpath);
+            tempStorageHeap.FreeFile(pMerleTreeFile->uri);
+            if (merkleRootHash.ToString() != receivedMerkleRootHash.ToString()) {
+                LogPrint("dfs", "Wrong merkle root hash. real hash: \"%s\" != \"%s\"(received)", merkleRootHash.ToString(), receivedMerkleRootHash.ToString());
+                fs::remove(tempFile);
+                return ;
+            }
         }
         std::shared_ptr<AllocatedFile> file = storageHeap.AllocateFile(order.fileURI, GetCryptoReplicaSize(order.fileSize));
         storageHeap.SetDecryptionKeys(file->uri, itHandshake->second.keys.rsaKey, itHandshake->second.keys.aesKey);
@@ -361,13 +378,14 @@ bool StorageController::AcceptProposal(const StorageProposal &proposal)
     if (it != mapReceivedHandshakes.end()) {
         auto itFile = mapLocalFiles.find(proposal.orderHash);
         auto pAllocatedFile = CreateReplica(itFile->second, order, keys, rsa);
+        auto pMerleTreeFile = tempStorageHeap.AllocateFile(uint256{}, pAllocatedFile->size);
+        auto merkleRootHash = Merkler::ConstructMerkleTree(pAllocatedFile->fullpath, pMerleTreeFile->fullpath);
         if (pNode) {
-            if (!SendReplica(order, pAllocatedFile, pNode)) {
-                RSA_free(rsa);
-                return false;
-            }
+            bool b = SendReplica(order, merkleRootHash, pAllocatedFile, pNode);
+            boost::filesystem::remove(pMerleTreeFile->fullpath);
+            tempStorageHeap.FreeFile(pMerleTreeFile->uri);
             RSA_free(rsa);
-            return true;
+            return b;
         }
     } else {
         if (pNode) {
@@ -572,7 +590,7 @@ std::shared_ptr<AllocatedFile> StorageController::CreateReplica(const boost::fil
     return tempFile;
 }
 
-bool StorageController::SendReplica(const StorageOrder &order, std::shared_ptr<AllocatedFile> pAllocatedFile, CNode* pNode)
+bool StorageController::SendReplica(const StorageOrder &order, const uint256 merkleRootHash, std::shared_ptr<AllocatedFile> pAllocatedFile, CNode* pNode)
 {
     namespace fs = boost::filesystem;
     if (!pNode) {
@@ -580,7 +598,8 @@ bool StorageController::SendReplica(const StorageOrder &order, std::shared_ptr<A
         return false;
     }
     ReplicaStream replicaStream;
-    replicaStream.currenOrderHash = order.GetHash();
+    replicaStream.currentOrderHash = order.GetHash();
+    replicaStream.merkleRootHash = merkleRootHash;
     replicaStream.filestream.open(pAllocatedFile->fullpath.string(), std::ios::binary|std::ios::in);
     if (!replicaStream.filestream.is_open()) {
         LogPrint("dfs", "file %s cannot be opened", pAllocatedFile->fullpath.string());
