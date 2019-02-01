@@ -15,6 +15,7 @@ LuxgateOpenOrdersModel::LuxgateOpenOrdersModel(const Luxgate::Decimals & decimal
       decimals(decimals)
 {
     update();
+    orderbook.subscribeOrdersChange(std::bind(&LuxgateOpenOrdersModel::update, this));
 }
 
 void LuxgateOpenOrdersModel::update()

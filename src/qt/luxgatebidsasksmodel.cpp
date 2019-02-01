@@ -1,5 +1,6 @@
 #include "luxgatebidsasksmodel.h"
 #include "luxgategui_global.h"
+
 #include <QColor>
 #include <QBrush>
 

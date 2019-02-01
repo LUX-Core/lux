@@ -1,8 +1,10 @@
 #ifndef LUXGATEOPENORDERSMODEL_H
 #define LUXGATEOPENORDERSMODEL_H
 
-#include <QAbstractTableModel>
 #include "luxgategui_global.h"
+
+#include <QAbstractTableModel>
+
 #include <vector>
 #include <memory>
 
