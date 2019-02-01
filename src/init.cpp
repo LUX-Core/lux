@@ -1750,7 +1750,7 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
     if (!strErrors.str().empty())
         return InitError(strErrors.str());
 
-    storageController.reset(new StorageController());
+
     fMasterNode = GetBoolArg("-masternode", false);
     if (fMasterNode) {
         LogPrintf("IS DARKSEND MASTER NODE\n");

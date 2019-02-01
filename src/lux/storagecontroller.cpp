@@ -11,7 +11,7 @@
 #include "serialize.h"
 #include "merkler.h"
 
-std::unique_ptr<StorageController> storageController;
+std::unique_ptr<StorageController> storageController(new StorageController());
 
 struct ReplicaStream
 {
@@ -566,7 +566,7 @@ std::shared_ptr<AllocatedFile> StorageController::CreateReplica(const boost::fil
     std::ofstream outfile;
     outfile.open(tempFile->fullpath.string(), std::ios::binary);
 
-    size_t sizeBuffer = nBlockSizeRSA - 2;
+    uint64_t sizeBuffer = nBlockSizeRSA - 2;
     byte *buffer = new byte[sizeBuffer];
     byte *replica = new byte[nBlockSizeRSA];
     for (auto i = 0u; i < length; i+= sizeBuffer)
