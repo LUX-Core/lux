@@ -9,6 +9,7 @@
 #include "base58.h"
 #include "qvalidatedlineedit.h"
 #include "bitcoinaddressvalidator.h"
+#include "../main.h"
 #include <QLineEdit>
 #include <QCompleter>
 
@@ -79,6 +80,8 @@ void AddressField::on_refresh()
     // Initialize variables
     QString currentAddress = currentText();
     m_stringList.clear();
+    if (GetTime() < lastRefreshTime + 30) return; //only do this once every 30 secs
+    lastRefreshTime = GetTime();
     vector<COutput> vecOutputs;
     assert(pwalletMain != NULL);
 

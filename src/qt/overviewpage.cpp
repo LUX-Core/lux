@@ -383,7 +383,6 @@ void OverviewPage::setWalletModel(WalletModel* model)
         connect(model, SIGNAL(balanceChanged(CAmount, CAmount, CAmount, CAmount, CAmount, CAmount, CAmount)), this, SLOT(setBalance(CAmount, CAmount, CAmount, CAmount, CAmount, CAmount, CAmount)));
 
         connect(model->getOptionsModel(), SIGNAL(displayUnitChanged(int)), this, SLOT(updateDisplayUnit()));
-        connect(model->getOptionsModel(), SIGNAL(darksendRoundsChanged()), this, SLOT(updateDarkSendProgress()));
         connect(model->getOptionsModel(), SIGNAL(advancedUIChanged(bool)), this, SLOT(updateAdvancedUI(bool)));
         updateAdvancedUI(model->getOptionsModel()->getShowAdvancedUI());
 
@@ -449,9 +448,29 @@ void OverviewPage::on_buttonAddToken_clicked()
 void OverviewPage::updateDarkSendProgress()
 {
     if (!pwalletMain) return;
+    if (IsInitialBlockDownload()) {
+        float progress = 0.0;
+        ui->darksendProgress->setValue(progress);
+        QString strToolPip = ("<b>" + tr("Currently syncing") + "</b>");
+        ui->darksendProgress->setToolTip(strToolPip);
+        return; // don't update the darksend progress while syncing - there's no point!
+    }
 
     QString strAmountAndRounds;
     QString strAnonymizeLuxAmount = BitcoinUnits::formatHtmlWithUnit(nDisplayUnit, nAnonymizeLuxAmount * COIN, false, BitcoinUnits::separatorAlways);
+
+    if (!fEnableDarksend) {
+        ui->darksendProgress->setValue(0);
+        ui->darksendProgress->setToolTip(tr("Darksend disabled"));
+
+        // when balance is zero just show info from settings
+        strAnonymizeLuxAmount = strAnonymizeLuxAmount.remove(strAnonymizeLuxAmount.indexOf("."), BitcoinUnits::decimals(nDisplayUnit) + 1);
+        strAmountAndRounds = strAnonymizeLuxAmount + " / " + tr("%n Rounds", "", nDarksendRounds);
+
+        ui->labelAmountRounds->setToolTip(tr("Darksend disabled"));
+        ui->labelAmountRounds->setText(tr("Disabled"));
+        return;
+    }
 
     if (currentBalance == 0) {
         ui->darksendProgress->setValue(0);
@@ -572,6 +591,7 @@ void OverviewPage::updateAdvancedUI(bool fShowAdvancedPSUI) {
 
 void OverviewPage::darkSendStatus()
 {
+    //bool fIsInitialBlockDownload = IsInitialBlockDownload();
     static int64_t nLastDSProgressBlockTime = 0;
 
     int nBestHeight = chainActive.Height();

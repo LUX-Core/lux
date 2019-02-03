@@ -411,6 +411,7 @@ int randomizeList(int i) { return std::rand() % i; }
 // Recursively determine the rounds of a given input (How deep is the darksend chain for a given input)
 int GetInputDarksendRounds(CTxIn in, int rounds) {
     if (rounds >= 17) return rounds;
+    if (rounds > nDarksendRounds || nDarksendRounds <= 0 || !fEnableDarksend) return rounds; // once we hit the max rounds setting, there's no point going further back (this func is only used for selecting qualifying txs)
 
     std::string padding = "";
     padding.insert(0, ((rounds + 1) * 5) + 3, ' ');
@@ -2114,41 +2115,12 @@ void ThreadCheckDarkSendPool() {
         darkSendPool.CheckTimeout();
 
         if (c % 60 == 0) {
-//            LOCK(cs_main);
-            /*
-                cs_main is required for doing masternode.Check because something
-                is modifying the coins view without a mempool lock. It causes
-                segfaults from this code without the cs_main lock.
-            */
-            {
-
+        {
                 LOCK(cs_masternodes);
                 vector<CMasterNode>::iterator it = vecMasternodes.begin();
                 //check them separately
                 while (it != vecMasternodes.end()) {
                     (*it).Check();
-                    ++it;
-                }
-
-                int count = vecMasternodes.size();
-                int i = 0;
-
-                for (CMasterNode mn : vecMasternodes) {
-
-                    if (mn.addr.IsRFC1918()) continue; //local network
-                    if (mn.IsEnabled()) {
-                        if (fDebug) LogPrintf("Sending masternode entry - %s \n", mn.addr.ToString().c_str());
-                        for (CNode * pnode : vNodes) {
-                            if (pnode)
-                                pnode->PushMessage("dsee", mn.vin, mn.addr, mn.sig, mn.now, mn.pubkey, mn.pubkey2, count, i, mn.lastTimeSeen, mn.protocolVersion);
-                        }
-                    }
-                    i++;
-                }
-
-                //remove inactive
-                it = vecMasternodes.begin();
-                while (it != vecMasternodes.end()) {
                     if ((*it).enabled == 4 || (*it).enabled == 3) {
                         LogPrintf("Removing inactive masternode %s\n", (*it).addr.ToString().c_str());
                         it = vecMasternodes.erase(it);
@@ -2156,15 +2128,13 @@ void ThreadCheckDarkSendPool() {
                         ++it;
                     }
                 }
-
             }
-
             masternodePayments.CleanPaymentList();
             CleanTransactionLocksList();
         }
 
-        //try to sync the masternode list and payment list every 5 seconds from at least 3 nodes
-        if (c % 5 == 0 && RequestedMasterNodeList < 3) {
+        //try to sync the masternode list and payment list every 5 seconds from at least 5 nodes
+        if (c % 5 == 0 && RequestedMasterNodeList < 5) {
             bool fIsInitialDownload = IsInitialBlockDownload();
             if (!fIsInitialDownload) {
                 LOCK(cs_vNodes);
