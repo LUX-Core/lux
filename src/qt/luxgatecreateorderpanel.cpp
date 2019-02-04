@@ -4,6 +4,7 @@
 #include "luxgategui_global.h"
 #include "walletmodel.h"
 #include "optionsmodel.h"
+#include "luxgate/blockchainclient.h"
 
 #include <QRegExpValidator>
 
@@ -42,7 +43,6 @@ void LuxgateCreateOrderPanel::slotPriceEditChanged(const QString & text)
     bool oldState = ui->horizontalSliderPrice->blockSignals(true);
     ui->horizontalSliderPrice->setValue(sliderValue);
     ui->horizontalSliderPrice->blockSignals(oldState);
-
     priceChangeUpdateGUI();
 }
 
@@ -116,6 +116,18 @@ void LuxgateCreateOrderPanel::setBuySell(bool _bBuy)
         slotUpdateAverageHighLowBidAsk(0.00017949, 0.00010979);
     else
         slotUpdateAverageHighLowBidAsk(0.00009364, 0.00010803);
+
+
+    //get balance
+    if(bBuy) {
+        if (blockchainClientPool.count("BTC")) {
+            double dbBalance = 0;
+            bool bBalance = blockchainClientPool["BTC"]->GetBalance(dbBalance);
+            if (bBalance)
+                ui->lineEditTotal->setText(QString::number(dbBalance));
+        }
+    }
+
 }
 
 float LuxgateCreateOrderPanel::minSliderPriceReal()
