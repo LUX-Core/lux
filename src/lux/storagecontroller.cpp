@@ -11,7 +11,7 @@
 #include "serialize.h"
 #include "merkler.h"
 
-std::unique_ptr<StorageController> storageController(new StorageController());
+std::unique_ptr<StorageController> storageController;
 
 struct ReplicaStream
 {
