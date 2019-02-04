@@ -2843,7 +2843,7 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CWalletT
                 wtxNew.fFromMe = true;
                 bool fFirst = true;
 
-                CAmount nTotalValue = nValue + nFeeRet;
+                CAmount nTotalValue = nValue;
                 if (nSubtractFeeFromAmount == 0)
                     nTotalValue += nFeeRet;
                 else {

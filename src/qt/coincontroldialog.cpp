@@ -689,7 +689,7 @@ void CoinControlDialog::updateLabels(WalletModel* model, QDialog* dialog)
         sPriorityLabel = CoinControlDialog::getPriorityLabel(dPriority, mempoolEstimatePriority);
 
         // Fee
-        nPayFee = CWallet::GetMinimumFee(nBytes, nTxConfirmTarget, mempool);
+        nPayFee = (CWallet::GetMinimumFee(nBytes, nTxConfirmTarget, mempool)) + 30;
         if (nPayFee > 0 && coinControl->nMinimumTotalFee > nPayFee)
             nPayFee = coinControl->nMinimumTotalFee;
 
