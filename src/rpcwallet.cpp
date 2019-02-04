@@ -561,8 +561,11 @@ void SendMoney(const CTxDestination& address, CAmount nValue, CWalletTx& wtxNew,
     // Create and send the transaction
     CReserveKey reservekey(pwalletMain);
     CAmount nFeeRequired;
+    std::vector<CRecipient> vecSend;
     int nChangePos = -1;
-    if (!pwalletMain->CreateTransaction(scriptPubKey, nValue, wtxNew, reservekey, nFeeRequired, nChangePos, strError, NULL, ALL_COINS, fUseIX, (CAmount)0)) {
+    CRecipient recipient = {scriptPubKey, nValue};
+    vecSend.push_back(recipient);
+    if (!pwalletMain->CreateTransaction(vecSend, wtxNew, reservekey, nFeeRequired, nChangePos, strError, NULL, ALL_COINS, fUseIX, (CAmount)0)) {
         if (nValue + nFeeRequired > pwalletMain->GetBalance())
             strError = strprintf("Error: This transaction requires a transaction fee of at least %s because of its amount, complexity, or use of recently received funds!", FormatMoney(nFeeRequired));
         LogPrintf("SendMoney() : %s\n", strError);
@@ -1162,7 +1165,7 @@ UniValue sendmany(const UniValue& params, bool fHelp)
         wtx.mapValue["comment"] = params[3].get_str();
 
     set<CTxDestination> destinations;
-    vector<pair<CScript, CAmount> > vecSend;
+    std::vector<CRecipient> vecSend;
 
     CAmount totalAmount = 0;
     vector<string> keys = sendTo.getKeys();
@@ -1181,7 +1184,8 @@ UniValue sendmany(const UniValue& params, bool fHelp)
             throw JSONRPCError(RPC_TYPE_ERROR, "Invalid amount for send");
         totalAmount += nAmount;
 
-        vecSend.push_back(make_pair(scriptPubKey, nAmount));
+        CRecipient recipient = {scriptPubKey, nAmount};
+        vecSend.push_back(recipient);
     }
 
     EnsureWalletIsUnlocked();
@@ -3022,8 +3026,9 @@ UniValue createcontract(const UniValue& params, bool fHelp){
     CAmount nFeeRequired;
     std::string strError;
     int nChangePos = -1;
-    vector<pair<CScript, CAmount> > vecSend;
-    vecSend.push_back(make_pair(scriptPubKey, 0));
+    std::vector<CRecipient> vecSend;
+    CRecipient recipient = {scriptPubKey, 0};
+    vecSend.push_back(recipient);
 
     if (!pwalletMain->CreateTransaction(vecSend, wtx, reservekey, nFeeRequired, nChangePos, strError, &coinControl,  ALL_COINS,
                                         false, (CAmount)0, nGasFee)) {
@@ -3245,9 +3250,10 @@ UniValue sendtocontract(const UniValue& params, bool fHelp){
     CAmount nFeeRequired;
     std::string strError;
     int nChangePos = -1;
-    vector<pair<CScript, CAmount> > vecSend;
+    std::vector<CRecipient> vecSend;
 //    int nChangePosRet = -1;
-    vecSend.push_back(make_pair(scriptPubKey, nAmount));
+    CRecipient recipient = {scriptPubKey, nAmount};
+    vecSend.push_back(recipient);
 
 
     if (!pwalletMain->CreateTransaction(vecSend, wtx, reservekey, nFeeRequired, nChangePos, strError, &coinControl, ALL_COINS,

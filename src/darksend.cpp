@@ -1652,10 +1652,11 @@ bool CDarkSendPool::SendRandomPaymentToSelf() {
     CWalletTx wtx;
     int64_t nFeeRet = 0;
     std::string strFail = "";
-    vector< pair<CScript, int64_t> > vecSend;
+    std::vector<CRecipient> vecSend;
 
     // ****** Add fees ************ /
-    vecSend.push_back(make_pair(scriptDenom, nPayment));
+    CRecipient recipient = {scriptDenom, nPayment};
+    vecSend.push_back(recipient);
 
     CCoinControl* coinControl = NULL;
     int nChangePos = -1;
@@ -1687,10 +1688,10 @@ bool CDarkSendPool::MakeCollateralAmounts() {
     CWalletTx wtx;
     int64_t nFeeRet = 0;
     std::string strFail = "";
-    vector< pair<CScript, int64_t> > vecSend;
+    std::vector<CRecipient> vecSend;
 
-    vecSend.push_back(make_pair(scriptChange, (DARKSEND_COLLATERAL * 2) + DARKSEND_FEE));
-    vecSend.push_back(make_pair(scriptChange, (DARKSEND_COLLATERAL * 2) + DARKSEND_FEE));
+    CRecipient recipient = {scriptChange, (DARKSEND_COLLATERAL * 2) + DARKSEND_FEE};
+    vecSend.push_back(recipient);
 
     CCoinControl* coinControl = NULL;
     int nChangePos = -1;
@@ -1731,15 +1732,13 @@ bool CDarkSendPool::CreateDenominated(int64_t nTotalValue) {
     CWalletTx wtx;
     int64_t nFeeRet = 0;
     std::string strFail = "";
-    vector< pair<CScript, int64_t> > vecSend;
+    std::vector<CRecipient> vecSend;
     int64_t nValueLeft = nTotalValue;
 
     // ****** Add collateral outputs ************ /
     if (!pwalletMain->HasCollateralInputs()) {
-        vecSend.push_back(make_pair(scriptChange, (DARKSEND_COLLATERAL * 2) + DARKSEND_FEE));
-        nValueLeft -= (DARKSEND_COLLATERAL * 2) + DARKSEND_FEE;
-        vecSend.push_back(make_pair(scriptChange, (DARKSEND_COLLATERAL * 2) + DARKSEND_FEE));
-        nValueLeft -= (DARKSEND_COLLATERAL * 2) + DARKSEND_FEE;
+        CRecipient recipient = {scriptChange, (DARKSEND_COLLATERAL * 2) + DARKSEND_FEE};
+        vecSend.push_back(recipient);
     }
 
     // ****** Add denoms ************ /
@@ -1755,7 +1754,8 @@ bool CDarkSendPool::CreateDenominated(int64_t nTotalValue) {
             scriptChange = GetScriptForDestination(vchPubKey.GetID());
             reservekey.KeepKey();
 
-            vecSend.push_back(make_pair(scriptChange, v));
+            CRecipient recipient = {scriptChange, v};
+            vecSend.push_back(recipient);
 
             //increment outputs and subtract denomination amount
             nOutputs++;
