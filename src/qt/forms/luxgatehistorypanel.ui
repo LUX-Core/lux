@@ -15,7 +15,11 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="LuxgateTableView" name="tableViewHistory"/>
+    <widget class="LuxgateTableView" name="tableViewHistory">
+     <attribute name="horizontalHeaderMinimumSectionSize">
+      <number>20</number>
+     </attribute>
+    </widget>
    </item>
   </layout>
  </widget>

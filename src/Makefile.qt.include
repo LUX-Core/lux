@@ -201,7 +201,9 @@ if ENABLE_LUXGATE
                   qt/moc_luxgatehistorymodel.cpp \
                   qt/moc_luxgatecreateorderpanel.cpp \
                   qt/moc_luxgatepricedelegate.cpp \
-                  qt/moc_luxgatetableview.cpp
+                  qt/moc_luxgatetableview.cpp \
+                  qt/moc_bitmexnetwork.cpp \
+                  qt/moc_luxgatehtmldelegate.cpp
 endif
 
 BITCOIN_MM = \
@@ -355,7 +357,9 @@ if ENABLE_LUXGATE
                   qt/luxgatehistorymodel.h \
                   qt/luxgatecreateorderpanel.h \
                   qt/luxgatepricedelegate.h \
-                  qt/luxgatetableview.h
+                  qt/luxgatetableview.h \
+                  qt/bitmexnetwork.h \
+                  qt/luxgatehtmldelegate.h
 endif
 
 RES_ICONS = \
@@ -588,7 +592,9 @@ if ENABLE_LUXGATE
                     qt/luxgatecreateorderpanel.cpp \
                     qt/luxgatepricedelegate.cpp \
                     qt/luxgategui_global.cpp \
-                    qt/luxgatetableview.cpp                                                       
+                    qt/luxgatetableview.cpp \
+                    qt/bitmexnetwork.cpp \
+                    qt/luxgatehtmldelegate.cpp
 endif
 
 endif

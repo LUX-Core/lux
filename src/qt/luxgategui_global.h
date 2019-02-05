@@ -1,7 +1,8 @@
 #ifndef LUXGATEGUI_GLOBAL_H
 #define LUXGATEGUI_GLOBAL_H
 #include <QString>
-
+#include <QDateTime>
+#include <boost/filesystem.hpp>
 
 namespace Luxgate {
     struct Decimals {
@@ -42,5 +43,21 @@ namespace Luxgate {
 
     enum CommonRoles {BidAskRole = Qt::UserRole, CopyRowRole, IndividualRole};
 }
+
+
+struct LuxgateHistoryRow
+{
+    QDateTime dateTime;
+    bool bBuy;
+    double dbPrice;
+    double dbSize;
+    int arrayDirection; //-1 - down, 0 - no array, 1- up array
+};
+typedef QVector<LuxgateHistoryRow> LuxgateHistoryData;
+
+boost::filesystem::path PathFromQString(const QString & filePath);
+
+QString QStringFromPath(const boost::filesystem::path & filePath);
+
 extern Luxgate::CurrencyPair curCurrencyPair;
 #endif // LUXGATEGUI_GLOBAL_H

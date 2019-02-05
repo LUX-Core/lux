@@ -4,6 +4,7 @@
 #include "luxgateconfigmodel.h"
 #include "luxgate/luxgate.h"
 #include "luxgate/lgconfig.h"
+#include "luxgategui_global.h"
 
 #include <QStringList>
 #include <QHeaderView>
@@ -18,25 +19,6 @@
 #include <QRegExp>
 #include <QPainter>
 #include <QLineEdit>
-
-boost::filesystem::path PathFromQString(const QString & filePath)
-{
-#ifdef _WIN32
-    auto * wptr = reinterpret_cast<const wchar_t*>(filePath.utf16());
-    return boost::filesystem::path(wptr, wptr + filePath.size());
-#else
-    return boost::filesystem::path(filePath.toStdString());
-#endif
-}
-
-QString QStringFromPath(const boost::filesystem::path & filePath)
-{
-#ifdef _WIN32
-    return QString::fromStdWString(filePath.generic_wstring());
-#else
-    return QString::fromStdString(filePath.native());
-#endif
-}
 
 
 class LuxgateConfigDelegate : public QItemDelegate

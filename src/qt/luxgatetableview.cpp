@@ -43,6 +43,9 @@ LuxgateTableView::LuxgateTableView(QWidget *parent):
         case BaseAmountColumn:
             addAction(BaseAmountColumn, tr("Copy Amount"));
         break;
+        case SizeColumn:
+            addAction(SizeColumn, tr("Copy Size"));
+            break;
         case QuoteTotalColumn:
             addAction(QuoteTotalColumn, tr("Copy Total"));
         break;

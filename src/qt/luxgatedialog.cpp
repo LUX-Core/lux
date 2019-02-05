@@ -18,6 +18,7 @@
 #include "luxgatehistorypanel.h"
 #include "tradingplot.h"
 #include "luxgatecreateorderpanel.h"
+#include "bitmexnetwork.h"
 
 #include <QClipboard>
 #include <QDebug>
@@ -65,8 +66,10 @@ LuxgateDialog::LuxgateDialog(QWidget *parent) :
         model(0)
 {
     ui->setupUi(this);
+    qRegisterMetaType<LuxgateHistoryData>("LuxgateHistoryData");
     setWindowFlags(Qt::Widget);
     setContentsMargins(10,10,10,10);
+
     createWidgetsAndDocks();
 }
 
@@ -119,6 +122,10 @@ void LuxgateDialog::createWidgetsAndDocks()
     QDockWidget* centralDockNULL = new QDockWidget(this);
     centralDockNULL->setFixedWidth(0);
     setCentralWidget(centralDockNULL);
+
+    BitMexNetwork * bitMex = new BitMexNetwork(this);
+    connect(bitMex, &BitMexNetwork::sigGlobalHistoryData,
+            historyPanel, &LuxgateHistoryPanel::slotUpdateData);
 }
 
 QDockWidget* LuxgateDialog::createDock(QWidget* widget, const QString& title)

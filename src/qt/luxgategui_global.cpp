@@ -33,3 +33,22 @@ namespace Luxgate {
         return nullPart + "<font color=\"" + color + "\">" + numberPart + "</font>";
     }
 }
+
+boost::filesystem::path PathFromQString(const QString & filePath)
+{
+#ifdef _WIN32
+    auto * wptr = reinterpret_cast<const wchar_t*>(filePath.utf16());
+    return boost::filesystem::path(wptr, wptr + filePath.size());
+#else
+    return boost::filesystem::path(filePath.toStdString());
+#endif
+}
+
+QString QStringFromPath(const boost::filesystem::path & filePath)
+{
+#ifdef _WIN32
+    return QString::fromStdWString(filePath.generic_wstring());
+#else
+    return QString::fromStdString(filePath.native());
+#endif
+}

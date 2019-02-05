@@ -118,15 +118,6 @@ void LuxgateCreateOrderPanel::setBuySell(bool _bBuy)
         slotUpdateAverageHighLowBidAsk(0.00009364, 0.00010803);
 
 
-    //get balance
-    if(bBuy) {
-        if (blockchainClientPool.count("BTC")) {
-            double dbBalance = 0;
-            bool bBalance = blockchainClientPool["BTC"]->GetBalance(dbBalance);
-            if (bBalance)
-                ui->lineEditTotal->setText(QString::number(dbBalance));
-        }
-    }
 
 }
 

@@ -4,6 +4,7 @@
 
 #include <QColor>
 #include <QBrush>
+#include <QDateTime>
 
 LuxgateHistoryModel::LuxgateHistoryModel(const Luxgate::Decimals & decimals, QObject *parent)
     : QAbstractTableModel(parent),
@@ -26,11 +27,14 @@ QVariant LuxgateHistoryModel::headerData(int section, Qt::Orientation orientatio
             case PriceColumn:
                 res = "PRICE";
                 break;
-            case BaseAmountColumn:
-                res = "AMOUNT ( " + curCurrencyPair.baseCurrency + " )";
+            case SizeColumn:
+                res = "SIZE ( " + curCurrencyPair.quoteCurrency + " )";
                 break;
-            case QuoteTotalColumn:
-                res = "TOTAL ( " + curCurrencyPair.quoteCurrency + " )";
+            case SideColumn:
+                res = "SIDE";
+                break;
+            case TickColumn:
+                res = "";
                 break;
         }
     }
@@ -48,8 +52,7 @@ int LuxgateHistoryModel::rowCount(const QModelIndex &parent) const
     if (parent.isValid())
         return 0;
     else
-        return 3;
-    // FIXME: Implement me!
+        return luxgateData.size();
 }
 
 int LuxgateHistoryModel::columnCount(const QModelIndex &parent) const
@@ -60,40 +63,78 @@ int LuxgateHistoryModel::columnCount(const QModelIndex &parent) const
         return NColumns;
 }
 
+bool LuxgateHistoryModel::insertRows(int row, int count, const QModelIndex &parent)
+{
+    if(row < 0 || (row > luxgateData.size() && luxgateData.size()!= 0))
+        return false;
+    beginInsertRows(parent,row, row+count-1);
+    endInsertRows();
+    return true;
+}
+
+bool LuxgateHistoryModel::removeRows(int row, int count, const QModelIndex &parent)
+{
+    if(row < 0 || row+count > luxgateData.size())
+        return false;
+    beginRemoveRows(parent,row, row+count-1);
+    endRemoveRows();
+    return true;
+}
+void LuxgateHistoryModel::slotUpdateData(const LuxgateHistoryData & luxgateData_)
+{
+    if(luxgateData_.size() != rowCount())
+    {
+        removeRows(0, rowCount());
+        insertRows(0, luxgateData_.size());
+    }
+    luxgateData = luxgateData_;
+    emit dataChanged(index(0,0), index(rowCount()-1,columnCount()-1), {Qt::DisplayRole});
+}
+
 QVariant LuxgateHistoryModel::data(const QModelIndex &index, int role) const
 {
     QVariant res;
 
     if (index.isValid()) {
-        if (Luxgate::BidAskRole == role) {
-            if(index.row()%2)
-                return true;
-            else
-                return false;
+        if (Luxgate::BidAskRole == role)
+            return luxgateData[index.row()].bBuy;
+        else if (Luxgate::CopyRowRole == role)
+            res = "Price: " + data(this->index(index.row(), PriceColumn)).toString()
+                  + " Size: " + data(this->index(index.row(), SizeColumn)).toString()
+                  + " Date: " + data(this->index(index.row(), DateColumn)).toString();
+        else if (Qt::ToolTipRole == role) {
+            if (DateColumn == index.column())
+                res = luxgateData[index.row()].dateTime.toString("yyyy-MM-dd HH:mm:ss.zzz");
         }
-        else if(Luxgate::CopyRowRole == role)
-            res =   "Price: " + data(this->index(index.row(), PriceColumn)).toString()
-                    + " Base: "  + data(this->index(index.row(), BaseAmountColumn)).toString()
-                    + " Quote: "  + data(this->index(index.row(), QuoteTotalColumn)).toString()
-                    + " Date: " + data(this->index(index.row(), DateColumn)).toString();
         else if(Qt::EditRole == role ||
                 Qt::DisplayRole == role)
         {
-            if (DateColumn == index.column()) {
-                res = QString("12-21 19:59:10");
+            if (DateColumn == index.column())
+                res = luxgateData[index.row()].dateTime.toString("hh:mm:ss");
+            else if (SideColumn == index.column()) {
+                if(luxgateData[index.row()].bBuy)
+                    res = "Buy";
+                else
+                    res = "Sell";
             }
-
+            else if (TickColumn == index.column()) {
+                QString color;
+                if(luxgateData[index.row()].bBuy)
+                    color =  "#267E00";
+                else
+                    color =  "red";
+                if(1 == luxgateData[index.row()].arrayDirection)
+                    res = "<font color=\"" + color + "\">" + "<b>&#8593;</b>" + "</font>";
+                else if(-1 == luxgateData[index.row()].arrayDirection)
+                    res = "<font color=\"" + color + "\">" + "<b>&#8595;</b>" + "</font>";
+            }
             else if (PriceColumn == index.column()) {
-                res = QString::number(0.00005234 + 0.000001 * index.row(), 'f',decimals.price);
+                res = QString::number(luxgateData[index.row()].dbPrice, 'f',decimals.price);
             }
-            else if (BaseAmountColumn == index.column()) {
-                res = QString::number(574.2354 + 3 * index.row(), 'f',decimals.base);
-            }
-            else if (QuoteTotalColumn == index.column()) {
-                res = QString::number(0.00034512 + 3 * index.row(), 'f',decimals.quote);
+            else if (SizeColumn == index.column()) {
+                res = QString::number(luxgateData[index.row()].dbSize, 'f',decimals.quote);
             }
         }
     }
-    // FIXME: Implement me!
     return res;
 }
