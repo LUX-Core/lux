@@ -1,7 +1,7 @@
 #include "bitmexnetwork.h"
 
 #include "util.h"
-#include "luxgatehistorymodel.h"
+#include "luxgategui_global.h"
 
 #include <QNetworkAccessManager>
 #include <QTimer>
@@ -12,6 +12,7 @@
 #include <QNetworkRequest>
 #include <QNetworkReply>
 #include <QFile>
+
 
 BitMexNetwork::BitMexNetwork(QObject *parent):
     QObject(parent)
@@ -47,9 +48,20 @@ void BitMexNetwork::requestGlobalHistory()
             this, &BitMexNetwork::replyGlobalHistory);
 }
 
+void BitMexNetwork::requestOrderBook()
+{
+    QNetworkRequest request(QUrl("https://testnet.bitmex.com/api/v1/orderBook/L2?symbol=XBT&depth=" + QString::number(depthOrderBook)));
+    request.setHeader(QNetworkRequest::ContentTypeHeader,
+                      "application/json");
+    auto reply = nam->get(request);
+    connect(reply, &QNetworkReply::finished,
+            this, &BitMexNetwork::replyOrderBook);
+}
+
 void BitMexNetwork::allRequests()
 {
     requestGlobalHistory();
+    requestOrderBook();
 }
 
 void BitMexNetwork::replyGlobalHistory()
@@ -57,7 +69,7 @@ void BitMexNetwork::replyGlobalHistory()
     auto reply = qobject_cast<QNetworkReply *>(sender());
     QJsonDocument document = QJsonDocument::fromJson(reply->readAll());
     auto array = document.array();
-    QVector<LuxgateHistoryRow> data;
+    LuxgateHistoryData data;
     for(int i=0; i<array.size(); i++)
     {
         LuxgateHistoryRow row;
@@ -75,4 +87,25 @@ void BitMexNetwork::replyGlobalHistory()
         data.append(row);
     }
     emit sigGlobalHistoryData(data);
+}
+
+void BitMexNetwork::replyOrderBook()
+{
+    auto reply = qobject_cast<QNetworkReply *>(sender());
+    QJsonDocument document = QJsonDocument::fromJson(reply->readAll());
+    auto array = document.array();
+    QVector<LuxgateOrderBookRow> dataBids;
+    QVector<LuxgateOrderBookRow> dataAsks;
+    for(int i=0; i<array.size(); i++)
+    {
+        LuxgateOrderBookRow row;
+        row.dbPrice = array[i].toObject().value("price").toDouble();
+        row.dbSize = array[i].toObject().value("size").toDouble();
+        if ("Buy" == array[i].toObject().value("side").toString())
+            dataBids.append(row);
+        else
+            dataAsks.prepend(row);
+    }
+    emit sigOrderBookAsksData(dataAsks);
+    emit sigOrderBookBidsData(dataBids);
 }

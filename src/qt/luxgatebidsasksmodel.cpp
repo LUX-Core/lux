@@ -1,8 +1,12 @@
 #include "luxgatebidsasksmodel.h"
+
 #include "luxgategui_global.h"
+#include "bitmexnetwork.h"
 
 #include <QColor>
 #include <QBrush>
+
+extern BitMexNetwork * bitMexNetw;
 
 LuxgateBidsAsksModel::LuxgateBidsAsksModel(bool bBids, const Luxgate::Decimals & decimals, QObject *parent)
     : QAbstractTableModel(parent),
@@ -10,7 +14,41 @@ LuxgateBidsAsksModel::LuxgateBidsAsksModel(bool bBids, const Luxgate::Decimals &
       bLeft(bBids),
       bBids(bBids)
 {
+    if(bBids)
+        connect(bitMexNetw, &BitMexNetwork::sigOrderBookBidsData,
+                this, &LuxgateBidsAsksModel::slotUpdateData);
+    else
+        connect(bitMexNetw, &BitMexNetwork::sigOrderBookAsksData,
+                this, &LuxgateBidsAsksModel::slotUpdateData);
+}
 
+bool LuxgateBidsAsksModel::insertRows(int row, int count, const QModelIndex &parent)
+{
+    if(row < 0 || (row > luxgateData.size() && luxgateData.size()!= 0))
+        return false;
+    beginInsertRows(parent,row, row+count-1);
+    endInsertRows();
+    return true;
+}
+
+bool LuxgateBidsAsksModel::removeRows(int row, int count, const QModelIndex &parent)
+{
+    if(row < 0 || row+count > luxgateData.size())
+        return false;
+    beginRemoveRows(parent,row, row+count-1);
+    endRemoveRows();
+    return true;
+}
+
+void LuxgateBidsAsksModel::slotUpdateData(const LuxgateOrderBookData & luxgateData_)
+{
+    if(luxgateData_.size() != rowCount())
+    {
+        removeRows(0, rowCount());
+        insertRows(0, luxgateData_.size());
+    }
+    luxgateData = luxgateData_;
+    emit dataChanged(index(0,0), index(rowCount()-1,columnCount()-1), {Qt::DisplayRole});
 }
 
 //convert value from Columns to columnNum
@@ -62,15 +100,18 @@ QVariant LuxgateBidsAsksModel::headerData(int section, Qt::Orientation orientati
 
 int LuxgateBidsAsksModel::rowCount(const QModelIndex &parent) const
 {
-    // FIXME: Implement me!
-    Q_UNUSED(parent);
-    return 2;
+    if (parent.isValid())
+        return 0;
+    else
+        return luxgateData.size();
 }
 
 int LuxgateBidsAsksModel::columnCount(const QModelIndex &parent) const
 {
-    Q_UNUSED(parent);
-    return NColumns;
+    if (parent.isValid())
+        return 0;
+    else
+        return NColumns;
 }
 
 QVariant LuxgateBidsAsksModel::data(const QModelIndex &index, int role) const
@@ -78,16 +119,6 @@ QVariant LuxgateBidsAsksModel::data(const QModelIndex &index, int role) const
     QVariant res;
 
     if (index.isValid()) {
-        /*if (Qt::ForegroundRole == role) {
-            if (columnNum(PriceColumn) == index.column()) {
-                QColor col;
-                if(bBids)
-                    col.setNamedColor("#267E00");
-                else
-                    col = Qt::red;
-                res = QBrush(col);
-            }
-        }*/
         if(Luxgate::BidAskRole == role)
             res =  bBids;
         else if(Luxgate::CopyRowRole == role)
@@ -98,17 +129,16 @@ QVariant LuxgateBidsAsksModel::data(const QModelIndex &index, int role) const
                 Qt::DisplayRole == role)
         {
             if (columnNum(PriceColumn) == index.column()) {
-                res = QString::number(0.00001234 + 0.000001 * index.row(), 'f',decimals.price);
+                res = QString::number(luxgateData[index.row()].dbPrice, 'f',decimals.price);
             }
             else if (columnNum(BaseColumn) == index.column()) {
-                res = QString::number(104.2354 + 3 * index.row(), 'f',decimals.base);
+                res = QString::number(luxgateData[index.row()].dbSize/luxgateData[index.row()].dbPrice, 'f',decimals.base);
             }
             else if (columnNum(QuoteColumn) == index.column()) {
-                res = QString::number(0.00024512 + 3 * index.row(), 'f',decimals.quote);
+                res = QString::number(luxgateData[index.row()].dbSize, 'f',decimals.quote);
             }
         }
     }
-    // FIXME: Implement me!
     return res;
 }
 

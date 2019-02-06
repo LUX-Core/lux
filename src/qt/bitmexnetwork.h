@@ -3,7 +3,7 @@
 
 #include <QString>
 #include <QObject>
-#include "luxgategui_global.h"
+#include "bitmex_shared.h"
 
 class QNetworkAccessManager;
 
@@ -19,12 +19,19 @@ private:
     const int apiExpiresInterval {5};
 
     void requestGlobalHistory();
+
+    void requestOrderBook();
+    int depthOrderBook {25};
+
     void readConfig();
 private slots:
     void allRequests();
     void replyGlobalHistory();
+    void replyOrderBook();
 signals:
     void sigGlobalHistoryData(const LuxgateHistoryData & data);
+    void sigOrderBookAsksData(const LuxgateOrderBookData & data);
+    void sigOrderBookBidsData(const LuxgateOrderBookData & data);
 };
 
 #endif // BITMEXNETWORK_H

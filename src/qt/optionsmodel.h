@@ -6,7 +6,7 @@
 #define BITCOIN_QT_OPTIONSMODEL_H
 
 #include "amount.h"
-#include "luxgategui_global.h"
+#include "luxgate_options.h"
 
 #include <QAbstractListModel>
 

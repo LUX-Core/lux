@@ -1,8 +1,10 @@
 #ifndef LUXGATECREATEORDERPANEL_H
 #define LUXGATECREATEORDERPANEL_H
 
-#include <QFrame>
 #include "luxgategui_global.h"
+#include "luxgate_options.h"
+
+#include <QFrame>
 
 namespace Ui {
 class LuxgateCreateOrderPanel;

@@ -2,7 +2,6 @@
 #define LUXGATEHISTORYPANEL_H
 
 #include <QFrame>
-#include "luxgatehistorymodel.h"
 
 namespace Ui {
 class LuxgateHistoryPanel;
@@ -18,8 +17,6 @@ public:
     explicit LuxgateHistoryPanel(QWidget *parent = nullptr);
     ~LuxgateHistoryPanel();
     void setModel(WalletModel *model);
-public slots:
-    void slotUpdateData(const LuxgateHistoryData & data);
 private:
     WalletModel * wal_model;
     Ui::LuxgateHistoryPanel *ui;

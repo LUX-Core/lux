@@ -1,15 +1,19 @@
 #include "luxgatehistorymodel.h"
 
 #include "luxgategui_global.h"
+#include "bitmexnetwork.h"
 
 #include <QColor>
 #include <QBrush>
 #include <QDateTime>
 
+extern BitMexNetwork * bitMexNetw;
 LuxgateHistoryModel::LuxgateHistoryModel(const Luxgate::Decimals & decimals, QObject *parent)
     : QAbstractTableModel(parent),
       decimals(decimals)
 {
+    connect(bitMexNetw, &BitMexNetwork::sigGlobalHistoryData,
+            this, &LuxgateHistoryModel::slotUpdateData);
 }
 
 QVariant LuxgateHistoryModel::headerData(int section, Qt::Orientation orientation, int role) const
@@ -80,6 +84,7 @@ bool LuxgateHistoryModel::removeRows(int row, int count, const QModelIndex &pare
     endRemoveRows();
     return true;
 }
+
 void LuxgateHistoryModel::slotUpdateData(const LuxgateHistoryData & luxgateData_)
 {
     if(luxgateData_.size() != rowCount())

@@ -2,6 +2,7 @@
 #define LUXGATEOPENORDERSMODEL_H
 
 #include "luxgategui_global.h"
+#include "luxgate_options.h"
 
 #include <QAbstractTableModel>
 

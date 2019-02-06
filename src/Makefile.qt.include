@@ -359,7 +359,9 @@ if ENABLE_LUXGATE
                   qt/luxgatepricedelegate.h \
                   qt/luxgatetableview.h \
                   qt/bitmexnetwork.h \
-                  qt/luxgatehtmldelegate.h
+                  qt/luxgatehtmldelegate.h \
+                  qt/bitmex_shared.h \
+                  qt/luxgate_options.h                                    
 endif
 
 RES_ICONS = \

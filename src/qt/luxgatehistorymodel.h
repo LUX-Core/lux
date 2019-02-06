@@ -3,8 +3,8 @@
 
 #include <QAbstractTableModel>
 #include <QVector>
-#include "luxgategui_global.h"
-
+#include "bitmex_shared.h"
+#include "luxgate_options.h"
 
 class LuxgateHistoryModel : public QAbstractTableModel
 {

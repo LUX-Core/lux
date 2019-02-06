@@ -19,6 +19,7 @@
 #include "tradingplot.h"
 #include "luxgatecreateorderpanel.h"
 #include "bitmexnetwork.h"
+#include "bitmex_shared.h"
 
 #include <QClipboard>
 #include <QDebug>
@@ -58,7 +59,7 @@
 using namespace std;
 
 Luxgate::CurrencyPair curCurrencyPair ("LUX", "BTC");
-
+BitMexNetwork * bitMexNetw;
 
 LuxgateDialog::LuxgateDialog(QWidget *parent) :
         QMainWindow(parent),
@@ -66,7 +67,12 @@ LuxgateDialog::LuxgateDialog(QWidget *parent) :
         model(0)
 {
     ui->setupUi(this);
+
+    bitMexNetw = new BitMexNetwork(this);
+    //register types
     qRegisterMetaType<LuxgateHistoryData>("LuxgateHistoryData");
+    qRegisterMetaType<LuxgateOrderBookData>("LuxgateOrderBookData");
+
     setWindowFlags(Qt::Widget);
     setContentsMargins(10,10,10,10);
 
@@ -122,10 +128,6 @@ void LuxgateDialog::createWidgetsAndDocks()
     QDockWidget* centralDockNULL = new QDockWidget(this);
     centralDockNULL->setFixedWidth(0);
     setCentralWidget(centralDockNULL);
-
-    BitMexNetwork * bitMex = new BitMexNetwork(this);
-    connect(bitMex, &BitMexNetwork::sigGlobalHistoryData,
-            historyPanel, &LuxgateHistoryPanel::slotUpdateData);
 }
 
 QDockWidget* LuxgateDialog::createDock(QWidget* widget, const QString& title)

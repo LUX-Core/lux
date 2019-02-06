@@ -42,11 +42,6 @@ void LuxgateHistoryPanel::setModel(WalletModel *model)
     }
 }
 
-void LuxgateHistoryPanel::slotUpdateData(const LuxgateHistoryData & data)
-{
-    qobject_cast<LuxgateHistoryModel *>(ui->tableViewHistory->model())->slotUpdateData(data);
-}
-
 LuxgateHistoryPanel::~LuxgateHistoryPanel()
 {
     delete ui;
