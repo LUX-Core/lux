@@ -93,17 +93,13 @@ void StorageController::ProcessStorageMessage(CNode* pfrom, const std::string& s
         vRecv >> order;
 
         uint256 hash = order.GetHash();
-        if (mapAnnouncements.find(hash) == mapAnnouncements.end()) {
+        if (GetAnnounce(hash) == nullptr) {
             AnnounceOrder(order); // TODO: Is need remove "pfrom" node from announcement? (SS)
             if (storageHeap.MaxAllocateSize() > order.fileSize &&
                 tempStorageHeap.MaxAllocateSize() > order.fileSize &&
                 order.maxRate >= rate &&
                 order.maxGap >= maxblocksgap) {
-                StorageProposal proposal;
-                proposal.time = std::time(0);
-                proposal.orderHash = hash;
-                proposal.rate = rate;
-                proposal.address = address;
+                StorageProposal proposal { std::time(nullptr), hash, rate, address };
 
                 CNode* pNode = FindNode(order.address);
                 if (!pNode) {
@@ -112,7 +108,6 @@ void StorageController::ProcessStorageMessage(CNode* pfrom, const std::string& s
                     MilliSleep(500);
                     pNode = FindNode(order.address);
                 }
-
                 if (pNode) {
                     pNode->PushMessage("dfsproposal", proposal);
                 } else {
@@ -125,8 +120,8 @@ void StorageController::ProcessStorageMessage(CNode* pfrom, const std::string& s
         isStorageCommand = true;
         StorageProposal proposal;
         vRecv >> proposal;
-        auto itAnnounce = mapAnnouncements.find(proposal.orderHash);
-        if (itAnnounce != mapAnnouncements.end()) {
+        const auto *order = GetAnnounce(proposal.orderHash);
+        if (order != nullptr) {
             std::vector<uint256> vListenProposals;
             {
                 boost::lock_guard <boost::mutex> lock(mutex);
@@ -134,7 +129,7 @@ void StorageController::ProcessStorageMessage(CNode* pfrom, const std::string& s
             }
 
             if (std::find(vListenProposals.begin(), vListenProposals.end(), proposal.orderHash) != vListenProposals.end()) {
-                if (itAnnounce->second.maxRate > proposal.rate) {
+                if (order->maxRate > proposal.rate) {
                     boost::lock_guard <boost::mutex> lock(mutex);
                     proposalsAgent.AddProposal(proposal);
                 }
@@ -155,18 +150,12 @@ void StorageController::ProcessStorageMessage(CNode* pfrom, const std::string& s
         isStorageCommand = true;
         StorageHandshake handshake;
         vRecv >> handshake;
-        auto itAnnounce = mapAnnouncements.find(handshake.orderHash);
-        if (itAnnounce != mapAnnouncements.end()) {
-            StorageOrder &order = itAnnounce->second;
-            if (storageHeap.MaxAllocateSize() > order.fileSize && tempStorageHeap.MaxAllocateSize() > order.fileSize) { // TODO: Change to exist(handshake.proposalHash) (SS)
-                StorageHandshake requestReplica;
-                requestReplica.time = std::time(0);
-                requestReplica.orderHash = handshake.orderHash;
-                requestReplica.proposalHash = handshake.proposalHash;
-                requestReplica.port = DEFAULT_DFS_PORT;
-
+        const auto *order = GetAnnounce(handshake.orderHash);
+        if (order != nullptr) {
+            if (storageHeap.MaxAllocateSize() > order->fileSize && tempStorageHeap.MaxAllocateSize() > order->fileSize) { // TODO: Change to exist(handshake.proposalHash) (SS)
+                StorageHandshake requestReplica { std::time(nullptr), handshake.orderHash, handshake.proposalHash, DEFAULT_DFS_PORT };
                 mapReceivedHandshakes[handshake.orderHash] = handshake;
-                CNode* pNode = FindNode(order.address);
+                CNode* pNode = FindNode(order->address);
 
                 if (pNode) {
                     pNode->PushMessage("dfsrr", requestReplica);
@@ -187,8 +176,8 @@ void StorageController::ProcessStorageMessage(CNode* pfrom, const std::string& s
         isStorageCommand = true;
         StorageHandshake handshake;
         vRecv >> handshake;
-        auto itAnnounce = mapAnnouncements.find(handshake.orderHash);
-        if (itAnnounce != mapAnnouncements.end()) {
+        const auto *order = GetAnnounce(handshake.orderHash);
+        if (order != nullptr) {
             auto it = mapLocalFiles.find(handshake.orderHash);
             if (it != mapLocalFiles.end()) {
                 mapReceivedHandshakes[handshake.orderHash] = handshake;
@@ -219,12 +208,18 @@ void StorageController::ProcessStorageMessage(CNode* pfrom, const std::string& s
             fs::remove(tempFile);
             return ;
         }
-        StorageOrder &order = mapAnnouncements.find(orderHash)->second;
-        auto handshake = mapReceivedHandshakes.find(orderHash)->second;
-        std::shared_ptr<AllocatedFile> file = storageHeap.AllocateFile(order.fileURI, GetCryptoReplicaSize(order.fileSize));
-        storageHeap.SetDecryptionKeys(file->uri, handshake.keys.rsaKey, handshake.keys.aesKey);
+        const auto *order = GetAnnounce(orderHash);
+        auto itHandshake = mapReceivedHandshakes.find(orderHash);
+        if (itHandshake == mapReceivedHandshakes.end()) {
+            LogPrint("dfs", "Handshake \"%s\" not found", orderHash.ToString());
+            fs::remove(tempFile);
+            return ;
+        }
+        auto keys = itHandshake->second.keys;
+        std::shared_ptr<AllocatedFile> file = storageHeap.AllocateFile(order->fileURI, GetCryptoReplicaSize(order->fileSize));
+        storageHeap.SetDecryptionKeys(file->uri, keys.rsaKey, keys.aesKey);
         fs::rename(tempFile, file->fullpath);
-        LogPrint("dfs", "File \"%s\" was uploaded", order.filename);
+        LogPrint("dfs", "File \"%s\" was uploaded", order->filename);
     } else if (strCommand == "dfsping") {
         isStorageCommand = true;
         pfrom->PushMessage("dfspong", pfrom->addr);
@@ -305,11 +300,10 @@ void StorageController::ClearOldAnnouncments(std::time_t timestamp)
 
 bool StorageController::AcceptProposal(const StorageProposal &proposal)
 {
-    if (!mapAnnouncements.count(proposal.orderHash)) {
+    const auto *order = GetAnnounce(proposal.orderHash);
+    if (order == nullptr) {
         return false;
     }
-
-    auto order = mapAnnouncements[proposal.orderHash];
     RSA *rsa;
     DecryptionKeys keys = GenerateKeys(&rsa);
     if (!StartHandshake(proposal, keys)) {
@@ -324,11 +318,11 @@ bool StorageController::AcceptProposal(const StorageProposal &proposal)
     CNode* pNode = FindNode(proposal.address);
     if (it != mapReceivedHandshakes.end()) {
         auto itFile = mapLocalFiles.find(proposal.orderHash);
-        auto pAllocatedFile = CreateReplica(itFile->second, order, keys, rsa);
+        auto pAllocatedFile = CreateReplica(itFile->second, *order, keys, rsa);
         auto pMerleTreeFile = tempStorageHeap.AllocateFile(uint256{}, pAllocatedFile->size);
         auto merkleRootHash = Merkler::ConstructMerkleTree(pAllocatedFile->fullpath, pMerleTreeFile->fullpath);
         if (pNode) {
-            bool b = SendReplica(order, merkleRootHash, pAllocatedFile, pNode);
+            bool b = SendReplica(*order, merkleRootHash, pAllocatedFile, pNode);
             boost::filesystem::remove(pMerleTreeFile->fullpath);
             tempStorageHeap.FreeFile(pMerleTreeFile->uri);
             RSA_free(rsa);
@@ -343,29 +337,30 @@ bool StorageController::AcceptProposal(const StorageProposal &proposal)
     return false;
 }
 
-bool StorageController::DecryptReplica(std::shared_ptr<AllocatedFile> pAllocatedFile, const uint64_t fileSize, const boost::filesystem::path &decryptedFile)
+void StorageController::DecryptReplica(const uint256 &orderHash, const boost::filesystem::path &decryptedFile)
 {
     namespace fs = boost::filesystem;
 
+    const auto *order = GetAnnounce(orderHash);
+    if (!order) {
+        return ;
+    }
+    std::shared_ptr<AllocatedFile> pAllocatedFile = storageHeap.GetFile(order->fileURI);
     RSA *rsa = CreatePublicRSA(DecryptionKeys::ToString(pAllocatedFile->keys.rsaKey));
-
-    std::ifstream filein;
-    filein.open(pAllocatedFile->fullpath.string(), std::ios::binary);
+    std::ifstream filein(pAllocatedFile->fullpath.string(), std::ios::binary);
     if (!filein.is_open()) {
         LogPrint("dfs", "file %s cannot be opened", pAllocatedFile->fullpath.string());
-        return false;
+        return ;
     }
-
-    auto length = fs::file_size(pAllocatedFile->fullpath);
-    auto bytesSize = fileSize;
-
+    auto fileSize = fs::file_size(pAllocatedFile->fullpath);
+    auto bytesSize = order->fileSize;
     std::ofstream outfile;
     outfile.open(decryptedFile.string().c_str(), std::ios::binary);
-
     uint64_t sizeBuffer = nBlockSizeRSA - 2;
     byte *buffer = new byte[sizeBuffer];
     byte *replica = new byte[nBlockSizeRSA];
-    for (auto i = 0u; i < length; i+= nBlockSizeRSA)
+
+    for (auto i = 0u; i < fileSize; i+= nBlockSizeRSA)
     {
         filein.read((char *)replica, nBlockSizeRSA); // TODO: change to loop of readsome
 
@@ -374,12 +369,12 @@ bool StorageController::DecryptReplica(std::shared_ptr<AllocatedFile> pAllocated
         bytesSize -= sizeBuffer;
         // TODO: check write (SS)
     }
-    filein.close();
-    outfile.close();
+
     delete[] buffer;
     delete[] replica;
-
-    return true;
+    filein.close();
+    outfile.close();
+    return ;
 }
 
 std::map<uint256, StorageOrder> StorageController::GetAnnouncements()
@@ -482,17 +477,10 @@ std::vector<StorageProposal> StorageController::SortProposals(const StorageOrder
 
 bool StorageController::StartHandshake(const StorageProposal &proposal, const DecryptionKeys &keys)
 {
-    StorageHandshake handshake;
-    handshake.time = std::time(0);
-    handshake.orderHash = proposal.orderHash;
-    handshake.proposalHash = proposal.GetHash();
-    handshake.port = DEFAULT_DFS_PORT;
-    handshake.keys = keys;
-
+    StorageHandshake handshake { std::time(nullptr), proposal.orderHash, proposal.GetHash(), DEFAULT_DFS_PORT, keys };
     CNode* pNode = FindNode(proposal.address);
     if (pNode == nullptr) {
         for (int64_t nLoop = 0; nLoop < 100 && pNode == nullptr; nLoop++) {
-         //   ProcessOneShot();
             CAddress addr;
             OpenNetworkConnection(addr, false, NULL, proposal.address.ToStringIPPort().c_str());
             for (int i = 0; i < 10 && i < nLoop; i++) {
@@ -599,52 +587,26 @@ bool StorageController::CheckReceivedReplica(const uint256 &orderHash, const uin
 {
     namespace fs = boost::filesystem;
 
-    auto itAnnounce = mapAnnouncements.find(orderHash);
-    if (itAnnounce == mapAnnouncements.end()) {
-        LogPrint("dfs", "Order \"%s\" not found", orderHash.ToString());
-        return false;
-    }
-    auto itHandshake = mapReceivedHandshakes.find(orderHash);
-    if (itHandshake == mapReceivedHandshakes.end()) {
-        LogPrint("dfs", "Handshake \"%s\" not found", orderHash.ToString());
-        return false;
-    }
-    StorageOrder &order = itAnnounce->second;
-    size_t size = fs::file_size(replica);
-    if (size != GetCryptoReplicaSize(order.fileSize)) {
-        LogPrint("dfs", "Wrong file \"%s\" size. real size: %d not equal order size: %d ", order.filename, fs::file_size(replica),  GetCryptoReplicaSize(order.fileSize));
-        return false;
-    }
-    { // check merkle root hash
-        auto pMerleTreeFile = tempStorageHeap.AllocateFile(uint256{}, size);
-        uint256 merkleRootHash = Merkler::ConstructMerkleTree(replica, pMerleTreeFile->fullpath);
-        fs::remove(pMerleTreeFile->fullpath);
-        tempStorageHeap.FreeFile(pMerleTreeFile->uri);
-        if (merkleRootHash.ToString() != receivedMerkleRootHash.ToString()) {
-            LogPrint("dfs", "Wrong merkle root hash. real hash: \"%s\" != \"%s\"(received)", merkleRootHash.ToString(), receivedMerkleRootHash.ToString());
+    auto *order = GetAnnounce(orderHash);
+    if (order) {
+        size_t size = fs::file_size(replica);
+        if (size != GetCryptoReplicaSize(order->fileSize)) {
+            LogPrint("dfs", "Wrong file \"%s\" size. real size: %d not equal order size: %d ", order->filename, size,  GetCryptoReplicaSize(order->fileSize));
             return false;
         }
+        { // check merkle root hash
+            auto pMerleTreeFile = tempStorageHeap.AllocateFile(uint256{}, size);
+            uint256 merkleRootHash = Merkler::ConstructMerkleTree(replica, pMerleTreeFile->fullpath);
+            fs::remove(pMerleTreeFile->fullpath);
+            tempStorageHeap.FreeFile(pMerleTreeFile->uri);
+            if (merkleRootHash.ToString() != receivedMerkleRootHash.ToString()) {
+                LogPrint("dfs", "Wrong merkle root hash. real hash: \"%s\" != \"%s\"(received)", merkleRootHash.ToString(), receivedMerkleRootHash.ToString());
+                return false;
+            }
+        }
+        return true;
     }
-    return true;
-}
-
-void StorageController::DecryptReplica(const uint256 &orderHash, const boost::filesystem::path &decryptedFile)
-{
-    namespace fs = boost::filesystem;
-
-    auto itAnnounce = mapAnnouncements.find(orderHash);
-    if (itAnnounce == mapAnnouncements.end()) {
-        LogPrint("dfs", "Order \"%s\" not found", orderHash.ToString());
-        return ;
-    }
-    auto itHandshake = mapReceivedHandshakes.find(orderHash);
-    if (itHandshake == mapReceivedHandshakes.end()) {
-        LogPrint("dfs", "Handshake \"%s\" not found", orderHash.ToString());
-        return ;
-    }
-    StorageOrder &order = itAnnounce->second;
-    std::shared_ptr<AllocatedFile> pAllocatedFile = storageHeap.GetFile(order.fileURI);
-    DecryptReplica(pAllocatedFile, order.fileSize, decryptedFile);
+    return false;
 }
 
 void StorageController::BackgroundJob()
@@ -655,16 +617,18 @@ void StorageController::BackgroundJob()
         boost::this_thread::interruption_point();
         boost::this_thread::sleep(boost::posix_time::seconds(1));
 
-        std::vector<CNode*> vNodesCopy;
-        {
-            LOCK(cs_vNodes);
-            vNodesCopy = vNodes;
-        }
-
         if (!address.IsValid() || (std::time(nullptr) - lastCheckIp > 3600))
         {
+            std::vector<CNode*> vNodesCopy;
+            {
+                LOCK(cs_vNodes);
+                vNodesCopy = vNodes;
+            }
             for (const auto &node : vNodesCopy) {
                 node->PushMessage("dfsping");
+            }
+            if (std::time(nullptr) - lastCheckIp > 3600) {
+                lastCheckIp = std::time(nullptr);
             }
         }
 
@@ -674,14 +638,12 @@ void StorageController::BackgroundJob()
             orderHashes = proposalsAgent.GetListenProposals();
         }
         for(auto &&orderHash : orderHashes) {
-            auto orderIt = mapAnnouncements.find(orderHash);
-            if (orderIt != mapAnnouncements.end()) {
-                auto order = orderIt->second;
-                if(std::time(nullptr) > order.time + 60) {
-                    if (FindReplicaKeepers(order, 1)) {
-                        boost::lock_guard<boost::mutex> lock(mutex);
-                        proposalsAgent.StopListenProposal(orderHash);
-                    }
+            const auto *order = GetAnnounce(orderHash);
+            if (order != nullptr) {
+                if(std::time(nullptr) > order->time + 60) {
+                    FindReplicaKeepers(*order, 1);
+                    boost::lock_guard<boost::mutex> lock(mutex);
+                    proposalsAgent.StopListenProposal(orderHash);
                 }
             }
         }
