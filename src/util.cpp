@@ -241,6 +241,7 @@ bool LogAcceptCategory(const char* category)
             // thread_specific_ptr automatically deletes the set when the thread ends.
             // "lux" is a composite category enabling all LUX-related debug output
             if (ptrCategory->count(string("lux"))) {
+                ptrCategory->insert(string("dfs"));
                 ptrCategory->insert(string("darksend"));
                 ptrCategory->insert(string("instantx"));
                 ptrCategory->insert(string("masternode"));
@@ -608,7 +609,7 @@ void ReadConfigFile(map<string, string>& mapSettingsRet,
     ClearDatadirCache();
 }
 
-void WriteConfigToFile(std::string strKey, std::string strValue) 
+void WriteConfigToFile(std::string strKey, std::string strValue)
 {
     std::ifstream fin(GetConfigFile().string().c_str());
     std::string line;
