@@ -1341,7 +1341,7 @@ UniValue dfslistorders(const UniValue& params, bool fHelp)
 
     UniValue result(UniValue::VARR);
 
-    for (auto announcePair : storageController->mapAnnouncements){
+    for (auto &&announcePair : storageController->GetAnnouncements()){
         StorageOrder announce = announcePair.second;
         UniValue obj(UniValue::VOBJ);
         obj.push_back(Pair("orderhash", announcePair.first.ToString()));

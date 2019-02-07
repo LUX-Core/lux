@@ -17,7 +17,8 @@
 #include "consensus/validation.h"
 #include "hash.h"
 #include "init.h"
-#include "stake.h"
+#include "instantx.h"
+#include "lux/storagecontroller.h"
 #include "masternode.h"
 #include "merkleblock.h"
 #include "net.h"
@@ -26,23 +27,22 @@
 #include "pow.h"
 #include "primitives/block.h"
 #include "primitives/transaction.h"
-#include "spork.h"
-#include "instantx.h"
+#include "script/interpreter.h"
 #include "script/script.h"
 #include "script/sigcache.h"
 #include "script/standard.h"
+#include "spork.h"
+#include "stake.h"
 #include "timedata.h"
 #include "txdb.h"
 #include "txmempool.h"
 #include "ui_interface.h"
+#include "univalue/univalue.h"
 #include "util.h"
 #include "utilmoneystr.h"
 #include "validationinterface.h"
 #include "versionbits.h"
-#include "script/interpreter.h"
-#include "lux/storagecontroller.h"
 
-#include "univalue/univalue.h"
 #include <atomic>
 #include <sstream>
 
@@ -5830,7 +5830,7 @@ bool static AlreadyHave(const CInv& inv)
     case MSG_MASTERNODE_WINNER:
         return mapSeenMasternodeVotes.count(inv.hash);
     case MSG_STORAGE_ORDER_ANNOUNCE:
-        return storageController->mapAnnouncements.count(inv.hash);
+        return storageController->GetAnnounce(inv.hash) != nullptr;
     }
     // Don't know what it is, just say we already got one
     return true;
@@ -5986,10 +5986,11 @@ void static ProcessGetData(CNode* pfrom, const Consensus::Params& consensusParam
                     vNotFound.push_back(inv);
                 }
             } else if (inv.type == MSG_STORAGE_ORDER_ANNOUNCE) {
-                if (storageController->mapAnnouncements.count(inv.hash)) {
+                const auto *announce = storageController->GetAnnounce(inv.hash);
+                if (announce != nullptr) {
                     CDataStream ss(SER_NETWORK, PROTOCOL_VERSION);
                     ss.reserve(1000);
-                    ss << storageController->mapAnnouncements[inv.hash];
+                    ss << (*announce);
                     pfrom->PushMessage("dfsannounce", ss);
                 }
             }
