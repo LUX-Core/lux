@@ -13,9 +13,22 @@ LuxgateBidAskPanel::LuxgateBidAskPanel(QWidget *parent) :
     ui(new Ui::LuxgateBidAskPanel)
 {
     ui->setupUi(this);
+    ui->widgetTotalData->hide();
     ui->labelTotalCurrency->setText(" " + curCurrencyPair.baseCurrency);
     ui->labelAveragePriceCurrency->setText(" " + curCurrencyPair.baseCurrency
                                            + "/" + curCurrencyPair.quoteCurrency);
+}
+
+void LuxgateBidAskPanel::setRowsDisplayed (int RowsDisplayed_)
+{
+    auto tableModel = qobject_cast<LuxgateBidsAsksModel *>(ui->tableViewBidsAsks->model());
+    tableModel->setRowsDisplayed(RowsDisplayed_);
+}
+
+void LuxgateBidAskPanel::slotGroup(bool bGroup, double dbStep)
+{
+    auto tableModel = qobject_cast<LuxgateBidsAsksModel *>(ui->tableViewBidsAsks->model());
+    tableModel->slotGroup(bGroup, dbStep);
 }
 
 void LuxgateBidAskPanel::setData(bool bBids_, WalletModel *model)
@@ -41,8 +54,8 @@ void LuxgateBidAskPanel::setData(bool bBids_, WalletModel *model)
 
         ui->tableViewBidsAsks->setCopyColumns(QMap<int, int>{
                 {LuxgateTableView::PriceColumn, tableModel->columnNum(LuxgateBidsAsksModel::PriceColumn)},
-                {LuxgateTableView::BaseAmountColumn, tableModel->columnNum(LuxgateBidsAsksModel::BaseColumn)},
-                {LuxgateTableView::QuoteTotalColumn, tableModel->columnNum(LuxgateBidsAsksModel::QuoteColumn)}});
+                {LuxgateTableView::SizeColumn, tableModel->columnNum(LuxgateBidsAsksModel::SizeColumn)},
+                {LuxgateTableView::TotalColumn, tableModel->columnNum(LuxgateBidsAsksModel::TotalColumn)}});
     }
 
     //init other widgets
@@ -88,11 +101,6 @@ void LuxgateBidAskPanel::setOrientation(bool bLeft) {
     tableModel->setOrientation(bLeft);
     ui->tableViewBidsAsks->setItemDelegateForColumn(tableModel->columnNum(LuxgateBidsAsksModel::PriceColumn),
                                                     new LuxgatePriceDelegate(this));
-
-    ui->tableViewBidsAsks->setCopyColumns(QMap < int, int > {
-            {LuxgateTableView::PriceColumn,      tableModel->columnNum(LuxgateBidsAsksModel::PriceColumn)},
-            {LuxgateTableView::BaseAmountColumn, tableModel->columnNum(LuxgateBidsAsksModel::BaseColumn)},
-            {LuxgateTableView::QuoteTotalColumn, tableModel->columnNum(LuxgateBidsAsksModel::QuoteColumn)}});
 }
 
 LuxgateBidAskPanel::~LuxgateBidAskPanel()

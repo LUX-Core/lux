@@ -117,10 +117,14 @@ QVariant LuxgateHistoryModel::data(const QModelIndex &index, int role) const
             if (DateColumn == index.column())
                 res = luxgateData[index.row()].dateTime.toString("hh:mm:ss");
             else if (SideColumn == index.column()) {
-                if(luxgateData[index.row()].bBuy)
-                    res = "Buy";
-                else
-                    res = "Sell";
+                if(luxgateData[index.row()].bBuy) {
+                    QString color =  "#267E00";
+                    res = "<font color=\"" + color + "\">" + "<b>Buy</b>" + "</font>";
+                }
+                else {
+                    QString color =  "red";
+                    res = "<font color=\"" + color + "\">" + "<b>Sell</b>" + "</font>";
+                }
             }
             else if (TickColumn == index.column()) {
                 QString color;

@@ -9,9 +9,9 @@ namespace Luxgate {
         Decimals(int price, int base, int quote) : price(price),
                                                    base(base),
                                                    quote(quote) {}
-        Decimals(): price(8),
+        Decimals(): price(1),
                     base(8),
-                    quote(8) {}
+                    quote(1) {}
 
         Decimals(const Decimals &other) {
             price = other.price;

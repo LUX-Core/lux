@@ -35,6 +35,8 @@ void LuxgateHistoryPanel::setModel(WalletModel *model)
                                                         new LuxgatePriceDelegate(this));
         ui->tableViewHistory->setItemDelegateForColumn(LuxgateHistoryModel::TickColumn,
                                                        new LuxgateHtmlDelegate(this));
+        ui->tableViewHistory->setItemDelegateForColumn(LuxgateHistoryModel::SideColumn,
+                                                       new LuxgateHtmlDelegate(this));
         ui->tableViewHistory->setCopyColumns(QMap<int, int>{
                 {LuxgateTableView::PriceColumn, LuxgateHistoryModel::PriceColumn},
                 {LuxgateTableView::SizeColumn, LuxgateHistoryModel::SizeColumn},

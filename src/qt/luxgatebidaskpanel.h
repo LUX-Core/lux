@@ -18,6 +18,9 @@ public:
     ~LuxgateBidAskPanel();
     void setData(bool bBids_, WalletModel *model);
     void setOrientation(bool bLeft);
+    void setRowsDisplayed (int RowsDisplayed_);
+public slots:
+    void slotGroup(bool bGroup, double dbStep = 0.f);
 private:
     Ui::LuxgateBidAskPanel *ui;
     WalletModel * wal_model;

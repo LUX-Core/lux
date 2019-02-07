@@ -13,7 +13,7 @@ public:
     LuxgateTableView(QWidget *parent = nullptr);
     enum possibleColumns {  RowsAction, SeparatorAction,
                             PriceColumn,  BaseAmountColumn,
-                            QuoteTotalColumn, SizeColumn,
+                            QuoteTotalColumn, SizeColumn, TotalColumn,
                             DateOpenOrderColumn,
                             DateCloseOrderColumn, nPossibleColumns};
     void setCopyColumns(QMap<int, int> copyColumns); //QMap<possibleColumn, realModelColumn>

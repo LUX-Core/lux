@@ -14,7 +14,7 @@ LuxgateOpenOrdersModel::LuxgateOpenOrdersModel(const Luxgate::Decimals & decimal
     : QAbstractTableModel(parent),
       decimals(decimals)
 {
-    update();
+    //update();
     orderbook.subscribeOrdersChange(std::bind(&LuxgateOpenOrdersModel::update, this));
 }
 

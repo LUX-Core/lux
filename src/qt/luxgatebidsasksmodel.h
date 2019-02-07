@@ -13,8 +13,8 @@ public:
     explicit LuxgateBidsAsksModel(bool bBids, const Luxgate::Decimals & decimals, QObject *parent = nullptr);
 
     enum Columns{
-        PriceColumn = 0, BaseColumn,
-        QuoteColumn, NColumns
+        PriceColumn = 0, SizeColumn,
+        TotalColumn, NColumns
     };
 
     //convert value from Columns to columnNum
@@ -33,15 +33,21 @@ public:
     bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
 
     void setOrientation(bool bLeft);
-
+    void setRowsDisplayed (int RowsDisplayed_);
 public slots:
     void slotSetDecimals(const Luxgate::Decimals & decimals_);
     void slotUpdateData(const LuxgateOrderBookData & data);
+    void slotGroup(bool bGroup, double dbStep = 0.f);
 private:
     LuxgateOrderBookData luxgateData;
+    LuxgateOrderBookData luxgateDataGroup;
     Luxgate::Decimals decimals;
     bool bLeft;             //true - in left side, false - right
     const bool bBids;       //true - Bids, false - Asks
+    bool bGroup{false};     //true - group price, false - dont group
+    double dbStepGroup {0.f};
+    void groupData();
+    int nRowsDisplayed {1000};
 };
 
 #endif // LUXGATEBIDSMODEL_H

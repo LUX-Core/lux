@@ -87,7 +87,7 @@
             <number>1</number>
            </property>
            <property name="text">
-            <string>89356</string>
+            <string>-</string>
            </property>
           </widget>
          </item>
@@ -148,7 +148,7 @@
             </size>
            </property>
            <property name="text">
-            <string>0.59888888</string>
+            <string>-</string>
            </property>
            <property name="alignment">
             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -212,7 +212,7 @@
             </size>
            </property>
            <property name="text">
-            <string>0.00123456</string>
+            <string>-</string>
            </property>
            <property name="alignment">
             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>

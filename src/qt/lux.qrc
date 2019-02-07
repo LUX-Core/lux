@@ -96,6 +96,7 @@
         <file>res/icons/currencies/BTC.png</file>
         <file>res/icons/currencies/LUX.png</file>
         <file>res/icons/replace.png</file>
+        <file>res/icons/earth.png</file>
     </qresource>
     <qresource prefix="/css">
         <file alias="default">res/css/default.css</file>

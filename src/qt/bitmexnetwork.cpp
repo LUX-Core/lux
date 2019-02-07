@@ -22,7 +22,50 @@ BitMexNetwork::BitMexNetwork(QObject *parent):
 
     QTimer *timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &BitMexNetwork::allRequests);
-    timer->start(5000);
+    timer->start(15000);
+}
+
+void BitMexNetwork::setDepthGlobalHistory(int depthGlobalHistory_)
+{
+    depthGlobalHistory = depthGlobalHistory_;
+    requestGlobalHistory();
+}
+
+void BitMexNetwork::updateOrderBook()
+{
+    requestOrderBook();
+}
+
+void BitMexNetwork::requestIndices()
+{
+    QNetworkRequest request(QUrl("https://testnet.bitmex.com/api/v1/instrument/indices"));
+    request.setHeader(QNetworkRequest::ContentTypeHeader,
+                      "application/json");
+    auto reply = nam->get(request);
+    connect(reply, &QNetworkReply::finished,
+            this, &BitMexNetwork::replyIndices);
+}
+
+void BitMexNetwork::replyIndices()
+{
+    auto reply = qobject_cast<QNetworkReply *>(sender());
+    if(200 != reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt())
+        return;
+    QJsonDocument document = QJsonDocument::fromJson(reply->readAll());
+    auto array = document.array();
+    LuxgateIndices data;
+    for(int i=0; i<array.size(); i++)
+    {
+        auto obj = array[i].toObject();
+        if(".BXBT" == obj.value("symbol").toString())
+        {
+            data.dbLastPrice = obj.value("lastPrice").toDouble();
+            data.dbMarkPrice = obj.value("markPrice").toDouble();
+            data.lastTickDirection = obj.value("lastTickDirection").toString();
+            break;
+        }
+    }
+    emit sigIndices(data);
 }
 
 void BitMexNetwork::readConfig()
@@ -40,7 +83,7 @@ void BitMexNetwork::readConfig()
 
 void BitMexNetwork::requestGlobalHistory()
 {
-    QNetworkRequest request(QUrl("https://testnet.bitmex.com/api/v1/trade?symbol=XBT&count=100&reverse=true"));
+    QNetworkRequest request(QUrl("https://testnet.bitmex.com/api/v1/trade?symbol=XBT&count=" + QString::number(depthGlobalHistory) + "&reverse=true"));
     request.setHeader(QNetworkRequest::ContentTypeHeader,
                       "application/json");
     auto reply = nam->get(request);
@@ -48,9 +91,19 @@ void BitMexNetwork::requestGlobalHistory()
             this, &BitMexNetwork::replyGlobalHistory);
 }
 
+void BitMexNetwork::requestBXBT_Index()
+{
+    QNetworkRequest request(QUrl("https://testnet.bitmex.com/api/v1/trade?symbol=.BXBT&count=1&columns=price&reverse=true"));
+    request.setHeader(QNetworkRequest::ContentTypeHeader,
+                      "application/json");
+    auto reply = nam->get(request);
+    connect(reply, &QNetworkReply::finished,
+            this, &BitMexNetwork::replyBXBT_Index);
+}
+
 void BitMexNetwork::requestOrderBook()
 {
-    QNetworkRequest request(QUrl("https://testnet.bitmex.com/api/v1/orderBook/L2?symbol=XBT&depth=" + QString::number(depthOrderBook)));
+    QNetworkRequest request(QUrl("https://testnet.bitmex.com/api/v1/orderBook/L2?symbol=XBT&depth=1000"));
     request.setHeader(QNetworkRequest::ContentTypeHeader,
                       "application/json");
     auto reply = nam->get(request);
@@ -62,11 +115,26 @@ void BitMexNetwork::allRequests()
 {
     requestGlobalHistory();
     requestOrderBook();
+    requestBXBT_Index();
+    requestIndices();
+}
+
+void BitMexNetwork::replyBXBT_Index()
+{
+    auto reply = qobject_cast<QNetworkReply *>(sender());
+    if(200 != reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt())
+        return;
+    QJsonDocument document = QJsonDocument::fromJson(reply->readAll());
+    auto array = document.array();
+    double dbIndex = array[0].toObject().value("price").toDouble();
+    emit sigBXBT_Index(dbIndex);
 }
 
 void BitMexNetwork::replyGlobalHistory()
 {
     auto reply = qobject_cast<QNetworkReply *>(sender());
+    if(200 != reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt())
+        return;
     QJsonDocument document = QJsonDocument::fromJson(reply->readAll());
     auto array = document.array();
     LuxgateHistoryData data;
@@ -92,6 +160,8 @@ void BitMexNetwork::replyGlobalHistory()
 void BitMexNetwork::replyOrderBook()
 {
     auto reply = qobject_cast<QNetworkReply *>(sender());
+    if(200 != reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt())
+        return;
     QJsonDocument document = QJsonDocument::fromJson(reply->readAll());
     auto array = document.array();
     QVector<LuxgateOrderBookRow> dataBids;

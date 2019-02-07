@@ -2,6 +2,7 @@
 #define LUXGATEORDERBOOKPANEL_H
 
 #include <QFrame>
+#include "luxgate_options.h"
 
 namespace Ui {
 class LuxgateOrderBookPanel;
@@ -20,8 +21,13 @@ public:
 private:
     Ui::LuxgateOrderBookPanel *ui;
     WalletModel * wal_model;
+    Luxgate::Decimals decimals;
 private slots:
     void slotReplaceBidsAsks();
+    void slotBXBT_Index(double dbIndex);
+    void slotRowsDisplayChanged (const QString &text);
+    void slotGroupsChanged (const QString &text);
+    void slotDecimalsChanged(const Luxgate::Decimals & decimals_);
 };
 
 #endif // LUXGATEORDERBOOKPANEL_H

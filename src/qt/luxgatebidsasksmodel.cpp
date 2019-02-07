@@ -6,6 +6,8 @@
 #include <QColor>
 #include <QBrush>
 
+#include "math.h"
+
 extern BitMexNetwork * bitMexNetw;
 
 LuxgateBidsAsksModel::LuxgateBidsAsksModel(bool bBids, const Luxgate::Decimals & decimals, QObject *parent)
@@ -20,6 +22,68 @@ LuxgateBidsAsksModel::LuxgateBidsAsksModel(bool bBids, const Luxgate::Decimals &
     else
         connect(bitMexNetw, &BitMexNetwork::sigOrderBookAsksData,
                 this, &LuxgateBidsAsksModel::slotUpdateData);
+}
+
+void LuxgateBidsAsksModel::slotGroup(bool bGroup_, double dbStepGroup_)
+{
+    bGroup = bGroup_;
+    dbStepGroup = dbStepGroup_;
+    groupData();
+}
+
+void LuxgateBidsAsksModel::groupData()
+{
+    int oldRowCount = rowCount();
+    if(luxgateData.size() == 0)
+        return;
+    if(!bGroup)
+        luxgateDataGroup = luxgateData;
+    else {
+        luxgateDataGroup.clear();
+        int groupFactor = 0;
+        if(bBids)
+            groupFactor = floor(luxgateData[0].dbPrice / dbStepGroup);
+        else
+            groupFactor = ceil(luxgateData[0].dbPrice / dbStepGroup);
+        LuxgateOrderBookRow rowGroup;
+        rowGroup.dbPrice = groupFactor*dbStepGroup;
+        int iLastAdded = 0;
+        for(int i=0; i<luxgateData.size(); i++) {
+            int newFactor = 0;
+            if(bBids)
+                newFactor = floor(luxgateData[i].dbPrice / dbStepGroup);
+            else
+                newFactor = ceil(luxgateData[i].dbPrice / dbStepGroup);
+            if(groupFactor != newFactor) {
+                luxgateDataGroup.append(rowGroup);
+                groupFactor = newFactor;
+                rowGroup.dbPrice = groupFactor*dbStepGroup;
+                rowGroup.dbSize = 0.f;
+                iLastAdded = i;
+            }
+            rowGroup.dbSize += luxgateData[i].dbSize;
+        }
+        if(luxgateData.size()-1 != iLastAdded)
+            luxgateDataGroup.append(rowGroup);
+    }
+    if(rowCount() != oldRowCount)
+    {
+        removeRows(0, oldRowCount);
+        insertRows(0, rowCount());
+    }
+    emit dataChanged(index(0,0), index(rowCount()-1,columnCount()-1), {Qt::DisplayRole});
+}
+
+void LuxgateBidsAsksModel::setRowsDisplayed (int RowsDisplayed_)
+{
+    int oldRowCount = rowCount();
+    nRowsDisplayed = RowsDisplayed_;
+    if(rowCount() != oldRowCount)
+    {
+        removeRows(0, oldRowCount);
+        insertRows(0, rowCount());
+    }
+    emit dataChanged(index(0,0), index(rowCount()-1,columnCount()-1), {Qt::DisplayRole});
 }
 
 bool LuxgateBidsAsksModel::insertRows(int row, int count, const QModelIndex &parent)
@@ -42,13 +106,8 @@ bool LuxgateBidsAsksModel::removeRows(int row, int count, const QModelIndex &par
 
 void LuxgateBidsAsksModel::slotUpdateData(const LuxgateOrderBookData & luxgateData_)
 {
-    if(luxgateData_.size() != rowCount())
-    {
-        removeRows(0, rowCount());
-        insertRows(0, luxgateData_.size());
-    }
     luxgateData = luxgateData_;
-    emit dataChanged(index(0,0), index(rowCount()-1,columnCount()-1), {Qt::DisplayRole});
+    groupData();
 }
 
 //convert value from Columns to columnNum
@@ -72,6 +131,9 @@ Qt::ItemFlags LuxgateBidsAsksModel::flags(const QModelIndex &index) const
 void LuxgateBidsAsksModel::slotSetDecimals(const Luxgate::Decimals & decimals_)
 {
     decimals = decimals_;
+    bGroup = false;
+    dbStepGroup = 0.f;
+    groupData();
     emit dataChanged(index(0,0), index(rowCount()-1,columnCount()-1), {Qt::DisplayRole});
 }
 
@@ -87,11 +149,11 @@ QVariant LuxgateBidsAsksModel::headerData(int section, Qt::Orientation orientati
             case PriceColumn:
                 res = "PRICE ("+ curCurrencyPair.quoteCurrency + ")";
                 break;
-            case BaseColumn:
-                res = curCurrencyPair.baseCurrency;
+            case SizeColumn:
+                res = "SIZE";
                 break;
-            case QuoteColumn:
-                res = curCurrencyPair.quoteCurrency;
+            case TotalColumn:
+                res = "TOTAL";
                 break;
         }
     }
@@ -103,7 +165,7 @@ int LuxgateBidsAsksModel::rowCount(const QModelIndex &parent) const
     if (parent.isValid())
         return 0;
     else
-        return luxgateData.size();
+        return qMin(luxgateDataGroup.size(), nRowsDisplayed);
 }
 
 int LuxgateBidsAsksModel::columnCount(const QModelIndex &parent) const
@@ -123,19 +185,23 @@ QVariant LuxgateBidsAsksModel::data(const QModelIndex &index, int role) const
             res =  bBids;
         else if(Luxgate::CopyRowRole == role)
             res =   "Price: " + data(this->index(index.row(), columnNum(PriceColumn))).toString()
-                    + " Base: "  + data(this->index(index.row(), columnNum(BaseColumn))).toString()
-                    + " Quote: "  + data(this->index(index.row(), columnNum(QuoteColumn))).toString();
+                    + " Size: "  + data(this->index(index.row(), columnNum(SizeColumn))).toString()
+                    + " Total: "  + data(this->index(index.row(), columnNum(TotalColumn))).toString();
         else if(Qt::EditRole == role ||
                 Qt::DisplayRole == role)
         {
             if (columnNum(PriceColumn) == index.column()) {
-                res = QString::number(luxgateData[index.row()].dbPrice, 'f',decimals.price);
+                res = QString::number(luxgateDataGroup[index.row()].dbPrice, 'f',decimals.price);
             }
-            else if (columnNum(BaseColumn) == index.column()) {
-                res = QString::number(luxgateData[index.row()].dbSize/luxgateData[index.row()].dbPrice, 'f',decimals.base);
+            else if (columnNum(SizeColumn) == index.column()) {
+                res = QString::number(luxgateDataGroup[index.row()].dbSize, 'f',decimals.quote);
             }
-            else if (columnNum(QuoteColumn) == index.column()) {
-                res = QString::number(luxgateData[index.row()].dbSize, 'f',decimals.quote);
+            else if (columnNum(TotalColumn) == index.column()) {
+                double dbTotal = 0;
+                for(int i=0; i<=index.row(); i++) {
+                    dbTotal +=  luxgateDataGroup[i].dbSize;
+                }
+                res = QString::number(dbTotal, 'f',decimals.quote);
             }
         }
     }
