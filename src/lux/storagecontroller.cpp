@@ -83,17 +83,6 @@ void StorageController::InitStorages(const boost::filesystem::path &dataDir, con
     tempStorageHeap.AddChunk(tempDataDir, DEFAULT_STORAGE_SIZE);
 }
 
-
-std::map<uint256, StorageOrder> StorageController::GetAnnouncements()
-{
-    return mapAnnouncements;
-}
-
-const StorageOrder *StorageController::GetAnnounce(const uint256 &hash)
-{
-    return mapAnnouncements.find(hash) != mapAnnouncements.end()? &(mapAnnouncements[hash]) : nullptr;
-}
-
 void StorageController::ProcessStorageMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv, bool& isStorageCommand)
 {
     namespace fs = boost::filesystem;
@@ -223,7 +212,6 @@ void StorageController::ProcessStorageMessage(CNode* pfrom, const std::string& s
             return ;
         }
         vRecv >> replicaStream;
-
         replicaStream.filestream.close();
         uint256 orderHash = replicaStream.currentOrderHash;
         uint256 receivedMerkleRootHash = replicaStream.merkleRootHash;
@@ -244,47 +232,6 @@ void StorageController::ProcessStorageMessage(CNode* pfrom, const std::string& s
         isStorageCommand = true;
         vRecv >> address;
         address.SetPort(GetListenPort());
-    }
-}
-
-void StorageController::BackgroundJob()
-{
-    auto lastCheckIp = std::time(nullptr);
-
-    while (1) {
-        boost::this_thread::interruption_point();
-        boost::this_thread::sleep(boost::posix_time::seconds(1));
-
-        std::vector<CNode*> vNodesCopy;
-        {
-            LOCK(cs_vNodes);
-            vNodesCopy = vNodes;
-        }
-
-        if (!address.IsValid() || (std::time(nullptr) - lastCheckIp > 3600))
-        {
-            for (const auto &node : vNodesCopy) {
-                node->PushMessage("dfsping");
-            }
-        }
-
-        std::vector<uint256> orderHashes;
-        {
-            boost::lock_guard<boost::mutex> lock(mutex);
-            orderHashes = proposalsAgent.GetListenProposals();
-        }
-        for(auto &&orderHash : orderHashes) {
-            auto orderIt = mapAnnouncements.find(orderHash);
-            if (orderIt != mapAnnouncements.end()) {
-                auto order = orderIt->second;
-                if(std::time(nullptr) > order.time + 60) {
-                    if (FindReplicaKeepers(order, 1)) {
-                        boost::lock_guard<boost::mutex> lock(mutex);
-                        proposalsAgent.StopListenProposal(orderHash);
-                    }
-                }
-            }
-        }
     }
 }
 
@@ -333,6 +280,29 @@ bool StorageController::CancelOrder(const uint256 &orderHash)
     return true;
 }
 
+void StorageController::ClearOldAnnouncments(std::time_t timestamp)
+{
+    boost::lock_guard<boost::mutex> lock(mutex);
+    for (auto &&it = mapAnnouncements.begin(); it != mapAnnouncements.end(); ) {
+        StorageOrder order = it->second;
+        if (order.time < timestamp) {
+            std::vector<uint256> vListenProposals = proposalsAgent.GetListenProposals();
+            uint256 orderHash = order.GetHash();
+            if (std::find(vListenProposals.begin(), vListenProposals.end(), orderHash) != vListenProposals.end()) {
+                proposalsAgent.StopListenProposal(orderHash);
+            }
+            std::vector<StorageProposal> vProposals = proposalsAgent.GetProposals(orderHash);
+            if (vProposals.size()) {
+                proposalsAgent.EraseOrdersProposals(orderHash);
+            }
+            mapLocalFiles.erase(orderHash);
+            mapAnnouncements.erase(it++);
+        } else {
+            ++it;
+        }
+    }
+}
+
 bool StorageController::AcceptProposal(const StorageProposal &proposal)
 {
     if (!mapAnnouncements.count(proposal.orderHash)) {
@@ -373,113 +343,90 @@ bool StorageController::AcceptProposal(const StorageProposal &proposal)
     return false;
 }
 
-bool StorageController::StartHandshake(const StorageProposal &proposal, const DecryptionKeys &keys)
+bool StorageController::DecryptReplica(std::shared_ptr<AllocatedFile> pAllocatedFile, const uint64_t fileSize, const boost::filesystem::path &decryptedFile)
 {
-    StorageHandshake handshake;
-    handshake.time = std::time(0);
-    handshake.orderHash = proposal.orderHash;
-    handshake.proposalHash = proposal.GetHash();
-    handshake.port = DEFAULT_DFS_PORT;
-    handshake.keys = keys;
+    namespace fs = boost::filesystem;
 
-    CNode* pNode = FindNode(proposal.address);
-    if (pNode == nullptr) {
-        for (int64_t nLoop = 0; nLoop < 100 && pNode == nullptr; nLoop++) {
-         //   ProcessOneShot();
-            CAddress addr;
-            OpenNetworkConnection(addr, false, NULL, proposal.address.ToStringIPPort().c_str());
-            for (int i = 0; i < 10 && i < nLoop; i++) {
-                MilliSleep(500);
-            }
-            pNode = FindNode(proposal.address);
-            MilliSleep(500);
-        }
+    RSA *rsa = CreatePublicRSA(DecryptionKeys::ToString(pAllocatedFile->keys.rsaKey));
+
+    std::ifstream filein;
+    filein.open(pAllocatedFile->fullpath.string(), std::ios::binary);
+    if (!filein.is_open()) {
+        LogPrint("dfs", "file %s cannot be opened", pAllocatedFile->fullpath.string());
+        return false;
     }
 
-    if (pNode != nullptr) {
-        pNode->PushMessage("dfshandshake", handshake);
-        return true;
+    auto length = fs::file_size(pAllocatedFile->fullpath);
+    auto bytesSize = fileSize;
+
+    std::ofstream outfile;
+    outfile.open(decryptedFile.string().c_str(), std::ios::binary);
+
+    uint64_t sizeBuffer = nBlockSizeRSA - 2;
+    byte *buffer = new byte[sizeBuffer];
+    byte *replica = new byte[nBlockSizeRSA];
+    for (auto i = 0u; i < length; i+= nBlockSizeRSA)
+    {
+        filein.read((char *)replica, nBlockSizeRSA); // TODO: change to loop of readsome
+
+        DecryptData(replica, 0, sizeBuffer, buffer, pAllocatedFile->keys.aesKey, rsa);
+        outfile.write((char *) buffer, std::min(sizeBuffer, bytesSize));
+        bytesSize -= sizeBuffer;
+        // TODO: check write (SS)
     }
-    return false;
+    filein.close();
+    outfile.close();
+    delete[] buffer;
+    delete[] replica;
+
+    return true;
 }
 
-std::vector<StorageProposal> StorageController::SortProposals(const StorageOrder &order)
+std::map<uint256, StorageOrder> StorageController::GetAnnouncements()
+{
+    return mapAnnouncements;
+}
+
+const StorageOrder *StorageController::GetAnnounce(const uint256 &hash)
+{
+    return mapAnnouncements.find(hash) != mapAnnouncements.end()? &(mapAnnouncements[hash]) : nullptr;
+}
+
+std::vector<std::shared_ptr<StorageChunk>> StorageController::GetChunks(bool tempChunk) const
+{
+    return tempChunk?
+           tempStorageHeap.GetChunks() :
+           storageHeap.GetChunks();
+}
+
+void StorageController::MoveChunk(size_t chunkIndex, const boost::filesystem::path &newpath, bool tempChunk)
+{
+    tempChunk?
+    tempStorageHeap.MoveChunk(chunkIndex, newpath) :
+    storageHeap.MoveChunk(chunkIndex, newpath);
+}
+
+std::vector<StorageProposal> StorageController::GetProposals(const uint256 &orderHash)
 {
     boost::lock_guard<boost::mutex> lock(mutex);
-    std::vector<StorageProposal> proposals = proposalsAgent.GetProposals(order.GetHash());
-    if (!proposals.size()) {
-        return {};
-    }
-
-    std::list<StorageProposal> sortedProposals = { *(proposals.begin()) };
-    for (auto itProposal = ++(proposals.begin()); itProposal != proposals.end(); ++itProposal) {
-        for (auto it = sortedProposals.begin(); it != sortedProposals.end(); ++it) {
-            if (itProposal->rate < it->rate) { // TODO: add check last save file time, free space, etc. (SS)
-                sortedProposals.insert(it, *itProposal);
-                break;
-            }
-        }
-    }
-
-    std::vector<StorageProposal> bestProposals(sortedProposals.begin(), sortedProposals.end());
-
-    return bestProposals;
+    return proposalsAgent.GetProposals(orderHash);
 }
 
-void StorageController::ClearOldAnnouncments(std::time_t timestamp)
+StorageProposal StorageController::GetProposal(const uint256 &orderHash, const uint256 &proposalHash)
 {
-    boost::lock_guard<boost::mutex> lock(mutex);
-    for (auto &&it = mapAnnouncements.begin(); it != mapAnnouncements.end(); ) {
-        StorageOrder order = it->second;
-        if (order.time < timestamp) {
-            std::vector<uint256> vListenProposals = proposalsAgent.GetListenProposals();
-            uint256 orderHash = order.GetHash();
-            if (std::find(vListenProposals.begin(), vListenProposals.end(), orderHash) != vListenProposals.end()) {
-                proposalsAgent.StopListenProposal(orderHash);
-            }
-            std::vector<StorageProposal> vProposals = proposalsAgent.GetProposals(orderHash);
-            if (vProposals.size()) {
-                proposalsAgent.EraseOrdersProposals(orderHash);
-            }
-            mapLocalFiles.erase(orderHash);
-            mapAnnouncements.erase(it++);
-        } else {
-            ++it;
-        }
-    }
+    return proposalsAgent.GetProposal(orderHash, proposalHash);
 }
 
-//void StorageController::ListenProposal(const uint256 &orderHash)
-//{
-//    boost::lock_guard<boost::mutex> lock(mutex);
-//    proposalsAgent.ListenProposal(orderHash);
-//}
-//
-//void StorageController::StopListenProposal(const uint256 &orderHash)
-//{
-//    proposalsAgent.StopListenProposal(orderHash);
-//}
-//
-//std::vector<StorageProposal> StorageController::GetProposals(const uint256 &orderHash)
-//{
-//    boost::lock_guard<boost::mutex> lock(mutex);
-//    return proposalsAgent.GetProposals(orderHash);
-//}
-
-bool StorageController::FindReplicaKeepers(const StorageOrder &order, const int countReplica)
-{
-    std::vector<StorageProposal> proposals = SortProposals(order);
-    int numReplica = 0;
-    for (StorageProposal proposal : proposals) {
-        if (AcceptProposal(proposal)) {
-            if (++numReplica == countReplica) {
-                boost::lock_guard<boost::mutex> lock(mutex);
-                proposalsAgent.StopListenProposal(order.GetHash());
-                return true;
-            }
-        }
+RSA* StorageController::CreatePublicRSA(const std::string &key) { // utility function
+    RSA *rsa = NULL;
+    BIO *keybio;
+    const char* c_string = key.c_str();
+    keybio = BIO_new_mem_buf((void*)c_string, -1);
+    if (keybio==NULL) {
+        return 0;
     }
-    return false;
+    rsa = PEM_read_bio_RSAPublicKey(keybio, &rsa, 0, NULL);
+    return rsa;
 }
 
 DecryptionKeys StorageController::GenerateKeys(RSA **rsa)
@@ -510,16 +457,73 @@ DecryptionKeys StorageController::GenerateKeys(RSA **rsa)
     return decryptionKeys;
 }
 
-RSA* StorageController::CreatePublicRSA(const std::string &key) { // utility function
-    RSA *rsa = NULL;
-    BIO *keybio;
-    const char* c_string = key.c_str();
-    keybio = BIO_new_mem_buf((void*)c_string, -1);
-    if (keybio==NULL) {
-        return 0;
+std::vector<StorageProposal> StorageController::SortProposals(const StorageOrder &order)
+{
+    boost::lock_guard<boost::mutex> lock(mutex);
+    std::vector<StorageProposal> proposals = proposalsAgent.GetProposals(order.GetHash());
+    if (!proposals.size()) {
+        return {};
     }
-    rsa = PEM_read_bio_RSAPublicKey(keybio, &rsa, 0, NULL);
-    return rsa;
+
+    std::list<StorageProposal> sortedProposals = { *(proposals.begin()) };
+    for (auto itProposal = ++(proposals.begin()); itProposal != proposals.end(); ++itProposal) {
+        for (auto it = sortedProposals.begin(); it != sortedProposals.end(); ++it) {
+            if (itProposal->rate < it->rate) { // TODO: add check last save file time, free space, etc. (SS)
+                sortedProposals.insert(it, *itProposal);
+                break;
+            }
+        }
+    }
+
+    std::vector<StorageProposal> bestProposals(sortedProposals.begin(), sortedProposals.end());
+
+    return bestProposals;
+}
+
+bool StorageController::StartHandshake(const StorageProposal &proposal, const DecryptionKeys &keys)
+{
+    StorageHandshake handshake;
+    handshake.time = std::time(0);
+    handshake.orderHash = proposal.orderHash;
+    handshake.proposalHash = proposal.GetHash();
+    handshake.port = DEFAULT_DFS_PORT;
+    handshake.keys = keys;
+
+    CNode* pNode = FindNode(proposal.address);
+    if (pNode == nullptr) {
+        for (int64_t nLoop = 0; nLoop < 100 && pNode == nullptr; nLoop++) {
+         //   ProcessOneShot();
+            CAddress addr;
+            OpenNetworkConnection(addr, false, NULL, proposal.address.ToStringIPPort().c_str());
+            for (int i = 0; i < 10 && i < nLoop; i++) {
+                MilliSleep(500);
+            }
+            pNode = FindNode(proposal.address);
+            MilliSleep(500);
+        }
+    }
+
+    if (pNode != nullptr) {
+        pNode->PushMessage("dfshandshake", handshake);
+        return true;
+    }
+    return false;
+}
+
+bool StorageController::FindReplicaKeepers(const StorageOrder &order, const int countReplica)
+{
+    std::vector<StorageProposal> proposals = SortProposals(order);
+    int numReplica = 0;
+    for (StorageProposal proposal : proposals) {
+        if (AcceptProposal(proposal)) {
+            if (++numReplica == countReplica) {
+                boost::lock_guard<boost::mutex> lock(mutex);
+                proposalsAgent.StopListenProposal(order.GetHash());
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 std::shared_ptr<AllocatedFile> StorageController::CreateReplica(const boost::filesystem::path &sourcePath,
@@ -591,65 +595,6 @@ bool StorageController::SendReplica(const StorageOrder &order, const uint256 mer
     return true;
 }
 
-bool StorageController::DecryptReplica(std::shared_ptr<AllocatedFile> pAllocatedFile, const uint64_t fileSize, const boost::filesystem::path &decryptedFile)
-{
-    namespace fs = boost::filesystem;
-
-    RSA *rsa = CreatePublicRSA(DecryptionKeys::ToString(pAllocatedFile->keys.rsaKey));
-
-    std::ifstream filein;
-    filein.open(pAllocatedFile->fullpath.string(), std::ios::binary);
-    if (!filein.is_open()) {
-        LogPrint("dfs", "file %s cannot be opened", pAllocatedFile->fullpath.string());
-        return false;
-    }
-
-    auto length = fs::file_size(pAllocatedFile->fullpath);
-    auto bytesSize = fileSize;
-
-    std::ofstream outfile;
-    outfile.open(decryptedFile.string().c_str(), std::ios::binary);
-
-    uint64_t sizeBuffer = nBlockSizeRSA - 2;
-    byte *buffer = new byte[sizeBuffer];
-    byte *replica = new byte[nBlockSizeRSA];
-    for (auto i = 0u; i < length; i+= nBlockSizeRSA)
-    {
-        filein.read((char *)replica, nBlockSizeRSA); // TODO: change to loop of readsome
-
-        DecryptData(replica, 0, sizeBuffer, buffer, pAllocatedFile->keys.aesKey, rsa);
-        outfile.write((char *) buffer, std::min(sizeBuffer, bytesSize));
-        bytesSize -= sizeBuffer;
-        // TODO: check write (SS)
-    }
-    filein.close();
-    outfile.close();
-    delete[] buffer;
-    delete[] replica;
-
-    return true;
-}
-
-
-void StorageController::DecryptReplica(const uint256 &orderHash, const boost::filesystem::path &decryptedFile)
-{
-    namespace fs = boost::filesystem;
-
-    auto itAnnounce = mapAnnouncements.find(orderHash);
-    if (itAnnounce == mapAnnouncements.end()) {
-        LogPrint("dfs", "Order \"%s\" not found", orderHash.ToString());
-        return ;
-    }
-    auto itHandshake = mapReceivedHandshakes.find(orderHash);
-    if (itHandshake == mapReceivedHandshakes.end()) {
-        LogPrint("dfs", "Handshake \"%s\" not found", orderHash.ToString());
-        return ;
-    }
-    StorageOrder &order = itAnnounce->second;
-    std::shared_ptr<AllocatedFile> pAllocatedFile = storageHeap.GetFile(order.fileURI);
-    DecryptReplica(pAllocatedFile, order.fileSize, decryptedFile);
-}
-
 bool StorageController::CheckReceivedReplica(const uint256 &orderHash, const uint256 &receivedMerkleRootHash, const boost::filesystem::path &replica)
 {
     namespace fs = boost::filesystem;
@@ -681,4 +626,64 @@ bool StorageController::CheckReceivedReplica(const uint256 &orderHash, const uin
         }
     }
     return true;
+}
+
+void StorageController::DecryptReplica(const uint256 &orderHash, const boost::filesystem::path &decryptedFile)
+{
+    namespace fs = boost::filesystem;
+
+    auto itAnnounce = mapAnnouncements.find(orderHash);
+    if (itAnnounce == mapAnnouncements.end()) {
+        LogPrint("dfs", "Order \"%s\" not found", orderHash.ToString());
+        return ;
+    }
+    auto itHandshake = mapReceivedHandshakes.find(orderHash);
+    if (itHandshake == mapReceivedHandshakes.end()) {
+        LogPrint("dfs", "Handshake \"%s\" not found", orderHash.ToString());
+        return ;
+    }
+    StorageOrder &order = itAnnounce->second;
+    std::shared_ptr<AllocatedFile> pAllocatedFile = storageHeap.GetFile(order.fileURI);
+    DecryptReplica(pAllocatedFile, order.fileSize, decryptedFile);
+}
+
+void StorageController::BackgroundJob()
+{
+    auto lastCheckIp = std::time(nullptr);
+
+    while (1) {
+        boost::this_thread::interruption_point();
+        boost::this_thread::sleep(boost::posix_time::seconds(1));
+
+        std::vector<CNode*> vNodesCopy;
+        {
+            LOCK(cs_vNodes);
+            vNodesCopy = vNodes;
+        }
+
+        if (!address.IsValid() || (std::time(nullptr) - lastCheckIp > 3600))
+        {
+            for (const auto &node : vNodesCopy) {
+                node->PushMessage("dfsping");
+            }
+        }
+
+        std::vector<uint256> orderHashes;
+        {
+            boost::lock_guard<boost::mutex> lock(mutex);
+            orderHashes = proposalsAgent.GetListenProposals();
+        }
+        for(auto &&orderHash : orderHashes) {
+            auto orderIt = mapAnnouncements.find(orderHash);
+            if (orderIt != mapAnnouncements.end()) {
+                auto order = orderIt->second;
+                if(std::time(nullptr) > order.time + 60) {
+                    if (FindReplicaKeepers(order, 1)) {
+                        boost::lock_guard<boost::mutex> lock(mutex);
+                        proposalsAgent.StopListenProposal(orderHash);
+                    }
+                }
+            }
+        }
+    }
 }

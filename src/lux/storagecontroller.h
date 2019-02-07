@@ -30,10 +30,45 @@ protected:
     std::map<uint256, boost::filesystem::path> mapLocalFiles;
     std::map<uint256, StorageOrder> mapAnnouncements;
     std::map<uint256, StorageHandshake> mapReceivedHandshakes;
+    StorageHeap storageHeap;
+    StorageHeap tempStorageHeap;
+    ProposalsAgent proposalsAgent;
 
-    bool StartHandshake(const StorageProposal &proposal, const DecryptionKeys &keys);
-    DecryptionKeys GenerateKeys(RSA **rsa);
+public:
+    CAmount rate;
+    int maxblocksgap;
+    CAddress address;
+
+    StorageController() : background(boost::bind(&StorageController::BackgroundJob, this)),
+                                     rate(STORAGE_MIN_RATE),
+                                     maxblocksgap(DEFAULT_STORAGE_MAX_BLOCK_GAP) {}
+    // Init functions
+    void InitStorages(const boost::filesystem::path &dataDir, const boost::filesystem::path &tempDataDir);
+    // ProcessMessage function
+    void ProcessStorageMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv, bool& isStorageCommand);
+    // Orders functions
+    void AnnounceOrder(const StorageOrder &order);
+    void AnnounceOrder(const StorageOrder &order, const boost::filesystem::path &path);
+    bool CancelOrder(const uint256 &orderHash);
+    void ClearOldAnnouncments(std::time_t timestamp);
+    // Proposals functions
+    bool AcceptProposal(const StorageProposal &proposal);
+    // Replica functions
+    void DecryptReplica(const uint256 &orderHash, const boost::filesystem::path &decryptedFile);
+    // Get functions
+    std::map<uint256, StorageOrder> GetAnnouncements();
+    const StorageOrder *GetAnnounce(const uint256 &hash);
+    std::vector<std::shared_ptr<StorageChunk>> GetChunks(bool tempChunk = false) const;
+    void MoveChunk(size_t chunkIndex, const boost::filesystem::path &newpath, bool tempChunk = false);
+    std::vector<StorageProposal> GetProposals(const uint256 &orderHash);
+    StorageProposal GetProposal(const uint256 &orderHash, const uint256 &proposalHash);
+
+private:
     RSA* CreatePublicRSA(const std::string &key);
+    DecryptionKeys GenerateKeys(RSA **rsa);
+    std::vector<StorageProposal> SortProposals(const StorageOrder &order);
+    bool StartHandshake(const StorageProposal &proposal, const DecryptionKeys &keys);
+    bool FindReplicaKeepers(const StorageOrder &order, const int countReplica);
     std::shared_ptr<AllocatedFile> CreateReplica(const boost::filesystem::path &filename,
                                                  const StorageOrder &order,
                                                  const DecryptionKeys &keys,
@@ -42,39 +77,6 @@ protected:
     bool CheckReceivedReplica(const uint256 &orderHash, const uint256 &receivedMerkleRootHash, const boost::filesystem::path &replica);
     bool DecryptReplica(std::shared_ptr<AllocatedFile> pAllocatedFile, const uint64_t fileSize, const boost::filesystem::path &decryptedFile);
     void BackgroundJob();
-
-public:
-    CAmount rate;
-    int maxblocksgap;
-    CAddress address;
-    StorageHeap storageHeap;
-    StorageHeap tempStorageHeap;
-    ProposalsAgent proposalsAgent;
-
-    StorageController() : background(boost::bind(&StorageController::BackgroundJob, this)),
-                                     rate(STORAGE_MIN_RATE),
-                                     maxblocksgap(DEFAULT_STORAGE_MAX_BLOCK_GAP) {}
-    // Init functions
-    void InitStorages(const boost::filesystem::path &dataDir, const boost::filesystem::path &tempDataDir);
-    // Get functions
-    std::map<uint256, StorageOrder> GetAnnouncements();
-    const StorageOrder *GetAnnounce(const uint256 &hash);
-    // Common functions
-    void AnnounceOrder(const StorageOrder &order);
-    void AnnounceOrder(const StorageOrder &order, const boost::filesystem::path &path);
-    bool CancelOrder(const uint256 &orderHash);
-    std::vector<StorageProposal> SortProposals(const StorageOrder &order);
-    bool AcceptProposal(const StorageProposal &proposal);
-    void ClearOldAnnouncments(std::time_t timestamp);
-    void ProcessStorageMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv, bool& isStorageCommand);
-    void DecryptReplica(const uint256 &orderHash, const boost::filesystem::path &decryptedFile);
-    // Proposals Agent functions
-    //void ListenProposal(const uint256 &orderHash);
-    //void StopListenProposal(const uint256 &orderHash);
-    //bool isListen(const uint256 &proposalHash);
-    //std::vector<StorageProposal> GetProposals(const uint256 &orderHash);
-    // Temp functions
-    bool FindReplicaKeepers(const StorageOrder &order, const int countReplica);
 };
 
 #endif //LUX_STORAGECONTROLLER_H

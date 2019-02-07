@@ -1306,8 +1306,8 @@ UniValue dfsgetinfo(const UniValue& params, bool fHelp)
     UniValue obj(UniValue::VOBJ);
     obj.push_back(Pair("enabled", enabled));
     obj.push_back(Pair("myip", myip));
-    obj.push_back(Pair("dfsfolder", storageController->storageHeap.GetChunks().back()->path.string()));
-    obj.push_back(Pair("dfstempfolder", storageController->tempStorageHeap.GetChunks().back()->path.string()));
+    obj.push_back(Pair("dfsfolder", storageController->GetChunks().back()->path.string()));
+    obj.push_back(Pair("dfstempfolder", storageController->GetChunks(true).back()->path.string()));
     obj.push_back(Pair("rate", storageController->rate));
     obj.push_back(Pair("maxblocksgap", storageController->maxblocksgap));
 
@@ -1382,7 +1382,7 @@ UniValue dfslistproposals(const UniValue& params, bool fHelp)
                 + HelpExampleRpc("dfslistproposals", "cca72157824073c35e010893267a8d843f565cb7f7e53b4fd8f1066a30939f1b"));
 
     UniValue result(UniValue::VARR);
-    std::vector<StorageProposal> proposals = storageController->proposalsAgent.GetProposals(uint256{params[0].get_str()});
+    std::vector<StorageProposal> proposals = storageController->GetProposals(uint256{params[0].get_str()});
     for (auto proposal : proposals){
         UniValue obj(UniValue::VOBJ);
         obj.push_back(Pair("orderhash", proposal.orderHash.ToString()));
@@ -1414,7 +1414,7 @@ UniValue dfslocalstorage(const UniValue& params, bool fHelp)
                 + HelpExampleRpc("dfslocalstorage", ""));
 
     UniValue result(UniValue::VARR);
-    const auto chunks = storageController->storageHeap.GetChunks();
+    const auto chunks = storageController->GetChunks();
 
     int chunkIndex = 0;
     for(auto &&chunk : chunks) {
@@ -1437,7 +1437,7 @@ UniValue dfslocalstorage(const UniValue& params, bool fHelp)
         result.push_back(obj);
     }
 
-    const auto tempChunks = storageController->tempStorageHeap.GetChunks();
+    const auto tempChunks = storageController->GetChunks(true);
 
     chunkIndex = 0;
     for(auto &&chunk : tempChunks) {
@@ -1479,7 +1479,7 @@ UniValue dfsacceptproposal(const UniValue& params, bool fHelp)
                 + HelpExampleRpc("dfsacceptproposal", "cca72157824073c35e010893267a8d843f565cb7f7e53b4fd8f1066a30939f1b cca72157824073c35e010893267a8d843f565cb7f7e53b4fd8f1066a30939f1b"));
 
     uint256 orderHash = uint256{params[0].get_str()};
-    StorageProposal proposal = storageController->proposalsAgent.GetProposal(orderHash, uint256{params[1].get_str()});
+    StorageProposal proposal = storageController->GetProposal(orderHash, uint256{params[1].get_str()});
     if (proposal.time != 0) {
         storageController->AcceptProposal(proposal);
     }
@@ -1537,8 +1537,8 @@ UniValue dfssetfolder(const UniValue& params, bool fHelp)
         return obj;
     }
 
-    auto chunksSize = storageController->storageHeap.GetChunks().size();
-    storageController->storageHeap.MoveChunk(chunksSize - 1, path);
+    auto chunksSize = storageController->GetChunks().size();
+    storageController->MoveChunk(chunksSize - 1, path);
 
     UniValue obj(UniValue::VSTR, "dfssetfolder: move chunk to " + path.string() + " directory");
     return obj;
@@ -1566,8 +1566,8 @@ UniValue dfssettempfolder(const UniValue& params, bool fHelp)
         return obj;
     }
 
-    auto chunksSize = storageController->tempStorageHeap.GetChunks().size();
-    storageController->tempStorageHeap.MoveChunk(chunksSize - 1, path);
+    auto chunksSize = storageController->GetChunks(true).size();
+    storageController->MoveChunk(chunksSize - 1, path, true);
 
     UniValue obj(UniValue::VSTR, "dfssettempfolder: move temp chunk to " + path.string() + " directory");
     return obj;
