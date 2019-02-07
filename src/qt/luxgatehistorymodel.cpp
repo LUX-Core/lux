@@ -7,6 +7,8 @@
 #include <QBrush>
 #include <QDateTime>
 
+#include "math.h"
+
 extern BitMexNetwork * bitMexNetw;
 LuxgateHistoryModel::LuxgateHistoryModel(const Luxgate::Decimals & decimals, QObject *parent)
     : QAbstractTableModel(parent),
@@ -45,6 +47,18 @@ QVariant LuxgateHistoryModel::headerData(int section, Qt::Orientation orientatio
     return res;
 }
 
+void LuxgateHistoryModel::setRowsDisplayed (int RowsDisplayed_)
+{
+    int oldRowCount = rowCount();
+    nRowsDisplayed = RowsDisplayed_;
+    if(rowCount() != oldRowCount)
+    {
+        removeRows(0, oldRowCount);
+        insertRows(0, rowCount());
+    }
+    emit dataChanged(index(0,0), index(rowCount()-1,columnCount()-1), {Qt::DisplayRole});
+}
+
 void LuxgateHistoryModel::slotSetDecimals(const Luxgate::Decimals & decimals_)
 {
     decimals = decimals_;
@@ -56,7 +70,7 @@ int LuxgateHistoryModel::rowCount(const QModelIndex &parent) const
     if (parent.isValid())
         return 0;
     else
-        return luxgateData.size();
+        return qMin(luxgateData.size(), nRowsDisplayed);
 }
 
 int LuxgateHistoryModel::columnCount(const QModelIndex &parent) const

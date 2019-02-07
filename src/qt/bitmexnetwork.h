@@ -12,8 +12,6 @@ class BitMexNetwork : public QObject
     Q_OBJECT
 public:
     BitMexNetwork(QObject *parent=Q_NULLPTR);
-    void setDepthGlobalHistory(int depthGlobalHistory_);
-    void updateOrderBook();
 private:
     QNetworkAccessManager * nam;
     QString apiKey;
@@ -23,7 +21,6 @@ private:
 
     //requests
     void requestGlobalHistory();
-    int depthGlobalHistory {25};
 
     void requestOrderBook();
 

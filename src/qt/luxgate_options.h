@@ -30,5 +30,7 @@ namespace Luxgate {
         int base;
         int quote;
     };
+
+    const int defaultDisplayRows {1000};
 }
 #endif // LUXGATEGUI_GLOBAL_H

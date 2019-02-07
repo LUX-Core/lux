@@ -26,13 +26,14 @@ public:
     bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
 
+    void setRowsDisplayed (int RowsDisplayed_);
 public slots:
     void slotSetDecimals(const Luxgate::Decimals & decimals_);
     void slotUpdateData(const LuxgateHistoryData & data);
 private:
     Luxgate::Decimals decimals;
     QVector<LuxgateHistoryRow> luxgateData;
-
+    int nRowsDisplayed {500};
 };
 
 #endif // LUXGATEHISTORYMODEL_H

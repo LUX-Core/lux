@@ -20,6 +20,8 @@ public:
 private:
     WalletModel * wal_model;
     Ui::LuxgateHistoryPanel *ui;
+private slots:
+    void slotRowsDisplayChanged (const QString &text);
 };
 
 #endif // LUXGATEHISTORYPANEL_H

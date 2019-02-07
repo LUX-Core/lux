@@ -47,7 +47,7 @@ private:
     bool bGroup{false};     //true - group price, false - dont group
     double dbStepGroup {0.f};
     void groupData();
-    int nRowsDisplayed {1000};
+    int nRowsDisplayed {Luxgate::defaultDisplayRows};
 };
 
 #endif // LUXGATEBIDSMODEL_H

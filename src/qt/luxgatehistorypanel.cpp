@@ -12,6 +12,19 @@ LuxgateHistoryPanel::LuxgateHistoryPanel(QWidget *parent) :
     ui(new Ui::LuxgateHistoryPanel)
 {
     ui->setupUi(this);
+
+    ui->comboBoxRowsNum->addItems(QStringList() << "5" << "10" << "20"
+                                                << "50" << "100" << "500");
+    ui->comboBoxRowsNum->setCurrentText("500");
+    connect(ui->comboBoxRowsNum, QOverload<const QString &>::of(&QComboBox::activated),
+            this, [=](const QString &text){slotRowsDisplayChanged(text);});
+}
+
+void LuxgateHistoryPanel::slotRowsDisplayChanged (const QString &text)
+{
+    int rows = text.toInt();
+    auto tableModel = qobject_cast<LuxgateHistoryModel *>(ui->tableViewHistory->model());
+    tableModel->setRowsDisplayed(rows);
 }
 
 void LuxgateHistoryPanel::setModel(WalletModel *model)

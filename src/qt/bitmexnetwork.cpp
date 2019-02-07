@@ -25,17 +25,6 @@ BitMexNetwork::BitMexNetwork(QObject *parent):
     timer->start(15000);
 }
 
-void BitMexNetwork::setDepthGlobalHistory(int depthGlobalHistory_)
-{
-    depthGlobalHistory = depthGlobalHistory_;
-    requestGlobalHistory();
-}
-
-void BitMexNetwork::updateOrderBook()
-{
-    requestOrderBook();
-}
-
 void BitMexNetwork::requestIndices()
 {
     QNetworkRequest request(QUrl("https://testnet.bitmex.com/api/v1/instrument/indices"));
@@ -83,7 +72,7 @@ void BitMexNetwork::readConfig()
 
 void BitMexNetwork::requestGlobalHistory()
 {
-    QNetworkRequest request(QUrl("https://testnet.bitmex.com/api/v1/trade?symbol=XBT&count=" + QString::number(depthGlobalHistory) + "&reverse=true"));
+    QNetworkRequest request(QUrl("https://testnet.bitmex.com/api/v1/trade?symbol=XBT&count=500&reverse=true"));
     request.setHeader(QNetworkRequest::ContentTypeHeader,
                       "application/json");
     auto reply = nam->get(request);
