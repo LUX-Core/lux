@@ -27,25 +27,25 @@ QVariant LuxgateConfigModel::headerData(int section, Qt::Orientation orientation
         switch(section)
         {
             case TickerColumn:
-                res = "TICKER";
+                res = tr("TICKER");
                 break;
             case HostColumn:
-                res = "HOST";
+                res = tr("HOST");
                 break;
             case PortColumn:
-                res = "PORT";
+                res = tr("PORT");
                 break;
             case RpcuserColumn:
-                res = "RPC USER";
+                res = tr("RPC USER");
                 break;
             case RpcpasswordColumn:
-                res = "RPC PASSW";
+                res = tr("RPC PASSW");
                 break;
             case Zmq_pub_raw_tx_endpointColumn:
-                res = "ZMQ";
+                res = tr("ZMQ");
                 break;
             case SwapSupportColumn:
-                res = "SWAP";
+                res = tr("SWAP");
                 break;
         }
     }

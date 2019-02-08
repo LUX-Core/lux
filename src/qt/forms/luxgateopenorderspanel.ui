@@ -79,7 +79,11 @@
     </layout>
    </item>
    <item>
-    <widget class="LuxgateTableView" name="tableViewOpenOrders"/>
+    <widget class="LuxgateTableView" name="tableViewOpenOrders">
+     <property name="sortingEnabled">
+      <bool>false</bool>
+     </property>
+    </widget>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_2">

@@ -23,6 +23,7 @@ private:
     void updateButtonsCancel();
 private slots:
     void slotCancelClicked();
+    void slotAllCancelClicked();
 };
 
 #endif // LUXGATEOPENORDERSPANEL_H

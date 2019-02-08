@@ -40,7 +40,7 @@ void LuxgateBidsAsksModel::groupData()
         luxgateDataGroup = luxgateData;
     else {
         luxgateDataGroup.clear();
-        int groupFactor = 0;
+        qint64 groupFactor = 0;
         if(bBids)
             groupFactor = floor(luxgateData[0].dbPrice / dbStepGroup);
         else
@@ -49,7 +49,7 @@ void LuxgateBidsAsksModel::groupData()
         rowGroup.dbPrice = groupFactor*dbStepGroup;
         int iLastAdded = 0;
         for(int i=0; i<luxgateData.size(); i++) {
-            int newFactor = 0;
+            qint64 newFactor = 0;
             if(bBids)
                 newFactor = floor(luxgateData[i].dbPrice / dbStepGroup);
             else
@@ -147,13 +147,13 @@ QVariant LuxgateBidsAsksModel::headerData(int section, Qt::Orientation orientati
         switch(columnNum(static_cast<Columns>(section)))
         {
             case PriceColumn:
-                res = "PRICE ("+ curCurrencyPair.quoteCurrency + ")";
+                res = tr("PRICE (")+ curCurrencyPair.baseCurrency + "/" + curCurrencyPair.quoteCurrency + ")";
                 break;
             case SizeColumn:
-                res = "SIZE";
+                res = tr("SIZE (") + curCurrencyPair.quoteCurrency + ")";
                 break;
             case TotalColumn:
-                res = "TOTAL";
+                res = tr("TOTAL (") + curCurrencyPair.quoteCurrency + ")";
                 break;
         }
     }

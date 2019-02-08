@@ -40,23 +40,26 @@ LuxgateTableView::LuxgateTableView(QWidget *parent):
         case PriceColumn:
             addAction(PriceColumn, tr("Copy Price"));
         break;
-        case BaseAmountColumn:
-            addAction(BaseAmountColumn, tr("Copy Amount"));
-        break;
         case SizeColumn:
             addAction(SizeColumn, tr("Copy Size"));
         break;
         case TotalColumn:
             addAction(TotalColumn, tr("Copy Total"));
         break;
-        case QuoteTotalColumn:
-            addAction(QuoteTotalColumn, tr("Copy Total"));
-        break;
         case DateOpenOrderColumn:
             addAction(DateOpenOrderColumn, tr("Copy Open Date"));
         break;
         case DateCloseOrderColumn:
             addAction(DateCloseOrderColumn, tr("Copy Close Date"));
+        break;
+        case QtyColumn:
+            addAction(QtyColumn, tr("Copy Qty"));
+        break;
+        case RemainQtyColumn:
+            addAction(RemainQtyColumn, tr("Copy Remain Qty"));
+        break;
+        case ValueColumn:
+            addAction(ValueColumn, tr("Copy Value"));
         break;
         }
     }

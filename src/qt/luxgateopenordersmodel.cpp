@@ -3,6 +3,7 @@
 #include "luxgategui_global.h"
 #include "luxgate/luxgate.h"
 #include "guiutil.h"
+#include "bitmexnetwork.h"
 
 #include <algorithm>
 
@@ -10,15 +11,20 @@
 #include <QBrush>
 #include <QDateTime>
 
+extern BitMexNetwork * bitMexNetw;
+
 LuxgateOpenOrdersModel::LuxgateOpenOrdersModel(const Luxgate::Decimals & decimals, QObject *parent)
     : QAbstractTableModel(parent),
       decimals(decimals)
 {
     //update();
-    orderbook.subscribeOrdersChange(std::bind(&LuxgateOpenOrdersModel::update, this));
+    //orderbook.subscribeOrdersChange(std::bind(&LuxgateOpenOrdersModel::update, this));
+
+    connect(bitMexNetw, &BitMexNetwork::sigOpenOrdersData,
+            this, &LuxgateOpenOrdersModel::slotUpdateData);
 }
 
-void LuxgateOpenOrdersModel::update()
+/*void LuxgateOpenOrdersModel::update()
 {
     openOrders.clear();
     for( auto it = orderbook.Orders().begin(); it != orderbook.Orders().end(); ++it ) {
@@ -29,6 +35,37 @@ void LuxgateOpenOrdersModel::update()
               [](std::shared_ptr<COrder> a, std::shared_ptr<COrder> b)
               { return a->OrderCreationTime() > b->OrderCreationTime();});
     emit dataChanged(index(0,0), index(rowCount()-1,columnCount()-1), {Luxgate::BidAskRole, Qt::DisplayRole});
+}*/
+
+void LuxgateOpenOrdersModel::slotUpdateData(const LuxgateOpenOrdersData & luxgateData_)
+{
+    int oldRowCount = rowCount();
+
+    removeRows(0, oldRowCount);
+    luxgateData = luxgateData_;
+    insertRows(0, rowCount());
+
+    emit dataChanged(index(0,0), index(rowCount()-1,columnCount()-1), {Qt::DisplayRole});
+    emit sigUpdateButtons();
+}
+
+
+bool LuxgateOpenOrdersModel::insertRows(int row, int count, const QModelIndex &parent)
+{
+    if(row < 0 || (row > rowCount() && rowCount()!= 0))
+        return false;
+    beginInsertRows(parent,row, row+count-1);
+    endInsertRows();
+    return true;
+}
+
+bool LuxgateOpenOrdersModel::removeRows(int row, int count, const QModelIndex &parent)
+{
+    if(row < 0 || row+count > rowCount())
+        return false;
+    beginRemoveRows(parent,row, row+count-1);
+    endRemoveRows();
+    return true;
 }
 
 Qt::ItemFlags LuxgateOpenOrdersModel::flags(const QModelIndex &index) const
@@ -52,25 +89,28 @@ QVariant LuxgateOpenOrdersModel::headerData(int section, Qt::Orientation orienta
         switch(section)
         {
             case DateColumn:
-                res = "DATE";
+                res = tr("DATE");
                 break;
             case TypeColumn:
-                res = "TYPE";
-                break;
-            case SideColumn:
-                res = "SIDE";
+                res = tr("TYPE");
                 break;
             case PriceColumn:
-                res = "PRICE";
+                res = tr("PRICE");
                 break;
-            case BaseAmountColumn:
-                res = "AMOUNT ( " + curCurrencyPair.baseCurrency + " )";
+            case QtyColumn:
+                res = tr("QTY");
                 break;
-            case QuoteTotalColumn:
-                res = "TOTAL ( " + curCurrencyPair.quoteCurrency + " )";
+            case RemainQtyColumn:
+                res = tr("REMAINING");
+                break;
+            case ValueColumn:
+                res = tr("VALUE");
+                break;
+            case StatusColumn:
+                res = tr("STATUS");
                 break;
             case CancelColumn:
-                res = "CANCEL";
+                res = tr("CANCEL");
                 break;
         }
     }
@@ -82,7 +122,7 @@ int LuxgateOpenOrdersModel::rowCount(const QModelIndex &parent) const
     if (parent.isValid())
         return 0;
     else
-        return openOrders.size();
+        return luxgateData.size();
 }
 
 int LuxgateOpenOrdersModel::columnCount(const QModelIndex &parent) const
@@ -98,40 +138,44 @@ QVariant LuxgateOpenOrdersModel::data(const QModelIndex &index, int role) const
     QVariant res;
 
     if (index.isValid()) {
-        auto order = openOrders[index.row()];
-
         if (Luxgate::BidAskRole == role)
-            res = order->IsBid();
-        else if(Luxgate::CopyRowRole == role)
-            res =   "Price: " + data(this->index(index.row(), PriceColumn)).toString()
-                    + " Base: "  + data(this->index(index.row(), BaseAmountColumn)).toString()
-                    + " Quote: "  + data(this->index(index.row(), QuoteTotalColumn)).toString()
-                    + " Date: " + data(this->index(index.row(), DateColumn)).toString();
+            res = luxgateData[index.row()].bBuy;
+        else if(Luxgate::CopyRowRole == role) {
+            QString side;
+            if(luxgateData[index.row()].bBuy)
+                side = QString("Buy");
+            else
+                side = QString("Sell");
+            res = tr("Price: ") + data(this->index(index.row(), PriceColumn)).toString()
+                  + tr(" Type: ") + data(this->index(index.row(), TypeColumn)).toString()
+                  + tr(" Side: ") + side
+                  + tr(" Qty: ") + data(this->index(index.row(), QtyColumn)).toString()
+                  + tr(" Remaining: ") + data(this->index(index.row(), RemainQtyColumn)).toString()
+                  + tr(" Value: ") + data(this->index(index.row(), ValueColumn)).toString()
+                  + tr(" Status: ") + data(this->index(index.row(), StatusColumn)).toString();
+        }
+        else if(OrderIdRole == role)
+            res = luxgateData[index.row()].orderId;
+        else if (Qt::ToolTipRole == role) {
+            if (DateColumn == index.column())
+                res = luxgateData[index.row()].dateTimeOpen.toString("yyyy-MM-dd HH:mm:ss.zzz");
+        }
         else if(Qt::EditRole == role ||
                 Qt::DisplayRole == role) {
-
-            if (DateColumn == index.column()) {
-                auto createTime = order->OrderCreationTime();
-                res = GUIUtil::dateTimeStr(createTime);
-            }
-            else if (TypeColumn == index.column()) {
-                res = QString("limit");
-            }
-            else if (SideColumn == index.column()) {
-                if(order->IsAsk())
-                    res = QString("Sell");
-                if(order->IsBid())
-                    res = QString("Buy");
-            }
-            else if (PriceColumn == index.column()) {
-                res = QString::number(order->Price(), 'f',decimals.price);
-            }
-            else if (BaseAmountColumn == index.column()) {
-                res = QString::number(order->Amount(), 'f',decimals.base);
-            }
-            else if (QuoteTotalColumn == index.column()) {
-                res = QString::number(order->Total(), 'f',decimals.quote);
-            }
+            if (DateColumn == index.column())
+                res = luxgateData[index.row()].dateTimeOpen.toString("hh:mm:ss");
+            else if (TypeColumn == index.column())
+                res = luxgateData[index.row()].type;
+            else if (PriceColumn == index.column())
+                res = QString::number(luxgateData[index.row()].dbPrice, 'f',decimals.price);
+            else if (QtyColumn == index.column())
+                res = QString::number(luxgateData[index.row()].dbQty, 'f',decimals.quote);
+            else if (RemainQtyColumn == index.column())
+                res = QString::number(luxgateData[index.row()].dbLeavesQty, 'f',decimals.quote);
+            else if (ValueColumn == index.column())
+                res = QString::number(luxgateData[index.row()].dbValue, 'f',decimals.base);
+            else if (StatusColumn == index.column())
+                res = luxgateData[index.row()].status;
         }
     }
     return res;

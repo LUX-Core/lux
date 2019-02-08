@@ -12,6 +12,10 @@
 #include <QNetworkRequest>
 #include <QNetworkReply>
 #include <QFile>
+#include <QDateTime>
+#include <QMessageAuthenticationCode>
+#include <QDebug>
+#include <QBuffer>
 
 
 BitMexNetwork::BitMexNetwork(QObject *parent):
@@ -23,6 +27,24 @@ BitMexNetwork::BitMexNetwork(QObject *parent):
     QTimer *timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &BitMexNetwork::allRequests);
     timer->start(15000);
+
+    allRequests();
+}
+
+//create timestamp to api-expires
+QByteArray BitMexNetwork::apiExpires()
+{
+    QByteArray res;
+    res.append(QString::number(QDateTime::currentSecsSinceEpoch() + 30));
+    return res;
+}
+
+//create api-signature
+QByteArray BitMexNetwork::apiSignature(const QByteArray & verb, const QByteArray & path,
+                                const QByteArray & apiExpires,  const QByteArray & data)
+{
+    QByteArray message = verb + path + apiExpires + data;
+    return QMessageAuthenticationCode::hash(message, apiPrivate, QCryptographicHash::Sha256).toHex();
 }
 
 void BitMexNetwork::requestIndices()
@@ -33,6 +55,72 @@ void BitMexNetwork::requestIndices()
     auto reply = nam->get(request);
     connect(reply, &QNetworkReply::finished,
             this, &BitMexNetwork::replyIndices);
+}
+
+void BitMexNetwork::requestCancelOrder(const QByteArray & orderId)
+{
+    QNetworkRequest request(QUrl("https://testnet.bitmex.com/api/v1/order"));
+    request.setRawHeader("HTTP", "DELETE");
+
+    request.setHeader(QNetworkRequest::ContentTypeHeader,
+                      "application/json");
+    request.setRawHeader("X-Requested-With", "XMLHttpRequest");
+    request.setRawHeader("Content-Type", "application/x-www-form-urlencoded");
+    auto apiExp = apiExpires();
+    request.setRawHeader("api-expires", apiExp);
+    request.setRawHeader("api-key", apiKey);
+
+    QBuffer *buff = new QBuffer;
+    QByteArray requestData = "orderID=" + orderId;
+    const char * dataRequest =  requestData.data();
+    buff->setData(requestData);
+    buff->open(QIODevice::ReadOnly);
+
+    request.setRawHeader("api-signature", apiSignature("DELETE", "/api/v1/order", apiExp, requestData));
+    auto reply = nam->sendCustomRequest(request, "DELETE", buff);
+    buff->setParent(reply);
+    connect(reply, &QNetworkReply::finished,
+            this, &BitMexNetwork::replyCancelOrder);
+}
+
+void BitMexNetwork::requestCancelAllOrders()
+{
+    QNetworkRequest request(QUrl("https://testnet.bitmex.com/api/v1/order/all"));
+
+    request.setHeader(QNetworkRequest::ContentTypeHeader,
+                      "application/json");
+    request.setRawHeader("X-Requested-With", "XMLHttpRequest");
+    request.setRawHeader("Content-Type", "application/x-www-form-urlencoded");
+    auto apiExp = apiExpires();
+    request.setRawHeader("api-expires", apiExp);
+    request.setRawHeader("api-key", apiKey);
+
+    request.setRawHeader("api-signature", apiSignature("DELETE", "/api/v1/order/all", apiExp));
+    auto reply = nam->deleteResource(request);
+    connect(reply, &QNetworkReply::finished,
+            this, &BitMexNetwork::replyCancelAllOrders);
+}
+
+void BitMexNetwork::replyCancelAllOrders()
+{
+    auto reply = qobject_cast<QNetworkReply *>(sender());
+    auto baData = reply->readAll();
+    const char * data = baData.data();
+    int httpCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+    if(200 != httpCode)
+        return;
+    requestOpenOrders();
+}
+
+void BitMexNetwork::replyCancelOrder()
+{
+    auto reply = qobject_cast<QNetworkReply *>(sender());
+    auto baData = reply->readAll();
+    const char * data = baData.data();
+    int httpCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+    if(200 != httpCode)
+        return;
+    requestOpenOrders();
 }
 
 void BitMexNetwork::replyIndices()
@@ -65,8 +153,10 @@ void BitMexNetwork::readConfig()
         auto data = fileConfig.readAll();
         QJsonDocument document = QJsonDocument::fromJson(data);
         auto object = document.object();
-        apiKey = object.value("apiKey").toString();
-        apiPrivate = object.value("apiPrivate").toString();
+        apiKey.clear();
+        apiKey.append(object.value("apiKey").toString());
+        apiPrivate.clear();
+        apiPrivate.append(object.value("apiPrivate").toString());
     }
 }
 
@@ -100,12 +190,59 @@ void BitMexNetwork::requestOrderBook()
             this, &BitMexNetwork::replyOrderBook);
 }
 
+void BitMexNetwork::requestOpenOrders()
+{
+    QNetworkRequest request(QUrl("https://testnet.bitmex.com/api/v1/order?symbol=XBTUSD&filter=%7B%22open%22%3A%20true%7D&count=100&reverse=true"));
+    request.setHeader(QNetworkRequest::ContentTypeHeader,
+                      "application/json");
+    request.setRawHeader("X-Requested-With", "XMLHttpRequest");
+    auto apiExp = apiExpires();
+    request.setRawHeader("api-expires", apiExp);
+    request.setRawHeader("api-key", apiKey);
+    request.setRawHeader("api-signature", apiSignature("GET","/api/v1/order?symbol=XBTUSD&filter=%7B%22open%22%3A%20true%7D&count=100&reverse=true", apiExp));
+    auto reply = nam->get(request);
+    connect(reply, &QNetworkReply::finished,
+            this, &BitMexNetwork::replyOpenOrders);
+}
+
+void BitMexNetwork::replyOpenOrders()
+{
+    auto reply = qobject_cast<QNetworkReply *>(sender());
+    int httpCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+
+    auto baData = reply->readAll();
+    const char * data = baData.data();
+    if(200 != httpCode)
+        return;
+    QJsonDocument document = QJsonDocument::fromJson(baData);
+    auto array = document.array();
+    LuxgateOpenOrdersData luxgateData;
+    for(int i=0; i<array.size(); i++)
+    {
+        LuxgateOpenOrdersRow row;
+        row.dateTimeOpen = QDateTime::fromString(array[i].toObject().value("transactTime").toString(),
+                                             "yyyy-MM-ddTHH:mm:ss.zzzZ");
+        row.dbPrice = array[i].toObject().value("price").toDouble();
+        row.dbQty = array[i].toObject().value("orderQty").toDouble();
+        row.dbValue = row.dbQty/row.dbPrice;
+        row.type = array[i].toObject().value("ordType").toString();
+        row.bBuy = ("Buy" == array[i].toObject().value("side").toString());
+        row.dbLeavesQty = array[i].toObject().value("leavesQty").toDouble();
+        row.status = array[i].toObject().value("ordStatus").toString();
+        row.orderId.clear();
+        row.orderId.append(array[i].toObject().value("orderID").toString());
+        luxgateData.append(row);
+    }
+    emit sigOpenOrdersData(luxgateData);
+}
+
 void BitMexNetwork::allRequests()
 {
     requestGlobalHistory();
     requestOrderBook();
     requestBXBT_Index();
     requestIndices();
+    requestOpenOrders();
 }
 
 void BitMexNetwork::replyBXBT_Index()

@@ -28,16 +28,16 @@ QVariant LuxgateHistoryModel::headerData(int section, Qt::Orientation orientatio
         switch(section)
         {
             case DateColumn:
-                res = "DATE";
+                res = tr("DATE");
                 break;
             case PriceColumn:
-                res = "PRICE";
+                res = tr("PRICE (")+ curCurrencyPair.baseCurrency + "/" + curCurrencyPair.quoteCurrency + ")";
                 break;
             case SizeColumn:
-                res = "SIZE ( " + curCurrencyPair.quoteCurrency + " )";
+                res = tr("SIZE (") + curCurrencyPair.quoteCurrency + ")";
                 break;
             case SideColumn:
-                res = "SIDE";
+                res = tr("SIDE");
                 break;
             case TickColumn:
                 res = "";
@@ -101,12 +101,11 @@ bool LuxgateHistoryModel::removeRows(int row, int count, const QModelIndex &pare
 
 void LuxgateHistoryModel::slotUpdateData(const LuxgateHistoryData & luxgateData_)
 {
-    if(luxgateData_.size() != rowCount())
-    {
-        removeRows(0, rowCount());
-        insertRows(0, luxgateData_.size());
-    }
+    int oldRowCount = rowCount();
+    removeRows(0, oldRowCount);
     luxgateData = luxgateData_;
+    insertRows(0, rowCount());
+
     emit dataChanged(index(0,0), index(rowCount()-1,columnCount()-1), {Qt::DisplayRole});
 }
 

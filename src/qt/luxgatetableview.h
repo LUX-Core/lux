@@ -12,10 +12,9 @@ class LuxgateTableView : public QTableView
 public:
     LuxgateTableView(QWidget *parent = nullptr);
     enum possibleColumns {  RowsAction, SeparatorAction,
-                            PriceColumn,  BaseAmountColumn,
-                            QuoteTotalColumn, SizeColumn, TotalColumn,
-                            DateOpenOrderColumn,
-                            DateCloseOrderColumn, nPossibleColumns};
+                            PriceColumn,  SizeColumn, TotalColumn,
+                            QtyColumn, RemainQtyColumn, ValueColumn,
+                            DateOpenOrderColumn, DateCloseOrderColumn, nPossibleColumns};
     void setCopyColumns(QMap<int, int> copyColumns); //QMap<possibleColumn, realModelColumn>
 private:
     QMap<int, int> copyColumns; //QMap<possibleColumn, realModelColumn>
