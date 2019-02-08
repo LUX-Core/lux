@@ -3134,15 +3134,8 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CWalletT
     }
     return true;
 }
-/*
-bool CWallet::CreateTransaction(CScript scriptPubKey, const CAmount& nValue, CWalletTx& wtxNew, CReserveKey& reservekey, CAmount& nFeeRet, int& nChangePosInOut, std::string& strFailReason, const CCoinControl* coinControl, AvailableCoinsType coin_type, bool useIX, CAmount nFeePay)
-{
-    vector<pair<CScript, CAmount> > vecSend;
-    vecSend.push_back(make_pair(scriptPubKey, nValue));
-    return CreateTransaction(vecSend, wtxNew, reservekey, nFeeRet, nChangePosInOut, strFailReason, coinControl, coin_type, useIX, nFeePay);
-}
 
-/**
+/*
  * Call after CreateTransaction unless you want to abort
  */
 bool CWallet::CommitTransaction(CWalletTx& wtxNew, CReserveKey& reservekey, std::string strCommand)
@@ -4219,7 +4212,7 @@ void CWallet::AutoCombineDust()
 
         std::vector<CRecipient> vecSend;
         CScript scriptPubKey = GetScriptForDestination(it->first);
-        CRecipient recipient = {scriptPubKey, nTotalRewardsValue};
+        CRecipient recipient = {scriptPubKey, nTotalRewardsValue, false};
         vecSend.push_back(recipient);
 
          //Send change to same address
@@ -4339,7 +4332,7 @@ bool CWallet::MultiSend()
             CTxDestination strAddSend = DecodeDestination(vMultiSend[i].first);
             CScript scriptPubKey;
             scriptPubKey = GetScriptForDestination(strAddSend);
-            CRecipient recipient = {scriptPubKey, nAmount};
+            CRecipient recipient = {scriptPubKey, nAmount, false};
             vecSend.push_back(recipient);
         }
 

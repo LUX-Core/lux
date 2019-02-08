@@ -45,7 +45,7 @@ void SendMoney(const CTxDestination& address, CAmount nValue, CWalletTx& wtxNew,
     CReserveKey reservekey(pwalletMain);
     CAmount nFeeRequired;
     std::vector<CRecipient> vecSend;
-    CRecipient recipient = {scriptPubKey, nValue};
+    CRecipient recipient = {scriptPubKey, nValue, false};
     vecSend.push_back(recipient);
     int nChangePos;
     if (!pwalletMain->CreateTransaction(vecSend, wtxNew, reservekey, nFeeRequired, nChangePos, strError, NULL, coin_type)) {

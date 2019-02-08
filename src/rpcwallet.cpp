@@ -534,7 +534,7 @@ UniValue getaddressesbyaccount(const UniValue& params, bool fHelp)
     return ret;
 }
 
-void SendMoney(const CTxDestination& address, CAmount nValue, CWalletTx& wtxNew, bool fUseIX = false)
+void SendMoney(const CTxDestination& address, CAmount nValue, CWalletTx& wtxNew, bool fUseIX = false, bool fSubtractFeeFromAmount = false)
 {
     // Check amount
     if (nValue <= 0)
@@ -563,10 +563,10 @@ void SendMoney(const CTxDestination& address, CAmount nValue, CWalletTx& wtxNew,
     CAmount nFeeRequired;
     std::vector<CRecipient> vecSend;
     int nChangePos = -1;
-    CRecipient recipient = {scriptPubKey, nValue};
+    CRecipient recipient = {scriptPubKey, nValue, fSubtractFeeFromAmount};
     vecSend.push_back(recipient);
     if (!pwalletMain->CreateTransaction(vecSend, wtxNew, reservekey, nFeeRequired, nChangePos, strError, NULL, ALL_COINS, fUseIX, (CAmount)0)) {
-        if (nValue + nFeeRequired > pwalletMain->GetBalance())
+        if (!fSubtractFeeFromAmount && nValue + nFeeRequired > pwalletMain->GetBalance())
             strError = strprintf("Error: This transaction requires a transaction fee of at least %s because of its amount, complexity, or use of recently received funds!", FormatMoney(nFeeRequired));
         LogPrintf("SendMoney() : %s\n", strError);
         throw JSONRPCError(RPC_WALLET_ERROR, strError);
@@ -577,9 +577,9 @@ void SendMoney(const CTxDestination& address, CAmount nValue, CWalletTx& wtxNew,
 
 UniValue sendtoaddress(const UniValue& params, bool fHelp)
 {
-    if (fHelp || params.size() < 2 || params.size() > 4)
+    if (fHelp || params.size() < 2 || params.size() > 5)
         throw runtime_error(
-            "sendtoaddress \"luxaddress\" amount ( \"comment\" \"comment-to\" )\n"
+            "sendtoaddress \"luxaddress\" amount ( \"comment\" \"comment-to\" \"subtractfeefromamount\" )\n"
             "\nSend an amount to a given address. The amount is a real and is rounded to the nearest 0.00000001\n" +
             HelpRequiringPassphrase() +
             "\nArguments:\n"
@@ -590,6 +590,8 @@ UniValue sendtoaddress(const UniValue& params, bool fHelp)
             "4. \"comment-to\"  (string, optional) A comment to store the name of the person or organization \n"
             "                             to which you're sending the transaction. This is not part of the \n"
             "                             transaction, just kept in your wallet.\n"
+            "5. \"subtractfeefromamount\" (bool, optional) The fee will be deducted from the amount being sent.\n"
+            "                                       The recipient will receive less bitcoins than you enter in the amount field.\n"
             "\nResult:\n"
             "\"transactionid\"  (string) The transaction id.\n"
             "\nExamples:\n" +
@@ -610,10 +612,14 @@ UniValue sendtoaddress(const UniValue& params, bool fHelp)
         wtx.mapValue["comment"] = params[2].get_str();
     if (params.size() > 3 && !params[3].isNull() && !params[3].get_str().empty())
         wtx.mapValue["to"] = params[3].get_str();
+    bool fSubtractFeeFromAmount = false;
+    if (!params[4].isNull()) {
+        fSubtractFeeFromAmount = params[4].get_bool();
+    }
 
     EnsureWalletIsUnlocked();
 
-    SendMoney(dest, nAmount, wtx);
+    SendMoney(dest, nAmount, wtx, false, fSubtractFeeFromAmount);
 
     return wtx.GetHash().GetHex();
 }
@@ -654,7 +660,7 @@ UniValue sendtoaddressix(const UniValue& params, bool fHelp)
 
     EnsureWalletIsUnlocked();
 
-    SendMoney(dest, nAmount, wtx, true);
+    SendMoney(dest, nAmount, wtx, true, false);
 
     return wtx.GetHash().GetHex();
 }
@@ -1130,18 +1136,25 @@ UniValue sendmany(const UniValue& params, bool fHelp)
 {
     if (fHelp || params.size() < 2 || params.size() > 4)
         throw runtime_error(
-            "sendmany \"fromaccount\" {\"address\":amount,...} ( minconf \"comment\" )\n"
+            "sendmany \"fromaccount\" {\"address\":amount,...} ( minconf \"comment\" subtractfeefrom\" )\n"
             "\nSend multiple times. Amounts are double-precision floating point numbers." +
             HelpRequiringPassphrase() + "\n"
             "\nArguments:\n"
             "1. \"fromaccount\"         (string, required) The account to send the funds from, can be \"\" for the default account\n"
             "2. \"amounts\"             (string, required) A json object with addresses and amounts\n"
             "    {\n"
-            "      \"address\":amount   (numeric) The lux address is the key, the numeric amount in btc is the value\n"
+            "      \"address\":amount   (numeric) The lux address is the key, the numeric amount in lux is the value\n"
             "      ,...\n"
             "    }\n"
             "3. minconf                 (numeric, optional, default=1) Only use the balance confirmed at least this many times.\n"
             "4. \"comment\"             (string, optional) A comment\n"
+            "5. \"subtractfeefrom\" (array, optional) A json array with addresses.\n"
+            "                           The fee will be equally deducted from the amount of each selected address.\n"
+            "                           Those recipients will receive less bitcoins than you enter in their corresponding amount field.\n"
+            "                           If no addresses are specified here, the sender pays the fee.\n"
+            "        {\n"
+            "          \"address (string, optional) Subtract fee from this address\n"
+            "        }\n"
              "\nResult:\n"
             "\"transactionid\"          (string) The transaction id for the send. Only 1 transaction is created regardless of \n"
             "                                    the number of addresses.\n"
@@ -1164,6 +1177,10 @@ UniValue sendmany(const UniValue& params, bool fHelp)
     if (params.size() > 3 && !params[3].isNull() && !params[3].get_str().empty())
         wtx.mapValue["comment"] = params[3].get_str();
 
+    UniValue subtractFeeFromAmount(UniValue::VARR);
+    if (!params[4].isNull())
+        subtractFeeFromAmount = params[4].get_array();
+
     set<CTxDestination> destinations;
     std::vector<CRecipient> vecSend;
 
@@ -1184,7 +1201,14 @@ UniValue sendmany(const UniValue& params, bool fHelp)
             throw JSONRPCError(RPC_TYPE_ERROR, "Invalid amount for send");
         totalAmount += nAmount;
 
-        CRecipient recipient = {scriptPubKey, nAmount};
+        bool fSubtractFeeFromAmount = false;
+        for (unsigned int idx = 0; idx < subtractFeeFromAmount.size(); idx++) {
+            const UniValue& addr = subtractFeeFromAmount[idx];
+            if (addr.get_str() == name_)
+                fSubtractFeeFromAmount = true;
+        }
+
+        CRecipient recipient = {scriptPubKey, nAmount, fSubtractFeeFromAmount};
         vecSend.push_back(recipient);
     }
 
@@ -3027,7 +3051,7 @@ UniValue createcontract(const UniValue& params, bool fHelp){
     std::string strError;
     int nChangePos = -1;
     std::vector<CRecipient> vecSend;
-    CRecipient recipient = {scriptPubKey, 0};
+    CRecipient recipient = {scriptPubKey, 0, false};
     vecSend.push_back(recipient);
 
     if (!pwalletMain->CreateTransaction(vecSend, wtx, reservekey, nFeeRequired, nChangePos, strError, &coinControl,  ALL_COINS,
@@ -3252,7 +3276,7 @@ UniValue sendtocontract(const UniValue& params, bool fHelp){
     int nChangePos = -1;
     std::vector<CRecipient> vecSend;
 //    int nChangePosRet = -1;
-    CRecipient recipient = {scriptPubKey, nAmount};
+    CRecipient recipient = {scriptPubKey, nAmount, false};
     vecSend.push_back(recipient);
 
 

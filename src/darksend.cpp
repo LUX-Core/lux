@@ -1655,7 +1655,7 @@ bool CDarkSendPool::SendRandomPaymentToSelf() {
     std::vector<CRecipient> vecSend;
 
     // ****** Add fees ************ /
-    CRecipient recipient = {scriptDenom, nPayment};
+    CRecipient recipient = {scriptDenom, nPayment, false};
     vecSend.push_back(recipient);
 
     CCoinControl* coinControl = NULL;
@@ -1690,7 +1690,7 @@ bool CDarkSendPool::MakeCollateralAmounts() {
     std::string strFail = "";
     std::vector<CRecipient> vecSend;
 
-    CRecipient recipient = {scriptChange, (DARKSEND_COLLATERAL * 2) + DARKSEND_FEE};
+    CRecipient recipient = {scriptChange, (DARKSEND_COLLATERAL * 2) + DARKSEND_FEE, false};
     vecSend.push_back(recipient);
 
     CCoinControl* coinControl = NULL;
@@ -1737,7 +1737,7 @@ bool CDarkSendPool::CreateDenominated(int64_t nTotalValue) {
 
     // ****** Add collateral outputs ************ /
     if (!pwalletMain->HasCollateralInputs()) {
-        CRecipient recipient = {scriptChange, (DARKSEND_COLLATERAL * 2) + DARKSEND_FEE};
+        CRecipient recipient = {scriptChange, (DARKSEND_COLLATERAL * 2) + DARKSEND_FEE, false};
         vecSend.push_back(recipient);
     }
 
@@ -1754,7 +1754,7 @@ bool CDarkSendPool::CreateDenominated(int64_t nTotalValue) {
             scriptChange = GetScriptForDestination(vchPubKey.GetID());
             reservekey.KeepKey();
 
-            CRecipient recipient = {scriptChange, v};
+            CRecipient recipient = {scriptChange, v, false};
             vecSend.push_back(recipient);
 
             //increment outputs and subtract denomination amount
