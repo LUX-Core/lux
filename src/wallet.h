@@ -169,6 +169,13 @@ public:
     StringMap destdata;
 };
 
+struct CRecipient
+{
+    CScript scriptPubKey;
+    CAmount nAmount;
+    bool fSubtractFeeFromAmount;
+};
+
 typedef std::map <std::string, std::string> mapValue_t;
 
 
@@ -596,8 +603,8 @@ public:
     CAmount GetWatchOnlyBalance() const;
     CAmount GetUnconfirmedWatchOnlyBalance() const;
     CAmount GetImmatureWatchOnlyBalance() const;
-    OutputType TransactionChangeType(const std::vector<std::pair<CScript, CAmount> >& vecSend);
-    bool CreateTransaction(const std::vector<std::pair<CScript, CAmount> >& vecSend,
+    OutputType TransactionChangeType(const std::vector<CRecipient>& vecSend);
+    bool CreateTransaction(const std::vector<CRecipient>& vecSend,
                            CWalletTx& wtxNew,
                            CReserveKey& reservekey,
                            CAmount& nFeeRet,
@@ -607,7 +614,7 @@ public:
                            AvailableCoinsType coin_type = ALL_COINS,
                            bool useIX = false,
                            CAmount nFeePay = 0, CAmount nGasFee=0, bool sign = true);
-    bool CreateTransaction(CScript scriptPubKey, const CAmount& nValue, CWalletTx& wtxNew, CReserveKey& reservekey, CAmount& nFeeRet, int& nChangePosInOut, std::string& strFailReason, const CCoinControl* coinControl = NULL, AvailableCoinsType coin_type = ALL_COINS, bool useIX = false, CAmount nFeePay = 0);
+    //bool CreateTransaction(CScript scriptPubKey, const CAmount& nValue, CWalletTx& wtxNew, CReserveKey& reservekey, CAmount& nFeeRet, int& nChangePosInOut, std::string& strFailReason, const CCoinControl* coinControl = NULL, AvailableCoinsType coin_type = ALL_COINS, bool useIX = false, CAmount nFeePay = 0);
     bool CommitTransaction(CWalletTx& wtxNew, CReserveKey& reservekey, std::string strCommand = "tx");
     bool FundTransaction(CMutableTransaction& tx, CAmount& nFeeRet,  bool overrideEstimatedFeeRate, int& nChangePosInOut, std::string& strFailReason,
                          bool lockUnspents, const std::set<int>& setSubtractFeeFromOutputs, CCoinControl* coinControl);
