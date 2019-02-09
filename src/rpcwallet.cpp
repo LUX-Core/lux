@@ -579,7 +579,7 @@ UniValue sendtoaddress(const UniValue& params, bool fHelp)
 {
     if (fHelp || params.size() < 2 || params.size() > 5)
         throw runtime_error(
-            "sendtoaddress \"luxaddress\" amount ( \"comment\" \"comment-to\" \"subtractfeefromamount\" )\n"
+            "sendtoaddress \"luxaddress\" amount ( \"comment\" \"comment-to\" subtractfee )\n"
             "\nSend an amount to a given address. The amount is a real and is rounded to the nearest 0.00000001\n" +
             HelpRequiringPassphrase() +
             "\nArguments:\n"
@@ -590,8 +590,8 @@ UniValue sendtoaddress(const UniValue& params, bool fHelp)
             "4. \"comment-to\"  (string, optional) A comment to store the name of the person or organization \n"
             "                             to which you're sending the transaction. This is not part of the \n"
             "                             transaction, just kept in your wallet.\n"
-            "5. \"subtractfeefromamount\" (bool, optional) The fee will be deducted from the amount being sent.\n"
-            "                                       The recipient will receive less bitcoins than you enter in the amount field.\n"
+            "5. \"subtractfee\" (bool, optional) The fee will be deducted from the amount being sent.\n"
+            "                             The recipient will receive less than you enter in the amount field.\n"
             "\nResult:\n"
             "\"transactionid\"  (string) The transaction id.\n"
             "\nExamples:\n" +
@@ -613,7 +613,7 @@ UniValue sendtoaddress(const UniValue& params, bool fHelp)
     if (params.size() > 3 && !params[3].isNull() && !params[3].get_str().empty())
         wtx.mapValue["to"] = params[3].get_str();
     bool fSubtractFeeFromAmount = false;
-    if (!params[4].isNull()) {
+    if (params.size() > 4 && !params[4].isNull()) {
         fSubtractFeeFromAmount = params[4].get_bool();
     }
 
@@ -1178,7 +1178,7 @@ UniValue sendmany(const UniValue& params, bool fHelp)
         wtx.mapValue["comment"] = params[3].get_str();
 
     UniValue subtractFeeFromAmount(UniValue::VARR);
-    if (!params[4].isNull())
+    if (params.size() > 4 && !params[4].isNull())
         subtractFeeFromAmount = params[4].get_array();
 
     set<CTxDestination> destinations;
