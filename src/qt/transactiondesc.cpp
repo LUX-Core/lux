@@ -26,6 +26,21 @@
 
 using namespace std;
 
+static int GetStakeInputAge(const CWalletTx& wtx)
+{
+    CTransaction tx;
+    uint256 hashBlock;
+    COutPoint out = wtx.vin[0].prevout;
+    if (GetTransaction(out.hash, tx, Params().GetConsensus(), hashBlock, true)) {
+        CBlockIndex* pindex = LookupBlockIndex(hashBlock);
+        if (pindex) {
+            CBlockHeader prevblock = pindex->GetBlockHeader();
+            return (wtx.GetTxTime() - prevblock.nTime);
+        }
+    }
+    return 0;
+}
+
 QString TransactionDesc::FormatTxStatus(const CWalletTx& wtx)
 {
     AssertLockHeld(cs_main);
@@ -125,7 +140,10 @@ QString TransactionDesc::toHTML(CWallet* wallet, CWalletTx& wtx, TransactionReco
         strHTML += "<br/>";
     } else if (wtx.IsCoinStake()) {
         // Minted (PoS)
-        strHTML += "<b>" + tr("Input") + ":</b> " + BitcoinUnits::formatHtmlWithUnit(unit, nCredit - nNet) + "<br/>";
+        strHTML += "<b>" + tr("Input") + ":</b> " + BitcoinUnits::formatHtmlWithUnit(unit, nCredit - nNet);
+        int stakeHrs = GetStakeInputAge(wtx) / (60*60);
+        if (stakeHrs > 0) strHTML += ", " + tr("after") + " " + QString::number(stakeHrs) + " " + tr("hours");
+        strHTML += "<br/>";
         strHTML += "<b>" + tr("Credit") + ":</b> " + BitcoinUnits::formatHtmlWithUnit(unit, nNet);
         int nDepth = wtx.GetDepthInMainChain();
         if (nDepth >= 0 && nDepth < Params().COINBASE_MATURITY())

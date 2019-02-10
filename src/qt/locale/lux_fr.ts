@@ -5972,6 +5972,14 @@ https://www.transifex.com/luxcore/luxcore</source>
         <source>Output index</source>
         <translation>Index sortie</translation>
     </message>
+    <message>
+        <source>after</source>
+        <translation>après</translation>
+    </message>
+    <message>
+        <source>hours</source>
+        <translation>heures</translation>
+    </message>
     <message numerus="yes">
         <source>Open for %n more block(s)</source>
         <translation>
