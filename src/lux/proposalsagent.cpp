@@ -1,11 +1,13 @@
 #include "proposalsagent.h"
 
-void ProposalsAgent::ListenProposal(const uint256 &orderHash)
+#include <algorithm>
+
+void ProposalsAgent::ListenProposals(const uint256 &orderHash)
 {
     mapListenProposals[orderHash] = std::make_pair(true, std::time(nullptr));
 }
 
-void ProposalsAgent::StopListenProposal(const uint256 &orderHash)
+void ProposalsAgent::StopListenProposals(const uint256 &orderHash)
 {
     auto it = mapListenProposals.find(orderHash);
     if (it != mapListenProposals.end()) {
@@ -22,15 +24,12 @@ void ProposalsAgent::AddProposal(const StorageProposal &proposal)
         return ;
     }
     // remove previous proposal
-    std::vector<StorageProposal> &vOrderProposal = mapProposals[orderHash];
-    for (auto it = vOrderProposal.begin(); it != vOrderProposal.end(); ++it) {
-        if (it->orderHash == proposal.orderHash &&
-            it->address == proposal.address &&
-            it->time > proposal.time) {
-            vOrderProposal.erase(it);
-            break;
-        }
-    }
+    std::list<StorageProposal> &vOrderProposal = mapProposals[orderHash];
+    vOrderProposal.remove_if([proposal](const StorageProposal &p){
+        return p.orderHash == proposal.orderHash &&
+               p.address == proposal.address &&
+               p.time > proposal.time;
+    });
     vOrderProposal.push_back(proposal);
 }
 
@@ -42,13 +41,39 @@ void ProposalsAgent::EraseOrdersProposals(const uint256 &orderHash)
     mapProposals.erase(orderHash);
 }
 
+void ProposalsAgent::RemoveOrdersProposal(const uint256 &orderHash, const uint256 &proposalHash)
+{
+    if (mapProposals.find(orderHash) == mapProposals.end()) {
+        return ;
+    }
+    auto proposals = mapProposals[orderHash];
+    proposals.remove_if([proposalHash](const StorageProposal &p) {
+        return p.GetHash() == proposalHash;
+    });
+}
+
 std::vector<StorageProposal> ProposalsAgent::GetProposals(const uint256 &orderHash)
 {
-    std::vector<StorageProposal> vProposalsForOrder;
     if (mapProposals.find(orderHash) == mapProposals.end()) {
         return {};
     }
-    return mapProposals[orderHash];
+    return std::vector<StorageProposal>{ mapProposals[orderHash].begin(),
+                                         mapProposals[orderHash].end() };
+}
+
+std::vector<StorageProposal> ProposalsAgent::GetSortedProposals(const uint256 &orderHash)
+{
+    if (mapProposals.find(orderHash) == mapProposals.end()) {
+        return {};
+    }
+    auto proposals = mapProposals[orderHash];
+    if (proposals.size()) {
+        proposals.sort([](const StorageProposal &a, const StorageProposal &b) {
+            return a.rate < b.rate;
+        });
+        return { proposals.begin(), proposals.end() };
+    }
+    return {};
 }
 
 StorageProposal ProposalsAgent::GetProposal(const uint256 &orderHash, const uint256 &proposalHash)
@@ -56,11 +81,15 @@ StorageProposal ProposalsAgent::GetProposal(const uint256 &orderHash, const uint
     if (mapProposals.find(orderHash) == mapProposals.end()) {
         return {};
     }
-    std::vector<StorageProposal> &vOrderProposal = mapProposals[orderHash];
-    for (auto it = vOrderProposal.begin(); it != vOrderProposal.end(); ++it) {
-        if (it->GetHash() == proposalHash) {
-            return *it;
-        }
+    std::list<StorageProposal> &vOrderProposal = mapProposals[orderHash];
+    std::list<StorageProposal>::iterator it = std::find_if(vOrderProposal.begin(),
+                                                            vOrderProposal.end(),
+                                                            [proposalHash](const StorageProposal &p) {
+        return p.GetHash() == proposalHash;
+    });
+
+    if (it != vOrderProposal.end()) {
+        return *it;
     }
 
     return {};

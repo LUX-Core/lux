@@ -176,7 +176,17 @@ BITCOIN_CORE_H = \
   lux/luxstate.h \
   lux/luxtransaction.h \
   lux/luxDGP.h \
-  lux/storageresults.h
+  lux/cancelingsettimeout.h \
+  lux/concurrent_queue.h \
+  lux/decryptionkeys.h \
+  lux/handshakeagent.h \
+  lux/merkler.h \
+  lux/proposalsagent.h \
+  lux/replicabuilder.h \
+  lux/storageresults.h \
+  lux/storageheap.h \
+  lux/storagecontroller.h \
+  lux/storageorder.h
 
 obj/build.h: FORCE
 	@$(MKDIR_P) $(builddir)/obj
@@ -224,19 +234,13 @@ libbitcoin_server_a_SOURCES = \
   lux/luxstate.cpp \
   lux/luxtransaction.cpp \
   lux/luxDGP.cpp \
-  lux/storageresults.cpp \
-  lux/replicabuilder.h \
-  lux/replicabuilder.cpp \
-  lux/storageheap.h \
-  lux/storageheap.cpp \
-  lux/merkler.h \
   lux/merkler.cpp \
-  lux/storagecontroller.h \
-  lux/storagecontroller.cpp \
-  lux/proposalsagent.h \
+  lux/handshakeagent.cpp \
   lux/proposalsagent.cpp \
-  lux/storageorder.h \
-  lux/decryptionkeys.h \
+  lux/replicabuilder.cpp \
+  lux/storageresults.cpp \
+  lux/storageheap.cpp \
+  lux/storagecontroller.cpp \
   $(BITCOIN_CORE_H)
 
 if ENABLE_ZMQ

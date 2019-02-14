@@ -16,21 +16,6 @@ public:
         maxblocksgap = DEFAULT_STORAGE_MAX_BLOCK_GAP;
     }
 
-    bool StartHandshake(const StorageProposal &proposal, const DecryptionKeys &keys)
-    {
-        return StorageController::StartHandshake(proposal, keys);
-    }
-
-    DecryptionKeys GenerateKeys(RSA **rsa)
-    {
-        return StorageController::GenerateKeys(rsa);
-    }
-
-    RSA* CreatePublicRSA(const std::string &key)
-    {
-        return StorageController::CreatePublicRSA(key);
-    }
-
     std::shared_ptr<AllocatedFile> CreateReplica(const boost::filesystem::path &filename,
                                                  const StorageOrder &order,
                                                  const DecryptionKeys &keys,
@@ -38,8 +23,6 @@ public:
     {
         return StorageController::CreateReplica(filename, order, keys, rsa);
     }
-    // bool SendReplica(const StorageOrder &order, std::shared_ptr<AllocatedFile> pAllocatedFile, CNode* pNode);
-    // bool DecryptReplica(std::shared_ptr<AllocatedFile> pAllocatedFile, const uint64_t fileSize, const boost::filesystem::path &decryptedFile);
 };
 
 BOOST_AUTO_TEST_SUITE(storage_controller_tests)
@@ -68,7 +51,7 @@ BOOST_AUTO_TEST_CASE(createreplica)
         CService("127.0.0.1")
     };
     RSA *rsa;
-    DecryptionKeys keys = controller.GenerateKeys(&rsa);// TODO: need test for this (SS)
+    DecryptionKeys keys = DecryptionKeys::GenerateKeys(&rsa);// TODO: need test for this (SS)
 
     auto tempFile = controller.CreateReplica(fullFilename, order, keys, rsa);
 

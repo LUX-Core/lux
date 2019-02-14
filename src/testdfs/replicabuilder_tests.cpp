@@ -5,20 +5,6 @@
 #include <boost/test/unit_test.hpp>
 #include <iostream>
 
-#if OPENSSL_VERSION_NUMBER < 0x10100005L
-static void RSA_get0_key(const RSA *r, const BIGNUM **n, const BIGNUM **e, const BIGNUM **d)
-{
-    if(n != NULL)
-        *n = r->n;
-
-    if(e != NULL)
-        *e = r->e;
-
-    if(d != NULL)
-        *d = r->d;
-}
-#endif
-
 BOOST_AUTO_TEST_SUITE(crypto_splitter_tests)
 
 BOOST_AUTO_TEST_CASE(get_crypto_replica_size)
@@ -38,7 +24,7 @@ BOOST_AUTO_TEST_CASE(encrypt_1bytes)
     // search for rsa->n > 0x0000ff...126 bytes...ff
     {
         rsa = RSA_generate_key(nBlockSizeRSA * 8, 3, nullptr, nullptr);
-        BIGNUM *minModulus = GetMinModulus();
+        BIGNUM *minModulus = DecryptionKeys::GetMinModulus();
         RSA_get0_key(rsa, &rsa_n, NULL, NULL);
         while (BN_ucmp(minModulus, rsa_n) >= 0) {
             RSA_free(rsa);
@@ -68,7 +54,7 @@ BOOST_AUTO_TEST_CASE(encrypt_126bytes)
     // search for rsa->n > 0x0000ff...126 bytes...ff
     {
         rsa = RSA_generate_key(nBlockSizeRSA * 8, 3, nullptr, nullptr);
-        BIGNUM *minModulus = GetMinModulus();
+        BIGNUM *minModulus = DecryptionKeys::GetMinModulus();
         RSA_get0_key(rsa, &rsa_n, nullptr, nullptr);
         while (BN_ucmp(minModulus, rsa_n) >= 0) {
             RSA_free(rsa);
@@ -98,7 +84,7 @@ BOOST_AUTO_TEST_CASE(encrypt_252bytes)
     // search for rsa->n > 0x0000ff...126 bytes...ff
     {
         rsa = RSA_generate_key(nBlockSizeRSA * 8, 3, nullptr, nullptr);
-        BIGNUM *minModulus = GetMinModulus();
+        BIGNUM *minModulus = DecryptionKeys::GetMinModulus();
         RSA_get0_key(rsa, &rsa_n, nullptr, nullptr);
         while (BN_ucmp(minModulus, rsa_n) >= 0) {
             RSA_free(rsa);

@@ -184,6 +184,7 @@ void PrepareShutdown()
     RenameThread("lux-shutoff");
     mempool.AddTransactionsUpdated(1);
     StopRPCThreads();
+    storageController->StopThreads();
 #ifdef ENABLE_WALLET
     if (pwalletMain)
         bitdb.Flush(false);

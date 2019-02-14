@@ -11,7 +11,7 @@ public:
     static const uint256 hashOne;
     static const uint256 hashTwo;
 
-    std::map<uint256, std::vector<StorageProposal>> & GetMapProposals()
+    std::map<uint256, std::list<StorageProposal>> & GetMapProposals()
     {
         return mapProposals;
     }
@@ -53,12 +53,20 @@ public:
         return result;
     }
 
-    static StorageProposal MakeProposal(const uint256 &hash, const CService &address = CService{})
+    void AddTestProposal(const StorageProposal &proposal)
+    {
+        auto & proposals = GetMapProposals()[proposal.orderHash];
+
+        proposals.push_back(proposal);
+    }
+
+    static StorageProposal MakeProposal(const uint256 &hash, const CAmount rate = 0, const CService &address = CService{})
     {
         StorageProposal result{};
 
         result.time = std::time(nullptr);
         result.orderHash = hash;
+        result.rate = rate;
         result.address = address;
 
         return result;
@@ -81,9 +89,9 @@ BOOST_AUTO_TEST_CASE(listen_proposal)
     TestProposalsAgent agent{};
 
     BOOST_CHECK_EQUAL(agent.GetMapListenProposals().size(), 0);
-    agent.ListenProposal(TestProposalsAgent::hashOne);
+    agent.ListenProposals(TestProposalsAgent::hashOne);
     BOOST_CHECK_EQUAL(agent.GetMapListenProposals().size(), 1);
-    agent.ListenProposal(TestProposalsAgent::hashTwo);
+    agent.ListenProposals(TestProposalsAgent::hashTwo);
     BOOST_CHECK_EQUAL(agent.GetMapListenProposals().size(), 2);
 
     BOOST_CHECK_EQUAL(agent.GetMapListenProposals().begin()->first, TestProposalsAgent::hashOne);
@@ -100,9 +108,9 @@ BOOST_AUTO_TEST_CASE(stop_listen_proposal)
     agent.AddOneAndTwoListenProposals();
 
     BOOST_CHECK_EQUAL(agent.GetMapListenProposals().size(), 2);
-    agent.StopListenProposal(TestProposalsAgent::hashOne);
+    agent.StopListenProposals(TestProposalsAgent::hashOne);
     BOOST_CHECK_EQUAL(agent.GetMapListenProposals().size(), 2);
-    agent.StopListenProposal(TestProposalsAgent::hashTwo);
+    agent.StopListenProposals(TestProposalsAgent::hashTwo);
     BOOST_CHECK_EQUAL(agent.GetMapListenProposals().size(), 2);
 
     BOOST_CHECK_EQUAL(agent.GetMapListenProposals().begin()->first, TestProposalsAgent::hashOne);
@@ -166,6 +174,27 @@ BOOST_AUTO_TEST_CASE(get_proposals)
     BOOST_CHECK_EQUAL(agent.GetProposals(TestProposalsAgent::hashTwo)[0].orderHash, TestProposalsAgent::hashTwo);
     BOOST_CHECK_EQUAL(agent.GetProposals(TestProposalsAgent::hashOne)[0].GetHash(), hashes[0]);
     BOOST_CHECK_EQUAL(agent.GetProposals(TestProposalsAgent::hashTwo)[0].GetHash(), hashes[1]);
+}
+
+BOOST_AUTO_TEST_CASE(get_sorted_proposals)
+{
+    TestProposalsAgent agent{};
+
+    agent.AddTestProposal(TestProposalsAgent::MakeProposal(TestProposalsAgent::hashOne, 5));
+    agent.AddTestProposal(TestProposalsAgent::MakeProposal(TestProposalsAgent::hashOne, 3));
+    agent.AddTestProposal(TestProposalsAgent::MakeProposal(TestProposalsAgent::hashOne, 7));
+    agent.AddTestProposal(TestProposalsAgent::MakeProposal(TestProposalsAgent::hashOne, 6));
+    agent.AddTestProposal(TestProposalsAgent::MakeProposal(TestProposalsAgent::hashOne, 1));
+
+    BOOST_CHECK_EQUAL(agent.GetMapProposals().size(), 1);
+    BOOST_CHECK_EQUAL(agent.GetProposals(TestProposalsAgent::hashOne).size(), 5);
+
+    auto proposals = agent.GetSortedProposals(TestProposalsAgent::hashOne);
+    BOOST_CHECK_EQUAL(proposals[0].rate, 1);
+    BOOST_CHECK_EQUAL(proposals[1].rate, 3);
+    BOOST_CHECK_EQUAL(proposals[2].rate, 5);
+    BOOST_CHECK_EQUAL(proposals[3].rate, 6);
+    BOOST_CHECK_EQUAL(proposals[4].rate, 7);
 }
 
 BOOST_AUTO_TEST_CASE(get_proposal)

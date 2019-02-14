@@ -51,19 +51,6 @@ int encrypt(const unsigned char *plaintext, int plaintext_len, AESKey key,
     return ciphertext_len;
 }
 
-BIGNUM *GetMinModulus()
-{
-    BIGNUM *minModulus = BN_new();
-    std::string minModulusHex;
-    minModulusHex.reserve(nBlockSizeRSA * 2);
-    minModulusHex += "0000";
-    for (size_t i = 0; i < (nBlockSizeRSA - 2); i++)
-        minModulusHex += "ff";
-
-    BN_hex2bn(&minModulus, minModulusHex.c_str());
-    return minModulus;
-}
-
 uint64_t GetCryptoReplicaSize(size_t srcSize, size_t blockSizeRSA){
     return (uint64_t)ceil((double)srcSize / (blockSizeRSA - 2)) * blockSizeRSA;
 }
