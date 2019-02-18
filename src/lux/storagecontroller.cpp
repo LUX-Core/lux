@@ -100,7 +100,7 @@ void StorageController::ProcessStorageMessage(CNode* pfrom, const std::string& s
                 order.maxGap >= maxblocksgap) {
                 StorageProposal proposal { std::time(nullptr), hash, rate, address };
 
-                CNode* pNode = TryConnectToNode(order.address);
+                CNode* pNode = TryConnectToNode(order.address, 2);
                 if (pNode) {
                     pNode->PushMessage("dfsproposal", proposal);
                 } else {
@@ -290,9 +290,11 @@ void StorageController::AnnounceOrder(const StorageOrder &order, const boost::fi
 {
     AnnounceOrder(order);
 
-    boost::lock_guard<boost::mutex> lock(mutex);
-    mapLocalFiles[order.GetHash()] = path;
-    proposalsAgent.ListenProposals(order.GetHash());
+    {
+        boost::lock_guard<boost::mutex> lock(mutex);
+        mapLocalFiles[order.GetHash()] = path;
+        proposalsAgent.ListenProposals(order.GetHash());
+    }
     mapTimers[order.GetHash()] = std::make_shared<CancelingSetTimeout>(std::chrono::milliseconds(60000),
                                                                        nullptr,
                                                                        [this](){ Notify(BackgroundJobs::CHECK_PROPOSALS); });
@@ -564,11 +566,11 @@ bool StorageController::CheckReceivedReplica(const uint256 &orderHash, const uin
     return true;
 }
 
-CNode *StorageController::TryConnectToNode(const CService &address)
+CNode *StorageController::TryConnectToNode(const CService &address, int maxAttempt)
 {
     CNode* pNode = FindNode(address);
     if (pNode == nullptr) {
-        for (int64_t nLoop = 0; nLoop < 20 && pNode == nullptr; ++nLoop) {
+        for (size_t nLoop = 0; nLoop < maxAttempt && pNode == nullptr; ++nLoop) {
             CAddress addr;
             OpenNetworkConnection(addr, false, NULL, address.ToStringIPPort().c_str());
             for (int i = 0; i < 10 && i < nLoop; ++i) {
@@ -711,7 +713,7 @@ void StorageController::ProcessHandshakesMessages()
         }
         CNode *pNode = FindNode(proposal.address);
         if (!status) {
-            if (pNode) {
+            if (pNode && vNodes.size() > 5) {
                 pNode->CloseSocketDisconnect();
             }
             Notify(BackgroundJobs::FAIL_HANDSHAKE);

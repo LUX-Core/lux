@@ -113,7 +113,7 @@ protected:
                      const DecryptionKeys &keys,
                      CNode* pNode);
     bool CheckReceivedReplica(const uint256 &orderHash, const uint256 &receivedMerkleRootHash, const boost::filesystem::path &replica);
-    CNode *TryConnectToNode(const CService &address);
+    CNode *TryConnectToNode(const CService &address, int maxAttempt = 20);
     void Notify(const StorageController::BackgroundJobs job);
     void FoundMyIP();                   // pingThread
     void ProcessProposalsMessages();    // proposalsManagerThread
