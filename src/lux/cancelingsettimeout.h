@@ -8,7 +8,8 @@
 
 namespace ch = std::chrono;
 
-class CancelingSetTimeout {
+class CancelingSetTimeout
+{
 protected:
     std::thread thread;
     std::condition_variable cv;

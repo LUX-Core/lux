@@ -10,10 +10,11 @@
 
 #include <boost/asio.hpp>
 
-class HandshakeAgent {
+class HandshakeAgent
+{
 protected:
     std::map<uint256, StorageHandshake> mapReceivedHandshakes;
-    std::map<uint256, CancelingSetTimeout *> mapTimers;
+    std::map<uint256, std::shared_ptr<CancelingSetTimeout>> mapTimers;
 public:
     void StartHandshake(const StorageProposal &proposal, CNode* pNode);
     void Add(StorageHandshake handshake);

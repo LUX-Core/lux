@@ -45,6 +45,8 @@ protected:
 
     concurrent_queue<StorageProposal> qProposals;
 
+    bool shutdownThreads;
+
     boost::thread pingThread;
     boost::thread proposalsManagerThread;
     boost::thread handshakesManagerThread;
@@ -57,8 +59,7 @@ protected:
 
     std::map<uint256, boost::filesystem::path> mapLocalFiles;
     std::map<uint256, StorageOrder> mapAnnouncements;
-
-    bool shutdownThreads;
+    std::map<uint256, std::shared_ptr<CancelingSetTimeout>> mapTimers;
 
 public:
     CAmount rate;
@@ -70,7 +71,9 @@ public:
                           handshakesManagerThread(boost::bind(&StorageController::ProcessHandshakesMessages, this)),
                           shutdownThreads(false),
                           rate(STORAGE_MIN_RATE),
-                          maxblocksgap(DEFAULT_STORAGE_MAX_BLOCK_GAP) {}
+                          maxblocksgap(DEFAULT_STORAGE_MAX_BLOCK_GAP)
+    {
+    }
     // Init function
     void InitStorages(const boost::filesystem::path &dataDir, const boost::filesystem::path &tempDataDir);
     // ProcessMessage function

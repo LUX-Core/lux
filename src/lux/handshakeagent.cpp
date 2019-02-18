@@ -12,9 +12,9 @@ void HandshakeAgent::StartHandshake(const StorageProposal &proposal, CNode* pNod
 
     pNode->PushMessage("dfshandshake", handshake);
 
-    mapTimers[proposal.orderHash] = new CancelingSetTimeout(std::chrono::milliseconds(30000),
-                                                            nullptr,
-                                                            [handshake](){ storageController->PushHandshake(handshake, false); });
+    mapTimers[proposal.orderHash] =  std::make_shared<CancelingSetTimeout>(std::chrono::milliseconds(30000),
+                                                                           nullptr,
+                                                                           [handshake](){ storageController->PushHandshake(handshake, false); });
     return ;
 }
 
@@ -40,8 +40,7 @@ void HandshakeAgent::CancelWait(const uint256 &orderHash)
     if (it == mapTimers.end()) {
         return ;
     }
-    auto *timer = it->second;
+    auto timer = it->second;
     timer->Cancel();
-    delete timer;
     mapTimers.erase(it);
 }

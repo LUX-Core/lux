@@ -293,9 +293,9 @@ void StorageController::AnnounceOrder(const StorageOrder &order, const boost::fi
     boost::lock_guard<boost::mutex> lock(mutex);
     mapLocalFiles[order.GetHash()] = path;
     proposalsAgent.ListenProposals(order.GetHash());
-    CancelingSetTimeout timer(std::chrono::milliseconds(60000),
-                              nullptr,
-                              [this](){ Notify(BackgroundJobs::CHECK_PROPOSALS); });
+    mapTimers[order.GetHash()] = std::make_shared<CancelingSetTimeout>(std::chrono::milliseconds(60000),
+                                                                       nullptr,
+                                                                       [this](){ Notify(BackgroundJobs::CHECK_PROPOSALS); });
 }
 
 bool StorageController::CancelOrder(const uint256 &orderHash)
@@ -639,9 +639,9 @@ void StorageController::ProcessProposalsMessages()
     while (true) {
         boost::this_thread::interruption_point();
 
-        if(qJobs.size()) {
+        if(!qJobs.size() && !shutdownThreads) {
             boost::unique_lock<boost::mutex> lock(jobsMutex);
-            jobsHandler.wait(lock, [this]() { return qJobs.size() != 0 || shutdownThreads; });
+            jobsHandler.wait(lock, [this]() { return qJobs.size() || shutdownThreads; });
         }
 
         if (shutdownThreads) {
@@ -688,7 +688,7 @@ void StorageController::ProcessHandshakesMessages()
     while (true) {
         boost::this_thread::interruption_point();
 
-        if(qHandshakes.size()) {
+        if(!qHandshakes.size() && !shutdownThreads) {
             boost::unique_lock<boost::mutex> lock(handshakesMutex);
             handshakesHandler.wait(lock, [this]() { return qHandshakes.size() != 0 || shutdownThreads; });
         }
