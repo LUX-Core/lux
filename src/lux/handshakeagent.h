@@ -18,7 +18,8 @@ protected:
 public:
     void StartHandshake(const StorageProposal &proposal, CNode* pNode);
     void Add(StorageHandshake handshake);
-    const StorageHandshake *Find(uint256 orderHash);
+    const StorageHandshake Get(uint256 orderHash);
+    bool Exist(uint256 orderHash);
     void CancelWait(const uint256 &orderHash);
 protected:
 };

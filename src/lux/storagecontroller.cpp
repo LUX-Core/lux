@@ -30,34 +30,29 @@ struct ReplicaStream
     inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion) {
         std::vector<char> buf(BUFFER_SIZE);
 
-        if (!ser_action.ForRead()) {
-            const auto *order = storageController->GetAnnounce(currentOrderHash);
+        READWRITE(currentOrderHash);
+        READWRITE(merkleRootHash);
+        READWRITE(keys);
+        const auto *order = storageController->GetAnnounce(currentOrderHash);
+        if (order) {
             const auto fileSize = GetCryptoReplicaSize(order->fileSize);
-
-            READWRITE(currentOrderHash);
-            READWRITE(merkleRootHash);
-            READWRITE(keys);
-            for (auto i = 0u; i < fileSize;) {
-                uint64_t n = std::min(BUFFER_SIZE, fileSize - i);
-                buf.resize(n);
-                filestream.read(&buf[0], n);  // TODO: change to loop of readsome
-                if (buf.empty()) {
-                    break;
+            if (!ser_action.ForRead()) {
+                for (auto i = 0u; i < fileSize;) {
+                    uint64_t n = std::min(BUFFER_SIZE, fileSize - i);
+                    buf.resize(n);
+                    filestream.read(&buf[0], n);  // TODO: change to loop of readsome
+                    if (buf.empty()) {
+                        break;
+                    }
+                    READWRITE(buf);
+                    i += buf.size();
                 }
-                READWRITE(buf);
-                i += buf.size();
-            }
-        } else {
-            READWRITE(currentOrderHash);
-            READWRITE(merkleRootHash);
-            READWRITE(keys);
-
-            const auto *order = storageController->GetAnnounce(currentOrderHash);
-            const auto fileSize = GetCryptoReplicaSize(order->fileSize);
-            for (auto i = 0u; i < fileSize;) {
-                READWRITE(buf);
-                filestream.write(&buf[0], buf.size());
-                i += buf.size();
+            } else {
+                for (auto i = 0u; i < fileSize;) {
+                    READWRITE(buf);
+                    filestream.write(&buf[0], buf.size());
+                    i += buf.size();
+                }
             }
         }
     }
@@ -217,8 +212,7 @@ void StorageController::ProcessStorageMessage(CNode* pfrom, const std::string& s
         }
         const auto *order = GetAnnounce(orderHash);
         if (order) {
-            const auto *handshake = handshakeAgent.Find(orderHash);
-            if (!handshake) {
+            if (!handshakeAgent.Exist(orderHash)) {
                 LogPrint("dfs", "Handshake \"%s\" not found", orderHash.ToString());
                 fs::remove(tempFile);
                 return ;

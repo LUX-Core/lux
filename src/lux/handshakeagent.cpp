@@ -23,15 +23,19 @@ void HandshakeAgent::Add(StorageHandshake handshake)
     mapReceivedHandshakes[handshake.orderHash] = handshake;
 }
 
-const StorageHandshake *HandshakeAgent::Find(uint256 orderHash)
+const StorageHandshake HandshakeAgent::Get(uint256 orderHash)
 {
     auto itHandshake = mapReceivedHandshakes.find(orderHash);
     if (itHandshake == mapReceivedHandshakes.end()) {
-        return nullptr;
+        return {};
     }
-    StorageHandshake handshake = itHandshake->second;
-    StorageHandshake *ret = &handshake;
-    return ret;
+    return itHandshake->second;
+}
+
+bool HandshakeAgent::Exist(uint256 orderHash)
+{
+    auto itHandshake = mapReceivedHandshakes.find(orderHash);
+    return (itHandshake != mapReceivedHandshakes.end());
 }
 
 void HandshakeAgent::CancelWait(const uint256 &orderHash)
