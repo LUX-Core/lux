@@ -5987,7 +5987,7 @@ void static ProcessGetData(CNode* pfrom, const Consensus::Params& consensusParam
                 }
             } else if (inv.type == MSG_STORAGE_ORDER_ANNOUNCE) {
                 const auto *announce = storageController->GetAnnounce(inv.hash);
-                if (announce != nullptr) {
+                if (announce) {
                     CDataStream ss(SER_NETWORK, PROTOCOL_VERSION);
                     ss.reserve(1000);
                     ss << (*announce);

@@ -30,32 +30,34 @@ struct ReplicaStream
     inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion) {
         std::vector<char> buf(BUFFER_SIZE);
 
-        const auto *order = storageController->GetAnnounce(currentOrderHash);
-        const auto fileSize = GetCryptoReplicaSize(order->fileSize);
-        if (order) {
-            if (!ser_action.ForRead()) {
-                READWRITE(currentOrderHash);
-                READWRITE(merkleRootHash);
-                READWRITE(keys);
-                for (auto i = 0u; i < fileSize;) {
-                    uint64_t n = std::min(BUFFER_SIZE, fileSize - i);
-                    buf.resize(n);
-                    filestream.read(&buf[0], n);  // TODO: change to loop of readsome
-                    if (buf.empty()) {
-                        break;
-                    }
-                    READWRITE(buf);
-                    i += buf.size();
+        if (!ser_action.ForRead()) {
+            const auto *order = storageController->GetAnnounce(currentOrderHash);
+            const auto fileSize = GetCryptoReplicaSize(order->fileSize);
+
+            READWRITE(currentOrderHash);
+            READWRITE(merkleRootHash);
+            READWRITE(keys);
+            for (auto i = 0u; i < fileSize;) {
+                uint64_t n = std::min(BUFFER_SIZE, fileSize - i);
+                buf.resize(n);
+                filestream.read(&buf[0], n);  // TODO: change to loop of readsome
+                if (buf.empty()) {
+                    break;
                 }
-            } else {
-                READWRITE(currentOrderHash);
-                READWRITE(merkleRootHash);
-                READWRITE(keys);
-                for (auto i = 0u; i < fileSize;) {
-                    READWRITE(buf);
-                    filestream.write(&buf[0], buf.size());
-                    i += buf.size();
-                }
+                READWRITE(buf);
+                i += buf.size();
+            }
+        } else {
+            READWRITE(currentOrderHash);
+            READWRITE(merkleRootHash);
+            READWRITE(keys);
+
+            const auto *order = storageController->GetAnnounce(currentOrderHash);
+            const auto fileSize = GetCryptoReplicaSize(order->fileSize);
+            for (auto i = 0u; i < fileSize;) {
+                READWRITE(buf);
+                filestream.write(&buf[0], buf.size());
+                i += buf.size();
             }
         }
     }
@@ -573,7 +575,7 @@ CNode *StorageController::TryConnectToNode(const CService &address, int maxAttem
         for (size_t nLoop = 0; nLoop < maxAttempt && pNode == nullptr; ++nLoop) {
             CAddress addr;
             OpenNetworkConnection(addr, false, NULL, address.ToStringIPPort().c_str());
-            for (int i = 0; i < 10 && i < nLoop; ++i) {
+            for (size_t i = 0; i < 10 && i < nLoop; ++i) {
                 MilliSleep(500);
             }
             pNode = FindNode(address);
