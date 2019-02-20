@@ -20,13 +20,13 @@ namespace {
 #if OPENSSL_VERSION_NUMBER < 0x10100005L
     static void RSA_get0_key(const RSA *r, const BIGNUM **n, const BIGNUM **e, const BIGNUM **d)
     {
-        if(n != NULL)
+        if(n)
             *n = r->n;
 
-        if(e != NULL)
+        if(e)
             *e = r->e;
 
-        if(d != NULL)
+        if(d)
             *d = r->d;
     }
 #endif
