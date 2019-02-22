@@ -2,6 +2,7 @@
 #ifndef MASTERNODEMANAGER_H
 #define MASTERNODEMANAGER_H
 
+#include "optionsmodel.h"
 #include "util.h"
 #include "sync.h"
 
@@ -16,6 +17,7 @@ namespace Ui {
     class MasternodeManager;
 }
 class ClientModel;
+class OptionsModel;
 class WalletModel;
 
 QT_BEGIN_NAMESPACE
@@ -39,7 +41,7 @@ public slots:
     void updateNodeList();
     void updateLuxNode(QString alias, QString addr, QString privkey, QString collateral);
     
-signals:
+Q_SIGNALS:
 
 private:
     QTimer *timer;
@@ -48,13 +50,14 @@ private:
     WalletModel *walletModel;
     CCriticalSection cs_adrenaline;
     int64_t nTimeFilterUpdated;
-	bool fFilterUpdated;
-	QFuture<void> f1;
+    bool fFilterUpdated;
+    QFuture<void> f1;
     void subscribeToCoreSignals();
     void unsubscribeFromCoreSignals();
    
 private slots:
-    void on_copyAddressButton_clicked();
+    void setPMNsVisible(bool);
+    //void on_copyAddressButton_clicked();
     void on_createButton_clicked();
     void on_editButton_clicked();
     void on_getConfigButton_clicked();

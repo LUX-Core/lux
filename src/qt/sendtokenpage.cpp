@@ -57,7 +57,7 @@ SendTokenPage::SendTokenPage(QWidget *parent) :
     connect(ui->lineEditAmount, SIGNAL(valueChanged()), SLOT(on_updateConfirmButton()));
     connect(ui->confirmButton, SIGNAL(clicked()), SLOT(on_confirmClicked()));
 
-    ui->lineEditPayTo->setCheckValidator(new BitcoinAddressCheckValidator(parent, false));
+    ui->lineEditPayTo->setCheckValidator(new BitcoinAddressCheckValidator(parent));
 }
 
 SendTokenPage::~SendTokenPage()
@@ -80,8 +80,8 @@ void SendTokenPage::setClientModel(ClientModel *_clientModel)
 
     if (m_clientModel)
     {
-        connect(m_clientModel, SIGNAL(numBlocksChanged(int)), this, SLOT(on_numBlocksChanged()));
-        on_numBlocksChanged();
+        connect(m_clientModel, SIGNAL(numBlocksChanged(int)), this, SLOT(on_numBlocksChanged(int)));
+        on_numBlocksChanged(1);
     }
 }
 
@@ -121,19 +121,25 @@ void SendTokenPage::on_clearButton_clicked()
     clearAll();
 }
 
-void SendTokenPage::on_numBlocksChanged()
+void SendTokenPage::on_numBlocksChanged(int newHeight)
 {
     if(m_clientModel)
     {
-        uint64_t blockGasLimit = 0;
-        uint64_t minGasPrice = 0;
-        uint64_t nGasPrice = 0;
-        m_clientModel->getGasInfo(blockGasLimit, minGasPrice, nGasPrice);
+        if (lastUpdatedHeight < newHeight) {
+            uint64_t blockGasLimit = 0;
+            uint64_t minGasPrice = 0;
+            uint64_t nGasPrice = 0;
+            m_clientModel->getGasInfo(blockGasLimit, minGasPrice, nGasPrice);
 
-        ui->labelGasLimit->setToolTip(tr("Gas limit: Default = %1, Max = %2.").arg(DEFAULT_GAS_LIMIT_OP_SEND).arg(blockGasLimit));
-        ui->labelGasPrice->setToolTip(tr("Gas price: LUX/gas unit. Default = %1, Min = %2.").arg(QString::fromStdString(FormatMoney(DEFAULT_GAS_PRICE))).arg(QString::fromStdString(FormatMoney(minGasPrice))));
-        ui->lineEditGasPrice->setMinimum(minGasPrice);
-        ui->lineEditGasLimit->setMaximum(blockGasLimit);
+            ui->labelGasLimit->setToolTip(
+                    tr("Gas limit: Default = %1, Max = %2.").arg(DEFAULT_GAS_LIMIT_OP_SEND).arg(blockGasLimit));
+            ui->labelGasPrice->setToolTip(tr("Gas price: LUX/gas unit. Default = %1, Min = %2.").arg(
+                    QString::fromStdString(FormatMoney(DEFAULT_GAS_PRICE))).arg(
+                    QString::fromStdString(FormatMoney(minGasPrice))));
+            ui->lineEditGasPrice->setMinimum(minGasPrice);
+            ui->lineEditGasLimit->setMaximum(blockGasLimit);
+            lastUpdatedHeight = newHeight;
+        }
     }
 }
 

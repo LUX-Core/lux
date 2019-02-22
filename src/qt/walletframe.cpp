@@ -12,9 +12,10 @@
 #include <QHBoxLayout>
 #include <QLabel>
 
-WalletFrame::WalletFrame(BitcoinGUI *_gui) :
+WalletFrame::WalletFrame(const PlatformStyle *platformStyle, BitcoinGUI *_gui) :
     QFrame(_gui),
-    gui(_gui)
+    gui(_gui),
+    platformStyle(platformStyle)
 {
     // Leave HBox hook for adding a list view later
     QHBoxLayout* walletFrameLayout = new QHBoxLayout(this);
@@ -44,19 +45,25 @@ bool WalletFrame::addWallet(const QString& name, WalletModel* walletModel)
     if (!gui || !clientModel || !walletModel || mapWalletViews.count(name) > 0)
         return false;
 
-    WalletView *walletView = new WalletView(this);
+    WalletView *walletView = new WalletView(platformStyle, this);
     walletView->setBitcoinGUI(gui);
     walletView->setClientModel(clientModel);
     walletView->setWalletModel(walletModel);
     walletView->showOutOfSyncWarning(bOutOfSync);
 
-    /* TODO we should goto the currently selected page once dynamically adding wallets is supported */
-    walletView->gotoOverviewPage();
+    WalletView* CurrentWalletView = currentWalletView();
+    if (CurrentWalletView) {
+        walletView->setCurrentIndex(CurrentWalletView->currentIndex());
+    } else {
+        walletView->gotoOverviewPage();
+    }
+
     walletStack->addWidget(walletView);
     mapWalletViews[name] = walletView;
 
     // Ensure a walletView is able to show the main window
     connect(walletView, SIGNAL(showNormalIfMinimized()), gui, SLOT(showNormalIfMinimized()));
+    connect(walletView, SIGNAL(outOfSyncWarningClicked()), this, SLOT(outOfSyncWarningClicked()));
 
     return true;
 }
@@ -79,6 +86,7 @@ bool WalletFrame::removeWallet(const QString& name)
 
     WalletView* walletView = mapWalletViews.take(name);
     walletStack->removeWidget(walletView);
+    delete walletView;
     return true;
 }
 
@@ -119,13 +127,6 @@ void WalletFrame::gotoHistoryPage()
     QMap<QString, WalletView*>::const_iterator i;
     for (i = mapWalletViews.constBegin(); i != mapWalletViews.constEnd(); ++i)
         i.value()->gotoHistoryPage();
-}
-
-void WalletFrame::gotoTradingPage()
-{
-    QMap<QString, WalletView*>::const_iterator i;
-    for (i = mapWalletViews.constBegin(); i != mapWalletViews.constEnd(); ++i)
-        i.value()->gotoTradingPage();
 }
 
 void WalletFrame::gotoMasternodePage() // Masternode list
@@ -238,8 +239,10 @@ void WalletFrame::unlockWallet()
 void WalletFrame::lockWallet()
 {
     WalletView *walletView = currentWalletView();
-    if (walletView)
+    if (walletView) {
         walletView->lockWallet();
+        fWalletUnlockStakingOnly = false;
+    }
 }
 
 void WalletFrame::usedSendingAddresses()
@@ -259,4 +262,9 @@ void WalletFrame::usedReceivingAddresses()
 WalletView *WalletFrame::currentWalletView()
 {
     return qobject_cast<WalletView*>(walletStack->currentWidget());
+}
+
+void WalletFrame::outOfSyncWarningClicked()
+{
+    Q_EMIT requestedSyncWarningInfo();
 }

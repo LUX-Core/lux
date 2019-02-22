@@ -1,4 +1,6 @@
-// Copyright (c) 2012-2014 The Bitcoin developers               -*- c++ -*-
+// Copyright (c) 2012-2014 The Bitcoin developers
+// Copyright (c) 2014-2015 The Dash developers
+// Copyright (c) 2015-2018 The Luxcore developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -39,12 +41,12 @@ public:
         CDataStream ssKey(SER_DISK, CLIENT_VERSION);
         ssKey.reserve(ssKey.GetSerializeSize(key));
         ssKey << key;
-        leveldb::Slice slKey(&ssKey[0], ssKey.size());
+        leveldb::Slice slKey(ssKey.data(), ssKey.size());
 
         CDataStream ssValue(SER_DISK, CLIENT_VERSION);
         ssValue.reserve(ssValue.GetSerializeSize(value));
         ssValue << value;
-        leveldb::Slice slValue(&ssValue[0], ssValue.size());
+        leveldb::Slice slValue(ssValue.data(), ssValue.size());
 
         batch.Put(slKey, slValue);
     }
@@ -55,7 +57,7 @@ public:
         CDataStream ssKey(SER_DISK, CLIENT_VERSION);
         ssKey.reserve(ssKey.GetSerializeSize(key));
         ssKey << key;
-        leveldb::Slice slKey(&ssKey[0], ssKey.size());
+        leveldb::Slice slKey(ssKey.data(), ssKey.size());
 
         batch.Delete(slKey);
     }
@@ -95,7 +97,7 @@ public:
         CDataStream ssKey(SER_DISK, CLIENT_VERSION);
         ssKey.reserve(ssKey.GetSerializeSize(key));
         ssKey << key;
-        leveldb::Slice slKey(&ssKey[0], ssKey.size());
+        leveldb::Slice slKey(ssKey.data(), ssKey.size());
 
         std::string strValue;
         leveldb::Status status = pdb->Get(readoptions, slKey, &strValue);
@@ -128,7 +130,7 @@ public:
         CDataStream ssKey(SER_DISK, CLIENT_VERSION);
         ssKey.reserve(ssKey.GetSerializeSize(key));
         ssKey << key;
-        leveldb::Slice slKey(&ssKey[0], ssKey.size());
+        leveldb::Slice slKey(ssKey.data(), ssKey.size());
 
         std::string strValue;
         leveldb::Status status = pdb->Get(readoptions, slKey, &strValue);

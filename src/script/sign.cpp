@@ -140,7 +140,7 @@ static CScript PushAll(const vector<valtype>& values)
     return result;
 }
 
-bool ProduceSignature(const BaseSignatureCreator& creator, const CScript& fromPubKey, SignatureData& sigdata)
+bool ProduceSignature(const BaseSignatureCreator& creator, const CScript& fromPubKey, SignatureData& sigdata, bool bVerify)
 {
     CScript script = fromPubKey;
     std::vector<valtype> result;
@@ -184,7 +184,9 @@ bool ProduceSignature(const BaseSignatureCreator& creator, const CScript& fromPu
     }
     sigdata.scriptSig = PushAll(result);
 
-    // Test solution
+    if (!bVerify)
+        return solved;
+
     return solved && VerifyScript(sigdata.scriptSig, fromPubKey, &sigdata.scriptWitness, STANDARD_SCRIPT_VERIFY_FLAGS, creator.Checker());
 }
 

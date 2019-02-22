@@ -16,13 +16,14 @@
 #include "csvmodelwriter.h"
 #include "editaddressdialog.h"
 #include "guiutil.h"
+#include "platformstyle.h"
 
 #include <QIcon>
 #include <QMenu>
 #include <QMessageBox>
 #include <QSortFilterProxyModel>
 
-AddressBookPage::AddressBookPage(Mode mode, Tabs tab, QWidget* parent) : QDialog(parent),
+AddressBookPage::AddressBookPage(const PlatformStyle *platformStyle, Mode mode, Tabs tab, QWidget* parent) : QDialog(parent),
                                                                          ui(new Ui::AddressBookPage),
                                                                          model(0),
                                                                          mode(mode),
@@ -30,12 +31,17 @@ AddressBookPage::AddressBookPage(Mode mode, Tabs tab, QWidget* parent) : QDialog
 {
     ui->setupUi(this);
 
-#ifdef Q_OS_MAC // Icons on push buttons are very uncommon on Mac
-    ui->newAddress->setIcon(QIcon());
-    ui->copyAddress->setIcon(QIcon());
-    ui->deleteAddress->setIcon(QIcon());
-    ui->exportButton->setIcon(QIcon());
-#endif
+    if (!platformStyle->getImagesOnButtons()) {
+        ui->newAddress->setIcon(QIcon());
+        ui->copyAddress->setIcon(QIcon());
+        ui->deleteAddress->setIcon(QIcon());
+        ui->exportButton->setIcon(QIcon());
+    } else {
+        ui->newAddress->setIcon(platformStyle->SingleColorIcon(":/icons/add"));
+        ui->copyAddress->setIcon(platformStyle->SingleColorIcon(":/icons/editcopy"));
+        ui->deleteAddress->setIcon(platformStyle->SingleColorIcon(":/icons/remove"));
+        ui->exportButton->setIcon(platformStyle->SingleColorIcon(":/icons/export"));
+    }
 
     switch (mode) {
     case ForSelection:
@@ -82,7 +88,7 @@ AddressBookPage::AddressBookPage(Mode mode, Tabs tab, QWidget* parent) : QDialog
     deleteAction = new QAction(ui->deleteAddress->text(), this);
 
     // Build context menu
-    contextMenu = new QMenu();
+    contextMenu = new QMenu(this);
     contextMenu->addAction(copyAddressAction);
     contextMenu->addAction(copyLabelAction);
     contextMenu->addAction(editAction);
@@ -248,7 +254,7 @@ void AddressBookPage::done(int retval)
     // Figure out which address was selected, and return it
     QModelIndexList indexes = table->selectionModel()->selectedRows(AddressTableModel::Address);
 
-    foreach (QModelIndex index, indexes) {
+    Q_FOREACH (QModelIndex index, indexes) {
         QVariant address = table->model()->data(index);
         returnValue = address.toString();
     }

@@ -1,7 +1,6 @@
-// Copyright (c) 2009-2010 Satoshi Nakamoto
-// Copyright (c) 2009-2014 The Bitcoin developers
+// Copyright (c) 2012-2014 The Bitcoin developers
 // Copyright (c) 2014-2015 The Dash developers
-// Copyright (c) 2015-2017 The LUX developers
+// Copyright (c) 2015-2018 The Luxcore developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -98,6 +97,8 @@ std::string to_internal(const std::string&);
 } // namespace boost
 
 using namespace std;
+
+regex hexData("^([0-9a-fA-f]{2,}$)");
 
 //LUX only features
 int nLogFile = 1;
@@ -398,7 +399,7 @@ void ParseParameters(int argc, const char* const argv[])
     }
 
     // New 0.6 features:
-    for (const std::pair<string, string> & entry : mapArgs) {
+    for (const PAIRTYPE(string, string) & entry : mapArgs) {
         // interpret -nofoo as -foo=0 (and -nofoo=0 as -foo=1) as long as -foo not set
         InterpretNegativeSetting(entry.first, mapArgs);
     }
@@ -468,6 +469,21 @@ void ForceSetArg(const std::string& strArg, const std::string& strValue)
 {
     //LOCK(cs_args);
     mapArgs[strArg] = strValue;
+}
+
+static const int screenWidth = 79;
+static const int optIndent = 2;
+static const int msgIndent = 7;
+
+std::string HelpMessageGroup(const std::string &message) {
+    return std::string(message) + std::string("\n\n");
+}
+
+std::string HelpMessageOpt(const std::string &option, const std::string &message) {
+    return std::string(optIndent,' ') + std::string(option) +
+           std::string("\n") + std::string(msgIndent,' ') +
+           FormatParagraph(message, screenWidth - msgIndent, msgIndent) +
+           std::string("\n\n");
 }
 
 static std::string FormatException(std::exception* pex, const char* pszThread)
@@ -663,7 +679,7 @@ bool TryCreateDirectory(const boost::filesystem::path& p)
 {
     try {
         return boost::filesystem::create_directory(p);
-    } catch (boost::filesystem::filesystem_error) {
+    } catch (boost::filesystem::filesystem_error& e) {
         if (!boost::filesystem::exists(p) || !boost::filesystem::is_directory(p))
             throw;
     }

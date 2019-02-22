@@ -1,11 +1,13 @@
-// Copyright (c) 2009-2010 Satoshi Nakamoto                     -*- c++ -*-
-// Copyright (c) 2009-2014 The Bitcoin developers
+// Copyright (c) 2012-2014 The Bitcoin developers
+// Copyright (c) 2014-2015 The Dash developers
+// Copyright (c) 2015-2018 The Luxcore developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #ifndef BITCOIN_KEYSTORE_H
 #define BITCOIN_KEYSTORE_H
 
+#include "hdchain.h"
 #include "key.h"
 #include "pubkey.h"
 #include "script/standard.h"
@@ -61,6 +63,7 @@ protected:
     WatchKeyMap mapWatchKeys;
     ScriptMap mapScripts;
     WatchOnlySet setWatchOnly;
+    CHDChain hdChain;
 
     void ImplicitlyLearnRelatedKeyScripts(const CPubKey& pubkey);
 
@@ -78,6 +81,7 @@ public:
     bool RemoveWatchOnly(const CScript& dest) override;
     bool HaveWatchOnly(const CScript& dest) const override;
     bool HaveWatchOnly() const override;
+    bool GetHDChain(CHDChain& hdChainRet) const;
 };
 
 typedef std::vector<unsigned char, secure_allocator<unsigned char> > CKeyingMaterial;

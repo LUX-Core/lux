@@ -44,10 +44,9 @@ share/qt/Info.plist
 src/univalue/gen
 
 src/qt/*.moc
-src/qt/moc_*.cpp
 src/qt/forms/ui_*.h
-
-src/qt/test/moc*.cpp
+src/lux-installer/src/forms/ui_*.h
+moc_*.cpp
 
 .deps
 .dirstamp
@@ -123,5 +122,11 @@ qa/pull-tester/test.*/*
 .idea
 
 contrib/devtools/split-debug.sh
+
+depends/built/
+depends/Release/
+depends/sources/
+depends/i686-w64-mingw32/
+depends/x86_64-w64-mingw32/
 
 /src/DEBUG_DUMP_STAKING_INFO.hpp

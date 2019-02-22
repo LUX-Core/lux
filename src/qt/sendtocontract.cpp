@@ -70,7 +70,7 @@ SendToContract::SendToContract(QWidget *parent) :
     ui->labelSenderAddress->setToolTip(tr("The quantum address that will be used as sender."));
 
     m_tabInfo = new TabBarInfo(ui->stackedWidget);
-    m_tabInfo->addTab(0, tr("Send To Contract"));
+    m_tabInfo->addTab(0, tr("Write to Contract"));
 
     // Set defaults
     ui->lineEditGasPrice->setValue(DEFAULT_GAS_PRICE);
@@ -168,8 +168,8 @@ void SendToContract::setClientModel(ClientModel *_clientModel)
 
     if (m_clientModel)
     {
-        connect(m_clientModel, SIGNAL(numBlocksChanged(int)), this, SLOT(on_numBlocksChanged()));
-        on_numBlocksChanged();
+        connect(m_clientModel, SIGNAL(numBlocksChanged(int)), this, SLOT(on_numBlocksChanged(int)));
+        on_numBlocksChanged(1);
     }
 }
 
@@ -238,27 +238,34 @@ void SendToContract::on_sendToContractClicked()
                 widgetResult->setResultData(result, FunctionABI(), m_ABIFunctionField->getParamsValues(), ContractResult::SendToResult);
                 widgetResult->show();
             } else {
-                QMessageBox::warning(this, tr("Send to contract"), errorMessage);
+                QMessageBox::warning(this, tr("Write to Contract"), errorMessage);
             }
         }
     }
 }
 
-void SendToContract::on_numBlocksChanged()
+void SendToContract::on_numBlocksChanged(int newHeight)
 {
     if(m_clientModel)
     {
-        uint64_t blockGasLimit = 0;
-        uint64_t minGasPrice = 0;
-        uint64_t nGasPrice = 0;
-        m_clientModel->getGasInfo(blockGasLimit, minGasPrice, nGasPrice);
 
-        ui->labelGasLimit->setToolTip(tr("Gas limit: Default = %1, Max = %2.").arg(DEFAULT_GAS_LIMIT_OP_SEND).arg(blockGasLimit));
-        ui->labelGasPrice->setToolTip(tr("Gas price: LUX price per gas unit. Default = %1, Min = %2.").arg(QString::fromStdString(FormatMoney(DEFAULT_GAS_PRICE))).arg(QString::fromStdString(FormatMoney(minGasPrice))));
-        ui->lineEditGasPrice->setMinimum(minGasPrice);
-        ui->lineEditGasLimit->setMaximum(blockGasLimit);
+        if (lastUpdatedHeight < newHeight) {
+            uint64_t blockGasLimit = 0;
+            uint64_t minGasPrice = 0;
+            uint64_t nGasPrice = 0;
+            m_clientModel->getGasInfo(blockGasLimit, minGasPrice, nGasPrice);
 
-        ui->lineEditSenderAddress->on_refresh();
+            ui->labelGasLimit->setToolTip(
+                    tr("Gas limit: Default = %1, Max = %2.").arg(DEFAULT_GAS_LIMIT_OP_SEND).arg(blockGasLimit));
+            ui->labelGasPrice->setToolTip(tr("Gas price: LUX price per gas unit. Default = %1, Min = %2.").arg(
+                    QString::fromStdString(FormatMoney(DEFAULT_GAS_PRICE))).arg(
+                    QString::fromStdString(FormatMoney(minGasPrice))));
+            ui->lineEditGasPrice->setMinimum(minGasPrice);
+            ui->lineEditGasLimit->setMaximum(blockGasLimit);
+
+            ui->lineEditSenderAddress->on_refresh();
+            lastUpdatedHeight = newHeight;
+        }
     }
 }
 

@@ -20,6 +20,7 @@
 #include "splashscreen.h"
 #include "utilitydialog.h"
 #include "winshutdownmonitor.h"
+#include "platformstyle.h"
 
 #ifdef ENABLE_WALLET
 #include "paymentserver.h"
@@ -153,19 +154,30 @@ static void initTranslations(QTranslator& qtTranslatorBase, QTranslator& qtTrans
         QApplication::installTranslator(&translator);
 }
 
-/* qDebug() message handler --> debug.log */
+/*  qDebug() message handler --> debug.log 
+
+    Also includes a very basic warning suppressor, we want to use it to remove useless clutter from the debug log. It currently 
+    suppresses warnings from broken QT functionality (QFont's setPixelSize unwarranted "warnings")
+
+*/
 #if QT_VERSION < 0x050000
 void DebugMessageHandler(QtMsgType type, const char* msg)
 {
     const char* category = (type == QtDebugMsg) ? "qt" : NULL;
-    LogPrint(category, "GUI: %s\n", msg);
+    if (msg == "QFont::setPixelSize: Pixel size <= 0 (0)") {
+        return;
+    }
+    else LogPrint(category, "GUI: %s\n", msg);
 }
 #else
 void DebugMessageHandler(QtMsgType type, const QMessageLogContext& context, const QString& msg)
 {
     Q_UNUSED(context);
     const char* category = (type == QtDebugMsg) ? "qt" : NULL;
-    LogPrint(category, "GUI: %s\n", msg.toStdString());
+    if (msg == "QFont::setPixelSize: Pixel size <= 0 (0)") {
+        return; 
+    }
+    else LogPrint(category, "GUI: %s\n", msg.toStdString());
 }
 #endif
 
@@ -178,22 +190,17 @@ class BitcoinCore : public QObject
 public:
     explicit BitcoinCore();
 
-public slots:
+public Q_SLOTS:
     void initialize();
     void shutdown();
     void restart(QStringList args);
 
-signals:
+Q_SIGNALS:
     void initializeResult(int retval);
     void shutdownResult(int retval);
     void runawayException(const QString& message);
 
 private:
-    boost::thread_group threadGroup;
-    CScheduler scheduler;
-
-    /// Flag indicating a restart
-    bool execute_restart;
 
     /// Pass fatal exception message to UI thread
     void handleRunawayException(std::exception* e);
@@ -231,13 +238,13 @@ public:
 
     void restoreWallet();
 
-public slots:
+public Q_SLOTS:
     void initializeResult(int retval);
     void shutdownResult(int retval);
     /// Handle runaway exceptions. Shows a message box with the problem and quits the program.
     void handleRunawayException(const QString& message);
 
-signals:
+Q_SIGNALS:
     void requestedInitialize();
     void requestedRestart(QStringList args);
     void requestedShutdown();
@@ -255,6 +262,8 @@ private:
     WalletModel* walletModel;
 #endif
     int returnValue;
+    const PlatformStyle* platformStyle;
+    std::unique_ptr<QWidget> shutdownWindow;
 
     void startThread();
 
@@ -272,23 +281,15 @@ BitcoinCore::BitcoinCore() : QObject()
 void BitcoinCore::handleRunawayException(std::exception* e)
 {
     PrintExceptionContinue(e, "Runaway exception");
-    emit runawayException(QString::fromStdString(strMiscWarning));
+    Q_EMIT runawayException(QString::fromStdString(strMiscWarning));
 }
 
 void BitcoinCore::initialize()
 {
-    execute_restart = true;
-
     try {
         qDebug() << __func__ << ": Running AppInit2 in thread";
-        int rv = AppInit2(threadGroup, scheduler);
-        if (rv) {
-            /* Start a dummy RPC thread if no RPC thread is active yet
-             * to handle timeouts.
-             */
-            StartDummyRPCThread();
-        }
-        emit initializeResult(rv);
+        int rv = AppInit2();
+        Q_EMIT initializeResult(rv);
     } catch (std::exception& e) {
         handleRunawayException(&e);
     } catch (...) {
@@ -298,15 +299,17 @@ void BitcoinCore::initialize()
 
 void BitcoinCore::restart(QStringList args)
 {
-    if (execute_restart) { // Only restart 1x, no matter how often a user clicks on a restart-button
-        execute_restart = false;
+    static bool executing_restart{false};
+
+    if(!executing_restart) { // Only restart 1x, no matter how often a user clicks on a restart-button
+        executing_restart = true;
         try {
             qDebug() << __func__ << ": Running Restart in thread";
-            threadGroup.interrupt_all();
-            threadGroup.join_all();
+            Interrupt();
+            StartRestart();
             PrepareShutdown();
             qDebug() << __func__ << ": Shutdown finished";
-            emit shutdownResult(1);
+            Q_EMIT shutdownResult(1);
             CExplicitNetCleanup::callCleanup();
             QProcess::startDetached(QApplication::applicationFilePath(), args);
             qDebug() << __func__ << ": Restart initiated...";
@@ -323,11 +326,10 @@ void BitcoinCore::shutdown()
 {
     try {
         qDebug() << __func__ << ": Running Shutdown in thread";
-        threadGroup.interrupt_all();
-        threadGroup.join_all();
+        Interrupt();
         Shutdown();
         qDebug() << __func__ << ": Shutdown finished";
-        emit shutdownResult(1);
+        Q_EMIT shutdownResult(1);
     } catch (std::exception& e) {
         handleRunawayException(&e);
     } catch (...) {
@@ -348,13 +350,28 @@ BitcoinApplication::BitcoinApplication(int& argc, char** argv) : QApplication(ar
                                                                  returnValue(0)
 {
     setQuitOnLastWindowClosed(false);
+    // UI per-platform customization
+    // This must be done inside the BitcoinApplication constructor, or after it, because
+    // PlatformStyle::instantiate requires a QApplication
+#if defined(Q_OS_MAC)
+    std::string platformName = "macosx";
+#elif defined(Q_OS_WIN)
+    std::string platformName = "windows";
+#else
+    std::string platformName = "other";
+#endif
+    platformName = GetArg("-uiplatform", platformName);
+    platformStyle = PlatformStyle::instantiate(QString::fromStdString(platformName));
+    if (!platformStyle) // Fall back to "other" if specified name not found
+        platformStyle = PlatformStyle::instantiate("other");
+    assert(platformStyle);
 }
 
 BitcoinApplication::~BitcoinApplication()
 {
     if (coreThread) {
         qDebug() << __func__ << ": Stopping thread";
-        emit stopThread();
+        Q_EMIT stopThread();
         coreThread->wait();
         qDebug() << __func__ << ": Stopped thread";
         delete coreThread;
@@ -381,6 +398,8 @@ BitcoinApplication::~BitcoinApplication()
         }
         delete optionsModel;
         optionsModel = 0;
+        delete platformStyle;
+        platformStyle = 0;
     }
 
 }
@@ -399,7 +418,7 @@ void BitcoinApplication::createOptionsModel()
 
 void BitcoinApplication::createWindow(const NetworkStyle* networkStyle)
 {
-    window = new BitcoinGUI(networkStyle, 0);
+    window = new BitcoinGUI(platformStyle, networkStyle, 0);
 
     pollShutdownTimer = new QTimer(window);
     connect(pollShutdownTimer, SIGNAL(timeout()), window, SLOT(detectShutdown()));
@@ -410,7 +429,7 @@ void BitcoinApplication::createSplashScreen(const NetworkStyle* networkStyle)
     SplashScreen* splash = new SplashScreen(0, networkStyle);
     // We don't hold a direct pointer to the splash screen after creation, so use
     // Qt::WA_DeleteOnClose to make sure that the window will be deleted eventually.
-    splash->setAttribute(Qt::WA_DeleteOnClose);
+//    splash->setAttribute(Qt::WA_DeleteOnClose);
     splash->show();
     connect(this, SIGNAL(splashFinished(QWidget*)), splash, SLOT(slotFinish(QWidget*)));
 }
@@ -441,12 +460,12 @@ void BitcoinApplication::requestInitialize()
 {
     qDebug() << __func__ << ": Requesting initialize";
     startThread();
-    emit requestedInitialize();
+    Q_EMIT requestedInitialize();
 }
 
 void BitcoinApplication::requestShutdown()
 {
-    ShutdownWindow::showShutdownWindow(window);
+    shutdownWindow.reset(ShutdownWindow::showShutdownWindow(window));
     qDebug() << __func__ << ": Requesting shutdown";
     startThread();
     window->hide();
@@ -469,8 +488,9 @@ void BitcoinApplication::requestShutdown()
     }
     clientModel = 0;
 
+    StartShutdown();
     // Request shutdown from core thread
-    emit requestedShutdown();
+    Q_EMIT requestedShutdown();
 }
 
 void BitcoinApplication::initializeResult(int retval)
@@ -479,6 +499,7 @@ void BitcoinApplication::initializeResult(int retval)
     // Set exit result: 0 if successful, 1 if failure
     returnValue = retval ? 0 : 1;
     if (retval) {
+        qWarning() << "Platform customization:" << platformStyle->getName();
 #ifdef ENABLE_WALLET
         PaymentServer::LoadRootCAs();
         paymentServer->setOptionsModel(optionsModel);
@@ -489,7 +510,7 @@ void BitcoinApplication::initializeResult(int retval)
 
 #ifdef ENABLE_WALLET
         if (pwalletMain) {
-            walletModel = new WalletModel(pwalletMain, optionsModel);
+            walletModel = new WalletModel(platformStyle, pwalletMain, optionsModel);
 
             window->addWallet(BitcoinGUI::DEFAULT_WALLET, walletModel);
             window->setCurrentWallet(BitcoinGUI::DEFAULT_WALLET);
@@ -505,7 +526,7 @@ void BitcoinApplication::initializeResult(int retval)
         } else {
             window->show();
         }
-        emit splashFinished(window);
+        Q_EMIT splashFinished(window);
 
 #ifdef ENABLE_WALLET
         // Now that initialization/startup is done, process any command-line
@@ -518,9 +539,9 @@ void BitcoinApplication::initializeResult(int retval)
             window, SLOT(message(QString, QString, unsigned int)));
         QTimer::singleShot(100, paymentServer, SLOT(uiReady()));
 #endif
-        pollShutdownTimer->start(150);
+        pollShutdownTimer->start(300);
     } else {
-        emit splashFinished(window);
+        Q_EMIT splashFinished(window);
         quit(); // Exit main loop
     }
 }
@@ -630,8 +651,8 @@ int main(int argc, char* argv[])
 
     // Show help message immediately after parsing command-line options (for "-lang") and setting locale,
     // but before showing splash screen.
-    if (mapArgs.count("-?") || mapArgs.count("-help") || mapArgs.count("-version")) {
-        HelpMessageDialog help(NULL, mapArgs.count("-version"));
+    if (mapArgs.count("-?") || mapArgs.count("-h") || mapArgs.count("-help") || mapArgs.count("-version")) {
+        HelpMessageDialog help(NULL, mapArgs.count("-version") ? HelpMessageDialog::about : HelpMessageDialog::cmdline);
         help.showOrPrint();
         return 1;
     }

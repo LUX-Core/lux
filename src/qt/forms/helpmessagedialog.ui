@@ -35,7 +35,17 @@
    <item>
     <layout class="QVBoxLayout" name="verticalLayout">
      <item>
+      <widget class="QTextEdit" name="helpMessage">
+       <property name="readOnly">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QScrollArea" name="scrollArea">
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
        <property name="verticalScrollBarPolicy">
         <enum>Qt::ScrollBarAlwaysOn</enum>
        </property>
@@ -53,12 +63,15 @@
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_2">
          <item>
-          <widget class="QLabel" name="helpMessageLabel">
+          <widget class="QLabel" name="aboutMessage">
            <property name="cursor">
             <cursorShape>IBeamCursor</cursorShape>
            </property>
            <property name="textFormat">
             <enum>Qt::PlainText</enum>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
            </property>
            <property name="openExternalLinks">
             <bool>true</bool>
@@ -71,6 +84,22 @@
         </layout>
        </widget>
       </widget>
+     </item>
+     <item>
+      <spacer name="verticalSpacer">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeType">
+        <enum>QSizePolicy::Fixed</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>4</width>
+         <height>4</height>
+        </size>
+       </property>
+      </spacer>
      </item>
      <item>
       <widget class="QDialogButtonBox" name="okButton">

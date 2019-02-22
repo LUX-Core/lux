@@ -1,8 +1,7 @@
-// Copyright (c) 2009-2010 Satoshi Nakamoto
-// Copyright (c) 2009-2014 The Bitcoin developers
+// Copyright (c) 2012-2014 The Bitcoin developers
 // Copyright (c) 2014-2015 The Dash developers
-// Copyright (c) 2015-2017 The LUX developers
-// Distributed under the MIT/X11 software license, see the accompanying
+// Copyright (c) 2015-2018 The Luxcore developers
+// Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #if defined(HAVE_CONFIG_H)
@@ -1808,8 +1807,12 @@ void StartNode(boost::thread_group& threadGroup, CScheduler& scheduler) {
     // Load addresses for peers.dat
     int64_t nStart = GetTimeMillis();{
         CAddrDB adb;
-        if (!adb.Read(addrman))
+        if (adb.Read(addrman))
+            LogPrintf("Loaded %i addresses from peers.dat  %dms\n", addrman.size(), GetTimeMillis() - nStart);
+        else {
             LogPrintf("Invalid or missing peers.dat; recreating\n");
+            DumpAddresses();
+        }
     }
 
     //try to read stored banlist
@@ -1822,8 +1825,11 @@ void StartNode(boost::thread_group& threadGroup, CScheduler& scheduler) {
 
         LogPrint("net", "Loaded %d banned node ips/subnets from banlist.dat  %dms\n",
                  banmap.size(), GetTimeMillis() - nStart);
-    } else
+    } else {
         LogPrintf("Invalid or missing banlist.dat; recreating\n");
+        CNode::SetBannedSetDirty(true);
+        DumpBanlist();
+    }
 
     fAddressesInitialized = true;
 
@@ -1880,9 +1886,11 @@ void StartNode(boost::thread_group& threadGroup, CScheduler& scheduler) {
 bool StopNode() {
     LogPrintf("StopNode()\n");
     MapPort(false);
-    if (semOutbound)
-        for (int i = 0; i < MAX_OUTBOUND_CONNECTIONS; i++)
+    if (semOutbound) {
+        for (int i = 0; i < MAX_OUTBOUND_CONNECTIONS; i++) {
             semOutbound->post();
+        }
+    }
 
     if (fAddressesInitialized) {
         DumpData();

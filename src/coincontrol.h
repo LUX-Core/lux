@@ -1,5 +1,7 @@
-// Copyright (c) 2011-2013 The Bitcoin developers               -*- c++ -*-
-// Distributed under the MIT/X11 software license, see the accompanying
+// Copyright (c) 2012-2014 The Bitcoin developers
+// Copyright (c) 2014-2015 The Dash developers
+// Copyright (c) 2015-2018 The Luxcore developers
+// Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #ifndef BITCOIN_COINCONTROL_H
@@ -23,6 +25,12 @@ public:
     bool fAllowWatchOnly;
     //! Minimum absolute fee (not per kilobyte)
     CAmount nMinimumTotalFee;
+    //! Override the default confirmation target, 0 = use default
+    int nConfirmTarget;
+    //! Override estimated feerate
+    bool fOverrideFeeRate;
+    //! Feerate to use if overrideFeeRate is true
+    CFeeRate nFeeRate;
 
     CCoinControl()
     {
@@ -40,6 +48,9 @@ public:
         nMinimumTotalFee = 0;
         fSplitBlock = false;
         nSplitBlock = 1;
+        nConfirmTarget = 0;
+        nFeeRate = CFeeRate(0);
+        fOverrideFeeRate = false;
     }
 
     bool HasSelected() const
@@ -68,7 +79,7 @@ public:
         setSelected.clear();
     }
 
-    void ListSelected(std::vector<COutPoint>& vOutpoints)
+    void ListSelected(std::vector<COutPoint>& vOutpoints) const
     {
         vOutpoints.assign(setSelected.begin(), setSelected.end());
     }

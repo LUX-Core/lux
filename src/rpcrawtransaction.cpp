@@ -1,16 +1,17 @@
-// Copyright (c) 2010 Satoshi Nakamoto
-// Copyright (c) 2009-2014 The Bitcoin developers
+// Copyright (c) 2012-2014 The Bitcoin developers
 // Copyright (c) 2014-2015 The Dash developers
-// Copyright (c) 2015-2017 The LUX developers
+// Copyright (c) 2015-2018 The Luxcore developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "base58.h"
+#include "coincontrol.h"
 #include "consensus/validation.h"
 #include "core_io.h"
 #include "init.h"
 #include "keystore.h"
 #include "main.h"
+#include "merkleblock.h"
 #include "net.h"
 #include "primitives/transaction.h"
 #include "rpcserver.h"
@@ -18,6 +19,7 @@
 #include "script/sign.h"
 #include "script/standard.h"
 #include "uint256.h"
+#include "utilmoneystr.h"
 #include "univalue/univalue.h"
 
 #ifdef ENABLE_WALLET
@@ -263,6 +265,8 @@ UniValue listunspent(const UniValue& params, bool fHelp)
             "    \"scriptPubKey\" : \"key\", (string) the script key\n"
             "    \"amount\" : x.xxx,         (numeric) the transaction amount in btc\n"
             "    \"confirmations\" : n       (numeric) The number of confirmations\n"
+            "    \"ds_rounds\" : n           (numeric) The number of ds round\n"
+            "    \"spendable\" : xxx,        (bool) Whether we have the private keys to spend this output\n"
             "    \"redeemScript\" : n        (string) The redeemScript if scriptPubKey is P2SH\n"
             "  }\n"
             "  ,...\n"
@@ -326,57 +330,224 @@ UniValue listunspent(const UniValue& params, bool fHelp)
             if (scriptPubKey.IsPayToScriptHash()) {
                 const CScriptID& hash = boost::get<CScriptID>(address);
                 CScript redeemScript;
-                if (pwalletMain->GetCScript(hash, redeemScript)) {
+                if (pwalletMain->GetCScript(hash, redeemScript))
                     entry.push_back(Pair("redeemScript", HexStr(redeemScript.begin(), redeemScript.end())));
-                }
             }
         }
-
-        entry.push_back(Pair("scriptPubKey", HexStr(scriptPubKey.begin(), scriptPubKey.end())));
         entry.push_back(Pair("amount", ValueFromAmount(out.tx->vout[out.i].nValue)));
         entry.push_back(Pair("confirmations", out.nDepth));
+        entry.push_back(Pair("ds_rounds", pwalletMain->GetInputDarkSendRounds(CTxIn(out.tx->GetHash(), out.i))));
         entry.push_back(Pair("spendable", out.fSpendable));
         results.push_back(entry);
     }
 
     return results;
 }
+
+UniValue fundrawtransaction(const UniValue& params, bool fHelp)
+{
+    if (fHelp || params.size() < 1 || params.size() > 3)
+        throw std::runtime_error(
+            "fundrawtransaction \"hexstring\" ( options iswitness )\n"
+            "\nAdd inputs to a transaction until it has enough in value to meet its out value.\n"
+            "This will not modify existing inputs, and will add at most one change output to the outputs.\n"
+            "No existing outputs will be modified.\n"
+            "Note that inputs which were signed may need to be resigned after completion since in/outputs have been added.\n"
+            "The inputs added will not be signed, use signrawtransaction for that.\n"
+            "Note that all existing inputs must have their previous output transaction be in the wallet.\n"
+            "Note that all inputs selected must be of standard form and P2SH scripts must be\n"
+            "in the wallet using importaddress or addmultisigaddress (to calculate fees).\n"
+            "You can see whether this is the case by checking the \"solvable\" field in the listunspent output.\n"
+            "Only pay-to-pubkey, multisig, and P2SH versions thereof are currently supported for watch-only\n"
+            "\nArguments:\n"
+            "1. \"hexstring\"           (string, required) The hex string of the raw transaction\n"
+            "2. options                 (object, optional)\n"
+            "   {\n"
+            "     \"changeAddress\"          (string, optional, default pool address) The lux address to receive the change\n"
+            "     \"changePosition\"         (numeric, optional, default random) The index of the change output\n"
+            "     \"includeWatching\"        (boolean, optional, default false) Also select inputs which are watch only\n"
+            "     \"lockUnspents\"           (boolean, optional, default false) Lock selected unspent outputs\n"
+            "     \"feeRate\"           (numeric, optional, default not set: makes wallet determine the fee) Set a specific feerate (" + CURRENCY_UNIT + " per KB)\n"
+            "     \"subtractFeeFromOutputs\" (array, optional) A json array of integers.\n"
+            "                              The fee will be equally deducted from the amount of each specified output.\n"
+            "                              The outputs are specified by their zero-based index, before any change output is added.\n"
+            "                              Those recipients will receive less lux than you enter in their corresponding amount field.\n"
+            "                              If no outputs are specified here, the sender pays the fee.\n"
+            "                                  [vout_index,...]\n"
+            "   }\n"
+            "                         for backward compatibility: passing in a true instead of an object will result in {\"includeWatching\":true}\n"
+            "3. iswitness               (boolean, optional) Whether the transaction hex is a serialized witness transaction \n"
+            "                              If iswitness is not present, heuristic tests will be used in decoding\n"
+
+            "\nResult:\n"
+            "{\n"
+            "  \"hex\":       \"value\", (string)  The resulting raw transaction (hex-encoded string)\n"
+            "  \"fee\":       n,         (numeric) Fee in " + CURRENCY_UNIT + " the resulting transaction pays\n"
+            "  \"changepos\": n          (numeric) The position of the added change output, or -1\n"
+            "}\n"
+            "\nExamples:\n"
+            "\nCreate a transaction with no inputs\n"
+            + HelpExampleCli("createrawtransaction", "\"[]\" \"{\\\"myaddress\\\":0.01}\"") +
+            "\nAdd sufficient unsigned inputs to meet the output value\n"
+            + HelpExampleCli("fundrawtransaction", "\"rawtransactionhex\"") +
+            "\nSign the transaction\n"
+            + HelpExampleCli("signrawtransaction", "\"fundedtransactionhex\"") +
+            "\nSend the transaction\n"
+            + HelpExampleCli("sendrawtransaction", "\"signedtransactionhex\"")
+            );
+
+    RPCTypeCheck(params, {UniValue::VSTR});
+
+    EnsureWalletIsUnlocked();
+
+    assert(pwalletMain != nullptr);
+    LOCK2(cs_main, pwalletMain->cs_wallet);
+
+    CCoinControl coinControl;
+    int changePosition = -1;
+    bool lockUnspents = false;
+    UniValue subtractFeeFromOutputs;
+    set<int> setSubtractFeeFromOutputs;
+    bool overrideEstimatedFeerate = false;
+    CFeeRate feeRate = CFeeRate(0);
+
+    if (!params[1].isNull()) {
+        if (params[1].type() == UniValue::VBOOL) {
+            // backward compatibility bool only fallback
+            coinControl.fAllowWatchOnly = params[1].get_bool();
+        } else {
+            RPCTypeCheck(params, {UniValue::VSTR, UniValue::VOBJ, UniValue::VBOOL});
+
+            UniValue options = params[1];
+
+            RPCTypeCheckObj(options,
+                {
+                    {"changeAddress", UniValue::VSTR},
+                    {"changePosition", UniValue::VNUM},
+                    {"includeWatching", UniValue::VBOOL},
+                    {"lockUnspents", UniValue::VBOOL},
+                    {"feeRate", UniValueType()},
+                    {"reserveChangeKey", UniValue::VBOOL}, // DEPRECATED (and ignored), should be removed in 0.16 or so.
+                    {"subtractFeeFromOutputs", (UniValue::VARR)},
+                },
+                true);
+
+            if (options.exists("changeAddress")) {
+                CTxDestination dest = DecodeDestination(options["changeAddress"].get_str());
+
+                if (!IsValidDestination(dest)) {
+                    throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "changeAddress must be a valid lux address");
+                }
+
+                coinControl.destChange = dest;
+            }
+
+            if (options.exists("changePosition"))
+                changePosition = options["changePosition"].get_int();
+
+            if (options.exists("includeWatching"))
+                coinControl.fAllowWatchOnly = options["includeWatching"].get_bool();
+
+            if (options.exists("lockUnspents"))
+                lockUnspents = options["lockUnspents"].get_bool();
+
+            if (options.exists("feeRate")) {
+            feeRate = CFeeRate(AmountFromValue(options["feeRate"]));
+            overrideEstimatedFeerate = true;
+             }
+
+            if (options.exists("subtractFeeFromOutputs"))
+            subtractFeeFromOutputs = options["subtractFeeFromOutputs"].get_array();
+        }
+    }
+
+    // parse hex string from parameter
+    CTransaction ctx;
+    bool try_no_witness = params[2].isNull() ? true : !params[2].get_bool();
+    if (!DecodeHexTx(ctx, params[0].get_str(), try_no_witness)) {
+        throw JSONRPCError(RPC_DESERIALIZATION_ERROR, "TX decode failed");
+    }
+
+    CMutableTransaction tx(ctx);
+
+    if (tx.vout.size() == 0)
+        throw JSONRPCError(RPC_INVALID_PARAMETER, "TX must have at least one output");
+
+    if (changePosition != -1 && (changePosition < 0 || (unsigned int)changePosition > tx.vout.size()))
+        throw JSONRPCError(RPC_INVALID_PARAMETER, "changePosition out of bounds");
+
+    for (unsigned int idx = 0; idx < subtractFeeFromOutputs.size(); idx++) {
+        int pos = subtractFeeFromOutputs[idx].get_int();
+        if (setSubtractFeeFromOutputs.count(pos))
+            throw JSONRPCError(RPC_INVALID_PARAMETER, strprintf("Invalid parameter, duplicated position: %d", pos));
+        if (pos < 0)
+            throw JSONRPCError(RPC_INVALID_PARAMETER, strprintf("Invalid parameter, negative position: %d", pos));
+        if (pos >= int(tx.vout.size()))
+            throw JSONRPCError(RPC_INVALID_PARAMETER, strprintf("Invalid parameter, position too large: %d", pos));
+        setSubtractFeeFromOutputs.insert(pos);
+    }
+
+    CAmount nFeeOut;
+    std::string strFailReason;
+
+    if (!pwalletMain->FundTransaction(tx, nFeeOut, overrideEstimatedFeerate, changePosition, strFailReason, lockUnspents, setSubtractFeeFromOutputs, &coinControl)) {
+        throw JSONRPCError(RPC_WALLET_ERROR, strFailReason);
+    }
+
+    UniValue result(UniValue::VOBJ);
+    result.push_back(Pair("hex", EncodeHexTx(tx)));
+    result.push_back(Pair("changepos", changePosition));
+    result.push_back(Pair("fee", ValueFromAmount(nFeeOut)));
+
+    return result;
+}
+
+
 #endif
 
 UniValue createrawtransaction(const UniValue& params, bool fHelp)
 {
-    if (fHelp || params.size() != 2)
+    if (fHelp || params.size() < 2 || params.size() > 4)
         throw runtime_error(
-            "createrawtransaction [{\"txid\":\"id\",\"vout\":n},...] {\"address\":amount,...}\n"
-            "\nCreate a transaction spending the given inputs and sending to the given addresses.\n"
+            "createrawtransaction [{\"txid\":\"id\",\"vout\":n},...] {\"address\":amount,\"data\":\"hex\",...} ( locktime ) ( replaceable )\n"
+            "\nCreate a transaction spending the given inputs and creating new outputs.\n"
+                "Outputs can be addresses or data.\n"
             "Returns hex-encoded raw transaction.\n"
             "Note that the transaction's inputs are not signed, and\n"
             "it is not stored in the wallet or transmitted to the network.\n"
 
             "\nArguments:\n"
-            "1. \"transactions\"        (string, required) A json array of json objects\n"
+            "1. \"inputs\"                (array, required) A json array of json objects\n"
             "     [\n"
             "       {\n"
             "         \"txid\":\"id\",  (string, required) The transaction id\n"
-            "         \"vout\":n        (numeric, required) The output number\n"
-            "       }\n"
+            "         \"vout\":n,        (numeric, required) The output number\n"
+            "         \"sequence\":n      (numeric, optional) The sequence number\n"
+            "       } \n"
             "       ,...\n"
             "     ]\n"
-            "2. \"addresses\"           (string, required) a json object with addresses as keys and amounts as values\n"
+            "2. \"outputs\"               (object, required) a json object with outputs\n"
             "    {\n"
-            "      \"address\": x.xxx   (numeric, required) The key is the lux address, the value is the btc amount\n"
+            "      \"address\": x.xxx,    (numeric or string, required) The key is the lux address, the numeric value (can be string) is the " + CURRENCY_UNIT + " amount\n"
+            "      \"data\": \"hex\"      (string, required) The key is \"data\", the value is hex encoded data\n"
+            "      \"contract\":{\n"
+            "         \"contractAddress\":\"address\", (string, required) Valid contract address (valid hash160 hex data)\n"
+            "         \"data\":\"hex\",                (string, required) Hex data to add in the call output\n"
+            "         \"amount\":x.xxx,                (numeric, optional) Value in LUX to send with the call, should be a valid amount, default 0\n"
+            "         \"gasLimit\":x,                  (numeric, optional) The gas limit for the transaction\n"
+            "         \"gasPrice\":x.xxx               (numeric, optional) The gas price for the transaction\n"
+            "       } \n"
             "      ,...\n"
             "    }\n"
 
             "\nResult:\n"
             "\"transaction\"            (string) hex string of the transaction\n"
-
             "\nExamples\n" +
-            HelpExampleCli("createrawtransaction", "\"[{\\\"txid\\\":\\\"myid\\\",\\\"vout\\\":0}]\" \"{\\\"address\\\":0.01}\"") + HelpExampleRpc("createrawtransaction", "\"[{\\\"txid\\\":\\\"myid\\\",\\\"vout\\\":0}]\", \"{\\\"address\\\":0.01}\""));
+            HelpExampleCli("createrawtransaction", "\"[{\\\"txid\\\":\\\"myid\\\",\\\"vout\\\":0}]\" \"{\\\"address\\\":0.01}\"") + HelpExampleRpc("createrawtransaction", "\"[{\\\"txid\\\":\\\"myid\\\",\\\"vout\\\":0}]\", \"{\\\"address\\\":0.01}\""));"\nExamples:\n" + HelpExampleCli("createrawtransaction", "\"[{\\\"txid\\\":\\\"myid\\\",\\\"vout\\\":0}]\" \"{\\\"address\\\":0.01}\"") + HelpExampleCli("createrawtransaction", "\"[{\\\"txid\\\":\\\"myid\\\",\\\"vout\\\":0}]\" \"{\\\"data\\\":\\\"00010203\\\"}\"") + HelpExampleCli("createrawtransaction", "\"[{\\\"txid\\\":\\\"myid\\\",\\\"vout\\\":0}]\" \"{\\\"contract\\\":{\\\"contractAddress\\\":\\\"mycontract\\\",""\\\"data\\\":\\\"00\\\", \\\"gasLimit\\\":250000, \\\"gasPrice\\\":0.00000040, \\\"amount\\\":0}}\"") + HelpExampleRpc("createrawtransaction", "\"[{\\\"txid\\\":\\\"myid\\\",\\\"vout\\\":0}]\", \"{\\\"address\\\":0.01}\"") + HelpExampleRpc("createrawtransaction", "\"[{\\\"txid\\\":\\\"myid\\\",\\\"vout\\\":0}]\", \"{\\\"data\\\":\\\"00010203\\\"}\"") + HelpExampleRpc("createrawtransaction", "\"[{\\\"txid\\\":\\\"myid\\\",\\\"vout\\\":0}]\" \"{\\\"contract\\\":{\\\"contractAddress\\\":\\\"mycontract\\\",""\\\"data\\\":\\\"00\\\", \\\"gasLimit\\\":250000, \\\"gasPrice\\\":0.00000040, \\\"amount\\\":0}}\"");
 
-    LOCK(cs_main);
-
-    RPCTypeCheck(params, boost::assign::list_of(UniValue::VARR)(UniValue::VOBJ));
+    RPCTypeCheck(params, {UniValue::VARR, UniValue::VOBJ, UniValue::VNUM, UniValue::VBOOL}, true);
+    if (params[0].isNull() || params[1].isNull())
+        throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter, arguments 1 and 2 must be non-null");
 
     UniValue inputs = params[0].get_array();
     UniValue sendTo = params[1].get_obj();
@@ -405,19 +576,97 @@ UniValue createrawtransaction(const UniValue& params, bool fHelp)
     set<CTxDestination > destinations;
     vector<string> addrList = sendTo.getKeys();
     for (const string& name_ : addrList) {
-        CTxDestination dest = DecodeDestination(name_);
 
-        if (!IsValidDestination(dest))
-            throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, string("Invalid LUX address: ") + name_);
+        if (name_ == "data") {
+            vector<unsigned char> data = ParseHexV(sendTo[name_].getValStr(),"Data");
 
-        if (!destinations.insert(dest).second)
-            throw JSONRPCError(RPC_INVALID_PARAMETER, string("Invalid parameter, duplicated address: ") + name_);
+            CTxOut out(0, CScript() << OP_RETURN << data);
+            rawTx.vout.push_back(out);
+        } else if (name_ == "contract") {
+            // Get the call object
+            UniValue Contract = sendTo[name_];
+            if(!Contract.isObject())
+                throw JSONRPCError(RPC_INVALID_PARAMETER, string("Invalid parameter, need to be object: ")+name_);
 
-        CScript scriptPubKey = GetScriptForDestination(dest);
+            // Get dgp gas limit and gas price
+            LOCK(cs_main);
+            LuxDGP luxDGP(globalState.get(), fGettingValuesDGP);
+            uint64_t blockGasLimit = luxDGP.getBlockGasLimit(chainActive.Height());
+            uint64_t minGasPrice = CAmount(luxDGP.getMinGasPrice(chainActive.Height()));
+            CAmount nGasPrice = (minGasPrice>DEFAULT_GAS_PRICE)?minGasPrice:DEFAULT_GAS_PRICE;
+
+            // Get the contract address
+            if(!Contract.exists("contractAddress") || !Contract["contractAddress"].isStr())
+                throw JSONRPCError(RPC_INVALID_PARAMETER, string("Invalid parameter, contract address is mandatory."));
+
+           string contractaddress = Contract["contractAddress"].get_str();
+           if(contractaddress.size() != 40 || !CheckHex(contractaddress))
+               throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Incorrect contract address");
+
+            dev::Address addrAccount(contractaddress);
+            if(!globalState->addressInUse(addrAccount))
+                throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "contract address does not exist");
+
+            // Get the contract data
+            if(!Contract.exists("data") || !Contract["data"].isStr())
+                throw JSONRPCError(RPC_INVALID_PARAMETER, string("Invalid parameter, contract data is mandatory."));
+
+            string datahex = Contract["data"].get_str();
+            if(datahex.size() % 2 != 0 || !CheckHex(datahex))
+                throw JSONRPCError(RPC_TYPE_ERROR, "Invalid data (data not hex)");
+
+            // Get amount
+            CAmount nAmount = 0;
+            if (Contract.exists("amount")){
+                nAmount = AmountFromValue(Contract["amount"]);
+                if (nAmount < 0)
+                    throw JSONRPCError(RPC_TYPE_ERROR, "Invalid amount for call contract");
+            }
+
+            // Get gas limit
+            uint64_t nGasLimit=DEFAULT_GAS_LIMIT_OP_SEND;
+            if (Contract.exists("gasLimit")){
+                nGasLimit = Contract["gasLimit"].get_int64();
+                if (nGasLimit > blockGasLimit)throw JSONRPCError(RPC_TYPE_ERROR, "Invalid value for gasLimit (Maximum is: "+i64tostr(blockGasLimit)+")");
+                if (nGasLimit < MINIMUM_GAS_LIMIT)throw JSONRPCError(RPC_TYPE_ERROR, "Invalid value for gasLimit (Minimum is: "+i64tostr(MINIMUM_GAS_LIMIT)+")");
+                if (nGasLimit <= 0)throw JSONRPCError(RPC_TYPE_ERROR, "Invalid value for gasLimit");
+            }
+
+            // Get gas price
+            if (Contract.exists("gasPrice")){
+                UniValue uGasPrice = Contract["gasPrice"];
+                if(!ParseMoney(uGasPrice.getValStr(), nGasPrice))
+                {
+                    throw JSONRPCError(RPC_TYPE_ERROR, "Invalid value for gasPrice");
+                }
+                CAmount maxRpcGasPrice = GetArg("-rpcmaxgasprice", MAX_RPC_GAS_PRICE);
+                if (nGasPrice > (int64_t)maxRpcGasPrice)
+                    throw JSONRPCError(RPC_TYPE_ERROR, "Invalid value for gasPrice, Maximum allowed in RPC calls is: "+FormatMoney(maxRpcGasPrice)+" (use -rpcmaxgasprice to change it)");
+                if (nGasPrice < (int64_t)minGasPrice)
+                    throw JSONRPCError(RPC_TYPE_ERROR, "Invalid value for gasPrice (Minimum is: "+FormatMoney(minGasPrice)+")");
+                if (nGasPrice <= 0)
+                    throw JSONRPCError(RPC_TYPE_ERROR, "Invalid value for gasPrice");
+            }
+
+            // Add call contract output
+            CScript scriptPubKey = CScript() << CScriptNum(VersionVM::GetEVMDefault().toRaw()) << CScriptNum(nGasLimit) << CScriptNum(nGasPrice) << ParseHex(datahex) << ParseHex(contractaddress) << OP_CALL;
+            CTxOut out(nAmount, scriptPubKey);
+            rawTx.vout.push_back(out);
+        } else {
+            CTxDestination destination = DecodeDestination(name_);
+            if (!IsValidDestination(destination)) {
+                throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, string("Invalid Lux address: ")+name_);
+            }
+
+            if (!destinations.insert(destination).second) {
+                throw JSONRPCError(RPC_INVALID_PARAMETER, string("Invalid parameter, duplicated address: ") + name_);
+            }
+
+        CScript scriptPubKey = GetScriptForDestination(destination);
         CAmount nAmount = AmountFromValue(sendTo[name_]);
-
         CTxOut out(nAmount, scriptPubKey);
         rawTx.vout.push_back(out);
+        }
     }
 
     return EncodeHexTx(rawTx);
@@ -670,7 +919,7 @@ UniValue signrawtransaction(const UniValue& params, bool fHelp)
 
             UniValue prevOut = p.get_obj();
 
-            RPCTypeCheckObj(prevOut, map_list_of("txid", UniValue::VSTR)("vout", UniValue::VNUM)("scriptPubKey", UniValue::VSTR));
+            RPCTypeCheckObj(prevOut, { {"txid", UniValueType(UniValue::VSTR)}, {"vout", UniValueType(UniValue::VNUM)}, {"scriptPubKey", UniValueType(UniValue::VSTR)}, });
 
             uint256 txid = ParseHashO(prevOut, "txid");
 
@@ -701,7 +950,7 @@ UniValue signrawtransaction(const UniValue& params, bool fHelp)
             // if redeemScript given and not using the local wallet (private keys
             // given), add redeemScript to the tempKeystore so it can be signed:
             if (fGivenKeys && (scriptPubKey.IsPayToScriptHash() || scriptPubKey.IsPayToWitnessScriptHash())) {
-                RPCTypeCheckObj(prevOut, map_list_of("txid", UniValue::VSTR)("vout", UniValue::VNUM)("scriptPubKey", UniValue::VSTR)("redeemScript", UniValue::VSTR));
+                RPCTypeCheckObj(prevOut, { {"txid", UniValueType(UniValue::VSTR)}, {"vout", UniValueType(UniValue::VNUM)}, {"scriptPubKey", UniValueType(UniValue::VSTR)}, {"redeemScript", UniValueType(UniValue::VSTR)},});
                 UniValue v = find_value(prevOut, "redeemScript");
                 if (!(v.isNull())) {
                     vector<unsigned char> rsData(ParseHexV(v, "redeemScript"));
@@ -808,7 +1057,7 @@ UniValue sendrawtransaction(const UniValue& params, bool fHelp)
         // push to local node and sync with wallets
         CValidationState state;
         bool fMissingInputs;
-        if (!AcceptToMemoryPool(mempool, state, tx, false, &fMissingInputs, !fOverrideFees)) {
+        if (!AcceptToMemoryPool(mempool, state, tx, false, &fMissingInputs, nullptr, !fOverrideFees)) {
             if (state.IsInvalid()) {
                 throw JSONRPCError(RPC_TRANSACTION_REJECTED,
                                    strprintf("%i: %s", state.GetRejectCode(), state.GetRejectReason()));

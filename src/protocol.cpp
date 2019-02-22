@@ -1,8 +1,8 @@
-// Copyright (c) 2009-2010 Satoshi Nakamoto
-// Copyright (c) 2009-2014 The Bitcoin developers
-// Distributed under the MIT/X11 software license, see the accompanying
+// Copyright (c) 2012-2014 The Bitcoin developers
+// Copyright (c) 2014-2015 The Dash developers
+// Copyright (c) 2015-2018 The Luxcore developers
+// Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
-
 #include "protocol.h"
 
 #include "chainparams.h"
@@ -122,7 +122,7 @@ CInv::CInv(const std::string& strType, const uint256& hashIn)
         }
     }
     if (i == ARRAYLEN(ppszTypeName))
-        LogPrint("net", "CInv::CInv(string, uint256) : unknown type '%s'", strType);
+        throw std::out_of_range(strprintf("CInv::CInv(string, uint256): unknown type '%s'", strType));
     hash = hashIn;
 }
 
@@ -138,11 +138,8 @@ bool CInv::IsKnownType() const
 
 const char* CInv::GetCommand() const
 {
-    if (!IsKnownType()) {
-        LogPrint("net", "CInv::GetCommand() : type=%d unknown type", type);
-        return ppszTypeName[0]; // ERROR
-    }
-
+    if (!IsKnownType())
+        throw std::out_of_range(strprintf("CInv::GetCommand(): type=%d unknown type", type));
     return ppszTypeName[type];
 }
 

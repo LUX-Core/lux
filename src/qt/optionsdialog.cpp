@@ -29,6 +29,7 @@
 #include <QIntValidator>
 #include <QLocale>
 #include <QMessageBox>
+#include <QSettings>
 #include <QTimer>
 
 OptionsDialog::OptionsDialog(QWidget* parent, bool enableWallet) : QDialog(parent),
@@ -83,7 +84,7 @@ OptionsDialog::OptionsDialog(QWidget* parent, bool enableWallet) : QDialog(paren
     }
 
     /* Theme selector static themes */
-    ui->theme->addItem(QString("Default"), QVariant("default"));
+    ui->theme->addItem(tr("default"), QVariant("default"));
 
     /* Theme selector external themes */
     boost::filesystem::path pathAddr = GetDataDir() / "themes";
@@ -99,7 +100,7 @@ OptionsDialog::OptionsDialog(QWidget* parent, bool enableWallet) : QDialog(paren
     /* Language selector */
     QDir translations(":translations");
     ui->lang->addItem(QString("(") + tr("default") + QString(")"), QVariant(""));
-    foreach (const QString& langStr, translations.entryList()) {
+    Q_FOREACH (const QString& langStr, translations.entryList()) {
         QLocale locale(langStr);
 
         /** check if the locale name consists of 2 parts (language_country) */
@@ -167,7 +168,37 @@ void OptionsDialog::setModel(OptionsModel* model)
     connect(ui->databaseCache, SIGNAL(valueChanged(int)), this, SLOT(showRestartWarning()));
     //connect(ui->logFileCount, SIGNAL(valueChanged(int)), this, SLOT(showRestartWarning()));
     connect(ui->logEvents, SIGNAL(clicked(bool)), this, SLOT(showRestartWarning()));
+    connect(ui->txIndex, SIGNAL(clicked(bool)), this, SLOT(showRestartWarning()));
+    connect(ui->addressIndex, SIGNAL(clicked(bool)), this, SLOT(showRestartWarning()));
     connect(ui->threadsScriptVerif, SIGNAL(valueChanged(int)), this, SLOT(showRestartWarning()));
+
+    // if set in lux.conf or in startup command line, sync and gray the checkboxes
+    if (!SoftSetBoolArg("-logevents", fLogEvents)) {
+        QSettings settings;
+        settings.setValue("fLogEvents", fLogEvents);
+        ui->logEvents->setChecked(fLogEvents);
+        //ui->logEvents->setEnabled(false);
+    }
+    if (!SoftSetBoolArg("-txindex", fTxIndex)) {
+        QSettings settings;
+        settings.setValue("fTxIndex", fTxIndex);
+        ui->txIndex->setChecked(fTxIndex);
+        ui->txIndex->setEnabled(false);
+    }
+    if (!SoftSetBoolArg("-addressindex", fAddressIndex)) {
+        QSettings settings;
+        settings.setValue("fAddressIndex", fAddressIndex);
+        ui->addressIndex->setChecked(fAddressIndex);
+        ui->addressIndex->setEnabled(false);
+    }
+
+    // option tooltips, strings taken from -help
+    ui->logEvents->setToolTip(tr("Maintain a full EVM log index, used by searchlogs and gettransactionreceipt rpc calls (default: %u)")
+            .replace(QString("%u"),tr("no")));
+    ui->txIndex->setToolTip(tr("Maintain a full transaction index, used by the getrawtransaction rpc call (default: %u)")
+            .replace(QString("%u"),tr("yes")));
+    ui->addressIndex->setToolTip(tr("Maintain a full address index, used to query for the balance, txids and unspent outputs for addresses (default: %u)").replace(QString("%u"), DEFAULT_ADDRESSINDEX ? tr("yes") : tr("no")));
+
     /* Wallet */
     connect(ui->spendZeroConfChange, SIGNAL(clicked(bool)), this, SLOT(showRestartWarning()));
     /* Network */
@@ -183,32 +214,39 @@ void OptionsDialog::setModel(OptionsModel* model)
 
 void OptionsDialog::setMapper()
 {
-    /* Main */
+    /* Main */     uiInterface.InitMessage(_("Done loading"));
+
     mapper->addMapping(ui->bitcoinAtStartup, OptionsModel::StartAtStartup);
     mapper->addMapping(ui->threadsScriptVerif, OptionsModel::ThreadsScriptVerif);
     mapper->addMapping(ui->databaseCache, OptionsModel::DatabaseCache);
     mapper->addMapping(ui->logFileCount, OptionsModel::LogFileCount);
     mapper->addMapping(ui->logEvents, OptionsModel::LogEvents);
+    mapper->addMapping(ui->txIndex, OptionsModel::TxIndex);
+    mapper->addMapping(ui->addressIndex, OptionsModel::AddressIndex);
 
     /* Wallet */
     mapper->addMapping(ui->spendZeroConfChange, OptionsModel::SpendZeroConfChange);
     mapper->addMapping(ui->coinControlFeatures, OptionsModel::CoinControlFeatures);
-    mapper->addMapping(ui->showMasternodesTab, OptionsModel::showMasternodesTab);
-    mapper->addMapping(ui->parallelMasterNode, OptionsModel::parallelMasterNode);
+    mapper->addMapping(ui->showMasternodesTab, OptionsModel::ShowMasternodesTab);
+    mapper->addMapping(ui->showAdvancedUI, OptionsModel::ShowAdvancedUI);
+    mapper->addMapping(ui->parallelMasternodes, OptionsModel::ParallelMasternodes);
+    mapper->addMapping(ui->darksendRounds, OptionsModel::DarkSendRounds);
+    mapper->addMapping(ui->anonymizeLux, OptionsModel::AnonymizeLuxAmount);
     mapper->addMapping(ui->notUseChangeAddress, OptionsModel::NotUseChangeAddress);
     mapper->addMapping(ui->walletBackups, OptionsModel::WalletBackups);
     mapper->addMapping(ui->zeroBalanceAddressToken, OptionsModel::ZeroBalanceAddressToken);
+    mapper->addMapping(ui->checkUpdates, OptionsModel::CheckUpdates);
 
     /* Network */
     mapper->addMapping(ui->mapPortUpnp, OptionsModel::MapPortUPnP);
     mapper->addMapping(ui->allowIncoming, OptionsModel::Listen);
-
     mapper->addMapping(ui->connectSocks, OptionsModel::ProxyUse);
     mapper->addMapping(ui->proxyIp, OptionsModel::ProxyIP);
     mapper->addMapping(ui->proxyPort, OptionsModel::ProxyPort);
 
 /* Window */
 #ifndef Q_OS_MAC
+    mapper->addMapping(ui->hideTrayIcon, OptionsModel::HideTrayIcon);
     mapper->addMapping(ui->minimizeToTray, OptionsModel::MinimizeToTray);
     mapper->addMapping(ui->minimizeOnClose, OptionsModel::MinimizeOnClose);
 #endif
@@ -221,9 +259,8 @@ void OptionsDialog::setMapper()
     mapper->addMapping(ui->unit, OptionsModel::DisplayUnit);
     mapper->addMapping(ui->thirdPartyTxUrls, OptionsModel::ThirdPartyTxUrls);
 
-
     /* DarkSend Rounds */
-    mapper->addMapping(ui->darksendRounds, OptionsModel::DarksendRounds);
+    mapper->addMapping(ui->darksendRounds, OptionsModel::DarkSendRounds);
     mapper->addMapping(ui->anonymizeLux, OptionsModel::AnonymizeLuxAmount);
     mapper->addMapping(ui->showMasternodesTab, OptionsModel::ShowMasternodesTab);
 }
@@ -276,6 +313,15 @@ void OptionsDialog::on_cancelButton_clicked()
     reject();
 }
 
+void OptionsDialog::on_hideTrayIcon_stateChanged(int fState) {
+    if(fState) {
+        ui->minimizeToTray->setChecked(false);
+        ui->minimizeToTray->setEnabled(false);
+    } else {
+        ui->minimizeToTray->setEnabled(true);
+    }
+}
+
 void OptionsDialog::showRestartWarning(bool fPersistent)
 {
     ui->statusLabel->setStyleSheet("QLabel { color: red; }");
@@ -293,6 +339,9 @@ void OptionsDialog::showRestartWarning(bool fPersistent)
 void OptionsDialog::clearStatusLabel()
 {
     ui->statusLabel->clear();
+    if (model && model->isRestartRequired()) {
+        showRestartWarning(true);
+    }
 }
 
 void OptionsDialog::doProxyIpChecks(QValidatedLineEdit* pUiProxyIp, int nProxyPort)
@@ -310,7 +359,7 @@ void OptionsDialog::doProxyIpChecks(QValidatedLineEdit* pUiProxyIp, int nProxyPo
         ui->statusLabel->setText(tr("The supplied proxy address is invalid."));
     } else {
         enableOkButton();
-        ui->statusLabel->clear();
+        clearStatusLabel();
     }
 }
 
@@ -318,7 +367,7 @@ bool OptionsDialog::eventFilter(QObject* object, QEvent* event)
 {
     if (event->type() == QEvent::FocusOut) {
         if (object == ui->proxyIp) {
-            emit proxyIpChecks(ui->proxyIp, ui->proxyPort->text().toInt());
+            Q_EMIT proxyIpChecks(ui->proxyIp, ui->proxyPort->text().toInt());
         }
     }
     return QDialog::eventFilter(object, event);

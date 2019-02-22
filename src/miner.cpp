@@ -1,5 +1,6 @@
-// Copyright (c) 2009-2010 Satoshi Nakamoto
-// Copyright (c) 2009-2016 The Bitcoin Core developers
+// Copyright (c) 2012-2014 The Bitcoin developers
+// Copyright (c) 2014-2015 The Dash developers
+// Copyright (c) 2015-2018 The Luxcore developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -53,7 +54,8 @@ void FormatHashBuffers(CBlock* pblock, char* pmidstate, char* pdata)
         } block;
     } tmp;
 
-    memset(&tmp, 0, sizeof(tmp));
+    // Check all field below
+    //memset(&tmp, 0, sizeof(tmp));
 
     tmp.block.nVersion       = pblock->nVersion;
     tmp.block.hashPrevBlock  = pblock->hashPrevBlock;
@@ -194,8 +196,13 @@ void BlockAssembler::RebuildRefundTransaction()
 
         if (nHeight >= chainparams.FirstSplitRewardBlock() && SelectMasternodePayee(mnPayee)) {
             contrTx.vout.resize(2);
-            // set masternode payee and 20% reward
-            mnReward = powReward * 0.2;
+            // set masternode payee and 20% reward, or mint
+            if (nHeight == chainparams.PreminePayment()) {
+                mnReward = powReward * 25000;
+            } else {
+                mnReward = powReward * 0.2;
+            }
+
             contrTx.vout[1].scriptPubKey = mnPayee;
             contrTx.vout[1].nValue = mnReward;
 
@@ -204,7 +211,12 @@ void BlockAssembler::RebuildRefundTransaction()
             //LogPrintf("%s: Masternode payment to %s (pow)\n", __func__, EncodeDestination(txDest));
 
             // miner's reward is everything that left
-            minerReward = totalReward - mnReward;
+            
+            if (nHeight == chainparams.PreminePayment()) {
+                minerReward = powReward * 0.8;
+            } else {
+                minerReward = totalReward - mnReward;
+            }
         } else {
             minerReward = totalReward;
         }
@@ -225,13 +237,17 @@ void BlockAssembler::RebuildRefundTransaction()
 std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlockWithKey(CReserveKey& reservekey, bool fMineWitnessTx, bool fProofOfStake, int64_t* pTotalFees, int32_t txProofTime, int32_t nTimeLimit)
 {
     CPubKey pubkey;
-    if (!reservekey.GetReservedKey(pubkey))
+    if (!reservekey.GetReservedKey(pubkey, true))
         return NULL;
 
     CScript scriptPubKey = CScript() << ToByteVector(pubkey) << OP_CHECKSIG;
     return CreateNewBlock(scriptPubKey, fMineWitnessTx, fProofOfStake, pTotalFees, txProofTime, nTimeLimit);
 }
 
+std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewStake(bool fMineWitnessTx, bool fProofOfStake, int64_t* pTotalFees, int32_t txProofTime, int32_t nTimeLimit)
+{
+    return CreateNewBlock(CScript(), fMineWitnessTx, fProofOfStake, pTotalFees, txProofTime, nTimeLimit);
+}
 
 std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& scriptPubKeyIn, bool fMineWitnessTx, bool fProofOfStake, int64_t* pTotalFees, int32_t txProofTime, int32_t nTimeLimit)
 {
@@ -259,6 +275,8 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
     if (!pindexPrev) return nullptr;
 
     nHeight = pindexPrev->nHeight + 1;
+
+    LogPrintf("Height is: %s\n", nHeight);
 
     pblock->nVersion = ComputeBlockVersion(pindexPrev, chainparams.GetConsensus());
     // -regtest only: allow overriding block.nVersion with
@@ -312,17 +330,27 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
 
         if (nHeight >= chainparams.FirstSplitRewardBlock() && SelectMasternodePayee(mnPayee)) {
             coinbaseTx.vout.resize(2);
-            // set masternode 20% reward
-            mnReward = powReward * 0.2;
+            // set masternode 20% reward, or mint the 250k for the team MN 
+            
+            if (nHeight == chainparams.PreminePayment()) {
+                mnReward = powReward * 25000;
+            } else {
+                mnReward = powReward * 0.2;
+            }
+            
             coinbaseTx.vout[1].scriptPubKey = mnPayee;
             coinbaseTx.vout[1].nValue = mnReward;
 
             CTxDestination txDest;
             ExtractDestination(mnPayee, txDest);
             LogPrintf("%s: Masternode payment to %s (pow)\n", __func__, EncodeDestination(txDest));
-
+            LogPrintf("Masternode reward %s\n", mnReward);
             // miner's reward is everything that is left
-            minerReward = totalReward - mnReward;
+            if (nHeight == chainparams.PreminePayment()) {
+                minerReward = powReward * 0.8;
+            } else {
+                minerReward = totalReward - mnReward;
+            }
         } else {
             minerReward = totalReward;
         }
@@ -1050,7 +1078,7 @@ void IncrementExtraNonce(CBlock* pblock, const CBlockIndex* pindexPrev, unsigned
     pblock->hashMerkleRoot = BlockMerkleRoot(*pblock);
 }
 
-bool ProcessBlockFound(CBlock* pblock, CWallet& wallet, CReserveKey& reservekey)
+bool ProcessBlockFound(CBlock* pblock, CWallet& wallet)
 {
     // Found a solution (stake)
     {
@@ -1065,31 +1093,20 @@ bool ProcessBlockFound(CBlock* pblock, CWallet& wallet, CReserveKey& reservekey)
         }
     }
 
-    CAmount generated = GetProofOfStakeReward(0, 0, chainActive.Height()+1);
+    CAmount generated = GetProofOfStakeReward(0, chainActive.Height()+1);
     generated -= GetMasternodePosReward(chainActive.Height()+1, generated);
     LogPrintf("generated %s\n", FormatMoney(generated));
-
-    // Remove key from key pool
-    reservekey.KeepKey();
-
-    bool usePhi2;
-    {
-        LOCK(cs_main);
-        CBlockIndex* pindexPrev = LookupBlockIndex(pblock->hashPrevBlock);
-        usePhi2 = pindexPrev ? pindexPrev->nHeight + 1 >= Params().SwitchPhi2Block() : false;
-    }
-
-    // Track how many getdata requests this block gets
-    {
-        LOCK(wallet.cs_wallet);
-        wallet.mapRequestCount[pblock->GetHash(usePhi2)] = 0;
-    }
 
     // Process this block the same as if we had received it from another node
     const CChainParams& chainparams = Params();
     CValidationState state;
     if (!ProcessNewBlock(state, chainparams, NULL, pblock)) {
         return error("LUXMiner : ProcessNewBlock, block not accepted");
+    }
+
+    {
+        LOCK(stake->stakeMiner.lock);
+        stake->stakeMiner.nBlocksAccepted++;
     }
 
     return true;

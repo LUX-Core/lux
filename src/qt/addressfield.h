@@ -100,6 +100,7 @@ private:
     QAbstractItemModel* m_addressTableModel;
     int m_addressColumn;
     int m_typeRole;
+    int64_t lastRefreshTime;
     QString m_receive;
 };
 

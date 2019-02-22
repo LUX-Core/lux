@@ -1,5 +1,6 @@
-// Copyright (c) 2009-2010 Satoshi Nakamoto             -*- c++ -*-
-// Copyright (c) 2009-2014 The Bitcoin developers
+// Copyright (c) 2012-2014 The Bitcoin developers
+// Copyright (c) 2014-2015 The Dash developers
+// Copyright (c) 2015-2018 The Luxcore developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -22,11 +23,17 @@ class CCoins;
 class uint256;
 
 //! -dbcache default (MiB)
-static const int64_t nDefaultDbCache = 256;
+static const int64_t nDefaultDbCache = 450;
 //! max. -dbcache in (MiB)
-static const int64_t nMaxDbCache = sizeof(void*) > 4 ? 4096 : 1024;
+static const int64_t nMaxDbCache = sizeof(void*) > 4 ? 16384 : 1024;
 //! min. -dbcache in (MiB)
 static const int64_t nMinDbCache = 4;
+//! Max memory allocated to block tree DB specific cache, if no -txindex (MiB)
+static const int64_t nMaxBlockDBCache = 2;
+//! Max memory allocated to block tree DB specific cache, if -txindex (MiB)
+static const int64_t nMaxBlockDBAndTxIndexCache = 1024;
+//! Max memory allocated to coin DB specific cache (MiB)
+static const int64_t nMaxCoinsDBCache = 8;
 
 /** CCoinsView backed by the LevelDB coin database (chainstate/) */
 class CCoinsViewDB : public CCoinsView

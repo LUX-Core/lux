@@ -29,7 +29,6 @@ using namespace std;
 #include <QClipboard>
 #include <QMessageBox>
 #include <QThread>
-#include <QtConcurrent/QtConcurrent>
 #include <QScrollBar>
 #include <QMessageBox>
 
@@ -51,10 +50,9 @@ MasternodeManager::MasternodeManager(QWidget *parent) :
 
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(updateNodeList()));
-        timer->start(1000);
-
-        fFilterUpdated = true;
-	nTimeFilterUpdated = GetTime();
+    timer->start(1000);
+    fFilterUpdated = true;
+    nTimeFilterUpdated = GetTime();
 }
 
 MasternodeManager::~MasternodeManager()
@@ -98,7 +96,7 @@ void MasternodeManager::on_tableWidget_2_itemSelectionChanged()
         ui->getConfigButton->setEnabled(true);
         ui->startButton->setEnabled(true);
         ui->stopButton->setEnabled(true);
-	   //ui->copyAddressButton->setEnabled(true);
+        //ui->copyAddressButton->setEnabled(true);
     }
 }
 
@@ -190,7 +188,7 @@ void MasternodeManager::updateNodeList()
     if(pwalletMain)
     {
         LOCK(cs_adrenaline);
-        for (std::pair<std::string, CLuxNodeConfig> adrenaline : pwalletMain->mapMyLuxNodes)
+        for (PAIRTYPE(std::string, CLuxNodeConfig) adrenaline : pwalletMain->mapMyLuxNodes)
         {
             updateLuxNode(QString::fromStdString(adrenaline.second.sAlias), QString::fromStdString(adrenaline.second.sAddress), QString::fromStdString(adrenaline.second.sMasternodePrivKey), QString::fromStdString(adrenaline.second.sCollateralAddress));
         }
@@ -210,8 +208,15 @@ void MasternodeManager::setWalletModel(WalletModel *model)
     this->walletModel = model;
     if(model && model->getOptionsModel())
     {
+        setPMNsVisible(model->getOptionsModel()->getParallelMasternodes());
+        connect(model->getOptionsModel(), SIGNAL(parallelMasternodesChanged(bool)), this, SLOT(setPMNsVisible(bool)));
     }
+}
 
+void MasternodeManager::setPMNsVisible(bool visible)
+{
+    ui->tableWidgetPMN->setVisible(visible);
+    ui->labelPMN->setVisible(visible);
 }
 
 void MasternodeManager::on_createButton_clicked()
@@ -219,7 +224,7 @@ void MasternodeManager::on_createButton_clicked()
     AddEditLuxNode* aenode = new AddEditLuxNode();
     aenode->exec();
 }
-
+#if 0
 void MasternodeManager::on_copyAddressButton_clicked()
 {
     QItemSelectionModel* selectionModel = ui->tableWidget_2->selectionModel();
@@ -233,7 +238,7 @@ void MasternodeManager::on_copyAddressButton_clicked()
 
     QApplication::clipboard()->setText(QString::fromStdString(sCollateralAddress));
 }
-
+#endif
 void MasternodeManager::on_editButton_clicked()
 {
     QItemSelectionModel* selectionModel = ui->tableWidget_2->selectionModel();
@@ -286,7 +291,7 @@ void MasternodeManager::on_removeButton_clicked()
         walletdb.EraseLuxNodeConfig(c.sAddress);
         ui->tableWidget_2->clearContents();
         ui->tableWidget_2->setRowCount(0);
-        for (std::pair<std::string, CLuxNodeConfig> adrenaline : pwalletMain->mapMyLuxNodes)
+        for (PAIRTYPE(std::string, CLuxNodeConfig) adrenaline : pwalletMain->mapMyLuxNodes)
         {
             updateLuxNode(QString::fromStdString(adrenaline.second.sAlias), QString::fromStdString(adrenaline.second.sAddress), QString::fromStdString(adrenaline.second.sMasternodePrivKey), QString::fromStdString(adrenaline.second.sCollateralAddress));
         }
@@ -348,7 +353,7 @@ void MasternodeManager::on_stopButton_clicked()
 void MasternodeManager::on_startAllButton_clicked()
 {
     std::string results;
-    for (std::pair<std::string, CLuxNodeConfig> adrenaline : pwalletMain->mapMyLuxNodes)
+    for (PAIRTYPE(std::string, CLuxNodeConfig) adrenaline : pwalletMain->mapMyLuxNodes)
     {
         CLuxNodeConfig c = adrenaline.second;
 	std::string errorMessage;
@@ -371,7 +376,7 @@ void MasternodeManager::on_startAllButton_clicked()
 void MasternodeManager::on_stopAllButton_clicked()
 {
     std::string results;
-    for (std::pair<std::string, CLuxNodeConfig> adrenaline : pwalletMain->mapMyLuxNodes)
+    for (PAIRTYPE(std::string, CLuxNodeConfig) adrenaline : pwalletMain->mapMyLuxNodes)
     {
         CLuxNodeConfig c = adrenaline.second;
 	std::string errorMessage;

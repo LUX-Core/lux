@@ -1,7 +1,8 @@
-// Copyright (c) 2011-2013 The Bitcoin developers           -*- c++ -*-
-// Distributed under the MIT/X11 software license, see the accompanying
+// Copyright (c) 2012-2014 The Bitcoin developers
+// Copyright (c) 2014-2015 The Dash developers
+// Copyright (c) 2015-2018 The Luxcore developers
+// Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
-
 #ifndef BITCOIN_QT_WALLETFRAME_H
 #define BITCOIN_QT_WALLETFRAME_H
 
@@ -10,11 +11,10 @@
 
 class BitcoinGUI;
 class ClientModel;
-//class PlatformStyle;
+class PlatformStyle;
 class SendCoinsRecipient;
 class WalletModel;
 class WalletView;
-class TradingDialog;
 class BlockExplorer;
 
 QT_BEGIN_NAMESPACE
@@ -26,7 +26,7 @@ class WalletFrame : public QFrame
     Q_OBJECT
 
 public:
-    explicit WalletFrame(BitcoinGUI *_gui = 0);
+    explicit WalletFrame(const PlatformStyle *platformStyle, BitcoinGUI *_gui = 0);
     ~WalletFrame();
 
     void setClientModel(ClientModel *clientModel);
@@ -39,7 +39,9 @@ public:
     bool handlePaymentRequest(const SendCoinsRecipient& recipient);
 
     void showOutOfSyncWarning(bool fShow);
-
+    Q_SIGNALS:
+            /** Notify that the user has requested more information about the out-of-sync warning */
+            void requestedSyncWarningInfo();
 private:
     QStackedWidget* walletStack;
     BitcoinGUI* gui;
@@ -48,15 +50,15 @@ private:
 
     bool bOutOfSync;
 
+    const PlatformStyle* platformStyle;
+
     WalletView* currentWalletView();
 
-public slots:
+public Q_SLOTS:
     /** Switch to overview (home) page */
     void gotoOverviewPage();
     /** Switch to history (transactions) page */
     void gotoHistoryPage();
-    /** Switch to trading page */
-    void gotoTradingPage();
     /** Switch to masternode page */
     void gotoMasternodePage();
     /** Switch to smart contract page */
@@ -96,6 +98,8 @@ public slots:
     void usedSendingAddresses();
     /** Show used receiving addresses */
     void usedReceivingAddresses();
+    /** Pass on signal over requested out-of-sync-warning information */
+    void outOfSyncWarningClicked();
 };
 
 #endif // BITCOIN_QT_WALLETFRAME_H

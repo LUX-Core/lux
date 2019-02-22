@@ -28,14 +28,19 @@ class NetworkStyle;
 class Notificator;
 class OptionsModel;
 class BlockExplorer;
-//class PlatformStyle;
+class PlatformStyle;
 class RPCConsole;
 class SendCoinsRecipient;
 class UnitDisplayStatusBarControl;
 class WalletFrame;
 class WalletModel;
+class HelpMessageDialog;
+class ModalOverlay;
 class MasternodeList;
 class HexAddressConverter;
+class CBlockIndex;
+class UpdateDialog;
+class HelpMessageDialog;
 
 
 class CWallet;
@@ -57,8 +62,9 @@ class BitcoinGUI : public QMainWindow
 
 public:
     static const QString DEFAULT_WALLET;
+    static const std::string DEFAULT_UIPLATFORM;
 
-    explicit BitcoinGUI(const NetworkStyle* networkStyle, QWidget* parent = 0);
+    explicit BitcoinGUI(const PlatformStyle *platformStyle, const NetworkStyle* networkStyle, QWidget* parent = 0);
     ~BitcoinGUI();
 
     /** Set the client model.
@@ -95,8 +101,14 @@ private:
 
     UnitDisplayStatusBarControl* unitDisplayControl;
     QLabel* labelStakingIcon;
-    QLabel* labelEncryptionIcon;
+    QLabel* labelWalletEncryptionIcon;
+    QPushButton* pushButtonWalletHDStatusIcon;
     QPushButton* labelConnectionsIcon;
+    QPushButton * pushButtonTelegram;
+    QPushButton * pushButtonTwitter;
+    QPushButton * pushButtonGithub;
+    QPushButton * pushButtonDiscord;
+	QPushButton * pushButtonHelp;
     QLabel* labelBlocksIcon;
     QLabel* progressBarLabel;
     QProgressBar* progressBar;
@@ -105,7 +117,6 @@ private:
     QMenuBar* appMenuBar;
     QAction* overviewAction;
     QAction* historyAction;
-    QAction* tradingAction;
     QAction* masternodeAction;
     QAction* quitAction;
     QAction* sendCoinsAction;
@@ -146,15 +157,19 @@ private:
     QMenu* trayIconMenu;
     Notificator* notificator;
     RPCConsole* rpcConsole;
+    HelpMessageDialog* helpMessageDialog;
     BlockExplorer* explorerWindow;
     HexAddressConverter* hexAddressWindow;
+    ModalOverlay* modalOverlay;
+    UpdateDialog* updateDialog;
 
     /** Keep track of previous number of blocks, to detect progress */
     int prevBlocks;
     int spinnerFrame;
+    const PlatformStyle* platformStyle;
 
     /** Create the main UI actions. */
-    void createActions(const NetworkStyle* networkStyle);
+    void createActions();
     /** Create the menu bar and sub-menus. */
     void createMenuBar();
     /** Create the toolbars */
@@ -175,21 +190,24 @@ private:
     /** Disconnect core signals from GUI client */
     void unsubscribeFromCoreSignals();
 
-signals:
+    void updateHeadersSyncProgressLabel();
+Q_SIGNALS:
     /** Signal raised when a URI was entered or dragged to the GUI */
     void receivedURI(const QString& uri);
     /** Restart handling */
     void requestedRestart(QStringList args);
 
-public slots:
+public Q_SLOTS:
     /** Set number of connections shown in the UI */
     void setNumConnections(int count);
     /** Set network state shown in the UI */
     void setNetworkActive(bool networkActive);
-    /** Set number of blocks shown in the UI */
-    void setNumBlocks(int count);
     /** Get restart command-line parameters and request restart */
     void handleRestart(QStringList args);
+    /** Set number of blocks and last block date shown in the UI */
+    void setNumBlocks(int count, const QDateTime& lastBlockDate, double nVerificationProgress, bool headers);
+    /** Set additional data sync status shown in the UI */
+    //void setAdditionalDataSyncProgress(double nSyncProgress);
 
     /** Notify the user of an event from the core network or transaction handling code.
        @param[in] title     the message box / notification title
@@ -203,6 +221,13 @@ public slots:
     void setStakingStatus();
 
 #ifdef ENABLE_WALLET
+
+    /** Set the hd-enabled status as shown in the UI.
+     @param[in] status            current hd enabled status
+     @see WalletModel::EncryptionStatus
+     */
+    void setHDStatus(int hdEnabled);
+
     /** Set the encryption status as shown in the UI.
        @param[in] status            current encryption status
        @see WalletModel::EncryptionStatus
@@ -219,14 +244,12 @@ public slots:
 
 #endif // ENABLE_WALLET
 
-private slots:
+private Q_SLOTS:
 #ifdef ENABLE_WALLET
     /** Switch to overview (home) page */
     void gotoOverviewPage();
     /** Switch to history (transactions) page */
     void gotoHistoryPage();
-    /** Switch to trading page */
-    void gotoTradingPage();
     /** Switch to Explorer Page */
     void gotoBlockExplorerPage();
     /** Switch to masternode page */
@@ -266,6 +289,12 @@ private slots:
     /** Show help message dialog */
     void showHelpMessageClicked();
 
+    /** Show debug window */
+    void showDebugWindow();
+
+    /** Show debug window and set focus to the console */
+    void showDebugWindowActivateConsole();
+
 #ifndef Q_OS_MAC
     /** Handle tray icon clicked */
     void trayIconActivated(QSystemTrayIcon::ActivationReason reason);
@@ -281,6 +310,14 @@ private slots:
 
     /** Show progress dialog e.g. for verifychain */
     void showProgress(const QString& title, int nProgress);
+
+    /** When hideTrayIcon setting is changed in OptionsModel hide or show the icon accordingly. */
+    void setTrayIconVisible(bool);
+
+    /** Toggle networking */
+    void toggleNetworkActive();
+
+    void showModalOverlay();
 };
 
 class UnitDisplayStatusBarControl : public QLabel
@@ -288,7 +325,7 @@ class UnitDisplayStatusBarControl : public QLabel
     Q_OBJECT
 
 public:
-    explicit UnitDisplayStatusBarControl();
+    explicit UnitDisplayStatusBarControl(const PlatformStyle* platformStyle);
     /** Lets the control know about the Options Model (and its signals) */
     void setOptionsModel(OptionsModel* optionsModel);
 
@@ -305,7 +342,7 @@ private:
     /** Creates context menu, its actions, and wires up all the relevant signals for mouse events. */
     void createContextMenu();
 
-private slots:
+private Q_SLOTS:
     /** When Display Units are changed on OptionsModel it will refresh the display text of the control on the status bar */
     void updateDisplayUnit(int newUnits);
     /** Tells underlying optionsModel to update its current display unit. */

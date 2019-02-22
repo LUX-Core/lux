@@ -1,5 +1,6 @@
-// Copyright (c) 2015-2017 The Bitcoin Core developers
-// Copyright (c) 2017 The LUX developers
+// Copyright (c) 2012-2014 The Bitcoin developers
+// Copyright (c) 2014-2015 The Dash developers
+// Copyright (c) 2015-2018 The Luxcore developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -39,7 +40,7 @@ private:
 class HTTPRPCTimerInterface : public RPCTimerInterface
 {
 public:
-    HTTPRPCTimerInterface(struct event_base* base) : base(base)
+    HTTPRPCTimerInterface(struct event_base* _base) : base(_base)
     {
     }
     const char* Name()
@@ -188,7 +189,7 @@ bool StartHTTPRPC()
 
     assert(EventBase());
     httpRPCTimerInterface = new HTTPRPCTimerInterface(EventBase());
-    RPCRegisterTimerInterface(httpRPCTimerInterface);
+    RPCSetTimerInterface(httpRPCTimerInterface);
     return true;
 }
 
@@ -201,8 +202,11 @@ void StopHTTPRPC()
 {
     LogPrint("rpc", "Stopping HTTP RPC server\n");
     UnregisterHTTPHandler("/", true);
+#ifdef ENABLE_WALLET
+    UnregisterHTTPHandler("/wallet/", false);
+#endif
     if (httpRPCTimerInterface) {
-        RPCUnregisterTimerInterface(httpRPCTimerInterface);
+        RPCUnsetTimerInterface(httpRPCTimerInterface);
         delete httpRPCTimerInterface;
         httpRPCTimerInterface = 0;
     }

@@ -1,5 +1,6 @@
-// Copyright (c) 2009-2010 Satoshi Nakamoto
-// Copyright (c) 2009-2014 The Bitcoin developers
+// Copyright (c) 2012-2014 The Bitcoin developers
+// Copyright (c) 2014-2015 The Dash developers
+// Copyright (c) 2015-2018 The Luxcore developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -9,24 +10,24 @@
 
 #include "tinyformat.h"
 #include "utiltime.h"
-
+#include <atomic>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/thread.hpp>
 
 using namespace std;
 
-static int64_t nMockTime = 0; //! For unit testing
+static std::atomic<int64_t> nMockTime(0); //! For unit testing
 
 int64_t GetTime()
 {
-    if (nMockTime) return nMockTime;
-
+    int64_t mocktime = nMockTime.load(std::memory_order_relaxed);
+    if (mocktime) return mocktime;
     return time(NULL);
 }
 
 void SetMockTime(int64_t nMockTimeIn)
 {
-    nMockTime = nMockTimeIn;
+    nMockTime.store(nMockTimeIn, std::memory_order_relaxed);
 }
 
 int64_t GetTimeMillis()

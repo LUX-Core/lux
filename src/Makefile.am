@@ -77,6 +77,8 @@ BITCOIN_CORE_H = \
   allocators.h \
   amount.h \
   base58.h \
+  bip39.h \
+  bip39_english.h \
   bech32.h \
   bip38.h \
   bloom.h \
@@ -98,10 +100,12 @@ BITCOIN_CORE_H = \
   consensus/params.h \
   core_io.h \
   core_memusage.h \
+  cuckoocache.h \
   crypter.h \
   darksend.h \
   db.h \
   hash.h \
+  hdchain.h \
   indirectmap.h \
   init.h \
   instantx.h \
@@ -152,6 +156,7 @@ BITCOIN_CORE_H = \
   streams.h \
   support/allocators/zeroafterfree.h \
   support/cleanse.h \
+  support/events.h \
   sync.h \
   threadsafety.h \
   timedata.h \
@@ -224,7 +229,6 @@ libbitcoin_server_a_SOURCES = \
   validationinterface.cpp \
   versionbits.cpp \
   lux/luxstate.cpp \
-  lux/luxtransaction.cpp \
   lux/luxDGP.cpp \
   lux/storageresults.cpp \
   $(BITCOIN_CORE_H)
@@ -322,6 +326,8 @@ crypto_libbitcoin_crypto_a_SOURCES = \
 if USE_ASM
 crypto/crypto_libbitcoin_crypto_a-sha256.$(OBJEXT) : CXXFLAGS += -DUSE_ASM
 crypto/crypto_libbitcoin_crypto_a-sha256_sse4.$(OBJEXT) : CXXFLAGS += $(SSE42_CXXFLAGS) -DUSE_ASM
+crypto/libbitcoin_crypto_a-sha256.$(OBJEXT) : CXXFLAGS += -DUSE_ASM
+crypto/libbitcoin_crypto_a-sha256_sse4.$(OBJEXT) : CXXFLAGS += $(SSE42_CXXFLAGS) -DUSE_ASM
 crypto_libbitcoin_crypto_a_SOURCES += crypto/sha256_sse4.cpp
 endif
 
@@ -389,6 +395,7 @@ libbitcoin_common_a_SOURCES = \
   allocators.cpp \
   amount.cpp \
   base58.cpp \
+  bip39.cpp \
   bech32.cpp \
   bip38.cpp \
   chainparams.cpp \
@@ -399,6 +406,7 @@ libbitcoin_common_a_SOURCES = \
   core_read.cpp \
   core_write.cpp \
   hash.cpp \
+  hdchain.cpp \
   key.cpp \
   keystore.cpp \
   netbase.cpp \
@@ -570,7 +578,6 @@ libbitcoin_common_a_SOURCES = \
   cpp-ethereum/libethash/io.h \
   cpp-ethereum/libethash/ethash.h \
   cpp-ethereum/libethash/internal.h \
-  cpp-ethereum/libethash/mmap_win32.c \
   cpp-ethereum/utils/json_spirit/JsonSpiritHeaders.h \
   cpp-ethereum/utils/json_spirit/json_spirit.h \
   cpp-ethereum/utils/json_spirit/json_spirit_error_position.h \
@@ -586,6 +593,7 @@ libbitcoin_common_a_SOURCES = \
 if TARGET_WINDOWS
     libbitcoin_common_a_SOURCES += \
       cpp-ethereum/libethash/io_win32.c \
+      cpp-ethereum/libethash/mmap_win32.c \
       cpp-ethereum/libethash/util_win32.c
 else
     libbitcoin_common_a_SOURCES += cpp-ethereum/libethash/io_posix.c
@@ -634,7 +642,7 @@ luxd_CPPFLAGS = $(BITCOIN_INCLUDES)
 luxd_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
 
 if TARGET_WINDOWS
-luxd_SOURCES += luxd-res.rc
+luxd_SOURCES += luxd-res.rc config/lux-config.h
 endif
 
 luxd_LDADD = \
@@ -659,7 +667,7 @@ lux_cli_SOURCES = lux-cli.cpp
 lux_cli_CPPFLAGS = $(BITCOIN_INCLUDES) $(EVENT_CFLAGS)
 
 if TARGET_WINDOWS
-lux_cli_SOURCES += lux-cli-res.rc
+lux_cli_SOURCES += lux-cli-res.rc config/lux-config.h
 endif
 
 lux_cli_LDADD = \

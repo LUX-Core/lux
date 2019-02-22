@@ -1,5 +1,7 @@
-// Copyright (c) 2014-2015 The Darkcoin developers
-// Distributed under the MIT/X11 software license, see the accompanying
+// Copyright (c) 2012-2014 The Bitcoin developers
+// Copyright (c) 2014-2015 The Dash developers
+// Copyright (c) 2015-2018 The Luxcore developers
+// Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "consensus/validation.h"
@@ -386,7 +388,7 @@ void ProcessMessageDarksend(CNode* pfrom, const std::string& strCommand, CDataSt
         vector<CTxIn> sigs;
         vRecv >> sigs;
 
-        bool success = false;
+        std::atomic<bool> success{false};
         int count = 0;
 
         LogPrintf(" -- sigs count %d %d\n", (int) sigs.size(), count);
@@ -409,6 +411,7 @@ int randomizeList(int i) { return std::rand() % i; }
 // Recursively determine the rounds of a given input (How deep is the darksend chain for a given input)
 int GetInputDarksendRounds(CTxIn in, int rounds) {
     if (rounds >= 17) return rounds;
+    if (rounds > nDarksendRounds || nDarksendRounds <= 0 || !fEnableDarksend) return rounds; // once we hit the max rounds setting, there's no point going further back (this func is only used for selecting qualifying txs)
 
     std::string padding = "";
     padding.insert(0, ((rounds + 1) * 5) + 3, ' ');
@@ -1641,23 +1644,25 @@ bool CDarkSendPool::SendRandomPaymentToSelf() {
     // make our change address
     CReserveKey reservekey(pwalletMain);
 
-    CScript scriptChange;
+    CScript scriptDenom;
     CPubKey vchPubKey;
-    assert(reservekey.GetReservedKey(vchPubKey)); // should never fail, as we just unlocked
-    scriptChange = GetScriptForDestination(vchPubKey.GetID());
+    assert(reservekey.GetReservedKey(vchPubKey, false)); // should never fail, as we just unlocked
+    scriptDenom = GetScriptForDestination(vchPubKey.GetID());
 
     CWalletTx wtx;
     int64_t nFeeRet = 0;
     std::string strFail = "";
-    vector< pair<CScript, int64_t> > vecSend;
+    std::vector<CRecipient> vecSend;
 
     // ****** Add fees ************ /
-    vecSend.push_back(make_pair(scriptChange, nPayment));
+    CRecipient recipient = {scriptDenom, nPayment, false};
+    vecSend.push_back(recipient);
 
     CCoinControl* coinControl = NULL;
+    int nChangePos = -1;
     //int32_t nChangePos;
     //bool success = pwalletMain->CreateTransaction(vecSend, wtx, reservekey, nFeeRet, nChangePos, strFail, coinControl, ONLY_DENOMINATED);
-    bool success = pwalletMain->CreateTransaction(vecSend, wtx, reservekey, nFeeRet, strFail, coinControl, ONLY_DENOMINATED);
+    bool success = pwalletMain->CreateTransaction(vecSend, wtx, reservekey, nFeeRet, nChangePos, strFail, coinControl, ONLY_DENOMINATED);
     if (!success) {
         LogPrintf("SendRandomPaymentToSelf: Error - %s\n", strFail.c_str());
         return false;
@@ -1677,27 +1682,28 @@ bool CDarkSendPool::MakeCollateralAmounts() {
 
     CScript scriptChange;
     CPubKey vchPubKey;
-    assert(reservekey.GetReservedKey(vchPubKey)); // should never fail, as we just unlocked
+    assert(reservekey.GetReservedKey(vchPubKey, false)); // should never fail, as we just unlocked
     scriptChange = GetScriptForDestination(vchPubKey.GetID());
 
     CWalletTx wtx;
     int64_t nFeeRet = 0;
     std::string strFail = "";
-    vector< pair<CScript, int64_t> > vecSend;
+    std::vector<CRecipient> vecSend;
 
-    vecSend.push_back(make_pair(scriptChange, (DARKSEND_COLLATERAL * 2) + DARKSEND_FEE));
-    vecSend.push_back(make_pair(scriptChange, (DARKSEND_COLLATERAL * 2) + DARKSEND_FEE));
+    CRecipient recipient = {scriptChange, (DARKSEND_COLLATERAL * 2) + DARKSEND_FEE, false};
+    vecSend.push_back(recipient);
 
     CCoinControl* coinControl = NULL;
+    int nChangePos = -1;
     //int32_t nChangePos;
     // try to use non-denominated and not mn-like funds
     //bool success = pwalletMain->CreateTransaction(vecSend, wtx, reservekey, nFeeRet, nChangePos, strFail, coinControl, ONLY_NONDENOMINATED_NOTMN);
-    bool success = pwalletMain->CreateTransaction(vecSend, wtx, reservekey, nFeeRet, strFail, coinControl, ONLY_NONDENOMINATED_NOTMN);
+    bool success = pwalletMain->CreateTransaction(vecSend, wtx, reservekey, nFeeRet, nChangePos, strFail, coinControl, ONLY_NONDENOMINATED_NOTMN);
     if (!success) {
         // if we failed (most likeky not enough funds), try to use denominated instead -
         // MN-like funds should not be touched in any case and we can't mix denominated without collaterals anyway
         //success = pwalletMain->CreateTransaction(vecSend, wtx, reservekey, nFeeRet, nChangePos, strFail, coinControl, ONLY_DENOMINATED);
-        success = pwalletMain->CreateTransaction(vecSend, wtx, reservekey, nFeeRet, strFail, coinControl, ONLY_DENOMINATED);
+        success = pwalletMain->CreateTransaction(vecSend, wtx, reservekey, nFeeRet, nChangePos, strFail, coinControl, ONLY_DENOMINATED);
         if (!success) {
             LogPrintf("MakeCollateralAmounts: Error - %s\n", strFail.c_str());
             return false;
@@ -1720,21 +1726,19 @@ bool CDarkSendPool::CreateDenominated(int64_t nTotalValue) {
 
     CScript scriptChange;
     CPubKey vchPubKey;
-    assert(reservekey.GetReservedKey(vchPubKey)); // should never fail, as we just unlocked
+    assert(reservekey.GetReservedKey(vchPubKey, false)); // should never fail, as we just unlocked
     scriptChange = GetScriptForDestination(vchPubKey.GetID());
 
     CWalletTx wtx;
     int64_t nFeeRet = 0;
     std::string strFail = "";
-    vector< pair<CScript, int64_t> > vecSend;
+    std::vector<CRecipient> vecSend;
     int64_t nValueLeft = nTotalValue;
 
     // ****** Add collateral outputs ************ /
     if (!pwalletMain->HasCollateralInputs()) {
-        vecSend.push_back(make_pair(scriptChange, (DARKSEND_COLLATERAL * 2) + DARKSEND_FEE));
-        nValueLeft -= (DARKSEND_COLLATERAL * 2) + DARKSEND_FEE;
-        vecSend.push_back(make_pair(scriptChange, (DARKSEND_COLLATERAL * 2) + DARKSEND_FEE));
-        nValueLeft -= (DARKSEND_COLLATERAL * 2) + DARKSEND_FEE;
+        CRecipient recipient = {scriptChange, (DARKSEND_COLLATERAL * 2) + DARKSEND_FEE, false};
+        vecSend.push_back(recipient);
     }
 
     // ****** Add denoms ************ /
@@ -1746,11 +1750,12 @@ bool CDarkSendPool::CreateDenominated(int64_t nTotalValue) {
             CScript scriptChange;
             CPubKey vchPubKey;
             //use a unique change address
-            assert(reservekey.GetReservedKey(vchPubKey)); // should never fail, as we just unlocked
+            assert(reservekey.GetReservedKey(vchPubKey, false)); // should never fail, as we just unlocked
             scriptChange = GetScriptForDestination(vchPubKey.GetID());
             reservekey.KeepKey();
 
-            vecSend.push_back(make_pair(scriptChange, v));
+            CRecipient recipient = {scriptChange, v, false};
+            vecSend.push_back(recipient);
 
             //increment outputs and subtract denomination amount
             nOutputs++;
@@ -1765,9 +1770,9 @@ bool CDarkSendPool::CreateDenominated(int64_t nTotalValue) {
     // if we have anything left over, it will be automatically send back as change - there is no need to send it manually
 
     CCoinControl* coinControl = NULL;
-    //int32_t nChangePos;
+    int nChangePos = -1;
     //bool success = pwalletMain->CreateTransaction(vecSend, wtx, reservekey, nFeeRet, nChangePos, strFail, coinControl, ONLY_NONDENOMINATED_NOTMN);
-    bool success = pwalletMain->CreateTransaction(vecSend, wtx, reservekey, nFeeRet, strFail, coinControl, ONLY_NONDENOMINATED_NOTMN);
+    bool success = pwalletMain->CreateTransaction(vecSend, wtx, reservekey, nFeeRet, nChangePos, strFail, coinControl, ONLY_NONDENOMINATED_NOTMN);
     if (!success) {
         LogPrintf("CreateDenominated: Error - %s\n", strFail.c_str());
         return false;
@@ -1889,7 +1894,7 @@ int CDarkSendPool::GetDenominations(const std::vector<CTxOut>& vout) {
     // look for denominations and update uses to 1
     for (CTxOut out : vout) {
         bool found = false;
-        for (std::pair<int64_t, int> &s : denomUsed) {
+        for (PAIRTYPE(int64_t, int) &s : denomUsed) {
             if (out.nValue == s.first) {
                 s.second = 1;
                 found = true;
@@ -1902,7 +1907,7 @@ int CDarkSendPool::GetDenominations(const std::vector<CTxOut>& vout) {
     int c = 0;
     // if the denomination is used, shift the bit on.
     // then move to the next
-    for (std::pair<int64_t, int> &s : denomUsed)
+    for (PAIRTYPE(int64_t, int) &s : denomUsed)
         denom |= s.second << c++;
 
     // Function returns as follows:
@@ -2110,41 +2115,12 @@ void ThreadCheckDarkSendPool() {
         darkSendPool.CheckTimeout();
 
         if (c % 60 == 0) {
-            LOCK(cs_main);
-            /*
-                cs_main is required for doing masternode.Check because something
-                is modifying the coins view without a mempool lock. It causes
-                segfaults from this code without the cs_main lock.
-            */
-            {
-
+        {
                 LOCK(cs_masternodes);
                 vector<CMasterNode>::iterator it = vecMasternodes.begin();
                 //check them separately
                 while (it != vecMasternodes.end()) {
                     (*it).Check();
-                    ++it;
-                }
-
-                int count = vecMasternodes.size();
-                int i = 0;
-
-                for (CMasterNode mn : vecMasternodes) {
-
-                    if (mn.addr.IsRFC1918()) continue; //local network
-                    if (mn.IsEnabled()) {
-                        if (fDebug) LogPrintf("Sending masternode entry - %s \n", mn.addr.ToString().c_str());
-                        for (CNode * pnode : vNodes) {
-                            if (pnode)
-                                pnode->PushMessage("dsee", mn.vin, mn.addr, mn.sig, mn.now, mn.pubkey, mn.pubkey2, count, i, mn.lastTimeSeen, mn.protocolVersion);
-                        }
-                    }
-                    i++;
-                }
-
-                //remove inactive
-                it = vecMasternodes.begin();
-                while (it != vecMasternodes.end()) {
                     if ((*it).enabled == 4 || (*it).enabled == 3) {
                         LogPrintf("Removing inactive masternode %s\n", (*it).addr.ToString().c_str());
                         it = vecMasternodes.erase(it);
@@ -2152,15 +2128,13 @@ void ThreadCheckDarkSendPool() {
                         ++it;
                     }
                 }
-
             }
-
             masternodePayments.CleanPaymentList();
             CleanTransactionLocksList();
         }
 
-        //try to sync the masternode list and payment list every 5 seconds from at least 3 nodes
-        if (c % 5 == 0 && RequestedMasterNodeList < 3) {
+        //try to sync the masternode list and payment list every 5 seconds from at least 5 nodes
+        if (c % 5 == 0 && RequestedMasterNodeList < 5) {
             bool fIsInitialDownload = IsInitialBlockDownload();
             if (!fIsInitialDownload) {
                 LOCK(cs_vNodes);

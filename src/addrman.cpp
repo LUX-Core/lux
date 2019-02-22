@@ -1,4 +1,6 @@
-// Copyright (c) 2012 Pieter Wuille
+// Copyright (c) 2012-2014 The Bitcoin developers
+// Copyright (c) 2014-2015 The Dash developers
+// Copyright (c) 2015-2018 The Luxcore developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -54,14 +56,7 @@ bool CAddrInfo::IsTerrible(int64_t nNow) const
 double CAddrInfo::GetChance(int64_t nNow) const
 {
     double fChance = 1.0;
-
-    int64_t nSinceLastSeen = nNow - nTime;
-    int64_t nSinceLastTry = nNow - nLastTry;
-
-    if (nSinceLastSeen < 0)
-        nSinceLastSeen = 0;
-    if (nSinceLastTry < 0)
-        nSinceLastTry = 0;
+    int64_t nSinceLastTry = std::max<int64_t>(nNow - nLastTry, 0);
 
     // deprioritize very recent attempts away
     if (nSinceLastTry < 60 * 10)

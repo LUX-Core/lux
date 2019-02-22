@@ -8,7 +8,6 @@
 
 #include "amount.h"
 #include "masternodemanager.h"
-#include "tradingdialog.h"
 #include "smartcontract.h"
 
 #include <QStackedWidget>
@@ -16,7 +15,7 @@
 class BitcoinGUI;
 class ClientModel;
 class OverviewPage;
-//class PlatformStyle;
+class PlatformStyle;
 class ReceiveCoinsDialog;
 class SendCoinsDialog;
 class SendCoinsRecipient;
@@ -46,7 +45,7 @@ class WalletView : public QStackedWidget
     Q_OBJECT
 
 public:
-    explicit WalletView(QWidget *parent);
+    explicit WalletView(const PlatformStyle *platformStyle, QWidget *parent);
     ~WalletView();
 
     void setBitcoinGUI(BitcoinGUI* gui);
@@ -73,7 +72,6 @@ private:
     SmartContract* smartContractPage;
     LSRToken* LSRTokenPage;
     QWidget* transactionsPage;
-    tradingDialog* tradingPage;
     ReceiveCoinsDialog* receiveCoinsPage;
     SendCoinsDialog* sendCoinsPage;
     BlockExplorer* explorerWindow;
@@ -83,15 +81,13 @@ private:
 
     QProgressDialog* progressDialog;
     QLabel* transactionSum;
-    //const PlatformStyle *platformStyle;
+    const PlatformStyle* platformStyle;
 
-public slots:
+public Q_SLOTS:
     /** Switch to overview (home) page */
     void gotoOverviewPage();
     /** Switch to history (transactions) page */
     void gotoHistoryPage();
-    /** Switch to trading page */
-    void gotoTradingPage();
     /** Switch to masternode page */
     void gotoMasternodePage();
     /** Switch to smart contract page */
@@ -151,6 +147,9 @@ public slots:
     /** Show progress dialog e.g. for rescan */
     void showProgress(const QString& title, int nProgress);
 
+    /** User has requested more information about the out of sync state */
+    void requestedSyncWarningInfo();
+
     /** Update selected LUX amount from transactionview */
     void trxAmount(QString amount);
 
@@ -161,6 +160,8 @@ signals:
     void message(const QString& title, const QString& message, unsigned int style);
     /** Encryption status of wallet changed */
     void encryptionStatusChanged(int status);
+    /** HD-Enabled status of wallet changed (only possible during startup) */
+    void hdEnabledStatusChanged(int hdEnabled);
     /** Notify that a new transaction appeared */
     void incomingTransaction(const QString& date, int unit, const CAmount& amount, const QString& type, const QString& address, const QString& label);
     /** Notify that a new token transaction appeared */

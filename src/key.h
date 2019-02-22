@@ -1,5 +1,6 @@
-// Copyright (c) 2009-2010 Satoshi Nakamoto                     -*- c++ -*-
-// Copyright (c) 2009-2014 The Bitcoin developers
+// Copyright (c) 2012-2014 The Bitcoin developers
+// Copyright (c) 2014-2015 The Dash developers
+// Copyright (c) 2015-2018 The Luxcore developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -179,6 +180,23 @@ struct CExtKey {
     bool Derive(CExtKey& out, unsigned int nChild) const;
     CExtPubKey Neuter() const;
     void SetMaster(const unsigned char* seed, unsigned int nSeedLen);
+    template <typename Stream>
+    void Serialize(Stream& s, int nType, int nVersion) const
+    {
+        unsigned int len = BIP32_EXTKEY_SIZE;
+        ::WriteCompactSize(s, len);
+        unsigned char code[BIP32_EXTKEY_SIZE];
+        Encode(code);
+        s.write((const char *)&code[0], len);
+    }
+    template <typename Stream>
+    void Unserialize(Stream& s, int nType, int nVersion)
+    {
+        unsigned int len = ::ReadCompactSize(s);
+        unsigned char code[BIP32_EXTKEY_SIZE];
+        s.read((char *)&code[0], len);
+        Decode(code);
+    }
 };
 
 /** Initialize the elliptic curve support. May not be called twice without calling ECC_Stop first. */

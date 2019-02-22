@@ -58,7 +58,7 @@ CallContractPage::CallContractPage(QWidget *parent) :
     ui->lineEditSenderAddress->setComboBoxEditable(true);
 
     m_tabInfo = new TabBarInfo(ui->stackedWidget);
-    m_tabInfo->addTab(0, tr("Call Contract"));
+    m_tabInfo->addTab(0, tr("Read Contract"));
 
     // Create new PRC command line interface
     QStringList lstMandatory;
@@ -103,8 +103,8 @@ void CallContractPage::setClientModel(ClientModel *_clientModel)
 
     if (m_clientModel)
     {
-        connect(m_clientModel, SIGNAL(numBlocksChanged(int)), this, SLOT(on_numBlocksChanged()));
-        on_numBlocksChanged();
+        connect(m_clientModel, SIGNAL(numBlocksChanged(int)), this, SLOT(on_numBlocksChanged(int)));
+        on_numBlocksChanged(1);
     }
 }
 
@@ -178,16 +178,19 @@ void CallContractPage::on_callContractClicked()
             widgetResult->setResultData(result, m_contractABI->functions[func], m_ABIFunctionField->getParamsValues(), ContractResult::CallResult);
             widgetResult->show();
         } else {
-            QMessageBox::warning(this, tr("Call contract"), errorMessage);
+            QMessageBox::warning(this, tr("Read contract"), errorMessage);
         }
     }
 }
 
-void CallContractPage::on_numBlocksChanged()
+void CallContractPage::on_numBlocksChanged(int newHeight)
 {
     if(m_clientModel)
     {
-        ui->lineEditSenderAddress->on_refresh();
+        if (lastUpdatedHeight < newHeight) {
+            ui->lineEditSenderAddress->on_refresh();
+            lastUpdatedHeight = newHeight;
+        }
     }
 }
 

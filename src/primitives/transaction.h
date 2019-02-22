@@ -1,5 +1,6 @@
-// Copyright (c) 2009-2010 Satoshi Nakamoto             -*- c++ -*-
-// Copyright (c) 2009-2014 The Bitcoin developers
+// Copyright (c) 2012-2014 The Bitcoin developers
+// Copyright (c) 2014-2015 The Dash developers
+// Copyright (c) 2015-2018 The Luxcore developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -432,6 +433,8 @@ public:
     // Compute a hash that includes both transaction and witness data
     uint256 GetWitnessHash() const;
 
+    bool IsEquivalent(const CTransaction& tx) const;
+
     // Return sum of txouts.
     CAmount GetValueOut() const;
     // GetValueIn() is a method on CCoinsViewCache, because
@@ -481,8 +484,6 @@ public:
     }
 
     std::string ToString() const;
-
-    bool GetCoinAge(uint64_t& nCoinAge) const;  // ppcoin: get transaction coin age
 
     bool HasWitness() const
     {

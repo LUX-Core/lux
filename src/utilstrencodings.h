@@ -1,5 +1,6 @@
-// Copyright (c) 2009-2010 Satoshi Nakamoto             -*- c++ -*-
-// Copyright (c) 2009-2014 The Bitcoin developers
+// Copyright (c) 2012-2014 The Bitcoin developers
+// Copyright (c) 2014-2015 The Dash developers
+// Copyright (c) 2015-2018 The Luxcore developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -21,6 +22,7 @@
 #define ARRAYLEN(array) (sizeof(array) / sizeof((array)[0]))
 
 /** This is needed because the foreach macro can't get over the comma in pair<t1, t2> */
+#define PAIRTYPE(t1, t2) std::pair<t1, t2>
 
 std::string SanitizeString(const std::string& str);
 std::vector<unsigned char> ParseHex(const char* psz);
@@ -58,6 +60,20 @@ bool ParseInt32(const std::string& str, int32_t *out);
  *   false if not the entire string could be parsed or when overflow or underflow occurred.
  */
 bool ParseInt64(const std::string& str, int64_t *out);
+
+/**
+ * Convert decimal string to unsigned 32-bit integer with strict parse error feedback.
+ * @returns true if the entire string could be parsed as valid integer,
+ *   false if not the entire string could be parsed or when overflow or underflow occurred.
+ */
+bool ParseUInt32(const std::string& str, uint32_t *out);
+
+/**
+ * Convert decimal string to unsigned 64-bit integer with strict parse error feedback.
+ * @returns true if the entire string could be parsed as valid integer,
+ *   false if not the entire string could be parsed or when overflow or underflow occurred.
+ */
+bool ParseUInt64(const std::string& str, uint64_t *out);
 
 /**
  * Convert string to double with strict parse error feedback.

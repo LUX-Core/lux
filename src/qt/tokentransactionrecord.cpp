@@ -85,13 +85,7 @@ void TokenTransactionRecord::updateStatus(const CWallet *wallet, const CTokenTx 
     {
         status.depth = status.cur_num_blocks - wtx.blockNumber + 1;
     }
-
-    auto mi = wallet->mapWallet.find(wtx.transactionHash);
-    if (mi != wallet->mapWallet.end() && (GetAdjustedTime() - mi->second.nTimeReceived > 2 * 60) && mi->second.GetRequestCount() == 0)
-    {
-        status.status = TokenTransactionStatus::Offline;
-    }
-    else if (status.depth == 0)
+    if (status.depth == 0)
     {
         status.status = TokenTransactionStatus::Unconfirmed;
     }

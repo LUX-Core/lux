@@ -1,7 +1,9 @@
-// Copyright (c) 2015 The Lux developers
-// Copyright (c) 2009-2012 The Darkcoin developers
-// Distributed under the MIT/X11 software license, see the accompanying
+// Copyright (c) 2012-2014 The Bitcoin developers
+// Copyright (c) 2014-2015 The Dash developers
+// Copyright (c) 2015-2018 The Luxcore developers
+// Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
+
 #ifndef SPORK_H
 #define SPORK_H
 
@@ -59,7 +61,7 @@ extern std::map<int, CSporkMessage> mapSporksActive;
 extern CSporkManager sporkManager;
 
 void ProcessSpork(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv, bool &isSporkCommand);
-int GetSporkValue(int nSporkID);
+long GetSporkValue(int nSporkID);
 bool IsSporkActive(int nSporkID);
 void ExecuteSpork(int nSporkID, int nValue);
 

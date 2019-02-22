@@ -9,6 +9,7 @@
 
 #include "guiconstants.h"
 #include "walletmodel.h"
+#include "wallet.h"
 
 #include "allocators.h"
 
@@ -36,7 +37,8 @@ AskPassphraseDialog::AskPassphraseDialog(Mode mode, QWidget* parent, WalletModel
     ui->passEdit1->installEventFilter(this);
     ui->passEdit2->installEventFilter(this);
     ui->passEdit3->installEventFilter(this);
-
+    ui->stakingCheckBox->setChecked(fWalletUnlockStakingOnly);
+    ui->stakingCheckBox->hide();
     this->model = model;
 
     switch (mode) {
@@ -47,8 +49,8 @@ AskPassphraseDialog::AskPassphraseDialog(Mode mode, QWidget* parent, WalletModel
         setWindowTitle(tr("Encrypt wallet"));
         break;
     case UnlockAnonymize:
-        ui->anonymizationCheckBox->setChecked(true);
-        ui->anonymizationCheckBox->show();
+        ui->stakingCheckBox->setChecked(true);
+        ui->stakingCheckBox->show();
     case Unlock: // Ask passphrase
         ui->warningLabel->setText(tr("This operation needs your wallet passphrase to unlock the wallet."));
         ui->passLabel2->hide();
@@ -71,7 +73,7 @@ AskPassphraseDialog::AskPassphraseDialog(Mode mode, QWidget* parent, WalletModel
         break;
     }
 
-    ui->anonymizationCheckBox->setChecked(model->isAnonymizeOnlyUnlocked());
+    ui->stakingCheckBox->setChecked(model->isUnlockStakingOnly());
 
     textChanged();
     connect(ui->passEdit1, SIGNAL(textChanged(QString)), this, SLOT(textChanged()));
@@ -120,17 +122,29 @@ void AskPassphraseDialog::accept()
         if (retval == QMessageBox::Yes) {
             if (newpass1 == newpass2) {
                 if (model->setWalletEncrypted(true, newpass1)) {
-                    QMessageBox::warning(this, tr("Wallet encrypted"),
-                        "<qt>" +
-                            tr("LUX will close now to finish the encryption process. "
-                               "Remember that encrypting your wallet cannot fully protect "
-                               "your LUXs from being stolen by malware infecting your computer.") +
-                            "<br><br><b>" +
-                            tr("IMPORTANT: Any previous backups you have made of your wallet file "
-                               "should be replaced with the newly generated, encrypted wallet file. "
-                               "For security reasons, previous backups of the unencrypted wallet file "
-                               "will become useless as soon as you start using the new, encrypted wallet.") +
-                            "</b></qt>");
+                    if (model->hdEnabled()) { QMessageBox::warning(this, tr("Wallet encrypted"),
+                                             "<qt>" +
+                                             tr("%1 will close now to finish the encryption process."
+                                                "Remember that encrypting your wallet cannot fully protect "
+                                                "your LUXs from being stolen by malware infecting your computer.").arg(tr(PACKAGE_NAME)) +
+                                             "<br><br><b>" +
+                                             tr("IMPORTANT: Any previous backups you have made of your wallet file "
+                                                "should be replaced with the newly generated, encrypted wallet file. "
+                                                "Previous backups of the unencrypted wallet file contain the same HD seed and"
+                                                "still have full access to all your funds just like the new, encrypted wallet.") +
+                                             "</b></qt>");
+                    } else { QMessageBox::warning(this, tr("Wallet encrypted"),
+                                             "<qt>" +
+                                             tr("%1 will close now to finish the encryption process. "
+                                                "Remember that encrypting your wallet cannot fully protect "
+                                                "your funds from being stolen by malware infecting your computer.").arg(tr(PACKAGE_NAME)) +
+                                             "<br><br><b>" +
+                                             tr("IMPORTANT: Any previous backups you have made of your wallet file "
+                                                "should be replaced with the newly generated, encrypted wallet file. "
+                                                "For security reasons, previous backups of the unencrypted wallet file "
+                                                "will become useless as soon as you start using the new, encrypted wallet.") +
+                                             "</b></qt>");
+                    }
                     QApplication::quit();
                 } else {
                     QMessageBox::critical(this, tr("Wallet encryption failed"),
@@ -147,10 +161,11 @@ void AskPassphraseDialog::accept()
     } break;
     case UnlockAnonymize:
     case Unlock:
-        if (!model->setWalletLocked(false, oldpass, ui->anonymizationCheckBox->isChecked())) {
+        if (!model->setWalletLocked(false, oldpass, ui->stakingCheckBox->isChecked())) {
             QMessageBox::critical(this, tr("Wallet unlock failed"),
                 tr("The passphrase entered for the wallet decryption was incorrect."));
         } else {
+            fWalletUnlockStakingOnly = ui->stakingCheckBox->isChecked();
             QDialog::accept(); // Success
         }
         break;

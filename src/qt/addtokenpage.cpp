@@ -55,8 +55,8 @@ void AddTokenPage::setClientModel(ClientModel *clientModel)
     m_clientModel = clientModel;
     if (m_clientModel)
     {
-        connect(m_clientModel, SIGNAL(numBlocksChanged(int)), this, SLOT(on_numBlocksChanged()));
-        on_numBlocksChanged();
+        connect(m_clientModel, SIGNAL(numBlocksChanged(int)), this, SLOT(on_numBlocksChanged(int)));
+        on_numBlocksChanged(1);
     }
 }
 
@@ -138,9 +138,12 @@ void AddTokenPage::on_addressChanged()
     ui->confirmButton->setEnabled(m_validTokenAddress);
 }
 
-void AddTokenPage::on_numBlocksChanged()
+void AddTokenPage::on_numBlocksChanged(int newHeight)
 {
-    ui->lineEditSenderAddress->on_refresh();
+    if (lastUpdatedHeight < newHeight) {
+        ui->lineEditSenderAddress->on_refresh();
+        lastUpdatedHeight = newHeight;
+    }
 }
 
 void AddTokenPage::on_updateConfirmButton()

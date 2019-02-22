@@ -6,8 +6,10 @@
 #define BITCOIN_QT_SPLASHSCREEN_H
 
 #include <QSplashScreen>
+#include <functional>
 
 class NetworkStyle;
+class CWallet;
 
 /** Class for the splashscreen with information of the running client.
  *
@@ -27,7 +29,7 @@ protected:
     void paintEvent(QPaintEvent* event);
     void closeEvent(QCloseEvent* event);
 
-public slots:
+public Q_SLOTS:
     /** Slot to call finish() method as it's not defined as slot */
     void slotFinish(QWidget* mainWin);
 
@@ -39,11 +41,17 @@ private:
     void subscribeToCoreSignals();
     /** Disconnect core signals to splash screen */
     void unsubscribeFromCoreSignals();
+    /** Connect wallet signals to splash screen */
+    void ConnectWallet(CWallet*);
 
     QPixmap pixmap;
     QString curMessage;
     QColor curColor;
     int curAlignment;
+
+    QList<CWallet*> connectedWallets;
+
+    std::function<void(void)> breakAction;
 };
 
 #endif // BITCOIN_QT_SPLASHSCREEN_H

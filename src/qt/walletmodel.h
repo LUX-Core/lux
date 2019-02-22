@@ -24,6 +24,7 @@ enum OutputType : int;
 
 class AddressTableModel;
 class OptionsModel;
+class PlatformStyle;
 class RecentRequestsTableModel;
 class TransactionTableModel;
 class WalletModelTransaction;
@@ -69,6 +70,8 @@ public:
     // Empty if no authentication or invalid signature/cert/etc.
     QString authenticatedMerchant;
 
+    bool fSubtractFeeFromAmount; // memory only
+
     static const int CURRENT_VERSION = 1;
     int nVersion;
 
@@ -111,7 +114,7 @@ class WalletModel : public QObject
     Q_OBJECT
 
 public:
-    explicit WalletModel(CWallet* wallet, OptionsModel* optionsModel, QObject* parent = 0);
+    explicit WalletModel(const PlatformStyle *platformStyle, CWallet* wallet, OptionsModel* optionsModel, QObject* parent = 0);
     ~WalletModel();
 
     enum StatusCode // Returned by sendCoins
@@ -124,7 +127,7 @@ public:
         DuplicateAddress,
         TransactionCreationFailed, // Error returned when wallet is still locked
         TransactionCommitFailed,
-        AnonymizeOnlyUnlocked,
+        StakingOnlyUnlocked,
         InsaneFee
     };
 
@@ -132,7 +135,7 @@ public:
         Unencrypted,                 // !wallet->IsCrypted()
         Locked,                      // wallet->IsCrypted() && wallet->IsLocked()
         Unlocked,                    // wallet->IsCrypted() && !wallet->IsLocked()
-        UnlockedForAnonymizationOnly // wallet->IsCrypted() && !wallet->IsLocked() && wallet->fWalletUnlockAnonymizeOnly
+        UnlockedForStakingOnly            // wallet->IsCrypted() && !wallet->IsLocked() && wallet->fWalletUnlockStakingOnly
     };
 
     OptionsModel* getOptionsModel();
@@ -169,13 +172,19 @@ public:
     bool validateAddress(const QString& address);
 
     // Return status record for SendCoins, contains error id + information
-    struct SendCoinsReturn {
-        SendCoinsReturn(StatusCode status = OK) : status(status) {}
+    struct SendCoinsReturn
+    {
+        SendCoinsReturn(StatusCode _status = OK, QString _reasonCommitFailed = "")
+                : status(_status),
+                  reasonCommitFailed(_reasonCommitFailed)
+        {
+        }
         StatusCode status;
+        QString reasonCommitFailed;
     };
 
     // prepare transaction for getting txfee before sending coins
-    SendCoinsReturn prepareTransaction(WalletModelTransaction& transaction, const CCoinControl* coinControl = NULL);
+    SendCoinsReturn prepareTransaction(WalletModelTransaction& transaction, const CCoinControl* coinControl = NULL, bool sign = false);
 
     // Send coins to a list of recipients
     SendCoinsReturn sendCoins(WalletModelTransaction& transaction);
@@ -183,10 +192,10 @@ public:
     // Wallet encryption
     bool setWalletEncrypted(bool encrypted, const SecureString& passphrase);
     // Passphrase only needed when unlocking
-    bool setWalletLocked(bool locked, const SecureString& passPhrase = SecureString(), bool anonymizeOnly = false);
+    bool setWalletLocked(bool locked, const SecureString& passPhrase = SecureString(), bool stakingOnly = false);
     bool changePassphrase(const SecureString& oldPass, const SecureString& newPass);
     // Is wallet unlocked for anonymization only?
-    bool isAnonymizeOnlyUnlocked();
+    bool isUnlockStakingOnly();
     // Wallet backup
     bool backupWallet(const QString &filename);
     // Restore backup
@@ -214,6 +223,7 @@ public:
         bool valid;
         mutable bool relock; // mutable, as it can be set to false by copying
         void CopyFrom(const UnlockContext& rhs);
+        bool stakingOnly;
     };
 
     UnlockContext requestUnlock(bool relock = false);
@@ -236,6 +246,10 @@ public:
     void loadReceiveRequests(std::vector<std::string>& vReceiveRequests);
     bool saveReceiveRequest(const std::string& sAddress, const int64_t nId, const std::string& sRequest);
     CWallet* getCurrentWallet() { return wallet; }
+    bool hdEnabled() const;
+
+    bool transactionCanBeAbandoned(uint256 hash) const;
+    bool abandonTransaction(uint256 hash) const;
 
     QString getRestorePath();
     QString getRestoreParam();
@@ -245,6 +259,10 @@ public:
     std::vector<CTokenInfo> getInvalidTokens();
 
     bool isMineAddress(const std::string &Address);
+
+    static bool isWalletEnabled();
+
+    int getDefaultConfirmTarget() const;
 
 private:
     CWallet* wallet;
@@ -285,7 +303,7 @@ private:
     void checkBalanceChanged();
     void checkTokenBalanceChanged();
 
-signals:
+Q_SIGNALS:
     // Signal that balance in wallet changed
     void balanceChanged(const CAmount& balance, const CAmount& unconfirmedBalance, const CAmount& immatureBalance, const CAmount& anonymizedBalance, const CAmount& watchOnlyBalance, const CAmount& watchUnconfBalance, const CAmount& watchImmatureBalance);
 
@@ -311,7 +329,7 @@ signals:
 
     void AddTokenTxEntry(bool fHaveWatchonly);
 
-public slots:
+public Q_SLOTS:
     /* Wallet status might have changed */
     void updateStatus();
     /* New transaction, or transaction changed status */

@@ -1,4 +1,6 @@
-// Copyright (c) 2012-2014 The Bitcoin developers               -*- c++ -*-
+// Copyright (c) 2012-2014 The Bitcoin developers
+// Copyright (c) 2014-2015 The Dash developers
+// Copyright (c) 2015-2018 The Luxcore developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -64,7 +66,7 @@ public:
     void update(const_iterator itIn, const mapped_type& v)
     {
         // TODO: When we switch to C++11, use map.erase(itIn, itIn) to get the non-const iterator.
-        iterator itTarget = map.find(itIn->first);
+        iterator itTarget = map.erase(itIn, itIn);
         if (itTarget == map.end())
             return;
         std::pair<rmap_iterator, rmap_iterator> itPair = rmap.equal_range(itTarget->second);

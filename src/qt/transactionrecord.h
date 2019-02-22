@@ -20,7 +20,7 @@ class TransactionStatus
 {
 public:
     TransactionStatus() : countsForBalance(false), sortKey(""),
-                          matures_in(0), status(Offline), depth(0), open_for(0), cur_num_blocks(-1)
+                          matures_in(0), status(Unconfirmed), depth(0), open_for(0), cur_num_blocks(-1)
     {
     }
 
@@ -29,13 +29,12 @@ public:
         /// Normal (sent/received) transactions
         OpenUntilDate,  /**< Transaction not yet final, waiting for date */
         OpenUntilBlock, /**< Transaction not yet final, waiting for block */
-        Offline,        /**< Not sent to any other nodes **/
         Unconfirmed,    /**< Not yet mined into a block **/
         Confirming,     /**< Confirmed, but waiting for the recommended number of confirmations **/
         Conflicted,     /**< Conflicts with other transaction or mempool **/
+        Abandoned,          /**< Abandoned from the wallet **/
         /// Generated (mined) transactions
         Immature,       /**< Mined but waiting for maturity */
-        MaturesWarning, /**< Transaction will likely not mature because no nodes have confirmed */
         NotAccepted     /**< Mined but not accepted */
     };
 
@@ -59,10 +58,13 @@ public:
     /**@}*/
 
     /** Current number of blocks (to know whether cached status is still valid) */
+
     int cur_num_blocks;
 
     //** Know when to update transaction for ix locks **/
     int cur_num_ix_locks;
+
+    bool Updating;
 };
 
 /** UI model for a transaction. A core transaction can be represented by multiple UI transactions if it has
@@ -87,7 +89,7 @@ public:
         DarksendMakeCollaterals,
         DarksendCreateDenominations,
         Darksend,
-        SCcall,
+        SCsent,
         SCcreate,
         SCrefund
     };

@@ -22,7 +22,13 @@ class HelpMessageDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit HelpMessageDialog(QWidget* parent, bool about);
+    enum HelpMode {
+        about,
+        cmdline,
+        pshelp
+    };
+
+    explicit HelpMessageDialog(QWidget *parent, HelpMode helpMode);
     ~HelpMessageDialog();
 
     void printToConsole();
@@ -32,7 +38,7 @@ private:
     Ui::HelpMessageDialog* ui;
     QString text;
 
-private slots:
+private Q_SLOTS:
     void on_okButton_accepted();
 };
 
@@ -44,7 +50,7 @@ class ShutdownWindow : public QWidget
 
 public:
     ShutdownWindow(QWidget* parent = 0, Qt::WindowFlags f = 0);
-    static void showShutdownWindow(BitcoinGUI* window);
+    static QWidget* showShutdownWindow(BitcoinGUI* window);
 
 protected:
     void closeEvent(QCloseEvent* event);

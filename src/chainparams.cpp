@@ -1,7 +1,6 @@
-// Copyright (c) 2010 Satoshi Nakamoto
-// Copyright (c) 2009-2014 The Bitcoin developers
+// Copyright (c) 2012-2014 The Bitcoin developers
 // Copyright (c) 2014-2015 The Dash developers
-// Copyright (c) 2015-2017 The LUX developers
+// Copyright (c) 2015-2018 The Luxcore developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -171,6 +170,7 @@ public:
         nFirstSCBlock = 350000;
         nPruneAfterHeight = 300000;
         nSplitRewardBlock = 300000;
+        nPreminePaymentandHardForkBlock = 621950;
 
         /**
          * The message start string is designed to be unlikely to occur in normal data.
@@ -263,6 +263,9 @@ public:
         base58Prefixes[SECRET_KEY]     = std::vector<unsigned char>(1,155);
         base58Prefixes[EXT_PUBLIC_KEY] = boost::assign::list_of(0x07)(0x28)(0xA2)(0x4E).convert_to_container<std::vector<unsigned char> >();
         base58Prefixes[EXT_SECRET_KEY] = boost::assign::list_of(0x03)(0xD8)(0xA1)(0xE5).convert_to_container<std::vector<unsigned char> >();
+
+        // LUX BIP44 coin type is '1'
+        nExtCoinType = 1;
 
         bech32_hrp = "bc";
 
@@ -369,6 +372,7 @@ public:
         nSplitRewardBlock = 1500;
         nPruneAfterHeight = 5000;
         nFirstSCBlock = 10000;
+        nPreminePaymentandHardForkBlock = 50000;
 
         consensus.hashGenesisBlock = genesis.GetHash();
 
@@ -389,8 +393,8 @@ public:
         // Testnet lux BIP32 prvkeys start with 'DRKP'
         base58Prefixes[EXT_SECRET_KEY] = boost::assign::list_of(0x3a)(0x80)(0x58)(0x37).convert_to_container<std::vector<unsigned char> >();
         // Testnet lux BIP44 coin type is '1' (All coin's testnet default)
-        base58Prefixes[EXT_COIN_TYPE] = boost::assign::list_of(0x01)(0x00)(0x00)(0x80).convert_to_container<std::vector<unsigned char> >();
-
+        // LUX BIP44 coin type is '1'
+        nExtCoinType = 1;
         bech32_hrp = "tb";
 
         convertSeed6(vFixedSeeds, pnSeed6_test, ARRAYLEN(pnSeed6_test));
@@ -452,6 +456,10 @@ public:
         consensus.vDeployments[Consensus::DEPLOYMENT_SEGWIT].nStartTime = 0;
         consensus.vDeployments[Consensus::DEPLOYMENT_SEGWIT].nTimeout = 999999999999ULL;
         consensus.powLimit = ~uint256(0) >> 1;
+        nPreminePaymentandHardForkBlock = 60;
+        nSwitchPhi2Block = 299501;
+        nFirstSCBlock = 350000;
+        nSplitRewardBlock = 50;
 
         pchMessageStart[0] = 0xa1;
         pchMessageStart[1] = 0xcf;
@@ -606,7 +614,8 @@ public:
         base58Prefixes[SECRET_KEY]     = std::vector<unsigned char>(1,155);
         base58Prefixes[EXT_PUBLIC_KEY] = boost::assign::list_of(0x07)(0x28)(0xA2)(0x4E).convert_to_container<std::vector<unsigned char> >();
         base58Prefixes[EXT_SECRET_KEY] = boost::assign::list_of(0x03)(0xD8)(0xA1)(0xE5).convert_to_container<std::vector<unsigned char> >();
-
+        // LUX BIP44 coin type is '1'
+        nExtCoinType = 1;
         fMiningRequiresPeers = true;
         fDefaultConsistencyChecks = false;
         fRequireStandard = true;

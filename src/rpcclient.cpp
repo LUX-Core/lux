@@ -1,7 +1,6 @@
-// Copyright (c) 2010 Satoshi Nakamoto
-// Copyright (c) 2009-2014 The Bitcoin developers
+// Copyright (c) 2012-2014 The Bitcoin developers
 // Copyright (c) 2014-2015 The Dash developers
-// Copyright (c) 2015-2017 The LUX developers
+// Copyright (c) 2015-2018 The Luxcore developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -42,6 +41,7 @@ static const CRPCConvertParam vRPCConvertParams[] =
     { "getsubsidy", 0, "height" },
     { "getreceivedbyaddress", 1, "minconf" },
     { "getreceivedbyaccount", 1, "minconf" },
+    { "listaddressbalances", 0, "minamount" },
     { "listreceivedbyaddress", 0, "minconf" },
     { "listreceivedbyaddress", 1, "include_empty" },
     { "listreceivedbyaddress", 2, "include_watchonly" },
@@ -75,6 +75,8 @@ static const CRPCConvertParam vRPCConvertParams[] =
     { "addmultisigaddress", 0, "nrequired" },
     { "addmultisigaddress", 1, "keys" },
     ////////////////////////////////////////////////// // lux
+    { "autocombinerewards", 0, "enable"},
+    { "autocombinerewards", 1, "threshold"},
     { "getaddresstxids", 0, "addresses"},
     { "getaddresstxids", 1, "start"},
     { "getaddresstxids", 2, "end"},
@@ -92,6 +94,10 @@ static const CRPCConvertParam vRPCConvertParams[] =
     { "searchlogs", 1, "toBlock"},
     { "searchlogs", 2, "address"},
     { "searchlogs", 3, "topics"},
+    { "waitforlogs", 0, "fromBlock"},
+    { "waitforlogs", 1, "txlimit"},
+    { "waitforlogs", 2, "address"},
+    { "waitforlogs", 3, "topics"},
     //////////////////////////////////////////////////
     { "createmultisig", 0, "nrequired" },
     { "createmultisig", 1, "keys" },
@@ -100,6 +106,7 @@ static const CRPCConvertParam vRPCConvertParams[] =
     { "listunspent", 2, "addresses" },
     { "getblock", 1, "verbose" },
     { "getblockheader", 1, "verbose" },
+    { "getchaintxstats", 0, "nblocks" },
     { "gettransaction", 1, "include_watchonly" },
     { "getrawtransaction", 1, "verbose" },
     { "createrawtransaction", 0, "transactions" },

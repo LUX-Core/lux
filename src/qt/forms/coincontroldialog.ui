@@ -495,27 +495,27 @@
      </column>
      <column>
       <property name="text">
-       <string/>
+       <string>Tx Hash</string>
       </property>
      </column>
      <column>
       <property name="text">
-       <string/>
+       <string>Output index</string>
       </property>
      </column>
      <column>
       <property name="text">
-       <string/>
+       <string>Priority</string>
       </property>
      </column>
      <column>
       <property name="text">
-       <string/>
+       <string>Luxsend Rounds</string>
       </property>
      </column>
      <column>
       <property name="text">
-       <string/>
+       <string>Date</string>
       </property>
      </column>
     </widget>

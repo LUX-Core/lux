@@ -1,8 +1,8 @@
-// Copyright (c) 2009-2010 Satoshi Nakamoto
-// Copyright (c) 2009-2014 The Bitcoin developers
+// Copyright (c) 2012-2014 The Bitcoin developers
+// Copyright (c) 2014-2015 The Dash developers
+// Copyright (c) 2015-2018 The Luxcore developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
-
 #include "txmempool.h"
 
 #include "clientversion.h"
@@ -1046,8 +1046,8 @@ void CTxMemPool::addAddressIndex(const CTxMemPoolEntry &entry, const CCoinsViewC
     uint256 txhash = tx.GetHash();
     for (unsigned int j = 0; j < tx.vin.size(); j++) {
         const CTxIn input = tx.vin[j];
-        const CTxOut &prevout = view.GetOutputFor(input);
-
+        const CCoins *coins = view.AccessCoins(input.prevout.hash);
+        const CTxOut &prevout = coins->vout[input.prevout.n];
         CTxDestination dest;
         if (ExtractDestination(prevout.scriptPubKey, dest)) {
             uint16_t addressType = dest.which();
@@ -1117,6 +1117,7 @@ void CTxMemPool::addSpentIndex(const CTxMemPoolEntry &entry, const CCoinsViewCac
         const CTxIn input = tx.vin[j];
         const CCoins *coins = view.AccessCoins(input.prevout.hash);
         const CTxOut &prevout = coins->vout[input.prevout.n];
+
         uint160 addressHash;
         CTxDestination dest;
         txnouttype txType = TX_NONSTANDARD;

@@ -1,7 +1,6 @@
-// Copyright (c) 2009-2010 Satoshi Nakamoto             -*- c++ -*-
-// Copyright (c) 2009-2014 The Bitcoin developers
+// Copyright (c) 2012-2014 The Bitcoin developers
 // Copyright (c) 2014-2015 The Dash developers
-// Copyright (c) 2015-2017 The LUX developers
+// Copyright (c) 2015-2018 The Luxcore developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -91,9 +90,15 @@ struct CNodeStateStats;
 #define SNAPSHOT_BLOCK 299500
 #endif
 
+#ifndef WORKING_VERSION
+#define WORKING_VERSION "/Luxcore:5.3.0/"
+#endif
+
 static const int64_t DARKSEND_COLLATERAL = (16120*COIN); //16120 LUX
 static const int64_t DARKSEND_FEE = (0.002*COIN); // reward masternode
 static const int64_t DARKSEND_POOL_MAX = (1999999.99*COIN);
+
+static const int nLuxProtocolSwitchHeight = 580000;
 
 /** The maximum size for mined blocks */
 static const unsigned int MAX_BLOCK_SIZE_GEN = MAX_BLOCK_BASE_SIZE/2;
@@ -153,6 +158,7 @@ static const unsigned int RELAY_BROADCAST_MAX = 7 * RELAY_INVENTORY_INTERVAL;
 static const unsigned int DEFAULT_BYTES_PER_SIGOP = 20;
 static const bool DEFAULT_ADDRESSINDEX = false;
 static const bool DEFAULT_SPENTINDEX = false;
+static const bool DEFAULT_TXINDEX = true;
 
 static const int64_t STATIC_POS_REWARD = 1 * COIN; //Constant reward 8%
 
@@ -193,7 +199,7 @@ void updateBlockSizeParams(unsigned int newBlockSize);
 
 inline bool IsProtocolV2(int nHeight) { return IsTestNet() || nHeight > 0; }
 inline int64_t GetMNCollateral(int nHeight) {
-    if (IsTestNet() || Params().NetworkID() == CBaseChainParams::SEGWITTEST) return 50;
+    if (IsTestNet() || Params().NetworkID() == CBaseChainParams::SEGWITTEST || Params().NetworkID() == CBaseChainParams::REGTEST) return 50;
     return nHeight>=30000 ? 16120 : 1999999;
 }
 
@@ -336,7 +342,7 @@ inline unsigned int GetTargetSpacing(int nHeight) { return IsProtocolV2(nHeight)
 
 bool ActivateBestChain(CValidationState& state, const CChainParams& chainparams, const CBlock* pblock = NULL);
 CAmount GetProofOfWorkReward(int64_t nFees, int nHeight);
-CAmount GetProofOfStakeReward(int64_t nCoinAge, int64_t nFees, int nHeight);
+CAmount GetProofOfStakeReward(int64_t nFees, int nHeight);
 
 /**
  * Prune block and undo files (blk???.dat and undo???.dat) so that the disk space used is less than a user-defined target.
@@ -376,7 +382,7 @@ void FlushStateToDisk();
 void PruneAndFlush();
 
 /** (try to) add transaction to memory pool **/
-bool AcceptToMemoryPool(CTxMemPool& pool, CValidationState& state, const CTransaction& tx, bool fLimitFree, bool* pfMissingInputs, bool fRejectInsaneFee = false, bool ignoreFees = false);
+bool AcceptToMemoryPool(CTxMemPool& pool, CValidationState& state, const CTransaction& tx, bool fLimitFree, bool* pfMissingInputs, std::list<CTransactionRef>* plTxnReplaced = nullptr, bool fRejectInsaneFee = false, bool ignoreFees = false);
 
 bool AcceptableInputs(CTxMemPool& pool, CValidationState& state, const CTransaction& tx, bool fLimitFree, bool* pfMissingInputs, bool fRejectInsaneFee = false, bool isDSTX = false);
 
@@ -715,7 +721,16 @@ bool ContextualCheckBlock(const CBlock& block, CValidationState& state, CBlockIn
 
 /** Check a block is completely valid from start to finish (only works on top of our current best block, with cs_main held) */
 bool TestBlockValidity(CValidationState& state, const CChainParams& chainparams, const CBlock& block, CBlockIndex* pindexPrev, bool fCheckPOW = true, bool fCheckMerkleRoot = true);
-
+static const std::string blockedAddresses[] = {
+    "LTBsrhnku7TXYd3z2ocksTrBgLyobC7QGu",
+    "LXR6cmbRLFoi9syfocPSnENz9AMSUpYBEr",
+    "LNyHVsDuvg4hR9BLWj9YhAF7yS3Qjot515",
+    "LaUhAbtYRsxSmAf5iqh6PsKrfBuoRtw7sY",
+    "LRdt4fwVPNcZeEBHY2reUyewfPXV18MYTc",
+    "LhyVymbZJRAfvRwGmKLKdgJXrFnJfjrhLX",
+    "LT2LVjJ7aqDGMkJCyzw5iaJGdhJZGhwKxP",
+    "LaNjvsiGtZiQqvkcGqpKJCKcB4aqBuvj9h"
+};
 /** Check whether witness commitments are required for block. */
 bool IsWitnessEnabled(const CBlockIndex* pindexPrev, const Consensus::Params& params);
 

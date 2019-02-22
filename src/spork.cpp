@@ -1,8 +1,8 @@
-// Copyright (c) 2015 The Lux developers
-// Copyright (c) 2009-2012 The Darkcoin developers
-// Distributed under the MIT/X11 software license, see the accompanying
+// Copyright (c) 2012-2014 The Bitcoin developers
+// Copyright (c) 2014-2015 The Dash developers
+// Copyright (c) 2015-2018 The Luxcore developers
+// Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
-
 
 //#include "bignum.h"
 #include "sync.h"
@@ -96,7 +96,7 @@ bool IsSporkActive(int nSporkID) {
 }
 
 // grab the value of the spork on the network, or the default
-int GetSporkValue(int nSporkID) {
+long GetSporkValue(int nSporkID) {
     int r = 0;
     if (mapSporksActive.count(nSporkID)) {
         r = mapSporksActive[nSporkID].nValue;

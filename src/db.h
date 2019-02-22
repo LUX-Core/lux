@@ -1,5 +1,6 @@
-// Copyright (c) 2009-2010 Satoshi Nakamoto                     -*- c++ -*-
-// Copyright (c) 2009-2014 The Bitcoin developers
+// Copyright (c) 2012-2014 The Bitcoin developers
+// Copyright (c) 2014-2015 The Dash developers
+// Copyright (c) 2015-2018 The Luxcore developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -25,7 +26,6 @@ class COutPoint;
 
 struct CBlockLocator;
 
-extern unsigned int nWalletDBUpdated;
 
 class CDBEnv
 {
@@ -40,7 +40,7 @@ private:
 
 public:
     mutable CCriticalSection cs_db;
-    DbEnv dbenv;
+    DbEnv *dbenv;
     std::map<std::string, int> mapFileUseCount;
     std::map<std::string, Db*> mapDb;
 
@@ -48,6 +48,7 @@ public:
     ~CDBEnv();
     void MakeMock();
     bool IsMock() { return fMockDb; }
+    void Reset();
 
     /**
      * Verify that database file strFile is OK. If it is not,
@@ -69,7 +70,7 @@ public:
     typedef std::pair<std::vector<unsigned char>, std::vector<unsigned char> > KeyValPair;
     bool Salvage(std::string strFile, bool fAggressive, std::vector<KeyValPair>& vResult);
 
-    bool Open(const boost::filesystem::path& path);
+    bool Open(const boost::filesystem::path& path, bool retry = true);
     void Close();
     void Flush(bool fShutdown);
     void CheckpointLSN(const std::string& strFile);
@@ -80,7 +81,7 @@ public:
     DbTxn* TxnBegin(int flags = DB_TXN_WRITE_NOSYNC)
     {
         DbTxn* ptxn = NULL;
-        int ret = dbenv.txn_begin(NULL, &ptxn, flags);
+        int ret = dbenv->txn_begin(NULL, &ptxn, flags);
         if (!ptxn || ret != 0)
             return NULL;
         return ptxn;
@@ -122,28 +123,29 @@ protected:
         CDataStream ssKey(SER_DISK, CLIENT_VERSION);
         ssKey.reserve(1000);
         ssKey << key;
-        Dbt datKey(&ssKey[0], ssKey.size());
+        Dbt datKey(ssKey.data(), ssKey.size());
 
         // Read
         Dbt datValue;
         datValue.set_flags(DB_DBT_MALLOC);
         int ret = pdb->get(activeTxn, &datKey, &datValue, 0);
-        memset(datKey.get_data(), 0, datKey.get_size());
-        if (datValue.get_data() == NULL)
-            return false;
+        memory_cleanse(datKey.get_data(), datKey.get_size());
+        bool success = false;
+        if (datValue.get_data() != NULL) {
+            // Unserialize value
+            try {
+                CDataStream ssValue((char*)datValue.get_data(), (char*)datValue.get_data() + datValue.get_size(), SER_DISK, CLIENT_VERSION);
+                ssValue >> value;
+                success = true;
+            } catch (const std::exception&) {
+                // In this case success remains 'false'
+            }
 
-        // Unserialize value
-        try {
-            CDataStream ssValue((char*)datValue.get_data(), (char*)datValue.get_data() + datValue.get_size(), SER_DISK, CLIENT_VERSION);
-            ssValue >> value;
-        } catch (const std::exception&) {
-            return false;
+            // Clear and free memory
+            memory_cleanse(datValue.get_data(), datValue.get_size());
+            free(datValue.get_data());
         }
-
-        // Clear and free memory
-        memset(datValue.get_data(), 0, datValue.get_size());
-        free(datValue.get_data());
-        return (ret == 0);
+        return ret == 0 && success;
     }
 
     template <typename K, typename T>
@@ -158,7 +160,7 @@ protected:
         CDataStream ssKey(SER_DISK, CLIENT_VERSION);
         ssKey.reserve(1000);
         ssKey << key;
-        Dbt datKey(&ssKey[0], ssKey.size());
+        Dbt datKey(ssKey.data(), ssKey.size());
 
         // Value
         CDataStream ssValue(SER_DISK, CLIENT_VERSION);
@@ -170,8 +172,8 @@ protected:
         int ret = pdb->put(activeTxn, &datKey, &datValue, (fOverwrite ? 0 : DB_NOOVERWRITE));
 
         // Clear memory in case it was a private key
-        memset(datKey.get_data(), 0, datKey.get_size());
-        memset(datValue.get_data(), 0, datValue.get_size());
+        memory_cleanse(datKey.get_data(), datKey.get_size());
+        memory_cleanse(datValue.get_data(), datValue.get_size());
         return (ret == 0);
     }
 
@@ -187,13 +189,13 @@ protected:
         CDataStream ssKey(SER_DISK, CLIENT_VERSION);
         ssKey.reserve(1000);
         ssKey << key;
-        Dbt datKey(&ssKey[0], ssKey.size());
+        Dbt datKey(ssKey.data(), ssKey.size());
 
         // Erase
         int ret = pdb->del(activeTxn, &datKey, 0);
 
         // Clear memory
-        memset(datKey.get_data(), 0, datKey.get_size());
+        memory_cleanse(datKey.get_data(), datKey.get_size());
         return (ret == 0 || ret == DB_NOTFOUND);
     }
 
@@ -207,13 +209,13 @@ protected:
         CDataStream ssKey(SER_DISK, CLIENT_VERSION);
         ssKey.reserve(1000);
         ssKey << key;
-        Dbt datKey(&ssKey[0], ssKey.size());
+        Dbt datKey(ssKey.data(), ssKey.size());
 
         // Exists
         int ret = pdb->exists(activeTxn, &datKey, 0);
 
         // Clear memory
-        memset(datKey.get_data(), 0, datKey.get_size());
+        memory_cleanse(datKey.get_data(), datKey.get_size());
         return (ret == 0);
     }
 
@@ -233,7 +235,7 @@ protected:
         // Read at cursor
         Dbt datKey;
         if (fFlags == DB_SET || fFlags == DB_SET_RANGE || fFlags == DB_GET_BOTH || fFlags == DB_GET_BOTH_RANGE) {
-            datKey.set_data(&ssKey[0]);
+            datKey.set_data(ssKey.data());
             datKey.set_size(ssKey.size());
         }
         Dbt datValue;
@@ -258,8 +260,8 @@ protected:
         ssValue.write((char*)datValue.get_data(), datValue.get_size());
 
         // Clear and free memory
-        memset(datKey.get_data(), 0, datKey.get_size());
-        memset(datValue.get_data(), 0, datValue.get_size());
+        memory_cleanse(datKey.get_data(), datKey.get_size());
+        memory_cleanse(datValue.get_data(), datValue.get_size());
         free(datKey.get_data());
         free(datValue.get_data());
         return 0;

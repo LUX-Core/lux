@@ -1,6 +1,7 @@
-// Copyright (c) 2009-2010 Satoshi Nakamoto             -*- c++ -*-
-// Copyright (c) 2009-2013 The Bitcoin developers
-// Distributed under the MIT/X11 software license, see the accompanying
+// Copyright (c) 2012-2014 The Bitcoin developers
+// Copyright (c) 2014-2015 The Dash developers
+// Copyright (c) 2015-2018 The Luxcore developers
+// Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #ifndef BITCOIN_WALLETDB_H
@@ -8,6 +9,7 @@
 
 #include "amount.h"
 #include "db.h"
+#include "hdchain.h"
 #include "key.h"
 #include "keystore.h"
 
@@ -45,9 +47,13 @@ enum DBErrors {
 class CKeyMetadata
 {
 public:
-    static const int CURRENT_VERSION = 1;
+    static const int VERSION_BASIC=1;
+    static const int VERSION_WITH_HDDATA=10;
+    static const int CURRENT_VERSION=VERSION_WITH_HDDATA;
     int nVersion;
     int64_t nCreateTime; // 0 means unknown
+    CKeyID hdMasterKeyID; //id of the hd masterkey used to derive this key
+    std::string hdKeypath; //optional HD/bip32 keypath
 
     CKeyMetadata()
     {
@@ -55,7 +61,7 @@ public:
     }
     CKeyMetadata(int64_t nCreateTime_)
     {
-        nVersion = CKeyMetadata::CURRENT_VERSION;
+        SetNull();
         nCreateTime = nCreateTime_;
     }
 
@@ -67,12 +73,19 @@ public:
         READWRITE(this->nVersion);
         nVersion = this->nVersion;
         READWRITE(nCreateTime);
+        if (this->nVersion >= VERSION_WITH_HDDATA)
+        {
+            READWRITE(hdKeypath);
+            READWRITE(hdMasterKeyID);
+        }
     }
 
     void SetNull()
     {
         nVersion = CKeyMetadata::CURRENT_VERSION;
         nCreateTime = 0;
+        hdKeypath.clear();
+
     }
 };
 
@@ -100,7 +113,7 @@ public:
         READWRITE(sAlias);
         READWRITE(sAddress);
         READWRITE(sCollateralAddress);
-	READWRITE(sMasternodePrivKey);
+	    READWRITE(sMasternodePrivKey);
     }
 };
 
@@ -118,7 +131,7 @@ public:
     bool WritePurpose(const std::string& strAddress, const std::string& purpose);
     bool ErasePurpose(const std::string& strAddress);
 
-    bool WriteTx(uint256 hash, const CWalletTx& wtx);
+    bool WriteTx(const CWalletTx& wtx);
     bool EraseTx(uint256 hash);
 
     bool WriteToken(const CTokenInfo& wtoken);
@@ -146,13 +159,13 @@ public:
     bool WriteOrderPosNext(int64_t nOrderPosNext);
 
     // presstab
-    bool WriteStakeSplitThreshold(uint64_t nStakeSplitThreshold);
+    bool WriteStakeSplitThreshold(int64_t nStakeSplitThreshold);
     bool WriteMultiSend(std::vector<std::pair<std::string, int> > vMultiSend);
     bool EraseMultiSend(std::vector<std::pair<std::string, int> > vMultiSend);
     bool WriteMSettings(bool fMultiSendStake, bool fMultiSendMasternode, int nLastMultiSendHeight);
     bool WriteMSDisabledAddresses(std::vector<std::string> vDisabledAddresses);
     bool EraseMSDisabledAddresses(std::vector<std::string> vDisabledAddresses);
-    bool WriteAutoCombineSettings(bool fEnable, CAmount nCombineThreshold);
+    bool WriteAutoCombineSettings(bool fEnable, int64_t nCombineThreshold);
 
     bool WriteDefaultKey(const CPubKey& vchPubKey);
 
@@ -184,9 +197,17 @@ public:
     DBErrors LoadWallet(CWallet* pwallet);
     DBErrors FindWalletTx(CWallet* pwallet, std::vector<uint256>& vTxHash, std::vector<CWalletTx>& vWtx);
     DBErrors ZapWalletTx(CWallet* pwallet, std::vector<CWalletTx>& vWtx);
+    DBErrors ZapSelectTx(CWallet* pwallet, std::vector<uint256>& vHashIn, std::vector<uint256>& vHashOut);
     static bool Recover(CDBEnv& dbenv, std::string filename, bool fOnlyKeys);
     static bool Recover(CDBEnv& dbenv, std::string filename);
     static unsigned int GetUpdateCounter();
+
+    //! write the hdchain model (external chain child index counter)
+    bool WriteHDChain(const CHDChain& chain);
+    bool WriteCryptedHDChain(const CHDChain& chain);
+    bool WriteHDPubKey(const CHDPubKey& hdPubKey, const CKeyMetadata& keyMeta);
+
+    static void IncrementUpdateCounter();
 private:
     CWalletDB(const CWalletDB&);
     void operator=(const CWalletDB&);

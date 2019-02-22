@@ -1,5 +1,6 @@
-// Copyright (c) 2009-2010 Satoshi Nakamoto                     -*- c++ -*-
-// Copyright (c) 2009-2014 The Bitcoin developers
+// Copyright (c) 2012-2014 The Bitcoin developers
+// Copyright (c) 2014-2015 The Dash developers
+// Copyright (c) 2015-2018 The Luxcore developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -19,10 +20,13 @@ class thread_group;
 extern CWallet* pwalletMain;
 
 void StartShutdown();
+void StartRestart();
 bool ShutdownRequested();
 void Shutdown();
 void PrepareShutdown();
-bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler);
+bool AppInit2();
+/** Interrupt threads */
+void Interrupt();
 
 /** The help message mode determines what help message to show */
 enum HelpMessageMode {

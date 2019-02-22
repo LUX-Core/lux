@@ -97,7 +97,7 @@ void StorageResults::commitResults(){
 bool StorageResults::readResult(dev::h256 const& _key, std::vector<TransactionReceiptInfo>& _result){
 
     std::string value;
-    std::string keyTemp = _key.hex();;
+    std::string keyTemp = _key.hex();
     leveldb::Slice key(keyTemp);
     leveldb::Status s = db->Get(leveldb::ReadOptions(), key, &value);
 

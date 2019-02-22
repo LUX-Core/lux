@@ -347,6 +347,9 @@ UniValue validateaddress(const UniValue& params, bool fHelp)
             "  \"iscompressed\" : true|false,    (boolean) If the address is compressed\n"
             "  \"account\" : \"account\"         (string) The account associated with the address, \"\" is the default account\n"
             "  \"timestamp\" : timestamp,      (number, optional) The creation time of the key if available in seconds since epoch (Jan 1 1970 GMT)\n"
+            "  \"hdkeypath\" : \"keypath\"       (string, optional) The HD keypath if the key is HD and available\n"
+            "  \"hdchainid\" : \"<hash>\"        (string, optional) The ID of the HD chain\n"
+            "  \"hdmasterkeyid\" : \"<hash160>\" (string, optional) The Hash160 of the HD master pubkey\n"
             "}\n"
             "\nExamples:\n" +
             HelpExampleCli("validateaddress", "\"1PSSGeFHDnKNxiEyFrD1wcEaHr9hrQDDWc\"") + HelpExampleRpc("validateaddress", "\"1PSSGeFHDnKNxiEyFrD1wcEaHr9hrQDDWc\""));
@@ -374,7 +377,8 @@ UniValue validateaddress(const UniValue& params, bool fHelp)
         ret.pushKVs(detail);
         if (pwalletMain && pwalletMain->mapAddressBook.count(dest))
             ret.push_back(Pair("account", pwalletMain->mapAddressBook[dest].name));
-        if (pwalletMain) {
+        CKeyID keyID;
+            if (pwalletMain) {
             const CKeyMetadata* meta = nullptr;
             CKeyID key_id = GetKeyForDestination(*pwalletMain, dest);
             if (key_id != uint160(0)) {
@@ -383,8 +387,24 @@ UniValue validateaddress(const UniValue& params, bool fHelp)
                     meta = &it->second;
                 }
             }
+            if (!meta) {
+                auto it = pwalletMain->m_script_metadata.find(CScriptID(scriptPubKey));
+                if (it != pwalletMain->m_script_metadata.end()) {
+                    meta = &it->second;
+                }
+            }
             if (meta) {
                 ret.push_back(Pair("timestamp", meta->nCreateTime));
+                if (!meta->hdKeypath.empty()) {
+                    ret.push_back(Pair("hdkeypath", meta->hdKeypath));
+                    ret.push_back(Pair("hdmasterkeyid", meta->hdMasterKeyID.GetHex()));
+                    }
+            }
+
+            CHDChain hdChainCurrent;
+            if (!keyID.IsNull() && pwalletMain->mapHdPubKeys.count(keyID) && pwalletMain->GetHDChain(hdChainCurrent)) {
+                ret.push_back(Pair("hdkeypath", pwalletMain->mapHdPubKeys[keyID].GetKeyPath()));
+                ret.push_back(Pair("hdchainid", hdChainCurrent.GetID().GetHex()));
             }
         }
 #endif
@@ -1193,22 +1213,61 @@ UniValue getstakingstatus(const UniValue& params, bool fHelp)
             "Returns an object containing various staking information.\n"
             "\nResult:\n"
             "{\n"
+            "  \"staking\": true|false,            (boolean) if the wallet is staking or not\n"
             "  \"validtime\": true|false,          (boolean) if the chain tip is within staking phases\n"
             "  \"haveconnections\": true|false,    (boolean) if network connections are present\n"
             "  \"walletunlocked\": true|false,     (boolean) if the wallet is unlocked\n"
             "  \"mintablecoins\": true|false,      (boolean) if the wallet has mintable coins\n"
             "  \"enoughcoins\": true|false,        (boolean) if available coins are greater than reserve balance\n"
+            "  \"stakeweight\": {\n"
+            "    \"min\": X,                       (integer) min weight of staked coin\n"
+            "    \"max\": X,                       (integer) max weight of staked coin\n"
+            "    \"combined\": X,                  (integer) sum of weights of staked coins\n"
+            "    \"valuesum\": X,                  (integer) sum of values of staked coins\n"
+            "  },\n"
+            "  \"stakeblockscreated\": X,          (integer) number of stake blocks created\n"
+            "  \"stakeblocksaccepted\": X,         (integer) number of stake blocks accepted\n"
+            "  \"foundstake\": X,                  (integer) number of stake kernels found\n"
+            "  \"difficulty\": X,                  (integer) Returns the proof-of-stake difficulty as a multiple of the minimum difficulty. \n"
+            "  \"beststakediff\": X.X,             (double) best diff of staked coins\n"
+            "  \"sumdiff\": X.X,                   (double) sum of diff of staked coins\n"
+            "  \"netstakeweight\": X,              (integer) estimated network weight\n"
+            "  \"expectedtime\": X                 (integer) expected time to stake in seconds\n"
             "}\n"
             "\nExamples:\n" +
             HelpExampleCli("getstakingstatus", "") + HelpExampleRpc("getstakingstatus", ""));
 
     UniValue obj(UniValue::VOBJ);
+    obj.push_back(Pair("staking", stake->IsActive()));
     obj.push_back(Pair("validtime", chainActive.Tip()->nTime > 1471482000));
     obj.push_back(Pair("haveconnections", !vNodes.empty()));
     if (pwalletMain) {
         obj.push_back(Pair("walletunlocked", !pwalletMain->IsLocked()));
         obj.push_back(Pair("mintablecoins", pwalletMain->MintableCoins()));
         obj.push_back(Pair("enoughcoins", (stake->GetReservedBalance() <= pwalletMain->GetBalance() ? "yes" : "no")));
+    }
+    uint64_t nWeight = 0;
+    if (pwalletMain)
+        pwalletMain->GetStakeWeight(nWeight);
+    uint64_t nNetworkWeight = GetPoSKernelPS();
+    int64_t nTargetSpacing = Params().StakingInterval();
+    uint64_t nExpectedTime = nWeight != 0 ? (nTargetSpacing * nNetworkWeight / nWeight) : 0;
+    UniValue weight(UniValue::VOBJ);
+    {
+        LOCK(stake->stakeMiner.lock);
+        weight.pushKV("min",    stake->stakeMiner.nWeightMin);
+        weight.pushKV("max",    stake->stakeMiner.nWeightMax);
+        weight.pushKV("combined",   stake->stakeMiner.nWeightSum);
+        weight.pushKV("valuesum",   stake->stakeMiner.dValueSum);
+        obj.pushKV("stakeweight", weight);
+        obj.pushKV("stakeblockscreated", stake->stakeMiner.nBlocksCreated);
+        obj.pushKV("stakeblocksaccepted", stake->stakeMiner.nBlocksAccepted);
+        obj.pushKV("foundstake", stake->stakeMiner.nKernelsFound);
+        obj.push_back(Pair("difficulty", GetDifficulty(GetLastBlockIndex(pindexBestHeader, true))));
+        obj.pushKV("beststakediff", stake->stakeMiner.dKernelDiffMax);
+        obj.pushKV("sumdiff", stake->stakeMiner.dKernelDiffSum);
+        obj.push_back(Pair("netstakeweight", (uint64_t)nNetworkWeight));
+        obj.push_back(Pair("expectedtime", nExpectedTime));
     }
     return obj;
 }

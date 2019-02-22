@@ -14,6 +14,7 @@ class WalletModel;
 class ClientModel;
 class TokenTransactionView;
 class QMenu;
+class QSortFilterProxyModel;
 
 namespace Ui {
 class LSRToken;
@@ -46,7 +47,7 @@ public Q_SLOTS:
     void copyTokenName();
     void copySenderAddress();
     void removeToken();
-
+    void focusToken(const QModelIndex& index);
 private:
     Ui::LSRToken *ui;
     SendTokenPage* m_sendTokenPage;
@@ -54,7 +55,7 @@ private:
     AddTokenPage* m_addTokenPage;
     WalletModel* m_model;
     ClientModel* m_clientModel;
-    QAbstractItemModel* m_tokenModel;
+    QSortFilterProxyModel* m_tokenModel;
     TokenViewDelegate* m_tokenDelegate;
     QAction *m_sendAction;
     QAction *m_receiveAction;

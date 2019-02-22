@@ -4,7 +4,7 @@
 #include "guiconstants.h"
 #include "guiutil.h"
 #include "optionsmodel.h"
-//#include "platformstyle.h"
+#include "platformstyle.h"
 #include "tokentransactiondesc.h"
 #include "tokentransactionrecord.h"
 #include "walletmodel.h"
@@ -261,12 +261,13 @@ public:
     }
 };
 
-TokenTransactionTableModel::TokenTransactionTableModel(CWallet* _wallet, WalletModel *parent):
+TokenTransactionTableModel::TokenTransactionTableModel(const PlatformStyle* platformStyle, CWallet* wallet, WalletModel *parent):
         QAbstractTableModel(parent),
-        wallet(_wallet),
+        wallet(wallet),
         walletModel(parent),
-        priv(new TokenTransactionTablePriv(_wallet, this)),
-        fProcessingQueuedTransactions(false)
+        priv(new TokenTransactionTablePriv(wallet, this)),
+        fProcessingQueuedTransactions(false),
+        platformStyle(platformStyle)
 
 {
     columns << QString() << tr("Date") << tr("Type") << tr("Label") << tr("Name") << tr("Amount");
@@ -464,8 +465,6 @@ QVariant TokenTransactionTableModel::txStatusDecoration(const TokenTransactionRe
 {
     switch(wtx->status.status)
     {
-    case TokenTransactionStatus::Offline:
-        return COLOR_TX_STATUS_OFFLINE;
     case TokenTransactionStatus::Unconfirmed:
         return QIcon(":/icons/transaction_0");
     case TokenTransactionStatus::Confirming: {
@@ -724,7 +723,7 @@ static void NotifyTokenTransactionChanged(TokenTransactionTableModel *ttm, CWall
 
 static void ShowProgress(TokenTransactionTableModel *ttm, const std::string &title, int nProgress)
 {
-    if (nProgress == 0)
+    if (nProgress < 100)
         fQueueNotifications = true;
 
     if (nProgress == 100)

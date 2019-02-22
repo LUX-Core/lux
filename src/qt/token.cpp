@@ -560,6 +560,36 @@ bool Token::exec(const std::vector<std::string> &input, int func, std::vector<st
     return true;
 }
 
+void logTokenEvents(std::vector<TokenEvent> &tokenEvents, TokenEvent tokenEvent) {
+    bool found = false;
+    for(size_t i = 0; i < tokenEvents.size(); i++) {
+        // Compare the event data
+        TokenEvent tokenTx = tokenEvents[i];
+        if(tokenTx.address != tokenEvent.address)
+            continue;
+        if(tokenTx.sender != tokenEvent.sender)
+            continue;
+        if(tokenTx.receiver != tokenEvent.receiver)
+            continue;
+        if(tokenTx.blockHash != tokenEvent.blockHash)
+            continue;
+        if(tokenTx.blockNumber != tokenEvent.blockNumber)
+            continue;
+        if(tokenTx.transactionHash != tokenEvent.transactionHash)
+            continue;
+
+        // Update value
+        dev::u256 tokenValue = uintTou256(tokenTx.value) + uintTou256(tokenEvent.value);
+        tokenTx.value = u256Touint(tokenValue);
+        tokenEvents[i] = tokenTx;
+        found = true;
+        break;
+    }
+    // Add new event
+    if(!found)
+        tokenEvents.push_back(tokenEvent);
+}
+
 bool Token::execEvents(int64_t fromBlock, int64_t toBlock, int func, std::vector<TokenEvent> &tokenEvents)
 {
     // Check parameters
@@ -612,7 +642,7 @@ bool Token::execEvents(int64_t fromBlock, int64_t toBlock, int func, std::vector
             dev::u256 outData = dev::eth::ABIDeserialiser<dev::u256>::deserialise(o);
             tokenEvent.value = u256Touint(outData);
 
-            tokenEvents.push_back(tokenEvent);
+            logTokenEvents(tokenEvents, tokenEvent);
         }
     }
 

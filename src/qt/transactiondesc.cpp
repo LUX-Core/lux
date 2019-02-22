@@ -26,6 +26,21 @@
 
 using namespace std;
 
+static int GetStakeInputAge(const CWalletTx& wtx)
+{
+    CTransaction tx;
+    uint256 hashBlock;
+    COutPoint out = wtx.vin[0].prevout;
+    if (GetTransaction(out.hash, tx, Params().GetConsensus(), hashBlock, true)) {
+        CBlockIndex* pindex = LookupBlockIndex(hashBlock);
+        if (pindex) {
+            CBlockHeader prevblock = pindex->GetBlockHeader();
+            return (wtx.GetTxTime() - prevblock.nTime);
+        }
+    }
+    return 0;
+}
+
 QString TransactionDesc::FormatTxStatus(const CWalletTx& wtx)
 {
     AssertLockHeld(cs_main);
@@ -37,9 +52,9 @@ QString TransactionDesc::FormatTxStatus(const CWalletTx& wtx)
     } else {
         int nDepth = wtx.GetDepthInMainChain();
         if (nDepth < 0)
-            return tr("conflicted");
-        else if (GetAdjustedTime() - wtx.nTimeReceived > 2 * 60 && wtx.GetRequestCount() == 0)
-            return tr("%1/offline").arg(nDepth);
+            return tr("conflicted with a transaction with %1 confirmations").arg(-nDepth);
+        else if (nDepth == 0)
+            return tr("0/unconfirmed, %1").arg((wtx.InMempool() ? tr("in memory pool") : tr("not in memory pool")));
         else if (nDepth < 6)
             return tr("%1/unconfirmed").arg(nDepth);
         else
@@ -62,13 +77,6 @@ QString TransactionDesc::toHTML(CWallet* wallet, CWalletTx& wtx, TransactionReco
     bool isSCrefund = false;
 
     strHTML += "<b>" + tr("Status") + ":</b> " + FormatTxStatus(wtx);
-    int nRequests = wtx.GetRequestCount();
-    if (nRequests != -1) {
-        if (nRequests == 0)
-            strHTML += tr(", has not been successfully broadcast yet");
-        else if (nRequests > 0)
-            strHTML += tr(", broadcast through %n node(s)", "", nRequests);
-    }
     strHTML += "<br>";
 
     strHTML += "<b>" + tr("Date") + ":</b> " + (nTime ? GUIUtil::dateTimeStr(nTime) : "") + "<br>";
@@ -132,7 +140,10 @@ QString TransactionDesc::toHTML(CWallet* wallet, CWalletTx& wtx, TransactionReco
         strHTML += "<br/>";
     } else if (wtx.IsCoinStake()) {
         // Minted (PoS)
-        strHTML += "<b>" + tr("Input") + ":</b> " + BitcoinUnits::formatHtmlWithUnit(unit, nCredit - nNet) + "<br/>";
+        strHTML += "<b>" + tr("Input") + ":</b> " + BitcoinUnits::formatHtmlWithUnit(unit, nCredit - nNet);
+        int stakeHrs = GetStakeInputAge(wtx) / (60*60);
+        if (stakeHrs > 0) strHTML += ", " + tr("after") + " " + QString::number(stakeHrs) + " " + tr("hours");
+        strHTML += "<br/>";
         strHTML += "<b>" + tr("Credit") + ":</b> " + BitcoinUnits::formatHtmlWithUnit(unit, nNet);
         int nDepth = wtx.GetDepthInMainChain();
         if (nDepth >= 0 && nDepth < Params().COINBASE_MATURITY())
@@ -173,20 +184,29 @@ QString TransactionDesc::toHTML(CWallet* wallet, CWalletTx& wtx, TransactionReco
                 if (!wtx.mapValue.count("to") || wtx.mapValue["to"].empty()) {
                     CTxDestination address;
                     if (ExtractDestination(txout.scriptPubKey, address)) {
-                        strHTML += "<b>" + tr("To") + ":</b> ";
-                        if (wallet->mapAddressBook.count(address) && !wallet->mapAddressBook[address].name.empty())
-                            strHTML += GUIUtil::HtmlEscape(wallet->mapAddressBook[address].name) + " ";
-                        strHTML += GUIUtil::HtmlEscape(EncodeDestination(address));
-                        if (toSelf == ISMINE_SPENDABLE)
-                            strHTML += " (" + tr("own address") + ")";
-                        else if (toSelf == ISMINE_WATCH_ONLY)
-                            strHTML += " (" + tr("watch-only") + ")";
+                        if (txout.scriptPubKey.HasOpCall()) {
+                            // Sent to SC
+                            CKeyID *keyid = boost::get<CKeyID>(&address);
+                            if (keyid) {
+                                std::string contract = HexStr(valtype(keyid->begin(),keyid->end()));
+                                strHTML += "<b>" + tr("To") + " " + tr("SC Address (Hash160)") + ":</b> ";
+                                strHTML += QString::fromStdString(contract);
+                            }
+                        } else {
+                            // Sent to Address
+                            strHTML += "<b>" + tr("To") + ":</b> ";
+                            if (wallet->mapAddressBook.count(address) && !wallet->mapAddressBook[address].name.empty())
+                                strHTML += GUIUtil::HtmlEscape(wallet->mapAddressBook[address].name) + " ";
+                            strHTML += GUIUtil::HtmlEscape(EncodeDestination(address));
+                            if (toSelf == ISMINE_SPENDABLE)
+                                strHTML += " (" + tr("own address") + ")";
+                            else if (toSelf == ISMINE_WATCH_ONLY)
+                                strHTML += " (" + tr("watch-only") + ")";
+                        }
                         strHTML += "<br/>";
                     } else if (txout.scriptPubKey.HasOpCreate()) {
-                        uint160 contract = uint160(LuxState::createLuxAddress(uintToh256(wtx.GetWitnessHash()), nOut).asBytes());
-                        strHTML += "<b>" + tr("Smart contract") + ":</b> ";
-                        strHTML += GUIUtil::HtmlEscape(EncodeDestination(CKeyID(contract))) + "<br/>";
-                        strHTML += "<b>Hash160:</b> ";
+                        uint160 contract = uint160(LuxState::createLuxAddress(uintToh256(wtx.GetHash()), nOut).asBytes());
+                        strHTML += "<b>" + tr("SC Address (Hash160)") + ":</b> ";
                         strHTML += QString::fromStdString(contract.ToStringReverseEndian()) + "<br/>";
                     }
                 }
@@ -238,14 +258,14 @@ QString TransactionDesc::toHTML(CWallet* wallet, CWalletTx& wtx, TransactionReco
     strHTML += "<b>" + tr("Output index") + ":</b> " + QString::number(rec->getOutputIndex()) + "<br>";
 
     // Message from normal lux:URI (lux:XyZ...?message=example)
-    for (const std::pair<std::string, std::string>& r : wtx.vOrderForm)
+    Q_FOREACH (const PAIRTYPE(string, string) & r, wtx.vOrderForm)
         if (r.first == "Message")
             strHTML += "<br><b>" + tr("Message") + ":</b><br>" + GUIUtil::HtmlEscape(r.second, true) + "<br>";
 
     //
     // PaymentRequest info:
     //
-    for (const std::pair<std::string, std::string>& r : wtx.vOrderForm) {
+    Q_FOREACH (const PAIRTYPE(string, string) & r, wtx.vOrderForm) {
         if (r.first == "PaymentRequest") {
             PaymentRequestPlus req;
             req.parse(QByteArray::fromRawData(r.second.data(), r.second.size()));

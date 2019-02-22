@@ -1,5 +1,6 @@
-// Copyright (c) 2009-2010 Satoshi Nakamoto                     -*- c++ -*-
-// Copyright (c) 2009-2014 The Bitcoin developers
+// Copyright (c) 2012-2014 The Bitcoin developers
+// Copyright (c) 2014-2015 The Dash developers
+// Copyright (c) 2015-2018 The Luxcore developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -11,6 +12,7 @@
 #include <stdlib.h>
 #include <string>
 
+// CBanana
 typedef int64_t CAmount;
 
 static const CAmount COIN = 100000000;
@@ -36,10 +38,10 @@ private:
 public:
     CFeeRate() : nSatoshisPerK(0) {}
     explicit CFeeRate(const CAmount& _nSatoshisPerK) : nSatoshisPerK(_nSatoshisPerK) {}
-    CFeeRate(const CAmount& nFeePaid, size_t nSize);
+    CFeeRate(const CAmount& nFeePaid, size_t nBytes);
     CFeeRate(const CFeeRate& other) { nSatoshisPerK = other.nSatoshisPerK; }
 
-    CAmount GetFee(size_t size) const;                  // unit returned is satoshis
+    CAmount GetFee(size_t nBytes) const;                // unit returned is satoshis
     CAmount GetFeePerK() const { return GetFee(1000); } // satoshis-per-1000-bytes
 
     friend bool operator<(const CFeeRate& a, const CFeeRate& b) { return a.nSatoshisPerK < b.nSatoshisPerK; }
