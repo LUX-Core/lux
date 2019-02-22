@@ -22,9 +22,15 @@ Features
 * New PHI2 PoW/PoS hybrid algorithm
 * Luxgate
 * Parallel masternode
+
   * [Banking layer](#)
-  * [Proof of file storage (Decentralised distributed file storage)](doc/Technical-description-of-the-implementation-of-a-distributed-file-storage.md)
+  
+  * [Proof of file storage (Distributed file storage (DFS))](doc/Technical-description-of-the-implementation-of-a-distributed-file-storage.md)
+   
+    * [DFS Testnet](doc/dfs-testnet.md)
+    
 * ~~PHI1612 PoW/PoS hybrid algorithm~~
+
 
 The Luxcore Project is a decentralized peer-to-peer banking financial platform, created under an open source license, featuring a built-in cryptocurrency, end-to-end encrypted messaging and decentralized marketplace. The decentralized network aims to provide anonymity and privacy for everyone through a simple user-friendly interface by taking care of all the advanced cryptography in the background.
 
@@ -58,11 +64,13 @@ In addition, without Luxgate and Pmn, Bitcoin and Ethereum cannot interact with 
 
 Instructions
 -----------
-[Lux-qt](https://github.com/LUX-Core/lux/blob/master/doc/LUX_QT_v5_Win_Mac_User_Guide.pdf)
+* [Lux-qt](doc/LUX_QT_v5_Win_Mac_User_Guide.pdf)
 
-[Smart contract](doc/smartcontract.md)
+* [Smart contract](doc/smartcontract.md)
 
-[Token](https://github.com/LUX-Core/lux/blob/master/doc/Token_Instructionsv2.pdf) (Thanks @snowfro)
+* [Token](doc/Token_Instructionsv2.pdf) (Thanks @snowfro)
+
+* [DFS Testnet](doc/dfs-testnet.md)
 
 Build Lux wallet
 ----------
