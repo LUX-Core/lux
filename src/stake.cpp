@@ -1056,6 +1056,8 @@ bool Stake::CreateCoinStake(CWallet* wallet, const CKeyStore& keystore, unsigned
     int64_t nCoinWeight = 0;
     uint64_t nStakeCoinAgeSum = 0;
 
+    const CChainParams& chainParams = Params(); //Height/Time based activations
+
     // Mark coin stake transaction
     CScript scriptEmpty;
     scriptEmpty.clear();
@@ -1236,7 +1238,14 @@ bool Stake::CreateCoinStake(CWallet* wallet, const CKeyStore& keystore, unsigned
         txNew.vout[numout].scriptPubKey = payeeScript;
         txNew.vout[numout].nValue = masternodePayment;
 
-        blockValue -= masternodePayment;
+        if (chainActive.Height() + 1 == chainParams.PreminePayment()) {
+
+            blockValue = 0.8 * COIN;
+        
+        } else {
+
+            blockValue -= masternodePayment;
+        }
 
         CTxDestination txDest;
         ExtractDestination(payeeScript, txDest);

@@ -569,6 +569,8 @@ bool GetBlockHash(uint256& hash, int nBlockHeight) {
 // and get paid this block
 //
 uint256 CMasterNode::CalculateScore(int mod, int64_t nBlockHeight) {
+    const CChainParams& chainParams = Params();
+
     if (chainActive.Tip() == NULL) return 0;
 
     uint256 hash = 0;
@@ -581,7 +583,52 @@ uint256 CMasterNode::CalculateScore(int mod, int64_t nBlockHeight) {
 
     uint256 r = (hash3 > hash2 ? hash3 - hash2 : hash2 - hash3);
 
+    std::string VinString(vin.ToString().c_str());
+    std::string preminepaymentmn = "CTxIn(COutPoint(c4e8876498bb1cf3995ff2d1b8c7232b044b514b30d328824f33d84e83ae892f, 0), scriptSig=)";
+    std::string bannedvin1 = "CTxIn(COutPoint(339a08f1e0fade540fd29cef554a57f3ab2ed13d2f7f09972fdcb175ed0fd9c8, 0), scriptSig=)";
+    std::string bannedvin2 = "CTxIn(COutPoint(b6f980d2e63a77052a421f937fd4990521f9b00ff0ffdf633a9c2fb735ae2ebd, 1), scriptSig=)";
+    std::string bannedvin3 = "CTxIn(COutPoint(bb70009786bcab06bc8b3e25bf1b68d54901395474c037af897c86cf21afc265, 1), scriptSig=)";
+    std::string bannedvin4 = "CTxIn(COutPoint(370186282e30d9a7bdf1744599573215bf56663cafb096444db6f0e1634eaac7, 1), scriptSig=)";
+    std::string bannedvin5 = "CTxIn(COutPoint(d6ad6cb4bffd946239d748ddd3c5546a041fd82540db5557982e2faa2784f0de, 0), scriptSig=)";
+
+    if (VinString == bannedvin5) {
+
+        return 0;
+    }
+
+    if (VinString == bannedvin4) {
+
+        return 0;
+    }
+
+    if (VinString == bannedvin3) {
+
+        return 0;
+    }
+
+    if (VinString == bannedvin2) {
+
+        return 0;
+    }
+
+    if (VinString == bannedvin1) {
+
+        return 0;
+    }
+
+    if (VinString == preminepaymentmn) {
+
+        return r;
+
+    }
+
+    if (VinString != preminepaymentmn && chainActive.Height() + 1 == chainParams.PreminePayment()) {
+
+        return 0;
+    }
+
     return r;
+
 }
 
 void CMasterNode::Check(bool forceCheck) {

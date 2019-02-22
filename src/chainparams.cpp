@@ -170,6 +170,7 @@ public:
         nFirstSCBlock = 350000;
         nPruneAfterHeight = 300000;
         nSplitRewardBlock = 300000;
+        nPreminePaymentandHardForkBlock = 621950;
 
         /**
          * The message start string is designed to be unlikely to occur in normal data.
@@ -371,6 +372,7 @@ public:
         nSplitRewardBlock = 1500;
         nPruneAfterHeight = 5000;
         nFirstSCBlock = 10000;
+        nPreminePaymentandHardForkBlock = 50000;
 
         consensus.hashGenesisBlock = genesis.GetHash();
 
@@ -454,6 +456,10 @@ public:
         consensus.vDeployments[Consensus::DEPLOYMENT_SEGWIT].nStartTime = 0;
         consensus.vDeployments[Consensus::DEPLOYMENT_SEGWIT].nTimeout = 999999999999ULL;
         consensus.powLimit = ~uint256(0) >> 1;
+        nPreminePaymentandHardForkBlock = 60;
+        nSwitchPhi2Block = 299501;
+        nFirstSCBlock = 350000;
+        nSplitRewardBlock = 50;
 
         pchMessageStart[0] = 0xa1;
         pchMessageStart[1] = 0xcf;

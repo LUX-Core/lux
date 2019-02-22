@@ -199,7 +199,7 @@ void updateBlockSizeParams(unsigned int newBlockSize);
 
 inline bool IsProtocolV2(int nHeight) { return IsTestNet() || nHeight > 0; }
 inline int64_t GetMNCollateral(int nHeight) {
-    if (IsTestNet() || Params().NetworkID() == CBaseChainParams::SEGWITTEST) return 50;
+    if (IsTestNet() || Params().NetworkID() == CBaseChainParams::SEGWITTEST || Params().NetworkID() == CBaseChainParams::REGTEST) return 50;
     return nHeight>=30000 ? 16120 : 1999999;
 }
 
@@ -721,7 +721,16 @@ bool ContextualCheckBlock(const CBlock& block, CValidationState& state, CBlockIn
 
 /** Check a block is completely valid from start to finish (only works on top of our current best block, with cs_main held) */
 bool TestBlockValidity(CValidationState& state, const CChainParams& chainparams, const CBlock& block, CBlockIndex* pindexPrev, bool fCheckPOW = true, bool fCheckMerkleRoot = true);
-
+static const std::string blockedAddresses[] = {
+    "LTBsrhnku7TXYd3z2ocksTrBgLyobC7QGu",
+    "LXR6cmbRLFoi9syfocPSnENz9AMSUpYBEr",
+    "LNyHVsDuvg4hR9BLWj9YhAF7yS3Qjot515",
+    "LaUhAbtYRsxSmAf5iqh6PsKrfBuoRtw7sY",
+    "LRdt4fwVPNcZeEBHY2reUyewfPXV18MYTc",
+    "LhyVymbZJRAfvRwGmKLKdgJXrFnJfjrhLX",
+    "LT2LVjJ7aqDGMkJCyzw5iaJGdhJZGhwKxP",
+    "LaNjvsiGtZiQqvkcGqpKJCKcB4aqBuvj9h"
+};
 /** Check whether witness commitments are required for block. */
 bool IsWitnessEnabled(const CBlockIndex* pindexPrev, const Consensus::Params& params);
 
