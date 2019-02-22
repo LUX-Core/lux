@@ -1652,10 +1652,11 @@ bool CDarkSendPool::SendRandomPaymentToSelf() {
     CWalletTx wtx;
     int64_t nFeeRet = 0;
     std::string strFail = "";
-    vector< pair<CScript, int64_t> > vecSend;
+    std::vector<CRecipient> vecSend;
 
     // ****** Add fees ************ /
-    vecSend.push_back(make_pair(scriptDenom, nPayment));
+    CRecipient recipient = {scriptDenom, nPayment, false};
+    vecSend.push_back(recipient);
 
     CCoinControl* coinControl = NULL;
     int nChangePos = -1;
@@ -1687,10 +1688,10 @@ bool CDarkSendPool::MakeCollateralAmounts() {
     CWalletTx wtx;
     int64_t nFeeRet = 0;
     std::string strFail = "";
-    vector< pair<CScript, int64_t> > vecSend;
+    std::vector<CRecipient> vecSend;
 
-    vecSend.push_back(make_pair(scriptChange, (DARKSEND_COLLATERAL * 2) + DARKSEND_FEE));
-    vecSend.push_back(make_pair(scriptChange, (DARKSEND_COLLATERAL * 2) + DARKSEND_FEE));
+    CRecipient recipient = {scriptChange, (DARKSEND_COLLATERAL * 2) + DARKSEND_FEE, false};
+    vecSend.push_back(recipient);
 
     CCoinControl* coinControl = NULL;
     int nChangePos = -1;
@@ -1731,15 +1732,13 @@ bool CDarkSendPool::CreateDenominated(int64_t nTotalValue) {
     CWalletTx wtx;
     int64_t nFeeRet = 0;
     std::string strFail = "";
-    vector< pair<CScript, int64_t> > vecSend;
+    std::vector<CRecipient> vecSend;
     int64_t nValueLeft = nTotalValue;
 
     // ****** Add collateral outputs ************ /
     if (!pwalletMain->HasCollateralInputs()) {
-        vecSend.push_back(make_pair(scriptChange, (DARKSEND_COLLATERAL * 2) + DARKSEND_FEE));
-        nValueLeft -= (DARKSEND_COLLATERAL * 2) + DARKSEND_FEE;
-        vecSend.push_back(make_pair(scriptChange, (DARKSEND_COLLATERAL * 2) + DARKSEND_FEE));
-        nValueLeft -= (DARKSEND_COLLATERAL * 2) + DARKSEND_FEE;
+        CRecipient recipient = {scriptChange, (DARKSEND_COLLATERAL * 2) + DARKSEND_FEE, false};
+        vecSend.push_back(recipient);
     }
 
     // ****** Add denoms ************ /
@@ -1755,7 +1754,8 @@ bool CDarkSendPool::CreateDenominated(int64_t nTotalValue) {
             scriptChange = GetScriptForDestination(vchPubKey.GetID());
             reservekey.KeepKey();
 
-            vecSend.push_back(make_pair(scriptChange, v));
+            CRecipient recipient = {scriptChange, v, false};
+            vecSend.push_back(recipient);
 
             //increment outputs and subtract denomination amount
             nOutputs++;
@@ -2115,41 +2115,12 @@ void ThreadCheckDarkSendPool() {
         darkSendPool.CheckTimeout();
 
         if (c % 60 == 0) {
-//            LOCK(cs_main);
-            /*
-                cs_main is required for doing masternode.Check because something
-                is modifying the coins view without a mempool lock. It causes
-                segfaults from this code without the cs_main lock.
-            */
-            {
-
+        {
                 LOCK(cs_masternodes);
                 vector<CMasterNode>::iterator it = vecMasternodes.begin();
                 //check them separately
                 while (it != vecMasternodes.end()) {
                     (*it).Check();
-                    ++it;
-                }
-
-                int count = vecMasternodes.size();
-                int i = 0;
-
-                for (CMasterNode mn : vecMasternodes) {
-
-                    if (mn.addr.IsRFC1918()) continue; //local network
-                    if (mn.IsEnabled()) {
-                        if (fDebug) LogPrintf("Sending masternode entry - %s \n", mn.addr.ToString().c_str());
-                        for (CNode * pnode : vNodes) {
-                            if (pnode)
-                                pnode->PushMessage("dsee", mn.vin, mn.addr, mn.sig, mn.now, mn.pubkey, mn.pubkey2, count, i, mn.lastTimeSeen, mn.protocolVersion);
-                        }
-                    }
-                    i++;
-                }
-
-                //remove inactive
-                it = vecMasternodes.begin();
-                while (it != vecMasternodes.end()) {
                     if ((*it).enabled == 4 || (*it).enabled == 3) {
                         LogPrintf("Removing inactive masternode %s\n", (*it).addr.ToString().c_str());
                         it = vecMasternodes.erase(it);
@@ -2157,15 +2128,13 @@ void ThreadCheckDarkSendPool() {
                         ++it;
                     }
                 }
-
             }
-
             masternodePayments.CleanPaymentList();
             CleanTransactionLocksList();
         }
 
-        //try to sync the masternode list and payment list every 5 seconds from at least 3 nodes
-        if (c % 5 == 0 && RequestedMasterNodeList < 3) {
+        //try to sync the masternode list and payment list every 5 seconds from at least 5 nodes
+        if (c % 5 == 0 && RequestedMasterNodeList < 5) {
             bool fIsInitialDownload = IsInitialBlockDownload();
             if (!fIsInitialDownload) {
                 LOCK(cs_vNodes);

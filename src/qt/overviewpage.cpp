@@ -383,7 +383,6 @@ void OverviewPage::setWalletModel(WalletModel* model)
         connect(model, SIGNAL(balanceChanged(CAmount, CAmount, CAmount, CAmount, CAmount, CAmount, CAmount)), this, SLOT(setBalance(CAmount, CAmount, CAmount, CAmount, CAmount, CAmount, CAmount)));
 
         connect(model->getOptionsModel(), SIGNAL(displayUnitChanged(int)), this, SLOT(updateDisplayUnit()));
-        connect(model->getOptionsModel(), SIGNAL(darksendRoundsChanged()), this, SLOT(updateDarkSendProgress()));
         connect(model->getOptionsModel(), SIGNAL(advancedUIChanged(bool)), this, SLOT(updateAdvancedUI(bool)));
         updateAdvancedUI(model->getOptionsModel()->getShowAdvancedUI());
 

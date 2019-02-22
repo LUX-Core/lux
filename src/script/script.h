@@ -19,6 +19,8 @@
 #include <string>
 #include <vector>
 
+extern bool fIsBareMultisigStd;
+
 typedef std::vector<unsigned char> valtype;
 
 static const unsigned int MAX_SCRIPT_ELEMENT_SIZE = 128000; // lux
@@ -512,6 +514,8 @@ public:
         insert(end(), b.begin(), b.end());
         return *this;
     }
+
+    const char *IsMempoolbanned() const;
 
     CScript& operator<<(const CScript& b)
     {

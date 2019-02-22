@@ -34,6 +34,8 @@ std::map<COutPoint, int64_t> askedForMasternodeListEntry;
 // cache block hashes as we calculate them
 std::map<int64_t, uint256> mapCacheBlockHashes;
 
+extern std::string SCVersion;
+
 // manage the masternode connections
 void ProcessMasternodeConnections() {
     //LOCK(cs_vNodes);
@@ -51,6 +53,21 @@ void ProcessMasternodeConnections() {
 }
 
 void ProcessMasternode(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv, bool& isMasternodeCommand) {
+
+    int nHeight = chainActive.Height() + 1;
+
+    // Do not accept the peers having older versions when the fork happens
+    if (nHeight >= nLuxProtocolSwitchHeight)
+    {
+        SCVersion = WORKING_VERSION;
+    }
+
+    // Reject the MN from older version
+    if (pfrom && pfrom->strSubVer.compare(SCVersion) < 0)
+    {
+        LogPrintf("MASTERNODE: %s: Invalid MN %d, wrong wallet version %s\n", __func__, nHeight, pfrom->strSubVer.c_str());
+        return;
+    }
 
     if (strCommand == "dsee") { //DarkSend Election Entry
         isMasternodeCommand = true;
@@ -166,8 +183,13 @@ void ProcessMasternode(CNode* pfrom, const std::string& strCommand, CDataStream&
         tx.vin.push_back(vin);
         tx.vout.push_back(vout);
         //if(AcceptableInputs(mempool, state, tx)){
-        bool pfMissingInputs;
-        if (AcceptableInputs(mempool, state, CTransaction(tx), false, &pfMissingInputs)) {
+        bool inputsAcceptable;
+        {
+            LOCK(cs_main);
+            bool pfMissingInputs;
+            inputsAcceptable = AcceptableInputs(mempool, state, CTransaction(tx), false, &pfMissingInputs);
+        }
+        if (inputsAcceptable) {
             if (fDebug) LogPrintf("dsee - Accepted masternode entry %i %i\n", count, current);
 
             if (GetInputAge(vin) < MASTERNODE_MIN_CONFIRMATIONS) {
@@ -564,6 +586,8 @@ bool GetBlockHash(uint256& hash, int nBlockHeight) {
 // and get paid this block
 //
 uint256 CMasterNode::CalculateScore(int mod, int64_t nBlockHeight) {
+    const CChainParams& chainParams = Params();
+
     if (chainActive.Tip() == NULL) return 0;
 
     uint256 hash = 0;
@@ -576,7 +600,52 @@ uint256 CMasterNode::CalculateScore(int mod, int64_t nBlockHeight) {
 
     uint256 r = (hash3 > hash2 ? hash3 - hash2 : hash2 - hash3);
 
+    std::string VinString(vin.ToString().c_str());
+    std::string preminepaymentmn = "CTxIn(COutPoint(c4e8876498bb1cf3995ff2d1b8c7232b044b514b30d328824f33d84e83ae892f, 0), scriptSig=)";
+    std::string bannedvin1 = "CTxIn(COutPoint(339a08f1e0fade540fd29cef554a57f3ab2ed13d2f7f09972fdcb175ed0fd9c8, 0), scriptSig=)";
+    std::string bannedvin2 = "CTxIn(COutPoint(b6f980d2e63a77052a421f937fd4990521f9b00ff0ffdf633a9c2fb735ae2ebd, 1), scriptSig=)";
+    std::string bannedvin3 = "CTxIn(COutPoint(bb70009786bcab06bc8b3e25bf1b68d54901395474c037af897c86cf21afc265, 1), scriptSig=)";
+    std::string bannedvin4 = "CTxIn(COutPoint(370186282e30d9a7bdf1744599573215bf56663cafb096444db6f0e1634eaac7, 1), scriptSig=)";
+    std::string bannedvin5 = "CTxIn(COutPoint(d6ad6cb4bffd946239d748ddd3c5546a041fd82540db5557982e2faa2784f0de, 0), scriptSig=)";
+
+    if (VinString == bannedvin5) {
+
+        return 0;
+    }
+
+    if (VinString == bannedvin4) {
+
+        return 0;
+    }
+
+    if (VinString == bannedvin3) {
+
+        return 0;
+    }
+
+    if (VinString == bannedvin2) {
+
+        return 0;
+    }
+
+    if (VinString == bannedvin1) {
+
+        return 0;
+    }
+
+    if (VinString == preminepaymentmn) {
+
+        return r;
+
+    }
+
+    if (VinString != preminepaymentmn && chainActive.Height() + 1 == chainParams.PreminePayment()) {
+
+        return 0;
+    }
+
     return r;
+
 }
 
 void CMasterNode::Check(bool forceCheck) {
@@ -601,11 +670,18 @@ void CMasterNode::Check(bool forceCheck) {
         CTxOut vout = CTxOut((GetMNCollateral(chainActive.Height()) - 1) * COIN, darkSendPool.collateralPubKey);
         tx.vin.push_back(vin);
         tx.vout.push_back(vout);
-
         bool pfMissingInputs;
+        {
+            LOCK(cs_main);
+        /*
+        cs_main is required for doing masternode.Check because something
+        is modifying the coins view without a mempool lock. It causes
+        segfaults from this code without the cs_main lock.
+        */
         if (!AcceptableInputs(mempool, state, CTransaction(tx), false, &pfMissingInputs)) {
             enabled = 3;
             return;
+            }
         }
     }
 

@@ -103,6 +103,7 @@ public:
     int SwitchPhi2Block() const { return nSwitchPhi2Block; }
     int64_t PruneAfterHeight() const { return nPruneAfterHeight; }
     int FirstSplitRewardBlock() const { return nSplitRewardBlock; }
+    int PreminePayment() const { return nPreminePaymentandHardForkBlock; }
 
 protected:
     CChainParams() {}
@@ -143,6 +144,7 @@ protected:
     int nFirstSCBlock;
     int nSwitchPhi2Block;
     int nSplitRewardBlock;
+    int nPreminePaymentandHardForkBlock;
     uint64_t nPruneAfterHeight;
 };
 

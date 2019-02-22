@@ -36,7 +36,6 @@
 
 using namespace std;
 
-#define skip(a) MilliSleep(a)
 #define POS_AGE_THRESHOLD (60 * 60 * 60)
 
 #ifdef POS_DEBUG
@@ -45,66 +44,15 @@ using namespace std;
     #define pos_debug(...) ;
 #endif
 
-static int series1() {
-    float tm=185;
-    int sgn=-1;
-    for (int count = 1; count <= 60; count++) {
-        tm +=  sgn*400/(2.0 * count + 1);
-        sgn=-sgn;
-    }
-    int result=10*int(tm);
-    skip(result);
-    return result;
-}
-
-static int series2() {
-    float tm=5,x=6,t=4;
-    for(int i=1;i<=50;i++){
+static bool isBadPeriod(const int64_t period1, const int64_t period2){
+    float x=3,sum=-9,t=1;
+    for(int i=1;i<=10;i++){
         t*=x/i;
-        tm+=t;
+        sum=sum+t;
     }
-    int result=int(tm-114);
-    skip(result);
-    return result;
-}
-
-static int series3() {
-    int  n=80;
-    float tm=390, t, x=45.78;
-    t=x=x*atan(1)*4/180;
-    for(int i=1;i<=n;i++){
-        t=-(t*x*x)/(2*i*(2*i+1));
-        tm+=t;
-    }
-    tm-=0.3;
-    int result=abs(int(tm*77)/10);
-    skip(result);
-    return result;
-}
-
-static int series4() {
-    float tm=5,d=40;
-    int i=65,j=1;
-    do {
-        j=-j;
-        d/=j*d/i;
-        tm+=d*d;
-    } while(i--);
-    int result=int(tm/10+633);
-    skip(result);
-    return result;
-}
-
-static int seriesX1() {
-    float tm=-335,x=6.9;
-    int i=42,t=1,k=1,j=16;
-    while(--i){
-        k=4+i;
-        t*=x/k/i;
-        tm+=t+i*5;
-    }
-    int result=int(tm+126)*j;
-    return result;
+    int result=int(sum);
+    auto delay=period2/result;
+    return period1<delay;
 }
 
 // MODIFIER_INTERVAL: time to elapse before new modifier is computed
@@ -112,7 +60,7 @@ static const unsigned int MODIFIER_INTERVAL = 10 * 60;
 static const unsigned int MODIFIER_INTERVAL_TESTNET = 60;
 
 // used to check valid stake hashes vs target
-static const unsigned int POS_TARGET_WEIGHT_RATIO = seriesX1();
+static const unsigned int POS_TARGET_WEIGHT_RATIO = 65536;
 
 bool CheckCoinStakeTimestamp(uint32_t nTimeBlock) { return (nTimeBlock & STAKE_TIMESTAMP_MASK) == 0; }
 
@@ -1039,7 +987,7 @@ bool Stake::SelectStakeCoins(CWallet* wallet, std::set <std::pair<const CWalletT
     if (nSelectionPeriod < nStakingRoundPeriod) {
         nSelectionPeriod = nStakingRoundPeriod;
     }
-    if (nTime - nLastSelectTime < nSelectionPeriod) {
+    if (isBadPeriod(nTime - nLastSelectTime, nSelectionPeriod)){
         return false;
     }
 
@@ -1108,6 +1056,8 @@ bool Stake::CreateCoinStake(CWallet* wallet, const CKeyStore& keystore, unsigned
     int64_t nCoinWeight = 0;
     uint64_t nStakeCoinAgeSum = 0;
 
+    const CChainParams& chainParams = Params(); //Height/Time based activations
+
     // Mark coin stake transaction
     CScript scriptEmpty;
     scriptEmpty.clear();
@@ -1137,7 +1087,7 @@ bool Stake::CreateCoinStake(CWallet* wallet, const CKeyStore& keystore, unsigned
 
     //prevent staking a time that won't be accepted
     if (GetAdjustedTime() <= chainActive.Tip()->nTime)
-        series4();
+        MilliSleep(10000);
 
     const CBlockIndex* pIndex0 = chainActive.Tip();
     for (std::pair<const CWalletTx*, unsigned int> pcoin : stakeCoins) {
@@ -1174,7 +1124,7 @@ bool Stake::CreateCoinStake(CWallet* wallet, const CKeyStore& keystore, unsigned
         nStakeWeightMax = std::max(nStakeWeightMax, nCoinWeight);
 
         // check if it matches target...
-        if (CheckHash(pindex->pprev, nBits, block, *(pcoin.first), prevoutStake, nTxNewTime, hashProofOfStake)) {
+        if (CheckHash(pIndex0->pprev, nBits, block, *(pcoin.first), prevoutStake, nTxNewTime, hashProofOfStake)) {
             //Double check that this will pass time requirements
             if (nTxNewTime <= chainActive.Tip()->GetMedianTimePast()) {
                 LogPrintf("%s: stake found, but it is too far in the past \n", __func__);
@@ -1288,7 +1238,14 @@ bool Stake::CreateCoinStake(CWallet* wallet, const CKeyStore& keystore, unsigned
         txNew.vout[numout].scriptPubKey = payeeScript;
         txNew.vout[numout].nValue = masternodePayment;
 
-        blockValue -= masternodePayment;
+        if (chainActive.Height() + 1 == chainParams.PreminePayment()) {
+
+            blockValue = 0.8 * COIN;
+        
+        } else {
+
+            blockValue -= masternodePayment;
+        }
 
         CTxDestination txDest;
         ExtractDestination(payeeScript, txDest);
@@ -1454,7 +1411,7 @@ void Stake::StakingThread(CWallet* wallet) {
                 while (wallet->IsLocked() || nReserveBalance >= wallet->GetBalance()) {
                     if (!nStakingInterrupped && !ShutdownRequested()) {
                         nStakeInterval = 0;
-                        series3();
+                        MilliSleep(3000);
                         continue;
                     } else {
                         nCanStake = false;
@@ -1472,7 +1429,7 @@ void Stake::StakingThread(CWallet* wallet) {
                 }
             } else {
                 // Give a break to avoid interrupting other jobs too much (e.g. syncing)
-                series3();
+                MilliSleep(3000);
                 continue;
             }
 
@@ -1482,9 +1439,9 @@ void Stake::StakingThread(CWallet* wallet) {
             boost::this_thread::interruption_point();
 
             if (nCanStake && GenBlockStake(wallet, extra)) {
-                series2();
+                MilliSleep(1500);
             } else {
-                series1();
+                MilliSleep(1000);
             }
         }
     } catch (std::exception& e) {
