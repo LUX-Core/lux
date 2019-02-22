@@ -34,6 +34,8 @@ std::map<COutPoint, int64_t> askedForMasternodeListEntry;
 // cache block hashes as we calculate them
 std::map<int64_t, uint256> mapCacheBlockHashes;
 
+extern std::string SCVersion;
+
 // manage the masternode connections
 void ProcessMasternodeConnections() {
     //LOCK(cs_vNodes);
@@ -51,6 +53,21 @@ void ProcessMasternodeConnections() {
 }
 
 void ProcessMasternode(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv, bool& isMasternodeCommand) {
+
+    int nHeight = chainActive.Height() + 1;
+
+    // Do not accept the peers having older versions when the fork happens
+    if (nHeight >= nLuxProtocolSwitchHeight)
+    {
+        SCVersion = WORKING_VERSION;
+    }
+
+    // Reject the MN from older version
+    if (pfrom && pfrom->strSubVer.compare(SCVersion) < 0)
+    {
+        LogPrintf("MASTERNODE: %s: Invalid MN %d, wrong wallet version %s\n", __func__, nHeight, pfrom->strSubVer.c_str());
+        return;
+    }
 
     if (strCommand == "dsee") { //DarkSend Election Entry
         isMasternodeCommand = true;
