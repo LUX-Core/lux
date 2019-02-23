@@ -1,5 +1,5 @@
 ---
-name: "lux-osx-2.2"
+name: "lux-osx-5.3.2"
 enable_cache: true
 suites:
 - "trusty"
