@@ -334,6 +334,7 @@ RES_ICONS = \
   qt/res/icons/connect3_16.png \
   qt/res/icons/connect4_16.png \
   qt/res/icons/debugwindow.png \
+  qt/res/icons/discord.png \
   qt/res/icons/edit.png \
   qt/res/icons/editcopy.png \
   qt/res/icons/editpaste.png \
@@ -345,10 +346,13 @@ RES_ICONS = \
   qt/res/icons/filesave.png \
   qt/res/icons/fontbigger.png \
   qt/res/icons/fontsmaller.png \
+  qt/res/icons/github.png \
   qt/res/icons/hd_disabled.png \
   qt/res/icons/hd_enabled.png \
   qt/res/icons/hex.png \
   qt/res/icons/history.png \
+  qt/res/icons/home.png \
+  qt/res/icons/hub.png \
   qt/res/icons/key.png \
   qt/res/icons/lock_closed.png \
   qt/res/icons/lock_closed_black.png \
@@ -373,6 +377,7 @@ RES_ICONS = \
   qt/res/icons/staking_inactive.png \
   qt/res/icons/synced.png \
   qt/res/icons/stake.png \
+  qt/res/icons/telegram.png \
   qt/res/icons/transaction0.png \
   qt/res/icons/transaction2.png \
   qt/res/icons/transaction_abandoned.png \
@@ -381,6 +386,7 @@ RES_ICONS = \
   qt/res/icons/tx_input.png \
   qt/res/icons/tx_output.png \
   qt/res/icons/tx_mined.png \
+  qt/res/icons/twitter.png \
   qt/res/icons/unit_lux.png \
   qt/res/icons/unit_mlux.png \
   qt/res/icons/unit_ulux.png \
@@ -392,6 +398,7 @@ RES_ICONS = \
   qt/res/icons/verified.png \
   qt/res/icons/wallet_repair.png \
   qt/res/icons/warning.png
+
 
 BITCOIN_QT_CPP = \
   qt/bantablemodel.cpp \
