@@ -1932,7 +1932,7 @@ CAmount GetProofOfWorkReward(int64_t nFees, int nHeight)
     if (Params().NetworkID() == CBaseChainParams::REGTEST) {
         if (nHeight < 5) {
             return 50000 * COIN;
-        } 
+        }
         else return COIN + nFees;
     }
 
@@ -1983,10 +1983,9 @@ CAmount GetMasternodePosReward(int nHeight, CAmount blockValue)
 {
     const CChainParams& chainParams = Params();
     CAmount ret;
-    if (nHeight >= POS_REWARD_CHANGED_BLOCK) {
-        if (nHeight != chainParams.PreminePayment() || IsTestNet()) {
-            ret = blockValue * 0.2; //20% for masternode
-        } else if (nHeight == chainParams.PreminePayment()) {
+    if (nHeight >= POS_REWARD_CHANGED_BLOCK || IsTestNet()) {
+        ret = blockValue * 0.2; //20% for masternode
+        if (nHeight == chainParams.PreminePayment() && !IsTestNet()) {
             ret = blockValue * 250000; //premine mint
         }
     } else {
