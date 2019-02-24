@@ -420,6 +420,10 @@ def deployPlugins(appBundleInfo, deploymentInfo, strip, verbose):
             # Deploy the mediaservice plugins only if QtMultimediaWidgets is in use
             if not deploymentInfo.usesFramework("QtMultimediaWidgets"):
                 continue
+        elif pluginDirectory == "webview":
+            # Deploy the webview plugins only if QtWebView is in use
+            if not deploymentInfo.usesFramework("QtWebView"):
+                continue
 
         for pluginName in filenames:
             pluginPath = os.path.join(pluginDirectory, pluginName)
