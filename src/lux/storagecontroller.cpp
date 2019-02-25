@@ -1,19 +1,20 @@
 #include "storagecontroller.h"
 
+#include "cancelingsettimeout.h"
+#include "compat.h"
+#include "main.h"
+#include "merkler.h"
+#include "primitives/transaction.h"
+#include "replicabuilder.h"
+#include "serialize.h"
+#include "streams.h"
+#include "util.h"
+
 #include <fstream>
 #include <iostream>
 #include <boost/filesystem.hpp>
 #include <boost/asio.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
-
-#include "cancelingsettimeout.h"
-#include "compat.h"
-#include "main.h"
-#include "merkler.h"
-#include "replicabuilder.h"
-#include "serialize.h"
-#include "streams.h"
-#include "util.h"
 
 std::unique_ptr<StorageController> storageController;
 
@@ -178,6 +179,7 @@ void StorageController::ProcessStorageMessage(CNode* pfrom, const std::string& s
                 handshakeAgent.CancelWait(handshake.orderHash);
                 handshakeAgent.Add(handshake);
                 PushHandshake(handshake);
+                // TODO: add timer for file sending (SS)
             } else {
                 // DoS prevention
 //            CNode* pNode = FindNode(proposal.address);
@@ -236,12 +238,15 @@ void StorageController::ProcessStorageMessage(CNode* pfrom, const std::string& s
         isStorageCommand = true;
         uint256 orderHash;
         vRecv >> orderHash;
-        // TODO: check order (SS)
-        while (qProposals.size() > 0) {
-            auto proposal = qProposals.pop();
-            if (proposal.orderHash != orderHash) {
-                qProposals.push(proposal);
-                break;
+        const auto *order = GetAnnounce(orderHash);
+        if (order) {
+            CreateOrderTransaction(*order);
+            while (qProposals.size() > 0) { // TODO: all copies must be saved (SS)
+                auto proposal = qProposals.pop();
+                if (proposal.orderHash != orderHash) {
+                    qProposals.push(proposal);
+                    break;
+                }
             }
         }
         Notify(BackgroundJobs::ACCEPT_PROPOSAL);
@@ -282,7 +287,7 @@ void StorageController::AnnounceOrder(const StorageOrder &order)
     }
 }
 
-void StorageController::AnnounceOrder(const StorageOrder &order, const boost::filesystem::path &path)
+void StorageController::AnnounceNewOrder(const StorageOrder &order, const boost::filesystem::path &path)
 {
     AnnounceOrder(order);
 
@@ -382,16 +387,6 @@ void StorageController::DecryptReplica(const uint256 &orderHash, const boost::fi
     return ;
 }
 
-bool StorageController::CreateOrderTransaction()
-{
-    return true;
-}
-
-bool StorageController::CreateProofTransaction()
-{
-    return true;
-}
-
 std::map<uint256, StorageOrder> StorageController::GetAnnouncements()
 {
     boost::lock_guard<boost::mutex> lock(mutex);
@@ -479,9 +474,6 @@ std::shared_ptr<AllocatedFile> StorageController::CreateReplica(const boost::fil
         uint64_t n = std::min(sizeBuffer, order.fileSize - i);
 
         filein.read((char *)buffer, n); // TODO: change to loop of readsome
-//        if (n < sizeBuffer) {
-//            std::cout << "tail " << n << std::endl;
-//        }
         EncryptData(buffer, 0, n, replica, keys.aesKey, rsa);
         outfile.write((char *) replica, nBlockSizeRSA);
         // TODO: check write (SS)
@@ -744,27 +736,4 @@ void StorageController::ProcessHandshakesMessages()
         RSA_free(rsa);
     }
 }
-
-//void StorageController::CustomerHandshakesAgent()
-//{
-//    //auto hanshakesQ;
-//    auto dfsresvQ;
-//
-//    select {
-//            msg = dfsresvQ:
-//                check msg.proposal was accepted;
-//                send file;
-//    };
-//}
-//
-//void StorageController::CustomerHandshakesAgent()
-//{
-//    auto dfsrrQ;
-//
-//    select {
-//            msg = dfsrrQ:
-//            check file was sent;
-//            create order transaction;
-//    };
-//}
 

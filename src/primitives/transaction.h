@@ -18,6 +18,21 @@ static const int SERIALIZE_TRANSACTION_NO_WITNESS = 0x40000000;
 
 static const int WITNESS_SCALE_FACTOR = 4;
 
+static const std::vector<unsigned char> STORAGE_TX_PREFIX = {'S', 'g', 'T', 'x'};
+
+enum class StorageTxTypes : unsigned char
+{
+    None = 0,
+    Announce            = 'a',
+    Payment             = 'p'
+};
+
+static const std::map<char, StorageTxTypes> StorageTxTypesToCode =
+{
+    {'a', StorageTxTypes::Announce },
+    {'p', StorageTxTypes::Payment }
+};
+
 /** An outpoint - a combination of a transaction hash and an index n into its vout */
 class COutPoint
 {
@@ -468,6 +483,15 @@ public:
     bool IsCoinGenerated() const
     {
         return this->IsCoinBase() || this->IsCoinStake();
+    }
+
+    StorageTxTypes CheckStorageTransaction(std::vector<unsigned char> &data) const;
+    bool IsStorageOrder() const
+    {
+        std::vector<unsigned char> data;
+        return (vin.size() > 0 &&
+                vout.size() > 0 &&
+                CheckStorageTransaction(data) != StorageTxTypes::None);
     }
 
     friend bool operator==(const CTransaction& a, const CTransaction& b)

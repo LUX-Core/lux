@@ -1,15 +1,17 @@
 #ifndef LUX_STORAGECONTROLLER_H
 #define LUX_STORAGECONTROLLER_H
 
-#include "uint256.h"
+#include "amount.h"
+#include "concurrent_queue.h"
+#include "decryptionkeys.h"
+#include "handshakeagent.h"
 #include "net.h"
+#include "proposalsagent.h"
 #include "protocol.h"
+#include "script/standard.h"
 #include "storageheap.h"
 #include "storageorder.h"
-#include "proposalsagent.h"
-#include "handshakeagent.h"
-#include "decryptionkeys.h"
-#include "concurrent_queue.h"
+#include "uint256.h"
 
 #include <boost/thread.hpp>
 #include <openssl/rsa.h>
@@ -60,6 +62,7 @@ protected:
     std::map<uint256, boost::filesystem::path> mapLocalFiles;
     std::map<uint256, StorageOrder> mapAnnouncements;
     std::map<uint256, std::shared_ptr<CancelingSetTimeout>> mapTimers;
+    std::map<uint256, std::pair<CTxDestination, CAmount>> mapPayments;
 
 public:
     CAmount rate;
@@ -89,9 +92,6 @@ public:
     bool AcceptProposal(const StorageProposal &proposal);
     // Replica functions
     void DecryptReplica(const uint256 &orderHash, const boost::filesystem::path &decryptedFile);
-    // Transactions
-    bool CreateOrderTransaction();
-    bool CreateProofTransaction();
     // Get functions
     std::map<uint256, StorageOrder> GetAnnouncements();
     const StorageOrder *GetAnnounce(const uint256 &hash);

@@ -215,4 +215,32 @@ bool CTransaction::HasOpSpend() const{
     }
     return false;
 }
+
+StorageTxTypes CTransaction::CheckStorageTransaction(std::vector<unsigned char> &data) const
+{
+    assert(vout.size() > 0);
+    CScript const & scriptPubKey = vout[0].scriptPubKey;
+    CScript::const_iterator pc = scriptPubKey.begin();
+    opcodetype opcode;
+    if (!scriptPubKey.GetOp(pc, opcode) || opcode != OP_RETURN)
+    {
+        return StorageTxTypes::None;
+    }
+    if (!scriptPubKey.GetOp(pc, opcode, data) ||
+        (opcode > OP_PUSHDATA1 &&
+         opcode != OP_PUSHDATA2 &&
+         opcode != OP_PUSHDATA4) ||
+        data.size() < STORAGE_TX_PREFIX.size() + 1 ||
+        memcmp(&data[0], &STORAGE_TX_PREFIX[0], STORAGE_TX_PREFIX.size()) != 0)
+    {
+        return StorageTxTypes::None;
+    }
+    auto const & it = StorageTxTypesToCode.find(data[STORAGE_TX_PREFIX.size()]);
+    if (it == StorageTxTypesToCode.end())
+    {
+        return StorageTxTypes::None;
+    }
+    data.erase(data.begin(), data.begin() + STORAGE_TX_PREFIX.size() + 1);
+    return it->second;
+}
 /////////////////////////////////////////////////////////////
