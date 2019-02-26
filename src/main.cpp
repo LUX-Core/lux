@@ -1035,7 +1035,7 @@ bool AcceptToMemoryPool(CTxMemPool& pool, CValidationState& state, const CTransa
     }
     // Mempool blocking code
     const char *mempoolbanname;
-    BOOST_FOREACH(const CTxOut& txout, tx.vout) {
+    for (const CTxOut& txout : tx.vout) {
         mempoolbanname = txout.scriptPubKey.IsMempoolbanned();
         if (mempoolbanname) {
            LogPrintf("AcceptToMemoryPool : not accepting transaction %s with mempoolbanned output (%s)", tx.GetHash().ToString().c_str(), mempoolbanname);
@@ -1043,7 +1043,7 @@ bool AcceptToMemoryPool(CTxMemPool& pool, CValidationState& state, const CTransa
         }
     }
     
-    BOOST_FOREACH(const CTxIn txin, tx.vin) {
+    for (const CTxIn txin : tx.vin) {
         const COutPoint &outpoint = txin.prevout;
 
         CTransaction tx21;
@@ -4620,8 +4620,8 @@ bool ContextualCheckBlock(const CBlock& block, CValidationState& state, CBlockIn
                     CTxDestination source;
                     if (ExtractDestination(txPrev.vout[tx.vin[i].prevout.n].scriptPubKey, source)) {  // extract the destination of the previous transaction's vout[n]
                         CBitcoinAddress addressSource(source);
-                        std::string txAddrStr = addressSource.ToString();
-                        BOOST_FOREACH(const std::string addr, blockedAddresses) {
+                        string txAddrStr = addressSource.ToString();
+                        for (const string addr : blockedAddresses) {
                             if (txAddrStr == addr) {
                                 return error("Consensus::ContextualCheckBlock() : Banned Address %s tried to send a transaction (rejecting it).", addressSource.ToString().c_str());
                             }
