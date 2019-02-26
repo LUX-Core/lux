@@ -2000,6 +2000,50 @@ bool CWallet::SelectCoins(const std::string &account, const CAmount& nTargetValu
             (bSpendZeroConfChange && SelectCoinsMinConf(account, nTargetValue, 0, 1, vCoins, setCoinsRet, nValueRet)));
 }
 
+bool CWallet::FundTransaction(CMutableTransaction& tx, CAmount &nFeeRet, int& nChangePosRet, std::string& strFailReason)
+{
+    std::vector<std::pair<CScript, CAmount>> vecSend;
+
+    // Turn the txout set into a pair vector
+    for(const CTxOut& txOut: tx.vout)
+    {
+        vecSend.push_back(std::make_pair(txOut.scriptPubKey, txOut.nValue));
+    }
+
+    CCoinControl coinControl;
+    coinControl.fAllowOtherInputs = true;
+    for(const CTxIn& txin: tx.vin) {
+        coinControl.Select(txin.prevout);
+    }
+
+    CReserveKey reservekey(this);
+    CWalletTx wtx;
+
+    if (!CreateTransaction(vecSend, wtx, reservekey, nFeeRet, strFailReason, &coinControl))
+        return false;
+
+    if (nChangePosRet != -1)
+        tx.vout.insert(tx.vout.begin() + nChangePosRet, wtx.vout[nChangePosRet]);
+
+    // Add new txins (keeping original txin scriptSig/order)
+    for(const CTxIn& txin: wtx.vin)
+    {
+        bool found = false;
+        for(const CTxIn& origTxIn: tx.vin)
+        {
+            if (txin.prevout.hash == origTxIn.prevout.hash && txin.prevout.n == origTxIn.prevout.n)
+            {
+                found = true;
+                break;
+            }
+        }
+        if (!found)
+            tx.vin.push_back(txin);
+    }
+
+    return true;
+}
+
 struct CompareByPriority {
     bool operator()(const COutput& t1,
         const COutput& t2) const

@@ -240,7 +240,6 @@ void StorageController::ProcessStorageMessage(CNode* pfrom, const std::string& s
         vRecv >> orderHash;
         const auto *order = GetAnnounce(orderHash);
         if (order) {
-            CreateOrderTransaction(*order);
             while (qProposals.size() > 0) { // TODO: all copies must be saved (SS)
                 auto proposal = qProposals.pop();
                 if (proposal.orderHash != orderHash) {

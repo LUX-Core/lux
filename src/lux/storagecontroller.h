@@ -85,7 +85,7 @@ public:
     void PushHandshake(const StorageHandshake &handshake, const bool status = true);
     // Orders functions
     void AnnounceOrder(const StorageOrder &order);
-    void AnnounceOrder(const StorageOrder &order, const boost::filesystem::path &path);
+    void AnnounceNewOrder(const StorageOrder &order, const boost::filesystem::path &path);
     bool CancelOrder(const uint256 &orderHash);
     void ClearOldAnnouncments(std::time_t timestamp);
     // Proposals functions
