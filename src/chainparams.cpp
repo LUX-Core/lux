@@ -215,7 +215,7 @@ public:
         assert(genesis.hashMerkleRoot == uint256("0xe08ae0cfc35a1d70e6764f347fdc54355206adeb382446dd54c32cd0201000d3"));
 
         ////////////////////////////////////////////////////////////////////////////////////////////////
-        vSeeds.push_back(CDNSSeedData("Seed1", "domain.to.be.added"));       // LUX seeder TBA
+        vSeeds.push_back(CDNSSeedData("Seed1", "seed.luxcore.tech"));       // LUX seeder
 
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,48); // LUX address start with 'L'
         base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1,63); // LUX script addresses start with 'S'
