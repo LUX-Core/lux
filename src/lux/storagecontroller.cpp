@@ -426,6 +426,15 @@ StorageProposal StorageController::GetProposal(const uint256 &orderHash, const u
     return proposalsAgent.GetProposal(orderHash, proposalHash);
 }
 
+std::pair<uint256, DecryptionKeys> StorageController::GetMetadata(const uint256 &orderHash, const uint256 &proposalHash)
+{
+    if (mapMetadata.find(orderHash) != mapMetadata.end() &&
+        mapMetadata[orderHash].find(proposalHash) != mapMetadata[orderHash].end()) {
+        return mapMetadata[orderHash][proposalHash];
+    }
+    return {};
+}
+
 void StorageController::StopThreads()
 {
     {
@@ -732,6 +741,8 @@ void StorageController::ProcessHandshakesMessages()
                 tempStorageHeap.FreeFile(pMerleTreeFile->uri);
             }
         }
+
+        mapMetadata[handshake.orderHash][handshake.proposalHash] = std::make_pair(merkleRootHash, keys);
         RSA_free(rsa);
     }
 }

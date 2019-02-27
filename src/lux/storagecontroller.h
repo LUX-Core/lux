@@ -62,7 +62,7 @@ protected:
     std::map<uint256, boost::filesystem::path> mapLocalFiles;
     std::map<uint256, StorageOrder> mapAnnouncements;
     std::map<uint256, std::shared_ptr<CancelingSetTimeout>> mapTimers;
-    std::map<uint256, std::pair<CTxDestination, CAmount>> mapPayments;
+    std::map<uint256, std::map<uint256, std::pair<uint256, DecryptionKeys>>> mapMetadata;
 
 public:
     CAmount rate;
@@ -99,6 +99,7 @@ public:
     void MoveChunk(size_t chunkIndex, const boost::filesystem::path &newpath,const bool tempChunk = false);
     std::vector<StorageProposal> GetProposals(const uint256 &orderHash);
     StorageProposal GetProposal(const uint256 &orderHash, const uint256 &proposalHash);
+    std::pair<uint256, DecryptionKeys> GetMetadata(const uint256 &orderHash, const uint256 &proposalHash);
     // Shutdown function
     void StopThreads();
 

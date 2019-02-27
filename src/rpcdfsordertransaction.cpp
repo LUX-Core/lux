@@ -1,5 +1,6 @@
 #include "rpcserver.h"
 
+#include "core_io.h"
 #include "lux/storagecontroller.h"
 //#include "script/script_error.h"
 //#include "script/sign.h"
@@ -33,7 +34,7 @@ UniValue AssemblyNewTx(UniValue params, CKeyID const & changeAddress = CKeyID())
 
 UniValue dfscreaterawordertx(UniValue const & params, bool fHelp)
 {
-    if (fHelp || params.size() != 2)
+    if (fHelp || params.size() != 4)
         throw std::runtime_error(
                 "dfscreaterawordertx [{\"txid\":\"id\",\"vout\":n},...] {address, ...}\n"
                         "\nArguments:\n"
@@ -46,7 +47,9 @@ UniValue dfscreaterawordertx(UniValue const & params, bool fHelp)
                         "       }\n"
                         "       ,...\n"
                         "     ]\n"
-                        "address\": P2PKH           (string, required)\n"
+                        "2. \"orders hash\":hash    (string, required) The hash of announces order\n"
+                        "3. \"proposal hash\":hash  (string, required) The hash of proposal\n"
+                        "4. \"address\": P2PKH      (string, required)\n"
                         "\nResult:\n"
                         "\"hex\"             (string) The transaction hash in hex\n"
         );
@@ -58,35 +61,46 @@ UniValue dfscreaterawordertx(UniValue const & params, bool fHelp)
 #endif
 
     RPCTypeCheck(params, boost::assign::list_of(UniValue::VARR)(UniValue::VOBJ), true);
-    if (params[0].isNull() || params[1].isNull())
-    {
-        throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameters, arguments 1 and 2 must be non-null");
+
+    uint256 orderHash = uint256{params[1].get_str()};
+
+    const StorageOrder *order = storageController->GetAnnounce(orderHash);
+
+    if (!order) {
+        throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameters, order not found");
     }
-    UniValue obj = params[1].get_obj();
 
+    uint256 proposalHash = uint256{params[2].get_str()};
 
-    std::string destBase58 = params[0].get_str();
+    auto metadata = storageController->GetMetadata(orderHash, proposalHash);
+
+    std::string destBase58 = params[3].get_str();
     CTxDestination dest = DecodeDestination(destBase58);
 
-    StorageOrder order;
+    DecryptionKeys keys = metadata.second;
+    uint256 merkleRootHash = metadata.first;
     CDataStream ss(STORAGE_TX_PREFIX, SER_NETWORK, PROTOCOL_VERSION);
     ss << static_cast<unsigned char>(StorageTxTypes::Announce)
-       << order.GetHash()
-       << ToByteVector(GetScriptForDestination(dest));
+       << order->fileURI
+       << order->fileSize
+       << keys
+       << merkleRootHash
+       << order->maxGap
+       << order->maxRate
+       << order->storageUntil
+       << *boost::get<CKeyID>(&dest);
 
     CScript script;
     script << OP_RETURN << ToByteVector(ss);
 
-    CMutableTransaction orderTx;
-    orderTx.vin.resize(1);
-    orderTx.vin[0].prevout.SetNull();
-    orderTx.vin[0].scriptSig = script;
-    orderTx.vout.resize(1);
-    orderTx.vout[0].nValue = 0;
+    CAmount amount = std::difftime(order->storageUntil, std::time(nullptr)) * order->maxRate;
+    UniValue vouts(UniValue::VOBJ);
+    vouts.push_back(Pair(EncodeDestination(script), ValueFromAmount(0)));
+    vouts.push_back(Pair(EncodeDestination(CTxDestination(GetScriptForDestination(dest))), ValueFromAmount(amount)));
 
     UniValue newparams(UniValue::VARR);
     newparams.push_back(params[0]);
-    //newparams.push_back(vouts);
+    newparams.push_back(vouts);
 
     return AssemblyNewTx(newparams);
 }
