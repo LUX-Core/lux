@@ -25,11 +25,6 @@
 using namespace std;
 using namespace boost::assign;
 
-struct SeedSpec6 {
-    uint8_t addr[16];
-    uint16_t port;
-};
-
 #include "chainparamsseeds.h"
 
 bool CheckProof(uint256 hash, unsigned int nBits)
@@ -55,23 +50,6 @@ bool CheckProof(uint256 hash, unsigned int nBits)
 /**
  * Main network
  */
-
-//! Convert the pnSeeds6 array into usable address objects.
-static void convertSeed6(std::vector<CAddress>& vSeedsOut, const SeedSpec6* data, unsigned int count)
-{
-    // It'll only connect to one or two seed nodes because once it connects,
-    // it'll get a pile of addresses with newer timestamps.
-    // Seed nodes are given a random 'last seen time' of between one and two
-    // weeks ago.
-    const int64_t nOneWeek = 7 * 24 * 60 * 60;
-    for (unsigned int i = 0; i < count; i++) {
-        struct in6_addr ip;
-        memcpy(&ip, data[i].addr, sizeof(ip));
-        CAddress addr(CService(ip, data[i].port), NODE_NETWORK);
-        addr.nTime = GetTime() - GetRand(nOneWeek) - nOneWeek;
-        vSeedsOut.push_back(addr);
-    }
-}
 
 //   What makes a good checkpoint block?
 // + Is surrounded by blocks with reasonable timestamps
@@ -229,7 +207,7 @@ public:
 
         bech32_hrp = "bc";
 
-        convertSeed6(vFixedSeeds, pnSeed6_main, ARRAYLEN(pnSeed6_main));
+        vFixedSeeds = std::vector<SeedSpec6>(pnSeed6_main, pnSeed6_main + ARRAYLEN(pnSeed6_main));
 
         fMiningRequiresPeers = true;
         fDefaultConsistencyChecks = false;
@@ -357,8 +335,7 @@ public:
         nExtCoinType = 1;
         bech32_hrp = "tb";
 
-        convertSeed6(vFixedSeeds, pnSeed6_test, ARRAYLEN(pnSeed6_test));
-
+        vFixedSeeds = std::vector<SeedSpec6>(pnSeed6_main, pnSeed6_main + ARRAYLEN(pnSeed6_main));
         fMiningRequiresPeers = true;
         fDefaultConsistencyChecks = false;
         fRequireStandard = true;
