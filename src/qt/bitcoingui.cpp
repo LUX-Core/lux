@@ -309,7 +309,7 @@ BitcoinGUI::BitcoinGUI(const PlatformStyle *platformStyle, const NetworkStyle* n
         pushButtonDiscord = new QPushButton(frameSocMedia);
         pushButtonDiscord->setToolTip(tr("Go to")+" Discord");
         connect(pushButtonDiscord, &QPushButton::clicked,
-                this, [](){QDesktopServices::openUrl(QUrl("https://discord.gg/27xFP5Y"));});
+                this, [](){QDesktopServices::openUrl(QUrl("https://discord.gg/ndUg9va"));});
         pushButtonDiscord->setIcon(QIcon(":/icons/res/icons/discord.png").pixmap(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE));
 
         pushButtonTwitter = new QPushButton(frameSocMedia);
