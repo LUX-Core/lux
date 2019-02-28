@@ -1,14 +1,14 @@
 #ifndef LUX_STORAGEORDER_H
 #define LUX_STORAGEORDER_H
 
-#include "uint256.h"
 #include "amount.h"
+#include "decryptionkeys.h"
 #include "hash.h"
-#include "utilstrencodings.h"
+#include "protocol.h"
 #include "serialize.h"
 #include "streams.h"
-#include "protocol.h"
-#include "decryptionkeys.h"
+#include "uint256.h"
+#include "utilstrencodings.h"
 
 class StorageOrder
 {
@@ -40,6 +40,39 @@ public:
         READWRITE(maxRate);
         READWRITE(maxGap);
         READWRITE(address);
+    }
+};
+
+class StorageOrderDB
+{
+public:
+    std::time_t storageUntil;
+    std::string filename;
+    uint64_t fileSize;
+    uint256 fileURI;
+    uint256 merkleRootHash;
+    CAmount maxRate;
+    int maxGap;
+    DecryptionKeys keys;
+
+    uint256 GetHash() const{
+        CDataStream ss(SER_GETHASH, 0);
+        ss << *this;
+        return Hash(ss.begin(), ss.end());
+    }
+
+    ADD_SERIALIZE_METHODS;
+
+    template <typename Stream, typename Operation>
+    inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion) {
+        READWRITE(storageUntil);
+        READWRITE(filename);
+        READWRITE(fileSize);
+        READWRITE(fileURI);
+        READWRITE(merkleRootHash);
+        READWRITE(maxRate);
+        READWRITE(maxGap);
+        READWRITE(keys);
     }
 };
 

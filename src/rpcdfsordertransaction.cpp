@@ -82,6 +82,7 @@ UniValue dfscreaterawordertx(UniValue const & params, bool fHelp)
     CDataStream ss(STORAGE_TX_PREFIX, SER_NETWORK, PROTOCOL_VERSION);
     ss << static_cast<unsigned char>(StorageTxTypes::Announce)
        << order->fileURI
+       << order->filename
        << order->fileSize
        << keys
        << merkleRootHash

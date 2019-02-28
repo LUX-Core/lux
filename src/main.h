@@ -76,6 +76,7 @@ class CConnman;
 class CScriptCheck;
 class CValidationInterface;
 class CValidationState;
+class COrdersDB;
 
 struct CBlockTemplate;
 struct CNodeStateStats;
@@ -231,6 +232,8 @@ extern bool fLargeWorkForkFound;
 extern bool fLargeWorkInvalidChainFound;
 
 extern CBlockIndex* pindexBestHeader;
+
+extern COrdersDB *porderDB;
 
 /** Minimum disk space required - used in CheckDiskSpace() */
 static const uint64_t nMinDiskSpace = 52428800;

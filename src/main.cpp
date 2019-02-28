@@ -610,6 +610,7 @@ CBlockIndex* FindForkInGlobalIndex(const CChain& chain, const CBlockLocator& loc
 CCoinsViewCache* pcoinsTip = NULL;
 CBlockTreeDB* pblocktree = NULL;
 StorageResults *pstorageresult = NULL;
+COrdersDB *porderDB = nullptr;
 
 //////////////////////////////////////////////////////////////////////////////
 //

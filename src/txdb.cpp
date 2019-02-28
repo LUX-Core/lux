@@ -6,6 +6,7 @@
 
 #include "txdb.h"
 
+#include "lux/storageorder.h"
 #include "main.h"
 #include "pow.h"
 #include "stake.h"
@@ -34,6 +35,12 @@ static const char DB_SPENTINDEX = 's';
 static const char DB_FLAG = 'F';
 static const char DB_REINDEX_FLAG = 'R';
 static const char DB_LAST_BLOCK = 'l';
+
+///////////////////////////////////////// dfs
+
+static const char DB_ORDER = 'o';
+
+/////////////////////////////////////////
 
 extern map<uint256, uint256> mapProofOfStake;
 
@@ -554,7 +561,7 @@ bool CBlockTreeDB::LoadBlockIndexGuts()
                         continue;
                     } else if (stake->GetProof(hash, proof)) {
                         if (proof != pindexNew->hashProofOfStake)
-                            return error("%s: diverged stake %s, %s (block %s)\n", __func__, 
+                            return error("%s: diverged stake %s, %s (block %s)\n", __func__,
                                          pindexNew->hashProofOfStake.GetHex(), proof.GetHex(), hash.GetHex());
                     } else {
                         stake->SetProof(hash, pindexNew->hashProofOfStake);
@@ -706,6 +713,61 @@ bool CBlockTreeDB::WipeHeightIndex() {
     }
 
     return WriteBatch(batch);
+}
+
+/////////////////////////////////////////////////////// dfs: COrdersDB
+COrdersDB::COrdersDB(size_t nCacheSize, bool fMemory, bool fWipe) : CLevelDBWrapper(GetDataDir() / "dfsdb", nCacheSize, fMemory, fWipe)
+{
+}
+
+
+bool COrdersDB::WriteOrder(const uint256 &hash, const StorageOrderDB &orderDB)
+{
+    CLevelDBBatch batch;
+    batch.Write(std::make_pair(DB_ORDER, hash), orderDB);
+    return WriteBatch(batch);
+}
+
+bool COrdersDB::EraseOrder(const uint256 &hash, const StorageOrderDB &orderDB)
+{
+    CLevelDBBatch batch;
+    batch.Write(std::make_pair(DB_ORDER, hash), orderDB);
+    return WriteBatch(batch);
+}
+
+bool COrdersDB::LoadOrders(std::function<void (const uint256 &, const StorageOrderDB &)> onCheck)
+{
+    boost::scoped_ptr<leveldb::Iterator> pcursor(NewIterator());
+
+    CDataStream ssKeySet(SER_DISK, CLIENT_VERSION);
+    ssKeySet << make_pair(DB_ORDER, uint256(0));
+    pcursor->Seek(ssKeySet.str());
+
+    CLevelDBBatch batch;
+
+    while (pcursor->Valid()) {
+        boost::this_thread::interruption_point();
+        try {
+            leveldb::Slice slKey = pcursor->key();
+            CDataStream ssKey(slKey.data(), slKey.data() + slKey.size(), SER_DISK, CLIENT_VERSION);
+            std::pair<char, uint256> key{};
+            ssKey >> key;
+            if (key.first == DB_ORDER) {
+                leveldb::Slice slValue = pcursor->value();
+                CDataStream ssValue(slValue.data(), slValue.data() + slValue.size(), SER_DISK, CLIENT_VERSION);
+                StorageOrderDB orderDB;
+                ssValue >> orderDB;
+
+                pcursor->Next();
+            } else {
+                break; // if shutdown requested or finished loading
+            }
+        } catch (std::exception& e) {
+            return error("%s : Deserialize or I/O error - %s", __func__, e.what());
+        }
+    }
+
+    return true;
 }
 
 ///////////////////////////////////////////////////////
