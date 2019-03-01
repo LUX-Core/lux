@@ -233,8 +233,6 @@ extern bool fLargeWorkInvalidChainFound;
 
 extern CBlockIndex* pindexBestHeader;
 
-extern COrdersDB *porderDB;
-
 /** Minimum disk space required - used in CheckDiskSpace() */
 static const uint64_t nMinDiskSpace = 52428800;
 
@@ -706,6 +704,9 @@ bool DisconnectBlocksAndReprocess(int blocks);
 
 /** Apply the effects of this block (with given index) on the UTXO set represented by coins */
 bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pindex, CCoinsViewCache& coins, const CChainParams& chainparams, bool fJustCheck = false);
+
+/** DFS transactions check and save **/
+void ProcessDFSTransactions(const CBlock &block);
 
 /** Context-independent validity checks */
 bool CheckBlockHeader(const CBlockHeader& block, CValidationState& state, const Consensus::Params& consensusParams, bool fCheckPOW = true);

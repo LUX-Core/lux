@@ -486,12 +486,12 @@ public:
     }
 
     StorageTxTypes CheckStorageTransaction(std::vector<unsigned char> &data) const;
-    bool IsStorageOrder() const
+    StorageTxTypes IsStorageOrder(std::vector<unsigned char> &data) const
     {
-        std::vector<unsigned char> data;
-        return (vin.size() > 0 &&
-                vout.size() > 0 &&
-                CheckStorageTransaction(data) != StorageTxTypes::None);
+        if (vin.size() > 0 && vout.size() > 1) {
+            return CheckStorageTransaction(data);
+        }
+        return StorageTxTypes::None;
     }
 
     friend bool operator==(const CTransaction& a, const CTransaction& b)

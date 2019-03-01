@@ -8,6 +8,7 @@
 #include "replicabuilder.h"
 #include "serialize.h"
 #include "streams.h"
+#include "txdb.h"
 #include "util.h"
 
 #include <fstream>
@@ -72,6 +73,12 @@ void StorageController::InitStorages(const boost::filesystem::path &dataDir, con
         fs::create_directories(tempDataDir);
     }
     tempStorageHeap.AddChunk(tempDataDir, DEFAULT_STORAGE_SIZE);
+}
+
+void StorageController::InitDB(size_t nCacheSize, bool fMemory, bool fWipe)
+{
+    delete db;
+    db = new COrdersDB(nCacheSize, fMemory, fWipe);
 }
 
 void StorageController::ProcessStorageMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv, bool& isStorageCommand)
@@ -335,6 +342,18 @@ void StorageController::ClearOldAnnouncments(std::time_t timestamp)
             ++it;
         }
     }
+}
+
+void StorageController::LoadOrders()
+{
+    db->LoadOrders([this] (const uint256 &orderHash, const StorageOrderDB &orderDB) {
+        mapOrders.insert(std::make_pair(orderHash, orderDB));
+    });
+}
+
+void StorageController::SaveOrder(const uint256 &orderHash, const StorageOrderDB &orderDB)
+{
+    db->WriteOrder(orderHash, orderDB);
 }
 
 bool StorageController::AcceptProposal(const StorageProposal &proposal) {

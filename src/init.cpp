@@ -1403,7 +1403,6 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
                 delete pcoinscatcher;
                 delete pblocktree;
                 delete pstorageresult;
-                delete porderDB;
                 globalState.reset();
                 globalSealEngine.reset();
 
@@ -1411,7 +1410,9 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
                 pcoinsdbview = new CCoinsViewDB(nCoinDBCache, false, fReindex || fReindexChainState);
                 pcoinscatcher = new CCoinsViewErrorCatcher(pcoinsdbview);
                 pcoinsTip = new CCoinsViewCache(pcoinscatcher);
-                porderDB = new COrdersDB(nMinDbCache << 20, false, fReindex);
+                storageController->InitDB(nMinDbCache << 20, false, fReindex);
+
+                storageController->LoadOrders();
 
                 if (fReset) {
                     pblocktree->WriteReindexing(true);

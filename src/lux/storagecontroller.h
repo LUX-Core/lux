@@ -17,6 +17,7 @@
 #include <openssl/rsa.h>
 
 class StorageController;
+class COrdersDB;
 
 extern std::unique_ptr<StorageController> storageController;
 
@@ -61,9 +62,11 @@ protected:
 
     std::map<uint256, boost::filesystem::path> mapLocalFiles;
     std::map<uint256, StorageOrder> mapAnnouncements;
+    std::map<uint256, StorageOrderDB> mapOrders;
     std::map<uint256, std::shared_ptr<CancelingSetTimeout>> mapTimers;
     std::map<uint256, std::map<uint256, std::pair<uint256, DecryptionKeys>>> mapMetadata;
 
+    COrdersDB *db;
 public:
     CAmount rate;
     int maxblocksgap;
@@ -77,8 +80,9 @@ public:
                           maxblocksgap(DEFAULT_STORAGE_MAX_BLOCK_GAP)
     {
     }
-    // Init function
+    // Init functions
     void InitStorages(const boost::filesystem::path &dataDir, const boost::filesystem::path &tempDataDir);
+    void InitDB(size_t nCacheSize, bool fMemory, bool fWipe);
     // ProcessMessage function
     void ProcessStorageMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv, bool& isStorageCommand);
     // MultiThread signals
@@ -88,6 +92,8 @@ public:
     void AnnounceNewOrder(const StorageOrder &order, const boost::filesystem::path &path);
     bool CancelOrder(const uint256 &orderHash);
     void ClearOldAnnouncments(std::time_t timestamp);
+    void LoadOrders();
+    void SaveOrder(const uint256 &orderHash, const StorageOrderDB &orderDB);
     // Proposals functions
     bool AcceptProposal(const StorageProposal &proposal);
     // Replica functions

@@ -610,7 +610,6 @@ CBlockIndex* FindForkInGlobalIndex(const CChain& chain, const CBlockLocator& loc
 CCoinsViewCache* pcoinsTip = NULL;
 CBlockTreeDB* pblocktree = NULL;
 StorageResults *pstorageresult = NULL;
-COrdersDB *porderDB = nullptr;
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -3140,7 +3139,32 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
     if (fLogEvents)
         pstorageresult->commitResults();
 
+    ProcessDFSTransactions(block);
     return true;
+}
+
+void ProcessDFSTransactions(const CBlock &block)
+{
+    for (const CTransaction &tx: block.vtx) {
+        std::vector<unsigned char> data;
+        auto type = tx.IsStorageOrder(data);
+        if (type != StorageTxTypes::None) {
+            if (type == StorageTxTypes::Announce) {
+                StorageOrderDB order;
+                CDataStream ss(data, SER_NETWORK, PROTOCOL_VERSION);
+                ss >> order.fileURI
+                   >> order.filename
+                   >> order.fileSize
+                   >> order.keys
+                   >> order.merkleRootHash
+                   >> order.maxGap
+                   >> order.maxRate
+                   >> order.storageUntil;
+
+                storageController->SaveOrder(order.GetHash(), order);
+            }
+        }
+    }
 }
 
 enum FlushStateMode {

@@ -216,6 +216,7 @@ bool CTransaction::HasOpSpend() const{
     return false;
 }
 
+///////////////////////////////////////////////////////////// dfs
 StorageTxTypes CTransaction::CheckStorageTransaction(std::vector<unsigned char> &data) const
 {
     assert(vout.size() > 0);
