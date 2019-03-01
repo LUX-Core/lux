@@ -26,7 +26,7 @@ SUSPICIOUS_HOSTS = {
 PATTERN_IPV4 = re.compile(r"^((\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})):(\d+)$")
 PATTERN_IPV6 = re.compile(r"^\[([0-9a-z:]+)\]:(\d+)$")
 PATTERN_ONION = re.compile(r"^([abcdefghijklmnopqrstuvwxyz234567]{16}\.onion):(\d+)$")
-PATTERN_AGENT = re.compile(r"^(/Luxcore:5.3.2/)$")
+PATTERN_AGENT = re.compile(r"^/Luxcore:5.3.2(\.\d)?/$")
 
 def parseline(line):
     sline = line.split()
@@ -146,7 +146,7 @@ def main():
     # Require service bit 1.
     ips = [ip for ip in ips if (ip['service'] & 1) == 1]
     # Require at least 50% 30-day uptime. (To be changed once seeder becomes more established)
-    ips = [ip for ip in ips if ip['uptime'] > 1]
+    ips = [ip for ip in ips if ip['uptime'] > 2]
     # Require a known and recent user agent.
     ips = [ip for ip in ips if PATTERN_AGENT.match(ip['agent'])]
     # Sort by availability (and use last success as tie breaker)
