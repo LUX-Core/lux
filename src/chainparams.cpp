@@ -633,6 +633,70 @@ public:
 };
 static CSegWitTestnet segwitParams;
 
+/**
+ * DFS Testnet
+ */
+class CDFSTestNetParams : public CTestNetParams
+{
+public:
+    CDFSTestNetParams()
+    {
+        networkID = CBaseChainParams::DFSTTEST;
+        strNetworkID = "dfstest";
+        pchMessageStart[0] = 0xab;
+        pchMessageStart[1] = 0x51;
+        pchMessageStart[2] = 0x67;
+        pchMessageStart[3] = 0x54;
+        nDefaultPort = 28999;
+        nMinerThreads = 0;
+        nMaturity = 10;
+        nModifierUpdateBlock = 51197; //approx Mon, 17 Apr 2017 04:00:00 GMT
+
+        //! Modify the testnet genesis block so the timestamp is valid for a later start.
+        const char* pszTimestamp = "Lux - DFS Testnet"; // Input Activation code to activate blockchain
+        CMutableTransaction txNew;
+        txNew.nVersion = 1;
+        txNew.nTime = 1551688317;
+        txNew.nLockTime = 0;
+        txNew.vin.resize(1);
+        txNew.vout.resize(1);
+        txNew.vin[0].scriptSig = CScript() << 0 << CScriptNum(42) << vector<unsigned char>((const unsigned char*)pszTimestamp, (const unsigned char*)pszTimestamp + strlen(pszTimestamp));
+        txNew.vout[0].SetEmpty();
+
+        genesis.SetNull();
+        genesis.vtx.push_back(txNew);
+        genesis.hashPrevBlock = 0;
+        genesis.hashMerkleRoot = BlockMerkleRoot(genesis);
+        genesis.nVersion = 1;
+        genesis.nTime = 1551688317; // 03 March 2019 @ 8:31am (UTC)
+        genesis.nBits = 0x1e0fffff;
+        genesis.nNonce = 19854;
+        genesis.hashStateRoot = uint256(h256Touint(dev::h256("e965ffd002cd6ad0e2dc402b8044de833e06b23127ea8c3d80aec91410771495"))); // lux
+        genesis.hashUTXORoot = uint256(h256Touint(dev::sha3(dev::rlp("")))); // lux
+
+//        while (!CheckProof(genesis.GetHash(), genesis.nBits)) {
+//            genesis.nNonce ++;
+//        }
+//
+//        std::cout << genesis.nNonce << std::endl;
+//        std::cout << genesis.GetHash().GetHex() << std::endl;
+//        std::cout << genesis.hashMerkleRoot.GetHex() << std::endl;
+
+        consensus.hashGenesisBlock = genesis.GetHash();
+
+        assert(consensus.hashGenesisBlock == uint256("0x00000a7c3f48b97195d0a7857b788b117f9c5be491bee04796b4446ffe787a68"));
+        assert(genesis.hashMerkleRoot == uint256("0x9e218bb13fea4ce65f15cb70748e9c9fb3f427632bfd54a05f633c9a0fd60960"));
+
+        vFixedSeeds.clear();
+        vSeeds.clear();
+    }
+    const Checkpoints::CCheckpointData& Checkpoints() const
+    {
+        return dataTestnet;
+    }
+};
+static CDFSTestNetParams dfstestNetParams;
+
 
 static CChainParams* pCurrentParams = 0;
 
@@ -662,6 +726,8 @@ CChainParams& Params(CBaseChainParams::Network network)
         return unitTestParams;
     case CBaseChainParams::SEGWITTEST:
         return segwitParams;
+    case CBaseChainParams::DFSTTEST:
+        return dfstestNetParams;
     default:
         assert(false && "Unimplemented network");
         return mainParams;
@@ -679,6 +745,8 @@ CChainParams* CreateChainParams(CBaseChainParams::Network network)
         return new CRegTestParams();
     case CBaseChainParams::SEGWITTEST:
         return new CSegWitTestnet();
+    case CBaseChainParams::DFSTTEST:
+        return new CDFSTestNetParams();
     default:
         throw std::runtime_error(strprintf("%s: Unknown chain.", __func__));
     }

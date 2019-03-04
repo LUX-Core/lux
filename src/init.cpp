@@ -225,6 +225,7 @@ void PrepareShutdown()
         }
         delete globalState.release();
         globalSealEngine.reset();
+        delete storageController.release();
     }
 #ifdef ENABLE_WALLET
     if (pwalletMain)
@@ -1057,8 +1058,6 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
 
     LogPrintf("Using %u threads for script verification\n", nScriptCheckThreads);
 
-    storageController.reset(new StorageController());
-    storageController->InitStorages(GetDataDir() / "dfs", GetDataDir() / "dfstemp"); // =========> INIT DFS CONTROLLER <=========
     if (nScriptCheckThreads) {
         for (int i = 0; i < nScriptCheckThreads - 1; i++)
             threadGroup.create_thread(&ThreadScriptCheck);
@@ -1405,11 +1404,16 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
                 delete pstorageresult;
                 globalState.reset();
                 globalSealEngine.reset();
+                storageController.reset();
 
                 pblocktree = new CBlockTreeDB(nBlockTreeDBCache, false, fReindex);
                 pcoinsdbview = new CCoinsViewDB(nCoinDBCache, false, fReindex || fReindexChainState);
                 pcoinscatcher = new CCoinsViewErrorCatcher(pcoinsdbview);
                 pcoinsTip = new CCoinsViewCache(pcoinscatcher);
+
+
+                storageController = std::unique_ptr<StorageController>(new StorageController());
+                storageController->InitStorages(GetDataDir() / "dfs", GetDataDir() / "dfstemp"); // =========> INIT DFS CONTROLLER <=========
                 storageController->InitDB(nMinDbCache << 20, false, fReindex);
 
                 storageController->LoadOrders();

@@ -42,7 +42,7 @@ public:
 };
 static CBaseTestNetParams testNetParams;
 
-/*
+/**
  * Regression test
  */
 class CBaseRegTestParams : public CBaseTestNetParams
@@ -56,7 +56,7 @@ public:
 };
 static CBaseRegTestParams regTestParams;
 
-/*
+/**
  * Unit test
  */
 class CBaseUnitTestParams : public CBaseMainParams
@@ -79,6 +79,21 @@ public:
     }
 };
 static CBaseSegwitTestParams segwitTestParams;
+
+/**
+ * DFS Testnet
+ */
+class CBaseDFSTestNetParams : public CBaseMainParams
+{
+public:
+    CBaseDFSTestNetParams()
+    {
+        networkID = CBaseChainParams::DFSTTEST;
+        nRPCPort = 9555;
+        strDataDir = "dfstestnet";
+    }
+};
+static CBaseDFSTestNetParams dfstestNetParams;
 
 static CBaseChainParams* pCurrentBaseParams = 0;
 
@@ -106,6 +121,9 @@ void SelectBaseParams(CBaseChainParams::Network network)
     case CBaseChainParams::SEGWITTEST:
         pCurrentBaseParams = &segwitTestParams;
         break;
+    case CBaseChainParams::DFSTTEST:
+        pCurrentBaseParams = &dfstestNetParams;
+        break;
     default:
         assert(false && "Unimplemented network");
         return;
@@ -117,6 +135,7 @@ CBaseChainParams::Network NetworkIdFromCommandLine()
     bool fRegTest = GetBoolArg("-regtest", false);
     bool fTestNet = GetBoolArg("-testnet", false);
     bool fSegWitTestNet = GetBoolArg("-segwittest", false);
+    bool fDfsTestNet = GetBoolArg("-dfstestnet", false);
 
     if (fTestNet && fRegTest)
         return CBaseChainParams::MAX_NETWORK_TYPES;
@@ -126,6 +145,8 @@ CBaseChainParams::Network NetworkIdFromCommandLine()
         return CBaseChainParams::TESTNET;
     if (fSegWitTestNet)
         return CBaseChainParams::SEGWITTEST;
+    if (fDfsTestNet)
+        return CBaseChainParams::DFSTTEST;
     return CBaseChainParams::MAIN;
 }
 
