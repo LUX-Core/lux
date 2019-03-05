@@ -183,6 +183,9 @@ enum opcodetype
     OP_CALL = 0xc2,
     OP_SPEND = 0xc3,
 
+    // DFS merkle root checker
+    OP_MERKLE_PATH = 0xc4,
+
     // template matching params
     OP_GAS_PRICE = 0xf5,
     OP_VERSION = 0xf6,
@@ -709,7 +712,6 @@ public:
     {
         return Find(OP_CREATE) == 1;
     }
-
     bool HasOpCall() const
     {
         return Find(OP_CALL) == 1;
@@ -717,6 +719,11 @@ public:
     bool HasOpSpend() const
     {
         return size()==1 && *begin() == OP_SPEND;
+    }
+    ///////////////////////////////////////// dfs
+    bool HasOpDFSProof() const
+    {
+        return Find(OP_MERKLE_PATH) == 1;
     }
     /////////////////////////////////////////
 

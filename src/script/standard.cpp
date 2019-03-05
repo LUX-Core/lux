@@ -49,6 +49,7 @@ const char* GetTxnOutputType(txnouttype t)
     case TX_NULL_DATA: return "nulldata";
     case TX_CREATE: return "create";
     case TX_CALL: return "call";
+    case TX_PROOF: return "proof";
     case TX_WITNESS_V0_KEYHASH: return "witness_v0_keyhash";
     case TX_WITNESS_V0_SCRIPTHASH: return "witness_v0_scripthash";
     case TX_WITNESS_UNKNOWN: return "witness_unknown";
@@ -83,6 +84,9 @@ bool Solver(const CScript& scriptPubKey, txnouttype& typeRet, vector<vector<unsi
 
         // Call contract tx
         mTemplates.insert(make_pair(TX_CALL, CScript() << OP_VERSION << OP_GAS_LIMIT << OP_GAS_PRICE << OP_DATA << OP_PUBKEYHASH << OP_CALL));
+
+        // Storage proof tx
+        mTemplates.insert(make_pair(TX_PROOF, CScript() << OP_DATA << OP_MERKLE_PATH << OP_CHECKSIG));
 //        // Empty, provably prunable, data-carrying output
 //        if (GetBoolArg("-datacarrier", true))
 //            mTemplates.insert(make_pair(TX_NULL_DATA, CScript() << OP_RETURN << OP_SMALLDATA));

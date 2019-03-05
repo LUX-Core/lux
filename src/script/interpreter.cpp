@@ -5,14 +5,14 @@
 
 #include "interpreter.h"
 
-#include "primitives/transaction.h"
-#include "script/script_error.h"
-#include "script/script.h"
 #include "crypto/ripemd160.h"
 #include "crypto/sha1.h"
 #include "crypto/sha256.h"
-#include "pubkey.h"
+#include "lux/merkler.h"
 #include "main.h"
+#include "primitives/transaction.h"
+#include "pubkey.h"
+#include "script/script_error.h"
 #include "script/script.h"
 #include "uint256.h"
 
@@ -105,7 +105,7 @@ bool static IsCompressedPubKey(const valtype &vchPubKey) {
  * Where R and S are not negative (their first byte has its highest bit not set), and not
  * excessively padded (do not start with a 0 byte, unless an otherwise negative number follows,
  * in which case a single 0 byte is necessary and even required).
- * 
+ *
  * See https://bitcointalk.org/index.php?topic=8392.msg127623#msg127623
  *
  * This function is consensus-critical since BIP66.
@@ -145,7 +145,7 @@ bool static IsValidSignatureEncoding(const std::vector<unsigned char> &sig, bool
     // Verify that the length of the signature matches the sum of the length
     // of the elements.
     if ((size_t)(lenR + lenS + (haveHashType ? 7 : 6)) != sig.size()) return false;
- 
+
     // Check whether the R element is an integer.
     if (sig[2] != 0x02) return false;
 
@@ -875,7 +875,7 @@ bool EvalScript(vector<vector<unsigned char> >& stack, const CScript& script, un
                     popstack(stack);
                     stack.push_back(vchHash);
                 }
-                break;                                   
+                break;
 
                 case OP_CODESEPARATOR:
                 {
@@ -1044,6 +1044,24 @@ bool EvalScript(vector<vector<unsigned char> >& stack, const CScript& script, un
                     valtype scriptRest(pc - 1, pend);
                     stack.push_back(scriptRest);
                     return true; // temp
+                }
+                break;
+                //////////////////////////////////////////////////////// dfs
+                case OP_MERKLE_PATH:
+                {
+                    if (stack.size() < 4)
+                        return set_error(serror, SCRIPT_ERR_INVALID_STACK_OPERATION);
+                    uint64_t index = 0; // TODO: index of merkle path must be get from outside
+                    valtype& vchHash =  stacktop(-1);
+                    valtype& vchData =  stacktop(-2);
+                    valtype& vch =      stacktop(-3);
+                    uint64_t fileSize = (vch[0] << 24) | (vch[1] << 16) | (vch[2] << 8) | vch[3];
+                    popstack(stack);
+                    popstack(stack);
+                    popstack(stack);
+                    if (!Merkler::CheckMerklePath(vchData, vchHash, index, fileSize)) {
+                        return set_error(serror, SCRIPT_ERR_INVALID_STACK_OPERATION); // TODO: wrong error (SS)
+                    }
                 }
                 break;
                 ////////////////////////////////////////////////////////

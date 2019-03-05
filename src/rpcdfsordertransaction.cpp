@@ -88,16 +88,16 @@ UniValue dfscreaterawordertx(UniValue const & params, bool fHelp)
        << merkleRootHash
        << order->maxGap
        << order->maxRate
-       << order->storageUntil
-       << *boost::get<CKeyID>(&dest);
+       << order->storageUntil;
 
-    CScript script;
-    script << OP_RETURN << ToByteVector(ss);
+    CScript scriptMarkerOut = CScript() << OP_RETURN << ToByteVector(ss);
+    CScript scriptMerkleProofOut = CScript() << ToByteVector(merkleRootHash) << OP_MERKLE_PATH;
 
     CAmount amount = std::difftime(order->storageUntil, std::time(nullptr)) * order->maxRate;
     UniValue vouts(UniValue::VOBJ);
-    vouts.push_back(Pair(EncodeDestination(script), ValueFromAmount(0)));
-    vouts.push_back(Pair(EncodeDestination(CTxDestination(GetScriptForDestination(dest))), ValueFromAmount(amount)));
+    vouts.push_back(Pair(EncodeDestination(scriptMarkerOut), ValueFromAmount(0)));
+    vouts.push_back(Pair(EncodeDestination(scriptMerkleProofOut), ValueFromAmount(amount)));
+
 
     UniValue newparams(UniValue::VARR);
     newparams.push_back(params[0]);

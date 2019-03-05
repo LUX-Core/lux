@@ -140,7 +140,6 @@ bool ConstructMerklePath(std::istream &merkleTree, size_t height, std::list<uint
     return true;
 }
 
-
 std::list<uint256> Merkler::ConstructMerklePath(const boost::filesystem::path &source, const boost::filesystem::path &merkleTree, size_t position)
 {
     namespace fs = boost::filesystem;
@@ -184,4 +183,43 @@ std::list<uint256> Merkler::ConstructMerklePath(const boost::filesystem::path &s
     }
     merkleTreeStream.close();
     return path;
+}
+
+// TODO: add tests in merkler_tests.cpp (SS)
+bool Merkler::CheckMerklePath(const std::vector<unsigned char> &merklePath, const std::vector<unsigned char> &merkleRootHash, uint64_t index, uint64_t fileSize)
+{
+    size_t depth = Merkler::CalcDepth(fileSize);
+    uint64_t position = index;
+    std::list<uint256> path;
+
+    // copy memory to list
+    for (int i = 0; i < merklePath.size(); i += SHA256_DIGEST_LENGTH) {
+        uint256 hash = uint256{std::string(merklePath.begin() + i, merklePath.begin() + (i + SHA256_DIGEST_LENGTH))};
+        path.push_back(hash);
+    }
+
+    // find first hash
+    auto it = path.begin();
+    for (size_t i = 0; i < depth; ++i, position /= 2) {
+        if (!(position % 2)) {
+            ++it;
+        }
+    }
+
+    position = index;
+    unsigned char hashCh[SHA256_DIGEST_LENGTH];
+    unsigned char data[2 * SHA256_DIGEST_LENGTH];
+    memset(data, 0, 2 * SHA256_DIGEST_LENGTH);
+    memcpy(data + (position % 2) * SHA256_DIGEST_LENGTH, it->begin(), SHA256_DIGEST_LENGTH);
+
+    for (size_t i = 0; i < depth; ++i) {
+        auto temp = it;
+        (position % 2) ? ++it : --it;
+        path.erase(temp);
+
+        memcpy(data + !(position % 2) * SHA256_DIGEST_LENGTH, it->begin(), SHA256_DIGEST_LENGTH);
+        Hash(data, 2 * SHA256_DIGEST_LENGTH, hashCh);
+        position /= 2;
+        memcpy(data + (position % 2) * SHA256_DIGEST_LENGTH, hashCh, SHA256_DIGEST_LENGTH);
+    }
 }

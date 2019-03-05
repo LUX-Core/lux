@@ -22,7 +22,7 @@ namespace Merkler {
     bool ConstructMerkleTreeLayer(std::istream &prevLayer, size_t blocksNum, std::ostream &outputLayer);
     uint256 ConstructMerkleTree(const boost::filesystem::path &source, const boost::filesystem::path &dest);
     std::list<uint256> ConstructMerklePath(const boost::filesystem::path &source, const boost::filesystem::path &merkleTree, size_t position);
-    // TODO: add check merkle path func (SS)
+    bool CheckMerklePath(const std::vector<unsigned char> &merklePath, const std::vector<unsigned char> &merkleRootHash, uint64_t index, uint64_t fileSize);
 } // namespace Merkler
 
 #endif //LUX_LIB_CRYPTO_MERKLER_H
