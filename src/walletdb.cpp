@@ -76,18 +76,18 @@ bool CWalletDB::EraseTx(uint256 hash)
 bool CWalletDB::WriteLuxNodeConfig(std::string sAlias, const CLuxNodeConfig& nodeConfig)
 {
     nWalletDBUpdateCounter++;
-    return Write(std::make_pair(std::string("adrenaline"), sAlias), nodeConfig, true);
+    return Write(std::make_pair(std::string("lux"), sAlias), nodeConfig, true);
 }
 
 bool CWalletDB::ReadLuxNodeConfig(std::string sAlias, CLuxNodeConfig& nodeConfig)
 {
-    return Read(std::make_pair(std::string("adrenaline"), sAlias), nodeConfig);
+    return Read(std::make_pair(std::string("lux"), sAlias), nodeConfig);
 }
 
 bool CWalletDB::EraseLuxNodeConfig(std::string sAlias)
 {
     nWalletDBUpdateCounter++;
-    return Erase(std::make_pair(std::string("adrenaline"), sAlias));
+    return Erase(std::make_pair(std::string("lux"), sAlias));
 }
 
 bool CWalletDB::WriteKey(const CPubKey& vchPubKey, const CPrivKey& vchPrivKey, const CKeyMetadata& keyMeta)
