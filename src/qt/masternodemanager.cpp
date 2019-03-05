@@ -173,9 +173,6 @@ void MasternodeManager::updateNodeList()
     for (CMasterNode &mn : vecMasternodes)
     {
         if (ShutdownRequested()) return;
-        
-        int mnRow = 0;
-        ui->tableWidget->insertRow(0);
 
     // populate list
     // Address, Rank, Active, Active Seconds, Last Seen, Pub Key
@@ -201,12 +198,13 @@ void MasternodeManager::updateNodeList()
             if (!strToFilter.contains(strCurrentFilter)) continue;
         }
 
-        ui->tableWidget->setItem(mnRow, 0, addressItem);
-        ui->tableWidget->setItem(mnRow, 1, rankItem);
-        ui->tableWidget->setItem(mnRow, 2, activeItem);
-        ui->tableWidget->setItem(mnRow, 3, activeSecondsItem);
-        ui->tableWidget->setItem(mnRow, 4, lastSeenItem);
-        ui->tableWidget->setItem(mnRow, 5, pubkeyItem);
+        ui->tableWidget->insertRow(0);
+        ui->tableWidget->setItem(0, 0, addressItem);
+        ui->tableWidget->setItem(0, 1, rankItem);
+        ui->tableWidget->setItem(0, 2, activeItem);
+        ui->tableWidget->setItem(0, 3, activeSecondsItem);
+        ui->tableWidget->setItem(0, 4, lastSeenItem);
+        ui->tableWidget->setItem(0, 5, pubkeyItem);
     }
 
     ui->countLabel->setText(QString::number(ui->tableWidget->rowCount()));
