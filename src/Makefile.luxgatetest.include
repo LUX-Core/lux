@@ -5,8 +5,6 @@ bin_PROGRAMS += luxgate/test/test_luxgate
 LUXGATETEST_BINARY = luxgate/test/test_luxgate$(EXEEXT)
 
 LUXGATE_TESTS = \
-  luxgate/test/archive_test.cpp \
-  luxgate/test/luxgate_test.cpp \
   luxgate/test/test_luxgate.cpp
 
 AM_CXXFLAGS += -std=c++11

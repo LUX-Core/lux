@@ -185,7 +185,6 @@ BITCOIN_CORE_H = \
 
 if ENABLE_LUXGATE
 BITCOIN_CORE_H += \
-  luxgate/archive.h \
   luxgate/atomicswap.h \
   luxgate/blockchainclient.h \
   luxgate/http.h \
@@ -202,7 +201,7 @@ obj/build.h: FORCE
 libbitcoin_util_a-clientversion.$(OBJEXT): obj/build.h
 
 # server: shared between luxd and lux-qt
-libbitcoin_server_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES) $(MINIUPNPC_CPPFLAGS) $(EVENT_CFLAGS) $(EVENT_PTHREADS_CFLAGS)
+libbitcoin_server_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES) $(MINIUPNPC_CPPFLAGS) $(EVENT_CFLAGS) $(EVENT_PTHREADS_CFLAGS) $(ZMQ_CFLAGS)
 libbitcoin_server_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 libbitcoin_server_a_SOURCES = \
   addrman.cpp \
@@ -245,7 +244,6 @@ libbitcoin_server_a_SOURCES = \
 
 if ENABLE_LUXGATE
 libbitcoin_server_a_SOURCES += \
-  luxgate/archive.cpp \
   luxgate/atomicswap.cpp \
   luxgate/blockchainclient.cpp \
   luxgate/http.cpp \
@@ -713,7 +711,7 @@ lux_cli_LDADD += $(BOOST_LIBS) $(SSL_LIBS) $(CRYPTO_LIBS) $(EVENT_LIBS)
 #
 
 # lux-tx binary #
-lux_tx_CPPFLAGS = $(BITCOIN_INCLUDES)
+lux_tx_CPPFLAGS = $(BITCOIN_INCLUDES) $(ZMQ_CFLAGS)
 lux_tx_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
 lux_tx_SOURCES =  \
   lux-tx.cpp \
