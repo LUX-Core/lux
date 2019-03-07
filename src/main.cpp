@@ -3158,10 +3158,19 @@ void ProcessDFSTransactions(const CBlock &block)
                    >> order.keys
                    >> order.merkleRootHash
                    >> order.maxGap
-                   >> order.maxRate
+                   >> order.rate
                    >> order.storageUntil;
 
-                storageController->SaveOrder(order.GetHash(), order);
+                storageController->SaveOrder(order);
+            } else if (type == StorageTxTypes::Proof) {
+                StorageProofDB proof;
+                CDataStream ss(data, SER_NETWORK, PROTOCOL_VERSION);
+                ss >> proof.time
+                   >> proof.fileURI
+                   >> proof.merkleRootHash
+                   >> proof.rate;
+
+                storageController->SaveProof(proof);
             }
         }
     }

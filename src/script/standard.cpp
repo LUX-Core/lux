@@ -446,6 +446,12 @@ public:
         *script << CScript::EncodeOP_N(id.version) << std::vector<unsigned char>(id.program, id.program + id.length);
         return true;
     }
+
+    bool operator()(const CScript &rawscript) const {
+        script->clear();
+        *script = rawscript;
+        return true;
+    }
 };
 }
 

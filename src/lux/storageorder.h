@@ -51,7 +51,7 @@ public:
     uint64_t fileSize;
     uint256 fileURI;
     uint256 merkleRootHash;
-    CAmount maxRate;
+    CAmount rate;
     int maxGap;
     DecryptionKeys keys;
 
@@ -70,9 +70,34 @@ public:
         READWRITE(fileSize);
         READWRITE(fileURI);
         READWRITE(merkleRootHash);
-        READWRITE(maxRate);
+        READWRITE(rate);
         READWRITE(maxGap);
         READWRITE(keys);
+    }
+};
+
+class StorageProofDB
+{
+public:
+    std::time_t time;
+    uint256 fileURI;
+    uint256 merkleRootHash;
+    CAmount rate;
+
+    uint256 GetHash() const{
+        CDataStream ss(SER_GETHASH, 0);
+        ss << *this;
+        return Hash(ss.begin(), ss.end());
+    }
+
+    ADD_SERIALIZE_METHODS;
+
+    template <typename Stream, typename Operation>
+    inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion) {
+        READWRITE(time);
+        READWRITE(fileURI);
+        READWRITE(merkleRootHash);
+        READWRITE(rate);
     }
 };
 

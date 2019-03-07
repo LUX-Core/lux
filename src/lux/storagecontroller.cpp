@@ -78,7 +78,7 @@ void StorageController::InitStorages(const boost::filesystem::path &dataDir, con
 void StorageController::InitDB(size_t nCacheSize, bool fMemory, bool fWipe)
 {
     delete db;
-    db = new COrdersDB(nCacheSize, fMemory, fWipe);
+    db = new CFileStorageDB(nCacheSize, fMemory, fWipe);
 }
 
 void StorageController::ProcessStorageMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv, bool& isStorageCommand)
@@ -344,18 +344,6 @@ void StorageController::ClearOldAnnouncments(std::time_t timestamp)
     }
 }
 
-void StorageController::LoadOrders()
-{
-    db->LoadOrders([this] (const uint256 &orderHash, const StorageOrderDB &orderDB) {
-        mapOrders.insert(std::make_pair(orderHash, orderDB));
-    });
-}
-
-void StorageController::SaveOrder(const uint256 &orderHash, const StorageOrderDB &orderDB)
-{
-    db->WriteOrder(orderHash, orderDB);
-}
-
 bool StorageController::AcceptProposal(const StorageProposal &proposal) {
     CNode* pNode = TryConnectToNode(proposal.address);
     handshakeAgent.StartHandshake(proposal, pNode);
@@ -405,6 +393,30 @@ void StorageController::DecryptReplica(const uint256 &orderHash, const boost::fi
     return ;
 }
 
+void StorageController::LoadOrders()
+{
+    db->LoadOrders([this] (const uint256 &orderHash, const StorageOrderDB &orderDB) {
+        mapOrders.insert(std::make_pair(orderHash, orderDB));
+    });
+}
+
+void StorageController::SaveOrder(const StorageOrderDB &orderDB)
+{
+    db->WriteOrder(orderDB.GetHash(), orderDB);
+}
+
+void StorageController::LoadProofs()
+{
+    db->LoadProofs([this] (const uint256 &proofHash, const StorageProofDB &proof) {
+        mapProofs[proof.merkleRootHash].push_back(proof);
+    });
+}
+
+void StorageController::SaveProof(const StorageProofDB &proof)
+{
+    db->WriteProof(proof.GetHash(), proof);
+}
+
 std::map<uint256, StorageOrder> StorageController::GetAnnouncements()
 {
     boost::lock_guard<boost::mutex> lock(mutex);
@@ -450,6 +462,24 @@ std::pair<uint256, DecryptionKeys> StorageController::GetMetadata(const uint256 
     if (mapMetadata.find(orderHash) != mapMetadata.end() &&
         mapMetadata[orderHash].find(proposalHash) != mapMetadata[orderHash].end()) {
         return mapMetadata[orderHash][proposalHash];
+    }
+    return {};
+}
+
+const StorageOrderDB *StorageController::GetOrderDB(const uint256 &merkleRootHash)
+{
+    boost::lock_guard<boost::mutex> lock(mutex);
+    auto it = std::find_if(mapOrders.begin(), mapOrders.end(), [&merkleRootHash](const std::pair<uint256, StorageOrderDB> &entity) {
+        return entity.second.merkleRootHash == merkleRootHash;
+    });
+    return it != mapOrders.end()? &(it->second) : nullptr;
+}
+
+const std::vector<StorageProofDB> &StorageController::GetProofs(const uint256 &merkleRootHash)
+{
+    boost::lock_guard<boost::mutex> lock(mutex);
+    if (mapProofs.find(merkleRootHash) != mapProofs.end()) {
+        return mapProofs[merkleRootHash];
     }
     return {};
 }

@@ -1,5 +1,6 @@
 #include "rpcserver.h"
 
+#include "amount.h"
 #include "core_io.h"
 #include "lux/storagecontroller.h"
 //#include "script/script_error.h"
@@ -36,7 +37,7 @@ UniValue dfscreaterawordertx(UniValue const & params, bool fHelp)
 {
     if (fHelp || params.size() != 4)
         throw std::runtime_error(
-                "dfscreaterawordertx [{\"txid\":\"id\",\"vout\":n},...] {address, ...}\n"
+                "dfscreaterawordertx\n"
                         "\nArguments:\n"
                         "1. \"transactions\"        (string, required) A json array of json objects\n"
                         "     [\n"
@@ -73,9 +74,7 @@ UniValue dfscreaterawordertx(UniValue const & params, bool fHelp)
     uint256 proposalHash = uint256{params[2].get_str()};
 
     auto metadata = storageController->GetMetadata(orderHash, proposalHash);
-
-    std::string destBase58 = params[3].get_str();
-    CTxDestination dest = DecodeDestination(destBase58);
+    const StorageProposal proposal = storageController->GetProposal(orderHash, proposalHash);
 
     DecryptionKeys keys = metadata.second;
     uint256 merkleRootHash = metadata.first;
@@ -87,13 +86,13 @@ UniValue dfscreaterawordertx(UniValue const & params, bool fHelp)
        << keys
        << merkleRootHash
        << order->maxGap
-       << order->maxRate
+       << proposal.rate
        << order->storageUntil;
 
     CScript scriptMarkerOut = CScript() << OP_RETURN << ToByteVector(ss);
     CScript scriptMerkleProofOut = CScript() << ToByteVector(merkleRootHash) << OP_MERKLE_PATH;
 
-    CAmount amount = std::difftime(order->storageUntil, std::time(nullptr)) * order->maxRate;
+    CAmount amount = std::difftime(order->storageUntil, std::time(nullptr)) * proposal.rate * order->fileSize;
     UniValue vouts(UniValue::VOBJ);
     vouts.push_back(Pair(EncodeDestination(scriptMarkerOut), ValueFromAmount(0)));
     vouts.push_back(Pair(EncodeDestination(scriptMerkleProofOut), ValueFromAmount(amount)));
@@ -101,6 +100,84 @@ UniValue dfscreaterawordertx(UniValue const & params, bool fHelp)
 
     UniValue newparams(UniValue::VARR);
     newparams.push_back(params[0]);
+    newparams.push_back(vouts);
+
+    return AssemblyNewTx(newparams);
+}
+
+UniValue dfscreaterawprooftx(UniValue const & params, bool fHelp)
+{
+    if (fHelp || params.size() != 2)
+        throw std::runtime_error(
+                "dfscreaterawprooftx\n"
+                        "\nArguments:\n"
+                        "1. \"merkle root hash\":hash (string, required) The merkle root hash of file replica\n"
+                        "2. \"address\": P2PKH      (string, required)\n"
+                        "\nResult:\n"
+                        "\"hex\"             (string) The transaction hash in hex\n"
+        );
+
+#ifdef ENABLE_WALLET
+    //    LOCK2(cs_main, wallet->cs_wallet);
+#else
+    LOCK(cs_main);
+#endif
+
+    RPCTypeCheck(params, boost::assign::list_of(UniValue::VARR)(UniValue::VOBJ), true);
+
+    uint256 merkleRootHash = uint256{params[0].get_str()};
+
+    const StorageOrderDB *orderDB = storageController->GetOrderDB(merkleRootHash);
+
+    if (!orderDB) {
+        throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameters, order not found");
+    }
+
+    const std::vector<StorageProofDB> proofs = storageController->GetProofs(merkleRootHash);
+    std::time_t lastProofTime;
+    if (proofs.size()) {
+        std::vector<StorageProofDB> sortedProofs(proofs.begin(), proofs.end());
+        std::sort(sortedProofs.begin(), sortedProofs.end(), [](const StorageProofDB &proofA, const StorageProofDB &proofB) {
+            return std::difftime(proofA.time, proofB.time) > 0;
+        });
+        lastProofTime = sortedProofs[0].time;
+    } else {
+        // TODO: get time from order tx (SS)
+    }
+
+    std::string destBase58 = params[1].get_str();
+    CTxDestination dest = DecodeDestination(destBase58);
+
+    if (!IsValidDestination(dest))
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, string("Invalid address: ") + destBase58);
+
+    StorageProofDB proof;
+    proof.time = std::time(nullptr);
+    proof.fileURI = orderDB->fileURI;
+    proof.merkleRootHash = merkleRootHash;
+    proof.rate = orderDB->rate;
+
+    CDataStream ss(STORAGE_TX_PREFIX, SER_NETWORK, PROTOCOL_VERSION);
+    ss << static_cast<unsigned char>(StorageTxTypes::Proof)
+       << proof.time
+       << proof.fileURI
+       << proof.merkleRootHash
+       << proof.rate;
+
+    CScript scriptMarkerOut = CScript() << OP_RETURN << ToByteVector(ss);
+    CScript scriptMerkleProofOut = CScript() << ToByteVector(merkleRootHash) << OP_MERKLE_PATH;
+
+    CAmount fullAmount = 0;
+    CAmount fee = MIN_TX_FEE;
+    CAmount amount = std::difftime(std::time(nullptr), lastProofTime) * orderDB->rate * orderDB->fileSize;
+
+    UniValue vouts(UniValue::VOBJ);
+    vouts.push_back(Pair(EncodeDestination(scriptMarkerOut), ValueFromAmount(0)));
+    vouts.push_back(Pair(EncodeDestination(CTxDestination(GetScriptForDestination(dest))), ValueFromAmount(amount - fee)));
+    vouts.push_back(Pair(EncodeDestination(scriptMerkleProofOut), ValueFromAmount(fullAmount - amount)));
+
+    UniValue newparams(UniValue::VARR);
+//    newparams.push_back(params[0]);
     newparams.push_back(vouts);
 
     return AssemblyNewTx(newparams);

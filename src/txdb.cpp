@@ -39,6 +39,7 @@ static const char DB_LAST_BLOCK = 'l';
 ///////////////////////////////////////// dfs
 
 static const char DB_ORDER = 'o';
+static const char DB_PROOF = 'p';
 
 /////////////////////////////////////////
 
@@ -715,27 +716,27 @@ bool CBlockTreeDB::WipeHeightIndex() {
     return WriteBatch(batch);
 }
 
-/////////////////////////////////////////////////////// dfs: COrdersDB
-COrdersDB::COrdersDB(size_t nCacheSize, bool fMemory, bool fWipe) : CLevelDBWrapper(GetDataDir() / "dfsdb", nCacheSize, fMemory, fWipe)
+/////////////////////////////////////////////////////// dfs: CFileStorageDB
+CFileStorageDB::CFileStorageDB(size_t nCacheSize, bool fMemory, bool fWipe) : CLevelDBWrapper(GetDataDir() / "dfsdb", nCacheSize, fMemory, fWipe)
 {
 }
 
 
-bool COrdersDB::WriteOrder(const uint256 &hash, const StorageOrderDB &orderDB)
-{
-    CLevelDBBatch batch;
-    batch.Write(std::make_pair(DB_ORDER, hash), orderDB);
-    return WriteBatch(batch);
-}
-
-bool COrdersDB::EraseOrder(const uint256 &hash, const StorageOrderDB &orderDB)
+bool CFileStorageDB::WriteOrder(const uint256 &hash, const StorageOrderDB &orderDB)
 {
     CLevelDBBatch batch;
     batch.Write(std::make_pair(DB_ORDER, hash), orderDB);
     return WriteBatch(batch);
 }
 
-bool COrdersDB::LoadOrders(std::function<void (const uint256 &, const StorageOrderDB &)> onCheck)
+bool CFileStorageDB::EraseOrder(const uint256 &hash, const StorageOrderDB &orderDB)
+{
+    CLevelDBBatch batch;
+    batch.Erase(std::make_pair(DB_ORDER, hash));
+    return WriteBatch(batch);
+}
+
+bool CFileStorageDB::LoadOrders(std::function<void (const uint256 &, const StorageOrderDB &)> onCheck)
 {
     boost::scoped_ptr<leveldb::Iterator> pcursor(NewIterator());
 
@@ -757,6 +758,57 @@ bool COrdersDB::LoadOrders(std::function<void (const uint256 &, const StorageOrd
                 CDataStream ssValue(slValue.data(), slValue.data() + slValue.size(), SER_DISK, CLIENT_VERSION);
                 StorageOrderDB orderDB;
                 ssValue >> orderDB;
+                onCheck(key.second, orderDB);
+
+                pcursor->Next();
+            } else {
+                break; // if shutdown requested or finished loading
+            }
+        } catch (std::exception& e) {
+            return error("%s : Deserialize or I/O error - %s", __func__, e.what());
+        }
+    }
+
+    return true;
+}
+
+bool CFileStorageDB::WriteProof(const uint256 &hash, const StorageProofDB &proof)
+{
+    CLevelDBBatch batch;
+    batch.Write(std::make_pair(DB_PROOF, hash), proof);
+    return WriteBatch(batch);
+}
+
+bool CFileStorageDB::EraseProof(const uint256 &hash, const StorageProofDB &proof)
+{
+    CLevelDBBatch batch;
+    batch.Erase(std::make_pair(DB_PROOF, hash));
+    return WriteBatch(batch);
+}
+
+bool CFileStorageDB::LoadProofs(std::function<void (const uint256 &, const StorageProofDB &)> onCheck)
+{
+    boost::scoped_ptr<leveldb::Iterator> pcursor(NewIterator());
+
+    CDataStream ssKeySet(SER_DISK, CLIENT_VERSION);
+    ssKeySet << make_pair(DB_PROOF, uint256(0));
+    pcursor->Seek(ssKeySet.str());
+
+    CLevelDBBatch batch;
+
+    while (pcursor->Valid()) {
+        boost::this_thread::interruption_point();
+        try {
+            leveldb::Slice slKey = pcursor->key();
+            CDataStream ssKey(slKey.data(), slKey.data() + slKey.size(), SER_DISK, CLIENT_VERSION);
+            std::pair<char, uint256> key{};
+            ssKey >> key;
+            if (key.first == DB_PROOF) {
+                leveldb::Slice slValue = pcursor->value();
+                CDataStream ssValue(slValue.data(), slValue.data() + slValue.size(), SER_DISK, CLIENT_VERSION);
+                StorageProofDB proof;
+                ssValue >> proof;
+                onCheck(key.second, proof);
 
                 pcursor->Next();
             } else {

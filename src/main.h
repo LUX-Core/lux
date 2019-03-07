@@ -76,7 +76,7 @@ class CConnman;
 class CScriptCheck;
 class CValidationInterface;
 class CValidationState;
-class COrdersDB;
+class CFileStorageDB;
 
 struct CBlockTemplate;
 struct CNodeStateStats;

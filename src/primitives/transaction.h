@@ -24,13 +24,13 @@ enum class StorageTxTypes : unsigned char
 {
     None = 0,
     Announce            = 'a',
-    Payment             = 'p'
+    Proof               = 'p'
 };
 
 static const std::map<char, StorageTxTypes> StorageTxTypesToCode =
 {
     {'a', StorageTxTypes::Announce },
-    {'p', StorageTxTypes::Payment }
+    {'p', StorageTxTypes::Proof }
 };
 
 /** An outpoint - a combination of a transaction hash and an index n into its vout */

@@ -17,7 +17,7 @@
 #include <openssl/rsa.h>
 
 class StorageController;
-class COrdersDB;
+class CFileStorageDB;
 
 extern std::unique_ptr<StorageController> storageController;
 
@@ -35,6 +35,12 @@ class StorageController
         ACCEPT_PROPOSAL     = 1 << 2,
         FAIL_HANDSHAKE      = 1 << 3
     };
+
+    using OrderHash = uint256;
+    using ProposalHash = uint256;
+    using OrderHashDB = uint256;
+    using MerkleRootHash = uint256;
+
 protected:
     boost::mutex mutex;
 
@@ -60,13 +66,14 @@ protected:
     StorageHeap storageHeap;
     StorageHeap tempStorageHeap;
 
-    std::map<uint256, boost::filesystem::path> mapLocalFiles;
-    std::map<uint256, StorageOrder> mapAnnouncements;
-    std::map<uint256, StorageOrderDB> mapOrders;
-    std::map<uint256, std::shared_ptr<CancelingSetTimeout>> mapTimers;
-    std::map<uint256, std::map<uint256, std::pair<uint256, DecryptionKeys>>> mapMetadata;
+    std::map<OrderHash, boost::filesystem::path> mapLocalFiles;
+    std::map<OrderHash, StorageOrder> mapAnnouncements;
+    std::map<OrderHash, std::shared_ptr<CancelingSetTimeout>> mapTimers;
+    std::map<OrderHash, std::map<ProposalHash, std::pair<uint256, DecryptionKeys>>> mapMetadata;
+    std::map<OrderHashDB, StorageOrderDB> mapOrders;
+    std::map<MerkleRootHash, std::vector<StorageProofDB>> mapProofs;
 
-    COrdersDB *db;
+    CFileStorageDB *db;
 public:
     CAmount rate;
     int maxblocksgap;
@@ -92,12 +99,15 @@ public:
     void AnnounceNewOrder(const StorageOrder &order, const boost::filesystem::path &path);
     bool CancelOrder(const uint256 &orderHash);
     void ClearOldAnnouncments(std::time_t timestamp);
-    void LoadOrders();
-    void SaveOrder(const uint256 &orderHash, const StorageOrderDB &orderDB);
-    // Proposals functions
+    // Proposals function
     bool AcceptProposal(const StorageProposal &proposal);
-    // Replica functions
+    // Replica function
     void DecryptReplica(const uint256 &orderHash, const boost::filesystem::path &decryptedFile);
+    // DB functions
+    void LoadOrders();
+    void SaveOrder(const StorageOrderDB &orderDB);
+    void LoadProofs();
+    void SaveProof(const StorageProofDB &proof);
     // Get functions
     std::map<uint256, StorageOrder> GetAnnouncements();
     const StorageOrder *GetAnnounce(const uint256 &hash);
@@ -106,6 +116,8 @@ public:
     std::vector<StorageProposal> GetProposals(const uint256 &orderHash);
     StorageProposal GetProposal(const uint256 &orderHash, const uint256 &proposalHash);
     std::pair<uint256, DecryptionKeys> GetMetadata(const uint256 &orderHash, const uint256 &proposalHash);
+    const StorageOrderDB *GetOrderDB(const uint256 &merkleRootHash);
+    const std::vector<StorageProofDB> &GetProofs(const uint256 &merkleRootHash);
     // Shutdown function
     void StopThreads();
 

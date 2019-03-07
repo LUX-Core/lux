@@ -21,6 +21,7 @@ struct CDiskTxPos;
 class CCoins;
 class uint256;
 class StorageOrderDB;
+class StorageProofDB;
 
 //! -dbcache default (MiB)
 static const int64_t nDefaultDbCache = 256;
@@ -108,17 +109,20 @@ public:
     //////////////////////////////////////////////////////////////////////////////
 };
 
-class COrdersDB : public CLevelDBWrapper
+class CFileStorageDB : public CLevelDBWrapper
 {
 public:
-    COrdersDB(size_t nCacheSize, bool fMemory = false, bool fWipe = false);
-    COrdersDB(const COrdersDB&) = delete;
-    void operator=(const COrdersDB&) = delete;
+    CFileStorageDB(size_t nCacheSize, bool fMemory = false, bool fWipe = false);
+    CFileStorageDB(const CFileStorageDB&) = delete;
+    void operator=(const CFileStorageDB&) = delete;
 
     bool WriteOrder(const uint256 &hash, const StorageOrderDB &orderDB);
     bool EraseOrder(const uint256 &hash, const StorageOrderDB &orderDB);
-
     bool LoadOrders(std::function<void (const uint256 &, const StorageOrderDB &)> onCheck);
+
+    bool WriteProof(const uint256 &hash, const StorageProofDB &proof);
+    bool EraseProof(const uint256 &hash, const StorageProofDB &proof);
+    bool LoadProofs(std::function<void (const uint256 &, const StorageProofDB &)> onCheck);
 };
 
 #endif // BITCOIN_TXDB_H

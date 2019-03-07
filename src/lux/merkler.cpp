@@ -222,4 +222,5 @@ bool Merkler::CheckMerklePath(const std::vector<unsigned char> &merklePath, cons
         position /= 2;
         memcpy(data + (position % 2) * SHA256_DIGEST_LENGTH, hashCh, SHA256_DIGEST_LENGTH);
     }
+    return memcmp(hashCh, &merkleRootHash[0], SHA256_DIGEST_LENGTH);
 }
