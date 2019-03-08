@@ -4,7 +4,7 @@
 
 
 WalletFrame {
-	background: #ffffff url(':/images/walletFrame_bg') no-repeat top right cover; 
+	background: #ffffff url(':/images/walletFrame_bg') no-repeat top right cover;
     border-top: 0px solid #000;
     margin:0;
     padding:0;
@@ -396,12 +396,12 @@ QHeaderView::section:last {
     border:1px solid #333;
 }
 
-QTableView::item { /* Table Item */
+QTableView::item [defaultQSS=true]{ /* Table Item */
     background-color:#fcfcfc;
     font-size:12px;
 }
 
-QTableView::item:selected { /* Table Item Selected */
+QTableView::item:selected [defaultQSS=true] { /* Table Item Selected */
     background-color:#40c2dc;
     color:#fff;
 }
@@ -1702,7 +1702,205 @@ QCalendarWidget QAbstractItemView:disabled { /* Calendar widget days not in mont
     color:#818181;
 }
 
-QDialog#Bip38ToolDialog  .QToolButton { 
+/**************************** LUXGATE DIALOG ********************************/
+
+QMainWindow#LuxgateDialog .QLabel#labelCoupledAssetSwap {
+    background-color:#061431;
+		color: white;
+}
+
+QMainWindow#LuxgateDialog .QLabel#labelStatus {
+	background-color:#061431;
+	color: white;
+}
+
+QMainWindow#LuxgateDialog .QLabel#labelConfigStatus[status="error"] {
+	color: red;
+}
+
+QMainWindow#LuxgateDialog .QLabel#labelConfigStatus[status="info"] {
+	color: black;
+}
+
+QMainWindow#LuxgateDialog .QLabel[OrderColor="BIDS"]{
+	color: #267E00;
+}
+
+QMainWindow#LuxgateDialog .QLabel[OrderColor="ASKS"]{
+	color: red;
+}
+
+*[IsDockable] {
+	background: rgba(255,255,255,40);
+	border: 1px solid gray;
+  border-radius: 3px;
+	margin-top:2px
+}
+
+QDockWidget::title {
+	background: rgba(255,255,255,100);
+	border: 1px solid gray;
+	border-radius: 2px;
+	padding:3px;
+	text-align: left center;
+}
+
+QDockWidget#LuxgateBidDockWidget::title {
+  text-align: center center;
+}
+
+QDockWidget#LuxgateAskDockWidget::title {
+  text-align: center center;
+}
+
+QDockWidget::close-button {
+	top:2px;
+	right:3px
+}
+
+QDockWidget::float-button {
+	top:2px;
+	right:18px
+}
+
+/**************************** LuxgateCreateOrderPanel ********************************/
+
+QMainWindow#LuxgateDialog .LuxgateCreateOrderPanel .QLineEdit#lineEditPrice[Status="Cheap"] {
+		color: #800080;
+}
+
+QMainWindow#LuxgateDialog .LuxgateCreateOrderPanel .QLineEdit#lineEditPrice[Status="Expensive"] {
+		color: #800517;
+}
+
+
+/****SELL****/
+
+QMainWindow#LuxgateDialog .LuxgateCreateOrderPanel#createSellOrderPanel .QPushButton#pushButtonBuySell {
+		margin-right: 0px;
+		background-color: #E42217;
+    border:0;
+    color:#ffffff;
+    font-size:12px;
+    font-weight:bold;
+    padding-left:25px;
+    padding-right:25px;
+    padding-top:5px;
+    padding-bottom:5px;
+		text: "SELL";
+}
+
+QMainWindow#LuxgateDialog .LuxgateCreateOrderPanel#createSellOrderPanel .QPushButton#pushButtonBuySell:hover {
+    background-color: #40c2dc;
+}
+
+
+QMainWindow#LuxgateDialog .LuxgateCreateOrderPanel#createSellOrderPanel .QPushButton#pushButtonBuySell:focus {
+    border:none;
+    outline:none;
+}
+
+QMainWindow#LuxgateDialog .LuxgateCreateOrderPanel#createSellOrderPanel .QPushButton#pushButtonBuySell:pressed {
+    border:1px solid #333;
+}
+
+QMainWindow#LuxgateDialog .LuxgateCreateOrderPanel#createSellOrderPanel .QPushButton#pushButtonBuySell:disabled {
+	background-color:#DC381F;
+	color:#F5F5DC;
+}
+
+QMainWindow#LuxgateDialog .LuxgateCreateOrderPanel#createSellOrderPanel {
+		border-top: 3px solid #E42217;
+}
+
+
+/****BUY****/
+
+QMainWindow#LuxgateDialog .LuxgateCreateOrderPanel#createBuyOrderPanel .QPushButton#pushButtonBuySell {
+		margin-right: 0px;
+		background-color: #437C17;
+    border:0;
+    color:#ffffff;
+    font-size:12px;
+    font-weight:bold;
+    padding-left:25px;
+    padding-right:25px;
+    padding-top:5px;
+    padding-bottom:5px;
+		text: "SELL";
+}
+
+QMainWindow#LuxgateDialog .LuxgateCreateOrderPanel#createBuyOrderPanel .QPushButton#pushButtonBuySell:hover {
+    background-color: #40c2dc;
+}
+
+
+QMainWindow#LuxgateDialog .LuxgateCreateOrderPanel#createBuyOrderPanel .QPushButton#pushButtonBuySell:focus {
+    border:none;
+    outline:none;
+}
+
+QMainWindow#LuxgateDialog .LuxgateCreateOrderPanel#createBuyOrderPanel .QPushButton#pushButtonBuySell:pressed {
+    border:1px solid #333;
+}
+
+QMainWindow#LuxgateDialog .LuxgateCreateOrderPanel#createBuyOrderPanel .QPushButton#pushButtonBuySell:disabled {
+	background-color:#85BB65;
+	color:#F5F5DC;
+}
+
+QMainWindow#LuxgateDialog .LuxgateCreateOrderPanel#createBuyOrderPanel {
+		border-top: 3px solid #437C17;
+}
+
+
+/**************************** LuxgateBidAskPanel ********************************/
+
+*[class~="LuxgateBidAskPanel"] .QTableView#tableViewBidsAsks[OrderColor="BIDS"] .QHeaderView::section{
+		border-bottom: 3px solid #6CC417;
+}
+
+*[class~="LuxgateBidAskPanel"] .QTableView#tableViewBidsAsks[OrderColor="ASKS"] .QHeaderView::section{
+		border-bottom: 3px solid red;
+}
+
+*[class~="LuxgateBidAskPanel"] .QLabel#labelTotal {
+	color: blue;
+}
+
+*[class~="LuxgateBidAskPanel"] .QLabel#labelAveragePrice {
+	color: blue;
+}
+
+/**************************** LuxgateOpenOrdersPanel ********************************/
+*[class~="LuxgateOpenOrdersPanel"] .QPushButton {
+	margin-right: 0px;
+}
+
+QMainWindow#LuxgateDialog .QPushButton[OpenOrdersCancel=true] {
+    background-color:qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: .01 #f6f6f6, stop: .1 rgba(250, 250, 250, 128), stop: .95 rgba(250, 250, 250, 255), stop: 1 #ebebeb);
+    border:1px solid #d2d2d2;
+    color:#616161;
+    padding-left:10px;
+    padding-right:10px;
+}
+
+QMainWindow#LuxgateDialog .QPushButton[OpenOrdersCancel=true]:hover {
+    background-color:qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: .01 #f6f6f6, stop: .1 rgba(240, 240, 240, 255), stop: .95 rgba(240, 240, 240, 255), stop: 1 #ebebeb);
+    color:#333;
+}
+
+QMainWindow#LuxgateDialog .QPushButton[OpenOrdersCancel=true]:pressed {
+    border:1px solid #9e9e9e;
+}
+
+/**************************** LuxgateOrderBookPanel ********************************/
+*[class~="LuxgateOrderBookPanel"] .QPushButton#pushButtonReplaceBidsAsks {
+	margin-right: 0px;
+}
+
+/**************************** Bip38ToolDialog ********************************/
+QDialog#Bip38ToolDialog  .QToolButton {
     background-color:transparent;
     border: 0;
     outline: 0;
@@ -1744,6 +1942,7 @@ QDialog#Bip38ToolDialog .QPushButton#clearButton_ENC:pressed {
     border:1px solid #9e9e9e;
 }
 
+/**************************** MultiSendDialog ********************************/
 QDialog#MultiSendDialog .QToolButton {
     background-color:transparent;
     border: 0;

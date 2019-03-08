@@ -9,6 +9,9 @@
 #include "amount.h"
 #include "masternodemanager.h"
 #include "tradingdialog.h"
+#ifdef ENABLE_LUXGATE
+#include "luxgatedialog.h"
+#endif
 #include "smartcontract.h"
 
 #include <QStackedWidget>
@@ -74,6 +77,9 @@ private:
     LSRToken* LSRTokenPage;
     QWidget* transactionsPage;
     tradingDialog* tradingPage;
+#ifdef ENABLE_LUXGATE
+    LuxgateDialog* luxgatePage;
+#endif
     ReceiveCoinsDialog* receiveCoinsPage;
     SendCoinsDialog* sendCoinsPage;
     BlockExplorer* explorerWindow;
@@ -92,6 +98,10 @@ public Q_SLOTS:
     void gotoHistoryPage();
     /** Switch to trading page */
     void gotoTradingPage();
+#ifdef ENABLE_LUXGATE
+    /** Switch to luxgate page */
+    void gotoLuxgatePage();
+#endif
     /** Switch to masternode page */
     void gotoMasternodePage();
     /** Switch to smart contract page */

@@ -932,6 +932,9 @@
            <property name="sortingEnabled">
             <bool>true</bool>
            </property>
+           <property name="defaultQSS" stdset="0">
+            <bool>true</bool>
+           </property>
            <attribute name="horizontalHeaderHighlightSections">
             <bool>false</bool>
            </attribute>
@@ -997,6 +1000,9 @@
             <enum>Qt::ScrollBarAsNeeded</enum>
            </property>
            <property name="sortingEnabled">
+            <bool>true</bool>
+           </property>
+           <property name="defaultQSS" stdset="0">
             <bool>true</bool>
            </property>
            <attribute name="horizontalHeaderHighlightSections">

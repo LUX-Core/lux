@@ -197,6 +197,30 @@ void OptionsModel::Init()
         SoftSetArg("-anonymizeluxamount", settings.value("nAnonymizeLuxAmount").toString().toStdString());
 
     language = settings.value("language").toString();
+
+    //Luxgate Decimals
+    if (!settings.contains("nLuxgateDecimalsPrice"))
+        settings.setValue("nLuxgateDecimalsPrice", 8);
+    if (!settings.contains("nLuxgateDecimalsBase"))
+        settings.setValue("nLuxgateDecimalsBase", 8);
+    if (!settings.contains("nLuxgateDecimalsQuote"))
+        settings.setValue("nLuxgateDecimalsQuote", 8);
+
+    //Luxgate Widgets
+    if (!settings.contains("bOrderBookShowWidget"))
+        settings.setValue("bOrderBookShowWidget", true);
+    if (!settings.contains("bConfigShowWidget"))
+        settings.setValue("bConfigShowWidget", true);
+    if (!settings.contains("bOpenOrdersShowWidget"))
+        settings.setValue("bOpenOrdersShowWidget", true);
+    if (!settings.contains("bChartsShowWidget"))
+        settings.setValue("bChartsShowWidget", true);
+    if (!settings.contains("bTradesHistoryShowWidget"))
+        settings.setValue("bTradesHistoryShowWidget", true);
+    if (!settings.contains("bBuyShowWidget"))
+        settings.setValue("bBuyShowWidget", true);
+    if (!settings.contains("bSellShowWidget"))
+        settings.setValue("bSellShowWidget", true);
 }
 
 void OptionsModel::Reset()
@@ -302,12 +326,36 @@ QVariant OptionsModel::data(const QModelIndex& index, int role) const
             return settings.value("fTxIndex");
         case AddressIndex:
             return settings.value("fAddressIndex");
+        case DecimalsPrice:
+            return settings.value("nLuxgateDecimalsPrice");
+        case DecimalsBase:
+            return settings.value("nLuxgateDecimalsBase");
+        case DecimalsQuote:
+            return settings.value("nLuxgateDecimalsQuote");
+        case ConfigShowWidget:
+            return settings.value("bConfigShowWidget");
+        case OpenOrdersShowWidget:
+            return settings.value("bOpenOrdersShowWidget");
+        case OrderBookShowWidget:
+            return settings.value("bOrderBookShowWidget");
+        case ChartsShowWidget:
+            return settings.value("bChartsShowWidget");
+        case TradesHistoryShowWidget:
+            return settings.value("bTradesHistoryShowWidget");
+        case BuyShowWidget:
+            return settings.value("bBuyShowWidget");
+        case SellShowWidget:
+            return settings.value("bSellShowWidget");
         default:
             return QVariant();
         }
     }
     return QVariant();
 }
+
+Luxgate::Decimals OptionsModel::getLuxgateDecimals() { return Luxgate::Decimals(QSettings().value("nLuxgateDecimalsPrice").toInt(),
+                                                 QSettings().value("nLuxgateDecimalsBase").toInt(),
+                                                 QSettings().value("nLuxgateDecimalsQuote").toInt()); }
 
 // write QSettings values
 bool OptionsModel::setData(const QModelIndex& index, const QVariant& value, int role)
@@ -522,6 +570,52 @@ bool OptionsModel::setData(const QModelIndex& index, const QVariant& value, int 
                 setRestartRequired(true);
             }
             break;
+        case DecimalsPrice:
+            settings.setValue("nLuxgateDecimalsPrice", value);
+            emit luxgateDecimalsChanged(Luxgate::Decimals(settings.value("nLuxgateDecimalsPrice").toInt(),
+                                                  settings.value("nLuxgateDecimalsBase").toInt(),
+                                                  settings.value("nLuxgateDecimalsQuote").toInt()));
+            break;
+        case DecimalsBase:
+            settings.setValue("nLuxgateDecimalsBase", value);
+            emit luxgateDecimalsChanged(Luxgate::Decimals(settings.value("nLuxgateDecimalsPrice").toInt(),
+                                                  settings.value("nLuxgateDecimalsBase").toInt(),
+                                                  settings.value("nLuxgateDecimalsQuote").toInt()));
+            break;
+        case DecimalsQuote:
+            settings.setValue("nLuxgateDecimalsQuote", value);
+            emit luxgateDecimalsChanged(Luxgate::Decimals(settings.value("nLuxgateDecimalsPrice").toInt(),
+                                                  settings.value("nLuxgateDecimalsBase").toInt(),
+                                                  settings.value("nLuxgateDecimalsQuote").toInt()));
+            break;
+        case ConfigShowWidget:
+            settings.setValue("bConfigShowWidget", value);
+            emit hideConfigWidget(!value.toBool());
+            break;
+        case OpenOrdersShowWidget:
+            settings.setValue("bOpenOrdersShowWidget", value);
+            emit hideOpenOrdersWidget(!value.toBool());
+            break;
+        case OrderBookShowWidget:
+            settings.setValue("bOrderBookShowWidget", value);
+            emit hideOrderBookWidget(!value.toBool());
+            break;
+        case ChartsShowWidget:
+            settings.setValue("bChartsShowWidget", value);
+            emit hideChartsWidget(!value.toBool());
+            break;
+        case TradesHistoryShowWidget:
+            settings.setValue("bTradesHistoryShowWidget", value);
+            emit hideTradesHistoryWidget(!value.toBool());
+            break;
+        case BuyShowWidget:
+            settings.setValue("bBuyShowWidget", value);
+            emit hideBuyWidget(!value.toBool());
+            break;
+        case SellShowWidget:
+            settings.setValue("bSellShowWidget", value);
+            emit hideSellWidget(!value.toBool());
+            break;
         default:
             break;
         }
@@ -558,6 +652,41 @@ bool OptionsModel::getProxySettings(QNetworkProxy& proxy) const
         proxy.setType(QNetworkProxy::NoProxy);
 
     return false;
+}
+
+bool OptionsModel::getHideConfigWidget()
+{
+    return !QSettings().value("bConfigShowWidget").toBool();
+}
+
+bool OptionsModel::getHideOrderBookWidget()
+{
+    return !QSettings().value("bOrderBookShowWidget").toBool();
+}
+
+bool OptionsModel::getHideOpenOrdersWidget()
+{
+    return !QSettings().value("bOpenOrdersShowWidget").toBool();
+}
+
+bool OptionsModel::getHideChartsWidget()
+{
+    return !QSettings().value("bChartsShowWidget").toBool();
+}
+
+bool OptionsModel::getHideTradesHistoryWidget()
+{
+    return !QSettings().value("bTradesHistoryShowWidget").toBool();
+}
+
+bool OptionsModel::getHideBuyWidget()
+{
+    return !QSettings().value("bBuyShowWidget").toBool();
+}
+
+bool OptionsModel::getHideSellWidget()
+{
+    return !QSettings().value("bSellShowWidget").toBool();
 }
 
 void OptionsModel::setRestartRequired(bool fRequired)

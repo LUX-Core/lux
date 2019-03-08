@@ -73,7 +73,18 @@ QT_FORMS_UI = \
 
 if ENABLE_UPDATER
  QT_FORMS_UI += lux-installer/src/forms/updateinfodialog.ui \
-                lux-installer/src/forms/progressdialog.ui 
+                lux-installer/src/forms/progressdialog.ui
+endif
+
+if ENABLE_LUXGATE
+ QT_FORMS_UI += qt/forms/luxgatedialog.ui \
+                qt/forms/luxgateconfigpanel.ui \
+                qt/forms/luxgatebidaskpanel.ui \
+                qt/forms/luxgateopenorderspanel.ui \
+                qt/forms/luxgateorderbookpanel.ui \
+                qt/forms/tradingplot.ui \
+                qt/forms/luxgatehistorypanel.ui \
+                qt/forms/luxgatecreateorderpanel.ui
 endif
 
 QT_MOC_CPP = \
@@ -174,6 +185,23 @@ if ENABLE_UPDATER
                 lux-installer/src/moc_progressdialog_p.cpp \
                 lux-installer/src/moc_updatecontroller.cpp \
                 lux-installer/src/moc_updateinfodialog_p.cpp
+endif
+
+if ENABLE_LUXGATE
+ QT_MOC_CPP +=    qt/moc_luxgatedialog.cpp \
+                  qt/moc_luxgateconfigmodel.cpp \
+                  qt/moc_luxgateconfigpanel.cpp \
+                  qt/moc_luxgatebidsasksmodel.cpp \
+                  qt/moc_luxgatebidaskpanel.cpp \
+                  qt/moc_luxgateopenorderspanel.cpp \
+                  qt/moc_luxgateopenordersmodel.cpp \
+                  qt/moc_luxgateorderbookpanel.cpp \
+                  qt/moc_tradingplot.cpp \
+                  qt/moc_luxgatehistorypanel.cpp \
+                  qt/moc_luxgatehistorymodel.cpp \
+                  qt/moc_luxgatecreateorderpanel.cpp \
+                  qt/moc_luxgatepricedelegate.cpp \
+                  qt/moc_luxgatetableview.cpp
 endif
 
 BITCOIN_MM = \
@@ -312,6 +340,23 @@ if ENABLE_UPDATER
                   lux-installer/src/updateinfodialog_p.h
 endif
 
+if ENABLE_LUXGATE
+ BITCOIN_QT_H +=  qt/luxgatedialog.h \
+                  qt/luxgateconfigmodel.h \
+                  qt/luxgateconfigpanel.h \
+                  qt/luxgatebidaskpanel.h \
+                  qt/luxgatebidsasksmodel.h \
+                  qt/luxgateopenorderspanel.h \
+                  qt/luxgateopenordersmodel.h \
+                  qt/luxgateorderbookpanel.h \
+                  qt/luxgategui_global.h \
+                  qt/tradingplot.h \
+                  qt/luxgatehistorypanel.h \
+                  qt/luxgatehistorymodel.h \
+                  qt/luxgatecreateorderpanel.h \
+                  qt/luxgatepricedelegate.h \
+                  qt/luxgatetableview.h
+endif
 
 RES_ICONS = \
   qt/res/icons/add.png \
@@ -363,6 +408,11 @@ RES_ICONS = \
   qt/res/icons/network_monitor.png \
   qt/res/icons/options.png \
   qt/res/icons/overview.png \
+  qt/res/icons/smartcontract.png \
+  qt/res/icons/luxgate.png \
+  qt/res/icons/rec_luxgate.png \
+  qt/res/icons/send_luxgate.png\
+  qt/res/icons/swap.png \
   qt/res/icons/peer.png \
   qt/res/icons/qrcode.png \
   qt/res/icons/quit.png \
@@ -504,6 +554,7 @@ BITCOIN_QT_CPP += \
   qt/walletmodeltransaction.cpp \
   qt/walletview.cpp
 
+
 if ENABLE_UPDATER
   BITCOIN_QT_CPP += lux-installer/src/luxupdater/simplescheduler.cpp \
                     lux-installer/src/luxupdater/luxupdater_p.cpp \
@@ -520,6 +571,24 @@ else
   BITCOIN_QT_CPP += lux-installer/src/adminauthorization_x11.cpp
 endif
 
+endif
+
+if ENABLE_LUXGATE
+ BITCOIN_QT_CPP +=  qt/luxgatedialog.cpp \
+                    qt/luxgateconfigmodel.cpp \
+                    qt/luxgateconfigpanel.cpp \
+                    qt/luxgatebidaskpanel.cpp \
+                    qt/luxgatebidsasksmodel.cpp \
+                    qt/luxgateopenorderspanel.cpp \
+                    qt/luxgateopenordersmodel.cpp \
+                    qt/luxgateorderbookpanel.cpp \
+                    qt/tradingplot.cpp \
+                    qt/luxgatehistorypanel.cpp \
+                    qt/luxgatehistorymodel.cpp \
+                    qt/luxgatecreateorderpanel.cpp \
+                    qt/luxgatepricedelegate.cpp \
+                    qt/luxgategui_global.cpp \
+                    qt/luxgatetableview.cpp                                                       
 endif
 
 endif

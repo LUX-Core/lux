@@ -53,6 +53,9 @@ WalletView::WalletView(const PlatformStyle* platformStyle, QWidget* parent) : QS
     smartContractPage = new SmartContract(this);
     LSRTokenPage = new LSRToken(this);
     tradingPage = new tradingDialog(this);
+#ifdef ENABLE_LUXGATE
+    luxgatePage = new LuxgateDialog(this);
+#endif
     QVBoxLayout* vbox = new QVBoxLayout();
     QHBoxLayout* hbox_buttons = new QHBoxLayout();
     transactionView = new TransactionView(platformStyle, this);
@@ -88,6 +91,9 @@ WalletView::WalletView(const PlatformStyle* platformStyle, QWidget* parent) : QS
     addWidget(transactionsPage);
 
     addWidget(tradingPage);
+#ifdef ENABLE_LUXGATE
+    addWidget(luxgatePage);
+#endif
     addWidget(receiveCoinsPage);
     addWidget(sendCoinsPage);
     addWidget(explorerWindow);
@@ -189,7 +195,9 @@ void WalletView::setWalletModel(WalletModel* walletModel)
     }
     receiveCoinsPage->setModel(walletModel);
     sendCoinsPage->setModel(walletModel);
-
+#ifdef ENABLE_LUXGATE
+    luxgatePage->setModel(walletModel);
+#endif
     if (walletModel) {
         // Receive and pass through messages from wallet model
         connect(walletModel, SIGNAL(message(QString, QString, unsigned int)), this, SIGNAL(message(QString, QString, unsigned int)));
@@ -272,6 +280,13 @@ void WalletView::gotoTradingPage()
 {
     setCurrentWidget(tradingPage);
 }
+
+#ifdef ENABLE_LUXGATE
+void WalletView::gotoLuxgatePage()
+{
+    setCurrentWidget(luxgatePage);
+}
+#endif
 
 void WalletView::gotoBlockExplorerPage()
 {

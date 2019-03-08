@@ -6,6 +6,7 @@
 #define BITCOIN_QT_OPTIONSMODEL_H
 
 #include "amount.h"
+#include "luxgategui_global.h"
 
 #include <QAbstractListModel>
 
@@ -59,6 +60,16 @@ public:
         CheckUpdates,            // bool
         TxIndex,                 // bool
         AddressIndex,            // bool
+        DecimalsPrice,   // int
+        DecimalsBase,    // int
+        DecimalsQuote,   // int
+        OrderBookShowWidget,     // bool
+        ConfigShowWidget,        // bool
+        OpenOrdersShowWidget,    // bool
+        ChartsShowWidget,        // bool
+        TradesHistoryShowWidget, // bool
+        BuyShowWidget, // bool
+        SellShowWidget, // bool
         OptionIDRowCount,
     };
 
@@ -81,8 +92,16 @@ public:
     bool getCoinControlFeatures() { return fCoinControlFeatures; }
     bool getShowAdvancedUI() { return fShowAdvancedUI; }
     bool getshowMasternodesTab() { return fshowMasternodesTab; }
-    bool getparallelMasterNode() { return fparallelMasterNode; }
+    bool getparallelMasterNode() { return fparallelMasterNode; } 
     const QString& getOverriddenByCommandLine() { return strOverriddenByCommandLine; }
+    Luxgate::Decimals getLuxgateDecimals();
+    bool getHideConfigWidget();
+    bool getHideOpenOrdersWidget();
+    bool getHideOrderBookWidget();
+    bool getHideChartsWidget();
+    bool getHideTradesHistoryWidget();
+    bool getHideBuyWidget();
+    bool getHideSellWidget();
 
     /* Restart flag helper */
     void setRestartRequired(bool fRequired);
@@ -119,6 +138,14 @@ Q_SIGNALS:
     void zeroBalanceAddressTokenChanged(bool);
     void walletBackupsChanged(int);
     void hideTrayIconChanged(bool);
+    void luxgateDecimalsChanged(Luxgate::Decimals);
+    void hideOrderBookWidget(bool bHide);
+    void hideConfigWidget(bool bHide);
+    void hideOpenOrdersWidget(bool bHide);
+    void hideChartsWidget(bool bHide);
+    void hideTradesHistoryWidget(bool bHide);
+    void hideBuyWidget(bool bHide);
+    void hideSellWidget(bool bHide);
 };
 
 #endif // BITCOIN_QT_OPTIONSMODEL_H
