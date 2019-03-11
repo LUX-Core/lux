@@ -84,7 +84,8 @@ public:
                           handshakesManagerThread(boost::bind(&StorageController::ProcessHandshakesMessages, this)),
                           shutdownThreads(false),
                           rate(STORAGE_MIN_RATE),
-                          maxblocksgap(DEFAULT_STORAGE_MAX_BLOCK_GAP)
+                          maxblocksgap(DEFAULT_STORAGE_MAX_BLOCK_GAP),
+                          db(nullptr)
     {
     }
     // Init functions

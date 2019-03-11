@@ -77,7 +77,7 @@ void StorageController::InitStorages(const boost::filesystem::path &dataDir, con
 
 void StorageController::InitDB(size_t nCacheSize, bool fMemory, bool fWipe)
 {
-    delete db;
+    if (db) delete db;
     db = new CFileStorageDB(nCacheSize, fMemory, fWipe);
 }
 
