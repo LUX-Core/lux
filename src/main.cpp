@@ -1982,7 +1982,7 @@ CAmount GetProofOfStakeReward(int64_t nFees, int nHeight)
 CAmount GetMasternodePosReward(int nHeight, CAmount blockValue)
 {
     const CChainParams& chainParams = Params();
-    CAmount ret;
+    CAmount ret = 0;
     if (nHeight >= POS_REWARD_CHANGED_BLOCK) {
         if (nHeight != chainParams.PreminePayment() || IsTestNet()) {
             ret = blockValue * 0.2; //20% for masternode
