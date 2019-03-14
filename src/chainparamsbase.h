@@ -21,7 +21,7 @@ public:
         REGTEST,
         UNITTEST,
         SEGWITTEST,
-        DFSTTEST,
+        DFSTEST,
 
         MAX_NETWORK_TYPES
     };

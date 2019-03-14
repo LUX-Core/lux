@@ -641,7 +641,7 @@ class CDFSTestNetParams : public CTestNetParams
 public:
     CDFSTestNetParams()
     {
-        networkID = CBaseChainParams::DFSTTEST;
+        networkID = CBaseChainParams::DFSTEST;
         strNetworkID = "dfstest";
         pchMessageStart[0] = 0xab;
         pchMessageStart[1] = 0x51;
@@ -726,7 +726,7 @@ CChainParams& Params(CBaseChainParams::Network network)
         return unitTestParams;
     case CBaseChainParams::SEGWITTEST:
         return segwitParams;
-    case CBaseChainParams::DFSTTEST:
+    case CBaseChainParams::DFSTEST:
         return dfstestNetParams;
     default:
         assert(false && "Unimplemented network");
@@ -745,7 +745,7 @@ CChainParams* CreateChainParams(CBaseChainParams::Network network)
         return new CRegTestParams();
     case CBaseChainParams::SEGWITTEST:
         return new CSegWitTestnet();
-    case CBaseChainParams::DFSTTEST:
+    case CBaseChainParams::DFSTEST:
         return new CDFSTestNetParams();
     default:
         throw std::runtime_error(strprintf("%s: Unknown chain.", __func__));

@@ -88,7 +88,7 @@ class CBaseDFSTestNetParams : public CBaseMainParams
 public:
     CBaseDFSTestNetParams()
     {
-        networkID = CBaseChainParams::DFSTTEST;
+        networkID = CBaseChainParams::DFSTEST;
         nRPCPort = 9555;
         strDataDir = "dfstestnet";
     }
@@ -121,7 +121,7 @@ void SelectBaseParams(CBaseChainParams::Network network)
     case CBaseChainParams::SEGWITTEST:
         pCurrentBaseParams = &segwitTestParams;
         break;
-    case CBaseChainParams::DFSTTEST:
+    case CBaseChainParams::DFSTEST:
         pCurrentBaseParams = &dfstestNetParams;
         break;
     default:
@@ -146,7 +146,7 @@ CBaseChainParams::Network NetworkIdFromCommandLine()
     if (fSegWitTestNet)
         return CBaseChainParams::SEGWITTEST;
     if (fDfsTestNet)
-        return CBaseChainParams::DFSTTEST;
+        return CBaseChainParams::DFSTEST;
     return CBaseChainParams::MAIN;
 }
 
