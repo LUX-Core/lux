@@ -106,9 +106,9 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButtonChangeConfig">
+      <widget class="QPushButton" name="pushButtonUpdateConfig">
        <property name="text">
-        <string>Change</string>
+        <string>Update</string>
        </property>
       </widget>
      </item>

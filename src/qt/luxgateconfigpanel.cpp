@@ -58,14 +58,13 @@ void LuxgateConfigDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
 {
     painter->setRenderHint(QPainter::Antialiasing, true);
     QStyleOptionViewItem opt = option;
-    if(!index.model()->data(index, LuxgateConfigModel::ValidRole).toBool()) {
+    if (!index.model()->data(index, LuxgateConfigModel::ValidRole).toBool()) {
         QColor col;
         col.setNamedColor("#990012");
         opt.palette.setColor(QPalette::Highlight, col);
     }
     QItemDelegate::paint(painter, opt, index);
-    if(LuxgateConfigModel::SwapSupportColumn == index.column())
-    {
+    if (LuxgateConfigModel::SwapSupportColumn == index.column()) {
         QPen oldPen = painter->pen();
         QBrush oldBrush =  painter->brush();
         QColor col;
@@ -86,9 +85,9 @@ QWidget * LuxgateConfigDelegate::createEditor(QWidget *parent, const QStyleOptio
     connect(editor, &QLineEdit::editingFinished,
             this, &LuxgateConfigDelegate::commitAndCloseEditor);
 
-    if(LuxgateConfigModel::PortColumn == index.column())
+    if (LuxgateConfigModel::PortColumn == index.column())
         editor->setValidator(new QRegExpValidator(QRegExp("^[1-9]\\d*$"), editor));
-    if(LuxgateConfigModel::HostColumn == index.column())
+    if (LuxgateConfigModel::HostColumn == index.column())
         editor->setInputMask("000.000.000.000;_");
     return editor;
 }
@@ -106,8 +105,7 @@ void LuxgateConfigDelegate::setModelData(QWidget *editor, QAbstractItemModel *mo
     int iColumn = index.column();
     bool bSetModel = true;
     QLineEdit * lineEdit = qobject_cast<QLineEdit *>(editor);
-    if(LuxgateConfigModel::HostColumn == iColumn)
-    {
+    if (LuxgateConfigModel::HostColumn == iColumn) {
         QString ipRange = "(?:[0-1]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])";
         QRegExp ipRegex ("^" + ipRange
                          + "\\." + ipRange
@@ -116,10 +114,10 @@ void LuxgateConfigDelegate::setModelData(QWidget *editor, QAbstractItemModel *mo
         QRegExpValidator *ipValidator = new QRegExpValidator(ipRegex, lineEdit);
         int pos = 0;
         QString text = lineEdit->text();
-        if(QValidator::Acceptable != ipValidator->validate(text, pos))
+        if (QValidator::Acceptable != ipValidator->validate(text, pos))
             bSetModel = false;
     }
-    if(bSetModel)
+    if (bSetModel)
         QItemDelegate::setModelData(editor, model, index);
 }
 
@@ -147,12 +145,12 @@ LuxgateConfigPanel::LuxgateConfigPanel(QWidget *parent) :
     HeaderView->setFixedHeight(30);
     slotClickResetConfiguration();
     ui->pushButtonResetConfig->setEnabled(false);
-    ui->pushButtonChangeConfig->setEnabled(false);
+    ui->pushButtonUpdateConfig->setEnabled(false);
 
     connect(ui->pushButtonResetConfig, &QPushButton::clicked,
             this, &LuxgateConfigPanel::slotClickResetConfiguration);
-    connect(ui->pushButtonChangeConfig, &QPushButton::clicked,
-            this, &LuxgateConfigPanel::slotClickChangeConfig);
+    connect(ui->pushButtonUpdateConfig, &QPushButton::clicked,
+            this, &LuxgateConfigPanel::slotClickUpdateConfig);
     connect(configModel, &LuxgateConfigModel::dataChanged,
             this, &LuxgateConfigPanel::slotConfigDataChanged);
     connect(ui->pushButtonAddConfiguration, &QPushButton::clicked,
@@ -169,9 +167,8 @@ void LuxgateConfigPanel::slotClickRemoveConfiguration()
 {
     auto modelConfig = qobject_cast<LuxgateConfigModel *>(ui->tableViewConfiguration->model());
     auto selectRows = ui->tableViewConfiguration->selectionModel()->selectedRows();
-    if(selectRows.isEmpty())
-    {
-        QMessageBox::critical(this, tr("Luxgate"),
+    if (selectRows.isEmpty()) {
+        QMessageBox::critical(this, tr("LuxGate"),
                 tr("No rows selected!"));
         return;
     }
@@ -199,31 +196,30 @@ void LuxgateConfigPanel::slotConfigDataChanged(const QModelIndex &topLeft, const
         ui->labelConfigStatus->setText(tr("Unsaved configuration changes"));
 
         ui->pushButtonResetConfig->setEnabled(true);
-        ui->pushButtonChangeConfig->setEnabled(true);
+        ui->pushButtonUpdateConfig->setEnabled(true);
     }
 }
 
 void LuxgateConfigPanel::slotClickImportConfiguration()
 {
-    QString openFileName = QFileDialog::getOpenFileName(this, tr("Import Luxgate Configuration"),
+    QString openFileName = QFileDialog::getOpenFileName(this, tr("Import LuxGate Configuration"),
             QStandardPaths::writableLocation(QStandardPaths::DataLocation),
             tr("*.json"));
-    if(!openFileName.isEmpty())
-    {
+    if (!openFileName.isEmpty()) {
         fillInTableWithConfig(openFileName);
         ui->pushButtonResetConfig->setEnabled(true);
-        ui->pushButtonChangeConfig->setEnabled(true);
+        ui->pushButtonUpdateConfig->setEnabled(true);
     }
 }
 
 void LuxgateConfigPanel::slotClickExportConfiguration()
 {
-    QString newFileName = QFileDialog::getSaveFileName(this, tr("Export Luxgate Configuration"),
-                                                        QStandardPaths::writableLocation(QStandardPaths::DataLocation),
+    QString defaultConfigLocation = QStringFromPath(GetLuxGateConfigFile());
+    QString newFileName = QFileDialog::getSaveFileName(this, tr("Export LuxGate configuration"),
+                                                        defaultConfigLocation,
                                                         tr("*.json"));
     QFile::remove(newFileName);
-    QFile::copy(QStringFromPath(GetLuxGateConfigFile()),
-                newFileName);
+    QFile::copy(defaultConfigLocation, newFileName);
 }
 
 //strConfig - path to import config, if strConfig == "" use standard config file
@@ -233,10 +229,9 @@ void LuxgateConfigPanel::fillInTableWithConfig(QString strConfig)
     modelConfig->removeRows(0, modelConfig->rowCount());
     // Read LuxGate config
     std::map<std::string, BlockchainConfig> config = ReadLuxGateConfigFile(PathFromQString(strConfig));
-    for (auto it : config)
-    {
+    for (auto it : config) {
         BlockchainConfigQt conf(it.second);
-        if(conf.ticker == "Lux")
+        if (conf.ticker == "Lux" || conf.ticker == "LUX")
             continue;
         modelConfig->insertRows(modelConfig->rowCount(), 1);
         modelConfig->setData(modelConfig->rowCount()-1, 0,
@@ -249,10 +244,10 @@ void LuxgateConfigPanel::slotClickResetConfiguration()
 {
     fillInTableWithConfig();
     ui->pushButtonResetConfig->setEnabled(false);
-    ui->pushButtonChangeConfig->setEnabled(false);
+    ui->pushButtonUpdateConfig->setEnabled(false);
 }
 
-void LuxgateConfigPanel::slotClickChangeConfig()
+void LuxgateConfigPanel::slotClickUpdateConfig()
 {
     std::map<std::string, BlockchainConfig> configs;
     auto modelConfig = qobject_cast<LuxgateConfigModel *>(ui->tableViewConfiguration->model());
@@ -262,53 +257,50 @@ void LuxgateConfigPanel::slotClickChangeConfig()
     int iEditingRow = modelConfig->rowCount();
     //fill in configs and bValid
     {
-        for(int iR=0; iR<modelConfig->rowCount(); iR++)
-        {
+        for (int iR = 0; iR < modelConfig->rowCount(); iR++) {
             BlockchainConfig conf = qvariant_cast<BlockchainConfigQt>(modelConfig->data(iR, 0, LuxgateConfigModel::AllDataRole)).toBlockchainConfig();
             configs[conf.ticker] = conf;
 
             //check Valid configs
             auto validItems = isValidBlockchainConfig(conf);
-            if(!validItems.bValid) {
+            if (!validItems.bValid) {
 
-                if(!validItems.bTickerValid)
+                if (!validItems.bTickerValid)
                     iEditingCol = qMin(iEditingCol, static_cast<int>(LuxgateConfigModel::TickerColumn));
                 modelConfig->setData(iR, LuxgateConfigModel::TickerColumn, validItems.bTickerValid, LuxgateConfigModel::ValidRole);
 
-                if(!validItems.bHostValid)
+                if (!validItems.bHostValid)
                     iEditingCol = qMin(iEditingCol, static_cast<int>(LuxgateConfigModel::HostColumn));
                 modelConfig->setData(iR, LuxgateConfigModel::HostColumn, validItems.bHostValid, LuxgateConfigModel::ValidRole);
 
 
-                if(!validItems.bPortValid)
+                if (!validItems.bPortValid)
                     iEditingCol = qMin(iEditingCol, static_cast<int>(LuxgateConfigModel::PortColumn));
                 modelConfig->setData(iR, LuxgateConfigModel::PortColumn, validItems.bPortValid, LuxgateConfigModel::ValidRole);
 
-                if(!validItems.bRpcUserValid)
+                if (!validItems.bRpcUserValid)
                     iEditingCol = qMin(iEditingCol, static_cast<int>(LuxgateConfigModel::RpcuserColumn));
                 modelConfig->setData(iR, LuxgateConfigModel::RpcuserColumn, validItems.bRpcUserValid, LuxgateConfigModel::ValidRole);
 
-                if(!validItems.bRpcPasswordValid)
+                if (!validItems.bRpcPasswordValid)
                     iEditingCol = qMin(iEditingCol, static_cast<int>(LuxgateConfigModel::RpcpasswordColumn));
                 modelConfig->setData(iR, LuxgateConfigModel::RpcpasswordColumn, validItems.bRpcPasswordValid, LuxgateConfigModel::ValidRole);
 
-                if(iEditingCol != modelConfig->columnCount())
+                if (iEditingCol != modelConfig->columnCount())
                     iEditingRow = iR;
 
                 bValid = false;
-            }
-            else {
-                for(int iC=0; iC<modelConfig->columnCount(); iC++){
+            } else {
+                for (int iC = 0; iC < modelConfig->columnCount(); iC++) {
                     modelConfig->setData(iR, iC, true, LuxgateConfigModel::ValidRole);
                 }
             }
             //check that ticker is unical
-            auto tickerList = modelConfig->match(modelConfig->index(LuxgateConfigModel::TickerColumn,0), Qt::DisplayRole, QString::fromStdString(conf.ticker), -1);
-            if(tickerList.size() > 1 && conf.ticker != "") {
+            auto tickerList = modelConfig->match(modelConfig->index(LuxgateConfigModel::TickerColumn, 0), Qt::DisplayRole, QString::fromStdString(conf.ticker), -1);
+            if (tickerList.size() > 1 && conf.ticker != "") {
                 iEditingCol = qMin(iEditingCol, static_cast<int>(LuxgateConfigModel::TickerColumn));
                 bValid = false;
-                foreach(auto index, tickerList)
-                {
+                foreach (auto index, tickerList) {
                     modelConfig->setData(index, false, LuxgateConfigModel::ValidRole);
                     iEditingRow = qMin(iEditingRow,index.row());
                 }
@@ -316,11 +308,10 @@ void LuxgateConfigPanel::slotClickChangeConfig()
         }
     }
 
-    if(!bValid)
-    {
-        QMessageBox::critical(this, tr("Luxgate"), tr("Configuration is not valid!"));
+    if (!bValid) {
+        QMessageBox::critical(this, tr("LuxGate"), tr("Configuration is not valid!"));
 
-        if(iEditingCol != modelConfig->columnCount()) {
+        if (iEditingCol != modelConfig->columnCount()) {
             ui->tableViewConfiguration->edit(modelConfig->index(iEditingRow, iEditingCol));
         }
         ui->labelConfigStatus->setProperty("status", "error");
@@ -330,18 +321,14 @@ void LuxgateConfigPanel::slotClickChangeConfig()
         return;
     }
 
-    if(ChangeLuxGateConfiguration(configs))
-    {
+    if (ChangeLuxGateConfiguration(configs)) {
         update();//fill in swap supported
-        for (auto it : blockchainClientPool)
-        {
+        for (auto it : blockchainClientPool) {
             Ticker ticker =  it.first;
             auto client =  it.second;
             auto list = modelConfig->match(modelConfig->index(0,0), Qt::DisplayRole, QString::fromStdString(ticker), -1);
-            foreach(auto index, list)
-            {
-                if(LuxgateConfigModel::TickerColumn == index.column())
-                {
+            foreach (auto index, list) {
+                if (LuxgateConfigModel::TickerColumn == index.column()) {
                     auto indexStatus = modelConfig->index(index.row(), LuxgateConfigModel::SwapSupportColumn);
                     modelConfig->setData(indexStatus, true);
                     break;
@@ -349,18 +336,15 @@ void LuxgateConfigPanel::slotClickChangeConfig()
             }
         }
         ui->pushButtonResetConfig->setEnabled(false);
-        ui->pushButtonChangeConfig->setEnabled(false);
+        ui->pushButtonUpdateConfig->setEnabled(false);
         ui->labelConfigStatus->clear();
-    }
-    else
-    {
-        QMessageBox::critical(this, tr("Luxgate"), tr("Error while changing configuration"));
+    } else {
+        QMessageBox::critical(this, tr("LuxGate"), tr("Error while updating configuration"));
         ui->labelConfigStatus->setProperty("status", "error");
         ui->labelConfigStatus->style()->unpolish(ui->labelConfigStatus);
         ui->labelConfigStatus->style()->polish(ui->labelConfigStatus);
-        ui->labelConfigStatus->setText(tr("Error while changing configuration!"));
+        ui->labelConfigStatus->setText(tr("Error while updating configuration!"));
     }
-
 }
 
 void LuxgateConfigPanel::slotClickAddConfiguration()
@@ -373,7 +357,7 @@ void LuxgateConfigPanel::slotClickAddConfiguration()
     ui->labelConfigStatus->setText(tr("Unsaved configuration changes"));
 
     ui->pushButtonResetConfig->setEnabled(true);
-    ui->pushButtonChangeConfig->setEnabled(true);
+    ui->pushButtonUpdateConfig->setEnabled(true);
 }
 
 
