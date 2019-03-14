@@ -69,12 +69,9 @@ void LuxgateConfigDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
         QPen oldPen = painter->pen();
         QBrush oldBrush =  painter->brush();
         QColor col;
-        if(index.model()->data(index).toBool())
-            col = Qt::green;
-        else
-            col = Qt::red;
+        bool value = index.model()->data(index).toBool();
         painter->setPen(QPen(Qt::black));
-        painter->setBrush(QBrush(col));
+        painter->setBrush(QBrush(value ? Qt::green : Qt::red));
         painter->drawEllipse(option.rect.center(),9,9);
         painter->setPen(oldPen);
         painter->setBrush(oldBrush);
@@ -93,8 +90,6 @@ QWidget * LuxgateConfigDelegate::createEditor(QWidget *parent, const QStyleOptio
         editor->setValidator(new QRegExpValidator(QRegExp("^[1-9]\\d*$"), editor));
     if(LuxgateConfigModel::HostColumn == index.column())
         editor->setInputMask("000.000.000.000;_");
-    if(LuxgateConfigModel::Zmq_pub_raw_tx_endpointColumn == index.column())
-        editor->setInputMask("000.000.000.000:0000000000;_");
     return editor;
 }
 
@@ -111,19 +106,6 @@ void LuxgateConfigDelegate::setModelData(QWidget *editor, QAbstractItemModel *mo
     int iColumn = index.column();
     bool bSetModel = true;
     QLineEdit * lineEdit = qobject_cast<QLineEdit *>(editor);
-    if(LuxgateConfigModel::Zmq_pub_raw_tx_endpointColumn == iColumn)
-    {
-        QString ipRange = "(?:[0-1]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])";
-        QRegExp ipRegex ("^" + ipRange
-                         + "\\." + ipRange
-                         + "\\." + ipRange
-                         + "\\." + ipRange + "\\:" + "[1-9]\\d*$");
-        QRegExpValidator *val = new QRegExpValidator(ipRegex, lineEdit);
-        int pos = 0;
-        QString text = lineEdit->text();
-        if(QValidator::Acceptable != val->validate(text, pos))
-            bSetModel = false;
-    }
     if(LuxgateConfigModel::HostColumn == iColumn)
     {
         QString ipRange = "(?:[0-1]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])";
@@ -158,7 +140,6 @@ LuxgateConfigPanel::LuxgateConfigPanel(QWidget *parent) :
     HeaderView->resizeSection(LuxgateConfigModel::HostColumn, 80);
     HeaderView->resizeSection(LuxgateConfigModel::PortColumn, 50);
     HeaderView->resizeSection(LuxgateConfigModel::SwapSupportColumn, 50);
-    HeaderView->resizeSection(LuxgateConfigModel::Zmq_pub_raw_tx_endpointColumn, 80);
     int rpc_width = (HeaderView->length() - (50*3+80*2)) /2;
     HeaderView->resizeSection(LuxgateConfigModel::RpcuserColumn, rpc_width);
     HeaderView->resizeSection(LuxgateConfigModel::RpcpasswordColumn, rpc_width);*/
@@ -311,13 +292,9 @@ void LuxgateConfigPanel::slotClickChangeConfig()
                     iEditingCol = qMin(iEditingCol, static_cast<int>(LuxgateConfigModel::RpcpasswordColumn));
                 modelConfig->setData(iR, LuxgateConfigModel::RpcpasswordColumn, validItems.bRpcPasswordValid, LuxgateConfigModel::ValidRole);
 
-                if(!validItems.bZmqEndpointValid)
-                    iEditingCol = qMin(iEditingCol, static_cast<int>(LuxgateConfigModel::Zmq_pub_raw_tx_endpointColumn));
-
                 if(iEditingCol != modelConfig->columnCount())
                     iEditingRow = iR;
 
-                modelConfig->setData(iR, LuxgateConfigModel::Zmq_pub_raw_tx_endpointColumn, validItems.bZmqEndpointValid, LuxgateConfigModel::ValidRole);
                 bValid = false;
             }
             else {
@@ -361,16 +338,13 @@ void LuxgateConfigPanel::slotClickChangeConfig()
             Ticker ticker =  it.first;
             auto client =  it.second;
             auto list = modelConfig->match(modelConfig->index(0,0), Qt::DisplayRole, QString::fromStdString(ticker), -1);
-            if(!list.isEmpty())
+            foreach(auto index, list)
             {
-                foreach(auto index, list)
+                if(LuxgateConfigModel::TickerColumn == index.column())
                 {
-                    if(LuxgateConfigModel::TickerColumn == index.column())
-                    {
-                        modelConfig->setData(modelConfig->index(index.row(), LuxgateConfigModel::SwapSupportColumn),
-                                client->IsSwapSupported());
-                        break;
-                    }
+                    auto indexStatus = modelConfig->index(index.row(), LuxgateConfigModel::SwapSupportColumn);
+                    modelConfig->setData(indexStatus, true);
+                    break;
                 }
             }
         }

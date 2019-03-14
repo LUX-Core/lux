@@ -20,9 +20,7 @@ QVariant LuxgateConfigModel::data(int iRow, int iColumn, int role)
 QVariant LuxgateConfigModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
     QVariant res;
-    if (Qt::Horizontal == orientation
-            &&
-        Qt::DisplayRole == role)
+    if (Qt::Horizontal == orientation && Qt::DisplayRole == role)
     {
         switch(section)
         {
@@ -39,13 +37,10 @@ QVariant LuxgateConfigModel::headerData(int section, Qt::Orientation orientation
                 res = "RPC USER";
                 break;
             case RpcpasswordColumn:
-                res = "RPC PASSW";
-                break;
-            case Zmq_pub_raw_tx_endpointColumn:
-                res = "ZMQ";
+                res = "RPC PASSWORD";
                 break;
             case SwapSupportColumn:
-                res = "SWAP";
+                res = "STATUS";
                 break;
         }
     }
@@ -58,27 +53,28 @@ QVariant LuxgateConfigModel::data(const QModelIndex &index, int role) const
     if (index.isValid()) {
         if (Qt::EditRole == role ||
             Qt::DisplayRole == role) {
+            auto irow = items[index.row()];
             switch (index.column()) {
                 case TickerColumn:
-                    res = items[index.row()].ticker;
+                    res = irow.ticker;
                     break;
                 case HostColumn:
-                    res = items[index.row()].host;
+                    res = irow.host;
                     break;
                 case PortColumn:
-                    res = items[index.row()].port;
+                    res = irow.port;
                     break;
                 case RpcuserColumn:
-                    res = items[index.row()].rpcuser;
+                    res = irow.rpcuser;
                     break;
                 case RpcpasswordColumn:
-                    res = items[index.row()].rpcpassword;
-                    break;
-                case Zmq_pub_raw_tx_endpointColumn:
-                    res = items[index.row()].zmq_pub_raw_tx_endpoint;
+                    res = irow.rpcpassword;
                     break;
                 case SwapSupportColumn:
-                    res = QVariant();
+                    ClientPtr client;
+                    if (!FindClient(irow.ticker.toStdString(), client))
+                        return false;
+                    res = client->IsSwapSupported();
                     break;
             }
         } else if (Qt::BackgroundRole == role)
@@ -172,9 +168,6 @@ bool LuxgateConfigModel::setData(const QModelIndex &index, const QVariant &value
             break;
             case RpcpasswordColumn:
                 items[index.row()].rpcpassword = value.toString();
-            break;
-            case Zmq_pub_raw_tx_endpointColumn:
-                items[index.row()].zmq_pub_raw_tx_endpoint = value.toString();
             break;
             case SwapSupportColumn:
                 items[index.row()].bSwapConnect = value.toBool();

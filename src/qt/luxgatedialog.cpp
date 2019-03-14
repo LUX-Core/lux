@@ -124,6 +124,9 @@ void LuxgateDialog::createWidgetsAndDocks()
 QDockWidget* LuxgateDialog::createDock(QWidget* widget, const QString& title)
 {
     QDockWidget* dock = new QDockWidget(this);
+    dock->setFloating(false);
+    dock->setFeatures(QDockWidget::NoDockWidgetFeatures);
+
     widget->setProperty("IsDockable", true);
     if(widget->layout())
     {
