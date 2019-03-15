@@ -39,3 +39,4 @@ private:
 };
 
 #endif // LUXGATEOPENORDERSMODEL_H
+

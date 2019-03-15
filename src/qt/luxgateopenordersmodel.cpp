@@ -9,11 +9,13 @@
 #include <QColor>
 #include <QBrush>
 #include <QDateTime>
+#include <QVector>
 
 LuxgateOpenOrdersModel::LuxgateOpenOrdersModel(const Luxgate::Decimals & decimals, QObject *parent)
     : QAbstractTableModel(parent),
       decimals(decimals)
 {
+    qRegisterMetaType<QVector<int>>();
     update();
     orderbook.subscribeOrdersChange(std::bind(&LuxgateOpenOrdersModel::update, this));
 }
@@ -21,14 +23,13 @@ LuxgateOpenOrdersModel::LuxgateOpenOrdersModel(const Luxgate::Decimals & decimal
 void LuxgateOpenOrdersModel::update()
 {
     openOrders.clear();
-    for( auto it = orderbook.Orders().begin(); it != orderbook.Orders().end(); ++it ) {
+    for (auto it = orderbook.Orders().begin(); it != orderbook.Orders().end(); ++it) {
         openOrders.push_back( it->second );
     }
     std::sort(openOrders.begin(), openOrders.end(),
-
               [](std::shared_ptr<COrder> a, std::shared_ptr<COrder> b)
-              { return a->OrderCreationTime() > b->OrderCreationTime();});
-    emit dataChanged(index(0,0), index(rowCount()-1,columnCount()-1), {Luxgate::BidAskRole, Qt::DisplayRole});
+              { return a->OrderCreationTime() > b->OrderCreationTime(); });
+    emit dataChanged(index(0, 0), index(rowCount() - 1, columnCount() - 1), { Luxgate::BidAskRole, Qt::DisplayRole });
 }
 
 Qt::ItemFlags LuxgateOpenOrdersModel::flags(const QModelIndex &index) const
@@ -39,7 +40,7 @@ Qt::ItemFlags LuxgateOpenOrdersModel::flags(const QModelIndex &index) const
 void LuxgateOpenOrdersModel::slotSetDecimals(const Luxgate::Decimals & decimals_)
 {
     decimals = decimals_;
-    emit dataChanged(index(0,0), index(rowCount()-1,columnCount()-1), {Qt::DisplayRole});
+    emit dataChanged(index(0, 0), index(rowCount() - 1, columnCount() - 1), { Qt::DisplayRole });
 }
 
 QVariant LuxgateOpenOrdersModel::headerData(int section, Qt::Orientation orientation, int role) const
