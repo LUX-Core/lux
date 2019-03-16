@@ -5,7 +5,7 @@ This guide will show you how to build luxd (headless client) for OSX.
 Notes
 -----
 
-* Tested on OS X 10.7 through 10.10 on 64-bit Intel processors only.
+* Tested on OS X 10.7 through 10.14 on 64-bit Intel processors only.
 
 * All of the commands should be executed in a Terminal application. The
 built-in one is located in `/Applications/Utilities`.
@@ -19,7 +19,14 @@ available on your OS X installation media, but if not, you can get the
 current version from https://developer.apple.com/xcode/. If you install
 Xcode 4.3 or later, you'll need to install its command line tools. This can
 be done in `Xcode > Preferences > Downloads > Components` and generally must
-be re-done or updated every time Xcode is updated.
+be re-done or updated every time Xcode is updated. If, instead, you'd like
+to install it from the command line, use `xcode-select --install`
+
+If you're on Mojave, remember to run 
+
+    open /Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_10.14.pkg
+
+to get proper build headers
 
 There's also an assumption that you already have `git` installed. If
 not, it's the path of least resistance to install [Github for Mac](https://mac.github.com/)
@@ -38,7 +45,11 @@ Instructions: Homebrew
 
 #### Install dependencies using Homebrew
 
-        brew install autoconf automake berkeley-db4 libtool boost miniupnpc openssl pkg-config protobuf qt5 libzmq
+        brew install automake berkeley-db4 libtool boost@1.60 miniupnpc openssl pkg-config protobuf python qt libevent qrencode librsvg
+
+### Force link `boost`
+
+        brew link boost@1.60 --force
 
 ### Building `luxd`
 
@@ -49,6 +60,8 @@ Instructions: Homebrew
 
 2.  Build luxd:
 
+        export LDFLAGS=-L/usr/local/opt/openssl/lib
+        export CPPFLAGS=-I/usr/local/opt/openssl/include
         ./autogen.sh
         ./configure --with-gui=qt5
         make

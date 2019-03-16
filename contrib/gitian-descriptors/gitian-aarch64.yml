@@ -25,7 +25,7 @@ packages:
 - "python"
 reference_datetime: "2018-04-05 00:00:00"
 remotes:
-- "url": "https://github.com/216k155/lux.git"
+- "url": "https://github.com/LUX-Core/lux.git"
   "dir": "lux"
 files: []
 script: |
