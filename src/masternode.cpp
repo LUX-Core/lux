@@ -613,7 +613,9 @@ uint256 CMasterNode::CalculateScore(int mod, int64_t nBlockHeight) {
 	    VinString == bannedvin3 ||
 	    VinString == bannedvin2 ||
 	    VinString == bannedvin1 ||
-	    )
+	    ){
+       return 0;	   
+   }
 
     if (VinString == preminepaymentmn) {
 
