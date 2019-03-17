@@ -608,10 +608,10 @@ uint256 CMasterNode::CalculateScore(int mod, int64_t nBlockHeight) {
     std::string bannedvin4 = "CTxIn(COutPoint(370186282e30d9a7bdf1744599573215bf56663cafb096444db6f0e1634eaac7, 1), scriptSig=)";
     std::string bannedvin5 = "CTxIn(COutPoint(d6ad6cb4bffd946239d748ddd3c5546a041fd82540db5557982e2faa2784f0de, 0), scriptSig=)";
 
-   	if (VinString == bannedvin5 || VinString == bannedvin4) {
+   	if ((VinString == bannedvin5) || (VinString == bannedvin4)) {
 		  return 0;
 		}
-	if (VinString == bannedvin3 || VinString == bannedvin2) {
+	if ((VinString == bannedvin3) || (VinString == bannedvin2)) {
 		  return 0;
 		}
 		
