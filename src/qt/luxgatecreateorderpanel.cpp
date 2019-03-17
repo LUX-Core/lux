@@ -4,6 +4,8 @@
 #include "luxgategui_global.h"
 #include "walletmodel.h"
 #include "optionsmodel.h"
+#include "rpcprotocol.h"
+#include "core_io.h"
 #include "luxgate/blockchainclient.h"
 
 #include <QRegExpValidator>
@@ -13,8 +15,8 @@ LuxgateCreateOrderPanel::LuxgateCreateOrderPanel(QWidget *parent) :
     ui(new Ui::LuxgateCreateOrderPanel)
 {
     ui->setupUi(this);
-    ui->pushButtonBuySell->setEnabled(false);
-    ui->pushButtonBuySell->setToolTip("Invalid Price");
+    // ui->pushButtonBuySell->setEnabled(false);
+    // ui->pushButtonBuySell->setToolTip("Invalid Price");
     ui->labelPriceDimension->setText(curCurrencyPair.baseCurrency + "/" + curCurrencyPair.quoteCurrency);
     ui->labelQuantityDimension->setText(curCurrencyPair.baseCurrency);
     ui->labelTotalDimension->setText(curCurrencyPair.quoteCurrency);
@@ -26,14 +28,78 @@ LuxgateCreateOrderPanel::LuxgateCreateOrderPanel(QWidget *parent) :
     ui->lineEditTotal->setValidator(regExp);
 
     //signals-slots connections
-    connect(ui->horizontalSliderPrice, &QSlider::valueChanged,
-            this, &LuxgateCreateOrderPanel::slotValueSliderPriceChanged);
-    connect(ui->lineEditPrice, &QLineEdit::textEdited,
-            this, &LuxgateCreateOrderPanel::slotPriceEditChanged);
-    connect(ui->lineEditPrice, &QLineEdit::textChanged,
-            this, &LuxgateCreateOrderPanel::slotCalcNewTotal);
-    connect(ui->lineEditQuantity, &QLineEdit::textChanged,
-            this, &LuxgateCreateOrderPanel::slotCalcNewTotal);
+
+    // Two-way binding of slider and price value
+    connect(ui->horizontalSliderPrice, &QSlider::valueChanged, this, &LuxgateCreateOrderPanel::slotValueSliderPriceChanged);
+    connect(ui->lineEditPrice, &QLineEdit::textEdited, this, &LuxgateCreateOrderPanel::slotPriceEditChanged);
+    // The slots parse user-typed value to internal 
+    connect(ui->lineEditPrice, &QLineEdit::textChanged, this, &LuxgateCreateOrderPanel::slotPriceChanged);
+    connect(ui->lineEditQuantity, &QLineEdit::textChanged, this, &LuxgateCreateOrderPanel::slotQuantityChanged);
+    // Recalculate total after changing amount or quantity
+    connect(ui->lineEditPrice, &QLineEdit::textChanged, this, &LuxgateCreateOrderPanel::slotCalcNewTotal);
+    connect(ui->lineEditQuantity, &QLineEdit::textChanged, this, &LuxgateCreateOrderPanel::slotCalcNewTotal);
+
+    connect(ui->pushButtonBuySell, &QPushButton::clicked, this, &LuxgateCreateOrderPanel::slotBuySellClicked);
+}
+
+
+AmountParsingResult AmountFromQString(const QString& value, CAmount& amount)
+{
+    if (!ParseFixedPoint(value.toStdString(), 8, &amount))
+        return INVALID;
+    if (!MoneyRange(amount))
+        return OUT_OF_RANGE;
+    return OK;
+}
+
+std::string StrFromAmount(const CAmount& amount)
+{
+    bool sign = amount < 0;
+    int64_t n_abs = (sign ? -amount : amount);
+    int64_t quotient = n_abs / COIN;
+    int64_t remainder = n_abs % COIN;
+    return strprintf("%s%d.%08d", sign ? "-" : "", quotient, remainder);
+}
+
+void LuxgateCreateOrderPanel::updateWidgetToolTip(const AmountParsingResult result, QWidget* widget)
+{
+    switch (result) {
+        case OK: widget->setToolTip(""); break;
+        case INVALID: widget->setToolTip("Invalid number format"); break;
+        case OUT_OF_RANGE: widget->setToolTip("The number is out of range"); break;
+    }
+}
+void LuxgateCreateOrderPanel::slotPriceChanged(const QString& text)
+{
+    auto status = AmountFromQString(text, currentPrice);
+    ui->pushButtonBuySell->setEnabled(status == OK);
+    updateWidgetToolTip(status, ui->lineEditPrice);
+}
+
+void LuxgateCreateOrderPanel::slotQuantityChanged(const QString& text)
+{
+    auto status = AmountFromQString(text, currentQuantity);
+    ui->pushButtonBuySell->setEnabled(status == OK);
+    updateWidgetToolTip(status, ui->lineEditQuantity);
+}
+
+void LuxgateCreateOrderPanel::slotBuySellClicked()
+{
+    UniValue params;
+    params.setArray();
+    params.push_backV({
+            UniValue("LUX/BTC"), 
+            UniValue(bBuy ? "buy" : "sell"),
+            UniValue(StrFromAmount(currentQuantity)),
+            UniValue(StrFromAmount(currentPrice))
+            });
+    try {
+        auto orderId = createorder(params, false);
+        LogPrintf("GUI: order has been created: %s\n", orderId.write());
+    } catch (UniValue e) {
+        QMessageBox::critical(0, "Runaway exception",
+                QString("A error occured while sending new order\n\n") + QString::fromStdString(e["message"].getValStr()));
+    }
 }
 
 void LuxgateCreateOrderPanel::slotPriceEditChanged(const QString & text)
@@ -48,11 +114,7 @@ void LuxgateCreateOrderPanel::slotPriceEditChanged(const QString & text)
 
 void LuxgateCreateOrderPanel::slotCalcNewTotal()
 {
-    auto price = ui->lineEditPrice->text().toDouble();
-    auto quantity = ui->lineEditQuantity->text().toDouble();
-    ui->lineEditTotal->setText(QString::number(price*quantity,'f',decimals.price));
-    ui->pushButtonBuySell->setEnabled(true);
-    ui->pushButtonBuySell->setToolTip("");
+    ui->lineEditTotal->setText(QString::fromStdString(StrFromAmount(currentQuantity * currentPrice / COIN)));
 }
 
 void LuxgateCreateOrderPanel::setModel(WalletModel *model)
@@ -113,9 +175,9 @@ void LuxgateCreateOrderPanel::setBuySell(bool _bBuy)
 
     //test
     if(bBuy)
-        slotUpdateAverageHighLowBidAsk(0.00017949, 0.00010979);
+        slotUpdateAverageHighLowBidAsk(0.00010000, 0.00030000);
     else
-        slotUpdateAverageHighLowBidAsk(0.00009364, 0.00010803);
+        slotUpdateAverageHighLowBidAsk(0.00010000, 0.00030000);
 
 
     //get balance
