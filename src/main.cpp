@@ -3160,6 +3160,7 @@ void ProcessDFSTransactions(const CBlock &block)
                    >> order.maxGap
                    >> order.rate
                    >> order.storageUntil;
+                order.hashTx = tx.GetHash();
 
                 storageController->SaveOrder(order);
             } else if (type == StorageTxTypes::Proof) {
@@ -3169,6 +3170,7 @@ void ProcessDFSTransactions(const CBlock &block)
                    >> proof.fileURI
                    >> proof.merkleRootHash
                    >> proof.rate;
+                proof.hashTx = tx.GetHash();
 
                 storageController->SaveProof(proof);
             }

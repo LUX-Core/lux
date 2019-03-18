@@ -51,6 +51,7 @@ public:
     uint64_t fileSize;
     uint256 fileURI;
     uint256 merkleRootHash;
+    uint256 hashTx;
     CAmount rate;
     int maxGap;
     DecryptionKeys keys;
@@ -70,6 +71,7 @@ public:
         READWRITE(fileSize);
         READWRITE(fileURI);
         READWRITE(merkleRootHash);
+        READWRITE(hashTx);
         READWRITE(rate);
         READWRITE(maxGap);
         READWRITE(keys);
@@ -82,6 +84,7 @@ public:
     std::time_t time;
     uint256 fileURI;
     uint256 merkleRootHash;
+    uint256 hashTx;
     CAmount rate;
 
     uint256 GetHash() const{
@@ -97,6 +100,7 @@ public:
         READWRITE(time);
         READWRITE(fileURI);
         READWRITE(merkleRootHash);
+        READWRITE(hashTx);
         READWRITE(rate);
     }
 };

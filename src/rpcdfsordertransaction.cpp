@@ -3,6 +3,7 @@
 #include "amount.h"
 #include "core_io.h"
 #include "lux/storagecontroller.h"
+#include "main.h"
 //#include "script/script_error.h"
 //#include "script/sign.h"
 //#include "version.h"
@@ -133,16 +134,25 @@ UniValue dfscreaterawprooftx(UniValue const & params, bool fHelp)
         throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameters, order not found");
     }
 
+    CTransaction orderTx;
+    uint256 hashBlockOrderTx;
+    if (!GetTransaction(orderDB->hashTx, orderTx, Params().GetConsensus(), hashBlockOrderTx, true)) {
+        throw JSONRPCError(RPC_VERIFY_REJECTED, "transaction not found not found");
+    }
+
     const std::vector<StorageProofDB> proofs = storageController->GetProofs(merkleRootHash);
     std::time_t lastProofTime;
+    uint256 lastProofTxHash;
     if (proofs.size()) {
         std::vector<StorageProofDB> sortedProofs(proofs.begin(), proofs.end());
         std::sort(sortedProofs.begin(), sortedProofs.end(), [](const StorageProofDB &proofA, const StorageProofDB &proofB) {
             return std::difftime(proofA.time, proofB.time) > 0;
         });
         lastProofTime = sortedProofs[0].time;
+        lastProofTxHash = sortedProofs[0].hashTx;
     } else {
-        // TODO: get time from order tx (SS)
+        lastProofTime = (std::time_t)orderTx.nTime;
+        lastProofTxHash = orderDB->hashTx;
     }
 
     std::string destBase58 = params[1].get_str();
@@ -176,8 +186,14 @@ UniValue dfscreaterawprooftx(UniValue const & params, bool fHelp)
     vouts.push_back(Pair(EncodeDestination(CTxDestination(GetScriptForDestination(dest))), ValueFromAmount(amount - fee)));
     vouts.push_back(Pair(EncodeDestination(scriptMerkleProofOut), ValueFromAmount(fullAmount - amount)));
 
+    UniValue inputs(UniValue::VARR);
+    UniValue entry(UniValue::VOBJ);
+    entry.push_back(Pair("txid", lastProofTxHash.GetHex()));
+    entry.push_back(Pair("vout", 1));
+    inputs.push_back(entry);
+
     UniValue newparams(UniValue::VARR);
-//    newparams.push_back(params[0]);
+    newparams.push_back(inputs);
     newparams.push_back(vouts);
 
     return AssemblyNewTx(newparams);
