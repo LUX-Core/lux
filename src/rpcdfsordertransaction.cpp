@@ -18,14 +18,10 @@ extern UniValue fundrawtransaction(UniValue const & params, bool fHelp);
 extern UniValue signrawtransaction(UniValue const & params, bool fHelp);
 extern UniValue sendrawtransaction(UniValue const & params, bool fHelp);
 
-UniValue AssemblyNewTx(UniValue params, CKeyID const & changeAddress = CKeyID())
+UniValue SignAndSentNewTx(UniValue params, CKeyID const & changeAddress = CKeyID())
 {
-    UniValue created = createrawtransaction(params, false);
-
-    UniValue fundsparams = fundrawtransaction(created, false);
-
     UniValue signparams(UniValue::VARR);
-    signparams.push_back(fundsparams["hex"]);
+    signparams.push_back(params["hex"]);
     UniValue signedTxObj = signrawtransaction(signparams, false);
 
     UniValue sendparams(UniValue::VARR);
@@ -36,22 +32,12 @@ UniValue AssemblyNewTx(UniValue params, CKeyID const & changeAddress = CKeyID())
 
 UniValue dfscreaterawordertx(UniValue const & params, bool fHelp)
 {
-    if (fHelp || params.size() != 4)
+    if (fHelp || params.size() != 2)
         throw std::runtime_error(
                 "dfscreaterawordertx\n"
                         "\nArguments:\n"
-                        "1. \"transactions\"        (string, required) A json array of json objects\n"
-                        "     [\n"
-                        "       {\n"
-                        "         \"txid\":\"id\",  (string, required) The transaction id\n"
-                        "         \"vout\":n        (numeric, required) The output number\n"
-                        "         \"sequence\":n    (numeric, optional) The sequence number\n"
-                        "       }\n"
-                        "       ,...\n"
-                        "     ]\n"
-                        "2. \"orders hash\":hash    (string, required) The hash of announces order\n"
-                        "3. \"proposal hash\":hash  (string, required) The hash of proposal\n"
-                        "4. \"address\": P2PKH      (string, required)\n"
+                        "1. \"orders hash\":hash    (string, required) The hash of announces order\n"
+                        "2. \"proposal hash\":hash  (string, required) The hash of proposal\n"
                         "\nResult:\n"
                         "\"hex\"             (string) The transaction hash in hex\n"
         );
@@ -64,7 +50,7 @@ UniValue dfscreaterawordertx(UniValue const & params, bool fHelp)
 
     RPCTypeCheck(params, boost::assign::list_of(UniValue::VARR)(UniValue::VOBJ), true);
 
-    uint256 orderHash = uint256{params[1].get_str()};
+    uint256 orderHash = uint256{params[0].get_str()};
 
     const StorageOrder *order = storageController->GetAnnounce(orderHash);
 
@@ -72,7 +58,7 @@ UniValue dfscreaterawordertx(UniValue const & params, bool fHelp)
         throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameters, order not found");
     }
 
-    uint256 proposalHash = uint256{params[2].get_str()};
+    uint256 proposalHash = uint256{params[1].get_str()};
 
     auto metadata = storageController->GetMetadata(orderHash, proposalHash);
     const StorageProposal proposal = storageController->GetProposal(orderHash, proposalHash);
@@ -100,10 +86,15 @@ UniValue dfscreaterawordertx(UniValue const & params, bool fHelp)
 
 
     UniValue newparams(UniValue::VARR);
-    newparams.push_back(params[0]);
+    UniValue emptyInputs(UniValue::VARR);
+    newparams.push_back(emptyInputs);
     newparams.push_back(vouts);
 
-    return AssemblyNewTx(newparams);
+    UniValue created = createrawtransaction(newparams, false);
+
+    UniValue fundsparams = fundrawtransaction(created, false);
+
+    return SignAndSentNewTx(newparams);
 }
 
 UniValue dfscreaterawprooftx(UniValue const & params, bool fHelp)
@@ -196,5 +187,7 @@ UniValue dfscreaterawprooftx(UniValue const & params, bool fHelp)
     newparams.push_back(inputs);
     newparams.push_back(vouts);
 
-    return AssemblyNewTx(newparams);
+    UniValue created = createrawtransaction(newparams, false);
+
+    return SignAndSentNewTx(newparams);
 }
