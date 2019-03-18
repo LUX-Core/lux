@@ -25,7 +25,7 @@ python27
 
 Download the source code:
 ```
-git clone https://github.com/LUX-Core/lux
+git clone https://github.com/216k155/lux
 ```
 
 See [dependencies.md](dependencies.md) for a complete overview.
