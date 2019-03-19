@@ -48,7 +48,7 @@ UniValue dfscreaterawordertx(UniValue const & params, bool fHelp)
     LOCK(cs_main);
 #endif
 
-    RPCTypeCheck(params, boost::assign::list_of(UniValue::VARR)(UniValue::VOBJ), true);
+    RPCTypeCheck(params, boost::assign::list_of(UniValue::VSTR)(UniValue::VSTR), true);
 
     uint256 orderHash = uint256{params[0].get_str()};
 
@@ -79,7 +79,7 @@ UniValue dfscreaterawordertx(UniValue const & params, bool fHelp)
     CScript scriptMarkerOut = CScript() << OP_RETURN << ToByteVector(ss);
     CScript scriptMerkleProofOut = CScript() << ToByteVector(merkleRootHash) << OP_MERKLE_PATH;
 
-    CAmount amount = std::difftime(order->storageUntil, std::time(nullptr)) * proposal.rate * order->fileSize;
+    CAmount amount = std::difftime(order->storageUntil, std::time(nullptr)) * proposal.rate * (uint64_t)(order->fileSize / 1000); // rate for 1 Kb
     UniValue vouts(UniValue::VOBJ);
     vouts.push_back(Pair(EncodeDestination(scriptMarkerOut), ValueFromAmount(0)));
     vouts.push_back(Pair(EncodeDestination(scriptMerkleProofOut), ValueFromAmount(amount)));
@@ -115,7 +115,7 @@ UniValue dfscreaterawprooftx(UniValue const & params, bool fHelp)
     LOCK(cs_main);
 #endif
 
-    RPCTypeCheck(params, boost::assign::list_of(UniValue::VARR)(UniValue::VOBJ), true);
+    RPCTypeCheck(params, boost::assign::list_of(UniValue::VSTR)(UniValue::VSTR), true);
 
     uint256 merkleRootHash = uint256{params[0].get_str()};
 
