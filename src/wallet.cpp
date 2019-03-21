@@ -2019,7 +2019,7 @@ bool CWallet::FundTransaction(CMutableTransaction& tx, CAmount &nFeeRet, int& nC
     CReserveKey reservekey(this);
     CWalletTx wtx;
 
-    if (!CreateTransaction(vecSend, wtx, reservekey, nFeeRet, strFailReason, &coinControl))
+    if (!CreateTransaction(vecSend, wtx, reservekey, nFeeRet, nChangePosRet, strFailReason, &coinControl))
         return false;
 
     if (nChangePosRet != -1)
@@ -2375,7 +2375,8 @@ OutputType CWallet::TransactionChangeType(const std::vector<std::pair<CScript, C
     return g_address_type;
 }
 
-bool CWallet::CreateTransaction(const vector<pair<CScript, CAmount> >& vecSend, CWalletTx& wtxNew, CReserveKey& reservekey, CAmount& nFeeRet, std::string& strFailReason, const CCoinControl* coinControl, AvailableCoinsType coin_type, bool useIX, CAmount nFeePay, CAmount nGasFee)
+bool CWallet::CreateTransaction(const vector<pair<CScript, CAmount> >& vecSend, CWalletTx& wtxNew, CReserveKey& reservekey, CAmount& nFeeRet,
+                                int& nChangePosRet, std::string& strFailReason, const CCoinControl* coinControl, AvailableCoinsType coin_type, bool useIX, CAmount nFeePay, CAmount nGasFee)
 {
 #   if defined(DEBUG_DUMP_STAKING_INFO) && defined(DEBUG_DUMP_CreateTransaction_1)
     DEBUG_DUMP_CreateTransaction_1();
@@ -2409,6 +2410,7 @@ bool CWallet::CreateTransaction(const vector<pair<CScript, CAmount> >& vecSend, 
             while (true) {
                 txNew.vin.clear();
                 txNew.vout.clear();
+                nChangePosRet = -1;
                 wtxNew.fFromMe = true;
 
                 CAmount nTotalValue = nValue + nFeeRet;
@@ -2571,7 +2573,8 @@ bool CWallet::CreateTransaction(const vector<pair<CScript, CAmount> >& vecSend, 
                             reservekey.ReturnKey();
                         } else {
                             // Insert change txn at random position:
-                            vector<CTxOut>::iterator position = txNew.vout.begin() + GetRandInt(txNew.vout.size() + 1);
+                            nChangePosRet = GetRandInt(txNew.vout.size()+1);
+                            vector<CTxOut>::iterator position = txNew.vout.begin() + nChangePosRet;
                             txNew.vout.insert(position, newTxOut);
                         }
                     }
@@ -2644,11 +2647,12 @@ bool CWallet::CreateTransaction(const vector<pair<CScript, CAmount> >& vecSend, 
     return true;
 }
 
-bool CWallet::CreateTransaction(CScript scriptPubKey, const CAmount& nValue, CWalletTx& wtxNew, CReserveKey& reservekey, CAmount& nFeeRet, std::string& strFailReason, const CCoinControl* coinControl, AvailableCoinsType coin_type, bool useIX, CAmount nFeePay)
+bool CWallet::CreateTransaction(CScript scriptPubKey, const CAmount& nValue, CWalletTx& wtxNew, CReserveKey& reservekey, CAmount& nFeeRet,
+                                int& nChangePosRet, std::string& strFailReason, const CCoinControl* coinControl, AvailableCoinsType coin_type, bool useIX, CAmount nFeePay)
 {
     vector<pair<CScript, CAmount> > vecSend;
     vecSend.push_back(make_pair(scriptPubKey, nValue));
-    return CreateTransaction(vecSend, wtxNew, reservekey, nFeeRet, strFailReason, coinControl, coin_type, useIX, nFeePay);
+    return CreateTransaction(vecSend, wtxNew, reservekey, nFeeRet, nChangePosRet, strFailReason, coinControl, coin_type, useIX, nFeePay);
 }
 
 /**
@@ -3617,11 +3621,12 @@ void CWallet::AutoCombineDust()
 #if 1
         //get the fee amount
         CWalletTx wtxdummy;
-        CreateTransaction(vecSend, wtxdummy, keyChange, nFeeRet, strErr, coinControl, ALL_COINS, false, CAmount(0));
+        int nChangePosRet;
+        CreateTransaction(vecSend, wtxdummy, keyChange, nFeeRet, nChangePosRet, strErr, coinControl, ALL_COINS, false, CAmount(0));
 
         vecSend[0].second = nTotalRewardsValue - nFeeRet - 500;
 
-        if (!CreateTransaction(vecSend, wtx, keyChange, nFeeRet, strErr, coinControl, ALL_COINS, false, CAmount(0))) {
+        if (!CreateTransaction(vecSend, wtx, keyChange, nFeeRet, nChangePosRet, strErr, coinControl, ALL_COINS, false, CAmount(0))) {
             LogPrintf("AutoCombineDust createtransaction failed, reason: %s\n", strErr);
             continue;
         }
@@ -3631,7 +3636,8 @@ void CWallet::AutoCombineDust()
        // Added 5% fee tp prevent "Insufficient funds" errors
         vecSend[0].second = nTotalRewardsValue - (nTotalRewardsValue / 5);
 
-        if (!CreateTransaction(vecSend, wtx, keyChange, nFeeRet, strErr, coinControl, ALL_COINS, false, CAmount(0))) {
+        int nChangePosRet;
+        if (!CreateTransaction(vecSend, wtx, keyChange, nFeeRet, nChangePosRet, strErr, coinControl, ALL_COINS, false, CAmount(0))) {
             LogPrintf("AutoCombineDust createtransaction failed, reason: %s\n", strErr);
             continue;
         }
@@ -3722,7 +3728,8 @@ bool CWallet::MultiSend()
         //get the fee amount
         CWalletTx wtxdummy;
         string strErr;
-        CreateTransaction(vecSend, wtxdummy, keyChange, nFeeRet, strErr, cControl, ALL_COINS, false, CAmount(0));
+        int nChangePosRet;
+        CreateTransaction(vecSend, wtxdummy, keyChange, nFeeRet, nChangePosRet, strErr, cControl, ALL_COINS, false, CAmount(0));
         CAmount nLastSendAmount = vecSend[vecSend.size() - 1].second;
         if (nLastSendAmount < nFeeRet + 500) {
             LogPrintf("%s: fee of %s is too large to insert into last output\n");
@@ -3731,7 +3738,7 @@ bool CWallet::MultiSend()
         vecSend[vecSend.size() - 1].second = nLastSendAmount - nFeeRet - 500;
 
         // Create the transaction and commit it to the network
-        if (!CreateTransaction(vecSend, wtx, keyChange, nFeeRet, strErr, cControl, ALL_COINS, false, CAmount(0))) {
+        if (!CreateTransaction(vecSend, wtx, keyChange, nFeeRet, nChangePosRet, strErr, cControl, ALL_COINS, false, CAmount(0))) {
             LogPrintf("MultiSend createtransaction failed\n");
             return false;
         }

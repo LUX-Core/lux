@@ -578,7 +578,8 @@ void SendMoney(const CTxDestination& address, CAmount nValue, CWalletTx& wtxNew,
     // Create and send the transaction
     CReserveKey reservekey(pwalletMain);
     CAmount nFeeRequired;
-    if (!pwalletMain->CreateTransaction(scriptPubKey, nValue, wtxNew, reservekey, nFeeRequired, strError, NULL, ALL_COINS, fUseIX, (CAmount)0)) {
+    int32_t nChangePos;
+    if (!pwalletMain->CreateTransaction(scriptPubKey, nValue, wtxNew, reservekey, nFeeRequired, nChangePos, strError, NULL, ALL_COINS, fUseIX, (CAmount)0)) {
         if (nValue + nFeeRequired > pwalletMain->GetBalance())
             strError = strprintf("Error: This transaction requires a transaction fee of at least %s because of its amount, complexity, or use of recently received funds!", FormatMoney(nFeeRequired));
         LogPrintf("SendMoney() : %s\n", strError);
@@ -1173,7 +1174,8 @@ UniValue sendmany(const UniValue& params, bool fHelp)
     CReserveKey keyChange(pwalletMain);
     CAmount nFeeRequired = 0;
     string strFailReason;
-    bool fCreated = pwalletMain->CreateTransaction(vecSend, wtx, keyChange, nFeeRequired, strFailReason);
+    int nChangePosRet;
+    bool fCreated = pwalletMain->CreateTransaction(vecSend, wtx, keyChange, nFeeRequired, nChangePosRet, strFailReason);
     if (!fCreated)
         throw JSONRPCError(RPC_WALLET_INSUFFICIENT_FUNDS, strFailReason);
     if (!pwalletMain->CommitTransaction(wtx, keyChange)) {
@@ -2331,7 +2333,7 @@ UniValue fundrawtransaction(const UniValue& params, bool fHelp)
 
     // parse hex string from parameter
     CTransaction origTx;
-    if (!DecodeHexTx(origTx, params[0].get_str()))
+    if (!DecodeHexTx(origTx, params[0].get_str(), true))
         throw JSONRPCError(RPC_DESERIALIZATION_ERROR, "TX decode failed");
 
     CMutableTransaction tx(origTx);
@@ -2976,7 +2978,8 @@ UniValue createcontract(const UniValue& params, bool fHelp){
     vector<pair<CScript, CAmount> > vecSend;
     vecSend.push_back(make_pair(scriptPubKey, 0));
 
-    if (!pwalletMain->CreateTransaction(vecSend, wtx, reservekey, nFeeRequired, strError, &coinControl,  ALL_COINS,
+    int nChangePosRet;
+    if (!pwalletMain->CreateTransaction(vecSend, wtx, reservekey, nFeeRequired, nChangePosRet, strError, &coinControl,  ALL_COINS,
                                         false, (CAmount)0, nGasFee)) {
         if (nFeeRequired > pwalletMain->GetBalance())
             strError = strprintf("Error: This transaction requires a transaction fee of at least %s because of its amount, complexity, or use of recently received funds!", FormatMoney(nFeeRequired));
@@ -3199,8 +3202,8 @@ UniValue sendtocontract(const UniValue& params, bool fHelp){
 //    int nChangePosRet = -1;
     vecSend.push_back(make_pair(scriptPubKey, nAmount));
 
-
-    if (!pwalletMain->CreateTransaction(vecSend, wtx, reservekey, nFeeRequired, strError, &coinControl, ALL_COINS,
+    int nChangePosRet;
+    if (!pwalletMain->CreateTransaction(vecSend, wtx, reservekey, nFeeRequired, nChangePosRet, strError, &coinControl, ALL_COINS,
                                         false, (CAmount)0, nGasFee)) {
         if (nFeeRequired > pwalletMain->GetBalance())
             strError = strprintf("Error: This transaction requires a transaction fee of at least %s because of its amount, complexity, or use of recently received funds!", FormatMoney(nFeeRequired));

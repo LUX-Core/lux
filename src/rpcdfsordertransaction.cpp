@@ -81,7 +81,7 @@ UniValue dfscreaterawordertx(UniValue const & params, bool fHelp)
 
     CAmount amount = std::difftime(order->storageUntil, std::time(nullptr)) * proposal.rate * (uint64_t)(order->fileSize / 1000); // rate for 1 Kb
     UniValue vouts(UniValue::VOBJ);
-    vouts.push_back(Pair(EncodeDestination(scriptMarkerOut), ValueFromAmount(0)));
+    vouts.push_back(Pair(EncodeDestination(scriptMarkerOut), ValueFromAmount(10000))); // min tx fee
     vouts.push_back(Pair(EncodeDestination(scriptMerkleProofOut), ValueFromAmount(amount)));
 
 
@@ -90,11 +90,14 @@ UniValue dfscreaterawordertx(UniValue const & params, bool fHelp)
     newparams.push_back(emptyInputs);
     newparams.push_back(vouts);
 
-    UniValue created = createrawtransaction(newparams, false);
+    UniValue obj = createrawtransaction(newparams, false);
+
+    UniValue created(UniValue::VARR);
+    created.push_back(obj);
 
     UniValue fundsparams = fundrawtransaction(created, false);
 
-    return SignAndSentNewTx(newparams);
+    return SignAndSentNewTx(fundsparams);
 }
 
 UniValue dfscreaterawprooftx(UniValue const & params, bool fHelp)
@@ -173,7 +176,7 @@ UniValue dfscreaterawprooftx(UniValue const & params, bool fHelp)
     CAmount amount = std::difftime(std::time(nullptr), lastProofTime) * orderDB->rate * orderDB->fileSize;
 
     UniValue vouts(UniValue::VOBJ);
-    vouts.push_back(Pair(EncodeDestination(scriptMarkerOut), ValueFromAmount(0)));
+    vouts.push_back(Pair(EncodeDestination(scriptMarkerOut), ValueFromAmount(10000))); // min tx fee
     vouts.push_back(Pair(EncodeDestination(CTxDestination(GetScriptForDestination(dest))), ValueFromAmount(amount - fee)));
     vouts.push_back(Pair(EncodeDestination(scriptMerkleProofOut), ValueFromAmount(fullAmount - amount)));
 
@@ -189,5 +192,5 @@ UniValue dfscreaterawprooftx(UniValue const & params, bool fHelp)
 
     UniValue created = createrawtransaction(newparams, false);
 
-    return SignAndSentNewTx(newparams);
+    return SignAndSentNewTx(created);
 }
