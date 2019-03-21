@@ -120,7 +120,7 @@ public:
     StorageProposal GetProposal(const uint256 &orderHash, const uint256 &proposalHash);
     std::pair<uint256, DecryptionKeys> GetMetadata(const uint256 &orderHash, const uint256 &proposalHash);
     const StorageOrderDB *GetOrderDB(const uint256 &merkleRootHash);
-    const std::vector<StorageProofDB> &GetProofs(const uint256 &merkleRootHash);
+    const std::vector<StorageProofDB> GetProofs(const uint256 &merkleRootHash);
     // Shutdown function
     void StopThreads();
 

@@ -396,19 +396,19 @@ void StorageController::DecryptReplica(const uint256 &orderHash, const boost::fi
 
 void StorageController::LoadOrders()
 {
-    db->LoadOrders([this] (const uint256 &orderHash, const StorageOrderDB &orderDB) {
-        mapOrders.insert(std::make_pair(orderHash, orderDB));
+    db->LoadOrders([this] (const uint256 &merkleRootHash, const StorageOrderDB &orderDB) {
+        mapOrders.insert(std::make_pair(merkleRootHash, orderDB));
     });
 }
 
 void StorageController::AddOrder(const StorageOrderDB &orderDB)
 {
-    mapOrders.insert(std::make_pair(orderDB.GetHash(), orderDB));
+    mapOrders.insert(std::make_pair(orderDB.merkleRootHash, orderDB));
 }
 
 void StorageController::SaveOrder(const StorageOrderDB &orderDB)
 {
-    db->WriteOrder(orderDB.GetHash(), orderDB);
+    db->WriteOrder(orderDB.merkleRootHash, orderDB);
 }
 
 void StorageController::AddProof(const StorageProofDB &proof)
@@ -486,7 +486,7 @@ const StorageOrderDB *StorageController::GetOrderDB(const uint256 &merkleRootHas
     return it != mapOrders.end()? &(it->second) : nullptr;
 }
 
-const std::vector<StorageProofDB> &StorageController::GetProofs(const uint256 &merkleRootHash)
+const std::vector<StorageProofDB> StorageController::GetProofs(const uint256 &merkleRootHash)
 {
     boost::lock_guard<boost::mutex> lock(mutex);
     if (mapProofs.find(merkleRootHash) != mapProofs.end()) {
