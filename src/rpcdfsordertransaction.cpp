@@ -129,24 +129,26 @@ UniValue dfscreaterawprooftx(UniValue const & params, bool fHelp)
     }
 
     CTransaction orderTx;
+    CTransaction *lastProofTx;
     uint256 hashBlockOrderTx;
     if (!GetTransaction(orderDB->hashTx, orderTx, Params().GetConsensus(), hashBlockOrderTx, true)) {
         throw JSONRPCError(RPC_VERIFY_REJECTED, "transaction not found not found");
     }
 
     const std::vector<StorageProofDB> proofs = storageController->GetProofs(merkleRootHash);
-    std::time_t lastProofTime;
-    uint256 lastProofTxHash;
     if (proofs.size()) {
         std::vector<StorageProofDB> sortedProofs(proofs.begin(), proofs.end());
         std::sort(sortedProofs.begin(), sortedProofs.end(), [](const StorageProofDB &proofA, const StorageProofDB &proofB) {
             return std::difftime(proofA.time, proofB.time) > 0;
         });
-        lastProofTime = sortedProofs[0].time;
-        lastProofTxHash = sortedProofs[0].hashTx;
+        CTransaction proofTx;
+        uint256 hashBlockProofTx;
+        if (!GetTransaction(sortedProofs[0].hashTx, proofTx, Params().GetConsensus(), hashBlockProofTx, true)) {
+            throw JSONRPCError(RPC_VERIFY_REJECTED, "transaction not found not found");
+        }
+        lastProofTx = &proofTx;
     } else {
-        lastProofTime = (std::time_t)orderTx.nTime;
-        lastProofTxHash = orderDB->hashTx;
+        lastProofTx = &orderTx;
     }
 
     std::string destBase58 = params[1].get_str();
@@ -171,19 +173,27 @@ UniValue dfscreaterawprooftx(UniValue const & params, bool fHelp)
     CScript scriptMarkerOut = CScript() << OP_RETURN << ToByteVector(ss);
     CScript scriptMerkleProofOut = CScript() << ToByteVector(merkleRootHash) << OP_MERKLE_PATH;
 
-    CAmount fullAmount = 0;
+    uint64_t nProofOut = 0;
+
+    for (const CTxOut out : lastProofTx->vout) {
+        if (out.scriptPubKey.HasOpDFSProof()) {
+            break;
+        }
+        nProofOut++;
+    }
+    CAmount fullAmount = lastProofTx->vout[nProofOut].nValue;
     CAmount fee = MIN_TX_FEE;
-    CAmount amount = std::difftime(std::time(nullptr), lastProofTime) * orderDB->rate * orderDB->fileSize;
+    CAmount amount = std::difftime(std::time(nullptr), lastProofTx->nTime) * orderDB->rate * orderDB->fileSize;
 
     UniValue vouts(UniValue::VOBJ);
     vouts.push_back(Pair(EncodeDestination(scriptMarkerOut), ValueFromAmount(10000))); // min tx fee
     vouts.push_back(Pair(EncodeDestination(CTxDestination(GetScriptForDestination(dest))), ValueFromAmount(amount - fee)));
-    vouts.push_back(Pair(EncodeDestination(scriptMerkleProofOut), ValueFromAmount(fullAmount - amount)));
+    vouts.push_back(Pair(EncodeDestination(scriptMerkleProofOut), ValueFromAmount(fullAmount - amount - fee)));
 
     UniValue inputs(UniValue::VARR);
     UniValue entry(UniValue::VOBJ);
-    entry.push_back(Pair("txid", lastProofTxHash.GetHex()));
-    entry.push_back(Pair("vout", 1));
+    entry.push_back(Pair("txid", lastProofTx->GetHash().GetHex()));
+    entry.push_back(Pair("vout", nProofOut));
     inputs.push_back(entry);
 
     UniValue newparams(UniValue::VARR);
