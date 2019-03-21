@@ -141,3 +141,16 @@ void StorageHeap::SetDecryptionKeys(const uint256& uri, const RSAKey& rsaKey, co
     }
 }
 
+void StorageHeap::SetMerkleRootHash(const uint256& uri, const uint256& merkleRootHash)
+{
+    std::lock_guard<std::mutex> scoped_lock(cs_dfs);
+    for (auto&& chunk : chunks) {
+        for (auto&& file : chunk->files) {
+            if (file->uri == uri) {
+                file->merkleRootHash = merkleRootHash;
+                files[uri]->merkleRootHash = merkleRootHash;
+                return;
+            }
+        }
+    }
+}

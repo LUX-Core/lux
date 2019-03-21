@@ -230,6 +230,7 @@ void StorageController::ProcessStorageMessage(CNode* pfrom, const std::string& s
                 boost::lock_guard<boost::mutex> lock(mutex);
                 std::shared_ptr<AllocatedFile> file = storageHeap.AllocateFile(order->fileURI, GetCryptoReplicaSize(order->fileSize));
                 storageHeap.SetDecryptionKeys(file->uri, keys.rsaKey, keys.aesKey);
+                storageHeap.SetMerkleRootHash(file->uri, receivedMerkleRootHash);
                 fs::rename(tempFile, file->fullpath);
             }
             LogPrint("dfs", "File \"%s\" was uploaded", order->filename);
@@ -400,9 +401,19 @@ void StorageController::LoadOrders()
     });
 }
 
+void StorageController::AddOrder(const StorageOrderDB &orderDB)
+{
+    mapOrders.insert(std::make_pair(orderDB.GetHash(), orderDB));
+}
+
 void StorageController::SaveOrder(const StorageOrderDB &orderDB)
 {
     db->WriteOrder(orderDB.GetHash(), orderDB);
+}
+
+void StorageController::AddProof(const StorageProofDB &proof)
+{
+    mapProofs[proof.merkleRootHash].push_back(proof);
 }
 
 void StorageController::LoadProofs()

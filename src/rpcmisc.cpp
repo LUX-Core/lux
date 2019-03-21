@@ -1430,6 +1430,7 @@ UniValue dfslocalstorage(const UniValue& params, bool fHelp)
             UniValue objFile(UniValue::VOBJ);
             objFile.push_back(Pair("filename", file->fullpath.string()));
             objFile.push_back(Pair("uri", file->uri.ToString()));
+            objFile.push_back(Pair("merkle hash", file->merkleRootHash.ToString()));
             objFile.push_back(Pair("size", std::to_string(file->size)));
             files.push_back(objFile);
         }

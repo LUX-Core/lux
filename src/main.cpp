@@ -3162,6 +3162,7 @@ void ProcessDFSTransactions(const CBlock &block)
                    >> order.storageUntil;
                 order.hashTx = tx.GetHash();
 
+                storageController->AddOrder(order);
                 storageController->SaveOrder(order);
             } else if (type == StorageTxTypes::Proof) {
                 StorageProofDB proof;
@@ -3172,6 +3173,7 @@ void ProcessDFSTransactions(const CBlock &block)
                    >> proof.rate;
                 proof.hashTx = tx.GetHash();
 
+                storageController->AddProof(proof);
                 storageController->SaveProof(proof);
             }
         }

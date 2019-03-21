@@ -18,6 +18,7 @@ struct AllocatedFile
     boost::filesystem::path fullpath;
     uint64_t size;
     uint256 uri;
+    uint256 merkleRootHash;
     DecryptionKeys keys;
 };
 
@@ -49,6 +50,7 @@ public:
     void FreeFile(const uint256& uri);
     std::shared_ptr<AllocatedFile> GetFile(const uint256& uri) const;
     void SetDecryptionKeys(const uint256& uri, const RSAKey& rsaKey, const AESKey& aesKey);
+    void SetMerkleRootHash(const uint256& uri, const uint256& merkleRootHash); // TODO: add tests (SS)
 };
 
 #endif //LUX_LIB_CRYPTO_STORAGE_HEAP_H

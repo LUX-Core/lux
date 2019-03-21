@@ -106,8 +106,10 @@ public:
     void DecryptReplica(const uint256 &orderHash, const boost::filesystem::path &decryptedFile);
     // DB functions
     void LoadOrders();
+    void AddOrder(const StorageOrderDB &orderDB);
     void SaveOrder(const StorageOrderDB &orderDB);
     void LoadProofs();
+    void AddProof(const StorageProofDB &proof);
     void SaveProof(const StorageProofDB &proof);
     // Get functions
     std::map<uint256, StorageOrder> GetAnnouncements();
