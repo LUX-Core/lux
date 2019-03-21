@@ -15,7 +15,7 @@
     /**
      * Check transaction inputs to mitigate two
      * potential denial-of-service attacks:
-     * 
+     *
      * 1. scriptSigs with extra data stuffed into them,
      *    not consumed by scriptPubKey (or P2SH script)
      * 2. P2SH scripts with a crazy number of expensive
@@ -45,8 +45,10 @@ bool IsStandard(const CScript& scriptPubKey, txnouttype& whichType, const bool w
         if (m < 1 || m > n)
             return false;
     } else if (whichType == TX_NULL_DATA &&
-               (!fAcceptDatacarrier || scriptPubKey.size() > nMaxDatacarrierBytes))
+               (!fAcceptDatacarrier /*|| scriptPubKey.size() > nMaxDatacarrierBytes*/))
           return false;
+      else if (whichType == TX_PROOF)
+        return true;
 
     else if (!witnessEnabled && (whichType == TX_WITNESS_V0_KEYHASH || whichType == TX_WITNESS_V0_SCRIPTHASH))
         return false;

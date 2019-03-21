@@ -2574,6 +2574,7 @@ bool CWallet::CreateTransaction(const vector<pair<CScript, CAmount> >& vecSend, 
                         } else {
                             // Insert change txn at random position:
                             nChangePosRet = GetRandInt(txNew.vout.size()+1);
+                            if (!nChangePosRet) nChangePosRet++; //  position can not be first
                             vector<CTxOut>::iterator position = txNew.vout.begin() + nChangePosRet;
                             txNew.vout.insert(position, newTxOut);
                         }

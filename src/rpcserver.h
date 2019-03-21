@@ -455,6 +455,7 @@ extern UniValue dfssettempfolder(const UniValue& params, bool fHelp);
 extern UniValue dfsremoveoldorders(const UniValue& params, bool fHelp);
 extern UniValue dfsdecrypt(const UniValue& params, bool fHelp);
 
+extern UniValue dfschecktx(const UniValue& params, bool fHelp);
 extern UniValue dfscreaterawordertx(const UniValue& params, bool fHelp); // in rcpdfsordertransaction.cpp
 extern UniValue dfscreaterawprooftx(const UniValue& params, bool fHelp); // in rcpdfsordertransaction.cpp
 

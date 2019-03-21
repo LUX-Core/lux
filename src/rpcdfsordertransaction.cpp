@@ -17,6 +17,7 @@ extern UniValue createrawtransaction(UniValue const & params, bool fHelp);
 extern UniValue fundrawtransaction(UniValue const & params, bool fHelp);
 extern UniValue signrawtransaction(UniValue const & params, bool fHelp);
 extern UniValue sendrawtransaction(UniValue const & params, bool fHelp);
+extern std::string EncodeHexTx(const CTransaction& tx);
 
 UniValue SignAndSentNewTx(UniValue params, CKeyID const & changeAddress = CKeyID())
 {
@@ -76,28 +77,55 @@ UniValue dfscreaterawordertx(UniValue const & params, bool fHelp)
        << proposal.rate
        << order->storageUntil;
 
+    CMutableTransaction mTx;
     CScript scriptMarkerOut = CScript() << OP_RETURN << ToByteVector(ss);
     CScript scriptMerkleProofOut = CScript() << ToByteVector(merkleRootHash) << OP_MERKLE_PATH;
 
     CAmount amount = std::difftime(order->storageUntil, std::time(nullptr)) * proposal.rate * (uint64_t)(order->fileSize / 1000); // rate for 1 Kb
-    UniValue vouts(UniValue::VOBJ);
-    vouts.push_back(Pair(EncodeDestination(scriptMarkerOut), ValueFromAmount(10000))); // min tx fee
-    vouts.push_back(Pair(EncodeDestination(scriptMerkleProofOut), ValueFromAmount(amount)));
 
+    mTx.vout.emplace_back(0, scriptMarkerOut);
+    mTx.vout.emplace_back(amount, scriptMerkleProofOut);
 
-    UniValue newparams(UniValue::VARR);
-    UniValue emptyInputs(UniValue::VARR);
-    newparams.push_back(emptyInputs);
-    newparams.push_back(vouts);
-
-    UniValue obj = createrawtransaction(newparams, false);
-
+    UniValue obj = EncodeHexTx(mTx);
     UniValue created(UniValue::VARR);
     created.push_back(obj);
 
     UniValue fundsparams = fundrawtransaction(created, false);
 
     return SignAndSentNewTx(fundsparams);
+}
+
+UniValue dfschecktx(UniValue const & params, bool fHelp)
+{
+    if (fHelp || params.size() != 1)
+        throw std::runtime_error(
+                "dfschecktx\n"
+                        "\nArguments:\n"
+                        "1. \"tx hash\":hash (string, required) The transaction hash\n"
+                        "\nResult:\n"
+                        "\"type\"             (string) order/proof/none type\n"
+        );
+
+    CTransaction tx;
+    uint256 hashBlock;
+    GetTransaction(uint256{params[0].get_str()}, tx, Params().GetConsensus(), hashBlock, true);
+
+    std::vector<unsigned char> data;
+    StorageTxTypes type = tx.IsStorageOrder(data);
+
+    UniValue obj(UniValue::VSTR);
+    switch (type) {
+        case StorageTxTypes::None:
+            obj = "None";
+            break;
+        case StorageTxTypes::Announce:
+            obj = "Announce";
+            break;
+        case StorageTxTypes::Proof:
+            obj = "Proof";
+            break;
+    }
+    return obj;
 }
 
 UniValue dfscreaterawprooftx(UniValue const & params, bool fHelp)

@@ -86,7 +86,7 @@ bool Solver(const CScript& scriptPubKey, txnouttype& typeRet, vector<vector<unsi
         mTemplates.insert(make_pair(TX_CALL, CScript() << OP_VERSION << OP_GAS_LIMIT << OP_GAS_PRICE << OP_DATA << OP_PUBKEYHASH << OP_CALL));
 
         // Storage proof tx
-        mTemplates.insert(make_pair(TX_PROOF, CScript() << OP_DATA << OP_MERKLE_PATH << OP_CHECKSIG));
+        mTemplates.insert(make_pair(TX_PROOF, CScript() << OP_DATA << OP_MERKLE_PATH));
 //        // Empty, provably prunable, data-carrying output
 //        if (GetBoolArg("-datacarrier", true))
 //            mTemplates.insert(make_pair(TX_NULL_DATA, CScript() << OP_RETURN << OP_SMALLDATA));
@@ -135,6 +135,12 @@ bool Solver(const CScript& scriptPubKey, txnouttype& typeRet, vector<vector<unsi
     // script.
     if (scriptPubKey.size() >= 1 && scriptPubKey[0] == OP_RETURN && scriptPubKey.IsPushOnly(scriptPubKey.begin()+1)) {
         typeRet = TX_NULL_DATA;
+        return true;
+    }
+
+    if (scriptPubKey.HasOpDFSProof()) // TODO: TX_PROOF temp (SS)
+    {
+        typeRet = TX_PROOF;
         return true;
     }
 
@@ -284,6 +290,11 @@ bool Solver(const CScript& scriptPubKey, txnouttype& typeRet, vector<vector<unsi
                         break;
                 }
             }
+            else if(opcode2 == OP_MERKLE_PATH)
+            {
+                if(vch1.size() != 1) // TODO: TX_PROOF temp (SS)
+                    break;
+            }
                 ///////////////////////////////////////////////////////////
             else if (opcode1 != opcode2 || vch1 != vch2)
             {
@@ -358,6 +369,9 @@ bool ExtractDestination(const CScript& scriptPubKey, CTxDestination& addressRet,
     else if(whichType == TX_WITNESS_V0_SCRIPTHASH)
     {
         addressRet = WitnessV0ScriptHash(uint256(vSolutions[0]));
+        return true;
+    }
+    if (whichType == TX_PROOF) { // TODO: TX_PROOF temp (SS)
         return true;
     }
     // Multisig txns have more than one address...
@@ -446,12 +460,6 @@ public:
         *script << CScript::EncodeOP_N(id.version) << std::vector<unsigned char>(id.program, id.program + id.length);
         return true;
     }
-
-    bool operator()(const CScript &rawscript) const {
-        script->clear();
-        *script = rawscript;
-        return true;
-    }
 };
 }
 
@@ -491,6 +499,9 @@ uint160 GetHashForDestination(const CTxDestination& dest)
             CKeyID addressKey(boost::get<CKeyID>(dest));
             std::vector<unsigned char> addrBytes(addressKey.begin(), addressKey.end());
             hashDest = uint160(addrBytes);
+        }
+        else if (txType == TX_PROOF) { // TODO: TX_PROOF temp (SS)
+            // TODO: get merkle root hash (SS)
         }
         // TODO: TX_COLDSTAKE if/when merged
     }

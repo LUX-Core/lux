@@ -372,6 +372,7 @@ static const CRPCCommand vRPCCommands[] =
         {"lux", "dfsacceptproposal", &dfsacceptproposal, true, true, false},
         {"lux", "dfsannounce", &dfsannounce, true, true, false},
         {"lux", "dfscancelorder", &dfscancelorder, true, true, false},
+        {"lux", "dfschecktx", &dfschecktx, true, true, false},
         {"lux", "dfscreaterawordertx", &dfscreaterawordertx, true, true, false},
         {"lux", "dfscreaterawprooftx", &dfscreaterawprooftx, true, true, false},
         {"lux", "dfsdecrypt", &dfsdecrypt, true, true, false},
