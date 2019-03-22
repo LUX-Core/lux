@@ -495,6 +495,32 @@ const std::vector<StorageProofDB> StorageController::GetProofs(const uint256 &me
     return {};
 }
 
+const std::list<uint256> StorageController::ConstructMerklePath(const uint256 &fileURI, const size_t position)
+{
+    std::shared_ptr<AllocatedFile> pAllocatedFile = storageHeap.GetFile(fileURI);
+
+    if (!pAllocatedFile) {
+        return {};
+    }
+
+    std::shared_ptr<AllocatedFile> pMerleTreeFile;
+    {
+        boost::lock_guard<boost::mutex> lock(mutex);
+        pMerleTreeFile = tempStorageHeap.AllocateFile(uint256{}, pAllocatedFile->size);
+    }
+    auto merkleRootHash = Merkler::ConstructMerkleTree(pAllocatedFile->fullpath, pMerleTreeFile->fullpath);
+
+    std::list<uint256> ret = Merkler::ConstructMerklePath(pAllocatedFile->fullpath, pMerleTreeFile->fullpath, position);
+
+    boost::filesystem::remove(pMerleTreeFile->fullpath);
+    {
+        boost::lock_guard<boost::mutex> lock(mutex);
+        tempStorageHeap.FreeFile(pMerleTreeFile->uri);
+    }
+
+    return ret;
+}
+
 void StorageController::StopThreads()
 {
     {

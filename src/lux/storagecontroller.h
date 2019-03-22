@@ -121,6 +121,7 @@ public:
     std::pair<uint256, DecryptionKeys> GetMetadata(const uint256 &orderHash, const uint256 &proposalHash);
     const StorageOrderDB *GetOrderDB(const uint256 &merkleRootHash);
     const std::vector<StorageProofDB> GetProofs(const uint256 &merkleRootHash);
+    const std::list<uint256> ConstructMerklePath(const uint256 &fileURI, const size_t position);
     // Shutdown function
     void StopThreads();
 

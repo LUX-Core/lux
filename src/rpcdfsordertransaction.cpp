@@ -81,7 +81,7 @@ UniValue dfscreaterawordertx(UniValue const & params, bool fHelp)
     CScript scriptMarkerOut = CScript() << OP_RETURN << ToByteVector(ss);
     CScript scriptMerkleProofOut = CScript() << ToByteVector(merkleRootHash) << OP_MERKLE_PATH;
 
-    CAmount amount = std::difftime(order->storageUntil, std::time(nullptr)) * proposal.rate * (uint64_t)(order->fileSize / 1000); // rate for 1 Kb
+    CAmount amount = std::difftime(order->storageUntil, std::time(nullptr)) * proposal.rate * (uint64_t)(order->fileSize / 1000) * 10; // TODO: WILL REMOVE "*10"!!! FOR FAST TEST ONLY!!! (SS) // rate for 1 Kb
 
     mTx.vout.emplace_back(0, scriptMarkerOut);
     mTx.vout.emplace_back(amount, scriptMerkleProofOut);
@@ -159,6 +159,7 @@ UniValue dfscreaterawprooftx(UniValue const & params, bool fHelp)
     CTransaction orderTx;
     CTransaction *lastProofTx;
     uint256 hashBlockOrderTx;
+    CBlockIndex *pindex;
     if (!GetTransaction(orderDB->hashTx, orderTx, Params().GetConsensus(), hashBlockOrderTx, true)) {
         throw JSONRPCError(RPC_VERIFY_REJECTED, "transaction not found not found");
     }
@@ -175,8 +176,10 @@ UniValue dfscreaterawprooftx(UniValue const & params, bool fHelp)
             throw JSONRPCError(RPC_VERIFY_REJECTED, "transaction not found not found");
         }
         lastProofTx = &proofTx;
+        pindex = LookupBlockIndex(hashBlockProofTx);
     } else {
         lastProofTx = &orderTx;
+        pindex = LookupBlockIndex(hashBlockOrderTx);
     }
 
     std::string destBase58 = params[1].get_str();
@@ -201,34 +204,49 @@ UniValue dfscreaterawprooftx(UniValue const & params, bool fHelp)
     CScript scriptMarkerOut = CScript() << OP_RETURN << ToByteVector(ss);
     CScript scriptMerkleProofOut = CScript() << ToByteVector(merkleRootHash) << OP_MERKLE_PATH;
 
-    uint64_t nProofOut = 0;
+    //Get last proof time
+    CBlockHeader blockHeader = pindex->GetBlockHeader();
+    uint32_t time = blockHeader.nTime;
 
+    // get number of TX_PROOF script
+    uint64_t nProofOut = 0;
     for (const CTxOut out : lastProofTx->vout) {
         if (out.scriptPubKey.HasOpDFSProof()) {
             break;
         }
         nProofOut++;
     }
+
+    CMutableTransaction mTx;
+
+    size_t position = 0;
+    std::list<uint256> merklePath = storageController->ConstructMerklePath(orderDB->fileURI, position);
+
+    if (!merklePath.size()) {
+        throw std::runtime_error(
+                "dfscreaterawprooftx file not found\n"
+        );
+    }
+
+    CDataStream ss2(SER_DISK, CLIENT_VERSION);
+    for (auto hash : merklePath) {
+        ss2 << hash;
+    }
+    CScript unlockingScript = CScript() << ToByteVector(ss2);
+
+    mTx.vin.emplace_back(lastProofTx->GetHash(), nProofOut, unlockingScript);
+
+    // Calculate amount
     CAmount fullAmount = lastProofTx->vout[nProofOut].nValue;
-    CAmount fee = MIN_TX_FEE;
-    CAmount amount = std::difftime(std::time(nullptr), lastProofTx->nTime) * orderDB->rate * orderDB->fileSize;
+    CAmount fee = ::minRelayTxFee.GetFee(32000); // TODO: calculate real tx size (SS)
+    CAmount amount = std::difftime(std::time(nullptr), time) * orderDB->rate * (uint64_t)(orderDB->fileSize / 1000) * 10; // TODO: WILL REMOVE "*10"!!! FOR FAST TEST ONLY!!! (SS) // rate for 1 Kb
 
-    UniValue vouts(UniValue::VOBJ);
-    vouts.push_back(Pair(EncodeDestination(scriptMarkerOut), ValueFromAmount(10000))); // min tx fee
-    vouts.push_back(Pair(EncodeDestination(CTxDestination(GetScriptForDestination(dest))), ValueFromAmount(amount - fee)));
-    vouts.push_back(Pair(EncodeDestination(scriptMerkleProofOut), ValueFromAmount(fullAmount - amount - fee)));
+    mTx.vout.emplace_back(0, scriptMarkerOut);
+    mTx.vout.emplace_back(amount - fee, GetScriptForDestination(dest));
+    mTx.vout.emplace_back(fullAmount - amount - fee, scriptMerkleProofOut);
 
-    UniValue inputs(UniValue::VARR);
-    UniValue entry(UniValue::VOBJ);
-    entry.push_back(Pair("txid", lastProofTx->GetHash().GetHex()));
-    entry.push_back(Pair("vout", nProofOut));
-    inputs.push_back(entry);
-
-    UniValue newparams(UniValue::VARR);
-    newparams.push_back(inputs);
-    newparams.push_back(vouts);
-
-    UniValue created = createrawtransaction(newparams, false);
+    UniValue created(UniValue::VOBJ);
+    created.push_back(Pair("hex", EncodeHexTx(mTx)));
 
     return SignAndSentNewTx(created);
 }
