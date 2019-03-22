@@ -7610,7 +7610,6 @@ bool CheckRefund(const CBlock& block, const std::vector<CTxOut>& vouts){
         if (it==vTempVouts.end()) {
             bool refundValid = false;
             const int nPrecision = 10000000;
-            LogPrintf("%s: warning, unable to find exact %s\n", __func__, vouts[i].ToString().c_str());
             for(it=vTempVouts.begin(); it!=vTempVouts.end(); it++) {
                 if (vouts[i].scriptPubKey == it->scriptPubKey && it->nValue/nPrecision == vouts[i].nValue/nPrecision) {
                     LogPrintf("%s: found vout %s (%s)\n", __func__, it->ToString().c_str(), FormatMoney(it->nValue));
