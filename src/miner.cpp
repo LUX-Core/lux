@@ -205,12 +205,6 @@ void BlockAssembler::RebuildRefundTransaction()
 
             contrTx.vout[1].scriptPubKey = mnPayee;
             contrTx.vout[1].nValue = mnReward;
-
-            //CTxDestination txDest;
-            //ExtractDestination(mnPayee, txDest);
-            //LogPrintf("%s: Masternode payment to %s (pow)\n", __func__, EncodeDestination(txDest));
-
-            // miner's reward is everything that left
             
             if (nHeight == chainparams.PreminePayment()) {
                 minerReward = powReward * 0.8;
@@ -406,11 +400,15 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
     //then it won't get populated
     RebuildRefundTransaction();
 
+/*
+
     if (fProofOfStake && bceResult.refundOutputs.size()) {
         // SC txs are not processed in PoS blocks
         LogPrintf("%s: PoS Block generation skipped due to %zu SC refund\n", __func__, bceResult.refundOutputs.size());
         return nullptr;
     }
+  
+*/
     ////////////////////////////////////////////////////////
 
     pblocktemplate->vchCoinbaseCommitment = GenerateCoinbaseCommitment(*pblock, pindexPrev, chainparams.GetConsensus(), fProofOfStake);
