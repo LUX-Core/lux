@@ -93,9 +93,9 @@ BanTableModel::BanTableModel(ClientModel *parent) :
     // default to unsorted
     priv->sortColumn = -1;
     // set up timer for auto refresh
-    timer_ban = new QTimer(this);
-    connect(timer_ban, SIGNAL(timeout()), SLOT(refresh()));
-    timer_ban->start(1000);
+    timer = new QTimer(this);
+    connect(timer, SIGNAL(timeout()), SLOT(refresh()));
+    timer->start(1000);
     // load initial data
     refresh();
 }
