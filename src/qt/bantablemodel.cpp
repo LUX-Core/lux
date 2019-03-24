@@ -85,7 +85,7 @@ public:
 
 BanTableModel::BanTableModel(ClientModel *parent) :
     QAbstractTableModel(parent),
-    clientModel(parent)
+    clientModel(parent),
         timer(0)
 {
     columns << tr("IP/Netmask") << tr("Banned Until");
