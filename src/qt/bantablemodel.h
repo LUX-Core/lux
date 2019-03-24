@@ -48,7 +48,6 @@ public:
     ~BanTableModel();
 
     void startAutoRefresh();
-    void stopAutoRefresh();
 
     enum ColumnIndex {
         Address = 0,
