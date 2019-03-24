@@ -12,8 +12,10 @@
 #include "sync.h"
 #include "utiltime.h"
 
+
 #include <QDebug>
 #include <QList>
+#include <QTimer>
 
 bool BannedNodeLessThan::operator()(const CCombinedBan& left, const CCombinedBan& right) const
 {
@@ -89,7 +91,10 @@ BanTableModel::BanTableModel(ClientModel *parent) :
     priv.reset(new BanTablePriv());
     // default to unsorted
     priv->sortColumn = -1;
-
+    // set up timer for auto refresh
+    timer = new QTimer(this);
+    connect(timer, SIGNAL(timeout()), SLOT(refresh()));
+    timer->setInterval(MODEL_UPDATE_DELAY);
     // load initial data
     refresh();
 }
