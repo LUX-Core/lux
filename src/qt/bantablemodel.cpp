@@ -95,7 +95,7 @@ BanTableModel::BanTableModel(ClientModel *parent) :
     // set up timer for auto refresh
     timer_ban = new QTimer(this);
     connect(timer_ban, SIGNAL(timeout()), SLOT(refresh()));
-    timer_ban->setInterval(MODEL_UPDATE_DELAY);
+    timer_ban->start(1000);
     // load initial data
     refresh();
 }
