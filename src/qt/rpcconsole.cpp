@@ -587,7 +587,7 @@ void RPCConsole::setClientModel(ClientModel* model)
         //add a signal mapping, use int instead of int64_t for bantime because signalmapper only supports int or objects
         //int is sufficient for our case
         QSignalMapper* signalMapper = new QSignalMapper(this);
-        signalMapper->setMapping(banAction1h, 60*60);
+        signalMapper->setMapping(banAction1h, 60*1);
         signalMapper->setMapping(banAction24h, 60*60*24);
         signalMapper->setMapping(banAction7d, 60*60*24*7);
         signalMapper->setMapping(banAction365d, 60*60*24*365);
