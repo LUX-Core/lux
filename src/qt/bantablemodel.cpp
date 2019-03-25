@@ -105,16 +105,6 @@ BanTableModel::~BanTableModel()
     // Intentionally left empty
 }
 
-void BanTableModel::StartAutoRefresh()
-{
-timer->start();
-}
-
-void BanTableModel::StopAutoRefresh()
-{
-timer->stop();
-}
-
 int BanTableModel::rowCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent);
