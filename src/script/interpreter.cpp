@@ -1049,19 +1049,22 @@ bool EvalScript(vector<vector<unsigned char> >& stack, const CScript& script, un
                 //////////////////////////////////////////////////////// dfs
                 case OP_MERKLE_PATH:
                 {
-                    if (stack.size() < 4)
+                    if (stack.size() < 3)
                         return set_error(serror, SCRIPT_ERR_INVALID_STACK_OPERATION);
                     uint64_t index = 0; // TODO: index of merkle path must be get from outside
                     valtype& vchHash =  stacktop(-1);
                     valtype& vchData =  stacktop(-2);
                     valtype& vch =      stacktop(-3);
-                    uint64_t fileSize = (vch[0] << 24) | (vch[1] << 16) | (vch[2] << 8) | vch[3];
-                    popstack(stack);
-                    popstack(stack);
-                    popstack(stack);
-                    if (!Merkler::CheckMerklePath(vchData, vchHash, index, fileSize)) {
-                        return set_error(serror, SCRIPT_ERR_INVALID_STACK_OPERATION); // TODO: wrong error (SS)
+                    uint64_t fileSize = 0;
+                    assert(vch.size() <= sizeof(fileSize));
+                    for (uint32_t i = 0; i< vch.size(); ++i) {
+                        fileSize += vch[i] << (i * 8);
                     }
+                    popstack(stack);
+                    popstack(stack);
+                    popstack(stack);
+                    bool fEqual = Merkler::CheckMerklePath(vchData, vchHash, index, Merkler::CalcFirstLayerSize(fileSize));
+                    stack.push_back(fEqual? vchTrue : vchFalse);
                 }
                 break;
                 ////////////////////////////////////////////////////////

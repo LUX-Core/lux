@@ -113,6 +113,9 @@ enum
     //
     SCRIPT_VERIFY_WITNESS_PUBKEYTYPE = (1U << 15),
 
+
+    SCRIPT_VERIFY_MERKLE_HASH = (1U << 16),
+
     // Performs the compiled byte code
     //
     SCRIPT_EXEC_BYTE_CODE = (1U << 30),

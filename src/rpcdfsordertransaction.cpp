@@ -19,18 +19,6 @@ extern UniValue signrawtransaction(UniValue const & params, bool fHelp);
 extern UniValue sendrawtransaction(UniValue const & params, bool fHelp);
 extern std::string EncodeHexTx(const CTransaction& tx);
 
-UniValue SignAndSentNewTx(UniValue params, CKeyID const & changeAddress = CKeyID())
-{
-    UniValue signparams(UniValue::VARR);
-    signparams.push_back(params["hex"]);
-    UniValue signedTxObj = signrawtransaction(signparams, false);
-
-    UniValue sendparams(UniValue::VARR);
-    sendparams.push_back(signedTxObj["hex"]);
-    UniValue sent = sendrawtransaction(sendparams, false);
-    return sent;
-}
-
 UniValue dfscreaterawordertx(UniValue const & params, bool fHelp)
 {
     if (fHelp || params.size() != 2)
@@ -92,7 +80,15 @@ UniValue dfscreaterawordertx(UniValue const & params, bool fHelp)
 
     UniValue fundsparams = fundrawtransaction(created, false);
 
-    return SignAndSentNewTx(fundsparams);
+    UniValue signparams(UniValue::VARR);
+    signparams.push_back(fundsparams["hex"]);
+    UniValue signedTxObj = signrawtransaction(signparams, false);
+
+    UniValue sendparams(UniValue::VARR);
+    sendparams.push_back(signedTxObj["hex"]);
+    UniValue sent = sendrawtransaction(sendparams, false);
+
+    return sent;
 }
 
 UniValue dfschecktx(UniValue const & params, bool fHelp)
@@ -232,21 +228,22 @@ UniValue dfscreaterawprooftx(UniValue const & params, bool fHelp)
     for (auto hash : merklePath) {
         ss2 << hash;
     }
-    CScript unlockingScript = CScript() << ToByteVector(ss2);
+    CScript unlockingScript = CScript() << orderDB->fileSize << ToByteVector(ss2);
 
     mTx.vin.emplace_back(lastProofTx->GetHash(), nProofOut, unlockingScript);
 
     // Calculate amount
     CAmount fullAmount = lastProofTx->vout[nProofOut].nValue;
     CAmount fee = ::minRelayTxFee.GetFee(32000); // TODO: calculate real tx size (SS)
-    CAmount amount = std::difftime(std::time(nullptr), time) * orderDB->rate * (uint64_t)(orderDB->fileSize / 1000) * 10; // TODO: WILL REMOVE "*10"!!! FOR FAST TEST ONLY!!! (SS) // rate for 1 Kb
+    CAmount amount = std::difftime(std::time(nullptr), time) * orderDB->rate * (uint64_t)(orderDB->fileSize / 1000); // rate for 1 Kb
 
     mTx.vout.emplace_back(0, scriptMarkerOut);
     mTx.vout.emplace_back(amount - fee, GetScriptForDestination(dest));
     mTx.vout.emplace_back(fullAmount - amount - fee, scriptMerkleProofOut);
 
-    UniValue created(UniValue::VOBJ);
-    created.push_back(Pair("hex", EncodeHexTx(mTx)));
+    UniValue sendparams(UniValue::VARR);
+    sendparams.push_back(EncodeHexTx(mTx));
+    UniValue sent = sendrawtransaction(sendparams, false);
 
-    return SignAndSentNewTx(created);
+    return  sent;
 }
