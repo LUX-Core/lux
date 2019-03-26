@@ -94,15 +94,14 @@ BanTableModel::BanTableModel(ClientModel *parent) :
              // set up timer for auto refresh
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), SLOT(refresh()));
-    timer->start(10000); //every 10m
-
+    timer->start(10000); //every 10s
     // load initial data
     refresh();
 }
 
 BanTableModel::~BanTableModel()
 {
-    // Intentionally left empty
+  timer->stop();  // Intentionally left empty
 }
 
 int BanTableModel::rowCount(const QModelIndex &parent) const
