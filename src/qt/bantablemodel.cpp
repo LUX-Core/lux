@@ -85,13 +85,13 @@ public:
 BanTableModel::BanTableModel(ClientModel *parent) :
     QAbstractTableModel(parent),
     clientModel(parent),
-        timer(0)
+    timer(0)
 {
     columns << tr("IP/Netmask") << tr("Banned Until");
     priv.reset(new BanTablePriv());
     // default to unsorted
     priv->sortColumn = -1;
-             // set up timer for auto refresh
+    // set up timer for auto refresh
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), SLOT(refresh()));
     timer->start(10000); //every 10s
@@ -101,7 +101,8 @@ BanTableModel::BanTableModel(ClientModel *parent) :
 
 BanTableModel::~BanTableModel()
 {
-  timer->stop();  // Intentionally left empty
+    timer->stop();
+    delete timer;
 }
 
 int BanTableModel::rowCount(const QModelIndex &parent) const
