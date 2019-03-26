@@ -2956,6 +2956,9 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
 
     if (block.IsProofOfWork()) {
         auto nReward = GetProofOfWorkReward(nFees, pindex->nHeight/*pindex->pprev->nHeight*/);
+        if (Params().NetworkID() == CBaseChainParams::DFSTEST) {
+            nReward += 100000000; // + 1 lux for fee
+        }
         if (!IsInitialBlockDownload() && !IsBlockValueValid(block, nReward)) {
             return state.DoS(100, error("%s: reward pays too much (actual=%d vs limit=%d) (nHeight=%d, nFees=%d)", __func__,
                                         block.vtx[0].GetValueOut(), nReward, pindex->nHeight, nFees),
