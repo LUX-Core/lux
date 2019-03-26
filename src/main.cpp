@@ -1811,6 +1811,10 @@ CAmount GetProofOfWorkReward(int64_t nFees, int nHeight)
         return COIN + nFees;
     }
 
+    if (Params().NetworkID() == CBaseChainParams::DFSTEST) {
+        if (nHeight < 500) return 25000 * COIN;
+    }
+
     CAmount nSubsidy = 1 * COIN;
     if (nHeight < 1) {
         nSubsidy = 1 * COIN;
