@@ -16,7 +16,6 @@ class WalletModel;
 extern UniValue createorder(const UniValue& params, bool fHelp);
 enum AmountParsingResult { OK, INVALID, OUT_OF_RANGE };
 AmountParsingResult AmountFromQString(const QString& value, CAmount& amount);
-std::string StrFromAmount(const CAmount& amount);
 
 class LuxgateCreateOrderPanel : public QFrame
 {

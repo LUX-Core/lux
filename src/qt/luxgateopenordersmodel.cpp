@@ -77,9 +77,6 @@ QVariant LuxgateOpenOrdersModel::headerData(int section, Qt::Orientation orienta
             case TypeColumn:
                 res = "TYPE";
                 break;
-            case SideColumn:
-                res = "SIDE";
-                break;
             case PriceColumn:
                 res = "PRICE";
                 break;
@@ -135,22 +132,19 @@ QVariant LuxgateOpenOrdersModel::data(const QModelIndex &index, int role) const
                 res = GUIUtil::dateTimeStr(createTime);
             }
             else if (TypeColumn == index.column()) {
-                res = QString("limit");
-            }
-            else if (SideColumn == index.column()) {
                 if(order->IsAsk())
                     res = QString("Sell");
                 if(order->IsBid())
                     res = QString("Buy");
             }
             else if (PriceColumn == index.column()) {
-                res = QString::number(order->Price(), 'f',decimals.price);
+                res = QString(Luxgate::QStrFromAmount(order->Price()));
             }
             else if (BaseAmountColumn == index.column()) {
-                res = QString::number(order->Amount(), 'f',decimals.base);
+                res = QString(Luxgate::QStrFromAmount(order->Amount()));
             }
             else if (QuoteTotalColumn == index.column()) {
-                res = QString::number(order->Total(), 'f',decimals.quote);
+                res = QString(Luxgate::QStrFromAmount(order->Total()));
             }
         }
     }

@@ -32,4 +32,18 @@ namespace Luxgate {
 
         return nullPart + "<font color=\"" + color + "\">" + numberPart + "</font>";
     }
+
+    std::string StrFromAmount(const CAmount& amount)
+    {
+        bool sign = amount < 0;
+        int64_t n_abs = (sign ? -amount : amount);
+        int64_t quotient = n_abs / COIN;
+        int64_t remainder = n_abs % COIN;
+        return strprintf("%s%d.%08d", sign ? "-" : "", quotient, remainder);
+    }
+
+    QString QStrFromAmount(const CAmount& amount)
+    {
+        return QString::fromStdString(StrFromAmount(amount));
+    }
 }

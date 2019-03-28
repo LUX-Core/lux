@@ -52,15 +52,6 @@ AmountParsingResult AmountFromQString(const QString& value, CAmount& amount)
     return OK;
 }
 
-std::string StrFromAmount(const CAmount& amount)
-{
-    bool sign = amount < 0;
-    int64_t n_abs = (sign ? -amount : amount);
-    int64_t quotient = n_abs / COIN;
-    int64_t remainder = n_abs % COIN;
-    return strprintf("%s%d.%08d", sign ? "-" : "", quotient, remainder);
-}
-
 void LuxgateCreateOrderPanel::updateWidgetToolTip(const AmountParsingResult result, QWidget* widget)
 {
     switch (result) {
@@ -90,8 +81,8 @@ void LuxgateCreateOrderPanel::slotBuySellClicked()
     params.push_backV({
             UniValue("LUX/BTC"), 
             UniValue(bBuy ? "buy" : "sell"),
-            UniValue(StrFromAmount(currentQuantity)),
-            UniValue(StrFromAmount(currentPrice))
+            UniValue(Luxgate::StrFromAmount(currentQuantity)),
+            UniValue(Luxgate::StrFromAmount(currentPrice))
             });
     try {
         auto orderId = createorder(params, false);
@@ -114,7 +105,7 @@ void LuxgateCreateOrderPanel::slotPriceEditChanged(const QString & text)
 
 void LuxgateCreateOrderPanel::slotCalcNewTotal()
 {
-    ui->lineEditTotal->setText(QString::fromStdString(StrFromAmount(currentQuantity * currentPrice / COIN)));
+    ui->lineEditTotal->setText(QString::fromStdString(Luxgate::StrFromAmount(currentQuantity * currentPrice / COIN)));
 }
 
 void LuxgateCreateOrderPanel::setModel(WalletModel *model)

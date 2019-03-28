@@ -1,7 +1,8 @@
 #ifndef LUXGATEGUI_GLOBAL_H
 #define LUXGATEGUI_GLOBAL_H
 #include <QString>
-
+#include <tinyformat.h>
+#include <amount.h>
 
 namespace Luxgate {
     struct Decimals {
@@ -41,6 +42,9 @@ namespace Luxgate {
     QString priceFormattedText(QString text, bool bBid); //if bBid==true price of bid, else price of ask
 
     enum CommonRoles {BidAskRole = Qt::UserRole, CopyRowRole, IndividualRole};
+
+    std::string StrFromAmount(const CAmount& amount);
+    QString QStrFromAmount(const CAmount& amount);
 }
 extern Luxgate::CurrencyPair curCurrencyPair;
 #endif // LUXGATEGUI_GLOBAL_H
