@@ -33,6 +33,7 @@ public:
 public slots:
     void slotSetDecimals(const Luxgate::Decimals & decimals_);
     void update();
+    void addRow(std::shared_ptr<COrder>);
 private:
     Luxgate::Decimals decimals;
     std::vector<std::shared_ptr<COrder>> openOrders;

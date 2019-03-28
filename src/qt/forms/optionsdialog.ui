@@ -391,6 +391,9 @@
       </layout>
      </widget>
      <widget class="QWidget" name="tabLuxgate">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
       <attribute name="title">
        <string>Luxgate</string>
       </attribute>

@@ -18,18 +18,36 @@ LuxgateOpenOrdersModel::LuxgateOpenOrdersModel(const Luxgate::Decimals & decimal
     qRegisterMetaType<QVector<int>>();
     update();
     orderbook.subscribeOrdersChange(std::bind(&LuxgateOpenOrdersModel::update, this));
+    orderbook.subscribeOrderAdded(std::bind(&LuxgateOpenOrdersModel::addRow, this, std::placeholders::_1));
+}
+
+void LuxgateOpenOrdersModel::addRow(std::shared_ptr<COrder> order)
+{
+    LogPrintf("LuxgateOpenOrdersModel addRow %s\n", order->ToString());
+    beginInsertRows(QModelIndex(), 0, 0);
+    openOrders.insert(openOrders.begin(), order);
+    endInsertRows();
 }
 
 void LuxgateOpenOrdersModel::update()
 {
+    LogPrintf("LuxgateOpenOrdersModel UPDATE\n");
+
+    beginResetModel();
     openOrders.clear();
+    endResetModel();
+
+    beginInsertRows(QModelIndex(), 0, 0);
     for (auto it = orderbook.Orders().begin(); it != orderbook.Orders().end(); ++it) {
-        openOrders.push_back( it->second );
+        LogPrintf("LuxgateOpenOrdersModel add %s\n", it->second->ToString());
+        openOrders.push_back(it->second);
     }
+    endInsertRows();
+
     std::sort(openOrders.begin(), openOrders.end(),
               [](std::shared_ptr<COrder> a, std::shared_ptr<COrder> b)
               { return a->OrderCreationTime() > b->OrderCreationTime(); });
-    emit dataChanged(index(0, 0), index(rowCount() - 1, columnCount() - 1), { Luxgate::BidAskRole, Qt::DisplayRole });
+    //Q_EMIT dataChanged(index(0, 0), index(rowCount() - 1, columnCount() - 1), { Luxgate::BidAskRole, Qt::DisplayRole });
 }
 
 Qt::ItemFlags LuxgateOpenOrdersModel::flags(const QModelIndex &index) const
@@ -51,6 +69,7 @@ QVariant LuxgateOpenOrdersModel::headerData(int section, Qt::Orientation orienta
         Qt::DisplayRole == role)
     {
         switch(section)
+
         {
             case DateColumn:
                 res = "DATE";
