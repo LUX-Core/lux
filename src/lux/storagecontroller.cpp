@@ -35,7 +35,7 @@ struct ReplicaStream
         READWRITE(currentOrderHash);
         READWRITE(merkleRootHash);
         READWRITE(keys);
-        const auto *order = storageController->GetAnnounce(currentOrderHash);
+        const auto *order = storageController->GetOrder(currentOrderHash);
         if (order) {
             const auto fileSize = GetCryptoReplicaSize(order->fileSize);
             if (!ser_action.ForRead()) {
@@ -90,7 +90,7 @@ void StorageController::ProcessStorageMessage(CNode* pfrom, const std::string& s
         StorageOrder order;
         vRecv >> order;
         uint256 hash = order.GetHash();
-        if (!GetAnnounce(hash)) {
+        if (!GetOrder(hash)) {
             AnnounceOrder(order);
             uint64_t storageHeapSize = 0;
             uint64_t tempStorageHeapSize = 0;
@@ -114,40 +114,11 @@ void StorageController::ProcessStorageMessage(CNode* pfrom, const std::string& s
 
             }
         }
-    } else if (strCommand == "dfsproposal") {
-        isStorageCommand = true;
-        StorageProposal proposal;
-        vRecv >> proposal;
-        const auto *order = GetAnnounce(proposal.orderHash);
-        if (order) {
-            std::vector<uint256> vListenProposals;
-            {
-                boost::lock_guard <boost::mutex> lock(mutex);
-                vListenProposals = proposalsAgent.GetListenProposals();
-            }
-            if (std::find(vListenProposals.begin(), vListenProposals.end(), proposal.orderHash) != vListenProposals.end()) {
-                if (order->maxRate > proposal.rate) {
-                    boost::lock_guard <boost::mutex> lock(mutex);
-                    proposalsAgent.AddProposal(proposal);
-                }
-            }
-            CNode* pNode = FindNode(proposal.address);
-            if (pNode && vNodes.size() > 5) {
-                pNode->CloseSocketDisconnect();
-            }
-        } else {
-            // DoS prevention
-//            CNode* pNode = FindNode(proposal.address);
-//            if (pNode) {
-//                CNodeState *state = State(pNode); // CNodeState was declared in main.cpp (SS)
-//                state->nMisbehavior += 10;
-//            }
-        }
     } else if (strCommand == "dfshandshake") {
         isStorageCommand = true;
         StorageHandshake handshake;
         vRecv >> handshake;
-        const auto *order = GetAnnounce(handshake.orderHash);
+        const auto *order = GetOrder(handshake.orderHash);
         if (order) {
             uint64_t storageHeapSize = 0;
             uint64_t tempStorageHeapSize = 0;
@@ -176,11 +147,63 @@ void StorageController::ProcessStorageMessage(CNode* pfrom, const std::string& s
 //                state->nMisbehavior += 10;
 //            }
         }
+    } else if (strCommand == "dfsping") {
+        isStorageCommand = true;
+        pfrom->PushMessage("dfspong", pfrom->addr);
+    } else if (strCommand == "dfspong") {
+        isStorageCommand = true;
+        vRecv >> address;
+        address.SetPort(GetListenPort());
+        lastCheckIp = std::time(nullptr);
+    } else if (strCommand == "dfsproposal") {
+        isStorageCommand = true;
+        StorageProposal proposal;
+        vRecv >> proposal;
+        const auto *order = GetOrder(proposal.orderHash);
+        if (order) {
+            std::vector<ProposalHash> vListenProposals;
+            {
+                boost::lock_guard <boost::mutex> lock(mutex);
+                vListenProposals = proposalsAgent.GetListenProposals();
+            }
+            if (std::find(vListenProposals.begin(), vListenProposals.end(), proposal.orderHash) != vListenProposals.end()) {
+                if (order->maxRate > proposal.rate) {
+                    boost::lock_guard <boost::mutex> lock(mutex);
+                    proposalsAgent.AddProposal(proposal);
+                }
+            }
+            CNode* pNode = FindNode(proposal.address);
+            if (pNode && vNodes.size() > 5) {
+                pNode->CloseSocketDisconnect();
+            }
+        } else {
+            // DoS prevention
+//            CNode* pNode = FindNode(proposal.address);
+//            if (pNode) {
+//                CNodeState *state = State(pNode); // CNodeState was declared in main.cpp (SS)
+//                state->nMisbehavior += 10;
+//            }
+        }
+    } else if (strCommand == "dfsresv") {
+        isStorageCommand = true;
+        OrderHash orderHash;
+        vRecv >> orderHash;
+        const auto *order = GetOrder(orderHash);
+        if (order) {
+            while (qProposals.size() > 0) { // TODO: all copies must be saved (SS)
+                auto proposal = qProposals.pop();
+                if (proposal.orderHash != orderHash) {
+                    qProposals.push(proposal);
+                    break;
+                }
+            }
+        }
+        Notify(BackgroundJobs::ACCEPT_PROPOSAL);
     } else if (strCommand == "dfsrr") { // dfs request replica
         isStorageCommand = true;
         StorageHandshake handshake;
         vRecv >> handshake;
-        if (GetAnnounce(handshake.orderHash)) {
+        if (GetOrder(handshake.orderHash)) {
             auto it = mapLocalFiles.find(handshake.orderHash);
             if (it != mapLocalFiles.end()) {
                 handshakeAgent.CancelWait(handshake.orderHash);
@@ -212,14 +235,14 @@ void StorageController::ProcessStorageMessage(CNode* pfrom, const std::string& s
         }
         vRecv >> replicaStream;
         replicaStream.filestream.close();
-        uint256 orderHash = replicaStream.currentOrderHash;
-        uint256 receivedMerkleRootHash = replicaStream.merkleRootHash;
+        OrderHash orderHash = replicaStream.currentOrderHash;
+        MerkleRootHash receivedMerkleRootHash = replicaStream.merkleRootHash;
         DecryptionKeys keys = replicaStream.keys;
         if (!CheckReceivedReplica(orderHash, receivedMerkleRootHash, tempFile)) {
             fs::remove(tempFile);
             return ;
         }
-        const auto *order = GetAnnounce(orderHash);
+        const auto *order = GetOrder(orderHash);
         if (order) {
             if (!handshakeAgent.Exist(orderHash)) {
                 LogPrint("dfs", "Handshake \"%s\" not found", orderHash.ToString());
@@ -242,34 +265,12 @@ void StorageController::ProcessStorageMessage(CNode* pfrom, const std::string& s
                 pfrom->PushMessage("dfsresv", orderHash);
             }
         }
-    } else if (strCommand == "dfsresv") {
-        isStorageCommand = true;
-        uint256 orderHash;
-        vRecv >> orderHash;
-        const auto *order = GetAnnounce(orderHash);
-        if (order) {
-            while (qProposals.size() > 0) { // TODO: all copies must be saved (SS)
-                auto proposal = qProposals.pop();
-                if (proposal.orderHash != orderHash) {
-                    qProposals.push(proposal);
-                    break;
-                }
-            }
-        }
-        Notify(BackgroundJobs::ACCEPT_PROPOSAL);
-    } else if (strCommand == "dfsping") {
-        isStorageCommand = true;
-        pfrom->PushMessage("dfspong", pfrom->addr);
-    } else if (strCommand == "dfspong") {
-        isStorageCommand = true;
-        vRecv >> address;
-        address.SetPort(GetListenPort());
     }
 }
 
 void StorageController::AnnounceOrder(const StorageOrder &order)
 {
-    uint256 hash = order.GetHash();
+    OrderHash hash = order.GetHash();
     {
         boost::lock_guard<boost::mutex> lock(mutex);
         mapAnnouncements[hash] = order;
@@ -328,8 +329,8 @@ void StorageController::ClearOldAnnouncments(std::time_t timestamp)
     for (auto &&it = mapAnnouncements.begin(); it != mapAnnouncements.end(); ) {
         StorageOrder order = it->second;
         if (order.time < timestamp) {
-            std::vector<uint256> vListenProposals = proposalsAgent.GetListenProposals();
-            uint256 orderHash = order.GetHash();
+            std::vector<ProposalHash> vListenProposals = proposalsAgent.GetListenProposals();
+            OrderHash orderHash = order.GetHash();
             if (std::find(vListenProposals.begin(), vListenProposals.end(), orderHash) != vListenProposals.end()) {
                 proposalsAgent.StopListenProposals(orderHash);
             }
@@ -354,7 +355,7 @@ void StorageController::DecryptReplica(const uint256 &orderHash, const boost::fi
 {
     namespace fs = boost::filesystem;
 
-    const auto *order = GetAnnounce(orderHash);
+    const auto *order = GetOrder(orderHash);
     if (!order) {
         return ;
     }
@@ -396,7 +397,7 @@ void StorageController::DecryptReplica(const uint256 &orderHash, const boost::fi
 
 void StorageController::LoadOrders()
 {
-    db->LoadOrders([this] (const uint256 &merkleRootHash, const StorageOrderDB &orderDB) {
+    db->LoadOrders([this] (const MerkleRootHash &merkleRootHash, const StorageOrderDB &orderDB) {
         mapOrders.insert(std::make_pair(merkleRootHash, orderDB));
     });
 }
@@ -434,7 +435,7 @@ std::map<uint256, StorageOrder> StorageController::GetAnnouncements()
     return mapAnnouncements;
 }
 
-const StorageOrder *StorageController::GetAnnounce(const uint256 &hash)
+const StorageOrder *StorageController::GetOrder(const uint256 &hash)
 {
     boost::lock_guard<boost::mutex> lock(mutex);
     return mapAnnouncements.find(hash) != mapAnnouncements.end()? &(mapAnnouncements[hash]) : nullptr;
@@ -480,7 +481,7 @@ std::pair<uint256, DecryptionKeys> StorageController::GetMetadata(const uint256 
 const StorageOrderDB *StorageController::GetOrderDB(const uint256 &merkleRootHash)
 {
     boost::lock_guard<boost::mutex> lock(mutex);
-    auto it = std::find_if(mapOrders.begin(), mapOrders.end(), [&merkleRootHash](const std::pair<uint256, StorageOrderDB> &entity) {
+    auto it = std::find_if(mapOrders.begin(), mapOrders.end(), [&merkleRootHash](const std::pair<OrderHashDB, StorageOrderDB> &entity) {
         return entity.second.merkleRootHash == merkleRootHash;
     });
     return it != mapOrders.end()? &(it->second) : nullptr;
@@ -619,7 +620,7 @@ bool StorageController::CheckReceivedReplica(const uint256 &orderHash, const uin
 {
     namespace fs = boost::filesystem;
 
-    const auto *order = GetAnnounce(orderHash);
+    const auto *order = GetOrder(orderHash);
     if (!order) {
         return false;
     }
@@ -634,7 +635,7 @@ bool StorageController::CheckReceivedReplica(const uint256 &orderHash, const uin
             boost::lock_guard<boost::mutex> lock(mutex);
             pMerleTreeFile = tempStorageHeap.AllocateFile(uint256{}, size);
         }
-        uint256 merkleRootHash = Merkler::ConstructMerkleTree(replica, pMerleTreeFile->fullpath);
+        MerkleRootHash merkleRootHash = Merkler::ConstructMerkleTree(replica, pMerleTreeFile->fullpath);
         fs::remove(pMerleTreeFile->fullpath);
         {
             boost::lock_guard<boost::mutex> lock(mutex);
@@ -685,7 +686,7 @@ void StorageController::PushHandshake(const StorageHandshake &handshake,const bo
 void StorageController::FoundMyIP()
 {
     SetThreadPriority(THREAD_PRIORITY_BELOW_NORMAL);
-    auto lastCheckIp = std::time(nullptr);
+    lastCheckIp = std::time(nullptr);
 
     while (true) {
         boost::this_thread::interruption_point();
@@ -694,21 +695,17 @@ void StorageController::FoundMyIP()
             return ;
         }
 
-        if (address.IsValid() && (std::time(nullptr) - lastCheckIp < 3600)) {
-            boost::this_thread::sleep(boost::posix_time::seconds(1));
-            continue ;
-        }
+        if (!address.IsValid() || !(std::time(nullptr) - lastCheckIp < 3600)) {
+            std::vector<CNode*> vNodesCopy;
+            {
+                LOCK(cs_vNodes);
+                vNodesCopy = vNodes;
+            }
 
-        std::vector<CNode*> vNodesCopy;
-        {
-            LOCK(cs_vNodes);
-            vNodesCopy = vNodes;
+            for (const auto &node : vNodesCopy) {
+                node->PushMessage("dfsping");
+            }
         }
-
-        for (const auto &node : vNodesCopy) {
-            node->PushMessage("dfsping");
-        }
-        lastCheckIp = std::time(nullptr);
 
         boost::this_thread::sleep(boost::posix_time::seconds(1));
 
@@ -735,7 +732,7 @@ void StorageController::ProcessProposalsMessages()
         BackgroundJobs job = qJobs.pop();
 
         if (job == BackgroundJobs::CHECK_PROPOSALS) {
-            std::vector<uint256> orderHashes;
+            std::vector<OrderHash> orderHashes;
             {
                 boost::lock_guard<boost::mutex> lock(mutex);
                 orderHashes = proposalsAgent.GetListenProposals();
@@ -784,7 +781,7 @@ void StorageController::ProcessHandshakesMessages()
         auto item = qHandshakes.pop();
         bool status = item.first;
         StorageHandshake handshake = item.second;
-        auto order = GetAnnounce(handshake.orderHash);
+        auto order = GetOrder(handshake.orderHash);
         if (!order) {
             continue ;
         }

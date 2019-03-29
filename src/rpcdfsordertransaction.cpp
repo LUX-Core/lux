@@ -41,7 +41,7 @@ UniValue dfscreaterawordertx(UniValue const & params, bool fHelp)
 
     uint256 orderHash = uint256{params[0].get_str()};
 
-    const StorageOrder *order = storageController->GetAnnounce(orderHash);
+    const StorageOrder *order = storageController->GetOrder(orderHash);
 
     if (!order) {
         throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameters, order not found");

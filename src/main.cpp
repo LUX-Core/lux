@@ -5875,7 +5875,7 @@ bool static AlreadyHave(const CInv& inv)
     case MSG_MASTERNODE_WINNER:
         return mapSeenMasternodeVotes.count(inv.hash);
     case MSG_STORAGE_ORDER_ANNOUNCE:
-        return storageController->GetAnnounce(inv.hash) != nullptr;
+        return storageController->GetOrder(inv.hash) != nullptr;
     }
     // Don't know what it is, just say we already got one
     return true;
@@ -6031,7 +6031,7 @@ void static ProcessGetData(CNode* pfrom, const Consensus::Params& consensusParam
                     vNotFound.push_back(inv);
                 }
             } else if (inv.type == MSG_STORAGE_ORDER_ANNOUNCE) {
-                const auto *announce = storageController->GetAnnounce(inv.hash);
+                const auto *announce = storageController->GetOrder(inv.hash);
                 if (announce) {
                     CDataStream ss(SER_NETWORK, PROTOCOL_VERSION);
                     ss.reserve(1000);

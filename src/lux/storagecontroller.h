@@ -55,6 +55,7 @@ protected:
     concurrent_queue<StorageProposal> qProposals;
 
     bool shutdownThreads;
+    time_t lastCheckIp;
 
     boost::thread pingThread;
     boost::thread proposalsManagerThread;
@@ -113,7 +114,7 @@ public:
     void SaveProof(const StorageProofDB &proof);
     // Get functions
     std::map<uint256, StorageOrder> GetAnnouncements();
-    const StorageOrder *GetAnnounce(const uint256 &hash);
+    const StorageOrder *GetOrder(const uint256 &hash);
     std::vector<std::shared_ptr<StorageChunk>> GetChunks(const bool tempChunk = false);
     void MoveChunk(size_t chunkIndex, const boost::filesystem::path &newpath,const bool tempChunk = false);
     std::vector<StorageProposal> GetProposals(const uint256 &orderHash);
