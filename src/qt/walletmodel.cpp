@@ -67,6 +67,7 @@ WalletModel::WalletModel(const PlatformStyle *platformStyle, CWallet* wallet, Op
 
 WalletModel::~WalletModel()
 {
+    delete pollTimer;
     unsubscribeFromCoreSignals();
 }
 
