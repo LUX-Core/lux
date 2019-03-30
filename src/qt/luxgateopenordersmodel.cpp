@@ -38,16 +38,16 @@ void LuxgateOpenOrdersModel::update()
     endResetModel();
 
     beginInsertRows(QModelIndex(), 0, 0);
-    for (auto it = orderbook.Orders().begin(); it != orderbook.Orders().end(); ++it) {
+    auto orders = orderbook.ConstOrders();
+    for (auto it = orders.begin(); it != orders.end(); ++it) {
         LogPrintf("LuxgateOpenOrdersModel add %s\n", it->second->ToString());
         openOrders.push_back(it->second);
     }
     endInsertRows();
 
     std::sort(openOrders.begin(), openOrders.end(),
-              [](std::shared_ptr<COrder> a, std::shared_ptr<COrder> b)
+              [](std::shared_ptr<const COrder> a, std::shared_ptr<const COrder> b)
               { return a->OrderCreationTime() > b->OrderCreationTime(); });
-    //Q_EMIT dataChanged(index(0, 0), index(rowCount() - 1, columnCount() - 1), { Luxgate::BidAskRole, Qt::DisplayRole });
 }
 
 Qt::ItemFlags LuxgateOpenOrdersModel::flags(const QModelIndex &index) const

@@ -36,7 +36,7 @@ public slots:
     void addRow(std::shared_ptr<COrder>);
 private:
     Luxgate::Decimals decimals;
-    std::vector<std::shared_ptr<COrder>> openOrders;
+    std::vector<std::shared_ptr<const COrder>> openOrders;
 };
 
 #endif // LUXGATEOPENORDERSMODEL_H
