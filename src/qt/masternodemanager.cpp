@@ -57,7 +57,8 @@ MasternodeManager::MasternodeManager(QWidget *parent) :
 }
 
 MasternodeManager::~MasternodeManager()
-{
+{   timer->stop();
+    delete timer;
     delete ui;
 }
 
