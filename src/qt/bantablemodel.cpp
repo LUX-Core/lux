@@ -101,7 +101,6 @@ BanTableModel::BanTableModel(ClientModel *parent) :
 
 BanTableModel::~BanTableModel()
 {
-    timer->stop();
     delete timer;
 }
 
