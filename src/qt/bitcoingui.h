@@ -46,6 +46,8 @@ class HelpMessageDialog;
 class CWallet;
 
 QT_BEGIN_NAMESPACE
+class QPaintEvent;
+class QTimer;
 class QAction;
 class QProgressBar;
 class QProgressDialog;
@@ -92,6 +94,7 @@ protected:
     bool eventFilter(QObject* object, QEvent* event);
 
 private:
+    QTimer* timer;
     ClientModel* clientModel;
     WalletFrame* walletFrame;
 

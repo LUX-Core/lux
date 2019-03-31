@@ -133,6 +133,7 @@ BitcoinGUI::BitcoinGUI(const PlatformStyle *platformStyle, const NetworkStyle* n
                                                                             LSRTokenAction(0),
                                                                             trayIcon(0),
                                                                             trayIconMenu(0),
+                                                                            timer(0),
                                                                             notificator(0),
                                                                             rpcConsole(0),
                                                                             helpMessageDialog(0),
@@ -398,9 +399,9 @@ BitcoinGUI::BitcoinGUI(const PlatformStyle *platformStyle, const NetworkStyle* n
     // Subscribe to notifications from core
     subscribeToCoreSignals();
 
-    QTimer* timerStakingIcon = new QTimer(labelStakingIcon);
-    connect(timerStakingIcon, SIGNAL(timeout()), this, SLOT(setStakingStatus()));
-    timerStakingIcon->start(10000);
+    timer = new QTimer(this);
+    connect(timer, SIGNAL(timeout()), SLOT(setStakingStatus()));
+    timer->start(10000);
     setStakingStatus();
     modalOverlay = new ModalOverlay(this->centralWidget());
 
@@ -427,7 +428,7 @@ BitcoinGUI::BitcoinGUI(const PlatformStyle *platformStyle, const NetworkStyle* n
 BitcoinGUI::~BitcoinGUI() {
     // Unsubscribe from notifications from core
     unsubscribeFromCoreSignals();
-
+delete timer;
     GUIUtil::saveWindowGeometry("nWindow", this);
     if (trayIcon) // Hide tray icon, as deleting will let it linger until quit (on Ubuntu)
         trayIcon->hide();
