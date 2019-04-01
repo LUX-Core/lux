@@ -43,6 +43,21 @@ public:
 };
 static CBaseTestNetParams testNetParams;
 
+
+/**
+ * LuxGate testing network
+ */
+class CBaseLuxGateTestParams : public CBaseTestNetParams
+{
+public:
+    CBaseLuxGateTestParams()
+    {
+        networkID = CBaseChainParams::LUXGATETEST;
+        strDataDir = "luxgatetest";
+    }
+};
+static CBaseLuxGateTestParams luxGateTestParams;
+
 /*
  * Regression test
  */
@@ -98,6 +113,9 @@ void SelectBaseParams(CBaseChainParams::Network network)
     case CBaseChainParams::TESTNET:
         pCurrentBaseParams = &testNetParams;
         break;
+    case CBaseChainParams::LUXGATETEST:
+        pCurrentBaseParams = &luxGateTestParams;
+        break;
     case CBaseChainParams::REGTEST:
         pCurrentBaseParams = &regTestParams;
         break;
@@ -117,6 +135,7 @@ CBaseChainParams::Network NetworkIdFromCommandLine()
 {
     bool fRegTest = GetBoolArg("-regtest", false);
     bool fTestNet = GetBoolArg("-testnet", false);
+    bool fLuxGateTest = GetBoolArg("-luxgatetest", false);
     bool fSegWitTestNet = GetBoolArg("-segwittest", false);
 
     if (fTestNet && fRegTest)
@@ -127,6 +146,8 @@ CBaseChainParams::Network NetworkIdFromCommandLine()
         return CBaseChainParams::TESTNET;
     if (fSegWitTestNet)
         return CBaseChainParams::SEGWITTEST;
+    if (fLuxGateTest)
+        return CBaseChainParams::LUXGATETEST;
     return CBaseChainParams::MAIN;
 }
 

@@ -51,6 +51,12 @@
 #include "miner.h"
 #endif
 
+#ifdef ENABLE_LUXGATE
+#include <luxgate/lgconfig.h>
+#include <luxgate/blockchainclient.h>
+#include <luxgate/luxgate.h>
+#endif
+
 #include <fstream>
 #include <stdint.h>
 #include <stdio.h>
@@ -216,6 +222,11 @@ void PrepareShutdown()
         bitdb.Flush(false);
 //    GenerateBitcoins(NULL, 0);
 #endif
+
+#ifdef ENABLE_LUXGATE
+    ShutdownLuxGate();
+#endif
+
     StopNode();
     UnregisterNodeSignals(GetNodeSignals());
 
@@ -385,6 +396,9 @@ std::string HelpMessage(HelpMessageMode mode)
     strUsage += HelpMessageOpt("-checkblocks=<n>", strprintf(_("How many blocks to check at startup (default: %u, 0 = all)"), 500));
     strUsage += HelpMessageOpt("-checklevel=<n>", strprintf(_("How thorough the block verification of -checkblocks is (0-4, default: %u)"), 3));
     strUsage += HelpMessageOpt("-conf=<file>", strprintf(_("Specify configuration file (default: %s)"), "lux.conf"));
+#ifdef ENABLE_LUXGATE
+    strUsage += HelpMessageOpt("-luxgateconf=<file>", strprintf(_("Specify LuxGate configuration file (default: %s)"), "luxgate.json"));
+#endif
     if (mode == HMM_BITCOIND) {
 #if !defined(WIN32)
         strUsage += HelpMessageOpt("-daemon", _("Run in the background as a daemon and accept commands"));
@@ -1140,6 +1154,32 @@ bool AppInit2()
     LogPrintf("Using config file %s\n", GetConfigFile().string());
     LogPrintf("Using at most %i connections (%i file descriptors available)\n", nMaxConnections, nFD);
     std::ostringstream strErrors;
+
+#ifdef ENABLE_LUXGATE
+    LogPrintf("Using LuxGate config file %s\n", GetLuxGateConfigFile().string());
+
+    // Read LuxGate config
+    std::map<std::string, BlockchainConfig> config = ReadLuxGateConfigFile();
+    BlockchainConfig luxConfig{"LUX", "", 0, "", ""}; // Empty config because we don't need to actually connect to RPC
+    ClientPtr luxClient = std::make_shared<CLuxClient>(luxConfig);
+    blockchainClientPool.insert(std::make_pair(luxClient->ticker, luxClient));
+    for (auto it : config) {
+        BlockchainConfig conf = it.second;
+        LogPrintf("BlockchainConfig: %s\n", conf.ToString().c_str());
+        ClientPtr client = std::make_shared<CBitcoinClient>(conf);
+        bool swapIsSupported = client->IsSwapSupported();
+        LogPrintf("%s swap support - %s\n", client->ticker, swapIsSupported ? "yes" : "no");
+        blockchainClientPool.insert(std::make_pair(client->ticker, client));
+    }
+    StartLuxGateRefundService();
+    if (!InitializeLuxGate()) {
+        LogPrintf("Failed to initialize LuxGate\n");
+    }
+    // Set LUXGATE service bit only if we have 2 or more blockchain clients
+    if (blockchainClientPool.size() >= 2) {
+        nLocalServices = ServiceFlags(nLocalServices | NODE_LUXGATE);
+    }
+#endif // ENABLE_LUXGATE
 
     InitSignatureCache();
 

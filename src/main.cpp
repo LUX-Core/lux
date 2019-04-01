@@ -41,6 +41,10 @@
 #include "script/interpreter.h"
 #include "base58.h"
 
+#ifdef ENABLE_LUXGATE
+#include "luxgate/luxgate.h"
+#endif
+
 #include "univalue/univalue.h"
 #include <atomic>
 #include <sstream>
@@ -1929,6 +1933,10 @@ CAmount GetProofOfWorkReward(int64_t nFees, int nHeight)
         if (nHeight < 200) return 250000 * COIN;
     }
 
+    if (Params().NetworkID() == CBaseChainParams::LUXGATETEST) {
+        if (nHeight < 20) return 250000 * COIN;
+    }
+
     if (Params().NetworkID() == CBaseChainParams::REGTEST) {
         if (nHeight < 5) {
             return 50000 * COIN;
@@ -1958,7 +1966,9 @@ CAmount GetProofOfWorkReward(int64_t nFees, int nHeight)
     }
 
     if (nHeight < LAST_HEIGHT_FEE_BLOCK) {
-        if (IsTestNet() && nHeight >= 17500)
+        if (Params().NetworkID() == CBaseChainParams::TESTNET && nHeight >= 17500)
+            return nSubsidy + nFees;
+        if (Params().NetworkID() == CBaseChainParams::LUXGATETEST && nHeight >= 20)
             return nSubsidy + nFees;
         nFees = nHeight;
     }
@@ -7107,6 +7117,10 @@ static bool ProcessMessage(CNode* pfrom, const string &strCommand, CDataStream& 
         if (!processed) ProcessMasternodeConnections();
         if (!processed) ProcessInstantX(pfrom, strCommand, vRecv, processed);
         if (!processed) ProcessSpork(pfrom, strCommand, vRecv, processed);
+#ifdef ENABLE_LUXGATE
+        if (!processed) ProcessMessageLuxgate(pfrom, strCommand, vRecv, processed);
+#endif
+
 #       endif
     }
 

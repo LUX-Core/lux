@@ -117,6 +117,9 @@ private:
     QMenuBar* appMenuBar;
     QAction* overviewAction;
     QAction* historyAction;
+#ifdef ENABLE_LUXGATE
+    QAction* luxgateAction;
+#endif
     QAction* masternodeAction;
     QAction* quitAction;
     QAction* sendCoinsAction;
@@ -250,6 +253,10 @@ private Q_SLOTS:
     void gotoOverviewPage();
     /** Switch to history (transactions) page */
     void gotoHistoryPage();
+#ifdef ENABLE_LUXGATE
+    /** Switch to luxgate page */
+    void gotoLuxgatePage();
+#endif
     /** Switch to Explorer Page */
     void gotoBlockExplorerPage();
     /** Switch to masternode page */

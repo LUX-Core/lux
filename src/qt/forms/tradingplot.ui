@@ -1,0 +1,473 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>TradingPlot</class>
+ <widget class="QFrame" name="TradingPlot">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>708</width>
+    <height>553</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Widget</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_5">
+     <property name="spacing">
+      <number>15</number>
+     </property>
+     <item>
+      <spacer name="horizontalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_2">
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QLabel" name="labelDateTytle">
+         <property name="minimumSize">
+          <size>
+           <width>45</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>&lt;b&gt;Date:&lt;/b&gt;</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="labelDate">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>110</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>110</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_3">
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QLabel" name="labelVolTytle">
+         <property name="minimumSize">
+          <size>
+           <width>45</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>&lt;b&gt;Vol:&lt;/b&gt;</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="labelVol">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>110</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>110</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_4">
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QLabel" name="labelBaseTytle">
+         <property name="minimumSize">
+          <size>
+           <width>45</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>&lt;b&gt;Base:&lt;/b&gt;</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="labelBase">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>110</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>110</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_10">
+     <property name="spacing">
+      <number>15</number>
+     </property>
+     <item>
+      <spacer name="horizontalSpacer_3">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_6">
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QLabel" name="labelOpenTytle">
+         <property name="minimumSize">
+          <size>
+           <width>45</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>&lt;b&gt;Open:&lt;/b&gt;</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="labelOpen">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>110</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>110</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_7">
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QLabel" name="labelCloseTytle">
+         <property name="minimumSize">
+          <size>
+           <width>45</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>&lt;b&gt;Close:&lt;/b&gt;</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="labelClose">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>110</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>110</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_8">
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QLabel" name="labelHighTytle">
+         <property name="minimumSize">
+          <size>
+           <width>45</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>&lt;b&gt;High:&lt;/b&gt;</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="labelHigh">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>110</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>110</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_9">
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QLabel" name="labelLowTytle">
+         <property name="minimumSize">
+          <size>
+           <width>45</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>&lt;b&gt;Low:&lt;/b&gt;</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="labelLow">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>110</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>110</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QCustomPlot" name="priceChart" native="true">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="sizeIncrement">
+      <size>
+       <width>0</width>
+       <height>1</height>
+      </size>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QScrollBar" name="horPriceChartScrollBar">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QLabel" name="labelGraphType">
+       <property name="text">
+        <string>Graph Type</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="comboBoxGraphType">
+       <property name="toolTip">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="labelDataRange">
+       <property name="text">
+        <string>Data Range</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="comboBoxDataRange">
+       <property name="toolTip">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="labelDataInterval">
+       <property name="text">
+        <string>Data Interval</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="comboBoxDataInterval">
+       <property name="toolTip">
+        <string/>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>QCustomPlot</class>
+   <extends>QWidget</extends>
+   <header>qcustomplot.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

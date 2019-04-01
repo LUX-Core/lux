@@ -1,0 +1,127 @@
+@startuml
+
+
+' Just for better look
+skinparam shadowing false
+skinparam defaultFontColor #d8d8d8
+skinparam SequenceGroupBorderColor #d8d8d8
+skinparam SequenceGroupHeaderFontColor #333333
+skinparam defaultFontName "Ubuntu"
+skinparam BackgroundColor #333333
+skinparam sequenceArrowThickness 2
+skinparam roundcorner 2
+skinparam ParticipantBorderColor #black
+skinparam NoteBackgroundColor #333333
+skinparam NoteBorderColor  #d8d8d8
+skinparam sequence {
+    ArrowColor #white
+    LifeLineBorderColor #d8d8d8
+    ActorBorderColor #black
+}
+
+actor Alice #6b4c70
+participant btcA as "Alice's BTC Node"  #6b4c70
+participant luxA as "Alice's LUX Node"  #6b4c70
+participant lgA as "Alice's Luxgate" #6b4c70
+actor Carol as "Carol\n(Luxgate)" #888888
+participant lgB as "Bob's Luxgate"  #007a74
+participant luxB as "Bob's LUX Node"  #007a74
+participant btcB as "Bob's BTC Node"  #007a74
+actor Bob  #007a74
+
+autonumber
+
+Bob -> lgB : **createorder** (rpc)\nY BTC - X LUX
+rnote over lgB : Save order locally
+hnote over lgB: **NEW**
+lgB -> Bob : ok
+lgB -> Carol : **createorder**\nBTC\LUX, Y, X, Bob's address
+rnote over Carol: Relay if no matches with local orders
+Carol -> lgA : **createorder**\nBTC\LUX, Y, X, Bob's address
+rnote over lgA : Relay to other peers
+... After ...
+Alice -> lgA : **createorder** (rpc)\nX LUX - Y BTC
+rnote over lgA : Save order locally
+hnote over lgA: **NEW**
+lgA -> Alice : ok
+
+lgA -> Carol : **createorder**\nBTC\LUX, Y, X, Alice's address
+rnote over Carol: Relay if no matches with local orders
+Carol -> lgB : **createorder**\nBTC\LUX, Y, X, Alice's address
+
+rnote over lgB: **Match with local order!**
+
+lgB -> luxB: **addnode**(Alice's address)
+luxB -> luxA: connect, versions exhange
+luxA -> luxB: connect, versions exhange
+luxB -> lgB: ok
+lgB -> lgA: **ordermatch**\nlocal order
+hnote over lgB :**MATCH_FOUND**
+
+lgA -> btcA :  getnewaddress
+btcA -> lgA :  alice_btc_addr
+
+
+lgA -> lgB : **reqswap**\nlocal order, alice_btc_addr
+hnote over lgA : **SWAP_REQUESTED**
+
+lgB -> luxB : getnewaddress
+luxB -> lgB : bob_lux_addr
+
+lgB -> lgA: **reqswapack**\nlocal order, bob_lux_addr
+hnote over lgB : **SWAP_ACK**
+
+
+rnote over lgA : Generate **secret**
+lgA -> luxA: getnewaddress
+luxA -> lgA: alice_lux_refund_addr
+
+lgA -> luxA : Create tx with p2sh sending X LUX to **bob_lux_addr**\nusing **secretHash**\nor refunding to **alice_lux_refund_addr** after 40h
+luxA -> lgA : txidLUX
+
+
+lgA -> lgB : **swccreated**\nlocal_order, txidLUX, secretHash,\nalice_lux_refund_addr, p2sh_redeemScript
+
+hnote over lgA : **CONTRACT_CREATED**
+hnote over lgB: **CONTRACT_VERIFYING**
+
+group Polling 
+lgB -> luxB : Verify txidLUX\n**getrawtransaction**
+luxB -> lgB : confirmations
+' space
+|||  
+end
+
+lgB -> btcB: getnewaddress
+btcB -> lgB: bob_btc_refund_addr
+
+lgB -> btcB : Create tx with p2sh sending Y BTC to **alice_btc_addr**\nusing **secretHash**\nor refunding to **bob_btc_refund_addr** after 40h
+btcB -> lgB : txidBTC
+
+
+lgB -> lgA: **swcack**\nlocal_order, txidBTC,\nbob_btc_refund_addr, p2sh_redeemScript
+
+hnote over lgB: **CONTRACT_ACK**
+
+hnote over lgA: **CONTRACT_ACK_VERIFYING**
+group Polling 
+lgA -> btcA : Verify txidBTC\n**getrawtransaction**
+btcA -> lgA : confirmations
+' space
+|||  
+end
+
+lgA -> btcA: Create tx that claims **txidBTC** with the **secret** in scriptSig
+btcA -> lgA: **claimTxid**
+rnote over lgA: Alice has Y BTC
+
+group Subscribe(ZMQ)
+btcB -> lgB: **claimTxidBTC** with the **secret**
+|||
+end
+
+lgB -> luxB: Create tx that claims **txidLUX**\nwith the **secret** in scriptSig
+luxB -> lgB:
+rnote over lgB: Bob has X LUX
+
+@enduml

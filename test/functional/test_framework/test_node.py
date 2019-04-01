@@ -78,6 +78,7 @@ class TestNode():
 
         if not any(arg.startswith('-staking=') for arg in extra_args):
             extra_args.append('-staking=0')
+        print("Starting node: %s" % ' '.join(self.args + extra_args))
         self.process = subprocess.Popen(self.args + extra_args, stderr=stderr)
         self.running = True
         self.log.debug("luxd started, waiting for RPC to come up")

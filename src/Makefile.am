@@ -8,8 +8,6 @@ if !TARGET_WINDOWS
 PIE_FLAGS = -fPIC
 endif
 
-EXTRA_LIBRARIES =
-
 BITCOIN_CONFIG_INCLUDES=-I$(builddir)/config
 BITCOIN_INCLUDES=-I$(builddir) -I$(builddir)/obj $(BDB_CPPFLAGS) $(BOOST_CPPFLAGS) $(LEVELDB_CPPFLAGS) $(CRYPTO_CFLAGS) $(SSL_CFLAGS) -I$(srcdir)/cpp-ethereum/utils
 
@@ -185,6 +183,17 @@ BITCOIN_CORE_H = \
   lux/luxDGP.h \
   lux/storageresults.h
 
+if ENABLE_LUXGATE
+BITCOIN_CORE_H += \
+  luxgate/atomicswap.h \
+  luxgate/blockchainclient.h \
+  luxgate/http.h \
+  luxgate/lgconfig.h \
+  luxgate/luxgate.h \
+  luxgate/version.h \
+  luxgate/zmqsub.h
+endif
+
 obj/build.h: FORCE
 	@$(MKDIR_P) $(builddir)/obj
 	@$(top_srcdir)/share/genbuild.sh $(abs_top_builddir)/src/obj/build.h \
@@ -192,7 +201,7 @@ obj/build.h: FORCE
 libbitcoin_util_a-clientversion.$(OBJEXT): obj/build.h
 
 # server: shared between luxd and lux-qt
-libbitcoin_server_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES) $(MINIUPNPC_CPPFLAGS) $(EVENT_CFLAGS) $(EVENT_PTHREADS_CFLAGS)
+libbitcoin_server_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES) $(MINIUPNPC_CPPFLAGS) $(EVENT_CFLAGS) $(EVENT_PTHREADS_CFLAGS) $(ZMQ_CFLAGS)
 libbitcoin_server_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 libbitcoin_server_a_SOURCES = \
   addrman.cpp \
@@ -232,6 +241,17 @@ libbitcoin_server_a_SOURCES = \
   lux/luxDGP.cpp \
   lux/storageresults.cpp \
   $(BITCOIN_CORE_H)
+
+if ENABLE_LUXGATE
+libbitcoin_server_a_SOURCES += \
+  luxgate/atomicswap.cpp \
+  luxgate/blockchainclient.cpp \
+  luxgate/http.cpp \
+  luxgate/lgconfig.cpp \
+  luxgate/luxgate.cpp \
+  luxgate/rpcluxgate.cpp \
+  luxgate/zmqsub.cpp
+endif
 
 if ENABLE_ZMQ
 libbitcoin_zmq_a_CPPFLAGS = $(BITCOIN_INCLUDES) $(ZMQ_CFLAGS)
@@ -358,6 +378,11 @@ libbitcoin_consensus_a_SOURCES = \
   cpp-ethereum/libdevcore/CommonData.h \
   hash.cpp \
   hash.h \
+  json/json_spirit_error_position.h \
+  json/json_spirit_reader.h \
+  json/json_spirit_reader.cpp \
+  json/json_spirit_value.h \
+  json/json_spirit_value.cpp \
   key.cpp \
   prevector.h \
   primitives/block.cpp \
@@ -610,6 +635,12 @@ libbitcoin_util_a_SOURCES = \
   compat/glibcxx_sanity.cpp \
   chainparamsbase.cpp \
   clientversion.cpp \
+  json/json_spirit_error_position.h \
+  json/json_spirit_reader_template.h \
+  json/json_spirit_reader.h \
+  json/json_spirit_reader.cpp \
+  json/json_spirit_value.h \
+  json/json_spirit_value.cpp \
   random.cpp \
   rpcprotocol.cpp \
   rpcutil.cpp \
@@ -661,7 +692,6 @@ luxd_LDADD = \
 
 luxd_LDADD += $(BOOST_LIBS) $(BDB_LIBS) $(SSL_LIBS) $(CRYPTO_LIBS) $(MINIUPNPC_LIBS) $(ZMQ_LIBS) $(EVENT_PTHREADS_LIBS) $(EVENT_LIBS)
 
-
 # lux-cli binary #
 lux_cli_SOURCES = lux-cli.cpp
 lux_cli_CPPFLAGS = $(BITCOIN_INCLUDES) $(EVENT_CFLAGS)
@@ -681,7 +711,7 @@ lux_cli_LDADD += $(BOOST_LIBS) $(SSL_LIBS) $(CRYPTO_LIBS) $(EVENT_LIBS)
 #
 
 # lux-tx binary #
-lux_tx_CPPFLAGS = $(BITCOIN_INCLUDES)
+lux_tx_CPPFLAGS = $(BITCOIN_INCLUDES) $(ZMQ_CFLAGS)
 lux_tx_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
 lux_tx_SOURCES =  \
   lux-tx.cpp \
@@ -729,6 +759,7 @@ CLEANFILES += *.a *.la crypto/*.a cryptopp/*.a qt/*.a
 CLEANFILES += *.gcda *.gcno
 CLEANFILES += compat/*.gcda compat/*.gcno
 CLEANFILES += crypto/*.gcda crypto/*.gcno
+CLEANFILES += luxgate/*.gcda luxgate/*.gcno
 CLEANFILES += primitives/*.gcda primitives/*.gcno
 CLEANFILES += script/*.gcda script/*.gcno
 CLEANFILES += univalue/*.gcda univalue/*.gcno
@@ -773,4 +804,8 @@ endif
 
 if ENABLE_QT
 include Makefile.qt.include
+endif
+
+if ENABLE_LUXGATE_TESTS
+include Makefile.luxgatetest.include
 endif

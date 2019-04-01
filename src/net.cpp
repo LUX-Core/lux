@@ -23,6 +23,10 @@
 #include "miner.h"
 #include "stake.h"
 
+#ifdef ENABLE_LUXGATE
+#include "luxgate/luxgate.h"
+#endif
+
 #ifdef WIN32
 #include <string.h>
 #else
@@ -73,8 +77,10 @@ struct ListenSocket {
 };
 }
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////// Luxgate
 /** Services this node implementation cares about */
-ServiceFlags nRelevantServices = NODE_NETWORK;
+ServiceFlags nRelevantServices = ServiceFlags(NODE_NETWORK | NODE_LUXGATE);
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////// Luxgate
 
 //
 // Global state variables
@@ -82,7 +88,9 @@ ServiceFlags nRelevantServices = NODE_NETWORK;
 bool fDiscover = true;
 bool fListen = true;
 bool fNetworkActive = true;
-ServiceFlags nLocalServices = NODE_NETWORK;
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////// Luxgate
+ServiceFlags nLocalServices = ServiceFlags(NODE_NETWORK);
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////// Luxgate
 CCriticalSection cs_mapLocalHost;
 map<CNetAddr, LocalServiceInfo> mapLocalHost;
 static bool vfReachable[NET_MAX] = {};
@@ -531,6 +539,12 @@ void CNode::PushVersion()
         LogPrint("net", "send version message: version %d, blocks=%d, us=%s, peer=%d\n", PROTOCOL_VERSION, nBestHeight, addrMe.ToString(), id);
     PushMessage("version", PROTOCOL_VERSION, (uint64_t) nLocalServices, nTime, addrYou, addrMe,
         nLocalHostNonce, FormatSubVersion(CLIENT_NAME, CLIENT_VERSION, std::vector<string>()), nBestHeight, true);
+#ifdef ENABLE_LUXGATE
+    if (nRelevantServices & NODE_LUXGATE) {
+        LogPrint("net", "send LuxGate version message: version %d, us=%s, peer=%d\n", LUXGATE_PROTOCOL_VERSION, addrMe.ToString(), id);
+        PushMessage("lgversion", LUXGATE_PROTOCOL_VERSION);
+    }
+#endif
 }
 
 
@@ -693,6 +707,9 @@ void CNode::copyStats(CNodeStats& stats)
     X(addrName);
     X(nVersion);
     X(cleanSubVer);
+#ifdef ENABLE_LUXGATE
+    X(nLuxGateVersion);
+#endif
     X(fInbound);
     X(nStartingHeight);
     {

@@ -37,6 +37,9 @@ QT_END_NAMESPACE
  */
 namespace GUIUtil
 {
+//return path to resourse icon
+QString currencyIcon(QString ticker);
+
 // Return a monospace font
 QFont fixedPitchFont();
 
