@@ -116,9 +116,9 @@ public:
     CFileStorageDB(const CFileStorageDB&) = delete;
     void operator=(const CFileStorageDB&) = delete;
 
-    bool WriteOrder(const uint256 &hash, const StorageOrderDB &orderDB);
-    bool EraseOrder(const uint256 &hash, const StorageOrderDB &orderDB);
-    bool LoadOrders(std::function<void (const uint256 &, const StorageOrderDB &)> onCheck);
+    bool WriteOrderDB(const uint256 &hash, const StorageOrderDB &orderDB);
+    bool EraseOrderDB(const uint256 &hash, const StorageOrderDB &orderDB);
+    bool LoadOrdersDB(std::function<void (const uint256 &, const StorageOrderDB &)> onCheck);
 
     bool WriteProof(const uint256 &hash, const StorageProofDB &proof);
     bool EraseProof(const uint256 &hash, const StorageProofDB &proof);

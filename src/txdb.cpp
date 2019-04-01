@@ -722,21 +722,21 @@ CFileStorageDB::CFileStorageDB(size_t nCacheSize, bool fMemory, bool fWipe) : CL
 }
 
 
-bool CFileStorageDB::WriteOrder(const uint256 &hash, const StorageOrderDB &orderDB)
+bool CFileStorageDB::WriteOrderDB(const uint256 &hash, const StorageOrderDB &orderDB)
 {
     CLevelDBBatch batch;
     batch.Write(std::make_pair(DB_ORDER, hash), orderDB);
     return WriteBatch(batch);
 }
 
-bool CFileStorageDB::EraseOrder(const uint256 &hash, const StorageOrderDB &orderDB)
+bool CFileStorageDB::EraseOrderDB(const uint256 &hash, const StorageOrderDB &orderDB)
 {
     CLevelDBBatch batch;
     batch.Erase(std::make_pair(DB_ORDER, hash));
     return WriteBatch(batch);
 }
 
-bool CFileStorageDB::LoadOrders(std::function<void (const uint256 &, const StorageOrderDB &)> onCheck)
+bool CFileStorageDB::LoadOrdersDB(std::function<void (const uint256 &, const StorageOrderDB &)> onCheck)
 {
     boost::scoped_ptr<leveldb::Iterator> pcursor(NewIterator());
 

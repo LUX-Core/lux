@@ -3169,8 +3169,8 @@ void ProcessDFSTransactions(const CBlock &block)
                    >> order.storageUntil;
                 order.hashTx = tx.GetHash();
 
-                storageController->AddOrder(order);
-                storageController->SaveOrder(order);
+                storageController->AddOrderDB(order);
+                storageController->SaveOrderDB(order);
             } else if (type == StorageTxTypes::Proof) {
                 StorageProofDB proof;
                 CDataStream ss(data, SER_NETWORK, PROTOCOL_VERSION);

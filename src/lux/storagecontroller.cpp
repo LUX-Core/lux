@@ -85,33 +85,60 @@ void StorageController::ProcessStorageMessage(CNode* pfrom, const std::string& s
 {
     namespace fs = boost::filesystem;
 
-    if (strCommand == "dfsannounce") {
+    if (strCommand == "dfsalr") { // dfs announcements list request
+        std::vector <CInv> vInv;
+        size_t counter = 0;
+        if (pfrom->nVersion < ActiveProtocol()) {
+            LogPrint("dfs", "protocol version \"%s\" is not active", pfrom->nVersion);
+            return ;
+        }
+        for (auto &&pair : mapAnnouncements) {
+            const StorageOrder *order = GetOrder(pair.first);
+            if (!order || (order->time + MAX_WAIT_TIME) > std::time(nullptr)) {
+                continue ;
+            }
+            CInv inv(MSG_STORAGE_ORDER_ANNOUNCE, pair.first);
+            vInv.push_back(inv);
+            if (counter >= MAX_ANNOUNCEMETS_SIZE) {
+                pfrom->PushMessage("inv", vInv);
+                vInv.clear();
+                counter = 0;
+            } else {
+                counter++;
+            }
+        }
+        if (counter > 0) {
+            pfrom->PushMessage("inv", vInv);
+        }
+    } else if (strCommand == "dfsannounce") {
         isStorageCommand = true;
         StorageOrder order;
         vRecv >> order;
         uint256 hash = order.GetHash();
         if (!GetOrder(hash)) {
-            AnnounceOrder(order);
-            uint64_t storageHeapSize = 0;
-            uint64_t tempStorageHeapSize = 0;
-            {
-                boost::lock_guard<boost::mutex> lock(mutex);
-                storageHeapSize = storageHeap.MaxAllocateSize();
-                tempStorageHeapSize = tempStorageHeap.MaxAllocateSize();
-            }
-            if (storageHeapSize > order.fileSize &&
-                tempStorageHeapSize > order.fileSize &&
-                order.maxRate >= rate &&
-                order.maxGap >= maxblocksgap) {
-                StorageProposal proposal { std::time(nullptr), hash, rate, address };
-
-                CNode* pNode = TryConnectToNode(order.address, 2);
-                if (pNode) {
-                    pNode->PushMessage("dfsproposal", proposal);
-                } else {
-                    pfrom->PushMessage("dfsproposal", proposal);
+            AddOrder(order);
+            if ((order.time + MAX_WAIT_TIME) < std::time(nullptr)) {
+                AnnounceOrder(order);
+                uint64_t storageHeapSize = 0;
+                uint64_t tempStorageHeapSize = 0;
+                {
+                    boost::lock_guard <boost::mutex> lock(mutex);
+                    storageHeapSize = storageHeap.MaxAllocateSize();
+                    tempStorageHeapSize = tempStorageHeap.MaxAllocateSize();
                 }
+                if (storageHeapSize > order.fileSize &&
+                    tempStorageHeapSize > order.fileSize &&
+                    order.maxRate >= rate &&
+                    order.maxGap >= maxblocksgap) {
+                    StorageProposal proposal{std::time(nullptr), hash, rate, address};
 
+                    CNode *pNode = TryConnectToNode(order.address, 2);
+                    if (pNode) {
+                        pNode->PushMessage("dfsproposal", proposal);
+                    } else {
+                        pfrom->PushMessage("dfsproposal", proposal);
+                    }
+                }
             }
         }
     } else if (strCommand == "dfshandshake") {
@@ -146,27 +173,6 @@ void StorageController::ProcessStorageMessage(CNode* pfrom, const std::string& s
 //                CNodeState *state = State(pNode); // CNodeState was declared in main.cpp (SS)
 //                state->nMisbehavior += 10;
 //            }
-        }
-    } else if (strCommand == "dfsalr") { // dfs announcements list request
-        std::vector <CInv> vInv;
-        size_t counter = 0;
-        if (pfrom->nVersion < ActiveProtocol()) {
-            LogPrint("dfs", "protocol version \"%s\" is not active", pfrom->nVersion);
-            return ;
-        }
-        for (auto &&pair : mapAnnouncements) {
-            CInv inv(MSG_STORAGE_ORDER_ANNOUNCE, pair.first);
-            vInv.push_back(inv);
-            if (counter >= MAX_ANNOUNCEMETS_SIZE) {
-                pfrom->PushMessage("inv", vInv);
-                vInv.clear();
-                counter = 0;
-            } else {
-                counter++;
-            }
-        }
-        if (counter > 0) {
-            pfrom->PushMessage("inv", vInv);
         }
     } else if (strCommand == "dfsping") {
         isStorageCommand = true;
@@ -290,13 +296,18 @@ void StorageController::ProcessStorageMessage(CNode* pfrom, const std::string& s
     }
 }
 
-void StorageController::AnnounceOrder(const StorageOrder &order)
+void StorageController::AddOrder(const StorageOrder &order)
 {
     OrderHash hash = order.GetHash();
     {
         boost::lock_guard<boost::mutex> lock(mutex);
         mapAnnouncements[hash] = order;
     }
+}
+
+void StorageController::AnnounceOrder(const StorageOrder &order)
+{
+    OrderHash hash = order.GetHash();
 
     CInv inv(MSG_STORAGE_ORDER_ANNOUNCE, hash);
     std::vector <CInv> vInv;
@@ -319,6 +330,7 @@ void StorageController::AnnounceOrder(const StorageOrder &order)
 
 void StorageController::AnnounceNewOrder(const StorageOrder &order, const boost::filesystem::path &path)
 {
+    AddOrder(order);
     AnnounceOrder(order);
 
     {
@@ -326,7 +338,7 @@ void StorageController::AnnounceNewOrder(const StorageOrder &order, const boost:
         mapLocalFiles[order.GetHash()] = path;
         proposalsAgent.ListenProposals(order.GetHash());
     }
-    mapTimers[order.GetHash()] = std::make_shared<CancelingSetTimeout>(std::chrono::milliseconds(60000),
+    mapTimers[order.GetHash()] = std::make_shared<CancelingSetTimeout>(std::chrono::milliseconds(MAX_WAIT_TIME * 1000),
                                                                        nullptr,
                                                                        [this](){ Notify(BackgroundJobs::CHECK_PROPOSALS); });
 }
@@ -417,21 +429,21 @@ void StorageController::DecryptReplica(const uint256 &orderHash, const boost::fi
     return ;
 }
 
-void StorageController::LoadOrders()
+void StorageController::LoadOrdersDB()
 {
-    db->LoadOrders([this] (const MerkleRootHash &merkleRootHash, const StorageOrderDB &orderDB) {
+    db->LoadOrdersDB([this] (const MerkleRootHash &merkleRootHash, const StorageOrderDB &orderDB) {
         mapOrders.insert(std::make_pair(merkleRootHash, orderDB));
     });
 }
 
-void StorageController::AddOrder(const StorageOrderDB &orderDB)
+void StorageController::AddOrderDB(const StorageOrderDB &orderDB)
 {
     mapOrders.insert(std::make_pair(orderDB.merkleRootHash, orderDB));
 }
 
-void StorageController::SaveOrder(const StorageOrderDB &orderDB)
+void StorageController::SaveOrderDB(const StorageOrderDB &orderDB)
 {
-    db->WriteOrder(orderDB.merkleRootHash, orderDB);
+    db->WriteOrderDB(orderDB.merkleRootHash, orderDB);
 }
 
 void StorageController::AddProof(const StorageProofDB &proof)

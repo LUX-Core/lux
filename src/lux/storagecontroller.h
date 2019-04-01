@@ -29,6 +29,8 @@ static const unsigned short DEFAULT_DFS_PORT = 1507;
 
 static const size_t MAX_ANNOUNCEMETS_SIZE = 100;
 
+static const int MAX_WAIT_TIME = 60;
+
 class StorageController
 {
     enum BackgroundJobs {
@@ -99,6 +101,7 @@ public:
     // MultiThread signals
     void PushHandshake(const StorageHandshake &handshake, const bool status = true);
     // Orders functions
+    void AddOrder(const StorageOrder &order);
     void AnnounceOrder(const StorageOrder &order);
     void AnnounceNewOrder(const StorageOrder &order, const boost::filesystem::path &path);
     bool CancelOrder(const uint256 &orderHash);
@@ -108,9 +111,9 @@ public:
     // Replica function
     void DecryptReplica(const uint256 &orderHash, const boost::filesystem::path &decryptedFile);
     // DB functions
-    void LoadOrders();
-    void AddOrder(const StorageOrderDB &orderDB);
-    void SaveOrder(const StorageOrderDB &orderDB);
+    void LoadOrdersDB();
+    void AddOrderDB(const StorageOrderDB &orderDB);
+    void SaveOrderDB(const StorageOrderDB &orderDB);
     void LoadProofs();
     void AddProof(const StorageProofDB &proof);
     void SaveProof(const StorageProofDB &proof);

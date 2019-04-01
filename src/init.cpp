@@ -1416,7 +1416,7 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
                 storageController->InitStorages(GetDataDir() / "dfs", GetDataDir() / "dfstemp"); // =========> INIT DFS CONTROLLER <=========
                 storageController->InitDB(nMinDbCache << 20, false, fReindex);
 
-                storageController->LoadOrders();
+                storageController->LoadOrdersDB();
 
                 if (fReset) {
                     pblocktree->WriteReindexing(true);
