@@ -153,7 +153,7 @@ public:
 		const char *x = "YES";
 		return x;
 	}
-
+}
     int GetMasternodeInputAge()
     {
         if(chainActive.Tip() == NULL) return 0;
