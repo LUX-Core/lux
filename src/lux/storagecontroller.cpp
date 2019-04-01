@@ -429,21 +429,21 @@ void StorageController::DecryptReplica(const uint256 &orderHash, const boost::fi
     return ;
 }
 
-void StorageController::LoadOrdersDB()
-{
-    db->LoadOrdersDB([this] (const MerkleRootHash &merkleRootHash, const StorageOrderDB &orderDB) {
-        mapOrders.insert(std::make_pair(merkleRootHash, orderDB));
-    });
-}
-
 void StorageController::AddOrderDB(const StorageOrderDB &orderDB)
 {
     mapOrders.insert(std::make_pair(orderDB.merkleRootHash, orderDB));
 }
 
+void StorageController::LoadOrdersDB()
+{
+    db->LoadObjects<StorageOrderDB, DB_ORDER>([this] (const MerkleRootHash &merkleRootHash, const StorageOrderDB &orderDB) {
+        mapOrders.insert(std::make_pair(merkleRootHash, orderDB));
+    });
+}
+
 void StorageController::SaveOrderDB(const StorageOrderDB &orderDB)
 {
-    db->WriteOrderDB(orderDB.merkleRootHash, orderDB);
+    db->WriteObj<StorageOrderDB, DB_ORDER>(orderDB.merkleRootHash, orderDB);
 }
 
 void StorageController::AddProof(const StorageProofDB &proof)
@@ -453,14 +453,14 @@ void StorageController::AddProof(const StorageProofDB &proof)
 
 void StorageController::LoadProofs()
 {
-    db->LoadProofs([this] (const uint256 &proofHash, const StorageProofDB &proof) {
+    db->LoadObjects<StorageProofDB, DB_PROOF>([this] (const uint256 &proofHash, const StorageProofDB &proof) {
         mapProofs[proof.merkleRootHash].push_back(proof);
     });
 }
 
 void StorageController::SaveProof(const StorageProofDB &proof)
 {
-    db->WriteProof(proof.GetHash(), proof);
+    db->WriteObj<StorageProofDB, DB_PROOF>(proof.GetHash(), proof);
 }
 
 std::map<uint256, StorageOrder> StorageController::GetAnnouncements()

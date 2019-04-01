@@ -30,6 +30,14 @@ static const int64_t nMaxDbCache = sizeof(void*) > 4 ? 4096 : 1024;
 //! min. -dbcache in (MiB)
 static const int64_t nMinDbCache = 4;
 
+///////////////////////////////////////// CFileStorageDB
+
+static const char DB_ORDER = 'o';
+static const char DB_PROOF = 'p';
+static const char DB_FILE = 'i';
+
+/////////////////////////////////////////
+
 /** CCoinsView backed by the LevelDB coin database (chainstate/) */
 class CCoinsViewDB : public CCoinsView
 {
@@ -112,17 +120,64 @@ public:
 class CFileStorageDB : public CLevelDBWrapper
 {
 public:
-    CFileStorageDB(size_t nCacheSize, bool fMemory = false, bool fWipe = false);
+    CFileStorageDB(size_t nCacheSize, bool fMemory = false, bool fWipe = false)
+            : CLevelDBWrapper(GetDataDir() / "dfsdb", nCacheSize, fMemory, fWipe) {}
+
     CFileStorageDB(const CFileStorageDB&) = delete;
     void operator=(const CFileStorageDB&) = delete;
 
-    bool WriteOrderDB(const uint256 &hash, const StorageOrderDB &orderDB);
-    bool EraseOrderDB(const uint256 &hash, const StorageOrderDB &orderDB);
-    bool LoadOrdersDB(std::function<void (const uint256 &, const StorageOrderDB &)> onCheck);
+    template <class T, const char C>
+    bool WriteObj(const uint256 &hash, const T &obj)
+    {
+        CLevelDBBatch batch;
+        batch.Write(std::make_pair(C, hash), obj);
+        return WriteBatch(batch);
+    }
 
-    bool WriteProof(const uint256 &hash, const StorageProofDB &proof);
-    bool EraseProof(const uint256 &hash, const StorageProofDB &proof);
-    bool LoadProofs(std::function<void (const uint256 &, const StorageProofDB &)> onCheck);
+    template <class T, const char C>
+    bool EraseObj(const uint256 &hash)
+    {
+        CLevelDBBatch batch;
+        batch.Erase(std::make_pair(C, hash));
+        return WriteBatch(batch);
+    }
+
+    template <class T, const char C>
+    bool LoadObjects(std::function<void (const uint256 &, const T &)> onCheck)
+    {
+        boost::scoped_ptr<leveldb::Iterator> pcursor(NewIterator());
+
+        CDataStream ssKeySet(SER_DISK, CLIENT_VERSION);
+        ssKeySet << make_pair(C, uint256(0));
+        pcursor->Seek(ssKeySet.str());
+
+        CLevelDBBatch batch;
+
+        while (pcursor->Valid()) {
+            boost::this_thread::interruption_point();
+            try {
+                leveldb::Slice slKey = pcursor->key();
+                CDataStream ssKey(slKey.data(), slKey.data() + slKey.size(), SER_DISK, CLIENT_VERSION);
+                std::pair<char, uint256> key{};
+                ssKey >> key;
+                if (key.first == C) {
+                    leveldb::Slice slValue = pcursor->value();
+                    CDataStream ssValue(slValue.data(), slValue.data() + slValue.size(), SER_DISK, CLIENT_VERSION);
+                    T obj;
+                    ssValue >> obj;
+                    onCheck(key.second, obj);
+
+                    pcursor->Next();
+                } else {
+                    break; // if shutdown requested or finished loading
+                }
+            } catch (std::exception& e) {
+                return error("%s : Deserialize or I/O error - %s", __func__, e.what());
+            }
+        }
+
+        return true;
+    }
 };
 
 #endif // BITCOIN_TXDB_H
