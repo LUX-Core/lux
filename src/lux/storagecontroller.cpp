@@ -147,6 +147,37 @@ void StorageController::ProcessStorageMessage(CNode* pfrom, const std::string& s
 //                state->nMisbehavior += 10;
 //            }
         }
+    } else if (strCommand == "dfsalr") { // dfs announcements list request
+        std::vector<OrderHash> hashes;
+        size_t counter = 0;
+        for (auto &&pair : mapAnnouncements) {
+            hashes.push_back(pair.first);
+            if (counter >= MAX_ANNOUNCEMETS_SIZE) {
+                pfrom->PushMessage("dfsal", hashes);
+                hashes.clear();
+                counter = 0;
+            } else {
+                counter++;
+            }
+        }
+        if (counter > 0) {
+            pfrom->PushMessage("dfsal", hashes);
+        }
+    } else if (strCommand == "dfsal") { // dfs announcements list
+        isStorageCommand = true;
+        std::vector<OrderHash> hashes;
+        vRecv >> hashes;
+        std::vector <CInv> vInv;
+        for (auto &&hash : hashes) {
+            if (mapAnnouncements.find(hash) == mapAnnouncements.end()) {
+                std::cout << hash.ToString() << std::endl;
+                CInv inv(MSG_STORAGE_ORDER_ANNOUNCE, hash);
+                vInv.push_back(inv);
+            }
+        }
+        if (vInv.size()) {
+            pfrom->PushMessage("inv", vInv);
+        }
     } else if (strCommand == "dfsping") {
         isStorageCommand = true;
         pfrom->PushMessage("dfspong", pfrom->addr);
@@ -155,6 +186,7 @@ void StorageController::ProcessStorageMessage(CNode* pfrom, const std::string& s
         vRecv >> address;
         address.SetPort(GetListenPort());
         lastCheckIp = std::time(nullptr);
+        pfrom->PushMessage("dfsalr");
     } else if (strCommand == "dfsproposal") {
         isStorageCommand = true;
         StorageProposal proposal;
@@ -277,7 +309,7 @@ void StorageController::AnnounceOrder(const StorageOrder &order)
     }
 
     CInv inv(MSG_STORAGE_ORDER_ANNOUNCE, hash);
-    vector <CInv> vInv;
+    std::vector <CInv> vInv;
     vInv.push_back(inv);
 
     std::vector<CNode*> vNodesCopy;

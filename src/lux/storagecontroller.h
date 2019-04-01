@@ -27,6 +27,8 @@ static const int DEFAULT_STORAGE_MAX_BLOCK_GAP = 100;
 static const uint64_t DEFAULT_STORAGE_SIZE = 100ull * 1024 * 1024 * 1024; // 100 Gb
 static const unsigned short DEFAULT_DFS_PORT = 1507;
 
+static const size_t MAX_ANNOUNCEMETS_SIZE = 100;
+
 class StorageController
 {
     enum BackgroundJobs {
