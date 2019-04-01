@@ -376,6 +376,7 @@ BitcoinApplication::~BitcoinApplication()
         qDebug() << __func__ << ": Stopped thread";
         delete coreThread;
         coreThread = 0;
+        delete pollShutdownTimer;
     }
 
     delete window;
