@@ -94,7 +94,7 @@ void StorageController::ProcessStorageMessage(CNode* pfrom, const std::string& s
         }
         for (auto &&pair : mapAnnouncements) {
             const StorageOrder *order = GetOrder(pair.first);
-            if (!order || (order->time + MAX_WAIT_TIME) > std::time(nullptr)) {
+            if (!order || (order->time + MAX_WAIT_TIME) < std::time(nullptr)) {
                 continue ;
             }
             CInv inv(MSG_STORAGE_ORDER_ANNOUNCE, pair.first);
