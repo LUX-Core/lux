@@ -118,7 +118,7 @@ QVariant LuxgateOpenOrdersModel::data(const QModelIndex &index, int role) const
         auto order = openOrders[index.row()];
 
         if (Luxgate::BidAskRole == role)
-            res = order->IsBid();
+            res = order->IsBuy();
         else if(Luxgate::CopyRowRole == role)
             res =   "Price: " + data(this->index(index.row(), PriceColumn)).toString()
                     + " Base: "  + data(this->index(index.row(), BaseAmountColumn)).toString()
@@ -132,9 +132,9 @@ QVariant LuxgateOpenOrdersModel::data(const QModelIndex &index, int role) const
                 res = GUIUtil::dateTimeStr(createTime);
             }
             else if (TypeColumn == index.column()) {
-                if(order->IsAsk())
+                if(order->IsSell())
                     res = QString("Sell");
-                if(order->IsBid())
+                if(order->IsBuy())
                     res = QString("Buy");
             }
             else if (PriceColumn == index.column()) {
