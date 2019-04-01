@@ -1,4 +1,6 @@
+#include "clientversion.h"
 #include "storageheap.h"
+#include "streams.h"
 #include "uint256.h"
 
 #include <iostream>
@@ -153,4 +155,57 @@ void StorageHeap::SetMerkleRootHash(const uint256& uri, const uint256& merkleRoo
             }
         }
     }
+}
+
+std::vector<unsigned char> StorageHeap::ExportFileMetadata(const uint256& uri)
+{
+    std::shared_ptr<AllocatedFile> file = GetFile(uri);
+    if (file == nullptr) {
+        return {};
+    }
+
+    CDataStream ss(SER_DISK, CLIENT_VERSION);
+    ss << file->fullpath.string()
+       << file->size
+       << file->uri
+       << file->merkleRootHash
+       << file->keys;
+
+    return std::vector<unsigned char>(ss.begin(), ss.end());
+}
+
+void StorageHeap::ImportFileMetadata(std::vector<unsigned char> data)
+{
+    CDataStream ss(data, SER_DISK, CLIENT_VERSION);
+    std::string fullpath;
+    std::shared_ptr<AllocatedFile> file_ptr = std::make_shared<AllocatedFile>();
+    ss >> fullpath
+       >> file_ptr->size
+       >> file_ptr->uri
+       >> file_ptr->merkleRootHash
+       >> file_ptr->keys;
+    file_ptr->fullpath = fullpath;
+
+    if (GetFile(file_ptr->uri) != nullptr) {
+        // file already exist
+        FreeFile(file_ptr->uri);
+    }
+
+    //find chunk
+    unsigned long nChunkIndex = 0;
+    for (auto &&chunk : chunks) {
+        if (file_ptr->fullpath.parent_path() == chunk->path) {
+            break;
+        }
+        nChunkIndex++;
+    }
+
+    if (nChunkIndex == chunks.size()) {
+        // chunk not exist
+        return ;
+    }
+
+    files[file_ptr->uri] = file_ptr;
+    chunks[nChunkIndex]->files.push_back(file_ptr);
+    chunks[nChunkIndex]->freeSpace -= file_ptr->size;
 }

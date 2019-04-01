@@ -111,12 +111,15 @@ public:
     // Replica function
     void DecryptReplica(const uint256 &orderHash, const boost::filesystem::path &decryptedFile);
     // DB functions
-    void LoadOrdersDB();
+    void LoadDataFromDB();
     void AddOrderDB(const StorageOrderDB &orderDB);
+    void LoadOrdersDB();
     void SaveOrderDB(const StorageOrderDB &orderDB);
-    void LoadProofs();
     void AddProof(const StorageProofDB &proof);
+    void LoadProofs();
     void SaveProof(const StorageProofDB &proof);
+    void LoadFileObjsFromDB();
+    bool SaveFileObjToDB(const uint256 &file);
     // Get functions
     std::map<uint256, StorageOrder> GetAnnouncements();
     const StorageOrder *GetOrder(const uint256 &hash);

@@ -44,13 +44,15 @@ public:
     void AddChunk(const boost::filesystem::path& path, uint64_t size);
     void MoveChunk(size_t chunkIndex, const boost::filesystem::path &newpath);
     std::vector<std::shared_ptr<StorageChunk>> GetChunks() const;
-    void FreeChunk(const boost::filesystem::path& path);
+    void FreeChunk(const boost::filesystem::path &path);
     uint64_t MaxAllocateSize() const;
-    std::shared_ptr<AllocatedFile> AllocateFile(const uint256& uri, uint64_t size);
-    void FreeFile(const uint256& uri);
-    std::shared_ptr<AllocatedFile> GetFile(const uint256& uri) const;
-    void SetDecryptionKeys(const uint256& uri, const RSAKey& rsaKey, const AESKey& aesKey);
-    void SetMerkleRootHash(const uint256& uri, const uint256& merkleRootHash); // TODO: add tests (SS)
+    std::shared_ptr<AllocatedFile> AllocateFile(const uint256 &uri, uint64_t size);
+    void FreeFile(const uint256 &uri);
+    std::shared_ptr<AllocatedFile> GetFile(const uint256 &uri) const;
+    void SetDecryptionKeys(const uint256 &uri, const RSAKey &rsaKey, const AESKey &aesKey);
+    void SetMerkleRootHash(const uint256 &uri, const uint256 &merkleRootHash); // TODO: add tests (SS)
+    std::vector<unsigned char> ExportFileMetadata(const uint256& uri);
+    void ImportFileMetadata(std::vector<unsigned char> data);
 };
 
 #endif //LUX_LIB_CRYPTO_STORAGE_HEAP_H

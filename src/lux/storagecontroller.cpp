@@ -283,6 +283,7 @@ void StorageController::ProcessStorageMessage(CNode* pfrom, const std::string& s
                 storageHeap.SetDecryptionKeys(file->uri, keys.rsaKey, keys.aesKey);
                 storageHeap.SetMerkleRootHash(file->uri, receivedMerkleRootHash);
                 fs::rename(tempFile, file->fullpath);
+                SaveFileObjToDB(file->uri);
             }
             LogPrint("dfs", "File \"%s\" was uploaded", order->filename);
             CNode* pNode = FindNode(order->address);
@@ -429,6 +430,13 @@ void StorageController::DecryptReplica(const uint256 &orderHash, const boost::fi
     return ;
 }
 
+void StorageController::LoadDataFromDB()
+{
+    LoadOrdersDB();
+    LoadProofs();
+    LoadFileObjsFromDB();
+}
+
 void StorageController::AddOrderDB(const StorageOrderDB &orderDB)
 {
     mapOrders.insert(std::make_pair(orderDB.merkleRootHash, orderDB));
@@ -461,6 +469,25 @@ void StorageController::LoadProofs()
 void StorageController::SaveProof(const StorageProofDB &proof)
 {
     db->WriteObj<StorageProofDB, DB_PROOF>(proof.GetHash(), proof);
+}
+
+void StorageController::LoadFileObjsFromDB()
+{
+    db->LoadObjects<std::vector<unsigned char>, DB_FILE>([this] (const uint256 &merkleRootHash, const std::vector<unsigned char> &data) {
+        storageHeap.ImportFileMetadata(data);
+    });
+}
+
+bool StorageController::SaveFileObjToDB(const uint256 &uri)
+{
+    std::shared_ptr<AllocatedFile> file = storageHeap.GetFile(uri);
+    if (file == nullptr) {
+        //file not found;
+        return false;
+    }
+    std::vector<unsigned char> data = storageHeap.ExportFileMetadata(uri);
+    db->WriteObj<std::vector<unsigned char>, DB_FILE>(file->merkleRootHash, data);
+    return true;
 }
 
 std::map<uint256, StorageOrder> StorageController::GetAnnouncements()
