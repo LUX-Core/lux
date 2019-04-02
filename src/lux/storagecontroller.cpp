@@ -454,7 +454,6 @@ void StorageController::LoadOrdersDB()
     });
 
     for (auto &&hash : oldOrdersDB) {
-        std::cout << "remove order " << hash.ToString() << std::endl;
         db->EraseObj<StorageOrderDB, DB_ORDER>(hash);
     }
 }
@@ -473,15 +472,21 @@ void StorageController::LoadProofs()
 {
     std::vector<uint256> oldProofDB{};
     db->LoadObjects<StorageProofDB, DB_PROOF>([this, &oldProofDB] (const uint256 &proofHash, const StorageProofDB &proof) {
-        if (proof.time + PROOF_STORAGE_TIME > std::time(nullptr)) {
-            oldProofDB.push_back(proofHash);
-        } else {
+        if (mapProofs.find(proof.merkleRootHash) == mapProofs.end()) {
             mapProofs[proof.merkleRootHash].push_back(proof);
+            return;
+        }
+        StorageProofDB lastProof = mapProofs[proof.merkleRootHash].back();
+        if (lastProof.time < proof.time) {
+            oldProofDB.push_back(lastProof.GetHash());
+            mapProofs[proof.merkleRootHash].pop_back();
+            mapProofs[proof.merkleRootHash].push_back(proof);
+        } else {
+            oldProofDB.push_back(proofHash);
         }
     });
 
     for (auto &&hash : oldProofDB) {
-        std::cout << "remove proof " << hash.ToString() << std::endl;
         db->EraseObj<StorageProofDB, DB_PROOF>(hash);
     }
 }

@@ -30,7 +30,6 @@ static const unsigned short DEFAULT_DFS_PORT = 1507;
 static const size_t MAX_ANNOUNCEMETS_SIZE = 100;
 
 static const int MAX_WAIT_TIME = 60;
-static const int PROOF_STORAGE_TIME = 60;
 
 class StorageController
 {
