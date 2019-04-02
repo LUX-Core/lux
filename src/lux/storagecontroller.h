@@ -30,6 +30,7 @@ static const unsigned short DEFAULT_DFS_PORT = 1507;
 static const size_t MAX_ANNOUNCEMETS_SIZE = 100;
 
 static const int MAX_WAIT_TIME = 60;
+static const int PROOF_STORAGE_TIME = 60;
 
 class StorageController
 {
@@ -119,7 +120,8 @@ public:
     void LoadProofs();
     void SaveProof(const StorageProofDB &proof);
     void LoadFileObjsFromDB();
-    bool SaveFileObjToDB(const uint256 &file);
+    bool SaveFileObjToDB(const uint256 &uri);
+    bool EraseFileObjToDB(const uint256 &uri);
     // Get functions
     std::map<uint256, StorageOrder> GetAnnouncements();
     const StorageOrder *GetOrder(const uint256 &hash);

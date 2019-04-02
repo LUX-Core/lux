@@ -117,7 +117,7 @@ void StorageController::ProcessStorageMessage(CNode* pfrom, const std::string& s
         uint256 hash = order.GetHash();
         if (!GetOrder(hash)) {
             AddOrder(order);
-            if ((order.time + MAX_WAIT_TIME) < std::time(nullptr)) {
+            if ((order.time + MAX_WAIT_TIME) > std::time(nullptr)) {
                 AnnounceOrder(order);
                 uint64_t storageHeapSize = 0;
                 uint64_t tempStorageHeapSize = 0;
@@ -444,9 +444,19 @@ void StorageController::AddOrderDB(const StorageOrderDB &orderDB)
 
 void StorageController::LoadOrdersDB()
 {
-    db->LoadObjects<StorageOrderDB, DB_ORDER>([this] (const MerkleRootHash &merkleRootHash, const StorageOrderDB &orderDB) {
-        mapOrders.insert(std::make_pair(merkleRootHash, orderDB));
+    std::vector<uint256> oldOrdersDB{};
+    db->LoadObjects<StorageOrderDB, DB_ORDER>([this, &oldOrdersDB] (const MerkleRootHash &merkleRootHash, const StorageOrderDB &orderDB) {
+        if (orderDB.storageUntil > std::time(nullptr)) {
+            oldOrdersDB.push_back(merkleRootHash);
+        } else {
+            mapOrders.insert(std::make_pair(merkleRootHash, orderDB));
+        }
     });
+
+    for (auto &&hash : oldOrdersDB) {
+        std::cout << "remove order " << hash.ToString() << std::endl;
+        db->EraseObj<StorageOrderDB, DB_ORDER>(hash);
+    }
 }
 
 void StorageController::SaveOrderDB(const StorageOrderDB &orderDB)
@@ -461,9 +471,19 @@ void StorageController::AddProof(const StorageProofDB &proof)
 
 void StorageController::LoadProofs()
 {
-    db->LoadObjects<StorageProofDB, DB_PROOF>([this] (const uint256 &proofHash, const StorageProofDB &proof) {
-        mapProofs[proof.merkleRootHash].push_back(proof);
+    std::vector<uint256> oldProofDB{};
+    db->LoadObjects<StorageProofDB, DB_PROOF>([this, &oldProofDB] (const uint256 &proofHash, const StorageProofDB &proof) {
+        if (proof.time + PROOF_STORAGE_TIME > std::time(nullptr)) {
+            oldProofDB.push_back(proofHash);
+        } else {
+            mapProofs[proof.merkleRootHash].push_back(proof);
+        }
     });
+
+    for (auto &&hash : oldProofDB) {
+        std::cout << "remove proof " << hash.ToString() << std::endl;
+        db->EraseObj<StorageProofDB, DB_PROOF>(hash);
+    }
 }
 
 void StorageController::SaveProof(const StorageProofDB &proof)
@@ -487,6 +507,17 @@ bool StorageController::SaveFileObjToDB(const uint256 &uri)
     }
     std::vector<unsigned char> data = storageHeap.ExportFileMetadata(uri);
     db->WriteObj<std::vector<unsigned char>, DB_FILE>(file->merkleRootHash, data);
+    return true;
+}
+
+bool StorageController::EraseFileObjToDB(const uint256 &uri)
+{
+    std::shared_ptr<AllocatedFile> file = storageHeap.GetFile(uri);
+    if (file == nullptr) {
+        //file not found;
+        return false;
+    }
+    db->EraseObj<std::vector<unsigned char>, DB_FILE>(file->merkleRootHash);
     return true;
 }
 
