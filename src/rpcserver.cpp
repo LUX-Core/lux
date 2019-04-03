@@ -320,6 +320,15 @@ static const CRPCCommand vRPCCommands[] =
         {"mining", "submitblock", &submitblock, true, true, false},
         {"mining", "reservebalance", &reservebalance, true, true, false},
 
+#ifdef ENABLE_LUXGATE
+        /* Luxgate features */
+        {"luxgate", "listtradepairs", &listtradepairs, true, true, false},
+        {"luxgate", "createorder", &createorder, true, true, false},
+        {"luxgate", "getactivecoins", &getactivecoins, true, true, false},
+        {"luxgate", "listorderbook", &listorderbook, true, true, false},
+        {"luxgate", "getlocalorder", &getlocalorder, true, true, false},
+#endif // ENABLE_LUXGATE
+
 #ifdef ENABLE_WALLET
         /* Coin generation */
 #ifdef ENABLE_CPUMINER
