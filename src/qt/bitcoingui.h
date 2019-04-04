@@ -50,6 +50,7 @@ class QAction;
 class QProgressBar;
 class QProgressDialog;
 class QDockWidget;
+class QTimer;
 QT_END_NAMESPACE
 
 /**
@@ -100,6 +101,7 @@ private:
 #endif
 
     UnitDisplayStatusBarControl* unitDisplayControl;
+    QTimer* timerStakingIcon;
     QLabel* labelStakingIcon;
     QLabel* labelWalletEncryptionIcon;
     QPushButton* pushButtonWalletHDStatusIcon;
@@ -108,7 +110,7 @@ private:
     QPushButton * pushButtonTwitter;
     QPushButton * pushButtonGithub;
     QPushButton * pushButtonDiscord;
-	QPushButton * pushButtonHelp;
+    QPushButton * pushButtonHelp;
     QLabel* labelBlocksIcon;
     QLabel* progressBarLabel;
     QProgressBar* progressBar;
