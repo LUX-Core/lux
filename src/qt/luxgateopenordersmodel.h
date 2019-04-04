@@ -3,6 +3,7 @@
 
 #include "luxgategui_global.h"
 
+#include "luxgate/luxgate.h"
 #include <QAbstractTableModel>
 
 #include <vector>
@@ -19,7 +20,7 @@ public:
 
     enum Columns{   DateColumn = 0, TypeColumn, 
                     PriceColumn,  BaseAmountColumn,
-                    QuoteTotalColumn, CancelColumn,  NColumns };
+                    QuoteTotalColumn, StateColumn, CancelColumn,  NColumns };
     // Header:
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
 
@@ -37,6 +38,7 @@ public slots:
 private:
     Luxgate::Decimals decimals;
     std::vector<std::shared_ptr<const COrder>> openOrders;
+    QString stateToString(const COrder::State state) const;
 };
 
 #endif // LUXGATEOPENORDERSMODEL_H

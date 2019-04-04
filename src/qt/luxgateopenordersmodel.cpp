@@ -1,7 +1,6 @@
 #include "luxgateopenordersmodel.h"
 
 #include "luxgategui_global.h"
-#include "luxgate/luxgate.h"
 #include "guiutil.h"
 
 #include <algorithm>
@@ -89,6 +88,9 @@ QVariant LuxgateOpenOrdersModel::headerData(int section, Qt::Orientation orienta
             case CancelColumn:
                 res = "CANCEL";
                 break;
+            case StateColumn:
+                res = "STATE";
+                break;
         }
     }
     return res;
@@ -123,7 +125,8 @@ QVariant LuxgateOpenOrdersModel::data(const QModelIndex &index, int role) const
             res =   "Price: " + data(this->index(index.row(), PriceColumn)).toString()
                     + " Base: "  + data(this->index(index.row(), BaseAmountColumn)).toString()
                     + " Quote: "  + data(this->index(index.row(), QuoteTotalColumn)).toString()
-                    + " Date: " + data(this->index(index.row(), DateColumn)).toString();
+                    + " Date: " + data(this->index(index.row(), DateColumn)).toString()
+                    + " State: " + data(this->index(index.row(), StateColumn)).toString();
         else if(Qt::EditRole == role ||
                 Qt::DisplayRole == role) {
 
@@ -146,7 +149,29 @@ QVariant LuxgateOpenOrdersModel::data(const QModelIndex &index, int role) const
             else if (QuoteTotalColumn == index.column()) {
                 res = QString(Luxgate::QStrFromAmount(order->Total()));
             }
+            else if (StateColumn == index.column()) {
+                res = QString(stateToString(order->GetState()));
+            }
         }
     }
     return res;
 }
+
+QString LuxgateOpenOrdersModel::stateToString(const COrder::State state) const
+{
+    switch (state) {
+        case COrder::State::INVALID: return QString("Invalid");
+        case COrder::State::NEW: return QString("New");
+        case COrder::State::MATCH_FOUND: return QString("Match found");
+        case COrder::State::SWAP_REQUESTED: return QString("Swap requested");
+        case COrder::State::SWAP_ACK: return QString("Swap acknowledgement sent");
+        case COrder::State::CONTRACT_CREATED: return QString("Contract created");
+        case COrder::State::CONTRACT_ACK: return QString("Contract aknowledgement sent");
+        case COrder::State::REFUNDING: return QString("Refunding");
+        case COrder::State::CONTRACT_VERIFYING: return QString("Verifying contract");
+        case COrder::State::CONTRACT_ACK_VERIFYING: return QString("Verifying contract acknowledgement");
+        case COrder::State::COMPLETE: return QString("Completed");
+        default: return QString("Unknown");
+    };
+}
+
