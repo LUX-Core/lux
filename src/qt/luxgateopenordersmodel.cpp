@@ -38,7 +38,7 @@ void LuxgateOpenOrdersModel::update()
     endResetModel();
 
     beginInsertRows(QModelIndex(), 0, 0);
-    auto orders = orderbook.ConstOrders();
+    auto orders = orderbook.ConstRefOrders();
     for (auto it = orders.begin(); it != orders.end(); ++it) {
         LogPrintf("LuxgateOpenOrdersModel add %s\n", it->second->ToString());
         openOrders.push_back(it->second);
