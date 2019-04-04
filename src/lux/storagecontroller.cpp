@@ -94,17 +94,16 @@ void StorageController::ProcessStorageMessage(CNode* pfrom, const std::string& s
         }
         for (auto &&pair : mapAnnouncements) {
             const StorageOrder *order = GetOrder(pair.first);
-            if (!order || (order->time + MAX_WAIT_TIME) < std::time(nullptr)) {
-                continue ;
-            }
-            CInv inv(MSG_STORAGE_ORDER_ANNOUNCE, pair.first);
-            vInv.push_back(inv);
-            if (counter >= MAX_ANNOUNCEMETS_SIZE) {
-                pfrom->PushMessage("inv", vInv);
-                vInv.clear();
-                counter = 0;
-            } else {
-                counter++;
+            if (!order || (order->time + MAX_WAIT_PROPOSALS_TIME) > std::time(nullptr)) {
+                CInv inv(MSG_STORAGE_ORDER_ANNOUNCE, pair.first);
+                vInv.push_back(inv);
+                if (counter >= MAX_ANNOUNCEMETS_SIZE) {
+                    pfrom->PushMessage("inv", vInv);
+                    vInv.clear();
+                    counter = 0;
+                } else {
+                    counter++;
+                }
             }
         }
         if (counter > 0) {
@@ -117,7 +116,7 @@ void StorageController::ProcessStorageMessage(CNode* pfrom, const std::string& s
         uint256 hash = order.GetHash();
         if (!GetOrder(hash)) {
             AddOrder(order);
-            if ((order.time + MAX_WAIT_TIME) > std::time(nullptr)) {
+            if ((order.time + MAX_WAIT_PROPOSALS_TIME) > std::time(nullptr)) {
                 AnnounceOrder(order);
                 uint64_t storageHeapSize = 0;
                 uint64_t tempStorageHeapSize = 0;
@@ -339,7 +338,7 @@ void StorageController::AnnounceNewOrder(const StorageOrder &order, const boost:
         mapLocalFiles[order.GetHash()] = path;
         proposalsAgent.ListenProposals(order.GetHash());
     }
-    mapTimers[order.GetHash()] = std::make_shared<CancelingSetTimeout>(std::chrono::milliseconds(MAX_WAIT_TIME * 1000),
+    mapTimers[order.GetHash()] = std::make_shared<CancelingSetTimeout>(std::chrono::milliseconds(MAX_WAIT_PROPOSALS_TIME * 1000),
                                                                        nullptr,
                                                                        [this](){ Notify(BackgroundJobs::CHECK_PROPOSALS); });
 }
@@ -632,6 +631,7 @@ void StorageController::StopThreads()
     proposalsManagerThread.join();
     handshakesManagerThread.join();
     pingThread.join();
+    generatingProofsThread.join();
 }
 
 std::shared_ptr<AllocatedFile> StorageController::CreateReplica(const boost::filesystem::path &sourcePath,
@@ -792,7 +792,7 @@ void StorageController::FoundMyIP()
             return ;
         }
 
-        if (!address.IsValid() || !(std::time(nullptr) - lastCheckIp < 3600)) {
+        if (!address.IsValid() || !(std::time(nullptr) - lastCheckIp < DFS_PING_INTERVAL)) {
             std::vector<CNode*> vNodesCopy;
             {
                 LOCK(cs_vNodes);
@@ -806,6 +806,26 @@ void StorageController::FoundMyIP()
 
         boost::this_thread::sleep(boost::posix_time::seconds(1));
 
+    }
+}
+
+void StorageController::GenerateProofs()
+{
+    SetThreadPriority(THREAD_PRIORITY_BELOW_NORMAL);
+    time_t lastCheckProof = std::time(nullptr);
+
+    while (true) {
+        boost::this_thread::interruption_point();
+
+        if (shutdownThreads) {
+            return ;
+        }
+
+        if (!(std::time(nullptr) - lastCheckProof) < CHECK_PROOF_INTERVAL) {
+            lastCheckProof = std::time(nullptr);
+        }
+
+        boost::this_thread::sleep(boost::posix_time::seconds(1));
     }
 }
 

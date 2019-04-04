@@ -27,9 +27,11 @@ static const int DEFAULT_STORAGE_MAX_BLOCK_GAP = 100;
 static const uint64_t DEFAULT_STORAGE_SIZE = 100ull * 1024 * 1024 * 1024; // 100 Gb
 static const unsigned short DEFAULT_DFS_PORT = 1507;
 
-static const size_t MAX_ANNOUNCEMETS_SIZE = 100;
+static const size_t MAX_ANNOUNCEMETS_SIZE = 100;    // 100 announces
 
-static const int MAX_WAIT_TIME = 60;
+static const size_t CHECK_PROOF_INTERVAL    = 60;   // 1 min
+static const size_t MAX_WAIT_PROPOSALS_TIME = 60;   // 1 min
+static const size_t DFS_PING_INTERVAL       = 3600; // 1 hour
 
 class StorageController
 {
@@ -62,6 +64,7 @@ protected:
     time_t lastCheckIp;
 
     boost::thread pingThread;
+    boost::thread generatingProofsThread;
     boost::thread proposalsManagerThread;
     boost::thread handshakesManagerThread;
 
@@ -83,8 +86,10 @@ public:
     CAmount rate;
     int maxblocksgap;
     CAddress address;
+    std::string rewardAddress;
 
     StorageController() : pingThread(boost::bind(&StorageController::FoundMyIP, this)),
+                          generatingProofsThread(boost::bind(&StorageController::GenerateProofs, this)),
                           proposalsManagerThread(boost::bind(&StorageController::ProcessProposalsMessages, this)),
                           handshakesManagerThread(boost::bind(&StorageController::ProcessHandshakesMessages, this)),
                           shutdownThreads(false),
@@ -149,6 +154,7 @@ protected:
     CNode *TryConnectToNode(const CService &address, int maxAttempt = 20);
     void Notify(const StorageController::BackgroundJobs job);
     void FoundMyIP();                   // pingThread
+    void GenerateProofs();              // generatingProofsThread
     void ProcessProposalsMessages();    // proposalsManagerThread
     void ProcessHandshakesMessages();   // handshakesManagerThread
 };

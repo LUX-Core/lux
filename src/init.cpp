@@ -131,6 +131,8 @@ CClientUIInterface uiInterface;
 //
 
 std::atomic<bool> fRequestShutdown(false);
+std::string GenerateDFSRewardAddress();
+std::string LoadDFSRewardAddress();
 
 void StartShutdown()
 {
@@ -1700,6 +1702,10 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
 #else  // ENABLE_WALLET
     LogPrintf("No wallet compiled in!\n");
 #endif // !ENABLE_WALLET
+    storageController->rewardAddress = LoadDFSRewardAddress();
+    if (storageController->rewardAddress == "") {
+        storageController->rewardAddress = GenerateDFSRewardAddress();
+    }
     // ********************************************************* Step 9: import blocks
 
     // if prune mode, unset NODE_NETWORK and prune block files
@@ -1878,4 +1884,38 @@ void UnlockDataDirectory()
 {
     // Try lock and unlock
     LockDataDirectory(true, false);
+}
+
+std::string GenerateDFSRewardAddress()
+{
+    OutputType output_type = g_address_type;
+
+    if (!pwalletMain->IsLocked())
+        pwalletMain->TopUpKeyPool();
+
+    // Generate a new key that is added to wallet
+    CPubKey newKey;
+    if (!pwalletMain->GetKeyFromPool(newKey))
+        throw JSONRPCError(RPC_WALLET_KEYPOOL_RAN_OUT, "Error: Keypool ran out, please call keypoolrefill first");
+
+    CTxDestination dest = GetDestinationForKey(newKey, output_type);
+    pwalletMain->SetAddressBook(dest, "", "dfsreward");
+    return EncodeDestination(dest);
+}
+
+std::string LoadDFSRewardAddress()
+{
+    OutputType output_type = g_address_type;
+
+    std::set<CTxDestination> addresses = pwalletMain->GetAccountAddresses("");
+
+    CTxDestination dest;
+    for (auto &&address : addresses) {
+        if (pwalletMain->mapAddressBook.find(address) != pwalletMain->mapAddressBook.end() &&
+            pwalletMain->mapAddressBook[address].purpose == "dfsreward") {
+            return EncodeDestination(address);
+        }
+    }
+
+    return "";
 }
