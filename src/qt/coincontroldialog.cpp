@@ -142,6 +142,18 @@ CoinControlDialog::CoinControlDialog(const PlatformStyle *platformStyle, QWidget
     // Toggle lock state
     connect(ui->pushButtonToggleLock, SIGNAL(clicked()), this, SLOT(buttonToggleLockClicked()));
 
+    //selection of first 50 inputs
+    connect(ui->select_50, SIGNAL(clicked()), this, SLOT(select_50()));
+
+    //selection of first 100 inputs
+    connect(ui->select_100, SIGNAL(clicked()), this, SLOT(select_100()));
+
+    //selection of first 200 inputs
+    connect(ui->select_200, SIGNAL(clicked()), this, SLOT(select_200()));
+
+   //selection of first 300 inputs
+    connect(ui->select_300, SIGNAL(clicked()), this, SLOT(select_300()));
+
     // change coin control first column label due Qt4 bug.
     // see https://github.com/bitcoin/bitcoin/issues/5716
     ui->treeWidget->headerItem()->setText(COLUMN_CHECKBOX, QString());
@@ -241,7 +253,7 @@ void CoinControlDialog::buttonBoxClicked(QAbstractButton* button)
 // (un)select all
 void CoinControlDialog::buttonSelectAllClicked()
 {
-    Qt::CheckState state = Qt::Checked;
+ Qt::CheckState state = Qt::Checked;
     for (int i = 0; i < ui->treeWidget->topLevelItemCount(); i++) {
         if (ui->treeWidget->topLevelItem(i)->checkState(COLUMN_CHECKBOX) != Qt::Unchecked) {
             state = Qt::Unchecked;
@@ -257,6 +269,94 @@ void CoinControlDialog::buttonSelectAllClicked()
         coinControl->UnSelectAll(); // just to be sure
     CoinControlDialog::updateLabels(model, this);
     CheckDialogLablesUpdated();
+}
+
+void CoinControlDialog::select_50() //select the first 50 inputs 
+{
+if (ui->radioListMode->isChecked()) {
+    Qt::CheckState state = Qt::Checked;
+        ui->treeWidget->setEnabled(false);
+            for (int i = 0; i < 50; i++)
+                if (ui->treeWidget->topLevelItem(i)->checkState(COLUMN_CHECKBOX) != state)
+                ui->treeWidget->topLevelItem(i)->setCheckState(COLUMN_CHECKBOX, state);
+    ui->treeWidget->setEnabled(true);
+    if (state == Qt::Unchecked)
+        coinControl->UnSelectAll(); // just to be sure
+    CoinControlDialog::updateLabels(model, this);
+    CheckDialogLablesUpdated();
+        } else {
+        QMessageBox msgBox;
+        msgBox.setObjectName("lockMessageBox");
+        msgBox.setStyleSheet(GUIUtil::loadStyleSheet());
+        msgBox.setText(tr("Please switch to \"List mode\" to use this function."));
+        msgBox.exec();
+    }
+}
+
+void CoinControlDialog::select_100() //select the first 100 inputs 
+{
+if (ui->radioListMode->isChecked()) {
+    Qt::CheckState state = Qt::Checked;
+        ui->treeWidget->setEnabled(false);
+            for (int i = 0; i < 100; i++)
+                if (ui->treeWidget->topLevelItem(i)->checkState(COLUMN_CHECKBOX) != state)
+                ui->treeWidget->topLevelItem(i)->setCheckState(COLUMN_CHECKBOX, state);
+    ui->treeWidget->setEnabled(true);
+    if (state == Qt::Unchecked)
+        coinControl->UnSelectAll(); // just to be sure
+    CoinControlDialog::updateLabels(model, this);
+    CheckDialogLablesUpdated();
+        } else {
+        QMessageBox msgBox;
+        msgBox.setObjectName("lockMessageBox");
+        msgBox.setStyleSheet(GUIUtil::loadStyleSheet());
+        msgBox.setText(tr("Please switch to \"List mode\" to use this function."));
+        msgBox.exec();
+    }
+}
+
+void CoinControlDialog::select_200() //select the first 200 inputs 
+{
+if (ui->radioListMode->isChecked()) {
+    Qt::CheckState state = Qt::Checked;
+        ui->treeWidget->setEnabled(false);
+            for (int i = 0; i < 200; i++)
+                if (ui->treeWidget->topLevelItem(i)->checkState(COLUMN_CHECKBOX) != state)
+                ui->treeWidget->topLevelItem(i)->setCheckState(COLUMN_CHECKBOX, state);
+    ui->treeWidget->setEnabled(true);
+    if (state == Qt::Unchecked)
+        coinControl->UnSelectAll(); // just to be sure
+    CoinControlDialog::updateLabels(model, this);
+    CheckDialogLablesUpdated();
+        } else {
+        QMessageBox msgBox;
+        msgBox.setObjectName("lockMessageBox");
+        msgBox.setStyleSheet(GUIUtil::loadStyleSheet());
+        msgBox.setText(tr("Please switch to \"List mode\" to use this function."));
+        msgBox.exec();
+    }
+}
+
+void CoinControlDialog::select_300() //select the first 300 inputs 
+{
+if (ui->radioListMode->isChecked()) {
+    Qt::CheckState state = Qt::Checked;
+        ui->treeWidget->setEnabled(false);
+            for (int i = 0; i < 300; i++)
+                if (ui->treeWidget->topLevelItem(i)->checkState(COLUMN_CHECKBOX) != state)
+                ui->treeWidget->topLevelItem(i)->setCheckState(COLUMN_CHECKBOX, state);
+    ui->treeWidget->setEnabled(true);
+    if (state == Qt::Unchecked)
+        coinControl->UnSelectAll(); // just to be sure
+    CoinControlDialog::updateLabels(model, this);
+    CheckDialogLablesUpdated();
+        } else {
+        QMessageBox msgBox;
+        msgBox.setObjectName("lockMessageBox");
+        msgBox.setStyleSheet(GUIUtil::loadStyleSheet());
+        msgBox.setText(tr("Please switch to \"List mode\" to use this function."));
+        msgBox.exec();
+    }
 }
 
 // Toggle lock state
