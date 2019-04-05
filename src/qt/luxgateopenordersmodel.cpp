@@ -20,13 +20,9 @@ LuxgateOpenOrdersModel::LuxgateOpenOrdersModel(const Luxgate::Decimals & decimal
     auto orders = orderbook.ConstRefOrders();
     for (auto it = orders.begin(); it != orders.end(); ++it) {
         LogPrintf("LuxgateOpenOrdersModel add %s\n", it->second->ToString());
-        openOrders.push_back(it->second);
+        openOrders.insert(it->second);
     }
     endInsertRows();
-
-    std::sort(openOrders.begin(), openOrders.end(),
-              [](std::shared_ptr<const COrder> a, std::shared_ptr<const COrder> b)
-              { return a->OrderCreationTime() > b->OrderCreationTime(); });
 
     orderbook.subscribeOrdersChange(std::bind(&LuxgateOpenOrdersModel::updateRow, this, std::placeholders::_1, std::placeholders::_2));
     orderbook.subscribeOrderAdded(std::bind(&LuxgateOpenOrdersModel::addRow, this, std::placeholders::_1));
@@ -38,7 +34,7 @@ void LuxgateOpenOrdersModel::addRow(std::shared_ptr<COrder> order)
 {
     LogPrintf("LuxgateOpenOrdersModel addRow %s\n", order->ToString());
     beginInsertRows(QModelIndex(), 0, 0);
-    openOrders.insert(openOrders.begin(), order);
+    openOrders.insert(order);
     endInsertRows();
 }
 
@@ -64,12 +60,14 @@ void LuxgateOpenOrdersModel::updateRow(const OrderId& id, COrder::State state)
     for (auto it = openOrders.begin(); it != openOrders.end(); it++) {
         if ((*it)->ComputeId() == id) {
             auto porder = *it;
-            *it = std::make_shared<const COrder>(porder->Base(),
-                                                 porder->Rel(),
-                                                 porder->BaseAmount(),
-                                                 porder->Price(),
-                                                 porder->OrderCreationTime(),
-                                                 state);
+            openOrders.erase(it);
+            openOrders.insert(std::make_shared<const COrder>(porder->Base(),
+                                                             porder->Rel(),
+                                                             porder->BaseAmount(),
+                                                             porder->Price(),
+                                                             porder->OrderCreationTime(),
+                                                             state));
+
             auto stateCell = index(i, StateColumn);
             emit QAbstractItemModel::dataChanged(stateCell, stateCell, { Luxgate::BidAskRole, Qt::DisplayRole });
             break;
@@ -154,7 +152,9 @@ QVariant LuxgateOpenOrdersModel::data(const QModelIndex &index, int role) const
     QVariant res;
 
     if (index.isValid()) {
-        auto order = openOrders[index.row()];
+        auto it = openOrders.cbegin();
+        std::advance(it, index.row());
+        auto order = *it;
 
         if (Luxgate::BidAskRole == role)
             res = order->IsBuy();

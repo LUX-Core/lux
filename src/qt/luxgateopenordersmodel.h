@@ -6,8 +6,8 @@
 #include "luxgate/luxgate.h"
 #include <QAbstractTableModel>
 
-#include <vector>
 #include <memory>
+#include <set>
 
 class COrder;
 
@@ -39,7 +39,14 @@ public slots:
     void reset();
 private:
     Luxgate::Decimals decimals;
-    std::vector<std::shared_ptr<const COrder>> openOrders;
+    struct NewestOrderComparator
+    {
+        bool operator()(const std::shared_ptr<const COrder>& a, const std::shared_ptr<const COrder>& b)
+        {
+            return *a != *b && a->OrderCreationTime() > b->OrderCreationTime();
+        }
+    };
+    std::set<std::shared_ptr<const COrder>, NewestOrderComparator> openOrders;
     QString stateToString(const COrder::State state) const;
 };
 
