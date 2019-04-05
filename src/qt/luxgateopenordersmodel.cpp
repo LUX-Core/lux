@@ -15,26 +15,6 @@ LuxgateOpenOrdersModel::LuxgateOpenOrdersModel(const Luxgate::Decimals & decimal
       decimals(decimals)
 {
     qRegisterMetaType<QVector<int>>();
-    update();
-    orderbook.subscribeOrdersChange(std::bind(&LuxgateOpenOrdersModel::update, this));
-    orderbook.subscribeOrderAdded(std::bind(&LuxgateOpenOrdersModel::addRow, this, std::placeholders::_1));
-}
-
-void LuxgateOpenOrdersModel::addRow(std::shared_ptr<COrder> order)
-{
-    LogPrintf("LuxgateOpenOrdersModel addRow %s\n", order->ToString());
-    beginInsertRows(QModelIndex(), 0, 0);
-    openOrders.insert(openOrders.begin(), order);
-    endInsertRows();
-}
-
-void LuxgateOpenOrdersModel::update()
-{
-    LogPrintf("LuxgateOpenOrdersModel UPDATE\n");
-
-    beginResetModel();
-    openOrders.clear();
-    endResetModel();
 
     beginInsertRows(QModelIndex(), 0, 0);
     auto orders = orderbook.ConstRefOrders();
@@ -47,6 +27,63 @@ void LuxgateOpenOrdersModel::update()
     std::sort(openOrders.begin(), openOrders.end(),
               [](std::shared_ptr<const COrder> a, std::shared_ptr<const COrder> b)
               { return a->OrderCreationTime() > b->OrderCreationTime(); });
+
+    orderbook.subscribeOrdersChange(std::bind(&LuxgateOpenOrdersModel::updateRow, this, std::placeholders::_1, std::placeholders::_2));
+    orderbook.subscribeOrderAdded(std::bind(&LuxgateOpenOrdersModel::addRow, this, std::placeholders::_1));
+    orderbook.subscribeOrderDeleted(std::bind(&LuxgateOpenOrdersModel::deleteRow, this, std::placeholders::_1));
+    orderbook.subscribeOrderbookCleared(std::bind(&LuxgateOpenOrdersModel::reset, this));
+}
+
+void LuxgateOpenOrdersModel::addRow(std::shared_ptr<COrder> order)
+{
+    LogPrintf("LuxgateOpenOrdersModel addRow %s\n", order->ToString());
+    beginInsertRows(QModelIndex(), 0, 0);
+    openOrders.insert(openOrders.begin(), order);
+    endInsertRows();
+}
+
+void LuxgateOpenOrdersModel::deleteRow(const OrderId& id)
+{
+    LogPrintf("LuxgateOpenOrdersModel deleteRow %s\n", OrderIdToString(id));
+    int i = 0;
+    for (auto it = openOrders.cbegin(); it != openOrders.cend(); it++) {
+        if ((*it)->ComputeId() == id) {
+            beginRemoveRows(QModelIndex(), i, i);
+            openOrders.erase(it);
+            endRemoveRows();
+            break;
+        }
+        ++i;
+    }
+}
+
+void LuxgateOpenOrdersModel::updateRow(const OrderId& id, COrder::State state)
+{
+    LogPrintf("LuxgateOpenOrdersModel updateRow %s %u\n", OrderIdToString(id), (uint64_t) state);
+    int i = 0;
+    for (auto it = openOrders.begin(); it != openOrders.end(); it++) {
+        if ((*it)->ComputeId() == id) {
+            auto porder = *it;
+            *it = std::make_shared<const COrder>(porder->Base(),
+                                                 porder->Rel(),
+                                                 porder->BaseAmount(),
+                                                 porder->Price(),
+                                                 porder->OrderCreationTime(),
+                                                 state);
+            auto stateCell = index(i, StateColumn);
+            emit QAbstractItemModel::dataChanged(stateCell, stateCell, { Luxgate::BidAskRole, Qt::DisplayRole });
+            break;
+        }
+        ++i;
+    }
+}
+
+void LuxgateOpenOrdersModel::reset()
+{
+    LogPrintf("LuxgateOpenOrdersModel reset\n");
+    beginResetModel();
+    openOrders.clear();
+    endResetModel();
 }
 
 Qt::ItemFlags LuxgateOpenOrdersModel::flags(const QModelIndex &index) const
