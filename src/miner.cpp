@@ -400,15 +400,11 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
     //then it won't get populated
     RebuildRefundTransaction();
 
-/*
-
     if (fProofOfStake && bceResult.refundOutputs.size()) {
         // SC txs are not processed in PoS blocks
         LogPrintf("%s: PoS Block generation skipped due to %zu SC refund\n", __func__, bceResult.refundOutputs.size());
         return nullptr;
     }
-  
-*/
     ////////////////////////////////////////////////////////
 
     pblocktemplate->vchCoinbaseCommitment = GenerateCoinbaseCommitment(*pblock, pindexPrev, chainparams.GetConsensus(), fProofOfStake);
