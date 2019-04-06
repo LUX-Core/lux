@@ -2569,11 +2569,19 @@ MultiSend: %1</translation>
     </message>
     <message>
         <source>Last Seen</source>
-        <translation type="unfinished"></translation>
+        <translation>Dernier contact</translation>
     </message>
     <message>
         <source>Pubkey</source>
         <translation>Pubkey</translation>
+    </message>
+    <message>
+        <source>Filter List:</source>
+        <translation>Filtrer Liste :</translation>
+    </message>
+    <message>
+        <source>Filter masternode list</source>
+        <translation>Filtrer la liste de Masternodes</translation>
     </message>
     <message>
         <source>Masternodes Activated:</source>
@@ -2638,6 +2646,14 @@ MultiSend: %1</translation>
     <message>
         <source>&amp;Stop All</source>
         <translation>Arrêter t&amp;out</translation>
+    </message>
+    <message>
+        <source>yes</source>
+        <translation>oui</translation>
+    </message>
+    <message>
+        <source>no</source>
+        <translation>non</translation>
     </message>
 </context>
 <context>
