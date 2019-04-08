@@ -36,6 +36,7 @@ void LuxgateOpenOrdersModel::addRow(std::shared_ptr<COrder> order)
     beginInsertRows(QModelIndex(), 0, 0);
     openOrders.insert(order);
     endInsertRows();
+    emit rowAdded();
 }
 
 void LuxgateOpenOrdersModel::deleteRow(const OrderId& id)

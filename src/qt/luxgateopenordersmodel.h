@@ -37,6 +37,8 @@ public slots:
     void addRow(std::shared_ptr<COrder>);
     void deleteRow(const OrderId&);
     void reset();
+signals:
+    void rowAdded();
 private:
     Luxgate::Decimals decimals;
     struct NewestOrderComparator

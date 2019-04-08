@@ -28,7 +28,7 @@ void LuxgateOpenOrdersPanel::setModel(WalletModel *model)
     OptionsModel * opt_model = wal_model->getOptionsModel();
     //init tableview
     {
-        auto tableModel =new LuxgateOpenOrdersModel(opt_model->getLuxgateDecimals(), this);
+        auto tableModel = new LuxgateOpenOrdersModel(opt_model->getLuxgateDecimals(), this);
         ui->tableViewOpenOrders->setModel(tableModel);
         QHeaderView * HeaderView = ui->tableViewOpenOrders->horizontalHeader();
         HeaderView->setSectionResizeMode(QHeaderView::Stretch);
@@ -36,6 +36,8 @@ void LuxgateOpenOrdersPanel::setModel(WalletModel *model)
         HeaderView->setFixedHeight(30);
         connect(opt_model, &OptionsModel::luxgateDecimalsChanged,
                 tableModel, &LuxgateOpenOrdersModel::slotSetDecimals);
+        connect(tableModel, &LuxgateOpenOrdersModel::rowAdded,
+                this, &LuxgateOpenOrdersPanel::updateButtonsCancel);
         updateButtonsCancel();
 
         ui->tableViewOpenOrders->setItemDelegateForColumn(LuxgateOpenOrdersModel::PriceColumn,

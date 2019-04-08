@@ -20,9 +20,9 @@ public:
 private:
     Ui::LuxgateOpenOrdersPanel *ui;
     WalletModel * wal_model;
-    void updateButtonsCancel();
 private slots:
     void slotCancelClicked();
+    void updateButtonsCancel();
 };
 
 #endif // LUXGATEOPENORDERSPANEL_H
