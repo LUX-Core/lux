@@ -18,9 +18,9 @@ class LuxgateOpenOrdersModel : public QAbstractTableModel
 public:
     explicit LuxgateOpenOrdersModel(const Luxgate::Decimals & decimals, QObject *parent = nullptr);
 
-    enum Columns{   DateColumn = 0, TypeColumn, 
-                    PriceColumn,  BaseAmountColumn,
-                    QuoteTotalColumn, StateColumn, CancelColumn,  NColumns };
+    enum Columns { DateColumn = 0, IdColumn, TypeColumn, 
+                   PriceColumn, BaseAmountColumn, QuoteTotalColumn,
+                   StateColumn, CancelColumn, NColumns };
     // Header:
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
 

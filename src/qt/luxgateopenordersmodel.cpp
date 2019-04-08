@@ -99,13 +99,11 @@ void LuxgateOpenOrdersModel::slotSetDecimals(const Luxgate::Decimals & decimals_
 QVariant LuxgateOpenOrdersModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
     QVariant res;
-    if (Qt::Horizontal == orientation
-        &&
-        Qt::DisplayRole == role)
-    {
-        switch(section)
-
-        {
+    if (Qt::Horizontal == orientation && Qt::DisplayRole == role) {
+        switch(section) {
+            case IdColumn:
+                res = "ID";
+                break;
             case DateColumn:
                 res = "DATE";
                 break;
@@ -161,6 +159,7 @@ QVariant LuxgateOpenOrdersModel::data(const QModelIndex &index, int role) const
             res = order->IsBuy();
         else if(Luxgate::CopyRowRole == role)
             res =   "Price: " + data(this->index(index.row(), PriceColumn)).toString()
+                    + " ID: " + data(this->index(index.row(), IdColumn)).toString()
                     + " Base: "  + data(this->index(index.row(), BaseAmountColumn)).toString()
                     + " Quote: "  + data(this->index(index.row(), QuoteTotalColumn)).toString()
                     + " Date: " + data(this->index(index.row(), DateColumn)).toString()
@@ -189,6 +188,9 @@ QVariant LuxgateOpenOrdersModel::data(const QModelIndex &index, int role) const
             }
             else if (StateColumn == index.column()) {
                 res = QString(stateToString(order->GetState()));
+            }
+            else if (IdColumn == index.column()) {
+                res = QString::fromStdString(OrderIdToString(order->ComputeId()));
             }
         }
     }

@@ -27,31 +27,32 @@ LuxgateTableView::LuxgateTableView(QWidget *parent):
                 sigMapper->setMapping(action, iCol);
             };
 
-    for(int i=0; i<nPossibleColumns; i++)
-    {
-        switch(i)
-        {
+    for (int i = 0; i < nPossibleColumns; i++){
+        switch (i) {
         case RowsAction:
             copyTableValuesMenu->addAction(tr("Copy selected Rows"), this, SLOT(slotCopyRows()));
-        break;
+            break;
         case SeparatorAction:
             copyTableValuesMenu->addSeparator();
-        break;
+            break;
         case PriceColumn:
             addAction(PriceColumn, tr("Copy Price"));
-        break;
+            break;
         case BaseAmountColumn:
             addAction(BaseAmountColumn, tr("Copy Amount"));
-        break;
+            break;
         case QuoteTotalColumn:
             addAction(QuoteTotalColumn, tr("Copy Total"));
-        break;
+            break;
         case DateOpenOrderColumn:
             addAction(DateOpenOrderColumn, tr("Copy Open Date"));
-        break;
+            break;
         case DateCloseOrderColumn:
             addAction(DateCloseOrderColumn, tr("Copy Close Date"));
-        break;
+            break;
+        case IdColumn:
+            addAction(IdColumn, tr("Copy Order ID"));
+            break;
         }
     }
 
@@ -76,7 +77,7 @@ void LuxgateTableView::copy(bool bRow, int iCol)
     QStringList copyData;
 
     int role = Qt::DisplayRole;
-    if(bRow)
+    if (bRow)
         role = Luxgate::CopyRowRole;
     for (int i = 0; i < selectedRows.count(); i++)
         copyData << selectedRows[i].data(role).toString();

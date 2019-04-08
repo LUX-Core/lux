@@ -44,10 +44,11 @@ void LuxgateOpenOrdersPanel::setModel(WalletModel *model)
                                                        new LuxgatePriceDelegate(this));
 
         ui->tableViewOpenOrders->setCopyColumns(QMap<int, int>{
-                {LuxgateTableView::PriceColumn, LuxgateOpenOrdersModel::PriceColumn},
-                {LuxgateTableView::BaseAmountColumn, LuxgateOpenOrdersModel::BaseAmountColumn},
-                {LuxgateTableView::QuoteTotalColumn, LuxgateOpenOrdersModel::QuoteTotalColumn},
-                {LuxgateTableView::DateOpenOrderColumn, LuxgateOpenOrdersModel::DateColumn}});
+                { LuxgateTableView::IdColumn, LuxgateOpenOrdersModel::IdColumn },
+                { LuxgateTableView::PriceColumn, LuxgateOpenOrdersModel::PriceColumn },
+                { LuxgateTableView::BaseAmountColumn, LuxgateOpenOrdersModel::BaseAmountColumn },
+                { LuxgateTableView::QuoteTotalColumn, LuxgateOpenOrdersModel::QuoteTotalColumn },
+                { LuxgateTableView::DateOpenOrderColumn, LuxgateOpenOrdersModel::DateColumn }});
     }
 
 }
@@ -64,7 +65,7 @@ void LuxgateOpenOrdersPanel::updateButtonsCancel()
     auto buttonsList = ui->tableViewOpenOrders->findChildren<QPushButton *>();
     foreach(auto but, buttonsList)
         but->deleteLater();
-    for(int iR=0; iR<tableModel->rowCount(); iR++) {
+    for (int iR = 0; iR < tableModel->rowCount(); iR++) {
         auto button = new QPushButton(this);
         button->setText("Cancel");
         button->setIcon(QIcon(":/icons/quit"));
