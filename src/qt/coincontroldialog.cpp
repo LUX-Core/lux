@@ -34,8 +34,8 @@
 #include <QStringList>
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
-
 using namespace std;
+int sort;
 QList<CAmount> CoinControlDialog::payAmounts;
 int CoinControlDialog::nSplitBlockDummy;
 CCoinControl* CoinControlDialog::coinControl = new CCoinControl();
@@ -122,6 +122,8 @@ CoinControlDialog::CoinControlDialog(const PlatformStyle *platformStyle, QWidget
     connect(ui->radioTreeMode, SIGNAL(toggled(bool)), this, SLOT(radioTreeMode(bool)));
     connect(ui->radioListMode, SIGNAL(toggled(bool)), this, SLOT(radioListMode(bool)));
 
+
+
     // click on checkbox
     connect(ui->treeWidget, SIGNAL(itemChanged(QTreeWidgetItem*, int)), this, SLOT(viewItemChanged(QTreeWidgetItem*, int)));
 
@@ -142,6 +144,23 @@ CoinControlDialog::CoinControlDialog(const PlatformStyle *platformStyle, QWidget
     // Toggle lock state
     connect(ui->pushButtonToggleLock, SIGNAL(clicked()), this, SLOT(buttonToggleLockClicked()));
 
+    //selection of first 50 inputs
+    connect(ui->select_50, SIGNAL(clicked()), this, SLOT(select_50()));
+
+    //selection of first 100 inputs
+    connect(ui->select_100, SIGNAL(clicked()), this, SLOT(select_100()));
+
+    //selection of first 250 inputs
+    connect(ui->select_250, SIGNAL(clicked()), this, SLOT(select_250()));
+
+    connect(ui->advanced, SIGNAL(clicked(bool)), this, SLOT(toggled(bool)));
+    
+    connect(ui->GreaterThan, SIGNAL(clicked()), this, SLOT(greater()));
+
+    connect(ui->LessThan, SIGNAL(clicked()), this, SLOT(Less()));
+
+    connect(ui->EqualTo, SIGNAL(clicked()), this, SLOT(Equal()));
+
     // change coin control first column label due Qt4 bug.
     // see https://github.com/bitcoin/bitcoin/issues/5716
     ui->treeWidget->headerItem()->setText(COLUMN_CHECKBOX, QString());
@@ -159,6 +178,14 @@ CoinControlDialog::CoinControlDialog(const PlatformStyle *platformStyle, QWidget
     ui->treeWidget->setColumnHidden(COLUMN_VOUT_INDEX, true);     // store vout index in this column, but dont show it
     ui->treeWidget->setColumnHidden(COLUMN_PRIORITY_INT64, true);
     ui->treeWidget->setColumnHidden(COLUMN_DATE_INT64, true);     // store date int64 in this column, but dont show it
+    ui->num_box->setRange(1, 9999);
+    ui->select_50->setVisible(false);
+    ui->select_100->setVisible(false);
+    ui->select_250->setVisible(false);
+    ui->GreaterThan->setVisible(false);
+    ui->LessThan->setVisible(false);
+    ui->EqualTo->setVisible(false);
+    ui->num_box->setVisible(false);
 
     // default view is sorted by amount desc
     sortView(COLUMN_AMOUNT, Qt::DescendingOrder);
@@ -241,7 +268,7 @@ void CoinControlDialog::buttonBoxClicked(QAbstractButton* button)
 // (un)select all
 void CoinControlDialog::buttonSelectAllClicked()
 {
-    Qt::CheckState state = Qt::Checked;
+ Qt::CheckState state = Qt::Checked;
     for (int i = 0; i < ui->treeWidget->topLevelItemCount(); i++) {
         if (ui->treeWidget->topLevelItem(i)->checkState(COLUMN_CHECKBOX) != Qt::Unchecked) {
             state = Qt::Unchecked;
@@ -257,6 +284,190 @@ void CoinControlDialog::buttonSelectAllClicked()
         coinControl->UnSelectAll(); // just to be sure
     CoinControlDialog::updateLabels(model, this);
     CheckDialogLablesUpdated();
+}
+
+void CoinControlDialog::HideInputAutoSelection()
+{
+
+    ui->select_50->setVisible(false);
+    ui->select_100->setVisible(false);
+    ui->select_250->setVisible(false);
+    ui->GreaterThan->setVisible(false);
+    ui->LessThan->setVisible(false);
+    ui->EqualTo->setVisible(false);
+    ui->num_box->setVisible(false);
+}
+
+void CoinControlDialog::ShowInputAutoSelection()
+{
+
+    ui->select_50->setVisible(true);
+    ui->select_100->setVisible(true);
+    ui->select_250->setVisible(true);
+    ui->GreaterThan->setVisible(true);
+    ui->LessThan->setVisible(true);
+    ui->EqualTo->setVisible(true);
+    ui->num_box->setVisible(true);
+
+}
+
+
+void CoinControlDialog::greater()// select all inputs grater than "amount"
+{
+int val = ui->num_box->value();   
+Qt::CheckState state = Qt::Checked;  
+ui->treeWidget->setEnabled(true);
+            for (int i = 0; i < ui->treeWidget->topLevelItemCount(); i++) {
+            QTreeWidgetItem* item = ui->treeWidget->topLevelItem(i);
+            double value = item->text(COLUMN_AMOUNT).toDouble();
+    if (value > val) {
+            if (ui->treeWidget->topLevelItem(i)->checkState(COLUMN_CHECKBOX) != state)
+            ui->treeWidget->topLevelItem(i)->setCheckState(COLUMN_CHECKBOX, state);
+            ui->treeWidget->setEnabled(true);
+                if (state == Qt::Unchecked)
+                    coinControl->UnSelectAll();
+                    ui->treeWidget->setEnabled(true);
+                    CoinControlDialog::updateLabels(model, this);
+                    CheckDialogLablesUpdated();
+        }
+    } 
+} 
+
+void CoinControlDialog::Less()//select all inputs Less than "amount"
+{
+int val = ui->num_box->value();   
+Qt::CheckState state = Qt::Checked;  
+ui->treeWidget->setEnabled(true);
+            for (int i = 0; i < ui->treeWidget->topLevelItemCount(); i++) {
+            QTreeWidgetItem* item = ui->treeWidget->topLevelItem(i);
+            double value = item->text(COLUMN_AMOUNT).toDouble();
+    if (value < val) {
+            if (ui->treeWidget->topLevelItem(i)->checkState(COLUMN_CHECKBOX) != state)
+            ui->treeWidget->topLevelItem(i)->setCheckState(COLUMN_CHECKBOX, state);
+            ui->treeWidget->setEnabled(true);
+                if (state == Qt::Unchecked)
+                    coinControl->UnSelectAll();
+                    ui->treeWidget->setEnabled(true);
+                    CoinControlDialog::updateLabels(model, this);
+                    CheckDialogLablesUpdated();
+        }
+    } 
+}
+
+
+void CoinControlDialog::Equal() // select all inputs equal to "amount"
+{
+            QMessageBox msgBox;
+        msgBox.setObjectName("lockMessageBdox");
+        msgBox.setStyleSheet(GUIUtil::loadStyleSheet());
+        msgBox.setText(tr("pree"));
+        msgBox.exec();
+double round;
+double val = ui->num_box->value();  
+Qt::CheckState state = Qt::Checked;  
+ui->treeWidget->setEnabled(true);
+
+            for (int i = 0; i < ui->treeWidget->topLevelItemCount(); i++) {
+            QTreeWidgetItem* item = ui->treeWidget->topLevelItem(i);
+            double value = item->text(COLUMN_AMOUNT).toDouble();
+            int log = 0;
+adjusted:
+if (val > value){round = val - value; log++;}//since we can't compare "value" and "val" directly we minus the 2 and get the difference
+if (val < value){round = value - val; log++;}
+if (log == 0) { // in the event that the input and "val" are equal add a small amount and go through the sorting process again
+val = val +0.001;
+log++;
+goto adjusted;
+}
+    if (round < 0.01) { // if are input and "val" are within 0.01 of each other
+                QMessageBox msgBox;
+        msgBox.setObjectName("lockMessaewgeBox");
+        msgBox.setStyleSheet(GUIUtil::loadStyleSheet());
+        msgBox.setText(tr("if"));
+        msgBox.exec();
+            if (ui->treeWidget->topLevelItem(i)->checkState(COLUMN_CHECKBOX) != state)
+            ui->treeWidget->topLevelItem(i)->setCheckState(COLUMN_CHECKBOX, state);
+            ui->treeWidget->setEnabled(true);
+                if (state == Qt::Unchecked)
+                    coinControl->UnSelectAll();
+                    CoinControlDialog::updateLabels(model, this);
+                    CheckDialogLablesUpdated();
+        }
+    } 
+}
+
+void CoinControlDialog::select_50() //select the first 50 inputs 
+{
+if (ui->treeWidget->topLevelItemCount() > 49){ //check we have more then 50 inputs 
+
+        Qt::CheckState state = Qt::Checked;   
+            ui->treeWidget->setEnabled(false);
+                for (int i = 0; i < 50; i++)
+                    if (ui->treeWidget->topLevelItem(i)->checkState(COLUMN_CHECKBOX) != state)
+                    ui->treeWidget->topLevelItem(i)->setCheckState(COLUMN_CHECKBOX, state);
+        ui->treeWidget->setEnabled(true);
+        if (state == Qt::Unchecked)
+            coinControl->UnSelectAll(); // just to be sure
+        CoinControlDialog::updateLabels(model, this);
+        CheckDialogLablesUpdated();
+            
+                }else { //if we have less then 50 inputs give the user dialogue to inform them of this issue  
+                QMessageBox msgBox;
+                msgBox.setObjectName("lockMessageBox");
+                msgBox.setStyleSheet(GUIUtil::loadStyleSheet());
+                msgBox.setText(tr("Please have at least 50 inputs to use this function."));
+                msgBox.exec();
+                }
+}
+
+void CoinControlDialog::select_100()
+{
+ 
+if (ui->treeWidget->topLevelItemCount() > 99){  
+
+        Qt::CheckState state = Qt::Checked;
+            ui->treeWidget->setEnabled(false);
+                for (int i = 0; i < 100; i++)
+                    if (ui->treeWidget->topLevelItem(i)->checkState(COLUMN_CHECKBOX) != state)
+                    ui->treeWidget->topLevelItem(i)->setCheckState(COLUMN_CHECKBOX, state);
+        ui->treeWidget->setEnabled(true);
+        if (state == Qt::Unchecked)
+            coinControl->UnSelectAll(); // just to be sure
+        CoinControlDialog::updateLabels(model, this);
+        CheckDialogLablesUpdated();
+            
+                }else {  
+                QMessageBox msgBox;
+                msgBox.setObjectName("lockMessageBox");
+                msgBox.setStyleSheet(GUIUtil::loadStyleSheet());
+                msgBox.setText(tr("Please have at least 100 inputs to use this function."));
+                msgBox.exec();
+                }
+}
+
+void CoinControlDialog::select_250()
+{
+if (ui->treeWidget->topLevelItemCount() > 249){  
+
+        Qt::CheckState state = Qt::Checked;
+            ui->treeWidget->setEnabled(false);
+                for (int i = 0; i < 250; i++)
+                    if (ui->treeWidget->topLevelItem(i)->checkState(COLUMN_CHECKBOX) != state)
+                    ui->treeWidget->topLevelItem(i)->setCheckState(COLUMN_CHECKBOX, state);
+        ui->treeWidget->setEnabled(true);
+        if (state == Qt::Unchecked)
+            coinControl->UnSelectAll(); // just to be sure
+        CoinControlDialog::updateLabels(model, this);
+        CheckDialogLablesUpdated();
+            
+            }else {  
+            QMessageBox msgBox;
+            msgBox.setObjectName("lockMessageBox");
+            msgBox.setStyleSheet(GUIUtil::loadStyleSheet());
+                msgBox.setText(tr("Please have at least 250 inputs to use this function."));
+            msgBox.exec();
+    }
+
 }
 
 // Toggle lock state
@@ -463,6 +674,7 @@ void CoinControlDialog::headerSectionClicked(int logicalIndex)
 // toggle tree mode
 void CoinControlDialog::radioTreeMode(bool checked)
 {
+HideInputAutoSelection(); 
     if (checked && model)
         updateView();
 }
@@ -470,8 +682,33 @@ void CoinControlDialog::radioTreeMode(bool checked)
 // toggle list mode
 void CoinControlDialog::radioListMode(bool checked)
 {
+    if (ui->advanced->checkState()){
+        ShowInputAutoSelection();    
+            }else{
+            HideInputAutoSelection(); 
+    }
     if (checked && model)
         updateView();
+}
+
+void CoinControlDialog::toggled(bool)
+{
+    if (ui->radioListMode->isChecked()){
+    if (ui->advanced->checkState()){
+        ShowInputAutoSelection();    
+            }else{
+            HideInputAutoSelection(); 
+    }
+        if (checked && model)
+        updateView();
+            }else
+                {
+                QMessageBox msgBox;
+                msgBox.setObjectName("lockMessageBox");
+                msgBox.setStyleSheet(GUIUtil::loadStyleSheet());
+                msgBox.setText(tr("Please switch to \"List mode\" to use this function."));
+                msgBox.exec();
+                }
 }
 
 // checkbox clicked by user
