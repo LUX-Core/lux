@@ -7,9 +7,31 @@
 #include <QAbstractTableModel>
 
 #include <memory>
-#include <set>
+#include <list>
 
 class COrder;
+
+QString stateToString(const COrder::State state);
+
+class OrderView
+{
+public:
+  OrderView() {}
+  OrderView(const std::shared_ptr<const COrder> order);
+  ~OrderView() {}
+  std::string log() const { return sId.toStdString(); }
+  qint64 creationTime;
+  OrderId id;
+  bool isBuy;
+  QString sCreationTime;
+  QString sType;
+  QString sPrice;
+  QString sAmount;
+  QString sTotal;
+  QString sState;
+  QString sId;
+};
+Q_DECLARE_METATYPE(OrderView);
 
 class LuxgateOpenOrdersModel : public QAbstractTableModel
 {
@@ -33,9 +55,9 @@ public:
 
 public slots:
     void slotSetDecimals(const Luxgate::Decimals & decimals_);
-    void updateRow(const OrderId&, COrder::State);
-    void addRow(std::shared_ptr<COrder>);
-    void deleteRow(const OrderId&);
+    void updateRow(const quint64, const int);
+    void addRow(const OrderView);
+    void deleteRow(const quint64);
     void reset();
 signals:
     void rowAdded();
@@ -43,13 +65,12 @@ private:
     Luxgate::Decimals decimals;
     struct NewestOrderComparator
     {
-        bool operator()(const std::shared_ptr<const COrder>& a, const std::shared_ptr<const COrder>& b)
+        bool operator()(const OrderView& a, const OrderView& b)
         {
-            return *a != *b && a->OrderCreationTime() > b->OrderCreationTime();
+            return a.creationTime > b.creationTime;
         }
     };
-    std::set<std::shared_ptr<const COrder>, NewestOrderComparator> openOrders;
-    QString stateToString(const COrder::State state) const;
+    std::list<OrderView> openOrders;
 };
 
 #endif // LUXGATEOPENORDERSMODEL_H

@@ -9,42 +9,80 @@
 #include <QBrush>
 #include <QDateTime>
 #include <QVector>
+#include <QDebug>
+
+
+static void AddRow(LuxgateOpenOrdersModel* model, std::shared_ptr<COrder> order)
+{
+    OrderView view(order);
+    QMetaObject::invokeMethod(model, "addRow", Qt::QueuedConnection, Q_ARG(OrderView, view));
+}
+
+static void UpdateRow(LuxgateOpenOrdersModel* model, const OrderId orderId, const COrder::State state)
+{
+    QMetaObject::invokeMethod(model, "updateRow", Qt::QueuedConnection, Q_ARG(quint64, (quint64)orderId), Q_ARG(int, state));
+}
+static void DeleteRow(LuxgateOpenOrdersModel* model, const OrderId orderId)
+{
+    QMetaObject::invokeMethod(model, "deleteRow", Qt::QueuedConnection, Q_ARG(quint64, (quint64)orderId));
+}
+
+static void ResetOrderBook(LuxgateOpenOrdersModel* model)
+{
+    QMetaObject::invokeMethod(model, "reset", Qt::QueuedConnection);
+}
+
+OrderView::OrderView(const std::shared_ptr<const COrder> order)
+{
+    id = order->ComputeId();
+    sId = QString::fromStdString(OrderIdToString(id));
+    sState = stateToString(order->GetState());
+    creationTime = order->OrderCreationTime();
+    sCreationTime = GUIUtil::dateTimeStr(creationTime);
+    sType = order->IsSell() ? QString("Sell") : QString("Buy");
+    isBuy = order->IsBuy();
+    sPrice = QString(Luxgate::QStrFromAmount(order->Price()));
+    sAmount = QString(Luxgate::QStrFromAmount(order->Amount()));
+    sTotal = QString(Luxgate::QStrFromAmount(order->Total()));
+}
 
 LuxgateOpenOrdersModel::LuxgateOpenOrdersModel(const Luxgate::Decimals & decimals, QObject *parent)
     : QAbstractTableModel(parent),
       decimals(decimals)
 {
     qRegisterMetaType<QVector<int>>();
+    qRegisterMetaType<OrderView>();
 
     beginInsertRows(QModelIndex(), 0, 0);
     auto orders = orderbook.ConstRefOrders();
     for (auto it = orders.begin(); it != orders.end(); ++it) {
-        LogPrintf("LuxgateOpenOrdersModel add %s\n", it->second->ToString());
-        openOrders.insert(it->second);
+        OrderView view(it->second);
+        LogPrintf("LuxgateOpenOrdersModel add %s\n", view.log());
+        openOrders.push_front(view);
     }
     endInsertRows();
 
-    orderbook.subscribeOrdersChange(std::bind(&LuxgateOpenOrdersModel::updateRow, this, std::placeholders::_1, std::placeholders::_2));
-    orderbook.subscribeOrderAdded(std::bind(&LuxgateOpenOrdersModel::addRow, this, std::placeholders::_1));
-    orderbook.subscribeOrderDeleted(std::bind(&LuxgateOpenOrdersModel::deleteRow, this, std::placeholders::_1));
-    orderbook.subscribeOrderbookCleared(std::bind(&LuxgateOpenOrdersModel::reset, this));
+    orderbook.OrderChanged.connect(std::bind(&UpdateRow, this, std::placeholders::_1, std::placeholders::_2));
+    orderbook.OrderAdded.connect(std::bind(&AddRow, this, std::placeholders::_1));
+    orderbook.OrderDeleted.connect(std::bind(&DeleteRow, this, std::placeholders::_1));
+    orderbook.OrderBookCleared.connect(std::bind(&ResetOrderBook, this));
 }
 
-void LuxgateOpenOrdersModel::addRow(std::shared_ptr<COrder> order)
+void LuxgateOpenOrdersModel::addRow(const OrderView order)
 {
-    LogPrintf("LuxgateOpenOrdersModel addRow %s\n", order->ToString());
+    LogPrintf("LuxgateOpenOrdersModel addRow %s\n", order.log());
     beginInsertRows(QModelIndex(), 0, 0);
-    openOrders.insert(order);
+    openOrders.push_front(order);
     endInsertRows();
     emit rowAdded();
 }
 
-void LuxgateOpenOrdersModel::deleteRow(const OrderId& id)
+void LuxgateOpenOrdersModel::deleteRow(const quint64 id)
 {
     LogPrintf("LuxgateOpenOrdersModel deleteRow %s\n", OrderIdToString(id));
     int i = 0;
     for (auto it = openOrders.cbegin(); it != openOrders.cend(); it++) {
-        if ((*it)->ComputeId() == id) {
+        if ((*it).id == id) {
             beginRemoveRows(QModelIndex(), i, i);
             openOrders.erase(it);
             endRemoveRows();
@@ -54,27 +92,22 @@ void LuxgateOpenOrdersModel::deleteRow(const OrderId& id)
     }
 }
 
-void LuxgateOpenOrdersModel::updateRow(const OrderId& id, COrder::State state)
+void LuxgateOpenOrdersModel::updateRow(const quint64 id, const int state)
 {
-    LogPrintf("LuxgateOpenOrdersModel updateRow %s %u\n", OrderIdToString(id), (uint64_t) state);
+    QString ss = stateToString(static_cast<COrder::State>(state));
+    LogPrintf("LuxgateOpenOrdersModel updateRow %s %s\n", OrderIdToString(id), ss.toStdString());
     int i = 0;
     for (auto it = openOrders.begin(); it != openOrders.end(); it++) {
-        if ((*it)->ComputeId() == id) {
-            auto porder = *it;
-            openOrders.erase(it);
-            openOrders.insert(std::make_shared<const COrder>(porder->Base(),
-                                                             porder->Rel(),
-                                                             porder->BaseAmount(),
-                                                             porder->Price(),
-                                                             porder->OrderCreationTime(),
-                                                             state));
-
+        auto order = *it;
+        if (order.id == id) {
+            (*it).sState = ss;
             auto stateCell = index(i, StateColumn);
-            emit QAbstractItemModel::dataChanged(stateCell, stateCell, { Luxgate::BidAskRole, Qt::DisplayRole });
-            break;
+            emit dataChanged(stateCell, stateCell, { Luxgate::BidAskRole, Qt::DisplayRole });
+            return;
         }
         ++i;
     }
+    LogPrintf("LuxgateOpenOrdersModel::updateRow : Warning: Got update event, but entry is not in model\n");
 }
 
 void LuxgateOpenOrdersModel::reset()
@@ -154,9 +187,10 @@ QVariant LuxgateOpenOrdersModel::data(const QModelIndex &index, int role) const
         auto it = openOrders.cbegin();
         std::advance(it, index.row());
         auto order = *it;
-
+        
         if (Luxgate::BidAskRole == role)
-            res = order->IsBuy();
+            res = order.isBuy;
+
         else if(Luxgate::CopyRowRole == role)
             res =   "Price: " + data(this->index(index.row(), PriceColumn)).toString()
                     + " ID: " + data(this->index(index.row(), IdColumn)).toString()
@@ -164,40 +198,36 @@ QVariant LuxgateOpenOrdersModel::data(const QModelIndex &index, int role) const
                     + " Quote: "  + data(this->index(index.row(), QuoteTotalColumn)).toString()
                     + " Date: " + data(this->index(index.row(), DateColumn)).toString()
                     + " State: " + data(this->index(index.row(), StateColumn)).toString();
-        else if(Qt::EditRole == role ||
-                Qt::DisplayRole == role) {
+
+        else if (Qt::EditRole == role || Qt::DisplayRole == role) {
 
             if (DateColumn == index.column()) {
-                auto createTime = order->OrderCreationTime();
-                res = GUIUtil::dateTimeStr(createTime);
+                res = order.sCreationTime;
             }
             else if (TypeColumn == index.column()) {
-                if(order->IsSell())
-                    res = QString("Sell");
-                if(order->IsBuy())
-                    res = QString("Buy");
+                res = order.sType;
             }
             else if (PriceColumn == index.column()) {
-                res = QString(Luxgate::QStrFromAmount(order->Price()));
+                res = order.sPrice;
             }
             else if (BaseAmountColumn == index.column()) {
-                res = QString(Luxgate::QStrFromAmount(order->Amount()));
+                res = order.sAmount;
             }
             else if (QuoteTotalColumn == index.column()) {
-                res = QString(Luxgate::QStrFromAmount(order->Total()));
+                res = order.sTotal;
             }
             else if (StateColumn == index.column()) {
-                res = QString(stateToString(order->GetState()));
+                res = order.sState;
             }
             else if (IdColumn == index.column()) {
-                res = QString::fromStdString(OrderIdToString(order->ComputeId()));
+                res = order.sId;
             }
         }
     }
     return res;
 }
 
-QString LuxgateOpenOrdersModel::stateToString(const COrder::State state) const
+QString stateToString(const COrder::State state)
 {
     switch (state) {
         case COrder::State::INVALID: return QString("Invalid");
