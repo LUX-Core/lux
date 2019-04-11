@@ -35,7 +35,7 @@
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
 using namespace std;
-int sort;
+
 QList<CAmount> CoinControlDialog::payAmounts;
 int CoinControlDialog::nSplitBlockDummy;
 CCoinControl* CoinControlDialog::coinControl = new CCoinControl();
