@@ -4559,6 +4559,10 @@ bool ContextualCheckBlockHeader(const CBlockHeader& block, CValidationState& sta
     if (chainActive.Height() - nHeight >= Params().FirstSCBlock() && !(block.nVersion & (1 << 30)))
         return state.DoS(1, error("%s: smart contracts hardfork is not active yet. (height %d)", __func__, nHeight));
 
+    // make sure chaintip is actually recent
+    if (GetAdjustedTime() - block.nTime > 7 * 86400)
+        return state.DoS(100, error("%s: node trying to promote alternate chainfork (height %d)", __func__, nHeight));
+
     //If this is a reorg, check that it is not too depp
     if (chainActive.Height() - nHeight >= Params().MaxReorganizationDepth())
         return state.DoS(1, error("%s: forked chain older than max reorganization depth (height %d)", __func__, nHeight));
