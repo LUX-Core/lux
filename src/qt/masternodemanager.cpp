@@ -54,6 +54,7 @@ MasternodeManager::MasternodeManager(QWidget *parent) :
     fFilterUpdated = true;
     nTimeFilterUpdated = GetTime();
     updateNodeList();
+    connect(ui->filterLineEdit, SIGNAL(textChanged(const QString &)), this, SLOT(wait()));
 }
 
 MasternodeManager::~MasternodeManager()
@@ -147,17 +148,22 @@ static QString seconds_to_DHMS(quint32 duration)
   return res.sprintf("%dd %02dh:%02dm:%02ds", days, hours, minutes, seconds);
 }
 
+void MasternodeManager::wait()
+{
+QTimer::singleShot(3000, this, SLOT(updateNodeList()));
+}
+
 void MasternodeManager::updateNodeList()
 {
+
     static int64_t nTimeListUpdated = GetTime();
 
     // to prevent high cpu usage update only once in MASTERNODELIST_UPDATE_SECONDS seconds
     // or MASTERNODELIST_FILTER_COOLDOWN_SECONDS seconds after filter was last changed
     int64_t nSecondsToWait = fFilterUpdated ? nTimeFilterUpdated - GetTime() + MASTERNODELIST_FILTER_COOLDOWN_SECONDS : nTimeListUpdated - GetTime() + MASTERNODELIST_UPDATE_SECONDS;
 
-    if (fFilterUpdated) ui->countLabel->setText(QString::fromStdString(strprintf("Please wait... %d", nSecondsToWait)));
-    if (nSecondsToWait > 0) return;
-
+  if (fFilterUpdated) ui->countLabel->setText(QString::fromStdString(strprintf("Please wait... %d", nSecondsToWait)));
+  if (nSecondsToWait > 0) return;
     nTimeListUpdated = GetTime();
     fFilterUpdated = false;
 
