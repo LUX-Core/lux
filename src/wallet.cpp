@@ -2791,7 +2791,7 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CWalletT
     {
         if (nValue < 0 || recipient.nAmount < 0)
         {
-            strFailReason = _("Transaction amounts must not be negative");
+            strFailReason = _("Transaction amounts must be positive");
             return false;
         }
         nValue += recipient.nAmount;
@@ -2855,20 +2855,18 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CWalletT
                 // vouts to the payees
                 if (coinControl && !coinControl->fSplitBlock) {
                     for (const auto& recipient : vecSend) {
-                        CTxOut txout(recipient.nAmount, recipient.scriptPubKey);
-                            if (recipient.fSubtractFeeFromAmount)
-                            {
-                                assert(nSubtractFeeFromAmount != 0);
-                                txout.nValue -= nFeeRet / nSubtractFeeFromAmount; // Subtract fee equally from each selected recipient
 
-                                if (fFirst) // first receiver pays the remainder not divisible by output count
-                                {
-                                    fFirst = false;
-                                    txout.nValue -= nFeeRet % nSubtractFeeFromAmount;
-                                }
+                        CTxOut txout(recipient.nAmount, recipient.scriptPubKey);
+                        if (recipient.fSubtractFeeFromAmount) {
+                            assert(nSubtractFeeFromAmount != 0);
+                            txout.nValue -= nFeeRet / nSubtractFeeFromAmount; // Subtract fee equally from each selected recipient
+                            if (fFirst) { // first receiver pays the remainder not divisible by output count
+                                fFirst = false;
+                                txout.nValue -= nFeeRet % nSubtractFeeFromAmount;
                             }
+                        }
+
                         if (txout.IsDust(::minRelayTxFee)) {
-                        
                             if (recipient.fSubtractFeeFromAmount && nFeeRet > 0)
                             {
                                 if (txout.nValue < 0)

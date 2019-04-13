@@ -165,8 +165,8 @@ static const int64_t STATIC_POS_REWARD = 1 * COIN; //Constant reward 8%
 static const bool DEFAULT_LOGEVENTS = false;
 
 ////////////////////////////////////////////////////// lux
-static const uint64_t DEFAULT_GAS_LIMIT_OP_CREATE=2500000;
-static const uint64_t DEFAULT_GAS_LIMIT_OP_SEND=250000;
+static const uint64_t DEFAULT_GAS_LIMIT_OP_CREATE=500000;
+static const uint64_t DEFAULT_GAS_LIMIT_OP_SEND=500000;
 static const CAmount DEFAULT_GAS_PRICE=0.00000040*COIN;
 static const CAmount MAX_RPC_GAS_PRICE=0.00000100*COIN;
 

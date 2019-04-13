@@ -201,8 +201,8 @@ public:
         base58Prefixes[EXT_PUBLIC_KEY] = boost::assign::list_of(0x07)(0x28)(0xA2)(0x4E).convert_to_container<std::vector<unsigned char> >();
         base58Prefixes[EXT_SECRET_KEY] = boost::assign::list_of(0x03)(0xD8)(0xA1)(0xE5).convert_to_container<std::vector<unsigned char> >();
 
-        // LUX BIP44 coin type is '1'
-        nExtCoinType = 1;
+        // LUX BIP44 coin type is '3003'
+        nExtCoinType = 3003;
 
         bech32_hrp = "bc";
 
