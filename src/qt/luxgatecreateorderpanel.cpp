@@ -40,6 +40,11 @@ LuxgateCreateOrderPanel::LuxgateCreateOrderPanel(QWidget *parent) :
     connect(ui->lineEditQuantity, &QLineEdit::textChanged, this, &LuxgateCreateOrderPanel::slotCalcNewTotal);
 
     connect(ui->pushButtonBuySell, &QPushButton::clicked, this, &LuxgateCreateOrderPanel::slotBuySellClicked);
+
+    currentPrice = 0;
+    currentQuantity = 0;
+    ui->lineEditQuantity->setText("0.0");
+    ui->lineEditPrice->setText("0.0");
 }
 
 
