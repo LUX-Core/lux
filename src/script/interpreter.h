@@ -141,6 +141,12 @@ uint256 SignatureHash(const CScript &scriptCode, const CTransaction& txTo, unsig
 class BaseSignatureChecker
 {
 public:
+    //! Verifies a signature given the pubkey, signature and sighash (Kudos to all the Bitcoin developers for this trick)
+    
+    virtual bool VerifySignature(const std::vector<uint8_t> &vchSig, const CPubKey &vchPubKey, const uint256 &sighash) const;
+
+    //! Verifies a signature given the pubkey, signature, script, and transaction (member var)
+
     virtual bool CheckSig(const std::vector<unsigned char>& scriptSig, const std::vector<unsigned char>& vchPubKey, const CScript& scriptCode, SigVersion sigversion) const
     {
         return false;
@@ -166,9 +172,6 @@ private:
     unsigned int nIn;
     const CAmount amount;
     const PrecomputedTransactionData* txdata;
-
-protected:
-    virtual bool VerifySignature(const std::vector<unsigned char>& vchSig, const CPubKey& vchPubKey, const uint256& sighash) const;
 
 public:
     TransactionSignatureChecker(const CTransaction* txToIn, unsigned int nInIn, const CAmount& amountIn) : txTo(txToIn), nIn(nInIn), amount(amountIn), txdata(nullptr) {}
