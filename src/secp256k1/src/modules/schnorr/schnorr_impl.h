@@ -116,7 +116,8 @@ static int secp256k1_schnorr_sig_verify(
     secp256k1_sha256_write(&sha, r, 32);
 
      /* compressed P */
-    secp256k1_eckey_pubkey_serialize(p, buf, &size, 1);
+    if (!secp256k1_eckey_pubkey_serialize(p, buf, &size, 1))
+        return 0;
     VERIFY_CHECK(size == 33);
     secp256k1_sha256_write(&sha, buf, 33);
 
@@ -146,7 +147,7 @@ static int secp256k1_schnorr_sig_verify(
     }
     k = *nonce;
 
-     secp256k1_ecmult_gen(ctx, &Rj, &k);
+    secp256k1_ecmult_gen(ctx, &Rj, &k);
     secp256k1_ge_set_gej(&Ra, &Rj);
     if (!secp256k1_fe_is_quad_var(&Ra.y)) {
         /**
@@ -156,9 +157,10 @@ static int secp256k1_schnorr_sig_verify(
         secp256k1_scalar_negate(&k, &k);
     }
 
-     secp256k1_fe_normalize(&Ra.x);
+    secp256k1_fe_normalize(&Ra.x);
     secp256k1_fe_get_b32(sig64, &Ra.x);
-    secp256k1_schnorr_compute_e(&e, sig64, pubkey, msg32);
+    if (!secp256k1_schnorr_compute_e(&e, sig64, pubkey, msg32))
+        return 0;
     secp256k1_scalar_mul(&s, &e, privkey);
     secp256k1_scalar_add(&s, &s, &k);
     secp256k1_scalar_clear(&k);

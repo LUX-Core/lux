@@ -13,6 +13,7 @@
 
 #include <secp256k1.h>
 #include <secp256k1_recovery.h>
+#include <secp256k1_schnorr.h>
 
 static secp256k1_context* secp256k1_context_sign = nullptr;
 
@@ -179,7 +180,7 @@ CPubKey CKey::GetPubKey() const {
     return result;
 }
 
-bool CKey::SignECDSA(const uint256& hash, std::vector<unsigned char>& vchSig, uint32_t test_case) const {
+bool CKey::SignECDSA(const uint256& hash, std::vector<uint8_t>& vchSig, uint32_t test_case) const {
     if (!fValid)
         return false;
     vchSig.resize(CPubKey::SIGNATURE_SIZE);
@@ -191,6 +192,23 @@ bool CKey::SignECDSA(const uint256& hash, std::vector<unsigned char>& vchSig, ui
     assert(ret);
     secp256k1_ecdsa_signature_serialize_der(secp256k1_context_sign, (unsigned char*)vchSig.data(), &nSigLen, &sig);
     vchSig.resize(nSigLen);
+    return true;
+}
+
+    bool CKey::SignSchnorr(const uint256 &hash, std::vector<uint8_t> &vchSig, uint32_t test_case) const
+{
+    if (!fValid)
+    {
+        return false;
+    }
+    vchSig.resize(64);
+    uint8_t extra_entropy[32] = {0};
+    WriteLE32(extra_entropy, test_case);
+
+     int ret = secp256k1_schnorr_sign(
+        secp256k1_context_sign, &vchSig[0], hash.begin(), begin(),
+        secp256k1_nonce_function_rfc6979, test_case ? extra_entropy : nullptr);
+    assert(ret);
     return true;
 }
 
@@ -208,7 +226,7 @@ bool CKey::VerifyPubKey(const CPubKey& pubkey) const {
     return pubkey.VerifyECDSA(hash, vchSig);
 }
 
-bool CKey::SignCompact(const uint256& hash, std::vector<unsigned char>& vchSig) const {
+bool CKey::SignCompact(const uint256& hash, std::vector<uint8_t>& vchSig) const {
     if (!fValid)
         return false;
     vchSig.resize(CPubKey::COMPACT_SIGNATURE_SIZE);
