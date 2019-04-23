@@ -54,6 +54,7 @@ MasternodeManager::MasternodeManager(QWidget *parent) :
     fFilterUpdated = true;
     nTimeFilterUpdated = GetTime();
     updateNodeList();
+    connect(ui->filterLineEdit, SIGNAL(textChanged(const QString &)), this, SLOT(wait()));
 }
 
 MasternodeManager::~MasternodeManager()
@@ -133,18 +134,23 @@ void MasternodeManager::updateLuxNode(QString alias, QString addr, QString privk
 
 static QString seconds_to_DHMS(quint32 duration)
 {
-  QString res;
-  int seconds = (int) (duration % 60);
-  duration /= 60;
-  int minutes = (int) (duration % 60);
-  duration /= 60;
-  int hours = (int) (duration % 24);
-  int days = (int) (duration / 24);
-  if((hours == 0)&&(days == 0))
-      return res.sprintf("%02dm:%02ds", minutes, seconds);
-  if (days == 0)
-      return res.sprintf("%02dh:%02dm:%02ds", hours, minutes, seconds);
-  return res.sprintf("%dd %02dh:%02dm:%02ds", days, hours, minutes, seconds);
+    QString res;
+    int seconds = (int) (duration % 60);
+    duration /= 60;
+    int minutes = (int) (duration % 60);
+    duration /= 60;
+    int hours = (int) (duration % 24);
+    int days = (int) (duration / 24);
+    if((hours == 0)&&(days == 0))
+        return res.sprintf("%02dm:%02ds", minutes, seconds);
+    if (days == 0)
+        return res.sprintf("%02dh:%02dm:%02ds", hours, minutes, seconds);
+    return res.sprintf("%dd %02dh:%02dm:%02ds", days, hours, minutes, seconds);
+}
+
+void MasternodeManager::wait()
+{
+    QTimer::singleShot(3000, this, SLOT(updateNodeList()));
 }
 
 void MasternodeManager::updateNodeList()
@@ -155,14 +161,13 @@ void MasternodeManager::updateNodeList()
     // or MASTERNODELIST_FILTER_COOLDOWN_SECONDS seconds after filter was last changed
     int64_t nSecondsToWait = fFilterUpdated ? nTimeFilterUpdated - GetTime() + MASTERNODELIST_FILTER_COOLDOWN_SECONDS : nTimeListUpdated - GetTime() + MASTERNODELIST_UPDATE_SECONDS;
 
-    if (fFilterUpdated) ui->countLabel->setText(QString::fromStdString(strprintf("Please wait... %d", nSecondsToWait)));
+    if (fFilterUpdated) ui->countLabel->setText(tr("Please wait... ") + nSecondsToWait);
     if (nSecondsToWait > 0) return;
-
     nTimeListUpdated = GetTime();
     fFilterUpdated = false;
 
     TRY_LOCK(cs_masternodes, lockMasternodes);
-    if(!lockMasternodes) 
+    if(!lockMasternodes)
         return;
 
     QString strToFilter;
@@ -286,7 +291,6 @@ void MasternodeManager::on_editButton_clicked()
     std::string sAddress = ui->tableWidget_2->item(r, 1)->text().toStdString();
 
     // get existing config entry
-
 }
 
 void MasternodeManager::on_getConfigButton_clicked()

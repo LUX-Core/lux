@@ -69,6 +69,7 @@ private slots:
     void on_stopAllButton_clicked();
     void on_removeButton_clicked();
     void on_tableWidget_2_itemSelectionChanged();
+    void wait();
 };
 
 #endif // MASTERNODEMANAGER_H
