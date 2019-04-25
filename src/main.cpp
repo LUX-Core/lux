@@ -181,7 +181,9 @@ static void CheckBlockIndex(const Consensus::Params& consensusParams);
 CScript COINBASE_FLAGS;
 
 const string strMessageMagic = "Lux Signed Message:\n";
-
+#ifdef ENABLE_LUXGATE
+CLuxGate luxgate(CDefaultLuxGateContext::create());
+#endif
 // Internal stuff
 namespace
 {
@@ -7118,7 +7120,7 @@ static bool ProcessMessage(CNode* pfrom, const string &strCommand, CDataStream& 
         if (!processed) ProcessInstantX(pfrom, strCommand, vRecv, processed);
         if (!processed) ProcessSpork(pfrom, strCommand, vRecv, processed);
 #ifdef ENABLE_LUXGATE
-        if (!processed) ProcessMessageLuxgate(pfrom, strCommand, vRecv, processed);
+        if (!processed) luxgate.ProcessMessage(pfrom, strCommand, vRecv, processed);
 #endif
 
 #       endif

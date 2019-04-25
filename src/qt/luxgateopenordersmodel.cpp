@@ -54,7 +54,7 @@ LuxgateOpenOrdersModel::LuxgateOpenOrdersModel(const Luxgate::Decimals & decimal
     qRegisterMetaType<OrderView>();
 
     beginInsertRows(QModelIndex(), 0, 0);
-    auto orders = orderbook.ConstRefOrders();
+    auto orders = luxgate.OrderBook().ConstRefOrders();
     for (auto it = orders.begin(); it != orders.end(); ++it) {
         OrderView view(it->second);
         LogPrintf("LuxgateOpenOrdersModel add %s\n", view.log());
@@ -62,10 +62,10 @@ LuxgateOpenOrdersModel::LuxgateOpenOrdersModel(const Luxgate::Decimals & decimal
     }
     endInsertRows();
 
-    orderbook.OrderChanged.connect(std::bind(&UpdateRow, this, std::placeholders::_1, std::placeholders::_2));
-    orderbook.OrderAdded.connect(std::bind(&AddRow, this, std::placeholders::_1));
-    orderbook.OrderDeleted.connect(std::bind(&DeleteRow, this, std::placeholders::_1));
-    orderbook.OrderBookCleared.connect(std::bind(&ResetOrderBook, this));
+    luxgate.OrderBook().OrderChanged.connect(std::bind(&UpdateRow, this, std::placeholders::_1, std::placeholders::_2));
+    luxgate.OrderBook().OrderAdded.connect(std::bind(&AddRow, this, std::placeholders::_1));
+    luxgate.OrderBook().OrderDeleted.connect(std::bind(&DeleteRow, this, std::placeholders::_1));
+    luxgate.OrderBook().OrderBookCleared.connect(std::bind(&ResetOrderBook, this));
 }
 
 void LuxgateOpenOrdersModel::addRow(const OrderView order)

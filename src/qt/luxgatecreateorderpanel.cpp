@@ -178,10 +178,10 @@ void LuxgateCreateOrderPanel::setBuySell(bool _bBuy)
 
     //get balance
     if(bBuy) {
-        if (blockchainClientPool.count("BTC")) {
+        ClientPtr client;
+        if (luxgate.FindClient("BTC", client)) {
             double dbBalance = 0;
-            bool bBalance = blockchainClientPool["BTC"]->GetBalance(dbBalance);
-            if (bBalance)
+            if (client->GetBalance(dbBalance))
                 ui->lineEditTotal->setText(QString::number(dbBalance));
         }
     }

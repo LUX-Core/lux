@@ -9,6 +9,8 @@
 #include <QString>
 #include <QBrush>
 
+extern CLuxGate luxgate;
+
 struct BlockchainConfigQt
 {
     BlockchainConfigQt()

@@ -86,6 +86,9 @@ extern void ThreadSendAlert();
 CWallet* pwalletMain = NULL;
 //int nWalletBackups = 10;
 #endif
+#ifdef ENABLE_LUXGATE
+extern CLuxGate luxgate;
+#endif
 bool fFeeEstimatesInitialized = false;
 std::atomic<bool> fRestartRequested(false); // true: restart false: shutdown
 unsigned int nMinerSleep;
@@ -224,7 +227,7 @@ void PrepareShutdown()
 #endif
 
 #ifdef ENABLE_LUXGATE
-    ShutdownLuxGate();
+    luxgate.Shutdown();
 #endif
 
     StopNode();
@@ -1162,21 +1165,20 @@ bool AppInit2()
     std::map<std::string, BlockchainConfig> config = ReadLuxGateConfigFile();
     BlockchainConfig luxConfig{"LUX", "", 0, "", ""}; // Empty config because we don't need to actually connect to RPC
     ClientPtr luxClient = std::make_shared<CLuxClient>(luxConfig);
-    blockchainClientPool.insert(std::make_pair(luxClient->ticker, luxClient));
+    luxgate.AddClient(luxClient);
     for (auto it : config) {
         BlockchainConfig conf = it.second;
         LogPrintf("BlockchainConfig: %s\n", conf.ToString().c_str());
         ClientPtr client = std::make_shared<CBitcoinClient>(conf);
         bool swapIsSupported = client->IsSwapSupported();
         LogPrintf("%s swap support - %s\n", client->ticker, swapIsSupported ? "yes" : "no");
-        blockchainClientPool.insert(std::make_pair(client->ticker, client));
+        luxgate.AddClient(client);
     }
-    StartLuxGateRefundService();
-    if (!InitializeLuxGate()) {
+    if (!luxgate.Initialize()) {
         LogPrintf("Failed to initialize LuxGate\n");
     }
     // Set LUXGATE service bit only if we have 2 or more blockchain clients
-    if (blockchainClientPool.size() >= 2) {
+    if (luxgate.Clients().size() >= 2) {
         nLocalServices = ServiceFlags(nLocalServices | NODE_LUXGATE);
     }
 #endif // ENABLE_LUXGATE

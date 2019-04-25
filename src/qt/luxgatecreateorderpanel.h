@@ -7,6 +7,8 @@
 #include "univalue/univalue.h"
 #include "utilmoneystr.h"
 
+#include "luxgate/luxgate.h"
+
 namespace Ui {
 class LuxgateCreateOrderPanel;
 }
@@ -14,6 +16,7 @@ class LuxgateCreateOrderPanel;
 class WalletModel;
 
 extern UniValue createorder(const UniValue& params, bool fHelp);
+extern CLuxGate luxgate;
 enum AmountParsingResult { OK, INVALID, OUT_OF_RANGE };
 AmountParsingResult AmountFromQString(const QString& value, CAmount& amount);
 

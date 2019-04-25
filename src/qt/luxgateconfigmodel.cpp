@@ -72,7 +72,7 @@ QVariant LuxgateConfigModel::data(const QModelIndex &index, int role) const
                     break;
                 case SwapSupportColumn:
                     ClientPtr client;
-                    if (!FindClient(irow.ticker.toStdString(), client))
+                    if (!luxgate.FindClient(irow.ticker.toStdString(), client))
                         return false;
                     res = client->IsSwapSupported();
                     break;

@@ -76,6 +76,10 @@ class CScriptCheck;
 class CValidationInterface;
 class CValidationState;
 
+#ifdef ENABLE_LUXGATE
+class CLuxGate;
+#endif
+
 struct CBlockTemplate;
 struct CNodeStateStats;
 

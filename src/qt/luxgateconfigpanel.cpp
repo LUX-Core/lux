@@ -321,9 +321,9 @@ void LuxgateConfigPanel::slotClickUpdateConfig()
         return;
     }
 
-    if (ChangeLuxGateConfiguration(configs)) {
-        update();//fill in swap supported
-        for (auto it : blockchainClientPool) {
+    if (luxgate.ChangeConfiguration(configs)) {
+        update();  // fill in swap supported
+        for (auto it : luxgate.Clients()) {
             Ticker ticker =  it.first;
             auto client =  it.second;
             auto list = modelConfig->match(modelConfig->index(0,0), Qt::DisplayRole, QString::fromStdString(ticker), -1);
