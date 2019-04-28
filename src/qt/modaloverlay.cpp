@@ -74,7 +74,6 @@ void ModalOverlay::setKnownBestHeight(int count, const QDateTime& blockDate)
 }
 
 void ModalOverlay::tipUpdate(int count, const QDateTime& blockDate, double nVerificationProgress) {
-	//ui->TimeLeft->setText("ok");
     QDateTime currentDate = QDateTime::currentDateTime();
 
     // keep a vector of samples of verification progress at height
