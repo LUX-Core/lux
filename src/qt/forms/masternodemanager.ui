@@ -23,6 +23,19 @@
       <number>0</number>
      </property>
      <item>
+      <spacer name="horizontalSpacer0">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+          <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
       <widget class="QTabWidget" name="tabWidget">
        <property name="currentIndex">
         <number>0</number>
@@ -93,32 +106,37 @@
             <property name="text">
              <string>Address</string>
             </property>
-           </column>
+	  </column>
            <column>
             <property name="text">
              <string>Rank</string>
             </property>
-           </column>
+	  </column>
            <column>
             <property name="text">
-             <string>Active</string>
+             <string>Protocol</string>
+            </property>
+          </column>
+           <column>
+            <property name="text">
+             <string>Status</string>
             </property>
            </column>
            <column>
             <property name="text">
-             <string>Active (secs)</string>
+             <string>Time Active</string>
             </property>
-           </column>
+          </column>
            <column>
             <property name="text">
-             <string>Last Seen</string>
+             <string>Last Seen (UTC)</string>
             </property>
-           </column>
+          </column>
            <column>
             <property name="text">
              <string>Pubkey</string>
             </property>
-           </column>
+         </column>
           </widget>
          </item>
          <item row="5" column="0">
