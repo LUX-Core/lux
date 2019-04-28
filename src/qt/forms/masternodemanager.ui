@@ -22,7 +22,7 @@
      <property name="bottomMargin">
       <number>0</number>
      </property>
-	 <item>
+     <item>
       <spacer name="horizontalSpacer0">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
