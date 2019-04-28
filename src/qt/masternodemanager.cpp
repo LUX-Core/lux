@@ -203,7 +203,7 @@ void MasternodeManager::updateNodeList()
         if (strCurrentFilter != "") {
             strToFilter = addressItem->text() + " " +
                           rankItem->text() + " " +
-						  protocolItem->text() + " " +
+			  protocolItem->text() + " " +
                           activeItem->text() + " " +
                           activeSecondsItem->text() + " " +
                           lastSeenItem->text() + " " +
@@ -211,8 +211,7 @@ void MasternodeManager::updateNodeList()
             if (!strToFilter.contains(strCurrentFilter)) continue;
         }
 		
-		ui->tableWidget->insertRow(0);
-	
+	ui->tableWidget->insertRow(0);
         ui->tableWidget->setItem(0, 0, addressItem);
         ui->tableWidget->setItem(0, 1, rankItem);
 	ui->tableWidget->setItem(0, 2, protocolItem);
