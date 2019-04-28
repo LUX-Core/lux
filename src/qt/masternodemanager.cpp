@@ -56,19 +56,19 @@ MasternodeManager::MasternodeManager(QWidget *parent) :
     updateNodeList();
     connect(ui->filterLineEdit, SIGNAL(textChanged(const QString &)), this, SLOT(wait()));
 	
-	int columnAddressWidth = 200;
+    int columnAddressWidth = 200;
     int columnrankItemWidth = 60;
     int columnProtocolWidth = 60;
     int columnActiveWidth = 80;
     int columnActiveSecondsWidth = 130;
     int columnLastSeenWidth = 130;
 		
-	ui->tableWidget->setColumnWidth(0, columnAddressWidth); // Address
+    ui->tableWidget->setColumnWidth(0, columnAddressWidth); // Address
     ui->tableWidget->setColumnWidth(1, columnrankItemWidth); // Rank
     ui->tableWidget->setColumnWidth(2, columnProtocolWidth); // protocol
     ui->tableWidget->setColumnWidth(3, columnActiveWidth); // status
     ui->tableWidget->setColumnWidth(4, columnActiveSecondsWidth); // time active
-	ui->tableWidget->setColumnWidth(5, columnLastSeenWidth); // last seen
+    ui->tableWidget->setColumnWidth(5, columnLastSeenWidth); // last seen
 	
 }
 
@@ -186,9 +186,9 @@ void MasternodeManager::updateNodeList()
     // populate list
     // Address, Rank, protocol, status, time active, last seen, Pub Key
 	
-	QTableWidgetItem *addressItem = new QTableWidgetItem(QString::fromStdString(mn.addr.ToString())); // Address
-	QTableWidgetItem *rankItem = new QTableWidgetItem(QString::number(GetMasternodeRank(mn.vin, chainActive.Height()))); // Rank
-	QTableWidgetItem *protocolItem = new QTableWidgetItem(QString::number(mn.protocolVersion)); // Protocol
+    QTableWidgetItem *addressItem = new QTableWidgetItem(QString::fromStdString(mn.addr.ToString())); // Address
+    QTableWidgetItem *rankItem = new QTableWidgetItem(QString::number(GetMasternodeRank(mn.vin, chainActive.Height()))); // Rank
+    QTableWidgetItem *protocolItem = new QTableWidgetItem(QString::number(mn.protocolVersion)); // Protocol
     QTableWidgetItem *activeItem = new QTableWidgetItem(mn.IsEnabled() ? tr("Enabled") : tr("Disabled")); // Status
     QTableWidgetItem *activeSecondsItem = new QTableWidgetItem(seconds_to_DHMS((qint64)(mn.lastTimeSeen - mn.now))); // Time Active
     QTableWidgetItem *lastSeenItem = new QTableWidgetItem(QString::fromStdString(DateTimeStrFormat("%Y-%m-%d %H:%M:%S", mn.lastTimeSeen))); // Last Seen
@@ -215,7 +215,7 @@ void MasternodeManager::updateNodeList()
 	
         ui->tableWidget->setItem(0, 0, addressItem);
         ui->tableWidget->setItem(0, 1, rankItem);
-		ui->tableWidget->setItem(0, 2, protocolItem);
+	ui->tableWidget->setItem(0, 2, protocolItem);
         ui->tableWidget->setItem(0, 3, activeItem);
         ui->tableWidget->setItem(0, 4, activeSecondsItem);
         ui->tableWidget->setItem(0, 5, lastSeenItem);
