@@ -1019,7 +1019,7 @@ void ThreadFlushWalletDB(const string& strFile)
                         bitdb.CloseDb(strFile);
                         bitdb.CheckpointLSN(strFile);
 
-                        bitdb.mapFileUseCount.erase(mi++);
+                        //bitdb.mapFileUseCount.erase(mi++); I'll reference this: https://github.com/bitcoin/bitcoin/issues/7475
                         LogPrint("db", "Flushed wallet.dat %dms\n", GetTimeMillis() - nStart);
                     }
                 }
@@ -1040,6 +1040,9 @@ bool BackupWallet(const CWallet& wallet, const string& strDest)
                 bitdb.CloseDb(wallet.strWalletFile);
                 bitdb.CheckpointLSN(wallet.strWalletFile);
                 bitdb.mapFileUseCount.erase(wallet.strWalletFile);
+                printf("Issuing lsn_reset for backup file compatibility.\n");
+                bitdb.lsn_reset(wallet.strWalletFile); 
+
 
                 // Copy wallet.dat
                 filesystem::path pathSrc = GetDataDir() / wallet.strWalletFile;
