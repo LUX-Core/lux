@@ -185,6 +185,7 @@ BITCOIN_CORE_H = \
 
 if ENABLE_LUXGATE
 BITCOIN_CORE_H += \
+  luxgate/context.h \
   luxgate/atomicswap.h \
   luxgate/blockchainclient.h \
   luxgate/http.h \

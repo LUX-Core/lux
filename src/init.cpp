@@ -1159,28 +1159,8 @@ bool AppInit2()
     std::ostringstream strErrors;
 
 #ifdef ENABLE_LUXGATE
-    LogPrintf("Using LuxGate config file %s\n", GetLuxGateConfigFile().string());
-
-    // Read LuxGate config
-    std::map<std::string, BlockchainConfig> config = ReadLuxGateConfigFile();
-    BlockchainConfig luxConfig{"LUX", "", 0, "", ""}; // Empty config because we don't need to actually connect to RPC
-    ClientPtr luxClient = std::make_shared<CLuxClient>(luxConfig);
-    luxgate.AddClient(luxClient);
-    for (auto it : config) {
-        BlockchainConfig conf = it.second;
-        LogPrintf("BlockchainConfig: %s\n", conf.ToString().c_str());
-        ClientPtr client = std::make_shared<CBitcoinClient>(conf);
-        bool swapIsSupported = client->IsSwapSupported();
-        LogPrintf("%s swap support - %s\n", client->ticker, swapIsSupported ? "yes" : "no");
-        luxgate.AddClient(client);
-    }
-    if (!luxgate.Initialize()) {
-        LogPrintf("Failed to initialize LuxGate\n");
-    }
-    // Set LUXGATE service bit only if we have 2 or more blockchain clients
-    if (luxgate.Clients().size() >= 2) {
-        nLocalServices = ServiceFlags(nLocalServices | NODE_LUXGATE);
-    }
+    LogPrintf("Using LuxGate config file %s\n", luxgate.Context()->GetLuxGateConfigFile().string());
+    luxgate.InitializeFromConfig();
 #endif // ENABLE_LUXGATE
 
     InitSignatureCache();

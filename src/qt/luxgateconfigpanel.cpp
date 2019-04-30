@@ -214,7 +214,7 @@ void LuxgateConfigPanel::slotClickImportConfiguration()
 
 void LuxgateConfigPanel::slotClickExportConfiguration()
 {
-    QString defaultConfigLocation = QStringFromPath(GetLuxGateConfigFile());
+    QString defaultConfigLocation = QStringFromPath(luxgate.Context()->GetLuxGateConfigFile());
     QString newFileName = QFileDialog::getSaveFileName(this, tr("Export LuxGate configuration"),
                                                         defaultConfigLocation,
                                                         tr("*.json"));
@@ -228,7 +228,8 @@ void LuxgateConfigPanel::fillInTableWithConfig(QString strConfig)
     auto modelConfig = qobject_cast<LuxgateConfigModel*>(ui->tableViewConfiguration->model());
     modelConfig->removeRows(0, modelConfig->rowCount());
     // Read LuxGate config
-    std::map<std::string, BlockchainConfig> config = ReadLuxGateConfigFile(PathFromQString(strConfig));
+    CConfigFile configFile(luxgate.Context());
+    std::map<std::string, BlockchainConfig> config = configFile.Read(PathFromQString(strConfig));
     for (auto it : config) {
         BlockchainConfigQt conf(it.second);
         if (conf.ticker == "Lux" || conf.ticker == "LUX")
@@ -262,7 +263,7 @@ void LuxgateConfigPanel::slotClickUpdateConfig()
             configs[conf.ticker] = conf;
 
             //check Valid configs
-            auto validItems = isValidBlockchainConfig(conf);
+            auto validItems = CConfigFile::isValidBlockchainConfig(conf);
             if (!validItems.bValid) {
 
                 if (!validItems.bTickerValid)
@@ -321,7 +322,7 @@ void LuxgateConfigPanel::slotClickUpdateConfig()
         return;
     }
 
-    if (luxgate.ChangeConfiguration(configs)) {
+    if (luxgate.SaveConfig(configs) && luxgate.InitializeFromConfig()) {
         update();  // fill in swap supported
         for (auto it : luxgate.Clients()) {
             Ticker ticker =  it.first;

@@ -42,6 +42,7 @@
 #include "base58.h"
 
 #ifdef ENABLE_LUXGATE
+#include "luxgate/context.h"
 #include "luxgate/luxgate.h"
 #endif
 
