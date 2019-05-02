@@ -30,6 +30,11 @@ TrafficGraphWidget::TrafficGraphWidget(QWidget* parent) : QWidget(parent),
     timer->start();
 }
 
+TrafficGraphWidget::~TrafficGraphWidget()
+{
+    delete timer;
+}
+
 void TrafficGraphWidget::setClientModel(ClientModel* model)
 {
     clientModel = model;

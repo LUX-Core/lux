@@ -607,7 +607,7 @@ Cliquer sur &quot;Crypter la clé&quot; pour signer et encrypter la clé privée
     </message>
     <message>
         <source>&amp;Unlock Wallet...</source>
-        <translation>Déverro&amp;uiller le portefeuille</translation>
+        <translation>&amp;Déverrouiller le portefeuille</translation>
     </message>
     <message>
         <source>Unlock wallet</source>
@@ -615,7 +615,7 @@ Cliquer sur &quot;Crypter la clé&quot; pour signer et encrypter la clé privée
     </message>
     <message>
         <source>&amp;Lock Wallet</source>
-        <translation>Verroui&amp;ller le portefeuille</translation>
+        <translation>&amp;Verrouiller le portefeuille</translation>
     </message>
     <message>
         <source>&amp;Backup Wallet...</source>
@@ -891,14 +891,6 @@ MultiSend: %1</translation>
         <translation>Rechercher mise à jour</translation>
     </message>
     <message>
-        <source>&amp;Trading</source>
-        <translation>&amp;Trading</translation>
-    </message>
-    <message>
-        <source>Trading on Cryptopia</source>
-        <translation>Trading sur Cryptopia</translation>
-    </message>
-    <message>
         <source>&amp;Smart Contracts</source>
         <translation>&amp;Smart Contrats</translation>
     </message>
@@ -1055,7 +1047,7 @@ MultiSend: %1</translation>
     </message>
     <message>
         <source>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;unlocked&lt;/b&gt; for anonymization and staking only</source>
-        <translation>Le portefeuille est &lt;b&gt;encrypté&lt;/b&gt; et &lt;b&gt;dévérouillé&lt;/b&gt; pour l&apos;anonymisation et le PoS</translation>
+        <translation>Le portefeuille est &lt;b&gt;encrypté&lt;/b&gt; et &lt;b&gt;déverrouillé&lt;/b&gt; pour l&apos;anonymisation et le PoS</translation>
     </message>
     <message>
         <source>A fatal error occurred. LUX can no longer continue safely and will quit.</source>
@@ -1081,8 +1073,8 @@ MultiSend: %1</translation>
         <translation>Chercher</translation>
     </message>
     <message>
-        <source>Not all transactions will be shown. To view all transactions you need to set txindex=1 in the configuration file (lux.conf).</source>
-        <translation>Toutes les transaction ne seront pas affichés. Pour voir toutes les transactions, vous devez régler txindex=1 dans le fichier de configuration (lux.conf).</translation>
+        <source>Not all transactions will be shown and block explorer is not available while running in pruned mode. To view all transactions you need to set txindex=1 in the configuration file (lux.conf).</source>
+        <translation>Certaines transactions ne seront pas affichées. Pour voir toutes les transactions, vous devez définir txindex=1 dans le fichier de configuration (lux.conf).</translation>
     </message>
     <message>
         <source>Blockchain Explorer</source>
@@ -1511,11 +1503,11 @@ MultiSend: %1</translation>
     </message>
     <message>
         <source>toggle lock state</source>
-        <translation>(Dé)vérouiller</translation>
+        <translation>(Dé)verrouiller</translation>
     </message>
     <message>
         <source>(1 locked)</source>
-        <translation>(1 vérouillé)</translation>
+        <translation>(1 verrouillé)</translation>
     </message>
     <message>
         <source>Received with label</source>
@@ -1535,7 +1527,7 @@ MultiSend: %1</translation>
     </message>
     <message>
         <source>Unlock unspent</source>
-        <translation>Dévérouiller entrée</translation>
+        <translation>Déverrouiller entrée</translation>
     </message>
     <message>
         <source>Copy bytes</source>
@@ -2577,11 +2569,19 @@ MultiSend: %1</translation>
     </message>
     <message>
         <source>Last Seen</source>
-        <translation type="unfinished"></translation>
+        <translation>Dernier contact</translation>
     </message>
     <message>
         <source>Pubkey</source>
         <translation>Pubkey</translation>
+    </message>
+    <message>
+        <source>Filter List:</source>
+        <translation>Filtrer Liste :</translation>
+    </message>
+    <message>
+        <source>Filter masternode list</source>
+        <translation>Filtrer la liste de Masternodes</translation>
     </message>
     <message>
         <source>Masternodes Activated:</source>
@@ -2646,6 +2646,14 @@ MultiSend: %1</translation>
     <message>
         <source>&amp;Stop All</source>
         <translation>Arrêter t&amp;out</translation>
+    </message>
+    <message>
+        <source>yes</source>
+        <translation>oui</translation>
+    </message>
+    <message>
+        <source>no</source>
+        <translation>non</translation>
     </message>
 </context>
 <context>
@@ -3504,7 +3512,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Wallet is locked and user declined to unlock. Disabling Darksend.</source>
-        <translation>Le portefeuille est toujours vérouillé. Désactivation de Luxsend.</translation>
+        <translation>Le portefeuille est toujours verrouillé. Désactivation de Luxsend.</translation>
     </message>
 </context>
 <context>
@@ -4915,7 +4923,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Error: The wallet was unlocked only to anonymize and stake coins.</source>
-        <translation>Erreur: Le portefeuille n&apos;est dévérouillé que pour l&apos;anonymisation et le PoS.</translation>
+        <translation>Erreur: Le portefeuille n&apos;est déverrouillé que pour l&apos;anonymisation et le PoS.</translation>
     </message>
     <message>
         <source>A fee %1 times higher than %2 per kB is considered an insanely high fee.</source>
@@ -4923,7 +4931,7 @@ https://www.transifex.com/luxcore/luxcore</source>
     </message>
     <message>
         <source>Error: The wallet was unlocked only to anonymize coins. Unlock canceled.</source>
-        <translation>Erreur: Le portefeuille n&apos;est dévérouillé que pour l&apos;anonymisation. Dévérouillage annulé.</translation>
+        <translation>Erreur: Le portefeuille n&apos;est déverrouillé que pour l&apos;anonymisation. Déverrouillage annulé.</translation>
     </message>
     <message>
         <source>Warning: Invalid LUX address</source>
@@ -5979,6 +5987,14 @@ https://www.transifex.com/luxcore/luxcore</source>
     <message>
         <source>Output index</source>
         <translation>Index sortie</translation>
+    </message>
+    <message>
+        <source>after</source>
+        <translation>après</translation>
+    </message>
+    <message>
+        <source>hours</source>
+        <translation>heures</translation>
     </message>
     <message numerus="yes">
         <source>Open for %n more block(s)</source>
@@ -7803,381 +7819,6 @@ https://www.transifex.com/luxcore/luxcore</source>
     <message>
         <source>wallet.dat corrupt, salvage failed</source>
         <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>tradingDialog</name>
-    <message>
-        <source>Dialog</source>
-        <translation>Dialog</translation>
-    </message>
-    <message>
-        <source>0.00000000</source>
-        <translation>0.00000000</translation>
-    </message>
-    <message>
-        <source>0.000000000</source>
-        <translation>0.000000000</translation>
-    </message>
-    <message>
-        <source>Trade</source>
-        <translation>Echanger</translation>
-    </message>
-    <message>
-        <source>Bid</source>
-        <translation>Prix</translation>
-    </message>
-    <message>
-        <source>BTC</source>
-        <translation>BTC</translation>
-    </message>
-    <message>
-        <source>Total w/ 0.25% Fee </source>
-        <translation>Total après frais (0.25%)</translation>
-    </message>
-    <message>
-        <source> 0.00000000</source>
-        <translation> 0.00000000</translation>
-    </message>
-    <message>
-        <source>Buy LUX</source>
-        <translation>Acheter des LUX</translation>
-    </message>
-    <message>
-        <source>0.00000000 BTC</source>
-        <translation>0.00000000 BTC</translation>
-    </message>
-    <message>
-        <source>Bids: 0000</source>
-        <translation>Achats: 0000</translation>
-    </message>
-    <message>
-        <source>Supply: 0.00000000 LUX</source>
-        <translation>Offre : 0.00000000 LUX</translation>
-    </message>
-    <message>
-        <source>Sell LUX</source>
-        <translation>Vendre des LUX</translation>
-    </message>
-    <message>
-        <source>Demand: 0.00000000 LUX</source>
-        <translation>Demande : 0.00000000 LUX</translation>
-    </message>
-    <message>
-        <source>LUX</source>
-        <translation>LUX</translation>
-    </message>
-    <message>
-        <source>Max</source>
-        <translation>Max</translation>
-    </message>
-    <message>
-        <source>Asks: 0000</source>
-        <translation>Ventes: 0000</translation>
-    </message>
-    <message>
-        <source>Units</source>
-        <translation>Unités</translation>
-    </message>
-    <message>
-        <source>BTC Available:</source>
-        <translation>BTC disponibles :</translation>
-    </message>
-    <message>
-        <source>LUX Available:</source>
-        <translation>LUX disponibles :</translation>
-    </message>
-    <message>
-        <source>Send</source>
-        <translation>Envoyer</translation>
-    </message>
-    <message>
-        <source>Lowest price:</source>
-        <translation>Plus bas prix :</translation>
-    </message>
-    <message>
-        <source>Amount in LUX:</source>
-        <translation>Montant en LUX :</translation>
-    </message>
-    <message>
-        <source>Total w/ Fees :</source>
-        <translation>Total après frais :</translation>
-    </message>
-    <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:9pt; font-weight:600;&quot;&gt;Warning:&lt;/span&gt;&lt;span style=&quot; font-size:9pt;&quot;&gt; This feature is in &lt;/span&gt;&lt;span style=&quot; font-size:9pt; font-weight:600;&quot;&gt;ALPHA ! USE AT OWN RISK !&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:9pt; font-weight:600;&quot;&gt;Attention:&lt;/span&gt;&lt;span style=&quot; font-size:9pt;&quot;&gt; Cette fonctionnalité est en &lt;/span&gt;&lt;span style=&quot; font-size:9pt; font-weight:600;&quot;&gt;ALPHA ! UTILISEZ LA A VOS RISQUES !&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-weight:600; text-decoration: underline;&quot;&gt;Instructions:&lt;/span&gt;&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;To use the cross sending feature you need to have &lt;/p&gt;&lt;p align=&quot;center&quot;&gt;LUX available to spend on Cryptopia. If you don&apos;t have any &lt;/p&gt;&lt;p align=&quot;center&quot;&gt;you can find your deposit address on the &amp;quot;Balance&amp;quot; tab.&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;1. Enter the amount you want to receive in Bitcoin.&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;2. Enter the Bitcoin address you are sending to.&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;3. Check that the Total with fee&apos;s is correct.&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;4. Press send and watch the magic happen.&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-weight:600; text-decoration: underline;&quot;&gt;Notes.&lt;/span&gt;&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:7pt;&quot;&gt;Total w/ fees: N/A means you dont have enough LUX to sell !&lt;/span&gt;&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:7pt;&quot;&gt;All trades are done through Cryptopia using your own balance and API keys.&lt;/span&gt;&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:7pt;&quot;&gt;Encrypt and backup your wallet when using this feature.&lt;/span&gt;&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:7pt;&quot;&gt;If you don&apos;t have a password you Cryptopia account will be accessible 24/7&lt;/span&gt;&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:7pt;&quot;&gt;Withdrawal fee of 0.002 and 0.25% taken by Cryptopia.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Amount:</source>
-        <translation>Montant :</translation>
-    </message>
-    <message>
-        <source>Address:</source>
-        <translation>Adresse :</translation>
-    </message>
-    <message>
-        <source>LUX Balance:</source>
-        <translation>Balance LUX :</translation>
-    </message>
-    <message>
-        <source>BTC Balance:</source>
-        <translation>Balance BTC :</translation>
-    </message>
-    <message>
-        <source>Paste from clipboard</source>
-        <translation>Coller depuis presse-papier</translation>
-    </message>
-    <message>
-        <source>Alt+P</source>
-        <translation>Alt+P</translation>
-    </message>
-    <message>
-        <source>Cross-Send</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Market History</source>
-        <translation>Historique Marché</translation>
-    </message>
-    <message>
-        <source>Open Orders</source>
-        <translation>Ordres ouverts</translation>
-    </message>
-    <message>
-        <source>Trade history</source>
-        <translation>Transactions</translation>
-    </message>
-    <message>
-        <source>Balance</source>
-        <translation>Balance</translation>
-    </message>
-    <message>
-        <source>LUX Pending:</source>
-        <translation>LUX en attente :</translation>
-    </message>
-    <message>
-        <source>BTC Pending:</source>
-        <translation>BTC en attente :</translation>
-    </message>
-    <message>
-        <source>Generate LUX Coin Deposit Address</source>
-        <translation>Générer adresse LUX de dépot</translation>
-    </message>
-    <message>
-        <source>Deposit Address:</source>
-        <translation>Adresse de dépot LUX :</translation>
-    </message>
-    <message>
-        <source>Copy to clipboard</source>
-        <translation>Copier vers presse-papier</translation>
-    </message>
-    <message>
-        <source>Withdraw LUX:</source>
-        <translation>Rapatrier des LUX :</translation>
-    </message>
-    <message>
-        <source>Withdraw</source>
-        <translation>Rapatrier</translation>
-    </message>
-    <message>
-        <source>Settings</source>
-        <translation>Paramètres</translation>
-    </message>
-    <message>
-        <source>API Key</source>
-        <translation>Clé API</translation>
-    </message>
-    <message>
-        <source>Secret Key</source>
-        <translation>Clé secrète</translation>
-    </message>
-    <message>
-        <source>Password</source>
-        <translation>Mot de passe</translation>
-    </message>
-    <message>
-        <source>Load API Keys</source>
-        <translation>Charger clés</translation>
-    </message>
-    <message>
-        <source>Update API Keys</source>
-        <translation>Tester les clés</translation>
-    </message>
-    <message>
-        <source>Save API Keys</source>
-        <translation>Enregistrer clés</translation>
-    </message>
-    <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Loading keys:&lt;/p&gt;&lt;p&gt;1) Enter Password&lt;/p&gt;&lt;p&gt;2) Load API Keys&lt;/p&gt;&lt;p&gt;3) Start trading on Cryptopia&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Chargement des clés:&lt;/p&gt;&lt;p&gt;1) Entrer le mot de passe &lt;/p&gt;&lt;p&gt;2) Charger les clés API&lt;/p&gt;&lt;p&gt;3) Echanger sur Cryptopia&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Saving keys:&lt;/p&gt;&lt;p&gt;1) Enter in API Keys found at &lt;a href=&quot;https://Cryptopia.co.nz/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Cryptopia&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;2) Enter Password&lt;/p&gt;&lt;p&gt;3) Save API Keys&lt;/p&gt;&lt;p&gt;4) Start trading on Cryptopia&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enregistrement des clés:&lt;/p&gt;&lt;p&gt;1) Saisir les clés API fournies par &lt;a href=&quot;https://Cryptopia.co.nz/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Cryptopia&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;2) Entrer un mot de passe&lt;/p&gt;&lt;p&gt;3) Enregistrer les clés API&lt;/p&gt;&lt;p&gt;4) Echanger sur Cryptopia&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
-        <source>Cancel Order</source>
-        <translation>Annuler Ordre</translation>
-    </message>
-    <message>
-        <source> BTC</source>
-        <translation> BTC</translation>
-    </message>
-    <message>
-        <source> 0.00000000 </source>
-        <translation> 0.00000000 </translation>
-    </message>
-    <message>
-        <source> LUX</source>
-        <translation> LUX</translation>
-    </message>
-    <message>
-        <source>Supply:</source>
-        <translation>Offre :</translation>
-    </message>
-    <message>
-        <source>Ask&apos;s:</source>
-        <translation>En vente :</translation>
-    </message>
-    <message>
-        <source>Demand:</source>
-        <translation>Demande :</translation>
-    </message>
-    <message>
-        <source>Bid&apos;s:</source>
-        <translation>Ordres d&apos;achat :</translation>
-    </message>
-    <message>
-        <source>SUM(BTC)</source>
-        <translation>Somme BTC</translation>
-    </message>
-    <message>
-        <source>TOTAL(BTC)</source>
-        <translation>Total BTC</translation>
-    </message>
-    <message>
-        <source>LUX(SIZE)</source>
-        <translation>Quantité LUX</translation>
-    </message>
-    <message>
-        <source>BID(BTC)</source>
-        <translation>Prix BTC</translation>
-    </message>
-    <message>
-        <source>ASK(BTC)</source>
-        <translation>Prix BTC</translation>
-    </message>
-    <message>
-        <source>DATE</source>
-        <translation>Date</translation>
-    </message>
-    <message>
-        <source>BUY/SELL</source>
-        <translation>Type</translation>
-    </message>
-    <message>
-        <source>BID/ASK</source>
-        <translation>Prix</translation>
-    </message>
-    <message>
-        <source>TOTAL UNITS(LUX)</source>
-        <translation>Total LUX</translation>
-    </message>
-    <message>
-        <source>TOTAL COST(BTC)</source>
-        <translation>Total BTC</translation>
-    </message>
-    <message>
-        <source>Date Time</source>
-        <translation>Date Heure</translation>
-    </message>
-    <message>
-        <source>Exchange</source>
-        <translation>Marché</translation>
-    </message>
-    <message>
-        <source>OrderType</source>
-        <translation>Type</translation>
-    </message>
-    <message>
-        <source>QTY</source>
-        <translation>Qté</translation>
-    </message>
-    <message>
-        <source>Price</source>
-        <translation>Prix</translation>
-    </message>
-    <message>
-        <source>PricePerUnit</source>
-        <translation>Prix</translation>
-    </message>
-    <message>
-        <source>OrderId</source>
-        <translation>ID Ordre</translation>
-    </message>
-    <message>
-        <source>QTY_Rem</source>
-        <translation>Reste</translation>
-    </message>
-    <message>
-        <source>Ask:</source>
-        <translation>Demande :</translation>
-    </message>
-    <message>
-        <source>Bid:</source>
-        <translation>Offre :</translation>
-    </message>
-    <message>
-        <source>LUX Volume:</source>
-        <translation>Volume LUX :</translation>
-    </message>
-    <message>
-        <source>BTC Volume:</source>
-        <translation>Volume BTC :</translation>
-    </message>
-    <message>
-        <source>Time (GMT)</source>
-        <translation>Heure (GMT)</translation>
-    </message>
-    <message>
-        <source>LUX Price in BTC</source>
-        <translation>LUX en BTC</translation>
-    </message>
-    <message>
-        <source>API Configuration Failed</source>
-        <translation>Echec configuration API</translation>
-    </message>
-    <message>
-        <source>Api configuration was unsuccesful.</source>
-        <translation>La configuration API a échoué.</translation>
-    </message>
-    <message>
-        <source>API Configuration Complete</source>
-        <translation>Configuration API</translation>
-    </message>
-    <message>
-        <source>Your API keys have been loaded and the connection has been successfully configured and tested.</source>
-        <translation>Vos clés API on été chargées et la connexion a été correctement configurée et testée.</translation>
-    </message>
-    <message>
-        <source>Your API keys have been saved and the connection has been successfully configured and tested.</source>
-        <translation>Vos clés API ont été enregistrées et la connexion a été correctement configurée et testée.</translation>
-    </message>
-    <message>
-        <source>Api connection has been successfully configured and tested.</source>
-        <translation>La connexion API a été correctement configurée et testée.</translation>
-    </message>
-    <message>
-        <source>Error</source>
-        <translation>Erreur</translation>
-    </message>
-    <message>
-        <source>Your password is too short!</source>
-        <translation>Votre mot de passe est trop court !</translation>
     </message>
 </context>
 </TS>

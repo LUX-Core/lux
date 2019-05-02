@@ -9,6 +9,7 @@
 #include "base58.h"
 #include "qvalidatedlineedit.h"
 #include "bitcoinaddressvalidator.h"
+#include "../main.h"
 #include <QLineEdit>
 #include <QCompleter>
 
@@ -20,7 +21,8 @@ AddressField::AddressField(QWidget *parent) :
     m_addressTableModel(0),
     m_addressColumn(0),
     m_typeRole(Qt::UserRole),
-    m_receive("R")
+    m_receive("R"),
+    m_senderAddress(false)
 
 {
     // Set editable state
@@ -79,6 +81,8 @@ void AddressField::on_refresh()
     // Initialize variables
     QString currentAddress = currentText();
     m_stringList.clear();
+    if (GetTime() < lastRefreshTime + 30) return; //only do this once every 30 secs
+    lastRefreshTime = GetTime();
     vector<COutput> vecOutputs;
     assert(pwalletMain != NULL);
 
@@ -180,4 +184,9 @@ void AddressField::setAddressTableModel(QAbstractItemModel *addressTableModel)
     connect(m_addressTableModel, SIGNAL(rowsRemoved(QModelIndex,int,int)), this, SLOT(on_refresh()));
 
     on_refresh();
+}
+
+void AddressField::setSenderAddress(bool senderAddress)
+{
+    m_senderAddress = senderAddress;
 }

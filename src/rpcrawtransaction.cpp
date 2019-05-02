@@ -1,7 +1,6 @@
-// Copyright (c) 2010 Satoshi Nakamoto
-// Copyright (c) 2009-2014 The Bitcoin developers
+// Copyright (c) 2012-2014 The Bitcoin developers
 // Copyright (c) 2014-2015 The Dash developers
-// Copyright (c) 2015-2017 The LUX developers
+// Copyright (c) 2015-2018 The Luxcore developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -335,6 +334,7 @@ UniValue listunspent(const UniValue& params, bool fHelp)
                     entry.push_back(Pair("redeemScript", HexStr(redeemScript.begin(), redeemScript.end())));
             }
         }
+        entry.push_back(Pair("scriptPubKey", HexStr(scriptPubKey.begin(), scriptPubKey.end())));
         entry.push_back(Pair("amount", ValueFromAmount(out.tx->vout[out.i].nValue)));
         entry.push_back(Pair("confirmations", out.nDepth));
         entry.push_back(Pair("ds_rounds", pwalletMain->GetInputDarkSendRounds(CTxIn(out.tx->GetHash(), out.i))));

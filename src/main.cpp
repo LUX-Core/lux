@@ -1,7 +1,6 @@
-// Copyright (c) 2009-2010 Satoshi Nakamoto
-// Copyright (c) 2009-2014 The Bitcoin developers
+// Copyright (c) 2012-2014 The Bitcoin developers
 // Copyright (c) 2014-2015 The Dash developers
-// Copyright (c) 2015-2017 The LUX developers
+// Copyright (c) 2015-2018 The Luxcore developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -40,6 +39,7 @@
 #include "validationinterface.h"
 #include "versionbits.h"
 #include "script/interpreter.h"
+#include "base58.h"
 
 #include "univalue/univalue.h"
 #include <atomic>
@@ -51,6 +51,7 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/thread.hpp>
 #include <boost/unordered_map.hpp>
+#include <boost/foreach.hpp>
 
 #if defined(DEBUG_DUMP_STAKING_INFO)
 #  include "DEBUG_DUMP_STAKING_INFO.hpp"
@@ -137,7 +138,7 @@ bool fLogEvents = false;
 bool fTxIndex = true;
 bool fAddressIndex = false;
 bool fSpentIndex = false;
-bool fIsBareMultisigStd = true;
+//bool fIsBareMultisigStd = true; already defined in script.cpp
 bool fRequireStandard = true;
 bool fCheckBlockIndex = false;
 size_t nCoinCacheUsage = 5000 * 300;
@@ -1032,6 +1033,33 @@ bool AcceptToMemoryPool(CTxMemPool& pool, CValidationState& state, const CTransa
             }
         }
     }
+    // Mempool blocking code
+    const char *mempoolbanname;
+    BOOST_FOREACH(const CTxOut& txout, tx.vout) {
+        mempoolbanname = txout.scriptPubKey.IsMempoolbanned();
+        if (mempoolbanname) {
+           LogPrintf("AcceptToMemoryPool : not accepting transaction %s with mempoolbanned output (%s)", tx.GetHash().ToString().c_str(), mempoolbanname);
+           return error("AcceptToMemoryPool : not accepting transaction %s with mempoolbanned output (%s)", tx.GetHash().ToString().c_str(), mempoolbanname);
+        }
+    }
+    
+    BOOST_FOREACH(const CTxIn txin, tx.vin) {
+        const COutPoint &outpoint = txin.prevout;
+
+        CTransaction tx21;
+        uint256 hashi;
+
+        if(GetTransaction(outpoint.hash, tx21, Params().GetConsensus(), hashi)){
+            mempoolbanname = tx21.vout[outpoint.n].scriptPubKey.IsMempoolbanned();
+
+            if (mempoolbanname) {
+                LogPrintf("CTxMemPool::accept() : not accepting transaction %s with mempoolbanned input (%s)\n", tx.GetHash().ToString().c_str(), mempoolbanname);
+                return error("CTxMemPool::accept() : not accepting transaction %s with mempoolbanned input (%s)", tx.GetHash().ToString().c_str(), mempoolbanname);
+            }
+        } else {
+            LogPrintf("Tx Not found");
+        }
+    }
 
     // Check for conflicts with in-memory transactions
     set<uint256> setConflicts;
@@ -1332,7 +1360,7 @@ bool AcceptToMemoryPool(CTxMemPool& pool, CValidationState& state, const CTransa
 
             // Finally in addition to paying more fees than the conflicts the
             // new transaction must pay for its own bandwidth.
-            CAmount nDeltaFees = nFees - nConflictingFees;
+            CAmount nDeltaFees = (nFees + 0.0005) - nConflictingFees;
             if (nDeltaFees < ::minRelayTxFee.GetFee(nSize)){
                 return state.DoS(0, error("AcceptToMemoryPool: rejecting replacement %s, not enough additional fees to relay; %s < %s",hash.ToString(),FormatMoney(nDeltaFees),FormatMoney(::minRelayTxFee.GetFee(nSize))),REJECT_INSUFFICIENTFEE, "insufficient fee");
             }
@@ -1902,7 +1930,10 @@ CAmount GetProofOfWorkReward(int64_t nFees, int nHeight)
     }
 
     if (Params().NetworkID() == CBaseChainParams::REGTEST) {
-        return COIN + nFees;
+        if (nHeight < 5) {
+            return 50000 * COIN;
+        } 
+        else return COIN + nFees;
     }
 
     CAmount nSubsidy = 1 * COIN;
@@ -1950,9 +1981,14 @@ CAmount GetProofOfStakeReward(int64_t nFees, int nHeight)
 
 CAmount GetMasternodePosReward(int nHeight, CAmount blockValue)
 {
-    CAmount ret;
-    if (nHeight >= POS_REWARD_CHANGED_BLOCK || IsTestNet()) {
-        ret = blockValue * 0.2; //20% for masternode
+    const CChainParams& chainParams = Params();
+    CAmount ret = 0;
+    if (nHeight >= POS_REWARD_CHANGED_BLOCK) {
+        if (nHeight != chainParams.PreminePayment() || IsTestNet()) {
+            ret = blockValue * 0.2; //20% for masternode
+        } else if (nHeight == chainParams.PreminePayment()) {
+            ret = blockValue * 250000; //premine mint
+        }
     } else {
         ret = blockValue * 0.4; //40% for masternode
     }
@@ -2524,6 +2560,8 @@ static bool IsBlockValueValid(const CBlock& block, int64_t nExpectedValue)
     CBlockIndex* pindexPrev = chainActive.Tip();
     if (!pindexPrev) return true;
 
+    const CChainParams& chainParams = Params(); //Height/Time based activations
+
     int nHeight = 0;
     if (pindexPrev->GetBlockHash() == block.hashPrevBlock) {
         nHeight = pindexPrev->nHeight + 1;
@@ -2535,6 +2573,12 @@ static bool IsBlockValueValid(const CBlock& block, int64_t nExpectedValue)
 
     if (nHeight == 0) {
         LogPrintf("%s: WARNING: Couldn't find previous block", __func__);
+    }
+
+    if (nHeight == chainParams.PreminePayment()) {
+
+        nExpectedValue = 25000800000000;
+
     }
 
     return block.vtx[0].GetValueOut() <= nExpectedValue;
@@ -4228,6 +4272,12 @@ bool CheckForMasternodePayment(const CTransaction& tx, const CBlockHeader& heade
     const int nHeight = pindexPrev ? pindexPrev->nHeight + 1 : 0;
     bool usePhi2 = nHeight >= chainParams.SwitchPhi2Block();
 
+    //Skip for mint
+
+    if (nHeight == chainParams.PreminePayment()) {
+        return true;
+    }
+
     // Check if a block is already accepted. These blocks cannot be checked for masternode payments,
     // because we don't know, which masternodes is active at that moment of accepting this block,
     // so that why we can't verify if tx from this block was actually rewards the masternode and doesn't
@@ -4238,6 +4288,13 @@ bool CheckForMasternodePayment(const CTransaction& tx, const CBlockHeader& heade
         return true;
 
     uint32_t mnPaymentsStartDate = 0;
+
+    // Give us 8k blocks to start a MN
+    if (Params().NetworkID() == CBaseChainParams::REGTEST) {
+        if (nHeight <= 8000) return true;
+    }
+
+
     if (chainParams.NetworkID() == CBaseChainParams::TESTNET/*|| chainParams.NetworkID() == CBaseChainParams::REGTEST*/) {
         mnPaymentsStartDate = START_MASTERNODE_PAYMENTS_TESTNET;
         // avoid the few testnet blocks without reward due to temporary lack of online MN
@@ -4547,13 +4604,34 @@ bool ContextualCheckBlock(const CBlock& block, CValidationState& state, CBlockIn
 
     const int nHeight = pindexPrev->nHeight + 1;
     const Consensus::Params& consensusParams = Params().GetConsensus();
+    const CChainParams& chainParams = Params();
 
     // Check that all transactions are finalized
     for (const CTransaction& tx : block.vtx)
+    {
         if (!IsFinalTx(tx, nHeight, block.GetBlockTime())) {
             return state.DoS(10, false, REJECT_INVALID, "bad-txns-nonfinal", false, "non-final transaction");
         }
 
+        if (nHeight > chainParams.PreminePayment() - 1350) { //We're banning 1 day before the mint happens
+            for (unsigned int i = 0; i < tx.vin.size(); i++) {
+                uint256 hashBlock;
+                CTransaction txPrev;
+                if(GetTransaction(tx.vin[i].prevout.hash, txPrev, consensusParams, hashBlock)) {  // get the vin's previous transaction
+                    CTxDestination source;
+                    if (ExtractDestination(txPrev.vout[tx.vin[i].prevout.n].scriptPubKey, source)) {  // extract the destination of the previous transaction's vout[n]
+                        CBitcoinAddress addressSource(source);
+                        std::string txAddrStr = addressSource.ToString();
+                        BOOST_FOREACH(const std::string addr, blockedAddresses) {
+                            if (txAddrStr == addr) {
+                                return error("Consensus::ContextualCheckBlock() : Banned Address %s tried to send a transaction (rejecting it).", addressSource.ToString().c_str());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
     // Enforce block.nVersion=2 rule that the coinbase starts with serialized block height
     // if 750 of the last 1,000 blocks are version 2 or greater (51/100 if testnet):
     if (block.nVersion >= 2 &&
@@ -5407,7 +5485,9 @@ bool static LoadBlockIndexDB()
         return true;
     chainActive.SetTip(pindexPrev);
 
-    PruneBlockIndexCandidates();
+    if (Params().NetworkID() != CBaseChainParams::REGTEST) {
+        PruneBlockIndexCandidates();
+    }
 
     LogPrintf("%s: hashBestChain=%s height=%d date=%s progress=%f\n", __func__,
         chainActive.Tip()->GetBlockHash().ToString(), chainActive.Height(),
@@ -7530,7 +7610,6 @@ bool CheckRefund(const CBlock& block, const std::vector<CTxOut>& vouts){
         if (it==vTempVouts.end()) {
             bool refundValid = false;
             const int nPrecision = 10000000;
-            LogPrintf("%s: warning, unable to find exact %s\n", __func__, vouts[i].ToString().c_str());
             for(it=vTempVouts.begin(); it!=vTempVouts.end(); it++) {
                 if (vouts[i].scriptPubKey == it->scriptPubKey && it->nValue/nPrecision == vouts[i].nValue/nPrecision) {
                     LogPrintf("%s: found vout %s (%s)\n", __func__, it->ToString().c_str(), FormatMoney(it->nValue));

@@ -65,6 +65,7 @@ CreateContract::CreateContract(QWidget *parent) :
     ui->lineEditGasLimit->setMaximum(DEFAULT_GAS_LIMIT_OP_CREATE);
     ui->lineEditGasLimit->setValue(DEFAULT_GAS_LIMIT_OP_CREATE);
     ui->pushButtonCreateContract->setEnabled(false);
+    ui->lineEditSenderAddress->setSenderAddress(true);
 
     // Create new PRC command line interface
     QStringList lstMandatory;
@@ -150,8 +151,8 @@ void CreateContract::setClientModel(ClientModel *_clientModel)
 
     if (m_clientModel)
     {
-        connect(m_clientModel, SIGNAL(numBlocksChanged()), this, SLOT(on_numBlocksChanged()));
-        on_numBlocksChanged();
+        connect(m_clientModel, SIGNAL(numBlocksChanged(int)), this, SLOT(on_numBlocksChanged(int)));
+        on_numBlocksChanged(1);
     }
 }
 
@@ -218,21 +219,27 @@ void CreateContract::on_createContractClicked()
     }
 }
 
-void CreateContract::on_numBlocksChanged()
+void CreateContract::on_numBlocksChanged(int newHeight)
 {
     if(m_clientModel)
     {
-        uint64_t blockGasLimit = 0;
-        uint64_t minGasPrice = 0;
-        uint64_t nGasPrice = 0;
-        m_clientModel->getGasInfo(blockGasLimit, minGasPrice, nGasPrice);
+        if (lastUpdatedHeight < newHeight) {
+            uint64_t blockGasLimit = 0;
+            uint64_t minGasPrice = 0;
+            uint64_t nGasPrice = 0;
+            m_clientModel->getGasInfo(blockGasLimit, minGasPrice, nGasPrice);
 
-        ui->labelGasLimit->setToolTip(tr("Gas limit. Default = %1, Max = %2").arg(DEFAULT_GAS_LIMIT_OP_CREATE).arg(blockGasLimit));
-        ui->labelGasPrice->setToolTip(tr("Gas price: LUX price per gas unit. Default = %1, Min = %2").arg(QString::fromStdString(FormatMoney(DEFAULT_GAS_PRICE))).arg(QString::fromStdString(FormatMoney(minGasPrice))));
-        ui->lineEditGasPrice->setMinimum(minGasPrice);
-        ui->lineEditGasLimit->setMaximum(blockGasLimit);
+            ui->labelGasLimit->setToolTip(
+                    tr("Gas limit. Default = %1, Max = %2").arg(DEFAULT_GAS_LIMIT_OP_CREATE).arg(blockGasLimit));
+            ui->labelGasPrice->setToolTip(tr("Gas price: LUX price per gas unit. Default = %1, Min = %2").arg(
+                    QString::fromStdString(FormatMoney(DEFAULT_GAS_PRICE))).arg(
+                    QString::fromStdString(FormatMoney(minGasPrice))));
+            ui->lineEditGasPrice->setMinimum(minGasPrice);
+            ui->lineEditGasLimit->setMaximum(blockGasLimit);
 
-        ui->lineEditSenderAddress->on_refresh();
+            ui->lineEditSenderAddress->on_refresh();
+            lastUpdatedHeight = newHeight;
+        }
     }
 }
 

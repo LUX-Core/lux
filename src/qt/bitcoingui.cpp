@@ -96,6 +96,7 @@ BitcoinGUI::BitcoinGUI(const PlatformStyle *platformStyle, const NetworkStyle* n
                                                                             clientModel(0),
                                                                             walletFrame(0),
                                                                             unitDisplayControl(0),
+                                                                            timerStakingIcon(0),
                                                                             labelStakingIcon(0),
                                                                             labelWalletEncryptionIcon(0),
                                                                             pushButtonWalletHDStatusIcon(0),
@@ -107,7 +108,6 @@ BitcoinGUI::BitcoinGUI(const PlatformStyle *platformStyle, const NetworkStyle* n
                                                                             appMenuBar(0),
                                                                             overviewAction(0),
                                                                             historyAction(0),
-                                                                            tradingAction(0),
                                                                             masternodeAction(0),
                                                                             quitAction(0),
                                                                             sendCoinsAction(0),
@@ -310,7 +310,7 @@ BitcoinGUI::BitcoinGUI(const PlatformStyle *platformStyle, const NetworkStyle* n
         pushButtonDiscord = new QPushButton(frameSocMedia);
         pushButtonDiscord->setToolTip(tr("Go to")+" Discord");
         connect(pushButtonDiscord, &QPushButton::clicked,
-                this, [](){QDesktopServices::openUrl(QUrl("https://discord.gg/27xFP5Y"));});
+                this, [](){QDesktopServices::openUrl(QUrl("https://discord.gg/ndUg9va"));});
         pushButtonDiscord->setIcon(QIcon(":/icons/res/icons/discord.png").pixmap(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE));
 
         pushButtonTwitter = new QPushButton(frameSocMedia);
@@ -399,10 +399,11 @@ BitcoinGUI::BitcoinGUI(const PlatformStyle *platformStyle, const NetworkStyle* n
     // Subscribe to notifications from core
     subscribeToCoreSignals();
 
-    QTimer* timerStakingIcon = new QTimer(labelStakingIcon);
+    setStakingStatus();
+    timerStakingIcon = new QTimer(this);
     connect(timerStakingIcon, SIGNAL(timeout()), this, SLOT(setStakingStatus()));
     timerStakingIcon->start(10000);
-    setStakingStatus();
+
     modalOverlay = new ModalOverlay(this->centralWidget());
 
     updateDialog = new UpdateDialog(this);
@@ -428,7 +429,7 @@ BitcoinGUI::BitcoinGUI(const PlatformStyle *platformStyle, const NetworkStyle* n
 BitcoinGUI::~BitcoinGUI() {
     // Unsubscribe from notifications from core
     unsubscribeFromCoreSignals();
-
+    delete timerStakingIcon;
     GUIUtil::saveWindowGeometry("nWindow", this);
     if (trayIcon) // Hide tray icon, as deleting will let it linger until quit (on Ubuntu)
         trayIcon->hide();
@@ -484,17 +485,6 @@ void BitcoinGUI::createActions() {
 #endif
     tabGroup->addAction(historyAction);
 
-    tradingAction = new QAction(QIcon(":/icons/trading"), tr("&Trading"), this);
-    tradingAction->setStatusTip(tr("Trading on Cryptopia"));
-    tradingAction->setToolTip(tradingAction->statusTip());
-    tradingAction->setCheckable(true);
-#ifdef Q_OS_MAC
-    tradingAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_6));
-#else
-    tradingAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_6));
-#endif
-    tabGroup->addAction(tradingAction);
-
     LSRTokenAction = new QAction(QIcon(":/icons/lsrtoken"), tr("&LSR Token"), this);
     LSRTokenAction->setStatusTip(tr("LSR Token (send, receive or add Token in list)"));
     LSRTokenAction->setToolTip(LSRTokenAction->statusTip());
@@ -549,8 +539,6 @@ void BitcoinGUI::createActions() {
     connect(LSRTokenAction, SIGNAL(triggered()), this, SLOT(gotoLSRTokenPage()));
     connect(historyAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
     connect(historyAction, SIGNAL(triggered()), this, SLOT(gotoHistoryPage()));
-    connect(tradingAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
-    connect(tradingAction, SIGNAL(triggered()), this, SLOT(gotoTradingPage()));
 #endif // ENABLE_WALLET
 
     quitAction = new QAction(QIcon(":/icons/quit"), tr("E&xit"), this);
@@ -561,10 +549,12 @@ void BitcoinGUI::createActions() {
     aboutAction->setStatusTip(tr("Show information about Luxcore"));
     aboutAction->setMenuRole(QAction::AboutRole);
 
+#ifdef ENABLE_UPDATER
     // Check for update menu item
     checkForUpdateAction = new QAction(QIcon(":/icons/update_black"), tr("Check for &Update"), this);
     checkForUpdateAction->setStatusTip(tr("Check whether there is an updated wallet from Luxcore"));
     checkForUpdateAction->setMenuRole(QAction::NoRole);
+#endif
 
 #if QT_VERSION < 0x050000
     aboutQtAction = new QAction(QIcon(":/trolltech/qmessagebox/images/qtlogo-64.png"), tr("About &Qt"), this);
@@ -642,7 +632,9 @@ void BitcoinGUI::createActions() {
 
     connect(quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
     connect(aboutAction, SIGNAL(triggered()), this, SLOT(aboutClicked()));
+#ifdef ENABLE_UPDATER
     connect(checkForUpdateAction, SIGNAL(triggered()), this, SLOT(updaterClicked()));
+#endif
     connect(aboutQtAction, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
     connect(optionsAction, SIGNAL(triggered()), this, SLOT(optionsClicked()));
     connect(toggleHideAction, SIGNAL(triggered()), this, SLOT(toggleHidden()));
@@ -725,9 +717,11 @@ void BitcoinGUI::createMenuBar() {
         tools->addSeparator();
         tools->addAction(openHexAddressAction);
         tools->addAction(openBlockExplorerAction);
+#ifdef ENABLE_UPDATER
         tools->addSeparator();
         tools->addAction(checkForUpdateAction);
         tools->addSeparator();
+#endif
     }
 
     QMenu* help = appMenuBar->addMenu(tr("&Help"));
@@ -750,7 +744,6 @@ void BitcoinGUI::createToolBars() {
         toolbar->addAction(receiveCoinsAction);
         toolbar->addAction(historyAction);
         toolbar->addAction(LSRTokenAction);
-        toolbar->addAction(tradingAction);
         QSettings settings;
         if (settings.value("fShowMasternodesTab").toBool()) {
             toolbar->addAction(masternodeAction);
@@ -877,7 +870,6 @@ void BitcoinGUI::setWalletActionsEnabled(bool enabled) {
     sendCoinsAction->setEnabled(enabled);
     receiveCoinsAction->setEnabled(enabled);
     historyAction->setEnabled(enabled);
-    tradingAction->setEnabled(enabled);
     QSettings settings;
     if (settings.value("fShowMasternodesTab").toBool()) {
         masternodeAction->setEnabled(enabled);
@@ -1035,12 +1027,6 @@ void BitcoinGUI::gotoHistoryPage()
     if (walletFrame) walletFrame->gotoHistoryPage();
 }
 
-void BitcoinGUI::gotoTradingPage()
-{
-    tradingAction->setChecked(true);
-    if (walletFrame) walletFrame->gotoTradingPage();
-}
-
 void BitcoinGUI::gotoMasternodePage()
 {
     QSettings settings;
@@ -1151,6 +1137,7 @@ void BitcoinGUI::setNumBlocks(int count, const QDateTime& blockDate, double nVer
     enum BlockSource blockSource = clientModel->getBlockSource();
     switch (blockSource) {
         case BLOCK_SOURCE_NETWORK:
+            hideLogMessage = true;
             if (header) {
                 updateHeadersSyncProgressLabel();
                 return;
@@ -1185,6 +1172,7 @@ void BitcoinGUI::setNumBlocks(int count, const QDateTime& blockDate, double nVer
 
     tooltip = tr("Processed %n blocks of transaction history.", "", count);
     if(secs < 90*60) {
+        hideLogMessage = false;
         tooltip = tr("Up to date") + QString(".<br>") + tooltip;
         labelBlocksIcon->setPixmap(QIcon(":/icons/synced").pixmap(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE));
 #ifdef ENABLE_WALLET
@@ -1200,7 +1188,7 @@ void BitcoinGUI::setNumBlocks(int count, const QDateTime& blockDate, double nVer
         // notify tip changed when the sync is finished
         if(fWalletProcessingMode) {
             fWalletProcessingMode = false;
-            QMetaObject::invokeMethod(clientModel, "numBlocksChanged", Qt::QueuedConnection);
+            QMetaObject::invokeMethod(clientModel, "numBlocksChanged", Qt::QueuedConnection, Q_ARG(int, count));
         }
     } else {
         QString timeBehindText = GUIUtil::formatNiceTimeOffset(secs);

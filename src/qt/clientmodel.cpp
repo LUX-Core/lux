@@ -61,6 +61,7 @@ ClientModel::ClientModel(OptionsModel* optionsModel, QObject* parent) : QObject(
 
 ClientModel::~ClientModel()
 {
+    delete pollTimer;
     unsubscribeFromCoreSignals();
 }
 
@@ -386,7 +387,7 @@ static void BlockTipChanged(ClientModel *clientmodel, bool initialSync, const CB
                                   Q_ARG(double, clientmodel->getVerificationProgress(pIndex)),
                                   Q_ARG(bool, fHeader));
         if(!fHeader && !fWalletProcessingMode) {
-            QMetaObject::invokeMethod(clientmodel, "numBlocksChanged", Qt::QueuedConnection);
+            QMetaObject::invokeMethod(clientmodel, "numBlocksChanged", Qt::QueuedConnection, Q_ARG(int, pIndex->nHeight));
         }
         nLastUpdateNotification = now;
     }

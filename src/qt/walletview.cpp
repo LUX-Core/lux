@@ -23,7 +23,6 @@
 #include "tokentransactiontablemodel.h"
 #include "transactionview.h"
 #include "walletmodel.h"
-#include "tradingdialog.h"
 #include "smartcontract.h"
 #include "lsrtoken.h"
 #include "restoredialog.h"
@@ -52,7 +51,6 @@ WalletView::WalletView(const PlatformStyle* platformStyle, QWidget* parent) : QS
     transactionsPage = new QWidget(this);
     smartContractPage = new SmartContract(this);
     LSRTokenPage = new LSRToken(this);
-    tradingPage = new tradingDialog(this);
     QVBoxLayout* vbox = new QVBoxLayout();
     QHBoxLayout* hbox_buttons = new QHBoxLayout();
     transactionView = new TransactionView(platformStyle, this);
@@ -79,7 +77,6 @@ WalletView::WalletView(const PlatformStyle* platformStyle, QWidget* parent) : QS
     hbox_buttons->addWidget(exportButton);
     vbox->addLayout(hbox_buttons);
     transactionsPage->setLayout(vbox);
-    tradingPage->setLayout(vbox);
 
     receiveCoinsPage = new ReceiveCoinsDialog(platformStyle);
     sendCoinsPage = new SendCoinsDialog(platformStyle);
@@ -87,7 +84,6 @@ WalletView::WalletView(const PlatformStyle* platformStyle, QWidget* parent) : QS
     addWidget(overviewPage);
     addWidget(transactionsPage);
 
-    addWidget(tradingPage);
     addWidget(receiveCoinsPage);
     addWidget(sendCoinsPage);
     addWidget(explorerWindow);
@@ -266,11 +262,6 @@ void WalletView::gotoOverviewPage()
 void WalletView::gotoHistoryPage()
 {
     setCurrentWidget(transactionsPage);
-}
-
-void WalletView::gotoTradingPage()
-{
-    setCurrentWidget(tradingPage);
 }
 
 void WalletView::gotoBlockExplorerPage()

@@ -1,4 +1,6 @@
-// Copyright (c) 2012 Pieter Wuille                             -*- c++ -*-
+// Copyright (c) 2012-2014 The Bitcoin developers
+// Copyright (c) 2014-2015 The Dash developers
+// Copyright (c) 2015-2018 The Luxcore developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -476,33 +478,31 @@ public:
     }
 
     //! Add a single address.
-    bool Add(const CAddress& addr, const CNetAddr& source, int64_t nTimePenalty = 0)
+    bool Add(const CAddress &addr, const CNetAddr& source, int64_t nTimePenalty = 0)
     {
         LOCK(cs);
         bool fRet = false;
-        {
-            Check();
-            fRet |= Add_(addr, source, nTimePenalty);
-            Check();
-        }
-        if (fRet)
+        Check();
+        fRet |= Add_(addr, source, nTimePenalty);
+        Check();
+        if (fRet) {
             LogPrint("addrman", "Added %s from %s: %i tried, %i new\n", addr.ToStringIPPort(), source.ToString(), nTried, nNew);
+        }
         return fRet;
     }
 
     //! Add multiple addresses.
-    bool Add(const std::vector<CAddress>& vAddr, const CNetAddr& source, int64_t nTimePenalty = 0)
+    bool Add(const std::vector<CAddress> &vAddr, const CNetAddr& source, int64_t nTimePenalty = 0)
     {
         LOCK(cs);
         int nAdd = 0;
-        {
-            Check();
-            for (std::vector<CAddress>::const_iterator it = vAddr.begin(); it != vAddr.end(); it++)
-                nAdd += Add_(*it, source, nTimePenalty) ? 1 : 0;
-            Check();
-        }
-        if (nAdd)
+        Check();
+        for (std::vector<CAddress>::const_iterator it = vAddr.begin(); it != vAddr.end(); it++)
+            nAdd += Add_(*it, source, nTimePenalty) ? 1 : 0;
+        Check();
+        if (nAdd) {
             LogPrint("addrman", "Added %i addresses from %s: %i tried, %i new\n", nAdd, source.ToString(), nTried, nNew);
+        }
         return nAdd > 0;
     }
 

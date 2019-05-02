@@ -68,6 +68,8 @@ public:
 
     void setReceive(const QString &receive);
 
+    void setSenderAddress(bool senderAddress);
+
 Q_SIGNALS:
     /**
      * @brief addressTypeChanged Signal that the address type is changed
@@ -100,7 +102,9 @@ private:
     QAbstractItemModel* m_addressTableModel;
     int m_addressColumn;
     int m_typeRole;
+    int64_t lastRefreshTime;
     QString m_receive;
+    bool m_senderAddress;
 };
 
 #endif // ADDRESSFIELD_H

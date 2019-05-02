@@ -31,7 +31,7 @@ public:
 
 private Q_SLOTS:
     void on_clearButton_clicked();
-    void on_numBlocksChanged();
+    void on_numBlocksChanged(int newHeight);
     void on_updateConfirmButton();
     void on_confirmClicked();
 
@@ -41,6 +41,7 @@ private:
     ClientModel* m_clientModel;
     Token *m_tokenABI;
     SelectedToken *m_selectedToken;
+    int lastUpdatedHeight;
 };
 
 #endif // SENDTOKENPAGE_H

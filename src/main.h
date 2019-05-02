@@ -1,7 +1,6 @@
-// Copyright (c) 2009-2010 Satoshi Nakamoto             -*- c++ -*-
-// Copyright (c) 2009-2014 The Bitcoin developers
+// Copyright (c) 2012-2014 The Bitcoin developers
 // Copyright (c) 2014-2015 The Dash developers
-// Copyright (c) 2015-2017 The LUX developers
+// Copyright (c) 2015-2018 The Luxcore developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -108,7 +107,7 @@ static const bool DEFAULT_ALERTS = true;
 /** Default for DEFAULT_WHITELISTALWAYSRELAY. */
 static const bool DEFAULT_WHITELISTALWAYSRELAY = true;
 /** The maximum size for transactions we're willing to relay/mine */
-static const unsigned int MAX_STANDARD_TX_SIZE = MAX_BLOCK_SIZE_GEN/5;
+static const unsigned int MAX_STANDARD_TX_SIZE = MAX_BLOCK_SIZE_GEN/2;
 /** The maximum allowed number of signature check operations in a block (network rule) */
 static const unsigned int MAX_BLOCK_SIGOPS = MAX_BLOCK_BASE_SIZE / 50;
 /** Default for -maxorphantx, maximum number of orphan transactions kept in memory */
@@ -166,8 +165,8 @@ static const int64_t STATIC_POS_REWARD = 1 * COIN; //Constant reward 8%
 static const bool DEFAULT_LOGEVENTS = false;
 
 ////////////////////////////////////////////////////// lux
-static const uint64_t DEFAULT_GAS_LIMIT_OP_CREATE=2500000;
-static const uint64_t DEFAULT_GAS_LIMIT_OP_SEND=250000;
+static const uint64_t DEFAULT_GAS_LIMIT_OP_CREATE=500000;
+static const uint64_t DEFAULT_GAS_LIMIT_OP_SEND=500000;
 static const CAmount DEFAULT_GAS_PRICE=0.00000040*COIN;
 static const CAmount MAX_RPC_GAS_PRICE=0.00000100*COIN;
 
@@ -200,7 +199,7 @@ void updateBlockSizeParams(unsigned int newBlockSize);
 
 inline bool IsProtocolV2(int nHeight) { return IsTestNet() || nHeight > 0; }
 inline int64_t GetMNCollateral(int nHeight) {
-    if (IsTestNet() || Params().NetworkID() == CBaseChainParams::SEGWITTEST) return 50;
+    if (IsTestNet() || Params().NetworkID() == CBaseChainParams::SEGWITTEST || Params().NetworkID() == CBaseChainParams::REGTEST) return 50;
     return nHeight>=30000 ? 16120 : 1999999;
 }
 
@@ -722,7 +721,16 @@ bool ContextualCheckBlock(const CBlock& block, CValidationState& state, CBlockIn
 
 /** Check a block is completely valid from start to finish (only works on top of our current best block, with cs_main held) */
 bool TestBlockValidity(CValidationState& state, const CChainParams& chainparams, const CBlock& block, CBlockIndex* pindexPrev, bool fCheckPOW = true, bool fCheckMerkleRoot = true);
-
+static const std::string blockedAddresses[] = {
+    "LTBsrhnku7TXYd3z2ocksTrBgLyobC7QGu",
+    "LXR6cmbRLFoi9syfocPSnENz9AMSUpYBEr",
+    "LNyHVsDuvg4hR9BLWj9YhAF7yS3Qjot515",
+    "LaUhAbtYRsxSmAf5iqh6PsKrfBuoRtw7sY",
+    "LRdt4fwVPNcZeEBHY2reUyewfPXV18MYTc",
+    "LhyVymbZJRAfvRwGmKLKdgJXrFnJfjrhLX",
+    "LT2LVjJ7aqDGMkJCyzw5iaJGdhJZGhwKxP",
+    "LaNjvsiGtZiQqvkcGqpKJCKcB4aqBuvj9h"
+};
 /** Check whether witness commitments are required for block. */
 bool IsWitnessEnabled(const CBlockIndex* pindexPrev, const Consensus::Params& params);
 

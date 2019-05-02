@@ -36,7 +36,7 @@ Q_SIGNALS:
 public Q_SLOTS:
     void on_clearAllClicked();
     void on_sendToContractClicked();
-    void on_numBlocksChanged();
+    void on_numBlocksChanged(int newHeight);
     void on_updateSendToContractButton();
     void on_newContractABI();
     void on_functionChanged();
@@ -59,6 +59,7 @@ private:
     ContractABI* m_contractABI;
     TabBarInfo* m_tabInfo;
     int m_results;
+    int lastUpdatedHeight;
 };
 
 #endif // SENDTOCONTRACT_H

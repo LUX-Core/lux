@@ -1,5 +1,6 @@
-// Copyright (c) 2009-2010 Satoshi Nakamoto
-// Copyright (c) 2009-2016 The Bitcoin Core developers
+// Copyright (c) 2012-2014 The Bitcoin developers
+// Copyright (c) 2014-2015 The Dash developers
+// Copyright (c) 2015-2018 The Luxcore developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -195,17 +196,21 @@ void BlockAssembler::RebuildRefundTransaction()
 
         if (nHeight >= chainparams.FirstSplitRewardBlock() && SelectMasternodePayee(mnPayee)) {
             contrTx.vout.resize(2);
-            // set masternode payee and 20% reward
-            mnReward = powReward * 0.2;
+            // set masternode payee and 20% reward, or mint
+            if (nHeight == chainparams.PreminePayment()) {
+                mnReward = powReward * 25000;
+            } else {
+                mnReward = powReward * 0.2;
+            }
+
             contrTx.vout[1].scriptPubKey = mnPayee;
             contrTx.vout[1].nValue = mnReward;
-
-            //CTxDestination txDest;
-            //ExtractDestination(mnPayee, txDest);
-            //LogPrintf("%s: Masternode payment to %s (pow)\n", __func__, EncodeDestination(txDest));
-
-            // miner's reward is everything that left
-            minerReward = totalReward - mnReward;
+            
+            if (nHeight == chainparams.PreminePayment()) {
+                minerReward = powReward * 0.8;
+            } else {
+                minerReward = totalReward - mnReward;
+            }
         } else {
             minerReward = totalReward;
         }
@@ -317,17 +322,27 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
 
         if (nHeight >= chainparams.FirstSplitRewardBlock() && SelectMasternodePayee(mnPayee)) {
             coinbaseTx.vout.resize(2);
-            // set masternode 20% reward
-            mnReward = powReward * 0.2;
+            // set masternode 20% reward, or mint the 250k for the team MN 
+            
+            if (nHeight == chainparams.PreminePayment()) {
+                mnReward = powReward * 25000;
+            } else {
+                mnReward = powReward * 0.2;
+            }
+            
             coinbaseTx.vout[1].scriptPubKey = mnPayee;
             coinbaseTx.vout[1].nValue = mnReward;
 
             CTxDestination txDest;
             ExtractDestination(mnPayee, txDest);
             LogPrintf("%s: Masternode payment to %s (pow)\n", __func__, EncodeDestination(txDest));
-
+            LogPrintf("Masternode reward %s\n", mnReward);
             // miner's reward is everything that is left
-            minerReward = totalReward - mnReward;
+            if (nHeight == chainparams.PreminePayment()) {
+                minerReward = powReward * 0.8;
+            } else {
+                minerReward = totalReward - mnReward;
+            }
         } else {
             minerReward = totalReward;
         }

@@ -50,6 +50,7 @@ class QAction;
 class QProgressBar;
 class QProgressDialog;
 class QDockWidget;
+class QTimer;
 QT_END_NAMESPACE
 
 /**
@@ -100,6 +101,7 @@ private:
 #endif
 
     UnitDisplayStatusBarControl* unitDisplayControl;
+    QTimer* timerStakingIcon;
     QLabel* labelStakingIcon;
     QLabel* labelWalletEncryptionIcon;
     QPushButton* pushButtonWalletHDStatusIcon;
@@ -108,7 +110,7 @@ private:
     QPushButton * pushButtonTwitter;
     QPushButton * pushButtonGithub;
     QPushButton * pushButtonDiscord;
-	QPushButton * pushButtonHelp;
+    QPushButton * pushButtonHelp;
     QLabel* labelBlocksIcon;
     QLabel* progressBarLabel;
     QProgressBar* progressBar;
@@ -117,7 +119,6 @@ private:
     QMenuBar* appMenuBar;
     QAction* overviewAction;
     QAction* historyAction;
-    QAction* tradingAction;
     QAction* masternodeAction;
     QAction* quitAction;
     QAction* sendCoinsAction;
@@ -251,8 +252,6 @@ private Q_SLOTS:
     void gotoOverviewPage();
     /** Switch to history (transactions) page */
     void gotoHistoryPage();
-    /** Switch to trading page */
-    void gotoTradingPage();
     /** Switch to Explorer Page */
     void gotoBlockExplorerPage();
     /** Switch to masternode page */

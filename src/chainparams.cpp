@@ -1,7 +1,6 @@
-// Copyright (c) 2010 Satoshi Nakamoto
-// Copyright (c) 2009-2014 The Bitcoin developers
+// Copyright (c) 2012-2014 The Bitcoin developers
 // Copyright (c) 2014-2015 The Dash developers
-// Copyright (c) 2015-2017 The LUX developers
+// Copyright (c) 2015-2018 The Luxcore developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -25,11 +24,6 @@
 
 using namespace std;
 using namespace boost::assign;
-
-struct SeedSpec6 {
-    uint8_t addr[16];
-    uint16_t port;
-};
 
 #include "chainparamsseeds.h"
 
@@ -56,23 +50,6 @@ bool CheckProof(uint256 hash, unsigned int nBits)
 /**
  * Main network
  */
-
-//! Convert the pnSeeds6 array into usable address objects.
-static void convertSeed6(std::vector<CAddress>& vSeedsOut, const SeedSpec6* data, unsigned int count)
-{
-    // It'll only connect to one or two seed nodes because once it connects,
-    // it'll get a pile of addresses with newer timestamps.
-    // Seed nodes are given a random 'last seen time' of between one and two
-    // weeks ago.
-    const int64_t nOneWeek = 7 * 24 * 60 * 60;
-    for (unsigned int i = 0; i < count; i++) {
-        struct in6_addr ip;
-        memcpy(&ip, data[i].addr, sizeof(ip));
-        CAddress addr(CService(ip, data[i].port), NODE_NETWORK);
-        addr.nTime = GetTime() - GetRand(nOneWeek) - nOneWeek;
-        vSeedsOut.push_back(addr);
-    }
-}
 
 //   What makes a good checkpoint block?
 // + Is surrounded by blocks with reasonable timestamps
@@ -171,6 +148,7 @@ public:
         nFirstSCBlock = 350000;
         nPruneAfterHeight = 300000;
         nSplitRewardBlock = 300000;
+        nPreminePaymentandHardForkBlock = 621950;
 
         /**
          * The message start string is designed to be unlikely to occur in normal data.
@@ -215,48 +193,7 @@ public:
         assert(genesis.hashMerkleRoot == uint256("0xe08ae0cfc35a1d70e6764f347fdc54355206adeb382446dd54c32cd0201000d3"));
 
         ////////////////////////////////////////////////////////////////////////////////////////////////
-        vSeeds.push_back(CDNSSeedData("149.28.183.115", "149.28.183.115"));       // Luxgate seed
-        vSeeds.push_back(CDNSSeedData("149.28.163.40", "149.28.163.40"));         // Main seed
-        vSeeds.push_back(CDNSSeedData("45.32.246.142", "45.32.246.142"));         // Chain state seed
-        vSeeds.push_back(CDNSSeedData("207.148.81.88", "207.148.81.88"));         // Global state seed
-        vSeeds.push_back(CDNSSeedData("45.32.240.8", "45.32.240.8"));             // Main seed
-        ////////////////////////////////////////////////////////////////////////////////////////////////
-        vSeeds.push_back(CDNSSeedData("45.77.237.16", "45.77.237.16"));           // DNSSeed
-        vSeeds.push_back(CDNSSeedData("45.77.127.10", "45.77.127.10"));           // DNSSeed
-        vSeeds.push_back(CDNSSeedData("45.32.146.237", "45.32.146.237"));         // DNSSeed
-        ////////////////////////////////////////////////////////////////////////////////////////////////
-        vSeeds.push_back(CDNSSeedData("89.3.178.185", "89.3.178.185"));           // DNSSeed
-        vSeeds.push_back(CDNSSeedData("104.238.189.30", "104.238.189.30"));       // DNSSeed
-        vSeeds.push_back(CDNSSeedData("51.15.39.62", "51.15.39.62"));             // DNSSeed
-        vSeeds.push_back(CDNSSeedData("108.61.176.178", "108.61.176.178"));       // DNSSeed
-        vSeeds.push_back(CDNSSeedData("45.77.224.63", "45.77.224.63"));           // DNSSeed
-        vSeeds.push_back(CDNSSeedData("45.77.227.235", "45.77.227.235"));         // DNSSeed
-        vSeeds.push_back(CDNSSeedData("45.32.187.166", "45.32.187.166"));         // DNSSeed
-        ////////////////////////////////////////////////////////////////////////////////////////////////
-        vSeeds.push_back(CDNSSeedData("51.15.39.62", "51.15.39.62"));             // DNSSeed
-        vSeeds.push_back(CDNSSeedData("66.42.68.169", "66.42.68.169"));           // DNSSeed
-        vSeeds.push_back(CDNSSeedData("107.191.62.96", "107.191.62.96"));         // DNSSeed
-        vSeeds.push_back(CDNSSeedData("149.28.229.80", "149.28.229.80"));         // DNSSeed
-        vSeeds.push_back(CDNSSeedData("208.167.255.8", "208.167.255.8"));         // DNSSeed
-        vSeeds.push_back(CDNSSeedData("207.246.100.179", "207.246.100.179"));     // DNSSeed
-        vSeeds.push_back(CDNSSeedData("209.250.250.164", "209.250.250.164"));     // DNSSeed
-        vSeeds.push_back(CDNSSeedData("108.61.172.159", "108.61.172.159"));       // DNSSeed
-        vSeeds.push_back(CDNSSeedData("163.172.49.27", "163.172.49.27"));         // DNSSeed
-        ////////////////////////////////////////////////////////////////////////////////////////////////
-        vSeeds.push_back(CDNSSeedData("149.28.145.20", "149.28.145.20"));         // DNSSeed Asia
-        vSeeds.push_back(CDNSSeedData("149.28.150.184", "149.28.150.184"));       // DNSSeed Asia
-        vSeeds.push_back(CDNSSeedData("45.32.115.110", "45.32.115.110"));         // DNSSeed Asia
-        vSeeds.push_back(CDNSSeedData("66.42.51.223", "66.42.51.223"));           // DNSSeed Asia
-        vSeeds.push_back(CDNSSeedData("45.76.159.236", "45.76.159.236"));         // DNSSeed Asia
-        ////////////////////////////////////////////////////////////////////////////////////////////////
-        vSeeds.push_back(CDNSSeedData("149.28.167.57", "149.28.167.57"));         // DNSSeed AUS
-        ////////////////////////////////////////////////////////////////////////////////////////////////
-        vSeeds.push_back(CDNSSeedData("95.179.136.100", "95.179.136.100"));       // DNSSeed Europe
-        vSeeds.push_back(CDNSSeedData("199.247.28.100", "199.247.28.100"));       // DNSSeed Europe
-        vSeeds.push_back(CDNSSeedData("45.63.40.109", "45.63.40.109"));           // DNSSeed Europe
-        vSeeds.push_back(CDNSSeedData("95.179.179.146", "95.179.179.146"));       // DNSSeed Europe
-        vSeeds.push_back(CDNSSeedData("45.76.36.166", "45.76.36.166"));           // DNSSeed Europe
-        ////////////////////////////////////////////////////////////////////////////////////////////////
+        vSeeds.push_back(CDNSSeedData("Seed1", "seed.luxcore.tech"));       // LUX seeder
 
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,48); // LUX address start with 'L'
         base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1,63); // LUX script addresses start with 'S'
@@ -264,12 +201,12 @@ public:
         base58Prefixes[EXT_PUBLIC_KEY] = boost::assign::list_of(0x07)(0x28)(0xA2)(0x4E).convert_to_container<std::vector<unsigned char> >();
         base58Prefixes[EXT_SECRET_KEY] = boost::assign::list_of(0x03)(0xD8)(0xA1)(0xE5).convert_to_container<std::vector<unsigned char> >();
 
-        // LUX BIP44 coin type is '1'
-        nExtCoinType = 1;
+        // LUX BIP44 coin type is '3003'
+        nExtCoinType = 3003;
 
         bech32_hrp = "bc";
 
-        convertSeed6(vFixedSeeds, pnSeed6_main, ARRAYLEN(pnSeed6_main));
+        vFixedSeeds = std::vector<SeedSpec6>(pnSeed6_main, pnSeed6_main + ARRAYLEN(pnSeed6_main));
 
         fMiningRequiresPeers = true;
         fDefaultConsistencyChecks = false;
@@ -372,6 +309,7 @@ public:
         nSplitRewardBlock = 1500;
         nPruneAfterHeight = 5000;
         nFirstSCBlock = 10000;
+        nPreminePaymentandHardForkBlock = 50000;
 
         consensus.hashGenesisBlock = genesis.GetHash();
 
@@ -396,8 +334,7 @@ public:
         nExtCoinType = 1;
         bech32_hrp = "tb";
 
-        convertSeed6(vFixedSeeds, pnSeed6_test, ARRAYLEN(pnSeed6_test));
-
+        vFixedSeeds = std::vector<SeedSpec6>(pnSeed6_test, pnSeed6_test + ARRAYLEN(pnSeed6_test));
         fMiningRequiresPeers = true;
         fDefaultConsistencyChecks = false;
         fRequireStandard = true;
@@ -455,6 +392,10 @@ public:
         consensus.vDeployments[Consensus::DEPLOYMENT_SEGWIT].nStartTime = 0;
         consensus.vDeployments[Consensus::DEPLOYMENT_SEGWIT].nTimeout = 999999999999ULL;
         consensus.powLimit = ~uint256(0) >> 1;
+        nPreminePaymentandHardForkBlock = 60;
+        nSwitchPhi2Block = 299501;
+        nFirstSCBlock = 350000;
+        nSplitRewardBlock = 50;
 
         pchMessageStart[0] = 0xa1;
         pchMessageStart[1] = 0xcf;
