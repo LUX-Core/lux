@@ -2090,6 +2090,8 @@ void CWallet::AvailableCoins(vector<COutput>& vCoins, bool fOnlyConfirmed, const
 
     {
         LOCK2(cs_main, cs_wallet);
+
+        std::map<CScript, isminetype> mapOutputIsMine;
         for (map<uint256, CWalletTx>::const_iterator it = mapWallet.begin(); it != mapWallet.end(); ++it) {
             const uint256& wtxid = it->first;
             const CWalletTx* pcoin = &(*it).second;
@@ -2129,7 +2131,14 @@ void CWallet::AvailableCoins(vector<COutput>& vCoins, bool fOnlyConfirmed, const
                 }
                 if (!found) continue;
 
-                isminetype mine = IsMine(pcoin->vout[i]);
+                //isminetype mine = IsMine(pcoin->vout[i]);
+                auto inserted = mapOutputIsMine.emplace(pcoin->vout[i].scriptPubKey, ISMINE_NO);
+                if (inserted.second) {
+                   inserted.first->second = IsMine(pcoin->vout[i]);
+                }
+                
+                isminetype mine = inserted.first->second;
+
                 if (mine && !(IsSpent(wtxid, i)) && mine != ISMINE_NO &&
                     !IsLockedCoin((*it).first, i) && pcoin->vout[i].nValue > 0 &&
                     (!coinControl || !coinControl->HasSelected() || coinControl->fAllowOtherInputs || coinControl->IsSelected((*it).first, i))) {
