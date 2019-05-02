@@ -23,8 +23,8 @@ Build-Depends: debhelper,
  libprotobuf-dev, protobuf-compiler
 Standards-Version: 3.9.2
 Homepage: http://www.luxcore.io
-Vcs-Git: git://github.com/216k155/lux.git
-Vcs-Browser: http://github.com/216k155/lux
+Vcs-Git: git://github.com/LUX-Core/lux.git
+Vcs-Browser: http://github.com/LUX-Core/lux
 
 Package: luxd
 Architecture: any

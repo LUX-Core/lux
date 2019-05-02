@@ -34,6 +34,43 @@
         <layout class="QGridLayout" name="gridLayout">
          <item row="1" column="0">
           <widget class="QTableWidget" name="tableWidget">
+           <property name="palette">
+            <palette>
+             <active>
+              <colorrole role="Text">
+               <brush brushstyle="SolidPattern">
+                <color alpha="255">
+                 <red>51</red>
+                 <green>51</green>
+                 <blue>51</blue>
+                </color>
+               </brush>
+              </colorrole>
+             </active>
+             <inactive>
+              <colorrole role="Text">
+               <brush brushstyle="SolidPattern">
+                <color alpha="255">
+                 <red>51</red>
+                 <green>51</green>
+                 <blue>51</blue>
+                </color>
+               </brush>
+              </colorrole>
+             </inactive>
+             <disabled>
+              <colorrole role="Text">
+               <brush brushstyle="SolidPattern">
+                <color alpha="255">
+                 <red>85</red>
+                 <green>85</green>
+                 <blue>85</blue>
+                </color>
+               </brush>
+              </colorrole>
+             </disabled>
+            </palette>
+           </property>
            <property name="editTriggers">
             <set>QAbstractItemView::NoEditTriggers</set>
            </property>
@@ -43,8 +80,14 @@
            <property name="selectionBehavior">
             <enum>QAbstractItemView::SelectRows</enum>
            </property>
+           <property name="sortingEnabled">
+            <bool>true</bool>
+           </property>
            <attribute name="horizontalHeaderStretchLastSection">
             <bool>true</bool>
+           </attribute>
+           <attribute name="ResizeMode">
+            <enum>QHeaderView::Interactive</enum>
            </attribute>
            <column>
             <property name="text">
@@ -133,6 +176,33 @@
             <number>0</number>
            </property>
            <item>
+            <widget class="QLabel" name="label_filter">
+             <property name="text">
+              <string>Filter List:</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="filterLineEdit">
+             <property name="toolTip">
+              <string>Filter masternode list</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_3">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>10</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
             <widget class="QLabel" name="label_2">
              <property name="text">
               <string>Masternodes Activated:</string>
@@ -147,7 +217,7 @@
             </widget>
            </item>
            <item>
-            <spacer name="horizontalSpacer_3">
+            <spacer name="horizontalSpacer_31">
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
              </property>
@@ -187,6 +257,43 @@
             <widget class="QTableWidget" name="tableWidget_2">
              <property name="editTriggers">
               <set>QAbstractItemView::NoEditTriggers</set>
+             </property>
+             <property name="palette">
+              <palette>
+               <active>
+                <colorrole role="Text">
+                 <brush brushstyle="SolidPattern">
+                  <color alpha="255">
+                   <red>51</red>
+                   <green>51</green>
+                   <blue>51</blue>
+                  </color>
+                 </brush>
+                </colorrole>
+               </active>
+               <inactive>
+                <colorrole role="Text">
+                 <brush brushstyle="SolidPattern">
+                  <color alpha="255">
+                   <red>51</red>
+                   <green>51</green>
+                   <blue>51</blue>
+                  </color>
+                 </brush>
+                </colorrole>
+               </inactive>
+               <disabled>
+                <colorrole role="Text">
+                 <brush brushstyle="SolidPattern">
+                  <color alpha="255">
+                   <red>85</red>
+                   <green>85</green>
+                   <blue>85</blue>
+                  </color>
+                 </brush>
+                </colorrole>
+               </disabled>
+              </palette>
              </property>
              <property name="alternatingRowColors">
               <bool>true</bool>

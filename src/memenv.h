@@ -1,6 +1,8 @@
-// Copyright (c) 2011 The LevelDB Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file. See the AUTHORS file for names of contributors.
+// Copyright (c) 2012-2014 The Bitcoin developers
+// Copyright (c) 2014-2015 The Dash developers
+// Copyright (c) 2015-2018 The Luxcore developers
+// Distributed under the MIT software license, see the accompanying
+// file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #ifndef STORAGE_LEVELDB_HELPERS_MEMENV_MEMENV_H_
 #define STORAGE_LEVELDB_HELPERS_MEMENV_MEMENV_H_

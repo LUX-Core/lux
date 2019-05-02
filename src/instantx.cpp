@@ -1,3 +1,9 @@
+// Copyright (c) 2012-2014 The Bitcoin developers
+// Copyright (c) 2014-2015 The Dash developers
+// Copyright (c) 2015-2018 The Luxcore developers
+// Distributed under the MIT software license, see the accompanying
+// file COPYING or http://www.opensource.org/licenses/mit-license.php.
+
 #include "uint256.h"
 #include "sync.h"
 #include "net.h"
@@ -257,7 +263,7 @@ int64_t CreateNewLock(CTransaction tx) {
 void DoConsensusVote(CTransaction& tx, int64_t nBlockHeight) {
     if (!fMasterNode) return;
 
-    int n = GetMasternodeRank(activeMasternode.vin, nBlockHeight, MIN_INSTANTX_PROTO_VERSION);
+    int n = GetMasternodeRank(activeMasternode.vin, nBlockHeight, MIN_PROTO_VERSION);
 
     if (n == -1) {
         if (fDebug) LogPrintf("InstantX::DoConsensusVote - Unknown Masternode\n");
@@ -303,7 +309,7 @@ void DoConsensusVote(CTransaction& tx, int64_t nBlockHeight) {
 
 //received a consensus vote
 bool ProcessConsensusVote(CConsensusVote& ctx) {
-    int n = GetMasternodeRank(ctx.vinMasternode, ctx.nBlockHeight, MIN_INSTANTX_PROTO_VERSION);
+    int n = GetMasternodeRank(ctx.vinMasternode, ctx.nBlockHeight, MIN_PROTO_VERSION);
 
     int x = GetMasternodeByVin(ctx.vinMasternode);
     if (x != -1) {
@@ -510,7 +516,7 @@ bool CConsensusVote::Sign() {
 bool CTransactionLock::SignaturesValid() {
 
     for (CConsensusVote vote : vecConsensusVotes) {
-        int n = GetMasternodeRank(vote.vinMasternode, vote.nBlockHeight, MIN_INSTANTX_PROTO_VERSION);
+        int n = GetMasternodeRank(vote.vinMasternode, vote.nBlockHeight, MIN_PROTO_VERSION);
 
         if (n == -1) {
             LogPrintf("InstantX::DoConsensusVote - Unknown Masternode\n");

@@ -154,19 +154,30 @@ static void initTranslations(QTranslator& qtTranslatorBase, QTranslator& qtTrans
         QApplication::installTranslator(&translator);
 }
 
-/* qDebug() message handler --> debug.log */
+/*  qDebug() message handler --> debug.log 
+
+    Also includes a very basic warning suppressor, we want to use it to remove useless clutter from the debug log. It currently 
+    suppresses warnings from broken QT functionality (QFont's setPixelSize unwarranted "warnings")
+
+*/
 #if QT_VERSION < 0x050000
 void DebugMessageHandler(QtMsgType type, const char* msg)
 {
     const char* category = (type == QtDebugMsg) ? "qt" : NULL;
-    LogPrint(category, "GUI: %s\n", msg);
+    if (msg == "QFont::setPixelSize: Pixel size <= 0 (0)") {
+        return;
+    }
+    else LogPrint(category, "GUI: %s\n", msg);
 }
 #else
 void DebugMessageHandler(QtMsgType type, const QMessageLogContext& context, const QString& msg)
 {
     Q_UNUSED(context);
     const char* category = (type == QtDebugMsg) ? "qt" : NULL;
-    LogPrint(category, "GUI: %s\n", msg.toStdString());
+    if (msg == "QFont::setPixelSize: Pixel size <= 0 (0)") {
+        return; 
+    }
+    else LogPrint(category, "GUI: %s\n", msg.toStdString());
 }
 #endif
 
@@ -365,6 +376,7 @@ BitcoinApplication::~BitcoinApplication()
         qDebug() << __func__ << ": Stopped thread";
         delete coreThread;
         coreThread = 0;
+        delete pollShutdownTimer;
     }
 
     delete window;
@@ -528,7 +540,7 @@ void BitcoinApplication::initializeResult(int retval)
             window, SLOT(message(QString, QString, unsigned int)));
         QTimer::singleShot(100, paymentServer, SLOT(uiReady()));
 #endif
-        pollShutdownTimer->start(150);
+        pollShutdownTimer->start(300);
     } else {
         Q_EMIT splashFinished(window);
         quit(); // Exit main loop

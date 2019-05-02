@@ -311,7 +311,6 @@ crypto_libbitcoin_crypto_a_SOURCES = \
   cpp-ethereum/utils/libscrypt/b64.h \
   cpp-ethereum/utils/libscrypt/crypto-mcf.c \
   cpp-ethereum/utils/libscrypt/crypto_scrypt-check.c \
-  cpp-ethereum/utils/libscrypt/crypto_scrypt-hash.c \
   cpp-ethereum/utils/libscrypt/crypto_scrypt-hexconvert.c \
   cpp-ethereum/utils/libscrypt/crypto_scrypt-hexconvert.h \
   cpp-ethereum/utils/libscrypt/crypto_scrypt-nosse.c \

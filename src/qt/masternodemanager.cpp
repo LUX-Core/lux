@@ -50,13 +50,16 @@ MasternodeManager::MasternodeManager(QWidget *parent) :
 
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(updateNodeList()));
-    timer->start(1000);
+    timer->start(20000);
     fFilterUpdated = true;
     nTimeFilterUpdated = GetTime();
+    updateNodeList();
+    connect(ui->filterLineEdit, SIGNAL(textChanged(const QString &)), this, SLOT(wait()));
 }
 
 MasternodeManager::~MasternodeManager()
 {
+    delete timer;
     delete ui;
 }
 
@@ -102,7 +105,7 @@ void MasternodeManager::on_tableWidget_2_itemSelectionChanged()
 
 void MasternodeManager::updateLuxNode(QString alias, QString addr, QString privkey, QString collateral)
 {
-    LOCK(cs_adrenaline);
+    LOCK(cs_lux);
     bool bFound = false;
     int nodeRow = 0;
     for(int i=0; i < ui->tableWidget_2->rowCount(); i++)
@@ -131,75 +134,112 @@ void MasternodeManager::updateLuxNode(QString alias, QString addr, QString privk
 
 static QString seconds_to_DHMS(quint32 duration)
 {
-  QString res;
-  int seconds = (int) (duration % 60);
-  duration /= 60;
-  int minutes = (int) (duration % 60);
-  duration /= 60;
-  int hours = (int) (duration % 24);
-  int days = (int) (duration / 24);
-  if((hours == 0)&&(days == 0))
-      return res.sprintf("%02dm:%02ds", minutes, seconds);
-  if (days == 0)
-      return res.sprintf("%02dh:%02dm:%02ds", hours, minutes, seconds);
-  return res.sprintf("%dd %02dh:%02dm:%02ds", days, hours, minutes, seconds);
+    QString res;
+    int seconds = (int) (duration % 60);
+    duration /= 60;
+    int minutes = (int) (duration % 60);
+    duration /= 60;
+    int hours = (int) (duration % 24);
+    int days = (int) (duration / 24);
+    if((hours == 0)&&(days == 0))
+        return res.sprintf("%02dm:%02ds", minutes, seconds);
+    if (days == 0)
+        return res.sprintf("%02dh:%02dm:%02ds", hours, minutes, seconds);
+    return res.sprintf("%dd %02dh:%02dm:%02ds", days, hours, minutes, seconds);
+}
+
+void MasternodeManager::wait()
+{
+    QTimer::singleShot(3000, this, SLOT(updateNodeList()));
 }
 
 void MasternodeManager::updateNodeList()
 {
+    static int64_t nTimeListUpdated = GetTime();
+
+    // to prevent high cpu usage update only once in MASTERNODELIST_UPDATE_SECONDS seconds
+    // or MASTERNODELIST_FILTER_COOLDOWN_SECONDS seconds after filter was last changed
+    int64_t nSecondsToWait = fFilterUpdated ? nTimeFilterUpdated - GetTime() + MASTERNODELIST_FILTER_COOLDOWN_SECONDS : nTimeListUpdated - GetTime() + MASTERNODELIST_UPDATE_SECONDS;
+
+    if (fFilterUpdated) ui->countLabel->setText(tr("Please wait... ") + nSecondsToWait);
+    if (nSecondsToWait > 0) return;
+    nTimeListUpdated = GetTime();
+    fFilterUpdated = false;
+
     TRY_LOCK(cs_masternodes, lockMasternodes);
     if(!lockMasternodes)
         return;
 
+    QString strToFilter;
     ui->countLabel->setText("Updating...");
+    ui->tableWidget->setSortingEnabled(false);
     ui->tableWidget->clearContents();
     ui->tableWidget->setRowCount(0);
+
     for (CMasterNode &mn : vecMasternodes)
     {
         if (ShutdownRequested()) return;
-        
-        int mnRow = 0;
-        ui->tableWidget->insertRow(0);
 
- 	// populate list
-	// Address, Rank, Active, Active Seconds, Last Seen, Pub Key
-	QTableWidgetItem *activeItem = new QTableWidgetItem(QString::number(mn.IsEnabled()));
-	QTableWidgetItem *addressItem = new QTableWidgetItem(QString::fromStdString(mn.addr.ToString()));
-	QTableWidgetItem *rankItem = new QTableWidgetItem(QString::number(GetMasternodeRank(mn.vin, chainActive.Height())));
-	QTableWidgetItem *activeSecondsItem = new QTableWidgetItem(seconds_to_DHMS((qint64)(mn.lastTimeSeen - mn.now)));
-	QTableWidgetItem *lastSeenItem = new QTableWidgetItem(QString::fromStdString(DateTimeStrFormat("%Y-%m-%d %H:%M:%S", mn.lastTimeSeen)));
-	
-	CScript pubkey;
+    // populate list
+    // Address, Rank, Active, Active Seconds, Last Seen, Pub Key
+    QTableWidgetItem *activeItem = new QTableWidgetItem(mn.IsEnabled() ? tr("yes") : tr("no"));
+    QTableWidgetItem *addressItem = new QTableWidgetItem(QString::fromStdString(mn.addr.ToString()));
+    QTableWidgetItem *rankItem = new QTableWidgetItem(QString::number(GetMasternodeRank(mn.vin, chainActive.Height())));
+    QTableWidgetItem *activeSecondsItem = new QTableWidgetItem(seconds_to_DHMS((qint64)(mn.lastTimeSeen - mn.now)));
+    QTableWidgetItem *lastSeenItem = new QTableWidgetItem(QString::fromStdString(DateTimeStrFormat("%Y-%m-%d %H:%M:%S", mn.lastTimeSeen)));
+    
+    CScript pubkey;
         pubkey = GetScriptForDestination(mn.pubkey.GetID());
         CTxDestination address1;
         ExtractDestination(pubkey, address1);
-	QTableWidgetItem *pubkeyItem = new QTableWidgetItem(QString::fromStdString(EncodeDestination(address1)));
-	
-	ui->tableWidget->setItem(mnRow, 0, addressItem);
-	ui->tableWidget->setItem(mnRow, 1, rankItem);
-	ui->tableWidget->setItem(mnRow, 2, activeItem);
-	ui->tableWidget->setItem(mnRow, 3, activeSecondsItem);
-	ui->tableWidget->setItem(mnRow, 4, lastSeenItem);
-	ui->tableWidget->setItem(mnRow, 5, pubkeyItem);
+    QTableWidgetItem *pubkeyItem = new QTableWidgetItem(QString::fromStdString(EncodeDestination(address1)));
+
+        if (strCurrentFilter != "") {
+            strToFilter = activeItem->text() + " " +
+                          addressItem->text() + " " +
+                          rankItem->text() + " " +
+                          activeSecondsItem->text() + " " +
+                          lastSeenItem->text() + " " +
+                          pubkeyItem->text();
+            if (!strToFilter.contains(strCurrentFilter)) continue;
+        }
+
+        ui->tableWidget->insertRow(0);
+        ui->tableWidget->setItem(0, 0, addressItem);
+        ui->tableWidget->setItem(0, 1, rankItem);
+        ui->tableWidget->setItem(0, 2, activeItem);
+        ui->tableWidget->setItem(0, 3, activeSecondsItem);
+        ui->tableWidget->setItem(0, 4, lastSeenItem);
+        ui->tableWidget->setItem(0, 5, pubkeyItem);
     }
 
     ui->countLabel->setText(QString::number(ui->tableWidget->rowCount()));
-
+    ui->tableWidget->setSortingEnabled(true);
+    
     if(pwalletMain)
     {
-        LOCK(cs_adrenaline);
-        for (PAIRTYPE(std::string, CLuxNodeConfig) adrenaline : pwalletMain->mapMyLuxNodes)
+        LOCK(cs_lux);
+        for (PAIRTYPE(std::string, CLuxNodeConfig) lux : pwalletMain->mapMyLuxNodes)
         {
-            updateLuxNode(QString::fromStdString(adrenaline.second.sAlias), QString::fromStdString(adrenaline.second.sAddress), QString::fromStdString(adrenaline.second.sMasternodePrivKey), QString::fromStdString(adrenaline.second.sCollateralAddress));
+            updateLuxNode(QString::fromStdString(lux.second.sAlias), QString::fromStdString(lux.second.sAddress), QString::fromStdString(lux.second.sMasternodePrivKey), QString::fromStdString(lux.second.sCollateralAddress));
         }
     }
+}
+
+void MasternodeManager::on_filterLineEdit_textChanged(const QString& strFilterIn)
+{
+    strCurrentFilter = strFilterIn;
+    nTimeFilterUpdated = GetTime();
+    fFilterUpdated = true;
+    ui->countLabel->setText(QString::fromStdString(strprintf("Please wait... %d", MASTERNODELIST_FILTER_COOLDOWN_SECONDS)));
 }
 
 void MasternodeManager::setClientModel(ClientModel *model)
 {
     this->clientModel = model;
-    if(model)
-    {
+    if (model) {
+        // try to update list when masternode count changes
+        connect(clientModel, SIGNAL(strMasternodesChanged(QString)), this, SLOT(updateNodeList()));
     }
 }
 
@@ -251,7 +291,6 @@ void MasternodeManager::on_editButton_clicked()
     std::string sAddress = ui->tableWidget_2->item(r, 1)->text().toStdString();
 
     // get existing config entry
-
 }
 
 void MasternodeManager::on_getConfigButton_clicked()
@@ -278,7 +317,7 @@ void MasternodeManager::on_removeButton_clicked()
         return;
 
     QMessageBox::StandardButton confirm;
-    confirm = QMessageBox::question(this, "Delete Adrenaline Node?", "Are you sure you want to delete this adrenaline node configuration?", QMessageBox::Yes|QMessageBox::No);
+    confirm = QMessageBox::question(this, "Delete LUX Node?", "Are you sure you want to delete this LUX node configuration?", QMessageBox::Yes|QMessageBox::No);
 
     if(confirm == QMessageBox::Yes)
     {
@@ -291,9 +330,9 @@ void MasternodeManager::on_removeButton_clicked()
         walletdb.EraseLuxNodeConfig(c.sAddress);
         ui->tableWidget_2->clearContents();
         ui->tableWidget_2->setRowCount(0);
-        for (PAIRTYPE(std::string, CLuxNodeConfig) adrenaline : pwalletMain->mapMyLuxNodes)
+        for (PAIRTYPE(std::string, CLuxNodeConfig) lux : pwalletMain->mapMyLuxNodes)
         {
-            updateLuxNode(QString::fromStdString(adrenaline.second.sAlias), QString::fromStdString(adrenaline.second.sAddress), QString::fromStdString(adrenaline.second.sMasternodePrivKey), QString::fromStdString(adrenaline.second.sCollateralAddress));
+            updateLuxNode(QString::fromStdString(lux.second.sAlias), QString::fromStdString(lux.second.sAddress), QString::fromStdString(lux.second.sMasternodePrivKey), QString::fromStdString(lux.second.sCollateralAddress));
         }
     }
 }
@@ -316,7 +355,7 @@ void MasternodeManager::on_startButton_clicked()
 
     QMessageBox msg;
     if(result)
-        msg.setText("Adrenaline Node at " + QString::fromStdString(c.sAddress) + " started.");
+        msg.setText("LUX Node at " + QString::fromStdString(c.sAddress) + " started.");
     else
         msg.setText("Error: " + QString::fromStdString(errorMessage));
 
@@ -341,7 +380,7 @@ void MasternodeManager::on_stopButton_clicked()
     QMessageBox msg;
     if(result)
     {
-        msg.setText("Adrenaline Node at " + QString::fromStdString(c.sAddress) + " stopped.");
+        msg.setText("LUX Node at " + QString::fromStdString(c.sAddress) + " stopped.");
     }
     else
     {
@@ -353,9 +392,9 @@ void MasternodeManager::on_stopButton_clicked()
 void MasternodeManager::on_startAllButton_clicked()
 {
     std::string results;
-    for (PAIRTYPE(std::string, CLuxNodeConfig) adrenaline : pwalletMain->mapMyLuxNodes)
+    for (PAIRTYPE(std::string, CLuxNodeConfig) lux : pwalletMain->mapMyLuxNodes)
     {
-        CLuxNodeConfig c = adrenaline.second;
+        CLuxNodeConfig c = lux.second;
 	std::string errorMessage;
         bool result = activeMasternode.RegisterByPubKey(c.sAddress, c.sMasternodePrivKey, c.sCollateralAddress, errorMessage);
 	if(result)
@@ -376,9 +415,9 @@ void MasternodeManager::on_startAllButton_clicked()
 void MasternodeManager::on_stopAllButton_clicked()
 {
     std::string results;
-    for (PAIRTYPE(std::string, CLuxNodeConfig) adrenaline : pwalletMain->mapMyLuxNodes)
+    for (PAIRTYPE(std::string, CLuxNodeConfig) lux : pwalletMain->mapMyLuxNodes)
     {
-        CLuxNodeConfig c = adrenaline.second;
+        CLuxNodeConfig c = lux.second;
 	std::string errorMessage;
         bool result = activeMasternode.StopMasterNode(c.sAddress, c.sMasternodePrivKey, errorMessage);
 	if(result)
@@ -395,5 +434,4 @@ void MasternodeManager::on_stopAllButton_clicked()
     msg.setText(QString::fromStdString(results));
     msg.exec();
 }
-
 

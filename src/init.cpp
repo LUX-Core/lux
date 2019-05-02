@@ -401,7 +401,8 @@ std::string HelpMessage(HelpMessageMode mode)
     strUsage += HelpMessageOpt("-pid=<file>", strprintf(_("Specify pid file (default: %s)"), "luxd.pid"));
 #endif
     strUsage += HelpMessageOpt("-record-log-opcodes", _("Logs all EVM LOG opcode operations to the file vmExecLogs.json"));
-    strUsage += HelpMessageOpt("-prune=<n>", _("Reduce storage requirements by pruning (deleting) old blocks. This mode disables wallet support and is incompatible with -txindex.") + " " + _("Warning: Reverting this setting requires re-downloading the entire blockchain.") + " " + _("(default: 0 = disable pruning blocks,") + " " + strprintf(_(">%u = target size in MiB to use for block files)"), MIN_DISK_SPACE_FOR_BLOCK_FILES / 1024 / 1024));
+    //Temporarily disabled until our chain doesn't grow in size
+    //strUsage += HelpMessageOpt("-prune=<n>", _("Reduce storage requirements by pruning (deleting) old blocks. This mode disables wallet support and is incompatible with -txindex.") + " " + _("Warning: Reverting this setting requires re-downloading the entire blockchain.") + " " + _("(default: 0 = disable pruning blocks,") + " " + strprintf(_(">%u = target size in MiB to use for block files)"), MIN_DISK_SPACE_FOR_BLOCK_FILES / 1024 / 1024));
     strUsage += HelpMessageOpt("-reindex-chainstate", _("Rebuild chain state from the currently indexed blocks"));
     strUsage += HelpMessageOpt("-reindex", _("Rebuild block chain index from current blk000??.dat files") + " " + _("on startup"));
 #if !defined(WIN32)
@@ -821,6 +822,8 @@ bool AppInit2()
     fPrintToConsole = GetBoolArg("-printtoconsole", false);
     fLogTimestamps = GetBoolArg("-logtimestamps", true);
     fLogIPs = GetBoolArg("-logips", false);
+    //Temporarily disabled until our chain doesn't grow in size
+    //int nIndexNum;
 
     if (mapArgs.count("-bind") || mapArgs.count("-whitebind")) {
         // when specifying an explicit binding address, you want to listen on it
@@ -917,10 +920,30 @@ bool AppInit2()
         return InitError(_("Not enough file descriptors available."));
     if (nFD - MIN_CORE_FILEDESCRIPTORS < nMaxConnections)
         nMaxConnections = nFD - MIN_CORE_FILEDESCRIPTORS;
-
-    if (GetArg("-prune", 0)) {
-        if (GetBoolArg("-txindex", DEFAULT_TXINDEX))
-            return InitError(_("Prune mode is incompatible with -txindex."));
+    //Temporarily disabled until our chain doesn't grow in size
+    /*if (GetArg("-prune", 0)) {
+        std::string strLoadError;
+        if (GetBoolArg("-txindex", DEFAULT_TXINDEX)) {
+            strLoadError = _("You need to add txindex=0 to start pruning");
+            bool fRetPrune = uiInterface.ThreadSafeQuestion(
+                strLoadError + ".\n\n" + _("Do you want to add automatically add it to the configuration file and close the wallet?"),
+                strLoadError + ".\nPlease restart with txindex=0 to prune.",
+                "", CClientUIInterface::MSG_ERROR | CClientUIInterface::BTN_ABORT);
+            if (fRetPrune){
+                nIndexNum = 0;
+                WriteConfigToFile("txindex", std::to_string(nIndexNum));
+                fReindex = true;
+                fRequestRestart = true;  
+            } else {
+                LogPrintf("Aborted configuration changes. Exiting.\n");
+                return false;
+            }
+        }
+    }
+    */
+    if (fRequestRestart) {
+        LogPrintf("Restart requested. Exiting.\n");
+        return false;
     }
 
     // ********************************************************* Step 3: parameter-to-internal-flags
@@ -1159,7 +1182,7 @@ bool AppInit2()
     }
 
     //ignore masternodes below protocol version
-    CMasterNode::minProtoVersion = GetArg("-masternodeminprotocol", MIN_MN_PROTO_VERSION);
+    CMasterNode::minProtoVersion = GetArg("-masternodeminprotocol", MIN_PROTO_VERSION);
 
     int64_t nStart = 0;
 
@@ -1588,7 +1611,7 @@ bool AppInit2()
                 }
 
                 {
-                    LOCK(cs_main);
+                    //LOCK(cs_main);
                     CBlockIndex* tip = chainActive.Tip();
                     RPCNotifyBlockChange(true, tip);
                     if (tip && tip->nTime > GetAdjustedTime() + 2 * 60 * 60) {

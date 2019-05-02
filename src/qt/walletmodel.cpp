@@ -60,13 +60,14 @@ WalletModel::WalletModel(const PlatformStyle *platformStyle, CWallet* wallet, Op
     // This timer will be fired repeatedly to update the balance
     pollTimer = new QTimer(this);
     connect(pollTimer, SIGNAL(timeout()), this, SLOT(pollBalanceChanged()));
-    pollTimer->start(MODEL_UPDATE_DELAY);
+    pollTimer->start(MODEL_UPDATE_DELAY * 4);
 
     subscribeToCoreSignals();
 }
 
 WalletModel::~WalletModel()
 {
+    delete pollTimer;
     unsubscribeFromCoreSignals();
 }
 
@@ -133,6 +134,9 @@ void WalletModel::updateStatus()
 
 void WalletModel::pollBalanceChanged()
 {
+    // let's not bother polling for balance changes if we're syncing - the user will be told they're out of sync so the number doesn't matter anyway.
+    //if (IsInitialBlockDownload()) return;
+
     // Get required locks upfront. This avoids the GUI from getting stuck on
     // periodical polls if the core is holding the locks for a longer time -
     // for example, during a wallet rescan.
@@ -168,8 +172,8 @@ void WalletModel::updateContractBook(const QString &address, const QString &labe
 
 void WalletModel::checkBalanceChanged()
 {
-    //TRY_LOCK(cs_main, lockMain);
-    //if (!lockMain) return;
+    TRY_LOCK(cs_main, lockMain);
+    if (!lockMain) return;
 
     CAmount newBalance = getBalance();
     CAmount newUnconfirmedBalance = getUnconfirmedBalance();
@@ -235,8 +239,9 @@ bool WalletModel::validateAddress(const QString& address)
 WalletModel::SendCoinsReturn WalletModel::prepareTransaction(WalletModelTransaction& transaction, const CCoinControl* coinControl, bool sign)
 {
     CAmount total = 0;
+    bool fSubtractFeeFromAmount = false;
     QList<SendCoinsRecipient> recipients = transaction.getRecipients();
-    std::vector<std::pair<CScript, CAmount> > vecSend;
+    std::vector<CRecipient> vecSend;
 
     if (recipients.empty()) {
         return OK;
@@ -251,6 +256,8 @@ WalletModel::SendCoinsReturn WalletModel::prepareTransaction(WalletModelTransact
 
     // Pre-check input data for validity
     Q_FOREACH (const SendCoinsRecipient& rcp, recipients) {
+        if (rcp.fSubtractFeeFromAmount)
+            fSubtractFeeFromAmount = true;
         if (rcp.paymentRequest.IsInitialized()) { // PaymentRequest...
             CAmount subtotal = 0;
             const payments::PaymentDetails& details = rcp.paymentRequest.getDetails();
@@ -260,7 +267,9 @@ WalletModel::SendCoinsReturn WalletModel::prepareTransaction(WalletModelTransact
                 subtotal += out.amount();
                 const unsigned char* scriptStr = (const unsigned char*)out.script().data();
                 CScript scriptPubKey(scriptStr, scriptStr + out.script().size());
-                vecSend.push_back(std::pair<CScript, CAmount>(scriptPubKey, out.amount()));
+                CAmount nAmount = out.amount();
+                CRecipient recipient = {scriptPubKey, nAmount, rcp.fSubtractFeeFromAmount};
+                vecSend.push_back(recipient);
             }
             if (subtotal <= 0) {
                 return InvalidAmount;
@@ -277,7 +286,8 @@ WalletModel::SendCoinsReturn WalletModel::prepareTransaction(WalletModelTransact
             ++nAddresses;
 
             CScript scriptPubKey = GetScriptForDestination(DecodeDestination(rcp.address.toStdString()));
-            vecSend.push_back(std::pair<CScript, CAmount>(scriptPubKey, rcp.amount));
+            CRecipient recipient = {scriptPubKey, rcp.amount, rcp.fSubtractFeeFromAmount};
+            vecSend.push_back(recipient);
 
             total += rcp.amount;
         }
@@ -317,6 +327,8 @@ WalletModel::SendCoinsReturn WalletModel::prepareTransaction(WalletModelTransact
             fCreated = wallet->CreateTransaction(vecSend, *newTx, *keyChange, nFeeRequired, nChangePos, strFailReason, coinControl, recipients[0].inputType, recipients[0].useInstanTX, 0, 0, false);
         }
         transaction.setTransactionFee(nFeeRequired);
+        if (fSubtractFeeFromAmount && fCreated)
+            transaction.reassignAmounts(nChangePos);
 
         if (recipients[0].useInstanTX && newTx->GetValueOut() > GetSporkValue(SPORK_2_MAX_VALUE) * COIN) {
             Q_EMIT message(tr("Send Coins"), tr("InstanTX doesn't support sending values that high yet. Transactions are currently limited to %1 LUX.").arg(GetSporkValue(SPORK_2_MAX_VALUE)),
@@ -325,7 +337,7 @@ WalletModel::SendCoinsReturn WalletModel::prepareTransaction(WalletModelTransact
         }
 
         if (!fCreated) {
-            if ((total + nFeeRequired) > nBalance) {
+            if (!fSubtractFeeFromAmount && (total + nFeeRequired) > nBalance) {
                 return SendCoinsReturn(AmountWithFeeExceedsBalance);
             }
             Q_EMIT message(tr("Send Coins"), QString::fromStdString(strFailReason),
@@ -472,6 +484,7 @@ bool WalletModel::setWalletLocked(bool locked, const SecureString& passPhrase, b
 {
     if (locked) {
         // Lock
+        wallet->fWalletUnlockStakingOnly = false;
         return wallet->Lock();
     } else {
         // Unlock

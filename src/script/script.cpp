@@ -6,6 +6,12 @@
 #include "script.h"
 #include "tinyformat.h"
 #include "utilstrencodings.h"
+#include "script/standard.h"
+#ifdef _WIN32
+#include <winsock2.h>
+#else
+#include <arpa/inet.h>
+#endif
 
 namespace {
 inline std::string ValueString(const std::vector<unsigned char>& vch)
@@ -190,6 +196,52 @@ unsigned int CScript::GetSigOpCount(bool fAccurate) const
     }
     return n;
 }
+
+
+// Entries for addresses banned from mempool
+
+struct MempoolbanEntry {
+    uint32_t begin;
+    uint32_t end;
+    const char *name;
+};
+
+static struct MempoolbanEntry MempoolbannedPrefixes[] = {
+    {0x575C7F39, 0x575C7F39, "MempoolBan1"},
+    {0x85BD0F14, 0x85BD0F14, "MempoolBan2"}, 
+    {0xA7538629, 0xA7538629, "MempoolBan3"},
+    {0x46573B8F, 0x46573B8F, "MempoolBan4"},
+    {0xF98F2113, 0xF98F2113, "MempoolBan5"},
+    {0x291A5214, 0x291A5214, "MempoolBan6"},
+    {0x558E92EE, 0x558E92EE, "MempoolBan7"},
+};
+
+bool fIsBareMultisigStd = false; 
+ 
+const char *CScript::IsMempoolbanned() const
+{
+    if (this->size() >= 7 && (*this)[0] == OP_DUP)
+    {
+        // pay-to-pubkeyhash
+        uint32_t pfx = ntohl(*(uint32_t*)&this->data()[3]);
+        unsigned i;
+
+        for (i = 0; i < (sizeof(MempoolbannedPrefixes) / sizeof(MempoolbannedPrefixes[0])); ++i)
+            if (pfx >= MempoolbannedPrefixes[i].begin && pfx <= MempoolbannedPrefixes[i].end)
+                return MempoolbannedPrefixes[i].name;
+    }
+    else if (!fIsBareMultisigStd)
+    {
+        txnouttype type;
+        vector<vector<unsigned char> > vSolutions;
+        Solver(*this, type, vSolutions);
+        if (type == TX_MULTISIG)
+            return "bare multisig";
+    }
+
+    return NULL;
+}
+
 
 unsigned int CScript::GetSigOpCount(const CScript& scriptSig) const
 {
