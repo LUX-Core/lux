@@ -1040,7 +1040,7 @@ bool BackupWallet(const CWallet& wallet, const string& strDest)
                 bitdb.CloseDb(wallet.strWalletFile);
                 bitdb.CheckpointLSN(wallet.strWalletFile);
                 bitdb.mapFileUseCount.erase(wallet.strWalletFile);
-                printf("Issuing lsn_reset for backup file compatibility.\n");
+                LogPrintf("Issuing lsn_reset for backup file compatibility.\n");
                 bitdb.lsn_reset(wallet.strWalletFile); 
 
 
