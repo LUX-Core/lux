@@ -55,6 +55,21 @@ MasternodeManager::MasternodeManager(QWidget *parent) :
     nTimeFilterUpdated = GetTime();
     updateNodeList();
     connect(ui->filterLineEdit, SIGNAL(textChanged(const QString &)), this, SLOT(wait()));
+	
+    int columnAddressWidth = 200;
+    int columnrankItemWidth = 60;
+    int columnProtocolWidth = 60;
+    int columnActiveWidth = 80;
+    int columnActiveSecondsWidth = 130;
+    int columnLastSeenWidth = 130;
+		
+    ui->tableWidget->setColumnWidth(0, columnAddressWidth); // Address
+    ui->tableWidget->setColumnWidth(1, columnrankItemWidth); // Rank
+    ui->tableWidget->setColumnWidth(2, columnProtocolWidth); // protocol
+    ui->tableWidget->setColumnWidth(3, columnActiveWidth); // status
+    ui->tableWidget->setColumnWidth(4, columnActiveSecondsWidth); // time active
+    ui->tableWidget->setColumnWidth(5, columnLastSeenWidth); // last seen
+	
 }
 
 MasternodeManager::~MasternodeManager()
@@ -106,30 +121,18 @@ void MasternodeManager::on_tableWidget_2_itemSelectionChanged()
 void MasternodeManager::updateLuxNode(QString alias, QString addr, QString privkey, QString collateral)
 {
     LOCK(cs_lux);
-    bool bFound = false;
-    int nodeRow = 0;
-    for(int i=0; i < ui->tableWidget_2->rowCount(); i++)
-    {
-        if(ui->tableWidget_2->item(i, 0)->text() == alias)
-        {
-            bFound = true;
-            nodeRow = i;
-            break;
-        }
-    }
-
-    if(nodeRow == 0 && !bFound)
-        ui->tableWidget_2->insertRow(0);
+   
+    ui->tableWidget_2->insertRow(0);
 
     QTableWidgetItem *aliasItem = new QTableWidgetItem(alias);
     QTableWidgetItem *addrItem = new QTableWidgetItem(addr);
     QTableWidgetItem *statusItem = new QTableWidgetItem("");
     QTableWidgetItem *collateralItem = new QTableWidgetItem(collateral);
 
-    ui->tableWidget_2->setItem(nodeRow, 0, aliasItem);
-    ui->tableWidget_2->setItem(nodeRow, 1, addrItem);
-    ui->tableWidget_2->setItem(nodeRow, 2, statusItem);
-    ui->tableWidget_2->setItem(nodeRow, 3, collateralItem);
+    ui->tableWidget_2->setItem(0, 0, aliasItem);
+    ui->tableWidget_2->setItem(0, 1, addrItem);
+    ui->tableWidget_2->setItem(0, 2, statusItem);
+    ui->tableWidget_2->setItem(0, 3, collateralItem);
 }
 
 static QString seconds_to_DHMS(quint32 duration)
@@ -181,13 +184,16 @@ void MasternodeManager::updateNodeList()
         if (ShutdownRequested()) return;
 
     // populate list
-    // Address, Rank, Active, Active Seconds, Last Seen, Pub Key
-    QTableWidgetItem *activeItem = new QTableWidgetItem(mn.IsEnabled() ? tr("yes") : tr("no"));
-    QTableWidgetItem *addressItem = new QTableWidgetItem(QString::fromStdString(mn.addr.ToString()));
-    QTableWidgetItem *rankItem = new QTableWidgetItem(QString::number(GetMasternodeRank(mn.vin, chainActive.Height())));
-    QTableWidgetItem *activeSecondsItem = new QTableWidgetItem(seconds_to_DHMS((qint64)(mn.lastTimeSeen - mn.now)));
-    QTableWidgetItem *lastSeenItem = new QTableWidgetItem(QString::fromStdString(DateTimeStrFormat("%Y-%m-%d %H:%M:%S", mn.lastTimeSeen)));
-    
+    // Address, Rank, protocol, status, time active, last seen, Pub Key
+	
+    QTableWidgetItem *addressItem = new QTableWidgetItem(QString::fromStdString(mn.addr.ToString())); // Address
+    QTableWidgetItem *rankItem = new QTableWidgetItem(QString::number(GetMasternodeRank(mn.vin, chainActive.Height()))); // Rank
+    QTableWidgetItem *protocolItem = new QTableWidgetItem(QString::number(mn.protocolVersion)); // Protocol
+    QTableWidgetItem *activeItem = new QTableWidgetItem(mn.IsEnabled() ? tr("Enabled") : tr("Disabled")); // Status
+    QTableWidgetItem *activeSecondsItem = new QTableWidgetItem(seconds_to_DHMS((qint64)(mn.lastTimeSeen - mn.now))); // Time Active
+    QTableWidgetItem *lastSeenItem = new QTableWidgetItem(QString::fromStdString(DateTimeStrFormat("%Y-%m-%d %H:%M:%S", mn.lastTimeSeen))); // Last Seen
+	
+	
     CScript pubkey;
         pubkey = GetScriptForDestination(mn.pubkey.GetID());
         CTxDestination address1;
@@ -195,22 +201,25 @@ void MasternodeManager::updateNodeList()
     QTableWidgetItem *pubkeyItem = new QTableWidgetItem(QString::fromStdString(EncodeDestination(address1)));
 
         if (strCurrentFilter != "") {
-            strToFilter = activeItem->text() + " " +
-                          addressItem->text() + " " +
+            strToFilter = addressItem->text() + " " +
                           rankItem->text() + " " +
+			  protocolItem->text() + " " +
+                          activeItem->text() + " " +
                           activeSecondsItem->text() + " " +
                           lastSeenItem->text() + " " +
                           pubkeyItem->text();
             if (!strToFilter.contains(strCurrentFilter)) continue;
         }
-
-        ui->tableWidget->insertRow(0);
+		
+	ui->tableWidget->insertRow(0);
         ui->tableWidget->setItem(0, 0, addressItem);
         ui->tableWidget->setItem(0, 1, rankItem);
-        ui->tableWidget->setItem(0, 2, activeItem);
-        ui->tableWidget->setItem(0, 3, activeSecondsItem);
-        ui->tableWidget->setItem(0, 4, lastSeenItem);
-        ui->tableWidget->setItem(0, 5, pubkeyItem);
+	ui->tableWidget->setItem(0, 2, protocolItem);
+        ui->tableWidget->setItem(0, 3, activeItem);
+        ui->tableWidget->setItem(0, 4, activeSecondsItem);
+        ui->tableWidget->setItem(0, 5, lastSeenItem);
+        ui->tableWidget->setItem(0, 6, pubkeyItem);
+		
     }
 
     ui->countLabel->setText(QString::number(ui->tableWidget->rowCount()));
@@ -434,4 +443,3 @@ void MasternodeManager::on_stopAllButton_clicked()
     msg.setText(QString::fromStdString(results));
     msg.exec();
 }
-
