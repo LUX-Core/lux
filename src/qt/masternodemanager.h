@@ -37,6 +37,15 @@ public:
     void setWalletModel(WalletModel *walletModel);
     void updateListConc();
 
+    enum ColumnIndex {
+        Address = 0,
+        Rank = 1,
+        Active = 2,
+        ActiveSecs = 3,
+        LastSeen = 4,
+        Pubkey = 5
+    };
+
 public slots:
     void updateNodeList();
     void updateLuxNode(QString alias, QString addr, QString privkey, QString collateral);
