@@ -8,7 +8,6 @@
 #include "main.h"
 
 #include "addrman.h"
-#include "alert.h"
 #include "chainparams.h"
 #include "checkpoints.h"
 #include "checkqueue.h"
@@ -41,7 +40,6 @@
 #include "versionbits.h"
 #include "script/interpreter.h"
 
-#include "univalue/univalue.h"
 #include <atomic>
 #include <sstream>
 

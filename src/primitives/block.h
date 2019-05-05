@@ -20,6 +20,8 @@
 class CBlockHeader
 {
 public:
+    std::vector<CTransactionRef> vtx;
+
     // header
     int32_t nVersion;
     uint256 hashPrevBlock;
@@ -63,8 +65,8 @@ public:
         nTime = 0;
         nBits = 0;
         nNonce = 0;
-        hashStateRoot = 0; // lux
-        hashUTXORoot = 0; // lux
+        hashStateRoot = uint256(); // lux
+        hashUTXORoot = uint256(); // lux
     }
 
     bool IsNull() const
@@ -77,6 +79,18 @@ public:
     int64_t GetBlockTime() const {
         return (int64_t)nTime;
     }
+    
+    // ppcoin: two types of block: proof-of-work or proof-of-stake
+    bool IsProofOfStake() const
+    {
+        return (vtx.size() > 1 && vtx[1]->IsCoinStake());
+    }
+
+    bool IsProofOfWork() const
+    {
+        return !IsProofOfStake();
+    }
+
 };
 
 
@@ -127,17 +141,6 @@ public:
         block.hashStateRoot  = hashStateRoot; // lux
         block.hashUTXORoot   = hashUTXORoot; // lux
         return block;
-    }
-
-    // ppcoin: two types of block: proof-of-work or proof-of-stake
-    bool IsProofOfStake() const
-    {
-        return (vtx.size() > 1 && vtx[1].IsCoinStake());
-    }
-
-    bool IsProofOfWork() const
-    {
-        return !IsProofOfStake();
     }
 
     std::string ToString() const;

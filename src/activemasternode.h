@@ -12,7 +12,7 @@
 //#include "primitives/transaction.h"
 #include "main.h"
 #include "init.h"
-#include "wallet.h"
+#include "wallet/wallet.h"
 #include "darksend.h"
 
 // Responsible for activating the masternode and pinging the network

@@ -84,8 +84,8 @@
 // Application startup time (used for uptime calculation)
 const int64_t nStartupTime = GetTime();
 
-const char * const LUX_CONF_FILENAME = "lux.conf";
-const char * const LUX_PID_FILENAME = "luxd.pid";
+const char * const BITCOIN_CONF_FILENAME = "lux.conf";
+const char * const BITCOIN_PID_FILENAME = "luxd.pid";
 const char * const DEFAULT_DEBUGLOGFILE = "debug.log";
 const char * const DEFAULT_VMLOGFILE = "vm.log";
 

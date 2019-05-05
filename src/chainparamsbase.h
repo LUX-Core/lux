@@ -5,7 +5,6 @@
 #ifndef BITCOIN_CHAINPARAMSBASE_H
 #define BITCOIN_CHAINPARAMSBASE_H
 
-#include <memory>
 #include <string>
 #include <vector>
 
@@ -16,11 +15,15 @@
 class CBaseChainParams
 {
 public:
-    /** BIP70 chain name strings (main, test or regtest) */
-    static const std::string MAIN;
-    static const std::string TESTNET;
-    static const std::string REGTEST;
-    static const std::string SEGWITTEST;
+    enum Network {
+        MAIN,
+        TESTNET,
+        REGTEST,
+        UNITTEST,
+        SEGWITTEST,
+
+        MAX_NETWORK_TYPES
+    };
 
     const std::string& DataDir() const { return strDataDir; }
     int RPCPort() const { return nRPCPort; }
@@ -30,34 +33,35 @@ protected:
 
     int nRPCPort;
     std::string strDataDir;
+    Network networkID;
 };
 
 /**
- * Creates and returns a std::unique_ptr<CBaseChainParams> of the chosen chain.
- * @returns a CBaseChainParams* of the chosen chain.
- * @throws a std::runtime_error if the chain is not supported.
- */
-std::unique_ptr<CBaseChainParams> CreateBaseChainParams(const std::string& chain);
-
-/**
- * Append the help messages for the chainparams options to the
- * parameter string.
- */
-void AppendParamsHelpMessages(std::string& strUsage, bool debugHelp=true);
-
-/**
- * Return the currently selected parameters. This won't change after app
- * startup, except for unit tests.
+ * Return the currently selected parameters. This won't change after app startup
+ * outside of the unit tests.
  */
 const CBaseChainParams& BaseParams();
 
 /** Sets the params returned by Params() to those for the given network. */
-void SelectBaseParams(const std::string& chain);
+void SelectBaseParams(CBaseChainParams::Network network);
+
+/**
+ * Looks for -regtest or -testnet and returns the appropriate Network ID.
+ * Returns MAX_NETWORK_TYPES if an invalid combination is given.
+ */
+CBaseChainParams::Network NetworkIdFromCommandLine();
+
+/**
+ * Calls NetworkIdFromCommandLine() and then calls SelectParams as appropriate.
+ * Returns false if an invalid combination is given.
+ */
+bool SelectBaseParamsFromCommandLine();
 
 /**
  * Looks for -regtest, -testnet and returns the appropriate BIP70 chain name.
  * @return CBaseChainParams::MAX_NETWORK_TYPES if an invalid combination is given. CBaseChainParams::MAIN by default.
  */
 std::string ChainNameFromCommandLine();
+bool AreBaseParamsConfigured();
 
 #endif // BITCOIN_CHAINPARAMSBASE_H

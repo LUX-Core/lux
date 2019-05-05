@@ -36,6 +36,9 @@
 // Application startup time (used for uptime calculation)
 int64_t GetStartupTime();
 
+extern const char * const BITCOIN_CONF_FILENAME;
+extern const char * const BITCOIND_PID_FILENAME;
+
 static const bool DEFAULT_LOGTIMEMICROS = false;
 static const bool DEFAULT_LOGIPS        = false;
 static const bool DEFAULT_LOGTIMESTAMPS = true;

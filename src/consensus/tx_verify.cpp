@@ -202,6 +202,16 @@ bool CheckTransaction(const CTransaction& tx, CValidationState &state, bool fChe
                 return state.DoS(10, false, REJECT_INVALID, "bad-txns-prevout-null");
     }
 
+    /////////////////////////////////////////////////////////// // lux
+    if (txout.scriptPubKey.HasOpCall() || txout.scriptPubKey.HasOpCreate()) {
+        std::vector<valtype> vSolutions;
+        txnouttype whichType;
+        if (!Solver(txout.scriptPubKey, whichType, vSolutions, true)) {
+            return state.DoS(100, false, REJECT_INVALID, "bad-txns-contract-nonstandard");
+        }
+    }
+    ///////////////////////////////////////////////////////////
+
     return true;
 }
 

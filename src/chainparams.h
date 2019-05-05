@@ -15,7 +15,7 @@
 
 #include <vector>
 
-typedef unsigned char MessageStartChars[MESSAGE_START_SIZE];
+typedef unsigned char MessageStartChars[CMessageHeader::MESSAGE_START_SIZE];
 
 struct CDNSSeedData {
     std::string name, host;
@@ -87,6 +87,7 @@ public:
     std::string NetworkIDString() const { return strNetworkID; }
     const std::vector<CDNSSeedData>& DNSSeeds() const { return vSeeds; }
     const std::vector<unsigned char>& Base58Prefix(Base58Type type) const { return base58Prefixes[type]; }
+    int ExtCoinType() const { return nExtCoinType; }
     const std::string& Bech32HRP() const { return bech32_hrp; }
     const std::vector<CAddress>& FixedSeeds() const { return vFixedSeeds; }
     virtual const Checkpoints::CCheckpointData& Checkpoints() const = 0;
@@ -102,6 +103,7 @@ public:
     int SwitchPhi2Block() const { return nSwitchPhi2Block; }
     int64_t PruneAfterHeight() const { return nPruneAfterHeight; }
     int FirstSplitRewardBlock() const { return nSplitRewardBlock; }
+    int PreminePayment() const { return nPreminePaymentandHardForkBlock; }
 
 protected:
     CChainParams() {}
@@ -118,6 +120,7 @@ protected:
     int nMinerThreads;
     std::vector<CDNSSeedData> vSeeds;
     std::vector<unsigned char> base58Prefixes[MAX_BASE58_TYPES];
+    int nExtCoinType;
     std::string bech32_hrp;
     CBaseChainParams::Network networkID;
     std::string strNetworkID;
@@ -141,6 +144,7 @@ protected:
     int nFirstSCBlock;
     int nSwitchPhi2Block;
     int nSplitRewardBlock;
+    int nPreminePaymentandHardForkBlock;
     uint64_t nPruneAfterHeight;
 };
 
@@ -182,8 +186,11 @@ CChainParams& Params(CBaseChainParams::Network network);
 /** Get modifiable network parameters (UNITTEST only) */
 CModifiableParams* ModifiableParams();
 
-/** Sets the params returned by Params() to those for the given network. */
-void SelectParams(CBaseChainParams::Network network);
+/**
+ * Sets the params returned by Params() to those for the given BIP70 chain name.
+ * @throws std::runtime_error when the chain is not supported.
+ */
+void SelectParams(const std::string& chain);
 
 /**
  * Looks for -regtest or -testnet and then calls SelectParams as appropriate.

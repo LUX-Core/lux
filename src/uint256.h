@@ -160,25 +160,20 @@ inline uint256 uint256S(const std::string& str)
     uint256 rv;
     rv.SetHex(str);
     return rv;
-}
+};
 
 /** 512-bit unsigned big integer. */
-class uint512 : public base_uint<512>
-{
+class uint512 : public base_blob<512> {
 public:
     uint512() {}
-    uint512(const base_uint<512>& b) : base_uint<512>(b) {}
-    uint512(uint64_t b) : base_uint<512>(b) {}
-    explicit uint512(const std::string& str) : base_uint<512>(str) {}
-    explicit uint512(const std::vector<unsigned char>& vch) : base_uint<512>(vch) {}
+    uint512(const base_blob<512>& b) : base_blob<512>(b) {}
+    explicit uint512(const std::vector<unsigned char>& vch) : base_blob<512>(vch) {}
 
     uint256 trim256() const
     {
-        uint256 ret;
-        for (unsigned int i = 0; i < uint256::WIDTH; i++) {
-            ret.pn[i] = pn[i];
-        }
-        return ret;
+        uint256 result;
+        memcpy((void*)&result, (void*)data, 32);
+        return result;
     }
 };
 

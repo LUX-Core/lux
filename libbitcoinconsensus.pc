@@ -1,0 +1,12 @@
+
+prefix=/usr/local
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: Luxcore consensus library
+Description: Library for the Bitcoin consensus protocol.
+Version: 5.1.0
+Libs: -L${libdir} -lbitcoinconsensus
+Cflags: -I${includedir}
+Requires.private: libcrypto
