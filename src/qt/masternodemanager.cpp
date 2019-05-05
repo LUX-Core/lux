@@ -208,7 +208,7 @@ void MasternodeManager::updateNodeList()
 
     // populate list
     // Address, Rank, Active, Active Seconds, Last Seen, Pub Key
-    QTableWidgetItem *activeItem = new QTableWidgetItem(mn->IsEnabled() ? tr("yes") : tr("no"));
+    QTableWidgetItem *activeItem = new QTableWidgetItem(mn->IsEnabled() ? tr("Active") : tr("Inactive"));
     QTableWidgetItem *addressItem = new QTableWidgetItem(QString::fromStdString(mn->addr.ToString()));
     SortedWidgetItem *protocolItem = new SortedWidgetItem();
     protocolItem->setData(Qt::UserRole, mn->protocolVersion);
