@@ -3,7 +3,7 @@
 #include "walletmodel.h"
 #include "wallet.h"
 #include "bitcoinunits.h"
-#include "main.h"
+#include "validation.h"
 
 #include <boost/foreach.hpp>
 #include <algorithm>

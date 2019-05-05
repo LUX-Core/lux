@@ -1,6 +1,6 @@
 #include "tokentransactiondesc.h"
 #include "tokentransactionrecord.h"
-#include "main.h"
+#include "validation.h"
 #include "wallet.h"
 #include "timedata.h"
 #include "bitcoinunits.h"

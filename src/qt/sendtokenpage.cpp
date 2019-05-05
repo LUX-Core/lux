@@ -1,7 +1,7 @@
 #include "sendtokenpage.h"
 #include "ui_sendtokenpage.h"
 
-#include "main.h"
+#include "validation.h"
 #include "clientmodel.h"
 #include "optionsmodel.h"
 #include "utilmoneystr.h"

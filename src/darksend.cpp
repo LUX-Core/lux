@@ -4,7 +4,7 @@
 
 #include "consensus/validation.h"
 #include "darksend.h"
-#include "main.h"
+#include "validation.h"
 #include "init.h"
 #include "script/sign.h"
 #include "script/interpreter.h"

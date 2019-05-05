@@ -1,7 +1,7 @@
 #include "token.h"
 #include "execrpccommand.h"
 #include "contractabi.h"
-#include "main.h"
+#include "validation.h"
 #include "utilmoneystr.h"
 #include "base58.h"
 #include "utilstrencodings.h"

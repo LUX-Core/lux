@@ -10,7 +10,7 @@
 #include "net.h"
 #include "key.h"
 //#include "primitives/transaction.h"
-#include "main.h"
+#include "validation.h"
 #include "init.h"
 #include "wallet/wallet.h"
 #include "darksend.h"

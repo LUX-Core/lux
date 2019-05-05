@@ -7,7 +7,7 @@
 #include "consensus/merkle.h"
 #include "consensus/validation.h"
 #include "init.h"
-#include "main.h"
+#include "validation.h"
 #include "miner.h"
 #include "policy/policy.h"
 #include "pubkey.h"

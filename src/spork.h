@@ -13,7 +13,7 @@
 #include "util.h"
 #include "script/script.h"
 #include "base58.h"
-#include "main.h"
+#include "validation.h"
 
 using namespace std;
 using namespace boost;

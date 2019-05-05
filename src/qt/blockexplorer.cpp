@@ -3,7 +3,7 @@
 #include "chainparams.h"
 #include "clientmodel.h"
 #include "core_io.h"
-#include "main.h"
+#include "validation.h"
 #include "net.h"
 #include "txdb.h"
 #include "ui_blockexplorer.h"

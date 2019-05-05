@@ -28,7 +28,7 @@
 #include "masternodeconfig.h"
 
 #include "init.h"
-#include "main.h"
+#include "validation.h"
 #include "rpcserver.h"
 #include "scheduler.h"
 #include "ui_interface.h"

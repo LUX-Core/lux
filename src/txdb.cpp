@@ -5,7 +5,7 @@
 
 #include "txdb.h"
 
-#include "main.h"
+#include "validation.h"
 #include "pow.h"
 #include "stake.h"
 

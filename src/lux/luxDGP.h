@@ -3,7 +3,7 @@
 
 #include "luxstate.h"
 #include "primitives/block.h"
-#include "main.h"
+#include "validation.h"
 #include "utilstrencodings.h"
 
 static const dev::Address GasScheduleDGP = dev::Address("0000000000000000000000000000000000000080");

@@ -15,7 +15,7 @@
 
 #include "amount.h"
 #include "init.h"
-#include "main.h"
+#include "validation.h"
 #include "net.h"
 #include "txdb.h" // for -dbcache defaults
 

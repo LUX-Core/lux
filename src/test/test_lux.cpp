@@ -4,7 +4,7 @@
 
 #define BOOST_TEST_MODULE Lux Test Suite
 
-#include "main.h"
+#include "validation.h"
 #include "random.h"
 #include "txdb.h"
 #include "ui_interface.h"

@@ -7,7 +7,7 @@
 #include "core_io.h"
 #include "key.h"
 #include "keystore.h"
-#include "main.h"
+#include "validation.h"
 #include "primitives/transaction.h"
 #include "rpcserver.h"
 #include "script/script.h"

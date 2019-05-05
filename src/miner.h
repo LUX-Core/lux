@@ -11,7 +11,7 @@
 
 #include <stdint.h>
 #include <memory>
-#include "main.h"
+#include "validation.h"
 #include "boost/multi_index_container.hpp"
 #include "boost/multi_index/ordered_index.hpp"
 

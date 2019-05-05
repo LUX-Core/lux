@@ -13,7 +13,7 @@
 
 #include "base58.h"
 #include "db.h"
-#include "main.h"
+#include "validation.h"
 #include "script/script.h"
 #include "timedata.h"
 #include "ui_interface.h"

@@ -3,7 +3,7 @@
 #include "consensus/validation.h"
 #include "darksend.h"
 #include "primitives/transaction.h"
-#include "main.h"
+#include "validation.h"
 #include "util.h"
 #include "addrman.h"
 #include <boost/lexical_cast.hpp>

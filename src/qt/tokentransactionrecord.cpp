@@ -2,7 +2,7 @@
 
 #include "base58.h"
 #include "primitives/block.h"
-#include "main.h"
+#include "validation.h"
 #include "timedata.h"
 #include "wallet.h"
 

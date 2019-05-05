@@ -28,7 +28,7 @@
 #include "masternode.h"
 
 #ifdef ENABLE_WALLET
-#include "wallet.h"
+#include "wallet/wallet.h"
 #endif
 
 #include <algorithm>

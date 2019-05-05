@@ -1,6 +1,6 @@
 #include <sstream>
 #include <util.h>
-#include <main.h>
+#include <validation.h>
 #include "luxstate.h"
 
 using namespace std;

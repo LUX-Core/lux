@@ -23,6 +23,11 @@ struct CDNSSeedData {
     CDNSSeedData(const std::string& strName, const std::string& strHost, bool supportsServiceBitsFilteringIn = false) : name(strName), host(strHost), supportsServiceBitsFiltering(supportsServiceBitsFilteringIn) {}
 };
 
+struct SeedSpec6 {
+    uint8_t addr[16];
+    uint16_t port;
+};
+
 /**
  * CChainParams defines various tweakable parameters of a given instance of the
  * LUX system. There are three: the main network on which people trade goods
@@ -85,11 +90,11 @@ public:
     bool TestnetToBeDeprecatedFieldRPC() const { return fTestnetToBeDeprecatedFieldRPC; }
     /** Return the BIP70 network string (main, test or regtest) */
     std::string NetworkIDString() const { return strNetworkID; }
-    const std::vector<CDNSSeedData>& DNSSeeds() const { return vSeeds; }
+    const std::vector<std::string>& DNSSeeds() const { return vSeeds; }
     const std::vector<unsigned char>& Base58Prefix(Base58Type type) const { return base58Prefixes[type]; }
     int ExtCoinType() const { return nExtCoinType; }
     const std::string& Bech32HRP() const { return bech32_hrp; }
-    const std::vector<CAddress>& FixedSeeds() const { return vFixedSeeds; }
+    const std::vector<SeedSpec6>& FixedSeeds() const { return vFixedSeeds; }
     virtual const Checkpoints::CCheckpointData& Checkpoints() const = 0;
     int PoolMaxTransactions() const { return nPoolMaxTransactions; }
     std::string SporkKey() const { return strSporkKey; }
@@ -118,14 +123,14 @@ protected:
     int nMaturity;
     int nModifierUpdateBlock;
     int nMinerThreads;
-    std::vector<CDNSSeedData> vSeeds;
+    std::vector<std::string> vSeeds;
     std::vector<unsigned char> base58Prefixes[MAX_BASE58_TYPES];
     int nExtCoinType;
     std::string bech32_hrp;
     CBaseChainParams::Network networkID;
     std::string strNetworkID;
     CBlock genesis;
-    std::vector<CAddress> vFixedSeeds;
+    std::vector<SeedSpec6> vFixedSeeds;
     bool fMiningRequiresPeers;
 
     bool fDefaultConsistencyChecks;

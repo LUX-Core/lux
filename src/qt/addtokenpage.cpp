@@ -8,7 +8,7 @@
 #include "clientmodel.h"
 #include "qvalidatedlineedit.h"
 #include "contractabi.h"
-#include "main.h"
+#include "validation.h"
 #include "addresstablemodel.h"
 #include "optionsmodel.h"
 

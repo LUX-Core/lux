@@ -111,7 +111,6 @@ BITCOIN_CORE_H = \
   keystore.h \
   dbwrapper.h \
   limitedmap.h \
-  main.h \
   masternode.h \
   masternodeconfig.h \
   memusage.h \
@@ -209,7 +208,6 @@ libbitcoin_server_a_SOURCES = \
   httpserver.cpp \
   init.cpp \
   dbwrapper.cpp \
-  main.cpp \
   merkleblock.cpp \
   miner.cpp \
   net.cpp \

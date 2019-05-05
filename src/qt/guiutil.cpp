@@ -12,7 +12,7 @@
 #include "walletmodel.h"
 
 #include "init.h"
-#include "main.h"
+#include "validation.h"
 #include "primitives/transaction.h"
 #include "protocol.h"
 #include "script/script.h"

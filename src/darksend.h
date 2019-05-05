@@ -6,7 +6,7 @@
 #define DARKSEND_H
 
 //#include "primitives/transaction.h"
-#include "main.h"
+#include "validation.h"
 #include "masternode.h"
 #include "activemasternode.h"
 

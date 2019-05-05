@@ -12,7 +12,7 @@
 #include "key.h"
 #include "util.h"
 #include "base58.h"
-#include "main.h"
+#include "validation.h"
 #include "timedata.h"
 #include "script/script.h"
 

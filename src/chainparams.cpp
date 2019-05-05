@@ -26,11 +26,6 @@
 using namespace std;
 using namespace boost::assign;
 
-struct SeedSpec6 {
-    uint8_t addr[16];
-    uint16_t port;
-};
-
 #include "chainparamsseeds.h"
 
 bool CheckProof(uint256 hash, unsigned int nBits)
@@ -217,9 +212,9 @@ public:
         assert(genesis.hashMerkleRoot == uint256("0xe08ae0cfc35a1d70e6764f347fdc54355206adeb382446dd54c32cd0201000d3"));
 
         ////////////////////////////////////////////////////////////////////////////////////////////////
-        vSeeds.push_back(CDNSSeedData("Seed1", "seed.luxcore.tech"));       // LUX seeder
-        vSeeds.push_back(CDNSSeedData("Seed2", "seed.luxseeds.nl"));        // LUX seeder
-        vSeeds.push_back(CDNSSeedData("Seed3", "lux.yiimp.eu"));            // LUX seeder with IPv6
+        vSeeds.emplace_back("seed.luxcore.tech");                   // LUX seeder
+        vSeeds.emplace_back("seed.luxseeds.nl");                    // LUX seeder
+        vSeeds.emplace_back("lux.yiimp.eu");                        // LUX seeder with IPv6
 
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,48); // LUX address start with 'L'
         base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1,63); // LUX script addresses start with 'S'
@@ -232,7 +227,7 @@ public:
 
         bech32_hrp = "bc";
 
-        convertSeed6(vFixedSeeds, pnSeed6_main, ARRAYLEN(pnSeed6_main));
+        vFixedSeeds = std::vector<SeedSpec6>(pnSeed6_main, pnSeed6_main + ARRAYLEN(pnSeed6_main));
 
         fMiningRequiresPeers = true;
         fDefaultConsistencyChecks = false;

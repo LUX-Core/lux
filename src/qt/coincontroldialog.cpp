@@ -16,7 +16,7 @@
 #include "clientmodel.h"
 
 #include "coincontrol.h"
-#include "main.h"
+#include "validation.h"
 #include "darksend.h"
 #include "wallet.h"
 

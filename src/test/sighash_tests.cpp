@@ -5,7 +5,7 @@
 #include "consensus/validation.h"
 #include "data/sighash.json.h"
 #include "hash.h"
-#include "main.h"
+#include "validation.h"
 #include "random.h"
 #include "serialize.h"
 #include "script/script.h"

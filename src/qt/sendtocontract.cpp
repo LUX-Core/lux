@@ -8,7 +8,7 @@
 #include "execrpccommand.h"
 #include "bitcoinunits.h"
 #include "optionsmodel.h"
-#include "main.h"
+#include "validation.h"
 #include "utilmoneystr.h"
 #include "abifunctionfield.h"
 #include "contractabi.h"

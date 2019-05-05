@@ -20,7 +20,7 @@
 #include "rpcconsole.h"
 #include "utilitydialog.h"
 #include "stake.h"
-#include "main.h"
+#include "validation.h"
 
 #ifdef ENABLE_WALLET
 #include "blockexplorer.h"

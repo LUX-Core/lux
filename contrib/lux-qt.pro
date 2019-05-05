@@ -90,7 +90,7 @@ HEADERS += src/activemasternode.h \
            src/keystore.h \
            src/leveldbwrapper.h \
            src/limitedmap.h \
-           src/main.h \
+           src/validation.h \
            src/masternode-budget.h \
            src/masternode-payments.h \
            src/masternode-sync.h \
