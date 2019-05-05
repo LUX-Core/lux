@@ -282,29 +282,29 @@ UniValue masternode(const UniValue& params, bool fHelp) {
         }
 
         UniValue obj(UniValue::VOBJ);
-        for (CMasterNode mn : vecMasternodes) {
-            mn.Check();
+        for (CMasterNode* mn : vecMasternodes) {
+            mn->Check();
 
             if (strCommand == "active") {
-                obj.push_back(Pair(mn.addr.ToString().c_str(), (int) mn.IsEnabled()));
+                obj.push_back(Pair(mn->addr.ToString().c_str(), (int) mn->IsEnabled()));
             } else if (strCommand == "vin") {
-                obj.push_back(Pair(mn.addr.ToString().c_str(), mn.vin.prevout.hash.ToString().c_str()));
+                obj.push_back(Pair(mn->addr.ToString().c_str(), mn->vin.prevout.hash.ToString().c_str()));
             } else if (strCommand == "pubkey") {
                 CScript pubkey;
-                pubkey = GetScriptForDestination(mn.pubkey.GetID());
+                pubkey = GetScriptForDestination(mn->pubkey.GetID());
                 CTxDestination address1;
                 ExtractDestination(pubkey, address1);
                 CTxDestination address2(address1);
 
-                obj.push_back(Pair(mn.addr.ToString().c_str(), EncodeDestination(address2)));
+                obj.push_back(Pair(mn->addr.ToString().c_str(), EncodeDestination(address2)));
             } else if (strCommand == "protocol") {
-                obj.push_back(Pair(mn.addr.ToString().c_str(), (int64_t) mn.protocolVersion));
+                obj.push_back(Pair(mn->addr.ToString().c_str(), (int64_t) mn->protocolVersion));
             } else if (strCommand == "lastseen") {
-                obj.push_back(Pair(mn.addr.ToString().c_str(), (int64_t) mn.lastTimeSeen));
+                obj.push_back(Pair(mn->addr.ToString().c_str(), (int64_t) mn->lastTimeSeen));
             } else if (strCommand == "activeseconds") {
-                obj.push_back(Pair(mn.addr.ToString().c_str(), (int64_t)(mn.lastTimeSeen - mn.now)));
+                obj.push_back(Pair(mn->addr.ToString().c_str(), (int64_t)(mn->lastTimeSeen - mn->now)));
             } else if (strCommand == "rank") {
-                obj.push_back(Pair(mn.addr.ToString().c_str(), (int) (GetMasternodeRank(mn.vin, chainActive.Height()))));
+                obj.push_back(Pair(mn->addr.ToString().c_str(), (int) (GetMasternodeRank(mn->vin, chainActive.Height()))));
             }
         }
         return obj;
@@ -494,7 +494,7 @@ UniValue masternode(const UniValue& params, bool fHelp) {
     if (strCommand == "current") {
         int winner = GetCurrentMasterNode(1);
         if (winner >= 0) {
-            return vecMasternodes[winner].addr.ToString().c_str();
+            return vecMasternodes[winner]->addr.ToString().c_str();
         }
 
         return "unknown";
