@@ -103,9 +103,9 @@ void ModalOverlay::tipUpdate(int count, const QDateTime& blockDate, double nVeri
 
         // show expected remaining time
         if(remainingMSecs >= 0) {
-            ui->expectedTimeLeft->setText(GUIUtil::formatNiceTimeOffset(remainingMSecs / 1000.0));
+            ui->TimeLeft->setText(GUIUtil::formatNiceTimeOffset(remainingMSecs / 1000.0));
         } else {
-            ui->expectedTimeLeft->setText(QObject::tr("unknown"));
+            ui->TimeLeft->setText(QObject::tr("calculating..."));
         }
 
         // keep maximal 5000 samples
@@ -121,7 +121,7 @@ void ModalOverlay::tipUpdate(int count, const QDateTime& blockDate, double nVeri
     // show the percentage done according to nVerificationProgress
     ui->percentageProgress->setText(QString::number(nVerificationProgress * 100, 'f', 2) + "%");
     ui->progressBar->setValue(nVerificationProgress * 100);
-
+    
     if (!bestHeaderDate.isValid())
         // not syncing
         return;
@@ -136,7 +136,6 @@ void ModalOverlay::tipUpdate(int count, const QDateTime& blockDate, double nVeri
         ui->numberOfBlocksLeft->setText(QString::number(bestHeaderHeight - count));
     } else {
         ui->numberOfBlocksLeft->setText(tr("Unknown. Syncing Headers (%1)...").arg(bestHeaderHeight));
-        ui->expectedTimeLeft->setText(tr("Unknown..."));
     }
 }
 
