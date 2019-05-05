@@ -193,6 +193,8 @@ void MasternodeManager::updateNodeList()
 {
     if (chainActive.Tip() == NULL) return; // don't segfault if the gui boots before the wallet's ready
 
+    static int64_t nTimeListUpdated = GetTime();
+
     QString strToFilter;
     ui->countLabel->setText("Updating...");
     ui->tableWidget->setSortingEnabled(false);
@@ -214,12 +216,12 @@ void MasternodeManager::updateNodeList()
     // populate list
     // Address, Rank, protocol, status, time active, last seen, Pub Key
 	
-    QTableWidgetItem *addressItem = new QTableWidgetItem(QString::fromStdString(mn->addr.ToString())); // Address
-    QTableWidgetItem *rankItem = new QTableWidgetItem(QString::number(GetMasternodeRank(mn->vin, chainActive.Height()))); // Rank
-    QTableWidgetItem *protocolItem = new QTableWidgetItem(QString::number(mn->protocolVersion)); // Protocol
-    QTableWidgetItem *activeItem = new QTableWidgetItem(mn->IsEnabled() ? tr("Enabled") : tr("Disabled")); // Status
-    QTableWidgetItem *activeSecondsItem = new QTableWidgetItem(seconds_to_DHMS((qint64)(mn->lastTimeSeen - mn->now))); // Time Active
-    QTableWidgetItem *lastSeenItem = new QTableWidgetItem(QString::fromStdString(DateTimeStrFormat("%Y-%m-%d %H:%M:%S", mn->lastTimeSeen))); // Last Seen
+    QTableWidgetItem *addressItem = new QTableWidgetItem(QString::fromStdString(mn.addr.ToString())); // Address
+    QTableWidgetItem *rankItem = new QTableWidgetItem(QString::number(GetMasternodeRank(mn.vin, chainActive.Height()))); // Rank
+    QTableWidgetItem *protocolItem = new QTableWidgetItem(QString::number(mn.protocolVersion)); // Protocol
+    QTableWidgetItem *activeItem = new QTableWidgetItem(mn.IsEnabled() ? tr("Enabled") : tr("Disabled")); // Status
+    QTableWidgetItem *activeSecondsItem = new QTableWidgetItem(seconds_to_DHMS((qint64)(mn.lastTimeSeen - mn.now))); // Time Active
+    QTableWidgetItem *lastSeenItem = new QTableWidgetItem(QString::fromStdString(DateTimeStrFormat("%Y-%m-%d %H:%M:%S", mn.lastTimeSeen))); // Last Seen
 	
 	
     CScript pubkey;
