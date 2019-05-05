@@ -98,7 +98,7 @@ std::string to_internal(const std::string&);
 
 using namespace std;
 
-regex hexData("^([0-9a-fA-f]{2,}$)");
+regex hexData("(^[0-9A-Fa-f][0-9A-Fa-f]+)");
 
 //LUX only features
 int nLogFile = 1;

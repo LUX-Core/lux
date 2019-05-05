@@ -46,6 +46,30 @@ MasternodeManager::MasternodeManager(QWidget *parent) :
     ui->stopButton->setEnabled(false);
     //ui->copyAddressButton->setEnabled(false);
 
+    // setup widths for the main table
+    ui->tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Fixed);
+    ui->tableWidget->horizontalHeader()->setStretchLastSection(true);
+    ui->tableWidget->setColumnWidth(Address, 160);
+    ui->tableWidget->setColumnWidth(Rank, 40);
+    ui->tableWidget->setColumnWidth(Active, 40);
+    ui->tableWidget->setColumnWidth(ActiveSecs, 120);
+    ui->tableWidget->setColumnWidth(LastSeen, 140);
+
+    ui->tableWidget->sortByColumn(Rank, Qt::AscendingOrder);
+    ui->tableWidget->setSortingEnabled(true);
+
+    // setup widths for parallel table
+    ui->tableWidget_2->horizontalHeader()->setSectionResizeMode(QHeaderView::Fixed);
+    ui->tableWidget_2->horizontalHeader()->setStretchLastSection(true);
+    ui->tableWidget_2->setColumnWidth(Address, 160);
+    ui->tableWidget_2->setColumnWidth(Rank, 40);
+    ui->tableWidget_2->setColumnWidth(Active, 40);
+    ui->tableWidget_2->setColumnWidth(ActiveSecs, 120);
+    ui->tableWidget_2->setColumnWidth(LastSeen, 140);
+
+    ui->tableWidget_2->sortByColumn(Address, Qt::AscendingOrder);
+    ui->tableWidget_2->setSortingEnabled(true);
+
     subscribeToCoreSignals();
 
     timer = new QTimer(this);
@@ -71,6 +95,15 @@ MasternodeManager::MasternodeManager(QWidget *parent) :
     ui->tableWidget->setColumnWidth(5, columnLastSeenWidth); // last seen
 	
 }
+
+class SortedWidgetItem : public QTableWidgetItem
+{
+public:
+    bool operator <( const QTableWidgetItem& other ) const
+    {
+        return (data(Qt::UserRole) < other.data(Qt::UserRole));
+    }
+};
 
 MasternodeManager::~MasternodeManager()
 {
@@ -158,28 +191,25 @@ void MasternodeManager::wait()
 
 void MasternodeManager::updateNodeList()
 {
+    if (chainActive.Tip() == NULL) return; // don't segfault if the gui boots before the wallet's ready
+
     static int64_t nTimeListUpdated = GetTime();
-
-    // to prevent high cpu usage update only once in MASTERNODELIST_UPDATE_SECONDS seconds
-    // or MASTERNODELIST_FILTER_COOLDOWN_SECONDS seconds after filter was last changed
-    int64_t nSecondsToWait = fFilterUpdated ? nTimeFilterUpdated - GetTime() + MASTERNODELIST_FILTER_COOLDOWN_SECONDS : nTimeListUpdated - GetTime() + MASTERNODELIST_UPDATE_SECONDS;
-
-    if (fFilterUpdated) ui->countLabel->setText(tr("Please wait... ") + nSecondsToWait);
-    if (nSecondsToWait > 0) return;
-    nTimeListUpdated = GetTime();
-    fFilterUpdated = false;
-
-    TRY_LOCK(cs_masternodes, lockMasternodes);
-    if(!lockMasternodes)
-        return;
 
     QString strToFilter;
     ui->countLabel->setText("Updating...");
     ui->tableWidget->setSortingEnabled(false);
+    ui->tableWidget->setUpdatesEnabled(false); // disable sorting and gui updates while doing this so as to not incur thousands of redraws
     ui->tableWidget->clearContents();
     ui->tableWidget->setRowCount(0);
 
-    for (CMasterNode &mn : vecMasternodes)
+    // lock masternodes every time, and make a quick copy before doing expensive UI stuff during the lock period.
+    vector<CMasterNode*> vecMasternodesCopy;
+    {
+        LOCK(cs_masternodes);
+        vecMasternodesCopy = vecMasternodes;
+    }
+
+    for (CMasterNode* mn : vecMasternodesCopy)
     {
         if (ShutdownRequested()) return;
 
@@ -195,7 +225,7 @@ void MasternodeManager::updateNodeList()
 	
 	
     CScript pubkey;
-        pubkey = GetScriptForDestination(mn.pubkey.GetID());
+        pubkey = GetScriptForDestination(mn->pubkey.GetID());
         CTxDestination address1;
         ExtractDestination(pubkey, address1);
     QTableWidgetItem *pubkeyItem = new QTableWidgetItem(QString::fromStdString(EncodeDestination(address1)));
@@ -224,6 +254,7 @@ void MasternodeManager::updateNodeList()
 
     ui->countLabel->setText(QString::number(ui->tableWidget->rowCount()));
     ui->tableWidget->setSortingEnabled(true);
+    ui->tableWidget->setUpdatesEnabled(true);
     
     if(pwalletMain)
     {
@@ -240,7 +271,8 @@ void MasternodeManager::on_filterLineEdit_textChanged(const QString& strFilterIn
     strCurrentFilter = strFilterIn;
     nTimeFilterUpdated = GetTime();
     fFilterUpdated = true;
-    ui->countLabel->setText(QString::fromStdString(strprintf("Please wait... %d", MASTERNODELIST_FILTER_COOLDOWN_SECONDS)));
+    updateNodeList();
+    // ui->countLabel->setText(QString::fromStdString(strprintf("Please wait... %d", MASTERNODELIST_FILTER_COOLDOWN_SECONDS)));
 }
 
 void MasternodeManager::setClientModel(ClientModel *model)

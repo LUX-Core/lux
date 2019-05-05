@@ -4331,8 +4331,8 @@ bool CheckForMasternodePayment(const CTransaction& tx, const CBlockHeader& heade
 
         // Retrieve a list of masternodes' scriptPubKeys
         std::vector<CScript> vmnScripts(vecMasternodes.size());
-        for (const CMasterNode& mn : vecMasternodes) {
-            vmnScripts.push_back(GetScriptForDestination(mn.pubkey.GetID()));
+        for (const CMasterNode* mn : vecMasternodes) {
+            vmnScripts.push_back(GetScriptForDestination(mn->pubkey.GetID()));
         }
 
         LOCK(cs_main);
