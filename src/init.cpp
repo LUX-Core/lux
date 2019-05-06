@@ -38,6 +38,7 @@
 #include <script/standard.h>
 #include <script/sigcache.h>
 #include <scheduler.h>
+#include <spork.h>
 #include <timedata.h>
 #include <txdb.h>
 #include <txmempool.h>

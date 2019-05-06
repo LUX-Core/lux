@@ -610,6 +610,10 @@ bool DumpMempool();
 /** Load the mempool from disk. */
 bool LoadMempool();
 
+int GetInputAge(CTxIn& vin);
+int GetIXConfirmations(uint256 nTXHash);
+bool GetCoinAge(const CTransaction& tx, const unsigned int nTxTime, uint64_t& nCoinAge);
+
 //////////////////////////////////////////////////////// lux
 std::vector<ResultExecute> CallContract(const dev::Address& addrContract, std::vector<unsigned char> opcode, const dev::Address& sender = dev::Address(), uint64_t gasLimit=0);
 

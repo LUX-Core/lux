@@ -16,6 +16,7 @@
 #include <consensus/consensus.h>
 #include <crypto/common.h>
 #include <crypto/sha256.h>
+#include <miner.h>
 #include <primitives/transaction.h>
 #include <netbase.h>
 #include <scheduler.h>
