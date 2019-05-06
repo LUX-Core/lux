@@ -601,7 +601,7 @@ if test x$use_hardening != xno; then
 fi
 
 if test x$TARGET_OS = xwindows; then
-LDFLAGS="$LDFLAGS -Wl,--stack,268435456"
+LDFLAGS="$LDFLAGS -Wl,--stack,16777216"
 fi
 
 dnl this flag screws up non-darwin gcc even when the check fails. special-case it.
