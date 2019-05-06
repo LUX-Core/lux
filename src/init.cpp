@@ -1534,7 +1534,7 @@ bool AppInitMain()
                 globalState->dbUtxo().commit();
 
 
-                fRecordLogOpcodes = GetBoolArg("-record-log-opcodes", true);
+                fRecordLogOpcodes = gArgs.GetBoolArg("-record-log-opcodes", true);
                 fIsVMlogFile = boost::filesystem::exists(GetDataDir() / "vmExecLogs.json");
                 ///////////////////////////////////////////////////////////
 
@@ -1551,12 +1551,12 @@ bool AppInitMain()
                 }
 
                 // Check for changed -logevents state
-                if (fLogEvents != GetBoolArg("-logevents", false) && !fLogEvents) {
+                if (fLogEvents != gArgs.GetBoolArg("-logevents", false) && !fLogEvents) {
                     strLoadError = _("You need to rebuild the database using -reindex-chainstate to enable -logevents");
                     break;
                 }
 
-                if (GetBoolArg("-logevents", false)) {
+                if (gArgs.GetBoolArg("-logevents", false)) {
                     pstorageresult->wipeResults();
 //                  pblocktree->WipeHeightIndex();
                     fLogEvents = false;
@@ -1766,7 +1766,7 @@ bool AppInitMain()
 
     // ********************************************************* Step 11: setup Darksend
 
-    fMasterNode = GetBoolArg("-masternode", false);
+    fMasterNode = gArgs.GetBoolArg("-masternode", false);
     if (fMasterNode) {
         LogPrintf("IS DARKSEND MASTER NODE\n");
 
@@ -1795,20 +1795,20 @@ bool AppInitMain()
         }
     }
 
-    fEnableDarksend = GetBoolArg("-enabledarksend", false);
+    fEnableDarksend = gArgs.GetBoolArg("-enabledarksend", false);
 
-    nDarksendRounds = GetArg("-darksendrounds", 2);
+    nDarksendRounds = gArgs.GetArg("-darksendrounds", 2);
     if (nDarksendRounds > 16) nDarksendRounds = 16;
     if (nDarksendRounds < 1) nDarksendRounds = 1;
 
-    nLiquidityProvider = GetArg("-liquidityprovider", 0); //0-100
+    nLiquidityProvider = gArgs.GetArg("-liquidityprovider", 0); //0-100
     if (nLiquidityProvider != 0) {
         darkSendPool.SetMinBlockSpacing(std::min(nLiquidityProvider,100)*15);
         fEnableDarksend = true;
         nDarksendRounds = 99999;
     }
 
-    nAnonymizeLuxAmount = GetArg("-anonymizeLuxamount", 0);
+    nAnonymizeLuxAmount = gArgs.GetArg("-anonymizeLuxamount", 0);
     if (nAnonymizeLuxAmount > 999999) nAnonymizeLuxAmount = 999999;
     if (nAnonymizeLuxAmount < 2) nAnonymizeLuxAmount = 2;
 

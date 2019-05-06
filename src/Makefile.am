@@ -3,26 +3,19 @@
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-DIST_SUBDIRS = secp256k1 univalue
+DIST_SUBDIRS = secp256k1
 
-AM_LDFLAGS = $(PTHREAD_CFLAGS) $(LIBTOOL_LDFLAGS) $(HARDENED_LDFLAGS)
-AM_CXXFLAGS = $(HARDENED_CXXFLAGS) $(ERROR_CXXFLAGS)
-AM_CPPFLAGS = $(HARDENED_CPPFLAGS)
+AM_LDFLAGS = $(PTHREAD_CFLAGS) $(LIBTOOL_LDFLAGS)
+AM_CXXFLAGS = $(HARDENED_CXXFLAGS) $(ERROR_CXXFLAGS) -DETH_FATDB=1
+AM_CPPFLAGS = $(HARDENED_CPPFLAGS) -DLUX_BUILD
 EXTRA_LIBRARIES =
 
-if EMBEDDED_UNIVALUE
-LIBUNIVALUE = univalue/libunivalue.la
-
-$(LIBUNIVALUE): $(wildcard univalue/lib/*) $(wildcard univalue/include/*)
-	$(AM_V_at)$(MAKE) $(AM_MAKEFLAGS) -C $(@D) $(@F)
-else
-LIBUNIVALUE = $(UNIVALUE_LIBS)
-endif
-
-BITCOIN_INCLUDES=-I$(builddir) $(BDB_CPPFLAGS) $(BOOST_CPPFLAGS) $(LEVELDB_CPPFLAGS) $(CRYPTO_CFLAGS) $(SSL_CFLAGS) -I$(srcdir)/cpp-ethereum/utils
+BITCOIN_CONFIG_INCLUDES=-I$(builddir)/config
+BITCOIN_INCLUDES=-I$(builddir) -I$(builddir)/obj $(BDB_CPPFLAGS) $(BOOST_CPPFLAGS) $(LEVELDB_CPPFLAGS) $(CRYPTO_CFLAGS) $(SSL_CFLAGS) -I$(srcdir)/cpp-ethereum/utils -I$(srcdir)/univalue
 
 BITCOIN_INCLUDES += -I$(srcdir)/secp256k1/include
-BITCOIN_INCLUDES += -I$(srcdir)/cpp-ethereum $(UNIVALUE_CFLAGS)
+
+BITCOIN_INCLUDES += -I$(srcdir)/cpp-ethereum
 
 LIBBITCOIN_SERVER=libbitcoin_server.a
 LIBBITCOIN_COMMON=libbitcoin_common.a
@@ -30,6 +23,7 @@ LIBBITCOIN_CONSENSUS=libbitcoin_consensus.a
 LIBBITCOIN_CLI=libbitcoin_cli.a
 LIBBITCOIN_UTIL=libbitcoin_util.a
 LIBBITCOIN_CRYPTO=crypto/libbitcoin_crypto.a
+LIBBITCOIN_UNIVALUE=univalue/libbitcoin_univalue.a
 LIBBITCOINQT=qt/libbitcoinqt.a
 LIBSECP256K1=secp256k1/libsecp256k1.la
 LIBCRYPTOPP=cryptopp/libcryptopp.a
@@ -53,6 +47,7 @@ EXTRA_LIBRARIES += \
   $(LIBBITCOIN_CRYPTO) \
   $(LIBBITCOIN_UTIL) \
   $(LIBBITCOIN_COMMON) \
+  univalue/libbitcoin_univalue.a \
   $(LIBBITCOIN_CONSENSUS) \
   $(LIBBITCOIN_SERVER) \
   $(LIBBITCOIN_CLI) \
@@ -62,9 +57,7 @@ EXTRA_LIBRARIES += \
 lib_LTLIBRARIES = $(LIBBITCOINCONSENSUS)
 
 bin_PROGRAMS =
-noinst_PROGRAMS =
 TESTS =
-BENCHMARKS =
 
 if BUILD_BITCOIND
   bin_PROGRAMS += luxd
@@ -189,8 +182,8 @@ BITCOIN_CORE_H = \
 
 obj/build.h: FORCE
 	@$(MKDIR_P) $(builddir)/obj
-	@$(top_srcdir)/share/genbuild.sh "$(abs_top_builddir)/src/obj/build.h" \
-	  "$(abs_top_srcdir)"
+	@$(top_srcdir)/share/genbuild.sh $(abs_top_builddir)/src/obj/build.h \
+	  $(abs_top_srcdir)
 libbitcoin_util_a-clientversion.$(OBJEXT): obj/build.h
 
 # server: shared between luxd and lux-qt
@@ -250,11 +243,11 @@ libbitcoin_zmq_a_SOURCES = \
   zmq/zmqpublishnotifier.cpp
 endif
 
-
 # wallet: shared between luxd and lux-qt, but only linked
 # when wallet enabled
-libbitcoin_wallet_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
-libbitcoin_wallet_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+
+libbitcoin_wallet_a_CFLAGS = $(PIE_FLAGS)
+libbitcoin_wallet_a_CPPFLAGS = $(BITCOIN_INCLUDES)
 libbitcoin_wallet_a_SOURCES = \
   activemasternode.cpp \
   darksend.cpp \
@@ -337,6 +330,16 @@ if USE_ASM
 crypto_libbitcoin_crypto_a_SOURCES += crypto/sha256_sse4.cpp
 endif
 
+# univalue JSON library
+univalue_libbitcoin_univalue_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
+univalue_libbitcoin_univalue_a_SOURCES = \
+  univalue/univalue.cpp \
+  univalue/univalue_read.cpp \
+  univalue/univalue_write.cpp \
+  univalue/univalue_escapes.h \
+  univalue/univalue.h \
+  $(BITCOIN_CORE_H)
+
 # consensus: shared between all executables that validate any consensus rules.
 libbitcoin_consensus_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
 libbitcoin_consensus_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
@@ -377,7 +380,7 @@ libbitcoin_consensus_a_SOURCES = \
 # common: shared between luxd, and lux-qt and non-server tools
 libbitcoin_common_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES) -DLUX_BUILD
 libbitcoin_common_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-libbitcoin_common_a_CFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS) -std=c99 -fPIC
+libbitcoin_common_a_CFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS) -std=c99
 libbitcoin_common_a_SOURCES = \
   base58.cpp \
   bech32.cpp \
@@ -556,7 +559,6 @@ libbitcoin_common_a_SOURCES = \
   cpp-ethereum/libethash/io.h \
   cpp-ethereum/libethash/ethash.h \
   cpp-ethereum/libethash/internal.h \
-  cpp-ethereum/libethash/mmap_win32.c \
   cpp-ethereum/utils/json_spirit/JsonSpiritHeaders.h \
   cpp-ethereum/utils/json_spirit/json_spirit.h \
   cpp-ethereum/utils/json_spirit/json_spirit_error_position.h \
@@ -572,6 +574,7 @@ libbitcoin_common_a_SOURCES = \
 if TARGET_WINDOWS
     libbitcoin_common_a_SOURCES += \
       cpp-ethereum/libethash/io_win32.c \
+      cpp-ethereum/libethash/mmap_win32.c \
       cpp-ethereum/libethash/util_win32.c
 else
     libbitcoin_common_a_SOURCES += cpp-ethereum/libethash/io_posix.c
@@ -580,8 +583,7 @@ endif
 # util: shared between all executables.
 # This library *must* be included to make sure that the glibc
 # backward-compatibility objects and their sanity checks are linked.
-libbitcoin_util_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
-libbitcoin_util_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+libbitcoin_util_a_CPPFLAGS = $(BITCOIN_INCLUDES)
 libbitcoin_util_a_SOURCES = \
   support/lockedpool.cpp \
   chainparamsbase.cpp \
@@ -607,8 +609,7 @@ libbitcoin_util_a_SOURCES += compat/glibc_compat.cpp
 endif
 
 # cli: shared between lux-cli and lux-qt
-libbitcoin_cli_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
-libbitcoin_cli_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+libbitcoin_cli_a_CPPFLAGS = $(BITCOIN_INCLUDES)
 libbitcoin_cli_a_SOURCES = \
   rpc/client.cpp \
   $(BITCOIN_CORE_H)
@@ -618,44 +619,41 @@ nodist_libbitcoin_util_a_SOURCES = $(srcdir)/obj/build.h
 
 # bitcoind binary #
 luxd_SOURCES = luxd.cpp
-luxd_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
-luxd_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+luxd_CPPFLAGS = $(BITCOIN_INCLUDES)
 luxd_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
 
 if TARGET_WINDOWS
-luxd_SOURCES += luxd-res.rc
+luxd_SOURCES += luxd-res.rc config/lux-config.h
 endif
 
 luxd_LDADD = \
   $(LIBBITCOIN_SERVER) \
   $(LIBBITCOIN_COMMON) \
-  $(LIBUNIVALUE) \
+  $(LIBBITCOIN_UNIVALUE) \
   $(LIBBITCOIN_UTIL) \
   $(LIBBITCOIN_WALLET) \
   $(LIBBITCOIN_ZMQ) \
   $(LIBBITCOIN_CONSENSUS) \
   $(LIBBITCOIN_CRYPTO) \
   $(LIBLEVELDB) \
-  $(LIBLEVELDB_SSE42) \
   $(LIBMEMENV) \
   $(LIBCRYPTOPP) \
   $(LIBSECP256K1)
 
-luxd_LDADD += $(BOOST_LIBS) $(BDB_LIBS) $(SSL_LIBS) $(CRYPTO_LIBS) $(MINIUPNPC_LIBS) $(EVENT_PTHREADS_LIBS) $(EVENT_LIBS) $(ZMQ_LIBS)
+luxd_LDADD += $(BOOST_LIBS) $(BDB_LIBS) $(SSL_LIBS) $(CRYPTO_LIBS) $(MINIUPNPC_LIBS) $(ZMQ_LIBS) $(EVENT_PTHREADS_LIBS) $(EVENT_LIBS)
+
 
 # lux-cli binary #
 lux_cli_SOURCES = lux-cli.cpp
-lux_cli_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES) $(EVENT_CFLAGS)
-lux_cli_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-lux_cli_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
+lux_cli_CPPFLAGS = $(BITCOIN_INCLUDES) $(EVENT_CFLAGS)
 
 if TARGET_WINDOWS
-lux_cli_SOURCES += lux-cli-res.rc
+lux_cli_SOURCES += lux-cli-res.rc config/lux-config.h
 endif
 
 lux_cli_LDADD = \
   $(LIBBITCOIN_CLI) \
-  $(LIBUNIVALUE) \
+  $(LIBBITCOIN_UNIVALUE) \
   $(LIBBITCOIN_UTIL) \
   $(LIBBITCOIN_CRYPTO) \
   $(LIBSECP256K1)
@@ -664,74 +662,72 @@ lux_cli_LDADD += $(BOOST_LIBS) $(SSL_LIBS) $(CRYPTO_LIBS) $(EVENT_LIBS)
 #
 
 # lux-tx binary #
-lux_tx_SOURCES =  lux-tx.cpp
-lux_tx_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
-lux_tx_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+lux_tx_CPPFLAGS = $(BITCOIN_INCLUDES)
 lux_tx_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
-
-if TARGET_WINDOWS
-lux_tx_SOURCES += lux-tx-res.rc
-endif
+lux_tx_SOURCES =  \
+  lux-tx.cpp \
+  $(libbitcoin_common_a_SOURCES) \
+  $(libbitcoin_server_a_SOURCES)
 
 lux_tx_LDADD = \
-  $(LIBUNIVALUE) \
+  $(LIBBITCOIN_UNIVALUE) \
   $(LIBBITCOIN_COMMON) \
-  $(LIBBITCOIN_UTIL) \
+  $(LIBBITCOIN_SERVER) \
   $(LIBBITCOIN_CONSENSUS) \
+  $(LIBBITCOIN_WALLET) \
+  $(LIBBITCOIN_ZMQ) \
+  $(LIBLEVELDB) \
+  $(LIBMEMENV) \
+  $(LIBBITCOIN_UTIL) \
   $(LIBBITCOIN_CRYPTO) \
   $(LIBSECP256K1) \
   $(LIBCRYPTOPP)
 
-lux_tx_LDADD += $(BOOST_LIBS) $(CRYPTO_LIBS)
+lux_tx_LDADD += $(BOOST_LIBS) $(BDB_LIBS) $(SSL_LIBS) $(CRYPTO_LIBS) $(EVENT_PTHREADS_LIBS) $(EVENT_LIBS) $(MINIUPNPC_LIBS) $(ZMQ_LIBS)
 #
 
 # bitcoinconsensus library #
 if BUILD_BITCOIN_LIBS
 include_HEADERS = script/bitcoinconsensus.h
-libbitcoinconsensus_la_SOURCES = $(crypto_libbitcoin_crypto_a_SOURCES) $(libbitcoin_consensus_a_SOURCES)
+
+libbitcoinconsensus_la_SOURCES = \
+  $(libbitcoin_consensus_a_SOURCES) \
+  $(BITCOIN_CORE_H)
 
 if GLIBC_BACK_COMPAT
   libbitcoinconsensus_la_SOURCES += compat/glibc_compat.cpp
 endif
 
-libbitcoinconsensus_la_LDFLAGS = $(AM_LDFLAGS) -no-undefined $(RELDFLAGS)
-libbitcoinconsensus_la_LIBADD = $(LIBSECP256K1)
-libbitcoinconsensus_la_CPPFLAGS = $(AM_CPPFLAGS) -I$(builddir)/obj -I$(srcdir)/secp256k1/include -DBUILD_BITCOIN_INTERNAL
-libbitcoinconsensus_la_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+libbitcoinconsensus_la_LDFLAGS = -no-undefined $(RELDFLAGS)
+libbitcoinconsensus_la_LIBADD = $(LIBSECP256K1) $(CRYPTO_LIBS) $(BOOST_LIBS) $(SSL_LIBS) $(LIBBITCOIN_CRYPTO)
+libbitcoinconsensus_la_CPPFLAGS = $(CRYPTO_CFLAGS) $(BITCOIN_INCLUDES) -I$(builddir)/obj -I$(srcdir)/secp256k1/include -DBUILD_BITCOIN_INTERNAL
 
 endif
 
-CLEANFILES = $(EXTRA_LIBRARIES)
-
+CLEANFILES = leveldb/libleveldb.a leveldb/libmemenv.a
+CLEANFILES += *.a *.la crypto/*.a cryptopp/*.a qt/*.a
 CLEANFILES += *.gcda *.gcno
 CLEANFILES += compat/*.gcda compat/*.gcno
-CLEANFILES += consensus/*.gcda consensus/*.gcno
 CLEANFILES += crypto/*.gcda crypto/*.gcno
-CLEANFILES += policy/*.gcda policy/*.gcno
 CLEANFILES += primitives/*.gcda primitives/*.gcno
 CLEANFILES += script/*.gcda script/*.gcno
-CLEANFILES += support/*.gcda support/*.gcno
 CLEANFILES += univalue/*.gcda univalue/*.gcno
-CLEANFILES += wallet/*.gcda wallet/*.gcno
-CLEANFILES += wallet/test/*.gcda wallet/test/*.gcno
 CLEANFILES += zmq/*.gcda zmq/*.gcno
-CLEANFILES += obj/build.h
 
+DISTCLEANFILES = obj/build.h
 
+EXTRA_DIST = leveldb
 
-config/lux-config.h: config/stamp-h1
-	@$(MAKE) -C $(top_builddir) $(subdir)/$(@)
-config/stamp-h1: $(top_srcdir)/$(subdir)/config/lux-config.h.in $(top_builddir)/config.status
-	$(AM_V_at)$(MAKE) -C $(top_builddir) $(subdir)/$(@)
-$(top_srcdir)/$(subdir)/config/lux-config.h.in:  $(am__configure_deps)
-	$(AM_V_at)$(MAKE) -C $(top_srcdir) $(subdir)/config/lux-config.h.in
+# workaround for travis builds
+dist_pkgdata_DATA = multipliers.hpp univalue/univalue_utffilter.h
 
 clean-local:
+	-$(MAKE) -C leveldb clean
 	-$(MAKE) -C secp256k1 clean
 	-$(MAKE) -C univalue clean
-	-rm -f leveldb/*/*.gcda leveldb/*/*.gcno leveldb/helpers/memenv/*.gcda leveldb/helpers/memenv/*.gcno
+	rm -f leveldb/*/*.gcno leveldb/helpers/memenv/*.gcno
+	-rm -f cryptopp/*.o
 	-rm -f config.h
-	-rm -rf test/__pycache__
 
 .rc.o:
 	@test -f $(WINDRES)
@@ -758,8 +754,4 @@ endif
 
 if ENABLE_QT
 include Makefile.qt.include
-endif
-
-if ENABLE_QT_TESTS
-include Makefile.qttest.include
 endif
