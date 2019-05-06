@@ -1,9 +1,9 @@
-prefix=@prefix@
-exec_prefix=@exec_prefix@
-libdir=@libdir@
-includedir=@includedir@
+prefix=/usr/local
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
 
 Name: libunivalue
 Description: libunivalue, C++ universal value object and JSON library
-Version: @VERSION@
+Version: 1.0.3
 Libs: ${pc_top_builddir}/${pcfiledir}/libunivalue.la
