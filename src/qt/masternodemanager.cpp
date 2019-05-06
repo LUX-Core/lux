@@ -46,14 +46,22 @@ MasternodeManager::MasternodeManager(QWidget *parent) :
     ui->stopButton->setEnabled(false);
     //ui->copyAddressButton->setEnabled(false);
 
+    int columnAddressWidth = 160;
+    int columnrankItemWidth = 40;
+    int columnActiveWidth = 60;
+    int columnActiveSecondsWidth = 130;
+    int columnLastSeenWidth = 130;
+    int columnProtocolWidth = 60;
+
     // setup widths for the main table
     ui->tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Fixed);
     ui->tableWidget->horizontalHeader()->setStretchLastSection(true);
-    ui->tableWidget->setColumnWidth(Address, 160);
-    ui->tableWidget->setColumnWidth(Rank, 40);
-    ui->tableWidget->setColumnWidth(Active, 40);
-    ui->tableWidget->setColumnWidth(ActiveSecs, 120);
-    ui->tableWidget->setColumnWidth(LastSeen, 140);
+    ui->tableWidget->setColumnWidth(Address, columnAddressWidth);
+    ui->tableWidget->setColumnWidth(Rank, columnrankItemWidth);
+    ui->tableWidget->setColumnWidth(Active, columnActiveWidth);
+    ui->tableWidget->setColumnWidth(ActiveSecs, columnActiveSecondsWidth);
+    ui->tableWidget->setColumnWidth(LastSeen, columnLastSeenWidth);
+    ui->tableWidget->setColumnWidth(Protocol, columnProtocolWidth);
 
     ui->tableWidget->sortByColumn(Rank, Qt::AscendingOrder);
     ui->tableWidget->setSortingEnabled(true);
@@ -61,11 +69,12 @@ MasternodeManager::MasternodeManager(QWidget *parent) :
     // setup widths for parallel table
     ui->tableWidget_2->horizontalHeader()->setSectionResizeMode(QHeaderView::Fixed);
     ui->tableWidget_2->horizontalHeader()->setStretchLastSection(true);
-    ui->tableWidget_2->setColumnWidth(Address, 160);
-    ui->tableWidget_2->setColumnWidth(Rank, 40);
-    ui->tableWidget_2->setColumnWidth(Active, 40);
-    ui->tableWidget_2->setColumnWidth(ActiveSecs, 120);
-    ui->tableWidget_2->setColumnWidth(LastSeen, 140);
+    ui->tableWidget_2->setColumnWidth(Address, columnAddressWidth);
+    ui->tableWidget_2->setColumnWidth(Rank, columnrankItemWidth);
+    ui->tableWidget_2->setColumnWidth(Active, columnActiveWidth);
+    ui->tableWidget_2->setColumnWidth(ActiveSecs, columnActiveSecondsWidth);
+    ui->tableWidget_2->setColumnWidth(LastSeen, columnLastSeenWidth);
+    ui->tableWidget_2->setColumnWidth(Protocol, columnProtocolWidth);
 
     ui->tableWidget_2->sortByColumn(Address, Qt::AscendingOrder);
     ui->tableWidget_2->setSortingEnabled(true);
@@ -79,21 +88,7 @@ MasternodeManager::MasternodeManager(QWidget *parent) :
     nTimeFilterUpdated = GetTime();
     updateNodeList();
     connect(ui->filterLineEdit, SIGNAL(textChanged(const QString &)), this, SLOT(wait()));
-	
-    int columnAddressWidth = 200;
-    int columnrankItemWidth = 60;
-    int columnProtocolWidth = 60;
-    int columnActiveWidth = 80;
-    int columnActiveSecondsWidth = 130;
-    int columnLastSeenWidth = 130;
-		
-    ui->tableWidget->setColumnWidth(0, columnAddressWidth); // Address
-    ui->tableWidget->setColumnWidth(1, columnrankItemWidth); // Rank
-    ui->tableWidget->setColumnWidth(2, columnProtocolWidth); // protocol
-    ui->tableWidget->setColumnWidth(3, columnActiveWidth); // status
-    ui->tableWidget->setColumnWidth(4, columnActiveSecondsWidth); // time active
-    ui->tableWidget->setColumnWidth(5, columnLastSeenWidth); // last seen
-	
+
 }
 
 class SortedWidgetItem : public QTableWidgetItem
@@ -212,26 +207,32 @@ void MasternodeManager::updateNodeList()
         if (ShutdownRequested()) return;
 
     // populate list
-    // Address, Rank, protocol, status, time active, last seen, Pub Key
-	
-    QTableWidgetItem *addressItem = new QTableWidgetItem(QString::fromStdString(mn->addr.ToString())); // Address
-    QTableWidgetItem *rankItem = new QTableWidgetItem(QString::number(GetMasternodeRank(mn->vin, chainActive.Height()))); // Rank
-    QTableWidgetItem *protocolItem = new QTableWidgetItem(QString::number(mn->protocolVersion)); // Protocol
-    QTableWidgetItem *activeItem = new QTableWidgetItem(mn->IsEnabled() ? tr("Enabled") : tr("Disabled")); // Status
-    QTableWidgetItem *activeSecondsItem = new QTableWidgetItem(seconds_to_DHMS((qint64)(mn->lastTimeSeen - mn->now))); // Time Active
-    QTableWidgetItem *lastSeenItem = new QTableWidgetItem(QString::fromStdString(DateTimeStrFormat("%Y-%m-%d %H:%M:%S", mn->lastTimeSeen))); // Last Seen
-	
-	
+    // Address, Rank, Active, Active Seconds, Last Seen, Pub Key
+    QTableWidgetItem *activeItem = new QTableWidgetItem(mn->IsEnabled() ? tr("Active") : tr("Inactive"));
+    QTableWidgetItem *addressItem = new QTableWidgetItem(QString::fromStdString(mn->addr.ToString()));
+    SortedWidgetItem *protocolItem = new SortedWidgetItem();
+    protocolItem->setData(Qt::UserRole, mn->protocolVersion);
+    protocolItem->setData(Qt::DisplayRole, QString::number(mn->protocolVersion));
+    SortedWidgetItem *rankItem = new SortedWidgetItem();
+    int rank = GetMasternodeRank(mn->vin, chainActive.Height());
+    rankItem->setData(Qt::UserRole, rank > 0 ? rank : 99999);
+    rankItem->setData(Qt::DisplayRole, rank > 0 ? QString::number(rank) : QString(""));
+    SortedWidgetItem *activeSecondsItem = new SortedWidgetItem();
+    activeSecondsItem->setData(Qt::UserRole, (qint64)(mn->lastTimeSeen - mn->now));
+    activeSecondsItem->setData(Qt::DisplayRole, seconds_to_DHMS((qint64)(mn->lastTimeSeen - mn->now)));
+    QTableWidgetItem *lastSeenItem = new QTableWidgetItem(QString::fromStdString(DateTimeStrFormat("%Y-%m-%d %H:%M:%S", mn->lastTimeSeen)));
+
+
     CScript pubkey;
-        pubkey = GetScriptForDestination(mn->pubkey.GetID());
-        CTxDestination address1;
-        ExtractDestination(pubkey, address1);
+    pubkey = GetScriptForDestination(mn->pubkey.GetID());
+    CTxDestination address1;
+    ExtractDestination(pubkey, address1);
     QTableWidgetItem *pubkeyItem = new QTableWidgetItem(QString::fromStdString(EncodeDestination(address1)));
 
         if (strCurrentFilter != "") {
             strToFilter = addressItem->text() + " " +
                           rankItem->text() + " " +
-			  protocolItem->text() + " " +
+                          protocolItem->text() + " " +
                           activeItem->text() + " " +
                           activeSecondsItem->text() + " " +
                           lastSeenItem->text() + " " +
@@ -239,14 +240,14 @@ void MasternodeManager::updateNodeList()
             if (!strToFilter.contains(strCurrentFilter)) continue;
         }
 		
-	ui->tableWidget->insertRow(0);
-        ui->tableWidget->setItem(0, 0, addressItem);
-        ui->tableWidget->setItem(0, 1, rankItem);
-	ui->tableWidget->setItem(0, 2, protocolItem);
-        ui->tableWidget->setItem(0, 3, activeItem);
-        ui->tableWidget->setItem(0, 4, activeSecondsItem);
-        ui->tableWidget->setItem(0, 5, lastSeenItem);
-        ui->tableWidget->setItem(0, 6, pubkeyItem);
+	    ui->tableWidget->insertRow(0);
+        ui->tableWidget->setItem(0, Address, addressItem);
+        ui->tableWidget->setItem(0, Rank, rankItem);
+	    ui->tableWidget->setItem(0, Protocol, protocolItem);
+        ui->tableWidget->setItem(0, Active, activeItem);
+        ui->tableWidget->setItem(0, ActiveSecs, activeSecondsItem);
+        ui->tableWidget->setItem(0, LastSeen, lastSeenItem);
+        ui->tableWidget->setItem(0, Pubkey, pubkeyItem);
 		
     }
 
