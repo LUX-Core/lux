@@ -88,7 +88,7 @@ public:
     {
         if(isSet){return false;}
 
-        BOOST_FOREACH(const CTxIn v, vinIn) {
+        for (const CTxIn v : vinIn) {
             CDarkSendEntryVin s = CDarkSendEntryVin();
             s.vin = v;
             sev.push_back(s);
@@ -104,7 +104,7 @@ public:
 
     bool AddSig(const CTxIn& vin)
     {
-        BOOST_FOREACH(CDarkSendEntryVin& s, sev) {
+        for (CDarkSendEntryVin& s : sev) {
             if(s.vin.prevout == vin.prevout && s.vin.nSequence == vin.nSequence){
                 if(s.isSigSet){return false;}
                 s.vin.scriptSig = vin.scriptSig;
@@ -158,7 +158,7 @@ public:
 
     bool GetAddress(CService &addr)
     {
-        BOOST_FOREACH(CMasterNode mn, vecMasternodes) {
+        for (CMasterNode mn : vecMasternodes) {
             if(mn.vin == vin){
                 addr = mn.addr;
                 return true;
@@ -169,7 +169,7 @@ public:
 
     bool GetProtocolVersion(int &protocolVersion)
     {
-        BOOST_FOREACH(CMasterNode mn, vecMasternodes) {
+        for (CMasterNode mn : vecMasternodes) {
             if(mn.vin == vin){
                 protocolVersion = mn.protocolVersion;
                 return true;
