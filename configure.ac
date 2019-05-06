@@ -600,6 +600,10 @@ if test x$use_hardening != xno; then
   OBJCXXFLAGS="$CXXFLAGS"
 fi
 
+if test x$TARGET_OS = xwindows; then
+LDFLAGS="$LDFLAGS -Wl,--stack,268435456"
+fi
+
 dnl this flag screws up non-darwin gcc even when the check fails. special-case it.
 if test x$TARGET_OS = xdarwin; then
   AX_CHECK_LINK_FLAG([[-Wl,-dead_strip]], [LDFLAGS="$LDFLAGS -Wl,-dead_strip"])
