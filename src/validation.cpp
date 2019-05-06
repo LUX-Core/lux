@@ -4745,6 +4745,94 @@ bool LoadExternalBlockFile(const CChainParams& chainparams, FILE* fileIn, CDiskB
     return nLoaded > 0;
 }
 
+/////////////////////////////////////////////////////////////////////////////////
+
+int GetInputAge(CTxIn& vin)
+{
+    CCoinsView viewDummy;
+    CCoinsViewCache view(&viewDummy);
+    {
+        LOCK(mempool.cs);
+        CCoinsViewMemPool viewMempool(pcoinsTip, mempool);
+        view.SetBackend(viewMempool); // temporarily switch cache backend to db+mempool view
+
+        const CCoins* coins = view.AccessCoins(vin.prevout.hash);
+
+        if (coins) {
+            if (coins->nHeight < 0) return 0;
+            return (chainActive.Height() + 1) - coins->nHeight;
+        } else
+            return -1;
+    }
+}
+
+int GetIXConfirmations(uint256 nTXHash)
+{
+    int sigs = 0;
+    std::map<uint256, CTransactionLock>::iterator i = mapTxLocks.find(nTXHash);
+    if (i != mapTxLocks.end()) {
+        sigs = (*i).second.CountSignatures();
+    }
+    if (sigs >= INSTANTX_SIGNATURES_REQUIRED) {
+        return nInstanTXDepth;
+    }
+    return 0;
+}
+
+// ppcoin: total coin age spent in transaction, in the unit of coin-days.
+// Only those coins meeting minimum age requirement counts. As those
+// transactions not in main chain are not currently indexed so we
+// might not find out about their coin age. Older transactions are
+// guaranteed to be in main chain by sync-checkpoint. This rule is
+// introduced to help nodes establish a consistent view of the coin
+// age (trust score) of competing branches.
+bool GetCoinAge(const CTransaction& tx, const unsigned int nTxTime, uint64_t& nCoinAge)
+{
+    uint256 bnCentSecond = 0; // coin age in the unit of cent-seconds
+    nCoinAge = 0;
+
+    const Consensus::Params& consensusParams = Params().GetConsensus();
+
+    CBlockIndex* pindex = NULL;
+    for (const CTxIn& txin : tx.vin) {
+        // First try finding the previous transaction in database
+        CTransaction txPrev;
+        uint256 hashBlockPrev;
+        if (!GetTransaction(txin.prevout.hash, txPrev, consensusParams, hashBlockPrev, true)) {
+            LogPrintf("GetCoinAge: failed to find vin transaction \n");
+            continue; // previous transaction not in main chain
+        }
+
+        pindex = LookupBlockIndex(hashBlockPrev);
+        if (!pindex) {
+            LogPrintf("GetCoinAge() failed to find block index \n");
+            continue;
+        }
+
+        // Read block header
+        CBlockHeader prevblock = pindex->GetBlockHeader();
+
+        if (stake->GetStakeAge(prevblock.nTime) > nTxTime)
+            continue; // only count coins meeting min age requirement
+
+        if (nTxTime < prevblock.nTime) {
+            LogPrintf("GetCoinAge: Timestamp Violation: txtime less than txPrev.nTime");
+            return false; // Transaction timestamp violation
+        }
+
+        int64_t nValueIn = txPrev.vout[txin.prevout.n].nValue;
+        bnCentSecond += uint256(nValueIn) * (nTxTime - prevblock.nTime);
+    }
+
+    uint256 bnCoinDay = bnCentSecond / COIN / (24 * 60 * 60);
+    if (!hideLogMessage && bnCoinDay != uint256(0))
+        LogPrintf("coin age bnCoinDay=%s\n", bnCoinDay.GetHex());
+    nCoinAge = bnCoinDay.GetCompact();
+    return true;
+}
+
+/////////////////////////////////////////////////////////////////////////////////
+
 void CChainState::CheckBlockIndex(const Consensus::Params& consensusParams)
 {
     if (!fCheckBlockIndex) {

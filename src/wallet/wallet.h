@@ -17,6 +17,7 @@
 #include <validationinterface.h>
 #include <script/ismine.h>
 #include <script/sign.h>
+#include <util.h>
 #include <wallet/crypter.h>
 #include <wallet/walletdb.h>
 #include <wallet/rpcwallet.h>
@@ -345,6 +346,9 @@ class CWallet final : public CCryptoKeyStore, public CValidationInterface
     void SyncMetaData(std::pair<TxSpends::iterator, TxSpends::iterator>);
 
 public:
+    std::atomic<bool> fScanningWallet{false}; // controlled by WalletRescanReserver
+    std::mutex mutexScanning;
+
     bool MintableCoins();
     bool SelectCoinsDark(int64_t nValueMin, int64_t nValueMax, std::vector<CTxIn>& setCoinsRet, int64_t& nValueRet, int nDarksendRoundsMin, int nDarksendRoundsMax) const;
     bool SelectCoinsByDenominations(int nDenom, int64_t nValueMin, int64_t nValueMax, std::vector<CTxIn>& vCoinsRet, std::vector<COutput>& vCoinsRet2, int64_t& nValueRet, int nDarksendRoundsMin, int nDarksendRoundsMax);
@@ -1039,11 +1043,11 @@ public:
     CAmount GetAvailableWatchOnlyCredit(const bool fUseCache=true) const;
     CAmount GetChange() const;
 
-    // Get the marginal bytes if spending the specified output from this transaction
-    int GetSpendSize(unsigned int out) const
-    {
-        return CalculateMaximumSignedInputSize(tx->vout[out], pwallet);
-    }
+//    // Get the marginal bytes if spending the specified output from this transaction
+//    int GetSpendSize(unsigned int out) const
+//    {
+//        return CalculateMaximumSignedInputSize(tx->vout[out], pwallet);
+//    }
 
     void GetAmounts(std::list<COutputEntry>& listReceived,
                     std::list<COutputEntry>& listSent, CAmount& nFee, std::string& strSentAccount, const isminefilter& filter) const;
@@ -1059,32 +1063,7 @@ public:
     bool IsEquivalentTo(const CWalletTx& tx) const;
 
     bool InMempool() const;
-    bool IsTrusted() const
-    {
-        // Quick answer in most cases
-        if (!IsFinalTx(*this))
-            return false;
-        int nDepth = GetDepthInMainChain();
-        if (nDepth >= 1)
-            return true;
-        if (nDepth < 0)
-            return false;
-        if (!bSpendZeroConfChange || !IsFromMe(ISMINE_ALL)) // using wtx's cached debit
-            return false;
-
-        // Trusted if all inputs are from us and are in the mempool:
-        for (const CTxIn& txin : vin) {
-            // Transactions not sent by us: not trusted
-            const CWalletTx* parent = pwallet->GetWalletTx(txin.prevout.hash);
-            if (parent == NULL)
-                return false;
-            const CTxOut& parentOut = parent->vout[txin.prevout.n];
-            const isminetype t = pwallet->IsMine(parentOut);
-            if (t != ISMINE_SPENDABLE)
-                return false;
-        }
-        return true;
-    }
+    bool IsTrusted() const;
 
     int64_t GetTxTime() const;
 
@@ -1095,36 +1074,6 @@ public:
     bool AcceptToMemoryPool(const CAmount& nAbsurdFee, CValidationState& state);
 
     std::set<uint256> GetConflicts() const;
-};
-
-
-class CInputCoin {
-public:
-    CInputCoin(const CWalletTx* walletTx, unsigned int i)
-    {
-        if (!walletTx)
-            throw std::invalid_argument("walletTx should not be null");
-        if (i >= walletTx->tx->vout.size())
-            throw std::out_of_range("The output index is out of range");
-
-        outpoint = COutPoint(walletTx->GetHash(), i);
-        txout = walletTx->tx->vout[i];
-    }
-
-    COutPoint outpoint;
-    CTxOut txout;
-
-    bool operator<(const CInputCoin& rhs) const {
-        return outpoint < rhs.outpoint;
-    }
-
-    bool operator!=(const CInputCoin& rhs) const {
-        return outpoint != rhs.outpoint;
-    }
-
-    bool operator==(const CInputCoin& rhs) const {
-        return outpoint == rhs.outpoint;
-    }
 };
 
 class COutput
@@ -1153,20 +1102,7 @@ public:
     }
 
     //Used with DarkSend. Will return largest nondenom, then denominations, then very small inputs
-    int Priority() const
-    {
-        for (int64_t d : darkSendDenominations)
-            if (tx->vout[i].nValue == d) return 10000;
-        if (tx->vout[i].nValue < 1 * COIN) return 20000;
-
-        //nondenom return largest first
-        return static_cast<int>(-(tx->vout[i].nValue / COIN));
-    }
-
-    CAmount Value() const
-    {
-        return tx->vout[i].nValue;
-    }
+    int Priority() const;
 
     std::string ToString() const;
 };
@@ -1344,43 +1280,6 @@ public:
         READWRITE(vchPubKey);
     }
 };
-
-// Helper for producing a bunch of max-sized low-S signatures (eg 72 bytes)
-// ContainerType is meant to hold pair<CWalletTx *, int>, and be iterable
-// so that each entry corresponds to each vIn, in order.
-template <typename ContainerType>
-bool CWallet::DummySignTx(CMutableTransaction &txNew, const ContainerType &coins) const
-{
-    // Fill in dummy signatures for fee calculation.
-    int nIn = 0;
-    for (const auto& coin : coins)
-    {
-        const CScript& scriptPubKey = coin.txout.scriptPubKey;
-        SignatureData sigdata;
-
-        if (!ProduceSignature(DummySignatureCreator(this), scriptPubKey, sigdata))
-        {
-            return false;
-        } else {
-            UpdateTransaction(txNew, nIn, sigdata);
-        }
-
-        nIn++;
-    }
-    return true;
-}
-
-OutputType ParseOutputType(const std::string& str, OutputType default_type = OUTPUT_TYPE_DEFAULT);
-const std::string& FormatOutputType(OutputType type);
-
-/**
- * Get a destination of the requested type (if possible) to the specified key.
- * The caller must make sure LearnRelatedScripts has been called beforehand.
- */
-CTxDestination GetDestinationForKey(const CPubKey& key, OutputType);
-
-/** Get all destinations (potentially) supported by the wallet for the given key. */
-std::vector<CTxDestination> GetAllDestinationsForKey(const CPubKey& key);
 
 /** RAII object to check and reserve a wallet rescan */
 class WalletRescanReserver

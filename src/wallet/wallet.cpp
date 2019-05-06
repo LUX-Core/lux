@@ -100,6 +100,16 @@ std::string COutput::ToString() const
     return strprintf("COutput(%s, %d, %d) [%s]", tx->GetHash().ToString(), i, nDepth, FormatMoney(tx->tx->vout[i].nValue));
 }
 
+int COutput::Priority() const
+{
+    for (const auto& d : CPrivateSend::GetStandardDenominations())
+        if(tx->tx->vout[i].nValue == d) return 10000;
+    if(tx->tx->vout[i].nValue < 1*COIN) return 20000;
+
+    //nondenom return largest first
+    return -(tx->tx->vout[i].nValue/COIN);
+}
+
 class CAffectedKeysVisitor : public boost::static_visitor<void> {
 private:
     const CKeyStore &keystore;
