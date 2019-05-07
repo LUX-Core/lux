@@ -7602,31 +7602,19 @@ bool CheckRefund(const CBlock& block, const std::vector<CTxOut>& vouts){
     size_t offset = block.IsProofOfStake() ? 1 : 0;
     std::vector<CTxOut> vTempVouts=block.vtx[offset].vout;
     std::vector<CTxOut>::iterator it;
-    bool allValid = true;
-    for(size_t i = 0; i < vouts.size(); i++){
+    bool found = true;
+    for (size_t i = 0; i < vouts.size(); i++) {
         it=std::find(vTempVouts.begin(), vTempVouts.end(), vouts[i]);
-        if (it==vTempVouts.end()) {
-            bool refundValid = false;
-            const int nPrecision = 10000000;
-            for(it=vTempVouts.begin(); it!=vTempVouts.end(); it++) {
-                if (vouts[i].scriptPubKey == it->scriptPubKey && it->nValue/nPrecision == vouts[i].nValue/nPrecision) {
-                    LogPrintf("%s: found vout %s (%s)\n", __func__, it->ToString().c_str(), FormatMoney(it->nValue));
-                    refundValid = true;
-                    break;
-                }
-            }
-            if (!refundValid) {
-                LogPrintf("%s: Unable to find vout %s\n", __func__, vouts[i].ToString().c_str());
-                LogPrintf("%s: first block %s\n", __func__, vTempVouts.at(0).ToString().c_str());
-                allValid = false;
-                break;
-            }
+        if(it==vTempVouts.end()) {
+            found = true;
+            break;
         } else {
             vTempVouts.erase(it);
+            found = false;
+            break;
         }
     }
-    vTempVouts.clear();
-    return allValid;
+    return found;
 }
 
 valtype GetSenderAddress(const CTransaction& tx, const CCoinsViewCache* coinsView, const std::vector<CTransaction>* blockTxs){
