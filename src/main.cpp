@@ -7606,12 +7606,9 @@ bool CheckRefund(const CBlock& block, const std::vector<CTxOut>& vouts){
     for (size_t i = 0; i < vouts.size(); i++) {
         it=std::find(vTempVouts.begin(), vTempVouts.end(), vouts[i]);
         if(it==vTempVouts.end()) {
-            found = true;
-            break;
+            found = false;
         } else {
             vTempVouts.erase(it);
-            found = false;
-            break;
         }
     }
     return found;
