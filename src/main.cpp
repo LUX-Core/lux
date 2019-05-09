@@ -7602,16 +7602,30 @@ bool CheckRefund(const CBlock& block, const std::vector<CTxOut>& vouts){
     size_t offset = block.IsProofOfStake() ? 1 : 0;
     std::vector<CTxOut> vTempVouts=block.vtx[offset].vout;
     std::vector<CTxOut>::iterator it;
-    bool found = true;
+    bool RefundFound = true;
     for (size_t i = 0; i < vouts.size(); i++) {
         it=std::find(vTempVouts.begin(), vTempVouts.end(), vouts[i]);
         if(it==vTempVouts.end()) {
-            found = false;
+            bool IsRefundValid = false;
+            int nMaxDriftAllowed = 1;
+            for(it=vTempVouts.begin(); it!=vTempVouts.end(); it++) {    
+                if (vouts[i].scriptPubKey == it->scriptPubKey && it->nValue - vouts[i].nValue < nMaxDriftAllowed) { 
+                    LogPrintf("%s: found vout %s (%s)\n", __func__, it->ToString().c_str(), FormatMoney(it->nValue));   
+                    IsRefundValid = true; 
+                    break;  
+                }   
+            }   
+            if (!IsRefundValid) { 
+                LogPrintf("%s: unable to find a suitable vout %s\n", __func__, vouts[i].ToString().c_str());   
+                LogPrintf("%s: current best vout %s\n", __func__, vTempVouts.at(0).ToString().c_str());   
+                RefundFound = false;   
+                break;  
+            }
         } else {
             vTempVouts.erase(it);
         }
     }
-    return found;
+    return RefundFound;
 }
 
 valtype GetSenderAddress(const CTransaction& tx, const CCoinsViewCache* coinsView, const std::vector<CTransaction>* blockTxs){
