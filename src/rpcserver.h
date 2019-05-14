@@ -445,6 +445,7 @@ extern UniValue redeemorder(const UniValue& params, bool fHelp);
 extern UniValue getactivecoins(const UniValue& params, bool fHelp);
 extern UniValue listorderbook(const UniValue& params, bool fHelp);
 extern UniValue getlocalorder(const UniValue& params, bool fHelp);
+extern UniValue getdepositaddresses(const UniValue& params, bool fHelp);
 
 bool StartRPC();
 void InterruptRPC();
