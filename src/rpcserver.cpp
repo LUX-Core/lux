@@ -327,6 +327,10 @@ static const CRPCCommand vRPCCommands[] =
         {"luxgate", "getactivecoins", &getactivecoins, true, true, false},
         {"luxgate", "listorderbook", &listorderbook, true, true, false},
         {"luxgate", "getlocalorder", &getlocalorder, true, true, false},
+        {"luxgate", "addmarket", &addmarket, true, true, false},
+        {"luxgate", "getmarket", &getmarket, true, true, false},
+        {"luxgate", "placeordertomarket", &placeordertomarket, true, true, false},
+
 #endif // ENABLE_LUXGATE
 
 #ifdef ENABLE_WALLET

@@ -139,6 +139,7 @@ BITCOIN_CORE_H = \
   httpserver.h \
   luxcontrol.h \
   rpcserver.h \
+  rpcwallet.h \
   rpcutil.h \
   scheduler.h \
   script/interpreter.h \

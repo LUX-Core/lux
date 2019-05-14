@@ -5,47 +5,13 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "amount.h"
-#include "base58.h"
-#include "core_io.h"
-#include "consensus/validation.h"
-#include "init.h"
-#include "net.h"
-#include "netbase.h"
-#include "rpcserver.h"
-#include "timedata.h"
-#include "util.h"
-#include "utilmoneystr.h"
-#include "wallet.h"
-#include "walletdb.h"
-#include "stake.h"
-#include "coincontrol.h"
-#include "consensus/validation.h"
-#include "rbf.h"
-#include <stdint.h>
-#include <string>
-#include "miner.h"
-
-#include "libdevcore/CommonData.h"
-
-#include "univalue/univalue.h"
-#include "rpcutil.h"
-#include <boost/assign/list_of.hpp>
+#include "rpcwallet.h"
 
 using namespace std;
 using namespace boost;
 using namespace boost::assign;
-struct CUpdatedBlock
-{
-    uint256 hash;
-    int height;
-};
-static std::mutex cs_blockchange;
-static std::condition_variable cond_blockchange;
-static CUpdatedBlock latestblock;
 
 int64_t nWalletUnlockTime;
-static CCriticalSection cs_nWalletUnlockTime;
 
 bool EnsureWalletIsAvailable(bool avoidException)
 {

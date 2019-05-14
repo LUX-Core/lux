@@ -117,6 +117,7 @@ SendToContract::SendToContract(QWidget *parent) :
     QRegularExpressionValidator *addressValidatr = new QRegularExpressionValidator(ui->lineEditContractAddress);
     addressValidatr->setRegularExpression(regEx);
     ui->lineEditContractAddress->setCheckValidator(addressValidatr);
+    ui->lineEditSenderAddress->setComboBoxEditable(true);
 }
 
 SendToContract::~SendToContract()

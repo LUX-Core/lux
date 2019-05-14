@@ -10,7 +10,7 @@
 #include "main.h"
 #include "primitives/transaction.h"
 #include "rpcserver.h"
-#include "rpcwallet.cpp"
+#include "rpcwallet.h"
 #include "sync.h"
 #include "txdb.h"
 #include "util.h"

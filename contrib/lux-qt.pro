@@ -110,6 +110,7 @@ HEADERS += src/activemasternode.h \
            src/rpcclient.h \
            src/rpcprotocol.h \
            src/rpcserver.h \
+           src/rpcwallet.h \
            src/serialize.h \
            src/spork.h \
            src/streams.h \
