@@ -193,6 +193,8 @@ BITCOIN_CORE_H += \
   luxgate/lgconfig.h \
   luxgate/luxclient.h \
   luxgate/luxgate.h \
+  luxgate/order.h \
+  luxgate/orderbook.h \
   luxgate/version.h \
   luxgate/zmqsub.h
 endif
@@ -254,6 +256,8 @@ libbitcoin_server_a_SOURCES += \
   luxgate/lgconfig.cpp \
   luxgate/luxclient.cpp \
   luxgate/luxgate.cpp \
+  luxgate/order.cpp \
+  luxgate/orderbook.cpp \
   luxgate/rpcluxgate.cpp \
   luxgate/zmqsub.cpp
 endif
