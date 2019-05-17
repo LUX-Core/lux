@@ -27,11 +27,8 @@ LuxgateCreateOrderPanel::LuxgateCreateOrderPanel(QWidget *parent) :
     ui->lineEditQuantity->setValidator(regExp);
     ui->lineEditTotal->setValidator(regExp);
 
-    //signals-slots connections
+    // Signals-slots connections
 
-    // Two-way binding of slider and price value
-    connect(ui->horizontalSliderPrice, &QSlider::valueChanged, this, &LuxgateCreateOrderPanel::slotValueSliderPriceChanged);
-    connect(ui->lineEditPrice, &QLineEdit::textEdited, this, &LuxgateCreateOrderPanel::slotPriceEditChanged);
     // The slots parse user-typed value to internal 
     connect(ui->lineEditPrice, &QLineEdit::textChanged, this, &LuxgateCreateOrderPanel::slotPriceChanged);
     connect(ui->lineEditQuantity, &QLineEdit::textChanged, this, &LuxgateCreateOrderPanel::slotQuantityChanged);
@@ -98,16 +95,6 @@ void LuxgateCreateOrderPanel::slotBuySellClicked()
     }
 }
 
-void LuxgateCreateOrderPanel::slotPriceEditChanged(const QString & text)
-{
-    float value = text.toDouble();
-    int sliderValue =  100 * (value - minSliderPriceReal())/(maxSliderPriceReal() - minSliderPriceReal());
-    bool oldState = ui->horizontalSliderPrice->blockSignals(true);
-    ui->horizontalSliderPrice->setValue(sliderValue);
-    ui->horizontalSliderPrice->blockSignals(oldState);
-    priceChangeUpdateGUI();
-}
-
 void LuxgateCreateOrderPanel::slotCalcNewTotal()
 {
     ui->lineEditTotal->setText(QString::fromStdString(Luxgate::StrFromAmount(currentQuantity * currentPrice / COIN)));
@@ -119,27 +106,6 @@ void LuxgateCreateOrderPanel::setModel(WalletModel *model)
     decimals = opt_model->getLuxgateDecimals();
     connect(opt_model, &OptionsModel::luxgateDecimalsChanged,
             this, [this](Luxgate::Decimals decimals_){decimals=decimals_;});
-}
-
-void LuxgateCreateOrderPanel::slotUpdateAverageHighLowBidAsk(float average_, float highLow_)
-{
-    average = average_;
-    highLow = highLow_;
-
-    auto formatText = [](QString priceText, QString color, QString tytleText)
-    {
-        return "<html><head/><body><p style=\"line-height:10\" align=\"center\">" +
-                priceText + "</p><p style=\"line-height:10\" align=\"center\">" + tytleText + "</font></p></body></html>";
-    };
-
-    if(!bBuy) {
-        ui->labelLeftPrice->setText(formatText(Luxgate::priceFormattedText(QString::number(average,'f',decimals.price), true), "#267E00", "Average bid"));
-        ui->labelRightPrice->setText(formatText(Luxgate::priceFormattedText(QString::number(highLow,'f',decimals.price), true), "#267E00", "Highest bid"));
-    }
-    else {
-        ui->labelLeftPrice->setText(formatText(Luxgate::priceFormattedText(QString::number(highLow,'f',decimals.price), false), "red", "Lowest ask"));
-        ui->labelRightPrice->setText(formatText(Luxgate::priceFormattedText(QString::number(average,'f',decimals.price), false), "red", "Average ask"));
-    }
 }
 
 void LuxgateCreateOrderPanel::priceChangeUpdateGUI()
@@ -169,11 +135,6 @@ void LuxgateCreateOrderPanel::setBuySell(bool _bBuy)
         ui->labelFeeDimension->setText(curCurrencyPair.quoteCurrency);
     }
 
-    //test
-    if(bBuy)
-        slotUpdateAverageHighLowBidAsk(0.00010000, 0.00030000);
-    else
-        slotUpdateAverageHighLowBidAsk(0.00010000, 0.00030000);
 
 
     //get balance

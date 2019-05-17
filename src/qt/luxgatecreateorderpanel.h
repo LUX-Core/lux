@@ -44,9 +44,7 @@ private:
     CAmount currentQuantity;
 
 private slots:
-    void slotUpdateAverageHighLowBidAsk(float average, float highLow);
     void slotValueSliderPriceChanged(int value);
-    void slotPriceEditChanged(const QString & text);
     void slotCalcNewTotal();
     void slotBuySellClicked();
 
