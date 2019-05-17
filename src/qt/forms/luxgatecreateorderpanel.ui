@@ -10,6 +10,9 @@
     <height>309</height>
    </rect>
   </property>
+  <property name="focusPolicy">
+   <enum>Qt::WheelFocus</enum>
+  </property>
   <property name="windowTitle">
    <string>Frame</string>
   </property>
@@ -40,6 +43,12 @@
      </item>
      <item>
       <widget class="QLineEdit" name="lineEditPrice">
+       <property name="minimumSize">
+        <size>
+         <width>200</width>
+         <height>32</height>
+        </size>
+       </property>
        <property name="font">
         <font>
          <pointsize>14</pointsize>
@@ -106,6 +115,12 @@
      </item>
      <item>
       <widget class="QLineEdit" name="lineEditQuantity">
+       <property name="minimumSize">
+        <size>
+         <width>200</width>
+         <height>32</height>
+        </size>
+       </property>
        <property name="font">
         <font>
          <pointsize>14</pointsize>
@@ -175,6 +190,12 @@
        <property name="enabled">
         <bool>false</bool>
        </property>
+       <property name="minimumSize">
+        <size>
+         <width>200</width>
+         <height>32</height>
+        </size>
+       </property>
        <property name="font">
         <font>
          <pointsize>14</pointsize>
@@ -243,6 +264,12 @@
       <widget class="QLineEdit" name="lineEditFee">
        <property name="enabled">
         <bool>false</bool>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>200</width>
+         <height>31</height>
+        </size>
        </property>
        <property name="focusPolicy">
         <enum>Qt::ClickFocus</enum>
@@ -314,11 +341,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButtonBuySell">
-       <property name="text">
-        <string/>
-       </property>
-      </widget>
+      <widget class="QPushButton" name="pushButtonBuySell"/>
      </item>
     </layout>
    </item>
