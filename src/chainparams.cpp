@@ -374,6 +374,9 @@ class CLuxGateTestParams : public CTestNetParams
             nSwitchPhi2Block = 30;
             consensus.nPowTargetSpacing = 15; // 15 seconds
             nFirstSCBlock = 40;
+            nSplitRewardBlock = 500000;
+            nPreminePaymentandHardForkBlock = 500000;
+            nPruneAfterHeight = 500000;
         } 
 };
 
