@@ -64,6 +64,7 @@ before_script:
     - cd src/luxgate/test
     - touch test_luxgate.cpp unspent_output_generator.h unspent_output_generator.cpp
     - cd -
+    - mkdir -p src/luxgate/sql
     - cd src/luxgate/sql
     - touch sqlite.h sqlite.c
     - cd -
