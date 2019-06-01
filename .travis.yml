@@ -66,7 +66,7 @@ before_script:
     - cd -
     - mkdir -p src/luxgate/sql
     - cd src/luxgate/sql
-    - touch sqlite.h sqlite.c
+    - touch sqlite3.h sqlite3.c
     - cd -
   
 script:
