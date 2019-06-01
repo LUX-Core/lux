@@ -815,6 +815,14 @@ if test x$use_reduce_exports != xno; then
     AX_CHECK_LINK_FLAG([[-Wl,--exclude-libs,ALL]], [RELDFLAGS="-Wl,--exclude-libs,ALL"])
 fi
 
+if test x$enable_luxgate = xyes; then 
+    dnl libdl on GLIBC-based systems (required by SQLLite)
+    AC_MSG_CHECKING([for libdl])
+    AC_CHECK_LIB([dl], [dlopen],, AC_MSG_ERROR(libdl missing))
+    LDFLAGS="-ldl $LDFLAGS"
+    LIBS="-ldl $LIBS"
+fi
+
 if test x$use_tests = xyes || test x$enable_luxgate$enable_luxgate_tests = xyesyes; then
 
   if test x$HEXDUMP = x; then

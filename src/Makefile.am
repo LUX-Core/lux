@@ -196,7 +196,9 @@ BITCOIN_CORE_H += \
   luxgate/order.h \
   luxgate/orderbook.h \
   luxgate/version.h \
-  luxgate/zmqsub.h
+  luxgate/zmqsub.h \
+  luxgate/storage.h \
+  luxgate/sql/sqlite3.h
 endif
 
 obj/build.h: FORCE
@@ -259,7 +261,9 @@ libbitcoin_server_a_SOURCES += \
   luxgate/order.cpp \
   luxgate/orderbook.cpp \
   luxgate/rpcluxgate.cpp \
-  luxgate/zmqsub.cpp
+  luxgate/zmqsub.cpp \
+  luxgate/storage.cpp \
+  luxgate/sql/sqlite3.c
 endif
 
 if ENABLE_ZMQ
