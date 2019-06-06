@@ -1812,3 +1812,11 @@ LuxgateCreateOrderPanel QLineEdit#lineEditTotal {
     border: none;
 }
 
+LuxgateOpenOrdersPanel QPushButton {
+    padding-left: 10px;
+    padding-right: 10px;
+    text-align: center;
+    align-content: center;
+    margin-right: 0;
+}
+
