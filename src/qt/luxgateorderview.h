@@ -21,9 +21,11 @@ public:
     ~OrderView() {}
     std::string log() const { return sId.toStdString(); }
     qint64 creationTime;
+    qint64 completionTime;
     OrderId id;
     bool isBuy;
     QString sCreationTime;
+    QString sCompletionTime;
     QString sType;
     QString sPrice;
     QString sAmount;

@@ -129,11 +129,11 @@ QVariant LuxgateHistoryModel::data(const QModelIndex &index, int role) const
               " ID: " + data(this->index(index.row(), IdColumn)).toString() +
               " Base: "  + data(this->index(index.row(), BaseAmountColumn)).toString() +
               " Quote: "  + data(this->index(index.row(), QuoteTotalColumn)).toString() +
-              " Date: " + data(this->index(index.row(), CompleteDateColumn)).toString() +
+              " Completion Date: " + data(this->index(index.row(), CompleteDateColumn)).toString() +
               " State: " + data(this->index(index.row(), StateColumn)).toString();
     else if (Qt::EditRole == role || Qt::DisplayRole == role) {
         if (CompleteDateColumn == index.column())
-            res = order.sCreationTime;
+            res = order.sCompletionTime;
         else if (TypeColumn == index.column())
             res = order.sType;
         else if (PriceColumn == index.column())

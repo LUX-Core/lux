@@ -14,6 +14,8 @@ OrderView::OrderView(const std::shared_ptr<const COrder> order)
     sState = stateToString(order->GetState());
     creationTime = order->OrderCreationTime();
     sCreationTime = GUIUtil::dateTimeStr(creationTime);
+    completionTime = order->OrderCompletionTime();
+    sCompletionTime = GUIUtil::dateTimeStr(completionTime);
     sType = order->IsSell() ? QString("Sell") : QString("Buy");
     isBuy = order->IsBuy();
     sPrice = QString(Luxgate::QStrFromAmount(order->Price()));
@@ -28,6 +30,8 @@ OrderView::OrderView(const std::shared_ptr<COrder> order)
     sState = stateToString(order->GetState());
     creationTime = order->OrderCreationTime();
     sCreationTime = GUIUtil::dateTimeStr(creationTime);
+    completionTime = order->OrderCompletionTime();
+    sCompletionTime = GUIUtil::dateTimeStr(completionTime);
     sType = order->IsSell() ? QString("Sell") : QString("Buy");
     isBuy = order->IsBuy();
     sPrice = QString(Luxgate::QStrFromAmount(order->Price()));
