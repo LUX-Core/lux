@@ -1,37 +1,17 @@
+// Copyright (c) 2019 The Luxcore developers
+// Distributed under the MIT software license, see the accompanying
+// file COPYING or http://www.opensource.org/licenses/mit-license.php.
+
 #ifndef LUXGATEOPENORDERSMODEL_H
 #define LUXGATEOPENORDERSMODEL_H
 
 #include "luxgategui_global.h"
+#include "luxgateorderview.h"
 
-#include "luxgate/luxgate.h"
 #include <QAbstractTableModel>
 
 #include <memory>
 #include <list>
-
-class COrder;
-
-QString stateToString(const COrder::State state);
-
-class OrderView
-{
-public:
-  OrderView() {}
-  OrderView(const std::shared_ptr<const COrder> order);
-  ~OrderView() {}
-  std::string log() const { return sId.toStdString(); }
-  qint64 creationTime;
-  OrderId id;
-  bool isBuy;
-  QString sCreationTime;
-  QString sType;
-  QString sPrice;
-  QString sAmount;
-  QString sTotal;
-  QString sState;
-  QString sId;
-};
-Q_DECLARE_METATYPE(OrderView);
 
 class LuxgateOpenOrdersModel : public QAbstractTableModel
 {
@@ -40,7 +20,7 @@ class LuxgateOpenOrdersModel : public QAbstractTableModel
 public:
     explicit LuxgateOpenOrdersModel(const Luxgate::Decimals & decimals, QObject *parent = nullptr);
 
-    enum Columns { DateColumn = 0, IdColumn, TypeColumn, 
+    enum Columns { DateColumn = 0, IdColumn, TypeColumn,
                    PriceColumn, BaseAmountColumn, QuoteTotalColumn,
                    StateColumn, CancelColumn, NColumns };
     // Header:

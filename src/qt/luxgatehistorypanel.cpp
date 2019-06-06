@@ -1,3 +1,7 @@
+// Copyright (c) 2019 The Luxcore developers
+// Distributed under the MIT software license, see the accompanying
+// file COPYING or http://www.opensource.org/licenses/mit-license.php.
+
 #include "luxgatehistorypanel.h"
 #include "ui_luxgatehistorypanel.h"
 
@@ -16,12 +20,12 @@ LuxgateHistoryPanel::LuxgateHistoryPanel(QWidget *parent) :
 void LuxgateHistoryPanel::setModel(WalletModel *model)
 {
     wal_model = model;
-    OptionsModel * opt_model = wal_model->getOptionsModel();
+    OptionsModel *opt_model = wal_model->getOptionsModel();
     //init tableview
     {
-        auto tableModel =new LuxgateHistoryModel(opt_model->getLuxgateDecimals(), this);
+        auto tableModel = new LuxgateHistoryModel(opt_model->getLuxgateDecimals(), this);
         ui->tableViewHistory->setModel(tableModel);
-        QHeaderView * HeaderView = ui->tableViewHistory->horizontalHeader();
+        QHeaderView *HeaderView = ui->tableViewHistory->horizontalHeader();
         HeaderView->setSectionResizeMode(QHeaderView::Stretch);
         HeaderView->setSectionsMovable(true);
         HeaderView->setFixedHeight(30);
@@ -29,13 +33,14 @@ void LuxgateHistoryPanel::setModel(WalletModel *model)
                 tableModel, &LuxgateHistoryModel::slotSetDecimals);
 
         ui->tableViewHistory->setItemDelegateForColumn(LuxgateHistoryModel::PriceColumn,
-                                                        new LuxgatePriceDelegate(this));
+                                                       new LuxgatePriceDelegate(this));
 
         ui->tableViewHistory->setCopyColumns(QMap<int, int>{
-                {LuxgateTableView::PriceColumn, LuxgateHistoryModel::PriceColumn},
-                {LuxgateTableView::BaseAmountColumn, LuxgateHistoryModel::BaseAmountColumn},
-                {LuxgateTableView::QuoteTotalColumn, LuxgateHistoryModel::QuoteTotalColumn},
-                {LuxgateTableView::DateCloseOrderColumn, LuxgateHistoryModel::DateColumn}});
+                { LuxgateTableView::IdColumn, LuxgateHistoryModel::IdColumn },
+                { LuxgateTableView::PriceColumn, LuxgateHistoryModel::PriceColumn },
+                { LuxgateTableView::BaseAmountColumn, LuxgateHistoryModel::BaseAmountColumn },
+                { LuxgateTableView::QuoteTotalColumn, LuxgateHistoryModel::QuoteTotalColumn },
+                { LuxgateTableView::DateCloseOrderColumn, LuxgateHistoryModel::CompleteDateColumn }});
     }
 }
 
@@ -43,3 +48,4 @@ LuxgateHistoryPanel::~LuxgateHistoryPanel()
 {
     delete ui;
 }
+

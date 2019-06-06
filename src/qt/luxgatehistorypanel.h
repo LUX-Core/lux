@@ -1,3 +1,7 @@
+// Copyright (c) 2019 The Luxcore developers
+// Distributed under the MIT software license, see the accompanying
+// file COPYING or http://www.opensource.org/licenses/mit-license.php.
+
 #ifndef LUXGATEHISTORYPANEL_H
 #define LUXGATEHISTORYPANEL_H
 
@@ -19,8 +23,9 @@ public:
     ~LuxgateHistoryPanel();
     void setModel(WalletModel *model);
 private:
-    WalletModel * wal_model;
+    WalletModel *wal_model;
     Ui::LuxgateHistoryPanel *ui;
 };
 
 #endif // LUXGATEHISTORYPANEL_H
+
