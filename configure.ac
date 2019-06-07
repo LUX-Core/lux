@@ -816,11 +816,9 @@ if test x$use_reduce_exports != xno; then
 fi
 
 if test x$enable_luxgate = xyes; then 
-    dnl libdl on GLIBC-based systems (required by SQLLite)
-    AC_MSG_CHECKING([for libdl])
-    AC_CHECK_LIB([dl], [dlopen],, AC_MSG_ERROR(libdl missing))
-    LDFLAGS="-ldl $LDFLAGS"
-    LIBS="-ldl $LIBS"
+    dnl avoid sqlite require libdl for build
+    dnl it is not necessary (the lib is used for dynamic extension loading)
+    LDFLAGS="-DSQLITE_OMIT_LOAD_EXTENSION $LDFLAGS"
 fi
 
 if test x$use_tests = xyes || test x$enable_luxgate$enable_luxgate_tests = xyesyes; then
