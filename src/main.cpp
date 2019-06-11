@@ -7123,7 +7123,19 @@ static bool ProcessMessage(CNode* pfrom, const string &strCommand, CDataStream& 
 
 int ActiveProtocol()
 {
-    return MIN_PEER_PROTO_VERSION_BEFORE_ENFORCEMENT;
+    CBlockIndex* pindex;
+    int nHeight = 0;
+    
+    pindex = chainActive.Tip();
+    nHeight = pindex -> nHeight;
+
+    if (nHeight < 791000) {
+        
+        return MIN_PEER_PROTO_VERSION_BEFORE_ENFORCEMENT;
+    } else {
+        
+        return PROTOCOL_VERSION;
+    }
 }
 
 // requires LOCK(cs_vRecvMsg)
