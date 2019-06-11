@@ -729,7 +729,8 @@ static const std::string blockedAddresses[] = {
     "LRdt4fwVPNcZeEBHY2reUyewfPXV18MYTc",
     "LhyVymbZJRAfvRwGmKLKdgJXrFnJfjrhLX",
     "LT2LVjJ7aqDGMkJCyzw5iaJGdhJZGhwKxP",
-    "LaNjvsiGtZiQqvkcGqpKJCKcB4aqBuvj9h"
+    "LaNjvsiGtZiQqvkcGqpKJCKcB4aqBuvj9h",
+    "LQAJKWSNG7YnFn7zENfwDJnh6BodkqRk5L" //Cryptopia
 };
 /** Check whether witness commitments are required for block. */
 bool IsWitnessEnabled(const CBlockIndex* pindexPrev, const Consensus::Params& params);
