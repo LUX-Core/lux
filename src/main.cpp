@@ -1945,12 +1945,10 @@ CAmount GetProofOfWorkReward(int64_t nFees, int nHeight)
         nSubsidy = 1 * COIN;
     } else if (nHeight == 501) {
         nSubsidy = 1000 * COIN;
-    } else if (nHeight < 1000000) {
+    } else if (nHeight >= 500 && nHeight < 791000) {
         nSubsidy = 10 * COIN;
-    } else if (nHeight < 5000000) {
-        nSubsidy = 10 * COIN;
-    } else if (nHeight < 6000000) {
-        nSubsidy = 10 * COIN;
+    } else if (nHeight >= 791000 && nHeight < 6000000) {
+        nSubsidy = 8 * COIN;
     } else {
         nSubsidy = 1 * COIN;
     }
@@ -1970,6 +1968,10 @@ CAmount GetProofOfStakeReward(int64_t nFees, int nHeight)
     // First 100,000 blocks double stake for masternode ready
     if (nHeight < 100000) {
         nSubsidy = 2 * COIN;
+    } else if (nHeight >= 100000 && nHeight < 791000) {
+        nSubsidy = 1 * COIN;
+    } else if (nHeight >= 791000 && nHeight < 6000000) {
+        nSubsidy = 1.5 * COIN;
     } else {
         nSubsidy = 1 * COIN;
     }
@@ -1981,12 +1983,14 @@ CAmount GetMasternodePosReward(int nHeight, CAmount blockValue)
 {
     const CChainParams& chainParams = Params();
     CAmount ret = 0;
-    if (nHeight >= POS_REWARD_CHANGED_BLOCK) {
+    if (nHeight >= POS_REWARD_CHANGED_BLOCK && nHeight < 791000) {
         if (nHeight != chainParams.PreminePayment() || IsTestNet()) {
             ret = blockValue * 0.2; //20% for masternode
         } else if (nHeight == chainParams.PreminePayment()) {
             ret = blockValue * 250000; //premine mint
         }
+    } else if (nHeight >= 791000 && nHeight < 6000000) {
+        ret = blockValue * 0.25; //25% for masternodes after this reward change
     } else {
         ret = blockValue * 0.4; //40% for masternode
     }
