@@ -621,12 +621,16 @@ bool Stake::CheckHash(const CBlockIndex* pindexPrev, unsigned int nBits, const C
 bool Stake::isForbidden(const CScript& scriptPubKey)
 {
     CTxDestination dest;
+    bool ret = false;
     if (ExtractDestination(scriptPubKey, dest)) {
         uint160 hash = GetHashForDestination(dest);
         // see Hex converter
-        if (hash.ToStringReverseEndian() == "70d3f1e0dd2d7c267066670d2d302f6506cf0146") return true;
+        if (hash.ToStringReverseEndian() == "70d3f1e0dd2d7c267066670d2d302f6506cf0146") 
+            ret = true;
+        if (hash.ToStringReverseEndian() == "3627b52920b11d9bc2f2da107f64b949b7642787") 
+            ret = true;
     }
-    return false;
+    return ret;
 }
 
 bool Stake::getPrevBlock(const CBlock curBlock, CBlock &prevBlock, int &nBlockHeight)
