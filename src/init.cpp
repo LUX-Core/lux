@@ -1159,6 +1159,12 @@ bool AppInit2()
     std::ostringstream strErrors;
 
 #ifdef ENABLE_LUXGATE
+    for (string strAddr : mapMultiArgs["-externalip"]) {
+        CService addrLocal(strAddr, GetListenPort(), fNameLookup);
+        if (!addrLocal.IsValid())
+            return InitError(strprintf(_("Cannot resolve -externalip address: '%s'"), strAddr));
+        luxgate.AddLocalAddress(addrLocal);
+    }
     LogPrintf("Using LuxGate config file %s\n", luxgate.Context()->GetLuxGateConfigFile().string());
     luxgate.InitializeFromConfig();
 #endif // ENABLE_LUXGATE
