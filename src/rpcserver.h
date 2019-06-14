@@ -448,6 +448,9 @@ extern UniValue getlocalorder(const UniValue& params, bool fHelp);
 extern UniValue getdepositaddresses(const UniValue& params, bool fHelp);
 extern UniValue cancel(const UniValue& params, bool fHelp);
 extern UniValue getordershistory(const UniValue& params, bool fHelp);
+#if defined(DEBUG) || defined(_DEBUG)
+extern UniValue debugrelay(const UniValue& params, bool fHelp);
+#endif // DEBUG
 
 bool StartRPC();
 void InterruptRPC();
