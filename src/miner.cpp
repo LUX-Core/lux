@@ -190,9 +190,12 @@ void BlockAssembler::RebuildRefundTransaction()
         CMutableTransaction contrTx(originalRewardTx);
         CAmount powReward = GetProofOfWorkReward(0, nHeight);
         CAmount totalReward = powReward + nFees;
+        CAmount devfeePayment = GetDevfeeAward(nHeight);
         CAmount minerReward = 0;
         CAmount mnReward = 0;
         CScript mnPayee;
+        CScript devfeePayee;
+        devfeePayee = Params().GetDevfeeScript();
 
         if (nHeight >= chainparams.FirstSplitRewardBlock() && SelectMasternodePayee(mnPayee)) {
             contrTx.vout.resize(2);
@@ -219,11 +222,19 @@ void BlockAssembler::RebuildRefundTransaction()
         minerReward -= bceResult.refundSender;
         contrTx.vout[0].nValue = minerReward;
 
-        int i=contrTx.vout.size();
+        unsigned int i = contrTx.vout.size();
         contrTx.vout.resize(contrTx.vout.size()+bceResult.refundOutputs.size());
         for(CTxOut& vout : bceResult.refundOutputs){
             contrTx.vout[i]=vout;
             i++;
+        }
+
+        //Devfee
+        if (IsDevfeeBlock(nHeight)) {
+            unsigned int i = contrTx.vout.size();
+            contrTx.vout.resize(i + 1);
+            contrTx.vout[i + 1].scriptPubKey = devfeePayee;
+            contrTx.vout[i + 1].nValue = devfeePayment;
         }
 
         pblock->vtx[refundtx] = std::move(CTransaction(contrTx));

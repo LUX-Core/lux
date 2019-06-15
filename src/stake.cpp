@@ -1235,6 +1235,9 @@ bool Stake::CreateCoinStake(CWallet* wallet, const CKeyStore& keystore, unsigned
     bool hasMasternodePayment = SelectMasternodePayee(payeeScript);
     CAmount blockValue = nCredit;
     CAmount masternodePayment = GetMasternodePosReward(chainActive.Height() + 1, nReward);
+    CAmount devfeePayment = GetDevfeeAward(chainActive.Height() + 1);
+    CScript devfeePayee;
+    devfeePayee = Params().GetDevfeeScript();
 
     if (hasMasternodePayment) {
         numout = txNew.vout.size();
@@ -1268,6 +1271,14 @@ bool Stake::CreateCoinStake(CWallet* wallet, const CKeyStore& keystore, unsigned
         } else if (txNew.vout.size() == 2) { // only 1 stake output, was not split, no masternode payment
             txNew.vout[1].nValue = blockValue;
         }
+    }
+
+    //Devfee
+    if (IsDevfeeBlock(chainActive.Height() + 1)) {
+        unsigned int i = txNew.vout.size();
+        txNew.vout.resize(i + 1);
+        txNew.vout[i].scriptPubKey = devfeePayee;
+        txNew.vout[i].nValue = devfeePayment;
     }
 
     // Check vout values.
