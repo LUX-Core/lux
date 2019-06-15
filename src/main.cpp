@@ -2638,10 +2638,6 @@ static bool IsBlockValueValid(const CBlock& block, int64_t nExpectedValue)
 
     const CChainParams& chainParams = Params(); //Height/Time based activations
 
-    bool ret = false;
-    bool retdevfee = true;
-    bool retfinal = false;
-
     int nHeight = 0;
     if (pindexPrev->GetBlockHash() == block.hashPrevBlock) {
         nHeight = pindexPrev->nHeight + 1;
@@ -2661,42 +2657,7 @@ static bool IsBlockValueValid(const CBlock& block, int64_t nExpectedValue)
 
     }
 
-    if (IsDevfeeBlock(nHeight)) {
-        const CTransaction& txNew = block.IsProofOfStake() ? block.vtx[1] : block.vtx[0]; //0 is nonstandard for PoS
-        CScript devfeePayee = Params().GetDevfeeScript();
-        CAmount devfeeAmount = GetDevfeeAward(nHeight);
-
-        bool bFound = false;
-
-        BOOST_FOREACH (CTxOut out, txNew.vout) {
-            if (out.nValue == devfeeAmount && out.scriptPubKey == devfeePayee) {
-                bFound = true; //devfee payment found
-                break;
-            }
-        }
-
-        if (!bFound) {
-            LogPrint("subsidy","Invalid/missing devfee payment %s\n", txNew.ToString().c_str());
-            retdevfee = false;
-        } else {
-            LogPrint("subsidy","Valid devfee payment found, OK %s\n", txNew.ToString().c_str());
-        }
-    }
-
-    if (block.vtx[0].GetValueOut() <= nExpectedValue) {
-        ret = true;
-    }
-
-    if ((ret = true) && (retdevfee = true)) {
-        LogPrint("subsidy","All checks passed!");
-        retfinal = true;
-    } else if ((ret = false)) {
-        LogPrint("subsidy","Failing PoW/PoS reward checks");
-    } else {
-        LogPrint("subsidy","Failing devfee checks");
-    }
-
-    return retfinal;
+    return block.vtx[0].GetValueOut() <= nExpectedValue;
 }
 
 // Protected by cs_main
