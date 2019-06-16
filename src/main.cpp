@@ -144,6 +144,7 @@ bool fCheckBlockIndex = false;
 size_t nCoinCacheUsage = 5000 * 300;
 unsigned int nBytesPerSigOp = DEFAULT_BYTES_PER_SIGOP;
 bool fAlerts = DEFAULT_ALERTS;
+int64_t nMaxTipAge = DEFAULT_MAX_TIP_AGE;
 
 bool fHavePruned = false;
 bool fPruneMode = false;
@@ -2076,13 +2077,26 @@ int64_t GetDevfeeAward(int nHeight)
 bool IsInitialBlockDownload()
 {
     const CChainParams& chainParams = Params();
+    
+    // Once this function has returned false, it must remain false.
+    static std::atomic<bool> latchToFalse{false};
+    // Optimization: pre-test latch before taking the lock.
+    if (latchToFalse.load(std::memory_order_relaxed))
+        return false;
+
     LOCK(cs_main);
-    if (fImporting || fReindex || chainActive.Height() < Checkpoints::GetTotalBlocksEstimate(chainParams.Checkpoints()))
+    if (latchToFalse.load(std::memory_order_relaxed))
+        return false;
+    if (fImporting || fReindex)
         return true;
-    // ~144 blocks behind -> 2 x fork detection time
-    bool lock = (chainActive.Height() < pindexBestHeader->nHeight - 24 * 6 ||
-        (!IsTestNet() && pindexBestHeader->GetBlockTime() < GetTime() - 8 * 60 * 60));
-    return lock;
+    if (chainActive.Tip() == NULL)
+        return true;
+    if (chainActive.Height() < Checkpoints::GetTotalBlocksEstimate(chainParams.Checkpoints()))
+        return true;
+    if (chainActive.Tip()->GetBlockTime() < (GetTime() - nMaxTipAge))
+        return true;
+    latchToFalse.store(true, std::memory_order_relaxed);
+    return false;
 }
 
 bool fLargeWorkForkFound = false;
