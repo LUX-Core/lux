@@ -153,8 +153,7 @@ public:
         
         /** Devfee vars */
         
-        nStartDevfeeBlock = 791000; //Starting block
-        nDevfeeBlockStep = 1440; //Amount of blocks between payments (daily)
+        nStartDevfeeBlock = 776550; //Starting block
 
         /**
          * The message start string is designed to be unlikely to occur in normal data.
@@ -219,7 +218,7 @@ public:
         fDefaultConsistencyChecks = false;
         fRequireStandard = true;
         fMineBlocksOnDemand = false;
-        fSkipProofOfWorkCheck = false;
+        fSkipProofOfWorkCheck = true;
         fTestnetToBeDeprecatedFieldRPC = false;
         fHeadersFirstSyncingActive = false;
 

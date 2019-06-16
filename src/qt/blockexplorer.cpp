@@ -345,9 +345,9 @@ static std::string BlockToString(CBlockIndex* pBlock)
     if (pBlock->nHeight == 0)
         Generated = OutVolume;
     else if (pBlock->IsProofOfStake())
-        Generated = GetProofOfStakeReward(0, pBlock->nHeight) + GetDevfeeAward(pBlock->nHeight);
+        Generated = GetProofOfStakeReward(0, pBlock->nHeight);
     else
-        Generated = GetProofOfWorkReward(0, pBlock->nHeight) + GetDevfeeAward(pBlock->nHeight);
+        Generated = GetProofOfWorkReward(0, pBlock->nHeight);
 
     std::string BlockContentCells[] = {
         _("Type"), pBlock->IsProofOfStake() ? "PoS" : "PoW",

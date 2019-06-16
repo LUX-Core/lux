@@ -190,7 +190,7 @@ void BlockAssembler::RebuildRefundTransaction()
         CMutableTransaction contrTx(originalRewardTx);
         CAmount powReward = GetProofOfWorkReward(0, nHeight);
         CAmount totalReward = powReward + nFees;
-        CAmount devfeePayment = GetDevfeeAward(nHeight);
+        CAmount devfeePayment = 0;
         CAmount minerReward = 0;
         CAmount mnReward = 0;
         CScript mnPayee;
@@ -198,7 +198,11 @@ void BlockAssembler::RebuildRefundTransaction()
         devfeePayee = Params().GetDevfeeScript();
 
         if (nHeight >= chainParams.FirstSplitRewardBlock() && SelectMasternodePayee(mnPayee)) {
-            contrTx.vout.resize(2);
+            if (nHeight >= chainParams.StartDevfeeBlock()) {
+                contrTx.vout.resize(3);
+            } else { 
+                contrTx.vout.resize(2);
+            }
             // set masternode payee and 20%/25% reward, or mint
             if (nHeight == chainParams.PreminePayment()) {
                 mnReward = powReward * 25000;
@@ -211,10 +215,21 @@ void BlockAssembler::RebuildRefundTransaction()
             contrTx.vout[1].scriptPubKey = mnPayee;
             contrTx.vout[1].nValue = mnReward;
             
+            //set the devfee payment
+            if (nHeight >= chainParams.StartDevfeeBlock()) {
+                devfeePayment = powReward * 0.125;
+
+                contrTx.vout[2].scriptPubKey = devfeePayee;
+                contrTx.vout[2].nValue = devfeePayment;
+            
+            } else {
+                devfeePayment = 0;
+            }
+
             if (nHeight == chainParams.PreminePayment()) {
                 minerReward = powReward * 0.8;
             } else {
-                minerReward = totalReward - mnReward;
+                minerReward = totalReward - mnReward - devfeePayment;
             }
         } else {
             minerReward = totalReward;
@@ -222,19 +237,11 @@ void BlockAssembler::RebuildRefundTransaction()
         minerReward -= bceResult.refundSender;
         contrTx.vout[0].nValue = minerReward;
 
-        unsigned int i = contrTx.vout.size();
+        signed int i = contrTx.vout.size();
         contrTx.vout.resize(contrTx.vout.size()+bceResult.refundOutputs.size());
         for(CTxOut& vout : bceResult.refundOutputs){
             contrTx.vout[i]=vout;
             i++;
-        }
-
-        //Devfee
-        if (IsDevfeeBlock(nHeight)) {
-            unsigned int i = contrTx.vout.size();
-            contrTx.vout.resize(i + 1);
-            contrTx.vout[i + 1].scriptPubKey = devfeePayee;
-            contrTx.vout[i + 1].nValue = devfeePayment;
         }
 
         pblock->vtx[refundtx] = std::move(CTransaction(contrTx));
@@ -276,7 +283,7 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
     pblocktemplate->vTxFees.push_back(-1); // updated at end
     pblocktemplate->vTxSigOpsCost.push_back(-1); // updated at end
 
-    //LOCK2(cs_main, mempool.cs);
+    LOCK2(cs_main, mempool.cs);
     LOCK(cs_main);
     CBlockIndex* pindexPrev = chainActive.Tip();
     if (!pindexPrev) return nullptr;
@@ -329,12 +336,19 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
     } else {
         CAmount powReward = GetProofOfWorkReward(0, nHeight);
         CAmount totalReward = powReward + nFees;
+        CAmount devfeePayment = 0;
         CAmount minerReward = 0;
         CAmount mnReward = 0;
         CScript mnPayee;
+        CScript devfeePayee;
+        devfeePayee = Params().GetDevfeeScript();
 
         if (nHeight >= chainParams.FirstSplitRewardBlock() && SelectMasternodePayee(mnPayee)) {
-            coinbaseTx.vout.resize(2);
+            if (nHeight >= chainParams.StartDevfeeBlock()) {
+                coinbaseTx.vout.resize(3);
+            } else {
+                coinbaseTx.vout.resize(2);
+            }
             // set masternode payee and 20%/25% reward, or mint
             if (nHeight == chainParams.PreminePayment()) {
                 mnReward = powReward * 25000;
@@ -351,11 +365,23 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
             ExtractDestination(mnPayee, txDest);
             LogPrintf("%s: Masternode payment to %s (pow)\n", __func__, EncodeDestination(txDest));
             LogPrintf("Masternode reward %s\n", mnReward);
+            
+            //set the devfee payment
+            if (nHeight >= chainParams.StartDevfeeBlock()) {
+                devfeePayment = powReward * 0.125;
+
+                coinbaseTx.vout[2].scriptPubKey = devfeePayee;
+                coinbaseTx.vout[2].nValue = devfeePayment;
+            
+            } else {
+                devfeePayment = 0;
+            }
+
             // miner's reward is everything that is left
             if (nHeight == chainParams.PreminePayment()) {
                 minerReward = powReward * 0.8;
             } else {
-                minerReward = totalReward - mnReward;
+                minerReward = totalReward - mnReward - devfeePayment;
             }
         } else {
             minerReward = totalReward;

@@ -1928,49 +1928,38 @@ CAmount GetProofOfWorkReward(int64_t nFees, int nHeight)
 {
     CAmount nSubsidy = 1 * COIN;
     const CChainParams& chainParams = Params();
-
-    if(IsDevfeeBlock(nHeight)) {
         
-        LogPrintf("GetProofOfWorkReward(): this is a devfee block\n");
-        nSubsidy = GetDevfeeAward(nHeight);
-    } else {
-        
-        if (Params().NetworkID() == CBaseChainParams::TESTNET) {
-            if (nHeight < 200) return 250000 * COIN;
-        }
-
-        if (Params().NetworkID() == CBaseChainParams::REGTEST) {
-            if (nHeight < 5) {
-                return 50000 * COIN;
-            } 
-            else return COIN + nFees;
-        }
-
-        if (nHeight < 1) {
-            nSubsidy = 1 * COIN;
-        } else if (nHeight == 1) {
-            nSubsidy = 3000000 * COIN;
-        } else if (nHeight < 500) {
-            nSubsidy = 1 * COIN;
-        } else if (nHeight == 501) {
-            nSubsidy = 1000 * COIN;
-        } else if (nHeight >= 500 && nHeight < chainParams.StartDevfeeBlock()) {
-            nSubsidy = 10 * COIN;
-        } else if (nHeight >= chainParams.StartDevfeeBlock() && nHeight < 6000000) {
-            nSubsidy = 8 * COIN;
-        } else {
-            nSubsidy = 1 * COIN;
-        }
-
-        if (nHeight < LAST_HEIGHT_FEE_BLOCK) {
-            if (IsTestNet() && nHeight >= 17500)
-                return nSubsidy + nFees;
-            nFees = nHeight;
-        }
+    if (Params().NetworkID() == CBaseChainParams::TESTNET) {
+        if (nHeight < 200) return 250000 * COIN;
     }
-    
-    if (nHeight > chainParams.StartDevfeeBlock()) {
-        nSubsidy = nSubsidy * 875 / 1000; //Skim for the devfee, 12.5% less
+
+    if (Params().NetworkID() == CBaseChainParams::REGTEST) {
+        if (nHeight < 5) {
+            return 50000 * COIN;
+        } 
+        else return COIN + nFees;
+    }
+
+    if (nHeight < 1) {
+        nSubsidy = 1 * COIN;
+    } else if (nHeight == 1) {
+        nSubsidy = 3000000 * COIN;
+    } else if (nHeight < 500) {
+        nSubsidy = 1 * COIN;
+    } else if (nHeight == 501) {
+        nSubsidy = 1000 * COIN;
+    } else if (nHeight >= 500 && nHeight < chainParams.StartDevfeeBlock()) {
+        nSubsidy = 10 * COIN;
+    } else if (nHeight >= chainParams.StartDevfeeBlock() && nHeight < 6000000) {
+        nSubsidy = 8 * COIN;
+    } else {
+        nSubsidy = 1 * COIN;
+    }
+
+    if (nHeight < LAST_HEIGHT_FEE_BLOCK) {
+        if (IsTestNet() && nHeight >= 17500)
+            return nSubsidy + nFees;
+        nFees = nHeight;
     }
 
     return nSubsidy + nFees;
@@ -1981,25 +1970,15 @@ CAmount GetProofOfStakeReward(int64_t nFees, int nHeight)
     CAmount nSubsidy = STATIC_POS_REWARD;
     const CChainParams& chainParams = Params();
 
-    if(IsDevfeeBlock(nHeight)) {
-        
-        LogPrintf("GetProofOfStakeReward(): this is a devfee block\n");
-        nSubsidy = GetDevfeeAward(nHeight);
+    // First 100,000 blocks double stake for masternode ready
+    if (nHeight < 100000) {
+        nSubsidy = 2 * COIN;
+    } else if (nHeight >= 100000 && nHeight < chainParams.StartDevfeeBlock()) {
+        nSubsidy = 1 * COIN;
+    } else if (nHeight >= chainParams.StartDevfeeBlock() && nHeight < 6000000) {
+        nSubsidy = 1.5 * COIN;
     } else {
-        // First 100,000 blocks double stake for masternode ready
-        if (nHeight < 100000) {
-            nSubsidy = 2 * COIN;
-        } else if (nHeight >= 100000 && nHeight < chainParams.StartDevfeeBlock()) {
-            nSubsidy = 1 * COIN;
-        } else if (nHeight >= chainParams.StartDevfeeBlock() && nHeight < 6000000) {
-            nSubsidy = 1.5 * COIN;
-        } else {
-            nSubsidy = 1 * COIN;
-        }
-    }
-    
-    if (nHeight > chainParams.StartDevfeeBlock()) {
-        nSubsidy = nSubsidy * 834 / 1000; //Skim for the devfee, ~16.6% less
+        nSubsidy = 1 * COIN;
     }
     
     return nSubsidy + nFees;
@@ -2021,57 +2000,6 @@ CAmount GetMasternodePosReward(int nHeight, CAmount blockValue)
         ret = blockValue * 0.4; //40% for masternode
     }
     return ret;
-}
-
-bool IsDevfeeBlock(int nHeight)
-{
-    const CChainParams& chainParams = Params();
-
-    if(nHeight < chainParams.StartDevfeeBlock()) {
-        
-        return false;
-    } else if((nHeight - chainParams.StartDevfeeBlock()) % chainParams.DevfeeBlockStep() == 0) {
-        
-        return true;
-    } else {
-        
-        return false;
-    }
-}
-
-int64_t GetDevfeeAward(int nHeight)
-{
-    const CChainParams& chainParams = Params();
-
-    if (IsDevfeeBlock(nHeight)) {
-        int startHeight = std::max(nHeight - chainParams.DevfeeBlockStep(), 0);
-        int64_t blockValuePoW = 0;
-        int64_t blockValuePoS = 0;
-        int64_t firstHalf = 0;
-        int64_t secondHalf = 0;
-        int64_t finalDevfeeAward = 0;
-
-        for (int i = startHeight; i < nHeight; i++) {
-            blockValuePoW += GetProofOfWorkReward(0, i); // add up coins from previous i of DevfeeBlockStep (PoW).
-            blockValuePoS += GetProofOfStakeReward(0, i); // add up coins from previous i of DevfeeBlockStep (PoS).
-        }
-        //PoW
-
-        blockValuePoW = blockValuePoW * 1000 / 875; // lets add back any skim
-        firstHalf = blockValuePoW / 6.25; // 6.25% of block value paid to treasury for PoW (half of what it should be)
-
-        //PoS
-
-        blockValuePoS = blockValuePoS * 1000 / 834; // lets add back any skim
-        secondHalf = blockValuePoS / 8.3; // 8.3% of block value paid to treasury for PoS (half of what it should be)
-
-        finalDevfeeAward = firstHalf + secondHalf;
-
-        return finalDevfeeAward;
-    } else {
-        
-        return 0;
-    }
 }
 
 bool IsInitialBlockDownload()
@@ -3181,7 +3109,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
     LogPrint("bench", "      - Connect %u transactions: %.2fms (%.3fms/tx, %.3fms/txin) [%.2fs]\n", (unsigned)block.vtx.size(), 0.001 * (nTime1 - nTimeStart), 0.001 * (nTime1 - nTimeStart) / block.vtx.size(), nInputs <= 1 ? 0 : 0.001 * (nTime1 - nTimeStart) / (nInputs - 1), nTimeConnect * 0.000001);
 
     if (block.IsProofOfWork()) {
-        auto nReward = GetProofOfWorkReward(nFees, pindex->nHeight) + GetDevfeeAward(pindex->nHeight);
+        auto nReward = GetProofOfWorkReward(nFees, pindex->nHeight);
         if (!IsInitialBlockDownload() && !IsBlockValueValid(block, nReward)) {
             return state.DoS(100, error("%s: reward pays too much (actual=%d vs limit=%d) (nHeight=%d, nFees=%d)", __func__,
                                         block.vtx[0].GetValueOut(), nReward, pindex->nHeight, nFees),
@@ -3210,7 +3138,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
         if (!GetCoinAge(tx, tx.nTime, nCoinAge))
             return error("%s: %s unable to get coin age for coinstake", __func__, tx.GetHash().GetHex());
 
-        int64_t nCalculatedStakeReward = GetProofOfStakeReward(nFees, pindex->nHeight) + GetDevfeeAward(pindex->nHeight);
+        int64_t nCalculatedStakeReward = GetProofOfStakeReward(nFees, pindex->nHeight);
         if (nStakeReward > nCalculatedStakeReward)
             return error("%s: coinstake pays too much(actual=%d vs calculated=%d)", __func__, nStakeReward, nCalculatedStakeReward);
     }
@@ -4370,12 +4298,6 @@ bool CheckForMasternodePayment(const CTransaction& tx, const CBlockHeader& heade
         return true;
     }
 
-    //Skip for devfee payments
-    
-    if (IsDevfeeBlock(pindexPrev -> nHeight + 1)) { // 1 more than pindexPrev pointer
-        return true;
-    }
-
     // Check if a block is already accepted. These blocks cannot be checked for masternode payments,
     // because we don't know, which masternodes is active at that moment of accepting this block,
     // so that why we can't verify if tx from this block was actually rewards the masternode and doesn't
@@ -4454,7 +4376,11 @@ bool CheckForMasternodePayment(const CTransaction& tx, const CBlockHeader& heade
     CAmount roundMnAward = 999999999;
 
     if (tx.IsCoinBase()) {
-        roundMnAward = (CAmount) (totalReward * 0.2f);
+        if (nHeight >= chainParams.StartDevfeeBlock()) {
+            roundMnAward = (CAmount) (totalReward * 0.25f);
+        } else {
+            roundMnAward = (CAmount) (totalReward * 0.2f);
+        }
     }
     else if (tx.vout.size() >= 3) {
 	roundMnAward = GetMasternodePosReward(nHeight, totalReward);
@@ -4732,10 +4658,10 @@ bool ContextualCheckBlock(const CBlock& block, CValidationState& state, CBlockIn
     }
 
     //Check for the devfee
-    if (IsDevfeeBlock(nHeight)) {
+    if (nHeight >= chainParams.StartDevfeeBlock()) {
         const CTransaction& txNew = block.IsProofOfStake() ? block.vtx[1] : block.vtx[0]; //0 is nonstandard for PoS
         CScript devfeePayee = Params().GetDevfeeScript();
-        CAmount devfeeAmount = GetDevfeeAward(nHeight);
+        CAmount devfeeAmount = block.IsProofOfStake() ? (GetProofOfStakeReward(0, nHeight) * 0.166) : (GetProofOfWorkReward(0, nHeight) * 0.125);
 
         bool bFound = false;
 
@@ -7244,7 +7170,7 @@ int ActiveProtocol()
 {
     const CChainParams& chainParams = Params();
     
-    if (chainActive.Height() < chainParams.StartDevfeeBlock()) {
+    if (chainActive.Height() < chainParams.StartDevfeeBlock() + 10) {
         
         return MIN_PEER_PROTO_VERSION_BEFORE_ENFORCEMENT;
     } else {

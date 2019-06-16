@@ -116,7 +116,6 @@ public:
 
     /** Devfee vars */
     int StartDevfeeBlock() const { return nStartDevfeeBlock; }
-    int DevfeeBlockStep() const { return nDevfeeBlockStep; }
 
 protected:
     CChainParams() {}
@@ -160,7 +159,6 @@ protected:
     int nPreminePaymentandHardForkBlock;
     uint64_t nPruneAfterHeight;
     int nStartDevfeeBlock;
-    int nDevfeeBlockStep;
 };
 
 /**

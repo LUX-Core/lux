@@ -1235,20 +1235,34 @@ bool Stake::CreateCoinStake(CWallet* wallet, const CKeyStore& keystore, unsigned
     bool hasMasternodePayment = SelectMasternodePayee(payeeScript);
     CAmount blockValue = nCredit;
     CAmount masternodePayment = GetMasternodePosReward(chainActive.Height() + 1, nReward);
-    CAmount devfeePayment = GetDevfeeAward(chainActive.Height() + 1);
+    CAmount devfeePayment = 0;
     CScript devfeePayee;
     devfeePayee = Params().GetDevfeeScript();
 
     if (hasMasternodePayment) {
         numout = txNew.vout.size();
-        txNew.vout.resize(numout + 1);
+        if (chainActive.Height() + 1 >= chainParams.StartDevfeeBlock()) {
+            txNew.vout.resize(numout + 2); //Append the devfee payment
+        } else {
+            txNew.vout.resize(numout + 1);
+        }
         txNew.vout[numout].scriptPubKey = payeeScript;
         txNew.vout[numout].nValue = masternodePayment;
+
+        if (chainActive.Height() + 1 >= chainParams.StartDevfeeBlock()) {
+            devfeePayment = blockValue * 0.166;
+            txNew.vout[numout + 1].scriptPubKey = devfeePayee;
+            txNew.vout[numout + 1].nValue = devfeePayment;
+        } else {
+            devfeePayment = 0;
+        }
 
         if (chainActive.Height() + 1 == chainParams.PreminePayment()) {
 
             blockValue = 0.8 * COIN;
-        
+        } else if (chainActive.Height() + 1 >= chainParams.StartDevfeeBlock()) {
+
+            blockValue -= masternodePayment + devfeePayment;
         } else {
 
             blockValue -= masternodePayment;
@@ -1271,14 +1285,6 @@ bool Stake::CreateCoinStake(CWallet* wallet, const CKeyStore& keystore, unsigned
         } else if (txNew.vout.size() == 2) { // only 1 stake output, was not split, no masternode payment
             txNew.vout[1].nValue = blockValue;
         }
-    }
-
-    //Devfee
-    if (IsDevfeeBlock(chainActive.Height() + 1)) {
-        unsigned int i = txNew.vout.size();
-        txNew.vout.resize(i + 1);
-        txNew.vout[i].scriptPubKey = devfeePayee;
-        txNew.vout[i].nValue = devfeePayment;
     }
 
     // Check vout values.
