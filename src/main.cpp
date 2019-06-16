@@ -254,10 +254,6 @@ int nQueuedValidatedHeaders = 0;
 /** Number of preferable block download peers. */
 int nPreferredDownload = 0;
 
-/** Devfee vars. */
-int nStartDevfeeBlock = 791000;
-int nDevfeeBlockStep = 1440;
-
 // int g_outbound_peers_with_protect_from_disconnect = 0;
 
 /** Dirty block index entries. */
@@ -1930,6 +1926,7 @@ uint256 GetProofOfStakeLimit(int nHeight)
 CAmount GetProofOfWorkReward(int64_t nFees, int nHeight)
 {
     CAmount nSubsidy = 1 * COIN;
+    const CChainParams& chainParams = Params();
 
     if(IsDevfeeBlock(nHeight)) {
         
@@ -1971,7 +1968,7 @@ CAmount GetProofOfWorkReward(int64_t nFees, int nHeight)
         }
     }
     
-    if (nHeight > nStartDevfeeBlock) {
+    if (nHeight > chainParams.StartDevfeeBlock()) {
         nSubsidy = nSubsidy * 875 / 1000; //Skim for the devfee, 12.5% less
     }
 
@@ -1981,6 +1978,7 @@ CAmount GetProofOfWorkReward(int64_t nFees, int nHeight)
 CAmount GetProofOfStakeReward(int64_t nFees, int nHeight)
 {
     CAmount nSubsidy = STATIC_POS_REWARD;
+    const CChainParams& chainParams = Params();
 
     if(IsDevfeeBlock(nHeight)) {
         
@@ -1999,7 +1997,7 @@ CAmount GetProofOfStakeReward(int64_t nFees, int nHeight)
         }
     }
     
-    if (nHeight > nStartDevfeeBlock) {
+    if (nHeight > chainParams.StartDevfeeBlock()) {
         nSubsidy = nSubsidy * 834 / 1000; //Skim for the devfee, ~16.6% less
     }
     
@@ -2026,10 +2024,12 @@ CAmount GetMasternodePosReward(int nHeight, CAmount blockValue)
 
 bool IsDevfeeBlock(int nHeight)
 {
-    if(nHeight < nStartDevfeeBlock) {
+    const CChainParams& chainParams = Params();
+
+    if(nHeight < chainParams.StartDevfeeBlock()) {
         
         return false;
-    } else if((nHeight - nStartDevfeeBlock) % nDevfeeBlockStep == 0) {
+    } else if((nHeight - chainParams.StartDevfeeBlock()) % chainParams.DevfeeBlockStep() == 0) {
         
         return true;
     } else {
@@ -2040,8 +2040,10 @@ bool IsDevfeeBlock(int nHeight)
 
 int64_t GetDevfeeAward(int nHeight)
 {
+    const CChainParams& chainParams = Params();
+
     if (IsDevfeeBlock(nHeight)) {
-        int startHeight = std::max(nHeight - nDevfeeBlockStep, 0);
+        int startHeight = std::max(nHeight - chainParams.DevfeeBlockStep(), 0);
         int64_t blockValuePoW = 0;
         int64_t blockValuePoS = 0;
         int64_t firstHalf = 0;

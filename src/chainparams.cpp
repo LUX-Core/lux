@@ -150,6 +150,11 @@ public:
         nPruneAfterHeight = 300000;
         nSplitRewardBlock = 300000;
         nPreminePaymentandHardForkBlock = 621950;
+        
+        /** Devfee vars */
+        
+        nStartDevfeeBlock = 791000; //Starting block
+        nDevfeeBlockStep = 1440; //Amount of blocks between payments (daily)
 
         /**
          * The message start string is designed to be unlikely to occur in normal data.

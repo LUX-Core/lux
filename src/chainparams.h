@@ -110,7 +110,13 @@ public:
     int SwitchPhi2Block() const { return nSwitchPhi2Block; }
     int64_t PruneAfterHeight() const { return nPruneAfterHeight; }
     int FirstSplitRewardBlock() const { return nSplitRewardBlock; }
+    
+    /** Height at which the premine payment happens */
     int PreminePayment() const { return nPreminePaymentandHardForkBlock; }
+
+    /** Devfee vars */
+    int StartDevfeeBlock() const { return nStartDevfeeBlock; }
+    int DevfeeBlockStep() const { return nDevfeeBlockStep; }
 
 protected:
     CChainParams() {}
@@ -153,6 +159,8 @@ protected:
     int nSplitRewardBlock;
     int nPreminePaymentandHardForkBlock;
     uint64_t nPruneAfterHeight;
+    int nStartDevfeeBlock;
+    int nDevfeeBlockStep;
 };
 
 /**
