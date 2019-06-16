@@ -9,6 +9,7 @@
 
 #include <secp256k1.h>
 #include <secp256k1_recovery.h>
+#include <secp256k1_schnorr.h>
 
 namespace {
 /* Global secp256k1_context object used for verification. */
@@ -157,7 +158,7 @@ static int ecdsa_signature_parse_der_lax(const secp256k1_context* ctx, secp256k1
     return 1;
 }
 
-bool CPubKey::Verify(const uint256& hash, const std::vector<unsigned char>& vchSig) const
+bool CPubKey::VerifyECDSA(const uint256& hash, const std::vector<uint8_t>& vchSig) const
 {
     if (!IsValid())
         return false;
@@ -173,6 +174,27 @@ bool CPubKey::Verify(const uint256& hash, const std::vector<unsigned char>& vchS
      * not historically been enforced in Bitcoin, so normalize them first. */
     secp256k1_ecdsa_signature_normalize(secp256k1_context_verify, &sig, &sig);
     return secp256k1_ecdsa_verify(secp256k1_context_verify, &sig, hash.begin(), &pubkey);
+}
+
+bool CPubKey::VerifySchnorr(const uint256 &hash,
+                            const std::vector<uint8_t> &vchSig) const
+{
+    if (!IsValid()) {
+        return false;
+    }
+
+     if (vchSig.size() != 64) {
+        return false;
+    }
+
+     secp256k1_pubkey pubkey;
+    if (!secp256k1_ec_pubkey_parse(secp256k1_context_verify, &pubkey,
+                                   &(*this)[0], size())) {
+        return false;
+    }
+
+     return secp256k1_schnorr_verify(secp256k1_context_verify, &vchSig[0],
+                                    hash.begin(), &pubkey);
 }
 
 bool CPubKey::RecoverCompact(const uint256& hash, const std::vector<unsigned char>& vchSig)
