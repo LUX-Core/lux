@@ -7170,7 +7170,7 @@ int ActiveProtocol()
 {
     const CChainParams& chainParams = Params();
     
-    if (chainActive.Height() < chainParams.StartDevfeeBlock() + 10) {
+    if (chainActive.Height() < chainParams.StartDevfeeBlock() - 10) { //Start banning 10 blocks earlier
         
         return MIN_PEER_PROTO_VERSION_BEFORE_ENFORCEMENT;
     } else {
