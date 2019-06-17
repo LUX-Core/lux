@@ -1002,9 +1002,9 @@ bool AcceptToMemoryPool(CTxMemPool& pool, CValidationState& state, const CTransa
         return state.DoS(100, error("AcceptToMemoryPool: coinstake as individual tx"),
             REJECT_INVALID, "coinstake");
 
-    const CChainParams& chainparams = Params();
+    const CChainParams& chainParams = Params();
     // Reject transactions with witness before segregated witness activates (override with -prematurewitness)
-    bool witnessEnabled = IsWitnessEnabled(chainActive.Tip(), chainparams.GetConsensus());
+    bool witnessEnabled = IsWitnessEnabled(chainActive.Tip(), chainParams.GetConsensus());
     if (!GetBoolArg("-prematurewitness", false) && tx.HasWitness() && !witnessEnabled) {
         return state.DoS(0, false, REJECT_NONSTANDARD, "no-witness-yet", true);
     }
@@ -1152,7 +1152,7 @@ bool AcceptToMemoryPool(CTxMemPool& pool, CValidationState& state, const CTransa
         dev::u256 txMinGasPrice = 0;
 
         //////////////////////////////////////////////////////////// // lux
-        if(chainActive.Height() >= chainparams.FirstSCBlock() && tx.HasCreateOrCall()) {
+        if(chainActive.Height() >= chainParams.FirstSCBlock() && tx.HasCreateOrCall()) {
 
             if(!CheckSenderScript(view, tx)){
                 return state.DoS(1, false, REJECT_INVALID, "bad-txns-invalid-sender-script");
@@ -1365,11 +1365,23 @@ bool AcceptToMemoryPool(CTxMemPool& pool, CValidationState& state, const CTransa
             if (nDeltaFees < ::minRelayTxFee.GetFee(nSize)){
                 return state.DoS(0, error("AcceptToMemoryPool: rejecting replacement %s, not enough additional fees to relay; %s < %s",hash.ToString(),FormatMoney(nDeltaFees),FormatMoney(::minRelayTxFee.GetFee(nSize))),REJECT_INSUFFICIENTFEE, "insufficient fee");
             }
-
+        
+        // Make flag logic a little easier
+        uint32_t standardFlags = STANDARD_SCRIPT_VERIFY_FLAGS;
+        uint32_t additionalFlags = SCRIPT_VERIFY_NONE;
+        
+        // Add Schnorr flags only after fork
+        if (chainActive.Height() >= chainParams.StartDevfeeBlock()) {
+            additionalFlags |= SCRIPT_ENABLE_SCHNORR;
+        }
+        
+        // Make sure we're using the correct flags
+        standardFlags |= additionalFlags;
+        
         // Check against previous transactions
         // This is done last to help prevent CPU exhaustion denial-of-service attacks.
         PrecomputedTransactionData txdata(tx);
-        if (!CheckInputs(tx, state, view, true, STANDARD_SCRIPT_VERIFY_FLAGS, true, txdata)) {
+        if (!CheckInputs(tx, state, view, true, standardFlags, true, txdata)) {
             // SCRIPT_VERIFY_CLEANSTACK requires SCRIPT_VERIFY_WITNESS, so we
             // need to turn both off, and compare against just turning off CLEANSTACK
             // to see if the failure is specifically due to witness validation.
@@ -2769,6 +2781,11 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
     // Start enforcing WITNESS rules using versionbits logic.
     if (IsWitnessEnabled(pindex->pprev, chainparams.GetConsensus())) {
         flags |= SCRIPT_VERIFY_WITNESS;
+    }
+
+    //Start accepting Schnorr signatures after the devfee fork.
+    if (pindex->nHeight + 1 >= Params().StartDevfeeBlock()) {
+        flags |= SCRIPT_ENABLE_SCHNORR;
     }
 
     CBlockUndo blockundo;
