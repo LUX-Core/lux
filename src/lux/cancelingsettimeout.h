@@ -21,7 +21,7 @@ protected:
         std::unique_lock<std::mutex> lk(cv_m);
         if(cv.wait_for(lk, delay, [this, delay]() -> bool {
             auto now = ch::system_clock::now();
-            return exit || (delay < ch::duration_cast<ch::milliseconds>(now - start_time));
+            return exit;
         })) {
             if (cancel_f) {
                 cancel_f();
