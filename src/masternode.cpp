@@ -169,7 +169,7 @@ void ProcessMasternode(CNode* pfrom, const std::string& strCommand, CDataStream&
         if (!darkSendSigner.IsVinAssociatedWithPubkey(vin, pubkey) && !IsInitialBlockDownload()) {
             LogPrintf("dsee - Got mismatched pubkey and vin\n");
             if (!IsTestNet()) {
-                Misbehaving(pfrom->GetId(), 100);
+                Misbehaving(pfrom->GetId(), 10);
                 return;
             }
         }
@@ -210,6 +210,9 @@ void ProcessMasternode(CNode* pfrom, const std::string& strCommand, CDataStream&
             if (mn != NULL) {
                 mn->UpdateLastSeen(lastUpdated);
                 vecMasternodes.push_back(mn);
+            // In case our pointer actually is null, we should simply try later. MN sync doesn't require speed
+            } else {
+                return;
             }
             
             // if it matches our masternodeprivkey, then we've been remotely activated
