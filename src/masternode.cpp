@@ -205,9 +205,13 @@ void ProcessMasternode(CNode* pfrom, const std::string& strCommand, CDataStream&
 
             // add our masternode
             CMasterNode* mn = new CMasterNode(addr, vin, pubkey, vchSig, sigTime, pubkey2, protocolVersion);
-            mn->UpdateLastSeen(lastUpdated);
-            vecMasternodes.push_back(mn);
-
+            
+            // Protect against leaking, special thanks to Tran for poiting this out
+            if (mn != NULL) {
+                mn->UpdateLastSeen(lastUpdated);
+                vecMasternodes.push_back(mn);
+            }
+            
             // if it matches our masternodeprivkey, then we've been remotely activated
             if (pubkey2 == activeMasternode.pubKeyMasternode && protocolVersion == PROTOCOL_VERSION) {
                 activeMasternode.EnableHotColdMasterNode(vin, addr);
