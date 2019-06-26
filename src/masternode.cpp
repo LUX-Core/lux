@@ -20,9 +20,7 @@ int CMasterNode::minProtoVersion = MIN_PROTO_VERSION;
 CCriticalSection cs_masternodes;
 
 /** The list of active masternodes */
-std::vector<CMasterNode*> vecMasternodes;
-std::vector <pair<int, CMasterNode*>> vecMasternodeScores;
-int vecMasternodeScoresCacheHeight; // system should be using the active chain tip instead of height here, but let's just roll with height.
+std::vector<CMasterNode> vecMasternodes;
 /** Object for who's going to get paid on which blocks */
 CMasternodePayments masternodePayments;
 // keep track of masternode votes I've seen
@@ -139,22 +137,22 @@ void ProcessMasternode(CNode* pfrom, const std::string& strCommand, CDataStream&
 
         //search existing masternode list, this is where we update existing masternodes with new dsee broadcasts
         //LOCK(cs_masternodes);
-        for (CMasterNode* mn : vecMasternodes) {
-            if (mn->vin.prevout == vin.prevout) {
+        for (CMasterNode& mn : vecMasternodes) {
+            if (mn.vin.prevout == vin.prevout) {
                 // count == -1 when it's a new entry
                 //   e.g. We don't want the entry relayed/time updated when we're syncing the list
-                // mn->pubkey = pubkey, IsVinAssociatedWithPubkey is validated once below,
+                // mn.pubkey = pubkey, IsVinAssociatedWithPubkey is validated once below,
                 //   after that they just need to match
-                if (count == -1 && mn->pubkey == pubkey && !mn->UpdatedWithin(MASTERNODE_MIN_DSEE_SECONDS)) {
-                    mn->UpdateLastSeen();
+                if (count == -1 && mn.pubkey == pubkey && !mn.UpdatedWithin(MASTERNODE_MIN_DSEE_SECONDS)) {
+                    mn.UpdateLastSeen();
 
-                    if (mn->now < sigTime) { //take the newest entry
+                    if (mn.now < sigTime) { //take the newest entry
                         LogPrintf("dsee - Got updated entry for %s\n", addr.ToString().c_str());
-                        mn->pubkey2 = pubkey2;
-                        mn->now = sigTime;
-                        mn->sig = vchSig;
-                        mn->protocolVersion = protocolVersion;
-                        mn->addr = addr;
+                        mn.pubkey2 = pubkey2;
+                        mn.now = sigTime;
+                        mn.sig = vchSig;
+                        mn.protocolVersion = protocolVersion;
+                        mn.addr = addr;
 
                         RelayDarkSendElectionEntry(vin, addr, vchSig, sigTime, pubkey, pubkey2, count, current, lastUpdated, protocolVersion);
                     }
@@ -204,17 +202,10 @@ void ProcessMasternode(CNode* pfrom, const std::string& strCommand, CDataStream&
             addrman.Add(CAddress(addr, NODE_NETWORK), pfrom->addr, 2 * 60 * 60);
 
             // add our masternode
-            CMasterNode* mn = new CMasterNode(addr, vin, pubkey, vchSig, sigTime, pubkey2, protocolVersion);
-            
-            // Protect against leaking, special thanks to Tran for poiting this out
-            if (mn != NULL) {
-                mn->UpdateLastSeen(lastUpdated);
-                vecMasternodes.push_back(mn);
-            // In case our pointer actually is null, we should simply try later. MN sync doesn't require speed
-            } else {
-                return;
-            }
-            
+            CMasterNode mn(addr, vin, pubkey, vchSig, sigTime, pubkey2, protocolVersion);
+            mn.UpdateLastSeen(lastUpdated);
+            vecMasternodes.push_back(mn);
+
             // if it matches our masternodeprivkey, then we've been remotely activated
             if (pubkey2 == activeMasternode.pubKeyMasternode && protocolVersion == PROTOCOL_VERSION) {
                 activeMasternode.EnableHotColdMasterNode(vin, addr);
@@ -261,26 +252,26 @@ void ProcessMasternode(CNode* pfrom, const std::string& strCommand, CDataStream&
 
         // see if we have this masternode
         LOCK(cs_masternodes);
-        for (CMasterNode* mn : vecMasternodes) {
-            if (mn->vin.prevout == vin.prevout) {
+        for (CMasterNode& mn : vecMasternodes) {
+            if (mn.vin.prevout == vin.prevout) {
                 // take this only if it's newer
-                if (mn->lastDseep < sigTime) {
-                    std::string strMessage = mn->addr.ToString() + boost::lexical_cast<std::string>(sigTime) + boost::lexical_cast<std::string>(stop);
+                if (mn.lastDseep < sigTime) {
+                    std::string strMessage = mn.addr.ToString() + boost::lexical_cast<std::string>(sigTime) + boost::lexical_cast<std::string>(stop);
 
                     std::string errorMessage = "";
-                    if (!darkSendSigner.VerifyMessage(mn->pubkey2, vchSig, strMessage, errorMessage)) {
+                    if (!darkSendSigner.VerifyMessage(mn.pubkey2, vchSig, strMessage, errorMessage)) {
                         LogPrintf("dseep - Got bad masternode address signature %s \n", vin.ToString().c_str());
                         //Misbehaving(pfrom->GetId(), 100);
                         return;
                     }
 
-                    mn->lastDseep = sigTime;
+                    mn.lastDseep = sigTime;
 
-                    if (!mn->UpdatedWithin(MASTERNODE_MIN_DSEEP_SECONDS)) {
-                        mn->UpdateLastSeen();
+                    if (!mn.UpdatedWithin(MASTERNODE_MIN_DSEEP_SECONDS)) {
+                        mn.UpdateLastSeen();
                         if (stop) {
-                            mn->Disable();
-                            mn->Check();
+                            mn.Disable();
+                            mn.Check();
                         }
                         RelayDarkSendElectionEntryPing(vin, vchSig, sigTime, stop);
                     }
@@ -338,18 +329,18 @@ void ProcessMasternode(CNode* pfrom, const std::string& strCommand, CDataStream&
         int count = vecMasternodes.size();
         int i = 0;
 
-        for (CMasterNode* mn : vecMasternodes) {
-            if (mn->addr.IsRFC1918()) continue; //local network
+        for (CMasterNode mn : vecMasternodes) {
+            if (mn.addr.IsRFC1918()) continue; //local network
 
             if (vin == CTxIn()) {
-                mn->Check();
-                if (mn->IsEnabled()) {
-                    if (fDebug) LogPrintf("dseg - Sending masternode entry - %s \n", mn->addr.ToString().c_str());
-                    pfrom->PushMessage("dsee", mn->vin, mn->addr, mn->sig, mn->now, mn->pubkey, mn->pubkey2, count, i, mn->lastTimeSeen, mn->protocolVersion);
+                mn.Check();
+                if (mn.IsEnabled()) {
+                    if (fDebug) LogPrintf("dseg - Sending masternode entry - %s \n", mn.addr.ToString().c_str());
+                    pfrom->PushMessage("dsee", mn.vin, mn.addr, mn.sig, mn.now, mn.pubkey, mn.pubkey2, count, i, mn.lastTimeSeen, mn.protocolVersion);
                 }
-            } else if (vin == mn->vin) {
-                if (fDebug) LogPrintf("dseg - Sending masternode entry - %s \n", mn->addr.ToString().c_str());
-                pfrom->PushMessage("dsee", mn->vin, mn->addr, mn->sig, mn->now, mn->pubkey, mn->pubkey2, count, i, mn->lastTimeSeen, mn->protocolVersion);
+            } else if (vin == mn.vin) {
+                if (fDebug) LogPrintf("dseg - Sending masternode entry - %s \n", mn.addr.ToString().c_str());
+                pfrom->PushMessage("dsee", mn.vin, mn.addr, mn.sig, mn.now, mn.pubkey, mn.pubkey2, count, i, mn.lastTimeSeen, mn.protocolVersion);
                 LogPrintf("dseg - Sent 1 masternode entries to %s\n", pfrom->addr.ToString().c_str());
                 return;
             }
@@ -430,23 +421,11 @@ struct CompareValueOnly2 {
     }
 };
 
-struct CompareScoreOnly
-{
-    CompareScoreOnly(int blockHeight) { this->blockHeight = blockHeight; }
-    bool operator()(const CMasterNode* t1,
-                    const CMasterNode* t2) const
-    {
-        return (t1->CalculateScore(1, blockHeight) > t2->CalculateScore(1, blockHeight));
-    }
-
-    int blockHeight;
-};
-
 int CountMasternodesAboveProtocol(int protocolVersion) {
     int i = 0;
     LOCK(cs_masternodes);
-    for (CMasterNode* mn : vecMasternodes) {
-        if (mn->protocolVersion < protocolVersion) continue;
+    for (CMasterNode& mn : vecMasternodes) {
+        if (mn.protocolVersion < protocolVersion) continue;
         i++;
     }
 
@@ -458,8 +437,8 @@ int CountMasternodesAboveProtocol(int protocolVersion) {
 int GetMasternodeByVin(CTxIn& vin) {
     int i = 0;
     LOCK(cs_masternodes);
-    for (CMasterNode* mn : vecMasternodes) {
-        if (mn->vin == vin) return i;
+    for (CMasterNode& mn : vecMasternodes) {
+        if (mn.vin == vin) return i;
         i++;
     }
 
@@ -472,16 +451,16 @@ int GetCurrentMasterNode(int mod, int64_t nBlockHeight, int minProtocol) {
     int winner = -1;
     //LOCK(cs_masternodes);
     // scan for winner
-    for (CMasterNode* mn : vecMasternodes) {
-        mn->Check();
-        if (mn->protocolVersion < minProtocol) continue;
-        if (!mn->IsEnabled()) {
+    for (CMasterNode mn : vecMasternodes) {
+        mn.Check();
+        if (mn.protocolVersion < minProtocol) continue;
+        if (!mn.IsEnabled()) {
             i++;
             continue;
         }
 
         // calculate the score for each masternode
-        uint256 n = mn->CalculateScore(mod, nBlockHeight);
+        uint256 n = mn.CalculateScore(mod, nBlockHeight);
         unsigned int n2 = 0;
         memcpy(&n2, &n, sizeof(n2));
 
@@ -495,72 +474,67 @@ int GetCurrentMasterNode(int mod, int64_t nBlockHeight, int minProtocol) {
     return winner;
 }
 
-void CalculateRanks(int nBlockHeight) {
-    if (vecMasternodeScores.size() && vecMasternodeScoresCacheHeight != nBlockHeight) {
-        vecMasternodeScoresCacheHeight = nBlockHeight;
-        vecMasternodeScores.clear();
+int GetMasternodeByRank(int findRank, int64_t nBlockHeight, int minProtocol) {
+    LOCK(cs_masternodes);
+    int i = 0;
 
-        // make a copy to work from as this might take more time than we want
-        std::vector<CMasterNode*> vecMasternodesCopy;
-        {
-            LOCK(cs_masternodes);
-            vecMasternodesCopy = vecMasternodes;
-            // sort the copy by score directly on the object
-            sort(vecMasternodesCopy.rbegin(), vecMasternodesCopy.rend(), CompareScoreOnly(nBlockHeight));
-            // loop the objects to give them rank numbers
-            int rank = 1;
-            for (CMasterNode* mn : vecMasternodesCopy) {
-                mn->rank = rank;
-                rank++;
-            }
+    std::vector <pair<unsigned int, int>> vecMasternodeScores;
 
-            // copy it back!
-            vecMasternodes = vecMasternodesCopy;
+    i = 0;
+    for (CMasterNode mn : vecMasternodes) {
+        mn.Check();
+        if (mn.protocolVersion < minProtocol) continue;
+        if (!mn.IsEnabled()) {
+            i++;
+            continue;
         }
 
-//        for (CMasterNode* mn : vecMasternodesCopy) {
-//            mn->Check();
-//            if (mn->protocolVersion < minProtocol) continue;
-//            if (!mn->IsEnabled()) {
-//                continue;
-//            }
-//
-//            uint256 n = mn->CalculateScore(1, nBlockHeight);
-//            unsigned int n2 = 0;
-//            memcpy(&n2, &n, sizeof(n2));
-//
-//            vecMasternodeScores.push_back(make_pair(n2, mn));
-//        }
-//
-//        sort(vecMasternodeScores.rbegin(), vecMasternodeScores.rend(), CompareScore());
-    }
-}
+        uint256 n = mn.CalculateScore(1, nBlockHeight);
+        unsigned int n2 = 0;
+        memcpy(&n2, &n, sizeof(n2));
 
-int GetMasternodeByRank(int findRank, int64_t nBlockHeight, int minProtocol) {
-    CalculateRanks(nBlockHeight);
-    int rank = 0;
-    // lock&copy masternodes for safety
-    std::vector<CMasterNode*> vecMasternodesCopy;
-    {
-        LOCK(cs_masternodes);
-        vecMasternodesCopy = vecMasternodes;
+        vecMasternodeScores.push_back(make_pair(n2, i));
+        i++;
     }
-    for (CMasterNode *mn : vecMasternodesCopy) {
+
+    sort(vecMasternodeScores.rbegin(), vecMasternodeScores.rend(), CompareValueOnly2());
+
+    int rank = 0;
+    for (PAIRTYPE(unsigned int, int) &s : vecMasternodeScores) {
         rank++;
-        if (mn->rank == findRank) return rank;
+        if (rank == findRank) return s.second;
     }
 
     return -1;
 }
 
 int GetMasternodeRank(CTxIn& vin, int64_t nBlockHeight, int minProtocol) {
-    CalculateRanks(nBlockHeight);
-    int rank = 0;
-    // lock masternodes for safety
-    LOCK(cs_masternodes);
-    for (CMasterNode* mn : vecMasternodes) {
+    //LOCK(cs_masternodes);
+    std::vector< pair<unsigned int, CTxIn> > vecMasternodeScores;
+
+    for (CMasterNode & mn : vecMasternodes) {
+        mn.Check();
+
+        if (mn.protocolVersion < minProtocol) continue;
+        if (!mn.IsEnabled()) {
+            continue;
+        }
+
+        uint256 n = mn.CalculateScore(1, nBlockHeight);
+        unsigned int n2 = 0;
+        memcpy(&n2, &n, sizeof(n2));
+
+        vecMasternodeScores.push_back(make_pair(n2, mn.vin));
+    }
+
+    sort(vecMasternodeScores.rbegin(), vecMasternodeScores.rend(), CompareValueOnly());
+
+    unsigned int rank = 0;
+    for (PAIRTYPE(unsigned int, CTxIn) &s : vecMasternodeScores) {
         rank++;
-        if (mn->vin == vin) return rank;
+        if (s.second == vin) {
+            return rank;
+        }
     }
 
     return -1;
@@ -611,7 +585,7 @@ bool GetBlockHash(uint256& hash, int nBlockHeight) {
 // the proof of work for that block. The further away they are the better, the furthest will win the election
 // and get paid this block
 //
-uint256 CMasterNode::CalculateScore(int mod, int64_t nBlockHeight) const {
+uint256 CMasterNode::CalculateScore(int mod, int64_t nBlockHeight) {
     const CChainParams& chainParams = Params();
 
     if (chainActive.Tip() == NULL) return 0;
@@ -677,14 +651,11 @@ uint256 CMasterNode::CalculateScore(int mod, int64_t nBlockHeight) const {
 void CMasterNode::Check(bool forceCheck) {
     if(!forceCheck && (GetTime() - lastTimeChecked < MASTERNODE_CHECK_SECONDS)) return;
     lastTimeChecked = GetTime();
+    //once spent, stop doing the checks
+    if (enabled == 3) return;
 
-    //once spent or timed out, stop doing the checks
     if (!UpdatedWithin(MASTERNODE_REMOVAL_SECONDS)) {
         enabled = 4;
-    }
-    if (enabled == 4 || enabled == 3) {
-        LogPrintf("Removing inactive masternode %s\n", addr.ToString().c_str());
-        delete this;
         return;
     }
 
@@ -855,22 +826,22 @@ bool CMasternodePayments::ProcessBlock(int nBlockHeight) {
     }
 
     std::random_shuffle(vecMasternodes.begin(), vecMasternodes.end());
-    for (CMasterNode* mn : vecMasternodes) {
+    for (CMasterNode& mn : vecMasternodes) {
         bool found = false;
         for (CTxIn & vin : vecLastPayments)
-        if (mn->vin == vin) found = true;
+        if (mn.vin == vin) found = true;
 
         if (found) continue;
 
-        mn->Check();
-        if (!mn->IsEnabled()) {
+        mn.Check();
+        if (!mn.IsEnabled()) {
             continue;
         }
 
         winner.score = 0;
         winner.nBlockHeight = nBlockHeight;
-        winner.vin = mn->vin;
-        winner.payee = GetScriptForDestination(mn->pubkey.GetID());
+        winner.vin = mn.vin;
+        winner.payee = GetScriptForDestination(mn.pubkey.GetID());
 
         break;
     }
@@ -879,8 +850,8 @@ bool CMasternodePayments::ProcessBlock(int nBlockHeight) {
     if (winner.nBlockHeight == 0 && vecMasternodes.size() > 0) {
         winner.score = 0;
         winner.nBlockHeight = nBlockHeight;
-        winner.vin = vecMasternodes[0]->vin;
-        winner.payee = GetScriptForDestination(vecMasternodes[0]->pubkey.GetID());
+        winner.vin = vecMasternodes[0].vin;
+        winner.payee = GetScriptForDestination(vecMasternodes[0].pubkey.GetID());
     }
 
     if (Sign(winner)) {
@@ -951,7 +922,7 @@ bool SelectMasternodePayee(CScript& payeeScript) {
         if (!masternodePayments.GetBlockPayee(chainActive.Height() + 1, payeeScript)) {
             int winningNode = GetCurrentMasterNode(1);
             if (winningNode >= 0) {
-                payeeScript = GetScriptForDestination(vecMasternodes[winningNode]->pubkey.GetID());
+                payeeScript = GetScriptForDestination(vecMasternodes[winningNode].pubkey.GetID());
                 result = true;
             } else {
                 LogPrintf("%s: Failed to detect masternode to pay\n", __func__);
@@ -959,9 +930,4 @@ bool SelectMasternodePayee(CScript& payeeScript) {
         }
     }
     return result;
-}
-
-CMasterNode::~CMasterNode()
-{
-
 }

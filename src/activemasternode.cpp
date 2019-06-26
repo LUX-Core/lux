@@ -187,11 +187,11 @@ bool CActiveMasternode::Dseep(CTxIn vin, CService service, CKey keyMasternode, C
 
     // Update Last Seen timestamp in masternode list
     bool found = false;
-    for (CMasterNode* mn : vecMasternodes) {
-        //LogPrintf(" -- %s\n", mn->vin.ToString().c_str());
-        if (mn->vin == vin) {
+    for (CMasterNode& mn : vecMasternodes) {
+        //LogPrintf(" -- %s\n", mn.vin.ToString().c_str());
+        if (mn.vin == vin) {
             found = true;
-            mn->UpdateLastSeen();
+            mn.UpdateLastSeen();
         }
     }
 
@@ -276,14 +276,14 @@ bool CActiveMasternode::Register(CTxIn vin, CService service, CKey keyCollateral
 
     bool found = false;
     LOCK(cs_masternodes);
-    for (CMasterNode* mn : vecMasternodes)
-        if (mn->vin == vin)
+    for (CMasterNode& mn : vecMasternodes)
+        if (mn.vin == vin)
             found = true;
 
     if (!found) {
         LogPrintf("CActiveMasternode::Register() - Adding to masternode list service: %s - vin: %s\n", service.ToString().c_str(), vin.ToString().c_str());
-        CMasterNode* mn = new CMasterNode(service, vin, pubKeyCollateralAddress, vchMasterNodeSignature, masterNodeSignatureTime, pubKeyMasternode, PROTOCOL_VERSION);
-        mn->UpdateLastSeen(masterNodeSignatureTime);
+        CMasterNode mn(service, vin, pubKeyCollateralAddress, vchMasterNodeSignature, masterNodeSignatureTime, pubKeyMasternode, PROTOCOL_VERSION);
+        mn.UpdateLastSeen(masterNodeSignatureTime);
         vecMasternodes.push_back(mn);
     }
 
