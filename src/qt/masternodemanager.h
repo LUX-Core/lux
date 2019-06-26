@@ -40,11 +40,10 @@ public:
     enum ColumnIndex {
         Address = 0,
         Rank = 1,
-        Protocol = 2,
-        Active = 3,
-        ActiveSecs = 4,
-        LastSeen = 5,
-        Pubkey = 6
+        Active = 2,
+        ActiveSecs = 3,
+        LastSeen = 4,
+        Pubkey = 5
     };
 
 public slots:
