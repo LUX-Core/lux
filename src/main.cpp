@@ -7121,7 +7121,8 @@ static bool ProcessMessage(CNode* pfrom, const string &strCommand, CDataStream& 
         if (!processed) ProcessInstantX(pfrom, strCommand, vRecv, processed);
         if (!processed) ProcessSpork(pfrom, strCommand, vRecv, processed);
 #ifdef ENABLE_LUXGATE
-        if (!processed) luxgate.ProcessMessage(pfrom, strCommand, vRecv, processed);
+        if (!processed && luxgate.MessageProcessingIsEnabled())
+            luxgate.ProcessMessage(pfrom, strCommand, vRecv, processed);
 #endif
 
 #       endif

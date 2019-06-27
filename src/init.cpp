@@ -587,6 +587,12 @@ std::string HelpMessage(HelpMessageMode mode)
     strUsage += HelpMessageOpt("-rpcsslprivatekeyfile=<file.pem>", strprintf(_("Server private key (default: %s)"), "server.pem"));
     strUsage += HelpMessageOpt("-rpcsslciphers=<ciphers>", strprintf(_("Acceptable ciphers (default: %s)"), "TLSv1.2+HIGH:TLSv1+HIGH:!SSLv2:!aNULL:!eNULL:!3DES:@STRENGTH"));
 
+#ifdef ENABLE_LUXGATE
+    strUsage += HelpMessageGroup(_("LuxGate options:"));
+    strUsage += HelpMessageOpt("-luxgate", strprintf(_("Enable LuxGate. (default: %u)"), DEFAULT_ENABLE_LUXGATE));
+    strUsage += HelpMessageOpt("-luxgaterelay", strprintf(_("Enable relaying LuxGate messages. (default 1 when -luxgate=1, otherwise %u)"), DEFAULT_ENABLE_LUXGATE_RELAY));
+#endif
+
     return strUsage;
 }
 
@@ -1159,8 +1165,18 @@ bool AppInit2()
     std::ostringstream strErrors;
 
 #ifdef ENABLE_LUXGATE
-    LogPrintf("Using LuxGate config file %s\n", luxgate.Context()->GetLuxGateConfigFile().string());
-    luxgate.InitializeFromConfig();
+    if (GetBoolArg("-luxgate", DEFAULT_ENABLE_LUXGATE)) {
+        if (!GetBoolArg("-txindex", DEFAULT_TXINDEX))
+            return InitError("You need to add txindex=1 to start LuxGate.");
+        LogPrintf("Using LuxGate config file %s\n", luxgate.Context()->GetLuxGateConfigFile().string());
+        luxgate.InitializeFromConfig();
+        luxgate.fEnabled = true;
+    }
+    if (luxgate.fEnabled || GetBoolArg("-luxgaterelay", DEFAULT_ENABLE_LUXGATE_RELAY)) {
+        luxgate.fRelayEnabled = true;
+        nLocalServices = ServiceFlags(nLocalServices | NODE_LUXGATE);
+        nRelevantServices = ServiceFlags(nRelevantServices | NODE_LUXGATE);
+    }
 #endif // ENABLE_LUXGATE
 
     InitSignatureCache();
