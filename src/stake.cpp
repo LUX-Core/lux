@@ -1271,18 +1271,27 @@ bool Stake::CreateCoinStake(CWallet* wallet, const CKeyStore& keystore, unsigned
         CTxDestination txDest;
         ExtractDestination(payeeScript, txDest);
         if (fDebug) LogPrintf("%s: Masternode payment to %s (pos)\n", __func__, EncodeDestination(txDest));
-        // Set output amount
-        if (txNew.vout.size() == 4) { // 2 stake outputs, stake was split, plus a masternode payment
-            txNew.vout[1].nValue = (blockValue / 2 / CENT) * CENT;
-            txNew.vout[2].nValue = blockValue - txNew.vout[1].nValue;
-        } else if (txNew.vout.size() == 3) { // only 1 stake output, was not split, plus a masternode payment
-            txNew.vout[1].nValue = blockValue;
+        // Set output amount, with space for the devfee
+        if (chainActive.Height() + 1 >= chainParams.StartDevfeeBlock()) {
+            if (txNew.vout.size() == 5) { // 2 stake outputs, stake was split, plus a masternode payment and a devfee payment
+                txNew.vout[1].nValue = (blockValue / 2 / CENT) * CENT;
+                txNew.vout[2].nValue = blockValue - txNew.vout[1].nValue;
+            } else if (txNew.vout.size() == 4) { // only 1 stake output, was not split, plus a masternode payment and a devfee payment
+                txNew.vout[1].nValue = blockValue;
+            }
+        } else {
+            if (txNew.vout.size() == 4) { // 2 stake outputs, stake was split, plus a masternode payment, no devfee payment yet
+                txNew.vout[1].nValue = (blockValue / 2 / CENT) * CENT;
+                txNew.vout[2].nValue = blockValue - txNew.vout[1].nValue;
+            } else if (txNew.vout.size() == 3) { // only 1 stake output, was not split, plus a masternode payment, no devfee payment yet
+                txNew.vout[1].nValue = blockValue;
+            }
         }
     } else {
-        if (txNew.vout.size() == 3) { // 2 stake outputs, stake was split, no masternode payment
+        if (txNew.vout.size() == 3) { // 2 stake outputs, stake was split, no masternode payment, no devfee payment yet
             txNew.vout[1].nValue = (blockValue / 2 / CENT) * CENT;
             txNew.vout[2].nValue = blockValue - txNew.vout[1].nValue;
-        } else if (txNew.vout.size() == 2) { // only 1 stake output, was not split, no masternode payment
+        } else if (txNew.vout.size() == 2) { // only 1 stake output, was not split, no masternode payment, no devfee payment yet
             txNew.vout[1].nValue = blockValue;
         }
     }
