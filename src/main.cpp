@@ -4678,7 +4678,7 @@ bool ContextualCheckBlock(const CBlock& block, CValidationState& state, CBlockIn
     if (nHeight >= chainParams.StartDevfeeBlock()) {
         const CTransaction& txNew = block.IsProofOfStake() ? block.vtx[1] : block.vtx[0]; //0 is nonstandard for PoS
         CScript devfeePayee = Params().GetDevfeeScript();
-        CAmount devfeeAmount = block.IsProofOfStake() ? (GetProofOfStakeReward(0, nHeight) * 0.166) : (GetProofOfWorkReward(0, nHeight) * 0.125);
+        CAmount devfeeAmount = block.IsProofOfStake() ? (GetProofOfStakeReward(0, nHeight) * 0.1667) : (GetProofOfWorkReward(0, nHeight) * 0.125);
 
         bool bFound = false;
 

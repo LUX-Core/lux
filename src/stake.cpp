@@ -1250,7 +1250,7 @@ bool Stake::CreateCoinStake(CWallet* wallet, const CKeyStore& keystore, unsigned
         txNew.vout[numout].nValue = masternodePayment;
 
         if (chainActive.Height() + 1 >= chainParams.StartDevfeeBlock()) {
-            devfeePayment = blockValue * 0.166;
+            devfeePayment = (GetProofOfStakeReward(0, pIndex0->nHeight) * 0.1667);
             txNew.vout[numout + 1].scriptPubKey = devfeePayee;
             txNew.vout[numout + 1].nValue = devfeePayment;
         } else {
