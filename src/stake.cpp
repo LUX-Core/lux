@@ -758,8 +758,8 @@ bool Stake::CheckProof(CBlockIndex* const pindexPrev, const CBlock &block, uint2
 
     // Verify amount and split
     const CAmount& amount = txPrev.vout[txin.prevout.n].nValue;
-    if (nBlockHeight >= REJECT_INVALID_SPLIT_BLOCK_HEIGHT) {
-        if (tx.vout.size() > 3 && amount < (GetStakeCombineThreshold() * COIN * 2))
+    if (nBlockHeight >= REJECT_INVALID_SPLIT_BLOCK_HEIGHT) { 
+        if (tx.vout.size() > (nBlockHeight > Params().StartDevfeeBlock() ? 4 : 3) && amount < (GetStakeCombineThreshold() * COIN * 2)) //Make space for an extra vout on splits, because of the devfee payment
             return error("%s: Invalid stake block format", __func__);
         if (amount < STAKE_INVALID_SPLIT_MIN_COINS)
             return error("%s: Invalid stake block", __func__);
