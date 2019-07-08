@@ -153,7 +153,7 @@ public:
         
         /** Devfee vars */
         
-        nStartDevfeeBlock = 791000; //Starting block
+        nStartDevfeeBlock = 810200; //Starting block
 
         /**
          * The message start string is designed to be unlikely to occur in normal data.
