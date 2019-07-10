@@ -74,6 +74,11 @@ static const bool DEFAULT_ZERO_BALANCE_ADDRESS_TOKEN = true;
 
 static const bool DEFAULT_NOT_USE_CHANGE_ADDRESS = true;
 
+//! Easy autotools switching for this bool value
+#ifdef ENABLE_CHANGE_ADDRESSES_DEFAULT
+DEFAULT_NOT_USE_CHANGE_ADDRESS = false;
+#endif
+
 //! if set, all keys will be derived by using BIP32
 static const bool DEFAULT_USE_HD_WALLET = false;
 

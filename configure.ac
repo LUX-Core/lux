@@ -250,6 +250,13 @@ if test "x$enable_debug_xdump" = xyes; then
     fi
 fi
 
+# Enable change addresses by default
+AC_ARG_ENABLE([change-addresses-default],
+  [AS_HELP_STRING([--enable-change-addresses-default],
+  [enable change addresses (default is no)])],
+  [enable_change_addresses_default=$enableval],
+  [enable_change_addresses_default=no])
+
 # Check for optional instruction set support. Enabling these does _not_ imply that all code will
 # be compiled with them, rather that specific objects/libs may use them after checking for runtime
 # compatibility.
@@ -1123,6 +1130,16 @@ else
   fi
 fi
 
+dnl change addresses by default
+AC_MSG_CHECKING([if change addresses by default should be enabled])
+if test x$change_addresses_default != xno; then
+  AC_MSG_RESULT(yes)
+  AC_DEFINE_UNQUOTED([ENABLE_CHANGE_ADDRESSES_DEFAULT],[1],[Define to 1 to enable change addresses by default])
+
+else
+  AC_MSG_RESULT(no)
+fi
+
 dnl these are only used when qt is enabled
 if test x$bitcoin_enable_qt != xno; then
   BUILD_QT=qt
@@ -1201,6 +1218,7 @@ AM_CONDITIONAL([GLIBC_BACK_COMPAT],[test x$use_glibc_compat = xyes])
 AM_CONDITIONAL([ENABLE_HWCRC32],[test x$enable_hwcrc32 = xyes])
 AM_CONDITIONAL([USE_LIBSECP256K1],[test x$use_libsecp256k1 = xyes])
 AM_CONDITIONAL([USE_ASM],[test x$use_asm = xyes])
+AM_CONDITIONAL([ENABLE_CHANGE_ADDRESSES_DEFAULT],[test x$enable_change_addresses_default = xyes])
 
 AC_DEFINE(CLIENT_VERSION_MAJOR, _CLIENT_VERSION_MAJOR, [Major version])
 AC_DEFINE(CLIENT_VERSION_MINOR, _CLIENT_VERSION_MINOR, [Minor version])
@@ -1300,30 +1318,29 @@ esac
 
 echo
 echo "Options used to compile and link:"
-echo "  with wallet          = $enable_wallet"
-echo "  with auto-update     = $enable_updater"
-echo "  with gui / qt        = $bitcoin_enable_qt"
+echo "  with wallet           = $enable_wallet"
+echo "  with auto-update      = $enable_updater"
+echo "  with gui / qt         = $bitcoin_enable_qt"
+echo "  with change addresses = $enable_change_addresses_default"
 if test x$bitcoin_enable_qt != xno; then
-echo "  qt version           = $bitcoin_qt_got_major_vers"
-echo "  with qr              = $use_qr"
+echo "  qt version            = $bitcoin_qt_got_major_vers"
+echo "  with qr               = $use_qr"
 fi
-echo "  with zmq             = $use_zmq"
-echo "  with test            = $use_tests"
-echo "  with bench           = $use_bench"
-echo "  with upnp            = $use_upnp"
-echo "  use asm              = $use_asm"
-echo "  use hardware CRC32   = $enable_hwcrc32"
-echo "  debug enabled        = $enable_debug"
-echo "  werror               = $enable_werror"
+echo "  with zmq              = $use_zmq"
+echo "  with test             = $use_tests"
+echo "  with upnp             = $use_upnp"
+echo "  use asm               = $use_asm"
+echo "  use hardware CRC32    = $enable_hwcrc32"
+echo "  debug enabled         = $enable_debug"
 echo
-echo "  target os            = $TARGET_OS"
-echo "  build os             = $BUILD_OS"
+echo "  target os             = $TARGET_OS"
+echo "  build os              = $BUILD_OS"
 echo
-echo "  CC                   = $CC"
-echo "  CFLAGS               = $CFLAGS"
-echo "  CPPFLAGS             = $CPPFLAGS"
-echo "  CXX                  = $CXX"
-echo "  CXXFLAGS             = $CXXFLAGS"
-echo "  LDFLAGS              = $LDFLAGS"
-echo "  ARFLAGS              = $ARFLAGS"
+echo "  CC                    = $CC"
+echo "  CFLAGS                = $CFLAGS"
+echo "  CPPFLAGS              = $CPPFLAGS"
+echo "  CXX                   = $CXX"
+echo "  CXXFLAGS              = $CXXFLAGS"
+echo "  LDFLAGS               = $LDFLAGS"
+echo "  ARFLAGS               = $ARFLAGS"
 echo
