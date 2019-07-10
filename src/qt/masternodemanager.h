@@ -48,7 +48,8 @@ private:
     Ui::MasternodeManager *ui;
     ClientModel *clientModel;
     WalletModel *walletModel;
-    CCriticalSection cs_adrenaline;
+    CCriticalSection cs_lux;
+    QString strCurrentFilter;
     int64_t nTimeFilterUpdated;
     bool fFilterUpdated;
     QFuture<void> f1;
@@ -61,12 +62,14 @@ private slots:
     void on_createButton_clicked();
     void on_editButton_clicked();
     void on_getConfigButton_clicked();
+    void on_filterLineEdit_textChanged(const QString& strFilterIn);
     void on_startButton_clicked();
     void on_stopButton_clicked();
     void on_startAllButton_clicked();
     void on_stopAllButton_clicked();
     void on_removeButton_clicked();
     void on_tableWidget_2_itemSelectionChanged();
+    void wait();
 };
 
 #endif // MASTERNODEMANAGER_H

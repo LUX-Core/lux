@@ -1,6 +1,6 @@
 #FROM debian:stretch
 FROM ubuntu:18.04
-LABEL maintainer="The Luxcore Developers <216k155@luxcore.io>"
+LABEL maintainer="The Luxcore Developers <giaki3003@luxcore.io>"
 LABEL description="Dockerised Luxcore, built from Travis"
 
 RUN apt-get update && apt-get install -y software-properties-common unzip

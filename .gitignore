@@ -130,3 +130,6 @@ depends/i686-w64-mingw32/
 depends/x86_64-w64-mingw32/
 
 /src/DEBUG_DUMP_STAKING_INFO.hpp
+depends/built
+depends/sources
+depends/x86_*

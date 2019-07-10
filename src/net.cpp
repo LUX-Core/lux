@@ -620,6 +620,8 @@ bool CNode::Unban(const CSubNet &subNet)
 void CNode::GetBanned(banmap_t &banMap)
 {
     LOCK(cs_setBanned);
+    // Sweep the banlist so expired bans are not returned
+    SweepBanned();
     banMap = setBanned; //create a thread safe copy
 }
 

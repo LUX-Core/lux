@@ -20,7 +20,7 @@ packages:
 - "python"
 reference_datetime: "2015-06-01 00:00:00"
 remotes:
-- "url": "https://github.com/216k155/lux.git"
+- "url": "https://github.com/LUX-Core/lux.git"
   "dir": "lux"
 files:
 - "raspberrypi-tools.tar.gz"

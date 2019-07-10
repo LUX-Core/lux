@@ -3481,6 +3481,17 @@
     <message>
         <location line="+13"/>
         <location filename="../forms/ui_masternodemanager.h" line="+1"/>
+        <source>Filter List:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Filter masternode list</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+13"/>
+        <location filename="../forms/ui_masternodemanager.h" line="+1"/>
         <source>Masternodes Activated:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3573,6 +3584,16 @@
         <location filename="../forms/ui_masternodemanager.h" line="+1"/>
         <source>&amp;Stop All</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../masternodemanager.cpp" line="+180"/>
+        <source>yes</source>
+        <translation type="unfinished">yes</translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>no</source>
+        <translation type="unfinished">no</translation>
     </message>
 </context>
 <context>
