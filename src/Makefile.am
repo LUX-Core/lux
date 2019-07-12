@@ -410,6 +410,7 @@ libbitcoin_common_a_SOURCES = \
   keystore.cpp \
   netbase.cpp \
   protocol.cpp \
+  secp256k1/include/secp256k1.h \
   pubkey.cpp \
   scheduler.cpp \
   script/interpreter.cpp \
