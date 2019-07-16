@@ -1840,6 +1840,8 @@ UniValue listsinceblock(const UniValue& params, bool fHelp)
 
     CBlockIndex* pindex = NULL;
     int target_confirms = 1;
+    int64_t since_btime = 0;
+    int min_depth = 0;
     isminefilter filter = ISMINE_SPENDABLE;
 
     if (params.size() > 0) {
@@ -1851,9 +1853,9 @@ UniValue listsinceblock(const UniValue& params, bool fHelp)
 
     if (params.size() > 1) {
         target_confirms = params[1].get_int();
-
         if (target_confirms < 1)
             throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter");
+        min_depth = target_confirms;
     }
 
     if (params.size() > 2)
@@ -1861,14 +1863,17 @@ UniValue listsinceblock(const UniValue& params, bool fHelp)
             filter = filter | ISMINE_WATCH_ONLY;
 
     int depth = pindex ? (1 + chainActive.Height() - pindex->nHeight) : -1;
+    if (pindex)
+        since_btime = pindex->nTime;
 
     UniValue transactions(UniValue::VARR);
 
     for (map<uint256, CWalletTx>::iterator it = pwalletMain->mapWallet.begin(); it != pwalletMain->mapWallet.end(); it++) {
         CWalletTx tx = (*it).second;
-
+        if (since_btime && tx.GetTxTime() < since_btime && tx.GetTxTime())
+            continue;
         if (depth == -1 || tx.GetDepthInMainChain(false) < depth)
-            ListTransactions(tx, "*", 0, true, transactions, filter);
+            ListTransactions(tx, "*", min_depth, true, transactions, filter);
     }
 
     CBlockIndex* pblockLast = chainActive[chainActive.Height() + 1 - target_confirms];

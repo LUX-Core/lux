@@ -1,5 +1,5 @@
 Luxcore
-=====================
+=============
 
 Intro
 -----
@@ -13,7 +13,11 @@ Setup
 -----
 Unpack the files into a directory and run lux-qt.exe.
 
-Luxcore is the original LUX client and it builds the backbone of the network.
-However, it downloads and stores the entire history of LUX transactions;
+Luxcore is the original Lux client and it builds the backbone of the network.
+However, it downloads and stores the entire history of lux transactions;
 depending on the speed of your computer and network connection, the synchronization
 process can take anywhere from a few hours to a day or more.
+
+See the lux docs at:
+  https://docs.luxcore.io/
+for more help and information.

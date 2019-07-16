@@ -110,9 +110,6 @@ TokenTransactionView::TokenTransactionView(QWidget *parent) :
 
     view->installEventFilter(this);
     tokenView = view;
-    tokenView->setProperty("defaultQSS", true);
-    tokenView->style()->unpolish(tokenView);
-    tokenView->style()->polish(tokenView);
 
     // Actions
     QAction *copyAddressAction = new QAction(tr("Copy address"), this);

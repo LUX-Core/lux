@@ -344,7 +344,6 @@ crypto_libbitcoin_crypto_a_SOURCES = \
   cpp-ethereum/utils/libscrypt/b64.h \
   cpp-ethereum/utils/libscrypt/crypto-mcf.c \
   cpp-ethereum/utils/libscrypt/crypto_scrypt-check.c \
-  cpp-ethereum/utils/libscrypt/crypto_scrypt-hash.c \
   cpp-ethereum/utils/libscrypt/crypto_scrypt-hexconvert.c \
   cpp-ethereum/utils/libscrypt/crypto_scrypt-hexconvert.h \
   cpp-ethereum/utils/libscrypt/crypto_scrypt-nosse.c \
@@ -430,6 +429,10 @@ libbitcoin_common_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES) -DLUX_BUILD
 libbitcoin_common_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 libbitcoin_common_a_CFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS) -std=c99
 libbitcoin_common_a_SOURCES = \
+  secp256k1/include/secp256k1.h \
+  secp256k1/include/secp256k1_ecdh.h \
+  secp256k1/include/secp256k1_recovery.h \
+  secp256k1/include/secp256k1_schnorr.h \
   allocators.cpp \
   amount.cpp \
   base58.cpp \

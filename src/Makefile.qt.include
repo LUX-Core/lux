@@ -608,7 +608,6 @@ RES_IMAGES = \
   qt/res/images/rightArrow_small.png \
   qt/res/images/qtreeview_selected.png \
   qt/res/images/walletFrame.png \
-  qt/res/images/walletFrame_bg.png \
   qt/res/images/walletFrame_bg.png
 
 RES_CSS = \

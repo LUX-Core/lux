@@ -128,7 +128,7 @@ int64_t UpdateTime(CBlockHeader* pblock, const Consensus::Params& consensusParam
 }
 
 BlockAssembler::BlockAssembler(const CChainParams& _chainparams)
-        : chainparams(_chainparams)
+        : chainParams(_chainparams)
 {
     // Block resource limits
     // If neither -blockmaxsize or -blockmaxweight is given, limit to DEFAULT_BLOCK_MAX_*
@@ -190,31 +190,46 @@ void BlockAssembler::RebuildRefundTransaction()
         CMutableTransaction contrTx(originalRewardTx);
         CAmount powReward = GetProofOfWorkReward(0, nHeight);
         CAmount totalReward = powReward + nFees;
+        CAmount devfeePayment = 0;
         CAmount minerReward = 0;
         CAmount mnReward = 0;
         CScript mnPayee;
+        CScript devfeePayee;
+        devfeePayee = Params().GetDevfeeScript();
 
-        if (nHeight >= chainparams.FirstSplitRewardBlock() && SelectMasternodePayee(mnPayee)) {
-            contrTx.vout.resize(2);
-            // set masternode payee and 20% reward, or mint
-            if (nHeight == chainparams.PreminePayment()) {
+        if (nHeight >= chainParams.FirstSplitRewardBlock() && SelectMasternodePayee(mnPayee)) {
+            if (nHeight >= chainParams.StartDevfeeBlock()) {
+                contrTx.vout.resize(3);
+            } else { 
+                contrTx.vout.resize(2);
+            }
+            // set masternode payee and 20%/25% reward, or mint
+            if (nHeight == chainParams.PreminePayment()) {
                 mnReward = powReward * 25000;
+            } else if (nHeight >= chainParams.StartDevfeeBlock() && nHeight < 6000000) {
+                mnReward = powReward * 0.25;
             } else {
                 mnReward = powReward * 0.2;
             }
 
             contrTx.vout[1].scriptPubKey = mnPayee;
             contrTx.vout[1].nValue = mnReward;
+            
+            //set the devfee payment
+            if (nHeight >= chainParams.StartDevfeeBlock()) {
+                devfeePayment = powReward * 0.125;
 
-            //CTxDestination txDest;
-            //ExtractDestination(mnPayee, txDest);
-            //LogPrintf("%s: Masternode payment to %s (pow)\n", __func__, EncodeDestination(txDest));
+                contrTx.vout[2].scriptPubKey = devfeePayee;
+                contrTx.vout[2].nValue = devfeePayment;
+            
+            } else {
+                devfeePayment = 0;
+            }
 
-            // miner's reward is everything that left
-            if (nHeight == chainparams.PreminePayment()) {
+            if (nHeight == chainParams.PreminePayment()) {
                 minerReward = powReward * 0.8;
             } else {
-                minerReward = totalReward - mnReward;
+                minerReward = totalReward - mnReward - devfeePayment;
             }
         } else {
             minerReward = totalReward;
@@ -222,7 +237,7 @@ void BlockAssembler::RebuildRefundTransaction()
         minerReward -= bceResult.refundSender;
         contrTx.vout[0].nValue = minerReward;
 
-        int i=contrTx.vout.size();
+        signed int i = contrTx.vout.size();
         contrTx.vout.resize(contrTx.vout.size()+bceResult.refundOutputs.size());
         for(CTxOut& vout : bceResult.refundOutputs){
             contrTx.vout[i]=vout;
@@ -268,17 +283,17 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
     pblocktemplate->vTxFees.push_back(-1); // updated at end
     pblocktemplate->vTxSigOpsCost.push_back(-1); // updated at end
 
-    //LOCK2(cs_main, mempool.cs);
+    LOCK2(cs_main, mempool.cs);
     LOCK(cs_main);
     CBlockIndex* pindexPrev = chainActive.Tip();
     if (!pindexPrev) return nullptr;
 
     nHeight = pindexPrev->nHeight + 1;
 
-    pblock->nVersion = ComputeBlockVersion(pindexPrev, chainparams.GetConsensus());
+    pblock->nVersion = ComputeBlockVersion(pindexPrev, chainParams.GetConsensus());
     // -regtest only: allow overriding block.nVersion with
     // -blockversion=N to test forking scenarios
-    if (chainparams.MineBlocksOnDemand())
+    if (chainParams.MineBlocksOnDemand())
         pblock->nVersion = GetArg("-blockversion", pblock->nVersion);
 
     if(txProofTime == 0) {
@@ -287,8 +302,8 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
 
     pblock->nTime = txProofTime;
     if (!fProofOfStake)
-        UpdateTime(pblock, chainparams.GetConsensus(), pindexPrev, fProofOfStake);
-    pblock->nBits = GetNextWorkRequired(pindexPrev, pblock, chainparams.GetConsensus(),fProofOfStake);
+        UpdateTime(pblock, chainParams.GetConsensus(), pindexPrev, fProofOfStake);
+    pblock->nBits = GetNextWorkRequired(pindexPrev, pblock, chainParams.GetConsensus(),fProofOfStake);
     const int64_t nMedianTimePast = pindexPrev->GetMedianTimePast();
 
     nLockTimeCutoff = (STANDARD_LOCKTIME_VERIFY_FLAGS & LOCKTIME_MEDIAN_TIME_PAST)
@@ -312,7 +327,7 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
     // -promiscuousmempoolflags is used.
     // TODO: replace this with a call to main to assess validity of a mempool
     // transaction (which in most cases can be a no-op).
-    fIncludeWitness = IsWitnessEnabled(pindexPrev, chainparams.GetConsensus()) && fMineWitnessTx;
+    fIncludeWitness = IsWitnessEnabled(pindexPrev, chainParams.GetConsensus()) && fMineWitnessTx;
     if (fProofOfStake){
         // Height first in coinbase required for block.version=2
         coinbaseTx.vin[0].scriptSig = (CScript() << nHeight) + COINBASE_FLAGS;
@@ -321,15 +336,24 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
     } else {
         CAmount powReward = GetProofOfWorkReward(0, nHeight);
         CAmount totalReward = powReward + nFees;
+        CAmount devfeePayment = 0;
         CAmount minerReward = 0;
         CAmount mnReward = 0;
         CScript mnPayee;
+        CScript devfeePayee;
+        devfeePayee = Params().GetDevfeeScript();
 
-        if (nHeight >= chainparams.FirstSplitRewardBlock() && SelectMasternodePayee(mnPayee)) {
-            coinbaseTx.vout.resize(2);
-            // set masternode 20% reward, or mint the 250k for the team MN
-            if (nHeight == chainparams.PreminePayment()) {
+        if (nHeight >= chainParams.FirstSplitRewardBlock() && SelectMasternodePayee(mnPayee)) {
+            if (nHeight >= chainParams.StartDevfeeBlock()) {
+                coinbaseTx.vout.resize(3);
+            } else {
+                coinbaseTx.vout.resize(2);
+            }
+            // set masternode payee and 20%/25% reward, or mint
+            if (nHeight == chainParams.PreminePayment()) {
                 mnReward = powReward * 25000;
+            } else if (nHeight >= chainParams.StartDevfeeBlock() && nHeight < 6000000) {
+                mnReward = powReward * 0.25;
             } else {
                 mnReward = powReward * 0.2;
             }
@@ -340,11 +364,24 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
             CTxDestination txDest;
             ExtractDestination(mnPayee, txDest);
             LogPrintf("%s: Masternode payment to %s (pow)\n", __func__, EncodeDestination(txDest));
+            LogPrintf("Masternode reward %s\n", mnReward);
+            
+            //set the devfee payment
+            if (nHeight >= chainParams.StartDevfeeBlock()) {
+                devfeePayment = powReward * 0.125;
+
+                coinbaseTx.vout[2].scriptPubKey = devfeePayee;
+                coinbaseTx.vout[2].nValue = devfeePayment;
+            
+            } else {
+                devfeePayment = 0;
+            }
+
             // miner's reward is everything that is left
-            if (nHeight == chainparams.PreminePayment()) {
+            if (nHeight == chainParams.PreminePayment()) {
                 minerReward = powReward * 0.8;
             } else {
-                minerReward = totalReward - mnReward;
+                minerReward = totalReward - mnReward - devfeePayment;
             }
         } else {
             minerReward = totalReward;
@@ -390,7 +427,7 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
     addPriorityTxs(minGasPrice, fProofOfStake);
     addPackageTxs(minGasPrice, fProofOfStake);
 
-    if (chainActive.Height() + (generateSCFix ? 1 : 0) >= chainparams.FirstSCBlock()) {
+    if (chainActive.Height() + (generateSCFix ? 1 : 0) >= chainParams.FirstSCBlock()) {
         pblock->hashStateRoot = h256Touint(getGlobalStateRoot(pindexState));
         pblock->hashUTXORoot = h256Touint(getGlobalStateUTXO(pindexState));
 
@@ -410,7 +447,7 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
     }
     ////////////////////////////////////////////////////////
 
-    pblocktemplate->vchCoinbaseCommitment = GenerateCoinbaseCommitment(*pblock, pindexPrev, chainparams.GetConsensus(), fProofOfStake);
+    pblocktemplate->vchCoinbaseCommitment = GenerateCoinbaseCommitment(*pblock, pindexPrev, chainParams.GetConsensus(), fProofOfStake);
     pblocktemplate->vTxFees[0] = -nFees;
 
     uint64_t nSerializeSize = GetSerializeSize(*pblock, SER_NETWORK, PROTOCOL_VERSION);
@@ -426,7 +463,7 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
     pblocktemplate->vTxSigOpsCost[0] = WITNESS_SCALE_FACTOR * GetLegacySigOpCount(pblock->vtx[0]);
 
     CValidationState state;
-    if (!TestBlockValidity(state, chainparams, *pblock, pindexPrev, false, false)) {
+    if (!TestBlockValidity(state, chainParams, *pblock, pindexPrev, false, false)) {
         if (!fProofOfStake) LogPrintf("%s: TestBlockValidity failed \n", __func__);
         return nullptr;
     }
@@ -1093,9 +1130,9 @@ bool ProcessBlockFound(CBlock* pblock, CWallet& wallet)
     LogPrintf("generated %s\n", FormatMoney(generated));
 
     // Process this block the same as if we had received it from another node
-    const CChainParams& chainparams = Params();
+    const CChainParams& chainParams = Params();
     CValidationState state;
-    if (!ProcessNewBlock(state, chainparams, NULL, pblock)) {
+    if (!ProcessNewBlock(state, chainParams, NULL, pblock)) {
         return error("LUXMiner : ProcessNewBlock, block not accepted");
     }
 

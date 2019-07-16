@@ -167,7 +167,7 @@ void ProcessMasternode(CNode* pfrom, const std::string& strCommand, CDataStream&
         if (!darkSendSigner.IsVinAssociatedWithPubkey(vin, pubkey) && !IsInitialBlockDownload()) {
             LogPrintf("dsee - Got mismatched pubkey and vin\n");
             if (!IsTestNet()) {
-                Misbehaving(pfrom->GetId(), 100);
+                Misbehaving(pfrom->GetId(), 10);
                 return;
             }
         }

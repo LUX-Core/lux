@@ -144,9 +144,6 @@ TransactionView::TransactionView(const PlatformStyle *platformStyle, QWidget* pa
     view->installEventFilter(this);
 
     transactionView = view;
-    transactionView->setProperty("defaultQSS", true);
-    transactionView->style()->unpolish(transactionView);
-    transactionView->style()->polish(transactionView);
 
     // Actions
     abandonAction = new QAction(tr("Abandon transaction"), this);

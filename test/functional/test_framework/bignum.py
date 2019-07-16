@@ -6,7 +6,6 @@
 
 This file is copied from python-luxlib.
 """
-
 import struct
 
 

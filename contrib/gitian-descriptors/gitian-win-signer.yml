@@ -8,7 +8,7 @@ packages:
 - "libssl1.0-dev"
 - "autoconf"
 remotes:
-- "url": "https://github.com/216k155/detached-sigs.git"
+- "url": "https://github.com/LUX-Core/detached-sigs.git"
   "dir": "signature"
 files:
 - "osslsigncode-1.7.1.tar.gz"
