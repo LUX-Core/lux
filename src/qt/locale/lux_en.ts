@@ -3585,16 +3585,6 @@
         <source>&amp;Stop All</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <location filename="../masternodemanager.cpp" line="+180"/>
-        <source>yes</source>
-        <translation type="unfinished">yes</translation>
-    </message>
-    <message>
-        <location line="+0"/>
-        <source>no</source>
-        <translation type="unfinished">no</translation>
-    </message>
 </context>
 <context>
     <name>ModalOverlay</name>
