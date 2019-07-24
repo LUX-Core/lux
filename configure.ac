@@ -1132,10 +1132,9 @@ fi
 
 dnl change addresses by default
 AC_MSG_CHECKING([if change addresses should be enabled by default])
-if test x$change_addresses_default != xno; then
+if test x$enable_change_addresses_default != xno; then
   AC_MSG_RESULT(yes)
   AC_DEFINE_UNQUOTED([ENABLE_CHANGE_ADDRESSES_DEFAULT],[1],[Define to 1 to enable change addresses by default])
-
 else
   AC_MSG_RESULT(no)
 fi

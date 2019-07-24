@@ -54,34 +54,30 @@ bool CheckProof(uint256 hash, unsigned int nBits)
 
 //   What makes a good checkpoint block?
 // + Is surrounded by blocks with reasonable timestamps
-//   (no blocks before with a timestamp after, none after with
-//    timestamp before)
+//   (no blocks before with a timestamp after, none after with timestamp before)
 // + Contains no strange transactions
+// + Should be a PoW block with a low hash (higher difficulty, starts with a lot of zeros)
 static Checkpoints::MapCheckpoints mapCheckpoints = boost::assign::map_list_of
-                ( 0,   uint256("0x00000759bb3da130d7c9aedae170da8335f5a0d01a9007e4c8d3ccd08ace6a42") )
-                ( 175,   uint256("0x000000000002611e8e3c2e460e7fcd0a39ee210b9915fc76a5573a0704bb2b33") )
-                ( 2241,   uint256("0x69e2e47fb84085c4b82b6090f701c7ac03a4e510bd1f41cc072c33061cf83a0d") )
-                ( 6901,   uint256("0x0000000000034bab666179e364e0cce7c19eaa255f1e4afd2170356acfa1a3ac") )
-                ( 25318,   uint256("0x092a04ee669d2d2241aba0ec9dcecb548c9cea9ff114b0ee52cdc7ddac98a1f4") )
-                ( 97176,   uint256("0x000000000004e4aac7926e7dbd778f21b15b62f0e4c1d424ac9e5a9889c1724a") )
-                ( 122237,   uint256("0x10f6d17326a0c439f61a21c44a172885469bb60668a0d77be82eead7209183b0") )
-                ( 203690,   uint256("0x00000000000180e78502c3c952f00bf8bba2bc9ffef60e7188c8763582f26ef4") )
-                ( 293220,   uint256("0xe90c89ff18e00b49be312aff64bcc18cba753ff36dde5c7fc216029d7bc2b457") )
-                ( 299500,   uint256("0x94c34653c7b107662f1f44d085be5817d03f8d3f0b3c29b970ce25eb44e03743") )
-                ( 303112,   uint256("0x0000000000026621b448ad1288a7f9762e78a0ef5ab87fcbc016cddc3ded4356") )
-                ( 350095,   uint256("0x000000000007726c464bbdb9bcffc3baf044333f88b79882aa0aefcbe6f0f881") )
-                ( 410000,   uint256("0x000000000008d3f413fdad9d3bf3403d4ea78a7ba94eaf442593ffc4535d4f3d") )
-                ( 460000,   uint256("0x00000000001267a73897a2e01f2fb376e3cb9ddc75c70b31f12d7fd2625879a0") )
-                ( 520000,   uint256("0x0000000000005f31a949ac51bacd2dff29aa4df5892f5fc4dd3580d6f8dfe079") )
-                ( 621950,   uint256("0x000000000009fa3ac44eaf8bb925e6f64aa5ceff8ae775748babda89e278222a") )
+    (       0, uint256("0x00000759bb3da130d7c9aedae170da8335f5a0d01a9007e4c8d3ccd08ace6a42") )
+    (     175, uint256("0x000000000002611e8e3c2e460e7fcd0a39ee210b9915fc76a5573a0704bb2b33") )
+    (    2241, uint256("0x69e2e47fb84085c4b82b6090f701c7ac03a4e510bd1f41cc072c33061cf83a0d") )
+    (    6901, uint256("0x0000000000034bab666179e364e0cce7c19eaa255f1e4afd2170356acfa1a3ac") )
+    (   97176, uint256("0x000000000004e4aac7926e7dbd778f21b15b62f0e4c1d424ac9e5a9889c1724a") )
+    (  203690, uint256("0x00000000000180e78502c3c952f00bf8bba2bc9ffef60e7188c8763582f26ef4") )
+    (  303112, uint256("0x0000000000026621b448ad1288a7f9762e78a0ef5ab87fcbc016cddc3ded4356") )
+    (  350095, uint256("0x000000000007726c464bbdb9bcffc3baf044333f88b79882aa0aefcbe6f0f881") )
+    (  410000, uint256("0x000000000008d3f413fdad9d3bf3403d4ea78a7ba94eaf442593ffc4535d4f3d") )
+    (  520000, uint256("0x0000000000005f31a949ac51bacd2dff29aa4df5892f5fc4dd3580d6f8dfe079") )
+    (  621950, uint256("0x000000000009fa3ac44eaf8bb925e6f64aa5ceff8ae775748babda89e278222a") )
+    (  733000, uint256("0x0000000000086dd3f294d990c326814b8f2d77fa0d789483941d48b3eee20c74") )
 ;
 
 static const Checkpoints::CCheckpointData data = {
-        &mapCheckpoints,
-        1550949577, // * UNIX timestamp of last checkpoint block
-        1197936,    // * total number of transactions between genesis and last checkpoint
-        //               (the tx=... number in UpdateTip debug.log lines)
-        2438.911721 // * estimated number of transactions per day after checkpoint
+    &mapCheckpoints,
+    1557972952, // * UNIX timestamp of last checkpoint block
+    1197936,    // * total number of transactions between genesis and last checkpoint
+    //               (the tx=... number in UpdateTip debug.log lines)
+    2438.911721 // * estimated number of transactions per day after checkpoint
 };
 
 static Checkpoints::MapCheckpoints mapCheckpointsTestnet =
