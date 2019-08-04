@@ -73,6 +73,10 @@ void OptionsModel::Init()
         settings.setValue("strThirdPartyTxUrls", "");
     strThirdPartyTxUrls = settings.value("strThirdPartyTxUrls", "").toString();
 
+    if (!settings.contains("fDARK_MODEFeatures"))
+        settings.setValue("fDARK_MODEFeatures", false);
+    fDARK_MODEFeatures = settings.value("fDARK_MODEFeatures", false).toBool();
+
     if (!settings.contains("fCoinControlFeatures"))
         settings.setValue("fCoinControlFeatures", true);
     fCoinControlFeatures = settings.value("fCoinControlFeatures", true).toBool();
@@ -183,8 +187,6 @@ void OptionsModel::Init()
     // Display
     if (!settings.contains("digits"))
         settings.setValue("digits", "2");
-    if (!settings.contains("theme"))
-        settings.setValue("theme", "");
     if (!settings.contains("fCSSexternal"))
         settings.setValue("fCSSexternal", false);
 
@@ -261,6 +263,8 @@ QVariant OptionsModel::data(const QModelIndex& index, int role) const
             return settings.value("bSpendZeroConfChange");
         case ShowAdvancedUI:
             return fShowAdvancedUI;
+        case DARK_MODEFeatures:
+            return fDARK_MODEFeatures;
 #endif
         case ZeroBalanceAddressToken:
             return settings.value("bZeroBalanceAddressToken");
@@ -270,8 +274,6 @@ QVariant OptionsModel::data(const QModelIndex& index, int role) const
             return strThirdPartyTxUrls;
         case Digits:
             return settings.value("digits");
-        case Theme:
-            return settings.value("theme");
         case Language:
             return settings.value("language");
         case CoinControlFeatures:
@@ -381,10 +383,17 @@ bool OptionsModel::setData(const QModelIndex& index, const QVariant& value, int 
                 setRestartRequired(true);
             }
             break;
+            
         case ShowAdvancedUI:
             fShowAdvancedUI = value.toBool();
             settings.setValue("fShowAdvancedUI", fShowAdvancedUI);
             Q_EMIT advancedUIChanged(fShowAdvancedUI);
+            break;
+
+        case DARK_MODEFeatures:
+            fDARK_MODEFeatures = value.toBool();
+            settings.setValue("fDARK_MODEFeatures", fDARK_MODEFeatures);
+            Q_EMIT DARK_MODEChanged(fDARK_MODEFeatures);
             break;
 #endif
         case ZeroBalanceAddressToken:
@@ -405,12 +414,6 @@ bool OptionsModel::setData(const QModelIndex& index, const QVariant& value, int 
         case Digits:
             if (settings.value("digits") != value) {
                 settings.setValue("digits", value);
-                setRestartRequired(true);
-            }
-            break;
-        case Theme:
-            if (settings.value("theme") != value) {
-                settings.setValue("theme", value);
                 setRestartRequired(true);
             }
             break;
