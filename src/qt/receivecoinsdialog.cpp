@@ -1,7 +1,7 @@
 // Copyright (c) 2011-2014 The Bitcoin developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
-
+#include "guiutil.h"
 #include "receivecoinsdialog.h"
 #include "ui_receivecoinsdialog.h"
 
@@ -22,6 +22,7 @@
 #include <QMessageBox>
 #include <QScrollBar>
 #include <QTextDocument>
+#include <QSettings>
 
 ReceiveCoinsDialog::ReceiveCoinsDialog(const PlatformStyle *platformStyle, QWidget* parent) : QDialog(parent),
                                                           ui(new Ui::ReceiveCoinsDialog),
@@ -72,6 +73,28 @@ ReceiveCoinsDialog::ReceiveCoinsDialog(const PlatformStyle *platformStyle, QWidg
     connect(copyAmountAction, SIGNAL(triggered()), this, SLOT(copyAmount()));
 
     connect(ui->clearButton, SIGNAL(clicked()), this, SLOT(clear()));
+
+    QSettings settings;
+    if (settings.value("fDARK_MODEFeatures") == true){
+        ui->reqLabel->setStyleSheet(
+                "background-color: #061532;"
+                "border:1px solid #40c2dc;"
+                "color:#FFFFFF;"
+        );
+
+        ui->reqAmount->setStyleSheet(
+                "background-color: #061532;"
+                "border:1px solid #40c2dc;"
+                "color:#FFFFFF;"
+        );
+    
+        ui->reqMessage->setStyleSheet(
+                "background-color: #061532;"
+                "border:1px solid #40c2dc;"
+                "color:#FFFFFF;"
+        );
+    }
+  
 }
 
 void ReceiveCoinsDialog::setModel(WalletModel* model)
