@@ -4,7 +4,7 @@
 
 
 WalletFrame {
-	background: #ffffff url(':/images/walletFrame_bg') repeat top right; 
+	background: #ffffff url(':/images/walletFrame_bg_light') repeat top right; 
     border-top: 0px solid #000;
     margin:0;
     padding:0;
