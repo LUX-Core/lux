@@ -203,6 +203,11 @@ CoinControlDialog::CoinControlDialog(const PlatformStyle *platformStyle, QWidget
         QString toogleLockValue = settings.value("toogleLockValue").toString();
         toogleLockList = toogleLockValue.split(",");
     }
+    if (settings.value("fDARK_MODEFeatures") == true){
+        ui->treeWidget->setStyleSheet(" color:#FFFFFF;"
+        "background-color: #061532;"
+        "border:1px solid #40c2dc;");
+    }
 }
 
 CoinControlDialog::~CoinControlDialog()
@@ -320,14 +325,16 @@ void CoinControlDialog::greater()// select all inputs grater than "amount"
             QTreeWidgetItem* item = ui->treeWidget->topLevelItem(i);
             double value = item->text(COLUMN_AMOUNT).toDouble();
         if (value > val) {
-            if (ui->treeWidget->topLevelItem(i)->checkState(COLUMN_CHECKBOX) != state)
+            if (ui->treeWidget->topLevelItem(i)->checkState(COLUMN_CHECKBOX) != state) {
                 ui->treeWidget->topLevelItem(i)->setCheckState(COLUMN_CHECKBOX, state);
                 ui->treeWidget->setEnabled(true);
-                    if (state == Qt::Unchecked)
-                        coinControl->UnSelectAll();
-                        ui->treeWidget->setEnabled(true);
-                        CoinControlDialog::updateLabels(model, this);
-                        CheckDialogLablesUpdated();
+                if (state == Qt::Unchecked) {
+                    coinControl->UnSelectAll();
+                    ui->treeWidget->setEnabled(true);
+                    CoinControlDialog::updateLabels(model, this);
+                    CheckDialogLablesUpdated();
+                }
+            }
         }
     } 
 } 
@@ -341,14 +348,16 @@ void CoinControlDialog::Less()//select all inputs Less than "amount"
             QTreeWidgetItem* item = ui->treeWidget->topLevelItem(i);
             double value = item->text(COLUMN_AMOUNT).toDouble();
         if (value < val) {
-            if (ui->treeWidget->topLevelItem(i)->checkState(COLUMN_CHECKBOX) != state)
+            if (ui->treeWidget->topLevelItem(i)->checkState(COLUMN_CHECKBOX) != state) {
                 ui->treeWidget->topLevelItem(i)->setCheckState(COLUMN_CHECKBOX, state);
                 ui->treeWidget->setEnabled(true);
-                    if (state == Qt::Unchecked)
-                        coinControl->UnSelectAll();
-                        ui->treeWidget->setEnabled(true);
-                        CoinControlDialog::updateLabels(model, this);
-                        CheckDialogLablesUpdated();
+                if (state == Qt::Unchecked) {
+                    coinControl->UnSelectAll();
+                    ui->treeWidget->setEnabled(true);
+                    CoinControlDialog::updateLabels(model, this);
+                    CheckDialogLablesUpdated();
+                }
+            }
         }
     } 
 }
@@ -356,7 +365,7 @@ void CoinControlDialog::Less()//select all inputs Less than "amount"
 
 void CoinControlDialog::Equal() // select all inputs equal to "amount"
 {
-    double round;
+    double round = 0;
     double val = ui->num_box->value();  
     Qt::CheckState state = Qt::Checked;  
     ui->treeWidget->setEnabled(true);
@@ -365,17 +374,31 @@ void CoinControlDialog::Equal() // select all inputs equal to "amount"
              double value = item->text(COLUMN_AMOUNT).toDouble();
              int log = 0;
                 adjusted:
-        if (val > value){round = val - value; log++;}//since we can't compare "value" and "val" directly we minus the 2 and get the difference
-            if (val < value){round = value - val; log++;}
-                if (log == 0) {  val = val +0.001; log++; goto adjusted; } // in the event that the input and "val" are equal add a small amount and go through the sorting process again
-                    if (round < 0.01) { // if are input and "val" are within 0.01 of each other
-                        if (ui->treeWidget->topLevelItem(i)->checkState(COLUMN_CHECKBOX) != state)
-                        ui->treeWidget->topLevelItem(i)->setCheckState(COLUMN_CHECKBOX, state);
-                        ui->treeWidget->setEnabled(true);
-        if (state == Qt::Unchecked)
-        coinControl->UnSelectAll();
-        CoinControlDialog::updateLabels(model, this);
-        CheckDialogLablesUpdated();
+        if (val > value) {
+            round = val - value; 
+            log++;
+        }   
+        //since we can't compare "value" and "val" directly we minus the 2 and get the difference
+        if (val < value){
+            round = value - val; 
+            log++;
+        }
+        if (log == 0) {  
+            val = val +0.001; 
+            log++; 
+            goto adjusted; 
+        }   
+        // in the event that the input and "val" are equal add a small amount and go through the sorting process again
+        if (round < 0.01) { // if are input and "val" are within 0.01 of each other
+            if (ui->treeWidget->topLevelItem(i)->checkState(COLUMN_CHECKBOX) != state) {
+                ui->treeWidget->topLevelItem(i)->setCheckState(COLUMN_CHECKBOX, state);
+                ui->treeWidget->setEnabled(true);
+                if (state == Qt::Unchecked) {
+                    coinControl->UnSelectAll();
+                    CoinControlDialog::updateLabels(model, this);
+                    CheckDialogLablesUpdated();
+                }
+            }
         }
     } 
 }
@@ -385,20 +408,23 @@ void CoinControlDialog::select_50() //select the first 50 inputs
     if (ui->treeWidget->topLevelItemCount() > 49){ //check we have more then 50 inputs 
         Qt::CheckState state = Qt::Checked;   
         ui->treeWidget->setEnabled(false);
-    for (int i = 0; i < 50; i++)
-        if (ui->treeWidget->topLevelItem(i)->checkState(COLUMN_CHECKBOX) != state)
-            ui->treeWidget->topLevelItem(i)->setCheckState(COLUMN_CHECKBOX, state);
-            ui->treeWidget->setEnabled(true);
-                if (state == Qt::Unchecked)
+        for (int i = 0; i < 50; i++) {
+            if (ui->treeWidget->topLevelItem(i)->checkState(COLUMN_CHECKBOX) != state) {
+                ui->treeWidget->topLevelItem(i)->setCheckState(COLUMN_CHECKBOX, state);
+                ui->treeWidget->setEnabled(true);
+                if (state == Qt::Unchecked) {
                     coinControl->UnSelectAll(); // just to be sure
                     CoinControlDialog::updateLabels(model, this);
                     CheckDialogLablesUpdated();
-                }else{ //if we have less then 50 inputs give the user dialogue to inform them of this issue  
-                    QMessageBox msgBox;
-                    msgBox.setObjectName("lockMessageBox");
-                    msgBox.setStyleSheet(GUIUtil::loadStyleSheet());
-                    msgBox.setText(tr("Please have at least 50 inputs to use this function."));
-                    msgBox.exec();
+                }
+            }
+        }
+    } else { //if we have less then 50 inputs give the user dialogue to inform them of this issue  
+        QMessageBox msgBox;
+        msgBox.setObjectName("lockMessageBox");
+        msgBox.setStyleSheet(GUIUtil::loadStyleSheet());
+        msgBox.setText(tr("Please have at least 50 inputs to use this function."));
+        msgBox.exec();
     }
 }
 
@@ -407,20 +433,23 @@ void CoinControlDialog::select_100() //select the first 100 inputs
     if (ui->treeWidget->topLevelItemCount() > 99){ //check we have more then 50 inputs 
         Qt::CheckState state = Qt::Checked;   
         ui->treeWidget->setEnabled(false);
-    for (int i = 0; i < 50; i++)
-        if (ui->treeWidget->topLevelItem(i)->checkState(COLUMN_CHECKBOX) != state)
-            ui->treeWidget->topLevelItem(i)->setCheckState(COLUMN_CHECKBOX, state);
-            ui->treeWidget->setEnabled(true);
-                if (state == Qt::Unchecked)
+        for (int i = 0; i < 50; i++) {
+            if (ui->treeWidget->topLevelItem(i)->checkState(COLUMN_CHECKBOX) != state) {
+                ui->treeWidget->topLevelItem(i)->setCheckState(COLUMN_CHECKBOX, state);
+                ui->treeWidget->setEnabled(true);
+                if (state == Qt::Unchecked) {
                     coinControl->UnSelectAll(); // just to be sure
                     CoinControlDialog::updateLabels(model, this);
                     CheckDialogLablesUpdated();
-                }else{ //if we have less then 100 inputs give the user dialogue to inform them of this issue  
-                    QMessageBox msgBox;
-                    msgBox.setObjectName("lockMessageBox");
-                    msgBox.setStyleSheet(GUIUtil::loadStyleSheet());
-                    msgBox.setText(tr("Please have at least 100 inputs to use this function."));
-                    msgBox.exec();
+                }
+            }
+        }
+    } else { //if we have less then 100 inputs give the user dialogue to inform them of this issue  
+        QMessageBox msgBox;
+        msgBox.setObjectName("lockMessageBox");
+        msgBox.setStyleSheet(GUIUtil::loadStyleSheet());
+        msgBox.setText(tr("Please have at least 100 inputs to use this function."));
+        msgBox.exec();
     }
 }
 
@@ -429,20 +458,23 @@ void CoinControlDialog::select_250() //select the first 250 inputs
     if (ui->treeWidget->topLevelItemCount() > 249){ //check we have more then 50 inputs 
         Qt::CheckState state = Qt::Checked;   
         ui->treeWidget->setEnabled(false);
-    for (int i = 0; i < 50; i++)
-        if (ui->treeWidget->topLevelItem(i)->checkState(COLUMN_CHECKBOX) != state)
-            ui->treeWidget->topLevelItem(i)->setCheckState(COLUMN_CHECKBOX, state);
-            ui->treeWidget->setEnabled(true);
-                if (state == Qt::Unchecked)
+        for (int i = 0; i < 50; i++) {
+            if (ui->treeWidget->topLevelItem(i)->checkState(COLUMN_CHECKBOX) != state) {
+                ui->treeWidget->topLevelItem(i)->setCheckState(COLUMN_CHECKBOX, state);
+                ui->treeWidget->setEnabled(true);
+                if (state == Qt::Unchecked) {
                     coinControl->UnSelectAll(); // just to be sure
                     CoinControlDialog::updateLabels(model, this);
                     CheckDialogLablesUpdated();
-                }else{ //if we have less then 250 inputs give the user dialogue to inform them of this issue  
-                    QMessageBox msgBox;
-                    msgBox.setObjectName("lockMessageBox");
-                    msgBox.setStyleSheet(GUIUtil::loadStyleSheet());
-                    msgBox.setText(tr("Please have at least 250 inputs to use this function."));
-                    msgBox.exec();
+                }
+            }
+        }
+    } else { //if we have less then 250 inputs give the user dialogue to inform them of this issue  
+        QMessageBox msgBox;
+        msgBox.setObjectName("lockMessageBox");
+        msgBox.setStyleSheet(GUIUtil::loadStyleSheet());
+        msgBox.setText(tr("Please have at least 250 inputs to use this function."));
+        msgBox.exec();
     }
 }
 
