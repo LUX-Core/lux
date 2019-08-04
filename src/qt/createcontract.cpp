@@ -1,3 +1,4 @@
+#include "guiutil.h"
 #include "createcontract.h"
 #include "ui_createcontract.h"
 #include "walletmodel.h"
@@ -15,8 +16,7 @@
 #include "tabbarinfo.h"
 #include "contractresult.h"
 #include "sendcoinsdialog.h"
-//#include "styleSheet.h"
-
+#include <QSettings>
 #include <QRegularExpressionValidator>
 
 namespace CreateContract_NS
@@ -95,6 +95,27 @@ CreateContract::CreateContract(QWidget *parent) :
     QRegularExpressionValidator *bytecodeValidator = new QRegularExpressionValidator(ui->textEditBytecode);
     bytecodeValidator->setRegularExpression(regEx);
     ui->textEditBytecode->setCheckValidator(bytecodeValidator);
+
+    QSettings settings;
+    if (settings.value("fDARK_MODEFeatures") == true){
+        ui->lineEditGasLimit->setStyleSheet(
+            "background-color: #061532;"
+            "border:1px solid #40c2dc;"
+            "color:#FFFFFF;"
+        );
+
+        ui->lineEditGasPrice->setStyleSheet(
+            "background-color: #061532;"
+            "border:1px solid #40c2dc;"
+            "color:#FFFFFF;"
+        );
+
+        ui->scrollAreaConstructor->setStyleSheet(
+            "background-color: #061532;"
+            "border:1px solid #40c2dc;"
+            "color:#FFFFFF;"
+        );
+    }
 }
 
 CreateContract::~CreateContract()
@@ -246,6 +267,7 @@ void CreateContract::on_numBlocksChanged(int newHeight)
 void CreateContract::on_updateCreateButton()
 {
     bool enabled = true;
+
     if(ui->textEditBytecode->toPlainText().isEmpty())
     {
         enabled = false;
