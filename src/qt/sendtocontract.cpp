@@ -1,6 +1,5 @@
 #include "sendtocontract.h"
 #include "ui_sendtocontract.h"
-//#include "platformstyle.h"
 #include "walletmodel.h"
 #include "clientmodel.h"
 #include "guiconstants.h"
@@ -17,10 +16,10 @@
 #include "contractbookpage.h"
 #include "editcontractinfodialog.h"
 #include "contracttablemodel.h"
-//#include "styleSheet.h"
 #include "guiutil.h"
 #include "sendcoinsdialog.h"
 #include <QClipboard>
+#include <QSettings>
 
 namespace SendToContract_NS
 {
@@ -117,6 +116,32 @@ SendToContract::SendToContract(QWidget *parent) :
     QRegularExpressionValidator *addressValidatr = new QRegularExpressionValidator(ui->lineEditContractAddress);
     addressValidatr->setRegularExpression(regEx);
     ui->lineEditContractAddress->setCheckValidator(addressValidatr);
+    QSettings settings;
+    if (settings.value("fDARK_MODEFeatures") == true){
+        ui->lineEditAmount->setStyleSheet(
+            "background-color: #061532;"
+            "border:1px solid #40c2dc;"
+            "color:#FFFFFF;"
+        );
+
+        ui->lineEditGasLimit->setStyleSheet(
+            "background-color: #061532;"
+            "border:1px solid #40c2dc;"
+            "color:#FFFFFF;"
+        );
+
+        ui->lineEditGasPrice->setStyleSheet(
+            "background-color: #061532;"
+            "border:1px solid #40c2dc;"
+            "color:#FFFFFF;"
+        );
+        
+        ui->scrollAreaFunction->setStyleSheet(
+            "background-color: #061532;"
+            "border:1px solid #40c2dc;"
+            "color:#FFFFFF;"
+        );
+    }
 }
 
 SendToContract::~SendToContract()
