@@ -155,12 +155,12 @@ void WalletModel::pollBalanceChanged()
         cachedNumBlocks = chainActive.Height();
         cachedDarksendRounds = nDarksendRounds;
 
-            checkBalanceChanged();
+        checkBalanceChanged();
 
-            if(cachedNumBlocksChanged)
-            {
-                checkTokenBalanceChanged();
-            }
+        if(cachedNumBlocksChanged)
+        {
+            checkTokenBalanceChanged();
+        }
     }
 }
 

@@ -382,6 +382,7 @@ void WalletView::backupWallet()
         Q_EMIT message(tr("Backup Successful"), tr("The wallet data was successfully saved to %1.").arg(filename),
             CClientUIInterface::MSG_INFORMATION);
     }
+        this->setStyleSheet("color:#fff backround-color: #061532");
 }
 
 void WalletView::restoreWallet()
