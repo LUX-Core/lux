@@ -92,15 +92,17 @@ QMenuBar::item {
 }
 
 QMenuBar::item:selected {
-    background-color:#f8f6f6;
+    background-color:#061532;
+    color:#fff;
 }
 
 QMenu {
-    background-color:#f8f6f6;
+    background-color:#061532;
+    color:#fff;
 }
 
 QMenu::item {
-    color:#333;
+    color:#fff;
 }
 
 QMenu::item:selected {
