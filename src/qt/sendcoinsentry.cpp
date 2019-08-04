@@ -3,7 +3,7 @@
 // Copyright (c) 2015-2017 The LUX developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
-
+#include "guiutil.h"
 #include "sendcoinsentry.h"
 #include "ui_sendcoinsentry.h"
 
@@ -16,6 +16,7 @@
 
 #include <QApplication>
 #include <QClipboard>
+#include <QSettings>
 
 SendCoinsEntry::SendCoinsEntry(const PlatformStyle *platformStyle, QWidget* parent) : QStackedWidget(parent),
                                                   ui(new Ui::SendCoinsEntry),
@@ -48,6 +49,7 @@ SendCoinsEntry::SendCoinsEntry(const PlatformStyle *platformStyle, QWidget* pare
     connect(ui->deleteButton, SIGNAL(clicked()), this, SLOT(deleteClicked()));
     connect(ui->deleteButton_is, SIGNAL(clicked()), this, SLOT(deleteClicked()));
     connect(ui->deleteButton_s, SIGNAL(clicked()), this, SLOT(deleteClicked()));
+    QSettings settings;
 }
 
 SendCoinsEntry::~SendCoinsEntry()
@@ -76,6 +78,13 @@ void SendCoinsEntry::on_addressBookButton_clicked()
 void SendCoinsEntry::on_payTo_textChanged(const QString& address)
 {
     updateLabel(address);
+    QSettings settings;
+    if (settings.value("fDARK_MODEFeatures") == true){
+        ui->payTo->setStyleSheet( // the backround would be reset to white with out this
+            "background-color: #061532;"
+            "color: #FFF;"
+        );
+    }
 }
 
 void SendCoinsEntry::setModel(WalletModel* model)
@@ -85,7 +94,31 @@ void SendCoinsEntry::setModel(WalletModel* model)
     if (model && model->getOptionsModel())
         connect(model->getOptionsModel(), SIGNAL(displayUnitChanged(int)), this, SLOT(updateDisplayUnit()));
 
+    QSettings settings;
+    if (settings.value("fDARK_MODEFeatures") == true){
+        ui->payTo->setStyleSheet(
+            "background-color: #061532;"
+            "color: #FFFFFF;"
+            "border:1px solid #40c2dc;"
+            "color:#FFFFFF;"
+        );
+
+        ui->addAsLabel->setStyleSheet(
+            "background-color: #061532;"
+            "color: #FFFFFF;"
+            "border:1px solid #40c2dc;"
+            "color:#FFFFFF;"
+        );
+
+        ui->payAmount->setStyleSheet(
+            "background-color: #061532;"
+            "color: #FFFFFF;"
+            "border:1px solid #40c2dc;"
+            "color:#FFFFFF;"
+        );
+    }
     clear();
+
 }
 
 void SendCoinsEntry::clear()
@@ -153,7 +186,6 @@ bool SendCoinsEntry::validate()
         ui->payAmount->setValid(false);
         retval = false;
     }
-
     return retval;
 }
 
@@ -225,6 +257,14 @@ void SendCoinsEntry::setAddress(const QString& address)
 {
     ui->payTo->setText(address);
     ui->payAmount->setFocus();
+
+    QSettings settings;
+    if (settings.value("fDARK_MODEFeatures") == true){
+        ui->payTo->setStyleSheet(
+            "background-color: #061532;"
+            "color: #FFF;"
+        );
+    }
 }
 
 bool SendCoinsEntry::isClear()

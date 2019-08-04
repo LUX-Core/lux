@@ -3,7 +3,7 @@
 // Copyright (c) 2015-2017 The LUX developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
-
+#include "guiutil.h"
 #include "sendcoinsdialog.h"
 #include "ui_sendcoinsdialog.h"
 #include "askpassphrasedialog.h"
@@ -30,6 +30,7 @@
 #include <QSettings>
 #include <QTextDocument>
 #include <QTimer>
+#include <QSettings>
 
 #define SEND_CONFIRM_DELAY 3
 
@@ -154,6 +155,17 @@ SendCoinsDialog::SendCoinsDialog(const PlatformStyle *platformStyle, QWidget* pa
     ui->checkBoxMinimumFee->setChecked(settings.value("fPayOnlyMinFee").toBool());
  // ui->checkBoxFreeTx->setChecked(settings.value("fSendFreeTransactions").toBool());
     minimizeFeeSection(settings.value("fFeeSectionMinimized").toBool());
+
+    if (settings.value("fDARK_MODEFeatures") == true){
+        ui->customFee->setStyleSheet(
+        "border:1px solid #000000;"
+        "padding: 3px 5px 3px 5px;"
+        "background:#061532;"
+        "min-height:25px;"
+        "color:#FFFFFF;"
+        "border:1px solid #40c2dc;"
+        );
+    }
 }
 
 void SendCoinsDialog::setClientModel(ClientModel* clientModel)
