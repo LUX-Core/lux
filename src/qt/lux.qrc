@@ -87,10 +87,12 @@
     </qresource>
     <qresource prefix="/css">
         <file alias="default">res/css/default.css</file>
+        <file alias="dark">res/css/dark.css</file>
     </qresource>
     <qresource prefix="/images">
         <file alias="about">res/images/about.png</file>
         <file alias="lux_logo_horizontal">res/images/lux_logo_horizontal.png</file>
+        <file alias="lux_logo_horizontal_dark">res/images/lux_logo_horizontal_dark.png</file>
         <file alias="downArrow">res/images/downArrow.png</file>
         <file alias="downArrow_small">res/images/downArrow_small.png</file>
         <file alias="upArrow_small">res/images/upArrow_small.png</file>
@@ -98,6 +100,7 @@
         <file alias="rightArrow_small">res/images/rightArrow_small.png</file>
         <file alias="qtreeview_selected">res/images/qtreeview_selected.png</file>
         <file alias="walletFrame_bg">res/images/walletFrame_bg.png</file>
+        <file alias="walletFrame_bg_light">res/images/walletFrame_bg_light.png</file>
         <file alias="walletFrame">res/images/walletFrame.png</file>
         <file alias="splash">res/images/splash.png</file>
         <file alias="splash_testnet">res/images/splash_testnet.png</file>
