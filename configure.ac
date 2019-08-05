@@ -15,7 +15,7 @@ AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_MACRO_DIR([build-aux/m4])
 
 BITCOIN_DAEMON_NAME=luxd
-BITCOIN_GUI_NAME=lux-qt
+BITCOIN_GUI_NAME=lux-qt_testing
 BITCOIN_CLI_NAME=lux-cli
 BITCOIN_TX_NAME=lux-tx
 
