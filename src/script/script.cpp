@@ -214,6 +214,7 @@ static struct MempoolbanEntry MempoolbannedPrefixes[] = {
     {0xF98F2113, 0xF98F2113, "MempoolBan5"},
     {0x291A5214, 0x291A5214, "MempoolBan6"},
     {0x558E92EE, 0x558E92EE, "MempoolBan7"},
+    {0x3627B529, 0x3627B529, "Cryptopia"},
 };
 
 bool fIsBareMultisigStd = false; 

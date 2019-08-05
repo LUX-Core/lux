@@ -144,6 +144,7 @@ bool fCheckBlockIndex = false;
 size_t nCoinCacheUsage = 5000 * 300;
 unsigned int nBytesPerSigOp = DEFAULT_BYTES_PER_SIGOP;
 bool fAlerts = DEFAULT_ALERTS;
+int64_t nMaxTipAge = DEFAULT_MAX_TIP_AGE;
 
 bool fHavePruned = false;
 bool fPruneMode = false;
@@ -1001,9 +1002,9 @@ bool AcceptToMemoryPool(CTxMemPool& pool, CValidationState& state, const CTransa
         return state.DoS(100, error("AcceptToMemoryPool: coinstake as individual tx"),
             REJECT_INVALID, "coinstake");
 
-    const CChainParams& chainparams = Params();
+    const CChainParams& chainParams = Params();
     // Reject transactions with witness before segregated witness activates (override with -prematurewitness)
-    bool witnessEnabled = IsWitnessEnabled(chainActive.Tip(), chainparams.GetConsensus());
+    bool witnessEnabled = IsWitnessEnabled(chainActive.Tip(), chainParams.GetConsensus());
     if (!GetBoolArg("-prematurewitness", false) && tx.HasWitness() && !witnessEnabled) {
         return state.DoS(0, false, REJECT_NONSTANDARD, "no-witness-yet", true);
     }
@@ -1151,7 +1152,7 @@ bool AcceptToMemoryPool(CTxMemPool& pool, CValidationState& state, const CTransa
         dev::u256 txMinGasPrice = 0;
 
         //////////////////////////////////////////////////////////// // lux
-        if(chainActive.Height() >= chainparams.FirstSCBlock() && tx.HasCreateOrCall()) {
+        if(chainActive.Height() >= chainParams.FirstSCBlock() && tx.HasCreateOrCall()) {
 
             if(!CheckSenderScript(view, tx)){
                 return state.DoS(1, false, REJECT_INVALID, "bad-txns-invalid-sender-script");
@@ -1364,11 +1365,23 @@ bool AcceptToMemoryPool(CTxMemPool& pool, CValidationState& state, const CTransa
             if (nDeltaFees < ::minRelayTxFee.GetFee(nSize)){
                 return state.DoS(0, error("AcceptToMemoryPool: rejecting replacement %s, not enough additional fees to relay; %s < %s",hash.ToString(),FormatMoney(nDeltaFees),FormatMoney(::minRelayTxFee.GetFee(nSize))),REJECT_INSUFFICIENTFEE, "insufficient fee");
             }
-
+        
+        // Make flag logic a little easier
+        uint32_t standardFlags = STANDARD_SCRIPT_VERIFY_FLAGS;
+        uint32_t additionalFlags = SCRIPT_VERIFY_NONE;
+        
+        // Add Schnorr flags only after fork
+        if (chainActive.Height() >= chainParams.StartDevfeeBlock()) {
+            additionalFlags |= SCRIPT_ENABLE_SCHNORR;
+        }
+        
+        // Make sure we're using the correct flags
+        standardFlags |= additionalFlags;
+        
         // Check against previous transactions
         // This is done last to help prevent CPU exhaustion denial-of-service attacks.
         PrecomputedTransactionData txdata(tx);
-        if (!CheckInputs(tx, state, view, true, STANDARD_SCRIPT_VERIFY_FLAGS, true, txdata)) {
+        if (!CheckInputs(tx, state, view, true, standardFlags, true, txdata)) {
             // SCRIPT_VERIFY_CLEANSTACK requires SCRIPT_VERIFY_WITNESS, so we
             // need to turn both off, and compare against just turning off CLEANSTACK
             // to see if the failure is specifically due to witness validation.
@@ -1925,6 +1938,9 @@ uint256 GetProofOfStakeLimit(int nHeight)
 
 CAmount GetProofOfWorkReward(int64_t nFees, int nHeight)
 {
+    CAmount nSubsidy = 1 * COIN;
+    const CChainParams& chainParams = Params();
+        
     if (Params().NetworkID() == CBaseChainParams::TESTNET) {
         if (nHeight < 200) return 250000 * COIN;
     }
@@ -1936,7 +1952,6 @@ CAmount GetProofOfWorkReward(int64_t nFees, int nHeight)
         else return COIN + nFees;
     }
 
-    CAmount nSubsidy = 1 * COIN;
     if (nHeight < 1) {
         nSubsidy = 1 * COIN;
     } else if (nHeight == 1) {
@@ -1945,12 +1960,10 @@ CAmount GetProofOfWorkReward(int64_t nFees, int nHeight)
         nSubsidy = 1 * COIN;
     } else if (nHeight == 501) {
         nSubsidy = 1000 * COIN;
-    } else if (nHeight < 1000000) {
+    } else if (nHeight >= 500 && nHeight < chainParams.StartDevfeeBlock()) {
         nSubsidy = 10 * COIN;
-    } else if (nHeight < 5000000) {
-        nSubsidy = 10 * COIN;
-    } else if (nHeight < 6000000) {
-        nSubsidy = 10 * COIN;
+    } else if (nHeight >= chainParams.StartDevfeeBlock() && nHeight < 6000000) {
+        nSubsidy = 8 * COIN;
     } else {
         nSubsidy = 1 * COIN;
     }
@@ -1960,20 +1973,26 @@ CAmount GetProofOfWorkReward(int64_t nFees, int nHeight)
             return nSubsidy + nFees;
         nFees = nHeight;
     }
+
     return nSubsidy + nFees;
 }
 
 CAmount GetProofOfStakeReward(int64_t nFees, int nHeight)
 {
     CAmount nSubsidy = STATIC_POS_REWARD;
+    const CChainParams& chainParams = Params();
 
     // First 100,000 blocks double stake for masternode ready
     if (nHeight < 100000) {
         nSubsidy = 2 * COIN;
+    } else if (nHeight >= 100000 && nHeight < chainParams.StartDevfeeBlock()) {
+        nSubsidy = 1 * COIN;
+    } else if (nHeight >= chainParams.StartDevfeeBlock() && nHeight < 6000000) {
+        nSubsidy = 1.5 * COIN;
     } else {
         nSubsidy = 1 * COIN;
     }
-
+    
     return nSubsidy + nFees;
 }
 
@@ -1981,12 +2000,14 @@ CAmount GetMasternodePosReward(int nHeight, CAmount blockValue)
 {
     const CChainParams& chainParams = Params();
     CAmount ret = 0;
-    if (nHeight >= POS_REWARD_CHANGED_BLOCK) {
+    if (nHeight >= POS_REWARD_CHANGED_BLOCK && nHeight < chainParams.StartDevfeeBlock()) {
         if (nHeight != chainParams.PreminePayment() || IsTestNet()) {
             ret = blockValue * 0.2; //20% for masternode
         } else if (nHeight == chainParams.PreminePayment()) {
             ret = blockValue * 250000; //premine mint
         }
+    } else if (nHeight >= chainParams.StartDevfeeBlock() && nHeight < 6000000) {
+        ret = blockValue * 0.25; //25% for masternodes after this reward change
     } else {
         ret = blockValue * 0.4; //40% for masternode
     }
@@ -1996,13 +2017,26 @@ CAmount GetMasternodePosReward(int nHeight, CAmount blockValue)
 bool IsInitialBlockDownload()
 {
     const CChainParams& chainParams = Params();
-    //LOCK(cs_main);
-    if (fImporting || fReindex || chainActive.Height() < Checkpoints::GetTotalBlocksEstimate(chainParams.Checkpoints()))
+    
+    // Once this function has returned false, it must remain false.
+    static std::atomic<bool> latchToFalse{false};
+    // Optimization: pre-test latch before taking the lock.
+    if (latchToFalse.load(std::memory_order_relaxed))
+        return false;
+
+    LOCK(cs_main);
+    if (latchToFalse.load(std::memory_order_relaxed))
+        return false;
+    if (fImporting || fReindex)
         return true;
-    // ~144 blocks behind -> 2 x fork detection time
-    bool lock = (chainActive.Height() < pindexBestHeader->nHeight - 24 * 6 ||
-        (!IsTestNet() && pindexBestHeader->GetBlockTime() < GetTime() - 8 * 60 * 60));
-    return lock;
+    if (chainActive.Tip() == NULL)
+        return true;
+    if (chainActive.Height() < Checkpoints::GetTotalBlocksEstimate(chainParams.Checkpoints()))
+        return true;
+    if (chainActive.Tip()->GetBlockTime() < (GetTime() - nMaxTipAge))
+        return true;
+    latchToFalse.store(true, std::memory_order_relaxed);
+    return false;
 }
 
 bool fLargeWorkForkFound = false;
@@ -2749,6 +2783,11 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
         flags |= SCRIPT_VERIFY_WITNESS;
     }
 
+    //Start accepting Schnorr signatures after the devfee fork.
+    if (pindex->nHeight + 1 >= Params().StartDevfeeBlock()) {
+        flags |= SCRIPT_ENABLE_SCHNORR;
+    }
+
     CBlockUndo blockundo;
 
     CCheckQueueControl<CScriptCheck> control(fScriptChecks && nScriptCheckThreads ? &scriptcheckqueue : NULL);
@@ -3087,7 +3126,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
     LogPrint("bench", "      - Connect %u transactions: %.2fms (%.3fms/tx, %.3fms/txin) [%.2fs]\n", (unsigned)block.vtx.size(), 0.001 * (nTime1 - nTimeStart), 0.001 * (nTime1 - nTimeStart) / block.vtx.size(), nInputs <= 1 ? 0 : 0.001 * (nTime1 - nTimeStart) / (nInputs - 1), nTimeConnect * 0.000001);
 
     if (block.IsProofOfWork()) {
-        auto nReward = GetProofOfWorkReward(nFees, pindex->nHeight/*pindex->pprev->nHeight*/);
+        auto nReward = GetProofOfWorkReward(nFees, pindex->nHeight);
         if (!IsInitialBlockDownload() && !IsBlockValueValid(block, nReward)) {
             return state.DoS(100, error("%s: reward pays too much (actual=%d vs limit=%d) (nHeight=%d, nFees=%d)", __func__,
                                         block.vtx[0].GetValueOut(), nReward, pindex->nHeight, nFees),
@@ -4262,7 +4301,7 @@ bool CheckForMasternodePayment(const CTransaction& tx, const CBlockHeader& heade
 
     const CChainParams& chainParams = Params();
 
-    // Special check for genesis block, which is guaranteed to not has a masternode payment
+    // Special check for genesis block, which is guaranteed to not have a masternode payment
     if (header.GetHash() == chainParams.HashGenesisBlock())
         return true;
 
@@ -4354,7 +4393,11 @@ bool CheckForMasternodePayment(const CTransaction& tx, const CBlockHeader& heade
     CAmount roundMnAward = 999999999;
 
     if (tx.IsCoinBase()) {
-        roundMnAward = (CAmount) (totalReward * 0.2f);
+        if (nHeight >= chainParams.StartDevfeeBlock()) {
+            roundMnAward = (CAmount) (totalReward * 0.25f);
+        } else {
+            roundMnAward = (CAmount) (totalReward * 0.2f);
+        }
     }
     else if (tx.vout.size() >= 3) {
 	roundMnAward = GetMasternodePosReward(nHeight, totalReward);
@@ -4630,6 +4673,26 @@ bool ContextualCheckBlock(const CBlock& block, CValidationState& state, CBlockIn
             }
         }
     }
+
+    //Check for the devfee
+    if (nHeight >= chainParams.StartDevfeeBlock()) {
+        const CTransaction& txNew = block.IsProofOfStake() ? block.vtx[1] : block.vtx[0]; //0 is nonstandard for PoS
+        CScript devfeePayee = Params().GetDevfeeScript();
+        CAmount devfeeAmount = block.IsProofOfStake() ? (GetProofOfStakeReward(0, nHeight) * 0.1667) : (GetProofOfWorkReward(0, nHeight) * 0.125);
+
+        bool bFound = false;
+
+        BOOST_FOREACH (CTxOut out, txNew.vout) {
+            if (out.nValue == devfeeAmount && out.scriptPubKey == devfeePayee) {
+                bFound = true; //devfee payment found
+                break;
+            }
+        }
+
+        if (!bFound) {
+            return state.DoS(100, false, REJECT_INVALID, "bad-devfee-missing", false, "missing or invalid devfee");
+        }
+    }
     // Enforce block.nVersion=2 rule that the coinbase starts with serialized block height
     // if 750 of the last 1,000 blocks are version 2 or greater (51/100 if testnet):
     if (block.nVersion >= 2 &&
@@ -4865,12 +4928,12 @@ int static inline GetSkipHeight(int height)
     return (height & 1) ? InvertLowestOne(InvertLowestOne(height - 1)) + 1 : InvertLowestOne(height);
 }
 
-CBlockIndex* CBlockIndex::GetAncestor(int height)
+const CBlockIndex* CBlockIndex::GetAncestor(int height) const
 {
     if (height > nHeight || height < 0)
         return NULL;
 
-    CBlockIndex* pindexWalk = this;
+    const CBlockIndex* pindexWalk = this;
     int heightWalk = nHeight;
     while (heightWalk > height) {
         int heightSkip = GetSkipHeight(heightWalk);
@@ -4889,9 +4952,9 @@ CBlockIndex* CBlockIndex::GetAncestor(int height)
     return pindexWalk;
 }
 
-const CBlockIndex* CBlockIndex::GetAncestor(int height) const
+CBlockIndex* CBlockIndex::GetAncestor(int height)
 {
-    return const_cast<CBlockIndex*>(this)->GetAncestor(height);
+    return const_cast<CBlockIndex*>(static_cast<const CBlockIndex*>(this)->GetAncestor(height));
 }
 
 void CBlockIndex::BuildSkip()
@@ -6596,7 +6659,10 @@ static bool ProcessMessage(CNode* pfrom, const string &strCommand, CDataStream& 
             pindex = chainActive.Next(pindex);
 
         int nLimit = 500;
-        LogPrintf("getblocks %d to %s limit %d from peer=%d\n", (pindex ? pindex->nHeight : -1), hashStop == uint256(0) ? "end" : hashStop.ToString(), nLimit, pfrom->id);
+        if (fDebug) {
+            LogPrintf("getblocks %d to %s limit %d from peer=%d\n", (pindex ? pindex->nHeight : -1), hashStop == uint256(0) ? "end" : hashStop.ToString(), nLimit, pfrom->id);
+        }
+        
         for (; pindex; pindex = chainActive.Next(pindex)) {
             if (pindex->GetBlockHash() == hashStop) {
                 LogPrint("net", "  getblocks stopping at %d %s\n", pindex->nHeight, pindex->GetBlockHash().ToString());
@@ -7119,7 +7185,15 @@ static bool ProcessMessage(CNode* pfrom, const string &strCommand, CDataStream& 
 
 int ActiveProtocol()
 {
-    return MIN_PEER_PROTO_VERSION_BEFORE_ENFORCEMENT;
+    const CChainParams& chainParams = Params();
+    
+    if (chainActive.Height() < chainParams.StartDevfeeBlock() - 10) { //Start banning 10 blocks earlier
+        
+        return MIN_PEER_PROTO_VERSION_BEFORE_ENFORCEMENT;
+    } else {
+        
+        return PROTOCOL_VERSION;
+    }
 }
 
 // requires LOCK(cs_vRecvMsg)
@@ -7602,31 +7676,30 @@ bool CheckRefund(const CBlock& block, const std::vector<CTxOut>& vouts){
     size_t offset = block.IsProofOfStake() ? 1 : 0;
     std::vector<CTxOut> vTempVouts=block.vtx[offset].vout;
     std::vector<CTxOut>::iterator it;
-    bool allValid = true;
-    for(size_t i = 0; i < vouts.size(); i++){
+    bool RefundFound = true;
+    for (size_t i = 0; i < vouts.size(); i++) {
         it=std::find(vTempVouts.begin(), vTempVouts.end(), vouts[i]);
-        if (it==vTempVouts.end()) {
-            bool refundValid = false;
-            const int nPrecision = 10000000;
-            for(it=vTempVouts.begin(); it!=vTempVouts.end(); it++) {
-                if (vouts[i].scriptPubKey == it->scriptPubKey && it->nValue/nPrecision == vouts[i].nValue/nPrecision) {
-                    LogPrintf("%s: found vout %s (%s)\n", __func__, it->ToString().c_str(), FormatMoney(it->nValue));
-                    refundValid = true;
-                    break;
-                }
-            }
-            if (!refundValid) {
-                LogPrintf("%s: Unable to find vout %s\n", __func__, vouts[i].ToString().c_str());
-                LogPrintf("%s: first block %s\n", __func__, vTempVouts.at(0).ToString().c_str());
-                allValid = false;
-                break;
+        if(it==vTempVouts.end()) {
+            bool IsRefundValid = false;
+            int nMaxDriftAllowed = 1;
+            for(it=vTempVouts.begin(); it!=vTempVouts.end(); it++) {    
+                if (vouts[i].scriptPubKey == it->scriptPubKey && it->nValue - vouts[i].nValue < nMaxDriftAllowed) { 
+                    LogPrintf("%s: found vout %s (%s)\n", __func__, it->ToString().c_str(), FormatMoney(it->nValue));   
+                    IsRefundValid = true; 
+                    break;  
+                }   
+            }   
+            if (!IsRefundValid) { 
+                LogPrintf("%s: unable to find a suitable vout %s\n", __func__, vouts[i].ToString().c_str());   
+                LogPrintf("%s: current best vout %s\n", __func__, vTempVouts.at(0).ToString().c_str());   
+                RefundFound = false;   
+                break;  
             }
         } else {
             vTempVouts.erase(it);
         }
     }
-    vTempVouts.clear();
-    return allValid;
+    return RefundFound;
 }
 
 valtype GetSenderAddress(const CTransaction& tx, const CCoinsViewCache* coinsView, const std::vector<CTransaction>* blockTxs){

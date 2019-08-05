@@ -113,6 +113,10 @@ enum
     //
     SCRIPT_VERIFY_WITNESS_PUBKEYTYPE = (1U << 15),
 
+    // Are Schnorr sigs enabled?
+    //
+    SCRIPT_ENABLE_SCHNORR = (1U << 19),
+
     // Performs the compiled byte code
     //
     SCRIPT_EXEC_BYTE_CODE = (1U << 30),
@@ -141,7 +145,13 @@ uint256 SignatureHash(const CScript &scriptCode, const CTransaction& txTo, unsig
 class BaseSignatureChecker
 {
 public:
-    virtual bool CheckSig(const std::vector<unsigned char>& scriptSig, const std::vector<unsigned char>& vchPubKey, const CScript& scriptCode, SigVersion sigversion) const
+    //! Verifies a signature given the pubkey, signature and sighash (Kudos to all the Bitcoin developers for this trick)
+    
+    virtual bool VerifySignature(const std::vector<uint8_t> &vchSig, const CPubKey &vchPubKey, const uint256 &sighash, uint32_t flags) const;
+
+    //! Verifies a signature given the pubkey, signature, script, and transaction (member var)
+
+    virtual bool CheckSig(const std::vector<unsigned char>& scriptSig, const std::vector<unsigned char>& vchPubKey, const CScript& scriptCode, SigVersion sigversion, uint32_t flags) const
     {
         return false;
     }
@@ -167,13 +177,10 @@ private:
     const CAmount amount;
     const PrecomputedTransactionData* txdata;
 
-protected:
-    virtual bool VerifySignature(const std::vector<unsigned char>& vchSig, const CPubKey& vchPubKey, const uint256& sighash) const;
-
 public:
     TransactionSignatureChecker(const CTransaction* txToIn, unsigned int nInIn, const CAmount& amountIn) : txTo(txToIn), nIn(nInIn), amount(amountIn), txdata(nullptr) {}
     TransactionSignatureChecker(const CTransaction* txToIn, unsigned int nInIn, const CAmount& amountIn, const PrecomputedTransactionData& txdataIn) : txTo(txToIn), nIn(nInIn), amount(amountIn), txdata(&txdataIn) {}
-    bool CheckSig(const std::vector<unsigned char>& scriptSig, const std::vector<unsigned char>& vchPubKey, const CScript& scriptCode, SigVersion sigversion) const override;
+    bool CheckSig(const std::vector<unsigned char>& scriptSig, const std::vector<unsigned char>& vchPubKey, const CScript& scriptCode, SigVersion sigversion, uint32_t flags) const override;
     bool CheckLockTime(const CScriptNum& nLockTime) const override;
     bool CheckSequence(const CScriptNum& nSequence) const override;
 };

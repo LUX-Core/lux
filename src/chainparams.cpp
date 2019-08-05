@@ -4,6 +4,7 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
+#include "base58.h"
 #include "chainparams.h"
 #include "consensus/merkle.h"
 #include "primitives/transaction.h"
@@ -149,6 +150,10 @@ public:
         nPruneAfterHeight = 300000;
         nSplitRewardBlock = 300000;
         nPreminePaymentandHardForkBlock = 621950;
+        
+        /** Devfee vars */
+        
+        nStartDevfeeBlock = 828100; //Starting block
 
         /**
          * The message start string is designed to be unlikely to occur in normal data.
@@ -207,6 +212,7 @@ public:
         bech32_hrp = "bc";
 
         vFixedSeeds = std::vector<SeedSpec6>(pnSeed6_main, pnSeed6_main + ARRAYLEN(pnSeed6_main));
+        vDevfeeAddress = "Laqt6GdG615kHonGcp3mkH2KMP4WZwsZhQ";
 
         fMiningRequiresPeers = true;
         fDefaultConsistencyChecks = false;
@@ -232,6 +238,15 @@ public:
         return data;
     }
 };
+
+CScript CChainParams::GetDevfeeScript() const {
+    CBitcoinAddress address(vDevfeeAddress.c_str());
+    assert(address.IsValid());
+
+    CScript script = GetScriptForDestination(address.Get());
+    return script;
+}
+
 static CMainParams mainParams;
 
 /**
