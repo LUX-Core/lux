@@ -167,8 +167,8 @@ static const bool DEFAULT_LOGEVENTS = false;
 static const int64_t DEFAULT_MAX_TIP_AGE = 6 * 60 * 60; // ~144 blocks behind -> 2 x fork detection time, was 24 * 60 * 60 in bitcoin
 
 ////////////////////////////////////////////////////// lux
-static const uint64_t DEFAULT_GAS_LIMIT_OP_CREATE=500000;
-static const uint64_t DEFAULT_GAS_LIMIT_OP_SEND=500000;
+static const uint64_t DEFAULT_GAS_LIMIT_OP_CREATE=5000000;
+static const uint64_t DEFAULT_GAS_LIMIT_OP_SEND=5000000;
 static const CAmount DEFAULT_GAS_PRICE=0.00000040*COIN;
 static const CAmount MAX_RPC_GAS_PRICE=0.00000100*COIN;
 
