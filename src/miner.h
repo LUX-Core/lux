@@ -231,7 +231,7 @@ private:
     // Chain context for the block
     int nHeight;
     int64_t nLockTimeCutoff;
-    const CChainParams& chainparams;
+    const CChainParams& chainParams;
 
     // Variables used for addPriorityTxs
     int lastFewTxs;
@@ -252,7 +252,7 @@ private:
     int32_t nTimeLimit;
 
 public:
-    BlockAssembler(const CChainParams& chainparams);
+    BlockAssembler(const CChainParams& chainParams);
     /** Construct a new block template with coinbase to scriptPubKeyIn */
     std::unique_ptr<CBlockTemplate> CreateNewBlock(const CScript& scriptPubKeyIn, bool fMineWitnessTx=true, bool fProofOfStake=false, int64_t* pTotalFees = 0, int32_t nTime=0, int32_t nTimeLimit=0, bool generateSCFix = false);
     std::unique_ptr<CBlockTemplate> CreateNewStake(bool fMineWitnessTx=true, bool fProofOfStake=false, int64_t* pTotalFees = 0, int32_t nTime=0, int32_t nTimeLimit=0);

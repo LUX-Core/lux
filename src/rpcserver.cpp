@@ -330,7 +330,14 @@ static const CRPCCommand vRPCCommands[] =
         {"luxgate", "addmarket", &addmarket, true, true, false},
         {"luxgate", "getmarket", &getmarket, true, true, false},
         {"luxgate", "placeordertomarket", &placeordertomarket, true, true, false},
-
+        {"luxgate", "takeorderfrommarket", &takeorderfrommarket, true, true, false},
+        {"luxgate", "getdepositaddresses", &getdepositaddresses, true, true, false},
+        {"luxgate", "cancel", &cancel, true, true, false},
+        {"luxgate", "getordershistory", &getordershistory, true, true, false},
+#if defined(DEBUG) || defined(_DEBUG)
+        {"luxgate", "debugrelay", &debugrelay, true, true, false},
+#endif // DEBUG
+ 
 #endif // ENABLE_LUXGATE
 
 #ifdef ENABLE_WALLET

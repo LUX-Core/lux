@@ -1,7 +1,11 @@
+// Copyright (c) 2019 The Luxcore developers
+// Distributed under the MIT software license, see the accompanying
+// file COPYING or http://www.opensource.org/licenses/mit-license.php.
+
 #include "luxgateopenordersmodel.h"
 
-#include "luxgategui_global.h"
 #include "guiutil.h"
+#include "luxgate/luxgate.h"
 
 #include <algorithm>
 
@@ -22,6 +26,7 @@ static void UpdateRow(LuxgateOpenOrdersModel* model, const OrderId orderId, cons
 {
     QMetaObject::invokeMethod(model, "updateRow", Qt::QueuedConnection, Q_ARG(quint64, (quint64)orderId), Q_ARG(int, state));
 }
+
 static void DeleteRow(LuxgateOpenOrdersModel* model, const OrderId orderId)
 {
     QMetaObject::invokeMethod(model, "deleteRow", Qt::QueuedConnection, Q_ARG(quint64, (quint64)orderId));
@@ -30,20 +35,6 @@ static void DeleteRow(LuxgateOpenOrdersModel* model, const OrderId orderId)
 static void ResetOrderBook(LuxgateOpenOrdersModel* model)
 {
     QMetaObject::invokeMethod(model, "reset", Qt::QueuedConnection);
-}
-
-OrderView::OrderView(const std::shared_ptr<const COrder> order)
-{
-    id = order->ComputeId();
-    sId = QString::fromStdString(OrderIdToString(id));
-    sState = stateToString(order->GetState());
-    creationTime = order->OrderCreationTime();
-    sCreationTime = GUIUtil::dateTimeStr(creationTime);
-    sType = order->IsSell() ? QString("Sell") : QString("Buy");
-    isBuy = order->IsBuy();
-    sPrice = QString(Luxgate::QStrFromAmount(order->Price()));
-    sAmount = QString(Luxgate::QStrFromAmount(order->Amount()));
-    sTotal = QString(Luxgate::QStrFromAmount(order->Total()));
 }
 
 LuxgateOpenOrdersModel::LuxgateOpenOrdersModel(const Luxgate::Decimals & decimals, QObject *parent)
@@ -120,7 +111,7 @@ void LuxgateOpenOrdersModel::reset()
 
 Qt::ItemFlags LuxgateOpenOrdersModel::flags(const QModelIndex &index) const
 {
-    return Qt::ItemIsSelectable |  Qt::ItemIsEnabled;
+    return Qt::ItemIsSelectable | Qt::ItemIsEnabled;
 }
 
 void LuxgateOpenOrdersModel::slotSetDecimals(const Luxgate::Decimals & decimals_)
@@ -183,65 +174,38 @@ QVariant LuxgateOpenOrdersModel::data(const QModelIndex &index, int role) const
 {
     QVariant res;
 
-    if (index.isValid()) {
-        auto it = openOrders.cbegin();
-        std::advance(it, index.row());
-        auto order = *it;
-        
-        if (Luxgate::BidAskRole == role)
-            res = order.isBuy;
+    if (!index.isValid())
+        return res;
 
-        else if(Luxgate::CopyRowRole == role)
-            res =   "Price: " + data(this->index(index.row(), PriceColumn)).toString()
-                    + " ID: " + data(this->index(index.row(), IdColumn)).toString()
-                    + " Base: "  + data(this->index(index.row(), BaseAmountColumn)).toString()
-                    + " Quote: "  + data(this->index(index.row(), QuoteTotalColumn)).toString()
-                    + " Date: " + data(this->index(index.row(), DateColumn)).toString()
-                    + " State: " + data(this->index(index.row(), StateColumn)).toString();
+    auto it = openOrders.cbegin();
+    std::advance(it, index.row());
+    auto order = *it;
 
-        else if (Qt::EditRole == role || Qt::DisplayRole == role) {
-
-            if (DateColumn == index.column()) {
-                res = order.sCreationTime;
-            }
-            else if (TypeColumn == index.column()) {
-                res = order.sType;
-            }
-            else if (PriceColumn == index.column()) {
-                res = order.sPrice;
-            }
-            else if (BaseAmountColumn == index.column()) {
-                res = order.sAmount;
-            }
-            else if (QuoteTotalColumn == index.column()) {
-                res = order.sTotal;
-            }
-            else if (StateColumn == index.column()) {
-                res = order.sState;
-            }
-            else if (IdColumn == index.column()) {
-                res = order.sId;
-            }
-        }
+    if (Luxgate::BidAskRole == role)
+        res = order.isBuy;
+    else if(Luxgate::CopyRowRole == role)
+        res = "Price: " + data(this->index(index.row(), PriceColumn)).toString() +
+              " ID: " + data(this->index(index.row(), IdColumn)).toString() +
+              " Base: "  + data(this->index(index.row(), BaseAmountColumn)).toString() +
+              " Quote: "  + data(this->index(index.row(), QuoteTotalColumn)).toString() +
+              " Date: " + data(this->index(index.row(), DateColumn)).toString() +
+              " State: " + data(this->index(index.row(), StateColumn)).toString();
+    else if (Qt::EditRole == role || Qt::DisplayRole == role) {
+        if (DateColumn == index.column())
+            res = order.sCreationTime;
+        else if (TypeColumn == index.column())
+            res = order.sType;
+        else if (PriceColumn == index.column())
+            res = order.sPrice;
+        else if (BaseAmountColumn == index.column())
+            res = order.sAmount;
+        else if (QuoteTotalColumn == index.column())
+            res = order.sTotal;
+        else if (StateColumn == index.column())
+            res = order.sState;
+        else if (IdColumn == index.column())
+            res = order.sId;
     }
     return res;
-}
-
-QString stateToString(const COrder::State state)
-{
-    switch (state) {
-        case COrder::State::INVALID: return QString("Invalid");
-        case COrder::State::NEW: return QString("New");
-        case COrder::State::MATCH_FOUND: return QString("Match found");
-        case COrder::State::SWAP_REQUESTED: return QString("Swap requested");
-        case COrder::State::SWAP_ACK: return QString("Swap acknowledgement sent");
-        case COrder::State::CONTRACT_CREATED: return QString("Contract created");
-        case COrder::State::CONTRACT_ACK: return QString("Contract aknowledgement sent");
-        case COrder::State::REFUNDING: return QString("Refunding");
-        case COrder::State::CONTRACT_VERIFYING: return QString("Verifying contract");
-        case COrder::State::CONTRACT_ACK_VERIFYING: return QString("Verifying contract acknowledgement");
-        case COrder::State::COMPLETE: return QString("Completed");
-        default: return QString("Unknown");
-    };
 }
 

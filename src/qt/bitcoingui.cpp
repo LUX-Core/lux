@@ -96,6 +96,7 @@ BitcoinGUI::BitcoinGUI(const PlatformStyle *platformStyle, const NetworkStyle* n
                                                                             clientModel(0),
                                                                             walletFrame(0),
                                                                             unitDisplayControl(0),
+                                                                            timerStakingIcon(0),
                                                                             labelStakingIcon(0),
                                                                             labelWalletEncryptionIcon(0),
                                                                             pushButtonWalletHDStatusIcon(0),
@@ -150,7 +151,7 @@ BitcoinGUI::BitcoinGUI(const PlatformStyle *platformStyle, const NetworkStyle* n
 {
     /* Open CSS when configured */
     this->setStyleSheet(GUIUtil::loadStyleSheet());
-    resize(1200, 750);
+    resize(1250, 750);
     QString windowTitle = tr("Luxcore") + " - ";
 
 #ifdef ENABLE_UPDATER
@@ -401,10 +402,11 @@ BitcoinGUI::BitcoinGUI(const PlatformStyle *platformStyle, const NetworkStyle* n
     // Subscribe to notifications from core
     subscribeToCoreSignals();
 
-    QTimer* timerStakingIcon = new QTimer(labelStakingIcon);
+    setStakingStatus();
+    timerStakingIcon = new QTimer(this);
     connect(timerStakingIcon, SIGNAL(timeout()), this, SLOT(setStakingStatus()));
     timerStakingIcon->start(10000);
-    setStakingStatus();
+
     modalOverlay = new ModalOverlay(this->centralWidget());
 
     updateDialog = new UpdateDialog(this);
@@ -430,7 +432,7 @@ BitcoinGUI::BitcoinGUI(const PlatformStyle *platformStyle, const NetworkStyle* n
 BitcoinGUI::~BitcoinGUI() {
     // Unsubscribe from notifications from core
     unsubscribeFromCoreSignals();
-
+    delete timerStakingIcon;
     GUIUtil::saveWindowGeometry("nWindow", this);
     if (trayIcon) // Hide tray icon, as deleting will let it linger until quit (on Ubuntu)
         trayIcon->hide();

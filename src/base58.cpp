@@ -359,7 +359,7 @@ CTxDestination CBitcoinAddress::Get() const
     if (!IsValid())
         return CNoDestination();
     uint160 id;
-    memcpy(&id, &vchData[0], 20);
+    memcpy(static_cast<void*>(&id), &vchData[0], 20);
     if (vchVersion == Params().Base58Prefix(CChainParams::PUBKEY_ADDRESS))
         return CKeyID(id);
     else if (vchVersion == Params().Base58Prefix(CChainParams::SCRIPT_ADDRESS))
@@ -373,11 +373,11 @@ bool CBitcoinAddress::GetIndexKey(uint160& hashBytes, int& type) const
     if (!IsValid()) {
         return false;
     } else if (vchVersion == Params().Base58Prefix(CChainParams::PUBKEY_ADDRESS)) {
-        memcpy(&hashBytes, &vchData[0], 20);
+        memcpy(static_cast<void*>(&hashBytes), &vchData[0], 20);
         type = 1;
         return true;
     } else if (vchVersion == Params().Base58Prefix(CChainParams::SCRIPT_ADDRESS)) {
-        memcpy(&hashBytes, &vchData[0], 20);
+        memcpy(static_cast<void*>(&hashBytes), &vchData[0], 20);
         type = 2;
         return true;
     }
@@ -390,7 +390,7 @@ bool CBitcoinAddress::GetKeyID(CKeyID& keyID) const
     if (!IsValid() || vchVersion != Params().Base58Prefix(CChainParams::PUBKEY_ADDRESS))
         return false;
     uint160 id;
-    memcpy(&id, &vchData[0], 20);
+    memcpy(static_cast<void*>(&id), &vchData[0], 20);
     keyID = CKeyID(id);
     return true;
 }

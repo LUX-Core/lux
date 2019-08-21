@@ -188,12 +188,18 @@ if ENABLE_LUXGATE
 BITCOIN_CORE_H += \
   luxgate/context.h \
   luxgate/atomicswap.h \
+  luxgate/bitcoinclient.h \
   luxgate/blockchainclient.h \
   luxgate/http.h \
   luxgate/lgconfig.h \
+  luxgate/luxclient.h \
   luxgate/luxgate.h \
+  luxgate/order.h \
+  luxgate/orderbook.h \
   luxgate/version.h \
-  luxgate/zmqsub.h
+  luxgate/zmqsub.h \
+  luxgate/storage.h \
+  luxgate/sql/sqlite3.h
 endif
 
 obj/build.h: FORCE
@@ -247,12 +253,18 @@ libbitcoin_server_a_SOURCES = \
 if ENABLE_LUXGATE
 libbitcoin_server_a_SOURCES += \
   luxgate/atomicswap.cpp \
+  luxgate/bitcoinclient.cpp \
   luxgate/blockchainclient.cpp \
   luxgate/http.cpp \
   luxgate/lgconfig.cpp \
+  luxgate/luxclient.cpp \
   luxgate/luxgate.cpp \
+  luxgate/order.cpp \
+  luxgate/orderbook.cpp \
   luxgate/rpcluxgate.cpp \
-  luxgate/zmqsub.cpp
+  luxgate/zmqsub.cpp \
+  luxgate/storage.cpp \
+  luxgate/sql/sqlite3.c
 endif
 
 if ENABLE_ZMQ
@@ -333,7 +345,6 @@ crypto_libbitcoin_crypto_a_SOURCES = \
   cpp-ethereum/utils/libscrypt/b64.h \
   cpp-ethereum/utils/libscrypt/crypto-mcf.c \
   cpp-ethereum/utils/libscrypt/crypto_scrypt-check.c \
-  cpp-ethereum/utils/libscrypt/crypto_scrypt-hash.c \
   cpp-ethereum/utils/libscrypt/crypto_scrypt-hexconvert.c \
   cpp-ethereum/utils/libscrypt/crypto_scrypt-hexconvert.h \
   cpp-ethereum/utils/libscrypt/crypto_scrypt-nosse.c \
@@ -419,6 +430,10 @@ libbitcoin_common_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES) -DLUX_BUILD
 libbitcoin_common_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 libbitcoin_common_a_CFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS) -std=c99
 libbitcoin_common_a_SOURCES = \
+  secp256k1/include/secp256k1.h \
+  secp256k1/include/secp256k1_ecdh.h \
+  secp256k1/include/secp256k1_recovery.h \
+  secp256k1/include/secp256k1_schnorr.h \
   allocators.cpp \
   amount.cpp \
   base58.cpp \

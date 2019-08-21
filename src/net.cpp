@@ -77,10 +77,8 @@ struct ListenSocket {
 };
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////// Luxgate
 /** Services this node implementation cares about */
-ServiceFlags nRelevantServices = ServiceFlags(NODE_NETWORK | NODE_LUXGATE);
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////// Luxgate
+ServiceFlags nRelevantServices = NODE_NETWORK;
 
 //
 // Global state variables
@@ -88,9 +86,7 @@ ServiceFlags nRelevantServices = ServiceFlags(NODE_NETWORK | NODE_LUXGATE);
 bool fDiscover = true;
 bool fListen = true;
 bool fNetworkActive = true;
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////// Luxgate
-ServiceFlags nLocalServices = ServiceFlags(NODE_NETWORK);
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////// Luxgate
+ServiceFlags nLocalServices = NODE_NETWORK;
 CCriticalSection cs_mapLocalHost;
 map<CNetAddr, LocalServiceInfo> mapLocalHost;
 static bool vfReachable[NET_MAX] = {};
@@ -634,6 +630,8 @@ bool CNode::Unban(const CSubNet &subNet)
 void CNode::GetBanned(banmap_t &banMap)
 {
     LOCK(cs_setBanned);
+    // Sweep the banlist so expired bans are not returned
+    SweepBanned();
     banMap = setBanned; //create a thread safe copy
 }
 

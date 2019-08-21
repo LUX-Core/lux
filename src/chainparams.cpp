@@ -4,6 +4,7 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
+#include "base58.h"
 #include "chainparams.h"
 #include "consensus/merkle.h"
 #include "primitives/transaction.h"
@@ -150,6 +151,10 @@ public:
         nPruneAfterHeight = 300000;
         nSplitRewardBlock = 300000;
         nPreminePaymentandHardForkBlock = 621950;
+        
+        /** Devfee vars */
+        
+        nStartDevfeeBlock = 828100; //Starting block
 
         /**
          * The message start string is designed to be unlikely to occur in normal data.
@@ -204,12 +209,13 @@ public:
         base58Prefixes[EXT_PUBLIC_KEY] = boost::assign::list_of(0x07)(0x28)(0xA2)(0x4E).convert_to_container<std::vector<unsigned char> >();
         base58Prefixes[EXT_SECRET_KEY] = boost::assign::list_of(0x03)(0xD8)(0xA1)(0xE5).convert_to_container<std::vector<unsigned char> >();
 
-        // LUX BIP44 coin type is '1'
-        nExtCoinType = 1;
+        // LUX BIP44 coin type is '3003'
+        nExtCoinType = 3003;
 
         bech32_hrp = "bc";
 
         vFixedSeeds = std::vector<SeedSpec6>(pnSeed6_main, pnSeed6_main + ARRAYLEN(pnSeed6_main));
+        vDevfeeAddress = "Laqt6GdG615kHonGcp3mkH2KMP4WZwsZhQ";
 
         fMiningRequiresPeers = true;
         fDefaultConsistencyChecks = false;
@@ -235,6 +241,15 @@ public:
         return data;
     }
 };
+
+CScript CChainParams::GetDevfeeScript() const {
+    CBitcoinAddress address(vDevfeeAddress.c_str());
+    assert(address.IsValid());
+
+    CScript script = GetScriptForDestination(address.Get());
+    return script;
+}
+
 static CMainParams mainParams;
 
 /**
@@ -374,6 +389,9 @@ class CLuxGateTestParams : public CTestNetParams
             nSwitchPhi2Block = 30;
             consensus.nPowTargetSpacing = 15; // 15 seconds
             nFirstSCBlock = 40;
+            nSplitRewardBlock = 500000;
+            nPreminePaymentandHardForkBlock = 500000;
+            nPruneAfterHeight = 500000;
         } 
 };
 

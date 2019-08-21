@@ -399,9 +399,6 @@ std::string HelpMessage(HelpMessageMode mode)
     strUsage += HelpMessageOpt("-checkblocks=<n>", strprintf(_("How many blocks to check at startup (default: %u, 0 = all)"), 500));
     strUsage += HelpMessageOpt("-checklevel=<n>", strprintf(_("How thorough the block verification of -checkblocks is (0-4, default: %u)"), 3));
     strUsage += HelpMessageOpt("-conf=<file>", strprintf(_("Specify configuration file (default: %s)"), "lux.conf"));
-#ifdef ENABLE_LUXGATE
-    strUsage += HelpMessageOpt("-luxgateconf=<file>", strprintf(_("Specify LuxGate configuration file (default: %s)"), "luxgate.json"));
-#endif
     if (mode == HMM_BITCOIND) {
 #if !defined(WIN32)
         strUsage += HelpMessageOpt("-daemon", _("Run in the background as a daemon and accept commands"));
@@ -418,7 +415,8 @@ std::string HelpMessage(HelpMessageMode mode)
     strUsage += HelpMessageOpt("-pid=<file>", strprintf(_("Specify pid file (default: %s)"), "luxd.pid"));
 #endif
     strUsage += HelpMessageOpt("-record-log-opcodes", _("Logs all EVM LOG opcode operations to the file vmExecLogs.json"));
-    strUsage += HelpMessageOpt("-prune=<n>", _("Reduce storage requirements by pruning (deleting) old blocks. This mode disables wallet support and is incompatible with -txindex.") + " " + _("Warning: Reverting this setting requires re-downloading the entire blockchain.") + " " + _("(default: 0 = disable pruning blocks,") + " " + strprintf(_(">%u = target size in MiB to use for block files)"), MIN_DISK_SPACE_FOR_BLOCK_FILES / 1024 / 1024));
+    //Temporarily disabled until our chain doesn't grow in size
+    //strUsage += HelpMessageOpt("-prune=<n>", _("Reduce storage requirements by pruning (deleting) old blocks. This mode disables wallet support and is incompatible with -txindex.") + " " + _("Warning: Reverting this setting requires re-downloading the entire blockchain.") + " " + _("(default: 0 = disable pruning blocks,") + " " + strprintf(_(">%u = target size in MiB to use for block files)"), MIN_DISK_SPACE_FOR_BLOCK_FILES / 1024 / 1024));
     strUsage += HelpMessageOpt("-reindex-chainstate", _("Rebuild chain state from the currently indexed blocks"));
     strUsage += HelpMessageOpt("-reindex", _("Rebuild block chain index from current blk000??.dat files") + " " + _("on startup"));
 #if !defined(WIN32)
@@ -586,6 +584,13 @@ std::string HelpMessage(HelpMessageMode mode)
     strUsage += HelpMessageOpt("-rpcsslcertificatechainfile=<file.cert>", strprintf(_("Server certificate file (default: %s)"), "server.cert"));
     strUsage += HelpMessageOpt("-rpcsslprivatekeyfile=<file.pem>", strprintf(_("Server private key (default: %s)"), "server.pem"));
     strUsage += HelpMessageOpt("-rpcsslciphers=<ciphers>", strprintf(_("Acceptable ciphers (default: %s)"), "TLSv1.2+HIGH:TLSv1+HIGH:!SSLv2:!aNULL:!eNULL:!3DES:@STRENGTH"));
+
+#ifdef ENABLE_LUXGATE
+    strUsage += HelpMessageGroup(_("LuxGate options:"));
+    strUsage += HelpMessageOpt("-luxgate", strprintf(_("Enable LuxGate. (default: %u)"), DEFAULT_ENABLE_LUXGATE));
+    strUsage += HelpMessageOpt("-luxgaterelay", strprintf(_("Enable relaying LuxGate messages. (default 1 when -luxgate=1, otherwise %u)"), DEFAULT_ENABLE_LUXGATE_RELAY));
+    strUsage += HelpMessageOpt("-luxgateconf=<file>", strprintf(_("Specify LuxGate configuration file (default: %s)"), "luxgate.json"));
+#endif
 
     return strUsage;
 }
@@ -838,7 +843,8 @@ bool AppInit2()
     fPrintToConsole = GetBoolArg("-printtoconsole", false);
     fLogTimestamps = GetBoolArg("-logtimestamps", true);
     fLogIPs = GetBoolArg("-logips", false);
-    int nIndexNum;
+    //Temporarily disabled until our chain doesn't grow in size
+    //int nIndexNum;
 
     if (mapArgs.count("-bind") || mapArgs.count("-whitebind")) {
         // when specifying an explicit binding address, you want to listen on it
@@ -935,8 +941,8 @@ bool AppInit2()
         return InitError(_("Not enough file descriptors available."));
     if (nFD - MIN_CORE_FILEDESCRIPTORS < nMaxConnections)
         nMaxConnections = nFD - MIN_CORE_FILEDESCRIPTORS;
-
-    if (GetArg("-prune", 0)) {
+    //Temporarily disabled until our chain doesn't grow in size
+    /*if (GetArg("-prune", 0)) {
         std::string strLoadError;
         if (GetBoolArg("-txindex", DEFAULT_TXINDEX)) {
             strLoadError = _("You need to add txindex=0 to start pruning");
@@ -955,6 +961,7 @@ bool AppInit2()
             }
         }
     }
+    */
     if (fRequestRestart) {
         LogPrintf("Restart requested. Exiting.\n");
         return false;
@@ -1159,8 +1166,18 @@ bool AppInit2()
     std::ostringstream strErrors;
 
 #ifdef ENABLE_LUXGATE
-    LogPrintf("Using LuxGate config file %s\n", luxgate.Context()->GetLuxGateConfigFile().string());
-    luxgate.InitializeFromConfig();
+    if (GetBoolArg("-luxgate", DEFAULT_ENABLE_LUXGATE)) {
+        if (!GetBoolArg("-txindex", DEFAULT_TXINDEX))
+            return InitError("You need to add txindex=1 to start LuxGate.");
+        LogPrintf("Using LuxGate config file %s\n", luxgate.Context()->GetLuxGateConfigFile().string());
+        luxgate.InitializeFromConfig();
+        luxgate.fEnabled = true;
+    }
+    if (luxgate.fEnabled || GetBoolArg("-luxgaterelay", DEFAULT_ENABLE_LUXGATE_RELAY)) {
+        luxgate.fRelayEnabled = true;
+        nLocalServices = ServiceFlags(nLocalServices | NODE_LUXGATE);
+        nRelevantServices = ServiceFlags(nRelevantServices | NODE_LUXGATE);
+    }
 #endif // ENABLE_LUXGATE
 
     InitSignatureCache();

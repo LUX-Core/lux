@@ -346,6 +346,7 @@ if ENABLE_LUXGATE
                   qt/luxgateopenorderspanel.h \
                   qt/luxgateopenordersmodel.h \
                   qt/luxgateorderbookpanel.h \
+                  qt/luxgateorderview.h \
                   qt/luxgategui_global.h \
                   qt/tradingplot.h \
                   qt/luxgatehistorypanel.h \
@@ -583,6 +584,7 @@ if ENABLE_LUXGATE
                     qt/luxgateopenorderspanel.cpp \
                     qt/luxgateopenordersmodel.cpp \
                     qt/luxgateorderbookpanel.cpp \
+                    qt/luxgateorderview.cpp \
                     qt/tradingplot.cpp \
                     qt/luxgatehistorypanel.cpp \
                     qt/luxgatehistorymodel.cpp \
@@ -606,7 +608,6 @@ RES_IMAGES = \
   qt/res/images/rightArrow_small.png \
   qt/res/images/qtreeview_selected.png \
   qt/res/images/walletFrame.png \
-  qt/res/images/walletFrame_bg.png \
   qt/res/images/walletFrame_bg.png
 
 RES_CSS = \

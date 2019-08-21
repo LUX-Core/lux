@@ -1794,3 +1794,29 @@ QDialog#MultiSendDialog .QPushButton#deleteButton:hover {
 QDialog#MultiSendDialog .QPushButton#deleteButton:pressed {
     border:1px solid #9e9e9e;
 }
+
+/********************************* LUXGATE **************************************/
+
+LuxgateCreateOrderPanel  QPushButton#pushButtonBuySell {
+    padding: 10px 20px;
+}
+
+LuxgateCreateOrderPanel QLineEdit#lineEditPrice,
+LuxgateCreateOrderPanel QLineEdit#lineEditQuantity,
+LuxgateCreateOrderPanel QLineEdit#lineEditTotal {
+    font-size: 12pt;
+}
+
+LuxgateCreateOrderPanel QLineEdit#lineEditFee,
+LuxgateCreateOrderPanel QLineEdit#lineEditTotal {
+    border: none;
+}
+
+LuxgateOpenOrdersPanel QPushButton {
+    padding-left: 10px;
+    padding-right: 10px;
+    text-align: center;
+    align-content: center;
+    margin-right: 0;
+}
+
