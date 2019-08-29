@@ -196,6 +196,7 @@ BITCOIN_CORE_H += \
   luxgate/luxgate.h \
   luxgate/order.h \
   luxgate/orderbook.h \
+  luxgate/market.h \
   luxgate/version.h \
   luxgate/zmqsub.h \
   luxgate/storage.h \
@@ -259,6 +260,7 @@ libbitcoin_server_a_SOURCES += \
   luxgate/lgconfig.cpp \
   luxgate/luxclient.cpp \
   luxgate/luxgate.cpp \
+  luxgate/market.cpp \
   luxgate/order.cpp \
   luxgate/orderbook.cpp \
   luxgate/rpcluxgate.cpp \
