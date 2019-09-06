@@ -214,7 +214,7 @@ void LuxgateConfigPanel::slotClickImportConfiguration()
 
 void LuxgateConfigPanel::slotClickExportConfiguration()
 {
-    QString defaultConfigLocation = QStringFromPath(luxgate.Context()->GetLuxGateConfigFile());
+    QString defaultConfigLocation = QStringFromPath(luxgate.Context()->GetConfigFile());
     QString newFileName = QFileDialog::getSaveFileName(this, tr("Export LuxGate configuration"),
                                                         defaultConfigLocation,
                                                         tr("*.json"));

@@ -1169,7 +1169,7 @@ bool AppInit2()
     if (GetBoolArg("-luxgate", DEFAULT_ENABLE_LUXGATE)) {
         if (!GetBoolArg("-txindex", DEFAULT_TXINDEX))
             return InitError("You need to add txindex=1 to start LuxGate.");
-        LogPrintf("Using LuxGate config file %s\n", luxgate.Context()->GetLuxGateConfigFile().string());
+        LogPrintf("Using LuxGate config file %s\n", luxgate.Context()->GetConfigFile().string());
         luxgate.InitializeFromConfig();
         luxgate.fEnabled = true;
     }
