@@ -309,12 +309,6 @@ extern UniValue bip38decrypt(const UniValue& params, bool fHelp);
 extern UniValue importprunedfunds(const UniValue& params, bool fHelp);
 extern UniValue removeprunedfunds(const UniValue& params, bool fHelp);
 
-extern UniValue importprivkey(const UniValue& params, bool fHelp);
-extern UniValue importaddress(const UniValue& params, bool fHelp);
-extern UniValue dumpwallet(const UniValue& params, bool fHelp);
-extern UniValue importwallet(const UniValue& params, bool fHelp);
-extern UniValue bip38encrypt(const UniValue& params, bool fHelp);
-extern UniValue bip38decrypt(const UniValue& params, bool fHelp);
 extern UniValue setstakesplitthreshold(const UniValue& params, bool fHelp);
 extern UniValue getstakesplitthreshold(const UniValue& params, bool fHelp);
 extern UniValue getgenerate(const UniValue& params, bool fHelp); // in rpcmining.cpp
