@@ -133,3 +133,4 @@ depends/x86_64-w64-mingw32/
 depends/built
 depends/sources
 depends/x86_*
+/cmake-build-debug/

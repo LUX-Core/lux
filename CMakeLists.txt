@@ -21,3 +21,5 @@ add_custom_target(debug-lux-qt ALL
         COMMAND ./configure --enable-debug --with-gui
         COMMAND $(MAKE) WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
         COMMAND $(MAKE))
+
+include(CLion.cmake)
