@@ -134,3 +134,8 @@ depends/built
 depends/sources
 depends/x86_*
 /cmake-build-debug/
+/.clangd/index/
+*.ctags
+/compile_commands.json
+*.todo
+*.plist
