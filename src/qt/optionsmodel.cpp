@@ -391,6 +391,7 @@ bool OptionsModel::setData(const QModelIndex& index, const QVariant& value, int 
         case DARK_MODEFeatures:
             fDARK_MODEFeatures = value.toBool();
             settings.setValue("fDARK_MODEFeatures", fDARK_MODEFeatures);
+            setRestartRequired(true);
             Q_EMIT DARK_MODEChanged(fDARK_MODEFeatures);
             break;
 #endif
