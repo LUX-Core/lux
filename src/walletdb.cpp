@@ -76,18 +76,18 @@ bool CWalletDB::EraseTx(uint256 hash)
 bool CWalletDB::WriteLuxNodeConfig(std::string sAlias, const CLuxNodeConfig& nodeConfig)
 {
     nWalletDBUpdateCounter++;
-    return Write(std::make_pair(std::string("adrenaline"), sAlias), nodeConfig, true);
+    return Write(std::make_pair(std::string("lux"), sAlias), nodeConfig, true);
 }
 
 bool CWalletDB::ReadLuxNodeConfig(std::string sAlias, CLuxNodeConfig& nodeConfig)
 {
-    return Read(std::make_pair(std::string("adrenaline"), sAlias), nodeConfig);
+    return Read(std::make_pair(std::string("lux"), sAlias), nodeConfig);
 }
 
 bool CWalletDB::EraseLuxNodeConfig(std::string sAlias)
 {
     nWalletDBUpdateCounter++;
-    return Erase(std::make_pair(std::string("adrenaline"), sAlias));
+    return Erase(std::make_pair(std::string("lux"), sAlias));
 }
 
 bool CWalletDB::WriteKey(const CPubKey& vchPubKey, const CPrivKey& vchPrivKey, const CKeyMetadata& keyMeta)
@@ -1019,7 +1019,7 @@ void ThreadFlushWalletDB(const string& strFile)
                         bitdb.CloseDb(strFile);
                         bitdb.CheckpointLSN(strFile);
 
-                        bitdb.mapFileUseCount.erase(mi++);
+                        //bitdb.mapFileUseCount.erase(mi++); I'll reference this: https://github.com/bitcoin/bitcoin/issues/7475
                         LogPrint("db", "Flushed wallet.dat %dms\n", GetTimeMillis() - nStart);
                     }
                 }
@@ -1040,6 +1040,9 @@ bool BackupWallet(const CWallet& wallet, const string& strDest)
                 bitdb.CloseDb(wallet.strWalletFile);
                 bitdb.CheckpointLSN(wallet.strWalletFile);
                 bitdb.mapFileUseCount.erase(wallet.strWalletFile);
+                LogPrintf("Issuing lsn_reset for backup file compatibility.\n");
+                bitdb.lsn_reset(wallet.strWalletFile); 
+
 
                 // Copy wallet.dat
                 filesystem::path pathSrc = GetDataDir() / wallet.strWalletFile;

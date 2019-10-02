@@ -2090,6 +2090,8 @@ void CWallet::AvailableCoins(vector<COutput>& vCoins, bool fOnlyConfirmed, const
 
     {
         LOCK2(cs_main, cs_wallet);
+
+        std::map<CScript, isminetype> mapOutputIsMine;
         for (map<uint256, CWalletTx>::const_iterator it = mapWallet.begin(); it != mapWallet.end(); ++it) {
             const uint256& wtxid = it->first;
             const CWalletTx* pcoin = &(*it).second;
@@ -2129,7 +2131,14 @@ void CWallet::AvailableCoins(vector<COutput>& vCoins, bool fOnlyConfirmed, const
                 }
                 if (!found) continue;
 
-                isminetype mine = IsMine(pcoin->vout[i]);
+                //isminetype mine = IsMine(pcoin->vout[i]);
+                auto inserted = mapOutputIsMine.emplace(pcoin->vout[i].scriptPubKey, ISMINE_NO);
+                if (inserted.second) {
+                   inserted.first->second = IsMine(pcoin->vout[i]);
+                }
+                
+                isminetype mine = inserted.first->second;
+
                 if (mine && !(IsSpent(wtxid, i)) && mine != ISMINE_NO &&
                     !IsLockedCoin((*it).first, i) && pcoin->vout[i].nValue > 0 &&
                     (!coinControl || !coinControl->HasSelected() || coinControl->fAllowOtherInputs || coinControl->IsSelected((*it).first, i))) {
@@ -2791,7 +2800,7 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CWalletT
     {
         if (nValue < 0 || recipient.nAmount < 0)
         {
-            strFailReason = _("Transaction amounts must not be negative");
+            strFailReason = _("Transaction amounts must be positive");
             return false;
         }
         nValue += recipient.nAmount;
@@ -2855,20 +2864,18 @@ bool CWallet::CreateTransaction(const std::vector<CRecipient>& vecSend, CWalletT
                 // vouts to the payees
                 if (coinControl && !coinControl->fSplitBlock) {
                     for (const auto& recipient : vecSend) {
-                        CTxOut txout(recipient.nAmount, recipient.scriptPubKey);
-                            if (recipient.fSubtractFeeFromAmount)
-                            {
-                                assert(nSubtractFeeFromAmount != 0);
-                                txout.nValue -= nFeeRet / nSubtractFeeFromAmount; // Subtract fee equally from each selected recipient
 
-                                if (fFirst) // first receiver pays the remainder not divisible by output count
-                                {
-                                    fFirst = false;
-                                    txout.nValue -= nFeeRet % nSubtractFeeFromAmount;
-                                }
+                        CTxOut txout(recipient.nAmount, recipient.scriptPubKey);
+                        if (recipient.fSubtractFeeFromAmount) {
+                            assert(nSubtractFeeFromAmount != 0);
+                            txout.nValue -= nFeeRet / nSubtractFeeFromAmount; // Subtract fee equally from each selected recipient
+                            if (fFirst) { // first receiver pays the remainder not divisible by output count
+                                fFirst = false;
+                                txout.nValue -= nFeeRet % nSubtractFeeFromAmount;
                             }
+                        }
+
                         if (txout.IsDust(::minRelayTxFee)) {
-                        
                             if (recipient.fSubtractFeeFromAmount && nFeeRet > 0)
                             {
                                 if (txout.nValue < 0)

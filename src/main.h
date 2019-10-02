@@ -107,7 +107,7 @@ static const bool DEFAULT_ALERTS = true;
 /** Default for DEFAULT_WHITELISTALWAYSRELAY. */
 static const bool DEFAULT_WHITELISTALWAYSRELAY = true;
 /** The maximum size for transactions we're willing to relay/mine */
-static const unsigned int MAX_STANDARD_TX_SIZE = MAX_BLOCK_SIZE_GEN/5;
+static const unsigned int MAX_STANDARD_TX_SIZE = MAX_BLOCK_SIZE_GEN/2;
 /** The maximum allowed number of signature check operations in a block (network rule) */
 static const unsigned int MAX_BLOCK_SIGOPS = MAX_BLOCK_BASE_SIZE / 50;
 /** Default for -maxorphantx, maximum number of orphan transactions kept in memory */
@@ -164,9 +164,11 @@ static const int64_t STATIC_POS_REWARD = 1 * COIN; //Constant reward 8%
 
 static const bool DEFAULT_LOGEVENTS = false;
 
+static const int64_t DEFAULT_MAX_TIP_AGE = 6 * 60 * 60; // ~144 blocks behind -> 2 x fork detection time, was 24 * 60 * 60 in bitcoin
+
 ////////////////////////////////////////////////////// lux
-static const uint64_t DEFAULT_GAS_LIMIT_OP_CREATE=2500000;
-static const uint64_t DEFAULT_GAS_LIMIT_OP_SEND=250000;
+static const uint64_t DEFAULT_GAS_LIMIT_OP_CREATE=5000000;
+static const uint64_t DEFAULT_GAS_LIMIT_OP_SEND=5000000;
 static const CAmount DEFAULT_GAS_PRICE=0.00000040*COIN;
 static const CAmount MAX_RPC_GAS_PRICE=0.00000100*COIN;
 
@@ -343,7 +345,6 @@ inline unsigned int GetTargetSpacing(int nHeight) { return IsProtocolV2(nHeight)
 bool ActivateBestChain(CValidationState& state, const CChainParams& chainparams, const CBlock* pblock = NULL);
 CAmount GetProofOfWorkReward(int64_t nFees, int nHeight);
 CAmount GetProofOfStakeReward(int64_t nFees, int nHeight);
-
 /**
  * Prune block and undo files (blk???.dat and undo???.dat) so that the disk space used is less than a user-defined target.
  * The user sets the target (in MB) on the command line or in config file.  This will be run on startup and whenever new
@@ -729,7 +730,8 @@ static const std::string blockedAddresses[] = {
     "LRdt4fwVPNcZeEBHY2reUyewfPXV18MYTc",
     "LhyVymbZJRAfvRwGmKLKdgJXrFnJfjrhLX",
     "LT2LVjJ7aqDGMkJCyzw5iaJGdhJZGhwKxP",
-    "LaNjvsiGtZiQqvkcGqpKJCKcB4aqBuvj9h"
+    "LaNjvsiGtZiQqvkcGqpKJCKcB4aqBuvj9h",
+    "LQAJKWSNG7YnFn7zENfwDJnh6BodkqRk5L" //Cryptopia
 };
 /** Check whether witness commitments are required for block. */
 bool IsWitnessEnabled(const CBlockIndex* pindexPrev, const Consensus::Params& params);

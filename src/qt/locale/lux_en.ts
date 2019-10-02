@@ -3481,6 +3481,17 @@
     <message>
         <location line="+13"/>
         <location filename="../forms/ui_masternodemanager.h" line="+1"/>
+        <source>Filter List:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Filter masternode list</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+13"/>
+        <location filename="../forms/ui_masternodemanager.h" line="+1"/>
         <source>Masternodes Activated:</source>
         <translation type="unfinished"></translation>
     </message>

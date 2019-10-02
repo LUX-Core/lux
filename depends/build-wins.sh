@@ -71,7 +71,7 @@ cp ../src/config/condition_variable.hpp "$INCLUDE_DIR/boost/thread/win32/conditi
 cd ..
 TARGET_ARCH_FLAGS="-march=core2" # arch samples: core2 atom corei7 corei7-avx
 ./autogen.sh windows $PLATFORM $INSTALL_DIR
-./configure --prefix=$PWD/depends/$PLATFORM --host=$PLATFORM --disable-shared --enable-reduce-exports --enable-upnp-default CPPFLAGS="$TARGET_ARCH_FLAGS -DMINIUPNP_STATICLIB" CFLAGS="-std=c99" LDFLAGS="-static -static-libgcc -Wl,-Bstatic -lstdc++"
+./configure --prefix=$PWD/depends/$PLATFORM --host=$PLATFORM --disable-shared --enable-reduce-exports --enable-upnp-default CPPFLAGS="$TARGET_ARCH_FLAGS -DMINIUPNP_STATICLIB" CFLAGS="-std=c99" LDFLAGS="-static -static-libgcc -Bstatic -lstdc++ -Wl,--stack,16777216"
 
 # Build the application
 make -j$(nproc) #--trace

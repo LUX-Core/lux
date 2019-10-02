@@ -171,7 +171,7 @@ bool CBlock::SignBlock(const CKeyStore& keystore)
                 if (!keystore.GetKey(keyID, key))
                     return false;
 
-                if (!key.Sign(GetHash(), vchBlockSig))
+                if (!key.SignECDSA(GetHash(), vchBlockSig))
                     return false;
 
                 return true;
@@ -195,7 +195,7 @@ bool CBlock::SignBlock(const CKeyStore& keystore)
                 if (!keystore.GetKey(keyID, key))
                     return false;
 
-                if (!key.Sign(GetHash(), vchBlockSig))
+                if (!key.SignECDSA(GetHash(), vchBlockSig))
                     return false;
 
                 return true;
@@ -208,7 +208,7 @@ bool CBlock::SignBlock(const CKeyStore& keystore)
                     return false;
                 if (key.GetPubKey() != pubKey)
                     return false;
-                return key.Sign(GetHash(), vchBlockSig, 0);
+                return key.SignECDSA(GetHash(), vchBlockSig, 0);
             }
             return false;
             }
@@ -246,7 +246,7 @@ bool CBlock::CheckBlockSignature() const
         if (vchBlockSig.empty())
             return false;
 
-        return pubkey.Verify(GetHash(), vchBlockSig);
+        return pubkey.VerifyECDSA(GetHash(), vchBlockSig);
     }
     else if(whichType == TX_PUBKEYHASH)
     {
@@ -261,7 +261,7 @@ bool CBlock::CheckBlockSignature() const
         if (vchBlockSig.empty())
             return false;
 
-        return pubkey.Verify(GetHash(), vchBlockSig);
+        return pubkey.VerifyECDSA(GetHash(), vchBlockSig);
 
         }
     }

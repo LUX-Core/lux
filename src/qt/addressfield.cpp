@@ -21,7 +21,8 @@ AddressField::AddressField(QWidget *parent) :
     m_addressTableModel(0),
     m_addressColumn(0),
     m_typeRole(Qt::UserRole),
-    m_receive("R")
+    m_receive("R"),
+    m_senderAddress(false)
 
 {
     // Set editable state
@@ -183,4 +184,9 @@ void AddressField::setAddressTableModel(QAbstractItemModel *addressTableModel)
     connect(m_addressTableModel, SIGNAL(rowsRemoved(QModelIndex,int,int)), this, SLOT(on_refresh()));
 
     on_refresh();
+}
+
+void AddressField::setSenderAddress(bool senderAddress)
+{
+    m_senderAddress = senderAddress;
 }

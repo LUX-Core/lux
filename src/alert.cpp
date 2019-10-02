@@ -157,9 +157,9 @@ bool CAlert::Sign()
         return false;
     }
     CKey key = vchSecret.GetKey();
-    if (!key.Sign(Hash(vchMsg.begin(), vchMsg.end()), vchSig))
+    if (!key.SignECDSA(Hash(vchMsg.begin(), vchMsg.end()), vchSig))
     {
-        printf("CAlert::SignAlert() : key.Sign failed\n");
+        printf("CAlert::SignAlert() : key.SignECDSA failed\n");
         return false;
     }
 
@@ -169,7 +169,7 @@ bool CAlert::Sign()
 bool CAlert::CheckSignature(const std::vector<unsigned char>& alertKey) const
 {
     CPubKey key(alertKey);
-    if (!key.Verify(Hash(vchMsg.begin(), vchMsg.end()), vchSig))
+    if (!key.VerifyECDSA(Hash(vchMsg.begin(), vchMsg.end()), vchSig))
         return error("CAlert::CheckSignature() : verify signature failed");
 
     // Now unserialize the data
