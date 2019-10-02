@@ -904,22 +904,16 @@ QString loadStyleSheet()
     QString cssName;
     QString theme = settings.value("theme", "").toString();
 
-    if (isExternal(theme)) {
-        // External CSS
-        settings.setValue("fCSSexternal", true);
-        boost::filesystem::path pathAddr = GetDataDir() / "themes/";
-        cssName = pathAddr.string().c_str() + theme + "/css/theme.css";
-    } else {
-        // Build-in CSS
         settings.setValue("fCSSexternal", false);
-        if (!theme.isEmpty()) {
-            cssName = QString(":/css/") + theme;
-        } else {
-            cssName = QString(":/css/default");
-            settings.setValue("theme", "default");
-        }
-    }
 
+        if (settings.value("fDARK_MODEFeatures") == true){
+            settings.setValue("theme", "dark");
+            cssName = QString(":/css/dark");
+        }else{
+            settings.setValue("theme", "default");
+            cssName = QString(":/css/default");
+        }
+        
     QFile qFile(cssName);
     if (qFile.open(QFile::ReadOnly)) {
         styleSheet = QLatin1String(qFile.readAll());

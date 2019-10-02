@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>640</width>
-    <height>385</height>
+    <height>389</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -50,9 +50,9 @@
       <item>
        <widget class="QWidget" name="contentWidget" native="true">
         <property name="styleSheet">
-         <string notr="true">#contentWidget { background: rgba(255,255,255,240); border-radius: 6px; }
+         <string notr="true">#contentWidget {     background-color: #061532;}
 
-          QLabel { color: rgb(40,40,40);  }</string>
+          QLabel { color:#fff;  }</string>
         </property>
         <layout class="QVBoxLayout" name="verticalLayoutSub" stretch="1,0,0,0">
          <property name="spacing">

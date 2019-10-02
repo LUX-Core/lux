@@ -42,6 +42,7 @@ public:
         Digits,                  // QString
         Theme,                   // QString
         Language,                // QString
+        DARK_MODEFeatures,       // bool
         CoinControlFeatures,     // bool
         ShowMasternodesTab,      // bool
         ParallelMasternodes,     // bool
@@ -80,6 +81,7 @@ public:
     QString getThirdPartyTxUrls() { return strThirdPartyTxUrls; }
     bool getProxySettings(QNetworkProxy& proxy) const;
     bool getCoinControlFeatures() { return fCoinControlFeatures; }
+    bool getDARK_MODE() { return fDARK_MODEFeatures; }
     bool getShowAdvancedUI() { return fShowAdvancedUI; }
     bool getShowMasternodesTab() { return fShowMasternodesTab; }
     bool getParallelMasternodes() { return fParallelMasternodes; }
@@ -99,6 +101,7 @@ private:
     int nDisplayUnit;
     QString strThirdPartyTxUrls;
     bool fCoinControlFeatures;
+    bool fDARK_MODEFeatures;
     bool fShowAdvancedUI;
     bool fShowMasternodesTab;
     bool fParallelMasternodes;
@@ -114,6 +117,7 @@ Q_SIGNALS:
     void darkSentAmountChanged();
     void advancedUIChanged(bool);
     void anonymizeLuxAmountChanged(int);
+    void DARK_MODEChanged(bool);
     void coinControlFeaturesChanged(bool);
     void showMasternodesTabChanged(bool);
     void parallelMasternodesChanged(bool);

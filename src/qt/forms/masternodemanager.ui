@@ -106,12 +106,12 @@
             <property name="text">
              <string>Address</string>
             </property>
-	  </column>
+      </column>
            <column>
             <property name="text">
              <string>Rank</string>
             </property>
-	  </column>
+      </column>
            <column>
             <property name="text">
              <string>Protocol</string>

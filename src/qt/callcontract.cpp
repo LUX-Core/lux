@@ -12,9 +12,9 @@
 #include "contractbookpage.h"
 #include "editcontractinfodialog.h"
 #include "contracttablemodel.h"
-//#include "styleSheet.h"
 #include "guiutil.h"
 #include <QClipboard>
+#include <QSettings>
 
 namespace CallContract_NS
 {
@@ -89,6 +89,14 @@ CallContractPage::CallContractPage(QWidget *parent) :
     QRegularExpressionValidator *addressValidatr = new QRegularExpressionValidator(ui->lineEditContractAddress);
     addressValidatr->setRegularExpression(regEx);
     ui->lineEditContractAddress->setCheckValidator(addressValidatr);
+    QSettings settings;
+    if (settings.value("fDARK_MODEFeatures") == true){
+        ui->scrollAreaFunction->setStyleSheet(
+            "background-color: #061532;"
+            "border:1px solid #40c2dc;"
+            "color:#FFFFFF;"
+        );
+    }
 }
 
 CallContractPage::~CallContractPage()

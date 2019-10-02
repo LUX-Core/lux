@@ -15,6 +15,7 @@
 #include "../wallet.h"
 #include "walletmodel.h"
 #include "platformstyle.h"
+#include "guiutil.h"
 
 #include <QAction>
 #include <QCursor>
@@ -22,6 +23,7 @@
 #include <QMessageBox>
 #include <QScrollBar>
 #include <QTextDocument>
+#include <QSettings>
 
 ReceiveCoinsDialog::ReceiveCoinsDialog(const PlatformStyle *platformStyle, QWidget* parent) : QDialog(parent),
                                                           ui(new Ui::ReceiveCoinsDialog),
@@ -72,6 +74,27 @@ ReceiveCoinsDialog::ReceiveCoinsDialog(const PlatformStyle *platformStyle, QWidg
     connect(copyAmountAction, SIGNAL(triggered()), this, SLOT(copyAmount()));
 
     connect(ui->clearButton, SIGNAL(clicked()), this, SLOT(clear()));
+
+    QSettings settings;
+    if (settings.value("fDARK_MODEFeatures") == true){
+        ui->reqLabel->setStyleSheet(
+                "background-color: #061532;"
+                "border:1px solid #40c2dc;"
+                "color:#FFFFFF;"
+        );
+
+        ui->reqAmount->setStyleSheet(
+                "background-color: #061532;"
+                "border:1px solid #40c2dc;"
+                "color:#FFFFFF;"
+        );
+
+        ui->reqMessage->setStyleSheet(
+                "background-color: #061532;"
+                "border:1px solid #40c2dc;"
+                "color:#FFFFFF;"
+        );
+    }
 }
 
 void ReceiveCoinsDialog::setModel(WalletModel* model)

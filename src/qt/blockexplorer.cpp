@@ -15,6 +15,7 @@
 #include <QKeyEvent>
 #include <QMessageBox>
 #include <set>
+#include <QSettings>
 #include "pubkey.h"
 #include "utilstrencodings.h"
 
@@ -633,6 +634,15 @@ BlockExplorer::BlockExplorer(const PlatformStyle* platformStyle, QWidget* parent
     frameBlocksLayout->addStretch();
 
     statusBar()->addPermanentWidget(frameBlocks);
+
+    QSettings settings;
+    if (settings.value("fDARK_MODEFeatures") == true){
+        this->setStyleSheet(
+            "background-color: #061532;"
+            "color:#FFFFFF;"
+        );
+    }
+
 }
 
 BlockExplorer::~BlockExplorer()
@@ -757,24 +767,52 @@ void BlockExplorer::setBlock(CBlockIndex* pBlock)
 
 void BlockExplorer::setContent(const std::string& Content)
 {
-    QString CSS = "body { font-size:12px; background-color: white; color: #444444; margin: 0; }\n"
-    "span.hl  { color: #061532; }\n"
-    "span.hli { color: red; }\n"
-    "span.hlo { color: green; }\n"
-    "table tr td { padding: 3px; border: none; background-color: #ffffff; color: #061532; }\n"
-    //"tbody.tx a { font-family: monospace; white-space: pre; }\n"
-    "tbody.tx tr td.d3 { text-align: right; }\n"
-    "tbody.h td.d3, tbody.h td.d5, tbody.h td.d6, tbody.h td.d7 { text-align: right; }\n"
-    "tbody.b td.d2, tbody.b td.d4 { text-align: right; }\n"
-    "thead tr td { padding: 3px; border: none; background-color: #061532; color: #e0e0e0; font-weight: bold; text-align: center; }\n"
-    "thead tr td.d0 { text-align: left; }\n"
-    "h2, h3 { white-space: nowrap; color: #061532; }\n"
-    "a { text-decoration: none; color: #34A9FF; }\n"
-    "a.nav { color: #061532; }\n";
+        QSettings settings;
+    if (settings.value("fDARK_MODEFeatures") == true){
+        this->setStyleSheet(
+        "background-color: #061532;"
+        "color:#FFFFFF;"
+        );
+        QString CSS = "body { font-size:12px; background-color: white; color: #444444; margin: 0; }\n"
+        "span.hl  { color: #FFFFFF; }\n"
+        "span.hli { color: red; }\n"
+        "span.hlo { color: green; }\n"
+        "table tr td { padding: 3px; border:1px solid #FFFFFF; background-color: #40c2dc; color: #FFFFFF; }\n"
+        //"tbody.tx a { font-family: monospace; white-space: pre; }\n"
+        "tbody.tx tr td.d3 { text-align: right; }\n"
+        "tbody.h td.d3, tbody.h td.d5, tbody.h td.d6, tbody.h td.d7 { text-align: right; }\n"
+        "tbody.b td.d2, tbody.b td.d4 { text-align: right; }\n"
+        "thead tr td { padding: 3px; border: none; background-color: #40c2dc; color: #FFFFFF; font-weight: bold; text-align: center; }\n"
+        "thead tr td.d0 { text-align: left; }\n"
+        "h2, h3 { white-space: nowrap; color: #FFFFFF; }\n"
+        "a { text-decoration: none; color: #FFFFFF; }\n"
+        "a.nav { color: #FFFFFF; }\n";
 
-    QString FullContent = "<html><head><style type=\"text/css\">" + CSS + "</style></head>" + "<body>" + Content.c_str() + "</body></html>";
-    // printf(FullContent.toUtf8());
-    ui->content->setText(FullContent);
+        QString FullContent = "<html><head><style type=\"text/css\">" + CSS + "</style></head>" + "<body>" + Content.c_str() + "</body></html>";
+        // printf(FullContent.toUtf8());
+        ui->content->setText(FullContent);
+    }else{
+        QString CSS = "body { font-size:12px; background-color: white; color: #444444; margin: 0; }\n"
+        "span.hl  { color: #061532; }\n"
+        "span.hli { color: red; }\n"
+        "span.hlo { color: green; }\n"
+        "table tr td { padding: 3px; border: none; background-color: #ffffff; color: #061532; }\n"
+        //"tbody.tx a { font-family: monospace; white-space: pre; }\n"
+        "tbody.tx tr td.d3 { text-align: right; }\n"
+        "tbody.h td.d3, tbody.h td.d5, tbody.h td.d6, tbody.h td.d7 { text-align: right; }\n"
+        "tbody.b td.d2, tbody.b td.d4 { text-align: right; }\n"
+        "thead tr td { padding: 3px; border: none; background-color: #061532; color: #e0e0e0; font-weight: bold; text-align: center; }\n"
+        "thead tr td.d0 { text-align: left; }\n"
+        "h2, h3 { white-space: nowrap; color: #061532; }\n"
+        "a { text-decoration: none; color: #34A9FF; }\n"
+        "a.nav { color: #061532; }\n";
+
+        QString FullContent = "<html><head><style type=\"text/css\">" + CSS + "</style></head>" + "<body>" + Content.c_str() + "</body></html>";
+        // printf(FullContent.toUtf8());
+        ui->content->setText(FullContent);
+
+    }
+
 }
 
 void BlockExplorer::back()

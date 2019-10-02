@@ -16,6 +16,7 @@
 #include "bitcoinaddressvalidator.h"
 #include "timedata.h"
 #include "uint256.h"
+#include <QSettings>
 
 static const CAmount SINGLE_STEP = 0.00000001*COIN;
 
@@ -58,6 +59,27 @@ SendTokenPage::SendTokenPage(QWidget *parent) :
     connect(ui->confirmButton, SIGNAL(clicked()), SLOT(on_confirmClicked()));
 
     ui->lineEditPayTo->setCheckValidator(new BitcoinAddressCheckValidator(parent));
+
+        QSettings settings;
+    if (settings.value("fDARK_MODEFeatures") == true){
+        ui->lineEditAmount->setStyleSheet(
+            "background-color: #061532;"
+            "border:1px solid #40c2dc;"
+            "color:#FFFFFF;"
+        );
+
+        ui->lineEditGasLimit->setStyleSheet(
+            "background-color: #061532;"
+            "border:1px solid #40c2dc;"
+            "color:#FFFFFF;"
+        );
+
+        ui->lineEditGasPrice->setStyleSheet(
+            "background-color: #061532;"
+            "border:1px solid #40c2dc;"
+            "color:#FFFFFF;"
+        );
+    }
 }
 
 SendTokenPage::~SendTokenPage()

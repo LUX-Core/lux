@@ -531,6 +531,7 @@ RES_IMAGES = \
   qt/res/images/splash.png \
   qt/res/images/splash_testnet.png \
   qt/res/images/lux_logo_horizontal.png \
+  qt/res/images/lux_logo_horizontal_dark.png \
   qt/res/images/downArrow.png \
   qt/res/images/downArrow_small.png \
   qt/res/images/upArrow_small.png \
@@ -538,10 +539,12 @@ RES_IMAGES = \
   qt/res/images/rightArrow_small.png \
   qt/res/images/qtreeview_selected.png \
   qt/res/images/walletFrame.png \
-  qt/res/images/walletFrame_bg.png
+  qt/res/images/walletFrame_bg.png \
+  qt/res/images/walletFrame_bg_light.png
 
 RES_CSS = \
-  qt/res/css/default.css
+  qt/res/css/default.css \
+  qt/res/css/dark.css
 
 RES_MOVIES = $(wildcard $(srcdir)/qt/res/movies/spinner-*.png)
 
