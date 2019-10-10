@@ -441,7 +441,6 @@ extern UniValue pruneblockchain(const UniValue& params, bool fHelp);
 
 extern UniValue listtradepairs(const UniValue& params, bool fHelp);
 extern UniValue createorder(const UniValue& params, bool fHelp);
-extern UniValue redeemorder(const UniValue& params, bool fHelp);
 extern UniValue getactivecoins(const UniValue& params, bool fHelp);
 extern UniValue listorderbook(const UniValue& params, bool fHelp);
 extern UniValue getlocalorder(const UniValue& params, bool fHelp);

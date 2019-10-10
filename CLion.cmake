@@ -1964,7 +1964,7 @@ if($ENV{CLION_IDE})
             src/zmq/zmqnotificationinterface.h
             src/zmq/zmqpublishnotifier.cpp
             src/zmq/zmqpublishnotifier.h
-            src/luxgate/address.cpp)
+            )
 
     add_library(noexecutable ${SOURCE_FILES})
 endif()
