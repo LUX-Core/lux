@@ -1,4 +1,3 @@
-// Copyright (c) 2010 Satoshi Nakamoto
 // Copyright (c) 2009-2014 The Bitcoin developers
 // Copyright (c) 2014-2015 The Dash developers
 // Copyright (c) 2015-2017 The LUX developers
@@ -2946,7 +2945,7 @@ UniValue createcontract(const UniValue& params, bool fHelp){
 
     string bytecode=params[0].get_str();
 
-    if(bytecode.size() % 2 != 0 || !regex_match(bytecode, hexData))
+    if(bytecode.size() % 2 != 0 || !CheckHex(bytecode))
         throw JSONRPCError(RPC_TYPE_ERROR, "Invalid data (data not hex)");
 
     uint64_t nGasLimit=DEFAULT_GAS_LIMIT_OP_CREATE;
