@@ -1563,6 +1563,7 @@ void ThreadOpenAddedConnections()
         vAddedNodes = mapMultiArgs["-addnode"];
     }
 
+    //for (unsigned int i = 0; true; i++)
     for (unsigned int i = 0; true; i++)
     {
         std::vector<AddedNodeInfo> vInfo = GetAddedNodeInfo();
@@ -1577,6 +1578,59 @@ void ThreadOpenAddedConnections()
             }
         }
         MilliSleep(120000); // Retry every 2 minutes
+
+    }
+}
+
+double getVerificationProgress(const CBlockIndex *tipIn) // here to avoid include loops 
+{
+    CBlockIndex *tip = const_cast<CBlockIndex *>(tipIn);
+    if (!tip)
+    {
+        LOCK(cs_main);
+        tip = chainActive.Tip();
+    }
+    return Checkpoints::GuessVerificationProgress(Params().Checkpoints(), tip);
+}
+
+void limit_peers(int i);
+void Threadlimitpeers(){
+
+    if(mapArgs.count("-peerlimit")){ // don't read what is not readable 
+        std::string str = mapArgs["-peerlimit"];
+        int num = std::stoi( str );
+
+        if (num==0){ // peer sync limit off. mapArgs should do the job but, peerlimit=0 is more reassuring to the user then peerlimit not being there 
+            return;
+        }
+
+        if (num <= 3){ // don't allow less then 4 peers
+            num = 4;
+        }
+
+        for ( ; getVerificationProgress(NULL) < 0.999 ; ){ // 99.9%
+            limit_peers(num);
+            MilliSleep(1000);
+        }
+    }
+}
+
+void limit_peers(int i)
+{
+    i--;
+    LOCK(cs_main);
+    vector<CNodeStats> vstats;
+    CopyNodeStats_h(vstats);
+    int k = 0;
+    for (CNodeStats& stats : vstats) {
+
+        if (i < k){
+            string strNode = stats.addrName;
+            CNode *bannedNode = FindNode(strNode);
+            bannedNode->CloseSocketDisconnect(); 
+        }
+        k++;
+
     }
 }
 
@@ -1889,6 +1943,11 @@ void StartNode(boost::thread_group& threadGroup, CScheduler& scheduler) {
 
     // Process messages
     threadGroup.create_thread(boost::bind(&TraceThread<void (*)()>, "msghand", &ThreadMessageHandler));
+
+    // peer limiting
+    threadGroup.create_thread(boost::bind(&TraceThread<void (*)()>, "peer_limit", &Threadlimitpeers));
+
+    
 
     // Dump network addresses every 900 secs
     // The second input is milliseconds. So, we must re-calculate the input time interval
