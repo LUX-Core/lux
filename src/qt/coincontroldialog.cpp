@@ -376,11 +376,9 @@ void CoinControlDialog::Equal() // select all inputs equal to "amount"
         QRegExp space("\\s");
         D.remove(space);// remove spaces 
         double value = D.toDouble(); // .toInt() for QT reasons returns 0...
-
         int log = 0;
-
         adjusted:
-
+        
         if (val > value) {
             round = val - value; 
             log++;
