@@ -34,8 +34,6 @@
 #include <QStringList>
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
-#include <string>
-#include <algorithm> // std::remove_if
 
 using namespace std;
 QList<CAmount> CoinControlDialog::payAmounts;
@@ -310,12 +308,6 @@ void CoinControlDialog::ShowInputAutoSelection() // set the advanced features to
     ui->LessThan->setVisible(true);
     ui->EqualTo->setVisible(true);
     ui->num_box->setVisible(true);
-}
-
-bool CoinControlDialog::TX_size_limit(unsigned int size)
-{
-    unsigned int MAX = MAX_STANDARD_TX_SIZE - 10;
-    return size >= MAX;
 }
 
 void CoinControlDialog::greater()// select all inputs grater than "amount"
