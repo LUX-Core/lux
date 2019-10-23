@@ -118,7 +118,6 @@ private Q_SLOTS:
     void buttonSelectAllClicked();
     void HideInputAutoSelection();
     void ShowInputAutoSelection();
-    bool TX_size_limit(unsigned int size);
     void greater();
     void Less();
     void Equal();
