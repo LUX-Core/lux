@@ -34,6 +34,8 @@
 #include <QStringList>
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
+#include <string>
+#include <algorithm> // std::remove_if
 
 using namespace std;
 QList<CAmount> CoinControlDialog::payAmounts;
@@ -310,6 +312,11 @@ void CoinControlDialog::ShowInputAutoSelection() // set the advanced features to
     ui->num_box->setVisible(true);
 }
 
+bool CoinControlDialog::TX_size_limit(unsigned int size)
+{
+    unsigned int MAX = MAX_STANDARD_TX_SIZE - 10;
+    return size >= MAX;
+}
 
 void CoinControlDialog::greater()// select all inputs grater than "amount"
 {
@@ -318,20 +325,24 @@ void CoinControlDialog::greater()// select all inputs grater than "amount"
     ui->treeWidget->setEnabled(true);
         for (int i = 0; i < ui->treeWidget->topLevelItemCount(); i++) {
             QTreeWidgetItem* item = ui->treeWidget->topLevelItem(i);
-            double value = item->text(COLUMN_AMOUNT).toDouble();
-        if (value > val) {
-            if (ui->treeWidget->topLevelItem(i)->checkState(COLUMN_CHECKBOX) != state) {
-                ui->treeWidget->topLevelItem(i)->setCheckState(COLUMN_CHECKBOX, state);
-                ui->treeWidget->setEnabled(true);
-                if (state == Qt::Unchecked) {
-                    coinControl->UnSelectAll();
+            QString D = item->text(COLUMN_AMOUNT);
+            QRegExp space("\\s");
+            D.remove(space);// remove spaces 
+            double value = D.toDouble(); // .toInt() for QT reasons returns 0...
+
+            if (value > val) {
+                if (ui->treeWidget->topLevelItem(i)->checkState(COLUMN_CHECKBOX) != state) {
+                    ui->treeWidget->topLevelItem(i)->setCheckState(COLUMN_CHECKBOX, state);
                     ui->treeWidget->setEnabled(true);
-                    CoinControlDialog::updateLabels(model, this);
-                    CheckDialogLablesUpdated();
+                    if (state == Qt::Unchecked) {
+                        coinControl->UnSelectAll();
+                        ui->treeWidget->setEnabled(true);
+                        CoinControlDialog::updateLabels(model, this);
+                        CheckDialogLablesUpdated();
+                    }
                 }
             }
-        }
-    } 
+        } 
 } 
 
 void CoinControlDialog::Less()//select all inputs Less than "amount"
@@ -341,7 +352,10 @@ void CoinControlDialog::Less()//select all inputs Less than "amount"
     ui->treeWidget->setEnabled(true);
         for (int i = 0; i < ui->treeWidget->topLevelItemCount(); i++) {
             QTreeWidgetItem* item = ui->treeWidget->topLevelItem(i);
-            double value = item->text(COLUMN_AMOUNT).toDouble();
+            QString D = item->text(COLUMN_AMOUNT);
+            QRegExp space("\\s");
+            D.remove(space);// remove spaces 
+            double value = D.toDouble(); // .toInt() for QT reasons returns 0...
         if (value < val) {
             if (ui->treeWidget->topLevelItem(i)->checkState(COLUMN_CHECKBOX) != state) {
                 ui->treeWidget->topLevelItem(i)->setCheckState(COLUMN_CHECKBOX, state);
@@ -361,14 +375,20 @@ void CoinControlDialog::Less()//select all inputs Less than "amount"
 void CoinControlDialog::Equal() // select all inputs equal to "amount"
 {
     double round = 0;
-    double val = ui->num_box->value();  
+    int val = ui->num_box->value();  
     Qt::CheckState state = Qt::Checked;  
     ui->treeWidget->setEnabled(true);
-        for (int i = 0; i < ui->treeWidget->topLevelItemCount(); i++) {
-             QTreeWidgetItem* item = ui->treeWidget->topLevelItem(i);
-             double value = item->text(COLUMN_AMOUNT).toDouble();
-             int log = 0;
-                adjusted:
+    for (int i = 0; i < ui->treeWidget->topLevelItemCount(); i++) {
+        QTreeWidgetItem* item = ui->treeWidget->topLevelItem(i);
+        QString D = item->text(COLUMN_AMOUNT);
+        QRegExp space("\\s");
+        D.remove(space);// remove spaces 
+        double value = D.toDouble(); // .toInt() for QT reasons returns 0...
+
+        int log = 0;
+
+        adjusted:
+
         if (val > value) {
             round = val - value; 
             log++;
