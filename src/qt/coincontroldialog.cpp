@@ -1262,7 +1262,6 @@ void CoinControlDialog::updateLabels(WalletModel* model, QDialog* dialog)
 
 void CoinControlDialog::updateView()
 {
-    int xoxo = 0;
     if (!model || !model->getOptionsModel() || !model->getAddressTableModel())
         return;
 
