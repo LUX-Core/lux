@@ -1563,7 +1563,6 @@ void ThreadOpenAddedConnections()
         vAddedNodes = mapMultiArgs["-addnode"];
     }
 
-    //for (unsigned int i = 0; true; i++)
     for (unsigned int i = 0; true; i++)
     {
         std::vector<AddedNodeInfo> vInfo = GetAddedNodeInfo();
