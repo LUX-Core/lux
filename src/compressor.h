@@ -96,6 +96,7 @@ public:
             script << OP_RETURN;
             s.ignore(nSize);
         } else {
+            nSize -= nSpecialScripts;
             script.resize(nSize);
             s >> REF(CFlatData(script));
         }
