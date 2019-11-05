@@ -1039,8 +1039,8 @@ bool AcceptToMemoryPool(CTxMemPool& pool, CValidationState& state, const CTransa
     BOOST_FOREACH(const CTxOut& txout, tx.vout) {
         mempoolbanname = txout.scriptPubKey.IsMempoolbanned();
         if (mempoolbanname) {
-           LogPrintf("AcceptToMemoryPool : not accepting transaction %s with mempoolbanned output (%s)", tx.GetHash().ToString().c_str(), mempoolbanname);
-           return error("AcceptToMemoryPool : not accepting transaction %s with mempoolbanned output (%s)", tx.GetHash().ToString().c_str(), mempoolbanname);
+           LogPrintf("AcceptToMemoryPool : not accepting transaction %s with mempoolbanned output (%s)\n", tx.GetHash().ToString().c_str(), mempoolbanname);
+           return error("AcceptToMemoryPool : not accepting transaction %s with mempoolbanned output (%s)\n", tx.GetHash().ToString().c_str(), mempoolbanname);
         }
     }
     
@@ -1055,10 +1055,8 @@ bool AcceptToMemoryPool(CTxMemPool& pool, CValidationState& state, const CTransa
 
             if (mempoolbanname) {
                 LogPrintf("CTxMemPool::accept() : not accepting transaction %s with mempoolbanned input (%s)\n", tx.GetHash().ToString().c_str(), mempoolbanname);
-                return error("CTxMemPool::accept() : not accepting transaction %s with mempoolbanned input (%s)", tx.GetHash().ToString().c_str(), mempoolbanname);
+                return error("CTxMemPool::accept() : not accepting transaction %s with mempoolbanned input (%s)\n", tx.GetHash().ToString().c_str(), mempoolbanname);
             }
-        } else {
-            LogPrintf("Tx Not found");
         }
     }
 
