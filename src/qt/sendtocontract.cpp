@@ -21,6 +21,7 @@
 #include "guiutil.h"
 #include "sendcoinsdialog.h"
 #include <QClipboard>
+#include <QSettings>
 
 namespace SendToContract_NS
 {
@@ -53,9 +54,17 @@ SendToContract::SendToContract(QWidget *parent) :
 
     // Setup ui components
     ui->setupUi(this);
-    ui->saveInfoButton->setIcon(QIcon(":/icons/filesave"));
-    ui->loadInfoButton->setIcon(QIcon(":/icons/address-book"));
-    ui->pasteAddressButton->setIcon(QIcon(":/icons/editpaste"));
+	
+	QSettings settings;
+	if (settings.value("theme").toString() == "dark grey" || settings.value("theme").toString() == "dark blue") {
+		ui->saveInfoButton->setIcon(QIcon(":/icons/filesave-light"));
+		ui->loadInfoButton->setIcon(QIcon(":/icons/address-book-white"));
+		ui->pasteAddressButton->setIcon(QIcon(":/icons/editpaste-white"));
+	} else {
+		ui->saveInfoButton->setIcon(QIcon(":/icons/filesave"));
+		ui->loadInfoButton->setIcon(QIcon(":/icons/address-book"));
+		ui->pasteAddressButton->setIcon(QIcon(":/icons/editpaste"));
+	}
     // Format tool buttons
     GUIUtil::formatToolButtons(ui->saveInfoButton, ui->loadInfoButton, ui->pasteAddressButton);
 

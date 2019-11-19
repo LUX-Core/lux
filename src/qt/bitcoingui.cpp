@@ -150,6 +150,7 @@ BitcoinGUI::BitcoinGUI(const PlatformStyle *platformStyle, const NetworkStyle* n
     this->setStyleSheet(GUIUtil::loadStyleSheet());
     resize(1200, 750);
     QString windowTitle = tr("Luxcore") + " - ";
+	QSettings settings;
 
 #ifdef ENABLE_UPDATER
     controller = new QtLuxUpdater::UpdateController(QStringLiteral("v5.3.0"), this);
@@ -220,22 +221,28 @@ BitcoinGUI::BitcoinGUI(const PlatformStyle *platformStyle, const NetworkStyle* n
     // Disable size grip because it looks ugly and nobody needs it
     statusBar()->setSizeGripEnabled(false);
 
-    // Status bar notification icons
+	// Status bar notification icons
     QFrame* frameBlocks = new QFrame();
+
     frameBlocks->setContentsMargins(0, 0, 0, 0);
     frameBlocks->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
     QHBoxLayout* frameBlocksLayout = new QHBoxLayout(frameBlocks);
+
     frameBlocksLayout->setContentsMargins(6, 0, 6, 0);
     frameBlocksLayout->setSpacing(6);
     unitDisplayControl = new UnitDisplayStatusBarControl(platformStyle);
     unitDisplayControl->setCursor(Qt::PointingHandCursor);
     labelStakingIcon = new QLabel();
     labelWalletEncryptionIcon = new QLabel();
-
     pushButtonWalletHDStatusIcon = new QPushButton();
-    QString styleSheet = ".QPushButton { background-color: transparent;"
-                         "border: none;"
-                         "qproperty-text: \"\" }";
+	
+    QString styleSheet = ".QPushButton { padding-left:2px !important; " 
+							"padding-right:2px !important; " 
+							"border:0 !important; "
+							"min-height:5px !important; " 
+							"min-width:5px !important; }"
+							".QPushButton::hover {background-color: transparent !important; }";
+							
     pushButtonWalletHDStatusIcon->setMinimumSize(30, STATUSBAR_ICONSIZE);
     pushButtonWalletHDStatusIcon->setMaximumSize(30, STATUSBAR_ICONSIZE);
     pushButtonWalletHDStatusIcon->setIconSize(QSize(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE));
@@ -269,7 +276,7 @@ BitcoinGUI::BitcoinGUI(const PlatformStyle *platformStyle, const NetworkStyle* n
 
     labelConnectionsIcon = new QPushButton();
     labelConnectionsIcon->setFlat(true); // Make the button look like a label, but clickable
-    labelConnectionsIcon->setStyleSheet(".QPushButton { background-color: rgba(255, 255, 255, 0);}");
+	labelConnectionsIcon->setStyleSheet(styleSheet);
     labelConnectionsIcon->setMaximumSize(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE);
 
 
@@ -292,49 +299,60 @@ BitcoinGUI::BitcoinGUI(const PlatformStyle *platformStyle, const NetworkStyle* n
 
     //status bar social media icons
     QFrame* frameSocMedia = new QFrame();
-
     //fill in frameSocMedia
     {
         frameSocMedia->setContentsMargins(0, 0, 0, 0);
         frameSocMedia->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
         QHBoxLayout* frameLayout = new QHBoxLayout(frameSocMedia);
         frameLayout->setContentsMargins(6, 0, 6, 0);
-        frameLayout->setSpacing(10);
-
-        pushButtonTelegram = new QPushButton(frameSocMedia);
+        frameLayout->setSpacing(6);
+		
+		pushButtonTelegram = new QPushButton(frameSocMedia);
         pushButtonTelegram->setToolTip(tr("Go to")+" Telegram");
         connect(pushButtonTelegram, &QPushButton::clicked,
                 this, [](){QDesktopServices::openUrl(QUrl("https://t.me/LUXcoreOfficial"));});
-        pushButtonTelegram->setIcon(QIcon(QPixmap(":/icons/res/icons/telegram.png").scaledToHeight(STATUSBAR_ICONSIZE,Qt::SmoothTransformation)));
+        pushButtonTelegram->setIcon(QIcon(QPixmap(":/icons/telegram").scaledToHeight(STATUSBAR_ICONSIZE,Qt::SmoothTransformation)));
 
         pushButtonDiscord = new QPushButton(frameSocMedia);
         pushButtonDiscord->setToolTip(tr("Go to")+" Discord");
         connect(pushButtonDiscord, &QPushButton::clicked,
                 this, [](){QDesktopServices::openUrl(QUrl("https://discord.gg/ndUg9va"));});
-        pushButtonDiscord->setIcon(QIcon(":/icons/res/icons/discord.png").pixmap(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE));
+        pushButtonDiscord->setIcon(QIcon(":/icons/discord").pixmap(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE));
 
         pushButtonTwitter = new QPushButton(frameSocMedia);
         pushButtonTwitter->setToolTip(tr("Go to")+" Twitter");
         connect(pushButtonTwitter, &QPushButton::clicked,
                 this, [](){QDesktopServices::openUrl(QUrl("https://twitter.com/LUX_Coin"));});
-        pushButtonTwitter->setIcon(QIcon(":/icons/res/icons/twitter.png").pixmap(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE));
+        pushButtonTwitter->setIcon(QIcon(":/icons/twitter").pixmap(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE));
 
         pushButtonGithub = new QPushButton(frameSocMedia);
         pushButtonGithub->setToolTip(tr("Go to")+" GitHub");
         connect(pushButtonGithub, &QPushButton::clicked,
                 this, [](){QDesktopServices::openUrl(QUrl("https://github.com/lux-core"));});
-        pushButtonGithub->setIcon(QIcon(":/icons/res/icons/github.png").pixmap(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE));
+        pushButtonGithub->setIcon(QIcon(":/icons/github").pixmap(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE));
 
         pushButtonHelp = new QPushButton(frameSocMedia);
         pushButtonHelp->setToolTip(tr("Go to")+" Documentation Hub");
         connect(pushButtonHelp, &QPushButton::clicked,
                 this, [](){QDesktopServices::openUrl(QUrl("https://docs.luxcore.io/"));});
-        pushButtonHelp->setIcon(QIcon(":/icons/res/icons/hub.png").pixmap(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE));		
+        pushButtonHelp->setIcon(QIcon(":/icons/hub").pixmap(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE));	
 		
         auto buttons = frameSocMedia->findChildren<QPushButton* >();
-        QString styleSheet = ".QPushButton { background-color: transparent;"
+		
+		
+		if (settings.value("theme").toString() == "dark grey" || settings.value("theme").toString() == "dark blue") {
+			QString styleSheet = ".QPushButton { padding-left:2px !important; " 
+							"padding-right:2px !important; " 
+							"border:0 !important; "
+							"min-height:5px !important; " 
+							"min-width:5px !important; }"
+							".QPushButton::hover {background-color: transparent !important; }";
+		} else { 
+			QString styleSheet = ".QPushButton { background-color: transparent;"
                                         "border: none;"
                                         "qproperty-text: \"\" }";
+		}
+						
         foreach(auto but, buttons)
         {
             frameLayout->addWidget(but);
@@ -345,15 +363,42 @@ BitcoinGUI::BitcoinGUI(const PlatformStyle *platformStyle, const NetworkStyle* n
             but->setStyleSheet(styleSheet);
         }
     }
-
+	
+	
     // Progress bar and label for blocks download
     progressBarLabel = new QLabel();
     progressBarLabel->setVisible(true);
-	progressBarLabel->setStyleSheet("color: #ffffff; margin-left: 10px; margin-right: 10px; border: 0px solid #ff0000;");
-    progressBar = new GUIUtil::ProgressBar();
+	
+	
+	progressBar = new GUIUtil::ProgressBar();
     progressBar->setAlignment(Qt::AlignCenter);
-	progressBar->setStyleSheet("border: 0px solid #ff0000;");
-    progressBar->setVisible(true);
+	progressBar->setVisible(true);
+	
+	if (settings.value("theme").toString() == "dark grey" || settings.value("theme").toString() == "dark blue") {
+		QString styleSheet = ".QLabel{ color: #fff; margin-left: 60px !important;" 
+								"margin-right: 10px; border: 0px solid #40c2dc; min-width: 100px !important;" 
+								"min-height:5px !iomportant; max-height: 8px !important; }"
+								".ProgressBar { border: 1px solid #40c2dc !important; "
+								"min-height:3px !iomportant; max-height: 8px !important; }";
+		progressBarLabel->setStyleSheet(styleSheet);
+		progressBar->setStyleSheet(styleSheet);
+	} else if (settings.value("theme").toString() == "dark grey" || settings.value("theme").toString() == "dark blue") {
+		QString styleSheet = ".QLabel { color: #fff; margin-left-left: 60px !important;" 
+								"margin-right: 10px; border: 0px solid #40c2dc; min-width: 100px !important;" 
+								"min-height:5px !iomportant; max-height: 8px !important; }"
+								".ProgressBar { border: 1px solid #40c2dc !important; "
+								"min-height:3px !iomportant; max-height: 8px !important; }";
+		progressBarLabel->setStyleSheet(styleSheet);
+		progressBar->setStyleSheet(styleSheet);
+	}else { 
+		QString styleSheet = ".QLabel#progressBarLabel { color: #ffffff; margin-left: 10px; "
+								"margin-right: 10px; border: 0px solid #ff0000 } "
+								".ProgressBar#progressBarLabel { border: 0px solid #ff0000; }";
+		progressBarLabel->setStyleSheet(styleSheet);
+		progressBar->setStyleSheet(styleSheet);
+	}
+	
+    
 
     // Override style sheet for progress bar for styles that have a segmented progress bar,
     // as they make the text unreadable (workaround for issue #1071)
@@ -362,11 +407,19 @@ BitcoinGUI::BitcoinGUI(const PlatformStyle *platformStyle, const NetworkStyle* n
     if (curStyle == "QWindowsStyle" || curStyle == "QWindowsXPStyle") {
         
     }
-
+	
+	QFrame* horizontalSpacerFrame1 = new QFrame(); // blank frames that will fix the location of the other items on the statusBar
+	QFrame* horizontalSpacerFrame2 = new QFrame();
+	horizontalSpacerFrame1->setGeometry(0,0,48,5);
+	horizontalSpacerFrame2->setGeometry(0,0,2,5);
+	
+	statusBar()->addWidget(horizontalSpacerFrame1);
     statusBar()->addWidget(progressBarLabel);
     statusBar()->addWidget(progressBar);
     statusBar()->addPermanentWidget(frameSocMedia);
     statusBar()->addPermanentWidget(frameBlocks);
+	statusBar()->addPermanentWidget(horizontalSpacerFrame2);
+
 
     // Jump directly to tabs in RPC-console
     connect(openInfoAction, SIGNAL(triggered()), rpcConsole, SLOT(showInfo()));
@@ -451,7 +504,6 @@ void BitcoinGUI::createActions() {
     overviewAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_1));
 #endif
     tabGroup->addAction(overviewAction);
-
     sendCoinsAction = new QAction(QIcon(":/icons/send"), tr("&Send"), this);
     sendCoinsAction->setStatusTip(tr("Send coins to a LUX address"));
     sendCoinsAction->setToolTip(sendCoinsAction->statusTip());
@@ -541,95 +593,146 @@ void BitcoinGUI::createActions() {
     connect(historyAction, SIGNAL(triggered()), this, SLOT(gotoHistoryPage()));
 #endif // ENABLE_WALLET
 
-    quitAction = new QAction(QIcon(":/icons/quit"), tr("E&xit"), this);
+	//SETUP THE CORRECT ICON IF THEME IS DIFFERENT THAN DEFAULT
+	if (settings.value("theme").toString() == "dark grey" || settings.value("theme").toString() == "dark blue") {	
+		
+		quitAction = new QAction(QIcon(":/icons/quit-light"), tr("E&xit"), this);
+		optionsAction = new QAction(QIcon(":/icons/options-white"), tr("&Options..."), this);
+		aboutAction = new QAction(QIcon(":/icons/luxcoin_black-white"), tr("&About Luxcore"), this);
+#ifdef ENABLE_UPDATER
+		// Check for update menu item
+		checkForUpdateAction = new QAction(QIcon(":/icons/update_black"), tr("Check for &Update"), this);
+#endif	
+#if QT_VERSION < 0x050000
+		aboutQtAction = new QAction(QIcon(":/trolltech/qmessagebox/images/qtlogo-64.png"), tr("About &Qt"), this);
+#else
+		aboutQtAction = new QAction(QIcon(":/qt-project.org/qmessagebox/images/qtlogo-64.png"), tr("About &Qt"), this);
+#endif
+		toggleHideAction = new QAction(QIcon(":/icons/luxcoin_black-white"), tr("&Show / Hide"), this);
+		encryptWalletAction = new QAction(QIcon(":/icons/lock_closed_black-white"), tr("&Encrypt Wallet..."), this);
+		backupWalletAction = new QAction(QIcon(":/icons/backup-white"), tr("&Backup Wallet..."), this);
+		changePassphraseAction = new QAction(QIcon(":/icons/key-white"), tr("&Change Passphrase..."), this);
+		restoreWalletAction = new QAction(QIcon(":/icons/restore-white"), tr("&Restore Wallet..."), this);
+		unlockWalletAction = new QAction(tr("&Unlock Wallet..."), this); //no icon
+		lockWalletAction = new QAction(tr("&Lock Wallet"), this); //no icon
+		signMessageAction = new QAction(QIcon(":/icons/sign-white"), tr("Sign &message..."), this);
+		verifyMessageAction = new QAction(QIcon(":/icons/verified-white"), tr("&Verify message..."), this);
+		bip38ToolAction = new QAction(QIcon(":/icons/key-white"), tr("&BIP38 tool"), this);
+		multiSendAction = new QAction(QIcon(":/icons/edit"), tr("&MultiSend"), this);
+		openInfoAction = new QAction(QApplication::style()->standardIcon(QStyle::SP_MessageBoxInformation), tr("&Information"), this);
+		openRPCConsoleAction = new QAction(QIcon(":/icons/debugwindow-white"), tr("&Debug console"), this);
+		openNetworkAction = new QAction(QIcon(":/icons/network_monitor-white"), tr("&Network Monitor"), this);
+		openPeersAction = new QAction(QIcon(":/icons/peer-white"), tr("&Peers list"), this);
+		openRepairAction = new QAction(QIcon(":/icons/wallet_repair-white"), tr("Wallet &Repair"), this);
+		openConfEditorAction = new QAction(QIcon(":/icons/edit"), tr("Open Wallet &Configuration File"), this);
+		openMNConfEditorAction = new QAction(QIcon(":/icons/edit"), tr("Open &Masternode Configuration File"), this);
+		showBackupsAction = new QAction(QIcon(":/icons/auto_backup"), tr("Show Automatic &Backups"), this);
+		openConfEditorAction = new QAction(QIcon(":/icons/conf-white"), tr("Edit &Configuration File"), this);
+		usedSendingAddressesAction = new QAction(QIcon(":/icons/address-book-white"), tr("&Sending addresses..."), this);
+		usedReceivingAddressesAction = new QAction(QIcon(":/icons/address-book-white"), tr("&Receiving addresses..."), this);
+		openAction = new QAction(QApplication::style()->standardIcon(QStyle::SP_FileIcon), tr("Open payment request | &URI..."), this);
+		openBlockExplorerAction = new QAction(QIcon(":/icons/explorer"), tr("&Blockchain explorer"), this);
+		openHexAddressAction = new QAction(QIcon(":/icons/editcopy"), tr("&Hex Address Converter"), this);
+		showHelpMessageAction = new QAction(QApplication::style()->standardIcon(QStyle::SP_MessageBoxInformation), tr("&Command-line options"), this);
+		
+	} else {
+		
+		quitAction = new QAction(QIcon(":/icons/quit"), tr("E&xit"), this);
+		optionsAction = new QAction(QIcon(":/icons/options"), tr("&Options..."), this);
+		aboutAction = new QAction(QIcon(":/icons/luxcoin_black"), tr("&About Luxcore"), this);
+#ifdef ENABLE_UPDATER
+		// Check for update menu item
+		checkForUpdateAction = new QAction(QIcon(":/icons/update_black"), tr("Check for &Update"), this);
+#endif	
+#if QT_VERSION < 0x050000
+		aboutQtAction = new QAction(QIcon(":/trolltech/qmessagebox/images/qtlogo-64.png"), tr("About &Qt"), this);
+#else
+		aboutQtAction = new QAction(QIcon(":/qt-project.org/qmessagebox/images/qtlogo-64.png"), tr("About &Qt"), this);
+#endif
+		toggleHideAction = new QAction(QIcon(":/icons/luxcoin_black"), tr("&Show / Hide"), this);
+		encryptWalletAction = new QAction(QIcon(":/icons/lock_closed_black"), tr("&Encrypt Wallet..."), this);
+		backupWalletAction = new QAction(QIcon(":/icons/backup"), tr("&Backup Wallet..."), this);
+		changePassphraseAction = new QAction(QIcon(":/icons/key"), tr("&Change Passphrase..."), this);
+		restoreWalletAction = new QAction(QIcon(":/icons/restore"), tr("&Restore Wallet..."), this);
+		unlockWalletAction = new QAction(tr("&Unlock Wallet..."), this);
+		lockWalletAction = new QAction(tr("&Lock Wallet"), this);
+		signMessageAction = new QAction(QIcon(":/icons/sign"), tr("Sign &message..."), this);
+		verifyMessageAction = new QAction(QIcon(":/icons/verified"), tr("&Verify message..."), this);
+		bip38ToolAction = new QAction(QIcon(":/icons/key"), tr("&BIP38 tool"), this);
+		multiSendAction = new QAction(QIcon(":/icons/edit"), tr("&MultiSend"), this);
+		openInfoAction = new QAction(QApplication::style()->standardIcon(QStyle::SP_MessageBoxInformation), tr("&Information"), this);
+		openRPCConsoleAction = new QAction(QIcon(":/icons/debugwindow"), tr("&Debug console"), this);
+		openNetworkAction = new QAction(QIcon(":/icons/network_monitor"), tr("&Network Monitor"), this);
+		openPeersAction = new QAction(QIcon(":/icons/peer"), tr("&Peers list"), this);
+		openRepairAction = new QAction(QIcon(":/icons/wallet_repair"), tr("Wallet &Repair"), this);
+		openConfEditorAction = new QAction(QIcon(":/icons/edit"), tr("Open Wallet &Configuration File"), this);
+		openMNConfEditorAction = new QAction(QIcon(":/icons/edit"), tr("Open &Masternode Configuration File"), this);
+		showBackupsAction = new QAction(QIcon(":/icons/auto_backup"), tr("Show Automatic &Backups"), this);
+		openConfEditorAction = new QAction(QIcon(":/icons/conf"), tr("Edit &Configuration File"), this);
+		usedSendingAddressesAction = new QAction(QIcon(":/icons/address-book"), tr("&Sending addresses..."), this);
+		usedReceivingAddressesAction = new QAction(QIcon(":/icons/address-book"), tr("&Receiving addresses..."), this);
+		openAction = new QAction(QApplication::style()->standardIcon(QStyle::SP_FileIcon), tr("Open payment request | &URI..."), this);
+		openBlockExplorerAction = new QAction(QIcon(":/icons/explorer"), tr("&Blockchain explorer"), this);
+		openHexAddressAction = new QAction(QIcon(":/icons/editcopy"), tr("&Hex Address Converter"), this);
+		showHelpMessageAction = new QAction(QApplication::style()->standardIcon(QStyle::SP_MessageBoxInformation), tr("&Command-line options"), this);
+			
+	}
+    
     quitAction->setStatusTip(tr("Quit application"));
     quitAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Q));
     quitAction->setMenuRole(QAction::QuitRole);
-    aboutAction = new QAction(QIcon(":/icons/luxcoin_black"), tr("&About Luxcore"), this);
+	
     aboutAction->setStatusTip(tr("Show information about Luxcore"));
     aboutAction->setMenuRole(QAction::AboutRole);
 
 #ifdef ENABLE_UPDATER
     // Check for update menu item
-    checkForUpdateAction = new QAction(QIcon(":/icons/update_black"), tr("Check for &Update"), this);
     checkForUpdateAction->setStatusTip(tr("Check whether there is an updated wallet from Luxcore"));
     checkForUpdateAction->setMenuRole(QAction::NoRole);
 #endif
 
-#if QT_VERSION < 0x050000
-    aboutQtAction = new QAction(QIcon(":/trolltech/qmessagebox/images/qtlogo-64.png"), tr("About &Qt"), this);
-#else
-    aboutQtAction = new QAction(QIcon(":/qt-project.org/qmessagebox/images/qtlogo-64.png"), tr("About &Qt"), this);
-#endif
     aboutQtAction->setStatusTip(tr("Show information about Qt"));
     aboutQtAction->setMenuRole(QAction::AboutQtRole);
-    optionsAction = new QAction(QIcon(":/icons/options"), tr("&Options..."), this);
+	
     optionsAction->setStatusTip(tr("Modify configuration options for LUX"));
     optionsAction->setMenuRole(QAction::PreferencesRole);
-    toggleHideAction = new QAction(QIcon(":/icons/luxcoin_black"), tr("&Show / Hide"), this);
+	
     toggleHideAction->setStatusTip(tr("Show or hide the main Window"));
-
-    encryptWalletAction = new QAction(QIcon(":/icons/lock_closed_black"), tr("&Encrypt Wallet..."), this);
+	
     encryptWalletAction->setStatusTip(tr("Encrypt the private keys that belong to your wallet"));
     encryptWalletAction->setCheckable(true);
-    backupWalletAction = new QAction(QIcon(":/icons/backup"), tr("&Backup Wallet..."), this);
+
     backupWalletAction->setStatusTip(tr("Backup wallet to another location"));
-    changePassphraseAction = new QAction(QIcon(":/icons/key"), tr("&Change Passphrase..."), this);
-    changePassphraseAction->setStatusTip(tr("Change the passphrase used for wallet encryption"));
-    restoreWalletAction = new QAction(QIcon(":/icons/restore"), tr("&Restore Wallet..."), this);
+    changePassphraseAction->setStatusTip(tr("Change the passphrase used for wallet encryption"));  
     restoreWalletAction->setStatusTip(tr("Restore wallet from another location"));
-    unlockWalletAction = new QAction(tr("&Unlock Wallet..."), this);
     unlockWalletAction->setToolTip(tr("Unlock wallet"));
-    lockWalletAction = new QAction(tr("&Lock Wallet"), this);
-    signMessageAction = new QAction(QIcon(":/icons/sign"), tr("Sign &message..."), this);
     signMessageAction->setStatusTip(tr("Sign messages with your LUX addresses to prove you own them"));
-    verifyMessageAction = new QAction(QIcon(":/icons/verified"), tr("&Verify message..."), this);
     verifyMessageAction->setStatusTip(tr("Verify messages to ensure they were signed with specified LUX addresses"));
-    bip38ToolAction = new QAction(QIcon(":/icons/key"), tr("&BIP38 tool"), this);
     bip38ToolAction->setToolTip(tr("Encrypt and decrypt private keys using a passphrase"));
-    multiSendAction = new QAction(QIcon(":/icons/edit"), tr("&MultiSend"), this);
+    
     multiSendAction->setToolTip(tr("MultiSend Settings"));
     multiSendAction->setCheckable(true);
 
-    openInfoAction = new QAction(QApplication::style()->standardIcon(QStyle::SP_MessageBoxInformation), tr("&Information"), this);
     openInfoAction->setStatusTip(tr("Show diagnostic information"));
-    openRPCConsoleAction = new QAction(QIcon(":/icons/debugwindow"), tr("&Debug console"), this);
     openRPCConsoleAction->setStatusTip(tr("Open debugging console"));
-    openNetworkAction = new QAction(QIcon(":/icons/network_monitor"), tr("&Network Monitor"), this);
     openNetworkAction->setStatusTip(tr("Show network monitor"));
-    openPeersAction = new QAction(QIcon(":/icons/peer"), tr("&Peers list"), this);
     openPeersAction->setStatusTip(tr("Show peers info"));
-    openRepairAction = new QAction(QIcon(":/icons/wallet_repair"), tr("Wallet &Repair"), this);
     openRepairAction->setStatusTip(tr("Show wallet repair options"));
-    openConfEditorAction = new QAction(QIcon(":/icons/edit"), tr("Open Wallet &Configuration File"), this);
     openConfEditorAction->setStatusTip(tr("Open configuration file"));
-    openMNConfEditorAction = new QAction(QIcon(":/icons/edit"), tr("Open &Masternode Configuration File"), this);
     openMNConfEditorAction->setStatusTip(tr("Open Masternode configuration file"));
-    showBackupsAction = new QAction(QIcon(":/icons/auto_backup"), tr("Show Automatic &Backups"), this);
     showBackupsAction->setStatusTip(tr("Show automatically created wallet backups"));
-
-    openConfEditorAction = new QAction(QIcon(":/icons/conf"), tr("Edit &Configuration File"), this);
     openConfEditorAction->setStatusTip(tr("Edit configuration file"));
-
-    usedSendingAddressesAction = new QAction(QIcon(":/icons/address-book"), tr("&Sending addresses..."), this);
     usedSendingAddressesAction->setStatusTip(tr("Show the list of used sending addresses and labels"));
-    usedReceivingAddressesAction = new QAction(QIcon(":/icons/address-book"), tr("&Receiving addresses..."), this);
     usedReceivingAddressesAction->setStatusTip(tr("Show the list of used receiving addresses and labels"));
-
-    openAction = new QAction(QApplication::style()->standardIcon(QStyle::SP_FileIcon), tr("Open payment request | &URI..."), this);
     openAction->setStatusTip(tr("Open a LUX: URI or payment request"));
-    openBlockExplorerAction = new QAction(QIcon(":/icons/explorer"), tr("&Blockchain explorer"), this);
     openBlockExplorerAction->setStatusTip(tr("Block explorer window"));
-
-    openHexAddressAction = new QAction(QIcon(":/icons/editcopy"), tr("&Hex Address Converter"), this);
     openHexAddressAction->setStatusTip(tr("Converter for LUX Smart Contract addresses"));
 
-    showHelpMessageAction = new QAction(QApplication::style()->standardIcon(QStyle::SP_MessageBoxInformation), tr("&Command-line options"), this);
     showHelpMessageAction->setMenuRole(QAction::NoRole);
     showHelpMessageAction->setStatusTip(tr("Show the Luxcore help message to get a list with possible LUX command-line options"));
 
-    connect(qApp, SIGNAL(aboutToQuit()), qApp, SLOT(quit()));
 
+    connect(qApp, SIGNAL(aboutToQuit()), qApp, SLOT(quit()));
     connect(quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
     connect(aboutAction, SIGNAL(triggered()), this, SLOT(aboutClicked()));
 #ifdef ENABLE_UPDATER
@@ -735,6 +838,10 @@ void BitcoinGUI::createMenuBar() {
 
 void BitcoinGUI::createToolBars() {
     if (walletFrame) {
+		
+		QWidget* separator = new QWidget(this);
+		separator->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+		
         QToolBar* toolbar = new QToolBar(tr("Tabs toolbar"));
         toolbar->setContextMenuPolicy(Qt::PreventContextMenu);
         toolbar->setMovable(false);
@@ -744,14 +851,40 @@ void BitcoinGUI::createToolBars() {
         toolbar->addAction(receiveCoinsAction);
         toolbar->addAction(historyAction);
         toolbar->addAction(LSRTokenAction);
+				
         QSettings settings;
         if (settings.value("fShowMasternodesTab").toBool()) {
             toolbar->addAction(masternodeAction);
         }
         toolbar->addAction(smartContractAction);
-        toolbar->setMovable(false); // remove unused icon in upper left corner
+		toolbar->addWidget(separator);
+		toolbar->setMovable(false); // remove unused icon in upper left corner
         overviewAction->setChecked(true);
 
+		if (settings.value("theme").toString() == "dark grey") {
+			QString styleSheet = ".toolbar {  border: 1px solid #40c2dc !important; } "
+							".QToolButton {  background-color: transparent; margin-left: -1px !important; padding-top: 1px !important; "
+							" border: 1px solid #40c2dc !important; "
+							" min-height: 35px !important; min-width: 85px !important; text-align:center !important; }" 
+							".QToolButton::hover { background-color: #40c2dc; margin-bottom: -1px !important; } "
+							".QToolButton:checked, .QToolButton::hover:selected { background-color: transparent; color: #fff !important; margin-bottom: -1px !important;} "
+							".QWidget { border-bottom: 1px solid #40c2dc !important; }";
+			toolbar->setStyleSheet(styleSheet);
+			separator->setStyleSheet(styleSheet);
+		} else if (settings.value("theme").toString() == "dark blue") {
+			QString styleSheet = ".toolbar {  border: 1px solid #40c2dc !important; } "
+							".QToolButton {  background-color: transparent; margin-left: -1px !important; padding-top: 1px !important; "
+							" border: 1px solid #40c2dc !important; "
+							" min-height: 35px !important; min-width: 85px !important; text-align:center !important; }" 
+							".QToolButton::hover { background-color: #40c2dc; margin-bottom: -1px !important;} "
+							".QToolButton:checked, .QToolButton::hover:selected { background-color: transparent; color: #fff !important; margin-bottom: -1px !important;} "
+							".QWidget { border-bottom: 1px solid #40c2dc !important; }";
+			toolbar->setStyleSheet(styleSheet);
+			separator->setStyleSheet(styleSheet);
+		} else { 
+			//code here
+		}
+		
         /** Create additional container for toolbar and walletFrame and make it the central widget.
             This is a workaround mostly for toolbar styling on Mac OS but should work fine for every other OSes too.
         */
@@ -762,6 +895,21 @@ void BitcoinGUI::createToolBars() {
         layout->setContentsMargins(QMargins());
         QWidget* containerWidget = new QWidget();
         containerWidget->setLayout(layout);
+		
+		if (settings.value("theme").toString() == "dark grey") {
+			QString styleSheet = ".QToolButton { background-color: #262626 !important; color:#fff !important; "
+								"padding-left:5px; padding-right:5px;} "
+								".QToolButton::hover { background-color:#40c2dc; color:#262626; }";
+			containerWidget->setStyleSheet(styleSheet);
+		} else if (settings.value("theme").toString() == "dark blue") {
+			QString styleSheet = ".QToolButton { background-color: #061532 !important; color:#fff !important; "
+								"padding-left:5px; padding-right:5px;} "
+								".QToolButton::hover { background-color:#40c2dc; color:#061532; }";
+			containerWidget->setStyleSheet(styleSheet);
+		} else { 
+			//code here
+		}
+		
         setMinimumSize(200, 200);
         setCentralWidget(containerWidget);
     }
@@ -1115,6 +1263,7 @@ void BitcoinGUI::updateHeadersSyncProgressLabel()
     int estHeadersLeft = (GetTime() - headersTipTime) / Params().GetConsensus().nPowTargetSpacing;
 #if 1
     if (estHeadersLeft > HEADER_HEIGHT_SYNC)
+		
         progressBarLabel->setText(tr("Syncing Headers (%1%)...").arg(QString::number(100.0 / (headersTipHeight+estHeadersLeft)*headersTipHeight, 'f', 1)));
 #endif
 }
@@ -1436,6 +1585,8 @@ void BitcoinGUI::setHDStatus(int hdEnabled)
 
 void BitcoinGUI::setEncryptionStatus(int status)
 {
+	QSettings settings;
+
     switch (status) {
     case WalletModel::Unencrypted:
         labelWalletEncryptionIcon->hide();
@@ -1447,7 +1598,12 @@ void BitcoinGUI::setEncryptionStatus(int status)
         break;
     case WalletModel::Unlocked:
         labelWalletEncryptionIcon->show();
-        labelWalletEncryptionIcon->setPixmap(QIcon(":/icons/lock_open").pixmap(STATUSBAR_ICONSIZE,STATUSBAR_ICONSIZE));
+		if (settings.value("theme").toString() == "dark grey" || settings.value("theme").toString() == "dark blue") {
+			        labelWalletEncryptionIcon->setPixmap(QIcon(":/icons/lock_open-white").pixmap(STATUSBAR_ICONSIZE,STATUSBAR_ICONSIZE));
+		} else {
+			labelWalletEncryptionIcon->setPixmap(QIcon(":/icons/lock_open").pixmap(STATUSBAR_ICONSIZE,STATUSBAR_ICONSIZE));
+		}
+
         labelWalletEncryptionIcon->setToolTip(tr("Wallet is <b>encrypted</b> and currently <b>unlocked</b>"));
         encryptWalletAction->setChecked(true);
         changePassphraseAction->setEnabled(true);
@@ -1457,7 +1613,11 @@ void BitcoinGUI::setEncryptionStatus(int status)
         break;
     case WalletModel::UnlockedForStakingOnly:
         labelWalletEncryptionIcon->show();
-        labelWalletEncryptionIcon->setPixmap(QIcon(":/icons/lock_open").pixmap(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE));
+		if (settings.value("theme").toString() == "dark grey" || settings.value("theme").toString() == "dark blue") {
+			labelWalletEncryptionIcon->setPixmap(QIcon(":/icons/lock_open-white").pixmap(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE));
+		} else {
+			labelWalletEncryptionIcon->setPixmap(QIcon(":/icons/lock_open").pixmap(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE));
+		}
         labelWalletEncryptionIcon->setToolTip(tr("Wallet is <b>encrypted</b> and currently <b>unlocked</b> for anonymization and staking only"));
         encryptWalletAction->setChecked(true);
         changePassphraseAction->setEnabled(true);
@@ -1467,7 +1627,11 @@ void BitcoinGUI::setEncryptionStatus(int status)
         break;
     case WalletModel::Locked:
         labelWalletEncryptionIcon->show();
-        labelWalletEncryptionIcon->setPixmap(QIcon(":/icons/lock_closed_black").pixmap(STATUSBAR_ICONSIZE,STATUSBAR_ICONSIZE));
+		if (settings.value("theme").toString() == "dark grey" || settings.value("theme").toString() == "dark blue") {
+			labelWalletEncryptionIcon->setPixmap(QIcon(":/icons/lock_closed_black-white").pixmap(STATUSBAR_ICONSIZE,STATUSBAR_ICONSIZE));
+		} else {
+			labelWalletEncryptionIcon->setPixmap(QIcon(":/icons/lock_closed_black").pixmap(STATUSBAR_ICONSIZE,STATUSBAR_ICONSIZE));
+		}
         labelWalletEncryptionIcon->setToolTip(tr("Wallet is <b>encrypted</b> and currently <b>locked</b>"));
         encryptWalletAction->setChecked(true);
         changePassphraseAction->setEnabled(true);
@@ -1508,7 +1672,7 @@ void BitcoinGUI::detectShutdown() {
         qApp->quit();
     }
 }
-
+//check this for theme 
 void BitcoinGUI::showProgress(const QString& title, int nProgress) {
     if (nProgress == 0) {
         progressDialog = new QProgressDialog(title, "", 0, 100);

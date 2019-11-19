@@ -44,17 +44,27 @@ SendCoinsDialog::SendCoinsDialog(const PlatformStyle *platformStyle, QWidget* pa
 {
     ui->setupUi(this);
 
+	QSettings settings;
+	
     if (!platformStyle->getImagesOnButtons()) {
         ui->addButton->setIcon(QIcon());
         ui->clearButton->setIcon(QIcon());
         ui->sendButton->setIcon(QIcon());
     } else {
-        ui->addButton->setIcon(platformStyle->SingleColorIcon(":/icons/add"));
-        ui->clearButton->setIcon(platformStyle->SingleColorIcon(":/icons/remove"));
-        ui->sendButton->setIcon(platformStyle->SingleColorIcon(":/icons/send"));
+		if (settings.value("theme").toString() == "dark grey" || settings.value("theme").toString() == "dark blue") {
+			ui->addButton->setIcon(platformStyle->SingleColorIcon(":/icons/add-white"));
+			ui->clearButton->setIcon(platformStyle->SingleColorIcon(":/icons/remove-light"));
+			ui->sendButton->setIcon(platformStyle->SingleColorIcon(":/icons/send"));
+
+		} else {
+			ui->addButton->setIcon(platformStyle->SingleColorIcon(":/icons/add"));
+			ui->clearButton->setIcon(platformStyle->SingleColorIcon(":/icons/remove"));
+			ui->sendButton->setIcon(platformStyle->SingleColorIcon(":/icons/send"));
+		}	
     }
 
     GUIUtil::setupAddressWidget(ui->lineEditCoinControlChange, this);
+	
 
     addEntry();
 
@@ -71,7 +81,7 @@ SendCoinsDialog::SendCoinsDialog(const PlatformStyle *platformStyle, QWidget* pa
     connect(ui->splitBlockLineEdit, SIGNAL(textChanged(const QString&)), this, SLOT(splitBlockLineEditChanged(const QString&)));
 
     // LUX specific
-    QSettings settings;
+    
     if (!settings.contains("bUseDarksend"))
         settings.setValue("bUseDarksend", false);
     if (!settings.contains("bUseInstanTX"))
@@ -387,6 +397,8 @@ void SendCoinsDialog::on_sendButton_clicked()
 
 void SendCoinsDialog::send(QList<SendCoinsRecipient> recipients, QString strFee, QStringList formatted)
 {
+	QSettings settings;
+	
     // prepare transaction for getting txFee earlier
     WalletModelTransaction currentTransaction(recipients);
     WalletModel::SendCoinsReturn prepareStatus;
@@ -415,7 +427,11 @@ void SendCoinsDialog::send(QList<SendCoinsRecipient> recipients, QString strFee,
 
     if (txFee > 0) {
         // append fee string if a fee is required
-        questionString.append("<hr /><span style='color:#aa0000;'>");
+		if (settings.value("theme").toString() == "dark grey" || settings.value("theme").toString() == "dark blue") {
+			questionString.append("<hr /><span style='color:#fff;'>");
+		} else { 
+			questionString.append("<hr /><span style='color:#aa0000;'>");
+		}
         questionString.append(BitcoinUnits::formatHtmlWithUnit(model->getOptionsModel()->getDisplayUnit(), txFee));
         questionString.append("</span> ");
         questionString.append(tr("are added as transaction fee"));

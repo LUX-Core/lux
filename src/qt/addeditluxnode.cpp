@@ -9,13 +9,61 @@
 #include "script/script.h"
 #include "init.h"
 #include "base58.h"
+#include "guiutil.h"
+
 #include <QMessageBox>
+#include <QSettings>
 
 AddEditLuxNode::AddEditLuxNode(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::AddEditLuxNode)
 {
     ui->setupUi(this);
+
+	QSettings settings;
+
+	if (settings.value("theme").toString() == "dark grey") {
+		QString styleSheet = "QDialog { background-color: #262626; color: #fff; }"
+								".QLabel { color: #fff; }"
+								".QLineEdit { background-color: #262626; color:#fff; border: 1px solid #40c2dc; "
+								"padding-left:10px; padding-right:10px; min-height:25px; }"
+								".QPushButton { background-color: #262626; color:#fff; "
+								"border: 1px solid #40c2dc; padding-left:10px; "
+								"padding-right:10px; min-height:25px; min-width:75px; }"
+								".QPushButton::hover { background-color:#40c2dc; color:#262626; }";
+								
+		this->setStyleSheet(styleSheet);
+		ui->label->setStyleSheet(styleSheet);
+		ui->label_2->setStyleSheet(styleSheet);
+		ui->label_3->setStyleSheet(styleSheet);
+		ui->statusLabel->setStyleSheet(styleSheet);
+		ui->aliasLineEdit->setStyleSheet(styleSheet);
+		ui->addressLineEdit->setStyleSheet(styleSheet);
+		ui->cancelButton->setStyleSheet(styleSheet);
+		ui->okButton->setStyleSheet(styleSheet);
+		
+	} else if (settings.value("theme").toString() == "dark blue") {
+		QString styleSheet = "QDialog { background-color: #061532; color: #fff; }"
+								".QLabel { color: #fff; }"
+								".QLineEdit { background-color: #061532; color:#fff; border: 1px solid #40c2dc; "
+								"padding-left:10px; padding-right:10px; min-height:25px; }"
+								".QPushButton { background-color: #061532; color:#fff; "
+								"border: 1px solid #40c2dc; padding-left:10px; "
+								"padding-right:10px; min-height:25px; min-width:75px; }"
+								".QPushButton::hover { background-color:#40c2dc; color:#061532; }";
+		this->setStyleSheet(styleSheet);
+		ui->label->setStyleSheet(styleSheet);
+		ui->label_2->setStyleSheet(styleSheet);
+		ui->label_3->setStyleSheet(styleSheet);
+		ui->statusLabel->setStyleSheet(styleSheet);
+		ui->aliasLineEdit->setStyleSheet(styleSheet);
+		ui->addressLineEdit->setStyleSheet(styleSheet);
+		ui->cancelButton->setStyleSheet(styleSheet);
+		ui->okButton->setStyleSheet(styleSheet);
+		
+	} else { 
+		//code here
+	}
 
 }
 
