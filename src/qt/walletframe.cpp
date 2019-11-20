@@ -10,6 +10,7 @@
 #include <cstdio>
 
 #include <QHBoxLayout>
+#include <QSettings>
 #include <QLabel>
 
 WalletFrame::WalletFrame(const PlatformStyle *platformStyle, BitcoinGUI *_gui) :
@@ -22,7 +23,16 @@ WalletFrame::WalletFrame(const PlatformStyle *platformStyle, BitcoinGUI *_gui) :
     setContentsMargins(0, 0, 0, 0);
     walletStack = new QStackedWidget(this);
     walletStack->setObjectName("walletStack");
-    walletStack->setStyleSheet("#walletStack {border: 1px solid #c4c1bd;}");
+	
+	QSettings settings;
+	if (settings.value("theme").toString() == "dark grey") {
+		walletStack->setStyleSheet("#walletStack { border: 1px solid #40c2dc; margin-top: -1px !important }");
+	} else if (settings.value("theme").toString() == "dark blue") {
+		walletStack->setStyleSheet("#walletStack { border: 1px solid #40c2dc; margin-top: -1px !important }");
+	} else { 
+		walletStack->setStyleSheet("#walletStack {border: 1px solid #c4c1bd;}");
+	}
+    
     walletFrameLayout->setContentsMargins(0,0,0,0);
     walletFrameLayout->addWidget(walletStack);
 

@@ -33,13 +33,13 @@
 #include <QMessageBox>
 #include <QPixmap>
 
-#define DECORATION_SIZE 48
+#define DECORATION_SIZE 38
 #define ICON_OFFSET 16
 #define NUM_ITEMS 5
 #define TOKEN_NUM_ITEMS 3
 #define TOKEN_SIZE 35
 #define MARGIN 4
-#define NAME_WIDTH 250 /* to align with txs history amounts */
+#define NAME_WIDTH 290 /* to align with txs history amounts */
 
 class TxViewDelegate : public QAbstractItemDelegate
 {
@@ -71,7 +71,16 @@ public:
         qint64 amount = index.data(TransactionTableModel::AmountRole).toLongLong();
         bool confirmed = index.data(TransactionTableModel::ConfirmedRole).toBool();
         QVariant value = index.data(Qt::ForegroundRole);
-        QColor foreground = COLOR_BLACK;
+		QSettings settings;
+		
+		QColor foreground;
+		
+		if (settings.value("theme").toString() == "dark grey" || settings.value("theme").toString() == "dark blue") {
+		   	foreground = SECOND_COLOR_WHITE;	
+	   	} else { 
+	   		foreground = COLOR_BLACK;
+	   	}
+        
         if (value.canConvert<QBrush>()) {
             QBrush brush = qvariant_cast<QBrush>(value);
             foreground = brush.color();
@@ -87,21 +96,36 @@ public:
             iconWatchonly.paint(painter, watchonlyRect);
         }
 
-        if (amount < 0) {
-            foreground = COLOR_NEGATIVE;
-        } else if (!confirmed) {
-            foreground = COLOR_UNCONFIRMED;
-        } else {
-            foreground = COLOR_BLACK;
-        }
+		if (settings.value("theme").toString() == "dark grey" || settings.value("theme").toString() == "dark blue") {
+			if (amount < 0) {
+				foreground = SECOND_COLOR_NEGATIVE;
+			} else if (!confirmed) {
+				foreground = SECOND_COLOR_UNCONFIRMED;
+			} else {
+				foreground = SECOND_COLOR_WHITE;
+			}	
+		} else { 
+			if (amount < 0) {
+				foreground = COLOR_NEGATIVE;
+			} else if (!confirmed) {
+				foreground = COLOR_UNCONFIRMED;
+			} else {
+				foreground = COLOR_BLACK;
+			}
+		}
+
         painter->setPen(foreground);
         QString amountText = BitcoinUnits::formatWithUnit(unit, amount, true, BitcoinUnits::separatorAlways);
         if (!confirmed) {
             amountText = QString("[") + amountText + QString("]");
         }
         painter->drawText(amountRect, Qt::AlignRight | Qt::AlignVCenter, amountText);
-
-        painter->setPen(COLOR_BLACK);
+		if (settings.value("theme").toString() == "dark grey" || settings.value("theme").toString() == "dark blue") {
+			painter->setPen(SECOND_COLOR_WHITE);
+		} else { 
+			painter->setPen(COLOR_BLACK);
+		}
+        
         painter->drawText(amountRect, Qt::AlignLeft | Qt::AlignVCenter, GUIUtil::dateTimeStr(date));
 
         painter->restore();
@@ -169,7 +193,13 @@ public:
         QFont addressFont = option.font;
         //addressFont.setPixelSize(addressFont.pixelSize() * 0.9);
         painter->setFont(addressFont);
-        painter->setPen(COLOR_UNCONFIRMED);
+		QSettings settings;
+		if (settings.value("theme").toString() == "dark grey" || settings.value("theme").toString() == "dark blue") {
+			painter->setPen(SECOND_COLOR_UNCONFIRMED);
+		} else { 
+			painter->setPen(COLOR_UNCONFIRMED);
+		}
+        
         QRect receiveAddressRect(decorationRect.right() + MARGIN, decorationSize +mainRect.top()
                                  , mainRect.width() - decorationSize, decorationSize * 2);
         painter->drawText(receiveAddressRect, Qt::AlignLeft|Qt::AlignBottom, receiveAddress);
@@ -210,10 +240,19 @@ OverviewPage::OverviewPage(const PlatformStyle *platformStyle, QWidget* parent) 
 {
     nDisplayUnit = 0; // just make sure it's not unitialized
     ui->setupUi(this);
+	QSettings settings;
+	
     //set Logo
-    ui->labelLogo->setPixmap(QPixmap(":/images/lux_logo_horizontal")
-                             .scaled(410,80,Qt::KeepAspectRatio,
-                                     Qt::SmoothTransformation));
+	if (settings.value("theme").toString() == "dark grey" || settings.value("theme").toString() == "dark blue") {
+		ui->labelLogo->setPixmap(QPixmap(":/images/lux_logo_horizontal-white")
+								.scaled(410,80,Qt::KeepAspectRatio,
+										Qt::SmoothTransformation));
+	} else { 
+		ui->labelLogo->setPixmap(QPixmap(":/images/lux_logo_horizontal")
+								.scaled(410,80,Qt::KeepAspectRatio,
+										Qt::SmoothTransformation));
+	}
+
 
     // Recent transactions
     ui->listTransactions->setItemDelegate(txdelegate);
@@ -230,9 +269,19 @@ OverviewPage::OverviewPage(const PlatformStyle *platformStyle, QWidget* parent) 
     connect(ui->listTokens, SIGNAL(clicked(QModelIndex)), this, SLOT(handleTokenClicked(QModelIndex)));
 
     // init "out of sync" warning labels
-    ui->labelWalletStatus->setText("(" + tr("out of sync") + ")");
+	
+	ui->labelWalletStatus->setText("(" + tr("out of sync") + ")");
     ui->labelDarksendSyncStatus->setText("(" + tr("out of sync") + ")");
     ui->labelTransactionsStatus->setText("(" + tr("out of sync") + ")");
+	if (settings.value("theme").toString() == "dark grey" || settings.value("theme").toString() == "dark blue") {
+		QString styleSheet = ".QLabel { color: #ff7d7d; }";
+		ui->labelWalletStatus->setStyleSheet(styleSheet);
+		ui->labelDarksendSyncStatus->setStyleSheet(styleSheet);
+		ui->labelTransactionsStatus->setStyleSheet(styleSheet);
+	} else { 
+
+	}
+
 #if 0
     if (!fLiteMode) {
         ui->frameDarksend->setVisible(false);

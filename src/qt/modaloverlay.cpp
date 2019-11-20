@@ -10,6 +10,8 @@
 
 #include <QResizeEvent>
 #include <QPropertyAnimation>
+#include <QSettings>
+#include <QStyle>
 
 ModalOverlay::ModalOverlay(QWidget *parent) :
         QWidget(parent),
@@ -28,6 +30,13 @@ ModalOverlay::ModalOverlay(QWidget *parent) :
 
     blockProcessTime.clear();
     setVisible(false);
+	
+	QSettings settings;
+	if (settings.value("theme").toString() == "dark grey" || settings.value("theme").toString() == "dark blue") {
+		ui->warningIcon->setIcon(QIcon(":/icons/warning-white"));
+	} else {
+		ui->warningIcon->setIcon(QIcon(":/icons/warning"));
+	}	
 }
 
 ModalOverlay::~ModalOverlay()
@@ -78,7 +87,44 @@ void ModalOverlay::tipUpdate(int count, const QDateTime& blockDate, double nVeri
 
     // keep a vector of samples of verification progress at height
     blockProcessTime.push_front(qMakePair(currentDate.toMSecsSinceEpoch(), nVerificationProgress));
+	
+	QSettings settings;
 
+	if (settings.value("theme").toString() == "dark grey") {
+		QString styleSheet = ".QWidget#contentWidget {  background: #262626 !important; color: #fff !important; "
+								"border: 1px solid #40c2dc !important; border-radius: 6px !important; } " 
+								".QWidget#bgWidget{  background: rgba(0,0,0,220); border-left: 1px solid #40c2dc !important; "
+								"border-right: 1px solid #40c2dc !important; }"
+								".QLabel { color: #fff !important; } " 
+								".QPushButton#warningIcon { border:0 !important; } "
+								".QPushButton#warningIcon::hover {background-color: transparent !important; } "
+								".QProgressBar#progressBar  { border-radius: 10px !important; min-height:5px !important;"
+								"max-height:9px !important; }";
+		ui->contentWidget->setStyleSheet(styleSheet);
+		ui->bgWidget->setStyleSheet(styleSheet);
+	} else if (settings.value("theme").toString() == "dark blue") {
+		QString styleSheet = ".QWidget#contentWidget  {  background: #061532 !important; color: #fff !important; "
+								"border: 1px solid #40c2dc !important; border-radius: 6px !important; } "
+								".QWidget#bgWidget{  background: rgba(0,0,0,220); border-left: 1px solid #40c2dc !important; "
+								"border-right: 1px solid #40c2dc !important; }"
+								".QLabel { color: #fff !important; } " 
+								".QPushButton#warningIcon { border:0 !important; } "
+								".QPushButton#warningIcon::hover {background-color: transparent !important; } "
+								".QProgressBar#progressBar  { border-radius: 10px !important; min-height:5px !important;"
+								"max-height:9px !important; }";
+		ui->contentWidget->setStyleSheet(styleSheet);
+		ui->bgWidget->setStyleSheet(styleSheet);
+	} else { 
+		//default color
+		QString styleSheet = ".QWidget#contentWidget {  background: rgba(255,255,255,240); border-radius: 6px }"
+								".QWidget#bgWidget{  background: rgba(0,0,0,220); }"
+								"QLabel { color: rgb(40,40,40); "
+								".QPushButton#warningIcon::hover {background-color: transparent !important; } ";
+		ui->contentWidget->setStyleSheet(styleSheet);
+		ui->bgWidget->setStyleSheet(styleSheet);
+		
+	}
+	
     // show progress speed if we have more then one sample
     if (blockProcessTime.size() >= 2) {
         double progressDelta = 0;

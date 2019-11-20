@@ -16,7 +16,9 @@
 #include "contractresult.h"
 #include "sendcoinsdialog.h"
 //#include "styleSheet.h"
+#include "guiutil.h"
 
+#include <QSettings>
 #include <QRegularExpressionValidator>
 
 namespace CreateContract_NS
@@ -105,11 +107,21 @@ CreateContract::~CreateContract()
 
 void CreateContract::setLinkLabels()
 {
+	QSettings settings;
+	
     ui->labelSolidity->setOpenExternalLinks(true);
-    ui->labelSolidity->setText("<a href=\"http://remix.ethereum.org/\">Solidity compiler</a>");
-
     ui->labelToken->setOpenExternalLinks(true);
-    ui->labelToken->setText("<a href=\"https://ethereum.org/token#the-code\">Token template</a>");
+
+	if (settings.value("theme").toString() == "dark grey") {
+		ui->labelSolidity->setText("<a href=\"http://remix.ethereum.org/\"><span style=\"color:#40c2dc;\">Solidity compiler</span></a>");
+		ui->labelToken->setText("<a href=\"https://ethereum.org/token#the-code\"><span style=\"color:#40c2dc;\">Token template</span></a>");
+	} else if (settings.value("theme").toString() == "dark blue") {
+		ui->labelSolidity->setText("<a href=\"http://remix.ethereum.org/\"><span style=\"color:#40c2dc;\">Solidity compiler</span></a>");
+		ui->labelToken->setText("<a href=\"https://ethereum.org/token#the-code\"><span style=\"color:#40c2dc;\">Token template</span></a>");
+	} else { 
+		ui->labelSolidity->setText("<a href=\"http://remix.ethereum.org/\">Solidity compiler</a>");
+		ui->labelToken->setText("<a href=\"https://ethereum.org/token#the-code\">Token template</a>");
+	}
 }
 
 void CreateContract::setModel(WalletModel *_model)

@@ -11,9 +11,11 @@
 #include "main.h"
 #include "addresstablemodel.h"
 #include "optionsmodel.h"
+#include "guiutil.h"
 
 #include <QRegularExpressionValidator>
 #include <QMessageBox>
+#include <QSettings>
 
 AddTokenPage::AddTokenPage(QWidget *parent) :
         QWidget(parent),
@@ -39,6 +41,25 @@ AddTokenPage::AddTokenPage(QWidget *parent) :
     if(ui->lineEditSenderAddress->isEditable())
         ((QValidatedLineEdit*)ui->lineEditSenderAddress->lineEdit())->setEmptyIsValid(false);
     m_validTokenAddress = false;
+	
+	QSettings settings;
+	
+	if (settings.value("theme").toString() == "dark grey") {
+		QString styleSheet = ".QPushButton { background-color: #262626; color:#fff; border: 1px solid #40c2dc; "
+								"padding-left:10px; padding-right:10px; min-height:25px; min-width:75px; }"
+								".QPushButton:hover { background-color:#40c2dc !important; color:#262626 !important; }";					
+		ui->confirmButton->setStyleSheet(styleSheet);
+		ui->clearButton->setStyleSheet(styleSheet);
+	} else if (settings.value("theme").toString() == "dark blue") {
+		QString styleSheet = ".QPushButton { background-color: #061532; color:#fff; border: 1px solid #40c2dc; "
+								"padding-left:10px; padding-right:10px; min-height:25px; min-width:75px; }"
+								".QPushButton:hover { background-color:#40c2dc; color:#061532; }";					
+		ui->confirmButton->setStyleSheet(styleSheet);
+		ui->clearButton->setStyleSheet(styleSheet);
+	} else { 
+		//code here
+	}
+	
 }
 
 AddTokenPage::~AddTokenPage()

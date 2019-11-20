@@ -15,6 +15,7 @@
 #include "rpcserver.h"
 #include <boost/lexical_cast.hpp>
 #include <fstream>
+#include "guiutil.h"
 
 using namespace std;
 
@@ -31,6 +32,8 @@ using namespace std;
 #include <QThread>
 #include <QScrollBar>
 #include <QMessageBox>
+#include <QSettings>
+#include <QHeaderView>
 
 MasternodeManager::MasternodeManager(QWidget *parent) :
     QWidget(parent),
@@ -69,6 +72,31 @@ MasternodeManager::MasternodeManager(QWidget *parent) :
     ui->tableWidget->setColumnWidth(3, columnActiveWidth); // status
     ui->tableWidget->setColumnWidth(4, columnActiveSecondsWidth); // time active
     ui->tableWidget->setColumnWidth(5, columnLastSeenWidth); // last seen
+	ui->tableWidget->verticalHeader()->setVisible(false); // hide numberic row
+	
+	QSettings settings;
+
+	if (settings.value("theme").toString() == "dark grey") {
+		QString styleSheet = ".QTabWidget { border-left: 0px !important; border-bottom: 0px !important; "
+								"border-right: 0px !important; marging-left: -1px !important; "
+								"marging-bottom: -1px !important; marging-right: -1px !important; } "
+								".QTableWidget {background-color: #262626; alternate-background-color:#424242; "
+								"gridline-color: #40c2dc; border: 1px solid #40c2dc; color: #fff; min-height:2em; }";
+		ui->tableWidget->setStyleSheet(styleSheet);
+		ui->tableWidgetPMN->setStyleSheet(styleSheet);
+		ui->tableWidget_2->setStyleSheet(styleSheet);
+	} else if (settings.value("theme").toString() == "dark blue") {
+		QString styleSheet = ".QTabWidget { border-left: 0px !important; border-bottom: 0px !important; "
+								"border-right: 0px !important; marging-left: -1px !important; "
+								"marging-bottom: -1px !important; marging-right: -1px !important; } "
+								".QTableWidget {background-color: #061532; alternate-background-color:#0D2A64; "
+								"gridline-color: #40c2dc; border: 1px solid #40c2dc; color: #fff; min-height:2em; }";										
+		ui->tableWidget->setStyleSheet(styleSheet);
+		ui->tableWidgetPMN->setStyleSheet(styleSheet);
+		ui->tableWidget_2->setStyleSheet(styleSheet);
+	} else { 
+		//code here
+	}
 	
 }
 
@@ -203,18 +231,18 @@ void MasternodeManager::updateNodeList()
         if (strCurrentFilter != "") {
             strToFilter = addressItem->text() + " " +
                           rankItem->text() + " " +
-			  protocolItem->text() + " " +
+						  protocolItem->text() + " " +
                           activeItem->text() + " " +
                           activeSecondsItem->text() + " " +
                           lastSeenItem->text() + " " +
                           pubkeyItem->text();
             if (!strToFilter.contains(strCurrentFilter)) continue;
         }
-		
-	ui->tableWidget->insertRow(0);
+				
+		ui->tableWidget->insertRow(0);
         ui->tableWidget->setItem(0, 0, addressItem);
         ui->tableWidget->setItem(0, 1, rankItem);
-	ui->tableWidget->setItem(0, 2, protocolItem);
+		ui->tableWidget->setItem(0, 2, protocolItem);
         ui->tableWidget->setItem(0, 3, activeItem);
         ui->tableWidget->setItem(0, 4, activeSecondsItem);
         ui->tableWidget->setItem(0, 5, lastSeenItem);
@@ -362,13 +390,58 @@ void MasternodeManager::on_startButton_clicked()
     std::string errorMessage;
     bool result = activeMasternode.RegisterByPubKey(c.sAddress, c.sMasternodePrivKey, c.sCollateralAddress, errorMessage);
 
-    QMessageBox msg;
-    if(result)
-        msg.setText("LUX Node at " + QString::fromStdString(c.sAddress) + " started.");
-    else
-        msg.setText("Error: " + QString::fromStdString(errorMessage));
+	QMessageBox* msg = new QMessageBox();
+	
+	QSettings settings;
 
-    msg.exec();
+	if (settings.value("theme").toString() == "dark grey") {
+		QString styleSheet = ".QMessageBox { background-color: #262626; color:#fff; border: 1px solid #40c2dc;"
+								"min-width: 150px; min-width: 250px; }"
+								"QMessageBox QPushButton { background-color: #262626; color:#fff; "
+								"border: 1px solid #40c2dc; padding-left:10px; "
+								"padding-right:10px; min-height:25px; min-width:75px; }"
+								"QMessageBox QPushButton::hover { background-color:#40c2dc; color:#262626; }"
+								"QMessageBox QLabel {color:#fff;}";
+
+		msg->setStyleSheet(styleSheet);
+		if(result)
+		{
+			msg->setText("<span style=\"color:#fff;\"> LUX Node at " + QString::fromStdString(c.sAddress) + " started. </span>");
+		}
+		else
+		{
+			msg->setText("<span style=\"color:#fff;\"> Error: " + QString::fromStdString(errorMessage) + "</span>");
+		}
+	} else if (settings.value("theme").toString() == "dark blue") {
+		QString styleSheet = ".QMessageBox { background-color: #061532; color:#fff; border: 1px solid #40c2dc; "
+								"min-width: 150px; min-width: 250px; }"
+								"QMessageBox QPushButton { background-color: #061532; color:#fff; "
+								"border: 1px solid #40c2dc; padding-left:10px; "
+								"padding-right:10px; min-height:25px; min-width:75px; }"
+								"QMessageBox QPushButton::hover { background-color:#40c2dc; color:#061532; }";
+								"QMessageBox QLabel {color:#fff;}";
+							
+		msg->setStyleSheet(styleSheet);
+		if(result)
+		{
+			msg->setText("<span style=\"color:#fff;\"> LUX Node at " + QString::fromStdString(c.sAddress) + " started. </span>");
+		}
+		else
+		{
+			msg->setText("<span style=\"color:#fff;\"> Error: " + QString::fromStdString(errorMessage) + "</span>");
+		}
+	} else { 
+		if(result)
+		{
+			msg->setText("LUX Node at " + QString::fromStdString(c.sAddress) + " started.");
+		}
+		else
+		{
+			msg->setText("Error: " + QString::fromStdString(errorMessage));
+		}
+	}
+	
+    msg->exec();
 }
 
 void MasternodeManager::on_stopButton_clicked()
@@ -386,39 +459,111 @@ void MasternodeManager::on_stopButton_clicked()
 
     std::string errorMessage;
     bool result = activeMasternode.StopMasterNode(c.sAddress, c.sMasternodePrivKey, errorMessage);
-    QMessageBox msg;
-    if(result)
-    {
-        msg.setText("LUX Node at " + QString::fromStdString(c.sAddress) + " stopped.");
-    }
-    else
-    {
-        msg.setText("Error: " + QString::fromStdString(errorMessage));
-    }
-    msg.exec();
+    QMessageBox* msg = new QMessageBox();
+	
+	QSettings settings;
+
+	if (settings.value("theme").toString() == "dark grey") {
+		QString styleSheet = ".QMessageBox { background-color: #262626; color:#fff; border: 1px solid #40c2dc;"
+								"min-width: 150px; min-width: 250px; }"
+								"QMessageBox QPushButton { background-color: #262626; color:#fff; "
+								"border: 1px solid #40c2dc; padding-left:10px; "
+								"padding-right:10px; min-height:25px; min-width:75px; }"
+								"QMessageBox QPushButton::hover { background-color:#40c2dc; color:#262626; }"
+								"QMessageBox QLabel {color:#fff;}";
+
+		msg->setStyleSheet(styleSheet);
+		if(result)
+		{
+			msg->setText("<span style=\"color:#fff;\"> LUX Node at " + QString::fromStdString(c.sAddress) + " stopped. </span>");
+		}
+		else
+		{
+			msg->setText("<span style=\"color:#fff;\"> Error: " + QString::fromStdString(errorMessage) + "</span>");
+		}
+	} else if (settings.value("theme").toString() == "dark blue") {
+		QString styleSheet = ".QMessageBox { background-color: #061532; color:#fff; border: 1px solid #40c2dc; "
+								"min-width: 150px; min-width: 250px; }"
+								"QMessageBox QPushButton { background-color: #061532; color:#fff; "
+								"border: 1px solid #40c2dc; padding-left:10px; "
+								"padding-right:10px; min-height:25px; min-width:75px; }"
+								"QMessageBox QPushButton::hover { background-color:#40c2dc; color:#061532; }";
+								"QMessageBox QLabel {color:#fff;}";
+							
+		msg->setStyleSheet(styleSheet);
+		if(result)
+		{
+			msg->setText("<span style=\"color:#fff;\"> LUX Node at " + QString::fromStdString(c.sAddress) + " stopped. </span>");
+		}
+		else
+		{
+			msg->setText("<span style=\"color:#fff;\"> Error: " + QString::fromStdString(errorMessage) + "</span>");
+		}
+	} else { 
+		if(result)
+		{
+			msg->setText("LUX Node at " + QString::fromStdString(c.sAddress) + " stopped.");
+		}
+		else
+		{
+			msg->setText("Error: " + QString::fromStdString(errorMessage));
+		}
+	}
+
+    msg->exec();
 }
 
 void MasternodeManager::on_startAllButton_clicked()
 {
     std::string results;
+	
+	results = "There are not masternodes setup";
+	
     for (PAIRTYPE(std::string, CLuxNodeConfig) lux : pwalletMain->mapMyLuxNodes)
     {
-        CLuxNodeConfig c = lux.second;
-	std::string errorMessage;
-        bool result = activeMasternode.RegisterByPubKey(c.sAddress, c.sMasternodePrivKey, c.sCollateralAddress, errorMessage);
-	if(result)
-	{
-   	    results += c.sAddress + ": STARTED\n";
-	}	
-	else
-	{
-	    results += c.sAddress + ": ERROR: " + errorMessage + "\n";
-	}
+		CLuxNodeConfig c = lux.second;
+		std::string errorMessage;
+			bool result = activeMasternode.RegisterByPubKey(c.sAddress, c.sMasternodePrivKey, c.sCollateralAddress, errorMessage);
+		if(result)
+		{
+			results += c.sAddress + ": STARTED\n";
+		}	
+		else
+		{
+			results += c.sAddress + ": ERROR: " + errorMessage + "\n";
+		}
     }
 
-    QMessageBox msg;
-    msg.setText(QString::fromStdString(results));
-    msg.exec();
+    QMessageBox* msg = new QMessageBox();
+	
+	QSettings settings;
+
+	if (settings.value("theme").toString() == "dark grey") {
+		QString styleSheet = ".QMessageBox { background-color: #262626; color:#fff; border: 1px solid #40c2dc;"
+								"min-width: 150px; min-width: 250px; }"
+								"QMessageBox QPushButton { background-color: #262626; color:#fff; "
+								"border: 1px solid #40c2dc; padding-left:10px; "
+								"padding-right:10px; min-height:25px; min-width:75px; }"
+								"QMessageBox QPushButton::hover { background-color:#40c2dc; color:#262626; }"
+								"QMessageBox QLabel {color:#fff;}";
+
+		msg->setStyleSheet(styleSheet);
+		msg->setText("<span style=\"color:#fff;\">" +QString::fromStdString(results) + "</span>");
+	} else if (settings.value("theme").toString() == "dark blue") {
+		QString styleSheet = ".QMessageBox { background-color: #061532; color:#fff; border: 1px solid #40c2dc; "
+								"min-width: 150px; min-width: 250px; }"
+								"QMessageBox QPushButton { background-color: #061532; color:#fff; "
+								"border: 1px solid #40c2dc; padding-left:10px; "
+								"padding-right:10px; min-height:25px; min-width:75px; }"
+								"QMessageBox QPushButton::hover { background-color:#40c2dc; color:#061532; }";
+								"QMessageBox QLabel {color:#fff;}";
+							
+		msg->setStyleSheet(styleSheet);
+		msg->setText("<span style=\"color:#fff;\">" +QString::fromStdString(results) + "</span>");
+	} else { 
+		msg->setText(QString::fromStdString(results));
+	}
+    msg->exec();
 }
 
 void MasternodeManager::on_stopAllButton_clicked()
@@ -439,7 +584,34 @@ void MasternodeManager::on_stopAllButton_clicked()
 	}
     }
 
-    QMessageBox msg;
-    msg.setText(QString::fromStdString(results));
-    msg.exec();
+    QMessageBox* msg = new QMessageBox();
+	
+	QSettings settings;
+
+	if (settings.value("theme").toString() == "dark grey") {
+		QString styleSheet = ".QMessageBox { background-color: #262626; color:#fff; border: 1px solid #40c2dc;"
+								"min-width: 150px; min-width: 250px; }"
+								"QMessageBox QPushButton { background-color: #262626; color:#fff; "
+								"border: 1px solid #40c2dc; padding-left:10px; "
+								"padding-right:10px; min-height:25px; min-width:75px; }"
+								"QMessageBox QPushButton::hover { background-color:#40c2dc; color:#262626; }"
+								"QMessageBox QLabel {color:#fff;}";
+
+		msg->setStyleSheet(styleSheet);
+		msg->setText("<span style=\"color:#fff;\">" +QString::fromStdString(results) + "</span>");
+	} else if (settings.value("theme").toString() == "dark blue") {
+		QString styleSheet = ".QMessageBox { background-color: #061532; color:#fff; border: 1px solid #40c2dc; "
+								"min-width: 150px; min-width: 250px; }"
+								"QMessageBox QPushButton { background-color: #061532; color:#fff; "
+								"border: 1px solid #40c2dc; padding-left:10px; "
+								"padding-right:10px; min-height:25px; min-width:75px; }"
+								"QMessageBox QPushButton::hover { background-color:#40c2dc; color:#061532; }";
+								"QMessageBox QLabel {color:#fff;}";
+
+		msg->setStyleSheet(styleSheet);
+		msg->setText("<span style=\"color:#fff;\">" +QString::fromStdString(results) + "</span>");
+	} else { 
+		msg->setText(QString::fromStdString(results));
+	}
+    msg->exec();
 }

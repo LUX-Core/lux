@@ -19,12 +19,14 @@
 #include "util.h"
 #include "wallet.h"
 #include "core_io.h"
+#include "guiutil.h"
 
 #include <QColor>
 #include <QDateTime>
 #include <QDebug>
 #include <QIcon>
 #include <QList>
+#include <QSettings>
 
 // Amount column is right-aligned it contains numbers
 static int column_alignments[] = {
@@ -384,25 +386,50 @@ QString TransactionTableModel::formatTxType(const TransactionRecord* wtx) const
 
 QVariant TransactionTableModel::txAddressDecoration(const TransactionRecord* wtx) const
 {
-    switch (wtx->type) {
-    case TransactionRecord::Generated:
-    case TransactionRecord::StakeMint:
-    case TransactionRecord::MNReward:
-        return QIcon(":/icons/tx_mined");
-    case TransactionRecord::RecvWithDarksend:
-    case TransactionRecord::RecvWithAddress:
-    case TransactionRecord::RecvFromOther:
-    case TransactionRecord::SCrefund:
-        return QIcon(":/icons/tx_input");
-    case TransactionRecord::SendToAddress:
-    case TransactionRecord::SendToOther:
-    case TransactionRecord::SCcreate:
-        return QIcon(":/icons/tx_output");
-    case TransactionRecord::SCsent:
-        return QIcon(":/icons/tx_output");
-    default:
-        return QIcon(":/icons/tx_inout");
-    }
+	QSettings settings;
+	if (settings.value("theme").toString() == "dark grey" || settings.value("theme").toString() == "dark blue") {
+		switch (wtx->type) {
+		case TransactionRecord::Generated:
+		case TransactionRecord::StakeMint:
+		case TransactionRecord::MNReward:
+			return QIcon(":/icons/tx_mined");
+		case TransactionRecord::RecvWithDarksend:
+		case TransactionRecord::RecvWithAddress:
+		case TransactionRecord::RecvFromOther:
+		case TransactionRecord::SCrefund:
+			return QIcon(":/icons/tx_input-light");
+		case TransactionRecord::SendToAddress:
+		case TransactionRecord::SendToOther:
+		case TransactionRecord::SCcreate:
+			return QIcon(":/icons/tx_output-light");
+		case TransactionRecord::SCsent:
+			return QIcon(":/icons/tx_output-light");
+		default:
+			return QIcon(":/icons/tx_inout-light");
+		}
+
+	} else {
+		switch (wtx->type) {
+		case TransactionRecord::Generated:
+		case TransactionRecord::StakeMint:
+		case TransactionRecord::MNReward:
+			return QIcon(":/icons/tx_mined");
+		case TransactionRecord::RecvWithDarksend:
+		case TransactionRecord::RecvWithAddress:
+		case TransactionRecord::RecvFromOther:
+		case TransactionRecord::SCrefund:
+			return QIcon(":/icons/tx_input");
+		case TransactionRecord::SendToAddress:
+		case TransactionRecord::SendToOther:
+		case TransactionRecord::SCcreate:
+			return QIcon(":/icons/tx_output");
+		case TransactionRecord::SCsent:
+			return QIcon(":/icons/tx_output");
+		default:
+			return QIcon(":/icons/tx_inout");
+		}
+
+	}	
 }
 
 QString TransactionTableModel::formatTxToAddress(const TransactionRecord* wtx, bool tooltip) const
@@ -439,26 +466,51 @@ QString TransactionTableModel::formatTxToAddress(const TransactionRecord* wtx, b
 
 QVariant TransactionTableModel::addressColor(const TransactionRecord* wtx) const
 {
-    switch (wtx->type) {
-    case TransactionRecord::SendToSelf:
-        return COLOR_BAREADDRESS;
-    // Show addresses without label in a less visible color
-    case TransactionRecord::RecvWithAddress:
-    case TransactionRecord::SendToAddress:
-    case TransactionRecord::Generated:
-    case TransactionRecord::SCcreate:
-    case TransactionRecord::SCsent:
-    case TransactionRecord::SCrefund:
-    case TransactionRecord::MNReward: {
-        QString label = walletModel->getAddressTableModel()->labelForAddress(QString::fromStdString(wtx->address));
-        if (label.isEmpty())
-            return COLOR_BAREADDRESS;
-    }
-    default:
-        // To avoid overriding above conditional formats a default text color for this QTableView is not defined in stylesheet,
-        // so we must always return a color here
-        return COLOR_BLACK;
-    }
+	QSettings settings;
+	if (settings.value("theme").toString() == "dark grey" || settings.value("theme").toString() == "dark blue") {
+		switch (wtx->type) {
+		case TransactionRecord::SendToSelf:
+			return SECOND_COLOR_BAREADDRESS;
+		// Show addresses without label in a less visible color
+		case TransactionRecord::RecvWithAddress:
+		case TransactionRecord::SendToAddress:
+		case TransactionRecord::Generated:
+		case TransactionRecord::SCcreate:
+		case TransactionRecord::SCsent:
+		case TransactionRecord::SCrefund:
+		case TransactionRecord::MNReward: {
+			QString label = walletModel->getAddressTableModel()->labelForAddress(QString::fromStdString(wtx->address));
+			if (label.isEmpty())
+				return SECOND_COLOR_BAREADDRESS;
+		}
+		default:
+			// To avoid overriding above conditional formats a default text color for this QTableView is not defined in stylesheet,
+			// so we must always return a color here
+			return SECOND_COLOR_WHITE;
+		}
+			
+	} else { 
+		switch (wtx->type) {
+		case TransactionRecord::SendToSelf:
+			return COLOR_BAREADDRESS;
+		// Show addresses without label in a less visible color
+		case TransactionRecord::RecvWithAddress:
+		case TransactionRecord::SendToAddress:
+		case TransactionRecord::Generated:
+		case TransactionRecord::SCcreate:
+		case TransactionRecord::SCsent:
+		case TransactionRecord::SCrefund:
+		case TransactionRecord::MNReward: {
+			QString label = walletModel->getAddressTableModel()->labelForAddress(QString::fromStdString(wtx->address));
+			if (label.isEmpty())
+				return COLOR_BAREADDRESS;
+		}
+		default:
+			// To avoid overriding above conditional formats a default text color for this QTableView is not defined in stylesheet,
+			// so we must always return a color here
+			return COLOR_BLACK;
+		}
+	}
 }
 
 QString TransactionTableModel::formatTxAmount(const TransactionRecord* wtx, bool showUnconfirmed, BitcoinUnits::SeparatorStyle separators) const
@@ -507,7 +559,12 @@ QVariant TransactionTableModel::txStatusDecoration(const TransactionRecord* wtx)
     case TransactionStatus::NotAccepted:
         return QIcon(":/icons/transaction_0");
     default:
-        return COLOR_BLACK;
+		QSettings settings;
+		if (settings.value("theme").toString() == "dark grey" || settings.value("theme").toString() == "dark blue") {
+			return SECOND_COLOR_WHITE;			
+		} else { 
+			return COLOR_BLACK;
+		}
     }
 }
 
@@ -536,6 +593,8 @@ QVariant TransactionTableModel::data(const QModelIndex& index, int role) const
         return QVariant();
     TransactionRecord* rec = static_cast<TransactionRecord*>(index.internalPointer());
 
+	QSettings settings;
+	
     switch (role) {
     case Qt::DecorationRole:
         switch (index.column()) {
@@ -581,25 +640,47 @@ QVariant TransactionTableModel::data(const QModelIndex& index, int role) const
     case Qt::TextAlignmentRole:
         return column_alignments[index.column()];
     case Qt::ForegroundRole:
-        // Use the "danger" color for abandoned transactions
-        if(rec->status.status == TransactionStatus::Abandoned)
-        {
-            return COLOR_TX_STATUS_DANGER;
-        }
-        // Non-confirmed (but not immature) as transactions are grey
-        if (!rec->status.countsForBalance && rec->status.status != TransactionStatus::Immature) {
-            return COLOR_UNCONFIRMED;
-        }
-        if (index.column() == Amount && (rec->credit + rec->debit) < 0) {
-            return COLOR_NEGATIVE;
-        }
-        if (index.column() == ToAddress) {
-            return addressColor(rec);
-        }
+		if (settings.value("theme").toString() == "dark grey" || settings.value("theme").toString() == "dark blue") {
+			// Use the "danger" color for abandoned transactions
+			if(rec->status.status == TransactionStatus::Abandoned)
+			{
+				return COLOR_TX_STATUS_DANGER;
+			}
+			// Non-confirmed (but not immature) as transactions are grey
+			if (!rec->status.countsForBalance && rec->status.status != TransactionStatus::Immature) {
+				return SECOND_COLOR_UNCONFIRMED;
+			}
+			if (index.column() == Amount && (rec->credit + rec->debit) < 0) {
+				return SECOND_COLOR_NEGATIVE;
+			}
+			if (index.column() == ToAddress) {
+				return addressColor(rec);
+			}
 
-        // To avoid overriding above conditional formats a default text color for this QTableView is not defined in stylesheet,
-        // so we must always return a color here
-        return COLOR_BLACK;
+			// To avoid overriding above conditional formats a default text color for this QTableView is not defined in stylesheet,
+			// so we must always return a color here
+			return SECOND_COLOR_WHITE;	
+		} else { 
+			// Use the "danger" color for abandoned transactions
+			if(rec->status.status == TransactionStatus::Abandoned)
+			{
+				return COLOR_TX_STATUS_DANGER;
+			}
+			// Non-confirmed (but not immature) as transactions are grey
+			if (!rec->status.countsForBalance && rec->status.status != TransactionStatus::Immature) {
+				return COLOR_UNCONFIRMED;
+			}
+			if (index.column() == Amount && (rec->credit + rec->debit) < 0) {
+				return COLOR_NEGATIVE;
+			}
+			if (index.column() == ToAddress) {
+				return addressColor(rec);
+			}
+
+			// To avoid overriding above conditional formats a default text color for this QTableView is not defined in stylesheet,
+			// so we must always return a color here
+			return COLOR_BLACK;
+		}   
     case TypeRole:
         return rec->type;
     case DateRole:

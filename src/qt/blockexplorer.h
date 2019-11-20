@@ -3,7 +3,6 @@
 
 #include <QLabel>
 #include <QMainWindow>
-#include <QStatusBar>
 
 #include "bitcoinunits.h"
 #include "clientmodel.h"
@@ -24,7 +23,6 @@ class BlockExplorer;
 class CBlockIndex;
 class CTransaction;
 class CBlockTreeDB;
-class NetworkDisplayStatusBarControl;
 
 std::string getexplorerBlockHash(int64_t);
 const CBlockIndex* getexplorerBlockIndex(int64_t);
@@ -58,7 +56,6 @@ private:
     QStringList m_History;
 
     ClientModel *model;
-    NetworkDisplayStatusBarControl* unitDisplayControl;
 
     void setBlock(CBlockIndex* pBlock);
     bool switchTo(const QString& query);
@@ -66,23 +63,6 @@ private:
     void updateNavButtons();
 
     void Translations();
-};
-
-class NetworkDisplayStatusBarControl : public QLabel
-{
-    Q_OBJECT
-
-public:
-    explicit NetworkDisplayStatusBarControl(const PlatformStyle* platformStyle);
-    /** Lets the control know about the Options Model (and its signals) */
-    void setOptionsModel(OptionsModel* optionsModel);
-
-private:
-    OptionsModel* optionsModel;
-
-private Q_SLOTS:
-    /** When Display Units are changed on OptionsModel it will refresh the display text of the control on the status bar */
-    void updateDisplayUnit(int newUnits);
 };
 
 #endif // BLOCKEXPLORER_H

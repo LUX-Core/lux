@@ -312,21 +312,27 @@ endif
 
 RES_ICONS = \
   qt/res/icons/add.png \
+  qt/res/icons/add-white.png \
   qt/res/icons/address-book.png \
+  qt/res/icons/address-book-white.png \
   qt/res/icons/auto_backup.png \
   qt/res/icons/backup.png \
+  qt/res/icons/backup-white.png \
   qt/res/icons/bitcoin.ico \
   qt/res/icons/bitcoin.png \
   qt/res/icons/bitcoin_testnet.ico \
   qt/res/icons/bitcoin_testnet.png \
   qt/res/icons/browse.png \
+  qt/res/icons/browse-light.png \
   qt/res/icons/chevron.png \
+  qt/res/icons/chevron-white.png \
   qt/res/icons/clock1.png \
   qt/res/icons/clock2.png \
   qt/res/icons/clock3.png \
   qt/res/icons/clock4.png \
   qt/res/icons/clock5.png \
   qt/res/icons/conf.png \
+  qt/res/icons/conf-white.png \
   qt/res/icons/configure.png \
   qt/res/icons/connect0_16.png \
   qt/res/icons/connect1_16.png \
@@ -334,44 +340,61 @@ RES_ICONS = \
   qt/res/icons/connect3_16.png \
   qt/res/icons/connect4_16.png \
   qt/res/icons/debugwindow.png \
+  qt/res/icons/debugwindow-white.png \
   qt/res/icons/discord.png \
   qt/res/icons/edit.png \
   qt/res/icons/editcopy.png \
   qt/res/icons/editpaste.png \
+  qt/res/icons/editpaste-white.png \
   qt/res/icons/explorer.png \
   qt/res/icons/export.png \
   qt/res/icons/eye.png \
   qt/res/icons/eye_minus.png \
   qt/res/icons/eye_plus.png \
   qt/res/icons/filesave.png \
+  qt/res/icons/filesave-light.png \
   qt/res/icons/fontbigger.png \
+  qt/res/icons/fontbigger-white.png \
   qt/res/icons/fontsmaller.png \
+  qt/res/icons/fontsmaller-white.png \
   qt/res/icons/github.png \
   qt/res/icons/hd_disabled.png \
   qt/res/icons/hd_enabled.png \
   qt/res/icons/hex.png \
+  qt/res/icons/hex-white.png \
   qt/res/icons/history.png \
   qt/res/icons/home.png \
   qt/res/icons/hub.png \
   qt/res/icons/key.png \
+  qt/res/icons/key-white.png \
   qt/res/icons/lock_closed.png \
   qt/res/icons/lock_closed_black.png \
+  qt/res/icons/lock_closed_black-white.png \
   qt/res/icons/luxcoin_black.png \
+  qt/res/icons/luxcoin_black-white.png \
   qt/res/icons/lsrtoken.png \
   qt/res/icons/lock_open.png \
+  qt/res/icons/lock_open-white.png \
   qt/res/icons/luxupdate-loader.gif \
   qt/res/icons/masternodes.png \
   qt/res/icons/network_monitor.png \
+  qt/res/icons/network_monitor-white.png \
   qt/res/icons/options.png \
+  qt/res/icons/options-white.png \
   qt/res/icons/overview.png \
   qt/res/icons/peer.png \
+  qt/res/icons/peer-white.png \
   qt/res/icons/qrcode.png \
   qt/res/icons/quit.png \
+  qt/res/icons/quit-light.png \
   qt/res/icons/receive.png \
   qt/res/icons/remove.png \
+  qt/res/icons/remove-light.png \
   qt/res/icons/restore.png \
+  qt/res/icons/restore-white.png \
   qt/res/icons/send.png \
   qt/res/icons/sign.png \
+  qt/res/icons/sign-white.png \
   qt/res/icons/smartcontract.png \
   qt/res/icons/staking_active.png \
   qt/res/icons/staking_inactive.png \
@@ -383,8 +406,11 @@ RES_ICONS = \
   qt/res/icons/transaction_abandoned.png \
   qt/res/icons/transaction_conflicted.png \
   qt/res/icons/tx_inout.png \
+  qt/res/icons/tx_inout-light.png \
   qt/res/icons/tx_input.png \
+  qt/res/icons/tx_input-light.png \
   qt/res/icons/tx_output.png \
+  qt/res/icons/tx_output-light.png \
   qt/res/icons/tx_mined.png \
   qt/res/icons/twitter.png \
   qt/res/icons/unit_lux.png \
@@ -396,8 +422,11 @@ RES_ICONS = \
   qt/res/icons/update.ico \
   qt/res/icons/update_black.png \
   qt/res/icons/verified.png \
+  qt/res/icons/verified-white.png \
   qt/res/icons/wallet_repair.png \
-  qt/res/icons/warning.png
+  qt/res/icons/wallet_repair-white.png \
+  qt/res/icons/warning.png \
+  qt/res/icons/warning-white.png
 
 
 BITCOIN_QT_CPP = \
@@ -528,9 +557,11 @@ endif
 
 RES_IMAGES = \
   qt/res/images/about.png \
+  qt/res/images/about-white.png \
   qt/res/images/splash.png \
   qt/res/images/splash_testnet.png \
   qt/res/images/lux_logo_horizontal.png \
+  qt/res/images/lux_logo_horizontal-white.png \
   qt/res/images/downArrow.png \
   qt/res/images/downArrow_small.png \
   qt/res/images/upArrow_small.png \
@@ -541,7 +572,9 @@ RES_IMAGES = \
   qt/res/images/walletFrame_bg.png
 
 RES_CSS = \
-  qt/res/css/default.css
+  qt/res/css/default.css \
+  qt/res/css/dark_blue.css \
+  qt/res/css/dark_grey.css
 
 RES_MOVIES = $(wildcard $(srcdir)/qt/res/movies/spinner-*.png)
 
