@@ -258,7 +258,6 @@ void SendToContract::on_numBlocksChanged(int newHeight)
     if(m_clientModel)
     {
 
-        if (lastUpdatedHeight < newHeight) {
             uint64_t blockGasLimit = 0;
             uint64_t minGasPrice = 0;
             uint64_t nGasPrice = 0;
@@ -273,8 +272,6 @@ void SendToContract::on_numBlocksChanged(int newHeight)
             ui->lineEditGasLimit->setMaximum(blockGasLimit);
 
             ui->lineEditSenderAddress->on_refresh();
-            lastUpdatedHeight = newHeight;
-        }
     }
 }
 

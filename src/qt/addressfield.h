@@ -68,8 +68,6 @@ public:
 
     void setReceive(const QString &receive);
 
-    void setSenderAddress(bool senderAddress);
-
 Q_SIGNALS:
     /**
      * @brief addressTypeChanged Signal that the address type is changed
