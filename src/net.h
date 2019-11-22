@@ -184,6 +184,7 @@ public:
     std::string addrLocal;
 };
 
+void CopyNodeStats_h(std::vector<CNodeStats>& vstats);
 
 class CNetMessage
 {
