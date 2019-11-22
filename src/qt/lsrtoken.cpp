@@ -14,6 +14,7 @@
 #include <QSortFilterProxyModel>
 #include <QSizePolicy>
 #include <QMenu>
+#include <QSettings>
 
 #define TOKEN_SIZE 54
 #define SYMBOL_WIDTH 100
@@ -48,14 +49,21 @@ public:
 
         QRect mainRect = option.rect;
         mainRect.setWidth(option.rect.width());
-        QColor rowColor = index.row() % 2 ? QColor("#ededed") : QColor("#e3e3e3");
+		
+		QSettings settings;
+		QColor rowColor;
+
+		if (settings.value("theme").toString() == "dark grey") {
+			rowColor = index.row() % 2 ? QColor("#262626") : QColor("#424242");
+		} else if (settings.value("theme").toString() == "dark blue") {
+			rowColor = index.row() % 2 ? QColor("#061532") : QColor("#0d2a64");
+		} else { 
+			rowColor = index.row() % 2 ? QColor("#ededed") : QColor("#e3e3e3");
+		}
+        
         painter->fillRect(mainRect, rowColor);
 
         bool selected = option.state & QStyle::State_Selected;
-        if(selected)
-        {
-            painter->fillRect(mainRect,QColor("#cbcbcb"));
-        }
 
         int decorationSize = TOKEN_SIZE - 20;
         int leftTopMargin = 10;
@@ -64,25 +72,56 @@ public:
 
         QFontMetrics fmName(option.font);
         QString clippedSymbol = fmName.elidedText(tokenSymbol, Qt::ElideRight, SYMBOL_WIDTH);
-
-        QColor foreground = option.palette.color(QPalette::Text);
-        painter->setPen(foreground);
-        QRect tokenSymbolRect(decorationRect.right() + MARGIN, decorationRect.top(), SYMBOL_WIDTH, decorationSize / 2);
-        painter->drawText(tokenSymbolRect, Qt::AlignLeft|Qt::AlignTop, clippedSymbol);
-
-        QFont font = option.font;
+		
+		QColor foreground;
+		
+		foreground = option.palette.color(QPalette::Text);
+		painter->setPen(foreground);
+		
+		QFont font = option.font;
         font.setBold(true);
         painter->setFont(font);
-
-        int amountWidth = (mainRect.width() - decorationRect.width() - 2 * MARGIN - tokenSymbolRect.width()- leftTopMargin);
-        QRect tokenBalanceRect(tokenSymbolRect.right(), decorationRect.top(), amountWidth, decorationSize / 2);
-        painter->drawText(tokenBalanceRect, Qt::AlignRight|Qt::AlignTop, tokenBalance);
-
-        QFont addressFont = option.font;
+		
+		QFont addressFont = option.font;
         addressFont.setPixelSize(addressFont.pixelSize() * 0.9);
         painter->setFont(addressFont);
-        QRect receiveAddressRect(decorationRect.right() + MARGIN, tokenSymbolRect.bottom(), mainRect.width() - decorationSize, decorationSize / 2);
-        painter->drawText(receiveAddressRect, Qt::AlignLeft|Qt::AlignBottom, receiveAddress);
+		
+		QRect tokenSymbolRect(decorationRect.right() + MARGIN, decorationRect.top(), SYMBOL_WIDTH, decorationSize / 2);
+		
+		int amountWidth = (mainRect.width() - decorationRect.width() - 2 * MARGIN - tokenSymbolRect.width()- leftTopMargin);
+		
+		QRect tokenBalanceRect(tokenSymbolRect.right(), decorationRect.top(), amountWidth, decorationSize / 2);
+		QRect receiveAddressRect(decorationRect.right() + MARGIN, tokenSymbolRect.bottom(), mainRect.width() - decorationSize, decorationSize / 2);
+        	
+		if(selected)
+		{
+			if (settings.value("theme").toString() == "dark grey") {
+				painter->fillRect(mainRect,QColor("#40c2dc"));
+				
+				foreground = "262626";
+				painter->setPen(foreground);
+				
+				painter->drawText(tokenSymbolRect, Qt::AlignLeft|Qt::AlignTop, clippedSymbol);
+				painter->drawText(tokenBalanceRect, Qt::AlignRight|Qt::AlignTop, tokenBalance);
+				painter->drawText(receiveAddressRect, Qt::AlignLeft|Qt::AlignBottom, receiveAddress);
+				
+			} else if (settings.value("theme").toString() == "dark blue") {
+				painter->fillRect(mainRect,QColor("#40c2dc"));
+				
+				foreground = "#061532";
+				painter->setPen(foreground);
+				
+				painter->drawText(tokenSymbolRect, Qt::AlignLeft|Qt::AlignTop, clippedSymbol);
+				painter->drawText(tokenBalanceRect, Qt::AlignRight|Qt::AlignTop, tokenBalance);
+				painter->drawText(receiveAddressRect, Qt::AlignLeft|Qt::AlignBottom, receiveAddress);
+			} else { 
+				painter->fillRect(mainRect,QColor("#cbcbcb"));
+			}
+		}
+		
+		painter->drawText(tokenSymbolRect, Qt::AlignLeft|Qt::AlignTop, clippedSymbol);
+		painter->drawText(tokenBalanceRect, Qt::AlignRight|Qt::AlignTop, tokenBalance);
+		painter->drawText(receiveAddressRect, Qt::AlignLeft|Qt::AlignBottom, receiveAddress);
 
         painter->restore();
     }
