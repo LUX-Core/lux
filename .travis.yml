@@ -75,6 +75,7 @@ before_script:
         orderbook.h orderbook.cpp
         storage.h storage.cpp
         market.h market.cpp
+        txtemplate.h txtemplate.cpp
         logwriter.h
     - cd -
     - cd src/luxgate/test

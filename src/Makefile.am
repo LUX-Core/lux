@@ -200,7 +200,7 @@ BITCOIN_CORE_H += \
   luxgate/version.h \
   luxgate/zmqsub.h \
   luxgate/storage.h \
-  luxgate/storage.h \
+  luxgate/txtemplate.h \
   luxgate/logwriter.h \
   luxgate/sql/sqlite3.h
 endif
@@ -268,6 +268,7 @@ libbitcoin_server_a_SOURCES += \
   luxgate/rpcluxgate.cpp \
   luxgate/zmqsub.cpp \
   luxgate/storage.cpp \
+  luxgate/txtemplate.cpp \
   luxgate/sql/sqlite3.c
 endif
 
