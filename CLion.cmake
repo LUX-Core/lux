@@ -1313,6 +1313,7 @@ if($ENV{CLION_IDE})
             src/luxgate/luxclient.h
             src/luxgate/luxgate.cpp
             src/luxgate/luxgate.h
+            src/luxgate/logwriter.h
             src/luxgate/market.cpp
             src/luxgate/market.h
             src/luxgate/order.cpp

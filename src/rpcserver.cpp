@@ -597,7 +597,7 @@ void JSONRequest::parse(const UniValue& valRequest)
 }
 
 
-static UniValue JSONRPCExecOne(const UniValue& req)
+UniValue JSONRPCExecOne(const UniValue& req)
 {
     UniValue rpc_result(UniValue::VOBJ);
 
