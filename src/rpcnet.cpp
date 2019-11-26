@@ -71,20 +71,6 @@ static void CopyNodeStats(std::vector<CNodeStats>& vstats)
     }
 }
 
-void CopyNodeStats_h(std::vector<CNodeStats>& vstats)
-{
-    vstats.clear();
-
-    LOCK(cs_vNodes);
-    vstats.reserve(vNodes.size());
-    for (CNode* pnode : vNodes) {
-        if (!pnode) continue;
-        CNodeStats stats;
-        pnode->copyStats(stats);
-        vstats.push_back(stats);
-    }
-}
-
 UniValue getpeerinfo(const UniValue& params, bool fHelp)
 {
     if (fHelp || params.size() != 0)
