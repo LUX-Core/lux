@@ -5,7 +5,7 @@ date
 #################################################################
 # Update Ubuntu and install prerequisites for running LUX   #
 #################################################################
-sudo add-apt-repository ppa:bitcoin/bitcoin
+sudo add-apt-repository -y ppa:bitcoin/bitcoin 
 sudo apt-get update
 
 #################################################################
