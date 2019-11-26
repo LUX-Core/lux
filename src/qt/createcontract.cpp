@@ -67,7 +67,6 @@ CreateContract::CreateContract(QWidget *parent) :
     ui->lineEditGasLimit->setMaximum(DEFAULT_GAS_LIMIT_OP_CREATE);
     ui->lineEditGasLimit->setValue(DEFAULT_GAS_LIMIT_OP_CREATE);
     ui->pushButtonCreateContract->setEnabled(false);
-    ui->lineEditSenderAddress->setSenderAddress(true);
 
     // Create new PRC command line interface
     QStringList lstMandatory;
@@ -235,7 +234,6 @@ void CreateContract::on_numBlocksChanged(int newHeight)
 {
     if(m_clientModel)
     {
-        if (lastUpdatedHeight < newHeight) {
             uint64_t blockGasLimit = 0;
             uint64_t minGasPrice = 0;
             uint64_t nGasPrice = 0;
@@ -250,8 +248,7 @@ void CreateContract::on_numBlocksChanged(int newHeight)
             ui->lineEditGasLimit->setMaximum(blockGasLimit);
 
             ui->lineEditSenderAddress->on_refresh();
-            lastUpdatedHeight = newHeight;
-        }
+
     }
 }
 
