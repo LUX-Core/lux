@@ -48,7 +48,7 @@ wget http://download.oracle.com/berkeley-db/db-4.8.30.NC.tar.gz
 tar -xvf db-4.8.30.NC.tar.gz
 cd db-4.8.30.NC
 wget http://git.yoctoproject.org/cgit.cgi/poky/plain/meta/recipes-support/db/db/0001-atomic-Rename-local-__atomic_compare_exchange-to-avo.patch
-patch < 0001-atomic-Rename-local-__atomic_compare_exchange-to-avo.patch
+patch -p2 < 0001-atomic-Rename-local-__atomic_compare_exchange-to-avo.patch
 cd build_unix
 mkdir -p build
 BDB_PREFIX=$(pwd)/build
