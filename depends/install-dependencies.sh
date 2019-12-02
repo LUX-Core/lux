@@ -52,7 +52,7 @@ patch -p2 < 0001-atomic-Rename-local-__atomic_compare_exchange-to-avo.patch
 cd build_unix
 mkdir -p build
 BDB_PREFIX=$(pwd)/build
-../dist/configure --disable-shared --enable-cxx --with-pic
+../dist/configure --prefix=/usr/local --disable-shared --enable-cxx --with-pic
 sudo make install
 
 cd ../..
