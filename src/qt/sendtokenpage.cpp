@@ -41,9 +41,9 @@ SendTokenPage::SendTokenPage(QWidget *parent) :
     m_selectedToken(0)
 {
     ui->setupUi(this);
-    ui->labelPayTo->setToolTip(tr("The address that will receive the tokens."));
-    ui->labelAmount->setToolTip(tr("The amount in LSR Token to send."));
-    ui->labelDescription->setToolTip(tr("Optional description for transaction."));
+    ui->lineEditPayTo->setToolTip(tr("The address that will receive the tokens."));
+    ui->lineEditAmount->setToolTip(tr("The amount in LSR Token to send."));
+    ui->lineEditDescription->setToolTip(tr("Optional description for transaction."));
     m_tokenABI = new Token();
     m_selectedToken = new SelectedToken();
 
@@ -151,9 +151,9 @@ void SendTokenPage::on_numBlocksChanged(int newHeight)
             uint64_t nGasPrice = 0;
             m_clientModel->getGasInfo(blockGasLimit, minGasPrice, nGasPrice);
 
-            ui->labelGasLimit->setToolTip(
+            ui->lineEditGasLimit->setToolTip(
                     tr("Gas limit: Default = %1, Max = %2.").arg(DEFAULT_GAS_LIMIT_OP_SEND).arg(blockGasLimit));
-            ui->labelGasPrice->setToolTip(tr("Gas price: LUX/gas unit. Default = %1, Min = %2.").arg(
+            ui->lineEditGasPrice->setToolTip(tr("Gas price: LUX/gas unit. Default = %1, Min = %2.").arg(
                     QString::fromStdString(FormatMoney(DEFAULT_GAS_PRICE))).arg(
                     QString::fromStdString(FormatMoney(minGasPrice))));
             ui->lineEditGasPrice->setMinimum(minGasPrice);
@@ -176,10 +176,9 @@ void SendTokenPage::on_updateConfirmButton()
 
 void SendTokenPage::on_confirmClicked()
 {
-    if(!isDataValid())
-        return;
+    if(!isDataValid()) return;
 
-WalletModel::UnlockContext ctx(m_model->requestUnlock());
+    WalletModel::UnlockContext ctx(m_model->requestUnlock());
     if(!ctx.isValid()) {
         return;
     }

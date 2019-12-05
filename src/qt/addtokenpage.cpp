@@ -12,6 +12,7 @@
 #include "addresstablemodel.h"
 #include "optionsmodel.h"
 #include "guiutil.h"
+#include "converter.h"
 
 #include <QRegularExpressionValidator>
 #include <QMessageBox>
@@ -104,10 +105,17 @@ void AddTokenPage::on_clearButton_clicked()
 
 void AddTokenPage::on_confirmButton_clicked()
 {
-    if(ui->lineEditSenderAddress->isValidAddress())
+
+    converter* addToHex = new converter();
+    bool checkedValidity = false;
+    QString convertAddrToHex = ui->lineEditContractAddress->text();
+    QString convertedAddr = "";
+    addToHex->addHexConverter(convertAddrToHex, &convertedAddr, &checkedValidity);
+
+    if(checkedValidity)
     {
         CTokenInfo tokenInfo;
-        tokenInfo.strContractAddress = ui->lineEditContractAddress->text().toStdString();
+        tokenInfo.strContractAddress = convertedAddr.toStdString();
         tokenInfo.strTokenName = ui->lineEditTokenName->text().toStdString();
         tokenInfo.strTokenSymbol = ui->lineEditTokenSymbol->text().toStdString();
         tokenInfo.nDecimals = ui->lineEditDecimals->text().toInt();
@@ -132,10 +140,12 @@ void AddTokenPage::on_confirmButton_clicked()
 
                 clearAll();
 
-                if(!fLogEvents)
-                {
-                    QMessageBox::information(this, tr("Log events"), tr("Enable log events from the option menu in order to receive token transactions."));
-                }
+/*
+            if(!fLogEvents)
+            {
+                QMessageBox::information(this, tr("Log events"), tr("Enable log events from the option menu in order to receive token transactions."));
+            }
+*/
             }
         }
     }
@@ -143,10 +153,22 @@ void AddTokenPage::on_confirmButton_clicked()
 
 void AddTokenPage::on_addressChanged()
 {
+
+    converter* addToHex = new converter();
+    bool checkedValidity = false;
     QString tokenAddress = ui->lineEditContractAddress->text();
+    QString convertedAddr = "";
+    addToHex->addHexConverter(tokenAddress, &convertedAddr, &checkedValidity);
+
+    if(tokenAddress.isEmpty()) {
+        ui->lineEditContractAddress->setValid(true);
+    } else {
+        ui->lineEditContractAddress->setValid(checkedValidity);
+    }
+
     if(m_tokenABI)
     {
-        m_tokenABI->setAddress(tokenAddress.toStdString());
+        m_tokenABI->setAddress(convertedAddr.toStdString());
         std::string name, symbol, decimals;
         bool ret = m_tokenABI->name(name);
         ret &= m_tokenABI->symbol(symbol);
