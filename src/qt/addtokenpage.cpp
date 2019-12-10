@@ -139,13 +139,11 @@ void AddTokenPage::on_confirmButton_clicked()
                 m_model->addTokenEntry(tokenInfo);
 
                 clearAll();
-
-/*
+// TODO: Make sure we enable LogEvents by default, and get rid of this type of warnings
             if(!fLogEvents)
             {
                 QMessageBox::information(this, tr("Log events"), tr("Enable log events from the option menu in order to receive token transactions."));
             }
-*/
             }
         }
     }
