@@ -102,6 +102,7 @@ QT_MOC_CPP = \
   qt/moc_contractbookpage.cpp \
   qt/moc_contractresult.cpp \
   qt/moc_contracttablemodel.cpp \
+  qt/moc_converter.cpp \
   qt/moc_createcontract.cpp \
   qt/moc_csvmodelwriter.cpp \
   qt/moc_darksendconfig.cpp \
@@ -225,6 +226,7 @@ BITCOIN_QT_H = \
   qt/contractbookpage.h \
   qt/contractresult.h \
   qt/contracttablemodel.h \
+  qt/converter.h \
   qt/createcontract.h \
   qt/csvmodelwriter.h \
   qt/customlist.h \
@@ -491,6 +493,7 @@ BITCOIN_QT_CPP += \
   qt/contractbookpage.cpp \
   qt/contractresult.cpp \
   qt/contracttablemodel.cpp \
+  qt/converter.cpp \
   qt/createcontract.cpp \
   qt/darksendconfig.cpp \
   qt/editaddressdialog.cpp \

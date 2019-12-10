@@ -1,14 +1,9 @@
 #include "hexaddressconverter.h"
 #include "forms/ui_hexaddressconverter.h"
-#include "base58.h"
-#include "uint256.h"
-#include "utilstrencodings.h"
+#include "converter.h"
 
 #include <iostream>
 #include <QClipboard>
-#include <QRegularExpressionValidator>
-
-#define paternAddress "^[a-fA-F0-9]{40,40}$"
 
 HexAddressConverter::HexAddressConverter(QWidget *parent) :
     QMainWindow(parent),
@@ -26,36 +21,26 @@ HexAddressConverter::~HexAddressConverter() {
 }
 
 void HexAddressConverter::addressChanged(const QString& address) {
-    bool isAddressValid = true;
+
+    converter* addToHex = new converter();
+    bool isAddressValid, checkedValidityHex, checkedValidityAddr = false;
+    QString convertedAddr = "";
+    addToHex->twoWayConverter(address, &convertedAddr, &checkedValidityHex, &checkedValidityAddr);
 
     if(!address.isEmpty()) {
-        bool hasHexAddress = false;
-        bool hasLuxAddress = false;
-        QRegularExpression regEx(paternAddress);
-        hasHexAddress = regEx.match(address).hasMatch();
-        if (hasHexAddress) {
+
+        if (checkedValidityHex) {
             ui->label->setText("Address (hex)");
             ui->label_2->setText("Result (Lux)");
-            uint160 key(ParseHex(address.toStdString()));
-            CKeyID keyid(key);
-            if(IsValidDestination(CTxDestination(keyid))) {
-                ui->resultLabel->setText(QString::fromStdString(EncodeDestination(CTxDestination(keyid))));
-            }
+            ui->resultLabel->setText(convertedAddr);
         }
 
-        CTxDestination addr = DecodeDestination(address.toStdString());
-        hasLuxAddress = IsValidDestination(addr);
-        if (hasLuxAddress) {
+        if (checkedValidityAddr) {
             ui->label->setText("Address (Lux)");
             ui->label_2->setText("Result (hex)");
-            CKeyID *keyid = boost::get<CKeyID>(&addr);
-            if (keyid) {
-                ui->resultLabel->setText(QString::fromStdString(HexStr(valtype(keyid->begin(),keyid->end()))));
-            }
-
+            ui->resultLabel->setText(convertedAddr);
         }
-
-        isAddressValid = hasHexAddress || hasLuxAddress;
+        isAddressValid = checkedValidityHex || checkedValidityAddr;
     }
 
     if(!isAddressValid) ui->resultLabel->setText("");
