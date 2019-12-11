@@ -47,6 +47,8 @@ QProgressBar::chunk { background-color:#40c2dc; width: 20px; color:#262626 }
 
 
 QTableWidget { background-color: #262626; alternate-background-color:#424242; gridline-color: #40c2dc; border: 0px solid #40c2dc; border-bottom: 1px solid #40c2dc; border-right: 1px solid #40c2dc; color: #fff; min-height:2em; }
+QTableView::item:selected:!active { selection-background-color: transparent; selection-color: #fff; }
+QTableView::item:selected:active { selection-background-color: #40c2dc; selection-color: #262626; }
 QHeaderView { background-color: transparent; outline: 10; border-top: 1px solid #40c2dc; border-left: 1px solid #40c2dc;}
 QHeaderView::section { qproperty-alignment: center; background-color: #262626; color: #fff; min-height: 25px; min-width: 20px; font-weight: bold; font-size: 12px; border: 0; border-right: 1px solid #40c2dc; border-bottom: 1px solid #40c2dc; padding-left: 5px; padding-right: 5px; padding-top: 2px; padding-bottom: 2px; }
 QHeaderView::section:last { border-right: 1px solid #40c2dc; }
@@ -309,9 +311,14 @@ QDialog#RestoreDialog,
 QDialog#RPCConsole,
 QDialog#SignVerifyMessageDialog,
 QDialog#TokenDescDialog,
+QDialog#TransactionDescDialog,
 QDialog#MultiSendDialog,
 QStackedWidget#ContractResult
 { border: 1px solid #40c2dc !important; }
 
 QWidget#buttonsContainerWhite {border-left: 1px solid #40c2dc !important; border-bottom: 1px solid #40c2dc !important; border-right: 1px solid #40c2dc !important; }
+
+/************************************ TOKEN TRANSACTION DIALOG ************************************/
+
+QDialog#TokenDescDialog { background-color: #262626; color: #fff; }
 
