@@ -310,9 +310,13 @@ QDialog#RestoreDialog,
 QDialog#RPCConsole,
 QDialog#SignVerifyMessageDialog,
 QDialog#TokenDescDialog,
+QDialog#TransactionDescDialog,
 QDialog#MultiSendDialog,
 QStackedWidget#ContractResult
 { border: 1px solid #40c2dc !important; }
 
 QWidget#buttonsContainerWhite {border-left: 1px solid #40c2dc !important; border-bottom: 1px solid #40c2dc !important; border-right: 1px solid #40c2dc !important; }
+/************************************ TOKEN TRANSACTION DIALOG ************************************/
+
+QDialog#TokenDescDialog { background-color: #061532; color: #fff; }
 
