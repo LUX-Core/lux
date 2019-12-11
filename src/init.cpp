@@ -2054,6 +2054,12 @@ bool AppInit2()
     SetRPCWarmupFinished();
     uiInterface.InitMessage(_("Done loading"));
 
+#ifdef ENABLE_LUXGATE
+    // Start refunding timers only after RPC server has been initialized
+    luxgate.StartRefundService();
+    LogPrintf("Luxgate: refund service started\n");
+#endif
+
 #ifdef ENABLE_WALLET
     if (pwalletMain) {
         // Add wallet transactions that aren't already in a block to mapTransactions
