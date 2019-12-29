@@ -138,8 +138,8 @@ void ProcessMessageDarksend(CNode* pfrom, const std::string& strCommand, CDataSt
         }
 
         if (darkSendPool.sessionUsers == 0) {
-            if (vecMasternodes[mn]->nLastDsq != 0 &&
-                vecMasternodes[mn]->nLastDsq + CountMasternodesAboveProtocol(darkSendPool.MIN_PEER_PROTO_VERSION) / 5 > darkSendPool.nDsqCount) {
+            if (vecMasternodes[mn].nLastDsq != 0 &&
+                vecMasternodes[mn].nLastDsq + CountMasternodesAboveProtocol(darkSendPool.MIN_PEER_PROTO_VERSION) / 5 > darkSendPool.nDsqCount) {
                 //LogPrintf("dsa -- last dsq too recent, must wait. %s \n", vecMasternodes[mn].addr.ToString().c_str());
                 std::string strError = _("Last Darksend was too recent.");
                 pfrom->PushMessage("dssu", darkSendPool.sessionID, darkSendPool.GetState(), darkSendPool.GetEntriesCount(), MASTERNODE_REJECTED, strError);
@@ -190,16 +190,16 @@ void ProcessMessageDarksend(CNode* pfrom, const std::string& strCommand, CDataSt
                 if (q.vin == dsq.vin) return;
             }
 
-            if (fDebug) LogPrintf("dsq last %d last2 %d count %d\n", vecMasternodes[mn]->nLastDsq, vecMasternodes[mn]->nLastDsq + (int) vecMasternodes.size() / 5, darkSendPool.nDsqCount);
+            if (fDebug) LogPrintf("dsq last %d last2 %d count %d\n", vecMasternodes[mn].nLastDsq, vecMasternodes[mn].nLastDsq + (int) vecMasternodes.size() / 5, darkSendPool.nDsqCount);
             //don't allow a few nodes to dominate the queuing process
-            if (vecMasternodes[mn]->nLastDsq != 0 &&
-                vecMasternodes[mn]->nLastDsq + CountMasternodesAboveProtocol(darkSendPool.MIN_PEER_PROTO_VERSION) / 5 > darkSendPool.nDsqCount) {
-                if (fDebug) LogPrintf("dsq -- masternode sending too many dsq messages. %s \n", vecMasternodes[mn]->addr.ToString().c_str());
+            if (vecMasternodes[mn].nLastDsq != 0 &&
+                vecMasternodes[mn].nLastDsq + CountMasternodesAboveProtocol(darkSendPool.MIN_PEER_PROTO_VERSION) / 5 > darkSendPool.nDsqCount) {
+                if (fDebug) LogPrintf("dsq -- masternode sending too many dsq messages. %s \n", vecMasternodes[mn].addr.ToString().c_str());
                 return;
             }
             darkSendPool.nDsqCount++;
-            vecMasternodes[mn]->nLastDsq = darkSendPool.nDsqCount;
-            vecMasternodes[mn]->allowFreeTx = true;
+            vecMasternodes[mn].nLastDsq = darkSendPool.nDsqCount;
+            vecMasternodes[mn].allowFreeTx = true;
 
             if (fDebug) LogPrintf("dsq - new darksend queue object - %s\n", addr.ToString().c_str());
             vecDarksendQueue.push_back(dsq);
@@ -1559,31 +1559,31 @@ bool CDarkSendPool::DoAutomaticDenominating(bool fDryRun, bool ready) {
         while (i < 10) {
             //don't reuse masternodes
             for (CTxIn usedVin : vecMasternodesUsed) {
-                if (vecMasternodes[i]->vin == usedVin) {
+                if (vecMasternodes[i].vin == usedVin) {
                     i++;
                     continue;
                 }
             }
-            if (vecMasternodes[i]->protocolVersion < MIN_PEER_PROTO_VERSION) {
+            if (vecMasternodes[i].protocolVersion < MIN_PEER_PROTO_VERSION) {
                 i++;
                 continue;
             }
 
-            if (vecMasternodes[i]->nLastDsq != 0 &&
-                vecMasternodes[i]->nLastDsq + CountMasternodesAboveProtocol(darkSendPool.MIN_PEER_PROTO_VERSION) / 5 > darkSendPool.nDsqCount) {
+            if (vecMasternodes[i].nLastDsq != 0 &&
+                vecMasternodes[i].nLastDsq + CountMasternodesAboveProtocol(darkSendPool.MIN_PEER_PROTO_VERSION) / 5 > darkSendPool.nDsqCount) {
                 i++;
                 continue;
             }
 
             lastTimeChanged = GetTimeMillis();
-            LogPrintf("DoAutomaticDenominating -- attempt %d connection to masternode %s\n", i, vecMasternodes[i]->addr.ToString().c_str());
-            if (ConnectNode(CAddress(vecMasternodes[i]->addr, NODE_NETWORK), NULL, true)) {
-                submittedToMasternode = vecMasternodes[i]->addr;
+            LogPrintf("DoAutomaticDenominating -- attempt %d connection to masternode %s\n", i, vecMasternodes[i].addr.ToString().c_str());
+            if (ConnectNode(CAddress(vecMasternodes[i].addr, NODE_NETWORK), NULL, true)) {
+                submittedToMasternode = vecMasternodes[i].addr;
 
                 LOCK(cs_vNodes);
                 for (CNode * pnode : vNodes) {
                     if (!pnode) continue;
-                    if ((CNetAddr) pnode->addr != (CNetAddr) vecMasternodes[i]->addr) continue;
+                    if ((CNetAddr) pnode->addr != (CNetAddr) vecMasternodes[i].addr) continue;
 
                     std::string strReason;
                     if (txCollateral == CMutableTransaction()) {
@@ -1593,7 +1593,7 @@ bool CDarkSendPool::DoAutomaticDenominating(bool fDryRun, bool ready) {
                         }
                     }
 
-                    vecMasternodesUsed.push_back(vecMasternodes[i]->vin);
+                    vecMasternodesUsed.push_back(vecMasternodes[i].vin);
 
                     std::vector<int64_t> vecAmounts;
                     pwalletMain->ConvertList(vCoins, vecAmounts);
@@ -2081,13 +2081,13 @@ bool CDarksendQueue::Relay() {
 }
 
 bool CDarksendQueue::CheckSignature() {
-    for (CMasterNode* mn : vecMasternodes) {
+    for (CMasterNode & mn : vecMasternodes) {
 
-        if (mn->vin == vin) {
+        if (mn.vin == vin) {
             std::string strMessage = vin.ToString() + boost::lexical_cast<std::string>(nDenom) + boost::lexical_cast<std::string>(time) + boost::lexical_cast<std::string>(ready);
 
             std::string errorMessage = "";
-            if (!darkSendSigner.VerifyMessage(mn->pubkey2, vchSig, strMessage, errorMessage)) {
+            if (!darkSendSigner.VerifyMessage(mn.pubkey2, vchSig, strMessage, errorMessage)) {
                 return error("CDarksendQueue::CheckSignature() - Got bad masternode address signature %s \n", vin.ToString().c_str());
             }
 
@@ -2115,6 +2115,20 @@ void ThreadCheckDarkSendPool() {
         darkSendPool.CheckTimeout();
 
         if (c % 60 == 0) {
+        {
+                LOCK(cs_masternodes);
+                vector<CMasterNode>::iterator it = vecMasternodes.begin();
+                //check them separately
+                while (it != vecMasternodes.end()) {
+                    (*it).Check();
+                    if ((*it).enabled == 4 || (*it).enabled == 3) {
+                        LogPrintf("Removing inactive masternode %s\n", (*it).addr.ToString().c_str());
+                        it = vecMasternodes.erase(it);
+                    } else {
+                        ++it;
+                    }
+                }
+            }
             masternodePayments.CleanPaymentList();
             CleanTransactionLocksList();
         }

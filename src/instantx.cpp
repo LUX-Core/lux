@@ -313,7 +313,7 @@ bool ProcessConsensusVote(CConsensusVote& ctx) {
 
     int x = GetMasternodeByVin(ctx.vinMasternode);
     if (x != -1) {
-        if (fDebug) LogPrintf("InstantX::ProcessConsensusVote - Masternode ADDR %s %d\n", vecMasternodes[x]->addr.ToString().c_str(), n);
+        if (fDebug) LogPrintf("InstantX::ProcessConsensusVote - Masternode ADDR %s %d\n", vecMasternodes[x].addr.ToString().c_str(), n);
     }
 
     if (n == -1) {
@@ -474,7 +474,7 @@ bool CConsensusVote::SignatureValid() {
         return false;
     }
 
-    if (!darkSendSigner.VerifyMessage(vecMasternodes[n]->pubkey2, vchMasterNodeSignature, strMessage, errorMessage)) {
+    if (!darkSendSigner.VerifyMessage(vecMasternodes[n].pubkey2, vchMasterNodeSignature, strMessage, errorMessage)) {
         LogPrintf("InstantX::CConsensusVote::SignatureValid() - Verify message failed\n");
         return false;
     }

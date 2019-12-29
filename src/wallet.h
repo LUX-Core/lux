@@ -72,7 +72,12 @@ static const bool DEFAULT_SPEND_ZEROCONF_CHANGE = true;
 //! Default for -zerobalanceaddresstoken
 static const bool DEFAULT_ZERO_BALANCE_ADDRESS_TOKEN = true;
 
+//! Easy autotools switching for this bool value
+#ifdef ENABLE_CHANGE_ADDRESSES_DEFAULT
+static const bool DEFAULT_NOT_USE_CHANGE_ADDRESS = false;
+#else
 static const bool DEFAULT_NOT_USE_CHANGE_ADDRESS = true;
+#endif
 
 //! if set, all keys will be derived by using BIP32
 static const bool DEFAULT_USE_HD_WALLET = false;
@@ -1372,9 +1377,9 @@ public:
             int nHeight = chainActive.Height();
             if (nDepth > 0) nHeight -= nDepth;
             CAmount blockReward = GetProofOfWorkReward(0, nHeight);
-            if (nHeight >= Params().FirstSplitRewardBlock() && nHeight < 791000) {
+            if (nHeight >= Params().FirstSplitRewardBlock() && nHeight < Params().StartDevfeeBlock()) {
                 blockReward = blockReward * 0.2; // MN reward
-            } else if (nHeight >= 791000 && nHeight < 6000000) {
+            } else if (nHeight >= Params().StartDevfeeBlock() && nHeight < 6000000) {
                 blockReward = blockReward * 0.25; // MN reward after the reward changes
             }
             if (credit < blockReward)

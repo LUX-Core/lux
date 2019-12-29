@@ -758,8 +758,8 @@ bool Stake::CheckProof(CBlockIndex* const pindexPrev, const CBlock &block, uint2
 
     // Verify amount and split
     const CAmount& amount = txPrev.vout[txin.prevout.n].nValue;
-    if (nBlockHeight >= REJECT_INVALID_SPLIT_BLOCK_HEIGHT) {
-        if (tx.vout.size() > 3 && amount < (GetStakeCombineThreshold() * COIN * 2))
+    if (nBlockHeight >= REJECT_INVALID_SPLIT_BLOCK_HEIGHT) { 
+        if (tx.vout.size() > (nBlockHeight > Params().StartDevfeeBlock() ? 4 : 3) && amount < (GetStakeCombineThreshold() * COIN * 2)) //Make space for an extra vout on splits, because of the devfee payment
             return error("%s: Invalid stake block format", __func__);
         if (amount < STAKE_INVALID_SPLIT_MIN_COINS)
             return error("%s: Invalid stake block", __func__);
@@ -1235,20 +1235,34 @@ bool Stake::CreateCoinStake(CWallet* wallet, const CKeyStore& keystore, unsigned
     bool hasMasternodePayment = SelectMasternodePayee(payeeScript);
     CAmount blockValue = nCredit;
     CAmount masternodePayment = GetMasternodePosReward(chainActive.Height() + 1, nReward);
-    CAmount devfeePayment = GetDevfeeAward(chainActive.Height() + 1);
+    CAmount devfeePayment = 0;
     CScript devfeePayee;
     devfeePayee = Params().GetDevfeeScript();
 
     if (hasMasternodePayment) {
         numout = txNew.vout.size();
-        txNew.vout.resize(numout + 1);
+        if (chainActive.Height() + 1 >= chainParams.StartDevfeeBlock()) {
+            txNew.vout.resize(numout + 2); //Append the devfee payment
+        } else {
+            txNew.vout.resize(numout + 1);
+        }
         txNew.vout[numout].scriptPubKey = payeeScript;
         txNew.vout[numout].nValue = masternodePayment;
+
+        if (chainActive.Height() + 1 >= chainParams.StartDevfeeBlock()) {
+            devfeePayment = (GetProofOfStakeReward(0, pIndex0->nHeight) * 0.1667);
+            txNew.vout[numout + 1].scriptPubKey = devfeePayee;
+            txNew.vout[numout + 1].nValue = devfeePayment;
+        } else {
+            devfeePayment = 0;
+        }
 
         if (chainActive.Height() + 1 == chainParams.PreminePayment()) {
 
             blockValue = 0.8 * COIN;
-        
+        } else if (chainActive.Height() + 1 >= chainParams.StartDevfeeBlock()) {
+
+            blockValue -= masternodePayment + devfeePayment;
         } else {
 
             blockValue -= masternodePayment;
@@ -1257,28 +1271,29 @@ bool Stake::CreateCoinStake(CWallet* wallet, const CKeyStore& keystore, unsigned
         CTxDestination txDest;
         ExtractDestination(payeeScript, txDest);
         if (fDebug) LogPrintf("%s: Masternode payment to %s (pos)\n", __func__, EncodeDestination(txDest));
-        // Set output amount
-        if (txNew.vout.size() == 4) { // 2 stake outputs, stake was split, plus a masternode payment
-            txNew.vout[1].nValue = (blockValue / 2 / CENT) * CENT;
-            txNew.vout[2].nValue = blockValue - txNew.vout[1].nValue;
-        } else if (txNew.vout.size() == 3) { // only 1 stake output, was not split, plus a masternode payment
-            txNew.vout[1].nValue = blockValue;
+        // Set output amount, with space for the devfee
+        if (chainActive.Height() + 1 >= chainParams.StartDevfeeBlock()) {
+            if (txNew.vout.size() == 5) { // 2 stake outputs, stake was split, plus a masternode payment and a devfee payment
+                txNew.vout[1].nValue = (blockValue / 2 / CENT) * CENT;
+                txNew.vout[2].nValue = blockValue - txNew.vout[1].nValue;
+            } else if (txNew.vout.size() == 4) { // only 1 stake output, was not split, plus a masternode payment and a devfee payment
+                txNew.vout[1].nValue = blockValue;
+            }
+        } else {
+            if (txNew.vout.size() == 4) { // 2 stake outputs, stake was split, plus a masternode payment, no devfee payment yet
+                txNew.vout[1].nValue = (blockValue / 2 / CENT) * CENT;
+                txNew.vout[2].nValue = blockValue - txNew.vout[1].nValue;
+            } else if (txNew.vout.size() == 3) { // only 1 stake output, was not split, plus a masternode payment, no devfee payment yet
+                txNew.vout[1].nValue = blockValue;
+            }
         }
     } else {
-        if (txNew.vout.size() == 3) { // 2 stake outputs, stake was split, no masternode payment
+        if (txNew.vout.size() == 3) { // 2 stake outputs, stake was split, no masternode payment, no devfee payment yet
             txNew.vout[1].nValue = (blockValue / 2 / CENT) * CENT;
             txNew.vout[2].nValue = blockValue - txNew.vout[1].nValue;
-        } else if (txNew.vout.size() == 2) { // only 1 stake output, was not split, no masternode payment
+        } else if (txNew.vout.size() == 2) { // only 1 stake output, was not split, no masternode payment, no devfee payment yet
             txNew.vout[1].nValue = blockValue;
         }
-    }
-
-    //Devfee
-    if (IsDevfeeBlock(chainActive.Height() + 1)) {
-        unsigned int i = txNew.vout.size();
-        txNew.vout.resize(i + 1);
-        txNew.vout[i].scriptPubKey = devfeePayee;
-        txNew.vout[i].nValue = devfeePayment;
     }
 
     // Check vout values.

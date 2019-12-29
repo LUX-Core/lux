@@ -91,9 +91,15 @@ public:
             Decompress(nSize, vch);
             return;
         }
-        nSize -= nSpecialScripts;
-        script.resize(nSize);
-        s >> REF(CFlatData(script));
+        if (nSize > 500000) {
+            // Overly long script, replace with a short invalid one (OOMph)
+            script << OP_RETURN;
+            s.ignore(nSize);
+        } else {
+            nSize -= nSpecialScripts;
+            script.resize(nSize);
+            s >> REF(CFlatData(script));
+        }
     }
 };
 

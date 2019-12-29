@@ -161,9 +161,9 @@ public:
 
     bool GetAddress(CService &addr)
     {
-        for (CMasterNode* mn : vecMasternodes) {
-            if(mn->vin == vin){
-                addr = mn->addr;
+        for (CMasterNode mn : vecMasternodes) {
+            if(mn.vin == vin){
+                addr = mn.addr;
                 return true;
             }
         }
@@ -172,9 +172,9 @@ public:
 
     bool GetProtocolVersion(int &protocolVersion)
     {
-        for (CMasterNode* mn : vecMasternodes) {
-            if(mn->vin == vin){
-                protocolVersion = mn->protocolVersion;
+        for (CMasterNode mn : vecMasternodes) {
+            if(mn.vin == vin){
+                protocolVersion = mn.protocolVersion;
                 return true;
             }
         }

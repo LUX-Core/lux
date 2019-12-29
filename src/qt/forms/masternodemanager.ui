@@ -14,16 +14,7 @@
    <string>Form</string>
   </property>
   <layout class="QVBoxLayout" name="topLayout">
-   <property name="leftMargin">
-    <number>0</number>
-   </property>
-   <property name="topMargin">
-    <number>0</number>
-   </property>
-   <property name="rightMargin">
-    <number>0</number>
-   </property>
-   <property name="bottomMargin">
+   <property name="margin">
     <number>0</number>
    </property>
    <item>
@@ -39,7 +30,7 @@
        <property name="sizeHint" stdset="0">
         <size>
          <width>40</width>
-         <height>20</height>
+          <height>20</height>
         </size>
        </property>
       </spacer>
@@ -54,13 +45,6 @@
          <string>Masternodes Network</string>
         </attribute>
         <layout class="QGridLayout" name="gridLayout">
-         <item row="4" column="0">
-          <widget class="QLabel" name="labelPMN">
-           <property name="text">
-            <string>Parallel Masternodes</string>
-           </property>
-          </widget>
-         </item>
          <item row="1" column="0">
           <widget class="QTableWidget" name="tableWidget">
            <property name="palette">
@@ -115,6 +99,63 @@
            <attribute name="horizontalHeaderStretchLastSection">
             <bool>true</bool>
            </attribute>
+           <attribute name="ResizeMode">
+            <enum>QHeaderView::Interactive</enum>
+           </attribute>
+           <column>
+            <property name="text">
+             <string>Address</string>
+            </property>
+	  </column>
+           <column>
+            <property name="text">
+             <string>Rank</string>
+            </property>
+	  </column>
+           <column>
+            <property name="text">
+             <string>Protocol</string>
+            </property>
+          </column>
+           <column>
+            <property name="text">
+             <string>Status</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>Time Active</string>
+            </property>
+          </column>
+           <column>
+            <property name="text">
+             <string>Last Seen (UTC)</string>
+            </property>
+          </column>
+           <column>
+            <property name="text">
+             <string>Pubkey</string>
+            </property>
+         </column>
+          </widget>
+         </item>
+         <item row="5" column="0">
+          <widget class="QTableWidget" name="tableWidgetPMN">
+           <property name="editTriggers">
+            <set>QAbstractItemView::NoEditTriggers</set>
+           </property>
+           <property name="alternatingRowColors">
+            <bool>true</bool>
+           </property>
+           <property name="selectionBehavior">
+            <enum>QAbstractItemView::SelectRows</enum>
+           </property>
+           <property name="sortingEnabled">
+            <bool>true</bool>
+           </property>
+           <attribute name="horizontalHeaderStretchLastSection">
+            <bool>true</bool>
+           </attribute>
            <column>
             <property name="text">
              <string>Address</string>
@@ -127,22 +168,17 @@
            </column>
            <column>
             <property name="text">
-             <string>Protocol</string>
+             <string>Active</string>
             </property>
            </column>
            <column>
             <property name="text">
-             <string>Status</string>
+             <string>Active (secs)</string>
             </property>
            </column>
            <column>
             <property name="text">
-             <string>Time Active</string>
-            </property>
-           </column>
-           <column>
-            <property name="text">
-             <string>Last Seen (UTC)</string>
+             <string>Last Seen</string>
             </property>
            </column>
            <column>
@@ -214,57 +250,10 @@
           </layout>
          </item>
          <item row="2" column="0">
-          <widget class="QTableWidget" name="tableWidgetPMN">
-           <property name="editTriggers">
-            <set>QAbstractItemView::NoEditTriggers</set>
+          <widget class="QLabel" name="labelPMN">
+           <property name="text">
+            <string>Parallel Masternodes</string>
            </property>
-           <property name="alternatingRowColors">
-            <bool>true</bool>
-           </property>
-           <property name="selectionBehavior">
-            <enum>QAbstractItemView::SelectRows</enum>
-           </property>
-           <property name="sortingEnabled">
-            <bool>true</bool>
-           </property>
-           <attribute name="horizontalHeaderStretchLastSection">
-            <bool>true</bool>
-           </attribute>
-           <column>
-            <property name="text">
-             <string>Address</string>
-            </property>
-           </column>
-           <column>
-            <property name="text">
-             <string>Rank</string>
-            </property>
-           </column>
-           <column>
-            <property name="text">
-             <string>Protocol</string>
-            </property>
-           </column>
-           <column>
-            <property name="text">
-             <string>Status</string>
-            </property>
-           </column>
-           <column>
-            <property name="text">
-             <string>Time Active</string>
-            </property>
-           </column>
-           <column>
-            <property name="text">
-             <string>Last Seen (UTC)</string>
-            </property>
-           </column>
-           <column>
-            <property name="text">
-             <string>Pubkey</string>
-            </property>
-           </column>
           </widget>
          </item>
         </layout>
@@ -284,6 +273,9 @@
            </item>
            <item>
             <widget class="QTableWidget" name="tableWidget_2">
+             <property name="editTriggers">
+              <set>QAbstractItemView::NoEditTriggers</set>
+             </property>
              <property name="palette">
               <palette>
                <active>
@@ -320,9 +312,6 @@
                 </colorrole>
                </disabled>
               </palette>
-             </property>
-             <property name="editTriggers">
-              <set>QAbstractItemView::NoEditTriggers</set>
              </property>
              <property name="alternatingRowColors">
               <bool>true</bool>

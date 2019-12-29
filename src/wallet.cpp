@@ -1837,7 +1837,6 @@ CAmount CWallet::GetBalance() const
 
 CAmount CWallet::GetAnonymizableBalance() const
 {
-    if (!fEnableDarksend) return 0; // if we have disabled darksend, don't bother calculating anonymized funds in the balances
     CAmount nTotal = 0;
     {
         LOCK2(cs_main, cs_wallet);

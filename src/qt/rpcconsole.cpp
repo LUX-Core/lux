@@ -68,9 +68,13 @@ const struct {
     const char* source;
 } ICON_MAPPING[] = {
     {"cmd-request", ":/icons/tx_input"},
+	{"cmd-request-light", ":/icons/tx_input-light"},
     {"cmd-reply", ":/icons/tx_output"},
+	{"cmd-reply-light", ":/icons/tx_output-light"},
     {"cmd-error", ":/icons/tx_output"},
+	{"cmd-error-light", ":/icons/tx_output-light"},
     {"misc", ":/icons/tx_inout"},
+	{"misc-light", ":/icons/tx_inout-light"},
     {NULL, NULL}};
 
 namespace {
@@ -420,11 +424,16 @@ RPCConsole::RPCConsole(const PlatformStyle *platformStyle, QWidget* parent) : QD
 {
     ui->setupUi(this);
     GUIUtil::restoreWindowGeometry("nRPCConsoleWindow", this->size(), this);
+	QSettings settings;
+	
+	if (settings.value("theme").toString() == "dark grey" || settings.value("theme").toString() == "dark blue") {
+		if (platformStyle->getImagesOnButtons()) ui->openDebugLogfileButton->setIcon(platformStyle->SingleColorIcon(":/icons/export"));
+		ui->clearButton->setIcon(platformStyle->SingleColorIcon(":/icons/remove-light"));
+	} else {
+		if (platformStyle->getImagesOnButtons()) ui->openDebugLogfileButton->setIcon(platformStyle->SingleColorIcon(":/icons/export"));
+		ui->clearButton->setIcon(platformStyle->SingleColorIcon(":/icons/remove"));
+	}	
 
-    if (platformStyle->getImagesOnButtons()) {
-        ui->openDebugLogfileButton->setIcon(platformStyle->SingleColorIcon(":/icons/export"));
-    }
-    ui->clearButton->setIcon(platformStyle->SingleColorIcon(":/icons/remove"));
 
 
     // Install event filter for up and down arrow
@@ -432,8 +441,14 @@ RPCConsole::RPCConsole(const PlatformStyle *platformStyle, QWidget* parent) : QD
     ui->messagesWidget->installEventFilter(this);
 
     connect(ui->clearButton, SIGNAL(clicked()), this, SLOT(clear()));
-//    ui->fontBiggerButton->setIcon(QIcon(":/icons/fontbigger"));
-//    ui->fontSmallerButton->setIcon(QIcon(":/icons/fontsmaller"));
+	
+	if (settings.value("theme").toString() == "dark grey" || settings.value("theme").toString() == "dark blue") {
+		ui->fontBiggerButton->setIcon(QIcon(":/icons/fontbigger-white"));
+		ui->fontSmallerButton->setIcon(QIcon(":/icons/fontsmaller-white"));
+	} else {
+		ui->fontBiggerButton->setIcon(QIcon(":/icons/fontbigger"));
+		ui->fontSmallerButton->setIcon(QIcon(":/icons/fontsmaller"));
+	}	 
     connect(ui->btnClearTrafficGraph, SIGNAL(clicked()), ui->trafficGraph, SLOT(clear()));
 
     // Wallet Repair Buttons
@@ -466,7 +481,6 @@ RPCConsole::RPCConsole(const PlatformStyle *platformStyle, QWidget* parent) : QD
 
     ui->peerHeading->setText(tr("Select a peer to view detailed information."));
 
-    QSettings settings;
     consoleFontSize = settings.value(fontSizeSettingsKey, QFontInfo(QFont()).pointSize()).toInt();
     clear();
 }
@@ -534,6 +548,25 @@ void RPCConsole::setClientModel(ClientModel* model)
 {
     clientModel = model;
     ui->trafficGraph->setClientModel(model);
+	
+	QSettings settings;
+
+	if (settings.value("theme").toString() == "dark grey") {
+		QString styleSheet = ".QTableView { background-color: #262626; alternate-background-color:#424242; "
+								"gridline-color: #40c2dc; border: 1px solid #40c2dc; border-bottom: 1px solid #40c2dc; "
+								"border-right: 1px solid #40c2dc; color: #fff; min-height:2em; } ";
+		ui->peerWidget->setStyleSheet(styleSheet);
+		ui->banlistWidget->setStyleSheet(styleSheet);
+	} else if (settings.value("theme").toString() == "dark blue") {
+		QString styleSheet = ".QTableView { background-color: #061532; alternate-background-color:#0D2A64; "
+								"gridline-color: #40c2dc; border: 1px solid #40c2dc; border-bottom: 1px solid #40c2dc; "
+								"border-right: 1px solid #40c2dc; color: #fff; min-height:2em; } ";
+		ui->peerWidget->setStyleSheet(styleSheet);
+		ui->banlistWidget->setStyleSheet(styleSheet);
+	} else { 
+		//code here
+	}
+	
     if (model && clientModel->getPeerTableModel() && clientModel->getBanTableModel()) {
         // Keep up to date with client
         setNumConnections(model->getNumConnections());
@@ -670,19 +703,37 @@ void RPCConsole::setClientModel(ClientModel* model)
 
 static QString categoryClass(int category)
 {
-    switch (category) {
-    case RPCConsole::CMD_REQUEST:
-        return "cmd-request";
-        break;
-    case RPCConsole::CMD_REPLY:
-        return "cmd-reply";
-        break;
-    case RPCConsole::CMD_ERROR:
-        return "cmd-error";
-        break;
-    default:
-        return "misc";
-    }
+	QSettings settings;
+	if (settings.value("theme").toString() == "dark grey" || settings.value("theme").toString() == "dark blue") {
+	    switch (category) {
+		case RPCConsole::CMD_REQUEST:
+			return "cmd-request-light";
+			break;
+		case RPCConsole::CMD_REPLY:
+			return "cmd-reply-light";
+			break;
+		case RPCConsole::CMD_ERROR:
+			return "cmd-error-light";
+			break;
+		default:
+			return "misc-light";
+		}
+	} else {
+	    switch (category) {
+		case RPCConsole::CMD_REQUEST:
+			return "cmd-request";
+			break;
+		case RPCConsole::CMD_REPLY:
+			return "cmd-reply";
+			break;
+		case RPCConsole::CMD_ERROR:
+			return "cmd-error";
+			break;
+		default:
+			return "misc";
+		}
+	}
+
 }
 
 void RPCConsole::fontBigger()
@@ -798,19 +849,32 @@ void RPCConsole::clear(bool clearHistory)
             platformStyle->SingleColorImage(ICON_MAPPING[i].source).scaled(ICON_SIZE, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
     }
 
-    // Set default style sheet
-    ui->messagesWidget->document()->setDefaultStyleSheet(
-    QString(
-        "table { }"
-        "td.time { color: #808080; padding-top: 3px; } "
-        "td.message { font-family: Courier New, Lucida Console, monospace; font-size: %1; } " // Todo: Remove fixed font-size
-        "td.cmd-request { color: #006060; } "
-        "td.cmd-error { color: red; } "
-        "b { color: #006060; } "
-        ).arg(QString("%1pt").arg(consoleFontSize))
-        );
-
-
+	// Set default style sheet
+	QSettings settings;
+	if (settings.value("theme").toString() == "dark grey" || settings.value("theme").toString() == "dark blue") {
+		ui->messagesWidget->document()->setDefaultStyleSheet(
+		QString(
+			"table { }"
+			"td.time { color: #fff; padding-top: 3px; } "
+			"td.message { font-family: Courier New, Lucida Console, monospace; font-size: %1; } " // Todo: Remove fixed font-size
+			"td.cmd-request { color: #fff; } "
+			"td.cmd-error { color: #ff7d7d; } "
+			"b { color: #ff7d7d; } "
+			).arg(QString("%1pt").arg(consoleFontSize))
+			);
+	} else { 
+		ui->messagesWidget->document()->setDefaultStyleSheet(
+		QString(
+			"table { }"
+			"td.time { color: #808080; padding-top: 3px; } "
+			"td.message { font-family: Courier New, Lucida Console, monospace; font-size: %1; } " // Todo: Remove fixed font-size
+			"td.cmd-request { color: #006060; } "
+			"td.cmd-error { color: red; } "
+			"b { color: #006060; } "
+			).arg(QString("%1pt").arg(consoleFontSize))
+			);
+	}
+    
     message(CMD_REPLY, (tr("Welcome to the LUX RPC console.") + "<br>" +
                            tr("Use up and down arrows to navigate history, and <b>Ctrl-L</b> to clear screen.") + "<br>" +
                            tr("Type <b>help</b> for an overview of available commands.") + "<br>" + "<br>" +

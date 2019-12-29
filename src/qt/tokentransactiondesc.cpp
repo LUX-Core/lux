@@ -7,6 +7,8 @@
 #include "guiutil.h"
 #include "uint256.h"
 
+#include <QSettings>
+
 QString TokenTransactionDesc::FormatTxStatus(CWallet *wallet, const CTokenTx& wtx)
 {
     AssertLockHeld(cs_main);
@@ -41,10 +43,14 @@ QString TokenTransactionDesc::FormatTxStatus(CWallet *wallet, const CTokenTx& wt
 QString TokenTransactionDesc::toHTML(CWallet *wallet, CTokenTx &wtx, TokenTransactionRecord *rec)
 {
     QString strHTML;
-
+    QSettings settings;
     LOCK2(cs_main, wallet->cs_wallet);
     strHTML.reserve(4000);
-    strHTML += "<html><font face='verdana, arial, helvetica, sans-serif'>";
+    if (settings.value("theme").toString() == "dark grey" || settings.value("theme").toString() == "dark blue") {
+        strHTML += "<html><font color='white' face='verdana, arial, helvetica, sans-serif'>";
+    } else {
+        strHTML += "<html><font face='verdana, arial, helvetica, sans-serif'>";
+    }
 
     int64_t nTime = rec->time;
     dev::s256 nDebit = rec->debit;

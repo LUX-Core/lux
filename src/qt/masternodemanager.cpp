@@ -15,6 +15,7 @@
 #include "rpcserver.h"
 #include <boost/lexical_cast.hpp>
 #include <fstream>
+#include "guiutil.h"
 
 using namespace std;
 
@@ -31,6 +32,8 @@ using namespace std;
 #include <QThread>
 #include <QScrollBar>
 #include <QMessageBox>
+#include <QSettings>
+#include <QHeaderView>
 
 MasternodeManager::MasternodeManager(QWidget *parent) :
     QWidget(parent),
@@ -46,39 +49,6 @@ MasternodeManager::MasternodeManager(QWidget *parent) :
     ui->stopButton->setEnabled(false);
     //ui->copyAddressButton->setEnabled(false);
 
-    int columnAddressWidth = 160;
-    int columnrankItemWidth = 40;
-    int columnActiveWidth = 60;
-    int columnActiveSecondsWidth = 130;
-    int columnLastSeenWidth = 130;
-    int columnProtocolWidth = 60;
-
-    // setup widths for the main table
-    ui->tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Fixed);
-    ui->tableWidget->horizontalHeader()->setStretchLastSection(true);
-    ui->tableWidget->setColumnWidth(Address, columnAddressWidth);
-    ui->tableWidget->setColumnWidth(Rank, columnrankItemWidth);
-    ui->tableWidget->setColumnWidth(Active, columnActiveWidth);
-    ui->tableWidget->setColumnWidth(ActiveSecs, columnActiveSecondsWidth);
-    ui->tableWidget->setColumnWidth(LastSeen, columnLastSeenWidth);
-    ui->tableWidget->setColumnWidth(Protocol, columnProtocolWidth);
-
-    ui->tableWidget->sortByColumn(Rank, Qt::AscendingOrder);
-    ui->tableWidget->setSortingEnabled(true);
-
-    // setup widths for parallel table
-    ui->tableWidget_2->horizontalHeader()->setSectionResizeMode(QHeaderView::Fixed);
-    ui->tableWidget_2->horizontalHeader()->setStretchLastSection(true);
-    ui->tableWidget_2->setColumnWidth(Address, columnAddressWidth);
-    ui->tableWidget_2->setColumnWidth(Rank, columnrankItemWidth);
-    ui->tableWidget_2->setColumnWidth(Active, columnActiveWidth);
-    ui->tableWidget_2->setColumnWidth(ActiveSecs, columnActiveSecondsWidth);
-    ui->tableWidget_2->setColumnWidth(LastSeen, columnLastSeenWidth);
-    ui->tableWidget_2->setColumnWidth(Protocol, columnProtocolWidth);
-
-    ui->tableWidget_2->sortByColumn(Address, Qt::AscendingOrder);
-    ui->tableWidget_2->setSortingEnabled(true);
-
     subscribeToCoreSignals();
 
     timer = new QTimer(this);
@@ -88,17 +58,47 @@ MasternodeManager::MasternodeManager(QWidget *parent) :
     nTimeFilterUpdated = GetTime();
     updateNodeList();
     connect(ui->filterLineEdit, SIGNAL(textChanged(const QString &)), this, SLOT(wait()));
+	
+    int columnAddressWidth = 200;
+    int columnrankItemWidth = 60;
+    int columnProtocolWidth = 60;
+    int columnActiveWidth = 80;
+    int columnActiveSecondsWidth = 130;
+    int columnLastSeenWidth = 130;
+		
+    ui->tableWidget->setColumnWidth(0, columnAddressWidth); // Address
+    ui->tableWidget->setColumnWidth(1, columnrankItemWidth); // Rank
+    ui->tableWidget->setColumnWidth(2, columnProtocolWidth); // protocol
+    ui->tableWidget->setColumnWidth(3, columnActiveWidth); // status
+    ui->tableWidget->setColumnWidth(4, columnActiveSecondsWidth); // time active
+    ui->tableWidget->setColumnWidth(5, columnLastSeenWidth); // last seen
+	ui->tableWidget->verticalHeader()->setVisible(false); // hide numberic row
+	
+	QSettings settings;
 
+	if (settings.value("theme").toString() == "dark grey") {
+		QString styleSheet = ".QTabWidget { border-left: 0px !important; border-bottom: 0px !important; "
+								"border-right: 0px !important; marging-left: -1px !important; "
+								"marging-bottom: -1px !important; marging-right: -1px !important; } "
+								".QTableWidget {background-color: #262626; alternate-background-color:#424242; "
+								"gridline-color: #40c2dc; border: 1px solid #40c2dc; color: #fff; min-height:2em; }";
+		ui->tableWidget->setStyleSheet(styleSheet);
+		ui->tableWidgetPMN->setStyleSheet(styleSheet);
+		ui->tableWidget_2->setStyleSheet(styleSheet);
+	} else if (settings.value("theme").toString() == "dark blue") {
+		QString styleSheet = ".QTabWidget { border-left: 0px !important; border-bottom: 0px !important; "
+								"border-right: 0px !important; marging-left: -1px !important; "
+								"marging-bottom: -1px !important; marging-right: -1px !important; } "
+								".QTableWidget {background-color: #061532; alternate-background-color:#0D2A64; "
+								"gridline-color: #40c2dc; border: 1px solid #40c2dc; color: #fff; min-height:2em; }";										
+		ui->tableWidget->setStyleSheet(styleSheet);
+		ui->tableWidgetPMN->setStyleSheet(styleSheet);
+		ui->tableWidget_2->setStyleSheet(styleSheet);
+	} else { 
+		//code here
+	}
+	
 }
-
-class SortedWidgetItem : public QTableWidgetItem
-{
-public:
-    bool operator <( const QTableWidgetItem& other ) const
-    {
-        return (data(Qt::UserRole) < other.data(Qt::UserRole));
-    }
-};
 
 MasternodeManager::~MasternodeManager()
 {
@@ -186,74 +186,72 @@ void MasternodeManager::wait()
 
 void MasternodeManager::updateNodeList()
 {
-    if (chainActive.Tip() == NULL) return; // don't segfault if the gui boots before the wallet's ready
+    static int64_t nTimeListUpdated = GetTime();
+
+    // to prevent high cpu usage update only once in MASTERNODELIST_UPDATE_SECONDS seconds
+    // or MASTERNODELIST_FILTER_COOLDOWN_SECONDS seconds after filter was last changed
+    int64_t nSecondsToWait = fFilterUpdated ? nTimeFilterUpdated - GetTime() + MASTERNODELIST_FILTER_COOLDOWN_SECONDS : nTimeListUpdated - GetTime() + MASTERNODELIST_UPDATE_SECONDS;
+
+    if (fFilterUpdated) ui->countLabel->setText(tr("Please wait... ") + nSecondsToWait);
+    if (nSecondsToWait > 0) return;
+    nTimeListUpdated = GetTime();
+    fFilterUpdated = false;
+
+    TRY_LOCK(cs_masternodes, lockMasternodes);
+    if(!lockMasternodes)
+        return;
 
     QString strToFilter;
     ui->countLabel->setText("Updating...");
     ui->tableWidget->setSortingEnabled(false);
-    ui->tableWidget->setUpdatesEnabled(false); // disable sorting and gui updates while doing this so as to not incur thousands of redraws
     ui->tableWidget->clearContents();
     ui->tableWidget->setRowCount(0);
 
-    // lock masternodes every time, and make a quick copy before doing expensive UI stuff during the lock period.
-    vector<CMasterNode*> vecMasternodesCopy;
-    {
-        LOCK(cs_masternodes);
-        vecMasternodesCopy = vecMasternodes;
-    }
-
-    for (CMasterNode* mn : vecMasternodesCopy)
+    for (CMasterNode &mn : vecMasternodes)
     {
         if (ShutdownRequested()) return;
 
     // populate list
-    // Address, Rank, Active, Active Seconds, Last Seen, Pub Key
-    QTableWidgetItem *activeItem = new QTableWidgetItem(mn->IsEnabled() ? tr("Active") : tr("Inactive"));
-    QTableWidgetItem *addressItem = new QTableWidgetItem(QString::fromStdString(mn->addr.ToString()));
-    SortedWidgetItem *protocolItem = new SortedWidgetItem();
-    protocolItem->setData(Qt::UserRole, mn->protocolVersion);
-    protocolItem->setData(Qt::DisplayRole, QString::number(mn->protocolVersion));
-    SortedWidgetItem *rankItem = new SortedWidgetItem();
-    int rank = GetMasternodeRank(mn->vin, chainActive.Height());
-    rankItem->setData(Qt::UserRole, rank > 0 ? rank : 99999);
-    rankItem->setData(Qt::DisplayRole, rank > 0 ? QString::number(rank) : QString(""));
-    SortedWidgetItem *activeSecondsItem = new SortedWidgetItem();
-    activeSecondsItem->setData(Qt::UserRole, (qint64)(mn->lastTimeSeen - mn->now));
-    activeSecondsItem->setData(Qt::DisplayRole, seconds_to_DHMS((qint64)(mn->lastTimeSeen - mn->now)));
-    QTableWidgetItem *lastSeenItem = new QTableWidgetItem(QString::fromStdString(DateTimeStrFormat("%Y-%m-%d %H:%M:%S", mn->lastTimeSeen)));
-
-
+    // Address, Rank, protocol, status, time active, last seen, Pub Key
+	
+    QTableWidgetItem *addressItem = new QTableWidgetItem(QString::fromStdString(mn.addr.ToString())); // Address
+    QTableWidgetItem *rankItem = new QTableWidgetItem(QString::number(GetMasternodeRank(mn.vin, chainActive.Height()))); // Rank
+    QTableWidgetItem *protocolItem = new QTableWidgetItem(QString::number(mn.protocolVersion)); // Protocol
+    QTableWidgetItem *activeItem = new QTableWidgetItem(mn.IsEnabled() ? tr("Enabled") : tr("Disabled")); // Status
+    QTableWidgetItem *activeSecondsItem = new QTableWidgetItem(seconds_to_DHMS((qint64)(mn.lastTimeSeen - mn.now))); // Time Active
+    QTableWidgetItem *lastSeenItem = new QTableWidgetItem(QString::fromStdString(DateTimeStrFormat("%Y-%m-%d %H:%M:%S", mn.lastTimeSeen))); // Last Seen
+	
+	
     CScript pubkey;
-    pubkey = GetScriptForDestination(mn->pubkey.GetID());
-    CTxDestination address1;
-    ExtractDestination(pubkey, address1);
+        pubkey = GetScriptForDestination(mn.pubkey.GetID());
+        CTxDestination address1;
+        ExtractDestination(pubkey, address1);
     QTableWidgetItem *pubkeyItem = new QTableWidgetItem(QString::fromStdString(EncodeDestination(address1)));
 
         if (strCurrentFilter != "") {
             strToFilter = addressItem->text() + " " +
                           rankItem->text() + " " +
-                          protocolItem->text() + " " +
+						  protocolItem->text() + " " +
                           activeItem->text() + " " +
                           activeSecondsItem->text() + " " +
                           lastSeenItem->text() + " " +
                           pubkeyItem->text();
             if (!strToFilter.contains(strCurrentFilter)) continue;
         }
-		
-	    ui->tableWidget->insertRow(0);
-        ui->tableWidget->setItem(0, Address, addressItem);
-        ui->tableWidget->setItem(0, Rank, rankItem);
-	    ui->tableWidget->setItem(0, Protocol, protocolItem);
-        ui->tableWidget->setItem(0, Active, activeItem);
-        ui->tableWidget->setItem(0, ActiveSecs, activeSecondsItem);
-        ui->tableWidget->setItem(0, LastSeen, lastSeenItem);
-        ui->tableWidget->setItem(0, Pubkey, pubkeyItem);
+				
+		ui->tableWidget->insertRow(0);
+        ui->tableWidget->setItem(0, 0, addressItem);
+        ui->tableWidget->setItem(0, 1, rankItem);
+		ui->tableWidget->setItem(0, 2, protocolItem);
+        ui->tableWidget->setItem(0, 3, activeItem);
+        ui->tableWidget->setItem(0, 4, activeSecondsItem);
+        ui->tableWidget->setItem(0, 5, lastSeenItem);
+        ui->tableWidget->setItem(0, 6, pubkeyItem);
 		
     }
 
     ui->countLabel->setText(QString::number(ui->tableWidget->rowCount()));
     ui->tableWidget->setSortingEnabled(true);
-    ui->tableWidget->setUpdatesEnabled(true);
     
     if(pwalletMain)
     {
@@ -270,8 +268,7 @@ void MasternodeManager::on_filterLineEdit_textChanged(const QString& strFilterIn
     strCurrentFilter = strFilterIn;
     nTimeFilterUpdated = GetTime();
     fFilterUpdated = true;
-    updateNodeList();
-    // ui->countLabel->setText(QString::fromStdString(strprintf("Please wait... %d", MASTERNODELIST_FILTER_COOLDOWN_SECONDS)));
+    ui->countLabel->setText(QString::fromStdString(strprintf("Please wait... %d", MASTERNODELIST_FILTER_COOLDOWN_SECONDS)));
 }
 
 void MasternodeManager::setClientModel(ClientModel *model)
@@ -393,13 +390,58 @@ void MasternodeManager::on_startButton_clicked()
     std::string errorMessage;
     bool result = activeMasternode.RegisterByPubKey(c.sAddress, c.sMasternodePrivKey, c.sCollateralAddress, errorMessage);
 
-    QMessageBox msg;
-    if(result)
-        msg.setText("LUX Node at " + QString::fromStdString(c.sAddress) + " started.");
-    else
-        msg.setText("Error: " + QString::fromStdString(errorMessage));
+	QMessageBox* msg = new QMessageBox();
+	
+	QSettings settings;
 
-    msg.exec();
+	if (settings.value("theme").toString() == "dark grey") {
+		QString styleSheet = ".QMessageBox { background-color: #262626; color:#fff; border: 1px solid #40c2dc;"
+								"min-width: 150px; min-width: 250px; }"
+								"QMessageBox QPushButton { background-color: #262626; color:#fff; "
+								"border: 1px solid #40c2dc; padding-left:10px; "
+								"padding-right:10px; min-height:25px; min-width:75px; }"
+								"QMessageBox QPushButton::hover { background-color:#40c2dc; color:#262626; }"
+								"QMessageBox QLabel {color:#fff;}";
+
+		msg->setStyleSheet(styleSheet);
+		if(result)
+		{
+			msg->setText("<span style=\"color:#fff;\"> LUX Node at " + QString::fromStdString(c.sAddress) + " started. </span>");
+		}
+		else
+		{
+			msg->setText("<span style=\"color:#fff;\"> Error: " + QString::fromStdString(errorMessage) + "</span>");
+		}
+	} else if (settings.value("theme").toString() == "dark blue") {
+		QString styleSheet = ".QMessageBox { background-color: #061532; color:#fff; border: 1px solid #40c2dc; "
+								"min-width: 150px; min-width: 250px; }"
+								"QMessageBox QPushButton { background-color: #061532; color:#fff; "
+								"border: 1px solid #40c2dc; padding-left:10px; "
+								"padding-right:10px; min-height:25px; min-width:75px; }"
+								"QMessageBox QPushButton::hover { background-color:#40c2dc; color:#061532; }";
+								"QMessageBox QLabel {color:#fff;}";
+							
+		msg->setStyleSheet(styleSheet);
+		if(result)
+		{
+			msg->setText("<span style=\"color:#fff;\"> LUX Node at " + QString::fromStdString(c.sAddress) + " started. </span>");
+		}
+		else
+		{
+			msg->setText("<span style=\"color:#fff;\"> Error: " + QString::fromStdString(errorMessage) + "</span>");
+		}
+	} else { 
+		if(result)
+		{
+			msg->setText("LUX Node at " + QString::fromStdString(c.sAddress) + " started.");
+		}
+		else
+		{
+			msg->setText("Error: " + QString::fromStdString(errorMessage));
+		}
+	}
+	
+    msg->exec();
 }
 
 void MasternodeManager::on_stopButton_clicked()
@@ -417,39 +459,111 @@ void MasternodeManager::on_stopButton_clicked()
 
     std::string errorMessage;
     bool result = activeMasternode.StopMasterNode(c.sAddress, c.sMasternodePrivKey, errorMessage);
-    QMessageBox msg;
-    if(result)
-    {
-        msg.setText("LUX Node at " + QString::fromStdString(c.sAddress) + " stopped.");
-    }
-    else
-    {
-        msg.setText("Error: " + QString::fromStdString(errorMessage));
-    }
-    msg.exec();
+    QMessageBox* msg = new QMessageBox();
+	
+	QSettings settings;
+
+	if (settings.value("theme").toString() == "dark grey") {
+		QString styleSheet = ".QMessageBox { background-color: #262626; color:#fff; border: 1px solid #40c2dc;"
+								"min-width: 150px; min-width: 250px; }"
+								"QMessageBox QPushButton { background-color: #262626; color:#fff; "
+								"border: 1px solid #40c2dc; padding-left:10px; "
+								"padding-right:10px; min-height:25px; min-width:75px; }"
+								"QMessageBox QPushButton::hover { background-color:#40c2dc; color:#262626; }"
+								"QMessageBox QLabel {color:#fff;}";
+
+		msg->setStyleSheet(styleSheet);
+		if(result)
+		{
+			msg->setText("<span style=\"color:#fff;\"> LUX Node at " + QString::fromStdString(c.sAddress) + " stopped. </span>");
+		}
+		else
+		{
+			msg->setText("<span style=\"color:#fff;\"> Error: " + QString::fromStdString(errorMessage) + "</span>");
+		}
+	} else if (settings.value("theme").toString() == "dark blue") {
+		QString styleSheet = ".QMessageBox { background-color: #061532; color:#fff; border: 1px solid #40c2dc; "
+								"min-width: 150px; min-width: 250px; }"
+								"QMessageBox QPushButton { background-color: #061532; color:#fff; "
+								"border: 1px solid #40c2dc; padding-left:10px; "
+								"padding-right:10px; min-height:25px; min-width:75px; }"
+								"QMessageBox QPushButton::hover { background-color:#40c2dc; color:#061532; }";
+								"QMessageBox QLabel {color:#fff;}";
+							
+		msg->setStyleSheet(styleSheet);
+		if(result)
+		{
+			msg->setText("<span style=\"color:#fff;\"> LUX Node at " + QString::fromStdString(c.sAddress) + " stopped. </span>");
+		}
+		else
+		{
+			msg->setText("<span style=\"color:#fff;\"> Error: " + QString::fromStdString(errorMessage) + "</span>");
+		}
+	} else { 
+		if(result)
+		{
+			msg->setText("LUX Node at " + QString::fromStdString(c.sAddress) + " stopped.");
+		}
+		else
+		{
+			msg->setText("Error: " + QString::fromStdString(errorMessage));
+		}
+	}
+
+    msg->exec();
 }
 
 void MasternodeManager::on_startAllButton_clicked()
 {
     std::string results;
+	
+	results = "There are not masternodes setup";
+	
     for (PAIRTYPE(std::string, CLuxNodeConfig) lux : pwalletMain->mapMyLuxNodes)
     {
-        CLuxNodeConfig c = lux.second;
-	std::string errorMessage;
-        bool result = activeMasternode.RegisterByPubKey(c.sAddress, c.sMasternodePrivKey, c.sCollateralAddress, errorMessage);
-	if(result)
-	{
-   	    results += c.sAddress + ": STARTED\n";
-	}	
-	else
-	{
-	    results += c.sAddress + ": ERROR: " + errorMessage + "\n";
-	}
+		CLuxNodeConfig c = lux.second;
+		std::string errorMessage;
+			bool result = activeMasternode.RegisterByPubKey(c.sAddress, c.sMasternodePrivKey, c.sCollateralAddress, errorMessage);
+		if(result)
+		{
+			results += c.sAddress + ": STARTED\n";
+		}	
+		else
+		{
+			results += c.sAddress + ": ERROR: " + errorMessage + "\n";
+		}
     }
 
-    QMessageBox msg;
-    msg.setText(QString::fromStdString(results));
-    msg.exec();
+    QMessageBox* msg = new QMessageBox();
+	
+	QSettings settings;
+
+	if (settings.value("theme").toString() == "dark grey") {
+		QString styleSheet = ".QMessageBox { background-color: #262626; color:#fff; border: 1px solid #40c2dc;"
+								"min-width: 150px; min-width: 250px; }"
+								"QMessageBox QPushButton { background-color: #262626; color:#fff; "
+								"border: 1px solid #40c2dc; padding-left:10px; "
+								"padding-right:10px; min-height:25px; min-width:75px; }"
+								"QMessageBox QPushButton::hover { background-color:#40c2dc; color:#262626; }"
+								"QMessageBox QLabel {color:#fff;}";
+
+		msg->setStyleSheet(styleSheet);
+		msg->setText("<span style=\"color:#fff;\">" +QString::fromStdString(results) + "</span>");
+	} else if (settings.value("theme").toString() == "dark blue") {
+		QString styleSheet = ".QMessageBox { background-color: #061532; color:#fff; border: 1px solid #40c2dc; "
+								"min-width: 150px; min-width: 250px; }"
+								"QMessageBox QPushButton { background-color: #061532; color:#fff; "
+								"border: 1px solid #40c2dc; padding-left:10px; "
+								"padding-right:10px; min-height:25px; min-width:75px; }"
+								"QMessageBox QPushButton::hover { background-color:#40c2dc; color:#061532; }";
+								"QMessageBox QLabel {color:#fff;}";
+							
+		msg->setStyleSheet(styleSheet);
+		msg->setText("<span style=\"color:#fff;\">" +QString::fromStdString(results) + "</span>");
+	} else { 
+		msg->setText(QString::fromStdString(results));
+	}
+    msg->exec();
 }
 
 void MasternodeManager::on_stopAllButton_clicked()
@@ -470,7 +584,34 @@ void MasternodeManager::on_stopAllButton_clicked()
 	}
     }
 
-    QMessageBox msg;
-    msg.setText(QString::fromStdString(results));
-    msg.exec();
+    QMessageBox* msg = new QMessageBox();
+	
+	QSettings settings;
+
+	if (settings.value("theme").toString() == "dark grey") {
+		QString styleSheet = ".QMessageBox { background-color: #262626; color:#fff; border: 1px solid #40c2dc;"
+								"min-width: 150px; min-width: 250px; }"
+								"QMessageBox QPushButton { background-color: #262626; color:#fff; "
+								"border: 1px solid #40c2dc; padding-left:10px; "
+								"padding-right:10px; min-height:25px; min-width:75px; }"
+								"QMessageBox QPushButton::hover { background-color:#40c2dc; color:#262626; }"
+								"QMessageBox QLabel {color:#fff;}";
+
+		msg->setStyleSheet(styleSheet);
+		msg->setText("<span style=\"color:#fff;\">" +QString::fromStdString(results) + "</span>");
+	} else if (settings.value("theme").toString() == "dark blue") {
+		QString styleSheet = ".QMessageBox { background-color: #061532; color:#fff; border: 1px solid #40c2dc; "
+								"min-width: 150px; min-width: 250px; }"
+								"QMessageBox QPushButton { background-color: #061532; color:#fff; "
+								"border: 1px solid #40c2dc; padding-left:10px; "
+								"padding-right:10px; min-height:25px; min-width:75px; }"
+								"QMessageBox QPushButton::hover { background-color:#40c2dc; color:#061532; }";
+								"QMessageBox QLabel {color:#fff;}";
+
+		msg->setStyleSheet(styleSheet);
+		msg->setText("<span style=\"color:#fff;\">" +QString::fromStdString(results) + "</span>");
+	} else { 
+		msg->setText(QString::fromStdString(results));
+	}
+    msg->exec();
 }

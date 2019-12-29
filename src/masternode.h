@@ -45,7 +45,7 @@ using namespace std;
 class CMasternodePaymentWinner;
 
 extern CCriticalSection cs_masternodes;
-extern std::vector<CMasterNode*> vecMasternodes;
+extern std::vector<CMasterNode> vecMasternodes;
 extern CMasternodePayments masternodePayments;
 extern std::vector<CTxIn> vecMasternodeAskedFor;
 extern map<uint256, CMasternodePaymentWinner> mapSeenMasternodeVotes;
@@ -64,6 +64,10 @@ void ProcessMasternode(CNode* pfrom, const std::string& strCommand, CDataStream&
 //
 class CMasterNode
 {
+private:
+    boost::filesystem::path GetMasternodeConfigFile;
+    std::string strMagicMessage;
+
 public:
 	static int minProtoVersion;
     CService addr;
@@ -81,7 +85,6 @@ public:
     bool unitTest;
     bool allowFreeTx;
     int protocolVersion;
-    int rank;
     //the dsq count from the last dsq broadcast of this node
     int64_t nLastDsq;
 
@@ -103,12 +106,9 @@ public:
         allowFreeTx = true;
         protocolVersion = protocolVersionIn;
         lastTimeChecked = GetTime() + GetRand(60); // set random check time
-        rank = 0;
     }
 
-    ~CMasterNode();
-
-    uint256 CalculateScore(int mod=1, int64_t nBlockHeight=0) const;
+    uint256 CalculateScore(int mod=1, int64_t nBlockHeight=0);
 
     void UpdateLastSeen(int64_t override=0)
     {
@@ -156,12 +156,6 @@ public:
 
         return cacheInputAge + (chainActive.Height() - cacheInputAgeBlock);
     }
-
-private:
-    boost::filesystem::path GetMasternodeConfigFile;
-    std::string strMagicMessage;
-    CMasterNode(const CMasterNode&);
-    void operator=(const CMasterNode&);
 };
 
 
@@ -258,7 +252,7 @@ public:
     void Relay(CMasternodePaymentWinner& winner);
     void Sync(CNode* node);
     void CleanPaymentList();
-    int LastPayment(CMasterNode* mn);
+    int LastPayment(CMasterNode& mn);
 
     //slow
     bool GetBlockPayee(int nBlockHeight, CScript& payee);
