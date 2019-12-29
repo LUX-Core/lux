@@ -1648,8 +1648,19 @@ bool AppInit2()
                     fReindex = true;
                     fRequestShutdown = false;
                 } else {
-                    LogPrintf("Aborted block database rebuild. Exiting.\n");
-                    return false;
+                    bool RIP_DB = uiInterface.ThreadSafeQuestion(
+                    strLoadError + ".\n\n" + _("are you sure? failure to rebuild the DataBase will result in corruption of the wallet!!!"),
+                    strLoadError + ".\nPlease restart with -reindex or -reindex-chainstate to recover.",
+                    "", CClientUIInterface::MSG_ERROR | CClientUIInterface::BTN_ABORT);
+
+                    if(RIP_DB){
+                        fReindex = true;
+                        fRequestShutdown = false;
+                    }else{
+                        LogPrintf("Aborted block database rebuild. Exiting.\n");
+                        return false;                        
+                    }
+
                 }
             } else {
                 return InitError(strLoadError);
