@@ -1658,7 +1658,7 @@ bool AppInit2()
                         return false;  
                     }else{
                         fReindex = true;
-                        fRequestShutdown = 
+                        fRequestShutdown = false; 
                     }
                 }
             } else {
