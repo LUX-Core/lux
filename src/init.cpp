@@ -1651,7 +1651,7 @@ bool AppInit2()
                     bool RIP_DB = uiInterface.ThreadSafeQuestion(
                     strLoadError + ".\n\n" + _("are you sure? failure to rebuild the DataBase will result in corruption of the wallet!!!"),
                     strLoadError + ".\nPlease restart with -reindex or -reindex-chainstate to recover.",
-                    "", CClientUIInterface::MSG_ERROR | CClientUIInterface::BTN_ABORT);
+                    "", CClientUIInterface::MSG_ERROR | CClientUIInterface::BTN_NO);
 
                     if(RIP_DB){
                         LogPrintf("Aborted block database rebuild. Exiting.\n");
