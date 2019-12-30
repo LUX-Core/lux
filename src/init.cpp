@@ -1654,13 +1654,12 @@ bool AppInit2()
                     "", CClientUIInterface::MSG_ERROR | CClientUIInterface::BTN_ABORT);
 
                     if(RIP_DB){
-                        fReindex = true;
-                        fRequestShutdown = false;
-                    }else{
                         LogPrintf("Aborted block database rebuild. Exiting.\n");
-                        return false;                        
+                        return false;  
+                    }else{
+                        fReindex = true;
+                        fRequestShutdown = 
                     }
-
                 }
             } else {
                 return InitError(strLoadError);
