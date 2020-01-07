@@ -1609,7 +1609,7 @@ void Threadlimitpeers(){
             LogPrintf("Threadlimitpeers(): peer limit (%d) is too low. limit set to 4 peers.\n", num);
         }
 
-        if (num >= 16){ // I hope this ever gets run.....
+        if (num >= 16){ // I hope this never gets run.....
             LogPrintf("Threadlimitpeers(): peer limit (%d) is too high. limit set to 16 peers.\n", num);
             num = 16;
         }
