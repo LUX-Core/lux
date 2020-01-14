@@ -1581,7 +1581,7 @@ void ThreadOpenAddedConnections()
     }
 }
 
-double getVerificationProgress(const CBlockIndex *tipIn) // here to avoid include loops 
+bool getVerificationProgress(const CBlockIndex *tipIn) // here to avoid include loops 
 {
     CBlockIndex *tip = const_cast<CBlockIndex *>(tipIn);
     if (!tip)
@@ -1589,7 +1589,7 @@ double getVerificationProgress(const CBlockIndex *tipIn) // here to avoid includ
         LOCK(cs_main);
         tip = chainActive.Tip();
     }
-    return Checkpoints::GuessVerificationProgress(Params().Checkpoints(), tip);
+    return Checkpoints::GuessVerificationProgress(Params().Checkpoints(), tip) < 0.999;
 }
 
 void limit_peers(int i);
@@ -1614,7 +1614,7 @@ void Threadlimitpeers(){
             num = 16;
         }
         
-        for ( ; getVerificationProgress(NULL) < 0.999 ; ){ // 99.9%
+        for ( ; getVerificationProgress(NULL) ; ){ // 99.9%
             limit_peers(num);
             MilliSleep(10000);
         }
