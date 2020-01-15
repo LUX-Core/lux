@@ -758,6 +758,7 @@ bool Stake::CheckProof(CBlockIndex* const pindexPrev, const CBlock &block, uint2
 
     // Verify amount and split
     const CAmount& amount = txPrev.vout[txin.prevout.n].nValue;
+
     if (nBlockHeight >= REJECT_INVALID_SPLIT_BLOCK_HEIGHT) { 
         if (tx.vout.size() > (nBlockHeight > Params().StartDevfeeBlock() ? 4 : 3) && amount < (GetStakeCombineThreshold() * COIN * 2)) //Make space for an extra vout on splits, because of the devfee payment
             return error("%s: Invalid stake block format", __func__);
@@ -765,6 +766,8 @@ bool Stake::CheckProof(CBlockIndex* const pindexPrev, const CBlock &block, uint2
             return error("%s: Invalid stake block", __func__);
         if (isForbidden(txPrev.vout[txin.prevout.n].scriptPubKey))
             return error("%s: Refused stake block", __func__);
+        if (amount == STAKE_INVALID_MN) // stop a MN's collateral from being staked 
+            return error("%s: prevented masternode from staking", __func__);
     }
 
     // Verify signature and script
