@@ -565,20 +565,7 @@ UniValue masternode(const UniValue& params, bool fHelp) {
 
         return resultObj;
     }
-
-    if (strCommand == "outputs") {
-        // Find possible candidates
-        vector<COutput> possibleCoins = activeMasternode.SelectCoinsMasternode();
-
-        UniValue obj(UniValue::VOBJ);
-        for (COutput& out : possibleCoins) {
-            obj.push_back(Pair(out.tx->GetHash().ToString().c_str(), boost::lexical_cast<std::string>(out.i)));
-        }
-
-        return obj;
-
-    }
-
+    
     return NullUniValue;
 }
 
