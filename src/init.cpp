@@ -2058,6 +2058,7 @@ bool AppInit2()
     // Start refunding timers only after RPC server has been initialized
     luxgate.StartRefundService();
     LogPrintf("Luxgate: refund service started\n");
+    luxgate.LoadKeys();
 #endif
 
 #ifdef ENABLE_WALLET

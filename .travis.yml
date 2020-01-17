@@ -77,6 +77,8 @@ before_script:
         market.h market.cpp
         txtemplate.h txtemplate.cpp
         rpcutil.h rpcutil.cpp
+        status_service.h status_service.cpp
+        netabstract.h
         logwriter.h
     - cd -
     - cd src/luxgate/test
