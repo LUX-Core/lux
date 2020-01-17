@@ -475,14 +475,26 @@ UniValue masternode(const UniValue& params, bool fHelp) {
         }
     }
 
-    if (strCommand == "outputs"){
+    if (strCommand == "outputs") {
         // Find possible candidates
         vector<COutput> possibleCoins = activeMasternode.SelectCoinsMasternode();
-
         UniValue obj(UniValue::VOBJ);
-        for (const auto& out : possibleCoins) {
-            obj.push_back(Pair(out.tx->GetHash().ToString().c_str(), boost::lexical_cast<std::string>(out.i)));
+
+        for (COutput& out : possibleCoins) {
+
+            for (CMasternodeConfig::CMasternodeEntry mne : masternodeConfig.getEntries()) { // check if the TXID is currently in masternode.conf, 
+
+               std::string MNC = mne.getTxHash(); // TXID from masternode in masternode.conf
+               std::string possibleMN = out.tx->GetHash().ToString(); // TXID for 16120 LUX tx
+                if (possibleMN==MNC){
+                    obj.push_back(Pair(out.tx->GetHash().ToString().c_str(), boost::lexical_cast<std::string>(out.i) + " TXID is being used by a MN in your wallet," + " MN alias = " + mne.getAlias().c_str()) );
+                }else{
+                    obj.push_back(Pair(out.tx->GetHash().ToString().c_str(), boost::lexical_cast<std::string>(out.i)));
+                }
+            }
+
         }
+
         return obj;
     }
 
