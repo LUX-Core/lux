@@ -73,7 +73,6 @@ UniValue getinfo(const UniValue& params, bool fHelp)
             "  \"paytxfee\": x.xxxx,         (numeric) the transaction fee set in lux/kB\n"
             "  \"relayfee\": x.xxxx,         (numeric) minimum relay fee for non-free transactions in lux/kB\n"
             "  \"staking\": true|false,      (boolean) if the wallet is staking or not\n"
-            "  \"lockedutxoscount\": xxxxx,  (numeric) Total number of locked unspent outputs in the wallet\n"
             "  \"errors\": \"...\"           (string) any error messages\n"
             "}\n"
             "\nExamples:\n" +
@@ -120,13 +119,6 @@ UniValue getinfo(const UniValue& params, bool fHelp)
 #endif
     obj.push_back(Pair("relayfee", ValueFromAmount(::minRelayTxFee.GetFeePerK())));
     obj.push_back(Pair("staking", stake->IsActive()));
-
-    {
-        LOCK(pwalletMain->cs_wallet);
-        vector<COutPoint> vOutpts;
-        pwalletMain->ListLockedCoins(vOutpts);
-        obj.push_back(Pair("lockedutxoscount", vOutpts.size()));
-    }
 
     obj.push_back(Pair("errors", GetWarnings("statusbar")));
     return obj;
