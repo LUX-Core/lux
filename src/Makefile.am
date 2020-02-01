@@ -258,6 +258,7 @@ libbitcoin_server_a_SOURCES = \
 
 if ENABLE_LUXGATE
 libbitcoin_server_a_SOURCES += \
+  luxgate/context.cpp \
   luxgate/atomicswap.cpp \
   luxgate/bitcoinclient.cpp \
   luxgate/blockchainclient.cpp \
