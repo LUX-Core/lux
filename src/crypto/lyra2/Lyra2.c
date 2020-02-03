@@ -76,6 +76,7 @@ int LYRA2(void *K, int64_t kLen, const void *pwd, int32_t pwdlen, const void *sa
 	//Allocates pointers to each row of the matrix
 	uint64_t **memMatrix = malloc(sizeof(uint64_t*) * nRows);
 	if (memMatrix == NULL) {
+		free(wholeMatrix); //stop a cheeky mem leak
 		return -1;
 	}
 	//Places the pointers in the correct positions
