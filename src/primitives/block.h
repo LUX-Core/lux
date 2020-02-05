@@ -106,7 +106,7 @@ public:
     CBlock(const CBlockHeader &header)
     {
         SetNull();
-        *((CBlockHeader*)this) = header;
+        *(static_cast<CBlockHeader*>(this)) = header; // don't use C-style cast 
     }
 
     ADD_SERIALIZE_METHODS;

@@ -147,6 +147,7 @@ void AddTokenPage::on_confirmButton_clicked()
             }
         }
     }
+    delete addToHex; // mem leak out of nowhere
 }
 
 void AddTokenPage::on_addressChanged()
@@ -177,6 +178,7 @@ void AddTokenPage::on_addressChanged()
         m_validTokenAddress = ret;
     }
     ui->confirmButton->setEnabled(m_validTokenAddress);
+    delete addToHex; // mem leak out of nowhere
 }
 
 void AddTokenPage::on_numBlocksChanged(int newHeight)

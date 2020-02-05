@@ -46,6 +46,7 @@ void HexAddressConverter::addressChanged(const QString& address) {
     if(!isAddressValid) ui->resultLabel->setText("");
 
     ui->addressEdit->setValid(isAddressValid);
+    delete addToHex; // mem leak
 }
 
 void HexAddressConverter::copyButtonClicked() {

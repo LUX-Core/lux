@@ -1071,7 +1071,7 @@ bool TestNIST_DRBG()
 			"\xF2\x86\xE4\xED\x74\xF2\x5D\x8B\x6C\x4D\xB8\xDE\xD8\x4A\xD6\x5E\xD6\x6D\xAE\xB1"
 			"\x1B\xA2\x94\x52\x54\xAD\x3C\x3D\x25\xBD\x12\x46\x3C\xA0\x45\x9D";
 
-		fail = !!memcmp(result, expected, 2048/8);
+		fail = !!memcmp(result, expected, sizeof(expected)); // Stop buffer from accessing out of bounds
 		pass = !fail && pass;
 
 		cout << (fail ? "FAILED   " : "passed   ") << "Hash_DRBG SHA512/256/888 (C0UNT=0, E=32, N=16, A=32, P=32)" << endl;
