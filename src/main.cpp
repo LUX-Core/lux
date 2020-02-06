@@ -7206,12 +7206,15 @@ static bool ProcessMessage(CNode* pfrom, const string &strCommand, CDataStream& 
 
 int ActiveProtocol()
 {
+#if 0
     const CChainParams& chainParams = Params();
-    if (chainActive.Height() < chainParams.StartSubsidyReductionBlock() - 10) { //Start banning 10 blocks earlier
+    if (chainActive.Height() < chainParams.StartDevfeeBlock() - 10) { //Start banning 10 blocks earlier
         return MIN_PEER_PROTO_VERSION_BEFORE_ENFORCEMENT;
     } else {
         return PROTOCOL_VERSION;
     }
+#endif
+    return MIN_PROTO_VERSION;
 }
 
 // requires LOCK(cs_vRecvMsg)
