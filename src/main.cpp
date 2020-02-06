@@ -1936,15 +1936,7 @@ uint256 GetProofOfStakeLimit(int nHeight)
 
 CAmount GetProofOfWorkReward(int64_t nFees, int nHeight)
 {
-    CAmount nSubsidy = 8 * COIN;
-    
-    /** Subsidy reduction stuff */
-    int nCalcHeight = 0; // Height on which we're going to be calculating
-    int nHeightDelta = 1000000; // Delta when calculating subsidy redeuctions
-    int nTimesToReduce = 0; // Var which will store the total times when need to reduce the subsidy
-    int nIsReductionHeight = 0; // Remainder check to make sure we're ready for a subsidy reduction
-    int nBlocksBetweenReductions = 125000; // Number of blocks between which we reduce subsidies
-
+    CAmount nSubsidy = 1 * COIN;
     const CChainParams& chainParams = Params();
         
     if (Params().NetworkID() == CBaseChainParams::TESTNET) {
@@ -1968,14 +1960,10 @@ CAmount GetProofOfWorkReward(int64_t nFees, int nHeight)
         nSubsidy = 1000 * COIN;
     } else if (nHeight >= 500 && nHeight < chainParams.StartDevfeeBlock()) {
         nSubsidy = 10 * COIN;
-    } else if (nHeight >= chainParams.StartDevfeeBlock() && nHeight < chainParams.StartSubsidyReductionBlock()) {
+    } else if (nHeight >= chainParams.StartDevfeeBlock() && nHeight < 6000000) {
         nSubsidy = 8 * COIN;
     } else {
-        nCalcHeight = nHeight - nHeightDelta;
-        nTimesToReduce = (int)nCalcHeight / nBlocksBetweenReductions;
-        for (int i = 0; i <= nTimesToReduce; ++i) {
-            nSubsidy -= (nSubsidy / 100) * 1;
-        }
+        nSubsidy = 1 * COIN;
     }
 
     if (nHeight < LAST_HEIGHT_FEE_BLOCK) {
@@ -1989,29 +1977,18 @@ CAmount GetProofOfWorkReward(int64_t nFees, int nHeight)
 
 CAmount GetProofOfStakeReward(int64_t nFees, int nHeight)
 {
-    CAmount nSubsidy = 1.5 * COIN;
+    CAmount nSubsidy = STATIC_POS_REWARD;
     const CChainParams& chainParams = Params();
-
-    /** Subsidy reduction stuff */
-    int nCalcHeight = 0; // Height on which we're going to be calculating
-    int nHeightDelta = 1000000; // Delta when calculating subsidy redeuctions
-    int nTimesToReduce = 0; // Var which will store the total times when need to reduce the subsidy
-    int nIsReductionHeight = 0; // Remainder check to make sure we're ready for a subsidy reduction
-    int nBlocksBetweenReductions = 125000; // Number of blocks between which we reduce subsidies
 
     // First 100,000 blocks double stake for masternode ready
     if (nHeight < 100000) {
         nSubsidy = 2 * COIN;
     } else if (nHeight >= 100000 && nHeight < chainParams.StartDevfeeBlock()) {
         nSubsidy = 1 * COIN;
-    } else if (nHeight >= chainParams.StartDevfeeBlock() && nHeight < chainParams.StartSubsidyReductionBlock()) {
+    } else if (nHeight >= chainParams.StartDevfeeBlock() && nHeight < 6000000) {
         nSubsidy = 1.5 * COIN;
     } else {
-        nCalcHeight = nHeight - nHeightDelta;
-        nTimesToReduce = (int)nCalcHeight / nBlocksBetweenReductions;
-        for (int i = 0; i <= nTimesToReduce; ++i) {
-            nSubsidy -= (nSubsidy / 100) * 1;
-        }
+        nSubsidy = 1 * COIN;
     }
     
     return nSubsidy + nFees;
