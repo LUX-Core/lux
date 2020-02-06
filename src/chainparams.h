@@ -79,6 +79,7 @@ public:
     int64_t TargetTimespan() const { return consensus.nPowTargetTimespan; }
     int64_t TargetSpacing() const { return consensus.nPowTargetSpacing; }
     int64_t Interval() const { return consensus.nPowTargetTimespan / consensus.nPowTargetSpacing; }
+    int LAST_POW_BLOCK() const { return consensus.nLastPOWBlock; }
     int COINBASE_MATURITY() const { return nMaturity; }
     int ModifierUpgradeBlock() const { return nModifierUpdateBlock; }
     /** The masternode count that we will allow the see-saw reward payments to be off by */

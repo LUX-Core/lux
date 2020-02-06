@@ -42,6 +42,8 @@ namespace Consensus {
         int nMajorityEnforceBlockUpgrade;
         int nMajorityRejectBlockOutdated;
         int nMajorityWindow;
+        /** Proof of work parameters */
+        int nLastPOWBlock;
         /**
          * Minimum blocks including miner confirmation of the total of 2016 blocks in a retargetting period,
          * (nPowTargetTimespan / nPowTargetSpacing) which is also used for BIP9 deployments.
