@@ -1379,7 +1379,7 @@ public:
             CAmount blockReward = GetProofOfWorkReward(0, nHeight);
             if (nHeight >= Params().FirstSplitRewardBlock() && nHeight < Params().StartDevfeeBlock()) {
                 blockReward = blockReward * 0.2; // MN reward
-            } else if (nHeight >= Params().StartDevfeeBlock() && nHeight < 6000000) {
+            } else {
                 blockReward = blockReward * 0.25; // MN reward after the reward changes
             }
             if (credit < blockReward)

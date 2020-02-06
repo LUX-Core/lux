@@ -1942,7 +1942,6 @@ CAmount GetProofOfWorkReward(int64_t nFees, int nHeight)
     int nCalcHeight = 0; // Height on which we're going to be calculating
     int nHeightDelta = 1000000; // Delta when calculating subsidy redeuctions
     int nTimesToReduce = 0; // Var which will store the total times when need to reduce the subsidy
-    int nIsReductionHeight = 0; // Remainder check to make sure we're ready for a subsidy reduction
     int nBlocksBetweenReductions = 125000; // Number of blocks between which we reduce subsidies
 
     const CChainParams& chainParams = Params();
@@ -1996,7 +1995,6 @@ CAmount GetProofOfStakeReward(int64_t nFees, int nHeight)
     int nCalcHeight = 0; // Height on which we're going to be calculating
     int nHeightDelta = 1000000; // Delta when calculating subsidy redeuctions
     int nTimesToReduce = 0; // Var which will store the total times when need to reduce the subsidy
-    int nIsReductionHeight = 0; // Remainder check to make sure we're ready for a subsidy reduction
     int nBlocksBetweenReductions = 125000; // Number of blocks between which we reduce subsidies
 
     // First 100,000 blocks double stake for masternode ready
@@ -2027,10 +2025,8 @@ CAmount GetMasternodePosReward(int nHeight, CAmount blockValue)
         } else if (nHeight == chainParams.PreminePayment()) {
             ret = blockValue * 250000; //premine mint
         }
-    } else if (nHeight >= chainParams.StartDevfeeBlock() && nHeight < 6000000) {
-        ret = blockValue * 0.25; //25% for masternodes after this reward change
     } else {
-        ret = blockValue * 0.4; //40% for masternode
+        ret = blockValue * 0.25; //25% for masternodes after this reward change
     }
     return ret;
 }
@@ -2747,14 +2743,6 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
         view.SetBestBlock(pindex->GetBlockHash());
         return true;
     }
-
-//    if (pindex->nHeight <= Params().LAST_POW_BLOCK() && block.IsProofOfStake())
-//        return state.DoS(100, error("%s: PoS period not active", __func__),
-//            REJECT_INVALID, "PoS-early");
-
-    if (pindex->nHeight > Params().LAST_POW_BLOCK() && block.IsProofOfWork())
-        return state.DoS(100, error("%s: PoW period ended", __func__),
-            REJECT_INVALID, "PoW-ended");
 
     bool fScriptChecks = pindex->nHeight >= Checkpoints::GetTotalBlocksEstimate(chainparams.Checkpoints());
 
@@ -4578,9 +4566,6 @@ bool CheckWork(const CBlock &block, CBlockIndex* const pindexPrev)
         return error("%s: null pindexPrev for block %s", __func__, block.GetHash().GetHex());
 
     unsigned int nBitsRequired = GetNextWorkRequired(pindexPrev, &block, consensusParams, block.IsProofOfStake());
-
-    if (block.IsProofOfWork() && pindexPrev->nHeight + 1 > chainParams.LAST_POW_BLOCK())
-        return error("%s: reject proof-of-work at height %d", __func__, pindexPrev->nHeight + 1);
 
     if (block.nBits != nBitsRequired)
         return error("%s: incorrect proof of work at %d", __func__, pindexPrev->nHeight + 1);

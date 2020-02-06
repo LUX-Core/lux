@@ -206,10 +206,8 @@ void BlockAssembler::RebuildRefundTransaction()
             // set masternode payee and 20%/25% reward, or mint
             if (nHeight == chainParams.PreminePayment()) {
                 mnReward = powReward * 25000;
-            } else if (nHeight >= chainParams.StartDevfeeBlock() && nHeight < 6000000) {
-                mnReward = powReward * 0.25;
             } else {
-                mnReward = powReward * 0.2;
+                mnReward = powReward * 0.25;
             }
 
             contrTx.vout[1].scriptPubKey = mnPayee;
@@ -352,10 +350,8 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
             // set masternode payee and 20%/25% reward, or mint
             if (nHeight == chainParams.PreminePayment()) {
                 mnReward = powReward * 25000;
-            } else if (nHeight >= chainParams.StartDevfeeBlock() && nHeight < 6000000) {
-                mnReward = powReward * 0.25;
             } else {
-                mnReward = powReward * 0.2;
+                mnReward = powReward * 0.25;
             }
 
             coinbaseTx.vout[1].scriptPubKey = mnPayee;

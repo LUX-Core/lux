@@ -1453,7 +1453,7 @@ void Stake::StakingThread(CWallet* wallet) {
                     LOCK(cs_main);
                     tip = chainActive.Tip();
                     nHeight = tip->nHeight;
-                    if (/*tip->nHeight < Params().LAST_POW_BLOCK() ||*/ IsBlockStaked(tip->nHeight)) {
+                    if (IsBlockStaked(tip->nHeight)) {
                         nCanStake = false;
                     }
                 }
