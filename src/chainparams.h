@@ -116,8 +116,10 @@ public:
     /** Devfee vars */
     int StartDevfeeBlock() const { return nStartDevfeeBlock; }
 
-    /** Devfee vars */
+    /** Subsidy reduction vars */
     int StartSubsidyReductionBlock() const { return nStartSubsidyReductionBlock; }
+    int HeightDelta() const { return nHeightDelta; }
+    int BlocksBetweenReductions() const { return nBlocksBetweenReductions; }
 
 protected:
     CChainParams() {}
@@ -162,6 +164,8 @@ protected:
     uint64_t nPruneAfterHeight;
     int nStartDevfeeBlock;
     int nStartSubsidyReductionBlock;
+    int nHeightDelta;
+    int nBlocksBetweenReductions;
 };
 
 /**

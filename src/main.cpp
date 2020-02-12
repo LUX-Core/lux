@@ -1938,11 +1938,9 @@ CAmount GetProofOfWorkReward(int64_t nFees, int nHeight)
 {
     CAmount nSubsidy = 8 * COIN;
     
-    /** Subsidy reduction stuff */
+    /** Local subsidy reduction stuff (stuff we calculate on) */
     int nCalcHeight = 0; // Height on which we're going to be calculating
-    int nHeightDelta = 1000000; // Delta when calculating subsidy redeuctions
-    int nTimesToReduce = 0; // Var which will store the total times when need to reduce the subsidy
-    int nBlocksBetweenReductions = 125000; // Number of blocks between which we reduce subsidies
+    int nTimesToReduce = 0; // Var for storing the total times when need to reduce the subsidy
 
     const CChainParams& chainParams = Params();
         
@@ -1970,8 +1968,8 @@ CAmount GetProofOfWorkReward(int64_t nFees, int nHeight)
     } else if (nHeight >= chainParams.StartDevfeeBlock() && nHeight < chainParams.StartSubsidyReductionBlock()) {
         nSubsidy = 8 * COIN;
     } else {
-        nCalcHeight = nHeight - nHeightDelta;
-        nTimesToReduce = (int)nCalcHeight / nBlocksBetweenReductions;
+        nCalcHeight = nHeight - chainParams.HeightDelta();
+        nTimesToReduce = (int)nCalcHeight / chainParams.BlocksBetweenReductions();
         for (int i = 0; i <= nTimesToReduce; ++i) {
             nSubsidy -= (nSubsidy / 100) * 1;
         }
