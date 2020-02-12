@@ -152,11 +152,9 @@ public:
         
         nStartDevfeeBlock = 828100; //Starting block
 
-        /** Subsidy reduction vars */
+        /** Subsidy reudction vars */
         
-        nStartSubsidyReductionBlock = 1125000; //Starting height (blocks)
-        nHeightDelta = 1000000; // Delta when calculating subsidy reductions (blocks)
-        nBlocksBetweenReductions = nStartSubsidyReductionBlock - nHeightDelta; // Interval between subsidy reductions (blocks)
+        nStartSubsidyReductionBlock = 1125000; //Starting block
 
         /**
          * The message start string is designed to be unlikely to occur in normal data.
