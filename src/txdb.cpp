@@ -496,7 +496,6 @@ bool CBlockTreeDB::LoadBlockIndexGuts()
 
     // Load mapBlockIndex
     while (pcursor->Valid()) {
-        if (fRequestShutdown) return false;
         boost::this_thread::interruption_point();
         try {
             leveldb::Slice slKey = pcursor->key();
@@ -563,21 +562,12 @@ bool CBlockTreeDB::LoadBlockIndexGuts()
                     }
                 }
 
-                pindexPrev = pindexNew;
                 pcursor->Next();
             } else {
                 break; // if shutdown requested or finished loading block index
             }
         } catch (std::exception& e) {
             return error("%s : Deserialize or I/O error - %s", __func__, e.what());
-        }
-    }
-
-    if (nDiscarded) {
-        if (WriteBatch(batch)) {
-            LogPrintf("pruned %d orphaned blocks from disk index\n", nDiscarded);
-        } else {
-            return error("%d invalid blocks in disk index, restart with -reindex is required! (first was %d)\n", nDiscarded, nFirstDiscarded);
         }
     }
 
