@@ -309,7 +309,6 @@ static const CRPCCommand vRPCCommands[] =
         {"blockchain", "waitforlogs", &waitforlogs,true, true, false },
         {"blockchain", "createcontract", &createcontract,true, true, false },
         {"blockchain", "sendtocontract", &sendtocontract,true, true, false },
-        {"blockchain", "pruneblockchain", &pruneblockchain,true, true, false },
 
         /* Mining */
         {"mining", "getblocktemplate", &getblocktemplate, true, false, false},
