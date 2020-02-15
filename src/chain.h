@@ -500,7 +500,7 @@ public:
         block.nNonce = nNonce;
         block.hashStateRoot   = hashStateRoot; // lux
         block.hashUTXORoot    = hashUTXORoot; // lux
-        return block.GetHash(nHeight >= Params().SwitchPhi2Block());
+        return block.GetHash(this->nHeight, true);
     }
 
     std::string ToString() const

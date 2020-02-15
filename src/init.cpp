@@ -30,6 +30,7 @@
 #include "miner.h"
 #include "net.h"
 #include "policy/policy.h"
+#include "randomx.h"
 #include "rpcserver.h"
 #include "script/standard.h"
 #include "script/sigcache.h"
@@ -214,8 +215,8 @@ void PrepareShutdown()
 #ifdef ENABLE_WALLET
     if (pwalletMain)
         bitdb.Flush(false);
-//    GenerateBitcoins(NULL, 0);
 #endif
+    randomx_shutoff();
     StopNode();
     UnregisterNodeSignals(GetNodeSignals());
 
@@ -1091,6 +1092,9 @@ bool AppInit2()
 
     if (GetBoolArg("-peerbloomfilters", false))
         nLocalServices = ServiceFlags(nLocalServices | NODE_BLOOM);
+
+    // ********************************************************* Step 3.5: initialize randomx vm
+    randomx_init();
 
     // ********************************************************* Step 4: application initialization: dir lock, daemonize, pidfile, debug log
     // Initialize elliptic curve code

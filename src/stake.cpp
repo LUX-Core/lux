@@ -776,6 +776,7 @@ bool Stake::CheckProof(CBlockIndex* const pindexPrev, const CBlock &block, uint2
         return error("%s: VerifySignature failed on %s coinstake, err %d", __func__, FormatMoney(amount), (int)err);
 
     CBlockIndex* pindex = LookupBlockIndex(prevBlockHash);
+    //! LogPrintf("Attempting to lookup %s\n", prevBlockHash.ToString().c_str());
     if (!pindex)
         return error("%s: read block failed", __func__);
 
@@ -1381,16 +1382,16 @@ bool Stake::GenBlockStake(CWallet* wallet, unsigned int& extra) {
 
     SetThreadPriority(THREAD_PRIORITY_NORMAL);
 
-    bool usePhi2;
+    int nHeight = 0;
     {
         LOCK(cs_main);
         CBlockIndex* pindexPrev = LookupBlockIndex(block->hashPrevBlock);
-        usePhi2 = pindexPrev ? pindexPrev->nHeight + 1 >= Params().SwitchPhi2Block() : false;
+        nHeight = pindexPrev ? pindexPrev->nHeight + 1 : 0;
     }
 
     bool result = true;
     uint256 proof1, proof2;
-    auto hash = block->GetHash(usePhi2);
+    auto hash = block->GetHash(nHeight);
     auto good = CheckProof(tip, *block, proof1);
 
 #if defined(DEBUG_DUMP_STAKE_CHECK) && defined(DEBUG_DUMP_STAKING_INFO)

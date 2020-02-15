@@ -17,6 +17,7 @@
 #include "pow.h"
 #include "masternode.h"
 #include "primitives/transaction.h"
+#include "randomx.h"
 #include "rpcserver.h"
 #include "util.h"
 #include "script/script.h"
@@ -447,9 +448,9 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
                 throw JSONRPCError(RPC_DESERIALIZATION_ERROR, "Block decode failed");
 
             CBlockIndex* pindexPrev = LookupBlockIndex(block.hashPrevBlock);
-            bool usePhi2 = pindexPrev ? pindexPrev->nHeight + 1 >= Params().SwitchPhi2Block() : false;
+            int nHeight = pindexPrev ? pindexPrev->nHeight + 1 : 0;
 
-            uint256 hash = block.GetHash(usePhi2);
+            uint256 hash = block.GetHash(nHeight);
             CBlockIndex* pindex = LookupBlockIndex(hash);
             if (pindex) {
                 if (pindex->IsValid(BLOCK_VALID_SCRIPTS))
@@ -493,7 +494,8 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
 
     // Disable checking block downloading and number of connected nodes for segwittest network
     // because it is tested locally, without any nodes connected, and with significant amount of time between blocks
-    if (Params().NetworkID() != CBaseChainParams::SEGWITTEST) {
+    if (Params().MiningRequiresPeers() == true)
+    {
         if (vNodes.empty())
             throw JSONRPCError(RPC_CLIENT_NOT_CONNECTED, "LUX is not connected!");
 
@@ -521,7 +523,7 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
             nTransactionsUpdatedLastLP = nTransactionsUpdatedLast;
         }
 
-// Release the wallet and main lock while waiting
+        // Release the wallet and main lock while waiting
         LEAVE_CRITICAL_SECTION(cs_main);
         {
             checktxtime = boost::get_system_time() + boost::posix_time::minutes(1);
@@ -749,6 +751,12 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
         result.push_back(Pair("screfund", scrObjArray));
     }
 
+    // randomx epochHash
+    uint256 seed;
+    char seedHex[64];
+    seedHash(seed, seedHex, nHeight);
+    result.push_back(Pair("seed",seedHex));
+
     result.push_back(Pair("transactions", transactions));
     result.push_back(Pair("coinbaseaux", aux));
     result.push_back(Pair("coinbasevalue", (int64_t)pblock->vtx[0].GetValueOut()));
@@ -930,15 +938,15 @@ class submitblock_StateCatcher : public CValidationInterface
 public:
     uint256 hash;
     bool found;
-    bool usePhi2;
+    int nHeight;
     CValidationState state;
 
-    submitblock_StateCatcher(const uint256& hashIn, bool usePhi2) : hash(hashIn), found(false), usePhi2(usePhi2), state(){};
+    submitblock_StateCatcher(const uint256& hashIn, int nHeight) : hash(hashIn), found(false), nHeight(nHeight), state(){};
 
 protected:
     virtual void BlockChecked(const CBlock& block, const CValidationState& stateIn)
     {
-        if (block.GetHash(usePhi2) != hash)
+        if (block.GetHash(nHeight) != hash)
             return;
         found = true;
         state = stateIn;
@@ -970,15 +978,16 @@ UniValue submitblock(const UniValue& params, bool fHelp)
         throw JSONRPCError(RPC_DESERIALIZATION_ERROR, "Block decode failed");
     }
 
+    int nHeight = 0;
     CValidationState state;
-    bool usePhi2, fBlockPresent = false;
+    bool fBlockPresent = false;
     {
         LOCK(cs_main);
         CBlockIndex* pindexPrev = LookupBlockIndex(block.hashPrevBlock);
         UpdateUncommittedBlockStructures(block, pindexPrev, Params().GetConsensus());
 
-        usePhi2 = pindexPrev ? pindexPrev->nHeight + 1 >= Params().SwitchPhi2Block() : false;
-        uint256 hash = block.GetHash(usePhi2);
+        nHeight = pindexPrev ? pindexPrev->nHeight + 1 : 0;
+        uint256 hash = block.GetHash(nHeight);
         CBlockIndex* pindex = LookupBlockIndex(hash);
         if (pindex) {
             if (pindex->IsValid(BLOCK_VALID_SCRIPTS)) {
@@ -999,7 +1008,7 @@ UniValue submitblock(const UniValue& params, bool fHelp)
         }
     }
 
-    submitblock_StateCatcher sc(block.GetHash(usePhi2), usePhi2);
+    submitblock_StateCatcher sc(block.GetHash(nHeight), nHeight);
     RegisterValidationInterface(&sc);
     bool fAccepted = ProcessNewBlock(state, Params(), NULL, &block);
     UnregisterValidationInterface(&sc);

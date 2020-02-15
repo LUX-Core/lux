@@ -78,7 +78,8 @@ public:
         return (nBits == 0);
     }
 
-    uint256 GetHash(bool phi2block = false) const;
+    uint256 GetHash(int nHeight = 0, bool fBlockIndexHash = false) const;
+    uint256 GetGenesisHash() const;
 
     int64_t GetBlockTime() const {
         return (int64_t)nTime;
