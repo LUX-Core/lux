@@ -2648,12 +2648,28 @@ MultiSend: %1</translation>
         <translation>Arrêter t&amp;out</translation>
     </message>
     <message>
-        <source>yes</source>
-        <translation>oui</translation>
+        <source>Protocol</source>
+        <translation>Protocole</translation>
     </message>
     <message>
-        <source>no</source>
-        <translation>non</translation>
+        <source>Time Active</source>
+        <translation>Depuis</translation>
+    </message>
+    <message>
+        <source>Last Seen (UTC)</source>
+        <translation>Vue le (UTC)</translation>
+    </message>
+    <message>
+        <source>Please wait... </source>
+        <translation>Patience... </translation>
+    </message>
+    <message>
+        <source>Enabled</source>
+        <translation>Active</translation>
+    </message>
+    <message>
+        <source>Disabled</source>
+        <translation>Inactive</translation>
     </message>
 </context>
 <context>
