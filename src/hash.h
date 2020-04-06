@@ -10,6 +10,7 @@
 #include "crypto/ripemd160.h"
 #include "crypto/sha256.h"
 #include "prevector.h"
+#include "randomx.h"
 #include "serialize.h"
 #include "uint256.h"
 #include "version.h"
@@ -339,6 +340,19 @@ public:
 //int HMAC_SHA512_Init(HMAC_SHA512_CTX *pctx, const void *pkey, size_t len);
 //int HMAC_SHA512_Update(HMAC_SHA512_CTX *pctx, const void *pdata, size_t len);
 //int HMAC_SHA512_Final(unsigned char *pmd, HMAC_SHA512_CTX *pctx);
+
+/* ----------- RandomX Hash ------------------------------------------------ */
+
+template<typename T1>
+inline uint256 randomx_hash(const T1 pbegin, const T1 pend)
+{
+    char hash[32];
+    uint256 output;
+    int len = (pend - pbegin) * sizeof(pbegin[0]);
+    randomxhash(static_cast<const char*>(&pbegin[0]), hash, len);
+    memcpy((void *)&output, hash, 32);
+    return output;
+}
 
 /* ----------- Phi1612 Hash ------------------------------------------------ */
 

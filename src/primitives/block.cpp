@@ -6,6 +6,7 @@
 #include "primitives/block.h"
 
 #include "hash.h"
+#include "randomx.h"
 #include "script/standard.h"
 #include "script/sign.h"
 #include "tinyformat.h"
@@ -14,14 +15,36 @@
 #include "chainparams.h"
 #include "versionbits.h"
 
-uint256 CBlockHeader::GetHash(bool phi2block) const {
-    if (phi2block && (nVersion & (1 << 30)))
-        return phi2_hash(BEGIN(nVersion), END(hashUTXORoot));
-    else if (nVersion > VERSIONBITS_LAST_OLD_BLOCK_VERSION && phi2block) {
-        return phi2_hash(BEGIN(nVersion), END(nNonce));
-    } else {
-        return Phi1612(BEGIN(nVersion), END(nNonce));
+uint256 CBlockHeader::GetGenesisHash() const
+{
+    return Phi1612(BEGIN(nVersion), END(nNonce));
+}
+
+uint256 CBlockHeader::GetHash(int nHeight, bool fBlockIndexHash) const
+{
+    const int nSwitchPhi2Block = Params().SwitchPhi2Block();
+    const int nSwitchRandomXBlock = Params().SwitchRandomXBlock();
+
+    if (nHeight >= nSwitchRandomXBlock && (nVersion & (1 << 30))) {
+      //! LogPrintf("\nalgo: randomx (144) height %d\n", nHeight);
+      seedNow(nHeight);
+      return randomx_hash(BEGIN(nVersion), END(hashUTXORoot));
     }
+    else if (nHeight >= nSwitchRandomXBlock) {
+      //! LogPrintf("\nalgo: randomx (80) height %d\n", nHeight);
+      seedNow(nHeight);
+      return randomx_hash(BEGIN(nVersion), END(nNonce));
+    }
+    else if (nHeight >= nSwitchPhi2Block && (nVersion & (1 << 30))) {
+        //! LogPrintf("\nalgo: phi2 (144) height %d\n", nHeight);
+        return phi2_hash(BEGIN(nVersion), END(hashUTXORoot));
+    }
+    else if (nHeight >= nSwitchPhi2Block) {
+        //! LogPrintf("\nalgo: phi2 (80) height %d\n", nHeight);
+        return phi2_hash(BEGIN(nVersion), END(nNonce));
+    }
+    //! LogPrintf("\nalgo: phi1612 (80) height %d\n", nHeight);
+    return Phi1612(BEGIN(nVersion), END(nNonce));
 }
 
 uint256 CBlock::BuildMerkleTree(bool* fMutated) const

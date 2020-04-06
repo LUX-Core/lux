@@ -11,6 +11,7 @@
 #include "init.h"
 #include "net.h"
 #include "netbase.h"
+#include "randomx.h"
 #include "rpcserver.h"
 #include "timedata.h"
 #include "util.h"
@@ -3345,9 +3346,20 @@ UniValue generateBlocks(std::shared_ptr<CReserveScript> coinbaseScript, int nGen
             LOCK(cs_main);
             IncrementExtraNonce(pblock, chainActive.Tip(), nExtraNonce);
         }
-        while (nMaxTries > 0 && pblock->nNonce < nInnerLoopCount && !CheckProofOfWork(pblock->GetHash(), pblock->nBits, Params().GetConsensus())) {
+	uint32_t hashState = 0;
+        int64_t hashStart = GetTimeMillis();
+        while (nMaxTries > 0 &&
+               pblock->nNonce < nInnerLoopCount &&
+               !ShutdownRequested() &&
+               !CheckProofOfWork(pblock->GetHash(nHeight+1), pblock->nBits, Params().GetConsensus()))
+            {
             ++pblock->nNonce;
             --nMaxTries;
+            if (GetTimeMillis()-hashStart>1000) {
+               LogPrintf("hashing @ %dh/s\n", pblock->nNonce-hashState);
+               hashState = pblock->nNonce;
+               hashStart=GetTimeMillis();
+            }
         }
         if (nMaxTries == 0) {
             break;
