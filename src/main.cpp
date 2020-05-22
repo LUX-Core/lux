@@ -2075,7 +2075,7 @@ void CheckForkWarningConditions()
             }
         } else {
             LogPrintf("CheckForkWarningConditions: Warning: Found invalid chain at least ~6 blocks longer than our best chain.\nChain state database corruption likely.\n");
-            fLargeWorkInvalidChainFound = true;
+            fLargeWorkInvalidChainFound = false;
         }
     } else {
         fLargeWorkForkFound = false;
