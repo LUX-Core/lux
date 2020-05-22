@@ -752,10 +752,9 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
     }
 
     // randomx epochHash
-    uint256 seed;
-    char seedHex[64];
-    seedHash(seed, seedHex, nHeight);
-    result.push_back(Pair("seed",seedHex));
+    uint256 seedHash = uint256();
+    barrysPreposterouslyNamedSeedHashFunction(nHeight, seedHash);
+    result.push_back(Pair("seed",seedHash.ToString().c_str()));
 
     result.push_back(Pair("transactions", transactions));
     result.push_back(Pair("coinbaseaux", aux));

@@ -395,6 +395,9 @@ libbitcoin_consensus_a_SOURCES = \
   random.cpp \
   randomx.cpp \
   randomx.h \
+  rxmonero/rx-slow-hash.c \
+  rxmonero/hash-ops.h \
+  rxmonero/c_threads.h \
   script/bitcoinconsensus.cpp \
   script/interpreter.cpp \
   script/interpreter.h \

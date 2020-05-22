@@ -11,6 +11,8 @@
 #include <uint256.h>
 #include "keystore.h"
 
+void barrysPreposterouslyNamedSeedHashFunction(int nHeight, uint256& thisSeed);
+
 /** The maximum allowed size for a serialized block, in bytes (network rule) */
 static const unsigned int MAX_BLOCK_SIZE = 6000000;
 

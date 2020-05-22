@@ -5,7 +5,9 @@
 
 #include "primitives/block.h"
 
+#include "rxmonero/hash-ops.h"
 #include "hash.h"
+#include "main.h"
 #include "randomx.h"
 #include "script/standard.h"
 #include "script/sign.h"
@@ -15,25 +17,78 @@
 #include "chainparams.h"
 #include "versionbits.h"
 
+//! set to 8 for testnet
+int EPOCH_INTERVAL = 8;
+std::vector<std::pair<int, uint256>> seedGenerationHeights;
+
 uint256 CBlockHeader::GetGenesisHash() const
 {
     return Phi1612(BEGIN(nVersion), END(nNonce));
 }
+
+void barrysPreposterouslyNamedSeedHashFunction(int nHeight, uint256& thisSeed)
+{
+    if (nHeight < EPOCH_INTERVAL * 2) {
+       thisSeed = uint256();
+       return;
+    }
+
+    char mixHash[64] = {0};
+    bool generateForHeight = (nHeight % EPOCH_INTERVAL == 0);
+
+    if (seedGenerationHeights.size() > 0) {
+       for (const auto &l : seedGenerationHeights) {
+          if (l.first == nHeight) {
+              thisSeed = l.second;
+              return;
+          }
+       }
+    }
+
+    //! recalculate?
+    if (generateForHeight) {
+
+        const CBlockIndex* pindex = chainActive.Tip();
+        uint256 seedHash = pindex->GetBlockHash();
+        memcpy(mixHash,&seedHash,32);
+
+        for(int i = 0; i < EPOCH_INTERVAL-1; i++) {
+           pindex = pindex->pprev;
+           uint256 prevHash = pindex->GetBlockHash();
+           memcpy(mixHash+32,&prevHash,32);
+           SHA256((const unsigned char*)mixHash,64,(unsigned char*)&seedHash);
+        }
+
+        memcpy(&thisSeed,&seedHash,32);
+        seedGenerationHeights.push_back(make_pair(nHeight, thisSeed));
+
+        LogPrintf("%s - height %08d seedhash %s\n", __func__, nHeight, thisSeed.ToString().c_str());
+    }
+}
+
 
 uint256 CBlockHeader::GetHash(int nHeight, bool fBlockIndexHash) const
 {
     const int nSwitchPhi2Block = Params().SwitchPhi2Block();
     const int nSwitchRandomXBlock = Params().SwitchRandomXBlock();
 
+    uint256 thash;
+    uint256 thisSeed = uint256();
+    static unsigned miners = 1;
+
+    //! note, having this here is slightly lazy but ensures we end
+    //! up at the right place each time.. (we get called a tonne during loadblockindex)
+    barrysPreposterouslyNamedSeedHashFunction(nHeight, thisSeed);
+
     if (nHeight >= nSwitchRandomXBlock && (nVersion & (1 << 30))) {
-      //! LogPrintf("\nalgo: randomx (144) height %d\n", nHeight);
-      seedNow(nHeight);
-      return randomx_hash(BEGIN(nVersion), END(hashUTXORoot));
+        //! LogPrintf("\nalgo: randomx (144) height %d\n", nHeight);
+        rx_slow_hash(nHeight, 0, (const char*)&thisSeed, this, 144, (char*)&thash, miners, 0);
+        return thash;
     }
     else if (nHeight >= nSwitchRandomXBlock) {
-      //! LogPrintf("\nalgo: randomx (80) height %d\n", nHeight);
-      seedNow(nHeight);
-      return randomx_hash(BEGIN(nVersion), END(nNonce));
+        //! LogPrintf("\nalgo: randomx (80) height %d\n", nHeight);
+        rx_slow_hash(nHeight, 0, (const char*)&thisSeed, this, 80, (char*)&thash, miners, 0);
+        return thash;
     }
     else if (nHeight >= nSwitchPhi2Block && (nVersion & (1 << 30))) {
         //! LogPrintf("\nalgo: phi2 (144) height %d\n", nHeight);

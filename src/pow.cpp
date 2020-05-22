@@ -31,6 +31,9 @@ unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHead
         bnTargetLimit = GetProofOfStakeLimit(pindexLast->nHeight);
     }
 
+    if (pindexLast->nHeight >= 1153400)
+        return bnTargetLimit.GetCompact();
+
     if (pindexLast == nullptr) // Lux Modified
         return bnTargetLimit.GetCompact();
 
