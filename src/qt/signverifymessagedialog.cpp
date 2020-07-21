@@ -21,6 +21,7 @@
 #include <vector>
 
 #include <QClipboard>
+#include <QSettings>
 
 SignVerifyMessageDialog::SignVerifyMessageDialog(const PlatformStyle *platformStyle, QWidget* parent) : QDialog(parent),
                                                                     ui(new Ui::SignVerifyMessageDialog),
@@ -29,15 +30,26 @@ SignVerifyMessageDialog::SignVerifyMessageDialog(const PlatformStyle *platformSt
 
 {
     ui->setupUi(this);
-
-    ui->addressBookButton_SM->setIcon(platformStyle->SingleColorIcon(":/icons/address-book"));
-    ui->pasteButton_SM->setIcon(platformStyle->SingleColorIcon(":/icons/editpaste"));
-    ui->copySignatureButton_SM->setIcon(platformStyle->SingleColorIcon(":/icons/editcopy"));
-    ui->signMessageButton_SM->setIcon(platformStyle->SingleColorIcon(":/icons/edit"));
-    ui->clearButton_SM->setIcon(platformStyle->SingleColorIcon(":/icons/remove"));
-    ui->addressBookButton_VM->setIcon(platformStyle->SingleColorIcon(":/icons/address-book"));
-    ui->verifyMessageButton_VM->setIcon(platformStyle->SingleColorIcon(":/icons/transaction_0"));
-    ui->clearButton_VM->setIcon(platformStyle->SingleColorIcon(":/icons/remove"));
+	QSettings settings;
+	if (settings.value("theme").toString() == "dark grey" || settings.value("theme").toString() == "dark blue") {
+		ui->addressBookButton_SM->setIcon(platformStyle->SingleColorIcon(":/icons/address-book-white"));
+		ui->pasteButton_SM->setIcon(platformStyle->SingleColorIcon(":/icons/editpaste-white"));
+		ui->copySignatureButton_SM->setIcon(platformStyle->SingleColorIcon(":/icons/editcopy"));
+		ui->signMessageButton_SM->setIcon(platformStyle->SingleColorIcon(":/icons/edit"));
+		ui->clearButton_SM->setIcon(platformStyle->SingleColorIcon(":/icons/remove-light"));
+		ui->addressBookButton_VM->setIcon(platformStyle->SingleColorIcon(":/icons/address-book-white"));
+		ui->verifyMessageButton_VM->setIcon(platformStyle->SingleColorIcon(":/icons/transaction_0"));
+		ui->clearButton_VM->setIcon(platformStyle->SingleColorIcon(":/icons/remove-light"));
+	} else {
+		ui->addressBookButton_SM->setIcon(platformStyle->SingleColorIcon(":/icons/address-book"));
+		ui->pasteButton_SM->setIcon(platformStyle->SingleColorIcon(":/icons/editpaste"));
+		ui->copySignatureButton_SM->setIcon(platformStyle->SingleColorIcon(":/icons/editcopy"));
+		ui->signMessageButton_SM->setIcon(platformStyle->SingleColorIcon(":/icons/edit"));
+		ui->clearButton_SM->setIcon(platformStyle->SingleColorIcon(":/icons/remove"));
+		ui->addressBookButton_VM->setIcon(platformStyle->SingleColorIcon(":/icons/address-book"));
+		ui->verifyMessageButton_VM->setIcon(platformStyle->SingleColorIcon(":/icons/transaction_0"));
+		ui->clearButton_VM->setIcon(platformStyle->SingleColorIcon(":/icons/remove"));
+	}
 
 
 #if QT_VERSION >= 0x040700

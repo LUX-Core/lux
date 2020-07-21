@@ -167,19 +167,43 @@ CoinControlDialog::CoinControlDialog(const PlatformStyle *platformStyle, QWidget
     // see https://github.com/bitcoin/bitcoin/issues/5716
     ui->treeWidget->headerItem()->setText(COLUMN_CHECKBOX, QString());
 
-    ui->treeWidget->setColumnWidth(COLUMN_CHECKBOX, 84);
-    ui->treeWidget->setColumnWidth(COLUMN_AMOUNT, 100);
-    ui->treeWidget->setColumnWidth(COLUMN_LABEL, 160);
-    ui->treeWidget->setColumnWidth(COLUMN_ADDRESS, 210);
-    ui->treeWidget->setColumnWidth(COLUMN_DATE, 100);
-    ui->treeWidget->setColumnWidth(COLUMN_CONFIRMATIONS, 80);
-    ui->treeWidget->setColumnWidth(COLUMN_PRIORITY, 100);
-    ui->treeWidget->setColumnWidth(COLUMN_DARKSEND_ROUNDS, 80);
-
+	int columnCheckboxWidth = 50;
+	int columnAmountWidth = 100;
+	int columnLabelWidth = 160;
+	int columnAddressWidth = 230;
+	int columnDateWidth = 100;
+	int columnConfirmationsWidth = 100;
+	int columnPriority = 100;
+	int columnDarkSendWidth = 150;
+	
+    ui->treeWidget->setColumnWidth(COLUMN_CHECKBOX, columnCheckboxWidth); 
+    ui->treeWidget->setColumnWidth(COLUMN_AMOUNT, columnAmountWidth);
+    ui->treeWidget->setColumnWidth(COLUMN_LABEL, columnLabelWidth);
+    ui->treeWidget->setColumnWidth(COLUMN_ADDRESS, columnAddressWidth);
+    ui->treeWidget->setColumnWidth(COLUMN_DATE, columnDateWidth);
+    ui->treeWidget->setColumnWidth(COLUMN_CONFIRMATIONS, columnConfirmationsWidth);
+    ui->treeWidget->setColumnWidth(COLUMN_PRIORITY, columnPriority);
+    ui->treeWidget->setColumnWidth(COLUMN_DARKSEND_ROUNDS, columnDarkSendWidth);
+	
     ui->treeWidget->setColumnHidden(COLUMN_TXHASH, true);         // store transacton hash in this column, but dont show it
     ui->treeWidget->setColumnHidden(COLUMN_VOUT_INDEX, true);     // store vout index in this column, but dont show it
     ui->treeWidget->setColumnHidden(COLUMN_PRIORITY_INT64, true);
     ui->treeWidget->setColumnHidden(COLUMN_DATE_INT64, true);     // store date int64 in this column, but dont show it
+	
+	QSettings settings;
+	
+	if (settings.value("theme").toString() == "dark grey") {
+		QString styleSheet = ".CoinControlTreeWidget#treeWidget {  background-color: #262626; alternate-background-color:#424242; " 
+								"gridline-color: #40c2dc; border: 1px solid #40c2dc; color: #fff; min-height:2em; }";					
+		ui->treeWidget->setStyleSheet(styleSheet);
+	} else if (settings.value("theme").toString() == "dark blue") {
+		QString styleSheet = ".CoinControlTreeWidget#treeWidget {  background-color: #061532; alternate-background-color:#0D2A64; " 
+								"gridline-color: #40c2dc; border: 1px solid #40c2dc; color: #fff; min-height:2em; }";
+		ui->treeWidget->setStyleSheet(styleSheet);
+	} else { 
+		//code here
+	}
+	
     ui->num_box->setRange(1, 9999); // set the range
     ui->select_50->setVisible(false); // set the advanced features to hidden 
     ui->select_100->setVisible(false);
@@ -193,7 +217,7 @@ CoinControlDialog::CoinControlDialog(const PlatformStyle *platformStyle, QWidget
     sortView(COLUMN_AMOUNT, Qt::DescendingOrder);
 
     // restore list mode and sortorder as a convenience feature
-    QSettings settings;
+    
     if (settings.contains("nCoinControlMode") && !settings.value("nCoinControlMode").toBool())
         ui->radioTreeMode->click();
     if (settings.contains("nCoinControlSortColumn") && settings.contains("nCoinControlSortOrder"))

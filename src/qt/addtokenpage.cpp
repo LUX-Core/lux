@@ -11,9 +11,12 @@
 #include "main.h"
 #include "addresstablemodel.h"
 #include "optionsmodel.h"
+#include "guiutil.h"
+#include "converter.h"
 
 #include <QRegularExpressionValidator>
 #include <QMessageBox>
+#include <QSettings>
 
 AddTokenPage::AddTokenPage(QWidget *parent) :
         QWidget(parent),
@@ -39,6 +42,25 @@ AddTokenPage::AddTokenPage(QWidget *parent) :
     if(ui->lineEditSenderAddress->isEditable())
         ((QValidatedLineEdit*)ui->lineEditSenderAddress->lineEdit())->setEmptyIsValid(false);
     m_validTokenAddress = false;
+	
+	QSettings settings;
+	
+	if (settings.value("theme").toString() == "dark grey") {
+		QString styleSheet = ".QPushButton { background-color: #262626; color:#fff; border: 1px solid #40c2dc; "
+								"padding-left:10px; padding-right:10px; min-height:25px; min-width:75px; }"
+								".QPushButton:hover { background-color:#40c2dc !important; color:#262626 !important; }";					
+		ui->confirmButton->setStyleSheet(styleSheet);
+		ui->clearButton->setStyleSheet(styleSheet);
+	} else if (settings.value("theme").toString() == "dark blue") {
+		QString styleSheet = ".QPushButton { background-color: #061532; color:#fff; border: 1px solid #40c2dc; "
+								"padding-left:10px; padding-right:10px; min-height:25px; min-width:75px; }"
+								".QPushButton:hover { background-color:#40c2dc; color:#061532; }";					
+		ui->confirmButton->setStyleSheet(styleSheet);
+		ui->clearButton->setStyleSheet(styleSheet);
+	} else { 
+		//code here
+	}
+	
 }
 
 AddTokenPage::~AddTokenPage()
@@ -83,10 +105,17 @@ void AddTokenPage::on_clearButton_clicked()
 
 void AddTokenPage::on_confirmButton_clicked()
 {
-    if(ui->lineEditSenderAddress->isValidAddress())
+
+    converter* addToHex = new converter();
+    bool checkedValidity = false;
+    QString convertAddrToHex = ui->lineEditContractAddress->text();
+    QString convertedAddr = "";
+    addToHex->addHexConverter(convertAddrToHex, &convertedAddr, &checkedValidity);
+
+    if(checkedValidity)
     {
         CTokenInfo tokenInfo;
-        tokenInfo.strContractAddress = ui->lineEditContractAddress->text().toStdString();
+        tokenInfo.strContractAddress = convertedAddr.toStdString();
         tokenInfo.strTokenName = ui->lineEditTokenName->text().toStdString();
         tokenInfo.strTokenSymbol = ui->lineEditTokenSymbol->text().toStdString();
         tokenInfo.nDecimals = ui->lineEditDecimals->text().toInt();
@@ -110,11 +139,11 @@ void AddTokenPage::on_confirmButton_clicked()
                 m_model->addTokenEntry(tokenInfo);
 
                 clearAll();
-
-                if(!fLogEvents)
-                {
-                    QMessageBox::information(this, tr("Log events"), tr("Enable log events from the option menu in order to receive token transactions."));
-                }
+// TODO: Make sure we enable LogEvents by default, and get rid of this type of warnings
+            if(!fLogEvents)
+            {
+                QMessageBox::information(this, tr("Log events"), tr("Enable log events from the option menu in order to receive token transactions."));
+            }
             }
         }
     }
@@ -122,10 +151,22 @@ void AddTokenPage::on_confirmButton_clicked()
 
 void AddTokenPage::on_addressChanged()
 {
+
+    converter* addToHex = new converter();
+    bool checkedValidity = false;
     QString tokenAddress = ui->lineEditContractAddress->text();
+    QString convertedAddr = "";
+    addToHex->addHexConverter(tokenAddress, &convertedAddr, &checkedValidity);
+
+    if(tokenAddress.isEmpty()) {
+        ui->lineEditContractAddress->setValid(true);
+    } else {
+        ui->lineEditContractAddress->setValid(checkedValidity);
+    }
+
     if(m_tokenABI)
     {
-        m_tokenABI->setAddress(tokenAddress.toStdString());
+        m_tokenABI->setAddress(convertedAddr.toStdString());
         std::string name, symbol, decimals;
         bool ret = m_tokenABI->name(name);
         ret &= m_tokenABI->symbol(symbol);

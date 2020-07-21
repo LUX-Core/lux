@@ -22,6 +22,7 @@
 #include <QMenu>
 #include <QMessageBox>
 #include <QSortFilterProxyModel>
+#include <QSettings>
 
 AddressBookPage::AddressBookPage(const PlatformStyle *platformStyle, Mode mode, Tabs tab, QWidget* parent) : QDialog(parent),
                                                                          ui(new Ui::AddressBookPage),
@@ -29,6 +30,8 @@ AddressBookPage::AddressBookPage(const PlatformStyle *platformStyle, Mode mode, 
                                                                          mode(mode),
                                                                          tab(tab)
 {
+		
+	QSettings settings;
     ui->setupUi(this);
 
     if (!platformStyle->getImagesOnButtons()) {
@@ -37,10 +40,19 @@ AddressBookPage::AddressBookPage(const PlatformStyle *platformStyle, Mode mode, 
         ui->deleteAddress->setIcon(QIcon());
         ui->exportButton->setIcon(QIcon());
     } else {
-        ui->newAddress->setIcon(platformStyle->SingleColorIcon(":/icons/add"));
-        ui->copyAddress->setIcon(platformStyle->SingleColorIcon(":/icons/editcopy"));
-        ui->deleteAddress->setIcon(platformStyle->SingleColorIcon(":/icons/remove"));
-        ui->exportButton->setIcon(platformStyle->SingleColorIcon(":/icons/export"));
+		
+		if (settings.value("theme").toString() == "dark grey" || settings.value("theme").toString() == "dark blue") {
+			ui->newAddress->setIcon(platformStyle->SingleColorIcon(":/icons/add-white"));
+			ui->copyAddress->setIcon(platformStyle->SingleColorIcon(":/icons/editcopy"));
+			ui->deleteAddress->setIcon(platformStyle->SingleColorIcon(":/icons/remove-light"));
+			ui->exportButton->setIcon(platformStyle->SingleColorIcon(":/icons/export"));
+
+		} else {
+			ui->newAddress->setIcon(platformStyle->SingleColorIcon(":/icons/add"));
+			ui->copyAddress->setIcon(platformStyle->SingleColorIcon(":/icons/editcopy"));
+			ui->deleteAddress->setIcon(platformStyle->SingleColorIcon(":/icons/remove"));
+			ui->exportButton->setIcon(platformStyle->SingleColorIcon(":/icons/export"));
+		}	
     }
 
     switch (mode) {
@@ -80,6 +92,18 @@ AddressBookPage::AddressBookPage(const PlatformStyle *platformStyle, Mode mode, 
         ui->deleteAddress->setVisible(false);
         break;
     }
+	
+	if (settings.value("theme").toString() == "dark grey") {
+		QString styleSheet = ".QTableView { background-color: #262626; alternate-background-color:#424242; "
+								"gridline-color: #40c2dc; border: 1px solid #40c2dc !important; color: #fff; min-height:2em; }";				
+		ui->tableView->setStyleSheet(styleSheet);
+	} else if (settings.value("theme").toString() == "dark blue") {
+		QString styleSheet = ".QTableView { background-color: #061532; alternate-background-color:#0D2A64; "
+								"gridline-color: #40c2dc; border: 1px solid #40c2dc !important; color: #fff; min-height:2em; }";					
+		ui->tableView->setStyleSheet(styleSheet);
+	} else { 
+		//code here
+	}	
 
     // Context menu actions
     QAction* copyAddressAction = new QAction(tr("&Copy Address"), this);

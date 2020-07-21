@@ -52,7 +52,12 @@ public:
         qint64 amount = index.data(TransactionTableModel::AmountRole).toLongLong();
         bool confirmed = index.data(TransactionTableModel::ConfirmedRole).toBool();
         QVariant value = index.data(Qt::ForegroundRole);
-        QColor foreground = COLOR_BLACK;
+		QSettings settings;
+		if (settings.value("theme").toString() == "dark grey" || settings.value("theme").toString() == "dark blue") {
+			QColor foreground = SECOND_COLOR_WHITE;	
+		} else { 
+			QColor foreground = COLOR_BLACK;
+		}
         if (value.canConvert<QBrush>()) {
             QBrush brush = qvariant_cast<QBrush>(value);
             foreground = brush.color();
@@ -68,21 +73,38 @@ public:
             iconWatchonly.paint(painter, watchonlyRect);
         }
 
-        if (amount < 0) {
-            foreground = COLOR_NEGATIVE;
-        } else if (!confirmed) {
-            foreground = COLOR_UNCONFIRMED;
-        } else {
-            foreground = COLOR_BLACK;
-        }
+		QSettings settings;
+		if (settings.value("theme").toString() == "dark grey" || settings.value("theme").toString() == "dark blue") {
+			if (amount < 0) {
+				foreground = SECOND_COLOR_NEGATIVE;
+			} else if (!confirmed) {
+				foreground = SECOND_COLOR_UNCONFIRMED;
+			} else {
+				foreground = SECOND_COLOR_WHITE;
+			}	
+		} else { 
+			if (amount < 0) {
+				foreground = COLOR_NEGATIVE;
+			} else if (!confirmed) {
+				foreground = COLOR_UNCONFIRMED;
+			} else {
+				foreground = COLOR_BLACK;
+			}
+		}
+        
         painter->setPen(foreground);
         QString amountText = BitcoinUnits::formatWithUnit(unit, amount, true, BitcoinUnits::separatorAlways);
         if (!confirmed) {
             amountText = QString("[") + amountText + QString("]");
         }
         painter->drawText(amountRect, Qt::AlignRight | Qt::AlignVCenter, amountText);
-
-        painter->setPen(COLOR_BLACK);
+		QSettings settings;
+		if (settings.value("theme").toString() == "dark grey" || settings.value("theme").toString() == "dark blue") {
+			painter->setPen(SECOND_COLOR_WHITE);
+		} else { 
+			painter->setPen(COLOR_BLACK);
+		}
+        
         painter->drawText(amountRect, Qt::AlignLeft | Qt::AlignVCenter, GUIUtil::dateTimeStr(date));
 
         painter->restore();

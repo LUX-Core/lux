@@ -16,6 +16,7 @@
 
 #include <QApplication>
 #include <QClipboard>
+#include <QSettings>
 
 SendCoinsEntry::SendCoinsEntry(const PlatformStyle *platformStyle, QWidget* parent) : QStackedWidget(parent),
                                                   ui(new Ui::SendCoinsEntry),
@@ -23,11 +24,22 @@ SendCoinsEntry::SendCoinsEntry(const PlatformStyle *platformStyle, QWidget* pare
                                                   platformStyle(platformStyle)
 {
     ui->setupUi(this);
-    ui->addressBookButton->setIcon(platformStyle->SingleColorIcon(":/icons/address-book"));
-    ui->pasteButton->setIcon(platformStyle->SingleColorIcon(":/icons/editpaste"));
-    ui->deleteButton->setIcon(platformStyle->SingleColorIcon(":/icons/remove"));
-    ui->deleteButton_is->setIcon(platformStyle->SingleColorIcon(":/icons/remove"));
-    ui->deleteButton_s->setIcon(platformStyle->SingleColorIcon(":/icons/remove"));
+	
+		QSettings settings;
+	if (settings.value("theme").toString() == "dark grey" || settings.value("theme").toString() == "dark blue") {
+		ui->addressBookButton->setIcon(platformStyle->SingleColorIcon(":/icons/address-book-white"));
+		ui->pasteButton->setIcon(platformStyle->SingleColorIcon(":/icons/editpaste-white"));
+		ui->deleteButton->setIcon(platformStyle->SingleColorIcon(":/icons/remove-light"));
+		ui->deleteButton_is->setIcon(platformStyle->SingleColorIcon(":/icons/remove-light"));
+		ui->deleteButton_s->setIcon(platformStyle->SingleColorIcon(":/icons/remove-light"));
+
+	} else {
+		ui->addressBookButton->setIcon(platformStyle->SingleColorIcon(":/icons/address-book"));
+		ui->pasteButton->setIcon(platformStyle->SingleColorIcon(":/icons/editpaste"));
+		ui->deleteButton->setIcon(platformStyle->SingleColorIcon(":/icons/remove"));
+		ui->deleteButton_is->setIcon(platformStyle->SingleColorIcon(":/icons/remove"));
+		ui->deleteButton_s->setIcon(platformStyle->SingleColorIcon(":/icons/remove"));
+	}
 
     setCurrentWidget(ui->SendCoins);
 

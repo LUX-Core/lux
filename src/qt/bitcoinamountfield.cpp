@@ -13,6 +13,7 @@
 #include <QHBoxLayout>
 #include <QKeyEvent>
 #include <QLineEdit>
+#include <QSettings>
 
 /** QSpinBox that uses fixed-point numbers internally and uses our own
  * formatting/parsing functions.
@@ -214,6 +215,30 @@ BitcoinAmountField::BitcoinAmountField(QWidget* parent) : QWidget(parent),
 
     setFocusPolicy(Qt::TabFocus);
     setFocusProxy(amount);
+	
+	QSettings settings;
+	
+	if (settings.value("theme").toString() == "dark grey") {
+		QString styleSheet = ".AmountSpinBox { background-color: #262626; "
+								"color:#fff; border: 1px solid #40c2dc; "
+								"padding-left:10px; padding-right:10px; min-height:25px; }"
+								".QValueComboBox { background-color: #262626; color:#fff; "
+								"border: 1px solid #40c2dc; padding-left:10px; padding-right:10px; min-height:25px; }";
+		
+		amount->setStyleSheet(styleSheet);
+		unit->setStyleSheet(styleSheet);
+	} else if (settings.value("theme").toString() == "dark blue") {
+		QString styleSheet = ".AmountSpinBox { background-color: #061532; "
+								"color:#fff; border: 1px solid #40c2dc; "
+								"padding-left:10px; padding-right:10px; min-height:25px; }"
+								".QValueComboBox { background-color: #061532; color:#fff; "
+								"border: 1px solid #40c2dc; padding-left:10px; padding-right:10px; min-height:25px; }";
+		
+		amount->setStyleSheet(styleSheet);
+		unit->setStyleSheet(styleSheet);
+	} else { 
+		//code here
+	}
 
     // If one if the widgets changes, the combined content changes as well
     connect(amount, SIGNAL(valueChanged()), this, SIGNAL(valueChanged()));
@@ -245,10 +270,55 @@ bool BitcoinAmountField::validate()
 
 void BitcoinAmountField::setValid(bool valid)
 {
-    if (valid)
-        amount->setStyleSheet("");
-    else
-        amount->setStyleSheet(STYLE_INVALID);
+	QSettings settings;
+    if (valid) {
+		
+		if (settings.value("theme").toString() == "dark grey") {
+			QString styleSheet = ".AmountSpinBox { background-color: #262626; "
+									"color:#fff; border: 1px solid #40c2dc; "
+									"padding-left:10px; padding-right:10px; min-height:25px; }"
+									".QValueComboBox { background-color: #262626; color:#fff; "
+									"border: 1px solid #40c2dc; padding-left:10px; padding-right:10px; min-height:25px; }";
+			
+			amount->setStyleSheet(styleSheet);
+			unit->setStyleSheet(styleSheet);
+		} else if (settings.value("theme").toString() == "dark blue") {
+			QString styleSheet = ".AmountSpinBox { background-color: #061532; "
+									"color:#fff; border: 1px solid #40c2dc; "
+									"padding-left:10px; padding-right:10px; min-height:25px; }"
+									".QValueComboBox { background-color: #061532; color:#fff; "
+									"border: 1px solid #40c2dc; padding-left:10px; padding-right:10px; min-height:25px; }";
+			
+			amount->setStyleSheet(styleSheet);
+			unit->setStyleSheet(styleSheet);
+		} else { 
+			amount->setStyleSheet("");
+		}
+        
+    } else {
+		if (settings.value("theme").toString() == "dark grey") {
+			QString styleSheet = ".AmountSpinBox { background-color: #ff8080; "
+									"color:#061532; border: 1px solid #40c2dc; "
+									"padding-left:10px; padding-right:10px; min-height:25px; }"
+									".QValueComboBox { background-color: #061532; color:#fff; "
+									"border: 1px solid #40c2dc; padding-left:10px; padding-right:10px; min-height:25px; }";
+			
+			amount->setStyleSheet(styleSheet);
+			unit->setStyleSheet(styleSheet);
+		} else if (settings.value("theme").toString() == "dark blue") {
+			QString styleSheet = ".AmountSpinBox { background-color: #ff8080; "
+									"color:#061532; border: 1px solid #40c2dc; "
+									"padding-left:10px; padding-right:10px; min-height:25px; }"
+									".QValueComboBox { background-color: #061532; color:#fff; "
+									"border: 1px solid #40c2dc; padding-left:10px; padding-right:10px; min-height:25px; }";
+			
+			amount->setStyleSheet(styleSheet);
+			unit->setStyleSheet(styleSheet);
+		} else { 
+			amount->setStyleSheet(STYLE_INVALID);
+		}
+        
+	}
 }
 
 bool BitcoinAmountField::eventFilter(QObject* object, QEvent* event)
