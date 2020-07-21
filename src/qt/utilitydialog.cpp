@@ -33,7 +33,7 @@ HelpMessageDialog::HelpMessageDialog(QWidget* parent, HelpMode helpMode) : QDial
                                                                     ui(new Ui::HelpMessageDialog)
 {
     ui->setupUi(this);
-
+    ui->findMessage->setStyleSheet("QLabel { color : red; }");
     QString version = tr("Luxcore") + " " + tr("version") + " " + QString::fromStdString(FormatFullVersion());
 /* On x86 add a bit specifier to the version so that users can distinguish between
      * 32 and 64 bit builds. On other architectures, 32/64 bit may be more ambigious.
@@ -126,6 +126,17 @@ HelpMessageDialog::HelpMessageDialog(QWidget* parent, HelpMode helpMode) : QDial
         ui->helpMessage->moveCursor(QTextCursor::Start);
         ui->scrollArea->setVisible(false);
         ui->aboutMessage->setVisible(false);
+
+        connect(ui->findButton, &QPushButton::clicked, [&](){
+            bool found = ui->helpMessage->find(ui->findLineEdit->text());
+            ui->findMessage->clear();
+            if(!found) {
+                QTextCursor curCursor = ui->helpMessage->textCursor();
+                curCursor.movePosition(QTextCursor::Start, QTextCursor::MoveAnchor,1);
+                ui->helpMessage->setTextCursor(curCursor);
+                ui->findMessage->setText("No more results");
+            }
+        });
     }
 }
 
