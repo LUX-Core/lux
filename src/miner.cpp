@@ -263,7 +263,7 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewStake(bool fMineWitness
     return CreateNewBlock(CScript(), fMineWitnessTx, fProofOfStake, pTotalFees, txProofTime, nTimeLimit);
 }
 
-std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& scriptPubKeyIn, bool fMineWitnessTx, bool fProofOfStake, int64_t* pTotalFees, int32_t txProofTime, int32_t nTimeLimit)
+std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& scriptPubKeyIn, bool fMineWitnessTx, bool fProofOfStake, int64_t* pTotalFees, int32_t txProofTime, int32_t nTimeLimit, bool generateSCFix)
 {
     resetBlock();
 
@@ -427,7 +427,7 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
     addPriorityTxs(minGasPrice, fProofOfStake);
     addPackageTxs(minGasPrice, fProofOfStake);
 
-    if (chainActive.Height() >= chainParams.FirstSCBlock()) {
+    if (chainActive.Height() + (generateSCFix ? 1 : 0) >= chainParams.FirstSCBlock()) {
         pblock->hashStateRoot = h256Touint(getGlobalStateRoot(pindexState));
         pblock->hashUTXORoot = h256Touint(getGlobalStateUTXO(pindexState));
 

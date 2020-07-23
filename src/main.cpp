@@ -1934,7 +1934,7 @@ CAmount GetProofOfWorkReward(int64_t nFees, int nHeight)
     const CChainParams& chainParams = Params();
         
     if (Params().NetworkID() == CBaseChainParams::TESTNET) {
-        if (nHeight < 200) return 250000 * COIN;
+        if (nHeight < 20) return 250000 * COIN;
     }
 
     if (Params().NetworkID() == CBaseChainParams::REGTEST) {
@@ -1961,7 +1961,7 @@ CAmount GetProofOfWorkReward(int64_t nFees, int nHeight)
     }
 
     if (nHeight < LAST_HEIGHT_FEE_BLOCK) {
-        if (IsTestNet() && nHeight >= 17500)
+        if (Params().NetworkID() == CBaseChainParams::TESTNET && nHeight >= 20)
             return nSubsidy + nFees;
         nFees = nHeight;
     }
