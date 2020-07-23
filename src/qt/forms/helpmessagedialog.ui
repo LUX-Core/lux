@@ -35,7 +35,7 @@
    <item>
     <layout class="QVBoxLayout" name="verticalLayout">
      <item>
-      <widget class="QFrame" name="horizontalFrame">
+      <widget class="QFrame" name="findFrame">
        <layout class="QHBoxLayout" name="horizontalLayout_3">
         <item>
          <widget class="QLineEdit" name="findLineEdit">
