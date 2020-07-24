@@ -36,7 +36,6 @@ HelpMessageDialog::HelpMessageDialog(QWidget* parent, HelpMode helpMode) : QDial
 {
     ui->setupUi(this);
 	QSettings settings;
-    ui->findMessage->setStyleSheet("QLabel { color : red; }");
     QString version = tr("Luxcore") + " " + tr("version") + " " + QString::fromStdString(FormatFullVersion());
 /* On x86 add a bit specifier to the version so that users can distinguish between
      * 32 and 64 bit builds. On other architectures, 32/64 bit may be more ambigious.
@@ -76,6 +75,7 @@ HelpMessageDialog::HelpMessageDialog(QWidget* parent, HelpMode helpMode) : QDial
         ui->helpMessage->setVisible(false);
         ui->findFrame->setVisible(false);
     } else if (helpMode == cmdline) {
+    	ui->findMessage->setStyleSheet("QLabel { color : red; }");
         setWindowTitle(tr("Command-line options"));
         QString header = tr("Usage:") + "\n" +
                          "  lux-qt [" + tr("command-line options") + "]                     " + "\n";
