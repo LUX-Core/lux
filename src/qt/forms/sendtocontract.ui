@@ -84,7 +84,7 @@
                <number>5</number>
               </property>
               <item>
-               <widget class="QValidatedLineEdit" name="lineEditContractAddress"/>
+               <widget class="EthAddressLineEdit" name="lineEditContractAddress"/>
               </item>
               <item>
                <widget class="QToolButton" name="loadInfoButton">

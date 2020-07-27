@@ -233,6 +233,7 @@ BITCOIN_QT_H = \
   qt/darksendconfig.h \
   qt/editaddressdialog.h \
   qt/editcontractinfodialog.h \
+  qt/ethaddresslineedit.h \
   qt/execrpccommand.h \
   qt/eventlog.h \
   qt/guiconstants.h \
@@ -498,6 +499,7 @@ BITCOIN_QT_CPP += \
   qt/darksendconfig.cpp \
   qt/editaddressdialog.cpp \
   qt/execrpccommand.cpp \
+  qt/ethaddresslineedit.cpp \
   qt/editcontractinfodialog.cpp \
   qt/eventlog.cpp \
   qt/masternodemanager.cpp \
