@@ -9,7 +9,7 @@ ABIParamItem::ABIParamItem(const ParameterABI &param, QWidget *parent) :
     QWidget(parent),
     m_buttonAdd(new QToolButton(this)),
     m_buttonRemove(new QToolButton(this)),
-    m_itemValue(new QValidatedLineEdit(this)),
+    m_itemValue(new EthAddressLineEdit(this)),
     m_isDeleted(false)
 {
     QHBoxLayout *mainLayout = new QHBoxLayout(this);

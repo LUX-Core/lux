@@ -3,7 +3,7 @@
 
 #include <QWidget>
 #include <QToolButton>
-#include "qvalidatedlineedit.h"
+#include "ethaddresslineedit.h"
 
 class ParameterABI;
 
@@ -36,7 +36,7 @@ public Q_SLOTS:
 private:
     QToolButton *m_buttonAdd;
     QToolButton *m_buttonRemove;
-    QValidatedLineEdit *m_itemValue;
+    EthAddressLineEdit *m_itemValue;
     int m_position;
     bool m_isDeleted;
 };

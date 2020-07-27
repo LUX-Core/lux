@@ -113,6 +113,7 @@
         <file alias="telegram">res/icons/telegram.png</file>
         <file alias="twitter">res/icons/twitter.png</file>
 		<file alias="hub">res/icons/hub.png</file>
+	<file alias="eth">res/icons/eth.png</file>
     </qresource>
     <qresource prefix="/css">
         <file alias="default">res/css/default.css</file>
