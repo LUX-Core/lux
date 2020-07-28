@@ -30,8 +30,10 @@ void EthAddressLineEdit::init()
             bool checkedValidityHex, checkedValidityAddr = false;
             QString convertedAddr = "";
             addToHex.twoWayConverter(text(), &convertedAddr, &checkedValidityHex, &checkedValidityAddr);
-            if(checkedValidityHex || checkedValidityAddr)
+            if(checkedValidityHex || checkedValidityAddr) {
                 setText(convertedAddr);
+                hexConvertAction->setVisible(false);
+            }
         }
     );
 }
