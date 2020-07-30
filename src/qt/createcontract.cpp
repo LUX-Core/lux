@@ -68,6 +68,13 @@ CreateContract::CreateContract(QWidget *parent) :
     ui->lineEditGasLimit->setValue(DEFAULT_GAS_LIMIT_OP_CREATE);
     ui->pushButtonCreateContract->setEnabled(false);
 
+    connect(ui->lineEditGasPrice,
+        &BitcoinAmountField::valueChanged,
+        [&](){
+            ui->labelAvailInputInfo->setText(GUIUtil::handleAvailableInputInfo(m_model, ui->lineEditGasPrice->value()));
+        }
+    );
+
     // Create new PRC command line interface
     QStringList lstMandatory;
     lstMandatory.append(PARAM_BYTECODE);
@@ -126,6 +133,17 @@ void CreateContract::setLinkLabels()
 void CreateContract::setModel(WalletModel *_model)
 {
     m_model = _model;
+    connect(m_model, &WalletModel::balanceChanged, 
+        [&](const CAmount& balance,
+            const CAmount&,
+            const CAmount&,
+            const CAmount&,
+            const CAmount&,
+            const CAmount&,
+            const CAmount&){
+                ui->labelAvailInputInfo->setText(GUIUtil::handleAvailableInputInfo(m_model, ui->lineEditGasPrice->value()));
+        }
+    );
 }
 
 bool CreateContract::isValidBytecode()
