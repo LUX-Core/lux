@@ -9,7 +9,6 @@
 #include "bitcoinaddressvalidator.h"
 #include "bitcoinunits.h"
 #include "qvalidatedlineedit.h"
-#include "walletmodel.h"
 
 #include "init.h"
 #include "main.h"
@@ -86,6 +85,7 @@ extern double NSAppKitVersionNumber;
 #endif
 
 #define URI_SCHEME "lux"
+static std::string availInputsErrorMessage = "<span style=\"color: red;\"><b>CAUTION!</b> You do not have enough valid inputs to process your Smart Contract</span>";
 
 namespace GUIUtil
 {
@@ -1059,5 +1059,35 @@ void formatToolButtons(QToolButton *btn1, QToolButton *btn2, QToolButton *btn3)
         btn->setIconSize(QSize(16, 16));
     }
 }
+
+
+QString handleAvailableInputInfo(const WalletModel *_model, const int64_t &gasAmount)
+{
+    if(_model == nullptr)
+        return availInputsErrorMessage.c_str();
+
+    map<QString, vector<COutput> > outputs;
+    _model->listCoins(outputs);
+    const std::size_t count = 
+        std::accumulate(std::begin(outputs),
+                        std::end(outputs),
+                        0,
+                        [&](const std::size_t previous,
+                            const std::pair<QString, vector<COutput> > &p) {
+                            return previous + 
+                                count_if(std::begin(p.second),
+                                         std::end(p.second),
+                                         [&](const COutput &output) {
+                                            return output.tx->vout[output.i].nValue > gasAmount;
+                                         }
+                                );
+                });
+
+    return count > 0 ?
+        QString("<span style=\"color: green;\">You have <b>%1</b> valid inputs to process your Smart Contract</span>").arg(count)
+        :
+        availInputsErrorMessage.c_str();
+}
+
 
 }// namespace GUIUtil

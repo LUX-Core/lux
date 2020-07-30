@@ -89,7 +89,12 @@ SendToContract::SendToContract(QWidget *parent) :
     ui->lineEditGasLimit->setValue(DEFAULT_GAS_LIMIT_OP_SEND);
     ui->textEditInterface->setIsValidManually(true);
     ui->pushButtonSendToContract->setEnabled(false);
-
+    connect(ui->lineEditGasPrice,
+        &BitcoinAmountField::valueChanged,
+        [&](){
+            ui->labelAvailInputInfo->setText(GUIUtil::handleAvailableInputInfo(m_model, ui->lineEditGasPrice->value()));
+        }
+    );
     // Create new PRC command line interface
     QStringList lstMandatory;
     lstMandatory.append(PARAM_ADDRESS);
@@ -138,6 +143,17 @@ void SendToContract::setModel(WalletModel *_model)
 {
     m_model = _model;
     m_contractModel = m_model->getContractTableModel();
+    connect(m_model, &WalletModel::balanceChanged, 
+        [&](const CAmount& balance,
+            const CAmount&,
+            const CAmount&,
+            const CAmount&,
+            const CAmount&,
+            const CAmount&,
+            const CAmount&){
+                ui->labelAvailInputInfo->setText(GUIUtil::handleAvailableInputInfo(m_model, ui->lineEditGasPrice->value()));
+        }
+    );
 }
 
 bool SendToContract::isValidContractAddress()

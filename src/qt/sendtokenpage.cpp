@@ -53,7 +53,12 @@ SendTokenPage::SendTokenPage(QWidget *parent) :
     ui->lineEditGasLimit->setMaximum(DEFAULT_GAS_LIMIT_OP_SEND);
     ui->lineEditGasLimit->setValue(DEFAULT_GAS_LIMIT_OP_SEND);
     ui->confirmButton->setEnabled(false);
-	
+	connect(ui->lineEditGasPrice,
+        &BitcoinAmountField::valueChanged,
+        [&](){
+            ui->labelAvailInputInfo->setText(GUIUtil::handleAvailableInputInfo(m_model, ui->lineEditGasPrice->value()));
+        }
+    );  
 	QSettings settings;
 	
 	if (settings.value("theme").toString() == "dark grey") {
@@ -92,6 +97,17 @@ SendTokenPage::~SendTokenPage()
 void SendTokenPage::setModel(WalletModel *_model)
 {
     m_model = _model;
+    connect(m_model, &WalletModel::balanceChanged, 
+        [&](const CAmount& balance,
+            const CAmount&,
+            const CAmount&,
+            const CAmount&,
+            const CAmount&,
+            const CAmount&,
+            const CAmount&){
+                ui->labelAvailInputInfo->setText(GUIUtil::handleAvailableInputInfo(m_model, ui->lineEditGasPrice->value()));
+        }
+    );
 }
 
 void SendTokenPage::setClientModel(ClientModel *_clientModel)
