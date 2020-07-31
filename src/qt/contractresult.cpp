@@ -14,7 +14,7 @@ ContractResult::ContractResult(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    connect(ui->toContractBook, SIGNAL(stateChanged(int)), SLOT(on_toContractBookStateChanged()));
+    connect(ui->toContractBook, SIGNAL(clicked(bool)), SLOT(on_toContractBookStateChanged()));
     connect(ui->okButton, SIGNAL(clicked()), SLOT(on_okButtonClicked()));
 }
 

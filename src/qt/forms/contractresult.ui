@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>941</width>
-    <height>503</height>
+    <width>588</width>
+    <height>345</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -180,19 +180,6 @@ background: transparent;
      </widget>
     </item>
     <item>
-     <spacer name="verticalSpacer">
-      <property name="orientation">
-       <enum>Qt::Vertical</enum>
-      </property>
-      <property name="sizeHint" stdset="0">
-       <size>
-        <width>20</width>
-        <height>40</height>
-       </size>
-      </property>
-     </spacer>
-    </item>
-    <item>
      <widget class="QGroupBox" name="groupContractBookOptional">
       <property name="enabled">
        <bool>true</bool>
@@ -202,28 +189,30 @@ background: transparent;
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_6">
        <item>
-        <widget class="QCheckBox" name="toContractBook">
-         <property name="text">
-          <string>Save contract to Contract Book</string>
-         </property>
-        </widget>
-       </item>
-       <item>
         <widget class="QWidget" name="widgetOptionalLabel" native="true">
          <layout class="QHBoxLayout" name="horizontalLayout_2">
           <property name="leftMargin">
            <number>2</number>
           </property>
           <item>
-           <widget class="QLabel" name="label">
+           <widget class="QPushButton" name="toContractBook">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>150</width>
+              <height>40</height>
+             </size>
+            </property>
             <property name="text">
-             <string>Contract label</string>
+             <string>Save Contract As</string>
             </property>
-            <property name="margin">
-             <number>-1</number>
-            </property>
-            <property name="indent">
-             <number>0</number>
+            <property name="checkable">
+             <bool>true</bool>
             </property>
            </widget>
           </item>
@@ -232,8 +221,14 @@ background: transparent;
             <property name="enabled">
              <bool>false</bool>
             </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>40</height>
+             </size>
+            </property>
             <property name="autoFillBackground">
-             <bool>true</bool>
+             <bool>false</bool>
             </property>
             <property name="maxLength">
              <number>150</number>
@@ -347,8 +342,8 @@ background: transparent;
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>889</width>
-            <height>76</height>
+            <width>98</width>
+            <height>28</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_4"/>
@@ -462,8 +457,8 @@ background: transparent;
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>889</width>
-            <height>76</height>
+            <width>98</width>
+            <height>28</height>
            </rect>
           </property>
          </widget>
