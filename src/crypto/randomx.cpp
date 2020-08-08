@@ -18,8 +18,8 @@
 uint256 GetRandomXSeed(const uint32_t& nHeight)
 {
     static uint256 current_key_block;
-    uint32_t SeedStartingHeight = Params().GetConsensus().RdxSeedHeight;
-    uint32_t SeedInterval = Params().GetConsensus().RdxSeedInterval;
+    uint32_t SeedStartingHeight = 0; //Params().GetConsensus().RdxSeedHeight;
+    uint32_t SeedInterval = 0; //Params().GetConsensus().RdxSeedInterval;
     uint32_t SwitchKey = SeedStartingHeight % SeedInterval;
 
 

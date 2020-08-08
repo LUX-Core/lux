@@ -15,10 +15,18 @@
 #include "versionbits.h"
 #include "crypto/randomx.h"
 
+uint256 CBlockHeader::GetGenesisHash() const
+{
+    return Phi1612(BEGIN(nVersion), END(nNonce));
+}
+
 uint256 CBlockHeader::GetHash(int nHeight) const
 {
-    bool randomxblock = (nHeight>=Params().SwitchRandomXBlock())? true:false;
-    bool phi2block    = (nHeight>=Params().SwitchPhi2Block() && randomxblock!=true)? true:false;
+//    std::cout << "Params().SwitchPhi2Block()" << Params().SwitchPhi2Block() << std::endl;
+//    std::cout << "Params().SwitchRandomXBlock()" << Params().SwitchRandomXBlock() << std::endl;
+
+    bool randomxblock = false; //(nHeight>=Params().SwitchRandomXBlock())? true:false;
+    bool phi2block    = false; //(nHeight>=Params().SwitchPhi2Block() && randomxblock!=true)? true:false;
  
 // phi2 algo
     if (phi2block && (nVersion & (1 << 30)))
