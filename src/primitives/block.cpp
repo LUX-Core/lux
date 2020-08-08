@@ -13,16 +13,34 @@
 #include "util.h"
 #include "chainparams.h"
 #include "versionbits.h"
+#include "crypto/randomx.h"
 
-uint256 CBlockHeader::GetHash(bool phi2block) const {
+uint256 CBlockHeader::GetHash(int nHeight) const
+{
+    bool randomxblock = (nHeight>=Params().SwitchRandomXBlock())? true:false;
+    bool phi2block    = (nHeight>=Params().SwitchPhi2Block() && randomxblock!=true)? true:false;
+ 
+// phi2 algo
     if (phi2block && (nVersion & (1 << 30)))
         return phi2_hash(BEGIN(nVersion), END(hashUTXORoot));
-    else if (nVersion > VERSIONBITS_LAST_OLD_BLOCK_VERSION && phi2block) {
+    
+    if (phi2block && (nVersion > VERSIONBITS_LAST_OLD_BLOCK_VERSION)) 
         return phi2_hash(BEGIN(nVersion), END(nNonce));
-    } else {
-        return Phi1612(BEGIN(nVersion), END(nNonce));
-    }
+ 
+// randomX algo
+    if (randomxblock) {
+ 
+     uint256 thisSeed = GetRandomXSeed(nHeight);
+//    barrysPreposterouslyNamedSeedHashFunction(nHeight, thisSeed);
+        uint256 thash;
+            std::cout << "seed " << thisSeed.GetHex().c_str() << "size of the seed " << strlen(thisSeed.GetHex().c_str()) << std::endl;
+        rx_slow_hash((char*)this,(char*)&thash,144,thisSeed);
+        return thash;
+    } 
+// for genesis hash and case the function is called without argument (nHeight==0)
+    return Phi1612(BEGIN(nVersion), END(nNonce));
 }
+
 
 uint256 CBlock::BuildMerkleTree(bool* fMutated) const
 {

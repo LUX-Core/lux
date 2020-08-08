@@ -1795,9 +1795,8 @@ bool GetTransaction(const uint256& hash, CTransaction& txOut, const Consensus::P
             }
 
             CBlockIndex* pindexPrev = LookupBlockIndex(header.hashPrevBlock);
-            bool usePhi2 = pindexPrev ? pindexPrev->nHeight + 1 >= Params().SwitchPhi2Block() : false;
-
-            hashBlock = header.GetHash(usePhi2);
+            int TheHeight = pindexPrev ? pindexPrev->nHeight + 1  : 0;
+            hashBlock = header.GetHash(TheHeight);
             if (txOut.GetHash() != hash)
                 return error("%s: txid mismatch", __func__);
             return true;
@@ -1879,7 +1878,7 @@ bool ReadBlockFromDisk(CBlock& block, const CDiskBlockPos& pos, int nHeight, con
 
     // Check the header
     if (block.IsProofOfWork()) {
-        if (!CheckProofOfWork(block.GetHash(nHeight >= Params().SwitchPhi2Block()), block.nBits, consensusParams))
+        if (!CheckProofOfWork(block.GetHash(nHeight), block.nBits, consensusParams))
             return error("ReadBlockFromDisk : Errors in block header");
     }
 
@@ -1893,7 +1892,7 @@ bool ReadBlockFromDisk(CBlock& block, const CBlockIndex* pindex, const Consensus
     if (!ReadBlockFromDisk(block, pindex->GetBlockPos(), pindex->nHeight, consensusParams))
         return false;
     //both phi1612 and phi2 hashes do not match indexed hash
-    if (block.GetHash() != pindex->GetBlockHash() && block.GetHash(true) != pindex->GetBlockHash()) {
+    if (block.GetHash() != pindex->GetBlockHash() && block.GetHash(pindex->nHeight) != pindex->GetBlockHash()) {
         LogPrintf("%s : block=%s index=%s\n", __func__, block.GetHash().GetHex(), pindex->GetBlockHash().GetHex());
         return error("ReadBlockFromDisk(CBlock&, CBlockIndex*) : GetHash() doesn't match index");
     }
@@ -3079,7 +3078,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
                             heightIndexes[key].first = CHeightTxIndexKey(pindex->nHeight, resultExec[k].execRes.newAddress);
                         }
                         heightIndexes[key].second.push_back(tx.GetHash());
-                        tri.push_back(TransactionReceiptInfo{block.GetHash(pindex->nHeight >= Params().SwitchPhi2Block()), uint32_t(pindex->nHeight), tx.GetHash(), uint32_t(i), resultConvertLuxTX.first[k].from(), resultConvertLuxTX.first[k].to(),
+                        tri.push_back(TransactionReceiptInfo{block.GetHash(pindex->nHeight), uint32_t(pindex->nHeight), tx.GetHash(), uint32_t(i), resultConvertLuxTX.first[k].from(), resultConvertLuxTX.first[k].to(),
                                                              countCumulativeGasUsed, uint64_t(resultExec[k].execRes.gasUsed), resultExec[k].execRes.newAddress, resultExec[k].txRec.log(), resultExec[k].execRes.excepted});
                     }
 
@@ -3186,9 +3185,8 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
         checkBlock.hashStateRoot = h256Touint(oldHashStateRoot);
         checkBlock.hashUTXORoot = h256Touint(oldHashUTXORoot);
 
-        bool usePhi2 = pindex->nHeight >= Params().SwitchPhi2Block();
         //If this error happens, it probably means that something with AAL created transactions didn't match up to what is expected
-        if ((checkBlock.GetHash(usePhi2) != block.GetHash(usePhi2)) && !fJustCheck) {
+        if ((checkBlock.GetHash(pindex->nHeight) != block.GetHash(pindex->nHeight)) && !fJustCheck) {
             LogPrintf("Actual block data does not match block expected by AAL\n");
             //Something went wrong with AAL, compare different elements and determine what the problem is
             if (checkBlock.hashMerkleRoot != block.hashMerkleRoot) {
@@ -3861,7 +3859,6 @@ bool ActivateBestChain(CValidationState& state, const CChainParams& chainparams,
         if (ShutdownRequested())
             break;
         bool fInitialDownload;
-        bool usePhi2 = false;
         while (true) {
             TRY_LOCK(cs_main, lockMain);
             if (!lockMain) {
@@ -3876,9 +3873,9 @@ bool ActivateBestChain(CValidationState& state, const CChainParams& chainparams,
                 return true;
 
             //Active chain's tip will be updated after ActivateBestChainStep, when block is added, so add 1 to active height
-            usePhi2 = chainActive.Height() + 1 >= Params().SwitchPhi2Block();
+            
 
-            if (!ActivateBestChainStep(state, chainparams, pindexMostWork, pblock && pblock->GetHash(usePhi2) == pindexMostWork->GetBlockHash() ? pblock : NULL))
+            if (!ActivateBestChainStep(state, chainparams, pindexMostWork, pblock && pblock->GetHash(chainActive.Height() + 1) == pindexMostWork->GetBlockHash() ? pblock : NULL))
                 return false;
 
             pindexNewTip = chainActive.Tip();
@@ -3991,10 +3988,10 @@ bool ReconsiderBlock(CValidationState& state, CBlockIndex* pindex)
 CBlockIndex* AddToBlockIndex(const CBlock& block)
 {
     CBlockIndex* pindexPrev = LookupBlockIndex(block.hashPrevBlock);
-    bool usePhi2 = pindexPrev ? pindexPrev->nHeight + 1 >= Params().SwitchPhi2Block() : false;
 
+    int Height = pindexPrev ? pindexPrev->nHeight + 1 : 0;
     // Check for duplicate
-    uint256 hash = block.GetHash(usePhi2);
+    uint256 hash = block.GetHash(Height);
     CBlockIndex* pindex = LookupBlockIndex(hash);
     if (pindex)
         return pindex;
@@ -4194,13 +4191,11 @@ bool FindUndoPos(CValidationState& state, int nFile, CDiskBlockPos& pos, unsigne
 
 bool CheckBlockHeader(const CBlockHeader& block, CValidationState& state, const Consensus::Params& consensusParams, bool fCheckPOW) {
     // Get prev block index
-    bool usePhi2 = false;
     int nBlockHeight = 0;
     const CChainParams& chainparams = Params();
     CBlockIndex* pindexPrev = LookupBlockIndex(block.hashPrevBlock);
     if (pindexPrev) {
         nBlockHeight = pindexPrev->nHeight + 1;
-        usePhi2 = nBlockHeight >= chainparams.SwitchPhi2Block();
         bool isScVersioned = block.nVersion & (1 << consensusParams.vDeployments[Consensus::SMART_CONTRACTS_HARDFORK].bit);
         if (nBlockHeight >= chainparams.FirstSCBlock() && !isScVersioned) {
             return error("invalid block version after smart-contract hardfork");
@@ -4211,7 +4206,7 @@ bool CheckBlockHeader(const CBlockHeader& block, CValidationState& state, const 
     }
 
     // Check proof of work matches claimed amount
-    if (fCheckPOW && !CheckProofOfWork(block.GetHash(usePhi2), block.nBits, consensusParams))
+    if (fCheckPOW && !CheckProofOfWork(block.GetHash(nBlockHeight), block.nBits, consensusParams))
         return state.DoS(50, false, REJECT_INVALID, "high-hash", false, "proof of work failed");
     return true;
 }
@@ -4229,8 +4224,7 @@ bool CheckForMasternodePayment(const CTransaction& tx, const CBlockHeader& heade
 
     const CBlockIndex* pindexPrev = LookupBlockIndex(header.hashPrevBlock);
     const int nHeight = pindexPrev ? pindexPrev->nHeight + 1 : 0;
-    bool usePhi2 = nHeight >= chainParams.SwitchPhi2Block();
-
+    
     //Skip for mint
 
     if (nHeight == chainParams.PreminePayment()) {
@@ -4242,7 +4236,7 @@ bool CheckForMasternodePayment(const CTransaction& tx, const CBlockHeader& heade
     // so that why we can't verify if tx from this block was actually rewards the masternode and doesn't
     // simply split the block subsidy which AFAIK and some pools do.
     // So, if we found a block in the block index, then return true as if this tx has a valid masternode payment.
-    const CBlockIndex* pindex = LookupBlockIndex(header.GetHash(usePhi2));
+    const CBlockIndex* pindex = LookupBlockIndex(header.GetHash(nHeight));
     if (pindex)
         return true;
 
@@ -4488,7 +4482,7 @@ bool CheckWork(const CBlock &block, CBlockIndex* const pindexPrev)
 
     if (block.IsProofOfStake()) {
         uint256 hashProofOfStake, proof;
-        uint256 hash = block.GetHash(pindexPrev->nHeight + 1 >= chainParams.SwitchPhi2Block());
+        uint256 hash = block.GetHash(pindexPrev->nHeight + 1);
         if (!stake->CheckProof(pindexPrev, block, hashProofOfStake)) {
             return error("%s: invalid proof-of-stake (block %s)", __func__, hash.GetHex());
         }
@@ -4508,7 +4502,7 @@ bool ContextualCheckBlockHeader(const CBlockHeader& block, CValidationState& sta
     const CChainParams& chainParams = Params();
     uint256 hash;
     if (pindexPrev) {
-        hash = block.GetHash(pindexPrev->nHeight + 1 >= Params().SwitchPhi2Block());
+        hash = block.GetHash(pindexPrev->nHeight + 1);
     } else {
         hash = block.GetHash();
     }
@@ -4678,16 +4672,14 @@ bool AcceptBlockHeader(const CBlock& block, CValidationState& state, const CChai
 
     // Get prev block index
     CBlockIndex* pindexPrev = LookupBlockIndex(block.hashPrevBlock);
-    bool usePhi2 = false;
-    if (pindexPrev) {
-        usePhi2 = pindexPrev->nHeight + 1 >= Params().SwitchPhi2Block();
-    } else {
+
+    if (!pindexPrev) {
         if (block.GetHash() != Params().GenesisBlock().GetHash())
             return state.DoS(0, error("%s : prev block %s not found", __func__, block.hashPrevBlock.GetHex()), 0, "bad-prevblk");
     }
 
     // Check for duplicate
-    uint256 hash = block.GetHash(usePhi2);
+    uint256 hash = block.GetHash(pindexPrev->nHeight + 1);
     CBlockIndex* pindex = LookupBlockIndex(hash);
 
     // TODO : ENABLE BLOCK CACHE IN SPECIFIC CASES
@@ -4885,7 +4877,6 @@ void CBlockIndex::BuildSkip()
 bool ProcessNewBlock(CValidationState& state, const CChainParams& chainparams, CNode* pfrom, const CBlock* pblock, CDiskBlockPos* dbp)
 {
     int nHeight = chainActive.Height() + 1;
-    bool usePhi2 = false;
     bool alreadyAccepted = false;
 
     // Do not accept the peers having older versions when the fork happens
@@ -4919,8 +4910,7 @@ bool ProcessNewBlock(CValidationState& state, const CChainParams& chainparams, C
             return false;
         } else {
             nHeight = pindexPrev->nHeight + 1;
-            usePhi2 = nHeight >= Params().SwitchPhi2Block();
-            alreadyAccepted = (LookupBlockIndex(pblock->GetHash(usePhi2)) != nullptr);
+            alreadyAccepted = (LookupBlockIndex(pblock->GetHash(nHeight)) != nullptr);
         }
     }
 
@@ -4938,7 +4928,7 @@ bool ProcessNewBlock(CValidationState& state, const CChainParams& chainparams, C
             continue;
         }
 
-        MarkBlockAsReceived(pblock->GetHash(usePhi2));
+        MarkBlockAsReceived(pblock->GetHash(nHeight));
 
         // Store to disk
         bool ret = AcceptBlock(*pblock, state, chainparams, &pindex, dbp);
@@ -5477,9 +5467,9 @@ bool LoadExternalBlockFile(const CChainParams& chainparams, FILE* fileIn, CDiskB
                     continue;
                 }
 
-                bool usePhi2 = pindexPrev ? pindexPrev->nHeight + 1 >= Params().SwitchPhi2Block() : false;
-                if (usePhi2) {
-                    hash = block.GetHash(usePhi2);
+                int TheHeight = pindexPrev ? pindexPrev->nHeight + 1 : 0;
+                if (pindexPrev) {
+                    hash = block.GetHash(TheHeight);
                 }
 
                 // process in case the block isn't known yet
@@ -5504,17 +5494,17 @@ bool LoadExternalBlockFile(const CChainParams& chainparams, FILE* fileIn, CDiskB
                     while (range.first != range.second) {
                         std::multimap<uint256, CDiskBlockPos>::iterator it = range.first;
                         pindexPrev = LookupBlockIndex(block.hashPrevBlock);
-                        usePhi2 = pindexPrev ? pindexPrev->nHeight + 1 >= Params().SwitchPhi2Block() : false;
-                        hash = block.GetHash(usePhi2);
+                        TheHeight = pindexPrev ? pindexPrev->nHeight + 1 : 0;
+                        hash = block.GetHash(TheHeight);
                         int nHeight = mapBlockIndex[hash] ? mapBlockIndex[hash]->nHeight : pindexPrev->nHeight;
                         if (ReadBlockFromDisk(block, it->second, nHeight, chainparams.GetConsensus())) {
                             LogPrintf("%s: Processing out of order child %s of %s\n", __func__,
-                                      block.GetHash(usePhi2).ToString(),
+                                      block.GetHash(TheHeight).ToString(),
                                       head.ToString());
                             CValidationState dummy;
                             if (ProcessNewBlock(dummy, chainparams, NULL, &block, &it->second)) {
                                 nLoaded++;
-                                queue.push_back(block.GetHash(usePhi2));
+                                queue.push_back(block.GetHash(TheHeight));
                             }
                         }
                         range.first++;
@@ -6540,9 +6530,9 @@ static bool ProcessMessage(CNode* pfrom, const string &strCommand, CDataStream& 
         vRecv >> block;
 
         CBlockIndex* pindexPrev = LookupBlockIndex(block.hashPrevBlock);
-        bool usePhi2 = pindexPrev ? pindexPrev->nHeight + 1 >= Params().SwitchPhi2Block() : false;
+        int TheHeight = pindexPrev ? pindexPrev->nHeight + 1 : 0 ;
 
-        uint256 hashBlock = block.GetHash(usePhi2);
+        uint256 hashBlock = block.GetHash(TheHeight);
         CInv inv(MSG_BLOCK, hashBlock);
         LogPrint("net", "received block %s peer=%d\n", inv.hash.ToString(), pfrom->id);
 
@@ -7393,11 +7383,11 @@ UniValue vmLogToJSON(const ResultExecute& execRes, const CTransaction& tx, const
     result.push_back(Pair("address", execRes.execRes.newAddress.hex()));
 
     CBlockIndex* pindexPrev = LookupBlockIndex(block.hashPrevBlock);
-    bool usePhi2 = pindexPrev ? pindexPrev->nHeight + 1 >= Params().SwitchPhi2Block() : false;
+    int TheHeight = pindexPrev ? pindexPrev->nHeight + 1 : 0;
 
-    if(block.GetHash(usePhi2) != CBlock().GetHash(usePhi2)){
+    if(block.GetHash(TheHeight) != CBlock().GetHash(TheHeight)){
         result.push_back(Pair("time", block.GetBlockTime()));
-        result.push_back(Pair("blockhash", block.GetHash(usePhi2).GetHex()));
+        result.push_back(Pair("blockhash", block.GetHash(TheHeight).GetHex()));
         result.push_back(Pair("blockheight", chainActive.Height() + 1));
     } else {
         result.push_back(Pair("time", GetAdjustedTime()));

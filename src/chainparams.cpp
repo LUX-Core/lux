@@ -128,6 +128,8 @@ public:
         consensus.nRuleChangeActivationThreshold = 1026; // 95% of 1080 is 1026
         consensus.nMinerConfirmationWindow = 1080; // nPowTargetTimespan / nPowTargetSpacing
         consensus.nLastPOWBlock = 6000000;
+        consensus.RdxSeedHeight = 2000000;
+        consensus.RdxSeedInterval = 1345; //seed changes every day based on average total block time
         // Deployment of SegWit (BIP141 and BIP143)
         consensus.vDeployments[Consensus::DEPLOYMENT_SEGWIT].bit = 1;
         consensus.vDeployments[Consensus::DEPLOYMENT_SEGWIT].nStartTime = 1530428034; // 01/07/2018
@@ -144,6 +146,7 @@ public:
         consensus.vDeployments[Consensus::SMART_CONTRACTS_HARDFORK].bit = 30;
 
         nSwitchPhi2Block = 299501;
+        nSwitchRandomXBlock = 1153400; /// dunno the value 
         nFirstSCBlock = 350000;
         nPruneAfterHeight = 300000;
         nSplitRewardBlock = 300000;
@@ -277,7 +280,8 @@ public:
         consensus.vDeployments[Consensus::DEPLOYMENT_CSV].nStartTime = 577836800;
         consensus.vDeployments[Consensus::DEPLOYMENT_CSV].nTimeout = 2577836900; // Never / undefined
         consensus.nLastPOWBlock = 6000000;
-
+        consensus.RdxSeedHeight = 0;  // starting on 
+        consensus.RdxSeedInterval = 5; //seed changes every 5 blocks (testnet)
         networkID = CBaseChainParams::TESTNET;
         strNetworkID = "test";
         pchMessageStart[0] = 0x54;
@@ -320,11 +324,12 @@ public:
 //        std::cout << genesis.GetHash().GetHex() << std::endl;
 //        std::cout << genesis.hashMerkleRoot.GetHex() << std::endl;
 
-        nSwitchPhi2Block = 30;
-        nSplitRewardBlock = 500000;
-        nPruneAfterHeight = 500000;
-        nFirstSCBlock = 40;
-        nPreminePaymentandHardForkBlock = 500000;
+        nSwitchPhi2Block = 20;
+        nSwitchRandomXBlock = 25; /// dunno the value 
+        nSplitRewardBlock = 15;
+        nPruneAfterHeight = 5000;
+        nFirstSCBlock = 20;
+        nPreminePaymentandHardForkBlock = 50000;
 
         consensus.hashGenesisBlock = genesis.GetHash();
 
@@ -408,6 +413,7 @@ public:
         consensus.powLimit = ~uint256(0) >> 1;
         nPreminePaymentandHardForkBlock = 60;
         nSwitchPhi2Block = 299501;
+        nSwitchRandomXBlock = 650000; /// dunno the value 
         nFirstSCBlock = 350000;
         nSplitRewardBlock = 50;
 
@@ -505,6 +511,7 @@ public:
         consensus.nLastPOWBlock = 6000000;
 
         nSwitchPhi2Block = 1200;
+        nSwitchRandomXBlock = 1300; /// dunno the value 
         //nFirstSCBlock = 300000;
         //nPruneAfterHeight = 100000;
 

@@ -23,6 +23,7 @@
 #include "script/script_error.h"
 #include "validationinterface.h"
 #include "versionbits.h"
+#include "crypto/randomx.h"
 #ifdef ENABLE_WALLET
 #include "db.h"
 #include "wallet.h"
@@ -259,7 +260,14 @@ UniValue getmininginfo(const UniValue& params, bool fHelp)
     obj.push_back(Pair("pooledtx", (uint64_t)mempool.size()));
     obj.push_back(Pair("testnet", Params().NetworkIDString() != "main"));
     obj.push_back(Pair("chain", Params().NetworkIDString()));
-    obj.push_back(Pair("algo", (chainActive.Height()+1) < Params().SwitchPhi2Block() ? "phi1612" : "phi2"));
+    if ((chainActive.Height()+1) < Params().SwitchPhi2Block())
+        obj.push_back(Pair("algo", "phi1612"));
+    else if ((chainActive.Height()+1) < Params().SwitchRandomXBlock())
+        obj.push_back(Pair("algo", "phi2"));
+    else
+        obj.push_back(Pair("algo", "randomx"));
+
+
     obj.push_back(Pair("segwit", IsWitnessEnabled(chainActive.Tip(), Params().GetConsensus()) ));
 #ifdef ENABLE_CPUMINER
     obj.push_back(Pair("generate", getgenerate(params, false)));
@@ -447,9 +455,9 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
                 throw JSONRPCError(RPC_DESERIALIZATION_ERROR, "Block decode failed");
 
             CBlockIndex* pindexPrev = LookupBlockIndex(block.hashPrevBlock);
-            bool usePhi2 = pindexPrev ? pindexPrev->nHeight + 1 >= Params().SwitchPhi2Block() : false;
+            int TheHeight = pindexPrev ? pindexPrev->nHeight + 1  : 0;
 
-            uint256 hash = block.GetHash(usePhi2);
+            uint256 hash = block.GetHash(TheHeight);
             CBlockIndex* pindex = LookupBlockIndex(hash);
             if (pindex) {
                 if (pindex->IsValid(BLOCK_VALID_SCRIPTS))
@@ -748,6 +756,9 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
         result.push_back(Pair("utxoroot", pblock->hashUTXORoot.GetHex()));
         result.push_back(Pair("screfund", scrObjArray));
     }
+    //randomX keyHash
+    uint256 seedHash = GetRandomXSeed(nHeight);
+    result.push_back(Pair("seed",seedHash.ToString().c_str()));
 
     result.push_back(Pair("transactions", transactions));
     result.push_back(Pair("coinbaseaux", aux));
@@ -883,7 +894,13 @@ UniValue getwork(const UniValue& params, bool fHelp) {
         uint256 hashTarget = uint256().SetCompact(pblock->nBits);
 
         UniValue result(UniValue::VOBJ);
-        result.push_back(Pair("algo", (chainActive.Height()+1) < Params().SwitchPhi2Block() ? "phi1612" : "phi2"));
+        if ((chainActive.Height()+1) < Params().SwitchPhi2Block())
+        result.push_back(Pair("algo", "phi1612"));
+        else if ((chainActive.Height()+1) < Params().SwitchRandomXBlock())
+        result.push_back(Pair("algo", "phi2"));
+        else
+        result.push_back(Pair("algo", "randomx"));
+
         result.push_back(Pair("midstate", HexStr(BEGIN(pmidstate), END(pmidstate))));
         if (pblock->nVersion & (1 << 30))
             result.push_back(Pair("data", HexStr(BEGIN(pdata), END(pdata))));
@@ -930,15 +947,15 @@ class submitblock_StateCatcher : public CValidationInterface
 public:
     uint256 hash;
     bool found;
-    bool usePhi2;
+    int  nHeight;
     CValidationState state;
 
-    submitblock_StateCatcher(const uint256& hashIn, bool usePhi2) : hash(hashIn), found(false), usePhi2(usePhi2), state(){};
+    submitblock_StateCatcher(const uint256& hashIn, int TheHeight) : hash(hashIn), found(false), nHeight(TheHeight), state(){};
 
 protected:
     virtual void BlockChecked(const CBlock& block, const CValidationState& stateIn)
     {
-        if (block.GetHash(usePhi2) != hash)
+        if (block.GetHash(nHeight) != hash)
             return;
         found = true;
         state = stateIn;
@@ -971,14 +988,15 @@ UniValue submitblock(const UniValue& params, bool fHelp)
     }
 
     CValidationState state;
-    bool usePhi2, fBlockPresent = false;
+    bool fBlockPresent = false;
+    int TheHeight = 0;
     {
         LOCK(cs_main);
         CBlockIndex* pindexPrev = LookupBlockIndex(block.hashPrevBlock);
         UpdateUncommittedBlockStructures(block, pindexPrev, Params().GetConsensus());
 
-        usePhi2 = pindexPrev ? pindexPrev->nHeight + 1 >= Params().SwitchPhi2Block() : false;
-        uint256 hash = block.GetHash(usePhi2);
+        TheHeight = pindexPrev ? pindexPrev->nHeight + 1 : 0;
+        uint256 hash = block.GetHash(TheHeight);
         CBlockIndex* pindex = LookupBlockIndex(hash);
         if (pindex) {
             if (pindex->IsValid(BLOCK_VALID_SCRIPTS)) {
@@ -999,7 +1017,7 @@ UniValue submitblock(const UniValue& params, bool fHelp)
         }
     }
 
-    submitblock_StateCatcher sc(block.GetHash(usePhi2), usePhi2);
+    submitblock_StateCatcher sc(block.GetHash(TheHeight), TheHeight);
     RegisterValidationInterface(&sc);
     bool fAccepted = ProcessNewBlock(state, Params(), NULL, &block);
     UnregisterValidationInterface(&sc);

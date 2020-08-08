@@ -3346,9 +3346,7 @@ UniValue generateBlocks(std::shared_ptr<CReserveScript> coinbaseScript, int nGen
             IncrementExtraNonce(pblock, chainActive.Tip(), nExtraNonce);
         }
 
-	bool usePhi2 = nHeight + 1 >= Params().SwitchPhi2Block();
-
-        while (nMaxTries > 0 && pblock->nNonce < nInnerLoopCount && !CheckProofOfWork(pblock->GetHash(usePhi2), pblock->nBits, Params().GetConsensus())) {
+        while (nMaxTries > 0 && pblock->nNonce < nInnerLoopCount && !CheckProofOfWork(pblock->GetHash(nHeight + 1), pblock->nBits, Params().GetConsensus())) {
             ++pblock->nNonce;
             --nMaxTries;
         }

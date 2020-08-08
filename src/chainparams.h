@@ -108,6 +108,7 @@ public:
     CBaseChainParams::Network NetworkID() const { return networkID; }
     int FirstSCBlock() const { return nFirstSCBlock; }
     int SwitchPhi2Block() const { return nSwitchPhi2Block; }
+    int SwitchRandomXBlock() const { return nSwitchRandomXBlock;}
     int64_t PruneAfterHeight() const { return nPruneAfterHeight; }
     int FirstSplitRewardBlock() const { return nSplitRewardBlock; }
     
@@ -155,6 +156,7 @@ protected:
     int64_t nStakingMinAge;
     int nFirstSCBlock;
     int nSwitchPhi2Block;
+    int nSwitchRandomXBlock;
     int nSplitRewardBlock;
     int nPreminePaymentandHardForkBlock;
     uint64_t nPruneAfterHeight;
