@@ -72,10 +72,12 @@ bool CheckProofOfWork(uint256 hash, unsigned int nBits, const Consensus::Params&
 
     bnTarget.SetCompact(nBits, &fNegative, &fOverflow);
 
+    std::cout << " solution " << hash.GetHex() << " bnTarget " <<  bnTarget.GetHex() << std::endl;
     // Check range
-    if (fNegative || bnTarget == 0 || fOverflow || bnTarget > Params().ProofOfWorkLimit()) 
+    if (fNegative || bnTarget == 0 || fOverflow || bnTarget > Params().ProofOfWorkLimit()) {
+        std::cout << "doesn't passed first check " << std::endl;
         return false; //error("CheckProofOfWork() : nBits below minimum work");
-    
+    }
     // Check proof of work matches claimed amount
     if (hash > bnTarget) 
         return false; //error("CheckProofOfWork() : hash doesn't match nBits");

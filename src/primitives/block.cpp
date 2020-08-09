@@ -25,6 +25,8 @@ uint256 CBlockHeader::GetHash(int nHeight) const
     bool randomxblock = (nHeight>=Params().SwitchRandomXBlock())? true:false;
     bool phi2block    = (nHeight>=Params().SwitchPhi2Block() && randomxblock!=true)? true:false;
  
+
+
 // phi2 algo
     if (phi2block && (nVersion & (1 << 30)))
         return phi2_hash(BEGIN(nVersion), END(hashUTXORoot));
@@ -38,7 +40,7 @@ uint256 CBlockHeader::GetHash(int nHeight) const
      uint256 thisSeed = GetRandomXSeed(nHeight);
 //    barrysPreposterouslyNamedSeedHashFunction(nHeight, thisSeed);
         uint256 thash;
-            std::cout << "seed " << thisSeed.GetHex().c_str() << "size of the seed " << strlen(thisSeed.GetHex().c_str()) << std::endl;
+            std::cout << "height " << nHeight << " seed " << thisSeed.GetHex().c_str() << "size of the seed " << strlen(thisSeed.GetHex().c_str()) << std::endl;
         rx_slow_hash((char*)this,(char*)&thash,144,thisSeed);
         return thash;
     } 

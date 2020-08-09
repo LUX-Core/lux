@@ -29,10 +29,10 @@ uint256 GetRandomXSeed(const uint32_t& nHeight)
     auto second_check = nHeight - SeedInterval - remainer;
 
     if (nHeight > nHeight - remainer + SwitchKey) {
-        if (chainActive.Height() > first_check)
+        if ( nHeight  > first_check)
             current_key_block = chainActive[first_check-SeedStartingHeight]->GetBlockHash();
     } else {
-        if (chainActive.Height() > second_check)
+        if ( nHeight  > second_check)
             current_key_block = chainActive[second_check-SeedStartingHeight]->GetBlockHash();
     }
 
