@@ -281,7 +281,6 @@ public:
         consensus.vDeployments[Consensus::DEPLOYMENT_CSV].nStartTime = 577836800;
         consensus.vDeployments[Consensus::DEPLOYMENT_CSV].nTimeout = 2577836900; // Never / undefined
         
-
         consensus.nLastPOWBlock = 6000000;
         consensus.RdxSeedHeight = 0;  // starting on 
         consensus.RdxSeedInterval = 5; //seed changes every 5 blocks (testnet)
@@ -357,7 +356,7 @@ public:
         bech32_hrp = "tb";
 
         vFixedSeeds = std::vector<SeedSpec6>(pnSeed6_test, pnSeed6_test + ARRAYLEN(pnSeed6_test));
-        fMiningRequiresPeers = true;
+        fMiningRequiresPeers = false;
         fDefaultConsistencyChecks = false;
         fRequireStandard = true;
         fMineBlocksOnDemand = false;

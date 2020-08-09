@@ -18,8 +18,7 @@
 
 uint256 CBlockHeader::GetHash(int nHeight) const
 {
-//    std::cout << "Params().SwitchPhi2Block()" << Params().SwitchPhi2Block() << std::endl;
-//    std::cout << "Params().SwitchRandomXBlock()" << Params().SwitchRandomXBlock() << std::endl;
+ 
     if (nHeight==0)
     return Phi1612(BEGIN(nVersion), END(nNonce));
 

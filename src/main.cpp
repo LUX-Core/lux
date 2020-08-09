@@ -4222,6 +4222,10 @@ bool CheckForMasternodePayment(const CTransaction& tx, const CBlockHeader& heade
     if (header.GetHash() == chainParams.HashGenesisBlock())
         return true;
 
+    // Not required for testnet - only optional
+    if (chainParams.NetworkID() == CBaseChainParams::TESTNET)
+        return true;
+
     const CBlockIndex* pindexPrev = LookupBlockIndex(header.hashPrevBlock);
     const int nHeight = pindexPrev ? pindexPrev->nHeight + 1 : 0;
     
