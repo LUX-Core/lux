@@ -266,7 +266,8 @@ public:
         //consensus.BIP34Height = 227931;
         //consensus.BIP34Hash = uint256S("0x000000000000024b89b42a942fe0d9fea3bb44ab7bd1b19115dd6a759c0808b8");
         
-        consensus.powLimit = ~uint256(0) >> 10; // LUX starting difficulty is 1 / 2^12
+//        consensus.powLimit = ~uint256(0) >> 10; // LUX starting difficulty is 1 / 2^12
+        consensus.powLimit = uint256S("0x7fff000000000000000000000000000000000000000000000000000000000000");
         consensus.nPowTargetTimespan = 30 * 60; //36 * 60 * 60; // LUX: 1 36hrs
         consensus.nPowTargetSpacing = 2 * 60;  // LUX: 2 minute
         consensus.fPowAllowMinDifficultyBlocks = false;
@@ -327,10 +328,10 @@ public:
 //        std::cout << genesis.hashMerkleRoot.GetHex() << std::endl;
 
         nSwitchPhi2Block = 20;
-        nSwitchRandomXBlock = 25; /// dunno the value 
-        nSplitRewardBlock = 15;
+        nSwitchRandomXBlock = 30; /// dunno the value 
+        nSplitRewardBlock = 5000;
         nPruneAfterHeight = 5000;
-        nFirstSCBlock = 20;
+        nFirstSCBlock = 25;
         nPreminePaymentandHardForkBlock = 50000;
 
         consensus.hashGenesisBlock = genesis.GetHash();
@@ -371,7 +372,7 @@ public:
         nStartMasternodePayments = 1528954643; //Fri, 09 Jan 2015 21:05:58 GMT
 
         nStakingRoundPeriod = 120; // 5 seconds a round
-        nStakingInterval = 22; // 30 seconds
+        nStakingInterval = 120; // 30 seconds
         nStakingMinAge = 360; // 6 minutes
     }
     const Checkpoints::CCheckpointData& Checkpoints() const

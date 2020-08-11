@@ -16,7 +16,7 @@
 #include "crypto/randomx.h"
 
 
-uint256 CBlockHeader::GetHash(int nHeight) const
+uint256 CBlockHeader::GetHash(int nHeight,bool Mining) const
 {
  
     if (nHeight==0)
@@ -41,7 +41,11 @@ uint256 CBlockHeader::GetHash(int nHeight) const
 //    barrysPreposterouslyNamedSeedHashFunction(nHeight, thisSeed);
         uint256 thash;
             std::cout << "height " << nHeight << " seed " << thisSeed.GetHex().c_str() << "size of the seed " << strlen(thisSeed.GetHex().c_str()) << std::endl;
+    if (Mining)        
         rx_slow_hash((char*)this,(char*)&thash,144,thisSeed);
+    else 
+        rx_slow_hash2((char*)this,(char*)&thash,144,thisSeed);
+
         return thash;
     } 
 // for genesis hash and case the function is called without argument (nHeight==0)

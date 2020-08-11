@@ -3337,6 +3337,8 @@ UniValue generateBlocks(std::shared_ptr<CReserveScript> coinbaseScript, int nGen
     UniValue blockHashes(UniValue::VARR);
     while (nHeight < nHeightEnd)
     {
+        nHeight = chainActive.Height();
+        nHeightEnd = nHeight+nGenerate;
         std::unique_ptr<CBlockTemplate> pblocktemplate(BlockAssembler(Params()).CreateNewBlock(coinbaseScript->reserveScript, true, false, 0, 0, 0, true));
         if (!pblocktemplate.get())
             throw JSONRPCError(RPC_INTERNAL_ERROR, "Couldn't create new block");
@@ -3346,10 +3348,18 @@ UniValue generateBlocks(std::shared_ptr<CReserveScript> coinbaseScript, int nGen
             IncrementExtraNonce(pblock, chainActive.Tip(), nExtraNonce);
         }
 
-        while (nMaxTries > 0 && pblock->nNonce < nInnerLoopCount && !CheckProofOfWork(pblock->GetHash(nHeight + 1), pblock->nBits, Params().GetConsensus())) {
+        while (nMaxTries > 0 && pblock->nNonce < nInnerLoopCount 
+        && chainActive.Height() == nHeight
+        && !ShutdownRequested()
+        && !CheckProofOfWork(pblock->GetHash(nHeight + 1,true), pblock->nBits, Params().GetConsensus())) {
+            std::cout << "chainactiveheight " << chainActive.Height() << std::endl;
             ++pblock->nNonce;
             --nMaxTries;
-        }
+        } 
+        
+        if (!CheckProofOfWork(pblock->GetHash(nHeight + 1,true), pblock->nBits, Params().GetConsensus()))
+            continue;
+
         if (nMaxTries == 0) {
             break;
         }
