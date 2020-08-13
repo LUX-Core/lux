@@ -114,6 +114,7 @@ bool CBlockTreeDB::WriteBatchSync(const std::vector<std::pair<int, const CBlockF
 
 bool CBlockTreeDB::WriteBlockIndex(const CDiskBlockIndex& blockindex)
 {
+
     auto const &hash = blockindex.GetBlockHash();
     if (blockindex.IsProofOfStake()) {
         if (blockindex.hashProofOfStake == 0) {
@@ -537,11 +538,15 @@ bool CBlockTreeDB::LoadBlockIndexGuts()
 
                 bool isPoW = (diskindex.nNonce != 0) && pindexNew->nHeight <= Params().LAST_POW_BLOCK();
                 if (isPoW) {
-                    auto const &hash(pindexNew->GetBlockHash());
-                    if (!CheckProofOfWork(hash, pindexNew->nBits, Params().GetConsensus())) {
+//                    auto const &hash(pindexNew->phashBlock);
+                    const uint256 *hash = pindexNew->phashBlock;                    
+                //    auto const &hash(pindexNew->GetBlockHeader().GetHash(pindexNew->nHeight,1));
+/*                    
+                    if (!CheckProofOfWork(hash[0], pindexNew->nBits, Params().GetConsensus())) {
                         unsigned int nBits = pindexPrev ? pindexPrev->nBits : 0;
-                        return error("%s: CheckProofOfWork failed: %d %s (%d, %d)", __func__, pindexNew->nHeight, hash.GetHex(), pindexNew->nBits, nBits);
+                        return error("%s: CheckProofOfWork failed: %d %s (%d, %d)", __func__, pindexNew->nHeight, hash[0].GetHex(), pindexNew->nBits, nBits);
                     }
+*/                    
                 } else {
                     stake->MarkStake(pindexNew->prevoutStake, pindexNew->nStakeTime);
                     auto const &hash(pindexNew->GetBlockHash());

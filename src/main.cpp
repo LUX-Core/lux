@@ -1862,6 +1862,7 @@ bool WriteBlockToDisk(const CBlock& block, CDiskBlockPos& pos)
 
 bool ReadBlockFromDisk(CBlock& block, const CDiskBlockPos& pos, int nHeight, const Consensus::Params& consensusParams)
 {
+ 
     block.SetNull();
 
     // Open history file to read
@@ -1878,7 +1879,7 @@ bool ReadBlockFromDisk(CBlock& block, const CDiskBlockPos& pos, int nHeight, con
 
     // Check the header
     if (block.IsProofOfWork()) {
-        if (!CheckProofOfWork(block.GetHash(nHeight), block.nBits, consensusParams))
+        if (!CheckProofOfWork(block.GetHash(nHeight,2), block.nBits, consensusParams))
             return error("ReadBlockFromDisk : Errors in block header");
     }
 
@@ -1889,10 +1890,11 @@ bool ReadBlockFromDisk(CBlock& block, const CDiskBlockPos& pos, int nHeight, con
 }
 
 bool ReadBlockFromDisk(CBlock& block, const CBlockIndex* pindex, const Consensus::Params& consensusParams) {
+  
     if (!ReadBlockFromDisk(block, pindex->GetBlockPos(), pindex->nHeight, consensusParams))
         return false;
     //both phi1612 and phi2 hashes do not match indexed hash
-    if (block.GetHash() != pindex->GetBlockHash() && block.GetHash(pindex->nHeight) != pindex->GetBlockHash()) {
+    if (block.GetHash() != pindex->GetBlockHash() && block.GetHash(pindex->nHeight,2) != pindex->GetBlockHash()  && block.GetHash(pindex->nHeight) != pindex->GetBlockHash()) {
         LogPrintf("%s : block=%s index=%s\n", __func__, block.GetHash().GetHex(), pindex->GetBlockHash().GetHex());
         return error("ReadBlockFromDisk(CBlock&, CBlockIndex*) : GetHash() doesn't match index");
     }
@@ -3991,7 +3993,8 @@ CBlockIndex* AddToBlockIndex(const CBlock& block)
 
     int Height = pindexPrev ? pindexPrev->nHeight + 1 : 0;
     // Check for duplicate
-    uint256 hash = block.GetHash(Height);
+ 
+    uint256 hash = /*(block.IsProofOfWork()) ?  block.GetHash(Height,2):*/block.GetHash(Height);
     CBlockIndex* pindex = LookupBlockIndex(hash);
     if (pindex)
         return pindex;
@@ -4191,6 +4194,7 @@ bool FindUndoPos(CValidationState& state, int nFile, CDiskBlockPos& pos, unsigne
 
 bool CheckBlockHeader(const CBlockHeader& block, CValidationState& state, const Consensus::Params& consensusParams, bool fCheckPOW) {
     // Get prev block index
+      
     int nBlockHeight = 0;
     const CChainParams& chainparams = Params();
     CBlockIndex* pindexPrev = LookupBlockIndex(block.hashPrevBlock);
@@ -4206,7 +4210,8 @@ bool CheckBlockHeader(const CBlockHeader& block, CValidationState& state, const 
     }
 
     // Check proof of work matches claimed amount
-    if (fCheckPOW && !CheckProofOfWork(block.GetHash(nBlockHeight), block.nBits, consensusParams))
+ 
+    if (fCheckPOW && !CheckProofOfWork(block.GetHash(nBlockHeight,2), block.nBits, consensusParams))
         return state.DoS(50, false, REJECT_INVALID, "high-hash", false, "proof of work failed");
     return true;
 }

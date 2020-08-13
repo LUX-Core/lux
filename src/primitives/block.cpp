@@ -16,9 +16,9 @@
 #include "crypto/randomx.h"
 
 
-uint256 CBlockHeader::GetHash(int nHeight,bool Mining) const
+uint256 CBlockHeader::GetHash(int nHeight,int Mining) const
 {
- 
+// printf("height = %d",nHeight);
     if (nHeight==0)
     return Phi1612(BEGIN(nVersion), END(nNonce));
 
@@ -36,17 +36,29 @@ uint256 CBlockHeader::GetHash(int nHeight,bool Mining) const
  
 // randomX algo
     if (randomxblock) {
- 
-     uint256 thisSeed = GetRandomXSeed(nHeight);
+         uint256 thisSeed;
+    if (Mining == 1 || Mining == 2) 
+        thisSeed = GetRandomXSeed(nHeight);
 //    barrysPreposterouslyNamedSeedHashFunction(nHeight, thisSeed);
         uint256 thash;
-            std::cout << "height " << nHeight << " seed " << thisSeed.GetHex().c_str() << "size of the seed " << strlen(thisSeed.GetHex().c_str()) << std::endl;
-    if (Mining)        
+   if (Mining == 1) {
+//                 std::cout << " 1 height " << nHeight << " seed " << thisSeed.GetHex().c_str() << "size of the seed " << strlen(thisSeed.GetHex().c_str()) << std::endl;
+           
         rx_slow_hash((char*)this,(char*)&thash,144,thisSeed);
-    else 
-        rx_slow_hash2((char*)this,(char*)&thash,144,thisSeed);
-
         return thash;
+     } else if (Mining == 2) {
+//                std::cout << "2 height " << nHeight << " seed " << thisSeed.GetHex().c_str() << "size of the seed " << strlen(thisSeed.GetHex().c_str()) << std::endl;
+        rx_slow_hash2((char*)this,(char*)&thash,144,thisSeed);
+        return thash;
+     } else {
+            if ((nVersion & (1 << 30)))
+                return phi2_hash(BEGIN(nVersion), END(hashUTXORoot));
+    
+            if ((nVersion > VERSIONBITS_LAST_OLD_BLOCK_VERSION)) 
+                return phi2_hash(BEGIN(nVersion), END(nNonce));
+
+    }
+        
     } 
 // for genesis hash and case the function is called without argument (nHeight==0)
     return Phi1612(BEGIN(nVersion), END(nNonce));

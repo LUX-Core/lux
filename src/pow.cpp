@@ -72,7 +72,7 @@ bool CheckProofOfWork(uint256 hash, unsigned int nBits, const Consensus::Params&
 
     bnTarget.SetCompact(nBits, &fNegative, &fOverflow);
 
-    std::cout << " solution " << hash.GetHex() << " bnTarget " <<  bnTarget.GetHex() << std::endl;
+//    std::cout << " solution " << hash.GetHex() << " bnTarget " <<  bnTarget.GetHex() << std::endl;
     // Check range
     if (fNegative || bnTarget == 0 || fOverflow || bnTarget > Params().ProofOfWorkLimit()) {
         std::cout << "doesn't passed first check " << std::endl;

@@ -3327,7 +3327,7 @@ UniValue generateBlocks(std::shared_ptr<CReserveScript> coinbaseScript, int nGen
     static const int nInnerLoopCount = 0x10000;
     int nHeightEnd = 0;
     int nHeight = 0;
-
+beginning: 
     {   // Don't keep cs_main locked
         LOCK(cs_main);
         nHeight = chainActive.Height();
@@ -3335,10 +3335,11 @@ UniValue generateBlocks(std::shared_ptr<CReserveScript> coinbaseScript, int nGen
     }
     unsigned int nExtraNonce = 0;
     UniValue blockHashes(UniValue::VARR);
-    while (nHeight < nHeightEnd)
+   
+    while (nHeight < nHeightEnd && nMaxTries > 0 )
     {
-        nHeight = chainActive.Height();
-        nHeightEnd = nHeight+nGenerate;
+    //    nHeight = chainActive.Height();
+    //    nHeightEnd = nHeight+nGenerate;
         std::unique_ptr<CBlockTemplate> pblocktemplate(BlockAssembler(Params()).CreateNewBlock(coinbaseScript->reserveScript, true, false, 0, 0, 0, true));
         if (!pblocktemplate.get())
             throw JSONRPCError(RPC_INTERNAL_ERROR, "Couldn't create new block");
@@ -3349,16 +3350,18 @@ UniValue generateBlocks(std::shared_ptr<CReserveScript> coinbaseScript, int nGen
         }
 
         while (nMaxTries > 0 && pblock->nNonce < nInnerLoopCount 
-        && chainActive.Height() == nHeight
+        && nHeight == chainActive.Height()
         && !ShutdownRequested()
-        && !CheckProofOfWork(pblock->GetHash(nHeight + 1,true), pblock->nBits, Params().GetConsensus())) {
-            std::cout << "chainactiveheight " << chainActive.Height() << std::endl;
+        && !CheckProofOfWork(pblock->GetHash(nHeight + 1,1), pblock->nBits, Params().GetConsensus())) {
+//            
+//            std::cout << "chainactiveheight " << chainActive.Height() << std::endl;
             ++pblock->nNonce;
             --nMaxTries;
+            if (nHeight != chainActive.Height()) { printf("gtfo from here "); continue;}
         } 
         
-        if (!CheckProofOfWork(pblock->GetHash(nHeight + 1,true), pblock->nBits, Params().GetConsensus()))
-            continue;
+//        if (!CheckProofOfWork(pblock->GetHash(nHeight + 1,1), pblock->nBits, Params().GetConsensus()))
+//            continue;
 
         if (nMaxTries == 0) {
             break;
