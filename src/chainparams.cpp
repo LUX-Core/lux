@@ -331,7 +331,7 @@ public:
         nSwitchRandomXBlock = 20; /// dunno the value 
         nSplitRewardBlock = 5000;
         nPruneAfterHeight = 5000;
-        nFirstSCBlock = 5000;
+        nFirstSCBlock = 25;
         nPreminePaymentandHardForkBlock = 50000;
 
         consensus.hashGenesisBlock = genesis.GetHash();
