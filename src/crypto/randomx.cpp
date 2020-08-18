@@ -58,9 +58,8 @@ void rx_slow_hash(const char* data, char* hash, int length, uint256 seedhash)
 
  
     if (!is_init) {
-//        randomx_init();
-//    seed_set(0);
-        randomx_seed2 = uint256(0);
+
+        randomx_seed2 = seedhash;
     if (!cache) {
         flags = randomx_get_flags();
         cache = randomx_alloc_cache(flags);
@@ -73,7 +72,7 @@ void rx_slow_hash(const char* data, char* hash, int length, uint256 seedhash)
 
     is_init = true;
     }
-    if (/*seed_changed(seedhash)*/ randomx_seed2!=seedhash) {
+    if (randomx_seed2!=seedhash) {
         randomx_seed2 = seedhash;
 //        randomx_reinit();
     randomx_destroy_vm(rx_vm);
@@ -89,7 +88,51 @@ void rx_slow_hash(const char* data, char* hash, int length, uint256 seedhash)
 //    printf("after calcultae hash %s\n", __func__); 
 }
 
+
 void rx_slow_hash2(const char* data, char* hash, int length, uint256 seedhash)
+{
+//    printf("%s\n", __func__);
+    static bool is_init; // = false;
+//    static char randomx_seed[64]; //={0}; // this should be 64 and not 32
+    static uint256 randomx_seed2;
+    static randomx_flags flags;
+    static randomx_vm *rx_vm; // = nullptr;
+    static randomx_cache *cache; // = nullptr;
+
+ 
+    if (!is_init) {
+
+        randomx_seed2 = seedhash;
+    if (!cache) {
+        flags = randomx_get_flags();
+        cache = randomx_alloc_cache(flags);
+       
+        randomx_init_cache(cache, randomx_seed2.GetHex().c_str(), randomx_seed2.GetHex().size());
+    }
+ 
+    if (!rx_vm)
+        rx_vm = randomx_create_vm(flags, cache, nullptr);
+
+    is_init = true;
+    }
+    if (randomx_seed2!=seedhash) {
+        randomx_seed2 = seedhash;
+//        randomx_reinit();
+    randomx_destroy_vm(rx_vm);
+    randomx_release_cache(cache);
+
+    cache = randomx_alloc_cache(flags);
+    randomx_init_cache(cache, randomx_seed2.GetHex().c_str(), 64);
+    rx_vm = randomx_create_vm(flags, cache, nullptr);
+
+    }   
+//    printf("before calcultae hash %s\n", __func__);
+    randomx_calculate_hash(rx_vm, data, length, hash);
+//    printf("after calcultae hash %s\n", __func__); 
+}
+
+
+void rx_slow_hash2_old(const char* data, char* hash, int length, uint256 seedhash)
 {
  
     bool is_init = false;
