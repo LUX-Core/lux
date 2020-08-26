@@ -284,7 +284,7 @@ public:
         
         consensus.nLastPOWBlock = 6000000;
         consensus.RdxSeedHeight = 0;  // starting on 
-        consensus.RdxSeedInterval = 5; //seed changes every 5 blocks (testnet)
+        consensus.RdxSeedInterval = 60; //seed changes every 5 blocks (testnet)
         networkID = CBaseChainParams::TESTNET;
         strNetworkID = "test";
         pchMessageStart[0] = 0x54;
@@ -370,10 +370,15 @@ public:
 
         strDarksendPoolDummyAddress = "LPGq7DZbqZ8Vb3tfLH8Z8VHqeV4fsK68oX";
         nStartMasternodePayments = 1528954643; //Fri, 09 Jan 2015 21:05:58 GMT
-
+        /*
         nStakingRoundPeriod = 120; // 5 seconds a round
         nStakingInterval = 120; // 30 seconds
         nStakingMinAge = 360; // 6 minutes
+        */
+        nStakingRoundPeriod = 120; // 2 minutes a round
+        nStakingInterval = 22;
+        nStakingMinAge = 36 * 60 * 60;
+
     }
     const Checkpoints::CCheckpointData& Checkpoints() const
     {
