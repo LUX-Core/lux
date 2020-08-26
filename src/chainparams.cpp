@@ -266,8 +266,8 @@ public:
         //consensus.BIP34Height = 227931;
         //consensus.BIP34Hash = uint256S("0x000000000000024b89b42a942fe0d9fea3bb44ab7bd1b19115dd6a759c0808b8");
         
-//        consensus.powLimit = ~uint256(0) >> 10; // LUX starting difficulty is 1 / 2^12
-        consensus.powLimit = uint256S("0x7fff000000000000000000000000000000000000000000000000000000000000");
+        consensus.powLimit = ~uint256(0) >> 10; // LUX starting difficulty is 1 / 2^12
+//        consensus.powLimit = uint256S("0x7fff000000000000000000000000000000000000000000000000000000000000");
         consensus.nPowTargetTimespan = 30 * 60; //36 * 60 * 60; // LUX: 1 36hrs
         consensus.nPowTargetSpacing = 2 * 60;  // LUX: 2 minute
         consensus.fPowAllowMinDifficultyBlocks = false;
@@ -284,7 +284,7 @@ public:
         
         consensus.nLastPOWBlock = 6000000;
         consensus.RdxSeedHeight = 0;  // starting on 
-        consensus.RdxSeedInterval = 60; //seed changes every 5 blocks (testnet)
+        consensus.RdxSeedInterval = 100; //seed changes every 5 blocks (testnet)
         networkID = CBaseChainParams::TESTNET;
         strNetworkID = "test";
         pchMessageStart[0] = 0x54;
