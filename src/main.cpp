@@ -2694,7 +2694,7 @@ static int64_t nTimeTotal = 0;
 bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pindex, CCoinsViewCache& view, const CChainParams& chainparams, bool fJustCheck)
 {
     AssertLockHeld(cs_main);
-
+    // printf("into %s\n",__func__);
     ///////////////////////////////////////////////// // lux
 #if 0
     LuxDGP luxDGP(globalState.get(), fGettingValuesDGP);
@@ -2723,11 +2723,15 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
     if (pindex->pprev) {
         hashPrevBlock = pindex->pprev->GetBlockHash();
     }
+        // printf("into %s afterhashprevblock\n",__func__);
+        //std::cout << "  hashprevblock  " << hashPrevBlock.GetHex() << " best block " << view.GetBestBlock().GetHex() << std::endl;
+      
     if (hashPrevBlock != view.GetBestBlock()) {
+        // printf("into %s not the best block\n",__func__);
         LogPrintf("%s: block=%s,%d prev=%s best=%s\n", __func__, pindex->GetBlockHash().GetHex(), pindex->nHeight, hashPrevBlock.GetHex(), view.GetBestBlock().GetHex());
         return error("%s: previous block not best", __func__);
     }
-
+       // printf("into %s afterhashprevblock 2\n",__func__);
     assert(hashPrevBlock == view.GetBestBlock());
 
     // Special case for the genesis block, skipping connection of its transactions
@@ -4210,9 +4214,18 @@ bool CheckBlockHeader(const CBlockHeader& block, CValidationState& state, const 
     }
 
     // Check proof of work matches claimed amount
- 
+    // printf("chainActiveHeight %d",chainActive.Height());
+     if (chainActive.Height()<nBlockHeight-1) {
+//         ActivateBestChain(state, chainparams, &block);
+//        CheckBlockIndex(chainparams.GetConsensus());
+        chainActive.SetTip(LookupBlockIndex(block.hashPrevBlock));}
+            // printf("chainActiveHeight %d",chainActive.Height());
     if (fCheckPOW && !CheckProofOfWork(block.GetHash(nBlockHeight,2), block.nBits, consensusParams))
         return state.DoS(50, false, REJECT_INVALID, "high-hash", false, "proof of work failed");
+  //         "5d6f13eb4d02fa2c059f416f9f4a7a0944751faeb09ff8f27b64d99ea9f301e4", 
+//  5d6f13eb4d02fa2c059f416f9f4a7a0944751faeb09ff8f27b64d99ea9f301e4
+//        chainActive.SetTip(LookupBlockIndex(block.GetHash(nBlockHeight)));
+        chainActive.SetTip(LookupBlockIndex(pcoinsTip->GetBestBlock()));
     return true;
 }
 
@@ -4679,16 +4692,22 @@ bool AcceptBlockHeader(const CBlock& block, CValidationState& state, const CChai
 {
     AssertLockHeld(cs_main);
 
-    // Get prev block index
+    // Get prev block index (or not and check for duplicate)
     CBlockIndex* pindexPrev = LookupBlockIndex(block.hashPrevBlock);
-
+    uint256 hash; 
     if (!pindexPrev) {
         if (block.GetHash() != Params().GenesisBlock().GetHash())
             return state.DoS(0, error("%s : prev block %s not found", __func__, block.hashPrevBlock.GetHex()), 0, "bad-prevblk");
+   // Check for duplicate
+    hash = block.GetHash();
+    } else 
+    {
+   // Check for duplicate
+    hash = block.GetHash(pindexPrev->nHeight + 1);
     }
 
-    // Check for duplicate
-    uint256 hash = block.GetHash(pindexPrev->nHeight + 1);
+ 
+
     CBlockIndex* pindex = LookupBlockIndex(hash);
 
     // TODO : ENABLE BLOCK CACHE IN SPECIFIC CASES
@@ -4885,6 +4904,7 @@ void CBlockIndex::BuildSkip()
 
 bool ProcessNewBlock(CValidationState& state, const CChainParams& chainparams, CNode* pfrom, const CBlock* pblock, CDiskBlockPos* dbp)
 {
+   // printf("function %s\n",__func__);
     int nHeight = chainActive.Height() + 1;
     bool alreadyAccepted = false;
 
@@ -4901,6 +4921,8 @@ bool ProcessNewBlock(CValidationState& state, const CChainParams& chainparams, C
     // Preliminary checks
     if (!CheckBlock(*pblock, state, chainparams.GetConsensus()))
         return error("%s: block not passing checks", __func__);
+
+   // printf("function 1 %s\n",__func__);
 
     // Check proof-of-stake block signature
     if (!pblock->CheckBlockSignature())
@@ -4922,7 +4944,7 @@ bool ProcessNewBlock(CValidationState& state, const CChainParams& chainparams, C
             alreadyAccepted = (LookupBlockIndex(pblock->GetHash(nHeight)) != nullptr);
         }
     }
-
+   // printf("function 2 %s\n",__func__);
     // Reject all blocks from old chain forks
     if (nHeight > SNAPSHOT_BLOCK && pblock->nTime < SNAPSHOT_VALID_TIME) {
         return error("%s: Invalid block %d, time too old (%x) for %s",
@@ -4936,9 +4958,14 @@ bool ProcessNewBlock(CValidationState& state, const CChainParams& chainparams, C
             MilliSleep(50);
             continue;
         }
+   // printf("function 3 %s\n",__func__);
+
+//    ActivateBestChain(state, chainparams, pblock);
+//    chainActive.SetTip(pindex);
+// printf("heigh in check block %d chainactive %d\n",nHeight,chainActive.Height());
 
         MarkBlockAsReceived(pblock->GetHash(nHeight));
-
+   // printf("function 3.0 %s\n",__func__);
         // Store to disk
         bool ret = AcceptBlock(*pblock, state, chainparams, &pindex, dbp);
         if (pindex && pfrom) {
@@ -4946,19 +4973,25 @@ bool ProcessNewBlock(CValidationState& state, const CChainParams& chainparams, C
         }
 
         CheckBlockIndex(chainparams.GetConsensus());
-
+  // printf("function 3.05 %s\n",__func__);
         if (ret) {
             break;
         } else {
+               // printf("function 3.1 %s\n",__func__);
             return error("%s: block not accepted", __func__);
         }
     }
-
+   // printf("function 4 %s\n",__func__);
     if (ActivateBestChain(state, chainparams, pblock)) {
         stake->MarkBlockStaked(pindex->nHeight, pindex->nTime);
     } else {
         return error("%s: ActivateBestChain failed", __func__);
     }
+// printf("function 5 %s\n",__func__);
+         
+//       CheckBlockIndex(chainparams.GetConsensus());
+//              chainActive.SetTip(pindex);
+// printf("heigh in check block %d chainactive %d\n",nHeight,chainActive.Height());
 
     if (pwalletMain) {
         // If turned on MultiSend will send a transaction (or more) on the after maturity of a stake
@@ -4989,15 +5022,15 @@ bool IsWitnessLocked(const CBlockIndex* pindexPrev){
 bool TestBlockValidity(CValidationState& state, const CChainParams& chainparams, const CBlock& block, CBlockIndex* const pindexPrev, bool fCheckPOW, bool fCheckMerkleRoot)
 {
     AssertLockHeld(cs_main);
-
+// printf("%s\n",__func__);
     // In some cases, chainActive.Tip() may return nullptr
     CBlockIndex *pIndex = chainActive.Tip();
     if (pIndex == nullptr) {
-        LogPrintf("%s: Invalid chain tip!\n", __func__);
+       // printf("%s: Invalid chain tip!\n", __func__);
         return false;
     }
     else if (pindexPrev != pIndex) {
-        LogPrintf("%s: Invalid prevblock!\n", __func__);
+       // printf("%s: Invalid prevblock!\n", __func__);
         return false;
     }
 
@@ -5016,10 +5049,13 @@ bool TestBlockValidity(CValidationState& state, const CChainParams& chainparams,
     if (block.IsProofOfStake() && !stake->CheckProof(pindexPrev, block, index.hashProofOfStake))
         return false;
 
+// printf("%s after checks\n",__func__);
+
     dev::h256 oldHashStateRoot = getGlobalStateRoot(&index);
     dev::h256 oldHashUTXORoot = getGlobalStateUTXO(&index);
 
     if (!ConnectBlock(block, state, &index, viewNew, chainparams, true)) {
+       // printf("%s fail connectblock\n",__func__);
         if (index.nHeight >= chainparams.FirstSCBlock()) {
             setGlobalStateRoot(oldHashStateRoot);
             setGlobalStateUTXO(oldHashUTXORoot);
@@ -5029,9 +5065,10 @@ bool TestBlockValidity(CValidationState& state, const CChainParams& chainparams,
     }
 
     if (!state.IsValid()) {
+        // printf("%s state invalid\n",__func__);
         return false;
     }
-
+// printf("%s everything fine here\n",__func__);
     return true;
 }
 

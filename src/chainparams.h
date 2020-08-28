@@ -109,6 +109,7 @@ public:
     int FirstSCBlock() const { return nFirstSCBlock; }
     int SwitchPhi2Block() const { return nSwitchPhi2Block; }
     int SwitchRandomXBlock() const { return nSwitchRandomXBlock;}
+    uint32_t RandomXTime() const {return RandomXSwitchTime;}
     int64_t PruneAfterHeight() const { return nPruneAfterHeight; }
     int FirstSplitRewardBlock() const { return nSplitRewardBlock; }
     
@@ -157,6 +158,7 @@ protected:
     int nFirstSCBlock;
     int nSwitchPhi2Block;
     int nSwitchRandomXBlock;
+    uint32_t RandomXSwitchTime; 
     int nSplitRewardBlock;
     int nPreminePaymentandHardForkBlock;
     uint64_t nPruneAfterHeight;

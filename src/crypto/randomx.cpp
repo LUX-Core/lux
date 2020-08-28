@@ -17,6 +17,7 @@
 
 uint256 GetRandomXSeed(const uint32_t& nHeight)
 {  
+//    printf("the seed function \n");
     static uint256 current_key_block;
     uint32_t SeedStartingHeight = Params().GetConsensus().RdxSeedHeight;
     uint32_t SeedInterval = Params().GetConsensus().RdxSeedInterval;
@@ -29,7 +30,7 @@ uint256 GetRandomXSeed(const uint32_t& nHeight)
 
     uint32_t first_check = nHeight - remainer;
     uint32_t second_check = nHeight - SeedInterval - remainer;
-
+//    printf("the seed function aftergenesis first height = %d second height = %d \n",first_check,second_check);
     if (nHeight > nHeight - remainer + SwitchKey) {
         
         if ( nHeight  > first_check)
