@@ -286,7 +286,7 @@ printf("create new block \n");
     LOCK2(cs_main, mempool.cs);
     LOCK(cs_main);
     CBlockIndex* pindexPrev = chainActive.Tip();
-    printf("create new block chaintip height %d\n",chainActive.Height());
+   // printf("create new block chaintip height %d\n",chainActive.Height());
     if (!pindexPrev) {
         printf("noindex in here  %d\n",chainActive.Height());
         return nullptr;
@@ -296,7 +296,7 @@ printf("create new block \n");
     pblock->nVersion = ComputeBlockVersion(pindexPrev, chainParams.GetConsensus());
     // -regtest only: allow overriding block.nVersion with
     // -blockversion=N to test forking scenarios
-    printf("after ComputeBlockVersion %d\n",chainActive.Height());
+   // printf("after ComputeBlockVersion %d\n",chainActive.Height());
     if (chainParams.MineBlocksOnDemand())
         pblock->nVersion = GetArg("-blockversion", pblock->nVersion);
 
@@ -305,7 +305,7 @@ printf("create new block \n");
     }
 
     pblock->nTime = txProofTime;
-    printf("after txProofTime %d\n",chainActive.Height());
+ //   printf("after txProofTime %d\n",chainActive.Height());
     if (!fProofOfStake)
         UpdateTime(pblock, chainParams.GetConsensus(), pindexPrev, fProofOfStake);
     pblock->nBits = GetNextWorkRequired(pindexPrev, pblock, chainParams.GetConsensus(),fProofOfStake);
@@ -325,7 +325,7 @@ printf("create new block \n");
     coinbaseTx.vin.resize(1);
     coinbaseTx.vin[0].prevout.SetNull();
     coinbaseTx.vout.resize(1);
-printf("after coinbaseTx %d\n",chainActive.Height());
+// printf("after coinbaseTx %d\n",chainActive.Height());
     // Decide whether to include witness transactions
     // This is only needed in case the witness softfork activation is reverted
     // (which would require a very deep reorganization) or when

@@ -4213,18 +4213,15 @@ bool CheckBlockHeader(const CBlockHeader& block, CValidationState& state, const 
         }
     }
 
-    // Check proof of work matches claimed amount
-    // printf("chainActiveHeight %d",chainActive.Height());
-     if (chainActive.Height()<nBlockHeight-1) {
-//         ActivateBestChain(state, chainparams, &block);
-//        CheckBlockIndex(chainparams.GetConsensus());
+
+     if (chainActive.Height()<nBlockHeight-1 && fReindex) {
         chainActive.SetTip(LookupBlockIndex(block.hashPrevBlock));}
-            // printf("chainActiveHeight %d",chainActive.Height());
+
+
     if (fCheckPOW && !CheckProofOfWork(block.GetHash(nBlockHeight,2), block.nBits, consensusParams))
         return state.DoS(50, false, REJECT_INVALID, "high-hash", false, "proof of work failed");
-  //         "5d6f13eb4d02fa2c059f416f9f4a7a0944751faeb09ff8f27b64d99ea9f301e4", 
-//  5d6f13eb4d02fa2c059f416f9f4a7a0944751faeb09ff8f27b64d99ea9f301e4
-//        chainActive.SetTip(LookupBlockIndex(block.GetHash(nBlockHeight)));
+ 
+    if (fReindex )
         chainActive.SetTip(LookupBlockIndex(pcoinsTip->GetBestBlock()));
     return true;
 }

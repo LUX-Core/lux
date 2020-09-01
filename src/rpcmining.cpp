@@ -428,15 +428,15 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
             HelpExampleCli("getblocktemplate", "") + HelpExampleRpc("getblocktemplate", ""));
 
     LOCK(cs_main);
-            printf("getblocktemplate\n");
-            printf("chainActive tip in block template on height %d\n",chainActive.Height());
+      //      printf("getblocktemplate\n");
+      ///      printf("chainActive tip in block template on height %d\n",chainActive.Height());
     std::string strMode = "template";
     UniValue lpval = NullUniValue;
     std::set<std::string> setClientRules;
     int64_t nMaxVersionPreVB = -1;
     if (params.size() > 0)
     {
-    printf("after paramsize: chainActive tip in block template on height %d\n",chainActive.Height());
+ //   printf("after paramsize: chainActive tip in block template on height %d\n",chainActive.Height());
         const UniValue& oparam = params[0].get_obj();
         const UniValue& modeval = find_value(oparam, "mode");
         if (modeval.isStr())
@@ -457,13 +457,13 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
                 throw JSONRPCError(RPC_DESERIALIZATION_ERROR, "Block decode failed");
 
 
-           printf("getblocktemplate: chainActive tip in block template on height %d\n",chainActive.Height());
+   //        printf("getblocktemplate: chainActive tip in block template on height %d\n",chainActive.Height());
             CBlockIndex* pindexPrev = LookupBlockIndex(block.hashPrevBlock);
             int TheHeight = pindexPrev ? pindexPrev->nHeight + 1  : 0;
-            printf("chainActive tip in block template on height %d Height in gethash %d\n",chainActive.Height(),TheHeight);
+   //         printf("chainActive tip in block template on height %d Height in gethash %d\n",chainActive.Height(),TheHeight);
             uint256 hash = block.GetHash(TheHeight);
             CBlockIndex* pindex = LookupBlockIndex(hash);
-            printf("chainActive tip in block template on height %d\n",chainActive.Height());
+    //        printf("chainActive tip in block template on height %d\n",chainActive.Height());
             if (pindex) {
                 if (pindex->IsValid(BLOCK_VALID_SCRIPTS))
                     return "duplicate";
@@ -473,9 +473,9 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
             }
 
 
-            printf("chainActive tip in block template on height %d\n",chainActive.Height());
+ //           printf("chainActive tip in block template on height %d\n",chainActive.Height());
             pindexPrev = chainActive.Tip();
-            printf("chainActive tip in block template on height %d\n",chainActive.Height());
+ //           printf("chainActive tip in block template on height %d\n",chainActive.Height());
             // TestBlockValidity only supports blocks built on the current Tip
             if (block.hashPrevBlock != pindexPrev->GetBlockHash())
                 return "inconclusive-not-best-prevblk";
@@ -564,7 +564,7 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
     // to select witness transactions, after segwit activates (otherwise
     // don't).
     bool fSupportsSegwit = setClientRules.find(segwit_info.name) != setClientRules.end();
-          printf("before pindexPrev chainActive tip in block template on height %d\n",chainActive.Height());
+ //         printf("before pindexPrev chainActive tip in block template on height %d\n",chainActive.Height());
     // Update block
     static CBlockIndex* pindexPrev;
     static int64_t nStart;
@@ -577,7 +577,7 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
         fLastTemplateSupportsSegwit != fSupportsSegwit) {
         // Clear pindexPrev so future calls make a new block, despite any failures from here on
         pindexPrev = NULL;
-         printf(" different from chainActivetip %d\n",chainActive.Height());
+ //        printf(" different from chainActivetip %d\n",chainActive.Height());
         // Store the chainActive.Tip() used before CreateNewBlock, to avoid races
         nTransactionsUpdatedLast = mempool.GetTransactionsUpdated();
         CBlockIndex* pindexPrevNew = chainActive.Tip();
@@ -586,23 +586,23 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
 
         // Create new block
         CScript scriptDummy = CScript() << OP_TRUE;
-                printf(" before createnewblock %d\n",chainActive.Height());
+ //               printf(" before createnewblock %d\n",chainActive.Height());
         pblocktemplate = BlockAssembler(Params()).CreateNewBlock(scriptDummy, fSupportsSegwit);
-                       printf(" after createnewblock %d\n",chainActive.Height());
+//                       printf(" after createnewblock %d\n",chainActive.Height());
         if (!pblocktemplate)
             throw JSONRPCError(RPC_OUT_OF_MEMORY, "Out of memory");
 
         // Need to update only after we know CreateNewBlock succeeded
         pindexPrev = pindexPrevNew;
     }
-            printf(" beforeupdate time %d\n",chainActive.Height());
+ //           printf(" beforeupdate time %d\n",chainActive.Height());
     CBlock* pblock = &pblocktemplate->block; // pointer for convenience
     const Consensus::Params& consensusParams = Params().GetConsensus();
 
     // Update nTime
     UpdateTime(pblock, consensusParams, pindexPrev, false);
     pblock->nNonce = 0;
-            printf(" after update time %d\n",chainActive.Height());
+  //          printf(" after update time %d\n",chainActive.Height());
     // NOTE: If at some point we support pre-segwit miners post-segwit-activation, this needs to take segwit support into consideration
     const bool fPreSegWit = (THRESHOLD_ACTIVE != VersionBitsState(pindexPrev, consensusParams, Consensus::DEPLOYMENT_SEGWIT, versionbitscache));
 
@@ -746,11 +746,11 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
         // Note that this can probably also be removed entirely after the first BIP9 non-force deployment (ie, probably segwit) gets activated
         aMutable.push_back("version/force");
     }
-          printf("previousblockhash: chainActive tip in block template on height %d\n",chainActive.Height());
+//          printf("previousblockhash: chainActive tip in block template on height %d\n",chainActive.Height());
     int64_t nHeight = pindexPrev->nHeight + 1;
     result.push_back(Pair("previousblockhash", pblock->hashPrevBlock.GetHex()));
 
-         printf("after previousblockhash: chainActive tip in block template on height %d\n",chainActive.Height());
+//         printf("after previousblockhash: chainActive tip in block template on height %d\n",chainActive.Height());
     // smart contracts
     if (nHeight >= Params().FirstSCBlock()) {
         // gas refund
