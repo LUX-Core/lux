@@ -14,10 +14,11 @@
 
 //#define KEY_CHANGE 2048
 //#define SWITCH_KEY 64
+static CCriticalSection cs_randomx;
 
 uint256 GetRandomXSeed(const uint32_t& nHeight)
 {  
-//    printf("the seed function \n");
+    printf("the seed function \n");
     static uint256 current_key_block;
     uint32_t SeedStartingHeight = Params().GetConsensus().RdxSeedHeight;
     uint32_t SeedInterval = Params().GetConsensus().RdxSeedInterval;
@@ -42,13 +43,14 @@ uint256 GetRandomXSeed(const uint32_t& nHeight)
             current_key_block = /*uint256("0xaf8367c7285833f5036ae884aadcc64a277b7e20bfb160cf57eaf7ece0e00c68size"); */ chainActive[second_check-SeedStartingHeight]->GetBlockHash();
         }
     }
-
+   printf("leaving the seed function \n");
     return current_key_block;
 }
 
 
 void rx_slow_hash(const char* data, char* hash, int length, uint256 seedhash)
 {
+    ENTER_CRITICAL_SECTION(cs_randomx) 
 //    printf("%s\n", __func__);
     static bool is_init; // = false;
 //    static char randomx_seed[64]; //={0}; // this should be 64 and not 32
@@ -87,12 +89,14 @@ void rx_slow_hash(const char* data, char* hash, int length, uint256 seedhash)
 //    printf("before calcultae hash %s\n", __func__);
     randomx_calculate_hash(rx_vm, data, length, hash);
 //    printf("after calcultae hash %s\n", __func__); 
+        LEAVE_CRITICAL_SECTION(cs_randomx) 
 }
 
 
 void rx_slow_hash2(const char* data, char* hash, int length, uint256 seedhash)
 {
-//    printf("%s\n", __func__);
+        ENTER_CRITICAL_SECTION(cs_randomx) 
+    printf("%s ... ", __func__);
     static bool is_init; // = false;
 //    static char randomx_seed[64]; //={0}; // this should be 64 and not 32
     static uint256 randomx_seed2;
@@ -117,6 +121,7 @@ void rx_slow_hash2(const char* data, char* hash, int length, uint256 seedhash)
     is_init = true;
     }
     if (randomx_seed2!=seedhash) {
+        printf(".... random seed changing .... ");
         randomx_seed2 = seedhash;
 //        randomx_reinit();
     randomx_destroy_vm(rx_vm);
@@ -125,17 +130,20 @@ void rx_slow_hash2(const char* data, char* hash, int length, uint256 seedhash)
     cache = randomx_alloc_cache(flags);
     randomx_init_cache(cache, randomx_seed2.GetHex().c_str(), 64);
     rx_vm = randomx_create_vm(flags, cache, nullptr);
+    
 
     }   
-//    printf("before calcultae hash %s\n", __func__);
+    printf(".... before hash ....%s\n", __func__);
     randomx_calculate_hash(rx_vm, data, length, hash);
 //    printf("after calcultae hash %s\n", __func__); 
+    printf("leaving %s\n", __func__);
+        LEAVE_CRITICAL_SECTION(cs_randomx) 
 }
 
 
 void rx_slow_hash2_old(const char* data, char* hash, int length, uint256 seedhash)
 {
- 
+     printf("%s .....", __func__);
     bool is_init = false;
 //    static char randomx_seed[64]; //={0}; // this should be 64 and not 32
      uint256 randomx_seed2;
@@ -155,5 +163,5 @@ void rx_slow_hash2_old(const char* data, char* hash, int length, uint256 seedhas
     randomx_destroy_vm(rx_vm);
     randomx_release_cache(cache);
 
-
+    printf("leaving %s\n", __func__);
 }

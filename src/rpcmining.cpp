@@ -967,8 +967,11 @@ public:
 protected:
     virtual void BlockChecked(const CBlock& block, const CValidationState& stateIn)
     {
-        if (block.GetHash(nHeight) != hash)
+        printf("check submitted block \n");
+        if (block.GetHash(nHeight) != hash) {
+            printf("block.GetHash(nHeight) != hash");
             return;
+        }    
         found = true;
         state = stateIn;
     };
@@ -1031,7 +1034,9 @@ UniValue submitblock(const UniValue& params, bool fHelp)
 
     submitblock_StateCatcher sc(block.GetHash(TheHeight), TheHeight);
     RegisterValidationInterface(&sc);
+    printf("entering ProcessNewBlock\n");
     bool fAccepted = ProcessNewBlock(state, Params(), NULL, &block);
+    printf("leaving ProcessNewBlock\n");
     UnregisterValidationInterface(&sc);
     if (fBlockPresent) {
         if (fAccepted && !sc.found) {

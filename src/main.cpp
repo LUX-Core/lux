@@ -1860,9 +1860,9 @@ bool WriteBlockToDisk(const CBlock& block, CDiskBlockPos& pos)
     return true;
 }
 
-bool ReadBlockFromDisk(CBlock& block, const CDiskBlockPos& pos, int nHeight, const Consensus::Params& consensusParams)
+bool ReadBlockFromDisk(CBlock& block, const CDiskBlockPos& pos, int nHeight, const Consensus::Params& consensusParams, bool required)
 {
- 
+ printf("** required =%d **",required);
     block.SetNull();
 
     // Open history file to read
@@ -1878,7 +1878,8 @@ bool ReadBlockFromDisk(CBlock& block, const CDiskBlockPos& pos, int nHeight, con
     }
 
     // Check the header
-    if (block.IsProofOfWork()) {
+    if (block.IsProofOfWork() && required==true) {
+        printf(" required = %d ",required);
         if (!CheckProofOfWork(block.GetHash(nHeight,2), block.nBits, consensusParams))
             return error("ReadBlockFromDisk : Errors in block header");
     }
@@ -1889,12 +1890,12 @@ bool ReadBlockFromDisk(CBlock& block, const CDiskBlockPos& pos, int nHeight, con
     return true;
 }
 
-bool ReadBlockFromDisk(CBlock& block, const CBlockIndex* pindex, const Consensus::Params& consensusParams) {
-  
-    if (!ReadBlockFromDisk(block, pindex->GetBlockPos(), pindex->nHeight, consensusParams))
+bool ReadBlockFromDisk(CBlock& block, const CBlockIndex* pindex, const Consensus::Params& consensusParams, bool required) {
+  printf("** required =%d **",required);
+    if (!ReadBlockFromDisk(block, pindex->GetBlockPos(), pindex->nHeight, consensusParams, required))
         return false;
-    //both phi1612 and phi2 hashes do not match indexed hash
-    if (block.GetHash() != pindex->GetBlockHash() && block.GetHash(pindex->nHeight,2) != pindex->GetBlockHash()  && block.GetHash(pindex->nHeight) != pindex->GetBlockHash()) {
+    //both phi1612 and phi2 hashes do not match indexed hash // rdx pow never matches GetBlockHash per design 
+    if (block.GetHash() != pindex->GetBlockHash() && block.GetHash(pindex->nHeight) != pindex->GetBlockHash()) {
         LogPrintf("%s : block=%s index=%s\n", __func__, block.GetHash().GetHex(), pindex->GetBlockHash().GetHex());
         return error("ReadBlockFromDisk(CBlock&, CBlockIndex*) : GetHash() doesn't match index");
     }
@@ -4934,7 +4935,7 @@ bool ProcessNewBlock(CValidationState& state, const CChainParams& chainparams, C
     else if (pblock->GetHash() != chainparams.GetConsensus().hashGenesisBlock && pfrom != NULL) {
         CBlockIndex* pindexPrev = LookupBlockIndex(pblock->hashPrevBlock);
         if (!pindexPrev) {
-            pfrom->PushMessage("getblocks", chainActive.GetLocator(), uint256(0));
+            pfrom->PushMessage("wtf getblocks", chainActive.GetLocator(), uint256(0));
             return false;
         } else {
             nHeight = pindexPrev->nHeight + 1;
