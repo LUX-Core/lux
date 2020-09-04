@@ -6,6 +6,7 @@
 #define BITCOIN_QT_GUIUTIL_H
 
 #include "amount.h"
+#include "walletmodel.h"
 
 #include <QEvent>
 #include <QHeaderView>
@@ -273,6 +274,9 @@ typedef ClickableProgressBar ProgressBar;
 #endif
 
     void formatToolButtons(QToolButton* btn1, QToolButton* btn2 = 0, QToolButton* btn3 = 0);
+
+QString handleAvailableInputInfo(const WalletModel *_model, const int64_t& gasAmount);
+
 
 
 } // namespace GUIUtil

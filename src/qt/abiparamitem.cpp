@@ -3,20 +3,28 @@
 
 #include <QHBoxLayout>
 #include <QRegularExpressionValidator>
+#include <QSettings>
 
 ABIParamItem::ABIParamItem(const ParameterABI &param, QWidget *parent) :
     QWidget(parent),
     m_buttonAdd(new QToolButton(this)),
     m_buttonRemove(new QToolButton(this)),
-    m_itemValue(new QValidatedLineEdit(this)),
+    m_itemValue(new EthAddressLineEdit(this)),
     m_isDeleted(false)
 {
     QHBoxLayout *mainLayout = new QHBoxLayout(this);
     mainLayout->setSpacing(2);
     mainLayout->setContentsMargins(0,0,0,0);
+	
+	QSettings settings;
+	if (settings.value("theme").toString() == "dark grey" || settings.value("theme").toString() == "dark blue") {
+	    m_buttonAdd->setIcon(QIcon(":/icons/add-white"));
+		m_buttonRemove->setIcon(QIcon(":/icons/remove-light"));
+	} else {
+	    m_buttonAdd->setIcon(QIcon(":/icons/add"));
+		m_buttonRemove->setIcon(QIcon(":/icons/remove"));
+	}		
 
-    m_buttonAdd->setIcon(QIcon(":/icons/add"));
-    m_buttonRemove->setIcon(QIcon(":/icons/remove"));
 
     m_buttonAdd->setFixedSize(30,30);
     m_buttonRemove->setFixedSize(30,30);

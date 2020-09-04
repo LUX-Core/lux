@@ -32,6 +32,15 @@ static const bool DEFAULT_SPLASHSCREEN = true;
 #define COLOR_BLACK QColor(51, 51, 51)
 #define COLOR_TX_STATUS_DANGER QColor(200, 100, 100)
 
+/* Transaction list -- unconfirmed transaction when a darker theme is selected */
+#define SECOND_COLOR_UNCONFIRMED QColor(255, 255, 255)
+/* Transaction list -- negative amount when a darker theme is selected */
+#define SECOND_COLOR_NEGATIVE QColor(255, 125, 125)
+/* Transaction list -- bare address (without label) when a darker theme is selected */
+#define SECOND_COLOR_BAREADDRESS QColor(255, 255, 255)
+/* Transaction list -- TX status decoration - default color when a darker theme is selected */
+#define SECOND_COLOR_WHITE QColor(255, 255, 255)
+
 #define CONFIRM_ICONS 5
 
 /* Tooltips longer than this (in characters) are converted into rich text,

@@ -9,6 +9,7 @@
 #include <QIcon>
 #include <QMenu>
 #include <QSortFilterProxyModel>
+#include <QSettings>
 
 ContractBookPage::ContractBookPage(QWidget *parent) :
     QDialog(parent),
@@ -17,10 +18,19 @@ ContractBookPage::ContractBookPage(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    ui->newContractInfo->setIcon(QIcon(":/icons/add"));
-    ui->copyAddress->setIcon(QIcon(":/icons/editcopy"));
-    ui->deleteContractInfo->setIcon(QIcon(":/icons/remove"));
-    ui->exportButton->setIcon(QIcon(":/icons/export"));
+	QSettings settings;
+	if (settings.value("theme").toString() == "dark grey" || settings.value("theme").toString() == "dark blue") {
+		ui->newContractInfo->setIcon(QIcon(":/icons/add-white"));
+		ui->copyAddress->setIcon(QIcon(":/icons/editcopy"));
+		ui->deleteContractInfo->setIcon(QIcon(":/icons/remove-light"));
+		ui->exportButton->setIcon(QIcon(":/icons/export"));
+
+	} else {
+		ui->newContractInfo->setIcon(QIcon(":/icons/add"));
+		ui->copyAddress->setIcon(QIcon(":/icons/editcopy"));
+		ui->deleteContractInfo->setIcon(QIcon(":/icons/remove"));
+		ui->exportButton->setIcon(QIcon(":/icons/export"));
+	}	
 
     setWindowTitle(tr("Choose the contract for send/call"));
     ui->labelExplanation->setText(tr("These are your saved contracts. Always check the contract address and the ABI before sending/calling."));
@@ -40,6 +50,18 @@ ContractBookPage::ContractBookPage(QWidget *parent) :
     contextMenu->addAction(editAction);
     contextMenu->addAction(deleteAction);
     contextMenu->addSeparator();
+	
+	if (settings.value("theme").toString() == "dark grey") {
+		QString styleSheet = ".QTableView { background-color: #262626; alternate-background-color:#424242; "
+								"gridline-color: #40c2dc; border: 1px solid #40c2dc !important; color: #fff; min-height:2em; }";				
+		ui->tableView->setStyleSheet(styleSheet);
+	} else if (settings.value("theme").toString() == "dark blue") {
+		QString styleSheet = ".QTableView { background-color: #061532; alternate-background-color:#0D2A64; "
+								"gridline-color: #40c2dc; border: 1px solid #40c2dc !important; color: #fff; min-height:2em; }";					
+		ui->tableView->setStyleSheet(styleSheet);
+	} else { 
+		//code here
+	}
 
     // Connect signals for context menu actions
     connect(copyAddressAction, SIGNAL(triggered()), this, SLOT(on_copyAddress_clicked()));

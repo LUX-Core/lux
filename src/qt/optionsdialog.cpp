@@ -40,6 +40,18 @@ OptionsDialog::OptionsDialog(QWidget* parent, bool enableWallet) : QDialog(paren
 {
     ui->setupUi(this);
     GUIUtil::restoreWindowGeometry("nOptionsDialogWindow", this->size(), this);
+	
+	QSettings settings;
+
+	if (settings.value("theme").toString() == "dark grey") {
+		QString styleSheet = ".QGroupBox { background-color: transparent; border: 0px solid #40c2dc !important;}";
+		ui->groupBox->setStyleSheet(styleSheet);
+	} else if (settings.value("theme").toString() == "dark blue") {
+		QString styleSheet = ".QGroupBox { background-color: transparent; border: 0px solid #40c2dc !important; }";
+		ui->groupBox->setStyleSheet(styleSheet);
+	} else { 
+		//code here
+	}
 
     /* Main elements init */
     ui->databaseCache->setMinimum(nMinDbCache);
@@ -84,7 +96,9 @@ OptionsDialog::OptionsDialog(QWidget* parent, bool enableWallet) : QDialog(paren
     }
 
     /* Theme selector static themes */
-    ui->theme->addItem(tr("default"), QVariant("default"));
+    ui->theme->addItem(QString("default"), QVariant("default"));
+	  ui->theme->addItem(QString("dark blue"), QVariant("dark blue"));
+    ui->theme->addItem(QString("dark grey"), QVariant("dark grey"));
 
     /* Theme selector external themes */
     boost::filesystem::path pathAddr = GetDataDir() / "themes";
@@ -324,8 +338,14 @@ void OptionsDialog::on_hideTrayIcon_stateChanged(int fState) {
 
 void OptionsDialog::showRestartWarning(bool fPersistent)
 {
-    ui->statusLabel->setStyleSheet("QLabel { color: red; }");
-
+    
+	QSettings settings;
+	if (settings.value("theme").toString() == "dark grey" || settings.value("theme").toString() == "dark blue") {
+		ui->statusLabel->setStyleSheet("QLabel { color: #ff7d7d; }");
+	} else {
+		ui->statusLabel->setStyleSheet("QLabel { color: red; }");
+	}
+	
     if (fPersistent) {
         ui->statusLabel->setText(tr("Client restart required to activate changes."));
     } else {

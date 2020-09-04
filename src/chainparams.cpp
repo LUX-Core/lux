@@ -320,11 +320,11 @@ public:
 //        std::cout << genesis.GetHash().GetHex() << std::endl;
 //        std::cout << genesis.hashMerkleRoot.GetHex() << std::endl;
 
-        nSwitchPhi2Block = 1000;
-        nSplitRewardBlock = 1500;
-        nPruneAfterHeight = 5000;
-        nFirstSCBlock = 10000;
-        nPreminePaymentandHardForkBlock = 50000;
+        nSwitchPhi2Block = 30;
+        nSplitRewardBlock = 500000;
+        nPruneAfterHeight = 500000;
+        nFirstSCBlock = 40;
+        nPreminePaymentandHardForkBlock = 500000;
 
         consensus.hashGenesisBlock = genesis.GetHash();
 

@@ -23,6 +23,7 @@
 #include <QTableView>
 #include <QVBoxLayout>
 #include <QRegularExpressionValidator>
+#include <QSettings>
 
 #define paternTokenAmount "^[0-9]{1,59}\\.{1,1}[0-9]{0,18}"
 
@@ -108,6 +109,37 @@ TokenTransactionView::TokenTransactionView(QWidget *parent) :
     view->setTabKeyNavigation(false);
     view->setContextMenuPolicy(Qt::CustomContextMenu);
 
+	QSettings settings;
+
+	if (settings.value("theme").toString() == "dark grey") {
+		QString styleSheet = ".QHeaderView { background-color: #262626; outline: 10; "
+								"border-top: 1px solid #40c2dc; border-left: 1px solid #40c2dc; }"
+								".QHeaderView::section { qproperty-alignment: center; background-color: #262626; "
+								"color: #fff; min-height: 25px; min-width: 20px; font-weight: bold; font-size: 12px; "
+								"border: 0; border-right: 1px solid #40c2dc; border-bottom: 1px solid #40c2dc; "
+								"padding-left: 5px; padding-right: 5px; padding-top: 2px; padding-bottom: 2px; }"
+								".QHeaderView::section:last { border-right: 1px solid #40c2dc; }"
+								".QTableCornerButton::section { background-color:#262626; border: 0px solid #40c2dc !important;}"
+								".QTableView { background-color: #262626; alternate-background-color:#424242; "
+								"gridline-color: #40c2dc; border: 0px solid #40c2dc; border-left: 1px solid #40c2dc !important; "
+								"border-bottom: 1px solid #40c2dc !important; color: #fff; min-height:2em; margin-top: 5px  !important; }";					
+		view->setStyleSheet(styleSheet);
+	} else if (settings.value("theme").toString() == "dark blue") {
+		QString styleSheet = ".QHeaderView { background-color: 061532; outline: 10; "
+								"border-top: 1px solid #40c2dc; border-left: 1px solid #40c2dc; }"
+								".QHeaderView::section { qproperty-alignment: center; background-color: #061532; "
+								"color: #fff; min-height: 25px; min-width: 20px; font-weight: bold; font-size: 12px; "
+								"border: 0; border-right: 1px solid #40c2dc; border-bottom: 1px solid #40c2dc; "
+								"padding-left: 5px; padding-right: 5px; padding-top: 2px; padding-bottom: 2px; }"
+								".QHeaderView::section:last { border-right: 1px solid #40c2dc; }"
+								".QTableCornerButton::section { background-color:#061532; border: 0px solid #40c2dc !important;}"
+								".QTableView { background-color: #061532; alternate-background-color:#0D2A64; "
+								"gridline-color: #40c2dc; border: 0px solid #40c2dc; border-left: 1px solid #40c2dc !important; "
+								"border-bottom: 1px solid #40c2dc !important; color: #fff; min-height:2em; margin-top: 5px  !important; }";	
+		view->setStyleSheet(styleSheet);
+	} else { 
+		//code here
+	}
     view->installEventFilter(this);
     tokenView = view;
 

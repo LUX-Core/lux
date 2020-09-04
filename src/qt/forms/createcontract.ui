@@ -259,7 +259,7 @@
                <x>0</x>
                <y>0</y>
                <width>656</width>
-               <height>172</height>
+               <height>134</height>
               </rect>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_5"/>
@@ -287,55 +287,10 @@
           <property name="verticalSpacing">
            <number>6</number>
           </property>
-          <item row="2" column="1" colspan="4">
-           <widget class="AddressField" name="lineEditSenderAddress">
-            <property name="minimumSize">
-             <size>
-              <width>370</width>
-              <height>0</height>
-             </size>
-            </property>
-           </widget>
+          <item row="1" column="4">
+           <widget class="BitcoinAmountField" name="lineEditGasPrice"/>
           </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="labelSenderAddress">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="minimumSize">
-             <size>
-              <width>130</width>
-              <height>0</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>Sender Address</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="3">
-           <widget class="QLabel" name="labelGasPrice">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="minimumSize">
-             <size>
-              <width>90</width>
-              <height>0</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>Gas Price</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="0">
+          <item row="1" column="0">
            <widget class="QLabel" name="labelGasLimit">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
@@ -354,23 +309,45 @@
             </property>
            </widget>
           </item>
-          <item row="0" column="1">
-           <widget class="QSpinBox" name="lineEditGasLimit">
+          <item row="3" column="0">
+           <widget class="QLabel" name="labelSenderAddress">
             <property name="sizePolicy">
-             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+             <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            <property name="minimumSize">
+             <size>
+              <width>130</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>Sender Address</string>
             </property>
            </widget>
           </item>
-          <item row="0" column="4">
-           <widget class="BitcoinAmountField" name="lineEditGasPrice"/>
+          <item row="1" column="3">
+           <widget class="QLabel" name="labelGasPrice">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>90</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>Gas Price</string>
+            </property>
+           </widget>
           </item>
-          <item row="0" column="2">
+          <item row="1" column="2">
            <spacer name="horizontalSpacer_5">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
@@ -385,6 +362,43 @@
              </size>
             </property>
            </spacer>
+          </item>
+          <item row="3" column="1" colspan="4">
+           <widget class="AddressField" name="lineEditSenderAddress">
+            <property name="minimumSize">
+             <size>
+              <width>370</width>
+              <height>0</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QSpinBox" name="lineEditGasLimit">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="labelInfo">
+            <property name="text">
+             <string>Info</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1" colspan="4">
+           <widget class="QLabel" name="labelAvailInputInfo">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
           </item>
          </layout>
         </widget>
@@ -459,6 +473,12 @@
  </widget>
  <customwidgets>
   <customwidget>
+   <class>BitcoinAmountField</class>
+   <extends>QLineEdit</extends>
+   <header>bitcoinamountfield.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
    <class>QValidatedTextEdit</class>
    <extends>QTextEdit</extends>
    <header>qvalidatedtextedit.h</header>
@@ -467,12 +487,6 @@
    <class>AddressField</class>
    <extends>QComboBox</extends>
    <header>addressfield.h</header>
-  </customwidget>
-  <customwidget>
-   <class>BitcoinAmountField</class>
-   <extends>QLineEdit</extends>
-   <header>bitcoinamountfield.h</header>
-   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>

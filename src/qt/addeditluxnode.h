@@ -1,5 +1,5 @@
-#ifndef ADDEDITLUXNODE_H
-#define ADDEDITLUXNODE_H
+#ifndef BITCOIN_QT_ADDEDITLUXNODE_H
+#define BITCOIN_QT_ADDEDITLUXNODE_H
 
 #include <QDialog>
 
@@ -28,4 +28,4 @@ private:
     Ui::AddEditLuxNode *ui;
 };
 
-#endif // ADDEDITLUXNODE_H
+#endif // BITCOIN_QT_ADDEDITLUXNODE_H

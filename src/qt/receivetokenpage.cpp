@@ -4,11 +4,30 @@
 #include "receiverequestdialog.h"
 #include "guiutil.h"
 
+#include <QSettings>
+
 ReceiveTokenPage::ReceiveTokenPage(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::ReceiveTokenPage)
 {
     ui->setupUi(this);
+	
+		QSettings settings;
+	
+	if (settings.value("theme").toString() == "dark grey") {
+		QString styleSheet = ".QPushButton { background-color: #262626; color:#fff; border: 1px solid #40c2dc; "
+								"padding-left:10px; padding-right:10px; min-height:25px; min-width:75px; }"
+								".QPushButton:hover { background-color:#40c2dc !important; color:#262626 !important; }";					
+		ui->copyAddressButton->setStyleSheet(styleSheet);
+	} else if (settings.value("theme").toString() == "dark blue") {
+		QString styleSheet = ".QPushButton { background-color: #061532; color:#fff; border: 1px solid #40c2dc; "
+								"padding-left:10px; padding-right:10px; min-height:25px; min-width:75px; }"
+								".QPushButton:hover { background-color:#40c2dc; color:#061532; }";					
+		ui->copyAddressButton->setStyleSheet(styleSheet);
+	} else { 
+		//code here
+	}
+	
     connect(ui->copyAddressButton, SIGNAL(clicked()), this, SLOT(on_copyAddressClicked()));
 }
 

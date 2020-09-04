@@ -9,6 +9,7 @@
 #include <QKeyEvent>
 #include <QLineEdit>
 #include <QHBoxLayout>
+#include <QSettings>
 
 class TokenAmountSpinBox: public QAbstractSpinBox
 {
@@ -177,6 +178,23 @@ TokenAmountField::TokenAmountField(QWidget *parent) :
     amount = new TokenAmountSpinBox(this);
     amount->setLocale(QLocale::c());
     amount->installEventFilter(this);
+	
+	QSettings settings;
+	if (settings.value("theme").toString() == "dark grey") {
+		QString styleSheet = ".TokenAmountSpinBox { background-color: #262626; "
+								"color:#fff; border: 1px solid #40c2dc; "
+								"padding-left:10px; padding-right:10px; min-height:25px;  }";
+		
+		amount->setStyleSheet(styleSheet);
+	} else if (settings.value("theme").toString() == "dark blue") {
+		QString styleSheet = ".TokenAmountSpinBox { background-color: #061532; "
+								"color:#fff; border: 1px solid #40c2dc; "
+								"padding-left:10px; padding-right:10px; min-height:25px;  }";
+		
+		amount->setStyleSheet(styleSheet);
+	} else { 
+		//code here
+	}
 
     QHBoxLayout *layout = new QHBoxLayout(this);
     layout->addWidget(amount);
@@ -207,10 +225,29 @@ bool TokenAmountField::validate()
 
 void TokenAmountField::setValid(bool valid)
 {
-    if (valid)
-        amount->setStyleSheet("");
-    else
-        amount->setStyleSheet(STYLE_INVALID);
+	QSettings settings;
+
+
+    if (valid) {
+		if (settings.value("theme").toString() == "dark grey") {
+			QString styleSheet = ".TokenAmountSpinBox { background-color: #262626; "
+									"color:#fff; border: 1px solid #40c2dc; "
+									"padding-left:10px; padding-right:10px; min-height:25px;  }";
+			
+			amount->setStyleSheet(styleSheet);
+		} else if (settings.value("theme").toString() == "dark blue") {
+			QString styleSheet = ".TokenAmountSpinBox { background-color: #061532; "
+									"color:#fff; border: 1px solid #40c2dc; "
+									"padding-left:10px; padding-right:10px; min-height:25px;  }";
+			
+			amount->setStyleSheet(styleSheet);
+		} else {
+			amount->setStyleSheet("");
+		}
+
+    } else {
+		amount->setStyleSheet(STYLE_INVALID);
+	}
 }
 
 bool TokenAmountField::eventFilter(QObject *object, QEvent *event)

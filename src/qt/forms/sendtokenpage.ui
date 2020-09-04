@@ -38,46 +38,7 @@
      <property name="verticalSpacing">
       <number>15</number>
      </property>
-     <item row="0" column="0">
-      <widget class="QLabel" name="labelPayTo">
-       <property name="minimumSize">
-        <size>
-         <width>100</width>
-         <height>0</height>
-        </size>
-       </property>
-       <property name="text">
-        <string>PayTo</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="0">
-      <widget class="QLabel" name="labelAmount">
-       <property name="minimumSize">
-        <size>
-         <width>100</width>
-         <height>0</height>
-        </size>
-       </property>
-       <property name="text">
-        <string>Amount</string>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="0">
-      <widget class="QLabel" name="labelGasLimit">
-       <property name="minimumSize">
-        <size>
-         <width>100</width>
-         <height>0</height>
-        </size>
-       </property>
-       <property name="text">
-        <string>GasLimit</string>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="0">
+     <item row="5" column="0">
       <widget class="QLabel" name="labelGasPrice">
        <property name="minimumSize">
         <size>
@@ -87,6 +48,19 @@
        </property>
        <property name="text">
         <string>GasPrice</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="0">
+      <widget class="QLabel" name="labelGasLimit">
+       <property name="minimumSize">
+        <size>
+         <width>100</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>GasLimit</string>
        </property>
       </widget>
      </item>
@@ -103,16 +77,29 @@
        </property>
       </widget>
      </item>
+     <item row="1" column="1">
+      <widget class="TokenAmountField" name="lineEditAmount" native="true"/>
+     </item>
      <item row="0" column="1">
       <widget class="QValidatedLineEdit" name="lineEditPayTo"/>
      </item>
      <item row="2" column="1">
       <widget class="QLineEdit" name="lineEditDescription"/>
      </item>
-     <item row="4" column="1">
-      <widget class="BitcoinAmountField" name="lineEditGasPrice"/>
+     <item row="0" column="0">
+      <widget class="QLabel" name="labelPayTo">
+       <property name="minimumSize">
+        <size>
+         <width>100</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>PayTo</string>
+       </property>
+      </widget>
      </item>
-     <item row="3" column="1">
+     <item row="4" column="1">
       <widget class="QSpinBox" name="lineEditGasLimit">
        <property name="maximumSize">
         <size>
@@ -125,8 +112,35 @@
        </property>
       </widget>
      </item>
-     <item row="1" column="1">
-      <widget class="TokenAmountField" name="lineEditAmount" native="true"/>
+     <item row="5" column="1">
+      <widget class="BitcoinAmountField" name="lineEditGasPrice"/>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="labelAmount">
+       <property name="minimumSize">
+        <size>
+         <width>100</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>Amount</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="labelInfo">
+       <property name="text">
+        <string>Info</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QLabel" name="labelAvailInputInfo">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>

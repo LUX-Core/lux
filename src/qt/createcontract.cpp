@@ -16,7 +16,9 @@
 #include "contractresult.h"
 #include "sendcoinsdialog.h"
 //#include "styleSheet.h"
+#include "guiutil.h"
 
+#include <QSettings>
 #include <QRegularExpressionValidator>
 
 namespace CreateContract_NS
@@ -65,7 +67,13 @@ CreateContract::CreateContract(QWidget *parent) :
     ui->lineEditGasLimit->setMaximum(DEFAULT_GAS_LIMIT_OP_CREATE);
     ui->lineEditGasLimit->setValue(DEFAULT_GAS_LIMIT_OP_CREATE);
     ui->pushButtonCreateContract->setEnabled(false);
-    ui->lineEditSenderAddress->setSenderAddress(true);
+
+    connect(ui->lineEditGasPrice,
+        &BitcoinAmountField::valueChanged,
+        [&](){
+            ui->labelAvailInputInfo->setText(GUIUtil::handleAvailableInputInfo(m_model, ui->lineEditGasPrice->value()));
+        }
+    );
 
     // Create new PRC command line interface
     QStringList lstMandatory;
@@ -105,16 +113,37 @@ CreateContract::~CreateContract()
 
 void CreateContract::setLinkLabels()
 {
+	QSettings settings;
+	
     ui->labelSolidity->setOpenExternalLinks(true);
-    ui->labelSolidity->setText("<a href=\"http://remix.ethereum.org/\">Solidity compiler</a>");
-
     ui->labelToken->setOpenExternalLinks(true);
-    ui->labelToken->setText("<a href=\"https://ethereum.org/token#the-code\">Token template</a>");
+
+	if (settings.value("theme").toString() == "dark grey") {
+		ui->labelSolidity->setText("<a href=\"http://remix.ethereum.org/\"><span style=\"color:#40c2dc;\">Solidity compiler</span></a>");
+		ui->labelToken->setText("<a href=\"https://ethereum.org/token#the-code\"><span style=\"color:#40c2dc;\">Token template</span></a>");
+	} else if (settings.value("theme").toString() == "dark blue") {
+		ui->labelSolidity->setText("<a href=\"http://remix.ethereum.org/\"><span style=\"color:#40c2dc;\">Solidity compiler</span></a>");
+		ui->labelToken->setText("<a href=\"https://ethereum.org/token#the-code\"><span style=\"color:#40c2dc;\">Token template</span></a>");
+	} else { 
+		ui->labelSolidity->setText("<a href=\"http://remix.ethereum.org/\">Solidity compiler</a>");
+		ui->labelToken->setText("<a href=\"https://ethereum.org/token#the-code\">Token template</a>");
+	}
 }
 
 void CreateContract::setModel(WalletModel *_model)
 {
     m_model = _model;
+    connect(m_model, &WalletModel::balanceChanged, 
+        [&](const CAmount& balance,
+            const CAmount&,
+            const CAmount&,
+            const CAmount&,
+            const CAmount&,
+            const CAmount&,
+            const CAmount&){
+                ui->labelAvailInputInfo->setText(GUIUtil::handleAvailableInputInfo(m_model, ui->lineEditGasPrice->value()));
+        }
+    );
 }
 
 bool CreateContract::isValidBytecode()
@@ -223,7 +252,6 @@ void CreateContract::on_numBlocksChanged(int newHeight)
 {
     if(m_clientModel)
     {
-        if (lastUpdatedHeight < newHeight) {
             uint64_t blockGasLimit = 0;
             uint64_t minGasPrice = 0;
             uint64_t nGasPrice = 0;
@@ -238,8 +266,7 @@ void CreateContract::on_numBlocksChanged(int newHeight)
             ui->lineEditGasLimit->setMaximum(blockGasLimit);
 
             ui->lineEditSenderAddress->on_refresh();
-            lastUpdatedHeight = newHeight;
-        }
+
     }
 }
 

@@ -15,12 +15,14 @@
 #include "uint256.h"
 #include "util.h"
 #include "wallet.h"
+#include "guiutil.h"
 
 #include <QColor>
 #include <QDateTime>
 #include <QDebug>
 #include <QIcon>
 #include <QList>
+#include <QSettings>
 
 // Amount column is right-aligned it contains numbers
 static int column_alignments[] = {
@@ -386,17 +388,34 @@ QString TokenTransactionTableModel::formatTxType(const TokenTransactionRecord *w
 
 QVariant TokenTransactionTableModel::txAddressDecoration(const TokenTransactionRecord *wtx) const
 {
-    switch(wtx->type)
-    {
-    case TokenTransactionRecord::RecvWithAddress:
-    case TokenTransactionRecord::RecvFromOther:
-        return QIcon(":/icons/tx_input");
-    case TokenTransactionRecord::SendToAddress:
-    case TokenTransactionRecord::SendToOther:
-        return QIcon(":/icons/tx_output");
-    default:
-        return QIcon(":/icons/tx_inout");
-    }
+	QSettings settings;
+	if (settings.value("theme").toString() == "dark grey" || settings.value("theme").toString() == "dark blue") {
+		switch(wtx->type)
+		{
+		case TokenTransactionRecord::RecvWithAddress:
+		case TokenTransactionRecord::RecvFromOther:
+			return QIcon(":/icons/tx_input-light");
+		case TokenTransactionRecord::SendToAddress:
+		case TokenTransactionRecord::SendToOther:
+			return QIcon(":/icons/tx_output-light");
+		default:
+			return QIcon(":/icons/tx_inout-light");
+		}
+
+	} else {
+		switch(wtx->type)
+		{
+		case TokenTransactionRecord::RecvWithAddress:
+		case TokenTransactionRecord::RecvFromOther:
+			return QIcon(":/icons/tx_input");
+		case TokenTransactionRecord::SendToAddress:
+		case TokenTransactionRecord::SendToOther:
+			return QIcon(":/icons/tx_output");
+		default:
+			return QIcon(":/icons/tx_inout");
+		}
+
+	}	
 }
 
 QString TokenTransactionTableModel::formatTxToAddress(const TokenTransactionRecord *wtx, bool tooltip) const
@@ -423,21 +442,40 @@ QString TokenTransactionTableModel::formatTxTokenSymbol(const TokenTransactionRe
 
 QVariant TokenTransactionTableModel::addressColor(const TokenTransactionRecord *wtx) const
 {
+		QSettings settings;
+	if (settings.value("theme").toString() == "dark grey" || settings.value("theme").toString() == "dark blue") {
+		switch(wtx->type)
+		{
+		case TokenTransactionRecord::RecvWithAddress:
+		case TokenTransactionRecord::SendToAddress:
+			{
+			QString label = walletModel->getAddressTableModel()->labelForAddress(QString::fromStdString(wtx->address));
+			if(label.isEmpty())
+				return SECOND_COLOR_BAREADDRESS;
+			} break;
+		case TokenTransactionRecord::SendToSelf:
+			return SECOND_COLOR_BAREADDRESS;
+		default:
+			break;
+		}
+			
+	} else { 
+		switch(wtx->type)
+		{
+		case TokenTransactionRecord::RecvWithAddress:
+		case TokenTransactionRecord::SendToAddress:
+			{
+			QString label = walletModel->getAddressTableModel()->labelForAddress(QString::fromStdString(wtx->address));
+			if(label.isEmpty())
+				return COLOR_BAREADDRESS;
+			} break;
+		case TokenTransactionRecord::SendToSelf:
+			return COLOR_BAREADDRESS;
+		default:
+			break;
+		}
+	}
     // Show addresses without label in a less visible color
-    switch(wtx->type)
-    {
-    case TokenTransactionRecord::RecvWithAddress:
-    case TokenTransactionRecord::SendToAddress:
-        {
-        QString label = walletModel->getAddressTableModel()->labelForAddress(QString::fromStdString(wtx->address));
-        if(label.isEmpty())
-            return COLOR_BAREADDRESS;
-        } break;
-    case TokenTransactionRecord::SendToSelf:
-        return COLOR_BAREADDRESS;
-    default:
-        break;
-    }
     return QVariant();
 }
 
@@ -475,7 +513,13 @@ QVariant TokenTransactionTableModel::txStatusDecoration(const TokenTransactionRe
     case TokenTransactionStatus::Confirmed:
         return QIcon(":/icons/transaction_confirmed");
     default:
-        return COLOR_BLACK;
+		QSettings settings;
+		if (settings.value("theme").toString() == "dark grey" || settings.value("theme").toString() == "dark blue") {
+			return SECOND_COLOR_WHITE;			
+		} else { 
+			return COLOR_BLACK;
+		}
+        
     }
 }
 
@@ -495,7 +539,7 @@ QVariant TokenTransactionTableModel::data(const QModelIndex &index, int role) co
     if(!index.isValid())
         return QVariant();
     TokenTransactionRecord *rec = static_cast<TokenTransactionRecord*>(index.internalPointer());
-
+	QSettings settings;
     switch(role)
     {
     case RawDecorationRole:
@@ -550,18 +594,31 @@ QVariant TokenTransactionTableModel::data(const QModelIndex &index, int role) co
         return column_alignments[index.column()];
     case Qt::ForegroundRole:
         // Non-confirmed as transactions are grey
-        if(!rec->status.countsForBalance)
-        {
-            return COLOR_UNCONFIRMED;
-        }
-        if(index.column() == Amount && (rec->credit+rec->debit) < 0)
-        {
-            return COLOR_NEGATIVE;
-        }
-        if(index.column() == ToAddress)
-        {
-            return addressColor(rec);
-        }
+			
+		if (settings.value("theme").toString() == "dark grey" || settings.value("theme").toString() == "dark blue") {
+			if(!rec->status.countsForBalance)
+			{
+				return SECOND_COLOR_UNCONFIRMED;
+			}
+			if(index.column() == Amount && (rec->credit+rec->debit) < 0)
+			{
+				return SECOND_COLOR_NEGATIVE;
+			}
+			
+		} else { 
+			if(!rec->status.countsForBalance)
+			{
+				return COLOR_UNCONFIRMED;
+			}
+			if(index.column() == Amount && (rec->credit+rec->debit) < 0)
+			{
+				return COLOR_NEGATIVE;
+			}
+		}
+		if(index.column() == ToAddress)
+		{
+			return addressColor(rec);
+		}
         break;
     case TypeRole:
         return rec->type;

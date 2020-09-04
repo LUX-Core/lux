@@ -21,6 +21,7 @@
 #include "guiutil.h"
 #include "sendcoinsdialog.h"
 #include <QClipboard>
+#include <QSettings>
 
 namespace SendToContract_NS
 {
@@ -53,9 +54,17 @@ SendToContract::SendToContract(QWidget *parent) :
 
     // Setup ui components
     ui->setupUi(this);
-    ui->saveInfoButton->setIcon(QIcon(":/icons/filesave"));
-    ui->loadInfoButton->setIcon(QIcon(":/icons/address-book"));
-    ui->pasteAddressButton->setIcon(QIcon(":/icons/editpaste"));
+	
+	QSettings settings;
+	if (settings.value("theme").toString() == "dark grey" || settings.value("theme").toString() == "dark blue") {
+		ui->saveInfoButton->setIcon(QIcon(":/icons/filesave-light"));
+		ui->loadInfoButton->setIcon(QIcon(":/icons/address-book-white"));
+		ui->pasteAddressButton->setIcon(QIcon(":/icons/editpaste-white"));
+	} else {
+		ui->saveInfoButton->setIcon(QIcon(":/icons/filesave"));
+		ui->loadInfoButton->setIcon(QIcon(":/icons/address-book"));
+		ui->pasteAddressButton->setIcon(QIcon(":/icons/editpaste"));
+	}
     // Format tool buttons
     GUIUtil::formatToolButtons(ui->saveInfoButton, ui->loadInfoButton, ui->pasteAddressButton);
 
@@ -80,7 +89,12 @@ SendToContract::SendToContract(QWidget *parent) :
     ui->lineEditGasLimit->setValue(DEFAULT_GAS_LIMIT_OP_SEND);
     ui->textEditInterface->setIsValidManually(true);
     ui->pushButtonSendToContract->setEnabled(false);
-
+    connect(ui->lineEditGasPrice,
+        &BitcoinAmountField::valueChanged,
+        [&](){
+            ui->labelAvailInputInfo->setText(GUIUtil::handleAvailableInputInfo(m_model, ui->lineEditGasPrice->value()));
+        }
+    );
     // Create new PRC command line interface
     QStringList lstMandatory;
     lstMandatory.append(PARAM_ADDRESS);
@@ -129,6 +143,17 @@ void SendToContract::setModel(WalletModel *_model)
 {
     m_model = _model;
     m_contractModel = m_model->getContractTableModel();
+    connect(m_model, &WalletModel::balanceChanged, 
+        [&](const CAmount& balance,
+            const CAmount&,
+            const CAmount&,
+            const CAmount&,
+            const CAmount&,
+            const CAmount&,
+            const CAmount&){
+                ui->labelAvailInputInfo->setText(GUIUtil::handleAvailableInputInfo(m_model, ui->lineEditGasPrice->value()));
+        }
+    );
 }
 
 bool SendToContract::isValidContractAddress()
@@ -249,7 +274,6 @@ void SendToContract::on_numBlocksChanged(int newHeight)
     if(m_clientModel)
     {
 
-        if (lastUpdatedHeight < newHeight) {
             uint64_t blockGasLimit = 0;
             uint64_t minGasPrice = 0;
             uint64_t nGasPrice = 0;
@@ -264,8 +288,6 @@ void SendToContract::on_numBlocksChanged(int newHeight)
             ui->lineEditGasLimit->setMaximum(blockGasLimit);
 
             ui->lineEditSenderAddress->on_refresh();
-            lastUpdatedHeight = newHeight;
-        }
     }
 }
 

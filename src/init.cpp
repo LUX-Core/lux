@@ -401,8 +401,6 @@ std::string HelpMessage(HelpMessageMode mode)
     strUsage += HelpMessageOpt("-pid=<file>", strprintf(_("Specify pid file (default: %s)"), "luxd.pid"));
 #endif
     strUsage += HelpMessageOpt("-record-log-opcodes", _("Logs all EVM LOG opcode operations to the file vmExecLogs.json"));
-    //Temporarily disabled until our chain doesn't grow in size
-    //strUsage += HelpMessageOpt("-prune=<n>", _("Reduce storage requirements by pruning (deleting) old blocks. This mode disables wallet support and is incompatible with -txindex.") + " " + _("Warning: Reverting this setting requires re-downloading the entire blockchain.") + " " + _("(default: 0 = disable pruning blocks,") + " " + strprintf(_(">%u = target size in MiB to use for block files)"), MIN_DISK_SPACE_FOR_BLOCK_FILES / 1024 / 1024));
     strUsage += HelpMessageOpt("-reindex-chainstate", _("Rebuild chain state from the currently indexed blocks"));
     strUsage += HelpMessageOpt("-reindex", _("Rebuild block chain index from current blk000??.dat files") + " " + _("on startup"));
 #if !defined(WIN32)
@@ -415,6 +413,7 @@ std::string HelpMessage(HelpMessageMode mode)
 
     strUsage += HelpMessageGroup(_("Connection options:"));
     strUsage += HelpMessageOpt("-addnode=<ip>", _("Add a node to connect to and attempt to keep the connection open"));
+    strUsage += HelpMessageOpt("-peerlimit=<n>", _("limit the number of peers used while syncing to increase syncing speed. (limit removed after wallet is synced)"));
     strUsage += HelpMessageOpt("-banscore=<n>", strprintf(_("Threshold for disconnecting misbehaving peers (default: %u)"), 100));
     strUsage += HelpMessageOpt("-bantime=<n>", strprintf(_("Number of seconds to keep misbehaving peers from reconnecting (default: %u)"), 86400));
     strUsage += HelpMessageOpt("-bind=<addr>", _("Bind to given address and always listen on it. Use [host]:port notation for IPv6"));
@@ -613,26 +612,6 @@ struct CImportingNow {
         fImporting = false;
     }
 };
-
-class Read;
-
-void DeleteAllBlockFiles()
-{
-    if (boost::filesystem::exists(GetBlockPosFilename(CDiskBlockPos(0, 0), "blk")))
-        return;
-
-    LogPrintf("Removing all blk?????.dat and rev?????.dat files for -reindex with -prune\n");
-    boost::filesystem::path blocksdir = GetDataDir() / "blocks";
-    for (boost::filesystem::directory_iterator it(blocksdir); it != boost::filesystem::directory_iterator(); it++) {
-        if (is_regular_file(*it)) {
-            if ((it->path().filename().string().length() == 12) &&
-                (it->path().filename().string().substr(8,4) == ".dat") &&
-                ((it->path().filename().string().substr(0,3) == "blk") ||
-                 (it->path().filename().string().substr(0,3) == "rev")))
-                boost::filesystem::remove(it->path());
-        }
-    }
-}
 
 void ThreadImport(std::vector<boost::filesystem::path> vImportFiles)
 {
@@ -920,27 +899,6 @@ bool AppInit2()
         return InitError(_("Not enough file descriptors available."));
     if (nFD - MIN_CORE_FILEDESCRIPTORS < nMaxConnections)
         nMaxConnections = nFD - MIN_CORE_FILEDESCRIPTORS;
-    //Temporarily disabled until our chain doesn't grow in size
-    /*if (GetArg("-prune", 0)) {
-        std::string strLoadError;
-        if (GetBoolArg("-txindex", DEFAULT_TXINDEX)) {
-            strLoadError = _("You need to add txindex=0 to start pruning");
-            bool fRetPrune = uiInterface.ThreadSafeQuestion(
-                strLoadError + ".\n\n" + _("Do you want to add automatically add it to the configuration file and close the wallet?"),
-                strLoadError + ".\nPlease restart with txindex=0 to prune.",
-                "", CClientUIInterface::MSG_ERROR | CClientUIInterface::BTN_ABORT);
-            if (fRetPrune){
-                nIndexNum = 0;
-                WriteConfigToFile("txindex", std::to_string(nIndexNum));
-                fReindex = true;
-                fRequestRestart = true;  
-            } else {
-                LogPrintf("Aborted configuration changes. Exiting.\n");
-                return false;
-            }
-        }
-    }
-    */
     if (fRequestRestart) {
         LogPrintf("Restart requested. Exiting.\n");
         return false;
@@ -991,19 +949,6 @@ bool AppInit2()
 
     fServer = GetBoolArg("-server", false);
     setvbuf(stdout, NULL, _IOLBF, 0); /// ***TODO*** do we still need this after -printtoconsole is gone?
-
-    int64_t nSignedPruneTarget = GetArg("-prune", 0) * 1024 * 1024;
-    if (nSignedPruneTarget < 0) {
-        return InitError(_("Prune cannot be configured with a negative value."));
-    }
-    nPruneTarget = (uint64_t) nSignedPruneTarget;
-    if (nPruneTarget) {
-        if (nPruneTarget < MIN_DISK_SPACE_FOR_BLOCK_FILES) {
-            return InitError(strprintf(_("Prune configured below the minimum of %d MB.  Please use a higher number."), MIN_DISK_SPACE_FOR_BLOCK_FILES / 1024 / 1024));
-        }
-        LogPrintf("Prune configured to target %uMiB on disk for block and undo files.\n", nPruneTarget / 1024 / 1024);
-        fPruneMode = true;
-    }
 
 #ifdef ENABLE_WALLET
     bool fDisableWallet = GetBoolArg("-disablewallet", false);
@@ -1498,8 +1443,6 @@ bool AppInit2()
 
                 if (fReset) {
                     pblocktree->WriteReindexing(true);
-                    if (fPruneMode)
-                        DeleteAllBlockFiles();
                 }
 
                 if (fRequestShutdown) {
@@ -1596,19 +1539,7 @@ bool AppInit2()
 
                 nLogFile = GetArg("-nlogfile", 1);
 
-                // Check for changed -prune state.  What we are concerned about is a user who has pruned blocks
-                // in the past, but is now trying to run unpruned.
-                if (fHavePruned && !fPruneMode) {
-                    strLoadError = _("You need to rebuild the database using -reindex to go back to unpruned mode.  This will redownload the entire blockchain");
-                    break;
-                }
-
                 uiInterface.InitMessage(_("Verifying blocks..."));
-
-                if (fHavePruned && GetArg("-checkblocks", 288) > MIN_BLOCKS_TO_KEEP) {
-                    LogPrintf("Prune: pruned datadir may not have more than %d blocks; -checkblocks=%d may fail\n",
-                              MIN_BLOCKS_TO_KEEP, GetArg("-checkblocks", 288));
-                }
 
                 {
                     //LOCK(cs_main);
@@ -1812,15 +1743,6 @@ bool AppInit2()
         }
         if (chainActive.Tip() && chainActive.Tip() != pindexRescan) {
 
-            if (fPruneMode) {
-                CBlockIndex *block = chainActive.Tip();
-                while (block && block->pprev && (block->pprev->nStatus & BLOCK_HAVE_DATA) && block->pprev->nTx > 0 && pindexRescan != block)
-                    block = block->pprev;
-                if (pindexRescan != block) {
-                    return InitError(_("Prune: last wallet synchronisation goes beyond pruned data. You need to -reindex (download the whole blockchain again in case of pruned node)") += "\n");
-                }
-            }
-
             uiInterface.InitMessage(_("Rescanning..."));
             LogPrintf("Rescanning last %i blocks (from block %i)...\n", chainActive.Height() - pindexRescan->nHeight, pindexRescan->nHeight);
             nStart = GetTimeMillis();
@@ -1856,16 +1778,6 @@ bool AppInit2()
     LogPrintf("No wallet compiled in!\n");
 #endif // !ENABLE_WALLET
     // ********************************************************* Step 9: import blocks
-
-    // if prune mode, unset NODE_NETWORK and prune block files
-    if (fPruneMode) {
-        LogPrintf("Unsetting NODE_NETWORK on prune mode\n");
-        nLocalServices = ServiceFlags(nLocalServices | NODE_NETWORK);
-        if (!fReindex) {
-            uiInterface.InitMessage(_("Pruning blockstore..."));
-            PruneAndFlush();
-        }
-    }
 
     if (!CheckDiskSpace())
         return false;

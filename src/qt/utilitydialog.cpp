@@ -27,13 +27,15 @@
 #include <QTextTable>
 #include <QTextCursor>
 #include <QVBoxLayout>
+#include <QSettings>
+#include <QPixmap>
 
 /** "Help message" or "About" dialog box */
 HelpMessageDialog::HelpMessageDialog(QWidget* parent, HelpMode helpMode) : QDialog(parent),
                                                                     ui(new Ui::HelpMessageDialog)
 {
     ui->setupUi(this);
-
+	QSettings settings;
     QString version = tr("Luxcore") + " " + tr("version") + " " + QString::fromStdString(FormatFullVersion());
 /* On x86 add a bit specifier to the version so that users can distinguish between
      * 32 and 64 bit builds. On other architectures, 32/64 bit may be more ambigious.
@@ -54,7 +56,14 @@ HelpMessageDialog::HelpMessageDialog(QWidget* parent, HelpMode helpMode) : QDial
         // Make URLs clickable
         QRegExp uri("<(.*)>", Qt::CaseSensitive, QRegExp::RegExp2);
         uri.setMinimal(true); // use non-greedy matching
-        licenseInfoHTML.replace(uri, "<a href=\"\\1\">\\1</a>");
+		
+		if (settings.value("theme").toString() == "dark grey") {
+			licenseInfoHTML.replace(uri, "<a href=\"\\1\"><span style=\"color:#40c2dc;\">\\1</span></a>");
+		} else if (settings.value("theme").toString() == "dark blue") {
+			licenseInfoHTML.replace(uri, "<a href=\"\\1\"><span style=\"color:#40c2dc;\">\\1</span></a>");
+		} else { 
+			licenseInfoHTML.replace(uri, "<a href=\"\\1\">\\1</a>");
+		}        
         // Replace newlines with HTML breaks
         licenseInfoHTML.replace("\n", "<br>");
 
@@ -64,7 +73,9 @@ HelpMessageDialog::HelpMessageDialog(QWidget* parent, HelpMode helpMode) : QDial
         ui->aboutMessage->setText(version + "<br><br>" + licenseInfoHTML);
         ui->aboutMessage->setWordWrap(true);
         ui->helpMessage->setVisible(false);
+        ui->findFrame->setVisible(false);
     } else if (helpMode == cmdline) {
+    	ui->findMessage->setStyleSheet("QLabel { color : red; }");
         setWindowTitle(tr("Command-line options"));
         QString header = tr("Usage:") + "\n" +
                          "  lux-qt [" + tr("command-line options") + "]                     " + "\n";
@@ -126,7 +137,30 @@ HelpMessageDialog::HelpMessageDialog(QWidget* parent, HelpMode helpMode) : QDial
         ui->helpMessage->moveCursor(QTextCursor::Start);
         ui->scrollArea->setVisible(false);
         ui->aboutMessage->setVisible(false);
+
+        connect(ui->findButton, &QPushButton::clicked, [&](){
+            bool found = ui->helpMessage->find(ui->findLineEdit->text());
+            ui->findMessage->clear();
+            if(!found) {
+                QTextCursor curCursor = ui->helpMessage->textCursor();
+                curCursor.movePosition(QTextCursor::Start, QTextCursor::MoveAnchor,1);
+                ui->helpMessage->setTextCursor(curCursor);
+                ui->findMessage->setText("No more results");
+            }
+        });
     }
+
+	if (settings.value("theme").toString() == "dark grey") {
+		QString styleSheet = ".QTextEdit { border: 0px; border-left: 1px solid #40c2dc;}";
+		ui->helpMessage->setStyleSheet(styleSheet);
+		ui->graphic->setPixmap(QPixmap(":/images/about-white"));
+	} else if (settings.value("theme").toString() == "dark blue") {
+		QString styleSheet = ".QTextEdit { border: 0px; border-left: 1px solid #40c2dc;}";
+		ui->helpMessage->setStyleSheet(styleSheet);
+		ui->graphic->setPixmap(QPixmap(":/images/about-white"));
+	} else { 
+		ui->graphic->setPixmap(QPixmap(":/images/about"));
+	}
 }
 
 HelpMessageDialog::~HelpMessageDialog()
@@ -160,10 +194,45 @@ void HelpMessageDialog::on_okButton_accepted()
 /** "Shutdown" window */
 ShutdownWindow::ShutdownWindow(QWidget* parent, Qt::WindowFlags f) : QWidget(parent, f)
 {
+	QLabel* shutdownText = new QLabel(
+								tr("Luxcore is shutting down...") + "<br /><br />" +
+								tr("Do not shut down the computer until this window disappears."));
+	QLabel* shutdownLogo = new QLabel();
+	shutdownText->setAlignment(Qt::AlignCenter);
+	shutdownLogo->setAlignment(Qt::AlignCenter);
+	
     QVBoxLayout* layout = new QVBoxLayout();
-    layout->addWidget(new QLabel(
-        tr("Luxcore is shutting down...") + "<br /><br />" +
-        tr("Do not shut down the computer until this window disappears.")));
+	
+	QSettings settings;
+	
+	if (settings.value("theme").toString() == "dark grey") {
+		shutdownText->setStyleSheet("background-color: #262626; color: #fff; border: 0px solid #40c2dc !important;");
+		shutdownLogo->setStyleSheet("background-color: #262626; color: #fff; border: 0px solid #40c2dc !important;");		
+		shutdownLogo->setPixmap(QPixmap(":/icons/warning-white")
+								.scaled(70,70,Qt::KeepAspectRatio,
+								Qt::SmoothTransformation));
+	} else if (settings.value("theme").toString() == "dark blue") {
+		shutdownText->setStyleSheet("background-color: #061532; color: #fff; border: 0px solid #40c2dc !important;");
+		shutdownLogo->setStyleSheet("background-color: #061532; color: #fff; border: 0px solid #40c2dc !important;");
+		shutdownLogo->setPixmap(QPixmap(":/icons/warning-white")
+								.scaled(70,70,Qt::KeepAspectRatio,
+								Qt::SmoothTransformation));
+
+	} else { 
+		//shutdownText->setStyleSheet("background-color: #ffffff; color: #000;");
+		//shutdownLogo->setStyleSheet("background-color: #ffffff; color: #000;");
+		shutdownLogo->setPixmap(QPixmap(":/icons/warning")
+								.scaled(70,70,Qt::KeepAspectRatio,
+								Qt::SmoothTransformation));
+
+	}
+	
+	layout->addStretch();
+	layout->addWidget(shutdownLogo);
+	layout->addStretch();
+	layout->addWidget(shutdownText);
+	layout->addStretch();
+	
     setLayout(layout);
 }
 
@@ -175,6 +244,16 @@ QWidget *ShutdownWindow::showShutdownWindow(BitcoinGUI* window)
     // Show a simple window indicating shutdown status
     QWidget* shutdownWindow = new ShutdownWindow();
     shutdownWindow->setWindowTitle(window->windowTitle());
+	
+	QSettings settings;
+
+	if (settings.value("theme").toString() == "dark grey") {
+		shutdownWindow->setStyleSheet("background-color: #262626; border: 1px solid #40c2dc;");
+	} else if (settings.value("theme").toString() == "dark blue") {
+		shutdownWindow->setStyleSheet("background-color: #061532; border: 1px solid #40c2dc;");
+	} else { 
+		shutdownWindow->setStyleSheet("background-color: #ffffff;");
+	}
 
     // Center shutdown window at where main window was
     const QPoint global = window->mapToGlobal(window->rect().center());
