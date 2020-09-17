@@ -969,10 +969,14 @@ void SendCoinsDialog::coinControlChangeChecked(int state)
 void SendCoinsDialog::coinControlChangeEdited(const QString& text)
 {
     if (model && model->getAddressTableModel()) {
+		QSettings settings;
         // Default to no change address until verified
         CoinControlDialog::coinControl->destChange = CNoDestination();
-        ui->labelCoinControlChangeLabel->setStyleSheet("QLabel{color:red;}");
-
+        if (settings.value("theme").toString() == "dark grey" || settings.value("theme").toString() == "dark blue") {
+            ui->labelCoinControlChangeLabel->setStyleSheet("QLabel{color:#FF7D7D;}");
+        } else { 
+            ui->labelCoinControlChangeLabel->setStyleSheet("QLabel{color:red;}");
+        }
         CTxDestination addr = DecodeDestination(text.toStdString());
 
         if (text.isEmpty()) // Nothing entered
@@ -996,13 +1000,21 @@ void SendCoinsDialog::coinControlChangeEdited(const QString& text)
                 else
                 {
                     ui->lineEditCoinControlChange->setText("");
-                    ui->labelCoinControlChangeLabel->setStyleSheet("QLabel{color:black;}");
+                    if (settings.value("theme").toString() == "dark grey" || settings.value("theme").toString() == "dark blue") {
+                        ui->labelCoinControlChangeLabel->setStyleSheet("QLabel{color:#FFFFFF;}");
+                    } else { 
+                        ui->labelCoinControlChangeLabel->setStyleSheet("QLabel{color:black;}");
+                    }                    
                     ui->labelCoinControlChangeLabel->setText("");
                 }
             } else // Known change address
             {
-                ui->labelCoinControlChangeLabel->setStyleSheet("QLabel{color:black;}");
-
+                if (settings.value("theme").toString() == "dark grey" || settings.value("theme").toString() == "dark blue") {
+                    ui->labelCoinControlChangeLabel->setStyleSheet("QLabel{color:#FFFFFF;}");
+                } else { 
+                    ui->labelCoinControlChangeLabel->setStyleSheet("QLabel{color:black;}");
+                }
+                
                 // Query label
                 QString associatedLabel = model->getAddressTableModel()->labelForAddress(text);
                 if (!associatedLabel.isEmpty())
