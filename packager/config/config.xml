@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Installer>
+    <Name>LUX Wallet</Name>
+    <Version>v5.3.5.0-22d01d88-Luxcore</Version>
+    <Title>LUX Wallet</Title>
+    <Publisher>LUXCore</Publisher>
+    <ProductUrl>https://luxcore.io/</ProductUrl>
+    <RunProgram>@TargetDir@/lux-qt.exe</RunProgram>
+    <Logo>logo.ico</Logo>
+    <Watermark>watermark.png</Watermark>
+    <Background>splash.png</Background>
+    <Banner></Banner>
+    <WizardStyle>Modern</WizardStyle>
+    <StartMenuDir>LUX</StartMenuDir>
+    <TargetDir>@HomeDir@/LUX</TargetDir>
+    <InstallerWindowIcon>logo</InstallerWindowIcon>
+    <InstallerApplicationIcon>logo</InstallerApplicationIcon>
+    <RemoteRepositories>
+        <Repository>
+            <Url>http://www.your-repo-location/packages/</Url>
+        </Repository>
+    </RemoteRepositories>
+</Installer>
