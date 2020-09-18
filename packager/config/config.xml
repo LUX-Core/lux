@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Installer>
     <Name>LUX Wallet</Name>
-    <Version>v5.3.5.0-22d01d88-Luxcore</Version>
+    <Version>v5.3.5.0-4692537d-Luxcore</Version>
     <Title>LUX Wallet</Title>
     <Publisher>Luxcore</Publisher>
-    <ProductUrl>https://luxcore.io</ProductUrl>
+    <ProductUrl>https://luxcore.io/</ProductUrl>
     <RunProgram>@TargetDir@/lux-qt.exe</RunProgram>
     <Logo>logo</Logo>
     <Watermark>watermark.png</Watermark>

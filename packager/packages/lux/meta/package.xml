@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Package>
     <DisplayName>LUX Wallet</DisplayName>
-    <Version>v5.3.5.0-22d01d88-Luxcore</Version>
-    <ReleaseDate>2020-09-21</ReleaseDate>
+    <Version>v5.3.5.0-4692537d-Luxcore</Version>
+    <ReleaseDate>2020-09-19</ReleaseDate>
     <Licenses>
         <License file="license.html" />
     </Licenses>
