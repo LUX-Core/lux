@@ -9,10 +9,12 @@ parser.add_argument('--site_url', type = str)
 parser.add_argument('--logo', type = str)
 parser.add_argument('--watermark', type = str)
 parser.add_argument('--repository', type = str)
+parser.add_argument('--config_file', type = str)
+
 args = parser.parse_args()
 
 
-f = open("../configure.ac", "r")
+f = open("./configure.ac", "r")
 configure_lines = f.readlines()[:20]
 f.close()
 
@@ -78,11 +80,11 @@ package_xml_str = """<?xml version="1.0" encoding="UTF-8"?>
 </Package>""" % (name, version, publisher, date.today().strftime("%Y-%m-%d"))
 
 
-text_file = open("config/config.xml", "w")
+text_file = open("./packager/config/config.xml", "w")
 n = text_file.write(config_xml_str)
 text_file.close()
 
 
-text_file = open("packages/lux/meta/package.xml", "w")
+text_file = open("./packager/packages/lux/meta/package.xml", "w")
 n = text_file.write(package_xml_str)
 text_file.close()
