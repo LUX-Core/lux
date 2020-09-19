@@ -3,6 +3,7 @@ import subprocess
 from datetime import date
 import os
 import platform
+from pathlib import Path
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--name', type = str)
@@ -44,7 +45,7 @@ publisher = ac_init_line[0].replace("AC_INIT([","").replace("]","")
 logo = "logo"
 watermark = "watermark.png"
 
-repository = ""
+repository = "http://www.example.com/"
 if args.repository is not None:
     repository = args['repository']
 
@@ -102,7 +103,7 @@ if platform.system() == 'Windows':
         installer_dir = args['installer_dir']
     installer_cmd = [installer_dir + 'bin\\binarycreator.exe', '-c', 'packager\\config\\config.xml', '-p', 'packager\\packages', '-t', installer_dir +  'bin\\installerbase.exe', 'LuxInstaler']
 else:
-    installer_dir = '~/Qt/Installer/'
+    installer_dir = str(Path.home()) + '/Qt/QtIFW-3.2.2/'
     if args.installer_dir is not None:
         installer_dir = args['installer_dir']
     installer_cmd = [installer_dir + 'bin/binarycreator', '-c', './packager/config/config.xml', '-p', './packager/packages', '-t', installer_dir +  'bin/installerbase', 'LuxInstaler']
