@@ -1,6 +1,8 @@
 import argparse
 import subprocess
 from datetime import date
+import os
+import platform
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--name', type = str)
@@ -9,7 +11,7 @@ parser.add_argument('--site_url', type = str)
 parser.add_argument('--logo', type = str)
 parser.add_argument('--watermark', type = str)
 parser.add_argument('--repository', type = str)
-parser.add_argument('--config_file', type = str)
+parser.add_argument('--installer_dir', type = str)
 
 args = parser.parse_args()
 
@@ -42,8 +44,14 @@ publisher = ac_init_line[0].replace("AC_INIT([","").replace("]","")
 logo = "logo"
 watermark = "watermark.png"
 
+installer_dir = 'C:\\Qt\\QtIFW-3.2.2\\'
+repository = ""
 
-repository = "http://www.your-repo-location/packages/"
+if args.repository is not None:
+    repository = args['repository']
+
+if args.installer_dir is not None:
+    installer_dir = args['installer_dir']
 
 config_xml_str = """<?xml version="1.0" encoding="UTF-8"?>
 <Installer>
@@ -88,3 +96,13 @@ text_file.close()
 text_file = open("./packager/packages/lux/meta/package.xml", "w")
 n = text_file.write(package_xml_str)
 text_file.close()
+
+
+commit_id = subprocess.check_output(['git', 'log', '--pretty=format:\'%h\'', '-n', '1']).strip().decode('ascii').replace("'","")
+if platform.system() == 'Windows':
+    installer_cmd = [installer_dir + 'bin\\binarycreator.exe', '-c', 'packager\\config\\config.xml', '-p', 'packager\\packages', '-t', installer_dir +  'bin\\installerbase.exe', 'LuxInstaler']
+else:
+    installer_cmd = [installer_dir + 'bin/binarycreator', '-c', './packager/config/config.xml', '-p', './packager/packages', '-t', installer_dir +  'bin/installerbase', 'LuxInstaler']
+
+process = subprocess.Popen(installer_cmd, stdout=subprocess.PIPE)
+process.wait()
