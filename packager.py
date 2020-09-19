@@ -44,14 +44,11 @@ publisher = ac_init_line[0].replace("AC_INIT([","").replace("]","")
 logo = "logo"
 watermark = "watermark.png"
 
-installer_dir = 'C:\\Qt\\QtIFW-3.2.2\\'
 repository = ""
-
 if args.repository is not None:
     repository = args['repository']
 
-if args.installer_dir is not None:
-    installer_dir = args['installer_dir']
+
 
 config_xml_str = """<?xml version="1.0" encoding="UTF-8"?>
 <Installer>
@@ -100,8 +97,14 @@ text_file.close()
 
 commit_id = subprocess.check_output(['git', 'log', '--pretty=format:\'%h\'', '-n', '1']).strip().decode('ascii').replace("'","")
 if platform.system() == 'Windows':
+    installer_dir = 'C:\\Qt\\QtIFW-3.2.2\\'
+    if args.installer_dir is not None:
+        installer_dir = args['installer_dir']
     installer_cmd = [installer_dir + 'bin\\binarycreator.exe', '-c', 'packager\\config\\config.xml', '-p', 'packager\\packages', '-t', installer_dir +  'bin\\installerbase.exe', 'LuxInstaler']
 else:
+    installer_dir = '~/Qt/Installer/'
+    if args.installer_dir is not None:
+        installer_dir = args['installer_dir']
     installer_cmd = [installer_dir + 'bin/binarycreator', '-c', './packager/config/config.xml', '-p', './packager/packages', '-t', installer_dir +  'bin/installerbase', 'LuxInstaler']
 
 process = subprocess.Popen(installer_cmd, stdout=subprocess.PIPE)
