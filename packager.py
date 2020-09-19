@@ -4,6 +4,7 @@ from datetime import date
 import os
 import platform
 from pathlib import Path
+import shutil
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--name', type = str)
@@ -15,6 +16,24 @@ parser.add_argument('--repository', type = str)
 parser.add_argument('--installer_dir', type = str)
 
 args = parser.parse_args()
+
+
+
+
+try:
+    if platform.system() == 'Windows':
+        shutil.copyfile('src/luxd.exe', 'packager/packages/lux/data/luxd.exe')
+        shutil.copyfile('src/lux-cli.exe', 'packager/packages/lux/data/lux-cli.exe')
+        shutil.copyfile('src/lux-tx.exe', 'packager/packages/lux/data/lux-tx.exe')
+        shutil.copyfile('src/qt/lux-qt.exe', 'packager/packages/lux/data/lux-qt.exe')
+    else:
+        shutil.copyfile('src/luxd', 'packager/packages/lux/data/luxd')
+        shutil.copyfile('src/lux-cli', 'packager/packages/lux/data/lux-cli')
+        shutil.copyfile('src/lux-tx', 'packager/packages/lux/data/lux-tx')
+        shutil.copyfile('src/qt/lux-qt', 'packager/packages/lux/data/lux-qt')
+
+except Exception as e:
+    print(e)
 
 
 f = open("./configure.ac", "r")
@@ -58,7 +77,7 @@ config_xml_str = """<?xml version="1.0" encoding="UTF-8"?>
     <Title>%s</Title>
     <Publisher>%s</Publisher>
     <ProductUrl>%s</ProductUrl>
-    <RunProgram>@TargetDir@/lux-qt.exe</RunProgram>
+    <RunProgram>@TargetDir@/lux-qt%s</RunProgram>
     <Logo>%s</Logo>
     <Watermark>%s</Watermark>
     <WizardStyle>Modern</WizardStyle>
@@ -71,7 +90,7 @@ config_xml_str = """<?xml version="1.0" encoding="UTF-8"?>
             <Url>%s</Url>
         </Repository>
     </RemoteRepositories>
-</Installer>""" % (name, version, publisher, name, publisher, site_url, logo, watermark, publisher, publisher, logo, logo, repository)
+</Installer>""" % (name, version, publisher, name, publisher, site_url, ".exe" if platform.system() == "Windows" else "",logo, watermark, publisher, publisher, logo, logo, repository)
 
 package_xml_str = """<?xml version="1.0" encoding="UTF-8"?>
 <Package>
@@ -100,13 +119,13 @@ commit_id = subprocess.check_output(['git', 'log', '--pretty=format:\'%h\'', '-n
 if platform.system() == 'Windows':
     installer_dir = 'C:\\Qt\\QtIFW-3.2.2\\'
     if args.installer_dir is not None:
-        installer_dir = args['installer_dir']
-    installer_cmd = [installer_dir + 'bin\\binarycreator.exe', '-c', 'packager\\config\\config.xml', '-p', 'packager\\packages', '-t', installer_dir +  'bin\\installerbase.exe', 'LuxInstaler']
+        installer_dir = args.installer_dir
+    installer_cmd = [installer_dir + 'bin\\binarycreator.exe', '-c', 'packager\\config\\config.xml', '-p', 'packager\\packages', '-t', installer_dir +  'bin\\installerbase.exe', 'LuxInstaller']
 else:
     installer_dir = str(Path.home()) + '/Qt/QtIFW-3.2.2/'
     if args.installer_dir is not None:
-        installer_dir = args['installer_dir']
-    installer_cmd = [installer_dir + 'bin/binarycreator', '-c', './packager/config/config.xml', '-p', './packager/packages', '-t', installer_dir +  'bin/installerbase', 'LuxInstaler']
+        installer_dir = args.installer_dir
+    installer_cmd = [installer_dir + 'bin/binarycreator', '-c', './packager/config/config.xml', '-p', './packager/packages', '-t', installer_dir +  'bin/installerbase', 'LuxInstaller']
 
 process = subprocess.Popen(installer_cmd, stdout=subprocess.PIPE)
 process.wait()
