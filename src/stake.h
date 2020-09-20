@@ -35,8 +35,6 @@ namespace boost { class thread_group; }
 static const int REJECT_INVALID_SPLIT_BLOCK_HEIGHT = 465000;
 // Reject stake of small inputs
 static const CAmount STAKE_INVALID_SPLIT_MIN_COINS = 90 * COIN;
-// Reject stake that is 16120 (a masternode)
-static const CAmount STAKE_INVALID_MN = 16120 * COIN;
 
 struct StakeKernel
 {
