@@ -44,7 +44,13 @@ Component.prototype.createOperations = function()
         component.createOperations();
         if (installer.value("os") == "win") { 
             component.addOperation("CreateShortcut", "@TargetDir@/lux-qt.exe", "@StartMenuDir@/LUX.lnk", "workingDirectory=@TargetDir@", "iconPath=@TargetDir@/favicon.ico");
-        }
+        } else if(installer.value("os") == "x11") {
+		component.addOperation("CreateDesktopEntry",
+			"lux.desktop",
+			"Version=1.0\nType=Application\nTerminal=false\nExec=@TargetDir@/lux-qt\nName=Luxcore\nIcon=@TargetDir@/favicon.ico\nName[en_US]=Luxcore");
+
+	}
+
     } catch (e) {
         console.log(e);
     }
