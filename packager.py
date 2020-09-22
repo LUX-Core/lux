@@ -36,7 +36,7 @@ except Exception as e:
     print(e)
 
 
-f = open("./configure.ac", "r")
+f = open('./configure.ac', 'r')
 configure_lines = f.readlines()[:20]
 f.close()
 
@@ -47,24 +47,24 @@ build_version_line = None
 ac_init_line = None
 
 try:
-    majon_version_line = next(filter(lambda x: "_CLIENT_VERSION_MAJOR" in x, configure_lines)).replace(" ", "").replace("\n", "").replace(")","").split(",")
-    minor_version_line = next(filter(lambda x: "_CLIENT_VERSION_MINOR" in x, configure_lines)).replace(" ", "").replace("\n", "").replace(")","").split(",")
-    revision_version_line = next(filter(lambda x: "_CLIENT_VERSION_REVISION" in x, configure_lines)).replace(" ", "").replace("\n", "").replace(")","").split(",")
-    build_version_line = next(filter(lambda x: "_CLIENT_VERSION_BUILD" in x, configure_lines)).replace(" ", "").replace("\n", "").replace(")","").split(",")
-    ac_init_line = next(filter(lambda x: "AC_INIT" in x, configure_lines)).replace(" ", "").replace("\n", "").split(",")
+    majon_version_line = next(filter(lambda x: '_CLIENT_VERSION_MAJOR' in x, configure_lines)).replace(' ', '').replace('\n', '').replace(')', '').split(',')
+    minor_version_line = next(filter(lambda x: '_CLIENT_VERSION_MINOR' in x, configure_lines)).replace(' ', '').replace('\n', '').replace(')', '').split(',')
+    revision_version_line = next(filter(lambda x: '_CLIENT_VERSION_REVISION' in x, configure_lines)).replace(' ', '').replace('\n', '').replace(')', '').split(',')
+    build_version_line = next(filter(lambda x: '_CLIENT_VERSION_BUILD' in x, configure_lines)).replace(' ', '').replace('\n', '').replace(')', '').split(',')
+    ac_init_line = next(filter(lambda x: 'AC_INIT' in x, configure_lines)).replace(' ', '').replace('\n', '').split(',')
 
 except Exception as e:
     print(e)
 
-commit_id = subprocess.check_output(['git', 'log', '--pretty=format:\'%h\'', '-n', '1']).strip().decode('ascii').replace("'","")
-name = "LUX Wallet"
-version = "v%s.%s.%s.%s-%s" % (majon_version_line[1], minor_version_line[1], revision_version_line[1], build_version_line[1], commit_id)
-site_url = ac_init_line[4].replace("[","").replace("]","").replace(")","")
-publisher = ac_init_line[0].replace("AC_INIT([","").replace("]","")
-logo = "logo"
-watermark = "watermark.png"
+commit_id = subprocess.check_output(['git', 'log', '--pretty=format:\'%h\'', '-n', '1']).strip().decode('ascii').replace('\'','')
+name = 'LUX Wallet'
+version = 'v%s.%s.%s.%s-%s' % (majon_version_line[1], minor_version_line[1], revision_version_line[1], build_version_line[1], commit_id)
+site_url = ac_init_line[4].replace('[', '').replace(']', '').replace(')', '')
+publisher = ac_init_line[0].replace('AC_INIT([', '').replace(']', '')
+logo = 'logo'
+watermark = 'watermark.png'
 
-repository = "http://155.138.209.167/repo/" + platform.system() 
+repository = 'http://155.138.209.167/repo/' + platform.system() 
 if args.repository is not None:
     repository = args['repository']
 
@@ -90,7 +90,7 @@ config_xml_str = """<?xml version="1.0" encoding="UTF-8"?>
             <Url>%s</Url>
         </Repository>
     </RemoteRepositories>
-</Installer>""" % (name, version, publisher, name, publisher, site_url, ".exe" if platform.system() == "Windows" else "",logo, watermark, publisher, publisher, logo, logo, repository)
+</Installer>""" % (name, version, publisher, name, publisher, site_url, '.exe' if platform.system() == 'Windows' else '', logo, watermark, publisher, publisher, logo, logo, repository)
 
 package_xml_str = """<?xml version="1.0" encoding="UTF-8"?>
 <Package>
@@ -105,33 +105,38 @@ package_xml_str = """<?xml version="1.0" encoding="UTF-8"?>
 </Package>""" % (name, version, publisher, date.today().strftime("%Y-%m-%d"))
 
 
-text_file = open("./packager/config/config.xml", "w")
+text_file = open('./packager/config/config.xml', 'w')
 n = text_file.write(config_xml_str)
 text_file.close()
 
 
-text_file = open("./packager/packages/lux/meta/package.xml", "w")
+text_file = open('./packager/packages/lux/meta/package.xml', 'w')
 n = text_file.write(package_xml_str)
 text_file.close()
 
 installer_cmd = []
 repo_cmd = []
-commit_id = subprocess.check_output(['git', 'log', '--pretty=format:\'%h\'', '-n', '1']).strip().decode('ascii').replace("'","")
+commit_id = subprocess.check_output(['git', 'log', '--pretty=format:\'%h\'', '-n', '1']).strip().decode('ascii').replace('\'', '')
 if platform.system() == 'Windows':
     installer_dir = 'C:\\Qt\\QtIFW-3.2.2\\'
     if args.installer_dir is not None:
         installer_dir = args.installer_dir
     installer_cmd = [installer_dir + 'bin\\binarycreator.exe', '--online-only', '-c', 'packager\\config\\config.xml', '-p', 'packager\\packages', '-t', installer_dir +  'bin\\installerbase.exe', 'LuxInstaller']
-    repo_cmd = [installer_dir + 'bin\\repogen.exe', '-p', 'packager\\packages', 'Luxrepo']
+    repo_cmd = [installer_dir + 'bin\\repogen.exe', '-p', 'packager\\packages', 'repo' + platform.system()]
 
 else:
     installer_dir = str(Path.home()) + '/Qt/QtIFW-3.2.2/'
     if args.installer_dir is not None:
         installer_dir = args.installer_dir
     installer_cmd = [installer_dir + 'bin/binarycreator', '--online-only', '-c', './packager/config/config.xml', '-p', './packager/packages', '-t', installer_dir +  'bin/installerbase', 'LuxInstaller']
-    repo_cmd = [installer_dir + 'bin/repogen', '-p', './packager/packages', 'Luxrepo']
+    repo_cmd = [installer_dir + 'bin/repogen', '-p', './packager/packages', 'repo' + platform.system()]
 
 process = subprocess.Popen(installer_cmd, stdout=subprocess.PIPE)
 process.wait()
+try:
+    shutil.rmtree('repo' + platform.system())
+except Exception as e:
+    print(e)
+    pass
 process = subprocess.Popen(repo_cmd, stdout=subprocess.PIPE)
 process.wait()
