@@ -121,14 +121,14 @@ if platform.system() == 'Windows':
     installer_dir = 'C:\\Qt\\QtIFW-3.2.2\\'
     if args.installer_dir is not None:
         installer_dir = args.installer_dir
-    installer_cmd = [installer_dir + 'bin\\binarycreator.exe', '-c', 'packager\\config\\config.xml', '-p', 'packager\\packages', '-t', installer_dir +  'bin\\installerbase.exe', 'LuxInstaller']
+    installer_cmd = [installer_dir + 'bin\\binarycreator.exe', '--online-only', '-c', 'packager\\config\\config.xml', '-p', 'packager\\packages', '-t', installer_dir +  'bin\\installerbase.exe', 'LuxInstaller']
     repo_cmd = [installer_dir + 'bin\\repogen.exe', '-p', 'packager\\packages', 'Luxrepo']
 
 else:
     installer_dir = str(Path.home()) + '/Qt/QtIFW-3.2.2/'
     if args.installer_dir is not None:
         installer_dir = args.installer_dir
-    installer_cmd = [installer_dir + 'bin/binarycreator', '-c', './packager/config/config.xml', '-p', './packager/packages', '-t', installer_dir +  'bin/installerbase', 'LuxInstaller']
+    installer_cmd = [installer_dir + 'bin/binarycreator', '--online-only', '-c', './packager/config/config.xml', '-p', './packager/packages', '-t', installer_dir +  'bin/installerbase', 'LuxInstaller']
     repo_cmd = [installer_dir + 'bin/repogen', '-p', './packager/packages', 'Luxrepo']
 
 process = subprocess.Popen(installer_cmd, stdout=subprocess.PIPE)
