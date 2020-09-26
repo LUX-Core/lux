@@ -1309,6 +1309,12 @@ void RPCConsole::showBackups()
     GUIUtil::showBackups();
 }
 
+
+void RPCConsole::on_updateClientButton_clicked()
+{
+    //std::cout << "on_updateClientButton_clicked" << std::endl;
+}
+
 void RPCConsole::on_switchNetworkActiveButton_clicked()
 {
     clientModel->setNetworkActive(!clientModel->getNetworkActive());

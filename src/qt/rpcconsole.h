@@ -68,6 +68,8 @@ protected:
 private Q_SLOTS:
     void on_lineEdit_returnPressed();
     void on_tabWidget_currentChanged(int index);
+    /** Update client */
+    void on_updateClientButton_clicked();
     /** Switch network activity */
     void on_switchNetworkActiveButton_clicked();
     /** open the debug.log from the current datadir */

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>769</width>
-    <height>539</height>
+    <width>731</width>
+    <height>570</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -37,7 +37,7 @@
          </property>
         </widget>
        </item>
-       <item row="7" column="0">
+       <item row="8" column="0">
         <widget class="QLabel" name="networkHeader">
          <property name="font">
           <font>
@@ -50,7 +50,7 @@
          </property>
         </widget>
        </item>
-       <item row="13" column="1">
+       <item row="14" column="1">
         <widget class="QLabel" name="numberOfBlocks">
          <property name="cursor">
           <cursorShape>IBeamCursor</cursorShape>
@@ -66,7 +66,7 @@
          </property>
         </widget>
        </item>
-       <item row="8" column="0">
+       <item row="9" column="0">
         <widget class="QLabel" name="networkNameLabel">
          <property name="text">
           <string>Name</string>
@@ -80,7 +80,7 @@
          </property>
         </widget>
        </item>
-       <item row="9" column="0">
+       <item row="10" column="0">
         <widget class="QLabel" name="numberOfConnectionsLabel">
          <property name="text">
           <string>Number of connections</string>
@@ -148,7 +148,7 @@
          </property>
         </widget>
        </item>
-       <item row="12" column="0">
+       <item row="13" column="0">
         <widget class="QLabel" name="blockchainHeader">
          <property name="font">
           <font>
@@ -220,14 +220,14 @@
          </property>
         </widget>
        </item>
-       <item row="10" column="0">
+       <item row="11" column="0">
         <widget class="QLabel" name="masternodeCountLabel">
          <property name="text">
           <string>Number of Masternodes</string>
          </property>
         </widget>
        </item>
-       <item row="10" column="1">
+       <item row="11" column="1">
         <widget class="QLabel" name="masternodeCount">
          <property name="cursor">
           <cursorShape>IBeamCursor</cursorShape>
@@ -253,7 +253,7 @@
          </property>
         </widget>
        </item>
-       <item row="14" column="1">
+       <item row="15" column="1">
         <widget class="QLabel" name="lastBlockTime">
          <property name="cursor">
           <cursorShape>IBeamCursor</cursorShape>
@@ -269,7 +269,7 @@
          </property>
         </widget>
        </item>
-       <item row="8" column="1">
+       <item row="9" column="1">
         <widget class="QLabel" name="networkName">
          <property name="cursor">
           <cursorShape>IBeamCursor</cursorShape>
@@ -285,14 +285,14 @@
          </property>
         </widget>
        </item>
-       <item row="14" column="0">
+       <item row="15" column="0">
         <widget class="QLabel" name="lastBlockTimeLabel">
          <property name="text">
           <string>Last block time</string>
          </property>
         </widget>
        </item>
-       <item row="9" column="1">
+       <item row="10" column="1">
         <widget class="QLabel" name="numberOfConnections">
          <property name="cursor">
           <cursorShape>IBeamCursor</cursorShape>
@@ -308,7 +308,7 @@
          </property>
         </widget>
        </item>
-       <item row="13" column="0">
+       <item row="14" column="0">
         <widget class="QLabel" name="numberOfBlocksLabel">
          <property name="text">
           <string>Current number of blocks</string>
@@ -322,7 +322,7 @@
          </property>
         </widget>
        </item>
-       <item row="11" column="0">
+       <item row="12" column="0">
         <widget class="QPushButton" name="switchNetworkActiveButton">
          <property name="toolTip">
           <string>Temporarily switch network activity ON/OFF</string>
@@ -335,21 +335,21 @@
          </property>
         </widget>
        </item>
-       <item row="19" column="0">
+       <item row="20" column="0">
         <widget class="QLabel" name="labelMemoryUsage">
          <property name="text">
           <string>Memory usage</string>
          </property>
         </widget>
        </item>
-       <item row="18" column="0">
+       <item row="19" column="0">
         <widget class="QLabel" name="labelNumberOfTransactions">
          <property name="text">
           <string>Current number of transactions</string>
          </property>
         </widget>
        </item>
-       <item row="19" column="1">
+       <item row="20" column="1">
         <widget class="QLabel" name="mempoolSize">
          <property name="cursor">
           <cursorShape>IBeamCursor</cursorShape>
@@ -365,7 +365,7 @@
          </property>
         </widget>
        </item>
-       <item row="18" column="1">
+       <item row="19" column="1">
         <widget class="QLabel" name="mempoolNumberTxs">
          <property name="cursor">
           <cursorShape>IBeamCursor</cursorShape>
@@ -381,7 +381,7 @@
          </property>
         </widget>
        </item>
-       <item row="17" column="0">
+       <item row="18" column="0">
         <widget class="QLabel" name="labelMempoolTitle">
          <property name="font">
           <font>
@@ -394,7 +394,7 @@
          </property>
         </widget>
        </item>
-       <item row="20" column="0">
+       <item row="21" column="0">
         <widget class="QLabel" name="debugLogFileHeader">
          <property name="font">
           <font>
@@ -407,13 +407,26 @@
          </property>
         </widget>
        </item>
-       <item row="21" column="0">
+       <item row="22" column="0">
         <widget class="QPushButton" name="openDebugLogfileButton">
          <property name="toolTip">
           <string>Open the LUX debug log file from the current data directory. This can take a few seconds for large log files.</string>
          </property>
          <property name="text">
           <string>&amp;Open</string>
+         </property>
+         <property name="autoDefault">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="0">
+        <widget class="QPushButton" name="updateClientButton">
+         <property name="text">
+          <string>&amp;Update Client</string>
+         </property>
+ 	 <property name="toolTip">
+          <string>Update Lux Client to the newest version</string>
          </property>
          <property name="autoDefault">
           <bool>false</bool>
@@ -454,6 +467,7 @@
       <zorder>switchNetworkActiveButton</zorder>
       <zorder>debugLogFileHeader</zorder>
       <zorder>openDebugLogfileButton</zorder>
+      <zorder>updateClientButton</zorder>
      </widget>
      <widget class="QWidget" name="tab_console">
       <attribute name="title">
