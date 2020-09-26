@@ -2,31 +2,37 @@ import argparse
 import subprocess
 from datetime import date
 import os
-import platform
 from pathlib import Path
 import shutil
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--name', type = str)
-parser.add_argument('--version', type = str)
-parser.add_argument('--site_url', type = str)
-parser.add_argument('--logo', type = str)
-parser.add_argument('--watermark', type = str)
 parser.add_argument('--repository', type = str)
 parser.add_argument('--installer_dir', type = str)
+parser.add_argument('--platform', type = str)
+
 
 args = parser.parse_args()
 
+valid_os_list = ['windows', 'linux', 'macos']
+platform = ""
 
+print("Platform Selected:",args.platform)
 
+if args.platform != None:
+    if args.platform in valid_os_list:
+        platform = args.platform
+
+if not platform in valid_os_list:
+    print("Platform not selected:",valid_os_list)
+    quit()
 
 try:
-    if platform.system() == 'Windows':
+    if args.platform == 'windows':
         shutil.copyfile('src/luxd.exe', 'packager/packages/lux/data/luxd.exe')
         shutil.copyfile('src/lux-cli.exe', 'packager/packages/lux/data/lux-cli.exe')
         shutil.copyfile('src/lux-tx.exe', 'packager/packages/lux/data/lux-tx.exe')
         shutil.copyfile('src/qt/lux-qt.exe', 'packager/packages/lux/data/lux-qt.exe')
-    else:
+    if args.platform in ['macos', 'linux']:
         shutil.copyfile('src/luxd', 'packager/packages/lux/data/luxd')
         shutil.copyfile('src/lux-cli', 'packager/packages/lux/data/lux-cli')
         shutil.copyfile('src/lux-tx', 'packager/packages/lux/data/lux-tx')
@@ -34,6 +40,7 @@ try:
 
 except Exception as e:
     print(e)
+    quit()
 
 
 f = open('./configure.ac', 'r')
@@ -64,7 +71,7 @@ publisher = ac_init_line[0].replace('AC_INIT([', '').replace(']', '')
 logo = 'logo'
 watermark = 'watermark.png'
 
-repository = 'http://155.138.209.167/repo/' + platform.system() 
+repository = 'http://155.138.209.167/repo/' + platform
 if args.repository is not None:
     repository = args['repository']
 
@@ -90,7 +97,7 @@ config_xml_str = """<?xml version="1.0" encoding="UTF-8"?>
             <Url>%s</Url>
         </Repository>
     </RemoteRepositories>
-</Installer>""" % (name, version, publisher, name, publisher, site_url, '.exe' if platform.system() == 'Windows' else '', logo, watermark, publisher, publisher, logo, logo, repository)
+</Installer>""" % (name, version, publisher, name, publisher, site_url, '.exe' if platform == 'windows' else '', logo, watermark, publisher, publisher, logo, logo, repository)
 
 package_xml_str = """<?xml version="1.0" encoding="UTF-8"?>
 <Package>
@@ -117,26 +124,36 @@ text_file.close()
 installer_cmd = []
 repo_cmd = []
 commit_id = subprocess.check_output(['git', 'log', '--pretty=format:\'%h\'', '-n', '1']).strip().decode('ascii').replace('\'', '')
-if platform.system() == 'Windows':
-    installer_dir = 'C:\\Qt\\QtIFW-3.2.2\\'
-    if args.installer_dir is not None:
-        installer_dir = args.installer_dir
-    installer_cmd = [installer_dir + 'bin\\binarycreator.exe', '--online-only', '-c', 'packager\\config\\config.xml', '-p', 'packager\\packages', '-t', installer_dir +  'bin\\installerbase.exe', 'LuxInstaller']
-    repo_cmd = [installer_dir + 'bin\\repogen.exe', '-p', 'packager\\packages', 'repo' + platform.system()]
+#if platform == 'windows':
+#    installer_dir = 'C:\\Qt\\QtIFW-3.2.2\\'
+#    if args.installer_dir is not None:
+#        installer_dir = args.installer_dir
+#    installer_cmd = [installer_dir + 'bin\\binarycreator.exe', '--online-only', '-c', 'packager\\config\\config.xml', '-p', 'packager\\packages', '-t', installer_dir +  'bin\\installerbase.exe', 'LuxInstaller']
+#    repo_cmd = [installer_dir + 'bin\\repogen.exe', '-p', 'packager\\packages', 'repo' + platform]
+#
+#else:
+#    installer_dir = str(Path.home()) + '/Qt/QtIFW-3.2.2/'
+#    if args.installer_dir is not None:
+#        installer_dir = args.installer_dir
+#    installer_cmd = [installer_dir + 'bin/binarycreator', '--online-only', '-c', './packager/config/config.xml', '-p', './packager/packages', '-t', installer_dir +  'bin/installerbase', 'LuxInstaller']
+#    repo_cmd = [installer_dir + 'bin/repogen', '-p', './packager/packages', 'repo' + platform]
 
-else:
-    installer_dir = str(Path.home()) + '/Qt/QtIFW-3.2.2/'
-    if args.installer_dir is not None:
-        installer_dir = args.installer_dir
-    installer_cmd = [installer_dir + 'bin/binarycreator', '--online-only', '-c', './packager/config/config.xml', '-p', './packager/packages', '-t', installer_dir +  'bin/installerbase', 'LuxInstaller']
-    repo_cmd = [installer_dir + 'bin/repogen', '-p', './packager/packages', 'repo' + platform.system()]
 
-process = subprocess.Popen(installer_cmd, stdout=subprocess.PIPE)
-process.wait()
+installer_dir = str(Path.home()) + '/Qt/QtIFW-3.2.2/'
+if args.installer_dir != None:
+    installer_dir = args.installer_dir
+
+repo_cmd = [installer_dir + 'bin/repogen', '-p', './packager/packages', 'repo' + platform]
+
+
+
+#process = subprocess.Popen(installer_cmd, stdout=subprocess.PIPE)
+#process.wait()
 try:
-    shutil.rmtree('repo' + platform.system())
+    shutil.rmtree('repo' + platform)
 except Exception as e:
     print(e)
     pass
+
 process = subprocess.Popen(repo_cmd, stdout=subprocess.PIPE)
 process.wait()
