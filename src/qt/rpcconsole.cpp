@@ -434,7 +434,9 @@ RPCConsole::RPCConsole(const PlatformStyle *platformStyle, QWidget* parent) : QD
 		ui->clearButton->setIcon(platformStyle->SingleColorIcon(":/icons/remove"));
 	}	
 
-
+	ui->sldGraphRange->setMinimum(1);
+	ui->sldGraphRange->setMaximum(10);
+	ui->sldGraphRange->setValue(3);
 
     // Install event filter for up and down arrow
     ui->lineEdit->installEventFilter(this);
@@ -1076,8 +1078,8 @@ QString RPCConsole::FormatBytes(quint64 bytes)
 
 void RPCConsole::setTrafficGraphRange(TrafficGraphData::GraphRange range)
 {
-    ui->trafficGraph->setGraphRangeMins(range);
-    ui->lblGraphRange->setText(GUIUtil::formatDurationStr(TrafficGraphData::RangeMinutes[range] * 60));
+    ui->trafficGraph->setGraphRangeMins(range-1);
+    ui->lblGraphRange->setText(GUIUtil::formatDurationStr(TrafficGraphData::RangeMinutes[range-1] * 60));
 }
 
 void RPCConsole::updateTrafficStats(quint64 totalBytesIn, quint64 totalBytesOut)

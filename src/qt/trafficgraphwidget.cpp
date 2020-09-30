@@ -10,6 +10,7 @@
 #include <QColor>
 #include <QPainter>
 #include <QTimer>
+#include <QSettings>
 
 #include <cmath>
 
@@ -119,18 +120,31 @@ void TrafficGraphWidget::paintEvent(QPaintEvent*)
     }
 
     const TrafficGraphData::SampleQueue& queue = trafficGraphData.getCurrentRangeQueue();
+    QSettings settings;
 
     if(!queue.empty()) {
         QPainterPath pIn;
         paintPath(pIn, queue, boost::bind(chooseIn,_1));
-        painter.fillPath(pIn, QColor(0, 255, 0, 128));
-        painter.setPen(Qt::green);
+        if (settings.value("theme").toString() == "dark grey" || settings.value("theme").toString() == "dark blue") {
+            painter.fillPath(pIn, QColor(152, 251, 152, 128));
+            QColor lightgreenColor(152, 251, 152);
+            painter.setPen(lightgreenColor);
+        } else { 
+            painter.fillPath(pIn, QColor(0, 255, 0, 128));
+            painter.setPen(Qt::green);
+        }
         painter.drawPath(pIn);
 
         QPainterPath pOut;
         paintPath(pOut, queue, boost::bind(chooseOut,_1));
-        painter.fillPath(pOut, QColor(255, 0, 0, 128));
-        painter.setPen(Qt::red);
+        if (settings.value("theme").toString() == "dark grey" || settings.value("theme").toString() == "dark blue") {
+            painter.fillPath(pOut, QColor(255, 125, 125, 128));
+            QColor lightredColor(255, 125, 125);
+            painter.setPen(lightredColor);
+        } else { 
+            painter.fillPath(pOut, QColor(255, 0, 0, 128));
+            painter.setPen(Qt::red);
+        }
         painter.drawPath(pOut);
     }
 }
