@@ -1327,7 +1327,7 @@ void RPCConsole::on_updateClientButton_clicked()
     QString output(updateCheckProcess.readAllStandardOutput());
     QXmlStreamReader xmlReader(output);
     QString version;
-    while (!xmlReader.isEndDocument()) {
+    while (!xmlReader.atEnd()) {
 	    QString name = xmlReader.name().toString();
 	    if(name == "update" && xmlReader.attributes().hasAttribute("version")) 
 		    version = xmlReader.attributes().value("version").toUtf8().constData();
@@ -1343,8 +1343,15 @@ void RPCConsole::on_updateClientButton_clicked()
 		   while(!updateCheckProcess.waitForFinished(10)) {
 			   QCoreApplication::processEvents();
 		   }
+		   QApplication::quit();
 	   } 
+    } else {
+	    QMessageBox::information(BitcoinGUI::instance(), "Update", QString("No Update Available "));
     }
+
+    if(xmlReader().hasErrors())
+	    QMessageBox::information(BitcoinGUI::instance(), "Update", QString("No Update Available "));
+
 }
 
 void RPCConsole::on_switchNetworkActiveButton_clicked()
