@@ -988,6 +988,16 @@ void BitcoinGUI::setClientModel(ClientModel* clientModel) {
     }
 }
 
+BitcoinGUI* BitcoinGUI::instance()
+{
+	foreach (QWidget *w, qApp->topLevelWidgets()) {
+		if (BitcoinGUI* mainWin = qobject_cast<BitcoinGUI*>(w))
+			return mainWin;
+	}
+	return nullptr;
+}
+
+
 #ifdef ENABLE_WALLET
 bool BitcoinGUI::addWallet(const QString& name, WalletModel* walletModel)
 {

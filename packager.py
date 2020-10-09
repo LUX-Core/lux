@@ -144,6 +144,7 @@ if args.installer_dir != None:
     installer_dir = args.installer_dir
 
 repo_cmd = [installer_dir + 'bin/repogen', '-p', './packager/packages', 'repo' + platform]
+installer_cmd = [installer_dir + 'bin/binarycreator', '-c', './packager/config/config.xml', '-p', './packager/packages', '-t', installer_dir +  'bin/installerbase', 'LuxInstaller']
 
 
 

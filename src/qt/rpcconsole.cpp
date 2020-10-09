@@ -8,6 +8,7 @@
 #include "ui_rpcconsole.h"
 
 #include "clientmodel.h"
+#include "bitcoingui.h"
 #include "guiutil.h"
 #include "peertablemodel.h"
 #include "bantablemodel.h"
@@ -38,6 +39,10 @@
 #include <QTimer>
 #include <QStringList>
 #include <QSettings>
+#include <QProcess>
+#include <QXmlStreamReader>
+#include <QXmlStreamAttributes>
+#include <QStringRef>
 
 #if QT_VERSION < 0x050000
 #include <QUrl>
@@ -1309,10 +1314,37 @@ void RPCConsole::showBackups()
     GUIUtil::showBackups();
 }
 
-
 void RPCConsole::on_updateClientButton_clicked()
 {
-    //std::cout << "on_updateClientButton_clicked" << std::endl;
+    QProcess updateCheckProcess;
+    updateCheckProcess.start(QCoreApplication::applicationDirPath() + "/maintenancetool", {"--checkupdates"});
+
+    while(!updateCheckProcess.waitForFinished(10)) {
+	    QCoreApplication::processEvents();
+    }
+
+
+    QString output(updateCheckProcess.readAllStandardOutput());
+    QXmlStreamReader xmlReader(output);
+    QString version;
+    while (!xmlReader.isEndDocument()) {
+	    QString name = xmlReader.name().toString();
+	    if(name == "update" && xmlReader.attributes().hasAttribute("version")) 
+		    version = xmlReader.attributes().value("version").toUtf8().constData();
+	    xmlReader.readNext();
+    }
+
+    if(!version.isEmpty()) {
+	   QMessageBox::StandardButton button = QMessageBox::question(BitcoinGUI::instance(), "Update", QString("Update Available ") + version);
+	   if(button == QMessageBox::Yes) {
+		   QProcess updateProcess;
+		   updateProcess.start(QCoreApplication::applicationDirPath() + "/maintenancetool", {"--updater"});
+
+		   while(!updateCheckProcess.waitForFinished(10)) {
+			   QCoreApplication::processEvents();
+		   }
+	   } 
+    }
 }
 
 void RPCConsole::on_switchNetworkActiveButton_clicked()
