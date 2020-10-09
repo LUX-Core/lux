@@ -41,8 +41,8 @@
 #include <QSettings>
 #include <QProcess>
 #include <QXmlStreamReader>
-#include <QXmlStreamAttributes>
-#include <QStringRef>
+#include <QOperatingSystemVersion>
+
 
 #if QT_VERSION < 0x050000
 #include <QUrl>
@@ -1316,8 +1316,10 @@ void RPCConsole::showBackups()
 
 void RPCConsole::on_updateClientButton_clicked()
 {
+    QString extension = QOperatingSystemVersion::Windows == QOperatingSystemVersion::current().type() ? QString(".exe") : QString::null;
     QProcess updateCheckProcess;
-    updateCheckProcess.start(QCoreApplication::applicationDirPath() + "/maintenancetool", {"--checkupdates"});
+    QString maintenanceToolPath = QCoreApplication::applicationDirPath() + "/maintenancetool" + extension;
+    updateCheckProcess.start(maintenanceToolPath, {"--checkupdates"});
 
     while(!updateCheckProcess.waitForFinished(10)) {
 	    QCoreApplication::processEvents();
@@ -1338,7 +1340,7 @@ void RPCConsole::on_updateClientButton_clicked()
 	   QMessageBox::StandardButton button = QMessageBox::question(BitcoinGUI::instance(), "Update", QString("Update Available ") + version);
 	   if(button == QMessageBox::Yes) {
 		   QProcess updateProcess;
-		   updateProcess.start(QCoreApplication::applicationDirPath() + "/maintenancetool", {"--updater"});
+		   updateProcess.start(maintenanceToolPath, {"--updater"});
 
 		   while(!updateCheckProcess.waitForFinished(10)) {
 			   QCoreApplication::processEvents();
@@ -1349,7 +1351,7 @@ void RPCConsole::on_updateClientButton_clicked()
 	    QMessageBox::information(BitcoinGUI::instance(), "Update", QString("No Update Available "));
     }
 
-    if(xmlReader().hasErrors())
+    if(xmlReader.hasError())
 	    QMessageBox::information(BitcoinGUI::instance(), "Update", QString("No Update Available "));
 
 }
