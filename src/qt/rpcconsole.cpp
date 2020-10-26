@@ -1347,12 +1347,12 @@ void RPCConsole::on_updateClientButton_clicked()
 		   }
 		   QApplication::quit();
 	   } 
+    } else if(xmlReader.hasError()) {
+	    QMessageBox::information(BitcoinGUI::instance(), "Update", QString("Error fetching updates from server"));
     } else {
 	    QMessageBox::information(BitcoinGUI::instance(), "Update", QString("No Update Available "));
     }
 
-    if(xmlReader.hasError())
-	    QMessageBox::information(BitcoinGUI::instance(), "Update", QString("No Update Available "));
 
 }
 
