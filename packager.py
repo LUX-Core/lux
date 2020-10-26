@@ -33,6 +33,10 @@ try:
         shutil.copyfile('src/lux-tx.exe', 'packager/packages/lux/data/lux-tx.exe')
         shutil.copyfile('src/qt/lux-qt.exe', 'packager/packages/lux/data/lux-qt.exe')
     if args.platform in ['macos', 'linux']:
+        os.system('strip src/luxd')
+        os.system('strip src/lux-cli')
+        os.system('strip src/lux-tx')
+        os.system('strip src/lux-qt')
         shutil.copyfile('src/luxd', 'packager/packages/lux/data/luxd')
         shutil.copyfile('src/lux-cli', 'packager/packages/lux/data/lux-cli')
         shutil.copyfile('src/lux-tx', 'packager/packages/lux/data/lux-tx')
@@ -148,8 +152,8 @@ installer_cmd = [installer_dir + 'bin/binarycreator', '-c', './packager/config/c
 
 
 
-#process = subprocess.Popen(installer_cmd, stdout=subprocess.PIPE)
-#process.wait()
+process = subprocess.Popen(installer_cmd, stdout=subprocess.PIPE)
+process.wait()
 try:
     shutil.rmtree('repo' + platform)
 except Exception as e:
