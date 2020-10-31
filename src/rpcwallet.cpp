@@ -3357,7 +3357,7 @@ beginning:
 //            std::cout << "chainactiveheight " << chainActive.Height() << std::endl;
             ++pblock->nNonce;
             --nMaxTries;
-            if (nHeight != chainActive.Height()) { printf("gtfo from here "); continue;}
+            if (nHeight != chainActive.Height()) {  continue;}
         } 
         
 //        if (!CheckProofOfWork(pblock->GetHash(nHeight + 1,1), pblock->nBits, Params().GetConsensus()))

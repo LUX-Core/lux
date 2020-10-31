@@ -1862,7 +1862,7 @@ bool WriteBlockToDisk(const CBlock& block, CDiskBlockPos& pos)
 
 bool ReadBlockFromDisk(CBlock& block, const CDiskBlockPos& pos, int nHeight, const Consensus::Params& consensusParams, bool required)
 {
- printf("** required =%d **",required);
+ 
     block.SetNull();
 
     // Open history file to read
@@ -1879,7 +1879,7 @@ bool ReadBlockFromDisk(CBlock& block, const CDiskBlockPos& pos, int nHeight, con
 
     // Check the header
     if (block.IsProofOfWork() && required==true) {
-        printf(" required = %d ",required);
+    
         if (!CheckProofOfWork(block.GetHash(nHeight,2), block.nBits, consensusParams))
             return error("ReadBlockFromDisk : Errors in block header");
     }
@@ -1891,7 +1891,7 @@ bool ReadBlockFromDisk(CBlock& block, const CDiskBlockPos& pos, int nHeight, con
 }
 
 bool ReadBlockFromDisk(CBlock& block, const CBlockIndex* pindex, const Consensus::Params& consensusParams, bool required) {
-  printf("** required =%d **",required);
+
     if (!ReadBlockFromDisk(block, pindex->GetBlockPos(), pindex->nHeight, consensusParams, required))
         return false;
     //both phi1612 and phi2 hashes do not match indexed hash // rdx pow never matches GetBlockHash per design 

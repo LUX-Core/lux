@@ -266,7 +266,7 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewStake(bool fMineWitness
 std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& scriptPubKeyIn, bool fMineWitnessTx, bool fProofOfStake, int64_t* pTotalFees, int32_t txProofTime, int32_t nTimeLimit, bool generateSCFix)
 {
     resetBlock();
-printf("create new block \n");
+
     pblocktemplate.reset(new CBlockTemplate());
 
     if(!pblocktemplate.get())
@@ -396,7 +396,7 @@ printf("create new block \n");
         coinbaseTx.vout[0].scriptPubKey = scriptPubKeyIn;
         coinbaseTx.vout[0].nValue = minerReward;
     }
-printf("after coinbaseTx 2 %d\n",chainActive.Height());
+
     originalRewardTx = coinbaseTx;
 
     pblock->vtx[0] = std::move(coinbaseTx);
@@ -428,7 +428,7 @@ printf("after coinbaseTx 2 %d\n",chainActive.Height());
     CBlockIndex* pindexState = chainActive.Tip();
     dev::h256 oldHashStateRoot = getGlobalStateRoot(pindexState);
     dev::h256 oldHashUTXORoot = getGlobalStateUTXO(pindexState);
-printf("after pindexState  %d\n",chainActive.Height());
+
     addPriorityTxs(minGasPrice, fProofOfStake);
     addPackageTxs(minGasPrice, fProofOfStake);
 
@@ -461,19 +461,19 @@ printf("after pindexState  %d\n",chainActive.Height());
     // The total fee is the Fees minus the Refund
     if (pTotalFees)
         *pTotalFees = nFees - bceResult.refundSender;
-printf("before filling header pindexState  %d\n",chainActive.Height());
+//printf("before filling header pindexState  %d\n",chainActive.Height());
     // Fill in header
     pblock->hashPrevBlock  = pindexPrev->GetBlockHash();
     pblock->nNonce         = 0;
     pblocktemplate->vTxSigOpsCost[0] = WITNESS_SCALE_FACTOR * GetLegacySigOpCount(pblock->vtx[0]);
-printf("after filling header pindexState  %d\n",chainActive.Height());
+//printf("after filling header pindexState  %d\n",chainActive.Height());
     CValidationState state;
     if (!TestBlockValidity(state, chainParams, *pblock, pindexPrev, false, false)) {
-        printf("%s failed valididty test\n",__func__);
+      //  printf("%s failed valididty test\n",__func__);
         if (!fProofOfStake) LogPrintf("%s: TestBlockValidity failed \n", __func__);
         return nullptr;
     }
-printf("end of create new block chaintip height %d\n",chainActive.Height());
+//printf("end of create new block chaintip height %d\n",chainActive.Height());
     return std::move(pblocktemplate);
 }
 

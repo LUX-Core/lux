@@ -73,7 +73,7 @@ CBlockIndex* GetLastBlockOfType(const int nPoS) // 0: PoW; 1: PoS
 
 UniValue blockToJSON(const CBlock& block, const CBlockIndex* blockindex, bool txDetails = false)
 {
-    printf("%s \n",__func__);
+//    printf("%s \n",__func__);
     UniValue result(UniValue::VOBJ);
     result.push_back(Pair("hash", block.GetHash(blockindex->nHeight).GetHex()));
     int confirmations = -1;
@@ -111,7 +111,7 @@ UniValue blockToJSON(const CBlock& block, const CBlockIndex* blockindex, bool tx
     if (pnext)
         result.push_back(Pair("nextblockhash", pnext->GetBlockHash().GetHex()));
 
-    printf("leaving %s \n",__func__);        
+ //   printf("leaving %s \n",__func__);        
     return result;
 }
 
@@ -349,7 +349,6 @@ UniValue getblockhash(const UniValue& params, bool fHelp)
 
 UniValue getblock(const UniValue& params, bool fHelp)
 {
-    printf("entering %s ",__func__);
     if (fHelp || params.size() < 1 || params.size() > 2)
         throw runtime_error(
             "getblock \"hash\" ( verbose )\n"
@@ -396,17 +395,17 @@ UniValue getblock(const UniValue& params, bool fHelp)
 
     CBlock block;
     CBlockIndex* pblockindex = mapBlockIndex[hash];
-printf("...before ReadBlockFromDisk...");
+
     if (!ReadBlockFromDisk(block, pblockindex, Params().GetConsensus(),false)) // check proof of work not required here
         throw JSONRPCError(RPC_INTERNAL_ERROR, "Can't read block from disk");
-printf("...after ReadBlockFromDisk..."); 
+
     if (!fVerbose) {
         CDataStream ssBlock(SER_NETWORK, PROTOCOL_VERSION);
         ssBlock << block;
         std::string strHex = HexStr(ssBlock.begin(), ssBlock.end());
         return strHex;
     }
-printf("%s \n",__func__);
+
     return blockToJSON(block, pblockindex);
 }
 
