@@ -2027,7 +2027,7 @@ bool IsInitialBlockDownload()
         return true;
     if (chainActive.Height() < Checkpoints::GetTotalBlocksEstimate(chainParams.Checkpoints()))
         return true;
-    if (chainActive.Tip()->GetBlockTime() < (GetTime() - nMaxTipAge))
+    if (chainActive.Tip()->GetBlockTime() < (GetTime() - nMaxTipAge) && chainParams.NetworkID() == CBaseChainParams::MAIN)
         return true;
     latchToFalse.store(true, std::memory_order_relaxed);
     return false;
