@@ -4,6 +4,7 @@ from datetime import date
 import os
 from pathlib import Path
 import shutil
+import stat
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--repository', type = str)
@@ -36,11 +37,20 @@ try:
         os.system('strip src/luxd')
         os.system('strip src/lux-cli')
         os.system('strip src/lux-tx')
-        os.system('strip src/lux-qt')
+        os.system('strip src/qt/lux-qt')
+
         shutil.copyfile('src/luxd', 'packager/packages/lux/data/luxd')
+        st = os.stat('packager/packages/lux/data/luxd')
+        os.chmod('packager/packages/lux/data/luxd', st.st_mode | stat.S_IEXEC)
         shutil.copyfile('src/lux-cli', 'packager/packages/lux/data/lux-cli')
+        st = os.stat('packager/packages/lux/data/lux-cli')
+        os.chmod('packager/packages/lux/data/lux-cli', st.st_mode | stat.S_IEXEC)
         shutil.copyfile('src/lux-tx', 'packager/packages/lux/data/lux-tx')
+        st = os.stat('packager/packages/lux/data/lux-tx')
+        os.chmod('packager/packages/lux/data/lux-tx', st.st_mode | stat.S_IEXEC)
         shutil.copyfile('src/qt/lux-qt', 'packager/packages/lux/data/lux-qt')
+        st = os.stat('packager/packages/lux/data/lux-qt')
+        os.chmod('packager/packages/lux/data/lux-qt', st.st_mode | stat.S_IEXEC)
 
 except Exception as e:
     print(e)
@@ -105,6 +115,7 @@ config_xml_str = """<?xml version="1.0" encoding="UTF-8"?>
 
 package_xml_str = """<?xml version="1.0" encoding="UTF-8"?>
 <Package>
+    <Name>%s</Name>
     <DisplayName>%s</DisplayName>
     <Version>%s-%s</Version>
     <ReleaseDate>%s</ReleaseDate>
@@ -113,7 +124,7 @@ package_xml_str = """<?xml version="1.0" encoding="UTF-8"?>
     </Licenses>
     <Default>script</Default>
     <Script>installscript.qs</Script>
-</Package>""" % (name, version, publisher, date.today().strftime("%Y-%m-%d"))
+</Package>""" % (name, name, version, publisher, date.today().strftime("%Y-%m-%d"))
 
 
 text_file = open('./packager/config/config.xml', 'w')
@@ -147,7 +158,7 @@ installer_dir = str(Path.home()) + '/Qt/QtIFW-3.2.2/'
 if args.installer_dir != None:
     installer_dir = args.installer_dir
 
-repo_cmd = [installer_dir + 'bin/repogen', '-p', './packager/packages', 'repo' + platform]
+repo_cmd = [installer_dir + 'bin/repogen', '-p', './packager/packages', '-i', 'lux', 'repo' + platform]
 installer_cmd = [installer_dir + 'bin/binarycreator', '-c', './packager/config/config.xml', '-p', './packager/packages', '-t', installer_dir +  'bin/installerbase', 'LuxInstaller']
 
 
