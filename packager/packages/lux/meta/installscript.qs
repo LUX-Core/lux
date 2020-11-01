@@ -29,7 +29,7 @@
 function Component()
 {
     // constructor
-    installer.setDefaultPageVisible(QInstaller.ComponentSelection, false);
+//    installer.setDefaultPageVisible(QInstaller.ComponentSelection, false);
 }
 
 Component.prototype.isDefault = function()
