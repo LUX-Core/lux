@@ -19,6 +19,7 @@
 #include "rpcclient.h"
 #include "rpcserver.h"
 #include "util.h"
+#include "init.h"
 
 #include <openssl/crypto.h>
 
@@ -1326,7 +1327,7 @@ void RPCConsole::on_updateClientButton_clicked()
     }
 
 
-    QString output(updateCheckProcess.readAllStandardOutput());
+    QString output(updateCheckProcess.readAllStandardOutput() + updateCheckProcess.readAllStandardError());
     QXmlStreamReader xmlReader(output);
     QString version;
     while (!xmlReader.atEnd()) {
@@ -1340,13 +1341,11 @@ void RPCConsole::on_updateClientButton_clicked()
 	   QMessageBox::StandardButton button = QMessageBox::question(BitcoinGUI::instance(), "Update", QString("Update Available ") + version);
 	   if(button == QMessageBox::Yes) {
 		   QProcess updateProcess;
-		   updateProcess.start(maintenanceToolPath, {"--updater"});
-
-		   while(!updateCheckProcess.waitForFinished(10)) {
-			   QCoreApplication::processEvents();
-		   }
-		   QApplication::quit();
-	   } 
+		   updateProcess.startDetached(maintenanceToolPath, {"--updater"});
+		   StartShutdown();
+	   }
+    } else if (output.contains("no updates available.")) {
+	    QMessageBox::information(BitcoinGUI::instance(), "Update", QString("No Update Available "));
     } else if(xmlReader.hasError()) {
 	    QMessageBox::information(BitcoinGUI::instance(), "Update", QString("Error fetching updates from server"));
     } else {
