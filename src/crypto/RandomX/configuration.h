@@ -29,7 +29,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #pragma once
 
 //Cache size in KiB. Must be a power of 2.
-#define RANDOMX_ARGON_MEMORY       262144
+#define RANDOMX_ARGON_MEMORY       524288 //262144 standard
 
 //Number of Argon2d iterations for Cache initialization.
 #define RANDOMX_ARGON_ITERATIONS   3
@@ -41,16 +41,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define RANDOMX_ARGON_SALT         "RandomX\x03"
 
 //Number of random Cache accesses per Dataset item. Minimum is 2.
-#define RANDOMX_CACHE_ACCESSES     8
+#define RANDOMX_CACHE_ACCESSES     16 // 8 standard
 
 //Target latency for SuperscalarHash (in cycles of the reference CPU).
 #define RANDOMX_SUPERSCALAR_LATENCY   170
 
 //Dataset base size in bytes. Must be a power of 2.
-#define RANDOMX_DATASET_BASE_SIZE  2147483648
+#define RANDOMX_DATASET_BASE_SIZE   4294967296 //2147483648 standard
 
 //Dataset extra size. Must be divisible by 64.
-#define RANDOMX_DATASET_EXTRA_SIZE 33554368
+#define RANDOMX_DATASET_EXTRA_SIZE 2181038016 //33554368 standard
 
 //Number of instructions in a RandomX program. Must be divisible by 8.
 #define RANDOMX_PROGRAM_SIZE       256
