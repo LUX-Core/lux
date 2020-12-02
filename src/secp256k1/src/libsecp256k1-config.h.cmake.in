@@ -1,0 +1,31 @@
+/* Copyright (c) 2017 The Bitcoin developers */
+
+#ifndef LIBSECP256K1_CONFIG_H
+#define LIBSECP256K1_CONFIG_H
+
+#cmakedefine HAVE___INT128
+
+#cmakedefine USE_NUM_GMP
+#cmakedefine USE_FIELD_INV_NUM
+#cmakedefine USE_SCALAR_INV_NUM
+
+#cmakedefine USE_NUM_NONE
+#cmakedefine USE_FIELD_INV_BUILTIN
+#cmakedefine USE_SCALAR_INV_BUILTIN
+
+#cmakedefine USE_SCALAR_4X64
+#cmakedefine USE_FIELD_5X52
+
+#cmakedefine USE_SCALAR_8X32
+#cmakedefine USE_FIELD_10X26
+
+#cmakedefine USE_ASM_X86_64
+
+#cmakedefine USE_ECMULT_STATIC_PRECOMPUTATION
+
+#cmakedefine ENABLE_MODULE_ECDH
+#cmakedefine ENABLE_MODULE_MULTISET
+#cmakedefine ENABLE_MODULE_RECOVERY
+#cmakedefine ENABLE_MODULE_SCHNORR
+
+#endif /* LIBSECP256K1_CONFIG_H */
