@@ -284,7 +284,7 @@ public:
         
         consensus.nLastPOWBlock = 6000000;
         consensus.RdxSeedHeight = 0;  // starting on 
-        consensus.RdxSeedInterval = 100; //seed changes every 5 blocks (testnet)
+        consensus.RdxSeedInterval = 340; //seed changes every 6 hours (based on mainnet)
         networkID = CBaseChainParams::TESTNET;
         strNetworkID = "test";
         pchMessageStart[0] = 0x54;
