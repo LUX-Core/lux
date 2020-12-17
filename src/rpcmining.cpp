@@ -23,7 +23,7 @@
 #include "script/script_error.h"
 #include "validationinterface.h"
 #include "versionbits.h"
-#include "crypto/randomx.h"
+#include "crypto/rx2.h"
 #ifdef ENABLE_WALLET
 #include "db.h"
 #include "wallet.h"
@@ -265,7 +265,7 @@ UniValue getmininginfo(const UniValue& params, bool fHelp)
     else if ((chainActive.Height()+1) < Params().SwitchRandomXBlock())
         obj.push_back(Pair("algo", "phi2"));
     else
-        obj.push_back(Pair("algo", "randomx"));
+        obj.push_back(Pair("algo", "rx2"));
 
 
     obj.push_back(Pair("segwit", IsWitnessEnabled(chainActive.Tip(), Params().GetConsensus()) ));
@@ -911,7 +911,7 @@ UniValue getwork(const UniValue& params, bool fHelp) {
         else if ((chainActive.Height()+1) < Params().SwitchRandomXBlock())
         result.push_back(Pair("algo", "phi2"));
         else
-        result.push_back(Pair("algo", "randomx"));
+        result.push_back(Pair("algo", "rx2"));
 
         result.push_back(Pair("midstate", HexStr(BEGIN(pmidstate), END(pmidstate))));
         if (pblock->nVersion & (1 << 30))

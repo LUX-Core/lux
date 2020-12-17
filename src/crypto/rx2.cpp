@@ -1,7 +1,7 @@
 #include "uint256.h"
 #include <string.h>
 #include "util.h"
-#include "randomx.h"
+#include "rx2.h"
 #include "RandomX/randomx.h"
 
 

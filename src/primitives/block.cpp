@@ -13,7 +13,7 @@
 #include "util.h"
 #include "chainparams.h"
 #include "versionbits.h"
-#include "crypto/randomx.h"
+#include "crypto/rx2.h"
 
 
 uint256 CBlockHeader::GetHash(int nHeight,int Mining) const

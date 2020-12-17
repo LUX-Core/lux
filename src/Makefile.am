@@ -333,8 +333,8 @@ crypto_libbitcoin_crypto_a_SOURCES = \
   crypto/RandomX/blake2/blake2b.c \
   crypto/RandomX/jit_compiler_x86.cpp \
   crypto/RandomX/jit_compiler_x86_static.S \
-  crypto/randomx.h \
-  crypto/randomx.cpp \
+  crypto/rx2.h \
+  crypto/rx2.cpp \
   cpp-ethereum/utils/libscrypt/b64.c \
   cpp-ethereum/utils/libscrypt/b64.h \
   cpp-ethereum/utils/libscrypt/crypto-mcf.c \
