@@ -19,8 +19,8 @@ static CCriticalSection cs_randomx;
 uint256 GetRandomXSeed(const uint32_t& nHeight)
 {  
     static uint256 current_key_block;
-    uint32_t SeedStartingHeight = Params().GetConsensus().RdxSeedHeight;
-    uint32_t SeedInterval = Params().GetConsensus().RdxSeedInterval;
+    uint32_t SeedStartingHeight = Params().GetConsensus().RX2SeedHeight;
+    uint32_t SeedInterval = Params().GetConsensus().RX2SeedInterval;
     uint32_t SwitchKey = SeedStartingHeight % SeedInterval;
 
     if (current_key_block == uint256())

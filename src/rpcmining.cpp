@@ -262,7 +262,7 @@ UniValue getmininginfo(const UniValue& params, bool fHelp)
     obj.push_back(Pair("chain", Params().NetworkIDString()));
     if ((chainActive.Height()+1) < Params().SwitchPhi2Block())
         obj.push_back(Pair("algo", "phi1612"));
-    else if ((chainActive.Height()+1) < Params().SwitchRandomXBlock())
+    else if ((chainActive.Height()+1) < Params().SwitchRX2Block())
         obj.push_back(Pair("algo", "phi2"));
     else
         obj.push_back(Pair("algo", "rx2"));
@@ -908,7 +908,7 @@ UniValue getwork(const UniValue& params, bool fHelp) {
         UniValue result(UniValue::VOBJ);
         if ((chainActive.Height()+1) < Params().SwitchPhi2Block())
         result.push_back(Pair("algo", "phi1612"));
-        else if ((chainActive.Height()+1) < Params().SwitchRandomXBlock())
+        else if ((chainActive.Height()+1) < Params().SwitchRX2Block())
         result.push_back(Pair("algo", "phi2"));
         else
         result.push_back(Pair("algo", "rx2"));

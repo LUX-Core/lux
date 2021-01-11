@@ -55,8 +55,8 @@ namespace Consensus {
         int64_t nPowTargetTimespan;
         uint256 powLimit;
         uint256 hashGenesisBlock;
-        uint32_t RdxSeedHeight;
-        uint32_t RdxSeedInterval;
+        uint32_t RX2SeedHeight;
+        uint32_t RX2SeedInterval;
     };
 } // namespace Consensus
 

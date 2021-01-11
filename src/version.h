@@ -11,10 +11,10 @@
  * network protocol versioning
  */
 
-static const int PROTOCOL_VERSION = 70101;
+static const int PROTOCOL_VERSION = 70201;
 
 //! disconnect from peers older than this proto version
-static const int MIN_PROTO_VERSION = 70101;
+static const int MIN_PROTO_VERSION = 70201;
 
 //static const int MIN_PEER_PROTO_VERSION_BEFORE_ENFORCEMENT = 70100;
 

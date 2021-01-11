@@ -24,10 +24,10 @@ uint256 CBlockHeader::GetHash(int nHeight,int Mining) const
 
 //printf("%s height = %d  (01)\n",__func__,nHeight);
 
-    bool randomxblock = (nHeight>=Params().SwitchRandomXBlock())? true:false;
+    bool randomxblock = (nHeight>=Params().SwitchRX2Block())? true:false;
     bool phi2block    = (nHeight>=Params().SwitchPhi2Block() && randomxblock!=true)? true:false;
  
-// printf("height = %d randomxblock %d phi2block %d switchrandomxblock %d switchphi2block %d \n",nHeight,randomxblock,phi2block,Params().SwitchRandomXBlock(),Params().SwitchPhi2Block());
+// printf("height = %d randomxblock %d phi2block %d switchrandomxblock %d switchphi2block %d \n",nHeight,randomxblock,phi2block,Params().SwitchRX2Block(),Params().SwitchPhi2Block());
 
 // phi2 algo
     if (phi2block && (nVersion & (1 << 30)))

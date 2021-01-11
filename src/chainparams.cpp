@@ -128,8 +128,8 @@ public:
         consensus.nRuleChangeActivationThreshold = 1026; // 95% of 1080 is 1026
         consensus.nMinerConfirmationWindow = 1080; // nPowTargetTimespan / nPowTargetSpacing
         consensus.nLastPOWBlock = 6000000;
-        consensus.RdxSeedHeight = 2000000;
-        consensus.RdxSeedInterval = 1345; //seed changes every day based on average total block time
+        consensus.RX2SeedHeight = 1061960;
+        consensus.RX2SeedInterval = 340; //seed changes every 6 hours (based on mainnet)
         // Deployment of SegWit (BIP141 and BIP143)
         consensus.vDeployments[Consensus::DEPLOYMENT_SEGWIT].bit = 1;
         consensus.vDeployments[Consensus::DEPLOYMENT_SEGWIT].nStartTime = 1530428034; // 01/07/2018
@@ -146,7 +146,7 @@ public:
         consensus.vDeployments[Consensus::SMART_CONTRACTS_HARDFORK].bit = 30;
 
         nSwitchPhi2Block = 299501;
-        nSwitchRandomXBlock = 1153400; /// dunno the value 
+        nSwitchRX2Block = 1561960; /// dunno the value 
         nFirstSCBlock = 350000;
         nPruneAfterHeight = 300000;
         nSplitRewardBlock = 300000;
@@ -283,8 +283,8 @@ public:
         consensus.vDeployments[Consensus::DEPLOYMENT_CSV].nTimeout = 2577836900; // Never / undefined
         
         consensus.nLastPOWBlock = 6000000;
-        consensus.RdxSeedHeight = 0;  // starting on 
-        consensus.RdxSeedInterval = 340; //seed changes every 6 hours (based on mainnet)
+        consensus.RX2SeedHeight = 0;  // starting on 
+        consensus.RX2SeedInterval = 340; //seed changes every 6 hours (based on mainnet)
         networkID = CBaseChainParams::TESTNET;
         strNetworkID = "test";
         pchMessageStart[0] = 0x54;
@@ -328,7 +328,7 @@ public:
 //        std::cout << genesis.hashMerkleRoot.GetHex() << std::endl;
 
         nSwitchPhi2Block = 10;
-        nSwitchRandomXBlock = 20; /// dunno the value 
+        nSwitchRX2Block = 20; /// dunno the value 
         nSplitRewardBlock = 5000;
         nPruneAfterHeight = 5000;
         nFirstSCBlock = 25;
@@ -421,7 +421,7 @@ public:
         consensus.powLimit = ~uint256(0) >> 1;
         nPreminePaymentandHardForkBlock = 60;
         nSwitchPhi2Block = 299501;
-        nSwitchRandomXBlock = 650000; /// dunno the value 
+        nSwitchRX2Block = 650000; /// dunno the value 
         nFirstSCBlock = 350000;
         nSplitRewardBlock = 50;
 
@@ -519,7 +519,7 @@ public:
         consensus.nLastPOWBlock = 6000000;
 
         nSwitchPhi2Block = 1200;
-        nSwitchRandomXBlock = 1300; /// dunno the value 
+        nSwitchRX2Block = 1300; /// dunno the value 
         //nFirstSCBlock = 300000;
         //nPruneAfterHeight = 100000;
 
