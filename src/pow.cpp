@@ -42,8 +42,8 @@ unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHead
         return bnTargetLimit.GetCompact(); // second block
 
     //rx fork
-    if (pindexLast->nHeight == (Params().SwitchRX2Block() - 1)) {
-        return bnTargetLimit.GetCompact(); // return mindiff on rx2 fork block
+    if (pindexLast->nHeight >= (Params().SwitchRX2Block() - 10) && pindexLast->nHeight <= (Params().SwitchRX2Block() + 10)) {
+        return bnTargetLimit.GetCompact(); // return mindiff on range of 20 blocks around rx fork block
     }
 
     int64_t nActualSpacing = pindexPrev->GetBlockTime() - pindexPrevPrev->GetBlockTime();
