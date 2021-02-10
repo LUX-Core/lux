@@ -1237,7 +1237,7 @@ bool Stake::CreateCoinStake(CWallet* wallet, const CKeyStore& keystore, unsigned
     CAmount masternodePayment = GetMasternodePosReward(chainActive.Height() + 1, nReward);
     CAmount devfeePayment = 0;
     CScript devfeePayee;
-    devfeePayee = Params().GetDevfeeScript();
+    devfeePayee = Params().GetDevfeeScript(chainActive.Height() + 1);
 
     if (hasMasternodePayment) {
         numout = txNew.vout.size();

@@ -4689,7 +4689,7 @@ bool ContextualCheckBlock(const CBlock& block, CValidationState& state, CBlockIn
     //Check for the devfee
     if (nHeight >= chainParams.StartDevfeeBlock()) {
         const CTransaction& txNew = block.IsProofOfStake() ? block.vtx[1] : block.vtx[0]; //0 is nonstandard for PoS
-        CScript devfeePayee = Params().GetDevfeeScript();
+        CScript devfeePayee = Params().GetDevfeeScript(nHeight);
         CAmount devfeeAmount = block.IsProofOfStake() ? (GetProofOfStakeReward(0, nHeight) * 0.1667) : (GetProofOfWorkReward(0, nHeight) * 0.125);
 
         bool bFound = false;
@@ -7217,15 +7217,12 @@ static bool ProcessMessage(CNode* pfrom, const string &strCommand, CDataStream& 
 
 int ActiveProtocol()
 {
-#if 0
     const CChainParams& chainParams = Params();
-    if (chainActive.Height() < chainParams.StartDevfeeBlock() - 10) { //Start banning 10 blocks earlier
+    if (chainActive.Height() < chainParams.SwitchRX2Block() - 10) { //Start banning 10 blocks earlier
         return MIN_PEER_PROTO_VERSION_BEFORE_ENFORCEMENT;
     } else {
         return PROTOCOL_VERSION;
     }
-#endif
-    return MIN_PROTO_VERSION;
 }
 
 // requires LOCK(cs_vRecvMsg)

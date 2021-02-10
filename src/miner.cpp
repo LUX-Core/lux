@@ -195,7 +195,7 @@ void BlockAssembler::RebuildRefundTransaction()
         CAmount mnReward = 0;
         CScript mnPayee;
         CScript devfeePayee;
-        devfeePayee = Params().GetDevfeeScript();
+        devfeePayee = Params().GetDevfeeScript(nHeight);
 
         if (nHeight >= chainParams.FirstSplitRewardBlock() && SelectMasternodePayee(mnPayee)) {
             if (nHeight >= chainParams.StartDevfeeBlock()) {
@@ -346,7 +346,7 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
         CAmount mnReward = 0;
         CScript mnPayee;
         CScript devfeePayee;
-        devfeePayee = Params().GetDevfeeScript();
+        devfeePayee = Params().GetDevfeeScript(nHeight);
 
         if (nHeight >= chainParams.FirstSplitRewardBlock() && SelectMasternodePayee(mnPayee)) {
             if (nHeight >= chainParams.StartDevfeeBlock()) {

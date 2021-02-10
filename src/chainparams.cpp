@@ -146,7 +146,7 @@ public:
         consensus.vDeployments[Consensus::SMART_CONTRACTS_HARDFORK].bit = 30;
 
         nSwitchPhi2Block = 299501;
-        nSwitchRX2Block = 1574270; /// dunno the value 
+        nSwitchRX2Block = 1612500;
         nFirstSCBlock = 350000;
         nPruneAfterHeight = 300000;
         nSplitRewardBlock = 300000;
@@ -166,8 +166,7 @@ public:
         pchMessageStart[2] = 0xc8;
         pchMessageStart[3] = 0xa9;
         vAlertPubKey = ParseHex("042d13c016ed91528241bcff222989769417eb10cdb679228c91e26e26900eb9fd053cd9f16a9a2894ad5ebbd551be1a4bd23bd55023679be17f0bd3a16e6fbeba");
-//test mainnet        nDefaultPort = 26969;
-        nDefaultPort = 36969; //test mainnet
+        nDefaultPort = 26969;
         nMaxReorganizationDepth = 100;
         nMinerThreads = 0;
         nMaturity = 79;
@@ -200,9 +199,9 @@ public:
         assert(genesis.hashMerkleRoot == uint256("0xe08ae0cfc35a1d70e6764f347fdc54355206adeb382446dd54c32cd0201000d3"));
 
         ////////////////////////////////////////////////////////////////////////////////////////////////
-//test mainnet       vSeeds.push_back(CDNSSeedData("Seed1", "seed.luxcore.tech"));       // LUX seeder
-//test mainnet       vSeeds.push_back(CDNSSeedData("Seed2", "seed.luxseeds.nl"));        // LUX seeder
-//test mainet        vSeeds.push_back(CDNSSeedData("Seed3", "lux.yiimp.eu"));            // LUX seeder with IPv6
+        vSeeds.push_back(CDNSSeedData("Seed1", "seed.luxcore.tech"));       // LUX seeder
+        vSeeds.push_back(CDNSSeedData("Seed2", "seed.luxseeds.nl"));        // LUX seeder
+        vSeeds.push_back(CDNSSeedData("Seed3", "lux.yiimp.eu"));            // LUX seeder with IPv6
 
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,48); // LUX address start with 'L'
         base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1,63); // LUX script addresses start with 'S'
@@ -217,6 +216,7 @@ public:
 
         vFixedSeeds = std::vector<SeedSpec6>(pnSeed6_main, pnSeed6_main + ARRAYLEN(pnSeed6_main));
         vDevfeeAddress = "Laqt6GdG615kHonGcp3mkH2KMP4WZwsZhQ";
+        vDevfeeAddress2 = "LYSFr6D6trNHKFV5kfwuu4yexmRdo1vtDx";
 
         fMiningRequiresPeers = true;
         fDefaultConsistencyChecks = false;
@@ -243,11 +243,19 @@ public:
     }
 };
 
-CScript CChainParams::GetDevfeeScript() const {
+CScript CChainParams::GetDevfeeScript(int nHeight) const {
+    CScript script;
     CBitcoinAddress address(vDevfeeAddress.c_str());
+    CBitcoinAddress address2(vDevfeeAddress2.c_str());
     assert(address.IsValid());
+    assert(address2.IsValid());
 
-    CScript script = GetScriptForDestination(address.Get());
+    if (nHeight < nSwitchRX2Block) {
+        script = GetScriptForDestination(address.Get());
+    } else {
+        script = GetScriptForDestination(address2.Get());
+    }
+    
     return script;
 }
 
