@@ -23,6 +23,7 @@
 #include "script/script_error.h"
 #include "validationinterface.h"
 #include "versionbits.h"
+#include "crypto/rx2.h"
 #ifdef ENABLE_WALLET
 #include "db.h"
 #include "wallet.h"
@@ -259,7 +260,14 @@ UniValue getmininginfo(const UniValue& params, bool fHelp)
     obj.push_back(Pair("pooledtx", (uint64_t)mempool.size()));
     obj.push_back(Pair("testnet", Params().NetworkIDString() != "main"));
     obj.push_back(Pair("chain", Params().NetworkIDString()));
-    obj.push_back(Pair("algo", (chainActive.Height()+1) < Params().SwitchPhi2Block() ? "phi1612" : "phi2"));
+    if ((chainActive.Height()+1) < Params().SwitchPhi2Block())
+        obj.push_back(Pair("algo", "phi1612"));
+    else if ((chainActive.Height()+1) < Params().SwitchRX2Block())
+        obj.push_back(Pair("algo", "phi2"));
+    else
+        obj.push_back(Pair("algo", "rx2"));
+
+
     obj.push_back(Pair("segwit", IsWitnessEnabled(chainActive.Tip(), Params().GetConsensus()) ));
 #ifdef ENABLE_CPUMINER
     obj.push_back(Pair("generate", getgenerate(params, false)));
@@ -420,13 +428,15 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
             HelpExampleCli("getblocktemplate", "") + HelpExampleRpc("getblocktemplate", ""));
 
     LOCK(cs_main);
-
+      //      printf("getblocktemplate\n");
+      ///      printf("chainActive tip in block template on height %d\n",chainActive.Height());
     std::string strMode = "template";
     UniValue lpval = NullUniValue;
     std::set<std::string> setClientRules;
     int64_t nMaxVersionPreVB = -1;
     if (params.size() > 0)
     {
+ //   printf("after paramsize: chainActive tip in block template on height %d\n",chainActive.Height());
         const UniValue& oparam = params[0].get_obj();
         const UniValue& modeval = find_value(oparam, "mode");
         if (modeval.isStr())
@@ -446,11 +456,14 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
             if (!DecodeHexBlk(block, dataval.get_str()))
                 throw JSONRPCError(RPC_DESERIALIZATION_ERROR, "Block decode failed");
 
-            CBlockIndex* pindexPrev = LookupBlockIndex(block.hashPrevBlock);
-            bool usePhi2 = pindexPrev ? pindexPrev->nHeight + 1 >= Params().SwitchPhi2Block() : false;
 
-            uint256 hash = block.GetHash(usePhi2);
+   //        printf("getblocktemplate: chainActive tip in block template on height %d\n",chainActive.Height());
+            CBlockIndex* pindexPrev = LookupBlockIndex(block.hashPrevBlock);
+            int TheHeight = pindexPrev ? pindexPrev->nHeight + 1  : 0;
+   //         printf("chainActive tip in block template on height %d Height in gethash %d\n",chainActive.Height(),TheHeight);
+            uint256 hash = block.GetHash(TheHeight);
             CBlockIndex* pindex = LookupBlockIndex(hash);
+    //        printf("chainActive tip in block template on height %d\n",chainActive.Height());
             if (pindex) {
                 if (pindex->IsValid(BLOCK_VALID_SCRIPTS))
                     return "duplicate";
@@ -459,7 +472,10 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
                 return "duplicate-inconclusive";
             }
 
+
+ //           printf("chainActive tip in block template on height %d\n",chainActive.Height());
             pindexPrev = chainActive.Tip();
+ //           printf("chainActive tip in block template on height %d\n",chainActive.Height());
             // TestBlockValidity only supports blocks built on the current Tip
             if (block.hashPrevBlock != pindexPrev->GetBlockHash())
                 return "inconclusive-not-best-prevblk";
@@ -548,7 +564,7 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
     // to select witness transactions, after segwit activates (otherwise
     // don't).
     bool fSupportsSegwit = setClientRules.find(segwit_info.name) != setClientRules.end();
-
+ //         printf("before pindexPrev chainActive tip in block template on height %d\n",chainActive.Height());
     // Update block
     static CBlockIndex* pindexPrev;
     static int64_t nStart;
@@ -561,7 +577,7 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
         fLastTemplateSupportsSegwit != fSupportsSegwit) {
         // Clear pindexPrev so future calls make a new block, despite any failures from here on
         pindexPrev = NULL;
-
+ //        printf(" different from chainActivetip %d\n",chainActive.Height());
         // Store the chainActive.Tip() used before CreateNewBlock, to avoid races
         nTransactionsUpdatedLast = mempool.GetTransactionsUpdated();
         CBlockIndex* pindexPrevNew = chainActive.Tip();
@@ -570,20 +586,23 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
 
         // Create new block
         CScript scriptDummy = CScript() << OP_TRUE;
+ //               printf(" before createnewblock %d\n",chainActive.Height());
         pblocktemplate = BlockAssembler(Params()).CreateNewBlock(scriptDummy, fSupportsSegwit);
+//                       printf(" after createnewblock %d\n",chainActive.Height());
         if (!pblocktemplate)
             throw JSONRPCError(RPC_OUT_OF_MEMORY, "Out of memory");
 
         // Need to update only after we know CreateNewBlock succeeded
         pindexPrev = pindexPrevNew;
     }
+ //           printf(" beforeupdate time %d\n",chainActive.Height());
     CBlock* pblock = &pblocktemplate->block; // pointer for convenience
     const Consensus::Params& consensusParams = Params().GetConsensus();
 
     // Update nTime
     UpdateTime(pblock, consensusParams, pindexPrev, false);
     pblock->nNonce = 0;
-
+  //          printf(" after update time %d\n",chainActive.Height());
     // NOTE: If at some point we support pre-segwit miners post-segwit-activation, this needs to take segwit support into consideration
     const bool fPreSegWit = (THRESHOLD_ACTIVE != VersionBitsState(pindexPrev, consensusParams, Consensus::DEPLOYMENT_SEGWIT, versionbitscache));
 
@@ -727,10 +746,11 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
         // Note that this can probably also be removed entirely after the first BIP9 non-force deployment (ie, probably segwit) gets activated
         aMutable.push_back("version/force");
     }
-
+//          printf("previousblockhash: chainActive tip in block template on height %d\n",chainActive.Height());
     int64_t nHeight = pindexPrev->nHeight + 1;
     result.push_back(Pair("previousblockhash", pblock->hashPrevBlock.GetHex()));
 
+//         printf("after previousblockhash: chainActive tip in block template on height %d\n",chainActive.Height());
     // smart contracts
     if (nHeight >= Params().FirstSCBlock()) {
         // gas refund
@@ -748,6 +768,9 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
         result.push_back(Pair("utxoroot", pblock->hashUTXORoot.GetHex()));
         result.push_back(Pair("screfund", scrObjArray));
     }
+    //randomX keyHash
+    uint256 seedHash = GetRandomXSeed(nHeight);
+    result.push_back(Pair("seed",seedHash.ToString().c_str()));
 
     result.push_back(Pair("transactions", transactions));
     result.push_back(Pair("coinbaseaux", aux));
@@ -883,7 +906,13 @@ UniValue getwork(const UniValue& params, bool fHelp) {
         uint256 hashTarget = uint256().SetCompact(pblock->nBits);
 
         UniValue result(UniValue::VOBJ);
-        result.push_back(Pair("algo", (chainActive.Height()+1) < Params().SwitchPhi2Block() ? "phi1612" : "phi2"));
+        if ((chainActive.Height()+1) < Params().SwitchPhi2Block())
+        result.push_back(Pair("algo", "phi1612"));
+        else if ((chainActive.Height()+1) < Params().SwitchRX2Block())
+        result.push_back(Pair("algo", "phi2"));
+        else
+        result.push_back(Pair("algo", "rx2"));
+
         result.push_back(Pair("midstate", HexStr(BEGIN(pmidstate), END(pmidstate))));
         if (pblock->nVersion & (1 << 30))
             result.push_back(Pair("data", HexStr(BEGIN(pdata), END(pdata))));
@@ -930,16 +959,18 @@ class submitblock_StateCatcher : public CValidationInterface
 public:
     uint256 hash;
     bool found;
-    bool usePhi2;
+    int  nHeight;
     CValidationState state;
 
-    submitblock_StateCatcher(const uint256& hashIn, bool usePhi2) : hash(hashIn), found(false), usePhi2(usePhi2), state(){};
+    submitblock_StateCatcher(const uint256& hashIn, int TheHeight) : hash(hashIn), found(false), nHeight(TheHeight), state(){};
 
 protected:
     virtual void BlockChecked(const CBlock& block, const CValidationState& stateIn)
     {
-        if (block.GetHash(usePhi2) != hash)
+        if (block.GetHash(nHeight) != hash) {
+            printf("block.GetHash(nHeight) != hash");
             return;
+        }    
         found = true;
         state = stateIn;
     };
@@ -971,14 +1002,15 @@ UniValue submitblock(const UniValue& params, bool fHelp)
     }
 
     CValidationState state;
-    bool usePhi2, fBlockPresent = false;
+    bool fBlockPresent = false;
+    int TheHeight = 0;
     {
         LOCK(cs_main);
         CBlockIndex* pindexPrev = LookupBlockIndex(block.hashPrevBlock);
         UpdateUncommittedBlockStructures(block, pindexPrev, Params().GetConsensus());
 
-        usePhi2 = pindexPrev ? pindexPrev->nHeight + 1 >= Params().SwitchPhi2Block() : false;
-        uint256 hash = block.GetHash(usePhi2);
+        TheHeight = pindexPrev ? pindexPrev->nHeight + 1 : 0;
+        uint256 hash = block.GetHash(TheHeight);
         CBlockIndex* pindex = LookupBlockIndex(hash);
         if (pindex) {
             if (pindex->IsValid(BLOCK_VALID_SCRIPTS)) {
@@ -999,9 +1031,11 @@ UniValue submitblock(const UniValue& params, bool fHelp)
         }
     }
 
-    submitblock_StateCatcher sc(block.GetHash(usePhi2), usePhi2);
+    submitblock_StateCatcher sc(block.GetHash(TheHeight), TheHeight);
     RegisterValidationInterface(&sc);
+ 
     bool fAccepted = ProcessNewBlock(state, Params(), NULL, &block);
+
     UnregisterValidationInterface(&sc);
     if (fBlockPresent) {
         if (fAccepted && !sc.found) {

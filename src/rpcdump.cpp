@@ -247,6 +247,9 @@ UniValue importaddress(const UniValue& params, bool fHelp)
     if (params.size() > 3)
         fP2SH = params[3].get_bool();
 
+    if (fRescan && fPruneMode)
+        throw JSONRPCError(RPC_WALLET_ERROR, "Rescan is disabled in pruned mode");
+
     CTxDestination dest = DecodeDestination(params[0].get_str());
     if (IsValidDestination(dest)) {
         if (fP2SH)
@@ -388,6 +391,9 @@ UniValue importpubkey(const UniValue& params, bool fHelp)
                 + HelpExampleRpc("importpubkey", "\"mypubkey\", \"testing\", false")
         );
 
+    if (fPruneMode)
+        throw JSONRPCError(RPC_WALLET_ERROR, "Importing public keys is disabled in pruned mode");
+
     string strLabel = "";
     if (params.size() > 1)
         strLabel = params[1].get_str();
@@ -396,6 +402,9 @@ UniValue importpubkey(const UniValue& params, bool fHelp)
     bool fRescan = true;
     if (params.size() > 2)
         fRescan = params[2].get_bool();
+
+    if (fRescan && fPruneMode)
+        throw JSONRPCError(RPC_WALLET_ERROR, "Rescan is disabled in pruned mode");
 
     {
         CTxDestination dest;

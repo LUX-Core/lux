@@ -114,6 +114,7 @@ bool CBlockTreeDB::WriteBatchSync(const std::vector<std::pair<int, const CBlockF
 
 bool CBlockTreeDB::WriteBlockIndex(const CDiskBlockIndex& blockindex)
 {
+
     auto const &hash = blockindex.GetBlockHash();
     if (blockindex.IsProofOfStake()) {
         if (blockindex.hashProofOfStake == 0) {
@@ -496,6 +497,7 @@ bool CBlockTreeDB::LoadBlockIndexGuts()
 
     // Load mapBlockIndex
     while (pcursor->Valid()) {
+        if (fRequestShutdown) return false;
         boost::this_thread::interruption_point();
         try {
             leveldb::Slice slKey = pcursor->key();
@@ -537,11 +539,15 @@ bool CBlockTreeDB::LoadBlockIndexGuts()
 
                 bool isPoW = (diskindex.nNonce != 0) && pindexNew->nHeight <= Params().LAST_POW_BLOCK();
                 if (isPoW) {
-                    auto const &hash(pindexNew->GetBlockHash());
-                    if (!CheckProofOfWork(hash, pindexNew->nBits, Params().GetConsensus())) {
+//                    auto const &hash(pindexNew->phashBlock);
+                    const uint256 *hash = pindexNew->phashBlock;                    
+                //    auto const &hash(pindexNew->GetBlockHeader().GetHash(pindexNew->nHeight,1));
+/*                    
+                    if (!CheckProofOfWork(hash[0], pindexNew->nBits, Params().GetConsensus())) {
                         unsigned int nBits = pindexPrev ? pindexPrev->nBits : 0;
-                        return error("%s: CheckProofOfWork failed: %d %s (%d, %d)", __func__, pindexNew->nHeight, hash.GetHex(), pindexNew->nBits, nBits);
+                        return error("%s: CheckProofOfWork failed: %d %s (%d, %d)", __func__, pindexNew->nHeight, hash[0].GetHex(), pindexNew->nBits, nBits);
                     }
+*/                    
                 } else {
                     stake->MarkStake(pindexNew->prevoutStake, pindexNew->nStakeTime);
                     auto const &hash(pindexNew->GetBlockHash());
@@ -562,12 +568,21 @@ bool CBlockTreeDB::LoadBlockIndexGuts()
                     }
                 }
 
+                pindexPrev = pindexNew;
                 pcursor->Next();
             } else {
                 break; // if shutdown requested or finished loading block index
             }
         } catch (std::exception& e) {
             return error("%s : Deserialize or I/O error - %s", __func__, e.what());
+        }
+    }
+
+    if (nDiscarded) {
+        if (WriteBatch(batch)) {
+            LogPrintf("pruned %d orphaned blocks from disk index\n", nDiscarded);
+        } else {
+            return error("%d invalid blocks in disk index, restart with -reindex is required! (first was %d)\n", nDiscarded, nFirstDiscarded);
         }
     }
 

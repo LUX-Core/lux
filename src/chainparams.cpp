@@ -128,6 +128,8 @@ public:
         consensus.nRuleChangeActivationThreshold = 1026; // 95% of 1080 is 1026
         consensus.nMinerConfirmationWindow = 1080; // nPowTargetTimespan / nPowTargetSpacing
         consensus.nLastPOWBlock = 6000000;
+        consensus.RX2SeedHeight = 1061960;
+        consensus.RX2SeedInterval = 340; //seed changes every 6 hours (based on mainnet)
         // Deployment of SegWit (BIP141 and BIP143)
         consensus.vDeployments[Consensus::DEPLOYMENT_SEGWIT].bit = 1;
         consensus.vDeployments[Consensus::DEPLOYMENT_SEGWIT].nStartTime = 1530428034; // 01/07/2018
@@ -144,6 +146,7 @@ public:
         consensus.vDeployments[Consensus::SMART_CONTRACTS_HARDFORK].bit = 30;
 
         nSwitchPhi2Block = 299501;
+        nSwitchRX2Block = 1574270; /// dunno the value 
         nFirstSCBlock = 350000;
         nPruneAfterHeight = 300000;
         nSplitRewardBlock = 300000;
@@ -163,7 +166,8 @@ public:
         pchMessageStart[2] = 0xc8;
         pchMessageStart[3] = 0xa9;
         vAlertPubKey = ParseHex("042d13c016ed91528241bcff222989769417eb10cdb679228c91e26e26900eb9fd053cd9f16a9a2894ad5ebbd551be1a4bd23bd55023679be17f0bd3a16e6fbeba");
-        nDefaultPort = 26969;
+//test mainnet        nDefaultPort = 26969;
+        nDefaultPort = 36969; //test mainnet
         nMaxReorganizationDepth = 100;
         nMinerThreads = 0;
         nMaturity = 79;
@@ -196,9 +200,9 @@ public:
         assert(genesis.hashMerkleRoot == uint256("0xe08ae0cfc35a1d70e6764f347fdc54355206adeb382446dd54c32cd0201000d3"));
 
         ////////////////////////////////////////////////////////////////////////////////////////////////
-        vSeeds.push_back(CDNSSeedData("Seed1", "seed.luxcore.tech"));       // LUX seeder
-        vSeeds.push_back(CDNSSeedData("Seed2", "seed.luxseeds.nl"));        // LUX seeder
-        vSeeds.push_back(CDNSSeedData("Seed3", "lux.yiimp.eu"));            // LUX seeder with IPv6
+//test mainnet       vSeeds.push_back(CDNSSeedData("Seed1", "seed.luxcore.tech"));       // LUX seeder
+//test mainnet       vSeeds.push_back(CDNSSeedData("Seed2", "seed.luxseeds.nl"));        // LUX seeder
+//test mainet        vSeeds.push_back(CDNSSeedData("Seed3", "lux.yiimp.eu"));            // LUX seeder with IPv6
 
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,48); // LUX address start with 'L'
         base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1,63); // LUX script addresses start with 'S'
@@ -262,7 +266,9 @@ public:
         consensus.nMajorityWindow = 100;
         //consensus.BIP34Height = 227931;
         //consensus.BIP34Hash = uint256S("0x000000000000024b89b42a942fe0d9fea3bb44ab7bd1b19115dd6a759c0808b8");
+        
         consensus.powLimit = ~uint256(0) >> 10; // LUX starting difficulty is 1 / 2^12
+//        consensus.powLimit = uint256S("0x7fff000000000000000000000000000000000000000000000000000000000000");
         consensus.nPowTargetTimespan = 30 * 60; //36 * 60 * 60; // LUX: 1 36hrs
         consensus.nPowTargetSpacing = 2 * 60;  // LUX: 2 minute
         consensus.fPowAllowMinDifficultyBlocks = false;
@@ -276,8 +282,10 @@ public:
         consensus.vDeployments[Consensus::DEPLOYMENT_CSV].bit = 0;
         consensus.vDeployments[Consensus::DEPLOYMENT_CSV].nStartTime = 577836800;
         consensus.vDeployments[Consensus::DEPLOYMENT_CSV].nTimeout = 2577836900; // Never / undefined
+        
         consensus.nLastPOWBlock = 6000000;
-
+        consensus.RX2SeedHeight = 0;  // starting on 
+        consensus.RX2SeedInterval = 340; //seed changes every 6 hours (based on mainnet)
         networkID = CBaseChainParams::TESTNET;
         strNetworkID = "test";
         pchMessageStart[0] = 0x54;
@@ -320,11 +328,12 @@ public:
 //        std::cout << genesis.GetHash().GetHex() << std::endl;
 //        std::cout << genesis.hashMerkleRoot.GetHex() << std::endl;
 
-        nSwitchPhi2Block = 30;
-        nSplitRewardBlock = 500000;
-        nPruneAfterHeight = 500000;
-        nFirstSCBlock = 40;
-        nPreminePaymentandHardForkBlock = 500000;
+        nSwitchPhi2Block = 10;
+        nSwitchRX2Block = 20; /// dunno the value 
+        nSplitRewardBlock = 5000;
+        nPruneAfterHeight = 5000;
+        nFirstSCBlock = 25;
+        nPreminePaymentandHardForkBlock = 50000;
 
         consensus.hashGenesisBlock = genesis.GetHash();
 
@@ -333,8 +342,8 @@ public:
 
         //vFixedSeeds.clear();
         //vSeeds.clear();
-        vSeeds.push_back(CDNSSeedData("51.15.76.137", "51.15.76.137"));
-        vSeeds.push_back(CDNSSeedData("89.3.178.185", "89.3.178.185"));
+        //vSeeds.push_back(CDNSSeedData("51.15.76.137", "51.15.76.137"));
+        //vSeeds.push_back(CDNSSeedData("89.3.178.185", "89.3.178.185"));
 
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1, 48); // Testnet lux addresses start with 'l'
         base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1, 63);  // Testnet lux script addresses start with 'S'
@@ -362,10 +371,15 @@ public:
 
         strDarksendPoolDummyAddress = "LPGq7DZbqZ8Vb3tfLH8Z8VHqeV4fsK68oX";
         nStartMasternodePayments = 1528954643; //Fri, 09 Jan 2015 21:05:58 GMT
-
+        /*
         nStakingRoundPeriod = 120; // 5 seconds a round
-        nStakingInterval = 22; // 30 seconds
+        nStakingInterval = 120; // 30 seconds
         nStakingMinAge = 360; // 6 minutes
+        */
+        nStakingRoundPeriod = 120; // 2 minutes a round
+        nStakingInterval = 22;
+        nStakingMinAge = 36 * 60 * 60;
+
     }
     const Checkpoints::CCheckpointData& Checkpoints() const
     {
@@ -408,6 +422,7 @@ public:
         consensus.powLimit = ~uint256(0) >> 1;
         nPreminePaymentandHardForkBlock = 60;
         nSwitchPhi2Block = 299501;
+        nSwitchRX2Block = 650000; /// dunno the value 
         nFirstSCBlock = 350000;
         nSplitRewardBlock = 50;
 
@@ -505,6 +520,7 @@ public:
         consensus.nLastPOWBlock = 6000000;
 
         nSwitchPhi2Block = 1200;
+        nSwitchRX2Block = 1300; /// dunno the value 
         //nFirstSCBlock = 300000;
         //nPruneAfterHeight = 100000;
 
