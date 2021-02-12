@@ -364,7 +364,7 @@ static std::string BlockToString(CBlockIndex* pBlock)
         _("Bits"), "<tt>" + strprintf("%08x", block.nBits) + "</tt>",
         _("Nonce"), "<tt>" + strprintf("%08x", block.nNonce) + "</tt>",
         _("Version"), "<tt>" + strprintf("%08x", block.nVersion) + "</tt>",
-        _("Hash"), "<tt>" + block.GetHash(pBlock->nHeight >= Params().SwitchPhi2Block()).GetHex() + "</tt>",
+        _("Hash"), "<tt>" + block.GetHash(pBlock->nHeight).GetHex() + "</tt>",
         _("Merkle Root"), "<tt>" + block.hashMerkleRoot.GetHex() + "</tt>",
         _("State Root"), "<tt>" + block.hashStateRoot.GetHex() + "</tt>",
         _("UTXO Root"), "<tt>" + block.hashUTXORoot.GetHex() + "</tt>",

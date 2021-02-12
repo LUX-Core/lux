@@ -195,7 +195,7 @@ void BlockAssembler::RebuildRefundTransaction()
         CAmount mnReward = 0;
         CScript mnPayee;
         CScript devfeePayee;
-        devfeePayee = Params().GetDevfeeScript();
+        devfeePayee = Params().GetDevfeeScript(nHeight);
 
         if (nHeight >= chainParams.FirstSplitRewardBlock() && SelectMasternodePayee(mnPayee)) {
             if (nHeight >= chainParams.StartDevfeeBlock()) {
@@ -286,13 +286,17 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
     LOCK2(cs_main, mempool.cs);
     LOCK(cs_main);
     CBlockIndex* pindexPrev = chainActive.Tip();
-    if (!pindexPrev) return nullptr;
-
+   // printf("create new block chaintip height %d\n",chainActive.Height());
+    if (!pindexPrev) {
+        printf("noindex in here  %d\n",chainActive.Height());
+        return nullptr;
+    }
     nHeight = pindexPrev->nHeight + 1;
 
     pblock->nVersion = ComputeBlockVersion(pindexPrev, chainParams.GetConsensus());
     // -regtest only: allow overriding block.nVersion with
     // -blockversion=N to test forking scenarios
+   // printf("after ComputeBlockVersion %d\n",chainActive.Height());
     if (chainParams.MineBlocksOnDemand())
         pblock->nVersion = GetArg("-blockversion", pblock->nVersion);
 
@@ -301,6 +305,7 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
     }
 
     pblock->nTime = txProofTime;
+ //   printf("after txProofTime %d\n",chainActive.Height());
     if (!fProofOfStake)
         UpdateTime(pblock, chainParams.GetConsensus(), pindexPrev, fProofOfStake);
     pblock->nBits = GetNextWorkRequired(pindexPrev, pblock, chainParams.GetConsensus(),fProofOfStake);
@@ -320,7 +325,7 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
     coinbaseTx.vin.resize(1);
     coinbaseTx.vin[0].prevout.SetNull();
     coinbaseTx.vout.resize(1);
-
+// printf("after coinbaseTx %d\n",chainActive.Height());
     // Decide whether to include witness transactions
     // This is only needed in case the witness softfork activation is reverted
     // (which would require a very deep reorganization) or when
@@ -341,7 +346,7 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
         CAmount mnReward = 0;
         CScript mnPayee;
         CScript devfeePayee;
-        devfeePayee = Params().GetDevfeeScript();
+        devfeePayee = Params().GetDevfeeScript(nHeight);
 
         if (nHeight >= chainParams.FirstSplitRewardBlock() && SelectMasternodePayee(mnPayee)) {
             if (nHeight >= chainParams.StartDevfeeBlock()) {
@@ -456,18 +461,19 @@ std::unique_ptr<CBlockTemplate> BlockAssembler::CreateNewBlock(const CScript& sc
     // The total fee is the Fees minus the Refund
     if (pTotalFees)
         *pTotalFees = nFees - bceResult.refundSender;
-
+//printf("before filling header pindexState  %d\n",chainActive.Height());
     // Fill in header
     pblock->hashPrevBlock  = pindexPrev->GetBlockHash();
     pblock->nNonce         = 0;
     pblocktemplate->vTxSigOpsCost[0] = WITNESS_SCALE_FACTOR * GetLegacySigOpCount(pblock->vtx[0]);
-
+//printf("after filling header pindexState  %d\n",chainActive.Height());
     CValidationState state;
     if (!TestBlockValidity(state, chainParams, *pblock, pindexPrev, false, false)) {
+      //  printf("%s failed valididty test\n",__func__);
         if (!fProofOfStake) LogPrintf("%s: TestBlockValidity failed \n", __func__);
         return nullptr;
     }
-
+//printf("end of create new block chaintip height %d\n",chainActive.Height());
     return std::move(pblocktemplate);
 }
 

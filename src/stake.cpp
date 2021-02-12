@@ -1237,7 +1237,7 @@ bool Stake::CreateCoinStake(CWallet* wallet, const CKeyStore& keystore, unsigned
     CAmount masternodePayment = GetMasternodePosReward(chainActive.Height() + 1, nReward);
     CAmount devfeePayment = 0;
     CScript devfeePayee;
-    devfeePayee = Params().GetDevfeeScript();
+    devfeePayee = Params().GetDevfeeScript(chainActive.Height() + 1);
 
     if (hasMasternodePayment) {
         numout = txNew.vout.size();
@@ -1381,16 +1381,16 @@ bool Stake::GenBlockStake(CWallet* wallet, unsigned int& extra) {
 
     SetThreadPriority(THREAD_PRIORITY_NORMAL);
 
-    bool usePhi2;
+    int TheHeight;
     {
         LOCK(cs_main);
         CBlockIndex* pindexPrev = LookupBlockIndex(block->hashPrevBlock);
-        usePhi2 = pindexPrev ? pindexPrev->nHeight + 1 >= Params().SwitchPhi2Block() : false;
+        TheHeight = pindexPrev ? pindexPrev->nHeight + 1  : 0;
     }
 
     bool result = true;
     uint256 proof1, proof2;
-    auto hash = block->GetHash(usePhi2);
+    auto hash = block->GetHash(TheHeight);
     auto good = CheckProof(tip, *block, proof1);
 
 #if defined(DEBUG_DUMP_STAKE_CHECK) && defined(DEBUG_DUMP_STAKING_INFO)

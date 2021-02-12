@@ -4506,10 +4506,10 @@ int CMerkleTx::SetMerkleBranch(const CBlock& block) {
     CBlock blockTmp;
 
     CBlockIndex* pindexPrev = LookupBlockIndex(block.hashPrevBlock);
-    bool usePhi2 = pindexPrev ? pindexPrev->nHeight + 1 >= Params().SwitchPhi2Block() : false;
+    int TheHeight = pindexPrev ? pindexPrev->nHeight + 1 : 0;
 
     // Update the tx's hashBlock
-    hashBlock = block.GetHash(usePhi2);
+    hashBlock = block.GetHash(TheHeight);
 
     // Locate the transaction
     for (nIndex = 0; nIndex < (int)block.vtx.size(); nIndex++)
