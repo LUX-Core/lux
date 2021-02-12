@@ -1,44 +1,32 @@
 ![LUX Logo](src/qt/res/images/lux_logo_horizontal.png)
 
-"FIRST OF ITS KIND"
+EMPOWERING PEOPLE
 
 Luxcore is GNU AGPLv3 licensed.
 
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FLUX-Core%2Flux.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2FLUX-Core%2Flux?ref=badge_shield) [![Build Status](https://travis-ci.org/LUX-Core/lux.svg?branch=master)](https://travis-ci.org/LUX-Core/lux) [![GitHub version](https://badge.fury.io/gh/LUX-Core%2Flux.png)](https://badge.fury.io/gh/LUX-Core%2Flux.png) [![HitCount](http://hits.dwyl.io/LUX-Core/lux.svg)](http://hits.dwyl.io/LUX-Core/lux)
+[![Build Status](https://travis-ci.org/LUX-Core/lux.svg?branch=master)](https://travis-ci.org/LUX-Core/lux) [![GitHub version](https://badge.fury.io/gh/LUX-Core%2Flux.png)](https://badge.fury.io/gh/LUX-Core%2Flux.png) [![HitCount](http://hits.dwyl.io/LUX-Core/lux.svg)](http://hits.dwyl.io/LUX-Core/lux)
 <a href="https://discord.gg/ndUg9va"><img src="https://discordapp.com/api/guilds/364500397999652866/embed.png" alt="Discord server" /></a> <a href="https://twitter.com/intent/follow?screen_name=LUX_COIN"><img src="https://img.shields.io/twitter/follow/LUX_COIN.svg?style=social&logo=twitter" alt="follow on Twitter"></a>
                                                                                                                                                      
 [![Build history](https://buildstats.info/travisci/chart/LUX-Core/lux?branch=master)](https://travis-ci.org/LUX-Core/lux?branch=master)
 
-[Website](https://luxcore.io) — [LUXtre + LUXGate](https://github.com/LUX-Core/luxtre) - [PoS Web Wallet](https://lux.poswallet.io) — [Block Explorer](https://explorer.luxcore.io/) — [Blog](https://reddit.com/r/LUXCoin) — [Forum](https://bitcointalk.org/index.php?topic=2254046.0) — [Telegram](https://t.me/LUXcoinOfficialChat) — [Twitter](https://twitter.com/LUX_Coin)
+[Website](https://luxcore.io) — [Luxgate](https://luxcore.io/luxgate/) - [PoS Web Wallet](https://www.luxcore.io/poswebwallet/) — [Block Explorer](https://explorer.luxcore.io/) — [Blog](https://reddit.com/r/LUXCoin) — [Forum](https://bitcointalk.org/index.php?topic=2254046.0) — [Telegram](https://t.me/LUXcoinOfficialChat) — [Twitter](https://twitter.com/LUX_Coin)
 
 Features
 =============
 
-* Hybrid PoW/PoS algorithm
+* Hybrid PoW/PoS
 * Hybrid masternode
-* Static PoS
-* Segwit
 * Smart contract
-* New PHI2 PoW/PoS hybrid algorithm
+* New RX2 algorithm
 * Luxgate
-* Parallel masternode (PMN)
-
-  * [Banking layer](#)
-  
-  * [Proof of file storage (Distributed file storage (DFS))](doc/Technical-description-of-the-implementation-of-a-distributed-file-storage.md)
-   
-    * [DFS Testnet](doc/dfs-testnet.md)
-    
-* ~~PHI1612 PoW/PoS hybrid algorithm~~
 
 
-The Luxcore Project is a decentralized peer-to-peer banking financial platform, created under an open source license, featuring a built-in cryptocurrency, end-to-end encrypted messaging and decentralized marketplace. The decentralized network aims to provide anonymity and privacy for everyone through a simple user-friendly interface by taking care of all the advanced cryptography in the background.
+Developed by Luxcore, LUX (LUX Coin) is a hybrid cryptocurrency utilizing both proof-of-stake and proof-of-work algorithms to enhance blockchain security and decentralization. Luxcore's hybrid consensus model employs masternodes to provide specialized functions and further secure the chain while providing additional rewards to coin holders. The LUX blockchain enables developers to utilize smart contracts and decentralized applications.
 
-The Luxgate allow for communications among validated blockchain with the ability to perform tasks and advanced functions. Through the use of PMN, Lux is able to interact with many other popular blockchains and create a unifying bond among those ecosystems.
+Luxcore continues to develop products for the LUX blockchain including Luxgate (a trustless, peer to peer decentralized exchange) and Luxedge (a decentralized software development platform and repository).
 
-Lux doesn't provide direct support for dapp database. Instead, a mechanism to interact with another Blockchain via Luxgate function where the other Blockchain can send and receive trigger function notices and international data through the Lux network via PMN and Luxgate. PMN & Luxgate can also be used to interact with the centralized services such as bankers. Those centralism services can connect to the Lux network for specific trigger of the Luxgate via PMN. It will allow for their developed autonomous system to act based on their behalf. The PMN will then be developed by the connecting Blockchain developer. Luxcore will have to supply a deployment guide to assist their development. In order to assist the Centralized services, Lux will need to provide a centralized trustworthy environments. So the user has their trusted oversight to verify that the transactions are legitimate.
+LUX was created in 2017 as a fork of the Bitcoin codebase, and aims to introduce new innovations and services to the broader crypto community with cross-chain and decentralized solutions.
 
-In addition, without Luxgate and PMN, Bitcoin and Ethereum cannot interact with each other on the same Blockchain because the technology is incompatible. It is almost impossible before our PMN and Luxgate functions are implemented. Therefore, we have to introduce a Smartcontract & Segwit features in the next release to verify that we succeed to combine those different technologies together to create a brand new unique feature of LUX.
 
 ## Coin Specifications
 
@@ -48,11 +36,11 @@ In addition, without Luxgate and PMN, Bitcoin and Ethereum cannot interact with 
 | Block Size | `4MB` |
 | Block Time | `60s` |
 | PoW Block Time | `120s`   |
-| PoW Reward | `10 LUX` |
+| PoW Reward | `5 (POW) + 2 (MN) + 1 (DEV FEE)` |
 | PoS Reward | `1 LUX` |
 | Stake Time | `36 hours` | 
 | Masternode Requirement | `16,120 LUX` |
-| Masternode Reward | `20% PoW/PoS` |
+| Masternode Reward | `25% PoW/PoS` |
 | Port | `26969` |
 | RPC Port | `9888` |
 | Masternode Port | `26969` |
@@ -64,13 +52,12 @@ In addition, without Luxgate and PMN, Bitcoin and Ethereum cannot interact with 
 
 Instructions
 -----------
-* [Lux-qt](doc/LUX_QT_v5_Win_Mac_User_Guide.pdf)
+* [Win-Lux-qt](https://docs.luxcore.io/docs/user-guide-windows)
 
-* [Smart contract](doc/smartcontract.md)
+* [Mac-Lux-qt](https://docs.luxcore.io/docs/user-guide-mac)
 
-* [Token](doc/Token_Instructionsv2.pdf) (Thanks @snowfro)
+* [Lux Masternode](https://docs.luxcore.io/docs/how-to-setup-a-masternode)
 
-* [DFS Testnet](doc/dfs-testnet.md)
 
 Build Lux wallet
 ----------
