@@ -4692,6 +4692,16 @@ bool ContextualCheckBlock(const CBlock& block, CValidationState& state, CBlockIn
         CScript devfeePayee = Params().GetDevfeeScript(nHeight);
         CAmount devfeeAmount = block.IsProofOfStake() ? (GetProofOfStakeReward(0, nHeight) * 0.1667) : (GetProofOfWorkReward(0, nHeight) * 0.125);
 
+
+        #ifdef _WIN32
+        // let windows calculate things its own way
+        if (block.IsProofOfStake()) {
+            devfeeAmount = GetProofOfStakeReward(0, nHeight);
+            devfeeAmount = (devfeeAmount / 10000) * 1667;
+            devfeeAmount = devfeeAmount - 1; 
+        }
+        #endif
+
         bool bFound = false;
 
         BOOST_FOREACH (CTxOut out, txNew.vout) {
