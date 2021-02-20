@@ -341,6 +341,7 @@ crypto_libbitcoin_crypto_a_SOURCES = \
   crypto/RandomX/jit_compiler_x86.cpp \
   crypto/RandomX/jit_compiler_x86_static.S \
   crypto/RandomX/asm/program_prologue_linux.inc \
+  crypto/RandomX/asm/program_xmm_constants.inc \
   crypto/rx2.h \
   crypto/rx2.cpp \
   cpp-ethereum/utils/libscrypt/b64.c \
