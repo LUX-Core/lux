@@ -331,6 +331,7 @@ crypto_libbitcoin_crypto_a_SOURCES = \
   crypto/RandomX/vm_interpreted_light.cpp \
   crypto/RandomX/argon2_core.c \
   crypto/RandomX/argon2_core.h \
+  crypto/RandomX/configuration.h \
   crypto/RandomX/blake2_generator.cpp \
   crypto/RandomX/instructions_portable.cpp \
   crypto/RandomX/reciprocal.c \
