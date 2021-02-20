@@ -355,6 +355,8 @@ crypto_libbitcoin_crypto_a_SOURCES = \
   crypto/RandomX/asm/program_sshash_prefetch.inc \
   crypto/RandomX/asm/program_sshash_constants.inc \
   crypto/RandomX/asm/randomx_reciprocal.inc \
+  crypto/RandomX/bytecode_machine.hpp \
+  
   crypto/rx2.h \
   crypto/rx2.cpp \
   cpp-ethereum/utils/libscrypt/b64.c \
