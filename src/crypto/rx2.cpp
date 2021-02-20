@@ -2,7 +2,7 @@
 #include <string.h>
 #include "util.h"
 #include "rx2.h"
-#include <RandomX/randomx.h>
+#include "RandomX/randomx.h"
 
 
 //    bool is_init = false;

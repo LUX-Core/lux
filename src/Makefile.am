@@ -326,6 +326,7 @@ crypto_libbitcoin_crypto_a_SOURCES = \
   crypto/RandomX/assembly_generator_x86.cpp \
   crypto/RandomX/instruction.cpp \
   crypto/RandomX/randomx.cpp \
+  crypto/RandomX/randomx.h \
   crypto/RandomX/superscalar.cpp \
   crypto/RandomX/vm_compiled.cpp \
   crypto/RandomX/vm_interpreted_light.cpp \
