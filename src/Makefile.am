@@ -313,6 +313,7 @@ crypto_libbitcoin_crypto_a_SOURCES = \
   crypto/RandomX/intrin_portable.h \
   crypto/RandomX/blake2/endian.h \
   crypto/RandomX/argon2_ref.c \
+  crypto/RandomX/argon2.h
   crypto/RandomX/argon2_ssse3.c \
   crypto/RandomX/argon2_avx2.c \
   crypto/RandomX/bytecode_machine.cpp \
