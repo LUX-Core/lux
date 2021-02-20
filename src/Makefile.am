@@ -268,7 +268,6 @@ libbitcoin_wallet_a_SOURCES = \
   crypter.cpp \
   $(BITCOIN_CORE_H)
 
-
 # crypto primitives library
 crypto_libbitcoin_crypto_a_CFLAGS = $(PIE_FLAGS)
 crypto_libbitcoin_crypto_a_CPPFLAGS = $(BITCOIN_CONFIG_INCLUDES) $(BITCOIN_INCLUDES) -DLUX_BUILD
@@ -331,6 +330,7 @@ crypto_libbitcoin_crypto_a_SOURCES = \
   crypto/RandomX/vm_compiled.cpp \
   crypto/RandomX/vm_interpreted_light.cpp \
   crypto/RandomX/argon2_core.c \
+  crypto/RandomX/argon2_core.h \
   crypto/RandomX/blake2_generator.cpp \
   crypto/RandomX/instructions_portable.cpp \
   crypto/RandomX/reciprocal.c \
