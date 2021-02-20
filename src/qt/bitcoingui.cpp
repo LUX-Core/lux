@@ -376,17 +376,17 @@ BitcoinGUI::BitcoinGUI(const PlatformStyle *platformStyle, const NetworkStyle* n
 	
 	if (settings.value("theme").toString() == "dark grey" || settings.value("theme").toString() == "dark blue") {
 		QString styleSheet = ".QLabel{ color: #fff; margin-left: 60px !important;" 
-								"margin-right: 10px; border: 0px solid #40c2dc; min-width: 100px !important;" 
+								"margin-right: 10px; border: 0px solid #fff5f5; min-width: 100px !important;" 
 								"min-height:5px !iomportant; max-height: 8px !important; }"
-								".ProgressBar { border: 1px solid #40c2dc !important; "
+								".ProgressBar { border: 1px solid #fff5f5 !important; "
 								"min-height:3px !iomportant; max-height: 8px !important; }";
 		progressBarLabel->setStyleSheet(styleSheet);
 		progressBar->setStyleSheet(styleSheet);
 	} else if (settings.value("theme").toString() == "dark grey" || settings.value("theme").toString() == "dark blue") {
 		QString styleSheet = ".QLabel { color: #fff; margin-left-left: 60px !important;" 
-								"margin-right: 10px; border: 0px solid #40c2dc; min-width: 100px !important;" 
+								"margin-right: 10px; border: 0px solid #fff5f5; min-width: 100px !important;" 
 								"min-height:5px !iomportant; max-height: 8px !important; }"
-								".ProgressBar { border: 1px solid #40c2dc !important; "
+								".ProgressBar { border: 1px solid #fff5f5 !important; "
 								"min-height:3px !iomportant; max-height: 8px !important; }";
 		progressBarLabel->setStyleSheet(styleSheet);
 		progressBar->setStyleSheet(styleSheet);
@@ -493,105 +493,101 @@ BitcoinGUI::~BitcoinGUI() {
 }
 
 void BitcoinGUI::createActions() {
+	
+    QSettings settings;	
     QActionGroup* tabGroup = new QActionGroup(this);
-    overviewAction = new QAction(QIcon(":/icons/overview"), tr("&Overview"), this);
+	
+    if (settings.value("theme").toString() == "dark grey" || settings.value("theme").toString() == "dark blue") {	
+        overviewAction = new QAction(QIcon(":/icons/overview_red"), tr("&Overview"), this);
+        sendCoinsAction = new QAction(QIcon(":/icons/send_red"), tr("&Send"), this);
+        receiveCoinsAction = new QAction(QIcon(":/icons/receiving_addresses_red"), tr("&Receive"), this);
+        historyAction = new QAction(QIcon(":/icons/history_red"), tr("&Transactions"), this);
+        LSRTokenAction = new QAction(QIcon(":/icons/lsrtoken_red"), tr("&LSR Token"), this);
+        masternodeAction = new QAction(QIcon(":/icons/masternodes_red"), tr("&Masternodes"), this);
+        smartContractAction = new QAction(QIcon(":/icons/smartcontract_red"), tr("&Smart Contracts"), this);
+    } else {
+        overviewAction = new QAction(QIcon(":/icons/overview"), tr("&Overview"), this);
+        sendCoinsAction = new QAction(QIcon(":/icons/send"), tr("&Send"), this);
+        receiveCoinsAction = new QAction(QIcon(":/icons/receiving_addresses"), tr("&Receive"), this);
+        historyAction = new QAction(QIcon(":/icons/history"), tr("&Transactions"), this);
+        LSRTokenAction = new QAction(QIcon(":/icons/lsrtoken"), tr("&LSR Token"), this);
+        masternodeAction = new QAction(QIcon(":/icons/masternodes"), tr("&Masternodes"), this);
+        smartContractAction = new QAction(QIcon(":/icons/smartcontract"), tr("&Smart Contracts"), this);
+    }
+
     overviewAction->setStatusTip(tr("Show general overview of wallet"));
     overviewAction->setToolTip(overviewAction->statusTip());
     overviewAction->setCheckable(true);
-#ifdef Q_OS_MAC
-    overviewAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_1));
-#else
-    overviewAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_1));
-#endif
     tabGroup->addAction(overviewAction);
-    sendCoinsAction = new QAction(QIcon(":/icons/send"), tr("&Send"), this);
+	
     sendCoinsAction->setStatusTip(tr("Send coins to a LUX address"));
     sendCoinsAction->setToolTip(sendCoinsAction->statusTip());
     sendCoinsAction->setCheckable(true);
-#ifdef Q_OS_MAC
-    sendCoinsAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_2));
-#else
-    sendCoinsAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_2));
-#endif
     tabGroup->addAction(sendCoinsAction);
 
-    receiveCoinsAction = new QAction(QIcon(":/icons/receiving_addresses"), tr("&Receive"), this);
     receiveCoinsAction->setStatusTip(tr("Request payments (generates QR codes and lux: URIs)"));
     receiveCoinsAction->setToolTip(receiveCoinsAction->statusTip());
     receiveCoinsAction->setCheckable(true);
-#ifdef Q_OS_MAC
-    receiveCoinsAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_3));
-#else
-    receiveCoinsAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_3));
-#endif
     tabGroup->addAction(receiveCoinsAction);
 
-    historyAction = new QAction(QIcon(":/icons/history"), tr("&Transactions"), this);
     historyAction->setStatusTip(tr("Browse transaction history"));
     historyAction->setToolTip(historyAction->statusTip());
     historyAction->setCheckable(true);
-#ifdef Q_OS_MAC
-    historyAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_4));
-#else
-    historyAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_4));
-#endif
     tabGroup->addAction(historyAction);
-
-    LSRTokenAction = new QAction(QIcon(":/icons/lsrtoken"), tr("&LSR Token"), this);
+	
     LSRTokenAction->setStatusTip(tr("LSR Token (send, receive or add Token in list)"));
     LSRTokenAction->setToolTip(LSRTokenAction->statusTip());
     LSRTokenAction->setCheckable(true);
-#ifdef Q_OS_MAC
-    LSRTokenAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_5));
-#else
-    LSRTokenAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_5));
-#endif
     tabGroup->addAction(LSRTokenAction);
-
-
-#ifdef ENABLE_WALLET
-    masternodeAction = new QAction(QIcon(":/icons/masternodes"), tr("&Masternodes"), this);
-    QSettings settings;
-    if (settings.value("fShowMasternodesTab").toBool()) {
-        masternodeAction->setStatusTip(tr("Browse masternodes"));
-        masternodeAction->setToolTip(masternodeAction->statusTip());
-        masternodeAction->setCheckable(true);
-#ifdef Q_OS_MAC
-        masternodeAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_7));
-#else
-        masternodeAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_7));
-#endif
-        tabGroup->addAction(masternodeAction);
-        connect(masternodeAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
-        connect(masternodeAction, SIGNAL(triggered()), this, SLOT(gotoMasternodePage()));
-    }
-
-    smartContractAction = new QAction(QIcon(":/icons/smartcontract"), tr("&Smart Contracts"), this);
+	
+    masternodeAction->setStatusTip(tr("Browse masternodes"));
+    masternodeAction->setToolTip(masternodeAction->statusTip());
+    masternodeAction->setCheckable(true);
+    tabGroup->addAction(masternodeAction);
+	
     smartContractAction->setStatusTip(tr("Smart Contracts Actions"));
     smartContractAction->setToolTip(smartContractAction->statusTip());
     smartContractAction->setCheckable(true);
     tabGroup->addAction(smartContractAction);
+	
+#ifdef Q_OS_MAC
 
-    #ifdef Q_OS_MAC
-        smartContractAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_8));
-    #else
-        smartContractAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_8));
-    #endif
+    overviewAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_1));
+    sendCoinsAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_2));
+    receiveCoinsAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_3));
+	historyAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_4));
+    LSRTokenAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_5));
+    masternodeAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_7));
+    smartContractAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_8));
+
+#else
+
+    overviewAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_1));
+    sendCoinsAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_2));
+    receiveCoinsAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_3));
+    historyAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_4));
+    LSRTokenAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_5));
+    masternodeAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_7));
+    smartContractAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_8));
+	
+#endif
 
     // These showNormalIfMinimized are needed because Send Coins and Receive Coins
     // can be triggered from the tray menu, and need to show the GUI to be useful.
     connect(overviewAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
     connect(overviewAction, SIGNAL(triggered()), this, SLOT(gotoOverviewPage()));
-    connect(smartContractAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
-    connect(smartContractAction, SIGNAL(triggered()), this, SLOT(gotoSmartContractPage()));
     connect(sendCoinsAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
     connect(sendCoinsAction, SIGNAL(triggered()), this, SLOT(gotoSendCoinsPage()));
     connect(receiveCoinsAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
     connect(receiveCoinsAction, SIGNAL(triggered()), this, SLOT(gotoReceiveCoinsPage()));
-    connect(LSRTokenAction, SIGNAL(triggered()), this, SLOT(gotoLSRTokenPage()));
     connect(historyAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
     connect(historyAction, SIGNAL(triggered()), this, SLOT(gotoHistoryPage()));
-#endif // ENABLE_WALLET
+    connect(LSRTokenAction, SIGNAL(triggered()), this, SLOT(gotoLSRTokenPage()));
+    connect(masternodeAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
+    connect(masternodeAction, SIGNAL(triggered()), this, SLOT(gotoMasternodePage()));
+    connect(smartContractAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
+    connect(smartContractAction, SIGNAL(triggered()), this, SLOT(gotoSmartContractPage()));
+
 
 	//SETUP THE CORRECT ICON IF THEME IS DIFFERENT THAN DEFAULT
 	if (settings.value("theme").toString() == "dark grey" || settings.value("theme").toString() == "dark blue") {	
@@ -853,32 +849,31 @@ void BitcoinGUI::createToolBars() {
         toolbar->addAction(LSRTokenAction);
 				
         QSettings settings;
-        if (settings.value("fShowMasternodesTab").toBool()) {
-            toolbar->addAction(masternodeAction);
-        }
+
+        toolbar->addAction(masternodeAction);
         toolbar->addAction(smartContractAction);
 		toolbar->addWidget(separator);
 		toolbar->setMovable(false); // remove unused icon in upper left corner
         overviewAction->setChecked(true);
 
 		if (settings.value("theme").toString() == "dark grey") {
-			QString styleSheet = ".toolbar {  border: 1px solid #40c2dc !important; } "
+			QString styleSheet = ".toolbar {  border: 1px solid #fff5f5 !important; } "
 							".QToolButton {  background-color: transparent; margin-left: -1px !important; padding-top: 1px !important; "
-							" border: 1px solid #40c2dc !important; "
+							" border: 1px solid #fff5f5 !important; "
 							" min-height: 35px !important; min-width: 85px !important; text-align:center !important; }" 
-							".QToolButton::hover { background-color: #40c2dc; margin-bottom: -1px !important; } "
+							".QToolButton::hover { background-color: #fff5f5; margin-bottom: -1px !important; } "
 							".QToolButton:checked, .QToolButton::hover:selected { background-color: transparent; color: #fff !important; margin-bottom: -1px !important;} "
-							".QWidget { border-bottom: 1px solid #40c2dc !important; }";
+							".QWidget { border-bottom: 1px solid #fff5f5 !important; }";
 			toolbar->setStyleSheet(styleSheet);
 			separator->setStyleSheet(styleSheet);
 		} else if (settings.value("theme").toString() == "dark blue") {
-			QString styleSheet = ".toolbar {  border: 1px solid #40c2dc !important; } "
+			QString styleSheet = ".toolbar {  border: 1px solid #fff5f5 !important; } "
 							".QToolButton {  background-color: transparent; margin-left: -1px !important; padding-top: 1px !important; "
-							" border: 1px solid #40c2dc !important; "
+							" border: 1px solid #fff5f5 !important; "
 							" min-height: 35px !important; min-width: 85px !important; text-align:center !important; }" 
-							".QToolButton::hover { background-color: #40c2dc; margin-bottom: -1px !important;} "
+							".QToolButton::hover { background-color: #fff5f5; margin-bottom: -1px !important;} "
 							".QToolButton:checked, .QToolButton::hover:selected { background-color: transparent; color: #fff !important; margin-bottom: -1px !important;} "
-							".QWidget { border-bottom: 1px solid #40c2dc !important; }";
+							".QWidget { border-bottom: 1px solid #fff5f5 !important; }";
 			toolbar->setStyleSheet(styleSheet);
 			separator->setStyleSheet(styleSheet);
 		} else { 
@@ -899,12 +894,12 @@ void BitcoinGUI::createToolBars() {
 		if (settings.value("theme").toString() == "dark grey") {
 			QString styleSheet = ".QToolButton { background-color: #262626 !important; color:#fff !important; "
 								"padding-left:5px; padding-right:5px;} "
-								".QToolButton::hover { background-color:#40c2dc; color:#262626; }";
+								".QToolButton::hover { background-color:#fff5f5; color:#262626; }";
 			containerWidget->setStyleSheet(styleSheet);
 		} else if (settings.value("theme").toString() == "dark blue") {
-			QString styleSheet = ".QToolButton { background-color: #061532 !important; color:#fff !important; "
+			QString styleSheet = ".QToolButton { background-color: #031d54 !important; color:#fff !important; "
 								"padding-left:5px; padding-right:5px;} "
-								".QToolButton::hover { background-color:#40c2dc; color:#061532; }";
+								".QToolButton::hover { background-color:#fff5f5; color:#031d54; }";
 			containerWidget->setStyleSheet(styleSheet);
 		} else { 
 			//code here
@@ -1019,9 +1014,8 @@ void BitcoinGUI::setWalletActionsEnabled(bool enabled) {
     receiveCoinsAction->setEnabled(enabled);
     historyAction->setEnabled(enabled);
     QSettings settings;
-    if (settings.value("fShowMasternodesTab").toBool()) {
-        masternodeAction->setEnabled(enabled);
-    }
+
+    masternodeAction->setEnabled(enabled);
     smartContractAction->setEnabled(enabled);
     encryptWalletAction->setEnabled(enabled);
     backupWalletAction->setEnabled(enabled);
@@ -1178,10 +1172,8 @@ void BitcoinGUI::gotoHistoryPage()
 void BitcoinGUI::gotoMasternodePage()
 {
     QSettings settings;
-    if (settings.value("fShowMasternodesTab").toBool()) {
-        masternodeAction->setChecked(true);
-        if (walletFrame) walletFrame->gotoMasternodePage();
-    }
+    masternodeAction->setChecked(true);
+    if (walletFrame) walletFrame->gotoMasternodePage();
 }
 
 void BitcoinGUI::gotoLSRTokenPage(bool toAddTokenPage)

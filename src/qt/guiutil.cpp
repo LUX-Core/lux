@@ -85,7 +85,7 @@ extern double NSAppKitVersionNumber;
 #endif
 
 #define URI_SCHEME "lux"
-static std::string availInputsErrorMessage = "<span style=\"color: red;\"><b>CAUTION!</b> You do not have enough valid inputs to process your Smart Contract</span>";
+static std::string availInputsErrorMessage = "";
 
 namespace GUIUtil
 {
@@ -1063,30 +1063,39 @@ void formatToolButtons(QToolButton *btn1, QToolButton *btn2, QToolButton *btn3)
 
 QString handleAvailableInputInfo(const WalletModel *_model, const int64_t &gasAmount)
 {
-    if(_model == nullptr)
+    QSettings settings;
+    if(_model == nullptr){
+        if (settings.value("theme").toString() == "dark grey" || settings.value("theme").toString() == "dark blue") {
+            availInputsErrorMessage = "<span style=\"color: #FF7D7D;\"><b>CAUTION!</b> You do not have enough valid inputs to process your Smart Contract</span>";
+        } else { 
+            availInputsErrorMessage = "<span style=\"color: #FF0000;\"><b>CAUTION!</b> You do not have enough valid inputs to process your Smart Contract</span>";
+        }	
         return availInputsErrorMessage.c_str();
-
-    map<QString, vector<COutput> > outputs;
-    _model->listCoins(outputs);
-    const std::size_t count = 
-        std::accumulate(std::begin(outputs),
-                        std::end(outputs),
-                        0,
-                        [&](const std::size_t previous,
-                            const std::pair<QString, vector<COutput> > &p) {
-                            return previous + 
-                                count_if(std::begin(p.second),
-                                         std::end(p.second),
+    }else{
+        map<QString, vector<COutput> > outputs;
+        _model->listCoins(outputs);
+        const std::size_t count = 
+            std::accumulate(std::begin(outputs),
+                            std::end(outputs),
+                            0,
+                            [&](const std::size_t previous,
+                                const std::pair<QString, vector<COutput> > &p) {
+                                return previous + 
+                                    count_if(std::begin(p.second),
+                                        std::end(p.second),
                                          [&](const COutput &output) {
                                             return output.tx->vout[output.i].nValue > gasAmount;
                                          }
-                                );
-                });
-
-    return count > 0 ?
-        QString("<span style=\"color: green;\">You have <b>%1</b> valid inputs to process your Smart Contract</span>").arg(count)
-        :
-        availInputsErrorMessage.c_str();
+                                    );
+                    });
+    QString SCinputStr;
+    if (settings.value("theme").toString() == "dark grey" || settings.value("theme").toString() == "dark blue") {
+        SCinputStr = count > 0 ? QString("<span style=\"color: #98FB98;\">You have <b>%1</b> valid inputs to process your Smart Contract</span>").arg(count):availInputsErrorMessage.c_str();
+    } else { 
+        SCinputStr = count > 0 ? QString("<span style=\"color: #008000;\">You have <b>%1</b> valid inputs to process your Smart Contract</span>").arg(count):availInputsErrorMessage.c_str();
+    }
+    return SCinputStr;
+	}
 }
 
 

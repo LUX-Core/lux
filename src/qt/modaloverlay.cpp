@@ -92,9 +92,9 @@ void ModalOverlay::tipUpdate(int count, const QDateTime& blockDate, double nVeri
 
 	if (settings.value("theme").toString() == "dark grey") {
 		QString styleSheet = ".QWidget#contentWidget {  background: #262626 !important; color: #fff !important; "
-								"border: 1px solid #40c2dc !important; border-radius: 6px !important; } " 
-								".QWidget#bgWidget{  background: rgba(0,0,0,220); border-left: 1px solid #40c2dc !important; "
-								"border-right: 1px solid #40c2dc !important; }"
+								"border: 1px solid #fff5f5 !important; border-radius: 6px !important; } " 
+								".QWidget#bgWidget{  background: rgba(0,0,0,220); border-left: 1px solid #fff5f5 !important; "
+								"border-right: 1px solid #fff5f5 !important; }"
 								".QLabel { color: #fff !important; } " 
 								".QPushButton#warningIcon { border:0 !important; } "
 								".QPushButton#warningIcon::hover {background-color: transparent !important; } "
@@ -103,10 +103,10 @@ void ModalOverlay::tipUpdate(int count, const QDateTime& blockDate, double nVeri
 		ui->contentWidget->setStyleSheet(styleSheet);
 		ui->bgWidget->setStyleSheet(styleSheet);
 	} else if (settings.value("theme").toString() == "dark blue") {
-		QString styleSheet = ".QWidget#contentWidget  {  background: #061532 !important; color: #fff !important; "
-								"border: 1px solid #40c2dc !important; border-radius: 6px !important; } "
-								".QWidget#bgWidget{  background: rgba(0,0,0,220); border-left: 1px solid #40c2dc !important; "
-								"border-right: 1px solid #40c2dc !important; }"
+		QString styleSheet = ".QWidget#contentWidget  {  background: #031d54 !important; color: #fff !important; "
+								"border: 1px solid #fff5f5 !important; border-radius: 6px !important; } "
+								".QWidget#bgWidget{  background: rgba(0,0,0,220); border-left: 1px solid #fff5f5 !important; "
+								"border-right: 1px solid #fff5f5 !important; }"
 								".QLabel { color: #fff !important; } " 
 								".QPushButton#warningIcon { border:0 !important; } "
 								".QPushButton#warningIcon::hover {background-color: transparent !important; } "

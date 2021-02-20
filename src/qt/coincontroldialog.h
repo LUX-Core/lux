@@ -118,6 +118,9 @@ private Q_SLOTS:
     void buttonSelectAllClicked();
     void HideInputAutoSelection();
     void ShowInputAutoSelection();
+    unsigned int SIZE_OF_TX();
+    void tree_view_data_to_double(QString &str, double &val);
+    bool TX_size_limit();
     void greater();
     void Less();
     void Equal();

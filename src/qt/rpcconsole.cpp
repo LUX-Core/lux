@@ -434,7 +434,9 @@ RPCConsole::RPCConsole(const PlatformStyle *platformStyle, QWidget* parent) : QD
 		ui->clearButton->setIcon(platformStyle->SingleColorIcon(":/icons/remove"));
 	}	
 
-
+	ui->sldGraphRange->setMinimum(1);
+	ui->sldGraphRange->setMaximum(10);
+	ui->sldGraphRange->setValue(3);
 
     // Install event filter for up and down arrow
     ui->lineEdit->installEventFilter(this);
@@ -553,14 +555,14 @@ void RPCConsole::setClientModel(ClientModel* model)
 
 	if (settings.value("theme").toString() == "dark grey") {
 		QString styleSheet = ".QTableView { background-color: #262626; alternate-background-color:#424242; "
-								"gridline-color: #40c2dc; border: 1px solid #40c2dc; border-bottom: 1px solid #40c2dc; "
-								"border-right: 1px solid #40c2dc; color: #fff; min-height:2em; } ";
+								"gridline-color: #fff5f5; border: 1px solid #fff5f5; border-bottom: 1px solid #fff5f5; "
+								"border-right: 1px solid #fff5f5; color: #fff; min-height:2em; } ";
 		ui->peerWidget->setStyleSheet(styleSheet);
 		ui->banlistWidget->setStyleSheet(styleSheet);
 	} else if (settings.value("theme").toString() == "dark blue") {
-		QString styleSheet = ".QTableView { background-color: #061532; alternate-background-color:#0D2A64; "
-								"gridline-color: #40c2dc; border: 1px solid #40c2dc; border-bottom: 1px solid #40c2dc; "
-								"border-right: 1px solid #40c2dc; color: #fff; min-height:2em; } ";
+		QString styleSheet = ".QTableView { background-color: #031d54; alternate-background-color:#0D2A64; "
+								"gridline-color: #fff5f5; border: 1px solid #fff5f5; border-bottom: 1px solid #fff5f5; "
+								"border-right: 1px solid #fff5f5; color: #fff; min-height:2em; } ";
 		ui->peerWidget->setStyleSheet(styleSheet);
 		ui->banlistWidget->setStyleSheet(styleSheet);
 	} else { 
@@ -1076,8 +1078,8 @@ QString RPCConsole::FormatBytes(quint64 bytes)
 
 void RPCConsole::setTrafficGraphRange(TrafficGraphData::GraphRange range)
 {
-    ui->trafficGraph->setGraphRangeMins(range);
-    ui->lblGraphRange->setText(GUIUtil::formatDurationStr(TrafficGraphData::RangeMinutes[range] * 60));
+    ui->trafficGraph->setGraphRangeMins(range-1);
+    ui->lblGraphRange->setText(GUIUtil::formatDurationStr(TrafficGraphData::RangeMinutes[range-1] * 60));
 }
 
 void RPCConsole::updateTrafficStats(quint64 totalBytesIn, quint64 totalBytesOut)

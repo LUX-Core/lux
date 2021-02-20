@@ -44,10 +44,10 @@ OptionsDialog::OptionsDialog(QWidget* parent, bool enableWallet) : QDialog(paren
 	QSettings settings;
 
 	if (settings.value("theme").toString() == "dark grey") {
-		QString styleSheet = ".QGroupBox { background-color: transparent; border: 0px solid #40c2dc !important;}";
+		QString styleSheet = ".QGroupBox { background-color: transparent; border: 0px solid #fff5f5 !important;}";
 		ui->groupBox->setStyleSheet(styleSheet);
 	} else if (settings.value("theme").toString() == "dark blue") {
-		QString styleSheet = ".QGroupBox { background-color: transparent; border: 0px solid #40c2dc !important; }";
+		QString styleSheet = ".QGroupBox { background-color: transparent; border: 0px solid #fff5f5 !important; }";
 		ui->groupBox->setStyleSheet(styleSheet);
 	} else { 
 		//code here
@@ -223,7 +223,6 @@ void OptionsDialog::setModel(OptionsModel* model)
     connect(ui->theme, SIGNAL(valueChanged()), this, SLOT(showRestartWarning()));
     connect(ui->lang, SIGNAL(valueChanged()), this, SLOT(showRestartWarning()));
     connect(ui->thirdPartyTxUrls, SIGNAL(textChanged(const QString&)), this, SLOT(showRestartWarning()));
-    connect(ui->showMasternodesTab, SIGNAL(clicked(bool)), this, SLOT(showRestartWarning()));
 }
 
 void OptionsDialog::setMapper()
@@ -241,7 +240,6 @@ void OptionsDialog::setMapper()
     /* Wallet */
     mapper->addMapping(ui->spendZeroConfChange, OptionsModel::SpendZeroConfChange);
     mapper->addMapping(ui->coinControlFeatures, OptionsModel::CoinControlFeatures);
-    mapper->addMapping(ui->showMasternodesTab, OptionsModel::ShowMasternodesTab);
     mapper->addMapping(ui->showAdvancedUI, OptionsModel::ShowAdvancedUI);
     mapper->addMapping(ui->parallelMasternodes, OptionsModel::ParallelMasternodes);
     mapper->addMapping(ui->darksendRounds, OptionsModel::DarkSendRounds);
@@ -276,7 +274,6 @@ void OptionsDialog::setMapper()
     /* DarkSend Rounds */
     mapper->addMapping(ui->darksendRounds, OptionsModel::DarkSendRounds);
     mapper->addMapping(ui->anonymizeLux, OptionsModel::AnonymizeLuxAmount);
-    mapper->addMapping(ui->showMasternodesTab, OptionsModel::ShowMasternodesTab);
 }
 
 void OptionsDialog::enableOkButton()

@@ -91,10 +91,9 @@ WalletView::WalletView(const PlatformStyle* platformStyle, QWidget* parent) : QS
     addWidget(LSRTokenPage);
 
     QSettings settings;
-    if (settings.value("fShowMasternodesTab").toBool()) {
-        masternodeManagerPage = new MasternodeManager();
-        addWidget(masternodeManagerPage);
-    }
+
+    masternodeManagerPage = new MasternodeManager();
+    addWidget(masternodeManagerPage);
 
     // Clicking on a transaction on the overview pre-selects the transaction on the transaction history page
     connect(overviewPage, SIGNAL(transactionClicked(QModelIndex)), transactionView, SLOT(focusTransaction(QModelIndex)));
@@ -165,9 +164,8 @@ void WalletView::setClientModel(ClientModel* clientModel)
     smartContractPage->setClientModel(clientModel);
     LSRTokenPage->setClientModel(clientModel);
     QSettings settings;
-    if (settings.value("fShowMasternodesTab").toBool()) {
-        masternodeManagerPage->setClientModel(clientModel);
-    }
+
+    masternodeManagerPage->setClientModel(clientModel);
 }
 
 void WalletView::setWalletModel(WalletModel* walletModel)
@@ -180,9 +178,8 @@ void WalletView::setWalletModel(WalletModel* walletModel)
     smartContractPage->setModel(walletModel);
     LSRTokenPage->setModel(walletModel);
     QSettings settings;
-    if (settings.value("fShowMasternodesTab").toBool()) {
-        masternodeManagerPage->setWalletModel(walletModel);
-    }
+
+    masternodeManagerPage->setWalletModel(walletModel);
     receiveCoinsPage->setModel(walletModel);
     sendCoinsPage->setModel(walletModel);
 
@@ -272,9 +269,7 @@ void WalletView::gotoBlockExplorerPage()
 void WalletView::gotoMasternodePage()
 {
     QSettings settings;
-    if (settings.value("fShowMasternodesTab").toBool()) {
-        setCurrentWidget(masternodeManagerPage);
-    }
+    setCurrentWidget(masternodeManagerPage);
 }
 void WalletView::gotoSmartContractPage()
 {

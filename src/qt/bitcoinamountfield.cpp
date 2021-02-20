@@ -220,19 +220,19 @@ BitcoinAmountField::BitcoinAmountField(QWidget* parent) : QWidget(parent),
 	
 	if (settings.value("theme").toString() == "dark grey") {
 		QString styleSheet = ".AmountSpinBox { background-color: #262626; "
-								"color:#fff; border: 1px solid #40c2dc; "
+								"color:#fff; border: 1px solid #fff5f5; "
 								"padding-left:10px; padding-right:10px; min-height:25px; }"
 								".QValueComboBox { background-color: #262626; color:#fff; "
-								"border: 1px solid #40c2dc; padding-left:10px; padding-right:10px; min-height:25px; }";
+								"border: 1px solid #fff5f5; padding-left:10px; padding-right:10px; min-height:25px; }";
 		
 		amount->setStyleSheet(styleSheet);
 		unit->setStyleSheet(styleSheet);
 	} else if (settings.value("theme").toString() == "dark blue") {
-		QString styleSheet = ".AmountSpinBox { background-color: #061532; "
-								"color:#fff; border: 1px solid #40c2dc; "
+		QString styleSheet = ".AmountSpinBox { background-color: #031d54; "
+								"color:#fff; border: 1px solid #fff5f5; "
 								"padding-left:10px; padding-right:10px; min-height:25px; }"
-								".QValueComboBox { background-color: #061532; color:#fff; "
-								"border: 1px solid #40c2dc; padding-left:10px; padding-right:10px; min-height:25px; }";
+								".QValueComboBox { background-color: #031d54; color:#fff; "
+								"border: 1px solid #fff5f5; padding-left:10px; padding-right:10px; min-height:25px; }";
 		
 		amount->setStyleSheet(styleSheet);
 		unit->setStyleSheet(styleSheet);
@@ -275,19 +275,19 @@ void BitcoinAmountField::setValid(bool valid)
 		
 		if (settings.value("theme").toString() == "dark grey") {
 			QString styleSheet = ".AmountSpinBox { background-color: #262626; "
-									"color:#fff; border: 1px solid #40c2dc; "
+									"color:#fff; border: 1px solid #fff5f5; "
 									"padding-left:10px; padding-right:10px; min-height:25px; }"
 									".QValueComboBox { background-color: #262626; color:#fff; "
-									"border: 1px solid #40c2dc; padding-left:10px; padding-right:10px; min-height:25px; }";
+									"border: 1px solid #fff5f5; padding-left:10px; padding-right:10px; min-height:25px; }";
 			
 			amount->setStyleSheet(styleSheet);
 			unit->setStyleSheet(styleSheet);
 		} else if (settings.value("theme").toString() == "dark blue") {
-			QString styleSheet = ".AmountSpinBox { background-color: #061532; "
-									"color:#fff; border: 1px solid #40c2dc; "
+			QString styleSheet = ".AmountSpinBox { background-color: #031d54; "
+									"color:#fff; border: 1px solid #fff5f5; "
 									"padding-left:10px; padding-right:10px; min-height:25px; }"
-									".QValueComboBox { background-color: #061532; color:#fff; "
-									"border: 1px solid #40c2dc; padding-left:10px; padding-right:10px; min-height:25px; }";
+									".QValueComboBox { background-color: #031d54; color:#fff; "
+									"border: 1px solid #fff5f5; padding-left:10px; padding-right:10px; min-height:25px; }";
 			
 			amount->setStyleSheet(styleSheet);
 			unit->setStyleSheet(styleSheet);
@@ -298,19 +298,19 @@ void BitcoinAmountField::setValid(bool valid)
     } else {
 		if (settings.value("theme").toString() == "dark grey") {
 			QString styleSheet = ".AmountSpinBox { background-color: #ff8080; "
-									"color:#061532; border: 1px solid #40c2dc; "
+									"color:#031d54; border: 1px solid #fff5f5; "
 									"padding-left:10px; padding-right:10px; min-height:25px; }"
-									".QValueComboBox { background-color: #061532; color:#fff; "
-									"border: 1px solid #40c2dc; padding-left:10px; padding-right:10px; min-height:25px; }";
+									".QValueComboBox { background-color: #031d54; color:#fff; "
+									"border: 1px solid #fff5f5; padding-left:10px; padding-right:10px; min-height:25px; }";
 			
 			amount->setStyleSheet(styleSheet);
 			unit->setStyleSheet(styleSheet);
 		} else if (settings.value("theme").toString() == "dark blue") {
 			QString styleSheet = ".AmountSpinBox { background-color: #ff8080; "
-									"color:#061532; border: 1px solid #40c2dc; "
+									"color:#031d54; border: 1px solid #fff5f5; "
 									"padding-left:10px; padding-right:10px; min-height:25px; }"
-									".QValueComboBox { background-color: #061532; color:#fff; "
-									"border: 1px solid #40c2dc; padding-left:10px; padding-right:10px; min-height:25px; }";
+									".QValueComboBox { background-color: #031d54; color:#fff; "
+									"border: 1px solid #fff5f5; padding-left:10px; padding-right:10px; min-height:25px; }";
 			
 			amount->setStyleSheet(styleSheet);
 			unit->setStyleSheet(styleSheet);

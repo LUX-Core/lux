@@ -15,6 +15,7 @@
 		<file alias="network_monitor-white">res/icons/network_monitor-white.png</file>
         <file alias="luxupdate-loader">res/icons/luxupdate-loader.gif</file>
         <file alias="send">res/icons/send.png</file>
+        <file alias="send_red">res/icons/send_red.png</file>
         <file alias="conf-white">res/icons/conf-white.png</file>
         <file alias="conf">res/icons/conf.png</file>
         <file alias="auto_backup">res/icons/auto_backup.png</file>
@@ -52,6 +53,7 @@
         <file alias="options">res/icons/options.png</file>
         <file alias="options-white">res/icons/options-white.png</file>
         <file alias="receiving_addresses">res/icons/receive.png</file>
+        <file alias="receiving_addresses_red">res/icons/receive_red.png</file>
         <file alias="editpaste">res/icons/editpaste.png</file>
         <file alias="editpaste-white">res/icons/editpaste-white.png</file>
         <file alias="editcopy">res/icons/editcopy.png</file>
@@ -60,11 +62,16 @@
         <file alias="bitcoin_testnet">res/icons/bitcoin_testnet.png</file>
         <file alias="edit">res/icons/edit.png</file>
         <file alias="history">res/icons/history.png</file>
+        <file alias="history_red">res/icons/history_red.png</file>
         <file alias="stake">res/icons/stake.png</file>
         <file alias="overview">res/icons/overview.png</file>
+        <file alias="overview_red">res/icons/overview_red.png</file>
         <file alias="smartcontract">res/icons/smartcontract.png</file>
+        <file alias="smartcontract_red">res/icons/smartcontract_red.png</file>
         <file alias="lsrtoken">res/icons/lsrtoken.png</file>
+        <file alias="lsrtoken_red">res/icons/lsrtoken_red.png</file>
         <file alias="masternodes">res/icons/masternodes.png</file>
+        <file alias="masternodes_red">res/icons/masternodes_red.png</file>
         <file alias="export">res/icons/export.png</file>
         <file alias="synced">res/icons/synced.png</file>
         <file alias="remove">res/icons/remove.png</file>

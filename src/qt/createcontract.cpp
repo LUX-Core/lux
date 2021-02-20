@@ -119,11 +119,11 @@ void CreateContract::setLinkLabels()
     ui->labelToken->setOpenExternalLinks(true);
 
 	if (settings.value("theme").toString() == "dark grey") {
-		ui->labelSolidity->setText("<a href=\"http://remix.ethereum.org/\"><span style=\"color:#40c2dc;\">Solidity compiler</span></a>");
-		ui->labelToken->setText("<a href=\"https://ethereum.org/token#the-code\"><span style=\"color:#40c2dc;\">Token template</span></a>");
+		ui->labelSolidity->setText("<a href=\"http://remix.ethereum.org/\"><span style=\"color:#fff5f5;\">Solidity compiler</span></a>");
+		ui->labelToken->setText("<a href=\"https://ethereum.org/token#the-code\"><span style=\"color:#fff5f5;\">Token template</span></a>");
 	} else if (settings.value("theme").toString() == "dark blue") {
-		ui->labelSolidity->setText("<a href=\"http://remix.ethereum.org/\"><span style=\"color:#40c2dc;\">Solidity compiler</span></a>");
-		ui->labelToken->setText("<a href=\"https://ethereum.org/token#the-code\"><span style=\"color:#40c2dc;\">Token template</span></a>");
+		ui->labelSolidity->setText("<a href=\"http://remix.ethereum.org/\"><span style=\"color:#fff5f5;\">Solidity compiler</span></a>");
+		ui->labelToken->setText("<a href=\"https://ethereum.org/token#the-code\"><span style=\"color:#fff5f5;\">Token template</span></a>");
 	} else { 
 		ui->labelSolidity->setText("<a href=\"http://remix.ethereum.org/\">Solidity compiler</a>");
 		ui->labelToken->setText("<a href=\"https://ethereum.org/token#the-code\">Token template</a>");

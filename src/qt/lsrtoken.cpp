@@ -56,7 +56,7 @@ public:
 	if (settings.value("theme").toString() == "dark grey") {
 		rowColor = index.row() % 2 ? QColor("#262626") : QColor("#424242");
 	} else if (settings.value("theme").toString() == "dark blue") {
-		rowColor = index.row() % 2 ? QColor("#061532") : QColor("#0d2a64");
+		rowColor = index.row() % 2 ? QColor("#031d54") : QColor("#0d2a64");
 	} else { 
 		rowColor = index.row() % 2 ? QColor("#ededed") : QColor("#e3e3e3");
 	}
@@ -96,7 +96,7 @@ public:
 	if(selected)
 	{
 		if (settings.value("theme").toString() == "dark grey") {
-			painter->fillRect(mainRect,QColor("#40c2dc"));
+			painter->fillRect(mainRect,QColor("#fff5f5"));
 				
 			foreground = "262626";
 			painter->setPen(foreground);
@@ -106,9 +106,9 @@ public:
 			painter->drawText(receiveAddressRect, Qt::AlignLeft|Qt::AlignBottom, receiveAddress);
 				
 		} else if (settings.value("theme").toString() == "dark blue") {
-			painter->fillRect(mainRect,QColor("#40c2dc"));
+			painter->fillRect(mainRect,QColor("#fff5f5"));
 				
-			foreground = "#061532";
+			foreground = "#031d54";
 			painter->setPen(foreground);
 				
 			painter->drawText(tokenSymbolRect, Qt::AlignLeft|Qt::AlignTop, clippedSymbol);

@@ -90,10 +90,6 @@ void OptionsModel::Init()
         settings.setValue("fShowAdvancedUI", fEnableDarksend);
     fShowAdvancedUI = settings.value("fShowAdvancedUI", false).toBool();
 
-    if (!settings.contains("fShowMasternodesTab"))
-        settings.setValue("fShowMasternodesTab", masternodeConfig.getCount());
-    fShowMasternodesTab = settings.value("fShowMasternodesTab", false).toBool();
-
     if (!settings.contains("fParallelMasternodes"))
         settings.setValue("fParallelMasternodes", false);
     fParallelMasternodes = settings.value("fParallelMasternodes", false).toBool();
@@ -276,8 +272,6 @@ QVariant OptionsModel::data(const QModelIndex& index, int role) const
             return settings.value("language");
         case CoinControlFeatures:
             return fCoinControlFeatures;
-        case ShowMasternodesTab:
-            return fShowMasternodesTab;
         case ParallelMasternodes:
             return settings.value("fParallelMasternodes");
         case NotUseChangeAddress:
@@ -434,11 +428,6 @@ bool OptionsModel::setData(const QModelIndex& index, const QVariant& value, int 
             fCoinControlFeatures = value.toBool();
             settings.setValue("fCoinControlFeatures", fCoinControlFeatures);
             Q_EMIT coinControlFeaturesChanged(fCoinControlFeatures);
-            break;
-        case ShowMasternodesTab:
-            fShowMasternodesTab = value.toBool();
-            settings.setValue("fShowMasternodesTab", fShowMasternodesTab);
-            Q_EMIT showMasternodesTabChanged(fShowMasternodesTab);
             break;
         case ParallelMasternodes:
             fParallelMasternodes = value.toBool();

@@ -25,12 +25,12 @@ AddEditLuxNode::AddEditLuxNode(QWidget *parent) :
 	if (settings.value("theme").toString() == "dark grey") {
 		QString styleSheet = "QDialog { background-color: #262626; color: #fff; }"
 								".QLabel { color: #fff; }"
-								".QLineEdit { background-color: #262626; color:#fff; border: 1px solid #40c2dc; "
+								".QLineEdit { background-color: #262626; color:#fff; border: 1px solid #fff5f5; "
 								"padding-left:10px; padding-right:10px; min-height:25px; }"
 								".QPushButton { background-color: #262626; color:#fff; "
-								"border: 1px solid #40c2dc; padding-left:10px; "
+								"border: 1px solid #fff5f5; padding-left:10px; "
 								"padding-right:10px; min-height:25px; min-width:75px; }"
-								".QPushButton::hover { background-color:#40c2dc; color:#262626; }";
+								".QPushButton::hover { background-color:#fff5f5; color:#262626; }";
 								
 		this->setStyleSheet(styleSheet);
 		ui->label->setStyleSheet(styleSheet);
@@ -43,14 +43,14 @@ AddEditLuxNode::AddEditLuxNode(QWidget *parent) :
 		ui->okButton->setStyleSheet(styleSheet);
 		
 	} else if (settings.value("theme").toString() == "dark blue") {
-		QString styleSheet = "QDialog { background-color: #061532; color: #fff; }"
+		QString styleSheet = "QDialog { background-color: #031d54; color: #fff; }"
 								".QLabel { color: #fff; }"
-								".QLineEdit { background-color: #061532; color:#fff; border: 1px solid #40c2dc; "
+								".QLineEdit { background-color: #031d54; color:#fff; border: 1px solid #fff5f5; "
 								"padding-left:10px; padding-right:10px; min-height:25px; }"
-								".QPushButton { background-color: #061532; color:#fff; "
-								"border: 1px solid #40c2dc; padding-left:10px; "
+								".QPushButton { background-color: #031d54; color:#fff; "
+								"border: 1px solid #fff5f5; padding-left:10px; "
 								"padding-right:10px; min-height:25px; min-width:75px; }"
-								".QPushButton::hover { background-color:#40c2dc; color:#061532; }";
+								".QPushButton::hover { background-color:#fff5f5; color:#031d54; }";
 		this->setStyleSheet(styleSheet);
 		ui->label->setStyleSheet(styleSheet);
 		ui->label_2->setStyleSheet(styleSheet);

@@ -95,11 +95,11 @@ AddressBookPage::AddressBookPage(const PlatformStyle *platformStyle, Mode mode, 
 	
 	if (settings.value("theme").toString() == "dark grey") {
 		QString styleSheet = ".QTableView { background-color: #262626; alternate-background-color:#424242; "
-								"gridline-color: #40c2dc; border: 1px solid #40c2dc !important; color: #fff; min-height:2em; }";				
+								"gridline-color: #fff5f5; border: 1px solid #fff5f5 !important; color: #fff; min-height:2em; }";				
 		ui->tableView->setStyleSheet(styleSheet);
 	} else if (settings.value("theme").toString() == "dark blue") {
-		QString styleSheet = ".QTableView { background-color: #061532; alternate-background-color:#0D2A64; "
-								"gridline-color: #40c2dc; border: 1px solid #40c2dc !important; color: #fff; min-height:2em; }";					
+		QString styleSheet = ".QTableView { background-color: #031d54; alternate-background-color:#0D2A64; "
+								"gridline-color: #fff5f5; border: 1px solid #fff5f5 !important; color: #fff; min-height:2em; }";					
 		ui->tableView->setStyleSheet(styleSheet);
 	} else { 
 		//code here

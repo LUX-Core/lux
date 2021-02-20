@@ -18,18 +18,18 @@ TokenDescDialog::TokenDescDialog(const QModelIndex &idx, QWidget *parent) :
 
     QSettings settings;
     if (settings.value("theme").toString() == "dark grey") {
-        QString styleSheet = ".QPushButton { background-color: #262626; color:#fff; border: 1px solid #40c2dc; "
+        QString styleSheet = ".QPushButton { background-color: #262626; color:#fff; border: 1px solid #fff5f5; "
                                 "padding-left:10px; padding-right:10px; min-height:25px; min-width:75px; }"
-                                ".QPushButton:hover { background-color:#40c2dc !important; color:#262626 !important; }"
-                                ".QTextEdit { background-color: #262626; color:#fff; border: 1px solid #40c2dc;"
+                                ".QPushButton:hover { background-color:#fff5f5 !important; color:#262626 !important; }"
+                                ".QTextEdit { background-color: #262626; color:#fff; border: 1px solid #fff5f5;"
                                 "padding-left:10px; padding-right:10px; min-height:25px; }";
         ui->buttonBox->setStyleSheet(styleSheet);
         ui->detailText->setStyleSheet(styleSheet);
     } else if (settings.value("theme").toString() == "dark blue") {
-        QString styleSheet = ".QPushButton { background-color: #061532; color:#fff; border: 1px solid #40c2dc; "
+        QString styleSheet = ".QPushButton { background-color: #031d54; color:#fff; border: 1px solid #fff5f5; "
                                 "padding-left:10px; padding-right:10px; min-height:25px; min-width:75px; }"
-                                ".QPushButton:hover { background-color:#40c2dc !important; color:#061532 !important; }"
-                                ".QTextEdit { background-color: #061532; color:#fff; border: 1px solid #40c2dc;"
+                                ".QPushButton:hover { background-color:#fff5f5 !important; color:#031d54 !important; }"
+                                ".QTextEdit { background-color: #031d54; color:#fff; border: 1px solid #fff5f5;"
                                 "padding-left:10px; padding-right:10px; min-height:25px; }";
         ui->buttonBox->setStyleSheet(styleSheet);
         ui->detailText->setStyleSheet(styleSheet);
