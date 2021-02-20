@@ -343,6 +343,18 @@ crypto_libbitcoin_crypto_a_SOURCES = \
   crypto/RandomX/asm/program_prologue_linux.inc \
   crypto/RandomX/asm/program_xmm_constants.inc \
   crypto/RandomX/asm/program_loop_load.inc \
+  crypto/RandomX/asm/program_read_dataset.inc \
+  crypto/RandomX/asm/program_prologue_win64.inc \
+  crypto/RandomX/asm/program_read_dataset_sshash_init.inc \
+  crypto/RandomX/asm/program_read_dataset_sshash_fin.inc \
+  crypto/RandomX/asm/program_loop_store.inc \
+  crypto/RandomX/asm/program_epilogue_store.inc \
+  crypto/RandomX/asm/program_epilogue_win64.inc \
+  crypto/RandomX/asm/program_epilogue_linux.inc \
+  crypto/RandomX/asm/program_sshash_load.inc \
+  crypto/RandomX/asm/program_sshash_prefetch.inc \
+  crypto/RandomX/asm/program_sshash_constants.inc \
+  crypto/RandomX/asm/randomx_reciprocal.inc \
   crypto/rx2.h \
   crypto/rx2.cpp \
   cpp-ethereum/utils/libscrypt/b64.c \
