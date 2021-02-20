@@ -308,6 +308,7 @@ crypto_libbitcoin_crypto_a_SOURCES = \
   crypto/lyra2/Lyra2.h \
   crypto/lyra2/Sponge.h \
   crypto/RandomX/aes_hash.cpp \
+  crypto/RandomX/soft_aes.h \
   crypto/RandomX/argon2_ref.c \
   crypto/RandomX/argon2_ssse3.c \
   crypto/RandomX/argon2_avx2.c \
