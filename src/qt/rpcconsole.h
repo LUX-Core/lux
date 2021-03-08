@@ -159,7 +159,7 @@ Q_SIGNALS:
 private:
     static QString FormatBytes(quint64 bytes);
     void startExecutor();
-    void setTrafficGraphRange(TrafficGraphData::GraphRange range);
+    void setTrafficGraphRange(int mins);
     /** Update UI with latest network info from model. */
     void updateNetworkState();
     /** Build parameter list for restart */

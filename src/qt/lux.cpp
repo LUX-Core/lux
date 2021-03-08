@@ -753,6 +753,7 @@ int main(int argc, char* argv[])
         app.createSplashScreen(networkStyle.data());
 
     try {
+		app.setStyleSheet(GUIUtil::loadStyleSheet());
         app.createWindow(networkStyle.data());
         app.requestInitialize();
 #if defined(Q_OS_WIN) && QT_VERSION >= 0x050000

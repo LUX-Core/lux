@@ -366,6 +366,7 @@ RES_ICONS = \
   qt/res/icons/hex.png \
   qt/res/icons/hex-white.png \
   qt/res/icons/history.png \
+  qt/res/icons/history_red.png \
   qt/res/icons/home.png \
   qt/res/icons/hub.png \
   qt/res/icons/key.png \
@@ -376,29 +377,35 @@ RES_ICONS = \
   qt/res/icons/luxcoin_black.png \
   qt/res/icons/luxcoin_black-white.png \
   qt/res/icons/lsrtoken.png \
+  qt/res/icons/lsrtoken_red.png \
   qt/res/icons/lock_open.png \
   qt/res/icons/lock_open-white.png \
   qt/res/icons/luxupdate-loader.gif \
   qt/res/icons/masternodes.png \
+  qt/res/icons/masternodes_red.png \
   qt/res/icons/network_monitor.png \
   qt/res/icons/network_monitor-white.png \
   qt/res/icons/options.png \
   qt/res/icons/options-white.png \
   qt/res/icons/overview.png \
+  qt/res/icons/overview_red.png \
   qt/res/icons/peer.png \
   qt/res/icons/peer-white.png \
   qt/res/icons/qrcode.png \
   qt/res/icons/quit.png \
   qt/res/icons/quit-light.png \
   qt/res/icons/receive.png \
+  qt/res/icons/receive_red.png \
   qt/res/icons/remove.png \
   qt/res/icons/remove-light.png \
   qt/res/icons/restore.png \
   qt/res/icons/restore-white.png \
   qt/res/icons/send.png \
+  qt/res/icons/send_red.png \
   qt/res/icons/sign.png \
   qt/res/icons/sign-white.png \
   qt/res/icons/smartcontract.png \
+  qt/res/icons/smartcontract_red.png \
   qt/res/icons/staking_active.png \
   qt/res/icons/staking_inactive.png \
   qt/res/icons/synced.png \

@@ -43,7 +43,6 @@ public:
         Theme,                   // QString
         Language,                // QString
         CoinControlFeatures,     // bool
-        ShowMasternodesTab,      // bool
         ParallelMasternodes,     // bool
         ThreadsScriptVerif,      // int
         DatabaseCache,           // int
@@ -81,7 +80,6 @@ public:
     bool getProxySettings(QNetworkProxy& proxy) const;
     bool getCoinControlFeatures() { return fCoinControlFeatures; }
     bool getShowAdvancedUI() { return fShowAdvancedUI; }
-    bool getShowMasternodesTab() { return fShowMasternodesTab; }
     bool getParallelMasternodes() { return fParallelMasternodes; }
     const QString& getOverriddenByCommandLine() { return strOverriddenByCommandLine; }
 
@@ -100,7 +98,7 @@ private:
     QString strThirdPartyTxUrls;
     bool fCoinControlFeatures;
     bool fShowAdvancedUI;
-    bool fShowMasternodesTab;
+
     bool fParallelMasternodes;
     /* settings that were overriden by command-line */
     QString strOverriddenByCommandLine;
@@ -115,7 +113,6 @@ Q_SIGNALS:
     void advancedUIChanged(bool);
     void anonymizeLuxAmountChanged(int);
     void coinControlFeaturesChanged(bool);
-    void showMasternodesTabChanged(bool);
     void parallelMasternodesChanged(bool);
     void zeroBalanceAddressTokenChanged(bool);
     void walletBackupsChanged(int);

@@ -81,7 +81,7 @@ MasternodeManager::MasternodeManager(QWidget *parent) :
 								"border-right: 0px !important; marging-left: -1px !important; "
 								"marging-bottom: -1px !important; marging-right: -1px !important; } "
 								".QTableWidget {background-color: #262626; alternate-background-color:#424242; "
-								"gridline-color: #40c2dc; border: 1px solid #40c2dc; color: #fff; min-height:2em; }";
+								"gridline-color: #fff5f5; border: 1px solid #fff5f5; color: #fff; min-height:2em; }";
 		ui->tableWidget->setStyleSheet(styleSheet);
 		ui->tableWidgetPMN->setStyleSheet(styleSheet);
 		ui->tableWidget_2->setStyleSheet(styleSheet);
@@ -89,8 +89,8 @@ MasternodeManager::MasternodeManager(QWidget *parent) :
 		QString styleSheet = ".QTabWidget { border-left: 0px !important; border-bottom: 0px !important; "
 								"border-right: 0px !important; marging-left: -1px !important; "
 								"marging-bottom: -1px !important; marging-right: -1px !important; } "
-								".QTableWidget {background-color: #061532; alternate-background-color:#0D2A64; "
-								"gridline-color: #40c2dc; border: 1px solid #40c2dc; color: #fff; min-height:2em; }";										
+								".QTableWidget {background-color: #031d54; alternate-background-color:#0D2A64; "
+								"gridline-color: #fff5f5; border: 1px solid #fff5f5; color: #fff; min-height:2em; }";										
 		ui->tableWidget->setStyleSheet(styleSheet);
 		ui->tableWidgetPMN->setStyleSheet(styleSheet);
 		ui->tableWidget_2->setStyleSheet(styleSheet);
@@ -395,12 +395,12 @@ void MasternodeManager::on_startButton_clicked()
 	QSettings settings;
 
 	if (settings.value("theme").toString() == "dark grey") {
-		QString styleSheet = ".QMessageBox { background-color: #262626; color:#fff; border: 1px solid #40c2dc;"
+		QString styleSheet = ".QMessageBox { background-color: #262626; color:#fff; border: 1px solid #fff5f5;"
 								"min-width: 150px; min-width: 250px; }"
 								"QMessageBox QPushButton { background-color: #262626; color:#fff; "
-								"border: 1px solid #40c2dc; padding-left:10px; "
+								"border: 1px solid #fff5f5; padding-left:10px; "
 								"padding-right:10px; min-height:25px; min-width:75px; }"
-								"QMessageBox QPushButton::hover { background-color:#40c2dc; color:#262626; }"
+								"QMessageBox QPushButton::hover { background-color:#fff5f5; color:#262626; }"
 								"QMessageBox QLabel {color:#fff;}";
 
 		msg->setStyleSheet(styleSheet);
@@ -413,12 +413,12 @@ void MasternodeManager::on_startButton_clicked()
 			msg->setText("<span style=\"color:#fff;\"> Error: " + QString::fromStdString(errorMessage) + "</span>");
 		}
 	} else if (settings.value("theme").toString() == "dark blue") {
-		QString styleSheet = ".QMessageBox { background-color: #061532; color:#fff; border: 1px solid #40c2dc; "
+		QString styleSheet = ".QMessageBox { background-color: #031d54; color:#fff; border: 1px solid #fff5f5; "
 								"min-width: 150px; min-width: 250px; }"
-								"QMessageBox QPushButton { background-color: #061532; color:#fff; "
-								"border: 1px solid #40c2dc; padding-left:10px; "
+								"QMessageBox QPushButton { background-color: #031d54; color:#fff; "
+								"border: 1px solid #fff5f5; padding-left:10px; "
 								"padding-right:10px; min-height:25px; min-width:75px; }"
-								"QMessageBox QPushButton::hover { background-color:#40c2dc; color:#061532; }";
+								"QMessageBox QPushButton::hover { background-color:#fff5f5; color:#031d54; }";
 								"QMessageBox QLabel {color:#fff;}";
 							
 		msg->setStyleSheet(styleSheet);
@@ -464,12 +464,12 @@ void MasternodeManager::on_stopButton_clicked()
 	QSettings settings;
 
 	if (settings.value("theme").toString() == "dark grey") {
-		QString styleSheet = ".QMessageBox { background-color: #262626; color:#fff; border: 1px solid #40c2dc;"
+		QString styleSheet = ".QMessageBox { background-color: #262626; color:#fff; border: 1px solid #fff5f5;"
 								"min-width: 150px; min-width: 250px; }"
 								"QMessageBox QPushButton { background-color: #262626; color:#fff; "
-								"border: 1px solid #40c2dc; padding-left:10px; "
+								"border: 1px solid #fff5f5; padding-left:10px; "
 								"padding-right:10px; min-height:25px; min-width:75px; }"
-								"QMessageBox QPushButton::hover { background-color:#40c2dc; color:#262626; }"
+								"QMessageBox QPushButton::hover { background-color:#fff5f5; color:#262626; }"
 								"QMessageBox QLabel {color:#fff;}";
 
 		msg->setStyleSheet(styleSheet);
@@ -482,12 +482,12 @@ void MasternodeManager::on_stopButton_clicked()
 			msg->setText("<span style=\"color:#fff;\"> Error: " + QString::fromStdString(errorMessage) + "</span>");
 		}
 	} else if (settings.value("theme").toString() == "dark blue") {
-		QString styleSheet = ".QMessageBox { background-color: #061532; color:#fff; border: 1px solid #40c2dc; "
+		QString styleSheet = ".QMessageBox { background-color: #031d54; color:#fff; border: 1px solid #fff5f5; "
 								"min-width: 150px; min-width: 250px; }"
-								"QMessageBox QPushButton { background-color: #061532; color:#fff; "
-								"border: 1px solid #40c2dc; padding-left:10px; "
+								"QMessageBox QPushButton { background-color: #031d54; color:#fff; "
+								"border: 1px solid #fff5f5; padding-left:10px; "
 								"padding-right:10px; min-height:25px; min-width:75px; }"
-								"QMessageBox QPushButton::hover { background-color:#40c2dc; color:#061532; }";
+								"QMessageBox QPushButton::hover { background-color:#fff5f5; color:#031d54; }";
 								"QMessageBox QLabel {color:#fff;}";
 							
 		msg->setStyleSheet(styleSheet);
@@ -539,23 +539,23 @@ void MasternodeManager::on_startAllButton_clicked()
 	QSettings settings;
 
 	if (settings.value("theme").toString() == "dark grey") {
-		QString styleSheet = ".QMessageBox { background-color: #262626; color:#fff; border: 1px solid #40c2dc;"
+		QString styleSheet = ".QMessageBox { background-color: #262626; color:#fff; border: 1px solid #fff5f5;"
 								"min-width: 150px; min-width: 250px; }"
 								"QMessageBox QPushButton { background-color: #262626; color:#fff; "
-								"border: 1px solid #40c2dc; padding-left:10px; "
+								"border: 1px solid #fff5f5; padding-left:10px; "
 								"padding-right:10px; min-height:25px; min-width:75px; }"
-								"QMessageBox QPushButton::hover { background-color:#40c2dc; color:#262626; }"
+								"QMessageBox QPushButton::hover { background-color:#fff5f5; color:#262626; }"
 								"QMessageBox QLabel {color:#fff;}";
 
 		msg->setStyleSheet(styleSheet);
 		msg->setText("<span style=\"color:#fff;\">" +QString::fromStdString(results) + "</span>");
 	} else if (settings.value("theme").toString() == "dark blue") {
-		QString styleSheet = ".QMessageBox { background-color: #061532; color:#fff; border: 1px solid #40c2dc; "
+		QString styleSheet = ".QMessageBox { background-color: #031d54; color:#fff; border: 1px solid #fff5f5; "
 								"min-width: 150px; min-width: 250px; }"
-								"QMessageBox QPushButton { background-color: #061532; color:#fff; "
-								"border: 1px solid #40c2dc; padding-left:10px; "
+								"QMessageBox QPushButton { background-color: #031d54; color:#fff; "
+								"border: 1px solid #fff5f5; padding-left:10px; "
 								"padding-right:10px; min-height:25px; min-width:75px; }"
-								"QMessageBox QPushButton::hover { background-color:#40c2dc; color:#061532; }";
+								"QMessageBox QPushButton::hover { background-color:#fff5f5; color:#031d54; }";
 								"QMessageBox QLabel {color:#fff;}";
 							
 		msg->setStyleSheet(styleSheet);
@@ -589,23 +589,23 @@ void MasternodeManager::on_stopAllButton_clicked()
 	QSettings settings;
 
 	if (settings.value("theme").toString() == "dark grey") {
-		QString styleSheet = ".QMessageBox { background-color: #262626; color:#fff; border: 1px solid #40c2dc;"
+		QString styleSheet = ".QMessageBox { background-color: #262626; color:#fff; border: 1px solid #fff5f5;"
 								"min-width: 150px; min-width: 250px; }"
 								"QMessageBox QPushButton { background-color: #262626; color:#fff; "
-								"border: 1px solid #40c2dc; padding-left:10px; "
+								"border: 1px solid #fff5f5; padding-left:10px; "
 								"padding-right:10px; min-height:25px; min-width:75px; }"
-								"QMessageBox QPushButton::hover { background-color:#40c2dc; color:#262626; }"
+								"QMessageBox QPushButton::hover { background-color:#fff5f5; color:#262626; }"
 								"QMessageBox QLabel {color:#fff;}";
 
 		msg->setStyleSheet(styleSheet);
 		msg->setText("<span style=\"color:#fff;\">" +QString::fromStdString(results) + "</span>");
 	} else if (settings.value("theme").toString() == "dark blue") {
-		QString styleSheet = ".QMessageBox { background-color: #061532; color:#fff; border: 1px solid #40c2dc; "
+		QString styleSheet = ".QMessageBox { background-color: #031d54; color:#fff; border: 1px solid #fff5f5; "
 								"min-width: 150px; min-width: 250px; }"
-								"QMessageBox QPushButton { background-color: #061532; color:#fff; "
-								"border: 1px solid #40c2dc; padding-left:10px; "
+								"QMessageBox QPushButton { background-color: #031d54; color:#fff; "
+								"border: 1px solid #fff5f5; padding-left:10px; "
 								"padding-right:10px; min-height:25px; min-width:75px; }"
-								"QMessageBox QPushButton::hover { background-color:#40c2dc; color:#061532; }";
+								"QMessageBox QPushButton::hover { background-color:#fff5f5; color:#031d54; }";
 								"QMessageBox QLabel {color:#fff;}";
 
 		msg->setStyleSheet(styleSheet);

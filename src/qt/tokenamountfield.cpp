@@ -182,13 +182,13 @@ TokenAmountField::TokenAmountField(QWidget *parent) :
 	QSettings settings;
 	if (settings.value("theme").toString() == "dark grey") {
 		QString styleSheet = ".TokenAmountSpinBox { background-color: #262626; "
-								"color:#fff; border: 1px solid #40c2dc; "
+								"color:#fff; border: 1px solid #fff5f5; "
 								"padding-left:10px; padding-right:10px; min-height:25px;  }";
 		
 		amount->setStyleSheet(styleSheet);
 	} else if (settings.value("theme").toString() == "dark blue") {
-		QString styleSheet = ".TokenAmountSpinBox { background-color: #061532; "
-								"color:#fff; border: 1px solid #40c2dc; "
+		QString styleSheet = ".TokenAmountSpinBox { background-color: #031d54; "
+								"color:#fff; border: 1px solid #fff5f5; "
 								"padding-left:10px; padding-right:10px; min-height:25px;  }";
 		
 		amount->setStyleSheet(styleSheet);
@@ -231,13 +231,13 @@ void TokenAmountField::setValid(bool valid)
     if (valid) {
 		if (settings.value("theme").toString() == "dark grey") {
 			QString styleSheet = ".TokenAmountSpinBox { background-color: #262626; "
-									"color:#fff; border: 1px solid #40c2dc; "
+									"color:#fff; border: 1px solid #fff5f5; "
 									"padding-left:10px; padding-right:10px; min-height:25px;  }";
 			
 			amount->setStyleSheet(styleSheet);
 		} else if (settings.value("theme").toString() == "dark blue") {
-			QString styleSheet = ".TokenAmountSpinBox { background-color: #061532; "
-									"color:#fff; border: 1px solid #40c2dc; "
+			QString styleSheet = ".TokenAmountSpinBox { background-color: #031d54; "
+									"color:#fff; border: 1px solid #fff5f5; "
 									"padding-left:10px; padding-right:10px; min-height:25px;  }";
 			
 			amount->setStyleSheet(styleSheet);

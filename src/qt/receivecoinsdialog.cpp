@@ -105,28 +105,28 @@ void ReceiveCoinsDialog::setModel(WalletModel* model)
         tableView->setColumnWidth(RecentRequestsTableModel::Date, DATE_COLUMN_WIDTH);
         tableView->setColumnWidth(RecentRequestsTableModel::Label, LABEL_COLUMN_WIDTH );
 		
-	QSettings settings;
+        QSettings settings;
 
-	if (settings.value("theme").toString() == "dark grey") {
-		QString styleSheet = ".QTableView {  background-color: #262626; alternate-background-color:#424242; "
-								"gridline-color: #40c2dc; border: 1px ssolid #40c2dc; "
+        if (settings.value("theme").toString() == "dark grey") {
+            QString styleSheet = ".QTableView {  background-color: #262626; alternate-background-color:#424242; "
+								"gridline-color: #fff5f5; border: 1px ssolid #fff5f5; "
 								"color: #fff; }";
-		tableView->setStyleSheet(styleSheet);	
+            tableView->setStyleSheet(styleSheet);	
 
-	} else if (settings.value("theme").toString() == "dark blue") {
-		QString styleSheet = ".QTableView {  background-color: #061532; alternate-background-color:#0D2A64; "
-								"gridline-color: #40c2dc; border: 1px ssolid #40c2dc;"
+        } else if (settings.value("theme").toString() == "dark blue") {
+            QString styleSheet = ".QTableView {  background-color: #031d54; alternate-background-color:#0D2A64; "
+								"gridline-color: #fff5f5; border: 1px ssolid #fff5f5;"
 								"color: #fff; }";
-		tableView->setStyleSheet(styleSheet);	
-	} else { 
-		//code here
-	}
+            tableView->setStyleSheet(styleSheet);	
+        } else { 
+            //code here
+        }
 
         connect(tableView->selectionModel(),
             SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this,
             SLOT(recentRequestsView_selectionChanged(QItemSelection, QItemSelection)));
         // Last 2 columns are set by the columnResizingFixer, when the table geometry is ready.
-        columnResizingFixer = new GUIUtil::TableViewLastColumnResizingFixer(tableView, AMOUNT_MINIMUM_COLUMN_WIDTH, DATE_COLUMN_WIDTH-10, this);
+        columnResizingFixer = new GUIUtil::TableViewLastColumnResizingFixer(tableView, AMOUNT_MINIMUM_COLUMN_WIDTH, MINIMUM_COLUMN_WIDTH-10, this);
     }
 }
 

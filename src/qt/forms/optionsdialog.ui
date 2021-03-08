@@ -288,16 +288,6 @@
            </widget>
           </item>
           <item>
-           <widget class="QCheckBox" name="showMasternodesTab">
-            <property name="toolTip">
-             <string>Show additional tab listing all your masternodes in first sub-tab&lt;br/&gt;and all masternodes on the network in second sub-tab.</string>
-            </property>
-            <property name="text">
-             <string>Show Masternodes Tab</string>
-            </property>
-           </widget>
-          </item>
-          <item>
            <widget class="QCheckBox" name="showAdvancedUI">
             <property name="toolTip">
              <string>Show additional information and buttons for Luxsend on overview screen.</string>

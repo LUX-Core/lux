@@ -143,29 +143,29 @@ TransactionView::TransactionView(const PlatformStyle *platformStyle, QWidget* pa
 
 	if (settings.value("theme").toString() == "dark grey") {
 		QString styleSheet = ".QHeaderView { background-color: transparent; outline: 10;  margin-left: -1px !important; "
-								"border-top: 1px solid #40c2dc; border-left: 1px solid #40c2dc; }"
+								"border-top: 1px solid #fff5f5; border-left: 1px solid #fff5f5; }"
 								".QHeaderView::section { qproperty-alignment: center; background-color: #262626; "
 								"color: #fff; min-height: 25px; min-width: 20px; font-weight: bold; font-size: 12px; "
-								"border: 0; border-right: 1px solid #40c2dc; border-bottom: 1px solid #40c2dc; "
+								"border: 0; border-right: 1px solid #fff5f5; border-bottom: 1px solid #fff5f5; "
 								"padding-left: 5px; padding-right: 5px; padding-top: 2px; padding-bottom: 2px; }"
-								".QHeaderView::section:last { border-right: 1px solid #40c2dc; }"
-								".QTableCornerButton::section { background-color:#262626; border: 0px solid #40c2dc !important;}"
+								".QHeaderView::section:last { border-right: 1px solid #fff5f5; }"
+								".QTableCornerButton::section { background-color:#262626; border: 0px solid #fff5f5 !important;}"
 								".QTableView { background-color: #262626; alternate-background-color:#424242; "
-								"gridline-color: #40c2dc; border: 0px solid #40c2dc !important; border-left: 1px solid #40c2dc !important; "
-								"border-bottom: 1px solid #40c2dc !important; color: #fff; min-height:2em; margin-top: 5px  !important; }";					
+								"gridline-color: #fff5f5; border: 0px solid #fff5f5 !important; border-left: 1px solid #fff5f5 !important; "
+								"border-bottom: 1px solid #fff5f5 !important; color: #fff; min-height:2em; margin-top: 5px  !important; }";					
 		view->setStyleSheet(styleSheet);
 	} else if (settings.value("theme").toString() == "dark blue") {
 		QString styleSheet = ".QHeaderView { background-color: transparent; outline: 10;  margin-left: -1px !important; "
-								"border-top: 1px solid #40c2dc; border-left: 1px solid #40c2dc; }"
-								".QHeaderView::section { qproperty-alignment: center; background-color: #061532; "
+								"border-top: 1px solid #fff5f5; border-left: 1px solid #fff5f5; }"
+								".QHeaderView::section { qproperty-alignment: center; background-color: #031d54; "
 								"color: #fff; min-height: 25px; min-width: 20px; font-weight: bold; font-size: 12px; "
-								"border: 0; border-right: 1px solid #40c2dc; border-bottom: 1px solid #40c2dc; "
+								"border: 0; border-right: 1px solid #fff5f5; border-bottom: 1px solid #fff5f5; "
 								"padding-left: 5px; padding-right: 5px; padding-top: 2px; padding-bottom: 2px; }"
-								".QHeaderView::section:last { border-right: 1px solid #40c2dc; }"
-								".QTableCornerButton::section { background-color:#061532; border: 0px solid #40c2dc !important;}"
-								".QTableView { background-color: #061532; alternate-background-color:#0D2A64; "
-								"gridline-color: #40c2dc; border: 0px solid #40c2dc !important; border-left: 1px solid #40c2dc !important; "
-								"border-bottom: 1px solid #40c2dc !important; color: #fff; min-height:2em; margin-top: 5px  !important; }";	
+								".QHeaderView::section:last { border-right: 1px solid #fff5f5; }"
+								".QTableCornerButton::section { background-color:#031d54; border: 0px solid #fff5f5 !important;}"
+								".QTableView { background-color: #031d54; alternate-background-color:#0D2A64; "
+								"gridline-color: #fff5f5; border: 0px solid #fff5f5 !important; border-left: 1px solid #fff5f5 !important; "
+								"border-bottom: 1px solid #fff5f5 !important; color: #fff; min-height:2em; margin-top: 5px  !important; }";	
 		view->setStyleSheet(styleSheet);
 	} else { 
 		//code here

@@ -62,15 +62,15 @@ SendTokenPage::SendTokenPage(QWidget *parent) :
 	QSettings settings;
 	
 	if (settings.value("theme").toString() == "dark grey") {
-		QString styleSheet = ".QPushButton { background-color: #262626; color:#fff; border: 1px solid #40c2dc; "
+		QString styleSheet = ".QPushButton { background-color: #262626; color:#fff; border: 1px solid #fff5f5; "
 								"padding-left:10px; padding-right:10px; min-height:25px; min-width:75px; }"
-								".QPushButton:hover { background-color:#40c2dc !important; color:#262626 !important; }";					
+								".QPushButton:hover { background-color:#fff5f5 !important; color:#262626 !important; }";					
 		ui->confirmButton->setStyleSheet(styleSheet);
 		ui->clearButton->setStyleSheet(styleSheet);
 	} else if (settings.value("theme").toString() == "dark blue") {
-		QString styleSheet = ".QPushButton { background-color: #061532; color:#fff; border: 1px solid #40c2dc; "
+		QString styleSheet = ".QPushButton { background-color: #031d54; color:#fff; border: 1px solid #fff5f5; "
 								"padding-left:10px; padding-right:10px; min-height:25px; min-width:75px; }"
-								".QPushButton:hover { background-color:#40c2dc; color:#061532; }";					
+								".QPushButton:hover { background-color:#fff5f5; color:#031d54; }";					
 		ui->confirmButton->setStyleSheet(styleSheet);
 		ui->clearButton->setStyleSheet(styleSheet);
 	} else { 

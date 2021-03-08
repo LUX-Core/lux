@@ -58,9 +58,9 @@ HelpMessageDialog::HelpMessageDialog(QWidget* parent, HelpMode helpMode) : QDial
         uri.setMinimal(true); // use non-greedy matching
 		
 		if (settings.value("theme").toString() == "dark grey") {
-			licenseInfoHTML.replace(uri, "<a href=\"\\1\"><span style=\"color:#40c2dc;\">\\1</span></a>");
+			licenseInfoHTML.replace(uri, "<a href=\"\\1\"><span style=\"color:#fff5f5;\">\\1</span></a>");
 		} else if (settings.value("theme").toString() == "dark blue") {
-			licenseInfoHTML.replace(uri, "<a href=\"\\1\"><span style=\"color:#40c2dc;\">\\1</span></a>");
+			licenseInfoHTML.replace(uri, "<a href=\"\\1\"><span style=\"color:#fff5f5;\">\\1</span></a>");
 		} else { 
 			licenseInfoHTML.replace(uri, "<a href=\"\\1\">\\1</a>");
 		}        
@@ -151,11 +151,11 @@ HelpMessageDialog::HelpMessageDialog(QWidget* parent, HelpMode helpMode) : QDial
     }
 
 	if (settings.value("theme").toString() == "dark grey") {
-		QString styleSheet = ".QTextEdit { border: 0px; border-left: 1px solid #40c2dc;}";
+		QString styleSheet = ".QTextEdit { border: 0px; border-left: 1px solid #fff5f5;}";
 		ui->helpMessage->setStyleSheet(styleSheet);
 		ui->graphic->setPixmap(QPixmap(":/images/about-white"));
 	} else if (settings.value("theme").toString() == "dark blue") {
-		QString styleSheet = ".QTextEdit { border: 0px; border-left: 1px solid #40c2dc;}";
+		QString styleSheet = ".QTextEdit { border: 0px; border-left: 1px solid #fff5f5;}";
 		ui->helpMessage->setStyleSheet(styleSheet);
 		ui->graphic->setPixmap(QPixmap(":/images/about-white"));
 	} else { 
@@ -206,14 +206,14 @@ ShutdownWindow::ShutdownWindow(QWidget* parent, Qt::WindowFlags f) : QWidget(par
 	QSettings settings;
 	
 	if (settings.value("theme").toString() == "dark grey") {
-		shutdownText->setStyleSheet("background-color: #262626; color: #fff; border: 0px solid #40c2dc !important;");
-		shutdownLogo->setStyleSheet("background-color: #262626; color: #fff; border: 0px solid #40c2dc !important;");		
+		shutdownText->setStyleSheet("background-color: #262626; color: #fff; border: 0px solid #fff5f5 !important;");
+		shutdownLogo->setStyleSheet("background-color: #262626; color: #fff; border: 0px solid #fff5f5 !important;");		
 		shutdownLogo->setPixmap(QPixmap(":/icons/warning-white")
 								.scaled(70,70,Qt::KeepAspectRatio,
 								Qt::SmoothTransformation));
 	} else if (settings.value("theme").toString() == "dark blue") {
-		shutdownText->setStyleSheet("background-color: #061532; color: #fff; border: 0px solid #40c2dc !important;");
-		shutdownLogo->setStyleSheet("background-color: #061532; color: #fff; border: 0px solid #40c2dc !important;");
+		shutdownText->setStyleSheet("background-color: #031d54; color: #fff; border: 0px solid #fff5f5 !important;");
+		shutdownLogo->setStyleSheet("background-color: #031d54; color: #fff; border: 0px solid #fff5f5 !important;");
 		shutdownLogo->setPixmap(QPixmap(":/icons/warning-white")
 								.scaled(70,70,Qt::KeepAspectRatio,
 								Qt::SmoothTransformation));
@@ -248,9 +248,9 @@ QWidget *ShutdownWindow::showShutdownWindow(BitcoinGUI* window)
 	QSettings settings;
 
 	if (settings.value("theme").toString() == "dark grey") {
-		shutdownWindow->setStyleSheet("background-color: #262626; border: 1px solid #40c2dc;");
+		shutdownWindow->setStyleSheet("background-color: #262626; border: 1px solid #fff5f5;");
 	} else if (settings.value("theme").toString() == "dark blue") {
-		shutdownWindow->setStyleSheet("background-color: #061532; border: 1px solid #40c2dc;");
+		shutdownWindow->setStyleSheet("background-color: #031d54; border: 1px solid #fff5f5;");
 	} else { 
 		shutdownWindow->setStyleSheet("background-color: #ffffff;");
 	}
