@@ -387,9 +387,14 @@ UniValue getblock(const UniValue& params, bool fHelp)
     uint256 hash(strHash);
 
     bool fVerbose = true;
-    if (params.size() > 1)
-        fVerbose = params[1].get_bool();
-
+    if (params.size() > 1) {
+        if(params[1].isBool()) {
+            fVerbose = params[1].get_bool();
+        } else {
+            fVerbose = params[1].get_int() ? true : false;
+        }        
+    }
+    
     if (mapBlockIndex.count(hash) == 0)
         throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Block not found");
 
