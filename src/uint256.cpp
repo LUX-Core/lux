@@ -216,7 +216,7 @@ unsigned int base_uint<BITS>::bits() const
     for (int pos = WIDTH - 1; pos >= 0; pos--) {
         if (pn[pos]) {
             for (int bits = 31; bits > 0; bits--) {
-                if (pn[pos] & 1 << bits)
+                if (pn[pos] & 1U << bits) // 1U instead of 1 to avoid Shifting a signed 32-bit value by 31 bits
                     return 32 * pos + bits + 1;
             }
             return 32 * pos + 1;

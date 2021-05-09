@@ -83,7 +83,7 @@ public:
         base_uint ret;
         for (int i = 0; i < WIDTH; i++)
             ret.pn[i] = ~pn[i];
-        ret++;
+        ++ret; // no need to use post-increment when pre-increment is available for this class
         return ret;
     }
 
@@ -177,7 +177,7 @@ public:
     {
         // prefix operator
         int i = 0;
-        while (++pn[i] == 0 && i < WIDTH - 1)
+        while (i < WIDTH - 1 && ++pn[i] == 0) // don't use i as an index before checking we are within limits 
             i++;
         return *this;
     }
@@ -194,7 +194,7 @@ public:
     {
         // prefix operator
         int i = 0;
-        while (--pn[i] == (uint32_t)-1 && i < WIDTH - 1)
+        while (i < WIDTH - 1 && --pn[i] == (uint32_t)-1) // don't use i as an index before checking we are within limits
             i++;
         return *this;
     }
