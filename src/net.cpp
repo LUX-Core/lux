@@ -1581,7 +1581,7 @@ void ThreadOpenAddedConnections()
     }
 }
 
-double getVerificationProgress(const CBlockIndex *tipIn) // here to avoid include loops 
+bool getVerificationProgress(const CBlockIndex *tipIn) // here to avoid include loops 
 {
     CBlockIndex *tip = const_cast<CBlockIndex *>(tipIn);
     if (!tip)
@@ -1589,47 +1589,72 @@ double getVerificationProgress(const CBlockIndex *tipIn) // here to avoid includ
         LOCK(cs_main);
         tip = chainActive.Tip();
     }
-    return Checkpoints::GuessVerificationProgress(Params().Checkpoints(), tip);
+    return Checkpoints::GuessVerificationProgress(Params().Checkpoints(), tip) < 0.999;
 }
 
 void limit_peers(int i);
 void Threadlimitpeers(){
 
     if(mapArgs.count("-peerlimit")){ // don't read what is not readable 
-        std::string str = mapArgs["-peerlimit"];
-        int num = std::stoi( str );
+        std::string str2 = mapArgs["-peerlimit"];
+        int num = std::stoi( str2 );
 
-        if (num==0){ // peer sync limit off. mapArgs should do the job but, peerlimit=0 is more reassuring to the user then peerlimit not being there 
+        if (num==0){ // Peer sync limit off. mapArgs should do the job but, peerlimit=0 is more reassuring to the user then peerlimit not being there 
+            LogPrintf("Threadlimitpeers(): peer limiting disabled\n");
             return;
         }
 
-        if (num <= 3){ // don't allow less then 4 peers
+        if (num <= 3){ // Don't allow less then 4 peers
             num = 4;
+            LogPrintf("Threadlimitpeers(): peer limit (%d) is too low. limit set to 4 peers.\n", num);
         }
 
-        for ( ; getVerificationProgress(NULL) < 0.999 ; ){ // 99.9%
+        if (num >= 16){ // I hope this never gets run.....
+            LogPrintf("Threadlimitpeers(): peer limit (%d) is too high. limit set to 16 peers.\n", num);
+            num = 16;
+        }
+        
+        for ( ; getVerificationProgress(NULL) ; ){ // 99.9%
             limit_peers(num);
-            MilliSleep(1000);
+            MilliSleep(10000);
         }
     }
 }
 
 void limit_peers(int i)
 {
-    i--;
     LOCK(cs_main);
+    i--;
+
     vector<CNodeStats> vstats;
+    CNodeStats temp;
     CopyNodeStats_h(vstats);
-    int k = 0;
-    for (CNodeStats& stats : vstats) {
+    if (vstats.size() > 0){ // avoid a nice Segmentation fault if we have no peers and avoid locking-up resources for nothing 
+        int a=0, j=0, k=0, n = vstats.size();
 
-        if (i < k){
-            string strNode = stats.addrName;
-            CNode *bannedNode = FindNode(strNode);
-            bannedNode->CloseSocketDisconnect(); 
+        for(a=0;a<n;a++)
+        {
+            for(j=a+1;j<n;j++)
+            {
+                if(vstats[a].dPingTime > vstats[j].dPingTime)
+                {
+                    temp = vstats[a];
+                    vstats[a] = vstats[j];
+                    vstats[j] = temp;
+                }
+            }
         }
-        k++;
 
+        for (CNodeStats& stats : vstats) {
+
+            if (i < k){
+                string strNode = stats.addrName;
+                CNode *bannedNode = FindNode(strNode);
+                bannedNode->CloseSocketDisconnect(); 
+                LogPrintf("(peer_limit() disconnected a peer) peer ip = %d node-id = %d ping = %dms \n",stats.addrName, stats.nodeid, stats.dPingTime*1000);
+            }
+            k++;
+        }
     }
 }
 
@@ -1663,7 +1688,6 @@ bool OpenNetworkConnection(const CAddress& addrConnect, bool fCountFailure, CSem
 
     return true;
 }
-
 
 void ThreadMessageHandler() {
     boost::mutex condition_mutex;
